@@ -53,6 +53,7 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
                                                   IDirect3DVolumeTexture9 * *ppVolumeTexture, HANDLE * pSharedHandle);
     virtual HRESULT __stdcall CreateCubeTexture(UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
                                                 IDirect3DCubeTexture9 * *ppCubeTexture, HANDLE * pSharedHandle);
+    void                      ApplyBorderlessPresentationTuning();
     virtual HRESULT __stdcall CreateVertexBuffer(UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool, IDirect3DVertexBuffer9 * *ppVertexBuffer,
                                                  HANDLE * pSharedHandle);
     virtual HRESULT __stdcall CreateIndexBuffer(UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DIndexBuffer9 * *ppIndexBuffer,
@@ -610,3 +611,18 @@ struct SGammaState
 };
 
 extern SGammaState g_GammaState;
+
+namespace BorderlessGamma
+{
+    extern const float kGammaMin;
+    extern const float kGammaMax;
+    extern const float kBrightnessMin;
+    extern const float kBrightnessMax;
+    extern const float kContrastMin;
+    extern const float kContrastMax;
+    extern const float kSaturationMin;
+    extern const float kSaturationMax;
+
+    void FetchSettings(float& gammaPower, float& brightnessScale, float& contrastScale, float& saturationScale, bool& applyWindowed, bool& applyFullscreen);
+    bool ShouldApplyAdjustments(float gammaPower, float brightnessScale, float contrastScale, float saturationScale);
+}

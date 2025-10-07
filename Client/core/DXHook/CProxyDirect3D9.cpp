@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "ComPtrValidation.h"
 #include <dwmapi.h>
 #include <resource.h>
 
@@ -18,43 +19,27 @@ extern HINSTANCE g_hModule;
 namespace
 {
 template <typename T>
-bool IsValidComInterfacePointer(T* pointer)
-{
-    if (!pointer)
-        return true;
-
-    if (!SharedUtil::IsReadablePointer(pointer, sizeof(void*)))
-        return false;
-
-    void* const* vtablePtr = reinterpret_cast<void* const*>(pointer);
-    if (!vtablePtr)
-        return false;
-
-    void* const vtable = *vtablePtr;
-    if (!vtable)
-        return false;
-
-    constexpr size_t requiredBytes = sizeof(void*) * 3;
-    return SharedUtil::IsReadablePointer(vtable, requiredBytes);
-}
-
-template <typename T>
 void ReleaseInterface(T*& pointer, const char* context = nullptr)
 {
     if (!pointer)
         return;
 
-    if (IsValidComInterfacePointer(pointer))
+    T* heldPointer = pointer;
+
+    const bool valid = IsValidComInterfacePointer(pointer, ComPtrValidation::ValidationMode::ForceRefresh);
+
+    if (valid)
     {
-        pointer->Release();
+        heldPointer->Release();
     }
     else
     {
-    SString label;
-    label = context ? context : "ReleaseInterface";
+        SString label;
+        label = context ? context : "ReleaseInterface";
         SString message;
-        message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), pointer);
+        message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), heldPointer);
         AddReportLog(8752, message, 5);
+        ComPtrValidation::Invalidate(heldPointer);
     }
 
     pointer = nullptr;
@@ -66,10 +51,10 @@ void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
     if (destination == source)
         return;
 
-    if (source && !IsValidComInterfacePointer(source))
+    if (source && !IsValidComInterfacePointer(source, ComPtrValidation::ValidationMode::ForceRefresh))
     {
-    SString label;
-    label = context ? context : "ReplaceInterface";
+        SString label;
+        label = context ? context : "ReplaceInterface";
         SString message;
         message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
         AddReportLog(8753, message, 5);
@@ -87,24 +72,26 @@ IDirect3D9* GetFirstValidTrackedDirect3D(std::vector<IDirect3D9*>& trackedList)
     for (auto iter = trackedList.begin(); iter != trackedList.end();)
     {
         IDirect3D9* candidate = *iter;
-        if (candidate && IsValidComInterfacePointer(candidate))
+        if (candidate && IsValidComInterfacePointer(candidate, ComPtrValidation::ValidationMode::ForceRefresh))
             return candidate;
 
         SString message;
         message.Format("CProxyDirect3D9: removing invalid tracked IDirect3D9 pointer %p", candidate);
         AddReportLog(8756, message, 5);
+        ComPtrValidation::Invalidate(candidate);
         iter = trackedList.erase(iter);
     }
 
     return nullptr;
 }
-}        // namespace
+}  // unnamed namespace
 
 HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
 std::vector<IDirect3D9*> ms_CreatedDirect3D9List;
 bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
+void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters);
 
 CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
     : m_pDevice(nullptr)
@@ -112,7 +99,7 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 {
     WriteDebugEvent(SString("CProxyDirect3D9::CProxyDirect3D9 %08x", this));
 
-    if (!IsValidComInterfacePointer(pInterface))
+    if (!IsValidComInterfacePointer(pInterface, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("CProxyDirect3D9 ctor: received invalid IDirect3D9 pointer %p", pInterface);
@@ -127,7 +114,7 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 
     if (m_pDevice)
     {
-        if (IsValidComInterfacePointer(m_pDevice))
+    if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             ms_CreatedDirect3D9List.push_back(m_pDevice);
         }
@@ -150,11 +137,11 @@ CProxyDirect3D9::~CProxyDirect3D9()
 /*** IUnknown methods ***/
 HRESULT CProxyDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
 {
-    if (!m_pDevice || !IsValidComInterfacePointer(m_pDevice))
+    if (!m_pDevice || !IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
     {
-    SString message;
-    message.Format("CProxyDirect3D9::QueryInterface rejected invalid IDirect3D9 pointer %p", m_pDevice);
-    AddReportLog(8752, message, 5);
+        SString message;
+        message.Format("CProxyDirect3D9::QueryInterface rejected invalid IDirect3D9 pointer %p", m_pDevice);
+        AddReportLog(8752, message, 5);
         if (ppvObj)
             *ppvObj = nullptr;
         return E_POINTER;
@@ -169,14 +156,14 @@ ULONG CProxyDirect3D9::AddRef()
 
     if (m_pDevice)
     {
-        if (IsValidComInterfacePointer(m_pDevice))
+        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             m_pDevice->AddRef();
         }
         else
         {
             SString message;
-            message.Format("CProxyDirect3D9::AddRef skipped underlying AddRef; invalid pointer %p", m_pDevice);
+            message.Format("CProxyDirect3D9::AddRef rejected invalid IDirect3D9 pointer %p", m_pDevice);
             AddReportLog(8752, message, 5);
         }
     }
@@ -190,22 +177,22 @@ ULONG CProxyDirect3D9::Release()
 
     if (lNewRefCount < 0)
     {
-    SString message;
-    message.Format("CProxyDirect3D9::Release detected reference count underflow for proxy %p", this);
-    AddReportLog(8752, message, 5);
+        SString message;
+        message.Format("CProxyDirect3D9::Release detected reference count underflow for proxy %p", this);
+        AddReportLog(8752, message, 5);
         lNewRefCount = 0;
     }
 
     if (m_pDevice && lNewRefCount > 0)
     {
-        if (IsValidComInterfacePointer(m_pDevice))
+        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             m_pDevice->Release();
         }
         else
         {
             SString message;
-            message.Format("CProxyDirect3D9::Release skipped underlying Release; invalid pointer %p", m_pDevice);
+            message.Format("CProxyDirect3D9::Release rejected invalid IDirect3D9 pointer %p", m_pDevice);
             AddReportLog(8752, message, 5);
         }
     }
@@ -349,7 +336,20 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     #endif
 
     // Set dark titlebar if needed
-    BOOL darkTitleBar = GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme") == "\x0";
+    int themeStatus = 0;
+    const SString appsUseLightTheme =
+        GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme", &themeStatus);
+    BOOL darkTitleBar = FALSE;
+    if (themeStatus > 0)
+    {
+        // Parse the registry value into a numeric flag
+        char* themeEnd = nullptr;
+        const long themeNumeric = strtol(appsUseLightTheme.c_str(), &themeEnd, 10);
+        if (themeEnd != appsUseLightTheme.c_str() && *themeEnd == '\0')
+        {
+            darkTitleBar = (themeNumeric == 0);
+        }
+    }
     DwmSetWindowAttribute(hFocusWindow, DWMWA_USE_IMMERSIVE_DARK_MODE, &darkTitleBar, sizeof(darkTitleBar));
 
     // Update icon
@@ -392,7 +392,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
             AddReportLog(8755, SStringX("CProxyDirect3D9::CreateDevice - driver returned nullptr device"), 5);
             hResult = D3DERR_INVALIDDEVICE;
         }
-        else if (!IsValidComInterfacePointer(pCreatedDevice))
+    else if (!IsValidComInterfacePointer(pCreatedDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             SString message;
             message.Format("CProxyDirect3D9::CreateDevice - rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
@@ -427,7 +427,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
         *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(pOriginalDevice);
         if (pOriginalDevice)
         {
-            if (IsValidComInterfacePointer(pOriginalDevice))
+            if (IsValidComInterfacePointer(pOriginalDevice, ComPtrValidation::ValidationMode::ForceRefresh))
             {
                 pOriginalDevice->Release();
             }
@@ -454,24 +454,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     if (SUCCEEDED(hResult) && *ppReturnedDeviceInterface)
     {
         // Check if we're in borderless mode
-        bool bIsBorderlessMode = pPresentationParameters->Windowed == TRUE;
-
-        if (bIsBorderlessMode)
-        {
-            // Enable sRGB correction for borderless mode to compensate for DWM composition
-            CProxyDirect3DDevice9* pProxyDevice = static_cast<CProxyDirect3DDevice9*>(*ppReturnedDeviceInterface);
-
-            // Set initial render states for proper color handling
-            pProxyDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, TRUE);
-
-            // Configure samplers for sRGB texture reading
-            for (DWORD i = 0; i < 8; i++)
-            {
-                pProxyDevice->SetSamplerState(i, D3DSAMP_SRGBTEXTURE, TRUE);
-            }
-
-            WriteDebugEvent("Applied sRGB color correction for borderless mode");
-        }
+        ApplyBorderlessColorCorrection(static_cast<CProxyDirect3DDevice9*>(*ppReturnedDeviceInterface), *pPresentationParameters);
     }
 
     return hResult;
@@ -549,6 +532,53 @@ namespace
     uint ms_uiCreationAttempts = 0;
 }            // namespace
 
+void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters)
+{
+    if (!proxyDevice)
+        return;
+
+    bool bBorderless = false;
+    if (CVideoModeManagerInterface* videoModeManager = GetVideoModeManager())
+    {
+        bBorderless = videoModeManager->IsDisplayModeWindowed() || videoModeManager->IsDisplayModeFullScreenWindow();
+    }
+    else
+    {
+        bBorderless = (presentationParameters.Windowed != 0);
+    }
+
+    float gammaPower = 1.0f;
+    float brightnessScale = 1.0f;
+    float contrastScale = 1.0f;
+    float saturationScale = 1.0f;
+    bool  applyWindowed = true;
+    bool  applyFullscreen = false;
+    BorderlessGamma::FetchSettings(gammaPower, brightnessScale, contrastScale, saturationScale, applyWindowed, applyFullscreen);
+
+    const bool adjustmentsEnabled = bBorderless ? applyWindowed : applyFullscreen;
+    const bool hasAdjustments = adjustmentsEnabled && BorderlessGamma::ShouldApplyAdjustments(gammaPower, brightnessScale, contrastScale, saturationScale);
+
+    if (!hasAdjustments)
+    {
+        proxyDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
+        for (DWORD sampler = 0; sampler < 8; ++sampler)
+        {
+            proxyDevice->SetSamplerState(sampler, D3DSAMP_SRGBTEXTURE, FALSE);
+        }
+        if (bBorderless)
+            WriteDebugEvent("Cleared sRGB color correction for windowed/borderless mode");
+        else
+            WriteDebugEvent("Cleared sRGB color correction for fullscreen mode");
+        return;
+    }
+
+    proxyDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, TRUE);
+    for (DWORD sampler = 0; sampler < 8; ++sampler)
+    {
+        proxyDevice->SetSamplerState(sampler, D3DSAMP_SRGBTEXTURE, TRUE);
+    }
+}
+
 ////////////////////////////////////////////////
 //
 // CreateDeviceInsist
@@ -576,7 +606,7 @@ HRESULT CreateDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect3
                 AddReportLog(8755, SStringX("CreateDeviceInsist: driver returned nullptr device"), 5);
                 hResult = D3DERR_INVALIDDEVICE;
             }
-            else if (!IsValidComInterfacePointer(pCreatedDevice))
+            else if (!IsValidComInterfacePointer(pCreatedDevice, ComPtrValidation::ValidationMode::ForceRefresh))
             {
                 SString message;
                 message.Format("CreateDeviceInsist: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
@@ -798,7 +828,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
 {
     HRESULT hr;
 
-    if (!pDirect3D || !IsValidComInterfacePointer(pDirect3D))
+    if (!pDirect3D || !IsValidComInterfacePointer(pDirect3D, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("AddCapsReport: invalid IDirect3D9 pointer %p", pDirect3D);
@@ -806,7 +836,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         return;
     }
 
-    if (!pD3DDevice9 || !IsValidComInterfacePointer(pD3DDevice9))
+    if (!pD3DDevice9 || !IsValidComInterfacePointer(pD3DDevice9, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("AddCapsReport: invalid IDirect3DDevice9 pointer %p", pD3DDevice9);
@@ -826,7 +856,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
     // Check device returns same D3D interface
     IDirect3D9* pDirect3DOther = NULL;
     pD3DDevice9->GetDirect3D(&pDirect3DOther);
-    if (pDirect3DOther && !IsValidComInterfacePointer(pDirect3DOther))
+    if (pDirect3DOther && !IsValidComInterfacePointer(pDirect3DOther, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("AddCapsReport: device returned invalid IDirect3D9 pointer %p", pDirect3DOther);
@@ -958,21 +988,28 @@ bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UIN
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
     static uint uiCreateCount = 0;
+    static IDirect3D9* lastTrackedInterface = nullptr;
+
+    if (!IsMainThread())
+    {
+        SString strMessage;
+        strMessage = " Passing through CreateDevice because not main thread";
+        WriteDebugEvent(strMessage);
+        AddReportLog(8627, strMessage);
+        hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
+        return true;
+    }
+
+    if (pDirect3D != lastTrackedInterface)
+    {
+        lastTrackedInterface = pDirect3D;
+        uiCreateCount = 0;
+    }
 
     // Also check for invalid size
     if (pPresentationParameters->BackBufferWidth == 0)
     {
         WriteDebugEvent(SString(" Passing through call #%d to CreateDevice because size is invalid", uiCreateCount));
-        hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
-        return true;
-    }
-
-    // Also check for calls from other threads
-    if (!IsMainThread())
-    {
-        SString strMessage(" Passing through call #%d to CreateDevice because not main thread", uiCreateCount);
-        WriteDebugEvent(strMessage);
-        AddReportLog(8627, strMessage);
         hOutResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
         return true;
     }
@@ -1026,7 +1063,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
                 AddReportLog(8755, SStringX("HandleCreateDeviceResult: DoCreateDevice returned nullptr device"), 5);
                 hResult = D3DERR_INVALIDDEVICE;
             }
-            else if (!IsValidComInterfacePointer(pCreatedDevice))
+            else if (!IsValidComInterfacePointer(pCreatedDevice, ComPtrValidation::ValidationMode::ForceRefresh))
             {
                 SString message;
                 message.Format("HandleCreateDeviceResult: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
@@ -1066,7 +1103,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
             *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(pOriginalDevice);
             if (pOriginalDevice)
             {
-                if (IsValidComInterfacePointer(pOriginalDevice))
+                if (IsValidComInterfacePointer(pOriginalDevice, ComPtrValidation::ValidationMode::ForceRefresh))
                 {
                     pOriginalDevice->Release();
                 }
@@ -1084,6 +1121,8 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
 
             WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s", parameters.AdapterOrdinal, parameters.DeviceType,
                                     parameters.BehaviorFlags, ReadableDepthFormat ? std::string((char*)&ReadableDepthFormat, 4).c_str() : "None"));
+
+            ApplyBorderlessColorCorrection(static_cast<CProxyDirect3DDevice9*>(*ppReturnedDeviceInterface), *pPresentationParameters);
         }
     }
 
@@ -1217,7 +1256,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         return hResult;
     }
 
-    if (!IsValidComInterfacePointer(*ppReturnedDeviceInterface))
+    if (!IsValidComInterfacePointer(*ppReturnedDeviceInterface, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
         message.Format("CCore::OnPostCreateDevice - invalid IDirect3DDevice9 pointer %p (via %p)", *ppReturnedDeviceInterface, ppReturnedDeviceInterface);
@@ -1280,7 +1319,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
                          "CCore::OnPostCreateDevice: CreateDeviceInsist returned nullptr device", 5);
             hResult = D3DERR_INVALIDDEVICE;
         }
-        else if (!IsValidComInterfacePointer(pCreatedDevice))
+    else if (!IsValidComInterfacePointer(pCreatedDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             AddReportLog(8755,
                          SString("CCore::OnPostCreateDevice: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice), 5);
@@ -1335,7 +1374,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(pOriginalDevice);
         if (pOriginalDevice)
         {
-            if (IsValidComInterfacePointer(pOriginalDevice))
+            if (IsValidComInterfacePointer(pOriginalDevice, ComPtrValidation::ValidationMode::ForceRefresh))
             {
                 pOriginalDevice->Release();
             }
@@ -1353,6 +1392,8 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         WriteDebugEvent("   Used creation parameters:");
         WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x  ReadableDepth:%s", parameters.AdapterOrdinal, parameters.DeviceType,
                                 parameters.BehaviorFlags, ReadableDepthFormat ? std::string((char*)&ReadableDepthFormat, 4).c_str() : "None"));
+
+    ApplyBorderlessColorCorrection(static_cast<CProxyDirect3DDevice9*>(*ppReturnedDeviceInterface), *pPresentationParameters);
     }
 
     bool bDetectOptimus = (GetModuleHandle("nvd3d9wrap.dll") != NULL);

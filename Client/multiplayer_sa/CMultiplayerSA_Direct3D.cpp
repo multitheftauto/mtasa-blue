@@ -60,7 +60,9 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
     else
     {
         ms_hasDeviceArgs = false;
-        AddReportLog(8740, SString("OnPreCreateDevice: missing device arguments for alt startup path"));
+        SString message;
+        message = "OnPreCreateDevice: missing device arguments for alt startup path";
+        AddReportLog(8740, message);
     }
 }
 
@@ -129,20 +131,26 @@ HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
 
     if (!ms_hasDeviceArgs)
     {
-        AddReportLog(8741, SString("OnPostCreateDevice: device arguments were not captured; skipping alt startup logic"));
+        SString message;
+        message = "OnPostCreateDevice: device arguments were not captured; skipping alt startup logic";
+        AddReportLog(8741, message);
         return hResult;
     }
 
     if (!SharedUtil::IsReadablePointer(ms_ppReturnedDeviceInterface, sizeof(*ms_ppReturnedDeviceInterface)))
     {
-        AddReportLog(8742, SString("OnPostCreateDevice: invalid device pointer reference %p", ms_ppReturnedDeviceInterface));
+        SString message;
+        message.Format("OnPostCreateDevice: invalid device pointer reference %p", ms_ppReturnedDeviceInterface);
+        AddReportLog(8742, message);
         ms_hasDeviceArgs = false;
         return hResult;
     }
 
     if (!SharedUtil::IsReadablePointer(ms_pPresentationParameters, sizeof(*ms_pPresentationParameters)))
     {
-        AddReportLog(8743, SString("OnPostCreateDevice: invalid presentation parameters pointer %p", ms_pPresentationParameters));
+        SString message;
+        message.Format("OnPostCreateDevice: invalid presentation parameters pointer %p", ms_pPresentationParameters);
+        AddReportLog(8743, message);
         ms_hasDeviceArgs = false;
         return hResult;
     }

@@ -10,15 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <d3dx9shader.h>
 #include <game/CRenderWare.h>
 #define DECLARE_PROFILER_SECTION_CDirect3DEvents9
 #include "profiler/SharedUtil.Profiler.h"
 #include "CProxyDirect3DVertexBuffer.h"
 #include "CProxyDirect3DIndexBuffer.h"
 #include "CProxyDirect3DTexture.h"
+#include "CProxyDirect3DDevice9.h"
 #include "CAdditionalVertexStreamManager.h"
 #include "CVertexStreamBoundingBoxManager.h"
 #include "CProxyDirect3DVertexDeclaration.h"
+#include "Graphics/CVideoModeManager.h"
 #include "Graphics/CRenderItem.EffectTemplate.h"
 
 
@@ -60,6 +63,320 @@ bool TryResolveShaderState(CShaderItem* pShaderItem, SResolvedShaderState& outSt
     outState.pEffect = pEffectWrap->m_pD3DEffect;
     return true;
 }
+}
+
+namespace
+{
+struct SToneMapVertex
+{
+    static const DWORD FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
+    float             x, y, z, w;
+    float             u, v;
+};
+
+class BorderlessToneMapPass
+{
+public:
+    bool Apply(IDirect3DDevice9* device, float gammaPower, float brightnessScale, float contrastScale, float saturationScale);
+    void Release();
+
+private:
+    bool EnsureResources(IDirect3DDevice9* device, UINT width, UINT height, D3DFORMAT format);
+    bool EnsureShader(IDirect3DDevice9* device);
+    bool EnsureStateBlock(IDirect3DDevice9* device);
+    void ReleaseTexture();
+    void ReleaseShader();
+    void ReleaseStateBlock();
+
+    IDirect3DTexture9* m_sourceTexture = nullptr;
+    IDirect3DSurface9* m_sourceSurface = nullptr;
+    IDirect3DPixelShader9* m_pixelShader = nullptr;
+    LPD3DXCONSTANTTABLE m_constantTable = nullptr;
+    D3DXHANDLE          m_toneParamsHandle = nullptr;
+    IDirect3DStateBlock9* m_restoreStateBlock = nullptr;
+    UINT                m_width = 0;
+    UINT                m_height = 0;
+    D3DFORMAT           m_format = D3DFMT_UNKNOWN;
+    bool                m_shaderFailed = false;
+};
+
+static BorderlessToneMapPass g_BorderlessToneMapPass;
+
+static void RunBorderlessToneMap(IDirect3DDevice9* device)
+{
+    if (!device)
+        return;
+
+    bool isWindowed = false;
+    bool havePresentationState = false;
+    if (CVideoModeManagerInterface* videoModeManager = GetVideoModeManager())
+    {
+        isWindowed = videoModeManager->IsDisplayModeWindowed() || videoModeManager->IsDisplayModeFullScreenWindow();
+        havePresentationState = true;
+    }
+
+    if (!havePresentationState && g_pDeviceState)
+    {
+        const auto& params = g_pDeviceState->CreationState.PresentationParameters;
+        isWindowed = params.Windowed != 0;
+        havePresentationState = true;
+    }
+
+    if (!havePresentationState)
+        return;
+
+    float gammaPower = 1.0f;
+    float brightnessScale = 1.0f;
+    float contrastScale = 1.0f;
+    float saturationScale = 1.0f;
+    bool  applyWindowed = true;
+    bool  applyFullscreen = false;
+    BorderlessGamma::FetchSettings(gammaPower, brightnessScale, contrastScale, saturationScale, applyWindowed, applyFullscreen);
+
+    const bool adjustmentsEnabled = isWindowed ? applyWindowed : applyFullscreen;
+    if (!adjustmentsEnabled)
+    {
+        g_BorderlessToneMapPass.Release();
+        return;
+    }
+
+    if (!BorderlessGamma::ShouldApplyAdjustments(gammaPower, brightnessScale, contrastScale, saturationScale))
+        return;
+
+    if (!g_BorderlessToneMapPass.Apply(device, gammaPower, brightnessScale, contrastScale, saturationScale))
+    {
+        // Fallback: release resources to allow retry on future frames.
+        g_BorderlessToneMapPass.Release();
+    }
+}
+} // namespace
+
+bool BorderlessToneMapPass::EnsureShader(IDirect3DDevice9* device)
+{
+    if (m_pixelShader)
+        return true;
+
+    if (m_shaderFailed)
+        return false;
+
+    static const char kShaderSource[] =
+        "sampler2D SourceSampler : register(s0);\n"
+        "float4 ToneParams;\n"
+        "float4 main(float2 uv : TEXCOORD0) : COLOR0\n"
+        "{\n"
+        "    float4 color = tex2D(SourceSampler, uv);\n"
+        "    float3 colorLinear = saturate(color.rgb);\n"
+        "    float3 gammaAdjusted = pow(colorLinear, ToneParams.xxx);\n"
+        "    float3 brightnessAdjusted = gammaAdjusted * ToneParams.y;\n"
+        "    float3 pivot = float3(0.5f, 0.5f, 0.5f);\n"
+        "    float3 contrasted = (brightnessAdjusted - pivot) * ToneParams.z + pivot;\n"
+        "    float luminance = dot(contrasted, float3(0.299f, 0.587f, 0.114f));\n"
+        "    float3 saturated = lerp(float3(luminance, luminance, luminance), contrasted, ToneParams.w);\n"
+        "    color.rgb = saturate(saturated);\n"
+        "    return color;\n"
+        "}\n";
+
+    LPD3DXBUFFER       shaderBuffer = nullptr;
+    LPD3DXBUFFER       errorBuffer = nullptr;
+    LPD3DXCONSTANTTABLE constantTable = nullptr;
+
+    HRESULT hr = D3DXCompileShader(kShaderSource, sizeof(kShaderSource) - 1, nullptr, nullptr, "main", "ps_2_0", 0, &shaderBuffer, &errorBuffer, &constantTable);
+    if (FAILED(hr))
+    {
+        SString message("BorderlessToneMap: pixel shader compile failed (%08x)", hr);
+        if (errorBuffer && errorBuffer->GetBufferPointer())
+            message += SString(" - %s", static_cast<const char*>(errorBuffer->GetBufferPointer()));
+        WriteDebugEvent(message);
+        SAFE_RELEASE(shaderBuffer);
+        SAFE_RELEASE(errorBuffer);
+        SAFE_RELEASE(constantTable);
+        m_shaderFailed = true;
+        return false;
+    }
+
+    hr = device->CreatePixelShader(reinterpret_cast<const DWORD*>(shaderBuffer->GetBufferPointer()), &m_pixelShader);
+    SAFE_RELEASE(shaderBuffer);
+    SAFE_RELEASE(errorBuffer);
+    if (FAILED(hr))
+    {
+        WriteDebugEvent(SString("BorderlessToneMap: CreatePixelShader failed (%08x)", hr));
+        SAFE_RELEASE(constantTable);
+        m_shaderFailed = true;
+        return false;
+    }
+
+    m_constantTable = constantTable;
+    m_toneParamsHandle = m_constantTable ? m_constantTable->GetConstantByName(nullptr, "ToneParams") : nullptr;
+    m_shaderFailed = false;
+    return true;
+}
+
+bool BorderlessToneMapPass::EnsureStateBlock(IDirect3DDevice9* device)
+{
+    if (!device)
+        return false;
+
+    if (m_restoreStateBlock)
+        return true;
+
+    IDirect3DStateBlock9* stateBlock = nullptr;
+    if (FAILED(device->CreateStateBlock(D3DSBT_ALL, &stateBlock)) || !stateBlock)
+        return false;
+
+    m_restoreStateBlock = stateBlock;
+    return true;
+}
+
+bool BorderlessToneMapPass::EnsureResources(IDirect3DDevice9* device, UINT width, UINT height, D3DFORMAT format)
+{
+    if (!device)
+        return false;
+
+    if (m_sourceTexture && (m_width != width || m_height != height || m_format != format))
+        ReleaseTexture();
+
+    if (!m_sourceTexture)
+    {
+        HRESULT hr = device->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, format, D3DPOOL_DEFAULT, &m_sourceTexture, nullptr);
+        if (FAILED(hr))
+        {
+            WriteDebugEvent(SString("BorderlessToneMap: CreateTexture failed (%08x)", hr));
+            return false;
+        }
+
+        hr = m_sourceTexture->GetSurfaceLevel(0, &m_sourceSurface);
+        if (FAILED(hr))
+        {
+            WriteDebugEvent(SString("BorderlessToneMap: GetSurfaceLevel failed (%08x)", hr));
+            ReleaseTexture();
+            return false;
+        }
+
+        m_width = width;
+        m_height = height;
+        m_format = format;
+    }
+
+    return m_sourceTexture && m_sourceSurface;
+}
+
+bool BorderlessToneMapPass::Apply(IDirect3DDevice9* device, float gammaPower, float brightnessScale, float contrastScale, float saturationScale)
+{
+    if (!device)
+        return false;
+
+    if (!EnsureShader(device))
+        return false;
+
+    IDirect3DSurface9* backBuffer = nullptr;
+    HRESULT             hr = device->GetRenderTarget(0, &backBuffer);
+    if (FAILED(hr) || !backBuffer)
+        return false;
+
+    D3DSURFACE_DESC backBufferDesc;
+    backBuffer->GetDesc(&backBufferDesc);
+
+    if (!EnsureResources(device, backBufferDesc.Width, backBufferDesc.Height, backBufferDesc.Format))
+    {
+        SAFE_RELEASE(backBuffer);
+        return false;
+    }
+
+    hr = device->StretchRect(backBuffer, nullptr, m_sourceSurface, nullptr, D3DTEXF_POINT);
+    if (FAILED(hr))
+    {
+        WriteDebugEvent(SString("BorderlessToneMap: StretchRect failed (%08x)", hr));
+        SAFE_RELEASE(backBuffer);
+        return false;
+    }
+
+    if (!EnsureStateBlock(device))
+    {
+        SAFE_RELEASE(backBuffer);
+        return false;
+    }
+
+    m_restoreStateBlock->Capture();
+
+    device->SetRenderState(D3DRS_ZENABLE, FALSE);
+    device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+    device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+    device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+    device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+    device->SetRenderState(D3DRS_FOGENABLE, FALSE);
+    device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+    device->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
+
+    device->SetPixelShader(m_pixelShader);
+    device->SetVertexShader(nullptr);
+    device->SetFVF(SToneMapVertex::FVF);
+
+    device->SetTexture(0, m_sourceTexture);
+    device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+    device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+    device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+    device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+    device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+    device->SetSamplerState(0, D3DSAMP_SRGBTEXTURE, FALSE);
+
+    if (m_constantTable && m_toneParamsHandle)
+    {
+        const float toneParams[4] = {gammaPower, brightnessScale, contrastScale, saturationScale};
+        m_constantTable->SetFloatArray(device, m_toneParamsHandle, toneParams, NUMELMS(toneParams));
+    }
+
+    const float left = -0.5f;
+    const float top = -0.5f;
+    const float right = static_cast<float>(m_width) - 0.5f;
+    const float bottom = static_cast<float>(m_height) - 0.5f;
+
+    const SToneMapVertex vertices[] = {
+        {left, top, 0.0f, 1.0f, 0.0f, 0.0f},
+        {right, top, 0.0f, 1.0f, 1.0f, 0.0f},
+        {left, bottom, 0.0f, 1.0f, 0.0f, 1.0f},
+        {right, top, 0.0f, 1.0f, 1.0f, 0.0f},
+        {right, bottom, 0.0f, 1.0f, 1.0f, 1.0f},
+        {left, bottom, 0.0f, 1.0f, 0.0f, 1.0f},
+    };
+
+    device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, NUMELMS(vertices) / 3, vertices, sizeof(SToneMapVertex));
+
+    device->SetPixelShader(nullptr);
+    device->SetTexture(0, nullptr);
+
+    m_restoreStateBlock->Apply();
+
+    SAFE_RELEASE(backBuffer);
+    return true;
+}
+
+void BorderlessToneMapPass::ReleaseTexture()
+{
+    SAFE_RELEASE(m_sourceSurface);
+    SAFE_RELEASE(m_sourceTexture);
+    m_width = 0;
+    m_height = 0;
+    m_format = D3DFMT_UNKNOWN;
+}
+
+void BorderlessToneMapPass::ReleaseShader()
+{
+    SAFE_RELEASE(m_pixelShader);
+    SAFE_RELEASE(m_constantTable);
+    m_toneParamsHandle = nullptr;
+    m_shaderFailed = false;
+}
+
+void BorderlessToneMapPass::ReleaseStateBlock()
+{
+    SAFE_RELEASE(m_restoreStateBlock);
+}
+
+void BorderlessToneMapPass::Release()
+{
+    ReleaseTexture();
+    ReleaseShader();
+    ReleaseStateBlock();
 }
 
 bool CDirect3DEvents9::IsDeviceOperational(IDirect3DDevice9* pDevice, bool* pbTemporarilyLost, HRESULT* pHrCooperativeLevel)
@@ -132,6 +449,7 @@ void CDirect3DEvents9::OnDirect3DDeviceDestroy(IDirect3DDevice9* pDevice)
 
     // De-initialize the GUI manager (destroying is done on Exit)
     CCore::GetSingleton().DeinitGUI();
+    g_BorderlessToneMapPass.Release();
 }
 
 void CDirect3DEvents9::OnBeginScene(IDirect3DDevice9* pDevice)
@@ -173,9 +491,9 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
 
         if (bInAnyScene)
         {
-            const HRESULT hrEndScene = pDevice->EndScene();
-            if (FAILED(hrEndScene))
-                WriteDebugEvent(SString("OnInvalidate: EndScene failed: %08x", hrEndScene));
+            const ESceneOwner owner = bInMTAScene ? ESceneOwner::MTA : (bInGTAScene ? ESceneOwner::GTA : ESceneOwner::None);
+            if (owner != ESceneOwner::None && !EndSceneWithoutProxy(pDevice, owner))
+                WriteDebugEvent("OnInvalidate: EndSceneWithoutProxy failed");
         }
     }
     else
@@ -198,6 +516,7 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     CLocalGUI::GetSingleton().Invalidate();
 
     CGraphics::GetSingleton().OnDeviceInvalidate(pDevice);
+    g_BorderlessToneMapPass.Release();
 }
 
 void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
@@ -222,15 +541,11 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
-    const HRESULT hrBeginScene = pDevice->BeginScene();
-    if (FAILED(hrBeginScene))
+    if (!BeginSceneWithoutProxy(pDevice, ESceneOwner::MTA))
     {
-        WriteDebugEvent(SString("OnPresent: BeginScene failed: %08x", hrBeginScene));
-    g_bInMTAScene.store(false, std::memory_order_release);
+        WriteDebugEvent("OnPresent: BeginSceneWithoutProxy failed");
         return;
     }
-
-    g_bInMTAScene.store(true, std::memory_order_release);
 
     // Reset samplers on first call
     static bool bDoneReset = false;
@@ -291,6 +606,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     // Redraw the mouse cursor so it will always be over other elements
     CLocalGUI::GetSingleton().DrawMouseCursor();
 
+    RunBorderlessToneMap(pDevice);
+
     CGraphics::GetSingleton().DidRenderScene();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
@@ -301,8 +618,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     // End the scene that we started.
     if (g_bInMTAScene.load(std::memory_order_acquire))
     {
-        pDevice->EndScene();
-    g_bInMTAScene.store(false, std::memory_order_release);
+        if (!EndSceneWithoutProxy(pDevice, ESceneOwner::MTA))
+            WriteDebugEvent("OnPresent: EndSceneWithoutProxy failed");
     }
 
     // Update incase settings changed
@@ -1009,7 +1326,6 @@ HRESULT CallCreateAdditionalSwapChainWithGuard(IDirect3DDevice9* pDevice, D3DPRE
 /////////////////////////////////////////////////////////////
 //
 // DrawPrimitiveGuarded
-//
 // Catch access violations
 //
 /////////////////////////////////////////////////////////////
@@ -1080,7 +1396,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
 
         if (hrCooperativeLevel != D3D_OK)
             return hrCooperativeLevel;
-
+    RunBorderlessToneMap(pDevice);
         return D3DERR_INVALIDCALL;
     }
 
