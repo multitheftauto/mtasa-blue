@@ -21,23 +21,14 @@ extern HINSTANCE g_hModule;
 
 namespace
 {
+// Cached static Direct3D pointer for lockless fast-path access
+std::atomic<IDirect3D9*> g_cachedStaticDirect3D{nullptr};
+std::atomic<bool>        g_cachedDirect3DValid{false};
 
 IDirect3D9* GetFirstValidTrackedDirect3D(std::vector<IDirect3D9*>& trackedList)
 {
-    for (auto iter = trackedList.begin(); iter != trackedList.end();)
-    {
-        IDirect3D9* candidate = *iter;
-        if (candidate && IsValidComInterfacePointer(candidate, ComPtrValidation::ValidationMode::ForceRefresh))
-            return candidate;
-
-        SString message;
-        message.Format("CProxyDirect3D9: removing invalid tracked IDirect3D9 pointer %p", candidate);
-        AddReportLog(8756, message, 5);
-        ComPtrValidation::Invalidate(candidate);
-        iter = trackedList.erase(iter);
-    }
-
-    return nullptr;
+    // Return first element without expensive COM validation (called frequently)
+    return trackedList.empty() ? nullptr : trackedList.front();
 }
 }  // unnamed namespace
 
@@ -56,7 +47,7 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 {
     WriteDebugEvent(SString("CProxyDirect3D9::CProxyDirect3D9 %08x", this));
 
-    if (!IsValidComInterfacePointer(pInterface, ComPtrValidation::ValidationMode::ForceRefresh))
+    if (!IsValidComInterfacePointer(pInterface, ComPtrValidation::ValidationMode::Default))
     {
         SString message;
         message.Format("CProxyDirect3D9 ctor: received invalid IDirect3D9 pointer %p, proxy will be non-functional", pInterface);
@@ -71,10 +62,13 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
     // Track this Direct3D9 instance for StaticGetDirect3D() lookups
     if (m_pDevice)
     {
-        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
+        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::Default))
         {
             std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
             ms_CreatedDirect3D9List.push_back(m_pDevice);
+            // Update cache for lockless StaticGetDirect3D access
+            g_cachedStaticDirect3D.store(m_pDevice, std::memory_order_release);
+            g_cachedDirect3DValid.store(true, std::memory_order_release);
         }
         else
         {
@@ -91,6 +85,8 @@ CProxyDirect3D9::~CProxyDirect3D9()
     {
         std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
         ListRemove(ms_CreatedDirect3D9List, m_pDevice);
+        // Invalidate cache when removing this device
+        g_cachedDirect3DValid.store(false, std::memory_order_release);
     }
     ReleaseInterface(m_pDevice, 8752);
 }
@@ -246,8 +242,23 @@ HMONITOR CProxyDirect3D9::StaticGetAdapterMonitor(UINT Adapter)
 
 IDirect3D9* CProxyDirect3D9::StaticGetDirect3D()
 {
+    // Fast path: use cached pointer without lock (called frequently)
+    if (g_cachedDirect3DValid.load(std::memory_order_acquire))
+    {
+        IDirect3D9* pDirect3D = g_cachedStaticDirect3D.load(std::memory_order_acquire);
+        if (pDirect3D)
+            return pDirect3D;
+    }
+    
+    // Slow path: refresh cache under lock
     std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
-    return GetFirstValidTrackedDirect3D(ms_CreatedDirect3D9List);
+    IDirect3D9* pDirect3D = GetFirstValidTrackedDirect3D(ms_CreatedDirect3D9List);
+    if (pDirect3D)
+    {
+        g_cachedStaticDirect3D.store(pDirect3D, std::memory_order_release);
+        g_cachedDirect3DValid.store(true, std::memory_order_release);
+    }
+    return pDirect3D;
 }
 
 HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
