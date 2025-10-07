@@ -2014,6 +2014,13 @@ void CClientPed::SetFrozen(bool bFrozen)
             if (m_pPlayerPed)
             {
                 m_pPlayerPed->GetMatrix(&m_matFrozen);
+                
+                CVector vecFrozenRotation = m_matFrozen.GetRotation();
+                
+                if (vecFrozenRotation.fX == 0.0f && vecFrozenRotation.fY == 0.0f && vecFrozenRotation.fZ == 0.0f)
+                {
+                    m_matFrozen.SetRotation(m_Matrix.GetRotation());
+                }
             }
             else
             {
@@ -3326,6 +3333,12 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
 
 float CClientPed::GetCurrentRotation()
 {
+    if (IsFrozen())
+    {
+        CVector vecRotation = m_matFrozen.GetRotation();
+        return vecRotation.fZ;
+    }
+    
     if (m_pPlayerPed)
     {
         return m_pPlayerPed->GetCurrentRotation();
@@ -6798,7 +6811,7 @@ bool CClientPed::ExitVehicle()
             return false;
 
         // Make ped exit vehicle
-        GetOutOfVehicle(targetDoor);
+        GetOutOfVehicle(m_ucVehicleInOutSeat);
 
         // Remember that this ped is working on leaving a vehicle
         SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
@@ -6913,6 +6926,7 @@ void CClientPed::UpdateVehicleInOut()
 
             m_bIsGettingOutOfVehicle = false;
             m_VehicleInOutID = INVALID_ELEMENT_ID;
+            RemoveFromVehicle();
             SetVehicleInOutState(VEHICLE_INOUT_NONE);
         }
 

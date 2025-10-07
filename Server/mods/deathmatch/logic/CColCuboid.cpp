@@ -30,10 +30,11 @@ bool CColCuboid::DoHitDetection(const CVector& vecNowPosition)
 {
     // FIXME: What about radius?
 
-    // See if the now position is within our cube
-    return (vecNowPosition.fX >= m_vecPosition.fX && vecNowPosition.fX <= m_vecPosition.fX + m_vecSize.fX && vecNowPosition.fY >= m_vecPosition.fY &&
-            vecNowPosition.fY <= m_vecPosition.fY + m_vecSize.fY && vecNowPosition.fZ >= m_vecPosition.fZ &&
-            vecNowPosition.fZ <= m_vecPosition.fZ + m_vecSize.fZ);
+    // See if the now position is within our cube    
+    const CVector& vecPosition = GetPosition();
+    return (vecNowPosition.fX >= vecPosition.fX && vecNowPosition.fX <= vecPosition.fX + m_vecSize.fX && vecNowPosition.fY >= vecPosition.fY &&
+            vecNowPosition.fY <= vecPosition.fY + m_vecSize.fY && vecNowPosition.fZ >= vecPosition.fZ &&
+            vecNowPosition.fZ <= vecPosition.fZ + m_vecSize.fZ);
 }
 
 bool CColCuboid::ReadSpecialData(const int iLine)
