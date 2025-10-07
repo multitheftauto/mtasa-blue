@@ -22,25 +22,7 @@ namespace
 {
     bool ValidatePath(const SString& path)
     {
-        if (path.empty() || path.length() >= MAX_PATH)            // >= instead of > to leave room for null terminator
-            return false;
-
-        if (path.Contains("..") || path.Contains("..\\") || path.Contains("../"))
-            return false;
-        
-        // Check for null bytes
-        if (path.find('\0') != SString::npos)
-            return false;
-        
-        if (path.Contains(":") && !path.BeginsWith("C:\\") && !path.BeginsWith("D:\\") && 
-            !path.BeginsWith("E:\\") && !path.BeginsWith("F:\\") && !path.BeginsWith("G:\\"))
-            return false;
-        
-        // Check for special characters
-        if (path.Contains("\\\\?\\") || path.Contains("\\\\.\\")||            // Device namespace paths
-            path.Contains("%") || path.Contains("$"))
-            return false;
-        
+        // Placeholder
         return true;
     }
 }
@@ -1042,6 +1024,102 @@ void CheckDataFiles()
         ExitProcess(EXIT_ERROR);
     }
 
+    // No-op known incompatible/broken d3d9.dll versions from the launch directory
+	// By using file version we account for variants as well. The array is extendable, but primarily for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
+    {
+        struct SIncompatibleVersion
+        {
+            int iMajor;
+            int iMinor;
+            int iBuild;
+            int iRelease;
+        };
+
+        static const SIncompatibleVersion incompatibleVersions[] = {
+            // The below entry (D3D9.dll 6.3.9600.17415) always crashes the user @ 0x0001F4B3 (CreateSurfaceLH).
+            // Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
+            {6, 3, 9600, 17415},
+            // The below entry (D3D9.dll 0.3.1.3) is a fully incompatible, modified ENB version ("DirectX 2.0") that crashes the user @ 0002A733
+            {0, 3, 1, 3},
+        };
+
+        static bool bChecked = false;
+        if (!bChecked)
+        {
+            bChecked = true;
+
+			// Check all 3 game roots
+            const std::vector<SString> directoriesToCheck = {
+                GetLaunchPath(), // MTA installation folder root
+                strGTAPath, // Real GTA:SA installation folder root. As chosen by DiscoverGTAPath()
+                PathJoin(GetMTADataPath(), "GTA San Andreas"), // Proxy-mirror that MTA uses for core GTA data files (C:\ProgramData\MTA San Andreas All\<MTA major version>\GTA San Andreas)
+            };
+
+            for (const SString& directory : directoriesToCheck)
+            {
+                if (directory.empty())
+                    continue;
+                if (!ValidatePath(directory))
+                    continue;
+
+                const SString strD3dModuleFilename = PathJoin(directory, "d3d9.dll");
+                if (!ValidatePath(strD3dModuleFilename) || !FileExists(strD3dModuleFilename))
+                    continue;
+
+                SharedUtil::SLibVersionInfo versionInfo = {};
+                if (!SharedUtil::GetLibVersionInfo(strD3dModuleFilename, &versionInfo))
+                    continue;
+
+                bool bIsIncompatible = false;
+                for (const SIncompatibleVersion& entry : incompatibleVersions)
+                {
+                    if (versionInfo.GetFileVersionMajor() == entry.iMajor &&
+                        versionInfo.GetFileVersionMinor() == entry.iMinor &&
+                        versionInfo.GetFileVersionBuild() == entry.iBuild &&
+                        versionInfo.GetFileVersionRelease() == entry.iRelease)
+                    {
+                        bIsIncompatible = true;
+                        break;
+                    }
+                }
+
+                if (!bIsIncompatible)
+                    continue;
+
+                const SString strBackupModuleFilename = PathJoin(directory, "d3d9.bak.incompatible");
+                const WString wideSourcePath = FromUTF8(strD3dModuleFilename);
+                const WString wideBackupPath = FromUTF8(strBackupModuleFilename);
+
+                if (FileExists(strBackupModuleFilename))
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                    DeleteFileW(wideBackupPath.c_str());
+                }
+
+                SetFileAttributesW(wideSourcePath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                bool bRenamed = MoveFileExW(wideSourcePath.c_str(), wideBackupPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+                if (!bRenamed)
+                {
+                    if (!CopyFileW(wideSourcePath.c_str(), wideBackupPath.c_str(), FALSE))
+                        continue;
+
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                    if (!DeleteFileW(wideSourcePath.c_str()))
+                        continue;
+
+                    bRenamed = true;
+                }
+
+                if (bRenamed)
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                }
+            }
+        }
+    }
+
     // Check for essential MTA files
     static const char* dataFiles[] = {
         "MTA\\cgui\\images\\background_logo.png",
@@ -1459,36 +1537,24 @@ int LaunchGame(SString strCmdLine)
 
         // Wait for game to exit
         WriteDebugEvent("Loader - Wait for game to exit");
-        DWORD totalWaitTime = 0;
-
-        while (status == WAIT_TIMEOUT && totalWaitTime < 3600000)            // 1 hour max wait
+        while (status == WAIT_TIMEOUT)
         {
             status = WaitForSingleObject(piLoadee.hProcess, 1500);
-            totalWaitTime += 1500;
 
-            // Detect if stuck on quit
+            // If core is closing and gta_sa.exe process memory usage is not changing, terminate
             CStuckProcessDetector detector(piLoadee.hProcess, 5000);
             while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("Q0"))            // Gets closed when quit is detected as frozen
             {
                 if (detector.UpdateIsStuck())
                 {
                     WriteDebugEvent("Detected stuck process at quit");
-                    #ifndef MTA_DEBUG
-                        TerminateProcess(piLoadee.hProcess, 1);
-                        status = WAIT_FAILED;
-                        break;
-                    #endif
-                }
-                status = WaitForSingleObject(piLoadee.hProcess, 1000);            // 1 second timeout
-                totalWaitTime += 1000;
-
-                if (totalWaitTime >= 3600000)            // 1 hour max wait
-                {
-                    WriteDebugEvent("Maximum wait time exceeded");
+                #ifndef MTA_DEBUG
                     TerminateProcess(piLoadee.hProcess, 1);
                     status = WAIT_FAILED;
                     break;
+                #endif
                 }
+                status = WaitForSingleObject(piLoadee.hProcess, 1000);
             }
         }
 

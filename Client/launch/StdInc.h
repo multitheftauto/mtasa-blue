@@ -1,15 +1,17 @@
+#pragma once
+
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <psapi.h>
-#include <shlwapi.h>
-#include <strsafe.h>
-#include <wintrust.h>
-#include <softpub.h>
 #define MTA_CLIENT
-#include "SharedUtil.h"
 
-#include "resource.h"
-#include <stdio.h>
-#include "shellapi.h"
-
+// Windows system headers
+#include <windows.h>
+#include <shellapi.h>
 #include <shlobj.h>
+#include <shlwapi.h>
+
+// C STL headers
+#include <stdio.h>
+
+// Project headers
+#include "resource.h"
+#include "SharedUtil.h"

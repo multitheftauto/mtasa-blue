@@ -94,9 +94,11 @@ static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleIn
     }
 }
 
-static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
+static void __declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         lea     eax, [esp+5Ch]
@@ -134,9 +136,11 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
 #define HOOKSIZE_CVehicle_AddExhaustParticles_2              9
 static const DWORD CONTINUE_CVehicle_AddExhaustParticles_2 = 0x6DE3A7;
 
-static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
+static void __declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         mov     eax, vehicleDummiesPositionArray
@@ -171,9 +175,11 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
 #define HOOKSIZE_CVehicle_AddDamagedVehicleParticles              6
 static const DWORD CONTINUE_CVehicle_AddDamagedVehicleParticles = 0x6D2B0F;
 
-static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
+static void __declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi // CVehicleSAInterface*
@@ -212,9 +218,11 @@ static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
 #define HOOKSIZE_CFire_ProcessFire              5
 static const DWORD CONTINUE_CFire_ProcessFire = 0x53A719;
 
-static void _declspec(naked) HOOK_CFire_ProcessFire()
+static void __declspec(naked) HOOK_CFire_ProcessFire()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx            // CVehicleSAInterface*
@@ -253,9 +261,11 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
 #define HOOKSIZE_CAutomobile_DoNitroEffect_1              6
 static const DWORD CONTINUE_CAutomobile_DoNitroEffect_1 = 0x6A3BE8;
 
-static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
+static void __declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -324,9 +334,11 @@ static void __cdecl ApplySecondaryExhaustNitroPosition(CVehicleSAInterface* vehi
     }
 }
 
-static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
+static void __declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         lea     eax, [esp+40h]
@@ -359,9 +371,11 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
 #define HOOKSIZE_CVehicle_DoVehicleLights_1              6
 static const DWORD CONTINUE_CVehicle_DoVehicleLights_1 = 0x6E1F42;
 
-static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
+static void __declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -393,9 +407,11 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
 #define HOOKSIZE_CVehicle_DoVehicleLights_2              6
 static const DWORD CONTINUE_CVehicle_DoVehicleLights_2 = 0x6E22D3;
 
-static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
+static void __declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -434,9 +450,11 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
 #define HOOKSIZE_CAutomobile_ProcessCarOnFireAndExplode              6
 static const DWORD CONTINUE_CAutomobile_ProcessCarOnFireAndExplode = 0x6A7185;
 
-static void _declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
+static void __declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -475,9 +493,11 @@ static void _declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
 #define HOOKSIZE_CBike_FixHandsToBars              6
 static const DWORD CONTINUE_CBike_FixHandsToBars = 0x6B8059;
 
-static void _declspec(naked) HOOK_CBike_FixHandsToBars()
+static void __declspec(naked) HOOK_CBike_FixHandsToBars()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ebx            // CVehicleSAInterface*
@@ -516,9 +536,11 @@ static void _declspec(naked) HOOK_CBike_FixHandsToBars()
 #define HOOKSIZE_CPed_SetPedPositionInCar_1              7
 static const DWORD CONTINUE_CPed_SetPedPositionInCar_1 = 0x5DF992;
 
-static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
+static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         mov     eax, [esi+58Ch]
@@ -558,9 +580,11 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
 #define HOOKSIZE_CPed_SetPedPositionInCar_2              6
 static const DWORD CONTINUE_CPed_SetPedPositionInCar_2 = 0x5DFA5C;
 
-static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
+static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         mov     eax, [esi+58Ch]
@@ -600,9 +624,11 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
 #define HOOKSIZE_CPed_SetPedPositionInCar_3              7
 static const DWORD CONTINUE_CPed_SetPedPositionInCar_3 = 0x5DFA0B;
 
-static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
+static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         mov     eax, [esi+58Ch]
@@ -642,9 +668,11 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
 #define HOOKSIZE_CPed_SetPedPositionInCar_4              6
 static const DWORD CONTINUE_CPed_SetPedPositionInCar_4 = 0x5DFA86;
 
-static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
+static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         mov     eax, [esi+58Ch]
@@ -684,9 +712,11 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
 #define HOOKSIZE_CVehicle_DoHeadLightEffect              6
 static const DWORD CONTINUE_CVehicle_DoHeadLightEffect = 0x6E0A6F;
 
-static void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
+static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx            // CVehicleSAInterface*
@@ -726,9 +756,11 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
 #define HOOKSIZE_CVehicle_DoTailLightEffect              8
 static const DWORD CONTINUE_CVehicle_DoTailLightEffect = 0x6E17C8;
 
-static void _declspec(naked) HOOK_CVehicle_DoTailLightEffect()
+static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -769,9 +801,11 @@ static void _declspec(naked) HOOK_CVehicle_DoTailLightEffect()
 #define HOOKSIZE_CVehicle_DoHeadLightReflectionSingle              5
 static const DWORD CONTINUE_CVehicle_DoHeadLightReflectionSingle = 0x6E1457;
 
-static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
+static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx            // CVehicleSAInterface*
@@ -810,9 +844,11 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
 #define HOOKSIZE_CVehicle_DoHeadLightReflectionTwin              5
 static const DWORD CONTINUE_CVehicle_DoHeadLightReflectionTwin = 0x6E1613;
 
-static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
+static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx            // CVehicleSAInterface*
@@ -852,9 +888,11 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 #define HOOKSIZE_CVehicle_GetPlaneGunsPosition              13
 static const DWORD CONTINUE_CVehicle_GetPlaneGunsPosition = 0x6D42A4;
 
-static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
+static void __declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx            // CVehicleSAInterface*
@@ -895,9 +933,11 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 #define HOOKSIZE_CVehicle_GetPlaneOrdnancePosition              8
 static const DWORD CONTINUE_CVehicle_GetPlaneOrdnancePosition = 0x6D46F8;
 
-static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
+static void __declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx            // CVehicleSAInterface*
@@ -936,9 +976,11 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
 #define HOOKSIZE_CVehicle_CanBeDriven              7
 static const DWORD CONTINUE_CVehicle_CanBeDriven = 0x6D543F;
 
-static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
+static void __declspec(naked) HOOK_CVehicle_CanBeDriven()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx            // CVehicleSAInterface*
@@ -977,9 +1019,11 @@ static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
 #define HOOKSIZE_CPlane_PreRender_1              9
 static const DWORD CONTINUE_CPlane_PreRender_1 = 0x6C9724;
 
-static void _declspec(naked) HOOK_CPlane_PreRender_1()
+static void __declspec(naked) HOOK_CPlane_PreRender_1()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -1018,9 +1062,11 @@ static void _declspec(naked) HOOK_CPlane_PreRender_1()
 #define HOOKSIZE_CPlane_PreRender_2              6
 static const DWORD CONTINUE_CPlane_PreRender_2 = 0x6C98CF;
 
-static void _declspec(naked) HOOK_CPlane_PreRender_2()
+static void __declspec(naked) HOOK_CPlane_PreRender_2()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -1059,9 +1105,11 @@ static void _declspec(naked) HOOK_CPlane_PreRender_2()
 #define HOOKSIZE_CPlane_PreRender_3              6
 static const DWORD CONTINUE_CPlane_PreRender_3 = 0x6C9B5C;
 
-static void _declspec(naked) HOOK_CPlane_PreRender_3()
+static void __declspec(naked) HOOK_CPlane_PreRender_3()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi            // CVehicleSAInterface*
@@ -1100,9 +1148,11 @@ static void _declspec(naked) HOOK_CPlane_PreRender_3()
 #define HOOKSIZE_CVehicle_DoHeadLightBeam              10
 static const DWORD CONTINUE_CVehicle_DoHeadLightBeam = 0x6E0E3E;
 
-static void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
+static void __declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    edi            // CVehicleSAInterface*

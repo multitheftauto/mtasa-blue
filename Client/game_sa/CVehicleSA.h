@@ -204,15 +204,15 @@ struct CTransmissionGear
 struct CTransmission
 {
     CTransmissionGear gears[6];
-    byte              driveType;
-    byte              engineType;
-    byte              numOfGears;
-    byte              pad;
+    uint8_t           driveType;
+    uint8_t           engineType;
+    uint8_t           numOfGears;
+    uint8_t           pad;
     DWORD             handlingFlags;
     float             engineAcceleration;
     float             engineInertia;
     float             maxGearVelocity;
-    byte              pad2[4];
+    uint8_t           pad2[4];
     float             minGearVelocity;
     float             curSpeed;
 };

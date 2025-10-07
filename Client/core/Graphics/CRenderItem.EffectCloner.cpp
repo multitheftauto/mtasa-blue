@@ -24,6 +24,21 @@ CEffectCloner::CEffectCloner(CRenderItemManager* pManager)
     m_pManager = pManager;
 }
 
+CEffectCloner::~CEffectCloner()
+{
+    for (auto& entry : m_ValidMap)
+    {
+        SAFE_RELEASE(entry.second);
+    }
+    m_ValidMap.clear();
+
+    for (CEffectTemplate* pTemplate : m_OldList)
+    {
+        SAFE_RELEASE(pTemplate);
+    }
+    m_OldList.clear();
+}
+
 ////////////////////////////////////////////////////////////////
 //
 // CEffectCloner::CreateD3DEffect

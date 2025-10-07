@@ -341,6 +341,7 @@ void CResource::Load()
         {
             // Write resource net ID
             pBitStream->Write(GetNetID());
+            pBitStream->Write(GetStartCounter());
             g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
@@ -409,11 +410,11 @@ void CResource::ShowCursor(bool bShow, bool bToggleControls)
 
         // Update our showing cursor state
         m_bShowingCursor = bShow;
-
-        // Show cursor if more than 0 resources wanting the cursor on
-        g_pCore->ForceCursorVisible(m_iShowingCursor > 0, bToggleControls);
-        g_pClientGame->SetCursorEventsEnabled(m_iShowingCursor > 0);
     }
+
+    // Always update cursor and controls state regardless of cursor visibility change
+    g_pCore->ForceCursorVisible(m_iShowingCursor > 0, bToggleControls);
+    g_pClientGame->SetCursorEventsEnabled(m_iShowingCursor > 0);
 }
 
 SString CResource::GetResourceDirectoryPath(eAccessType accessType, const SString& strMetaPath)
