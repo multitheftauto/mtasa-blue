@@ -15,6 +15,7 @@
 #include <WinTrust.h>
 #include <SoftPub.h>
 #include <Psapi.h>
+#include <SharedUtil.Misc.h>
 
 #define STEAM_GTASA_APP_ID "12120"
 
@@ -45,6 +46,33 @@ struct HandleDeleter
 };
 
 using HandleScope = std::unique_ptr<std::remove_pointer_t<HANDLE>, HandleDeleter>;
+
+namespace
+{
+DWORD GetProcessBaseName(HANDLE process, LPWSTR buffer, DWORD bufferLength)
+{
+    using ModuleBaseNameFn = DWORD(WINAPI*)(HANDLE, HMODULE, LPWSTR, DWORD);
+    ModuleBaseNameFn       moduleBaseNameFn = nullptr;
+
+    if (HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll"); kernel32 != nullptr)
+    {
+        if (SharedUtil::TryGetProcAddress(kernel32, "K32GetModuleBaseNameW", moduleBaseNameFn) ||
+            SharedUtil::TryGetProcAddress(kernel32, "GetModuleBaseNameW", moduleBaseNameFn))
+        {
+            return moduleBaseNameFn(process, nullptr, buffer, bufferLength);
+        }
+    }
+
+    HMODULE psapi = GetModuleHandleW(L"psapi.dll");
+    if (psapi == nullptr)
+        psapi = LoadLibraryW(L"psapi.dll");
+
+    if (psapi != nullptr && SharedUtil::TryGetProcAddress(psapi, "GetModuleBaseNameW", moduleBaseNameFn))
+        return moduleBaseNameFn(process, nullptr, buffer, bufferLength);
+
+    return 0;
+}
+}            // namespace
 
 struct SignerInfo
 {
@@ -325,7 +353,7 @@ static bool IsSteamProcess(DWORD pid)
 
     wchar_t processName[MAX_PATH];
 
-    if (!GetModuleBaseNameW(process, nullptr, processName, sizeof(processName) / sizeof(wchar_t)))
+    if (GetProcessBaseName(process, processName, static_cast<DWORD>(sizeof(processName) / sizeof(processName[0]))) == 0)
         return false;
 
     if (wcsicmp(processName, L"steam.exe") != 0)
@@ -380,7 +408,10 @@ bool CSteamClient::Load()
     static auto pAddDllDirectory = ([]() -> decltype(&AddDllDirectory) {
         if (const HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll"); kernel32 != nullptr)
         {
-            return reinterpret_cast<decltype(&AddDllDirectory)>(static_cast<void*>(GetProcAddress(kernel32, "AddDllDirectory")));
+            decltype(&AddDllDirectory) addDllDirectory = nullptr;
+            if (!SharedUtil::TryGetProcAddress(kernel32, "AddDllDirectory", addDllDirectory))
+                return nullptr;
+            return addDllDirectory;
         }
 
         return nullptr;
@@ -439,10 +470,8 @@ bool CSteamClient::Load()
     }
 
     releaseLibraryLock.reset();
-    
-    Native::CreateInterface = reinterpret_cast<decltype(Native::CreateInterface)>(static_cast<void*>(GetProcAddress(dll, "CreateInterface")));
 
-    if (!Native::CreateInterface)
+    if (!SharedUtil::TryGetProcAddress(dll, "CreateInterface", Native::CreateInterface))
     {
         FreeLibrary(dll);
         return false;

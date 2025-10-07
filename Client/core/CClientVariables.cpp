@@ -234,7 +234,15 @@ void CClientVariables::ValidateValues()
 
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
-    ClampValue("fps_limit", 0, std::numeric_limits<short>::max());
+
+    // CVars need a better API for this (Issue #4427)
+    int temp;
+    CVARS_GET("fps_limit", temp);
+    std::uint16_t fps = static_cast<std::uint16_t>(temp);
+    FPSLimits::IsValidAndSetValid(fps, fps);
+    CVARS_SET("fps_limit", fps);
+
+
     ClampValue("chat_font", 0, 3);
     ClampValue("chat_lines", 3, 62);
     ClampValue("chat_color", CColor(0, 0, 0, 0), CColor(255, 255, 255, 255));
@@ -257,13 +265,24 @@ void CClientVariables::ValidateValues()
     ClampValue("voicevolume", 0.0f, 1.0f);
     ClampValue("mapalpha", 0, 255);
     ClampValue("mapimage", 0, 1);
+    ClampValue("borderless_gamma_power", 0.5f, 2.0f);
+    ClampValue("borderless_brightness_scale", 0.5f, 2.0f);
+    ClampValue("borderless_contrast_scale", 0.5f, 2.0f);
+    ClampValue("borderless_saturation_scale", 0.5f, 2.0f);
+    ClampValue("borderless_gamma_enabled", false, true);
+    ClampValue("borderless_brightness_enabled", false, true);
+    ClampValue("borderless_contrast_enabled", false, true);
+    ClampValue("borderless_saturation_enabled", false, true);
+    ClampValue("borderless_apply_windowed", false, true);
+    ClampValue("borderless_apply_fullscreen", false, true);
 }
 
 void CClientVariables::LoadDefaults()
 {
-    #define DEFAULT(__x,__y)    if(!Exists(__x)) \
-                                Set(__x,__y)
-    #define _S(__x)             std::string(__x)
+#define DEFAULT(__x, __y) \
+    if (!Exists(__x)) \
+    Set(__x, __y)
+#define _S(__x) std::string(__x)
 
     if (!Exists("nick"))
     {
@@ -279,6 +298,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("console_size", CVector2D(200, 200));                        // console size
     DEFAULT("serverbrowser_size", CVector2D(720.0f, 495.0f));            // serverbrowser size
     DEFAULT("fps_limit", 100);                                           // frame limiter
+    DEFAULT("vsync", true);                                              // vsync
     DEFAULT("chat_font", 2);                                             // chatbox font type
     DEFAULT("chat_lines", 10);                                           // chatbox lines
     DEFAULT("chat_color", CColor(0, 0, 0, 0));                           // chatbox background color
@@ -338,6 +358,24 @@ void CClientVariables::LoadDefaults()
     DEFAULT("display_fullscreen_style", 0);                                           // 0-standard 1-borderless 2-borderless keep res 3-borderless stretch
     DEFAULT("display_windowed", 0);                                                   // 0-off 1-on
     DEFAULT("multimon_fullscreen_minimize", 1);                                       // 0-off 1-on
+    DEFAULT("borderless_gamma_power", 0.95f);                                         // Gamma exponent applied to windowed gamma ramp (1.0 = unchanged)
+    DEFAULT("borderless_brightness_scale", 1.03f);                                    // Brightness multiplier for windowed gamma ramp (1.0 = unchanged)
+    DEFAULT("borderless_contrast_scale", 1.0f);                                       // Contrast multiplier for borderless presentation (1.0 = unchanged)
+    DEFAULT("borderless_saturation_scale", 1.0f);                                     // Saturation multiplier for borderless presentation (1.0 = unchanged)
+    DEFAULT("borderless_enable_srgb", false);                                         // Enable sRGB correction when running borderless
+    DEFAULT("borderless_gamma_enabled", false);                                       // Apply gamma adjustment while borderless tuning active
+    DEFAULT("borderless_brightness_enabled", false);                                  // Apply brightness adjustment while borderless tuning active
+    DEFAULT("borderless_contrast_enabled", false);                                    // Apply contrast adjustment while borderless tuning active
+    DEFAULT("borderless_saturation_enabled", false);                                  // Apply saturation adjustment while borderless tuning active
+    DEFAULT("borderless_apply_windowed", false);                                      // Apply display adjustments while windowed/borderless
+    DEFAULT("borderless_apply_fullscreen", false);                                   // Apply display adjustments while in exclusive fullscreen
+
+    if (Exists("borderless_enable_srgb"))
+    {
+    bool legacyEnable = false;
+        Get("borderless_enable_srgb", legacyEnable);
+        Set("borderless_apply_windowed", legacyEnable);
+    }
     DEFAULT("vertical_aim_sensitivity", 0.0015f);                                     // 0.0015f is GTA default setting
     DEFAULT("process_priority", 0);                                                   // 0-normal 1-above normal 2-high
     DEFAULT("process_dpi_aware", false);                                              // Enable DPI awareness in core initialization
@@ -379,4 +417,8 @@ void CClientVariables::LoadDefaults()
 #if 0
     DEFAULT ( "streaming_memory",           50 );                           // Streaming memory
 #endif
+
+#undef DEFAULT
+#undef _S
+
 }

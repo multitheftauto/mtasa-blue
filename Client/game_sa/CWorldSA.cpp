@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <numbers>
 #include <multiplayer/CMultiplayer.h>
 #include <core/CCoreInterface.h>
 #include "CGameSA.h"
@@ -275,7 +276,13 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
     }
 
     // Get matrix, and it's inverse
-    c.entity->matrix->ConvertToMatrix(c.entMat);
+    if (c.entity->matrix)
+        c.entity->matrix->ConvertToMatrix(c.entMat);
+    else
+    {
+        c.entMat.SetPosition(c.entity->m_transform.m_translate);
+        c.entMat.SetRotation(CVector{0.0f, 0.0f, c.entity->m_transform.m_heading});
+    }
     c.entInvMat = c.entMat.Inverse();
 
     // ...to transform the line origin and end into object space
@@ -533,9 +540,18 @@ CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float rad
         return nullptr;
     
     result.collisionDetected = true;
-    result.modelID = entity->m_nModelIndex;
-    result.entityPosition = entity->matrix->vPos;
-    ConvertMatrixToEulerAngles(*entity->matrix, result.entityRotation.fX, result.entityRotation.fY, result.entityRotation.fZ);
+    result.modelID = entity->m_nModelIndex;   
+    if (entity->matrix)
+    {
+        result.entityPosition = entity->matrix->vPos;
+        ConvertMatrixToEulerAngles(*entity->matrix, result.entityRotation.fX, result.entityRotation.fY, result.entityRotation.fZ);
+    }
+    else
+    {
+        result.entityPosition = entity->m_transform.m_translate;
+        result.entityRotation.fX = result.entityRotation.fY = 0.0f;
+        result.entityRotation.fZ = entity->m_transform.m_heading * (180.0f/std::numbers::pi);
+    }
     result.entityRotation = -result.entityRotation;
     result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
     result.type = static_cast<eEntityType>(entity->nType);
