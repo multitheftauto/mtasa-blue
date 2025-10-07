@@ -163,7 +163,8 @@ namespace SharedUtil
     class GlobalUnlockGuard
     {
     public:
-    using MutexGuard = std::scoped_lock<std::mutex>;
+
+    using MutexGuard = std::lock_guard<std::mutex>;
 
         GlobalUnlockGuard() noexcept = default;
         explicit GlobalUnlockGuard(WinHGlobalHandle handle) noexcept : m_handle(handle) {}
@@ -203,7 +204,11 @@ namespace SharedUtil
 
     [[nodiscard]] WinHGlobalHandle release() noexcept
         {
-            return WithLock([&]() noexcept { return std::exchange(m_handle, nullptr); });
+            return WithLock([&]() noexcept { 
+                WinHGlobalHandle temp = m_handle;
+                m_handle = nullptr;
+                return temp;
+            });
         }
 
     [[nodiscard]] WinHGlobalHandle get() const noexcept
@@ -223,14 +228,14 @@ namespace SharedUtil
         }
 
         template <typename Fn>
-        decltype(auto) WithLock(Fn&& fn) const noexcept(noexcept(std::invoke(std::forward<Fn>(fn))))
+        auto WithLock(Fn&& fn) const noexcept(noexcept(fn())) -> decltype(fn())
         {
             MutexGuard lock(m_mutex);
-            return std::invoke(std::forward<Fn>(fn));
+            return fn();
         }
 
         template <typename Fn>
-        decltype(auto) WithLock(Fn&& fn) noexcept(noexcept(static_cast<const GlobalUnlockGuard*>(this)->WithLock(std::forward<Fn>(fn))))
+        auto WithLock(Fn&& fn) noexcept(noexcept(static_cast<const GlobalUnlockGuard*>(this)->WithLock(std::forward<Fn>(fn)))) -> decltype(static_cast<const GlobalUnlockGuard*>(this)->WithLock(std::forward<Fn>(fn)))
         {
             return static_cast<const GlobalUnlockGuard*>(this)->WithLock(std::forward<Fn>(fn));
         }

@@ -39,7 +39,9 @@
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
 #include "version.h"
-namespace SharedUtil::Details
+namespace SharedUtil
+{
+namespace Details
 {
     constexpr size_t kMaxClipboardBytes = 100u * 1024u * 1024u;
     constexpr size_t kMaxClipboardChars = kMaxClipboardBytes / sizeof(wchar_t);
@@ -49,6 +51,7 @@ namespace SharedUtil::Details
         static std::mutex mutex;
         return mutex;
     }
+}
 }
 
 #if defined(SHAREDUTIL_PLATFORM_WINDOWS)
@@ -68,7 +71,9 @@ namespace SharedUtil::Details
         #undef GetModuleBaseNameW
     #endif
 
-namespace SharedUtil::Details
+namespace SharedUtil
+{
+namespace Details
 {
     class UniqueHGlobal
     {
@@ -105,6 +110,7 @@ namespace SharedUtil::Details
     private:
         HGLOBAL m_handle = nullptr;
     };
+}
 }
 #else
     #include <wctype.h>
@@ -900,7 +906,8 @@ SString SharedUtil::GetClipboardText()
     if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
         return result;
 
-    if (const HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT); clipboardData)
+    const HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
+    if (clipboardData)
     {
         void* rawData = GlobalLock(clipboardData);
         if (!rawData)
