@@ -661,6 +661,11 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
             fDistance = static_cast<CClientObject&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
             return true;
         }
+        case CCLIENTBUILDING:
+        {
+            fDistance = static_cast<CClientBuilding&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
+            return true;
+        }
     }
 
     return false;
