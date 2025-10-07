@@ -24,6 +24,9 @@ namespace
 // Cached static Direct3D pointer for lockless fast-path access
 std::atomic<IDirect3D9*> g_cachedStaticDirect3D{nullptr};
 std::atomic<bool>        g_cachedDirect3DValid{false};
+// Cached adapter monitor for lockless fast-path access
+std::atomic<HMONITOR>    g_cachedAdapterMonitor{nullptr};
+std::atomic<bool>        g_cachedAdapterMonitorValid{false};
 
 IDirect3D9* GetFirstValidTrackedDirect3D(std::vector<IDirect3D9*>& trackedList)
 {
@@ -85,8 +88,9 @@ CProxyDirect3D9::~CProxyDirect3D9()
     {
         std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
         ListRemove(ms_CreatedDirect3D9List, m_pDevice);
-        // Invalidate cache when removing this device
+        // Invalidate both caches when removing this device
         g_cachedDirect3DValid.store(false, std::memory_order_release);
+        g_cachedAdapterMonitorValid.store(false, std::memory_order_release);
     }
     ReleaseInterface(m_pDevice, 8752);
 }
@@ -232,12 +236,30 @@ HMONITOR CProxyDirect3D9::GetAdapterMonitor(UINT Adapter)
 
 HMONITOR CProxyDirect3D9::StaticGetAdapterMonitor(UINT Adapter)
 {
+    // Fast path: use cached monitor without lock (for default adapter 0)
+    if (Adapter == 0 && g_cachedAdapterMonitorValid.load(std::memory_order_acquire))
+    {
+        HMONITOR hMonitor = g_cachedAdapterMonitor.load(std::memory_order_acquire);
+        if (hMonitor)
+            return hMonitor;
+    }
+    
+    // Slow path: refresh cache under lock
     std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
     IDirect3D9* pDirect3D = GetFirstValidTrackedDirect3D(ms_CreatedDirect3D9List);
     if (!pDirect3D)
         return NULL;
 
-    return pDirect3D->GetAdapterMonitor(Adapter);
+    HMONITOR hMonitor = pDirect3D->GetAdapterMonitor(Adapter);
+    
+    // Cache result for default adapter
+    if (Adapter == 0 && hMonitor)
+    {
+        g_cachedAdapterMonitor.store(hMonitor, std::memory_order_release);
+        g_cachedAdapterMonitorValid.store(true, std::memory_order_release);
+    }
+    
+    return hMonitor;
 }
 
 IDirect3D9* CProxyDirect3D9::StaticGetDirect3D()
