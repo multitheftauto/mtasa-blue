@@ -165,7 +165,7 @@ private:
 
     IDirect3DDevice9* m_pDevice;
     CDirect3DData*    m_pData;
-    ULONG             m_ulRefCount;
+    std::atomic<LONG> m_lRefCount;
     uint64_t          m_registrationToken;
     HRESULT           m_lastTestCooperativeLevelResult;
 

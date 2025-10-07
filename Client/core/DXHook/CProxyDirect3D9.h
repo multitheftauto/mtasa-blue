@@ -49,5 +49,5 @@ public:
 
 private:
     IDirect3D9*  m_pDevice;
-    volatile LONG m_lRefCount;
+    std::atomic<LONG> m_lRefCount;
 };
