@@ -102,19 +102,20 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
     if (!IsValidComInterfacePointer(pInterface, ComPtrValidation::ValidationMode::ForceRefresh))
     {
         SString message;
-        message.Format("CProxyDirect3D9 ctor: received invalid IDirect3D9 pointer %p", pInterface);
+        message.Format("CProxyDirect3D9 ctor: received invalid IDirect3D9 pointer %p, proxy will be non-functional", pInterface);
         AddReportLog(8753, message, 5);
-        m_pDevice = pInterface;
+        // Leave m_pDevice as nullptr - do not store invalid pointers
+        return;
     }
-    else
-    {
-        ReplaceInterface(m_pDevice, pInterface, "CProxyDirect3D9 ctor");
-        pInterface->Release();
-    }
+
+    // Take ownership of the interface pointer
+    // ReplaceInterface will AddRef(), giving us our own reference
+    // Caller retains their reference
+    ReplaceInterface(m_pDevice, pInterface, "CProxyDirect3D9 ctor");
 
     if (m_pDevice)
     {
-    if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
+        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
         {
             ms_CreatedDirect3D9List.push_back(m_pDevice);
         }
@@ -137,11 +138,8 @@ CProxyDirect3D9::~CProxyDirect3D9()
 /*** IUnknown methods ***/
 HRESULT CProxyDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
 {
-    if (!m_pDevice || !IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
+    if (!m_pDevice)
     {
-        SString message;
-        message.Format("CProxyDirect3D9::QueryInterface rejected invalid IDirect3D9 pointer %p", m_pDevice);
-        AddReportLog(8752, message, 5);
         if (ppvObj)
             *ppvObj = nullptr;
         return E_POINTER;
@@ -155,18 +153,7 @@ ULONG CProxyDirect3D9::AddRef()
     LONG lNewRefCount = InterlockedIncrement(&m_lRefCount);
 
     if (m_pDevice)
-    {
-        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
-        {
-            m_pDevice->AddRef();
-        }
-        else
-        {
-            SString message;
-            message.Format("CProxyDirect3D9::AddRef rejected invalid IDirect3D9 pointer %p", m_pDevice);
-            AddReportLog(8752, message, 5);
-        }
-    }
+        m_pDevice->AddRef();
 
     return static_cast<ULONG>(lNewRefCount);
 }
@@ -184,18 +171,7 @@ ULONG CProxyDirect3D9::Release()
     }
 
     if (m_pDevice && lNewRefCount > 0)
-    {
-        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
-        {
-            m_pDevice->Release();
-        }
-        else
-        {
-            SString message;
-            message.Format("CProxyDirect3D9::Release rejected invalid IDirect3D9 pointer %p", m_pDevice);
-            AddReportLog(8752, message, 5);
-        }
-    }
+        m_pDevice->Release();
 
     if (lNewRefCount == 0)
         delete this;
@@ -206,69 +182,95 @@ ULONG CProxyDirect3D9::Release()
 /*** IDirect3D9 methods ***/
 HRESULT CProxyDirect3D9::RegisterSoftwareDevice(void* pInitializeFunction)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->RegisterSoftwareDevice(pInitializeFunction);
 }
 
 UINT CProxyDirect3D9::GetAdapterCount()
 {
+    if (!m_pDevice)
+        return 0;
     return m_pDevice->GetAdapterCount();
 }
 
 HRESULT CProxyDirect3D9::GetAdapterIdentifier(UINT Adapter, DWORD Flags, D3DADAPTER_IDENTIFIER9* pIdentifier)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->GetAdapterIdentifier(Adapter, Flags, pIdentifier);
 }
 
 UINT CProxyDirect3D9::GetAdapterModeCount(UINT Adapter, D3DFORMAT Format)
 {
+    if (!m_pDevice)
+        return 0;
     return m_pDevice->GetAdapterModeCount(Adapter, Format);
 }
 
 HRESULT CProxyDirect3D9::EnumAdapterModes(UINT Adapter, D3DFORMAT Format, UINT Mode, D3DDISPLAYMODE* pMode)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->EnumAdapterModes(Adapter, Format, Mode, pMode);
 }
 
 HRESULT CProxyDirect3D9::GetAdapterDisplayMode(UINT Adapter, D3DDISPLAYMODE* pMode)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->GetAdapterDisplayMode(Adapter, pMode);
 }
 
 HRESULT CProxyDirect3D9::CheckDeviceType(UINT Adapter, D3DDEVTYPE DevType, D3DFORMAT AdapterFormat, D3DFORMAT BackBufferFormat, BOOL bWindowed)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDeviceType(Adapter, DevType, AdapterFormat, BackBufferFormat, bWindowed);
 }
 
 HRESULT CProxyDirect3D9::CheckDeviceFormat(UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT AdapterFormat, DWORD Usage, D3DRESOURCETYPE RType,
                                            D3DFORMAT CheckFormat)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDeviceFormat(Adapter, DeviceType, AdapterFormat, Usage, RType, CheckFormat);
 }
 
 HRESULT CProxyDirect3D9::CheckDeviceMultiSampleType(UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT SurfaceFormat, BOOL Windowed,
                                                     D3DMULTISAMPLE_TYPE MultiSampleType, DWORD* pQualityLevels)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDeviceMultiSampleType(Adapter, DeviceType, SurfaceFormat, Windowed, MultiSampleType, pQualityLevels);
 }
 
 HRESULT CProxyDirect3D9::CheckDepthStencilMatch(UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT AdapterFormat, D3DFORMAT RenderTargetFormat,
                                                 D3DFORMAT DepthStencilFormat)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDepthStencilMatch(Adapter, DeviceType, AdapterFormat, RenderTargetFormat, DepthStencilFormat);
 }
 
 HRESULT CProxyDirect3D9::CheckDeviceFormatConversion(UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT SourceFormat, D3DFORMAT TargetFormat)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDeviceFormatConversion(Adapter, DeviceType, SourceFormat, TargetFormat);
 }
 
 HRESULT CProxyDirect3D9::GetDeviceCaps(UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->GetDeviceCaps(Adapter, DeviceType, pCaps);
 }
 
 HMONITOR CProxyDirect3D9::GetAdapterMonitor(UINT Adapter)
 {
+    if (!m_pDevice)
+        return NULL;
     return m_pDevice->GetAdapterMonitor(Adapter);
 }
 
@@ -336,7 +338,20 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     #endif
 
     // Set dark titlebar if needed
-    BOOL darkTitleBar = GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme") == "\x0";
+    int themeStatus = 0;
+    const SString appsUseLightTheme =
+        GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme", &themeStatus);
+    BOOL darkTitleBar = FALSE;
+    if (themeStatus > 0)
+    {
+        // Parse the registry value into a numeric flag
+        char* themeEnd = nullptr;
+        const long themeNumeric = strtol(appsUseLightTheme.c_str(), &themeEnd, 10);
+        if (themeEnd != appsUseLightTheme.c_str() && *themeEnd == '\0')
+        {
+            darkTitleBar = (themeNumeric == 0);
+        }
+    }
     DwmSetWindowAttribute(hFocusWindow, DWMWA_USE_IMMERSIVE_DARK_MODE, &darkTitleBar, sizeof(darkTitleBar));
 
     // Update icon
@@ -355,7 +370,14 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     // Redraw, we avoid possible problems with the fact that it won't replace the icon somewhere
     InvalidateRect(hFocusWindow, nullptr, TRUE);
     UpdateWindow(hFocusWindow);
-    
+
+    // Check if proxy has valid device pointer
+    if (!m_pDevice)
+    {
+        AddReportLog(8754, SStringX("CProxyDirect3D9::CreateDevice - proxy has no valid IDirect3D9 device"), 5);
+        return D3DERR_INVALIDDEVICE;
+    }
+
     // Detect if second call to CreateDevice
     if (CreateDeviceSecondCallCheck(hResult, m_pDevice, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface))
     {
@@ -857,13 +879,19 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         {
             // Log graphic card name
             D3DADAPTER_IDENTIFIER9 AdapterIdent1;
-            pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent1);
+            ZeroMemory(&AdapterIdent1, sizeof(AdapterIdent1));
+            hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent1);
+            if (FAILED(hr))
+                WriteDebugEvent(SString("Warning: pDirect3D->GetAdapterIdentifier failed: %08x", hr));
             WriteDebugEvent("pDirect3D:");
             WriteDebugEvent(ToString(AdapterIdent1));
 
             // Log graphic card name
             D3DADAPTER_IDENTIFIER9 AdapterIdent2;
-            pDirect3DOther->GetAdapterIdentifier(Adapter, 0, &AdapterIdent2);
+            ZeroMemory(&AdapterIdent2, sizeof(AdapterIdent2));
+            hr = pDirect3DOther->GetAdapterIdentifier(Adapter, 0, &AdapterIdent2);
+            if (FAILED(hr))
+                WriteDebugEvent(SString("Warning: pDirect3DOther->GetAdapterIdentifier failed: %08x", hr));
             WriteDebugEvent("pDirect3DOther:");
             WriteDebugEvent(ToString(AdapterIdent2));
 
@@ -1020,7 +1048,10 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
 {
     // Log graphic card name
     D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
+    ZeroMemory(&AdapterIdent, sizeof(AdapterIdent));
+    HRESULT hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
+    if (FAILED(hr))
+        WriteDebugEvent(SString("Warning: GetAdapterIdentifier failed: %08x", hr));
     WriteDebugEvent(ToString(AdapterIdent));
 
     uint uiCurrentStatus = 0;            //  0-unknown  1-fail  2-success after retry  3-success
@@ -1150,13 +1181,6 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
         strMessage += "There was a problem starting MTA:SA\n\n";
         strMessage += SString("Direct3D CreateDevice error: %08x", hResult);
         BrowseToSolution("d3dcreatedevice-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage);
-    }
-    else
-    {
-        // Get current refresh rate
-        D3DDISPLAYMODE DisplayMode;
-        if (pDirect3D->GetAdapterDisplayMode(Adapter, &DisplayMode) == D3D_OK)
-            CCore::GetSingleton().SetCurrentRefreshRate(DisplayMode.RefreshRate);
     }
 
     return hResult;
@@ -1340,7 +1364,10 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
 
     // Log graphic card name
     D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
+    ZeroMemory(&AdapterIdent, sizeof(AdapterIdent));
+    HRESULT hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
+    if (FAILED(hr))
+        WriteDebugEvent(SString("Warning: GetAdapterIdentifier failed: %08x", hr));
     WriteDebugEvent(ToString(AdapterIdent));
 
     // Store the rendering window in the direct 3d data
@@ -1422,3 +1449,4 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
 
     return hResult;
 }
+
