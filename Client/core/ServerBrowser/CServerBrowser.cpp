@@ -2442,13 +2442,32 @@ bool CServerBrowser::ProcessServerListRefreshBatch(ServerBrowserType type, size_
     size_t processed = 0;
     while (state.iterator != state.endIterator && processed < uiMaxSteps)
     {
-        CServerListItem* pServer = *state.iterator;
+        CServerListItem* pServer = (state.iterator != state.endIterator) ? *state.iterator : nullptr;
+
+        // The list can briefly hand us null if an item was erased between batches
+        if (!pServer)
+        {
+            ++state.iterator;
+            state.bNeedsListClear = true;
+            continue;
+        }
+
+        // Skip entries that were removed from the list while we were waiting to process them
+        if (!CServerListItem::StaticIsValid(pServer))
+        {
+            ++state.iterator;
+            state.bNeedsListClear = true;
+            continue;
+        }
 
         if (state.bNeedsListClear)
             pServer->iRowIndex = -1;
 
         if (type == ServerBrowserTypes::FAVOURITES || type == ServerBrowserTypes::RECENTLY_PLAYED)
-            GetServerCache()->GetServerCachedInfo(pServer);
+        {
+            if (pServer->Address.s_addr != 0 && pServer->usGamePort != 0)
+                GetServerCache()->GetServerCachedInfo(pServer);
+        }
 
         if (pServer->revisionInList[type] != pServer->uiRevision || state.bClearServerList)
         {
