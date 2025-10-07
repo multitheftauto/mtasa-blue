@@ -372,7 +372,9 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
         {
             D3DADAPTER_IDENTIFIER9 adaptIdent;
             ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
-            pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
+            HRESULT hr = pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
+            if (FAILED(hr))
+                WriteDebugEvent(SString("Warning: GetAdapterIdentifier failed in device constructor: %08x", hr));
 
             int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
 
