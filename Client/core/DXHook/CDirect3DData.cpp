@@ -38,17 +38,20 @@ void CDirect3DData::StoreTransform(D3DTRANSFORMSTATETYPE dwMatrixToStore, const 
     if (!pMatrix)
         return;
 
-    // Use direct assignment instead of memcpy for better performance
+    // Only copy matrix if it has changed (avoid 64-byte copy)
     switch (dwMatrixToStore)
     {
         case D3DTS_VIEW:
-            m_mViewMatrix = *pMatrix;
+            if (memcmp(&m_mViewMatrix, pMatrix, sizeof(D3DMATRIX)) != 0)
+                m_mViewMatrix = *pMatrix;
             break;
         case D3DTS_PROJECTION:
-            m_mProjMatrix = *pMatrix;
+            if (memcmp(&m_mProjMatrix, pMatrix, sizeof(D3DMATRIX)) != 0)
+                m_mProjMatrix = *pMatrix;
             break;
         case D3DTS_WORLD:
-            m_mWorldMatrix = *pMatrix;
+            if (memcmp(&m_mWorldMatrix, pMatrix, sizeof(D3DMATRIX)) != 0)
+                m_mWorldMatrix = *pMatrix;
             break;
         default:
             // Do nothing for unsupported transforms

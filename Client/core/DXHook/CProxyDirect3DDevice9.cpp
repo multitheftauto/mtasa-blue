@@ -16,6 +16,7 @@
 #include <atomic>
 #include <cmath>
 #include <mutex>
+#include <thread>
 #include <game/CSettings.h>
 
 class CProxyDirect3DDevice9;
@@ -26,24 +27,6 @@ void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3
 namespace
 {
 
-constexpr const char* kSetTextureContexts[] = {
-    "SetTexture stage 0",
-    "SetTexture stage 1",
-    "SetTexture stage 2",
-    "SetTexture stage 3",
-    "SetTexture stage 4",
-    "SetTexture stage 5",
-    "SetTexture stage 6",
-    "SetTexture stage 7",
-};
-
-const char* GetSetTextureContextString(size_t stage)
-{
-    constexpr auto count = std::size(kSetTextureContexts);
-    if (stage < count)
-        return kSetTextureContexts[stage];
-    return "SetTexture";
-}
 
 } // unnamed namespace
 
@@ -702,7 +685,7 @@ static bool WaitForGpuIdle(IDirect3DDevice9* pDevice)
                 break;
             }
 
-            Sleep(0);
+            std::this_thread::yield();
         }
     }
 
@@ -841,8 +824,8 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 
 HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion)
 {
-    // Reset frame stat counters
-    DeviceState.FrameStats = {};
+    // Reset frame stat counters - using memset for efficiency
+    memset(&DeviceState.FrameStats, 0, sizeof(DeviceState.FrameStats));
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCoopLevel = D3DERR_INVALIDCALL;
@@ -1152,7 +1135,6 @@ HRESULT CProxyDirect3DDevice9::BeginScene()
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
@@ -1243,7 +1225,9 @@ HRESULT CProxyDirect3DDevice9::SetMaterial(CONST D3DMATERIAL9* pMaterial)
         return D3DERR_INVALIDCALL;
     }
 
-    DeviceState.Material = *pMaterial;
+    // Update cache if material has changed (avoid 68-byte copy)
+    if (memcmp(&DeviceState.Material, pMaterial, sizeof(D3DMATERIAL9)) != 0)
+        DeviceState.Material = *pMaterial;
     return m_pDevice->SetMaterial(pMaterial);
 }
 
@@ -1259,7 +1243,8 @@ HRESULT CProxyDirect3DDevice9::SetLight(DWORD Index, CONST D3DLIGHT9* pLight)
         return D3DERR_INVALIDCALL;
     }
 
-    if (Index < NUMELMS(DeviceState.Lights))
+    // Update cache if light has changed (avoid 104-byte copy)
+    if (Index < NUMELMS(DeviceState.Lights) && memcmp(&DeviceState.Lights[Index], pLight, sizeof(D3DLIGHT9)) != 0)
         DeviceState.Lights[Index] = *pLight;
     return m_pDevice->SetLight(Index, pLight);
 }
@@ -1293,8 +1278,10 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane(DWORD Index, float* pPlane)
 
 HRESULT CProxyDirect3DDevice9::SetRenderState(D3DRENDERSTATETYPE State, DWORD Value)
 {
+    // Update cache for state tracking
     if (State < NUMELMS(DeviceState.RenderState.Raw))
         DeviceState.RenderState.Raw[State] = Value;
+
     return m_pDevice->SetRenderState(State, Value);
 }
 
@@ -1355,9 +1342,11 @@ HRESULT CProxyDirect3DDevice9::GetTextureStageState(DWORD Stage, D3DTEXTURESTAGE
 
 HRESULT CProxyDirect3DDevice9::SetTextureStageState(DWORD Stage, D3DTEXTURESTAGESTATETYPE Type, DWORD Value)
 {
+    // Update cache for state tracking
     if (Stage < NUMELMS(DeviceState.StageState))
         if (Type < NUMELMS(DeviceState.StageState[Stage].Raw))
             DeviceState.StageState[Stage].Raw[Type] = Value;
+
     return m_pDevice->SetTextureStageState(Stage, Type, Value);
 }
 
@@ -1368,9 +1357,11 @@ HRESULT CProxyDirect3DDevice9::GetSamplerState(DWORD Sampler, D3DSAMPLERSTATETYP
 
 HRESULT CProxyDirect3DDevice9::SetSamplerState(DWORD Sampler, D3DSAMPLERSTATETYPE Type, DWORD Value)
 {
+    // Update cache for state tracking
     if (Sampler < NUMELMS(DeviceState.SamplerState))
         if (Type < NUMELMS(DeviceState.SamplerState[Sampler].Raw))
             DeviceState.SamplerState[Sampler].Raw[Type] = Value;
+
     return m_pDevice->SetSamplerState(Sampler, Type, Value);
 }
 
