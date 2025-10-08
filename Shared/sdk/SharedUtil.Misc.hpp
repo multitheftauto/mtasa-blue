@@ -79,6 +79,12 @@ namespace SharedUtil::Details
         #undef GetModuleBaseNameW
     #endif
 
+struct HKeyDeleter
+{
+    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
+};
+using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
+
 namespace SharedUtil::Details
 {
     class UniqueHGlobal
@@ -116,7 +122,7 @@ namespace SharedUtil::Details
     private:
         HGLOBAL m_handle = nullptr;
     };
-}
+}            // namespace SharedUtil::Details
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
@@ -152,12 +158,6 @@ struct SReportLine
     bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
-
-struct HKeyDeleter
-{
-    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
-};
-using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
 
 #ifdef MTA_CLIENT
 
@@ -1439,7 +1439,7 @@ void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, c
                             "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", 
                             uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, 
                             (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown", 
-                            (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
+                            (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "" );
 
     OutputDebugString("[ReportLog] ");
     OutputDebugString(&szOutput[0]);
