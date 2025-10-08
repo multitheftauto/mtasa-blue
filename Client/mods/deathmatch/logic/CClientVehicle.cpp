@@ -135,7 +135,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     memset(&m_ucLightStates[0], 0, sizeof(m_ucLightStates));
     m_bCanBeDamaged = true;
     m_bSyncUnoccupiedDamage = false;
-    m_bScriptCanBeDamaged = true;
+    m_bScriptCanBeDamaged = !IsLocalEntity();
     m_bTyresCanBurst = true;
     m_ucOverrideLights = 0;
     m_pTowedVehicle = NULL;
@@ -1176,6 +1176,9 @@ void CClientVehicle::CalcAndUpdateCanBeDamagedFlag()
     if (m_bSyncUnoccupiedDamage)
         bCanBeDamaged = true;
 
+    if (IsLocalEntity())
+        bCanBeDamaged = m_bScriptCanBeDamaged;
+
     // Script override
     if (!m_bScriptCanBeDamaged)
         bCanBeDamaged = false;
@@ -1217,6 +1220,9 @@ void CClientVehicle::CalcAndUpdateTyresCanBurstFlag()
 
     if (m_bSyncUnoccupiedDamage)
         bTyresCanBurst = true;
+
+    if (IsLocalEntity())
+        bTyresCanBurst = m_bScriptCanBeDamaged;
 
     // Script override
     if (!m_bScriptCanBeDamaged)
