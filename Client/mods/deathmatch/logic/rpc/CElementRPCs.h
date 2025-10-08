@@ -51,4 +51,5 @@ public:
     DECLARE_ELEMENT_RPC(SetCallPropagationEnabled);
     DECLARE_ELEMENT_RPC(SetColPolygonHeight);
     DECLARE_ELEMENT_RPC(SetElementOnFire);
+    DECLARE_ELEMENT_RPC(SetElementCollidableWith);
 };
