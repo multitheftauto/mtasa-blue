@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-05 14:21+0000\n"
-"PO-Revision-Date: 2025-10-05 14:21\n"
+"POT-Creation-Date: 2025-10-07 19:25+0000\n"
+"PO-Revision-Date: 2025-10-08 20:59\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -113,7 +113,7 @@ msgstr "الرجاء إيقاف البرامج التالية قبل الاست�
 
 #: Client/loader/MainFunctions.cpp:64
 msgid "Invalid module path detected.\n"
-msgstr "تم الكشف عن مسارات غير صحيحة للعبة."
+msgstr "تم الكشف عن مسار وحدة غير صالح."
 
 #: Client/loader/MainFunctions.cpp:91
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
@@ -256,7 +256,7 @@ msgstr "توجد مشاكل في أثناء إعادة تشغيل MTA:SA\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1439
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:193
+#: Shared/sdk/SharedUtil.Misc.hpp:247
 msgid "Error"
 msgstr "خطأ"
 
@@ -285,10 +285,9 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
-msgstr "مسار تثبيت لعبتك 'MTA:SA' أو 'GTA: San Andreas'\n"
-"تحتوي على فاصلة منقوطة (';').\n\n"
-"إذا واجهت مشكلات عند تشغيل MTA:SA،\n"
-"انقل التثبيت إلى مسار لا يحتوي على فاصلة منقوطة."
+msgstr "يحتوي مسار تثبيت 'MTA:SA' أو 'GTA: San Andreas' على ';' (فاصلة منقوطة).\n\n"
+"إذا واجهت مشاكل عند تشغيل MTA:SA،\n"
+"قم بنقل تثبيت اللعبة إلى مسار لا يحتوي على فاصلة منقوطة."
 
 #: Client/loader/MainFunctions.cpp:1023
 msgid "Invalid installation paths detected."
@@ -939,7 +938,7 @@ msgstr "الاتصال: فشل في إلغاء تحميل المود الحال�
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "إعادة الاتصال: لم يتم تجهيز الشبكة بعد، يُرجى الانتظار قليلاً"
+msgstr "إعادة الاتصال: الشبكة غير متاحة حاليًا، يرجى الانتظار"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
@@ -1444,7 +1443,7 @@ msgstr "تمكين Javascript في المواقع الخارجية"
 
 #: Client/core/CSettings.cpp:1558
 msgid "Enable GPU rendering"
-msgstr "تمكين وظيفة بطاقة العرض"
+msgstr "تفعيل العرض باستخدام وحدة معالجة الرسوميات"
 
 #: Client/core/CSettings.cpp:1562
 msgid "Custom blacklist"
@@ -1846,7 +1845,7 @@ msgstr "القائمة الرئيسية"
 
 #: Client/core/CSettings.cpp:4414 Client/core/CCore.cpp:698
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1098
-#: Client/mods/deathmatch/logic/CResource.cpp:368
+#: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
 msgstr "في اللعبة"
 
@@ -2027,7 +2026,7 @@ msgstr "إصلاح حركة الفأرة - قد يتطلب إعادة تشغيل
 
 #: Client/core/CSettings.cpp:5982
 msgid "CPU affinity:"
-msgstr "تحديد معالج CPU:"
+msgstr "ارتباط المعالج:"
 
 #: Client/core/CSettings.cpp:5982
 msgid "Only change if you're having stability issues."
@@ -2370,7 +2369,7 @@ msgstr "زر تحكم المجموعة للخلف"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "الشخصية التي قمت بإختيارها لا يمكن تحميلها, والشخصية الأساسية لا يمكن تحميلها أيضاً, الرجاء إعادة تثبيت MTA."
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1189
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1328
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "هل تريد أن ترى بعض المساعدة على الإنترنت عن هذه المشكلة؟"
 
@@ -2474,7 +2473,7 @@ msgstr "(قائمة الخادم الاحتياطي)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:351
 msgid "Cannot create LAN-broadcast socket"
-msgstr ""
+msgstr "تعذر إنشاء مقبس البث عبر الشبكة المحلية (LAN)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:361
 msgid "Cannot bind LAN-broadcast socket"
@@ -2649,7 +2648,7 @@ msgstr "إبدء البحث"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:315
 #: Client/core/ServerBrowser/CServerBrowser.cpp:362
 msgid "Delete from recent"
-msgstr ""
+msgstr "الحذف من العناصر الأخيرة"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:429
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2001
@@ -2713,7 +2712,7 @@ msgid "Loading..."
 msgstr "جاري التحميل..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1506
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2812
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2831
 msgid "  ..loading.."
 msgstr "    ..جاري التحميل.."
 
@@ -2838,7 +2837,7 @@ msgstr "تصغير خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map north"
-msgstr "يحرك خريطة اللاعب إلى الشمال"
+msgstr "تحريك خريطة اللاعب نحو الشمال"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map south"
@@ -2846,7 +2845,7 @@ msgstr "تحريك خريطة اللاعب جنوبًا"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map east"
-msgstr "يحرك خريطة اللاعب إلى الشرق"
+msgstr "تحريك خريطة اللاعب نحو الشرق"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map west"
@@ -2858,15 +2857,15 @@ msgstr "يربط خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces player-map opacity"
-msgstr "يقلل وضوح خريطة اللاعب"
+msgstr "خفض شفافية خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases player-map opacity"
-msgstr "يزيد وضوح خريطة اللاعب"
+msgstr "رفع شفافية خريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles player-map help text"
-msgstr "يبدّل عرض نص مساعدة خريطة اللاعب"
+msgstr "يبدّل عرض نص المساعدة لخريطة اللاعب"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
@@ -2951,20 +2950,20 @@ msgstr "تغيير الوضع: %s"
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr "التكبير: %s من %s الحركة: %s، %s، %s، %s الشفافية: %s من %s"
+msgstr "التكبير: %s/%s الحركة: %s, %s, %s, %s الشفافية: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr "تفعيل/إلغاء الخريطة: %s تفعيل/إلغاء نص المساعدة: %s"
+msgstr "تبديل الخريطة: %s تبديل نص المساعدة: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr "تتبع اللاعب"
+msgstr "يتبع اللاعب"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr "تحرك بحرية"
+msgstr "يتحرك بحرية"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -3273,19 +3272,19 @@ msgstr "يقاتل في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Throwing fists in"
-msgstr "الاشتباك بالأيدي في"
+msgstr "يضرب بالقبضات في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Blastin' fools in"
-msgstr "تفجير الخصوم في"
+msgstr "يطلق النار على الأوغاد في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Shooting up"
-msgstr "إطلاق النار"
+msgstr "يطلق النار"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:402
 msgid "Jetpacking in"
-msgstr "التحليق بالسترة النفاثة في"
+msgstr "يتنقل بالطيران بحقيبة نفاثة في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:403
 msgid "Literally on fire in"
@@ -3418,11 +3417,11 @@ msgstr "خطأ بروتوكول (%u). إذا استمرت هذه المشكلة�
 msgid "Connection error"
 msgstr "خطأ في الاتصال."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:193
+#: Shared/sdk/SharedUtil.Misc.hpp:247
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "لم يتم تثبيت Multi Theft Auto بشكل صحيح، الرجاء إعادة التثبيت."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:1203
+#: Shared/sdk/SharedUtil.Misc.hpp:1342
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "سوف يعرض المتصفح الآن صفحة ويب مع بعض المعلومات للمساعدة.\n\n"
