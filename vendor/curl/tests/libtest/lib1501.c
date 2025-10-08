@@ -21,17 +21,22 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include <fcntl.h>
+
+#include "testutil.h"
+#include "warnless.h"
 #include "memdebug.h"
 
-static CURLcode test_lib1501(const char *URL)
-{
-  static const long HANG_TIMEOUT = 30 * 1000;
-  /* 500 milliseconds allowed. An extreme number but lets be really
-     conservative to allow old and slow machines to run this test too */
-  static const int MAX_BLOCKED_TIME_MS = 500;
+#define TEST_HANG_TIMEOUT 30 * 1000
 
+/* 500 milliseconds allowed. An extreme number but lets be really conservative
+   to allow old and slow machines to run this test too */
+#define MAX_BLOCKED_TIME_MS 500
+
+CURLcode test(char *URL)
+{
   CURL *handle = NULL;
   CURLM *mhandle = NULL;
   CURLcode res = CURLE_OK;
@@ -52,7 +57,7 @@ static CURLcode test_lib1501(const char *URL)
 
   multi_perform(mhandle, &still_running);
 
-  abort_on_test_timeout_custom(HANG_TIMEOUT);
+  abort_on_test_timeout();
 
   while(still_running) {
     struct timeval timeout;
@@ -60,9 +65,9 @@ static CURLcode test_lib1501(const char *URL)
     fd_set fdwrite;
     fd_set fdexcep;
     int maxfd = -99;
-    struct curltime before;
-    struct curltime after;
-    timediff_t e;
+    struct timeval before;
+    struct timeval after;
+    long e;
 
     timeout.tv_sec = 0;
     timeout.tv_usec = 100000L; /* 100 ms */
@@ -77,18 +82,18 @@ static CURLcode test_lib1501(const char *URL)
 
     select_test(maxfd + 1, &fdread, &fdwrite, &fdexcep, &timeout);
 
-    abort_on_test_timeout_custom(HANG_TIMEOUT);
+    abort_on_test_timeout();
 
     curl_mfprintf(stderr, "ping\n");
-    before = curlx_now();
+    before = tutil_tvnow();
 
     multi_perform(mhandle, &still_running);
 
-    abort_on_test_timeout_custom(HANG_TIMEOUT);
+    abort_on_test_timeout();
 
-    after = curlx_now();
-    e = curlx_timediff(after, before);
-    curl_mfprintf(stderr, "pong = %ld\n", (long)e);
+    after = tutil_tvnow();
+    e = tutil_tvdiff(after, before);
+    curl_mfprintf(stderr, "pong = %ld\n", e);
 
     if(e > MAX_BLOCKED_TIME_MS) {
       res = CURLE_TOO_LARGE;

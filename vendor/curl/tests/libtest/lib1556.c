@@ -21,8 +21,10 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
+#include "warnless.h"
 #include "memdebug.h"
 
 struct headerinfo {
@@ -42,7 +44,7 @@ static size_t header(char *ptr, size_t size, size_t nmemb, void *stream)
   return nmemb * size;
 }
 
-static CURLcode test_lib1556(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode code;
   CURL *curl = NULL;
@@ -67,7 +69,7 @@ static CURLcode test_lib1556(const char *URL)
     goto test_cleanup;
   }
 
-  curl_mprintf("Max = %zu\n", info.largest);
+  curl_mprintf("Max = %ld\n", (long)info.largest);
 
 test_cleanup:
 

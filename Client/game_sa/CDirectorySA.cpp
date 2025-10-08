@@ -44,7 +44,7 @@ bool CDirectorySAInterface::RemoveEntry(const char* fileName)
 
     std::ptrdiff_t index = entry - m_entries;
 
-    if (index < m_numEntries - 1)
+    if (index < static_cast<std::ptrdiff_t>(m_numEntries - 1))
     {
         DirectoryInfoSA* lastEntry = m_entries + m_numEntries - 1;
         entry->m_offset = lastEntry->m_offset + lastEntry->m_sizeInArchive;
@@ -52,7 +52,7 @@ bool CDirectorySAInterface::RemoveEntry(const char* fileName)
 
     m_numEntries--;
 
-    if (index < m_numEntries)
+    if (index < static_cast<std::ptrdiff_t>(m_numEntries))
         std::memmove(entry, entry + 1, (m_numEntries - index) * sizeof(DirectoryInfoSA));
 
     return true;

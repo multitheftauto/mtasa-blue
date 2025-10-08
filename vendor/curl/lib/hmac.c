@@ -73,8 +73,7 @@ Curl_HMAC_init(const struct HMAC_params *hashparams,
 
   /* If the key is too long, replace it by its hash digest. */
   if(keylen > hashparams->maxkeylen) {
-    if(hashparams->hinit(ctxt->hashctxt1))
-      return NULL;
+    hashparams->hinit(ctxt->hashctxt1);
     hashparams->hupdate(ctxt->hashctxt1, key, keylen);
     hkey = (unsigned char *) ctxt->hashctxt2 + hashparams->ctxtsize;
     hashparams->hfinal(hkey, ctxt->hashctxt1);
@@ -83,9 +82,8 @@ Curl_HMAC_init(const struct HMAC_params *hashparams,
   }
 
   /* Prime the two hash contexts with the modified key. */
-  if(hashparams->hinit(ctxt->hashctxt1) ||
-     hashparams->hinit(ctxt->hashctxt2))
-    return NULL;
+  hashparams->hinit(ctxt->hashctxt1);
+  hashparams->hinit(ctxt->hashctxt2);
 
   for(i = 0; i < keylen; i++) {
     b = (unsigned char)(*key ^ hmac_ipad);

@@ -301,8 +301,7 @@ void SwitchContext(CPed* thePed)
                     pGameInterface->SetGravity(data->m_fGravity);
 
                     // Disable mouselook for remote players (so the mouse doesn't affect them)
-                    // Only disable mouselook if they're not holding a 1st-person weapon
-                    // And if they're not under-water
+                    // Disable mouselook if they're not holding a 1st-person weapon
                     bool bDisableMouseLook = true;
                     if (pWeapon)
                     {
@@ -312,6 +311,15 @@ void SwitchContext(CPed* thePed)
                             bDisableMouseLook = false;
                         }
                     }
+
+                    // Disable mouse look if they're not in a fight task and not aiming (strafing)
+                    // Fix GitHub Issue #395
+                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && data->m_pad.NewState.RightShoulder1 != 0 && thePed->GetPedIntelligence()->GetFightTask())
+                        bDisableMouseLook = false;
+
+                    // Disable mouse look if they're not underwater (Ped vertical rotation when diving)
+                    // TODO - After merge PR #4401
+
                     bMouseLookEnabled = *(bool*)0xB6EC2E;
                     if (bDisableMouseLook)
                         *(bool*)0xB6EC2E = false;
@@ -501,10 +509,12 @@ struct CSavedRegs
 };
 static CSavedRegs PlayerPed__ProcessControl_Saved;
 
-VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
+static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     // Assumes no reentrancy
-    _asm
+    __asm
     {
         mov     dwCurrentPlayerPed, ecx
 
@@ -522,7 +532,7 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 
     SwitchContext((CPedSAInterface*)dwCurrentPlayerPed);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CPlayerPed__ProcessControl
@@ -532,16 +542,18 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
     }
 }
 
-void _declspec(naked) CPlayerPed__ProcessControl_Abort()
+static void __declspec(naked) CPlayerPed__ProcessControl_Abort()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // restore stuff
         mov     eax, PlayerPed__ProcessControl_Saved.eax
@@ -557,7 +569,7 @@ void _declspec(naked) CPlayerPed__ProcessControl_Abort()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -566,9 +578,11 @@ void _declspec(naked) CPlayerPed__ProcessControl_Abort()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -576,7 +590,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CAutomobile__ProcessControl
@@ -586,7 +600,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -595,9 +609,11 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
+static void __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -605,7 +621,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CMonsterTruck__ProcessControl
@@ -615,7 +631,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -624,9 +640,11 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
+static void __declspec(naked) HOOK_CTrailer__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -634,7 +652,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CTrailer__ProcessControl
@@ -644,7 +662,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -653,9 +671,11 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
+static void __declspec(naked) HOOK_CQuadBike__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -663,7 +683,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CQuadBike__ProcessControl
@@ -673,7 +693,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -682,9 +702,11 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CPlane__ProcessControl()
+static void __declspec(naked) HOOK_CPlane__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -692,7 +714,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CPlane__ProcessControl
@@ -702,7 +724,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -711,9 +733,11 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CBmx__ProcessControl()
+static void __declspec(naked) HOOK_CBmx__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -721,7 +745,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CBmx__ProcessControl
@@ -731,7 +755,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -740,9 +764,11 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CTrain__ProcessControl()
+static void __declspec(naked) HOOK_CTrain__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -750,7 +776,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CTrain__ProcessControl
@@ -760,7 +786,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -769,9 +795,11 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CBoat__ProcessControl()
+static void __declspec(naked) HOOK_CBoat__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -779,7 +807,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CBoat__ProcessControl
@@ -789,7 +817,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -798,9 +826,11 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CBike__ProcessControl()
+static void __declspec(naked) HOOK_CBike__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -808,7 +838,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CBike__ProcessControl
@@ -818,7 +848,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn
@@ -827,9 +857,11 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
 
 //--------------------------------------------------------------------------------------------
 
-VOID _declspec(naked) HOOK_CHeli__ProcessControl()
+static void __declspec(naked) HOOK_CHeli__ProcessControl()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
@@ -837,7 +869,7 @@ VOID _declspec(naked) HOOK_CHeli__ProcessControl()
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
+    __asm
     {
         popad
         mov     edx, FUNC_CHeli__ProcessControl
@@ -847,7 +879,7 @@ VOID _declspec(naked) HOOK_CHeli__ProcessControl()
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    __asm
     {
         popad
         retn

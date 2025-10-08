@@ -569,7 +569,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
     if (strlen(pathList[0].c_str()))
     {
         // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-        if (strchr(pathList[0].c_str(), '?') > 0)
+        if (strchr(pathList[0].c_str(), '?') != nullptr)
             return GAME_PATH_UNICODE_CHARS;
     }
 
@@ -2155,7 +2155,7 @@ bool IsNativeArm64Host()
         if (kernel32)
         {
             BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
-            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(GetProcAddress(kernel32, "IsWow64Process2"));
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(static_cast<void*>(GetProcAddress(kernel32, "IsWow64Process2")));
 
             if (IsWow64Process2_)
             {

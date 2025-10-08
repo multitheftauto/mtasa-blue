@@ -15,8 +15,11 @@
 
 bool CPlayerResourceStartPacket::Read(NetBitStreamInterface& BitStream)
 {
-    ushort usResourceNetId;
-    BitStream.Read(usResourceNetId);
+    ushort usResourceNetId{};
+
+    if (!BitStream.Read(usResourceNetId) || !BitStream.Read(m_startCounter))
+        return false;
+
     m_pResource = g_pGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
     return true;
 }

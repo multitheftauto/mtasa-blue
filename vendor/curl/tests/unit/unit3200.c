@@ -21,63 +21,72 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 #include "curl_get_line.h"
 #include "memdebug.h"
-
-static CURLcode test_unit3200(const char *arg)
-{
-  UNITTEST_BEGIN_SIMPLE
 
 #if !defined(CURL_DISABLE_COOKIES) || !defined(CURL_DISABLE_ALTSVC) ||  \
   !defined(CURL_DISABLE_HSTS) || !defined(CURL_DISABLE_NETRC)
 
-#if defined(CURL_GNUC_DIAG) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Woverlength-strings"
-#endif
-
-  /* The test XML does not supply a way to write files without newlines
-   * so we write our own
-   */
+/* The test XML does not supply a way to write files without newlines
+ * so we write our own
+ */
 
 #define C64 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 #define C256 C64 C64 C64 C64
 #define C1024 C256 C256 C256 C256
 #define C4096 C1024 C1024 C1024 C1024
 
-  static const char *filecontents[] = {
-    /* Both should be read */
-    "LINE1\n"
-    "LINE2 NEWLINE\n",
+static CURLcode unit_setup(void)
+{
+  return CURLE_OK;
+}
 
-    /* Both should be read */
-    "LINE1\n"
-    "LINE2 NONEWLINE",
-
-    /* Only first should be read */
-    "LINE1\n"
-    C4096,
-
-    /* First line should be read */
-    "LINE1\n"
-    C4096 "SOME EXTRA TEXT",
-
-    /* Only first should be read */
-    "LINE1\n"
-    C4096 "SOME EXTRA TEXT\n"
-    "LINE3\n",
-
-    "LINE1\x1aTEST"
-  };
+static CURLcode unit_stop(void)
+{
+  return CURLE_OK;
+}
 
 #if defined(CURL_GNUC_DIAG) || defined(__clang__)
-#pragma GCC diagnostic pop
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverlength-strings"
 #endif
 
+#define NUMTESTS 6
+static const char *filecontents[] = {
+  /* Both should be read */
+  "LINE1\n"
+  "LINE2 NEWLINE\n",
+
+  /* Both should be read */
+  "LINE1\n"
+  "LINE2 NONEWLINE",
+
+  /* Only first should be read */
+  "LINE1\n"
+  C4096,
+
+  /* First line should be read */
+  "LINE1\n"
+  C4096 "SOME EXTRA TEXT",
+
+  /* Only first should be read */
+  "LINE1\n"
+  C4096 "SOME EXTRA TEXT\n"
+  "LINE3\n",
+
+  "LINE1\x1aTEST"
+};
+
+#if defined(CURL_GNUC_DIAG) || defined(__clang__)
+#pragma GCC diagnostic warning "-Woverlength-strings"
+#endif
+
+
+UNITTEST_START
   size_t i;
   int rc = 0;
-  for(i = 0; i < CURL_ARRAYSIZE(filecontents); i++) {
+  for(i = 0; i < NUMTESTS; i++) {
     FILE *fp;
     struct dynbuf buf;
     size_t len = 4096;
@@ -162,8 +171,21 @@ static CURLcode test_unit3200(const char *arg)
     curl_mfprintf(stderr, "OK\n");
   }
   return (CURLcode)rc;
+UNITTEST_STOP
 
+#if defined(CURL_GNUC_DIAG) || defined(__clang__)
+#pragma GCC diagnostic pop
 #endif
 
-  UNITTEST_END_SIMPLE
+#else
+static CURLcode unit_setup(void)
+{
+  return CURLE_OK;
 }
+static void unit_stop(void)
+{
+}
+UNITTEST_START
+UNITTEST_STOP
+
+#endif

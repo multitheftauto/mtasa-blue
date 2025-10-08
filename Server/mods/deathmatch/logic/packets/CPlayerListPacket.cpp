@@ -205,7 +205,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(pPlayer->GetInterior());
 
             // Write the weapons of the player weapon slots
-            for (unsigned int i = 0; i < 16; ++i)
+            for (unsigned char i = 0; i < 16; ++i)
             {
                 CWeapon* pWeapon = pPlayer->GetWeapon(i);
                 if (pWeapon && pWeapon->ucType != 0)

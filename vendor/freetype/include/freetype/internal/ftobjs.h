@@ -4,7 +4,7 @@
  *
  *   The FreeType private base classes (specification).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -520,9 +520,9 @@ FT_BEGIN_HEADER
    */
   typedef struct  FT_ModuleRec_
   {
-    FT_Module_Class*  clazz;
-    FT_Library        library;
-    FT_Memory         memory;
+    const FT_Module_Class*  clazz;
+    FT_Library              library;
+    FT_Memory               memory;
 
   } FT_ModuleRec;
 

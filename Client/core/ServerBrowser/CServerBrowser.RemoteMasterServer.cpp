@@ -23,6 +23,7 @@ public:
     virtual void Refresh();
     virtual bool HasData();
     virtual bool ParseList(CServerListItemList& itemList);
+    virtual void Cancel();
 
     // CRemoteMasterServer
     void Init(const SString& strURL);
@@ -42,6 +43,7 @@ protected:
     SString   m_strStage;
     SString   m_strURL;
     CBuffer   m_Data;
+    bool      m_bPendingDownload = false;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -121,10 +123,35 @@ void CRemoteMasterServer::Refresh()
     // Send new request
     m_strStage = "waitingreply";
     m_llLastRefreshTime = GetTickCount64_();
-    AddRef();            // Keep alive
     SHttpRequestOptions options;
     options.uiConnectionAttempts = 1;
-    GetHTTP()->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options);
+    if (GetHTTP()->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options))
+    {
+        m_bPendingDownload = true;
+        AddRef();            // Keep alive
+    }
+    else
+    {
+        m_strStage = "nogood";
+    }
+}
+
+void CRemoteMasterServer::Cancel()
+{
+    if (!m_bPendingDownload)
+        return;
+
+    if (GetHTTP()->CancelDownload(this, &CRemoteMasterServer::StaticDownloadFinished))
+    {
+        m_bPendingDownload = false;
+        m_strStage.clear();
+        Release();
+    }
+    else
+    {
+        m_bPendingDownload = false;
+        m_strStage.clear();
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -150,6 +177,8 @@ void CRemoteMasterServer::StaticDownloadFinished(const SHttpDownloadResult& resu
 ///////////////////////////////////////////////////////////////
 void CRemoteMasterServer::DownloadFinished(const SHttpDownloadResult& result)
 {
+    m_bPendingDownload = false;
+
     if (result.bSuccess)
     {
         if (m_strStage == "waitingreply")

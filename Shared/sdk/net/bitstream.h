@@ -28,13 +28,27 @@
 #endif
 
 struct ISyncStructure;
-class NetBitStreamInterface;
 
-class NetBitStreamInterfaceNoVersion : public CRefCountable
+// eBitStreamVersion allows us to track what BitStream version is being used without placing magic numbers everywhere.
+// It also helps us know what code branches can be removed when we increment a major version of MTA.
+// Make sure you only add new items to the end of the list, above the "Latest" entry.
+enum class eBitStreamVersion : unsigned short
+{
+    Unk = 0x030,
+
+    // DESCRIPTION
+    // YYYY-MM-DD
+    // Name,
+
+    // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
+    // Make sure you only add things above this comment.
+    Next,
+    Latest = Next - 1,
+};
+
+class NetBitStreamInterface : public CRefCountable
 {
 public:
-    virtual operator NetBitStreamInterface&() = 0;
-
     virtual int  GetReadOffsetAsBits() = 0;
     virtual void SetReadOffsetAsBits(int iOffset) = 0;
 
@@ -127,6 +141,10 @@ public:
     virtual void AlignReadToByteBoundary() const = 0;
 
     virtual unsigned char* GetData() const = 0;
+
+    virtual unsigned short Version() const = 0;
+
+    bool Can(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(Version()) >= query; }
 
     // Force long types to use 4 bytes
     bool Read(unsigned long& e)

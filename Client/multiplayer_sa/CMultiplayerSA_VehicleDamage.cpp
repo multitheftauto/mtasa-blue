@@ -63,9 +63,11 @@ bool OnMY_CVehicle_BurstTyre(CVehicleSAInterface* pVehicle, uchar ucTyre)
 #define HOOKCHECK_CAutomobile_BurstTyre                     0x6A
 DWORD RETURN_CAutomobile_BurstTyre_A = 0x06A3321;
 DWORD RETURN_CAutomobile_BurstTyre_B = 0x06A3425;
-void _declspec(naked) HOOK_CAutomobile_BurstTyre()
+static void __declspec(naked) HOOK_CAutomobile_BurstTyre()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    edi
@@ -100,9 +102,11 @@ cont:
 #define HOOKCHECK_CBike_BurstTyre                       0x6A
 DWORD RETURN_CBike_BurstTyre_A = 0x06BEB9E;
 DWORD RETURN_CBike_BurstTyre_B = 0x06BECA5;
-void _declspec(naked) HOOK_CBike_BurstTyre()
+static void __declspec(naked) HOOK_CBike_BurstTyre()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         movzx   eax, bl
@@ -149,9 +153,11 @@ bool OnMY_CVehicle_InflictDamage(CVehicleSAInterface* pVehicle, CEntitySAInterfa
 #define HOOKSIZE_CVehicle_InflictDamage                         5
 #define HOOKCHECK_CVehicle_InflictDamage                        0x6A
 DWORD RETURN_CVehicle_InflictDamage = 0x0404CDC;
-void _declspec(naked) HOOK_CVehicle_InflictDamage()
+static void __declspec(naked) HOOK_CVehicle_InflictDamage()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -203,9 +209,11 @@ void OnMY_CVehicle_VehicleDamage1(CVehicleSAInterface* pVehicle, float f, ushort
 #define HOOKSIZE_CAutomobile_VehicleDamage1                     7
 #define HOOKCHECK_CAutomobile_VehicleDamage1                    0x6A
 DWORD RETURN_CAutomobile_VehicleDamage1 = 0x06A7657;
-void _declspec(naked) HOOK_CAutomobile_VehicleDamage1()
+static void __declspec(naked) HOOK_CAutomobile_VehicleDamage1()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -262,9 +270,11 @@ float OnMY_CVehicle_VehicleDamage2(CVehicleSAInterface* pVehicle, float fDamage)
 #define HOOKSIZE_CAutomobile_VehicleDamage2                     6
 #define HOOKCHECK_CAutomobile_VehicleDamage2                    0xD8
 DWORD RETURN_CAutomobile_VehicleDamage2 = 0x06A832B;
-void _declspec(naked) HOOK_CAutomobile_VehicleDamage2()
+static void __declspec(naked) HOOK_CAutomobile_VehicleDamage2()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         fstp    [esp-4] // Pop loss
@@ -293,9 +303,11 @@ void _declspec(naked) HOOK_CAutomobile_VehicleDamage2()
 #define HOOKSIZE_CPlane_VehicleDamage1                      8
 #define HOOKCHECK_CPlane_VehicleDamage1                     0x83
 DWORD RETURN_CPlane_VehicleDamage1 = 0x06CC4B8;
-void _declspec(naked) HOOK_CPlane_VehicleDamage1()
+static void __declspec(naked) HOOK_CPlane_VehicleDamage1()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -328,9 +340,11 @@ void _declspec(naked) HOOK_CPlane_VehicleDamage1()
 #define HOOKSIZE_CPlane_VehicleDamage2                      6
 #define HOOKCHECK_CPlane_VehicleDamage2                     0xD8
 DWORD RETURN_CPlane_VehicleDamage2 = 0x06CC6CE;
-void _declspec(naked) HOOK_CPlane_VehicleDamage2()
+static void __declspec(naked) HOOK_CPlane_VehicleDamage2()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         fstp    [esp-4] // Pop loss
@@ -359,9 +373,11 @@ void _declspec(naked) HOOK_CPlane_VehicleDamage2()
 #define HOOKSIZE_CBike_VehicleDamage1                       5
 #define HOOKCHECK_CBike_VehicleDamage1                      0x51
 DWORD RETURN_CBike_VehicleDamage1 = 0x06B8EC5;
-void _declspec(naked) HOOK_CBike_VehicleDamage1()
+static void __declspec(naked) HOOK_CBike_VehicleDamage1()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -394,9 +410,11 @@ void _declspec(naked) HOOK_CBike_VehicleDamage1()
 #define HOOKSIZE_CBike_VehicleDamage2                       6
 #define HOOKCHECK_CBike_VehicleDamage2                      0xD8
 DWORD RETURN_CBike_VehicleDamage2 = 0x06B91C8;
-void _declspec(naked) HOOK_CBike_VehicleDamage2()
+static void __declspec(naked) HOOK_CBike_VehicleDamage2()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         fstp    [esp-4] // Pop loss

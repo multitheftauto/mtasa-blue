@@ -51,7 +51,7 @@ bool CTxdPoolSA::IsFreeTextureDictonarySlot(std::uint32_t uiTxdId)
     return (*m_ppTxdPoolInterface)->IsEmpty(uiTxdId);
 }
 
-std::uint16_t CTxdPoolSA::GetFreeTextureDictonarySlot()
+std::uint32_t CTxdPoolSA::GetFreeTextureDictonarySlot()
 {
     return (*m_ppTxdPoolInterface)->GetFreeSlot();
 }

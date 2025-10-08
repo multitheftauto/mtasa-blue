@@ -63,7 +63,8 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
         m_Cache.PlrPosition = position.data.vecPosition;
 
-        if (CVehicleManager::GetVehicleType(m_Cache.iModelID) == VEHICLE_TRAIN)
+        // TODO: GetVehicleType does not support the range of 'int'.
+        if (CVehicleManager::GetVehicleType(static_cast<unsigned short>(m_Cache.iModelID)) == VEHICLE_TRAIN)
         {
             // Train specific data
             float fRailPosition = 0.0f;
@@ -425,7 +426,8 @@ void CSimVehiclePuresyncPacket::ReadVehicleSpecific(NetBitStreamInterface& BitSt
     }
 
     // Door angles.
-    if (CVehicleManager::HasDoors(m_Cache.iModelID))
+    // TODO: HasDoors does not support the range of 'int'.
+    if (CVehicleManager::HasDoors(static_cast<unsigned short>(m_Cache.iModelID)))
     {
         SDoorOpenRatioSync door;
 
@@ -456,7 +458,8 @@ void CSimVehiclePuresyncPacket::WriteVehicleSpecific(NetBitStreamInterface& BitS
     }
 
     // Door angles.
-    if (CVehicleManager::HasDoors(m_Cache.iModelID))
+    // TODO: HasDoors does not support the range of 'int'.
+    if (CVehicleManager::HasDoors(static_cast<unsigned short>(m_Cache.iModelID)))
     {
         SDoorOpenRatioSync door;
         for (unsigned int i = 2; i < 6; ++i)

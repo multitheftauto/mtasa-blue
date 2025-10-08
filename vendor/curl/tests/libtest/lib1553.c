@@ -21,14 +21,18 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
+#include "testutil.h"
 #include "testtrace.h"
+#include "warnless.h"
 #include "memdebug.h"
 
-static int t1553_xferinfo(void *p,
-                          curl_off_t dltotal, curl_off_t dlnow,
-                          curl_off_t ultotal, curl_off_t ulnow)
+#define TEST_HANG_TIMEOUT 60 * 1000
+
+static int xferinfo(void *p,
+                    curl_off_t dltotal, curl_off_t dlnow,
+                    curl_off_t ultotal, curl_off_t ulnow)
 {
   (void)p;
   (void)dlnow;
@@ -39,7 +43,7 @@ static int t1553_xferinfo(void *p,
   return 1; /* fail as fast as we can */
 }
 
-static CURLcode test_lib1553(const char *URL)
+CURLcode test(char *URL)
 {
   CURL *curls = NULL;
   CURLM *multi = NULL;
@@ -68,12 +72,12 @@ static CURLcode test_lib1553(const char *URL)
   easy_setopt(curls, CURLOPT_VERBOSE, 1L);
   easy_setopt(curls, CURLOPT_MIMEPOST, mime);
   easy_setopt(curls, CURLOPT_USERPWD, "u:s");
-  easy_setopt(curls, CURLOPT_XFERINFOFUNCTION, t1553_xferinfo);
+  easy_setopt(curls, CURLOPT_XFERINFOFUNCTION, xferinfo);
   easy_setopt(curls, CURLOPT_NOPROGRESS, 1L);
 
-  debug_config.nohex = TRUE;
-  debug_config.tracetime = TRUE;
-  test_setopt(curls, CURLOPT_DEBUGDATA, &debug_config);
+  libtest_debug_config.nohex = 1;
+  libtest_debug_config.tracetime = 1;
+  test_setopt(curls, CURLOPT_DEBUGDATA, &libtest_debug_config);
   easy_setopt(curls, CURLOPT_DEBUGFUNCTION, libtest_debug_cb);
   easy_setopt(curls, CURLOPT_VERBOSE, 1L);
 

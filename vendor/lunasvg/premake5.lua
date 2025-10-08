@@ -1,6 +1,5 @@
 project "lunasvg"
 	language "C++"
-	cppdialect "C++17"
 	kind "StaticLib"
 	targetname "lunasvg"
 	targetdir(buildpath("mta"))
@@ -37,7 +36,14 @@ project "lunasvg"
 		"include"
 	}
 
+	filter "system:windows"
+		disablewarnings {
+			"4244", -- warning C4244: '=': conversion from '?' to '?', possible loss of data
+			"4018", -- warning C4018: '<': signed/unsigned mismatch
+		}
+
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
+	
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }

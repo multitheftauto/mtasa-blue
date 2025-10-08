@@ -24,7 +24,7 @@
 
 #include "curl_setup.h"
 
-#ifdef USE_CURL_NTLM_CORE
+#if defined(USE_CURL_NTLM_CORE)
 
 /*
  * NTLM details:
@@ -40,8 +40,9 @@
    3. USE_GNUTLS
    4. -
    5. USE_MBEDTLS
-   6. USE_OS400CRYPTO
-   7. USE_WIN32_CRYPTO
+   6. USE_SECTRANSP
+   7. USE_OS400CRYPTO
+   8. USE_WIN32_CRYPTO
 
    This ensures that:
    - the same SSL branch gets activated throughout this source
@@ -51,26 +52,26 @@
      in NTLM type-3 messages.
  */
 
-#ifdef USE_OPENSSL
+#if defined(USE_OPENSSL)
   #include <openssl/opensslconf.h>
   #if !defined(OPENSSL_NO_DES) && !defined(OPENSSL_NO_DEPRECATED_3_0)
     #define USE_OPENSSL_DES
   #endif
 #elif defined(USE_WOLFSSL)
   #include <wolfssl/options.h>
-  #ifndef NO_DES3
+  #if !defined(NO_DES3)
     #define USE_OPENSSL_DES
   #endif
 #endif
 
-#ifdef USE_OPENSSL_DES
+#if defined(USE_OPENSSL_DES)
 
-#ifdef USE_OPENSSL
+#if defined(USE_OPENSSL)
 #  include <openssl/des.h>
 #  include <openssl/md5.h>
 #  include <openssl/ssl.h>
 #  include <openssl/rand.h>
-#  ifdef OPENSSL_IS_AWSLC
+#  if defined(OPENSSL_IS_AWSLC)
 #    define DES_set_key_unchecked (void)DES_set_key
 #    define DESKEYARG(x) *x
 #    define DESKEY(x) &x
@@ -83,7 +84,7 @@
 #  include <wolfssl/openssl/md5.h>
 #  include <wolfssl/openssl/ssl.h>
 #  include <wolfssl/openssl/rand.h>
-#  ifdef OPENSSL_COEXIST
+#  if defined(OPENSSL_COEXIST)
 #    define DES_key_schedule WOLFSSL_DES_key_schedule
 #    define DES_cblock WOLFSSL_DES_cblock
 #    define DES_set_odd_parity wolfSSL_DES_set_odd_parity
@@ -105,6 +106,11 @@
 #elif defined(USE_MBEDTLS)
 
 #  include <mbedtls/des.h>
+
+#elif defined(USE_SECTRANSP)
+
+#  include <CommonCrypto/CommonCryptor.h>
+#  include <CommonCrypto/CommonDigest.h>
 
 #elif defined(USE_OS400CRYPTO)
 #  include "cipher.mih"  /* mih/cipher */
@@ -129,7 +135,7 @@
 #include "curl_memory.h"
 #include "memdebug.h"
 
-#ifndef CURL_NTLM_NOT_SUPPORTED
+#if !defined(CURL_NTLM_NOT_SUPPORTED)
 /*
 * Turns a 56-bit key into being 64-bit wide.
 */
@@ -146,7 +152,7 @@ static void extend_key_56_to_64(const unsigned char *key_56, char *key)
 }
 #endif
 
-#ifdef USE_OPENSSL_DES
+#if defined(USE_OPENSSL_DES)
 /*
  * Turns a 56-bit key into a 64-bit, odd parity key and sets the key. The
  * key schedule ks is also set.
@@ -201,6 +207,29 @@ static bool encrypt_des(const unsigned char *in, unsigned char *out,
   mbedtls_des_init(&ctx);
   mbedtls_des_setkey_enc(&ctx, (unsigned char *) key);
   return mbedtls_des_crypt_ecb(&ctx, in, out) == 0;
+}
+
+#elif defined(USE_SECTRANSP)
+
+static bool encrypt_des(const unsigned char *in, unsigned char *out,
+                        const unsigned char *key_56)
+{
+  char key[8];
+  size_t out_len;
+  CCCryptorStatus err;
+
+  /* Expand the 56-bit key to 64 bits */
+  extend_key_56_to_64(key_56, key);
+
+  /* Set the key parity to odd */
+  Curl_des_set_odd_parity((unsigned char *) key, sizeof(key));
+
+  /* Perform the encryption */
+  err = CCCrypt(kCCEncrypt, kCCAlgorithmDES, kCCOptionECBMode, key,
+                kCCKeySizeDES, NULL, in, 8 /* inbuflen */, out,
+                8 /* outbuflen */, &out_len);
+
+  return err == kCCSuccess;
 }
 
 #elif defined(USE_OS400CRYPTO)
@@ -277,7 +306,7 @@ static bool encrypt_des(const unsigned char *in, unsigned char *out,
   return TRUE;
 }
 
-#endif /* USE_WIN32_CRYPTO */
+#endif /* defined(USE_WIN32_CRYPTO) */
 
  /*
   * takes a 21 byte array and treats it as 3 56-bit DES keys. The
@@ -288,7 +317,7 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
                             const unsigned char *plaintext,
                             unsigned char *results)
 {
-#ifdef USE_OPENSSL_DES
+#if defined(USE_OPENSSL_DES)
   DES_key_schedule ks;
 
   setup_des_key(keys, DESKEY(ks));
@@ -310,8 +339,8 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
   des_encrypt(&des, 8, results + 8, plaintext);
   setup_des_key(keys + 14, &des);
   des_encrypt(&des, 8, results + 16, plaintext);
-#elif defined(USE_MBEDTLS) || defined(USE_OS400CRYPTO) ||       \
-  defined(USE_WIN32_CRYPTO)
+#elif defined(USE_MBEDTLS) || defined(USE_SECTRANSP)            \
+  || defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO)
   encrypt_des(plaintext, results, keys);
   encrypt_des(plaintext, results + 8, keys + 7);
   encrypt_des(plaintext, results + 16, keys + 14);
@@ -329,7 +358,7 @@ CURLcode Curl_ntlm_core_mk_lm_hash(const char *password,
                                    unsigned char *lmbuffer /* 21 bytes */)
 {
   unsigned char pw[14];
-#ifndef CURL_NTLM_NOT_SUPPORTED
+#if !defined(CURL_NTLM_NOT_SUPPORTED)
   static const unsigned char magic[] = {
     0x4B, 0x47, 0x53, 0x21, 0x40, 0x23, 0x24, 0x25 /* i.e. KGS!@#$% */
   };
@@ -342,7 +371,7 @@ CURLcode Curl_ntlm_core_mk_lm_hash(const char *password,
   {
     /* Create LanManager hashed password. */
 
-#ifdef USE_OPENSSL_DES
+#if defined(USE_OPENSSL_DES)
     DES_key_schedule ks;
 
     setup_des_key(pw, DESKEY(ks));
@@ -358,8 +387,8 @@ CURLcode Curl_ntlm_core_mk_lm_hash(const char *password,
     des_encrypt(&des, 8, lmbuffer, magic);
     setup_des_key(pw + 7, &des);
     des_encrypt(&des, 8, lmbuffer + 8, magic);
-#elif defined(USE_MBEDTLS) || defined(USE_OS400CRYPTO) ||       \
-  defined(USE_WIN32_CRYPTO)
+#elif defined(USE_MBEDTLS) || defined(USE_SECTRANSP)            \
+  || defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO)
     encrypt_des(magic, lmbuffer, pw);
     encrypt_des(magic, lmbuffer + 8, pw + 7);
 #endif
@@ -380,7 +409,7 @@ static void ascii_to_unicode_le(unsigned char *dest, const char *src,
   }
 }
 
-#ifndef USE_WINDOWS_SSPI
+#if !defined(USE_WINDOWS_SSPI)
 
 static void ascii_uppercase_to_unicode_le(unsigned char *dest,
                                           const char *src, size_t srclen)
@@ -422,7 +451,7 @@ CURLcode Curl_ntlm_core_mk_nt_hash(const char *password,
   return result;
 }
 
-#ifndef USE_WINDOWS_SSPI
+#if !defined(USE_WINDOWS_SSPI)
 
 #define NTLMv2_BLOB_SIGNATURE "\x01\x01\x00\x00"
 #define NTLMv2_BLOB_LEN       (44 -16 + ntlm->target_info_len + 4)
@@ -437,7 +466,7 @@ struct ms_filetime {
 static void time2filetime(struct ms_filetime *ft, time_t t)
 {
 #if SIZEOF_TIME_T > 4
-  t = (t + (curl_off_t)11644473600) * 10000000;
+  t = (t + CURL_OFF_T_C(11644473600)) * 10000000;
   ft->dwLowDateTime = (unsigned int) (t & 0xFFFFFFFF);
   ft->dwHighDateTime = (unsigned int) (t >> 32);
 #else

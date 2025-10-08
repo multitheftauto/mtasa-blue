@@ -68,7 +68,7 @@
  */
 
 #if defined(__INTEL_COMPILER) && (__INTEL_COMPILER == 910) && \
-  defined(__OPTIMIZE__) && defined(__unix__) &&  defined(__i386__)
+    defined(__OPTIMIZE__) && defined(__unix__) &&  defined(__i386__)
   /* workaround icc 9.1 optimizer issue */
 # define vqualifier volatile
 #else
@@ -398,7 +398,11 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
     addr = (void *)ai->ai_addr; /* storage area for this info */
 
     memcpy(&addr->sin_addr, inaddr, sizeof(struct in_addr));
+#ifdef __MINGW32__
+    addr->sin_family = (short)af;
+#else
     addr->sin_family = (CURL_SA_FAMILY_T)af;
+#endif
     addr->sin_port = htons((unsigned short)port);
     break;
 
@@ -407,7 +411,11 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
     addr6 = (void *)ai->ai_addr; /* storage area for this info */
 
     memcpy(&addr6->sin6_addr, inaddr, sizeof(struct in6_addr));
+#ifdef __MINGW32__
+    addr6->sin6_family = (short)af;
+#else
     addr6->sin6_family = (CURL_SA_FAMILY_T)af;
+#endif
     addr6->sin6_port = htons((unsigned short)port);
     break;
 #endif
@@ -513,7 +521,7 @@ curl_dbg_freeaddrinfo(struct addrinfo *freethis,
   freeaddrinfo(freethis);
 #endif
 }
-#endif /* CURLDEBUG && HAVE_FREEADDRINFO */
+#endif /* defined(CURLDEBUG) && defined(HAVE_FREEADDRINFO) */
 
 
 #if defined(CURLDEBUG) && defined(HAVE_GETADDRINFO)
@@ -544,7 +552,7 @@ curl_dbg_getaddrinfo(const char *hostname,
 #else
   int res = getaddrinfo(hostname, service, hints, result);
 #endif
-  if(res == 0)
+  if(0 == res)
     /* success */
     curl_dbg_log("ADDR %s:%d getaddrinfo() = %p\n",
                  source, line, (void *)*result);
@@ -553,7 +561,7 @@ curl_dbg_getaddrinfo(const char *hostname,
                  source, line);
   return res;
 }
-#endif /* CURLDEBUG && HAVE_GETADDRINFO */
+#endif /* defined(CURLDEBUG) && defined(HAVE_GETADDRINFO) */
 
 #if defined(HAVE_GETADDRINFO) && defined(USE_RESOLVE_ON_IPS)
 /*

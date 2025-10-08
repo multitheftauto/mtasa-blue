@@ -21,11 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "first.h"
+#include "test.h"
 
 #include "memdebug.h"
 
-static CURLcode test_lib694(const char *URL)
+CURLcode test(char *URL)
 {
   CURLcode res;
   CURL *curl;
@@ -48,7 +48,7 @@ static CURLcode test_lib694(const char *URL)
   test_setopt(curl, CURLOPT_HEADER, 1L);
   test_setopt(curl, CURLOPT_VERBOSE, 1L);
   test_setopt(curl, CURLOPT_HTTPAUTH,
-              CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NTLM);
+              (long) (CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NTLM));
   test_setopt(curl, CURLOPT_USERPWD, "me:password");
 
   do {

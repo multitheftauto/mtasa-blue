@@ -21,19 +21,24 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "unitcheck.h"
+#include "curlcheck.h"
 
 #include "vtls/x509asn1.h"
 
-static CURLcode test_unit1651(const char *arg)
+static CURLcode unit_setup(void)
 {
-  UNITTEST_BEGIN_SIMPLE
+  return CURLE_OK;
+}
 
-#if defined(USE_GNUTLS) || defined(USE_SCHANNEL)
+static void unit_stop(void)
+{
 
-  /* cert captured from gdb when connecting to curl.se on October 26
-     2018 */
-  static unsigned char cert[] = {
+}
+#if defined(USE_GNUTLS) || defined(USE_SCHANNEL) || defined(USE_SECTRANSP)
+
+/* cert captured from gdb when connecting to curl.se on October 26
+   2018 */
+static unsigned char cert[] = {
   0x30, 0x82, 0x0F, 0x5B, 0x30, 0x82, 0x0E, 0x43, 0xA0, 0x03, 0x02, 0x01, 0x02,
   0x02, 0x0C, 0x08, 0x77, 0x99, 0x2C, 0x6B, 0x67, 0xE1, 0x18, 0xD6, 0x66, 0x66,
   0x9E, 0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01,
@@ -337,8 +342,10 @@ static CURLcode test_unit1651(const char *arg)
   0x70, 0x77, 0x54, 0x57, 0x09, 0x03, 0x56, 0x4A, 0x33, 0x60, 0x00, 0x27, 0xFE,
   0xA7, 0xD7, 0xA9, 0xC4, 0xEC, 0x17, 0x17, 0x8D, 0x87, 0x70, 0x6B, 0x48, 0x88,
   0x61, 0x54, 0x4A, 0x2B, 0xB7, 0x6A, 0x12, 0x08, 0xFB,
-  };
+};
 
+UNITTEST_START
+{
   CURLcode result;
   const char *beg = (const char *)&cert[0];
   const char *end = (const char *)&cert[sizeof(cert)];
@@ -363,7 +370,7 @@ static CURLcode test_unit1651(const char *arg)
       for(i = 0; i < 45; i++) {
         unsigned char backup = cert[i];
         cert[i] = (unsigned char) (byte & 0xff);
-        (void)Curl_extract_certinfo(data, 0, beg, end);
+        (void) Curl_extract_certinfo(data, 0, beg, end);
         cert[i] = backup;
       }
     }
@@ -371,9 +378,15 @@ static CURLcode test_unit1651(const char *arg)
     curl_easy_cleanup(data);
   }
   curl_global_cleanup();
-#else
-  puts("not tested since Curl_extract_certinfo() is not built in");
-#endif
-
-  UNITTEST_END_SIMPLE
 }
+UNITTEST_STOP
+
+#else
+
+UNITTEST_START
+{
+  puts("not tested since Curl_extract_certinfo() is not built-in");
+}
+UNITTEST_STOP
+
+#endif
