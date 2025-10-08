@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-31 20:09\n"
-"PO-Revision-Date: 2025-10-08 18:54\n"
+"PO-Revision-Date: 2025-10-08 19:52\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -38,10 +38,10 @@ msgid "This wizard will guide you through the installation or update of $(^Name)
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
 "Click Next to continue."
-msgstr " معالج و مرشد التثبيت او التحديث من $(^Name) ${REVISION_TAG}\n\n"
-"  ننصح بـ اغلاق جميع البرامج قبل بدء التثبيت .\n\n"
-" [ ربما يتم طلب صلاحيات المسؤول لـ نظام فيستا و مافوق .]\n\n"
-"اضغط التالي للمتابعة.."
+msgstr "سيساعدك هذا البرنامج في تثبيت أو تحديث $(^Name) ${REVISION_TAG}\n\n"
+"يُنصح بإغلاق جميع التطبيقات الأخرى قبل بدء التثبيت.\n\n"
+"[قد يُطلب الوصول كمسؤول في أنظمة Vista والإصدارات الأحدث]\n\n"
+"انقر على \"التالي\" للمتابعة."
 
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:213
@@ -60,11 +60,11 @@ msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
 "$\n"
 "Click Install to begin installing."
-msgstr "الرجاء اختيار مجلد لعبة Grand Theft Auto: San Andreas.$\n"
+msgstr "يرجى تحديد مجلد Grand Theft Auto: San Andreas الخاص بك.$\n"
 " $\n"
-" يجب ان تكون لديك نسخة مثبتة من اللعبة MTA) ،Grand Theft Auto: San Andreas v1.0) لا تدعم اي نسخة اخرى.$\n"
+"يجب أن يكون لديك إصدار Grand Theft Auto: San Andreas 1.0 مثبتًا لاستخدام MTA:SA، حيث إنه لا يدعم أي إصدارات أخرى.$\n"
 " $\n"
-"انقر فوق تثبيت لبدء التركيب."
+"انقر على تثبيت لبدء عملية التثبيت."
 
 #. DESC_Section10
 #: Shared/installer/nightly.nsi:218
@@ -84,7 +84,7 @@ msgstr "تسجيل بروتوكل mtasa:// لكي يكون قابل للنقر �
 #. DESC_Section13
 #: Shared/installer/nightly.nsi:221
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "أضف الى مستكشف العاب ويندوز ( اذا كان موجوداَ ) ."
+msgstr "إضافة إلى مستعرض ألعاب ويندوز (إن وُجد)."
 
 #. DESC_DirectX
 #: Shared/installer/nightly.nsi:222
@@ -94,7 +94,7 @@ msgstr "ثبت أو حدث DirectX (إن كان ضروريا)."
 #. DESC_Section1
 #: Shared/installer/nightly.nsi:223
 msgid "The core components required to run Multi Theft Auto."
-msgstr "العناصراللازمة لـ تشغيل برنامج Multi Theft Auto."
+msgstr "المكونات الأساسية المطلوبة لتشغيل Multi Theft Auto."
 
 #. DESC_Section2
 #: Shared/installer/nightly.nsi:224
@@ -109,7 +109,7 @@ msgstr "خادم Multi Theft Auto. يتيح لك هذا استضافة الأل�
 #. DESC_Section4
 #: Shared/installer/nightly.nsi:228
 msgid "The Multi Theft Auto server. This is a required component."
-msgstr "الشيء المطلوب من MTA هو انشاء سيرفر و التمكن من اللعب فية اون لاين ."
+msgstr "خادم Multi Theft Auto. هذا مكون ضروري."
 
 #. DESC_Section5
 #: Shared/installer/nightly.nsi:229
@@ -149,7 +149,7 @@ msgstr "التطبيق هو البرنامج الذي تشلغه من اجل ا�
 #. INST_CLIENTSERVER
 #: Shared/installer/nightly.nsi:451
 msgid "Client and Server"
-msgstr "المستخدم و الخادم"
+msgstr "العميل والخادم"
 
 #. INST_SERVER
 #: Shared/installer/nightly.nsi:452
@@ -199,7 +199,7 @@ msgstr "المكونات الاساسية"
 #. INST_SEC_GAME
 #: Shared/installer/nightly.nsi:507
 msgid "Game module"
-msgstr "لعبة وحدة"
+msgstr "وحدة اللعبة"
 
 #. INFO_INPLACE_UPGRADE
 #: Shared/installer/nightly.nsi:509
@@ -209,7 +209,7 @@ msgstr "جاري الترقية في نفس المكان ..."
 #. INFO_UPDATE_PERMISSIONS
 #: Shared/installer/nightly.nsi:510
 msgid "Updating permissions. This could take a few minutes..."
-msgstr "تحديث الاذونات .. قد يستغرق دقائق معدودهـ ..."
+msgstr "جاري تحديث الأذونات. قد يستغرق هذا بضع دقائق..."
 
 #. MSGBOX_INVALID_GTASA
 #: Shared/installer/nightly.nsi:511
@@ -223,12 +223,12 @@ msgstr "لم يتم العثور على : Grand Theft Auto: San Andreas  في ا
 #. INST_SEC_CORE_RESOURCES
 #: Shared/installer/nightly.nsi:514
 msgid "Core Resources"
-msgstr "المودات الاساسية"
+msgstr "الموارد الأساسية"
 
 #. INST_SEC_OPTIONAL_RESOURCES
 #: Shared/installer/nightly.nsi:515
 msgid "Optional Resources"
-msgstr "المودات الاختيارية"
+msgstr "الموارد الاختيارية"
 
 #. INST_SEC_EDITOR
 #: Shared/installer/nightly.nsi:516
@@ -243,51 +243,52 @@ msgstr "تطوير"
 #. UNINST_SUCCESS
 #: Shared/installer/nightly.nsi:1041
 msgid "$(^Name) was successfully removed from your computer."
-msgstr "تمت إزالة $(^Name) بنجاح من حاسبك الألكتروني."
+msgstr "تم إزالة $(^Name) بنجاح من جهاز الكمبيوتر الخاص بك."
 
 #. UNINST_FAIL
 #: Shared/installer/nightly.nsi:1048
 msgid "Uninstallation has failed!"
-msgstr "فشل الغاء التثبيت !"
+msgstr "فشل إلغاء التثبيت!"
 
 #. UNINST_REQUEST
 #: Shared/installer/nightly.nsi:1056
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
-msgstr "هل انت متأكد انك تريد ازالة $(^Name) و جميع المكونات الخاصة بة ؟"
+msgstr "هل أنت متأكد أنك تريد إزالة $(^Name) وكل مكوناته تمامًا؟"
 
 #. UNINST_REQUEST_NOTE
 #: Shared/installer/nightly.nsi:1057
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
-msgstr "الغاء التثبيت قبل التحديث$\\r$\n"
-"ليس ضروريا إلغاء التثبيت قبل تثبيت نسخة جديدة من MTA:SA$\\r$\n"
-"شغل المثبت الجديد للتحديث و حفظ إعداداتك"
+msgstr "هل تريد إلغاء التثبيت قبل التحديث؟$\\r$\n"
+"ليس من الضروري إلغاء التثبيت قبل تثبيت نسخة جديدة من MTA:SA.$\\r$\n"
+"شغل المثبّت الجديد للترقية مع الحفاظ على إعداداتك."
 
 #. UNINST_DATA_REQUEST
 #: Shared/installer/nightly.nsi:1070
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
-msgstr "هل تود حفظ بياناتك مثل ( المودات , الصور لقطات الشاشة و جميع اعدادات السيرفر الخاص بـ جهازك ) ؟ اذا قمت باختيار لا اي مود موجود او اعداد او لقطات للشاشة من قبل سوف تذهب و تزال نهائيا ."
+msgstr "هل ترغب في الاحتفاظ بملفات البيانات الخاصة بك (مثل الموارد، لقطات الشاشة، وتكوينات السيرفر)؟\n"
+"إذا ضغطت لا، فسيتم فقدان أي موارد أو إعدادات أو لقطات شاشة قمت بإنشائها."
 
 #. UAC_RIGHTS1
 #: Shared/installer/nightly.nsi:1253
 msgid "This installer requires admin access, try again"
-msgstr "هذا التثبيت يحتاج الى صلاحيات مسؤول حاول مرة اخرى "
+msgstr "هذا المثبّت يحتاج صلاحيات المسؤول، حاول مرة أخرى"
 
 #. UAC_RIGHTS_UN
 #: Shared/installer/nightly.nsi:1254
 msgid "This uninstaller requires admin access, try again"
-msgstr "حاول ازالة التثبيت بـ صلاحيات مسؤول حاول مرة اخرى"
+msgstr "إزالة التثبيت يحتاج صلاحيات المسؤول، حاول مرة أخرى"
 
 #. UAC_RIGHTS3
 #: Shared/installer/nightly.nsi:1255
 msgid "Logon service not running, aborting!"
-msgstr "خدمة تسجيل الدخول لا تعمل! احباط!"
+msgstr "خدمة تسجيل الدخول غير نشطة، تم الإلغاء!"
 
 #. UAC_RIGHTS4
 #: Shared/installer/nightly.nsi:1256
 msgid "Unable to elevate"
-msgstr "غير قادر على الرفع !"
+msgstr "غير قادر على رفع الصلاحيات"
 
 #. INST_MTA_CONFLICT
 #: Shared/installer/nightly.nsi:1852
@@ -295,10 +296,10 @@ msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
 " Are you sure you want to overwrite MTA $1 at $INSTDIR ?"
-msgstr "هناك نسخة سابقة من MTA ($1) في هذا المسار.$\n"
+msgstr "نسخة رئيسية مختلفة من MTA ($1) موجودة بالفعل في ذلك المسار.$\n"
 " $\n"
-"MTA تم اعدادها للاصدارات الرئيسية لم يتم التثبيت في مسار مختلف $\n"
-"هل انت متأكد انك تريد تبديل وكتابة الملفات  $1 في $INSTDIR ؟"
+"MTA مصمم بحيث تُثبت النسخ الرئيسية المختلفة في مسارات منفصلة.$\n"
+"هل أنت متأكد من رغبتك في استبدال MTA $1 في $INSTDIR ؟"
 
 #. INST_GTA_CONFLICT
 #: Shared/installer/nightly.nsi:1856
@@ -306,28 +307,28 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
-msgstr "MTA لا يمكن تثبيتها في نفس ملف GTA:SA$\n"
+msgstr "لا يمكن تثبيت MTA في نفس مجلد GTA:SA.$\n"
 "$\n"
-"هل تريد استعمال ملف التثبيت الأساسي؟$\n"
-"$DEFAULT_INSTDIR ?"
+"هل تريد استخدام مجلد التثبيت الافتراضي؟$\n"
+"$DEFAULT_INSTDIR ؟"
 
 #. INST_GTA_ERROR1
 #: Shared/installer/nightly.nsi:1859
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
-msgstr "  المسار المختار غير موجود .$\n"
-" $\n"
-" الرجاء اختيار مسار GTA:SA الخاص بك !"
+msgstr "المجلد المختار غير موجود.$\n"
+"$\n"
+"يرجى اختيار مجلد تثبيت GTA:SA!"
 
 #. INST_GTA_ERROR2
 #: Shared/installer/nightly.nsi:1861
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
-msgstr "لم يتم العثور على GTA:SA مثبتة في $GTA_DIR $\n"
-" $\n"
-"هل انت متأكد انك تريد المتابعة ؟"
+msgstr "تعذر العثور على GTA:SA مثبتة في $GTA_DIR $\n"
+"$\n"
+"هل أنت متأكد أنك تريد المتابعة؟"
 
 #. INST_CHOOSE_LOC_TOP
 #: Shared/installer/nightly.nsi:1979
@@ -345,10 +346,10 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
 " Click Next to continue."
-msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} سيتم تثبيتة في المجلد التالي :$\n"
-"لـ التثبيت في مجلد اخر انقر فوق استعراض .$\n"
-" $\n"
-"انقر فوق التالي للاستكمال ."
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} سيتم تثبيته في المجلد التالي.$\n"
+"لتثبيته في مجلد مختلف، اضغط على استعراض واختر مجلدًا آخر.$\n"
+"$\n"
+"اضغط التالي للمتابعة."
 
 #. INST_CHOOSE_LOC3
 #: Shared/installer/nightly.nsi:1983
@@ -358,7 +359,7 @@ msgstr "وجهة الملف ( المسار )"
 #. INST_CHOOSE_LOC_BROWSE
 #: Shared/installer/nightly.nsi:1984
 msgid "Browse..."
-msgstr "استعراض"
+msgstr "استعراض..."
 
 #. INST_CHOOSE_LOC_DEFAULT
 #: Shared/installer/nightly.nsi:1985
@@ -383,30 +384,30 @@ msgstr "اختر المجلد لـ تثبيت ${PRODUCT_NAME_NO_VER} ${PRODUCT_V
 #. INST_LOC_OW
 #: Shared/installer/nightly.nsi:2183
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
-msgstr "تحذير : هناك نسخة مثبتة من MTA  ($1) في هذا المسار مسبقا!"
+msgstr "تحذير: نسخة رئيسية مختلفة من MTA ($1) موجودة بالفعل في هذا المسار."
 
 #. INST_LOC_UPGRADE
 #: Shared/installer/nightly.nsi:2184
 msgid "Installation type:  Upgrade"
-msgstr "نوع الثبيت : ترقية"
+msgstr "نوع الثبيت: ترقية"
 
 #. NETTEST_TITLE1
 #: Shared/installer/nightly.nsi:2418
 msgid "Online update"
-msgstr "التحديث عبر الانترنت ."
+msgstr "تحديث عبر الانترنت"
 
 #. NETTEST_TITLE2
 #: Shared/installer/nightly.nsi:2419
 msgid "Checking for update information"
-msgstr "يتم التحقق من معلومات التحديث"
+msgstr "جارٍ التحقق من معلومات التحديث"
 
 #. NETTEST_STATUS1
 #: Shared/installer/nightly.nsi:2420
 msgid "Checking for installer update information..."
-msgstr "جاري التحقق من معلومات مثبت التحديث..."
+msgstr "جاري التحقق من معلومات تحديث برنامج التثبيت..."
 
 #. NETTEST_STATUS2
 #: Shared/installer/nightly.nsi:2421
 msgid "Please ensure your firewall is not blocking"
-msgstr "الرجاء التأكد أن جدار الحماية الخاص بك لا يمنع"
+msgstr "يرجى التأكد من أن جدار الحماية الخاص بك لا يمنع الاتصال"
 
