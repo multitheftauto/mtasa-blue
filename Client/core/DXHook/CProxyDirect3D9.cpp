@@ -873,8 +873,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         if (pDirect3DOther)
         {
             // Log graphic card name
-            D3DADAPTER_IDENTIFIER9 AdapterIdent1;
-            ZeroMemory(&AdapterIdent1, sizeof(AdapterIdent1));
+            D3DADAPTER_IDENTIFIER9 AdapterIdent1{};
             hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent1);
             if (FAILED(hr))
                 WriteDebugEvent(SString("Warning: pDirect3D->GetAdapterIdentifier failed: %08x", hr));
@@ -882,8 +881,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
             WriteDebugEvent(ToString(AdapterIdent1));
 
             // Log graphic card name
-            D3DADAPTER_IDENTIFIER9 AdapterIdent2;
-            ZeroMemory(&AdapterIdent2, sizeof(AdapterIdent2));
+            D3DADAPTER_IDENTIFIER9 AdapterIdent2{};
             hr = pDirect3DOther->GetAdapterIdentifier(Adapter, 0, &AdapterIdent2);
             if (FAILED(hr))
                 WriteDebugEvent(SString("Warning: pDirect3DOther->GetAdapterIdentifier failed: %08x", hr));
@@ -981,7 +979,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         else
         {
             WriteDebugEvent("Fixing GTA caps");
-            memcpy(pGTACaps9, &DeviceCaps9, sizeof(D3DCAPS9));
+            *pGTACaps9 = DeviceCaps9;
         }
     }
 }
@@ -1042,8 +1040,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
     // Log graphic card name
-    D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    ZeroMemory(&AdapterIdent, sizeof(AdapterIdent));
+    D3DADAPTER_IDENTIFIER9 AdapterIdent{};
     HRESULT hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
     if (FAILED(hr))
         WriteDebugEvent(SString("Warning: GetAdapterIdentifier failed: %08x", hr));
@@ -1358,8 +1355,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     #endif
 
     // Log graphic card name
-    D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    ZeroMemory(&AdapterIdent, sizeof(AdapterIdent));
+    D3DADAPTER_IDENTIFIER9 AdapterIdent{};
     HRESULT hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
     if (FAILED(hr))
         WriteDebugEvent(SString("Warning: GetAdapterIdentifier failed: %08x", hr));

@@ -29,10 +29,10 @@ public:
 
     void StoreViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight);
 
-    DWORD GetViewportX();
-    DWORD GetViewportY();
-    DWORD GetViewportWidth();
-    DWORD GetViewportHeight();
+    DWORD GetViewportX() { return m_dwViewportX; }
+    DWORD GetViewportY() { return m_dwViewportY; }
+    DWORD GetViewportWidth() { return m_dwViewportWidth; }
+    DWORD GetViewportHeight() { return m_dwViewportHeight; }
 
 private:
     D3DMATRIX m_mViewMatrix;
