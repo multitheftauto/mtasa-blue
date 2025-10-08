@@ -20,28 +20,33 @@
 
 #include <bochs_internal/bochs_crc32.h>
 #include "CChecksum.h"
+#include "net/CNetHTTPDownloadManagerInterface.h"
+#include <cstdint>
 
 class CSingularFileDownload
 {
 public:
     CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource,
-                          CChecksum serverChecksum);
+                          CChecksum serverChecksum, std::uint32_t handlerId);
     ~CSingularFileDownload();
 
     static void DownloadFinishedCallBack(const SHttpDownloadResult& result);
 
     bool DoesClientAndServerChecksumMatch();
 
-    const char* GetName() { return m_strName; };
-    const char* GetShortName() { return m_strNameShort; };
+    const char* GetName() const noexcept { return m_strName; }
+    const char* GetShortName() const noexcept { return m_strNameShort; }
 
-    CResource* GetResource() { return m_pResource; };
+    CResource* GetResource() const noexcept { return resource; }
+    std::uint32_t GetHandlerId() const noexcept { return handlerId; }
 
-    void SetComplete() { m_bComplete = true; };
-    bool GetComplete() { return m_bComplete; };
+    void SetComplete() noexcept { complete = true; }
+    bool GetComplete() const noexcept { return complete; }
+    bool IsCancelled() const noexcept { return cancelled; }
 
     void CallFinished(bool bSuccess);
-    void Cancel();
+    bool Cancel();
+    void MarkForDeletion();
 
     CChecksum GenerateClientChecksum();
 
@@ -49,11 +54,16 @@ protected:
     SString m_strName;
     SString m_strNameShort;
 
-    CResource* m_pResource;
-    CResource* m_pRequestResource;
+    CResource* resource;
+    CResource* requestResource;
 
-    bool m_bComplete;
-    bool m_bBeingDeleted;
+    bool complete;
+    bool beingDeleted;
+    bool cancelled;
+
+    std::uint32_t handlerId;
+    CNetHTTPDownloadManagerInterface* httpManager;
+    EDownloadMode::EDownloadModeType downloadMode;
 
     CChecksum m_LastClientChecksum;
     CChecksum m_ServerChecksum;
