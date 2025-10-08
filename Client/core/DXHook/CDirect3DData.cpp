@@ -103,23 +103,3 @@ void CDirect3DData::StoreViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwH
     m_dwViewportWidth = dwWidth;
     m_dwViewportHeight = dwHeight;
 }
-
-DWORD CDirect3DData::GetViewportX()
-{
-    return m_dwViewportX;
-}
-
-DWORD CDirect3DData::GetViewportY()
-{
-    return m_dwViewportY;
-}
-
-DWORD CDirect3DData::GetViewportWidth()
-{
-    return m_dwViewportWidth;
-}
-
-DWORD CDirect3DData::GetViewportHeight()
-{
-    return m_dwViewportHeight;
-}
