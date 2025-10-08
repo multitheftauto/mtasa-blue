@@ -4,7 +4,7 @@
  *
  *   CID-keyed Type1 Glyph Loader (body).
  *
- * Copyright (C) 1996-2024 by
+ * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -103,20 +103,20 @@
       if ( ( cid->fd_bytes == 1 && fd_select == 0xFFU   ) ||
            ( cid->fd_bytes == 2 && fd_select == 0xFFFFU ) )
       {
-        FT_TRACE1(( "cid_load_glyph: fail for glyph index %d:\n",
+        FT_TRACE1(( "cid_load_glyph: fail for glyph index %u:\n",
                     glyph_index ));
-        FT_TRACE1(( "                FD number %ld is the maximum\n",
+        FT_TRACE1(( "                FD number %lu is the maximum\n",
                     fd_select ));
-        FT_TRACE1(( "                integer fitting into %d byte%s\n",
+        FT_TRACE1(( "                integer fitting into %u byte%s\n",
                     cid->fd_bytes, cid->fd_bytes == 1 ? "" : "s" ));
       }
       else
       {
-        FT_TRACE0(( "cid_load_glyph: fail for glyph index %d:\n",
+        FT_TRACE0(( "cid_load_glyph: fail for glyph index %u:\n",
                     glyph_index ));
-        FT_TRACE0(( "                FD number %ld is larger\n",
+        FT_TRACE0(( "                FD number %lu is larger\n",
                     fd_select ));
-        FT_TRACE0(( "                than number of dictionaries (%d)\n",
+        FT_TRACE0(( "                than number of dictionaries (%u)\n",
                     cid->num_dicts ));
       }
 
@@ -125,7 +125,7 @@
     }
     else if ( off2 > stream->size )
     {
-      FT_TRACE0(( "cid_load_glyph: fail for glyph index %d:\n",
+      FT_TRACE0(( "cid_load_glyph: fail for glyph index %u:\n",
                   glyph_index ));
       FT_TRACE0(( "               end of the glyph data\n" ));
       FT_TRACE0(( "               is beyond the data stream\n" ));
@@ -135,7 +135,7 @@
     }
     else if ( off1 > off2 )
     {
-      FT_TRACE0(( "cid_load_glyph: fail for glyph index %d:\n",
+      FT_TRACE0(( "cid_load_glyph: fail for glyph index %u:\n",
                   glyph_index ));
       FT_TRACE0(( "                the end position of glyph data\n" ));
       FT_TRACE0(( "                is set before the start position\n" ));
@@ -252,8 +252,8 @@
       cs_offset = decoder->lenIV >= 0 ? (FT_UInt)decoder->lenIV : 0;
       if ( cs_offset > glyph_length )
       {
-        FT_TRACE0(( "cid_load_glyph: fail for glyph_index=%d, "
-                    "offset to the charstring is beyond glyph length\n",
+        FT_TRACE0(( "cid_load_glyph: fail for glyph_index=%u,"
+                    " offset to the charstring is beyond glyph length\n",
                     glyph_index ));
         error = FT_THROW( Invalid_Offset );
         goto Exit;

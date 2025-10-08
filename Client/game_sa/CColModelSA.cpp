@@ -17,7 +17,7 @@ CColModelSA::CColModelSA()
     m_pInterface = new CColModelSAInterface;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CColModel_Constructor;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -37,7 +37,7 @@ CColModelSA::~CColModelSA()
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CColModel_Destructor;
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc

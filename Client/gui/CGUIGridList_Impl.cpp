@@ -19,7 +19,7 @@
 
 CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool bFrame)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Initialize
     m_hUniqueHandle = 0;

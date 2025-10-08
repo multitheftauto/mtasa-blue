@@ -97,7 +97,7 @@ CGameSA::CGameSA()
         }
 
         // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-        for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+        for (unsigned char i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
         {
             ObjectGroupsInfo[i].SetGroup(i);
         }
@@ -840,26 +840,28 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     MemPut((void*)0x855432, aCannons);                // 0x855431
     MemPut((void*)0x856BFD, aCannons);                // 0x856BFC
 
+    const auto ucNewLimit = static_cast<BYTE>(newLimit);
+
     // CWaterCannons::Init
-    MemPut<BYTE>(0x728C88, newLimit);
+    MemPut(0x728C88, ucNewLimit);
 
     // CWaterCannons::Update
-    MemPut<BYTE>(0x72A3F2, newLimit);
+    MemPut(0x72A3F2, ucNewLimit);
 
     // CWaterCanons::UpdateOne
-    MemPut<BYTE>(0x728CD4, newLimit);
-    MemPut<BYTE>(0x728CF6, newLimit);
-    MemPut<BYTE>(0x728CFF, newLimit);
-    MemPut<BYTE>(0x728D62, newLimit);
+    MemPut(0x728CD4, ucNewLimit);
+    MemPut(0x728CF6, ucNewLimit);
+    MemPut(0x728CFF, ucNewLimit);
+    MemPut(0x728D62, ucNewLimit);
 
     // CWaterCannons::Render
-    MemPutFast<BYTE>(0x729B38, newLimit);
+    MemPutFast(0x729B38, ucNewLimit);
 
     // 0x85542A
-    MemPut<BYTE>(0x85542B, newLimit);
+    MemPut(0x85542B, ucNewLimit);
 
     // 0x856BF5
-    MemPut<BYTE>(0x856BF6, newLimit);
+    MemPut(0x856BF6, ucNewLimit);
 
     // Free previous allocated memory
     if (!isEnabled && currentACannons != nullptr)

@@ -108,10 +108,16 @@ png_zalloc,(voidpf png_ptr, uInt items, uInt size),PNG_ALLOCATED)
    if (png_ptr == NULL)
       return NULL;
 
-   if (items >= (~(png_alloc_size_t)0)/size)
+   /* This check against overflow is vestigial, dating back from
+    * the old times when png_zalloc used to be an exported function.
+    * We're still keeping it here for now, as an extra-cautious
+    * prevention against programming errors inside zlib, although it
+    * should rather be a debug-time assertion instead.
+    */
+   if (size != 0 && items >= (~(png_alloc_size_t)0) / size)
    {
-      png_warning (png_voidcast(png_structrp, png_ptr),
-          "Potential overflow in png_zalloc()");
+      png_warning(png_voidcast(png_structrp, png_ptr),
+                  "Potential overflow in png_zalloc()");
       return NULL;
    }
 

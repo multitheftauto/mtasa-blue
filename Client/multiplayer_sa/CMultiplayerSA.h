@@ -56,6 +56,7 @@ public:
     void                Init_13();
     void                InitHooks_13();
     void                InitMemoryCopies_13();
+    void                InitHooks_CustomAnimations();
     void                InitHooks_ClothesSpeedUp();
     void                InitHooks_FixBadAnimId();
     void                InitHooks_HookDestructors();
@@ -76,6 +77,7 @@ public:
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
+    void                InitHooks_FixMallocAlign();
     void                InitHooks_FrameRateFixes();
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();

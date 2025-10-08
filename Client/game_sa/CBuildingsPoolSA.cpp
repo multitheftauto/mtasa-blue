@@ -311,7 +311,7 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
             return;
         }
         size_t arraySize = MemSA::msize(*ppArray) / sizeof(CBuildingSAInterface*);
-        for (auto j = 0; j < arraySize; j++)
+        for (size_t j = 0; j < arraySize; j++)
         {
             CBuildingSAInterface* object = (*ppArray)[j];
 

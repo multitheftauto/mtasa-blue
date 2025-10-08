@@ -474,6 +474,8 @@ public:
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 
+    void SetInWaterFlags(bool inWater) override;
+
     static void StaticSetHooks();
 
 private:

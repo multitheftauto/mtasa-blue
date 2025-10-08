@@ -9,6 +9,8 @@
 
 #include <StdInc.h>
 #include "CBassAudio.h"
+#include <memory>
+#include <utility>
 
 CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
@@ -25,8 +27,9 @@ CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(t
     m_fPlaybackSpeed = 1.0f;
     m_bPan = true;
     m_fPan = 0.0f;
+    m_bThrottle = false;
 
-    m_pBuffer = nullptr;
+    m_uiBufferLength = 0;
     m_uiFrameNumberCreated = g_pClientGame->GetFrameCount();
 }
 
@@ -35,8 +38,38 @@ CClientSound::~CClientSound()
     Destroy();
     m_pSoundManager->RemoveFromList(this);
 
-    delete m_pBuffer;
-    m_pBuffer = NULL;
+    ReleaseBuffer();
+}
+
+void CClientSound::ReleaseBuffer()
+{
+    if (!m_Buffer)
+        return;
+
+    m_Buffer.reset();
+    m_uiBufferLength = 0;
+}
+
+// Pull an existing audio buffer so it's owned by the sound; pass the matching deleter so we can release it safely later.
+void CClientSound::AdoptBuffer(void* pMemory, unsigned int uiLength, AudioBufferDeleter deleter)
+{
+    if (!pMemory || uiLength == 0)
+    {
+        ReleaseBuffer();
+        return;
+    }
+
+    if (!m_Buffer || m_Buffer.get() != pMemory)
+    {
+        m_Buffer = BufferPtr(pMemory, std::move(deleter));
+    }
+    else
+    {
+        m_Buffer.get_deleter() = std::move(deleter);
+    }
+
+    m_uiBufferLength = uiLength;
+    m_strPath.clear();
 }
 
 ////////////////////////////////////////////////////////////
@@ -112,16 +145,20 @@ bool CClientSound::Create()
             return false;
 
     // Initial state
-    if (!m_pBuffer)
+    if (!m_Buffer)
         m_pAudio = new CBassAudio(m_bStream, m_strPath, m_bLoop, m_bThrottle, m_b3D);
     else
-        m_pAudio = new CBassAudio(m_pBuffer, m_uiBufferLength, m_bLoop, m_b3D);
+        m_pAudio = new CBassAudio(m_Buffer.get(), m_uiBufferLength, m_bLoop, m_b3D);
 
     m_bDoneCreate = true;
 
     // Load file/start connect
     if (!m_pAudio->BeginLoadingMedia())
+    {
+        delete m_pAudio;
+        m_pAudio = nullptr;
         return false;
+    }
 
     // Get and save length
     m_dLength = m_pAudio->GetLength();
@@ -230,10 +267,13 @@ bool CClientSound::Play(const SString& strPath, bool bLoop)
 {
     assert(m_strPath.empty());
 
+    ReleaseBuffer();
+
     m_bStream = false;
     m_b3D = false;
     m_strPath = strPath;
     m_bLoop = bLoop;
+    m_bThrottle = false;
     m_bPan = false;
 
     // Instant distance-stream in
@@ -246,9 +286,9 @@ bool CClientSound::Play(void* pMemory, unsigned int uiLength, bool bLoop)
 
     m_bStream = false;
     m_b3D = false;
-    m_pBuffer = pMemory;
-    m_uiBufferLength = uiLength;
+    AdoptBuffer(pMemory, uiLength, AudioBufferDeleter::ForNewArray());
     m_bLoop = bLoop;
+    m_bThrottle = false;
     m_bPan = false;
 
     // Instant distance-stream in
@@ -259,10 +299,13 @@ bool CClientSound::Play3D(const SString& strPath, bool bLoop)
 {
     assert(m_strPath.empty());
 
+    ReleaseBuffer();
+
     m_bStream = false;
     m_b3D = true;
     m_strPath = strPath;
     m_bLoop = bLoop;
+    m_bThrottle = false;
 
     BeginSimulationOfPlayPosition();
 
@@ -273,9 +316,9 @@ bool CClientSound::Play3D(void* pMemory, unsigned int uiLength, bool bLoop)
 {
     m_bStream = false;
     m_b3D = true;
-    m_pBuffer = pMemory;
-    m_uiBufferLength = uiLength;
+    AdoptBuffer(pMemory, uiLength, AudioBufferDeleter::ForNewArray());
     m_bLoop = bLoop;
+    m_bThrottle = false;
 
     BeginSimulationOfPlayPosition();
 
@@ -285,6 +328,8 @@ bool CClientSound::Play3D(void* pMemory, unsigned int uiLength, bool bLoop)
 void CClientSound::PlayStream(const SString& strURL, bool bLoop, bool bThrottle, bool b3D)
 {
     assert(m_strPath.empty());
+
+    ReleaseBuffer();
 
     m_bStream = true;
     m_b3D = b3D;

@@ -61,9 +61,11 @@ void OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart(CVehicleSAInterface* p
 #define HOOKPOS_CAutomobile_CustomCarPlate_BeforeRenderingStart                         0x006A2F00
 #define HOOKSIZE_CAutomobile_CustomCarPlate_BeforeRenderingStart                        7
 DWORD RETURN_CAutomobile_CustomCarPlate_BeforeRenderingStart = 0x006A2F07;
-void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
+static void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*1]
@@ -116,9 +118,11 @@ void OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop(CVehicleModelInfoSAInter
 #define HOOKPOS_CAutomobile_CustomCarPlate_AfterRenderingStop                         0x006A2F30
 #define HOOKSIZE_CAutomobile_CustomCarPlate_AfterRenderingStop                        7
 DWORD RETURN_CAutomobile_CustomCarPlate_AfterRenderingStop = 0x006A2F37;
-void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
+static void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*1]
@@ -152,9 +156,11 @@ void OnMY_CCustomCarPlateMgr_SetupMaterialPlateTexture(struct RpMaterial* a, cha
 #define HOOKPOS_CCustomCarPlateMgr_SetupMaterialPlateTexture                         0x006FE020
 #define HOOKSIZE_CCustomCarPlateMgr_SetupMaterialPlateTexture                        5
 DWORD RETURN_CCustomCarPlateMgr_SetupMaterialPlateTexture = 0x006FE025;
-void _declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
+static void __declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -196,9 +202,11 @@ void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post()
 #define HOOKPOS_CVehicleModelInfo_SetCarCustomPlate                         0x004C9450
 #define HOOKSIZE_CVehicleModelInfo_SetCarCustomPlate                        6
 DWORD RETURN_CVehicleModelInfo_SetCarCustomPlate = 0x004C9456;
-void _declspec(naked) HOOK_CVehicleModelInfo_SetCarCustomPlate()
+static void __declspec(naked) HOOK_CVehicleModelInfo_SetCarCustomPlate()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx
@@ -232,9 +240,11 @@ inner:
 #define HOOKPOS_CCustomCarPlateMgr_CreatePlateTexture                         0x006FDEA0
 #define HOOKSIZE_CCustomCarPlateMgr_CreatePlateTexture                        5
 DWORD RETURN_CCustomCarPlateMgr_CreatePlateTexture = 0x006FDEA5;
-void _declspec(naked) HOOK_CCustomCarPlateMgr_CreatePlateTexture()
+static void __declspec(naked) HOOK_CCustomCarPlateMgr_CreatePlateTexture()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Skip our code if not processing a VehicleModelInfo
         cmp     ms_pProcessingVehicleModelInfo, 0

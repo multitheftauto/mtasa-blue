@@ -318,6 +318,10 @@ void CCommandFuncs::Reconnect(const char* szParameters)
         // Start the connect
         if (CCore::GetSingleton().GetConnectManager()->Reconnect(strHost.c_str(), usPort, strPassword.c_str(), false))
         {
+            if (CCore::GetSingleton().GetConnectManager()->WasQuickConnect())
+            {
+                CCore::GetSingleton().GetConnectManager()->SetQuickConnect(false);
+            }
             CCore::GetSingleton().GetConsole()->Printf(_("reconnect: Reconnecting to %s:%u..."), strHost.c_str(), usPort);
         }
         else
@@ -476,7 +480,8 @@ void CCommandFuncs::FakeLag(const char* szCmdLine)
     if (parts.size() > 3)
         iKBPSLimit = atoi(parts[3]);
 
-    g_pCore->GetNetwork()->SetFakeLag(iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit);
+    g_pCore->GetNetwork()->SetFakeLag(static_cast<unsigned short>(iPacketLoss), static_cast<unsigned short>(iExtraPing),
+                                      static_cast<unsigned short>(iExtraPingVary), iKBPSLimit);
     g_pCore->GetConsole()->Print(SString("Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit",
                                          iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit));
 }

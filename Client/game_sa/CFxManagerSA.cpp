@@ -21,7 +21,7 @@ CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& 
     DWORD                 dwFunc = FUNC_FxManager_c__CreateFxSystem;
     CFxSystemSAInterface* pFxSystem;
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    bSkipCameraFrustumCheck
@@ -50,7 +50,7 @@ void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
 
     void* pFxSA = pFxSystem->GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    pFxSA

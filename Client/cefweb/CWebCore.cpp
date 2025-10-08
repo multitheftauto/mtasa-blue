@@ -479,6 +479,15 @@ void CWebCore::OnPostScreenshot()
     }
 }
 
+void CWebCore::OnFPSLimitChange(std::uint16_t fps)
+{
+    dassert(g_pCore->GetNetwork() != nullptr);            // Ensure network module is loaded
+    for (auto& webView : m_WebViews)
+    {
+        webView->GetCefBrowser()->GetHost()->SetWindowlessFrameRate(fps);
+    }
+}
+
 void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (!m_pFocusedWebView ||
@@ -502,7 +511,7 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     if ((keyEvent.type == KEYEVENT_CHAR) && isKeyDown(VK_RMENU))
     {
         HKL   current_layout = ::GetKeyboardLayout(0);
-        SHORT scan_res = ::VkKeyScanExW(wParam, current_layout);
+        SHORT scan_res = ::VkKeyScanExW(static_cast<WCHAR>(wParam), current_layout);
         if ((HIBYTE(scan_res) & (2 | 4)) == (2 | 4))
         {
             keyEvent.modifiers &= ~(EVENTFLAG_CONTROL_DOWN | EVENTFLAG_ALT_DOWN);
