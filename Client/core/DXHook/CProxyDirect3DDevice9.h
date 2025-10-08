@@ -604,9 +604,8 @@ struct SGammaState
     D3DGAMMARAMP  originalGammaRamp;
     UINT          lastSwapChain;
     
-    SGammaState() : bOriginalGammaStored(false), bLastWasBorderless(false), lastSwapChain(0)
+    SGammaState() : bOriginalGammaStored(false), bLastWasBorderless(false), originalGammaRamp{}, lastSwapChain(0)
     {
-        ZeroMemory(&originalGammaRamp, sizeof(originalGammaRamp));
     }
 };
 

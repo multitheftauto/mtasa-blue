@@ -100,8 +100,8 @@ void RefreshCacheIfNeeded()
     const CClientVariables* currentSource = cvars;
     const int currentRevision = cvars ? cvars->GetRevision() : -1;
 
-    const CClientVariables* cachedSource = g_cachedSettings.source.load(std::memory_order_acquire);
-    const int cachedRevision = g_cachedSettings.revision.load(std::memory_order_acquire);
+    const CClientVariables* cachedSource = g_cachedSettings.source.load(std::memory_order_relaxed);
+    const int cachedRevision = g_cachedSettings.revision.load(std::memory_order_relaxed);
 
     if (cachedSource == currentSource && cachedRevision == currentRevision)
         return;
@@ -433,7 +433,7 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 
             g_GammaState.bOriginalGammaStored = false;
             g_GammaState.bLastWasBorderless = false;
-            ZeroMemory(&g_GammaState.originalGammaRamp, sizeof(g_GammaState.originalGammaRamp));
+            g_GammaState.originalGammaRamp = {};
         }
     }
 
@@ -1341,8 +1341,8 @@ HRESULT CProxyDirect3DDevice9::SetTexture(DWORD Stage, IDirect3DBaseTexture9* pT
         // Fast-path: avoid AddRef/Release if texture hasn't changed
         if (DeviceState.TextureState[Stage].Texture != pTexture)
         {
-            const char* context = GetSetTextureContextString(Stage);
-            ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture, context);
+            // Hot path: use non-validating ReplaceInterface since textures come from D3D9 driver
+            ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture);
         }
     }
     return m_pDevice->SetTexture(Stage, CDirect3DEvents9::GetRealTexture(pTexture));
@@ -1475,7 +1475,9 @@ HRESULT CProxyDirect3DDevice9::CreateVertexDeclaration(CONST D3DVERTEXELEMENT9* 
 
 HRESULT CProxyDirect3DDevice9::SetVertexDeclaration(IDirect3DVertexDeclaration9* pDecl)
 {
-    ReplaceInterface(DeviceState.VertexDeclaration, pDecl);
+    // Avoid validation overhead since declarations come from D3D9 driver
+    if (DeviceState.VertexDeclaration != pDecl)
+        ReplaceInterface(DeviceState.VertexDeclaration, pDecl);
     return CDirect3DEvents9::SetVertexDeclaration(m_pDevice, pDecl);
 }
 
@@ -1501,7 +1503,9 @@ HRESULT CProxyDirect3DDevice9::CreateVertexShader(CONST DWORD* pFunction, IDirec
 
 HRESULT CProxyDirect3DDevice9::SetVertexShader(IDirect3DVertexShader9* pShader)
 {
-    ReplaceInterface(DeviceState.VertexShader, pShader);
+    // Avoid validation overhead since shaders come from D3D9 driver
+    if (DeviceState.VertexShader != pShader)
+        ReplaceInterface(DeviceState.VertexShader, pShader);
     return m_pDevice->SetVertexShader(pShader);
 }
 
@@ -1544,7 +1548,9 @@ HRESULT CProxyDirect3DDevice9::SetStreamSource(UINT StreamNumber, IDirect3DVerte
 {
     if (StreamNumber < NUMELMS(DeviceState.VertexStreams))
     {
-        ReplaceInterface(DeviceState.VertexStreams[StreamNumber].StreamData, pStreamData);
+        // Avoid validation overhead since vertex buffers come from D3D9 driver
+        if (DeviceState.VertexStreams[StreamNumber].StreamData != pStreamData)
+            ReplaceInterface(DeviceState.VertexStreams[StreamNumber].StreamData, pStreamData);
         DeviceState.VertexStreams[StreamNumber].StreamOffset = OffsetInBytes;
         DeviceState.VertexStreams[StreamNumber].StreamStride = Stride;
     }
@@ -1568,7 +1574,9 @@ HRESULT CProxyDirect3DDevice9::GetStreamSourceFreq(UINT StreamNumber, UINT* pSet
 
 HRESULT CProxyDirect3DDevice9::SetIndices(IDirect3DIndexBuffer9* pIndexData)
 {
-    ReplaceInterface(DeviceState.IndexBufferData, pIndexData);
+    // Avoid validation overhead since index buffers come from D3D9 driver
+    if (DeviceState.IndexBufferData != pIndexData)
+        ReplaceInterface(DeviceState.IndexBufferData, pIndexData);
     return m_pDevice->SetIndices(CDirect3DEvents9::GetRealIndexBuffer(pIndexData));
 }
 
@@ -1584,7 +1592,9 @@ HRESULT CProxyDirect3DDevice9::CreatePixelShader(CONST DWORD* pFunction, IDirect
 
 HRESULT CProxyDirect3DDevice9::SetPixelShader(IDirect3DPixelShader9* pShader)
 {
-    ReplaceInterface(DeviceState.PixelShader, pShader);
+    // Avoid validation overhead since shaders come from D3D9 driver
+    if (DeviceState.PixelShader != pShader)
+        ReplaceInterface(DeviceState.PixelShader, pShader);
     return m_pDevice->SetPixelShader(pShader);
 }
 
