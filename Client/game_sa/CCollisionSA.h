@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCollisionSA.h
  *  PURPOSE:     Header file for `CCollision` - collision detection related functions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

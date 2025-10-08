@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CColSphere.cpp
  *  PURPOSE:     Sphere-shaped collision entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,7 +30,7 @@ CElement* CColSphere::Clone(bool* bAddEntity, CResource* pResource)
 bool CColSphere::DoHitDetection(const CVector& vecNowPosition)
 {
     // Do a simple distance check between now position and our position
-    return IsPointNearPoint3D(vecNowPosition, m_vecPosition, m_fRadius);
+    return IsPointNearPoint3D(vecNowPosition, GetPosition(), m_fRadius);
 }
 
 bool CColSphere::ReadSpecialData(const int iLine)

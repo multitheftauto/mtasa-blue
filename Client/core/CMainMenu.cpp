@@ -5,7 +5,7 @@
  *  FILE:        core/CMainMenu.cpp
  *  PURPOSE:     2D Main menu graphical user interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -358,33 +358,65 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
 CMainMenu::~CMainMenu()
 {
-    // Destroy GUI items
-    delete m_pBackground;
-    delete m_pCanvas;
-    delete m_pFiller;
-    delete m_pFiller2;
-    delete m_pLogo;
-    delete m_pLatestNews;
-    delete m_pVersion;
-    delete m_pMenuArea;
+    auto destroyElement = [this](auto*& element) {
+        if (!element)
+            return;
+        m_pManager->DestroyElementRecursive(element);
+        element = nullptr;
+    };
 
-    // Destroy the menu items. Note: The disconnect item isn't always in the
-    // list of menu items (it's only in there when we're in game). This means we
-    // don't delete it when we iterate the list and delete it separately - the
-    // menu item itself still exists even when it's no in the list of menu
-    // items. Perhaps there should be a separate list of loaded items really.
-    for (std::deque<sMenuItem*>::iterator it = m_menuItems.begin(); it != m_menuItems.end(); ++it)
+    for (uint i = 0; i < CORE_MTA_NEWS_ITEMS; ++i)
     {
-        if ((*it) != m_pDisconnect)
-        {
-            delete (*it)->image;
-            delete (*it);
-        }
+        destroyElement(m_pNewsItemLabels[i]);
+        destroyElement(m_pNewsItemShadowLabels[i]);
+        destroyElement(m_pNewsItemDateLabels[i]);
+        destroyElement(m_pNewsItemNEWLabels[i]);
     }
 
-    delete m_pDisconnect->image;
-    delete m_pDisconnect;
+    for (sMenuItem* pItem : m_menuItems)
+    {
+        if (!pItem || pItem == m_pDisconnect)
+            continue;
+
+        if (pItem->image)
+        {
+            m_pManager->DestroyElementRecursive(pItem->image);
+            pItem->image = nullptr;
+        }
+
+        delete pItem;
+    }
+    m_menuItems.clear();
+    m_unhoveredItems.clear();
+    m_pHoveredItem = nullptr;
+
+    if (m_pDisconnect)
+    {
+        if (m_pDisconnect->image)
+        {
+            m_pManager->DestroyElementRecursive(m_pDisconnect->image);
+            m_pDisconnect->image = nullptr;
+        }
+
+        delete m_pDisconnect;
+        m_pDisconnect = nullptr;
+    }
+
     delete m_pLanguageSelector;
+    m_pLanguageSelector = nullptr;
+
+    delete m_pNewsBrowser;
+    m_pNewsBrowser = nullptr;
+
+    destroyElement(m_pMenuArea);
+    destroyElement(m_pLogo);
+    destroyElement(m_pLatestNews);
+    destroyElement(m_pVersion);
+
+    destroyElement(m_pCanvas);
+    destroyElement(m_pBackground);
+    destroyElement(m_pFiller);
+    destroyElement(m_pFiller2);
 }
 
 void CMainMenu::SetMenuVerticalPosition(int iPosY)
@@ -447,7 +479,7 @@ void CMainMenu::Update()
 
     // Get the game interface and the system state
     CGame*       pGame = CCore::GetSingleton().GetGame();
-    eSystemState SystemState = pGame->GetSystemState();
+    SystemState  systemState = pGame->GetSystemState();
 
     m_Credits.Update();
     m_Settings.Update();
@@ -632,7 +664,7 @@ void CMainMenu::Update()
             m_bIsVisible = false;            // Make cursor disappear faster
             m_bCursorAlphaReset = false;
         }
-            
+
 
         // If the fade is complete
         if (m_fFader <= 0)
@@ -650,7 +682,7 @@ void CMainMenu::Update()
     }
 
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
-    if ((SystemState == 7 || SystemState == 9) && !m_bIsIngame)
+    if ((systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME) && !m_bIsIngame)
     {
         if (!m_bStarted)
         {
@@ -671,11 +703,11 @@ void CMainMenu::Update()
     }
 
     // If we're visible
-    if (m_bIsVisible && SystemState != 8)
+    if (m_bIsVisible && systemState != SystemState::GS_INIT_PLAYING_GAME)
     {
         // If we're at the game's mainmenu, or ingame when m_bIsIngame is true show the background
-        if (SystemState == 7 ||                          // GS_FRONTEND
-            SystemState == 9 && !m_bIsIngame)            // GS_PLAYING_GAME
+        if (systemState == SystemState::GS_FRONTEND ||
+            systemState == SystemState::GS_PLAYING_GAME && !m_bIsIngame)
         {
             if (m_ucFade == FADE_INVISIBLE)
                 Show(false);
@@ -777,7 +809,7 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
         m_Settings.SetIsModLoaded(bIsIngame);
 
         // Reset frame rate limit
-        CCore::GetSingleton().RecalculateFrameRateLimit(-1, false);
+        CCore::GetSingleton().GetFPSLimiter()->Reset();
 
         m_ulMoveStartTick = GetTickCount32();
         if (bIsIngame)
@@ -842,6 +874,17 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
             case MENU_ITEM_MAP_EDITOR:
                 AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
                 return true;
+            case MENU_ITEM_DISCONNECT:
+                if (g_pCore->GetCVars()->GetValue("ask_before_disconnect", true))
+                {
+                    AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
+                    return true;
+                }
+
+                break;
+            case MENU_ITEM_QUICK_CONNECT:
+                AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
+                return true;
             default:
                 break;
         }
@@ -863,7 +906,7 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
     switch (m_pHoveredItem->menuType)
     {
         case MENU_ITEM_DISCONNECT:
-            OnDisconnectButtonClick(pElement);
+            OnDisconnectButtonClick();
             break;
         case MENU_ITEM_QUICK_CONNECT:
             OnQuickConnectButtonClick(pElement, Args.button == LeftButton);
@@ -907,6 +950,7 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
             return true;
         }
 
+        g_pCore->GetConnectManager()->SetQuickConnect(true);
         g_pCore->GetCommands()->Execute("reconnect", "");
     }
     else
@@ -948,7 +992,7 @@ void CMainMenu::HideServerInfo()
     m_ServerInfo.Hide();
 }
 
-bool CMainMenu::OnDisconnectButtonClick(CGUIElement* pElement)
+bool CMainMenu::OnDisconnectButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
@@ -1250,6 +1294,12 @@ void CMainMenu::WantsToDisconnectCallBack(void* pData, uint uiButton)
                 break;
             case MENU_ITEM_MAP_EDITOR:
                 OnEditorButtonClick();
+                break;
+            case MENU_ITEM_DISCONNECT:
+                OnDisconnectButtonClick();
+                break;
+            case MENU_ITEM_QUICK_CONNECT:
+                OnQuickConnectButtonClick(nullptr, true);
                 break;
             default:
                 break;

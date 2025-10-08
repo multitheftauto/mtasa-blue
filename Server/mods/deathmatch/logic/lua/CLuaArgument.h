@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaArgument.h
  *  PURPOSE:     Lua argument handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -45,6 +45,7 @@ public:
     void ReadNumber(double dNumber);
     void ReadString(const std::string& string);
     void ReadString(const std::string_view& string);
+    void ReadString(const CStringName& string);
     void ReadString(const char* string);
     void ReadElement(CElement* pElement);
     void ReadElementID(ElementID ID);

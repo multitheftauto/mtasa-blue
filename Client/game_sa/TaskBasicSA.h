@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskBasicSA.h
  *  PURPOSE:     Basic game tasks
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -250,4 +250,15 @@ class CTaskComplexFacialSA : public virtual CTaskComplexSA, public virtual CTask
 {
 public:
     CTaskComplexFacialSA();
+};
+
+class CTaskComplexInWaterSAInterface : public CTaskComplexSAInterface
+{
+public:
+};
+
+class CTaskComplexInWaterSA : public virtual CTaskComplexSA, public virtual CTaskComplexInWater
+{
+public:
+    CTaskComplexInWaterSA();
 };

@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIEdit_Impl.cpp
  *  PURPOSE:     Edit box widget class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,7 +15,7 @@
 
 CGUIEdit_Impl::CGUIEdit_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szEdit)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique[CGUI_CHAR_SIZE];

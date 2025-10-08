@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaDatabaseDefs.cpp
  *  PURPOSE:     Lua function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -292,7 +292,7 @@ int CLuaDatabaseDefs::DbConnect(lua_State* luaVM)
                 // Set default values if required
                 GetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled, 1);
                 GetOption<CDbOptionsMap>(strOptions, "tag", strLogTag, "script");
-                GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : DB_SQLITE_QUEUE_NAME_DEFAULT);
+                GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : SStringX(DB_SQLITE_QUEUE_NAME_DEFAULT));
                 SetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled);
                 SetOption<CDbOptionsMap>(strOptions, "tag", strLogTag);
                 SetOption<CDbOptionsMap>(strOptions, "queue", strQueueName);

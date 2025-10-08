@@ -5,7 +5,7 @@
  *  FILE:        core/CDirect3DHook9.cpp
  *  PURPOSE:     Function hooker for Direct3D 9
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -88,13 +88,14 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
     }
 
     // D3DX_SDK_VERSION checks
-    // August 2009 SDK required for shaders to work properly
-    #if D3DX_SDK_VERSION != 42
+	// SDK required for shaders to work properly
+    // Accept the DirectX SDK shipped with August 2009 (42) or June 2010 (43)
+    #if (D3DX_SDK_VERSION != 42) && (D3DX_SDK_VERSION != 43)
     WriteDebugEvent("D3DX_SDK_VERSION incorrect " QUOTE_DEFINE(D3DX_SDK_VERSION));
-        #pragma message( "WARNING: Microsoft DirectX SDK (August 2009) includes missing" )
+        #pragma message( "WARNING: Microsoft DirectX SDK (August 2009 or June 2010) includes missing" )
         #ifndef CI_BUILD
             #ifndef MTA_DEBUG
-                #error "Microsoft DirectX SDK (August 2009) includes missing"
+                #error "Microsoft DirectX SDK (August 2009 or June 2010) includes missing"
             #endif
         #endif
     #endif

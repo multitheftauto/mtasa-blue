@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CFireManagerSA.cpp
  *  PURPOSE:     Fire manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -38,7 +38,7 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
     float fZ = vecPosition.fZ;
     DWORD dwFunction = FUNC_ExtinguishPoint;
 
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CFireManager
         push    fRadius

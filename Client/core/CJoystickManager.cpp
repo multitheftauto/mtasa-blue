@@ -5,7 +5,7 @@
  *  FILE:        core/CJoystickManager.cpp
  *  PURPOSE:     Joystick related operations
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1054,20 +1054,20 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
         if (line.OutputAxisDir == eDirNeg)
             value = -value;
 
-        int iValue = Round(value * line.MaxValue);
+        auto sValue = static_cast<short>(Round(value * line.MaxValue));
 
         if (line.OutputAxisIndex == eLeftStickX)
-            cs.LeftStickX += iValue;
+            cs.LeftStickX += sValue;
         else if (line.OutputAxisIndex == eLeftStickY)
-            cs.LeftStickY += iValue;
+            cs.LeftStickY += sValue;
         else if (line.OutputAxisIndex == eRightStickX)
-            cs.RightStickX += iValue;
+            cs.RightStickX += sValue;
         else if (line.OutputAxisIndex == eRightStickY)
-            cs.RightStickY += iValue;
+            cs.RightStickY += sValue;
         else if (line.OutputAxisIndex == eAccelerate && bInVehicle)
-            cs.ButtonCross += iValue;
+            cs.ButtonCross += sValue;
         else if (line.OutputAxisIndex == eBrake && bInVehicle)
-            cs.ButtonSquare += iValue;
+            cs.ButtonSquare += sValue;
     }
 
     // Keep everything in range

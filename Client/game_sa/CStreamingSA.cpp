@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CStreamingSA.cpp
  *  PURPOSE:     Data streamer
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -228,7 +228,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     if (IsUpgradeModelId(dwModelID))
     {
         DWORD dwFunc = FUNC_RequestVehicleUpgrade;
-        _asm
+        __asm
         {
             push    dwFlags
             push    dwModelID
@@ -239,7 +239,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     else
     {
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
-        _asm
+        __asm
         {
             push    dwFlags
             push    dwModelID
@@ -262,7 +262,7 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
-    _asm
+    __asm
     {
         push    dwOnlyPriorityModels
         call    dwFunction
@@ -283,7 +283,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         bool  bReturn;
         DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
-        _asm
+        __asm
         {
             push    dwModelID
             call    dwFunc
@@ -296,7 +296,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
         bool  bReturn = 0;
-        _asm
+        __asm
         {
             push    dwModelID
             call    dwFunc
@@ -311,7 +311,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
     DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
-    _asm
+    __asm
     {
         push    channel
         push    szTexture
@@ -351,7 +351,7 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     pItemInfo->archiveId = usStreamID;
     pItemInfo->offsetInBlocks = uiOffset;
     pItemInfo->sizeInBlocks = usSize;
-    pItemInfo->nextInImg = uiNextInImg;
+    pItemInfo->nextInImg = static_cast<uint16_t>(uiNextInImg);
 }
 
 CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)

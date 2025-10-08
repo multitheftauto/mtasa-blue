@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCheckpointSA.cpp
  *  PURPOSE:     Checkpoint entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -156,14 +156,19 @@ static void __cdecl RenderTargetArrow(CCheckpointSAInterface* pCheckpoint)
     ((void(__cdecl*)(float, float, float, float, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float, float, float))C3dMarkers_DirectionArrowSet)(position->fX, position->fY, position->fZ, checkpoint->GetTargetArrowSize(), color.R, color.G, color.B, color.A, -direction->fX, -direction->fY, -direction->fZ);
 }
 
-static void _declspec(naked) HOOK_CCheckpoint__Render()
+#define HOOKPOS_CCheckpoint__Render  0x725E56
+#define HOOKSIZE_CCheckpoint__Render 5
+static constexpr intptr_t RETURN_CCheckpoint__Render = 0x725E5B;
+static void __declspec(naked) HOOK_CCheckpoint__Render()
 {
-    _asm {
-        pushad
-        push esi
-        call RenderTargetArrow
-        add esp, 4
-        popad
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
+        push    esi
+        call    RenderTargetArrow
+        add     esp, 4
+
         jmp RETURN_CCheckpoint__Render
     }
 }

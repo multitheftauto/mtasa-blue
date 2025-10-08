@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaClasses.cpp
  *  PURPOSE:     Lua general class functions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -323,6 +323,8 @@ const char* CLuaClassDefs::GetElementClass(CElement* pElement)
             return "Blip";
         case CElement::OBJECT:
             return "Object";
+        case CElement::BUILDING:
+            return "Building";
         case CElement::PICKUP:
             return "Pickup";
         case CElement::RADAR_AREA:

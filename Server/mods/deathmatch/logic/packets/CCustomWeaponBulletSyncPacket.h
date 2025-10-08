@@ -1,10 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/packets/CCustomWeaponBulletSyncPacket.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -16,22 +15,22 @@
 class CCustomWeaponBulletSyncPacket final : public CPacket
 {
 public:
-    CCustomWeaponBulletSyncPacket(){};
-    CCustomWeaponBulletSyncPacket(class CPlayer* pPlayer);
+    CCustomWeaponBulletSyncPacket() = default;
+    explicit CCustomWeaponBulletSyncPacket(class CPlayer* player);
 
     ePacketID     GetPacketID() const { return PACKET_ID_WEAPON_BULLETSYNC; };
     unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; };
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& stream);
+    bool Write(NetBitStreamInterface& stream) const;
 
-    CPlayer*       GetWeaponOwner() { return m_pWeapon != NULL ? m_pWeapon->GetOwner() : NULL; };
-    CCustomWeapon* GetWeapon() { return m_pWeapon; };
-    CVector        GetStart() { return m_vecStart; };
-    CVector        GetEnd() { return m_vecEnd; };
+    CPlayer*       GetWeaponOwner() { return m_weapon != NULL ? m_weapon->GetOwner() : NULL; };
+    CCustomWeapon* GetWeapon() { return m_weapon; };
+    CVector        GetStart() { return m_start; };
+    CVector        GetEnd() { return m_end; };
 
-    CCustomWeapon* m_pWeapon;
-    CVector        m_vecStart;
-    CVector        m_vecEnd;
-    uchar          m_ucOrderCounter;
+    CCustomWeapon* m_weapon{};
+    CVector        m_start{};
+    CVector        m_end{};
+    std::uint8_t   m_order{};
 };

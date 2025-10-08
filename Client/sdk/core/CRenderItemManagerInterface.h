@@ -5,7 +5,7 @@
  *  FILE:        CRenderItemManagerInterface.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -183,10 +183,10 @@ public:
     virtual void           PreDrawWorld() = 0;
     virtual void           SetDepthBufferFormat(ERenderFormat depthBufferFormat) = 0;
     virtual ERenderFormat  GetDepthBufferFormat() = 0;
-    virtual void           SaveReadableDepthBuffer() = 0;
-    virtual void           FlushNonAARenderTarget() = 0;
-    virtual void           HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
-                                             int Filter) = 0;
+    virtual void     SaveReadableDepthBuffer() = 0;
+    virtual void     FlushNonAARenderTarget() = 0;
+    virtual HRESULT  HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface,
+                                       CONST RECT* pDestRect, int Filter) = 0;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -332,7 +332,7 @@ class CEffectWrap : public CRenderItem
     virtual void OnLostDevice();
     virtual void OnResetDevice();
     HRESULT      Begin(UINT* pPasses, DWORD Flags, bool bWorldRender = true);
-    HRESULT      End();
+    HRESULT      End(bool bDeviceOperational = true);
     bool         ApplyCommonHandles();
     bool         ApplyMappedHandles();
 

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CUnoccupiedVehicleSyncPacket.h
  *  PURPOSE:     Unoccupied vehicle synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

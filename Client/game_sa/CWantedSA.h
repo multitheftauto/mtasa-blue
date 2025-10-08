@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWantedSA.h
  *  PURPOSE:     Header file for wanted level management
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -60,8 +60,8 @@ public:
     DWORD current_chase_time_counter;
     bool  m_bTimeCounting;
 
-    eWantedLevelSA m_WantedLevel;
-    eWantedLevelSA m_WantedLevelBeforeParole;
+    std::uint32_t m_WantedLevel;
+    std::uint32_t m_WantedLevelBeforeParole;
 
     CCrimeBeingQd CrimesBeingQd[MAX_CRIMES_QD];
 
@@ -89,5 +89,5 @@ public:
     // Exported methods
     void SetWantedLevel(DWORD dwWantedLevel);
     void SetWantedLevelNoFlash(DWORD dwWantedLevel);
-    char GetWantedLevel() { return internalInterface->m_WantedLevel; };
+    char GetWantedLevel() { return static_cast<char>(internalInterface->m_WantedLevel); };
 };

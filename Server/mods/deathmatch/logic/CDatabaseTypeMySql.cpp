@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CDatabaseTypeMySql.cpp
  *  PURPOSE:     MySql connection maker
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -199,7 +199,7 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql(CDatabas
         SString strServerPath = g_pServerInterface->GetModManager()->GetServerPath();
         m_DbconmyLib.Load(PathJoin(strServerPath, SERVER_BIN_PATH_MOD, LIB_DBCONMY));
         m_pfnNewDatabaseConnection =
-            reinterpret_cast<NewDatabaseConnectionMySql_t*>((long long)(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql")));
+            reinterpret_cast<NewDatabaseConnectionMySql_t*>(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql"));
     }
 
     if (!m_pfnNewDatabaseConnection)

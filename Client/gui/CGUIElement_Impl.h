@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIElement_Impl.h
  *  PURPOSE:     Element (widget) base class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,6 +14,7 @@
 #include <gui/CGUIElement.h>
 
 #include <list>
+#include <cstdint>
 
 namespace CEGUI
 {
@@ -26,6 +27,8 @@ class CGUIElement_Impl : public CGUIElement
 {
 public:
     CGUIElement_Impl();
+
+    void SetManager(CGUI_Impl* pManager);
 
     void SetVisible(bool bVisible);
     bool IsVisible();
@@ -90,7 +93,10 @@ public:
     void         SetParent(CGUIElement* pParent);
     CGUIElement* GetParent();
 
-    CEGUI::Window* GetWindow();
+    CEGUI::Window* GetWindow() const { return m_pWindow; }
+    CGUI_Impl*     GetManager() const { return m_pManager; }
+    std::uint32_t  GetRedrawHandle() const { return m_redrawHandle; }
+    void           UnregisterFromRedrawQueue();
 
     void ForceRedraw();
 
@@ -139,6 +145,8 @@ protected:
     CGUIElement*   m_pParent;
 
     CGUI_Impl* m_pManager;
+
+    std::uint32_t m_redrawHandle;
 
     void* m_pData;
 

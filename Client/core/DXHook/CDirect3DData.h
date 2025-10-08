@@ -5,7 +5,7 @@
  *  FILE:        core/CDirect3DData.h
  *  PURPOSE:     Header file for Direct3D data class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -22,16 +22,17 @@ public:
 
     void StoreTransform(D3DTRANSFORMSTATETYPE dwMatrixToStore, const D3DMATRIX* pMatrix);
     void GetTransform(D3DTRANSFORMSTATETYPE dwRequestedMatrix, D3DMATRIX* pMatrixOut);
+    const D3DMATRIX* GetTransformPtr(D3DTRANSFORMSTATETYPE dwRequestedMatrix) const;
 
     HWND GetDeviceWindow() { return m_hDeviceWindow; };
     void StoreDeviceWindow(HWND hDeviceWindow) { m_hDeviceWindow = hDeviceWindow; };
 
     void StoreViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight);
 
-    DWORD GetViewportX();
-    DWORD GetViewportY();
-    DWORD GetViewportWidth();
-    DWORD GetViewportHeight();
+    DWORD GetViewportX() { return m_dwViewportX; }
+    DWORD GetViewportY() { return m_dwViewportY; }
+    DWORD GetViewportWidth() { return m_dwViewportWidth; }
+    DWORD GetViewportHeight() { return m_dwViewportHeight; }
 
 private:
     D3DMATRIX m_mViewMatrix;

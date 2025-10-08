@@ -5,7 +5,7 @@
  *  FILE:        core/CVersionUpdater.cpp
  *  PURPOSE:     Version update check and message dialog class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1912,7 +1912,7 @@ void CVersionUpdater::_DialogUpdateQueryError()
     // Display message
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("UPDATE CHECK"));
-    GetQuestionBox().SetMessage(_("An update is currently not available.\n\nPlease check www.mtasa.com"));
+    GetQuestionBox().SetMessage(_("An update is currently not available.\n\nPlease check www.multitheftauto.com"));
     GetQuestionBox().SetButton(0, _("OK"));
     GetQuestionBox().Show();
     _PollAnyButton();
@@ -2769,8 +2769,8 @@ int CVersionUpdater::_PollDownload()
                     }
                     if (m_JobInfo.bShowDownloadPercent)
                     {
-                        const bool  bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded;
-                        const int fDownloadedPercent = bIsDownloadedSizeRight ? Round((float)m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
+                        const bool bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && static_cast<unsigned int>(m_JobInfo.iFilesize) >= m_JobInfo.uiBytesDownloaded;
+                        const int  fDownloadedPercent = bIsDownloadedSizeRight ? Round((float)m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
                         GetQuestionBox().SetMessage(SString(_("%3d %% completed"), fDownloadedPercent));
                     }
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)
@@ -3155,8 +3155,20 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
         iReqKB3035131 = IsHotFixInstalled("KB3035131") ? 0 : 1;
     }
 
-    bool bSecureBootEnabled =
-        (GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled") == "\x01");
+    int secureBootStatus = 0;
+    const SString secureBootValue =
+        GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled", &secureBootStatus);
+    bool bSecureBootEnabled = false;
+    if (secureBootStatus > 0)
+    {
+        // Parse the registry value into a numeric flag
+        char* secureBootEnd = nullptr;
+        const long secureBootNumeric = strtol(secureBootValue.c_str(), &secureBootEnd, 10);
+        if (secureBootEnd != secureBootValue.c_str() && *secureBootEnd == '\0')
+        {
+            bSecureBootEnabled = secureBootNumeric != 0;
+        }
+    }
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);

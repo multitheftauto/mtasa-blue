@@ -5,7 +5,7 @@
  *  FILE:        sdk/core/CClientBase.h
  *  PURPOSE:     Client base interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,7 +24,7 @@ public:
     virtual void PreHUDRenderExecutionHandler(bool bDidUnminimize, bool bDidRecreateRenderTargets) = 0;
     virtual void PostFrameExecutionHandler() = 0;
     virtual void IdleHandler() = 0;
-    virtual void RestreamModel(unsigned short usModel) = 0;
+    virtual void RestreamModel(std::uint16_t model) = 0;
 
     virtual bool WebsiteRequestResultHandler(const std::unordered_set<SString>& newPages) = 0;
 

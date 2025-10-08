@@ -1,40 +1,36 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-//
-// For bouncing a bullet sync packet
-//
+#pragma once
+
 class CSimBulletsyncPacket : public CSimPacket
 {
 public:
-    ZERO_ON_NEW
-
-    CSimBulletsyncPacket(ElementID PlayerID);
+    CSimBulletsyncPacket() = default;
+    explicit CSimBulletsyncPacket(ElementID id);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_BULLETSYNC; };
     unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; };
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& stream);
+    bool Write(NetBitStreamInterface& stream) const;
 
-    // Set in constructor
-    const ElementID m_PlayerID;
+    const ElementID m_id{};
 
-    // Set in Read ()
     struct
     {
-        eWeaponType weaponType;
-        CVector     vecStart;
-        CVector     vecEnd;
-        uchar       ucOrderCounter;
-        float       fDamage;
-        uchar       ucHitZone;
-        ElementID   DamagedPlayerID;
-    } m_Cache;
+        eWeaponType  weapon = eWeaponType::WEAPONTYPE_UNARMED;
+        CVector      start{};
+        CVector      end{};
+        std::uint8_t order{};
+        float        damage{};
+        uchar        zone{};
+        ElementID    damaged = INVALID_ELEMENT_ID;
+    } m_cache;
 };

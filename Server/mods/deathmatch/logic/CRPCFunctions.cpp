@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CRPCFunctions.cpp
  *  PURPOSE:     Remote procedure call functionality class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -156,34 +156,30 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
         unsigned char ucPrevSlot = m_pSourcePlayer->GetWeaponSlot();
 
         // We don't get the puresync packet containing totalAmmo = 0 for slot 8 (THROWN), slot 7 (HEAVY) and slot 9 (SPECIAL)
-        if ((bitStream.Version() >= 0x44 && ucPrevSlot == WEAPONSLOT_TYPE_THROWN) || bitStream.Version() >= 0x4D)
+        if (bitStream.ReadBit() && (ucPrevSlot == WEAPONSLOT_TYPE_THROWN || ucPrevSlot == WEAPONSLOT_TYPE_HEAVY || ucPrevSlot == WEAPONSLOT_TYPE_SPECIAL))
         {
-            if (bitStream.ReadBit() && (ucPrevSlot == WEAPONSLOT_TYPE_THROWN ||
-                                        (bitStream.Version() >= 0x5A && (ucPrevSlot == WEAPONSLOT_TYPE_HEAVY || ucPrevSlot == WEAPONSLOT_TYPE_SPECIAL))))
-            {
-                CWeapon* pPrevWeapon = m_pSourcePlayer->GetWeapon(ucPrevSlot);
-                pPrevWeapon->usAmmo = 0;
-                pPrevWeapon->usAmmoInClip = 0;
-            }
+            CWeapon* pPrevWeapon = m_pSourcePlayer->GetWeapon(ucPrevSlot);
+            pPrevWeapon->usAmmo = 0;
+            pPrevWeapon->usAmmoInClip = 0;
         }
 
         SWeaponSlotSync slot;
         bitStream.Read(&slot);
-        unsigned int uiSlot = slot.data.uiSlot;
+        auto ucSlot = static_cast<unsigned char>(slot.data.uiSlot);
 
-        if (uiSlot != ucPrevSlot)
+        if (ucSlot != ucPrevSlot)
         {
             CLuaArguments Arguments;
             Arguments.PushNumber(m_pSourcePlayer->GetWeaponType(ucPrevSlot));
-            Arguments.PushNumber(m_pSourcePlayer->GetWeaponType(uiSlot));
+            Arguments.PushNumber(m_pSourcePlayer->GetWeaponType(ucSlot));
 
             m_pSourcePlayer->CallEvent("onPlayerWeaponSwitch", Arguments);
         }
 
-        m_pSourcePlayer->SetWeaponSlot(uiSlot);
-        CWeapon* pWeapon = m_pSourcePlayer->GetWeapon(uiSlot);
+        m_pSourcePlayer->SetWeaponSlot(ucSlot);
+        CWeapon* pWeapon = m_pSourcePlayer->GetWeapon(ucSlot);
 
-        if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
+        if (CWeaponNames::DoesSlotHaveAmmo(ucSlot))
         {
             if (pWeapon)
             {
@@ -199,7 +195,7 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
             pWeapon->usAmmo = 1;
             pWeapon->usAmmoInClip = 1;
             // Keep the server synced with the client (GTASA gives the client a detonator when they shoot so if they changed to slot 12 they obviously have one)
-            if (uiSlot == 12)
+            if (ucSlot == 12)
                 // Give them the detonator
                 CStaticFunctionDefinitions::GiveWeapon(m_pSourcePlayer, 40, 1, true);
         }

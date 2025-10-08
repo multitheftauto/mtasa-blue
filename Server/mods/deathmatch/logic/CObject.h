@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CObject.h
  *  PURPOSE:     Object entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -100,6 +100,8 @@ private:
     CPlayer*        m_pSyncer;
     bool            m_bVisibleInAllDimensions = false;
     bool            m_bRespawnable;
+
+    void NotifyMovementComplete();
 
 protected:
     bool m_bCollisionsEnabled;

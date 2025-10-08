@@ -5,7 +5,7 @@
  *  FILE:        core/CCommands.cpp
  *  PURPOSE:     Management for dynamically added commands
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -85,6 +85,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 {
     // Copy szParametersIn so the contents can be changed
     char* szParameters = NULL;
+    char  empyParameters[1] = {0};
     if (szParametersIn)
     {
         size_t sizeParameters = strlen(szParametersIn) + 1;
@@ -115,7 +116,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                 }
                 if (szParameters == NULL)
                 {
-                    szParameters = "";
+                    szParameters = empyParameters;
                 }
             }
         }
@@ -171,10 +172,19 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                 CVARS_SET(key, val);
 
                 // HACK: recalculate frame rate limit on cvar change
-                if (key == "fps_limit" && m_FpsLimitTimer.Get() >= 500 && CCore::GetSingleton().IsConnected())
+                if (key == "fps_limit")
                 {
-                    CCore::GetSingleton().RecalculateFrameRateLimit(-1, true);
-                    m_FpsLimitTimer.Reset();
+                    int fpsVal = 0;
+                    CVARS_GET("fps_limit", fpsVal);
+                    CCore::GetSingleton().GetFPSLimiter()->SetUserDefinedFPS(fpsVal);
+                }
+
+                // HACK: Foul dirty hack to force vsync (Rework on #4427)
+                if (key == "vsync")
+                {
+                    bool vSync;
+                    CVARS_GET("vsync", vSync);
+                    CCore::GetSingleton().GetFPSLimiter()->SetDisplayVSync(vSync);
                 }
             }
             else

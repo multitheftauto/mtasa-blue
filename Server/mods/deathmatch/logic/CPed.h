@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPed.h
  *  PURPOSE:     Ped entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -115,7 +115,7 @@ struct SPlayerAnimData
     int         blendTime{250};
     bool        taskToBeRestoredOnAnimEnd{false};
 
-    std::int64_t startedTick{0};
+    std::int64_t startTime{0};
 
     float progress{0.0f};
     float speed{1.0f};
@@ -309,6 +309,9 @@ public:
     void                   SetAnimationProgress(float progress) { m_animData.progress = progress; };
     void                   SetAnimationSpeed(float speed) { m_animData.speed = speed; };
 
+    void SetHanging(bool hanging) noexcept { m_hanging = hanging; }
+    bool IsHanging() const noexcept { return m_hanging; }
+
 protected:
     bool ReadSpecialData(const int iLine) override;
 
@@ -350,6 +353,7 @@ protected:
     CVehicle*                            m_pJackingVehicle;
     SPlayerAnimData                      m_animData{};
     float                                m_cameraRotation{};
+    bool                                 m_hanging{false}; // Is the player hanging during a climb task?
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;

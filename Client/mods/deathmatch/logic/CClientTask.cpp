@@ -617,7 +617,7 @@ CTask* CClientTask::CreateTask(bool& bTaskPrimary, int& iTaskPriority)
         iTaskPriority = TASK_PRIORITY_PRIMARY;
 
         // Create the task
-        return g_pGame->GetTasks()->CreateTaskSimpleClimb(NULL, vecTarget, fHeading, static_cast<unsigned char>(fSurfaceType), static_cast<char>(fClimbStage),
+        return g_pGame->GetTasks()->CreateTaskSimpleClimb(NULL, vecTarget, fHeading, static_cast<unsigned char>(fSurfaceType), static_cast<eClimbHeights>(fClimbStage),
                                                           bForceClimb);
     }
 

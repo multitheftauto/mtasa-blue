@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CBuildingsPoolSA.cpp
  *  PURPOSE:     Buildings pool class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -311,7 +311,7 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
             return;
         }
         size_t arraySize = MemSA::msize(*ppArray) / sizeof(CBuildingSAInterface*);
-        for (auto j = 0; j < arraySize; j++)
+        for (size_t j = 0; j < arraySize; j++)
         {
             CBuildingSAInterface* object = (*ppArray)[j];
 
@@ -374,7 +374,8 @@ void CBuildingsPoolSA::RemovePedsContactEnityLinks()
             ped->pLastContactedEntity[3] = nullptr;
             ped->m_ucCollisionState = 0;
 
-            reinterpret_cast<CPlayerPedSA*>(pedLinks->pEntity)->SetTargetedEntity(nullptr);
+            if (auto* playerPed = dynamic_cast<CPlayerPedSA*>(pedLinks->pEntity))
+                playerPed->SetTargetedEntity(nullptr);
         }
     }
 }

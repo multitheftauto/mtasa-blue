@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CModelInfoSA.cpp
  *  PURPOSE:     Entity model information handler
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,7 +30,7 @@ std::map<unsigned short, int>                                         CModelInfo
 std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
 std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
-std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
@@ -110,7 +110,7 @@ bool CModelInfoSA::IsBoat()
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -125,7 +125,7 @@ bool CModelInfoSA::IsCar()
     DWORD dwFunction = FUNC_IsCarModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -140,7 +140,7 @@ bool CModelInfoSA::IsTrain()
     DWORD dwFunction = FUNC_IsTrainModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -155,7 +155,7 @@ bool CModelInfoSA::IsHeli()
     DWORD dwFunction = FUNC_IsHeliModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -170,7 +170,7 @@ bool CModelInfoSA::IsPlane()
     DWORD dwFunction = FUNC_IsPlaneModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -185,7 +185,7 @@ bool CModelInfoSA::IsBike()
     DWORD dwFunction = FUNC_IsBikeModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -200,7 +200,7 @@ bool CModelInfoSA::IsFakePlane()
     DWORD dwFunction = FUNC_IsFakePlaneModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -215,7 +215,7 @@ bool CModelInfoSA::IsMonsterTruck()
     DWORD dwFunction = FUNC_IsMonsterTruckModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -230,7 +230,7 @@ bool CModelInfoSA::IsQuadBike()
     DWORD dwFunction = FUNC_IsQuadBikeModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -245,7 +245,7 @@ bool CModelInfoSA::IsBmx()
     DWORD dwFunction = FUNC_IsBmxModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -260,7 +260,7 @@ bool CModelInfoSA::IsTrailer()
     DWORD dwFunction = FUNC_IsTrailerModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -317,7 +317,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
-        _asm
+        __asm
         {
             push    eax
             push    ebx
@@ -349,7 +349,7 @@ uint CModelInfoSA::GetAnimFileIndex()
     uint  uiReturn = 0;
     if (dwFunc)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
@@ -733,7 +733,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
     DWORD         dwFunc = FUNC_GetBoundingBox;
     DWORD         ModelID = m_dwModelID;
     CBoundingBox* dwReturn = 0;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunc
@@ -767,7 +767,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     float fReturn = 0;
-    _asm {
+    __asm {
         mov     eax, ModelID
 
         push    ecx
@@ -815,8 +815,8 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
         CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
 
     // Store vanilla TXD ID
-    if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
-        ms_DefaultTxdIDMap[m_dwModelID] = m_pInterface->usTextureDictionary;
+    if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
+        ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = m_pInterface->usTextureDictionary;
 
     // Set new TXD and increase ref of it
     m_pInterface->usTextureDictionary = usID;
@@ -827,11 +827,11 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 
 void CModelInfoSA::ResetTextureDictionaryID()
 {
-    const auto it = ms_DefaultTxdIDMap.find(m_dwModelID);
+    const auto it = ms_DefaultTxdIDMap.find(static_cast<unsigned short>(m_dwModelID));
     if (it == ms_DefaultTxdIDMap.end()) {
         return;
     }
-    SetTextureDictionaryID(it->second);
+    SetTextureDictionaryID(static_cast<unsigned short>(it->second));
     ms_DefaultTxdIDMap.erase(it); // Only erase after calling the function above [otherwise gets reinserted]
 }
 
@@ -1018,7 +1018,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
-                    _asm
+                    __asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -1042,7 +1042,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
-                    _asm
+                    __asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -1118,7 +1118,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         {
             DWORD                      dwFunction = FUNC_RemoveRef;
             CBaseModelInfoSAInterface* pInterface = m_pInterface;
-            _asm
+            __asm
             {
                 mov     ecx, pInterface
                 call    dwFunction
@@ -1191,7 +1191,7 @@ short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
     if (usUpgrade >= 1000 && usUpgrade <= 1193)
     {
         DWORD ModelID = m_dwModelID;
-        _asm
+        __asm
         {
             mov     eax, ModelID
 
@@ -1213,7 +1213,7 @@ bool CModelInfoSA::IsUpgradeAvailable(eVehicleUpgradePosn posn)
 {
     bool  bRet = false;
     DWORD ModelID = m_dwModelID;
-    _asm
+    __asm
     {
         mov     eax, ModelID
         mov ecx, dword ptr[ARRAY_ModelInfo]
@@ -1239,7 +1239,7 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
 {
     char* szStoredText;
     DWORD ModelID = m_dwModelID;
-    _asm
+    __asm
     {
         push    ecx
         mov     ecx, ModelID
@@ -1263,7 +1263,7 @@ unsigned int CModelInfoSA::GetNumRemaps()
     DWORD        dwFunc = FUNC_CVehicleModelInfo__GetNumRemaps;
     DWORD        ModelID = m_dwModelID;
     unsigned int uiReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, ModelID
 
@@ -1293,15 +1293,15 @@ void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
 
 CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
 {
-    return GetVehicleDummyPosition(eVehicleDummies::EXHAUST);
+    return GetVehicleDummyPosition(VehicleDummies::EXHAUST);
 }
 
 void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
 {
-    return SetVehicleDummyPosition(eVehicleDummies::EXHAUST, vecPosition);
+    return SetVehicleDummyPosition(VehicleDummies::EXHAUST, vecPosition);
 }
 
-bool CModelInfoSA::GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const
+bool CModelInfoSA::GetVehicleDummyPositions(std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)>& positions) const
 {
     if (!IsVehicle())
         return false;
@@ -1311,7 +1311,7 @@ bool CModelInfoSA::GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_CO
     return true;
 }
 
-CVector CModelInfoSA::GetVehicleDummyDefaultPosition(eVehicleDummies eDummy)
+CVector CModelInfoSA::GetVehicleDummyDefaultPosition(VehicleDummies eDummy)
 {
     if (!IsVehicle())
         return CVector();
@@ -1331,14 +1331,14 @@ CVector CModelInfoSA::GetVehicleDummyDefaultPosition(eVehicleDummies eDummy)
     ModelAddRef(BLOCKING, "GetVehicleDummyDefaultPosition");
 
     auto    modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
-    CVector vec = modelInfo->pVisualInfo->vecDummies[eDummy];
+    CVector vec = modelInfo->pVisualInfo->vecDummies[(std::size_t)eDummy];
 
     RemoveRef();
 
     return vec;
 }
 
-CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
+CVector CModelInfoSA::GetVehicleDummyPosition(VehicleDummies eDummy)
 {
     if (!IsVehicle())
         return CVector();
@@ -1348,10 +1348,10 @@ CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
         Request(BLOCKING, "GetVehicleDummyPosition");
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return pVehicleModel->pVisualInfo->vecDummies[eDummy];
+    return pVehicleModel->pVisualInfo->vecDummies[(std::size_t)eDummy];
 }
 
-void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition)
+void CModelInfoSA::SetVehicleDummyPosition(VehicleDummies eDummy, const CVector& vecPosition)
 {
     if (!IsVehicle())
         return;
@@ -1364,7 +1364,7 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
     {
-        ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<eVehicleDummies, CVector>()});
+        ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<VehicleDummies, CVector>()});
         // Increment this model references count, so we don't unload it before we have a chance to reset the positions
         m_pInterface->usNumberOfRefs++;
     }
@@ -1372,11 +1372,11 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     if (ms_ModelDefaultDummiesPosition[m_dwModelID].find(eDummy) == ms_ModelDefaultDummiesPosition[m_dwModelID].end())
     {
-        ms_ModelDefaultDummiesPosition[m_dwModelID][eDummy] = pVehicleModel->pVisualInfo->vecDummies[eDummy];
+        ms_ModelDefaultDummiesPosition[m_dwModelID][eDummy] = pVehicleModel->pVisualInfo->vecDummies[(std::size_t)eDummy];
     }
 
     // Set dummy position
-    pVehicleModel->pVisualInfo->vecDummies[eDummy] = vecPosition;
+    pVehicleModel->pVisualInfo->vecDummies[static_cast<std::size_t>(eDummy)] = vecPosition;
 }
 
 void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
@@ -1392,7 +1392,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
     for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
     {
         if (pVehicleModel->pVisualInfo != nullptr)
-            pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
+            pVehicleModel->pVisualInfo->vecDummies[static_cast<std::size_t>(dummy.first)] = dummy.second;
     }
     // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
     pVehicleModel->usNumberOfRefs--;
@@ -1414,7 +1414,7 @@ void CModelInfoSA::ResetAllVehicleDummies()
     ms_ModelDefaultDummiesPosition.clear();
 }
 
-float CModelInfoSA::GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup)
+float CModelInfoSA::GetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup)
 {
     if (!IsVehicle())
         return 0.0f;
@@ -1422,16 +1422,16 @@ float CModelInfoSA::GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup)
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
     switch (eWheelGroup)
     {
-        case eResizableVehicleWheelGroup::FRONT_AXLE:
+        case ResizableVehicleWheelGroup::FRONT_AXLE:
             return pVehicleModel->fWheelSizeFront;
-        case eResizableVehicleWheelGroup::REAR_AXLE:
+        case ResizableVehicleWheelGroup::REAR_AXLE:
             return pVehicleModel->fWheelSizeRear;
     }
 
     return 0.0f;
 }
 
-void CModelInfoSA::SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize)
+void CModelInfoSA::SetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup, float fWheelSize)
 {
     if (!IsVehicle())
         return;
@@ -1444,13 +1444,13 @@ void CModelInfoSA::SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, 
 
     switch (eWheelGroup)
     {
-        case eResizableVehicleWheelGroup::FRONT_AXLE:
+        case ResizableVehicleWheelGroup::FRONT_AXLE:
             pVehicleModel->fWheelSizeFront = fWheelSize;
             break;
-        case eResizableVehicleWheelGroup::REAR_AXLE:
+        case ResizableVehicleWheelGroup::REAR_AXLE:
             pVehicleModel->fWheelSizeRear = fWheelSize;
             break;
-        case eResizableVehicleWheelGroup::ALL_WHEELS:
+        case ResizableVehicleWheelGroup::ALL_WHEELS:
             pVehicleModel->fWheelSizeFront = fWheelSize;
             pVehicleModel->fWheelSizeRear = fWheelSize;
             break;
@@ -1734,7 +1734,7 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
 }
 
-void CModelInfoSA::MakePedModel(char* szTexture)
+void CModelInfoSA::MakePedModel(const char* szTexture)
 {
     // Create a new CPedModelInfo
     CPedModelInfoSA pedModelInfo;
@@ -1892,9 +1892,11 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 #define HOOKPOS_NodeNameStreamRead                         0x072FA68
 #define HOOKSIZE_NodeNameStreamRead                        15
 DWORD RETURN_NodeNameStreamRead = 0x072FA77;
-void _declspec(naked) HOOK_NodeNameStreamRead()
+static void __declspec(naked) HOOK_NodeNameStreamRead()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    edi

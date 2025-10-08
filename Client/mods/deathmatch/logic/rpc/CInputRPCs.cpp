@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CInputRPCs.cpp
  *  PURPOSE:     Input remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include <StdInc.h>
@@ -126,6 +126,7 @@ void CInputRPCs::UnbindKey(NetBitStreamInterface& bitStream)
                 const SBindableKey* pKey = pKeyBinds->GetBindableFromKey(szKey);
                 if (pKey)
                 {
+                    // Only remove server-side function bindings, preserve user command bindings
                     pKeyBinds->RemoveFunction(szKey, CClientGame::StaticProcessServerKeyBind, true, bState);
                 }
                 else
@@ -133,6 +134,7 @@ void CInputRPCs::UnbindKey(NetBitStreamInterface& bitStream)
                     SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl(szKey);
                     if (pControl)
                     {
+                        // Only remove server-side control function bindings, preserve user command bindings
                         pKeyBinds->RemoveControlFunction(szKey, CClientGame::StaticProcessServerControlBind, true, bState);
                     }
                 }

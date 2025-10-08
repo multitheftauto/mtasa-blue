@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskGoToSA.cpp
  *  PURPOSE:     Go-to game tasks
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -26,7 +26,7 @@ int CTaskComplexWanderSA::GetWanderType()
 
     if (dwFunc && dwFunc != 0x82263A)            // some tasks have no wander type 0x82263A is purecal (assert?)
     {
-        _asm
+        __asm
         {
             mov     ecx, pTaskInterface
             call    dwFunc
@@ -58,7 +58,7 @@ CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState,
         return;
     DWORD dwFunc = FUNC_CTaskComplexWanderStandard__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bWanderSensibly

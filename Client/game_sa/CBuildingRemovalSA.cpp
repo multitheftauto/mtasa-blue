@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CBuildingRemovalSA.cpp
  *  PURPOSE:     Building removal logic
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -343,8 +343,10 @@ bool CBuildingRemovalSA::IsRemovedModelInRadius(SIPLInst* pInst)
 {
     // Init some variables
     std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
-        m_pBuildingRemovals->equal_range(pInst->m_nModelIndex);
+        m_pBuildingRemovals->equal_range(static_cast<uint16_t>(pInst->m_nModelIndex));
+
     std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
+
     // Loop through the buildings list
     for (; iter != iterators.second; ++iter)
     {

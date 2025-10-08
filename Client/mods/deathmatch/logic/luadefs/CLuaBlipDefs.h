@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaBlipDefs.h
  *  PURPOSE:     Lua blip definitions class header
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

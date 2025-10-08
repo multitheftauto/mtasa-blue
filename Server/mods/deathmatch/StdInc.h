@@ -27,6 +27,7 @@
 #include "MTAPlatform.h"
 
 #ifdef WIN32
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 //
 // Windows
 //
@@ -46,6 +47,7 @@
 #include <CSphere.h>
 #include <CBox.h>
 #include <CMatrix.h>
+#include "CStringName.h"
 #include <bochs_internal/bochs_crc32.h>
 #include <pcrecpp.h>
 #include <pthread.h>

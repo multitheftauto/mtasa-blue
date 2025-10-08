@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CStatsSA.cpp
  *  PURPOSE:     Game statistics
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -18,7 +18,7 @@ float CStatsSA::GetStatValue(unsigned short usIndex)
     float fReturn = 0.0f;
     DWORD dwStatIndex = usIndex;
 
-    _asm
+    __asm
     {
         push    dwStatIndex
         call    dwFunc
@@ -33,7 +33,7 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
     DWORD dwFunc = FUNC_ModifyStat;
     DWORD dwStatIndex = usIndex;
 
-    _asm
+    __asm
     {
         push    fAmmount
         push    dwStatIndex
@@ -47,7 +47,7 @@ void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
     DWORD dwFunc = FUNC_SetStatValue;
     DWORD dwStatIndex = usIndex;
 
-    _asm
+    __asm
     {
         push    fAmmount
         push    dwStatIndex
@@ -61,7 +61,7 @@ unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)
     int   weaponType = (int)type;
     int   iIndex;
     DWORD dwFunc = FUNC_CWeaponInfo_GetSkillStatIndex;
-    _asm
+    __asm
     {
         push    weaponType
         call    dwFunc

@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CModelInfo.h
  *  PURPOSE:     Entity model info interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,6 +13,8 @@
 #include <array>
 #include <CVector.h>
 #include "CAnimBlock.h"
+#include "enums/VehicleDummies.h"
+#include "enums/ResizableVehicleWheelGroup.h"
 #include "Common.h"
 
 constexpr std::uint16_t MODEL_PROPERTIES_GROUP_STATIC = 0xFFFF;
@@ -201,13 +203,13 @@ public:
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
-    virtual CVector      GetVehicleDummyDefaultPosition(eVehicleDummies eDummy) = 0;
-    virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
-    virtual bool         GetVehicleDummyPositions(std::array<CVector, VEHICLE_DUMMY_COUNT>& positions) const = 0;
-    virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
+    virtual CVector      GetVehicleDummyDefaultPosition(VehicleDummies eDummy) = 0;
+    virtual CVector      GetVehicleDummyPosition(VehicleDummies eDummy) = 0;
+    virtual bool         GetVehicleDummyPositions(std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)>& positions) const = 0;
+    virtual void         SetVehicleDummyPosition(VehicleDummies eDummy, const CVector& vecPosition) = 0;
     virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap) = 0;
-    virtual float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) = 0;
-    virtual void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) = 0;
+    virtual float        GetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup) = 0;
+    virtual void         SetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup, float fWheelSize) = 0;
     virtual void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) = 0;
 
     // Init the supported upgrades structure
@@ -234,7 +236,7 @@ public:
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
-    virtual void      MakePedModel(char* szTexture) = 0;
+    virtual void      MakePedModel(const char* szTexture) = 0;
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeObjectDamageableModel(std::uint16_t baseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;

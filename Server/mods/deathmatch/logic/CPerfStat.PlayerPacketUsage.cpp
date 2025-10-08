@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPerfStat.PlayerPacketUsage.cpp
  *  PURPOSE:     Performance stats manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -408,11 +408,11 @@ void CPerfStatPlayerPacketUsageImpl::OutputTimeSpanBlock(CPerfStatResult* pResul
             const CTimeSpan* p = timeSpanList[i];
             const CTopValue& value = (p->prev.data[0].uiPktsPerSec > p->acc.data[0].uiPktsPerSec) ? p->prev.data[iTopPos] : p->acc.data[iTopPos];
 
-            row[c++] = value.uiPktsPerSec ? SString("%d", value.uiPktsPerSec) : "-";
+            row[c++] = value.uiPktsPerSec ? SString("%d", value.uiPktsPerSec) : SStringX("-");
             if (bDetail)
             {
-                row[c++] = value.uiBytesInPerSec ? SString("%d", value.uiBytesInPerSec) : "-";
-                row[c++] = value.uiBytesOutPerSec ? SString("%d", value.uiBytesOutPerSec) : "-";
+                row[c++] = value.uiBytesInPerSec ? SString("%d", value.uiBytesInPerSec) : SStringX("-");
+                row[c++] = value.uiBytesOutPerSec ? SString("%d", value.uiBytesOutPerSec) : SStringX("-");
                 row[c++] = value.strSerial;
             }
             row[c++] = value.strName;

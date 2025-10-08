@@ -5,7 +5,7 @@
  *  FILE:        core/CVideoModeManager.h
  *  PURPOSE:     Header file for the video mode manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -37,6 +37,7 @@ public:
     virtual bool GetRequiredDisplayResolution(int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex) = 0;
     virtual int  GetFullScreenStyle() = 0;
     virtual bool IsDisplayModeWindowed() = 0;
+    virtual bool IsDisplayModeFullScreenWindow() = 0;
 };
 
 CVideoModeManagerInterface* GetVideoModeManager();

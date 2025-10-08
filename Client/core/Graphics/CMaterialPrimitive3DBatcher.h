@@ -5,7 +5,7 @@
  *  FILE:        CMaterialPrimitive3DBatcher.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -26,6 +26,7 @@ class CMaterialPrimitive3DBatcher
 {
 public:
     CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* pGraphics);
+    ~CMaterialPrimitive3DBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
     void AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices);

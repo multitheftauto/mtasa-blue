@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CEntitySA.cpp
  *  PURPOSE:     Base entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -125,7 +125,7 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
         // If it's a train, recalculate its rail position parameter (does not affect derailed state)
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
@@ -166,7 +166,7 @@ void CEntitySA::Render()
     // This function may use m_pInterface->Render()
     DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;
     DWORD dwThis = (DWORD)m_pInterface;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -181,14 +181,14 @@ void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x446F90;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
 
     dwFunc = 0x532B00;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -207,14 +207,14 @@ void CEntitySA::FixBoatOrientation()
     pGame->GetWorld()->Remove(this, CEntity_FixBoatOrientation);
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x446F90;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
 
     dwFunc = 0x532B00;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -318,7 +318,7 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
         {
             DWORD dwThis = (DWORD) m_pInterface;
             DWORD dwFunc = 0x6F6CC0;
-            _asm
+            __asm
             {
                 mov     ecx, dwThis
                 call    dwFunc
@@ -331,14 +331,14 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
         pGame->GetWorld()->Remove(this, CEntity_SetMatrix);
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = 0x446F90;            // CEntity::UpdateRwMatrix
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
 
         dwFunc = 0x532B00;            // CEntity::UpdateRwFrame
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
@@ -368,7 +368,7 @@ float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwFunc = FUNC_GetDistanceFromCentreOfMassToBaseOfModel;
     DWORD dwThis = (DWORD)m_pInterface;
     float fReturn;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -408,7 +408,7 @@ void CEntitySA::SetAlpha(DWORD dwAlpha)
 {
     DWORD dwFunc = FUNC_SetRwObjectAlpha;
     DWORD dwThis = (DWORD)m_pInterface;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    dwAlpha
@@ -421,7 +421,7 @@ bool CEntitySA::IsOnScreen()
     DWORD dwFunc = FUNC_IsVisible;
     DWORD dwThis = (DWORD)m_pInterface;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -457,7 +457,7 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
-        _asm
+        __asm
         {
             push    iUnknown
             push    fZ
@@ -475,7 +475,7 @@ void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int 
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
-        _asm
+        __asm
         {
             push    iUnknown
             push    fZ
@@ -493,7 +493,7 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     DWORD dwFunc = FUNC_RpAnimBlendClumpGetAssociation;
     DWORD dwThis = (DWORD)m_pInterface->m_pRwObject;
 
-    _asm
+    __asm
     {
         push    szAnimName
         push    dwThis

@@ -5,7 +5,7 @@
  *  FILE:        core/CServerInfo.cpp
  *  PURPOSE:     In-game server queue user interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -184,9 +184,6 @@ CServerInfo::CServerInfo()
 CServerInfo::~CServerInfo()
 {
     // Delete our GUI elements
-    delete m_pWindow;
-    m_pWindow = 0;
-
     delete m_pServerNameLabel;
     m_pServerNameLabel = 0;
 
@@ -246,6 +243,9 @@ CServerInfo::~CServerInfo()
 
     delete m_pEnterPasswordEdit;
     m_pEnterPasswordEdit = 0;
+
+    delete m_pWindow;
+    m_pWindow = 0;
 }
 
 bool CServerInfo::OnCloseClicked(CGUIElement* pElement)

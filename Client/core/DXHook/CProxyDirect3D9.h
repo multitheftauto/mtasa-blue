@@ -5,7 +5,7 @@
  *  FILE:        core/CProxyDirect3D9.h
  *  PURPOSE:     Header file for Direct3D 9 proxy class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -48,5 +48,6 @@ public:
     static IDirect3D9* StaticGetDirect3D();
 
 private:
-    IDirect3D9* m_pDevice;
+    IDirect3D9*  m_pDevice;
+    std::atomic<LONG> m_lRefCount;
 };

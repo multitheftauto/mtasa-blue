@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CSettings.h
  *  PURPOSE:     Game settings interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -155,9 +155,9 @@ public:
 
     virtual void UpdateFieldOfViewFromSettings() = 0;
     virtual void ResetFieldOfViewFromScript() = 0;
-    virtual void SetFieldOfViewPlayer(float fAngle, bool bFromScript) = 0;
-    virtual void SetFieldOfViewVehicle(float fAngle, bool bFromScript) = 0;
-    virtual void SetFieldOfViewVehicleMax(float fAngle, bool bFromScript) = 0;
+    virtual void SetFieldOfViewPlayer(float fAngle, bool bFromScript, bool instant = false) = 0;
+    virtual void SetFieldOfViewVehicle(float fAngle, bool bFromScript, bool instant = false) = 0;
+    virtual void SetFieldOfViewVehicleMax(float fAngle, bool bFromScript, bool instant = false) = 0;
 
     virtual float GetFieldOfViewPlayer() = 0;
     virtual float GetFieldOfViewVehicle() = 0;

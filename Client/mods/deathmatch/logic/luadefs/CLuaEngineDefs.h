@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaEngineDefs.cpp
  *  PURPOSE:     Lua definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -58,6 +58,9 @@ public:
     LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
+
+    static bool                                            EngineAddClothingModel(CClientDFF* pDff, std::string strModelName);
+    static bool                                            EngineAddClothingTXD(CClientTXD* pTxd, std::string strModelName);
     static uint                                            EngineGetModelFlags(uint uiModelID);
     static bool                                            EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);
     static bool                                            EngineGetModelFlag(uint uiModelID, eModelIdeFlag eFlag);
@@ -93,6 +96,8 @@ public:
     static eModelLoadState EngineStreamingGetModelLoadState(std::uint16_t modelId);
 
     static void EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option);
+    static bool EngineRestreamModel(std::uint16_t modelId);
+    static void EngineRestream(std::optional<RestreamOption> option);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

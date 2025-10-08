@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -49,7 +49,7 @@ void CTrainTrackManager::Reset()
     m_Tracks.clear();
 
     // Create default tracks
-    for (std::size_t i = 0; i < 4; ++i)
+    for (uchar i = 0; i < 4; ++i)
     {
         // Create train tracks
         CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, i);

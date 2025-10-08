@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayerMap.cpp
  *  PURPOSE:     Full screen player map renderer
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -87,7 +87,7 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
 
     for (uint i = 0; i < NUMELMS(messageList); i++)
     {
-        CClientTextDisplay* pTextDisplay = new CClientTextDisplay(m_pManager->GetDisplayManager());
+        auto pTextDisplay = m_pManager->GetDisplayManager()->CreateTextDisplay();
         pTextDisplay->SetCaption(messageList[i].strMessage);
         pTextDisplay->SetColor(messageList[i].color);
         pTextDisplay->SetPosition(CVector(0.50f, messageList[i].fPosY, 0));
@@ -112,8 +112,7 @@ CPlayerMap::~CPlayerMap()
     for (uint i = 0; i < m_markerTextureList.size(); i++)
         SAFE_RELEASE(m_markerTextureList[i]);
     m_markerTextureList.clear();
-
-    // Don't need to delete the help texts as those are destroyed by the display manager
+    m_HelpTextList.clear();
 }
 
 void CPlayerMap::CreateOrUpdateMapTexture()

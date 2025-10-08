@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CColShapeRPC.cpp
  *  PURPOSE:     Colshapes remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

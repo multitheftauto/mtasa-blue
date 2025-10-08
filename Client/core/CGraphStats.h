@@ -4,9 +4,11 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CGraphStats.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
+
+#pragma once
 
 #define TIMING_GRAPH(name) \
     GetGraphStats()->AddTimingPoint( name );

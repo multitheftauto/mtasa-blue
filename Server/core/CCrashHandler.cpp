@@ -5,7 +5,7 @@
  *  FILE:        core/CCrashHandler.cpp
  *  PURPOSE:     Crash handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -215,7 +215,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
     if (hDll)
     {
         // Grab the MiniDumpWriteDump proc address
-        MINIDUMPWRITEDUMP pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(hDll, "MiniDumpWriteDump"));
+        auto pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(static_cast<void*>(GetProcAddress(hDll, "MiniDumpWriteDump")));
         if (pDump)
         {
             // Grab the current time

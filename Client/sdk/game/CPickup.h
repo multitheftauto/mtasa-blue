@@ -5,13 +5,14 @@
  *  FILE:        sdk/game/CPickup.h
  *  PURPOSE:     Pickup entity interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
-#include "Common.h"
+#include "enums/PickupState.h"
+#include "enums/PickupType.h"
 
 class CObject;
 class CVector;
@@ -23,8 +24,8 @@ public:
     virtual void     SetPosition(CVector* vecPosition) = 0;
     virtual CVector* GetPosition(CVector* vecPosition) = 0;
 
-    virtual ePickupType  GetType() = 0;
-    virtual void         SetType(ePickupType type) = 0;
+    virtual PickupType  GetType() = 0;
+    virtual void         SetType(PickupType type) = 0;
     virtual float        GetCurrentValue() = 0;
     virtual void         SetCurrentValue(float fCurrentValue) = 0;
     virtual void         SetRegenerationTime(DWORD dwTime) = 0;
@@ -32,8 +33,8 @@ public:
     virtual WORD         GetMoneyPerDay() = 0;
     virtual WORD         GetModel() = 0;
     virtual void         SetModel(WORD wModelIndex) = 0;            // do not export
-    virtual ePickupState GetState() = 0;
-    virtual void         SetState(ePickupState bState) = 0;
+    virtual PickupState GetState() = 0;
+    virtual void         SetState(PickupState bState) = 0;
     virtual BYTE         GetAmmo() = 0;
     virtual void         SetAmmo(BYTE bAmmo) = 0;
     virtual long         GetMonetaryValue() = 0;

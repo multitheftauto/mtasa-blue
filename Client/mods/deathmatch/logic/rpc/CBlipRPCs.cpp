@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/rpc/CBlipRPCs.cpp
  *  PURPOSE:     Blip remote procedure calls
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

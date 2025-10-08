@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CExplosionManagerSA.cpp
  *  PURPOSE:     Explosion manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -40,7 +40,7 @@ CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity
     CExplosion* explosion = CExplosionManagerSA::FindFreeExplosion();
     bool        bReturn;
     DWORD       dwFunc = FUNC_CExplosion_AddExplosion;
-    _asm
+    __asm
     {
         push    bNoDamage
         push    fCamShake

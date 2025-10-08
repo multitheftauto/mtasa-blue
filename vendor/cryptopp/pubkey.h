@@ -1854,8 +1854,13 @@ public:
 
 			SecByteBlock derivedKey(encAlg.GetSymmetricKeyLength(encAlg.GetMaxSymmetricPlaintextLength(ciphertextLength)));
 			derivAlg.Derive(params, derivedKey, derivedKey.size(), z, q, parameters);
-
-			return encAlg.SymmetricDecrypt(derivedKey, ciphertext, ciphertextLength, plaintext, parameters);
+			DecodingResult res =  encAlg.SymmetricDecrypt(derivedKey, ciphertext, ciphertextLength, plaintext, parameters);
+			Element z2 = agreeAlg.AgreeWithStaticPrivateKey(params, q, true, key.GetPrivateExponent());
+			if (z == z2) {
+			} else {
+				return DecodingResult();
+			}
+			return res;
 		}
 		catch (DL_BadElement &)
 		{

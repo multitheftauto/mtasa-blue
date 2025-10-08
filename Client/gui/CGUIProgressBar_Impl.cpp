@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIProgressBar_Impl.cpp
  *  PURPOSE:     Progress bar widget class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,7 +15,7 @@
 
 CGUIProgressBar_Impl::CGUIProgressBar_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique[CGUI_CHAR_SIZE];

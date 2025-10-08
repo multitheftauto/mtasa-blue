@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CControllerConfigManagerSA.h
  *  PURPOSE:     Header file for controller configuration manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

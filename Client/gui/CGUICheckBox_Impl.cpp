@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUICheckBox_Impl.cpp
  *  PURPOSE:     Checkbox widget class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,7 +15,7 @@
 
 CGUICheckBox_Impl::CGUICheckBox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption, bool bChecked)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique[CGUI_CHAR_SIZE];

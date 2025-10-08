@@ -27,8 +27,13 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
+#include <SharedUtil.Misc.h>
 #include <game/CBuildingRemoval.h>
 #include <game/TaskBasic.h>
+#include <enums/VehicleType.h>
+#include <enums/HandlingProperty.h>
+#include <cmath>
+#include <numbers>
 
 using std::list;
 
@@ -258,43 +263,33 @@ bool CStaticFunctionDefinitions::ClearChatBox()
 
 bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded)
 {
-    if (strlen(szText) <= MAX_OUTPUTCHATBOX_LENGTH)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushString(szText);
-        Arguments.PushNumber(ucRed);
-        Arguments.PushNumber(ucGreen);
-        Arguments.PushNumber(ucBlue);
-
-        bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
-        if (!bCancelled)
-        {
-            m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
-            return true;
-        }
+    if (!szText || szText[0] == '\0')
+        return false;
+    
+    SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : SStringX(szText);
+    
+    if (textToProcess.length() > MAX_OUTPUTCHATBOX_LENGTH) {
+        return false;
     }
+
+    CLuaArguments Arguments;
+    Arguments.PushString(szText);
+    Arguments.PushNumber(ucRed);
+    Arguments.PushNumber(ucGreen);
+    Arguments.PushNumber(ucBlue);
+
+    bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
+    if (!bCancelled) {
+        m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
+        return true;
+    }
+    
     return false;
 }
 
 bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
 {
-    std::wstring strUTF = MbUTF8ToUTF16(strText);
-
-    // Open and empty the clipboard
-    OpenClipboard(NULL);
-    EmptyClipboard();
-
-    // Allocate the clipboard buffer and copy the data
-    HGLOBAL  hBuf = GlobalAlloc(GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t));
-    wchar_t* buf = reinterpret_cast<wchar_t*>(GlobalLock(hBuf));
-    wcscpy(buf, strUTF.c_str());
-    GlobalUnlock(hBuf);
-
-    // Copy the data into the clipboard
-    SetClipboardData(CF_UNICODETEXT, hBuf);
-
-    // Close the clipboard
-    CloseClipboard();
+    SharedUtil::SetClipboardText(strText);
     return true;
 }
 
@@ -666,6 +661,11 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
             fDistance = static_cast<CClientObject&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
             return true;
         }
+        case CCLIENTBUILDING:
+        {
+            fDistance = static_cast<CClientBuilding&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
+            return true;
+        }
     }
 
     return false;
@@ -1017,13 +1017,13 @@ bool CStaticFunctionDefinitions::SetElementID(CClientEntity& Entity, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const char* szName, CLuaArgument& Variable, bool bSynchronize)
+bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, CStringName name, CLuaArgument& Variable, bool bSynchronize)
 {
-    assert(szName);
-    assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
+    assert(name);
+    assert(name->length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
     bool          bIsSynced;
-    CLuaArgument* pCurrentVariable = Entity.GetCustomData(szName, false, &bIsSynced);
+    CLuaArgument* pCurrentVariable = Entity.GetCustomData(name, false, &bIsSynced);
     if (!pCurrentVariable || Variable != *pCurrentVariable || bIsSynced != bSynchronize)
     {
         if (bSynchronize && !Entity.IsLocalEntity())
@@ -1031,9 +1031,9 @@ bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const cha
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
             // Write element ID, name length and the name. Also write the variable.
             pBitStream->Write(Entity.GetID());
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+            unsigned short usNameLength = static_cast<unsigned short>(name->length());
             pBitStream->WriteCompressed(usNameLength);
-            pBitStream->Write(szName, usNameLength);
+            pBitStream->Write(name.ToCString(), usNameLength);
             Variable.WriteToBitStream(*pBitStream);
 
             // Send the packet and deallocate
@@ -1042,14 +1042,14 @@ bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const cha
         }
 
         // Set its custom data
-        Entity.SetCustomData(szName, Variable, bSynchronize);
+        Entity.SetCustomData(name, Variable, bSynchronize);
         return true;
     }
 
     return false;
 }
 
-bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, const char* szName)
+bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, CStringName name)
 {
     // TODO
     return false;
@@ -1369,18 +1369,30 @@ bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEn
     RUN_CHILDREN(AttachElements(**iter, AttachedToEntity, vecPosition, vecRotation))
 
     // Can these elements be attached?
-    if (Entity.IsAttachToable() && AttachedToEntity.IsAttachable() && !AttachedToEntity.IsAttachedToElement(&Entity) &&
-        Entity.GetDimension() == AttachedToEntity.GetDimension())
+    if (!Entity.IsAttachToable() || !AttachedToEntity.IsAttachable() || AttachedToEntity.IsAttachedToElement(&Entity) ||
+        Entity.GetDimension() != AttachedToEntity.GetDimension())
     {
-        ConvertDegreesToRadians(vecRotation);
-
-        Entity.SetAttachedOffsets(vecPosition, vecRotation);
-        Entity.AttachTo(&AttachedToEntity);
-
-        return true;
+        return false;
     }
 
-    return false;
+    CLuaArguments Arguments;
+    Arguments.PushElement(&AttachedToEntity);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!Entity.CallEvent("onClientElementAttach", Arguments, true))
+        return false;
+
+    ConvertDegreesToRadians(vecRotation);
+
+    Entity.SetAttachedOffsets(vecPosition, vecRotation);
+    Entity.AttachTo(&AttachedToEntity);
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::DetachElements(CClientEntity& Entity, CClientEntity* pAttachedToEntity)
@@ -1388,16 +1400,33 @@ bool CStaticFunctionDefinitions::DetachElements(CClientEntity& Entity, CClientEn
     RUN_CHILDREN(DetachElements(**iter, pAttachedToEntity))
 
     CClientEntity* pActualAttachedToEntity = Entity.GetAttachedTo();
-    if (pActualAttachedToEntity)
+    if (!pActualAttachedToEntity || (pAttachedToEntity && pActualAttachedToEntity != pAttachedToEntity))
     {
-        if (pAttachedToEntity == NULL || pActualAttachedToEntity == pAttachedToEntity)
-        {
-            Entity.AttachTo(NULL);
-            return true;
-        }
+        return false;
     }
 
-    return false;
+    CVector vecPosition;
+    CVector vecRotation;
+
+    Entity.GetPosition(vecPosition);
+    Entity.GetRotationDegrees(vecRotation);
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(pActualAttachedToEntity);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushNumber(vecRotation.fX);
+    Arguments.PushNumber(vecRotation.fY);
+    Arguments.PushNumber(vecRotation.fZ);
+
+    if (!Entity.CallEvent("onClientElementDetach", Arguments, true))
+    {
+        return false;
+    }
+
+    Entity.AttachTo(NULL);
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetElementAttachedOffsets(CClientEntity& Entity, CVector& vecPosition, CVector& vecRotation)
@@ -1461,6 +1490,12 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
+
+            // If setting health to 0 for local player, clear stale damage data
+            // and set proper scripted death parameters for DoWastedCheck
+            if (fHealth == 0.0f && Ped.IsLocalPlayer() && Ped.GetHealth() > 0.0f) {
+                g_pClientGame->SetScriptedDeathData();
+            }
 
             // Set the new health
             Ped.SetHealth(Clamp(0.0f, fHealth, Ped.GetMaxHealth()));
@@ -1702,15 +1737,15 @@ bool CStaticFunctionDefinitions::GetPedClothes(CClientPed& Ped, unsigned char uc
     const SPlayerClothing* pClothing = Ped.GetClothes()->GetClothing(ucType);
     if (pClothing)
     {
-        strOutTexture = pClothing->szTexture;
-        strOutModel = pClothing->szModel;
+        strOutTexture = pClothing->texture;
+        strOutModel = pClothing->model;
         return true;
     }
 
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept
+bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& ped, const std::string& control, bool& state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return GetControlState(control.c_str(), state);
@@ -2245,6 +2280,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                     }
                 }
             }
+
+            Ped.m_AnimationCache.startTime = GetTimestamp();
         }
         else
         {
@@ -2363,13 +2400,12 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& ped, const std::string& control, const bool state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return SetControlState(control.c_str(), state);
 
-    if (ped.m_Pad.SetControlState(control.c_str(), state))
-        return true;
+    return ped.m_Pad.SetControlState(control.c_str(), state);
 }
 
 bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby)
@@ -2618,18 +2654,18 @@ bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, SString& st
 
 bool CStaticFunctionDefinitions::GetClothesByTypeIndex(unsigned char ucType, unsigned char ucIndex, SString& strOutTexture, SString& strOutModel)
 {
-    const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
-    if (pPlayerClothing)
-    {
-        if (ucIndex < CClientPlayerClothes::GetClothingGroupMax(ucType))
-        {
-            strOutTexture = pPlayerClothing[ucIndex].szTexture;
-            strOutModel = pPlayerClothing[ucIndex].szModel;
-            return true;
-        }
-    }
+    std::vector<const SPlayerClothing*> pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
 
-    return false;
+    if (pPlayerClothing.empty())
+        return false;
+
+    if (ucIndex > (pPlayerClothing.size() - 1))
+        return false;
+
+    strOutTexture = pPlayerClothing.at(ucIndex)->texture;
+    strOutModel = pPlayerClothing.at(ucIndex)->model;
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn)
@@ -2639,13 +2675,13 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes(const char* szTexture, 
 
     for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
     {
-        const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
-        if (pPlayerClothing)
-        {
-            for (unsigned char ucIter = 0; pPlayerClothing[ucIter].szTexture != NULL; ucIter++)
+        std::vector<const SPlayerClothing*> pPlayerClothing = CClientPlayerClothes::GetClothingGroup(ucType);
+
+        if (!pPlayerClothing.empty()) {
+            for (unsigned char ucIter = 0; ucIter < pPlayerClothing.size(); ucIter++)
             {
-                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter].szTexture) == 0) &&
-                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter].szModel) == 0))
+                if ((szTexture == NULL || strcmp(szTexture, pPlayerClothing[ucIter]->texture.c_str()) == 0) &&
+                    (szModel == NULL || strcmp(szModel, pPlayerClothing[ucIter]->model.c_str()) == 0))
                 {
                     ucTypeReturn = ucType;
                     ucIndexReturn = ucIter;
@@ -2864,17 +2900,46 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optiona
 {
     RUN_CHILDREN(BlowVehicle(**iter, withExplosion))
 
-    if (IS_VEHICLE(&Entity))
-    {
-        CClientVehicle& vehicle = static_cast<CClientVehicle&>(Entity);
+    if (!IS_VEHICLE(&Entity))
+        return false;
 
-        VehicleBlowFlags blow;
-        blow.withExplosion = withExplosion.value_or(true);
+    CClientVehicle& vehicle = static_cast<CClientVehicle&>(Entity);
+    VehicleBlowFlags blow;
+
+    blow.withExplosion = withExplosion.value_or(true);
+
+    if (vehicle.IsLocalEntity())
+    {
         vehicle.Blow(blow);
-        return true;
+    }
+    else
+    {
+        CVector position;
+        vehicle.GetPosition(position);
+
+        const auto type = vehicle.GetType();
+        const auto state = (blow.withExplosion ? VehicleBlowState::AWAITING_EXPLOSION_SYNC : VehicleBlowState::BLOWN);
+        eExplosionType explosion;
+
+        switch (type)
+        {
+            case CLIENTVEHICLE_CAR:
+                explosion = EXP_TYPE_CAR;
+                break;
+            case CLIENTVEHICLE_HELI:
+                explosion = EXP_TYPE_HELI;
+                break;
+            case CLIENTVEHICLE_BOAT:
+                explosion = EXP_TYPE_BOAT;
+                break;
+            default:
+                explosion = EXP_TYPE_CAR;
+        }
+
+        g_pClientGame->SendExplosionSync(position, explosion, &Entity, state);
     }
 
-    return false;
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleVariant(CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2)
@@ -2893,7 +2958,7 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CClientVehicle& Vehicl
 
 bool CStaticFunctionDefinitions::GetVehicleCurrentGear(CClientVehicle& Vehicle, unsigned short& currentGear)
 {
-    currentGear = Vehicle.GetCurrentGear();
+    currentGear = static_cast<unsigned short>(Vehicle.GetCurrentGear());
     return true;
 }
 
@@ -3099,22 +3164,22 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
 
         if (ucDoor < MAX_DOORS)
         {
-            switch (Vehicle.GetModel())
+            switch (static_cast<VehicleType>(Vehicle.GetModel()))
             {
-                case VT_BFINJECT:
-                case VT_RCBANDIT:
-                case VT_CADDY:
-                case VT_RCRAIDER:
-                case VT_BAGGAGE:
-                case VT_DOZER:
-                case VT_FORKLIFT:
-                case VT_TRACTOR:
-                case VT_RCTIGER:
-                case VT_BANDITO:
-                case VT_KART:
-                case VT_MOWER:
-                case VT_RCCAM:
-                case VT_RCGOBLIN:
+                case VehicleType::VT_BFINJECT:
+                case VehicleType::VT_RCBANDIT:
+                case VehicleType::VT_CADDY:
+                case VehicleType::VT_RCRAIDER:
+                case VehicleType::VT_BAGGAGE:
+                case VehicleType::VT_DOZER:
+                case VehicleType::VT_FORKLIFT:
+                case VehicleType::VT_TRACTOR:
+                case VehicleType::VT_RCTIGER:
+                case VehicleType::VT_BANDITO:
+                case VehicleType::VT_KART:
+                case VehicleType::VT_MOWER:
+                case VehicleType::VT_RCCAM:
+                case VehicleType::VT_RCGOBLIN:
                     return false;
                     break;
                 default:
@@ -3660,7 +3725,7 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
-bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, VehicleDummies eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3674,7 +3739,7 @@ bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, VehicleDummies eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3688,7 +3753,7 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(unsigned short usModel, VehicleDummies eDummy, CVector& vecPosition)
 {
     CModelInfo* modelInfo = g_pGame->GetModelInfo(usModel);
 
@@ -4765,7 +4830,8 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
     assert(szType);
 
     // Grab the type id
-    unsigned char ucType = CClientMarker::StringToType(szType);
+    auto ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
+
     if (ucType != CClientMarker::MARKER_INVALID)
     {
         // Create the marker
@@ -4810,7 +4876,7 @@ bool CStaticFunctionDefinitions::SetMarkerType(CClientEntity& Entity, const char
     RUN_CHILDREN(SetMarkerType(**iter, szType))
 
     // Grab the new type ID
-    unsigned char ucType = CClientMarker::StringToType(szType);
+    const auto ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
     if (ucType != CClientMarker::MARKER_INVALID)
     {
         // Is this a marker?
@@ -4937,14 +5003,45 @@ bool CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(CClientEntity& E
 
 bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV)
 {
+    if (!m_pCamera)
+        return false;
+
     m_pCamera->GetPosition(vecPosition);
     m_pCamera->GetFixedTarget(vecLookAt, &fRoll);
-    fFOV = m_pCamera->GetFOV();
+    
+    fFOV = m_pCamera->GetAccurateFOV();
+    
+    if (fRoll == 0.0f)
+    {
+        // Calculate roll from camera matrix when not directly available
+        CMatrix matrix;
+        m_pCamera->GetMatrix(matrix);
+        
+        CVector worldUp(0.0f, 0.0f, 1.0f);
+        CVector cameraUp = matrix.vUp;
+        CVector cameraRight = matrix.vRight;
+        
+        // Project camera up vector onto plane perpendicular to camera front
+        CVector projectedUp = cameraUp - matrix.vFront * cameraUp.DotProduct(&matrix.vFront);
+        if (projectedUp.Length() <= FLOAT_EPSILON)
+            return true;
+
+        projectedUp.Normalize();
+        
+        float cosRoll = worldUp.DotProduct(&projectedUp);
+        float sinRoll = cameraRight.DotProduct(&worldUp);
+        
+        fRoll = std::atan2(sinRoll, cosRoll) * (180.0f / std::numbers::pi_v<float>);
+    }
+    
     return true;
 }
 
 CClientEntity* CStaticFunctionDefinitions::GetCameraTarget()
 {
+    if (!m_pCamera)
+        return nullptr;
+
     if (!m_pCamera->IsInFixedMode())
         return m_pCamera->GetTargetEntity();
     return NULL;
@@ -4952,12 +5049,22 @@ CClientEntity* CStaticFunctionDefinitions::GetCameraTarget()
 
 bool CStaticFunctionDefinitions::GetCameraInterior(unsigned char& ucInterior)
 {
-    ucInterior = static_cast<unsigned char>(g_pGame->GetWorld()->GetCurrentArea());
+    if (!g_pGame)
+        return false;
+
+    auto world = g_pGame->GetWorld();
+    if (!world)
+        return false;
+
+    ucInterior = static_cast<unsigned char>(world->GetCurrentArea());
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetCameraMatrix(const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV)
 {
+    if (!m_pCamera)
+        return false;
+
     if (!m_pCamera->IsInFixedMode())
     {
         m_pCamera->ToggleCameraFixedMode(true);
@@ -4973,13 +5080,23 @@ bool CStaticFunctionDefinitions::SetCameraMatrix(const CVector& vecPosition, CVe
         m_pCamera->GetFixedTarget(vecPrevLookAt);
         m_pCamera->SetFixedTarget(vecPrevLookAt, fRoll);
     }
+
+    if (!std::isfinite(fFOV) || fFOV <= 0.0f)
+        fFOV = 70.0f;
+    else if (fFOV >= 180.0f)
+        fFOV = 179.0f;
+
     m_pCamera->SetFOV(fFOV);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
 {
-    assert(pEntity);
+    if (!m_pCamera || !pEntity)
+        return false;
+
+    if (pEntity->IsBeingDeleted())
+        return false;
 
     switch (pEntity->GetType())
     {
@@ -5018,30 +5135,45 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
 
 bool CStaticFunctionDefinitions::SetCameraTarget(const CVector& vecTarget)
 {
+    if (!m_pCamera)
+        return false;
+
     m_pCamera->SetOrbitTarget(vecTarget);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetCameraInterior(unsigned char ucInterior)
 {
-    g_pGame->GetWorld()->SetCurrentArea(ucInterior);
+    if (!g_pGame)
+        return false;
+
+    auto world = g_pGame->GetWorld();
+    if (!world)
+        return false;
+
+    world->SetCurrentArea(ucInterior);
     return true;
 }
 
 bool CStaticFunctionDefinitions::FadeCamera(bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
     CClientCamera* pCamera = m_pManager->GetCamera();
+    if (!pCamera || !g_pClientGame)
+        return false;
+
     g_pClientGame->SetInitiallyFadedOut(false);
 
     if (bFadeIn)
     {
         pCamera->FadeIn(fFadeTime);
-        g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, !g_pClientGame->GetHudAreaNameDisabled());
+        if (g_pGame && g_pGame->GetHud())
+            g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, !g_pClientGame->GetHudAreaNameDisabled());
     }
     else
     {
         pCamera->FadeOut(fFadeTime, ucRed, ucGreen, ucBlue);
-        g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
+        if (g_pGame && g_pGame->GetHud())
+            g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     }
 
     return true;
@@ -6335,7 +6467,8 @@ void CStaticFunctionDefinitions::GUILabelSetColor(CClientEntity& Entity, int iR,
         if (IS_CGUIELEMENT_LABEL(&GUIElement))
         {
             // Set the label color
-            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetTextColor(iR, iG, iB);
+            static_cast<CGUILabel*>(GUIElement.GetCGUIElement())->SetTextColor(static_cast<unsigned char>(iR), static_cast<unsigned char>(iG),
+                                                                               static_cast<unsigned char>(iB));
         }
     }
 }
@@ -6614,6 +6747,11 @@ bool CStaticFunctionDefinitions::GetGarageSize(unsigned char ucGarageID, float& 
     if (pGarage)
     {
         pGarage->GetSize(fHeight, fWidth, fDepth);
+        
+        CVector vecPosition;
+        pGarage->GetPosition(vecPosition);
+        fHeight -= vecPosition.fZ;
+        
         return true;
     }
 
@@ -6941,20 +7079,19 @@ bool CStaticFunctionDefinitions::SetMoonSize(int iSize)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetFPSLimit(int iLimit)
+void CStaticFunctionDefinitions::SetClientFPSLimit(std::uint16_t fps)
 {
-    if (iLimit == 0 || (iLimit >= 25 && iLimit <= std::numeric_limits<short>::max()))
-    {
-        g_pCore->SetClientScriptFrameRateLimit(iLimit);
-        return true;
-    }
-    return false;
+    g_pCore->GetFPSLimiter()->SetClientEnforcedFPS(fps);
 }
 
-bool CStaticFunctionDefinitions::GetFPSLimit(int& iLimit)
+void CStaticFunctionDefinitions::GetFPSLimit(std::uint16_t& fps) noexcept
 {
-    iLimit = g_pCore->GetFrameRateLimit();
-    return true;
+    fps = g_pCore->GetFPSLimiter()->GetFPSTarget();
+}
+
+void CStaticFunctionDefinitions::SetServerFPSLimit(std::uint16_t fps)
+{
+    g_pCore->GetFPSLimiter()->SetServerEnforcedFPS(fps);
 }
 
 bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction,
@@ -7116,27 +7253,16 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             }
         }
 
-        pBind = g_pCore->GetKeyBinds()->GetBindFromCommand(szCommandName, NULL, false, szKey, bCheckHitState, bHitState);
-
+        // Use context-aware removal to only remove resource bindings
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
+            pKeyBinds->RemoveCommandFromContext(szKey, szCommandName, BindingContext::RESOURCE, bCheckHitState, bHitState, NULL, szResource))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
-
-            if (pBind)
-                pKeyBinds->Remove(pBind);
-
             bSuccess = true;
         }
         bHitState = false;
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
+            pKeyBinds->RemoveCommandFromContext(szKey, szCommandName, BindingContext::RESOURCE, bCheckHitState, bHitState, NULL, szResource))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
-
-            if (pBind)
-                pKeyBinds->Remove(pBind);
-
             bSuccess = true;
         }
     }
@@ -7585,11 +7711,11 @@ bool CStaticFunctionDefinitions::FireWeapon(CClientWeapon* pWeapon)
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, eWeaponProperty eProperty, short& sData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, short& sData)
 {
     if (pWeapon)
     {
-        if (eProperty == WEAPON_DAMAGE)
+        if (eProperty == WeaponProperty::WEAPON_DAMAGE)
         {
             sData = pWeapon->GetWeaponStat()->GetDamagePerHit();
             return true;
@@ -7598,11 +7724,11 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, eWeap
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, eWeaponProperty eProperty, CVector& vecData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, CVector& vecData)
 {
     if (pWeapon)
     {
-        if (eProperty == WEAPON_FIRE_ROTATION)
+        if (eProperty == WeaponProperty::WEAPON_FIRE_ROTATION)
         {
             vecData = pWeapon->GetFireRotationNoTarget();
             ConvertRadiansToDegrees(vecData);
@@ -7612,21 +7738,21 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, eWeap
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, eWeaponProperty eProperty, float& fData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, float& fData)
 {
     if (pWeapon)
     {
-        if (eProperty == WEAPON_ACCURACY)
+        if (eProperty == WeaponProperty::WEAPON_ACCURACY)
         {
             fData = pWeapon->GetWeaponStat()->GetAccuracy();
             return true;
         }
-        if (eProperty == WEAPON_TARGET_RANGE)
+        if (eProperty == WeaponProperty::WEAPON_TARGET_RANGE)
         {
             fData = pWeapon->GetWeaponStat()->GetTargetRange();
             return true;
         }
-        if (eProperty == WEAPON_WEAPON_RANGE)
+        if (eProperty == WeaponProperty::WEAPON_WEAPON_RANGE)
         {
             fData = pWeapon->GetWeaponStat()->GetWeaponRange();
             return true;
@@ -7635,11 +7761,11 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, eWeap
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, eWeaponProperty eProperty, short sData)
+bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, short sData)
 {
     if (pWeapon)
     {
-        if (eProperty == WEAPON_DAMAGE)
+        if (eProperty == WeaponProperty::WEAPON_DAMAGE)
         {
             pWeapon->GetWeaponStat()->SetDamagePerHit(sData);
             return true;
@@ -7648,11 +7774,11 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, eWeap
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, eWeaponProperty eProperty, const CVector& vecData)
+bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, const CVector& vecData)
 {
     if (pWeapon)
     {
-        if (eProperty == WEAPON_FIRE_ROTATION)
+        if (eProperty == WeaponProperty::WEAPON_FIRE_ROTATION)
         {
             CVector vecRotationRadians = vecData;
             ConvertDegreesToRadians(vecRotationRadians);
@@ -7663,21 +7789,21 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, eWeap
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, eWeaponProperty eProperty, float fData)
+bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, float fData)
 {
     if (pWeapon)
     {
-        if (eProperty == WEAPON_ACCURACY)
+        if (eProperty == WeaponProperty::WEAPON_ACCURACY)
         {
             pWeapon->GetWeaponStat()->SetAccuracy(fData);
             return true;
         }
-        if (eProperty == WEAPON_TARGET_RANGE)
+        if (eProperty == WeaponProperty::WEAPON_TARGET_RANGE)
         {
             pWeapon->GetWeaponStat()->SetTargetRange(fData);
             return true;
         }
-        if (eProperty == WEAPON_WEAPON_RANGE)
+        if (eProperty == WeaponProperty::WEAPON_WEAPON_RANGE)
         {
             pWeapon->GetWeaponStat()->SetWeaponRange(fData);
             return true;
@@ -7944,7 +8070,7 @@ bool CStaticFunctionDefinitions::FxAddFootSplash(CVector& vecPosition)
     return true;
 }
 
-bool CStaticFunctionDefinitions::FxCreateParticle(eFxParticleSystems eFxParticle, CVector& vecPosition, CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
+bool CStaticFunctionDefinitions::FxCreateParticle(FxParticleSystems eFxParticle, CVector& vecPosition, CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
 {
     g_pGame->GetFx()->AddParticle(eFxParticle, vecPosition, vecDirection, fR, fG, fB, fA, bRandomizeColors, iCount, fBrightness, fSize, bRandomizeSizes, fLife);
     return true;
@@ -8452,13 +8578,13 @@ SString CStaticFunctionDefinitions::GetVersionSortable()
 }
 
 /* Handling functions */
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, unsigned int uiValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_PERCENTSUBMERGED:
+            case HandlingProperty::HANDLING_PERCENTSUBMERGED:
             {
                 if (uiValue > 0 && uiValue <= 200)
                 {
@@ -8470,7 +8596,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
             /*case HANDLING_MONETARY:
             pEntry->SetMonetary ( uiValue );
             break;*/
-            case HANDLING_HANDLINGFLAGS:
+            case HandlingProperty::HANDLING_HANDLINGFLAGS:
             {
                 // Disable NOS and Hydraulic installed properties.
                 if (uiValue & 0x00080000)
@@ -8481,7 +8607,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 pEntry->SetHandlingFlags(uiValue);
                 return true;
             }
-            case HANDLING_MODELFLAGS:
+            case HandlingProperty::HANDLING_MODELFLAGS:
             {
                 pEntry->SetModelFlags(uiValue);
                 return true;
@@ -8495,13 +8621,13 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, unsigned char ucValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_NUMOFGEARS:
+            case HandlingProperty::HANDLING_NUMOFGEARS:
             {
                 if (ucValue > 0 && ucValue <= 5)
                 {
@@ -8510,7 +8636,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_ANIMGROUP:
+            case HandlingProperty::HANDLING_ANIMGROUP:
             {
                 if (ucValue >= 0 && ucValue <= 29)
                 {
@@ -8531,13 +8657,13 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, float fValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_MASS:
+            case HandlingProperty::HANDLING_MASS:
             {
                 if (fValue > 0 && fValue <= 100000)
                 {
@@ -8546,7 +8672,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_TURNMASS:
+            case HandlingProperty::HANDLING_TURNMASS:
             {
                 if (fValue > 0 && fValue <= 10000000)
                 {
@@ -8555,7 +8681,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_DRAGCOEFF:
+            case HandlingProperty::HANDLING_DRAGCOEFF:
             {
                 if (fValue >= -200 && fValue <= 200)
                 {
@@ -8564,7 +8690,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_TRACTIONMULTIPLIER:
+            case HandlingProperty::HANDLING_TRACTIONMULTIPLIER:
             {
                 if (fValue >= -100000 && fValue <= 100000)
                 {
@@ -8573,7 +8699,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_ENGINEACCELERATION:
+            case HandlingProperty::HANDLING_ENGINEACCELERATION:
             {
                 if (fValue >= 0 && fValue <= 100000)
                 {
@@ -8582,7 +8708,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_ENGINEINERTIA:
+            case HandlingProperty::HANDLING_ENGINEINERTIA:
             {
                 if (fValue >= -1000 && fValue <= 1000 && fValue != 0.0)
                 {
@@ -8591,7 +8717,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_MAXVELOCITY:
+            case HandlingProperty::HANDLING_MAXVELOCITY:
             {
                 if (fValue >= 0.0 && fValue <= 200000)
                 {
@@ -8600,7 +8726,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_BRAKEDECELERATION:
+            case HandlingProperty::HANDLING_BRAKEDECELERATION:
             {
                 if (fValue >= 0.0 && fValue <= 100000)
                 {
@@ -8609,7 +8735,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_BRAKEBIAS:
+            case HandlingProperty::HANDLING_BRAKEBIAS:
             {
                 if (fValue >= 0.0 && fValue <= 1.0)
                 {
@@ -8618,7 +8744,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_STEERINGLOCK:
+            case HandlingProperty::HANDLING_STEERINGLOCK:
             {
                 if (fValue >= 0.0 && fValue <= 360)
                 {
@@ -8627,7 +8753,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_TRACTIONLOSS:
+            case HandlingProperty::HANDLING_TRACTIONLOSS:
             {
                 if (fValue >= 0.0 && fValue <= 100)
                 {
@@ -8636,7 +8762,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_TRACTIONBIAS:
+            case HandlingProperty::HANDLING_TRACTIONBIAS:
             {
                 if (fValue >= 0.0 && fValue <= 1.0)
                 {
@@ -8645,7 +8771,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_SUSPENSION_FORCELEVEL:
+            case HandlingProperty::HANDLING_SUSPENSION_FORCELEVEL:
             {
                 if (fValue > 0.0 && fValue <= 100)
                 {
@@ -8654,7 +8780,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_SUSPENSION_DAMPING:
+            case HandlingProperty::HANDLING_SUSPENSION_DAMPING:
             {
                 if (fValue > 0.0 && fValue <= 100)
                 {
@@ -8663,7 +8789,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+            case HandlingProperty::HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
             {
                 if (fValue >= 0.0 && fValue <= 600)
                 {
@@ -8672,7 +8798,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_SUSPENSION_UPPER_LIMIT:
+            case HandlingProperty::HANDLING_SUSPENSION_UPPER_LIMIT:
             {
                 if (fValue >= -50 && fValue <= 50 && fValue > pEntry->GetSuspensionLowerLimit() + 0.01)
                 {
@@ -8684,7 +8810,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_SUSPENSION_LOWER_LIMIT:
+            case HandlingProperty::HANDLING_SUSPENSION_LOWER_LIMIT:
             {
                 if (fValue >= -50 && fValue <= 50 && fValue < pEntry->GetSuspensionUpperLimit() - 0.01)
                 {
@@ -8696,7 +8822,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_SUSPENSION_FRONTREARBIAS:
+            case HandlingProperty::HANDLING_SUSPENSION_FRONTREARBIAS:
             {
                 if (fValue >= 0.0 && fValue <= 3.0)
                 {
@@ -8705,7 +8831,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+            case HandlingProperty::HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
             {
                 if (fValue >= 0.0 && fValue <= 30)
                 {
@@ -8714,7 +8840,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+            case HandlingProperty::HANDLING_COLLISIONDAMAGEMULTIPLIER:
             {
                 if (fValue >= 0.0 && fValue <= 100)
                 {
@@ -8723,7 +8849,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_SEATOFFSETDISTANCE:
+            case HandlingProperty::HANDLING_SEATOFFSETDISTANCE:
             {
                 if (fValue >= -20 && fValue <= 20)
                 {
@@ -8732,7 +8858,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                 }
                 break;
             }
-            case HANDLING_ABS:
+            case HandlingProperty::HANDLING_ABS:
             {
                 pEntry->SetABS((fValue > 0.0f) ? true : false);
                 return true;
@@ -8746,11 +8872,11 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector vecValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, CVector vecValue)
 {
     if (pEntry)
     {
-        if (eProperty == HANDLING_CENTEROFMASS)
+        if (eProperty == HandlingProperty::HANDLING_CENTEROFMASS)
         {
             if (vecValue.fX >= -10.0 && vecValue.fX <= 10.0 && vecValue.fY >= -10.0 && vecValue.fY <= 10.0 && vecValue.fZ >= -10.0 && vecValue.fZ <= 10.0)
             {
@@ -8763,13 +8889,13 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, std::string strValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_DRIVETYPE:
+            case HandlingProperty::HANDLING_DRIVETYPE:
             {
                 if (strValue == "fwd")
                 {
@@ -8790,7 +8916,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
                     return false;
                 break;
             }
-            case HANDLING_ENGINETYPE:
+            case HandlingProperty::HANDLING_ENGINETYPE:
             {
                 if (strValue == "petrol")
                 {
@@ -8879,7 +9005,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, eHandl
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char ucValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, unsigned char ucValue)
 {
     assert(pVehicle);
 
@@ -8896,7 +9022,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, unsigned int uiValue)
 {
     assert(pVehicle);
 
@@ -8913,7 +9039,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, float fValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, float fValue)
 {
     assert(pVehicle);
 
@@ -8930,7 +9056,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, std::string strValue)
 {
     assert(pVehicle);
 
@@ -8947,7 +9073,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector vecValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, CVector vecValue)
 {
     assert(pVehicle);
 
@@ -9020,7 +9146,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pVehicle, eHandlingProperty eProperty)
+bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pVehicle, HandlingProperty eProperty)
 {
     assert(pVehicle);
 
@@ -9072,22 +9198,22 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pV
     return false;
 }
 
-eHandlingProperty CStaticFunctionDefinitions::GetVehicleHandlingEnum(std::string strProperty)
+HandlingProperty CStaticFunctionDefinitions::GetVehicleHandlingEnum(std::string strProperty)
 {
-    eHandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
-    if (eProperty)
+    HandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+    if (eProperty > HandlingProperty::HANDLING_NONE)
     {
         return eProperty;
     }
-    return HANDLING_MAX;
+    return HandlingProperty::HANDLING_MAX;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, CVector& vecValue)
 {
     assert(pVehicle);
 
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
-    if (eProperty == HANDLING_CENTEROFMASS)
+    if (eProperty == HandlingProperty::HANDLING_CENTEROFMASS)
     {
         vecValue = pEntry->GetCenterOfMass();
         return true;
@@ -9095,7 +9221,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, float& fValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, float& fValue)
 {
     assert(pVehicle);
 
@@ -9108,7 +9234,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, std::string& strValue)
 {
     assert(pVehicle);
 
@@ -9121,7 +9247,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, unsigned int& uiValue)
 {
     assert(pVehicle);
 
@@ -9133,7 +9259,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, unsigned char& ucValue)
 {
     assert(pVehicle);
 
@@ -9145,76 +9271,76 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, float& fValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_MASS:
+            case HandlingProperty::HANDLING_MASS:
                 fValue = pEntry->GetMass();
                 break;
-            case HANDLING_TURNMASS:
+            case HandlingProperty::HANDLING_TURNMASS:
                 fValue = pEntry->GetTurnMass();
                 break;
-            case HANDLING_DRAGCOEFF:
+            case HandlingProperty::HANDLING_DRAGCOEFF:
                 fValue = pEntry->GetDragCoeff();
                 break;
-            case HANDLING_TRACTIONMULTIPLIER:
+            case HandlingProperty::HANDLING_TRACTIONMULTIPLIER:
                 fValue = pEntry->GetTractionMultiplier();
                 break;
-            case HANDLING_ENGINEACCELERATION:
+            case HandlingProperty::HANDLING_ENGINEACCELERATION:
                 fValue = pEntry->GetEngineAcceleration();
                 break;
-            case HANDLING_ENGINEINERTIA:
+            case HandlingProperty::HANDLING_ENGINEINERTIA:
                 fValue = pEntry->GetEngineInertia();
                 break;
-            case HANDLING_MAXVELOCITY:
+            case HandlingProperty::HANDLING_MAXVELOCITY:
                 fValue = pEntry->GetMaxVelocity();
                 break;
-            case HANDLING_BRAKEDECELERATION:
+            case HandlingProperty::HANDLING_BRAKEDECELERATION:
                 fValue = pEntry->GetBrakeDeceleration();
                 break;
-            case HANDLING_BRAKEBIAS:
+            case HandlingProperty::HANDLING_BRAKEBIAS:
                 fValue = pEntry->GetBrakeBias();
                 break;
-            case HANDLING_STEERINGLOCK:
+            case HandlingProperty::HANDLING_STEERINGLOCK:
                 fValue = pEntry->GetSteeringLock();
                 break;
-            case HANDLING_TRACTIONLOSS:
+            case HandlingProperty::HANDLING_TRACTIONLOSS:
                 fValue = pEntry->GetTractionLoss();
                 break;
-            case HANDLING_TRACTIONBIAS:
+            case HandlingProperty::HANDLING_TRACTIONBIAS:
                 fValue = pEntry->GetTractionBias();
                 break;
-            case HANDLING_SUSPENSION_FORCELEVEL:
+            case HandlingProperty::HANDLING_SUSPENSION_FORCELEVEL:
                 fValue = pEntry->GetSuspensionForceLevel();
                 break;
-            case HANDLING_SUSPENSION_DAMPING:
+            case HandlingProperty::HANDLING_SUSPENSION_DAMPING:
                 fValue = pEntry->GetSuspensionDamping();
                 break;
-            case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+            case HandlingProperty::HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
                 fValue = pEntry->GetSuspensionHighSpeedDamping();
                 break;
-            case HANDLING_SUSPENSION_UPPER_LIMIT:
+            case HandlingProperty::HANDLING_SUSPENSION_UPPER_LIMIT:
                 fValue = pEntry->GetSuspensionUpperLimit();
                 break;
-            case HANDLING_SUSPENSION_LOWER_LIMIT:
+            case HandlingProperty::HANDLING_SUSPENSION_LOWER_LIMIT:
                 fValue = pEntry->GetSuspensionLowerLimit();
                 break;
-            case HANDLING_SUSPENSION_FRONTREARBIAS:
+            case HandlingProperty::HANDLING_SUSPENSION_FRONTREARBIAS:
                 fValue = pEntry->GetSuspensionFrontRearBias();
                 break;
-            case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+            case HandlingProperty::HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
                 fValue = pEntry->GetSuspensionAntiDiveMultiplier();
                 break;
-            case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+            case HandlingProperty::HANDLING_COLLISIONDAMAGEMULTIPLIER:
                 fValue = pEntry->GetCollisionDamageMultiplier();
                 break;
-            case HANDLING_SEATOFFSETDISTANCE:
+            case HandlingProperty::HANDLING_SEATOFFSETDISTANCE:
                 fValue = pEntry->GetSeatOffsetDistance();
                 break;
-            case HANDLING_ABS:            // bool
+            case HandlingProperty::HANDLING_ABS:            // bool
                 fValue = (float)(pEntry->GetABS() ? 1 : 0);
                 break;
             default:
@@ -9224,22 +9350,22 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandl
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, unsigned int& uiValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_PERCENTSUBMERGED:            // unsigned int
+            case HandlingProperty::HANDLING_PERCENTSUBMERGED:            // unsigned int
                 uiValue = pEntry->GetPercentSubmerged();
                 break;
-            case HANDLING_MONETARY:
+            case HandlingProperty::HANDLING_MONETARY:
                 uiValue = pEntry->GetMonetary();
                 break;
-            case HANDLING_HANDLINGFLAGS:
+            case HandlingProperty::HANDLING_HANDLINGFLAGS:
                 uiValue = pEntry->GetHandlingFlags();
                 break;
-            case HANDLING_MODELFLAGS:
+            case HandlingProperty::HANDLING_MODELFLAGS:
                 uiValue = pEntry->GetModelFlags();
                 break;
             default:
@@ -9249,16 +9375,16 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandl
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, unsigned char& ucValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_NUMOFGEARS:
+            case HandlingProperty::HANDLING_NUMOFGEARS:
                 ucValue = pEntry->GetNumberOfGears();
                 break;
-            case HANDLING_ANIMGROUP:
+            case HandlingProperty::HANDLING_ANIMGROUP:
                 ucValue = pEntry->GetAnimGroup();
                 break;
             default:
@@ -9268,13 +9394,13 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandl
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector& vecValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, CVector& vecValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_CENTEROFMASS:
+            case HandlingProperty::HANDLING_CENTEROFMASS:
             {
                 vecValue = pEntry->GetCenterOfMass();
                 break;
@@ -9287,13 +9413,13 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandl
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, std::string& strValue)
 {
     if (pEntry)
     {
         switch (eProperty)
         {
-            case HANDLING_DRIVETYPE:
+            case HandlingProperty::HANDLING_DRIVETYPE:
             {
                 CHandlingEntry::eDriveType eDriveType = pEntry->GetCarDriveType();
                 if (eDriveType == CHandlingEntry::FWD)
@@ -9306,7 +9432,7 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandl
                     return false;
                 break;
             }
-            case HANDLING_ENGINETYPE:
+            case HandlingProperty::HANDLING_ENGINETYPE:
             {
                 CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType();
                 if (eEngineType == CHandlingEntry::PETROL)
@@ -9319,7 +9445,7 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandl
                     return false;
                 break;
             }
-            case HANDLING_HEADLIGHT:
+            case HandlingProperty::HANDLING_HEADLIGHT:
             {
                 CHandlingEntry::eLightType eHeadType = pEntry->GetHeadLight();
                 if (eHeadType == CHandlingEntry::SMALL)
@@ -9334,7 +9460,7 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandl
                     return false;
                 break;
             }
-            case HANDLING_TAILLIGHT:
+            case HandlingProperty::HANDLING_TAILLIGHT:
             {
                 CHandlingEntry::eLightType eTailType = pEntry->GetTailLight();
                 if (eTailType == CHandlingEntry::SMALL)
@@ -9359,9 +9485,9 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, eHandl
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData)
 {
-    if (eProperty == WEAPON_INVALID_PROPERTY)
+    if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
 
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats(eWeapon, eSkillLevel);
@@ -9369,87 +9495,87 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eW
     {
         switch (eProperty)
         {
-            case WEAPON_WEAPON_RANGE:
+            case WeaponProperty::WEAPON_WEAPON_RANGE:
             {
                 fData = pWeaponInfo->GetWeaponRange();
                 break;
             }
-            case WEAPON_TARGET_RANGE:
+            case WeaponProperty::WEAPON_TARGET_RANGE:
             {
                 fData = pWeaponInfo->GetTargetRange();
                 break;
             }
-            case WEAPON_ACCURACY:
+            case WeaponProperty::WEAPON_ACCURACY:
             {
                 fData = pWeaponInfo->GetAccuracy();
                 break;
             }
-            case WEAPON_DAMAGE:
+            case WeaponProperty::WEAPON_DAMAGE:
             {
                 fData = pWeaponInfo->GetDamagePerHit();
                 break;
             }
-            case WEAPON_LIFE_SPAN:
+            case WeaponProperty::WEAPON_LIFE_SPAN:
             {
                 fData = pWeaponInfo->GetLifeSpan();
                 break;
             }
-            case WEAPON_FIRING_SPEED:
+            case WeaponProperty::WEAPON_FIRING_SPEED:
             {
                 fData = pWeaponInfo->GetFiringSpeed();
                 break;
             }
-            case WEAPON_MOVE_SPEED:
+            case WeaponProperty::WEAPON_MOVE_SPEED:
             {
                 fData = pWeaponInfo->GetMoveSpeed();
                 break;
             }
-            case WEAPON_SPREAD:
+            case WeaponProperty::WEAPON_SPREAD:
             {
                 fData = pWeaponInfo->GetSpread();
                 break;
             }
-            case WEAPON_REQ_SKILL_LEVEL:
+            case WeaponProperty::WEAPON_REQ_SKILL_LEVEL:
             {
                 fData = pWeaponInfo->GetRequiredStatLevel();
                 break;
             }
-            case WEAPON_ANIM_LOOP_START:
+            case WeaponProperty::WEAPON_ANIM_LOOP_START:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopStart();
                 break;
             }
-            case WEAPON_ANIM_LOOP_STOP:
+            case WeaponProperty::WEAPON_ANIM_LOOP_STOP:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopStop();
                 break;
             }
-            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            case WeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopFireTime();
                 break;
             }
-            case WEAPON_ANIM2_LOOP_START:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_START:
             {
                 fData = pWeaponInfo->GetWeaponAnim2LoopStart();
                 break;
             }
-            case WEAPON_ANIM2_LOOP_STOP:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_STOP:
             {
                 fData = pWeaponInfo->GetWeaponAnim2LoopStop();
                 break;
             }
-            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
             {
                 fData = pWeaponInfo->GetWeaponAnim2LoopFireTime();
                 break;
             }
-            case WEAPON_ANIM_BREAKOUT_TIME:
+            case WeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
             {
                 fData = pWeaponInfo->GetWeaponAnimBreakoutTime();
                 break;
             }
-            case WEAPON_RADIUS:
+            case WeaponProperty::WEAPON_RADIUS:
             {
                 fData = pWeaponInfo->GetWeaponRadius();
                 break;
@@ -9464,9 +9590,9 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eW
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData)
 {
-    if (eProperty == WEAPON_INVALID_PROPERTY)
+    if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
 
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats(eWeapon, eSkillLevel);
@@ -9474,62 +9600,62 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eW
     {
         switch (eProperty)
         {
-            case WEAPON_DAMAGE:
+            case WeaponProperty::WEAPON_DAMAGE:
             {
                 sData = pWeaponInfo->GetDamagePerHit();
                 break;
             }
-            case WEAPON_MAX_CLIP_AMMO:
+            case WeaponProperty::WEAPON_MAX_CLIP_AMMO:
             {
                 sData = pWeaponInfo->GetMaximumClipAmmo();
                 break;
             }
-            case WEAPON_ANIM_GROUP:
+            case WeaponProperty::WEAPON_ANIM_GROUP:
             {
                 sData = (short)pWeaponInfo->GetAnimGroup();
                 break;
             }
-            case WEAPON_FLAGS:
+            case WeaponProperty::WEAPON_FLAGS:
             {
                 sData = pWeaponInfo->GetFlags();
                 break;
             }
-            case WEAPON_FIRETYPE:
+            case WeaponProperty::WEAPON_FIRETYPE:
             {
                 sData = pWeaponInfo->GetFireType();
                 break;
             }
-            case WEAPON_MODEL:
+            case WeaponProperty::WEAPON_MODEL:
             {
                 sData = pWeaponInfo->GetModel();
                 break;
             }
-            case WEAPON_MODEL2:
+            case WeaponProperty::WEAPON_MODEL2:
             {
                 sData = pWeaponInfo->GetModel2();
                 break;
             }
-            case WEAPON_SLOT:
+            case WeaponProperty::WEAPON_SLOT:
             {
                 sData = pWeaponInfo->GetSlot();
                 break;
             }
-            case WEAPON_AIM_OFFSET:
+            case WeaponProperty::WEAPON_AIM_OFFSET:
             {
                 sData = pWeaponInfo->GetAimOffsetIndex();
                 break;
             }
-            case WEAPON_SKILL_LEVEL:
+            case WeaponProperty::WEAPON_SKILL_LEVEL:
             {
                 sData = pWeaponInfo->GetSkill();
                 break;
             }
-            case WEAPON_DEFAULT_COMBO:
+            case WeaponProperty::WEAPON_DEFAULT_COMBO:
             {
                 sData = pWeaponInfo->GetDefaultCombo();
                 break;
             }
-            case WEAPON_COMBOS_AVAILABLE:
+            case WeaponProperty::WEAPON_COMBOS_AVAILABLE:
             {
                 sData = pWeaponInfo->GetCombosAvailable();
                 break;
@@ -9545,9 +9671,9 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eW
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData)
 {
-    if (eProperty == WEAPON_INVALID_PROPERTY)
+    if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
 
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats(eWeapon, eSkillLevel);
@@ -9555,7 +9681,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eW
     {
         switch (eProperty)
         {
-            case WEAPON_FIRE_OFFSET:
+            case WeaponProperty::WEAPON_FIRE_OFFSET:
             {
                 vecData = *pWeaponInfo->GetFireOffset();
                 break;
@@ -9570,7 +9696,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(eWeaponProperty eProperty, eW
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable)
+bool CStaticFunctionDefinitions::GetWeaponPropertyFlag(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable)
 {
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats(eWeapon, eSkillLevel);
     if (!pWeaponInfo)
@@ -9586,9 +9712,9 @@ bool CStaticFunctionDefinitions::GetWeaponPropertyFlag(eWeaponProperty eProperty
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData)
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData)
 {
-    if (eProperty == WEAPON_INVALID_PROPERTY)
+    if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
 
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(eWeapon, eSkillLevel);
@@ -9596,88 +9722,88 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProp
     {
         switch (eProperty)
         {
-            case WEAPON_WEAPON_RANGE:
+            case WeaponProperty::WEAPON_WEAPON_RANGE:
             {
                 fData = pWeaponInfo->GetWeaponRange();
                 break;
             }
-            case WEAPON_TARGET_RANGE:
+            case WeaponProperty::WEAPON_TARGET_RANGE:
             {
                 fData = pWeaponInfo->GetTargetRange();
                 break;
             }
-            case WEAPON_ACCURACY:
+            case WeaponProperty::WEAPON_ACCURACY:
             {
                 fData = pWeaponInfo->GetAccuracy();
                 break;
             }
-            case WEAPON_DAMAGE:
+            case WeaponProperty::WEAPON_DAMAGE:
             {
                 fData = pWeaponInfo->GetDamagePerHit();
                 break;
             }
-            case WEAPON_LIFE_SPAN:
+            case WeaponProperty::WEAPON_LIFE_SPAN:
             {
                 fData = pWeaponInfo->GetLifeSpan();
                 break;
             }
-            case WEAPON_FIRING_SPEED:
+            case WeaponProperty::WEAPON_FIRING_SPEED:
             {
                 fData = pWeaponInfo->GetFiringSpeed();
                 break;
             }
-            case WEAPON_MOVE_SPEED:
+            case WeaponProperty::WEAPON_MOVE_SPEED:
             {
                 fData = pWeaponInfo->GetMoveSpeed();
                 break;
             }
-            case WEAPON_SPREAD:
+            case WeaponProperty::WEAPON_SPREAD:
             {
                 fData = pWeaponInfo->GetSpread();
                 break;
             }
 
-            case WEAPON_REQ_SKILL_LEVEL:
+            case WeaponProperty::WEAPON_REQ_SKILL_LEVEL:
             {
                 fData = pWeaponInfo->GetRequiredStatLevel();
                 break;
             }
-            case WEAPON_ANIM_LOOP_START:
+            case WeaponProperty::WEAPON_ANIM_LOOP_START:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopStart();
                 break;
             }
-            case WEAPON_ANIM_LOOP_STOP:
+            case WeaponProperty::WEAPON_ANIM_LOOP_STOP:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopStop();
                 break;
             }
-            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            case WeaponProperty::WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopFireTime();
                 break;
             }
-            case WEAPON_ANIM2_LOOP_START:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_START:
             {
                 fData = pWeaponInfo->GetWeaponAnim2LoopStart();
                 break;
             }
-            case WEAPON_ANIM2_LOOP_STOP:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_STOP:
             {
                 fData = pWeaponInfo->GetWeaponAnim2LoopStop();
                 break;
             }
-            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            case WeaponProperty::WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
             {
                 fData = pWeaponInfo->GetWeaponAnim2LoopFireTime();
                 break;
             }
-            case WEAPON_ANIM_BREAKOUT_TIME:
+            case WeaponProperty::WEAPON_ANIM_BREAKOUT_TIME:
             {
                 fData = pWeaponInfo->GetWeaponAnimBreakoutTime();
                 break;
             }
-            case WEAPON_RADIUS:
+            case WeaponProperty::WEAPON_RADIUS:
             {
                 fData = pWeaponInfo->GetWeaponRadius();
                 break;
@@ -9692,9 +9818,9 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProp
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData)
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData)
 {
-    if (eProperty == WEAPON_INVALID_PROPERTY)
+    if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
 
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(eWeapon, eSkillLevel);
@@ -9702,62 +9828,62 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProp
     {
         switch (eProperty)
         {
-            case WEAPON_DAMAGE:
+            case WeaponProperty::WEAPON_DAMAGE:
             {
                 sData = pWeaponInfo->GetDamagePerHit();
                 break;
             }
-            case WEAPON_MAX_CLIP_AMMO:
+            case WeaponProperty::WEAPON_MAX_CLIP_AMMO:
             {
                 sData = pWeaponInfo->GetMaximumClipAmmo();
                 break;
             }
-            case WEAPON_ANIM_GROUP:
+            case WeaponProperty::WEAPON_ANIM_GROUP:
             {
                 sData = (short)pWeaponInfo->GetAnimGroup();
                 break;
             }
-            case WEAPON_FLAGS:
+            case WeaponProperty::WEAPON_FLAGS:
             {
                 sData = pWeaponInfo->GetFlags();
                 break;
             }
-            case WEAPON_FIRETYPE:
+            case WeaponProperty::WEAPON_FIRETYPE:
             {
                 sData = pWeaponInfo->GetFireType();
                 break;
             }
-            case WEAPON_MODEL:
+            case WeaponProperty::WEAPON_MODEL:
             {
                 sData = pWeaponInfo->GetModel();
                 break;
             }
-            case WEAPON_MODEL2:
+            case WeaponProperty::WEAPON_MODEL2:
             {
                 sData = pWeaponInfo->GetModel2();
                 break;
             }
-            case WEAPON_SLOT:
+            case WeaponProperty::WEAPON_SLOT:
             {
                 sData = pWeaponInfo->GetSlot();
                 break;
             }
-            case WEAPON_AIM_OFFSET:
+            case WeaponProperty::WEAPON_AIM_OFFSET:
             {
                 sData = pWeaponInfo->GetAimOffsetIndex();
                 break;
             }
-            case WEAPON_SKILL_LEVEL:
+            case WeaponProperty::WEAPON_SKILL_LEVEL:
             {
                 sData = pWeaponInfo->GetSkill();
                 break;
             }
-            case WEAPON_DEFAULT_COMBO:
+            case WeaponProperty::WEAPON_DEFAULT_COMBO:
             {
                 sData = pWeaponInfo->GetDefaultCombo();
                 break;
             }
-            case WEAPON_COMBOS_AVAILABLE:
+            case WeaponProperty::WEAPON_COMBOS_AVAILABLE:
             {
                 sData = pWeaponInfo->GetCombosAvailable();
                 break;
@@ -9773,9 +9899,9 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProp
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData)
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData)
 {
-    if (eProperty == WEAPON_INVALID_PROPERTY)
+    if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
 
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(eWeapon, eSkillLevel);
@@ -9783,7 +9909,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProp
     {
         switch (eProperty)
         {
-            case WEAPON_FIRE_OFFSET:
+            case WeaponProperty::WEAPON_FIRE_OFFSET:
             {
                 vecData = *pWeaponInfo->GetFireOffset();
                 break;
@@ -9798,7 +9924,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(eWeaponProperty eProp
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable)
+bool CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable)
 {
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(eWeapon, eSkillLevel);
     if (!pWeaponInfo)

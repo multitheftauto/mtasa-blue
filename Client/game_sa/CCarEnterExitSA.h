@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCarEnterExitSA.h
  *  PURPOSE:     Header file for car enter and exit handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

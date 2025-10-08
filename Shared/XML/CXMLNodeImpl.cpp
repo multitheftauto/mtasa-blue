@@ -5,7 +5,7 @@
  *  FILE:        xml/CXMLNodeImpl.cpp
  *  PURPOSE:     XML node class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -328,7 +328,7 @@ void CXMLNodeImpl::SetTagContent(float fContent)
 {
     // Convert to string and set it
     char szBuffer[40];
-    sprintf(szBuffer, "%f", fContent);
+    snprintf(szBuffer, sizeof(szBuffer), "%f", fContent);
     SetTagContent(szBuffer);
 }
 

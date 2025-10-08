@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/FxSystemBP_cSA.h
  *  PURPOSE:     Game effects blueprint interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUITabPanel_Impl.cpp
  *  PURPOSE:     Tab panel widget class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,7 +15,7 @@
 
 CGUITabPanel_Impl::CGUITabPanel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Initialize
     m_pGUI = pGUI;

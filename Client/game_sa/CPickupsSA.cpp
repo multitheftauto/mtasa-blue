@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPickupsSA.cpp
  *  PURPOSE:     Pickup manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -36,7 +36,7 @@ CPickup* CPickupsSA::GetPickup(DWORD ID)
     return (CPickup*)Pickups[ID];
 }
 
-CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer)
+CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, PickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer)
 {
     DWORD      FreeSlot = 0;
     bool       bFoundFreeSlot = false;
@@ -56,7 +56,7 @@ CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, ePickupTy
     if (!bFoundFreeSlot)
     {
         FreeSlot = 0;
-        while (FreeSlot < MAX_PICKUPS && Pickups[FreeSlot]->GetInterface()->Type != PICKUP_NONE)
+        while (FreeSlot < MAX_PICKUPS && Pickups[FreeSlot]->GetInterface()->Type != (BYTE)PickupType::PICKUP_NONE)
         {
             FreeSlot++;
         }
@@ -68,7 +68,7 @@ CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, ePickupTy
     {
         // Simply use first money pickup.
         FreeSlot = 0;
-        while (FreeSlot < MAX_PICKUPS && Pickups[FreeSlot]->GetInterface()->Type != PICKUP_MONEY)
+        while (FreeSlot < MAX_PICKUPS && Pickups[FreeSlot]->GetInterface()->Type != (BYTE)PickupType::PICKUP_MONEY)
         {
             FreeSlot++;
         }
@@ -76,8 +76,8 @@ CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, ePickupTy
         if (FreeSlot >= MAX_PICKUPS)
         {            // In that case use the first PICKUP_ONCE_TIMEOUT
             FreeSlot = 0;
-            while (FreeSlot < MAX_PICKUPS && Pickups[FreeSlot]->GetInterface()->Type != PICKUP_ONCE_TIMEOUT &&
-                   Pickups[FreeSlot]->GetInterface()->Type != PICKUP_ONCE_TIMEOUT_SLOW)
+            while (FreeSlot < MAX_PICKUPS && Pickups[FreeSlot]->GetInterface()->Type != (BYTE)PickupType::PICKUP_ONCE_TIMEOUT &&
+                   Pickups[FreeSlot]->GetInterface()->Type != (BYTE)PickupType::PICKUP_ONCE_TIMEOUT_SLOW)
             {
                 FreeSlot++;
             }
@@ -101,33 +101,33 @@ CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, ePickupTy
     // Generate an object in the world for us.
     // Set the values for this pickup
     pickup->SetType(Type);
-    pickup->SetState(PUSTATE_ON);
+    pickup->SetState(PickupState::PUSTATE_ON);
     pickup->SetMonetaryValue(dwMonetaryValue);
     pickup->SetMoneyPerDay((WORD)dwMoneyPerDay);
     pickup->SetCurrentValue(0.0f);
     pickup->SetRegenerationTime(pGame->GetSystemTime());
     pickup->SetAmmo(bPingOutOfPlayer);
 
-    if (Type == PICKUP_ONCE_TIMEOUT)
+    if (Type == PickupType::PICKUP_ONCE_TIMEOUT)
     {
         pickup->SetRegenerationTime(pGame->GetSystemTime() + 20000);
     }
-    if (Type == PICKUP_ONCE_TIMEOUT_SLOW)
+    if (Type == PickupType::PICKUP_ONCE_TIMEOUT_SLOW)
     {
         pickup->SetRegenerationTime(pGame->GetSystemTime() + 120000);
     }
-    if (Type == PICKUP_MONEY)
+    if (Type == PickupType::PICKUP_MONEY)
     {
         pickup->SetRegenerationTime(pGame->GetSystemTime() + 30000);            // Money stays for 30 secs
     }
-    if (Type == PICKUP_MINE_INACTIVE || Type == PICKUP_MINE_ARMED)
+    if (Type == PickupType::PICKUP_MINE_INACTIVE || Type == PickupType::PICKUP_MINE_ARMED)
     {
-        pickup->SetType(PICKUP_MINE_INACTIVE);
+        pickup->SetType(PickupType::PICKUP_MINE_INACTIVE);
         pickup->SetRegenerationTime(pGame->GetSystemTime() + 1500);            // Mines get activated after 2 secs
     }
-    if (Type == PICKUP_NAUTICAL_MINE_INACTIVE || Type == PICKUP_NAUTICAL_MINE_ARMED)
+    if (Type == PickupType::PICKUP_NAUTICAL_MINE_INACTIVE || Type == PickupType::PICKUP_NAUTICAL_MINE_ARMED)
     {
-        pickup->SetType(PICKUP_NAUTICAL_MINE_INACTIVE);
+        pickup->SetType(PickupType::PICKUP_NAUTICAL_MINE_INACTIVE);
         pickup->GetInterface()->RegenerationTime = pGame->GetSystemTime() + 1500;            // Mines get activated after 2 secs
     }
     pickup->SetModel((WORD)ModelIndex);

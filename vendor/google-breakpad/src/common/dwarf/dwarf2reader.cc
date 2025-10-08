@@ -66,6 +66,10 @@ CompilationUnit::CompilationUnit(const string& path,
       have_checked_for_dwp_(false), dwp_path_(),
       dwp_byte_reader_(), dwp_reader_() {}
 
+CompilationUnit::~CompilationUnit() {
+  if (abbrevs_) delete abbrevs_;
+}
+
 // Initialize a compilation unit from a .dwo or .dwp file.
 // In this case, we need the .debug_addr section from the
 // executable file that contains the corresponding skeleton

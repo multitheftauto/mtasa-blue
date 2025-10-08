@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPoolsSA.h
  *  PURPOSE:     Header file for game entity pools class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once

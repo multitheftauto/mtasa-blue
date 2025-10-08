@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CDatabaseManager.cpp
  *  PURPOSE:     Outside world interface for enjoying asynchronous database functionality
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -585,7 +585,7 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
 
     // Determine connection type
     SString* pstrType = MapFind(m_ConnectionTypeMap, hConnection);
-    SString  strType = pstrType ? *pstrType : "";
+    SString  strType = pstrType ? *pstrType : SStringX("");
 
     if (strType == "sqlite")
         return InsertQueryArgumentsSqlite(strQuery, pArgs);
@@ -608,7 +608,7 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
 {
     // Determine connection type
     SString* pstrType = MapFind(m_ConnectionTypeMap, hConnection);
-    SString  strType = pstrType ? *pstrType : "";
+    SString  strType = pstrType ? *pstrType : SStringX("");
 
     if (strType == "sqlite")
         return InsertQueryArgumentsSqlite(szQuery, vl);

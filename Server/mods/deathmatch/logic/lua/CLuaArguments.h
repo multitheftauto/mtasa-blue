@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaArguments.h
  *  PURPOSE:     Lua argument manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -69,6 +69,7 @@ public:
     CLuaArgument* PushNumber(double dNumber);
     CLuaArgument* PushString(const std::string& string);
     CLuaArgument* PushString(const std::string_view& string);
+    CLuaArgument* PushString(const CStringName& string);
     CLuaArgument* PushString(const char* string);
     CLuaArgument* PushElement(CElement* pElement);
     CLuaArgument* PushBan(CBan* pBan);

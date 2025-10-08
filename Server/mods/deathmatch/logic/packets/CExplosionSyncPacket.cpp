@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CExplosionSyncPacket.cpp
  *  PURPOSE:     Explosion synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -37,7 +37,7 @@ bool CExplosionSyncPacket::Read(NetBitStreamInterface& BitStream)
     if (bHasOrigin && !BitStream.Read(m_OriginID))
         return false;
 
-    if (bHasOrigin && BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+    if (bHasOrigin)
     {
         if (!BitStream.ReadBit(m_isVehicleResponsible))
             return false;
@@ -70,7 +70,8 @@ bool CExplosionSyncPacket::Write(NetBitStreamInterface& BitStream) const
         ElementID ID = m_pSourceElement->GetID();
         BitStream.Write(ID);
 
-        unsigned short usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        unsigned int uiLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        auto         usLatency = static_cast<unsigned short>(uiLatency);
         BitStream.WriteCompressed(usLatency);
     }
     else
@@ -83,13 +84,10 @@ bool CExplosionSyncPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.WriteBit(true);
         BitStream.Write(m_OriginID);
 
-        if (BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
-        {
-            BitStream.WriteBit(m_isVehicleResponsible);
+        BitStream.WriteBit(m_isVehicleResponsible);
 
-            if (m_isVehicleResponsible)
-                BitStream.WriteBit(m_blowVehicleWithoutExplosion);
-        }
+        if (m_isVehicleResponsible)
+            BitStream.WriteBit(m_blowVehicleWithoutExplosion);
     }
     else
         BitStream.WriteBit(false);

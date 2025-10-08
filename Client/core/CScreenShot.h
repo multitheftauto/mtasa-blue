@@ -5,7 +5,7 @@
  *  FILE:        core/CScreenShot.h
  *  PURPOSE:     Header file for screen capture handling class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -22,9 +22,9 @@ public:
     static void SetPhotoSavingInsideDocuments(bool bSavePhoto) noexcept;
 
 protected:
-    static void    StartSaveThread();
-    static void    ClearBuffer();
-    static SString GetScreenshotPath();
-    static bool    IsRateLimited(bool bIsCameraShot);
-    static DWORD   ThreadProc(LPVOID lpdwThreadParam);
+    static void         StartSaveThread();
+    static void         ClearBuffer();
+    static SString      GetScreenshotPath();
+    static bool         IsRateLimited(bool bIsCameraShot);
+    static DWORD WINAPI ThreadProc(LPVOID lpdwThreadParam);
 };

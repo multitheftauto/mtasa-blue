@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CFireSyncPacket.cpp
  *  PURPOSE:     Fire synchronization packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -38,7 +38,8 @@ bool CFireSyncPacket::Write(NetBitStreamInterface& BitStream) const
         ElementID ID = m_pSourceElement->GetID();
         BitStream.Write(ID);
 
-        unsigned short usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        unsigned int uiLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        auto         usLatency = static_cast<unsigned short>(uiLatency);
         BitStream.WriteCompressed(usLatency);
     }
     else

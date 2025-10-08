@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CProjectileInfoSA.cpp
  *  PURPOSE:     Projectile type information
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -49,7 +49,7 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
             if (bBlow)
             {
                 DWORD dwFunc = FUNC_RemoveProjectile;
-                _asm
+                __asm
                 {
                     push    projectileInterface
                     push    projectileInfoInterface
@@ -60,7 +60,7 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
             else
             {
                 DWORD dwFunc = FUNC_RemoveIfThisIsAProjectile;
-                _asm
+                __asm
                 {
                     push   projectileInterface
                     call   dwFunc
@@ -111,7 +111,7 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
             targetVC = pTargetEntitySA->GetInterface();
     }
 
-    _asm
+    __asm
     {
         push    eax
 

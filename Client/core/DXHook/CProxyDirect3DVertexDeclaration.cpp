@@ -5,7 +5,7 @@
  *  FILE:
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,7 +24,7 @@ CProxyDirect3DVertexDeclaration::CProxyDirect3DVertexDeclaration(IDirect3DDevice
 {
     m_pOriginal = pOriginal;
 
-    CProxyDirect3DDevice9::SD3DVertexDeclState info;
+    CProxyDirect3DDevice9::SD3DVertexDeclState info{};
 
     // Calc and cache info
     for (uint i = 0; i < MAXD3DDECLLENGTH; i++)
@@ -70,7 +70,15 @@ CProxyDirect3DVertexDeclaration::CProxyDirect3DVertexDeclaration(IDirect3DDevice
     }
 
     // Add to cached info map
-    MapSet(g_pProxyDevice->m_VertexDeclMap, this, info);
+    CScopedActiveProxyDevice proxyDevice;
+    if (proxyDevice)
+    {
+        MapSet(proxyDevice->m_VertexDeclMap, this, info);
+    }
+    else
+    {
+        WriteDebugEvent("Warning: Unable to cache vertex declaration info because proxy device is unavailable");
+    }
 }
 
 /////////////////////////////////////////////////////////////
@@ -83,7 +91,11 @@ CProxyDirect3DVertexDeclaration::CProxyDirect3DVertexDeclaration(IDirect3DDevice
 CProxyDirect3DVertexDeclaration::~CProxyDirect3DVertexDeclaration()
 {
     // Remove from cached info map
-    MapRemove(g_pProxyDevice->m_VertexDeclMap, this);
+    CScopedActiveProxyDevice proxyDevice;
+    if (proxyDevice)
+    {
+        MapRemove(proxyDevice->m_VertexDeclMap, this);
+    }
 }
 
 /////////////////////////////////////////////////////////////
@@ -101,6 +113,7 @@ HRESULT CProxyDirect3DVertexDeclaration::QueryInterface(REFIID riid, void** ppvO
     if (riid == CProxyDirect3DVertexDeclaration_GUID)
     {
         *ppvObj = this;
+        AddRef();
         return S_OK;
     }
 

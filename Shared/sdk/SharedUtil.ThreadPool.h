@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        SharedUtil.ThreadPool.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #pragma once
@@ -14,6 +14,7 @@
 #include <future>
 #include <vector>
 #include <algorithm>
+#include <type_traits>
 #include "SharedUtil.Misc.h"
 
 namespace SharedUtil
@@ -49,7 +50,11 @@ namespace SharedUtil
         template <typename Func, typename... Args>
         auto enqueue(Func&& f, Args&&... args)
         {
+#if __cplusplus < 201703L // C++17
+            using ReturnT = std::result_of_t<Func, Args...>;
+#else
             using ReturnT = std::invoke_result_t<Func, Args...>;
+#endif
             auto  ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
             auto* task = new std::packaged_task<ReturnT()>(ff);
 
@@ -71,26 +76,35 @@ namespace SharedUtil
             return res;
         }
 
-        ~CThreadPool()
+        void shutdown()
         {
+            if (m_exit)
+                return;
+
+            // Ensure every thread receives the exit state, and discard all remaining tasks.
+            {
+                std::unique_lock<std::mutex> lock(m_mutex);
+                m_exit = true;
+
+                while (!m_tasks.empty())
+                {
+                    // Run each task but skip execution of the actual function (-> just delete the task)
+                    auto task = std::move(m_tasks.front());
+                    task(true);
+                }
+            }
+
             // Notify all threads to exit
-            m_exit = true;
             m_cv.notify_all();
+
             // Wait for threads to end
             for (std::thread& worker : m_vecThreads)
-            {
                 worker.join();
-            }
-            // Cleanup
-            do
-            {
-                if (m_tasks.empty())
-                    break;
-                // Run each task but skip execution of the actual
-                // function (-> just delete the task)
-                auto task = std::move(m_tasks.front());
-                task(true);
-            } while (true);
+        }
+
+        ~CThreadPool()
+        {
+            shutdown();
         }
 
         static CThreadPool& getDefaultThreadPool()

@@ -5,7 +5,7 @@
  *  FILE:        core/CNewsBrowser.cpp
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -26,6 +26,7 @@ CNewsBrowser::CNewsBrowser()
     m_pWindow = NULL;
     m_pTabPanel = NULL;
     m_pButtonOK = NULL;
+    m_pButtonNewsLink = NULL;
 }
 
 ////////////////////////////////////////////////////
@@ -199,31 +200,18 @@ void CNewsBrowser::CreateGUI()
 ////////////////////////////////////////////////////
 void CNewsBrowser::DestroyGUI()
 {
-    // Destroy
-    for (uint i = 0; i < m_TabList.size(); i++)
-    {
-        CGUITab* pTab = m_TabList[i];
-        if (pTab)
-            delete pTab;
-    }
-    m_TabList.clear();
-    for (uint i = 0; i < m_TabContentList.size(); i++)
-    {
-        CGUIWindow* pWindow = m_TabContentList[i];
-        if (pWindow)
-        {
-            CGUIElement* m_pScrollPane = pWindow->GetParent();
-            if (m_pScrollPane)
-            {
-                delete m_pScrollPane;
-            }
-            delete pWindow;
-        }
-    }
-    m_TabContentList.clear();
-    SAFE_DELETE(m_pTabPanel);
+    if (!m_pWindow && !m_pTabPanel && !m_pButtonOK && !m_pButtonNewsLink)
+        return;
+
+    // Clean up the main UI elements in reverse order of creation
+    SAFE_DELETE(m_pTabPanel);  // This will destroy all tabs and their children
     SAFE_DELETE(m_pButtonOK);
+    SAFE_DELETE(m_pButtonNewsLink);
     SAFE_DELETE(m_pWindow);
+
+    // Clear the lists after the GUI objects are destroyed
+    m_TabList.clear();
+    m_TabContentList.clear();
 }
 
 ////////////////////////////////////////////////////
@@ -387,7 +375,7 @@ bool CNewsBrowser::OnOKButtonClick(CGUIElement* pElement)
 bool CNewsBrowser::OnNewsLinkButtonClick(CGUIElement* pElement)
 {
     // Visit the website
-    ShellExecuteNonBlocking("open", "https://mtasa.com/news");
+    ShellExecuteNonBlocking("open", "https://multitheftauto.com/news");
 
     // Close the window
     m_pWindow->SetVisible(false);

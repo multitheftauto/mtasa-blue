@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CVehicleSA.h
  *  PURPOSE:     Header file for vehicle base entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,14 +17,17 @@
 #include "CPhysicalSA.h"
 #include "CPoolsSA.h"
 #include "CHandlingManagerSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 #include "CColPointSA.h"
 #include "CAEVehicleAudioEntitySA.h"
 
+#include "enums/VehicleClass.h"
+
 class CFxSystemSAInterface;
 class CTrainSAInterface;
-class CColModelSAInterface;
+struct CColModelSAInterface;
 struct RwTexture;
 
 #define SIZEOF_CHELI                            2584
@@ -35,6 +38,7 @@ struct RwTexture;
 #define FUNC_CVehicle_GetBaseVehicleType        0x411D50
 #define FUNC_CVehicle_IsUpsideDown              0x6D1D90
 #define FUNC_CVehicle_SetEngineOn               0x41BDD0
+#define FUNC_CVehicle_IsPassenger               0x6D1BD0
 #define FUNC_CTrain_FindPositionOnTrackFromCoors           0x6F6CC0
 
 #define FUNC_CVehicle_QueryPickedUpEntityWithWinch              0x6d3cf0
@@ -200,15 +204,15 @@ struct CTransmissionGear
 struct CTransmission
 {
     CTransmissionGear gears[6];
-    byte              driveType;
-    byte              engineType;
-    byte              numOfGears;
-    byte              pad;
+    uint8_t           driveType;
+    uint8_t           engineType;
+    uint8_t           numOfGears;
+    uint8_t           pad;
     DWORD             handlingFlags;
     float             engineAcceleration;
     float             engineInertia;
     float             maxGearVelocity;
-    byte              pad2[4];
+    uint8_t           pad2[4];
     float             minGearVelocity;
     float             curSpeed;
 };
@@ -280,6 +284,10 @@ public:
     void SetComponentVisibility(RwFrame* component, std::uint32_t state)
     {
         ((void(__thiscall*)(CVehicleSAInterface*, RwFrame*, std::uint32_t))0x6D2700)(this, component, state);
+    }
+
+    bool IsPassenger(CPedSAInterface* ped) const {
+        return ((bool(__thiscall*)(CVehicleSAInterface const*, CPedSAInterface*))0x6D1BD0)(this, ped);
     }
 
     CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312
@@ -435,7 +443,7 @@ private:
     bool                             m_doorsUndamageable{false};
     bool                             m_rotorState{true};
 
-    std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
+    std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
 
 public:
     CVehicleSA() = default;
@@ -477,6 +485,7 @@ public:
     void  SetRailTrack(BYTE ucTrackID);
     float GetTrainPosition();
     void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true);
+    bool  IsPassenger(CPed* pPed) { return GetVehicleInterface()->IsPassenger(pPed->GetPedInterface()); };
 
     void AddVehicleUpgrade(DWORD dwModelID);
     void RemoveVehicleUpgrade(DWORD dwModelID);
@@ -691,13 +700,14 @@ public:
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
+    void                              ReinitAudio();
 
     void UpdateLandingGearPosition();
 
     CAEVehicleAudioEntitySA* GetVehicleAudioEntity() { return m_pVehicleAudioEntity; };
 
-    bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const override;
-    bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) override;
+    bool GetDummyPosition(VehicleDummies dummy, CVector& position) const override;
+    bool SetDummyPosition(VehicleDummies dummy, const CVector& position) override;
 
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
@@ -710,7 +720,7 @@ public:
     static bool GetVehiclesSunGlareEnabled();
 
 private:
-    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
+    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position);
 
     void           RecalculateSuspensionLines();
     void           CopyGlobalSuspensionLinesToPrivate();

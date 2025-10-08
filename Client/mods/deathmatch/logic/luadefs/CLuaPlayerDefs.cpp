@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaPlayerDefs.cpp
  *  PURPOSE:     Lua player definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -492,7 +492,8 @@ int CLuaPlayerDefs::SetPlayerNametagColor(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::SetPlayerNametagColor(*pPlayer, false, iR, iG, iB))
+            if (CStaticFunctionDefinitions::SetPlayerNametagColor(*pPlayer, false, static_cast<unsigned char>(iR),
+                                                                  static_cast<unsigned char>(iG), static_cast<unsigned char>(iB)))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -653,7 +654,8 @@ bool CLuaPlayerDefs::IsPlayerCrosshairVisible()
 
 bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property, std::variant<CVector2D, float, bool, std::string> value)
 {
-    if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
+    if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR
+        || component == HUD_RADAR_MAP || component == HUD_RADAR_BLIPS || component == HUD_RADAR_ALTIMETER)
         return false;
 
     CHud* hud = g_pGame->GetHud();
@@ -885,7 +887,7 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
         }
         case eHudComponentProperty::BLINKING_HP_VALUE:
         {
-            if (!component != HUD_HEALTH)
+            if (component != HUD_HEALTH)
                 return false;
 
             hud->SetHealthBarBlinkingValue(10.0f);
@@ -950,12 +952,12 @@ std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiR
     {
         case eHudComponentProperty::POSITION:
         {
-            CVector2D& pos = hud->GetComponentPosition(component);
+            CVector2D pos = hud->GetComponentPosition(component);
             return CLuaMultiReturn<float, float>{pos.fX, pos.fY};
         }
         case eHudComponentProperty::SIZE:
         {
-            CVector2D& size = hud->GetComponentSize(component);
+            CVector2D size = hud->GetComponentSize(component);
             return CLuaMultiReturn<float, float>{size.fX, size.fY};
         }
         case eHudComponentProperty::FILL_COLOR:
@@ -963,7 +965,7 @@ std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiR
             if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
                 return false;
 
-            SColor& color = hud->GetComponentColor(component);
+            SColor color = hud->GetComponentColor(component);
             return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
         }
         case eHudComponentProperty::FILL_COLOR_SECONDARY:
@@ -971,7 +973,7 @@ std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiR
             if (component != HUD_RADIO && component != HUD_MONEY && component != HUD_WANTED && component != HUD_WEAPON)
                 return false;
 
-            SColor& color = hud->GetComponentSecondaryColor(component);
+            SColor color = hud->GetComponentSecondaryColor(component);
             return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
         }
         case eHudComponentProperty::DROP_COLOR:
@@ -979,7 +981,7 @@ std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiR
             if (!hud->IsComponentText(component))
                 return false;
 
-            SColor& color = hud->GetComponentFontDropColor(component);
+            SColor color = hud->GetComponentFontDropColor(component);
             return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
         }
         case eHudComponentProperty::DRAW_BLACK_BORDER:
@@ -1039,10 +1041,12 @@ std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiR
             return hud->GetComponentFontProportional(component);
         }
         case eHudComponentProperty::CUSTOM_ALPHA:
+        {
             return hud->GetComponentUseCustomAlpha(component);
+        }
         case eHudComponentProperty::TEXT_SIZE:
         {
-            CVector2D& size = hud->GetComponentTextSize(component);
+            CVector2D size = hud->GetComponentTextSize(component);
             return CLuaMultiReturn<float, float>{size.fX, size.fY};
         }
     }

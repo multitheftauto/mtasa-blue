@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaACLDefs.cpp
  *  PURPOSE:     Lua ACL function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -888,7 +888,7 @@ int CLuaACLDefs::aclGroupRemoveObject(lua_State* luaVM)
 
 int CLuaACLDefs::hasObjectPermissionTo(lua_State* luaVM)
 {
-    //  bool hasObjectPermissionTo ( string / element theObject, string theAction [, bool defaultPermission = true ] )
+    //  bool hasObjectPermissionTo ( string / element theObject, string theAction [, bool defaultPermission = false ] )
     CResource*                                 pResource = NULL;
     CElement*                                  pElement = NULL;
     SString                                    strObject;
@@ -905,7 +905,7 @@ int CLuaACLDefs::hasObjectPermissionTo(lua_State* luaVM)
         argStream.ReadString(strObject);
 
     argStream.ReadString(strRightName);
-    argStream.ReadBool(bDefault, true);
+    argStream.ReadBool(bDefault, false);
 
     if (!argStream.HasErrors())
     {

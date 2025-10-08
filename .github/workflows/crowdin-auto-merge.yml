@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          token: ${{ secrets.POT_CI_PAT }}
 
       - name: Setup Git
         run: |
@@ -28,4 +28,4 @@ jobs:
             git push origin --delete l10n/master
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.POT_CI_PAT }}

@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIFont_Impl.cpp
  *  PURPOSE:     Font type class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -88,7 +88,7 @@ void CGUIFont_Impl::SetNativeResolution(int iX, int iY)
 float CGUIFont_Impl::GetCharacterWidth(int iChar, float fScale)
 {
     char szBuf[2];
-    szBuf[0] = iChar;
+    szBuf[0] = static_cast<char>(iChar);
     szBuf[1] = 0;
 
     return m_pFont->getTextExtent(szBuf, fScale);

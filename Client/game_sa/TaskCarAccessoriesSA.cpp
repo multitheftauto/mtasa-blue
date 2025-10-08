@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskCarAccessoriesSA.cpp
  *  PURPOSE:     Car accessories game tasks
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,7 +30,7 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
-        _asm
+        __asm
         {
             mov     ecx, dwThisInterface
             push    pUtility
@@ -72,7 +72,7 @@ CTaskSimpleCarSetPedInAsPassengerSA::CTaskSimpleCarSetPedInAsPassengerSA(CVehicl
         DWORD dwFunc = FUNC_CTaskSimpleCarSetPedInAsPassenger__Constructor;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
-        _asm
+        __asm
         {
             mov     ecx, dwThisInterface
             push    pUtility
@@ -115,7 +115,7 @@ CTaskSimpleCarSetPedOutSA::CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, i
         DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__Constructor;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
-        _asm
+        __asm
         {
             mov     ecx, dwThisInterface
             xor     eax, eax
@@ -154,7 +154,7 @@ void CTaskSimpleCarSetPedOutSA::PositionPedOutOfCollision(CPed* ped, CVehicle* v
     DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision;
     DWORD dwVehiclePtr = (DWORD)((CEntitySA*)vehicle)->GetInterface();
     DWORD dwPedPtr = (DWORD)((CEntitySA*)ped)->GetInterface();
-    _asm
+    __asm
     {
         push    nDoor
         push    dwVehiclePtr

@@ -5,7 +5,7 @@
  *  FILE:
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -65,6 +65,7 @@ HRESULT CProxyDirect3DIndexBuffer::QueryInterface(REFIID riid, void** ppvObj)
     if (riid == CProxyDirect3DIndexBuffer_GUID)
     {
         *ppvObj = this;
+        AddRef();
         return S_OK;
     }
 

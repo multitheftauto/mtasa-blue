@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/TaskBasic.h
  *  PURPOSE:     Basic task interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -94,4 +94,10 @@ class CTaskComplexFacial : public virtual CTaskComplex
 {
 public:
     virtual ~CTaskComplexFacial(){};
+};
+
+class CTaskComplexInWater : public virtual CTaskComplex
+{
+public:
+    virtual ~CTaskComplexInWater(){};
 };

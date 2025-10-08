@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CColPolygon.cpp
  *  PURPOSE:     Polygon-shaped collision entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -160,8 +160,9 @@ void CColPolygon::CalculateRadius(const CVector2D& vecPoint)
 
 bool CColPolygon::IsInBounds(CVector vecPoint)
 {
-    float fDistanceX = vecPoint.fX - m_vecPosition.fX;
-    float fDistanceY = vecPoint.fY - m_vecPosition.fY;
+    const CVector& vecPosition = GetPosition();
+    float fDistanceX = vecPoint.fX - vecPosition.fX;
+    float fDistanceY = vecPoint.fY - vecPosition.fY;
 
     float fDist = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
 

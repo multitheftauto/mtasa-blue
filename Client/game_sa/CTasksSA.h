@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CTasksSA.h
  *  PURPOSE:     Header file for task creation class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -42,6 +42,7 @@ class CTaskSimpleRunNamedAnim;
 class CTaskSimpleStealthKill;
 class CTaskSimpleTriggerLookAt;
 class CTaskSimpleUseGun;
+class CTaskComplexInWater;
 
 class CTasksSA : public CTasks
 {
@@ -70,7 +71,7 @@ public:
     CTaskSimpleDuck*      CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck = 0, unsigned short nUseShotsWhizzingEvents = -1);
     CTaskSimpleChoking*   CreateTaskSimpleChoking(CPed* pAttacker, bool bIsTearGas);
 
-    CTaskSimpleClimb* CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight = CLIMB_GRAB,
+    CTaskSimpleClimb* CreateTaskSimpleClimb(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight = CLIMB_GRAB,
                                             const bool bForceClimb = false);
     CTaskSimpleJetPack* CreateTaskSimpleJetpack(const CVector* pVecTargetPos = NULL, float fCruiseHeight = 10.0f, int nHoverTime = 0);
 
@@ -79,6 +80,8 @@ public:
     CTaskSimpleRunNamedAnim* CreateTaskSimpleRunNamedAnim(const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta,
                                                           const int iTime = -1, const bool bDontInterrupt = false, const bool bRunInSequence = false,
                                                           const bool bOffsetPed = false, const bool bHoldLastFrame = false);
+
+    CTaskComplexInWater* CreateTaskComplexInWater();
 
     CTaskComplexDie*        CreateTaskComplexDie(const eWeaponType eMeansOfDeath = WEAPONTYPE_UNARMED, const AssocGroupId animGroup = 0 /*ANIM_STD_PED*/,
                                                  const AnimationId anim = 0 /*ANIM_STD_KO_FRONT*/, const float fBlendDelta = 4.0f, const float fAnimSpeed = 0.0f,

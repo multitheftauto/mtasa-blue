@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CDoorSA.h
  *  PURPOSE:     Header file for vehicle door entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -49,5 +49,5 @@ public:
     bool       IsClosed();
     bool       IsFullyOpen();
     void       Open(float fOpenRatio);
-    eDoorState GetDoorState() { return (eDoorState)GetInterface()->m_nDoorState; };
+    DoorState GetDoorState() { return (DoorState)GetInterface()->m_nDoorState; };
 };

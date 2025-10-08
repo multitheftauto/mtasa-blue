@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIScrollPane_Impl.cpp
  *  PURPOSE:     Scroll pane widget class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,7 +15,7 @@
 
 CGUIScrollPane_Impl::CGUIScrollPane_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Initialize
     m_pGUI = pGUI;

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayerManager.h
  *  PURPOSE:     Player ped entity manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -56,7 +56,7 @@ public:
 
     static bool IsValidPlayerModel(unsigned short model);
 
-    void ClearElementData(CElement* pElement, const std::string& name);
+    void ClearElementData(CElement* pElement, CStringName name);
     void ClearElementData(CElement* pElement);
 
     void               ResetAll();

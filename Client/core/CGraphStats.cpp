@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CGraphStats.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -137,7 +137,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
                 for (int i = 0; i < Dups; i++)
                 {
                     pLine->iDataPos++;
-                    if (pLine->iDataPos > sizeX - 1)
+                    if (pLine->iDataPos > static_cast<int>(sizeX - 1))
                         pLine->iDataPos = 0;
                     pLine->dataHistory[pLine->iDataPos] = Data;
                 }
@@ -171,7 +171,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
         {
             int f = rand() % NUMELMS(md5.data);
             int t = rand() % 3;
-            p[t] = std::min(255, p[t] + p[f] + 1);
+            p[t] = std::min<unsigned char>(255, p[t] + p[f] + 1);
         }
         pLine->color = SColorRGBA(p[0], p[1], p[2], 255);
     }
@@ -183,7 +183,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
 
     // Inc position
     pLine->iDataPos++;
-    if (pLine->iDataPos > sizeX - 1)
+    if (pLine->iDataPos > static_cast<int>(sizeX - 1))
         pLine->iDataPos = 0;
 
     // Insert data point

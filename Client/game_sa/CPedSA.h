@@ -261,7 +261,7 @@ public:
     int                              unk_52C;
 
     int                              pedState;
-    int                              moveState;
+    PedMoveState::Enum               moveState;
     int                              swimmingMoveState;
 
     int                              unk_53C;
@@ -276,10 +276,10 @@ public:
     float                            fRotationSpeed;
     float                            fMoveAnim;
 
-    CEntitySAInterface*              pContactEntity;
+    CEntitySAInterface*              pContactEntity; // m_standingOnEntity
     CVector                          unk_56C;
     CVector                          unk_578;
-    CEntitySAInterface*              pLastContactEntity;
+    CEntitySAInterface*              pLastContactEntity; // m_contactEntity
 
     CVehicleSAInterface*             pLastVehicle;
     CVehicleSAInterface*             pVehicle;
@@ -421,8 +421,9 @@ public:
     void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra = 6) override;
 
     CEntity* GetContactEntity() const override;
+    bool     IsStandingOnEntity() const override { return GetPedInterface()->pContactEntity != nullptr; };
 
-    int GetRunState() const override { return GetPedInterface()->moveState; }
+    PedMoveState::Enum GetMoveState() const override { return GetPedInterface()->moveState; }
 
     bool GetCanBeShotInVehicle() const override{ return GetPedInterface()->pedFlags.bCanBeShotInVehicle; }
     bool GetTestForShotInVehicle() const override { return GetPedInterface()->pedFlags.bTestForShotInVehicle; }
@@ -470,9 +471,11 @@ public:
     std::unique_ptr<CPedIK> GetPedIK() override { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
 
     CEntitySAInterface* GetTargetedObject() const override { return GetPedInterface()->pTargetedObject; }
-    ePedState           GetPedState() const override { return static_cast<ePedState>(GetPedInterface()->pedState); }
+    PedState           GetPedState() const override { return static_cast<PedState>(GetPedInterface()->pedState); }
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
+
+    void SetInWaterFlags(bool inWater) override;
 
     static void StaticSetHooks();
 

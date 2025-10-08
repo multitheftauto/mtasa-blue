@@ -5,7 +5,7 @@
  *  FILE:        game_sa/TaskPhysicalResponseSA.cpp
  *  PURPOSE:     Physical response game tasks
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -37,7 +37,7 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
     if (!IsValid())
         return;
     DWORD dwThisInterface = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThisInterface
         push    ebx
@@ -99,7 +99,7 @@ void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTear
     // Call the func
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CTaskSimpleChoking__UpdateChoke;
-    _asm
+    __asm
     {
         mov         ecx, dwThisInterface
         push        bIsTearGas

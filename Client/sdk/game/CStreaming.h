@@ -5,7 +5,7 @@
  *  FILE:        sdk/game/CStreaming.h
  *  PURPOSE:     Game streaming interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -42,6 +42,14 @@ enum class PreloadAreaOption
     MODELS = 0,
     COLLISIONS,
     ALL
+};
+
+enum class RestreamOption
+{
+    ALL = 0,
+    VEHICLES,
+    PEDS,
+    OBJECTS
 };
 
 struct CStreamingInfo

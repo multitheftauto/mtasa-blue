@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CPlayerManager.cpp
  *  PURPOSE:     Player ped entity manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -300,8 +300,12 @@ static void DoBroadcast(const CPacket& Packet, const T& sendList)
     std::multimap<ushort, CPlayer*> groupMap;
     for (typename T::const_iterator iter = sendList.begin(); iter != sendList.end(); ++iter)
     {
-        CPlayer* pPlayer = *iter;
-        MapInsert(groupMap, pPlayer->GetBitStreamVersion(), pPlayer);
+        CPlayer* player = *iter;
+
+        if (!player->IsLeavingServer())
+        {
+            MapInsert(groupMap, player->GetBitStreamVersion(), player);
+        }
     }
 
     DoBroadcast(Packet, groupMap);
@@ -347,7 +351,7 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short model)
     }
 }
 
-void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
+void CPlayerManager::ClearElementData(CElement* pElement, CStringName name)
 {
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)

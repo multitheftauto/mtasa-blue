@@ -5,7 +5,7 @@
  *  FILE:        mods/shared_logic/luadefs/CLuaEffectDefs.cpp
  *  PURPOSE:     Lua definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -38,5 +38,5 @@ public:
     LUA_DECLARE(SetEffectDensity);
     LUA_DECLARE(GetEffectDensity);
 
-    static bool FxCreateParticle(eFxParticleSystems eParticleSystem, CVector vecPosition, CVector vecDirection, float fR, float fG, float fB, float fA, std::optional<bool> bRandomizeColors, std::optional<std::uint32_t> iCount, std::optional<float> fBrightness, std::optional<float> fSize, std::optional<bool> bRandomizeSizes, std::optional<float> fLife);
+    static bool FxCreateParticle(FxParticleSystems eParticleSystem, CVector vecPosition, CVector vecDirection, float fR, float fG, float fB, float fA, std::optional<bool> bRandomizeColors, std::optional<std::uint32_t> iCount, std::optional<float> fBrightness, std::optional<float> fSize, std::optional<bool> bRandomizeSizes, std::optional<float> fLife);
 };

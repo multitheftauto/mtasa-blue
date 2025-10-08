@@ -5,26 +5,56 @@
  *  FILE:
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "CAdditionalVertexStreamManager.h"
+#include <limits>
+#include <mutex>
 
-CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::ms_Singleton = NULL;
+CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::ms_Singleton = nullptr;
 
 namespace
 {
     // Helper functions for this file only
 
-    // Convert size of PT stream to sizeof of N stream
-    uint ConvertPTSize(uint SizePT) { return SizePT * 12 / 20; }
-
-    // Get 64 bit key for a triangle by using the ordered vertex indices
-    long long getTriKey(WORD a, WORD b, WORD c)
+    uint ConvertPTOffset(uint OffsetPT)
     {
-        WORD tmp;
+        return (OffsetPT / 20) * 12;
+    }
+
+    // Convert size of PT stream to sizeof of N stream (rounded up to the next vertex)
+    uint ConvertPTSize(uint SizePT)
+    {
+        uint64_t padded = static_cast<uint64_t>(SizePT) + 19ull;
+        uint64_t result = (padded / 20ull) * 12ull;
+        if (result > std::numeric_limits<uint>::max())
+            return std::numeric_limits<uint>::max();
+        return static_cast<uint>(result);
+    }
+
+    struct STriKey
+    {
+        uint32_t v0;
+        uint32_t v1;
+        uint32_t v2;
+
+        bool operator<(const STriKey& rhs) const
+        {
+            if (v0 != rhs.v0)
+                return v0 < rhs.v0;
+            if (v1 != rhs.v1)
+                return v1 < rhs.v1;
+            return v2 < rhs.v2;
+        }
+    };
+
+    // Get ordered key for a triangle by using the sorted vertex indices
+    STriKey GetTriKey(uint32_t a, uint32_t b, uint32_t c)
+    {
+        uint32_t tmp;
         if (b < a)
         {
             tmp = b;
@@ -43,8 +73,11 @@ namespace
             b = a;
             a = tmp;
         }
-        return (((long long)a) << 32) | (((long long)b) << 16) | ((long long)c);
+        STriKey key = {a, b, c};
+        return key;
     }
+
+    std::mutex g_singletonMutex;
 }            // namespace
 
 ///////////////////////////////////////////////////////////////
@@ -67,6 +100,17 @@ CAdditionalVertexStreamManager::CAdditionalVertexStreamManager()
 ///////////////////////////////////////////////////////////////
 CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager()
 {
+    SAFE_RELEASE(m_pOldVertexDeclaration);
+
+    for (auto iter = m_AdditionalStreamInfoMap.begin(); iter != m_AdditionalStreamInfoMap.end(); ++iter)
+    {
+        SAdditionalStreamInfo& info = iter->second;
+        SAFE_RELEASE(info.pStreamData);
+        SAFE_RELEASE(info.pVertexDeclaration);
+    }
+
+    m_AdditionalStreamInfoMap.clear();
+    m_pDevice = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -78,9 +122,26 @@ CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager()
 ///////////////////////////////////////////////////////////////
 CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton()
 {
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
     if (!ms_Singleton)
         ms_Singleton = new CAdditionalVertexStreamManager();
     return ms_Singleton;
+}
+
+CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetExistingSingleton()
+{
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
+    return ms_Singleton;
+}
+
+void CAdditionalVertexStreamManager::DestroySingleton()
+{
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
+    if (!ms_Singleton)
+        return;
+
+    delete ms_Singleton;
+    ms_Singleton = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -105,6 +166,9 @@ void CAdditionalVertexStreamManager::OnDeviceCreate(IDirect3DDevice9* pDevice)
 bool CAdditionalVertexStreamManager::MaybeSetAdditionalVertexStream(D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices,
                                                                     UINT startIndex, UINT primCount)
 {
+    if (!m_pDevice)
+        return false;
+
     // Cache info
     SCurrentStateInfo state;
 
@@ -117,14 +181,14 @@ bool CAdditionalVertexStreamManager::MaybeSetAdditionalVertexStream(D3DPRIMITIVE
     state.args.primCount = primCount;
 
     // Cache info about state streams etc
-    UpdateCurrentStateInfo(state);
+    if (!UpdateCurrentStateInfo(state))
+        return false;
 
     // For now, this only works if the original has 3 decl elements (0:D, 1:P, 1:T) and stream 1 has a stride of 20
     if (!CheckCanDoThis(state))
         return false;
 
-    SetAdditionalVertexStream(state);
-    return true;
+    return SetAdditionalVertexStream(state);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -134,7 +198,7 @@ bool CAdditionalVertexStreamManager::MaybeSetAdditionalVertexStream(D3DPRIMITIVE
 //
 //
 ///////////////////////////////////////////////////////////////
-void CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo& state)
+bool CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo& state)
 {
     HRESULT hr;
 
@@ -143,40 +207,88 @@ void CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo
     if (!pAdditionalInfo)
         pAdditionalInfo = CreateAdditionalStreamInfo(state);
 
+    if (!pAdditionalInfo)
+        return false;
+
     uint StridePT = 20;
     uint StrideN = 12;
 
-    // Calc area we are going to use
-    uint viMinBased = state.args.MinVertexIndex + state.args.BaseVertexIndex;
-    uint viMaxBased = state.args.MinVertexIndex + state.args.NumVertices + state.args.BaseVertexIndex;
+    const INT baseVertexIndex = state.args.BaseVertexIndex;
 
-    uint ReadOffsetStart = viMinBased * StridePT + state.stream1.OffsetInBytes;
-    uint ReadOffsetSize = (viMaxBased - viMinBased) * StridePT;
+    const int64_t maxUint = static_cast<int64_t>(std::numeric_limits<uint>::max());
+    const int64_t viMinBasedSigned = static_cast<int64_t>(state.args.MinVertexIndex) + static_cast<int64_t>(baseVertexIndex);
+    if (viMinBasedSigned < 0 || viMinBasedSigned > maxUint)
+        return false;
 
-    uint OffsetInBytesN = ConvertPTSize(state.stream1.OffsetInBytes);
-    uint WriteOffsetStart = viMinBased * StrideN + OffsetInBytesN;
-    uint WriteOffsetSize = (viMaxBased - viMinBased) * StrideN;
+    const int64_t viMaxBasedSigned = viMinBasedSigned + static_cast<int64_t>(state.args.NumVertices);
+    if (viMaxBasedSigned < viMinBasedSigned || viMaxBasedSigned > maxUint)
+        return false;
 
-    assert(WriteOffsetStart == ConvertPTSize(ReadOffsetStart));
+    uint viMinBased = static_cast<uint>(viMinBasedSigned);
+    uint viMaxBased = static_cast<uint>(viMaxBasedSigned);
+    uint vertexSpan = viMaxBased - viMinBased;
+
+    uint64_t readOffsetStart64 = static_cast<uint64_t>(viMinBased) * StridePT + state.stream1.OffsetInBytes;
+    if (readOffsetStart64 > std::numeric_limits<uint>::max())
+        return false;
+    uint ReadOffsetStart = static_cast<uint>(readOffsetStart64);
+
+    uint64_t readOffsetSize64 = static_cast<uint64_t>(vertexSpan) * StridePT;
+    if (readOffsetSize64 > std::numeric_limits<uint>::max())
+        return false;
+    uint ReadOffsetSize = static_cast<uint>(readOffsetSize64);
+
+    uint OffsetInBytesN = ConvertPTOffset(state.stream1.OffsetInBytes);
+    uint64_t writeOffsetStart64 = static_cast<uint64_t>(viMinBased) * StrideN + OffsetInBytesN;
+    if (writeOffsetStart64 > std::numeric_limits<uint>::max())
+        return false;
+    uint WriteOffsetStart = static_cast<uint>(writeOffsetStart64);
+
+    uint64_t writeOffsetSize64 = static_cast<uint64_t>(vertexSpan) * StrideN;
+    if (writeOffsetSize64 > std::numeric_limits<uint>::max())
+        return false;
+    uint WriteOffsetSize = static_cast<uint>(writeOffsetSize64);
+
+    assert(WriteOffsetStart == ConvertPTOffset(ReadOffsetStart));
     assert(WriteOffsetSize == ConvertPTSize(ReadOffsetSize));
 
     // See if area VB area needs updating
     if (!pAdditionalInfo->ConvertedRanges.IsRangeSet(WriteOffsetStart, WriteOffsetSize))
     {
-        // Update VB area
-        UpdateAdditionalStreamContent(state, pAdditionalInfo, ReadOffsetStart, ReadOffsetSize, WriteOffsetStart, WriteOffsetSize);
+        if (!UpdateAdditionalStreamContent(state, pAdditionalInfo, ReadOffsetStart, ReadOffsetSize, WriteOffsetStart, WriteOffsetSize))
+            return false;
+
         pAdditionalInfo->ConvertedRanges.SetRange(WriteOffsetStart, WriteOffsetSize);
     }
 
-    // Save old declaration
-    hr = m_pDevice->GetVertexDeclaration(&m_pOldVertexDeclaration);
+    IDirect3DVertexDeclaration9* pPreviousDecl = nullptr;
+    if (FAILED(m_pDevice->GetVertexDeclaration(&pPreviousDecl)))
+        return false;
 
-    // Set declaration
-    hr = g_pProxyDevice->SetVertexDeclaration(pAdditionalInfo->pVertexDeclaration);
+    CScopedActiveProxyDevice proxyDevice;
+    if (!proxyDevice)
+    {
+        SAFE_RELEASE(pPreviousDecl);
+        return false;
+    }
 
-    // Set additional stream
-    uint OffsetInBytes = ConvertPTSize(state.stream1.OffsetInBytes);
-    hr = m_pDevice->SetStreamSource(2, pAdditionalInfo->pStreamData, OffsetInBytes, pAdditionalInfo->Stride);
+    if (FAILED(proxyDevice->SetVertexDeclaration(pAdditionalInfo->pVertexDeclaration)))
+    {
+        SAFE_RELEASE(pPreviousDecl);
+        return false;
+    }
+
+    uint OffsetInBytes = ConvertPTOffset(state.stream1.OffsetInBytes);
+    if (FAILED(m_pDevice->SetStreamSource(2, pAdditionalInfo->pStreamData, OffsetInBytes, pAdditionalInfo->Stride)))
+    {
+        proxyDevice->SetVertexDeclaration(pPreviousDecl);
+        SAFE_RELEASE(pPreviousDecl);
+        return false;
+    }
+
+    SAFE_RELEASE(m_pOldVertexDeclaration);
+    m_pOldVertexDeclaration = pPreviousDecl;
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -188,15 +300,26 @@ void CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo
 ///////////////////////////////////////////////////////////////
 void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream()
 {
-    HRESULT hr;
+    if (!m_pDevice)
+        return;
+
     if (m_pOldVertexDeclaration)
     {
-        // Set prev declaration
-        hr = g_pProxyDevice->SetVertexDeclaration(m_pOldVertexDeclaration);
-        SAFE_RELEASE(m_pOldVertexDeclaration);
+        HRESULT hr = m_pDevice->TestCooperativeLevel();
+        const bool bDeviceOperational = (hr == D3D_OK);
 
-        // Unset additional stream
-        hr = m_pDevice->SetStreamSource(2, NULL, 0, 0);
+        if (bDeviceOperational)
+        {
+            // Set prev declaration
+            CScopedActiveProxyDevice proxyDevice;
+            if (proxyDevice)
+                proxyDevice->SetVertexDeclaration(m_pOldVertexDeclaration);
+
+            // Unset additional stream
+            m_pDevice->SetStreamSource(2, nullptr, 0, 0);
+        }
+
+        SAFE_RELEASE(m_pOldVertexDeclaration);
     }
 }
 
@@ -218,12 +341,44 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
     uint                    NumVerts = ReadSize / StridePT;
     assert(NumVerts == WriteSize / StrideN);
 
+    if (ReadSize == 0 || WriteSize == 0)
+        return false;
+
+    if ((ReadSize % StridePT) != 0)
+        return false;
+
+    if ((WriteSize % StrideN) != 0)
+        return false;
+
+    if (WriteSize != NumVerts * StrideN)
+        return false;
+
+    if (NumVerts == 0)
+        return false;
+
+    const UINT bufferSizePT = state.decl.VertexBufferDesc1.Size;
+    if (ReadOffsetStart > bufferSizePT)
+        return false;
+
+    if (ReadSize > bufferSizePT - ReadOffsetStart)
+        return false;
+
+    D3DVERTEXBUFFER_DESC destDesc;
+    if (FAILED(pStreamDataN->GetDesc(&destDesc)))
+        return false;
+
+    if (WriteOffsetStart > destDesc.Size)
+        return false;
+
+    if (WriteSize > destDesc.Size - WriteOffsetStart)
+        return false;
+
     // Get the source vertex bytes
     std::vector<uchar> sourceArray;
     sourceArray.resize(ReadSize);
     uchar* pSourceArrayBytes = &sourceArray[0];
     {
-        void* pVertexBytesPT = NULL;
+        void* pVertexBytesPT = nullptr;
         if (FAILED(pStreamDataPT->Lock(ReadOffsetStart, ReadSize, &pVertexBytesPT, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
             return false;
         memcpy(pSourceArrayBytes, pVertexBytesPT, ReadSize);
@@ -238,12 +393,20 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
     // Compute dest bytes
     {
         // Get index buffer
-        if (FAILED(m_pDevice->GetIndices(&state.pIndexData)))
+        if (FAILED(m_pDevice->GetIndices(&state.pIndexData)) || !state.pIndexData)
             return false;
 
         // Get index buffer desc
         D3DINDEXBUFFER_DESC IndexBufferDesc;
         state.pIndexData->GetDesc(&IndexBufferDesc);
+
+        uint indexStride = 0;
+        if (IndexBufferDesc.Format == D3DFMT_INDEX16)
+            indexStride = sizeof(WORD);
+        else if (IndexBufferDesc.Format == D3DFMT_INDEX32)
+            indexStride = sizeof(DWORD);
+        else
+            return false;
 
         uint numIndices = state.args.primCount + 2;
         uint step = 1;
@@ -252,17 +415,35 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
             numIndices = state.args.primCount * 3;
             step = 3;
         }
-        assert(IndexBufferDesc.Size >= (numIndices + state.args.startIndex) * 2);
 
-        // Get index buffer data
-        std::vector<uchar> indexArray;
-        indexArray.resize(ReadSize);
-        uchar* pIndexArrayBytes = &indexArray[0];
+        size_t startByte = static_cast<size_t>(state.args.startIndex) * indexStride;
+        size_t requiredBytes = static_cast<size_t>(numIndices) * indexStride;
+        if (startByte > IndexBufferDesc.Size)
+            return false;
+
+        if (requiredBytes > IndexBufferDesc.Size - startByte)
+            return false;
+
+        std::vector<uint32_t> indices(numIndices);
         {
-            void* pIndexBytes = NULL;
-            if (FAILED(state.pIndexData->Lock(state.args.startIndex * 2, numIndices * 2, &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
+            void* pIndexBytes = nullptr;
+            if (FAILED(state.pIndexData->Lock(static_cast<UINT>(startByte), static_cast<UINT>(requiredBytes), &pIndexBytes,
+                                              D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
                 return false;
-            memcpy(pIndexArrayBytes, pIndexBytes, numIndices * 2);
+
+            if (indexStride == sizeof(WORD))
+            {
+                const WORD* pSrc = static_cast<const WORD*>(pIndexBytes);
+                for (uint i = 0; i < numIndices; ++i)
+                    indices[i] = pSrc[i];
+            }
+            else
+            {
+                const DWORD* pSrc = static_cast<const DWORD*>(pIndexBytes);
+                for (uint i = 0; i < numIndices; ++i)
+                    indices[i] = pSrc[i];
+            }
+
             state.pIndexData->Unlock();
         }
 
@@ -270,15 +451,15 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
         std::vector<CVector> NormalList;
         NormalList.insert(NormalList.end(), NumVerts, CVector());
 
-        std::map<long long, CVector> doneTrisMap;
+        std::map<STriKey, CVector> doneTrisMap;
 
         // For each triangle
         for (uint i = 0; i < numIndices - 2; i += step)
         {
             // Get triangle vertex indici
-            WORD v0 = ((WORD*)pIndexArrayBytes)[i];
-            WORD v1 = ((WORD*)pIndexArrayBytes)[i + 1];
-            WORD v2 = ((WORD*)pIndexArrayBytes)[i + 2];
+            uint32_t v0 = indices[i];
+            uint32_t v1 = indices[i + 1];
+            uint32_t v2 = indices[i + 2];
 
             if (v0 >= NumVerts || v1 >= NumVerts || v2 >= NumVerts)
                 continue;            // vert index out of range
@@ -287,9 +468,9 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
                 continue;            // degenerate tri
 
             // Get vertex positions from original stream
-            CVector* pPos0 = (CVector*)(pSourceArrayBytes + v0 * 20);
-            CVector* pPos1 = (CVector*)(pSourceArrayBytes + v1 * 20);
-            CVector* pPos2 = (CVector*)(pSourceArrayBytes + v2 * 20);
+            CVector* pPos0 = reinterpret_cast<CVector*>(pSourceArrayBytes + v0 * StridePT);
+            CVector* pPos1 = reinterpret_cast<CVector*>(pSourceArrayBytes + v1 * StridePT);
+            CVector* pPos2 = reinterpret_cast<CVector*>(pSourceArrayBytes + v2 * StridePT);
 
             // Calculate the normal
             CVector Dir1 = *pPos2 - *pPos1;
@@ -304,7 +485,7 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
                 Normal = -Normal;
 
             // Try to improve results by ignoring duplicated triangles
-            long long key = getTriKey(v0, v1, v2);
+            STriKey key = GetTriKey(v0, v1, v2);
             if (CVector* pDoneTriPrevNormal = MapFind(doneTrisMap, key))
             {
                 // Already done this tri - Keep prev tri if it has a better 'up' rating
@@ -334,14 +515,14 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
                 Normal = CVector(0, 0, 1);
 
             // Set
-            CVector* pNormal = (CVector*)(pDestArrayBytes + i * 12);
+            CVector* pNormal = reinterpret_cast<CVector*>(pDestArrayBytes + i * StrideN);
             *pNormal = Normal;
         }
     }
 
     // Set the dest bytes
     {
-        void* pVertexBytesN = NULL;
+        void* pVertexBytesN = nullptr;
         if (FAILED(pStreamDataN->Lock(WriteOffsetStart, WriteSize, &pVertexBytesN, D3DLOCK_NOSYSLOCK)))
             return false;
         memcpy(pVertexBytesN, pDestArrayBytes, WriteSize);
@@ -360,6 +541,9 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
 /////////////////////////////////////////////////////////////
 bool CAdditionalVertexStreamManager::UpdateCurrentStateInfo(SCurrentStateInfo& state)
 {
+    if (!m_pDevice)
+        return false;
+
     // Get vertex declaration
     if (FAILED(m_pDevice->GetVertexDeclaration(&state.decl.pVertexDeclaration)))
         return false;
@@ -373,7 +557,7 @@ bool CAdditionalVertexStreamManager::UpdateCurrentStateInfo(SCurrentStateInfo& s
 
     // Get vertex stream
     if (FAILED(m_pDevice->GetStreamSource(1, &state.stream1.pStreamData, &state.stream1.OffsetInBytes, &state.stream1.Stride)))
-        return NULL;
+        return false;
 
     // Get vertex stream desc
     if (state.stream1.pStreamData)
@@ -466,13 +650,16 @@ SAdditionalStreamInfo* CAdditionalVertexStreamManager::CreateAdditionalStreamInf
         declNew->Usage = D3DDECLUSAGE_NORMAL;
         declNew->UsageIndex = 0;
         if (FAILED(m_pDevice->CreateVertexDeclaration(elements, &info.pVertexDeclaration)))
-            return false;
+            return nullptr;
 
         // Create new stream
         info.Stride = sizeof(float) * 3;
-        UINT Size2 = ConvertPTSize(state.decl.VertexBufferDesc1.Size);
-        if (FAILED(m_pDevice->CreateVertexBuffer(Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &info.pStreamData, NULL)))
-            return false;
+    UINT Size2 = ConvertPTSize(state.decl.VertexBufferDesc1.Size);
+        if (FAILED(m_pDevice->CreateVertexBuffer(Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &info.pStreamData, nullptr)))
+        {
+            SAFE_RELEASE(info.pVertexDeclaration);
+            return nullptr;
+        }
 
         // Save info
         MapSet(m_AdditionalStreamInfoMap, state.stream1.pStreamData, info);
@@ -512,6 +699,25 @@ void CAdditionalVertexStreamManager::OnVertexBufferRangeInvalidated(IDirect3DVer
     SAdditionalStreamInfo* pAdditionalInfo = GetAdditionalStreamInfo(pStreamData1);
     if (pAdditionalInfo)
     {
-        pAdditionalInfo->ConvertedRanges.UnsetRange(Offset, Size);
+        if (Size == 0)
+        {
+            pAdditionalInfo->ConvertedRanges = CRanges();
+            return;
+        }
+
+    uint convertedOffset = ConvertPTOffset(Offset);
+
+        uint verticesTouched = Size / 20;
+        if ((Size % 20) != 0)
+            ++verticesTouched;
+
+        if (verticesTouched == 0)
+            verticesTouched = 1;
+
+    uint64_t convertedSize64 = static_cast<uint64_t>(verticesTouched) * static_cast<uint64_t>(pAdditionalInfo->Stride);
+    uint convertedSize = convertedSize64 > std::numeric_limits<uint>::max() ? std::numeric_limits<uint>::max()
+                                           : static_cast<uint>(convertedSize64);
+
+        pAdditionalInfo->ConvertedRanges.UnsetRange(convertedOffset, convertedSize);
     }
 }

@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CColTube.cpp
  *  PURPOSE:     Tube-shaped collision entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -32,8 +32,9 @@ bool CColTube::DoHitDetection(const CVector& vecNowPosition)
     // FIXME: What about radius in height?
 
     // First see if we're within the circle. Then see if we're within its height
-    return (IsPointNearPoint2D(vecNowPosition, m_vecPosition, m_fRadius) && vecNowPosition.fZ >= m_vecPosition.fZ &&
-            vecNowPosition.fZ <= m_vecPosition.fZ + m_fHeight);
+    const CVector& vecPosition = GetPosition();
+    return (IsPointNearPoint2D(vecNowPosition, vecPosition, m_fRadius) && vecNowPosition.fZ >= vecPosition.fZ &&
+            vecNowPosition.fZ <= vecPosition.fZ + m_fHeight);
 }
 
 bool CColTube::ReadSpecialData(const int iLine)

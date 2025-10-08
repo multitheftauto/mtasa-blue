@@ -59,7 +59,7 @@ body:
       description: |
         Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
 
-        **Warning!** Do not post any personal information or sensitive logs here. You are responsible for redacting any personal information from the logs. If you need to post sensitive logs, you can use our [private log uploader](https://upload.mtasa.com/) which will only allow MTA staff to access the file, just paste the link to it here.
+        **Warning!** Do not post any personal information or sensitive logs here. You are responsible for redacting any personal information from the logs. If you need to post sensitive logs, you can use our [private log uploader](https://upload.multitheftauto.com/) which will only allow MTA staff to access the file, just paste the link to it here.
       render: shell
   - type: checkboxes
     id: terms

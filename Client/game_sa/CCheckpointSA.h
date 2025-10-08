@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CCheckpointSA.h
  *  PURPOSE:     Header file for checkpoint entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,10 +13,6 @@
 
 #include <CVector.h>
 #include <game/CCheckpoint.h>
-
-#define HOOKPOS_CCheckpoint__Render  0x725E56
-#define HOOKSIZE_CCheckpoint__Render 0x5
-static constexpr std::uint32_t RETURN_CCheckpoint__Render = 0x725E5B;
 
 #define C3dMarkers_DirectionArrowSet 0x721140
 

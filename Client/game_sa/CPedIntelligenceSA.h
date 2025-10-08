@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPedIntelligenceSA.h
  *  PURPOSE:     Header file for ped entity AI class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -55,4 +55,5 @@ public:
     bool                         TestForStealthKill(CPed* pPed, bool bUnk);
     CTaskSAInterface*            SetTaskDuckSecondary(unsigned short nLengthOfDuck);
     CTaskSimpleUseGun*           GetTaskUseGun();
+    CTaskSimpleFight*            GetFightTask();
 };

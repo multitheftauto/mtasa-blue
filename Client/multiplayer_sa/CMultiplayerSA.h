@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA.h
  *  PURPOSE:     Multiplayer module class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -56,6 +56,7 @@ public:
     void                Init_13();
     void                InitHooks_13();
     void                InitMemoryCopies_13();
+    void                InitHooks_CustomAnimations();
     void                InitHooks_ClothesSpeedUp();
     void                InitHooks_FixBadAnimId();
     void                InitHooks_HookDestructors();
@@ -76,11 +77,14 @@ public:
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
+    void                InitHooks_FixMallocAlign();
     void                InitHooks_FrameRateFixes();
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();
     void                InitHooks_Postprocess();
     void                InitHooks_DeviceSelection();
+    void                InitHooks_Explosions();
+    void                InitHooks_Tasks();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -331,6 +335,12 @@ public:
 
     void SetAutomaticVehicleStartupOnPedEnter(bool bSet);
 
+    bool IsVehicleEngineAutoStartEnabled() const noexcept override;
+    void SetVehicleEngineAutoStartEnabled(bool enabled) override;
+
+    bool IsRapidVehicleStopFixEnabled() const noexcept override { return m_isRapidVehicleStopFixEnabled; };
+    void SetRapidVehicleStopFixEnabled(bool enabled) override;
+
     void SetPedTargetingMarkerEnabled(bool bEnable);
     bool IsPedTargetingMarkerEnabled();
     bool IsConnected();
@@ -379,6 +389,8 @@ private:
     eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
+
+    bool m_isRapidVehicleStopFixEnabled{false};
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

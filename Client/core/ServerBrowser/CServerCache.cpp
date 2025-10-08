@@ -6,7 +6,7 @@
  *  PURPOSE:
  *
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -65,9 +65,9 @@ public:
     ~CServerCache();
 
 protected:
-    bool         LoadServerCache();
-    static DWORD StaticThreadProc(LPVOID lpdwThreadParam);
-    static void  StaticSaveServerCache();
+    bool                LoadServerCache();
+    static DWORD WINAPI StaticThreadProc(LPVOID lpdwThreadParam);
+    static void         StaticSaveServerCache();
 
     bool                              m_bListChanged;
     std::map<CCachedKey, CCachedInfo> m_ServerCachedMap;
@@ -155,7 +155,7 @@ bool CServerCache::LoadServerCache()
         if (const SString* pString = MapFind(item.attributeMap, "ip"))
             key.ulIp = inet_addr(*pString);
         if (const SString* pString = MapFind(item.attributeMap, "port"))
-            key.usGamePort = atoi(*pString);
+            key.usGamePort = static_cast<ushort>(atoi(*pString));
         if (const SString* pString = MapFind(item.attributeMap, "nPlayers"))
             info.nPlayers.SetFromString(*pString);
         if (const SString* pString = MapFind(item.attributeMap, "nMaxPlayers"))
@@ -211,7 +211,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         ms_ServerCachedMap = m_ServerCachedMap;
 
         // Start save thread
-        HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CServerCache::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL);
+        HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerCache::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
         if (!hThread)
         {
             CCore::GetSingleton().GetConsole()->Printf("Could not create server cache thread.");
@@ -220,7 +220,14 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         {
             ms_bIsSaving = true;
             SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
-            ResumeThread(hThread);
+
+            if (ResumeThread(hThread) == static_cast<DWORD>(-1))
+            {
+                CCore::GetSingleton().GetConsole()->Printf("Could not start server cache thread.");
+                ms_bIsSaving = false;
+            }
+
+            CloseHandle(hThread);
         }
     }
 
@@ -238,7 +245,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
 // SaveServerCache thread
 //
 ///////////////////////////////////////////////////////////////
-DWORD CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
+DWORD WINAPI CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
 {
     StaticSaveServerCache();
     ms_bIsSaving = false;
@@ -329,9 +336,9 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
         {
             pItem->SetDataQuality(SERVER_INFO_CACHE);
 
-            pItem->nPlayers = pInfo->nPlayers;
-            pItem->nMaxPlayers = pInfo->nMaxPlayers;
-            pItem->nPing = pInfo->nPing;
+            pItem->nPlayers = static_cast<unsigned short>(pInfo->nPlayers);
+            pItem->nMaxPlayers = static_cast<unsigned short>(pInfo->nMaxPlayers);
+            pItem->nPing = static_cast<unsigned short>(pInfo->nPing);
             pItem->bPassworded = (pInfo->bPassworded != 0);
             pItem->bKeepFlag = (pInfo->bKeepFlag != 0);
             pItem->strName = pInfo->strName;
@@ -339,8 +346,8 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
             pItem->strMap = pInfo->strMap;
             pItem->strVersion = pInfo->strVersion;
             pItem->uiCacheNoReplyCount = pInfo->uiCacheNoReplyCount;
-            pItem->m_usHttpPort = pInfo->usHttpPort;
-            pItem->m_ucSpecialFlags = pInfo->ucSpecialFlags;
+            pItem->m_usHttpPort = static_cast<unsigned short>(pInfo->usHttpPort);
+            pItem->m_ucSpecialFlags = static_cast<unsigned char>(pInfo->ucSpecialFlags);
             pItem->PostChange();
         }
         else if (pItem->GetDataQuality() < SERVER_INFO_QUERY)
@@ -353,11 +360,11 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
             if (pItem->strVersion.empty())
                 pItem->strVersion = pInfo->strVersion;
             if (pItem->nPing == 9999)
-                pItem->nPing = pInfo->nPing;
+                pItem->nPing = static_cast<unsigned short>(pInfo->nPing);
             if (pItem->m_usHttpPort == 0)
-                pItem->m_usHttpPort = pInfo->usHttpPort;
+                pItem->m_usHttpPort = static_cast<unsigned short>(pInfo->usHttpPort);
             if (pItem->m_ucSpecialFlags == 0)
-                pItem->m_ucSpecialFlags = pInfo->ucSpecialFlags;
+                pItem->m_ucSpecialFlags = static_cast<unsigned char>(pInfo->ucSpecialFlags);
         }
     }
 }

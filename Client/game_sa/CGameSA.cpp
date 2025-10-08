@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGameSA.cpp
  *  PURPOSE:     Base game logic handling
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -97,7 +97,7 @@ CGameSA::CGameSA()
         }
 
         // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-        for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+        for (unsigned char i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
         {
             ObjectGroupsInfo[i].SetGroup(i);
         }
@@ -147,6 +147,7 @@ CGameSA::CGameSA()
         m_pCoverManager = new CCoverManagerSA();
         m_pPlantManager = new CPlantManagerSA();
         m_pBuildingRemoval = new CBuildingRemovalSA();
+        m_pVehicleAudioSettingsManager = std::make_unique<CVehicleAudioSettingsManagerSA>();
 
         m_pRenderer = std::make_unique<CRendererSA>();
 
@@ -246,7 +247,9 @@ CGameSA::CGameSA()
         CVehicleSA::StaticSetHooks();
         CCheckpointSA::StaticSetHooks();
         CHudSA::StaticSetHooks();
+        CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
+        CVehicleAudioSettingsManagerSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {
@@ -371,7 +374,7 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
  */
 void CGameSA::StartGame()
 {
-    SetSystemState(GS_INIT_PLAYING_GAME);
+    SetSystemState(SystemState::GS_INIT_PLAYING_GAME);
     MemPutFast<BYTE>(0xB7CB49, 0);            // CTimer::m_UserPause
     MemPutFast<BYTE>(0xBA67A4, 0);            // FrontEndMenuManager + 0x5C
 }
@@ -380,14 +383,14 @@ void CGameSA::StartGame()
  * Sets the part of the game loading process the game is in.
  * @param dwState DWORD containing a valid state 0 - 9
  */
-void CGameSA::SetSystemState(eSystemState State)
+void CGameSA::SetSystemState(SystemState State)
 {
-    MemPutFast<DWORD>(0xC8D4C0, State); // gGameState
+    MemPutFast<DWORD>(0xC8D4C0, (DWORD)State); // gGameState
 }
 
-eSystemState CGameSA::GetSystemState()
+SystemState CGameSA::GetSystemState()
 {
-    return *(eSystemState*)0xC8D4C0; // gGameState
+    return *(SystemState*)0xC8D4C0; // gGameState
 }
 
 /**
@@ -437,7 +440,7 @@ void CGameSA::SetGameSpeed(float fSpeed)
 void CGameSA::Reset()
 {
     // Things to do if the game was loaded
-    if (GetSystemState() == GS_PLAYING_GAME)
+    if (GetSystemState() == SystemState::GS_PLAYING_GAME)
     {
         // Extinguish all fires
         m_pFireManager->ExtinguishAllFires();
@@ -835,26 +838,28 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     MemPut((void*)0x855432, aCannons);                // 0x855431
     MemPut((void*)0x856BFD, aCannons);                // 0x856BFC
 
+    const auto ucNewLimit = static_cast<BYTE>(newLimit);
+
     // CWaterCannons::Init
-    MemPut<BYTE>(0x728C88, newLimit);
+    MemPut(0x728C88, ucNewLimit);
 
     // CWaterCannons::Update
-    MemPut<BYTE>(0x72A3F2, newLimit);
+    MemPut(0x72A3F2, ucNewLimit);
 
     // CWaterCanons::UpdateOne
-    MemPut<BYTE>(0x728CD4, newLimit);
-    MemPut<BYTE>(0x728CF6, newLimit);
-    MemPut<BYTE>(0x728CFF, newLimit);
-    MemPut<BYTE>(0x728D62, newLimit);
+    MemPut(0x728CD4, ucNewLimit);
+    MemPut(0x728CF6, ucNewLimit);
+    MemPut(0x728CFF, ucNewLimit);
+    MemPut(0x728D62, ucNewLimit);
 
     // CWaterCannons::Render
-    MemPutFast<BYTE>(0x729B38, newLimit);
+    MemPutFast(0x729B38, ucNewLimit);
 
     // 0x85542A
-    MemPut<BYTE>(0x85542B, newLimit);
+    MemPut(0x85542B, ucNewLimit);
 
     // 0x856BF5
-    MemPut<BYTE>(0x856BF6, newLimit);
+    MemPut(0x856BF6, ucNewLimit);
 
     // Free previous allocated memory
     if (!isEnabled && currentACannons != nullptr)
@@ -887,6 +892,9 @@ void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
         MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter
 
         MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon
+
+        MemSet((void*)0x53A899, 0x90, 5);             // CFire::ProcessFire
+        MemSet((void*)0x53A990, 0x90, 5);             // CFire::ProcessFire
     }
     else
     {
@@ -897,9 +905,31 @@ void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
         MemCpy((void*)0x64F3DB, "\x8B\x85\x90\x04\x00\x00\x85\xC0\x0F\x85\x1B\x01\x00\x00", 14);
 
         MemCpy((void*)0x685A7F, "\x8B\x86\x30\x07\x00\x00\x85\xC0\x0F\x85\x1D\x01\x00\x00", 14);
+
+        MemCpy((void*)0x53A899, "\xE8\x82\xF7\x0C\x00", 5);
+        MemCpy((void*)0x53A990, "\xE8\x8B\xF6\x0C\x00", 5);
     }
 
     m_isIgnoreFireStateEnabled = isEnabled;
+}
+
+void CGameSA::SetVehicleBurnExplosionsEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isVehicleBurnExplosionsEnabled)
+        return;
+
+    if (isEnabled)
+    {
+        MemCpy((void*)0x6A74EA, "\xE8\x61\xF5\x08\x00", 5);            // CAutomobile::ProcessCarOnFireAndExplode
+        MemCpy((void*)0x737929, "\xE8\x22\xF1\xFF\xFF", 5);            // CExplosion::Update
+    }
+    else
+    {
+        MemSet((void*)0x6A74EA, 0x90, 5);
+        MemSet((void*)0x737929, 0x90, 5);
+    }
+
+    m_isVehicleBurnExplosionsEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()

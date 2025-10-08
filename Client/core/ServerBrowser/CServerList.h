@@ -5,7 +5,7 @@
  *  FILE:        core/CServerList.h
  *  PURPOSE:     Header file for master server/LAN querying list
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,7 +23,7 @@ class CMasterServerManagerInterface;
 #include "CSingleton.h"
 
 // Master server list URL
-#define SERVER_LIST_MASTER_URL              "http://master.multitheftauto.com/ase/mta/"
+#define SERVER_LIST_MASTER_URL              "https://master.multitheftauto.com/ase/mta/"
 
 // Query response data buffer
 #define SERVER_LIST_QUERY_BUFFER            4096
@@ -174,6 +174,7 @@ public:
 
     std::string    Pulse(bool bCanSendQuery, bool bRemoveNonResponding = false);
     void           ResetForRefresh();
+    void           CancelPendingQuery();
     unsigned short GetQueryPort();
 
     in_addr        AddressCopy;            // Copy to ensure it doesn't get changed without us knowing
@@ -365,6 +366,7 @@ public:
     virtual void Pulse();
     virtual void Refresh();
     virtual bool RemoveNonResponding() { return true; }
+    virtual void SuspendActivity();
 
     CServerListIterator        IteratorBegin() { return m_Servers.begin(); };
     CServerListIterator        IteratorEnd() { return m_Servers.end(); };
@@ -399,9 +401,10 @@ class CServerListInternet : public CServerList
 {
 public:
     CServerListInternet();
-    ~CServerListInternet();
-    void Pulse();
-    void Refresh();
+    ~CServerListInternet() override;
+    void Pulse() override;
+    void Refresh() override;
+    void SuspendActivity() override;
     bool RemoveNonResponding() { return m_nScanned > 10; }            // Don't remove until net access is confirmed
 
 private:
@@ -413,8 +416,11 @@ private:
 class CServerListLAN : public CServerList
 {
 public:
-    void Pulse();
-    void Refresh();
+    CServerListLAN();
+    ~CServerListLAN() override;
+    void Pulse() override;
+    void Refresh() override;
+    void SuspendActivity() override;
 
 private:
     void Discover();

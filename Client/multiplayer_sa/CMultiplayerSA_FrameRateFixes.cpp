@@ -19,9 +19,12 @@ constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 #define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim 0x61E4F2
 #define HOOKSIZE_CTaskSimpleUseGun__SetMoveAnim 0x6
 const unsigned int RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
-void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
+static void __declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         fld ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep      // 1.666f
         fmul ds:[0x858B1C]          // 0.1f
@@ -37,9 +40,12 @@ void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 #define HOOKPOS_CCamera__Process 0x52C723
 #define HOOKSIZE_CCamera__Process 0x12
 static const unsigned int RETURN_CCamera__Process = 0x52C735;
-static void _declspec(naked) HOOK_CCamera__Process()
+static void __declspec(naked) HOOK_CCamera__Process()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         fld ds:[0x858C80]           // 5.0f
         fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep      // 1.666f
@@ -53,9 +59,12 @@ static void _declspec(naked) HOOK_CCamera__Process()
 #define HOOKPOS_CHeli__ProcessFlyingCarStuff 0x6C4F13
 #define HOOKSIZE_CHeli__ProcessFlyingCarStuff 0x2A
 static const unsigned int RETURN_CHeli__ProcessFlyingCarStuff = 0x6C4F3D;
-static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
+static void __declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         mov ax, [esi+0x22]
         cmp ax, 465
         jz is_rc_heli
@@ -80,9 +89,12 @@ static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
 #define HOOKPOS_CClouds__MovingFog_Update 0x716BA6
 #define HOOKSIZE_CClouds__MovingFog_Update 0x16
 static const unsigned int RETURN_CClouds__MovingFog_Update = 0x716BBC;
-static void _declspec(naked) HOOK_CClouds__MovingFog_Update()
+static void __declspec(naked) HOOK_CClouds__MovingFog_Update()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
         fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep      // 1.666f
@@ -100,9 +112,12 @@ static void _declspec(naked) HOOK_CClouds__MovingFog_Update()
 #define HOOKPOS_CFallingGlassPane__Update_A 0x71AABF
 #define HOOKSIZE_CFallingGlassPane__Update_A 0x6
 static const unsigned int RETURN_CFallingGlassPane__Update_A = 0x71AAC5;
-static void _declspec(naked) HOOK_CFallingGlassPane__Update_A()
+static void __declspec(naked) HOOK_CFallingGlassPane__Update_A()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         fld [esp+0x28]
         fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep      // 1.666f
@@ -123,9 +138,12 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_A()
 #define HOOKPOS_CFallingGlassPane__Update_B 0x71AAEA
 #define HOOKSIZE_CFallingGlassPane__Update_B 0x6
 static const unsigned int RETURN_CFallingGlassPane__Update_B = 0x71AAF0;
-static void _declspec(naked) HOOK_CFallingGlassPane__Update_B()
+static void __declspec(naked) HOOK_CFallingGlassPane__Update_B()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         fld [eax]
         fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep      // 1.666f
@@ -148,9 +166,12 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_B()
 #define HOOKPOS_CFallingGlassPane__Update_C 0x71AB29
 #define HOOKSIZE_CFallingGlassPane__Update_C 0x6
 static const unsigned int RETURN_CFallingGlassPane__Update_C = 0x71AB2F;
-static void _declspec(naked) HOOK_CFallingGlassPane__Update_C()
+static void __declspec(naked) HOOK_CFallingGlassPane__Update_C()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         fld [eax]
         fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep      // 1.666f
@@ -172,9 +193,12 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_C()
 // Ensure that CTimer::CurrentFrame is updated only every 33+ milliseconds.
 #define HOOKPOS_CTimer__Update 0x561C5D
 #define HOOKSIZE_CTimer__Update 0xE
-static void _declspec(naked) HOOK_CTimer__Update()
+static void __declspec(naked) HOOK_CTimer__Update()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         add esp, 0x4
 
         mov bWouldBeNewFrame, 0
@@ -200,9 +224,12 @@ static void _declspec(naked) HOOK_CTimer__Update()
 #define HOOKPOS_BreakObject_c__Update 0x59E420
 #define HOOKSIZE_BreakObject_c__Update 0xB
 static const unsigned int RETURN_BreakObject_c__Update = 0x59E42B;
-static void _declspec(naked) HOOK_BreakObject_c__Update()
+static void __declspec(naked) HOOK_BreakObject_c__Update()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -222,9 +249,13 @@ static void _declspec(naked) HOOK_BreakObject_c__Update()
 #define HOOKSIZE_CWaterCannon__Update_OncePerFrame 0x5
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame = 0x72A2A0;
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_SKIP = 0x72A2BB;
-static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
+static void __declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
 {
-    _asm {
+
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -243,9 +274,12 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
 #define HOOKSIZE_CPlayerInfo__Process 0x6
 static const unsigned int RETURN_CPlayerInfo__Process = 0x5700FB;
 static const unsigned int RETURN_CPlayerInfo__Process_SKIP = 0x57015B;
-static void _declspec(naked) HOOK_CPlayerInfo__Process()
+static void __declspec(naked) HOOK_CPlayerInfo__Process()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -263,9 +297,12 @@ static void _declspec(naked) HOOK_CPlayerInfo__Process()
 #define HOOKSIZE_CProjectileInfo__Update 0x5
 static const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
 static const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
-static void _declspec(naked) HOOK_CProjectileInfo__Update()
+static void __declspec(naked) HOOK_CProjectileInfo__Update()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -283,9 +320,12 @@ static void _declspec(naked) HOOK_CProjectileInfo__Update()
 #define HOOKPOS_CVehicle__AddWheelDirtAndWater 0x6D2D50
 #define HOOKSIZE_CVehicle__AddWheelDirtAndWater 0x6
 static const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
-static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
+static void __declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -305,9 +345,12 @@ static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
 #define HOOKSIZE_CPlane__PreRender 0x6
 static const unsigned int RETURN_CPlane__PreRender = 0x6CA93D;
 static const unsigned int RETURN_CPlane__PreRender_SKIP = 0x6CAA93;
-static void _declspec(naked) HOOK_CPlane__PreRender()
+static void __declspec(naked) HOOK_CPlane__PreRender()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -325,9 +368,12 @@ static void _declspec(naked) HOOK_CPlane__PreRender()
 #define HOOKSIZE_CWaterCannon__Update_OncePerFrame_PushPedFix 0x6
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix = 0x72A381;
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP = 0x72A38E;
-static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
+static void __declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -345,9 +391,12 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
 #define HOOKSIZE_CWaterCannon__Render_FxFix 0x5
 static const unsigned int RETURN_CWaterCannon__Render_FxFix = 0x729440;
 static const unsigned int RETURN_CWaterCannon__Render_FxFix_SKIP = 0x7294EE;
-static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
+static void __declspec(naked) HOOK_CWaterCannon__Render_FxFix()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -363,9 +412,12 @@ static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
 #define HOOKSIZE_CPed__PreRenderAfterTest 0x6
 static const unsigned int RETURN_CPed__PreRenderAfterTest = 0x5E7187;
 static const unsigned int RETURN_CPed__PreRenderAfterTest_SKIP = 0x5E722D;
-static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
+static void __declspec(naked) HOOK_CPed__PreRenderAfterTest()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -382,9 +434,12 @@ static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
 #define HOOKPOS_cBuoyancy__AddSplashParticles 0x6C34E0
 #define HOOKSIZE_cBuoyancy__AddSplashParticles 0x6
 static const unsigned int RETURN_cBuoyancy__AddSplashParticles = 0x6C34E6;
-static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
+static void __declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -401,9 +456,12 @@ static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
 #define HOOKPOS_CWeather__AddRain 0x72AAA8
 #define HOOKSIZE_CWeather__AddRain 0x6
 static const unsigned int RETURN_CWeather__AddRain = 0x72AAAE;
-static void _declspec(naked) HOOK_CWeather__AddRain()
+static void __declspec(naked) HOOK_CWeather__AddRain()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -423,9 +481,12 @@ static void _declspec(naked) HOOK_CWeather__AddRain()
 #define HOOKSIZE_CPlane__ProcessFlyingCarStuff 0x6
 static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff = 0x6CBE51;
 static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff_SKIP = 0x6CC0D9;
-static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
+static void __declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -443,9 +504,12 @@ static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
 #define HOOKSIZE_CAutomobile__UpdateWheelMatrix 0x5
 static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix = 0x6AA78F;
 static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix_SKIP = 0x6AAAD0;
-static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
+static void __declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -462,9 +526,12 @@ static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
 #define HOOKPOS_CVehicle__DoBoatSplashes 0x6DD130
 #define HOOKSIZE_CVehicle__DoBoatSplashes 0x6
 static const unsigned int RETURN_CVehicle__DoBoatSplashes = 0x6DD136;
-static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
+static void __declspec(naked) HOOK_CVehicle__DoBoatSplashes()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -481,9 +548,12 @@ static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
 #define HOOKPOS_CVehicle__AddWaterSplashParticles 0x6DDF60
 #define HOOKSIZE_CVehicle__AddWaterSplashParticles 0x6
 static const unsigned int RETURN_CVehicle__AddWaterSplashParticles = 0x6DDF66;
-static void _declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
+static void __declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -501,9 +571,12 @@ static void _declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
 #define HOOKSIZE_CPlane__ProcessControl 0x5
 static const unsigned int RETURN_CPlane__ProcessControl = 0x6C939F;
 static const unsigned int RETURN_CPlane__ProcessControl_SKIP = 0x6C9463;
-static void _declspec(naked) HOOK_CPlane__ProcessControl()
+static void __declspec(naked) HOOK_CPlane__ProcessControl()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -521,9 +594,12 @@ static void _declspec(naked) HOOK_CPlane__ProcessControl()
 #define HOOKPOS_CVehicle__AddExhaustParticles 0x6DE240
 #define HOOKSIZE_CVehicle__AddExhaustParticles 0x6
 static const unsigned int RETURN_CVehicle__AddExhaustParticles = 0x6DE246;
-static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
+static void __declspec(naked) HOOK_CVehicle__AddExhaustParticles()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -541,9 +617,12 @@ static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
 #define HOOKSIZE_CTaskSimpleSwim__ProcessEffects 0x6
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects = 0x68AD41;
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects_SKIP = 0x68AFDB;
-static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
+static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -562,9 +641,12 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
 #define HOOKSIZE_CTaskSimpleSwim__ProcessEffectsBubbleFix 0x7
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix = 0x68AC38;
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP = 0x68AD36;
-static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
+static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
 {
-    _asm {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -576,6 +658,126 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
     skip:
         jmp RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP
     }
+}
+
+// Fixes invisible weapon particles (extinguisher, spraycan, flamethrower) at high FPS
+#define HOOKPOS_CWeapon_Update 0x73DC3D
+#define HOOKSIZE_CWeapon_Update 5
+static constexpr std::uintptr_t RETURN_CWeapon_Update = 0x073DC42;
+static void __declspec(naked) HOOK_CWeapon_Update()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
+        // Temp fix for camera
+        cmp [esi], 0x2B // CWeapon::m_eWeaponType
+        je skip
+
+        // timeStep / kOriginalTimeStep
+        fld ds:[0xB7CB5C] // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep
+
+        mov eax, [esi+10h] // m_timeToNextShootInMS
+        mov ebx, ds:[0xB7CB84] // CTimer::m_snTimeInMilliseconds
+
+        sub eax, ebx // m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds
+
+        push eax
+        fild dword ptr [esp]
+        add esp, 4
+
+        fmul st(0), st(1) // (m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds) * (timeStep / kOriginalTimeStep)
+        fadd st(0), ebx // + m_snTimeInMilliseconds
+        fistp [esi+10h]
+        fstp st(0)
+
+        mov eax, ebx
+
+        xor ebx, ebx
+        jmp RETURN_CWeapon_Update
+
+        skip:
+        mov eax, ds:[0xB7CB84]
+        jmp RETURN_CWeapon_Update
+    }
+}
+
+#define HOOKPOS_CPhysical__ApplyAirResistance  0x544D29
+#define HOOKSIZE_CPhysical__ApplyAirResistance 5
+static const unsigned int    RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
+static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
+    {
+        fld ds:[0x862CD0]            // 0.99000001f
+        fld ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep            // 1.666f
+        mov eax, 0x822130            // powf
+        call eax
+
+        fld st(0)
+        fmul [esi+0x50]
+        fstp [esi+0x50]
+
+        fld st(0)
+        fmul [esi+0x54]
+        fstp [esi+0x54]
+
+        fmul [esi+0x58]
+        fstp [esi+0x58]
+        jmp RETURN_CPhysical__ApplyAirResistance
+    }
+}
+
+template <unsigned int returnAddress>
+static void __declspec(naked) HOOK_VehicleRapidStopFix()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    static unsigned int RETURN_VehicleRapidStopFix = returnAddress;
+    __asm
+    {
+        fld ds:[0xC2B9CC]            // mod_HandlingManager.m_fWheelFriction
+        fmul ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep            // 1.666f
+        jmp RETURN_VehicleRapidStopFix
+    }
+}
+
+void CMultiplayerSA::SetRapidVehicleStopFixEnabled(bool enabled)
+{
+    if (m_isRapidVehicleStopFixEnabled == enabled)
+        return;
+
+    if (enabled)
+    {
+        EZHookInstall(CPhysical__ApplyAirResistance);
+
+        // CVehicle::ProcessWheel
+        HookInstall(0x6D6E69, (DWORD)HOOK_VehicleRapidStopFix<0x6D6E6F>, 6);
+        HookInstall(0x6D6EA8, (DWORD)HOOK_VehicleRapidStopFix<0x6D6EAE>, 6);
+
+        // CVehicle::ProcessBikeWheel
+        HookInstall(0x6D767F, (DWORD)HOOK_VehicleRapidStopFix<0x6D7685>, 6);
+        HookInstall(0x6D76AB, (DWORD)HOOK_VehicleRapidStopFix<0x6D76B1>, 6);
+        HookInstall(0x6D76CD, (DWORD)HOOK_VehicleRapidStopFix<0x6D76D3>, 6);
+    }
+    else
+    {
+        MemCpy((void*)HOOKPOS_CPhysical__ApplyAirResistance, "\xD9\x46\x50\xD8\x0D", 5);
+
+        MemCpy((void*)0x6D6E69, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+        MemCpy((void*)0x6D6EA8, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+
+        MemCpy((void*)0x6D767F, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+        MemCpy((void*)0x6D76AB, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+        MemCpy((void*)0x6D76CD, "\xD9\x05\xCC\xB9\xC2\x00", 6);
+    }
+
+    m_isRapidVehicleStopFixEnabled = enabled;
 }
 
 void CMultiplayerSA::InitHooks_FrameRateFixes()
@@ -595,6 +797,12 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     // Fixes slow boat movement on high FPS.
     // CVehicle::ProcessBoatControl
     MemPut(0x6DC23F, &kOriginalTimeStep);
+
+    // Fixes climbing over certain objects killing player on high FPS or low game speed.
+    // GitHub Issue #602
+    MemPut(0x6811E9, &kOriginalTimeStep);
+    MemPut(0x68128A, &kOriginalTimeStep);
+    MemPut(0x68131B, &kOriginalTimeStep);
 
     // CTimer::m_FrameCounter fixes
     EZHookInstall(CTimer__Update);
@@ -619,4 +827,6 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CVehicle__AddExhaustParticles);
     EZHookInstall(CTaskSimpleSwim__ProcessEffects);
     EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
+
+    EZHookInstall(CWeapon_Update);
 }

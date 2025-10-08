@@ -5,7 +5,7 @@
  *  FILE:        core/CKeyBinds.h
  *  PURPOSE:     Header file for core keybind manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -74,6 +74,12 @@ public:
     CCommandBind* FindCommandMatch(const char* szKey, const char* szCommand, const char* szArguments, const char* szResource, const char* szOriginalScriptKey,
                                    bool bCheckState, bool bState, bool bCheckScriptCreated, bool bScriptCreated);
     void          SortCommandBinds();
+
+    // Context-aware binding methods
+    bool CommandExistsInContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true, const char* arguments = NULL, const char* resource = NULL);
+    bool RemoveCommandFromContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true, const char* arguments = NULL, const char* resource = NULL);
+    bool HasAnyBindingForKey(const char* key, bool checkState = false, bool state = true);
+    bool HasBindingInContext(const char* key, BindingContext context, bool checkState = false, bool state = true);
 
     // Control-bind funcs
     bool AddGTAControl(const char* szKey, const char* szControl);

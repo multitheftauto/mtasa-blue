@@ -5,11 +5,14 @@
  *  FILE:        sdk/Common.h
  *  PURPOSE:     Header for common definitions
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
+
+#include <cstdint>
+#include <limits>
 
 // Min and max number of characters in player serial
 #define MIN_SERIAL_LENGTH 1
@@ -98,3 +101,35 @@ private:
 
 // Maximum number of players that can be packed in a single lightweight puresync packet
 #define LIGHTSYNC_MAX_PLAYERS               32
+
+// Frame rate limits
+namespace FPSLimits
+{
+    constexpr std::uint16_t FPS_MAX = std::numeric_limits<std::uint16_t>::max();            // Maximum allowed frame rate limit
+    constexpr std::uint16_t FPS_MIN = 25;                                                   // Minimum allowed frame rate limit
+    constexpr std::uint16_t FPS_UNLIMITED = 0;                                              // Unlimited frame rate (no limit)
+
+    // Takes a FPS value and
+    // 1. Returns if `fpsToValidate` was valid
+    // 2. Writes clamped value to `outValidFps` reference
+    inline bool IsValidAndSetValid(std::uint16_t fpsToValidate, std::uint16_t& outValidFps) noexcept
+    {
+        if (fpsToValidate == FPS_UNLIMITED)
+        {
+            outValidFps = FPS_UNLIMITED;
+            return true;
+        }
+        if (fpsToValidate < FPS_MIN)
+        {
+            outValidFps = FPS_MIN;
+            return false;
+        }
+        if (fpsToValidate > FPS_MAX)
+        {
+            outValidFps = FPS_MAX;
+            return false;
+        }
+        outValidFps = fpsToValidate;
+        return true;
+    }
+}            // namespace FPSLimits

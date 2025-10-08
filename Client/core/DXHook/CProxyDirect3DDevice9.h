@@ -5,13 +5,14 @@
  *  FILE:        core/CProxyDirect3DDevice8.h
  *  PURPOSE:     Header file for Direct3D 9 device proxy class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
 #include <d3d9.h>
+#include <initializer_list>
 #include "CDirect3DData.h"
 
 interface CProxyDirect3DDevice9 : public IDirect3DDevice9
@@ -52,6 +53,7 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
                                                   IDirect3DVolumeTexture9 * *ppVolumeTexture, HANDLE * pSharedHandle);
     virtual HRESULT __stdcall CreateCubeTexture(UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
                                                 IDirect3DCubeTexture9 * *ppCubeTexture, HANDLE * pSharedHandle);
+    void                      ApplyBorderlessPresentationTuning();
     virtual HRESULT __stdcall CreateVertexBuffer(UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool, IDirect3DVertexBuffer9 * *ppVertexBuffer,
                                                  HANDLE * pSharedHandle);
     virtual HRESULT __stdcall CreateIndexBuffer(UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DIndexBuffer9 * *ppIndexBuffer,
@@ -159,8 +161,13 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
     virtual HRESULT __stdcall CreateQuery(D3DQUERYTYPE Type, IDirect3DQuery9 * *ppQuery);
 
 private:
+    void ReleaseCachedResources();
+
     IDirect3DDevice9* m_pDevice;
     CDirect3DData*    m_pData;
+    std::atomic<LONG> m_lRefCount;
+    uint64_t          m_registrationToken;
+    HRESULT           m_lastTestCooperativeLevelResult;
 
 public:
     //
@@ -551,8 +558,70 @@ public:
     std::map<IDirect3DVertexDeclaration9*, SD3DVertexDeclState> m_VertexDeclMap;
 
     // Debugging
-    void SetCallType(SCallState::eD3DCallType callType, uint uiNumArgs = 0, ...);
+    void SetCallType(SCallState::eD3DCallType callType, std::initializer_list<int> args = {});
 };
 
-extern CProxyDirect3DDevice9*                  g_pProxyDevice;
 extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;
+
+// GTA scene tracking helpers
+void ResetGTASceneState();
+
+enum class ESceneOwner
+{
+    None,
+    GTA,
+    MTA,
+};
+
+bool BeginSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner);
+bool EndSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner);
+
+CProxyDirect3DDevice9* AcquireActiveProxyDevice();
+void                   ReleaseActiveProxyDevice(CProxyDirect3DDevice9* pProxyDevice);
+
+class CScopedActiveProxyDevice
+{
+public:
+    CScopedActiveProxyDevice();
+    ~CScopedActiveProxyDevice();
+
+    CScopedActiveProxyDevice(const CScopedActiveProxyDevice&) = delete;
+    CScopedActiveProxyDevice& operator=(const CScopedActiveProxyDevice&) = delete;
+
+    CProxyDirect3DDevice9* operator->() const { return m_pProxy; }
+    CProxyDirect3DDevice9* Get() const { return m_pProxy; }
+    explicit operator bool() const { return m_pProxy != nullptr; }
+
+private:
+    CProxyDirect3DDevice9* m_pProxy;
+};
+
+// Add gamma state management
+struct SGammaState
+{
+    bool          bOriginalGammaStored;
+    bool          bLastWasBorderless;
+    D3DGAMMARAMP  originalGammaRamp;
+    UINT          lastSwapChain;
+    
+    SGammaState() : bOriginalGammaStored(false), bLastWasBorderless(false), originalGammaRamp{}, lastSwapChain(0)
+    {
+    }
+};
+
+extern SGammaState g_GammaState;
+
+namespace BorderlessGamma
+{
+    extern const float kGammaMin;
+    extern const float kGammaMax;
+    extern const float kBrightnessMin;
+    extern const float kBrightnessMax;
+    extern const float kContrastMin;
+    extern const float kContrastMax;
+    extern const float kSaturationMin;
+    extern const float kSaturationMax;
+
+    void FetchSettings(float& gammaPower, float& brightnessScale, float& contrastScale, float& saturationScale, bool& applyWindowed, bool& applyFullscreen);
+    bool ShouldApplyAdjustments(float gammaPower, float brightnessScale, float contrastScale, float saturationScale);
+}

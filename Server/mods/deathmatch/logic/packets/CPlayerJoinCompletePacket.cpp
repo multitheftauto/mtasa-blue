@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPlayerJoinCompletePacket.cpp
  *  PURPOSE:     Player join completion packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -90,10 +90,7 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteCompressed(m_uiBitrate);
 
     // fakelag command enabled
-    if (BitStream.Can(eBitStreamVersion::FakeLagCommand))
-    {
-        BitStream.WriteBit(g_pGame->GetConfig()->IsFakeLagCommandEnabled());
-    }
+    BitStream.WriteBit(g_pGame->GetConfig()->IsFakeLagCommandEnabled());
 
     // Tellclient about maybe throttling back http client requests
     BitStream.Write(m_iHTTPMaxConnectionsPerClient);
@@ -122,8 +119,7 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
             break;
     }
 
-    if (BitStream.Can(eBitStreamVersion::CPlayerJoinCompletePacket_ServerName))
-        BitStream.WriteString(m_szServerName);
+    BitStream.WriteString(m_szServerName);
 
     return true;
 }

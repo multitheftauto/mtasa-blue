@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIStaticImage_Impl.cpp
  *  PURPOSE:     Static image widget class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -20,7 +20,7 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl(CGUI_Impl* pGUI, CGUIElement* pParent
     m_pImageset = NULL;
     m_pImage = NULL;
     m_pGUI = pGUI;
-    m_pManager = pGUI;
+    SetManager(pGUI);
     m_pTexture = NULL;
     m_bCreatedTexture = false;
 

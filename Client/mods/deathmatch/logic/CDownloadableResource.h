@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CDownloadableResource.h
  *  PURPOSE:     Header for downloadable resource class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

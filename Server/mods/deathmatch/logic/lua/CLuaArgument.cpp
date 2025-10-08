@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/lua/CLuaArgument.cpp
  *  PURPOSE:     Lua argument handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -337,6 +337,13 @@ void CLuaArgument::ReadString(const std::string_view& string)
     m_iType = LUA_TSTRING;
     DeleteTableData();
     m_strString = string;
+}
+
+void CLuaArgument::ReadString(const CStringName& string)
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string.ToString();
 }
 
 void CLuaArgument::ReadString(const char* string)

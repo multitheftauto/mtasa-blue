@@ -5,7 +5,7 @@
  *  FILE:        CRenderItemManager.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -56,8 +56,8 @@ public:
     virtual ERenderFormat  GetDepthBufferFormat() { return m_depthBufferFormat; }
     virtual void           SaveReadableDepthBuffer();
     virtual void           FlushNonAARenderTarget();
-    virtual void           HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
-                                             int Filter);
+    virtual HRESULT        HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface,
+                                             CONST RECT* pDestRect, int Filter);
 
     // CRenderItemManager
     void NotifyContructRenderItem(CRenderItem* pItem);
@@ -68,12 +68,14 @@ public:
     void UpdateBackBufferCopySize();
     bool SaveDefaultRenderTarget();
     bool IsUsingDefaultRenderTarget();
-    void ChangeRenderTarget(uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface);
+    bool ChangeRenderTarget(uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface);
     void RemoveShaderItemFromWatchLists(CShaderItem* pShaderItem);
     void UpdateMemoryUsage();
     bool CanCreateRenderItem(ClassId classId);
     void NotifyShaderItemUsesDepthBuffer(CShaderItem* pShaderItem, bool bUsesDepthBuffer);
     void NotifyShaderItemUsesMultipleRenderTargets(CShaderItem* pShaderItem, bool bUsesMultipleRenderTargets);
+
+    HRESULT GetDeviceCooperativeLevel(const char* szContext, bool bLogLost = true) const;
 
     static int GetBitsPerPixel(D3DFORMAT Format);
     static int GetPitchDivisor(D3DFORMAT Format);

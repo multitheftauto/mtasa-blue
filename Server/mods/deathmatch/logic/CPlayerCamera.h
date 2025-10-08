@@ -5,13 +5,15 @@
  *  FILE:        mods/deathmatch/logic/CPlayerCamera.h
  *  PURPOSE:     Player camera entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
 #include <CVector.h>
+#include <cmath>
+#include "CameraScriptShared.h"
 
 class CPlayer;
 class CElement;
@@ -45,9 +47,15 @@ public:
     void      SetTarget(CElement* pElement);
 
     float GetRoll() const { return m_fRoll; }
-    void  SetRoll(float fRoll) { m_fRoll = fRoll; }
+    void  SetRoll(float fRoll)
+    {
+        m_fRoll = CameraScriptShared::NormalizeRoll(fRoll);
+    }
     float GetFOV() const { return m_fFOV; }
-    void  SetFOV(float fFOV) { m_fFOV = fFOV; }
+    void  SetFOV(float fFOV)
+    {
+        m_fFOV = CameraScriptShared::SanitizeFOV(fFOV);
+    }
 
     void SetRotation(CVector& vecRotation);
 

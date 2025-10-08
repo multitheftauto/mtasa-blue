@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA_ClothesMemFix.cpp
  *  PORPOISE:    Fix memory leak when clothes are changed
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -23,7 +23,7 @@ void CPedModelInfo_DeleteRwObject(CBaseModelInfoSAInterface* pModelInfo)
 {
     DWORD                      dwFunction = FUNC_CPedModelInfo_DeleteRwObject;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
-    _asm
+    __asm
     {
         mov     ecx, pInterface
         call    dwFunction
@@ -34,7 +34,7 @@ void CPedModelInfo_SetClump(CBaseModelInfoSAInterface* pModelInfo, RwObject* pSa
 {
     DWORD                      dwFunction = FUNC_CPedModelInfo_SetClump;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
-    _asm
+    __asm
     {
         push    pSavedRwObject
         mov     ecx, pInterface
@@ -61,9 +61,11 @@ void      OnMy_CClothesDeleteRwObject()
 #define HOOKPOS_CClothesDeleteRwObject                          0x5A8243
 #define HOOKSIZE_CClothesDeleteRwObject                         5
 DWORD RETURN_CClothesDeleteRwObject = 0x5A8248;
-void _declspec(naked) HOOK_CClothesDeleteRwObject()
+static void __declspec(naked) HOOK_CClothesDeleteRwObject()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         call    OnMy_CClothesDeleteRwObject
@@ -98,9 +100,11 @@ void OnMy_PostCPedDress()
 #define HOOKPOS_PostCPedDress                           0x5A835C
 #define HOOKSIZE_PostCPedDress                          5
 DWORD RETURN_PostCPedDress = 0x5A8361;
-void _declspec(naked) HOOK_PostCPedDress()
+static void __declspec(naked) HOOK_PostCPedDress()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         call    OnMy_PostCPedDress

@@ -5,13 +5,21 @@
  *  FILE:        sdk/game/CRenderWare.h
  *  PURPOSE:     RenderWare engine interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <vector>
+
+#include "RenderWare.h"
 
 class CClientEntityBase;
 class CD3DDUMMY;
@@ -29,20 +37,45 @@ struct RpClump;
 
 typedef CShaderItem CSHADERDUMMY;
 
+extern int (__cdecl* RwTextureDestroy)(RwTexture* texture);
+inline int (__cdecl*& gRwTextureDestroy)(RwTexture* texture) = RwTextureDestroy;
+
 // A list of custom textures to add to a model's txd
 struct SReplacementTextures
 {
+    struct RwTextureDeleter
+    {
+        void operator()(RwTexture* texture) const noexcept
+        {
+            if (!texture)
+                return;
+
+            if (RwTextureDestroy)
+            {
+                RwTextureDestroy(texture);
+            }
+        }
+    };
+
+    using TextureOwner = std::unique_ptr<RwTexture, RwTextureDeleter>;
+
     struct SPerTxd
     {
         std::vector<RwTexture*> usingTextures;
-        ushort                  usTxdId;
-        bool                    bTexturesAreCopies;
+        std::vector<RwTexture*> replacedOriginals;
+        std::vector<ushort>     modelIdsUsingTxd;
+        std::vector<TextureOwner> ownedClones;
+        ushort                  usTxdId = 0;
+        bool                    bTexturesAreCopies = false;
     };
 
     std::vector<RwTexture*> textures;              // List of textures we want to inject into TXD's
     std::vector<SPerTxd>    perTxdList;            // TXD's which have been modified
     std::vector<ushort>     usedInTxdIds;
     std::vector<ushort>     usedInModelIds;
+    std::unordered_set<ushort> usedInTxdIdLookup;
+    std::unordered_set<ushort> usedInModelIdLookup;
+    std::unordered_map<ushort, std::size_t> perTxdIndexLookup;
 };
 
 // Shader layers to render
@@ -79,6 +112,9 @@ public:
     virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId) = 0;
     virtual void             ClothesRemoveReplacement(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
+    virtual bool             ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) = 0;
+    virtual bool             ClothesRemoveFile(char* fileData) = 0;
+    virtual bool             HasClothesFile(const char* fileName) const noexcept = 0;
     virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
     virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
     virtual CColModel*       ReadCOL(const SString& buffer) = 0;

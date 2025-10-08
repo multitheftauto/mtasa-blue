@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CAudioContainerSA.cpp
  *  PURPOSE:     Audio container reader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -97,7 +97,7 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
     // Get archive file size
     std::ifstream archive(FromUTF8(GetAudioArchiveName(lookupIndex)), std::ios::binary);
 
-    SAudioLookupEntrySA* lookupEntry = m_pLookupTable->GetEntry(lookupIndex, bankIndex);
+    SAudioLookupEntrySA* lookupEntry = m_pLookupTable->GetEntry(lookupIndex, static_cast<uint8_t>(bankIndex));
     if (!lookupEntry)
         return false;
 

@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPickupsSA.h
  *  PURPOSE:     Header file for pickup manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -31,6 +31,6 @@ public:
     ~CPickupsSA();
 
     CPickup* GetPickup(DWORD ID);
-    CPickup* CreatePickup(CVector* position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer);
+    CPickup* CreatePickup(CVector* position, DWORD ModelIndex, PickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer);
     void     DisablePickupProcessing(bool bDisabled);
 };

@@ -4,7 +4,7 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        multiplayer_sa/CMultiplayerSA_DeviceSelection.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -26,9 +26,9 @@ std::unordered_map<std::string, std::string> GetFriendlyMonitorNamesForDevicePat
     if (!user32Lib)
         return monitorNames;
 
-    auto* getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes");
-    auto* queryDisplayConfig = (decltype(QueryDisplayConfig)*)GetProcAddress(user32Lib, "QueryDisplayConfig");
-    auto* displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo");
+    auto* getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)static_cast<void*>(GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes"));
+    auto* queryDisplayConfig = (decltype(QueryDisplayConfig)*)static_cast<void*>(GetProcAddress(user32Lib, "QueryDisplayConfig"));
+    auto* displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)static_cast<void*>(GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo"));
     if (!getDisplayConfigBufferSizes || !queryDisplayConfig || !displayConfigGetDeviceInfo)
     {
         FreeLibrary(user32Lib);

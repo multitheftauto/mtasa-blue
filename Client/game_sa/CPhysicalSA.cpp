@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CPhysicalSA.cpp
  *  PURPOSE:     Physical object entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -75,7 +75,7 @@ CVector* CPhysicalSA::GetMoveSpeedInternal(CVector* vecMoveSpeed)
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -90,7 +90,7 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     DWORD dwFunc = FUNC_GetTurnSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -197,7 +197,7 @@ void CPhysicalSA::ProcessCollision()
     DWORD dwFunc = FUNC_ProcessCollision;
     DWORD dwThis = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -209,7 +209,7 @@ void CPhysicalSA::AddToMovingList()
     DWORD dwFunc = FUNC_CPhysical_AddToMovingList;
     DWORD dwThis = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -279,7 +279,7 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
     if (((CPhysicalSAInterface*)GetInterface())->m_pAttachedEntity == NULL)
         return;
 
-    _asm
+    __asm
     {
         push    bUnk
         push    fUnkZ
@@ -295,7 +295,7 @@ bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CV
     DWORD dwFunc = FUNC_AttachEntityToEntity;
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, vecRotation
         push    [ecx+8]

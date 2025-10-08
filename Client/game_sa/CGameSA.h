@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CGameSA.h
  *  PURPOSE:     Header file for base game logic handling class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -18,6 +18,7 @@
 #include "CCoverManagerSA.h"
 #include "CPlantManagerSA.h"
 #include "CRendererSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -174,20 +175,25 @@ public:
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
-    
+
+    CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept override
+    {
+        return m_pVehicleAudioSettingsManager.get();
+    }
+
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
-    int32_t GetBaseIDforDFF() { return 0; }
-    int32_t GetBaseIDforTXD() { return *(int32_t*)(0x407104 + 2); }
-    int32_t GetBaseIDforCOL() { return *(int32_t*)(0x410344 + 2); }
-    int32_t GetBaseIDforIPL() { return *(int32_t*)(0x4044F4 + 2); }
-    int32_t GetBaseIDforDAT() { return *(int32_t*)(0x44D064 + 2); }
-    int32_t GetBaseIDforIFP() { return *(int32_t*)(0x407124 + 2); }
-    int32_t GetBaseIDforRRR() { return *(int32_t*)(0x4594A1 + 2); }
-    int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
-    int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
+    uint32_t GetBaseIDforDFF() override { return 0; }
+    uint32_t GetBaseIDforTXD() override { return *(uint32_t*)(0x407104 + 2); }
+    uint32_t GetBaseIDforCOL() override { return *(uint32_t*)(0x410344 + 2); }
+    uint32_t GetBaseIDforIPL() override { return *(uint32_t*)(0x4044F4 + 2); }
+    uint32_t GetBaseIDforDAT() override { return *(uint32_t*)(0x44D064 + 2); }
+    uint32_t GetBaseIDforIFP() override { return *(uint32_t*)(0x407124 + 2); }
+    uint32_t GetBaseIDforRRR() override { return *(uint32_t*)(0x4594A1 + 2); }
+    uint32_t GetBaseIDforSCM() override { return *(uint32_t*)(0x46A574 + 2); }
+    uint32_t GetCountOfAllFileIDs() override { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
     DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
     int   GetSystemFrameCounter() const { return *(int*)0xB7CB4C; } // CTimer::m_FrameCounter
@@ -195,8 +201,8 @@ public:
     bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
     void         StartGame();
-    void         SetSystemState(eSystemState State);
-    eSystemState GetSystemState();
+    void         SetSystemState(SystemState State);
+    SystemState  GetSystemState();
     void         Pause(bool bPaused);
 
     void Initialize();
@@ -252,6 +258,9 @@ public:
 
     bool IsIgnoreFireStateEnabled() const noexcept override { return m_isIgnoreFireStateEnabled; }
     void SetIgnoreFireStateEnabled(bool isEnabled) override;
+
+    bool IsVehicleBurnExplosionsEnabled() const noexcept override { return m_isVehicleBurnExplosionsEnabled; }
+    void SetVehicleBurnExplosionsEnabled(bool isEnabled) override;
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -351,6 +360,8 @@ private:
     CPlantManagerSA*                  m_pPlantManager;
     CBuildingRemoval*                 m_pBuildingRemoval;
 
+    std::unique_ptr<CVehicleAudioSettingsManagerSA> m_pVehicleAudioSettingsManager;
+
     std::unique_ptr<CRendererSA>    m_pRenderer;
 
     CPad*                     m_pPad;
@@ -382,6 +393,7 @@ private:
     bool         m_isGameWorldRemoved{false};
     bool         m_isExtendedWaterCannonsEnabled{false};
     bool         m_isIgnoreFireStateEnabled{false};
+    bool         m_isVehicleBurnExplosionsEnabled{true};
 
     static unsigned int&  ClumpOffset;
 

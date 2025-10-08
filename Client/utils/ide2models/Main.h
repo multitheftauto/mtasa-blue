@@ -5,14 +5,13 @@
  *  FILE:        utils/ide2models/Main.h
  *  PURPOSE:     IDE to models converter
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
 #include <cstdio>
-using namespace std;
 
 int  main(int iArgumentCount, char* szArgs[]);
 int  Convert(FILE* pInput, FILE* pOutput);

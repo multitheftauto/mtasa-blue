@@ -5,7 +5,7 @@
  *  FILE:        SString.h
  *  PURPOSE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -98,6 +98,10 @@ public:
     void           AssignLeft(const char* szOther, uint uiMaxLength);
 };
 
+// When to use SStringX over SString:
+// - (Potential) macro conversions
+// - Trouble with implicit conversions
+// - Situations where a length parameter is needed
 class SStringX : public SString
 {
 public:

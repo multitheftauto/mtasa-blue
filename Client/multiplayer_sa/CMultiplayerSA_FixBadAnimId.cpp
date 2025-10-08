@@ -5,7 +5,7 @@
  *  FILE:        multiplayer_sa/CMultiplayerSA_FixBadAnimId.cpp
  *  PORPOISE:
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -21,7 +21,7 @@ eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimG
     pMultiplayer->SetLastStaticAnimationPlayed(*pAnimGroup, *pAnimId, *(DWORD*)0xb4ea34);
 
     // Fix #1109: Weapon Fire ancient crash with anim ID 224
-    if (*pAnimId == eAnimID::ANIM_ID_WEAPON_FIRE && *pAnimGroup != eAnimGroup::ANIM_GROUP_GRENADE)
+    if (*pAnimId == eAnimID::ANIM_ID_FIRE && *pAnimGroup != eAnimGroup::ANIM_GROUP_GRENADE)
     {
         if (*pAnimGroup < eAnimGroup::ANIM_GROUP_PYTHON || *pAnimGroup > eAnimGroup::ANIM_GROUP_GOGGLES)
         {
@@ -95,9 +95,11 @@ void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHie
 #define HOOKPOS_GetAnimHierarchyFromSkinClump        0x734A5D
 #define HOOKSIZE_GetAnimHierarchyFromSkinClump       7
 DWORD RETURN_GetAnimHierarchyFromSkinClump = 0x734A64;
-void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
+static void __declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push[esp + 32 + 0x0C]       // RpHAnimHierarchy* (return value)

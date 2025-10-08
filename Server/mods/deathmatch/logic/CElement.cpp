@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CElement.cpp
  *  PURPOSE:     Base entity (element) class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -508,12 +508,12 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType, eCustomDataClientTrust* clientChangesMode)
+CLuaArgument* CElement::GetCustomData(const CStringName& name, bool bInheritData, ESyncType* pSyncType, eCustomDataClientTrust* clientChangesMode)
 {
-    assert(szName);
+    assert(name);
 
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_CustomData.Get(szName);
+    SCustomData* pData = m_CustomData.Get(name);
     if (pData)
     {
         if (pSyncType)
@@ -528,7 +528,7 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESy
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pSyncType, clientChangesMode);
+        return m_pParent->GetCustomData(name, true, pSyncType, clientChangesMode);
     }
 
     // None available
@@ -540,20 +540,20 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
     assert(table);
 
     // Grab it and return a pointer to the variable
-    map<string, SCustomData>::const_iterator iter = m_CustomData.IterBegin();
+    auto iter = m_CustomData.IterBegin();
     for (; iter != m_CustomData.IterEnd(); iter++)
     {
-        table->PushString(iter->first.c_str());                // key
+        table->PushString(iter->first);                        // key
         table->PushArgument(iter->second.Variable);            // value
     }
 
     return table;
 }
 
-bool CElement::GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData)
+bool CElement::GetCustomDataString(const CStringName& name, char* pOut, size_t sizeBuffer, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Make sure it gets 0 terminated
@@ -589,10 +589,10 @@ bool CElement::GetCustomDataString(const char* szName, char* pOut, size_t sizeBu
     return false;
 }
 
-bool CElement::GetCustomDataInt(const char* szName, int& iOut, bool bInheritData)
+bool CElement::GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -627,10 +627,10 @@ bool CElement::GetCustomDataInt(const char* szName, int& iOut, bool bInheritData
     return false;
 }
 
-bool CElement::GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData)
+bool CElement::GetCustomDataFloat(const CStringName& name, float& fOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -654,10 +654,10 @@ bool CElement::GetCustomDataFloat(const char* szName, float& fOut, bool bInherit
     return false;
 }
 
-bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData)
+bool CElement::GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -709,78 +709,96 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
+bool CElement::SetCustomData(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
 {
-    assert(szName);
-    if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
+    assert(name);
+    if (name->length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
-        CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return;
+        CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(name.ToCString()).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+        return false;
     }
 
-    // Grab the old variable
+    // Grab the old variable and sync type
     CLuaArgument       oldVariable;
-    const SCustomData* pData = m_CustomData.Get(szName);
+    ESyncType          oldSyncType = ESyncType::LOCAL;
+    const SCustomData* pData = m_CustomData.Get(name);
     if (pData)
     {
         oldVariable = pData->Variable;
+        oldSyncType = pData->syncType;
     }
 
     // Set the new data
-    m_CustomData.Set(szName, Variable, syncType);
+    m_CustomData.Set(name, Variable, syncType);
 
     if (bTriggerEvent)
     {
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
+        Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(Variable);
-        CallEvent("onElementDataChange", Arguments, pClient);
+        if (!CallEvent("onElementDataChange", Arguments, pClient))
+        {
+            // Event was cancelled, restore previous value
+            if (pData)
+                m_CustomData.Set(name, oldVariable, oldSyncType);
+            else
+                m_CustomData.Delete(name);
+            return false;
+        }
     }
+    return true;
 }
 
-void CElement::DeleteCustomData(const char* szName)
+bool CElement::DeleteCustomData(const CStringName& name)
 {
     // Grab the old variable
-    SCustomData* pData = m_CustomData.Get(szName);
+    SCustomData* pData = m_CustomData.Get(name);
     if (pData)
     {
-        CLuaArgument oldVariable;
-        oldVariable = pData->Variable;
+        CLuaArgument oldVariable = pData->Variable;
+        ESyncType    oldSyncType = pData->syncType;
 
         // Delete the custom data
-        m_CustomData.Delete(szName);
+        m_CustomData.Delete(name);
 
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
+        Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
-        CallEvent("onElementDataChange", Arguments);
+        if (!CallEvent("onElementDataChange", Arguments))
+        {
+            // Event was cancelled, restore previous value
+            m_CustomData.Set(name, oldVariable, oldSyncType);
+            return false;
+        }
+        return true;
     }
+    return false;
 }
 
 // Used to send the root element data when a player joins
 void CElement::SendAllCustomData(CPlayer* pPlayer)
 {
-    for (map<std::string, SCustomData>::const_iterator iter = m_CustomData.SyncedIterBegin(); iter != m_CustomData.SyncedIterEnd(); ++iter)
+    for (auto iter = m_CustomData.SyncedIterBegin(); iter != m_CustomData.SyncedIterEnd(); ++iter)
     {
-        const std::string& strName = iter->first;
+        const CStringName& name = iter->first;
         const SCustomData& customData = iter->second;
 
         if (customData.syncType == ESyncType::LOCAL)
             continue;
 
         // Tell our clients to update their data
-        unsigned short usNameLength = static_cast<unsigned short>(strName.length());
+        unsigned short usNameLength = static_cast<unsigned short>(name->length());
         CBitStream     BitStream;
         BitStream.pBitStream->WriteCompressed(usNameLength);
-        BitStream.pBitStream->Write(strName.c_str(), usNameLength);
+        BitStream.pBitStream->Write(name.ToCString(), usNameLength);
         customData.Variable.WriteToBitStream(*BitStream.pBitStream);
 
-        if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, strName))
+        if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, name))
             pPlayer->Send(CElementRPCPacket(this, SET_ELEMENT_DATA, *BitStream.pBitStream));
     }
 }
@@ -1019,7 +1037,8 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
     }
 
     // Call it on all our children
-    for (CElement* pElement : *GetChildrenListSnapshot())
+    CElementListSnapshotRef childrenList = GetChildrenListSnapshot();
+	for (CElement* pElement : *childrenList)
     {
         if (!pElement->IsBeingDeleted())
         {

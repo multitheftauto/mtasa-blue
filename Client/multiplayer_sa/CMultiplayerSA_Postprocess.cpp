@@ -4,80 +4,79 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        multiplayer_sa/CMultiplayerSA_Postprocess.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 
-#define HOOKPOS_GrainEffect_NightModifier 0x704EE8
+#define HOOKPOS_GrainEffect_NightModifier    0x704EE8
 #define HOOKPOS_GrainEffect_InfraredModifier 0x704F59
-#define HOOKPOS_GrainEffect_RainModifier 0x705078
-#define HOOKPOS_GrainEffect_OverlayModifier 0x705091
+#define HOOKPOS_GrainEffect_RainModifier     0x705078
+#define HOOKPOS_GrainEffect_OverlayModifier  0x705091
 
 namespace GrainEffect
 {
+    static BYTE  ucGrainEnabled = FALSE;
+    static DWORD dwGrainStrength = 1;
 
-static BYTE ucGrainEnabled = FALSE;
-static DWORD dwGrainStrength = 1;
-
-struct MasterModifier
-{
-    static float fMultiplier;
-
-    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    struct MasterModifier
     {
-        return ((int(__cdecl*)(char, char))0x7037C0)(ucLevel * fMultiplier, ucUpdate);
-    }
-};
+        static float fMultiplier;
 
-struct InfraredModifier
-{
-    static float fMultiplier;
+        static void ApplyEffect(float grainStrength, bool updateGrainRaster)
+        {
+            void(__cdecl * CPostEffects__Grain)(int, bool) = reinterpret_cast<decltype(CPostEffects__Grain)>(0x7037C0);
+            CPostEffects__Grain(static_cast<int>(grainStrength * fMultiplier), updateGrainRaster);
+        }
+    };
 
-    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    struct InfraredModifier
     {
-        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
-    }
-};
+        static float fMultiplier;
 
-struct NightModifier
-{
-    static float fMultiplier;
+        static void ApplyEffect(int grainStrength, bool updateGrainRaster)
+        {
+            MasterModifier::ApplyEffect(grainStrength * fMultiplier, updateGrainRaster);
+        }
+    };
 
-    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    struct NightModifier
     {
-        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
-    }
-};
+        static float fMultiplier;
 
-struct RainModifier
-{
-    static float fMultiplier;
+        static void ApplyEffect(int grainStrength, bool updateGrainRaster)
+        {
+            MasterModifier::ApplyEffect(grainStrength * fMultiplier, updateGrainRaster);
+        }
+    };
 
-    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    struct RainModifier
     {
-        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
-    }
-};
+        static float fMultiplier;
 
-struct OverlayModifier
-{
-    static float fMultiplier;
+        static void ApplyEffect(int grainStrength, bool updateGrainRaster)
+        {
+            MasterModifier::ApplyEffect(grainStrength * fMultiplier, updateGrainRaster);
+        }
+    };
 
-    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    struct OverlayModifier
     {
-        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
-    }
-};
+        static float fMultiplier;
 
-float MasterModifier::fMultiplier = 1.0f;
-float InfraredModifier::fMultiplier = 1.0f;
-float NightModifier::fMultiplier = 1.0f;
-float RainModifier::fMultiplier = 1.0f;
-float OverlayModifier::fMultiplier = 1.0f;
+        static void ApplyEffect(int grainStrength, bool updateGrainRaster)
+        {
+            MasterModifier::ApplyEffect(grainStrength * fMultiplier, updateGrainRaster);
+        }
+    };
 
-}
+    float MasterModifier::fMultiplier = 1.0f;
+    float InfraredModifier::fMultiplier = 1.0f;
+    float NightModifier::fMultiplier = 1.0f;
+    float RainModifier::fMultiplier = 1.0f;
+    float OverlayModifier::fMultiplier = 1.0f;
+}            // namespace GrainEffect
 
 void CMultiplayerSA::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)
 {
@@ -87,26 +86,27 @@ void CMultiplayerSA::SetGrainMultiplier(eGrainMultiplierType type, float fMultip
 
     switch (type)
     {
-    case eGrainMultiplierType::MASTER:
-        MasterModifier::fMultiplier = fMultiplier;
-        break;
-    case eGrainMultiplierType::INFRARED:
-        InfraredModifier::fMultiplier = fMultiplier;
-        break;
-    case eGrainMultiplierType::NIGHT:
-        NightModifier::fMultiplier = fMultiplier;
-        break;
-    case eGrainMultiplierType::RAIN:
-        RainModifier::fMultiplier = fMultiplier;
-        break;
-    case eGrainMultiplierType::OVERLAY:
-        OverlayModifier::fMultiplier = fMultiplier;
-        break;
-    case eGrainMultiplierType::ALL:
-        MasterModifier::fMultiplier = InfraredModifier::fMultiplier = NightModifier::fMultiplier = RainModifier::fMultiplier = OverlayModifier::fMultiplier = fMultiplier;
-        break;
-    default:
-        break;
+        case eGrainMultiplierType::MASTER:
+            MasterModifier::fMultiplier = fMultiplier;
+            break;
+        case eGrainMultiplierType::INFRARED:
+            InfraredModifier::fMultiplier = fMultiplier;
+            break;
+        case eGrainMultiplierType::NIGHT:
+            NightModifier::fMultiplier = fMultiplier;
+            break;
+        case eGrainMultiplierType::RAIN:
+            RainModifier::fMultiplier = fMultiplier;
+            break;
+        case eGrainMultiplierType::OVERLAY:
+            OverlayModifier::fMultiplier = fMultiplier;
+            break;
+        case eGrainMultiplierType::ALL:
+            MasterModifier::fMultiplier = InfraredModifier::fMultiplier = NightModifier::fMultiplier = RainModifier::fMultiplier =
+                OverlayModifier::fMultiplier = fMultiplier;
+            break;
+        default:
+            break;
     }
 }
 
@@ -119,7 +119,7 @@ void CMultiplayerSA::SetGrainLevel(BYTE ucLevel)
     GrainEffect::dwGrainStrength = static_cast<DWORD>(ucLevel);
 
     if (bEnable == bOverridden)
-        return;    
+        return;
 
     if (bEnable)
     {
@@ -136,14 +136,8 @@ void CMultiplayerSA::SetGrainLevel(BYTE ucLevel)
 
 void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
-    if (bEnabled)
-    {
-        MemPutFast<BYTE>(0xC402B8, 1);
-    }
-    else
-    {
-        MemPutFast<BYTE>(0xC402B8, 0);
-    }
+    MemPutFast<BYTE>(0xC402B8, bEnabled ? 1 : 0);            // bool CPostEffects::m_bNightVision
+
     if (bNoiseEnabled)
     {
         HookInstallCall(0x704EE8, (DWORD)GrainEffect::NightModifier::ApplyEffect);
@@ -156,14 +150,8 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 
 void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
-    if (bEnabled)
-    {
-        MemPutFast<BYTE>(0xC402B9, 1);
-    }
-    else
-    {
-        MemPutFast<BYTE>(0xC402B9, 0);
-    }
+    MemPutFast<BYTE>(0xC402B9, bEnabled ? 1 : 0);            // bool CPostEffects::m_bInfraredVision
+
     if (bNoiseEnabled)
     {
         HookInstallCall(0x704F59, (DWORD)GrainEffect::InfraredModifier::ApplyEffect);
@@ -176,12 +164,12 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 
 bool CMultiplayerSA::IsNightVisionEnabled()
 {
-    return (*(BYTE*)0xC402B8 == 1);
+    return (*(BYTE*)0xC402B8 == 1);            // bool CPostEffects::m_bNightVision
 }
 
 bool CMultiplayerSA::IsThermalVisionEnabled()
 {
-    return (*(BYTE*)0xC402B9 == 1);
+    return (*(BYTE*)0xC402B9 == 1);            // bool CPostEffects::m_bInfraredVision
 }
 
 void CMultiplayerSA::InitHooks_Postprocess()

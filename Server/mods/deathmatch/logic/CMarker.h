@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CMarker.h
  *  PURPOSE:     Marker entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

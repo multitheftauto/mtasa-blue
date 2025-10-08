@@ -5,7 +5,7 @@
  *  FILE:        gui/CGUIWebBrowser_Impl.cpp
  *  PURPOSE:     WebBrowser widget class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include "StdInc.h"
@@ -18,7 +18,7 @@ CGUIWebBrowser_Impl::CGUIWebBrowser_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
     m_pImageset = nullptr;
     m_pImage = nullptr;
     m_pGUI = pGUI;
-    m_pManager = pGUI;
+    SetManager(pGUI);
     m_pWebView = nullptr;
 
     // Get an unique identifier for CEGUI

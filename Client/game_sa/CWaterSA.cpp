@@ -5,7 +5,7 @@
  *  FILE:        game_sa/CWaterSA.cpp
  *  PURPOSE:     Control the lakes and seas
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

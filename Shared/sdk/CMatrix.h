@@ -5,7 +5,7 @@
  *  FILE:        sdk/CMatrix.h
  *  PURPOSE:     4x3 GTA matrix class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 

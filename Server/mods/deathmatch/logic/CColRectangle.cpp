@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CColRectangle.cpp
  *  PURPOSE:     Rectangle-shaped collision entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -34,8 +34,9 @@ bool CColRectangle::DoHitDetection(const CVector& vecNowPosition)
     // FIXME: What about radius?
 
     // See if the now position is within our cube
-    return (vecNowPosition.fX >= m_vecPosition.fX && vecNowPosition.fX <= m_vecPosition.fX + m_vecSize.fX && vecNowPosition.fY >= m_vecPosition.fY &&
-            vecNowPosition.fY <= m_vecPosition.fY + m_vecSize.fY);
+    const CVector& vecPosition = GetPosition();
+    return (vecNowPosition.fX >= vecPosition.fX && vecNowPosition.fX <= vecPosition.fX + m_vecSize.fX && vecNowPosition.fY >= vecPosition.fY &&
+            vecNowPosition.fY <= vecPosition.fY + m_vecSize.fY);
 }
 
 bool CColRectangle::ReadSpecialData(const int iLine)

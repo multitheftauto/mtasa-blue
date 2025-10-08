@@ -5,7 +5,7 @@
  *  FILE:        launcher/Main.cpp
  *  PURPOSE:     Launcher entry
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
     {
         // Grab the entrypoint
         typedef int(Main_t)(int, char*[]);
-        Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>((long long)(Core.GetProcedureAddress("Run")));
+        Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>(Core.GetProcedureAddress("Run"));
         if (pfnEntryPoint)
         {
             // Call it and return what it returns

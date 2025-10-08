@@ -5,7 +5,7 @@
  *  FILE:        core/CGUI.cpp
  *  PURPOSE:     Core graphical user interface container class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -44,6 +44,7 @@ CLocalGUI::CLocalGUI()
 
     m_LastSettingsRevision = -1;
     m_LocaleChangeCounter = 0;
+    m_bHasQueuedLocaleChange = false;
 }
 
 CLocalGUI::~CLocalGUI()
@@ -123,8 +124,15 @@ void CLocalGUI::ChangeLocale(const char* szName)
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
     m_LastSettingsRevision = cvars->GetRevision();
 
-    g_pLocalization->SetCurrentLanguage();
-    m_LastLocaleName = szName;
+    g_pLocalization->SetCurrentLanguage(szName ? szName : "");
+
+    SString strCanonicalLocale = g_pLocalization->GetLanguageCode();
+    if (strCanonicalLocale.empty())
+        strCanonicalLocale = CVARS_GET_VALUE<SString>("locale");
+    if (strCanonicalLocale.empty() && szName)
+        strCanonicalLocale = szName;
+
+    m_LastLocaleName = strCanonicalLocale;
 
     if (guiWasLoaded)
     {
@@ -158,7 +166,7 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     m_pLabelVersionTag->SetTextColor(255, 255, 255);
     m_pLabelVersionTag->SetZOrderingEnabled(false);
     m_pLabelVersionTag->MoveToBack();
-    if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
+    if (MTASA_VERSION_TYPE < VERSION_TYPE_UNTESTED)
         m_pLabelVersionTag->SetAlwaysOnTop(true);
 
     // Create mainmenu
@@ -211,6 +219,78 @@ void CLocalGUI::DestroyObjects()
     SAFE_DELETE(m_pLabelVersionTag);
 }
 
+void CLocalGUI::RequestLocaleChange(const SString& strLocale)
+{
+    if (strLocale.empty())
+        return;
+
+    if (m_bHasQueuedLocaleChange && strLocale == m_QueuedLocaleChange)
+        return;
+
+    const SString strCurrentLocale = CVARS_GET_VALUE<SString>("locale");
+    if (!m_bHasQueuedLocaleChange && strLocale == strCurrentLocale && strLocale == m_LastLocaleName)
+        return;
+
+    if (m_LocaleChangeCounter > 0)
+        CCore::GetSingleton().RemoveMessageBox();
+
+    m_QueuedLocaleChange = strLocale;
+    m_bHasQueuedLocaleChange = true;
+    m_LocaleChangeCounter = 0;
+
+    // Keep the cvar at the last applied locale so dependent systems remain stable while we rebuild UI
+    if (!m_LastLocaleName.empty() && strCurrentLocale != m_LastLocaleName)
+        CVARS_SET("locale", m_LastLocaleName);
+}
+
+void CLocalGUI::ApplyQueuedLocale()
+{
+    if (!m_bHasQueuedLocaleChange)
+        return;
+
+    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+
+    if (m_QueuedLocaleChange.empty())
+    {
+        m_bHasQueuedLocaleChange = false;
+        m_LocaleChangeCounter = 0;
+        CCore::GetSingleton().RemoveMessageBox();
+        return;
+    }
+
+    if (CCore::GetSingleton().GetModManager()->IsLoaded())
+    {
+        CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing language");
+        if (cvars)
+            cvars->Set("locale", m_LastLocaleName);
+
+        m_bHasQueuedLocaleChange = false;
+        m_QueuedLocaleChange.clear();
+        m_LocaleChangeCounter = 0;
+        CCore::GetSingleton().RemoveMessageBox();
+        return;
+    }
+
+    ChangeLocale(m_QueuedLocaleChange);
+
+    m_bHasQueuedLocaleChange = false;
+    SString strAppliedLocale = m_LastLocaleName;
+    m_QueuedLocaleChange.clear();
+    m_LocaleChangeCounter = 0;
+
+    if (!strAppliedLocale.empty())
+    {
+        SString strCurrentLocale = CVARS_GET_VALUE<SString>("locale");
+        if (strCurrentLocale != strAppliedLocale)
+            CVARS_SET("locale", strAppliedLocale);
+    }
+
+    if (cvars)
+        m_LastSettingsRevision = cvars->GetRevision();
+
+    CCore::GetSingleton().RemoveMessageBox();
+}
+
 void CLocalGUI::DoPulse()
 {
     m_pVersionUpdater->DoPulse();
@@ -247,33 +327,21 @@ void CLocalGUI::DoPulse()
         {
             m_LastLocaleName = currentLocaleName;
         }
-        if (currentLocaleName != m_LastLocaleName)
+        else if (!m_bHasQueuedLocaleChange && currentLocaleName != m_LastLocaleName)
         {
-            m_LocaleChangeCounter++;
-            if (m_LocaleChangeCounter < 5)
-            {
-                // Do GUI stuff for first 5 frames
-                // Force pulse next time
-                m_LastSettingsRevision = cvars->GetRevision() - 1;
-
-                if (m_LocaleChangeCounter == 2)
-                    CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("Changing language, please wait..."), MB_ICON_INFO);
-            }
-            else
-            {
-                // Do actual locale change
-                m_LocaleChangeCounter = 0;
-                CCore::GetSingleton().RemoveMessageBox();
-
-                if (!CCore::GetSingleton().GetModManager()->IsLoaded())
-                    ChangeLocale(currentLocaleName);
-                else
-                {
-                    CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing language");
-                    cvars->Set("locale", m_LastLocaleName);
-                }
-            }
+            RequestLocaleChange(currentLocaleName);
         }
+    }
+
+    if (m_bHasQueuedLocaleChange)
+    {
+        m_LocaleChangeCounter++;
+
+        if (m_LocaleChangeCounter == 2)
+            CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("Changing language, please wait..."), MB_ICON_INFO);
+
+        if (m_LocaleChangeCounter >= 5)
+            ApplyQueuedLocale();
     }
 }
 
@@ -281,17 +349,17 @@ void CLocalGUI::Draw()
 {
     // Get the game interface
     CGame*       pGame = CCore::GetSingleton().GetGame();
-    eSystemState SystemState = pGame->GetSystemState();
+    SystemState  systemState = pGame->GetSystemState();
     CGUI*        pGUI = CCore::GetSingleton().GetGUI();
 
     // Update mainmenu stuff
     m_pMainMenu->Update();
 
     // If we're ingame, make sure the chatbox is drawn
-    bool bChatVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bChatVisible = (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pChat->IsVisible() != bChatVisible)
         m_pChat->SetVisible(bChatVisible, !bChatVisible);
-    bool bDebugVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bDebugVisible = (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pDebugView->IsVisible() != bDebugVisible)
         m_pDebugView->SetVisible(bDebugVisible, true);
 
@@ -305,7 +373,7 @@ void CLocalGUI::Draw()
 
     // If we're not at the loadingscreen
     static bool bDelayedFrame = false;
-    if (SystemState != 8 || !bDelayedFrame /* GS_INIT_PLAYING_GAME */)
+    if (systemState != SystemState::GS_INIT_PLAYING_GAME || !bDelayedFrame)
     {
         // If we have a GUI manager, draw the GUI
         if (pGUI)
@@ -314,7 +382,7 @@ void CLocalGUI::Draw()
         }
 
         // If the system state was 8, make sure we don't do another delayed frame
-        if (SystemState == 8)
+        if (systemState == SystemState::GS_INIT_PLAYING_GAME)
         {
             bDelayedFrame = true;
         }
@@ -700,9 +768,21 @@ bool CLocalGUI::InputGoesToGUI()
     if (!pGUI)
         return false;
 
-    // Here we're supposed to check if things like menues are up, console is up or the chatbox is expecting input
-    // If the console is visible OR the chat is expecting input OR the mainmenu is visible
-    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
+    bool shouldShowCursorForGUI = false;
+    if (pGUI->GetGUIInputEnabled())
+    {
+        eInputMode inputMode = pGUI->GetGUIInputMode();
+        if (inputMode == INPUTMODE_NO_BINDS_ON_EDIT)
+        {
+            shouldShowCursorForGUI = true;
+        }
+        else if (inputMode == INPUTMODE_NO_BINDS)
+        {
+            shouldShowCursorForGUI = false;
+        }
+    }
+    
+    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || shouldShowCursorForGUI ||
             !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
 }
 

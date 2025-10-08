@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CVoiceRecorder.h
  *  PURPOSE:     Remote player voice chat playback
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -28,7 +28,7 @@ public:
     ZERO_ON_NEW
     CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder);
     ~CClientPlayerVoice();
-    void DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten);
+    void DecodeAndBuffer(const unsigned char* voiceBuffer, unsigned int voiceBufferLength);
     void DoPulse();
 
     bool m_bVoiceActive;
@@ -72,6 +72,9 @@ public:
 
     bool SetFxEffect(uint uiFxEffect, bool bEnable);
     bool IsFxEffectEnabled(uint uiFxEffect);
+
+    bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params);
+    bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params);
 
     bool IsActive() { return m_bVoiceActive; }
 

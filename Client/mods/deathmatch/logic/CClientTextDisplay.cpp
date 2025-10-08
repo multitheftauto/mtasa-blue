@@ -14,16 +14,12 @@ using std::list;
 
 float CClientTextDisplay::m_fGlobalScale = 1.0f;
 
-CClientTextDisplay::CClientTextDisplay(CClientDisplayManager* pDisplayManager, int ID) : CClientDisplay(pDisplayManager, ID)
+CClientTextDisplay::CClientTextDisplay(int ID) : CClientDisplay(ID)
 {
     // Init
     m_fScale = 1;
     m_ulFormat = 0;
     m_bVisible = true;
-}
-
-CClientTextDisplay::~CClientTextDisplay()
-{
 }
 
 void CClientTextDisplay::SetCaption(const char* szCaption)
