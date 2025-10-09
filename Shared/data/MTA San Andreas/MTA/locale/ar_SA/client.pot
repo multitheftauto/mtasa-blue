@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-07 19:25+0000\n"
-"PO-Revision-Date: 2025-10-08 20:59\n"
+"PO-Revision-Date: 2025-10-09 13:02\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1602,7 +1602,7 @@ msgstr "العرض في المستكشف"
 #. Process affinity
 #: Client/core/CSettings.cpp:1851
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr "عيّن توافقيّة المعالج CPU 0 لتحسين أداء اللعبة"
+msgstr "اضبط ارتباط المعالج على 0 لتحسين أداء اللعبة"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1857 Client/core/CSettings.cpp:1860
