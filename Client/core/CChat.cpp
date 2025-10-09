@@ -27,6 +27,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     // Calculate relative position (assuming a 800x600 native resolution for our defined CCHAT_* values)
     CVector2D vecResolution = m_pManager->GetResolution();
     m_vecScale = CVector2D(vecResolution.fX / 800.0f, vecResolution.fY / 600.0f);
+    m_previousScale = m_vecScale;
     m_vecBackgroundPosition = vecPosition * vecResolution;
 
     // Initialize variables
@@ -737,7 +738,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                         {
                             // Check size if it's ok, then output
                             SString strOutput = strCurrentInput.replace(iFound, std::string::npos, strPlayerName);
-                            if (MbUTF8ToUTF16(strOutput).size() < m_iCharacterLimit)
+                            if (MbUTF8ToUTF16(strOutput).size() < static_cast<size_t>(m_iCharacterLimit))
                             {
                                 bSuccess = true;
                                 m_strLastPlayerNamePart = strPlayerNamePart;
@@ -802,7 +803,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             }
 
             // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-            if (MbUTF8ToUTF16(m_strInputText).size() < m_iCharacterLimit)
+            if (MbUTF8ToUTF16(m_strInputText).size() < static_cast<size_t>(m_iCharacterLimit))
             {
                 if (KeyboardArgs.codepoint >= 32)
                 {
@@ -914,6 +915,13 @@ void CChat::SetDxFont(LPD3DXFONT pDXFont)
 
 void CChat::UpdateGUI()
 {
+    // Check if scale has changed and invalidate cached widths if so
+    if (m_vecScale != m_previousScale)
+    {
+        InvalidateAllCachedWidths();
+        m_previousScale = m_vecScale;
+    }
+
     m_vecBackgroundSize = CVector2D(m_fNativeWidth * m_vecScale.fX, CChat::GetFontHeight(m_vecScale.fY) * (float(m_uiNumLines) + 0.5f));
     m_vecBackgroundSize.fX = Round(m_vecBackgroundSize.fX);
     m_vecBackgroundSize.fY = Round(m_vecBackgroundSize.fY);
@@ -933,6 +941,15 @@ void CChat::UpdateGUI()
     }
 
     UpdatePosition();
+}
+
+void CChat::InvalidateAllCachedWidths()
+{
+    for (int i = 0; i < CHAT_MAX_LINES; i++)
+    {
+        m_Lines[i].InvalidateCache();
+    }
+    m_InputLine.InvalidateCache();
 }
 
 void CChat::UpdatePosition()
@@ -1166,78 +1183,78 @@ const char* CalcAnsiPtr(const char* szStringAnsi, const wchar_t* szPosition)
     return szStringAnsi + iOffset;
 }
 
-const char* CChatLine::Format(const char* szStringAnsi, float fWidth, CColor& color, bool bColorCoded)
+const char* CChatLine::Format(const char* text, float width, CColor& color, bool colorCoded)
 {
-    std::wstring   wString = MbUTF8ToUTF16(szStringAnsi);
+    std::wstring   wString = MbUTF8ToUTF16(text);
     const wchar_t* szString = wString.c_str();
 
-    float fPrevSectionsWidth = 0.0f;
+    float prevSectionsWidth = 0.0f;
     m_Sections.clear();
 
-    const wchar_t* szSectionStart = szString;
-    const wchar_t* szSectionEnd = szString;
-    const wchar_t* szLastWrapPoint = szString;
-    bool           bLastSection = false;
-    while (!bLastSection)            // iterate over sections
+    const wchar_t* sectionStart = szString;
+    const wchar_t* sectionEnd = szString;
+    const wchar_t* lastWrapPoint = szString;
+    bool           lastSection = false;
+    while (!lastSection)            // iterate over sections
     {
         m_Sections.resize(m_Sections.size() + 1);
         CChatLineSection& section = *(m_Sections.end() - 1);
         section.SetColor(color);
 
-        if (m_Sections.size() > 1 && bColorCoded)            // If we've processed sections before
-            szSectionEnd += 7;                               // skip the color code
+        if (m_Sections.size() > 1 && colorCoded)            // If we've processed sections before
+            sectionEnd += 7;                               // skip the color code
 
-        szSectionStart = szSectionEnd;
-        szLastWrapPoint = szSectionStart;
-        unsigned int uiSeekPos = 0;
-        std::wstring strSectionStart = szSectionStart;
+        sectionStart = sectionEnd;
+        lastWrapPoint = sectionStart;
+        unsigned int seekPos = 0;
+        std::wstring strSectionStart = sectionStart;
 
         while (true)            // find end of this section
         {
-            float fSectionWidth = CChat::GetTextExtent(UTF16ToMbUTF8(strSectionStart.substr(0, uiSeekPos)).c_str(), g_pChat->m_vecScale.fX);
+            float sectionWidth = CChat::GetTextExtent(UTF16ToMbUTF8(strSectionStart.substr(0, seekPos)).c_str(), g_pChat->m_vecScale.fX);
 
-            if (*szSectionEnd == '\0' || *szSectionEnd == '\n' || std::ceil(fPrevSectionsWidth + fSectionWidth) > fWidth)
+            if (*sectionEnd == '\0' || *sectionEnd == '\n' || std::ceil(prevSectionsWidth + sectionWidth) > width)
             {
-                bLastSection = true;
+                lastSection = true;
                 break;
             }
-            if (bColorCoded && IsColorCode(UTF16ToMbUTF8(szSectionEnd).c_str()))
+            if (colorCoded && IsColorCode(UTF16ToMbUTF8(sectionEnd).c_str()))
             {
-                unsigned long ulColor = 0;
-                sscanf(UTF16ToMbUTF8(szSectionEnd).c_str() + 1, "%06x", &ulColor);
-                color = ulColor;
-                fPrevSectionsWidth += fSectionWidth;
+                unsigned long colorValue = 0;
+                sscanf(UTF16ToMbUTF8(sectionEnd).c_str() + 1, "%06x", &colorValue);
+                color = colorValue;
+                prevSectionsWidth += sectionWidth;
                 break;
             }
-            if (isspace((unsigned char)*szSectionEnd) || ispunct((unsigned char)*szSectionEnd))
+            if (isspace((unsigned char)*sectionEnd) || ispunct((unsigned char)*sectionEnd))
             {
-                szLastWrapPoint = szSectionEnd;
+                lastWrapPoint = sectionEnd;
             }
-            szSectionEnd++;
-            uiSeekPos++;
+            sectionEnd++;
+            seekPos++;
         }
-        section.m_strText = UTF16ToMbUTF8(strSectionStart.substr(0, uiSeekPos));
+        section.m_text = UTF16ToMbUTF8(strSectionStart.substr(0, seekPos));
     }
 
-    if (*szSectionEnd == '\0')
+    if (*sectionEnd == '\0')
     {
-        return NULL;
+        return nullptr;
     }
-    else if (*szSectionEnd == '\n')
+    else if (*sectionEnd == '\n')
     {
-        return CalcAnsiPtr(szStringAnsi, szSectionEnd + 1);
+        return CalcAnsiPtr(text, sectionEnd + 1);
     }
     else
     {
         // Do word wrap
-        if (szLastWrapPoint == szSectionStart)
+        if (lastWrapPoint == sectionStart)
         {
             // Wrapping point coincides with the start of a section.
-            if (szLastWrapPoint == szString)
+            if (lastWrapPoint == szString)
             {
                 // The line consists of one huge word. Leave the one section we created as it
-                // is (with the huge word cut off) and return szRemaining as the rest of the word
-                return CalcAnsiPtr(szStringAnsi, szSectionEnd);
+                // is (with the huge word cut off) and return remaining as the rest of the word
+                return CalcAnsiPtr(text, sectionEnd);
             }
             else
             {
@@ -1249,56 +1266,61 @@ const char* CChatLine::Format(const char* szStringAnsi, float fWidth, CColor& co
         {
             // Wrapping point is in the middle of a section, truncate
             CChatLineSection& last = *(m_Sections.end() - 1);
-            std::wstring      wstrTemp = MbUTF8ToUTF16(last.m_strText);
-            wstrTemp.resize(szLastWrapPoint - szSectionStart);
-            last.m_strText = UTF16ToMbUTF8(wstrTemp);
+            std::wstring      wstrTemp = MbUTF8ToUTF16(last.m_text);
+            wstrTemp.resize(lastWrapPoint - sectionStart);
+            last.m_text = UTF16ToMbUTF8(wstrTemp);
         }
-        return CalcAnsiPtr(szStringAnsi, szLastWrapPoint);
+        return CalcAnsiPtr(text, lastWrapPoint);
     }
 }
 
-void CChatLine::Draw(const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline, const CRect2D& RenderBounds)
+void CChatLine::Draw(const CVector2D& position, unsigned char alpha, bool shadow, bool outline, const CRect2D& renderBounds)
 {
-    float                                   fCurrentX = vecPosition.fX;
-    std::vector<CChatLineSection>::iterator iter = m_Sections.begin();
-    for (; iter != m_Sections.end(); iter++)
+    float currentX = position.fX;
+    for (auto& section : m_Sections)
     {
-        (*iter).Draw(CVector2D(fCurrentX, vecPosition.fY), ucAlpha, bShadow, bOutline, RenderBounds);
-        fCurrentX += (*iter).GetWidth();
+        section.Draw(CVector2D(currentX, position.fY), alpha, shadow, outline, renderBounds);
+        currentX += section.GetWidth();
     }
 }
 
-float CChatLine::GetWidth()
+float CChatLine::GetWidth() const
 {
-    float                                   fWidth = 0.0f;
-    std::vector<CChatLineSection>::iterator it;
-    for (it = m_Sections.begin(); it != m_Sections.end(); it++)
+    float width = 0.0f;
+    for (const auto& section : m_Sections)
     {
-        fWidth += (*it).GetWidth();
+        width += section.GetWidth();
     }
-    return fWidth;
+    return width;
 }
 
-void CChatInputLine::Draw(CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline)
+void CChatLine::InvalidateCache()
 {
-    CRect2D RenderBounds(0, 0, 9999, 9999);
+    for (auto& section : m_Sections)
+    {
+        section.InvalidateCache();
+    }
+}
 
-    CColor colPrefix;
-    m_Prefix.GetColor(colPrefix);
-    if (colPrefix.A > 0)
-        m_Prefix.Draw(vecPosition, colPrefix.A, bShadow, bOutline, RenderBounds);
+void CChatInputLine::Draw(CVector2D& position, unsigned char alpha, bool shadow, bool outline)
+{
+    CRect2D renderBounds(0, 0, 9999, 9999);
+
+    CColor prefixColor;
+    m_Prefix.GetColor(prefixColor);
+    if (prefixColor.A > 0)
+        m_Prefix.Draw(position, prefixColor.A, shadow, outline, renderBounds);
 
     if (g_pChat->m_InputTextColor.A > 0 && m_Sections.size() > 0)
     {
-        m_Sections[0].Draw(CVector2D(vecPosition.fX + m_Prefix.GetWidth(), vecPosition.fY), g_pChat->m_InputTextColor.A, bShadow, bOutline, RenderBounds);
+        m_Sections[0].Draw(CVector2D(position.fX + m_Prefix.GetWidth(), position.fY), g_pChat->m_InputTextColor.A, shadow, outline, renderBounds);
 
-        float fLineDifference = CChat::GetFontHeight(g_pChat->m_vecScale.fY);
+        float lineDifference = CChat::GetFontHeight(g_pChat->m_vecScale.fY);
 
-        vector<CChatLine>::iterator iter = m_ExtraLines.begin();
-        for (; iter != m_ExtraLines.end(); iter++)
+        for (auto& line : m_ExtraLines)
         {
-            vecPosition.fY += fLineDifference;
-            (*iter).Draw(vecPosition, g_pChat->m_InputTextColor.A, bShadow, bOutline, RenderBounds);
+            position.fY += lineDifference;
+            line.Draw(position, g_pChat->m_InputTextColor.A, shadow, outline, renderBounds);
         }
     }
 }
@@ -1309,10 +1331,20 @@ void CChatInputLine::Clear()
     m_ExtraLines.clear();
 }
 
+void CChatInputLine::InvalidateCache()
+{
+    CChatLine::InvalidateCache();
+    m_Prefix.InvalidateCache();
+    for (auto& line : m_ExtraLines)
+    {
+        line.InvalidateCache();
+    }
+}
+
 CChatLineSection::CChatLineSection()
 {
-    m_fCachedWidth = -1.0f;
-    m_uiCachedLength = 0;
+    m_cachedWidth = -1.0f;
+    m_cachedLength = 0;
 }
 
 CChatLineSection::CChatLineSection(const CChatLineSection& other)
@@ -1322,35 +1354,41 @@ CChatLineSection::CChatLineSection(const CChatLineSection& other)
 
 CChatLineSection& CChatLineSection::operator=(const CChatLineSection& other)
 {
-    m_strText = other.m_strText;
-    m_Color = other.m_Color;
-    m_fCachedWidth = other.m_fCachedWidth;
-    m_uiCachedLength = other.m_uiCachedLength;
+    m_text = other.m_text;
+    m_color = other.m_color;
+    m_cachedWidth = other.m_cachedWidth;
+    m_cachedLength = other.m_cachedLength;
     return *this;
 }
 
-void CChatLineSection::Draw(const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline, const CRect2D& RenderBounds)
+void CChatLineSection::Draw(const CVector2D& position, unsigned char alpha, bool shadow, bool outline, const CRect2D& renderBounds)
 {
-    if (!m_strText.empty() && ucAlpha > 0)
+    if (!m_text.empty() && alpha > 0)
     {
-        if (bShadow)
+        if (shadow)
         {
-            CRect2D drawShadowAt(vecPosition.fX + 1.0f, vecPosition.fY + 1.0f, vecPosition.fX + 1000.0f, vecPosition.fY + 1000.0f);
-            CChat::DrawTextString(m_strText.c_str(), drawShadowAt, 0.0f, drawShadowAt, 0, COLOR_ARGB(ucAlpha, 0, 0, 0), g_pChat->m_vecScale.fX,
-                                  g_pChat->m_vecScale.fY, bOutline, RenderBounds);
+            CRect2D drawShadowAt(position.fX + 1.0f, position.fY + 1.0f, position.fX + 1000.0f, position.fY + 1000.0f);
+            CChat::DrawTextString(m_text.c_str(), drawShadowAt, 0.0f, drawShadowAt, 0, COLOR_ARGB(alpha, 0, 0, 0), g_pChat->m_vecScale.fX,
+                                  g_pChat->m_vecScale.fY, outline, renderBounds);
         }
-        CRect2D drawAt(vecPosition.fX, vecPosition.fY, vecPosition.fX + 1000.0f, vecPosition.fY + 1000.0f);
-        CChat::DrawTextString(m_strText.c_str(), drawAt, 0.0f, drawAt, 0, COLOR_ARGB(ucAlpha, m_Color.R, m_Color.G, m_Color.B), g_pChat->m_vecScale.fX,
-                              g_pChat->m_vecScale.fY, bOutline, RenderBounds);
+        CRect2D drawAt(position.fX, position.fY, position.fX + 1000.0f, position.fY + 1000.0f);
+        CChat::DrawTextString(m_text.c_str(), drawAt, 0.0f, drawAt, 0, COLOR_ARGB(alpha, m_color.R, m_color.G, m_color.B), g_pChat->m_vecScale.fX,
+                              g_pChat->m_vecScale.fY, outline, renderBounds);
     }
 }
 
-float CChatLineSection::GetWidth()
+float CChatLineSection::GetWidth() const
 {
-    if (m_fCachedWidth < 0.0f || m_strText.size() != m_uiCachedLength)
+    if (m_cachedWidth < 0.0f || m_text.size() != m_cachedLength)
     {
-        m_fCachedWidth = std::ceil(CChat::GetTextExtent(m_strText.c_str(), g_pChat->m_vecScale.fX) / std::max(0.01f, g_pChat->m_vecScale.fX));
-        m_uiCachedLength = m_strText.size();
+        m_cachedWidth = std::ceil(CChat::GetTextExtent(m_text.c_str(), g_pChat->m_vecScale.fX) / std::max(0.01f, g_pChat->m_vecScale.fX));
+        m_cachedLength = m_text.size();
     }
-    return m_fCachedWidth * g_pChat->m_vecScale.fX;
+    return m_cachedWidth * g_pChat->m_vecScale.fX;
+}
+
+void CChatLineSection::InvalidateCache()
+{
+    m_cachedWidth = -1.0f;
+    m_cachedLength = 0;
 }

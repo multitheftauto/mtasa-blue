@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
@@ -12,70 +12,53 @@
 #include "CPickupManager.h"
 #include "CWeaponStatManager.h"
 
-CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID PlayerID) : m_PlayerID(PlayerID)
+CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID id) : m_id(id) {}
+
+bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
 {
-    m_Cache.ucOrderCounter = 0;
-    m_Cache.fDamage = 0;
-    m_Cache.ucHitZone = 0;
-    m_Cache.DamagedPlayerID = INVALID_ELEMENT_ID;
-}
-
-//
-// Should do the same this as what CBulletsyncPacket::Read() does
-//
-bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
-{
-    char cWeaponType = 0;
-    if (!BitStream.Read(cWeaponType) || !CWeaponStatManager::HasWeaponBulletSync(cWeaponType))
-        return false;
-    m_Cache.weaponType = (eWeaponType)cWeaponType;
-
-    if (!BitStream.Read((char*)&m_Cache.vecStart, sizeof(CVector)) || !BitStream.Read((char*)&m_Cache.vecEnd, sizeof(CVector)))
+    char type = 0;
+    if (!stream.Read(type) || !CWeaponStatManager::HasWeaponBulletSync(type))
         return false;
 
-    if (!m_Cache.vecStart.IsValid() || !m_Cache.vecEnd.IsValid())
+    m_cache.weapon = static_cast<eWeaponType>(type);
+
+    if (!stream.Read(reinterpret_cast<char*>(&m_cache.start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&m_cache.end), sizeof(CVector)))
         return false;
 
-    // Duplicate packet protection
-    if (!BitStream.Read(m_Cache.ucOrderCounter))
+    if (!m_cache.start.IsValid() || !m_cache.end.IsValid())
         return false;
 
-    if (BitStream.ReadBit())
+    if (!stream.Read(m_cache.order))
+        return false;
+
+    if (stream.ReadBit())
     {
-        BitStream.Read(m_Cache.fDamage);
-        BitStream.Read(m_Cache.ucHitZone);
-        BitStream.Read(m_Cache.DamagedPlayerID);
+        stream.Read(m_cache.damage);
+        stream.Read(m_cache.zone);
+        stream.Read(m_cache.damaged);
     }
 
     return true;
 }
 
-//
-// Should do the same this as what CBulletsyncPacket::Write() does
-//
-bool CSimBulletsyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CSimBulletsyncPacket::Write(NetBitStreamInterface& stream) const
 {
-    // Write the source player id
-    BitStream.Write(m_PlayerID);
+    stream.Write(m_id);
+    stream.Write(static_cast<char>(m_cache.weapon));
+    stream.Write(reinterpret_cast<const char*>(&m_cache.start), sizeof(CVector));
+    stream.Write(reinterpret_cast<const char*>(&m_cache.end), sizeof(CVector));
+    stream.Write(m_cache.order);
 
-    // Write the bulletsync data
-    BitStream.Write((char)m_Cache.weaponType);
-    BitStream.Write((const char*)&m_Cache.vecStart, sizeof(CVector));
-    BitStream.Write((const char*)&m_Cache.vecEnd, sizeof(CVector));
-
-    // Duplicate packet protection
-    BitStream.Write(m_Cache.ucOrderCounter);
-
-    if (m_Cache.fDamage > 0 && m_Cache.DamagedPlayerID != INVALID_ELEMENT_ID)
+    if (m_cache.damage > 0 && m_cache.damaged != INVALID_ELEMENT_ID)
     {
-        BitStream.WriteBit(true);
-        BitStream.Write(m_Cache.fDamage);
-        BitStream.Write(m_Cache.ucHitZone);
-        BitStream.Write(m_Cache.DamagedPlayerID);
+        stream.WriteBit(true);
+        stream.Write(m_cache.damage);
+        stream.Write(m_cache.zone);
+        stream.Write(m_cache.damaged);
     }
     else
     {
-        BitStream.WriteBit(false);
+        stream.WriteBit(false);
     }
 
     return true;

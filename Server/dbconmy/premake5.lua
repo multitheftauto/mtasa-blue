@@ -38,33 +38,30 @@ project "Dbconmy"
 		links { "rt" }
 
 	filter "system:macosx"
+		-- brew install mysql-client libidn2
 		includedirs {
 			os.findheader("mysql.h", {
 				"/usr/local/opt/mysql/include/mysql",
 				"/opt/homebrew/include/mysql",
-				"/opt/osxcross/macports/pkgs/opt/local/include/mysql8/mysql",
+				"/opt/homebrew/opt/mysql-client/include/mysql",
 			})
 		}
 		libdirs {
 			os.findlib("libmysqlclient.a", {
 				"/usr/local/opt/mysql/lib",
 				"/opt/homebrew/lib",
-				"/opt/osxcross/macports/pkgs/opt/local/lib/mysql8/mysql",
+				"/opt/homebrew/opt/mysql-client/lib",
 			})
 		}
 
 	if GLIBC_COMPAT then
 		filter { "system:linux" }
 			buildoptions { "-pthread" }
-			linkoptions { "-l:libmysqlclient.a", "-pthread", "-lssl", "-lcrypto" }
-			links { "z", "dl", "m" }
+			linkoptions { "-pthread" }
+			links { "z", "dl", "m", "mysqlclient", "zstd", "ssl", "crypto", "resolv" }
 	else
 		filter "system:not windows"
 			links { "mysqlclient" }
-		filter {"system:linux", "platforms:x86"}
-			libdirs { "/usr/lib32/mysql" }
-		filter {"system:linux", "platforms:x64"}
-			libdirs { "/usr/lib64/mysql" }
 	end
 
 	filter { "system:windows", "platforms:x64" }

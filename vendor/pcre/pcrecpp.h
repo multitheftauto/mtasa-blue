@@ -488,15 +488,23 @@ class PCRECPP_EXP_DEFN RE {
  public:
   // We provide implicit conversions from strings so that users can
   // pass in a string or a "const char*" wherever an "RE" is expected.
-  RE(const string& pat) { Init(pat, NULL); }
-  RE(const string& pat, const RE_Options& option) { Init(pat, &option); }
-  RE(const char* pat) { Init(pat, NULL); }
-  RE(const char* pat, const RE_Options& option) { Init(pat, &option); }
+  RE(const string& pat) { Init(&pat, NULL); }
+  RE(const string& pat, const RE_Options& option) { Init(&pat, &option); }
+  RE(const char* pat) { 
+    std::string pats(reinterpret_cast<const char*>(pat));
+    Init(&pats, NULL);
+  }
+  RE(const char* pat, const RE_Options& option) {
+    std::string pats(reinterpret_cast<const char*>(pat));
+    Init(&pats, &option);
+  }
   RE(const unsigned char* pat) {
-    Init(reinterpret_cast<const char*>(pat), NULL);
+    std::string pats(reinterpret_cast<const char*>(pat));
+    Init(&pats, NULL);
   }
   RE(const unsigned char* pat, const RE_Options& option) {
-    Init(reinterpret_cast<const char*>(pat), &option);
+    std::string pats(reinterpret_cast<const char*>(pat));
+    Init(&pats, &option);
   }
 
   // Copy constructor & assignment - note that these are expensive
@@ -521,7 +529,10 @@ class PCRECPP_EXP_DEFN RE {
   // The string specification for this RE.  E.g.
   //   RE re("ab*c?d+");
   //   re.pattern();    // "ab*c?d+"
-  const string& pattern() const { return pattern_; }
+  const string& pattern() const {
+    static std::string empty;
+    return pattern_ ? *pattern_ : empty;
+  }
 
   // If RE could not be created properly, returns an error string.
   // Else returns the empty string.
@@ -657,7 +668,7 @@ class PCRECPP_EXP_DEFN RE {
 
  private:
 
-  void Init(const string& pattern, const RE_Options* options);
+  void Init(const string* pattern, const RE_Options* options);
   void Cleanup();
 
   // Match against "text", filling in "vec" (up to "vecsize" * 2/3) with
@@ -698,7 +709,7 @@ class PCRECPP_EXP_DEFN RE {
   // Compile the regexp for the specified anchoring mode
   pcre* Compile(Anchor anchor);
 
-  string        pattern_;
+  string*       pattern_;
   RE_Options    options_;
   pcre*         re_full_;       // For full matches
   pcre*         re_partial_;    // For partial matches

@@ -52,7 +52,7 @@ jobs:
 
   macOS:
     name: macOS
-    runs-on: macOS-13
+    runs-on: macOS-15
     steps:
       - uses: actions/checkout@v4
 
@@ -64,7 +64,7 @@ jobs:
         run: brew link --overwrite mysql
 
       - name: Run Build
-        run: ./linux-build.sh --os=macosx
+        run: ./linux-build.sh
 
   linux:
     strategy:
@@ -78,4 +78,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Build
-        run: ./linux-build.sh --arch=${{ matrix.architecture }}
+        run: /docker-entrypoint.sh --arch=${{ matrix.architecture }}

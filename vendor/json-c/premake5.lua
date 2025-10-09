@@ -18,6 +18,13 @@ project "json-c"
 		"*.c"
 	}
 
+	filter "system:windows"
+		disablewarnings {
+			"4244", -- warning C4244: '=': conversion from '?' to '?', possible loss of data
+			"4018", -- warning C4018: '<': signed/unsigned mismatch
+			"4996", -- use of symbol with __declspec(deprecated)
+		}
+
 	filter "system:macosx"
 		defines {"HAVE_XLOCALE_H"}
 

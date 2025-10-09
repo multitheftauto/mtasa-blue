@@ -29,8 +29,9 @@
 // https://www.cryptopp.com/wiki/Release_Process#Self_Tests
 // The problems with Clang pretending to be other compilers is
 // discussed at http://github.com/weidai11/cryptopp/issues/147.
-#if (defined(_MSC_VER) && defined(__clang__))
-# error: "Unsupported configuration"
+#if (defined(_MSC_VER) && defined(__clang__) && \
+   !(defined( __clang_analyzer__)) && !defined(__INTEL_LLVM_COMPILER))
+//# error: "Unsupported configuration"
 #endif
 
 // Windows platform

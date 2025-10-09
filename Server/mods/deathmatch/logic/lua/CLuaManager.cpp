@@ -43,6 +43,7 @@
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 #include "luadefs/CLuaCompatibilityDefs.h"
+#include "CIdArray.h"
 
 extern CGame* g_pGame;
 
@@ -182,6 +183,35 @@ CResource* CLuaManager::GetVirtualMachineResource(lua_State* luaVM)
     if (pLuaMain)
         return pLuaMain->GetResource();
     return NULL;
+}
+
+CLuaTimer* CLuaManager::FindTimerGlobally(unsigned long scriptID) const
+{
+    // First check if timer exists in global ID system
+    CLuaTimer* luaTimer = static_cast<CLuaTimer*>(CIdArray::FindEntry(scriptID, EIdClass::TIMER));
+    if (!luaTimer)
+        return nullptr;
+        
+    // Verify timer exists in any resource manager (ensures it's still valid)
+    for (std::list<CLuaMain*>::const_iterator iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter)
+    {
+        CLuaMain* luaMain = *iter;
+        if (!luaMain)
+            continue;
+            
+        CLuaTimerManager* timerManager = luaMain->GetTimerManager();
+        if (!timerManager)
+            continue;
+            
+        if (timerManager->GetTimerFromScriptID(scriptID) == luaTimer)
+        {
+            return luaTimer;
+        }
+    }
+    
+    // Timer exists in global ID array but not in any resource manager
+    // This indicates the timer has been cleaned up
+    return nullptr;
 }
 
 void CLuaManager::LoadCFunctions()

@@ -13,6 +13,7 @@
 #include "CClientEntity.h"
 #include "CFileReader.h"
 #include "CIFPAnimations.h"
+#include <game/CAnimBlendSequence.h>
 
 class CAnimBlendSequence;
 

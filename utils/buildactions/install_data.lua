@@ -111,13 +111,13 @@ newaction {
 			print(string.format("Listen, I ain't leaving here till you tell me where the macOS net builds are.\n       " ..
 				" So come on bub, for old times' sake, huh?\n\t%s[45m%s[37mDid you just call me... BLOB?%s[0m\n", c,c,c,c))
 
-			if not http.download_print_errors(NET_PATH_X64_MACOS, BIN_DIR.."/server/x64/net.dylib") then
+			if not http.download_print_errors(NET_PATH_X64_MACOS, BIN_DIR.."/server/arm64/net.dylib") then
 				os.exit(1)
 				return
 			end
 
-			if not os.copyfile(BIN_DIR.."/server/x64/net.dylib", BIN_DIR.."/server/x64/net_d.dylib") then
-				errormsg("ERROR: Could not copy server/x64/net.dylib")
+			if not os.copyfile(BIN_DIR.."/server/arm64/net.dylib", BIN_DIR.."/server/arm64/net_d.dylib") then
+				errormsg("ERROR: Could not copy server/arm64/net.dylib")
 				os.exit(1)
 				return
 			end

@@ -90,7 +90,7 @@ public:
     float        GetWeaponRangeFromSkillLevel(eWeaponType eWeapon, float fSkillLevel);
 
     // Static Methods
-    static unsigned short GetSkillStatIndex(eWeaponType eWeapon);
+    static eStats GetSkillStatIndex(eWeaponType weapon);
     static bool           HasWeaponBulletSync(uint32_t weaponID) noexcept;
 
 private:

@@ -29362,12 +29362,12 @@ void CModelNames::InitializeMaps()
     }
 
     // Include vehicle names as well
-    for (uint i = 400; i <= 610; i++)
+    for (uint32_t i = 400; i <= 610; i++)
     {
-        ushort      usID = i;
+        uint32_t    modelId = i;
         const char* szName = CVehicleNames::GetVehicleName(i);
-        MapSet(ms_ModelIDNameMap, usID, szName);
-        MapSet(ms_NameModelIDMap, SStringX(szName).ToLower(), usID);
+        MapSet(ms_ModelIDNameMap, modelId, szName);
+        MapSet(ms_NameModelIDMap, SStringX(szName).ToLower(), modelId);
     }
 
     assert(NUMELMS(playerClothesModel) == CLOTHES_MODEL_ID_LAST - CLOTHES_MODEL_ID_FIRST + 1);

@@ -30,11 +30,10 @@
     #define thread_id pthread_t
 #endif
 
-using namespace std;
 namespace
 {
     // #define maptype hash_map
-    #define maptype map
+    #define maptype std::map
     // Update or add a value for a key
     template <class T, class V, class TR, class T2>
     void xMapSet(maptype<T, V, TR>& collection, const T2& key, const V& value)
