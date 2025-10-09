@@ -1486,9 +1486,9 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CClientEntity& Entity, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float fHealth)
+bool CStaticFunctionDefinitions::SetElementHealth(lua_State* luaState, CClientEntity& Entity, float fHealth)
 {
-    RUN_CHILDREN(SetElementHealth(**iter, fHealth))
+    RUN_CHILDREN(SetElementHealth(luaState, **iter, fHealth))
 
     switch (Entity.GetType())
     {
@@ -1498,7 +1498,10 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             if (Ped.IsLocalPlayer())
+            {
+                g_pClientGame->GetScriptDebugging()->LogWarning(luaState, "The client-side setElementHealth function for localPlayer is deprecated. Use the corresponding server-side function instead");
                 return false;
+            }
 
             // If setting health to 0 for local player, clear stale damage data
             // and set proper scripted death parameters for DoWastedCheck
