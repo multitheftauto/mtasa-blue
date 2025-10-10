@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-07 19:25+0000\n"
-"PO-Revision-Date: 2025-10-10 12:30\n"
+"PO-Revision-Date: 2025-10-10 20:41\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -635,7 +635,7 @@ msgstr "لا تظهر ذلك مرة أخرى"
 
 #: Client/loader/Dialogs.cpp:98 Client/game_sa/CSettingsSA.cpp:902
 msgid "MTA: San Andreas"
-msgstr "ملتي تيڤت اوتو: سان أندرياس"
+msgstr "MTA: San Andreas"
 
 #: Client/loader/Dialogs.cpp:99
 msgid "Warning: Could not detect anti-virus product"
