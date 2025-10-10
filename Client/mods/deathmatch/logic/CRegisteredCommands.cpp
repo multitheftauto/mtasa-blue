@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClientGame.h"
 
 using std::list;
 
@@ -26,6 +27,26 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
 {
     assert(pLuaMain);
     assert(szKey);
+
+    if (CommandExists(szKey, nullptr))
+    {
+        const MultiCommandHandlerPolicy allowMultiHandlers = g_pClientGame->GetAllowMultiCommandHandlers();
+        
+        switch (allowMultiHandlers)
+        {
+            case MultiCommandHandlerPolicy::BLOCK:
+                g_pClientGame->GetScriptDebugging()->LogError(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
+                return false;
+            
+            case MultiCommandHandlerPolicy::WARN:
+                g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
+                break;
+            
+            case MultiCommandHandlerPolicy::ALLOW:
+            default:
+                break;
+        }
+    }
 
     // Check if we already have this key and handler
     SCommand* pCommand = GetCommand(szKey, pLuaMain);
@@ -126,7 +147,7 @@ bool CRegisteredCommands::CommandExists(const char* szKey, CLuaMain* pLuaMain)
 {
     assert(szKey);
 
-    return GetCommand(szKey, pLuaMain) != NULL;
+    return GetCommand(szKey, pLuaMain) != nullptr;
 }
 
 bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArguments)
@@ -183,7 +204,7 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand(const char* szKey
     }
 
     // Doesn't exist
-    return NULL;
+    return nullptr;
 }
 
 void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments)
@@ -204,7 +225,7 @@ void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunct
         while (arg)
         {
             Arguments.PushString(arg);
-            arg = strtok(NULL, " ");
+            arg = strtok(nullptr, " ");
         }
         delete[] szTempArguments;
     }

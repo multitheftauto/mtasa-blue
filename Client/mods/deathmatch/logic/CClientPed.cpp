@@ -31,6 +31,7 @@
 #include <game/TaskJumpFall.h>
 #include <game/TaskPhysicalResponse.h>
 #include <game/TaskAttack.h>
+#include <game/TaskSimpleSwim.h>
 #include "enums/VehicleType.h"
 
 using std::list;
@@ -2014,6 +2015,13 @@ void CClientPed::SetFrozen(bool bFrozen)
             if (m_pPlayerPed)
             {
                 m_pPlayerPed->GetMatrix(&m_matFrozen);
+                
+                CVector vecFrozenRotation = m_matFrozen.GetRotation();
+                
+                if (vecFrozenRotation.fX == 0.0f && vecFrozenRotation.fY == 0.0f && vecFrozenRotation.fZ == 0.0f)
+                {
+                    m_matFrozen.SetRotation(m_Matrix.GetRotation());
+                }
             }
             else
             {
@@ -3326,6 +3334,12 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
 
 float CClientPed::GetCurrentRotation()
 {
+    if (IsFrozen())
+    {
+        CVector vecRotation = m_matFrozen.GetRotation();
+        return vecRotation.fZ;
+    }
+    
     if (m_pPlayerPed)
     {
         return m_pPlayerPed->GetCurrentRotation();
@@ -6532,13 +6546,6 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
-    {
-        return false;
-    }
-
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
     {
@@ -6750,13 +6757,6 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
-    {
-        return false;
-    }
-
     // Get our occupied vehicle
     CClientVehicle* pOccupiedVehicle = GetOccupiedVehicle();
     if (!pOccupiedVehicle)
@@ -6812,7 +6812,7 @@ bool CClientPed::ExitVehicle()
             return false;
 
         // Make ped exit vehicle
-        GetOutOfVehicle(targetDoor);
+        GetOutOfVehicle(m_ucVehicleInOutSeat);
 
         // Remember that this ped is working on leaving a vehicle
         SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
@@ -6927,6 +6927,7 @@ void CClientPed::UpdateVehicleInOut()
 
             m_bIsGettingOutOfVehicle = false;
             m_VehicleInOutID = INVALID_ELEMENT_ID;
+            RemoveFromVehicle();
             SetVehicleInOutState(VEHICLE_INOUT_NONE);
         }
 
@@ -7217,3 +7218,65 @@ void CClientPed::SetSyncing(bool bIsSyncing)
         ResetVehicleInOut();
     }
 }
+
+void CClientPed::RunClimbingTask()
+{
+    if (!m_pPlayerPed)
+        return;
+
+    CVector climbPos;
+    float   climbAngle;
+    int     surfaceType;
+
+    CEntitySAInterface* climbEntity = CTaskSimpleClimb::TestForClimb(m_pPlayerPed, climbPos, climbAngle, surfaceType, true);
+
+    // If a ped is in the air, its rotation is inverted (see GetRotationDegressNew, GetRotationRadiansNew)
+    if (!IsOnGround() && !climbEntity)
+    {
+        CVector rot;
+        GetRotationDegrees(rot);
+
+        rot.fZ += 180.0f;
+        SetRotationDegrees(rot);
+
+        climbEntity = CTaskSimpleClimb::TestForClimb(m_pPlayerPed, climbPos, climbAngle, surfaceType, true);
+    }
+
+    if (!climbEntity)
+        return;
+
+    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, surfaceType, eClimbHeights::CLIMB_GRAB, false);
+    if (!climbTask)
+        return;
+
+    climbTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY, true);
+}
+
+CTaskSimpleSwim* CClientPed::GetSwimmingTask() const
+{
+    if (!m_pPlayerPed)
+        return nullptr;
+
+    CTask* simplestTask = const_cast<CTaskManager*>(GetTaskManager())->GetSimplestActiveTask();
+    if (!simplestTask || simplestTask->GetTaskType() != TASK_SIMPLE_SWIM)
+        return nullptr;
+
+    auto* swimmingTask = dynamic_cast<CTaskSimpleSwim*>(simplestTask);
+    return swimmingTask;
+}
+
+void CClientPed::RunSwimTask() const
+{
+    if (!m_pPlayerPed || GetSwimmingTask())
+        return;
+
+    CTaskComplexInWater* inWaterTask = g_pGame->GetTasks()->CreateTaskComplexInWater();
+    if (!inWaterTask)
+        return;
+
+    // Set physical flags (bTouchingWater, bSubmergedInWater)
+    m_pPlayerPed->SetInWaterFlags(true);
+
+    inWaterTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP, true);
+}
+  

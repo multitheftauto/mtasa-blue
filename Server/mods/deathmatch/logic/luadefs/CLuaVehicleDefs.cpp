@@ -2365,17 +2365,17 @@ int CLuaVehicleDefs::SetVehicleRespawnRotation(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaVehicleDefs::IsVehicleRespawnable(CVehicle* vehicle)
+bool CLuaVehicleDefs::IsVehicleRespawnable(CVehicle* vehicle) noexcept
 {
     return vehicle->GetRespawnEnabled();
 }
 
-uint32_t CLuaVehicleDefs::GetVehicleRespawnDelay(CVehicle* vehicle)
+uint32_t CLuaVehicleDefs::GetVehicleRespawnDelay(CVehicle* vehicle) noexcept
 {
     return vehicle->GetBlowRespawnInterval();
 }
 
-uint32_t CLuaVehicleDefs::GetVehicleIdleRespawnDelay(CVehicle* vehicle)
+uint32_t CLuaVehicleDefs::GetVehicleIdleRespawnDelay(CVehicle* vehicle) noexcept
 {
     return vehicle->GetIdleRespawnInterval();
 }
@@ -3052,7 +3052,7 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::
     return CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(vehicle, nodeIndex, static_cast<std::uint8_t>(collisionType), removalTime.value_or(-1));
 }
 
-bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state)
+bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept
 {
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit(state);

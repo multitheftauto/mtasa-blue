@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <cmath>
 #include "CCameraRPCs.h"
 
 void CCameraRPCs::LoadFunctions()
@@ -39,8 +40,17 @@ void CCameraRPCs::SetCameraMatrix(NetBitStreamInterface& bitStream)
         return; // Invalid data
     }
 
-    bitStream.Read(fRoll);
-    bitStream.Read(fFOV);
+    const unsigned int unreadBits = bitStream.GetNumberOfUnreadBits();
+    if (unreadBits >= 64)
+    {
+        if (!bitStream.Read(fRoll) || !bitStream.Read(fFOV))
+            return;
+    }
+    else if (unreadBits >= 32)
+    {
+        if (!bitStream.Read(fRoll))
+            return;
+    }
 
     // Validate float values to prevent potential issues
     if (!std::isfinite(fRoll) || !std::isfinite(fFOV) || 
@@ -48,6 +58,21 @@ void CCameraRPCs::SetCameraMatrix(NetBitStreamInterface& bitStream)
         !std::isfinite(vecLookAt.fX) || !std::isfinite(vecLookAt.fY) || !std::isfinite(vecLookAt.fZ))
     {
         return; // Invalid float values (NaN, infinity, etc.)
+    }
+
+    if (fFOV <= 0.0f)
+        fFOV = 70.0f;
+    else if (fFOV >= 180.0f)
+        fFOV = 179.0f;
+
+    if (!std::isfinite(fRoll))
+        fRoll = 0.0f;
+    else
+    {
+        constexpr float fullCircle = 360.0f;
+        fRoll = std::remainder(fRoll, fullCircle);
+        if (fRoll < 0.0f)
+            fRoll += fullCircle;
     }
 
     // Validate camera pointer before use

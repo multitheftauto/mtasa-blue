@@ -114,7 +114,23 @@ CResource::~CResource()
 
     // Remove all keybinds on this VM
     g_pClientGame->GetScriptKeyBinds()->RemoveAllKeys(m_pLuaVM);
-    g_pCore->GetKeyBinds()->SetAllCommandsActive(m_strResourceName, false);
+    
+    // Remove all resource-specific command bindings while preserving user bindings
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
+    pKeyBinds->SetAllCommandsActive(m_strResourceName, false);
+    
+    // Additional cleanup: remove any remaining resource bindings that weren't caught by SetAllCommandsActive
+    for (auto& bind : *pKeyBinds)
+    {
+        if (bind->type == KeyBindType::COMMAND)
+        {
+            auto commandBind = static_cast<CCommandBind*>(bind.get());
+            if (commandBind->context == BindingContext::RESOURCE && commandBind->resource == m_strResourceName)
+            {
+                pKeyBinds->Remove(commandBind);
+            }
+        }
+    }
 
     // Destroy the txd root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceTXDRoot);
@@ -341,6 +357,7 @@ void CResource::Load()
         {
             // Write resource net ID
             pBitStream->Write(GetNetID());
+            pBitStream->Write(GetStartCounter());
             g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
@@ -409,11 +426,11 @@ void CResource::ShowCursor(bool bShow, bool bToggleControls)
 
         // Update our showing cursor state
         m_bShowingCursor = bShow;
-
-        // Show cursor if more than 0 resources wanting the cursor on
-        g_pCore->ForceCursorVisible(m_iShowingCursor > 0, bToggleControls);
-        g_pClientGame->SetCursorEventsEnabled(m_iShowingCursor > 0);
     }
+
+    // Always update cursor and controls state regardless of cursor visibility change
+    g_pCore->ForceCursorVisible(m_iShowingCursor > 0, bToggleControls);
+    g_pClientGame->SetCursorEventsEnabled(m_iShowingCursor > 0);
 }
 
 SString CResource::GetResourceDirectoryPath(eAccessType accessType, const SString& strMetaPath)
