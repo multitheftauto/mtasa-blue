@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-07 19:25+0000\n"
-"PO-Revision-Date: 2025-10-10 11:23\n"
+"PO-Revision-Date: 2025-10-10 12:30\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -117,7 +117,7 @@ msgstr "تم الكشف عن مسار وحدة غير صالح."
 
 #: Client/loader/MainFunctions.cpp:91
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "إصدار الملف لا يتطابق. أعد تثبيت MTA: SA إن كنت تواجه مشاكل.\n"
+msgstr "إصدار الملف لا يتطابق. أعد تثبيت MTA:SA إن كنت تواجه مشاكل.\n"
 
 #: Client/loader/MainFunctions.cpp:99
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -1443,7 +1443,7 @@ msgstr "تمكين Javascript في المواقع الخارجية"
 
 #: Client/core/CSettings.cpp:1558
 msgid "Enable GPU rendering"
-msgstr "تفعيل العرض باستخدام وحدة معالجة الرسوميات"
+msgstr "تمكين العرض باستخدام وحدة معالجة الرسوميات"
 
 #: Client/core/CSettings.cpp:1562
 msgid "Custom blacklist"
