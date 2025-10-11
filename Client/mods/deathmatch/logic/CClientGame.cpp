@@ -4444,7 +4444,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
             pDamagedPed->GetGamePlayer()->SetArmor(fPreviousArmor);
 
-            if (GetTickCount64_() - pDamagedPed->m_lastEventDamageCancelledTime >= g_TickRateSettings.cancelledDamageInterval)
+            if (m_triggerEventDamageCancelledForPeds && GetTickCount64_() - pDamagedPed->m_lastEventDamageCancelledTime >= g_TickRateSettings.cancelledDamageInterval)
             {
                 bool sendPacket = true;
 

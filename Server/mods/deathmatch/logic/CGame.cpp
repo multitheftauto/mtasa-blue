@@ -4801,7 +4801,7 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
     const SEVentDamageCancelledSettings& damageCancelledSettings = m_pMainConfig->GetEventDamageCancelledSettings();
 
     CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs,
-                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix, multiCommandHandlerPolicy, damageCancelledSettings.triggerOnVehicleDamage == 1, damageCancelledSettings.triggerForDamageCalledEveryFrame == 1);
+                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix, multiCommandHandlerPolicy, damageCancelledSettings.triggerOnVehicleDamage == 1, damageCancelledSettings.triggerOnPedDamage == 1, damageCancelledSettings.triggerForDamageCalledEveryFrame == 1);
 
     if (pPlayer)
         pPlayer->Send(packet);

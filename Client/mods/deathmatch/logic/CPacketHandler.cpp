@@ -5507,10 +5507,13 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
     bool triggerEventDamageCancelledForVehicles;
     bitStream.ReadBit(triggerEventDamageCancelledForVehicles);
 
+    bool trigggerEventDamageCancelledForPeds;
+    bitStream.ReadBit(trigggerEventDamageCancelledForPeds);
+
     bool triggerEventDamageCancelledForDamageEveryFrame;
     bitStream.ReadBit(triggerEventDamageCancelledForDamageEveryFrame);
 
-    g_pClientGame->SetEventDamageCancelledSettings(triggerEventDamageCancelledForVehicles, triggerEventDamageCancelledForDamageEveryFrame);
+    g_pClientGame->SetEventDamageCancelledSettings(triggerEventDamageCancelledForVehicles, trigggerEventDamageCancelledForPeds, triggerEventDamageCancelledForDamageEveryFrame);
   
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = (ucUseAltPulseOrder != 0);

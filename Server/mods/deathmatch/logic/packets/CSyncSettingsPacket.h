@@ -19,7 +19,7 @@ public:
     CSyncSettingsPacket(){};
     CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
                         short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
-                        uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, std::uint8_t multiCommandHandlerPolicy, bool triggerDamageEventCancelledForVehicles, bool triggerDamageEventCancelledForDamageEveryFrame);
+                        uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, std::uint8_t multiCommandHandlerPolicy, bool triggerDamageEventCancelledForVehicles, bool triggerDamageEventCancelledForPeds, bool triggerDamageEventCancelledForDamageEveryFrame);
 
     ePacketID     GetPacketID() const { return PACKET_ID_SYNC_SETTINGS; };
     unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -37,6 +37,7 @@ public:
     uchar                 m_ucAllowDrivebyAnimationFix;
     uchar                 m_ucAllowShotgunDamageFix;
     std::uint8_t          m_multiCommandHandlerPolicy;
-    bool                  m_triggerDamageEventCancelledForVehicles;
-    bool                  m_triggerDamageEventCancelledForDamageEveryFrame;
+    bool                  m_triggerDamageEventCancelledForVehicles{};
+    bool                  m_triggerEventDamageCancelledForPeds{};
+    bool                  m_triggerDamageEventCancelledForDamageEveryFrame{};
 };

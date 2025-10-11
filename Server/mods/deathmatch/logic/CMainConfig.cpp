@@ -541,6 +541,7 @@ bool CMainConfig::Load()
     m_allowMultiCommandHandlers = Clamp(0, m_allowMultiCommandHandlers, 2);
 
     GetInteger(m_pRootNode, "cancelled_damage_for_vehicles", m_eventDamageCancelledSettings.triggerOnVehicleDamage);
+    GetInteger(m_pRootNode, "cancelled_damage_for_peds", m_eventDamageCancelledSettings.triggerOnPedDamage);
     GetInteger(m_pRootNode, "cancelled_damage_send_frame_based_dmg", m_eventDamageCancelledSettings.triggerForDamageCalledEveryFrame);
 
     ApplyNetOptions();
@@ -1541,7 +1542,8 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 0, 1, 1, "resource_client_file_checks", &m_checkResourceClientFiles, nullptr},
         {true, true, 0, 1, 2, "allow_multi_command_handlers", &m_allowMultiCommandHandlers, &CMainConfig::OnSettingChange},
         {true, true, 0, 0, 1, "cancelled_damage_for_vehicles", &m_eventDamageCancelledSettings.triggerOnVehicleDamage, &CMainConfig::OnSettingChange},
-        {true, true, 0, 1, 1, "cancelled_damage_send_frame_based_dmg", &m_eventDamageCancelledSettings.triggerForDamageCalledEveryFrame, &CMainConfig::OnSettingChange},
+        {true, true, 0, 0, 1, "cancelled_damage_for_peds", &m_eventDamageCancelledSettings.triggerOnPedDamage, &CMainConfig::OnSettingChange},
+        {true, true, 0, 0, 1, "cancelled_damage_send_frame_based_dmg", &m_eventDamageCancelledSettings.triggerForDamageCalledEveryFrame, &CMainConfig::OnSettingChange},
     };
 
     static std::vector<SIntSetting> settingsList;

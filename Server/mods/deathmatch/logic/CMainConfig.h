@@ -42,6 +42,7 @@ struct SIntSetting
 struct SEVentDamageCancelledSettings
 {
     int triggerOnVehicleDamage{false};
+    int triggerOnPedDamage{false};
     int triggerForDamageCalledEveryFrame{true};
 };
 
