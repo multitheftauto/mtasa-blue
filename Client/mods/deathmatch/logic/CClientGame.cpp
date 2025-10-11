@@ -4879,28 +4879,57 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
 
             if (m_triggerEventDamageCancelledForVehicles && GetTickCount64_() - pClientVehicle->m_lastEventDamageCancelledTime >= g_TickRateSettings.cancelledDamageInterval)
             {
-                NetBitStreamInterface* bitStream = g_pNet->AllocateNetBitStream();
+                bool sendPacket = true;
 
-                bitStream->Write(pClientVehicle->GetID());
+                if (m_triggerEventDamageCancelledForDamageEveryFrame)
+                {
+                    switch (weaponType)
+                    {
+                        case WEAPONTYPE_FLAMETHROWER:
+                        case WEAPONTYPE_MINIGUN:
+                        case WEAPONTYPE_MOLOTOV:
+                        {
+                            sendPacket = false;
+                            break;
+                        }
+                        case WEAPONTYPE_CHAINSAW:
+                        {
+                            if (pClientAttacker && pClientAttacker->GetType() == eClientEntityType::CCLIENTPED || pClientAttacker->GetType() == eClientEntityType::CCLIENTPLAYER)
+                            {
+                                CClientPed* attackerPed = static_cast<CClientPed*>(pClientAttacker);
+                                if (!attackerPed->m_pPlayerPed || !attackerPed->m_pPlayerPed->IsPedCuttingWithChainsaw())
+                                    sendPacket = false;
+                            }
+                            break;
+                        }
+                    }
+                }
 
-                bitStream->WriteBit(pClientAttacker != nullptr);
-                if (pClientAttacker)
-                    bitStream->Write(pClientAttacker->GetID());
+                if (sendPacket)
+                {
+                    NetBitStreamInterface* bitStream = g_pNet->AllocateNetBitStream();
 
-                SWeaponTypeSync weapon;
-                weapon.data.ucWeaponType = weaponType;
-                bitStream->Write(&weapon);
+                    bitStream->Write(pClientVehicle->GetID());
 
-                SFloatSync<8, 10> damage;
-                damage.data.fValue = fLoss;
-                bitStream->Write(&damage);
+                    bitStream->WriteBit(pClientAttacker != nullptr);
+                    if (pClientAttacker)
+                        bitStream->Write(pClientAttacker->GetID());
 
-                bitStream->WriteString(m_pLuaManager->GetEvents()->GetEventCancellingResourceName());
+                    SWeaponTypeSync weapon;
+                    weapon.data.ucWeaponType = weaponType;
+                    bitStream->Write(&weapon);
 
-                g_pNet->SendPacket(PACKET_ID_CANCEL_DAMAGE_EVENT, bitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-                g_pNet->DeallocateNetBitStream(bitStream);
+                    SFloatSync<8, 10> damage;
+                    damage.data.fValue = fLoss;
+                    bitStream->Write(&damage);
 
-                pClientVehicle->m_lastEventDamageCancelledTime = GetTickCount64_();
+                    bitStream->WriteString(m_pLuaManager->GetEvents()->GetEventCancellingResourceName());
+
+                    g_pNet->SendPacket(PACKET_ID_CANCEL_DAMAGE_EVENT, bitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+                    g_pNet->DeallocateNetBitStream(bitStream);
+
+                    pClientVehicle->m_lastEventDamageCancelledTime = GetTickCount64_();
+                }
             }
         }
     }
