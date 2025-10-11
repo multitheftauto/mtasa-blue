@@ -127,9 +127,11 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
 #define HOOKSIZE_CallCStreamingInfoAddToList            5
 DWORD RETURN_CallCStreamingInfoAddToListA = 0x408967;
 DWORD RETURN_CallCStreamingInfoAddToListB = 0x408990;
-void _declspec(naked) HOOK_CallCStreamingInfoAddToList()
+static void __declspec(naked) HOOK_CallCStreamingInfoAddToList()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    ecx
@@ -187,9 +189,11 @@ bool _cdecl ShouldSkipLoadRequestedModels(DWORD calledFrom)
 #define HOOKSIZE_CStreamingLoadRequestedModels       5
 DWORD RETURN_CStreamingLoadRequestedModels = 0x15670A5;
 DWORD RETURN_CStreamingLoadRequestedModelsB = 0x156711B;
-void _declspec(naked) HOOK_CStreamingLoadRequestedModels()
+static void __declspec(naked) HOOK_CStreamingLoadRequestedModels()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -233,10 +237,12 @@ bool IsPlayerImgDirLoaded()
 static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirA = 0x5A69E8;     // push 00000226 { 550 }
 static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;     // return of CreateSkinnedClump function
 
-void _declspec(naked) HOOK_LoadingPlayerImgDir()
+static void __declspec(naked) HOOK_LoadingPlayerImgDir()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     // hook from 005A69E3 5 bytes
-    _asm
+    __asm
     {
         pushad
         call    IsPlayerImgDirLoaded
@@ -270,11 +276,11 @@ bool SetClothingDirectorySize(int directorySize)
 
     // CClothesBuilder::LoadCdDirectory(void)
     MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));      // push    offset _playerImgEntries; headers
-    MemPut<std::uint16_t>(0x5A4195 + 1, directorySize);                                     // push    550             ; count
-    MemPut<std::uint16_t>(0x5A69E8 + 1, directorySize);                                     // push    550             ; count
+    MemPut<std::uint16_t>(0x5A4195 + 1, static_cast<std::uint16_t>(directorySize));         // push    550             ; count
+    MemPut<std::uint16_t>(0x5A69E8 + 1, static_cast<std::uint16_t>(directorySize));         // push    550             ; count
 
     g_playerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
-    g_playerImgSize = directorySize;
+    g_playerImgSize = static_cast<std::uint16_t>(directorySize);
 
     return true;
 }

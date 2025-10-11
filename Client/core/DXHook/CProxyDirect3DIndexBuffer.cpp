@@ -65,6 +65,7 @@ HRESULT CProxyDirect3DIndexBuffer::QueryInterface(REFIID riid, void** ppvObj)
     if (riid == CProxyDirect3DIndexBuffer_GUID)
     {
         *ppvObj = this;
+        AddRef();
         return S_OK;
     }
 

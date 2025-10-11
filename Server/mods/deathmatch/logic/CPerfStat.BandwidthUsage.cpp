@@ -626,7 +626,7 @@ void CPerfStatBandwidthUsageImpl::GetStats(CPerfStatResult* pResult, const std::
                     row[c++] = CPerfStatManager::GetScaledByteString(item.llGameRecv);
                     row[c++] = CPerfStatManager::GetScaledByteString(item.llGameSent);
                     if (bShowSentLoss[t])
-                        row[c++] = item.llGameResent ? CPerfStatManager::GetPercentString(item.llGameResent, item.llGameSent) : "";
+                        row[c++] = item.llGameResent ? CPerfStatManager::GetPercentString(item.llGameResent, item.llGameSent) : SStringX("");
                     row[c++] = CPerfStatManager::GetScaledByteString(item.llHttpSent);
                     if (bShowBlocked[t])
                         row[c++] = CPerfStatManager::GetScaledByteString(item.llGameRecvBlocked);

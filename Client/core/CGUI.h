@@ -92,8 +92,11 @@ public:
     bool IsOptionalUpdateInfoRequired(const char* szHost) { return m_pVersionUpdater->IsOptionalUpdateInfoRequired(szHost); }
     void InitiateDataFilesFix() { m_pVersionUpdater->InitiateDataFilesFix(); }
 
+    void RequestLocaleChange(const SString& strLocale);
+
 private:
     void UpdateCursor();
+    void ApplyQueuedLocale();
 
     DWORD TranslateScanCodeToGUIKey(DWORD dwCharacter);
 
@@ -118,4 +121,6 @@ private:
     SString m_LastSkinName;
     SString m_LastLocaleName;
     uint    m_LocaleChangeCounter;
+    SString m_QueuedLocaleChange;
+    bool    m_bHasQueuedLocaleChange;
 };

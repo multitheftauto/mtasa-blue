@@ -58,12 +58,12 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 return false;
 
             // Read out the remote model
-            int iModelID = pVehicle->GetModel();
-            int iRemoteModelID = iModelID;
+            int iRemoteModelID = 0;
             BitStream.Read(iRemoteModelID);
 
             eVehicleType vehicleType = pVehicle->GetVehicleType();
-            eVehicleType remoteVehicleType = CVehicleManager::GetVehicleType(iRemoteModelID);
+            // TODO: GetVehicleType does not support the range of 'int'.
+            eVehicleType remoteVehicleType = CVehicleManager::GetVehicleType(static_cast<unsigned short>(iRemoteModelID));
 
             // Read out its position
             SPositionSync position(false);
@@ -433,7 +433,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(pSourcePlayer->GetSyncTimeContext());
 
             // Write his ping divided with 2 plus a small number so the client can find out when this packet was sent
-            unsigned short usLatency = pSourcePlayer->GetPing();
+            auto usLatency = static_cast<unsigned short>(pSourcePlayer->GetPing());
             BitStream.WriteCompressed(usLatency);
 
             // Write the keysync data
@@ -658,11 +658,12 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStrea
     }
 
     // Door angles.
-    if (CVehicleManager::HasDoors(iRemoteModel))
+    // TODO: HasDoors does not support the range of 'int'.
+    if (CVehicleManager::HasDoors(static_cast<unsigned short>(iRemoteModel)))
     {
         SDoorOpenRatioSync door;
 
-        for (unsigned int i = 2; i < 6; ++i)
+        for (unsigned char i = 2; i < 6; ++i)
         {
             if (!BitStream.Read(&door))
                 return;
@@ -695,7 +696,7 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific(CVehicle* pVehicle, NetBitStre
     if (CVehicleManager::HasDoors(usModel))
     {
         SDoorOpenRatioSync door;
-        for (unsigned int i = 2; i < 6; ++i)
+        for (unsigned char i = 2; i < 6; ++i)
         {
             door.data.fRatio = pVehicle->GetDoorOpenRatio(i);
             BitStream.Write(&door);

@@ -26,7 +26,7 @@ bool CCarEnterExitSA::GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector*
     {
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
-        _asm
+        __asm
         {
             push    pDoor
             push    pVector
@@ -54,7 +54,7 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle,
     {
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
-        _asm
+        __asm
         {
             push    ebx
             xor     ebx, ebx
@@ -103,7 +103,7 @@ int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
     {
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
-        _asm
+        __asm
         {
             push    pPedInterface
             push    pVehicleInterface
@@ -185,7 +185,7 @@ bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVec
         if (pVehicleSA)
         {
             CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
-            _asm
+            __asm
             {
                 push    pUnknown
                 push    dwIdx

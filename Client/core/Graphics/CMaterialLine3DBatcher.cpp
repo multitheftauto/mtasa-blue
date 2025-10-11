@@ -36,6 +36,12 @@ CMaterialLine3DBatcher::CMaterialLine3DBatcher(bool bPreGUI)
 ////////////////////////////////////////////////////////////////
 CMaterialLine3DBatcher::~CMaterialLine3DBatcher()
 {
+    for (SMaterialLine3DItem& item : m_LineList)
+    {
+        if (item.pMaterial)
+            item.pMaterial->Release();
+    }
+    m_LineList.clear();
 }
 
 ////////////////////////////////////////////////////////////////

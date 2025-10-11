@@ -34,7 +34,7 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
         push    controllerType
@@ -48,7 +48,7 @@ int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eController
 {
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
         push    controllerType
@@ -63,7 +63,7 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
 {
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
         push    action
@@ -76,7 +76,7 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
 void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
         push    controllerType

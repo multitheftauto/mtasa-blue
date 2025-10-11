@@ -92,6 +92,6 @@ SString CAccessControlListRight::GetAttributeValue(const SString& strAttributeNa
     else
     {
         SString* pResult = MapFind(m_ExtraAttributeMap, strAttributeName);
-        return pResult ? *pResult : "";
+        return pResult ? *pResult : SStringX("");
     }
 }
