@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-07 19:25+0000\n"
-"PO-Revision-Date: 2025-10-10 20:41\n"
+"PO-Revision-Date: 2025-10-11 11:40\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -20,8 +20,8 @@ msgstr ""
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr "ابدأ تشغيل لُعْبَة Grand Theft Auto: San Andreas.\n"
-"تحقق وضع اللعبة داخل مجلد 'ملفات البرامج (x86)'."
+msgstr "قم بتشغيل Grand Theft Auto: San Andreas ثم انقر على إعادة المحاولة.\n"
+"تأكد من وجود اللعبة في مجلد 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
@@ -32,8 +32,8 @@ msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
 msgstr "عذرًا، لم يتم العثور على اللعبة.\n"
-"ابدأ تشغيل Grand Theft Auto: San Andreas ثم اضغط إعادة المحاولة.\n"
-"تحقق وضع اللعبة في مجلد 'Program Files (x86)'."
+"قم بتشغيل Grand Theft Auto: San Andreas ثم انقر على إعادة المحاولة.\n"
+"تأكد من وجود اللعبة في مجلد 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:597
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -113,7 +113,7 @@ msgstr "الرجاء إيقاف البرامج التالية قبل الاست�
 
 #: Client/loader/MainFunctions.cpp:64
 msgid "Invalid module path detected.\n"
-msgstr "تم الكشف عن مسار وحدة غير صالح."
+msgstr "تم اكتشاف مسار وحدة غير صالح.\n"
 
 #: Client/loader/MainFunctions.cpp:91
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
@@ -263,14 +263,14 @@ msgstr "خطأ"
 #: Client/loader/MainFunctions.cpp:785
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
-msgstr "لعبة MTA تعمل مسبقًا بالفعل.\n\n"
-"إذا تكررت المشكلة يرجى اعادة تشغيل الكمبيوتر"
+msgstr "هناك نسخة أخرى من MTA قيد التشغيل بالفعل.\n\n"
+"إذا استمرت هذه المشكلة، يرجى إعادة تشغيل جهاز الكمبيوتر الخاص بك"
 
 #: Client/loader/MainFunctions.cpp:789
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
-msgstr "لعبة MTA تعمل مسبقًا بالفعل.\n\n"
-"هل تريد إيقافها؟"
+msgstr "هناك نسخة أخرى من MTA قيد التشغيل بالفعل.\n\n"
+"هل تريد إنهاؤها؟"
 
 #: Client/loader/MainFunctions.cpp:821
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
@@ -785,8 +785,8 @@ msgstr "هل تريد تشغيل MTA:SA %s والدخول إلى هذا الخا
 #: Client/core/CVersionUpdater.cpp:1606
 msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
-msgstr "لا يمكن الدخول في هذا الوقت. \n\n"
-"الرجاء المحاولة لاحقاً."
+msgstr "لا يمكن الاتصال في هذا الوقت.\n\n"
+"يرجى المحاولة لاحقًا."
 
 #: Client/core/CVersionUpdater.cpp:1788
 msgid "Connecting"
@@ -2600,9 +2600,9 @@ msgstr "المستخدمة حديثاً"
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
-msgstr "للإتصال السريع:\n\n"
-"ادخل عنوان الـ IP والمنفذ في شريط العنوان.\n"
-"أو أختر خادم من قائمة الخوادم المستخدمة حدياً وإضغط على 'إتصال'"
+msgstr "للاتصال السريع:\n\n"
+"اكتب العنوان والمنفذ في شريط العنوان.\n"
+"أو اختر خادمًا من قائمة المستخدمة حديثًا واضغط على 'اتصال'"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:305
 msgid "HELP"
@@ -2623,7 +2623,7 @@ msgstr "أضف إلى المفضلة"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:431
 #: Client/core/ServerBrowser/CServerBrowser.cpp:502
 msgid "Connect"
-msgstr "إتصال"
+msgstr "اتصال"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:314
 #: Client/core/ServerBrowser/CServerBrowser.cpp:358
@@ -2738,7 +2738,7 @@ msgstr "اسم غير صحيح! الرجاء الذهاب إلى الإعداد�
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1648
 msgid "You have to select a server to connect to."
-msgstr "يجب إختيار خادم للإتصال به."
+msgstr "يجب اختيار خادم للاتصال به."
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1502
