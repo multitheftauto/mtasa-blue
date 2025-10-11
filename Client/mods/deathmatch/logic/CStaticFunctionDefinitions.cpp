@@ -224,9 +224,9 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CC
     return false;
 }
 
-bool CStaticFunctionDefinitions::CancelEvent(bool bCancel)
+bool CStaticFunctionDefinitions::CancelEvent(bool bCancel, CLuaMain* luaMain)
 {
-    m_pEvents->CancelEvent(bCancel);
+    m_pEvents->CancelEvent(bCancel, luaMain->GetResource()->GetName());
     return true;
 }
 

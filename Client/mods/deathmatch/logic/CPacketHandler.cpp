@@ -5504,6 +5504,17 @@ void CPacketHandler::Packet_SyncSettings(NetBitStreamInterface& bitStream)
     bitStream.Read(allowMultiCommandHandlers);
     g_pClientGame->SetAllowMultiCommandHandlers(static_cast<MultiCommandHandlerPolicy>(allowMultiCommandHandlers));
 
+    bool triggerEventDamageCancelledForVehicles;
+    bitStream.ReadBit(triggerEventDamageCancelledForVehicles);
+
+    bool trigggerEventDamageCancelledForPeds;
+    bitStream.ReadBit(trigggerEventDamageCancelledForPeds);
+
+    bool triggerEventDamageCancelledForDamageEveryFrame;
+    bitStream.ReadBit(triggerEventDamageCancelledForDamageEveryFrame);
+
+    g_pClientGame->SetEventDamageCancelledSettings(triggerEventDamageCancelledForVehicles, trigggerEventDamageCancelledForPeds, triggerEventDamageCancelledForDamageEveryFrame);
+  
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = (ucUseAltPulseOrder != 0);
     miscGameSettings.bAllowFastSprintFix = (ucAllowFastSprintFix != 0);

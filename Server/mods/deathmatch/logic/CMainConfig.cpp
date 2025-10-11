@@ -540,6 +540,10 @@ bool CMainConfig::Load()
     GetInteger(m_pRootNode, "allow_multi_command_handlers", m_allowMultiCommandHandlers);
     m_allowMultiCommandHandlers = Clamp(0, m_allowMultiCommandHandlers, 2);
 
+    GetInteger(m_pRootNode, "cancelled_damage_for_vehicles", m_eventDamageCancelledSettings.triggerOnVehicleDamage);
+    GetInteger(m_pRootNode, "cancelled_damage_for_peds", m_eventDamageCancelledSettings.triggerOnPedDamage);
+    GetInteger(m_pRootNode, "cancelled_damage_send_frame_based_dmg", m_eventDamageCancelledSettings.triggerForDamageCalledEveryFrame);
+
     ApplyNetOptions();
 
     return true;
@@ -1512,6 +1516,7 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 50, 100, 4000, "keysync_mouse_sync_interval", &g_TickRateSettings.iKeySyncRotation, &CMainConfig::OnTickRateChange},
         {true, true, 50, 100, 4000, "keysync_analog_sync_interval", &g_TickRateSettings.iKeySyncAnalogMove, &CMainConfig::OnTickRateChange},
         {true, true, 50, 100, 4000, "donkey_work_interval", &g_TickRateSettings.iNearListUpdate, &CMainConfig::OnTickRateChange},
+        {true, true, 50, 1000, 4000, "cancelled_damage_send_interval", &g_TickRateSettings.cancelledDamageInterval, &CMainConfig::OnTickRateChange},
         {true, true, 0, 0, 1, "bullet_sync", &m_bBulletSyncEnabled, &CMainConfig::OnTickRateChange},
         {true, true, 0, 0, 120, "vehext_percent", &m_iVehExtrapolatePercent, &CMainConfig::OnTickRateChange},
         {true, true, 0, 150, 500, "vehext_ping_limit", &m_iVehExtrapolatePingLimit, &CMainConfig::OnTickRateChange},
@@ -1535,7 +1540,10 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 50, 1000, 5000, "player_triggered_event_interval", &m_iPlayerTriggeredEventIntervalMs, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
         {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
         {true, true, 0, 1, 1, "resource_client_file_checks", &m_checkResourceClientFiles, nullptr},
-        {true, true, 0, 1, 2, "allow_multi_command_handlers", &m_allowMultiCommandHandlers, &CMainConfig::OnAllowMultiCommandHandlersChange},
+        {true, true, 0, 1, 2, "allow_multi_command_handlers", &m_allowMultiCommandHandlers, &CMainConfig::OnSettingChange},
+        {true, true, 0, 0, 1, "cancelled_damage_for_vehicles", &m_eventDamageCancelledSettings.triggerOnVehicleDamage, &CMainConfig::OnSettingChange},
+        {true, true, 0, 0, 1, "cancelled_damage_for_peds", &m_eventDamageCancelledSettings.triggerOnPedDamage, &CMainConfig::OnSettingChange},
+        {true, true, 0, 0, 1, "cancelled_damage_send_frame_based_dmg", &m_eventDamageCancelledSettings.triggerForDamageCalledEveryFrame, &CMainConfig::OnSettingChange},
     };
 
     static std::vector<SIntSetting> settingsList;
@@ -1585,7 +1593,7 @@ void CMainConfig::OnPlayerTriggeredEventIntervalChange()
     g_pGame->ApplyPlayerTriggeredEventIntervalChange();
 }
 
-void CMainConfig::OnAllowMultiCommandHandlersChange()
+void CMainConfig::OnSettingChange()
 {
     g_pGame->SendSyncSettings();
 }

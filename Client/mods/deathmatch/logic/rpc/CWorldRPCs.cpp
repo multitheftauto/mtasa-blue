@@ -603,6 +603,7 @@ void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)
     bitStream.Read(g_TickRateSettings.iKeySyncAnalogMove);
     bitStream.Read(g_TickRateSettings.iPedSyncerDistance);
     bitStream.Read(g_TickRateSettings.iUnoccupiedVehicleSyncerDistance);
+    bitStream.Read(g_TickRateSettings.cancelledDamageInterval);
 }
 
 void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)

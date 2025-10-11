@@ -39,6 +39,13 @@ struct SIntSetting
     PFN_SettingChangeCallback changeCallback;
 };
 
+struct SEVentDamageCancelledSettings
+{
+    int triggerOnVehicleDamage{false};
+    int triggerOnPedDamage{false};
+    int triggerForDamageCalledEveryFrame{true};
+};
+
 class CMainConfig : public CXMLConfig
 {
 public:
@@ -68,25 +75,25 @@ public:
     unsigned int GetVoiceQuality() { return m_ucVoiceQuality; };
     unsigned int GetVoiceBitrate() { return m_uiVoiceBitrate; };
 
-    bool                        GetAseInternetPushEnabled() { return m_iAseMode == 2 && !IsFakeLagCommandEnabled(); }
-    bool                        GetAseInternetListenEnabled() { return m_iAseMode == 1 && !IsFakeLagCommandEnabled(); }
-    bool                        GetAseLanListenEnabled() { return m_bDontBroadcastLan ? false : true; }
-    unsigned short              GetHTTPPort();
-    eHTTPDownloadType           GetHTTPDownloadType() { return m_ucHTTPDownloadType; };
-    const std::string&          GetHTTPDownloadURL() { return m_strHTTPDownloadURL; };
-    int                         GetHTTPMaxConnectionsPerClient() { return m_iHTTPMaxConnectionsPerClient; };
-    int                         GetHTTPThreadCount() { return m_iHTTPThreadCount; };
-    int                         GetHTTPDosThreshold() { return m_iHTTPDosThreshold; };
-    const SString&              GetHTTPDosExclude() { return m_strHTTPDosExclude; };
-    int                         GetEnableClientChecks() { return m_iEnableClientChecks; };
-    const std::string&          GetLogFile() { return m_strLogFile; };
-    const std::string&          GetAuthFile() { return m_strAuthFile; };
-    bool                        GetJoinFloodProtectionEnabled() { return m_bJoinFloodProtectionEnabled; };
-    bool                        GetScriptDebugLogEnabled() { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty(); };
-    const std::string&          GetScriptDebugLogFile() { return m_strScriptDebugLogFile; };
-    unsigned int                GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
-    const std::string&          GetAccessControlListFile() { return m_strAccessControlListFile; };
-    bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
+    bool                              GetAseInternetPushEnabled() { return m_iAseMode == 2 && !IsFakeLagCommandEnabled(); }
+    bool                              GetAseInternetListenEnabled() { return m_iAseMode == 1 && !IsFakeLagCommandEnabled(); }
+    bool                              GetAseLanListenEnabled() { return m_bDontBroadcastLan ? false : true; }
+    unsigned short                    GetHTTPPort();
+    eHTTPDownloadType                 GetHTTPDownloadType() { return m_ucHTTPDownloadType; };
+    const std::string&                GetHTTPDownloadURL() { return m_strHTTPDownloadURL; };
+    int                               GetHTTPMaxConnectionsPerClient() { return m_iHTTPMaxConnectionsPerClient; };
+    int                               GetHTTPThreadCount() { return m_iHTTPThreadCount; };
+    int                               GetHTTPDosThreshold() { return m_iHTTPDosThreshold; };
+    const SString&                    GetHTTPDosExclude() { return m_strHTTPDosExclude; };
+    int                               GetEnableClientChecks() { return m_iEnableClientChecks; };
+    const std::string&                GetLogFile() { return m_strLogFile; };
+    const std::string&                GetAuthFile() { return m_strAuthFile; };
+    bool                              GetJoinFloodProtectionEnabled() { return m_bJoinFloodProtectionEnabled; };
+    bool                              GetScriptDebugLogEnabled() { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty(); };
+    const std::string&                GetScriptDebugLogFile() { return m_strScriptDebugLogFile; };
+    unsigned int                      GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
+    const std::string&                GetAccessControlListFile() { return m_strAccessControlListFile; };
+    bool                              GetSerialVerificationEnabled() { return m_bVerifySerials; };
     const std::map<SString, SString>& GetRulesForASE() const noexcept { return m_RulesForASEMap; };
     bool                        IsDisableAC(const char* szTagAC) { return MapContains(m_DisableComboACMap, szTagAC); };
     bool                        IsEnableDiagnostic(const char* szTag) { return MapContains(m_EnableDiagnosticMap, szTag); };
@@ -147,11 +154,13 @@ public:
     void                            OnTickRateChange();
     void                            OnAseSettingChange();
     void                            OnPlayerTriggeredEventIntervalChange();
-    void                            OnAllowMultiCommandHandlersChange();
+    void                            OnSettingChange();
 
     int GetPlayerTriggeredEventInterval() const { return m_iPlayerTriggeredEventIntervalMs; }
     int GetMaxPlayerTriggeredEventsPerInterval() const { return m_iMaxPlayerTriggeredEventsPerInterval; }
     int GetAllowMultiCommandHandlers() const noexcept { return m_allowMultiCommandHandlers; }
+
+    SEVentDamageCancelledSettings GetEventDamageCancelledSettings() const noexcept { return m_eventDamageCancelledSettings; }
 
 private:
     void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, const char* szConsoleHelpText);
@@ -238,4 +247,5 @@ private:
     bool                       m_checkDuplicateSerials;
     int                        m_checkResourceClientFiles;
     int                        m_allowMultiCommandHandlers;
+    SEVentDamageCancelledSettings m_eventDamageCancelledSettings{};
 };

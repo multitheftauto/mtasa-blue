@@ -42,6 +42,7 @@ public:
     void ProcessPendingDeleteList();
 
     bool IsLuaVMValid(lua_State* luaVM) { return MapFindRef(m_VirtualMachineMap, luaVM) != nullptr; };
+    CEvents* GetEvents() const noexcept { return m_pEvents; }
 
     CClientGUIManager* m_pGUIManager;
 

@@ -20,6 +20,7 @@
 #include "CProjectileInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 #include "CFireManagerSA.h"
+#include "CAnimManagerSA.h"
 
 extern CGameSA* pGame;
 
@@ -586,6 +587,25 @@ void CPedSA::SetInWaterFlags(bool inWater)
 
     physicalInterface->bTouchingWater = inWater;
     physicalInterface->bSubmergedInWater = inWater;
+}
+
+bool CPedSA::IsPedCuttingWithChainsaw() const
+{
+    if (GetPedIntelligence()->GetTaskManager()->GetActiveTask()->GetTaskType() == TASK_SIMPLE_FIGHT)
+    {
+        CPedSAInterface* gamePed = GetPedInterface();
+
+        if (gamePed->weaponAudioEntity.m_chainsawState == eChainsawState::CUTTING)
+        {
+            auto cuttingAnim = pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(gamePed->m_pRwObject, "csaw_g");
+            if (!cuttingAnim)
+                cuttingAnim = pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(gamePed->m_pRwObject, "csaw_part");
+
+            return cuttingAnim != nullptr;
+        }
+    }
+
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////
