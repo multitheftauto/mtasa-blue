@@ -33,7 +33,8 @@ extern "C"
 #include <vector>
 // Obviously i can't get us this so other includes will most likely be needed later on
 
-using namespace std;
+using std::list;
+using std::vector;
 
 #ifndef __COMMON_H
 #define __COMMON_H

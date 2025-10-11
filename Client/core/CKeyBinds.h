@@ -75,6 +75,12 @@ public:
                                    bool bCheckState, bool bState, bool bCheckScriptCreated, bool bScriptCreated);
     void          SortCommandBinds();
 
+    // Context-aware binding methods
+    bool CommandExistsInContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true, const char* arguments = NULL, const char* resource = NULL);
+    bool RemoveCommandFromContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true, const char* arguments = NULL, const char* resource = NULL);
+    bool HasAnyBindingForKey(const char* key, bool checkState = false, bool state = true);
+    bool HasBindingInContext(const char* key, BindingContext context, bool checkState = false, bool state = true);
+
     // Control-bind funcs
     bool AddGTAControl(const char* szKey, const char* szControl);
     bool AddGTAControl(const SBindableKey* pKey, SBindableGTAControl* pControl);

@@ -146,6 +146,11 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
+    m_pModelCacheManager = nullptr;
+    m_iDummyProgressValue = 0;
+    m_DummyProgressTimerHandle = NULL;
+    m_bDummyProgressUpdateAlways = false;
+
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
@@ -187,9 +192,26 @@ CCore::~CCore()
     // Remove input hook
     CMessageLoopHook::GetSingleton().RemoveHook();
 
+    if (m_bWindowsTimerEnabled)
+    {
+        KillTimer(GetHookedWindow(), IDT_TIMER1);
+        m_bWindowsTimerEnabled = false;
+    }
+
+    extern int ms_iDummyProgressTimerCounter;
+
+    if (m_DummyProgressTimerHandle != NULL)
+    {
+        DeleteTimerQueueTimer(NULL, m_DummyProgressTimerHandle, INVALID_HANDLE_VALUE);
+        m_DummyProgressTimerHandle = NULL;
+        ms_iDummyProgressTimerCounter = 0;
+    }
+
     // Delete the mod manager
     delete m_pModManager;
     SAFE_DELETE(m_pMessageBox);
+
+    SAFE_DELETE(m_pModelCacheManager);
 
     // Destroy early subsystems
     m_bModulesLoaded = false;
@@ -224,6 +246,8 @@ CCore::~CCore()
     // Delete lazy subsystems
     DestroyGUI();
     DestroyXML();
+
+    SAFE_DELETE(g_pLocalization);
 
     // Delete keybinds
     delete m_pKeyBinds;
@@ -1072,6 +1096,16 @@ void CCore::CreateXML()
         if (!m_pConfigFile)
         {
             assert(false);
+
+            if (m_pXML)
+            {
+                using PFNReleaseXMLInterface = void (*)();
+                if (auto pfnRelease = reinterpret_cast<PFNReleaseXMLInterface>(m_XMLModule.GetFunctionPointer("ReleaseXMLInterface")))
+                    pfnRelease();
+            }
+
+            m_pXML = NULL;
+            m_XMLModule.UnloadModule();
             return;
         }
 
@@ -1123,10 +1157,14 @@ void CCore::DestroyXML()
     {
         SaveConfig(true);
         delete m_pConfigFile;
+        m_pConfigFile = nullptr;
     }
 
     if (m_pXML)
     {
+        using PFNReleaseXMLInterface = void (*)();
+        if (auto pfnRelease = reinterpret_cast<PFNReleaseXMLInterface>(m_XMLModule.GetFunctionPointer("ReleaseXMLInterface")))
+            pfnRelease();
         m_pXML = NULL;
     }
 
