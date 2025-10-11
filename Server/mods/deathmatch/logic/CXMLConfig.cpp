@@ -107,10 +107,10 @@ int CXMLConfig::GetRGBA(CXMLNode* pParent, const char* szKey, unsigned char& R, 
         try
         {
             iss >> iR >> cDelimiter >> iG >> cDelimiter >> iB >> cDelimiter >> iA;
-            R = iR;
-            G = iG;
-            B = iB;
-            A = iA;
+            R = static_cast<unsigned char>(iR);
+            G = static_cast<unsigned char>(iG);
+            B = static_cast<unsigned char>(iB);
+            A = static_cast<unsigned char>(iA);
             Status = IS_SUCCESS;
         }
         catch (std::ios::failure e)

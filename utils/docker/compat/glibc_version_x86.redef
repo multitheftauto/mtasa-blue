@@ -4,11 +4,4 @@
 # If you change this, remember to also change glibc_version.h
 # See also: create_static_libraries.sh 
 # 
-memcmp memcmp@GLIBC_2.0
-memcpy memcpy@GLIBC_2.0
-powf powf@GLIBC_2.0
-log log@GLIBC_2.0
-log2 log2@GLIBC_2.1
-pow pow@GLIBC_2.0
-exp exp@GLIBC_2.0
-fcntl fcntl@GLIBC_2.0
+# memcmp memcmp@GLIBC_2.0

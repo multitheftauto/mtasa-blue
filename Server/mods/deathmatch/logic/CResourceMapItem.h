@@ -70,5 +70,5 @@ private:
     CEvents*           m_pEvents;
     CDummy*            m_pMapElement;
     CElementGroup*     m_pElementGroup;
-    int                m_iDimension;
+    unsigned short     m_dimension;
 };

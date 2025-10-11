@@ -84,9 +84,11 @@ public:
     void OnVertexBufferRangeInvalidated(IDirect3DVertexBuffer9* pStreamData, uint Offset, uint Size);
 
     static CAdditionalVertexStreamManager* GetSingleton();
+    static CAdditionalVertexStreamManager* GetExistingSingleton();
+    static void DestroySingleton();
 
 protected:
-    void SetAdditionalVertexStream(SCurrentStateInfo& renderState);
+    bool SetAdditionalVertexStream(SCurrentStateInfo& renderState);
     bool UpdateCurrentStateInfo(SCurrentStateInfo& state);
     bool UpdateAdditionalStreamContent(SCurrentStateInfo& state, SAdditionalStreamInfo* pAdditionalStreamInfo, uint ReadOffsetStart, uint ReadSize,
                                        uint WriteOffsetStart, uint WriteSize);

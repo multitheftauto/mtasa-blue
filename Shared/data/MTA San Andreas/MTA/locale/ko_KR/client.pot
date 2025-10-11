@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-27 23:26+0000\n"
-"PO-Revision-Date: 2025-07-27 23:31\n"
+"POT-Creation-Date: 2025-10-05 14:21+0000\n"
+"PO-Revision-Date: 2025-10-05 14:21\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -17,7 +17,200 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/loader/MainFunctions.cpp:248
+#: Client/loader/Utils.cpp:535
+msgid "Start Grand Theft Auto: San Andreas.\n"
+"Ensure the game is placed in the 'Program Files (x86)' folder."
+msgstr ""
+
+#: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
+msgid "Searching for GTA: San Andreas"
+msgstr ""
+
+#: Client/loader/Utils.cpp:548
+msgid "Sorry, game not found.\n"
+"Start Grand Theft Auto: San Andreas and click retry.\n"
+"Ensure the game is placed in the 'Program Files (x86)' folder."
+msgstr ""
+
+#: Client/loader/Utils.cpp:597
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Grand Theft Auto: San Andreas가 설치된 폴더를 지정하십시오"
+
+#: Client/loader/Utils.cpp:965 Client/loader/CInstallManager.cpp:362
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "아래의 작업을 수행하기 위해 MTA:SA는 관리자 권한이 필요합니다:\n\n"
+"  '%s'\n\n"
+"다음 창에서 확인하십시오."
+
+#: Client/loader/Utils.cpp:1066
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "%s 모듈을 불러오는데 오류가 발생하였습니다! (%s)"
+
+#: Client/loader/Utils.cpp:1391 Client/loader/Dialogs.cpp:706
+msgid "Copying files..."
+msgstr "파일 복사 중..."
+
+#: Client/loader/Utils.cpp:1451 Client/loader/Dialogs.cpp:711
+msgid "Copy finished early. Everything OK."
+msgstr "복사가 일찍 끝났습니다. 모든 것이 좋습니다."
+
+#: Client/loader/Utils.cpp:1457 Client/loader/Dialogs.cpp:716
+msgid "Finishing..."
+msgstr "마무리 짓는 중..."
+
+#: Client/loader/Utils.cpp:1459 Client/loader/Dialogs.cpp:720
+msgid "Done!"
+msgstr "완료!"
+
+#: Client/loader/Utils.cpp:1499
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "%s의 새 설치가 감지되었습니다.\n\n"
+"%s에서 설정을 복사하시겠습니까?"
+
+#: Client/loader/Utils.cpp:1538
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA에서 '%s' 파일을 여는 데 문제가 발생했습니다."
+
+#: Client/loader/Utils.cpp:1560
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA에 '%s' 파일이 없습니다."
+
+#: Client/loader/Utils.cpp:1585
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA에서 모델을 불러오는 데 문제가 있었습니다."
+
+#: Client/loader/Utils.cpp:1587
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "최근에 gta3.img를 수정한 경우 GTA:SA를 다시 설치해 보십시오."
+
+#: Client/loader/Utils.cpp:1612
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA에서 차량에 업그레이드를 추가하는 데 문제가 있었습니다."
+
+#: Client/loader/Utils.cpp:1631
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA가 '%s' 파일에서 오류를 발견했습니다."
+
+#: Client/loader/Utils.cpp:1713
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "MTA:SA를 플레이할 때 컴퓨터가 다시 시작되었습니까?"
+
+#: Client/loader/Utils.cpp:1778
+msgid "Please terminate the following programs before continuing:"
+msgstr "계속하기 전에 다음 프로그램을 종료하십시오:"
+
+#: Client/loader/MainFunctions.cpp:64
+msgid "Invalid module path detected.\n"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:91
+msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr "파일 버전이 일치하지 않습니다. 문제가 발생하면 MTA:SA를 다시 설치하십시오.\n"
+
+#: Client/loader/MainFunctions.cpp:99
+msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
+msgstr "일부 파일이 없습니다. 문제가 발생하면 MTA:SA를 다시 설치하십시오.\n"
+
+#: Client/loader/MainFunctions.cpp:110
+msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
+"Please restart your PC.\n"
+msgstr "MTA:SA는 Windows '안전 모드'와 호환되지 않습니다.\n\n"
+"PC를 다시 시작하십시오.\n"
+
+#: Client/loader/MainFunctions.cpp:287
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to revert to an earlier version?"
+msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
+"이전 버전으로 되돌리시겠습니까?"
+
+#: Client/loader/MainFunctions.cpp:315
+msgid "There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n\n"
+"Do you want to reset GTA settings now?"
+msgstr "MTA:SA를 시작하는 데 문제가 있는 것 같습니다.\n"
+"GTA 설정을 재설정하면 이 문제가 해결될 수 있습니다.\n\n"
+"지금 GTA 설정을 재설정하시겠습니까?"
+
+#: Client/loader/MainFunctions.cpp:330
+msgid "GTA settings have been reset.\n\n"
+"Press OK to continue."
+msgstr "GTA 설정이 재설정되었습니다.\n\n"
+"계속하려면 확인을 누르십시오."
+
+#: Client/loader/MainFunctions.cpp:335
+#, c-format
+msgid "File could not be deleted: '%s'"
+msgstr "'%s' 파일을 삭제할 수 없습니다."
+
+#. No settings to delete, or can't find them
+#: Client/loader/MainFunctions.cpp:343
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to see some online help?"
+msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
+"온라인 도움말을 보시겠습니까?"
+
+#. Inform user
+#: Client/loader/MainFunctions.cpp:380
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to change the following setting?"
+msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
+"다음 설정을 변경하시겠습니까?"
+
+#: Client/loader/MainFunctions.cpp:381 Client/core/CSettings.cpp:1156
+#: Client/core/CSettings.cpp:1654
+msgid "Fullscreen mode:"
+msgstr "전체 화면 모드:"
+
+#: Client/loader/MainFunctions.cpp:381 Client/core/CSettings.cpp:1166
+#: Client/core/CSettings.cpp:2316
+msgid "Borderless window"
+msgstr "경계 없는 창 모드"
+
+#: Client/loader/MainFunctions.cpp:452
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Try disabling the following products for GTA and MTA:"
+msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
+"GTA 및 MTA에 대해 다음 제품을 비활성화해 보십시오:"
+
+#: Client/loader/MainFunctions.cpp:485
+msgid "WARNING\n\n"
+"MTA:SA has detected unusual activity.\n"
+"Please run a virus scan to ensure your system is secure.\n\n"
+msgstr "경고문\n\n"
+"MTA:SA가 비정상적인 활동을 감지했습니다.\n"
+"바이러스 검사를 실행하여 시스템이 안전한지 확인하십시오.\n\n"
+
+#: Client/loader/MainFunctions.cpp:488
+#, c-format
+msgid "The detected file was:  %s\n"
+msgstr "탐지된 파일: %s\n"
+
+#: Client/loader/MainFunctions.cpp:631
+msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr "GTA 인스턴스: GTA: San Andreas가 이미 실행 중입니다. MTA:SA를 시작하기 전에 종료해야 합니다. 지금하시겠습니까?"
+
+#: Client/loader/MainFunctions.cpp:632 Client/loader/MainFunctions.cpp:639
+#: Client/loader/MainFunctions.cpp:1527
+#: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1648
+#: Client/game_sa/CGameSA.cpp:269
+msgid "Information"
+msgstr "정보"
+
+#: Client/loader/MainFunctions.cpp:638
+msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
+msgstr "GTA: San Andreas를 종료할 수 없습니다. 문제가 지속되면 컴퓨터를 다시 시작하십시오."
+
+#: Client/loader/MainFunctions.cpp:761
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -31,240 +224,251 @@ msgstr "MTA:SA를 다시 시작하는 동안 문제가 발생했습니다.\n\n"
 #. Show failed message and abort the attempt
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
-#: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
-#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:848
+#: Client/loader/MainFunctions.cpp:766 Client/loader/MainFunctions.cpp:787
+#: Client/loader/MainFunctions.cpp:791 Client/loader/MainFunctions.cpp:1197
 #: Client/loader/CInstallManager.cpp:563 Client/loader/CInstallManager.cpp:572
-#: Client/core/CSettings.cpp:2993 Client/core/CSettings.cpp:4301
-#: Client/core/CSettings.cpp:4329 Client/core/CSettings.cpp:4940
 #: Client/core/CConnectManager.cpp:86 Client/core/CConnectManager.cpp:117
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
 #: Client/core/CConnectManager.cpp:329 Client/core/CConnectManager.cpp:415
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
-#: Client/core/CCore.cpp:1272 Client/core/CGUI.cpp:93
-#: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:651
-#: Client/mods/deathmatch/logic/CClientGame.cpp:725
-#: Client/mods/deathmatch/logic/CClientGame.cpp:749
-#: Client/mods/deathmatch/logic/CClientGame.cpp:771
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1429
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
+#: Client/core/CSettings.cpp:3816 Client/core/CSettings.cpp:5181
+#: Client/core/CSettings.cpp:5209 Client/core/CSettings.cpp:5921
+#: Client/core/CCore.cpp:1310 Client/core/CGUI.cpp:94
+#: Client/core/DXHook/CDirect3DHook9.cpp:128
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1544
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1566
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1625
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
+#: Client/mods/deathmatch/logic/CClientGame.cpp:656
+#: Client/mods/deathmatch/logic/CClientGame.cpp:724
+#: Client/mods/deathmatch/logic/CClientGame.cpp:748
+#: Client/mods/deathmatch/logic/CClientGame.cpp:770
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1182
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1341
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1427
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1439
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:137
+#: Shared/sdk/SharedUtil.Misc.hpp:193
 msgid "Error"
 msgstr "오류"
 
-#: Client/loader/MainFunctions.cpp:266
+#: Client/loader/MainFunctions.cpp:785
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "다른 MTA 인스턴스가 이미 실행 중입니다.\n\n"
 "이 문제가 지속되면 컴퓨터를 다시 시작하십시오."
 
-#: Client/loader/MainFunctions.cpp:269
+#: Client/loader/MainFunctions.cpp:789
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "다른 MTA 인스턴스가 이미 실행 중입니다.\n\n"
 "종료하시겠습니까?"
 
-#: Client/loader/MainFunctions.cpp:294
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to revert to an earlier version?"
-msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
-"이전 버전으로 되돌리시겠습니까?"
-
-#: Client/loader/MainFunctions.cpp:324
-msgid "There seems to be a problem launching MTA:SA.\n"
-"Resetting GTA settings can sometimes fix this problem.\n\n"
-"Do you want to reset GTA settings now?"
-msgstr "MTA:SA를 시작하는 데 문제가 있는 것 같습니다.\n"
-"GTA 설정을 재설정하면 이 문제가 해결될 수 있습니다.\n\n"
-"지금 GTA 설정을 재설정하시겠습니까?"
-
-#: Client/loader/MainFunctions.cpp:339
-msgid "GTA settings have been reset.\n\n"
-"Press OK to continue."
-msgstr "GTA 설정이 재설정되었습니다.\n\n"
-"계속하려면 확인을 누르십시오."
-
-#: Client/loader/MainFunctions.cpp:344
-#, c-format
-msgid "File could not be deleted: '%s'"
-msgstr "'%s' 파일을 삭제할 수 없습니다."
-
-#. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:352
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to see some online help?"
-msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
-"온라인 도움말을 보시겠습니까?"
-
-#. Inform user
-#: Client/loader/MainFunctions.cpp:388
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to change the following setting?"
-msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
-"다음 설정을 변경하시겠습니까?"
-
-#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:692
-#: Client/core/CSettings.cpp:1038
-msgid "Fullscreen mode:"
-msgstr "전체 화면 모드:"
-
-#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:700
-#: Client/core/CSettings.cpp:1660
-msgid "Borderless window"
-msgstr "경계 없는 창 모드"
-
-#: Client/loader/MainFunctions.cpp:431
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Try disabling the following products for GTA and MTA:"
-msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
-"GTA 및 MTA에 대해 다음 제품을 비활성화해 보십시오:"
-
-#: Client/loader/MainFunctions.cpp:465
-msgid "WARNING\n\n"
-"MTA:SA has detected unusual activity.\n"
-"Please run a virus scan to ensure your system is secure.\n\n"
-msgstr "경고문\n\n"
-"MTA:SA가 비정상적인 활동을 감지했습니다.\n"
-"바이러스 검사를 실행하여 시스템이 안전한지 확인하십시오.\n\n"
-
-#: Client/loader/MainFunctions.cpp:468
-#, c-format
-msgid "The detected file was:  %s\n"
-msgstr "탐지된 파일: %s\n"
-
-#: Client/loader/MainFunctions.cpp:604
-msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "GTA 인스턴스: GTA: San Andreas가 이미 실행 중입니다. MTA:SA를 시작하기 전에 종료해야 합니다. 지금하시겠습니까?"
-
-#: Client/loader/MainFunctions.cpp:605 Client/loader/MainFunctions.cpp:612
-#: Client/loader/MainFunctions.cpp:1221
-#: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
-#: Client/game_sa/CGameSA.cpp:269
-msgid "Information"
-msgstr "정보"
-
-#: Client/loader/MainFunctions.cpp:611
-msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "GTA: San Andreas를 종료할 수 없습니다. 문제가 지속되면 컴퓨터를 다시 시작하십시오."
-
-#: Client/loader/MainFunctions.cpp:634
+#: Client/loader/MainFunctions.cpp:821
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "레지스트리 항목이 없습니다. Multi Theft Auto: San Andreas를 다시 설치하십시오."
 
-#: Client/loader/MainFunctions.cpp:640
+#: Client/loader/MainFunctions.cpp:827
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "GTA: San Andreas 설치 경로에 지원되지 않는(유니코드) 문자가 포함되어 있습니다. Grand Theft Auto: San Andreas 설치를 표준 ASCII 문자만 포함된 호환되는 경로로 이동하고 Multi Theft Auto: San Andreas를 다시 설치하십시오."
 
-#: Client/loader/MainFunctions.cpp:650
+#: Client/loader/MainFunctions.cpp:840
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
-" If you experience problems when running MTA:SA,\n"
-" move your installation(s) to a path that does not contain a semicolon."
-msgstr "'MTA:SA' 또는 'GTA:San Andreas' 설치 경로\n"
-"에는 ';'(세미클론)이 포함됩니다.\n\n"
-" MTA:SA를 실행할 때 문제가 발생할 경우,\n"
-" 설치를 세미클론을 포함하지 않는 경로로 이동합니다."
+"If you experience problems when running MTA:SA,\n"
+"move your installation(s) to a path that does not contain a semicolon."
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:812
+#: Client/loader/MainFunctions.cpp:1023
+msgid "Invalid installation paths detected."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:1154
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "로드에 실패했습니다. 최신 데이터 파일이 올바르게 설치되었는지 확인하십시오."
 
-#: Client/loader/MainFunctions.cpp:821
+#: Client/loader/MainFunctions.cpp:1163
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "로드에 실패했습니다. %s이(가) 올바르게 설치되었는지 확인하십시오."
 
-#: Client/loader/MainFunctions.cpp:828
+#: Client/loader/MainFunctions.cpp:1172
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "로드에 실패했습니다. %s에서 gta_sa.exe를 찾을 수 없습니다."
 
-#: Client/loader/MainFunctions.cpp:838
+#: Client/loader/MainFunctions.cpp:1186
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "로드에 실패했습니다. %s이(가) GTA 디렉토리에 있습니다. 계속하기 전에 삭제하십시오."
 
-#: Client/loader/MainFunctions.cpp:847
+#: Client/loader/MainFunctions.cpp:1196
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "주 파일의 이름(%s)이 잘못되었습니다."
 
-#: Client/loader/MainFunctions.cpp:858
-msgid "Main file is unsigned. Possible virus activity.\n\n"
-"See online help if MTA does not work correctly."
-msgstr "기본 파일이 서명되지 않았습니다. 바이러스 활동 가능성이 있습니다.\n\n"
-"MTA가 올바르게 작동하지 않는 경우 온라인 도움말을 참조하십시오."
-
-#: Client/loader/MainFunctions.cpp:884
+#: Client/loader/MainFunctions.cpp:1243
 #, c-format
-msgid "Data file %s is missing. Possible virus activity.\n\n"
-"Consider reinstalling Multi Theft Auto for your security.\n"
-"See online help if MTA does not work correctly."
-msgstr "데이터 파일 %s이(가) 없습니다. 바이러스 활동 가능성이 있습니다.\n\n"
-"보안을 위해 Multi Theft Auto를 다시 설치하는 것을 고려해 보십시오.\n"
-"MTA가 올바르게 작동하지 않는 경우 온라인 도움말을 참조하십시오."
+msgid "Data file %s is missing. Possible virus activity."
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:895
+#: Client/loader/MainFunctions.cpp:1251
 #, c-format
-msgid "Data file %s is modified. Possible virus activity.\n\n"
-"Consider reinstalling Multi Theft Auto for your security.\n"
-"See online help if MTA does not work correctly."
-msgstr "%s 데이터 파일이 수정되었습니다. 바이러스 활동 가능성이 있습니다.\n\n"
-"보안을 위해 Multi Theft Auto를 다시 설치하는 것을 고려해 보십시오.\n"
-"MTA가 올바르게 작동하지 않는 경우 온라인 도움말을 참조하십시오."
+msgid "Data file %s is modified. Possible virus activity."
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:909
-msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
-"Remove these .asi files if you experience problems with MTA:SA."
-msgstr ".asi 파일이 'MTA:SA' 또는 'GTA:San Andreas' 설치 디렉토리에 있습니다.\n\n"
-"MTA:SA에서 문제가 발생하면 이러한 .asi 파일을 제거합니다."
+#: Client/loader/MainFunctions.cpp:1275
+msgid ".asi files are in the installation directory.\n\n"
+"Remove these .asi files if you experience problems."
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1011
-msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "파일 버전이 일치하지 않습니다. 문제가 발생하면 MTA:SA를 다시 설치하십시오.\n"
+#: Client/loader/MainFunctions.cpp:1430
+msgid "Invalid game paths detected."
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1020
-msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "일부 파일이 없습니다. 문제가 발생하면 MTA:SA를 다시 설치하십시오.\n"
-
-#: Client/loader/MainFunctions.cpp:1032
-msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
-"Please restart your PC.\n"
-msgstr "MTA:SA는 Windows '안전 모드'와 호환되지 않습니다.\n\n"
-"PC를 다시 시작하십시오.\n"
-
-#: Client/loader/MainFunctions.cpp:1125
+#: Client/loader/MainFunctions.cpp:1438
 msgid "Fix configuration issue"
 msgstr "구성 문제 해결"
 
-#. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1159
-msgid "Fix elevation required error"
-msgstr "고도 수정이 필요한 오류"
+#: Client/loader/MainFunctions.cpp:1527
+msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1166
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr "알 수 없음"
+
+#: Client/loader/Install.cpp:272
 #, c-format
-msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
-"[%s]"
-msgstr "Grand Theft Auto: San Andreas를 시작할 수 없습니다. 다시 시작해 보거나 문제가 지속되면 MTA(www.multitheftauto.com)에 문의하십시오.\n\n"
-"[%s]"
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr "'%s' 파일이 현재 %zu 프로세스에 의해 잠겨 있습니다.\n\n"
+"다음 프로세스를 종료하고 업데이트를 계속하시겠습니까?\n\n"
+"%s"
 
-#: Client/loader/MainFunctions.cpp:1221
-msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "GTA: San Andreas가 제대로 실행되지 않았을 수 있습니다. 종료하시겠습니까?"
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr "설치가 손상되었을 수 있습니다.\n\n"
+"%zu 파일 중 %zu 파일을 백업에서 복원할 수 없습니다.\n\n"
+"www.multitheftauto.com 에서 Multi Treft Auto를 다시 설치해야 합니다.\n"
+"또는 관리자 권한으로 업데이트를 실행해 보십시오."
+
+#: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:693
+msgid "Installing update..."
+msgstr "업데이트 설치 중..."
+
+#: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:701
+msgid "Extracting files..."
+msgstr "파일을 추출하는 중..."
+
+#: Client/loader/CInstallManager.cpp:377
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA가 다음 작업을 완료할 수 없습니다:\n\n"
+"  '%s'\n"
+
+#: Client/loader/CInstallManager.cpp:428
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** 그래픽 드라이버 오류로 인한 충돌 **\n\n"
+"** 그래픽 드라이버 **를 업데이트하십시오"
+
+#: Client/loader/CInstallManager.cpp:441
+msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:543
+msgid "Install updated MTA:SA files"
+msgstr "업데이트된 MTA:SA 파일 설치"
+
+#: Client/loader/CInstallManager.cpp:563
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "파일 충돌로 인해 업데이트할 수 없습니다. 다른 응용 프로그램을 닫고 다시 시도하십시오"
+
+#: Client/loader/CInstallManager.cpp:572
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto가 제대로 설치되지 않았습니다. 다시 설치하십시오. %s"
+
+#: Client/loader/CInstallManager.cpp:624
+msgid "Create GTA:SA junctions"
+msgstr "GTA:SA 정션 생성"
+
+#: Client/loader/CInstallManager.cpp:668
+msgid "MTA:SA cannot launch because copying a file failed:"
+msgstr "파일 복사에 실패했기 때문에 MTA:SA를 시작할 수 없습니다:"
+
+#: Client/loader/CInstallManager.cpp:674 Client/loader/CInstallManager.cpp:714
+msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
+msgstr "MTA:SA 파일이 잘못되었거나 누락되어 MTA:SA를 시작할 수 없습니다:"
+
+#: Client/loader/CInstallManager.cpp:683
+msgid "Copy MTA:SA files"
+msgstr "MTA:SA 파일 복사"
+
+#: Client/loader/CInstallManager.cpp:706 Client/loader/CInstallManager.cpp:784
+msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
+msgstr "GTA:SA 파일이 잘못되었거나 누락되어 MTA:SA를 시작할 수 없습니다:"
+
+#: Client/loader/CInstallManager.cpp:791
+msgid "Patch GTA:SA dependency"
+msgstr "패치 GTA:SA 종속성"
+
+#: Client/loader/CInstallManager.cpp:839
+msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
+msgstr "GTA:SA 실행 파일이 잘못되었거나 누락되어 MTA:SA를 시작할 수 없습니다:"
+
+#: Client/loader/CInstallManager.cpp:843
+msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
+msgstr "백신에서 잘못된 검출을 확인하고 GTA:SA 실행 파일에 대한 예외를 추가한 후 MTA:SA를 다시 시작하십시오."
+
+#: Client/loader/CInstallManager.cpp:849
+msgid "Generate GTA:SA"
+msgstr "GTA:SA 생성"
+
+#: Client/loader/CInstallManager.cpp:864
+msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
+msgstr "GTA:SA 실행 파일을 로드할 수 없기 때문에 MTA:SA를 시작할 수 없습니다:"
+
+#: Client/loader/CInstallManager.cpp:871 Client/loader/CInstallManager.cpp:894
+msgid "Patch GTA:SA"
+msgstr "패치 GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:887
+msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
+msgstr "GTA:SA 패치가 실패했기 때문에 MTA:SA를 시작할 수 없습니다:"
+
+#: Client/loader/CInstallManager.cpp:1068 Client/core/CCore.cpp:835
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "%s 드라이브에 공간이 부족하기 때문에 MTA:SA를 계속할 수 없습니다."
+
+#: Client/loader/CInstallManager.cpp:1124
+msgid "Missing file:"
+msgstr "누락된 파일:"
+
+#: Client/loader/CInstallManager.cpp:1128
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "MTA가 로드되지 않으면 GTA:SA를 다시 설치하십시오"
+
+#: Client/loader/CInstallManager.cpp:1163
+msgid "Update install settings"
+msgstr "설치 설정 업데이트"
+
+#: Client/loader/CInstallManager.cpp:1316
+msgid "Update compatibility settings"
+msgstr "호환성 설정 업데이트"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -272,38 +476,38 @@ msgstr "GTA: San Andreas가 제대로 실행되지 않았을 수 있습니다. �
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:35 Client/core/CMainMenu.cpp:1202
-#: Client/core/CSettings.cpp:1434 Client/core/CSettings.cpp:1458
-#: Client/core/CSettings.cpp:4624 Client/core/CSettings.cpp:4698
-#: Client/core/CSettings.cpp:4728 Client/core/CSettings.cpp:4777
-#: Client/core/CSettings.cpp:4830 Client/core/CVersionUpdater.cpp:1572
+#: Client/loader/Dialogs.cpp:35 Client/core/CVersionUpdater.cpp:1572
 #: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878 Client/core/CQuestionBox.cpp:195
+#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:2088
+#: Client/core/CSettings.cpp:2112 Client/core/CSettings.cpp:5596
+#: Client/core/CSettings.cpp:5670 Client/core/CSettings.cpp:5700
+#: Client/core/CSettings.cpp:5749 Client/core/CSettings.cpp:5811
+#: Client/core/CMainMenu.cpp:1238 Client/core/CQuestionBox.cpp:195
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
 msgstr "예"
 
-#: Client/loader/Dialogs.cpp:36 Client/core/CMainMenu.cpp:1201
-#: Client/core/CSettings.cpp:1433 Client/core/CSettings.cpp:1457
-#: Client/core/CSettings.cpp:4623 Client/core/CSettings.cpp:4697
-#: Client/core/CSettings.cpp:4727 Client/core/CSettings.cpp:4776
-#: Client/core/CSettings.cpp:4829 Client/core/CVersionUpdater.cpp:1571
+#: Client/loader/Dialogs.cpp:36 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
-#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:2087
+#: Client/core/CSettings.cpp:2111 Client/core/CSettings.cpp:5595
+#: Client/core/CSettings.cpp:5669 Client/core/CSettings.cpp:5699
+#: Client/core/CSettings.cpp:5748 Client/core/CSettings.cpp:5810
+#: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:481
 msgid "No"
 msgstr "아니오"
 
 #. Create buttons
 #. OK button
-#: Client/loader/Dialogs.cpp:37 Client/core/CMainMenu.cpp:1222
-#: Client/core/CSettings.cpp:128 Client/core/CSettings.cpp:4961
-#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
-#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
-#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
-#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
-#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/loader/Dialogs.cpp:37 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
+#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
+#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
+#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
+#: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:560
+#: Client/core/CSettings.cpp:5942 Client/core/CMainMenu.cpp:1258
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
 msgstr "확인"
@@ -313,16 +517,16 @@ msgid "Quit"
 msgstr "종료"
 
 #: Client/loader/Dialogs.cpp:39
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+#: Client/core/ServerBrowser/CServerBrowser.cpp:690
 msgid "Help"
 msgstr "도움말"
 
 #. Cancel button
-#: Client/loader/Dialogs.cpp:40 Client/core/CSettings.cpp:133
-#: Client/core/CSettings.cpp:4960 Client/core/CVersionUpdater.cpp:1790
+#: Client/loader/Dialogs.cpp:40 Client/core/CVersionUpdater.cpp:1790
 #: Client/core/CVersionUpdater.cpp:1806 Client/core/CVersionUpdater.cpp:1841
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/core/CSettings.cpp:565 Client/core/CSettings.cpp:5941
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
 msgstr "취소"
 
@@ -424,7 +628,7 @@ msgstr "강제 창 모드"
 msgid "Don't show again"
 msgstr "다시 표시하지 않음"
 
-#: Client/loader/Dialogs.cpp:98 Client/game_sa/CSettingsSA.cpp:898
+#: Client/loader/Dialogs.cpp:98 Client/game_sa/CSettingsSA.cpp:902
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -450,1326 +654,102 @@ msgid "I will not install an anti-virus.\n"
 msgstr "백신을 설치하지 않습니다.\n"
 "나는 컴퓨터에 렉이 걸리고 봇넷의 일부가 되어도 상관 없습니다."
 
-#: Client/loader/Dialogs.cpp:678
+#: Client/loader/Dialogs.cpp:682
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Grand Theft Auto San Andreas를 찾는 중"
 
-#: Client/loader/Dialogs.cpp:681
+#: Client/loader/Dialogs.cpp:685
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Grand Theft Auto San Andreas를 시작하십시오"
 
-#: Client/loader/Dialogs.cpp:689 Client/loader/Install.cpp:852
-msgid "Installing update..."
-msgstr "업데이트 설치 중..."
+#: Client/core/CConnectManager.cpp:85
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "연결에 실패했습니다. 잘못된 닉네임!"
 
-#: Client/loader/Dialogs.cpp:697 Client/loader/Install.cpp:934
-msgid "Extracting files..."
-msgstr "파일을 추출하는 중..."
+#: Client/core/CConnectManager.cpp:116
+msgid "Connecting failed. Invalid host provided!"
+msgstr "연결에 실패했습니다. 잘못된 호스트!"
 
-#: Client/loader/Dialogs.cpp:702 Client/loader/Utils.cpp:1391
-msgid "Copying files..."
-msgstr "파일 복사 중..."
-
-#: Client/loader/Dialogs.cpp:707 Client/loader/Utils.cpp:1451
-msgid "Copy finished early. Everything OK."
-msgstr "복사가 일찍 끝났습니다. 모든 것이 좋습니다."
-
-#: Client/loader/Dialogs.cpp:712 Client/loader/Utils.cpp:1457
-msgid "Finishing..."
-msgstr "마무리 짓는 중..."
-
-#: Client/loader/Dialogs.cpp:716 Client/loader/Utils.cpp:1459
-msgid "Done!"
-msgstr "완료!"
-
-#: Client/loader/CInstallManager.cpp:362 Client/loader/Utils.cpp:965
+#: Client/core/CConnectManager.cpp:132
 #, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "아래의 작업을 수행하기 위해 MTA:SA는 관리자 권한이 필요합니다:\n\n"
-"  '%s'\n\n"
-"다음 창에서 확인하십시오."
+msgid "Connecting to %s at port %u failed!"
+msgstr "%u 포트에서 %s에 연결하지 못했습니다!"
 
-#: Client/loader/CInstallManager.cpp:377
+#. Display the status box
+#: Client/core/CConnectManager.cpp:153
 #, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA가 다음 작업을 완료할 수 없습니다:\n\n"
-"  '%s'\n"
+msgid "Connecting to %s:%u ..."
+msgstr "%s:%u ... 에 연결 중"
 
-#: Client/loader/CInstallManager.cpp:428
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** 그래픽 드라이버 오류로 인한 충돌 **\n\n"
-"** 그래픽 드라이버 **를 업데이트하십시오"
-
-#: Client/loader/CInstallManager.cpp:441
-msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
+#: Client/core/CConnectManager.cpp:155
+#, c-format
+msgid "Reconnecting to %s:%u ..."
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:543
-msgid "Install updated MTA:SA files"
-msgstr "업데이트된 MTA:SA 파일 설치"
+#. Display the status box
+#: Client/core/CConnectManager.cpp:156
+#: Client/mods/deathmatch/logic/CClientGame.cpp:672
+msgid "CONNECTING"
+msgstr "연결 중"
 
-#: Client/loader/CInstallManager.cpp:563
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "파일 충돌로 인해 업데이트할 수 없습니다. 다른 응용 프로그램을 닫고 다시 시도하십시오"
+#: Client/core/CConnectManager.cpp:271
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1341
+msgid "Connection timed out"
+msgstr "연결 시간이 초과되었습니다."
 
-#: Client/loader/CInstallManager.cpp:572
+#: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
+msgid "Disconnected: unknown protocol error"
+msgstr "연결 끊김: 알 수 없는 프로토콜 오류"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
+msgid "Disconnected: disconnected remotely"
+msgstr "연결 끊김: 원격으로 연결이 끊어짐"
+
+#: Client/core/CConnectManager.cpp:297
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
+msgid "Disconnected: connection lost remotely"
+msgstr "연결 끊김: 원격으로 연결이 끊어짐"
+
+#: Client/core/CConnectManager.cpp:301
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
+msgid "Disconnected: you are banned from this server"
+msgstr "연결 끊김: 이 서버에서 밴되었습니다"
+
+#: Client/core/CConnectManager.cpp:308
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
+msgid "Disconnected: disconnected from the server"
+msgstr "연결 끊김: 서버와의 연결이 끊어졌습니다"
+
+#: Client/core/CConnectManager.cpp:312
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
+msgid "Disconnected: connection to the server was lost"
+msgstr "연결 끊김: 서버에 대한 연결이 끊어졌습니다"
+
+#: Client/core/CConnectManager.cpp:319
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1421
+msgid "Disconnected: connection was refused"
+msgstr "연결 끊김: 연결이 거부되었습니다"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:414
 #, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto가 제대로 설치되지 않았습니다. 다시 설치하십시오. %s"
+msgid "No such mod installed (%s)"
+msgstr "해당 모드가 설치되지 않았습니다(%s)"
 
-#: Client/loader/CInstallManager.cpp:624
-msgid "Create GTA:SA junctions"
-msgstr "GTA:SA 정션 생성"
+#: Client/core/CConnectManager.cpp:422
+msgid "Bad server response (2)"
+msgstr "서버 응답 불량(2)"
 
-#: Client/loader/CInstallManager.cpp:668
-msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "파일 복사에 실패했기 때문에 MTA:SA를 시작할 수 없습니다:"
-
-#: Client/loader/CInstallManager.cpp:674 Client/loader/CInstallManager.cpp:714
-msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SA 파일이 잘못되었거나 누락되어 MTA:SA를 시작할 수 없습니다:"
-
-#: Client/loader/CInstallManager.cpp:683
-msgid "Copy MTA:SA files"
-msgstr "MTA:SA 파일 복사"
-
-#: Client/loader/CInstallManager.cpp:706 Client/loader/CInstallManager.cpp:784
-msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "GTA:SA 파일이 잘못되었거나 누락되어 MTA:SA를 시작할 수 없습니다:"
-
-#: Client/loader/CInstallManager.cpp:791
-msgid "Patch GTA:SA dependency"
-msgstr "패치 GTA:SA 종속성"
-
-#: Client/loader/CInstallManager.cpp:839
-msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "GTA:SA 실행 파일이 잘못되었거나 누락되어 MTA:SA를 시작할 수 없습니다:"
-
-#: Client/loader/CInstallManager.cpp:843
-msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "백신에서 잘못된 검출을 확인하고 GTA:SA 실행 파일에 대한 예외를 추가한 후 MTA:SA를 다시 시작하십시오."
-
-#: Client/loader/CInstallManager.cpp:849
-msgid "Generate GTA:SA"
-msgstr "GTA:SA 생성"
-
-#: Client/loader/CInstallManager.cpp:864
-msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "GTA:SA 실행 파일을 로드할 수 없기 때문에 MTA:SA를 시작할 수 없습니다:"
-
-#: Client/loader/CInstallManager.cpp:871 Client/loader/CInstallManager.cpp:894
-msgid "Patch GTA:SA"
-msgstr "패치 GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:887
-msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "GTA:SA 패치가 실패했기 때문에 MTA:SA를 시작할 수 없습니다:"
-
-#: Client/loader/CInstallManager.cpp:1068 Client/core/CCore.cpp:811
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "%s 드라이브에 공간이 부족하기 때문에 MTA:SA를 계속할 수 없습니다."
-
-#: Client/loader/CInstallManager.cpp:1124
-msgid "Missing file:"
-msgstr "누락된 파일:"
-
-#: Client/loader/CInstallManager.cpp:1128
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "MTA가 로드되지 않으면 GTA:SA를 다시 설치하십시오"
-
-#: Client/loader/CInstallManager.cpp:1163
-msgid "Update install settings"
-msgstr "설치 설정 업데이트"
-
-#: Client/loader/CInstallManager.cpp:1316
-msgid "Update compatibility settings"
-msgstr "호환성 설정 업데이트"
-
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr "알 수 없음"
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr "'%s' 파일이 현재 %zu 프로세스에 의해 잠겨 있습니다.\n\n"
-"다음 프로세스를 종료하고 업데이트를 계속하시겠습니까?\n\n"
-"%s"
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr "설치가 손상되었을 수 있습니다.\n\n"
-"%zu 파일 중 %zu 파일을 백업에서 복원할 수 없습니다.\n\n"
-"www.multitheftauto.com 에서 Multi Treft Auto를 다시 설치해야 합니다.\n"
-"또는 관리자 권한으로 업데이트를 실행해 보십시오."
-
-#: Client/loader/Utils.cpp:535
-msgid "Start Grand Theft Auto: San Andreas.\n"
-"Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
-
-#: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
-msgid "Searching for GTA: San Andreas"
-msgstr ""
-
-#: Client/loader/Utils.cpp:548
-msgid "Sorry, game not found.\n"
-"Start Grand Theft Auto: San Andreas and click retry.\n"
-"Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr ""
-
-#: Client/loader/Utils.cpp:597
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Grand Theft Auto: San Andreas가 설치된 폴더를 지정하십시오"
-
-#: Client/loader/Utils.cpp:1066
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "%s 모듈을 불러오는데 오류가 발생하였습니다! (%s)"
-
-#: Client/loader/Utils.cpp:1499
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "%s의 새 설치가 감지되었습니다.\n\n"
-"%s에서 설정을 복사하시겠습니까?"
-
-#: Client/loader/Utils.cpp:1538
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA에서 '%s' 파일을 여는 데 문제가 발생했습니다."
-
-#: Client/loader/Utils.cpp:1560
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA에 '%s' 파일이 없습니다."
-
-#: Client/loader/Utils.cpp:1585
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA에서 모델을 불러오는 데 문제가 있었습니다."
-
-#: Client/loader/Utils.cpp:1587
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "최근에 gta3.img를 수정한 경우 GTA:SA를 다시 설치해 보십시오."
-
-#: Client/loader/Utils.cpp:1612
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA에서 차량에 업그레이드를 추가하는 데 문제가 있었습니다."
-
-#: Client/loader/Utils.cpp:1631
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA가 '%s' 파일에서 오류를 발견했습니다."
-
-#: Client/loader/Utils.cpp:1713
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "MTA:SA를 플레이할 때 컴퓨터가 다시 시작되었습니까?"
-
-#: Client/loader/Utils.cpp:1778
-msgid "Please terminate the following programs before continuing:"
-msgstr "계속하기 전에 다음 프로그램을 종료하십시오:"
-
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "웹 사이트 요청"
-
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "서버는 나중에 웹 사이트를 로드하기 위해 다음 웹 사이트를 요청합니다:"
-
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "보안을 위해 중요한 데이터를 절대 입력하지 마십시오."
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "기억하기"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:1008
-msgid "Allow"
-msgstr "허용"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "거부"
-
-#: Client/core/CMainMenu.cpp:303 Client/core/CSettings.cpp:3569
-#: Client/core/CCore.cpp:674 Client/mods/deathmatch/logic/CClientGame.cpp:543
-msgid "Main menu"
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:332
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "새로운 기능 빌드를 사용하고 있습니다. 공용 서버에 연결하는 데 사용할 수 없는 테스트 빌드입니다!"
-
-#: Client/core/CMainMenu.cpp:351
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA는 2019년 7월 이후에는 XP/Vista에 대한 업데이트를 받지 못할 것입니다.\n\n"
-"최신 서버에서 재생하도록 Windows를 업그레이드합니다."
-
-#: Client/core/CMainMenu.cpp:1195
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "현재 서버와의 연결이 끊어집니다.\n\n"
-"연결을 끊으시겠습니까?"
-
-#: Client/core/CMainMenu.cpp:1199
-msgid "DISCONNECT WARNING"
-msgstr "연결 해제 경고"
-
-#: Client/core/CMainMenu.cpp:1220
-msgid "INFORMATION"
-msgstr ""
+#: Client/core/CConnectManager.cpp:432
+msgid "Bad server response (1)"
+msgstr "서버 응답 불량(1)"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
 msgid "English"
 msgstr "한국어"
-
-#. Create window (with frame) if it will fit inside the screen resolution
-#: Client/core/CSettings.cpp:85
-msgid "SETTINGS"
-msgstr "설정"
-
-#: Client/core/CSettings.cpp:117
-msgid "Multiplayer"
-msgstr "멀티플레이"
-
-#: Client/core/CSettings.cpp:118
-msgid "Video"
-msgstr "비디오"
-
-#: Client/core/CSettings.cpp:119
-msgid "Audio"
-msgstr "오디오"
-
-#: Client/core/CSettings.cpp:120
-msgid "Binds"
-msgstr "바인드"
-
-#: Client/core/CSettings.cpp:121
-msgid "Controls"
-msgstr "컨트롤"
-
-#: Client/core/CSettings.cpp:122
-msgid "Interface"
-msgstr "인터페이스"
-
-#: Client/core/CSettings.cpp:123
-msgid "Web Browser"
-msgstr "웹 브라우저"
-
-#: Client/core/CSettings.cpp:124
-msgid "Advanced"
-msgstr "고급 설정"
-
-#: Client/core/CSettings.cpp:148 Client/core/CSettings.cpp:339
-#: Client/core/CSettings.cpp:650 Client/core/CSettings.cpp:919
-msgid "Load defaults"
-msgstr "기본값 불러오기"
-
-#. *
-#. *  Controls tab
-#. *
-#: Client/core/CSettings.cpp:158 Client/core/CSettings.cpp:182
-msgid "Mouse sensitivity:"
-msgstr "마우스 감도:"
-
-#. VerticalAimSensitivity
-#: Client/core/CSettings.cpp:158 Client/core/CSettings.cpp:200
-msgid "Vertical aim sensitivity:"
-msgstr "수직 감도:"
-
-#. Mouse Options
-#: Client/core/CSettings.cpp:161
-msgid "Mouse options"
-msgstr "마우스 설정"
-
-#: Client/core/CSettings.cpp:168
-msgid "Invert mouse vertically"
-msgstr "마우스 상하 반전"
-
-#: Client/core/CSettings.cpp:172
-msgid "Steer with mouse"
-msgstr "마우스로 조종"
-
-#: Client/core/CSettings.cpp:176
-msgid "Fly with mouse"
-msgstr "마우스로 비행"
-
-#. Joypad options
-#: Client/core/CSettings.cpp:218
-msgid "Joypad options"
-msgstr "조이패드 설정"
-
-#: Client/core/CSettings.cpp:231
-msgid "Standard controls (Mouse + Keyboard)"
-msgstr "기본 컨트롤 (마우스 + 키보드)"
-
-#: Client/core/CSettings.cpp:238
-msgid "Classic controls (Joypad)"
-msgstr "클래식 컨트롤 (조이패드)"
-
-#: Client/core/CSettings.cpp:275
-msgid "Dead Zone"
-msgstr "데드 존"
-
-#: Client/core/CSettings.cpp:280
-msgid "Saturation"
-msgstr "포화도"
-
-#: Client/core/CSettings.cpp:286
-msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "조이패드 버튼의 경우 '바인드' 탭을 사용하십시오."
-
-#: Client/core/CSettings.cpp:325
-msgid "Left Stick"
-msgstr "왼쪽 스틱"
-
-#: Client/core/CSettings.cpp:331
-msgid "Right Stick"
-msgstr "오른쪽 스틱"
-
-#: Client/core/CSettings.cpp:346
-msgid "DESCRIPTION"
-msgstr "제목"
-
-#: Client/core/CSettings.cpp:347
-msgid "KEY"
-msgstr "키"
-
-#: Client/core/CSettings.cpp:349
-msgid "ALT. KEY"
-msgstr "부가 키"
-
-#. *
-#. *    Multiplayer tab
-#. *
-#: Client/core/CSettings.cpp:354 Client/core/CSettings.cpp:357
-msgid "Nick:"
-msgstr "닉네임:"
-
-#: Client/core/CSettings.cpp:379
-msgid "Save server passwords"
-msgstr "서버 비밀번호 저장"
-
-#: Client/core/CSettings.cpp:384
-msgid "Auto-refresh server browser"
-msgstr "서버 브라우저 자동 새로고침"
-
-#: Client/core/CSettings.cpp:389
-msgid "Allow screen upload"
-msgstr "화면 업로드 허용"
-
-#: Client/core/CSettings.cpp:394
-msgid "Allow external sounds"
-msgstr "외부 사운드 허용"
-
-#: Client/core/CSettings.cpp:399
-msgid "Always show download window"
-msgstr "항상 다운로드 창 표시"
-
-#: Client/core/CSettings.cpp:404
-msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
-
-#: Client/core/CSettings.cpp:409
-msgid "Allow GTA:SA ingame status on Steam"
-msgstr ""
-
-#. Enable camera photos getting saved to documents folder
-#: Client/core/CSettings.cpp:415
-msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
-
-#: Client/core/CSettings.cpp:420
-msgid "Ask before disconnecting from server using main menu"
-msgstr ""
-
-#: Client/core/CSettings.cpp:425
-msgid "Use customized GTA:SA files"
-msgstr "커스터마이징 된 GTA:SA 파일 사용"
-
-#: Client/core/CSettings.cpp:430
-msgid "Map rendering options"
-msgstr "맵 렌더링 설정"
-
-#: Client/core/CSettings.cpp:438
-msgid "Opacity:"
-msgstr "불투명도:"
-
-#: Client/core/CSettings.cpp:458
-msgid "Image resolution:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:465
-msgid "1024 x 1024 (Default)"
-msgstr ""
-
-#. index 0
-#: Client/core/CSettings.cpp:466
-msgid "2048 x 2048"
-msgstr ""
-
-#. *
-#. *  Audio tab
-#. *
-#: Client/core/CSettings.cpp:472 Client/core/CSettings.cpp:481
-msgid "Master volume:"
-msgstr "주 음량:"
-
-#: Client/core/CSettings.cpp:472 Client/core/CSettings.cpp:500
-msgid "Radio volume:"
-msgstr "라디오 음량:"
-
-#: Client/core/CSettings.cpp:472 Client/core/CSettings.cpp:519
-msgid "SFX volume:"
-msgstr "SFX 음량:"
-
-#: Client/core/CSettings.cpp:472 Client/core/CSettings.cpp:538
-msgid "MTA volume:"
-msgstr "MTA 음량:"
-
-#: Client/core/CSettings.cpp:473 Client/core/CSettings.cpp:557
-msgid "Voice volume:"
-msgstr "음성 음량:"
-
-#: Client/core/CSettings.cpp:473 Client/core/CSettings.cpp:598
-msgid "Play mode:"
-msgstr "재생 모드:"
-
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/core/CSettings.cpp:475 Client/core/CSettings.cpp:934
-#: Client/core/CSettings.cpp:2070
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-msgid "General"
-msgstr "일반"
-
-#: Client/core/CSettings.cpp:576
-msgid "Radio options"
-msgstr "라디오 설정"
-
-#: Client/core/CSettings.cpp:582
-msgid "Radio Equalizer"
-msgstr "라디오 이퀄라이저"
-
-#: Client/core/CSettings.cpp:587
-msgid "Radio Auto-tune"
-msgstr "라디오 오토튠"
-
-#: Client/core/CSettings.cpp:592
-msgid "Usertrack options"
-msgstr "사용자 트랙 설정"
-
-#: Client/core/CSettings.cpp:606 Client/core/CSettings.cpp:3151
-msgid "Radio"
-msgstr "라디오"
-
-#: Client/core/CSettings.cpp:607 Client/core/CSettings.cpp:3153
-msgid "Random"
-msgstr "랜덤"
-
-#: Client/core/CSettings.cpp:608 Client/core/CSettings.cpp:3155
-msgid "Sequential"
-msgstr "순차적"
-
-#: Client/core/CSettings.cpp:611
-msgid "Automatic Media Scan"
-msgstr "자동 미디어 스캔"
-
-#: Client/core/CSettings.cpp:618
-msgid "Mute options"
-msgstr "음소거 설정"
-
-#: Client/core/CSettings.cpp:624
-msgid "Mute All sounds when minimized"
-msgstr "최소화 시 모든 소리 음소거"
-
-#: Client/core/CSettings.cpp:629
-msgid "Mute Radio sounds when minimized"
-msgstr "최소화 시 라디오 음소거"
-
-#: Client/core/CSettings.cpp:634
-msgid "Mute SFX sounds when minimized"
-msgstr "최소화 시 SFX 소리 음소거"
-
-#: Client/core/CSettings.cpp:639
-msgid "Mute MTA sounds when minimized"
-msgstr "최소화 시 MTA 소리 음소거"
-
-#: Client/core/CSettings.cpp:644
-msgid "Mute Voice sounds when minimized"
-msgstr "최소화 시 음성 음소거"
-
-#. *
-#. *  Video tab
-#. *
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:666
-msgid "Resolution:"
-msgstr "해상도:"
-
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:713
-msgid "FOV:"
-msgstr "FOV:"
-
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:729
-msgid "Draw Distance:"
-msgstr "가시 거리:"
-
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:747
-msgid "Brightness:"
-msgstr "밝기:"
-
-#: Client/core/CSettings.cpp:660 Client/core/CSettings.cpp:765
-msgid "FX Quality:"
-msgstr "FX 품질:"
-
-#: Client/core/CSettings.cpp:661 Client/core/CSettings.cpp:779
-msgid "Anisotropic filtering:"
-msgstr "이방성 필터링:"
-
-#: Client/core/CSettings.cpp:661 Client/core/CSettings.cpp:806
-msgid "Anti-aliasing:"
-msgstr "안티 앨리어싱:"
-
-#: Client/core/CSettings.cpp:661 Client/core/CSettings.cpp:820
-msgid "Aspect Ratio:"
-msgstr "화면비:"
-
-#: Client/core/CSettings.cpp:678
-msgid "Windowed"
-msgstr "창 모드"
-
-#: Client/core/CSettings.cpp:684
-msgid "DPI aware"
-msgstr "DPI aware"
-
-#: Client/core/CSettings.cpp:699 Client/core/CSettings.cpp:1658
-msgid "Standard"
-msgstr "기본"
-
-#: Client/core/CSettings.cpp:701 Client/core/CSettings.cpp:1662
-msgid "Borderless keep res"
-msgstr "테두리 없는 창 해상도 유지"
-
-#: Client/core/CSettings.cpp:705
-msgid "Mip Mapping"
-msgstr "밉 맵"
-
-#: Client/core/CSettings.cpp:773 Client/core/CSettings.cpp:1562
-msgid "Low"
-msgstr "낮음"
-
-#: Client/core/CSettings.cpp:774 Client/core/CSettings.cpp:1564
-msgid "Medium"
-msgstr "중간"
-
-#: Client/core/CSettings.cpp:775 Client/core/CSettings.cpp:1121
-#: Client/core/CSettings.cpp:1566 Client/core/CSettings.cpp:3209
-msgid "High"
-msgstr "높음"
-
-#: Client/core/CSettings.cpp:776 Client/core/CSettings.cpp:1568
-msgid "Very high"
-msgstr "매우 높음"
-
-#: Client/core/CSettings.cpp:791 Client/core/CSettings.cpp:814
-#: Client/core/CSettings.cpp:1052 Client/core/CSettings.cpp:1106
-#: Client/core/CSettings.cpp:1242 Client/core/CSettings.cpp:1572
-#: Client/core/CSettings.cpp:3216 Client/core/CSettings.cpp:3248
-#: Client/core/CSettings.cpp:3294 Client/core/CSettings.cpp:4369
-msgid "Off"
-msgstr "끄기"
-
-#: Client/core/CSettings.cpp:815 Client/core/CSettings.cpp:1574
-msgid "1x"
-msgstr "1x"
-
-#: Client/core/CSettings.cpp:816 Client/core/CSettings.cpp:1576
-msgid "2x"
-msgstr "2x"
-
-#: Client/core/CSettings.cpp:817 Client/core/CSettings.cpp:1578
-msgid "3x"
-msgstr "3x"
-
-#: Client/core/CSettings.cpp:830 Client/core/CSettings.cpp:1054
-#: Client/core/CSettings.cpp:1584 Client/core/CSettings.cpp:3218
-msgid "Auto"
-msgstr "자동"
-
-#: Client/core/CSettings.cpp:831 Client/core/CSettings.cpp:1586
-msgid "4:3"
-msgstr "4:3"
-
-#: Client/core/CSettings.cpp:832 Client/core/CSettings.cpp:1588
-msgid "16:10"
-msgstr "16:10"
-
-#: Client/core/CSettings.cpp:833 Client/core/CSettings.cpp:1590
-msgid "16:9"
-msgstr "16:9"
-
-#: Client/core/CSettings.cpp:836
-msgid "HUD Match Aspect Ratio"
-msgstr "HUD 일치 종횡비"
-
-#: Client/core/CSettings.cpp:842
-msgid "Volumetric Shadows"
-msgstr "체적 그림자"
-
-#: Client/core/CSettings.cpp:846
-msgid "Grass effect"
-msgstr "잔디 효과"
-
-#: Client/core/CSettings.cpp:850
-msgid "Heat haze"
-msgstr "열 헤이즈"
-
-#: Client/core/CSettings.cpp:854
-msgid "Tyre Smoke etc"
-msgstr "타이어 연기 등"
-
-#: Client/core/CSettings.cpp:858
-msgid "Dynamic ped shadows"
-msgstr "다이나믹 패드 그림자"
-
-#: Client/core/CSettings.cpp:862
-msgid "Motion blur"
-msgstr "모션블러"
-
-#: Client/core/CSettings.cpp:866
-msgid "Corona rain reflections"
-msgstr "Corona 비 반사"
-
-#: Client/core/CSettings.cpp:871
-msgid "Full Screen Minimize"
-msgstr "전체화면 최소화"
-
-#: Client/core/CSettings.cpp:883
-msgid "Enable Device Selection Dialog"
-msgstr "장치 선택 다이얼로그 활성화"
-
-#: Client/core/CSettings.cpp:895
-msgid "Show unsafe resolutions"
-msgstr "불안전한 해상도 표시"
-
-#: Client/core/CSettings.cpp:907
-msgid "Render vehicles always in high detail"
-msgstr "차량을 항상 최고 디테일로 렌더링"
-
-#: Client/core/CSettings.cpp:911
-msgid "Render peds always in high detail"
-msgstr "패드를 항상 최고 디테일 렌더링"
-
-#: Client/core/CSettings.cpp:940
-msgid "Enable remote websites"
-msgstr "원격 웹 사이트 사용"
-
-#: Client/core/CSettings.cpp:945
-msgid "Enable Javascript on remote websites"
-msgstr "원격 웹 사이트에서 자바스크립트 사용"
-
-#: Client/core/CSettings.cpp:950
-msgid "Enable GPU rendering"
-msgstr ""
-
-#: Client/core/CSettings.cpp:954
-msgid "Custom blacklist"
-msgstr "사용자 지정 블랙리스트"
-
-#: Client/core/CSettings.cpp:965 Client/core/CSettings.cpp:1000
-msgid "Enter a domain e.g. google.com"
-msgstr "도메인 입력 (예: google.com)"
-
-#: Client/core/CSettings.cpp:973
-msgid "Block"
-msgstr "차단"
-
-#: Client/core/CSettings.cpp:981 Client/core/CSettings.cpp:1016
-msgid "Domain"
-msgstr "도메인"
-
-#: Client/core/CSettings.cpp:983 Client/core/CSettings.cpp:1018
-msgid "Remove domain"
-msgstr "도메인 제거"
-
-#. Reset vecTemp
-#: Client/core/CSettings.cpp:989
-msgid "Custom whitelist"
-msgstr "사용자 지정 화이트리스트"
-
-#. Misc section label
-#: Client/core/CSettings.cpp:1031
-msgid "Misc"
-msgstr "기타"
-
-#. Fast clothes loading
-#: Client/core/CSettings.cpp:1037 Client/core/CSettings.cpp:1045
-#: Client/core/CSettings.cpp:4979
-msgid "Fast CJ clothes loading:"
-msgstr "빠른 CJ 옷 로딩:"
-
-#. Browser scan speed
-#: Client/core/CSettings.cpp:1037 Client/core/CSettings.cpp:1059
-#: Client/core/CSettings.cpp:4981
-msgid "Browser speed:"
-msgstr "브라우저 속도:"
-
-#. Single download
-#: Client/core/CSettings.cpp:1037 Client/core/CSettings.cpp:1073
-#: Client/core/CSettings.cpp:4983
-msgid "Single connection:"
-msgstr "단일 연결:"
-
-#. Packet tag
-#: Client/core/CSettings.cpp:1037 Client/core/CSettings.cpp:1086
-#: Client/core/CSettings.cpp:4985
-msgid "Packet tag:"
-msgstr "패킷 태그:"
-
-#. Progress animation
-#: Client/core/CSettings.cpp:1038 Client/core/CSettings.cpp:1099
-#: Client/core/CSettings.cpp:4987
-msgid "Progress animation:"
-msgstr "진행 애니메이션:"
-
-#. Process priority
-#: Client/core/CSettings.cpp:1038 Client/core/CSettings.cpp:1112
-#: Client/core/CSettings.cpp:4977
-msgid "Process priority:"
-msgstr "프로세스 우선도:"
-
-#. Debug setting
-#: Client/core/CSettings.cpp:1038 Client/core/CSettings.cpp:1126
-#: Client/core/CSettings.cpp:4989
-msgid "Debug setting:"
-msgstr "디버그 설정:"
-
-#. Streaming memory
-#: Client/core/CSettings.cpp:1039 Client/core/CSettings.cpp:1149
-#: Client/core/CSettings.cpp:4991
-msgid "Streaming memory:"
-msgstr "스트리밍 메모리:"
-
-#. Update build type
-#: Client/core/CSettings.cpp:1039 Client/core/CSettings.cpp:1256
-msgid "Update build type:"
-msgstr "빌드 유형 업데이트:"
-
-#. UpdateAutoInstall
-#: Client/core/CSettings.cpp:1039 Client/core/CSettings.cpp:1235
-msgid "Install important updates:"
-msgstr "중요한 업데이트를 설치합니다:"
-
-#: Client/core/CSettings.cpp:1053 Client/core/CSettings.cpp:1081
-#: Client/core/CSettings.cpp:1094 Client/core/CSettings.cpp:3220
-#: Client/core/CSettings.cpp:3236 Client/core/CSettings.cpp:3243
-msgid "On"
-msgstr "켜기"
-
-#: Client/core/CSettings.cpp:1066 Client/core/CSettings.cpp:3225
-msgid "Very slow"
-msgstr "매우 느리게"
-
-#: Client/core/CSettings.cpp:1067 Client/core/CSettings.cpp:1080
-#: Client/core/CSettings.cpp:1093 Client/core/CSettings.cpp:1107
-#: Client/core/CSettings.cpp:1133 Client/core/CSettings.cpp:1145
-#: Client/core/CSettings.cpp:1243 Client/core/CSettings.cpp:1263
-#: Client/core/CSettings.cpp:3227 Client/core/CSettings.cpp:3234
-#: Client/core/CSettings.cpp:3241 Client/core/CSettings.cpp:3250
-#: Client/core/CSettings.cpp:3287
-msgid "Default"
-msgstr "기본값"
-
-#: Client/core/CSettings.cpp:1068 Client/core/CSettings.cpp:3229
-msgid "Fast"
-msgstr "빠르게"
-
-#: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:3205
-msgid "Normal"
-msgstr "보통"
-
-#: Client/core/CSettings.cpp:1120 Client/core/CSettings.cpp:3207
-msgid "Above normal"
-msgstr "보통 이상"
-
-#: Client/core/CSettings.cpp:1156
-msgid "Min"
-msgstr "최소"
-
-#: Client/core/CSettings.cpp:1169
-msgid "Max"
-msgstr "최대"
-
-#. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1176
-msgid "Windows 8 compatibility:"
-msgstr "윈도우 8 호환성:"
-
-#: Client/core/CSettings.cpp:1180
-msgid "16-bit color"
-msgstr "16비트 색상"
-
-#: Client/core/CSettings.cpp:1185
-msgid "Mouse fix"
-msgstr "마우스 수정"
-
-#. Cache path info
-#: Client/core/CSettings.cpp:1203
-msgid "Client resource files:"
-msgstr "클라이언트 리소스 파일:"
-
-#: Client/core/CSettings.cpp:1207
-msgid "Show in Explorer"
-msgstr "탐색기에 표시"
-
-#. Process affinity
-#: Client/core/CSettings.cpp:1222
-msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
-
-#. Auto updater section label
-#: Client/core/CSettings.cpp:1228 Client/core/CSettings.cpp:1231
-msgid "Auto updater"
-msgstr "자동 업데이터"
-
-#. Check for updates
-#: Client/core/CSettings.cpp:1269
-msgid "Check for update now"
-msgstr "업데이트 확인"
-
-#: Client/core/CSettings.cpp:1427
-msgid "Some settings will be changed when you next start MTA"
-msgstr "일부 설정은 다음에 MTA를 시작할 때 변경됩니다."
-
-#: Client/core/CSettings.cpp:1428
-msgid "\n\n"
-"Do you want to restart now?"
-msgstr "\n\n"
-"지금 다시 시작하시겠습니까?"
-
-#: Client/core/CSettings.cpp:1431
-msgid "RESTART REQUIRED"
-msgstr "재시작 필요"
-
-#: Client/core/CSettings.cpp:1451
-msgid "Some settings will be changed when you disconnect the current server"
-msgstr "일부 설정은 현재 서버의 연결을 끊을 때 변경됩니다."
-
-#: Client/core/CSettings.cpp:1452
-msgid "\n\n"
-"Do you want to disconnect now?"
-msgstr "\n\n"
-"지금 연결을 끊으시겠습니까?"
-
-#: Client/core/CSettings.cpp:1455
-msgid "DISCONNECT REQUIRED"
-msgstr "연결 끊기 필요"
-
-#. Update the joystick name
-#: Client/core/CSettings.cpp:1787
-msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "조이패드가 인식되지 않음 - 연결을 확인하고 게임을 다시 시작하십시오."
-
-#: Client/core/CSettings.cpp:1984
-msgid "Binding axis"
-msgstr "바인딩 축"
-
-#: Client/core/CSettings.cpp:1984
-msgid "Move an axis to bind, or escape to clear"
-msgstr "축을 움직여 바인드 하거나, Esc를 눌러 지우십시오"
-
-#: Client/core/CSettings.cpp:2061
-msgid "Language:"
-msgstr "언어:"
-
-#: Client/core/CSettings.cpp:2061
-msgid "Skin:"
-msgstr "스킨:"
-
-#: Client/core/CSettings.cpp:2061
-msgid "Presets:"
-msgstr "프리셋:"
-
-#: Client/core/CSettings.cpp:2110
-msgid "Chat"
-msgstr "채팅"
-
-#: Client/core/CSettings.cpp:2127
-msgid "Load"
-msgstr "불러오기"
-
-#: Client/core/CSettings.cpp:2139
-msgid "Colors"
-msgstr "색상"
-
-#: Client/core/CSettings.cpp:2140
-msgid "Layout"
-msgstr "레이아웃"
-
-#: Client/core/CSettings.cpp:2141 Client/core/CSettings.cpp:2387
-msgid "Options"
-msgstr "설정"
-
-#: Client/core/CSettings.cpp:2147
-msgid "Chat Background"
-msgstr "채팅 배경"
-
-#: Client/core/CSettings.cpp:2147
-msgid "Chat Text"
-msgstr "채팅 텍스트"
-
-#: Client/core/CSettings.cpp:2147
-msgid "Input Background"
-msgstr "채팅 배경"
-
-#: Client/core/CSettings.cpp:2147
-msgid "Input Text"
-msgstr "텍스트 입력"
-
-#: Client/core/CSettings.cpp:2170
-msgid "Lines:"
-msgstr "줄:"
-
-#: Client/core/CSettings.cpp:2170
-msgid "Scale:"
-msgstr "스케일:"
-
-#: Client/core/CSettings.cpp:2170
-msgid "Width:"
-msgstr "너비:"
-
-#: Client/core/CSettings.cpp:2173
-msgid "Size"
-msgstr "크기:"
-
-#: Client/core/CSettings.cpp:2222
-msgid "after"
-msgstr "후"
-
-#: Client/core/CSettings.cpp:2222
-msgid "for"
-msgstr "동안"
-
-#: Client/core/CSettings.cpp:2222
-msgid "sec"
-msgstr "초"
-
-#: Client/core/CSettings.cpp:2225
-msgid "Fading"
-msgstr "페이딩"
-
-#: Client/core/CSettings.cpp:2231
-msgid "Fade out old lines"
-msgstr "오래된 줄 사라짐"
-
-#: Client/core/CSettings.cpp:2271
-msgid "Horizontal:"
-msgstr "수평:"
-
-#: Client/core/CSettings.cpp:2271
-msgid "Vertical:"
-msgstr "수직:"
-
-#: Client/core/CSettings.cpp:2271
-msgid "Text-Align:"
-msgstr "텍스트 정렬:"
-
-#: Client/core/CSettings.cpp:2271
-msgid "X-Offset:"
-msgstr "X-오프셋:"
-
-#: Client/core/CSettings.cpp:2272
-msgid "Y-Offset:"
-msgstr "Y-오프셋:"
-
-#: Client/core/CSettings.cpp:2278
-msgid "Position"
-msgstr "위치"
-
-#: Client/core/CSettings.cpp:2292 Client/core/CSettings.cpp:2320
-#: Client/core/CKeyBinds.cpp:191
-msgid "Left"
-msgstr "왼쪽"
-
-#: Client/core/CSettings.cpp:2293 Client/core/CSettings.cpp:2307
-msgid "Center"
-msgstr "중앙"
-
-#: Client/core/CSettings.cpp:2294 Client/core/CSettings.cpp:2321
-#: Client/core/CKeyBinds.cpp:192
-msgid "Right"
-msgstr "오른쪽"
-
-#: Client/core/CSettings.cpp:2306
-msgid "Top"
-msgstr "상단"
-
-#: Client/core/CSettings.cpp:2308
-msgid "Bottom"
-msgstr "하단"
-
-#: Client/core/CSettings.cpp:2356
-msgid "Font"
-msgstr "폰트"
-
-#: Client/core/CSettings.cpp:2393
-msgid "Hide background when not typing"
-msgstr "입력하지 않을 때 배경 숨기기"
-
-#: Client/core/CSettings.cpp:2398
-msgid "Nickname completion using the \"Tab\" key"
-msgstr "\"탭\" 키를 사용하여 닉네임 완성"
-
-#: Client/core/CSettings.cpp:2403
-msgid "Allow server to flash the window"
-msgstr "서버가 창을 깜박일 수 있도록 허용"
-
-#: Client/core/CSettings.cpp:2408
-msgid "Allow tray balloon notifications"
-msgstr "트레이 풍선 알림 허용"
-
-#: Client/core/CSettings.cpp:2413
-msgid "Chat text black/white outline"
-msgstr "채팅 텍스트 검은색/흰색 윤곽선"
-
-#. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:2662 Client/core/CSettings.cpp:2669
-msgid "Press a key to bind, or escape to clear"
-msgstr "원하는 키를 누르거나, Esc를 눌러 초기화하세요."
-
-#: Client/core/CSettings.cpp:2663
-msgid "Binding a primary key"
-msgstr "주 키 바인딩"
-
-#: Client/core/CSettings.cpp:2670
-msgid "Binding a secondary key"
-msgstr "부가 키 바인딩"
-
-#: Client/core/CSettings.cpp:2746
-msgid "GTA GAME CONTROLS"
-msgstr "GTA 게임 컨트롤"
-
-#: Client/core/CSettings.cpp:2748
-msgid "MULTIPLAYER CONTROLS"
-msgstr "멀티플레이 컨트롤"
-
-#: Client/core/CSettings.cpp:2993 Client/core/CSettings.cpp:4940
-msgid "Your nickname contains invalid characters!"
-msgstr "닉네임에 잘못된 문자가 포함되어 있습니다!"
-
-#: Client/core/CSettings.cpp:3573 Client/core/CCore.cpp:674
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
-#: Client/mods/deathmatch/logic/CResource.cpp:372
-msgid "In-game"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3913
-msgid "Red:"
-msgstr "빨강:"
-
-#: Client/core/CSettings.cpp:3913
-msgid "Green:"
-msgstr "초록:"
-
-#: Client/core/CSettings.cpp:3913
-msgid "Blue:"
-msgstr "파랑:"
-
-#: Client/core/CSettings.cpp:3913
-msgid "Transparency:"
-msgstr "투명도:"
-
-#: Client/core/CSettings.cpp:3916
-msgid "Color"
-msgstr "색상:"
-
-#: Client/core/CSettings.cpp:3993
-msgid "Preview"
-msgstr "미리보기"
-
-#: Client/core/CSettings.cpp:4301
-msgid "Please disconnect before changing language"
-msgstr "언어를 변경하기 전에 연결을 끊으십시오"
-
-#: Client/core/CSettings.cpp:4329
-msgid "Please disconnect before changing skin"
-msgstr "스킨을 변경하기 전에 연결을 끊으십시오"
-
-#: Client/core/CSettings.cpp:4617
-msgid "Volmetric shadows can cause some systems to slow down.\n\n"
-"Are you sure you want to enable them?"
-msgstr "그림자로 인해 일부 시스템의 속도가 느려질 수 있습니다.\n\n"
-"사용하도록 설정하시겠습니까?"
-
-#: Client/core/CSettings.cpp:4621
-msgid "PERFORMANCE WARNING"
-msgstr "성능 주의"
-
-#: Client/core/CSettings.cpp:4641
-msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
-"(The chat box and GUI is excluded from the upload)\n"
-msgstr "부정행위 방지를 위해 일부 서버에서 화면 업로드가 필요합니다.\n\n"
-"(채팅창 및 GUI는 업로드 대상에서 제외)\n"
-
-#: Client/core/CSettings.cpp:4643
-msgid "SCREEN UPLOAD INFORMATION"
-msgstr "화면 업로드 정보"
-
-#: Client/core/CSettings.cpp:4658
-msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
-"Disabling this setting may decrease network\n"
-"bandwidth consumption.\n"
-msgstr "일부 스크립트는 인터넷에서 라디오와 같은 소리를 재생할 수 있습니다.\n\n"
-"이 설정을 비활성화하면 네트워크 대역폭 소비가 감소할 수 있습니다.\n"
-
-#: Client/core/CSettings.cpp:4661
-msgid "EXTERNAL SOUNDS"
-msgstr "외부 사운드"
-
-#: Client/core/CSettings.cpp:4690
-msgid "It seems that you have the Rich Presence connection option enabled.\n"
-"Do you want to allow servers to share their data?\n\n"
-"This includes yours unique ID identifier."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4695
-msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4719
-msgid "Some files in your GTA:SA data directory are customized.\n"
-"MTA will only use these modified files if this check box is ticked.\n\n"
-"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
-"Are you sure you want to use them?"
-msgstr "GTA:SA 데이터 디렉토리의 일부 파일이 사용자 정의됩니다.\n"
-"MTA는 이 확인란을 선택한 경우에만 수정된 파일을 사용합니다.\n\n"
-"그러나 사용자 정의된 GTA:SA 파일이 많은 서버에 의해 차단되었습니다.\n\n"
-"사용하시겠습니까?"
-
-#: Client/core/CSettings.cpp:4725 Client/core/CVersionUpdater.cpp:2081
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "사용자 정의된 GTA:SA 파일"
-
-#: Client/core/CSettings.cpp:4768
-msgid "Enabling DPI awareness is an experimental feature and\n"
-"we only recommend it when you play MTA:SA on a scaled monitor.\n"
-"You may experience graphical issues if you enable this option.\n\n"
-"Are you sure you want to enable this option?"
-msgstr "DPI awareness을 활성화하는 것은 실험적인 기능입니다.\n"
-"스케일 모니터에서 MTA:SA를 재생할 때만 권장합니다.\n"
-"이 옵션을 활성화하면 그래픽 문제가 발생할 수 있습니다.\n\n"
-"이 옵션을 활성화하시겠습니까?"
-
-#: Client/core/CSettings.cpp:4774 Client/core/CSettings.cpp:4820
-msgid "EXPERIMENTAL FEATURE"
-msgstr "실험적인 기능"
-
-#: Client/core/CSettings.cpp:4822
-msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
-"Are you sure you want to disable it?"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4958
-msgid "Please enter a nickname"
-msgstr "닉네임을 입력하십시오."
-
-#: Client/core/CSettings.cpp:4959
-msgid "Please enter a nickname to be used ingame.  \n"
-"This will be your name when you connect to and play in a server"
-msgstr "게임 내에서 사용할 닉네임을 입력하십시오. \n"
-"이것은 서버에 연결하고 서버에서 재생할 때 귀하의 이름이 될 것입니다."
-
-#: Client/core/CSettings.cpp:4977
-msgid "Very experimental feature."
-msgstr "매우 실험적인 기능."
-
-#: Client/core/CSettings.cpp:4979
-msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "CJ 버전으로 스톨 중지(65MB 이상의 RAM 사용)"
-
-#: Client/core/CSettings.cpp:4981
-msgid "Older routers may require a slower scan speed."
-msgstr "구형 라우터는 스캔 속도가 느려질 수 있습니다."
-
-#: Client/core/CSettings.cpp:4983
-msgid "Switch on to use only one connection when downloading."
-msgstr "다운로드할 때 연결을 하나만 사용하려면 켜십시오."
-
-#: Client/core/CSettings.cpp:4985
-msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "ISP가 MTA 트래픽을 식별할 수 있도록 네트워크 패킷에 태그를 지정합니다."
-
-#: Client/core/CSettings.cpp:4987
-msgid "Spinning circle animation at the bottom of the screen"
-msgstr "화면 하단의 회전 원 애니메이션"
-
-#: Client/core/CSettings.cpp:4989
-msgid "Select default always. (This setting is not saved)"
-msgstr "항상 기본값을 선택합니다. (이 설정은 저장되지 않음)"
-
-#: Client/core/CSettings.cpp:4991
-msgid "Maximum is usually best"
-msgstr "일반적으로 최대값이 가장 좋습니다."
-
-#: Client/core/CSettings.cpp:4993 Client/core/CSettings.cpp:4995
-msgid "Auto updater:"
-msgstr "자동 업데이터:"
-
-#: Client/core/CSettings.cpp:4993
-msgid "Select default unless you like filling out bug reports."
-msgstr "버그 보고서 작성을 원하지 않는 경우 기본값을 선택하십시오."
-
-#: Client/core/CSettings.cpp:4995
-msgid "Select default to automatically install important updates."
-msgstr "중요한 업데이트를 자동으로 설치하려면 기본값을 선택하십시오."
-
-#: Client/core/CSettings.cpp:4997
-msgid "16-bit color:"
-msgstr "16비트 색상:"
-
-#: Client/core/CSettings.cpp:4997
-msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "16비트 색상 모드 사용 - MTA를 다시 시작해야 합니다."
-
-#: Client/core/CSettings.cpp:4999
-msgid "Mouse fix:"
-msgstr "마우스 수정:"
-
-#: Client/core/CSettings.cpp:4999
-msgid "Mouse movement fix - May need PC restart"
-msgstr "마우스 이동 수정 - PC를 다시 시작해야 할 수 있습니다."
-
-#: Client/core/CSettings.cpp:5001
-msgid "CPU affinity:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:5001
-msgid "Only change if you're having stability issues."
-msgstr ""
-
-#. Unknown command
-#: Client/core/CCommands.cpp:223
-msgid "Unknown command or cvar: "
-msgstr "알 수 없는 명령 또는 cvar: "
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -1885,6 +865,10 @@ msgstr "다운로드 완료"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - _DialogUpdateResult의 알 수 없는 문제"
 
+#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:5697
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "사용자 정의된 GTA:SA 파일"
+
 #: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
 msgid "Ok"
 msgstr "확인"
@@ -1910,212 +894,6 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "응답 대기 중 - %-3d"
-
-#: Client/core/CConnectManager.cpp:85
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "연결에 실패했습니다. 잘못된 닉네임!"
-
-#: Client/core/CConnectManager.cpp:116
-msgid "Connecting failed. Invalid host provided!"
-msgstr "연결에 실패했습니다. 잘못된 호스트!"
-
-#: Client/core/CConnectManager.cpp:132
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "%u 포트에서 %s에 연결하지 못했습니다!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:153
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "%s:%u ... 에 연결 중"
-
-#: Client/core/CConnectManager.cpp:155
-#, c-format
-msgid "Reconnecting to %s:%u ..."
-msgstr ""
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:156
-#: Client/mods/deathmatch/logic/CClientGame.cpp:667
-msgid "CONNECTING"
-msgstr "연결 중"
-
-#: Client/core/CConnectManager.cpp:271
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
-msgid "Connection timed out"
-msgstr "연결 시간이 초과되었습니다."
-
-#: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1391
-msgid "Disconnected: unknown protocol error"
-msgstr "연결 끊김: 알 수 없는 프로토콜 오류"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1395
-msgid "Disconnected: disconnected remotely"
-msgstr "연결 끊김: 원격으로 연결이 끊어짐"
-
-#: Client/core/CConnectManager.cpp:297
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1399
-msgid "Disconnected: connection lost remotely"
-msgstr "연결 끊김: 원격으로 연결이 끊어짐"
-
-#: Client/core/CConnectManager.cpp:301
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1403
-msgid "Disconnected: you are banned from this server"
-msgstr "연결 끊김: 이 서버에서 밴되었습니다"
-
-#: Client/core/CConnectManager.cpp:308
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1411
-msgid "Disconnected: disconnected from the server"
-msgstr "연결 끊김: 서버와의 연결이 끊어졌습니다"
-
-#: Client/core/CConnectManager.cpp:312
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1415
-msgid "Disconnected: connection to the server was lost"
-msgstr "연결 끊김: 서버에 대한 연결이 끊어졌습니다"
-
-#: Client/core/CConnectManager.cpp:319
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1423
-msgid "Disconnected: connection was refused"
-msgstr "연결 끊김: 연결이 거부되었습니다"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:414
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "해당 모드가 설치되지 않았습니다(%s)"
-
-#: Client/core/CConnectManager.cpp:422
-msgid "Bad server response (2)"
-msgstr "서버 응답 불량(2)"
-
-#: Client/core/CConnectManager.cpp:432
-msgid "Bad server response (1)"
-msgstr "서버 응답 불량(1)"
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "소식"
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "최근 소식글 방문"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "콘솔"
-
-#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:129
-msgid "Fatal error"
-msgstr "치명적인 오류"
-
-#: Client/core/CCore.cpp:934
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "고치기 위해서, 이 파일을 지우십시오:"
-
-#: Client/core/CCore.cpp:966
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s 모듈이 잘못되었습니다!"
-
-#: Client/core/CCore.cpp:1272
-msgid "Error executing URL"
-msgstr "URL 실행 중 오류 발생"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1367
-msgid "this help screen"
-msgstr "이 도움말 화면"
-
-#: Client/core/CCore.cpp:1368 Client/core/CCore.cpp:1369
-msgid "exits the application"
-msgstr "프로그램 종료"
-
-#: Client/core/CCore.cpp:1370
-msgid "shows the version"
-msgstr "버전 표시"
-
-#: Client/core/CCore.cpp:1371
-msgid "shows the time"
-msgstr "시간 표시"
-
-#: Client/core/CCore.cpp:1372
-msgid "shows the hud"
-msgstr "hud 표시"
-
-#: Client/core/CCore.cpp:1373
-msgid "shows all the binds"
-msgstr "모든 바인드 표시"
-
-#: Client/core/CCore.cpp:1374
-msgid "shows your serial"
-msgstr "시리얼 넘버 표시"
-
-#: Client/core/CCore.cpp:1383
-msgid "connects to a server (host port nick pass)"
-msgstr "서버에 연결 (호스트 포트 닉네임 패스)"
-
-#: Client/core/CCore.cpp:1384
-msgid "connects to a previous server"
-msgstr "이전 서버에 연결"
-
-#: Client/core/CCore.cpp:1385
-msgid "binds a key (key control)"
-msgstr "키 바인딩(키 컨트롤)"
-
-#: Client/core/CCore.cpp:1386
-msgid "unbinds a key (key)"
-msgstr "바인드 해제 (키)"
-
-#: Client/core/CCore.cpp:1387
-msgid "copies the default gta controls"
-msgstr "기본 gta 컨트롤 복사"
-
-#: Client/core/CCore.cpp:1388
-msgid "outputs a screenshot"
-msgstr "스크린샷 출력"
-
-#: Client/core/CCore.cpp:1389
-msgid "immediately saves the config"
-msgstr "즉시 구성을 저장합니다"
-
-#: Client/core/CCore.cpp:1391
-msgid "clears the debug view"
-msgstr "디버그 보기 지우기"
-
-#: Client/core/CCore.cpp:1392
-msgid "scrolls the chatbox upwards"
-msgstr "채팅창을 위로 스크롤합니다"
-
-#: Client/core/CCore.cpp:1393
-msgid "scrolls the chatbox downwards"
-msgstr "채팅창을 아래로 스크롤합니다"
-
-#: Client/core/CCore.cpp:1394
-msgid "scrolls the debug view upwards"
-msgstr "디버그 보기를 위로 스크롤합니다"
-
-#: Client/core/CCore.cpp:1395
-msgid "scrolls the debug view downwards"
-msgstr "디버그 보기를 아래로 스크롤합니다"
-
-#: Client/core/CCore.cpp:1398
-msgid "shows the memory statistics"
-msgstr "메모리 통계를 보여줍니다"
-
-#: Client/core/CCore.cpp:1399
-msgid "shows the frame timing graph"
-msgstr "프레임 타이밍 그래프를 보여줍니다"
-
-#: Client/core/CCore.cpp:1403
-msgid "for developers: reload news"
-msgstr "개발자용: 소식 다시 로드"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -2160,69 +938,1250 @@ msgstr ""
 msgid "reconnect: Bad port number"
 msgstr ""
 
-#: Client/core/CCommandFuncs.cpp:321
+#: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
 msgstr ""
 
-#: Client/core/CCommandFuncs.cpp:325
+#: Client/core/CCommandFuncs.cpp:329
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
 msgstr ""
 
-#: Client/core/CCommandFuncs.cpp:359
+#: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
 msgstr "모든 컨트롤을 GTA에서 바인딩"
 
-#: Client/core/CCommandFuncs.cpp:373
+#: Client/core/CCommandFuncs.cpp:377
 msgid "Saved configuration file"
 msgstr "저장된 구성 파일"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:452
+#: Client/core/CCommandFuncs.cpp:456
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* 당신의 시리얼 넘버: %s"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "축 가속"
+#. Create window (with frame) if it will fit inside the screen resolution
+#: Client/core/CSettings.cpp:502
+msgid "SETTINGS"
+msgstr "설정"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "축 브레이크"
+#: Client/core/CSettings.cpp:548
+msgid "Multiplayer"
+msgstr "멀티플레이"
 
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "프로그래밍"
+#: Client/core/CSettings.cpp:549
+msgid "Video"
+msgstr "비디오"
 
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "기여자"
+#: Client/core/CSettings.cpp:550
+msgid "PostFX"
+msgstr ""
 
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "게임 디자인 / 스크립팅"
+#: Client/core/CSettings.cpp:551
+msgid "Audio"
+msgstr "오디오"
 
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "언어 현지화"
+#: Client/core/CSettings.cpp:552
+msgid "Binds"
+msgstr "바인드"
 
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "패치 기여자"
+#: Client/core/CSettings.cpp:553
+msgid "Controls"
+msgstr "컨트롤"
 
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "특별 감사"
+#: Client/core/CSettings.cpp:554
+msgid "Interface"
+msgstr "인터페이스"
 
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr "이 소프트웨어 및 프로젝트는 다음 라이브러리 및 소프트웨어를 사용합니다:"
+#: Client/core/CSettings.cpp:555
+msgid "Web Browser"
+msgstr "웹 브라우저"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "이 문제에 대한 온라인 도움말을 보시겠습니까?"
+#: Client/core/CSettings.cpp:556
+msgid "Advanced"
+msgstr "고급 설정"
+
+#: Client/core/CSettings.cpp:581 Client/core/CSettings.cpp:785
+#: Client/core/CSettings.cpp:1114 Client/core/CSettings.cpp:1410
+msgid "Load defaults"
+msgstr "기본값 불러오기"
+
+#. *
+#. *  Controls tab
+#. *
+#: Client/core/CSettings.cpp:598 Client/core/CSettings.cpp:622
+msgid "Mouse sensitivity:"
+msgstr "마우스 감도:"
+
+#. VerticalAimSensitivity
+#: Client/core/CSettings.cpp:598 Client/core/CSettings.cpp:643
+msgid "Vertical aim sensitivity:"
+msgstr "수직 감도:"
+
+#. Mouse Options
+#: Client/core/CSettings.cpp:601
+msgid "Mouse options"
+msgstr "마우스 설정"
+
+#: Client/core/CSettings.cpp:608
+msgid "Invert mouse vertically"
+msgstr "마우스 상하 반전"
+
+#: Client/core/CSettings.cpp:612
+msgid "Steer with mouse"
+msgstr "마우스로 조종"
+
+#: Client/core/CSettings.cpp:616
+msgid "Fly with mouse"
+msgstr "마우스로 비행"
+
+#. Joypad options
+#: Client/core/CSettings.cpp:664
+msgid "Joypad options"
+msgstr "조이패드 설정"
+
+#: Client/core/CSettings.cpp:677
+msgid "Standard controls (Mouse + Keyboard)"
+msgstr "기본 컨트롤 (마우스 + 키보드)"
+
+#: Client/core/CSettings.cpp:684
+msgid "Classic controls (Joypad)"
+msgstr "클래식 컨트롤 (조이패드)"
+
+#: Client/core/CSettings.cpp:721
+msgid "Dead Zone"
+msgstr "데드 존"
+
+#: Client/core/CSettings.cpp:726
+msgid "Saturation"
+msgstr "포화도"
+
+#: Client/core/CSettings.cpp:732
+msgid "Use the 'Binds' tab for joypad buttons."
+msgstr "조이패드 버튼의 경우 '바인드' 탭을 사용하십시오."
+
+#: Client/core/CSettings.cpp:771
+msgid "Left Stick"
+msgstr "왼쪽 스틱"
+
+#: Client/core/CSettings.cpp:777
+msgid "Right Stick"
+msgstr "오른쪽 스틱"
+
+#: Client/core/CSettings.cpp:792
+msgid "DESCRIPTION"
+msgstr "제목"
+
+#: Client/core/CSettings.cpp:793
+msgid "KEY"
+msgstr "키"
+
+#: Client/core/CSettings.cpp:795
+msgid "ALT. KEY"
+msgstr "부가 키"
+
+#. *
+#. *    Multiplayer tab
+#. *
+#: Client/core/CSettings.cpp:800 Client/core/CSettings.cpp:803
+msgid "Nick:"
+msgstr "닉네임:"
+
+#: Client/core/CSettings.cpp:825
+msgid "Save server passwords"
+msgstr "서버 비밀번호 저장"
+
+#: Client/core/CSettings.cpp:830
+msgid "Auto-refresh server browser"
+msgstr "서버 브라우저 자동 새로고침"
+
+#: Client/core/CSettings.cpp:835
+msgid "Allow screen upload"
+msgstr "화면 업로드 허용"
+
+#: Client/core/CSettings.cpp:840
+msgid "Allow external sounds"
+msgstr "외부 사운드 허용"
+
+#: Client/core/CSettings.cpp:845
+msgid "Always show download window"
+msgstr "항상 다운로드 창 표시"
+
+#: Client/core/CSettings.cpp:850
+msgid "Allow connecting with Discord Rich Presence"
+msgstr ""
+
+#: Client/core/CSettings.cpp:855
+msgid "Allow GTA:SA ingame status on Steam"
+msgstr ""
+
+#. Enable camera photos getting saved to documents folder
+#: Client/core/CSettings.cpp:861
+msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
+msgstr ""
+
+#: Client/core/CSettings.cpp:866
+msgid "Ask before disconnecting from server using main menu"
+msgstr ""
+
+#: Client/core/CSettings.cpp:871
+msgid "Use customized GTA:SA files"
+msgstr "커스터마이징 된 GTA:SA 파일 사용"
+
+#: Client/core/CSettings.cpp:876
+msgid "Map rendering options"
+msgstr "맵 렌더링 설정"
+
+#: Client/core/CSettings.cpp:884
+msgid "Opacity:"
+msgstr "불투명도:"
+
+#: Client/core/CSettings.cpp:907
+msgid "Image resolution:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:914
+msgid "1024 x 1024 (Default)"
+msgstr ""
+
+#. index 0
+#: Client/core/CSettings.cpp:915
+msgid "2048 x 2048"
+msgstr ""
+
+#. *
+#. *  Audio tab
+#. *
+#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:930
+msgid "Master volume:"
+msgstr "주 음량:"
+
+#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:952
+msgid "Radio volume:"
+msgstr "라디오 음량:"
+
+#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:974
+msgid "SFX volume:"
+msgstr "SFX 음량:"
+
+#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:996
+msgid "MTA volume:"
+msgstr "MTA 음량:"
+
+#: Client/core/CSettings.cpp:922 Client/core/CSettings.cpp:1018
+msgid "Voice volume:"
+msgstr "음성 음량:"
+
+#: Client/core/CSettings.cpp:922 Client/core/CSettings.cpp:1062
+msgid "Play mode:"
+msgstr "재생 모드:"
+
+#: Client/core/CSettings.cpp:924 Client/core/CSettings.cpp:1542
+#: Client/core/CSettings.cpp:2893
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+msgid "General"
+msgstr "일반"
+
+#: Client/core/CSettings.cpp:1040
+msgid "Radio options"
+msgstr "라디오 설정"
+
+#: Client/core/CSettings.cpp:1046
+msgid "Radio Equalizer"
+msgstr "라디오 이퀄라이저"
+
+#: Client/core/CSettings.cpp:1051
+msgid "Radio Auto-tune"
+msgstr "라디오 오토튠"
+
+#: Client/core/CSettings.cpp:1056
+msgid "Usertrack options"
+msgstr "사용자 트랙 설정"
+
+#: Client/core/CSettings.cpp:1070 Client/core/CSettings.cpp:3974
+msgid "Radio"
+msgstr "라디오"
+
+#: Client/core/CSettings.cpp:1071 Client/core/CSettings.cpp:3976
+msgid "Random"
+msgstr "랜덤"
+
+#: Client/core/CSettings.cpp:1072 Client/core/CSettings.cpp:3978
+msgid "Sequential"
+msgstr "순차적"
+
+#: Client/core/CSettings.cpp:1075
+msgid "Automatic Media Scan"
+msgstr "자동 미디어 스캔"
+
+#: Client/core/CSettings.cpp:1082
+msgid "Mute options"
+msgstr "음소거 설정"
+
+#: Client/core/CSettings.cpp:1088
+msgid "Mute All sounds when minimized"
+msgstr "최소화 시 모든 소리 음소거"
+
+#: Client/core/CSettings.cpp:1093
+msgid "Mute Radio sounds when minimized"
+msgstr "최소화 시 라디오 음소거"
+
+#: Client/core/CSettings.cpp:1098
+msgid "Mute SFX sounds when minimized"
+msgstr "최소화 시 SFX 소리 음소거"
+
+#: Client/core/CSettings.cpp:1103
+msgid "Mute MTA sounds when minimized"
+msgstr "최소화 시 MTA 소리 음소거"
+
+#: Client/core/CSettings.cpp:1108
+msgid "Mute Voice sounds when minimized"
+msgstr "최소화 시 음성 음소거"
+
+#. *
+#. *  Video tab
+#. *
+#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1130
+msgid "Resolution:"
+msgstr "해상도:"
+
+#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1185
+msgid "FOV:"
+msgstr "FOV:"
+
+#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1204
+msgid "Draw Distance:"
+msgstr "가시 거리:"
+
+#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1225
+#: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1456
+msgid "Brightness:"
+msgstr "밝기:"
+
+#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1246
+msgid "FX Quality:"
+msgstr "FX 품질:"
+
+#: Client/core/CSettings.cpp:1125 Client/core/CSettings.cpp:1260
+msgid "Anisotropic filtering:"
+msgstr "이방성 필터링:"
+
+#: Client/core/CSettings.cpp:1125 Client/core/CSettings.cpp:1297
+msgid "Anti-aliasing:"
+msgstr "안티 앨리어싱:"
+
+#: Client/core/CSettings.cpp:1125 Client/core/CSettings.cpp:1311
+msgid "Aspect Ratio:"
+msgstr "화면비:"
+
+#: Client/core/CSettings.cpp:1142
+msgid "Windowed"
+msgstr "창 모드"
+
+#: Client/core/CSettings.cpp:1148
+msgid "DPI aware"
+msgstr "DPI aware"
+
+#: Client/core/CSettings.cpp:1165 Client/core/CSettings.cpp:2314
+msgid "Standard"
+msgstr "기본"
+
+#: Client/core/CSettings.cpp:1167 Client/core/CSettings.cpp:2318
+msgid "Borderless keep res"
+msgstr "테두리 없는 창 해상도 유지"
+
+#: Client/core/CSettings.cpp:1170
+msgid "Mip Mapping"
+msgstr "밉 맵"
+
+#: Client/core/CSettings.cpp:1177
+msgid "V-Sync"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1254 Client/core/CSettings.cpp:2218
+msgid "Low"
+msgstr "낮음"
+
+#: Client/core/CSettings.cpp:1255 Client/core/CSettings.cpp:2220
+msgid "Medium"
+msgstr "중간"
+
+#: Client/core/CSettings.cpp:1256 Client/core/CSettings.cpp:1737
+#: Client/core/CSettings.cpp:2222 Client/core/CSettings.cpp:4032
+msgid "High"
+msgstr "높음"
+
+#: Client/core/CSettings.cpp:1257 Client/core/CSettings.cpp:2224
+msgid "Very high"
+msgstr "매우 높음"
+
+#: Client/core/CSettings.cpp:1274 Client/core/CSettings.cpp:1277
+#: Client/core/CSettings.cpp:1305 Client/core/CSettings.cpp:1668
+#: Client/core/CSettings.cpp:1722 Client/core/CSettings.cpp:1871
+#: Client/core/CSettings.cpp:2228 Client/core/CSettings.cpp:4039
+#: Client/core/CSettings.cpp:4071 Client/core/CSettings.cpp:4117
+#: Client/core/CSettings.cpp:5341
+msgid "Off"
+msgstr "끄기"
+
+#: Client/core/CSettings.cpp:1306 Client/core/CSettings.cpp:2230
+msgid "1x"
+msgstr "1x"
+
+#: Client/core/CSettings.cpp:1307 Client/core/CSettings.cpp:2232
+msgid "2x"
+msgstr "2x"
+
+#: Client/core/CSettings.cpp:1308 Client/core/CSettings.cpp:2234
+msgid "3x"
+msgstr "3x"
+
+#: Client/core/CSettings.cpp:1321 Client/core/CSettings.cpp:1670
+#: Client/core/CSettings.cpp:2240 Client/core/CSettings.cpp:4041
+msgid "Auto"
+msgstr "자동"
+
+#: Client/core/CSettings.cpp:1322 Client/core/CSettings.cpp:2242
+msgid "4:3"
+msgstr "4:3"
+
+#: Client/core/CSettings.cpp:1323 Client/core/CSettings.cpp:2244
+msgid "16:10"
+msgstr "16:10"
+
+#: Client/core/CSettings.cpp:1324 Client/core/CSettings.cpp:2246
+msgid "16:9"
+msgstr "16:9"
+
+#: Client/core/CSettings.cpp:1327
+msgid "HUD Match Aspect Ratio"
+msgstr "HUD 일치 종횡비"
+
+#: Client/core/CSettings.cpp:1333
+msgid "Volumetric Shadows"
+msgstr "체적 그림자"
+
+#: Client/core/CSettings.cpp:1337
+msgid "Grass effect"
+msgstr "잔디 효과"
+
+#: Client/core/CSettings.cpp:1341
+msgid "Heat haze"
+msgstr "열 헤이즈"
+
+#: Client/core/CSettings.cpp:1345
+msgid "Tyre Smoke etc"
+msgstr "타이어 연기 등"
+
+#: Client/core/CSettings.cpp:1349
+msgid "Dynamic ped shadows"
+msgstr "다이나믹 패드 그림자"
+
+#: Client/core/CSettings.cpp:1353
+msgid "Motion blur"
+msgstr "모션블러"
+
+#: Client/core/CSettings.cpp:1357
+msgid "Corona rain reflections"
+msgstr "Corona 비 반사"
+
+#: Client/core/CSettings.cpp:1362
+msgid "Full Screen Minimize"
+msgstr "전체화면 최소화"
+
+#: Client/core/CSettings.cpp:1374
+msgid "Enable Device Selection Dialog"
+msgstr "장치 선택 다이얼로그 활성화"
+
+#: Client/core/CSettings.cpp:1386
+msgid "Show unsafe resolutions"
+msgstr "불안전한 해상도 표시"
+
+#: Client/core/CSettings.cpp:1398
+msgid "Render vehicles always in high detail"
+msgstr "차량을 항상 최고 디테일로 렌더링"
+
+#: Client/core/CSettings.cpp:1402
+msgid "Render peds always in high detail"
+msgstr "패드를 항상 최고 디테일 렌더링"
+
+#: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1436
+msgid "Gamma:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1476
+msgid "Contrast:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1496
+msgid "Saturation:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1512
+msgid "Apply adjustments in windowed mode"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1518
+msgid "Apply adjustments in fullscreen mode"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1548
+msgid "Enable remote websites"
+msgstr "원격 웹 사이트 사용"
+
+#: Client/core/CSettings.cpp:1553
+msgid "Enable Javascript on remote websites"
+msgstr "원격 웹 사이트에서 자바스크립트 사용"
+
+#: Client/core/CSettings.cpp:1558
+msgid "Enable GPU rendering"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1562
+msgid "Custom blacklist"
+msgstr "사용자 지정 블랙리스트"
+
+#: Client/core/CSettings.cpp:1573 Client/core/CSettings.cpp:1613
+msgid "Enter a domain e.g. google.com"
+msgstr "도메인 입력 (예: google.com)"
+
+#: Client/core/CSettings.cpp:1581
+msgid "Block"
+msgstr "차단"
+
+#: Client/core/CSettings.cpp:1594 Client/core/CSettings.cpp:1632
+msgid "Domain"
+msgstr "도메인"
+
+#: Client/core/CSettings.cpp:1596 Client/core/CSettings.cpp:1634
+msgid "Remove domain"
+msgstr "도메인 제거"
+
+#. Reset vecTemp
+#: Client/core/CSettings.cpp:1602
+msgid "Custom whitelist"
+msgstr "사용자 지정 화이트리스트"
+
+#: Client/core/CSettings.cpp:1621 Client/cefweb/CWebsiteRequests.cpp:51
+msgid "Allow"
+msgstr "허용"
+
+#. Misc section label
+#: Client/core/CSettings.cpp:1647
+msgid "Misc"
+msgstr "기타"
+
+#. Fast clothes loading
+#: Client/core/CSettings.cpp:1653 Client/core/CSettings.cpp:1661
+#: Client/core/CSettings.cpp:5960
+msgid "Fast CJ clothes loading:"
+msgstr "빠른 CJ 옷 로딩:"
+
+#. Browser scan speed
+#: Client/core/CSettings.cpp:1653 Client/core/CSettings.cpp:1675
+#: Client/core/CSettings.cpp:5962
+msgid "Browser speed:"
+msgstr "브라우저 속도:"
+
+#. Single download
+#: Client/core/CSettings.cpp:1653 Client/core/CSettings.cpp:1689
+#: Client/core/CSettings.cpp:5964
+msgid "Single connection:"
+msgstr "단일 연결:"
+
+#. Packet tag
+#: Client/core/CSettings.cpp:1653 Client/core/CSettings.cpp:1702
+#: Client/core/CSettings.cpp:5966
+msgid "Packet tag:"
+msgstr "패킷 태그:"
+
+#. Progress animation
+#: Client/core/CSettings.cpp:1654 Client/core/CSettings.cpp:1715
+#: Client/core/CSettings.cpp:5968
+msgid "Progress animation:"
+msgstr "진행 애니메이션:"
+
+#. Process priority
+#: Client/core/CSettings.cpp:1654 Client/core/CSettings.cpp:1728
+#: Client/core/CSettings.cpp:5958
+msgid "Process priority:"
+msgstr "프로세스 우선도:"
+
+#. Debug setting
+#: Client/core/CSettings.cpp:1654 Client/core/CSettings.cpp:1742
+#: Client/core/CSettings.cpp:5970
+msgid "Debug setting:"
+msgstr "디버그 설정:"
+
+#. Streaming memory
+#: Client/core/CSettings.cpp:1655 Client/core/CSettings.cpp:1765
+#: Client/core/CSettings.cpp:5972
+msgid "Streaming memory:"
+msgstr "스트리밍 메모리:"
+
+#. Update build type
+#: Client/core/CSettings.cpp:1655 Client/core/CSettings.cpp:1885
+msgid "Update build type:"
+msgstr "빌드 유형 업데이트:"
+
+#. UpdateAutoInstall
+#: Client/core/CSettings.cpp:1655 Client/core/CSettings.cpp:1864
+msgid "Install important updates:"
+msgstr "중요한 업데이트를 설치합니다:"
+
+#: Client/core/CSettings.cpp:1669 Client/core/CSettings.cpp:1697
+#: Client/core/CSettings.cpp:1710 Client/core/CSettings.cpp:4043
+#: Client/core/CSettings.cpp:4059 Client/core/CSettings.cpp:4066
+msgid "On"
+msgstr "켜기"
+
+#: Client/core/CSettings.cpp:1682 Client/core/CSettings.cpp:4048
+msgid "Very slow"
+msgstr "매우 느리게"
+
+#: Client/core/CSettings.cpp:1683 Client/core/CSettings.cpp:1696
+#: Client/core/CSettings.cpp:1709 Client/core/CSettings.cpp:1723
+#: Client/core/CSettings.cpp:1749 Client/core/CSettings.cpp:1761
+#: Client/core/CSettings.cpp:1872 Client/core/CSettings.cpp:1892
+#: Client/core/CSettings.cpp:4050 Client/core/CSettings.cpp:4057
+#: Client/core/CSettings.cpp:4064 Client/core/CSettings.cpp:4073
+#: Client/core/CSettings.cpp:4110
+msgid "Default"
+msgstr "기본값"
+
+#: Client/core/CSettings.cpp:1684 Client/core/CSettings.cpp:4052
+msgid "Fast"
+msgstr "빠르게"
+
+#: Client/core/CSettings.cpp:1735 Client/core/CSettings.cpp:4028
+msgid "Normal"
+msgstr "보통"
+
+#: Client/core/CSettings.cpp:1736 Client/core/CSettings.cpp:4030
+msgid "Above normal"
+msgstr "보통 이상"
+
+#: Client/core/CSettings.cpp:1772
+msgid "Min"
+msgstr "최소"
+
+#: Client/core/CSettings.cpp:1797
+msgid "Max"
+msgstr "최대"
+
+#. Windows 8 compatibility
+#: Client/core/CSettings.cpp:1805
+msgid "Windows 8 compatibility:"
+msgstr "윈도우 8 호환성:"
+
+#: Client/core/CSettings.cpp:1809
+msgid "16-bit color"
+msgstr "16비트 색상"
+
+#: Client/core/CSettings.cpp:1814
+msgid "Mouse fix"
+msgstr "마우스 수정"
+
+#. Cache path info
+#: Client/core/CSettings.cpp:1832
+msgid "Client resource files:"
+msgstr "클라이언트 리소스 파일:"
+
+#: Client/core/CSettings.cpp:1836
+msgid "Show in Explorer"
+msgstr "탐색기에 표시"
+
+#. Process affinity
+#: Client/core/CSettings.cpp:1851
+msgid "Set CPU 0 affinity to improve game performance"
+msgstr ""
+
+#. Auto updater section label
+#: Client/core/CSettings.cpp:1857 Client/core/CSettings.cpp:1860
+msgid "Auto updater"
+msgstr "자동 업데이터"
+
+#. Check for updates
+#: Client/core/CSettings.cpp:1898
+msgid "Check for update now"
+msgstr "업데이트 확인"
+
+#: Client/core/CSettings.cpp:2081
+msgid "Some settings will be changed when you next start MTA"
+msgstr "일부 설정은 다음에 MTA를 시작할 때 변경됩니다."
+
+#: Client/core/CSettings.cpp:2082
+msgid "\n\n"
+"Do you want to restart now?"
+msgstr "\n\n"
+"지금 다시 시작하시겠습니까?"
+
+#: Client/core/CSettings.cpp:2085
+msgid "RESTART REQUIRED"
+msgstr "재시작 필요"
+
+#: Client/core/CSettings.cpp:2105
+msgid "Some settings will be changed when you disconnect the current server"
+msgstr "일부 설정은 현재 서버의 연결을 끊을 때 변경됩니다."
+
+#: Client/core/CSettings.cpp:2106
+msgid "\n\n"
+"Do you want to disconnect now?"
+msgstr "\n\n"
+"지금 연결을 끊으시겠습니까?"
+
+#: Client/core/CSettings.cpp:2109
+msgid "DISCONNECT REQUIRED"
+msgstr "연결 끊기 필요"
+
+#. Update the joystick name
+#: Client/core/CSettings.cpp:2551
+msgid "Joypad not detected  -  Check connections and restart game"
+msgstr "조이패드가 인식되지 않음 - 연결을 확인하고 게임을 다시 시작하십시오."
+
+#: Client/core/CSettings.cpp:2807
+msgid "Binding axis"
+msgstr "바인딩 축"
+
+#: Client/core/CSettings.cpp:2807
+msgid "Move an axis to bind, or escape to clear"
+msgstr "축을 움직여 바인드 하거나, Esc를 눌러 지우십시오"
+
+#: Client/core/CSettings.cpp:2884
+msgid "Language:"
+msgstr "언어:"
+
+#: Client/core/CSettings.cpp:2884
+msgid "Skin:"
+msgstr "스킨:"
+
+#: Client/core/CSettings.cpp:2884
+msgid "Presets:"
+msgstr "프리셋:"
+
+#: Client/core/CSettings.cpp:2933
+msgid "Chat"
+msgstr "채팅"
+
+#: Client/core/CSettings.cpp:2950
+msgid "Load"
+msgstr "불러오기"
+
+#: Client/core/CSettings.cpp:2962
+msgid "Colors"
+msgstr "색상"
+
+#: Client/core/CSettings.cpp:2963
+msgid "Layout"
+msgstr "레이아웃"
+
+#: Client/core/CSettings.cpp:2964 Client/core/CSettings.cpp:3210
+msgid "Options"
+msgstr "설정"
+
+#: Client/core/CSettings.cpp:2970
+msgid "Chat Background"
+msgstr "채팅 배경"
+
+#: Client/core/CSettings.cpp:2970
+msgid "Chat Text"
+msgstr "채팅 텍스트"
+
+#: Client/core/CSettings.cpp:2970
+msgid "Input Background"
+msgstr "채팅 배경"
+
+#: Client/core/CSettings.cpp:2970
+msgid "Input Text"
+msgstr "텍스트 입력"
+
+#: Client/core/CSettings.cpp:2993
+msgid "Lines:"
+msgstr "줄:"
+
+#: Client/core/CSettings.cpp:2993
+msgid "Scale:"
+msgstr "스케일:"
+
+#: Client/core/CSettings.cpp:2993
+msgid "Width:"
+msgstr "너비:"
+
+#: Client/core/CSettings.cpp:2996
+msgid "Size"
+msgstr "크기:"
+
+#: Client/core/CSettings.cpp:3045
+msgid "after"
+msgstr "후"
+
+#: Client/core/CSettings.cpp:3045
+msgid "for"
+msgstr "동안"
+
+#: Client/core/CSettings.cpp:3045
+msgid "sec"
+msgstr "초"
+
+#: Client/core/CSettings.cpp:3048
+msgid "Fading"
+msgstr "페이딩"
+
+#: Client/core/CSettings.cpp:3054
+msgid "Fade out old lines"
+msgstr "오래된 줄 사라짐"
+
+#: Client/core/CSettings.cpp:3094
+msgid "Horizontal:"
+msgstr "수평:"
+
+#: Client/core/CSettings.cpp:3094
+msgid "Vertical:"
+msgstr "수직:"
+
+#: Client/core/CSettings.cpp:3094
+msgid "Text-Align:"
+msgstr "텍스트 정렬:"
+
+#: Client/core/CSettings.cpp:3094
+msgid "X-Offset:"
+msgstr "X-오프셋:"
+
+#: Client/core/CSettings.cpp:3095
+msgid "Y-Offset:"
+msgstr "Y-오프셋:"
+
+#: Client/core/CSettings.cpp:3101
+msgid "Position"
+msgstr "위치"
+
+#: Client/core/CSettings.cpp:3115 Client/core/CSettings.cpp:3143
+#: Client/core/CKeyBinds.cpp:191
+msgid "Left"
+msgstr "왼쪽"
+
+#: Client/core/CSettings.cpp:3116 Client/core/CSettings.cpp:3130
+msgid "Center"
+msgstr "중앙"
+
+#: Client/core/CSettings.cpp:3117 Client/core/CSettings.cpp:3144
+#: Client/core/CKeyBinds.cpp:192
+msgid "Right"
+msgstr "오른쪽"
+
+#: Client/core/CSettings.cpp:3129
+msgid "Top"
+msgstr "상단"
+
+#: Client/core/CSettings.cpp:3131
+msgid "Bottom"
+msgstr "하단"
+
+#: Client/core/CSettings.cpp:3179
+msgid "Font"
+msgstr "폰트"
+
+#: Client/core/CSettings.cpp:3216
+msgid "Hide background when not typing"
+msgstr "입력하지 않을 때 배경 숨기기"
+
+#: Client/core/CSettings.cpp:3221
+msgid "Nickname completion using the \"Tab\" key"
+msgstr "\"탭\" 키를 사용하여 닉네임 완성"
+
+#: Client/core/CSettings.cpp:3226
+msgid "Allow server to flash the window"
+msgstr "서버가 창을 깜박일 수 있도록 허용"
+
+#: Client/core/CSettings.cpp:3231
+msgid "Allow tray balloon notifications"
+msgstr "트레이 풍선 알림 허용"
+
+#: Client/core/CSettings.cpp:3236
+msgid "Chat text black/white outline"
+msgstr "채팅 텍스트 검은색/흰색 윤곽선"
+
+#. Create a messagebox to notify the user
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. Create a messagebox to notify the user
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#: Client/core/CSettings.cpp:3485 Client/core/CSettings.cpp:3492
+msgid "Press a key to bind, or escape to clear"
+msgstr "원하는 키를 누르거나, Esc를 눌러 초기화하세요."
+
+#: Client/core/CSettings.cpp:3486
+msgid "Binding a primary key"
+msgstr "주 키 바인딩"
+
+#: Client/core/CSettings.cpp:3493
+msgid "Binding a secondary key"
+msgstr "부가 키 바인딩"
+
+#: Client/core/CSettings.cpp:3569
+msgid "GTA GAME CONTROLS"
+msgstr "GTA 게임 컨트롤"
+
+#: Client/core/CSettings.cpp:3571
+msgid "MULTIPLAYER CONTROLS"
+msgstr "멀티플레이 컨트롤"
+
+#: Client/core/CSettings.cpp:3816 Client/core/CSettings.cpp:5921
+msgid "Your nickname contains invalid characters!"
+msgstr "닉네임에 잘못된 문자가 포함되어 있습니다!"
+
+#: Client/core/CSettings.cpp:4410 Client/core/CCore.cpp:698
+#: Client/core/CMainMenu.cpp:303
+#: Client/mods/deathmatch/logic/CClientGame.cpp:548
+msgid "Main menu"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4414 Client/core/CCore.cpp:698
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1098
+#: Client/mods/deathmatch/logic/CResource.cpp:368
+msgid "In-game"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4764
+msgid "Red:"
+msgstr "빨강:"
+
+#: Client/core/CSettings.cpp:4764
+msgid "Green:"
+msgstr "초록:"
+
+#: Client/core/CSettings.cpp:4764
+msgid "Blue:"
+msgstr "파랑:"
+
+#: Client/core/CSettings.cpp:4764
+msgid "Transparency:"
+msgstr "투명도:"
+
+#: Client/core/CSettings.cpp:4767
+msgid "Color"
+msgstr "색상:"
+
+#: Client/core/CSettings.cpp:4873
+msgid "Preview"
+msgstr "미리보기"
+
+#: Client/core/CSettings.cpp:5181
+msgid "Please disconnect before changing language"
+msgstr "언어를 변경하기 전에 연결을 끊으십시오"
+
+#: Client/core/CSettings.cpp:5209
+msgid "Please disconnect before changing skin"
+msgstr "스킨을 변경하기 전에 연결을 끊으십시오"
+
+#: Client/core/CSettings.cpp:5589
+msgid "Volmetric shadows can cause some systems to slow down.\n\n"
+"Are you sure you want to enable them?"
+msgstr "그림자로 인해 일부 시스템의 속도가 느려질 수 있습니다.\n\n"
+"사용하도록 설정하시겠습니까?"
+
+#: Client/core/CSettings.cpp:5593
+msgid "PERFORMANCE WARNING"
+msgstr "성능 주의"
+
+#: Client/core/CSettings.cpp:5613
+msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
+"(The chat box and GUI is excluded from the upload)\n"
+msgstr "부정행위 방지를 위해 일부 서버에서 화면 업로드가 필요합니다.\n\n"
+"(채팅창 및 GUI는 업로드 대상에서 제외)\n"
+
+#: Client/core/CSettings.cpp:5615
+msgid "SCREEN UPLOAD INFORMATION"
+msgstr "화면 업로드 정보"
+
+#: Client/core/CSettings.cpp:5630
+msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
+"Disabling this setting may decrease network\n"
+"bandwidth consumption.\n"
+msgstr "일부 스크립트는 인터넷에서 라디오와 같은 소리를 재생할 수 있습니다.\n\n"
+"이 설정을 비활성화하면 네트워크 대역폭 소비가 감소할 수 있습니다.\n"
+
+#: Client/core/CSettings.cpp:5633
+msgid "EXTERNAL SOUNDS"
+msgstr "외부 사운드"
+
+#: Client/core/CSettings.cpp:5662
+msgid "It seems that you have the Rich Presence connection option enabled.\n"
+"Do you want to allow servers to share their data?\n\n"
+"This includes yours unique ID identifier."
+msgstr ""
+
+#: Client/core/CSettings.cpp:5667
+msgid "CONSENT TO ALLOW DATA SHARING"
+msgstr ""
+
+#: Client/core/CSettings.cpp:5691
+msgid "Some files in your GTA:SA data directory are customized.\n"
+"MTA will only use these modified files if this check box is ticked.\n\n"
+"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
+"Are you sure you want to use them?"
+msgstr "GTA:SA 데이터 디렉토리의 일부 파일이 사용자 정의됩니다.\n"
+"MTA는 이 확인란을 선택한 경우에만 수정된 파일을 사용합니다.\n\n"
+"그러나 사용자 정의된 GTA:SA 파일이 많은 서버에 의해 차단되었습니다.\n\n"
+"사용하시겠습니까?"
+
+#: Client/core/CSettings.cpp:5740
+msgid "Enabling DPI awareness is an experimental feature and\n"
+"we only recommend it when you play MTA:SA on a scaled monitor.\n"
+"You may experience graphical issues if you enable this option.\n\n"
+"Are you sure you want to enable this option?"
+msgstr "DPI awareness을 활성화하는 것은 실험적인 기능입니다.\n"
+"스케일 모니터에서 MTA:SA를 재생할 때만 권장합니다.\n"
+"이 옵션을 활성화하면 그래픽 문제가 발생할 수 있습니다.\n\n"
+"이 옵션을 활성화하시겠습니까?"
+
+#: Client/core/CSettings.cpp:5746 Client/core/CSettings.cpp:5801
+msgid "EXPERIMENTAL FEATURE"
+msgstr "실험적인 기능"
+
+#: Client/core/CSettings.cpp:5803
+msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
+"Are you sure you want to disable it?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:5939
+msgid "Please enter a nickname"
+msgstr "닉네임을 입력하십시오."
+
+#: Client/core/CSettings.cpp:5940
+msgid "Please enter a nickname to be used ingame.  \n"
+"This will be your name when you connect to and play in a server"
+msgstr "게임 내에서 사용할 닉네임을 입력하십시오. \n"
+"이것은 서버에 연결하고 서버에서 재생할 때 귀하의 이름이 될 것입니다."
+
+#: Client/core/CSettings.cpp:5958
+msgid "Very experimental feature."
+msgstr "매우 실험적인 기능."
+
+#: Client/core/CSettings.cpp:5960
+msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
+msgstr "CJ 버전으로 스톨 중지(65MB 이상의 RAM 사용)"
+
+#: Client/core/CSettings.cpp:5962
+msgid "Older routers may require a slower scan speed."
+msgstr "구형 라우터는 스캔 속도가 느려질 수 있습니다."
+
+#: Client/core/CSettings.cpp:5964
+msgid "Switch on to use only one connection when downloading."
+msgstr "다운로드할 때 연결을 하나만 사용하려면 켜십시오."
+
+#: Client/core/CSettings.cpp:5966
+msgid "Tag network packets to help ISPs identify MTA traffic."
+msgstr "ISP가 MTA 트래픽을 식별할 수 있도록 네트워크 패킷에 태그를 지정합니다."
+
+#: Client/core/CSettings.cpp:5968
+msgid "Spinning circle animation at the bottom of the screen"
+msgstr "화면 하단의 회전 원 애니메이션"
+
+#: Client/core/CSettings.cpp:5970
+msgid "Select default always. (This setting is not saved)"
+msgstr "항상 기본값을 선택합니다. (이 설정은 저장되지 않음)"
+
+#: Client/core/CSettings.cpp:5972
+msgid "Maximum is usually best"
+msgstr "일반적으로 최대값이 가장 좋습니다."
+
+#: Client/core/CSettings.cpp:5974 Client/core/CSettings.cpp:5976
+msgid "Auto updater:"
+msgstr "자동 업데이터:"
+
+#: Client/core/CSettings.cpp:5974
+msgid "Select default unless you like filling out bug reports."
+msgstr "버그 보고서 작성을 원하지 않는 경우 기본값을 선택하십시오."
+
+#: Client/core/CSettings.cpp:5976
+msgid "Select default to automatically install important updates."
+msgstr "중요한 업데이트를 자동으로 설치하려면 기본값을 선택하십시오."
+
+#: Client/core/CSettings.cpp:5978
+msgid "16-bit color:"
+msgstr "16비트 색상:"
+
+#: Client/core/CSettings.cpp:5978
+msgid "Enable 16 bit color modes - Requires MTA restart"
+msgstr "16비트 색상 모드 사용 - MTA를 다시 시작해야 합니다."
+
+#: Client/core/CSettings.cpp:5980
+msgid "Mouse fix:"
+msgstr "마우스 수정:"
+
+#: Client/core/CSettings.cpp:5980
+msgid "Mouse movement fix - May need PC restart"
+msgstr "마우스 이동 수정 - PC를 다시 시작해야 할 수 있습니다."
+
+#: Client/core/CSettings.cpp:5982
+msgid "CPU affinity:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:5982
+msgid "Only change if you're having stability issues."
+msgstr ""
+
+#: Client/core/CCore.cpp:837 Shared/mods/deathmatch/logic/Utils.cpp:129
+msgid "Fatal error"
+msgstr "치명적인 오류"
+
+#: Client/core/CCore.cpp:958
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "고치기 위해서, 이 파일을 지우십시오:"
+
+#: Client/core/CCore.cpp:990
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s 모듈이 잘못되었습니다!"
+
+#: Client/core/CCore.cpp:1310
+msgid "Error executing URL"
+msgstr "URL 실행 중 오류 발생"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1405
+msgid "this help screen"
+msgstr "이 도움말 화면"
+
+#: Client/core/CCore.cpp:1406 Client/core/CCore.cpp:1407
+msgid "exits the application"
+msgstr "프로그램 종료"
+
+#: Client/core/CCore.cpp:1408
+msgid "shows the version"
+msgstr "버전 표시"
+
+#: Client/core/CCore.cpp:1409
+msgid "shows the time"
+msgstr "시간 표시"
+
+#: Client/core/CCore.cpp:1410
+msgid "shows the hud"
+msgstr "hud 표시"
+
+#: Client/core/CCore.cpp:1411
+msgid "shows all the binds"
+msgstr "모든 바인드 표시"
+
+#: Client/core/CCore.cpp:1412
+msgid "shows your serial"
+msgstr "시리얼 넘버 표시"
+
+#: Client/core/CCore.cpp:1421
+msgid "connects to a server (host port nick pass)"
+msgstr "서버에 연결 (호스트 포트 닉네임 패스)"
+
+#: Client/core/CCore.cpp:1422
+msgid "connects to a previous server"
+msgstr "이전 서버에 연결"
+
+#: Client/core/CCore.cpp:1423
+msgid "binds a key (key control)"
+msgstr "키 바인딩(키 컨트롤)"
+
+#: Client/core/CCore.cpp:1424
+msgid "unbinds a key (key)"
+msgstr "바인드 해제 (키)"
+
+#: Client/core/CCore.cpp:1425
+msgid "copies the default gta controls"
+msgstr "기본 gta 컨트롤 복사"
+
+#: Client/core/CCore.cpp:1426
+msgid "outputs a screenshot"
+msgstr "스크린샷 출력"
+
+#: Client/core/CCore.cpp:1427
+msgid "immediately saves the config"
+msgstr "즉시 구성을 저장합니다"
+
+#: Client/core/CCore.cpp:1429
+msgid "clears the debug view"
+msgstr "디버그 보기 지우기"
+
+#: Client/core/CCore.cpp:1430
+msgid "scrolls the chatbox upwards"
+msgstr "채팅창을 위로 스크롤합니다"
+
+#: Client/core/CCore.cpp:1431
+msgid "scrolls the chatbox downwards"
+msgstr "채팅창을 아래로 스크롤합니다"
+
+#: Client/core/CCore.cpp:1432
+msgid "scrolls the debug view upwards"
+msgstr "디버그 보기를 위로 스크롤합니다"
+
+#: Client/core/CCore.cpp:1433
+msgid "scrolls the debug view downwards"
+msgstr "디버그 보기를 아래로 스크롤합니다"
+
+#: Client/core/CCore.cpp:1436
+msgid "shows the memory statistics"
+msgstr "메모리 통계를 보여줍니다"
+
+#: Client/core/CCore.cpp:1437
+msgid "shows the frame timing graph"
+msgstr "프레임 타이밍 그래프를 보여줍니다"
+
+#: Client/core/CCore.cpp:1441
+msgid "for developers: reload news"
+msgstr "개발자용: 소식 다시 로드"
+
+#: Client/core/CMainMenu.cpp:332
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "새로운 기능 빌드를 사용하고 있습니다. 공용 서버에 연결하는 데 사용할 수 없는 테스트 빌드입니다!"
+
+#: Client/core/CMainMenu.cpp:351
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA는 2019년 7월 이후에는 XP/Vista에 대한 업데이트를 받지 못할 것입니다.\n\n"
+"최신 서버에서 재생하도록 Windows를 업그레이드합니다."
+
+#: Client/core/CMainMenu.cpp:1231
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "현재 서버와의 연결이 끊어집니다.\n\n"
+"연결을 끊으시겠습니까?"
+
+#: Client/core/CMainMenu.cpp:1235
+msgid "DISCONNECT WARNING"
+msgstr "연결 해제 경고"
+
+#: Client/core/CMainMenu.cpp:1256
+msgid "INFORMATION"
+msgstr ""
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:154
+msgid "NEWS"
+msgstr "소식"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
+msgid "Visit latest news article"
+msgstr "최근 소식글 방문"
+
+#: Client/core/CScreenShot.cpp:200
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "스크린샷은 %d 바이트이지만, %d 로 예상됩니다."
+
+#: Client/core/CScreenShot.cpp:206
+msgid "Screenshot failed"
+msgstr "스크린샷 저장에 실패했습니다."
+
+#: Client/core/CScreenShot.cpp:256
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "스크린샷 촬영됨: '%s'"
+
+#. Unknown command
+#: Client/core/CCommands.cpp:233
+msgid "Unknown command or cvar: "
+msgstr "알 수 없는 명령 또는 cvar: "
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2397,31 +2356,114 @@ msgid "Group control backwards"
 msgstr "그룹 조종 후진"
 
 #. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:92
+#: Client/core/CGUI.cpp:93
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "선택한 스킨을 로드할 수 없으며 기본 스킨도 로드할 수 없습니다. MTA를 다시 설치하십시오."
 
-#: Client/core/CScreenShot.cpp:117
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "스크린샷은 %d 바이트이지만, %d 로 예상됩니다."
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1189
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "이 문제에 대한 온라인 도움말을 보시겠습니까?"
 
-#: Client/core/CScreenShot.cpp:123
-msgid "Screenshot failed"
-msgstr "스크린샷 저장에 실패했습니다."
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "콘솔"
 
-#: Client/core/CScreenShot.cpp:173
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "스크린샷 촬영됨: '%s'"
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "프로그래밍"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:124
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "기여자"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "게임 디자인 / 스크립팅"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "언어 현지화"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "패치 기여자"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "특별 감사"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr "이 소프트웨어 및 프로젝트는 다음 라이브러리 및 소프트웨어를 사용합니다:"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "축 가속"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "축 브레이크"
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:125
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
 msgstr "Direct3D9를 초기화할 수 없습니다.\n\n"
 "DirectX 최종 사용자 런타임을 확인하고\n"
 "최신 Windows 서비스 팩이 올바르게 설치되었는지 확인하십시오."
+
+#: Client/core/ServerBrowser/CServerList.cpp:25
+#: Client/core/ServerBrowser/CServerList.cpp:63
+msgid "Idle"
+msgstr "없음"
+
+#: Client/core/ServerBrowser/CServerList.cpp:166
+msgid "player"
+msgid_plural "players"
+msgstr[0] "플레이어\n\n"
+"플레이어들"
+
+#: Client/core/ServerBrowser/CServerList.cpp:167
+msgid "on"
+msgstr "접속 중"
+
+#: Client/core/ServerBrowser/CServerList.cpp:170
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "서버"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:263
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "마스터 서버 목록 요청( %lu ms 경과)"
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:279
+msgid "Master server list could not be parsed."
+msgstr "마스터 서버 목록을 검색할 수 없습니다."
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:289
+msgid "Master server list could not be retrieved."
+msgstr "마스터 서버 목록을 검색할 수 없습니다."
+
+#: Client/core/ServerBrowser/CServerList.cpp:299
+msgid "(Backup server list)"
+msgstr "(백업 서버 목록)"
+
+#: Client/core/ServerBrowser/CServerList.cpp:351
+msgid "Cannot create LAN-broadcast socket"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:361
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "LAN 브로드캐스트 소켓을 바인딩할 수 없습니다."
+
+#: Client/core/ServerBrowser/CServerList.cpp:404
+msgid "Attempting to discover LAN servers"
+msgstr "LAN 서버 검색 중"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
@@ -2476,7 +2518,7 @@ msgstr "레이턴시"
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+#: Client/core/ServerBrowser/CServerBrowser.cpp:608
 msgid "Player list"
 msgstr "플레이어 목록"
 
@@ -2514,29 +2556,29 @@ msgid "Querying..."
 msgstr "쿼리 중..."
 
 #. Create the window
-#: Client/core/ServerBrowser/CServerBrowser.cpp:85
+#: Client/core/ServerBrowser/CServerBrowser.cpp:187
 msgid "SERVER BROWSER"
 msgstr "서버 브라우저"
 
 #. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+#: Client/core/ServerBrowser/CServerBrowser.cpp:235
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:90
 msgid "Internet"
 msgstr "인터넷"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:134
+#: Client/core/ServerBrowser/CServerBrowser.cpp:236
 msgid "Local"
 msgstr "로컬"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:135
+#: Client/core/ServerBrowser/CServerBrowser.cpp:237
 msgid "Favourites"
 msgstr "즐겨찾기"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:136
+#: Client/core/ServerBrowser/CServerBrowser.cpp:238
 msgid "Recent"
 msgstr "최근"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:191
+#: Client/core/ServerBrowser/CServerBrowser.cpp:293
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
@@ -2544,709 +2586,298 @@ msgstr "빠른 연결:\n\n"
 "주소 표시줄에 주소와 포트를 입력합니다.\n"
 "또는 목록에서 서버를 선택하고 '연결'을 누릅니다"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:203
+#: Client/core/ServerBrowser/CServerBrowser.cpp:305
 msgid "HELP"
 msgstr "도움말"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:252
+#: Client/core/ServerBrowser/CServerBrowser.cpp:314
+#: Client/core/ServerBrowser/CServerBrowser.cpp:355
 msgid "Refresh"
 msgstr "새로고침"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:253
+#: Client/core/ServerBrowser/CServerBrowser.cpp:314
+#: Client/core/ServerBrowser/CServerBrowser.cpp:356
 msgid "Add Favorite"
 msgstr "즐겨찾기 추가"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:254
-#: Client/core/ServerBrowser/CServerBrowser.cpp:301
-#: Client/core/ServerBrowser/CServerBrowser.cpp:372
+#: Client/core/ServerBrowser/CServerBrowser.cpp:314
+#: Client/core/ServerBrowser/CServerBrowser.cpp:357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:431
+#: Client/core/ServerBrowser/CServerBrowser.cpp:502
 msgid "Connect"
 msgstr "연결"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:255
+#: Client/core/ServerBrowser/CServerBrowser.cpp:314
+#: Client/core/ServerBrowser/CServerBrowser.cpp:358
 msgid "Server information"
 msgstr "서버 정보"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:256
+#: Client/core/ServerBrowser/CServerBrowser.cpp:315
+#: Client/core/ServerBrowser/CServerBrowser.cpp:359
 msgid "Search servers"
 msgstr "서버 검색"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:257
+#: Client/core/ServerBrowser/CServerBrowser.cpp:315
+#: Client/core/ServerBrowser/CServerBrowser.cpp:360
 msgid "Search players"
 msgstr "플레이어 검색"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:258
+#: Client/core/ServerBrowser/CServerBrowser.cpp:315
+#: Client/core/ServerBrowser/CServerBrowser.cpp:361
 msgid "Start search"
 msgstr "검색 시작"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:299
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
+#: Client/core/ServerBrowser/CServerBrowser.cpp:315
+#: Client/core/ServerBrowser/CServerBrowser.cpp:362
+msgid "Delete from recent"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:429
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2001
 msgid "Search players..."
 msgstr "플레이어 검색..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:422
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
+#: Client/core/ServerBrowser/CServerBrowser.cpp:552
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1999
 msgid "Search servers..."
 msgstr "서버 검색..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:453
+#: Client/core/ServerBrowser/CServerBrowser.cpp:583
 msgid "Name"
 msgstr "이름"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:454
+#: Client/core/ServerBrowser/CServerBrowser.cpp:584
 msgid "Players"
 msgstr "플레이어"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:455
+#: Client/core/ServerBrowser/CServerBrowser.cpp:585
 msgid "Ping"
 msgstr "핑"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:456
+#: Client/core/ServerBrowser/CServerBrowser.cpp:586
 msgid "Gamemode"
 msgstr "게임 모드"
 
 #. Include label
-#: Client/core/ServerBrowser/CServerBrowser.cpp:486
+#: Client/core/ServerBrowser/CServerBrowser.cpp:620
 msgid "Include:"
 msgstr "포함:"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:492
+#: Client/core/ServerBrowser/CServerBrowser.cpp:626
 msgid "Empty"
 msgstr "비어있음"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:498
+#: Client/core/ServerBrowser/CServerBrowser.cpp:632
 msgid "Full"
 msgstr "가득 참"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:504
+#: Client/core/ServerBrowser/CServerBrowser.cpp:638
 msgid "Locked"
 msgstr "잠김"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:516
+#: Client/core/ServerBrowser/CServerBrowser.cpp:650
 msgid "Offline"
 msgstr "오프라인"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:529
+#: Client/core/ServerBrowser/CServerBrowser.cpp:663
 msgid "Other Versions"
 msgstr "다른 버전"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:550
+#: Client/core/ServerBrowser/CServerBrowser.cpp:684
 msgid "Back"
 msgstr "뒤로가기"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:741
+#: Client/core/ServerBrowser/CServerBrowser.cpp:977
+#: Client/core/ServerBrowser/CServerBrowser.cpp:991
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1658
 msgid "Loading..."
 msgstr "불러오는 중…"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1223
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2150
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1506
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2812
 msgid "  ..loading.."
 msgstr "  ..불러오는 중.."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1261
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1389
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1544
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
 msgid "No address specified!"
 msgstr "주소가 입력되지 않았습니다!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1557
 msgid "Unknown protocol"
 msgstr "알 수 없는 프로토콜"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1274
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1557
 msgid "Please use the mtasa:// protocol!"
 msgstr "Mtasa:// 프로토콜을 사용하십시오!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1283
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1340
-#: Client/mods/deathmatch/logic/CClientGame.cpp:651
-#: Client/mods/deathmatch/logic/CClientGame.cpp:749
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1566
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1625
+#: Client/mods/deathmatch/logic/CClientGame.cpp:656
+#: Client/mods/deathmatch/logic/CClientGame.cpp:748
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "잘못된 닉네임입니다! 설정으로 이동하여 새 닉네임을 설정하십시오!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1363
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1648
 msgid "You have to select a server to connect to."
 msgstr "연결할 서버를 선택해야 합니다."
 
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "없음"
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1502
+msgid "Problem with graphics driver"
+msgstr "그래픽 드라이버 문제"
 
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "플레이어\n\n"
-"플레이어들"
+#: Client/game_sa/CSettingsSA.cpp:824
+msgid "Can't find valid screen resolution."
+msgstr "올바른 화면 해상도를 찾을 수 없습니다."
 
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "접속 중"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:900
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "이 화면 해상도를 사용하시겠습니까?"
 
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "서버"
+#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
+msgid "Failed initialization game_sa"
+msgstr ""
 
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "마스터 서버 목록 요청( %lu ms 경과)"
+#: Client/game_sa/CGameSA.cpp:258
+msgid "Memory allocations failed"
+msgstr ""
 
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "마스터 서버 목록을 검색할 수 없습니다."
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "웹 사이트 요청"
 
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "마스터 서버 목록을 검색할 수 없습니다."
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "서버는 나중에 웹 사이트를 로드하기 위해 다음 웹 사이트를 요청합니다:"
 
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(백업 서버 목록)"
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "보안을 위해 중요한 데이터를 절대 입력하지 마십시오."
 
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "LAN 브로드캐스트 소켓을 바인딩할 수 없습니다."
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "기억하기"
 
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "LAN 서버 검색 중"
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "거부"
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
 msgstr "이 버전은 만료되었습니다."
 
-#: Client/mods/deathmatch/CClient.cpp:56
+#: Client/mods/deathmatch/CClient.cpp:57
 msgid "disconnect from the game"
 msgstr "서버와 연결 끊기"
 
-#: Client/mods/deathmatch/CClient.cpp:57
+#: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the nametags"
 msgstr "네임태그 표시"
 
-#: Client/mods/deathmatch/CClient.cpp:58
+#: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the chatbox"
 msgstr "채팅창 표시"
 
-#: Client/mods/deathmatch/CClient.cpp:59
+#: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the network statistics"
 msgstr "인터넷 통계 표시"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:62
+#: Client/mods/deathmatch/CClient.cpp:63
 msgid "open the chat input"
 msgstr "채팅 입력창 열기"
 
-#: Client/mods/deathmatch/CClient.cpp:63
+#: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
 msgstr "다른 플레이어에게 음성 전송"
 
-#: Client/mods/deathmatch/CClient.cpp:64
+#: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
 msgstr "승객으로 탑승"
 
-#: Client/mods/deathmatch/CClient.cpp:65
+#: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
 msgstr "다음 라디오 채널"
 
-#: Client/mods/deathmatch/CClient.cpp:66
+#: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
 msgstr "이전 라디오 채널"
 
-#: Client/mods/deathmatch/CClient.cpp:67
+#: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the player-map view"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:68
+#: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map in"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:69
+#: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map out"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:70
+#: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the player-map north"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:71
+#: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map south"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:72
+#: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map east"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:73
+#: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map west"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:74
+#: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the player-map"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:75
+#: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces player-map opacity"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:76
+#: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases player-map opacity"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:77
+#: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles player-map help text"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:78
+#: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
 msgstr "대상 플레이어에게 메시지를 보냅니다"
 
-#: Client/mods/deathmatch/CClient.cpp:79
+#: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "차량에 탑승하는 동안 다음 무기로 변경"
 
-#: Client/mods/deathmatch/CClient.cpp:80
+#: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "차량에 탑승하는 동안 이전 무기로 변경"
 
-#: Client/mods/deathmatch/CClient.cpp:81
+#: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
 msgstr "현재 서버에 대한 정보 출력"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:84
+#: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
 msgstr "모든 텍스트 디스플레이의 스케일 멀티플러를 정의"
 
 #. Development mode
-#: Client/mods/deathmatch/CClient.cpp:91
+#: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
 msgstr "(개발자 모드) colshapes 표시"
 
-#: Client/mods/deathmatch/CClient.cpp:92
+#: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(개발자 모드) 월드 사운드 Id를 디버그 창에 출력"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "맵 다운로드 진행률:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "다운로드 진행률:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s 중 %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "다운로드를 취소하려면 연결을 끊으십시오"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:506
-msgid "Disconnected: Invalid nickname"
-msgstr "연결 끊김: 잘못된 닉네임"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:510
-msgid "Disconnect from server"
-msgstr "서버와의 연결이 끊겼습니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:514
-#, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "연결 끊김: 이용이 금지된 시리얼 넘버입니다.\n"
-"이유: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
-#, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "연결 끊김: 당신은 이용이 금지되었습니다.\n"
-"이유: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:526
-#, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "연결 끊김: 이용이 금지된 계정입니다.\n"
-"이유: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:531
-msgid "Disconnected: Version mismatch"
-msgstr "연결 끊김: 버전이 다름."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "연결 끊김: 대량 접속. 잠시 기다렸다가 다시 연결하십시오."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:539
-#, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "연결 끊김: 다른 지점의 서버입니다.\n"
-"정보: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
-#, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "연결 끊김: 잘못된 버전.\n"
-"정보: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:549
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "연결 끊김: 서버에서 최신 빌드로 구동되고 있습니다.\n"
-"정보: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "연결 끊김: 서버에서 오래된 빌드로 구동되고 있습니다.\n"
-"정보: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:559
-msgid "Disconnected: Nick already in use"
-msgstr "연결 끊김: 이미 사용 중인 닉네임."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
-msgid "Disconnected: Player element could not be created."
-msgstr "연결 끊김: 플레이어 요소를 만들 수 없습니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:567
-#, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "연결 끊김: 서버가 연결을 거부했습니다. %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:572
-msgid "Disconnected: Serial verification failed"
-msgstr "연결 끊김: 시리얼 넘버 인증 실패."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
-msgid "Disconnected: Serial already in use"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:580
-#, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "연결 끊김: 연결 비동기화 %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
-#, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "연결 끊김: %s에 의해 추방되었습니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:594
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "연결 끊김: 당신은 %s 에 의해 이용이 금지되었습니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "연결 끊김: 서버 종료 또는 다시 시작"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
-msgid "You were kicked from the game"
-msgstr "당신은 게임에서 추방되었습니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:637
-msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "이 서버에는 수정되지 않은 gta_sa.exe가 필요합니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
-msgid "Please replace gta_sa.exe"
-msgstr "Gta_sa.exe를 교체하십시오."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr "이 서버는 사용자 지정 D3D9.DLL을 허용하지 않습니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "GTA 설치 디렉토리에서 D3D9.DLL을 제거하고 MTA를 다시 시작하십시오."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
-msgid "This server does not allow virtual machines"
-msgstr "이 서버는 가상 시스템을 허용하지 않습니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
-msgid "This server requires driver signing to be enabled"
-msgstr "이 서버에서 드라이버 서명을 사용하도록 설정해야 합니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
-msgid "Please restart your PC"
-msgstr "PC를 재시작 하십시오."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
-msgid "This server has detected missing anti-cheat components"
-msgstr "이 서버가 부정행위 방지 구성요소 누락을 감지했습니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
-msgid "Try restarting MTA"
-msgstr "MTA를 다시 시작하십시오."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "이 서버에는 수정되지 않은 gta3.img 및 gta_int.img가 필요합니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
-msgid "Please replace gta3.img or gta_int.img"
-msgstr "Gta3.img 또는 gta_int.img를 교체하십시오."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:639
-msgid "This server does not allow Wine"
-msgstr "이 서버는 Wine을 허용하지 않습니다"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
-msgid "Ensure no other program is modifying MTA:SA"
-msgstr "다른 프로그램이 MTA:SA를 수정하지 않는지 확인합니다."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:654
-msgid "Time Remaining: "
-msgstr "남은 시간: "
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:664
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d일"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:666
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d 시간"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:668
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d 분"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:670
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d 초"
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:674
-msgid "Disconnected"
-msgstr "연결 끊김"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "다운로드 오류: %s"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
-msgid "Flying a UFO around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
-msgid "Cruising around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
-msgid "Riding the waves of"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:380
-msgid "Riding the train in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:380
-msgid "Flying around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:381
-msgid "Riding around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:381
-msgid "Monster truckin' around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:381
-msgid "Quaddin' around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:382
-msgid "Bunny hopping around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:382
-msgid "Doing weird stuff in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
-msgid "Climbing around in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:387
-#: Client/mods/deathmatch/logic/CClientGame.cpp:388
-msgid "Doing a drive-by in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:389
-msgid "Blub blub..."
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:390
-msgid "Breathing water"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:391
-msgid "Drowning in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:392
-msgid "Ducking for cover in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:393
-msgid "Fighting in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:394
-msgid "Throwing fists in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:395
-msgid "Blastin' fools in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:396
-msgid "Shooting up"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:397
-msgid "Jetpacking in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:398
-msgid "Literally on fire in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:399
-msgid "Burning up in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:400
-msgid "Swimming in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:401
-msgid "Floating around in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:402
-msgid "Being chased by a shark"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:403
-msgid "Choking to death in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:667
-msgid "Entering the game ..."
-msgstr "게임에 접속하는 중..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:725
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "연결되지 않았습니다. 빠른 연결 또는 '연결' 명령을 사용하여 서버에 연결하십시오."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:771
-msgid "Could not start the local server. See console for details."
-msgstr "로컬 서버를 시작할 수 없습니다. 자세한 내용은 콘솔을 참조하십시오."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:781
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
-msgid "Local Server"
-msgstr "로컬 서버"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:781
-msgid "Starting local server ..."
-msgstr "로컬 서버 시작 중..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1029
-msgid "Area 51"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1038
-msgid "Walking around "
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "당신은 게임에서 추방되었습니다. (%s)"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
-msgid "Connecting to local server..."
-msgstr "로컬 서버에 연결 중..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
-msgid "Error connecting to server."
-msgstr "서버에 접속 중 오류 발생."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
-msgid "Connecting to local server timed out. See console for details."
-msgstr "로컬 서버에 접속 중 타임아웃 되었습니다. 자세한 사항은 콘솔을 확인하십시오."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
-msgid "Connection with the server was lost"
-msgstr "서버와의 연결이 끊어졌습니다."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1407
-msgid "Disconnected: the server is currently full"
-msgstr "연결 끊김: 서버 인원이 꽉 찼습니다."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
-msgid "Disconnected: invalid password specified"
-msgstr "연결 끊김: 잘못된 암호입니다."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
-msgid "MTA Client verification failed!"
-msgstr "MTA 클라이언트 인증 실패!"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5642
-msgid "In a ditch"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5642
-msgid "En-route to hospital"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5642
-msgid "Meeting their maker"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5643
-msgid "Regretting their decisions"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5643
-msgid "Wasted"
-msgstr ""
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
@@ -3316,27 +2947,418 @@ msgstr ""
 msgid "Free Movement"
 msgstr ""
 
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1450
-msgid "Problem with graphics driver"
-msgstr "그래픽 드라이버 문제"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "맵 다운로드 진행률:"
 
-#: Client/game_sa/CSettingsSA.cpp:820
-msgid "Can't find valid screen resolution."
-msgstr "올바른 화면 해상도를 찾을 수 없습니다."
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "다운로드 진행률:"
 
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:896
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "이 화면 해상도를 사용하시겠습니까?"
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s 중 %s"
 
-#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
-msgid "Failed initialization game_sa"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "다운로드를 취소하려면 연결을 끊으십시오"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:499
+msgid "Disconnected: Invalid nickname"
+msgstr "연결 끊김: 잘못된 닉네임"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
+msgid "Disconnect from server"
+msgstr "서버와의 연결이 끊겼습니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "연결 끊김: 이용이 금지된 시리얼 넘버입니다.\n"
+"이유: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "연결 끊김: 당신은 이용이 금지되었습니다.\n"
+"이유: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "연결 끊김: 이용이 금지된 계정입니다.\n"
+"이유: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:524
+msgid "Disconnected: Version mismatch"
+msgstr "연결 끊김: 버전이 다름."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "연결 끊김: 대량 접속. 잠시 기다렸다가 다시 연결하십시오."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "연결 끊김: 다른 지점의 서버입니다.\n"
+"정보: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "연결 끊김: 잘못된 버전.\n"
+"정보: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:542
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "연결 끊김: 서버에서 최신 빌드로 구동되고 있습니다.\n"
+"정보: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:547
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "연결 끊김: 서버에서 오래된 빌드로 구동되고 있습니다.\n"
+"정보: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:552
+msgid "Disconnected: Nick already in use"
+msgstr "연결 끊김: 이미 사용 중인 닉네임."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
+msgid "Disconnected: Player element could not be created."
+msgstr "연결 끊김: 플레이어 요소를 만들 수 없습니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "연결 끊김: 서버가 연결을 거부했습니다. %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:565
+msgid "Disconnected: Serial verification failed"
+msgstr "연결 끊김: 시리얼 넘버 인증 실패."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
+msgid "Disconnected: Serial already in use"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:258
-msgid "Memory allocations failed"
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "연결 끊김: 연결 비동기화 %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "연결 끊김: %s에 의해 추방되었습니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:587
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "연결 끊김: 당신은 %s 에 의해 이용이 금지되었습니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:598
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "연결 끊김: 서버 종료 또는 다시 시작"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:618
+msgid "You were kicked from the game"
+msgstr "당신은 게임에서 추방되었습니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:619
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr "이 서버에는 수정되지 않은 gta_sa.exe가 필요합니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+msgid "Please replace gta_sa.exe"
+msgstr "Gta_sa.exe를 교체하십시오."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "이 서버는 사용자 지정 D3D9.DLL을 허용하지 않습니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "GTA 설치 디렉토리에서 D3D9.DLL을 제거하고 MTA를 다시 시작하십시오."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
+msgid "This server does not allow virtual machines"
+msgstr "이 서버는 가상 시스템을 허용하지 않습니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
+msgid "This server requires driver signing to be enabled"
+msgstr "이 서버에서 드라이버 서명을 사용하도록 설정해야 합니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
+msgid "Please restart your PC"
+msgstr "PC를 재시작 하십시오."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
+msgid "This server has detected missing anti-cheat components"
+msgstr "이 서버가 부정행위 방지 구성요소 누락을 감지했습니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
+msgid "Try restarting MTA"
+msgstr "MTA를 다시 시작하십시오."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "이 서버에는 수정되지 않은 gta3.img 및 gta_int.img가 필요합니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "Gta3.img 또는 gta_int.img를 교체하십시오."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
+msgid "This server does not allow Wine"
+msgstr "이 서버는 Wine을 허용하지 않습니다"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr "다른 프로그램이 MTA:SA를 수정하지 않는지 확인합니다."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
+msgid "Time Remaining: "
+msgstr "남은 시간: "
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:657
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d일"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d 시간"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d 분"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d 초"
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
+msgid "Disconnected"
+msgstr "연결 끊김"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+msgid "Flying a UFO around"
 msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+msgid "Cruising around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+msgid "Riding the waves of"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+msgid "Riding the train in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+msgid "Flying around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+msgid "Riding around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+msgid "Monster truckin' around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+msgid "Quaddin' around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+msgid "Bunny hopping around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+msgid "Doing weird stuff in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+msgid "Climbing around in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:392
+#: Client/mods/deathmatch/logic/CClientGame.cpp:393
+msgid "Doing a drive-by in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+msgid "Blub blub..."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:395
+msgid "Breathing water"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:396
+msgid "Drowning in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:397
+msgid "Ducking for cover in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:398
+msgid "Fighting in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:399
+msgid "Throwing fists in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:400
+msgid "Blastin' fools in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:401
+msgid "Shooting up"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:402
+msgid "Jetpacking in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:403
+msgid "Literally on fire in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:404
+msgid "Burning up in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:405
+msgid "Swimming in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:406
+msgid "Floating around in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:407
+msgid "Being chased by a shark"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:408
+msgid "Choking to death in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:672
+msgid "Entering the game ..."
+msgstr "게임에 접속하는 중..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:724
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "연결되지 않았습니다. 빠른 연결 또는 '연결' 명령을 사용하여 서버에 연결하십시오."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:770
+msgid "Could not start the local server. See console for details."
+msgstr "로컬 서버를 시작할 수 없습니다. 자세한 내용은 콘솔을 참조하십시오."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:780
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+msgid "Local Server"
+msgstr "로컬 서버"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:780
+msgid "Starting local server ..."
+msgstr "로컬 서버 시작 중..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1028
+msgid "Area 51"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1037
+msgid "Walking around "
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1182
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "당신은 게임에서 추방되었습니다. (%s)"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+msgid "Connecting to local server..."
+msgstr "로컬 서버에 연결 중..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+msgid "Error connecting to server."
+msgstr "서버에 접속 중 오류 발생."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
+msgid "Connecting to local server timed out. See console for details."
+msgstr "로컬 서버에 접속 중 타임아웃 되었습니다. 자세한 사항은 콘솔을 확인하십시오."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
+msgid "Connection with the server was lost"
+msgstr "서버와의 연결이 끊어졌습니다."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
+msgid "Disconnected: the server is currently full"
+msgstr "연결 끊김: 서버 인원이 꽉 찼습니다."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1417
+msgid "Disconnected: invalid password specified"
+msgstr "연결 끊김: 잘못된 암호입니다."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1439
+msgid "MTA Client verification failed!"
+msgstr "MTA 클라이언트 인증 실패!"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+msgid "In a ditch"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+msgid "En-route to hospital"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+msgid "Meeting their maker"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+msgid "Regretting their decisions"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+msgid "Wasted"
+msgstr ""
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "다운로드 오류: %s"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
@@ -3357,11 +3379,11 @@ msgstr ""
 msgid "Connection error"
 msgstr "연결 오류"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:137
+#: Shared/sdk/SharedUtil.Misc.hpp:193
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto가 제대로 설치되지 않았습니다. 다시 설치하십시오."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:702
+#: Shared/sdk/SharedUtil.Misc.hpp:1203
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "이제 브라우저에 도움말 정보가 포함된 웹 페이지가 표시됩니다.\n\n"

@@ -99,7 +99,7 @@ bool CPedSA::InternalAttachEntityToEntity(DWORD entityInteface, const CVector* p
 {
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
     CPedSAInterface* pedInterface = GetPedInterface();
-    std::uint8_t pedType = pedInterface->bPedType;
+    auto pedType = static_cast<std::uint8_t>(pedInterface->bPedType);
 
     // Hack the CPed type(?) to non-player so the camera doesn't get changed
     pedInterface->bPedType = 2;
@@ -351,7 +351,9 @@ void CPedSA::SetClothesTextureAndModel(const char* texture, const char* model, i
 
     // int __fastcall CPedClothesDesc::SetTextureAndModel(DWORD* this, int unknown, char* textureName, char* modelName, eClothesTexturePart texturePart)
     // Second argument is unused in CKeyGen::GetUppercaseKey
-    ((void(__fastcall*)(CPedClothesDesc*, int, const char*, const char*, std::uint8_t))FUNC_CPedClothesDesc__SetTextureAndModel)(clothes, 0, texture, model, textureType);
+    void(__fastcall* CPedClothesDesc__SetTextureAndModel)(CPedClothesDesc*, int, const char*, const char*, int) = nullptr;
+    CPedClothesDesc__SetTextureAndModel = reinterpret_cast<decltype(CPedClothesDesc__SetTextureAndModel)>(FUNC_CPedClothesDesc__SetTextureAndModel);
+    CPedClothesDesc__SetTextureAndModel(clothes, 0, texture, model, textureType);
 }
 
 void CPedSA::RebuildPlayer()
@@ -577,6 +579,16 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
     }
 }
 
+void CPedSA::SetInWaterFlags(bool inWater)
+{
+    auto* physicalInterface = static_cast<CPhysicalSAInterface*>(m_pInterface);
+    if (!physicalInterface)
+        return;
+
+    physicalInterface->bTouchingWater = inWater;
+    physicalInterface->bSubmergedInWater = inWater;
+}
+
 bool CPedSA::IsPedCuttingWithChainsaw() const
 {
     if (GetPedIntelligence()->GetTaskManager()->GetActiveTask()->GetTaskType() == TASK_SIMPLE_FIGHT)
@@ -608,30 +620,32 @@ bool CPedSA::IsPedCuttingWithChainsaw() const
 #define HOOKSIZE_CPed_PreRenderAfterTest 15
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
-static void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
+static void __declspec(naked) HOOK_CPed_PreRenderAfterTest()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Replaced code
-        sub esp,70h
-        push ebx
-        push ebp
-        push esi
-        mov ebp, ecx
-        mov ecx, dword ptr [ebp+47Ch]
-        push edi
+        sub     esp, 70h
+        push    ebx
+        push    ebp
+        push    esi
+        mov     ebp, ecx
+        mov     ecx, dword ptr [ebp+47Ch]
+        push    edi
 
         // Check what to do
-        mov eax, [ebp+474h] // Load m_nThirdPedFlags
-        test eax, 400h // check bCalledPreRender flag
-        jnz skip_rotation_update
+        mov     eax, [ebp+474h] // Load m_nThirdPedFlags
+        test    eax, 400h // check bCalledPreRender flag
+        jnz     skip_rotation_update
 
         // Run code at start of CPed::PreRenderAfterTest
-        jmp RETURN_CPed_PreRenderAfterTest
+        jmp     RETURN_CPed_PreRenderAfterTest
 
-skip_rotation_update:
+        skip_rotation_update:
         // Skip code at start of CPed::PreRenderAfterTest
-        jmp RETURN_CPed_PreRenderAfterTestSkip
+        jmp     RETURN_CPed_PreRenderAfterTestSkip
     }
 }
 
@@ -647,23 +661,25 @@ skip_rotation_update:
 #define HOOKSIZE_CPed_PreRenderAfterTest_Mid 5
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
-static void _declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
+static void __declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Check what to do
-        movzx eax, byte ptr g_onlyUpdateRotations
-        test eax, eax
-        jnz skip_tail
+        movzx   eax, byte ptr g_onlyUpdateRotations
+        test    eax, eax
+        jnz     skip_tail
 
         // Replaced code
-        mov al, byte ptr ds:[00B7CB89h]
+        mov     al, byte ptr ds:[00B7CB89h]
         // Run code at mid of CPed::PreRenderAfterTest
-        jmp RETURN_CPed_PreRenderAfterTest_Mid
+        jmp     RETURN_CPed_PreRenderAfterTest_Mid
 
-skip_tail:
+        skip_tail:
         // Skip code at mid of CPed::PreRenderAfterTest
-        jmp RETURN_CPed_PreRenderAfterTest_MidSkip
+        jmp     RETURN_CPed_PreRenderAfterTest_MidSkip
     }
 }
 

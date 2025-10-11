@@ -150,6 +150,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
+        {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
+        {"engineRestream", ArgumentParser<EngineRestream>},
+
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -329,12 +332,12 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
                     {
                         // Delete it again. We failed
                         delete pCol;
-                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading COL");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading COL");
                     }
                 }
                 else
                 {
-                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Bad file path");
                 }
             }
         }
@@ -401,12 +404,12 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                     {
                         // Delete it again
                         delete pDFF;
-                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading DFF");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading DFF");
                     }
                 }
                 else
                 {
-                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Bad file path");
                 }
             }
         }
@@ -475,11 +478,11 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                     {
                         // Delete it again
                         delete pTXD;
-                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading TXD");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading TXD");
                     }
                 }
                 else
-                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Bad file path");
             }
         }
     }
@@ -540,12 +543,12 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
                     }
                     else
                     {
-                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading IFP");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading IFP");
                     }
                 }
                 else
                 {
-                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Bad file path");
                 }
             }
         }
@@ -600,9 +603,9 @@ int CLuaEngineDefs::EngineRestoreCOL(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModelID = CModelNames::ResolveModelID(strModelName);
+        uint32_t modelId = CModelNames::ResolveModelID(strModelName);
 
-        if (m_pColModelManager->RestoreModel(usModelID))
+        if (m_pColModelManager->RestoreModel(static_cast<unsigned short>(modelId)))
         {
             // Success
             lua_pushboolean(luaVM, true);
@@ -628,13 +631,15 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Valid importable model?
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
-        if (usModelID == INVALID_MODEL_ID)
-            usModelID = CModelNames::ResolveClothesTexID(strModelName);
-        if (CClientTXD::IsImportableModel(usModelID))
+        uint32_t modelId = CModelNames::ResolveModelID(strModelName);
+
+        if (modelId == INVALID_MODEL_ID)
+            modelId = CModelNames::ResolveClothesTexID(strModelName);
+
+        if (CClientTXD::IsImportableModel(static_cast<unsigned short>(modelId)))
         {
             // Try to import
-            if (pTXD->Import(usModelID))
+            if (pTXD->Import(static_cast<unsigned short>(modelId)))
             {
                 // Success
                 lua_pushboolean(luaVM, true);
@@ -670,7 +675,7 @@ CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string st
     // Get the resource we belong to
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return false;
+        return nullptr;
 
     std::string strFullPath;
 
@@ -818,22 +823,29 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
-        if (usModelID != INVALID_MODEL_ID)
+        const auto modelId = static_cast<unsigned short>(CModelNames::ResolveModelID(strModelName));
+
+        if (modelId != INVALID_MODEL_ID)
         {
             // Fixes vehicle dff leak problem with engineReplaceModel
-            m_pDFFManager->RestoreModel(usModelID);
-            if (pDFF->ReplaceModel(usModelID, bAlphaTransparency))
+            m_pDFFManager->RestoreModel(modelId);
+
+            if (pDFF->ReplaceModel(modelId, bAlphaTransparency))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
             else
-                argStream.SetCustomError(SString("Model ID %d replace failed", usModelID));
+            {
+                argStream.SetCustomError(SString("Model ID %u replace failed", modelId));
+            }
         }
         else
+        {
             argStream.SetCustomError("Expected valid model ID or name at argument 2");
+        }
     }
+
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
@@ -855,7 +867,7 @@ bool CLuaEngineDefs::EngineAddClothingModel(CClientDFF* pDFF, std::string strMod
 int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 {
     // Grab the model ID
-    unsigned short usModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
+    const auto usModelID = static_cast<unsigned short>(CModelNames::ResolveModelID(lua_tostring(luaVM, 1)));
 
     // Valid client DFF and model?
     if (CClientDFFManager::IsReplacableModel(usModelID))
@@ -1055,11 +1067,11 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelId);
+        uint32_t modelId = CModelNames::ResolveModelID(strModelId);
         // Ensure we have a good model (GitHub #446)
-        if (usModelID < g_pGame->GetBaseIDforTXD())
+        if (modelId < g_pGame->GetBaseIDforTXD())
         {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
             if (pModelInfo)
             {
                 lua_pushnumber(luaVM, pModelInfo->GetLODDistance());
@@ -1068,7 +1080,7 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
         }
         else
             argStream.SetCustomError(
-                SString("Expected a valid model name or ID in range [0-%d] at argument 1, got \"%s\"", g_pGame->GetBaseIDforTXD(), *strModelId));
+                SString("Expected a valid model name or ID in range [0-%u] at argument 1, got \"%s\"", g_pGame->GetBaseIDforTXD(), *strModelId));
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1091,11 +1103,11 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelId);
+        uint32_t modelId = CModelNames::ResolveModelID(strModelId);
         // Ensure we have a good model (GitHub #446)
-        if (usModelID < g_pGame->GetBaseIDforTXD())
+        if (modelId < g_pGame->GetBaseIDforTXD())
         {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
             if (pModelInfo && fDistance > 0.0f)
             {
                 pModelInfo->SetLODDistance(fDistance, extendedLod);
@@ -1105,7 +1117,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
         }
         else
             argStream.SetCustomError(
-                SString("Expected a valid model name or ID in range [0-%d] at argument 1, got \"%s\"", g_pGame->GetBaseIDforTXD() - 1, *strModelId));
+                SString("Expected a valid model name or ID in range [0-%u] at argument 1, got \"%s\"", g_pGame->GetBaseIDforTXD() - 1, *strModelId));
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1123,8 +1135,8 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
-    CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+    uint32_t    modelId = CModelNames::ResolveModelID(strModel);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
     if (pModelInfo)
     {
         float fCurrentDistance = pModelInfo->GetLODDistance();
@@ -1417,11 +1429,11 @@ int CLuaEngineDefs::EngineGetModelTextureNames(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
-        if (usModelID != INVALID_MODEL_ID)
+        uint32_t modelId = CModelNames::ResolveModelID(strModelName);
+        if (modelId != INVALID_MODEL_ID)
         {
             std::vector<SString> nameList;
-            g_pGame->GetRenderWare()->GetModelTextureNames(nameList, usModelID);
+            g_pGame->GetRenderWare()->GetModelTextureNames(nameList, static_cast<ushort>(modelId));
 
             lua_newtable(luaVM);
             for (uint i = 0; i < nameList.size(); i++)
@@ -1454,11 +1466,11 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
-        if (usModelID != INVALID_MODEL_ID || strModelName == "")
+        uint32_t modelId = CModelNames::ResolveModelID(strModelName);
+        if (modelId != INVALID_MODEL_ID || strModelName == "")
         {
             std::vector<SString> nameList;
-            g_pCore->GetGraphics()->GetRenderItemManager()->GetVisibleTextureNames(nameList, strTextureNameMatch, usModelID);
+            g_pCore->GetGraphics()->GetRenderItemManager()->GetVisibleTextureNames(nameList, strTextureNameMatch, static_cast<ushort>(modelId));
 
             lua_newtable(luaVM);
             for (uint i = 0; i < nameList.size(); i++)
@@ -1481,8 +1493,8 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
 bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff)
 {
-    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+    uint32_t    modelId = CModelNames::ResolveModelID(strModelId);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
     if (pModelInfo)
     {
         if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
@@ -1495,8 +1507,8 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHou
 
 std::variant<bool, CLuaMultiReturn<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
 {
-    ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+    uint32_t    modelId = CModelNames::ResolveModelID(strModelId);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
     if (pModelInfo)
     {
         char cHourOn, cHourOff;
@@ -1532,9 +1544,9 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     else if (argStream.NextIsTable())
         argStream.ReadStringTable(vTextureNames);
 
-    ushort usModelID = CModelNames::ResolveModelID(strModelName);
+    uint32_t modelId = CModelNames::ResolveModelID(strModelName);
 
-    if (usModelID == INVALID_MODEL_ID || !g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID, vTextureNames))
+    if (modelId == INVALID_MODEL_ID || !g_pGame->GetRenderWare()->GetModelTextures(textureList, static_cast<ushort>(modelId), vTextureNames))
     {
         argStream.SetCustomError("Invalid model ID");
         lua_pushboolean(luaVM, false);
@@ -1718,7 +1730,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                     argStream.ReadNumber(uiTyreGrip);
                     if (!argStream.HasErrors() && uiTyreGrip >= 0 && uiTyreGrip <= 255)
                     {
-                        pSurface->m_tyreGrip = uiTyreGrip;
+                        pSurface->m_tyreGrip = static_cast<uint8_t>(uiTyreGrip);
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }
@@ -1730,7 +1742,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                     argStream.ReadNumber(uiWetGrip);
                     if (!argStream.HasErrors() && uiWetGrip >= 0 && uiWetGrip <= 255)
                     {
-                        pSurface->m_wetGrip = uiWetGrip;
+                        pSurface->m_wetGrip = static_cast<uint8_t>(uiWetGrip);
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }
@@ -1967,26 +1979,26 @@ int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
 int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  int engineGetModelPhysicalPropertiesGroup ( int modelID )
-    int iModelID;
+    unsigned int modelId;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iModelID);
+    argStream.ReadNumber(modelId);
 
     if (!argStream.HasErrors())
     {
-        if (iModelID < 0 || iModelID >= g_pGame->GetBaseIDforTXD())
+        if (modelId >= g_pGame->GetBaseIDforTXD())
         {
-            argStream.SetCustomError(SString("Expected model ID in range [0-%d] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
+            argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
-        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
-        if (pModelInfo)
+        if (auto pModelInfo = g_pGame->GetModelInfo(modelId); pModelInfo != nullptr)
         {
             uint16_t groupId = pModelInfo->GetObjectPropertiesGroup();
             lua_pushnumber(luaVM, groupId == 0xFFFF ? -1 : groupId);
             return 1;
         }
+
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
 
@@ -1996,18 +2008,18 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
-    int iModelID;
-    int iNewGroup;
+    uint32_t modelId;
+    int      iNewGroup;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iModelID);
+    argStream.ReadNumber(modelId);
     argStream.ReadNumber(iNewGroup);
 
     if (!argStream.HasErrors())
     {
-        if (iModelID < 0 || iModelID > g_pGame->GetBaseIDforTXD() - 1)
+        if (modelId > g_pGame->GetBaseIDforTXD() - 1)
         {
-            argStream.SetCustomError(SString("Expected model ID in range [0-%d] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
+            argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
@@ -2017,13 +2029,13 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
-        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
-        if (pModelInfo)
+        if (auto pModelInfo = g_pGame->GetModelInfo(modelId); pModelInfo != nullptr)
         {
-            pModelInfo->SetObjectPropertiesGroup(iNewGroup);
+            pModelInfo->SetObjectPropertiesGroup(static_cast<unsigned short>(iNewGroup));
             lua_pushboolean(luaVM, true);
             return 1;
         }
+
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
 
@@ -2033,26 +2045,26 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  bool engineRestoreModelPhysicalPropertiesGroup ( int modelID )
-    int iModelID;
+    uint32_t modelId;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iModelID);
+    argStream.ReadNumber(modelId);
 
     if (!argStream.HasErrors())
     {
-        if (iModelID < 0 || iModelID > g_pGame->GetBaseIDforTXD() - 1)
+        if (modelId > g_pGame->GetBaseIDforTXD() - 1)
         {
-            argStream.SetCustomError(SString("Expected model ID in range [0-%d] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
+            argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
-        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
-        if (pModelInfo)
+        if (auto pModelInfo = g_pGame->GetModelInfo(modelId); pModelInfo != nullptr)
         {
             pModelInfo->RestoreObjectPropertiesGroup();
             lua_pushboolean(luaVM, true);
             return 1;
         }
+
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
 
@@ -2099,7 +2111,7 @@ int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
 
-    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(iGivenGroup);
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(static_cast<unsigned char>(iGivenGroup));
     if (!pGroup)
     {
         argStream.SetCustomError("Expected valid group ID at argument 1");
@@ -2282,7 +2294,7 @@ int CLuaEngineDefs::EngineGetObjectGroupPhysicalProperty(lua_State* luaVM)
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
 
-    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(iGivenGroup);
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(static_cast<unsigned char>(iGivenGroup));
     if (!pGroup)
     {
         argStream.SetCustomError("Expected valid group ID at argument 1");
@@ -2383,7 +2395,7 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
 
-    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(iGivenGroup);
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(static_cast<unsigned char>(iGivenGroup));
     if (!pGroup)
     {
         argStream.SetCustomError("Expected valid group ID at argument 1");
@@ -2427,7 +2439,7 @@ bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::opti
     if (bIdeFlags.value_or(false))
         pModelInfo->SetIdeFlags(uiFlags);
     else
-        pModelInfo->SetFlags(uiFlags);
+        pModelInfo->SetFlags(static_cast<unsigned short>(uiFlags));
 
     return true;
 }
@@ -2592,4 +2604,14 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 
     if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
+}
+
+bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
+{
+    return g_pClientGame->RestreamModel(modelId);
+}
+
+void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
+{
+    g_pClientGame->Restream(option);
 }

@@ -212,9 +212,9 @@ void CWorldRPCs::ResetMapInfo(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetFPSLimit(NetBitStreamInterface& bitStream)
 {
-    short sFPSLimit;
-    bitStream.Read(sFPSLimit);
-    g_pCore->RecalculateFrameRateLimit(sFPSLimit);
+    std::uint16_t fps;
+    bitStream.Read(fps);
+    CStaticFunctionDefinitions::SetServerFPSLimit(fps);
 }
 
 void CWorldRPCs::SetGarageOpen(NetBitStreamInterface& bitStream)

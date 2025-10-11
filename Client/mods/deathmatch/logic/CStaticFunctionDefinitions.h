@@ -85,8 +85,8 @@ public:
     static CClientDummy* CreateElement(CResource& Resource, const char* szTypeName, const char* szID);
     static bool          DestroyElement(CClientEntity& Entity);
     static bool          SetElementID(CClientEntity& Entity, const char* szID);
-    static bool          SetElementData(CClientEntity& Entity, const char* szName, CLuaArgument& Variable, bool bSynchronize);
-    static bool          RemoveElementData(CClientEntity& Entity, const char* szName);
+    static bool          SetElementData(CClientEntity& Entity, CStringName name, CLuaArgument& Variable, bool bSynchronize);
+    static bool          RemoveElementData(CClientEntity& Entity, CStringName name);
     static bool          SetElementMatrix(CClientEntity& Entity, const CMatrix& matrix);
     static bool          SetElementPosition(CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true);
     static bool          SetElementRotation(CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
@@ -141,7 +141,7 @@ public:
     static bool           IsPedDoingTask(CClientPed& Ped, const char* szTaskName, bool& bIsDoingTask);
     static bool           GetPedBonePosition(CClientPed& Ped, eBone bone, CVector& vecPosition);
     static bool           GetPedClothes(CClientPed& Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel);
-    static bool           GetPedControlState(CClientPed& const ped, const std::string control, bool& state) noexcept;
+    static bool           GetPedControlState(CClientPed& ped, const std::string& control, bool& state) noexcept;
     static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput);
     static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
     static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
@@ -178,7 +178,7 @@ public:
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);
     static bool RemovePedClothes(CClientEntity& Entity, unsigned char ucType);
-    static bool SetPedControlState(CClientPed& const ped, const std::string control, const bool state) noexcept;
+    static bool SetPedControlState(CClientPed& ped, const std::string& control, const bool state) noexcept;
     static bool SetPedAnalogControlState(CClientEntity& Entity, const char* szControl, float fState);
     static bool SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby);
     static bool SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle);
@@ -540,8 +540,8 @@ public:
     };
     static inline void GUIGridListSetItemColor(CClientGUIElement& GUIElement, int iRow, int iColumn, int iRed, int iGreen, int iBlue, int iAlpha)
     {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemColor(iRow, iColumn, iRed, iGreen, iBlue, iAlpha);
-    };
+        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemColor(iRow, iColumn, static_cast<unsigned char>(iRed), static_cast<unsigned char>(iGreen), static_cast<unsigned char>(iBlue), static_cast<unsigned char>(iAlpha));
+    }
     static void GUIGridListSetHorizontalScrollPosition(CClientEntity& Element, float fPosition);
     static void GUIGridListSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
@@ -637,8 +637,11 @@ public:
     static bool SetBirdsEnabled(bool bEnabled);
     static bool GetBirdsEnabled();
     static bool SetMoonSize(int iSize);
-    static bool SetFPSLimit(int iLimit);
-    static bool GetFPSLimit(int& iLimit);
+
+    // FPS Limiter
+    static void GetFPSLimit(std::uint16_t& fps) noexcept;
+    static void SetClientFPSLimit(std::uint16_t fps);
+    static void SetServerFPSLimit(std::uint16_t fps);
 
     static bool ResetAllSurfaceInfo();
     static bool ResetSurfaceInfo(short sSurfaceID);

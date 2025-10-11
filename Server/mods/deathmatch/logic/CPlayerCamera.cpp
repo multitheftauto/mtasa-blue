@@ -14,6 +14,7 @@
 #include "CCameraSpatialDatabase.h"
 #include "CPlayer.h"
 #include "Utils.h"
+#include <cmath>
 
 CPlayerCamera::CPlayerCamera(CPlayer* pPlayer)
 {
@@ -52,7 +53,7 @@ void CPlayerCamera::SetMode(eCameraMode Mode)
 
 const CVector& CPlayerCamera::GetPosition() const
 {
-    if (m_Mode == CAMERAMODE_PLAYER && m_pTarget)
+    if (m_Mode == CAMERAMODE_PLAYER && m_pTarget && !m_pTarget->IsBeingDeleted())
     {
         return m_pTarget->GetPosition();
     }
@@ -65,19 +66,26 @@ void CPlayerCamera::GetPosition(CVector& vecPosition) const
     {
         vecPosition = m_vecPosition;
     }
-    else if (m_pTarget)
+    else if (m_pTarget && !m_pTarget->IsBeingDeleted())
     {
         vecPosition = m_pTarget->GetPosition();
+    }
+    else
+    {
+        vecPosition = CVector();
     }
 }
 
 void CPlayerCamera::SetPosition(const CVector& vecPosition)
 {
-    if (m_Mode == CAMERAMODE_FIXED)
-    {
-        m_vecPosition = vecPosition;
-        GetCameraSpatialDatabase()->UpdateItem(this);
-    }
+    if (m_Mode != CAMERAMODE_FIXED)
+        return;
+
+    if (!std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ))
+        return;
+
+    m_vecPosition = vecPosition;
+    GetCameraSpatialDatabase()->UpdateItem(this);
 }
 
 void CPlayerCamera::GetLookAt(CVector& vecLookAt) const
@@ -94,26 +102,37 @@ void CPlayerCamera::GetLookAt(CVector& vecLookAt) const
 
 void CPlayerCamera::SetLookAt(const CVector& vecLookAt)
 {
-    if (m_Mode == CAMERAMODE_FIXED)
-    {
-        m_vecLookAt = vecLookAt;
-    }
+    if (m_Mode != CAMERAMODE_FIXED)
+        return;
+
+    if (!std::isfinite(vecLookAt.fX) || !std::isfinite(vecLookAt.fY) || !std::isfinite(vecLookAt.fZ))
+        return;
+
+    m_vecLookAt = vecLookAt;
 }
 
 void CPlayerCamera::SetMatrix(const CVector& vecPosition, const CVector& vecLookAt)
 {
-    if (m_Mode == CAMERAMODE_FIXED)
-    {
-        m_vecPosition = vecPosition;
-        m_vecLookAt = vecLookAt;
-        GetCameraSpatialDatabase()->UpdateItem(this);
-    }
+    if (m_Mode != CAMERAMODE_FIXED)
+        return;
+
+    if (!std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ))
+        return;
+
+    if (!std::isfinite(vecLookAt.fX) || !std::isfinite(vecLookAt.fY) || !std::isfinite(vecLookAt.fZ))
+        return;
+
+    m_vecPosition = vecPosition;
+    m_vecLookAt = vecLookAt;
+    GetCameraSpatialDatabase()->UpdateItem(this);
 }
 
 void CPlayerCamera::SetTarget(CElement* pElement)
 {
-    if (!pElement)
+    if (!pElement || pElement->IsBeingDeleted())
+    {
         pElement = m_pPlayer;
+    }
 
     if (m_pTarget != pElement)
     {
@@ -127,6 +146,9 @@ void CPlayerCamera::SetTarget(CElement* pElement)
 
 void CPlayerCamera::SetRotation(CVector& vecRotation)
 {
+    if (!std::isfinite(vecRotation.fX) || !std::isfinite(vecRotation.fY) || !std::isfinite(vecRotation.fZ))
+        return;
+
     // Rotate a 1000,0,0 vector with the given rotation vector
     CVector vecRotationCopy = vecRotation;
     vecRotationCopy.fX = 0.0f;

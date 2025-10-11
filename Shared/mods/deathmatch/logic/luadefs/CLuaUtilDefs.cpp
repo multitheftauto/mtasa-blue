@@ -263,7 +263,7 @@ int CLuaUtilDefs::GetUserdataType(lua_State* luaVM)
         else if (iArgument == LUA_TUSERDATA)
             strType = GetUserDataClassName(*((void**)lua_touserdata(luaVM, 1)), luaVM, false);
 
-        strType = strType.empty() ? "userdata" : strType;
+        strType = strType.empty() ? SStringX("userdata") : strType;
 
         lua_pushstring(luaVM, strType.c_str());
         return 1;
@@ -728,7 +728,8 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Make it into an unsigned long
-        unsigned long ulColor = COLOR_RGBA(iRed, iGreen, iBlue, iAlpha);
+        unsigned long ulColor = COLOR_RGBA(static_cast<unsigned char>(iRed), static_cast<unsigned char>(iGreen),
+                                           static_cast<unsigned char>(iBlue), static_cast<unsigned char>(iAlpha));
         lua_pushinteger(luaVM, static_cast<lua_Integer>(ulColor));
         return 1;
     }

@@ -368,7 +368,7 @@ void CClientPacketRecorder::DoPulse()
                 }
 
                 // Read out the packet id
-                unsigned char ucPacketID = fgetc(pFile);
+                const auto ucPacketID = static_cast<unsigned char>(fgetc(pFile));
 
                 // Is it 0xFE (local player data) or 0xFF (local keys)?
                 if (ucPacketID == 0xFE)
@@ -396,7 +396,7 @@ void CClientPacketRecorder::DoPulse()
                         // Write the filedata to the bitstream
                         for (unsigned long i = 0; i < ulSize; i++)
                         {
-                            char c = fgetc(pFile);
+                            auto c = static_cast<char>(fgetc(pFile));
                             pBitStream->Write(c);
                         }
 
@@ -412,8 +412,8 @@ void CClientPacketRecorder::DoPulse()
                 // Remember the new offset and read out the time for the next packet
                 m_ulCurrentOffset = ftell(pFile);
                 fread(&m_lNextPacketTime, sizeof(long), 1, pFile);
-                m_ucNextPacketID = fgetc(pFile);
-                // g_pCore->GetConsole()->Printf("next time: %u\n",m_lNextPacketTime);
+                m_ucNextPacketID = static_cast<unsigned char>(fgetc(pFile));
+                // g_pCore->GetConsole()->Printf("next time: %ld\n",m_lNextPacketTime);
 
                 // Reached end of file?
                 int iTemp = 0;

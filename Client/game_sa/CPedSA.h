@@ -475,6 +475,7 @@ public:
 
     void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 
+    void SetInWaterFlags(bool inWater) override;
     bool IsPedCuttingWithChainsaw() const override;
 
     static void StaticSetHooks();

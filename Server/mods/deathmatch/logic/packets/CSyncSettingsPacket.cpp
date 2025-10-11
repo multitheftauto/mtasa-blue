@@ -15,7 +15,7 @@
 
 CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
                                          short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
-                                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, bool triggerDamageEventCancelledForVehicles, bool triggerDamageEventCancelledForDamageEveryFrame)
+                                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, std::uint8_t multiCommandHandlerPolicy, bool triggerDamageEventCancelledForVehicles, bool triggerDamageEventCancelledForDamageEveryFrame)
 {
     m_weaponTypesUsingBulletSync = weaponTypesUsingBulletSync;
     m_ucVehExtrapolateEnabled = ucVehExtrapolateEnabled;
@@ -26,6 +26,7 @@ CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponType
     m_ucAllowFastSprintFix = ucAllowFastSprintFix;
     m_ucAllowDrivebyAnimationFix = ucAllowDrivebyAnimationFix;
     m_ucAllowShotgunDamageFix = ucAllowShotgunDamageFix;
+    m_multiCommandHandlerPolicy = multiCommandHandlerPolicy;
     m_triggerDamageEventCancelledForVehicles = triggerDamageEventCancelledForVehicles;
     m_triggerDamageEventCancelledForDamageEveryFrame = triggerDamageEventCancelledForDamageEveryFrame;
 }
@@ -53,6 +54,7 @@ bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_ucAllowFastSprintFix);
     BitStream.Write(m_ucAllowDrivebyAnimationFix);
     BitStream.Write(m_ucAllowShotgunDamageFix);
+    BitStream.Write(m_multiCommandHandlerPolicy);
     BitStream.WriteBit(m_triggerDamageEventCancelledForVehicles);
     BitStream.WriteBit(m_triggerDamageEventCancelledForDamageEveryFrame);
     return true;
