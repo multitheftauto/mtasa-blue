@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-05 14:21+0000\n"
-"PO-Revision-Date: 2025-10-05 14:22\n"
+"POT-Creation-Date: 2025-10-07 19:25+0000\n"
+"PO-Revision-Date: 2025-10-08 22:01\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -253,7 +253,7 @@ msgstr "MTA: SA başlarkən problem yarandı\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1439
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:193
+#: Shared/sdk/SharedUtil.Misc.hpp:247
 msgid "Error"
 msgstr "Xəta"
 
@@ -835,9 +835,7 @@ msgstr "Server klienti yeniləmək təklif edir, amma bu məcburi deyil.\n\n"
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr "[ARABIC]\n"
-"لا يوجد تحديث متاح حالياً.\n"
-"يرجى زيارة www.multitheftauto.com"
+msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -909,8 +907,7 @@ msgstr "* Saat %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr "[ARABIC]\n"
-"الاتصال: الشبكة غير جاهزة، يرجى الانتظار قليلاً"
+msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -936,12 +933,11 @@ msgstr "bağlantı: Cari mod sıradan çıxarıla bilmədi"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "[ARABIC]\n"
-"إعادة الاتصال: الشبكة غير جاهزة، يرجى الانتظار قليلاً"
+msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "إعادة الاتصال: رقم المنفذ غير صالح"
+msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
@@ -1129,8 +1125,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:866
 msgid "Ask before disconnecting from server using main menu"
-msgstr "[ARABIC]\n"
-"اسأل قبل قطع الاتصال بالخادم عند استخدام القائمة الرئيسية"
+msgstr ""
 
 #: Client/core/CSettings.cpp:871
 msgid "Use customized GTA:SA files"
@@ -1155,7 +1150,7 @@ msgstr ""
 #. index 0
 #: Client/core/CSettings.cpp:915
 msgid "2048 x 2048"
-msgstr "2048 x 2048"
+msgstr ""
 
 #. *
 #. *  Audio tab
@@ -1443,7 +1438,7 @@ msgstr "Ayrı saytlarda Javascript-ə icazə ver"
 
 #: Client/core/CSettings.cpp:1558
 msgid "Enable GPU rendering"
-msgstr "تفعيل عرض الرسومات باستخدام وحدة معالجة الرسومات GPU"
+msgstr ""
 
 #: Client/core/CSettings.cpp:1562
 msgid "Custom blacklist"
@@ -1602,8 +1597,7 @@ msgstr "Qovluğu aç"
 #. Process affinity
 #: Client/core/CSettings.cpp:1851
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr "[ARABIC]\n"
-"تعيين ارتباط المعالج إلى 0 لتحسين أداء اللعبة"
+msgstr ""
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1857 Client/core/CSettings.cpp:1860
@@ -1846,7 +1840,7 @@ msgstr "Əsas menyu"
 
 #: Client/core/CSettings.cpp:4414 Client/core/CCore.cpp:698
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1098
-#: Client/mods/deathmatch/logic/CResource.cpp:368
+#: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
 msgstr "Oyunda"
 
@@ -1951,9 +1945,7 @@ msgstr "EKSPERİMENTAL XÜSUSİYYƏT"
 #: Client/core/CSettings.cpp:5803
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr "[ARABIC]\n"
-"تعطيل هذا الخيار غير مستحب إلا إذا كنت تعاني من مشاكل في الأداء.\n"
-"هل أنت متأكد من رغبتك في تعطيله؟"
+msgstr ""
 
 #: Client/core/CSettings.cpp:5939
 msgid "Please enter a nickname"
@@ -2027,13 +2019,11 @@ msgstr "Siçan hərəkətini düzəlt - Kompüterin yenidən başlanması tələ
 
 #: Client/core/CSettings.cpp:5982
 msgid "CPU affinity:"
-msgstr "[ARABIC]\n"
-"ارتباط المعالج:"
+msgstr ""
 
 #: Client/core/CSettings.cpp:5982
 msgid "Only change if you're having stability issues."
-msgstr "[ARABIC]\n"
-"غيّر هذا فقط إذا كنت تواجه مشكلات في الاستقرار."
+msgstr ""
 
 #: Client/core/CCore.cpp:837 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
@@ -2164,8 +2154,7 @@ msgstr "AYIRILMA XƏBƏRDARLIĞI"
 
 #: Client/core/CMainMenu.cpp:1256
 msgid "INFORMATION"
-msgstr "[ARABIC]\n"
-"معلومات"
+msgstr ""
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:154
@@ -2373,7 +2362,7 @@ msgstr "Qrup: geri"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "Seçdiyiniz üslub yüklənə bilmədi, həmçinin standart üslub yüklənilə bilmədi. Zəhmət olmasa, MTA-nı yenidən quraşdırın."
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1189
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1328
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Bu problemlə bağlı onlayn yardım görmək istəyirsiniz?"
 
@@ -2708,7 +2697,7 @@ msgid "Loading..."
 msgstr "Yüklənir..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1506
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2812
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2831
 msgid "  ..loading.."
 msgstr "  ..yüklənir.."
 
@@ -2821,7 +2810,7 @@ msgstr "əvvəlki radiostansiya"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the player-map view"
-msgstr "يُفعّل عرض خريطة اللاعب ( الرادار )"
+msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the player-map in"
@@ -2946,8 +2935,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr "[ARABIC]\n"
-"التكبير: %s/%s الحركة: %s، %s، %s، %s الشفافية: %s/%s"
+msgstr ""
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
@@ -3216,7 +3204,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Bunny hopping around"
-msgstr "يقفز متكرراً حول"
+msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Doing weird stuff in"
@@ -3398,11 +3386,11 @@ msgstr ""
 msgid "Connection error"
 msgstr "Bağlantı xətası"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:193
+#: Shared/sdk/SharedUtil.Misc.hpp:247
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto düzgün quraşdırılmayıb, zəhmət olmasa yenidən quraşdırın."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:1203
+#: Shared/sdk/SharedUtil.Misc.hpp:1342
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Brauzeriviz kömək məlumatı ilə bir səhifə açacaq.\n\n"
