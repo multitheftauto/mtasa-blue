@@ -4466,7 +4466,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
                         }
                         case WEAPONTYPE_CHAINSAW:
                         {
-                            if (pInflictingEntity && pInflictingEntity->GetType() == eClientEntityType::CCLIENTPED || pInflictingEntity->GetType() == eClientEntityType::CCLIENTPLAYER)
+                            if (pInflictingEntity && (pInflictingEntity->GetType() == eClientEntityType::CCLIENTPED || pInflictingEntity->GetType() == eClientEntityType::CCLIENTPLAYER))
                             {
                                 CClientPed* attackerPed = static_cast<CClientPed*>(pInflictingEntity);
                                 if (!attackerPed->m_pPlayerPed || !attackerPed->m_pPlayerPed->IsPedCuttingWithChainsaw())
@@ -4894,7 +4894,7 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
                         }
                         case WEAPONTYPE_CHAINSAW:
                         {
-                            if (pClientAttacker && pClientAttacker->GetType() == eClientEntityType::CCLIENTPED || pClientAttacker->GetType() == eClientEntityType::CCLIENTPLAYER)
+                            if (pClientAttacker && (pClientAttacker->GetType() == eClientEntityType::CCLIENTPED || pClientAttacker->GetType() == eClientEntityType::CCLIENTPLAYER))
                             {
                                 CClientPed* attackerPed = static_cast<CClientPed*>(pClientAttacker);
                                 if (!attackerPed->m_pPlayerPed || !attackerPed->m_pPlayerPed->IsPedCuttingWithChainsaw())
