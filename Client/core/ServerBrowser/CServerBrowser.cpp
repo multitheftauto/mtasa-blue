@@ -1453,6 +1453,8 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
         for (i = i_b; i != i_e; i++)
         {
             CServerListItem* pServer = *i;
+            if (!pServer || !CServerListItem::StaticIsValid(pServer))
+                continue;
 
             for (std::size_t j = 0; j < pServer->vecPlayers.size(); ++j)
             {
@@ -1748,6 +1750,8 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
         {
             for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
@@ -2096,6 +2100,8 @@ bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagNa
         if (iLimit && iProcessed == iLimit)
             break;
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
 
         // Add the item to the node
         CXMLNode* pSubNode = pNode->CreateSubNode(strTagName.c_str());
@@ -2442,7 +2448,7 @@ bool CServerBrowser::ProcessServerListRefreshBatch(ServerBrowserType type, size_
     size_t processed = 0;
     while (state.iterator != state.endIterator && processed < uiMaxSteps)
     {
-        CServerListItem* pServer = (state.iterator != state.endIterator) ? *state.iterator : nullptr;
+        CServerListItem* pServer = *state.iterator;
 
         // The list can briefly hand us null if an item was erased between batches
         if (!pServer)
@@ -2460,16 +2466,17 @@ bool CServerBrowser::ProcessServerListRefreshBatch(ServerBrowserType type, size_
             continue;
         }
 
+        // Additional safety check before accessing members
         if (state.bNeedsListClear)
             pServer->iRowIndex = -1;
 
         if (type == ServerBrowserTypes::FAVOURITES || type == ServerBrowserTypes::RECENTLY_PLAYED)
         {
-            if (pServer->Address.s_addr != 0 && pServer->usGamePort != 0)
+            if (pServer && pServer->Address.s_addr != 0 && pServer->usGamePort != 0)
                 GetServerCache()->GetServerCachedInfo(pServer);
         }
 
-        if (pServer->revisionInList[type] != pServer->uiRevision || state.bClearServerList)
+        if (pServer && (pServer->revisionInList[type] != pServer->uiRevision || state.bClearServerList))
         {
             if (!state.bDidUpdateRowIndices)
             {
@@ -2748,6 +2755,8 @@ CServerListItem* CServerBrowser::FindServer(const std::string& strHost, unsigned
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
             return pServer;
     }
@@ -2768,6 +2777,8 @@ unsigned short CServerBrowser::FindServerHttpPort(const std::string& strHost, un
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
             return pServer->m_usHttpPort;
     }
@@ -2789,6 +2800,8 @@ void CServerBrowser::UpdateRowIndexMembers(ServerBrowserType Type)
     for (int iRowIndex = 0; iRowIndex < iRowCount; iRowIndex++)
     {
         CServerListItem* pServer = (CServerListItem*)pServerList->GetItemData(iRowIndex, DATA_PSERVER);
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         pServer->iRowIndex = iRowIndex;
     }
 }
