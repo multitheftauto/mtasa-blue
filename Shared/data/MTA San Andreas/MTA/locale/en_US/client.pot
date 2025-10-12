@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-12 00:53+0000\n"
+"POT-Creation-Date: 2025-10-12 03:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -216,7 +216,7 @@ msgstr ""
 #: Client/loader/MainFunctions.cpp:637 Client/loader/MainFunctions.cpp:644
 #: Client/loader/MainFunctions.cpp:1543
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1648
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1650
 #: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr ""
@@ -253,10 +253,10 @@ msgstr ""
 #: Client/core/CSettings.cpp:5209 Client/core/CSettings.cpp:5921
 #: Client/core/CCore.cpp:1315 Client/core/CGUI.cpp:94
 #: Client/core/DXHook/CDirect3DHook9.cpp:128
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1544
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1566
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1625
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1546
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1568
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1627
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:724
@@ -2722,12 +2722,12 @@ msgid "Delete from recent"
 msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:429
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2001
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2005
 msgid "Search players..."
 msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:552
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1999
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2003
 msgid "Search servers..."
 msgstr ""
 
@@ -2778,36 +2778,36 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:977
 #: Client/core/ServerBrowser/CServerBrowser.cpp:991
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1658
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1660
 msgid "Loading..."
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1506
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2831
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1508
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2844
 msgid "  ..loading.."
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1544
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1546
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1680
 msgid "No address specified!"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1557
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1559
 msgid "Unknown protocol"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1557
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1559
 msgid "Please use the mtasa:// protocol!"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1566
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1625
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1568
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1627
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:748
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1648
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1650
 msgid "You have to select a server to connect to."
 msgstr ""
 
