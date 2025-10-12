@@ -92,7 +92,9 @@ CRemoteMasterServer::~CRemoteMasterServer()
 void CRemoteMasterServer::Init(const SString& strURL)
 {
     m_strURL = strURL;
-    GetHTTP()->SetMaxConnections(5);
+    CNetHTTPDownloadManagerInterface* pHTTP = GetHTTP();
+    if (pHTTP)
+        pHTTP->SetMaxConnections(5);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -120,12 +122,19 @@ void CRemoteMasterServer::Refresh()
     if (GetTickCount64_() - m_llLastRefreshTime < 60000 && m_strStage == "hasdata")
         return;
 
+    CNetHTTPDownloadManagerInterface* pHTTP = GetHTTP();
+    if (!pHTTP)
+    {
+        m_strStage = "nogood";
+        return;
+    }
+
     // Send new request
     m_strStage = "waitingreply";
     m_llLastRefreshTime = GetTickCount64_();
     SHttpRequestOptions options;
     options.uiConnectionAttempts = 1;
-    if (GetHTTP()->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options))
+    if (pHTTP->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options))
     {
         m_bPendingDownload = true;
         AddRef();            // Keep alive
@@ -141,7 +150,17 @@ void CRemoteMasterServer::Cancel()
     if (!m_bPendingDownload)
         return;
 
-    if (GetHTTP()->CancelDownload(this, &CRemoteMasterServer::StaticDownloadFinished))
+    CNetHTTPDownloadManagerInterface* pHTTP = GetHTTP();
+    if (!pHTTP)
+    {
+        // HTTP manager destroyed - callback won't be called, so Release() here
+        m_bPendingDownload = false;
+        m_strStage.clear();
+        Release();
+        return;
+    }
+
+    if (pHTTP->CancelDownload(this, &CRemoteMasterServer::StaticDownloadFinished))
     {
         m_bPendingDownload = false;
         m_strStage.clear();
@@ -200,7 +219,9 @@ void CRemoteMasterServer::DownloadFinished(const SHttpDownloadResult& result)
 ///////////////////////////////////////////////////////////////
 bool CRemoteMasterServer::HasData()
 {
-    GetHTTP()->ProcessQueuedFiles();
+    CNetHTTPDownloadManagerInterface* pHTTP = GetHTTP();
+    if (pHTTP)
+        pHTTP->ProcessQueuedFiles();
     return m_strStage == "hasdata";
 }
 

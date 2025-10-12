@@ -372,6 +372,11 @@ CServerBrowser::CServerBrowser()
 
 CServerBrowser::~CServerBrowser()
 {
+    // Suspend all server list activity and cancel pending network operations FIRST
+    // This must be done before DeleteTab() destroys the server lists, and while
+    // the network subsystem is still available (it may be destroyed before this destructor)
+    SuspendServerLists();
+
     // Save options now and disable selection handler
     SaveOptions(true);
     if (m_pPanel)
@@ -990,6 +995,13 @@ void CServerBrowser::StartRefresh(ServerBrowserType type)
 
         m_iSelectedServer[index] = -1;
         m_bPendingRefresh[index] = false;
+        
+        // Cancel any in-progress batch refresh to prevent iterator invalidation
+        // when pList->Refresh() calls Clear() on the server list
+        m_ListRefreshState[index].bActive = false;
+        m_ListRefreshState[index].pList = nullptr;
+        m_ListRefreshState[index].filterSnapshot.reset();
+        
         pList->Refresh();
         m_bInitialRefreshDone[index] = true;
     }
