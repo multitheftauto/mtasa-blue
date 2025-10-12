@@ -155,7 +155,7 @@ bool CClientSound::Create()
     // Load file/start connect
     if (!m_pAudio->BeginLoadingMedia())
     {
-        delete m_pAudio;
+        m_pAudio->Destroy();
         m_pAudio = nullptr;
         return false;
     }
