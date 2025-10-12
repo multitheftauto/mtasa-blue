@@ -1649,7 +1649,10 @@ bool CServerBrowser::ConnectToSelectedServer()
 
             if (strPassword.empty())            // No password could be found, popup password entry.
             {
-                CServerInfo::GetSingletonPtr()->Show(eWindowTypes::SERVER_INFO_PASSWORD, pServer->strHost.c_str(), pServer->usGamePort, "", pServer);
+                if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+                {
+                    pServerInfo->Show(eWindowTypes::SERVER_INFO_PASSWORD, pServer->strHost.c_str(), pServer->usGamePort, "", pServer);
+                }
                 return true;
             }
         }
@@ -1679,9 +1682,29 @@ bool CServerBrowser::OnRefreshClick(CGUIElement* pElement)
 
 bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 {
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    
+    // First try to get the selected server from the list
+    CServerListItem* pServer = FindSelectedServer(Type);
+    if (pServer && CServerListItem::StaticIsValid(pServer) && 
+        pServer->Address.s_addr != 0 && pServer->usGamePort != 0 && 
+        !pServer->strHost.empty())
+    {
+        // Use the selected server's information directly
+        const SString& strHost = pServer->strHost;
+        unsigned short usPort = pServer->usGamePort;
+
+        if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+        {
+            pServerInfo->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, "", pServer);
+            return true;
+        }
+    }
+    
+    // Fallback to using the address bar if no server is selected
     unsigned short usPort;
     std::string    strHost, strNick, strPassword;
-    SString        strURI = m_pEditAddress[GetCurrentServerBrowserType()]->GetText();
+    SString        strURI = m_pEditAddress[Type]->GetText();
 
     // Trim leading spaces from the URI
     strURI = strURI.TrimStart(" ");
@@ -1695,7 +1718,10 @@ bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
 
-    CServerInfo::GetSingletonPtr()->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str());
+    if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+    {
+        pServerInfo->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str());
+    }
     return true;
 }
 
