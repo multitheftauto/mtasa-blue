@@ -59,15 +59,14 @@ void CClientSound::AdoptBuffer(void* pMemory, unsigned int uiLength, AudioBuffer
         return;
     }
 
-    if (!m_Buffer || m_Buffer.get() != pMemory)
+    // Always release the old buffer before adopting a new one, even if the pointer is the same
+    // This prevents deleter mismatch issues (e.g., mixing new[]/delete[] with malloc/free)
+    if (m_Buffer)
     {
-        m_Buffer = BufferPtr(pMemory, std::move(deleter));
-    }
-    else
-    {
-        m_Buffer.get_deleter() = std::move(deleter);
+        ReleaseBuffer();
     }
 
+    m_Buffer = BufferPtr(pMemory, std::move(deleter));
     m_uiBufferLength = uiLength;
     m_strPath.clear();
 }
