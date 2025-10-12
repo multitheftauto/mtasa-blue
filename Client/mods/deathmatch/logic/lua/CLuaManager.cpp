@@ -13,6 +13,7 @@
 #include "../luadefs/CLuaFireDefs.h"
 #include "../luadefs/CLuaClientDefs.h"
 #include "../luadefs/CLuaVectorGraphicDefs.h"
+#include "../luadefs/CLuaGifDefs.h"
 
 using std::list;
 
@@ -275,6 +276,7 @@ void CLuaManager::LoadCFunctions()
     CLuaTeamDefs::LoadFunctions();
     CLuaTimerDefs::LoadFunctions();
     CLuaVectorGraphicDefs::LoadFunctions();
+    CLuaGifDefs::LoadFunctions();
     CLuaVehicleDefs::LoadFunctions();
     CLuaWaterDefs::LoadFunctions();
     CLuaWeaponDefs::LoadFunctions();
