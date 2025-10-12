@@ -39,6 +39,15 @@ static constexpr std::size_t INVALID_PARAMETER_SAMPLE_LIMIT = 8;
 static constexpr std::size_t MAX_FALLBACK_STACK_FRAMES = 32;
 static constexpr int         MAX_WIDE_TO_UTF8_BYTES = 1 * 1024 * 1024;
 
+static constexpr DWORD       PROCESS_WAIT_TIMEOUT_MS = 500;
+static constexpr DWORD       WINDOW_POLL_TIMEOUT_MS = 100;
+static constexpr std::size_t MAX_WINDOW_POLL_ATTEMPTS = 30;
+static constexpr std::size_t SHELL_EXEC_POLL_ATTEMPTS = 20;
+static constexpr DWORD       ALT_KEY_DURATION_MS = 50;
+static constexpr int         SCREEN_MARGIN_PIXELS = 50;
+static constexpr int         EMERGENCY_MSGBOX_WIDTH = 600;
+static constexpr int         EMERGENCY_MSGBOX_HEIGHT = 200;
+
 #define SAFE_DEBUG_OUTPUT(msg) SafeDebugOutput(msg)
 
 class CClientBase;
@@ -217,6 +226,7 @@ static std::array<SString, INVALID_PARAMETER_SAMPLE_LIMIT> ms_InvalidParameterSa
 static std::atomic<uint>                                   ms_uiInvalidParameterSampleCount{0};
 static std::atomic<bool>                                   ms_bInvalidParameterWarningStored{false};
 static std::atomic<bool>                                   ms_bFallbackStackLogged{false};
+static HANDLE                                              ms_hCrashDialogProcess = nullptr;
 
 [[nodiscard]] static std::array<SString, 2> BuildCrashDialogCandidates()
 {
@@ -224,6 +234,11 @@ static std::atomic<bool>                                   ms_bFallbackStackLogg
     std::array<SString, 2> candidates = {SharedUtil::PathJoin(basePath, "Multi Theft Auto.exe"), SharedUtil::PathJoin(basePath, "Multi Theft Auto_d.exe")};
 
     return candidates;
+}
+
+[[nodiscard]] static inline constexpr bool IsValidHandle(HANDLE handle) noexcept
+{
+    return handle != nullptr && handle != INVALID_HANDLE_VALUE;
 }
 
 static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformation) noexcept
@@ -245,19 +260,103 @@ static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformat
         switch (code)
         {
             case EXCEPTION_ACCESS_VIOLATION:
-                exceptionType = "Access Violation";
+                exceptionType = "Access Violation - Invalid memory access";
+                break;
+            case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+                exceptionType = "Array Bounds Exceeded";
+                break;
+            case EXCEPTION_BREAKPOINT:
+                exceptionType = "Breakpoint Hit";
+                break;
+            case EXCEPTION_DATATYPE_MISALIGNMENT:
+                exceptionType = "Data Type Misalignment";
+                break;
+            case EXCEPTION_FLT_DENORMAL_OPERAND:
+                exceptionType = "Floating Point - Denormal Operand";
+                break;
+            case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+                exceptionType = "Floating Point - Divide by Zero";
+                break;
+            case EXCEPTION_FLT_INEXACT_RESULT:
+                exceptionType = "Floating Point - Inexact Result";
+                break;
+            case EXCEPTION_FLT_INVALID_OPERATION:
+                exceptionType = "Floating Point - Invalid Operation";
+                break;
+            case EXCEPTION_FLT_OVERFLOW:
+                exceptionType = "Floating Point - Overflow";
+                break;
+            case EXCEPTION_FLT_STACK_CHECK:
+                exceptionType = "Floating Point - Stack Check";
+                break;
+            case EXCEPTION_FLT_UNDERFLOW:
+                exceptionType = "Floating Point - Underflow";
+                break;
+            case EXCEPTION_ILLEGAL_INSTRUCTION:
+                exceptionType = "Illegal Instruction";
+                break;
+            case EXCEPTION_IN_PAGE_ERROR:
+                exceptionType = "In Page Error - Page fault";
+                break;
+            case EXCEPTION_INT_DIVIDE_BY_ZERO:
+                exceptionType = "Integer Divide by Zero";
+                break;
+            case EXCEPTION_INT_OVERFLOW:
+                exceptionType = "Integer Overflow";
+                break;
+            case EXCEPTION_INVALID_DISPOSITION:
+                exceptionType = "Invalid Disposition";
+                break;
+            case EXCEPTION_NONCONTINUABLE_EXCEPTION:
+                exceptionType = "Non-Continuable Exception";
+                break;
+            case EXCEPTION_PRIV_INSTRUCTION:
+                exceptionType = "Privileged Instruction";
+                break;
+            case EXCEPTION_SINGLE_STEP:
+                exceptionType = "Single Step (Debugging)";
                 break;
             case EXCEPTION_STACK_OVERFLOW:
                 exceptionType = "Stack Overflow";
+                break;
+            case EXCEPTION_GUARD_PAGE:
+                exceptionType = "Guard Page Violation";
+                break;
+            case EXCEPTION_INVALID_HANDLE:
+                exceptionType = "Invalid Handle";
                 break;
             case CPP_EXCEPTION_CODE:
                 exceptionType = "C++ Exception";
                 break;
             case STATUS_STACK_BUFFER_OVERRUN_CODE:
-                exceptionType = "Stack Buffer Overrun";
+                exceptionType = "Stack Buffer Overrun (Security Check)";
                 break;
             case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
-                exceptionType = "Invalid CRT Parameter";
+                exceptionType = "Invalid C Runtime Parameter";
+                break;
+            case CUSTOM_EXCEPTION_CODE_OOM:
+                exceptionType = "Out of Memory - Allocation Failure";
+                break;
+            case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
+                exceptionType = "Watchdog Timeout - Thread Freeze Detected";
+                break;
+            case 0xC0000374:
+                exceptionType = "Heap Corruption Detected";
+                break;
+            case 0xC0000420:
+                exceptionType = "Assertion Failure";
+                break;
+            case 0x40000015:
+                exceptionType = "Fatal App Exit";
+                break;
+            case 0xC00002C9:
+                exceptionType = "Register NaT Consumption";
+                break;
+            case 0xC0000194:
+                exceptionType = "Possible Deadlock Condition";
+                break;
+            case 0x80000029:
+                exceptionType = "Unwind Consolidate (Frame consolidation)";
                 break;
             default:
                 exceptionType = SString("Exception 0x%08X", code);
@@ -703,7 +802,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
     try
     {
-        DumpCoreLog(pExceptionInformation);
+        DumpCoreLog(pException, pExceptionInformation);
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Core log dumped successfully\n");
     }
     catch (...)
@@ -740,7 +839,55 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     delete pExceptionInformation;
     pExceptionInformation = nullptr;
 
-    Sleep(500);
+    if (ms_hCrashDialogProcess != nullptr)
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Waiting for crash dialog to close before terminating...\n");
+        const DWORD waitResult = WaitForSingleObject(ms_hCrashDialogProcess, INFINITE);
+        if (waitResult == WAIT_OBJECT_0)
+        {
+            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash dialog closed by user\n");
+        }
+        else
+        {
+            SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter: Wait for dialog returned 0x%08X\n", waitResult).c_str());
+        }
+        CloseHandle(ms_hCrashDialogProcess);
+        ms_hCrashDialogProcess = nullptr;
+    }
+    else if (bCrashArtifactsGenerated)
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: No process handle (likely ShellExecute path), polling for dialog window...\n");
+        
+        HWND hDialogWindow = nullptr;
+        for (int attempts = 0; attempts < 30 && hDialogWindow == nullptr; attempts++)
+        {
+            hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
+            if (hDialogWindow == nullptr)
+                Sleep(100);
+        }
+        
+        if (hDialogWindow != nullptr && IsWindow(hDialogWindow))
+        {
+            SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter: Found dialog window %p, waiting for it to close...\n", hDialogWindow).c_str());
+            
+            while (IsWindow(hDialogWindow))
+            {
+                Sleep(100);
+            }
+            
+            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Dialog window closed\n");
+        }
+        else
+        {
+            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Could not find dialog window, waiting 500ms as fallback\n");
+            Sleep(500);
+        }
+    }
+    else
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: No dialog process and no artifacts generated (early termination)\n");
+        Sleep(500);
+    }
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Force terminating crashed process NOW\n");
     TerminateProcess(GetCurrentProcess(), CRASH_EXIT_CODE);
@@ -750,7 +897,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
+void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation)
 {
     if (pExceptionInformation == nullptr)
     {
@@ -779,20 +926,42 @@ void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
 
     const auto strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", nullptr, -2));
 
-    SString strInfo;
+    constexpr auto kNullInstructionPointer = 0u;
+    static_assert(kNullInstructionPointer == 0u, "Null instruction pointer must be zero");
+    
+    const auto eip = pExceptionInformation->GetEIP();
+    const auto isNullJump = (eip == kNullInstructionPointer);
+    
+    constexpr std::string_view kNullJumpAnnotation = " (attempted jump to null)";
+    constexpr std::string_view kEmptyAnnotation = "";
+    const auto eipAnnotation = isNullJump ? kNullJumpAnnotation : kEmptyAnnotation;
+
+    SString strInfo{};
     strInfo += SString("Version = %s\n", strMTAVersionFull.c_str());
     strInfo += SString("Time = %s", ctime(&timeTemp));
     strInfo += SString("Module = %s\n", pExceptionInformation->GetModulePathName());
     strInfo += SString("Code = 0x%08X\n", pExceptionInformation->GetCode());
     strInfo += SString("Offset = 0x%08X\n\n", pExceptionInformation->GetAddressModuleOffset());
 
+    // Add special notice for watchdog timeout exceptions
+    if (const auto exceptionCode = pExceptionInformation->GetCode(); exceptionCode == CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT)
+    {
+        constexpr std::string_view kWatchdogBanner =
+            "========================================\n"
+            "GAME FREEZE: FORCED CRASH GENERATION FOR INVESTIGATION\n"
+            "Stack Arrow marks frozen function/loop\n"
+            "========================================\n\n";
+        strInfo += SString{kWatchdogBanner.data(), kWatchdogBanner.size()};
+    }
+
     strInfo += SString(
         "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n"
-        "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n"
+        "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X%.*s  FLG=%08X\n"
         "CS=%04X   DS=%04X  SS=%04X  ES=%04X   FS=%04X  GS=%04X\n\n",
         pExceptionInformation->GetEAX(), pExceptionInformation->GetEBX(), pExceptionInformation->GetECX(), pExceptionInformation->GetEDX(),
         pExceptionInformation->GetESI(), pExceptionInformation->GetEDI(), pExceptionInformation->GetEBP(), pExceptionInformation->GetESP(),
-        pExceptionInformation->GetEIP(), pExceptionInformation->GetEFlags(), pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
+        pExceptionInformation->GetEIP(), static_cast<int>(eipAnnotation.size()), eipAnnotation.data(), pExceptionInformation->GetEFlags(), 
+        pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
         pExceptionInformation->GetSS(), pExceptionInformation->GetES(), pExceptionInformation->GetFS(), pExceptionInformation->GetGS());
 
     const auto invalidParameterCount = ms_uiInvalidParameterCount.load(std::memory_order_relaxed);
@@ -979,37 +1148,134 @@ void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
         appendDetailedLine("Enhanced exception diagnostics unavailable.\n");
     }
 
+    // Try to get stack trace from detailed exception information
     if (stackFrames == nullptr && pImpl != nullptr && pImpl->HasDetailedStackTrace())
     {
-        auto stackTrace = pImpl->GetStackTrace();
-        if (stackTrace.has_value() && !stackTrace->empty())
+        if (auto stackTrace = pImpl->GetStackTrace(); stackTrace.has_value() && !stackTrace->empty())
         {
-            fallbackStackStorage = std::move(stackTrace.value());
-            stackFrames = &fallbackStackStorage.value();
+            fallbackStackStorage = std::move(*stackTrace);
+            stackFrames = std::addressof(*fallbackStackStorage);
             stackHeader = hasEnhancedInfo ? "Stack trace (local capture):\n" : "Stack trace:\n";
+        }
+    }
+
+    // If still no stack trace, try to capture one directly from exception pointers
+    if (stackFrames == nullptr && pException != nullptr)
+    {
+        if (SString stackText; CaptureStackTraceText(pException, stackText) && !stackText.empty())
+        {
+            constexpr std::size_t kTypicalStackDepth = 50;
+            static_assert(kTypicalStackDepth > 0, "Stack depth must be positive");
+            
+            std::vector<SString> lines{};
+            lines.reserve(kTypicalStackDepth);
+            stackText.Split("\n", lines);
+            
+            if (const auto lineCount = lines.size(); lineCount > 0)
+            {
+                std::vector<std::string> capturedFrames{};
+                capturedFrames.reserve(lineCount);
+                
+                std::transform(lines.cbegin(), lines.cend(), std::back_inserter(capturedFrames),
+                    [](const auto& line) noexcept -> std::string {
+                        return std::string{line.c_str()};
+                    });
+
+                const auto newEnd = std::remove_if(capturedFrames.begin(), capturedFrames.end(),
+                    [](const auto& frame) noexcept -> bool {
+                        return frame.empty();
+                    });
+                capturedFrames.erase(newEnd, capturedFrames.end());
+                
+                if (const auto capturedCount = capturedFrames.size(); capturedCount > 0)
+                {
+                    fallbackStackStorage = std::move(capturedFrames);
+                    stackFrames = std::addressof(*fallbackStackStorage);
+                    stackHeader = "Stack trace (captured):\n";
+                }
+            }
+        }
+        else if (pException->ContextRecord != nullptr && pException->ContextRecord->Eip == 0)
+        {
+            // Special case: EIP=0 means we cannot walk the stack
+            // Provide register-based context instead
+            constexpr std::size_t kRegisterFrameCount = 3;
+            static_assert(kRegisterFrameCount > 0, "Register frame count must be positive");
+            
+            std::vector<std::string> registerFrames{};
+            registerFrames.reserve(kRegisterFrameCount);
+            
+            const auto* ctx = pException->ContextRecord;
+            registerFrames.emplace_back(SString("EIP=0x%08X (null instruction pointer - cannot walk stack)", ctx->Eip).c_str());
+            registerFrames.emplace_back(SString("ESP=0x%08X EBP=0x%08X (stack pointers)", ctx->Esp, ctx->Ebp).c_str());
+            registerFrames.emplace_back(SString("Last known address: check return address at [ESP] or recent call history", 0).c_str());
+            
+            fallbackStackStorage = std::move(registerFrames);
+            stackFrames = std::addressof(*fallbackStackStorage);
+            stackHeader = "Stack trace (EIP=0 - register context only):\n";
         }
     }
 
     if (stackFrames != nullptr)
     {
-        const auto&       frames = *stackFrames;
-        const std::size_t maxFrames = std::min(frames.size(), static_cast<std::size_t>(100));
+        constexpr std::size_t kMaxDisplayFrames = 100;
+        constexpr std::size_t kMaxFrameLength = 512;
+        static_assert(kMaxDisplayFrames > 0 && kMaxFrameLength > 0, "Display limits must be positive");
+        
+        const auto& frames = *stackFrames;
+        const auto  frameCount = frames.size();
+        const auto  maxFrames = std::clamp(frameCount, std::size_t{0}, 
+                                           std::min(kMaxDisplayFrames, std::numeric_limits<std::size_t>::max()));
 
         if (stackHeader == nullptr)
             stackHeader = "Stack trace:\n";
 
-        appendDetailedLine(stackHeader);
-        for (std::size_t i = 0; i < maxFrames; ++i)
+        // For watchdog timeouts, add explanatory note about freeze point
+        const bool isWatchdogTimeout = pExceptionInformation != nullptr && 
+                                       pExceptionInformation->GetCode() == CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT;
+        
+        if (isWatchdogTimeout && maxFrames > 0)
+        {
+            appendDetailedLine("Stack trace (captured from frozen thread - first frame shows freeze location):\n");
+        }
+        else
+        {
+            appendDetailedLine(stackHeader);
+        }
+        
+        [[maybe_unused]] const auto allFramesValid = 
+            std::all_of(frames.cbegin(), std::next(frames.cbegin(), static_cast<std::ptrdiff_t>(maxFrames)), 
+                       [](const auto& frame) constexpr noexcept -> bool { return !frame.empty(); });
+        
+        for (std::size_t i{}; i < maxFrames; ++i)
         {
             const auto&       frame = frames[i];
-            const std::size_t maxFrameLength = std::min(frame.length(), static_cast<std::size_t>(512));
-            appendDetailedLine(SString("  %.*s\n", static_cast<int>(maxFrameLength), frame.c_str()));
+            const std::size_t frameLength = std::clamp(frame.length(), std::size_t{0}, kMaxFrameLength);
+            
+            // First frame in watchdog timeout = exact freeze location
+            if (isWatchdogTimeout && i == 0)
+            {
+                appendDetailedLine(SString("--> %.*s  <-- FREEZE POINT\n", static_cast<int>(frameLength), frame.c_str()));
+            }
+            else
+            {
+                appendDetailedLine(SString("  %.*s\n", static_cast<int>(frameLength), frame.c_str()));
+            }
         }
     }
     else
     {
         appendDetailedLine("Stack trace: unavailable\n");
     }
+
+    // Get crash dump file path if available
+    const auto dumpFileInfo = [dumpFilePath = GetApplicationSetting("diagnostics", "last-dump-save")]() -> SString {
+        if (dumpFilePath.empty())
+            return {};
+        
+        constexpr std::string_view kDumpFileHeader = "\nCrash dump file: ";
+        return SString{kDumpFileHeader.data(), kDumpFileHeader.size()} + dumpFilePath + "\n";
+    }();
 
     FILE* pFile = File::Fopen(CalcMTASAPath("mta\\core.log"), "a+");
     if (pFile != nullptr)
@@ -1019,6 +1285,9 @@ void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
 
         if (!strDetailed.empty())
             fprintf(pFile, "%s", strDetailed.c_str());
+
+        if (!dumpFileInfo.empty())
+            fprintf(pFile, "%s", dumpFileInfo.c_str());
 
         fprintf(pFile, "%s", "** -- End of unhandled exception -- **\n\n\n");
         fclose(pFile);
@@ -1032,6 +1301,11 @@ void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
     if (!strDetailedForDialog.empty())
     {
         strInfoForSettings += strDetailedForDialog;
+    }
+
+    if (!dumpFileInfo.empty())
+    {
+        strInfoForSettings += dumpFileInfo;
     }
 
     if (strInfoForSettings.empty())
@@ -1375,9 +1649,13 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Display mode restoration complete\n");
 
-    SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Skipping game window access (prevents deadlock in crash state)\n");
-
-    SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Display prepared for crash dialog\n");
+    HWND hGTAWindow = FindWindowW(L"Grand theft auto San Andreas", nullptr);
+    if (hGTAWindow == nullptr)
+        hGTAWindow = FindWindowW(nullptr, L"MTA: San Andreas");
+    if (hGTAWindow != nullptr && IsWindow(hGTAWindow))
+    {
+        ShowWindow(hGTAWindow, SW_HIDE);
+    }
 
     const auto basePath = GetMTASABaseDir();
     const auto basePathWide = basePath.empty() ? WString() : FromUTF8(basePath);
@@ -1556,60 +1834,111 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
         STARTUPINFOW        startupInfo{.cb = sizeof(STARTUPINFOW), .dwFlags = STARTF_USESHOWWINDOW, .wShowWindow = SW_SHOWNORMAL};
         PROCESS_INFORMATION processInfo{};
 
+        constexpr DWORD kProcessCreationFlags = DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB | CREATE_NEW_PROCESS_GROUP;
         const auto bProcessCreated =
-            CreateProcessW(nullptr, commandBuffer.data(), nullptr, nullptr, FALSE, DETACHED_PROCESS, nullptr, candidateDirWidePtr, &startupInfo, &processInfo);
+            CreateProcessW(nullptr, commandBuffer.data(), nullptr, nullptr, FALSE, kProcessCreationFlags, nullptr, candidateDirWidePtr, &startupInfo, &processInfo);
         if (bProcessCreated)
         {
             SString debugMsg = SString("CCrashDumpWriter::RunErrorTool - Relaunched crash dialog via CreateProcess (%s)\n", candidate.c_str());
             SAFE_DEBUG_OUTPUT(debugMsg.c_str());
             AddReportLog(3124, SString("RunErrorTool launched crash dialog via CreateProcess (%s)", candidate.c_str()));
 
-            AllowSetForegroundWindow(processInfo.dwProcessId);
+            if (IsValidHandle(processInfo.hProcess))
+            {
+                SetPriorityClass(processInfo.hProcess, HIGH_PRIORITY_CLASS);
+            }
 
-            WaitForInputIdle(processInfo.hProcess, 3000);
+            if (processInfo.dwProcessId != 0)
+            {
+                AllowSetForegroundWindow(processInfo.dwProcessId);
+            }
+
+            if (IsValidHandle(processInfo.hProcess))
+            {
+                WaitForInputIdle(processInfo.hProcess, 3000);
+            }
 
             Sleep(500);
 
             HWND hDialogWindow = nullptr;
-            for (int attempts = 0; attempts < 10 && hDialogWindow == nullptr; attempts++)
+            for (std::size_t attempts = 0; attempts < MAX_WINDOW_POLL_ATTEMPTS && hDialogWindow == nullptr; attempts++)
             {
                 hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
                 if (hDialogWindow == nullptr)
-                    Sleep(100);
+                    Sleep(WINDOW_POLL_TIMEOUT_MS);
             }
 
-            if (hDialogWindow != nullptr)
+            if (hDialogWindow != nullptr && IsWindow(hDialogWindow))
             {
-                SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter::RunErrorTool - Found dialog window: %p\n", hDialogWindow).c_str());
-
-                auto       isVisible = IsWindowVisible(hDialogWindow);
-                const auto isIconic = IsIconic(hDialogWindow);
-                SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter::RunErrorTool - Window state: visible=%d, iconic=%d\n", isVisible, isIconic).c_str());
-
-                if (isIconic)
+                if (const auto isIconic = IsIconic(hDialogWindow); isIconic)
                 {
                     ShowWindow(hDialogWindow, SW_RESTORE);
-                    SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Restored minimized dialog window\n");
                 }
 
-                SetWindowPos(hDialogWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-                SetForegroundWindow(hDialogWindow);
-                BringWindowToTop(hDialogWindow);
-                SetActiveWindow(hDialogWindow);
-                SetFocus(hDialogWindow);
+                if (IsWindow(hDialogWindow))
+                {
+                    const DWORD dialogThreadId = GetWindowThreadProcessId(hDialogWindow, nullptr);
+                    const DWORD currentThreadId = GetCurrentThreadId();
+                    
+                    BOOL attached = FALSE;
+                    if (dialogThreadId != 0 && dialogThreadId != currentThreadId)
+                    {
+                        attached = AttachThreadInput(currentThreadId, dialogThreadId, TRUE);
+                    }
+                        
+                    LockSetForegroundWindow(LSFW_UNLOCK);
+                    SetWindowPos(hDialogWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+                    
+                    if (!SetForegroundWindow(hDialogWindow))
+                    {
+                        keybd_event(VK_MENU, 0, 0, 0);
+                        SetForegroundWindow(hDialogWindow);
+                        Sleep(ALT_KEY_DURATION_MS);
+                        keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0);
+                    }
+                    
+                    BringWindowToTop(hDialogWindow);
+                    SetActiveWindow(hDialogWindow);
+                    SetFocus(hDialogWindow);
+                        
+                    if (attached && dialogThreadId != 0)
+                    {
+                        AttachThreadInput(currentThreadId, dialogThreadId, FALSE);
+                    }
+                        
+                    RECT windowRect{};
+                    if (GetWindowRect(hDialogWindow, &windowRect))
+                    {
+                        const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+                        const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+                        
+                        if (windowRect.left < -100 || windowRect.top < -100 || 
+                            windowRect.left > screenWidth || windowRect.top > screenHeight)
+                        {
+                            const int windowWidth = windowRect.right - windowRect.left;
+                            const int windowHeight = windowRect.bottom - windowRect.top;
+                            const int centerX = (screenWidth - windowWidth) / 2;
+                            const int centerY = (screenHeight - windowHeight) / 2;
+                            SetWindowPos(hDialogWindow, HWND_TOPMOST, centerX, centerY, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW);
+                        }
+                    }
 
-                isVisible = IsWindowVisible(hDialogWindow);
-                SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter::RunErrorTool - After positioning: visible=%d\n", isVisible).c_str());
-                SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Brought crash dialog to foreground\n");
+                    if (!IsWindowVisible(hDialogWindow))
+                    {
+                        ShowWindow(hDialogWindow, SW_RESTORE);
+                    }
+                }
             }
             else
             {
-                SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Warning: Could not find crash dialog window\n");
                 AddReportLog(3132, "RunErrorTool could not find crash dialog window by title");
             }
 
-            CloseHandle(processInfo.hThread);
-            CloseHandle(processInfo.hProcess);
+            if (IsValidHandle(processInfo.hThread))
+            {
+                CloseHandle(processInfo.hThread);
+            }
+            ms_hCrashDialogProcess = processInfo.hProcess;
             dialogLaunched = true;
             break;
         }
@@ -1618,7 +1947,6 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
         {
             AddReportLog(3121, SString("RunErrorTool CreateProcess failed with error %u for %s", dwError, candidate.c_str()));
         }
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - CreateProcess failed, attempting ShellExecute fallback\n");
 
         if (crashArgsWide.empty())
         {
@@ -1634,13 +1962,29 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
             SString debugMsg = SString("CCrashDumpWriter::RunErrorTool - Relaunched crash dialog via ShellExecute (%s)\n", candidate.c_str());
             SAFE_DEBUG_OUTPUT(debugMsg.c_str());
             AddReportLog(3124, SString("RunErrorTool launched crash dialog via ShellExecute (%s)", candidate.c_str()));
+            
+            Sleep(1000);
+            
+            HWND hDialogWindow = nullptr;
+            for (std::size_t attempts = 0; attempts < SHELL_EXEC_POLL_ATTEMPTS && hDialogWindow == nullptr; attempts++)
+            {
+                hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
+                if (hDialogWindow == nullptr)
+                    Sleep(WINDOW_POLL_TIMEOUT_MS);
+            }
+            
+            if (hDialogWindow != nullptr && IsWindow(hDialogWindow))
+            {
+                SetWindowPos(hDialogWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+                SetForegroundWindow(hDialogWindow);
+            }
+            
             dialogLaunched = true;
             break;
         }
 
         AddReportLog(3122,
                      SString("RunErrorTool ShellExecute fallback failed with code %u for %s", static_cast<unsigned int>(shellExecuteCode), candidate.c_str()));
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - ShellExecute fallback failed to launch crash dialog\n");
         RestoreBaseDirectories();
     }
 
@@ -1651,6 +1995,17 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - FAILED to launch crash dialog with any candidate!\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - User will not see crash report dialog!\n");
         AddReportLog(3129, "RunErrorTool completely failed to launch crash dialog");
+        
+        const wchar_t* emergencyMessage = 
+            L"MTA: San Andreas has crashed.\n\n"
+            L"The usual crash dialog has also failed, with this as fallback.\n\n"
+            L"Crash information has been saved to:\n"
+            L"MTA San Andreas\\mta\\core.log\n\n"
+            L"Contact support on the MTA discord: https://discord.gg/RygaCSD.\n\n"
+            L"The game will now close.";
+        
+        MessageBoxW(nullptr, emergencyMessage, L"MTA: San Andreas - Fatal Error", 
+                   MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST);
     }
     else
     {

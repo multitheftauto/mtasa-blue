@@ -19,6 +19,7 @@
 #include <exception>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #if !defined(BUGSUTIL_DLLINTERFACE)
@@ -34,6 +35,7 @@ constexpr std::size_t DEBUG_BUFFER_SIZE = 256;
 constexpr DWORD CPP_EXCEPTION_CODE = 0xE06D7363;
 constexpr DWORD STATUS_INVALID_CRUNTIME_PARAMETER_CODE = 0xC0000417;
 constexpr DWORD STATUS_STACK_BUFFER_OVERRUN_CODE = 0xC0000409;
+constexpr DWORD CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT = 0xE0000001;
 
 constexpr DWORD INIT_PHASE_MINIMAL = 0;
 constexpr DWORD INIT_PHASE_D3D_INIT = 1;
@@ -60,19 +62,41 @@ constexpr DWORD EXCEPTION_INT_OVERFLOW_NONFATAL = 0xC0000095;
 constexpr DWORD EXCEPTION_PRIV_INSTRUCTION_NONFATAL = 0xC0000096;
 constexpr DWORD EXCEPTION_NONCONTINUABLE_EXCEPTION_NONFATAL = 0xC0000025;
 
-#define DEBUG_PREFIX_CRASH          "CrashHandler: "
-#define DEBUG_PREFIX_SEH            "SEH: "
-#define DEBUG_PREFIX_CPP            "C++ TERMINATE: "
-#define DEBUG_PREFIX_ABORT          "ABORT: "
-#define DEBUG_PREFIX_PURECALL       "PURECALL: "
-#define DEBUG_PREFIX_EXCEPTION_INFO "ExceptionInfo: "
-#define DEBUG_SEPARATOR             "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+inline constexpr std::string_view DEBUG_PREFIX_CRASH = "CrashHandler: ";
+inline constexpr std::string_view DEBUG_PREFIX_SEH = "SEH: ";
+inline constexpr std::string_view DEBUG_PREFIX_CPP = "C++ TERMINATE: ";
+inline constexpr std::string_view DEBUG_PREFIX_ABORT = "ABORT: ";
+inline constexpr std::string_view DEBUG_PREFIX_PURECALL = "PURECALL: ";
+inline constexpr std::string_view DEBUG_PREFIX_EXCEPTION_INFO = "ExceptionInfo: ";
+inline constexpr std::string_view DEBUG_PREFIX_WATCHDOG = "WATCHDOG: ";
+inline constexpr std::string_view DEBUG_SEPARATOR = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 
+inline void SafeDebugOutput(std::string_view message) noexcept
+{
+    if (!message.empty() && message.data() != nullptr)
+    {
+        // string_view from string literal is null-terminated, but views from substrings may not be
+        // Create temporary null-terminated string for safety with OutputDebugStringA
+        const std::string temp{message};
+        OutputDebugStringA(temp.c_str());
+    }
+}
+
+// Overload for C-string literals (backward compatibility)
 inline void SafeDebugOutput(const char* message) noexcept
 {
     if (message != nullptr)
     {
         OutputDebugStringA(message);
+    }
+}
+
+// Overload for std::string (for string_view concatenation)
+inline void SafeDebugOutput(const std::string& message) noexcept
+{
+    if (!message.empty())
+    {
+        OutputDebugStringA(message.c_str());
     }
 }
 
@@ -172,6 +196,12 @@ extern "C"
     [[nodiscard]] DWORD BUGSUTIL_DLLINTERFACE __stdcall GetInitializationPhase() noexcept;
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization() noexcept;
+
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds = 20) noexcept;
+
+    void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread() noexcept;
+
+    void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat() noexcept;
 
 #ifdef __cplusplus
 }
