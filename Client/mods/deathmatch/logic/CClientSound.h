@@ -127,7 +127,7 @@ private:
         static AudioBufferDeleter ForExternalReference() noexcept { return AudioBufferDeleter(&NoopImpl); }
 
     private:
-        static void DeleteArrayImpl(void* ptr) noexcept { ::operator delete[](ptr); }
+        static void DeleteArrayImpl(void* ptr) noexcept { delete[] static_cast<uint8_t*>(ptr); }
         static void FreeImpl(void* ptr) noexcept { std::free(ptr); }
         static void NoopImpl(void*) noexcept {}
 
