@@ -26,7 +26,7 @@ extern "C"
 #include "CLuaArgument.h"
 #include <vector>
 
-using namespace std;
+using std::vector;
 
 class CLuaArguments
 {

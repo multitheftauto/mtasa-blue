@@ -210,6 +210,8 @@ void InitLocalization(bool bShowErrors)
         ExitProcess(EXIT_ERROR);
     }
 
+    LoaderResolveCrashHandlerExports(hCoreModule);
+
     // Get locale
     SString strLocale = GetApplicationSetting("locale");
     if (strLocale.empty())
@@ -512,7 +514,10 @@ void HandleCustomStartMessage()
 //////////////////////////////////////////////////////////
 void PreLaunchWatchDogs()
 {
-    assert(!CreateSingleInstanceMutex());
+    // Note: Single instance mutex is properly checked later in the launch sequence
+    // Creating it here just ensures we acquire it early, but we shouldn't assert
+    // because after a crash the mutex won't exist (OS releases it)
+    CreateSingleInstanceMutex();
 
     // Check for unclean stop on previous run
 #ifndef MTA_DEBUG
@@ -695,10 +700,16 @@ void HandleDuplicateLaunching()
     const size_t cmdLineLen = strlen(lpCmdLine);
     if (cmdLineLen >= 32768) ExitProcess(EXIT_ERROR);            // Max Windows command line length
 
+    bool bIsCrashDialog = (cmdLineLen > 0 && strstr(lpCmdLine, "install_stage=crashed") != NULL);
+
     int recheckTime = 2000;            // 2 seconds recheck time
 
     // We can only do certain things if MTA is already running
-    while (!CreateSingleInstanceMutex())
+    // Unless this is a crash dialog launch, which needs to run alongside the crashed instance
+    //
+    // Normal behavior: Loop here if mutex is held, try to pass command line to existing instance
+    // Crash dialog: Skip this entirely (bIsCrashDialog=true), proceed directly to showing dialog
+    while (!bIsCrashDialog && !CreateSingleInstanceMutex())
     {
         if (cmdLineLen > 0)
         {
@@ -801,6 +812,11 @@ void HandleDuplicateLaunching()
             }
             ExitProcess(EXIT_ERROR);
         }
+    }
+
+    if (bIsCrashDialog)
+    {
+        CreateSingleInstanceMutex();
     }
 }
 
@@ -1022,6 +1038,102 @@ void CheckDataFiles()
     {
         DisplayErrorMessageBox(_("Invalid installation paths detected."), _E("CL45"), "invalid-install-paths");
         ExitProcess(EXIT_ERROR);
+    }
+
+    // No-op known incompatible/broken d3d9.dll versions from the launch directory
+	// By using file version we account for variants as well. The array is extendable, but primarily for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
+    {
+        struct SIncompatibleVersion
+        {
+            int iMajor;
+            int iMinor;
+            int iBuild;
+            int iRelease;
+        };
+
+        static const SIncompatibleVersion incompatibleVersions[] = {
+            // The below entry (D3D9.dll 6.3.9600.17415) always crashes the user @ 0x0001F4B3 (CreateSurfaceLH).
+            // Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
+            {6, 3, 9600, 17415},
+            // The below entry (D3D9.dll 0.3.1.3) is a fully incompatible, modified ENB version ("DirectX 2.0") that crashes the user @ 0002A733
+            {0, 3, 1, 3},
+        };
+
+        static bool bChecked = false;
+        if (!bChecked)
+        {
+            bChecked = true;
+
+			// Check all 3 game roots
+            const std::vector<SString> directoriesToCheck = {
+                GetLaunchPath(), // MTA installation folder root
+                strGTAPath, // Real GTA:SA installation folder root. As chosen by DiscoverGTAPath()
+                PathJoin(GetMTADataPath(), "GTA San Andreas"), // Proxy-mirror that MTA uses for core GTA data files (C:\ProgramData\MTA San Andreas All\<MTA major version>\GTA San Andreas)
+            };
+
+            for (const SString& directory : directoriesToCheck)
+            {
+                if (directory.empty())
+                    continue;
+                if (!ValidatePath(directory))
+                    continue;
+
+                const SString strD3dModuleFilename = PathJoin(directory, "d3d9.dll");
+                if (!ValidatePath(strD3dModuleFilename) || !FileExists(strD3dModuleFilename))
+                    continue;
+
+                SharedUtil::SLibVersionInfo versionInfo = {};
+                if (!SharedUtil::GetLibVersionInfo(strD3dModuleFilename, &versionInfo))
+                    continue;
+
+                bool bIsIncompatible = false;
+                for (const SIncompatibleVersion& entry : incompatibleVersions)
+                {
+                    if (versionInfo.GetFileVersionMajor() == entry.iMajor &&
+                        versionInfo.GetFileVersionMinor() == entry.iMinor &&
+                        versionInfo.GetFileVersionBuild() == entry.iBuild &&
+                        versionInfo.GetFileVersionRelease() == entry.iRelease)
+                    {
+                        bIsIncompatible = true;
+                        break;
+                    }
+                }
+
+                if (!bIsIncompatible)
+                    continue;
+
+                const SString strBackupModuleFilename = PathJoin(directory, "d3d9.bak.incompatible");
+                const WString wideSourcePath = FromUTF8(strD3dModuleFilename);
+                const WString wideBackupPath = FromUTF8(strBackupModuleFilename);
+
+                if (FileExists(strBackupModuleFilename))
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                    DeleteFileW(wideBackupPath.c_str());
+                }
+
+                SetFileAttributesW(wideSourcePath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                bool bRenamed = MoveFileExW(wideSourcePath.c_str(), wideBackupPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+                if (!bRenamed)
+                {
+                    if (!CopyFileW(wideSourcePath.c_str(), wideBackupPath.c_str(), FALSE))
+                        continue;
+
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                    if (!DeleteFileW(wideSourcePath.c_str()))
+                        continue;
+
+                    bRenamed = true;
+                }
+
+                if (bRenamed)
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                }
+            }
+        }
     }
 
     // Check for essential MTA files

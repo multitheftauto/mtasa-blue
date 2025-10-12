@@ -95,3 +95,9 @@ class CTaskComplexFacial : public virtual CTaskComplex
 public:
     virtual ~CTaskComplexFacial(){};
 };
+
+class CTaskComplexInWater : public virtual CTaskComplex
+{
+public:
+    virtual ~CTaskComplexInWater(){};
+};

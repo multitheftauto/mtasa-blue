@@ -69,3 +69,16 @@ CTaskSimpleUseGun* CPedIntelligenceSA::GetTaskUseGun()
 
     return nullptr;
 }
+
+CTaskSimpleFight* CPedIntelligenceSA::GetFightTask()
+{
+    CTaskManager* taskMgr = GetTaskManager();
+    if (!taskMgr)
+        return nullptr;
+
+    CTask* secondaryTask = taskMgr->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+    if (secondaryTask && secondaryTask->GetTaskType() == TASK_SIMPLE_FIGHT)
+        return dynamic_cast<CTaskSimpleFight*>(secondaryTask);
+
+    return nullptr;
+}

@@ -27,6 +27,7 @@
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordRichPresence.h"
 #include "CSteamClient.h"
+#include "CCrashDumpWriter.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -44,7 +45,7 @@ extern fs::path g_gtaDirectory;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static auto Win32LoadLibraryA = LoadLibraryA;
 static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
@@ -146,6 +147,11 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
+    m_pModelCacheManager = nullptr;
+    m_iDummyProgressValue = 0;
+    m_DummyProgressTimerHandle = NULL;
+    m_bDummyProgressUpdateAlways = false;
+
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
@@ -187,9 +193,26 @@ CCore::~CCore()
     // Remove input hook
     CMessageLoopHook::GetSingleton().RemoveHook();
 
+    if (m_bWindowsTimerEnabled)
+    {
+        KillTimer(GetHookedWindow(), IDT_TIMER1);
+        m_bWindowsTimerEnabled = false;
+    }
+
+    extern int ms_iDummyProgressTimerCounter;
+
+    if (m_DummyProgressTimerHandle != NULL)
+    {
+        DeleteTimerQueueTimer(NULL, m_DummyProgressTimerHandle, INVALID_HANDLE_VALUE);
+        m_DummyProgressTimerHandle = NULL;
+        ms_iDummyProgressTimerCounter = 0;
+    }
+
     // Delete the mod manager
     delete m_pModManager;
     SAFE_DELETE(m_pMessageBox);
+
+    SAFE_DELETE(m_pModelCacheManager);
 
     // Destroy early subsystems
     m_bModulesLoaded = false;
@@ -224,6 +247,8 @@ CCore::~CCore()
     // Delete lazy subsystems
     DestroyGUI();
     DestroyXML();
+
+    SAFE_DELETE(g_pLocalization);
 
     // Delete keybinds
     delete m_pKeyBinds;
@@ -968,7 +993,11 @@ T* InitModule(CModuleLoader& m_Loader, const SString& strName, const SString& st
     }
 
     // If we have a valid initializer, call it.
-    T* pResult = pfnInit(pObj);
+    T* pResult = nullptr;
+    if (pfnInit != nullptr)
+    {
+        pResult = pfnInit(pObj);
+    }
 
     // Restore current directory
     SetCurrentDirectory(strSavedCwd);
@@ -1072,6 +1101,16 @@ void CCore::CreateXML()
         if (!m_pConfigFile)
         {
             assert(false);
+
+            if (m_pXML)
+            {
+                using PFNReleaseXMLInterface = void (*)();
+                if (auto pfnRelease = reinterpret_cast<PFNReleaseXMLInterface>(m_XMLModule.GetFunctionPointer("ReleaseXMLInterface")))
+                    pfnRelease();
+            }
+
+            m_pXML = NULL;
+            m_XMLModule.UnloadModule();
             return;
         }
 
@@ -1123,10 +1162,14 @@ void CCore::DestroyXML()
     {
         SaveConfig(true);
         delete m_pConfigFile;
+        m_pConfigFile = nullptr;
     }
 
     if (m_pXML)
     {
+        using PFNReleaseXMLInterface = void (*)();
+        if (auto pfnRelease = reinterpret_cast<PFNReleaseXMLInterface>(m_XMLModule.GetFunctionPointer("ReleaseXMLInterface")))
+            pfnRelease();
         m_pXML = NULL;
     }
 
