@@ -27,6 +27,7 @@
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordRichPresence.h"
 #include "CSteamClient.h"
+#include "CCrashDumpWriter.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -44,7 +45,7 @@ extern fs::path g_gtaDirectory;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static auto Win32LoadLibraryA = LoadLibraryA;
 static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
@@ -968,7 +969,11 @@ T* InitModule(CModuleLoader& m_Loader, const SString& strName, const SString& st
     }
 
     // If we have a valid initializer, call it.
-    T* pResult = pfnInit(pObj);
+    T* pResult = nullptr;
+    if (pfnInit != nullptr)
+    {
+        pResult = pfnInit(pObj);
+    }
 
     // Restore current directory
     SetCurrentDirectory(strSavedCwd);

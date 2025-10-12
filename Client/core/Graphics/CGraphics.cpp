@@ -1584,6 +1584,18 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
 {
     m_pDevice = pDevice;
 
+    if (GetInitializationPhase() != INIT_PHASE_POST_D3D)
+    {
+        if (!EnableAllHandlersAfterInitialization())
+        {
+            SafeDebugOutput("CGraphics::OnDeviceCreate - Failed to enable crash handlers after device creation\n");
+        }
+        else
+        {
+            SafeDebugOutput("CGraphics::OnDeviceCreate - Crash handlers enabled after device creation\n");
+        }
+    }
+
     LoadStandardDXFonts();
 
     // Create drawing devices

@@ -209,6 +209,8 @@ void InitLocalization(bool bShowErrors)
         ExitProcess(EXIT_ERROR);
     }
 
+    LoaderResolveCrashHandlerExports(hCoreModule);
+
     // Get locale
     SString strLocale = GetApplicationSetting("locale");
     if (strLocale.empty())
@@ -511,7 +513,10 @@ void HandleCustomStartMessage()
 //////////////////////////////////////////////////////////
 void PreLaunchWatchDogs()
 {
-    assert(!CreateSingleInstanceMutex());
+    // Note: Single instance mutex is properly checked later in the launch sequence
+    // Creating it here just ensures we acquire it early, but we shouldn't assert
+    // because after a crash the mutex won't exist (OS releases it)
+    CreateSingleInstanceMutex();
 
     // Check for unclean stop on previous run
 #ifndef MTA_DEBUG
@@ -694,10 +699,16 @@ void HandleDuplicateLaunching()
     const size_t cmdLineLen = strlen(lpCmdLine);
     if (cmdLineLen >= 32768) ExitProcess(EXIT_ERROR);            // Max Windows command line length
 
+    bool bIsCrashDialog = (cmdLineLen > 0 && strstr(lpCmdLine, "install_stage=crashed") != NULL);
+
     int recheckTime = 2000;            // 2 seconds recheck time
 
     // We can only do certain things if MTA is already running
-    while (!CreateSingleInstanceMutex())
+    // Unless this is a crash dialog launch, which needs to run alongside the crashed instance
+    //
+    // Normal behavior: Loop here if mutex is held, try to pass command line to existing instance
+    // Crash dialog: Skip this entirely (bIsCrashDialog=true), proceed directly to showing dialog
+    while (!bIsCrashDialog && !CreateSingleInstanceMutex())
     {
         if (cmdLineLen > 0)
         {
@@ -800,6 +811,11 @@ void HandleDuplicateLaunching()
             }
             ExitProcess(EXIT_ERROR);
         }
+    }
+
+    if (bIsCrashDialog)
+    {
+        CreateSingleInstanceMutex();
     }
 }
 
@@ -1213,12 +1229,12 @@ void CheckDataFiles()
     };
 
     static const IntegrityCheck integrityCheckList[] = {
-        {"DE5C08577EAA65309974F9860E303F53", "bass.dll"},
-        {"1D5A1AEF041255DEA49CD4780CAE4CCC", "bass_aac.dll"},
+        {"6C01571C3BE9291F026DDEA2d7451F44", "bass.dll"},
+        {"E9E258AD87A914815C14f58C6293F361", "bass_aac.dll"},
         {"8A1AC2AAD7F1691943635CA42F7F2940", "bass_ac3.dll"},
-        {"61C38C1FD091375F2A30EC631DF337E6", "bass_fx.dll"},
-        {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},
-        {"49A603ED114982787FC0A301C0E93FDB", "bassmidi.dll"},
+        {"75ADF2E1C50C0819275B0FC34FA9B6DA", "bass_fx.dll"},
+        {"B8DF5378F08D6C89E20D9908088F9990", "bassflac.dll"},
+        {"0E950306A2D10CD84BAA14C4CDDA8D71", "bassmidi.dll"},
         {"064398B1A74B4EF35902F0C218142133", "bassmix.dll"},
         {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
         {"B35714019BBFF0D0CEE0AFA2637A77A7", "basswebm.dll"},
