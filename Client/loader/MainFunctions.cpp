@@ -1229,12 +1229,12 @@ void CheckDataFiles()
     };
 
     static const IntegrityCheck integrityCheckList[] = {
-        {"6C01571C3BE9291F026DDEA2d7451F44", "bass.dll"},
-        {"E9E258AD87A914815C14f58C6293F361", "bass_aac.dll"},
+        {"DE5C08577EAA65309974F9860E303F53", "bass.dll"},
+        {"1D5A1AEF041255DEA49CD4780CAE4CCC", "bass_aac.dll"},
         {"8A1AC2AAD7F1691943635CA42F7F2940", "bass_ac3.dll"},
-        {"75ADF2E1C50C0819275B0FC34FA9B6DA", "bass_fx.dll"},
-        {"B8DF5378F08D6C89E20D9908088F9990", "bassflac.dll"},
-        {"0E950306A2D10CD84BAA14C4CDDA8D71", "bassmidi.dll"},
+        {"61C38C1FD091375F2A30EC631DF337E6", "bass_fx.dll"},
+        {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},
+        {"49A603ED114982787FC0A301C0E93FDB", "bassmidi.dll"},
         {"064398B1A74B4EF35902F0C218142133", "bassmix.dll"},
         {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
         {"B35714019BBFF0D0CEE0AFA2637A77A7", "basswebm.dll"},
