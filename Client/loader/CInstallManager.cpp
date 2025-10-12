@@ -194,10 +194,17 @@ void CInstallManager::InitSequencer()
         CR "            CALL ChangeFromAdmin "                                             //
         CR "            CALL Quit "                                                        //
         CR " "                                                                             //
-        CR "crashed: "                                                                     // *** Starts here when restarting after crash
-        CR "            CALL ShowCrashFailDialog "                                         //
-        CR "            IF LastResult == ok GOTO initial: "                                //
-        CR "            CALL Quit "                                                        //
+        CR "crashed: "                                                                     // *** Starts here when install_stage=crashed is passed
+        CR "            CALL ShowCrashFailDialog "                                         // Shows immediate crash dialog from fresh launcher process
+        CR "            IF LastResult == ok GOTO initial: "                                // User clicked "Yes" to restart -> go to normal launch
+        CR "            CALL Quit "                                                        // User clicked "No" -> exit launcher
+        //
+        // Flow when game crashes:
+        // 1. core.dll crash handler saves crash info to settings
+        // 2. core.dll launches "Multi Theft Auto.exe install_stage=crashed" (bypasses mutex)
+        // 3. New launcher lands HERE at "crashed:" label
+        // 4. Shows dialog with crash info from settings
+        // 5. User chooses restart or quit
         CR " "                                                                             //
         CR "launch: ";
 
@@ -406,6 +413,15 @@ SString CInstallManager::_ChangeFromAdmin()
 //
 //
 //////////////////////////////////////////////////////////
+// ============================================================================
+// ShowCrashFailDialog - Display crash dialog in fresh launcher process
+// ============================================================================
+// This function runs in a NEWLY LAUNCHED launcher instance, NOT the crashed game.
+// The crashed core.dll saved crash info to application settings, and we read it here.
+//
+// Called when: Launcher starts with "install_stage=crashed" argument
+// See: CCrashDumpWriter::RunErrorTool() which launches us
+// ============================================================================
 SString CInstallManager::_ShowCrashFailDialog()
 {
     // Crashed before gta game started ?
@@ -423,6 +439,7 @@ SString CInstallManager::_ShowCrashFailDialog()
     SetApplicationSetting("diagnostics", "last-crash-reason", "");
 
     SString strMessage = GetApplicationSetting("diagnostics", "last-crash-info");
+    
     if (strReason == "direct3ddevice-reset")
     {
         strMessage += _("** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **");
@@ -444,6 +461,12 @@ SString CInstallManager::_ShowCrashFailDialog()
     strMessage = strMessage.Replace("\r", "").Replace("\n", "\r\n");
     SString strResult = ShowCrashedDialog(g_hInstance, strMessage);
     HideCrashedDialog();
+
+    // Show OOM-specific information message box after crash dialog closes
+    if (exceptionCode == CUSTOM_EXCEPTION_CODE_OOM)
+    {
+        ShowOOMMessageBox(g_hInstance);
+    }
 
     CheckAndShowFileOpenFailureMessage();
 
