@@ -708,30 +708,20 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
     CONTEXT*           pCtx = nullptr;
     EXCEPTION_POINTERS exPtrs{};
 
-    if (BuildExceptionContext(exPtrs, pExRecord, pCtx, EXCEPTION_NONCONTINUABLE_EXCEPTION))
-    {
-        PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
-        if (callback != nullptr)
-        {
-            LogHandlerEvent(DEBUG_PREFIX_PURECALL, "Calling crash handler callback");
+    PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
 
-            try
-            {
-                callback(&exPtrs);
-            }
-            catch (...)
-            {
-                LogHandlerEvent(DEBUG_PREFIX_PURECALL, "Exception in crash handler callback");
-            }
-        }
-        else
-        {
-            LogHandlerEvent(DEBUG_PREFIX_PURECALL, "No crash handler callback available");
-        }
-    }
-    else
+    if (callback != nullptr && BuildExceptionContext(exPtrs, pExRecord, pCtx, EXCEPTION_NONCONTINUABLE_EXCEPTION))
     {
-        LogHandlerEvent(DEBUG_PREFIX_PURECALL, "Failed to allocate exception structures");
+        LogHandlerEvent(DEBUG_PREFIX_PURECALL, "Calling crash handler callback");
+
+        try
+        {
+            callback(&exPtrs);
+        }
+        catch (...)
+        {
+            LogHandlerEvent(DEBUG_PREFIX_PURECALL, "Exception in crash handler callback");
+        }
     }
 
     if (pCtx != nullptr)
@@ -1346,7 +1336,7 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
 
     PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
 
-    if (BuildExceptionContext(exPtrs, pExRecord, pCtx, CPP_EXCEPTION_CODE) && callback != nullptr)
+    if (callback != nullptr && BuildExceptionContext(exPtrs, pExRecord, pCtx, CPP_EXCEPTION_CODE))
     {
         SafeDebugOutput(DEBUG_PREFIX_CPP "Calling crash handler callback\n");
 
