@@ -10,10 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProxyComHelpers.h"
+#include "ComPtrValidation.h"
 #include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <mutex>
+#include <thread>
 #include <game/CSettings.h>
 
 class CProxyDirect3DDevice9;
@@ -23,66 +26,7 @@ void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3
 
 namespace
 {
-template <typename T>
-bool IsValidComInterfacePointer(T* pointer)
-{
-    if (!pointer)
-        return true;
 
-    if (!SharedUtil::IsReadablePointer(pointer, sizeof(void*)))
-        return false;
-
-    void* const* vtablePtr = reinterpret_cast<void* const*>(pointer);
-    void* const  vtable = *vtablePtr;
-    if (!vtable)
-        return false;
-
-    constexpr size_t requiredBytes = sizeof(void*) * 3;  // QueryInterface, AddRef, Release
-    return SharedUtil::IsReadablePointer(vtable, requiredBytes);
-}
-
-template <typename T>
-void ReleaseInterface(T*& pointer, const char* context = nullptr)
-{
-    if (pointer)
-    {
-        if (IsValidComInterfacePointer(pointer))
-        {
-            pointer->Release();
-        }
-        else
-        {
-        SString label;
-        label = context ? context : "ReleaseInterface";
-            SString message;
-            message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), pointer);
-            AddReportLog(8750, message, 5);
-        }
-        pointer = nullptr;
-    }
-}
-
-template <typename T>
-void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
-{
-    if (destination == source)
-        return;
-
-    if (source && !IsValidComInterfacePointer(source))
-    {
-    SString label;
-    label = context ? context : "ReplaceInterface";
-        SString message;
-        message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
-        AddReportLog(8751, message, 5);
-        return;
-    }
-
-    ReleaseInterface(destination, context);
-    destination = source;
-    if (destination)
-        destination->AddRef();
-}
 
 } // unnamed namespace
 
@@ -139,8 +83,8 @@ void RefreshCacheIfNeeded()
     const CClientVariables* currentSource = cvars;
     const int currentRevision = cvars ? cvars->GetRevision() : -1;
 
-    const CClientVariables* cachedSource = g_cachedSettings.source.load(std::memory_order_acquire);
-    const int cachedRevision = g_cachedSettings.revision.load(std::memory_order_acquire);
+    const CClientVariables* cachedSource = g_cachedSettings.source.load(std::memory_order_relaxed);
+    const int cachedRevision = g_cachedSettings.revision.load(std::memory_order_relaxed);
 
     if (cachedSource == currentSource && cachedRevision == currentRevision)
         return;
@@ -248,8 +192,7 @@ std::mutex               g_proxyDeviceMutex;
 std::mutex               g_gammaStateMutex;
 std::mutex               g_deviceStateMutex;
 std::atomic<uint64_t>    g_proxyRegistrationCounter{0};
-std::mutex               g_sceneStateMutex;
-uint32_t                 g_gtaSceneActiveCount = 0;
+std::atomic<uint>        g_gtaSceneActiveCount{0};
 uint64_t                 g_activeProxyRegistrationId = 0;
 
 std::atomic<bool>                       g_bInGTAScene{false};
@@ -293,23 +236,23 @@ bool UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registratio
 
 void IncrementGTASceneState()
 {
-    std::lock_guard<std::mutex> lock(g_sceneStateMutex);
-    ++g_gtaSceneActiveCount;
+    // Lockless atomic increment (called on every BeginScene)
+    g_gtaSceneActiveCount.fetch_add(1, std::memory_order_relaxed);
     g_bInGTAScene.store(true, std::memory_order_release);
 }
 
 void DecrementGTASceneState()
 {
-    std::lock_guard<std::mutex> lock(g_sceneStateMutex);
-    if (g_gtaSceneActiveCount > 0)
-        --g_gtaSceneActiveCount;
-    g_bInGTAScene.store(g_gtaSceneActiveCount > 0, std::memory_order_release);
+    // Lockless atomic decrement (called on every EndScene)
+    uint prevCount = g_gtaSceneActiveCount.fetch_sub(1, std::memory_order_acq_rel);
+    // fetch_sub returns value BEFORE subtraction, so check if it was 1 (now 0)
+    g_bInGTAScene.store(prevCount > 1, std::memory_order_release);
 }
 
 void ResetGTASceneState()
 {
-    std::lock_guard<std::mutex> lock(g_sceneStateMutex);
-    g_gtaSceneActiveCount = 0;
+    // Lockless atomic reset
+    g_gtaSceneActiveCount.store(0, std::memory_order_relaxed);
     g_bInGTAScene.store(false, std::memory_order_release);
 }
 
@@ -318,11 +261,10 @@ void ResetGTASceneState()
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
     : m_pDevice(pDevice)
     , m_pData(nullptr)
-    , m_ulRefCount(1)
+    , m_lRefCount(1)
     , m_registrationToken(0)
     , m_lastTestCooperativeLevelResult(D3D_OK)
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x (device: %08x)", this, pDevice));
 
     struct DeviceRefGuard
     {
@@ -363,33 +305,41 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
         if (pD3D9)
         {
             D3DADAPTER_IDENTIFIER9 adaptIdent;
-            ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
-            pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
+            HRESULT hr = pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
+            
+            if (SUCCEEDED(hr))
+            {
+                // GetAdapterIdentifier succeeded - use adapter info
+                int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
 
-            int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
+                // Just incase, fallback to using texture memory stats
+                if (iVideoCardMemoryKBTotal < 16)
+                    iVideoCardMemoryKBTotal = m_pDevice->GetAvailableTextureMem() / 1024;
 
-            // Just incase, fallback to using texture memory stats
-            if (iVideoCardMemoryKBTotal < 16)
-                iVideoCardMemoryKBTotal = m_pDevice->GetAvailableTextureMem() / 1024;
+                DeviceState.AdapterState.InstalledMemoryKB = iVideoCardMemoryKBTotal;
 
-            DeviceState.AdapterState.InstalledMemoryKB = iVideoCardMemoryKBTotal;
+                // Get video card name
+                DeviceState.AdapterState.Name = adaptIdent.Description;
 
-            // Get video card name
-            DeviceState.AdapterState.Name = adaptIdent.Description;
-
-            // Clipping is required for some graphic configurations
-            DeviceState.AdapterState.bRequiresClipping = SStringX(adaptIdent.Description).Contains("Intel");
+                // Clipping is required for some graphic configurations - use direct C-string search to avoid heap allocation
+                DeviceState.AdapterState.bRequiresClipping = (strstr(adaptIdent.Description, "Intel") != nullptr);
+            }
+            else
+            {
+                // GetAdapterIdentifier failed - use defaults
+                DeviceState.AdapterState.InstalledMemoryKB = m_pDevice->GetAvailableTextureMem() / 1024;
+                DeviceState.AdapterState.Name = "Unknown";
+                DeviceState.AdapterState.bRequiresClipping = false;
+            }
 
             // Release D3D9 interface if we obtained it via GetDirect3D
             if (bNeedRelease)
             {
-                SAFE_RELEASE(pD3D9);
+                ReleaseInterface(pD3D9, 8799, "CProxyDirect3DDevice9 ctor GetDirect3D");
             }
         }
         else
         {
-            WriteDebugEvent("Warning: Could not obtain IDirect3D9 interface for adapter info");
-
             // Set default values
             DeviceState.AdapterState.InstalledMemoryKB = m_pDevice->GetAvailableTextureMem() / 1024;
             DeviceState.AdapterState.Name = "Unknown";
@@ -409,8 +359,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
                 DeviceState.AdapterState.MaxAnisotropicSetting++;
         }
 
-        WriteDebugEvent(SString("*** Using adapter: %s (Mem:%d KB, MaxAnisotropy:%d)", (const char*)DeviceState.AdapterState.Name,
-                                DeviceState.AdapterState.InstalledMemoryKB, DeviceState.AdapterState.MaxAnisotropicSetting));
+        // Adapter info collected in DeviceState
     }
 
     const uint64_t registrationToken = RegisterProxyDevice(this);
@@ -448,7 +397,6 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::~CProxyDirect3DDevice9 %08x", this));
     const bool bWasRegistered = UnregisterProxyDevice(this, m_registrationToken);
 
     bool          bRestoreGamma = false;
@@ -468,7 +416,7 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 
             g_GammaState.bOriginalGammaStored = false;
             g_GammaState.bLastWasBorderless = false;
-            ZeroMemory(&g_GammaState.originalGammaRamp, sizeof(g_GammaState.originalGammaRamp));
+            g_GammaState.originalGammaRamp = {};
         }
     }
 
@@ -478,7 +426,6 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
         pDevice->AddRef();
         pDevice->SetGammaRamp(lastSwapChain, 0, &originalGammaRamp);
         pDevice->Release();
-        WriteDebugEvent("Restored original gamma ramp on device destruction");
     }
 
     // Release any cached COM references we held onto for diagnostics
@@ -486,8 +433,7 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 
     // Release our reference to the wrapped device
     // Note: We don't check m_ulRefCount here because destructor is only called
-    // when Release() determined the count reached 0
-    if (m_pDevice)
+    // when Release() determined the count reached 0    if (m_pDevice)
     {
         m_pDevice->Release();
         m_pDevice = nullptr;
@@ -518,26 +464,26 @@ HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
 
 ULONG CProxyDirect3DDevice9::AddRef()
 {
-    // Only increment proxy reference count
+	// Only increment proxy reference count
     // We keep a single reference to the underlying device throughout the lifetime
-    return InterlockedIncrement(&m_ulRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_add(1, std::memory_order_relaxed) + 1;
+    return static_cast<ULONG>(lNewRefCount);
 }
 
 ULONG CProxyDirect3DDevice9::Release()
-{
+{  
     // Only decrement proxy reference count  
-    ULONG ulNewRefCount = InterlockedDecrement(&m_ulRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_sub(1, std::memory_order_acq_rel) - 1;
     
-    if (ulNewRefCount == 0)
+    if (lNewRefCount == 0)
     {
-        WriteDebugEvent("Releasing IDirect3DDevice9 Proxy...");
         // Call event handler
         CDirect3DEvents9::OnDirect3DDeviceDestroy(m_pDevice);
         delete this;
         return 0;
     }
 
-    return ulNewRefCount;
+    return static_cast<ULONG>(lNewRefCount);
 }
 
 /*** IDirect3DDevice9 methods ***/
@@ -545,10 +491,8 @@ HRESULT CProxyDirect3DDevice9::TestCooperativeLevel()
 {
     HRESULT hResult = m_pDevice->TestCooperativeLevel();
     
-    // Log device state transitions for debugging GPU driver issues
     if (hResult != m_lastTestCooperativeLevelResult)
     {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::TestCooperativeLevel - Device state changed: %08x -> %08x", m_lastTestCooperativeLevelResult, hResult));
         m_lastTestCooperativeLevelResult = hResult;
         
         // Additional safety for when transitioning to/from lost states
@@ -662,14 +606,12 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
 
     if (SUCCEEDED(hResult))
     {
-        // Log success
-        WriteDebugEvent("Reset success");
+        return hResult;
     }
     else if (FAILED(hResult))
     {
         // Handle failure of initial reset device call
         g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail0:%08x", hResult));
-        WriteDebugEvent(SString("Reset failed #0: %08x", hResult));
 
         // Try reset device again
         hResult = ResetDeviceInsist(5, 1000, pDevice, pPresentationParameters);
@@ -679,7 +621,6 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
         {
             // Record problem
             g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail1:%08x", hResult));
-            WriteDebugEvent(SString("Direct3DDevice9::Reset  Fail1:%08x", hResult));
 
             // Try with original presentation parameters
             *pPresentationParameters = presentationParametersOrig;
@@ -689,7 +630,6 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
             {
                 // Record problem
                 g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail2:%08x", hResult));
-                WriteDebugEvent(SString("Direct3DDevice9::Reset  Fail2:%08x", hResult));
 
                 // Prevent statup warning in loader
                 WatchDogCompletedSection("L3");
@@ -745,7 +685,7 @@ static bool WaitForGpuIdle(IDirect3DDevice9* pDevice)
                 break;
             }
 
-            Sleep(0);
+            std::this_thread::yield();
         }
     }
 
@@ -755,12 +695,10 @@ static bool WaitForGpuIdle(IDirect3DDevice9* pDevice)
 
 HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
-    WriteDebugEvent("CProxyDirect3DDevice9::Reset");
 
     // Validate input parameters
     if (!pPresentationParameters)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Invalid presentation parameters");
         return D3DERR_INVALIDCALL;
     }
 
@@ -773,18 +711,15 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         g_GammaState = SGammaState();
         gammaStateCleared = true;
     }
-    WriteDebugEvent("Reset gamma state due to device reset");
     
     // Check cooperative level before attempting reset
     HRESULT hCoopLevel = m_pDevice->TestCooperativeLevel();
     if (hCoopLevel == D3DERR_DEVICELOST)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Device still lost, cannot reset yet");
         return hCoopLevel;
     }
     else if (hCoopLevel != D3DERR_DEVICENOTRESET && hCoopLevel != D3D_OK)
     {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset - Device in unexpected state: %08x", hCoopLevel));
         return hCoopLevel;
     }
 
@@ -795,10 +730,6 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     if (pVideoModeManager)
     {
         pVideoModeManager->PreReset(pPresentationParameters);
-    }
-    else
-    {
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Video mode manager unavailable during PreReset");
     }
 
     HRESULT hResult;
@@ -812,8 +743,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Give GPU driver time to complete any pending operations. We keep the light Sleep as a
     // conservative fallback but first rely on an event query, as recommended in Microsoft's GPU
     // synchronization guidance, to ensure outstanding commands finish.
-    if (!WaitForGpuIdle(m_pDevice))
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - WaitForGpuIdle timed out or failed");
+    WaitForGpuIdle(m_pDevice);
 
     Sleep(1);
     
@@ -827,11 +757,9 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         HRESULT              hrSwapChain = m_pDevice->GetSwapChain(0, &pSwapChain);
         if (FAILED(hrSwapChain))
         {
-            WriteDebugEvent(SString("Warning: Failed to get swap chain for parameter storage: %08x", hrSwapChain));
         }
         else if (!pSwapChain)
         {
-            WriteDebugEvent("Warning: GetSwapChain succeeded but returned null swap chain");
         }
 
         // Store device creation parameters as well, keeping both updates atomic relative to device state changes
@@ -853,11 +781,10 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         }
 
         // Always release the swap chain if it was obtained, regardless of success/failure
-        ReleaseInterface(pSwapChain);
+        ReleaseInterface(pSwapChain, 8799, "CProxyDirect3DDevice9::Reset GetSwapChain");
 
         if (FAILED(hrCreationParams))
         {
-            WriteDebugEvent(SString("Warning: Failed to get creation parameters: %08x", hrCreationParams));
         }
 
         // Only perform post-reset operations on successful reset
@@ -866,64 +793,28 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         {
             pVideoModeManager->PostReset(pPresentationParameters);
         }
-        else
-        {
-            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Skipping PostReset because video mode manager is unavailable");
-        }
 
         ApplyBorderlessColorCorrection(this, *pPresentationParameters);
 
-    // Update our data.
-    m_pData->StoreViewport(0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
+        // Update our data.
+        m_pData->StoreViewport(0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
 
         // Ensure scene state is properly restored
         // Call our event handler.
         CDirect3DEvents9::OnRestore(m_pDevice);
         
         // Additional sync point for GPU driver
-        if (!BeginSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
+        if (BeginSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
         {
-            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to begin scene for driver sync");
+            EndSceneWithoutProxy(m_pDevice, ESceneOwner::MTA);
         }
-        else
-        {
-            if (!EndSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
-            {
-                WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to end scene for driver sync");
-                g_bInMTAScene.store(false, std::memory_order_release);
-            }
-        }
-
-    WriteDebugEvent(SString("    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d", pPresentationParameters->BackBufferWidth,
-                            pPresentationParameters->BackBufferHeight, pPresentationParameters->BackBufferFormat, pPresentationParameters->BackBufferCount));
-
-    WriteDebugEvent(SString("    MultiSampleType:%d  Quality:%d", pPresentationParameters->MultiSampleType, pPresentationParameters->MultiSampleQuality));
-
-    WriteDebugEvent(SString("    SwapEffect:%d  Windowed:%d  EnableAutoDepthStencil:%d  AutoDepthStencilFormat:%d  Flags:0x%x",
-                            pPresentationParameters->SwapEffect, pPresentationParameters->Windowed, pPresentationParameters->EnableAutoDepthStencil,
-                            pPresentationParameters->AutoDepthStencilFormat, pPresentationParameters->Flags));
-
-    WriteDebugEvent(SString("    FullScreen_RefreshRateInHz:%d  PresentationInterval:0x%08x", pPresentationParameters->FullScreen_RefreshRateInHz,
-                            pPresentationParameters->PresentationInterval));
-
-    {
-        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
-        if (g_pDeviceState)
-        {
-            const D3DDEVICE_CREATION_PARAMETERS& parameters = g_pDeviceState->CreationState.CreationParameters;
-            WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x", parameters.AdapterOrdinal, parameters.DeviceType,
-                                    parameters.BehaviorFlags));
-        }
-    }
     }
     else
     {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset failed with HRESULT: %08x", hResult));
         if (gammaStateCleared)
         {
             std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
             g_GammaState = previousGammaState;
-            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Restored prior gamma state after failed reset");
         }
     }
 
@@ -933,29 +824,24 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 
 HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion)
 {
-    // Reset frame stat counters
+    // Reset frame stat counters - using memset for efficiency
     memset(&DeviceState.FrameStats, 0, sizeof(DeviceState.FrameStats));
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCoopLevel = D3DERR_INVALIDCALL;
     if (!CDirect3DEvents9::IsDeviceOperational(m_pDevice, &bDeviceTemporarilyLost, &hrCoopLevel))
     {
-        if (bDeviceTemporarilyLost)
-            WriteDebugEvent(SString("CProxyDirect3DDevice9::Present skipped due to device state: %08x", hrCoopLevel));
-        else if (hrCoopLevel != D3D_OK)
-            WriteDebugEvent(SString("CProxyDirect3DDevice9::Present unexpected cooperative level: %08x", hrCoopLevel));
-        else
-            WriteDebugEvent("CProxyDirect3DDevice9::Present invalid device state");
-
         return (hrCoopLevel != D3D_OK) ? hrCoopLevel : D3DERR_INVALIDCALL;
     }
 
     CDirect3DEvents9::OnPresent(m_pDevice);
 
     // A fog flicker fix for some ATI cards
-    D3DMATRIX projMatrix;
-    m_pData->GetTransform(D3DTS_PROJECTION, &projMatrix);
-    m_pDevice->SetTransform(D3DTS_PROJECTION, &projMatrix);
+    const D3DMATRIX* pCachedProjection = m_pData->GetTransformPtr(D3DTS_PROJECTION);
+    if (pCachedProjection)
+    {
+        m_pDevice->SetTransform(D3DTS_PROJECTION, pCachedProjection);
+    }
 
     TIMING_GRAPH("Present");
     HRESULT hr = CDirect3DEvents9::PresentGuarded(m_pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
@@ -983,14 +869,12 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
     // Validate inputs first
     if (!pRamp)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::SetGammaRamp - Invalid gamma ramp pointer");
         return;
     }
 
     // Validate swap chain index
     if (iSwapChain >= GetNumberOfSwapChains())
     {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::SetGammaRamp - Invalid swap chain index: %d", iSwapChain));
         return;
     }
 
@@ -1004,6 +888,17 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
     }
 
     bool bIsBorderlessMode = pVideoModeManager->IsDisplayModeWindowed() || pVideoModeManager->IsDisplayModeFullScreenWindow();
+
+    // Fast-path: check cached state before expensive settings fetch
+    {
+        std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
+        if (g_GammaState.bOriginalGammaStored && g_GammaState.bLastWasBorderless == bIsBorderlessMode && g_GammaState.lastSwapChain == iSwapChain)
+        {
+            // State hasn't changed, apply ramp directly
+            m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
+            return;
+        }
+    }
 
     float gammaPower = 1.0f;
     float brightnessScale = 1.0f;
@@ -1047,8 +942,6 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
 
     // In exclusive fullscreen mode with no adjustments requested, fall back to the original gamma ramp
     m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
-    if (!bIsBorderlessMode)
-        WriteDebugEvent("Applied original gamma ramp for fullscreen mode");
 }
 
 void CProxyDirect3DDevice9::ApplyBorderlessPresentationTuning()
@@ -1242,7 +1135,6 @@ HRESULT CProxyDirect3DDevice9::BeginScene()
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
@@ -1279,7 +1171,6 @@ HRESULT CProxyDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State, CONST D
 {
     if (!pMatrix)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::SetTransform - Null matrix pointer");
         return D3DERR_INVALIDCALL;
     }
 
@@ -1294,6 +1185,17 @@ HRESULT CProxyDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State, CONST D
 
 HRESULT CProxyDirect3DDevice9::GetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix)
 {
+    // Use cached data if available to avoid expensive device query
+    if (pMatrix)
+    {
+        const D3DMATRIX* pCached = m_pData->GetTransformPtr(State);
+        if (pCached)
+        {
+            *pMatrix = *pCached;
+            return D3D_OK;
+        }
+    }
+    // Fallback to device query for unsupported transform types
     return m_pDevice->GetTransform(State, pMatrix);
 }
 
@@ -1320,11 +1222,12 @@ HRESULT CProxyDirect3DDevice9::SetMaterial(CONST D3DMATERIAL9* pMaterial)
 {
     if (!pMaterial)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::SetMaterial - Null material pointer");
         return D3DERR_INVALIDCALL;
     }
 
-    DeviceState.Material = *pMaterial;
+    // Update cache if material has changed (avoid 68-byte copy)
+    if (memcmp(&DeviceState.Material, pMaterial, sizeof(D3DMATERIAL9)) != 0)
+        DeviceState.Material = *pMaterial;
     return m_pDevice->SetMaterial(pMaterial);
 }
 
@@ -1337,11 +1240,11 @@ HRESULT CProxyDirect3DDevice9::SetLight(DWORD Index, CONST D3DLIGHT9* pLight)
 {
     if (!pLight)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::SetLight - Null light pointer");
         return D3DERR_INVALIDCALL;
     }
 
-    if (Index < NUMELMS(DeviceState.Lights))
+    // Update cache if light has changed (avoid 104-byte copy)
+    if (Index < NUMELMS(DeviceState.Lights) && memcmp(&DeviceState.Lights[Index], pLight, sizeof(D3DLIGHT9)) != 0)
         DeviceState.Lights[Index] = *pLight;
     return m_pDevice->SetLight(Index, pLight);
 }
@@ -1375,8 +1278,10 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane(DWORD Index, float* pPlane)
 
 HRESULT CProxyDirect3DDevice9::SetRenderState(D3DRENDERSTATETYPE State, DWORD Value)
 {
+    // Update cache for state tracking
     if (State < NUMELMS(DeviceState.RenderState.Raw))
         DeviceState.RenderState.Raw[State] = Value;
+
     return m_pDevice->SetRenderState(State, Value);
 }
 
@@ -1420,9 +1325,12 @@ HRESULT CProxyDirect3DDevice9::SetTexture(DWORD Stage, IDirect3DBaseTexture9* pT
     CDirect3DEvents9::CloseActiveShader();
     if (Stage < NUMELMS(DeviceState.TextureState))
     {
-        SString context;
-        context.Format("SetTexture stage %u", Stage);
-        ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture, context.c_str());
+        // Fast-path: avoid AddRef/Release if texture hasn't changed
+        if (DeviceState.TextureState[Stage].Texture != pTexture)
+        {
+            // Hot path: use non-validating ReplaceInterface since textures come from D3D9 driver
+            ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture);
+        }
     }
     return m_pDevice->SetTexture(Stage, CDirect3DEvents9::GetRealTexture(pTexture));
 }
@@ -1434,9 +1342,11 @@ HRESULT CProxyDirect3DDevice9::GetTextureStageState(DWORD Stage, D3DTEXTURESTAGE
 
 HRESULT CProxyDirect3DDevice9::SetTextureStageState(DWORD Stage, D3DTEXTURESTAGESTATETYPE Type, DWORD Value)
 {
+    // Update cache for state tracking
     if (Stage < NUMELMS(DeviceState.StageState))
         if (Type < NUMELMS(DeviceState.StageState[Stage].Raw))
             DeviceState.StageState[Stage].Raw[Type] = Value;
+
     return m_pDevice->SetTextureStageState(Stage, Type, Value);
 }
 
@@ -1447,9 +1357,11 @@ HRESULT CProxyDirect3DDevice9::GetSamplerState(DWORD Sampler, D3DSAMPLERSTATETYP
 
 HRESULT CProxyDirect3DDevice9::SetSamplerState(DWORD Sampler, D3DSAMPLERSTATETYPE Type, DWORD Value)
 {
+    // Update cache for state tracking
     if (Sampler < NUMELMS(DeviceState.SamplerState))
         if (Type < NUMELMS(DeviceState.SamplerState[Sampler].Raw))
             DeviceState.SamplerState[Sampler].Raw[Type] = Value;
+
     return m_pDevice->SetSamplerState(Sampler, Type, Value);
 }
 
@@ -1554,7 +1466,9 @@ HRESULT CProxyDirect3DDevice9::CreateVertexDeclaration(CONST D3DVERTEXELEMENT9* 
 
 HRESULT CProxyDirect3DDevice9::SetVertexDeclaration(IDirect3DVertexDeclaration9* pDecl)
 {
-    ReplaceInterface(DeviceState.VertexDeclaration, pDecl);
+    // Avoid validation overhead since declarations come from D3D9 driver
+    if (DeviceState.VertexDeclaration != pDecl)
+        ReplaceInterface(DeviceState.VertexDeclaration, pDecl);
     return CDirect3DEvents9::SetVertexDeclaration(m_pDevice, pDecl);
 }
 
@@ -1580,7 +1494,9 @@ HRESULT CProxyDirect3DDevice9::CreateVertexShader(CONST DWORD* pFunction, IDirec
 
 HRESULT CProxyDirect3DDevice9::SetVertexShader(IDirect3DVertexShader9* pShader)
 {
-    ReplaceInterface(DeviceState.VertexShader, pShader);
+    // Avoid validation overhead since shaders come from D3D9 driver
+    if (DeviceState.VertexShader != pShader)
+        ReplaceInterface(DeviceState.VertexShader, pShader);
     return m_pDevice->SetVertexShader(pShader);
 }
 
@@ -1623,7 +1539,9 @@ HRESULT CProxyDirect3DDevice9::SetStreamSource(UINT StreamNumber, IDirect3DVerte
 {
     if (StreamNumber < NUMELMS(DeviceState.VertexStreams))
     {
-        ReplaceInterface(DeviceState.VertexStreams[StreamNumber].StreamData, pStreamData);
+        // Avoid validation overhead since vertex buffers come from D3D9 driver
+        if (DeviceState.VertexStreams[StreamNumber].StreamData != pStreamData)
+            ReplaceInterface(DeviceState.VertexStreams[StreamNumber].StreamData, pStreamData);
         DeviceState.VertexStreams[StreamNumber].StreamOffset = OffsetInBytes;
         DeviceState.VertexStreams[StreamNumber].StreamStride = Stride;
     }
@@ -1647,7 +1565,9 @@ HRESULT CProxyDirect3DDevice9::GetStreamSourceFreq(UINT StreamNumber, UINT* pSet
 
 HRESULT CProxyDirect3DDevice9::SetIndices(IDirect3DIndexBuffer9* pIndexData)
 {
-    ReplaceInterface(DeviceState.IndexBufferData, pIndexData);
+    // Avoid validation overhead since index buffers come from D3D9 driver
+    if (DeviceState.IndexBufferData != pIndexData)
+        ReplaceInterface(DeviceState.IndexBufferData, pIndexData);
     return m_pDevice->SetIndices(CDirect3DEvents9::GetRealIndexBuffer(pIndexData));
 }
 
@@ -1663,7 +1583,9 @@ HRESULT CProxyDirect3DDevice9::CreatePixelShader(CONST DWORD* pFunction, IDirect
 
 HRESULT CProxyDirect3DDevice9::SetPixelShader(IDirect3DPixelShader9* pShader)
 {
-    ReplaceInterface(DeviceState.PixelShader, pShader);
+    // Avoid validation overhead since shaders come from D3D9 driver
+    if (DeviceState.PixelShader != pShader)
+        ReplaceInterface(DeviceState.PixelShader, pShader);
     return m_pDevice->SetPixelShader(pShader);
 }
 
@@ -1726,21 +1648,21 @@ void CProxyDirect3DDevice9::ReleaseCachedResources()
 {
     for (uint i = 0; i < NUMELMS(DeviceState.TextureState); ++i)
     {
-        ReleaseInterface(DeviceState.TextureState[i].Texture);
+        ReleaseInterface(DeviceState.TextureState[i].Texture, 8799, "ReleaseCachedResources Texture");
     }
 
     for (uint i = 0; i < NUMELMS(DeviceState.VertexStreams); ++i)
     {
-        ReleaseInterface(DeviceState.VertexStreams[i].StreamData);
+        ReleaseInterface(DeviceState.VertexStreams[i].StreamData, 8799, "ReleaseCachedResources VertexStream");
         DeviceState.VertexStreams[i].StreamOffset = 0;
         DeviceState.VertexStreams[i].StreamStride = 0;
     }
 
-    ReleaseInterface(DeviceState.VertexDeclaration);
-    ReleaseInterface(DeviceState.VertexShader);
-    ReleaseInterface(DeviceState.PixelShader);
-    ReleaseInterface(DeviceState.IndexBufferData);
-    ReleaseInterface(DeviceState.MainSceneState.DepthBuffer);
+    ReleaseInterface(DeviceState.VertexDeclaration, 8799, "ReleaseCachedResources VertexDecl");
+    ReleaseInterface(DeviceState.VertexShader, 8799, "ReleaseCachedResources VertexShader");
+    ReleaseInterface(DeviceState.PixelShader, 8799, "ReleaseCachedResources PixelShader");
+    ReleaseInterface(DeviceState.IndexBufferData, 8799, "ReleaseCachedResources IndexBuffer");
+    ReleaseInterface(DeviceState.MainSceneState.DepthBuffer, 8799, "ReleaseCachedResources DepthBuffer");
 }
 
 // For debugging
@@ -1788,7 +1710,6 @@ bool BeginSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner)
     const HRESULT hr = pDevice->BeginScene();
     if (FAILED(hr))
     {
-        WriteDebugEvent(SString("BeginSceneWithoutProxy failed: %08x", hr));
         return false;
     }
 

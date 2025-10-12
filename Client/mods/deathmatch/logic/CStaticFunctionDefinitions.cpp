@@ -27,6 +27,7 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
+#include <SharedUtil.Misc.h>
 #include <game/CBuildingRemoval.h>
 #include <game/TaskBasic.h>
 #include <enums/VehicleType.h>
@@ -288,23 +289,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char
 
 bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
 {
-    std::wstring strUTF = MbUTF8ToUTF16(strText);
-
-    // Open and empty the clipboard
-    OpenClipboard(NULL);
-    EmptyClipboard();
-
-    // Allocate the clipboard buffer and copy the data
-    HGLOBAL  hBuf = GlobalAlloc(GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t));
-    wchar_t* buf = reinterpret_cast<wchar_t*>(GlobalLock(hBuf));
-    wcscpy(buf, strUTF.c_str());
-    GlobalUnlock(hBuf);
-
-    // Copy the data into the clipboard
-    SetClipboardData(CF_UNICODETEXT, hBuf);
-
-    // Close the clipboard
-    CloseClipboard();
+    SharedUtil::SetClipboardText(strText);
     return true;
 }
 
@@ -674,6 +659,11 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
         case CCLIENTWEAPON:
         {
             fDistance = static_cast<CClientObject&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
+            return true;
+        }
+        case CCLIENTBUILDING:
+        {
+            fDistance = static_cast<CClientBuilding&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
             return true;
         }
     }
@@ -7263,27 +7253,16 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             }
         }
 
-        pBind = g_pCore->GetKeyBinds()->GetBindFromCommand(szCommandName, NULL, false, szKey, bCheckHitState, bHitState);
-
+        // Use context-aware removal to only remove resource bindings
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
+            pKeyBinds->RemoveCommandFromContext(szKey, szCommandName, BindingContext::RESOURCE, bCheckHitState, bHitState, NULL, szResource))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
-
-            if (pBind)
-                pKeyBinds->Remove(pBind);
-
             bSuccess = true;
         }
         bHitState = false;
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
+            pKeyBinds->RemoveCommandFromContext(szKey, szCommandName, BindingContext::RESOURCE, bCheckHitState, bHitState, NULL, szResource))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
-
-            if (pBind)
-                pKeyBinds->Remove(pBind);
-
             bSuccess = true;
         }
     }

@@ -1017,6 +1017,9 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, CStringName 
 
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
+        if (!pElement->SetCustomData(name, Variable, syncType))
+            return false; // The server cancelled the change in onElementDataChange
+
         if (syncType != ESyncType::LOCAL)
         {
             // Tell our clients to update their data
@@ -1037,8 +1040,6 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, CStringName 
         if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
             m_pPlayerManager->ClearElementData(pElement, name);
 
-        // Set its custom data
-        pElement->SetCustomData(name, Variable, syncType);
         return true;
     }
     return false;
@@ -1053,6 +1054,9 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, CStringNa
     // Check it exists
     if (pElement->GetCustomData(name, false))
     {
+        if (!pElement->DeleteCustomData(name))
+            return false; // The server cancelled the change in onElementDataChange
+
         // Tell our clients to update their data
         unsigned short usNameLength = static_cast<unsigned short>(name->length());
         CBitStream     BitStream;
@@ -1064,8 +1068,6 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, CStringNa
         // Clean up after the data removal
         m_pPlayerManager->ClearElementData(pElement, name);
 
-        // Delete here
-        pElement->DeleteCustomData(name);
         return true;
     }
 
@@ -9171,6 +9173,8 @@ bool CStaticFunctionDefinitions::UnbindKey(CPlayer* pPlayer, const char* szKey, 
         (pControl && (bSuccess = pKeyBinds->RemoveControlFunction(szKey, pLuaMain, bCheckHitState, bHitState, iLuaFunction)) &&
          !pKeyBinds->ControlFunctionExists(szKey, NULL, bCheckHitState, bHitState)))
     {
+        // Only send UNBIND_KEY RPC if there are no more function bindings for this key
+        // This allows user command bindings to persist
         unsigned char ucKeyLength = static_cast<unsigned char>(strlen(szKey));
 
         CBitStream bitStream;

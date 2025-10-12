@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <SharedUtil.Misc.h>
 #include "CModManager.h"
 #define DECLARE_PROFILER_SECTION_CModManager
 #include "profiler/SharedUtil.Profiler.h"
@@ -186,17 +187,16 @@ bool CModManager::TryStart()
         return false;
     }
 
-    CClientBase* (__cdecl * InitClient)() = nullptr;
-    InitClient = reinterpret_cast<decltype(InitClient)>(static_cast<void*>(GetProcAddress(library, "InitClient")));
-
-    if (InitClient == nullptr)
+    using InitClientFn = CClientBase* (__cdecl*)();
+    InitClientFn initClient = nullptr;
+    if (!SharedUtil::TryGetProcAddress(library, "InitClient", initClient))
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to initialize deathmatch's DLL (missing init)");
         FreeLibrary(library);
         return false;
     }
 
-    CClientBase* client = InitClient();
+    CClientBase* client = initClient();
 
     if (client == nullptr || client->ClientInitialize(m_arguments.c_str(), CCore::GetSingletonPtr()) != 0)
     {

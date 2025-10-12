@@ -28,6 +28,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
     SetTypeName("building");
     m_pBuildingManager->AddToList(this);
     Create();
+    UpdateSpatialData();
 }
 
 CClientBuilding::~CClientBuilding()
@@ -57,6 +58,7 @@ void CClientBuilding::SetPosition(const CVector& vecPosition)
         return;
     m_vPos = vecPosition;
     Recreate();
+    UpdateSpatialData();
 }
 
 void CClientBuilding::SetRotationRadians(const CVector& vecRadians)
@@ -190,4 +192,9 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
         m_pLowBuilding = nullptr;
     }
     return true;
+}
+
+float CClientBuilding::GetDistanceFromCentreOfMassToBaseOfModel()
+{
+    return m_pBuilding ? m_pBuilding->GetDistanceFromCentreOfMassToBaseOfModel() : 0.0f;
 }
