@@ -25,46 +25,32 @@
 #define ARRAY_CProjectile                   0xC89110 //##SA##
 #define ARRAY_CProjectileInfo               0xC891A8 //##SA##
 
-// #pragma pack(push,1)
-class CProjectileInfoSAInterface
-{
-public:
-    eWeaponType         dwProjectileType;
-    CEntitySAInterface* pEntProjectileOwner;
-    CEntitySAInterface* pEntProjectileTarget;
-    DWORD               dwCounter;
-    BYTE                bProjectileActive;
-    BYTE                bPad[3];
-    CVector             OldCoors;
-    DWORD               dwUnk;
-};
-// #pragma pack(pop)
+static constexpr std::size_t MAX_PROJECTILES_COUNT = 32;
 
-// TODO extract manager class
 class CProjectileInfoSA final : public CProjectileInfo
 {
 private:
-    CProjectileInfoSA*          projectileInfo[PROJECTILE_INFO_COUNT];
-    CProjectileInfoSAInterface* internalInterface;
+    // CProjectileInfoSAInterface
+    eWeaponType         m_weaponType;
+    CEntitySAInterface* m_creator;
+    CEntitySAInterface* m_target;
+    std::uint32_t       m_counter; // time to destroy
+    bool                m_isActive;
+    std::uint8_t        m_field_0x11[3]; // pad
+    CVector             m_lastPos;
+    void*               m_particle; // FxSystem_cSAInterface*
+    //
+
+    CProjectileSA* m_projectile;
+
+    static ProjectileHandler               m_projectileCreationHandler;
+    static GameProjectileDestructHandler*   m_projectileDestructionHandler;
+
+    static std::array<CProjectileInfoSA, MAX_PROJECTILES_COUNT> ms_projectileInfo; // gaProjectileInfo
 
 public:
-    CProjectileInfoSA()
-    {
-        for (int i = 0; i < PROJECTILE_INFO_COUNT; i++)
-        {
-            projectileInfo[i] = new CProjectileInfoSA((CProjectileInfoSAInterface*)(ARRAY_CProjectileInfo + i * sizeof(CProjectileInfoSAInterface)));
-        }
-    }
-
-    CProjectileInfoSA(CProjectileInfoSAInterface* projectileInfoInterface) { internalInterface = projectileInfoInterface; }
-
-    void             RemoveAllProjectiles();
-    void             RemoveProjectile(CProjectileInfo* pProjectileInfo, CProjectile* pProjectile, bool bBlow = true);
-    CProjectileInfo* GetProjectileInfo(void* projectileInfoInterface);
-    CProjectileInfo* GetProjectileInfo(DWORD dwIndex);
-    bool             AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
-    CProjectile*     GetProjectile(void* projectilePointer);
-    void             RemoveEntityReferences(CEntity* entity);
+    CProjectileInfo* AddProjectile(CEntity* creator, eWeaponType projectileType, CVector pos, float force, CVector* target, CEntity* targetEntity) const override;
+    void             RemoveProjectile(CProjectileInfo* info, CProjectile* object, bool blow = true) const override;
 
     CEntity* GetTarget();
     void     SetTarget(CEntity* pEntity);
@@ -73,4 +59,43 @@ public:
 
     void  SetCounter(DWORD dwCounter);
     DWORD GetCounter();
+
+    eWeaponType GetType() const override { return m_weaponType; }
+
+    CProjectile* GetProjectileObject() override { return m_projectile; }
+    CProjectileSA* GetProjectile() { return m_projectile; }
+
+    CProjectileInfoSA* GetProjectileInfo(std::uint32_t index) const noexcept override { return index >= MAX_PROJECTILES_COUNT ? nullptr : &ms_projectileInfo[index]; }
+
+    void SetProjectileCreationHandler(ProjectileHandler handler) override { m_projectileCreationHandler = handler; }
+    void SetGameProjectileDestructHandler(GameProjectileDestructHandler* handler) override { m_projectileDestructionHandler = handler; }
+
+    void RemoveEntityReferences(CEntity* entity) override;
+
+    static void StaticSetHooks();
+
+private:
+    static void Initialise();
+    static void Shutdown();
+
+    static CObjectSAInterface*     CreateProjectileObject(std::uint32_t modelIndex, CProjectileInfoSA* info);
+    static void                    DestroyProjectileObject(CObjectSAInterface* object);
+
+    static CProjectileInfo* StaticAddProjectile(CEntitySAInterface* creator, eWeaponType projectileType, CVector pos, float force, CVector* target, CEntitySAInterface* targetEntity);
+    static void             StaticRemoveProjectile(CProjectileInfoSA* info, CProjectileSA* projectile, bool blow = true);
+
+    static void RemoveNotAdd(CEntitySAInterface* entity, eWeaponType weaponType, CVector pos);
+
+    static void RemoveDetonatorProjectiles();
+
+    static void RemoveIfThisIsAProjectile(CObjectSAInterface* object);
+    static void RemoveAllProjectiles();
+    static void RemoveParticle(CProjectileInfoSA* info, bool instantly);
+    static bool IsProjectileInRange(float x1, float x2, float y1, float y2, float z1, float z2, bool destroy);
+    static void Update();
+
+    static int FindFreeIndex();
+    static void InitCollision(CObjectSAInterface* projectile);
+    static void UpdateLastPos(CProjectileInfoSA* info);
+    static bool CheckIsLineOfSightClear(CProjectileInfoSA* info);
 };
