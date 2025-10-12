@@ -210,6 +210,8 @@ void InitLocalization(bool bShowErrors)
         ExitProcess(EXIT_ERROR);
     }
 
+    LoaderResolveCrashHandlerExports(hCoreModule);
+
     // Get locale
     SString strLocale = GetApplicationSetting("locale");
     if (strLocale.empty())
@@ -512,7 +514,10 @@ void HandleCustomStartMessage()
 //////////////////////////////////////////////////////////
 void PreLaunchWatchDogs()
 {
-    assert(!CreateSingleInstanceMutex());
+    // Note: Single instance mutex is properly checked later in the launch sequence
+    // Creating it here just ensures we acquire it early, but we shouldn't assert
+    // because after a crash the mutex won't exist (OS releases it)
+    CreateSingleInstanceMutex();
 
     // Check for unclean stop on previous run
 #ifndef MTA_DEBUG
@@ -695,10 +700,16 @@ void HandleDuplicateLaunching()
     const size_t cmdLineLen = strlen(lpCmdLine);
     if (cmdLineLen >= 32768) ExitProcess(EXIT_ERROR);            // Max Windows command line length
 
+    bool bIsCrashDialog = (cmdLineLen > 0 && strstr(lpCmdLine, "install_stage=crashed") != NULL);
+
     int recheckTime = 2000;            // 2 seconds recheck time
 
     // We can only do certain things if MTA is already running
-    while (!CreateSingleInstanceMutex())
+    // Unless this is a crash dialog launch, which needs to run alongside the crashed instance
+    //
+    // Normal behavior: Loop here if mutex is held, try to pass command line to existing instance
+    // Crash dialog: Skip this entirely (bIsCrashDialog=true), proceed directly to showing dialog
+    while (!bIsCrashDialog && !CreateSingleInstanceMutex())
     {
         if (cmdLineLen > 0)
         {
@@ -801,6 +812,11 @@ void HandleDuplicateLaunching()
             }
             ExitProcess(EXIT_ERROR);
         }
+    }
+
+    if (bIsCrashDialog)
+    {
+        CreateSingleInstanceMutex();
     }
 }
 
