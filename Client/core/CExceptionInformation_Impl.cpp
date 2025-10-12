@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <SharedUtil.Misc.h>
 #include <SharedUtil.Detours.h>
+#include <SharedUtil.Memory.h>
 
 #include <algorithm>
 #include <array>
@@ -49,23 +50,27 @@
     if (pRecord->ExceptionCode == 0)
         return false;
 
+    // CUSTOM_EXCEPTION_CODE_OOM is a custom exception raised manually via RaiseException
+    // Always accept it for crash dump processing regardless of context state
+    if (pRecord->ExceptionCode == CUSTOM_EXCEPTION_CODE_OOM)
+        return true;
+
+    // CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT is a custom exception for frozen threads
+    // Always accept it for crash dump processing
+    if (pRecord->ExceptionCode == CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT)
+        return true;
+
     const CONTEXT* pContext = pException->ContextRecord;
     if (pContext->ContextFlags == 0)
         return false;
 
     if (pContext->ContextFlags & CONTEXT_CONTROL)
     {
-        if (pContext->Eip == 0 || pContext->Esp == 0)
+        if (pContext->Esp == 0)
         {
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "ValidateExceptionContext - Invalid control registers\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "ValidateExceptionContext - Invalid stack pointer\n");
             return false;
         }
-    }
-
-    if (pRecord->ExceptionAddress == nullptr)
-    {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "ValidateExceptionContext - Null exception address\n");
-        return false;
     }
 
     return true;
@@ -85,14 +90,15 @@ constexpr std::size_t MAX_SYMBOL_NAME = 256;
     if (copyResult == STRUNCATE)
     {
         std::array<char, DEBUG_BUFFER_SIZE> buffer{};
-        SAFE_DEBUG_PRINT(buffer, DEBUG_PREFIX_EXCEPTION_INFO "%s - Module path truncated to %zu bytes\n", context, destinationSize - 1U);
+        SAFE_DEBUG_PRINT(buffer, "%.*s%s - Module path truncated to %zu bytes\n", 
+            static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), context, destinationSize - 1U);
         return true;
     }
 
     if (copyResult != 0)
     {
         std::array<char, DEBUG_BUFFER_SIZE> buffer{};
-        SAFE_DEBUG_PRINT(buffer, DEBUG_PREFIX_EXCEPTION_INFO "%s - strncpy_s failed (error=%d)\n", context, copyResult);
+        SAFE_DEBUG_PRINT(buffer, "%.*s%s - strncpy_s failed (error=%d)\n", static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), context, copyResult);
         if (destinationSize > 0U)
             destination[0] = '\0';
         return false;
@@ -126,15 +132,16 @@ public:
             {
                 const DWORD                         dwError = GetLastError();
                 std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-                SAFE_DEBUG_PRINT(debugBuffer, DEBUG_PREFIX_EXCEPTION_INFO "SymbolHandlerGuard: SymInitialize failed, error: %u\n", dwError);
+                SAFE_DEBUG_PRINT(debugBuffer, "%.*sSymbolHandlerGuard: SymInitialize failed, error: %u\n", 
+                    static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), dwError);
 
                 if (dwError == ERROR_NOT_ENOUGH_MEMORY)
                 {
-                    SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "SymbolHandlerGuard: Insufficient memory for symbol initialization\n");
+                    SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "SymbolHandlerGuard: Insufficient memory for symbol initialization\n");
                 }
                 else if (dwError == ERROR_ACCESS_DENIED)
                 {
-                    SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "SymbolHandlerGuard: Access denied for symbol initialization\n");
+                    SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "SymbolHandlerGuard: Access denied for symbol initialization\n");
                 }
             }
         }
@@ -302,19 +309,19 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
 {
     if (!ValidateExceptionContext(pException))
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Invalid exception context\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Invalid exception context\n");
         return;
     }
 
     if (pException->ContextRecord == nullptr)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Null context record\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Null context record\n");
         return;
     }
 
     if (iCode == 0 || iCode > 0xFFFFFFFF)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Invalid exception code\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Invalid exception code\n");
         return;
     }
 
@@ -327,19 +334,20 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
 
     if (hasEnhancedInfo && enhancedInfo.exceptionCode == iCode)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Using enhanced exception info from CrashHandler (FRESH)\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Using enhanced exception info from CrashHandler (FRESH)\n");
     }
     else if (hasEnhancedInfo && enhancedInfo.exceptionCode != iCode)
     {
         std::array<char, DEBUG_BUFFER_SIZE> mismatchBuffer{};
         SAFE_DEBUG_PRINT(mismatchBuffer,
-                         DEBUG_PREFIX_EXCEPTION_INFO "Set - Exception code mismatch (stored: 0x%08X, current: 0x%08X) - STALE DATA, extracting fresh\n",
+                         "%.*sSet - Exception code mismatch (stored: 0x%08X, current: 0x%08X) - STALE DATA, extracting fresh\n",
+                         static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(),
                          enhancedInfo.exceptionCode, iCode);
         hasEnhancedInfo = false;
     }
     else if (!hasEnhancedInfo)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - No enhanced info available, extracting manually\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - No enhanced info available, extracting manually\n");
     }
 
     if (hasEnhancedInfo)
@@ -357,7 +365,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
             std::unique_ptr<char[]> enhancedPathBuffer(new (std::nothrow) char[pathLen]);
             if (!enhancedPathBuffer)
             {
-                SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Failed to allocate enhanced module path buffer\n");
+                SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Failed to allocate enhanced module path buffer\n");
             }
             else
             {
@@ -446,7 +454,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
 
     if (!modulePathNameBuffer || !tempModulePathBuffer)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Failed to allocate buffers\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Failed to allocate buffers\n");
         return;
     }
 
@@ -457,23 +465,60 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     void* pExceptionAddress = m_pAddress;
     void* pQueryAddress = m_pAddress;
 
+    // Special handling for EIP=0: Start from return address at [ESP] instead
+    constexpr auto kNullAddress = uintptr_t{0};
+    static_assert(kNullAddress == 0, "Null address must be zero");
+    
+    const auto queryAddressValue = reinterpret_cast<uintptr_t>(pQueryAddress);
+    
+    if (queryAddressValue == kNullAddress && m_ulEIP == kNullAddress)
+    {
+        const auto espAddr = static_cast<uintptr_t>(m_ulESP);
+        const auto pReturnAddress = reinterpret_cast<void* const*>(espAddr);
+        
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT(debugBuffer, 
+                        "%.*sSet - EIP=0 detected (ESP=0x%08X), attempting to read return address...\n", 
+                        static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(),
+                        static_cast<unsigned int>(espAddr));
+        
+        if (SharedUtil::IsReadablePointer(pReturnAddress, sizeof(void*)))
+        {
+            pQueryAddress = *pReturnAddress;
+            pExceptionAddress = pQueryAddress;
+            
+            const auto returnAddressValue = reinterpret_cast<uintptr_t>(pQueryAddress);
+            SAFE_DEBUG_PRINT(debugBuffer, 
+                            "%.*sSet - Successfully read return address: 0x%08X\n", 
+                            static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(),
+                            static_cast<unsigned int>(returnAddressValue));
+        }
+        else
+        {
+            SAFE_DEBUG_PRINT(debugBuffer, 
+                            "%.*sSet - Failed to read return address at ESP=0x%08X (not readable)\n", 
+                            static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(),
+                            static_cast<unsigned int>(espAddr));
+        }
+    }
+
     for (std::size_t i = 0; i < MAX_STACK_WALK_DEPTH; ++i)
     {
         void* pModuleBaseAddressTemp = nullptr;
 
         if (pQueryAddress == nullptr || !SharedUtil::IsReadablePointer(pQueryAddress, sizeof(void*)))
         {
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Invalid stack address during walk\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Invalid stack address during walk\n");
             break;
         }
 
         if (!GetModule(pQueryAddress, tempModulePathBuffer.get(), static_cast<int>(MAX_MODULE_PATH), &pModuleBaseAddressTemp))
         {
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Failed to get module info\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Failed to get module info\n");
             break;
         }
 
-        std::string_view tempPathView(tempModulePathBuffer.get());
+        const std::string_view tempPathView(tempModulePathBuffer.get());
         auto             tempBaseNamePos = tempPathView.find_last_of('\\');
         const char*      szModuleBaseNameTemp =
             tempBaseNamePos != std::string_view::npos ? tempModulePathBuffer.get() + tempBaseNamePos + 1 : tempModulePathBuffer.get();
@@ -489,7 +534,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
                                                        "Set - Initial module path copy");
             if (!copied)
             {
-                SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Initial module path copy failed\n");
+                SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Initial module path copy failed\n");
             }
             pModuleBaseAddress = pModuleBaseAddressTemp;
             pExceptionAddress = pQueryAddress;
@@ -502,7 +547,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
                                                        "Set - Selected module path copy");
             if (!copied)
             {
-                SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Selected module path copy failed\n");
+                SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Selected module path copy failed\n");
             }
             pModuleBaseAddress = pModuleBaseAddressTemp;
             pExceptionAddress = pQueryAddress;
@@ -514,7 +559,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
 
         if (offset > UINTPTR_MAX - espAddr)
         {
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Stack address calculation overflow\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Stack address calculation overflow\n");
             break;
         }
 
@@ -523,7 +568,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
 
         if (!SharedUtil::IsReadablePointer(stackEntry, sizeof(*stackEntry)))
         {
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Stack walk encountered unreadable memory\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Stack walk encountered unreadable memory\n");
             break;
         }
 
@@ -535,7 +580,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
 
         if (stackValue == nullptr)
         {
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Stack walk encountered null pointer\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Stack walk encountered null pointer\n");
             break;
         }
 
@@ -561,13 +606,13 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
             else
             {
                 m_uiAddressModuleOffset = 0;
-                SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Module offset too large\n");
+                SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Module offset too large\n");
             }
         }
         else
         {
             m_uiAddressModuleOffset = 0;
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Exception address before module base\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Exception address before module base\n");
         }
     }
     else
@@ -580,18 +625,18 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         if (CaptureUnifiedStackTrace(pException, 0, &m_stackTrace) != FALSE)
         {
             m_hasDetailedStackTrace = true;
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Unified stack trace captured successfully\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Unified stack trace captured successfully\n");
         }
         else
         {
             m_hasDetailedStackTrace = false;
-            SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Unified stack trace capture failed\n");
+            SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Unified stack trace capture failed\n");
         }
     }
     catch (...)
     {
         m_hasDetailedStackTrace = false;
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "Set - Stack trace capture failed with exception\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "Set - Stack trace capture failed with exception\n");
     }
 }
 
@@ -599,13 +644,13 @@ bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBu
 {
     if (pQueryAddress == nullptr || szOutputBuffer == nullptr || ppModuleBaseAddress == nullptr)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "GetModule - Invalid parameters\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "GetModule - Invalid parameters\n");
         return false;
     }
 
     if (nOutputNameLength <= 0)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "GetModule - Invalid buffer length\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "GetModule - Invalid buffer length\n");
         return false;
     }
 
@@ -617,14 +662,14 @@ bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBu
     HMODULE hKern32 = GetModuleHandleA("kernel32.dll");
     if (hKern32 == nullptr)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "GetModule - Failed to get kernel32 handle\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "GetModule - Failed to get kernel32 handle\n");
         return false;
     }
 
     GetModuleHandleExA_t pfnGetModuleHandleExA = nullptr;
     if (!SharedUtil::TryGetProcAddress(hKern32, "GetModuleHandleExA", pfnGetModuleHandleExA))
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "GetModule - GetModuleHandleExA not available\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "GetModule - GetModuleHandleExA not available\n");
         return false;
     }
 
@@ -634,7 +679,7 @@ bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBu
     {
         const DWORD                         dwErrorHandle = GetLastError();
         std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT(debugBuffer, DEBUG_PREFIX_EXCEPTION_INFO "GetModule - GetModuleHandleExA failed (0x%08X)\n", dwErrorHandle);
+        SAFE_DEBUG_PRINT(debugBuffer, "%.*sGetModule - GetModuleHandleExA failed (0x%08X)\n", static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), dwErrorHandle);
         return false;
     }
 
@@ -645,7 +690,7 @@ bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBu
     {
         const DWORD                         dwErrorFileName = GetLastError();
         std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT(debugBuffer, DEBUG_PREFIX_EXCEPTION_INFO "GetModule - GetModuleFileNameA failed (0x%08X)\n", dwErrorFileName);
+        SAFE_DEBUG_PRINT(debugBuffer, "%.*sGetModule - GetModuleFileNameA failed (0x%08X)\n", static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), dwErrorFileName);
         szOutputBuffer[0] = '\0';
         return false;
     }
@@ -653,12 +698,12 @@ bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBu
     if (static_cast<int>(dwResult) >= nOutputNameLength)
     {
         szOutputBuffer[nOutputNameLength - 1] = '\0';
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "GetModule - Module path truncated\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "GetModule - Module path truncated\n");
     }
 
     if (szOutputBuffer != nullptr && strlen(szOutputBuffer) == 0)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "GetModule - Empty module path\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "GetModule - Empty module path\n");
         return false;
     }
 
@@ -834,7 +879,7 @@ void CExceptionInformation_Impl::ClearModulePathState() noexcept
 
     if (!SharedUtil::IsReadablePointer(address, size))
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "CaptureMemoryDump - Memory region not readable\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "CaptureMemoryDump - Memory region not readable\n");
         return std::nullopt;
     }
 
@@ -847,7 +892,7 @@ void CExceptionInformation_Impl::ClearModulePathState() noexcept
     }
     catch (...)
     {
-        SafeDebugOutput(DEBUG_PREFIX_EXCEPTION_INFO "CaptureMemoryDump - Failed to allocate buffer\n");
+        SafeDebugOutput(std::string{DEBUG_PREFIX_EXCEPTION_INFO} + "CaptureMemoryDump - Failed to allocate buffer\n");
         return std::nullopt;
     }
 }
