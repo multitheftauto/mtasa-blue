@@ -11,8 +11,12 @@
 #include "D3DStuff.h"
 #include "Utils.h"
 #include "Dialogs.h"
+#include "../core/CrashHandler.h"
+
+#include <atomic>
 #include <d3d9.h>
 #include <nvapi/nvapi.h>
+
 
 namespace
 {
@@ -57,7 +61,48 @@ namespace
     IDirect3D9*                  pD3D9 = NULL;
     IDirect3DDevice9*            pD3DDevice9 = NULL;
     IDirect3DVertexDeclaration9* pD3DVertexDeclarations[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    using EnableHandlersFn = BOOL(WINAPI*)(void);
+    std::atomic<EnableHandlersFn> g_enableHandlersImpl{nullptr};
+    std::atomic<bool>             g_enableHandlersPending{false};
 }            // namespace
+
+// Loader is built without core crash handler code; defer to the implementation once core.dll is loaded.
+extern "C" BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization(void) noexcept
+{
+    if (EnableHandlersFn impl = g_enableHandlersImpl.load(std::memory_order_acquire))
+    {
+        return impl();
+    }
+
+    g_enableHandlersPending.store(true, std::memory_order_release);
+    return TRUE;
+}
+
+void LoaderResolveCrashHandlerExports(HMODULE coreModule) noexcept
+{
+    if (!coreModule)
+        return;
+
+    auto resolved = reinterpret_cast<EnableHandlersFn>(static_cast<void*>(GetProcAddress(coreModule, "EnableAllHandlersAfterInitialization")));
+
+    if (!resolved)
+    {
+        resolved = reinterpret_cast<EnableHandlersFn>(static_cast<void*>(GetProcAddress(coreModule, "_EnableAllHandlersAfterInitialization@0")));
+    }
+
+    g_enableHandlersImpl.store(resolved, std::memory_order_release);
+
+    if (!resolved)
+    {
+        WriteDebugEvent("Loader - Failed to resolve EnableAllHandlersAfterInitialization export");
+    }
+
+    if (resolved && g_enableHandlersPending.exchange(false, std::memory_order_acq_rel))
+    {
+        resolved();
+    }
+}
 
 //////////////////////////////////////////////////////////
 //
@@ -210,7 +255,11 @@ void BeginD3DStuff()
         SetApplicationSettingInt("nvhacks", "optimus-export-enablement", 0);
         SetApplicationSettingInt("nvhacks", "optimus-force-windowed", 0);
     }
+    
+    // Crash handler enablement now occurs inside the game process once the
+    // Direct3D device is fully created (see CGraphics::OnDeviceCreate).
 }
+
 
 //////////////////////////////////////////////////////////
 //

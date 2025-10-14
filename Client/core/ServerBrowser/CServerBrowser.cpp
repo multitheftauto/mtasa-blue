@@ -374,6 +374,11 @@ CServerBrowser::CServerBrowser()
 
 CServerBrowser::~CServerBrowser()
 {
+    // Suspend all server list activity and cancel pending network operations FIRST
+    // This must be done before DeleteTab() destroys the server lists, and while
+    // the network subsystem is still available (it may be destroyed before this destructor)
+    SuspendServerLists();
+
     // Save options now and disable selection handler
     SaveOptions(true);
     if (m_pPanel)
@@ -992,6 +997,13 @@ void CServerBrowser::StartRefresh(ServerBrowserType type)
 
         m_iSelectedServer[index] = -1;
         m_bPendingRefresh[index] = false;
+        
+        // Cancel any in-progress batch refresh to prevent iterator invalidation
+        // when pList->Refresh() calls Clear() on the server list
+        m_ListRefreshState[index].bActive = false;
+        m_ListRefreshState[index].pList = nullptr;
+        m_ListRefreshState[index].filterSnapshot.reset();
+        
         pList->Refresh();
         m_bInitialRefreshDone[index] = true;
     }
@@ -1455,6 +1467,8 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
         for (i = i_b; i != i_e; i++)
         {
             CServerListItem* pServer = *i;
+            if (!pServer || !CServerListItem::StaticIsValid(pServer))
+                continue;
 
             for (std::size_t j = 0; j < pServer->vecPlayers.size(); ++j)
             {
@@ -1635,7 +1649,10 @@ bool CServerBrowser::ConnectToSelectedServer()
 
             if (strPassword.empty())            // No password could be found, popup password entry.
             {
-                CServerInfo::GetSingletonPtr()->Show(eWindowTypes::SERVER_INFO_PASSWORD, pServer->strHost.c_str(), pServer->usGamePort, "", pServer);
+                if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+                {
+                    pServerInfo->Show(eWindowTypes::SERVER_INFO_PASSWORD, pServer->strHost.c_str(), pServer->usGamePort, "", pServer);
+                }
                 return true;
             }
         }
@@ -1665,9 +1682,29 @@ bool CServerBrowser::OnRefreshClick(CGUIElement* pElement)
 
 bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 {
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    
+    // First try to get the selected server from the list
+    CServerListItem* pServer = FindSelectedServer(Type);
+    if (pServer && CServerListItem::StaticIsValid(pServer) && 
+        pServer->Address.s_addr != 0 && pServer->usGamePort != 0 && 
+        !pServer->strHost.empty())
+    {
+        // Use the selected server's information directly
+        const SString& strHost = pServer->strHost;
+        unsigned short usPort = pServer->usGamePort;
+
+        if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+        {
+            pServerInfo->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, "", pServer);
+            return true;
+        }
+    }
+    
+    // Fallback to using the address bar if no server is selected
     unsigned short usPort;
     std::string    strHost, strNick, strPassword;
-    SString        strURI = m_pEditAddress[GetCurrentServerBrowserType()]->GetText();
+    SString        strURI = m_pEditAddress[Type]->GetText();
 
     // Trim leading spaces from the URI
     strURI = strURI.TrimStart(" ");
@@ -1681,7 +1718,10 @@ bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
 
-    CServerInfo::GetSingletonPtr()->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str());
+    if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+    {
+        pServerInfo->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str());
+    }
     return true;
 }
 
@@ -1750,6 +1790,8 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
         {
             for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
@@ -2098,6 +2140,8 @@ bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagNa
         if (iLimit && iProcessed == iLimit)
             break;
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
 
         // Add the item to the node
         CXMLNode* pSubNode = pNode->CreateSubNode(strTagName.c_str());
@@ -2444,7 +2488,7 @@ bool CServerBrowser::ProcessServerListRefreshBatch(ServerBrowserType type, size_
     size_t processed = 0;
     while (state.iterator != state.endIterator && processed < uiMaxSteps)
     {
-        CServerListItem* pServer = (state.iterator != state.endIterator) ? *state.iterator : nullptr;
+        CServerListItem* pServer = *state.iterator;
 
         // The list can briefly hand us null if an item was erased between batches
         if (!pServer)
@@ -2462,16 +2506,17 @@ bool CServerBrowser::ProcessServerListRefreshBatch(ServerBrowserType type, size_
             continue;
         }
 
+        // Additional safety check before accessing members
         if (state.bNeedsListClear)
             pServer->iRowIndex = -1;
 
         if (type == ServerBrowserTypes::FAVOURITES || type == ServerBrowserTypes::RECENTLY_PLAYED)
         {
-            if (pServer->Address.s_addr != 0 && pServer->usGamePort != 0)
+            if (pServer && pServer->Address.s_addr != 0 && pServer->usGamePort != 0)
                 GetServerCache()->GetServerCachedInfo(pServer);
         }
 
-        if (pServer->revisionInList[type] != pServer->uiRevision || state.bClearServerList)
+        if (pServer && (pServer->revisionInList[type] != pServer->uiRevision || state.bClearServerList))
         {
             if (!state.bDidUpdateRowIndices)
             {
@@ -2750,6 +2795,8 @@ CServerListItem* CServerBrowser::FindServer(const std::string& strHost, unsigned
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
             return pServer;
     }
@@ -2770,6 +2817,8 @@ unsigned short CServerBrowser::FindServerHttpPort(const std::string& strHost, un
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
             return pServer->m_usHttpPort;
     }
@@ -2791,6 +2840,8 @@ void CServerBrowser::UpdateRowIndexMembers(ServerBrowserType Type)
     for (int iRowIndex = 0; iRowIndex < iRowCount; iRowIndex++)
     {
         CServerListItem* pServer = (CServerListItem*)pServerList->GetItemData(iRowIndex, DATA_PSERVER);
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         pServer->iRowIndex = iRowIndex;
     }
 }
