@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-12 00:53+0000\n"
-"PO-Revision-Date: 2025-10-12 02:01\n"
+"POT-Creation-Date: 2025-10-12 09:36+0000\n"
+"PO-Revision-Date: 2025-10-15 08:11\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -201,7 +201,7 @@ msgstr "Инстанция на GTA:San Andreas вече се изпълянва
 #: Client/loader/MainFunctions.cpp:637 Client/loader/MainFunctions.cpp:644
 #: Client/loader/MainFunctions.cpp:1543
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1648
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1665
 #: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr "Информация"
@@ -235,10 +235,10 @@ msgstr "Проблем при рестартирането на MTA:SA\n\n"
 #: Client/core/CSettings.cpp:5209 Client/core/CSettings.cpp:5921
 #: Client/core/CCore.cpp:1315 Client/core/CGUI.cpp:94
 #: Client/core/DXHook/CDirect3DHook9.cpp:128
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1544
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1566
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1625
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1558
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1580
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1639
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1715
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:724
@@ -512,7 +512,7 @@ msgid "Quit"
 msgstr "Изход"
 
 #: Client/loader/Dialogs.cpp:67
-#: Client/core/ServerBrowser/CServerBrowser.cpp:690
+#: Client/core/ServerBrowser/CServerBrowser.cpp:695
 msgid "Help"
 msgstr "Помощ"
 
@@ -2519,7 +2519,7 @@ msgstr "Лаг:"
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
-#: Client/core/ServerBrowser/CServerBrowser.cpp:608
+#: Client/core/ServerBrowser/CServerBrowser.cpp:613
 msgid "Player list"
 msgstr "Лист от играчи"
 
@@ -2603,8 +2603,8 @@ msgstr "Добави към любими"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:314
 #: Client/core/ServerBrowser/CServerBrowser.cpp:357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:431
-#: Client/core/ServerBrowser/CServerBrowser.cpp:502
+#: Client/core/ServerBrowser/CServerBrowser.cpp:436
+#: Client/core/ServerBrowser/CServerBrowser.cpp:507
 msgid "Connect"
 msgstr "Свържи"
 
@@ -2633,93 +2633,93 @@ msgstr "Започни търсене"
 msgid "Delete from recent"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:429
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2001
+#: Client/core/ServerBrowser/CServerBrowser.cpp:434
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2043
 msgid "Search players..."
 msgstr "Търси играчи..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:552
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1999
+#: Client/core/ServerBrowser/CServerBrowser.cpp:557
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2041
 msgid "Search servers..."
 msgstr "Търси сървъри..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:583
+#: Client/core/ServerBrowser/CServerBrowser.cpp:588
 msgid "Name"
 msgstr "Име"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:584
+#: Client/core/ServerBrowser/CServerBrowser.cpp:589
 msgid "Players"
 msgstr "Играчи"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:585
+#: Client/core/ServerBrowser/CServerBrowser.cpp:590
 msgid "Ping"
 msgstr "Пинг"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:586
+#: Client/core/ServerBrowser/CServerBrowser.cpp:591
 msgid "Gamemode"
 msgstr "Игрален режим"
 
 #. Include label
-#: Client/core/ServerBrowser/CServerBrowser.cpp:620
+#: Client/core/ServerBrowser/CServerBrowser.cpp:625
 msgid "Include:"
 msgstr "Включва:"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:626
+#: Client/core/ServerBrowser/CServerBrowser.cpp:631
 msgid "Empty"
 msgstr "Празен"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:632
+#: Client/core/ServerBrowser/CServerBrowser.cpp:637
 msgid "Full"
 msgstr "Пълен"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:638
+#: Client/core/ServerBrowser/CServerBrowser.cpp:643
 msgid "Locked"
 msgstr "Заключен"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:650
+#: Client/core/ServerBrowser/CServerBrowser.cpp:655
 msgid "Offline"
 msgstr "Извън линия"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:663
+#: Client/core/ServerBrowser/CServerBrowser.cpp:668
 msgid "Other Versions"
 msgstr "Друга версия"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:684
+#: Client/core/ServerBrowser/CServerBrowser.cpp:689
 msgid "Back"
 msgstr "Назад"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:977
-#: Client/core/ServerBrowser/CServerBrowser.cpp:991
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1658
+#: Client/core/ServerBrowser/CServerBrowser.cpp:982
+#: Client/core/ServerBrowser/CServerBrowser.cpp:996
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1675
 msgid "Loading..."
 msgstr "Зареждане..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1506
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2831
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1520
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2882
 msgid "  ..loading.."
 msgstr "...зареждане.."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1544
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1558
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1715
 msgid "No address specified!"
 msgstr "Не е въведен адрес!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1557
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1571
 msgid "Unknown protocol"
 msgstr "Непознат протокол"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1557
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1571
 msgid "Please use the mtasa:// protocol!"
 msgstr "Моля използвайте mtasa:// протокола!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1566
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1625
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1580
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1639
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:748
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Невалиден никнейм! Моля отидете в Настройки и задайте нов!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1648
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1665
 msgid "You have to select a server to connect to."
 msgstr "Трябва да изберете сървър, за който да се свържете,"
 
