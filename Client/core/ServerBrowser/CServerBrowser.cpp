@@ -580,6 +580,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pServerList[type]->SetSize(CVector2D(fWidth, fHeight), false);
     m_pServerList[type]->SetIgnoreTextSpacer(true);
     m_pServerList[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnClick, this));
+    m_pServerList[type]->SetSelectionHandler(GUI_CALLBACK(&CServerBrowser::OnClick, this));
     m_pServerListRevision[type] = 0;
 
     // Server List Columns
@@ -619,7 +620,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     // Filters
     float fLineHeight = SB_BACK_BUTTON_SIZE_Y / 2;
     fX = SB_SMALL_SPACER;
-    fY = m_WidgetSize.fY - SB_SMALL_SPACER / 2 - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
+    fY = m_WidgetSize.fY - (SB_SMALL_SPACER * 0.5f) - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
 
     // Include label
     m_pLabelInclude[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTab[type], _("Include:")));
@@ -919,6 +920,7 @@ void CServerBrowser::DeleteTab(ServerBrowserType type)
         m_pServerList[type]->SetEnterKeyHandler(GUI_CALLBACK());
         m_pServerList[type]->SetDoubleClickHandler(GUI_CALLBACK());
         m_pServerList[type]->SetKeyDownHandler(GUI_CALLBACK_KEY());
+        m_pServerList[type]->SetSelectionHandler(GUI_CALLBACK());
         delete m_pServerList[type];
         m_pServerList[type] = nullptr;
     }
@@ -1720,7 +1722,7 @@ bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 
     if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
     {
-        pServerInfo->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str());
+        pServerInfo->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str(), nullptr);
     }
     return true;
 }
