@@ -14,7 +14,12 @@
 #include "Dialogs.h"
 #include "D3DStuff.h"
 #include <version.h>
+#include <algorithm>
 #include <array>
+#include <chrono>
+#include <cstdint>
+#include <iterator>
+#include <optional>
 #include <locale.h>
 
 // Function must be at the start to fix odd compile error (Didn't happen locally but does in build server)
@@ -25,6 +30,78 @@ namespace
         // Placeholder
         return true;
     }
+}
+
+[[nodiscard]] static bool IsCrashExitCode(DWORD exitCode) noexcept
+{
+    constexpr DWORD kLegacyCrashExitCode = 3;
+
+    if (exitCode == kLegacyCrashExitCode)
+        return true;
+
+    if (exitCode == EXIT_OK || exitCode == EXIT_ERROR || exitCode == STILL_ACTIVE)
+        return false;
+
+    const DWORD kInformationalCrashCodes[] = {
+        0x40000015u, // STATUS_FATAL_APP_EXIT
+        0x40010004u, // DBG_TERMINATE_PROCESS
+    };
+
+    if (std::any_of(std::begin(kInformationalCrashCodes), std::end(kInformationalCrashCodes),
+                    [exitCode](DWORD code) { return exitCode == code; }))
+    {
+        return true;
+    }
+
+    return (exitCode & 0x80000000u) != 0u;
+}
+
+enum class CrashArtifactState : unsigned char
+{
+    Missing,
+    Stale,
+    Fresh,
+};
+
+using FileTimeDuration = std::chrono::duration<std::int64_t, std::ratio<1, 10000000>>; // FILETIME ticks are 100ns
+
+constexpr auto kCrashArtifactStaleTolerance = std::chrono::seconds(2);
+static constexpr std::size_t kCrashArtifactCount = 3;
+
+[[nodiscard]] static constexpr const char* CrashArtifactStateToString(CrashArtifactState state) noexcept
+{
+    switch (state)
+    {
+        case CrashArtifactState::Fresh:
+            return "fresh";
+        case CrashArtifactState::Stale:
+            return "stale";
+        default:
+            return "missing";
+    }
+}
+
+[[nodiscard]] static FileTimeDuration FileTimeToDuration(const FILETIME& value) noexcept
+{
+    const auto combined = (static_cast<unsigned long long>(value.dwHighDateTime) << 32) | value.dwLowDateTime;
+    return FileTimeDuration{static_cast<FileTimeDuration::rep>(combined)};
+}
+
+[[nodiscard]] static CrashArtifactState InspectCrashArtifact(const SString& path,
+                                                             const std::optional<FileTimeDuration>& processCreationTime) noexcept
+{
+    WIN32_FILE_ATTRIBUTE_DATA attributes{};
+    if (!GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &attributes))
+        return CrashArtifactState::Missing;
+
+    if (!processCreationTime.has_value())
+        return CrashArtifactState::Fresh;
+
+    if (const auto lastWrite = FileTimeToDuration(attributes.ftLastWriteTime);
+        lastWrite + kCrashArtifactStaleTolerance < *processCreationTime)
+        return CrashArtifactState::Stale;
+
+    return CrashArtifactState::Fresh;
 }
 
 //////////////////////////////////////////////////////////
@@ -1493,6 +1570,16 @@ int LaunchGame(SString strCmdLine)
         return 5;
     }
 
+    std::optional<FileTimeDuration> gtaCreationTime;
+    if (HANDLE processHandle = piLoadee.hProcess; processHandle && processHandle != INVALID_HANDLE_VALUE)
+    {
+        if (FILETIME ftCreate{}, ftExit{}, ftKernel{}, ftUser{};
+            GetProcessTimes(processHandle, &ftCreate, &ftExit, &ftKernel, &ftUser))
+        {
+            gtaCreationTime = FileTimeToDuration(ftCreate);
+        }
+    }
+
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
     WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
@@ -1586,10 +1673,58 @@ int LaunchGame(SString strCmdLine)
     WriteDebugEvent("Loader - Finishing");
     EndD3DStuff();
 
+    const DWORD rawExitCode = dwExitCode;
+
+    if (IsCrashExitCode(rawExitCode))
+    {
+        const std::array<SString, kCrashArtifactCount> artifactPaths{
+            CalcMTASAPath("mta\\core.log"),
+            CalcMTASAPath("mta\\core.log.flag"),
+            CalcMTASAPath("mta\\core.dmp")
+        };
+
+        const auto artifactStates = [&] {
+            std::array<CrashArtifactState, kCrashArtifactCount> states{};
+            std::transform(artifactPaths.cbegin(), artifactPaths.cend(), states.begin(),
+                           [&](const SString& path) { return InspectCrashArtifact(path, gtaCreationTime); });
+            return states;
+        }();
+
+        const auto artifactLabels = [&] {
+            std::array<const char*, kCrashArtifactCount> labels{};
+            std::transform(artifactStates.cbegin(), artifactStates.cend(), labels.begin(),
+                           [](const CrashArtifactState state) { return CrashArtifactStateToString(state); });
+            return labels;
+        }();
+
+        if (const bool allArtifactsFresh = std::all_of(artifactStates.cbegin(), artifactStates.cend(),
+                                                       [](const CrashArtifactState state) {
+                                                           return state == CrashArtifactState::Fresh;
+                                                       });
+            !allArtifactsFresh)
+        {
+            const auto [coreLogLabel, coreLogFlagLabel, coreDumpLabel] = artifactLabels;
+            AddReportLog(3147,
+                         SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s)",
+                                 static_cast<unsigned int>(rawExitCode),
+                                 coreLogLabel,
+                                 coreLogFlagLabel,
+                                 coreDumpLabel));
+        }
+    }
+
     // Cleanup
     if (piLoadee.hProcess && piLoadee.hProcess != INVALID_HANDLE_VALUE)
     {
-        TerminateProcess(piLoadee.hProcess, 1);
+        const bool terminateRequired = (dwExitCode == STILL_ACTIVE) || (dwExitCode == static_cast<DWORD>(-1));
+        if (terminateRequired)
+        {
+            if (TerminateProcess(piLoadee.hProcess, EXIT_ERROR) != FALSE)
+            {
+                dwExitCode = EXIT_ERROR;
+            }
+        }
+
         if (piLoadee.hThread && piLoadee.hThread != INVALID_HANDLE_VALUE)
         {
             CloseHandle(piLoadee.hThread);

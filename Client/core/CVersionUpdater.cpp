@@ -3201,8 +3201,8 @@ void CVersionUpdater::_UseCrashDumpQueryURLs()
             return;
     }
         
-        auto is_control_char = [](const unsigned char c) noexcept -> bool { 
-            return c < CONTROL_CHAR_THRESHOLD || c == DELETE_CHAR; 
+        const auto is_control_char = [CONTROL_CHAR_THRESHOLD, DELETE_CHAR](unsigned char c) noexcept -> bool {
+            return c < CONTROL_CHAR_THRESHOLD || c == DELETE_CHAR;
         };
 
         SString strSanitizedFilename = strFilename;
@@ -3406,14 +3406,14 @@ void CVersionUpdater::_UseCrashDumpPostContent()
             const int iCurrentRetry = GetApplicationSettingInt(DIAGNOSTICS_SECTION, LAST_DUMP_LOAD_RETRY);
             
             // Lambda for backoff calculation with explicit return type
-                constexpr auto calculate_backoff = [](const int retry_count) constexpr noexcept -> int {
-                    if (retry_count <= 0)
-                        return 0;
-                    int backoff = INITIAL_BACKOFF_SECONDS;
-                    for (int i = 1; i < retry_count; ++i)
-                        backoff *= BACKOFF_MULTIPLIER;
-                    return backoff;
-                };
+            const auto calculate_backoff = [INITIAL_BACKOFF_SECONDS, BACKOFF_MULTIPLIER](int retry_count) noexcept -> int {
+                if (retry_count <= 0)
+                    return 0;
+                int backoff = INITIAL_BACKOFF_SECONDS;
+                for (int i = 1; i < retry_count; ++i)
+                    backoff *= BACKOFF_MULTIPLIER;
+                return backoff;
+            };
                 
             // Calculate backoff for current retry
             const int iBackoffSeconds = calculate_backoff(iCurrentRetry);
