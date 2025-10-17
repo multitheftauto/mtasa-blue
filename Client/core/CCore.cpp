@@ -969,11 +969,7 @@ T* InitModule(CModuleLoader& m_Loader, const SString& strName, const SString& st
     }
 
     // If we have a valid initializer, call it.
-    T* pResult = nullptr;
-    if (pfnInit != nullptr)
-    {
-        pResult = pfnInit(pObj);
-    }
+    T* pResult = pfnInit(pObj);
 
     // Restore current directory
     SetCurrentDirectory(strSavedCwd);
