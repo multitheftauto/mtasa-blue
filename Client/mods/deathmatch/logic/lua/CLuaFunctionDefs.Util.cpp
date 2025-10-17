@@ -372,6 +372,14 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        // Validate that the file input is not empty
+        if (strFileInput.empty())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Expected non-empty string, got empty string");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         // Grab our VM
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
@@ -390,10 +398,12 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
                 {
                     if (strcmp(strMetaPath, (*iter)->GetShortName()) == 0)
                     {
-                        if (CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, (*iter)->GetServerChecksum()))
+                        CSingularFileDownload* pDownload = CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, (*iter)->GetServerChecksum());
+                        if (pDownload)
                         {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
+                            lua_pushuserdata(luaVM, pDownload);
+                            lua_pushnumber(luaVM, pDownload->GetHandlerId());
+                            return 2;
                         }
                     }
                 }
@@ -405,6 +415,48 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
             }
         }
     }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::AbortDownload(lua_State* luaVM)
+{
+    //  bool abortDownload(number handlerId)
+    std::uint32_t handlerId = 0;
+    CScriptArgReader argStream(luaVM);
+    
+    // Check if argument is a number first
+    if (!argStream.NextIsNumber())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, SString("Expected number, got %s", lua_typename(luaVM, lua_type(luaVM, 1))));
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    
+    argStream.ReadNumber(handlerId);
+
+    if (!argStream.HasErrors())
+    {
+        // Validate that handlerId is positive
+        if (handlerId <= 0)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, SString("Expected positive value, got %d", handlerId));
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        if (g_pClientGame->GetSingularFileDownloadManager())
+        {
+            const bool success = g_pClientGame->GetSingularFileDownloadManager()->AbortDownload(handlerId);
+            lua_pushboolean(luaVM, success);
+            return 1;
+        }
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
