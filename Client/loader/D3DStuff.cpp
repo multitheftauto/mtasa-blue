@@ -11,7 +11,7 @@
 #include "D3DStuff.h"
 #include "Utils.h"
 #include "Dialogs.h"
-#include "../core/CrashHandler.h"
+#include "../sdk/core/CrashHandlerExports.h"
 
 #include <atomic>
 #include <d3d9.h>

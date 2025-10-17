@@ -42,7 +42,7 @@ public:
     static long WINAPI HandleExceptionGlobal(_EXCEPTION_POINTERS* pException);
     static void        DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);
     static void        DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);
-    static void        RunErrorTool(CExceptionInformation* pExceptionInformation);
+    [[nodiscard]] static bool RunErrorTool(CExceptionInformation* pExceptionInformation);
     static void        AppendToDumpFile(const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd);
     static void        GetPoolInfo(CBuffer& buffer);
     static void        GetD3DInfo(CBuffer& buffer);
