@@ -39,14 +39,41 @@ static constexpr std::size_t INVALID_PARAMETER_SAMPLE_LIMIT = 8;
 static constexpr std::size_t MAX_FALLBACK_STACK_FRAMES = 32;
 static constexpr int         MAX_WIDE_TO_UTF8_BYTES = 1 * 1024 * 1024;
 
-static constexpr DWORD       PROCESS_WAIT_TIMEOUT_MS = 500;
-static constexpr DWORD       WINDOW_POLL_TIMEOUT_MS = 100;
+static const std::chrono::milliseconds PROCESS_WAIT_TIMEOUT{500};
+static const std::chrono::milliseconds WINDOW_POLL_TIMEOUT{100};
 static constexpr std::size_t MAX_WINDOW_POLL_ATTEMPTS = 30;
 static constexpr std::size_t SHELL_EXEC_POLL_ATTEMPTS = 20;
-static constexpr DWORD       ALT_KEY_DURATION_MS = 50;
+static const std::chrono::milliseconds ALT_KEY_DURATION{50};
 static constexpr int         SCREEN_MARGIN_PIXELS = 50;
 static constexpr int         EMERGENCY_MSGBOX_WIDTH = 600;
 static constexpr int         EMERGENCY_MSGBOX_HEIGHT = 200;
+
+constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
+{
+    return static_cast<DWORD>(duration.count());
+}
+
+[[nodiscard]] static DWORD ResolveCrashExitCode(const _EXCEPTION_POINTERS* exceptionPtrs) noexcept
+{
+    if (const auto* record = (exceptionPtrs != nullptr) ? exceptionPtrs->ExceptionRecord : nullptr;
+        record != nullptr && record->ExceptionCode != 0)
+    {
+        return record->ExceptionCode;
+    }
+
+    return CRASH_EXIT_CODE;
+}
+
+[[noreturn]] static void TerminateCurrentProcessWithExitCode(DWORD exitCode) noexcept
+{
+    if (exitCode == 0)
+    {
+        exitCode = CRASH_EXIT_CODE;
+    }
+
+    TerminateProcess(GetCurrentProcess(), exitCode);
+    _exit(static_cast<int>(exitCode));
+}
 
 #define SAFE_DEBUG_OUTPUT(msg) SafeDebugOutput(msg)
 
@@ -240,6 +267,49 @@ static HANDLE                                              ms_hCrashDialogProces
 {
     return handle != nullptr && handle != INVALID_HANDLE_VALUE;
 }
+
+class UniqueHandle
+{
+public:
+    UniqueHandle() noexcept = default;
+    explicit UniqueHandle(HANDLE handle) noexcept : m_handle(handle) {}
+    ~UniqueHandle() noexcept { reset(); }
+
+    UniqueHandle(const UniqueHandle&) = delete;
+    UniqueHandle& operator=(const UniqueHandle&) = delete;
+
+    UniqueHandle(UniqueHandle&& other) noexcept : m_handle(other.release()) {}
+    UniqueHandle& operator=(UniqueHandle&& other) noexcept
+    {
+        if (this != &other)
+        {
+            reset();
+            m_handle = other.release();
+        }
+        return *this;
+    }
+
+    void reset(HANDLE handle = nullptr) noexcept
+    {
+        if (IsValidHandle(m_handle))
+            CloseHandle(m_handle);
+        m_handle = handle;
+    }
+
+    [[nodiscard]] HANDLE get() const noexcept { return m_handle; }
+
+    [[nodiscard]] HANDLE release() noexcept
+    {
+        HANDLE handle = m_handle;
+        m_handle = nullptr;
+        return handle;
+    }
+
+    [[nodiscard]] explicit operator bool() const noexcept { return IsValidHandle(m_handle); }
+
+private:
+    HANDLE m_handle = nullptr;
+};
 
 static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformation) noexcept
 {
@@ -713,12 +783,13 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - ENTRY\n");
     SAFE_DEBUG_OUTPUT("========================================\n");
 
+    const DWORD crashExitCode = ResolveCrashExitCode(pException);
+
     bool expected = false;
     if (!ms_bInCrashHandler.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: RECURSIVE CRASH - Already in crash handler\n");
-        TerminateProcess(GetCurrentProcess(), CRASH_EXIT_CODE);
-        _exit(CRASH_EXIT_CODE);
+        TerminateCurrentProcessWithExitCode(crashExitCode);
         return EXCEPTION_EXECUTE_HANDLER;
     }
 
@@ -729,8 +800,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - NULL exception pointers\n");
-        TerminateProcess(GetCurrentProcess(), CRASH_EXIT_CODE);
-        _exit(CRASH_EXIT_CODE);
+        TerminateCurrentProcessWithExitCode(crashExitCode);
         return EXCEPTION_EXECUTE_HANDLER;
     }
 
@@ -755,8 +825,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     if (pExceptionInformation == nullptr)
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - Failed to allocate exception information\n");
-        TerminateProcess(GetCurrentProcess(), CRASH_EXIT_CODE);
-        _exit(CRASH_EXIT_CODE);
+        TerminateCurrentProcessWithExitCode(crashExitCode);
         return EXCEPTION_EXECUTE_HANDLER;
     }
 
@@ -771,8 +840,10 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
     WriteDebugEvent("CCrashDumpWriter::HandleExceptionGlobal");
 
-    bool bCrashArtifactsGenerated = false;
     bool bClientHandled = false;
+    bool coreLogSucceeded = false;
+    bool miniDumpSucceeded = false;
+    bool crashDialogShown = false;
 
     CModManager* pModManager = CModManager::GetSingletonPtr();
     if (pModManager != nullptr && pModManager->IsLoaded())
@@ -803,6 +874,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     try
     {
         DumpCoreLog(pException, pExceptionInformation);
+        coreLogSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Core log dumped successfully\n");
     }
     catch (...)
@@ -813,6 +885,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     try
     {
         DumpMiniDump(pException, pExceptionInformation);
+        miniDumpSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Mini dump created successfully\n");
     }
     catch (...)
@@ -822,15 +895,33 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
     try
     {
-        RunErrorTool(pExceptionInformation);
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Error dialog launched successfully\n");
+        crashDialogShown = RunErrorTool(pExceptionInformation);
+        if (crashDialogShown)
+        {
+            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Error dialog launched successfully\n");
+        }
     }
     catch (...)
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to launch error dialog\n");
     }
 
-    bCrashArtifactsGenerated = true;
+    struct CrashStage
+    {
+        const char* name;
+        bool        succeeded;
+    };
+
+    const std::array<CrashStage, 3> crashStages{{
+        {"core", coreLogSucceeded},
+        {"dump", miniDumpSucceeded},
+        {"dialog", crashDialogShown},
+    }};
+
+    const bool crashArtifactsGenerated = std::any_of(crashStages.cbegin(), crashStages.cbegin() + 2,
+                                                     [](const CrashStage& stage) { return stage.succeeded; });
+    const bool crashHandlingComplete = std::all_of(crashStages.cbegin(), crashStages.cend(),
+                                                   [](const CrashStage& stage) { return stage.succeeded; });
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash processing complete - terminating\n");
@@ -839,40 +930,36 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     delete pExceptionInformation;
     pExceptionInformation = nullptr;
 
-    if (ms_hCrashDialogProcess != nullptr)
+    UniqueHandle crashDialogProcessHandle{ms_hCrashDialogProcess};
+    const bool  hadCrashDialogProcess = static_cast<bool>(crashDialogProcessHandle);
+    ms_hCrashDialogProcess = nullptr;
+
+    if (hadCrashDialogProcess)
     {
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Waiting for crash dialog to close before terminating...\n");
-        const DWORD waitResult = WaitForSingleObject(ms_hCrashDialogProcess, INFINITE);
-        if (waitResult == WAIT_OBJECT_0)
-        {
-            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash dialog closed by user\n");
-        }
-        else
-        {
-            SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter: Wait for dialog returned 0x%08X\n", waitResult).c_str());
-        }
-        CloseHandle(ms_hCrashDialogProcess);
-        ms_hCrashDialogProcess = nullptr;
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Detaching from crash dialog process before termination\n");
     }
-    else if (bCrashArtifactsGenerated)
+
+    if (!hadCrashDialogProcess && crashDialogShown)
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: No process handle (likely ShellExecute path), polling for dialog window...\n");
         
         HWND hDialogWindow = nullptr;
-        for (int attempts = 0; attempts < 30 && hDialogWindow == nullptr; attempts++)
+        for (std::size_t attempts = 0; attempts < MAX_WINDOW_POLL_ATTEMPTS && hDialogWindow == nullptr; ++attempts)
         {
             hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
             if (hDialogWindow == nullptr)
-                Sleep(100);
+                Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
         }
         
         if (hDialogWindow != nullptr && IsWindow(hDialogWindow))
         {
             SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter: Found dialog window %p, waiting for it to close...\n", hDialogWindow).c_str());
             
-            while (IsWindow(hDialogWindow))
+            while (true)
             {
-                Sleep(100);
+                if (!IsWindow(hDialogWindow))
+                    break;
+                Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
             }
             
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Dialog window closed\n");
@@ -880,19 +967,36 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         else
         {
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Could not find dialog window, waiting 500ms as fallback\n");
-            Sleep(500);
+            Sleep(Milliseconds(PROCESS_WAIT_TIMEOUT));
         }
     }
-    else
+    else if (!crashDialogShown)
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash dialog was not shown; skipping dialog wait\n");
+        Sleep(Milliseconds(PROCESS_WAIT_TIMEOUT));
+    }
+    else if (!crashArtifactsGenerated)
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: No dialog process and no artifacts generated (early termination)\n");
-        Sleep(500);
+        Sleep(Milliseconds(PROCESS_WAIT_TIMEOUT));
+    }
+
+    if (!crashHandlingComplete)
+    {
+        std::array<const char*, crashStages.size()> crashStageStatuses{};
+        std::transform(crashStages.cbegin(), crashStages.cend(), crashStageStatuses.begin(),
+                       [](const CrashStage& stage) { return stage.succeeded ? "ok" : "fail"; });
+
+        AddReportLog(3146,
+                     SString("Crash handler incomplete (code=0x%08X core=%s dump=%s dialog=%s)",
+                             static_cast<unsigned int>(crashExitCode),
+                             crashStageStatuses[0],
+                             crashStageStatuses[1],
+                             crashStageStatuses[2]));
     }
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Force terminating crashed process NOW\n");
-    TerminateProcess(GetCurrentProcess(), CRASH_EXIT_CODE);
-
-    _exit(CRASH_EXIT_CODE);
+    TerminateCurrentProcessWithExitCode(crashExitCode);
 
     return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -1224,8 +1328,7 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         
         const auto& frames = *stackFrames;
         const auto  frameCount = frames.size();
-        const auto  maxFrames = std::clamp(frameCount, std::size_t{0}, 
-                                           std::min(kMaxDisplayFrames, std::numeric_limits<std::size_t>::max()));
+        const auto  maxFrames = std::clamp(frameCount, std::size_t{0}, kMaxDisplayFrames);
 
         if (stackHeader == nullptr)
             stackHeader = "Stack trace:\n";
@@ -1606,18 +1709,14 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
         pNet->PostCrash();
 }
 
-void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation)
+[[nodiscard]] bool CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation)
 {
-    SAFE_DEBUG_OUTPUT("========================================\n");
-    SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - ENTRY\n");
-    SAFE_DEBUG_OUTPUT("========================================\n");
-
     static std::atomic<bool> bDoneReport{false};
     bool                     expected = false;
     if (!bDoneReport.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Already called, returning\n");
-        return;
+        return false;
     }
 
     SString strMessage(
@@ -1636,29 +1735,85 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
 
     EnsureCrashReasonForDialog(pExceptionInformation);
 
-    SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - *** FORCING DISPLAY TO DESKTOP MODE (CRITICAL) ***\n");
+    AllowSetForegroundWindow(ASFW_ANY);
+
+    ClipCursor(nullptr);
+    ReleaseCapture();
+    SystemParametersInfoW(SPI_SETCURSORS, 0, nullptr, 0);
+
+    auto EnsureCursorVisible = []() {
+        int cursorCount = ShowCursor(TRUE);
+        int loopGuard = 0;
+        while (cursorCount < 1 && loopGuard++ < 256)
+            cursorCount = ShowCursor(TRUE);
+        return cursorCount;
+    };
+
+    EnsureCursorVisible();
+
+    if (HCURSOR arrowCursor = LoadCursor(nullptr, IDC_ARROW); arrowCursor != nullptr)
+        SetCursor(arrowCursor);
+
+    const int screenCenterX = GetSystemMetrics(SM_CXSCREEN) / 2;
+    const int screenCenterY = GetSystemMetrics(SM_CYSCREEN) / 2;
+    SetCursorPos(screenCenterX, screenCenterY);
+
+    SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Restoring desktop display mode\n");
 
     for (int retryCount = 0; retryCount < 3; retryCount++)
     {
-        LONG                  result = ChangeDisplaySettings(nullptr, 0);
-        std::array<char, 128> debugMsg;
-        sprintf(debugMsg.data(), "CCrashDumpWriter::RunErrorTool - ChangeDisplaySettings attempt %d, result=%ld\n", retryCount + 1, result);
-        SAFE_DEBUG_OUTPUT(debugMsg.data());
+        const LONG result = ChangeDisplaySettings(nullptr, 0);
+        if (result == DISP_CHANGE_SUCCESSFUL)
+            break;
         Sleep(300);
     }
 
-    SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Display mode restoration complete\n");
+    DEVMODEW registryMode{};
+    registryMode.dmSize = sizeof(registryMode);
+    DEVMODEW currentMode{};
+    currentMode.dmSize = sizeof(currentMode);
+
+    const BOOL haveRegistryMode = EnumDisplaySettingsExW(nullptr, ENUM_REGISTRY_SETTINGS, &registryMode, 0);
+    const BOOL haveCurrentMode = EnumDisplaySettingsExW(nullptr, ENUM_CURRENT_SETTINGS, &currentMode, 0);
+
+    if (haveRegistryMode && haveCurrentMode)
+    {
+        const bool modesDiffer = registryMode.dmPelsWidth != currentMode.dmPelsWidth || registryMode.dmPelsHeight != currentMode.dmPelsHeight ||
+                                 registryMode.dmBitsPerPel != currentMode.dmBitsPerPel || registryMode.dmDisplayFrequency != currentMode.dmDisplayFrequency;
+
+        if (modesDiffer)
+            ChangeDisplaySettingsExW(nullptr, &registryMode, nullptr, CDS_FULLSCREEN, nullptr);
+    }
 
     HWND hGTAWindow = FindWindowW(L"Grand theft auto San Andreas", nullptr);
     if (hGTAWindow == nullptr)
         hGTAWindow = FindWindowW(nullptr, L"MTA: San Andreas");
     if (hGTAWindow != nullptr && IsWindow(hGTAWindow))
     {
-        ShowWindow(hGTAWindow, SW_HIDE);
+        ShowWindowAsync(hGTAWindow, SW_MINIMIZE);
+        PostMessageW(hGTAWindow, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+
+        const UINT asyncFlags = SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS | SWP_NOZORDER;
+        if (SetWindowPos(hGTAWindow, HWND_NOTOPMOST, 0, 0, 0, 0, asyncFlags) == FALSE)
+        {
+            const DWORD posError = GetLastError();
+            AddReportLog(3145, SString("Crash dialog failed to SetWindowPos (async) error %u", posError));
+        }
+    }
+
+    if (HWND shellWindow = GetShellWindow(); shellWindow != nullptr)
+    {
+        ShowWindow(shellWindow, SW_SHOWNORMAL);
+        SetForegroundWindow(shellWindow);
     }
 
     const auto basePath = GetMTASABaseDir();
+
     const auto basePathWide = basePath.empty() ? WString() : FromUTF8(basePath);
+    if (!basePath.empty() && basePathWide.empty())
+    {
+        AddReportLog(3138, "RunErrorTool base path conversion to wide string failed");
+    }
 
     auto RestoreBaseDirectories = [&]()
     {
@@ -1738,7 +1893,7 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
     if (crashArgsLength > std::numeric_limits<size_t>::max() - 1)
     {
         AddReportLog(3129, "RunErrorTool crash arguments unexpectedly large; aborting relaunch");
-        return;
+        return false;
     }
 
     bool       dialogLaunched = false;
@@ -1809,7 +1964,6 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
         }
 
         auto commandLine = SString("\"%s\" %s", candidate.c_str(), crashArgs);
-        SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter::RunErrorTool - Full command line: %s\n", commandLine.c_str()).c_str());
         AddReportLog(3125, SString("RunErrorTool attempting launch with command: %s", commandLine.c_str()));
 
         const size_t commandLength = commandLine.length();
@@ -1839,13 +1993,13 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
             CreateProcessW(nullptr, commandBuffer.data(), nullptr, nullptr, FALSE, kProcessCreationFlags, nullptr, candidateDirWidePtr, &startupInfo, &processInfo);
         if (bProcessCreated)
         {
-            SString debugMsg = SString("CCrashDumpWriter::RunErrorTool - Relaunched crash dialog via CreateProcess (%s)\n", candidate.c_str());
-            SAFE_DEBUG_OUTPUT(debugMsg.c_str());
             AddReportLog(3124, SString("RunErrorTool launched crash dialog via CreateProcess (%s)", candidate.c_str()));
+            UniqueHandle processHandle{processInfo.hProcess};
+            UniqueHandle threadHandle{processInfo.hThread};
 
-            if (IsValidHandle(processInfo.hProcess))
+            if (processHandle)
             {
-                SetPriorityClass(processInfo.hProcess, HIGH_PRIORITY_CLASS);
+                SetPriorityClass(processHandle.get(), HIGH_PRIORITY_CLASS);
             }
 
             if (processInfo.dwProcessId != 0)
@@ -1853,22 +2007,24 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
                 AllowSetForegroundWindow(processInfo.dwProcessId);
             }
 
-            if (IsValidHandle(processInfo.hProcess))
+            if (processHandle)
             {
-                WaitForInputIdle(processInfo.hProcess, 3000);
+                WaitForInputIdle(processHandle.get(), 3000);
             }
 
-            Sleep(500);
+            Sleep(Milliseconds(PROCESS_WAIT_TIMEOUT));
 
             HWND hDialogWindow = nullptr;
-            for (std::size_t attempts = 0; attempts < MAX_WINDOW_POLL_ATTEMPTS && hDialogWindow == nullptr; attempts++)
+            for (std::size_t attempts = 0; attempts < MAX_WINDOW_POLL_ATTEMPTS && hDialogWindow == nullptr; ++attempts)
             {
                 hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
                 if (hDialogWindow == nullptr)
-                    Sleep(WINDOW_POLL_TIMEOUT_MS);
+                    Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
             }
 
-            if (hDialogWindow != nullptr && IsWindow(hDialogWindow))
+            bool windowFound = (hDialogWindow != nullptr && IsWindow(hDialogWindow));
+
+            if (windowFound)
             {
                 if (const auto isIconic = IsIconic(hDialogWindow); isIconic)
                 {
@@ -1879,41 +2035,40 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
                 {
                     const DWORD dialogThreadId = GetWindowThreadProcessId(hDialogWindow, nullptr);
                     const DWORD currentThreadId = GetCurrentThreadId();
-                    
+
                     BOOL attached = FALSE;
                     if (dialogThreadId != 0 && dialogThreadId != currentThreadId)
                     {
                         attached = AttachThreadInput(currentThreadId, dialogThreadId, TRUE);
                     }
-                        
+
                     LockSetForegroundWindow(LSFW_UNLOCK);
                     SetWindowPos(hDialogWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-                    
+
                     if (!SetForegroundWindow(hDialogWindow))
                     {
                         keybd_event(VK_MENU, 0, 0, 0);
                         SetForegroundWindow(hDialogWindow);
-                        Sleep(ALT_KEY_DURATION_MS);
+                        Sleep(Milliseconds(ALT_KEY_DURATION));
                         keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0);
                     }
-                    
+
                     BringWindowToTop(hDialogWindow);
                     SetActiveWindow(hDialogWindow);
                     SetFocus(hDialogWindow);
-                        
+
                     if (attached && dialogThreadId != 0)
                     {
                         AttachThreadInput(currentThreadId, dialogThreadId, FALSE);
                     }
-                        
+
                     RECT windowRect{};
                     if (GetWindowRect(hDialogWindow, &windowRect))
                     {
                         const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
                         const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-                        
-                        if (windowRect.left < -100 || windowRect.top < -100 || 
-                            windowRect.left > screenWidth || windowRect.top > screenHeight)
+
+                        if (windowRect.left < -100 || windowRect.top < -100 || windowRect.left > screenWidth || windowRect.top > screenHeight)
                         {
                             const int windowWidth = windowRect.right - windowRect.left;
                             const int windowHeight = windowRect.bottom - windowRect.top;
@@ -1931,16 +2086,16 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
             }
             else
             {
-                AddReportLog(3132, "RunErrorTool could not find crash dialog window by title");
+                AddReportLog(3132, SString("RunErrorTool could not find crash dialog window by title after CreateProcess (%s)", candidate.c_str()));
             }
 
-            if (IsValidHandle(processInfo.hThread))
+            if (windowFound)
             {
-                CloseHandle(processInfo.hThread);
+                ms_hCrashDialogProcess = processHandle.release();
+                threadHandle.reset();
+                dialogLaunched = true;
+                break;
             }
-            ms_hCrashDialogProcess = processInfo.hProcess;
-            dialogLaunched = true;
-            break;
         }
 
         if (const auto dwError = GetLastError())
@@ -1959,32 +2114,32 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
         const auto shellExecuteCode = reinterpret_cast<ULONG_PTR>(shellExecuteResult);
         if (shellExecuteCode > 32u)
         {
-            SString debugMsg = SString("CCrashDumpWriter::RunErrorTool - Relaunched crash dialog via ShellExecute (%s)\n", candidate.c_str());
-            SAFE_DEBUG_OUTPUT(debugMsg.c_str());
             AddReportLog(3124, SString("RunErrorTool launched crash dialog via ShellExecute (%s)", candidate.c_str()));
-            
             Sleep(1000);
-            
+
             HWND hDialogWindow = nullptr;
-            for (std::size_t attempts = 0; attempts < SHELL_EXEC_POLL_ATTEMPTS && hDialogWindow == nullptr; attempts++)
+        for (std::size_t attempts = 0; attempts < SHELL_EXEC_POLL_ATTEMPTS && hDialogWindow == nullptr; attempts++)
             {
                 hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
                 if (hDialogWindow == nullptr)
-                    Sleep(WINDOW_POLL_TIMEOUT_MS);
+            Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
             }
-            
+
             if (hDialogWindow != nullptr && IsWindow(hDialogWindow))
             {
                 SetWindowPos(hDialogWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
                 SetForegroundWindow(hDialogWindow);
+                dialogLaunched = true;
+                break;
             }
-            
-            dialogLaunched = true;
-            break;
+
+            AddReportLog(3132, SString("RunErrorTool could not find crash dialog window by title after ShellExecute (%s)", candidate.c_str()));
+        }
+        else
+        {
+            AddReportLog(3122, SString("RunErrorTool ShellExecute fallback failed with code %u for %s", static_cast<unsigned int>(shellExecuteCode), candidate.c_str()));
         }
 
-        AddReportLog(3122,
-                     SString("RunErrorTool ShellExecute fallback failed with code %u for %s", static_cast<unsigned int>(shellExecuteCode), candidate.c_str()));
         RestoreBaseDirectories();
     }
 
@@ -1995,22 +2150,20 @@ void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - FAILED to launch crash dialog with any candidate!\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - User will not see crash report dialog!\n");
         AddReportLog(3129, "RunErrorTool completely failed to launch crash dialog");
-        
-        const wchar_t* emergencyMessage = 
+
+        const wchar_t* emergencyMessage =
             L"MTA: San Andreas has crashed.\n\n"
             L"The usual crash dialog has also failed, with this as fallback.\n\n"
             L"Crash information has been saved to:\n"
             L"MTA San Andreas\\mta\\core.log\n\n"
             L"Contact support on the MTA discord: https://discord.gg/RygaCSD.\n\n"
             L"The game will now close.";
-        
-        MessageBoxW(nullptr, emergencyMessage, L"MTA: San Andreas - Fatal Error", 
-                   MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST);
+
+        MessageBoxW(nullptr, emergencyMessage, L"MTA: San Andreas - Fatal Error",
+                    MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST);
     }
-    else
-    {
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Crash dialog launched successfully\n");
-    }
+
+    return dialogLaunched;
 }
 
 void CCrashDumpWriter::AppendToDumpFile(const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd)
