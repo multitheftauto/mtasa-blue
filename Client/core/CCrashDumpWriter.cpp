@@ -545,7 +545,8 @@ static void AppendCrashDiagnostics(const SString& text)
     constexpr DWORD                    kSymbolNameCapacity = MAX_SYM_NAME - 1;
     alignas(SYMBOL_INFO) unsigned char symbolBuffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME] = {};
     PSYMBOL_INFO                       pSymbol = reinterpret_cast<PSYMBOL_INFO>(symbolBuffer);
-    *pSymbol = SYMBOL_INFO{.SizeOfStruct = sizeof(SYMBOL_INFO), .MaxNameLen = kSymbolNameCapacity};
+    pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+    pSymbol->MaxNameLen = kSymbolNameCapacity;
 
     std::array<DWORD64, MAX_FALLBACK_STACK_FRAMES> visitedAddresses{};
     std::size_t                                    visitedCount = 0;
@@ -579,7 +580,8 @@ static void AppendCrashDiagnostics(const SString& text)
             symbolName = pSymbol->Name;
         }
 
-        IMAGEHLP_LINE64 lineInfo{.SizeOfStruct = sizeof(IMAGEHLP_LINE64)};
+    IMAGEHLP_LINE64 lineInfo{};
+    lineInfo.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
         DWORD           lineDisplacement = 0;
         SString         lineDetail = "unknown";
         if (SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
@@ -651,8 +653,7 @@ void CCrashDumpWriter::LogEvent(const char* szType, const char* szContext, const
     SLogEventLine line;
     while (ms_LogEventFilter.PopOutputLine(line))
     {
-        ms_LogEventList.emplace_front(
-            SLogEventInfo{.uiTickCount = GetTickCount32(), .strType = line.strType, .strContext = line.strContext, .strBody = line.strBody});
+        ms_LogEventList.emplace_front(SLogEventInfo{GetTickCount32(), line.strType, line.strContext, line.strBody});
 
         while (ms_LogEventList.size() > LOG_EVENT_SIZE)
             ms_LogEventList.pop_back();
@@ -1528,7 +1529,10 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
 
             if (hFile != INVALID_HANDLE_VALUE)
             {
-                _MINIDUMP_EXCEPTION_INFORMATION ExInfo{.ThreadId = GetCurrentThreadId(), .ExceptionPointers = pException, .ClientPointers = FALSE};
+                _MINIDUMP_EXCEPTION_INFORMATION ExInfo{};
+                ExInfo.ThreadId = GetCurrentThreadId();
+                ExInfo.ExceptionPointers = pException;
+                ExInfo.ClientPointers = FALSE;
 
                 BOOL bResult = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
                                      static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo, nullptr, nullptr);
@@ -1985,7 +1989,10 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
         std::vector<wchar_t> commandBuffer(commandLineWide.length() + 1u, L'\0');
         std::copy(commandLineWide.begin(), commandLineWide.end(), commandBuffer.begin());
 
-        STARTUPINFOW        startupInfo{.cb = sizeof(STARTUPINFOW), .dwFlags = STARTF_USESHOWWINDOW, .wShowWindow = SW_SHOWNORMAL};
+        STARTUPINFOW        startupInfo{};
+        startupInfo.cb = sizeof(startupInfo);
+        startupInfo.dwFlags = STARTF_USESHOWWINDOW;
+        startupInfo.wShowWindow = SW_SHOWNORMAL;
         PROCESS_INFORMATION processInfo{};
 
         constexpr DWORD kProcessCreationFlags = DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB | CREATE_NEW_PROCESS_GROUP;
