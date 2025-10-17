@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-12 03:29+0000\n"
+"POT-Creation-Date: 2025-10-12 09:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -216,7 +216,7 @@ msgstr ""
 #: Client/loader/MainFunctions.cpp:637 Client/loader/MainFunctions.cpp:644
 #: Client/loader/MainFunctions.cpp:1543
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1662
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1665
 #: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr ""
@@ -256,7 +256,7 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1558
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1580
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1639
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1692
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1715
 #: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:724
@@ -2722,12 +2722,12 @@ msgid "Delete from recent"
 msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:434
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2017
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2043
 msgid "Search players..."
 msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:557
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2015
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2041
 msgid "Search servers..."
 msgstr ""
 
@@ -2778,17 +2778,17 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:982
 #: Client/core/ServerBrowser/CServerBrowser.cpp:996
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1672
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1675
 msgid "Loading..."
 msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1520
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2856
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2882
 msgid "  ..loading.."
 msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1558
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1692
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1715
 msgid "No address specified!"
 msgstr ""
 
@@ -2807,7 +2807,7 @@ msgstr ""
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1662
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1665
 msgid "You have to select a server to connect to."
 msgstr ""
 
