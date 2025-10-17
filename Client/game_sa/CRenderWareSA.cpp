@@ -825,11 +825,16 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     std::vector<RwTexture*> rwTextureList;
     GetTxdTextures(rwTextureList, pTXD);
 
-    // If any texture names specified in vTextureNames, we should only return these
-    bool bExcludeTextures = false;
+    // If texture list is empty after enumeration
+    if (rwTextureList.empty())
+    {
+        if (bLoadedModel)
+            ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+        return false;
+    }
 
-    if (vTextureNames.size() > 0)
-        bExcludeTextures = true;
+    // If any texture names specified in vTextureNames, we should only return these
+    const bool bExcludeTextures = !vTextureNames.empty();
 
     for (RwTexture* pTexture : rwTextureList)
     {
@@ -894,10 +899,18 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, usho
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD)
 {
-    if (pTXD)
+    if (!pTXD)
+        return;
+
+    constexpr std::size_t kMaxReasonableTextures = 8192;
+    if (outTextureList.size() >= kMaxReasonableTextures)
     {
-        RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
+        LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                 SString("Texture list already contains %zu textures (limit: %zu)", outTextureList.size(), kMaxReasonableTextures), 5422);
+        return;
     }
+
+    RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -905,10 +918,19 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTe
 // CRenderWareSA::StaticGetTextureCB
 //
 // Callback used in GetTxdTextures
+// Returns false to stop enumeration if limits are hit
 //
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList)
 {
+    if (!texture || !pTextureList)
+        return false;
+
+    // Sanity check: prevent excessive allocations from corrupted/malicious TXDs
+    constexpr std::size_t kMaxReasonableTextures = 8192;
+    if (pTextureList->size() >= kMaxReasonableTextures)
+        return false;            // Stop enumeration
+
     pTextureList->push_back(texture);
     return true;
 }
