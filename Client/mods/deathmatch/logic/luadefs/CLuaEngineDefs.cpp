@@ -150,6 +150,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
+        {"engineIsModelValid", ArgumentParser<EngineIsModelValid>}
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
 
@@ -2604,6 +2605,13 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 
     if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
+}
+
+bool CLuaEngineDefs::EngineIsModelValid(std::uint32_t uiModelId)
+{
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
+
+    return (modelId < 20000 && modelInfo);
 }
 
 bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
