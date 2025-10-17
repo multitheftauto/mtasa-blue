@@ -283,16 +283,37 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         return NULL;
     }
 
-    // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
     if (bLoadEmbeddedCollisions)
+    {
+        // Vehicles have their collision loaded through the CollisionModel plugin, so we need to remove the current collision to prevent a memory leak.
+        // This needs to be done here before reading the stream data, because plugins are read in RpClumpStreamRead.
+        CModelInfo* modelInfo = pGame->GetModelInfo(usModelID);
+        if (modelInfo)
+        {
+            if (auto* modelInfoInterface = modelInfo->GetInterface())
+                ((void(__thiscall*)(CBaseModelInfoSAInterface*))0x4C4C40)(modelInfoInterface); // CBaseModelInfo::DeleteCollisionModel
+        }
+
+        // rockstar's collision hack
+        // It sets the pointer CCollisionPlugin::ms_currentModel to the model info of the given vehicle in order to correctly set up the vehicle’s
+        // collision during collision plugin reading (0x41B2BD).
         RpPrtStdGlobalDataSetStreamEmbedded((void*)pPool[usModelID]);
+
+        // Call CVehicleModelInfo::UseCommonVehicleTexDicationary
+        ((void(__cdecl*)())0x4C75A0)();
+    }
 
     // read the clump with all its extensions
     RpClump* pClump = RpClumpStreamRead(streamModel);
 
-    // reset collision hack
     if (bLoadEmbeddedCollisions)
-        RpPrtStdGlobalDataSetStreamEmbedded(NULL);
+    {
+        // reset collision hack
+        RpPrtStdGlobalDataSetStreamEmbedded(nullptr);
+
+        // Call CVehicleModelInfo::StopUsingCommonVehicleTexDicationary
+        ((void(__cdecl*)())0x4C75C0)();
+    }
 
     // close the stream
     RwStreamClose(streamModel, NULL);
@@ -804,11 +825,16 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     std::vector<RwTexture*> rwTextureList;
     GetTxdTextures(rwTextureList, pTXD);
 
-    // If any texture names specified in vTextureNames, we should only return these
-    bool bExcludeTextures = false;
+    // If texture list is empty after enumeration
+    if (rwTextureList.empty())
+    {
+        if (bLoadedModel)
+            ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+        return false;
+    }
 
-    if (vTextureNames.size() > 0)
-        bExcludeTextures = true;
+    // If any texture names specified in vTextureNames, we should only return these
+    const bool bExcludeTextures = !vTextureNames.empty();
 
     for (RwTexture* pTexture : rwTextureList)
     {
@@ -861,6 +887,9 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, usho
     if (!pTXD)
         return;
 
+    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
+        return;
+
     GetTxdTextures(outTextureList, pTXD);
 }
 
@@ -873,10 +902,24 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, usho
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD)
 {
-    if (pTXD)
+    if (!pTXD)
+        return;
+
+    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
+        return;
+
+    if (!SharedUtil::IsReadablePointer(&pTXD->textures, sizeof(pTXD->textures)))
+        return;
+
+    constexpr std::size_t kMaxReasonableTextures = 8192;
+    if (outTextureList.size() >= kMaxReasonableTextures)
     {
-        RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
+        LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                 SString("Texture list already contains %zu textures (limit: %zu)", outTextureList.size(), kMaxReasonableTextures), 5422);
+        return;
     }
+
+    RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -884,10 +927,19 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTe
 // CRenderWareSA::StaticGetTextureCB
 //
 // Callback used in GetTxdTextures
+// Returns false to stop enumeration if limits are hit
 //
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList)
 {
+    if (!texture || !pTextureList)
+        return false;
+
+    // Sanity check: prevent excessive allocations from corrupted/malicious TXDs
+    constexpr std::size_t kMaxReasonableTextures = 8192;
+    if (pTextureList->size() >= kMaxReasonableTextures)
+        return false;            // Stop enumeration
+
     pTextureList->push_back(texture);
     return true;
 }

@@ -1202,8 +1202,19 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
     if (!pShaderItem)
         return;
 
+    if (!SharedUtil::IsReadablePointer(pShaderItem, sizeof(void*)))
+        return;
+
     SResolvedShaderState shaderState;
     bool                 bHasShaderState = TryResolveShaderState(pShaderItem, shaderState);
+    
+    if (bHasShaderState)
+    {
+        if (shaderState.pInstance && !SharedUtil::IsReadablePointer(shaderState.pInstance, sizeof(void*)))
+            bHasShaderState = false;
+        if (bHasShaderState && shaderState.pEffectWrap && !SharedUtil::IsReadablePointer(shaderState.pEffectWrap, sizeof(void*)))
+            bHasShaderState = false;
+    }
 
     ID3DXEffect* pD3DEffect = bHasShaderState ? shaderState.pEffect : nullptr;
     IDirect3DDevice9* pDevice = g_pGraphics ? g_pGraphics->GetDevice() : nullptr;
