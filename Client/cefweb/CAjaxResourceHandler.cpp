@@ -34,12 +34,18 @@ void CAjaxResourceHandler::SetResponse(const SString& data)
     m_bHasData = true;
 
     if (m_callback)
+    {
         m_callback->Continue();
+        // Release callback to prevent memory leak
+        m_callback = nullptr;
+    }
 }
 
 // CefResourceHandler implementation
 void CAjaxResourceHandler::Cancel()
 {
+    // Release callback reference on cancellation to prevent memory leak
+    m_callback = nullptr;
 }
 
 void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl)
