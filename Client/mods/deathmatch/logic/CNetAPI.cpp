@@ -295,7 +295,7 @@ void CNetAPI::DoPulse()
 
         // Grab the local player
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
-        if (pPlayer && !pPlayer->IsDeadOnNetwork())
+        if (pPlayer)
         {
             unsigned long ulCurrentTime = CClientTime::GetTime();
 
