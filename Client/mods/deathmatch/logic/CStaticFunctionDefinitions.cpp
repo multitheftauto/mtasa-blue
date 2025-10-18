@@ -8905,6 +8905,10 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     {
         if (SetEntryHandling(pEntry, eProperty, ucValue))
         {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(pVehicle->GetModel());
+            if (!pModelInfo || !pModelInfo->IsLoaded())
+                return false;
+
             pVehicle->ApplyHandling();
             return true;
         }
@@ -8922,6 +8926,10 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     {
         if (SetEntryHandling(pEntry, eProperty, uiValue))
         {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(pVehicle->GetModel());
+            if (!pModelInfo || !pModelInfo->IsLoaded())
+                return false;
+
             pVehicle->ApplyHandling();
             return true;
         }
@@ -8939,6 +8947,10 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     {
         if (SetEntryHandling(pEntry, eProperty, fValue))
         {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(pVehicle->GetModel());
+            if (!pModelInfo || !pModelInfo->IsLoaded())
+                return false;
+
             pVehicle->ApplyHandling();
             return true;
         }
@@ -8956,6 +8968,10 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     {
         if (SetEntryHandling(pEntry, eProperty, strValue))
         {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(pVehicle->GetModel());
+            if (!pModelInfo || !pModelInfo->IsLoaded())
+                return false;
+
             pVehicle->ApplyHandling();
             return true;
         }
@@ -8973,6 +8989,10 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     {
         if (SetEntryHandling(pEntry, eProperty, vecValue))
         {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(pVehicle->GetModel());
+            if (!pModelInfo || !pModelInfo->IsLoaded())
+                return false;
+
             pVehicle->ApplyHandling();
             return true;
         }
@@ -9031,6 +9051,10 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
             pEntry->SetSuspensionUpperLimit(pEntry->GetSuspensionLowerLimit() - 0.1f);
     }
 
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(pVehicle->GetModel());
+    if (!pModelInfo || !pModelInfo->IsLoaded())
+        return false;
+
     pVehicle->ApplyHandling();
 
     return true;
@@ -9079,6 +9103,10 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pV
         {
             return false;
         }
+
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(pVehicle->GetModel());
+        if (!pModelInfo || !pModelInfo->IsLoaded())
+            return false;
 
         pVehicle->ApplyHandling();
 

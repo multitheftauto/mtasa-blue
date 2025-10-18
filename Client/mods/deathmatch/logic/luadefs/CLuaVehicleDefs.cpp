@@ -2518,6 +2518,15 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        // Check if the vehicle model is loaded
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(pVehicle->GetModel());
+        if (!pModelInfo || !pModelInfo->IsLoaded())
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "setVehicleHandling failed: vehicle model not loaded");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         if (argStream.NextIsString())
         {
             SString strProperty;
