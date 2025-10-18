@@ -18,6 +18,7 @@ void CWeaponRPCs::LoadFunctions()
 {
     AddHandler(GIVE_WEAPON, GiveWeapon, "GiveWeapon");
     AddHandler(TAKE_WEAPON, TakeWeapon, "TakeWeapon");
+    AddHandler(TAKE_WEAPONS, TakeWeapons, "TakeWeapons");
     AddHandler(TAKE_ALL_WEAPONS, TakeAllWeapons, "TakeAllWeapons");
     AddHandler(SET_WEAPON_AMMO, SetWeaponAmmo, "SetWeaponAmmo");
     AddHandler(SET_WEAPON_SLOT, SetWeaponSlot, "SetWeaponSlot");
@@ -180,6 +181,41 @@ void CWeaponRPCs::TakeWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
                         pPed->RemoveWeapon(static_cast<eWeaponType>(ucWeaponID));
                     }
                 }
+            }
+        }
+    }
+}
+
+void CWeaponRPCs::TakeWeapons(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    std::uint32_t count = 0;
+    if (!bitStream.Read(count))
+        return;
+
+    CClientPed* ped = m_pPedManager->Get(pSource->GetID(), true);
+    if (!ped)
+        return;
+
+    for (std::uint32_t i = 0; i < count; i++)
+    {
+        unsigned char weaponID;
+        if (!bitStream.Read(weaponID))
+            return;
+
+        if (!CClientPickupManager::IsValidWeaponID(weaponID))
+            continue;
+
+        if (ped->IsLocalPlayer())
+        {
+            ped->RemoveWeapon(static_cast<eWeaponType>(weaponID));
+        }
+        else
+        {
+            CWeapon* playerWeapon = ped->GetWeapon(static_cast<eWeaponType>(weaponID));
+            if (playerWeapon)
+            {
+                playerWeapon->SetAmmoInClip(0);
+                playerWeapon->SetAmmoTotal(0);
             }
         }
     }
