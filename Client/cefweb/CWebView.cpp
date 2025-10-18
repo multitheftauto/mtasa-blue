@@ -47,8 +47,12 @@ CWebView::~CWebView()
     // Clean up AJAX handlers to prevent accumulation
     m_AjaxHandlers.clear();
 
-    // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
-    m_pWebView = nullptr;
+    // Break circular reference: ensure browser reference is cleared
+    // This is to prevent memory leaks from CWebView <-> CefBrowser cycles
+    if (m_pWebView)
+    {
+        m_pWebView = nullptr;
+    }
 
     OutputDebugLine("CWebView::~CWebView");
 }
@@ -85,6 +89,9 @@ void CWebView::CloseBrowser()
 
     // Make sure we don't dead lock the CEF render thread
     ResumeCefThread();
+
+    // Clear AJAX handlers early to prevent late event processing
+    m_AjaxHandlers.clear();
 
     if (m_pWebView)
         m_pWebView->GetHost()->CloseBrowser(true);
@@ -503,8 +510,12 @@ bool CWebView::HasAjaxHandler(const SString& strURL)
 
 void CWebView::HandleAjaxRequest(const SString& strURL, CAjaxResourceHandler* pHandler)
 {
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "AjaxResourceRequest");
+    // Only queue event if not being destroyed to prevent UAF
+    if (!m_bBeingDestroyed)
+    {
+        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL);
+        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "AjaxResourceRequest");
+    }
 }
 
 bool CWebView::ToggleDevTools(bool visible)

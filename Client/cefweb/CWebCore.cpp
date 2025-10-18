@@ -109,13 +109,22 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*>(pWebViewInterface);
     if (pWebView)
     {
+        // Mark as being destroyed to prevent new events/tasks
+        pWebView->SetBeingDestroyed(true);
+        
         // Ensure that no attached events or tasks are in the queue
         RemoveWebViewEvents(pWebView.get());
         RemoveWebViewTasks(pWebView.get());
 
+        // Remove from list before closing to break reference cycles early
         m_WebViews.remove(pWebView);
-        // pWebView->Release(); // Do not release since other references get corrupted then
+        
+        // CloseBrowser will eventually trigger OnBeforeClose which clears m_pWebView
+        // This breaks the circular reference: CWebView -> CefBrowser -> CWebView
         pWebView->CloseBrowser();
+        
+        // Note: Do not call Release() - let CefRefPtr manage the lifecycle
+        // The circular reference is broken via OnBeforeClose setting m_pWebView = nullptr
     }
 }
 
