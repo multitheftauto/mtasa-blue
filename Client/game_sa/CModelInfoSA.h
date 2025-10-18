@@ -389,6 +389,7 @@ public:
     void           Remove();
     bool           UnloadUnused();
     bool           IsLoaded();
+    bool           IsCollisionLoaded() override;
     bool           DoIsLoaded();
     unsigned short GetFlags();
     unsigned short GetOriginalFlags();
