@@ -164,6 +164,18 @@ void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebV
 
     std::lock_guard<std::mutex> lock(m_EventQueueMutex);
 
+    // Prevent unbounded queue growth - drop oldest events if queue is too large
+    if (m_EventQueue.size() >= MAX_EVENT_QUEUE_SIZE)
+    {
+        // Log warning even in release builds as this indicates a serious issue
+        g_pCore->GetConsole()->Printf("WARNING: Browser event queue size limit reached (%d), dropping oldest events", MAX_EVENT_QUEUE_SIZE);
+        
+        // Remove oldest 10% of events to make room
+        auto removeCount = MAX_EVENT_QUEUE_SIZE / 10;
+        for (size_t i = 0; i < removeCount && !m_EventQueue.empty(); ++i)
+            m_EventQueue.pop_front();
+    }
+
 #ifndef MTA_DEBUG
     m_EventQueue.push_back(EventEntry(event, pWebView));
 #else
@@ -215,6 +227,22 @@ void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
     std::future<void> result;
     {
         std::scoped_lock lock(m_TaskQueueMutex);
+        
+        // Prevent unbounded queue growth - if queue is too large, oldest tasks will be dropped during pulse
+        if (m_TaskQueue.size() >= MAX_TASK_QUEUE_SIZE)
+        {
+#ifdef MTA_DEBUG
+            g_pCore->GetConsole()->Printf("Warning: Task queue size limit reached (%d), task will be aborted", MAX_TASK_QUEUE_SIZE);
+#endif
+            // Must still queue the task to fulfill the future, but it will be aborted during processing
+            // Removing oldest task to make room
+            if (!m_TaskQueue.empty())
+            {
+                m_TaskQueue.front().task(true);  // Abort oldest task
+                m_TaskQueue.pop_front();
+            }
+        }
+        
         m_TaskQueue.emplace_back(TaskEntry{task, webView});
         result = m_TaskQueue.back().task.get_future();
     }
@@ -358,12 +386,38 @@ void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
 {
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
+    // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
+    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    {
+        // Remove WEBFILTER_REQUEST entries (temporary session entries)
+        for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
+        {
+            if (iter->second.second == eWebFilterType::WEBFILTER_REQUEST)
+                m_Whitelist.erase(iter++);
+            else
+                ++iter;
+        }
+    }
+
     m_Whitelist[strURL] = std::pair<bool, eWebFilterType>(true, filterType);
 }
 
 void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
 {
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
+
+    // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
+    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    {
+        // Remove WEBFILTER_REQUEST entries (temporary session entries)
+        for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
+        {
+            if (iter->second.second == eWebFilterType::WEBFILTER_REQUEST)
+                m_Whitelist.erase(iter++);
+            else
+                ++iter;
+        }
+    }
 
     m_Whitelist[strURL] = std::pair<bool, eWebFilterType>(false, filterType);
 }

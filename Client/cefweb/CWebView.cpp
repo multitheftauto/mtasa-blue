@@ -44,6 +44,9 @@ CWebView::~CWebView()
     // Make sure we don't dead lock the CEF render thread
     ResumeCefThread();
 
+    // Clean up AJAX handlers to prevent accumulation
+    m_AjaxHandlers.clear();
+
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
     m_pWebView = nullptr;
 
@@ -719,6 +722,8 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
     m_RenderData.width = width;
     m_RenderData.height = height;
     m_RenderData.dirtyRects = dirtyRects;
+    // Prevent vector capacity growth memory leak - shrink excess capacity
+    m_RenderData.dirtyRects.shrink_to_fit();
     m_RenderData.changed = true;
 
     // Wait for the main thread to handle drawing the texture
