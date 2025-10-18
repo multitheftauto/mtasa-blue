@@ -63,8 +63,8 @@ namespace TextureIndex
 
     inline std::size_t HashCanonical(const char* str, std::size_t len)
     {
-        const std::size_t kFnvOffset = 2166136261u;
-        const std::size_t kFnvPrime = 16777619u;
+        constexpr std::size_t kFnvOffset = 2166136261u;
+        constexpr std::size_t kFnvPrime = 16777619u;
 
         std::size_t hash = kFnvOffset;
         for (std::size_t i = 0; i < len; ++i)
@@ -152,7 +152,7 @@ static std::recursive_mutex                           ms_ModelTexturesInfoMutex;
 
 namespace
 {
-    const unsigned int kReplacementTextureFilterFlags = 0x1102u;
+    constexpr unsigned int kReplacementTextureFilterFlags = 0x1102u;
 
     using TextureSwapMap = std::unordered_map<RwTexture*, RwTexture*>;
 
@@ -176,6 +176,11 @@ namespace
         void Release()
         {
             m_owned = false;
+        }
+
+        bool IsOwned() const
+        {
+            return m_owned;
         }
 
         ~ScopedTxdRef()
@@ -585,7 +590,7 @@ namespace
             return;
 
         // RenderWare guarantees materials.entries reflects the allocation size of the materials array
-        const int32_t MAX_MATERIALS = 10000;
+        constexpr int32_t MAX_MATERIALS = 10000;
         if (materials.entries < 0 || materials.entries > MAX_MATERIALS)
             return;
 
@@ -696,27 +701,46 @@ ModelTexturesInfoGuard AcquireModelTexturesInfo(ushort usModelId)
 
     if (!pTxd)
     {
-        guard.modelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
-        txdRefGuard.Acquire(usTxdId);
-        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
-        pTxd = CTxdStore_GetTxd(usTxdId);
+        // TXD not loaded - try to request it based on model type
+        const eModelInfoType modelType = guard.modelInfo->GetModelType();
+        
+        // For vehicles, we need the TXD loaded to prevent white textures
+        // For weapons and other models, use lazy loading to avoid freezes with large texture packs
+        if (modelType == eModelInfoType::VEHICLE)
+        {
+            // Request the model non-blocking first to avoid freezing
+            guard.modelInfo->Request(NON_BLOCKING, "CRenderWareSA::AcquireModelTexturesInfo");
+            pTxd = CTxdStore_GetTxd(usTxdId);
 
+            // If still not available, try blocking as last resort for vehicles
+            if (!pTxd)
+            {
+                guard.modelInfo->Request(BLOCKING, "CRenderWareSA::AcquireModelTexturesInfo");
+                // Remove model after blocking request to ensure proper reload
+                ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+                pTxd = CTxdStore_GetTxd(usTxdId);
+            }
+        }
+        
+        // If still unavailable after attempts, fail gracefully
         if (!pTxd)
             return guard;
     }
-    else
+    
+    // Acquire TXD reference only after confirming TXD is available
+    txdRefGuard.Acquire(usTxdId);
+    
+    const eModelInfoType modelType = guard.modelInfo->GetModelType();
+    if (modelType == eModelInfoType::PED)
     {
-        txdRefGuard.Acquire(usTxdId);
-        if (guard.modelInfo->GetModelType() == eModelInfoType::PED)
-        {
-            // Mystery fix for #9336: (MTA sometimes fails at loading custom textures)
-            // Possibly forces the ped model to be reloaded in some way
-            ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
-        }
+        // Mystery fix for #9336: (MTA sometimes fails at loading custom textures)
+        // Possibly forces the ped model to be reloaded in some way
+        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
     }
 
-    auto insertResult = ms_ModelTexturesInfoMap.emplace(usTxdId, CModelTexturesInfo());
-    guard.info = &insertResult.first->second;
+    auto result = ms_ModelTexturesInfoMap.emplace(usTxdId, CModelTexturesInfo());
+    auto insertIt = result.first;
+    guard.info = &insertIt->second;
 
     guard.info->usTxdId = usTxdId;
     guard.info->pTxd = pTxd;
@@ -727,8 +751,10 @@ ModelTexturesInfoGuard AcquireModelTexturesInfo(ushort usModelId)
     // Revalidate pTxd before passing to GetTxdTextures to prevent crashes from stale pointers
     if (!IsValidTexDictionary(pTxd))
     {
-        ms_ModelTexturesInfoMap.erase(insertResult.first);
+        ms_ModelTexturesInfoMap.erase(insertIt);
         guard.info = nullptr;
+        txdRefGuard.Release();
+        CTxdStore_RemoveRef(usTxdId);
         return guard;
     }
     
@@ -737,8 +763,10 @@ ModelTexturesInfoGuard AcquireModelTexturesInfo(ushort usModelId)
     // If texture enumeration failed
     if (originals.empty())
     {
-        ms_ModelTexturesInfoMap.erase(insertResult.first);
+        ms_ModelTexturesInfoMap.erase(insertIt);
         guard.info = nullptr;
+        txdRefGuard.Release();
+        CTxdStore_RemoveRef(usTxdId);
         return guard;
     }
     
@@ -765,37 +793,50 @@ ModelTexturesInfoGuard AcquireModelTexturesInfo(ushort usModelId)
 bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer,
                                              bool bFilteringEnabled)
 {
+    // Validate input pointer first
+    if (!pReplacementTextures)
+        return false;
+
     // Are we already loaded?
-    if (!pReplacementTextures->textures.empty())
+    if (!pReplacementTextures->ownedTextures.empty())
         return false;
 
     // Try to load it
     RwTexDictionary* pTxd = ReadTXD(strFilename, buffer);
     if (pTxd)
     {
-        // Get the list of textures into our own list
-        GetTxdTextures(pReplacementTextures->textures, pTxd);
+        // Get the list of textures into temporary vector
+        std::vector<RwTexture*> loadedTextures;
+        GetTxdTextures(loadedTextures, pTxd);
 
-        // Remove any null textures and configure valid ones
-        auto newEnd = std::remove_if(pReplacementTextures->textures.begin(), pReplacementTextures->textures.end(),
-                                     [](RwTexture* const pTex) { return pTex == nullptr; });
-        pReplacementTextures->textures.erase(newEnd, pReplacementTextures->textures.end());
-
-        for (RwTexture* pTexture : pReplacementTextures->textures)
-        {
-            pTexture->txd = nullptr;
-            if (bFilteringEnabled)
-                pTexture->flags = kReplacementTextureFilterFlags;
-        }
-
-        // Make the txd forget it has any textures and destroy it
+        // Make the txd forget it has any textures before destroying it
         pTxd->textures.root.next = &pTxd->textures.root;
         pTxd->textures.root.prev = &pTxd->textures.root;
         RwTexDictionaryDestroy(pTxd);
         pTxd = nullptr;
 
+        // Transfer ownership to unique_ptr with custom deleter
+        pReplacementTextures->ownedTextures.reserve(loadedTextures.size());
+        pReplacementTextures->textures.reserve(loadedTextures.size());
+        
+        for (RwTexture* pTexture : loadedTextures)
+        {
+            if (!pTexture)
+                continue;
+
+            // Textures are now orphaned (txd was destroyed), we own them
+            pTexture->txd = nullptr;
+            if (bFilteringEnabled)
+                pTexture->flags = kReplacementTextureFilterFlags;
+
+            // Take ownership with unique_ptr for automatic cleanup
+            pReplacementTextures->ownedTextures.emplace_back(pTexture);
+            // Keep raw pointer for compatibility with existing code
+            pReplacementTextures->textures.push_back(pTexture);
+        }
+
         // We succeeded if we got any textures
-        return pReplacementTextures->textures.size() > 0;
+        return !pReplacementTextures->textures.empty();
     }
 
     return false;
@@ -811,6 +852,10 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId)
 {
+    // Validate input pointer first
+    if (!pReplacementTextures)
+        return false;
+
     ModelTexturesInfoGuard infoGuard = AcquireModelTexturesInfo(usModelId);
     if (!infoGuard)
         return false;
@@ -833,7 +878,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
     // Prevent unbounded growth from spammy texture replacements on different TXD IDs(Like at client load complete on a very unoptimized server).
     // Reasonable limit: one SReplacementTextures shouldn't be applied to hundreds of different TXDs.
-    const std::size_t kMaxTxdEntriesPerReplacement = 64;
+    constexpr std::size_t kMaxTxdEntriesPerReplacement = 64;
     if (pReplacementTextures && pReplacementTextures->perTxdList.size() >= kMaxTxdEntriesPerReplacement)
     {
         // Defensive check for pInfo validity before accessing its members
@@ -1065,6 +1110,10 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures)
 {
+    // Validate input pointer first
+    if (!pReplacementTextures)
+        return;
+
     std::unique_lock<std::recursive_mutex> guard(ms_ModelTexturesInfoMutex);
     // For each using txd
     for (std::size_t i = 0; i < pReplacementTextures->perTxdList.size(); ++i)
@@ -1148,17 +1197,11 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         }
     }
 
-    // Destroy replacement textures with validation to prevent crashes
-    if (pReplacementTextures)
-    {
-        for (std::size_t i = 0; i < pReplacementTextures->textures.size(); ++i)
-        {
-            RwTexture* pTexture = pReplacementTextures->textures[i];
-            if (pTexture && IsValidTexturePtr(pTexture))
-                DestroyTexture(pTexture);
-        }
-    }
-    pReplacementTextures->textures.clear();
+    // Destroy replacement textures - ownedTextures vector handles cleanup automatically via unique_ptr
+    // Textures that were added to TXDs (txd != nullptr) won't be destroyed by unique_ptr's deleter
+    // because they're managed by the TXD. Orphaned textures (txd == nullptr) are destroyed safely.
+    pReplacementTextures->ownedTextures.clear();  // Automatic cleanup via unique_ptr destructors
+    pReplacementTextures->textures.clear();       // Clear raw pointers
 
     pReplacementTextures->perTxdList.clear();
     pReplacementTextures->usedInTxdIds.clear();
