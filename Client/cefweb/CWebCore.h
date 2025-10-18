@@ -20,6 +20,9 @@
 #define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
 #define BROWSER_LIST_UPDATE_INTERVAL (24*60*60)
 #define BROWSER_UPDATE_URL "https://cef.multitheftauto.com/get.php"
+#define MAX_EVENT_QUEUE_SIZE 10000
+#define MAX_TASK_QUEUE_SIZE 1000
+#define MAX_WHITELIST_SIZE 50000
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
