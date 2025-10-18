@@ -4306,7 +4306,7 @@ void CClientVehicle::ApplyHandling()
         return;
 
     // Ensure collision model is loaded before recalculating (needed for suspension lines)
-    if (!pModelInfo->GetInterface()->pColModel || !pModelInfo->GetInterface()->pColModel->m_data)
+    if (!pModelInfo->IsCollisionLoaded())
         return;
 
     m_pVehicle->RecalculateHandling();
