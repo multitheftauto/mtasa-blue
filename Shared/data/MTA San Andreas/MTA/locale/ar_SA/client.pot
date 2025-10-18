@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-12 09:36+0000\n"
-"PO-Revision-Date: 2025-10-13 09:11\n"
+"POT-Creation-Date: 2025-10-17 08:17+0000\n"
+"PO-Revision-Date: 2025-10-17 13:01\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -53,19 +53,19 @@ msgstr "MTA:SA تحتاج إلى صلاحيات المسؤول للوظيفة ا
 msgid "Error loading %s module! (%s)"
 msgstr "خطأ في تحميل الوحدة البرمجية %s !(%s)"
 
-#: Client/loader/Utils.cpp:1391 Client/loader/Dialogs.cpp:1054
+#: Client/loader/Utils.cpp:1391 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
 msgstr "جاري نسخ الملفات..."
 
-#: Client/loader/Utils.cpp:1451 Client/loader/Dialogs.cpp:1059
+#: Client/loader/Utils.cpp:1451 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
 msgstr "تم إكمال نسخ الملفات مبكرًا. كل شيء على مايرام."
 
-#: Client/loader/Utils.cpp:1457 Client/loader/Dialogs.cpp:1064
+#: Client/loader/Utils.cpp:1457 Client/loader/Dialogs.cpp:1058
 msgid "Finishing..."
 msgstr "جاري الانتهاء..."
 
-#: Client/loader/Utils.cpp:1459 Client/loader/Dialogs.cpp:1068
+#: Client/loader/Utils.cpp:1459 Client/loader/Dialogs.cpp:1062
 msgid "Done!"
 msgstr "تم!"
 
@@ -105,86 +105,86 @@ msgstr "GTA:SA وجدت أخطاء في الملف '%s'"
 
 #: Client/loader/Utils.cpp:1713
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "هل تمت إعادة تشغيل جهاز الكمبيوتر الخاص بك عند لعب MTA: SA؟"
+msgstr "هل أعاد جهازك التشغيل أثناء لعب MTA:SA؟"
 
 #: Client/loader/Utils.cpp:1778
 msgid "Please terminate the following programs before continuing:"
 msgstr "الرجاء إيقاف البرامج التالية قبل الاستمرار:"
 
-#: Client/loader/MainFunctions.cpp:64
+#: Client/loader/MainFunctions.cpp:141
 msgid "Invalid module path detected.\n"
 msgstr "تم اكتشاف مسار وحدة غير صالح.\n"
 
-#: Client/loader/MainFunctions.cpp:91
+#: Client/loader/MainFunctions.cpp:168
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "إصدار الملف لا يتطابق. أعد تثبيت MTA:SA إن كنت تواجه مشاكل.\n"
 
-#: Client/loader/MainFunctions.cpp:99
+#: Client/loader/MainFunctions.cpp:176
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "بعض الملفات مفقودة. أعد تثبيت MTA:SA إذا واجهت مشاكل.\n"
 
-#: Client/loader/MainFunctions.cpp:110
+#: Client/loader/MainFunctions.cpp:187
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA غير متوافقة مع \"وضع الأمان\" في الويندوز.\n\n"
 "الرجاء إعادة تشغيل جهازك.\n"
 
-#: Client/loader/MainFunctions.cpp:289
+#: Client/loader/MainFunctions.cpp:366
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "هل تواجه مشاكل في تشغيل MTA؟ \n\n"
 "هل تريد العودة إلى إصدار سابق؟"
 
-#: Client/loader/MainFunctions.cpp:317
+#: Client/loader/MainFunctions.cpp:394
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
-msgstr "يبدو أن هناك مشكلة خلال تشغيل MTA:SA.\n"
-"إعادة تعيين الإعدادات قد يكون الحل بعض الأحيان.\n\n"
-"هل تريد إعادة تهيئة إعدادات GTA الآن؟"
+msgstr "يبدو أن هناك مشكلة في تشغيل MTA:SA.\n"
+"إعادة ضبط إعدادات GTA قد تحل هذه المشكلة أحيانًا.\n\n"
+"هل ترغب في إعادة ضبط إعدادات GTA الآن؟"
 
-#: Client/loader/MainFunctions.cpp:332
+#: Client/loader/MainFunctions.cpp:409
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "تمت إعادة تعيين إعدادات GTA.\n\n"
 "اضغط حسنا للاستمرار."
 
-#: Client/loader/MainFunctions.cpp:337
+#: Client/loader/MainFunctions.cpp:414
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "لم يتم حذف الملف '%s' تعذر ذلك."
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:345
+#: Client/loader/MainFunctions.cpp:422
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "هل لديك مشاكل في تشغيل MTA:SA؟.\n\n"
 "هل تريد رؤية بعض المعلومات المساعدة على الإنترنت؟"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:382
+#: Client/loader/MainFunctions.cpp:459
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "هل تواجه مشاكل في تشغيل MTA:SA؟.\n\n"
 "هل تود تغيير الإعداد التالي؟"
 
-#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:1156
+#: Client/loader/MainFunctions.cpp:460 Client/core/CSettings.cpp:1156
 #: Client/core/CSettings.cpp:1654
 msgid "Fullscreen mode:"
 msgstr "وضع ملء الشاشة:"
 
-#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:1166
+#: Client/loader/MainFunctions.cpp:460 Client/core/CSettings.cpp:1166
 #: Client/core/CSettings.cpp:2316
 msgid "Borderless window"
-msgstr "نافذة بلا حدود"
+msgstr "نافذة بلا إطار"
 
-#: Client/loader/MainFunctions.cpp:454
+#: Client/loader/MainFunctions.cpp:531
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "هل تواجه مشاكل في تشغيل MTA:SA؟\n\n"
 "جرب تعطيل جميع منتجات GTA و MTA التالية:"
 
-#: Client/loader/MainFunctions.cpp:487
+#: Client/loader/MainFunctions.cpp:564
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -192,28 +192,28 @@ msgstr "تحذير\n\n"
 "MTA:SA كشفت عن نشاطات غير اعتيادية.\n"
 "الرجاء تشغيل فحص مكافحة الفيروسات للتأكد من أمان جهازك.\n\n"
 
-#: Client/loader/MainFunctions.cpp:490
+#: Client/loader/MainFunctions.cpp:567
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "الملف المكتشف هو: %s\n"
 
-#: Client/loader/MainFunctions.cpp:636
+#: Client/loader/MainFunctions.cpp:713
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "يوجد نسخة تعمل من جراند تيڤت أوتو: سان أندرياس بالفعل قيد العمل. يجب أن يتم إنهاؤها قبل تشغيل MTA:SA. هل تريد فعل ذلك الآن؟"
 
-#: Client/loader/MainFunctions.cpp:637 Client/loader/MainFunctions.cpp:644
-#: Client/loader/MainFunctions.cpp:1543
+#: Client/loader/MainFunctions.cpp:714 Client/loader/MainFunctions.cpp:721
+#: Client/loader/MainFunctions.cpp:1630
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1665
 #: Client/game_sa/CGameSA.cpp:269
 msgid "Information"
 msgstr "معلومات"
 
-#: Client/loader/MainFunctions.cpp:643
+#: Client/loader/MainFunctions.cpp:720
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "هناك مشكلة في إيقاف GTA: San Andreas. إذا تكررت المشكلة، الرجاء إعادة تشغيل جهاز الكمبيوتر."
 
-#: Client/loader/MainFunctions.cpp:772
+#: Client/loader/MainFunctions.cpp:849
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -227,8 +227,8 @@ msgstr "توجد مشاكل في أثناء إعادة تشغيل MTA:SA\n\n"
 #. Show failed message and abort the attempt
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
-#: Client/loader/MainFunctions.cpp:777 Client/loader/MainFunctions.cpp:798
-#: Client/loader/MainFunctions.cpp:802 Client/loader/MainFunctions.cpp:1213
+#: Client/loader/MainFunctions.cpp:854 Client/loader/MainFunctions.cpp:875
+#: Client/loader/MainFunctions.cpp:879 Client/loader/MainFunctions.cpp:1290
 #: Client/loader/CInstallManager.cpp:586 Client/loader/CInstallManager.cpp:595
 #: Client/core/CConnectManager.cpp:86 Client/core/CConnectManager.cpp:117
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
@@ -236,7 +236,7 @@ msgstr "توجد مشاكل في أثناء إعادة تشغيل MTA:SA\n\n"
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
 #: Client/core/CSettings.cpp:3816 Client/core/CSettings.cpp:5181
 #: Client/core/CSettings.cpp:5209 Client/core/CSettings.cpp:5921
-#: Client/core/CCore.cpp:1315 Client/core/CGUI.cpp:94
+#: Client/core/CCore.cpp:1311 Client/core/CGUI.cpp:94
 #: Client/core/DXHook/CDirect3DHook9.cpp:128
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1558
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1580
@@ -260,27 +260,27 @@ msgstr "توجد مشاكل في أثناء إعادة تشغيل MTA:SA\n\n"
 msgid "Error"
 msgstr "خطأ"
 
-#: Client/loader/MainFunctions.cpp:796
+#: Client/loader/MainFunctions.cpp:873
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "هناك نسخة أخرى من MTA قيد التشغيل بالفعل.\n\n"
 "إذا استمرت هذه المشكلة، يرجى إعادة تشغيل جهاز الكمبيوتر الخاص بك"
 
-#: Client/loader/MainFunctions.cpp:800
+#: Client/loader/MainFunctions.cpp:877
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "هناك نسخة أخرى من MTA قيد التشغيل بالفعل.\n\n"
 "هل تريد إنهاؤها؟"
 
-#: Client/loader/MainFunctions.cpp:837
+#: Client/loader/MainFunctions.cpp:914
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "مدخلات الرجستري (محرر التسجيل) مفقودة. يرجى إعادة تثبيت ملتي تيڤت أوتو: سان أندرياس."
 
-#: Client/loader/MainFunctions.cpp:843
+#: Client/loader/MainFunctions.cpp:920
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "المسار المثبت فيه لعبة GTA: San Andreas يحتوي على حروف غير مدعومة (Unicode). الرجاء نقل تثبيت GTA: San Andreas لمسار متوافق يحتوي على حروف (ASCII) فقط وإعادة تثبيت Multi Theft Auto: San Andreas من جديد."
 
-#: Client/loader/MainFunctions.cpp:856
+#: Client/loader/MainFunctions.cpp:933
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
@@ -289,59 +289,59 @@ msgstr "يحتوي مسار تثبيت 'MTA:SA' أو 'GTA: San Andreas' على '
 "إذا واجهت مشاكل عند تشغيل MTA:SA،\n"
 "قم بنقل تثبيت اللعبة إلى مسار لا يحتوي على فاصلة منقوطة."
 
-#: Client/loader/MainFunctions.cpp:1039
+#: Client/loader/MainFunctions.cpp:1116
 msgid "Invalid installation paths detected."
 msgstr "تم اكتشاف مسارات تثبيت غير صالحة."
 
-#: Client/loader/MainFunctions.cpp:1170
+#: Client/loader/MainFunctions.cpp:1247
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "فشل التشغيل. يرجى التأكد من تثبيت أحدث ملفات البيانات بشكل صحيح."
 
-#: Client/loader/MainFunctions.cpp:1179
+#: Client/loader/MainFunctions.cpp:1256
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "فشل التشغيل. الرجاء التأكد من تثبيت %s بشكل صحيح."
 
-#: Client/loader/MainFunctions.cpp:1188
+#: Client/loader/MainFunctions.cpp:1265
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "فشل التشغيل. تعذر إيجاد ملف gta_sa.exe في %s."
 
-#: Client/loader/MainFunctions.cpp:1202
+#: Client/loader/MainFunctions.cpp:1279
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "فشل التشغيل. %s موجود في مجلد GTA . يرجى حذفه قبل المتابعة"
 
-#: Client/loader/MainFunctions.cpp:1212
+#: Client/loader/MainFunctions.cpp:1289
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "الملف الرئيسي يحمل اسم خاطئ (%s)"
 
-#: Client/loader/MainFunctions.cpp:1259
+#: Client/loader/MainFunctions.cpp:1336
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr "ملف البيانات %s مفقود. قد يكون هناك نشاط فيروسي محتمل."
 
-#: Client/loader/MainFunctions.cpp:1267
+#: Client/loader/MainFunctions.cpp:1344
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr "ملف البيانات %s تم تعديله. قد يكون هناك نشاط فيروسي محتمل."
 
-#: Client/loader/MainFunctions.cpp:1291
+#: Client/loader/MainFunctions.cpp:1368
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
 msgstr "يوجد ملفات .asi في مجلد التثبيت.\n"
 "قم بحذف ملفات .asi إذا واجهت مشاكل."
 
-#: Client/loader/MainFunctions.cpp:1446
+#: Client/loader/MainFunctions.cpp:1523
 msgid "Invalid game paths detected."
 msgstr "تم الكشف عن مسارات غير صحيحة للعبة."
 
-#: Client/loader/MainFunctions.cpp:1454
+#: Client/loader/MainFunctions.cpp:1531
 msgid "Fix configuration issue"
 msgstr "إصلاح مشاكل الإعدادات"
 
-#: Client/loader/MainFunctions.cpp:1543
+#: Client/loader/MainFunctions.cpp:1630
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr "يبدو أن GTA: San Andreas لم تشغل بشكل صحيح. هل تريد إغلاقها؟"
 
@@ -368,11 +368,11 @@ msgstr "قد يكون تثبيتك تالفًا الآن.\n\n"
 "تعذر استرجاع %zu من %zu ملف من النسخة الاحتياطية.\n\n"
 "يجب عليك إعادة تثبيت Multi Theft Auto من www.multitheftauto.com أو إعادة تشغيل التحديث مع صلاحية المسؤول."
 
-#: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1041
+#: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1035
 msgid "Installing update..."
 msgstr "جاري تثبيت التحديث..."
 
-#: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1049
+#: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1043
 msgid "Extracting files..."
 msgstr "جاري استخراج الملفات..."
 
@@ -659,7 +659,7 @@ msgid "I will not install an anti-virus.\n"
 msgstr "لن أثبت مكافح فيروسات.\n"
 "أريد أن يصاب جهازي بالبطء."
 
-#: Client/loader/Dialogs.cpp:673
+#: Client/loader/Dialogs.cpp:667
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
 "Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
 "Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
@@ -667,15 +667,15 @@ msgstr "العطل الذي واجهته ناتج عن إساءة استخدام
 "حتى مع توافر قدر كبير من ذاكرة الوصول العشوائي (RAM)، فإن هذه اللعبة تعمل بنظام 32 بت (x86) ولها حد أقصى لمساحة العناوين يصل إلى 3.6 جيجابايت. بعض الخوادم الغير محسنة بشكل جيد وتحتوي على العديد من التعديلات (أو حتى بعض السكربتات المكتوبة بطريقة سيئة) تؤدي إلى حدوث هذا العطل وإلى بطء اللعبة أيضًا.\n\n"
 "لمزيد من المعلومات، يرجى التواصل مع مالك الخادم أو دعم MTA عبر منصة Discord الرسمية: https://discord.gg/mtasa"
 
-#: Client/loader/Dialogs.cpp:679
+#: Client/loader/Dialogs.cpp:673
 msgid "MTA: San Andreas - Out of Memory Information"
 msgstr "معلومات عن نفاذ الذاكرة - MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:1030
+#: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "جاري البحث عن Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:1033
+#: Client/loader/Dialogs.cpp:1027
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "يرجى تشغيل Grand Theft Auto San Andreas"
 
@@ -822,7 +822,7 @@ msgstr "لا يوجد تحديث مطلوب"
 
 #: Client/core/CVersionUpdater.cpp:1902
 msgid "DOWNLOADING"
-msgstr "جاري التحميل"
+msgstr "جاري التنزيل"
 
 #: Client/core/CVersionUpdater.cpp:1903
 msgid "waiting..."
@@ -865,7 +865,7 @@ msgstr "تعذَر إنشاء الملف."
 #: Client/core/CVersionUpdater.cpp:2008 Client/core/CVersionUpdater.cpp:2017
 #: Client/core/CVersionUpdater.cpp:2190 Client/core/CVersionUpdater.cpp:2199
 msgid "ERROR DOWNLOADING"
-msgstr "خطأ أثناء التحميل"
+msgstr "خطأ أثناء التنزيل"
 
 #: Client/core/CVersionUpdater.cpp:2009 Client/core/CVersionUpdater.cpp:2191
 msgid "The downloaded file appears to be incorrect."
@@ -877,7 +877,7 @@ msgstr "لسبب ما."
 
 #: Client/core/CVersionUpdater.cpp:2029 Client/core/CVersionUpdater.cpp:2213
 msgid "DOWNLOAD COMPLETE"
-msgstr "تم الانتهاء من التحميل"
+msgstr "اكتمل التنزيل"
 
 #: Client/core/CVersionUpdater.cpp:2053
 msgid " - Unknown problem in _DialogUpdateResult"
@@ -2057,97 +2057,97 @@ msgstr "للإصلاح، قم بإزالة هذا الملف:"
 msgid "%s module is incorrect!"
 msgstr "وحدة %s غير صحيحة!"
 
-#: Client/core/CCore.cpp:1315
+#: Client/core/CCore.cpp:1311
 msgid "Error executing URL"
 msgstr "خطأ في تنفيذ الرابط"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1410
+#: Client/core/CCore.cpp:1406
 msgid "this help screen"
 msgstr "شاشة المساعدة هذه"
 
-#: Client/core/CCore.cpp:1411 Client/core/CCore.cpp:1412
+#: Client/core/CCore.cpp:1407 Client/core/CCore.cpp:1408
 msgid "exits the application"
 msgstr "الخروج من التطبيق"
 
-#: Client/core/CCore.cpp:1413
+#: Client/core/CCore.cpp:1409
 msgid "shows the version"
 msgstr "إظهار الإصدار"
 
-#: Client/core/CCore.cpp:1414
+#: Client/core/CCore.cpp:1410
 msgid "shows the time"
 msgstr "إظهار الوقت"
 
-#: Client/core/CCore.cpp:1415
+#: Client/core/CCore.cpp:1411
 msgid "shows the hud"
 msgstr "إظهار معلومات اللعب (Hud)"
 
-#: Client/core/CCore.cpp:1416
+#: Client/core/CCore.cpp:1412
 msgid "shows all the binds"
 msgstr "إظهار جميع الأزرار المربوطة"
 
-#: Client/core/CCore.cpp:1417
+#: Client/core/CCore.cpp:1413
 msgid "shows your serial"
 msgstr "يظهر رقمك التسلسلي"
 
-#: Client/core/CCore.cpp:1426
+#: Client/core/CCore.cpp:1422
 msgid "connects to a server (host port nick pass)"
 msgstr "الاتصال بـ خادم (المضيف المنفذ الاسم المستخدم كلمة المرور)"
 
-#: Client/core/CCore.cpp:1427
+#: Client/core/CCore.cpp:1423
 msgid "connects to a previous server"
 msgstr "يتصل بخادم سابق"
 
-#: Client/core/CCore.cpp:1428
+#: Client/core/CCore.cpp:1424
 msgid "binds a key (key control)"
 msgstr "يربط بـ الزر (مفتاح التحكم)"
 
-#: Client/core/CCore.cpp:1429
+#: Client/core/CCore.cpp:1425
 msgid "unbinds a key (key)"
 msgstr "يزيل الربط عن الزر (الزر)"
 
-#: Client/core/CCore.cpp:1430
+#: Client/core/CCore.cpp:1426
 msgid "copies the default gta controls"
 msgstr "ينسخ ضوابط اللعبة الافتراضية"
 
-#: Client/core/CCore.cpp:1431
+#: Client/core/CCore.cpp:1427
 msgid "outputs a screenshot"
 msgstr "يخرج لقطة من الشاشة"
 
-#: Client/core/CCore.cpp:1432
+#: Client/core/CCore.cpp:1428
 msgid "immediately saves the config"
 msgstr "يحفظ الإعدادات على الفور"
 
-#: Client/core/CCore.cpp:1434
+#: Client/core/CCore.cpp:1430
 msgid "clears the debug view"
 msgstr "ينظف عرض تصحيح الأخطاء"
 
-#: Client/core/CCore.cpp:1435
+#: Client/core/CCore.cpp:1431
 msgid "scrolls the chatbox upwards"
 msgstr "تمرير صندوق الدردشة للأعلى"
 
-#: Client/core/CCore.cpp:1436
+#: Client/core/CCore.cpp:1432
 msgid "scrolls the chatbox downwards"
 msgstr "تمرير صندوق الدردشة للأسفل"
 
-#: Client/core/CCore.cpp:1437
+#: Client/core/CCore.cpp:1433
 msgid "scrolls the debug view upwards"
 msgstr "يرفع معالج الأخطاء إلى الأعلى"
 
-#: Client/core/CCore.cpp:1438
+#: Client/core/CCore.cpp:1434
 msgid "scrolls the debug view downwards"
 msgstr "ينزل معالج الأخطاء إلى الاسفل"
 
-#: Client/core/CCore.cpp:1441
+#: Client/core/CCore.cpp:1437
 msgid "shows the memory statistics"
 msgstr "يظهر إحصائيات الذاكرة"
 
-#: Client/core/CCore.cpp:1442
+#: Client/core/CCore.cpp:1438
 msgid "shows the frame timing graph"
 msgstr "يظهر مخطط توقيت الإطار"
 
-#: Client/core/CCore.cpp:1446
+#: Client/core/CCore.cpp:1442
 msgid "for developers: reload news"
 msgstr "للمطورين: إعادة تحميل الأخبار"
 
@@ -2983,7 +2983,7 @@ msgstr "تقدم تحميل الخريطة:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr "تقدم التحميل:"
+msgstr "تقدم التنزيل:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
@@ -2995,7 +2995,7 @@ msgstr "%s من %s"
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr "اقطع الاتصال حتى تلغي التحميل"
+msgstr "اقطع الاتصال لإلغاء التنزيل"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:499
 msgid "Disconnected: Invalid nickname"
