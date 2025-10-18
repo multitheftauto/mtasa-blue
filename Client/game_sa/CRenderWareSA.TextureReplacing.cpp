@@ -359,25 +359,54 @@ namespace
         return pTexture && SharedUtil::IsReadablePointer(pTexture, sizeof(*pTexture));
     }
 
-    [[nodiscard]] size_t GetTextureNameLength(const RwTexture* const pTexture)
+    // Safe wrapper for RwTexDictionaryFindNamedTexture that validates TXD structure
+    // Prevents crash at 0x003F3A17
+    [[nodiscard]] RwTexture* SafeFindNamedTexture(RwTexDictionary* pTxd, const char* name)
     {
-        if (!pTexture)
-            return 0;
+        if (!pTxd || !name)
+            return nullptr;
 
+        if (!IsValidTexDictionary(pTxd))
+            return nullptr;
+
+        RwListEntry* firstNode = pTxd->textures.root.next;
+
+        if (!firstNode)
+            return nullptr;
+
+        // Empty list check (valid case - no textures in TXD)
+        if (firstNode == &pTxd->textures.root)
+            return nullptr;
+
+        // Validate first texture using container_of pattern
+        // SA will iterate the list and dereference textures, so we need to ensure at least the first one is valid
+        RwTexture* firstTexture = reinterpret_cast<RwTexture*>(reinterpret_cast<char*>(firstNode) - offsetof(RwTexture, TXDList));
+        if (!IsValidTexturePtr(firstTexture))
+            return nullptr;
+
+        // Structure validated, safe to call SA native function
+        return RwTexDictionaryFindNamedTexture(pTxd, name);
+    }
+
+    // Fast path: caller guarantees pTexture is valid (already validated with IsValidTexturePtr)
+    [[nodiscard]] __forceinline std::string_view GetTextureNameViewUnsafe(const RwTexture* const pTexture) noexcept
+    {
         const char* p = pTexture->name;
         const char* end = p + RW_TEXTURE_NAME_LENGTH;
         while (p < end && *p != '\0')
             ++p;
-        return static_cast<size_t>(p - pTexture->name);
+        
+        const size_t length = static_cast<size_t>(p - pTexture->name);
+        return std::string_view(pTexture->name, length);
     }
 
+    // Safe path: validates pointer before dereferencing
     [[nodiscard]] std::string_view GetTextureNameView(const RwTexture* const pTexture)
     {
-        if (!pTexture)
+        if (!IsValidTexturePtr(pTexture))
             return {};
 
-        const size_t length = GetTextureNameLength(pTexture);
-        return std::string_view(pTexture->name, length);
+        return GetTextureNameViewUnsafe(pTexture);
     }
 
     TextureIndex::Name ExtractTextureName(const RwTexture* pTexture)
@@ -413,7 +442,7 @@ namespace
             for (auto& record : info.originalTextures)
             {
                 if (!IsValidTexturePtr(record.texture) && !record.name.Empty())
-                    record.texture = RwTexDictionaryFindNamedTexture(pTxd, record.name.CStr());
+                    record.texture = SafeFindNamedTexture(pTxd, record.name.CStr());
             }
         }
 
@@ -441,7 +470,7 @@ namespace
 
             auto& record = info.originalTextures[idx];
             if (!IsValidTexturePtr(record.texture) && canReload && !record.name.Empty())
-                record.texture = RwTexDictionaryFindNamedTexture(pTxd, record.name.CStr());
+                record.texture = SafeFindNamedTexture(pTxd, record.name.CStr());
 
             return IsValidTexturePtr(record.texture) ? record.texture : nullptr;
         };
@@ -469,7 +498,7 @@ namespace
         if (lookupName.Empty())
             return nullptr;
 
-        RwTexture* pFound = RwTexDictionaryFindNamedTexture(pTxd, lookupName.CStr());
+        RwTexture* pFound = SafeFindNamedTexture(pTxd, lookupName.CStr());
         if (!pFound)
             return nullptr;
 
@@ -529,7 +558,7 @@ namespace
                 continue;
 
             RwTexture*             pOriginalTexture = (idx < perTxdInfo.replacedOriginals.size()) ? perTxdInfo.replacedOriginals[idx] : nullptr;
-            const std::string_view replacementName = GetTextureNameView(pReplacementTexture);
+            const std::string_view replacementName = GetTextureNameViewUnsafe(pReplacementTexture);  // Already validated above
             RwTexture*             pResolvedOriginal = ResolveOriginalTexture(info, pTxd, pOriginalTexture, replacementName);
 
             if (pResolvedOriginal)
@@ -670,7 +699,11 @@ namespace
             // TXD was unloaded - try to reload it
             guard.info->pTxd = CTxdStore_GetTxd(usTxdId);
             
-            // If still invalid, the cached entry is stale and needs rebuild
+            // Refresh cached texture pointers after TXD reload
+            // This prevents stale texture pointers from causing crashes
+            RefreshOriginalTextureCache(*guard.info, guard.info->pTxd);
+            
+            // If still invalid after refresh, the cached entry is stale and needs rebuild
             if (!IsValidTexDictionary(guard.info->pTxd))
             {
                 // Invalidate the entry - caller should handle this 
@@ -746,7 +779,7 @@ namespace
     CRenderWareSA::GetTxdTextures(originals, pTxd);
     
     // If texture enumeration failed
-    if (std::empty(originals))
+    if (originals.empty())
     {
         ms_ModelTexturesInfoMap.erase(insertIt);
         guard.info = nullptr;
@@ -783,7 +816,7 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
         return false;
 
     // Are we already loaded?
-    if (!std::empty(pReplacementTextures->ownedTextures))
+    if (!pReplacementTextures->ownedTextures.empty())
         return false;
 
     // Try to load it
@@ -916,7 +949,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     bool cloneFailure = false;
     for (RwTexture* pSourceTexture : pReplacementTextures->textures)
     {
-        if (!pSourceTexture)
+        // Validate texture pointer before dereferencing its fields
+        if (!IsValidTexturePtr(pSourceTexture))
         {
             cloneFailure = true;
             break;
@@ -975,15 +1009,16 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     dassert(bHasValidTxd);
     for (RwTexture* pNewTexture : pPerTxdInfo->usingTextures)
     {
-        const std::string_view replacementName = GetTextureNameView(pNewTexture);
+        // All textures in usingTextures were validated during preparation phase
+        const std::string_view replacementName = GetTextureNameViewUnsafe(pNewTexture);
 
         RwTexture* pExistingTexture = LookupOriginalTexture(*pInfo, replacementName);
-        if (!pExistingTexture && bHasValidTxd && !std::empty(replacementName))
+        if (!pExistingTexture && bHasValidTxd && !replacementName.empty())
         {
             // Create null-terminated name for safe call
             TextureIndex::Name safeName;
             safeName.Assign(replacementName);
-            pExistingTexture = RwTexDictionaryFindNamedTexture(pInfo->pTxd, safeName.CStr());
+            pExistingTexture = SafeFindNamedTexture(pInfo->pTxd, safeName.CStr());
         }
 
         if (pExistingTexture && bHasValidTxd)
@@ -1024,7 +1059,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     pInfo->usedByReplacements.push_back(pReplacementTextures);
 
     ValidateUsageTracking(*pReplacementTextures);
-    return !std::empty(pPerTxdInfo->usingTextures);
+    return !pPerTxdInfo->usingTextures.empty();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -1040,7 +1075,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
     if (!pReplacementTextures)
         return;
 
-    std::scoped_lock guard(ms_ModelTexturesInfoMutex);
+    std::lock_guard<std::recursive_mutex> guard(ms_ModelTexturesInfoMutex);
     // For each using txd
     for (std::size_t i = 0; i < pReplacementTextures->perTxdList.size(); ++i)
     {
@@ -1103,7 +1138,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                     continue;
 
                 // Use the already-safe record.name instead of pOriginalTexture->name
-                if (!record.name.Empty() && !RwTexDictionaryFindNamedTexture(pTxd, record.name.CStr()))
+                if (!record.name.Empty() && !SafeFindNamedTexture(pTxd, record.name.CStr()))
                 {
                     RwTexture* const pAddedTexture = RwTexDictionaryAddTexture(pTxd, pOriginalTexture);
                     dassert(pAddedTexture == pOriginalTexture);
@@ -1115,7 +1150,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         {
             ListRemove(pInfo->usedByReplacements, pReplacementTextures);
 
-            if (std::empty(pInfo->usedByReplacements))
+            if (pInfo->usedByReplacements.empty())
             {
                 CTxdStore_RemoveRef(pInfo->usTxdId);
                 ms_ModelTexturesInfoMap.erase(usTxdId);
@@ -1149,11 +1184,11 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 /////////////////////////////////////////////////////////////
 void CRenderWareSA::ModelInfoTXDCleanupOrphanedEntries()
 {
-    std::scoped_lock lock(ms_ModelTexturesInfoMutex);
+    std::lock_guard<std::recursive_mutex> lock(ms_ModelTexturesInfoMutex);
 
     for (auto it = ms_ModelTexturesInfoMap.begin(); it != ms_ModelTexturesInfoMap.end();)
     {
-        if (std::empty(it->second.usedByReplacements))
+        if (it->second.usedByReplacements.empty())
         {
             CTxdStore_RemoveRef(it->first);
             it = ms_ModelTexturesInfoMap.erase(it);
