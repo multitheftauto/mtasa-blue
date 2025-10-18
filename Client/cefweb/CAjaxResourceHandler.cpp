@@ -18,6 +18,15 @@ CAjaxResourceHandler::CAjaxResourceHandler(std::vector<SString>& vecGet, std::ve
 {
 }
 
+CAjaxResourceHandler::~CAjaxResourceHandler()
+{
+    // Ensure callback is released if handler is destroyed before completion
+    if (m_callback)
+    {
+        m_callback = nullptr;
+    }
+}
+
 std::vector<SString>& CAjaxResourceHandler::GetGetData()
 {
     return m_vecGetData;
