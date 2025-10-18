@@ -60,6 +60,7 @@ public:
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
 
     static bool                                            EngineAddClothingModel(CClientDFF* pDff, std::string strModelName);
+    static bool                                            EngineSetClothingCacheTime(std::uint32_t timeInMs);
     static bool                                            EngineAddClothingTXD(CClientTXD* pTxd, std::string strModelName);
     static uint                                            EngineGetModelFlags(uint uiModelID);
     static bool                                            EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);
