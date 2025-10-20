@@ -1,28 +1,36 @@
 /*****************************************************************************
- *
- *  PROJECT:     Multi Theft Auto v1.0
- *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        multiplayer_sa/CMultiplayerSA_HookDestructors.cpp
- *  PORPOISE:
- *
- *  Multi Theft Auto is available from https://www.multitheftauto.com/
- *
- *****************************************************************************/
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        multiplayer_sa/CMultiplayerSA_HookDestructors.cpp
+*  PURPOSE:     Game destructor hooks and entity lifecycle tracking
+*
+*  Multi Theft Auto is available from https://www.multitheftauto.com/
+*
+*****************************************************************************/
 
 #include "StdInc.h"
 
+
 namespace
 {
+    // Handler pointers for game destructors
     CAnimBlendAssocDestructorHandler*  m_pCAnimBlendAssocDestructorHandler = nullptr;
-    GameObjectDestructHandler*         pGameObjectDestructHandler = NULL;
-    GameVehicleDestructHandler*        pGameVehicleDestructHandler = NULL;
-    GamePlayerDestructHandler*         pGamePlayerDestructHandler = NULL;
-    GameProjectileDestructHandler*     pGameProjectileDestructHandler = NULL;
-    GameModelRemoveHandler*            pGameModelRemoveHandler = NULL;
+    GameObjectDestructHandler*         pGameObjectDestructHandler = nullptr;
+    GameVehicleDestructHandler*        pGameVehicleDestructHandler = nullptr;
+    GamePlayerDestructHandler*         pGamePlayerDestructHandler = nullptr;
+    GameProjectileDestructHandler*     pGameProjectileDestructHandler = nullptr;
+    GameModelRemoveHandler*            pGameModelRemoveHandler = nullptr;
     GameRunNamedAnimDestructorHandler* pRunNamedAnimDestructorHandler = nullptr;
 
-    #define FUNC_CPtrListSingleLink_Remove  0x0533610
-    #define FUNC_CPtrListDoubleLink_Remove  0x05336B0
+    // Reentrancy protection for CStreamingRemoveModel
+    static volatile LONG g_lStreamingRemoveModelInProgress = 0;
+    static CRITICAL_SECTION g_csStreamingRemoveModel;
+    static volatile LONG g_lStreamingRemoveModelCriticalSectionInitialized = 0;
+
+    #define FUNC_CPtrListSingleLink_Remove      0x0533610
+    #define FUNC_CPtrListDoubleLink_Remove      0x05336B0
+    #define FUNC_CPhysical_RemoveFromMovingList 0x542860
 
     struct SStreamSectorEntrySingle
     {
@@ -46,14 +54,18 @@ namespace
 
     CFastHashMap<CEntitySAInterface*, SEntitySAInterfaceExtraInfo> ms_EntitySAInterfaceExtraInfoMap;
 
-    bool HasEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface) { return MapContains(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface); }
-
     SEntitySAInterfaceExtraInfo& GetEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface)
     {
+        if (!MapContains(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface))
+            ms_EntitySAInterfaceExtraInfoMap[pEntitySAInterface] = SEntitySAInterfaceExtraInfo();
+
         return MapGet(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface);
     }
 
-    void RemoveEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface) { MapRemove(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface); }
+    void RemoveEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface) 
+    { 
+        MapRemove(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface); 
+    }
 
     //
     // CPtrListSingleLink contains item
@@ -74,9 +86,11 @@ namespace
         DWORD dwFunc = FUNC_CPtrListSingleLink_Remove;
         __asm
         {
+            pushfd
             mov     ecx, ppStreamEntryList
             push    pCheckEntity
             call    dwFunc
+            popfd
         }
     }
 
@@ -99,44 +113,42 @@ namespace
         DWORD dwFunc = FUNC_CPtrListDoubleLink_Remove;
         __asm
         {
+            pushfd
             mov     ecx, ppStreamEntryList
             push    pCheckEntity
             call    dwFunc
+            popfd
         }
     }
 
     //
     // Ensure entity is removed from previously added stream sectors
     //
-    void RemoveEntityFromStreamSectors(CEntitySAInterface* pEntity, bool bRemoveExtraInfo)
+    void RemoveEntityFromStreamSectors(CEntitySAInterface* pEntity)
     {
         SEntitySAInterfaceExtraInfo* pInfo = MapFind(ms_EntitySAInterfaceExtraInfoMap, pEntity);
         if (!pInfo)
             return;
-        SEntitySAInterfaceExtraInfo& info = *pInfo;
 
-        // Check single link sectors
-        for (uint i = 0; i < info.AddedSectorSingleList.size(); i++)
+        // Remove from single link sectors
+        for (uint i = 0; i < pInfo->AddedSectorSingleList.size(); i++)
         {
-            if (CPtrListSingleLink_Contains(*info.AddedSectorSingleList[i], pEntity))
-            {
-                CPtrListSingleLink_Remove(info.AddedSectorSingleList[i], pEntity);
-            }
+            if (CPtrListSingleLink_Contains(*pInfo->AddedSectorSingleList[i], pEntity))
+                CPtrListSingleLink_Remove(pInfo->AddedSectorSingleList[i], pEntity);
         }
-        info.AddedSectorSingleList.clear();
+        pInfo->AddedSectorSingleList.clear();
 
-        // Check double link sectors
-        for (uint i = 0; i < info.AddedSectorDoubleList.size(); i++)
+        // Remove from double link sectors
+        for (uint i = 0; i < pInfo->AddedSectorDoubleList.size(); i++)
         {
-            if (CPtrListDoubleLink_Contains(*info.AddedSectorDoubleList[i], pEntity))
-            {
-                CPtrListDoubleLink_Remove(info.AddedSectorDoubleList[i], pEntity);
-            }
+            if (CPtrListDoubleLink_Contains(*pInfo->AddedSectorDoubleList[i], pEntity))
+                CPtrListDoubleLink_Remove(pInfo->AddedSectorDoubleList[i], pEntity);
         }
-        info.AddedSectorDoubleList.clear();
+        pInfo->AddedSectorDoubleList.clear();
 
-        if (bRemoveExtraInfo)
-            RemoveEntitySAInterfaceExtraInfo(pEntity);
+        // Remove map entry to prevent memory leak
+        // Entry will be auto-created if entity is re-added to sectors
+        RemoveEntitySAInterfaceExtraInfo(pEntity);
     }
 }            // namespace
 
@@ -158,14 +170,23 @@ static void __declspec(naked) HOOK_CAnimBlendAssoc_destructor()
 
     __asm
     {
-        push    ecx
-
-        push    ecx
+        // Cache this pointer from ECX before pushad
+        mov     eax, ecx
+        
+        // Preserve registers and flags
+        pushad
+        pushfd
+        
+        // Call handler (__cdecl convention)
+        push    eax
         call    CAnimBlendAssoc_destructor
-        add     esp, 0x4
+        add     esp, 4
+        
+        // Restore registers and flags
+        popfd
+        popad
 
-        pop     ecx
-
+        // Replay original prologue (6 bytes overwritten)
         push    esi
         mov     esi, ecx
         mov     eax, [esi + 10h]
@@ -175,38 +196,54 @@ static void __declspec(naked) HOOK_CAnimBlendAssoc_destructor()
 
 void _cdecl OnCObjectDestructor(DWORD calledFrom, CObjectSAInterface* pObject)
 {
-    // Tell client to check for things going away
+    if (!pObject)
+        return;
+
     if (pGameObjectDestructHandler)
         pGameObjectDestructHandler(pObject);
 }
 
 // Hook info
-#define HOOKPOS_CObjectDestructor        0x59F667
-#define HOOKSIZE_CObjectDestructor       6
-DWORD RETURN_CObjectDestructor = 0x59F66D;
+#define HOOKPOS_CObjectDestructor        0x59F660
+#define HOOKSIZE_CObjectDestructor       7
+DWORD RETURN_CObjectDestructor = 0x59F667;
 static void __declspec(naked) HOOK_CObjectDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     __asm
     {
+        // Cache parameters before pushad
+        mov     eax, ecx
+        mov     edx, [esp]
+        
+        // Preserve registers and flags
         pushad
-        push    ecx
-        push    [esp+32+4*1+4*2]
+        pushfd
+        
+        // Call handler (__cdecl convention)
+        push    eax
+        push    edx
         call    OnCObjectDestructor
         add     esp, 4*2
+        
+        // Restore registers and flags
+        popfd
         popad
 
-        mov     eax,dword ptr fs:[00000000h]
+        // Replay original prologue (7 bytes overwritten)
+        // SEH frame setup
+        push    0FFFFFFFFh
+        push    0x83D228
         jmp     RETURN_CObjectDestructor
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
 void _cdecl OnVehicleDestructor(DWORD calledFrom, CVehicleSAInterface* pVehicle)
 {
-    // Tell client to check for things going away
+    if (!pVehicle)
+        return;
+
     if (pGameVehicleDestructHandler)
         pGameVehicleDestructHandler(pVehicle);
 }
@@ -221,11 +258,18 @@ static void __declspec(naked) HOOK_CVehicleDestructor()
 
     __asm
     {
+        mov     eax, ecx
+        mov     edx, [esp]
+        
         pushad
-        push    ecx
-        push    [esp+32+4*1]
+        pushfd
+        
+        push    eax
+        push    edx
         call    OnVehicleDestructor
         add     esp, 4*2
+        
+        popfd
         popad
 
         push    0FFFFFFFFh
@@ -233,33 +277,41 @@ static void __declspec(naked) HOOK_CVehicleDestructor()
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
 void _cdecl OnCPlayerPedDestructor(DWORD calledFrom, CPedSAInterface* pPlayerPed)
 {
-    // Tell client to check for things going away
+    if (!pPlayerPed)
+        return;
+
     if (pGamePlayerDestructHandler)
         pGamePlayerDestructHandler(pPlayerPed);
 }
 
 // Hook info
-#define HOOKPOS_CPlayerPedDestructor        0x6093B7
-#define HOOKSIZE_CPlayerPedDestructor       6
-DWORD RETURN_CPlayerPedDestructor = 0x6093BD;
+#define HOOKPOS_CPlayerPedDestructor        0x6093B0
+#define HOOKSIZE_CPlayerPedDestructor       7
+DWORD RETURN_CPlayerPedDestructor = 0x6093B7;
 static void __declspec(naked) HOOK_CPlayerPedDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     __asm
     {
+        mov     eax, ecx
+        mov     edx, [esp]
+        
         pushad
-        push    ecx
-        push    [esp+32+4*1+4*2]
+        pushfd
+        
+        push    eax
+        push    edx
         call    OnCPlayerPedDestructor
         add     esp, 4*2
+        
+        popfd
         popad
 
-        mov     eax,dword ptr fs:[00000000h]
+        push    0FFFFFFFFh
+        push    0x83EC18
         jmp     RETURN_CPlayerPedDestructor
     }
 }
@@ -268,7 +320,9 @@ static void __declspec(naked) HOOK_CPlayerPedDestructor()
 //
 void _cdecl OnCProjectileDestructor(DWORD calledFrom, CEntitySAInterface* pProjectile)
 {
-    // Tell client to check for things going away
+    if (!pProjectile)
+        return;
+
     if (pGameProjectileDestructHandler)
         pGameProjectileDestructHandler(pProjectile);
 }
@@ -283,11 +337,18 @@ static void __declspec(naked) HOOK_CProjectileDestructor()
 
     __asm
     {
+        mov     eax, ecx
+        mov     edx, [esp]
+        
         pushad
-        push    ecx
-        push    [esp+32+4*1]
+        pushfd
+        
+        push    eax
+        push    edx
         call    OnCProjectileDestructor
         add     esp, 4*2
+        
+        popfd
         popad
 
         mov     dword ptr [ecx], 867030h
@@ -299,7 +360,9 @@ static void __declspec(naked) HOOK_CProjectileDestructor()
 //
 void _cdecl OnCPhysicalDestructor(DWORD calledFrom, CPhysicalSAInterface* pEntity)
 {
-    // This should be null
+    if (!pEntity)
+        return;
+
     if (pEntity->m_pMovingList)
     {
         AddReportLog(8640, SString("Removing CPhysical type %d from moving list", pEntity->nType));
@@ -313,23 +376,31 @@ void _cdecl OnCPhysicalDestructor(DWORD calledFrom, CPhysicalSAInterface* pEntit
 }
 
 // Hook info
-#define HOOKPOS_CPhysicalDestructor        0x0542457
-#define HOOKSIZE_CPhysicalDestructor       6
-DWORD RETURN_CPhysicalDestructor = 0x054245D;
+#define HOOKPOS_CPhysicalDestructor        0x542450
+#define HOOKSIZE_CPhysicalDestructor       7
+DWORD RETURN_CPhysicalDestructor = 0x542457;
 static void __declspec(naked) HOOK_CPhysicalDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     __asm
     {
+        mov     eax, ecx
+        mov     edx, [esp]
+        
         pushad
-        push    ecx
-        push    [esp+32+4*1+8]
+        pushfd
+        
+        push    eax
+        push    edx
         call    OnCPhysicalDestructor
         add     esp, 4*2
+        
+        popfd
         popad
 
-        mov     eax,dword ptr fs:[00000000h]
+        push    0FFFFFFFFh
+        push    0x83C996
         jmp     RETURN_CPhysicalDestructor
     }
 }
@@ -338,7 +409,10 @@ static void __declspec(naked) HOOK_CPhysicalDestructor()
 //
 void _cdecl OnCEntityDestructor(DWORD calledFrom, CEntitySAInterface* pEntity)
 {
-    RemoveEntityFromStreamSectors(pEntity, true);
+    if (!pEntity)
+        return;
+
+    RemoveEntityFromStreamSectors(pEntity);
 }
 
 // Hook info
@@ -351,11 +425,18 @@ static void __declspec(naked) HOOK_CEntityDestructor()
 
     __asm
     {
+        mov     eax, ecx
+        mov     edx, [esp]
+        
         pushad
-        push    ecx
-        push    [esp+32+4*1]
+        pushfd
+        
+        push    eax
+        push    edx
         call    OnCEntityDestructor
         add     esp, 4*2
+        
+        popfd
         popad
 
         mov     eax, dword ptr fs:[00000000h]
@@ -363,11 +444,11 @@ static void __declspec(naked) HOOK_CEntityDestructor()
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
 void cdecl OnCEntityAddMid1(SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pEntitySAInterface)
 {
-    // ARRAY_LodSectors
+    if (!ppStreamEntryList || !pEntitySAInterface)
+        return;
+
     SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo(pEntitySAInterface);
     info.AddedSectorSingleList.push_back(ppStreamEntryList);
 }
@@ -383,14 +464,21 @@ static void __declspec(naked) HOOK_CEntityAddMid1()
 
     __asm
     {
+        mov     eax, [esp+4]
+        mov     edx, ecx
+        
         pushad
-        push    [esp+32+4*0]
-        push    ecx
+        pushfd
+        
+        push    edx
+        push    eax
         call    OnCEntityAddMid1
         add     esp, 4*2
+        
+        popfd
         popad
 
-        mov     eax, 0x5335E0   // CPtrListSingleLink::Add
+        mov     eax, 0x5335E0
         call    eax
         jmp     RETURN_CEntityAddMid1
     }
@@ -400,7 +488,9 @@ static void __declspec(naked) HOOK_CEntityAddMid1()
 //
 void cdecl OnCEntityAddMid2(SStreamSectorEntrySingle** ppStreamEntryList, CEntitySAInterface* pEntitySAInterface)
 {
-    // ARRAY_BuildingSectors
+    if (!ppStreamEntryList || !pEntitySAInterface)
+        return;
+
     SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo(pEntitySAInterface);
     info.AddedSectorSingleList.push_back(ppStreamEntryList);
 }
@@ -416,14 +506,21 @@ static void __declspec(naked) HOOK_CEntityAddMid2()
 
     __asm
     {
+        mov     eax, [esp+4]
+        mov     edx, ecx
+        
         pushad
-        push    [esp+32+4*0]
-        push    ecx
+        pushfd
+        
+        push    edx
+        push    eax
         call    OnCEntityAddMid2
         add     esp, 4*2
+        
+        popfd
         popad
 
-        mov     eax, 0x5335E0   // CPtrListSingleLink::Add
+        mov     eax, 0x5335E0
         call    eax
         jmp     RETURN_CEntityAddMid2
     }
@@ -433,10 +530,9 @@ static void __declspec(naked) HOOK_CEntityAddMid2()
 //
 void cdecl OnCEntityAddMid3(SStreamSectorEntryDouble** ppStreamEntryList, CEntitySAInterface* pEntitySAInterface)
 {
-    // ARRAY_VehicleSectors
-    // ARRAY_PedSectors
-    // ARRAY_ObjectSectors
-    // ARRAY_DummySectors
+    if (!ppStreamEntryList || !pEntitySAInterface)
+        return;
+
     SEntitySAInterfaceExtraInfo& info = GetEntitySAInterfaceExtraInfo(pEntitySAInterface);
     info.AddedSectorDoubleList.push_back(ppStreamEntryList);
 }
@@ -452,14 +548,21 @@ static void __declspec(naked) HOOK_CEntityAddMid3()
 
     __asm
     {
+        mov     eax, [esp+4]
+        mov     edx, ecx
+        
         pushad
-        push    [esp+32+4*0]
-        push    ecx
+        pushfd
+        
+        push    edx
+        push    eax
         call    OnCEntityAddMid3
         add     esp, 4*2
+        
+        popfd
         popad
 
-        mov     eax, 0x533670   // CPtrListDoubleLink::Add
+        mov     eax, 0x533670
         call    eax
         jmp     RETURN_CEntityAddMid3
     }
@@ -469,7 +572,10 @@ static void __declspec(naked) HOOK_CEntityAddMid3()
 //
 void cdecl OnCEntityRemovePost(CEntitySAInterface* pEntity)
 {
-    RemoveEntityFromStreamSectors(pEntity, false);
+    if (!pEntity)
+        return;
+
+    RemoveEntityFromStreamSectors(pEntity);
 }
 
 // Hook info
@@ -483,19 +589,23 @@ static void __declspec(naked) HOOK_CEntityRemove()
 
     __asm
     {
-        push    [esp+4*1]
-        call inner
-        add     esp, 4*1
+        push    esi
+        mov     esi, ecx
+        mov     ecx, esi
+        call    inner
 
         pushad
-        push    [esp+32+4*1]
+        pushfd
+        push    esi
         call    OnCEntityRemovePost
         add     esp, 4*1
+        popfd
         popad
-        retn
+        
+        pop     esi
+        ret
 
 inner:
-        // Original code
         sub     esp, 30h
         push    ebx
         push    ebp
@@ -503,34 +613,63 @@ inner:
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
-void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, ushort usModelId)
+void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, int modelId)
 {
-    // Tell client to check for things going away
-    if (pGameModelRemoveHandler)
-        pGameModelRemoveHandler(usModelId);
+    if (InterlockedCompareExchange(&g_lStreamingRemoveModelInProgress, 1, 0) != 0)
+        return;
+
+    __try
+    {
+        if (g_lStreamingRemoveModelCriticalSectionInitialized)
+            EnterCriticalSection(&g_csStreamingRemoveModel);
+
+        if (pGameModelRemoveHandler)
+        {
+            __try
+            {
+                pGameModelRemoveHandler(static_cast<ushort>(modelId));
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+            }
+        }
+    }
+    __finally
+    {
+        if (g_lStreamingRemoveModelCriticalSectionInitialized)
+            LeaveCriticalSection(&g_csStreamingRemoveModel);
+        
+        InterlockedExchange(&g_lStreamingRemoveModelInProgress, 0);
+    }
 }
 
 // Hook info
 #define HOOKPOS_CStreamingRemoveModel        0x4089A0
-#define HOOKSIZE_CStreamingRemoveModel       5
-DWORD RETURN_CStreamingRemoveModel = 0x4089A5;
+#define HOOKSIZE_CStreamingRemoveModel       6
+DWORD RETURN_CStreamingRemoveModel = 0x4089A6;
 static void __declspec(naked) HOOK_CStreamingRemoveModel()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     __asm
     {
+        mov     eax, [esp+4]
+        mov     edx, [esp]
+        
         pushad
-        push    [esp+32+4*1]
-        push    [esp+32+4*1]
+        pushfd
+
+        push    eax
+        push    edx
         call    OnCStreamingRemoveModel
         add     esp, 4*2
+        
+        popfd
         popad
 
         push    esi
         mov     esi, [esp+8]
+        push    edi
         jmp     RETURN_CStreamingRemoveModel
     }
 }
@@ -539,6 +678,9 @@ static void __declspec(naked) HOOK_CStreamingRemoveModel()
 //
 void _cdecl OnCTaskSimpleRunNamedAnimDestructor(class CTaskSimpleRunNamedAnimSAInterface* pTask)
 {
+    if (!pTask)
+        return;
+
     if (pRunNamedAnimDestructorHandler)
         pRunNamedAnimDestructorHandler(pTask);
 }
@@ -553,17 +695,21 @@ static void __declspec(naked) HOOK_CTaskSimpleRunNamedAnimDestructor()
 
     __asm
     {
+        mov     eax, ecx
+        
         pushad
-        push    ecx
+        pushfd
+        
+        push    eax
         call    OnCTaskSimpleRunNamedAnimDestructor
-        add     esp, 4 * 1
+        add     esp, 4
+        
+        popfd
         popad
 
         push    esi
         mov     esi, ecx
 
-        // call the non-virtual destructor
-        // CTaskSimpleRunNamedAnim::~CTaskSimpleRunNamedAnim()
         mov     eax, 0x61BF10
         call    eax
         jmp     RETURN_CTaskSimpleRunNamedAnim
@@ -572,7 +718,7 @@ static void __declspec(naked) HOOK_CTaskSimpleRunNamedAnimDestructor()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// Set handlers
+// Handler setters
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler)
@@ -612,11 +758,16 @@ void CMultiplayerSA::SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestru
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// Setup hooks for HookDestructors
+// Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_HookDestructors()
 {
+    if (InterlockedCompareExchange(&g_lStreamingRemoveModelCriticalSectionInitialized, 1, 0) == 0)
+    {
+        InitializeCriticalSection(&g_csStreamingRemoveModel);
+    }
+
     HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
     EZHookInstall(CTaskSimpleRunNamedAnimDestructor);
     EZHookInstall(CObjectDestructor);
@@ -630,4 +781,27 @@ void CMultiplayerSA::InitHooks_HookDestructors()
     EZHookInstall(CEntityAddMid2);
     EZHookInstall(CEntityAddMid3);
     EZHookInstall(CEntityRemove);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Cleanup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::CleanupHooks_HookDestructors()
+{
+    m_pCAnimBlendAssocDestructorHandler = nullptr;
+    pGameObjectDestructHandler = nullptr;
+    pGameVehicleDestructHandler = nullptr;
+    pGamePlayerDestructHandler = nullptr;
+    pGameProjectileDestructHandler = nullptr;
+    pGameModelRemoveHandler = nullptr;
+    pRunNamedAnimDestructorHandler = nullptr;
+
+    if (InterlockedCompareExchange(&g_lStreamingRemoveModelCriticalSectionInitialized, 0, 1) == 1)
+    {
+        DeleteCriticalSection(&g_csStreamingRemoveModel);
+    }
+
+    ms_EntitySAInterfaceExtraInfoMap.clear();
 }
