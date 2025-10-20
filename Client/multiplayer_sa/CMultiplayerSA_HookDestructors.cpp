@@ -86,11 +86,11 @@ namespace
         DWORD dwFunc = FUNC_CPtrListSingleLink_Remove;
         __asm
         {
-            pushfd
+            pushfd                  // Preserve flags (including Direction Flag)
             mov     ecx, ppStreamEntryList
             push    pCheckEntity
             call    dwFunc
-            popfd
+            popfd                   // Restore flags
         }
     }
 
@@ -113,11 +113,11 @@ namespace
         DWORD dwFunc = FUNC_CPtrListDoubleLink_Remove;
         __asm
         {
-            pushfd
+            pushfd                  // Preserve flags (including Direction Flag)
             mov     ecx, ppStreamEntryList
             push    pCheckEntity
             call    dwFunc
-            popfd
+            popfd                   // Restore flags
         }
     }
 
@@ -589,23 +589,31 @@ static void __declspec(naked) HOOK_CEntityRemove()
 
     __asm
     {
+        // Save original ESI (callee-saved)
         push    esi
-        mov     esi, ecx
-        mov     ecx, esi
+        
+        // Get entity pointer from ECX (it's __thiscall!)
+        mov     esi, ecx            // Entity is in ECX, not on stack!
+        
+        // Inner function expects entity in ECX (not on stack!)
+        mov     ecx, esi            // Ensure ECX has entity
         call    inner
 
+        // Call post-removal handler
         pushad
         pushfd
-        push    esi
+        push    esi                 // Push cached entity
         call    OnCEntityRemovePost
         add     esp, 4*1
         popfd
         popad
         
+        // Restore original ESI
         pop     esi
-        ret
+        ret                         
 
 inner:
+        // Original code (expects entity in ECX)
         sub     esp, 30h
         push    ebx
         push    ebp
