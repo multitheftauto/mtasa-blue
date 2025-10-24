@@ -9,6 +9,7 @@
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #define SHARED_UTIL_WITH_SYS_INFO
 #include "SharedUtil.h"
+#include <SharedUtil.Memory.h>
 
 #include <sys/stat.h>
 #include <d3d9.h>

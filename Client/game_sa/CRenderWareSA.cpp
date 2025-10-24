@@ -825,11 +825,16 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     std::vector<RwTexture*> rwTextureList;
     GetTxdTextures(rwTextureList, pTXD);
 
-    // If any texture names specified in vTextureNames, we should only return these
-    bool bExcludeTextures = false;
+    // If texture list is empty after enumeration
+    if (rwTextureList.empty())
+    {
+        if (bLoadedModel)
+            ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+        return false;
+    }
 
-    if (vTextureNames.size() > 0)
-        bExcludeTextures = true;
+    // If any texture names specified in vTextureNames, we should only return these
+    const bool bExcludeTextures = !vTextureNames.empty();
 
     for (RwTexture* pTexture : rwTextureList)
     {
@@ -882,6 +887,9 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, usho
     if (!pTXD)
         return;
 
+    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
+        return;
+
     GetTxdTextures(outTextureList, pTXD);
 }
 
@@ -894,10 +902,44 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, usho
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD)
 {
-    if (pTXD)
+    if (!pTXD)
+        return;
+
+    // Validate TXD structure is readable (includes textures member)
+    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
+        return;
+
+    // Validate the linked list structure to prevent crash at 0x007F374A
+    // The crash occurs when next pointer is invalid and gets deref'd during iteration
+    RwListEntry* firstNode = pTXD->textures.root.next;
+    if (!SharedUtil::IsReadablePointer(firstNode, sizeof(RwListEntry)))
+        return;
+
+    // Check for empty list (next points back to root - valid case)
+    if (firstNode == &pTXD->textures.root)
+        return;  // Empty TXD is valid
+
+    // Validate the first texture node structure
+    // The texture pointer is at (node - offsetof(RwTexture, TXDList))
+    // which is (node - 8) since TXDList is at offset 8 in RwTexture
+    RwTexture* firstTexture = (RwTexture*)((char*)firstNode - 8);
+    if (!SharedUtil::IsReadablePointer(firstTexture, sizeof(RwTexture)))
+        return;
+
+    // Validate that first node's next pointer is also readable
+    // This catches most corruption cases where the list is broken
+    if (!SharedUtil::IsReadablePointer(firstNode->next, sizeof(RwListEntry)))
+        return;
+
+    constexpr std::size_t kMaxReasonableTextures = 8192;
+    if (outTextureList.size() >= kMaxReasonableTextures)
     {
-        RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
+        LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                 SString("Texture list already contains %zu textures (limit: %zu)", outTextureList.size(), kMaxReasonableTextures), 5422);
+        return;
     }
+
+    RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -905,10 +947,27 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTe
 // CRenderWareSA::StaticGetTextureCB
 //
 // Callback used in GetTxdTextures
+// Returns false to stop enumeration if limits are hit
 //
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList)
 {
+    // Fast null check before any heavy validation
+    if (!texture || !pTextureList)
+        return false;
+
+    // Prevent excessive allocations from corrupted TXDs
+    constexpr std::size_t kMaxReasonableTextures = 8192;
+    if (pTextureList->size() >= kMaxReasonableTextures)
+        return false;            // Stop enumeration
+
+    // Note: We don't validate readability here for performance reasons.
+    // The upfront validation in GetTxdTextures catches the first two nodes,
+    // and the SA function crashes before calling this callback if the
+    // linked list is corrupted mid-iteration. If we reach here with a bad
+    // pointer, we'll crash in push_back, but that's acceptable vs the cost
+    // of VirtualQuery on every texture in every TXD.
+    
     pTextureList->push_back(texture);
     return true;
 }

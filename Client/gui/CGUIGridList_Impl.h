@@ -80,6 +80,7 @@ public:
     void SetSelectedItem(int iRow, int hColumn, bool bReset);
 
     void SetSortColumnHandler(GUI_CALLBACK Callback);
+    void SetSelectionHandler(GUI_CALLBACK Callback);
 
     void      SetIgnoreTextSpacer(bool bIgnoreTextSpacer) { m_bIgnoreTextSpacer = bIgnoreTextSpacer; };
     eCGUIType GetType() { return CGUI_GRIDLIST; };
@@ -88,6 +89,7 @@ public:
 
 private:
     bool Event_OnSortColumn(const CEGUI::EventArgs& e);
+    bool Event_OnSelectionChanged(const CEGUI::EventArgs& e);
 
     int m_iIndex;
 
@@ -98,6 +100,7 @@ private:
     CFastHashMap<CEGUI::ListboxItem*, CGUIListItem_Impl*> m_Items;
 
     GUI_CALLBACK m_OnSortColumn;
+    GUI_CALLBACK m_OnSelectionChanged;
 
     bool m_bIgnoreTextSpacer;
 };

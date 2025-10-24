@@ -50,7 +50,23 @@ struct SReplacementTextures
             if (!texture)
                 return;
 
-            if (RwTextureDestroy)
+            // Fast validation: Check if pointer looks reasonable (not in low invalid range)
+            // This catches most corruption cases without expensive VirtualQuery
+            const uintptr_t addr = reinterpret_cast<uintptr_t>(texture);
+            constexpr uintptr_t kMinUserAddress = 0x10000;        // Below this is always invalid (null page protection)
+            
+            // Note: Upper bound check not needed on x86 with LARGEADDRESSAWARE, as MTA has (full 4GB accessible)
+            // On x86, uintptr_t cannot exceed 0xFFFFFFFF, so all pointers >= 0x10000 are potentially valid
+            if (addr < kMinUserAddress)
+                return;
+
+            // Only destroy if texture is orphaned (not owned by any TXD)
+            // If txd != nullptr, the TXD owns it and will destroy it
+            // Note: We access texture->txd without IsReadablePointer for performance.
+            // If the pointer is invalid, we'll crash here, but that's acceptable vs
+            // the cost of VirtualQuery on every texture destruction (1-2ms per 1000 textures).
+            // The address range check above catches most corruption cases.
+            if (texture->txd == nullptr && RwTextureDestroy)
             {
                 RwTextureDestroy(texture);
             }
@@ -69,13 +85,14 @@ struct SReplacementTextures
         bool                    bTexturesAreCopies = false;
     };
 
-    std::vector<RwTexture*> textures;              // List of textures we want to inject into TXD's
-    std::vector<SPerTxd>    perTxdList;            // TXD's which have been modified
-    std::vector<ushort>     usedInTxdIds;
+    std::vector<RwTexture*>   textures;            // Raw pointers to textures (for compatibility)
+    std::vector<SPerTxd>      perTxdList;          // TXD's which have been modified
+    std::vector<ushort>       usedInTxdIds;
     std::vector<ushort>     usedInModelIds;
     std::unordered_set<ushort> usedInTxdIdLookup;
     std::unordered_set<ushort> usedInModelIdLookup;
     std::unordered_map<ushort, std::size_t> perTxdIndexLookup;
+    std::vector<TextureOwner> ownedTextures;       // Owned textures with automatic lifetime management (MUST BE LAST for binary compatibility)
 };
 
 // Shader layers to render
@@ -109,6 +126,7 @@ public:
                                                       bool bFilteringEnabled) = 0;
     virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
+    virtual void             ModelInfoTXDCleanupOrphanedEntries() = 0;
     virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId) = 0;
     virtual void             ClothesRemoveReplacement(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;

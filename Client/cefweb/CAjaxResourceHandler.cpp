@@ -18,6 +18,15 @@ CAjaxResourceHandler::CAjaxResourceHandler(std::vector<SString>& vecGet, std::ve
 {
 }
 
+CAjaxResourceHandler::~CAjaxResourceHandler()
+{
+    // Ensure callback is released if handler is destroyed before completion
+    if (m_callback)
+    {
+        m_callback = nullptr;
+    }
+}
+
 std::vector<SString>& CAjaxResourceHandler::GetGetData()
 {
     return m_vecGetData;
@@ -34,12 +43,18 @@ void CAjaxResourceHandler::SetResponse(const SString& data)
     m_bHasData = true;
 
     if (m_callback)
+    {
         m_callback->Continue();
+        // Release callback to prevent memory leak
+        m_callback = nullptr;
+    }
 }
 
 // CefResourceHandler implementation
 void CAjaxResourceHandler::Cancel()
 {
+    // Release callback reference on cancellation to prevent memory leak
+    m_callback = nullptr;
 }
 
 void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl)
