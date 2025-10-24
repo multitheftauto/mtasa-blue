@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-24 01:59+0000\n"
-"PO-Revision-Date: 2025-10-24 20:41\n"
+"PO-Revision-Date: 2025-10-24 21:50\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -665,11 +665,13 @@ msgstr "Neću instalirati anti-virus.\n"
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
 "Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
 "Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
-msgstr ""
+msgstr "Ovaj pad koji ste iskusili je zbog zloupotrebe memorije od strane servera.\n\n"
+"Čak i sa dosta memorije, ovo je x86 igrica sa ograničenjima adresa do 3.6GB i neki jako loše optimizovani serveri sa dosta modova (ili samo par loše pisanih skripta) mogu prouzrokovati ovo, čak i usporiti vašu igru.\n\n"
+"Kontaktirajte vlasnika servera ili MTA podršku u zvaničnom MTA discord serveru (https://discord.gg/mtasa) za više informacija."
 
 #: Client/loader/Dialogs.cpp:673
 msgid "MTA: San Andreas - Out of Memory Information"
-msgstr ""
+msgstr "MTA: San Andreas - Informacije o nedostatku memorije"
 
 #: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -995,7 +997,7 @@ msgstr "Video"
 
 #: Client/core/CSettings.cpp:550
 msgid "PostFX"
-msgstr ""
+msgstr "PostFX"
 
 #: Client/core/CSettings.cpp:551
 msgid "Audio"
@@ -1427,23 +1429,23 @@ msgstr "Render pešaka uvek u visokim detaljima"
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1436
 msgid "Gamma:"
-msgstr ""
+msgstr "Gama:"
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1476
 msgid "Contrast:"
-msgstr ""
+msgstr "Kontrast:"
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1496
 msgid "Saturation:"
-msgstr ""
+msgstr "Zasićenost:"
 
 #: Client/core/CSettings.cpp:1512
 msgid "Apply adjustments in windowed mode"
-msgstr ""
+msgstr "Primeni promene u režimu prozora"
 
 #: Client/core/CSettings.cpp:1518
 msgid "Apply adjustments in fullscreen mode"
-msgstr ""
+msgstr "Primeni promene u režimu celog ekrana"
 
 #: Client/core/CSettings.cpp:1548
 msgid "Enable remote websites"
@@ -2479,7 +2481,7 @@ msgstr "(Lista rezervnih servera)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:351
 msgid "Cannot create LAN-broadcast socket"
-msgstr ""
+msgstr "Nije moguće napraviti LAN-emitovanje soket"
 
 #: Client/core/ServerBrowser/CServerList.cpp:361
 msgid "Cannot bind LAN-broadcast socket"
