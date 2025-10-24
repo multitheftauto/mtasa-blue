@@ -349,6 +349,8 @@ void                InitHooks();
 
     virtual void GetRwResourceStats(SRwResourceStats& outStats);
     virtual void GetClothesCacheStats(SClothesCacheStats& outStats);
+    virtual void ResetClothingCacheTime();
+    virtual bool SetClothingCacheTime(std::uint32_t timeInMs);
     virtual void SetIsMinimizedAndNotConnected(bool bIsMinimizedAndNotConnected);
     virtual void SetMirrorsEnabled(bool bEnabled);
 
