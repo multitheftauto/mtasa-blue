@@ -36,7 +36,7 @@ CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer(IDirect3DDevice9* InD3DDe
     m_fallbackOffset = 0;
     m_fallbackSize = 0;
     m_fallbackFlags = 0;
-    m_fallbackStorage.clear();
+    m_fallbackStorage.resize(std::max<size_t>(static_cast<size_t>(m_iMemUsed), static_cast<size_t>(1)));
 
     m_stats.iCurrentCount++;
     m_stats.iCurrentBytes += m_iMemUsed;
@@ -79,6 +79,7 @@ HRESULT CProxyDirect3DVertexBuffer::QueryInterface(REFIID riid, void** ppvObj)
     if (riid == CProxyDirect3DVertexBuffer_GUID)
     {
         *ppvObj = this;
+        AddRef();
         return S_OK;
     }
 
@@ -122,13 +123,25 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
 
     SharedUtil::CAutoCSLock fallbackGuard(m_fallbackCS);
 
+
     if (m_bFallbackActive)
     {
-        m_bFallbackActive = false;
-        m_fallbackOffset = 0;
-        m_fallbackSize = 0;
-        m_fallbackFlags = 0;
+        if (ppbData)
+            *ppbData = nullptr;
+
+        SString strMessage("Lock VertexBuffer: fallback still pending - refusing new lock (Offset:%x Size:%x Flags:%08x)", m_fallbackOffset, m_fallbackSize,
+                            m_fallbackFlags);
+        WriteDebugEvent(strMessage);
+        AddReportLog(8624, strMessage);
+        CCore::GetSingleton().LogEvent(624, "Lock VertexBuffer", "", strMessage);
+
+        return D3DERR_WASSTILLDRAWING;
     }
+
+    m_bFallbackActive = false;
+    m_fallbackOffset = 0;
+    m_fallbackSize = 0;
+    m_fallbackFlags = 0;
 
     *ppbData = nullptr;
     HRESULT hr = DoLock(OffsetToLock, SizeToLock, ppbData, Flags);

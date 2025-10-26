@@ -20,6 +20,10 @@ namespace mta::memory
     constexpr std::uint32_t NULL_PAGE_BOUNDARY = 0x10000;
     constexpr std::uint32_t MAX_ADDRESS_SPACE = 0xFFFFFFFF;
     constexpr std::uint32_t POINTER_SIZE = 4;
+    constexpr std::uint32_t POINTER_METADATA_OVERHEAD = POINTER_SIZE * 2;
+    constexpr std::uint32_t METADATA_MAGIC = 0x4D544100;            // 'MTA\0'
+    constexpr std::uint32_t METADATA_MAGIC_MASK = 0xFFFFFFFE;
+    constexpr std::uint32_t METADATA_FLAG_VIRTUALALLOC = 0x1;
 
     constexpr bool is_valid_alignment(std::size_t alignment) noexcept
     {
@@ -28,7 +32,7 @@ namespace mta::memory
 
     void* SafeMallocAlignVirtual(std::size_t size, std::size_t alignment) noexcept;
 
-    // Aligned malloc - stores pointer at result-4
+    // Aligned malloc - stores pointer at result-4 and metadata at result-8
     [[nodiscard]] void* SafeMallocAlign(std::size_t size, std::size_t alignment) noexcept
     {
         // Check alignment
@@ -56,18 +60,19 @@ namespace mta::memory
             const std::uint32_t align_u32 = static_cast<std::uint32_t>(alignment);
 
             // Prevent intermediate overflow
-            if (size_u32 > UINT32_MAX - align_u32)
+            if (align_u32 > UINT32_MAX - POINTER_METADATA_OVERHEAD)
             {
                 errno = ENOMEM;
                 return nullptr;
             }
-            // Now safe to add size_u32 + align_u32
-            if (size_u32 + align_u32 > UINT32_MAX - POINTER_SIZE)
+            const std::uint32_t alignment_overhead = align_u32 + POINTER_METADATA_OVERHEAD;
+
+            if (size_u32 > UINT32_MAX - alignment_overhead)
             {
                 errno = ENOMEM;
                 return nullptr;
             }
-            const std::uint32_t total_size = size_u32 + align_u32 + POINTER_SIZE;
+            const std::uint32_t total_size = size_u32 + alignment_overhead;
 
             void* raw_memory = malloc(total_size);
             if (!raw_memory)
@@ -78,16 +83,16 @@ namespace mta::memory
 
             const std::uint32_t raw_addr = reinterpret_cast<std::uint32_t>(raw_memory);
 
-            if (raw_addr > MAX_ADDRESS_SPACE - POINTER_SIZE - align_u32 + 1)
+            if (raw_addr > MAX_ADDRESS_SPACE - POINTER_METADATA_OVERHEAD - align_u32 + 1)
             {
                 free(raw_memory);
                 errno = ENOMEM;
                 return nullptr;
             }
 
-            const std::uint32_t aligned_addr = (raw_addr + POINTER_SIZE + align_u32 - 1) & ~(align_u32 - 1);
+            const std::uint32_t aligned_addr = (raw_addr + POINTER_METADATA_OVERHEAD + align_u32 - 1) & ~(align_u32 - 1);
 
-            if (aligned_addr < raw_addr + POINTER_SIZE || aligned_addr + size_u32 > raw_addr + total_size || aligned_addr + size_u32 < aligned_addr)
+            if (aligned_addr < raw_addr + POINTER_METADATA_OVERHEAD || aligned_addr + size_u32 > raw_addr + total_size || aligned_addr + size_u32 < aligned_addr)
             {
                 free(raw_memory);
                 errno = EINVAL;
@@ -98,8 +103,12 @@ namespace mta::memory
 
             // Validate store location
             void** store_location = reinterpret_cast<void**>(aligned_addr - POINTER_SIZE);
-            if (reinterpret_cast<std::uint32_t>(store_location) < raw_addr ||
-                reinterpret_cast<std::uint32_t>(store_location) > raw_addr + total_size - POINTER_SIZE)
+            std::uint32_t* metadata_location = reinterpret_cast<std::uint32_t*>(aligned_addr - POINTER_METADATA_OVERHEAD);
+            const std::uint32_t store_addr = reinterpret_cast<std::uint32_t>(store_location);
+            const std::uint32_t metadata_addr = reinterpret_cast<std::uint32_t>(metadata_location);
+
+            if (store_addr < raw_addr || store_addr > raw_addr + total_size - POINTER_SIZE ||
+                metadata_addr < raw_addr || metadata_addr > raw_addr + total_size - POINTER_SIZE)
             {
                 free(raw_memory);
                 errno = EFAULT;
@@ -107,6 +116,7 @@ namespace mta::memory
             }
 
             *store_location = raw_memory;
+            *metadata_location = METADATA_MAGIC;
 
             return result;
         }
@@ -127,18 +137,19 @@ namespace mta::memory
         const std::uint32_t align_u32 = static_cast<std::uint32_t>(alignment);
 
         // Prevent intermediate overflow
-        if (size_u32 > UINT32_MAX - align_u32)
+        if (align_u32 > UINT32_MAX - POINTER_METADATA_OVERHEAD)
         {
             errno = ENOMEM;
             return nullptr;
         }
-        // Now safe to add size_u32 + align_u32
-        if (size_u32 + align_u32 > UINT32_MAX - POINTER_SIZE)
+        const std::uint32_t alignment_overhead = align_u32 + POINTER_METADATA_OVERHEAD;
+
+        if (size_u32 > UINT32_MAX - alignment_overhead)
         {
             errno = ENOMEM;
             return nullptr;
         }
-        const std::uint32_t total_size = size_u32 + align_u32 + POINTER_SIZE;
+        const std::uint32_t total_size = size_u32 + alignment_overhead;
 
         void* raw_memory = malloc(total_size);
         if (!raw_memory)
@@ -149,16 +160,16 @@ namespace mta::memory
 
         const std::uint32_t raw_addr = reinterpret_cast<std::uint32_t>(raw_memory);
 
-        if (raw_addr > MAX_ADDRESS_SPACE - POINTER_SIZE - align_u32 + 1)
+        if (raw_addr > MAX_ADDRESS_SPACE - POINTER_METADATA_OVERHEAD - align_u32 + 1)
         {
             free(raw_memory);
             errno = ENOMEM;
             return nullptr;
         }
 
-        const std::uint32_t aligned_addr = (raw_addr + POINTER_SIZE + align_u32 - 1) & ~(align_u32 - 1);
+        const std::uint32_t aligned_addr = (raw_addr + POINTER_METADATA_OVERHEAD + align_u32 - 1) & ~(align_u32 - 1);
 
-        if (aligned_addr < raw_addr + POINTER_SIZE || aligned_addr + size_u32 > raw_addr + total_size || aligned_addr + size_u32 < aligned_addr)
+        if (aligned_addr < raw_addr + POINTER_METADATA_OVERHEAD || aligned_addr + size_u32 > raw_addr + total_size || aligned_addr + size_u32 < aligned_addr)
         {
             free(raw_memory);
             errno = EINVAL;
@@ -168,8 +179,12 @@ namespace mta::memory
         void* result = reinterpret_cast<void*>(aligned_addr);
 
         void** store_location = reinterpret_cast<void**>(aligned_addr - POINTER_SIZE);
-        if (reinterpret_cast<std::uint32_t>(store_location) < raw_addr ||
-            reinterpret_cast<std::uint32_t>(store_location) > raw_addr + total_size - POINTER_SIZE)
+        std::uint32_t* metadata_location = reinterpret_cast<std::uint32_t*>(aligned_addr - POINTER_METADATA_OVERHEAD);
+        const std::uint32_t store_addr = reinterpret_cast<std::uint32_t>(store_location);
+        const std::uint32_t metadata_addr = reinterpret_cast<std::uint32_t>(metadata_location);
+
+        if (store_addr < raw_addr || store_addr > raw_addr + total_size - POINTER_SIZE ||
+            metadata_addr < raw_addr || metadata_addr > raw_addr + total_size - POINTER_SIZE)
         {
             free(raw_memory);
             errno = EFAULT;
@@ -177,6 +192,7 @@ namespace mta::memory
         }
 
         *store_location = raw_memory;
+        *metadata_location = METADATA_MAGIC;
 
         return result;
     }
@@ -206,23 +222,25 @@ namespace mta::memory
         const std::uint32_t align_u32 = static_cast<std::uint32_t>(alignment);
         const std::uint32_t padding = (align_u32 <= 64) ? 32 : VIRTUALALLOC_PADDING;
 
-        if (align_u32 > UINT32_MAX - POINTER_SIZE)
+        if (align_u32 > UINT32_MAX - POINTER_METADATA_OVERHEAD)
         {
             errno = ENOMEM;
             return nullptr;
         }
-        if (align_u32 + POINTER_SIZE > UINT32_MAX - padding)
+        const std::uint32_t alignment_overhead = align_u32 + POINTER_METADATA_OVERHEAD;
+
+        if (alignment_overhead > UINT32_MAX - padding)
         {
             errno = ENOMEM;
             return nullptr;
         }
-        if (size_u32 > UINT32_MAX - align_u32 - POINTER_SIZE - padding)
+        if (size_u32 > UINT32_MAX - alignment_overhead - padding)
         {
             errno = ENOMEM;
             return nullptr;
         }
 
-        const DWORD total_size = size_u32 + align_u32 + POINTER_SIZE + padding;
+        const DWORD total_size = size_u32 + alignment_overhead + padding;
 
         void* raw_ptr = VirtualAlloc(nullptr, static_cast<SIZE_T>(total_size), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (!raw_ptr)
@@ -233,7 +251,7 @@ namespace mta::memory
 
         const std::uint32_t raw_addr = reinterpret_cast<std::uint32_t>(raw_ptr);
 
-        if (raw_addr > MAX_ADDRESS_SPACE - POINTER_SIZE - align_u32 + 1)
+        if (raw_addr > MAX_ADDRESS_SPACE - POINTER_METADATA_OVERHEAD - align_u32 + 1)
         {
             BOOL vfree_result = VirtualFree(raw_ptr, 0, MEM_RELEASE);
             (void)vfree_result;
@@ -241,9 +259,9 @@ namespace mta::memory
             return nullptr;
         }
 
-        const std::uint32_t aligned_addr = (raw_addr + POINTER_SIZE + align_u32 - 1) & ~(align_u32 - 1);
+        const std::uint32_t aligned_addr = (raw_addr + POINTER_METADATA_OVERHEAD + align_u32 - 1) & ~(align_u32 - 1);
 
-        if (aligned_addr < raw_addr + POINTER_SIZE || aligned_addr + size_u32 > raw_addr + total_size || aligned_addr + size_u32 < aligned_addr)
+        if (aligned_addr < raw_addr + POINTER_METADATA_OVERHEAD || aligned_addr + size_u32 > raw_addr + total_size || aligned_addr + size_u32 < aligned_addr)
         {
             BOOL vfree_result = VirtualFree(raw_ptr, 0, MEM_RELEASE);
             (void)vfree_result;
@@ -255,8 +273,12 @@ namespace mta::memory
 
         // Validate store location
         void** store_location = reinterpret_cast<void**>(aligned_addr - POINTER_SIZE);
-        if (reinterpret_cast<std::uint32_t>(store_location) < raw_addr ||
-            reinterpret_cast<std::uint32_t>(store_location) > raw_addr + total_size - POINTER_SIZE)
+        std::uint32_t* metadata_location = reinterpret_cast<std::uint32_t*>(aligned_addr - POINTER_METADATA_OVERHEAD);
+        const std::uint32_t store_addr = reinterpret_cast<std::uint32_t>(store_location);
+        const std::uint32_t metadata_addr = reinterpret_cast<std::uint32_t>(metadata_location);
+
+        if (store_addr < raw_addr || store_addr > raw_addr + total_size - POINTER_SIZE ||
+            metadata_addr < raw_addr || metadata_addr > raw_addr + total_size - POINTER_SIZE)
         {
             BOOL vfree_result = VirtualFree(raw_ptr, 0, MEM_RELEASE);
             (void)vfree_result;
@@ -265,6 +287,7 @@ namespace mta::memory
         }
 
         *store_location = raw_ptr;
+        *metadata_location = METADATA_MAGIC | METADATA_FLAG_VIRTUALALLOC;
 
         return result;
     }
@@ -282,7 +305,13 @@ namespace mta::memory
             return;
         }
 
+        if (ptr_addr < POINTER_METADATA_OVERHEAD)
+        {
+            return;
+        }
+
         void** read_location = reinterpret_cast<void**>(ptr_addr - POINTER_SIZE);
+        std::uint32_t* metadata_location = reinterpret_cast<std::uint32_t*>(ptr_addr - POINTER_METADATA_OVERHEAD);
 
         // Validate memory readable
         MEMORY_BASIC_INFORMATION mbi_read;
@@ -293,7 +322,35 @@ namespace mta::memory
             return;
         }
 
+        const std::uint32_t metadata_addr = reinterpret_cast<std::uint32_t>(metadata_location);
+        const std::uint32_t base_addr = reinterpret_cast<std::uint32_t>(mbi_read.BaseAddress);
+
+        if (mbi_read.RegionSize == 0 || mbi_read.RegionSize > static_cast<SIZE_T>(MAX_ADDRESS_SPACE))
+        {
+            return;
+        }
+
+        const std::uint32_t region_size_u32 = static_cast<std::uint32_t>(mbi_read.RegionSize);
+
+        if (base_addr > MAX_ADDRESS_SPACE - region_size_u32)
+        {
+            return;
+        }
+
+        const std::uint32_t region_end = base_addr + region_size_u32;
+
+        if (region_size_u32 < POINTER_SIZE || metadata_addr < base_addr || metadata_addr > region_end - POINTER_SIZE)
+        {
+            return;
+        }
+
         void* original_ptr = *read_location;
+        const std::uint32_t metadata = *metadata_location;
+
+        if ((metadata & METADATA_MAGIC_MASK) != METADATA_MAGIC)
+        {
+            return;
+        }
 
         if (!original_ptr)
         {
@@ -308,12 +365,12 @@ namespace mta::memory
         }
 
         const std::uint32_t distance = ptr_addr - original_addr;
-        if (distance > MAX_ALIGNMENT + POINTER_SIZE)
+        if (distance > MAX_ALIGNMENT + POINTER_METADATA_OVERHEAD)
         {
             return;            // Beyond maximum possible alignment
         }
 
-        if (ptr_addr < POINTER_SIZE || original_addr > ptr_addr - POINTER_SIZE)
+        if (original_addr > ptr_addr - POINTER_SIZE)
         {
             return;            // Violates our storage pattern
         }
@@ -323,31 +380,13 @@ namespace mta::memory
             return;
         }
 
-        MEMORY_BASIC_INFORMATION mbi;
-        SIZE_T                   mbi_result = VirtualQuery(original_ptr, &mbi, sizeof(mbi));
-
-        if (mbi_result == sizeof(mbi))
+        if ((metadata & METADATA_FLAG_VIRTUALALLOC) != 0)
         {
-            const std::uint32_t base_addr = reinterpret_cast<std::uint32_t>(mbi.AllocationBase);
-
-            // Validate region size
-            if (mbi.RegionSize > 0 && mbi.RegionSize <= static_cast<SIZE_T>(MAX_ADDRESS_SPACE) &&
-                base_addr <= MAX_ADDRESS_SPACE - static_cast<std::uint32_t>(mbi.RegionSize))
-            {
-                const std::uint32_t region_size_u32 = static_cast<std::uint32_t>(mbi.RegionSize);
-                const std::uint32_t region_end = base_addr + region_size_u32;
-
-                // Use VirtualFree if matches
-                if (mbi.Type == MEM_PRIVATE && mbi.State == MEM_COMMIT && original_addr >= base_addr && original_addr < region_end)
-                {
-                    BOOL vfree_result = VirtualFree(mbi.AllocationBase, 0, MEM_RELEASE);
-                    (void)vfree_result;
-                    return;
-                }
-            }
+            BOOL vfree_result = VirtualFree(original_ptr, 0, MEM_RELEASE);
+            (void)vfree_result;
+            return;
         }
 
-        // Use free for malloc
         free(original_ptr);
     }
 }            // namespace mta::memory

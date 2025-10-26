@@ -19,12 +19,14 @@
 
 CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool bFrame)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Initialize
     m_hUniqueHandle = 0;
     m_iIndex = 0;
     m_bIgnoreTextSpacer = false;
+    m_OnSortColumn = NULL;
+    m_OnSelectionChanged = NULL;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique[CGUI_CHAR_SIZE];
@@ -49,6 +51,7 @@ CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool
 
     // Register our events
     m_pWindow->subscribeEvent(CEGUI::MultiColumnList::EventSortColumnChanged, CEGUI::Event::Subscriber(&CGUIGridList_Impl::Event_OnSortColumn, this));
+    m_pWindow->subscribeEvent(CEGUI::MultiColumnList::EventSelectionChanged, CEGUI::Event::Subscriber(&CGUIGridList_Impl::Event_OnSelectionChanged, this));
     AddEvents();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
@@ -787,10 +790,22 @@ void CGUIGridList_Impl::SetSortColumnHandler(GUI_CALLBACK Callback)
     m_OnSortColumn = Callback;
 }
 
+void CGUIGridList_Impl::SetSelectionHandler(GUI_CALLBACK Callback)
+{
+    m_OnSelectionChanged = Callback;
+}
+
 bool CGUIGridList_Impl::Event_OnSortColumn(const CEGUI::EventArgs& e)
 {
     if (m_OnSortColumn)
         m_OnSortColumn(reinterpret_cast<CGUIElement*>(this));
+    return true;
+}
+
+bool CGUIGridList_Impl::Event_OnSelectionChanged(const CEGUI::EventArgs& e)
+{
+    if (m_OnSelectionChanged)
+        m_OnSelectionChanged(reinterpret_cast<CGUIElement*>(this));
     return true;
 }
 

@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CAdditionalVertexStreamManager.h"
 #include <limits>
+#include <mutex>
 
 CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::ms_Singleton = nullptr;
 
@@ -75,6 +76,8 @@ namespace
         STriKey key = {a, b, c};
         return key;
     }
+
+    std::mutex g_singletonMutex;
 }            // namespace
 
 ///////////////////////////////////////////////////////////////
@@ -119,23 +122,26 @@ CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager()
 ///////////////////////////////////////////////////////////////
 CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton()
 {
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
     if (!ms_Singleton)
         ms_Singleton = new CAdditionalVertexStreamManager();
     return ms_Singleton;
 }
 
-CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetExistingSingleton() noexcept
+CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetExistingSingleton()
 {
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
     return ms_Singleton;
 }
 
 void CAdditionalVertexStreamManager::DestroySingleton()
 {
-    if (ms_Singleton)
-    {
-        delete ms_Singleton;
-        ms_Singleton = nullptr;
-    }
+    std::lock_guard<std::mutex> guard(g_singletonMutex);
+    if (!ms_Singleton)
+        return;
+
+    delete ms_Singleton;
+    ms_Singleton = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -259,7 +265,14 @@ bool CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo
     if (FAILED(m_pDevice->GetVertexDeclaration(&pPreviousDecl)))
         return false;
 
-    if (FAILED(g_pProxyDevice->SetVertexDeclaration(pAdditionalInfo->pVertexDeclaration)))
+    CScopedActiveProxyDevice proxyDevice;
+    if (!proxyDevice)
+    {
+        SAFE_RELEASE(pPreviousDecl);
+        return false;
+    }
+
+    if (FAILED(proxyDevice->SetVertexDeclaration(pAdditionalInfo->pVertexDeclaration)))
     {
         SAFE_RELEASE(pPreviousDecl);
         return false;
@@ -268,7 +281,7 @@ bool CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo
     uint OffsetInBytes = ConvertPTOffset(state.stream1.OffsetInBytes);
     if (FAILED(m_pDevice->SetStreamSource(2, pAdditionalInfo->pStreamData, OffsetInBytes, pAdditionalInfo->Stride)))
     {
-        g_pProxyDevice->SetVertexDeclaration(pPreviousDecl);
+        proxyDevice->SetVertexDeclaration(pPreviousDecl);
         SAFE_RELEASE(pPreviousDecl);
         return false;
     }
@@ -298,7 +311,9 @@ void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream()
         if (bDeviceOperational)
         {
             // Set prev declaration
-            g_pProxyDevice->SetVertexDeclaration(m_pOldVertexDeclaration);
+            CScopedActiveProxyDevice proxyDevice;
+            if (proxyDevice)
+                proxyDevice->SetVertexDeclaration(m_pOldVertexDeclaration);
 
             // Unset additional stream
             m_pDevice->SetStreamSource(2, nullptr, 0, 0);
