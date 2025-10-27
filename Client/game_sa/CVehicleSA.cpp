@@ -1360,11 +1360,8 @@ void CVehicleSA::SetHandlingData(CHandlingEntry* pHandling)
     // Store the handling and recalculate it
     m_pHandlingData = static_cast<CHandlingEntrySA*>(pHandling);
     pVehicleInterface->pHandlingData = m_pHandlingData->GetInterface();
-    
-    // Only recalculate if collision model is loaded (needed for suspension lines)
-    CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    if (pModelInfo && pModelInfo->GetInterface()->pColModel && pModelInfo->GetInterface()->pColModel->m_data)
-        RecalculateHandling();
+
+    RecalculateHandling();
 }
 
 void CVehicleSA::SetFlyingHandlingData(CFlyingHandlingEntry* pFlyingHandling)
@@ -1385,16 +1382,18 @@ void CVehicleSA::RecalculateHandling()
     if (!pInt)
         return;
 
-    // Ensure collision model is loaded before recalculating (needed for suspension lines)
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    if (!pModelInfo || !pModelInfo->GetInterface()->pColModel || !pModelInfo->GetInterface()->pColModel->m_data)
-        return;
+    auto* pModelInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+    auto* pColModelInterface = pModelInterface ? pModelInterface->pColModel : nullptr;
+    bool  bSuspensionDataReady = pColModelInterface && pColModelInterface->m_data;
+    bool  bHasSuspension = pModelInfo &&
+                      (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() || pModelInfo->IsTrailer() || pModelInfo->IsBike());
 
     m_pHandlingData->Recalculate();
 
     // Recalculate the suspension lines (only for vehicles that have suspension)
-    // Already validated that pColModel and m_data exist above
-    if (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() || pModelInfo->IsTrailer() || pModelInfo->IsBike())
+    // Skip until collision data streams in to avoid accessing null suspension lines
+    if (bSuspensionDataReady && bHasSuspension)
         RecalculateSuspensionLines();
 
     // Put it in our interface
@@ -1846,13 +1845,30 @@ void CVehicleSA::RecalculateSuspensionLines()
             return;
 
         // Ensure collision model is loaded before setting up suspension
-        if (!pModelInfo->GetInterface()->pColModel || !pModelInfo->GetInterface()->pColModel->m_data)
+        auto* pColModelInterface = pModelInfo->GetInterface()->pColModel;
+        if (!pColModelInterface || !pColModelInterface->m_data)
             return;
 
-        // Note: We skip calling SetupSuspensionLines() because it's GTA SA's native code that can
-        // access pColModel->m_data without validation. If collision model is unloaded during execution
-        // (race condition), it causes crashes. CopyGlobalSuspensionLinesToPrivate() is safer as it
-        // validates collision model before accessing.
+        struct ScopedModelRef
+        {
+            explicit ScopedModelRef(CModelInfo* model)
+                : m_Model(model)
+            {
+                if (m_Model)
+                    m_Model->ModelAddRef(EModelRequestType::BLOCKING, "CVehicleSA::RecalculateSuspensionLines");
+            }
+
+            ~ScopedModelRef()
+            {
+                if (m_Model)
+                    m_Model->RemoveRef();
+            }
+
+            CModelInfo* m_Model;
+        } modelRef(pModelInfo);
+
+        GetVehicleInterface()->SetupSuspensionLines();
+
         CopyGlobalSuspensionLinesToPrivate();
     }
 }
