@@ -41,6 +41,15 @@ static_assert(DEBUG_BUFFER_SIZE > 1, "DEBUG_BUFFER_SIZE must allow for null term
 constexpr DWORD CPP_EXCEPTION_CODE = 0xE06D7363;
 constexpr DWORD STATUS_INVALID_CRUNTIME_PARAMETER_CODE = 0xC0000417;
 constexpr DWORD STATUS_STACK_BUFFER_OVERRUN_CODE = 0xC0000409;
+// STATUS_FATAL_USER_CALLBACK_EXCEPTION (0xC000041D):
+// This exception type occurs when an exception happens inside a Windows system callback
+// (e.g., window procedures, DLL callbacks, kernel-to-user transitions) and cannot be
+// properly unwound. Special handling is required as:
+// - The stack may be corrupted or incomplete
+// - Context may not have full information
+// - Stack walking may fail or cause secondary exceptions
+// - Module resolution may point to trampolines instead of actual code
+constexpr DWORD STATUS_FATAL_USER_CALLBACK_EXCEPTION = 0xC000041D;
 constexpr DWORD CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT = 0xE0000001;
 
 constexpr DWORD INIT_PHASE_MINIMAL = 0;
