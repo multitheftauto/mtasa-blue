@@ -93,6 +93,7 @@ using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std:
         case EXCEPTION_NONCONTINUABLE_EXCEPTION:
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
         case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
+        case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
         case CPP_EXCEPTION_CODE:
         case CUSTOM_EXCEPTION_CODE_OOM:
         case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
@@ -216,6 +217,8 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
             return "Stack Buffer Overrun (Security Check)";
         case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
             return "Invalid C Runtime Parameter";
+        case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
+            return "Fatal Exception in Windows Callback";
         case CUSTOM_EXCEPTION_CODE_OOM:
             return "Out of Memory - Allocation Failure";
         case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
@@ -375,14 +378,25 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
         }
 
         std::vector<std::string> stackTraceVec;
-        if (CaptureUnifiedStackTrace(pException, 32, &stackTraceVec))
+        // For callback exceptions (0xC000041D), stack walking may fail due to corrupted frames
+        // Wrap in additional protection and accept partial traces
+        bool isCallbackException = (info.exceptionCode == 0xC000041D);
+        if (CaptureUnifiedStackTrace(pException, isCallbackException ? 16 : 32, &stackTraceVec))
         {
             info.stackTrace = stackTraceVec;
             info.hasDetailedStackTrace = !stackTraceVec.empty();
+            if (isCallbackException && stackTraceVec.empty())
+            {
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Callback exception: stack trace empty (expected)\n");
+            }
         }
         else
         {
             info.hasDetailedStackTrace = false;
+            if (isCallbackException)
+            {
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Callback exception: stack capture failed (expected)\n");
+            }
         }
 
         info.uncaughtExceptionCount = std::uncaught_exceptions();
@@ -569,6 +583,9 @@ static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTER
             break;
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
             exceptionType = "Stack Buffer Overrun";
+            break;
+        case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
+            exceptionType = "Fatal User Callback Exception";
             break;
     }
 
@@ -1049,13 +1066,88 @@ static void InstallAbortHandlers() noexcept
     return TRUE;
 }
 
+// Helper to perform protected stack walk for callback exceptions
+static BOOL ProtectedStackWalk64(DWORD machineType, HANDLE hProcess, HANDLE hThread, STACKFRAME64* frame, CONTEXT* context) noexcept
+{
+    __try
+    {
+        return StackWalk64(machineType, hProcess, hThread, frame, context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
+// Helper to safely call SymFromAddr using only SEH
+static bool SafeSymFromAddr(HANDLE hProcess, DWORD64 address, PSYMBOL_INFO pSymbol, bool isCallback) noexcept
+{
+    bool result = false;
+    __try
+    {
+        if (SymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE && pSymbol->Name != nullptr)
+        {
+            result = true;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        if (isCallback)
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - SymFromAddr faulted\n");
+        }
+    }
+    return result;
+}
+
+// Helper to safely call SymGetLineFromAddr64 using only SEH
+static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pDisplacement, IMAGEHLP_LINE64* pLineInfo, bool isCallback) noexcept
+{
+    bool result = false;
+    __try
+    {
+        if (SymGetLineFromAddr64(hProcess, address, pDisplacement, pLineInfo) != FALSE)
+        {
+            result = true;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        if (isCallback)
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - SymGetLineFromAddr64 faulted\n");
+        }
+    }
+    return result;
+}
+
 [[nodiscard]] BOOL __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames, std::vector<std::string>* pOutTrace) noexcept
 {
-    if (pException == nullptr || pException->ContextRecord == nullptr)
+    if (pException == nullptr || pOutTrace == nullptr)
         return FALSE;
 
-    if (pOutTrace == nullptr)
+    // Check if this is a callback exception - these have special handling requirements
+    const bool isCallbackException = (pException->ExceptionRecord != nullptr && 
+                                      pException->ExceptionRecord->ExceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION);
+    
+    // Handle null ContextRecord - can occur with callbacks and other severe exceptions
+    if (pException->ContextRecord == nullptr)
+    {
+        if (isCallbackException)
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Callback exception has null context, cannot walk stack\n");
+        }
+        else
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Null context record, cannot walk stack\n");
+        }
         return FALSE;
+    }
+    
+    if (isCallbackException)
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Callback exception: using defensive stack capture\n");
+    }
 
     pOutTrace->clear();
 
@@ -1083,6 +1175,17 @@ static void InstallAbortHandlers() noexcept
 
     CONTEXT      context = *pException->ContextRecord;
     STACKFRAME64 frame{};
+
+    // Verify CONTEXT_CONTROL is present before using Eip/Ebp/Esp for stack walking
+    const bool hasControlContext = (context.ContextFlags & CONTEXT_CONTROL) != 0;
+    if (!hasControlContext)
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+            "CaptureUnifiedStackTrace - Incomplete context (flags=0x%08X), cannot walk stack%s\n",
+            context.ContextFlags,
+            isCallbackException ? " (callback exception)" : "");
+        return FALSE;
+    }
 
     // For EIP=0 crashes, start stack walk from return address at [ESP]
     constexpr auto kNullAddress = uintptr_t{0};
@@ -1169,8 +1272,25 @@ static void InstallAbortHandlers() noexcept
     for (DWORD frameIndex = 0; frameIndex < actualMaxFrames; ++frameIndex)
     {
         constexpr auto machineType = IMAGE_FILE_MACHINE_I386;
-        if (const BOOL bWalked = StackWalk64(machineType, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
-            bWalked == FALSE)
+        BOOL bWalked = FALSE;
+        
+        // Use protected stack walking for callback exceptions and reduce depth for better reliability
+        // Other exceptions can use standard walking with more frames
+        if (isCallbackException)
+        {
+            bWalked = ProtectedStackWalk64(machineType, hProcess, hThread, &frame, &context);
+            if (bWalked == FALSE)
+            {
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Exception during protected stack walk at frame %lu\n", frameIndex);
+                break;
+            }
+        }
+        else
+        {
+            bWalked = StackWalk64(machineType, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
+        }
+        
+        if (bWalked == FALSE)
             break;
 
         if (frame.AddrPC.Offset == 0)
@@ -1179,7 +1299,10 @@ static void InstallAbortHandlers() noexcept
         const DWORD64 address = frame.AddrPC.Offset;
 
         auto symbolName = "0x"s + std::to_string(address);
-        if (const BOOL symResult = SymFromAddr(hProcess, address, nullptr, pSymbol); symResult != FALSE && pSymbol->Name != nullptr)
+        
+        // Protect DbgHelp symbol lookups with SEH - addresses may be invalid/in guard pages
+        // Especially important for corrupted stacks (callbacks, overflows, heap corruption)
+        if (SafeSymFromAddr(hProcess, address, pSymbol, isCallbackException))
         {
             symbolName = pSymbol->Name;
         }
@@ -1189,7 +1312,9 @@ static void InstallAbortHandlers() noexcept
         DWORD lineDisplacement = 0;
 
         std::string frameInfo = symbolName;
-        if (const BOOL lineResult = SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo); lineResult != FALSE)
+        
+        // Protect line info lookup as well
+        if (SafeSymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo, isCallbackException))
         {
             if (lineInfo.FileName != nullptr)
             {
@@ -1625,6 +1750,11 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     if (STATUS_INVALID_CRUNTIME_PARAMETER_CODE == dwExceptionCode || STATUS_STACK_BUFFER_OVERRUN_CODE == dwExceptionCode)
     {
         SafeDebugOutput("SEH: FATAL - STACK BUFFER OVERRUN (STATUS_STACK_BUFFER_OVERRUN)\n");
+    }
+    else if (STATUS_FATAL_USER_CALLBACK_EXCEPTION == dwExceptionCode)
+    {
+        SafeDebugOutput("SEH: FATAL - Exception in Windows callback - attempting recovery\n");
+        SafeDebugOutput("SEH: Note - Stack may be corrupted, context may be incomplete\n");
     }
     else if (EXCEPTION_STACK_OVERFLOW == dwExceptionCode)
     {
