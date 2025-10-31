@@ -165,7 +165,7 @@ private:
 
     IDirect3DDevice9* m_pDevice;
     CDirect3DData*    m_pData;
-    ULONG             m_ulRefCount;
+    std::atomic<LONG> m_lRefCount;
     uint64_t          m_registrationToken;
     HRESULT           m_lastTestCooperativeLevelResult;
 
@@ -604,9 +604,8 @@ struct SGammaState
     D3DGAMMARAMP  originalGammaRamp;
     UINT          lastSwapChain;
     
-    SGammaState() : bOriginalGammaStored(false), bLastWasBorderless(false), lastSwapChain(0)
+    SGammaState() : bOriginalGammaStored(false), bLastWasBorderless(false), originalGammaRamp{}, lastSwapChain(0)
     {
-        ZeroMemory(&originalGammaRamp, sizeof(originalGammaRamp));
     }
 };
 

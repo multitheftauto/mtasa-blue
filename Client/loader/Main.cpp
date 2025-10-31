@@ -197,6 +197,15 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPre
     char safeCmdLine[MAX_CMD_LINE_LENGTH] = {0};
     SafeCopyCommandLine(lpCmdLine, safeCmdLine, sizeof(safeCmdLine));
 
+    // Log the command line we're receiving
+    {
+        char debugBuf[512];
+        _snprintf_s(debugBuf, sizeof(debugBuf), _TRUNCATE, 
+                   "========================================\nMain.cpp - Command line received: '%s'\n========================================\n", 
+                   safeCmdLine);
+        OutputDebugStringA(debugBuf);
+    }
+
     // RAII guard for UTF8 file hooks
     Utf8FileHooksGuard utf8Guard;
 
@@ -279,7 +288,8 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPre
     // Get current process ID for logging
     DWORD currentPid = GetSafeProcessId();
 
-    AddReportLog(LOG_ID_END, SString("* End (0x%X)* pid:%d", iReturnCode, currentPid));
-    
+    const DWORD exitCodeForLog = static_cast<DWORD>(static_cast<unsigned int>(iReturnCode));
+    AddReportLog(LOG_ID_END, SString("* End (0x%08X)* pid:%lu", exitCodeForLog, static_cast<unsigned long>(currentPid)));
+
     return iReturnCode;
 }

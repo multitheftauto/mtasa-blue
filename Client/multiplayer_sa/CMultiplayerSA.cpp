@@ -596,6 +596,13 @@ CMultiplayerSA::CMultiplayerSA()
     m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
 }
 
+CMultiplayerSA::~CMultiplayerSA()
+{
+    // Cleanup hooks that require explicit resource deallocation
+    // This is to prevent resource leaks
+    CleanupHooks_HookDestructors();
+}
+
 void CMultiplayerSA::InitHooks()
 {
     InitKeysyncHooks();
@@ -1563,10 +1570,10 @@ void CMultiplayerSA::InitHooks()
     MemCpy((void*)0x7259B0, "\xDD\xD8\x90", 3);
     MemSet((void*)0x7258B8, 0x90, 6);
 
-      // Disable spreading fires (Moved from multiplayer_shotsync)
+    // Disable spreading fires (Moved from multiplayer_shotsync)
     MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
     MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
-    
+
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
 

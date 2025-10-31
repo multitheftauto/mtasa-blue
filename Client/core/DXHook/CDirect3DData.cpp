@@ -17,17 +17,16 @@ template <>
 CDirect3DData* CSingleton<CDirect3DData>::m_pSingleton = NULL;
 
 CDirect3DData::CDirect3DData()
+    : m_mViewMatrix{}
+    , m_mProjMatrix{}
+    , m_mWorldMatrix{}
+    , m_hDeviceWindow(0)
+    , m_dwViewportX(0)
+    , m_dwViewportY(0)
+    , m_dwViewportWidth(0)
+    , m_dwViewportHeight(0)
 {
-    // Zero out our matricies.
-    memset(&m_mViewMatrix, 0, sizeof(D3DMATRIX));
-    memset(&m_mProjMatrix, 0, sizeof(D3DMATRIX));
-    memset(&m_mWorldMatrix, 0, sizeof(D3DMATRIX));
 
-    m_hDeviceWindow = 0;
-    m_dwViewportX = 0;
-    m_dwViewportY = 0;
-    m_dwViewportWidth = 0;
-    m_dwViewportHeight = 0;
 }
 
 CDirect3DData::~CDirect3DData()
@@ -36,49 +35,68 @@ CDirect3DData::~CDirect3DData()
 
 void CDirect3DData::StoreTransform(D3DTRANSFORMSTATETYPE dwMatrixToStore, const D3DMATRIX* pMatrix)
 {
+    if (!pMatrix)
+        return;
+
+    // Only copy matrix if it has changed (avoid 64-byte copy)
     switch (dwMatrixToStore)
     {
         case D3DTS_VIEW:
-            // Copy the real view matrix.
-            memcpy(&m_mViewMatrix, pMatrix, sizeof(D3DMATRIX));
+            if (memcmp(&m_mViewMatrix, pMatrix, sizeof(D3DMATRIX)) != 0)
+                m_mViewMatrix = *pMatrix;
             break;
         case D3DTS_PROJECTION:
-            // Copy the real projection marix.
-            memcpy(&m_mProjMatrix, pMatrix, sizeof(D3DMATRIX));
+            if (memcmp(&m_mProjMatrix, pMatrix, sizeof(D3DMATRIX)) != 0)
+                m_mProjMatrix = *pMatrix;
             break;
         case D3DTS_WORLD:
-            // Copy the real world matrix.
-            memcpy(&m_mWorldMatrix, pMatrix, sizeof(D3DMATRIX));
+            if (memcmp(&m_mWorldMatrix, pMatrix, sizeof(D3DMATRIX)) != 0)
+                m_mWorldMatrix = *pMatrix;
             break;
         default:
-            // Do nothing.
+            // Do nothing for unsupported transforms
             break;
     }
 }
 
 void CDirect3DData::GetTransform(D3DTRANSFORMSTATETYPE dwRequestedMatrix, D3DMATRIX* pMatrixOut)
 {
+    if (!pMatrixOut)
+        return;
+
+    // Use direct assignment instead of memcpy for better performance
     switch (dwRequestedMatrix)
     {
         case D3DTS_VIEW:
-            // Copy the stored view matrix.
-            memcpy(pMatrixOut, &m_mViewMatrix, sizeof(D3DMATRIX));
+            *pMatrixOut = m_mViewMatrix;
             break;
         case D3DTS_PROJECTION:
-            // Copy the stored projection matrix.
-            memcpy(pMatrixOut, &m_mProjMatrix, sizeof(D3DMATRIX));
+            *pMatrixOut = m_mProjMatrix;
             break;
         case D3DTS_WORLD:
-            // Copy the stored world matrix.
-            memcpy(pMatrixOut, &m_mWorldMatrix, sizeof(D3DMATRIX));
+            *pMatrixOut = m_mWorldMatrix;
             break;
         default:
-            // Zero out the structure for the user.
-            memset(pMatrixOut, 0, sizeof(D3DMATRIX));
+            // Zero out for unsupported transforms
+            *pMatrixOut = {};
             break;
     }
+}
 
-    // assert ( 0 );   // Too expensive to be used because SetTransform is used too often
+const D3DMATRIX* CDirect3DData::GetTransformPtr(D3DTRANSFORMSTATETYPE dwRequestedMatrix) const
+{
+    // Return direct pointer to cached matrix - avoids copy overhead
+    switch (dwRequestedMatrix)
+    {
+        case D3DTS_VIEW:
+            return &m_mViewMatrix;
+        case D3DTS_PROJECTION:
+            return &m_mProjMatrix;
+        case D3DTS_WORLD:
+            return &m_mWorldMatrix;
+        default:
+            return nullptr;
+    }
 }
 
 void CDirect3DData::StoreViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight)
@@ -87,24 +105,4 @@ void CDirect3DData::StoreViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwH
     m_dwViewportY = dwY;
     m_dwViewportWidth = dwWidth;
     m_dwViewportHeight = dwHeight;
-}
-
-DWORD CDirect3DData::GetViewportX()
-{
-    return m_dwViewportX;
-}
-
-DWORD CDirect3DData::GetViewportY()
-{
-    return m_dwViewportY;
-}
-
-DWORD CDirect3DData::GetViewportWidth()
-{
-    return m_dwViewportWidth;
-}
-
-DWORD CDirect3DData::GetViewportHeight()
-{
-    return m_dwViewportHeight;
 }
