@@ -1280,15 +1280,11 @@ unsigned int CModelInfoSA::GetNumRemaps()
 
 void* CModelInfoSA::GetVehicleSuspensionData()
 {
-    if (!GetInterface()->pColModel || !GetInterface()->pColModel->m_data)
-        return nullptr;
     return GetInterface()->pColModel->m_data->m_suspensionLines;
 }
 
 void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
 {
-    if (!GetInterface()->pColModel || !GetInterface()->pColModel->m_data)
-        return nullptr;
     CColDataSA* pColData = GetInterface()->pColModel->m_data;
     void*       pOrigSuspensionLines = pColData->m_suspensionLines;
     pColData->m_suspensionLines = reinterpret_cast<CColLineSA*>(pSuspensionLines);
@@ -1621,7 +1617,7 @@ void CModelInfoSA::RestoreColModel()
 
         // Force the game to load the original collision model data, if we applied a custom collision model before
         // there was any object/building, which would've provoked CColStore to request it.
-        if (m_pInterface->pColModel && !m_pInterface->pColModel->m_data && m_dwReferences > 1)
+        if (!m_pInterface->pColModel->m_data && m_dwReferences > 1)
         {
             pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
         }
