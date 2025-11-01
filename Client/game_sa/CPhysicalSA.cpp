@@ -22,14 +22,9 @@ CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {
     CVector boundCentre;
     CEntitySAInterface::GetBoundCentre(&boundCentre);
-    CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
-
-    if (!pModelInfo || !pModelInfo->pColModel)
-        return pRect;
-
-    float fRadius = pModelInfo->pColModel->m_sphere.m_radius;
+    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
-    pRect->FixIncorrectTopLeft(); // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
 }
 
