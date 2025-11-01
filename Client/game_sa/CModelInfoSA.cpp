@@ -488,15 +488,6 @@ bool CModelInfoSA::DoIsLoaded()
     return bLoaded;
 }
 
-bool CModelInfoSA::IsCollisionLoaded()
-{
-    m_pInterface = ppModelInfo[m_dwModelID];
-    if (!m_pInterface || !m_pInterface->pColModel)
-        return false;
-
-    return m_pInterface->pColModel->m_data != nullptr;
-}
-
 unsigned short CModelInfoSA::GetFlags()
 {
     return ppModelInfo[m_dwModelID]->usFlags;
