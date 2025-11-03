@@ -912,7 +912,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     const DWORD exceptionCodeSafe = SafeReadExceptionCode(pException);
 
     // Attempt minimal emergency dump for any reentrant crash
-    bool expected = false;
+    bool expected{false};
     if (!ms_bInCrashHandler.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: RECURSIVE CRASH - Already in crash handler\n");
