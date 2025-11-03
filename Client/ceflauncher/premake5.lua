@@ -1,5 +1,6 @@
 project "CEFLauncher"
 	language "C++"
+	cppdialect "C++23"
 	kind "WindowedApp"
 	targetname "CEFLauncher"
 	targetdir(buildpath("mta/cef"))
@@ -19,6 +20,28 @@ project "CEFLauncher"
 		"*.cpp",
 		"*.manifest",
 	}
+
+	filter "system:windows"
+		buildoptions { 
+			"/Zc:inline",
+			"/Zc:throwingNew",
+			"/diagnostics:caret",
+			"/sdl",
+			"/guard:cf"
+		}
+		editandcontinue "Off"
+		linkoptions { "/guard:cf" }
+
+	filter {"system:windows", "configurations:Debug"}
+		defines { "_DEBUG" }
+
+	filter {"system:windows", "configurations:Release"}
+		optimize "Speed"
+		defines { "NDEBUG" }
+
+	filter {"system:windows", "configurations:Nightly"}
+		optimize "Speed"
+		defines { "NDEBUG" }
 
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
