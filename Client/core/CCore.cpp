@@ -121,7 +121,6 @@ CCore::CCore()
 
     m_bIsOfflineMod = false;
     m_bQuitOnPulse = false;
-    m_bIsQuitting = false;
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
@@ -1166,12 +1165,7 @@ CWebCoreInterface* CCore::GetWebCore()
 void CCore::DestroyWeb()
 {
     WriteDebugEvent("CCore::DestroyWeb");
-    // Skip CEF cleanup during quit sequence - TerminateProcess will handle it
-    // Doing CefShutdown() here will cause a freeze, and cleanup is unnecessary when terminating
-    if (!m_bIsQuitting)
-    {
-        SAFE_DELETE(m_pWebCore);
-    }
+    SAFE_DELETE(m_pWebCore);
     m_WebCoreModule.UnloadModule();
 }
 
@@ -1464,7 +1458,6 @@ void CCore::Quit(bool bInstantly)
 {
     if (bInstantly)
     {
-        m_bIsQuitting = true;            // Skip CEF cleanup to prevent CefShutdown freeze
         AddReportLog(7101, "Core - Quit");
         // Show that we are quiting (for the crash dump filename)
         SetApplicationSettingInt("last-server-ip", 1);
@@ -1478,13 +1471,13 @@ void CCore::Quit(bool bInstantly)
         // Destroy the client
         CModManager::GetSingleton().Unload();
 
-        // Destroy ourself
+        // Use TerminateProcess before destroying CCore to ensure clean exit code
+        TerminateProcess(GetCurrentProcess(), 0);
+
+        // Destroy ourself (unreachable but kept for completeness)
         delete CCore::GetSingletonPtr();
 
         WatchDogCompletedSection("Q0");
-
-        // Use TerminateProcess for now as exiting the normal way crashes
-        TerminateProcess(GetCurrentProcess(), 0);
     }
     else
     {

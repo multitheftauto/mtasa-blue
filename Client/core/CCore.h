@@ -367,7 +367,6 @@ private:
     SString m_strModInstallRoot;
 
     bool m_bQuitOnPulse;
-    bool m_bIsQuitting;
     bool m_bDestroyMessageBox;
 
     bool                 m_bDoneFrameRateLimit;
