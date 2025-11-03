@@ -20,7 +20,7 @@ if not exist %MSBUILDPATH% (
 )
 echo Found MSBuild at: %MSBUILDPATH%
 
-set BUILD_CONFIGURATION=Debug
+set BUILD_CONFIGURATION=Release
 set BUILD_PLATFORM=Win32
 
 rem Read configuration (1st parameter)
