@@ -17,6 +17,8 @@
 #include <cef3/cef/include/cef_parser.h>
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
+#include <algorithm>
+#include <ranges>
 
 // #define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
@@ -39,12 +41,15 @@ CWebCore::CWebCore()
 
 CWebCore::~CWebCore()
 {
-    // Unregister schema factories
+    std::ranges::for_each(m_WebViews, [](const auto& pWebView) {
+        if (pWebView) [[likely]]
+            pWebView->CloseBrowser();
+    });
+    m_WebViews.clear();
     CefClearSchemeHandlerFactories();
 
-    // Shutdown CEF
-    CefShutdown();
-
+    // Don't call CefShutdown() here to avoid freeze.
+    // TerminateProcess (during quit) is called before CCore destruction anyways.
     delete m_pRequestsGUI;
     delete m_pXmlConfig;
 }
