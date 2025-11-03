@@ -1,33 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1" xmlns:v3="urn:schemas-microsoft-com:asm.v3">
-    <assemblyIdentity type="win32" version="1.0.0.0" processorArchitecture="*" name="CEFLauncher" />
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1"
+          xmlns:asmv3="urn:schemas-microsoft-com:asm.v3"
+          manifestVersion="1.0">
+    <assemblyIdentity type="win32"
+                      name="CEFLauncher"
+                      version="1.7.0"
+                      processorArchitecture="x86" />
 
-    <v3:application>
-        <windowsSettings>
-            <dpiAware     xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">True/PM</dpiAware>
-            <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor</dpiAwareness>
-        </windowsSettings>
-    </v3:application>
+    <description>MTA:SA CEF (Chromium Embedded Framework) Launcher</description>
 
     <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
         <application>
-            <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" /> <!-- Windows 10 and Windows 11 -->
-            <supportedOS Id="{1f676c76-80e1-4239-95bb-83d0f6d0da78}" /> <!-- Windows 8.1 -->
-            <supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}" /> <!-- Windows 8 -->
-            <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}" /> <!-- Windows 7 -->
+            <!-- Windows 11 and Windows 10 -->
+            <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
+            <!-- Windows 8.1 -->
+            <supportedOS Id="{1f676c76-80e1-4239-95bb-83d0f6d0da78}" />
+            <!-- Windows 8 -->
+            <supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}" />
+            <!-- Windows 7 -->
+            <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}" />
         </application>
     </compatibility>
 
+    <asmv3:application>
+        <asmv3:windowsSettings
+            xmlns:ws2005="http://schemas.microsoft.com/SMI/2005/WindowsSettings"
+            xmlns:ws2013="http://schemas.microsoft.com/SMI/2013/WindowsSettings"
+            xmlns:ws2016="http://schemas.microsoft.com/SMI/2016/WindowsSettings"
+            xmlns:ws2017="http://schemas.microsoft.com/SMI/2017/WindowsSettings"
+            xmlns:ws2019="http://schemas.microsoft.com/SMI/2019/WindowsSettings"
+            xmlns:ws2020="http://schemas.microsoft.com/SMI/2020/WindowsSettings"
+            xmlns:ws2024="http://schemas.microsoft.com/SMI/2024/WindowsSettings">
+            <ws2005:dpiAware>true/pm</ws2005:dpiAware>
+            <ws2016:dpiAwareness>PerMonitorV2, PerMonitor</ws2016:dpiAwareness>
+            <ws2013:ultraHighResolutionScrollingAware>true</ws2013:ultraHighResolutionScrollingAware>
+            <ws2016:longPathAware>true</ws2016:longPathAware>
+            <ws2019:activeCodePage>UTF-8</ws2019:activeCodePage>
+            <ws2020:heapType>SegmentHeap</ws2020:heapType>
+            <ws2024:supportedArchitectures>x86</ws2024:supportedArchitectures>
+        </asmv3:windowsSettings>
+    </asmv3:application>
+
     <dependency optional="yes">
         <dependentAssembly>
-            <!-- Automatically use ComCtl32.dll version 6 or later. -->
-            <assemblyIdentity
-                type="win32"
-                name="Microsoft.Windows.Common-Controls"
-                version="6.0.0.0"
-                processorArchitecture="*"
-                publicKeyToken="6595b64144ccf1df"
-                language="*" />
+            <assemblyIdentity type="win32"
+                              name="Microsoft.Windows.Common-Controls"
+                              version="6.0.0.0"
+                              processorArchitecture="*"
+                              publicKeyToken="6595b64144ccf1df"
+                              language="*" />
         </dependentAssembly>
     </dependency>
+
+    <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    </trustInfo>
 </assembly>
