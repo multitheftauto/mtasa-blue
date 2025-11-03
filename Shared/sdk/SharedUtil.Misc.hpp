@@ -79,6 +79,9 @@ namespace SharedUtil::Details
         #undef GetModuleBaseNameW
     #endif
 
+    #include <bit>
+    #include <filesystem>
+
 struct HKeyDeleter
 {
     void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
@@ -123,6 +126,50 @@ namespace SharedUtil::Details
         HGLOBAL m_handle = nullptr;
     };
 }            // namespace SharedUtil::Details
+
+[[nodiscard]] const SString& SharedUtil::GetProcessBaseDir()
+{
+    static SString        strProcessBaseDir;
+    static std::once_flag initFlag;
+
+    std::call_once(initFlag, []
+    {
+        try
+        {
+            constexpr auto                  bufferSize = MAX_PATH * 2uz;
+            std::array<wchar_t, bufferSize> moduleFileName{};
+
+            HMODULE hCurrentModule{};
+            if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                                   std::bit_cast<LPCWSTR>(&GetProcessBaseDir), &hCurrentModule) == 0 ||
+                !hCurrentModule) [[unlikely]]
+                return;
+
+            if (const auto length = GetModuleFileNameW(hCurrentModule, moduleFileName.data(), static_cast<DWORD>(moduleFileName.size()));
+                length == 0 || length >= moduleFileName.size()) [[unlikely]]
+                return;
+
+            std::array<wchar_t, bufferSize> fullPath{};
+
+            if (const auto length = GetFullPathNameW(moduleFileName.data(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr);
+                length == 0 || length >= fullPath.size()) [[unlikely]]
+                return;
+
+            if (const auto lastSeparator = std::wstring_view{fullPath.data()}.find_last_of(L"\\/");
+                lastSeparator != std::wstring_view::npos) [[likely]]
+            {
+                const auto modulePath = std::filesystem::path{std::wstring_view{fullPath.data()}.substr(0uz, lastSeparator)};
+                strProcessBaseDir     = ToUTF8(modulePath.parent_path().wstring());
+            }
+        }
+        catch (...)
+        {
+        }
+    });
+
+    return strProcessBaseDir;
+}
+
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE

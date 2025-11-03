@@ -27,6 +27,8 @@
 #include <string_view>
 #include <vector>
 
+class SString;
+
 #if !defined(BUGSUTIL_DLLINTERFACE)
     #if defined(BUGSUTIL_EXPORTS)
         #define BUGSUTIL_DLLINTERFACE __declspec(dllexport)
@@ -203,49 +205,54 @@ inline void SafeDebugPrintPrefixed(std::string_view prefix, const char* format, 
         OutputDebugStringA(buffer);
     }
 }
+
 #ifdef __cplusplus
+
+using PFNCHFILTFN = LONG(__stdcall*)(EXCEPTION_POINTERS* pExPtrs);
+
+struct ENHANCED_EXCEPTION_INFO
+{
+    DWORD                                   exceptionCode{};
+    void*                                   exceptionAddress{};
+    std::string                             moduleName{};
+    std::string                             modulePathName{};
+    std::string                             moduleBaseName{};
+    uint                                    moduleOffset{};
+    std::chrono::system_clock::time_point   timestamp{};
+    DWORD                                   threadId{};
+    DWORD                                   processId{};
+    std::optional<std::vector<std::string>> stackTrace{};
+    std::optional<std::exception_ptr>       capturedException{};
+    int                                     uncaughtExceptionCount{};
+    std::string                             exceptionDescription{};
+    bool                                    hasDetailedStackTrace{};
+
+    DWORD eax{}, ebx{}, ecx{}, edx{}, esi{}, edi{}, ebp{}, esp{}, eip{}, eflags{};
+    WORD  cs{}, ds{}, ss{}, es{}, fs{}, gs{};
+
+    std::string exceptionType{};
+    bool        isFatal{};
+    std::string additionalInfo{};
+
+    [[nodiscard]] auto operator<=>(const ENHANCED_EXCEPTION_INFO&) const = default;
+};
+using PENHANCED_EXCEPTION_INFO = ENHANCED_EXCEPTION_INFO*;
+
 extern "C"
 {
 #endif
 
-    typedef LONG(__stdcall* PFNCHFILTFN)(EXCEPTION_POINTERS* pExPtrs);
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn) noexcept;
 
-    typedef struct _ENHANCED_EXCEPTION_INFO
-    {
-        DWORD                                   exceptionCode;
-        void*                                   exceptionAddress;
-        std::string                             moduleName;
-        std::string                             modulePathName;
-        std::string                             moduleBaseName;
-        uint                                    moduleOffset;
-        std::chrono::system_clock::time_point   timestamp;
-        DWORD                                   threadId;
-        DWORD                                   processId;
-        std::optional<std::vector<std::string>> stackTrace;
-        std::optional<std::exception_ptr>       capturedException;
-        int                                     uncaughtExceptionCount;
-        std::string                             exceptionDescription;
-        bool                                    hasDetailedStackTrace;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableStackCookieFailureCapture(BOOL bEnable) noexcept;
 
-        DWORD eax, ebx, ecx, edx, esi, edi, ebp, esp, eip, eflags;
-        WORD  cs, ds, ss, es, fs, gs;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall GetEnhancedExceptionInfo(PENHANCED_EXCEPTION_INFO pExceptionInfo) noexcept;
 
-        std::string exceptionType;
-        bool        isFatal;
-        std::string additionalInfo;
-    } ENHANCED_EXCEPTION_INFO, *PENHANCED_EXCEPTION_INFO;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureCurrentException();
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn) noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall LogExceptionDetails(EXCEPTION_POINTERS* pException) noexcept;
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableStackCookieFailureCapture(BOOL bEnable) noexcept;
-
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetEnhancedExceptionInfo(PENHANCED_EXCEPTION_INFO pExceptionInfo) noexcept;
-
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureCurrentException() noexcept;
-
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall LogExceptionDetails(EXCEPTION_POINTERS* pException) noexcept;
-
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall IsFatalException(DWORD exceptionCode) noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall IsFatalException(DWORD exceptionCode) noexcept;
 
     typedef struct _CRASH_HANDLER_CONFIG
     {
@@ -260,10 +267,10 @@ extern "C"
         DWORD debugBufferSize;
     } CRASH_HANDLER_CONFIG, *PCRASH_HANDLER_CONFIG;
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig) noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig) noexcept;
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames,
-                                                                  std::vector<std::string>* pOutTrace) noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames,
+                                                                  std::vector<std::string>* pOutTrace);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableSehExceptionHandler() noexcept;
 
@@ -273,12 +280,17 @@ extern "C"
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization() noexcept;
 
-    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds = 20) noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds = 20);
 
-    void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread() noexcept;
+    void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread();
 
     void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat() noexcept;
 
 #ifdef __cplusplus
 }
 #endif
+
+namespace CrashHandler
+{
+    [[nodiscard]] bool ProcessHasLocalDebugSymbols() noexcept;
+}

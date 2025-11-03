@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "StackTraceHelpers.h"
 #include <SharedUtil.Misc.h>
 #include <SharedUtil.Detours.h>
 #include <SharedUtil.Memory.h>
@@ -129,10 +130,18 @@ constexpr std::size_t MAX_FILE_NAME = 260;
 class SymbolHandlerGuard
 {
 public:
-    explicit SymbolHandlerGuard(HANDLE process) noexcept : m_process(process), m_initialized(false), m_uncaughtExceptions(std::uncaught_exceptions())
+    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) noexcept
+        : m_process(process), m_initialized(false), m_uncaughtExceptions(std::uncaught_exceptions())
     {
+        if (!enableSymbols)
+        {
+            return;
+        }
+
         if (m_process != nullptr)
         {
+            SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS);
+            
             if (SymInitialize(m_process, nullptr, TRUE) != FALSE)
             {
                 m_initialized = true;
@@ -178,6 +187,15 @@ private:
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return std::nullopt;
 
+    const bool hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
+    if (!hasSymbols)
+    {
+        static std::once_flag logOnce;
+        std::call_once(logOnce, [] {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_EXCEPTION_INFO, "CaptureEnhancedStackTrace - capturing without symbols (raw addresses only)\n");
+        });
+    }
+
     std::vector<StackFrameInfo> frames;
     frames.reserve(MAX_STACK_FRAMES);
 
@@ -196,11 +214,13 @@ private:
     frame.AddrFrame.Mode = AddrModeFlat;
     frame.AddrStack.Mode = AddrModeFlat;
 
-    SymbolHandlerGuard symbolGuard(hProcess);
-    if (!symbolGuard.IsInitialized())
-        return std::nullopt;
+    SymbolHandlerGuard symbolGuard(hProcess, hasSymbols);
 
-    SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS);
+    const bool useDbgHelp = symbolGuard.IsInitialized();
+
+    const auto routines = useDbgHelp
+        ? StackTraceHelpers::MakeStackWalkRoutines(true)
+        : StackTraceHelpers::MakeStackWalkRoutines(false);
     alignas(SYMBOL_INFO) std::uint8_t symbolBuffer[sizeof(SYMBOL_INFO) + MAX_SYMBOL_NAME];
     memset(symbolBuffer, 0, sizeof(symbolBuffer));
     PSYMBOL_INFO pSymbol = reinterpret_cast<PSYMBOL_INFO>(symbolBuffer);
@@ -209,8 +229,15 @@ private:
 
     for (std::size_t frameIndex = 0; frameIndex < MAX_STACK_FRAMES; ++frameIndex)
     {
-        BOOL bWalked =
-            StackWalk64(IMAGE_FILE_MACHINE_I386, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
+        BOOL bWalked = StackWalk64(IMAGE_FILE_MACHINE_I386,
+                                  hProcess,
+                                  hThread,
+                                  &frame,
+                                  &context,
+                                  routines.readMemory,
+                                  routines.functionTableAccess,
+                                  routines.moduleBase,
+                                  nullptr);
         if (bWalked == FALSE)
             break;
 
@@ -222,28 +249,31 @@ private:
         frameInfo.isValid = true;
 
         DWORD64 address = frame.AddrPC.Offset;
-        frameInfo.symbolName = std::to_string(address);
+        frameInfo.symbolName = StackTraceHelpers::FormatAddressWithModuleAndAbsolute(address);
 
-        DWORD64 displacement = 0;
-        if (SymFromAddr(hProcess, address, &displacement, pSymbol) != FALSE)
+        if (useDbgHelp)
         {
-            frameInfo.symbolName = pSymbol->Name[0] != '\0' ? pSymbol->Name : "unknown";
-        }
+            DWORD64 displacement = 0;
+            if (SymFromAddr(hProcess, address, &displacement, pSymbol) != FALSE)
+            {
+                frameInfo.symbolName = pSymbol->Name[0] != '\0' ? pSymbol->Name : "unknown";
+            }
 
-        IMAGEHLP_LINE64 lineInfo;
-        memset(&lineInfo, 0, sizeof(lineInfo));
-        lineInfo.SizeOfStruct = sizeof(lineInfo);
-        DWORD lineDisplacement = 0;
+            IMAGEHLP_LINE64 lineInfo;
+            memset(&lineInfo, 0, sizeof(lineInfo));
+            lineInfo.SizeOfStruct = sizeof(lineInfo);
+            DWORD lineDisplacement = 0;
 
-        if (SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
-        {
-            frameInfo.fileName = lineInfo.FileName ? lineInfo.FileName : "unknown";
-            frameInfo.lineNumber = lineInfo.LineNumber;
-        }
-        else
-        {
-            frameInfo.fileName = "unknown";
-            frameInfo.lineNumber = 0;
+            if (SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
+            {
+                frameInfo.fileName = lineInfo.FileName ? lineInfo.FileName : "unknown";
+                frameInfo.lineNumber = lineInfo.LineNumber;
+            }
+            else
+            {
+                frameInfo.fileName.clear();
+                frameInfo.lineNumber = 0;
+            }
         }
 
         frames.push_back(std::move(frameInfo));
