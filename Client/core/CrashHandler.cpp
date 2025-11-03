@@ -28,14 +28,16 @@
 #include <cstdint>
 #include <exception>
 #include <errno.h>
-#include <filesystem>
+#include <format>
 #include <intrin.h>
 #include <mutex>
 #include <new>
 #include <optional>
 #include <process.h>
+#include <ranges>
 #include <signal.h>
 #include <stdio.h>
+#include <string>
 #include <string_view>
 #include <variant>
 #include <vector>
@@ -43,8 +45,6 @@
 #if defined(_MSC_VER)
     #include <corecrt.h>
 #endif
-
-using namespace std::string_literals;
 
 [[nodiscard]] constexpr bool IsMemoryException(DWORD code) noexcept
 {
@@ -59,6 +59,25 @@ using namespace std::string_literals;
 [[nodiscard]] constexpr bool IsIntegerException(DWORD code) noexcept
 {
     return code == EXCEPTION_INT_DIVIDE_BY_ZERO || code == EXCEPTION_INT_OVERFLOW;
+}
+
+[[nodiscard]] bool IsExceptionFromThirdParty(void* exceptionAddress) noexcept
+{
+    if (!exceptionAddress) [[unlikely]]
+        return false;
+
+    HMODULE hModule{nullptr};
+    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                          static_cast<LPCSTR>(exceptionAddress), &hModule) == 0) [[unlikely]]
+        return false;
+
+    char modulePath[256]{};
+    if (GetModuleFileNameA(hModule, modulePath, sizeof(modulePath)) == 0) [[unlikely]]
+        return false;
+
+    // Libraries with a lot of bogus breakpoints
+    return strstr(modulePath, "libcef.dll") != nullptr || 
+           strstr(modulePath, "chrome_elf.dll") != nullptr;
 }
 
 #ifndef STATUS_INVALID_PARAMETER
@@ -76,7 +95,6 @@ using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std:
 {
     switch (exceptionCode)
     {
-        case EXCEPTION_BREAKPOINT:
         case EXCEPTION_SINGLE_STEP:
         case EXCEPTION_GUARD_PAGE:
         case EXCEPTION_INVALID_HANDLE:
@@ -86,9 +104,14 @@ using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std:
             return FALSE;
     }
 
+    if (exceptionCode == EXCEPTION_BREAKPOINT)
+    {
+        SafeDebugOutput("IsFatalException: BREAKPOINT - NON-FATAL (debugger will handle if attached)\n");
+        return FALSE;
+    }
+
     switch (exceptionCode)
     {
-        case EXCEPTION_ILLEGAL_INSTRUCTION:
         case EXCEPTION_STACK_OVERFLOW:
         case EXCEPTION_NONCONTINUABLE_EXCEPTION:
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
@@ -101,6 +124,7 @@ using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std:
         case EXCEPTION_INT_DIVIDE_BY_ZERO:
         case EXCEPTION_INT_OVERFLOW:
         case EXCEPTION_PRIV_INSTRUCTION:
+        case EXCEPTION_ILLEGAL_INSTRUCTION:
         case EXCEPTION_FLT_DIVIDE_BY_ZERO:
         case EXCEPTION_FLT_INVALID_OPERATION:
         case EXCEPTION_FLT_OVERFLOW:
@@ -108,18 +132,16 @@ using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std:
             return TRUE;
     }
 
-    if (IsMemoryException(exceptionCode))
+    if (IsMemoryException(exceptionCode)) [[unlikely]]
     {
-        constexpr auto bufferSize = DEBUG_BUFFER_SIZE;
-        char           debugBuffer[bufferSize];
-        SAFE_DEBUG_PRINT_C(debugBuffer, bufferSize, "IsFatalException: Access violation/page fault 0x%08X - treating as fatal for dump generation\n",
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "IsFatalException: Access violation/page fault 0x%08X - treating as fatal for dump generation\n",
                            exceptionCode);
         return TRUE;
     }
 
-    constexpr auto bufferSize = DEBUG_BUFFER_SIZE;
-    char           debugBuffer[bufferSize];
-    SAFE_DEBUG_PRINT_C(debugBuffer, bufferSize, "IsFatalException: Unknown exception code 0x%08X, treating as non-fatal\n", exceptionCode);
+    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "IsFatalException: Unknown exception code 0x%08X, treating as non-fatal\n", exceptionCode);
     return FALSE;
 }
 
@@ -136,26 +158,25 @@ static void LogBasicExceptionInfo(_EXCEPTION_POINTERS* exception) noexcept
 
 static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
 {
-    if (pException == nullptr || pException->ExceptionRecord == nullptr)
+    if (pException == nullptr || pException->ExceptionRecord == nullptr) [[unlikely]]
         return;
 
     try
     {
-        std::unique_lock<std::mutex> lock(g_exceptionInfoMutex, std::try_to_lock);
-        if (!lock.owns_lock())
+        std::unique_lock lock{g_exceptionInfoMutex, std::try_to_lock};
+        if (!lock.owns_lock()) [[unlikely]]
         {
             LogBasicExceptionInfo(pException);
             return;
         }
 
-        ENHANCED_EXCEPTION_INFO info = {};
-        info.exceptionCode = pException->ExceptionRecord->ExceptionCode;
-        info.exceptionAddress = pException->ExceptionRecord->ExceptionAddress;
-        info.threadId = GetCurrentThreadId();
-        info.processId = GetCurrentProcessId();
-        info.timestamp = std::chrono::system_clock::now();
-
-        g_lastExceptionInfo = info;
+        g_lastExceptionInfo = ENHANCED_EXCEPTION_INFO{
+            .exceptionCode = pException->ExceptionRecord->ExceptionCode,
+            .exceptionAddress = pException->ExceptionRecord->ExceptionAddress,
+            .timestamp = std::chrono::system_clock::now(),
+            .threadId = GetCurrentThreadId(),
+            .processId = GetCurrentProcessId()
+        };
     }
     catch (...)
     {
@@ -285,20 +306,19 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
         info.eflags = pException->ContextRecord->EFlags;
 
         CExceptionInformation_Impl moduleHelper;
-        constexpr std::size_t      moduleBufferSize = 512;
-        char                       moduleBuffer[moduleBufferSize]{};
-        void*                      moduleBase = nullptr;
+        std::array<char, 512> moduleBuffer{};
+        void* moduleBase{nullptr};
 
         // For EIP=0 crashes, resolve module from return address at [ESP] instead of EIP
-        void* addressToResolve = info.exceptionAddress;
-        constexpr auto kNullAddress = uintptr_t{0};
+        void* addressToResolve{info.exceptionAddress};
+        constexpr auto kNullAddress{uintptr_t{0}};
         
-        const auto exceptionAddressValue = reinterpret_cast<uintptr_t>(info.exceptionAddress);
+        const auto exceptionAddressValue{reinterpret_cast<uintptr_t>(info.exceptionAddress)};
         
         if (exceptionAddressValue == kNullAddress && info.eip == kNullAddress)
         {
-            const auto espAddr = static_cast<uintptr_t>(info.esp);
-            const auto pReturnAddress = reinterpret_cast<void* const*>(espAddr);
+            const auto espAddr{static_cast<uintptr_t>(info.esp)};
+            const auto pReturnAddress{reinterpret_cast<void* const*>(espAddr)};
 
             SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
                                    "LogEnhancedExceptionInfo - EIP=0 detected (ESP=0x%08X), reading return address...\n",
@@ -308,7 +328,7 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
             {
                 addressToResolve = *pReturnAddress;
 
-                const auto returnAddressValue = reinterpret_cast<uintptr_t>(addressToResolve);
+                const auto returnAddressValue{reinterpret_cast<uintptr_t>(addressToResolve)};
                 SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
                                        "LogEnhancedExceptionInfo - Return address: 0x%08X (resolving module from this)\n",
                                        static_cast<unsigned int>(returnAddressValue));
@@ -321,31 +341,31 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
             }
         }
 
-        if (moduleHelper.GetModule(addressToResolve, moduleBuffer, sizeof(moduleBuffer), &moduleBase))
+        if (moduleHelper.GetModule(addressToResolve, moduleBuffer.data(), static_cast<int>(moduleBuffer.size()), &moduleBase))
         {
-            info.modulePathName = std::string(moduleBuffer);
+            info.modulePathName = std::string{moduleBuffer.data()};
 
-            const std::string_view moduleView(moduleBuffer);
+            const std::string_view moduleView{moduleBuffer.data()};
             if (const auto pos = moduleView.rfind('\\'); pos != std::string_view::npos)
             {
-                info.moduleName = std::string(moduleView.substr(pos + 1));
+                info.moduleName = std::string{moduleView.substr(pos + 1)};
                 info.moduleBaseName = info.moduleName;
             }
             else
             {
-                info.moduleName = std::string(moduleView);
+                info.moduleName = std::string{moduleView};
                 info.moduleBaseName = info.moduleName;
             }
 
             if (moduleBase != nullptr)
             {
                 // Use addressToResolve for offset calculation (handles EIP=0 return address case)
-                const uintptr_t resolvedAddr = reinterpret_cast<uintptr_t>(addressToResolve);
-                const uintptr_t baseAddr = reinterpret_cast<uintptr_t>(moduleBase);
+                const uintptr_t resolvedAddr{reinterpret_cast<uintptr_t>(addressToResolve)};
+                const uintptr_t baseAddr{reinterpret_cast<uintptr_t>(moduleBase)};
 
                 if (resolvedAddr >= baseAddr)
                 {
-                    const uintptr_t offset = resolvedAddr - baseAddr;
+                    const uintptr_t offset{resolvedAddr - baseAddr};
 
                     if (offset <= UINT_MAX)
                     {
@@ -714,7 +734,7 @@ static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI RedirectedSetUnhandledExceptionFilter
 
 void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
 {
-    bool expected = false;
+    bool expected{false};
     if (!g_bInAbortHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
     {
         SignalSafePrintPrefixed(DEBUG_PREFIX_ABORT, "Recursive\n");
@@ -728,14 +748,14 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
     alignas(16) EXCEPTION_RECORD exRecord{};
     alignas(16) CONTEXT          ctx{};
 
-    void* returnAddr = _ReturnAddress();
+    void* returnAddr{_ReturnAddress()};
 
     InitializeExceptionRecord(&exRecord, STATUS_STACK_BUFFER_OVERRUN_CODE, returnAddr);
 
     ctx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
     RtlCaptureContext(&ctx);
 
-    EXCEPTION_POINTERS exPtrs = {};
+    EXCEPTION_POINTERS exPtrs{};
     exPtrs.ExceptionRecord = &exRecord;
     exPtrs.ContextRecord = &ctx;
 
@@ -766,7 +786,7 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
 
 [[noreturn]] void __cdecl PureCallHandler() noexcept
 {
-    bool expected = false;
+    bool expected{false};
     if (!g_bInPureCallHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
     {
         SignalSafePrintPrefixed(DEBUG_PREFIX_PURECALL, "Recursive\n");
@@ -777,8 +797,8 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
     LogHandlerEvent(DEBUG_PREFIX_PURECALL.data(), "Pure virtual function call detected");
     SafeDebugOutput(DEBUG_SEPARATOR);
 
-    EXCEPTION_RECORD*  pExRecord = nullptr;
-    CONTEXT*           pCtx = nullptr;
+    EXCEPTION_RECORD* pExRecord{nullptr};
+    CONTEXT* pCtx{nullptr};
     EXCEPTION_POINTERS exPtrs{};
 
     PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
@@ -1020,8 +1040,8 @@ static void InstallAbortHandlers() noexcept
     if (length == 0 || length >= buffer.size())
         return false;
 
-    const std::uint8_t rawChar = static_cast<std::uint8_t>(buffer[0]);
-    const char         indicator = static_cast<char>(std::tolower(rawChar));
+    const std::uint8_t rawChar{static_cast<std::uint8_t>(buffer[0])};
+    const char indicator{static_cast<char>(std::tolower(rawChar))};
     outValue = !(indicator == '0' || indicator == 'f' || indicator == 'n');
     return true;
 }
@@ -1033,20 +1053,11 @@ static void InstallAbortHandlers() noexcept
 
     memset(pConfig, 0, sizeof(CRASH_HANDLER_CONFIG));
 
-    bool disableSehDetourBool = false;
-    bool forceSehDetourBool = false;
-    const bool hasDisableSehDetourEnv = TryReadEnvBool("MTA_DISABLE_SEH_DETOUR", disableSehDetourBool);
-    const bool hasForceSehDetourEnv = TryReadEnvBool("MTA_FORCE_SEH_DETOUR", forceSehDetourBool);
+    bool disableSehDetourBool{false};
+    bool forceSehDetourBool{false};
+    TryReadEnvBool("MTA_DISABLE_SEH_DETOUR", disableSehDetourBool);
+    TryReadEnvBool("MTA_FORCE_SEH_DETOUR", forceSehDetourBool);
 
-    if (!hasDisableSehDetourEnv)
-    {
-        disableSehDetourBool = false;
-    }
-
-    if (!hasForceSehDetourEnv)
-    {
-        forceSehDetourBool = false;
-    }
     pConfig->disableSehDetour = disableSehDetourBool ? TRUE : FALSE;
     pConfig->forceSehDetour = forceSehDetourBool ? TRUE : FALSE;
 
@@ -1082,7 +1093,7 @@ static BOOL ProtectedStackWalk64(DWORD machineType, HANDLE hProcess, HANDLE hThr
 // Helper to safely call SymFromAddr using only SEH
 static bool SafeSymFromAddr(HANDLE hProcess, DWORD64 address, PSYMBOL_INFO pSymbol, bool isCallback) noexcept
 {
-    bool result = false;
+    bool result{false};
     __try
     {
         if (SymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE && pSymbol->Name != nullptr)
@@ -1103,7 +1114,7 @@ static bool SafeSymFromAddr(HANDLE hProcess, DWORD64 address, PSYMBOL_INFO pSymb
 // Helper to safely call SymGetLineFromAddr64 using only SEH
 static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pDisplacement, IMAGEHLP_LINE64* pLineInfo, bool isCallback) noexcept
 {
-    bool result = false;
+    bool result{false};
     __try
     {
         if (SymGetLineFromAddr64(hProcess, address, pDisplacement, pLineInfo) != FALSE)
@@ -1196,12 +1207,12 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
     if (isNullJump)
     {
         // Try to read return address from [ESP]
-        const auto espAddr = static_cast<uintptr_t>(context.Esp);
-        const auto pReturnAddress = reinterpret_cast<void* const*>(espAddr);
+        const auto espAddr{static_cast<uintptr_t>(context.Esp)};
+        const auto pReturnAddress{reinterpret_cast<void* const*>(espAddr)};
 
         if (SharedUtil::IsReadablePointer(pReturnAddress, sizeof(void*)))
         {
-            const auto returnAddr = reinterpret_cast<uintptr_t>(*pReturnAddress);
+            const auto returnAddr{reinterpret_cast<uintptr_t>(*pReturnAddress)};
 
             SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
                                    "CaptureUnifiedStackTrace - EIP=0, starting stack walk from return address: 0x%08X\n",
@@ -1265,7 +1276,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
     constexpr auto                    kMaxSymbolNameLength = 256;
     constexpr auto                    symbolBufferSize = sizeof(SYMBOL_INFO) + kMaxSymbolNameLength;
     alignas(SYMBOL_INFO) std::uint8_t symbolBuffer[symbolBufferSize]{};
-    PSYMBOL_INFO                      pSymbol = reinterpret_cast<PSYMBOL_INFO>(symbolBuffer);
+    PSYMBOL_INFO pSymbol{reinterpret_cast<PSYMBOL_INFO>(symbolBuffer)};
     pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
     pSymbol->MaxNameLen = kMaxSymbolNameLength;
 
@@ -1298,7 +1309,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
 
         const DWORD64 address = frame.AddrPC.Offset;
 
-        auto symbolName = "0x"s + std::to_string(address);
+        auto symbolName = std::format("0x{:X}", address);
         
         // Protect DbgHelp symbol lookups with SEH - addresses may be invalid/in guard pages
         // Especially important for corrupted stacks (callbacks, overflows, heap corruption)
@@ -1318,11 +1329,11 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
         {
             if (lineInfo.FileName != nullptr)
             {
-                frameInfo += " ("s + lineInfo.FileName + ":"s + std::to_string(lineInfo.LineNumber) + ")"s;
+                frameInfo += std::format(" ({}:{})", lineInfo.FileName, lineInfo.LineNumber);
             }
         }
 
-        frameInfo += " [0x"s + std::to_string(address) + "]"s;
+        frameInfo += std::format(" [0x{:X}]", address);
         pOutTrace->push_back(frameInfo);
     }
 
@@ -1342,7 +1353,7 @@ static bool InstallSehHandler() noexcept
     LPTOP_LEVEL_EXCEPTION_FILTER previousFilter = SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
     g_pfnOrigFilt.store(previousFilter, std::memory_order_release);
 
-    bool success = true;
+    bool success{true};
 
     std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
     if (previousFilter != nullptr)
@@ -1354,29 +1365,29 @@ static bool InstallSehHandler() noexcept
         SafeDebugOutput("CrashHandler: SEH installed - no previous filter present\n");
     }
 
-    bool detourEnabled = true;
-    bool detourForced = false;
+    bool detourEnabled{true};
+    bool detourForced{false};
 
     if (CRASH_HANDLER_CONFIG config{}; GetCrashHandlerConfiguration(&config))
     {
-        const bool disableDetour = config.disableSehDetour != FALSE;
-        const bool forceDetour = config.forceSehDetour != FALSE;
+        const bool disableDetour{config.disableSehDetour != FALSE};
+        const bool forceDetour{config.forceSehDetour != FALSE};
 
         SAFE_DEBUG_PRINT(szDebug, "CrashHandler: SEH detour env check - MTA_DISABLE_SEH_DETOUR: %s, MTA_FORCE_SEH_DETOUR: %s\n",
                          disableDetour ? "true" : "false", forceDetour ? "true" : "false");
 
         detourForced = forceDetour;
 
-        if (disableDetour && !detourForced)
+        if (disableDetour && !detourForced) [[unlikely]]
         {
             detourEnabled = false;
         }
     }
 
-    const bool debuggerPresent = IsDebuggerPresent() != FALSE;
+    const bool debuggerPresent{IsDebuggerPresent() != FALSE};
     SAFE_DEBUG_PRINT(szDebug, "CrashHandler: Debugger present: %s\n", debuggerPresent ? "true" : "false");
 
-    if (!detourEnabled)
+    if (!detourEnabled) [[unlikely]]
     {
         SafeDebugOutput("CrashHandler: SEH detour protection disabled by configuration\n");
         return success;
@@ -1510,7 +1521,7 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
     exRecordGuard.ptr = nullptr;
     ctxGuard.ptr = nullptr;
 
-    void* returnAddr = _ReturnAddress();
+    void* returnAddr{_ReturnAddress()};
     InitializeExceptionRecord(outExRecord, dwExceptionCode, returnAddr);
 
     outCtx->ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
@@ -1720,19 +1731,36 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    const DWORD dwExceptionCode = pExPtrs->ExceptionRecord->ExceptionCode;
+    const DWORD dwExceptionCode{pExPtrs->ExceptionRecord->ExceptionCode};
 
-    if (IsFatalException(dwExceptionCode) == FALSE)
+    // Special handling for release build-affecting assertions from 3rd-party libs (e.g CEF) that overuse them
+    if (IsDebuggerPresent() == FALSE && pExPtrs->ContextRecord != nullptr)
     {
+        void* exceptionAddr = pExPtrs->ExceptionRecord->ExceptionAddress;
+        if (IsExceptionFromThirdParty(exceptionAddr))
+        {
+            if (dwExceptionCode == EXCEPTION_BREAKPOINT || dwExceptionCode == EXCEPTION_ILLEGAL_INSTRUCTION)
+            {
+                // Don't advance EIP - for EXCEPTION_BREAKPOINT, EIP already points past INT 3
+                // For EXCEPTION_ILLEGAL_INSTRUCTION with UD2, we just continue from current EIP
+                SafeDebugOutput("SEH: Assertion in 3rd-party library - continuing execution\n");
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
+        }
+    }
+
+    if (IsFatalException(dwExceptionCode) == FALSE) [[unlikely]]
+    {
+        // Non-fatal exceptions that are not from 3rd-party libraries
         std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
         SAFE_DEBUG_PRINT_C(szDebug.data(), szDebug.size(), "SEH: Non-fatal exception 0x%08X - ignoring\n", dwExceptionCode);
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    LONG lRet = EXCEPTION_CONTINUE_SEARCH;
+    LONG lRet{EXCEPTION_CONTINUE_SEARCH};
 
     static std::atomic<bool> bHandlerActive{false};
-    bool                     expected = false;
+    bool expected{false};
 
     if (!bHandlerActive.compare_exchange_strong(expected, true, std::memory_order_acq_rel, std::memory_order_relaxed))
     {
@@ -1742,7 +1770,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     SafeDebugOutput(DEBUG_SEPARATOR);
     SafeDebugOutput("SEH: FATAL - Unhandled exception filter triggered\n");
 
-    if (const BOOL logResult = LogExceptionDetails(pExPtrs); logResult == FALSE)
+    if (const BOOL logResult{LogExceptionDetails(pExPtrs)}; logResult == FALSE) [[unlikely]]
     {
         SafeDebugOutput("SEH: WARNING - Failed to log exception details\n");
     }
@@ -2170,14 +2198,14 @@ namespace
     g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
     
     constexpr unsigned int kStackSize = 0;
-    const auto threadHandle = reinterpret_cast<HANDLE>(_beginthreadex(
+    const auto threadHandle{reinterpret_cast<HANDLE>(_beginthreadex(
         nullptr,
         kStackSize,
         WatchdogThreadProc,
         nullptr,
         0,
         nullptr
-    ));
+    ))};
     
     HandleGuard watchdogHandle{threadHandle};
 
