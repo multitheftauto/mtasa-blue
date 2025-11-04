@@ -41,10 +41,11 @@ CWebCore::CWebCore()
 
 CWebCore::~CWebCore()
 {
-    std::ranges::for_each(m_WebViews, [](const auto& pWebView) {
+    for (const auto& pWebView : m_WebViews)
+    {
         if (pWebView) [[likely]]
             pWebView->CloseBrowser();
-    });
+    }
     m_WebViews.clear();
     CefClearSchemeHandlerFactories();
 
