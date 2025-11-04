@@ -4,7 +4,7 @@
           manifestVersion="1.0">
     <assemblyIdentity type="win32"
                       name="CEFLauncher"
-                      version="1.7.0"
+                      version="1.0.0.0"
                       processorArchitecture="x86" />
 
     <description>MTA:SA CEF (Chromium Embedded Framework) Launcher</description>
