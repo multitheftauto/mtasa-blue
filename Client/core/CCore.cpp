@@ -1471,13 +1471,14 @@ void CCore::Quit(bool bInstantly)
         // Destroy the client
         CModManager::GetSingleton().Unload();
 
-        // Use TerminateProcess before destroying CCore to ensure clean exit code
+        WatchDogCompletedSection("Q0");
+
+        // Use TerminateProcess before destroying CCore to ensure clean exit code (Exiting the normal way also crashes).
         TerminateProcess(GetCurrentProcess(), 0);
 
         // Destroy ourself (unreachable but kept for completeness)
         delete CCore::GetSingletonPtr();
 
-        WatchDogCompletedSection("Q0");
     }
     else
     {
