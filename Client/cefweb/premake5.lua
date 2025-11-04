@@ -1,5 +1,6 @@
 project "Client Webbrowser"
 	language "C++"
+	cppdialect "C++23"
 	kind "SharedLib"
 	targetname "cefweb"
 	targetdir(buildpath("mta"))
