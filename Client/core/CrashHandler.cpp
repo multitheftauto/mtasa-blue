@@ -28,7 +28,6 @@
 #include <cstdint>
 #include <exception>
 #include <errno.h>
-#include <format>
 #include <intrin.h>
 #include <mutex>
 #include <new>
@@ -170,13 +169,13 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
             return;
         }
 
-        g_lastExceptionInfo = ENHANCED_EXCEPTION_INFO{
-            .exceptionCode = pException->ExceptionRecord->ExceptionCode,
-            .exceptionAddress = pException->ExceptionRecord->ExceptionAddress,
-            .timestamp = std::chrono::system_clock::now(),
-            .threadId = GetCurrentThreadId(),
-            .processId = GetCurrentProcessId()
-        };
+        ENHANCED_EXCEPTION_INFO info;
+        info.exceptionCode = pException->ExceptionRecord->ExceptionCode;
+        info.exceptionAddress = pException->ExceptionRecord->ExceptionAddress;
+        info.timestamp = std::chrono::system_clock::now();
+        info.threadId = GetCurrentThreadId();
+        info.processId = GetCurrentProcessId();
+        g_lastExceptionInfo = info;
     }
     catch (...)
     {
@@ -1309,7 +1308,9 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
 
         const DWORD64 address = frame.AddrPC.Offset;
 
-        auto symbolName = std::format("0x{:X}", address);
+        char addressBuffer[32];
+        snprintf(addressBuffer, sizeof(addressBuffer), "0x%llX", static_cast<unsigned long long>(address));
+        std::string symbolName = addressBuffer;
         
         // Protect DbgHelp symbol lookups with SEH - addresses may be invalid/in guard pages
         // Especially important for corrupted stacks (callbacks, overflows, heap corruption)
@@ -1329,11 +1330,15 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
         {
             if (lineInfo.FileName != nullptr)
             {
-                frameInfo += std::format(" ({}:{})", lineInfo.FileName, lineInfo.LineNumber);
+                char lineBuffer[512];
+                snprintf(lineBuffer, sizeof(lineBuffer), " (%s:%lu)", lineInfo.FileName, lineInfo.LineNumber);
+                frameInfo += lineBuffer;
             }
         }
 
-        frameInfo += std::format(" [0x{:X}]", address);
+        char addrSuffixBuffer[32];
+        snprintf(addrSuffixBuffer, sizeof(addrSuffixBuffer), " [0x%llX]", static_cast<unsigned long long>(address));
+        frameInfo += addrSuffixBuffer;
         pOutTrace->push_back(frameInfo);
     }
 
