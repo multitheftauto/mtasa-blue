@@ -53,7 +53,7 @@ namespace
 // Returns CWebCoreInterface pointer on success, nullptr on failure
 // Thread safety: Must be called from the main thread only
 //
-extern "C" _declspec(dllexport) CWebCoreInterface* InitWebCoreInterface(CCoreInterface* pCore) noexcept
+extern "C" _declspec(dllexport) CWebCoreInterface* InitWebCoreInterface(CCoreInterface* pCore)
 {
     // Validate and initialize global interfaces
     if (!InitializeGlobalInterfaces(pCore)) [[unlikely]]
