@@ -20,15 +20,30 @@
     (set flag.new_cef_exe on the build server to generate new exe)
 */
 
-#include <Windows.h>
+#include <cstdlib>
+#include <functional>
 
-[[nodiscard]] int __declspec(dllimport) InitCEF();
+struct HINSTANCE__;
+using HINSTANCE = HINSTANCE__*;
+using LPSTR = char*;
 
-int __stdcall WinMain(
-    [[maybe_unused]] HINSTANCE hInstance,
-    [[maybe_unused]] HINSTANCE hPrevInstance,
-    [[maybe_unused]] LPSTR lpCmdLine,
-    [[maybe_unused]] int nCmdShow)
+[[nodiscard("InitCEF return value must be used")]] __declspec(dllimport) auto InitCEF() -> int;
+
+// Users are faced with vague crashes in CEFLauncher.exe, so rather than over-engineering all this is intended
+// Do note that CEFLauncher.exe ends up hosting any GPU rendering processes of CEF
+int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-    return InitCEF();
+    const auto init = std::function<int()>{InitCEF};
+    const auto safe_invoke = [&]() noexcept -> int
+    {
+        try
+        {
+            return std::invoke_r<int>(init);
+        }
+        catch (...)
+        {
+            return EXIT_FAILURE;
+        }
+    };
+    return safe_invoke();
 }

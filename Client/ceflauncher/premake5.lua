@@ -33,6 +33,7 @@ project "CEFLauncher"
 
 	filter {"system:windows", "configurations:Debug"}
 		defines { "_DEBUG" }
+		runtime "Debug"
 
 	filter {"system:windows", "configurations:Release"}
 		optimize "Speed"
