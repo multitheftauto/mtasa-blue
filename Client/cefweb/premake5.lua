@@ -1,6 +1,6 @@
 project "Client Webbrowser"
 	language "C++"
-	cppdialect "C++23"
+	cppdialect "C++20"
 	kind "SharedLib"
 	targetname "cefweb"
 	targetdir(buildpath("mta"))
@@ -38,6 +38,8 @@ project "Client Webbrowser"
 		"**.h",
 		"**.cpp"
 	}
+
+	filter {}
 
 	links {
 		"libcef", "CEF", "Psapi.lib", "version.lib", "Winmm.lib", "Ws2_32.lib", "DbgHelp.lib"

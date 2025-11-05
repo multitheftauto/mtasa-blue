@@ -31,6 +31,9 @@ CWebCore::CWebCore()
     m_bTestmodeEnabled = false;
     m_pXmlConfig = nullptr;
     m_pFocusedWebView = nullptr;
+    m_bGPUEnabled = false;
+    m_iWhitelistRevision = 0;
+    m_iBlacklistRevision = 0;
 
     MakeSureXMLNodesExist();
     InitialiseWhiteAndBlacklist();
@@ -92,12 +95,14 @@ bool CWebCore::Initialise(bool gpuEnabled)
     settings.multi_threaded_message_loop = true;
     settings.windowless_rendering_enabled = true;
 
-    bool state = CefInitialize(mainArgs, settings, app, sandboxInfo);
+    if (const bool state = CefInitialize(mainArgs, settings, app, sandboxInfo); state) [[likely]]
+    {
+        // Register custom scheme handler factory only if initialization succeeded
+        CefRegisterSchemeHandlerFactory("http", "mta", app);
+        return true;
+    }
 
-    // Register custom scheme handler factory
-    CefRegisterSchemeHandlerFactory("http", "mta", app);
-
-    return state;
+    return false;
 }
 
 CWebViewInterface* CWebCore::CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
@@ -243,19 +248,17 @@ void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
     {
         std::scoped_lock lock(m_TaskQueueMutex);
         
-        // Prevent unbounded queue growth - if queue is too large, oldest tasks will be dropped during pulse
-        if (m_TaskQueue.size() >= MAX_TASK_QUEUE_SIZE)
+        // Prevent unbounded queue growth - abort new task if queue is too large
+        if (m_TaskQueue.size() >= MAX_TASK_QUEUE_SIZE) [[unlikely]]
         {
 #ifdef MTA_DEBUG
-            g_pCore->GetConsole()->Printf("Warning: Task queue size limit reached (%d), task will be aborted", MAX_TASK_QUEUE_SIZE);
+            static constexpr auto WARNING_MSG = "Warning: Task queue size limit reached (%d), aborting new task";
+            g_pCore->GetConsole()->Printf(WARNING_MSG, MAX_TASK_QUEUE_SIZE);
 #endif
-            // Must still queue the task to fulfill the future, but it will be aborted during processing
-            // Removing oldest task to make room
-            if (!m_TaskQueue.empty())
-            {
-                m_TaskQueue.front().task(true);  // Abort oldest task
-                m_TaskQueue.pop_front();
-            }
+            // Abort the new task immediately to prevent deadlock
+            // Don't add it to the queue
+            task(true);
+            return;
         }
         
         m_TaskQueue.emplace_back(TaskEntry{task, webView});
@@ -269,14 +272,19 @@ void CWebCore::RemoveWebViewTasks(CWebView* webView)
 {
     std::scoped_lock lock(m_TaskQueueMutex);
 
-    for (auto iter = m_TaskQueue.begin(); iter != m_TaskQueue.end(); ++iter)
-    {
-        if (iter->webView != webView)
-            continue;
-
-        iter->task(true);
-        iter = m_TaskQueue.erase(iter);
-    }
+    // C++17-compatible erase-remove idiom (std::erase_if is C++20)
+    m_TaskQueue.erase(
+        std::remove_if(m_TaskQueue.begin(), m_TaskQueue.end(),
+            [webView](TaskEntry& entry) {
+                if (entry.webView == webView)
+                {
+                    entry.task(true);
+                    return true;
+                }
+                return false;
+            }),
+        m_TaskQueue.end()
+    );
 }
 
 void CWebCore::DoTaskQueuePulse()
@@ -298,12 +306,12 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
-    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
-                                          "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
+    static constexpr const char* wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
+                                                         "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
-    for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
+    for (const auto& pattern : wildcardWhitelist)
     {
-        if (WildcardMatch(wildcardWhitelist[i], strURL))
+        if (WildcardMatch(pattern, strURL))
             return eURLState::WEBPAGE_ALLOWED;
     }
 
@@ -602,6 +610,11 @@ bool CWebCore::SetGlobalAudioVolume(float fVolume)
     return true;
 }
 
+CWebViewInterface* CWebCore::GetFocusedWebView()
+{
+    return m_pFocusedWebView;
+}
+
 bool CWebCore::UpdateListsFromMaster()
 {
     if (!m_pXmlConfig)
@@ -813,7 +826,7 @@ void CWebCore::GetFilterEntriesByType(std::vector<std::pair<SString, bool>>& out
                 outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
             else if (state == eWebFilterState::WEBFILTER_ALLOWED && iter->second.first == true)
                 outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
-            else
+            else if (state == eWebFilterState::WEBFILTER_DISALLOWED && iter->second.first == false)
                 outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
         }
     }
@@ -822,6 +835,9 @@ void CWebCore::GetFilterEntriesByType(std::vector<std::pair<SString, bool>>& out
 void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
 {
     CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (!pWebCore) [[unlikely]]
+        return;
+
     if (result.bSuccess)
     {
         SString strData = result.pData;
@@ -862,6 +878,9 @@ void CWebCore::StaticFetchWhitelistFinished(const SHttpDownloadResult& result)
         return;
 
     CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (!pWebCore) [[unlikely]]
+        return;
+
     if (!pWebCore->m_pXmlConfig)
         return;
 
@@ -905,6 +924,9 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
         return;
 
     CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (!pWebCore) [[unlikely]]
+        return;
+
     if (!pWebCore->m_pXmlConfig)
         return;
 
