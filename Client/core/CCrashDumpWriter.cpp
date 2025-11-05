@@ -404,6 +404,9 @@ static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformat
             case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
                 exceptionType = "Invalid C Runtime Parameter";
                 break;
+            case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
+                exceptionType = "Fatal Exception in Windows Callback - Callback Exception Unhandled";
+                break;
             case CUSTOM_EXCEPTION_CODE_OOM:
                 exceptionType = "Out of Memory - Allocation Failure";
                 break;
@@ -513,6 +516,14 @@ static void AppendCrashDiagnostics(const SString& text)
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return false;
 
+    // For callback exceptions (0xC000041D), context and stack may be unreliable
+    const bool isCallbackException = (pException->ExceptionRecord != nullptr && 
+                                      pException->ExceptionRecord->ExceptionCode == 0xC000041D);
+    if (isCallbackException)
+    {
+        SAFE_DEBUG_OUTPUT("CaptureStackTraceText: Callback exception detected - using reduced trace depth\n");
+    }
+
     const DWORD contextFlags = pException->ContextRecord->ContextFlags;
     if ((contextFlags & CONTEXT_CONTROL) == 0)
     {
@@ -614,6 +625,25 @@ static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException) noexcept
     }
 }
 
+// Helper function to safely read callback exception context (uses SEH)
+static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException) noexcept
+{
+    __try
+    {
+        if (pException->ContextRecord != nullptr)
+        {
+            std::array<char, DEBUG_BUFFER_SIZE> szDebug;
+            SAFE_DEBUG_PRINT_C(szDebug.data(), szDebug.size(), 
+                "CCrashDumpWriter: Callback context EIP=0x%08X ESP=0x%08X\n",
+                pException->ContextRecord->Eip, pException->ContextRecord->Esp);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Failed to read callback exception context\n");
+    }
+}
+
 template <typename SectionGenerator>
 void AppendDumpSection(const SString& targetPath, const char* tryLabel, const char* successLabel, DWORD tagBegin, DWORD tagEnd, SectionGenerator&& generator)
 {
@@ -664,14 +694,8 @@ void CCrashDumpWriter::SetHandlers()
 {
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Setting up crash handlers\n");
 
-    ms_uiInvalidParameterSampleCount.store(0, std::memory_order_relaxed);
-    ms_bInvalidParameterWarningStored.store(false, std::memory_order_relaxed);
-    std::fill(ms_InvalidParameterSamples.begin(), ms_InvalidParameterSamples.end(), "");
-    SetApplicationSetting("diagnostics", "pending-invalid-parameter-warning", "");
-
-    _set_invalid_parameter_handler(CCrashDumpWriter::HandleInvalidParameter);
-    SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Invalid parameter handler installed\n");
-
+    // Install crash filter as absolute first action to catch early exceptions
+    // This improves the catching of crashes during window creation or early init
     if (!SetCrashHandlerFilter(CCrashDumpWriter::HandleExceptionGlobal))
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - Failed to install crash handler filter\n");
@@ -680,6 +704,14 @@ void CCrashDumpWriter::SetHandlers()
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash handler filter installed successfully\n");
     }
+
+    ms_uiInvalidParameterSampleCount.store(0, std::memory_order_relaxed);
+    ms_bInvalidParameterWarningStored.store(false, std::memory_order_relaxed);
+    std::fill(ms_InvalidParameterSamples.begin(), ms_InvalidParameterSamples.end(), "");
+    SetApplicationSetting("diagnostics", "pending-invalid-parameter-warning", "");
+
+    _set_invalid_parameter_handler(CCrashDumpWriter::HandleInvalidParameter);
+    SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Invalid parameter handler installed\n");
 
     CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing(3000);
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Reserved 3000KB for crash dump processing\n");
@@ -778,18 +810,121 @@ void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing()
     }
 }
 
+// Helper to safely read exception code using SEH
+static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException) noexcept
+{
+    DWORD exceptionCode = 0;
+    __try
+    {
+        if (pException != nullptr && pException->ExceptionRecord != nullptr)
+        {
+            exceptionCode = pException->ExceptionRecord->ExceptionCode;
+            if (exceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION)
+            {
+                OutputDebugStringA("CCrashDumpWriter: 0xC000041D callback exception detected\n");
+            }
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        OutputDebugStringA("CCrashDumpWriter: Exception accessing exception record (corrupted frame)\n");
+    }
+    return exceptionCode;
+}
+
+// Helper to get MTA path as C string for SEH contexts (avoids SString unwinding issues)
+static const char* GetMTAPathForSEH() noexcept
+{
+    static char szPath[MAX_PATH] = {0};
+    static bool initialized = false;
+    
+    if (!initialized)
+    {
+        SString strPath = GetMTASABaseDir();
+        strncpy_s(szPath, sizeof(szPath), strPath.c_str(), _TRUNCATE);
+        initialized = true;
+    }
+    
+    return szPath;
+}
+
+// Helper to write reentrant flag file using only SEH
+static void TryWriteReentrantFlag(DWORD exceptionCode) noexcept
+{
+    // Use static buffer to avoid SString (which requires object unwinding)
+    static char szFlagPath[MAX_PATH];
+    const char* szMTAPath = GetMTAPathForSEH();
+    if (szMTAPath != nullptr && szMTAPath[0] != '\0')
+    {
+        snprintf(szFlagPath, sizeof(szFlagPath), "%s\\mta\\core.log.flag.reentrant", szMTAPath);
+    }
+    else
+    {
+        return; // Cant proceed without path
+    }
+    
+    __try
+    {
+        if (FILE* pFlagFile = File::Fopen(szFlagPath, "w"))
+        {
+            fprintf(pFlagFile, "Reentrant exception 0x%08X\n", exceptionCode);
+            fclose(pFlagFile);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        // Ignore failures in emergency path
+    }
+}
+
+// Helper to re-read exception code with SEH protection (no C++ exception handling)
+static DWORD SafeRereadExceptionCode(_EXCEPTION_POINTERS* pException, DWORD fallback) noexcept
+{
+    DWORD exceptionCode = fallback;
+    __try
+    {
+        if (pException != nullptr && pException->ExceptionRecord != nullptr)
+        {
+            exceptionCode = pException->ExceptionRecord->ExceptionCode;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        // Keep using fallback if re-read fails
+    }
+    return exceptionCode;
+}
+
 long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pException)
 {
+    // Absolute first action - log that we entered the handler (before anything can fail)
+    // This is critical for diagnosing exceptions that may fault during handling
+    OutputDebugStringA("CCrashDumpWriter::HandleExceptionGlobal - EMERGENCY ENTRY MARKER\n");
+    
     SAFE_DEBUG_OUTPUT("========================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - ENTRY\n");
     SAFE_DEBUG_OUTPUT("========================================\n");
 
     const DWORD crashExitCode = ResolveCrashExitCode(pException);
+    
+    // Protect against stale/corrupted exception frames - use SEH to safely dereference exception pointers
+    // This applies to any exception that may have invalid pointers (callbacks, stack corruption, etc.)
+    const DWORD exceptionCodeSafe = SafeReadExceptionCode(pException);
 
-    bool expected = false;
+    // Attempt minimal emergency dump for any reentrant crash
+    bool expected{false};
     if (!ms_bInCrashHandler.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: RECURSIVE CRASH - Already in crash handler\n");
+        
+        // Try emergency minimal dump for any reentrant exception
+        if (exceptionCodeSafe != 0)
+        {
+            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Reentrant exception, attempting minimal dump\n");
+            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Exception during crash handling - attempting emergency artifacts\n");
+            TryWriteReentrantFlag(exceptionCodeSafe);
+        }
+        
         TerminateCurrentProcessWithExitCode(crashExitCode);
         return EXCEPTION_EXECUTE_HANDLER;
     }
@@ -798,14 +933,15 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
     FreeMemoryForCrashDumpProcessing();
 
-    if (pException == nullptr || pException->ExceptionRecord == nullptr)
+    // Use the safely-obtained exception code from SEH block
+    DWORD exceptionCode = SafeRereadExceptionCode(pException, exceptionCodeSafe);
+    
+    if (pException == nullptr || exceptionCode == 0)
     {
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - NULL exception pointers\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - NULL or invalid exception\n");
         TerminateCurrentProcessWithExitCode(crashExitCode);
         return EXCEPTION_EXECUTE_HANDLER;
     }
-
-    const auto exceptionCode = pException->ExceptionRecord->ExceptionCode;
 
     if (IsFatalException(exceptionCode) == FALSE)
     {
@@ -820,6 +956,20 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: FATAL EXCEPTION - Begin crash processing\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
 
+    // Special handling for callback exceptions - they require extra care
+    const bool isCallbackException = (exceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION);
+    if (isCallbackException)
+    {
+        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Entering callback exception special handling\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: STATUS_FATAL_USER_CALLBACK_EXCEPTION detected\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: This exception occurred in a Windows callback\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Stack frames may be incomplete or corrupted\n");
+        
+        // Try to capture what we can with additional protection
+        TryLogCallbackContext(pException);
+        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception context capture attempted\n");
+    }
+
     CExceptionInformation_Impl* pExceptionInformation = nullptr;
 
     pExceptionInformation = new (std::nothrow) CExceptionInformation_Impl;
@@ -832,11 +982,23 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
     pExceptionInformation->Set(exceptionCode, pException);
 
-    if (pExceptionInformation->GetCode() != exceptionCode)
+    // Validate that Set() succeeded - if code is 0, Set() failed validation
+    const DWORD storedCode = pExceptionInformation->GetCode();
+    if (storedCode == 0 && exceptionCode != 0)
+    {
+        std::array<char, DEBUG_BUFFER_SIZE> szDebug;
+        SAFE_DEBUG_PRINT_C(szDebug.data(), szDebug.size(), 
+            "CCrashDumpWriter: CRITICAL - Set() failed, stored code is 0 (expected 0x%08X)\n", exceptionCode);
+        
+        // This may occur due to null/corrupted context - try to salvage what we can
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Set() failed (likely null/corrupted context) - proceeding with minimal info\n");
+        // Continue processing with whatever partial info we have
+    }
+    else if (storedCode != exceptionCode)
     {
         std::array<char, DEBUG_BUFFER_SIZE> szDebug;
         SAFE_DEBUG_PRINT_C(szDebug.data(), szDebug.size(), "CCrashDumpWriter: WARNING - Exception code mismatch after Set() (expected 0x%08X, got 0x%08X)\n",
-                           exceptionCode, pExceptionInformation->GetCode());
+                           exceptionCode, storedCode);
     }
 
     WriteDebugEvent("CCrashDumpWriter::HandleExceptionGlobal");
@@ -846,65 +1008,117 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     bool miniDumpSucceeded = false;
     bool crashDialogShown = false;
 
-    CModManager* pModManager = CModManager::GetSingletonPtr();
-    if (pModManager != nullptr && pModManager->IsLoaded())
+    // Skip client hook for callback exceptions - addresses may be system trampolines
+    if (!isCallbackException)
     {
-        CClientBase* pClient = pModManager->GetClient();
-        bool         bHandled = false;
-        const bool   bHandledSafely = InvokeClientHandleExceptionSafe(pClient, pExceptionInformation, bHandled);
-
-        if (bHandledSafely && bHandled)
+        CModManager* pModManager = CModManager::GetSingletonPtr();
+        if (pModManager != nullptr && pModManager->IsLoaded())
         {
-            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Client handled exception - continuing execution\n");
-            delete pExceptionInformation;
-            return EXCEPTION_CONTINUE_SEARCH;
-        }
+            CClientBase* pClient = pModManager->GetClient();
+            bool         bHandled = false;
+            const bool   bHandledSafely = InvokeClientHandleExceptionSafe(pClient, pExceptionInformation, bHandled);
 
-        if (!bHandledSafely)
-        {
-            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Client exception handler faulted - forcing crash dump\n");
-        }
+            if (bHandledSafely && bHandled)
+            {
+                SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Client handled exception - continuing execution\n");
+                delete pExceptionInformation;
+                return EXCEPTION_CONTINUE_SEARCH;
+            }
 
-        bClientHandled = true;
+            if (!bHandledSafely)
+            {
+                SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Client exception handler failrd - forcing crash dump\n");
+            }
+
+            bClientHandled = true;
+        }
+    }
+    else
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Skipping client hook for callback exception (may re-enter broken callback)\n");
     }
 
     ms_uiTickCountBase = GetTickCount32();
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Generating crash artifacts...\n");
 
+    // Enhanced emergency logging for all exceptions to track dump generation progress
+    if (isCallbackException)
+    {
+        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception attempting core log\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception - attempting dump generation despite potential secondary faults\n");
+    }
+
     try
     {
+        if (isCallbackException)
+        {
+            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting DumpCoreLog\n");
+        }
         DumpCoreLog(pException, pExceptionInformation);
         coreLogSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Core log dumped successfully\n");
+        if (isCallbackException)
+        {
+            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpCoreLog succeeded\n");
+        }
     }
     catch (...)
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to dump core log\n");
+        if (isCallbackException)
+        {
+            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception may have caused secondary fault during core log\n");
+        }
     }
 
     try
     {
+        if (isCallbackException)
+        {
+            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting DumpMiniDump for callback exception\n");
+        }
         DumpMiniDump(pException, pExceptionInformation);
         miniDumpSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Mini dump created successfully\n");
+        if (isCallbackException)
+        {
+            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpMiniDump succeeded for callback exception\n");
+        }
     }
     catch (...)
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to create mini dump\n");
+        if (isCallbackException)
+        {
+            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpMiniDump FAILED for callback exception\n");
+            SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception may have caused secondary fault during minidump\n");
+        }
     }
 
     try
     {
+        if (isCallbackException)
+        {
+            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting RunErrorTool for callback exception\n");
+        }
         crashDialogShown = RunErrorTool(pExceptionInformation);
         if (crashDialogShown)
         {
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Error dialog launched successfully\n");
+            if (isCallbackException)
+            {
+                OutputDebugStringA("CCrashDumpWriter: EMERGENCY - RunErrorTool succeeded for callback exception\n");
+            }
         }
     }
     catch (...)
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to launch error dialog\n");
+        if (isCallbackException)
+        {
+            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - RunErrorTool FAILED for callback exception\n");
+        }
     }
 
     struct CrashStage
@@ -927,6 +1141,11 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash processing complete - terminating\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
+
+    if (isCallbackException)
+    {
+        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception processing completed, about to terminate\n");
+    }
 
     delete pExceptionInformation;
     pExceptionInformation = nullptr;
@@ -997,6 +1216,10 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     }
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Force terminating crashed process NOW\n");
+    if (isCallbackException)
+    {
+        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - About to call TerminateProcess for callback exception\n");
+    }
     TerminateCurrentProcessWithExitCode(crashExitCode);
 
     return EXCEPTION_EXECUTE_HANDLER;
@@ -1016,14 +1239,30 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         return;
     }
 
-    FILE* pFlagFile = File::Fopen(CalcMTASAPath("mta\\core.log.flag"), "w");
-    if (pFlagFile != nullptr)
+    // Use direct Win32 API to bypass potentially broken CRT after severe exceptions
+    // (stack corruption, buffer overruns, invalid parameters can all corrupt CRT state)
+    bool flagFileCreated = false;
+    const auto hFlagFile = CreateFileA(CalcMTASAPath("mta\\core.log.flag"), GENERIC_WRITE, 0, nullptr, 
+                                       CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (hFlagFile != INVALID_HANDLE_VALUE)
     {
-        fclose(pFlagFile);
+        const char* flagData = "crash\n";
+        DWORD bytesWritten = 0;
+        WriteFile(hFlagFile, flagData, static_cast<DWORD>(strlen(flagData)), &bytesWritten, nullptr);
+        CloseHandle(hFlagFile);
+        flagFileCreated = true;
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpCoreLog - Flag file created via Win32 API\n");
     }
     else
     {
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpCoreLog - Failed to create crash flag file\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpCoreLog - Failed to create crash flag file via Win32 API\n");
+        // Fallback: try CRT in case Win32 failed
+        if (FILE* pFlagFile = File::Fopen(CalcMTASAPath("mta\\core.log.flag"), "w"))
+        {
+            fclose(pFlagFile);
+            flagFileCreated = true;
+            SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpCoreLog - Flag file created via CRT fallback\n");
+        }
     }
 
     time_t timeTemp;
@@ -1539,8 +1778,29 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
 
                 if (!bResult)
                 {
-                    AddReportLog(9204, SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed (%08x)", GetLastError()));
-                    SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump FAILED with error 0x%08X\n", GetLastError()).c_str());
+                    const DWORD dwError = GetLastError();
+                    AddReportLog(9204, SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed (%08x)", dwError));
+                    SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump FAILED with error 0x%08X\n", dwError).c_str());
+                    
+                    // Retry with simpler dump type on partial copy errors (corrupted stacks, inaccessible memory)
+                    if (dwError == 0x8007012B || dwError == ERROR_PARTIAL_COPY) // ERROR_PARTIAL_COPY
+                    {
+                        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpMiniDump - Retrying with MiniDumpNormal only (no indirect memory)\n");
+                        SetFilePointer(hFile, 0, nullptr, FILE_BEGIN);
+                        SetEndOfFile(hFile);
+                        
+                        bResult = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
+                                      MiniDumpNormal, &ExInfo, nullptr, nullptr);
+                        if (bResult)
+                        {
+                            SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpMiniDump - Retry with MiniDumpNormal succeeded\n");
+                            bMiniDumpSucceeded = true;
+                        }
+                        else
+                        {
+                            SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter::DumpMiniDump - Retry also failed with error 0x%08X\n", GetLastError()).c_str());
+                        }
+                    }
                 }
                 else
                 {

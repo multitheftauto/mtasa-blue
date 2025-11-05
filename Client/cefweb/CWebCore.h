@@ -29,6 +29,7 @@
 class CWebBrowserItem;
 class CWebsiteRequests;
 class CWebView;
+class CWebViewInterface;
 
 class CWebCore : public CWebCoreInterface
 {
@@ -88,7 +89,7 @@ public:
     void SetTestModeEnabled(bool bEnabled) { m_bTestmodeEnabled = bEnabled; };
     void DebugOutputThreadsafe(const SString& message, unsigned char R, unsigned char G, unsigned char B);
 
-    CWebViewInterface* GetFocusedWebView() { return (CWebViewInterface*)m_pFocusedWebView; };
+    CWebViewInterface* GetFocusedWebView();
     void               SetFocusedWebView(CWebView* pWebView) { m_pFocusedWebView = pWebView; };
     void               ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void               ClearTextures();

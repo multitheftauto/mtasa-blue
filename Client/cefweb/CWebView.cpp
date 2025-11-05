@@ -37,8 +37,11 @@ CWebView::~CWebView()
 {
     if (IsMainThread())
     {
-        if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-            g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
+        if (auto pWebCore = g_pCore->GetWebCore(); pWebCore) [[likely]]
+        {
+            if (pWebCore->GetFocusedWebView() == this)
+                pWebCore->SetFocusedWebView(nullptr);
+        }
     }
 
     // Make sure we don't dead lock the CEF render thread
@@ -936,13 +939,16 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     // Remove events owned by this webview and invoke left callbacks
-    g_pCore->GetWebCore()->RemoveWebViewEvents(this);
+    if (auto pWebCore = g_pCore->GetWebCore(); pWebCore) [[likely]]
+    {
+        pWebCore->RemoveWebViewEvents(this);
+
+        // Remove focused web view reference
+        if (pWebCore->GetFocusedWebView() == this)
+            pWebCore->SetFocusedWebView(nullptr);
+    }
 
     m_pWebView = nullptr;
-
-    // Remove focused web view reference
-    if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////

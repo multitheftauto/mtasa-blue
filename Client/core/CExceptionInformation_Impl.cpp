@@ -43,9 +43,6 @@ static void DebugPrintExceptionInfo([[maybe_unused]] const char* /*message*/) no
     if (pException->ExceptionRecord == nullptr)
         return false;
 
-    if (pException->ContextRecord == nullptr)
-        return false;
-
     const EXCEPTION_RECORD* pRecord = pException->ExceptionRecord;
     if (pRecord->ExceptionCode == 0)
         return false;
@@ -60,7 +57,20 @@ static void DebugPrintExceptionInfo([[maybe_unused]] const char* /*message*/) no
     if (pRecord->ExceptionCode == CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT)
         return true;
 
+    // STATUS_FATAL_USER_CALLBACK_EXCEPTION (0xC000041D) - Windows often provides
+    // null or incomplete context for callback exceptions. Accept them anyway to generate dumps.
+    if (pRecord->ExceptionCode == 0xC000041D)
+    {
+        // Accept callback exceptions even with null context - we'll work with what we have
+        return true;
+    }
+
+    // For other exceptions, require valid context to ensure we can extract meaningful information
+    if (pException->ContextRecord == nullptr)
+        return false;
+
     const CONTEXT* pContext = pException->ContextRecord;
+
     if (pContext->ContextFlags == 0)
         return false;
 
@@ -304,10 +314,17 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         return;
     }
 
-    if (pException->ContextRecord == nullptr)
+    // Allow null context for callback exceptions and other special cases (validated above)
+    const bool isCallbackException = (iCode == 0xC000041D);
+    if (pException->ContextRecord == nullptr && !isCallbackException)
     {
-        DebugPrintExceptionInfo("Set - Null context record\n");
+        DebugPrintExceptionInfo("Set - Null context record (exception type requires context)\n");
         return;
+    }
+    
+    if (pException->ContextRecord == nullptr && isCallbackException)
+    {
+        DebugPrintExceptionInfo("Set - Null context for callback exception - proceeding with limited info\n");
     }
 
     if (iCode == 0 || iCode > 0xFFFFFFFF)
@@ -326,6 +343,12 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     if (hasEnhancedInfo && enhancedInfo.exceptionCode == iCode)
     {
         DebugPrintExceptionInfo("Set - Using enhanced exception info from CrashHandler (FRESH)\n");
+        
+        // Additional note for callback exceptions even when we have enhanced info
+        if (iCode == 0xC000041D)
+        {
+            DebugPrintExceptionInfo("Set - Callback exception: enhanced info available but stack/module may be incomplete\n");
+        }
     }
     else if (hasEnhancedInfo && enhancedInfo.exceptionCode != iCode)
     {
@@ -423,22 +446,47 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         m_capturedException = nullptr;
     }
 
-    m_ulEAX = pException->ContextRecord->Eax;
-    m_ulEBX = pException->ContextRecord->Ebx;
-    m_ulECX = pException->ContextRecord->Ecx;
-    m_ulEDX = pException->ContextRecord->Edx;
-    m_ulESI = pException->ContextRecord->Esi;
-    m_ulEDI = pException->ContextRecord->Edi;
-    m_ulEBP = pException->ContextRecord->Ebp;
-    m_ulESP = pException->ContextRecord->Esp;
-    m_ulEIP = pException->ContextRecord->Eip;
-    m_ulCS = pException->ContextRecord->SegCs;
-    m_ulDS = pException->ContextRecord->SegDs;
-    m_ulES = pException->ContextRecord->SegEs;
-    m_ulFS = pException->ContextRecord->SegFs;
-    m_ulGS = pException->ContextRecord->SegGs;
-    m_ulSS = pException->ContextRecord->SegSs;
-    m_ulEFlags = pException->ContextRecord->EFlags;
+    // Only access ContextRecord if it's not null (can be null for certain exception types)
+    if (pException->ContextRecord != nullptr)
+    {
+        m_ulEAX = pException->ContextRecord->Eax;
+        m_ulEBX = pException->ContextRecord->Ebx;
+        m_ulECX = pException->ContextRecord->Ecx;
+        m_ulEDX = pException->ContextRecord->Edx;
+        m_ulESI = pException->ContextRecord->Esi;
+        m_ulEDI = pException->ContextRecord->Edi;
+        m_ulEBP = pException->ContextRecord->Ebp;
+        m_ulESP = pException->ContextRecord->Esp;
+        m_ulEIP = pException->ContextRecord->Eip;
+        m_ulCS = pException->ContextRecord->SegCs;
+        m_ulDS = pException->ContextRecord->SegDs;
+        m_ulES = pException->ContextRecord->SegEs;
+        m_ulFS = pException->ContextRecord->SegFs;
+        m_ulGS = pException->ContextRecord->SegGs;
+        m_ulSS = pException->ContextRecord->SegSs;
+        m_ulEFlags = pException->ContextRecord->EFlags;
+    }
+    else
+    {
+        // No context available - zero out all registers
+        DebugPrintExceptionInfo("Set - Null context, zeroing register values\n");
+        m_ulEAX = 0;
+        m_ulEBX = 0;
+        m_ulECX = 0;
+        m_ulEDX = 0;
+        m_ulESI = 0;
+        m_ulEDI = 0;
+        m_ulEBP = 0;
+        m_ulESP = 0;
+        m_ulEIP = 0;
+        m_ulCS = 0;
+        m_ulDS = 0;
+        m_ulES = 0;
+        m_ulFS = 0;
+        m_ulGS = 0;
+        m_ulSS = 0;
+        m_ulEFlags = 0;
+    }
 
     std::unique_ptr<char[]> modulePathNameBuffer(new (std::nothrow) char[MAX_MODULE_PATH]);
     std::unique_ptr<char[]> tempModulePathBuffer(new (std::nothrow) char[MAX_MODULE_PATH]);
@@ -665,13 +713,29 @@ bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBu
     }
 
     HMODULE hModule = nullptr;
-    if (pfnGetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, static_cast<LPCSTR>(pQueryAddress),
-                              &hModule) == 0)
+    
+    // Wrap in __try for exception addresses that may be invalid/in guard pages/trampolines
+    // (callbacks, corrupted stacks, etc. can point to invalid memory)
+    __try
     {
-        const DWORD                         dwErrorHandle = GetLastError();
+        if (pfnGetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, static_cast<LPCSTR>(pQueryAddress),
+                                  &hModule) == 0)
+        {
+            const DWORD                         dwErrorHandle = GetLastError();
+            char debugBuffer[DEBUG_BUFFER_SIZE] = {};
+            SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sGetModule - GetModuleHandleExA failed (0x%08X)\n",
+                               static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), dwErrorHandle);
+            
+            // Address may be a system trampoline or invalid memory - don't proceed
+            return false;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
         char debugBuffer[DEBUG_BUFFER_SIZE] = {};
-        SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sGetModule - GetModuleHandleExA failed (0x%08X)\n",
-                           static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), dwErrorHandle);
+        SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sGetModule - Exception accessing address 0x%p (invalid/trampoline address)\n",
+                           static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), pQueryAddress);
+        // Don't proceed with invalid module info
         return false;
     }
 
