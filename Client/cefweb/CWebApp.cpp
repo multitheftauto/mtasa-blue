@@ -29,6 +29,9 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
     if (!command_line)
         return;
 
+    if (!g_pCore) [[unlikely]]
+        return;
+
     const auto pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
     if (!pWebCore)
         return;
@@ -63,6 +66,9 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
     // This is for exmaple true for the application cache or CEFURLRequests
     // (https://www.html5rocks.com/en/tutorials/appcache/beginner/)
     if (!browser || !frame || !request)
+        return nullptr;
+
+    if (!g_pCore) [[unlikely]]
         return nullptr;
 
     const auto pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
