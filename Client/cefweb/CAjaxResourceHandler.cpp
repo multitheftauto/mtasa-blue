@@ -84,13 +84,16 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
     }
 
     // Are we done?
-    if (m_strResponse.length() - m_DataOffset <= 0)
+    if (m_strResponse.length() - m_DataOffset <= 0) [[unlikely]]
         return false;
 
-    int copyBytes = std::min((uint)bytes_to_read, m_strResponse.length() - m_DataOffset);
+    if (bytes_to_read <= 0) [[unlikely]]
+        return false;
+
+    const size_t copyBytes = std::min(static_cast<size_t>(bytes_to_read), m_strResponse.length() - m_DataOffset);
 
     memcpy(data_out, m_strResponse.c_str() + m_DataOffset, copyBytes);
-    bytes_read = copyBytes;
+    bytes_read = static_cast<int>(copyBytes);
 
     m_DataOffset += copyBytes;
 
