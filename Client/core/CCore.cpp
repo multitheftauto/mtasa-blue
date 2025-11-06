@@ -1157,15 +1157,48 @@ CWebCoreInterface* CCore::GetWebCore()
         cvars->Get("browser_enable_gpu", gpuEnabled);
 
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        if (!m_pWebCore) [[unlikely]]
-            return nullptr;
-
-        if (!m_pWebCore->Initialise(gpuEnabled)) [[unlikely]]
+        if (!m_pWebCore)
         {
-            SAFE_DELETE(m_pWebCore);
+            WriteDebugEvent("CCore::GetWebCore - CreateModule failed");
+            return nullptr;
+        }
+
+        // Log current working directory
+        wchar_t cwdBeforeWebInit[32768]{};
+        DWORD cwdBeforeWebInitLen = GetCurrentDirectoryW(32768, cwdBeforeWebInit);
+        if (cwdBeforeWebInitLen > 0)
+        {
+            WriteDebugEvent(SString("CCore::GetWebCore - CWD before Initialise: %S", cwdBeforeWebInit));
+        }
+        
+        // Keep m_pWebCore alive even if Initialise() fails
+        // CefInitialize() can only be called once per process
+        // Deleting and recreating m_pWebCore causes repeated initialization attempts
+        // Track initialization state via IsInitialised() instead
+        bool bInitSuccess = false;
+        try
+        {
+            bInitSuccess = m_pWebCore->Initialise(gpuEnabled);
+        }
+        catch (...)
+        {
+            WriteDebugEvent("CCore::GetWebCore - Initialise threw exception");
+            bInitSuccess = false;
+        }
+        
+        if (!bInitSuccess)
+        {
+            WriteDebugEvent("CCore::GetWebCore - Initialise failed");
             return nullptr;
         }
     }
+    else
+    {
+        // On subsequent calls, check if initialization succeeded
+        if (!m_pWebCore->IsInitialised())
+            return nullptr;
+    }
+    
     return m_pWebCore;
 }
 

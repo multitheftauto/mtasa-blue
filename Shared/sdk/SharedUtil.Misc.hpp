@@ -12,8 +12,15 @@
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Time.h"
 #include <cstdint>
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <string>
 #include <limits>
 #include <map>
+#include <vector>
+#include <memory>
+#include <type_traits>
 #include <exception>
 #include <mutex>
 #include <utility>
@@ -71,6 +78,9 @@ namespace Details
         #undef GetModuleBaseNameW
     #endif
 
+    #include <bit>
+    #include <filesystem>
+
 namespace SharedUtil
 {
 namespace Details
@@ -110,8 +120,170 @@ namespace Details
     private:
         HGLOBAL m_handle = nullptr;
     };
+}            // namespace SharedUtil::Details
+}            // namespace SharedUtil
+
+static void InitializeProcessBaseDir(SString& strProcessBaseDir)
+{
+    try
+    {
+        const size_t bufferSize       = MAX_PATH * 2;
+        const size_t MAX_UNICODE_PATH = 32767;
+        std::vector<wchar_t> coreFileName(bufferSize);
+
+        // Get core.dll module handle to determine base directory
+        // Try debug build first (core_d.dll), then release build (core.dll)
+        const wchar_t* coreDllDebug   = L"core_d.dll";
+        const wchar_t* coreDllRelease = L"core.dll";
+
+        HMODULE hCoreModule      = nullptr;
+        bool    bCoreModuleFound = false;
+#ifdef MTA_DEBUG
+        bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllDebug, &hCoreModule) != FALSE;
+        if (!bCoreModuleFound)
+#endif
+            bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllRelease, &hCoreModule) != FALSE;
+
+        // Fallback: Use current module if core.dll isn't loaded yet
+        if (!hCoreModule)
+        {
+            GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               reinterpret_cast<LPCWSTR>(&InitializeProcessBaseDir), &hCoreModule);
+        }
+
+        if (hCoreModule)
+        {
+            DWORD lengthCore = GetModuleFileNameW(hCoreModule, coreFileName.data(), static_cast<DWORD>(coreFileName.size()));
+            if (lengthCore > 0)
+            {
+                std::wstring corePathBuffer(coreFileName.data(), static_cast<size_t>(lengthCore));
+
+                // If buffer too small, resize for long path support
+                const bool bufferTooSmall = (static_cast<size_t>(lengthCore) == coreFileName.size());
+                if (bufferTooSmall)
+                {
+                    corePathBuffer.resize(MAX_UNICODE_PATH);
+                    
+                    lengthCore = GetModuleFileNameW(hCoreModule, &corePathBuffer[0], static_cast<DWORD>(corePathBuffer.size()));
+                    if (lengthCore > 0 && static_cast<size_t>(lengthCore) < corePathBuffer.size())
+                    {
+                        corePathBuffer.resize(lengthCore);
+                    }
+                    else
+                    {
+                        return;  // Long path retrieval failed
+                    }
+                }
+
+                std::vector<wchar_t> fullPath(bufferSize);
+                
+                DWORD lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr);
+                if (lengthFull > 0)
+                {
+                    std::wstring fullPathStr;
+                    
+                    // If buffer too small, resize for long path support
+                    if (static_cast<size_t>(lengthFull) > fullPath.size())
+                    {
+                        if (static_cast<size_t>(lengthFull) > MAX_UNICODE_PATH)
+                            return;  // Path too long, validation failed
+                        
+                        std::wstring fullPathBuffer;
+                        fullPathBuffer.resize(static_cast<size_t>(lengthFull));
+                        lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPathBuffer.size()), &fullPathBuffer[0], nullptr);
+                        if (lengthFull > 0 && static_cast<size_t>(lengthFull) < fullPathBuffer.size())
+                        {
+                            fullPathStr = fullPathBuffer.substr(0, static_cast<size_t>(lengthFull));
+                        }
+                    }
+                    else
+                    {
+                        fullPathStr = std::wstring(fullPath.data(), static_cast<size_t>(lengthFull));
+                    }
+                    
+                    // Process path and extract base directory by walking up to find Bin/ directory
+                    if (!fullPathStr.empty())
+                    {
+                        const size_t lastSeparator = fullPathStr.find_last_of(L"\\/");
+                        if (lastSeparator != std::wstring::npos)
+                        {
+                            std::wstring currentPath = fullPathStr.substr(0, lastSeparator);
+                            
+                            // Walk up the directory tree to find Bin/ folder
+                            // Check current directory and up to 2 parent levels
+                            for (int level = 0; level < 3; ++level)
+                            {
+                                // Extract the current folder name (last component of path)
+                                const size_t lastSep = currentPath.find_last_of(L"\\/");
+                                std::wstring folderName = (lastSep != std::wstring::npos) 
+                                    ? currentPath.substr(lastSep + 1) 
+                                    : currentPath;
+                                
+                                // Convert to lowercase for case-insensitive comparison
+                                std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
+                                
+                                if (folderName == L"bin")
+                                {
+                                    strProcessBaseDir = ToUTF8(currentPath);
+                                    return;
+                                }
+                                
+                                // Move up one level for next iteration
+                                if (lastSep != std::wstring::npos)
+                                {
+                                    currentPath = currentPath.substr(0, lastSep);
+                                }
+                                else
+                                {
+                                    break;  // Reached root, can't go further
+                                }
+                            }
+                            
+                            // Fallback: Check if current working directory is or contains Bin/
+                            if (!bCoreModuleFound)
+                            {
+                                std::vector<wchar_t> cwdBuffer(MAX_PATH);
+                                if (GetCurrentDirectoryW(MAX_PATH, cwdBuffer.data()) > 0)
+                                {
+                                    std::wstring cwdPath(cwdBuffer.data());
+                                    // Extract the folder name (last component)
+                                    const size_t cwdLastSep = cwdPath.find_last_of(L"\\/");
+                                    std::wstring cwdName = (cwdLastSep != std::wstring::npos) 
+                                        ? cwdPath.substr(cwdLastSep + 1) 
+                                        : cwdPath;
+                                    
+                                    std::transform(cwdName.begin(), cwdName.end(), cwdName.begin(), ::towlower);
+                                    
+                                    if (cwdName == L"bin")
+                                    {
+                                        strProcessBaseDir = ToUTF8(cwdPath);
+                                        return;
+                                    }
+                                }
+                            }
+                            
+                            // No Bin/ folder found - leave strProcessBaseDir empty
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch (...)
+    {
+    }
 }
+
+[[nodiscard]] const SString& SharedUtil::GetMTAProcessBaseDir()
+{
+    static auto strProcessBaseDir = SString{};
+    static std::once_flag initFlag;
+
+    std::call_once(initFlag, InitializeProcessBaseDir, std::ref(strProcessBaseDir));
+
+    return strProcessBaseDir;
 }
+
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE

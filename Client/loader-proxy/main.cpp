@@ -121,9 +121,173 @@ VOID OnGameLaunch()
 
     std::error_code ec{};
 
+    // Log current working directory
+    wchar_t inheritedCwd[32768]{};
+    DWORD inheritedCwdLen = GetCurrentDirectoryW(32768, inheritedCwd);
+    if (inheritedCwdLen > 0)
+    {
+        AddLaunchLog("loader-proxy OnGameLaunch - Inherited CWD: %S", inheritedCwd);
+    }
+    else
+    {
+        AddLaunchLog("loader-proxy OnGameLaunch - GetCurrentDirectoryW failed: %u", GetLastError());
+    }
+
+    // CEF subprocess may have different working directory than parent process
+    // Try multiple methods to find the GTA directory:
+    // - Parse CEF command-line switch --mta-gta-path=<path>
+    // - Read from gta_path.txt file written by parent process
+    // - Check MTA_GTA_PATH environment variable
+    // - Use current_path() as fallback
+    
+    // Parse CEF command-line switch
+    std::array<wchar_t, 4096> gtaPathFromCmdLine{};
+    DWORD cmdLinePathLen = 0;
+    std::array<wchar_t, 4096> mtaBasePathFromCmdLine{};
+    DWORD mtaBasePathLen = 0;
+    {
+        const LPWSTR cmdLine = GetCommandLineW();
+        if (cmdLine)
+        {
+            AddLaunchLog("loader-proxy OnGameLaunch - Full command line: %S", cmdLine);
+            
+            // Parse for --mta-gta-path=<path>
+            // CEF command-line format: --switch=value or --switch=\"value with spaces\"
+            constexpr std::wstring_view switchPrefix = L"--mta-gta-path=";
+            if (const wchar_t* switchPos = wcsstr(cmdLine, switchPrefix.data()))
+            {
+                const wchar_t* const pathStartBase = switchPos + switchPrefix.length();
+                const wchar_t* pathStart = pathStartBase;
+                
+                // Skip opening quote if present
+                if (*pathStart == L'"')
+                    pathStart++;
+                
+                // Find end of path (closing quote or space)
+                const wchar_t* pathEnd = pathStart;
+                const bool isQuoted = (pathStartBase[0] == L'"');
+                
+                while (*pathEnd != L'\0')
+                {
+                    if (isQuoted && *pathEnd == L'"')
+                    {
+                        break;  // End of quoted path
+                    }
+                    else if (!isQuoted && *pathEnd == L' ')
+                    {
+                        break;  // End of unquoted path
+                    }
+                    pathEnd++;
+                }
+                
+                const size_t pathLen = pathEnd - pathStart;
+                if (pathLen > 0 && pathLen < gtaPathFromCmdLine.size())
+                {
+                    wcsncpy_s(gtaPathFromCmdLine.data(), gtaPathFromCmdLine.size(), pathStart, pathLen);
+                    cmdLinePathLen = static_cast<DWORD>(pathLen);
+                    AddLaunchLog("loader-proxy OnGameLaunch - Parsed CEF switch --mta-gta-path: '%S' (len=%u)", gtaPathFromCmdLine.data(), cmdLinePathLen);
+                }
+                else
+                {
+                    AddLaunchLog("loader-proxy OnGameLaunch - CEF switch found but path length invalid: %zu", pathLen);
+                }
+            }
+            else
+            {
+                AddLaunchLog("loader-proxy OnGameLaunch - CEF command-line switch --mta-gta-path NOT found in command line");
+            }
+
+            // Parse for --mta-base-path=<path>
+            constexpr std::wstring_view mtaSwitchPrefix = L"--mta-base-path=";
+            if (const wchar_t* mtaSwitchPos = wcsstr(cmdLine, mtaSwitchPrefix.data()))
+            {
+                const wchar_t* const mtaPathStartBase = mtaSwitchPos + mtaSwitchPrefix.length();
+                const wchar_t* mtaPathStart = mtaPathStartBase;
+                
+                // Skip opening quote if present
+                if (*mtaPathStart == L'"')
+                    mtaPathStart++;
+                
+                // Find end of path (closing quote or space)
+                const wchar_t* mtaPathEnd = mtaPathStart;
+                const bool mtaIsQuoted = (mtaPathStartBase[0] == L'"');
+                
+                while (*mtaPathEnd != L'\0')
+                {
+                    if (mtaIsQuoted && *mtaPathEnd == L'"')
+                    {
+                        break;
+                    }
+                    else if (!mtaIsQuoted && *mtaPathEnd == L' ')
+                    {
+                        break;
+                    }
+                    mtaPathEnd++;
+                }
+                
+                const size_t mtaPathLength = mtaPathEnd - mtaPathStart;
+                if (mtaPathLength > 0 && mtaPathLength < mtaBasePathFromCmdLine.size())
+                {
+                    wcsncpy_s(mtaBasePathFromCmdLine.data(), mtaBasePathFromCmdLine.size(), mtaPathStart, mtaPathLength);
+                    mtaBasePathLen = static_cast<DWORD>(mtaPathLength);
+                    AddLaunchLog("loader-proxy OnGameLaunch - Parsed CEF switch --mta-base-path: '%S' (len=%u)", mtaBasePathFromCmdLine.data(), mtaBasePathLen);
+                }
+            }
+        }
+    }
+    
+    // Read from file
+    std::array<wchar_t, 4096> gtaPathFromFile{};
+    DWORD filePathLen = 0;
+    const fs::path gtaPathFile = fs::current_path(ec) / L".." / L".." / L"MTA" / L"CEF" / L"gta_path.txt";
+    if (FILE* pFile = nullptr; _wfopen_s(&pFile, gtaPathFile.c_str(), L"r") == 0 && pFile)
+    {
+        std::array<char, 8192> buffer{};
+        const size_t bytesRead = fread(buffer.data(), 1, buffer.size() - 1, pFile);
+        fclose(pFile);
+        if (bytesRead > 0)
+        {
+            buffer[bytesRead] = '\0';  // Null-terminate
+            // Convert UTF-8 to wide char
+            if (MultiByteToWideChar(CP_UTF8, 0, buffer.data(), -1, gtaPathFromFile.data(), static_cast<int>(gtaPathFromFile.size())) > 0)
+            {
+                filePathLen = static_cast<DWORD>(wcslen(gtaPathFromFile.data()));
+            }
+        }
+    }
+    
+    // Check environment variable
+    std::array<wchar_t, 4096> gtaPathFromEnv{};
+    const DWORD envLen = GetEnvironmentVariableW(L"MTA_GTA_PATH", gtaPathFromEnv.data(), static_cast<DWORD>(gtaPathFromEnv.size()));
+    
+    const fs::path gtaDirectory = [&]() -> fs::path {
+        // CEF command-line switch
+        if (cmdLinePathLen > 0 && cmdLinePathLen < gtaPathFromCmdLine.size())
+        {
+            AddLaunchLog("loader-proxy OnGameLaunch - Using GTA path from CEF command-line switch: %S", gtaPathFromCmdLine.data());
+            return fs::path{gtaPathFromCmdLine.data()};
+        }
+        // File-based communication
+        else if (filePathLen > 0 && filePathLen < gtaPathFromFile.size())
+        {
+            AddLaunchLog("loader-proxy OnGameLaunch - Using GTA path from file: %S", gtaPathFromFile.data());
+            return fs::path{gtaPathFromFile.data()};
+        }
+        // Environment variable
+        else if (envLen > 0 && envLen < gtaPathFromEnv.size())
+        {
+            AddLaunchLog("loader-proxy OnGameLaunch - Using GTA path from MTA_GTA_PATH env var: %S", gtaPathFromEnv.data());
+            return fs::path{gtaPathFromEnv.data()};
+        }
+        // Current working directory
+        else
+        {
+            return fs::current_path(ec);
+        }
+    }();
+
     // MTA:SA launches GTA:SA process with the GTA:SA installation directory as the current directory.
     // We can't use the path to the current executable, because it's not in the game directory anymore.
-    const fs::path gtaDirectory = fs::current_path(ec);
 
     if (ec)
     {
@@ -148,43 +312,59 @@ VOID OnGameLaunch()
         }
     }
 
-    // Abort if the current process is not the game executable.
-    const std::wstring processName = GetCurrentProcessPath().filename().wstring();
+    // Detect if running as CEF subprocess by checking for --mta-base-path switch
+    // CEF subprocesses have this switch and skip validation checks
+    const bool bIsCefSubprocess = (mtaBasePathLen > 0);
 
-    if (!IEqual(GTA_EXE_NAME, processName))
+    if (bIsCefSubprocess)
     {
-        std::wstring message = L"Executable has an incorrect name (" + processName + L").";
-        DisplayErrorMessageBox(MakeLauncherError(message), L"CL52");
-        return;
+        AddLaunchLog("Detected CEF subprocess mode - skipping process name validation");
     }
 
-    // MTA:SA must be the parent launcher process in every case.
-    const fs::path launcherPath = GetParentProcessPath();
+    // Abort if the current process is not the game executable
+    if (!bIsCefSubprocess)
+    {
+        const std::wstring processName = GetCurrentProcessPath().filename().wstring();
 
-    if (launcherPath.empty())
+        if (!IEqual(GTA_EXE_NAME, processName))
+        {
+            std::wstring message = L"Executable has an incorrect name (" + processName + L").";
+            DisplayErrorMessageBox(MakeLauncherError(message), L"CL52");
+            return;
+        }
+    }
+
+    // MTA must be the parent launcher process in every case
+    // For CEF subprocesses, skip parent process check
+    const fs::path launcherPath = bIsCefSubprocess ? fs::path{} : GetParentProcessPath();
+
+    if (!bIsCefSubprocess && launcherPath.empty())
     {
         AddLaunchLog("Unable to determine launcher executable");
         DisplayErrorMessageBox(MakeLauncherError(L"Unable to determine launcher executable."), L"CL53");
         return;
     }
 
-    // Check if the name of the launcher process matches Multi Theft Auto.
-    const std::wstring launcherName = launcherPath.filename().wstring();
-
-    if (!IEqual(MTA_EXE_NAME, launcherName))
+    // Check if the name of the launcher process matches Multi Theft Auto
+    if (!bIsCefSubprocess)
     {
-        if (IEqual(EXPLORER_EXE_NAME, launcherName))
-        {
-            DisplayErrorMessageBox(MakeLauncherError(L"Do not run this game from Windows Explorer."), L"CL54");
-            return;
-        }
+        const std::wstring launcherName = launcherPath.filename().wstring();
 
-        std::wstring message = L"Launcher executable has an incorrect name (" + launcherName + L").";
-
-        if (!DisplayWarningMessageBox(MakeLauncherError(message), L"CL54"))
+        if (!IEqual(MTA_EXE_NAME, launcherName))
         {
-            ExitProcess(1);
-            return;
+            if (IEqual(EXPLORER_EXE_NAME, launcherName))
+            {
+                DisplayErrorMessageBox(MakeLauncherError(L"Do not run this game from Windows Explorer."), L"CL54");
+                return;
+            }
+
+            std::wstring message = L"Launcher executable has an incorrect name (" + launcherName + L").";
+
+            if (!DisplayWarningMessageBox(MakeLauncherError(message), L"CL54"))
+            {
+                ExitProcess(1);
+                return;
+            }
         }
     }
 
@@ -200,7 +380,33 @@ VOID OnGameLaunch()
     }
 
     // Check if the MTA subdirectory exists.
-    const fs::path mtaRootDirectory = launcherPath.parent_path();
+    // Use --mta-base-path from command-line if available,
+    // otherwise fall back to parent process path
+    const fs::path mtaRootDirectory = [&]() -> fs::path {
+        if (bIsCefSubprocess && mtaBasePathLen > 0 && mtaBasePathLen < mtaBasePathFromCmdLine.size())
+        {
+            AddLaunchLog("Using MTA base path from CEF command-line switch: %S", mtaBasePathFromCmdLine.data());
+            return fs::path{mtaBasePathFromCmdLine.data()};
+        }
+        else if (!bIsCefSubprocess && !launcherPath.empty())
+        {
+            AddLaunchLog("Using MTA base path from parent process path");
+            return launcherPath.parent_path();
+        }
+        else
+        {
+            AddLaunchLog("ERROR: Unable to determine MTA base path");
+            return fs::path{};
+        }
+    }();
+
+    if (mtaRootDirectory.empty())
+    {
+        AddLaunchLog("MTA root directory is empty - cannot continue");
+        DisplayErrorMessageBox(MakeLauncherError(L"Unable to determine MTA installation directory."), L"CL55");
+        return;
+    }
+
     const fs::path mtaDirectory = mtaRootDirectory / "MTA";
 
     if (!fs::is_directory(mtaDirectory, ec))

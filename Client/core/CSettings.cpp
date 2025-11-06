@@ -4151,6 +4151,8 @@ void CSettings::ReloadBrowserLists()
     if (m_bBrowserListsLoadEnabled)
     {
         auto                                  pWebCore = g_pCore->GetWebCore();
+        if (!pWebCore)
+            return;
         std::vector<std::pair<SString, bool>> customBlacklist;
         pWebCore->GetFilterEntriesByType(customBlacklist, eWebFilterType::WEBFILTER_USER);
         for (std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter)
@@ -4612,22 +4614,25 @@ void CSettings::SaveData()
     if (m_bBrowserListsLoadEnabled)
     {
         auto                 pWebCore = g_pCore->GetWebCore();
-        std::vector<SString> customBlacklist;
-        for (int i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
+        if (pWebCore)
         {
-            customBlacklist.push_back(m_pGridBrowserBlacklist->GetItemText(i, 1));
-        }
-        pWebCore->WriteCustomList("customblacklist", customBlacklist);
+            std::vector<SString> customBlacklist;
+            for (int i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
+            {
+                customBlacklist.push_back(m_pGridBrowserBlacklist->GetItemText(i, 1));
+            }
+            pWebCore->WriteCustomList("customblacklist", customBlacklist);
 
-        std::vector<SString> customWhitelist;
-        for (int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
-        {
-            customWhitelist.push_back(m_pGridBrowserWhitelist->GetItemText(i, 1));
-        }
-        pWebCore->WriteCustomList("customwhitelist", customWhitelist);
+            std::vector<SString> customWhitelist;
+            for (int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
+            {
+                customWhitelist.push_back(m_pGridBrowserWhitelist->GetItemText(i, 1));
+            }
+            pWebCore->WriteCustomList("customwhitelist", customWhitelist);
 
-        if (m_bBrowserListsChanged)
-            bBrowserSettingChanged = true;
+            if (m_bBrowserListsChanged)
+                bBrowserSettingChanged = true;
+        }
     }
 
     bool bBrowserGPUEnabled = false;
