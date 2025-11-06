@@ -13,6 +13,7 @@
 #pragma once
 
 #include <game/RenderWare.h>
+#include <cstring>
 
 struct CColModelSAInterface;
 
@@ -238,8 +239,8 @@ inline void RwFrameCopyMatrix(RwFrame* dst, RwFrame* src)
 {
     if (dst == NULL || src == NULL)
         return;
-    MemCpyFast(&dst->modelling, &src->modelling, sizeof(RwMatrix));
-    MemCpyFast(&dst->ltm, &src->ltm, sizeof(RwMatrix));
+    std::memcpy(&dst->modelling, &src->modelling, sizeof(RwMatrix));
+    std::memcpy(&dst->ltm, &src->ltm, sizeof(RwMatrix));
 }
 
 // Recursive RwFrame children searching function

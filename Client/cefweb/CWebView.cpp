@@ -37,15 +37,25 @@ CWebView::~CWebView()
 {
     if (IsMainThread())
     {
-        if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-            g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
+        if (auto pWebCore = g_pCore->GetWebCore(); pWebCore) [[likely]]
+        {
+            if (pWebCore->GetFocusedWebView() == this)
+                pWebCore->SetFocusedWebView(nullptr);
+        }
     }
 
     // Make sure we don't dead lock the CEF render thread
     ResumeCefThread();
 
-    // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
-    m_pWebView = nullptr;
+    // Clean up AJAX handlers to prevent accumulation
+    m_AjaxHandlers.clear();
+
+    // Break circular reference: ensure browser reference is cleared
+    // This is to prevent memory leaks from CWebView <-> CefBrowser cycles
+    if (m_pWebView)
+    {
+        m_pWebView = nullptr;
+    }
 
     OutputDebugLine("CWebView::~CWebView");
 }
@@ -54,7 +64,7 @@ void CWebView::Initialise()
 {
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit();
+    browserSettings.windowless_frame_rate = g_pCore->GetFPSLimiter()->GetFPSTarget();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
     browserSettings.javascript_dom_paste = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
@@ -82,6 +92,9 @@ void CWebView::CloseBrowser()
 
     // Make sure we don't dead lock the CEF render thread
     ResumeCefThread();
+
+    // Clear AJAX handlers early to prevent late event processing
+    m_AjaxHandlers.clear();
 
     if (m_pWebView)
         m_pWebView->GetHost()->CloseBrowser(true);
@@ -500,8 +513,12 @@ bool CWebView::HasAjaxHandler(const SString& strURL)
 
 void CWebView::HandleAjaxRequest(const SString& strURL, CAjaxResourceHandler* pHandler)
 {
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "AjaxResourceRequest");
+    // Only queue event if not being destroyed to prevent UAF
+    if (!m_bBeingDestroyed)
+    {
+        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL);
+        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "AjaxResourceRequest");
+    }
 }
 
 bool CWebView::ToggleDevTools(bool visible)
@@ -719,6 +736,8 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
     m_RenderData.width = width;
     m_RenderData.height = height;
     m_RenderData.dirtyRects = dirtyRects;
+    // Prevent vector capacity growth memory leak - shrink excess capacity
+    m_RenderData.dirtyRects.shrink_to_fit();
     m_RenderData.changed = true;
 
     // Wait for the main thread to handle drawing the texture
@@ -920,13 +939,16 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     // Remove events owned by this webview and invoke left callbacks
-    g_pCore->GetWebCore()->RemoveWebViewEvents(this);
+    if (auto pWebCore = g_pCore->GetWebCore(); pWebCore) [[likely]]
+    {
+        pWebCore->RemoveWebViewEvents(this);
+
+        // Remove focused web view reference
+        if (pWebCore->GetFocusedWebView() == this)
+            pWebCore->SetFocusedWebView(nullptr);
+    }
 
     m_pWebView = nullptr;
-
-    // Remove focused web view reference
-    if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////

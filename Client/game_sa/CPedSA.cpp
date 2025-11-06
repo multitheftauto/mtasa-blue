@@ -578,6 +578,16 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
     }
 }
 
+void CPedSA::SetInWaterFlags(bool inWater)
+{
+    auto* physicalInterface = static_cast<CPhysicalSAInterface*>(m_pInterface);
+    if (!physicalInterface)
+        return;
+
+    physicalInterface->bTouchingWater = inWater;
+    physicalInterface->bSubmergedInWater = inWater;
+}
+
 ////////////////////////////////////////////////////////////////
 //
 // CPed_PreRenderAfterTest

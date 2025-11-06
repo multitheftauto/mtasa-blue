@@ -20,12 +20,16 @@
 #define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
 #define BROWSER_LIST_UPDATE_INTERVAL (24*60*60)
 #define BROWSER_UPDATE_URL "https://cef.multitheftauto.com/get.php"
+#define MAX_EVENT_QUEUE_SIZE 10000
+#define MAX_TASK_QUEUE_SIZE 1000
+#define MAX_WHITELIST_SIZE 50000
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
 class CWebBrowserItem;
 class CWebsiteRequests;
 class CWebView;
+class CWebViewInterface;
 
 class CWebCore : public CWebCoreInterface
 {
@@ -85,7 +89,7 @@ public:
     void SetTestModeEnabled(bool bEnabled) { m_bTestmodeEnabled = bEnabled; };
     void DebugOutputThreadsafe(const SString& message, unsigned char R, unsigned char G, unsigned char B);
 
-    CWebViewInterface* GetFocusedWebView() { return (CWebViewInterface*)m_pFocusedWebView; };
+    CWebViewInterface* GetFocusedWebView();
     void               SetFocusedWebView(CWebView* pWebView) { m_pFocusedWebView = pWebView; };
     void               ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void               ClearTextures();
@@ -95,6 +99,8 @@ public:
 
     void OnPreScreenshot();
     void OnPostScreenshot();
+
+    void OnFPSLimitChange(std::uint16_t fps) override;
 
     bool SetGlobalAudioVolume(float fVolume);
 

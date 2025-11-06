@@ -14,516 +14,95 @@
 #include "Dialogs.h"
 #include "D3DStuff.h"
 #include <version.h>
+#include <algorithm>
 #include <array>
-#include <locale.h>
-#include <strsafe.h>
-#include <shlwapi.h>
-#include <wintrust.h>
-#include <softpub.h>
 #include <chrono>
-#include <psapi.h>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <locale.h>
 
-#pragma comment(lib, "shlwapi.lib")
-#pragma comment(lib, "wintrust.lib")
-#pragma comment(lib, "psapi.lib")
-
-#ifndef LOAD_WITH_ALTERED_SEARCH_PATH
-    #define LOAD_WITH_ALTERED_SEARCH_PATH 0x00000008
-#endif
-
-#ifndef LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR
-    #define LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR 0x00000100
-#endif
-
-#ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
-    #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
-#endif
-
-#ifndef WTD_UI_NONE
-    #define WTD_UI_NONE 2
-#endif
-
-#ifndef WTD_REVOKE_NONE
-    #define WTD_REVOKE_NONE 0x00000000
-#endif
-
-#ifndef WTD_REVOKE_WHOLECHAIN
-    #define WTD_REVOKE_WHOLECHAIN 0x00000001
-#endif
-
-#ifndef WTD_CHOICE_FILE
-    #define WTD_CHOICE_FILE 1
-#endif
-
-#ifndef WTD_STATEACTION_VERIFY
-    #define WTD_STATEACTION_VERIFY 1
-#endif
-
-#ifndef WTD_STATEACTION_CLOSE
-    #define WTD_STATEACTION_CLOSE 2
-#endif
-
-#ifndef WTD_SAFER_FLAG
-    #define WTD_SAFER_FLAG 0x00000100
-#endif
-
-#ifndef WTD_CACHE_ONLY_URL_RETRIEVAL
-    #define WTD_CACHE_ONLY_URL_RETRIEVAL 0x00001000
-#endif
-
+// Function must be at the start to fix odd compile error (Didn't happen locally but does in build server)
 namespace
 {
-
-    CRITICAL_SECTION g_DllLoadCS = {};
-    volatile LONG    g_lCriticalSectionInitialized = 0;
-
-    bool InitializeDllLoadCriticalSection()
+    bool ValidatePath(const SString& path)
     {
-        if (::InterlockedCompareExchange(&g_lCriticalSectionInitialized, 1L, 0L) == 0L)
-        {
-            if (!::InitializeCriticalSectionAndSpinCount(&g_DllLoadCS, 0x00000400))
-            {
-                ::InterlockedExchange(&g_lCriticalSectionInitialized, 0L);
-                return false;
-            }
-        }
+        // Placeholder
         return true;
     }
+}
 
-    // Check for KB2533623
-    bool HasKB2533623()
-    {
-        return (::GetProcAddress(::GetModuleHandleW(L"kernel32.dll"), "AddDllDirectory") != nullptr);
-    }
+[[nodiscard]] static bool IsCrashExitCode(DWORD exitCode) noexcept
+{
+    constexpr DWORD kLegacyCrashExitCode = 3;
 
-    SString GetSystemDirectory()
-    {
-        wchar_t systemPath[MAX_PATH + 1] = {0};
-        UINT    len = ::GetSystemDirectoryW(systemPath, MAX_PATH);
+    if (exitCode == kLegacyCrashExitCode)
+        return true;
 
-        if (len == 0 || len > MAX_PATH)
-            return "";
-
-        systemPath[len] = L'\0';
-        return ToUTF8(systemPath);
-    }
-
-
-    bool CheckForDotLocal(const SString& strExePath)
-    {
-        SString strLocalFile = strExePath + ".local";
-        if (FileExists(strLocalFile))
-        {
-            return true;
-        }
-
-        SString strExeDir = ExtractPath(strExePath);
-        SString strLocalDir = PathJoin(strExeDir, ".local");
-        if (DirectoryExists(strLocalDir))
-        {
-            return true;
-        }
-
+    if (exitCode == EXIT_OK || exitCode == EXIT_ERROR || exitCode == STILL_ACTIVE)
         return false;
-    }
 
-    bool ValidatePathSecurity(const SString& path)
+    const DWORD kInformationalCrashCodes[] = {
+        0x40000015u, // STATUS_FATAL_APP_EXIT
+        0x40010004u, // DBG_TERMINATE_PROCESS
+    };
+
+    if (std::any_of(std::begin(kInformationalCrashCodes), std::end(kInformationalCrashCodes),
+                    [exitCode](DWORD code) { return exitCode == code; }))
     {
-        if (path.empty() || path.length() >= MAX_PATH)
-            return false;
-
-        if (path.Contains("..") || path.Contains("..\\") || path.Contains("../"))
-            return false;
-
-        if (path.find('\0') != SString::npos)
-            return false;
-
-        if (path.Contains("\\\\?\\") || path.Contains("\\\\.\\") ||            // Device namespace paths
-            path.Contains("%") || path.Contains("$"))
-            return false;
-
         return true;
     }
 
-    bool IsKnownDLL(const SString& strDllName)
+    return (exitCode & 0x80000000u) != 0u;
+}
+
+enum class CrashArtifactState : unsigned char
+{
+    Missing,
+    Stale,
+    Fresh,
+};
+
+using FileTimeDuration = std::chrono::duration<std::int64_t, std::ratio<1, 10000000>>; // FILETIME ticks are 100ns
+
+constexpr auto kCrashArtifactStaleTolerance = std::chrono::seconds(2);
+static constexpr std::size_t kCrashArtifactCount = 3;
+
+[[nodiscard]] static constexpr const char* CrashArtifactStateToString(CrashArtifactState state) noexcept
+{
+    switch (state)
     {
-        if (strDllName.empty() || strDllName.length() > MAX_PATH)
-            return false;
-
-
-        SString strName = strDllName;
-        size_t  lastSlash = strName.find_last_of("\\/");
-        if (lastSlash != SString::npos)
-            strName = strName.substr(lastSlash + 1);
-
-        HKEY hKey = nullptr;
-        if (::RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\KnownDLLs", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
-            return false;
-
-        wchar_t buffer[MAX_PATH] = {0};
-        DWORD   bufferSize = sizeof(buffer);
-        LONG    result = ::RegQueryValueExW(hKey, FromUTF8(strName), nullptr, nullptr, reinterpret_cast<LPBYTE>(buffer), &bufferSize);
-
-        ::RegCloseKey(hKey);
-        return (result == ERROR_SUCCESS);
+        case CrashArtifactState::Fresh:
+            return "fresh";
+        case CrashArtifactState::Stale:
+            return "stale";
+        default:
+            return "missing";
     }
-
-    bool IsFromVirtualDisk(const SString& strPath)
-    {
-        if (strPath.empty())
-            return false;
-
-        wchar_t volumePath[MAX_PATH] = {0};
-        if (!::GetVolumePathNameW(FromUTF8(strPath), volumePath, MAX_PATH))
-            return false;
-
-        wchar_t volumeName[MAX_PATH] = {0};
-        wchar_t fileSystemName[MAX_PATH] = {0};
-        DWORD   volumeSerial = 0;
-        DWORD   maxComponentLen = 0;
-        DWORD   fileSystemFlags = 0;
-
-        if (!::GetVolumeInformationW(volumePath, volumeName, MAX_PATH, &volumeSerial, &maxComponentLen, &fileSystemFlags, fileSystemName, MAX_PATH))
-            return false;
-
-        SString strVolumeName = ToUTF8(volumeName);
-        SString strFileSystem = ToUTF8(fileSystemName);
-
-        if (strFileSystem == "CDFS" || strFileSystem == "UDF")
-            return true;
-
-        if (strVolumeName.ContainsI("ISO") || strVolumeName.ContainsI("VHD") || strVolumeName.ContainsI("VHDX") || strVolumeName.ContainsI("Virtual"))
-            return true;
-
-        return false;
-    }
-
-    DWORD GetRelativeFileCreationTime(const SString& strPath)
-    {
-        WIN32_FILE_ATTRIBUTE_DATA fileData;
-        if (!::GetFileAttributesExW(FromUTF8(strPath), GetFileExInfoStandard, &fileData))
-            return MAXDWORD;
-
-        FILETIME ftNow;
-        ::GetSystemTimeAsFileTime(&ftNow);
-
-        ULARGE_INTEGER now;
-        now.LowPart = ftNow.dwLowDateTime;
-        now.HighPart = ftNow.dwHighDateTime;
-
-        ULARGE_INTEGER created;
-        created.LowPart = fileData.ftCreationTime.dwLowDateTime;
-        created.HighPart = fileData.ftCreationTime.dwHighDateTime;
-
-        if (now.QuadPart < created.QuadPart)
-            return 0;
-
-        ULONGLONG diff = (now.QuadPart - created.QuadPart) / 10000000ULL;
-
-        if (diff > MAXDWORD)
-            return MAXDWORD;
-
-        return static_cast<DWORD>(diff);
-    }
-
-    [[nodiscard]] bool VerifyFileSignature(const SString& strFilePath)
-    {
-        const std::wstring wstrFilePath = FromUTF8(strFilePath);
-
-        DWORD dwAttribs = ::GetFileAttributesW(wstrFilePath.c_str());
-        if (dwAttribs == INVALID_FILE_ATTRIBUTES)
-            return false;
-        if (dwAttribs & FILE_ATTRIBUTE_REPARSE_POINT)
-            return false;
-
-        WINTRUST_FILE_INFO fileInfo = {};
-        fileInfo.cbStruct = sizeof(WINTRUST_FILE_INFO);
-        fileInfo.pcwszFilePath = wstrFilePath.c_str();
-
-        GUID guidAction = {0x00aac56b, 0xcd44, 0x11d0, {0x8c, 0xc2, 0x00, 0xc0, 0x4f, 0xc2, 0x95, 0xee}};
-
-        WINTRUST_DATA winTrustData = {};
-        winTrustData.cbStruct = sizeof(WINTRUST_DATA);
-        winTrustData.dwUIChoice = WTD_UI_NONE;
-        winTrustData.fdwRevocationChecks = WTD_REVOKE_WHOLECHAIN;
-        winTrustData.dwUnionChoice = WTD_CHOICE_FILE;
-        winTrustData.pFile = &fileInfo;
-        winTrustData.dwStateAction = WTD_STATEACTION_VERIFY;
-        winTrustData.dwProvFlags = WTD_SAFER_FLAG | WTD_CACHE_ONLY_URL_RETRIEVAL;
-
-        const LONG lStatus = ::WinVerifyTrust(nullptr, &guidAction, &winTrustData);
-
-        winTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
-        static_cast<void>(::WinVerifyTrust(nullptr, &guidAction, &winTrustData));
-
-#ifdef MTA_DEBUG
-        return (lStatus == ERROR_SUCCESS || (lStatus == TRUST_E_NOSIGNATURE && ::GetLastError() != ERROR_INVALID_PARAMETER));
-#else
-        return (lStatus == ERROR_SUCCESS);
-#endif
-    }
-
-    [[nodiscard]] bool ValidateModuleIntegrity(HMODULE hModule)
-    {
-        if (hModule == nullptr || hModule == INVALID_HANDLE_VALUE)
-            return false;
-
-        MODULEINFO moduleInfo = {};
-        if (!::GetModuleInformation(::GetCurrentProcess(), hModule, &moduleInfo, sizeof(moduleInfo)))
-            return false;
-
-        if (moduleInfo.lpBaseOfDll == nullptr || moduleInfo.SizeOfImage == 0)
-            return false;
-
-        if (moduleInfo.SizeOfImage > 100U * 1024U * 1024U || moduleInfo.SizeOfImage < 1024U)
-            return false;
-
-        MEMORY_BASIC_INFORMATION mbi = {};
-        const SIZE_T             querySize = ::VirtualQuery(moduleInfo.lpBaseOfDll, &mbi, sizeof(mbi));
-        if (querySize == 0)
-            return false;
-
-        if (mbi.State != MEM_COMMIT || mbi.Type != MEM_IMAGE)
-            return false;
-
-        if (mbi.Protect & (PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY))
-            return false;
-
-        __try
-        {
-            const auto* pDosHeader = reinterpret_cast<const IMAGE_DOS_HEADER*>(moduleInfo.lpBaseOfDll);
-            if (pDosHeader->e_magic != IMAGE_DOS_SIGNATURE)
-                return false;
-
-            const auto* pNtHeaders = reinterpret_cast<const IMAGE_NT_HEADERS*>(reinterpret_cast<const BYTE*>(moduleInfo.lpBaseOfDll) + pDosHeader->e_lfanew);
-            if (pNtHeaders->Signature != IMAGE_NT_SIGNATURE)
-                return false;
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    HMODULE SecureLoadLibraryInternal(const SString& strDllPath, DWORD dwFlags, bool bIsSystemDll)
-    {
-        if (!InitializeDllLoadCriticalSection())
-        {
-            return nullptr;
-        }
-
-        if (strDllPath.empty() || strDllPath.length() >= MAX_PATH)
-        {
-            return nullptr;
-        }
-
-        if (strDllPath.find('\0') != SString::npos)
-        {
-            return nullptr;
-        }
-
-        if (strDllPath.Contains("..") || strDllPath.Contains("~/") || strDllPath.Contains("~\\"))
-        {
-            return nullptr;
-        }
-
-        SString strFullPath;
-
-        if (bIsSystemDll && !strDllPath.Contains("\\"))
-        {
-            SString strSystemDir = GetSystemDirectory();
-            if (strSystemDir.empty())
-            {
-                return nullptr;
-            }
-
-            strFullPath = PathJoin(strSystemDir, strDllPath);
-        }
-        else
-        {
-            strFullPath = strDllPath;
-        }
-
-        wchar_t      canonicalPath[MAX_PATH + 1] = {0};
-        std::wstring wstrFullPath = FromUTF8(strFullPath);
-
-        if (wstrFullPath.length() >= MAX_PATH)
-        {
-            return nullptr;
-        }
-
-        if (!::PathCanonicalizeW(canonicalPath, wstrFullPath.c_str()))
-        {
-            return nullptr;
-        }
-
-        strFullPath = ToUTF8(canonicalPath);
-
-        if (!ValidatePathSecurity(strFullPath))
-        {
-            return nullptr;
-        }
-
-        if (bIsSystemDll)
-        {
-            SString strSystemDir = GetSystemDirectory();
-            if (!strSystemDir.empty())
-            {
-                if (!strFullPath.BeginsWithI(strSystemDir))
-                {
-                    return nullptr;
-                }
-            }
-        }
-
-
-        SString strExePath = GetLaunchPath();
-        if (!strExePath.empty())
-        {
-            strExePath = PathJoin(strExePath, MTA_EXE_NAME);
-            if (CheckForDotLocal(strExePath))
-            {
-			// placeholder
-            }
-        }
-
-        if (!FileExists(strFullPath))
-        {
-            return nullptr;
-        }
-
-        if (IsFromVirtualDisk(strFullPath))
-        {
-        }
-
-        DWORD dwRelativeCreationTime = GetRelativeFileCreationTime(strFullPath);
-        if (dwRelativeCreationTime < 3600)
-        {
-
-            bool bIsDebugContext = false;
-#ifdef MTA_DEBUG
-            bIsDebugContext = true;
-#endif
-
-            if (strFullPath.ContainsI("_d.dll") || strFullPath.ContainsI("\\debug\\"))
-            {
-                bIsDebugContext = true;
-            }
-
-            if (!bIsDebugContext)
-            {
-                // placeholder
-            }
-        }
-
-        std::wstring widePath = FromUTF8(strFullPath);
-
-        HANDLE hFile = ::CreateFileW(widePath.c_str(), GENERIC_READ,
-                                     FILE_SHARE_READ,
-                                     nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-        if (hFile == INVALID_HANDLE_VALUE)
-        {
-            DWORD dwError = ::GetLastError();
-            return nullptr;
-        }
-
-        BY_HANDLE_FILE_INFORMATION fileInfo = {};
-        if (!::GetFileInformationByHandle(hFile, &fileInfo))
-        {
-            ::CloseHandle(hFile);
-            return nullptr;
-        }
-
-        if ((fileInfo.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
-        {
-            ::CloseHandle(hFile);
-            return nullptr;
-        }
-
-        ::CloseHandle(hFile);
-        hFile = INVALID_HANDLE_VALUE;
-
-        if (bIsSystemDll)
-        {
-            if (!VerifyFileSignature(strFullPath))
-            {
-                return nullptr;
-            }
-        }
-
-        HMODULE hModule = nullptr;
-
-        ::EnterCriticalSection(&g_DllLoadCS);
-
-        const bool bHasKB2533623 = HasKB2533623();
-
-        if (bHasKB2533623 && bIsSystemDll)
-        {
-            hModule = ::LoadLibraryExW(widePath.c_str(), nullptr, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
-        }
-        else
-        {
-            hModule = ::LoadLibraryExW(widePath.c_str(), nullptr, dwFlags ? dwFlags : LOAD_WITH_ALTERED_SEARCH_PATH);
-        }
-
-        ::LeaveCriticalSection(&g_DllLoadCS);
-
-        if (hFile != INVALID_HANDLE_VALUE)
-        {
-            ::CloseHandle(hFile);
-        }
-
-        if (hModule == nullptr)
-        {
-            DWORD dwError = ::GetLastError();
-            WriteDebugEvent(SString("SecureLoadLibrary: LoadLibraryEx failed (%lu): %s", dwError, *strFullPath));
-            WriteDebugEventAndReport(5770, SString("DLL load failed (%lu): %s", dwError, *strFullPath));
-            return nullptr;
-        }
-
-        wchar_t loadedPath[MAX_PATH + 1] = {0};
-        DWORD   len = ::GetModuleFileNameW(hModule, loadedPath, MAX_PATH);
-        if (len > 0 && len < MAX_PATH)
-        {
-            // Canonicalize both paths for comparison
-            wchar_t expectedCanonical[MAX_PATH + 1] = {0};
-            wchar_t loadedCanonical[MAX_PATH + 1] = {0};
-
-            if (::PathCanonicalizeW(expectedCanonical, widePath.c_str()) && ::PathCanonicalizeW(loadedCanonical, loadedPath))
-            {
-                if (_wcsicmp(expectedCanonical, loadedCanonical) != 0)
-                {
-                    ::FreeLibrary(hModule);
-                    return nullptr;
-                }
-            }
-        }
-
-        if (!ValidateModuleIntegrity(hModule))
-        {
-            ::FreeLibrary(hModule);
-            return nullptr;
-        }
-
-        return hModule;
-    }
-
-    // Wrapper functions for ease of use
-    HMODULE SecureLoadLibrary(const SString& strDllPath, DWORD dwFlags = 0)
-    {
-        // For full paths, standard loading
-        return SecureLoadLibraryInternal(strDllPath, dwFlags, false);
-    }
-
-    HMODULE SecureLoadSystemLibrary(const SString& strDllName)
-    {
-        // System DLLs must be loaded from correct system directory
-        return SecureLoadLibraryInternal(strDllName, 0, true);
-    }
-}            // End anonymous namespace
+}
+
+[[nodiscard]] static FileTimeDuration FileTimeToDuration(const FILETIME& value) noexcept
+{
+    const auto combined = (static_cast<unsigned long long>(value.dwHighDateTime) << 32) | value.dwLowDateTime;
+    return FileTimeDuration{static_cast<FileTimeDuration::rep>(combined)};
+}
+
+[[nodiscard]] static CrashArtifactState InspectCrashArtifact(const SString& path,
+                                                             const std::optional<FileTimeDuration>& processCreationTime) noexcept
+{
+    WIN32_FILE_ATTRIBUTE_DATA attributes{};
+    if (!GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &attributes))
+        return CrashArtifactState::Missing;
+
+    if (!processCreationTime.has_value())
+        return CrashArtifactState::Fresh;
+
+    if (const auto lastWrite = FileTimeToDuration(attributes.ftLastWriteTime);
+        lastWrite + kCrashArtifactStaleTolerance < *processCreationTime)
+        return CrashArtifactState::Stale;
+
+    return CrashArtifactState::Fresh;
+}
 
 //////////////////////////////////////////////////////////
 //
@@ -535,32 +114,35 @@ namespace
 void CheckLibVersions()
 {
 #if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
-    const char* moduleList[] = {"MTA\\loader.dll",
-                                "MTA\\cgui.dll",
-                                "MTA\\core.dll",
-                                "MTA\\game_sa.dll",
-                                "MTA\\multiplayer_sa.dll",
-                                "MTA\\netc.dll",
-                                "MTA\\xmll.dll",
-                                "MTA\\game_sa.dll",
-                                "MTA\\" LOADER_PROXY_DLL_NAME,
-                                "mods\\deathmatch\\client.dll",
-                                "mods\\deathmatch\\pcre3.dll"};
+    const char* moduleList[] = {
+        "MTA\\loader.dll",
+        "MTA\\cgui.dll",
+        "MTA\\core.dll",
+        "MTA\\game_sa.dll",
+        "MTA\\multiplayer_sa.dll",
+        "MTA\\netc.dll",
+        "MTA\\xmll.dll",
+        "MTA\\game_sa.dll",
+        "MTA\\" LOADER_PROXY_DLL_NAME,
+        "mods\\deathmatch\\client.dll",
+        "mods\\deathmatch\\pcre3.dll"
+    };
 
     SString strReqFileVersion;
     for (uint i = 0; i < NUMELMS(moduleList); i++)
     {
         SString strFilename = moduleList[i];
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
         strFilename = ExtractBeforeExtension(strFilename) + "_d." + ExtractExtension(strFilename);
-    #endif
+#endif
         SString fullPath = CalcMTASAPath(strFilename);
-        if (!ValidatePathSecurity(fullPath))
+        if (!ValidatePath(fullPath))
         {
-            DisplayErrorMessageBox(SStringX(_("Invalid module path detected.\n") + SString("\n[%s]\n", *strFilename)), _E("CL49"), "invalid-module-path");
+            DisplayErrorMessageBox(SStringX(_("Invalid module path detected.\n") + SString("\n[%s]\n", *strFilename)),
+                                  _E("CL49"), "invalid-module-path");
             ExitProcess(EXIT_ERROR);
         }
-
+        
         SLibVersionInfo fileInfo;
         if (FileExists(fullPath))
         {
@@ -568,10 +150,12 @@ void CheckLibVersions()
             if (GetLibVersionInfo(fullPath, &fileInfo))
             {
                 // Validate version numbers
-                if (fileInfo.dwFileVersionMS > 0 && fileInfo.dwFileVersionMS < MAXDWORD && fileInfo.dwFileVersionLS > 0 && fileInfo.dwFileVersionLS < MAXDWORD)
+                if (fileInfo.dwFileVersionMS > 0 && fileInfo.dwFileVersionMS < MAXDWORD &&
+                    fileInfo.dwFileVersionLS > 0 && fileInfo.dwFileVersionLS < MAXDWORD)
                 {
-                    strFileVersion = SString("%d.%d.%d.%d", fileInfo.dwFileVersionMS >> 16, fileInfo.dwFileVersionMS & 0xFFFF, fileInfo.dwFileVersionLS >> 16,
-                                             fileInfo.dwFileVersionLS & 0xFFFF);
+                    strFileVersion = SString("%d.%d.%d.%d",
+                                            fileInfo.dwFileVersionMS >> 16, fileInfo.dwFileVersionMS & 0xFFFF,
+                                            fileInfo.dwFileVersionLS >> 16, fileInfo.dwFileVersionLS & 0xFFFF);
                 }
             }
 
@@ -582,15 +166,16 @@ void CheckLibVersions()
             else if (strReqFileVersion != strFileVersion)
             {
                 DisplayErrorMessageBox(SStringX(_("File version mismatch error. Reinstall MTA:SA if you experience problems.\n") +
-                                                SString("\n[%s %s/%s]\n", *strFilename, *strFileVersion, *strReqFileVersion)),
-                                       _E("CL40"), "bad-file-version");
+                                               SString("\n[%s %s/%s]\n", *strFilename, *strFileVersion, *strReqFileVersion)),
+                                      _E("CL40"), "bad-file-version");
                 break;
             }
         }
         else
         {
-            DisplayErrorMessageBox(SStringX(_("Some files are missing. Reinstall MTA:SA if you experience problems.\n") + SString("\n[%s]\n", *strFilename)),
-                                   _E("CL41"), "missing-file");
+            DisplayErrorMessageBox(SStringX(_("Some files are missing. Reinstall MTA:SA if you experience problems.\n") +
+                                           SString("\n[%s]\n", *strFilename)),
+                                  _E("CL41"), "missing-file");
             break;
         }
     }
@@ -599,7 +184,8 @@ void CheckLibVersions()
     // Check for Windows 'Safe Mode'
     if (GetSystemMetrics(SM_CLEANBOOT) != 0)
     {
-        DisplayErrorMessageBox(SStringX(_("MTA:SA is not compatible with Windows 'Safe Mode'.\n\nPlease restart your PC.\n")), _E("CL42"), "safe-mode");
+        DisplayErrorMessageBox(SStringX(_("MTA:SA is not compatible with Windows 'Safe Mode'.\n\nPlease restart your PC.\n")),
+                              _E("CL42"), "safe-mode");
         ExitProcess(EXIT_ERROR);
     }
 }
@@ -607,10 +193,10 @@ void CheckLibVersions()
 // Enum declarations for WSC health
 DECLARE_ENUM(WSC_SECURITY_PROVIDER_HEALTH)
 IMPLEMENT_ENUM_BEGIN(WSC_SECURITY_PROVIDER_HEALTH)
-ADD_ENUM(WSC_SECURITY_PROVIDER_HEALTH_GOOD, "good")
-ADD_ENUM(WSC_SECURITY_PROVIDER_HEALTH_NOTMONITORED, "not_monitored")
-ADD_ENUM(WSC_SECURITY_PROVIDER_HEALTH_POOR, "poor")
-ADD_ENUM(WSC_SECURITY_PROVIDER_HEALTH_SNOOZE, "snooze")
+    ADD_ENUM(WSC_SECURITY_PROVIDER_HEALTH_GOOD, "good")
+    ADD_ENUM(WSC_SECURITY_PROVIDER_HEALTH_NOTMONITORED, "not_monitored")
+    ADD_ENUM(WSC_SECURITY_PROVIDER_HEALTH_POOR, "poor")
+    ADD_ENUM(WSC_SECURITY_PROVIDER_HEALTH_SNOOZE, "snooze")
 IMPLEMENT_ENUM_END("wsc_health")
 
 // Simplified localization dummy class
@@ -620,7 +206,8 @@ public:
     SString Translate(const SString& strMessage) override { return strMessage; }
     SString TranslateWithContext(const SString& strContext, const SString& strMessage) override { return strMessage; }
     SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum) override { return strPlural; }
-    SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum) override { return strPlural; }
+    SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular,
+                                       const SString& strPlural, int iNum) override { return strPlural; }
     std::vector<SString> GetAvailableLocales() override { return {}; }
     bool                 IsLocalized() override { return false; }
     SString              GetLanguageDirectory(CLanguage* pLanguage = nullptr) override { return ""; }
@@ -641,17 +228,16 @@ CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
 void InitLocalization(bool bShowErrors)
 {
     static bool bInitialized = false;
-    if (bInitialized)
-        return;
+    if (bInitialized) return;
 
     // Check for core.dll
     const SString strCoreDLL = PathJoin(GetLaunchPath(), "mta", MTA_DLL_NAME);
     if (!FileExists(strCoreDLL))
     {
-        if (!bShowErrors)
-            return;
-        DisplayErrorMessageBox("Load failed. Please ensure that the file " MTA_DLL_NAME " is in the modules directory within the MTA root directory.",
-                               _E("CL23"), "core-missing");
+        if (!bShowErrors) return;
+        DisplayErrorMessageBox("Load failed. Please ensure that the file " MTA_DLL_NAME
+                              " is in the modules directory within the MTA root directory.",
+                              _E("CL23"), "core-missing");
         ExitProcess(EXIT_ERROR);
     }
 
@@ -660,67 +246,48 @@ void InitLocalization(bool bShowErrors)
     SetDllDirectory(PathJoin(strMTASAPath, "mta"));
 
     // See if xinput is loadable (XInput9_1_0.dll or xinput1_3.dll)
-    const DWORD dwPrevMode = SetErrorMode(SEM_FAILCRITICALERRORS);
-    const char* xinputModules[] = {"XInput9_1_0", "xinput1_3"};
+    const DWORD   dwPrevMode = SetErrorMode(SEM_FAILCRITICALERRORS);
+    const char*   xinputModules[] = {"XInput9_1_0", "xinput1_3"};
 
     for (uint i = 0; i < NUMELMS(xinputModules); ++i)
     {
         SString strDllName = SString("%s.dll", xinputModules[i]);
 
-        // Only load from our MTA directory - no system fallback
-        const SString strMTADest = PathJoin(strMTASAPath, "mta", strDllName);
-
-        if (!FileExists(strMTADest))
+        HMODULE hXInputModule = LoadLibrary(strDllName);
+        if (hXInputModule)
         {
-            // Try to copy from our backup file
-            SString strSrc = PathJoin(strMTASAPath, "mta", SString("%s_mta.dll", xinputModules[i]));
-            if (!FileExists(strSrc))
-            {
-                strSrc = PathJoin(GetLaunchPath(), "mta", SString("%s_mta.dll", xinputModules[i]));
-            }
-
-            if (FileExists(strSrc))
-            {
-                FileCopy(strSrc, strMTADest);
-            }
-        }
-
-        // Load from our directory only
-        if (FileExists(strMTADest))
-        {
-            HMODULE hXInputModule = SecureLoadLibrary(strMTADest);
-            if (hXInputModule)
-            {
-                WriteDebugEvent(SString("Successfully loaded XInput from: %s", *strMTADest));
-                FreeLibrary(hXInputModule);
-            }
-            else
-            {
-                WriteDebugEventAndReport(5775, SString("Failed to load XInput from: %s", *strMTADest));
-            }
+            FreeLibrary(hXInputModule);            // Exists already - no need to copy
         }
         else
         {
-            WriteDebugEventAndReport(5776, SString("Failed to load XInput from: %s", *strMTADest));
+            // Try to copy from our directory
+            const SString strDest = PathJoin(strMTASAPath, "mta", strDllName);
+            if (!FileExists(strDest))
+            {
+                SString strSrc = PathJoin(strMTASAPath, "mta", SString("%s_mta.dll", xinputModules[i]));
+                if (!FileExists(strSrc))
+                {
+                    strSrc = PathJoin(GetLaunchPath(), "mta", SString("%s_mta.dll", xinputModules[i]));
+                }
+                FileCopy(strSrc, strDest);
+            }
         }
     }
 
-    // Load core.dll using secure mechanism with full path
-    if (bShowErrors)
-        SetErrorMode(dwPrevMode);
-    HMODULE hCoreModule = SecureLoadLibrary(strCoreDLL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    // Load core.dll
+    if (bShowErrors) SetErrorMode(dwPrevMode);
+    HMODULE hCoreModule = LoadLibraryEx(strCoreDLL, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
     SetErrorMode(dwPrevMode);
 
     if (!hCoreModule)
     {
-        if (!bShowErrors)
-            return;
-        WriteDebugEventAndReport(5773, SString("Core.dll load failed: %s", *strCoreDLL));
-        DisplayErrorMessageBox("Loading core failed. Please ensure that the latest DirectX is correctly installed.", _E("CL24"), "core-not-loadable");
+        if (!bShowErrors) return;
+        DisplayErrorMessageBox("Loading core failed. Please ensure that the latest DirectX is correctly installed.",
+                              _E("CL24"), "core-not-loadable");
         ExitProcess(EXIT_ERROR);
     }
 
-    WriteDebugEvent(SString("Successfully loaded core.dll from: %s", *strCoreDLL));
+    LoaderResolveCrashHandlerExports(hCoreModule);
 
     // Get locale
     SString strLocale = GetApplicationSetting("locale");
@@ -748,7 +315,7 @@ void InitLocalization(bool bShowErrors)
     }
 
     // Create localization interface
-    typedef CLocalizationInterface*(__cdecl * CreateLocalizationFunc)(SString);
+    typedef CLocalizationInterface*(__cdecl* CreateLocalizationFunc)(SString);
     auto pFunc = reinterpret_cast<CreateLocalizationFunc>(static_cast<void*>(GetProcAddress(hCoreModule, "L10n_CreateLocalization")));
 
     if (!pFunc)
@@ -756,8 +323,8 @@ void InitLocalization(bool bShowErrors)
         FreeLibrary(hCoreModule);
         if (bShowErrors)
         {
-            DisplayErrorMessageBox("Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible.", _E("CL26"),
-                                   "localization-not-loadable");
+            DisplayErrorMessageBox("Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible.",
+                                  _E("CL26"), "localization-not-loadable");
         }
         return;
     }
@@ -768,8 +335,8 @@ void InitLocalization(bool bShowErrors)
         FreeLibrary(hCoreModule);
         if (bShowErrors)
         {
-            DisplayErrorMessageBox("Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible.", _E("CL26"),
-                                   "localization-not-loadable");
+            DisplayErrorMessageBox("Loading localization failed. Please ensure that MTA San Andreas 1.6\\MTA\\locale is accessible.",
+                                  _E("CL26"), "localization-not-loadable");
         }
         return;
     }
@@ -780,9 +347,9 @@ void InitLocalization(bool bShowErrors)
     // NOTE: hCoreModule is intentionally kept loaded as it contains the localization implementation
     bInitialized = true;
 
-#ifdef MTA_DEBUG
-    TestDialogs();
-#endif
+    #ifdef MTA_DEBUG
+        TestDialogs();
+    #endif
 }
 
 //////////////////////////////////////////////////////////
@@ -925,23 +492,25 @@ void HandleNotUsedMainMenu()
         std::vector<SString> matchTextList;
         const char*          szProductName;
         const char*          szTrouble;
-    } procItems[] = {{{"\\Evolve"}, "Evolve", "not-used-menu-evolve"},
-                     {{"\\GbpSv.exe", "Diebold\\Warsaw"}, "GAS Tecnologia - G-Buster Browser Defense", "not-used-menu-gbpsv"}};
+    } procItems[] = {
+        {{"\\Evolve"}, "Evolve", "not-used-menu-evolve"},
+        {{"\\GbpSv.exe", "Diebold\\Warsaw"}, "GAS Tecnologia - G-Buster Browser Defense", "not-used-menu-gbpsv"}
+    };
 
-    bool         foundProblemProcess = false;
+    bool foundProblemProcess = false;
     const size_t MAX_PROCESS_CHECKS = 100;
-    size_t       processesChecked = 0;
-
+    size_t processesChecked = 0;
+    
     for (uint i = 0; i < NUMELMS(procItems) && !foundProblemProcess; i++)
     {
         auto processList = MyEnumProcesses(true);
-
+        
         if (processList.size() > 1000)
         {
             WriteDebugEvent("Too many processes to check");
             break;
         }
-
+        
         for (auto processId : processList)
         {
             if (++processesChecked > MAX_PROCESS_CHECKS)
@@ -949,9 +518,9 @@ void HandleNotUsedMainMenu()
                 WriteDebugEvent("Process check limit reached in HandleNotUsedMainMenu");
                 break;
             }
-
+            
             SString strProcessFilename = GetProcessPathFilename(processId);
-
+            
             // Validate process path
             if (!strProcessFilename.empty() && strProcessFilename.length() < MAX_PATH)
             {
@@ -968,8 +537,7 @@ void HandleNotUsedMainMenu()
                     }
                 }
             }
-            if (foundProblemProcess)
-                break;
+            if (foundProblemProcess) break;
         }
     }
 }
@@ -993,10 +561,9 @@ void HandleCustomStartMessage()
     if (strStartMessage.BeginsWith("vdetect"))
     {
         SString strFilename = strStartMessage.SplitRight("name=");
-        strStartMessage =
-            _("WARNING\n\n"
-              "MTA:SA has detected unusual activity.\n"
-              "Please run a virus scan to ensure your system is secure.\n\n");
+        strStartMessage = _("WARNING\n\n"
+                           "MTA:SA has detected unusual activity.\n"
+                           "Please run a virus scan to ensure your system is secure.\n\n");
         strStartMessage += SString(_("The detected file was:  %s\n"), *strFilename);
     }
 
@@ -1024,7 +591,10 @@ void HandleCustomStartMessage()
 //////////////////////////////////////////////////////////
 void PreLaunchWatchDogs()
 {
-    assert(!CreateSingleInstanceMutex());
+    // Note: Single instance mutex is properly checked later in the launch sequence
+    // Creating it here just ensures we acquire it early, but we shouldn't assert
+    // because after a crash the mutex won't exist (OS releases it)
+    CreateSingleInstanceMutex();
 
     // Check for unclean stop on previous run
 #ifndef MTA_DEBUG
@@ -1139,9 +709,9 @@ void HandleIfGTAIsAlreadyRunning()
 {
     if (IsGTARunning())
     {
-        if (MessageBoxUTF8(
-                0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"),
-                _("Information") + _E("CL10"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST) == IDYES)
+        if (MessageBoxUTF8(0,
+                          _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"),
+                          _("Information") + _E("CL10"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST) == IDYES)
         {
             TerminateOtherMTAIfRunning();
             TerminateGTAIfRunning();
@@ -1201,34 +771,36 @@ void HandleSpecialLaunchOptions()
 void HandleDuplicateLaunching()
 {
     LPSTR lpCmdLine = GetCommandLine();
-    if (!lpCmdLine)
-        ExitProcess(EXIT_ERROR);
+    if (!lpCmdLine) ExitProcess(EXIT_ERROR);
 
     //  Validate command line length
     const size_t cmdLineLen = strlen(lpCmdLine);
-    if (cmdLineLen >= 32768)
-        ExitProcess(EXIT_ERROR);            // Max Windows command line length
+    if (cmdLineLen >= 32768) ExitProcess(EXIT_ERROR);            // Max Windows command line length
+
+    bool bIsCrashDialog = (cmdLineLen > 0 && strstr(lpCmdLine, "install_stage=crashed") != NULL);
 
     int recheckTime = 2000;            // 2 seconds recheck time
 
     // We can only do certain things if MTA is already running
-    while (!CreateSingleInstanceMutex())
+    // Unless this is a crash dialog launch, which needs to run alongside the crashed instance
+    //
+    // Normal behavior: Loop here if mutex is held, try to pass command line to existing instance
+    // Crash dialog: Skip this entirely (bIsCrashDialog=true), proceed directly to showing dialog
+    while (!bIsCrashDialog && !CreateSingleInstanceMutex())
     {
         if (cmdLineLen > 0)
         {
             // Command line args present, so pass it on
             HWND hwMTAWindow = FindWindow(NULL, "MTA: San Andreas");
-#ifdef MTA_DEBUG
-            if (!hwMTAWindow)
-                hwMTAWindow = FindWindow(NULL, "MTA: San Andreas [DEBUG]");
-#endif
+            #ifdef MTA_DEBUG
+                if (!hwMTAWindow) hwMTAWindow = FindWindow(NULL, "MTA: San Andreas [DEBUG]");
+            #endif
 
             if (hwMTAWindow)
             {
                 // Parse URI from command line
                 LPWSTR szCommandLine = GetCommandLineW();
-                if (!szCommandLine)
-                    continue;
+                if (!szCommandLine) continue;
 
                 int     numArgs = 0;
                 LPWSTR* aCommandLineArgs = CommandLineToArgvW(szCommandLine, &numArgs);
@@ -1237,8 +809,7 @@ void HandleDuplicateLaunching()
                 {
                     for (int i = 1; i < numArgs; ++i)
                     {
-                        if (!aCommandLineArgs[i])
-                            continue;
+                        if (!aCommandLineArgs[i]) continue;
 
                         WString wideArg = aCommandLineArgs[i];
                         if (wideArg.length() > 8 && wideArg.length() < 2048 &&            // Max MTA connect URI length
@@ -1253,12 +824,13 @@ void HandleDuplicateLaunching()
                             if (strConnectInfo.Contains("..") || strConnectInfo.Contains("\\\\"))
                                 continue;
 
-                            COPYDATASTRUCT cdStruct = {URI_CONNECT, static_cast<DWORD>(strConnectInfo.length() + 1), const_cast<char*>(strConnectInfo.c_str())};
+                            COPYDATASTRUCT cdStruct = {URI_CONNECT, static_cast<DWORD>(strConnectInfo.length() + 1),
+                                                       const_cast<char*>(strConnectInfo.c_str())};
 
                             // Use SendMessageTimeout to prevent hanging
                             DWORD_PTR dwResult = 0;
-                            SendMessageTimeout(hwMTAWindow, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cdStruct), SMTO_ABORTIFHUNG | SMTO_BLOCK, 5000,
-                                               &dwResult);
+                            SendMessageTimeout(hwMTAWindow, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cdStruct), SMTO_ABORTIFHUNG | SMTO_BLOCK,
+                                             5000, &dwResult);
                             break;
                         }
                     }
@@ -1274,11 +846,10 @@ void HandleDuplicateLaunching()
             }
             else
             {
-                const SString strMessage =
-                    _("Trouble restarting MTA:SA\n\n"
-                      "If the problem persists, open Task Manager and\n"
-                      "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
-                      "Try to launch MTA:SA again?");
+                const SString strMessage = _("Trouble restarting MTA:SA\n\n"
+                                            "If the problem persists, open Task Manager and\n"
+                                            "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
+                                            "Try to launch MTA:SA again?");
 
                 if (MessageBoxUTF8(0, strMessage, _("Error") + _E("CL04"), MB_ICONWARNING | MB_YESNO | MB_TOPMOST) == IDYES)
                 {
@@ -1299,15 +870,13 @@ void HandleDuplicateLaunching()
             // No command line args, so just bring to front
             if (!IsGTARunning() && !IsOtherMTARunning())
             {
-                MessageBoxUTF8(0,
-                               _("Another instance of MTA is already running.\n\n"
-                                 "If this problem persists, please restart your computer"),
-                               _("Error") + _E("CL05"), MB_ICONERROR | MB_TOPMOST);
+                MessageBoxUTF8(0, _("Another instance of MTA is already running.\n\n"
+                                   "If this problem persists, please restart your computer"),
+                              _("Error") + _E("CL05"), MB_ICONERROR | MB_TOPMOST);
             }
-            else if (MessageBoxUTF8(0,
-                                    _("Another instance of MTA is already running.\n\n"
-                                      "Do you want to terminate it?"),
-                                    _("Error") + _E("CL06"), MB_ICONQUESTION | MB_YESNO | MB_TOPMOST) == IDYES)
+            else if (MessageBoxUTF8(0, _("Another instance of MTA is already running.\n\n"
+                                          "Do you want to terminate it?"),
+                                     _("Error") + _E("CL06"), MB_ICONQUESTION | MB_YESNO | MB_TOPMOST) == IDYES)
             {
                 TerminateGTAIfRunning();
                 TerminateOtherMTAIfRunning();
@@ -1320,6 +889,11 @@ void HandleDuplicateLaunching()
             }
             ExitProcess(EXIT_ERROR);
         }
+    }
+
+    if (bIsCrashDialog)
+    {
+        CreateSingleInstanceMutex();
     }
 }
 
@@ -1337,15 +911,16 @@ void ValidateGTAPath()
 
     if (result == GAME_PATH_MISSING)
     {
-        DisplayErrorMessageBox(_("Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."), _E("CL12"), "reg-entries-missing");
+        DisplayErrorMessageBox(_("Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."),
+                              _E("CL12"), "reg-entries-missing");
         ExitProcess(EXIT_ERROR);
     }
     else if (result == GAME_PATH_UNICODE_CHARS)
     {
         DisplayErrorMessageBox(_("The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. "
-                                 "Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains "
-                                 "only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."),
-                               _E("CL13"));
+                                "Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains "
+                                "only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."),
+                              _E("CL13"));
         ExitProcess(EXIT_ERROR);
     }
 
@@ -1356,10 +931,10 @@ void ValidateGTAPath()
     if (strGTAPath.Contains(";") || strMTASAPath.Contains(";"))
     {
         DisplayErrorMessageBox(_("The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-                                 "contains a ';' (semicolon).\n\n"
-                                 "If you experience problems when running MTA:SA,\n"
-                                 "move your installation(s) to a path that does not contain a semicolon."),
-                               _E("CL15"), "path-semicolon");
+                                "contains a ';' (semicolon).\n\n"
+                                "If you experience problems when running MTA:SA,\n"
+                                "move your installation(s) to a path that does not contain a semicolon."),
+                              _E("CL15"), "path-semicolon");
     }
 }
 
@@ -1375,27 +950,18 @@ void CheckAntiVirusStatus()
     std::vector<SString> enabledList, disabledList;
     GetWMIAntiVirusStatus(enabledList, disabledList);
 
-    if (enabledList.size() > 100)
-        enabledList.resize(100);
-    if (disabledList.size() > 100)
-        disabledList.resize(100);
+    if (enabledList.size() > 100) enabledList.resize(100);
+    if (disabledList.size() > 100) disabledList.resize(100);
 
     WSC_SECURITY_PROVIDER_HEALTH health = static_cast<WSC_SECURITY_PROVIDER_HEALTH>(-1);
 
     // Get windows defender status
-    static const auto WscGetHealth = []() -> decltype(&WscGetSecurityProviderHealth)
-    {
-        // Wscapi.dll is a system DLL, load it securely from system directory
-        if (HMODULE wscapi = SecureLoadSystemLibrary("Wscapi.dll"))
+    static const auto WscGetHealth = []() -> decltype(&WscGetSecurityProviderHealth) {
+        if (HMODULE wscapi = LoadLibraryW(L"Wscapi.dll"))
         {
             auto function = static_cast<void*>(GetProcAddress(wscapi, "WscGetSecurityProviderHealth"));
-            if (!function)
-            {
-                WriteDebugEventAndReport(5774, "Failed to get WscGetSecurityProviderHealth from Wscapi.dll");
-            }
             return reinterpret_cast<decltype(&WscGetSecurityProviderHealth)>(function);
         }
-        WriteDebugEventAndReport(5775, "Wscapi.dll load failed");
         return nullptr;
     }();
 
@@ -1411,14 +977,12 @@ void CheckAntiVirusStatus()
     const size_t maxStatusItems = 10;
     for (size_t i = 0; i < enabledList.size() && i < maxStatusItems; ++i)
     {
-        if (strStatus.length() > 400)
-            break;            // Prevent status string from growing too large
+        if (strStatus.length() > 400) break;            // Prevent status string from growing too large
         strStatus += SString(" [Ena%zu:%s]", i, *enabledList[i]);
     }
     for (size_t i = 0; i < disabledList.size() && i < maxStatusItems; ++i)
     {
-        if (strStatus.length() > 400)
-            break;            // Prevent status string from growing too large
+        if (strStatus.length() > 400) break;            // Prevent status string from growing too large
         strStatus += SString(" [Dis%zu:%s]", i, *disabledList[i]);
     }
 
@@ -1431,18 +995,22 @@ void CheckAntiVirusStatus()
         if (showWarning)
         {
             // Check for AV in loaded modules
-            static const char* avProducts[] = {"antivirus", "anti-virus", "Avast",  "AVG",    "Avira",    "NOD32", "ESET",       "F-Secure",
-                                               "Faronics",  "Kaspersky",  "McAfee", "Norton", "Symantec", "Panda", "Trend Micro"};
+            static const char* avProducts[] = {
+                "antivirus", "anti-virus", "Avast", "AVG", "Avira", "NOD32", "ESET",
+                "F-Secure", "Faronics", "Kaspersky", "McAfee", "Norton", "Symantec",
+                "Panda", "Trend Micro"
+            };
 
             // Check for AV in loaded modules
             std::array<HMODULE, 1024> modules;
-            DWORD                     cbNeeded;
+            DWORD cbNeeded;
 
-            if (EnumProcessModules(GetCurrentProcess(), modules.data(), static_cast<DWORD>(sizeof(modules)), &cbNeeded))
+            if (EnumProcessModules(GetCurrentProcess(), modules.data(),
+                                  static_cast<DWORD>(sizeof(modules)), &cbNeeded))
             {
-                DWORD       moduleCount = cbNeeded / sizeof(HMODULE);
+                DWORD moduleCount = cbNeeded / sizeof(HMODULE);
                 const DWORD maxModules = static_cast<DWORD>(modules.size());
-
+                
                 if (cbNeeded > 0 && cbNeeded < MAXDWORD && (cbNeeded % sizeof(HMODULE)) == 0)
                 {
                     if (moduleCount > maxModules)
@@ -1453,23 +1021,24 @@ void CheckAntiVirusStatus()
 
                     for (DWORD i = 0; i < moduleCount && showWarning; ++i)
                     {
-                        if (!modules[i])
-                            continue;
+                        if (!modules[i]) continue;
 
                         WCHAR modulePath[MAX_PATH * 2] = L"";
-                        DWORD pathLen = GetModuleFileNameExW(GetCurrentProcess(), modules[i], modulePath, NUMELMS(modulePath) - 1);
-
+                        DWORD pathLen = GetModuleFileNameExW(GetCurrentProcess(), modules[i],
+                                                            modulePath, NUMELMS(modulePath) - 1);
+                        
                         // Ensure null-termination
                         if (pathLen > 0 && pathLen < NUMELMS(modulePath))
                         {
                             modulePath[pathLen] = L'\0';
-
+                            
                             SLibVersionInfo libInfo;
                             if (GetLibVersionInfo(ToUTF8(modulePath), &libInfo))
                             {
                                 for (uint j = 0; j < NUMELMS(avProducts); ++j)
                                 {
-                                    if (libInfo.strCompanyName.ContainsI(avProducts[j]) || libInfo.strProductName.ContainsI(avProducts[j]))
+                                    if (libInfo.strCompanyName.ContainsI(avProducts[j]) ||
+                                        libInfo.strProductName.ContainsI(avProducts[j]))
                                     {
                                         showWarning = false;
                                         WriteDebugEvent(SString("AV (module) found: %s", *ToUTF8(modulePath)));
@@ -1486,43 +1055,43 @@ void CheckAntiVirusStatus()
                 }
             }
 
-            // Check for running processes for AV
-            if (showWarning)
+    // Check for running processes for AV
+    if (showWarning)
+    {
+        auto processList = MyEnumProcesses(true);
+
+        const size_t maxProcessesToCheck = 500;
+        size_t processesChecked = 0;
+        
+        for (auto processId : processList)
+        {
+            if (++processesChecked > maxProcessesToCheck)
             {
-                auto processList = MyEnumProcesses(true);
-
-                const size_t maxProcessesToCheck = 500;
-                size_t       processesChecked = 0;
-
-                for (auto processId : processList)
+                WriteDebugEvent("Process check limit reached");
+                break;
+            }
+            
+            SString processPath = GetProcessPathFilename(processId);
+            if (!processPath.empty() && ValidatePath(processPath))
+            {
+                SLibVersionInfo libInfo;
+                if (GetLibVersionInfo(processPath, &libInfo))
                 {
-                    if (++processesChecked > maxProcessesToCheck)
+                    for (uint i = 0; i < NUMELMS(avProducts); ++i)
                     {
-                        WriteDebugEvent("Process check limit reached");
-                        break;
-                    }
-
-                    SString processPath = GetProcessPathFilename(processId);
-                    if (!processPath.empty() && ValidatePathSecurity(processPath))
-                    {
-                        SLibVersionInfo libInfo;
-                        if (GetLibVersionInfo(processPath, &libInfo))
+                        if (libInfo.strCompanyName.ContainsI(avProducts[i]) ||
+                            libInfo.strProductName.ContainsI(avProducts[i]))
                         {
-                            for (uint i = 0; i < NUMELMS(avProducts); ++i)
-                            {
-                                if (libInfo.strCompanyName.ContainsI(avProducts[i]) || libInfo.strProductName.ContainsI(avProducts[i]))
-                                {
-                                    showWarning = false;
-                                    WriteDebugEvent(SString("AV (process) found: %s", *processPath));
-                                    break;
-                                }
-                            }
+                            showWarning = false;
+                            WriteDebugEvent(SString("AV (process) found: %s", *processPath));
+                            break;
                         }
                     }
-                    if (!showWarning)
-                        break;
                 }
             }
+            if (!showWarning) break;
+        }
+    }
         }
 
         ShowNoAvDialog(g_hInstance, showWarning);
@@ -1542,43 +1111,141 @@ void CheckDataFiles()
     const SString strMTASAPath = GetMTASAPath();
     const SString strGTAPath = GetGTAPath();
 
-    if (!ValidatePathSecurity(strMTASAPath) || !ValidatePathSecurity(strGTAPath))
+    if (!ValidatePath(strMTASAPath) || !ValidatePath(strGTAPath))
     {
         DisplayErrorMessageBox(_("Invalid installation paths detected."), _E("CL45"), "invalid-install-paths");
         ExitProcess(EXIT_ERROR);
     }
 
+    // No-op known incompatible/broken d3d9.dll versions from the launch directory
+	// By using file version we account for variants as well. The array is extendable, but primarily for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
+    {
+        struct SIncompatibleVersion
+        {
+            int iMajor;
+            int iMinor;
+            int iBuild;
+            int iRelease;
+        };
+
+        static const SIncompatibleVersion incompatibleVersions[] = {
+            // The below entry (D3D9.dll 6.3.9600.17415) always crashes the user @ 0x0001F4B3 (CreateSurfaceLH).
+            // Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
+            {6, 3, 9600, 17415},
+            // The below entry (D3D9.dll 0.3.1.3) is a fully incompatible, modified ENB version ("DirectX 2.0") that crashes the user @ 0002A733
+            {0, 3, 1, 3},
+        };
+
+        static bool bChecked = false;
+        if (!bChecked)
+        {
+            bChecked = true;
+
+			// Check all 3 game roots
+            const std::vector<SString> directoriesToCheck = {
+                GetLaunchPath(), // MTA installation folder root
+                strGTAPath, // Real GTA:SA installation folder root. As chosen by DiscoverGTAPath()
+                PathJoin(GetMTADataPath(), "GTA San Andreas"), // Proxy-mirror that MTA uses for core GTA data files (C:\ProgramData\MTA San Andreas All\<MTA major version>\GTA San Andreas)
+            };
+
+            for (const SString& directory : directoriesToCheck)
+            {
+                if (directory.empty())
+                    continue;
+                if (!ValidatePath(directory))
+                    continue;
+
+                const SString strD3dModuleFilename = PathJoin(directory, "d3d9.dll");
+                if (!ValidatePath(strD3dModuleFilename) || !FileExists(strD3dModuleFilename))
+                    continue;
+
+                SharedUtil::SLibVersionInfo versionInfo = {};
+                if (!SharedUtil::GetLibVersionInfo(strD3dModuleFilename, &versionInfo))
+                    continue;
+
+                bool bIsIncompatible = false;
+                for (const SIncompatibleVersion& entry : incompatibleVersions)
+                {
+                    if (versionInfo.GetFileVersionMajor() == entry.iMajor &&
+                        versionInfo.GetFileVersionMinor() == entry.iMinor &&
+                        versionInfo.GetFileVersionBuild() == entry.iBuild &&
+                        versionInfo.GetFileVersionRelease() == entry.iRelease)
+                    {
+                        bIsIncompatible = true;
+                        break;
+                    }
+                }
+
+                if (!bIsIncompatible)
+                    continue;
+
+                const SString strBackupModuleFilename = PathJoin(directory, "d3d9.bak.incompatible");
+                const WString wideSourcePath = FromUTF8(strD3dModuleFilename);
+                const WString wideBackupPath = FromUTF8(strBackupModuleFilename);
+
+                if (FileExists(strBackupModuleFilename))
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                    DeleteFileW(wideBackupPath.c_str());
+                }
+
+                SetFileAttributesW(wideSourcePath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                bool bRenamed = MoveFileExW(wideSourcePath.c_str(), wideBackupPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+                if (!bRenamed)
+                {
+                    if (!CopyFileW(wideSourcePath.c_str(), wideBackupPath.c_str(), FALSE))
+                        continue;
+
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                    if (!DeleteFileW(wideSourcePath.c_str()))
+                        continue;
+
+                    bRenamed = true;
+                }
+
+                if (bRenamed)
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                }
+            }
+        }
+    }
+
     // Check for essential MTA files
-    static const char* dataFiles[] = {"MTA\\cgui\\images\\background_logo.png",
-                                      "MTA\\cgui\\images\\radarset\\up.png",
-                                      "MTA\\cgui\\images\\busy_spinner.png",
-                                      "MTA\\data\\gta_sa_diff.dat",
-                                      "MTA\\D3DX9_42.dll",
-                                      "MTA\\D3DCompiler_42.dll",
-                                      "MTA\\d3dcompiler_43.dll",
-                                      "MTA\\d3dcompiler_47.dll",
-                                      "MTA\\bass.dll",
-                                      "MTA\\bass_ac3.dll",
-                                      "MTA\\bassflac.dll",
-                                      "MTA\\bassmix.dll",
-                                      "MTA\\basswebm.dll",
-                                      "MTA\\bass_aac.dll",
-                                      "MTA\\bass_fx.dll",
-                                      "MTA\\bassmidi.dll",
-                                      "MTA\\bassopus.dll",
-                                      "MTA\\basswma.dll",
-                                      "MTA\\tags.dll",
-                                      "MTA\\sa.dat",
-                                      "MTA\\xinput1_3_mta.dll",
-                                      "MTA\\XInput9_1_0_mta.dll"};
+    static const char* dataFiles[] = {
+        "MTA\\cgui\\images\\background_logo.png",
+        "MTA\\cgui\\images\\radarset\\up.png",
+        "MTA\\cgui\\images\\busy_spinner.png",
+        "MTA\\data\\gta_sa_diff.dat",
+        "MTA\\D3DX9_42.dll",
+        "MTA\\D3DCompiler_42.dll",
+        "MTA\\d3dcompiler_43.dll",
+        "MTA\\d3dcompiler_47.dll",
+        "MTA\\bass.dll",
+        "MTA\\bass_ac3.dll",
+        "MTA\\bassflac.dll",
+        "MTA\\bassmix.dll",
+        "MTA\\basswebm.dll",
+        "MTA\\bass_aac.dll",
+        "MTA\\bass_fx.dll",
+        "MTA\\bassmidi.dll",
+        "MTA\\bassopus.dll",
+        "MTA\\basswma.dll",
+        "MTA\\tags.dll",
+        "MTA\\sa.dat",
+        "MTA\\xinput1_3_mta.dll",
+        "MTA\\XInput9_1_0_mta.dll"
+    };
 
     for (uint i = 0; i < NUMELMS(dataFiles); ++i)
     {
         const SString filePath = PathJoin(strMTASAPath, dataFiles[i]);
-        if (!ValidatePathSecurity(filePath) || !FileExists(filePath))
+        if (!ValidatePath(filePath) || !FileExists(filePath))
         {
-            DisplayErrorMessageBox(_("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL16"),
-                                   "mta-datafiles-missing");
+            DisplayErrorMessageBox(_("Load failed. Please ensure that the latest data files have been installed correctly."),
+                                  _E("CL16"), "mta-datafiles-missing");
             ExitProcess(EXIT_ERROR);
         }
     }
@@ -1586,26 +1253,31 @@ void CheckDataFiles()
     // Check for client deathmatch module
     if (!FileExists(PathJoin(strMTASAPath, CHECK_DM_CLIENT_NAME)))
     {
-        DisplayErrorMessageBox(SString(_("Load failed. Please ensure that %s is installed correctly."), CHECK_DM_CLIENT_NAME), _E("CL18"), "client-missing");
+        DisplayErrorMessageBox(SString(_("Load failed. Please ensure that %s is installed correctly."), CHECK_DM_CLIENT_NAME),
+                              _E("CL18"), "client-missing");
         ExitProcess(EXIT_ERROR);
     }
 
     // Check for GTA executable
-    if (!FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) && !FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME)))
+    if (!FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) &&
+        !FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME)))
     {
-        DisplayErrorMessageBox(SString(_("Load failed. Could not find gta_sa.exe in %s."), strGTAPath.c_str()), _E("CL20"), "gta_sa-missing");
+        DisplayErrorMessageBox(SString(_("Load failed. Could not find gta_sa.exe in %s."), strGTAPath.c_str()),
+                              _E("CL20"), "gta_sa-missing");
         ExitProcess(EXIT_ERROR);
     }
 
     // Check for conflicting files
-    static const char* dllConflicts[] = {"xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll", "pthread.dll"};
+    static const char* dllConflicts[] = {
+        "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll", "pthread.dll"
+    };
 
     for (uint i = 0; i < NUMELMS(dllConflicts); ++i)
     {
         if (FileExists(PathJoin(strGTAPath, dllConflicts[i])))
         {
-            DisplayErrorMessageBox(SString(_("Load failed. %s exists in the GTA directory. Please delete before continuing."), dllConflicts[i]), _E("CL21"),
-                                   "file-clash");
+            DisplayErrorMessageBox(SString(_("Load failed. %s exists in the GTA directory. Please delete before continuing."), dllConflicts[i]),
+                                  _E("CL21"), "file-clash");
             ExitProcess(EXIT_ERROR);
         }
     }
@@ -1635,30 +1307,42 @@ void CheckDataFiles()
     };
 
     static const IntegrityCheck integrityCheckList[] = {
-        {"DE5C08577EAA65309974F9860E303F53", "bass.dll"},           {"1D5A1AEF041255DEA49CD4780CAE4CCC", "bass_aac.dll"},
-        {"8A1AC2AAD7F1691943635CA42F7F2940", "bass_ac3.dll"},       {"61C38C1FD091375F2A30EC631DF337E6", "bass_fx.dll"},
-        {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"49A603ED114982787FC0A301C0E93FDB", "bassmidi.dll"},
-        {"064398B1A74B4EF35902F0C218142133", "bassmix.dll"},        {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
-        {"B35714019BBFF0D0CEE0AFA2637A77A7", "basswebm.dll"},       {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
-        {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
-        {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"4B3932359373F11CBC542CC96D9A9285", "tags.dll"},
-        {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"}, {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
-        {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"}, {"F1CA5A1E77965777AC26A81EAF345A7A", "XInput9_1_0_mta.dll"}};
+        {"DE5C08577EAA65309974F9860E303F53", "bass.dll"},
+        {"1D5A1AEF041255DEA49CD4780CAE4CCC", "bass_aac.dll"},
+        {"8A1AC2AAD7F1691943635CA42F7F2940", "bass_ac3.dll"},
+        {"61C38C1FD091375F2A30EC631DF337E6", "bass_fx.dll"},
+        {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},
+        {"49A603ED114982787FC0A301C0E93FDB", "bassmidi.dll"},
+        {"064398B1A74B4EF35902F0C218142133", "bassmix.dll"},
+        {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
+        {"B35714019BBFF0D0CEE0AFA2637A77A7", "basswebm.dll"},
+        {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
+        {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},
+        {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
+        {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"},
+        {"4B3932359373F11CBC542CC96D9A9285", "tags.dll"},
+        {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"},
+        {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
+        {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"},
+        {"F1CA5A1E77965777AC26A81EAF345A7A", "XInput9_1_0_mta.dll"}
+    };
 
     for (uint i = 0; i < NUMELMS(integrityCheckList); ++i)
     {
         const IntegrityCheck& check = integrityCheckList[i];
         const SString         filePath = PathJoin(strMTASAPath, "mta", check.fileName);
-        if (!ValidatePathSecurity(filePath) || !FileExists(filePath))
+        if (!ValidatePath(filePath) || !FileExists(filePath))
         {
-            DisplayErrorMessageBox(SString(_("Data file %s is missing. Possible virus activity."), check.fileName), _E("CL30"), "maybe-virus2");
+            DisplayErrorMessageBox(SString(_("Data file %s is missing. Possible virus activity."), check.fileName),
+                                 _E("CL30"), "maybe-virus2");
             break;
         }
 
         const SString computed = CMD5Hasher::CalculateHexString(filePath);
         if (!computed.CompareI(check.hash))
         {
-            DisplayErrorMessageBox(SString(_("Data file %s is modified. Possible virus activity."), check.fileName), _E("CL30"), "maybe-virus2");
+            DisplayErrorMessageBox(SString(_("Data file %s is modified. Possible virus activity."), check.fileName),
+                                 _E("CL30"), "maybe-virus2");
             break;
         }
     }
@@ -1668,8 +1352,8 @@ void CheckDataFiles()
     std::vector<SString> mtaAsiFiles = FindFiles(PathJoin(strMTASAPath, "mta", "*.asi"), true, false);
 
     const size_t MAX_ASI_FILES = 100;
-    bool         bFoundInGTADir = !gtaAsiFiles.empty() && gtaAsiFiles.size() < MAX_ASI_FILES;
-    bool         bFoundInMTADir = !mtaAsiFiles.empty() && mtaAsiFiles.size() < MAX_ASI_FILES;
+    bool bFoundInGTADir = !gtaAsiFiles.empty() && gtaAsiFiles.size() < MAX_ASI_FILES;
+    bool bFoundInMTADir = !mtaAsiFiles.empty() && mtaAsiFiles.size() < MAX_ASI_FILES;
 
     if (bFoundInGTADir || bFoundInMTADir)
     {
@@ -1680,38 +1364,39 @@ void CheckDataFiles()
                 WriteDebugEvent(SString("Warning: ASI file detected in GTA dir: %s", *gtaAsiFiles[i]));
             }
         }
-
+        
         DisplayErrorMessageBox(_(".asi files are in the installation directory.\n\n"
-                                 "Remove these .asi files if you experience problems."),
-                               _E("CL28"), "asi-files");
+                                "Remove these .asi files if you experience problems."),
+                              _E("CL28"), "asi-files");
     }
 
     // Check for graphics libraries in the GTA/MTA install directory
     {
-        const std::pair<const char*, SString> directoriesToCheck[] = {{"", strGTAPath}, {"mta-", PathJoin(strMTASAPath, "mta")}};
+        const std::pair<const char*, SString> directoriesToCheck[] = {
+            {"", strGTAPath},
+            {"mta-", PathJoin(strMTASAPath, "mta")}
+        };
 
         std::vector<GraphicsLibrary> offenders;
 
         for (const std::pair<const char*, SString>& directory : directoriesToCheck)
         {
-            if (!ValidatePathSecurity(directory.second))
-                continue;
+            if (!ValidatePath(directory.second)) continue;
 
             for (const char* libraryName : {"d3d9", "dxgi"})
             {
                 GraphicsLibrary library(libraryName);
                 library.absoluteFilePath = PathJoin(directory.second, library.stem + ".dll");
 
-                if (library.absoluteFilePath.length() > MAX_PATH)
-                    continue;
-                if (!FileExists(library.absoluteFilePath))
-                    continue;
+                if (library.absoluteFilePath.length() > MAX_PATH) continue;
+                if (!FileExists(library.absoluteFilePath)) continue;
 
                 library.appLastHash = SString("%s%s-dll-last-hash", directory.first, library.stem.c_str());
                 library.appDontRemind = SString("%s%s-dll-not-again", directory.first, library.stem.c_str());
 
                 library.md5Hash = CMD5Hasher::CalculateHexString(library.absoluteFilePath);
-                WriteDebugEvent(SString("Detected graphics library %s (md5: %s)", library.absoluteFilePath.c_str(), library.md5Hash.c_str()));
+                WriteDebugEvent(SString("Detected graphics library %s (md5: %s)",
+                                      library.absoluteFilePath.c_str(), library.md5Hash.c_str()));
 
                 bool isProblematic = true;
                 if (GetApplicationSetting("diagnostics", library.appLastHash) == library.md5Hash)
@@ -1743,7 +1428,7 @@ void CheckDataFiles()
         for (uint i = 0; i < NUMELMS(logFiles); ++i)
         {
             const SString path = PathJoin(strGTAPath, logFiles[i]);
-            if (ValidatePathSecurity(path))
+            if (ValidatePath(path))
             {
                 FileDelete(path);
             }
@@ -1829,11 +1514,11 @@ int LaunchGame(SString strCmdLine)
     CheckAndShowUpgradeProblems();
     CheckAndShowImgProblems();
 
-    const SString strGTAPath = GetGTAPath();
-    const SString strMTASAPath = GetMTASAPath();
+    const SString strGTAPath    = GetGTAPath();
+    const SString strMTASAPath  = GetMTASAPath();
     const SString strGTAEXEPath = UTF8FilePath(GetGameExecutablePath());
 
-    if (!ValidatePathSecurity(strGTAPath) || !ValidatePathSecurity(strMTASAPath) || !ValidatePathSecurity(strGTAEXEPath))
+    if (!ValidatePath(strGTAPath) || !ValidatePath(strMTASAPath) || !ValidatePath(strGTAEXEPath))
     {
         DisplayErrorMessageBox(_("Invalid game paths detected."), _E("CL44"), "invalid-paths");
         return 5;
@@ -1857,8 +1542,8 @@ int LaunchGame(SString strCmdLine)
 
     // Extract 'done-admin' flag from command line
     SString    sanitizedCmdLine = strCmdLine;
-    const bool bDoneAdmin = sanitizedCmdLine.Contains("/done-admin");
-    sanitizedCmdLine = sanitizedCmdLine.Replace(" /done-admin", "");
+    const bool bDoneAdmin       = sanitizedCmdLine.Contains("/done-admin");
+    sanitizedCmdLine             = sanitizedCmdLine.Replace(" /done-admin", "");
 
     // Validate command line length
     if (sanitizedCmdLine.length() > 2048)            // Max MTA connect URI length
@@ -1875,8 +1560,8 @@ int LaunchGame(SString strCmdLine)
 
     // Launch GTA using CreateProcess
     PROCESS_INFORMATION piLoadee = {};
-    DWORD               dwError = 0;
-    SString             strErrorContext;
+    DWORD dwError = 0;
+    SString strErrorContext;
     if (!StartGtaProcess(strGTAEXEPath, sanitizedCmdLine, strGTAPath, &piLoadee, dwError, strErrorContext))
     {
         // Handle process creation failure
@@ -1885,11 +1570,18 @@ int LaunchGame(SString strCmdLine)
         return 5;
     }
 
+    std::optional<FileTimeDuration> gtaCreationTime;
+    if (HANDLE processHandle = piLoadee.hProcess; processHandle && processHandle != INVALID_HANDLE_VALUE)
+    {
+        if (FILETIME ftCreate{}, ftExit{}, ftKernel{}, ftUser{};
+            GetProcessTimes(processHandle, &ftCreate, &ftExit, &ftKernel, &ftUser))
+        {
+            gtaCreationTime = FileTimeToDuration(ftCreate);
+        }
+    }
+
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
     WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
-
-    // Mark GTA launch as successful
-    WatchDogCompletedSection("L1");
 
     // Clear previous on quit commands
     SetOnQuitCommand("");
@@ -1959,11 +1651,11 @@ int LaunchGame(SString strCmdLine)
                 if (detector.UpdateIsStuck())
                 {
                     WriteDebugEvent("Detected stuck process at quit");
-#ifndef MTA_DEBUG
+                #ifndef MTA_DEBUG
                     TerminateProcess(piLoadee.hProcess, 1);
                     status = WAIT_FAILED;
                     break;
-#endif
+                #endif
                 }
                 status = WaitForSingleObject(piLoadee.hProcess, 1000);
             }
@@ -1981,10 +1673,58 @@ int LaunchGame(SString strCmdLine)
     WriteDebugEvent("Loader - Finishing");
     EndD3DStuff();
 
+    const DWORD rawExitCode = dwExitCode;
+
+    if (IsCrashExitCode(rawExitCode))
+    {
+        const std::array<SString, kCrashArtifactCount> artifactPaths{
+            CalcMTASAPath("mta\\core.log"),
+            CalcMTASAPath("mta\\core.log.flag"),
+            CalcMTASAPath("mta\\core.dmp")
+        };
+
+        const auto artifactStates = [&] {
+            std::array<CrashArtifactState, kCrashArtifactCount> states{};
+            std::transform(artifactPaths.cbegin(), artifactPaths.cend(), states.begin(),
+                           [&](const SString& path) { return InspectCrashArtifact(path, gtaCreationTime); });
+            return states;
+        }();
+
+        const auto artifactLabels = [&] {
+            std::array<const char*, kCrashArtifactCount> labels{};
+            std::transform(artifactStates.cbegin(), artifactStates.cend(), labels.begin(),
+                           [](const CrashArtifactState state) { return CrashArtifactStateToString(state); });
+            return labels;
+        }();
+
+        if (const bool allArtifactsFresh = std::all_of(artifactStates.cbegin(), artifactStates.cend(),
+                                                       [](const CrashArtifactState state) {
+                                                           return state == CrashArtifactState::Fresh;
+                                                       });
+            !allArtifactsFresh)
+        {
+            const auto [coreLogLabel, coreLogFlagLabel, coreDumpLabel] = artifactLabels;
+            AddReportLog(3147,
+                         SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s)",
+                                 static_cast<unsigned int>(rawExitCode),
+                                 coreLogLabel,
+                                 coreLogFlagLabel,
+                                 coreDumpLabel));
+        }
+    }
+
     // Cleanup
     if (piLoadee.hProcess && piLoadee.hProcess != INVALID_HANDLE_VALUE)
     {
-        TerminateProcess(piLoadee.hProcess, 1);
+        const bool terminateRequired = (dwExitCode == STILL_ACTIVE) || (dwExitCode == static_cast<DWORD>(-1));
+        if (terminateRequired)
+        {
+            if (TerminateProcess(piLoadee.hProcess, EXIT_ERROR) != FALSE)
+            {
+                dwExitCode = EXIT_ERROR;
+            }
+        }
+
         if (piLoadee.hThread && piLoadee.hThread != INVALID_HANDLE_VALUE)
         {
             CloseHandle(piLoadee.hThread);
@@ -2007,7 +1747,7 @@ void HandleOnQuitCommand()
 {
     const SString strMTASAPath = GetMTASAPath();
 
-    if (!ValidatePathSecurity(strMTASAPath))
+    if (!ValidatePath(strMTASAPath))
     {
         CheckService(CHECK_SERVICE_POST_GAME);
         return;
@@ -2045,17 +1785,17 @@ void HandleOnQuitCommand()
         }
     }
 
-    SString strOperation = vecParts[0];
-    SString strFile = vecParts[1];
+    SString strOperation  = vecParts[0];
+    SString strFile       = vecParts[1];
     SString strParameters = vecParts[2];
-    SString strDirectory = vecParts[3];
-    SString strShowCmd = vecParts[4];
+    SString strDirectory  = vecParts[3];
+    SString strShowCmd    = vecParts[4];
 
     // Process operation type
     if (strOperation == "restart")
     {
         strOperation = "open";
-        strFile = PathJoin(strMTASAPath, MTA_EXE_NAME);
+        strFile      = PathJoin(strMTASAPath, MTA_EXE_NAME);
 
         if (!FileExists(strFile))
         {
@@ -2129,7 +1869,7 @@ void HandleOnQuitCommand()
     if (!strOperation.empty() && !strFile.empty())
     {
         WriteDebugEvent(SString("Executing OnQuitCommand: op=%s, file=%s", *strOperation, *strFile));
-        ShellExecuteNonBlocking(strOperation.empty() ? NULL : strOperation.c_str(), strFile.c_str(), strParameters.empty() ? NULL : strParameters.c_str(),
-                                strDirectory.empty() ? NULL : strDirectory.c_str(), nShowCmd);
+        ShellExecuteNonBlocking(strOperation.empty() ? NULL : strOperation.c_str(), strFile.c_str(),
+                               strParameters.empty() ? NULL : strParameters.c_str(), strDirectory.empty() ? NULL : strDirectory.c_str(), nShowCmd);
     }
 }

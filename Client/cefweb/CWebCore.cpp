@@ -17,6 +17,8 @@
 #include <cef3/cef/include/cef_parser.h>
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
+#include <algorithm>
+#include <ranges>
 
 // #define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
@@ -29,6 +31,9 @@ CWebCore::CWebCore()
     m_bTestmodeEnabled = false;
     m_pXmlConfig = nullptr;
     m_pFocusedWebView = nullptr;
+    m_bGPUEnabled = false;
+    m_iWhitelistRevision = 0;
+    m_iBlacklistRevision = 0;
 
     MakeSureXMLNodesExist();
     InitialiseWhiteAndBlacklist();
@@ -39,12 +44,15 @@ CWebCore::CWebCore()
 
 CWebCore::~CWebCore()
 {
-    // Unregister schema factories
+    std::ranges::for_each(m_WebViews, [](const auto& pWebView) {
+        if (pWebView) [[likely]]
+            pWebView->CloseBrowser();
+    });
+    m_WebViews.clear();
     CefClearSchemeHandlerFactories();
 
-    // Shutdown CEF
-    CefShutdown();
-
+    // Don't call CefShutdown() here to avoid freeze.
+    // TerminateProcess (during quit) is called before CCore destruction anyways.
     delete m_pRequestsGUI;
     delete m_pXmlConfig;
 }
@@ -86,12 +94,14 @@ bool CWebCore::Initialise(bool gpuEnabled)
     settings.multi_threaded_message_loop = true;
     settings.windowless_rendering_enabled = true;
 
-    bool state = CefInitialize(mainArgs, settings, app, sandboxInfo);
+    if (const bool state = CefInitialize(mainArgs, settings, app, sandboxInfo); state) [[likely]]
+    {
+        // Register custom scheme handler factory only if initialization succeeded
+        CefRegisterSchemeHandlerFactory("http", "mta", app);
+        return true;
+    }
 
-    // Register custom scheme handler factory
-    CefRegisterSchemeHandlerFactory("http", "mta", app);
-
-    return state;
+    return false;
 }
 
 CWebViewInterface* CWebCore::CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
@@ -109,13 +119,22 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*>(pWebViewInterface);
     if (pWebView)
     {
+        // Mark as being destroyed to prevent new events/tasks
+        pWebView->SetBeingDestroyed(true);
+        
         // Ensure that no attached events or tasks are in the queue
         RemoveWebViewEvents(pWebView.get());
         RemoveWebViewTasks(pWebView.get());
 
+        // Remove from list before closing to break reference cycles early
         m_WebViews.remove(pWebView);
-        // pWebView->Release(); // Do not release since other references get corrupted then
+        
+        // CloseBrowser will eventually trigger OnBeforeClose which clears m_pWebView
+        // This breaks the circular reference: CWebView -> CefBrowser -> CWebView
         pWebView->CloseBrowser();
+        
+        // Note: Do not call Release() - let CefRefPtr manage the lifecycle
+        // The circular reference is broken via OnBeforeClose setting m_pWebView = nullptr
     }
 }
 
@@ -163,6 +182,18 @@ void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebV
         return;
 
     std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+
+    // Prevent unbounded queue growth - drop oldest events if queue is too large
+    if (m_EventQueue.size() >= MAX_EVENT_QUEUE_SIZE)
+    {
+        // Log warning even in release builds as this indicates a serious issue
+        g_pCore->GetConsole()->Printf("WARNING: Browser event queue size limit reached (%d), dropping oldest events", MAX_EVENT_QUEUE_SIZE);
+        
+        // Remove oldest 10% of events to make room
+        auto removeCount = MAX_EVENT_QUEUE_SIZE / 10;
+        for (size_t i = 0; i < removeCount && !m_EventQueue.empty(); ++i)
+            m_EventQueue.pop_front();
+    }
 
 #ifndef MTA_DEBUG
     m_EventQueue.push_back(EventEntry(event, pWebView));
@@ -215,6 +246,20 @@ void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
     std::future<void> result;
     {
         std::scoped_lock lock(m_TaskQueueMutex);
+        
+        // Prevent unbounded queue growth - abort new task if queue is too large
+        if (m_TaskQueue.size() >= MAX_TASK_QUEUE_SIZE) [[unlikely]]
+        {
+#ifdef MTA_DEBUG
+            static constexpr auto WARNING_MSG = "Warning: Task queue size limit reached (%d), aborting new task";
+            g_pCore->GetConsole()->Printf(WARNING_MSG, MAX_TASK_QUEUE_SIZE);
+#endif
+            // Abort the new task immediately to prevent deadlock
+            // Don't add it to the queue
+            task(true);
+            return;
+        }
+        
         m_TaskQueue.emplace_back(TaskEntry{task, webView});
         result = m_TaskQueue.back().task.get_future();
     }
@@ -226,14 +271,14 @@ void CWebCore::RemoveWebViewTasks(CWebView* webView)
 {
     std::scoped_lock lock(m_TaskQueueMutex);
 
-    for (auto iter = m_TaskQueue.begin(); iter != m_TaskQueue.end(); ++iter)
-    {
-        if (iter->webView != webView)
-            continue;
-
-        iter->task(true);
-        iter = m_TaskQueue.erase(iter);
-    }
+    std::erase_if(m_TaskQueue, [webView](TaskEntry& entry) {
+        if (entry.webView == webView)
+        {
+            entry.task(true);
+            return true;
+        }
+        return false;
+    });
 }
 
 void CWebCore::DoTaskQueuePulse()
@@ -255,12 +300,12 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
-    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
-                                          "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
+    static constexpr const char* wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
+                                                         "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
-    for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
+    for (const auto& pattern : wildcardWhitelist)
     {
-        if (WildcardMatch(wildcardWhitelist[i], strURL))
+        if (WildcardMatch(pattern, strURL))
             return eURLState::WEBPAGE_ALLOWED;
     }
 
@@ -358,12 +403,38 @@ void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
 {
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
+    // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
+    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    {
+        // Remove WEBFILTER_REQUEST entries (temporary session entries)
+        for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
+        {
+            if (iter->second.second == eWebFilterType::WEBFILTER_REQUEST)
+                m_Whitelist.erase(iter++);
+            else
+                ++iter;
+        }
+    }
+
     m_Whitelist[strURL] = std::pair<bool, eWebFilterType>(true, filterType);
 }
 
 void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
 {
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
+
+    // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
+    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    {
+        // Remove WEBFILTER_REQUEST entries (temporary session entries)
+        for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
+        {
+            if (iter->second.second == eWebFilterType::WEBFILTER_REQUEST)
+                m_Whitelist.erase(iter++);
+            else
+                ++iter;
+        }
+    }
 
     m_Whitelist[strURL] = std::pair<bool, eWebFilterType>(false, filterType);
 }
@@ -479,6 +550,16 @@ void CWebCore::OnPostScreenshot()
     }
 }
 
+void CWebCore::OnFPSLimitChange(std::uint16_t fps)
+{
+    dassert(g_pCore->GetNetwork() != nullptr);            // Ensure network module is loaded
+    for (auto& webView : m_WebViews)
+    {
+        if (auto browser = webView->GetCefBrowser(); browser) [[likely]]
+            browser->GetHost()->SetWindowlessFrameRate(fps);
+    }
+}
+
 void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (!m_pFocusedWebView ||
@@ -531,6 +612,11 @@ bool CWebCore::SetGlobalAudioVolume(float fVolume)
         pWebView->SetAudioVolume(fVolume);
     }
     return true;
+}
+
+CWebViewInterface* CWebCore::GetFocusedWebView()
+{
+    return m_pFocusedWebView;
 }
 
 bool CWebCore::UpdateListsFromMaster()
@@ -744,7 +830,7 @@ void CWebCore::GetFilterEntriesByType(std::vector<std::pair<SString, bool>>& out
                 outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
             else if (state == eWebFilterState::WEBFILTER_ALLOWED && iter->second.first == true)
                 outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
-            else
+            else if (state == eWebFilterState::WEBFILTER_DISALLOWED && iter->second.first == false)
                 outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
         }
     }
@@ -753,6 +839,9 @@ void CWebCore::GetFilterEntriesByType(std::vector<std::pair<SString, bool>>& out
 void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
 {
     CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (!pWebCore) [[unlikely]]
+        return;
+
     if (result.bSuccess)
     {
         SString strData = result.pData;
@@ -793,6 +882,9 @@ void CWebCore::StaticFetchWhitelistFinished(const SHttpDownloadResult& result)
         return;
 
     CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (!pWebCore) [[unlikely]]
+        return;
+
     if (!pWebCore->m_pXmlConfig)
         return;
 
@@ -836,6 +928,9 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
         return;
 
     CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (!pWebCore) [[unlikely]]
+        return;
+
     if (!pWebCore->m_pXmlConfig)
         return;
 
