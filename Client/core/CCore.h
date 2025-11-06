@@ -104,6 +104,7 @@ public:
     CLocalGUI*                         GetLocalGUI();
     CLocalizationInterface*            GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*                 GetWebCore();
+    CWebCoreInterface*                 GetWebCoreUnchecked() { return m_pWebCore; }            // For cleanup in destructors only - bypasses initialization check
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
     CSteamClient*                      GetSteamClient() { return m_steamClient.get(); }
@@ -187,7 +188,7 @@ public:
     void DestroyGUI();
 
     // Web
-    bool IsWebCoreLoaded() { return m_pWebCore != nullptr; }
+    bool IsWebCoreLoaded() { return m_pWebCore != nullptr && m_pWebCore->IsInitialised(); }
     void DestroyWeb();
 
     // Hooks

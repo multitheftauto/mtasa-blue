@@ -79,6 +79,7 @@ public:
     virtual CCVarsInterface*                   GetCVars() = 0;
     virtual CLocalizationInterface*            GetLocalization() = 0;
     virtual CWebCoreInterface*                 GetWebCore() = 0;
+    virtual CWebCoreInterface*                 GetWebCoreUnchecked() = 0;            // For cleanup in destructors only - bypasses initialization check
     virtual CTrayIconInterface*                GetTrayIcon() = 0;
     virtual std::shared_ptr<CDiscordInterface> GetDiscord() = 0;
 

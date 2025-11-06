@@ -29,6 +29,34 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
     if (!command_line)
         return;
 
+    // Add GTA path and MTA base path switches before g_pCore check
+    // This callback runs in both browser process and subprocess
+    // In subprocess, g_pCore is NULL, so switches must be added before that check
+    // Read GTA path from registry
+    const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path");
+    if (!strGTAPath.empty())
+    {
+        // Pass GTA directory path to CEFLauncher subprocess via command-line switch
+        // CEF's AppendSwitchWithValue handles quoting automatically
+        command_line->AppendSwitchWithValue("mta-gta-path", strGTAPath);
+        // AddReportLog only available in browser process where g_pCore exists
+    }
+
+    // Pass MTA base directory path to subprocess
+    // MTA DLLs are in Bin/MTA but parent process may be elsewhere
+    const SString strMTAPath = GetMTAProcessBaseDir();
+    if (!strMTAPath.empty())
+    {
+        command_line->AppendSwitchWithValue("mta-base-path", strMTAPath);
+    }
+
+    // Disable AutoDeElevate to allow CEF to run with elevated privileges
+    // Must be added before g_pCore check to apply to both browser process and subprocess
+    // https://github.com/chromiumembedded/cef/issues/3960
+    // https://chromium-review.googlesource.com/c/chromium/src/+/6515318
+    command_line->AppendSwitch("do-not-de-elevate");
+
+    // Browser-process-only settings
     if (!g_pCore) [[unlikely]]
         return;
 
@@ -38,11 +66,6 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
 
     if (!pWebCore->GetGPUEnabled())
         command_line->AppendSwitch("disable-gpu");
-
-    // Disable the AutoDeElevate feature to make launching CEF with Admin privileges work.
-    // https://github.com/chromiumembedded/cef/issues/3960
-    // https://chromium-review.googlesource.com/c/chromium/src/+/6515318
-    command_line->AppendSwitch("do-not-de-elevate");
 
     command_line->AppendSwitch("disable-gpu-compositing"); // always disable this, causes issues with official builds
 
@@ -108,8 +131,8 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
         }
         else
         {
-            SString resourceName = path.substr(0, slashPos);
-            SString resourcePath = path.substr(slashPos + 1);
+            const SString resourceName = path.substr(0, slashPos);
+            const SString resourcePath = path.substr(slashPos + 1);
 
             if (resourcePath.empty())
             {
@@ -137,7 +160,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 
                 if (urlParts.query.str)
                 {
-                    SString              strGet = UTF16ToMbUTF8(urlParts.query.str);
+                    const SString        strGet = UTF16ToMbUTF8(urlParts.query.str);
                     std::vector<SString> vecTmp;
                     vecTmp.reserve(8);  // Reserve space for common query parameter count
                     strGet.Split("&", vecTmp);
@@ -153,13 +176,13 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                 }
 
                 CefPostData::ElementVector vecPostElements;
-                if (auto postData = request->GetPostData(); postData)
+                if (const auto postData = request->GetPostData(); postData)
                 {
                     postData->GetElements(vecPostElements);
 
                     SString key;
                     SString value;
-                    for (auto&& post : vecPostElements)
+                    for (const auto& post : vecPostElements)
                     {
                         // Limit to 5MiB and allow byte data only
                         constexpr size_t MAX_POST_SIZE = 5 * 1024 * 1024;
@@ -168,12 +191,12 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                             continue;
 
                         // Make string from buffer
-                        auto buffer = std::make_unique<char[]>(bytesCount);
+                        const auto buffer = std::make_unique<char[]>(bytesCount);
                         // Verify GetBytes succeeded before using buffer
-                        size_t bytesRead = post->GetBytes(bytesCount, buffer.get());
+                        const size_t bytesRead = post->GetBytes(bytesCount, buffer.get());
                         if (bytesRead != bytesCount)
                             continue;
-                        SStringX postParam(buffer.get(), bytesCount);
+                        const SStringX postParam(buffer.get(), bytesCount);
 
                         // Parse POST data into vector
                         std::vector<SString> vecTmp;
@@ -197,7 +220,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
             {
                 // Calculate MTA resource path
                 static constexpr auto LOCAL = "local";
-                path = (resourceName != LOCAL) ? ":" + resourceName + "/" + resourcePath : resourcePath;
+                path = (resourceName != LOCAL) ? SString(":" + resourceName + "/" + resourcePath) : resourcePath;
 
                 // Calculate absolute path
                 if (!pWebView->GetFullPathFromLocal(path))
