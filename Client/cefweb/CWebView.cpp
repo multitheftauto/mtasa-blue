@@ -37,7 +37,7 @@ CWebView::~CWebView()
 {
     if (IsMainThread())
     {
-        if (auto pWebCore = g_pCore->GetWebCore(); pWebCore) [[likely]]
+        if (auto pWebCore = g_pCore->GetWebCore(); pWebCore)
         {
             if (pWebCore->GetFocusedWebView() == this)
                 pWebCore->SetFocusedWebView(nullptr);
@@ -71,7 +71,8 @@ void CWebView::Initialise()
 
     if (!m_bIsLocal)
     {
-        bool bEnabledJavascript = g_pCore->GetWebCore()->GetRemoteJavascriptEnabled();
+        const auto pWebCore = g_pCore->GetWebCore();
+        const bool bEnabledJavascript = pWebCore ? pWebCore->GetRemoteJavascriptEnabled() : false;
         browserSettings.javascript = bEnabledJavascript ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
     }
 
@@ -110,8 +111,12 @@ bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString
         return false;            // Invalid URL
 
     // Are we allowed to browse this website?
-    if (bFilterEnabled && g_pCore->GetWebCore()->GetDomainState(UTF16ToMbUTF8(urlParts.host.str), true) != eURLState::WEBPAGE_ALLOWED)
-        return false;
+    if (bFilterEnabled)
+    {
+        auto pWebCore = g_pCore->GetWebCore();
+        if (pWebCore && pWebCore->GetDomainState(UTF16ToMbUTF8(urlParts.host.str), true) != eURLState::WEBPAGE_ALLOWED)
+            return false;
+    }
 
     // Load it!
     auto pFrame = m_pWebView->GetMainFrame();
@@ -189,10 +194,14 @@ void CWebView::Focus(bool state)
     if (m_pWebView)
         m_pWebView->GetHost()->SetFocus(state);
 
+    auto pWebCore = g_pCore->GetWebCore();
+    if (!pWebCore)
+        return;
+    
     if (state)
-        g_pCore->GetWebCore()->SetFocusedWebView(this);
-    else if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
+        pWebCore->SetFocusedWebView(this);
+    else if (pWebCore->GetFocusedWebView() == this)
+        pWebCore->SetFocusedWebView(nullptr);
 }
 
 void CWebView::ClearTexture()

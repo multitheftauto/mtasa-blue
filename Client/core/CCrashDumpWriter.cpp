@@ -145,7 +145,7 @@ public:
             
             ConfigureDbgHelpOptions();
             
-            const SString& processDir = SharedUtil::GetProcessBaseDir();
+            const SString& processDir = SharedUtil::GetMTAProcessBaseDir();
             const char* searchPath = processDir.empty() ? nullptr : processDir.c_str();
 
             if (SymInitialize(m_process, searchPath, TRUE) != FALSE)
