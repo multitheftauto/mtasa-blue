@@ -127,45 +127,143 @@ namespace SharedUtil::Details
     };
 }            // namespace SharedUtil::Details
 
-[[nodiscard]] const SString& SharedUtil::GetProcessBaseDir()
+static void InitializeProcessBaseDir(SString& strProcessBaseDir)
 {
-    static SString        strProcessBaseDir;
-    static std::once_flag initFlag;
-
-    std::call_once(initFlag, []
+    try
     {
-        try
+        constexpr auto bufferSize        = MAX_PATH * 2;
+        constexpr auto MAX_UNICODE_PATH  = 32767;
+        auto           coreFileName      = std::array<wchar_t, bufferSize>{};
+
+        // Get core.dll module handle to determine base directory
+        // Try debug build first (core_d.dll), then release build (core.dll)
+        constexpr auto coreDllDebug   = std::wstring_view{L"core_d.dll"};
+        constexpr auto coreDllRelease = std::wstring_view{L"core.dll"};
+
+        auto    hCoreModule       = HMODULE{};
+        auto    bCoreModuleFound  = bool{false};
+#ifdef MTA_DEBUG
+        if (bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllDebug.data(), &hCoreModule); !bCoreModuleFound)
+#endif
+            bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllRelease.data(), &hCoreModule);
+
+        // Fallback: Use current module if core.dll isn't loaded yet
+        if (!hCoreModule)
         {
-            constexpr auto                  bufferSize = MAX_PATH * 2uz;
-            std::array<wchar_t, bufferSize> moduleFileName{};
+            GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               reinterpret_cast<LPCWSTR>(&InitializeProcessBaseDir), &hCoreModule);
+        }
 
-            HMODULE hCurrentModule{};
-            if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                                   std::bit_cast<LPCWSTR>(&GetProcessBaseDir), &hCurrentModule) == 0 ||
-                !hCurrentModule) [[unlikely]]
-                return;
-
-            if (const auto length = GetModuleFileNameW(hCurrentModule, moduleFileName.data(), static_cast<DWORD>(moduleFileName.size()));
-                length == 0 || length >= moduleFileName.size()) [[unlikely]]
-                return;
-
-            std::array<wchar_t, bufferSize> fullPath{};
-
-            if (const auto length = GetFullPathNameW(moduleFileName.data(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr);
-                length == 0 || length >= fullPath.size()) [[unlikely]]
-                return;
-
-            if (const auto lastSeparator = std::wstring_view{fullPath.data()}.find_last_of(L"\\/");
-                lastSeparator != std::wstring_view::npos) [[likely]]
+        if (hCoreModule)
+        {
+            if (DWORD lengthCore = GetModuleFileNameW(hCoreModule, coreFileName.data(), static_cast<DWORD>(coreFileName.size())); 
+                lengthCore > 0)
             {
-                const auto modulePath = std::filesystem::path{std::wstring_view{fullPath.data()}.substr(0uz, lastSeparator)};
-                strProcessBaseDir     = ToUTF8(modulePath.parent_path().wstring());
+                // Use std::wstring for flexible buffer management
+                auto corePathBuffer = std::wstring{coreFileName.data(), static_cast<size_t>(lengthCore)};
+
+                // If buffer too small, resize for long path support
+                if (const auto bufferTooSmall = (static_cast<size_t>(lengthCore) == coreFileName.size()); bufferTooSmall)
+                {
+                    corePathBuffer.resize(MAX_UNICODE_PATH);
+                    
+                    if (lengthCore = GetModuleFileNameW(hCoreModule, corePathBuffer.data(), static_cast<DWORD>(corePathBuffer.size()));
+                        lengthCore > 0 && static_cast<size_t>(lengthCore) < corePathBuffer.size())
+                    {
+                        corePathBuffer.resize(lengthCore);
+                    }
+                    else
+                    {
+                        return;  // Long path retrieval failed
+                    }
+                }
+
+                auto fullPath = std::array<wchar_t, bufferSize>{};
+                
+                if (DWORD lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr); lengthFull > 0)
+                {
+                    // Process path and extract base directory by walking up to find Bin/ directory
+                    const auto processPath = [&strProcessBaseDir, bCoreModuleFound](const std::wstring_view fullPathStr) {
+                        if (const auto lastSeparator = fullPathStr.find_last_of(L"\\/"); lastSeparator != std::wstring_view::npos)
+                        {
+                            const auto moduleDir = fullPathStr.substr(0, lastSeparator);
+                            auto currentPath = std::filesystem::path(moduleDir);
+                            
+                            // Walk up the directory tree to find Bin/ folder
+                            // Check current directory and up to 2 parent levels
+                            for (auto level = 0; level < 3; ++level)
+                            {
+                                auto folderName = currentPath.filename().wstring();
+                                
+                                // Convert to lowercase for case-insensitive comparison
+                                std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
+                                
+                                if (folderName == L"bin")
+                                {
+                                    strProcessBaseDir = ToUTF8(currentPath.wstring());
+                                    return;
+                                }
+                                
+                                // Move up one level
+                                if (currentPath.has_parent_path())
+                                    currentPath = currentPath.parent_path();
+                                else
+                                    break;  // Reached root, can't go further
+                            }
+                            
+                            // Fallback: Check if current working directory is or contains Bin/
+                            if (!bCoreModuleFound)
+                            {
+                                if (auto cwdBuffer = std::array<wchar_t, MAX_PATH>{}; GetCurrentDirectoryW(MAX_PATH, cwdBuffer.data()) > 0)
+                                {
+                                    const auto cwdPath = std::filesystem::path{cwdBuffer.data()};
+                                    auto cwdName = cwdPath.filename().wstring();
+                                    std::transform(cwdName.cbegin(), cwdName.cend(), cwdName.begin(), ::towlower);
+                                    
+                                    if (cwdName == L"bin")
+                                    {
+                                        strProcessBaseDir = ToUTF8(cwdPath.wstring());
+                                        return;
+                                    }
+                                }
+                            }
+                            
+                            // No Bin/ folder found - leave strProcessBaseDir empty
+                        }
+                    };
+
+                    // If buffer too small, resize for long path support
+                    if (auto fullPathBuffer = std::wstring{}; static_cast<size_t>(lengthFull) > fullPath.size())
+                    {
+                        if (static_cast<size_t>(lengthFull) > MAX_UNICODE_PATH)
+                            return;  // Path too long, validation failed
+                        
+                        fullPathBuffer.resize(static_cast<size_t>(lengthFull));
+                        if (lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPathBuffer.size()), fullPathBuffer.data(), nullptr);
+                            lengthFull > 0 && static_cast<size_t>(lengthFull) < fullPathBuffer.size())
+                        {
+                            processPath(std::wstring_view(fullPathBuffer.data(), static_cast<size_t>(lengthFull)));
+                        }
+                    }
+                    else
+                    {
+                        processPath(std::wstring_view(fullPath.data(), static_cast<size_t>(lengthFull)));
+                    }
+                }
             }
         }
-        catch (...)
-        {
-        }
-    });
+    }
+    catch (...)
+    {
+    }
+}
+
+[[nodiscard]] const SString& SharedUtil::GetMTAProcessBaseDir()
+{
+    static auto strProcessBaseDir = SString{};
+    static auto initFlag          = std::once_flag{};
+
+    std::call_once(initFlag, InitializeProcessBaseDir, std::ref(strProcessBaseDir));
 
     return strProcessBaseDir;
 }

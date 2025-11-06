@@ -910,7 +910,7 @@ namespace CrashHandler
     std::call_once(onceFlag, [] {
         try
         {
-            const SString& processDir = SharedUtil::GetProcessBaseDir();
+            const SString& processDir = SharedUtil::GetMTAProcessBaseDir();
             
             if (processDir.empty()) [[unlikely]]
                 return;
@@ -1027,7 +1027,7 @@ namespace CrashHandler
     }
     else [[unlikely]]
     {
-        const auto& processDir = SharedUtil::GetProcessBaseDir();
+        const auto& processDir = SharedUtil::GetMTAProcessBaseDir();
         if (!processDir.empty())
             symbolPath = processDir.c_str();
     }
