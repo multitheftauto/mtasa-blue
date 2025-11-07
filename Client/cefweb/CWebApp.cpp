@@ -97,8 +97,7 @@ void CWebApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
     // This callback runs in both browser process and subprocess
     // In subprocess, g_pCore is NULL, so switches must be added before that check
     // Read GTA path from registry
-    int iResult = 0;
-    const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iResult);
+    const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path");
     if (!strGTAPath.empty())
     {
         // Pass GTA directory path to CEFLauncher subprocess via command-line switch
