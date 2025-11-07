@@ -182,14 +182,16 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                 
                 if (DWORD lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr); lengthFull > 0)
                 {
-                    // Process path and extract base directory by walking up to find Bin/ directory
-                    const auto processPath = [&strProcessBaseDir, bCoreModuleFound](const std::wstring_view fullPathStr) {
+                    // Process path and extract base directory
+                    // The directory above /MTA/ is always the base directory
+                    const auto processPath = [&strProcessBaseDir](const std::wstring_view fullPathStr) {
                         if (const auto lastSeparator = fullPathStr.find_last_of(L"\\/"); lastSeparator != std::wstring_view::npos)
                         {
                             const auto moduleDir = fullPathStr.substr(0, lastSeparator);
                             auto currentPath = std::filesystem::path(moduleDir);
                             
-                            // Walk up the directory tree to find Bin/ folder
+                            // Walk up to find MTA/ folder
+                            // Stop at first MTA folder found - it's guaranteed to be the correct one
                             // Check current directory and up to 2 parent levels
                             for (auto level = 0; level < 3; ++level)
                             {
@@ -198,10 +200,15 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                                 // Convert to lowercase for case-insensitive comparison
                                 std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
                                 
-                                if (folderName == L"bin")
+                                if (folderName == L"mta")
                                 {
-                                    strProcessBaseDir = ToUTF8(currentPath.wstring());
-                                    return;
+                                    // Found MTA folder - base directory is its parent
+                                    // Stop searching immediately to avoid finding outer "MTA" folders (e.g user with custom intall dir)
+                                    if (currentPath.has_parent_path())
+                                    {
+                                        strProcessBaseDir = ToUTF8(currentPath.parent_path().wstring());
+                                    }
+                                    return;  // Always stop at first MTA folder found
                                 }
                                 
                                 // Move up one level
@@ -210,25 +217,6 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                                 else
                                     break;  // Reached root, can't go further
                             }
-                            
-                            // Fallback: Check if current working directory is or contains Bin/
-                            if (!bCoreModuleFound)
-                            {
-                                if (auto cwdBuffer = std::array<wchar_t, MAX_PATH>{}; GetCurrentDirectoryW(MAX_PATH, cwdBuffer.data()) > 0)
-                                {
-                                    const auto cwdPath = std::filesystem::path{cwdBuffer.data()};
-                                    auto cwdName = cwdPath.filename().wstring();
-                                    std::transform(cwdName.cbegin(), cwdName.cend(), cwdName.begin(), ::towlower);
-                                    
-                                    if (cwdName == L"bin")
-                                    {
-                                        strProcessBaseDir = ToUTF8(cwdPath.wstring());
-                                        return;
-                                    }
-                                }
-                            }
-                            
-                            // No Bin/ folder found - leave strProcessBaseDir empty
                         }
                     };
 
