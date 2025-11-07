@@ -180,8 +180,52 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                 DWORD lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr);
                 if (lengthFull > 0)
                 {
-                    std::wstring fullPathStr;
-                    
+                    // Process path and extract base directory
+                    // The directory above /MTA/ is always the base directory
+                    const auto processPath = [&strProcessBaseDir](const std::wstring& fullPathStr) {
+                        const size_t lastSeparator = fullPathStr.find_last_of(L"\\/");
+                        if (lastSeparator != std::wstring::npos)
+                        {
+                            std::wstring currentPath = fullPathStr.substr(0, lastSeparator);
+                            
+                            // Walk up to find MTA/ folder
+                            // Stop at first MTA folder found - it's guaranteed to be the correct one
+                            // Check current directory and up to 2 parent levels
+                            for (int level = 0; level < 3; ++level)
+                            {
+                                // Extract folder name from current path
+                                const size_t lastSep = currentPath.find_last_of(L"\\/");
+                                std::wstring folderName = (lastSep != std::wstring::npos) 
+                                    ? currentPath.substr(lastSep + 1) 
+                                    : currentPath;
+                                
+                                // Convert to lowercase for case-insensitive comparison
+                                std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
+                                
+                                if (folderName == L"mta")
+                                {
+                                    // Found MTA folder - base directory is its parent
+                                    // Stop searching immediately to avoid finding outer "MTA" folders (e.g user with custom install dir)
+                                    if (lastSep != std::wstring::npos)
+                                    {
+                                        std::wstring parentPath = currentPath.substr(0, lastSep);
+                                        // Add trailing separator for drive roots to match filesystem::path::parent_path() behavior
+                                        if (parentPath.length() == 2 && parentPath[1] == L':')
+                                            parentPath += L'\\';
+                                        strProcessBaseDir = ToUTF8(parentPath);
+                                    }
+                                    return;  // Always stop at first MTA folder found
+                                }
+                                
+                                // Move up one level
+                                if (lastSep != std::wstring::npos)
+                                    currentPath = currentPath.substr(0, lastSep);
+                                else
+                                    break;  // Reached root, can't go further
+                            }
+                        }
+                    };
+
                     // If buffer too small, resize for long path support
                     if (static_cast<size_t>(lengthFull) > fullPath.size())
                     {
@@ -193,77 +237,14 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                         lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPathBuffer.size()), &fullPathBuffer[0], nullptr);
                         if (lengthFull > 0 && static_cast<size_t>(lengthFull) < fullPathBuffer.size())
                         {
-                            fullPathStr = fullPathBuffer.substr(0, static_cast<size_t>(lengthFull));
+                            fullPathBuffer.resize(static_cast<size_t>(lengthFull));
+                            processPath(fullPathBuffer);
                         }
                     }
                     else
                     {
-                        fullPathStr = std::wstring(fullPath.data(), static_cast<size_t>(lengthFull));
-                    }
-                    
-                    // Process path and extract base directory by walking up to find Bin/ directory
-                    if (!fullPathStr.empty())
-                    {
-                        const size_t lastSeparator = fullPathStr.find_last_of(L"\\/");
-                        if (lastSeparator != std::wstring::npos)
-                        {
-                            std::wstring currentPath = fullPathStr.substr(0, lastSeparator);
-                            
-                            // Walk up the directory tree to find Bin/ folder
-                            // Check current directory and up to 2 parent levels
-                            for (int level = 0; level < 3; ++level)
-                            {
-                                // Extract the current folder name (last component of path)
-                                const size_t lastSep = currentPath.find_last_of(L"\\/");
-                                std::wstring folderName = (lastSep != std::wstring::npos) 
-                                    ? currentPath.substr(lastSep + 1) 
-                                    : currentPath;
-                                
-                                // Convert to lowercase for case-insensitive comparison
-                                std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
-                                
-                                if (folderName == L"bin")
-                                {
-                                    strProcessBaseDir = ToUTF8(currentPath);
-                                    return;
-                                }
-                                
-                                // Move up one level for next iteration
-                                if (lastSep != std::wstring::npos)
-                                {
-                                    currentPath = currentPath.substr(0, lastSep);
-                                }
-                                else
-                                {
-                                    break;  // Reached root, can't go further
-                                }
-                            }
-                            
-                            // Fallback: Check if current working directory is or contains Bin/
-                            if (!bCoreModuleFound)
-                            {
-                                std::vector<wchar_t> cwdBuffer(MAX_PATH);
-                                if (GetCurrentDirectoryW(MAX_PATH, cwdBuffer.data()) > 0)
-                                {
-                                    std::wstring cwdPath(cwdBuffer.data());
-                                    // Extract the folder name (last component)
-                                    const size_t cwdLastSep = cwdPath.find_last_of(L"\\/");
-                                    std::wstring cwdName = (cwdLastSep != std::wstring::npos) 
-                                        ? cwdPath.substr(cwdLastSep + 1) 
-                                        : cwdPath;
-                                    
-                                    std::transform(cwdName.begin(), cwdName.end(), cwdName.begin(), ::towlower);
-                                    
-                                    if (cwdName == L"bin")
-                                    {
-                                        strProcessBaseDir = ToUTF8(cwdPath);
-                                        return;
-                                    }
-                                }
-                            }
-                            
-                            // No Bin/ folder found - leave strProcessBaseDir empty
-                        }
+                        std::wstring fullPathStr(fullPath.data(), static_cast<size_t>(lengthFull));
+                        processPath(fullPathStr);
                     }
                 }
             }
