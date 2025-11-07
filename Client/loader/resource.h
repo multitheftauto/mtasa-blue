@@ -41,6 +41,7 @@
 #define IDC_NO_ACTION                   1037
 #define IDC_CHECK_REMEMBER              1038
 #define IDC_OPTIMUS_TEXT4               1039
+#define IDC_SEND_DUMP_LABEL             1040
 
 // Next default values for new objects
 //
@@ -48,7 +49,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1036
+#define _APS_NEXT_CONTROL_VALUE         1041
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

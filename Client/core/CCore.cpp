@@ -27,6 +27,7 @@
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordRichPresence.h"
 #include "CSteamClient.h"
+#include "CCrashDumpWriter.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -44,7 +45,7 @@ extern fs::path g_gtaDirectory;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static auto Win32LoadLibraryA = LoadLibraryA;
 static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
@@ -146,6 +147,11 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
+    m_pModelCacheManager = nullptr;
+    m_iDummyProgressValue = 0;
+    m_DummyProgressTimerHandle = NULL;
+    m_bDummyProgressUpdateAlways = false;
+
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
@@ -187,9 +193,26 @@ CCore::~CCore()
     // Remove input hook
     CMessageLoopHook::GetSingleton().RemoveHook();
 
+    if (m_bWindowsTimerEnabled)
+    {
+        KillTimer(GetHookedWindow(), IDT_TIMER1);
+        m_bWindowsTimerEnabled = false;
+    }
+
+    extern int ms_iDummyProgressTimerCounter;
+
+    if (m_DummyProgressTimerHandle != NULL)
+    {
+        DeleteTimerQueueTimer(NULL, m_DummyProgressTimerHandle, INVALID_HANDLE_VALUE);
+        m_DummyProgressTimerHandle = NULL;
+        ms_iDummyProgressTimerCounter = 0;
+    }
+
     // Delete the mod manager
     delete m_pModManager;
     SAFE_DELETE(m_pMessageBox);
+
+    SAFE_DELETE(m_pModelCacheManager);
 
     // Destroy early subsystems
     m_bModulesLoaded = false;
@@ -224,6 +247,8 @@ CCore::~CCore()
     // Delete lazy subsystems
     DestroyGUI();
     DestroyXML();
+
+    SAFE_DELETE(g_pLocalization);
 
     // Delete keybinds
     delete m_pKeyBinds;
@@ -1072,6 +1097,16 @@ void CCore::CreateXML()
         if (!m_pConfigFile)
         {
             assert(false);
+
+            if (m_pXML)
+            {
+                using PFNReleaseXMLInterface = void (*)();
+                if (auto pfnRelease = reinterpret_cast<PFNReleaseXMLInterface>(m_XMLModule.GetFunctionPointer("ReleaseXMLInterface")))
+                    pfnRelease();
+            }
+
+            m_pXML = NULL;
+            m_XMLModule.UnloadModule();
             return;
         }
 
@@ -1123,10 +1158,14 @@ void CCore::DestroyXML()
     {
         SaveConfig(true);
         delete m_pConfigFile;
+        m_pConfigFile = nullptr;
     }
 
     if (m_pXML)
     {
+        using PFNReleaseXMLInterface = void (*)();
+        if (auto pfnRelease = reinterpret_cast<PFNReleaseXMLInterface>(m_XMLModule.GetFunctionPointer("ReleaseXMLInterface")))
+            pfnRelease();
         m_pXML = NULL;
     }
 
@@ -1156,8 +1195,48 @@ CWebCoreInterface* CCore::GetWebCore()
         cvars->Get("browser_enable_gpu", gpuEnabled);
 
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise(gpuEnabled);
+        if (!m_pWebCore)
+        {
+            WriteDebugEvent("CCore::GetWebCore - CreateModule failed");
+            return nullptr;
+        }
+
+        // Log current working directory
+        wchar_t cwdBeforeWebInit[32768]{};
+        DWORD cwdBeforeWebInitLen = GetCurrentDirectoryW(32768, cwdBeforeWebInit);
+        if (cwdBeforeWebInitLen > 0)
+        {
+            WriteDebugEvent(SString("CCore::GetWebCore - CWD before Initialise: %S", cwdBeforeWebInit));
+        }
+        
+        // Keep m_pWebCore alive even if Initialise() fails
+        // CefInitialize() can only be called once per process
+        // Deleting and recreating m_pWebCore causes repeated initialization attempts
+        // Track initialization state via IsInitialised() instead
+        bool bInitSuccess = false;
+        try
+        {
+            bInitSuccess = m_pWebCore->Initialise(gpuEnabled);
+        }
+        catch (...)
+        {
+            WriteDebugEvent("CCore::GetWebCore - Initialise threw exception");
+            bInitSuccess = false;
+        }
+        
+        if (!bInitSuccess)
+        {
+            WriteDebugEvent("CCore::GetWebCore - Initialise failed");
+            return nullptr;
+        }
     }
+    else
+    {
+        // On subsequent calls, check if initialization succeeded
+        if (!m_pWebCore->IsInitialised())
+            return nullptr;
+    }
+    
     return m_pWebCore;
 }
 
@@ -1470,13 +1549,14 @@ void CCore::Quit(bool bInstantly)
         // Destroy the client
         CModManager::GetSingleton().Unload();
 
-        // Destroy ourself
-        delete CCore::GetSingletonPtr();
-
         WatchDogCompletedSection("Q0");
 
-        // Use TerminateProcess for now as exiting the normal way crashes
+        // Use TerminateProcess before destroying CCore to ensure clean exit code (Exiting the normal way also crashes).
         TerminateProcess(GetCurrentProcess(), 0);
+
+        // Destroy ourself (unreachable but kept for completeness)
+        delete CCore::GetSingletonPtr();
+
     }
     else
     {
@@ -1837,7 +1917,7 @@ void CCore::OnGameTimerUpdate()
 
 void CCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    if (m_pNet != nullptr)            // We have to wait for the network module to be loaded
+    if (m_pNet != nullptr && IsWebCoreLoaded())            // We have to wait for the network module to be loaded
         GetWebCore()->OnFPSLimitChange(fps);
 }
 

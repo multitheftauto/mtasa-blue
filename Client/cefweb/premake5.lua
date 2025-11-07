@@ -37,6 +37,8 @@ project "Client Webbrowser"
 		"**.cpp"
 	}
 
+	filter {}
+
 	links {
 		"libcef", "CEF", "Psapi.lib", "version.lib", "Winmm.lib", "Ws2_32.lib", "DbgHelp.lib"
 	}

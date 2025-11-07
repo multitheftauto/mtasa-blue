@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "FPSLimiter.h"
 #include "CGraphStats.h"
+#include <SharedUtil.Misc.h>
 
 namespace FPSLimiter
 {
@@ -259,9 +260,8 @@ namespace FPSLimiter
                 HMODULE ntdll = GetModuleHandleA("ntdll.dll");
                 if (ntdll)
                 {
-                    auto proc = GetProcAddress(ntdll, "NtSetTimerResolution");
-                    auto setRes = std::bit_cast<NtSetTimerResolution>(proc);
-                    if (setRes)
+                    NtSetTimerResolution setRes = nullptr;
+                    if (SharedUtil::TryGetProcAddress(ntdll, "NtSetTimerResolution", setRes))
                     {
                         ULONG actualRes;
                         setRes(10000, TRUE, &actualRes);            // 1ms in 100ns units

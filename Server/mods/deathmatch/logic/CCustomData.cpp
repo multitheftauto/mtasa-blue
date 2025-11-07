@@ -14,39 +14,39 @@
 
 void CCustomData::Copy(CCustomData* pCustomData)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
+    auto iter = pCustomData->IterBegin();
     for (; iter != pCustomData->IterEnd(); iter++)
     {
-        Set(iter->first.c_str(), iter->second.Variable);
+        Set(iter->first, iter->second.Variable);
     }
 }
 
-SCustomData* CCustomData::Get(const char* szName) const
+SCustomData* CCustomData::Get(const CStringName& name) const
 {
-    assert(szName);
+    assert(name);
 
-    std::map<std::string, SCustomData>::const_iterator it = m_Data.find(szName);
+    auto it = m_Data.find(name);
     if (it != m_Data.end())
         return (SCustomData*)&it->second;
 
     return NULL;
 }
 
-SCustomData* CCustomData::GetSynced(const char* szName)
+SCustomData* CCustomData::GetSynced(const CStringName& name)
 {
-    assert(szName);
+    assert(name);
 
-    std::map<std::string, SCustomData>::const_iterator it = m_SyncedData.find(szName);
+    auto it = m_SyncedData.find(name);
     if (it != m_SyncedData.end())
         return (SCustomData*)&it->second;
 
     return NULL;
 }
 
-bool CCustomData::DeleteSynced(const char* szName)
+bool CCustomData::DeleteSynced(const CStringName& name)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator iter = m_SyncedData.find(szName);
+    auto iter = m_SyncedData.find(name);
     if (iter != m_SyncedData.end())
     {
         m_SyncedData.erase(iter);
@@ -57,11 +57,11 @@ bool CCustomData::DeleteSynced(const char* szName)
     return false;
 }
 
-void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+void CCustomData::UpdateSynced(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType)
 {
     if (syncType == ESyncType::BROADCAST)
     {
-        SCustomData* pDataSynced = GetSynced(szName);
+        SCustomData* pDataSynced = GetSynced(name);
         if (pDataSynced)
         {
             pDataSynced->Variable = Variable;
@@ -72,27 +72,27 @@ void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable,
             SCustomData newData;
             newData.Variable = Variable;
             newData.syncType = syncType;
-            m_SyncedData[szName] = newData;
+            m_SyncedData[name] = newData;
         }
     }
     else
     {
-        DeleteSynced(szName);
+        DeleteSynced(name);
     }
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+void CCustomData::Set(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType)
 {
-    assert(szName);
+    assert(name);
 
     // Grab the item with the given name
-    SCustomData* pData = Get(szName);
+    SCustomData* pData = Get(name);
     if (pData)
     {
         // Update existing
         pData->Variable = Variable;
         pData->syncType = syncType;
-        UpdateSynced(szName, Variable, syncType);
+        UpdateSynced(name, Variable, syncType);
     }
     else
     {
@@ -101,18 +101,18 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncTyp
         newData.Variable = Variable;
         newData.syncType = syncType;
         newData.clientChangesMode = eCustomDataClientTrust::UNSET;
-        m_Data[szName] = newData;
-        UpdateSynced(szName, Variable, syncType);
+        m_Data[name] = newData;
+        UpdateSynced(name, Variable, syncType);
     }
 }
 
-bool CCustomData::Delete(const char* szName)
+bool CCustomData::Delete(const CStringName& name)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    auto it = m_Data.find(name);
     if (it != m_Data.end())
     {
-        DeleteSynced(szName);
+        DeleteSynced(name);
         m_Data.erase(it);
         return true;
     }
@@ -121,15 +121,15 @@ bool CCustomData::Delete(const char* szName)
     return false;
 }
 
-void CCustomData::SetClientChangesMode(const char* szName, eCustomDataClientTrust mode)
+void CCustomData::SetClientChangesMode(const CStringName& name, eCustomDataClientTrust mode)
 {
-    SCustomData& pData = m_Data[szName];
+    SCustomData& pData = m_Data[name];
     pData.clientChangesMode = mode;
 }
 
 CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = m_Data.begin();
+    auto iter = m_Data.begin();
     for (; iter != m_Data.end(); iter++)
     {
         CLuaArgument* arg = (CLuaArgument*)&iter->second.Variable;
@@ -138,19 +138,19 @@ CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
         {
             case LUA_TSTRING:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.ToCString());
                 attr->SetValue(arg->GetString().c_str());
                 break;
             }
             case LUA_TNUMBER:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.ToCString());
                 attr->SetValue((float)arg->GetNumber());
                 break;
             }
             case LUA_TBOOLEAN:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.ToCString());
                 attr->SetValue(arg->GetBoolean());
                 break;
             }
