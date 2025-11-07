@@ -93,6 +93,19 @@ void CWebApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
     if (!command_line)
         return;
 
+    // Add GTA path and MTA base path switches before g_pCore check
+    // This callback runs in both browser process and subprocess
+    // In subprocess, g_pCore is NULL, so switches must be added before that check
+    // Read GTA path from registry
+    int iResult = 0;
+    const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iResult);
+    if (!strGTAPath.empty())
+    {
+        // Pass GTA directory path to CEFLauncher subprocess via command-line switch
+        // CEF's AppendSwitchWithValue handles quoting automatically
+        command_line->AppendSwitchWithValue("mta-gta-path", strGTAPath);
+        // AddReportLog only available in browser process where g_pCore exists
+    }
     const CefString processType = command_line->GetSwitchValue("type");
     ConfigureCommandLineSwitches(command_line, processType);
 }
