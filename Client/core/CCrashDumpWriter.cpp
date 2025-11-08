@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "StackTraceHelpers.h"
 #include <SharedUtil.Misc.h>
 #include <game/CGame.h>
 #include <game/CPools.h>
@@ -31,6 +32,7 @@
 #include <ctime>
 #include <optional>
 #include <utility>
+#include <mutex>
 
 static constexpr DWORD       CRASH_EXIT_CODE = 3;
 static constexpr std::size_t LOG_EVENT_SIZE = 200;
@@ -118,21 +120,35 @@ namespace
         static std::atomic_flag configured = ATOMIC_FLAG_INIT;
         if (!configured.test_and_set(std::memory_order_acq_rel))
         {
-            SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS);
+            SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_DEFERRED_LOADS);
         }
+    }
+    
+    std::mutex& GetSymInitMutex() noexcept
+    {
+        static std::mutex symMutex;
+        return symMutex;
     }
 }            // namespace
 
 class SymbolHandlerGuard
 {
 public:
-    explicit SymbolHandlerGuard(HANDLE process) noexcept : m_process(process), m_initialized(false)
+    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) noexcept : m_process(process), m_initialized(false)
     {
+        if (!enableSymbols)
+            return;
+
         if (m_process != nullptr)
         {
+            std::lock_guard<std::mutex> lock{GetSymInitMutex()};
+            
             ConfigureDbgHelpOptions();
+            
+            const SString& processDir = SharedUtil::GetMTAProcessBaseDir();
+            const char* searchPath = processDir.empty() ? nullptr : processDir.c_str();
 
-            if (SymInitialize(m_process, nullptr, TRUE) != FALSE)
+            if (SymInitialize(m_process, searchPath, TRUE) != FALSE)
                 m_initialized = true;
         }
     }
@@ -516,6 +532,15 @@ static void AppendCrashDiagnostics(const SString& text)
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return false;
 
+    const bool hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
+    if (!hasSymbols)
+    {
+        static std::once_flag logOnce;
+        std::call_once(logOnce, [] {
+            SAFE_DEBUG_OUTPUT("CaptureStackTraceText: capturing without symbols (raw addresses only)\n");
+        });
+    }
+
     // For callback exceptions (0xC000041D), context and stack may be unreliable
     const bool isCallbackException = (pException->ExceptionRecord != nullptr && 
                                       pException->ExceptionRecord->ExceptionCode == 0xC000041D);
@@ -548,9 +573,12 @@ static void AppendCrashDiagnostics(const SString& text)
     frame.AddrFrame.Mode = AddrModeFlat;
     frame.AddrStack.Mode = AddrModeFlat;
 
-    SymbolHandlerGuard symbolGuard(hProcess);
-    if (!symbolGuard.IsInitialized())
-        return false;
+    SymbolHandlerGuard symbolGuard(hProcess, hasSymbols);
+
+    const bool useDbgHelp = symbolGuard.IsInitialized();
+    const auto routines = useDbgHelp 
+        ? StackTraceHelpers::MakeStackWalkRoutines(true)
+        : StackTraceHelpers::MakeStackWalkRoutines(false);
 
     static_assert(MAX_SYM_NAME > 1, "MAX_SYM_NAME must include room for a terminator");
     constexpr DWORD                    kSymbolNameCapacity = MAX_SYM_NAME - 1;
@@ -564,8 +592,15 @@ static void AppendCrashDiagnostics(const SString& text)
 
     for (std::size_t frameIndex = 0; frameIndex < MAX_FALLBACK_STACK_FRAMES; ++frameIndex)
     {
-        BOOL bWalked =
-            StackWalk64(IMAGE_FILE_MACHINE_I386, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
+        BOOL bWalked = StackWalk64(IMAGE_FILE_MACHINE_I386,
+                                   hProcess,
+                                   hThread,
+                                   &frame,
+                                   &context,
+                                   routines.readMemory,
+                                   routines.functionTableAccess,
+                                   routines.moduleBase,
+                                   nullptr);
         if (bWalked == FALSE)
             break;
 
@@ -583,7 +618,7 @@ static void AppendCrashDiagnostics(const SString& text)
             visitedAddresses[visitedCount++] = address;
 
         SString symbolName = SString("0x%llX", static_cast<unsigned long long>(address));
-        if (SymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE)
+        if (useDbgHelp && SymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE)
         {
             const auto terminatorIndex = static_cast<std::size_t>(pSymbol->MaxNameLen);
             if (terminatorIndex < MAX_SYM_NAME)
@@ -591,14 +626,20 @@ static void AppendCrashDiagnostics(const SString& text)
             symbolName = pSymbol->Name;
         }
 
-    IMAGEHLP_LINE64 lineInfo{};
-    lineInfo.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+        IMAGEHLP_LINE64 lineInfo{};
+        lineInfo.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
         DWORD           lineDisplacement = 0;
-        SString         lineDetail = "unknown";
-        if (SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
+        SString         lineDetail;
+        
+        if (useDbgHelp && SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
         {
             const char* fileName = lineInfo.FileName != nullptr ? lineInfo.FileName : "unknown";
             lineDetail = SString("%s:%lu", fileName, static_cast<unsigned long>(lineInfo.LineNumber));
+        }
+        else
+        {
+            const std::string formatted = StackTraceHelpers::FormatAddressWithModule(address);
+            lineDetail = formatted.c_str();
         }
 
         outText += SString("#%02u %s [0x%llX] (%s)\n", static_cast<unsigned int>(frameIndex), symbolName.c_str(), static_cast<unsigned long long>(address),
@@ -912,7 +953,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     const DWORD exceptionCodeSafe = SafeReadExceptionCode(pException);
 
     // Attempt minimal emergency dump for any reentrant crash
-    bool expected = false;
+    bool expected{false};
     if (!ms_bInCrashHandler.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: RECURSIVE CRASH - Already in crash handler\n");

@@ -37,8 +37,11 @@ CWebView::~CWebView()
 {
     if (IsMainThread())
     {
-        if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-            g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
+        if (auto pWebCore = g_pCore->GetWebCore(); pWebCore)
+        {
+            if (pWebCore->GetFocusedWebView() == this)
+                pWebCore->SetFocusedWebView(nullptr);
+        }
     }
 
     // Make sure we don't dead lock the CEF render thread
@@ -68,7 +71,8 @@ void CWebView::Initialise()
 
     if (!m_bIsLocal)
     {
-        bool bEnabledJavascript = g_pCore->GetWebCore()->GetRemoteJavascriptEnabled();
+        const auto pWebCore = g_pCore->GetWebCore();
+        const bool bEnabledJavascript = pWebCore ? pWebCore->GetRemoteJavascriptEnabled() : false;
         browserSettings.javascript = bEnabledJavascript ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
     }
 
@@ -107,8 +111,12 @@ bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString
         return false;            // Invalid URL
 
     // Are we allowed to browse this website?
-    if (bFilterEnabled && g_pCore->GetWebCore()->GetDomainState(UTF16ToMbUTF8(urlParts.host.str), true) != eURLState::WEBPAGE_ALLOWED)
-        return false;
+    if (bFilterEnabled)
+    {
+        auto pWebCore = g_pCore->GetWebCore();
+        if (pWebCore && pWebCore->GetDomainState(UTF16ToMbUTF8(urlParts.host.str), true) != eURLState::WEBPAGE_ALLOWED)
+            return false;
+    }
 
     // Load it!
     auto pFrame = m_pWebView->GetMainFrame();
@@ -186,10 +194,14 @@ void CWebView::Focus(bool state)
     if (m_pWebView)
         m_pWebView->GetHost()->SetFocus(state);
 
+    auto pWebCore = g_pCore->GetWebCore();
+    if (!pWebCore)
+        return;
+    
     if (state)
-        g_pCore->GetWebCore()->SetFocusedWebView(this);
-    else if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
+        pWebCore->SetFocusedWebView(this);
+    else if (pWebCore->GetFocusedWebView() == this)
+        pWebCore->SetFocusedWebView(nullptr);
 }
 
 void CWebView::ClearTexture()
@@ -936,13 +948,16 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     // Remove events owned by this webview and invoke left callbacks
-    g_pCore->GetWebCore()->RemoveWebViewEvents(this);
+    if (auto pWebCore = g_pCore->GetWebCore(); pWebCore) [[likely]]
+    {
+        pWebCore->RemoveWebViewEvents(this);
+
+        // Remove focused web view reference
+        if (pWebCore->GetFocusedWebView() == this)
+            pWebCore->SetFocusedWebView(nullptr);
+    }
 
     m_pWebView = nullptr;
-
-    // Remove focused web view reference
-    if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////

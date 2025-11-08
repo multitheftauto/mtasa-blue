@@ -29,6 +29,7 @@
 class CWebBrowserItem;
 class CWebsiteRequests;
 class CWebView;
+class CWebViewInterface;
 
 class CWebCore : public CWebCoreInterface
 {
@@ -58,6 +59,7 @@ public:
     CWebCore();
     ~CWebCore();
     bool Initialise(bool gpuEnabled) override;
+    bool IsInitialised() const noexcept override { return m_bInitialised; }
 
     CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent);
     void               DestroyWebView(CWebViewInterface* pWebViewInterface);
@@ -88,7 +90,7 @@ public:
     void SetTestModeEnabled(bool bEnabled) { m_bTestmodeEnabled = bEnabled; };
     void DebugOutputThreadsafe(const SString& message, unsigned char R, unsigned char G, unsigned char B);
 
-    CWebViewInterface* GetFocusedWebView() { return (CWebViewInterface*)m_pFocusedWebView; };
+    CWebViewInterface* GetFocusedWebView();
     void               SetFocusedWebView(CWebView* pWebView) { m_pFocusedWebView = pWebView; };
     void               ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void               ClearTextures();
@@ -139,4 +141,5 @@ private:
 
     // Shouldn't be changed after init
     bool m_bGPUEnabled;
+    bool m_bInitialised = false;            // Track if CefInitialize() succeeded
 };

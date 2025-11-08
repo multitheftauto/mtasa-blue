@@ -1350,17 +1350,9 @@ CFlyingHandlingEntry* CVehicleSA::GetFlyingHandlingData()
 
 void CVehicleSA::SetHandlingData(CHandlingEntry* pHandling)
 {
-    if (!pHandling)
-        return;
-
-    CVehicleSAInterface* pVehicleInterface = GetVehicleInterface();
-    if (!pVehicleInterface)
-        return;
-
     // Store the handling and recalculate it
     m_pHandlingData = static_cast<CHandlingEntrySA*>(pHandling);
-    pVehicleInterface->pHandlingData = m_pHandlingData->GetInterface();
-
+    GetVehicleInterface()->pHandlingData = m_pHandlingData->GetInterface();
     RecalculateHandling();
 }
 
@@ -1377,26 +1369,13 @@ void CVehicleSA::RecalculateHandling()
     if (!m_pHandlingData)
         return;
 
-    // Validate vehicle interface
-    CVehicleSAInterface* pInt = GetVehicleInterface();
-    if (!pInt)
-        return;
-
-    CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    auto* pModelInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
-    auto* pColModelInterface = pModelInterface ? pModelInterface->pColModel : nullptr;
-    bool  bSuspensionDataReady = pColModelInterface && pColModelInterface->m_data;
-    bool  bHasSuspension = pModelInfo &&
-                      (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() || pModelInfo->IsTrailer() || pModelInfo->IsBike());
-
     m_pHandlingData->Recalculate();
 
-    // Recalculate the suspension lines (only for vehicles that have suspension)
-    // Skip until collision data streams in to avoid accessing null suspension lines
-    if (bSuspensionDataReady && bHasSuspension)
-        RecalculateSuspensionLines();
+    // Recalculate the suspension lines
+    RecalculateSuspensionLines();
 
     // Put it in our interface
+    CVehicleSAInterface* pInt = GetVehicleInterface();
     unsigned int         uiHandlingFlags = m_pHandlingData->GetInterface()->uiHandlingFlags;
     bool                 hydralicsInstalled = false, nitroInstalled = false;
 
@@ -1779,11 +1758,6 @@ void* CVehicleSA::GetPrivateSuspensionLines()
     if (m_pSuspensionLines == NULL)
     {
         CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-        // pColModel can be NULL if collision data hasn't been streamed in yet.
-        // GTA SA loads visual models and collision models separately via CColStore.
-        // The model can be marked as "loaded" even if collision data is still pending.
-        if (!pModelInfo->GetInterface()->pColModel || !pModelInfo->GetInterface()->pColModel->m_data)
-            return NULL;
         CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->m_data;
         if (pModelInfo->IsMonsterTruck())
         {
@@ -1808,9 +1782,6 @@ void* CVehicleSA::GetPrivateSuspensionLines()
 void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    // Collision model may not be loaded yet (see GetPrivateSuspensionLines)
-    if (!pModelInfo->GetInterface()->pColModel || !pModelInfo->GetInterface()->pColModel->m_data)
-        return;
     CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->m_data;
     if (pModelInfo->IsMonsterTruck())
     {
@@ -1838,34 +1809,11 @@ void CVehicleSA::RecalculateSuspensionLines()
 
     DWORD       dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
-    if (pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() || pModelInfo->IsTrailer()))
+    if (pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar())
     {
         // Trains (Their trailers do as well!)
         if (pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590)
             return;
-
-        // Ensure collision model is loaded before setting up suspension
-        auto* pColModelInterface = pModelInfo->GetInterface()->pColModel;
-        if (!pColModelInterface || !pColModelInterface->m_data)
-            return;
-
-        struct ScopedModelRef
-        {
-            explicit ScopedModelRef(CModelInfo* model)
-                : m_Model(model)
-            {
-                if (m_Model)
-                    m_Model->ModelAddRef(EModelRequestType::BLOCKING, "CVehicleSA::RecalculateSuspensionLines");
-            }
-
-            ~ScopedModelRef()
-            {
-                if (m_Model)
-                    m_Model->RemoveRef();
-            }
-
-            CModelInfo* m_Model;
-        } modelRef(pModelInfo);
 
         GetVehicleInterface()->SetupSuspensionLines();
 
