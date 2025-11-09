@@ -1821,6 +1821,6 @@ void CGUI_Impl::Cleanup()
     }
     catch (std::exception& e)
     {
-        OutputDebugLine(SString("CGUI_Impl::Cleanup - Exception: %s", e.what()));
+        WriteDebugEvent(SString("CGUI_Impl::Cleanup - Exception: %s", e.what()));
     }
 }
