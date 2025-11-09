@@ -63,9 +63,6 @@ public:
     // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
     unsigned int LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics);
 
-    // Replaces all atomics for a specific model
-    bool ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) override;
-
     // Replaces all atomics in a clump
     void ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics);
 
@@ -83,10 +80,11 @@ public:
 
     // Replaces a CClumpModelInfo clump with a new clump
     bool ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) override;
-
     bool ReplacePedModel(RpClump* pNew, unsigned short usModelID) override;
-
     bool ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
+
+    // Replaces object model (clump or atomic)
+    bool ReplaceObjectModel(RpClump* newClump, std::uint16_t modelID) override;
 
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
@@ -125,6 +123,57 @@ public:
     CModelTexturesInfo* GetModelTexturesInfo(ushort usModelId);
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
+    RpAtomic* GetFirstAtomic(RpClump* clump) override;
+
+    static char* GetFrameNodeName(RwFrame* frame);
+
+    std::uint32_t RpGeometryGet2dFxCount(RpGeometry* geometry) override;
+    RpAtomic* Get2DEffectAtomic(RpClump* clump) override;
+
+    // Originally there was a possibility for this function to cause buffer overflow
+    // It should be fixed here.
+    template <size_t OutBuffSize>
+    static void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& outDamage)
+    {
+        const auto nodeNameLen = strlen(nodeName);
+
+        const auto NodeNameEndsWith = [=](const char* with)
+        {
+            const auto withLen = strlen(with);
+            // dassert(withLen <= nodeNameLen);
+            return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
+                   && strncmp(nodeName + nodeNameLen - withLen, with, withLen) == 0;
+        };
+
+        // Copy `nodeName` into `outName` with `off` trimmed from the end
+        // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
+        const auto TerminatedCopy = [&](size_t off)
+        {
+            dassert(nodeNameLen - off < OutBuffSize);
+            strncpy_s(
+                outName, nodeName,
+                std::min(nodeNameLen - off, OutBuffSize - 1));            // By providing `OutBuffSize - 1` it is ensured the array will be null terminated
+        };
+
+        if (NodeNameEndsWith("_dam"))
+        {
+            outDamage = true;
+            TerminatedCopy(sizeof("_dam") - 1);
+        }
+        else
+        {
+            outDamage = false;
+            if (NodeNameEndsWith("_l0") || NodeNameEndsWith("_L0"))
+            {
+                TerminatedCopy(sizeof("_l0") - 1);
+            }
+            else
+            {
+                dassert(nodeNameLen < OutBuffSize);
+                strncpy_s(outName, OutBuffSize, nodeName, OutBuffSize - 1);
+            }
+        }
+    }
 
     static void  StaticSetHooks();
     static void  StaticSetClothesReplacingHooks();

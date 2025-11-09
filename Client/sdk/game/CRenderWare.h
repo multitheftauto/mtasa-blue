@@ -26,6 +26,8 @@ struct RwMatrix;
 struct RwTexDictionary;
 struct RwTexture;
 struct RpClump;
+struct RpAtomic;
+struct RpGeometry;
 
 typedef CShaderItem CSHADERDUMMY;
 
@@ -91,7 +93,6 @@ public:
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
     virtual void             ReplaceCollisions(CColModel* pColModel, unsigned short usModelID) = 0;
     virtual unsigned int     LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics) = 0;
-    virtual bool             ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) = 0;
     virtual void             ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics) = 0;
     virtual void             ReplaceWheels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szWheel) = 0;
     virtual void             RepositionAtomic(RpClump* pDst, RpClump* pSrc, const char* szName) = 0;
@@ -99,6 +100,7 @@ public:
     virtual bool             ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplacePedModel(RpClump* pNew, unsigned short usModelID) = 0;
+    virtual bool             ReplaceObjectModel(RpClump* newClump, std::uint16_t modelID) = 0;
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
     virtual void             PulseWorldTextureWatch() = 0;
     virtual void             GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID) = 0;
@@ -114,6 +116,11 @@ public:
     virtual void     RemoveClientEntityRefs(CClientEntityBase* pClientEntity) = 0;
     virtual void     RemoveShaderRefs(CSHADERDUMMY* pShaderItem) = 0;
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
+    virtual RpAtomic* GetFirstAtomic(RpClump* clump) = 0;
+
+    virtual std::uint32_t RpGeometryGet2dFxCount(RpGeometry* geometry) = 0;
+    virtual RpAtomic*     Get2DEffectAtomic(RpClump* clump) = 0;
+
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
     virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
 

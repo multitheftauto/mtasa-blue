@@ -152,7 +152,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
-
+        {"engineConvertModelToType", ArgumentParser<EngineConvertModelToType>},
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2614,4 +2614,35 @@ bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
 void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
 {
     g_pClientGame->Restream(option);
+}
+
+bool CLuaEngineDefs::EngineConvertModelToType(std::uint32_t model, eClientModelType type)
+{
+    if (!CClientObjectManager::IsValidModel(model))
+        throw LuaFunctionError("Invalid model");
+
+    if (type == eClientModelType::PED || type == eClientModelType::VEHICLE || type == eClientModelType::TXD)
+        throw LuaFunctionError("The argument 'model-type' is invalid");
+
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(model);
+    if (!modelInfo)
+        return false;
+
+    // We need to stream out the model, otherwise it can crash
+    g_pClientGame->GetObjectManager()->RestreamObjects(model);
+    modelInfo->RestreamIPL();
+
+    switch (type)
+    {
+        case eClientModelType::OBJECT:
+            return modelInfo->ConvertToAtomic(false);
+        case eClientModelType::OBJECT_DAMAGEABLE:
+            return modelInfo->ConvertToAtomic(true);
+        case eClientModelType::CLUMP:
+            return modelInfo->ConvertToClump();
+        case eClientModelType::TIMED_OBJECT:
+            return modelInfo->ConvertToTimedObject();
+    }
+
+    return false;
 }
