@@ -13,6 +13,7 @@ using namespace tinygettext;
 
 #include <core/CLocalizationInterface.h>
 #include "CLanguage.h"
+#include <memory>
 #define MTA_LOCALE_DIR "MTA/locale/"
 
 #pragma once
