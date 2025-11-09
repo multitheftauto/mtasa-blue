@@ -330,28 +330,31 @@ bool CGUI_Impl::GetGUIInputEnabled()
             break;
         case INPUTMODE_NO_BINDS_ON_EDIT:
         {
-            CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
-            if (!pActiveWindow || pActiveWindow == m_pTop || !pActiveWindow->isVisible())
+            if (m_pTop)
             {
-                return false;
-            }
-            if (pActiveWindow->getType() == "CGUI/Editbox")
-            {
-                CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
-                return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
-            }
-            else if (pActiveWindow->getType() == "CGUI/MultiLineEditbox")
-            {
-                CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
-                return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
-            }
-            else if (pActiveWindow->getType() == CGUIWEBBROWSER_NAME)
-            {
-                auto pElement = reinterpret_cast<CGUIElement_Impl*>(pActiveWindow->getUserData());
-                if (pElement->GetType() == CGUI_WEBBROWSER)
+                CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
+                if (!pActiveWindow || pActiveWindow == m_pTop || !pActiveWindow->isVisible())
                 {
-                    auto pWebBrowser = reinterpret_cast<CGUIWebBrowser_Impl*>(pElement);
-                    return pWebBrowser->HasInputFocus();
+                    return false;
+                }
+                if (pActiveWindow->getType() == "CGUI/Editbox")
+                {
+                    CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
+                    return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
+                }
+                else if (pActiveWindow->getType() == "CGUI/MultiLineEditbox")
+                {
+                    CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
+                    return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
+                }
+                else if (pActiveWindow->getType() == CGUIWEBBROWSER_NAME)
+                {
+                    auto pElement = reinterpret_cast<CGUIElement_Impl*>(pActiveWindow->getUserData());
+                    if (pElement->GetType() == CGUI_WEBBROWSER)
+                    {
+                        auto pWebBrowser = reinterpret_cast<CGUIWebBrowser_Impl*>(pElement);
+                        return pWebBrowser->HasInputFocus();
+                    }
                 }
             }
             return false;
@@ -583,6 +586,9 @@ eCursorType CGUI_Impl::GetCursorType()
 
 void CGUI_Impl::AddChild(CGUIElement_Impl* pChild)
 {
+    if (!m_pTop)
+        return;
+
     m_pTop->addChildWindow(pChild->GetWindow());
 }
 
@@ -1156,12 +1162,15 @@ bool CGUI_Impl::Event_MouseButtonDown(const CEGUI::EventArgs& Args)
         pElement->Event_OnMouseButtonDown();
     else
     {
-        // If there's no element, we're probably dealing with the root element
-        CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
-        if (m_pTop == wnd && pActiveWindow)
+        if (m_pTop)
         {
-            // Deactivate active window to trigger onClientGUIBlur
-            pActiveWindow->deactivate();
+            // If there's no element, we're probably dealing with the root element
+            CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
+            if (m_pTop == wnd && pActiveWindow)
+            {
+                // Deactivate active window to trigger onClientGUIBlur
+                pActiveWindow->deactivate();
+            }
         }
     }
 
