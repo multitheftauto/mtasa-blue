@@ -41,7 +41,7 @@ CLocalization::CLocalization(const SString& strLocale, const SString& strLocaleP
 
 CLocalization::~CLocalization()
 {
-    // m_LanguageMap now uses unique_ptr so cleanup is automatic
+    m_pCurrentLang = nullptr;
 }
 
 //
