@@ -144,8 +144,17 @@ CGUI_Impl::~CGUI_Impl()
     // DO NOT delete m_pRenderer - it's already deleted by System destructor
 }
 
+void CGUI_Impl::CreateRootWindow()
+{
+    // Create dummy GUI root
+    m_pTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot"));
+    m_pSystem->setGUISheet(m_pTop);
+}
+
 void CGUI_Impl::SetSkin(const char* szName)
 {
+    m_currentSkin = szName;
+
     if (m_HasSchemeLoaded)
     {
         CEGUI::GlobalEventSet::getSingletonPtr()->removeAllEvents();
@@ -165,9 +174,8 @@ void CGUI_Impl::SetSkin(const char* szName)
     // Destroy any windows we already have
     CEGUI::WindowManager::getSingleton().destroyAllWindows();
 
-    // Create dummy GUI root
-    m_pTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot"));
-    m_pSystem->setGUISheet(m_pTop);
+    // Clean up CEGUI - this also re-creates the root window
+    Cleanup();
 
     // Disable single click timeouts
     m_pSystem->setSingleClickTimeout(100000000.0f);
@@ -1796,4 +1804,23 @@ CEGUI::Window* CGUI_Impl::GetMasterWindow(CEGUI::Window* wnd)
         }
     }
     return wnd;
+}
+
+void CGUI_Impl::Cleanup()
+{
+    try
+    {
+        CleanDeadPool();
+
+        if (m_pWindowManager)
+            m_pWindowManager->destroyAllWindows();
+
+        // Clear redraw structures that may reference old elements
+        m_RedrawQueue.clear();
+        m_RedrawRegistry.clear();
+
+        // Recreate the root window (destroyed above via destroyAllWindows)
+        CreateRootWindow();
+    }
+    catch (...) {}
 }

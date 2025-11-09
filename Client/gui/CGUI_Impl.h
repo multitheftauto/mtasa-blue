@@ -283,6 +283,9 @@ public:
     CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename);
     bool        LoadImageset(const SString& strFilename);
 
+    // Cleanup CEGUI active resources (dead pool)
+    void Cleanup();
+
 private:
     friend class CGUIElement_Impl;
     CGUIButton*      _CreateButton(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
@@ -361,4 +364,7 @@ private:
     bool         m_HasSchemeLoaded;
     SString      m_CurrentSchemeName;
     CElapsedTime m_RenderOkTimer;
+    const char*  m_currentSkin;
+
+    void CreateRootWindow();
 };

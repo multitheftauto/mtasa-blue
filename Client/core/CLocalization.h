@@ -13,7 +13,7 @@ using namespace tinygettext;
 
 #include <core/CLocalizationInterface.h>
 #include "CLanguage.h"
-#define MTA_LOCALE_DIR  "MTA/locale/"
+#define MTA_LOCALE_DIR "MTA/locale/"
 
 #pragma once
 
@@ -42,7 +42,7 @@ public:
     static void LogCallback(const std::string& str);
 
 private:
-    DictionaryManager             m_DictManager;
-    std::map<SString, CLanguage*> m_LanguageMap;
-    CLanguage*                    m_pCurrentLang{};
+    DictionaryManager                             m_DictManager;
+    std::map<SString, std::unique_ptr<CLanguage>> m_LanguageMap;
+    CLanguage*                                    m_pCurrentLang{};
 };
