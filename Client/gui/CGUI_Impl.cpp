@@ -146,6 +146,9 @@ CGUI_Impl::~CGUI_Impl()
 
 void CGUI_Impl::CreateRootWindow()
 {
+    if (!m_pWindowManager || !m_pSystem)
+        return;
+
     // Create dummy GUI root
     m_pTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot"));
     m_pSystem->setGUISheet(m_pTop);
@@ -1828,8 +1831,14 @@ void CGUI_Impl::Cleanup()
         // Recreate the root window (destroyed above via destroyAllWindows)
         CreateRootWindow();
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         WriteDebugEvent(SString("CGUI_Impl::Cleanup - Exception: %s", e.what()));
+        m_pTop = nullptr;
+    }
+    catch (...)
+    {
+        WriteDebugEvent("CGUI_Impl::Cleanup() failed with unknown exception");
+        m_pTop = nullptr;
     }
 }
