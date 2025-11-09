@@ -14,6 +14,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include "CEventContext.h"
 
 struct SEvent
 {
@@ -40,8 +41,8 @@ public:
     CFastHashMap<SString, SEvent*>::const_iterator IterBegin() { return m_EventHashMap.begin(); };
     CFastHashMap<SString, SEvent*>::const_iterator IterEnd() { return m_EventHashMap.end(); };
 
-    void PreEventPulse();
-    void PostEventPulse();
+    void PreEventPulse(CEventContext* pContext);
+    void PostEventPulse(CEventContext* pContext);
 
     void        CancelEvent(bool bCancelled = true);
     void        CancelEvent(bool bCancelled, const char* szReason);
@@ -56,6 +57,7 @@ private:
     std::vector<int> m_CancelledList;
     bool             m_bEventCancelled;
     bool             m_bWasEventCancelled;
+    SString          m_strLastError;
 
-    SString m_strLastError;
+    CEventContext* m_pCurrentContext;
 };

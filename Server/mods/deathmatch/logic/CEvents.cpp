@@ -11,11 +11,15 @@
 
 #include "StdInc.h"
 #include "CEvents.h"
+#include "CLogger.h"
+#include "CGame.h"
+#include "CScriptDebugging.h"
 
 CEvents::CEvents()
 {
     m_bWasEventCancelled = false;
     m_bEventCancelled = false;
+    m_pCurrentContext = nullptr;
 }
 
 bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pLuaMain, bool bAllowRemoteTrigger)
@@ -123,38 +127,67 @@ void CEvents::RemoveAllEvents()
     m_EventHashMap.clear();
 }
 
-void CEvents::PreEventPulse()
+void CEvents::PreEventPulse(CEventContext* pContext)
 {
+    assert(pContext);
+
     m_CancelledList.push_back(m_bEventCancelled);
+
+    m_pCurrentContext = pContext;
+    pContext->Reset();
+
     m_bEventCancelled = false;
     m_bWasEventCancelled = false;
     m_strLastError = "";
 }
 
-void CEvents::PostEventPulse()
+void CEvents::PostEventPulse(CEventContext* pContext)
 {
-    m_bWasEventCancelled = m_bEventCancelled;
+    assert(pContext);
+    assert(m_pCurrentContext == pContext);
+
+    m_bWasEventCancelled = pContext->IsCancelled();
     m_bEventCancelled = m_CancelledList.back() ? true : false;
     m_CancelledList.pop_back();
+
+    m_pCurrentContext = nullptr;
 }
 
 void CEvents::CancelEvent(bool bCancelled)
 {
-    m_bEventCancelled = bCancelled;
+    CancelEvent(bCancelled, nullptr);
 }
 
 void CEvents::CancelEvent(bool bCancelled, const char* szReason)
 {
+    // ALWAYS set the old global variable for backward compatibility
     m_bEventCancelled = bCancelled;
-    m_strLastError = SStringX(szReason);
+    
+    // Also update context if it exists
+    if (m_pCurrentContext)
+    {
+        if (bCancelled)
+            m_pCurrentContext->Cancel(szReason);
+        else
+            m_pCurrentContext->Reset();
+    }
+    
+    if (szReason)
+        m_strLastError = szReason;
 }
 
 bool CEvents::WasEventCancelled()
 {
-    return m_bWasEventCancelled;
+    if (m_pCurrentContext)
+        return m_pCurrentContext->IsCancelled();
+    
+    return m_bEventCancelled || m_bWasEventCancelled;
 }
 
 const char* CEvents::GetLastError()
 {
+    if (m_pCurrentContext)
+        return m_pCurrentContext->GetCancelReason().c_str();
+
     return m_strLastError;
 }
