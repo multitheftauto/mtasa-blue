@@ -163,6 +163,7 @@ void CLuaManager::LoadCFunctions()
         {"triggerServerEvent", CLuaFunctionDefs::TriggerServerEvent},
         {"cancelEvent", CLuaFunctionDefs::CancelEvent},
         {"wasEventCancelled", CLuaFunctionDefs::WasEventCancelled},
+        {"getEventTimestamp", CLuaFunctionDefs::GetEventTimestamp},
         {"triggerLatentServerEvent", CLuaFunctionDefs::TriggerLatentServerEvent},
         {"getLatentEventHandles", CLuaFunctionDefs::GetLatentEventHandles},
         {"getLatentEventStatus", CLuaFunctionDefs::GetLatentEventStatus},

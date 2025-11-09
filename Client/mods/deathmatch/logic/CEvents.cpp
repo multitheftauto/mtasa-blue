@@ -136,6 +136,7 @@ void CEvents::RemoveAllEvents()
 void CEvents::PreEventPulse()
 {
     m_CancelledList.push_back(m_bEventCancelled);
+    m_timestampStack.push_back(CTickCount::Now());
     m_bEventCancelled = false;
     m_bWasEventCancelled = false;
 }
@@ -145,6 +146,7 @@ void CEvents::PostEventPulse()
     m_bWasEventCancelled = m_bEventCancelled;
     m_bEventCancelled = m_CancelledList.back() ? true : false;
     m_CancelledList.pop_back();
+    m_timestampStack.pop_back();
 }
 
 void CEvents::CancelEvent(bool bCancelled)
@@ -155,4 +157,16 @@ void CEvents::CancelEvent(bool bCancelled)
 bool CEvents::WasEventCancelled()
 {
     return m_bWasEventCancelled;
+}
+
+CTickCount CEvents::GetEventTimestamp() const noexcept
+{
+    if (!m_timestampStack.empty())
+        return m_timestampStack.back();
+    return CTickCount(0LL);
+}
+
+bool CEvents::HasEventContext() const noexcept
+{
+    return !m_timestampStack.empty();
 }

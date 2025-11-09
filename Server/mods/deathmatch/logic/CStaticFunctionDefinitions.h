@@ -40,6 +40,7 @@ public:
     static bool        CancelEvent(bool bCancel, const char* szReason);
     static const char* GetCancelReason();
     static bool        WasEventCancelled();
+    static double      GetEventTimestamp();
 
     // Element create/destroy
     static CDummy*   CreateElement(CResource* pResource, const char* szTypeName, const char* szID);

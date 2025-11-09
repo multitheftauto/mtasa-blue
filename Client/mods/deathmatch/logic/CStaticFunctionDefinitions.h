@@ -35,8 +35,9 @@ public:
     static bool TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments);
     static bool TriggerLatentServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain,
                                          ushort usResourceNetId);
-    static bool CancelEvent(bool bCancel);
-    static bool WasEventCancelled();
+    static bool   CancelEvent(bool bCancel);
+    static bool   WasEventCancelled();
+    static double GetEventTimestamp();
 
     // Misc funcs
     static bool DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum = CChecksum());

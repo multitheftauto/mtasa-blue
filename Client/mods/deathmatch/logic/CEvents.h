@@ -45,11 +45,15 @@ public:
     void CancelEvent(bool bCancelled = true);
     bool WasEventCancelled();
 
+    CTickCount GetEventTimestamp() const noexcept;
+    bool       HasEventContext() const noexcept;
+
 private:
     void RemoveAllEvents();
 
     CFastHashMap<SString, SEvent*> m_EventHashMap;
     std::vector<int>               m_CancelledList;
+    std::vector<CTickCount>        m_timestampStack;
     bool                           m_bEventCancelled;
     bool                           m_bWasEventCancelled;
 };

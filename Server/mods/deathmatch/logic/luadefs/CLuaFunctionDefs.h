@@ -28,6 +28,7 @@ public:
     LUA_DECLARE(CancelEvent);
     LUA_DECLARE(GetCancelReason);
     LUA_DECLARE(WasEventCancelled);
+    LUA_DECLARE(GetEventTimestamp);
     LUA_DECLARE(TriggerLatentClientEvent);
     LUA_DECLARE(GetLatentEventHandles);
     LUA_DECLARE(GetLatentEventStatus);

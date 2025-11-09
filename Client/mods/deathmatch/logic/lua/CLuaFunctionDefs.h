@@ -36,6 +36,7 @@ public:
     LUA_DECLARE(TriggerServerEvent);
     LUA_DECLARE(CancelEvent);
     LUA_DECLARE(WasEventCancelled);
+    LUA_DECLARE(GetEventTimestamp);
     LUA_DECLARE(TriggerLatentServerEvent);
     LUA_DECLARE(GetLatentEventHandles);
     LUA_DECLARE(GetLatentEventStatus);

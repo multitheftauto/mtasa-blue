@@ -48,14 +48,18 @@ public:
     bool        WasEventCancelled();
     const char* GetLastError();
 
+    CTickCount GetEventTimestamp() const noexcept;
+    bool       HasEventContext() const noexcept;
+
 private:
     void RemoveAllEvents();
 
     CFastHashMap<SString, SEvent*> m_EventHashMap;
 
-    std::vector<int> m_CancelledList;
-    bool             m_bEventCancelled;
-    bool             m_bWasEventCancelled;
+    std::vector<int>       m_CancelledList;
+    std::vector<CTickCount> m_timestampStack;
+    bool                   m_bEventCancelled;
+    bool                   m_bWasEventCancelled;
 
     SString m_strLastError;
 };

@@ -235,6 +235,13 @@ bool CStaticFunctionDefinitions::WasEventCancelled()
     return m_pEvents->WasEventCancelled();
 }
 
+double CStaticFunctionDefinitions::GetEventTimestamp()
+{
+    if (m_pEvents->HasEventContext())
+        return m_pEvents->GetEventTimestamp().ToDouble();
+    return 0.0;
+}
+
 bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum)
 {
     SString strHTTPDownloadURLFull("%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile);

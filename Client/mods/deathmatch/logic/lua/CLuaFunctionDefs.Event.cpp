@@ -283,8 +283,19 @@ int CLuaFunctionDefs::CancelEvent(lua_State* luaVM)
 
 int CLuaFunctionDefs::WasEventCancelled(lua_State* luaVM)
 {
-    // Return whether the last event was cancelled or not
     lua_pushboolean(luaVM, CStaticFunctionDefinitions::WasEventCancelled());
+    return 1;
+}
+
+int CLuaFunctionDefs::GetEventTimestamp(lua_State* luaVM)
+{
+    double timestamp = CStaticFunctionDefinitions::GetEventTimestamp();
+    if (timestamp > 0.0)
+    {
+        lua_pushnumber(luaVM, timestamp);
+        return 1;
+    }
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
