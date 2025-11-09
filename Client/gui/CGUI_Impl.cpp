@@ -1807,6 +1807,8 @@ void CGUI_Impl::Cleanup()
     {
         CleanDeadPool();
 
+        m_pTop = nullptr;
+
         if (m_pWindowManager)
             m_pWindowManager->destroyAllWindows();
 
@@ -1817,5 +1819,8 @@ void CGUI_Impl::Cleanup()
         // Recreate the root window (destroyed above via destroyAllWindows)
         CreateRootWindow();
     }
-    catch (...) {}
+    catch (std::exception& e)
+    {
+        OutputDebugLine(SString("CGUI_Impl::Cleanup - Exception: %s", e.what()));
+    }
 }
