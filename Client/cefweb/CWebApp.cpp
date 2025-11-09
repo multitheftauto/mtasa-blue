@@ -9,9 +9,71 @@
 #include "StdInc.h"
 #include "CWebApp.h"
 
-#include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
+#include <cef3/cef/include/cef_command_line.h>
 #include <cef3/cef/include/cef_parser.h>
+#include <cef3/cef/include/cef_resource_handler.h>
+#include <cef3/cef/include/cef_response.h>
+#include <cef3/cef/include/cef_stream.h>
+#include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
 #include "CAjaxResourceHandler.h"
+
+namespace
+{
+    // Centralises command-line switch setup so both pre-launch callbacks stay in sync
+    void ConfigureCommandLineSwitches(const CefRefPtr<CefCommandLine>& commandLine, const CefString& processType)
+    {
+        if (!commandLine)
+            return;
+
+        // CEF occasionally forwards dangling pointers when destroying
+        if (!IsReadablePointer(commandLine.get(), sizeof(void*)))
+            return;
+
+        // Always provide base installation paths so loader-proxy can validate subprocess origin
+        const SString gtaPath = GetCommonRegistryValue("", "GTA:SA Path");
+        if (!gtaPath.empty())
+        {
+            commandLine->AppendSwitchWithValue("mta-gta-path", gtaPath);
+        }
+
+        const SString mtaPath = GetMTAProcessBaseDir();
+        if (!mtaPath.empty())
+        {
+            commandLine->AppendSwitchWithValue("mta-base-path", mtaPath);
+        }
+
+        // Prevent Chromium from dropping privileges; required for elevated launches (see chromium/3960)
+        commandLine->AppendSwitch("do-not-de-elevate");
+
+        // Must apply essential CEF switches regardless of WebCore availability
+        commandLine->AppendSwitch("disable-gpu-compositing");
+        commandLine->AppendSwitch("enable-begin-frame-scheduling");
+        // Explicitly block account sign-in to avoid crashes when Google API keys are registered on the system
+        commandLine->AppendSwitchWithValue("allow-browser-signin", "false");
+
+        if (processType.empty())
+        {
+            // Browser process only: unlock autoplay and legacy Blink features for resource compatibility
+            commandLine->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
+            commandLine->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
+        }
+
+        bool disableGpu = false;
+        if (g_pCore && IsReadablePointer(g_pCore, sizeof(void*)))
+        {
+            auto* cvars = g_pCore->GetCVars();
+            if (cvars && IsReadablePointer(cvars, sizeof(void*)))
+            {
+                bool gpuEnabled = true;
+                cvars->Get("browser_enable_gpu", gpuEnabled);
+                disableGpu = !gpuEnabled;
+            }
+        }
+
+        if (disableGpu)
+            commandLine->AppendSwitch("disable-gpu");
+    }
+}            // namespace
 
 [[nodiscard]] CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
 {
@@ -25,6 +87,11 @@
 }
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
+{
+    ConfigureCommandLineSwitches(command_line, process_type);
+}
+
+void CWebApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
 {
     if (!command_line)
         return;
@@ -42,45 +109,13 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
         command_line->AppendSwitchWithValue("mta-gta-path", strGTAPath);
         // AddReportLog only available in browser process where g_pCore exists
     }
+    const CefString processType = command_line->GetSwitchValue("type");
+    ConfigureCommandLineSwitches(command_line, processType);
+}
 
-    // Pass MTA base directory path to subprocess
-    // MTA DLLs are in Bin/MTA but parent process may be elsewhere
-    const SString strMTAPath = GetMTAProcessBaseDir();
-    if (!strMTAPath.empty())
-    {
-        command_line->AppendSwitchWithValue("mta-base-path", strMTAPath);
-    }
-
-    // Disable AutoDeElevate to allow CEF to run with elevated privileges
-    // Must be added before g_pCore check to apply to both browser process and subprocess
-    // https://github.com/chromiumembedded/cef/issues/3960
-    // https://chromium-review.googlesource.com/c/chromium/src/+/6515318
-    command_line->AppendSwitch("do-not-de-elevate");
-
-    // Browser-process-only settings
-    if (!g_pCore) [[unlikely]]
-        return;
-
-    const auto pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
-    if (!pWebCore)
-        return;
-
-    if (!pWebCore->GetGPUEnabled())
-        command_line->AppendSwitch("disable-gpu");
-
-    command_line->AppendSwitch("disable-gpu-compositing"); // always disable this, causes issues with official builds
-
-    // command_line->AppendSwitch("disable-d3d11");
-    command_line->AppendSwitch("enable-begin-frame-scheduling");
-
-    // browser-signin switch(or lack thereof) produces crashes when GOOGLE API keys are present in the OS registry
-    command_line->AppendSwitchWithValue("allow-browser-signin", "false");
-
-    if (process_type.empty())
-    {
-        command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
-        command_line->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
-    }
+CefRefPtr<CefBrowserProcessHandler> CWebApp::GetBrowserProcessHandler()
+{
+    return this;
 }
 
 CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name,
