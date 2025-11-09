@@ -19,7 +19,6 @@ CEvents::CEvents()
 {
     m_bWasEventCancelled = false;
     m_bEventCancelled = false;
-    m_pCurrentContext = nullptr;
 }
 
 bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pLuaMain, bool bAllowRemoteTrigger)
@@ -132,8 +131,8 @@ void CEvents::PreEventPulse(CEventContext* pContext)
     assert(pContext);
 
     m_CancelledList.push_back(m_bEventCancelled);
+    m_ContextStack.push_back(pContext);
 
-    m_pCurrentContext = pContext;
     pContext->Reset();
 
     m_bEventCancelled = false;
@@ -144,13 +143,13 @@ void CEvents::PreEventPulse(CEventContext* pContext)
 void CEvents::PostEventPulse(CEventContext* pContext)
 {
     assert(pContext);
-    assert(m_pCurrentContext == pContext);
+    assert(!m_ContextStack.empty());
+    assert(m_ContextStack.back() == pContext);
 
     m_bWasEventCancelled = pContext->IsCancelled();
     m_bEventCancelled = m_CancelledList.back() ? true : false;
     m_CancelledList.pop_back();
-
-    m_pCurrentContext = nullptr;
+    m_ContextStack.pop_back();
 }
 
 void CEvents::CancelEvent(bool bCancelled)
@@ -164,12 +163,13 @@ void CEvents::CancelEvent(bool bCancelled, const char* szReason)
     m_bEventCancelled = bCancelled;
     
     // Also update context if it exists
-    if (m_pCurrentContext)
+    if (!m_ContextStack.empty())
     {
+        CEventContext* pCurrentContext = m_ContextStack.back();
         if (bCancelled)
-            m_pCurrentContext->Cancel(szReason);
+            pCurrentContext->Cancel(szReason);
         else
-            m_pCurrentContext->Reset();
+            pCurrentContext->Reset();
     }
     
     if (szReason)
@@ -178,16 +178,16 @@ void CEvents::CancelEvent(bool bCancelled, const char* szReason)
 
 bool CEvents::WasEventCancelled()
 {
-    if (m_pCurrentContext)
-        return m_pCurrentContext->IsCancelled();
+    if (!m_ContextStack.empty())
+        return m_ContextStack.back()->IsCancelled();
     
     return m_bEventCancelled || m_bWasEventCancelled;
 }
 
 const char* CEvents::GetLastError()
 {
-    if (m_pCurrentContext)
-        return m_pCurrentContext->GetCancelReason().c_str();
+    if (!m_ContextStack.empty())
+        return m_ContextStack.back()->GetCancelReason().c_str();
 
     return m_strLastError;
 }
