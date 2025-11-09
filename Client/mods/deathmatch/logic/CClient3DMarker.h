@@ -73,5 +73,5 @@ private:
     C3DMarker*   m_pMarker;
     unsigned int m_ulIdentifier;
     bool         m_bMarkerStreamedIn;
-    bool         m_ignoreAlphaLimits;
+    bool         m_ignoreAlphaLimits{false};
 };
