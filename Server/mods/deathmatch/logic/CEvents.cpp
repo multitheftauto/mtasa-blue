@@ -11,9 +11,6 @@
 
 #include "StdInc.h"
 #include "CEvents.h"
-#include "CLogger.h"
-#include "CGame.h"
-#include "CScriptDebugging.h"
 
 CEvents::CEvents()
 {
