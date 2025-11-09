@@ -153,8 +153,6 @@ void CGUI_Impl::CreateRootWindow()
 
 void CGUI_Impl::SetSkin(const char* szName)
 {
-    m_currentSkin = szName;
-
     if (m_HasSchemeLoaded)
     {
         CEGUI::GlobalEventSet::getSingletonPtr()->removeAllEvents();
@@ -170,9 +168,6 @@ void CGUI_Impl::SetSkin(const char* szName)
     PopGuiWorkingDirectory();
 
     CEGUI::System::getSingleton().setDefaultMouseCursor("CGUI-Images", "MouseArrow");
-
-    // Destroy any windows we already have
-    CEGUI::WindowManager::getSingleton().destroyAllWindows();
 
     // Clean up CEGUI - this also re-creates the root window
     Cleanup();

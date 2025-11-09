@@ -364,7 +364,6 @@ private:
     bool         m_HasSchemeLoaded;
     SString      m_CurrentSchemeName;
     CElapsedTime m_RenderOkTimer;
-    const char*  m_currentSkin;
 
     void CreateRootWindow();
 };
