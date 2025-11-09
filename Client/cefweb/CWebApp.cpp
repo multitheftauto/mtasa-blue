@@ -58,19 +58,20 @@ namespace
             commandLine->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
         }
 
-        // WebCore-dependent settings (can fail safely if WebCore not initialized)
-        if (!g_pCore || !IsReadablePointer(g_pCore, sizeof(void*))) [[unlikely]]
-            return;
-
-        const auto webCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
-        if (!webCore || !IsReadablePointer(webCore, sizeof(void*)))
-            return;
-
-        // Honour the GPU toggle exposed through settings
-        if (!webCore->GetGPUEnabled())
+        bool disableGpu = false;
+        if (g_pCore && IsReadablePointer(g_pCore, sizeof(void*)))
         {
-            commandLine->AppendSwitch("disable-gpu");
+            auto* cvars = g_pCore->GetCVars();
+            if (cvars && IsReadablePointer(cvars, sizeof(void*)))
+            {
+                bool gpuEnabled = true;
+                cvars->Get("browser_enable_gpu", gpuEnabled);
+                disableGpu = !gpuEnabled;
+            }
         }
+
+        if (disableGpu)
+            commandLine->AppendSwitch("disable-gpu");
     }
 }            // namespace
 
