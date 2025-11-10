@@ -17,18 +17,20 @@ public:
     struct SModelToRender final
     {
         CModelInfo* pModelInfo;
-        CMatrix matrix;
-        float lighting;
+        CMatrix     matrix;
+        float       lighting;
+        bool        doubleSided;
 
-        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f) :
+        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f, bool doubleSided = false) :
             pModelInfo(pModelInfo),
             matrix(matrix),
-            lighting(lighting)
+            lighting(lighting),
+            doubleSided(doubleSided)
         {
         }
     };
 
-    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting);
+    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting, bool doubleSided);
 
     void Update();
 

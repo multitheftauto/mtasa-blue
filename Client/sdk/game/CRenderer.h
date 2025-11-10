@@ -19,5 +19,5 @@ class CRenderer
 public:
     virtual ~CRenderer() {}
 
-    virtual void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting) = 0;
+    virtual void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting, bool doubleSided) = 0;
 };
