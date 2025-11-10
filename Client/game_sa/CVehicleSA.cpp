@@ -16,6 +16,7 @@
 #include "CBikeSA.h"
 #include "CCameraSA.h"
 #include "CColModelSA.h"
+#include "CColModelGuard.h"
 #include "CFxManagerSA.h"
 #include "CFxSystemSA.h"
 #include "CGameSA.h"
@@ -1782,43 +1783,80 @@ void* CVehicleSA::GetPrivateSuspensionLines()
 void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->m_data;
+    if (!pModelInfo) [[unlikely]]
+        return;
+
+    // Protect collision model from streaming GC
+    CColModelGuard guard(static_cast<CModelInfoSA*>(pModelInfo));
+    if (!guard.IsValid()) [[unlikely]]
+        return;
+
+    CColDataSA* pColData = guard.GetColData();
+    if (!pColData || !pColData->m_suspensionLines) [[unlikely]]
+        return;
+
+    void* pPrivateLines = GetPrivateSuspensionLines();
+    if (!pPrivateLines) [[unlikely]]
+        return;
+
+    // Determine copy size based on vehicle type
+    size_t copySize = 0;
     if (pModelInfo->IsMonsterTruck())
     {
-        // Monster trucks are 0x90 bytes not 0x80
-        if (pColData->m_suspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x90);
+        // Monster trucks: 0x90 bytes
+        copySize = SUSPENSION_SIZE_MONSTER_TRUCK;
     }
     else if (pModelInfo->IsBike())
     {
-        // Bikes are 0x80 bytes not 0x40
-        if (pColData->m_suspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x80);
+        // Bikes: 0x80 bytes (2 wheels with extra data)
+        copySize = SUSPENSION_SIZE_BIKE;
     }
     else
     {
-        // CAutomobile allocates wheels * 32 (0x20)
-        if (pColData->m_suspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, pColData->m_numSuspensionLines * 0x20);
+        // CAutomobile: wheels * 0x20 bytes
+        const size_t numLines = std::min<size_t>(pColData->m_numSuspensionLines, MAX_SUSPENSION_LINES);
+        copySize = numLines * SUSPENSION_SIZE_STANDARD;
+    }
+
+    if (copySize > 0 && copySize <= MAX_SUSPENSION_LINES * SUSPENSION_SIZE_STANDARD)
+    {
+        memcpy(pPrivateLines, pColData->m_suspensionLines, copySize);
     }
 }
 
 void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
+    if (!pHandlingEntry) [[unlikely]]
+        return;
 
-    DWORD       dwModel = GetModelIndex();
+    DWORD dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
-    if (pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar())
-    {
-        // Trains (Their trailers do as well!)
-        if (pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590)
-            return;
+    if (!pModelInfo) [[unlikely]]
+        return;
 
-        GetVehicleInterface()->SetupSuspensionLines();
+    // Only for vehicles with suspension lines
+    if (!(pModelInfo->IsMonsterTruck() || pModelInfo->IsCar()))
+        return;
 
-        CopyGlobalSuspensionLinesToPrivate();
-    }
+    // Skip trains and their trailers (no suspension lines)
+    if (pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590)
+        return;
+
+    // Protect collision model before accessing suspension data
+    CColModelGuard guard(static_cast<CModelInfoSA*>(pModelInfo));
+    if (!guard.IsValid()) [[unlikely]]
+        return;
+
+    CVehicleSAInterface* pVehicleInterface = GetVehicleInterface();
+    if (!pVehicleInterface) [[unlikely]]
+        return;
+
+    // Safe to call now - collision is protected by guard
+    pVehicleInterface->SetupSuspensionLines();
+
+    // Copy to private storage while still protected
+    CopyGlobalSuspensionLinesToPrivate();
 }
 
 void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
