@@ -30,6 +30,7 @@
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
+#include "enums/VehicleType.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -1800,7 +1801,7 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
         return;
 
     // Determine copy size based on vehicle type
-    size_t copySize = 0;
+    std::size_t copySize = 0;
     if (pModelInfo->IsMonsterTruck())
     {
         // Monster trucks: 0x90 bytes
@@ -1814,7 +1815,7 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
     else
     {
         // CAutomobile: wheels * 0x20 bytes
-        const size_t numLines = std::min<size_t>(pColData->m_numSuspensionLines, MAX_SUSPENSION_LINES);
+        const std::size_t numLines = std::min<std::size_t>(pColData->m_numSuspensionLines, MAX_SUSPENSION_LINES);
         copySize = numLines * SUSPENSION_SIZE_STANDARD;
     }
 
@@ -1830,7 +1831,8 @@ void CVehicleSA::RecalculateSuspensionLines()
     if (!pHandlingEntry) [[unlikely]]
         return;
 
-    DWORD dwModel = GetModelIndex();
+    const std::uint32_t dwModel = GetModelIndex();
+
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
     if (!pModelInfo) [[unlikely]]
         return;
@@ -1840,7 +1842,8 @@ void CVehicleSA::RecalculateSuspensionLines()
         return;
 
     // Skip trains and their trailers (no suspension lines)
-    if (pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590)
+    if (pModelInfo->IsTrain() || dwModel == static_cast<std::uint32_t>(VehicleType::VT_FREIFLAT) ||
+        dwModel == static_cast<std::uint32_t>(VehicleType::VT_STREAKC) || dwModel == static_cast<std::uint32_t>(VehicleType::VT_FREIBOX))
         return;
 
     // Protect collision model before accessing suspension data
