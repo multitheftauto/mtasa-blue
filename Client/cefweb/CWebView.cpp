@@ -902,9 +902,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 
         // Fix youtube embed (#4531)
         if (domain == "www.youtube.com" && UTF16ToMbUTF8(urlParts.path.str).find("/embed") == 0)
-        {
             request->SetReferrer("https://mtasa.com/", REFERRER_POLICY_ORIGIN);
-        }
     }
 
     WString scheme = urlParts.scheme.str;
