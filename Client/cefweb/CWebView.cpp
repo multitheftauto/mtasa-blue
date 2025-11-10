@@ -12,7 +12,6 @@
 #include "CAjaxResourceHandler.h"
 #include <cef3/cef/include/cef_parser.h>
 #include <cef3/cef/include/cef_task.h>
-#include <cef3/cef/include/cef_request.h>
 #include "CWebDevTools.h"
 
 namespace
