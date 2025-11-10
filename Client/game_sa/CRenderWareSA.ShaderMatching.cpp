@@ -77,18 +77,33 @@ void CMatchChannelManager::InsertTexture(STexInfo* pTexInfo)
     if (!pTexNameInfo)
     {
         // Create TexNameInfo
-        MapSet(m_AllTextureList, pTexInfo->strTextureName, new STexNameInfo(pTexInfo->strTextureName));
-        pTexNameInfo = MapFindRef(m_AllTextureList, pTexInfo->strTextureName);
-
-        // Insert into existing channels
-        for (CFastHashSet<CMatchChannel*>::iterator iter = m_CreatedChannelList.begin(); iter != m_CreatedChannelList.end(); ++iter)
+        STexNameInfo* pNewTexNameInfo = new STexNameInfo(pTexInfo->strTextureName);
+        
+        try
         {
-            CMatchChannel* pChannel = *iter;
-            if (pChannel->m_MatchChain.IsAdditiveMatch(pTexNameInfo->strTextureName))
+            MapSet(m_AllTextureList, pTexInfo->strTextureName, pNewTexNameInfo);
+            pTexNameInfo = MapFindRef(m_AllTextureList, pTexInfo->strTextureName);
+            
+            if (!pTexNameInfo) [[unlikely]]
             {
-                pChannel->AddTexture(pTexNameInfo);
-                MapInsert(pTexNameInfo->matchChannelList, pChannel);
+                delete pNewTexNameInfo;
+                return;
             }
+
+            // Insert into existing channels
+            for (CMatchChannel* pChannel : m_CreatedChannelList)
+            {
+                if (pChannel->m_MatchChain.IsAdditiveMatch(pTexNameInfo->strTextureName))
+                {
+                    pChannel->AddTexture(pTexNameInfo);
+                    MapInsert(pTexNameInfo->matchChannelList, pChannel);
+                }
+            }
+        }
+        catch (...)
+        {
+            delete pNewTexNameInfo;
+            throw;
         }
     }
 
@@ -107,11 +122,15 @@ void CMatchChannelManager::InsertTexture(STexInfo* pTexInfo)
 void CMatchChannelManager::RemoveTexture(STexInfo* pTexInfo)
 {
     STexNameInfo* pTexNameInfo = pTexInfo->pAssociatedTexNameInfo;
+    
+    if (!pTexNameInfo) [[unlikely]]
+        return;
 
-    // Remove association
-    dassert(MapContains(pTexNameInfo->usedByTexInfoList, pTexInfo));
-    MapRemove(pTexNameInfo->usedByTexInfoList, pTexInfo);
-    pTexInfo->pAssociatedTexNameInfo = nullptr;
+    if (MapContains(pTexNameInfo->usedByTexInfoList, pTexInfo)) [[likely]]
+    {
+        MapRemove(pTexNameInfo->usedByTexInfoList, pTexInfo);
+        pTexInfo->pAssociatedTexNameInfo = nullptr;
+    }
 }
 
 //////////////////////////////////////////////////////////////////
@@ -142,7 +161,8 @@ void CMatchChannelManager::FinalizeLayers(SShaderInfoLayers& shaderLayers)
     for (std::size_t i = 0; i < uiNumLayers; ++i)
     {
         const SShaderInfo* pShaderInfo = shaderLayers.layerList[i].pShaderInfo;
-        dassert(pShaderInfo);            // Layers should always have valid shader info
+        if (!pShaderInfo)
+            continue;
         shaderLayers.output.layerList[i] = pShaderInfo->pShaderData;
         shaderLayers.output.bUsesVertexShader |= pShaderInfo->bUsesVertexShader;
     }
@@ -340,9 +360,8 @@ void CMatchChannelManager::CalcShaderForTexAndEntity(SShaderInfoLayers& outShade
     const CFastHashSet<CMatchChannel*>& resultChannelList = pTexNameInfo->matchChannelList;
 
     // In each channel, get the best shader that has the correct entity
-    for (CFastHashSet<CMatchChannel*>::const_iterator iter = resultChannelList.begin(); iter != resultChannelList.end(); ++iter)
+    for (CMatchChannel* pChannel : resultChannelList)
     {
-        CMatchChannel* pChannel = *iter;
         pChannel->GetBestShaderForEntity(pClientEntity, iEntityType, outShaderLayers);
     }
 
@@ -362,7 +381,8 @@ void CMatchChannelManager::CalcShaderForTexAndEntity(SShaderInfoLayers& outShade
 //////////////////////////////////////////////////////////////////
 void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEntity)
 {
-    assert(pClientEntity);
+    if (!pClientEntity)
+        return;
 
     // Ignore unknown client entities
     if (!MapContains(m_KnownClientEntities, pClientEntity))

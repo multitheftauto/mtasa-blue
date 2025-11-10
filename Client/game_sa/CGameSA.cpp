@@ -47,6 +47,7 @@
 #include "CRopesSA.h"
 #include "CSettingsSA.h"
 #include "CStatsSA.h"
+#include "CStreamingGC.h"
 #include "CTaskManagementSystemSA.h"
 #include "CTasksSA.h"
 #include "CVisibilityPluginsSA.h"
@@ -277,6 +278,9 @@ CGameSA::CGameSA()
 
 CGameSA::~CGameSA()
 {
+    // Shutdown streaming GC hooks
+    CStreamingGC::Shutdown();
+
     delete reinterpret_cast<CPlayerInfoSA*>(m_pPlayerInfo);
 
     for (int i = 0; i < NUM_WeaponInfosTotal; i++)
@@ -493,8 +497,16 @@ void CGameSA::Initialize()
     SetupBrokenModels();
     m_pRenderWare->Initialize();
 
+    // Initialize streaming GC protection hooks
+    CStreamingGC::Initialize();
+
     // *Sebas* Hide the GTA:SA Main menu.
     MemPutFast<BYTE>(CLASS_CMenuManager + 0x5C, 0);
+}
+
+StreamingRemoveModelCallback CGameSA::GetStreamingRemoveModelCallback() const noexcept
+{
+    return &CStreamingGC::OnRemoveModel;
 }
 
 eGameVersion CGameSA::GetGameVersion()

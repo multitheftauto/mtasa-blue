@@ -535,9 +535,18 @@ CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float rad
         return nullptr;
     
     result.collisionDetected = true;
-    result.modelID = entity->m_nModelIndex;
-    result.entityPosition = entity->matrix->vPos;
-    ConvertMatrixToEulerAngles(*entity->matrix, result.entityRotation.fX, result.entityRotation.fY, result.entityRotation.fZ);
+    result.modelID = entity->m_nModelIndex;   
+    if (entity->matrix)
+    {
+        result.entityPosition = entity->matrix->vPos;
+        ConvertMatrixToEulerAngles(*entity->matrix, result.entityRotation.fX, result.entityRotation.fY, result.entityRotation.fZ);
+    }
+    else
+    {
+        result.entityPosition = entity->m_transform.m_translate;
+        result.entityRotation.fX = result.entityRotation.fY = 0.0f;
+        result.entityRotation.fZ = entity->m_transform.m_heading * (180.0f / PI);
+    }
     result.entityRotation = -result.entityRotation;
     result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
     result.type = static_cast<eEntityType>(entity->nType);

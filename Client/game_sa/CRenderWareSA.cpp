@@ -37,6 +37,9 @@ struct SReplaceParts
 };
 static RwObject* ReplacePartsCB(RwObject* object, SReplaceParts* data)
 {
+    if (!object) [[unlikely]]
+        return object;
+    
     RpAtomic* Atomic = (RpAtomic*)object;
     char      szAtomicName[16] = {0};
 
@@ -69,6 +72,9 @@ static RwObject* ReplacePartsCB(RwObject* object, SReplaceParts* data)
 // RpClumpForAllAtomics callback used to add atomics to a vehicle
 static bool AddAllAtomicsCB(RpAtomic* atomic, void* pClump)
 {
+    if (!atomic || !pClump) [[unlikely]]
+        return false;
+    
     RpClump* data = reinterpret_cast<RpClump*>(pClump);
     RwFrame* pFrame = RpGetFrame(data);
 
@@ -89,6 +95,9 @@ struct SReplaceWheels
 };
 static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
 {
+    if (!atomic || !pData) [[unlikely]]
+        return false;
+    
     SReplaceWheels* data = reinterpret_cast<SReplaceWheels*>(pData);
     RwFrame*        Frame = RpGetFrame(atomic);
 
@@ -112,6 +121,7 @@ static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
 
                 // delete the current atomic
                 RpClumpRemoveAtomic(data->pClump, atomic);
+                RpAtomicDestroy(atomic);  // Destroy removed atomic to prevent leak
             }
         }
     }
@@ -128,6 +138,9 @@ struct SReplaceAll
 };
 static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
 {
+    if (!atomic || !pData) [[unlikely]]
+        return false;
+    
     SReplaceAll* data = reinterpret_cast<SReplaceAll*>(pData);
     RwFrame*     Frame = RpGetFrame(atomic);
     if (Frame == NULL)
@@ -157,6 +170,7 @@ static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
 
             // remove the current atomic
             RpClumpRemoveAtomic(data->pClump, atomic);
+            RpAtomicDestroy(atomic);  // Destroy removed atomic to prevent leak
         }
     }
 
@@ -164,6 +178,7 @@ static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
 }
 
 // RpClumpForAllAtomics struct and callback used to load the atomics from a specific clump into a container
+// Stores atomic pointers without transferring ownership - caller must manage lifetime
 struct SLoadAtomics
 {
     RpAtomicContainer* pReplacements;             // replacement atomics
@@ -171,10 +186,16 @@ struct SLoadAtomics
 };
 static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
 {
+    if (!atomic || !pData) [[unlikely]]
+        return false;
+    
     SLoadAtomics* data = reinterpret_cast<SLoadAtomics*>(pData);
     RwFrame*      Frame = RpGetFrame(atomic);
 
-    // add the atomic to the container
+    if (!Frame) [[unlikely]]
+        return false;
+
+    // Add atomic to container
     data->pReplacements[data->uiReplacements].atomic = atomic;
     strncpy(&data->pReplacements[data->uiReplacements].szName[0], &Frame->szName[0], 16);
 
@@ -457,9 +478,38 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 
     const ColModelFileHeader& header = *(ColModelFileHeader*)buffer.data();
 
+    // Validate version string is null-terminated
+    bool versionValid = false;
+    for (size_t i = 0; i < sizeof(header.version); ++i)
+    {
+        if (header.version[i] == '\0')
+        {
+            versionValid = true;
+            break;
+        }
+    }
+    if (!versionValid)
+    {
+        AddReportLog(8622, "ReadCOL: Invalid header - version field not null-terminated");
+        return NULL;
+    }
+
     // Load the col model
     if (header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L')
     {
+        // Validate name field is null-terminated to prevent buffer overrun
+        bool nameValid = false;
+        for (size_t i = 0; i < sizeof(header.name); ++i)
+        {
+            if (header.name[i] == '\0')
+            {
+                nameValid = true;
+                break;
+            }
+        }
+        if (!nameValid)
+            AddReportLog(8623, "ReadCOL: Name field not null-terminated, may be truncated");
+
         unsigned char* pModelData = (unsigned char*)buffer.data() + sizeof(ColModelFileHeader);
 
         // Create a new CColModel
@@ -488,6 +538,9 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
 unsigned int CRenderWareSA::LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics)
 {
+    if (!pClump || !pAtomics) [[unlikely]]
+        return 0;
+    
     // iterate through all atomics in the clump
     SLoadAtomics data = {0};
     data.pReplacements = pAtomics;
@@ -519,6 +572,9 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
 
 bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
 {
+    if (!pNew) [[unlikely]]
+        return false;
+    
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
 
     if (pModelInfo)
@@ -529,6 +585,11 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
         {
             // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
             RpClump* pCopy = RpClumpClone(pNew);
+            if (!pCopy) [[unlikely]]
+            {
+                AddReportLog(8624, SString("ReplaceAllAtomicsInModel: RpClumpClone failed for model %d", usModelID));
+                return false;
+            }
 
             // Replace the atomics
             SAtomicsReplacer data;
@@ -625,7 +686,7 @@ void CRenderWareSA::ReplaceCollisions(CColModel* pCol, unsigned short usModelID)
 
     // TODO: It seems that on entering the game, when this function is executed, the modelinfo array for this
     // model is still zero, leading to a crash!
-    pModelInfoSA->IsLoaded();
+    [[maybe_unused]] const bool modelLoaded = pModelInfoSA->IsLoaded();
 }
 
 // Destroys a DFF instance
@@ -683,7 +744,7 @@ bool CRenderWareSA::RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwText
 // Player model adds (seemingly) unnecessary refs
 // (Will crash if anything is actually using the txd)
 //
-// No idea what will happen if there is a custom txd replacement
+// Handles custom txd replacements
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
@@ -779,6 +840,14 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
         bLoadedModel = true;
         pGame->GetModelInfo(usModelId)->Request(BLOCKING, "CRenderWareSA::GetModelTextureNames");
         pTXD = CTxdStore_GetTxd(usTxdId);
+        
+        // Revalidate TXD pointer after load - it may still be NULL or have been GC'd
+        if (!pTXD)
+        {
+            if (bLoadedModel)
+                ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+            return;
+        }
     }
 
     std::vector<RwTexture*> textureList;
@@ -820,6 +889,14 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
         bLoadedModel = true;
         pGame->GetModelInfo(usModelId)->Request(BLOCKING, "CRenderWareSA::GetModelTextures");
         pTXD = CTxdStore_GetTxd(usTxdId);
+        
+        // Revalidate TXD pointer after load - it may still be NULL or have been GC'd
+        if (!pTXD)
+        {
+            if (bLoadedModel)
+                ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+            return false;
+        }
     }
 
     std::vector<RwTexture*> rwTextureList;

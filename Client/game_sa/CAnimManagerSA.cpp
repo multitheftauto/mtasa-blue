@@ -71,6 +71,7 @@ int CAnimManagerSA::GetNumAnimAssocDefinitions()
     return *(int*)(VAR_CAnimManager_NumAnimAssocDefinitions);
 }
 
+// Returns wrapper for animation hierarchy
 std::unique_ptr<CAnimBlendHierarchy> CAnimManagerSA::GetAnimation(int ID)
 {
     CAnimBlendHierarchySAInterface* pInterface = nullptr;
@@ -499,6 +500,7 @@ void CAnimManagerSA::RemoveAnimBlock(int ID)
     }
 }
 
+// Returns a pointer to GTA SA's internal animation association definition
 AnimAssocDefinition* CAnimManagerSA::AddAnimAssocDefinition(const char* szBlockName, const char* szAnimName, AssocGroupId animGroup, AnimationId animID,
                                                             AnimDescriptor* pDescriptor)
 {
