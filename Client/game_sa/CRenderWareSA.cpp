@@ -480,7 +480,7 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 
     // Validate version string is null-terminated
     bool versionValid = false;
-    for (size_t i = 0; i < sizeof(header.version); ++i)
+    for (std::size_t i = 0; i < sizeof(header.version); ++i)
     {
         if (header.version[i] == '\0')
         {
@@ -491,7 +491,7 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
     if (!versionValid)
     {
         AddReportLog(8622, "ReadCOL: Invalid header - version field not null-terminated");
-        return NULL;
+        return nullptr;
     }
 
     // Load the col model
@@ -499,7 +499,7 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
     {
         // Validate name field is null-terminated to prevent buffer overrun
         bool nameValid = false;
-        for (size_t i = 0; i < sizeof(header.name); ++i)
+        for (std::size_t i = 0; i < sizeof(header.name); ++i)
         {
             if (header.name[i] == '\0')
             {
