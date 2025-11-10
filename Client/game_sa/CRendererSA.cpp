@@ -32,9 +32,25 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     if (!pModelInfoSAInterface)
         return;
 
+    // Prevent GC from freeing RwObject during rendering
+    pModelInfo->ModelAddRef(NON_BLOCKING, "CRendererSA::RenderModel");
+
+    // Revalidate interface after AddRef
+    pModelInfoSAInterface = pModelInfo->GetInterface();
+    if (!pModelInfoSAInterface)
+    {
+        pModelInfo->RemoveRef();
+        return;
+    }
+
+    // Check and cache pRwObject
     RwObject* pRwObject = pModelInfoSAInterface->pRwObject;
     if (!pRwObject)
+    {
+        // Release reference before early return to prevent leak
+        pModelInfo->RemoveRef();
         return;
+    }
 
     RwFrame* pFrame = RpGetFrame(pRwObject);
 
@@ -45,30 +61,43 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     rwMatrix.pos = (RwV3d&)matrix.vPos;
     RwFrameTransform(pFrame, &rwMatrix, rwCOMBINEREPLACE);
 
-    // Setup ambient light multiplier
-    SetLightColoursForPedsCarsAndObjects(lighting);
-
-    RwCullMode currentCullMode;
-    if (doubleSided)
+    // Ensure reference released on exception
+    try
     {
-        RwRenderStateGet(rwRENDERSTATECULLMODE, &currentCullMode);
-        RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(rwCULLMODECULLNONE));
-    }
+        // Setup ambient light multiplier
+        SetLightColoursForPedsCarsAndObjects(lighting);
 
-    if (pRwObject->type == RP_TYPE_ATOMIC)
+        RwCullMode currentCullMode;
+        if (doubleSided)
+        {
+            RwRenderStateGet(rwRENDERSTATECULLMODE, &currentCullMode);
+            RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(rwCULLMODECULLNONE));
+        }
+      
+        if (pRwObject->type == RP_TYPE_ATOMIC)
+        {
+            RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
+            pRpAtomic->renderCallback(reinterpret_cast<RpAtomic*>(pRwObject));
+        }
+        else
+        {
+            RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
+            RpClumpRender(pClump);
+        }
+
+        if (doubleSided)
+            RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(currentCullMode));
+
+        // Restore ambient light
+        SetAmbientColours();
+    }
+    catch (...)
     {
-        RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
-        pRpAtomic->renderCallback(reinterpret_cast<RpAtomic*>(pRwObject));
+        // Release reference on rendering exception
+        pModelInfo->RemoveRef();
+        throw;
     }
-    else
-    {
-        RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
-        RpClumpRender(pClump);
-    }
-
-    if (doubleSided)
-        RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(currentCullMode));
-
-    // Restore ambient light
-    SetAmbientColours();
+  
+    // Release reference - allow GC
+    pModelInfo->RemoveRef();
 }
