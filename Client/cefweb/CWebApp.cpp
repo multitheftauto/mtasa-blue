@@ -45,19 +45,7 @@ namespace
         // Prevent Chromium from dropping privileges; required for elevated launches (see chromium/3960)
         commandLine->AppendSwitch("do-not-de-elevate");
 
-        if (!g_pCore || !IsReadablePointer(g_pCore, sizeof(void*))) [[unlikely]]
-            return;
-
-        const auto webCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
-        if (!webCore || !IsReadablePointer(webCore, sizeof(void*)))
-            return;
-
-        // Honour the GPU toggle exposed through settings and hard-disable compositor for stability
-        if (!webCore->GetGPUEnabled())
-        {
-            commandLine->AppendSwitch("disable-gpu");
-        }
-
+        // Must apply essential CEF switches regardless of WebCore availability
         commandLine->AppendSwitch("disable-gpu-compositing");
         commandLine->AppendSwitch("enable-begin-frame-scheduling");
         // Explicitly block account sign-in to avoid crashes when Google API keys are registered on the system
@@ -69,6 +57,21 @@ namespace
             commandLine->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
             commandLine->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
         }
+
+        bool disableGpu = false;
+        if (g_pCore && IsReadablePointer(g_pCore, sizeof(void*)))
+        {
+            auto* cvars = g_pCore->GetCVars();
+            if (cvars && IsReadablePointer(cvars, sizeof(void*)))
+            {
+                bool gpuEnabled = true;
+                cvars->Get("browser_enable_gpu", gpuEnabled);
+                disableGpu = !gpuEnabled;
+            }
+        }
+
+        if (disableGpu)
+            commandLine->AppendSwitch("disable-gpu");
     }
 }            // namespace
 
