@@ -16,6 +16,7 @@
 #include "Common.h"
 
 #include <game/CGame.h>
+#include <multiplayer/CMultiplayer.h>
 #include "../game_sa/CGameSA.h"
 
 #include "multiplayer_keysync.h"
