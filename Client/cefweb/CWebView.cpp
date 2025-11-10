@@ -12,6 +12,7 @@
 #include "CAjaxResourceHandler.h"
 #include <cef3/cef/include/cef_parser.h>
 #include <cef3/cef/include/cef_task.h>
+#include <cef3/cef/include/cef_request.h>
 #include "CWebDevTools.h"
 
 namespace
@@ -897,6 +898,12 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
                 iter->second = iter->second.ToString() + "; SMART-TV; Tizen 4.0";
 
             request->SetHeaderMap(headerMap);
+        }
+
+        // Fix youtube embed (#4531)
+        if (domain == "www.youtube.com" && UTF16ToMbUTF8(urlParts.path.str).find("/embed") == 0)
+        {
+            request->SetReferrer("https://www.youtube-nocookie.com/", REFERRER_POLICY_ORIGIN);
         }
     }
 
