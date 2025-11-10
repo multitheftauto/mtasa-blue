@@ -128,37 +128,29 @@ bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& B
 
         case PACKET_ID_PLAYER_BULLETSYNC:
         {
-            // Read out the player ID
-            ElementID PlayerID;
-            if (BitStream.Read(PlayerID))
-            {
-                // Grab the player
-                CClientPlayer* pPlayer = m_pPlayerManager->Get(PlayerID);
-                if (pPlayer)
-                {
-                    // Read out the bulletsync data
-                    ReadBulletsync(pPlayer, BitStream);
-                }
-            }
+            ElementID id;
+            if (!BitStream.Read(id))
+                return true;
 
+            auto* player = m_pPlayerManager->Get(id);
+            if (!player)
+                return true;
+
+            ReadBulletsync(player, BitStream);
             return true;
         }
 
         case PACKET_ID_WEAPON_BULLETSYNC:
         {
-            // Read out the player ID
-            ElementID PlayerID;
-            if (BitStream.Read(PlayerID))
-            {
-                // Grab the player
-                CClientPlayer* pPlayer = m_pPlayerManager->Get(PlayerID);
-                if (pPlayer)
-                {
-                    // Read out the bulletsync data
-                    ReadWeaponBulletsync(pPlayer, BitStream);
-                }
-            }
+            ElementID id;
+            if (!BitStream.Read(id))
+                return true;
 
+            auto* player = m_pPlayerManager->Get(id);
+            if (!player)
+                return true;
+
+            ReadWeaponBulletsync(player, BitStream);
             return true;
         }
 
@@ -472,8 +464,8 @@ bool CNetAPI::IsSmallKeySyncNeeded(CClientPed* pPlayerModel)
         return true;
 
     // Movement direction buttons change ?
-    short LeftStickXDelta = abs(ControllerState.LeftStickX - LastControllerState.LeftStickX);
-    short LeftStickYDelta = abs(ControllerState.LeftStickY - LastControllerState.LeftStickY);
+    auto LeftStickXDelta = static_cast<short>(abs(ControllerState.LeftStickX - LastControllerState.LeftStickX));
+    auto LeftStickYDelta = static_cast<short>(abs(ControllerState.LeftStickY - LastControllerState.LeftStickY));
     if (LeftStickXDelta > 32 || LeftStickYDelta > 32)
     {
         // If movement within -127 to -1 or 1 to 127, then apply analog update limits
@@ -989,6 +981,12 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
     pPlayer->SetOnFire(flags.data.bIsOnFire);
     pPlayer->SetStealthAiming(flags.data.bStealthAiming);
 
+    if (flags.data.hangingDuringClimb && pPlayer->GetMovementState() != eMovementState::MOVEMENTSTATE_HANGING && pPlayer->GetMovementState() != eMovementState::MOVEMENTSTATE_CLIMB)
+        pPlayer->RunClimbingTask();
+
+    if (flags.data.bIsInWater && !pPlayer->IsInWater())
+        pPlayer->RunSwimTask();
+  
     // Remember now as the last puresync time
     pPlayer->SetLastPuresyncTime(CClientTime::GetTime());
     pPlayer->SetLastPuresyncPosition(position.data.vecPosition);
@@ -1120,6 +1118,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.bStealthAiming = (pPlayerModel->IsStealthAiming() == true);
     flags.data.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
     flags.data.animInterrupted = pPlayerModel->HasSyncedAnim() && (!pPlayerModel->IsRunningAnimation() || pPlayerModel->m_animationOverridedByClient);
+    flags.data.hangingDuringClimb = pPlayerModel->GetMovementState() == eMovementState::MOVEMENTSTATE_HANGING;
 
     // The animation has been overwritten or interrupted by the client
     if (flags.data.animInterrupted)
@@ -2212,170 +2211,137 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
     bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
 
     if (damage.data.bSyncDoors)
-        for (unsigned int i = 0; i < MAX_DOORS; ++i)
+        for (unsigned char i = 0; i < MAX_DOORS; ++i)
             pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i], flyingComponents);
 
     if (damage.data.bSyncWheels)
-        for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+        for (unsigned char i = 0; i < MAX_WHEELS; ++i)
             pVehicle->SetWheelStatus(i, damage.data.wheels.data.ucStates[i]);
 
     if (damage.data.bSyncPanels)
-        for (unsigned int i = 0; i < MAX_PANELS; ++i)
+        for (unsigned char i = 0; i < MAX_PANELS; ++i)
             pVehicle->SetPanelStatus(i, damage.data.panels.data.ucStates[i], flyingComponents);
 
     if (damage.data.bSyncLights)
-        for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+        for (unsigned char i = 0; i < MAX_LIGHTS; ++i)
             pVehicle->SetLightStatus(i, damage.data.lights.data.ucStates[i]);
 
     static_cast<CDeathmatchVehicle*>(pVehicle)->ResetDamageModelSync();
 }
 
-//
-// Read bulletsync packet for a remote player
-//
-void CNetAPI::ReadBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStream)
+void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& stream)
 {
-    // Read the bulletsync data
-    uchar ucWeapon = 0;
-    if (!BitStream.Read(ucWeapon) || !CClientWeaponManager::HasWeaponBulletSync(ucWeapon))
+    std::uint8_t weapon = 0;
+    if (!stream.Read(weapon) || !CClientWeaponManager::HasWeaponBulletSync(weapon))
         return;
 
-    eWeaponType weaponType = (eWeaponType)ucWeapon;
+    const auto type = static_cast<eWeaponType>(weapon);
 
-    CVector vecStart, vecEnd;
-    if (!BitStream.Read((char*)&vecStart, sizeof(CVector)) || !BitStream.Read((char*)&vecEnd, sizeof(CVector)))
+    CVector start;
+    CVector end;
+    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) ||
+        !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) ||
+        !start.IsValid() || !end.IsValid())
         return;
 
-    if (!vecStart.IsValid() || !vecEnd.IsValid())
+    std::uint8_t order = 0;
+    if (!stream.Read(order))
         return;
 
-    uchar ucOrderCounter = 0;
-    if (!BitStream.Read(ucOrderCounter))
-        return;
+    float          damage = 0.0f;
+    std::uint8_t   zone = 0;
+    CClientPlayer* damaged = nullptr;
 
-    float          fDamage = 0;
-    uchar          ucHitZone = 0;
-    CClientPlayer* pDamagedPlayer = NULL;
-    if (BitStream.ReadBit())
+    if (stream.ReadBit())
     {
-        ElementID DamagedPlayerID = INVALID_ELEMENT_ID;
-        if (!BitStream.Read(fDamage) || !BitStream.Read(ucHitZone) || !BitStream.Read(DamagedPlayerID))
+        ElementID id = INVALID_ELEMENT_ID;
+        if (!stream.Read(damage) || !stream.Read(zone) || !stream.Read(id))
             return;
 
-        pDamagedPlayer = DynamicCast<CClientPlayer>(CElementIDs::GetElement(DamagedPlayerID));
+        damaged = DynamicCast<CClientPlayer>(CElementIDs::GetElement(id));
     }
 
-    // Duplicate bullet check
-    {
-        bool bIsDuplicate = false;
+    bool duplicate = false;
 
-        // Check if duplicate by comparing with previously sent vectors
-        if (vecStart == pPlayer->m_vecPrevBulletSyncStart && vecEnd == pPlayer->m_vecPrevBulletSyncEnd)
-        {
-            bIsDuplicate = true;
-        }
-        pPlayer->m_vecPrevBulletSyncStart = vecStart;
-        pPlayer->m_vecPrevBulletSyncEnd = vecEnd;
+    if (start == player->m_vecPrevBulletSyncStart && end == player->m_vecPrevBulletSyncEnd)
+        duplicate = true;
 
-        // Verify if duplicate by comparing order counter
-        char cDif = ucOrderCounter - pPlayer->m_ucPrevBulletSyncOrderCounter;
-        if (cDif > 0)
-            bIsDuplicate = false;
+    player->m_vecPrevBulletSyncStart = start;
+    player->m_vecPrevBulletSyncEnd = end;
 
-        pPlayer->m_ucPrevBulletSyncOrderCounter = ucOrderCounter;
+    if (static_cast<char>(order - player->m_ucPrevBulletSyncOrderCounter) > 0)
+        duplicate = false;
 
-        if (bIsDuplicate)
-            return;
-    }
+    player->m_ucPrevBulletSyncOrderCounter = order;
 
-    pPlayer->DischargeWeapon(weaponType, vecStart, vecEnd, fDamage, ucHitZone, pDamagedPlayer);
+    if (duplicate)
+        return;
+
+    player->DischargeWeapon(type, start, end, damage, zone, damaged);
 }
 
-//
-// Read bulletsync packet for a remote player
-//
-void CNetAPI::ReadWeaponBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStream)
+void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface& stream)
 {
-    // Read the bulletsync data
-    ElementID elementID;
-    if (!BitStream.Read(elementID))
+    ElementID id;
+    if (!stream.Read(id))
         return;
 
-    CClientWeapon* pWeapon = DynamicCast<CClientWeapon>(CElementIDs::GetElement(elementID));
-    if (!pWeapon || !CClientWeaponManager::HasWeaponBulletSync(pWeapon->GetWeaponType()))
+    auto* weapon = DynamicCast<CClientWeapon>(CElementIDs::GetElement(id));
+    if (!weapon || !CClientWeaponManager::HasWeaponBulletSync(weapon->GetWeaponType()))
         return;
 
-    CVector vecStart, vecEnd;
-    if (!BitStream.Read((char*)&vecStart, sizeof(CVector)) || !BitStream.Read((char*)&vecEnd, sizeof(CVector)))
+    CVector start;
+    CVector end;
+    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
+        !end.IsValid())
         return;
 
-    if (!vecStart.IsValid() || !vecEnd.IsValid())
+    uint8_t order = 0;
+    if (!stream.Read(order))
         return;
 
-    uchar ucOrderCounter = 0;
-    if (!BitStream.Read(ucOrderCounter))
-        return;
-
-    pWeapon->FireInstantHit(vecStart, vecEnd, false, true);
+    weapon->FireInstantHit(start, end, false, true);
 }
 
-//
-// Send bulletsync fire button press packet to remote players
-//
-void CNetAPI::SendBulletSyncFire(eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fDamage, uchar ucHitZone,
-                                 CClientPlayer* pRemoteDamagedPlayer)
+void CNetAPI::SendBulletSyncFire(eWeaponType weapon, const CVector& start, const CVector& end, float damage, std::uint8_t zone, CClientPlayer* damaged)
 {
-    // Send a bulletsync packet
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    auto* stream = g_pNet->AllocateNetBitStream();
 
-    // Write the bulletsync data
-    pBitStream->Write((char)weaponType);
+    stream->Write(static_cast<char>(weapon));
+    stream->Write(reinterpret_cast<const char*>(&start), sizeof(CVector));
+    stream->Write(reinterpret_cast<const char*>(&end), sizeof(CVector));
+    stream->Write(m_ucBulletSyncOrderCounter++);
 
-    pBitStream->Write((const char*)&vecStart, sizeof(CVector));
-    pBitStream->Write((const char*)&vecEnd, sizeof(CVector));
-
-    pBitStream->Write(m_ucBulletSyncOrderCounter++);
-
-    if (fDamage > 0 && pRemoteDamagedPlayer)
+    if (damage > 0.0f && damaged)
     {
-        pBitStream->WriteBit(true);
-        pBitStream->Write(fDamage);
-        pBitStream->Write(ucHitZone);
-        pBitStream->Write(pRemoteDamagedPlayer->GetID());
+        stream->WriteBit(true);
+        stream->Write(damage);
+        stream->Write(zone);
+        stream->Write(damaged->GetID());
     }
     else
     {
-        pBitStream->WriteBit(false);
+        stream->WriteBit(false);
     }
 
-    // Send the packet
-    g_pNet->SendPacket(PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE);
-    g_pNet->DeallocateNetBitStream(pBitStream);
+    g_pNet->SendPacket(PACKET_ID_PLAYER_BULLETSYNC, stream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE);
+    g_pNet->DeallocateNetBitStream(stream);
 }
 
-//
-// Send bulletsync fire button press packet to remote players
-//
-void CNetAPI::SendBulletSyncCustomWeaponFire(CClientWeapon* pWeapon, const CVector& vecStart, const CVector& vecEnd)
+void CNetAPI::SendBulletSyncCustomWeaponFire(CClientWeapon* weapon, const CVector& start, const CVector& end)
 {
-    // Ignore old bullet sync stuff
-    if (pWeapon->IsLocalEntity())
+    if (weapon->IsLocalEntity())
         return;
 
-    // Send a bulletsync packet
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    auto* stream = g_pNet->AllocateNetBitStream();
 
-    // Write the bulletsync data
-    pBitStream->Write(pWeapon->GetID());
+    stream->Write(weapon->GetID());
+    stream->Write(reinterpret_cast<const char*>(&start), sizeof(CVector));
+    stream->Write(reinterpret_cast<const char*>(&end), sizeof(CVector));
+    stream->Write(m_ucCustomWeaponBulletSyncOrderCounter++);
 
-    pBitStream->Write((const char*)&vecStart, sizeof(CVector));
-    pBitStream->Write((const char*)&vecEnd, sizeof(CVector));
-
-    pBitStream->Write(m_ucCustomWeaponBulletSyncOrderCounter++);
-
-    // Send the packet
-    g_pNet->SendPacket(PACKET_ID_WEAPON_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE);
-    g_pNet->DeallocateNetBitStream(pBitStream);
+    g_pNet->SendPacket(PACKET_ID_WEAPON_BULLETSYNC, stream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE);
+    g_pNet->DeallocateNetBitStream(stream);
 }
 
 //

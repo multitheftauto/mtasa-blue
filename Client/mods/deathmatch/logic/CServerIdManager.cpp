@@ -63,7 +63,7 @@ protected:
     void                 SaveServerIdMap(bool bWait = false);
     const CServerIdInfo& GetServerIdInfo(const SString& strServerId);
     bool                 LoadServerIdMap();
-    static DWORD         StaticThreadProc(LPVOID lpdwThreadParam);
+    static DWORD WINAPI  StaticThreadProc(LPVOID lpdwThreadParam);
     static void          StaticSaveServerIdMap();
 
     bool                                  m_bListChanged;
@@ -188,7 +188,8 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
     ms_ServerIdMap = m_ServerIdMap;
 
     // Start save thread
-    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerIdManagerImpl::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerIdManagerImpl::StaticThreadProc),
+                                  NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         g_pCore->GetConsole()->Printf("Could not create server-ids save thread.");
@@ -197,7 +198,13 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
     {
         ms_bIsSaving = true;
         SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
-        ResumeThread(hThread);
+        if (ResumeThread(hThread) == static_cast<DWORD>(-1))
+        {
+            g_pCore->GetConsole()->Printf("Could not start server-ids save thread.");
+            ms_bIsSaving = false;
+        }
+
+        CloseHandle(hThread);
     }
 
     // Wait for save to complete if required
@@ -212,7 +219,7 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
 // SaveServerIdMap thread
 //
 ///////////////////////////////////////////////////////////////
-DWORD CServerIdManagerImpl::StaticThreadProc(LPVOID lpdwThreadParam)
+DWORD WINAPI CServerIdManagerImpl::StaticThreadProc(LPVOID lpdwThreadParam)
 {
     StaticSaveServerIdMap();
     ms_bIsSaving = false;
@@ -266,7 +273,7 @@ SString CServerIdManagerImpl::GetConnectionPrivateDirectory(bool bPreviousVer)
 
     // If ServerId is invalid, use the temp dir
     if (strServerId.length() < 10)
-        return bPreviousVer ? "" : m_strTempErrorDir;
+        return bPreviousVer ? SStringX("") : m_strTempErrorDir;
 
     // Otherwise fetch the server unique dir
     const CServerIdInfo& info = GetServerIdInfo(strServerId);

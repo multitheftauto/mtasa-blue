@@ -97,7 +97,7 @@ void SharedUtil::OutputDebugLine(const char* szMessage)
     if (strMessage.length() > 0 && strMessage[strMessage.length() - 1] != '\n')
         strMessage += "\n";
 #ifdef _WIN32
-    OutputDebugString(strMessage);
+    OutputDebugStringW(FromUTF8(strMessage));
 #else
             // Other platforms here
 #endif
@@ -144,7 +144,7 @@ void SharedUtil::OutputReleaseLine(const char* szMessage)
     if (strMessage.length() > 0 && strMessage[strMessage.length() - 1] != '\n')
         strMessage += "\n";
 #ifdef _WIN32
-    OutputDebugString(strMessage);
+    OutputDebugStringW(FromUTF8(strMessage));
 #else
         // Other platforms here
 #endif
@@ -167,8 +167,8 @@ void SharedUtil::CycleFile(const SString& strPathFilename, uint uiCycleThreshKB,
             // Rename older files .1 .2 etc
             uint    uiNew = uiNumBackups - 1 - i;
             uint    uiOld = uiNumBackups - i;
-            SString strFilenameNewer = strPathFilename + (uiNew ? SString(".%d", uiNew) : "");
-            SString strFilenameOlder = strPathFilename + (uiOld ? SString(".%d", uiOld) : "");
+            SString strFilenameNewer = strPathFilename + (uiNew ? SString(".%d", uiNew) : SStringX(""));
+            SString strFilenameOlder = strPathFilename + (uiOld ? SString(".%d", uiOld) : SStringX(""));
 
             FileDelete(strFilenameOlder);
             FileRename(strFilenameNewer, strFilenameOlder);

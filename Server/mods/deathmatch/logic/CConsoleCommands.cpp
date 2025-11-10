@@ -32,7 +32,7 @@ extern CGame* g_pGame;
 static std::string GetAdminNameForLog(CClient* pClient)
 {
     std::string strName = pClient->GetNick();
-    std::string strAccountName = pClient->GetAccount() ? pClient->GetAccount()->GetName() : "no account";
+    std::string strAccountName = pClient->GetAccount() ? pClient->GetAccount()->GetName() : SStringX("no account");
     if (strName == strAccountName)
         return strName;
     return SString("%s(%s)", strName.c_str(), strAccountName.c_str());
@@ -1313,7 +1313,7 @@ bool CConsoleCommands::DebugScript(CConsole* console, const char* arguments, CCl
     }
 
     // Set the new level
-    player->SetScriptDebugLevel(debugLevel);
+    player->SetScriptDebugLevel(static_cast<uint8_t>(debugLevel));
     echoClient->SendEcho(("debugscript: Your debug mode was set to " + std::to_string(debugLevel)).c_str());
     CLogger::LogPrintf("SCRIPT: %s set their script debug mode to %d\n", GetAdminNameForLog(client).c_str(), debugLevel);
 
@@ -1625,9 +1625,9 @@ bool DoAclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient,
 
     std::vector<SString> parts;
     SStringX(szArguments).Split(" ", parts);
-    const SString& strAction = parts.size() > 0 ? parts[0] : "";
-    const SString& strResourceName = parts.size() > 1 ? parts[1] : "";
-    const SString& strRightName = parts.size() > 2 ? parts[2] : "";
+    const SString& strAction = parts.size() > 0 ? parts[0] : SStringX("");
+    const SString& strResourceName = parts.size() > 1 ? parts[1] : SStringX("");
+    const SString& strRightName = parts.size() > 2 ? parts[2] : SStringX("");
 
     bool bList = strAction == "list";
     bool bAllow = strAction == "allow";
@@ -1695,8 +1695,8 @@ bool CConsoleCommands::AuthorizeSerial(CConsole* pConsole, const char* szArgumen
 
     std::vector<SString> parts;
     SStringX(szArguments).Split(" ", parts);
-    const SString& strAccountName = parts.size() > 0 ? parts[0] : "";
-    const SString& strAction = parts.size() > 1 ? parts[1] : "";
+    const SString& strAccountName = parts.size() > 0 ? parts[0] : SStringX("");
+    const SString& strAction = parts.size() > 1 ? parts[1] : SStringX("");
 
     bool bList = strAction == "list";
     bool bAllow = strAction == "";

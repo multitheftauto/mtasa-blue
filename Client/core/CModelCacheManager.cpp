@@ -9,9 +9,12 @@
 
 #include "StdInc.h"
 #include <optional>
+#include <cstddef>
+#include <cstdint>
 #include <game/CStreaming.h>
 #include <game/CModelInfo.h>
 #include <game/CSettings.h>
+#include <game/CWorld.h>
 #include "CModelCacheManager.h"
 
 namespace
@@ -25,6 +28,92 @@ namespace
         bool       bIsModelCachedHere;
         bool       bIsModelLoadedByGame;
     };
+
+    constexpr uint8_t STREAMING_FLAG_GAME_REQUIRED = 0x2;
+    constexpr uint8_t STREAMING_FLAG_MISSION_REQUIRED = 0x4;
+
+    constexpr std::uintptr_t VAR_CStreaming_msPedsLoaded = 0x8E4C00;
+    constexpr std::uintptr_t VAR_CStreaming_msNumPedsLoaded = 0x8E4BB0;
+    constexpr std::uintptr_t VAR_CStreaming_msVehiclesLoaded = 0x8E4C24;
+    constexpr std::uintptr_t FUNC_CGame_CanSeeOutsideFromCurrArea = 0x53C4A0;
+
+    constexpr std::size_t PED_STREAMING_SLOT_COUNT = 8u;
+    constexpr int32_t      PED_STREAMING_SLOT_MAX_VALUE = 0xFFFF;
+    constexpr uint32_t PED_STREAMING_FLOOR = 4u;
+    constexpr uint32_t VEHICLE_STREAMING_FLOOR_EXTERIOR = 7u;
+    constexpr uint32_t VEHICLE_STREAMING_FLOOR_INTERIOR = 4u;
+    constexpr std::size_t VEHICLE_STREAMING_SLOT_COUNT = 23u;
+    constexpr int16_t VEHICLE_STREAMING_SLOT_UNUSED = -1;
+
+    uint32_t GetNativeNumPedsLoaded()
+    {
+        return *reinterpret_cast<uint32_t*>(VAR_CStreaming_msNumPedsLoaded);
+    }
+
+    bool IsModelTrackedByNativePedSlots(uint16_t modelId)
+    {
+        const auto* slots = reinterpret_cast<const int32_t*>(VAR_CStreaming_msPedsLoaded);
+        if (!slots)
+            return false;
+
+        for (std::size_t idx = 0; idx < PED_STREAMING_SLOT_COUNT; ++idx)
+        {
+            const int32_t pedSlot = slots[idx];
+            if (pedSlot < 0 || pedSlot > PED_STREAMING_SLOT_MAX_VALUE)
+                continue;
+
+            if (static_cast<uint16_t>(pedSlot) == modelId)
+                return true;
+        }
+
+        return false;
+    }
+
+    uint32_t GetNativeVehicleStreamCount()
+    {
+        const auto* slots = reinterpret_cast<const int16_t*>(VAR_CStreaming_msVehiclesLoaded);
+        if (!slots)
+            return 0;
+
+        uint32_t count = 0;
+        for (std::size_t idx = 0; idx < VEHICLE_STREAMING_SLOT_COUNT; ++idx)
+        {
+            if (slots[idx] == VEHICLE_STREAMING_SLOT_UNUSED)
+                break;
+
+            ++count;
+        }
+
+        return count;
+    }
+
+    bool IsModelTrackedByNativeVehicleGroup(uint16_t modelId)
+    {
+        const auto* slots = reinterpret_cast<const int16_t*>(VAR_CStreaming_msVehiclesLoaded);
+        if (!slots)
+            return false;
+
+        for (std::size_t idx = 0; idx < VEHICLE_STREAMING_SLOT_COUNT; ++idx)
+        {
+            const int16_t slotValue = slots[idx];
+            if (slotValue == VEHICLE_STREAMING_SLOT_UNUSED)
+                break;
+
+            if (slotValue < 0)
+                continue;
+
+            if (static_cast<uint16_t>(slotValue) == modelId)
+                return true;
+        }
+
+        return false;
+    }
+
+    bool NativeCanSeeOutsideFromCurrArea()
+    {
+        using Fn = bool(__cdecl*)();
+        return reinterpret_cast<Fn>(FUNC_CGame_CanSeeOutsideFromCurrArea)();
+    }
 }            // namespace
 
 ///////////////////////////////////////////////////////////////
@@ -59,6 +148,7 @@ public:
     int  GetModelRefCount(ushort usModelId);
     void AddModelRefCount(ushort usModelId);
     void SubModelRefCount(ushort usModelId);
+    bool TryReleaseCachedModel(ushort usModelId, SModelCacheInfo& info, const char* contextTag, uint& uiNumModelsCachedHereOnly);
 
 protected:
     CGame*                            m_pGame{};
@@ -177,10 +267,13 @@ void CModelCacheManagerImpl::PreLoad()
         {
             if (bSlowMethod)
                 SetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID, i);
-            AddModelRefCount(i);
+            
+            AddModelRefCount(static_cast<ushort>(i));
+
             if (bSlowMethod)
                 m_pGame->GetStreaming()->LoadAllRequestedModels(false);
         }
+
         m_pGame->GetStreaming()->LoadAllRequestedModels(false);
     }
     WatchDogCompletedSection(WD_SECTION_PRELOAD_UPGRADES);
@@ -396,31 +489,29 @@ void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& n
     }
 
     // If at or above cache limit, try to uncache unneeded first
-    if (uiNumModelsCachedHereOnly >= uiMaxCachedAllowed && !maybeUncacheUnneededList.empty())
-    {
-        const ushort     usModelId = maybeUncacheUnneededList.rbegin()->second;
-        SModelCacheInfo* pInfo = MapFind(currentCacheInfoMap, usModelId);
-        assert(pInfo);
-        assert(pInfo->bIsModelCachedHere);
-        SubModelRefCount(usModelId);
-        pInfo->bIsModelCachedHere = false;
-        MapRemove(currentCacheInfoMap, usModelId);
-        OutputDebugLine(SString("[Cache] End caching model %d  (UncacheUnneeded)", usModelId));
-    }
-    else if (uiNumModelsCachedHereOnly > uiMaxCachedAllowed && !maybeUncacheNeededList.empty())
-    {
-        // Only uncache from the needed list if above limit
+    bool bReleasedModel = false;
+    auto AttemptReleaseFromList = [&](const std::map<uint, ushort>& candidateList, const char* contextTag) -> bool {
+        for (auto it = candidateList.rbegin(); it != candidateList.rend(); ++it)
+        {
+            const ushort modelId = it->second;
+            auto         cacheIt = currentCacheInfoMap.find(modelId);
+            if (cacheIt == currentCacheInfoMap.end())
+                continue;
 
-        // Uncache furthest away model
-        const ushort     usModelId = maybeUncacheNeededList.rbegin()->second;
-        SModelCacheInfo* pInfo = MapFind(currentCacheInfoMap, usModelId);
-        assert(pInfo);
-        assert(pInfo->bIsModelCachedHere);
-        SubModelRefCount(usModelId);
-        pInfo->bIsModelCachedHere = false;
-        MapRemove(currentCacheInfoMap, usModelId);
-        OutputDebugLine(SString("[Cache] End caching model %d  (UncacheNeeded)", usModelId));
-    }
+            SModelCacheInfo& candidateInfo = cacheIt->second;
+            assert(candidateInfo.bIsModelCachedHere);
+
+            if (TryReleaseCachedModel(modelId, candidateInfo, contextTag, uiNumModelsCachedHereOnly))
+                return true;
+        }
+        return false;
+    };
+
+    if (uiNumModelsCachedHereOnly >= uiMaxCachedAllowed && !maybeUncacheUnneededList.empty())
+        bReleasedModel = AttemptReleaseFromList(maybeUncacheUnneededList, "UncacheUnneeded");
+
+    if (!bReleasedModel && uiNumModelsCachedHereOnly > uiMaxCachedAllowed && !maybeUncacheNeededList.empty())
+        bReleasedModel = AttemptReleaseFromList(maybeUncacheNeededList, "UncacheNeeded");
 
     // Cache if room
     if (!maybeCacheList.empty() && uiNumModelsCachedHereOnly < uiMaxCachedAllowed)
@@ -507,6 +598,7 @@ bool CModelCacheManagerImpl::UnloadModel(ushort usModelId)
 ///////////////////////////////////////////////////////////////
 void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
 {
+    // Keep forced restream untouched: callers expect full removal when restreaming.
     std::map<ushort, SModelCacheInfo>* mapList[] = {&m_PedModelCacheInfoMap, &m_VehicleModelCacheInfoMap};
 
     for (uint i = 0; i < NUMELMS(mapList); i++)
@@ -525,4 +617,80 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
             }
         }
     }   
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CModelCacheManagerImpl::TryReleaseCachedModel
+//
+///////////////////////////////////////////////////////////////
+bool CModelCacheManagerImpl::TryReleaseCachedModel(ushort usModelId, SModelCacheInfo& info, const char* contextTag, uint& uiNumModelsCachedHereOnly)
+{
+    assert(info.bIsModelCachedHere);
+
+    CStreaming* pStreaming = m_pGame->GetStreaming();
+    if (!pStreaming)
+    {
+        return false;
+    }
+
+    CStreamingInfo* pStreamingInfo = pStreaming->GetStreamingInfo(usModelId);
+    if (!pStreamingInfo)
+    {
+        return false;
+    }
+
+    if (pStreamingInfo->flg & STREAMING_FLAG_MISSION_REQUIRED)
+    {
+        return false;
+    }
+
+    if (pStreamingInfo->flg & STREAMING_FLAG_GAME_REQUIRED)
+    {
+        return false;
+    }
+
+    const int iRefCount = GetModelRefCount(usModelId);
+    if (iRefCount > 1)
+    {
+        return false;
+    }
+
+    CModelInfo* pModelInfo = m_pGame->GetModelInfo(usModelId, true);
+    const eModelInfoType modelType = pModelInfo ? pModelInfo->GetModelType() : eModelInfoType::UNKNOWN;
+    const bool bIsPedModel = modelType == eModelInfoType::PED;
+    const bool bIsVehicleModel = modelType == eModelInfoType::VEHICLE;
+
+    const bool bTrackedByNativePedSlots = bIsPedModel && IsModelTrackedByNativePedSlots(usModelId);
+    const bool bTrackedByNativeVehicleGroup = bIsVehicleModel && IsModelTrackedByNativeVehicleGroup(usModelId);
+
+    if (bTrackedByNativePedSlots)
+    {
+        if (GetNativeNumPedsLoaded() <= PED_STREAMING_FLOOR)
+        {
+            return false;
+        }
+    }
+
+    if (bTrackedByNativeVehicleGroup)
+    {
+        const uint32_t vehicleCount = GetNativeVehicleStreamCount();
+        const bool bIsInterior = m_pGame->GetWorld() && m_pGame->GetWorld()->GetCurrentArea() != 0;
+        const bool bTreatAsInterior = bIsInterior || !NativeCanSeeOutsideFromCurrArea();
+        const uint32_t minVehicleBudget = bTreatAsInterior ? VEHICLE_STREAMING_FLOOR_INTERIOR : VEHICLE_STREAMING_FLOOR_EXTERIOR;
+        if (vehicleCount <= minVehicleBudget)
+        {
+            return false;
+        }
+    }
+
+    SubModelRefCount(usModelId);
+    info.bIsModelCachedHere = false;
+    info.lastNeeded = m_TickCountNow;
+    info.bIsModelLoadedByGame = false;
+
+    if (uiNumModelsCachedHereOnly > 0)
+        uiNumModelsCachedHereOnly--;
+
+    return true;
 }

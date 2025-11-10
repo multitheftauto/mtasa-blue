@@ -6,7 +6,6 @@ project "Client Core"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
-		linkoptions { "/SAFESEH:NO" }
 		buildoptions { "-Zm130" }
 
 	filter {}
@@ -14,6 +13,7 @@ project "Client Core"
 			"../../Shared/sdk",
 			".",
 			"../sdk",
+			"../../vendor/cegui-0.4.0-custom/include",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
 			"../../vendor/jpeg-9f",
@@ -52,7 +52,7 @@ project "Client Core"
 
 	defines {
 		"INITGUID",
-		"PNG_SETJMP_NOT_SUPPORTED"
+		"PNG_SETJMP_NOT_SUPPORTED",
 	}
 
 	prebuildcommands {

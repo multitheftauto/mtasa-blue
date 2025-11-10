@@ -90,6 +90,7 @@ public:
     void _UseCrashDumpPostContent();
     void _ShouldSendCrashDump();
     void _ResetLastCrashDump();
+    int  ValidateCrashDumpPath(const SString& strPathFilename, SString* pOutErrorMsg, bool bCheckFileExists = false);
     void _ActionReconnect();
     void _DialogHide();
     void _ExitGame();
@@ -114,7 +115,7 @@ public:
     void _DialogExeFilesResult();
     void _StartDownload();
     int  _PollDownload();
-    void _StartSendPost();
+    bool _StartSendPost();
     int  _PollSendPost();
     void _CheckSidegradeRequirements();
     void _DoSidegradeLaunch();
@@ -1378,6 +1379,8 @@ error1:
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::Program_SendCrashDump()
 {
+    bool bUploadSuccess = false;  // Declare before any goto targets
+    
     _ShouldSendCrashDump();            // Have we already sent a matching dump?
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.!ok"))
         goto end;
@@ -1388,9 +1391,69 @@ void CVersionUpdater::Program_SendCrashDump()
         goto end;
     _UseCrashDumpURLs();                   // Use CRASH_DUMP_URL*
     _UseCrashDumpPostContent();            // Use crash dump source
-    _StartSendPost();                      // Send data
+    
+    // Send data and check if upload succeeded
+    bUploadSuccess = _StartSendPost();
+    
+    if (bUploadSuccess)
+    {
+        // Upload succeeded - clear all settings to prevent duplicate sends
+        SetApplicationSetting("diagnostics", "last-dump-save", "");
+        SetApplicationSetting("diagnostics", "last-dump-load-retry", "");
+        SetApplicationSetting("diagnostics", "last-dump-retry-time", "");
+        SetApplicationSetting("diagnostics", "last-dump-complete", "");
+    }
+    else
+    {
+        // Upload failed - retry with backoff
+        const int MAX_UPLOAD_RETRIES = 3;
+        int iCurrentRetry = GetApplicationSettingInt("diagnostics", "last-dump-load-retry");
+        
+        if (iCurrentRetry < MAX_UPLOAD_RETRIES)
+        {
+            iCurrentRetry++;
+            SetApplicationSettingInt("diagnostics", "last-dump-load-retry", iCurrentRetry);
+            
+            // Store timestamp as string for backoff enforcement (prevents int overflow)
+            const long long llCurrentTimeSec = GetTickCount64_() / 1000;
+            SetApplicationSetting("diagnostics", "last-dump-retry-time", SString("%lld", llCurrentTimeSec));
+            
+            // Calculate backoff delay
+            int iBackoffSeconds = 5;
+            for (int i = 1; i < iCurrentRetry; i++)
+                iBackoffSeconds *= 3;
+            
+            AddReportLog(9320, SString("Program_SendCrashDump: Upload failed (attempt %d/%d) - Will retry in %d seconds",
+                                       iCurrentRetry, MAX_UPLOAD_RETRIES, iBackoffSeconds));
+            
+            // Reset flag to allow retry on next pulse
+            m_bSentCrashDump = false;
+        }
+        else
+        {
+            // Max retries exceeded - give up
+            AddReportLog(9321, SString("Program_SendCrashDump: Upload failed after %d attempts - Giving up", MAX_UPLOAD_RETRIES));
+            _ResetLastCrashDump();
+        }
+    }
+    return;
+    
 end:
-    _ResetLastCrashDump();
+    // Only reset if we're not retrying
+    int iRetryCount = GetApplicationSettingInt("diagnostics", "last-dump-load-retry");
+    if (iRetryCount == 0)
+    {
+        const SString strDumpSave = GetApplicationSetting("diagnostics", "last-dump-save");
+        const SString strDumpComplete = GetApplicationSetting("diagnostics", "last-dump-complete");
+
+        if (strDumpSave.length() > 0 && strDumpComplete != "1")
+        {
+        }
+        else
+        {
+            _ResetLastCrashDump();
+        }
+    }
     return;
 }
 
@@ -2769,8 +2832,8 @@ int CVersionUpdater::_PollDownload()
                     }
                     if (m_JobInfo.bShowDownloadPercent)
                     {
-                        const bool  bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded;
-                        const int fDownloadedPercent = bIsDownloadedSizeRight ? Round((float)m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
+                        const bool bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && static_cast<unsigned int>(m_JobInfo.iFilesize) >= m_JobInfo.uiBytesDownloaded;
+                        const int  fDownloadedPercent = bIsDownloadedSizeRight ? Round((float)m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
                         GetQuestionBox().SetMessage(SString(_("%3d %% completed"), fDownloadedPercent));
                     }
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)
@@ -2839,6 +2902,98 @@ void CVersionUpdater::_UseReportLogPostContent()
     GetReportWrap()->ClearLogContents("-all");
 }
 
+
+int CVersionUpdater::ValidateCrashDumpPath(const SString& strPathFilename, SString* pOutErrorMsg, bool bCheckFileExists)
+{
+    // Constants for validation with constexpr for compile-time evaluation
+    constexpr size_t MAX_PATH_LENGTH = 32767;
+    constexpr size_t MAX_DUMP_FILE_SIZE = 2 * 1024 * 1024;
+    constexpr size_t MAX_PATH_COMPONENTS = 256;
+    constexpr size_t PATH_PARTS_RESERVE = 32;
+    constexpr size_t MAX_DUMP_FILE_SIZE_MB = MAX_DUMP_FILE_SIZE / (1024 * 1024);
+    
+    if (const size_t pathLength = strPathFilename.length(); pathLength > MAX_PATH_LENGTH)
+    {
+        if (pOutErrorMsg)
+            *pOutErrorMsg = SString("Path too long (%d > %d)", pathLength, MAX_PATH_LENGTH);
+        return 9311;
+    }
+
+    if (!strPathFilename.EndsWithI(".dmp"))
+    {
+        if (pOutErrorMsg)
+            *pOutErrorMsg = "Invalid file extension (must be .dmp)";
+        return 9315;
+    }
+
+
+    auto validatePathParts = [&](const SString& separator) noexcept -> int {
+        std::vector<SString> pathParts;
+        pathParts.reserve(PATH_PARTS_RESERVE);
+        strPathFilename.Split(separator, pathParts);
+        
+        if (const size_t numParts = pathParts.size(); numParts > MAX_PATH_COMPONENTS)
+        {
+            if (pOutErrorMsg)
+                *pOutErrorMsg = SString("Too many path components (%d > %d)", numParts, MAX_PATH_COMPONENTS);
+            return 9315;
+        }
+        
+        for (const auto& part : pathParts)
+        {
+            if (part == "..")
+            {
+                if (pOutErrorMsg)
+                    *pOutErrorMsg = "Path traversal detected";
+                return 9312;
+            }
+        }
+        return 0;
+    };
+    
+    if (const int result = validatePathParts(PATH_SEPERATOR); result != 0)
+        return result;
+    
+    if (const bool hasForwardSlash = strPathFilename.Contains("/"); hasForwardSlash)
+    {
+        if (const int result = validatePathParts("/"); result != 0)
+            return result;
+    }
+
+    if (bCheckFileExists)
+    {
+        if (FILE* pFile = File::Fopen(strPathFilename, "rb"); !pFile)
+        {
+            if (pOutErrorMsg)
+                *pOutErrorMsg = "File does not exist or cannot be opened";
+            return 9317;
+        }
+        else
+        {
+            if (const int seekResult = fseek(pFile, 0, SEEK_END); seekResult != 0)
+            {
+                fclose(pFile);
+                if (pOutErrorMsg)
+                    *pOutErrorMsg = "Failed to seek in file";
+                return 9317;
+            }
+            
+            const long fileSize = ftell(pFile);
+            fclose(pFile);
+
+            if (const bool isInvalidSize = fileSize < 0 || static_cast<size_t>(fileSize) > MAX_DUMP_FILE_SIZE; 
+                isInvalidSize)
+            {
+                if (pOutErrorMsg)
+                    *pOutErrorMsg = SString("File too large (%d bytes, max %d MB)", fileSize, MAX_DUMP_FILE_SIZE_MB);
+                return 9316;
+            }
+        }
+    }
+
+    return 0;
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CVersionUpdater::_ShouldSendCrashDump
@@ -2848,59 +3003,135 @@ void CVersionUpdater::_UseReportLogPostContent()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ShouldSendCrashDump()
 {
-    m_ConditionMap.SetCondition("ProcessResponse", "");
+    // constexpr string literals for diagnostics settings keys
+    constexpr const char* DIAGNOSTICS_SECTION = "diagnostics";
+    constexpr const char* LAST_DUMP_SAVE = "last-dump-save";
+    constexpr const char* LAST_DUMP_TAG = "last-dump-tag";
+    constexpr const char* LAST_DUMP_DATETIME = "last-dump-datetime";
+    constexpr const char* PROCESS_RESPONSE = "ProcessResponse";
+    constexpr const char* RESPONSE_OK = "ok";
+    constexpr const char* EMPTY_VALUE = "";
+    
+    m_ConditionMap.SetCondition(PROCESS_RESPONSE, EMPTY_VALUE);
 
-    // Add to history
-    SString strPathFilename = GetApplicationSetting("diagnostics", "last-dump-save");
-
-    // Extract module and address from filename
-    std::vector<SString> parts;
-    strPathFilename.Split("_", parts);
-    if (parts.size() > DUMP_PART_TIME)
+    if (const SString strPathFilename = GetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE); 
+        strPathFilename.empty())
     {
-        SString strVersionAndModuleAndOffset = parts[DUMP_PART_VERSION] + "_" + parts[DUMP_PART_MODULE] + "_" + parts[DUMP_PART_OFFSET];
-        SString strDateAndTime = parts[DUMP_PART_DATE] + "_" + parts[DUMP_PART_TIME];
-        strDateAndTime.Split(".", &strDateAndTime, NULL);
-
-        // Check history for duplicates
-        CDataInfoSet& history = m_VarConfig.crashdump_history;
-        int           iDuplicates = 0;
-        for (uint i = 0; i < history.size(); i++)
-            if (strVersionAndModuleAndOffset == history[i].GetAttribute("tag"))
-                iDuplicates++;
-
-        // Add to history
-        if (iDuplicates <= m_MasterConfig.crashdump.iDuplicates)
+        return;
+    }
+    else
+    {
+        if (SString strErrorMsg; const int iValidationResult = ValidateCrashDumpPath(strPathFilename, &strErrorMsg, true))
         {
-            SDataInfoItem item;
-            item.strName = "dump";
-            item.SetAttribute("tag", strVersionAndModuleAndOffset);
-            item.SetAttribute("date", strDateAndTime);
-            history.push_back(item);
-        }
-        else
+            AddReportLog(iValidationResult, SString("_ShouldSendCrashDump: %s", *strErrorMsg));
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE, EMPTY_VALUE);  // Clear invalid path
             return;
+        }
 
-        // Sort by date
-        for (int i = 0; i < (int)history.size() - 1; i++)
+
+        SString strFilename;
+        strPathFilename.Split(PATH_SEPERATOR, nullptr, &strFilename, -1);
+        
+        // constexpr validation constants for compile-time evaluation
+        constexpr size_t MAX_FILENAME_LENGTH = 2048;
+        constexpr size_t MAX_FILENAME_PARTS = 64;
+        constexpr size_t PARTS_RESERVE = 8;
+        constexpr size_t MAX_TAG_LENGTH = 1024;
+        constexpr size_t MAX_DATETIME_LENGTH = 256;
+        constexpr size_t MAX_HISTORY_SIZE = 100000;
+            constexpr int MAX_DUPLICATE_COUNT = 10000;
+
+        if (const size_t filenameLength = strFilename.length(); filenameLength > MAX_FILENAME_LENGTH)
         {
-            SDataInfoItem& a = history[i];
-            SDataInfoItem& b = history[i + 1];
-            if (a.GetAttribute("date") > b.GetAttribute("date"))
+            AddReportLog(9325, SString("_ShouldSendCrashDump: Filename too long (%d > %d)", 
+                                       filenameLength, MAX_FILENAME_LENGTH));
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE, EMPTY_VALUE);
+            return;
+        }
+
+        std::vector<SString> parts;
+        parts.reserve(PARTS_RESERVE); 
+        strFilename.Split("_", parts);
+        
+
+        if (const size_t numParts = parts.size(); numParts > MAX_FILENAME_PARTS)
+        {
+            AddReportLog(9315, SString("_ShouldSendCrashDump: Too many filename parts (%d > %d)", 
+                                       numParts, MAX_FILENAME_PARTS));
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE, EMPTY_VALUE);
+            return;
+    }
+        
+        if (const size_t maxRequiredIndex = std::max({DUMP_PART_VERSION, DUMP_PART_MODULE, DUMP_PART_OFFSET, 
+                                                       DUMP_PART_DATE, DUMP_PART_TIME}); 
+            parts.size() <= maxRequiredIndex)
+        {
+            AddReportLog(9313, SString("_ShouldSendCrashDump: Insufficient filename parts (parts=%d, max index=%d)", 
+                                       parts.size(), maxRequiredIndex));
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE, EMPTY_VALUE);
+            return;
+    }
+
+        const SString strVersionAndModuleAndOffset = 
+        parts[DUMP_PART_VERSION] + "_" + parts[DUMP_PART_MODULE] + "_" + parts[DUMP_PART_OFFSET];
+        
+        if (const size_t tagLength = strVersionAndModuleAndOffset.length(); tagLength > MAX_TAG_LENGTH)
+        {
+            AddReportLog(9326, SString("_ShouldSendCrashDump: Tag too long (%d > %d)", 
+                                       tagLength, MAX_TAG_LENGTH));
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE, EMPTY_VALUE);
+            return;
+    }
+        
+        SString strDateAndTime = parts[DUMP_PART_DATE] + "_" + parts[DUMP_PART_TIME];
+        strDateAndTime.Split(".", &strDateAndTime, nullptr);  // Remove .dmp extension from time part
+
+        if (const size_t dateTimeLength = strDateAndTime.length(); dateTimeLength > MAX_DATETIME_LENGTH)
+        {
+            AddReportLog(9327, SString("_ShouldSendCrashDump: Date/time string too long (%d > %d)", 
+                                       dateTimeLength, MAX_DATETIME_LENGTH));
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE, EMPTY_VALUE);
+            return;
+        }
+
+        CDataInfoSet& history = m_VarConfig.crashdump_history;
+        
+        if (const size_t historySize = history.size(); historySize > MAX_HISTORY_SIZE)
+        {
+            AddReportLog(9318, SString("_ShouldSendCrashDump: History size limit exceeded (%d > %d)", 
+                                       historySize, MAX_HISTORY_SIZE));
+            // Aggressively trim to half of max size with explicit calculation
+            constexpr size_t TRIM_TO_RATIO = 2;  // Keep half when trimming
+            history.erase(history.begin(), history.begin() + (historySize - MAX_HISTORY_SIZE / TRIM_TO_RATIO));
+            CCore::GetSingleton().SaveConfig();
+        }
+
+        int iDuplicates = 0;
+        for (const auto& item : history)
+        {
+            // Use if-init to cache GetAttribute result and compare
+            if (const SString& itemTag = item.GetAttribute("tag"); strVersionAndModuleAndOffset == itemTag)
             {
-                std::swap(a, b);
-                i = std::max(i - 2, -1);
+                if (++iDuplicates > MAX_DUPLICATE_COUNT)
+                {
+                    AddReportLog(9314, SString("_ShouldSendCrashDump: Excessive duplicates detected (%d+)", MAX_DUPLICATE_COUNT));
+                    return;
+                }
             }
         }
 
-        // Remove oldest if required
-        int iNumToRemove = history.size() - m_MasterConfig.crashdump.iMaxHistoryLength;
-        if (iNumToRemove > 0)
-            history.erase(history.begin(), history.begin() + iNumToRemove);
+        if (const int duplicateLimit = static_cast<int>(m_MasterConfig.crashdump.iDuplicates); 
+            iDuplicates > duplicateLimit)
+        {
+            AddReportLog(9314, SString("_ShouldSendCrashDump: Duplicate limit reached (%d/%d)", 
+                                       iDuplicates, duplicateLimit));
+            return;
+        }
 
-        CCore::GetSingleton().SaveConfig();
-
-        m_ConditionMap.SetCondition("ProcessResponse", "ok");
+        SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_TAG, strVersionAndModuleAndOffset);
+        SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_DATETIME, strDateAndTime);
+        
+        m_ConditionMap.SetCondition(PROCESS_RESPONSE, RESPONSE_OK);
     }
 }
 
@@ -2914,6 +3145,11 @@ void CVersionUpdater::_ShouldSendCrashDump()
 void CVersionUpdater::_ResetLastCrashDump()
 {
     SetApplicationSetting("diagnostics", "last-dump-save", "");
+    SetApplicationSetting("diagnostics", "last-dump-load-retry", "");
+    SetApplicationSetting("diagnostics", "last-dump-retry-time", "");
+    SetApplicationSetting("diagnostics", "last-dump-complete", "");
+    SetApplicationSetting("diagnostics", "last-dump-tag", "");
+    SetApplicationSetting("diagnostics", "last-dump-datetime", "");
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2925,11 +3161,60 @@ void CVersionUpdater::_ResetLastCrashDump()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_UseCrashDumpQueryURLs()
 {
+    constexpr const char* DIAGNOSTICS_SECTION = "diagnostics";
+    constexpr const char* LAST_DUMP_SAVE = "last-dump-save";
+    constexpr const char* EMPTY_VALUE = "";
+    
+    constexpr size_t MAX_POST_FILENAME_LENGTH = 1024;
+    constexpr unsigned char CONTROL_CHAR_THRESHOLD = 32;
+    constexpr unsigned char DELETE_CHAR = 127;
+    constexpr char REPLACEMENT_CHAR = '_';
+    
+    // Initialize job info with server list
     m_JobInfo = SJobInfo();
     m_JobInfo.serverList = MakeServerList(m_MasterConfig.crashdump.serverInfoMap);
 
-    SString strPathFilename = GetApplicationSetting("diagnostics", "last-dump-save");
-    strPathFilename.Split(PATH_SEPERATOR, NULL, &m_JobInfo.strPostFilename, -1);
+    if (const SString strPathFilename = GetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE); 
+        strPathFilename.empty())
+    {
+        return;
+    }
+    else
+    {
+        if (SString strErrorMsg; const int iValidationResult = ValidateCrashDumpPath(strPathFilename, &strErrorMsg))
+        {
+            AddReportLog(iValidationResult, SString("_UseCrashDumpQueryURLs: %s", *strErrorMsg));
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE, EMPTY_VALUE);  // Clear invalid path
+            return;
+        }
+
+        // Extract filename from path
+        SString strFilename;
+        strPathFilename.Split(PATH_SEPERATOR, nullptr, &strFilename, -1);
+        
+    if (const size_t queryFilenameLength = strFilename.length(); 
+            queryFilenameLength > MAX_POST_FILENAME_LENGTH)
+        {
+            AddReportLog(9328, SString("_UseCrashDumpQueryURLs: Filename too long (%d > %d)", 
+                                       queryFilenameLength, MAX_POST_FILENAME_LENGTH));
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE, EMPTY_VALUE);
+            return;
+    }
+        
+        const auto is_control_char = [CONTROL_CHAR_THRESHOLD, DELETE_CHAR](unsigned char c) noexcept -> bool {
+            return c < CONTROL_CHAR_THRESHOLD || c == DELETE_CHAR;
+        };
+
+        SString strSanitizedFilename = strFilename;
+        
+        for (auto& ch : strSanitizedFilename)
+        {
+            if (is_control_char(static_cast<unsigned char>(ch)))
+                ch = REPLACEMENT_CHAR;
+        }
+        
+        m_JobInfo.strPostFilename = strSanitizedFilename;
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2941,16 +3226,88 @@ void CVersionUpdater::_UseCrashDumpQueryURLs()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ProcessCrashDumpQuery()
 {
-    m_ConditionMap.SetCondition("ProcessResponse", "");
+    constexpr const char* PROCESS_RESPONSE = "ProcessResponse";
+    constexpr const char* DIAGNOSTICS_SECTION = "diagnostics";
+    constexpr const char* LAST_DUMP_TAG = "last-dump-tag";
+    constexpr const char* LAST_DUMP_DATETIME = "last-dump-datetime";
+    constexpr const char* EMPTY_VALUE = "";
+    constexpr const char* RESPONSE_OK = "ok";
+    constexpr const char* RESPONSE_YES = "yes";
+    constexpr const char* DUMP_ITEM_NAME = "dump";
+    constexpr const char* TAG_ATTRIBUTE = "tag";
+    constexpr const char* DATE_ATTRIBUTE = "date";
+    
+    constexpr size_t MAX_RESPONSE_SIZE = 10 * 1024 * 1024;
+    
+    m_ConditionMap.SetCondition(PROCESS_RESPONSE, EMPTY_VALUE);
 
-    if (m_JobInfo.downloadBuffer.size() == 0)
+    // Early return if no download buffer
+    if (const bool hasData = !m_JobInfo.downloadBuffer.empty(); !hasData)
         return;
 
-    SStringX strResponse(&m_JobInfo.downloadBuffer[0], m_JobInfo.downloadBuffer.size());
+    if (const size_t responseSize = m_JobInfo.downloadBuffer.size(); responseSize > MAX_RESPONSE_SIZE)
+    {
+        AddReportLog(9319, SString("_ProcessCrashDumpQuery: Response too large (%d > %d)", 
+                                   responseSize, MAX_RESPONSE_SIZE));
+        return;
+    }
 
-    // Is the dump file wanted?
-    if (strResponse.BeginsWithI("yes"))
-        m_ConditionMap.SetCondition("ProcessResponse", "ok");
+    const SStringX strResponse(m_JobInfo.downloadBuffer.data(), m_JobInfo.downloadBuffer.size());
+
+    // Check if dump is wanted
+    if (const bool isDumpWanted = strResponse.BeginsWithI(RESPONSE_YES); isDumpWanted)
+    {
+        // Server confirmed it wants the dump - retrieve metadata
+        if (const SString strTag = GetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_TAG),
+                         strDateTime = GetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_DATETIME);
+            !strTag.empty() && !strDateTime.empty())
+        {
+            CDataInfoSet& history = m_VarConfig.crashdump_history;
+            
+            // Add to history
+            SDataInfoItem item;
+            item.strName = DUMP_ITEM_NAME;
+            item.SetAttribute(TAG_ATTRIBUTE, strTag);
+            item.SetAttribute(DATE_ATTRIBUTE, strDateTime);
+            history.push_back(item);
+            
+            // Trim history if needed
+            if (const size_t historySize = history.size(); 
+                historySize > static_cast<size_t>(m_MasterConfig.crashdump.iMaxHistoryLength))
+            {
+                // Lambda for date comparison (GetAttribute is evaluated at runtime)
+                auto date_comparator = [](const SDataInfoItem& a, const SDataInfoItem& b) noexcept -> bool {
+                    return a.GetAttribute("date") < b.GetAttribute("date");
+                };
+                std::sort(history.begin(), history.end(), date_comparator);
+                
+                // Remove oldest entries
+                // Note: If numToRemove exceeds MAX_HISTORY_EXCESS, trim to safe limit to prevent oversized history
+                if (const size_t numToRemove = historySize - m_MasterConfig.crashdump.iMaxHistoryLength; 
+                    numToRemove > 0)
+                {
+                    constexpr size_t MAX_HISTORY_EXCESS = 1000;
+                    const size_t actualRemove = (numToRemove > MAX_HISTORY_EXCESS) ? (historySize - MAX_HISTORY_EXCESS) : numToRemove;
+                    history.erase(history.begin(), history.begin() + actualRemove);
+                }
+            }
+            
+            // Save config
+            CCore::GetSingleton().SaveConfig();
+            
+            // Clear metadata settings using constexpr string literals
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_TAG, EMPTY_VALUE);
+            SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_DATETIME, EMPTY_VALUE);
+        }
+        
+        m_ConditionMap.SetCondition(PROCESS_RESPONSE, RESPONSE_OK);
+    }
+    else
+    {
+        // Server rejected dump or sent invalid response - clear temporary metadata
+        SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_TAG, EMPTY_VALUE);
+        SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_DATETIME, EMPTY_VALUE);
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2970,27 +3327,190 @@ void CVersionUpdater::_UseCrashDumpURLs()
 //
 // CVersionUpdater::_UseCrashDumpPostContent
 //
-//
+// Load and prepare crash dump file for upload
 //
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_UseCrashDumpPostContent()
 {
-    // Get filename to send
-    SString strPathFilename = GetApplicationSetting("diagnostics", "last-dump-save");
-    if (!strPathFilename.length())
-        return;
-    SetApplicationSetting("diagnostics", "last-dump-save", "");
-
-    // Get user pref
-    if (GetApplicationSetting("diagnostics", "send-dumps") == "no")
-        return;
-
-    // Load into post buffer
-    if (FileLoad(strPathFilename, m_JobInfo.postContent))
+    constexpr const char* DIAGNOSTICS_SECTION = "diagnostics";
+    constexpr const char* LAST_DUMP_SAVE = "last-dump-save";
+    constexpr const char* SEND_DUMPS = "send-dumps";
+    constexpr const char* NO_SEND = "no";
+    constexpr const char* LAST_DUMP_COMPLETE = "last-dump-complete";
+    constexpr const char* COMPLETE_FLAG = "1";
+    constexpr const char* LAST_DUMP_LOAD_RETRY = "last-dump-load-retry";
+    constexpr const char* LAST_DUMP_RETRY_TIME = "last-dump-retry-time";
+    constexpr const char* LOG_PREFIX = "_UseCrashDumpPostContent: ";
+    
+    constexpr size_t MAX_POST_FILENAME_LENGTH = 1024;
+    constexpr size_t MAX_POST_CONTENT_SIZE = 2 * 1024 * 1024;  // 2 MB for minidumps
+    constexpr int MAX_LOAD_RETRIES = 3;
+    constexpr int INITIAL_BACKOFF_SECONDS = 5;
+    constexpr int BACKOFF_MULTIPLIER = 3;
+    constexpr uint32_t MDMP_SIGNATURE = 0x504D444D;  // "MDMP" in little-endian
+    constexpr size_t MIN_SIGNATURE_SIZE = sizeof(uint32_t);
+    constexpr int MILLISECONDS_PER_SECOND = 1000;
+    
+    if (const SString strPathFilename = GetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_SAVE); 
+        strPathFilename.empty())
     {
-        // Set post filename without path
-        strPathFilename.Split(PATH_SEPERATOR, NULL, &m_JobInfo.strPostFilename, -1);
-        m_JobInfo.bPostContentBinary = true;
+        return;
+    }
+    else
+    {
+        // Early return if user disabled dump sending
+        if (const SString strSendDumps = GetApplicationSetting(DIAGNOSTICS_SECTION, SEND_DUMPS); 
+            strSendDumps == NO_SEND)
+        {
+            _ResetLastCrashDump();
+            return;
+        }
+
+        // Validate path and file
+        SString strErrorMsg;
+        if (const int iValidationResult = ValidateCrashDumpPath(strPathFilename, &strErrorMsg, true); 
+            iValidationResult != 0)
+        {
+            AddReportLog(iValidationResult, SString("%s%s", LOG_PREFIX, *strErrorMsg));
+            _ResetLastCrashDump();
+            return;
+        }
+
+        // Extract filename from path
+        SString strFilename;
+        strPathFilename.Split(PATH_SEPERATOR, nullptr, &strFilename, -1);
+        
+        // Validate filename length
+            if (const size_t postFilenameLength = strFilename.length(); 
+                postFilenameLength > MAX_POST_FILENAME_LENGTH)
+            {
+                AddReportLog(9329, SString("%sFilename too long (%d > %d)", 
+                                           LOG_PREFIX, postFilenameLength, MAX_POST_FILENAME_LENGTH));
+                _ResetLastCrashDump();
+                return;
+            }
+
+            // Check if dump file writing is complete
+            if (const SString strDumpComplete = GetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_COMPLETE); 
+                strDumpComplete != COMPLETE_FLAG)
+            {
+                AddReportLog(9320, SString("%sDump file not yet complete - waiting for write to finish", LOG_PREFIX));
+                
+                // Don't start retry counter yet - just wait for next pulse
+                // This prevents premature file access while crash handler is still writing
+                m_bSentCrashDump = false;
+                return;
+            }
+            
+            // Get current retry count
+            const int iCurrentRetry = GetApplicationSettingInt(DIAGNOSTICS_SECTION, LAST_DUMP_LOAD_RETRY);
+            
+            // Lambda for backoff calculation with explicit return type
+            const auto calculate_backoff = [INITIAL_BACKOFF_SECONDS, BACKOFF_MULTIPLIER](int retry_count) noexcept -> int {
+                if (retry_count <= 0)
+                    return 0;
+                int backoff = INITIAL_BACKOFF_SECONDS;
+                for (int i = 1; i < retry_count; ++i)
+                    backoff *= BACKOFF_MULTIPLIER;
+                return backoff;
+            };
+                
+            // Calculate backoff for current retry
+            const int iBackoffSeconds = calculate_backoff(iCurrentRetry);
+            
+            // Check if we need to wait for retry backoff delay
+            if (iCurrentRetry > 0)
+            {
+                // Get retry timestamp
+                const long long llRetryTimeSec = GetApplicationSettingInt(DIAGNOSTICS_SECTION, LAST_DUMP_RETRY_TIME);
+                const long long llCurrentTimeSec = GetTickCount64_() / MILLISECONDS_PER_SECOND;
+                const long long llElapsedSec = llCurrentTimeSec - llRetryTimeSec;
+                
+                // Check if backoff delay has elapsed
+                if (llElapsedSec >= 0 && llElapsedSec < iBackoffSeconds)
+                {
+                    // Still waiting for backoff delay
+                    m_bSentCrashDump = false;
+                    return;
+                }
+            }
+            
+            // Attempt to load file
+            if (const bool bLoadSuccess = FileLoad(strPathFilename, m_JobInfo.postContent); bLoadSuccess)
+            {
+                if (m_JobInfo.postContent.empty())
+                {
+                    AddReportLog(9317, SString("%sLoaded content is empty", LOG_PREFIX));
+                    _ResetLastCrashDump();
+                    return;
+                }
+                
+                // Validate content size
+                if (const size_t contentSize = m_JobInfo.postContent.size(); 
+                    contentSize > MAX_POST_CONTENT_SIZE)
+                {
+                    AddReportLog(9316, SString("%sLoaded content too large (%d > %d)", 
+                                               LOG_PREFIX, contentSize, MAX_POST_CONTENT_SIZE));
+                    m_JobInfo.postContent.clear();
+                    _ResetLastCrashDump();
+                    return;
+                }
+                
+                // Validate minidump signature
+                if (const size_t contentSize = m_JobInfo.postContent.size(); 
+                    contentSize >= MIN_SIGNATURE_SIZE)
+                {
+                    uint32_t signature;
+                    memcpy(&signature, m_JobInfo.postContent.data(), sizeof(signature));
+                    
+                    if (signature != MDMP_SIGNATURE)
+                    {
+                        AddReportLog(9322, SString("%sInvalid minidump signature (0x%08X, expected 0x%08X)",
+                                                   LOG_PREFIX, signature, MDMP_SIGNATURE));
+                        m_JobInfo.postContent.clear();
+                        _ResetLastCrashDump();
+                        return;
+                    }
+                }
+                
+                // Set metadata - upload ready
+                m_JobInfo.strPostFilename = strFilename;
+                m_JobInfo.bPostContentBinary = true;
+                
+                // Don't clear settings yet - wait until upload succeeds
+                // Settings will be cleared in Program_SendCrashDump after _StartSendPost returns true
+                
+                AddReportLog(5200, SString("%sSuccessfully loaded crash dump file: %s (upload pending)", 
+                                           LOG_PREFIX, *strFilename));
+            }
+            else
+            {
+                // File load failed - retry
+                if (const int iNextRetry = iCurrentRetry + 1; iNextRetry <= MAX_LOAD_RETRIES)
+                {
+                    // Increment retry counter
+                    SetApplicationSettingInt(DIAGNOSTICS_SECTION, LAST_DUMP_LOAD_RETRY, iNextRetry);
+                    
+                    // Store current timestamp for backoff delay
+                    const long long llCurrentTimeSec = GetTickCount64_() / MILLISECONDS_PER_SECOND;
+                    SetApplicationSetting(DIAGNOSTICS_SECTION, LAST_DUMP_RETRY_TIME, SString("%lld", llCurrentTimeSec));
+                    
+                    // Calculate backoff for next retry
+                    const int iNextBackoffSeconds = calculate_backoff(iNextRetry);
+                    AddReportLog(9310, SString("%sFailed to load crash dump file (attempt %d/%d): %s - Will retry in %d seconds", 
+                                                   LOG_PREFIX, iNextRetry, MAX_LOAD_RETRIES, *strFilename, iNextBackoffSeconds));
+                    
+                    // Reset flag to allow retry on next pulse (after backoff delay)
+                    m_bSentCrashDump = false;
+                }
+                else
+                {
+                    // Max retries exceeded - give up
+                    AddReportLog(9324, SString("%sFailed to load crash dump file after %d attempts: %s - Giving up", 
+                                               LOG_PREFIX, MAX_LOAD_RETRIES, *strFilename));
+                    _ResetLastCrashDump();
+                }
+            }
     }
 }
 
@@ -2998,13 +3518,14 @@ void CVersionUpdater::_UseCrashDumpPostContent()
 //
 // CVersionUpdater::_StartSendPost
 //
+// Returns true if upload succeeded, false on failure
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_StartSendPost()
+bool CVersionUpdater::_StartSendPost()
 {
     if (!m_JobInfo.postContent.size())
-        return;
+        return false;
 
     while (true)
     {
@@ -3014,7 +3535,7 @@ void CVersionUpdater::_StartSendPost()
             case RES_FAIL:
                 // Can't find any(more) servers to send a query to
                 // Drop back to previous stack level
-                return;
+                return false;
 
             case RES_OK:
             {
@@ -3022,10 +3543,9 @@ void CVersionUpdater::_StartSendPost()
                 if (_PollSendPost() == RES_OK)
                 {
                     // Got a valid response
-                    return;
+                    return true;
                 }
                 // Connection to current server failed, try next server
-                break;
                 break;
             }
 
@@ -3155,8 +3675,20 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
         iReqKB3035131 = IsHotFixInstalled("KB3035131") ? 0 : 1;
     }
 
-    bool bSecureBootEnabled =
-        (GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled") == "\x01");
+    int secureBootStatus = 0;
+    const SString secureBootValue =
+        GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled", &secureBootStatus);
+    bool bSecureBootEnabled = false;
+    if (secureBootStatus > 0)
+    {
+        // Parse the registry value into a numeric flag
+        char* secureBootEnd = nullptr;
+        const long secureBootNumeric = strtol(secureBootValue.c_str(), &secureBootEnd, 10);
+        if (secureBootEnd != secureBootValue.c_str() && *secureBootEnd == '\0')
+        {
+            bSecureBootEnabled = secureBootNumeric != 0;
+        }
+    }
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);
@@ -3386,8 +3918,10 @@ int CVersionUpdater::DoSendPostToNextServer()
     // Get our serial number
     char szSerial[64];
     CCore::GetSingleton().GetNetwork()->GetSerial(szSerial, sizeof(szSerial));
+    szSerial[sizeof(szSerial) - 1] = '\0';  // Defensive null-termination
     char szStatus[128];
     CCore::GetSingleton().GetNetwork()->GetStatus(szStatus, sizeof(szStatus));
+    szStatus[sizeof(szStatus) - 1] = '\0';  // Defensive null-termination
 
     // Compose version string
     unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();

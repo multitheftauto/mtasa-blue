@@ -564,12 +564,14 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
 
     // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
     pathList.push_back(GetCommonRegistryValue("", "GTA:SA Path"));
+    
+    WriteDebugEvent(SString("GetGamePath: Registry returned '%s'", pathList[0].c_str()));
 
     // Unicode character check on first one
     if (strlen(pathList[0].c_str()))
     {
         // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-        if (strchr(pathList[0].c_str(), '?') > 0)
+        if (strchr(pathList[0].c_str(), '?') != nullptr)
             return GAME_PATH_UNICODE_CHARS;
     }
 
@@ -577,16 +579,23 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
     for (uint i = 0; i < pathList.size(); i++)
     {
         if (pathList[i].empty())
+        {
+            WriteDebugEvent(SString("GetGamePath: pathList[%d] is empty", i));
             continue;
+        }
 
+        WriteDebugEvent(SString("GetGamePath: Checking '%s' for '%s'", pathList[i].c_str(), MTA_GTA_KNOWN_FILE_NAME));
         if (FileExists(PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME)))
         {
             strOutResult = pathList[i];
             // Update registry.
             SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
+            WriteDebugEvent(SString("GetGamePath: Found GTA at '%s'", strOutResult.c_str()));
             return GAME_PATH_OK;
         }
     }
+
+    WriteDebugEvent("GetGamePath: No valid GTA path found in registry");
 
     // Try to find?
     if (!bFindIfMissing)
@@ -2155,7 +2164,7 @@ bool IsNativeArm64Host()
         if (kernel32)
         {
             BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
-            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(GetProcAddress(kernel32, "IsWow64Process2"));
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(static_cast<void*>(GetProcAddress(kernel32, "IsWow64Process2")));
 
             if (IsWow64Process2_)
             {

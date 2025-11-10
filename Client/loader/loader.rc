@@ -80,20 +80,20 @@ BEGIN
     LTEXT           "",IDC_PROGRESS_STATIC,23,22,265,8
 END
 
-IDD_CRASHED_DIALOG DIALOGEX 0, 0, 385, 265
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_CRASHED_DIALOG DIALOGEX 0, 0, 500, 480
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "MTA: San Andreas has encountered a problem"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Yes",IDOK,134,244,50,14
-    PUSHBUTTON      "No",IDCANCEL,204,244,50,14
-    CONTROL         " Tick the check box to send this crash info to MTA devs using the 'internet'",IDC_SEND_DUMP_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,174,299,13
-    CTEXT           "Doing so will increase the chance of this crash being fixed.",IDC_SEND_DESC_STATIC,21,189,336,14
-    GROUPBOX        "",IDC_STATIC,15,161,348,51
-    GROUPBOX        "Crash information",IDC_CRASH_HEAD,7,7,371,146,BS_CENTER
-    CTEXT           "Do you want to restart MTA: San Andreas ?",IDC_RESTART_QUESTION_STATIC,24,227,330,10
-    EDITTEXT        IDC_CRASH_INFO_EDIT,39,22,304,118,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
+    DEFPUSHBUTTON   "Yes",IDOK,187,459,50,14
+    PUSHBUTTON      "No",IDCANCEL,270,459,50,14
+    CONTROL         "Tick the check box to send this crash info to MTA devs using the 'internet'",IDC_SEND_DUMP_CHECK,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | BS_CENTER | WS_TABSTOP,18,395,464,13
+    CTEXT           "Doing so will increase the chance of this crash being fixed.",IDC_SEND_DESC_STATIC,18,410,464,14
+    GROUPBOX        "",IDC_STATIC,12,382,476,46
+    GROUPBOX        "Crash information",IDC_CRASH_HEAD,7,7,486,368,BS_CENTER
+    CTEXT           "Do you want to restart MTA: San Andreas ?",IDC_RESTART_QUESTION_STATIC,20,442,460,10
+    EDITTEXT        IDC_CRASH_INFO_EDIT,15,22,470,345,ES_MULTILINE | ES_READONLY | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
 END
 
 IDD_D3DDLL_DIALOG DIALOGEX 0, 0, 373, 236
@@ -172,7 +172,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 378
         TOPMARGIN, 7
-        BOTTOMMARGIN, 258
+        BOTTOMMARGIN, 493
     END
 
     IDD_D3DDLL_DIALOG, DIALOG

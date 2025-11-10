@@ -130,7 +130,7 @@ bool CPickup::ReadSpecialData(const int iLine)
         }
         else if (IsNumericString(szBuffer))
         {            // could be a weapon
-            usBuffer = atoi(szBuffer);
+            usBuffer = static_cast<unsigned short>(atoi(szBuffer));
             if (CPickupManager::IsValidWeaponID(usBuffer))
             {            // its a weapon
                 m_ucType = WEAPON;

@@ -477,22 +477,22 @@ void CPed::SetSyncer(CPlayer* pPlayer)
         {
             case VEHICLEACTION_ENTERING:
             {
-                CVehicle*     pVehicle = GetOccupiedVehicle();
-                unsigned char ucOccupiedSeat = static_cast<unsigned char>(GetOccupiedVehicleSeat());
+                CVehicle*    pVehicle = GetOccupiedVehicle();
+                unsigned int occupiedSeat = GetOccupiedVehicleSeat();
                 // Does it have an occupant and is the occupant us?
-                if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
+                if (pVehicle && (this == pVehicle->GetOccupant(occupiedSeat)))
                 {
                     // Warp us into vehicle
-                    CStaticFunctionDefinitions::WarpPedIntoVehicle(this, pVehicle, ucOccupiedSeat);
+                    CStaticFunctionDefinitions::WarpPedIntoVehicle(this, pVehicle, occupiedSeat);
                 }
             }
 
             case VEHICLEACTION_EXITING:
             {
-                CVehicle*     pVehicle = GetOccupiedVehicle();
-                unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
+                CVehicle*    pVehicle = GetOccupiedVehicle();
+                unsigned int occupiedSeat = GetOccupiedVehicleSeat();
                 // Does it have an occupant and is the occupant us?
-                if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
+                if (pVehicle && (this == pVehicle->GetOccupant(occupiedSeat)))
                 {
                     // Warp us out of vehicle
                     CStaticFunctionDefinitions::RemovePedFromVehicle(this);

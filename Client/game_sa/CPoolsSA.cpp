@@ -14,8 +14,10 @@
 #include "CBmxSA.h"
 #include "CBoatSA.h"
 #include "CBuildingSA.h"
+#include "CColModelSA.h"
 #include "CGameSA.h"
 #include "CHeliSA.h"
+#include "CModelInfoSA.h"
 #include "CMonsterTruckSA.h"
 #include "CPlaneSA.h"
 #include "CPlayerPedSA.h"
@@ -78,6 +80,34 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
 {
     if (m_vehiclePool.ulCount >= MAX_VEHICLES)
         return nullptr;
+
+    // Ensure collision model is fully loaded to prevent crash at 0x002a65ef in SetupSuspensionLines
+    CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(model));
+    if (!pModelInfo || !pModelInfo->GetInterface())
+        return nullptr;
+    
+    CBaseModelInfoSAInterface* pModelInterface = pModelInfo->GetInterface();
+
+    if (!pModelInterface->pColModel)
+    {
+        // Collision model pointer is NULL - try loading
+        pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
+        
+        // Re-check after loading - still NULL means loading failed
+        if (!pModelInterface->pColModel)
+            return nullptr;
+    }
+    
+    // Check if collision data (m_pColData) is loaded
+    if (!pModelInterface->pColModel->m_data)
+    {
+        // Collision data not loaded - force load
+        pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
+        
+        // Re-check after loading - still not loaded means loading failed
+        if (!pModelInterface->pColModel->m_data)
+            return nullptr;
+    }
 
     MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
     MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
@@ -504,7 +534,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
-    _asm {
+    __asm {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
         call    dwFunction
@@ -988,10 +1018,10 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
             break;
     }
     if (iPtr)
-        MemPut<int>(iPtr, iValue);
+        MemPut(iPtr, iValue);
 
     if (cPtr)
-        MemPut<char>(cPtr, iValue);
+        MemPut(cPtr, static_cast<char>(iValue));
 }
 
 int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
@@ -1073,7 +1103,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             mov     ecx, [ecx]
