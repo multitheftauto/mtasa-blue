@@ -75,6 +75,15 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
     return Win32LoadLibraryA(fileName);
 }
 
+template <typename T>
+inline void PatchMemory(std::uintptr_t address, const T& value)
+{
+    DWORD oldProtect;
+    VirtualProtect(reinterpret_cast<void*>(address), sizeof(T), PAGE_EXECUTE_READWRITE, &oldProtect);
+    std::memcpy(reinterpret_cast<void*>(address), value, sizeof(T));
+    VirtualProtect(reinterpret_cast<void*>(address), sizeof(T), oldProtect, &oldProtect);
+}
+
 CCore::CCore()
 {
     // Initialize the global pointer
@@ -836,14 +845,7 @@ void CCore::ApplyHooks()
 {
     WriteDebugEvent("CCore::ApplyHooks");
 
-    constexpr char newDocumentPath[] = "MTA San Andreas User Files";
-    void*          ducumentPathAddress = (void*)0x8747A9;
-    HANDLE         currentProcess = GetCurrentProcess();
-
-    DWORD oldProtect;
-    VirtualProtectEx(currentProcess, ducumentPathAddress, 32, PAGE_EXECUTE_READWRITE, &oldProtect);
-    WriteProcessMemory(currentProcess, ducumentPathAddress, newDocumentPath, sizeof(newDocumentPath), nullptr);
-    VirtualProtectEx(currentProcess, ducumentPathAddress, 32, oldProtect, &oldProtect);
+    PatchMemory(0x8747A9, "MTA San Andreas User Files");
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
