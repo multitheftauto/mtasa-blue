@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-07 03:03+0000\n"
+"POT-Creation-Date: 2025-11-10 10:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -217,7 +217,7 @@ msgstr ""
 #: Client/loader/MainFunctions.cpp:1630
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1667
-#: Client/game_sa/CGameSA.cpp:269
+#: Client/game_sa/CGameSA.cpp:270
 msgid "Information"
 msgstr ""
 
@@ -257,7 +257,7 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1582
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1641
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1717
-#: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
+#: Client/game_sa/CGameSA.cpp:263 Client/game_sa/CGameSA.cpp:274
 #: Client/mods/deathmatch/logic/CClientGame.cpp:656
 #: Client/mods/deathmatch/logic/CClientGame.cpp:724
 #: Client/mods/deathmatch/logic/CClientGame.cpp:748
@@ -2824,11 +2824,11 @@ msgstr ""
 msgid "Are you sure you want to use this screen resolution?"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
+#: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
 msgid "Failed initialization game_sa"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:258
+#: Client/game_sa/CGameSA.cpp:259
 msgid "Memory allocations failed"
 msgstr ""
 
