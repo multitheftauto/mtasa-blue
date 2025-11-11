@@ -16,9 +16,9 @@
 extern CGameSA* pGame;
 
 // Static member initialization
-std::unordered_map<uint32, uint32> CStreamingGC::ms_protectedModels;
-std::mutex                         CStreamingGC::ms_mutex;
-bool                               CStreamingGC::ms_bInitialized = false;
+std::unordered_map<std::uint32_t, std::uint32_t> CStreamingGC::ms_protectedModels;
+std::mutex                                        CStreamingGC::ms_mutex;
+bool                                              CStreamingGC::ms_bInitialized = false;
 
 void CStreamingGC::Initialize()
 {
@@ -66,7 +66,7 @@ void CStreamingGC::Shutdown()
     ms_bInitialized = false;
 }
 
-void CStreamingGC::ProtectModel(uint32 modelId)
+void CStreamingGC::ProtectModel(std::uint32_t modelId)
 {
     if (!ms_bInitialized) [[unlikely]]
         Initialize();
@@ -107,7 +107,7 @@ void CStreamingGC::ProtectModel(uint32 modelId)
     }
 }
 
-bool CStreamingGC::UnprotectModel(uint32 modelId)
+bool CStreamingGC::UnprotectModel(std::uint32_t modelId)
 {
     if (!ms_bInitialized) [[unlikely]]
         return false;
@@ -144,7 +144,7 @@ bool CStreamingGC::UnprotectModel(uint32 modelId)
     return false;
 }
 
-bool CStreamingGC::IsModelProtected(uint32 modelId)
+bool CStreamingGC::IsModelProtected(std::uint32_t modelId)
 {
     if (!ms_bInitialized) [[unlikely]]
         return false;
@@ -157,7 +157,7 @@ bool CStreamingGC::IsModelProtected(uint32 modelId)
     return ms_protectedModels.find(modelId) != ms_protectedModels.end();
 }
 
-size_t CStreamingGC::GetProtectedCount()
+std::size_t CStreamingGC::GetProtectedCount()
 {
     std::lock_guard<std::mutex> lock(ms_mutex);
     return ms_protectedModels.size();
@@ -196,7 +196,7 @@ void CStreamingGC::ClearAllProtections()
 // Returns true if removal should proceed, false to block
 //
 ////////////////////////////////////////////////////////////////
-bool CStreamingGC::OnRemoveModel(uint32 modelId)
+bool CStreamingGC::OnRemoveModel(std::uint32_t modelId)
 {
     // Validate model ID is within valid range
     if (modelId >= MODELINFO_MAX) [[unlikely]]

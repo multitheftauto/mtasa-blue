@@ -437,6 +437,22 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
 
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
             CBaseModelInfo_SetClump(pModelInfoInterface, pNewClone);
+            
+            // Re-fetch interface pointer after SetClump (may relocate/change)
+            pModelInfoInterface = pModelInfo->GetInterface();
+            
+            // Fix for custom DFF without embedded collision:
+            // SetClump clears pColModel when DFF has no collision data, but vehicles need collision from .col pool.
+            // Solution: Remove + Request + Load to restore pool-managed collision from data/vehicles.col
+            if (dwSetClumpFunction == FUNC_LoadVehicleModel && !pModelInfoInterface->pColModel)
+            {
+                pGame->GetStreaming()->RemoveModel(usModelID);
+                pGame->GetStreaming()->RequestModel(usModelID, 0x16);
+                pGame->GetStreaming()->LoadAllRequestedModels(false, "CRenderWareSA::ReplaceVehicleModel");
+                // Re-fetch interface pointer after model reload
+                pModelInfoInterface = pModelInfo->GetInterface();
+            }
+            
             RpClumpDestroy(pOldClump);
         }
     }
@@ -470,69 +486,75 @@ bool CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
     return ReplaceModel(pNew, usModelID, FUNC_LoadPedModel);
 }
 
-// Reads and parses a COL3 file
+// Reads and parses a COL file (versions 1-4: COLL, COL2, COL3, COL4)
 CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 {
-    if (buffer.size() < sizeof(ColModelFileHeader) + 16)
-        return NULL;
+    // Validate minimum buffer size
+    if (buffer.size() < sizeof(ColModelFileHeader) + 16) [[unlikely]]
+        return nullptr;
 
-    const ColModelFileHeader& header = *(ColModelFileHeader*)buffer.data();
+    const auto& header = *reinterpret_cast<const ColModelFileHeader*>(buffer.data());
 
-    // Validate version string is null-terminated
-    bool versionValid = false;
-    for (size_t i = 0; i < sizeof(header.version); ++i)
+    // Validate version field contains valid COL magic number
+    // Version is 4-char fixed string (not null-terminated): "COLL", "COL2", "COL3", "COL4"
+    constexpr std::array<std::array<char, 4>, 4> validVersions = {{
+        {'C', 'O', 'L', 'L'},
+        {'C', 'O', 'L', '2'},
+        {'C', 'O', 'L', '3'},
+        {'C', 'O', 'L', '4'}
+    }};
+    
+    const bool isValidVersion = std::any_of(validVersions.begin(), validVersions.end(),
+        [&header](const auto& valid) { 
+            return std::equal(valid.begin(), valid.end(), header.version);
+        });
+
+    if (!isValidVersion) [[unlikely]]
     {
-        if (header.version[i] == '\0')
-        {
-            versionValid = true;
+        // Explicitly limit to 4 characters
+        AddReportLog(8622, SString("ReadCOL: Invalid version '%c%c%c%c' - expected COLL, COL2, COL3, or COL4",
+            header.version[0], header.version[1], header.version[2], header.version[3]));
+        return nullptr;
+    }
+
+    // Ensure name field is null-terminated to prevent buffer overrun
+    const auto* nameEnd = static_cast<const char*>(std::memchr(header.name, '\0', sizeof(header.name)));
+    if (!nameEnd) [[unlikely]]
+    {
+        AddReportLog(8623, "ReadCOL: Name field not null-terminated, may be truncated");
+        return nullptr;
+    }
+
+    // Buffer is not modified by us, but GTA's functions expect non-const
+    auto* pModelData = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(buffer.data())) + sizeof(ColModelFileHeader);
+
+    // Create a new CColModel
+    auto* pColModel = new CColModelSA();
+
+    // Load appropriate collision version
+    switch (header.version[3])
+    {
+        case 'L':
+            LoadCollisionModel(pModelData, pColModel->GetInterface(), nullptr);
             break;
-        }
-    }
-    if (!versionValid)
-    {
-        AddReportLog(8622, "ReadCOL: Invalid header - version field not null-terminated");
-        return NULL;
-    }
-
-    // Load the col model
-    if (header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L')
-    {
-        // Validate name field is null-terminated to prevent buffer overrun
-        bool nameValid = false;
-        for (size_t i = 0; i < sizeof(header.name); ++i)
-        {
-            if (header.name[i] == '\0')
-            {
-                nameValid = true;
-                break;
-            }
-        }
-        if (!nameValid)
-            AddReportLog(8623, "ReadCOL: Name field not null-terminated, may be truncated");
-
-        unsigned char* pModelData = (unsigned char*)buffer.data() + sizeof(ColModelFileHeader);
-
-        // Create a new CColModel
-        CColModelSA* pColModel = new CColModelSA();
-
-        if (header.version[3] == 'L')
-        {
-            LoadCollisionModel(pModelData, pColModel->GetInterface(), NULL);
-        }
-        else if (header.version[3] == '2')
-        {
-            LoadCollisionModelVer2(pModelData, header.size - 0x18, pColModel->GetInterface(), NULL);
-        }
-        else if (header.version[3] == '3')
-        {
-            LoadCollisionModelVer3(pModelData, header.size - 0x18, pColModel->GetInterface(), NULL);
-        }
-
-        // Return the collision model
-        return pColModel;
+        case '2':
+            LoadCollisionModelVer2(pModelData, header.size - 0x18, pColModel->GetInterface(), nullptr);
+            break;
+        case '3':
+            LoadCollisionModelVer3(pModelData, header.size - 0x18, pColModel->GetInterface(), nullptr);
+            break;
+        case '4':
+            // COL4 format has same structure as COL3 with one extra uint32 field in header
+            // Must use Ver4 loader for correct offset calculations
+            LoadCollisionModelVer4(pModelData, header.size - 0x18, pColModel->GetInterface(), nullptr);
+            break;
+        default:
+            // Should never reach here due to validation above
+            delete pColModel;
+            return nullptr;
     }
 
-    return NULL;
+    return pColModel;
 }
 
 // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
