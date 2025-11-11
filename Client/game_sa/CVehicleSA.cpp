@@ -1784,20 +1784,20 @@ void* CVehicleSA::GetPrivateSuspensionLines()
 void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    if (!pModelInfo) [[unlikely]]
+    if (!pModelInfo)
         return;
 
     // Protect collision model from streaming GC
     CColModelGuard guard(static_cast<CModelInfoSA*>(pModelInfo));
-    if (!guard.IsValid()) [[unlikely]]
+    if (!guard.IsValid())
         return;
 
     CColDataSA* pColData = guard.GetColData();
-    if (!pColData || !pColData->m_suspensionLines) [[unlikely]]
+    if (!pColData || !pColData->m_suspensionLines)
         return;
 
     void* pPrivateLines = GetPrivateSuspensionLines();
-    if (!pPrivateLines) [[unlikely]]
+    if (!pPrivateLines)
         return;
 
     // Determine copy size based on vehicle type
@@ -1828,13 +1828,13 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
-    if (!pHandlingEntry) [[unlikely]]
+    if (!pHandlingEntry)
         return;
 
     const std::uint32_t dwModel = GetModelIndex();
 
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
-    if (!pModelInfo) [[unlikely]]
+    if (!pModelInfo)
         return;
 
     // Only for vehicles with suspension lines
@@ -1848,11 +1848,11 @@ void CVehicleSA::RecalculateSuspensionLines()
 
     // Protect collision model before accessing suspension data
     CColModelGuard guard(static_cast<CModelInfoSA*>(pModelInfo));
-    if (!guard.IsValid()) [[unlikely]]
+    if (!guard.IsValid())
         return;
 
     CVehicleSAInterface* pVehicleInterface = GetVehicleInterface();
-    if (!pVehicleInterface) [[unlikely]]
+    if (!pVehicleInterface)
         return;
 
     // Safe to call now - collision is protected by guard
