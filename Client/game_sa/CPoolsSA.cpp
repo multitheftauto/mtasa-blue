@@ -88,26 +88,22 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     
     CBaseModelInfoSAInterface* pModelInterface = pModelInfo->GetInterface();
 
+    // Ensure collision model pointer exists
     if (!pModelInterface->pColModel)
     {
         // Collision model pointer is NULL - try loading
         pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
         
-        // Re-check after loading - still NULL means loading failed
+        // Re-fetch interface as loading may have invalidated pointer
+        pModelInterface = pModelInfo->GetInterface();
+        
+        // Still NULL means model has no collision (or loading failed) - block creation
         if (!pModelInterface->pColModel)
             return nullptr;
     }
-    
-    // Check if collision data (m_pColData) is loaded
-    if (!pModelInterface->pColModel->m_data)
-    {
-        // Collision data not loaded - force load
-        pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
-        
-        // Re-check after loading - still not loaded means loading failed
-        if (!pModelInterface->pColModel->m_data)
-            return nullptr;
-    }
+
+    // Note: Vehicles with custom DFFs (no embedded collision) are handled in CModelInfoSA::SetCustomModel
+    // where collision is reloaded after SetClump to restore pool-managed collision data
 
     MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
     MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);

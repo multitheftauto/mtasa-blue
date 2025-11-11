@@ -1540,6 +1540,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::VEHICLE:
+            // ReplaceVehicleModele handles collision preservation internally
             success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::ATOMIC:
@@ -1562,9 +1563,8 @@ void CModelInfoSA::RestoreOriginalModel()
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
-
     // Reset the stored custom vehicle clump
-    m_pCustomClump = NULL;
+    m_pCustomClump = nullptr;
 }
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)
