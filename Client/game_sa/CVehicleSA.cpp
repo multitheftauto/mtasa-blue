@@ -1470,8 +1470,26 @@ bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 
 int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
 {
-    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    return vehicle->m_wheelFrictionState[eWheelPosition];
+    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    {
+        case VehicleClass::BIKE:
+        {
+            auto* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
+            if (!bikeInterface)
+                return false;
+
+            return bikeInterface->m_aiWheelState[eWheelPosition];
+        }
+        default:
+        {
+            auto* vehicleInterface = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+            if (!vehicleInterface)
+                return false;
+
+            return vehicleInterface->m_wheelFrictionState[eWheelPosition];
+        }
+    }
+    return false;
 }
 
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)
