@@ -4218,6 +4218,7 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
             return pVehicle->GetWheelFrictionState(wheel);
         }
         case CLIENTVEHICLE_BIKE:
+        case CLIENTVEHICLE_BMX:
         {
             if (wheel < 0 || wheel > 1)
                 throw std::invalid_argument("Invalid wheel number");

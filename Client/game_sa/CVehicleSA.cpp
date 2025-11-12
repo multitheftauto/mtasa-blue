@@ -1473,6 +1473,7 @@ int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
     switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::BIKE:
+        case VehicleClass::BMX:
         {
             auto* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
             if (!bikeInterface)
