@@ -940,6 +940,13 @@ void ValidateGTAPath()
     }
 }
 
+//////////////////////////////////////////////////////////
+//
+// isUsingWine
+//
+// Detect if we are running under Wine
+// 
+//////////////////////////////////////////////////////////
 int isUsingWine()
 {
     HMODULE ntdll = GetModuleHandleA("ntdll.dll");
