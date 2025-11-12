@@ -21,6 +21,8 @@
 #include <iterator>
 #include <optional>
 #include <locale.h>
+#include <windows.h>
+#include <stdio.h>
 
 // Function must be at the start to fix odd compile error (Didn't happen locally but does in build server)
 namespace
@@ -938,6 +940,22 @@ void ValidateGTAPath()
     }
 }
 
+int isUsingWine()
+{
+    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+    if (!ntdll)
+        return 0;            // Not ntdll? Not Wine.
+
+    // Check for Wine-specific function
+    FARPROC wineVersion = GetProcAddress(ntdll, "wine_get_version");
+    if (wineVersion)
+    {
+        return 1;            // Is Wine.
+    }
+
+    return 0;            // Not Wine.
+}
+
 //////////////////////////////////////////////////////////
 //
 // CheckAntiVirusStatus
@@ -947,6 +965,12 @@ void ValidateGTAPath()
 //////////////////////////////////////////////////////////
 void CheckAntiVirusStatus()
 {
+    if (isUsingWine())
+    {
+        WriteDebugEvent("Skipping AV check under Wine");
+        return;
+    }
+
     std::vector<SString> enabledList, disabledList;
     GetWMIAntiVirusStatus(enabledList, disabledList);
 
