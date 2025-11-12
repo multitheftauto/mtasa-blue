@@ -648,20 +648,14 @@ void HideCrashedDialog()
 {
     if (hwndCrashedDialog)
     {
-        try {
-            if (IsWindow(hwndCrashedDialog))
-                DestroyWindow(hwndCrashedDialog);
-        }
-        catch (...) {
-        }
-        (void)std::exchange(hwndCrashedDialog, nullptr);
+        const HWND crashedDialog = hwndCrashedDialog;
+        hwndCrashedDialog = nullptr;
+
+        if (crashedDialog && IsWindow(crashedDialog))
+            DestroyWindow(crashedDialog);
     }
-    
-    try {
-        ResumeSplash();
-    }
-    catch (...) {
-    }
+
+    ResumeSplash();
 }
 
 void ShowOOMMessageBox([[maybe_unused]] HINSTANCE hInstance)

@@ -18,6 +18,15 @@ CAjaxResourceHandler::CAjaxResourceHandler(std::vector<SString>& vecGet, std::ve
 {
 }
 
+CAjaxResourceHandler::~CAjaxResourceHandler()
+{
+    // Ensure callback is released if handler is destroyed before completion
+    if (m_callback)
+    {
+        m_callback = nullptr;
+    }
+}
+
 std::vector<SString>& CAjaxResourceHandler::GetGetData()
 {
     return m_vecGetData;
@@ -34,12 +43,18 @@ void CAjaxResourceHandler::SetResponse(const SString& data)
     m_bHasData = true;
 
     if (m_callback)
+    {
         m_callback->Continue();
+        // Release callback to prevent memory leak
+        m_callback = nullptr;
+    }
 }
 
 // CefResourceHandler implementation
 void CAjaxResourceHandler::Cancel()
 {
+    // Release callback reference on cancellation to prevent memory leak
+    m_callback = nullptr;
 }
 
 void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl)
@@ -69,13 +84,16 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
     }
 
     // Are we done?
-    if (m_strResponse.length() - m_DataOffset <= 0)
+    if (m_strResponse.length() - m_DataOffset <= 0) [[unlikely]]
         return false;
 
-    int copyBytes = std::min((uint)bytes_to_read, m_strResponse.length() - m_DataOffset);
+    if (bytes_to_read <= 0) [[unlikely]]
+        return false;
+
+    const size_t copyBytes = std::min(static_cast<size_t>(bytes_to_read), m_strResponse.length() - m_DataOffset);
 
     memcpy(data_out, m_strResponse.c_str() + m_DataOffset, copyBytes);
-    bytes_read = copyBytes;
+    bytes_read = static_cast<int>(copyBytes);
 
     m_DataOffset += copyBytes;
 

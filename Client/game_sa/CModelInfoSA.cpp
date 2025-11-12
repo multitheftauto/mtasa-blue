@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <chrono>
 #include <core/CCoreInterface.h>
 #include "CColModelSA.h"
 #include "CColStoreSA.h"
@@ -741,6 +742,25 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
         mov     dwReturn, eax
     }
     return dwReturn;
+}
+
+bool CModelInfoSA::IsCollisionLoaded() const noexcept
+{
+    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    return pInterface && pInterface->pColModel != nullptr;
+}
+
+bool CModelInfoSA::IsRwObjectLoaded() const noexcept
+{
+    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    return pInterface && pInterface->pRwObject != nullptr;
+}
+
+void CModelInfoSA::WaitForModelFullyLoaded(std::chrono::milliseconds timeout)
+{
+    // Implementation placeholder - would need streaming system integration
+    // For now, just ensure the model is requested
+    pGame->GetStreaming()->RequestModel(m_dwModelID, BLOCKING);
 }
 
 bool CModelInfoSA::IsValid()
@@ -1520,6 +1540,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::VEHICLE:
+            // ReplaceVehicleModele handles collision preservation internally
             success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::ATOMIC:
@@ -1542,9 +1563,8 @@ void CModelInfoSA::RestoreOriginalModel()
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
-
     // Reset the stored custom vehicle clump
-    m_pCustomClump = NULL;
+    m_pCustomClump = nullptr;
 }
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)

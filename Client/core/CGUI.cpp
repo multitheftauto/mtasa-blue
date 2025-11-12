@@ -134,6 +134,10 @@ void CLocalGUI::ChangeLocale(const char* szName)
 
     m_LastLocaleName = strCanonicalLocale;
 
+    // Attempt CEGUI cleanup
+    if (CGUI* pGUI = CCore::GetSingleton().GetGUI())
+        pGUI->Cleanup();
+
     if (guiWasLoaded)
     {
         CreateWindows(guiWasLoaded);

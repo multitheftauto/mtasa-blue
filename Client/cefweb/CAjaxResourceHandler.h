@@ -20,6 +20,7 @@ class CAjaxResourceHandler : public CefResourceHandler, public CAjaxResourceHand
 {
 public:
     CAjaxResourceHandler(std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& mimeType);
+    virtual ~CAjaxResourceHandler();
 
     virtual std::vector<SString>& GetGetData() override;
     virtual std::vector<SString>& GetPostData() override;

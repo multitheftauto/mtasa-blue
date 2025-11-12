@@ -41,10 +41,7 @@ CLocalization::CLocalization(const SString& strLocale, const SString& strLocaleP
 
 CLocalization::~CLocalization()
 {
-    for (auto iter : m_LanguageMap)
-    {
-        delete iter.second;
-    }
+    m_pCurrentLang = nullptr;
 }
 
 //
@@ -99,29 +96,32 @@ void CLocalization::SetCurrentLanguage(SString strLocale)
 CLanguage* CLocalization::GetLanguage(SString strLocale)
 {
     strLocale = ValidateLocale(strLocale);
-    CLanguage* pLanguage = MapFindRef(m_LanguageMap, strLocale);
-    if (!pLanguage)
+    auto iter = m_LanguageMap.find(strLocale);
+    if (iter != m_LanguageMap.end())
     {
-        Language Lang = Language::from_name(strLocale);
-        Lang = Lang ? Lang : Language::from_name("en_US");
-
-        try
-        {
-            pLanguage = new CLanguage(m_DictManager.get_dictionary(Lang, MTA_LOCALE_TEXTDOMAIN), Lang.str(), Lang.get_name());
-            MapSet(m_LanguageMap, strLocale, pLanguage);
-        }
-        catch (const std::exception& ex)
-        {
-            WriteDebugEvent(SString("Localization failed to load dictionary for '%s': %s", strLocale.c_str(), ex.what()));
-            return (strLocale != "en_US") ? GetLanguage("en_US") : nullptr;
-        }
-        catch (...)
-        {
-            WriteDebugEvent(SString("Localization failed to load dictionary for '%s': unknown error", strLocale.c_str()));
-            return (strLocale != "en_US") ? GetLanguage("en_US") : nullptr;
-        }
+        return iter->second.get();
     }
-    return pLanguage;
+
+    Language Lang = Language::from_name(strLocale);
+    Lang = Lang ? Lang : Language::from_name("en_US");
+
+    try
+    {
+        std::unique_ptr<CLanguage> pLanguage = std::make_unique<CLanguage>(m_DictManager.get_dictionary(Lang, MTA_LOCALE_TEXTDOMAIN), Lang.str(), Lang.get_name());
+        CLanguage* pLanguagePtr = pLanguage.get();
+        m_LanguageMap.emplace(strLocale, std::move(pLanguage));
+        return pLanguagePtr;
+    }
+    catch (const std::exception& ex)
+    {
+        WriteDebugEvent(SString("Localization failed to load dictionary for '%s': %s", strLocale.c_str(), ex.what()));
+        return (strLocale != "en_US") ? GetLanguage("en_US") : nullptr;
+    }
+    catch (...)
+    {
+        WriteDebugEvent(SString("Localization failed to load dictionary for '%s': unknown error", strLocale.c_str()));
+        return (strLocale != "en_US") ? GetLanguage("en_US") : nullptr;
+    }
 }
 
 //
