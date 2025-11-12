@@ -11,13 +11,27 @@
 #pragma once
 
 #ifdef WIN32
-#include <vector>
-#include "SString.h"
-#include <windows.h>
-#include "WinVer.h"
+    #include <vector>
+    #include "SString.h"
+    #include <windows.h>
+    #include "WinVer.h"
 
 namespace SharedUtil
 {
+    struct WMIProcessorInfo
+    {
+        std::uint32_t    MaxClockSpeed{0};
+        std::string      Name{};
+        std::uint32_t    NumberOfCores{0};
+        std::uint32_t    NumberOfLogicalProcessors{0};
+    };
+
+    struct WMISystemInfo
+    {
+        WMIProcessorInfo CPU{};
+        std::uint64_t    TotalPhysicalMemory{0};            // In KiB
+    };
+
     struct SQueryWMIResult : public std::vector<std::vector<SString> >
     {
     };
@@ -36,15 +50,16 @@ namespace SharedUtil
         SString strProductName;
     };
 
-    bool         QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace = "CIMV2");
-    SString      GetWMIOSVersion();
-    unsigned int GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev);
-    long long    GetWMITotalPhysicalMemory();
-    void         GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std::vector<SString>& outDisabledList);
-    void         GetInstalledHotFixList(std::vector<SString>& outInstalledList);
-    bool         IsHotFixInstalled(const SString& strHotFixId);
-    bool         GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo);
-    bool         Is64BitOS();
+    bool          QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace = "CIMV2");
+    SString       GetWMIOSVersion();
+    unsigned int  GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev);
+    long long     GetWMITotalPhysicalMemory();
+    void          GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std::vector<SString>& outDisabledList);
+    void          GetInstalledHotFixList(std::vector<SString>& outInstalledList);
+    bool          IsHotFixInstalled(const SString& strHotFixId);
+    bool          GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo);
+    bool          Is64BitOS();
+    WMISystemInfo GetWMISystemInfo();
 }            // namespace SharedUtil
 
 #endif
