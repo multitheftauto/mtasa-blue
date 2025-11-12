@@ -259,8 +259,17 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPre
     // Make sure GTA is not running
     HandleIfGTAIsAlreadyRunning();
 
-    // Maybe warn user if no anti-virus running
-    CheckAntiVirusStatus();
+    // Maybe warn user if no anti-virus running (skip under Wine)
+    HKEY hKey = nullptr;
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, "Software\\Wine", 0, KEY_READ, &hKey) != ERROR_SUCCESS &&
+        RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software\\Wine", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+    {
+        CheckAntiVirusStatus();
+    }
+    else
+    {
+        RegCloseKey(hKey);
+    }
 
     // Ensure logo is showing
     ShowSplash(hInstanceToUse);
