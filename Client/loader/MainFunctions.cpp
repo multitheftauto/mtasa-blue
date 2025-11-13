@@ -22,7 +22,6 @@
 #include <optional>
 #include <locale.h>
 #include <windows.h>
-#include <stdio.h>
 
 // Function must be at the start to fix odd compile error (Didn't happen locally but does in build server)
 namespace
