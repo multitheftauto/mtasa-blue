@@ -946,20 +946,14 @@ void ValidateGTAPath()
 // Detect if we are running under Wine
 // 
 //////////////////////////////////////////////////////////
-int isUsingWine()
+bool isUsingWine()
 {
     HMODULE ntdll = GetModuleHandleA("ntdll.dll");
     if (!ntdll)
-        return 0;            // Not ntdll? Not Wine.
+        return false;
 
-    // Check for Wine-specific function
     FARPROC wineVersion = GetProcAddress(ntdll, "wine_get_version");
-    if (wineVersion)
-    {
-        return 1;            // Is Wine.
-    }
-
-    return 0;            // Not Wine.
+    return wineVersion != nullptr;
 }
 
 //////////////////////////////////////////////////////////
