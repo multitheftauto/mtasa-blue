@@ -124,6 +124,11 @@ bool CVehicleModelInfoSAInterface::IsComponentDamageable(int componentIndex) con
     return pVisualInfo->m_maskComponentDamagable & (1 << componentIndex);
 }
 
+void CVehicleModelInfoSAInterface::SetVehicleDirtLevelFixEnabled(bool enabled) noexcept
+{
+    fixVehicleDirtLevel = enabled;
+}
+
 static void CVehicleModelInfo__SetClump()
 {
     _asm
@@ -140,9 +145,4 @@ void CVehicleModelInfoSAInterface::StaticSetHooks()
 {
     HookInstall(0x4C95C0, CVehicleModelInfo__SetClump);
     HookInstallCall(0x6D0E7E, (DWORD)CVehicleModelInfoSAInterface::SetDirtTextures);
-}
-
-void CVehicleModelInfoSAInterface::SetVehicleDirtLevelFixEnabled(bool enabled) noexcept
-{
-    fixVehicleDirtLevel = enabled;
 }
