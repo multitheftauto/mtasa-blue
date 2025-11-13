@@ -128,6 +128,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleSirenParams", GetVehicleSirenParams},
         {"setVehiclePlateText", SetVehiclePlateText},
         {"setVehicleNitroActivated", ArgumentParser<SetVehicleNitroActivated>},
+        {"setVehicleSmokeTrailEnabled", ArgumentParser<SetVehicleSmokeTrailEnabled>},
     };
 
     // Add functions
@@ -3058,5 +3059,14 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
     BitStream.pBitStream->WriteBit(state);
 
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
+    return true;
+}
+
+bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state) noexcept
+{
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(state);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_SMOKE_TRAIL_ENABLED, *BitStream.pBitStream));
     return true;
 }

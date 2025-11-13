@@ -54,6 +54,7 @@ void CVehicleRPCs::LoadFunctions()
     AddHandler(SET_VEHICLE_PLATE_TEXT, SetVehiclePlateText, "setVehiclePlateText");
     AddHandler(SPAWN_VEHICLE_FLYING_COMPONENT, SpawnVehicleFlyingComponent, "spawnVehicleFlyingComponent");
     AddHandler(SET_VEHICLE_NITRO_ACTIVATED, SetVehicleNitroActivated, "SetVehicleNitroActivated");
+    AddHandler(SET_VEHICLE_SMOKE_TRAIL_ENABLED, SetVehicleSmokeTrailEnabled, "SetVehicleSmokeTrailEnabled");
 }
 
 void CVehicleRPCs::DestroyAllVehicles(NetBitStreamInterface& bitStream)
@@ -693,3 +694,16 @@ void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBit
         vehicle->SetNitroLevel(vehicle->GetNitroLevel() + 1.0001f);
 }
 
+void CVehicleRPCs::SetVehicleSmokeTrailEnabled(CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream)
+{
+    bool state = bitStream.ReadBit();
+    CClientVehicle* vehicle = m_pVehicleManager->Get(pSourceEntity->GetID());
+    if (!vehicle)
+        return;
+
+    std::uint16_t model = vehicle->GetModel();
+    if (model != 512 && model != 513)
+        return;
+
+    vehicle->SetSmokeTrailEnabled(state);
+}
