@@ -3065,7 +3065,7 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
     return true;
 }
 
-bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state) noexcept
+bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state)
 {
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit(state);
