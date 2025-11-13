@@ -4211,7 +4211,7 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
     auto vehicleType = pVehicle->GetVehicleType();
 
     if (vehicleType == CLIENTVEHICLE_CAR || vehicleType == CLIENTVEHICLE_MONSTERTRUCK || vehicleType == CLIENTVEHICLE_QUADBIKE ||
-        vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX)
+        vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX || vehicleType == CLIENTVEHICLE_TRAILER)
     {
         return pVehicle->GetWheelFrictionState(wheel);
     }
