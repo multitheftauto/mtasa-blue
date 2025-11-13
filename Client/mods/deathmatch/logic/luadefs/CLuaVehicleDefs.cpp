@@ -4205,23 +4205,20 @@ bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, con
 
 int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel)
 {
-    eClientVehicleType vehicleType = pVehicle->GetVehicleType();
+    if (wheel >= MAX_WHEELS)
+        throw std::invalid_argument("Invalid wheel number");
 
-    switch (vehicleType)
+    switch (pVehicle->GetVehicleType())
     {
         case CLIENTVEHICLE_CAR:
         case CLIENTVEHICLE_MONSTERTRUCK:
         case CLIENTVEHICLE_QUADBIKE:
         {
-            if (wheel < 0 || wheel > 3)
-                throw std::invalid_argument("Invalid wheel number");
             return pVehicle->GetWheelFrictionState(wheel);
         }
         case CLIENTVEHICLE_BIKE:
         case CLIENTVEHICLE_BMX:
         {
-            if (wheel < 0 || wheel > 1)
-                throw std::invalid_argument("Invalid wheel number");
             return pVehicle->GetWheelFrictionState(wheel);
         }
         default:

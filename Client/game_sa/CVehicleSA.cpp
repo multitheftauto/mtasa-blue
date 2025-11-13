@@ -1476,21 +1476,14 @@ int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
         case VehicleClass::BMX:
         {
             auto* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
-            if (!bikeInterface)
-                return false;
-
             return bikeInterface->m_aiWheelState[eWheelPosition];
         }
         default:
         {
             auto* vehicleInterface = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
-            if (!vehicleInterface)
-                return false;
-
             return vehicleInterface->m_wheelFrictionState[eWheelPosition];
         }
     }
-    return false;
 }
 
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)
