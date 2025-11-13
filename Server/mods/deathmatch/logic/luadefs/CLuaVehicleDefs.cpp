@@ -290,6 +290,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "sirens", NULL, "getVehicleSirens");
     lua_classvariable(luaVM, "handling", nullptr, "getVehicleHandling");
     lua_classvariable(luaVM, "occupant", NULL, "getVehicleOccupant");
+    lua_classvariable(luaVM, "smokeTrailEnabled", "setVehicleSmokeTrailEnabled", "isVehicleSmokeTrailEnabled");
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
