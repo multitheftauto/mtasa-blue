@@ -26,6 +26,7 @@ void StopPseudoProgress();
 
 SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage);
 void    HideCrashedDialog();
+void    ShowOOMMessageBox(HINSTANCE hInstance);
 
 struct GraphicsLibrary
 {

@@ -94,6 +94,7 @@ private:
     LPD3DXCONSTANTTABLE m_constantTable = nullptr;
     D3DXHANDLE          m_toneParamsHandle = nullptr;
     IDirect3DStateBlock9* m_restoreStateBlock = nullptr;
+    IDirect3DStateBlock9* m_applyStateBlock = nullptr;
     UINT                m_width = 0;
     UINT                m_height = 0;
     D3DFORMAT           m_format = D3DFMT_UNKNOWN;
@@ -216,14 +217,59 @@ bool BorderlessToneMapPass::EnsureStateBlock(IDirect3DDevice9* device)
     if (!device)
         return false;
 
-    if (m_restoreStateBlock)
+    if (m_restoreStateBlock && m_applyStateBlock)
         return true;
 
-    IDirect3DStateBlock9* stateBlock = nullptr;
-    if (FAILED(device->CreateStateBlock(D3DSBT_ALL, &stateBlock)) || !stateBlock)
-        return false;
+    // Create restore state block (captures current state for restoration)
+    if (!m_restoreStateBlock)
+    {
+        IDirect3DStateBlock9* restoreBlock = nullptr;
+        if (FAILED(device->CreateStateBlock(D3DSBT_ALL, &restoreBlock)) || !restoreBlock)
+            return false;
 
-    m_restoreStateBlock = stateBlock;
+        if (FAILED(restoreBlock->Capture()))
+        {
+            restoreBlock->Release();
+            return false;
+        }
+        m_restoreStateBlock = restoreBlock;
+    }
+
+    // Create apply state block (captures our desired rendering state)
+    if (!m_applyStateBlock)
+    {
+        device->BeginStateBlock();
+        
+        // Configure all render states for tone mapping pass
+        device->SetRenderState(D3DRS_ZENABLE, FALSE);
+        device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+        device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+        device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+        device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+        device->SetRenderState(D3DRS_FOGENABLE, FALSE);
+        device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+        device->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
+        
+        device->SetPixelShader(m_pixelShader);
+        device->SetVertexShader(nullptr);
+        device->SetFVF(SToneMapVertex::FVF);
+        
+        device->SetTexture(0, m_sourceTexture);
+        device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+        device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+        device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+        device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+        device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+        device->SetSamplerState(0, D3DSAMP_SRGBTEXTURE, FALSE);
+        
+        IDirect3DStateBlock9* applyBlock = nullptr;
+        if (FAILED(device->EndStateBlock(&applyBlock)) || !applyBlock)
+        {
+            return false;
+        }
+        m_applyStateBlock = applyBlock;
+    }
+
     return true;
 }
 
@@ -296,28 +342,8 @@ bool BorderlessToneMapPass::Apply(IDirect3DDevice9* device, float gammaPower, fl
         return false;
     }
 
-    m_restoreStateBlock->Capture();
-
-    device->SetRenderState(D3DRS_ZENABLE, FALSE);
-    device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-    device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-    device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-    device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-    device->SetRenderState(D3DRS_FOGENABLE, FALSE);
-    device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-    device->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
-
-    device->SetPixelShader(m_pixelShader);
-    device->SetVertexShader(nullptr);
-    device->SetFVF(SToneMapVertex::FVF);
-
-    device->SetTexture(0, m_sourceTexture);
-    device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-    device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-    device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-    device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-    device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-    device->SetSamplerState(0, D3DSAMP_SRGBTEXTURE, FALSE);
+    // Apply all rendering state in one call using cached state block
+    m_applyStateBlock->Apply();
 
     if (m_constantTable && m_toneParamsHandle)
     {
@@ -325,12 +351,13 @@ bool BorderlessToneMapPass::Apply(IDirect3DDevice9* device, float gammaPower, fl
         m_constantTable->SetFloatArray(device, m_toneParamsHandle, toneParams, NUMELMS(toneParams));
     }
 
+    // Pre-compute vertices to avoid per-frame allocation
     const float left = -0.5f;
     const float top = -0.5f;
     const float right = static_cast<float>(m_width) - 0.5f;
     const float bottom = static_cast<float>(m_height) - 0.5f;
 
-    const SToneMapVertex vertices[] = {
+    const SToneMapVertex vertices[6] = {
         {left, top, 0.0f, 1.0f, 0.0f, 0.0f},
         {right, top, 0.0f, 1.0f, 1.0f, 0.0f},
         {left, bottom, 0.0f, 1.0f, 0.0f, 1.0f},
@@ -339,7 +366,7 @@ bool BorderlessToneMapPass::Apply(IDirect3DDevice9* device, float gammaPower, fl
         {left, bottom, 0.0f, 1.0f, 0.0f, 1.0f},
     };
 
-    device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, NUMELMS(vertices) / 3, vertices, sizeof(SToneMapVertex));
+    device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, vertices, sizeof(SToneMapVertex));
 
     device->SetPixelShader(nullptr);
     device->SetTexture(0, nullptr);
@@ -357,6 +384,9 @@ void BorderlessToneMapPass::ReleaseTexture()
     m_width = 0;
     m_height = 0;
     m_format = D3DFMT_UNKNOWN;
+    
+    // Invalidate apply state block since it captured the old texture pointer
+    SAFE_RELEASE(m_applyStateBlock);
 }
 
 void BorderlessToneMapPass::ReleaseShader()
@@ -365,11 +395,15 @@ void BorderlessToneMapPass::ReleaseShader()
     SAFE_RELEASE(m_constantTable);
     m_toneParamsHandle = nullptr;
     m_shaderFailed = false;
+    
+    // Invalidate apply state block since it captured the shader pointer
+    SAFE_RELEASE(m_applyStateBlock);
 }
 
 void BorderlessToneMapPass::ReleaseStateBlock()
 {
     SAFE_RELEASE(m_restoreStateBlock);
+    SAFE_RELEASE(m_applyStateBlock);
 }
 
 void BorderlessToneMapPass::Release()
@@ -1170,8 +1204,19 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
     if (!pShaderItem)
         return;
 
+    if (!SharedUtil::IsReadablePointer(pShaderItem, sizeof(void*)))
+        return;
+
     SResolvedShaderState shaderState;
     bool                 bHasShaderState = TryResolveShaderState(pShaderItem, shaderState);
+    
+    if (bHasShaderState)
+    {
+        if (shaderState.pInstance && !SharedUtil::IsReadablePointer(shaderState.pInstance, sizeof(void*)))
+            bHasShaderState = false;
+        if (bHasShaderState && shaderState.pEffectWrap && !SharedUtil::IsReadablePointer(shaderState.pEffectWrap, sizeof(void*)))
+            bHasShaderState = false;
+    }
 
     ID3DXEffect* pD3DEffect = bHasShaderState ? shaderState.pEffect : nullptr;
     IDirect3DDevice9* pDevice = g_pGraphics ? g_pGraphics->GetDevice() : nullptr;

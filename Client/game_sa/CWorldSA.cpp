@@ -550,7 +550,7 @@ CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float rad
     {
         result.entityPosition = entity->m_transform.m_translate;
         result.entityRotation.fX = result.entityRotation.fY = 0.0f;
-        result.entityRotation.fZ = entity->m_transform.m_heading * (180.0f/std::numbers::pi);
+        result.entityRotation.fZ = entity->m_transform.m_heading * (180.0f / std::numbers::pi_v<float>);
     }
     result.entityRotation = -result.entityRotation;
     result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;

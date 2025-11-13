@@ -10,85 +10,36 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProxyComHelpers.h"
 #include "ComPtrValidation.h"
 #include <dwmapi.h>
+#include <mutex>
+#include <atomic>
 #include <resource.h>
 
 extern HINSTANCE g_hModule;
 
 namespace
 {
-template <typename T>
-void ReleaseInterface(T*& pointer, const char* context = nullptr)
-{
-    if (!pointer)
-        return;
-
-    T* heldPointer = pointer;
-
-    const bool valid = IsValidComInterfacePointer(pointer, ComPtrValidation::ValidationMode::ForceRefresh);
-
-    if (valid)
-    {
-        heldPointer->Release();
-    }
-    else
-    {
-        SString label;
-        label = context ? context : "ReleaseInterface";
-        SString message;
-        message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), heldPointer);
-        AddReportLog(8752, message, 5);
-        ComPtrValidation::Invalidate(heldPointer);
-    }
-
-    pointer = nullptr;
-}
-
-template <typename T>
-void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
-{
-    if (destination == source)
-        return;
-
-    if (source && !IsValidComInterfacePointer(source, ComPtrValidation::ValidationMode::ForceRefresh))
-    {
-        SString label;
-        label = context ? context : "ReplaceInterface";
-        SString message;
-        message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
-        AddReportLog(8753, message, 5);
-        return;
-    }
-
-    ReleaseInterface(destination, context);
-    destination = source;
-    if (destination)
-        destination->AddRef();
-}
+// Cached static Direct3D pointer for lockless fast-path access
+std::atomic<IDirect3D9*> g_cachedStaticDirect3D{nullptr};
+std::atomic<bool>        g_cachedDirect3DValid{false};
+// Cached adapter monitor for lockless fast-path access
+std::atomic<HMONITOR>    g_cachedAdapterMonitor{nullptr};
+std::atomic<bool>        g_cachedAdapterMonitorValid{false};
 
 IDirect3D9* GetFirstValidTrackedDirect3D(std::vector<IDirect3D9*>& trackedList)
 {
-    for (auto iter = trackedList.begin(); iter != trackedList.end();)
-    {
-        IDirect3D9* candidate = *iter;
-        if (candidate && IsValidComInterfacePointer(candidate, ComPtrValidation::ValidationMode::ForceRefresh))
-            return candidate;
-
-        SString message;
-        message.Format("CProxyDirect3D9: removing invalid tracked IDirect3D9 pointer %p", candidate);
-        AddReportLog(8756, message, 5);
-        ComPtrValidation::Invalidate(candidate);
-        iter = trackedList.erase(iter);
-    }
-
-    return nullptr;
+    // Return first element without expensive COM validation (called frequently)
+    return trackedList.empty() ? nullptr : trackedList.front();
 }
 }  // unnamed namespace
 
 HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
+
 std::vector<IDirect3D9*> ms_CreatedDirect3D9List;
+std::mutex               ms_Direct3D9ListMutex;
 bool CreateDeviceSecondCallCheck(HRESULT& hOutResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
 void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters);
@@ -99,24 +50,28 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 {
     WriteDebugEvent(SString("CProxyDirect3D9::CProxyDirect3D9 %08x", this));
 
-    if (!IsValidComInterfacePointer(pInterface, ComPtrValidation::ValidationMode::ForceRefresh))
+    if (!IsValidComInterfacePointer(pInterface, ComPtrValidation::ValidationMode::Default))
     {
         SString message;
-        message.Format("CProxyDirect3D9 ctor: received invalid IDirect3D9 pointer %p", pInterface);
+        message.Format("CProxyDirect3D9 ctor: received invalid IDirect3D9 pointer %p, proxy will be non-functional", pInterface);
         AddReportLog(8753, message, 5);
-        m_pDevice = pInterface;
-    }
-    else
-    {
-        ReplaceInterface(m_pDevice, pInterface, "CProxyDirect3D9 ctor");
-        pInterface->Release();
+        // Leave m_pDevice as nullptr - do not store invalid pointers
+        return;
     }
 
+    pInterface->AddRef();
+    m_pDevice = pInterface;
+
+    // Track this Direct3D9 instance for StaticGetDirect3D() lookups
     if (m_pDevice)
     {
-    if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
+        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::Default))
         {
+            std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
             ms_CreatedDirect3D9List.push_back(m_pDevice);
+            // Update cache for lockless StaticGetDirect3D access
+            g_cachedStaticDirect3D.store(m_pDevice, std::memory_order_release);
+            g_cachedDirect3DValid.store(true, std::memory_order_release);
         }
         else
         {
@@ -130,18 +85,21 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 CProxyDirect3D9::~CProxyDirect3D9()
 {
     WriteDebugEvent(SString("CProxyDirect3D9::~CProxyDirect3D9 %08x", this));
-    ListRemove(ms_CreatedDirect3D9List, m_pDevice);
-    ReleaseInterface(m_pDevice, "CProxyDirect3D9 dtor");
+    {
+        std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
+        ListRemove(ms_CreatedDirect3D9List, m_pDevice);
+        // Invalidate both caches when removing this device
+        g_cachedDirect3DValid.store(false, std::memory_order_release);
+        g_cachedAdapterMonitorValid.store(false, std::memory_order_release);
+    }
+    ReleaseInterface(m_pDevice, 8752);
 }
 
 /*** IUnknown methods ***/
 HRESULT CProxyDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
 {
-    if (!m_pDevice || !IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
+    if (!m_pDevice)
     {
-        SString message;
-        message.Format("CProxyDirect3D9::QueryInterface rejected invalid IDirect3D9 pointer %p", m_pDevice);
-        AddReportLog(8752, message, 5);
         if (ppvObj)
             *ppvObj = nullptr;
         return E_POINTER;
@@ -152,28 +110,17 @@ HRESULT CProxyDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
 
 ULONG CProxyDirect3D9::AddRef()
 {
-    LONG lNewRefCount = InterlockedIncrement(&m_lRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_add(1, std::memory_order_relaxed) + 1;
 
     if (m_pDevice)
-    {
-        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
-        {
-            m_pDevice->AddRef();
-        }
-        else
-        {
-            SString message;
-            message.Format("CProxyDirect3D9::AddRef rejected invalid IDirect3D9 pointer %p", m_pDevice);
-            AddReportLog(8752, message, 5);
-        }
-    }
+        m_pDevice->AddRef();
 
     return static_cast<ULONG>(lNewRefCount);
 }
 
 ULONG CProxyDirect3D9::Release()
 {
-    LONG lNewRefCount = InterlockedDecrement(&m_lRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_sub(1, std::memory_order_acq_rel) - 1;
 
     if (lNewRefCount < 0)
     {
@@ -184,18 +131,7 @@ ULONG CProxyDirect3D9::Release()
     }
 
     if (m_pDevice && lNewRefCount > 0)
-    {
-        if (IsValidComInterfacePointer(m_pDevice, ComPtrValidation::ValidationMode::ForceRefresh))
-        {
-            m_pDevice->Release();
-        }
-        else
-        {
-            SString message;
-            message.Format("CProxyDirect3D9::Release rejected invalid IDirect3D9 pointer %p", m_pDevice);
-            AddReportLog(8752, message, 5);
-        }
-    }
+        m_pDevice->Release();
 
     if (lNewRefCount == 0)
         delete this;
@@ -206,84 +142,145 @@ ULONG CProxyDirect3D9::Release()
 /*** IDirect3D9 methods ***/
 HRESULT CProxyDirect3D9::RegisterSoftwareDevice(void* pInitializeFunction)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->RegisterSoftwareDevice(pInitializeFunction);
 }
 
 UINT CProxyDirect3D9::GetAdapterCount()
 {
+    if (!m_pDevice)
+        return 0;
     return m_pDevice->GetAdapterCount();
 }
 
 HRESULT CProxyDirect3D9::GetAdapterIdentifier(UINT Adapter, DWORD Flags, D3DADAPTER_IDENTIFIER9* pIdentifier)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->GetAdapterIdentifier(Adapter, Flags, pIdentifier);
 }
 
 UINT CProxyDirect3D9::GetAdapterModeCount(UINT Adapter, D3DFORMAT Format)
 {
+    if (!m_pDevice)
+        return 0;
     return m_pDevice->GetAdapterModeCount(Adapter, Format);
 }
 
 HRESULT CProxyDirect3D9::EnumAdapterModes(UINT Adapter, D3DFORMAT Format, UINT Mode, D3DDISPLAYMODE* pMode)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->EnumAdapterModes(Adapter, Format, Mode, pMode);
 }
 
 HRESULT CProxyDirect3D9::GetAdapterDisplayMode(UINT Adapter, D3DDISPLAYMODE* pMode)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->GetAdapterDisplayMode(Adapter, pMode);
 }
 
 HRESULT CProxyDirect3D9::CheckDeviceType(UINT Adapter, D3DDEVTYPE DevType, D3DFORMAT AdapterFormat, D3DFORMAT BackBufferFormat, BOOL bWindowed)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDeviceType(Adapter, DevType, AdapterFormat, BackBufferFormat, bWindowed);
 }
 
 HRESULT CProxyDirect3D9::CheckDeviceFormat(UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT AdapterFormat, DWORD Usage, D3DRESOURCETYPE RType,
                                            D3DFORMAT CheckFormat)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDeviceFormat(Adapter, DeviceType, AdapterFormat, Usage, RType, CheckFormat);
 }
 
 HRESULT CProxyDirect3D9::CheckDeviceMultiSampleType(UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT SurfaceFormat, BOOL Windowed,
                                                     D3DMULTISAMPLE_TYPE MultiSampleType, DWORD* pQualityLevels)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDeviceMultiSampleType(Adapter, DeviceType, SurfaceFormat, Windowed, MultiSampleType, pQualityLevels);
 }
 
 HRESULT CProxyDirect3D9::CheckDepthStencilMatch(UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT AdapterFormat, D3DFORMAT RenderTargetFormat,
                                                 D3DFORMAT DepthStencilFormat)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDepthStencilMatch(Adapter, DeviceType, AdapterFormat, RenderTargetFormat, DepthStencilFormat);
 }
 
 HRESULT CProxyDirect3D9::CheckDeviceFormatConversion(UINT Adapter, D3DDEVTYPE DeviceType, D3DFORMAT SourceFormat, D3DFORMAT TargetFormat)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->CheckDeviceFormatConversion(Adapter, DeviceType, SourceFormat, TargetFormat);
 }
 
 HRESULT CProxyDirect3D9::GetDeviceCaps(UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps)
 {
+    if (!m_pDevice)
+        return D3DERR_INVALIDDEVICE;
     return m_pDevice->GetDeviceCaps(Adapter, DeviceType, pCaps);
 }
 
 HMONITOR CProxyDirect3D9::GetAdapterMonitor(UINT Adapter)
 {
+    if (!m_pDevice)
+        return NULL;
     return m_pDevice->GetAdapterMonitor(Adapter);
 }
 
 HMONITOR CProxyDirect3D9::StaticGetAdapterMonitor(UINT Adapter)
 {
+    // Fast path: use cached monitor without lock (for default adapter 0)
+    if (Adapter == 0 && g_cachedAdapterMonitorValid.load(std::memory_order_acquire))
+    {
+        HMONITOR hMonitor = g_cachedAdapterMonitor.load(std::memory_order_acquire);
+        if (hMonitor)
+            return hMonitor;
+    }
+    
+    // Slow path: refresh cache under lock
+    std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
     IDirect3D9* pDirect3D = GetFirstValidTrackedDirect3D(ms_CreatedDirect3D9List);
     if (!pDirect3D)
         return NULL;
 
-    return pDirect3D->GetAdapterMonitor(Adapter);
+    HMONITOR hMonitor = pDirect3D->GetAdapterMonitor(Adapter);
+    
+    // Cache result for default adapter
+    if (Adapter == 0 && hMonitor)
+    {
+        g_cachedAdapterMonitor.store(hMonitor, std::memory_order_release);
+        g_cachedAdapterMonitorValid.store(true, std::memory_order_release);
+    }
+    
+    return hMonitor;
 }
 
 IDirect3D9* CProxyDirect3D9::StaticGetDirect3D()
 {
-    return GetFirstValidTrackedDirect3D(ms_CreatedDirect3D9List);
+    // Fast path: use cached pointer without lock (called frequently)
+    if (g_cachedDirect3DValid.load(std::memory_order_acquire))
+    {
+        IDirect3D9* pDirect3D = g_cachedStaticDirect3D.load(std::memory_order_acquire);
+        if (pDirect3D)
+            return pDirect3D;
+    }
+    
+    // Slow path: refresh cache under lock
+    std::lock_guard<std::mutex> lock(ms_Direct3D9ListMutex);
+    IDirect3D9* pDirect3D = GetFirstValidTrackedDirect3D(ms_CreatedDirect3D9List);
+    if (pDirect3D)
+    {
+        g_cachedStaticDirect3D.store(pDirect3D, std::memory_order_release);
+        g_cachedDirect3DValid.store(true, std::memory_order_release);
+    }
+    return pDirect3D;
 }
 
 HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags,
@@ -369,6 +366,13 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     InvalidateRect(hFocusWindow, nullptr, TRUE);
     UpdateWindow(hFocusWindow);
 
+    // Check if proxy has valid device pointer
+    if (!m_pDevice)
+    {
+        AddReportLog(8754, SStringX("CProxyDirect3D9::CreateDevice - proxy has no valid IDirect3D9 device"), 5);
+        return D3DERR_INVALIDDEVICE;
+    }
+
     // Detect if second call to CreateDevice
     if (CreateDeviceSecondCallCheck(hResult, m_pDevice, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface))
     {
@@ -397,7 +401,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
             SString message;
             message.Format("CProxyDirect3D9::CreateDevice - rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
             AddReportLog(8755, message, 5);
-            ReleaseInterface(pCreatedDevice, "CProxyDirect3D9::CreateDevice invalid return");
+            ReleaseInterface(pCreatedDevice, 8755, "CProxyDirect3D9::CreateDevice invalid return");
             *ppReturnedDeviceInterface = nullptr;
             hResult = D3DERR_INVALIDDEVICE;
         }
@@ -611,7 +615,7 @@ HRESULT CreateDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect3
                 SString message;
                 message.Format("CreateDeviceInsist: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
                 AddReportLog(8755, message, 5);
-                ReleaseInterface(pCreatedDevice, "CreateDeviceInsist invalid return");
+                ReleaseInterface(pCreatedDevice, 8755, "CreateDeviceInsist invalid return");
                 *ppReturnedDeviceInterface = nullptr;
                 hResult = D3DERR_INVALIDDEVICE;
             }
@@ -869,14 +873,18 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         if (pDirect3DOther)
         {
             // Log graphic card name
-            D3DADAPTER_IDENTIFIER9 AdapterIdent1;
-            pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent1);
+            D3DADAPTER_IDENTIFIER9 AdapterIdent1{};
+            hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent1);
+            if (FAILED(hr))
+                WriteDebugEvent(SString("Warning: pDirect3D->GetAdapterIdentifier failed: %08x", hr));
             WriteDebugEvent("pDirect3D:");
             WriteDebugEvent(ToString(AdapterIdent1));
 
             // Log graphic card name
-            D3DADAPTER_IDENTIFIER9 AdapterIdent2;
-            pDirect3DOther->GetAdapterIdentifier(Adapter, 0, &AdapterIdent2);
+            D3DADAPTER_IDENTIFIER9 AdapterIdent2{};
+            hr = pDirect3DOther->GetAdapterIdentifier(Adapter, 0, &AdapterIdent2);
+            if (FAILED(hr))
+                WriteDebugEvent(SString("Warning: pDirect3DOther->GetAdapterIdentifier failed: %08x", hr));
             WriteDebugEvent("pDirect3DOther:");
             WriteDebugEvent(ToString(AdapterIdent2));
 
@@ -887,7 +895,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         }
     }
 
-    ReleaseInterface(pDirect3DOther, "AddCapsReport GetDirect3D");
+    ReleaseInterface(pDirect3DOther, 8799, "AddCapsReport GetDirect3D");
 
     // Get caps from D3D
     D3DCAPS9 D3DCaps9;
@@ -921,7 +929,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         VertexElements[0].Type = DeclTypesList[i].VertexType;
     IDirect3DVertexDeclaration9* pD3DVertexDecl = nullptr;
     hr = pD3DDevice9->CreateVertexDeclaration(VertexElements, &pD3DVertexDecl);
-    ReleaseInterface(pD3DVertexDecl, "AddCapsReport CreateVertexDeclaration");
+    ReleaseInterface(pD3DVertexDecl, 8799, "AddCapsReport CreateVertexDeclaration");
 
         // Check against device caps
         bool bCapsSaysOk = (DeviceCaps9.DeclTypes & DeclTypesList[i].CapsType) ? true : false;
@@ -971,7 +979,7 @@ void AddCapsReport(UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DDe
         else
         {
             WriteDebugEvent("Fixing GTA caps");
-            memcpy(pGTACaps9, &DeviceCaps9, sizeof(D3DCAPS9));
+            *pGTACaps9 = DeviceCaps9;
         }
     }
 }
@@ -1032,8 +1040,10 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
                                  D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
     // Log graphic card name
-    D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
+    D3DADAPTER_IDENTIFIER9 AdapterIdent{};
+    HRESULT hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
+    if (FAILED(hr))
+        WriteDebugEvent(SString("Warning: GetAdapterIdentifier failed: %08x", hr));
     WriteDebugEvent(ToString(AdapterIdent));
 
     uint uiCurrentStatus = 0;            //  0-unknown  1-fail  2-success after retry  3-success
@@ -1068,7 +1078,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
                 SString message;
                 message.Format("HandleCreateDeviceResult: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice);
                 AddReportLog(8755, message, 5);
-                ReleaseInterface(pCreatedDevice, "HandleCreateDeviceResult invalid return");
+                ReleaseInterface(pCreatedDevice, 8755, "HandleCreateDeviceResult invalid return");
                 *ppReturnedDeviceInterface = nullptr;
                 hResult = D3DERR_INVALIDDEVICE;
             }
@@ -1200,7 +1210,7 @@ void CCore::OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
         WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
     IDirect3DDevice9* pReturnedDeviceInterface = NULL;
     HRESULT hResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, &pReturnedDeviceInterface);
-    ReleaseInterface(pReturnedDeviceInterface, "CCore::OnPreCreateDevice temp release");
+    ReleaseInterface(pReturnedDeviceInterface, 8799, "CCore::OnPreCreateDevice temp release");
         WriteDebugEvent(SString("  Unmodified result is: %08x", hResult));
     }
 
@@ -1280,7 +1290,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
 
     AddCapsReport(Adapter, pDirect3D, pDevice, false);
 
-    ReleaseInterface(pDevice, "CCore::OnPostCreateDevice temp release");
+    ReleaseInterface(pDevice, 8799, "CCore::OnPostCreateDevice temp release");
     *ppReturnedDeviceInterface = pDevice;
 
     //
@@ -1323,7 +1333,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         {
             AddReportLog(8755,
                          SString("CCore::OnPostCreateDevice: rejected invalid IDirect3DDevice9 pointer %p", pCreatedDevice), 5);
-            ReleaseInterface(pCreatedDevice, "CCore::OnPostCreateDevice invalid return");
+            ReleaseInterface(pCreatedDevice, 8755, "CCore::OnPostCreateDevice invalid return");
             *ppReturnedDeviceInterface = nullptr;
             hResult = D3DERR_INVALIDDEVICE;
         }
@@ -1345,8 +1355,10 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     #endif
 
     // Log graphic card name
-    D3DADAPTER_IDENTIFIER9 AdapterIdent;
-    pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
+    D3DADAPTER_IDENTIFIER9 AdapterIdent{};
+    HRESULT hr = pDirect3D->GetAdapterIdentifier(Adapter, 0, &AdapterIdent);
+    if (FAILED(hr))
+        WriteDebugEvent(SString("Warning: GetAdapterIdentifier failed: %08x", hr));
     WriteDebugEvent(ToString(AdapterIdent));
 
     // Store the rendering window in the direct 3d data

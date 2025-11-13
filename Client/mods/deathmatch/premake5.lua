@@ -48,7 +48,6 @@ project "Client Deathmatch"
 
 	files {
 		"premake5.lua",
-		"logic/RenderWareTextureGlobals.cpp",
 		"**.h",
 		"**.cpp",
 		"../../../Shared/mods/deathmatch/logic/**.cpp",

@@ -79,6 +79,15 @@ namespace SharedUtil::Details
         #undef GetModuleBaseNameW
     #endif
 
+    #include <bit>
+    #include <filesystem>
+
+struct HKeyDeleter
+{
+    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
+};
+using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
+
 namespace SharedUtil::Details
 {
     class UniqueHGlobal
@@ -116,7 +125,137 @@ namespace SharedUtil::Details
     private:
         HGLOBAL m_handle = nullptr;
     };
+}            // namespace SharedUtil::Details
+
+static void InitializeProcessBaseDir(SString& strProcessBaseDir)
+{
+    try
+    {
+        constexpr auto bufferSize        = MAX_PATH * 2;
+        constexpr auto MAX_UNICODE_PATH  = 32767;
+        auto           coreFileName      = std::array<wchar_t, bufferSize>{};
+
+        // Get core.dll module handle to determine base directory
+        // Try debug build first (core_d.dll), then release build (core.dll)
+        constexpr auto coreDllDebug   = std::wstring_view{L"core_d.dll"};
+        constexpr auto coreDllRelease = std::wstring_view{L"core.dll"};
+
+        auto    hCoreModule       = HMODULE{};
+        auto    bCoreModuleFound  = bool{false};
+#ifdef MTA_DEBUG
+        if (bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllDebug.data(), &hCoreModule); !bCoreModuleFound)
+#endif
+            bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllRelease.data(), &hCoreModule);
+
+        // Fallback: Use current module if core.dll isn't loaded yet
+        if (!hCoreModule)
+        {
+            GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               reinterpret_cast<LPCWSTR>(&InitializeProcessBaseDir), &hCoreModule);
+        }
+
+        if (hCoreModule)
+        {
+            if (DWORD lengthCore = GetModuleFileNameW(hCoreModule, coreFileName.data(), static_cast<DWORD>(coreFileName.size())); 
+                lengthCore > 0)
+            {
+                // Use std::wstring for flexible buffer management
+                auto corePathBuffer = std::wstring{coreFileName.data(), static_cast<size_t>(lengthCore)};
+
+                // If buffer too small, resize for long path support
+                if (const auto bufferTooSmall = (static_cast<size_t>(lengthCore) == coreFileName.size()); bufferTooSmall)
+                {
+                    corePathBuffer.resize(MAX_UNICODE_PATH);
+                    
+                    if (lengthCore = GetModuleFileNameW(hCoreModule, corePathBuffer.data(), static_cast<DWORD>(corePathBuffer.size()));
+                        lengthCore > 0 && static_cast<size_t>(lengthCore) < corePathBuffer.size())
+                    {
+                        corePathBuffer.resize(lengthCore);
+                    }
+                    else
+                    {
+                        return;  // Long path retrieval failed
+                    }
+                }
+
+                auto fullPath = std::array<wchar_t, bufferSize>{};
+                
+                if (DWORD lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr); lengthFull > 0)
+                {
+                    // Process path and extract base directory
+                    // The directory above /MTA/ is always the base directory
+                    const auto processPath = [&strProcessBaseDir](const std::wstring_view fullPathStr) {
+                        if (const auto lastSeparator = fullPathStr.find_last_of(L"\\/"); lastSeparator != std::wstring_view::npos)
+                        {
+                            const auto moduleDir = fullPathStr.substr(0, lastSeparator);
+                            auto currentPath = std::filesystem::path(moduleDir);
+                            
+                            // Walk up to find MTA/ folder
+                            // Stop at first MTA folder found - it's guaranteed to be the correct one
+                            // Check current directory and up to 2 parent levels
+                            for (auto level = 0; level < 3; ++level)
+                            {
+                                auto folderName = currentPath.filename().wstring();
+                                
+                                // Convert to lowercase for case-insensitive comparison
+                                std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
+                                
+                                if (folderName == L"mta")
+                                {
+                                    // Found MTA folder - base directory is its parent
+                                    // Stop searching immediately to avoid finding outer "MTA" folders (e.g user with custom intall dir)
+                                    if (currentPath.has_parent_path())
+                                    {
+                                        strProcessBaseDir = ToUTF8(currentPath.parent_path().wstring());
+                                    }
+                                    return;  // Always stop at first MTA folder found
+                                }
+                                
+                                // Move up one level
+                                if (currentPath.has_parent_path())
+                                    currentPath = currentPath.parent_path();
+                                else
+                                    break;  // Reached root, can't go further
+                            }
+                        }
+                    };
+
+                    // If buffer too small, resize for long path support
+                    if (auto fullPathBuffer = std::wstring{}; static_cast<size_t>(lengthFull) > fullPath.size())
+                    {
+                        if (static_cast<size_t>(lengthFull) > MAX_UNICODE_PATH)
+                            return;  // Path too long, validation failed
+                        
+                        fullPathBuffer.resize(static_cast<size_t>(lengthFull));
+                        if (lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPathBuffer.size()), fullPathBuffer.data(), nullptr);
+                            lengthFull > 0 && static_cast<size_t>(lengthFull) < fullPathBuffer.size())
+                        {
+                            processPath(std::wstring_view(fullPathBuffer.data(), static_cast<size_t>(lengthFull)));
+                        }
+                    }
+                    else
+                    {
+                        processPath(std::wstring_view(fullPath.data(), static_cast<size_t>(lengthFull)));
+                    }
+                }
+            }
+        }
+    }
+    catch (...)
+    {
+    }
 }
+
+[[nodiscard]] const SString& SharedUtil::GetMTAProcessBaseDir()
+{
+    static auto strProcessBaseDir = SString{};
+    static auto initFlag          = std::once_flag{};
+
+    std::call_once(initFlag, InitializeProcessBaseDir, std::ref(strProcessBaseDir));
+
+    return strProcessBaseDir;
+}
+
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
@@ -152,12 +291,6 @@ struct SReportLine
     bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
-
-struct HKeyDeleter
-{
-    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
-};
-using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
 
 #ifdef MTA_CLIENT
 
@@ -1439,7 +1572,7 @@ void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, c
                             "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", 
                             uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, 
                             (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown", 
-                            (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
+                            (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "" );
 
     OutputDebugString("[ReportLog] ");
     OutputDebugString(&szOutput[0]);

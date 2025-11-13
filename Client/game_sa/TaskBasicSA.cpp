@@ -246,3 +246,13 @@ CTaskComplexFacialSA::CTaskComplexFacialSA()
         call    dwFunc
     }
 }
+
+CTaskComplexInWaterSA::CTaskComplexInWaterSA()
+{
+    CreateTaskInterface(sizeof(CTaskComplexInWaterSA));
+    if (!IsValid())
+        return;
+
+    // Call the constructor
+    ((void(__thiscall*)(CTaskComplexInWaterSAInterface*))0x6350D0)(static_cast<CTaskComplexInWaterSAInterface*>(GetInterface()));
+}
