@@ -59,5 +59,4 @@ public:
     DECLARE_ELEMENT_RPC(SetVehiclePlateText);
     DECLARE_ELEMENT_RPC(SpawnVehicleFlyingComponent);
     DECLARE_ELEMENT_RPC(SetVehicleNitroActivated);
-    DECLARE_ELEMENT_RPC(SetVehicleSmokeTrailEnabled);
 };
