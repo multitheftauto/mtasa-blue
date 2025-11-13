@@ -89,7 +89,9 @@ void InitRwFunctions()
     RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51A0;
     RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5120;
     RtQuatRotate = (RtQuatRotate_t)0x7EB7C0;
-    
+    RpMaterialListDeinitialize = reinterpret_cast<RpMaterialListDeinitialize_t>(0x74E150);
+    RpGeometryForAllMaterials = reinterpret_cast<RpGeometryForAllMaterials_t>(0x74C790);
+
     SetTextureDict = (SetTextureDict_t)0x007319C0;
     LoadClumpFile = (LoadClumpFile_t)0x005371F0;
     LoadModel = (LoadModel_t)0x0040C6B0;

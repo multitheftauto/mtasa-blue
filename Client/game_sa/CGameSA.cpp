@@ -251,6 +251,7 @@ CGameSA::CGameSA()
         CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
         CVehicleAudioSettingsManagerSA::StaticSetHooks();
+        CVehicleModelInfoSAInterface::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {
@@ -571,6 +572,11 @@ unsigned char CGameSA::GetBlurLevel()
 void CGameSA::SetBlurLevel(unsigned char ucLevel)
 {
     MemPutFast<unsigned char>(0x8D5104, ucLevel);            // CPostEffects::m_SpeedFXAlpha
+}
+
+void CGameSA::SetVehiclesVannilaDirtEnabled(bool isEnabled) const noexcept
+{
+    CVehicleModelInfoSAInterface::SetVehicleDirtLevelFixEnabled(isEnabled);
 }
 
 unsigned long CGameSA::GetMinuteDuration()

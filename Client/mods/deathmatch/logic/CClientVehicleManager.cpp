@@ -792,6 +792,28 @@ void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
     }
 }
 
+void CClientVehicleManager::RecreateStreamedVehiclesRwObject()
+{
+    std::unordered_set<std::uint16_t> modelsToReload{};
+
+    for (auto& vehicle : m_List)
+    {
+        if (!vehicle->IsStreamedIn())
+            continue;
+
+        modelsToReload.insert(vehicle->GetModel());
+    }
+
+    for (const auto& model : modelsToReload)
+    {
+        // Stream out all vehicles of this model to remove ped from it and prevent crash
+        RestreamVehicles(model);
+
+        // Remove model from streaming to DeleteRwObject
+        g_pGame->GetStreaming()->RemoveModel(model);
+    }
+}
+
 void CClientVehicleManager::ResetNotControlledRotors(bool engineAutoStart)
 {
     // Reset rotors to original or custom state for loaded vehicles without controller
