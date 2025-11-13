@@ -12,7 +12,7 @@
 #include <StdInc.h>
 
 CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource,
-                                             CChecksum serverChecksum)
+                                             CChecksum serverChecksum, std::uint32_t handlerId)
 {
     // Store the name
     m_strName = szName;
@@ -21,13 +21,17 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
     m_strNameShort = szNameShort;
 
     // store resources
-    m_pResource = pResource;
-    m_pRequestResource = pRequestResource;
+    resource = pResource;
+    requestResource = pRequestResource;
 
     // Store the server checksum
     m_ServerChecksum = serverChecksum;
 
-    m_bBeingDeleted = false;
+    beingDeleted = false;
+    cancelled = false;
+    handlerId = handlerId;
+    httpManager = nullptr;
+    downloadMode = EDownloadMode::NONE;
 
     GenerateClientChecksum();
 
@@ -35,9 +39,10 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
     {
         SHttpRequestOptions options;
         options.bCheckContents = true;
-        CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::RESOURCE_SINGULAR_FILES);
-        pHTTP->QueueFile(strHTTPURL.c_str(), szName, this, DownloadFinishedCallBack, options);
-        m_bComplete = false;
+        httpManager = g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::RESOURCE_SINGULAR_FILES);
+        downloadMode = EDownloadMode::RESOURCE_SINGULAR_FILES;
+        httpManager->QueueFile(strHTTPURL.c_str(), szName, this, DownloadFinishedCallBack, options);
+        complete = false;
         g_pClientGame->SetTransferringSingularFiles(true);
     }
     else
@@ -61,33 +66,46 @@ void CSingularFileDownload::CallFinished(bool bSuccess)
     // Flag file as loadable
     g_pClientGame->GetResourceManager()->OnDownloadedResourceFile(GetName());
 
-    if (!m_bBeingDeleted && m_pResource)
+    if (!beingDeleted && resource)
     {
-        // Call the onClientbFileDownloadComplete event
+        // Call the onClientFileDownloadComplete event
         CLuaArguments Arguments;
         Arguments.PushString(GetShortName());            // file name
         Arguments.PushBoolean(bSuccess);                 // Completed successfully?
-        if (m_pRequestResource)
+        if (requestResource)
         {
-            Arguments.PushResource(m_pRequestResource);            // Resource that called downloadFile
+            Arguments.PushResource(requestResource);            // Resource that called downloadFile
         }
         else
         {
             Arguments.PushBoolean(false);            // or false
         }
 
-        m_pResource->GetResourceEntity()->CallEvent("onClientFileDownloadComplete", Arguments, false);
+        resource->GetResourceEntity()->CallEvent("onClientFileDownloadComplete", Arguments, false);
     }
     SetComplete();
 }
 
-void CSingularFileDownload::Cancel()
+bool CSingularFileDownload::Cancel()
 {
-    m_bBeingDeleted = true;
-    m_pResource = NULL;
-    m_pRequestResource = NULL;
+    if (cancelled || complete)
+        return false;
 
-    // TODO: Cancel also in Net
+    cancelled = true;
+    beingDeleted = true;
+    resource = nullptr;
+    requestResource = nullptr;
+
+    if (!httpManager || downloadMode == EDownloadMode::NONE)
+        return true;
+
+    const bool httpCancelSuccess = httpManager->CancelDownload(this, DownloadFinishedCallBack);
+    return httpCancelSuccess;
+}
+
+void CSingularFileDownload::MarkForDeletion()
+{
+    beingDeleted = true;
 }
 
 bool CSingularFileDownload::DoesClientAndServerChecksumMatch()
