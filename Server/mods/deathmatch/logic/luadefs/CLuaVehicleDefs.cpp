@@ -69,7 +69,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
         {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
-        {"isVehicleSmokeTrailEnabled", IsVehicleSmokeTrailEnabled},
+        {"isVehicleSmokeTrailEnabled", ArgumentParser<IsVehicleSmokeTrailEnabled>},
 
         // Vehicle set funcs
         {"fixVehicle", FixVehicle},
@@ -3067,6 +3067,12 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
 
 bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state)
 {
+    std::uint16_t model = vehicle->GetModel();
+    if (model != 512 && model != 513)
+        return false;
+
+    vehicle->SetSmokeTrailEnabled(state);
+
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit(state);
 
@@ -3074,18 +3080,7 @@ bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state)
     return true;
 }
 
-int CLuaVehicleDefs::IsVehicleSmokeTrailEnabled(lua_State* luaVM)
+bool CLuaVehicleDefs::IsVehicleSmokeTrailEnabled(CVehicle* vehicle)
 {
-    CVehicle*        pVehicle;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, CStaticFunctionDefinitions::IsVehicleSmokeTrailEnabled(pVehicle));
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vehicle->IsSmokeTrailEnabled();
 }

@@ -701,9 +701,5 @@ void CVehicleRPCs::SetVehicleSmokeTrailEnabled(CClientEntity* pSourceEntity, Net
     if (!vehicle)
         return;
 
-    std::uint16_t model = vehicle->GetModel();
-    if (model != 512 && model != 513)
-        return;
-
     vehicle->SetSmokeTrailEnabled(state);
 }

@@ -12668,8 +12668,3 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
 
     return true;
 }
-
-bool CStaticFunctionDefinitions::IsVehicleSmokeTrailEnabled(CVehicle* const vehicle)
-{
-    return vehicle->IsSmokeTrailEnabled();
-}
