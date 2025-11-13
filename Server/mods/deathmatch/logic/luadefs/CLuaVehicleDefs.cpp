@@ -3081,7 +3081,7 @@ bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state)
     return true;
 }
 
-bool CLuaVehicleDefs::IsVehicleSmokeTrailEnabled(CVehicle* vehicle)
+bool CLuaVehicleDefs::IsVehicleSmokeTrailEnabled(CVehicle* vehicle) noexcept
 {
     return vehicle->IsSmokeTrailEnabled();
 }
