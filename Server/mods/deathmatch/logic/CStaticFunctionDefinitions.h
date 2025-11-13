@@ -296,6 +296,7 @@ public:
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue);
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue);
     static bool GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue);
+    static bool IsVehicleSmokeTrailEnabled(CVehicle* const vehicle);
 
     // Vehicle set functions
     static bool FixVehicle(CElement* pElement);

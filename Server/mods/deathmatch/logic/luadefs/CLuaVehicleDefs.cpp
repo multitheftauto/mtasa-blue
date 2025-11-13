@@ -69,6 +69,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
         {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
+        {"isVehicleSmokeTrailEnabled", IsVehicleSmokeTrailEnabled},
 
         // Vehicle set funcs
         {"fixVehicle", FixVehicle},
@@ -210,6 +211,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isRespawnable", "isVehicleRespawnable");
     lua_classfunction(luaVM, "getRespawnDelay", "getVehicleRespawnDelay");
     lua_classfunction(luaVM, "getIdleRespawnDelay", "getVehicleIdleRespawnDelay");
+    lua_classfunction(luaVM, "isSmokeTrailEnabled", "isVehicleSmokeTrailEnabled");
 
     lua_classfunction(luaVM, "setColor", "setVehicleColor");
     lua_classfunction(luaVM, "setDamageProof", "setVehicleDamageProof");
@@ -245,6 +247,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");            // Reduce confusion
     lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
+    lua_classfunction(luaVM, "setSmokeTrailEnabled", "setVehicleSmokeTrailEnabled");
 
     lua_classvariable(luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof");
     lua_classvariable(luaVM, "locked", "setVehicleLocked", "isVehicleLocked");
@@ -3064,9 +3067,22 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
 
 bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state) noexcept
 {
-    CBitStream BitStream;
-    BitStream.pBitStream->WriteBit(state);
-
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_SMOKE_TRAIL_ENABLED, *BitStream.pBitStream));
+    vehicle->SetSmokeTrailEnabled(state);
     return true;
+}
+
+int CLuaVehicleDefs::IsVehicleSmokeTrailEnabled(lua_State* luaVM)
+{
+    CVehicle*        pVehicle;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::IsVehicleSmokeTrailEnabled(pVehicle));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
