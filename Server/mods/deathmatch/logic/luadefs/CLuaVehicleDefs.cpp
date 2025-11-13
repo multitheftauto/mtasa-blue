@@ -3067,7 +3067,10 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
 
 bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state) noexcept
 {
-    vehicle->SetSmokeTrailEnabled(state);
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(state);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_SMOKE_TRAIL_ENABLED, *BitStream.pBitStream));
     return true;
 }
 
