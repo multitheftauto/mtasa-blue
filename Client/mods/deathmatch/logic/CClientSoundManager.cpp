@@ -141,6 +141,7 @@ CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIs
         memcpy(pMemory, strSound.data(), size);
         if (pSound->Play((void*)pMemory, size, bLoop))
             return pSound;
+        // Note: pMemory is already owned by pSound via AdoptBuffer, don't delete it here
     }
     else if (pSound->Play(strSound, bLoop))
         return pSound;
@@ -180,6 +181,7 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
             pSound->SetPosition(vecPosition);
             return pSound;
         }
+        // Note: pMemory is already owned by pSound via AdoptBuffer, don't delete it here
     }
     else if (pSound->Play3D(strSound, bLoop))
     {

@@ -9,41 +9,113 @@
 #include "StdInc.h"
 #include "CWebApp.h"
 
-#include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
+#include <cef3/cef/include/cef_command_line.h>
 #include <cef3/cef/include/cef_parser.h>
+#include <cef3/cef/include/cef_resource_handler.h>
+#include <cef3/cef/include/cef_response.h>
+#include <cef3/cef/include/cef_stream.h>
+#include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
 #include "CAjaxResourceHandler.h"
 
-CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
+namespace
 {
-    auto stream = CefStreamReader::CreateForData((void*)strError.c_str(), strError.length());
-    return new CefStreamResourceHandler(uiError, strError, "text/plain", CefResponse::HeaderMap(), stream);
+    // Centralises command-line switch setup so both pre-launch callbacks stay in sync
+    void ConfigureCommandLineSwitches(const CefRefPtr<CefCommandLine>& commandLine, const CefString& processType)
+    {
+        if (!commandLine)
+            return;
+
+        // CEF occasionally forwards dangling pointers when destroying
+        if (!IsReadablePointer(commandLine.get(), sizeof(void*)))
+            return;
+
+        // Always provide base installation paths so loader-proxy can validate subprocess origin
+        const SString gtaPath = GetCommonRegistryValue("", "GTA:SA Path");
+        if (!gtaPath.empty())
+        {
+            commandLine->AppendSwitchWithValue("mta-gta-path", gtaPath);
+        }
+
+        const SString mtaPath = GetMTAProcessBaseDir();
+        if (!mtaPath.empty())
+        {
+            commandLine->AppendSwitchWithValue("mta-base-path", mtaPath);
+        }
+
+        // Prevent Chromium from dropping privileges; required for elevated launches (see chromium/3960)
+        commandLine->AppendSwitch("do-not-de-elevate");
+
+        // Must apply essential CEF switches regardless of WebCore availability
+        commandLine->AppendSwitch("disable-gpu-compositing");
+        commandLine->AppendSwitch("enable-begin-frame-scheduling");
+        // Explicitly block account sign-in to avoid crashes when Google API keys are registered on the system
+        commandLine->AppendSwitchWithValue("allow-browser-signin", "false");
+
+        if (processType.empty())
+        {
+            // Browser process only: unlock autoplay and legacy Blink features for resource compatibility
+            commandLine->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
+            commandLine->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
+        }
+
+        bool disableGpu = false;
+        if (g_pCore && IsReadablePointer(g_pCore, sizeof(void*)))
+        {
+            auto* cvars = g_pCore->GetCVars();
+            if (cvars && IsReadablePointer(cvars, sizeof(void*)))
+            {
+                bool gpuEnabled = true;
+                cvars->Get("browser_enable_gpu", gpuEnabled);
+                disableGpu = !gpuEnabled;
+            }
+        }
+
+        if (disableGpu)
+            commandLine->AppendSwitch("disable-gpu");
+    }
+}            // namespace
+
+[[nodiscard]] CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
+{
+    auto stream = CefStreamReader::CreateForData(
+        (void*)strError.c_str(), 
+        strError.length()
+    );
+    if (!stream)
+        return nullptr;
+    return CefRefPtr<CefResourceHandler>(new CefStreamResourceHandler(uiError, strError, "text/plain", CefResponse::HeaderMap(), stream));
 }
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
-    CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
+    ConfigureCommandLineSwitches(command_line, process_type);
+}
 
-    if (!pWebCore->GetGPUEnabled())
-        command_line->AppendSwitch("disable-gpu");
+void CWebApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
+{
+    if (!command_line)
+        return;
 
-    // Disable the AutoDeElevate feature to make launching CEF with Admin privileges work.
-    // https://github.com/chromiumembedded/cef/issues/3960
-    // https://chromium-review.googlesource.com/c/chromium/src/+/6515318
-    command_line->AppendSwitch("do-not-de-elevate");
-
-    command_line->AppendSwitch("disable-gpu-compositing"); // always disable this, causes issues with official builds
-
-    // command_line->AppendSwitch("disable-d3d11");
-    command_line->AppendSwitch("enable-begin-frame-scheduling");
-
-    // browser-signin switch(or lack thereof) produces crashes when GOOGLE API keys are present in the OS registry
-    command_line->AppendSwitchWithValue("allow-browser-signin", "false");
-
-    if (process_type.empty())
+    // Add GTA path and MTA base path switches before g_pCore check
+    // This callback runs in both browser process and subprocess
+    // In subprocess, g_pCore is NULL, so switches must be added before that check
+    // Read GTA path from registry
+    int iResult = 0;
+    const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iResult);
+    if (!strGTAPath.empty())
     {
-        command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
-        command_line->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
+        // Pass GTA directory path to CEFLauncher subprocess via command-line switch
+        // CEF's AppendSwitchWithValue handles quoting automatically
+        command_line->AppendSwitchWithValue("mta-gta-path", strGTAPath);
+        // AddReportLog only available in browser process where g_pCore exists
     }
+    const CefString processType = command_line->GetSwitchValue("type");
+    ConfigureCommandLineSwitches(command_line, processType);
+}
+
+CefRefPtr<CefBrowserProcessHandler> CWebApp::GetBrowserProcessHandler()
+{
+    return this;
 }
 
 CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name,
@@ -52,16 +124,25 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
     // browser or frame are NULL if the request does not orginate from a browser window
     // This is for exmaple true for the application cache or CEFURLRequests
     // (https://www.html5rocks.com/en/tutorials/appcache/beginner/)
-    if (!browser || !frame)
+    if (!browser || !frame || !request)
         return nullptr;
 
-    CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
-    auto      pWebView = pWebCore->FindWebView(browser);
+    if (!g_pCore) [[unlikely]]
+        return nullptr;
+
+    const auto pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
+    if (!pWebCore)
+        return nullptr;
+
+    auto pWebView = pWebCore->FindWebView(browser);
     if (!pWebView || !pWebView->IsLocal())
         return nullptr;
 
     CefURLParts urlParts;
     if (!CefParseURL(request->GetURL(), urlParts))
+        return nullptr;
+
+    if (!urlParts.host.str)
         return nullptr;
 
     SString host = UTF16ToMbUTF8(urlParts.host.str);
@@ -70,111 +151,150 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
         // Scheme format: https://mta/resourceName/file.html or https://mta/local/file.html for the current resource
 
         // Get resource name and path
-        SString path = UTF16ToMbUTF8(urlParts.path.str).substr(1);            // Remove slash at the front
-        size_t  slashPos = path.find('/');
-        if (slashPos == std::string::npos)
+        if (!urlParts.path.str)
             return HandleError("404 - Not found", 404);
 
-        SString resourceName = path.substr(0, slashPos);
-        SString resourcePath = path.substr(slashPos + 1);
-
-        if (resourcePath.empty())
+        SString path = UTF16ToMbUTF8(urlParts.path.str);
+        if (std::size(path) < 2)
             return HandleError("404 - Not found", 404);
 
-        // Get mime type from extension
-        CefString mimeType;
-        size_t    pos = resourcePath.find_last_of('.');
-        if (pos != std::string::npos)
-            mimeType = CefGetMimeType(resourcePath.substr(pos + 1));
-
-        // Make sure we provide a mime type, even
-        // when we cannot deduct it from the file extension
-        if (mimeType.empty())
-            mimeType = "application/octet-stream";
-
-        if (pWebView->HasAjaxHandler(resourcePath))
+        path = path.substr(1);            // Remove slash at the front
+        if (const auto slashPos = path.find('/'); slashPos == std::string::npos)
         {
-            std::vector<SString> vecGet;
-            std::vector<SString> vecPost;
-
-            if (urlParts.query.str != nullptr)
-            {
-                SString              strGet = UTF16ToMbUTF8(urlParts.query.str);
-                std::vector<SString> vecTmp;
-                strGet.Split("&", vecTmp);
-
-                SString key;
-                SString value;
-                for (auto&& param : vecTmp)
-                {
-                    param.Split("=", &key, &value);
-                    vecGet.push_back(key);
-                    vecGet.push_back(value);
-                }
-            }
-
-            CefPostData::ElementVector vecPostElements;
-            auto                       postData = request->GetPostData();
-            if (postData.get())
-            {
-                request->GetPostData()->GetElements(vecPostElements);
-
-                SString key;
-                SString value;
-                for (auto&& post : vecPostElements)
-                {
-                    // Limit to 5MiB and allow byte data only
-                    size_t bytesCount = post->GetBytesCount();
-                    if (bytesCount > 5 * 1024 * 1024 || post->GetType() != CefPostDataElement::Type::PDE_TYPE_BYTES)
-                        continue;
-
-                    // Make string from buffer
-                    std::unique_ptr<char[]> buffer{new char[bytesCount]};
-                    post->GetBytes(bytesCount, buffer.get());
-                    SStringX param(buffer.get(), bytesCount);
-
-                    // Parse POST data into vector
-                    std::vector<SString> vecTmp;
-                    param.Split("&", vecTmp);
-
-                    for (auto&& param : vecTmp)
-                    {
-                        param.Split("=", &key, &value);
-                        vecPost.push_back(key);
-                        vecPost.push_back(value);
-                    }
-                }
-            }
-
-            auto handler = new CAjaxResourceHandler(vecGet, vecPost, mimeType);
-            pWebView->HandleAjaxRequest(resourcePath, handler);
-            return handler;
+            static constexpr auto ERROR_404 = "404 - Not found";
+            static constexpr unsigned int CODE_404 = 404;
+            return HandleError(ERROR_404, CODE_404);
         }
         else
         {
-            // Calculate MTA resource path
-            if (resourceName != "local")
-                path = ":" + resourceName + "/" + resourcePath;
+            const SString resourceName = path.substr(0, slashPos);
+            const SString resourcePath = path.substr(slashPos + 1);
+
+            if (resourcePath.empty())
+            {
+                static constexpr auto ERROR_404 = "404 - Not found";
+                static constexpr unsigned int CODE_404 = 404;
+                return HandleError(ERROR_404, CODE_404);
+            }
+
+            // Get mime type from extension
+            CefString mimeType;
+            if (const auto pos = resourcePath.find_last_of('.'); pos != std::string::npos)
+                mimeType = CefGetMimeType(resourcePath.substr(pos + 1));
+
+            // Make sure we provide a mime type, even
+            // when we cannot deduct it from the file extension
+            if (mimeType.empty())
+            {
+                mimeType = "application/octet-stream";
+            }
+
+            if (pWebView->HasAjaxHandler(resourcePath))
+            {
+                std::vector<SString> vecGet;
+                std::vector<SString> vecPost;
+
+                if (urlParts.query.str)
+                {
+                    const SString        strGet = UTF16ToMbUTF8(urlParts.query.str);
+                    std::vector<SString> vecTmp;
+                    vecTmp.reserve(8);  // Reserve space for common query parameter count
+                    strGet.Split("&", vecTmp);
+
+                    SString key;
+                    SString value;
+                    for (auto&& param : vecTmp)
+                    {
+                        param.Split("=", &key, &value);
+                        vecGet.push_back(key);
+                        vecGet.push_back(value);
+                    }
+                }
+
+                CefPostData::ElementVector vecPostElements;
+                if (const auto postData = request->GetPostData(); postData)
+                {
+                    postData->GetElements(vecPostElements);
+
+                    SString key;
+                    SString value;
+                    for (const auto& post : vecPostElements)
+                    {
+                        // Limit to 5MiB and allow byte data only
+                        constexpr size_t MAX_POST_SIZE = 5 * 1024 * 1024;
+                        size_t bytesCount = post->GetBytesCount();
+                        if (bytesCount > MAX_POST_SIZE || post->GetType() != CefPostDataElement::Type::PDE_TYPE_BYTES)
+                            continue;
+
+                        // Make string from buffer
+                        const auto buffer = std::make_unique<char[]>(bytesCount);
+                        // Verify GetBytes succeeded before using buffer
+                        const size_t bytesRead = post->GetBytes(bytesCount, buffer.get());
+                        if (bytesRead != bytesCount)
+                            continue;
+                        const SStringX postParam(buffer.get(), bytesCount);
+
+                        // Parse POST data into vector
+                        std::vector<SString> vecTmp;
+                        vecTmp.reserve(8);
+                        postParam.Split("&", vecTmp);
+
+                        for (auto&& param : vecTmp)
+                        {
+                            param.Split("=", &key, &value);
+                            vecPost.push_back(key);
+                            vecPost.push_back(value);
+                        }
+                    }
+                }
+
+                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(vecGet, vecPost, mimeType));
+                pWebView->HandleAjaxRequest(resourcePath, handler.get());
+                return handler;
+            }
             else
-                path = resourcePath;
+            {
+                // Calculate MTA resource path
+                static constexpr auto LOCAL = "local";
+                path = (resourceName != LOCAL) ? SString(":" + resourceName + "/" + resourcePath) : resourcePath;
 
-            // Calculate absolute path
-            if (!pWebView->GetFullPathFromLocal(path))
-                return HandleError("404 - Not found", 404);
+                // Calculate absolute path
+                if (!pWebView->GetFullPathFromLocal(path))
+                {
+                    static constexpr auto ERROR_404 = "404 - Not found";
+                    static constexpr unsigned int CODE_404 = 404;
+                    return HandleError(ERROR_404, CODE_404);
+                }
 
-            // Verify local files
-            CBuffer fileData;
-            if (!pWebView->VerifyFile(path, fileData))
-                return HandleError("403 - Access Denied", 403);
+                // Verify local files
+                CBuffer fileData;
+                if (!pWebView->VerifyFile(path, fileData))
+                {
+                    static constexpr auto ERROR_403 = "403 - Access Denied";
+                    static constexpr unsigned int CODE_403 = 403;
+                    return HandleError(ERROR_403, CODE_403);
+                }
 
-            // Finally, load the file stream
-            if (fileData.GetData() == nullptr || fileData.GetSize() == 0)
-                fileData = CBuffer("", sizeof(""));
+                // Finally, load the file stream
+                if (!fileData.GetData() || fileData.GetSize() == 0)
+                {
+                    static constexpr char emptyStr[] = "";
+                    fileData = CBuffer(emptyStr, std::size(emptyStr));
+                }
 
-            auto stream = CefStreamReader::CreateForData(fileData.GetData(), fileData.GetSize());
-            if (stream.get())
-                return new CefStreamResourceHandler(mimeType, stream);
-            return HandleError("404 - Not found", 404);
+                auto stream = CefStreamReader::CreateForData(
+                    fileData.GetData(),
+                    fileData.GetSize()
+                );
+                if (!stream)
+                {
+                    static constexpr auto ERROR_404 = "404 - Not found";
+                    static constexpr unsigned int CODE_404 = 404;
+                    return HandleError(ERROR_404, CODE_404);
+                }
+                    
+                return CefRefPtr<CefResourceHandler>(new CefStreamResourceHandler(mimeType, stream));
+            }
         }
     }
 

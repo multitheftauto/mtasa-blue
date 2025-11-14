@@ -333,83 +333,167 @@ void CServerInfo::Show(eWindowType WindowType, const char* szHost, unsigned shor
 
 void CServerInfo::SetServerInformation(const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem)
 {
-    // Store the parameters in our class instance for later use
     m_usPort = usPort;
+    m_strPassword = szPassword ? szPassword : "";
+    m_strHost = szHost ? szHost : "";
 
-    m_strPassword = szPassword;
-    m_strHost = szHost;
-
-    // Create a winsock address endpoint and parse the IP into it
     in_addr Address;
-    CServerListItem::Parse(szHost, Address);
+    memset(&Address, 0, sizeof(Address));
+    if (!CServerListItem::Parse(szHost, Address))
+        Address.S_un.S_addr = 0;
 
-    // Set our server query's address, query port and game port
+    m_Server.CancelPendingQuery();
+
+    // Clear stale address data before applying the new endpoint
+    m_Server.Address.S_un.S_addr = 0;
+    m_Server.AddressCopy.S_un.S_addr = 0;
+    m_Server.usGamePort = 0;
+    m_Server.usGamePortCopy = 0;
+    m_Server.strHost = "";
+    m_Server.strEndpoint = "";
+    m_Server.strEndpointSortKey = "";
+    m_Server.bScanned = false;
+    m_Server.bSkipped = false;
+
+    // Assign the new address details
     m_Server.ChangeAddress(Address, usPort);
 
-    if (pInitialServerListItem)            // If we have a pointer to an already scanned server, we initially set text to this
-        ResetServerGUI(pInitialServerListItem);
-    else            // Otherwise, reset it to blank text
+    if (m_Server.Address.S_un.S_addr != Address.S_un.S_addr || m_Server.usGamePort != usPort)
+    {
+        m_Server.Address = Address;
+        m_Server.usGamePort = usPort;
+    }
+
+    m_Server.AddressCopy = m_Server.Address;
+    m_Server.usGamePortCopy = m_Server.usGamePort;
+
+    const uchar* addressBytes = reinterpret_cast<const uchar*>(&m_Server.Address.S_un.S_addr);
+    SString      strAddressHost = inet_ntoa(m_Server.Address);
+    if (strAddressHost.empty())
+        strAddressHost = szHost;
+    m_Server.strHost = strAddressHost;
+    m_Server.strEndpoint = SString("%s:%u", *strAddressHost, m_Server.usGamePort);
+    m_Server.strEndpointSortKey =
+        SString("%02x%02x%02x%02x-%04x", addressBytes[0], addressBytes[1], addressBytes[2], addressBytes[3], m_Server.usGamePort);
+
+    if (pInitialServerListItem && CServerListItem::StaticIsValid(pInitialServerListItem))
+    {
+        m_Server.strName = pInitialServerListItem->strName;
+        m_Server.strSearchableName = pInitialServerListItem->strSearchableName;
+        m_Server.strHostName = pInitialServerListItem->strHostName;
+        m_Server.strGameName = pInitialServerListItem->strGameName;
+        m_Server.strGameMode = pInitialServerListItem->strGameMode;
+        m_Server.strMap = pInitialServerListItem->strMap;
+        m_Server.strVersion = pInitialServerListItem->strVersion;
+        m_Server.nPlayers = pInitialServerListItem->nPlayers;
+        m_Server.nMaxPlayers = pInitialServerListItem->nMaxPlayers;
+        m_Server.nPing = pInitialServerListItem->nPing;
+        m_Server.bPassworded = pInitialServerListItem->bPassworded;
+        m_Server.bSerials = pInitialServerListItem->bSerials;
+        m_Server.isStatusVerified = pInitialServerListItem->isStatusVerified;
+        m_Server.bMaybeOffline = pInitialServerListItem->bMaybeOffline;
+        m_Server.bMasterServerSaysNoResponse = pInitialServerListItem->bMasterServerSaysNoResponse;
+        m_Server.uiMasterServerSaysRestrictions = pInitialServerListItem->uiMasterServerSaysRestrictions;
+        m_Server.vecPlayers = pInitialServerListItem->vecPlayers;
+        m_Server.uiTieBreakPosition = pInitialServerListItem->uiTieBreakPosition;
+        m_Server.strTieBreakSortKey = pInitialServerListItem->strTieBreakSortKey;
+        m_Server.strNameSortKey = pInitialServerListItem->strNameSortKey;
+        m_Server.strVersionSortKey = pInitialServerListItem->strVersionSortKey;
+        m_Server.m_iBuildType = pInitialServerListItem->m_iBuildType;
+        m_Server.m_iBuildNumber = pInitialServerListItem->m_iBuildNumber;
+        m_Server.m_usHttpPort = pInitialServerListItem->m_usHttpPort;
+        m_Server.m_ucSpecialFlags = pInitialServerListItem->m_ucSpecialFlags;
+        m_Server.SetDataQuality(pInitialServerListItem->GetDataQuality());
+        m_Server.bScanned = true;
+        m_Server.bSkipped = false;
+
+        if (!pInitialServerListItem->strHost.empty())
+            m_Server.strHost = pInitialServerListItem->strHost;
+        if (!pInitialServerListItem->strEndpoint.empty())
+            m_Server.strEndpoint = pInitialServerListItem->strEndpoint;
+        if (!pInitialServerListItem->strEndpointSortKey.empty())
+            m_Server.strEndpointSortKey = pInitialServerListItem->strEndpointSortKey;
+
+        ResetServerGUI(&m_Server);
+    }
+    else
+    {
         Reset();
+    }
 
-    m_pServerAddressLabel->SetText(SString("%s:%u", szHost, usPort));
+    const SString strDisplayedEndpoint = !m_Server.strEndpoint.empty() ? m_Server.strEndpoint : SString("%s:%u", szHost, usPort);
+    m_pServerAddressLabel->SetText(strDisplayedEndpoint);
 
-    // Lets query the server now, as the previous data is out of date
+    // Start a fresh query so we get the latest data for this server
     Refresh();
 }
 
 void CServerInfo::DoPulse()
 {
-    // Are we visible?
-    if (IsVisible())
+    if (!IsVisible())
     {
-        // Pulse the server query
-        m_Server.Pulse(true);
-
-        // Do we need a refresh?
-        if ((m_Server.bScanned && (CClientTime::GetTime() - m_ulLastUpdateTime) >= SERVER_UPDATE_INTERVAL))
-        {
-            // Are we queing, and is auto join enabled?
-            if (m_pCurrentWindowType == eWindowTypes::SERVER_INFO_QUEUE && m_pCheckboxAutojoin->GetSelected())
-            {
-                // Is a slot available?
-                if (m_Server.nPlayers < m_Server.nMaxPlayers)
-                {
-                    // Lets attempt to connect
-                    Connect();
-                    return;
-                }
-            }
-
-            ResetServerGUI(&m_Server);
-
-            m_ulLastUpdateTime = CClientTime::GetTime();
-
-            // Query the server
-            Refresh();
-        }
-        else if (m_Server.bSkipped)            // Server query timed out
-        {
-            // Should we try to query again?
-            if (CClientTime::GetTime() - m_ulLastUpdateTime >= SERVER_UPDATE_INTERVAL)
-            {
-                // Query the server
-                Refresh();
-            }
-
-            ResetServerGUI(&m_Server);
-
-            // The server has timed out
-            m_pLatencyLabel->SetText(_("Timed Out"));
-
-            m_ulLastUpdateTime = CClientTime::GetTime();
-        }
-
         if (m_bWaitingToActivatePassword)
         {
             m_bWaitingToActivatePassword = false;
             m_pWindow->Activate();
             m_pEnterPasswordEdit->Activate();
         }
+        return;
+    }
+
+    const unsigned long ulNow = CClientTime::GetTime();
+    bool                bRefreshed = false;
+
+    m_Server.Pulse(true);
+
+    in_addr expectedAddress;
+    memset(&expectedAddress, 0, sizeof(expectedAddress));
+    const bool bHasExpectedAddress = !m_strHost.empty() && CServerListItem::Parse(m_strHost.c_str(), expectedAddress);
+    const bool bAddressMatches = !bHasExpectedAddress || (expectedAddress.S_un.S_addr == m_Server.Address.S_un.S_addr && m_usPort == m_Server.usGamePort);
+
+    if (m_Server.bScanned)
+    {
+        if (bAddressMatches)
+        {
+            ResetServerGUI(&m_Server);
+
+            if (m_pCurrentWindowType == eWindowTypes::SERVER_INFO_QUEUE && m_pCheckboxAutojoin->GetSelected() &&
+                m_Server.nPlayers < m_Server.nMaxPlayers)
+            {
+                Connect();
+                return;
+            }
+
+            m_ulLastUpdateTime = ulNow;
+        }
+        else
+        {
+            Refresh();
+            bRefreshed = true;
+            m_ulLastUpdateTime = ulNow;
+        }
+    }
+    else if (m_Server.bSkipped)
+    {
+        ResetServerGUI(&m_Server);
+        m_pLatencyLabel->SetText(_("Timed Out"));
+        m_ulLastUpdateTime = ulNow;
+
+        Refresh();
+        bRefreshed = true;
+    }
+
+    if (!bRefreshed && (ulNow - m_ulLastUpdateTime) >= SERVER_UPDATE_INTERVAL)
+    {
+        Refresh();
+        m_ulLastUpdateTime = ulNow;
+    }
+
+    if (m_bWaitingToActivatePassword)
+    {
+        m_bWaitingToActivatePassword = false;
+        m_pWindow->Activate();
+        m_pEnterPasswordEdit->Activate();
     }
 }
 

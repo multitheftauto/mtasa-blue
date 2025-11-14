@@ -52,7 +52,7 @@ project "Client Core"
 
 	defines {
 		"INITGUID",
-		"PNG_SETJMP_NOT_SUPPORTED"
+		"PNG_SETJMP_NOT_SUPPORTED",
 	}
 
 	prebuildcommands {
