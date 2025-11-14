@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        core/AjaxResourceHandler.h
+ *  FILE:        cefweb/CAjaxResourceHandler.h
  *  PURPOSE:     CEF Handler for Ajax Requests with delayed results
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
@@ -20,13 +20,11 @@ class CAjaxResourceHandler : public CefResourceHandler, public CAjaxResourceHand
 {
 public:
     CAjaxResourceHandler(std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& mimeType);
-    virtual ~CAjaxResourceHandler();
+    ~CAjaxResourceHandler();
 
-    virtual std::vector<SString>& GetGetData() override;
-    virtual std::vector<SString>& GetPostData() override;
-    ;
-    virtual void SetResponse(const SString& data) override;
-    ;
+    std::vector<SString>& GetGetData() override { return m_vecGetData; }
+    std::vector<SString>& GetPostData() override { return m_vecPostData; }
+    void SetResponse(const SString& data) override;
 
     // CefResourceHandler
     virtual void Cancel() override;
@@ -44,5 +42,5 @@ private:
     SString                m_strResponse;
     CefString              m_strMime;
     bool                   m_bHasData = false;
-    int                    m_DataOffset = 0;
+    size_t                 m_DataOffset = 0;
 };
