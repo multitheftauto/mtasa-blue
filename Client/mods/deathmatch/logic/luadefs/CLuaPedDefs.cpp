@@ -213,6 +213,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
     lua_classfunction(luaVM, "setBleeding", "setPedBleeding");
     lua_classfunction(luaVM, "playVoiceLine", "playPedVoiceLine");
+    lua_classfunction(luaVM, "isEnteringToVehicle", "isPedEnteringToVehicle");
+    lua_classfunction(luaVM, "isExitingFromVehicle", "isPedExitingFromVehicle");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");

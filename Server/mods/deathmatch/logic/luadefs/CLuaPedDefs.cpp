@@ -49,6 +49,8 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
         {"isPedInVehicle", IsPedInVehicle},
         {"isPedReloadingWeapon", ArgumentParser<IsPedReloadingWeapon>},
+        {"isPedEnteringToVehicle", ArgumentParser<IsPedEnteringToVehicle>},
+        {"isPedExitingFromVehicle", ArgumentParser<IsPedExitingFromVehicle>},
 
         // Ped set functions
         {"setPedArmor", ArgumentParserWarn<false, SetPedArmor>},
@@ -120,6 +122,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
     lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
+    lua_classfunction(luaVM, "isEnteringToVehicle", "isPedEnteringToVehicle");
+    lua_classfunction(luaVM, "isExitingFromVehicle", "isPedExitingFromVehicle");
 
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
     lua_classfunction(luaVM, "getFightingStyle", "getPedFightingStyle");
@@ -1554,4 +1558,14 @@ int CLuaPedDefs::TakeAllWeapons(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaPedDefs::IsPedEnteringToVehicle(CPed* const ped) noexcept
+{
+    return ped->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING;
+}
+
+bool CLuaPedDefs::IsPedExitingFromVehicle(CPed* const ped) noexcept
+{
+    return ped->GetVehicleAction() == CPed::VEHICLEACTION_EXITING;
 }
