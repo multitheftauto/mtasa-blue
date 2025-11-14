@@ -80,6 +80,6 @@ public:
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);
     static bool ReloadPedWeapon(lua_State* vm, CPed* const ped) noexcept;
-    bool IsPedEnteringToVehicle(CPed* const ped) noexcept;
-    bool IsPedExitingFromVehicle(CPed* const ped) noexcept;
+    static bool IsPedEnteringToVehicle(CPed* const ped) noexcept;
+    static bool IsPedExitingFromVehicle(CPed* const ped) noexcept;
 };

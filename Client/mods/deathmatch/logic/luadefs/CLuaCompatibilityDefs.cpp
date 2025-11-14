@@ -71,8 +71,6 @@ void CLuaCompatibilityDefs::LoadFunctions()
         {"getControlState", ArgumentParserWarn<false, CLuaPedDefs::GetPedControlState>},
         {"setCameraShakeLevel", ArgumentParserWarn<false, CLuaCameraDefs::SetCameraDrunkLevel>},
         {"getCameraShakeLevel", ArgumentParserWarn<false, CLuaCameraDefs::GetCameraDrunkLevel>},
-        {"isPedEnteringToVehicle", ArgumentParserWarn<false, CLuaPedDefs::IsPedEnteringToVehicle>},
-        {"isPedExitingFromVehicle", ArgumentParserWarn<false, CLuaPedDefs::IsPedExitingFromVehicle>},
     };
 
     // Add functions

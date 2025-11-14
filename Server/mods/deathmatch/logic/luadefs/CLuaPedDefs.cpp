@@ -48,9 +48,9 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
         {"isPedInVehicle", IsPedInVehicle},
-        {"isPedReloadingWeapon", ArgumentParser<IsPedReloadingWeapon>},
         {"isPedEnteringToVehicle", ArgumentParser<IsPedEnteringToVehicle>},
         {"isPedExitingFromVehicle", ArgumentParser<IsPedExitingFromVehicle>},
+        {"isPedReloadingWeapon", ArgumentParser<IsPedReloadingWeapon>},
 
         // Ped set functions
         {"setPedArmor", ArgumentParserWarn<false, SetPedArmor>},
@@ -157,6 +157,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");            // introduced in 1.5.5-9.13846
 
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
+    lua_classvariable(luaVM, "enteringToVehicle", NULL, "isPedEnteringToVehicle");
+    lua_classvariable(luaVM, "exitingFromVehicle", NULL, "isPedExitingFromVehicle");
     lua_classvariable(luaVM, "ducked", NULL, "isPedDucked");
     lua_classvariable(luaVM, "inWater", NULL, "isPedInWater");
     lua_classvariable(luaVM, "onGround", NULL, "isPedOnGround");
