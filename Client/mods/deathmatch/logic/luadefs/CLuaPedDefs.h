@@ -122,5 +122,6 @@ public:
     static void PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probability);
     static bool IsPedEnteringToVehicle(CClientPed* const ped) noexcept;
     static bool IsPedExitingFromVehicle(CClientPed* const ped) noexcept;
-    static CClientVehicle* GetPedOccupiedVehicleEnteringTo(CClientPed* const ped);
+    static CClientVehicle* GetPedVehicleEnteringTo(CClientPed* const ped);
+    static int GetPedVehicleEnteringToSeat(CClientPed* const ped);
 };

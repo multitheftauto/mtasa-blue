@@ -106,7 +106,8 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
         {"isPedEnteringToVehicle", ArgumentParser<IsPedEnteringToVehicle>},
         {"isPedExitingFromVehicle", ArgumentParser<IsPedExitingFromVehicle>},
-        {"getPedOccupiedVehicleEnteringTo", ArgumentParser<GetPedOccupiedVehicleEnteringTo>},
+        {"getPedVehicleEnteringTo", ArgumentParser<GetPedVehicleEnteringTo>},
+        {"getPedVehicleEnteringToSeat", ArgumentParser<GetPedVehicleEnteringToSeat>},
 
         {"getPedBonePosition", GetPedBonePosition},
         {"getPedClothes", GetPedClothes},
@@ -159,7 +160,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getMoveState", "getPedMoveState");
     lua_classfunction(luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle");
     lua_classfunction(luaVM, "getOccupiedVehicleSeat", "getPedOccupiedVehicleSeat");
-    lua_classfunction(luaVM, "getOccupiedVehicleEnteringTo", "getPedOccupiedVehicleEnteringTo");
+    lua_classfunction(luaVM, "getVehicleEnteringTo", "getPedVehicleEnteringTo");
+    lua_classfunction(luaVM, "getVehicleEnteringToSeat", "getPedVehicleEnteringToSeat");
     lua_classfunction(luaVM, "getOxygenLevel", "getPedOxygenLevel");
     lua_classfunction(luaVM, "getStat", "getPedStat");
     lua_classfunction(luaVM, "getTarget", "getPedTarget");
@@ -241,7 +243,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
     lua_classvariable(luaVM, "enteringToVehicle", NULL, "isPedEnteringToVehicle");
     lua_classvariable(luaVM, "exitingFromVehicle", NULL, "isPedExitingFromVehicle");
-    lua_classvariable(luaVM, "occupiedVehicleEnteringTo", NULL, "getPedOccupiedVehicleEnteringTo");
+    lua_classvariable(luaVM, "vehicleEnteringTo", NULL, "getPedVehicleEnteringTo");
+    lua_classvariable(luaVM, "vehicleEnteringToSeat", NULL, "getPedVehicleEnteringToSeat");
     lua_classvariable(luaVM, "onFire", "setPedOnFire", "isPedOnFire");
     lua_classvariable(luaVM, "onGround", NULL, "isPedOnGround");
     lua_classvariable(luaVM, "dead", NULL, "isPedDead");
@@ -2581,7 +2584,12 @@ bool CLuaPedDefs::IsPedExitingFromVehicle(CClientPed* const ped) noexcept
     return ped->IsExitingFromVehicle();
 }
 
-CClientVehicle* CLuaPedDefs::GetPedOccupiedVehicleEnteringTo(CClientPed* const ped)
+CClientVehicle* CLuaPedDefs::GetPedVehicleEnteringTo(CClientPed* const ped)
 {
     return ped->GetOccupyingVehicle();
+}
+
+int CLuaPedDefs::GetPedVehicleEnteringToSeat(CClientPed* const ped)
+{
+    return ped->GetOccupyingVehicleSeat();
 }
