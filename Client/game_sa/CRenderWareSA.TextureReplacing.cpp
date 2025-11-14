@@ -118,7 +118,8 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
 
     const ushort usTxdId = pModelInfo->GetTextureDictionaryID();
 
-    if (auto it = ms_ModelTexturesInfoMap.find(usTxdId); it != ms_ModelTexturesInfoMap.end())
+    auto it = ms_ModelTexturesInfoMap.find(usTxdId);
+    if (it != ms_ModelTexturesInfoMap.end())
         return &it->second;
 
     // Get txd
@@ -146,13 +147,13 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         return nullptr;
 
     // Add new info
-    auto [it, inserted] = ms_ModelTexturesInfoMap.emplace(usTxdId, CModelTexturesInfo{});
-    auto& newInfo = it->second;
+    auto itInserted = ms_ModelTexturesInfoMap.emplace(usTxdId, CModelTexturesInfo{});
+    CModelTexturesInfo& newInfo = itInserted.first->second;
     newInfo.usTxdId = usTxdId;
     newInfo.pTxd = pTxd;
 
     // Save original textures
-    GetTxdTextures(newInfo.originalTextures, newInfo.pTxd);
+    GetTxdTextures(newInfo.originalTextures, pTxd);
     
     return &newInfo;
 }
@@ -172,7 +173,8 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
         return false;
 
     // Try to load it
-    if (auto* pTxd = ReadTXD(strFilename, buffer); pTxd)
+    auto* pTxd = ReadTXD(strFilename, buffer);
+    if (pTxd)
     {
         // Get the list of textures into our own list
         GetTxdTextures(pReplacementTextures->textures, pTxd);
@@ -229,7 +231,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     //
     // Add section for this txd
     //
-    auto& perTxdInfo = pReplacementTextures->perTxdList.emplace_back();
+    pReplacementTextures->perTxdList.emplace_back();
+    SReplacementTextures::SPerTxd& perTxdInfo = pReplacementTextures->perTxdList.back();
 
     perTxdInfo.usTxdId = pInfo->usTxdId;
     perTxdInfo.bTexturesAreCopies = !pReplacementTextures->usedInTxdIds.empty();
@@ -289,7 +292,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures)
 {
     // For each using txd
-    for (auto& perTxdInfo : pReplacementTextures->perTxdList)
+    for (SReplacementTextures::SPerTxd& perTxdInfo : pReplacementTextures->perTxdList)
     {
         // Get textures info
         ushort              usTxdId = perTxdInfo.usTxdId;
