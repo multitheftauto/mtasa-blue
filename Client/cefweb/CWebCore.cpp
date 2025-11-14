@@ -67,15 +67,8 @@ bool CWebCore::Initialise(bool gpuEnabled)
     
     m_bGPUEnabled = gpuEnabled;
 
-    // Log current working directory at entry
-    std::array<wchar_t, MAX_PATH> cwdBefore{};
-    GetCurrentDirectoryW(static_cast<DWORD>(cwdBefore.size()), cwdBefore.data());
-    AddReportLog(8010, SString("CWebCore::Initialise - CWD at entry: %s", *SharedUtil::ToUTF8(cwdBefore.data())));
-
     // Get MTA base directory
     SString strBaseDir = SharedUtil::GetMTAProcessBaseDir();
-    
-    AddReportLog(8011, SString("CWebCore::Initialise - GetMTAProcessBaseDir returned: '%s'", strBaseDir.c_str()));
     
     if (strBaseDir.empty())
     {
@@ -102,15 +95,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
     g_pCore->GetConsole()->Printf("DEBUG: Registry path='%s'", strGTAPath.c_str());
     AddReportLog(8017, SString("DEBUG: Registry path='%s'", strGTAPath.c_str()));
     
-    if (!strGTAPath.empty())
-    {
-        AddReportLog(8015, SString("Read GTA path from registry: %s", *strGTAPath));
-    }
-    else
-    {
-        AddReportLog(8016, "Failed to read GTA path from registry");
-    }
-    
     // Check if process is running with elevated privileges
     // CEF subprocesses may have communication issues when running elevated
     const bool bIsElevated = []() -> bool {
@@ -134,13 +118,8 @@ bool CWebCore::Initialise(bool gpuEnabled)
         AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
         AddReportLog(8022, "CEF browser features may not work correctly when running as Administrator");
         AddReportLog(8023, "Consider running MTA without Administrator privileges for full browser functionality");
-        g_pCore->GetConsole()->Printf("^3WARNING: Running as Administrator - browser features may be limited");
+        g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
-    
-    // Log current working directory before CEF initialization
-    std::array<wchar_t, MAX_PATH> cwdBeforeCef{};
-    GetCurrentDirectoryW(static_cast<DWORD>(cwdBeforeCef.size()), cwdBeforeCef.data());
-    AddReportLog(8012, SString("CWebCore::Initialise - CWD before CefInitialize: %s", *SharedUtil::ToUTF8(cwdBeforeCef.data())));
     
     if (!FileExists(strLauncherPath))
     {
@@ -164,11 +143,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
         return false;
     }
 
-    // Proceed with CEF initialization
-    AddReportLog(8018, SString("Pre-CEF Init: Launcher path: %s", *strLauncherPath));
-    AddReportLog(8019, SString("Pre-CEF Init: Cache path: %s", *strCachePath));
-    AddReportLog(8020, SString("Pre-CEF Init: Locales path: %s", *strLocalesPath));
-    
     // Use std::filesystem for CWD management with RAII scope guard
     namespace fs = std::filesystem;
     std::error_code ec;
@@ -189,10 +163,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
         ~CwdGuard() {
             std::error_code restoreEc;
             fs::current_path(savedPath, restoreEc);
-            if (!restoreEc)
-            {
-                AddReportLog(8027, SString("Restored original CWD: %s", savedPath.string().c_str()));
-            }
         }
     } cwdGuard(savedCwd);
     
@@ -205,7 +175,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
         m_bInitialised = false;
         return false;
     }
-    AddReportLog(8026, SString("Temporarily changed CWD to MTA dir for CEF init: %s", *strMTADir));
     
     CefMainArgs        mainArgs;
     void*              sandboxInfo = nullptr;
@@ -249,18 +218,11 @@ bool CWebCore::Initialise(bool gpuEnabled)
     }
 
     // CWD will be restored by cwdGuard destructor when this function returns
-
-    // Log CWD after CEF initialization
-    std::array<wchar_t, MAX_PATH> cwdAfterCef{};
-    GetCurrentDirectoryW(static_cast<DWORD>(cwdAfterCef.size()), cwdAfterCef.data());
-    AddReportLog(8013, SString("CWebCore::Initialise - CWD after CefInitialize: %s", *SharedUtil::ToUTF8(cwdAfterCef.data())));
     
     if (m_bInitialised)
     {
         // Register custom scheme handler factory only if initialization succeeded
         CefRegisterSchemeHandlerFactory("http", "mta", app);
-        g_pCore->GetConsole()->Printf("CEF initialized successfully");
-        AddReportLog(8000, "CEF initialized successfully");
     }
     else
     {
