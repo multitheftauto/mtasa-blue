@@ -267,6 +267,9 @@ public:
     void            WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0);
     CClientVehicle* RemoveFromVehicle(bool bIgnoreIfGettingOut = false);
 
+    bool IsEnteringToVehicle();
+    bool IsExitingFromVehicle();
+
     bool IsVisible();
     void SetVisible(bool bVisible);
     bool GetUsesCollision();

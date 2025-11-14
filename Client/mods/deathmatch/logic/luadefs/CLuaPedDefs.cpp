@@ -2560,3 +2560,13 @@ void CLuaPedDefs::PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<
 
     ped->Say(speechContextId, probability.value_or(1.0f));
 }
+
+bool CLuaPedDefs::IsPedEnteringToVehicle(CClientPed* const ped)
+{
+    return ped->IsEnteringToVehicle();
+}
+
+bool CLuaPedDefs::IsPedExitingFromVehicle(CClientPed* const ped)
+{
+    return ped->IsExitingFromVehicle();
+}

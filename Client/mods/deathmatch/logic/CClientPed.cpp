@@ -7279,4 +7279,15 @@ void CClientPed::RunSwimTask() const
 
     inWaterTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP, true);
 }
-  
+
+bool CClientPed::IsEnteringToVehicle()
+{
+    bool inOutState = GetVehicleInOutState();
+    return inOutState == VEHICLE_INOUT_GETTING_IN || inOutState == VEHICLE_INOUT_JACKING;
+}
+
+bool CClientPed::IsExitingFromVehicle()
+{
+    bool inOutState = GetVehicleInOutState();
+    return inOutState == VEHICLE_INOUT_GETTING_OUT || inOutState == VEHICLE_INOUT_GETTING_JACKED;
+}
