@@ -336,9 +336,9 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
 
     // We remove the existing RwObject because, after switching the archive, the streamer will load a new one.
-    // ReInit doesn’t delete all RwObjects unless certain conditions are met.
+    // ReInit doesn't delete all RwObjects unless certain conditions are met.
     // In this case, we must force-remove the RwObject from memory, because it is no longer used,
-    // and due to the archive change the streamer no longer detects it and therefore won’t delete it.
+    // and due to the archive change the streamer no longer detects it and therefore won't delete it.
     // As a result, a memory leak occurs after every call to engineImageLinkDFF.
     if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid); modelInfo->GetRwObject())
         RemoveModel(modelid);
