@@ -15,6 +15,7 @@
 #include "CModelInfoSA.h"
 #include "Fileapi.h"
 #include "processthreadsapi.h"
+#include "CGameSA.h"
 
 extern CCoreInterface* g_pCore;
 
@@ -333,6 +334,14 @@ void CStreamingSA::ReinitStreaming()
 void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
+
+    // We remove the existing RwObject because, after switching the archive, the streamer will load a new one.
+    // ReInit doesn’t delete all RwObjects unless certain conditions are met.
+    // In this case, we must force-remove the RwObject from memory, because it is no longer used,
+    // and due to the archive change the streamer no longer detects it and therefore won’t delete it.
+    // As a result, a memory leak occurs after every call to engineImageLinkDFF.
+    if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid); modelInfo->GetRwObject())
+        RemoveModel(modelid);
 
     // Change nextInImg field for prev model
     for (CStreamingInfo& info : ms_aInfoForModel)
