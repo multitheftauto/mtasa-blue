@@ -1418,14 +1418,10 @@ bool CGUI_Impl::Event_RedrawRequested(const CEGUI::EventArgs& Args)
     {
         // Add to queue for crash-protected deferred redraw
         AddToRedrawQueue(pElement);
-        // Also redraw immediately for responsiveness
-        pElement->ForceRedraw();
     }
-    else
-    {
-        // Fallback: if no data found, force immediate redraw
-        pMasterWindow->forceRedraw();
-    }
+    
+    // Always redraw the event source immediately for responsiveness
+    e.window->forceRedraw();
 
     return true;
 }
