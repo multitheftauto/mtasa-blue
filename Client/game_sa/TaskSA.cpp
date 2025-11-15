@@ -84,12 +84,18 @@ CTask* CTaskSA::GetSubTask()
 {
     static CTaskManagementSystemSA* s_pTaskManagementSystem = pGame->GetTaskManagementSystem();
 
-    DWORD dwThisInterface = (DWORD)GetInterface();
-    DWORD dwFunc = GetInterface()->VTBL->GetSubTask;
+    CTaskSAInterface* pTaskInterface = GetInterface();
+    if (!pTaskInterface)
+        return nullptr;
+
+    DWORD dwFunc = pTaskInterface->VTBL->GetSubTask;
+    if (!dwFunc || dwFunc == 0x82263A)
+        return nullptr;
+
     DWORD dwReturn = 0;
     _asm
     {
-        mov     ecx, dwThisInterface
+        mov     ecx, pTaskInterface
         call    dwFunc
         mov     dwReturn, eax
     }
@@ -326,21 +332,24 @@ CTask* CTaskComplexSA::CreateNextSubTask(CPed* pPed)
 {
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
-        return NULL;
+        return nullptr;
+
+    CTaskSAInterface* pTaskInterface = GetInterface();
+    if (!pTaskInterface)
+        return nullptr;
+
+    DWORD dwFunc = ((TaskComplexVTBL*)pTaskInterface->VTBL)->CreateNextSubTask;
+    if (!dwFunc || dwFunc == 0x82263A)
+        return nullptr;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)GetInterface();
-    DWORD dwFunc = ((TaskComplexVTBL*)GetInterface()->VTBL)->CreateNextSubTask;
     DWORD dwReturn = 0;
-    if (dwFunc != 0x82263A && dwFunc)
+    _asm
     {
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            push    dwPedInterface
-            call    dwFunc
-            mov     dwReturn, eax
-        }
+        mov     ecx, pTaskInterface
+        push    dwPedInterface
+        call    dwFunc
+        mov     dwReturn, eax
     }
     return pGame->GetTaskManagementSystem()->GetTask((CTaskSAInterface*)dwReturn);
 }
@@ -349,21 +358,24 @@ CTask* CTaskComplexSA::CreateFirstSubTask(CPed* pPed)
 {
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
-        return NULL;
+        return nullptr;
+
+    CTaskSAInterface* pTaskInterface = GetInterface();
+    if (!pTaskInterface)
+        return nullptr;
+
+    DWORD dwFunc = ((TaskComplexVTBL*)pTaskInterface->VTBL)->CreateFirstSubTask;
+    if (!dwFunc || dwFunc == 0x82263A)
+        return nullptr;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)GetInterface();
-    DWORD dwFunc = ((TaskComplexVTBL*)GetInterface()->VTBL)->CreateFirstSubTask;
     DWORD dwReturn = 0;
-    if (dwFunc != 0x82263A && dwFunc)
+    _asm
     {
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            push    dwPedInterface
-            call    dwFunc
-            mov     dwReturn, eax
-        }
+        mov     ecx, pTaskInterface
+        push    dwPedInterface
+        call    dwFunc
+        mov     dwReturn, eax
     }
     return pGame->GetTaskManagementSystem()->GetTask((CTaskSAInterface*)dwReturn);
 }
@@ -372,21 +384,24 @@ CTask* CTaskComplexSA::ControlSubTask(CPed* pPed)
 {
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
-        return NULL;
+        return nullptr;
+
+    CTaskSAInterface* pTaskInterface = GetInterface();
+    if (!pTaskInterface)
+        return nullptr;
+
+    DWORD dwFunc = ((TaskComplexVTBL*)pTaskInterface->VTBL)->ControlSubTask;
+    if (!dwFunc || dwFunc == 0x82263A)
+        return nullptr;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)GetInterface();
-    DWORD dwFunc = ((TaskComplexVTBL*)GetInterface()->VTBL)->ControlSubTask;
     DWORD dwReturn = 0;
-    if (dwFunc != 0x82263A && dwFunc)
+    _asm
     {
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            push    dwPedInterface
-            call    dwFunc
-            mov     dwReturn, eax
-        }
+        mov     ecx, pTaskInterface
+        push    dwPedInterface
+        call    dwFunc
+        mov     dwReturn, eax
     }
     return pGame->GetTaskManagementSystem()->GetTask((CTaskSAInterface*)dwReturn);
 }
