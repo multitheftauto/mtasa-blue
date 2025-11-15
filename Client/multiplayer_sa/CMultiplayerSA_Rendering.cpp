@@ -395,6 +395,8 @@ static void __declspec(naked) HOOK_CTimer_Update()
 static const DWORD CONTINUE_CTimer_Suspend = 0x5619EF;
 static void _declspec(naked) HOOK_CTimer_Suspend()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     _asm
     {
         // Check if _timerFunction is NULL
@@ -419,6 +421,8 @@ static void _declspec(naked) HOOK_CTimer_Suspend()
 static const DWORD CONTINUE_CTimer_Resume = 0x561A17;
 static void _declspec(naked) HOOK_CTimer_Resume()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     _asm
     {
         // Check if _timerFunction is NULL
