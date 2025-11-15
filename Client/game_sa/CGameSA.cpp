@@ -896,12 +896,13 @@ void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
 
     if (isEnabled)
     {
-        MemSet((void*)0x6511B9, 0x90, 10);            // CCarEnterExit::IsVehicleStealable
-        MemSet((void*)0x643A95, 0x90, 14);            // CTaskComplexEnterCar::CreateFirstSubTask
-        MemSet((void*)0x6900B5, 0x90, 14);            // CTaskComplexCopInCar::ControlSubTask
-        MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter
-
-        MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon
+        // All these patches disable fire state checks (m_pFire != nullptr)
+        // Related crash protection is handled by checks in TaskSA.cpp and CTaskManagementSystemSA.cpp
+        MemSet((void*)0x6511B9, 0x90, 10);            // CCarEnterExit::IsVehicleStealable - fire check
+        MemSet((void*)0x643A95, 0x90, 14);            // CTaskComplexEnterCar::CreateFirstSubTask - fire check
+        MemSet((void*)0x6900B5, 0x90, 14);            // CTaskComplexCopInCar::ControlSubTask - fire check
+        MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter - fire check  
+        MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon - fire check
 
         MemSet((void*)0x53A899, 0x90, 5);             // CFire::ProcessFire
         MemSet((void*)0x53A990, 0x90, 5);             // CFire::ProcessFire
