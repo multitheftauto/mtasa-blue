@@ -376,8 +376,65 @@ static void __declspec(naked) HOOK_CTimer_Update()
     __asm
     {
         popad
-        mov     ecx,dword ptr ds:[0B7CB28h]
+        // Original code: mov ecx, ds:_timerFunction
+        // GTA has its own NULL check at 0x561B19, so we just execute the original instruction
+        mov     ecx, dword ptr ds:[0B7CB28h]
         jmp     CONTINUE_CTimer_Update
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CTimer::Suspend / CTimer::Resume
+//
+// Prevent crashes if _timerFunction is NULL during init
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CTimer_Suspend              0x5619E9
+#define HOOKSIZE_CTimer_Suspend             6
+static const DWORD CONTINUE_CTimer_Suspend = 0x5619EF;
+static void _declspec(naked) HOOK_CTimer_Suspend()
+{
+    _asm
+    {
+        // Check if _timerFunction is NULL
+        mov     eax, dword ptr ds:[0B7CB28h]
+        test    eax, eax
+        jz      skip_suspend
+        
+        // Original code: call [_timerFunction]
+        call    eax
+        jmp     CONTINUE_CTimer_Suspend
+        
+    skip_suspend:
+        // If NULL, return zero timestamp (EAX:EDX = 0) to avoid corrupting pause time
+        xor     eax, eax
+        xor     edx, edx
+        jmp     CONTINUE_CTimer_Suspend
+    }
+}
+
+#define HOOKPOS_CTimer_Resume               0x561A11
+#define HOOKSIZE_CTimer_Resume              6
+static const DWORD CONTINUE_CTimer_Resume = 0x561A17;
+static void _declspec(naked) HOOK_CTimer_Resume()
+{
+    _asm
+    {
+        // Check if _timerFunction is NULL
+        mov     eax, dword ptr ds:[0B7CB28h]
+        test    eax, eax
+        jz      skip_resume
+        
+        // Original code: call [_timerFunction]
+        call    eax
+        jmp     CONTINUE_CTimer_Resume
+        
+    skip_resume:
+        // If NULL, return zero timestamp (EAX:EDX = 0) to avoid corrupting resume time calculations
+        xor     eax, eax
+        xor     edx, edx
+        jmp     CONTINUE_CTimer_Resume
     }
 }
 
@@ -788,6 +845,8 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstall(Check_NoOfVisibleEntities);
     EZHookInstall(WinLoop);
     EZHookInstall(CTimer_Update);
+    EZHookInstall(CTimer_Suspend);
+    EZHookInstall(CTimer_Resume);
     EZHookInstall(psGrabScreen);
     EZHookInstallChecked(CClouds_RenderSkyPolys);
     EZHookInstallChecked(RwCameraSetNearClipPlane);
