@@ -247,6 +247,9 @@ struct CTimeInfoSAInterface
 class CClumpModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 public:
+    void SetClump(RpClump* clump) { ((void(__thiscall*)(CClumpModelInfoSAInterface*, RpClump*))0x4C4F70)(this, clump); }
+    void SetFrameIds(RwObjectNameIdAssocation* componentList) { ((void(__thiscall*)(CClumpModelInfoSAInterface*, RwObjectNameIdAssocation*))0x4C5460)(this, componentList); }
+
     union
     {
         char*    m_animFileName;
@@ -286,24 +289,51 @@ public:
 };
 static_assert(sizeof(CVehicleModelVisualInfoSAInterface) == 0x314, "Invalid size of CVehicleModelVisualInfoSAInterface class");
 
+// Defines from CVehicleModelInfo.h
+#define MAX_PER_VEHICLE_MATERIALS      48
+#define MAX_PER_VEHICLE_MATERIALS2     32
+#define MAX_PER_VEHICLE_MATERIALS3     16
+#define MAX_PER_VEHICLE_MATERIALS4     16
+#define MAX_PER_VEHICLE_DIRT_MATERIALS 32
+#define NUM_DIRT_LEVELS                16
+#define MAX_POSSIBLE_COLOURS           8
+#define MAX_POSSIBLE_UPGRADES          18
+#define MAX_NUM_REMAPS                 4
+#define NUM_DIRT_LEVELS                16
+#define CUSTOM_PLATE_NUM_CHARS         (8)
+
 class CVehicleModelInfoSAInterface : public CClumpModelInfoSAInterface
 {
+private:
+    void SetClump(RpClump* clump);
+    void SetAtomicRenderCallbacks();
+    void SetRenderPipelines();
+    void PreprocessHierarchy();
+    void ReduceMaterialsInVehicle();
+    void SetCarCustomPlate();
+
+    static void SetDirtTextures(CVehicleModelInfoSAInterface* model, int dirtLevel);
+    static bool GetEditableMaterialListCB(RpAtomic* atomic, void* data);
+    void        FindEditableMaterialList();
+
 public:
+    static void StaticSetHooks();
+    static void SetVehicleDirtLevelFixEnabled(bool enabled) noexcept;
+
     bool IsComponentDamageable(int componentIndex) const;
 
-    RpMaterial*                         pPlateMaterial;
-    char                                plateText[8];
-    std::uint8_t                        field_30;
-    std::uint8_t                        plateType;
+    RpMaterial*                         pPlateMaterial; // pointer to material containing custom plate texture, NULL if no customizable plate present
+    char                                plateText[CUSTOM_PLATE_NUM_CHARS+1];
+    std::uint8_t                        plateType; // custom design: SF, Vegas, LA or default
     char                                gameName[8];
     std::uint8_t                        field_3A[2];
-    std::uint32_t                       vehicleType;
+    std::uint32_t                       vehicleType; // VehicleClass enum
     float                               fWheelSizeFront;
     float                               fWheelSizeRear;
     std::int16_t                        wheelModelID;
     std::int16_t                        handlingID;
     std::uint8_t                        numDoors;
-    std::uint8_t                        vehicleClass;
+    std::uint8_t                        inList;
     std::uint8_t                        vehicleFlags;
     std::uint8_t                        wheelUpgradeClass;
     std::uint8_t                        timesUsed;
@@ -312,24 +342,21 @@ public:
     std::uint32_t                       componentRules;
     float                               bikeSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo; // vehicleStruct
-    std::uint8_t                        field_60[464];
-    RpMaterial**                        m_dirtMaterials;
-    std::size_t                         m_numDirtMaterials;
-    RpMaterial*                         m_staticDirtMaterials[30];
-    std::uint8_t                        primColors[8];
-    std::uint8_t                        secondColors[8];
-    std::uint8_t                        treeColors[8];
-    std::uint8_t                        fourColors[8];
-    std::uint8_t                        numOfColorVariations;
-    std::uint8_t                        lastColorVariation;
-    std::uint8_t                        primColor;
-    std::uint8_t                        secColor;
-    std::uint8_t                        tertColor;
-    std::uint8_t                        quatColor;
-    std::uint8_t                        upgrades[36];
-    std::uint8_t                        anRemapTXDs[8];
-    std::uint8_t                        field_302[2];
-    void*                               pAnimBlock; // CAnimBlock*
+
+    // Arrays of materials to set the colour of when choosing car colours
+    RpMaterial*                         m_primaryColourMaterials[MAX_PER_VEHICLE_MATERIALS+1];
+    RpMaterial*                         m_secondaryColourMaterials[MAX_PER_VEHICLE_MATERIALS2 + 1];
+    RpMaterial*                         m_treeColourMaterials[MAX_PER_VEHICLE_MATERIALS3 + 1];
+    RpMaterial*                         m_fourColourMaterials[MAX_PER_VEHICLE_MATERIALS4 + 1];
+
+    RpMaterial*                         m_dirtMaterials[MAX_PER_VEHICLE_DIRT_MATERIALS];
+    std::uint8_t                        colourVariations[4][MAX_POSSIBLE_COLOURS];
+    std::uint8_t                        numOfColourVariations;
+    std::uint8_t                        lastUsedColourVariation;
+    std::uint8_t                        lastColours[4];
+    std::uint16_t                       upgrades[MAX_POSSIBLE_UPGRADES];
+    std::uint16_t                       anRemapTXDs[MAX_NUM_REMAPS];
+    std::uint32_t                       animFileIndex;
 };
 static_assert(sizeof(CVehicleModelInfoSAInterface) == 0x308, "Invalid size of CVehicleModelInfoSAInterface class");
 
