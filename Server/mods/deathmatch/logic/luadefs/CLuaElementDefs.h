@@ -108,4 +108,14 @@ public:
     LUA_DECLARE(setLowLODElement);
     LUA_DECLARE(setElementCallPropagationEnabled);
     static bool SetElementOnFire(CElement* element, bool onFire) noexcept;
+    static bool SetElementCollidableWith(CElement* element, CElement* withElement, bool canCollide);
+
+    struct ElementPair
+    {
+        CElement* element1;            // Could be any type
+        CElement* element2;
+        bool   canCollide;
+    };
+
+   static vector<ElementPair> elements;
 };
