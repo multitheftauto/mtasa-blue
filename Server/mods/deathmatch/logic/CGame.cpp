@@ -1655,6 +1655,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerChangesProtectedData", "element, key, value", nullptr, false);
     m_Events.AddEvent("onPlayerChangesWorldSpecialProperty", "property, enabled", nullptr, false);
     m_Events.AddEvent("onPlayerTeleport", "previousX, previousY, previousZ, currentX, currentY, currentZ", nullptr, false);
+    m_Events.AddEvent("onPlayerWeaponGiven", "weaponID, weaponAmmo, weaponSlot", nullptr, false);
+    m_Events.AddEvent("onPlayerWeaponTaken", "weaponID, weaponAmmo, weaponSlot", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -1663,6 +1665,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
     m_Events.AddEvent("onPedWeaponReload", "weapon, clip, ammo", nullptr, false);
     m_Events.AddEvent("onPedDamage", "loss", NULL, false);
+    m_Events.AddEvent("onPedWeaponGiven", "weaponID, weaponAmmo, weaponSlot", nullptr, false);
+    m_Events.AddEvent("onPedWeaponTaken", "weaponID, weaponAmmo, weaponSlot", nullptr, false);
 
     // Element events
     m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", NULL, false);
