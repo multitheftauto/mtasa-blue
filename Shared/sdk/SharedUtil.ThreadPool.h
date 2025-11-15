@@ -14,6 +14,7 @@
 #include <future>
 #include <vector>
 #include <algorithm>
+#include <cassert>
 #include "SharedUtil.Misc.h"
 
 namespace SharedUtil
@@ -39,8 +40,17 @@ namespace SharedUtil
                             task = std::move(m_tasks.front());
                             m_tasks.pop();
                         }
-                        // Run the task
-                        task(false);
+                        // Run the task (catch exceptions to prevent thread death)
+                        try
+                        {
+                            task(false);
+                        }
+                        catch (...)
+                        {
+                            // Exception is automatically captured by std::packaged_task
+                            // and will be re-thrown when future.get() is called.
+                            // We must catch here to prevent the worker thread from terminating.
+                        }
                     }
                 });
             }
@@ -49,22 +59,33 @@ namespace SharedUtil
         template <typename Func, typename... Args>
         auto enqueue(Func&& f, Args&&... args)
         {
-            using ReturnT = std::invoke_result_t<Func, Args...>;
-            auto  ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
-            auto* task = new std::packaged_task<ReturnT()>(ff);
 
-            // Package the task in a wrapper with a common void result
-            // plus a skip flag for destruction without running the task
-            std::packaged_task<void(bool)> resultTask([task](bool skip) {
-                if (!skip)
-                    (*task)();
-                delete task;
-            });
+	#if __cplusplus < 201703L // C++17
+	    using ReturnT = typename std::result_of<Func(Args...)>::type;
+	#else
+	    using ReturnT = std::invoke_result_t<Func, Args...>;
+	#endif
+
+    auto  ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
+    auto task = std::make_shared<std::packaged_task<ReturnT()>>(ff);
+
+    // Package the task in a wrapper with a common void result
+    // plus a skip flag for destruction without running the task
+    std::packaged_task<void(bool)> resultTask([task](bool skip) {
+        if (!skip)
+            (*task)();
+        // task automatically deleted when shared_ptr goes out of scope
+    });
 
             // Add task to queue and return future
             std::future<ReturnT> res = task->get_future();
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
+                if (m_exit)
+                {
+                    // Pool is shutting down - reject new tasks
+                    throw std::runtime_error("Cannot enqueue task: thread pool is shutting down");
+                }
                 m_tasks.emplace(std::move(resultTask));
             }
             m_cv.notify_one();
@@ -73,19 +94,36 @@ namespace SharedUtil
 
         void shutdown()
         {
-            if (m_exit)
-                return;
-
-            // Ensure every thread receives the exit state, and discard all remaining tasks.
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
+                
+                // Already shutting down or shut down
+                if (m_exit)
+                    return;
+                
                 m_exit = true;
 
+                // Discard all remaining tasks
                 while (!m_tasks.empty())
                 {
-                    // Run each task but skip execution of the actual function (-> just delete the task)
+                    // Run each task with skip flag to clean up without executing
                     auto task = std::move(m_tasks.front());
-                    task(true);
+                    m_tasks.pop();  // Important: Remove from queue to avoid infinite loop
+                    
+                    // Execute cleanup outside the critical section to reduce lock contention
+                    lock.unlock();
+                    try
+                    {
+                        task(true);  // Cleanup the shared_ptr
+                    }
+                    catch (...)
+                    {
+                        // Exceptions during cleanup indicate a serious bug (e.g., corrupted lambda)
+                        // We cannot propagate this exception as we're mid-shutdown with the lock released.
+                        // In debug builds, this should be logged/asserted.
+                        dassert(false && "Exception during thread pool task cleanup");
+                    }
+                    lock.lock();
                 }
             }
 
@@ -94,12 +132,24 @@ namespace SharedUtil
 
             // Wait for threads to end
             for (std::thread& worker : m_vecThreads)
-                worker.join();
+            {
+                if (worker.joinable())
+                    worker.join();
+            }
         }
 
-        ~CThreadPool()
+        ~CThreadPool() noexcept
         {
-            shutdown();
+            try
+            {
+                shutdown();
+            }
+            catch (...)
+            {
+                // Must suppress exceptions to prevent std::terminate().
+                // This should only happen if mutex operations fail (system error).
+                dassert(false && "Exception during thread pool destruction");
+            }
         }
 
         static CThreadPool& getDefaultThreadPool()
