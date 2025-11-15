@@ -365,6 +365,9 @@ CGame::~CGame()
     // Stop async task scheduler
     SAFE_DELETE(m_pAsyncTaskScheduler);
 
+    // Shutdown thread pool before destroying resources to prevent tasks being enqueued during shutdown
+    CThreadPool::getDefaultThreadPool().shutdown();
+
     // Destroy our stuff
     SAFE_DELETE(m_pResourceManager);
 
@@ -423,7 +426,6 @@ CGame::~CGame()
     SAFE_DELETE(m_pASE);
     SAFE_RELEASE(m_pHqComms);
     CSimControl::Shutdown();
-    CThreadPool::getDefaultThreadPool().shutdown();
 
     // Clear our global pointer
     g_pGame = NULL;
