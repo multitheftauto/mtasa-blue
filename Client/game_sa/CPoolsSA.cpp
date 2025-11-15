@@ -1116,3 +1116,20 @@ void CPoolsSA::InvalidateLocalPlayerClientEntity()
 {
     m_pedPool.arrayOfClientEntities[0] = {m_pedPool.arrayOfClientEntities[0].pEntity, nullptr};
 }
+
+std::uint16_t CPoolsSA::GetObjectHandle(CObjectSAInterface* object) const
+{
+    auto pool = *reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CPool_Object);
+    if (!pool || !pool->m_pObjects || !pool->m_byteMap)
+        return 0xFFFF;
+
+    int index = static_cast<int>((reinterpret_cast<std::uintptr_t>(object) - reinterpret_cast<std::uintptr_t>(pool->m_pObjects)) / (sizeof(CObjectSAInterface) + 32));
+    if (index < 0 || index >= pool->m_nSize)
+        return 0xFFFF;
+
+    const tPoolObjectFlags& flags = pool->m_byteMap[index];
+    if (flags.bEmpty)
+        return 0xFFFF;
+
+    return static_cast<std::uint16_t>((index << 8) | flags.nId);
+}

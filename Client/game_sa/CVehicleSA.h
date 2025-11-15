@@ -466,8 +466,6 @@ public:
     // Override of CPhysicalSA::SetMoveSpeed to take trains into account
     void SetMoveSpeed(const CVector& vecMoveSpeed) noexcept;
 
-    bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
-
     CTrainSAInterface* GetNextCarriageInTrain();
     CVehicle*          GetNextTrainCarriage();
     void               SetNextTrainCarriage(CVehicle* pNext);

@@ -400,11 +400,6 @@ CVehicle* CVehicleSA::GetNextTrainCarriage()
     return nullptr;
 }
 
-bool CVehicleSA::AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity)
-{
-    return ((CProjectileInfoSA*)pGame->GetProjectileInfo())->AddProjectile((CEntitySA*)this, eWeapon, vecOrigin, fForce, target, targetEntity);
-}
-
 void CVehicleSA::SetNextTrainCarriage(CVehicle* pNext)
 {
     if (pNext)
