@@ -539,8 +539,8 @@ void CSettings::CreateGUI()
             return;
         CVector2D buttonSize;
         button->GetSize(buttonSize);
-        const float bottomPadding = 12.0f;
-        const float buttonY = std::max(0.0f, tabPanelSize.fY - buttonSize.fY - bottomPadding);
+        const float bottomPadding = 32.0f;
+        const float buttonY = std::max(0.0f, tabPanelSize.fY - buttonSize.fY - bottomPadding - 4.0f);
         button->SetPosition(CVector2D(std::max(0.0f, tabPanelSize.fX - buttonSize.fX - bottomPadding), buttonY));
     };
 
@@ -1577,7 +1577,7 @@ void CSettings::CreateGUI()
     m_pGridBrowserBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserBlacklist->GetPosition(vecTemp);
     const CVector2D blacklistGridPos = vecTemp;
-    const float browserBottomPadding = 12.0f;
+    const float browserBottomPadding = 32.0f;
     const float browserButtonSpacing = 5.0f;
     const CVector2D blacklistRemoveSize(140.0f, 22.0f);
     const float blacklistHeightAvailable = tabPanelSize.fY - blacklistGridPos.fY - blacklistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
