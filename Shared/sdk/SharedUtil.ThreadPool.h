@@ -103,27 +103,10 @@ namespace SharedUtil
                 
                 m_exit = true;
 
-                // Discard all remaining tasks
+                // Clear all remaining tasks (they will be destroyed automatically)
                 while (!m_tasks.empty())
                 {
-                    // Run each task with skip flag to clean up without executing
-                    auto task = std::move(m_tasks.front());
-                    m_tasks.pop();  // Important: Remove from queue to avoid infinite loop
-                    
-                    // Execute cleanup outside the critical section to reduce lock contention
-                    lock.unlock();
-                    try
-                    {
-                        task(true);  // Cleanup the shared_ptr
-                    }
-                    catch (...)
-                    {
-                        // Exceptions during cleanup indicate a serious bug (e.g., corrupted lambda)
-                        // We cannot propagate this exception as we're mid-shutdown with the lock released.
-                        // In debug builds, this should be logged/asserted.
-                        dassert(false && "Exception during thread pool task cleanup");
-                    }
-                    lock.lock();
+                    m_tasks.pop();
                 }
             }
 
