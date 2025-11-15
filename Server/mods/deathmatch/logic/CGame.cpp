@@ -2525,20 +2525,20 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (player->GetWeaponTotalAmmo(slot) <= 0)
         return;
 
-    if (player->GetWeaponAmmoInClip(slot) <= 0)
-        return;
+    // Note: Don't check ammo in clip here - it can be out of sync due to network timing
+    // The total ammo check above is sufficient
 
     const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
     const auto level = player->GetPlayerStat(stat);
     auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
 
-    const float distance = (packet.m_start - packet.m_end).LengthSquared();
+    const float distanceSq = (packet.m_start - packet.m_end).LengthSquared();
     const float range = stats->GetWeaponRange();
-    const float rangesq = range * range;
+    const float rangeSq = range * range;
 
-    const float delta = std::fabs(distance - rangesq);
-    const float max = std::max(distance, rangesq);
-    if (delta > max * FLOAT_EPSILON)
+
+    const float maxRangeSq = rangeSq * 1.1f; // 10% tolerance for floating point
+    if (distanceSq > maxRangeSq)
         return;
 
     CLuaArguments args;
