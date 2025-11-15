@@ -12,6 +12,7 @@
 #include "gamesa_renderware.h"
 
 #include <map>
+#include <sstream>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -312,9 +313,16 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 continue;
 
             RwTexture* pOriginalTexture = (idx < perTxdInfo.replacedOriginals.size()) ? perTxdInfo.replacedOriginals[idx] : nullptr;
+            
+            if (pOriginalTexture && !SharedUtil::IsReadablePointer(pOriginalTexture, sizeof(RwTexture)))
+                pOriginalTexture = nullptr;
+                
             swapMap[pOldTexture] = pOriginalTexture;
 
-            if (pOriginalTexture && !RwTexDictionaryContainsTexture(pInfo->pTxd, pOriginalTexture))
+            // Only restore original textures early if this is the last replacement set for this TXD
+            // Otherwise, other replacement sets might still be using the TXD
+            bool isLastReplacement = (pInfo->usedByReplacements.size() == 1);
+            if (pOriginalTexture && isLastReplacement && !RwTexDictionaryContainsTexture(pInfo->pTxd, pOriginalTexture))
                 RwTexDictionaryAddTexture(pInfo->pTxd, pOriginalTexture);
         }
 
@@ -348,6 +356,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         for (RwTexture* pOldTexture : perTxdInfo.usingTextures)
         {
             if (!pOldTexture)
+                continue;
+            
+            if (!SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
                 continue;
                 
             RwTexDictionaryRemoveTexture(pInfo->pTxd, pOldTexture);
@@ -392,18 +403,85 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         #ifdef MTA_DEBUG
             std::vector<RwTexture*> currentTextures;
             GetTxdTextures(currentTextures, pInfo->pTxd);
-            assert(currentTextures.size() == pInfo->originalTextures.size());
-            for (RwTexture* pOriginalTexture : pInfo->originalTextures)
+            
+            auto formatTextures = [](const std::vector<RwTexture*>& textures) -> std::string {
+                std::ostringstream result;
+                for (size_t i = 0; i < textures.size(); ++i)
+                {
+                    const auto* pTex = textures[i];
+                    const bool isValid = pTex && SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture));
+                    const bool isLast = (i == textures.size() - 1);
+                    
+                    if (isValid)
+                        result << pTex->name << "[0x" << std::hex << pTex << std::dec << "]";
+                    else
+                        result << "INVALID[0x" << std::hex << pTex << std::dec << "]";
+                    
+                    if (!isLast)
+                        result << ", ";
+                }
+                return result.str();
+            };
+            
+            // Allow size mismatch in case texture removal was skipped due to invalid pointers
+            if (currentTextures.size() != pInfo->originalTextures.size())
             {
-                if (!pOriginalTexture)
-                    continue;
-                assert(ListContains(currentTextures, pOriginalTexture));
-                ListRemove(currentTextures, pOriginalTexture);
+                std::ostringstream debugMsg;
+                debugMsg << "TXD " << pInfo->usTxdId << ": texture count mismatch (current=" 
+                         << currentTextures.size() << ", expected=" << pInfo->originalTextures.size() << ")\n";
+                debugMsg << "  Current textures: " << formatTextures(currentTextures);
+                debugMsg << "\n  Expected textures: " << formatTextures(pInfo->originalTextures);
+                debugMsg << "\n";
+                OutputDebugString(debugMsg.str().c_str());
             }
-            assert(currentTextures.empty());
+            else
+            {
+                // First pass: validate all original textures are present
+                for (const auto* pOriginalTexture : pInfo->originalTextures)
+                {
+                    if (!pOriginalTexture)
+                        continue;
+                    if (!ListContains(currentTextures, pOriginalTexture))
+                    {
+                        const char* texName = SharedUtil::IsReadablePointer(pOriginalTexture, sizeof(RwTexture)) 
+                            ? pOriginalTexture->name : "INVALID";
+                        std::ostringstream oss;
+                        oss << "Original texture not found in TXD " << pInfo->usTxdId 
+                            << " - texture '" << texName << "' [0x" << std::hex << pOriginalTexture << std::dec 
+                            << "] was removed or replaced unexpectedly";
+                        const std::string assertMsg = oss.str();
+                        assert(false && assertMsg.c_str());
+                    }
+                }
+                
+                // Second pass: remove original textures from current list to find extras
+                for (auto* pOriginalTexture : pInfo->originalTextures)
+                {
+                    if (pOriginalTexture)
+                        ListRemove(currentTextures, pOriginalTexture);
+                }
+                
+                // Check for leaked textures
+                if (!currentTextures.empty())
+                {
+                    std::ostringstream oss;
+                    oss << "Extra textures remain in TXD " << pInfo->usTxdId 
+                        << " after removing all originals - indicates texture leak. Remaining: "
+                        << formatTextures(currentTextures);
+                    const std::string assertMsg = oss.str();
+                    assert(false && assertMsg.c_str());
+                }
+            }
 
-            int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
-            assert(refsCount > 0, "Should have at least one TXD reference here");
+            const int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
+            if (refsCount <= 0)
+            {
+                std::ostringstream oss;
+                oss << "TXD " << pInfo->usTxdId << " has invalid ref count " 
+                    << refsCount << " - should be > 0 before cleanup";
+                const std::string assertMsg = oss.str();
+                assert(false && assertMsg.c_str());
+            }
         #endif
             // Clear original textures to prevent dangling pointers after TXD ref removal
             // The textures themselves are owned by the TXD and will be cleaned up when ref count hits zero
