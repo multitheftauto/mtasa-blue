@@ -934,11 +934,15 @@ void CGameSA::SetVehicleBurnExplosionsEnabled(bool isEnabled)
     {
         MemCpy((void*)0x6A74EA, "\xE8\x61\xF5\x08\x00", 5);            // CAutomobile::ProcessCarOnFireAndExplode
         MemCpy((void*)0x737929, "\xE8\x22\xF1\xFF\xFF", 5);            // CExplosion::Update
+        MemCpy((void*)0x6A72B5, "\x0F\x84\x7F\x01\x00\x00", 6);        // if ( this->m_nBurnTimer > 5000.0 )
+        MemCpy((void*)0x6A7166, "\x0F\x84\x87\x00\x00\x00", 6);        // if ( v6 <= 5000.0 )
     }
     else
     {
         MemSet((void*)0x6A74EA, 0x90, 5);
         MemSet((void*)0x737929, 0x90, 5);
+        MemSet((void*)0x6A72B5, 0x90, 6);
+        MemSet((void*)0x6A7166, 0x90, 6);
     }
 
     m_isVehicleBurnExplosionsEnabled = isEnabled;
