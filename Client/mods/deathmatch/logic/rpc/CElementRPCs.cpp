@@ -864,10 +864,6 @@ void CElementRPCs::SetElementOnFire(CClientEntity* pSource, NetBitStreamInterfac
 void CElementRPCs::SetElementCollidableWith(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     ElementID ElementID;
-
-      if (!bitStream.Can(eBitStreamVersion::SetElementCollidableWith_Serverside))
-        return;
-
     bitStream.Read(ElementID);
 
    CClientEntity* collidableWith = CElementIDs::GetElement(ElementID);
