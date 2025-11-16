@@ -340,8 +340,16 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     // In this case, we must force-remove the RwObject from memory, because it is no longer used,
     // and due to the archive change the streamer no longer detects it and therefore won't delete it.
     // As a result, a memory leak occurs after every call to engineImageLinkDFF.
-    if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid); modelInfo->GetRwObject())
-        RemoveModel(modelid);
+    const auto baseTxdId = g_pCore->GetGame()->GetBaseIDforTXD();
+    if (modelid < static_cast<uint>(baseTxdId))
+    {
+        if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid, true))
+        {
+            // Only DFF models got RwObjects, TXDs don't, so we only flush those here (or crash)
+            if (modelInfo->GetRwObject())
+                RemoveModel(modelid);
+        }
+    }
 
     // Change nextInImg field for prev model
     for (CStreamingInfo& info : ms_aInfoForModel)
