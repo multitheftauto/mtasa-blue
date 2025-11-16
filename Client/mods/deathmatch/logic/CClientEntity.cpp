@@ -747,6 +747,13 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
     if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, NULL))
         return false;
 
+    const char* thisTypeName = GetTypeName() ? GetTypeName() : "<unknown>";
+    const ElementID thisId = GetID();
+    SString telemetryDetail;
+    telemetryDetail.Format("%s %s(%u)", szName, thisTypeName, static_cast<unsigned int>(thisId));
+    // Capture the element+event context so any crash (even core.dll faults) reports the last event being dispatched.
+    CrashTelemetry::Scope entityScope(0, this, "Entity::CallEvent", telemetryDetail.c_str());
+
     TIMEUS startTime = GetTimeUs();
 
     CEvents* pEvents = g_pClientGame->GetEvents();
