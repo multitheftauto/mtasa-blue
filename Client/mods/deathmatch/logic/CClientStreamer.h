@@ -51,7 +51,7 @@ private:
 
     void AddElementInSectors(CClientStreamElement* pElement);
     void RemoveElementFromSectors(CClientStreamElement* pElement);
-    bool IsElementShouldVisibleInCurrentDimesnion(CClientStreamElement* pElement);
+    bool IsElementShouldVisibleInCurrentDimension(CClientStreamElement* pElement);
 
     void SetExpDistances(std::list<CClientStreamElement*>* pList);
     void AddToSortedList(std::list<CClientStreamElement*>* pList, CClientStreamElement* pElement);
