@@ -496,8 +496,8 @@ void CClientStreamer::Restream(bool bMovedFar)
     }
 
     // Prepare temporary lists
-    static std::vector<CClientStreamElement*> closestOut;
-    static std::vector<CClientStreamElement*> furthestIn;
+    std::vector<CClientStreamElement*> closestOut;
+    std::vector<CClientStreamElement*> furthestIn;
 
     closestOut.clear();
     furthestIn.clear();
