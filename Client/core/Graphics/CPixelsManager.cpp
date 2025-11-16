@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include "CFileFormat.h"
 #include "CPixelsManager.h"
+#include <CrashTelemetry.h>
 
 ///////////////////////////////////////////////////////////////
 // Object creation
@@ -749,6 +750,22 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
     EPixelsFormatType oldFormat = GetPixelsFormat(oldPixels);
     if (oldFormat == EPixelsFormat::UNKNOWN || newFormat == EPixelsFormat::UNKNOWN)
         return false;
+
+    const uint sourceBytes = oldPixels.GetSize();
+    uint       width = 0;
+    uint       height = 0;
+    GetPixelsSize(oldPixels, width, height);
+
+    SString telemetryDetail;
+    telemetryDetail.Format("%s->%s q=%d bytes=%u dims=%ux%u",
+                           EnumToString(oldFormat).c_str(),
+                           EnumToString(newFormat).c_str(),
+                           uiQuality,
+                           sourceBytes,
+                           width,
+                           height);
+    // Tag conversions here so crashes show which pixel formats/dimensions were being processed.
+    CrashTelemetry::Scope conversionScope(sourceBytes, oldPixels.GetData(), "Pixels::ChangeFormat", telemetryDetail.c_str());
 
     if (oldFormat == newFormat)
     {
