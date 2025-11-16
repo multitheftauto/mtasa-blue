@@ -37,6 +37,7 @@ public:
     void                                       Remove(CClientStreamElement* pElement) { m_Elements.remove(pElement); }
     std::list<CClientStreamElement*>::iterator Begin() { return m_Elements.begin(); }
     std::list<CClientStreamElement*>::iterator End() { return m_Elements.end(); }
+    std::list<CClientStreamElement*>&          GetElements() { return m_Elements; }
 
     void         AddElements(std::list<CClientStreamElement*>* pList);
     void         RemoveElements(std::list<CClientStreamElement*>* pList);
