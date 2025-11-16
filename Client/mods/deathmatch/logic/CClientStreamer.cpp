@@ -232,8 +232,7 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
             {
                 auto& elements = sector->GetElements();
                 auto  iter = elements.begin();
-
-                while (iter != elements.end())
+                while (iter != sector->End())
                 {
                     CClientStreamElement* element = *iter;
 
@@ -261,18 +260,17 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
 
     auto iter = m_outsideCurrentDimensionElements.begin();
 
-    while (iter != m_outsideCurrentDimensionElements.end() && *iter != lastOutsideElement)
+    while (*iter != lastOutsideElement)
     {
         CClientStreamElement* element = *iter;
-
-        if (element->GetDimension() == m_usDimension)
+        if (element->GetDimension() == usDimension)
         {
             iter = m_outsideCurrentDimensionElements.erase(iter);
             AddElementInSectors(element);
         }
         else
         {
-            ++iter;
+            iter++;
         }
     }
 }
@@ -498,8 +496,8 @@ void CClientStreamer::Restream(bool bMovedFar)
     }
 
     // Prepare temporary lists
-    std::vector<CClientStreamElement*> closestOut;
-    std::vector<CClientStreamElement*> furthestIn;
+    static std::vector<CClientStreamElement*> closestOut;
+    static std::vector<CClientStreamElement*> furthestIn;
 
     closestOut.clear();
     furthestIn.clear();
