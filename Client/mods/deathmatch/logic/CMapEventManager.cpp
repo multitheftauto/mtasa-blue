@@ -188,21 +188,21 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                         continue;
 
                     const char* scriptName = pMapEvent->GetVM()->GetScriptName();
-                    const CResource* pEventResource = pMapEvent->GetVM()->GetResource();
-                    const char* resourceName = pEventResource ? pEventResource->GetName().c_str() : "<no-resource>";
+                    CResource*  pEventResource = pMapEvent->GetVM()->GetResource();
+                    const char* resourceName = pEventResource ? pEventResource->GetName() : "<no-resource>";
 
                     SString sourceTag = "<null>";
                     if (pSource)
                     {
                         const char* sourceTypeName = pSource->GetTypeName() ? pSource->GetTypeName() : "<unknown>";
-                        sourceTag.Format("%s(%u)", sourceTypeName, static_cast<unsigned int>(pSource->GetID()));
+                        sourceTag.Format("%s(%u)", sourceTypeName, pSource->GetID().Value());
                     }
 
                     SString thisTag = "<null>";
                     if (pThis)
                     {
                         const char* thisTypeName = pThis->GetTypeName() ? pThis->GetTypeName() : "<unknown>";
-                        thisTag.Format("%s(%u)", thisTypeName, static_cast<unsigned int>(pThis->GetID()));
+                        thisTag.Format("%s(%u)", thisTypeName, pThis->GetID().Value());
                     }
 
                     SString telemetryDetail;

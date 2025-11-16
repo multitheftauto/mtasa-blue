@@ -13,6 +13,27 @@
 #include "CPixelsManager.h"
 #include <CrashTelemetry.h>
 
+namespace
+{
+    const char* PixelsFormatToString(EPixelsFormatType format)
+    {
+        switch (format)
+        {
+            case EPixelsFormat::PLAIN:
+                return "plain";
+            case EPixelsFormat::JPEG:
+                return "jpeg";
+            case EPixelsFormat::PNG:
+                return "png";
+            case EPixelsFormat::DDS:
+                return "dds";
+            case EPixelsFormat::UNKNOWN:
+            default:
+                return "unknown";
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
@@ -758,8 +779,8 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
 
     SString telemetryDetail;
     telemetryDetail.Format("%s->%s q=%d bytes=%u dims=%ux%u",
-                           EnumToString(oldFormat).c_str(),
-                           EnumToString(newFormat).c_str(),
+                           PixelsFormatToString(oldFormat),
+                           PixelsFormatToString(newFormat),
                            uiQuality,
                            sourceBytes,
                            width,
