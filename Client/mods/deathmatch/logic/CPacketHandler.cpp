@@ -309,6 +309,9 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
     if (g_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         g_pGame->StartGame();
+
+        // Fix area name showing for a second when joining to server for first time
+        g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     }
 }
 
