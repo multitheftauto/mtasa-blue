@@ -20,6 +20,7 @@
 #include <SharedUtil.Detours.h>
 #include <SharedUtil.Misc.h>
 #include <SharedUtil.Memory.h>
+#include "../Shared/sdk/CrashTelemetry.h"
 
 #include <algorithm>
 #include <array>
@@ -27,6 +28,7 @@
 #include <chrono>
 #include <cctype>
 #include <cstdint>
+#include <cstring>
 #include <exception>
 #include <errno.h>
 #include <filesystem>
@@ -44,6 +46,9 @@
 #include <string_view>
 #include <variant>
 #include <vector>
+#if defined(_MSC_VER)
+    #include <new.h>
+#endif
 
 #if defined(_MSC_VER)
     #include <corecrt.h>
@@ -93,6 +98,16 @@ inline std::mutex                             g_exceptionInfoMutex;
 inline std::atomic<DWORD> g_initializationPhase{INIT_PHASE_MINIMAL};
 
 using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std::exception_ptr>;
+
+#if defined(__cplusplus)
+[[noreturn]] void __cdecl CppNewHandler() noexcept;
+#endif
+
+#if defined(_MSC_VER)
+static int __cdecl CppNewHandlerBridge(size_t size) noexcept;
+#else
+static void CppNewHandlerBridge() noexcept;
+#endif
 
 [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall IsFatalException(DWORD exceptionCode) noexcept
 {
@@ -173,13 +188,21 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
             return;
         }
 
-        g_lastExceptionInfo = ENHANCED_EXCEPTION_INFO{
+        ENHANCED_EXCEPTION_INFO info{
             .exceptionCode = pException->ExceptionRecord->ExceptionCode,
             .exceptionAddress = pException->ExceptionRecord->ExceptionAddress,
             .timestamp = std::chrono::system_clock::now(),
             .threadId = GetCurrentThreadId(),
             .processId = GetCurrentProcessId()
         };
+
+        const auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote();
+        if (!telemetryNote.empty())
+        {
+            info.additionalInfo = telemetryNote;
+        }
+
+        g_lastExceptionInfo = info;
     }
     catch (...)
     {
@@ -495,6 +518,12 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
             case EXCEPTION_GUARD_PAGE:
                 info.exceptionType = "SEH:GuardPage";
                 break;
+            case CUSTOM_EXCEPTION_CODE_OOM:
+                info.exceptionType = "User:OutOfMemory";
+                break;
+            case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
+                info.exceptionType = "User:WatchdogTimeout";
+                break;
             default:
                 if (info.exceptionCode >= 0xC0000000 && info.exceptionCode <= 0xCFFFFFFF)
                 {
@@ -513,6 +542,15 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
 
         info.exceptionDescription = GetExceptionCodeDescription(info.exceptionCode);
 
+        if (auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote(); !telemetryNote.empty())
+        {
+            if (!info.additionalInfo.empty())
+            {
+                info.additionalInfo.push_back('\n');
+            }
+            info.additionalInfo += telemetryNote;
+        }
+
         g_lastExceptionInfo = info;
     }
     catch (...)
@@ -522,7 +560,16 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
     }
 }
 
-static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTERS* pException)
+static void CaptureAllocationTelemetry(_EXCEPTION_POINTERS* pException) noexcept
+{
+    if (pException == nullptr || pException->ExceptionRecord == nullptr)
+        return;
+
+    StoreBasicExceptionInfo(pException);
+    LogEnhancedExceptionInfo(pException);
+}
+
+static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTERS* pException) noexcept
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
     {
@@ -625,7 +672,12 @@ static std::mutex                                          g_handlerStateMutex;
 static std::atomic<PFNCHFILTFN>                            g_pfnCrashCallback{nullptr};
 static std::atomic<LPTOP_LEVEL_EXCEPTION_FILTER>           g_pfnOrigFilt{nullptr};
 static std::atomic<std::terminate_handler>                 g_pfnOrigTerminate{nullptr};
+#if defined(_MSC_VER)
+using CrtNewHandler = int(__cdecl*)(size_t);
+static std::atomic<CrtNewHandler>                          g_pfnOrigNewHandler{nullptr};
+#else
 static std::atomic<std::new_handler>                       g_pfnOrigNewHandler{nullptr};
+#endif
 static std::atomic<decltype(&SetUnhandledExceptionFilter)> g_pfnKernelSetUnhandledExceptionFilter{nullptr};
 static decltype(&SetUnhandledExceptionFilter)              g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
 
@@ -641,10 +693,45 @@ static std::atomic<bool>                g_symbolsInitialized{false};
 static std::atomic<HANDLE>              g_symbolProcess{nullptr};
 static std::mutex                       g_symbolMutex;
 
+#if defined(_MSC_VER)
+static int __cdecl CppNewHandlerBridge(size_t size) noexcept
+{
+    const auto telemetry = CrashTelemetry::CaptureContext();
+    if ((!telemetry.hasData || telemetry.requestedSize == 0) && size > 0)
+    {
+        CrashTelemetry::SetAllocationContext(size, nullptr, "operator new", "std::new_handler");
+    }
+
+    if (auto previous = g_pfnOrigNewHandler.load(std::memory_order_acquire))
+    {
+        return previous(size);
+    }
+
+    CppNewHandler();
+    return 0;
+}
+#else
+static void CppNewHandlerBridge() noexcept
+{
+    const auto telemetry = CrashTelemetry::CaptureContext();
+    if (!telemetry.hasData)
+    {
+        CrashTelemetry::SetAllocationContext(0, nullptr, "operator new", "std::new_handler");
+    }
+
+    if (auto previous = g_pfnOrigNewHandler.load(std::memory_order_acquire))
+    {
+        previous();
+        return;
+    }
+
+    CppNewHandler();
+}
+#endif
+
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
 [[noreturn]] void __cdecl CppTerminateHandler() noexcept;
-[[noreturn]] void __cdecl CppNewHandler() noexcept;
 void __cdecl              AbortSignalHandler(int signal) noexcept;
 [[noreturn]] void __cdecl PureCallHandler() noexcept;
 
@@ -766,6 +853,8 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
     exPtrs.ExceptionRecord = &exRecord;
     exPtrs.ContextRecord = &ctx;
 
+    CaptureAllocationTelemetry(&exPtrs);
+
     PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
 
     if (callback != nullptr)
@@ -804,13 +893,19 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
     LogHandlerEvent(DEBUG_PREFIX_PURECALL.data(), "Pure virtual function call detected");
     SafeDebugOutput(DEBUG_SEPARATOR);
 
-    EXCEPTION_RECORD* pExRecord{nullptr};
-    CONTEXT* pCtx{nullptr};
+    EXCEPTION_RECORD*  pExRecord{nullptr};
+    CONTEXT*           pCtx{nullptr};
     EXCEPTION_POINTERS exPtrs{};
+
+    const bool haveContext = BuildExceptionContext(exPtrs, pExRecord, pCtx, EXCEPTION_NONCONTINUABLE_EXCEPTION);
+    if (haveContext)
+    {
+        CaptureAllocationTelemetry(&exPtrs);
+    }
 
     PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
 
-    if (callback != nullptr && BuildExceptionContext(exPtrs, pExRecord, pCtx, EXCEPTION_NONCONTINUABLE_EXCEPTION))
+    if (callback != nullptr && haveContext)
     {
         LogHandlerEvent(DEBUG_PREFIX_PURECALL.data(), "Calling crash handler callback");
 
@@ -867,7 +962,11 @@ public:
 
         if (auto newHandler = g_pfnOrigNewHandler.exchange(nullptr, std::memory_order_acq_rel); newHandler != nullptr)
         {
+    #if defined(_MSC_VER)
+            _set_new_handler(newHandler);
+    #else
             std::set_new_handler(newHandler);
+    #endif
         }
 
         if (auto abortHandler = g_pfnOrigAbortHandler.exchange(nullptr, std::memory_order_acq_rel); abortHandler != nullptr)
@@ -1332,7 +1431,11 @@ static void InstallCppHandlers() noexcept
 
     if (g_pfnOrigNewHandler.load(std::memory_order_acquire) == nullptr)
     {
-        std::new_handler previous = std::set_new_handler(CppNewHandler);
+#if defined(_MSC_VER)
+        CrtNewHandler previous = _set_new_handler(CppNewHandlerBridge);
+#else
+        std::new_handler previous = std::set_new_handler(CppNewHandlerBridge);
+#endif
         g_pfnOrigNewHandler.store(previous, std::memory_order_release);
         SafeDebugOutput("CrashHandler: C++ new handler installed\n");
     }
@@ -1903,7 +2006,11 @@ static void UninstallCrashHandlers() noexcept
 
     if (auto newHandler = g_pfnOrigNewHandler.exchange(nullptr, std::memory_order_acq_rel); newHandler != nullptr)
     {
+#if defined(_MSC_VER)
+        _set_new_handler(newHandler);
+#else
         std::set_new_handler(newHandler);
+#endif
     }
 
     if (auto abortHandler = g_pfnOrigAbortHandler.exchange(nullptr, std::memory_order_acq_rel); abortHandler != nullptr)
@@ -2004,13 +2111,24 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
 
     SafeDebugOutput(DEBUG_SEPARATOR);
 
+    if (auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote(); !telemetryNote.empty())
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "%s\n", telemetryNote.c_str());
+    }
+
     EXCEPTION_RECORD*  pExRecord = nullptr;
     CONTEXT*           pCtx = nullptr;
     EXCEPTION_POINTERS exPtrs{};
 
+    const bool haveContext = BuildExceptionContext(exPtrs, pExRecord, pCtx, CPP_EXCEPTION_CODE);
+    if (haveContext)
+    {
+        CaptureAllocationTelemetry(&exPtrs);
+    }
+
     PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
 
-    if (callback != nullptr && BuildExceptionContext(exPtrs, pExRecord, pCtx, CPP_EXCEPTION_CODE))
+    if (callback != nullptr && haveContext)
     {
         SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "Calling crash handler callback\n");
 
@@ -2081,6 +2199,12 @@ static void ReportCurrentCppException() noexcept
     SafeDebugOutput(DEBUG_SEPARATOR);
     SafeDebugOutput("C++ NEW HANDLER: Memory allocation failed\n");
     SafeDebugOutput(DEBUG_SEPARATOR);
+
+    if (auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote(); !telemetryNote.empty())
+    {
+        SafeDebugOutput(telemetryNote.c_str());
+        SafeDebugOutput("\n");
+    }
 
     std::terminate();
 }
