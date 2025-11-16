@@ -19,6 +19,9 @@
 #include "CResourceConfigItem.h"
 #include "CDummy.h"
 #include "Utils.h"
+#include <algorithm>
+#include <unordered_map>
+#include <variant>
 
 extern CNetServer* g_pRealNetServer;
 
@@ -60,6 +63,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceMapRootElement", getResourceMapRootElement},
         {"getResourceExportedFunctions", getResourceExportedFunctions},
         {"getResourceOrganizationalPath", getResourceOrganizationalPath},
+        {"getResourceFiles", ArgumentParser<getResourceFiles>},
         {"isResourceArchived", isResourceArchived},
         {"isResourceProtected", ArgumentParser<isResourceProtected>},
 
@@ -118,6 +122,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot");
     lua_classfunction(luaVM, "getRootElement", "getResourceRootElement");
     lua_classfunction(luaVM, "getExportedFunctions", "getResourceExportedFunctions");
+    lua_classfunction(luaVM, "getFiles", "getResourceFiles");
     lua_classfunction(luaVM, "getOrganizationalPath", "getResourceOrganizationalPath");
     lua_classfunction(luaVM, "getLastStartTime", "getResourceLastStartTime");
     lua_classfunction(luaVM, "getLoadTime", "getResourceLoadTime");
@@ -1066,6 +1071,111 @@ int CLuaResourceDefs::getResourceExportedFunctions(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+namespace
+{
+    CLuaResourceDefs::eResourceFileFilter ParseFilterString(const std::string& strFilter)
+    {
+        std::string strLower = strFilter;
+        std::transform(strLower.begin(), strLower.end(), strLower.begin(), ::tolower);
+        
+        if (strLower == "map")
+            return CLuaResourceDefs::eResourceFileFilter::MAP;
+        else if (strLower == "script")
+            return CLuaResourceDefs::eResourceFileFilter::SCRIPT;
+        else if (strLower == "config")
+            return CLuaResourceDefs::eResourceFileFilter::CONFIG;
+        else if (strLower == "html")
+            return CLuaResourceDefs::eResourceFileFilter::HTML;
+        else if (strLower == "file")
+            return CLuaResourceDefs::eResourceFileFilter::FILE;
+        else
+            return CLuaResourceDefs::eResourceFileFilter::ALL;
+    }
+
+    bool MatchesFilter(CResourceFile::eResourceType fileType, CLuaResourceDefs::eResourceFileFilter filter)
+    {
+        switch (filter)
+        {
+            case CLuaResourceDefs::eResourceFileFilter::ALL:
+                return true;
+            
+            case CLuaResourceDefs::eResourceFileFilter::MAP:
+                return fileType == CResourceFile::RESOURCE_FILE_TYPE_MAP;
+            
+            case CLuaResourceDefs::eResourceFileFilter::SCRIPT:
+                return fileType == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT ||
+                       fileType == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+            
+            case CLuaResourceDefs::eResourceFileFilter::CONFIG:
+                return fileType == CResourceFile::RESOURCE_FILE_TYPE_CONFIG ||
+                       fileType == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG;
+            
+            case CLuaResourceDefs::eResourceFileFilter::HTML:
+            case CLuaResourceDefs::eResourceFileFilter::FILE:
+                return fileType == CResourceFile::RESOURCE_FILE_TYPE_HTML ||
+                       fileType == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE;
+            
+            default:
+                return false;
+        }
+    }
+}
+
+std::variant<std::vector<std::string>, std::unordered_map<std::string, std::unordered_map<std::string, std::string>>>
+CLuaResourceDefs::getResourceFiles(lua_State* luaVM, std::optional<CResource*> optResource, std::optional<bool> optIncludeAttributes, std::optional<std::string> optFilter)
+{
+    CResource* pResource = optResource.value_or(nullptr);
+    bool bIncludeAttributes = optIncludeAttributes.value_or(false);
+    eResourceFileFilter filter = ParseFilterString(optFilter.value_or("all"));
+
+    if (!pResource)
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            pResource = pLuaMain->GetResource();
+        }
+    }
+
+    if (!pResource)
+    {
+        throw std::invalid_argument("Invalid resource");
+    }
+
+    if (bIncludeAttributes)
+    {
+        std::unordered_map<std::string, std::unordered_map<std::string, std::string>> result;
+        
+        for (auto iter = pResource->IterBegin(); iter != pResource->IterEnd(); ++iter)
+        {
+            CResourceFile* pResourceFile = *iter;
+            
+            if (!MatchesFilter(pResourceFile->GetType(), filter))
+                continue;
+
+            const std::map<std::string, std::string>& attributeMap = pResourceFile->GetAttributeMap();
+            std::unordered_map<std::string, std::string> attrs(attributeMap.begin(), attributeMap.end());
+            result[pResourceFile->GetName()] = attrs;
+        }
+        return result;
+    }
+    else
+    {
+        std::vector<std::string> result;
+        
+        for (auto iter = pResource->IterBegin(); iter != pResource->IterEnd(); ++iter)
+        {
+            CResourceFile* pResourceFile = *iter;
+            
+            if (!MatchesFilter(pResourceFile->GetType(), filter))
+                continue;
+
+            result.push_back(pResourceFile->GetName());
+        }
+        return result;
+    }
 }
 
 int CLuaResourceDefs::getResourceOrganizationalPath(lua_State* luaVM)
