@@ -698,24 +698,15 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
         for (; iter != uncommon.end(); iter++)
         {
             pTempSector = *iter;
-            // Make sure we dont unload our new sector
-            if (pTempSector != pSector)
+
+            // Don't unload the sector we are entering
+            if (pTempSector == pSector)
+                continue;
+
+            if (pTempSector->IsActivated())
             {
-                if (pTempSector->IsActivated())
-                {
-                    list<CClientStreamElement*>::iterator iter = pTempSector->Begin();
-                    for (; iter != pTempSector->End(); iter++)
-                    {
-                        pElement = *iter;
-                        if (pElement->IsStreamedIn())
-                        {
-                            // Add it to our streaming out list
-                            m_ToStreamOut.push_back(pElement);
-                        }
-                    }
-                    pTempSector->RemoveElements(&m_ActiveElements);
-                    pTempSector->SetActivated(false);
-                }
+                pTempSector->RemoveElements(&m_ActiveElements);
+                pTempSector->SetActivated(false);
             }
         }
 
