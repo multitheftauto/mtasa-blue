@@ -15,6 +15,10 @@
 #include <cstdint>
 #include <string>
 
+#if defined(_WIN32) && defined(__cplusplus)
+extern "C" __declspec(dllimport) unsigned long __stdcall GetCurrentThreadId(void);
+#endif
+
 #ifdef __cplusplus
 namespace CrashTelemetry
 {
@@ -31,9 +35,10 @@ namespace CrashTelemetry
 
 #if defined(MTA_CLIENT)
 #    include <algorithm>
-#    include <windows.h>
 #    include <cstring>
 #    include <cstdio>
+#    include <functional>
+#    include <thread>
 
 namespace detail
 {
@@ -62,6 +67,16 @@ namespace detail
         {
             std::fill(destination.begin() + static_cast<std::ptrdiff_t>(copyLength + 1), destination.end(), '\0');
         }
+    }
+
+    inline std::uint32_t GetThreadIdentifier() noexcept
+    {
+#    if defined(_WIN32)
+        return static_cast<std::uint32_t>(::GetCurrentThreadId());
+#    else
+        const auto hashed = std::hash<std::thread::id>{}(std::this_thread::get_id());
+        return static_cast<std::uint32_t>(hashed & 0xFFFFFFFFu);
+#    endif
     }
 
     struct ThreadState
@@ -140,7 +155,7 @@ namespace detail
         current.requestedSize = sizeBytes;
         current.resourcePointer = resourcePtr;
         current.timestamp = std::chrono::system_clock::now();
-        current.threadId = GetCurrentThreadId();
+        current.threadId = detail::GetThreadIdentifier();
         detail::CopyInto(current.resourceTag, resourceTag);
         detail::CopyInto(current.detail, detail);
         current.hasData = true;
@@ -203,7 +218,7 @@ namespace detail
 
             const char* resourceTag = (entry.resourceTag[0] != '\0') ? entry.resourceTag.data() : "<unset>";
             const char* detailText = (entry.detail[0] != '\0') ? entry.detail.data() : "<none>";
-            const auto  threadId = entry.threadId != 0 ? entry.threadId : GetCurrentThreadId();
+            const auto  threadId = entry.threadId != 0 ? entry.threadId : detail::GetThreadIdentifier();
 
             long long ageMs = -1;
             if (entry.timestamp.time_since_epoch().count() != 0)
