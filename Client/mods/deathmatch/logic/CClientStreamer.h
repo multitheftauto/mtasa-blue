@@ -30,6 +30,14 @@ public:
 
     static bool CompareExpDistance(CClientStreamElement* p1, CClientStreamElement* p2);
 
+    void SetStreamerLimits(int normalIn, int normalOut, int farIn, int farOut);
+    void ResetStreamerLimits();
+    void GetStreamingLimits(int& normalIn, int& normalOut, int& farIn, int& farOut, int& maxSwaps, int& furthestInLimit) const noexcept;
+    void SetStreamerMaxSwaps(int maxSwaps);
+    void ResetStreamerMaxSwaps();
+    void SetStreamerFurthestInLimit(int limit);
+    void ResetStreamerFurthestInLimit();
+
     unsigned int                               CountActiveElements() { return (unsigned int)m_ActiveElements.size(); }
     bool                                       IsActiveElement(CClientStreamElement* pElement);
     std::list<CClientStreamElement*>::iterator ActiveElementsBegin() { return m_ActiveElements.begin(); }
@@ -79,6 +87,12 @@ private:
     std::list<CClientStreamElement*>   m_ActiveElements;
     std::list<CClientStreamElement*>   m_ToStreamOut;
     std::list<CClientStreamElement*>   m_outsideCurrentDimensionElements;
+    int                                m_iMaxInDefault;
+    int                                m_iMaxOutDefault;
+    int                                m_iMaxInFar;
+    int                                m_iMaxOutFar;
+    int                                m_iMaxSwaps;
+    int                                m_iFurthestInLimit;
 
     static void* pAddingElement;
 };
