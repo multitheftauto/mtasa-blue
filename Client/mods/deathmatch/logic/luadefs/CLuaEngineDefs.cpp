@@ -2641,7 +2641,7 @@ int CLuaEngineDefs::EngineStreamingGetLimits(lua_State* luaVM)
     int normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit;
     pStreamer->GetStreamingLimits(normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit);
     
-    lua_newtable(luaVM);
+    lua_createtable(luaVM, 0, 6);
     
     lua_pushstring(luaVM, "normalIn");
     lua_pushnumber(luaVM, normalIn);
