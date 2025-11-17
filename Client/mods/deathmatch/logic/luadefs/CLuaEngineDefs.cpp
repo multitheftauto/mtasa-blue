@@ -152,6 +152,13 @@ void CLuaEngineDefs::LoadFunctions()
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
+        {"engineStreamingSetLimits", ArgumentParser<EngineStreamingSetLimits>},
+        {"engineStreamingGetLimits", ArgumentParser<EngineStreamingGetLimits>},
+        {"engineStreamingResetLimits", ArgumentParser<EngineStreamingResetLimits>},
+        {"engineStreamingSetMaxSwaps", ArgumentParser<EngineStreamingSetMaxSwaps>},
+        {"engineStreamingResetMaxSwaps", ArgumentParser<EngineStreamingResetMaxSwaps>},
+        {"engineStreamingSetFurthestInLimit", ArgumentParser<EngineStreamingSetFurthestInLimit>},
+        {"engineStreamingResetFurthestInLimit", ArgumentParser<EngineStreamingResetFurthestInLimit>},
 
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
@@ -216,6 +223,13 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
         lua_classfunction(luaVM, "getBufferSize", "engineStreamingGetBufferSize");
         lua_classfunction(luaVM, "setBufferSize", "engineStreamingSetBufferSize");
         lua_classfunction(luaVM, "restoreBufferSize", "engineStreamingRestoreBufferSize");
+        lua_classfunction(luaVM, "setLimits", "engineStreamingSetLimits");
+        lua_classfunction(luaVM, "getLimits", "engineStreamingGetLimits");
+        lua_classfunction(luaVM, "resetLimits", "engineStreamingResetLimits");
+        lua_classfunction(luaVM, "setMaxSwaps", "engineStreamingSetMaxSwaps");
+        lua_classfunction(luaVM, "resetMaxSwaps", "engineStreamingResetMaxSwaps");
+        lua_classfunction(luaVM, "setFurthestInLimit", "engineStreamingSetFurthestInLimit");
+        lua_classfunction(luaVM, "resetFurthestInLimit", "engineStreamingResetFurthestInLimit");
 
         lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
         lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetBufferSize");
@@ -2614,4 +2628,69 @@ bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
 void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
 {
     g_pClientGame->Restream(option);
+}
+
+void CLuaEngineDefs::EngineStreamingSetLimits(int normalIn, int normalOut, int farIn, int farOut)
+{
+    g_pClientGame->GetManager()->GetObjectStreamer()->SetStreamerLimits(normalIn, normalOut, farIn, farOut);
+}
+
+int CLuaEngineDefs::EngineStreamingGetLimits(lua_State* luaVM)
+{
+    auto* pStreamer = g_pClientGame->GetManager()->GetObjectStreamer();
+    int normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit;
+    pStreamer->GetStreamingLimits(normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit);
+    
+    lua_newtable(luaVM);
+    
+    lua_pushstring(luaVM, "normalIn");
+    lua_pushnumber(luaVM, normalIn);
+    lua_settable(luaVM, -3);
+    
+    lua_pushstring(luaVM, "normalOut");
+    lua_pushnumber(luaVM, normalOut);
+    lua_settable(luaVM, -3);
+    
+    lua_pushstring(luaVM, "farIn");
+    lua_pushnumber(luaVM, farIn);
+    lua_settable(luaVM, -3);
+    
+    lua_pushstring(luaVM, "farOut");
+    lua_pushnumber(luaVM, farOut);
+    lua_settable(luaVM, -3);
+    
+    lua_pushstring(luaVM, "maxSwaps");
+    lua_pushnumber(luaVM, maxSwaps);
+    lua_settable(luaVM, -3);
+    
+    lua_pushstring(luaVM, "furthestInLimit");
+    lua_pushnumber(luaVM, furthestInLimit);
+    lua_settable(luaVM, -3);
+    
+    return 1;
+}
+
+void CLuaEngineDefs::EngineStreamingResetLimits()
+{
+    g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerLimits();
+}
+
+void CLuaEngineDefs::EngineStreamingSetMaxSwaps(int maxSwaps)
+{
+    g_pClientGame->GetManager()->GetObjectStreamer()->SetStreamerMaxSwaps(maxSwaps);
+}
+
+void CLuaEngineDefs::EngineStreamingResetMaxSwaps()
+{
+    g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerMaxSwaps();
+}
+
+void CLuaEngineDefs::EngineStreamingSetFurthestInLimit(int limit)
+{
+    g_pClientGame->GetManager()->GetObjectStreamer()->SetStreamerFurthestInLimit(limit);
+}
+
+void CLuaEngineDefs::EngineStreamingResetFurthestInLimit()
+{
+    g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerFurthestInLimit();
 }

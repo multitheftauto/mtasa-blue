@@ -256,9 +256,6 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
     std::vector<CClientStreamElement*> elementsToHide;
     std::vector<CClientStreamElement*> elementsToShow;
 
-    elementsToHide.reserve(100);
-    elementsToShow.reserve(100);
-
     // Collect elements from sectors that need to be hidden
     auto collectFromRows = [this, &elementsToHide](std::list<CClientStreamSectorRow*>& rowList)
     {
@@ -487,6 +484,11 @@ void CClientStreamer::RemoveElementFromSectors(CClientStreamElement* pElement)
         return;
 
     OnElementEnterSector(pElement, nullptr);
+
+    // Clear row and sector
+    pElement->SetStreamRow(nullptr);
+
+    // Remove from active elements
     m_ToStreamOut.remove(pElement);
 }
 
@@ -957,7 +959,12 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
         m_ActiveElements.remove(pElement);
     }
 
+    // Update the element's sector pointer
     pElement->SetStreamSector(pSector);
+
+    // If the element no longer has a sector, clear the row pointer too
+    if (!pSector)
+        pElement->SetStreamRow(nullptr);
 }
 
 void CClientStreamer::OnElementForceStreamIn(CClientStreamElement* pElement)
@@ -1010,6 +1017,9 @@ void CClientStreamer::OnElementDimension(CClientStreamElement* pElement)
         // Stream out if needed
         if (pElement->IsStreamedIn())
             m_ToStreamOut.push_back(pElement);
+
+        // Clear row pointer
+        pElement->SetStreamRow(nullptr);
     }
 }
 
