@@ -175,7 +175,7 @@ bool CClientIMG::StreamEnable()
 bool CClientIMG::StreamDisable()
 {
     // If game is shutting down or not streaming is not available, do nothing
-    if (!g_pClientGame || !g_pGame || !g_pGame->GetStreaming())
+    if (g_bClientShuttingDown || !IsStreamed())
         return false;
 
     // Unlink all models
