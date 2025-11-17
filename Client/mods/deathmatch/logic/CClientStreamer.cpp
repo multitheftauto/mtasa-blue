@@ -636,10 +636,6 @@ void CClientStreamer::Restream(bool bMovedFar)
     std::vector<CClientStreamElement*> closestOut;
     std::vector<CClientStreamElement*> furthestIn;
 
-    // Reserve space
-    closestOut.reserve(iMaxIn);
-    furthestIn.reserve(STREAMER_FURTHEST_IN_LIMIT);
-
     bool bReachedLimit = ReachedLimit();
     int  iProcessedIn = 0;
 
@@ -718,7 +714,7 @@ void CClientStreamer::Restream(bool bMovedFar)
             else
             {
                 // Still inside distance -> keep track for possible swapping
-                if (furthestIn.size() < STREAMER_FURTHEST_IN_LIMIT)
+                if (furthestIn.size() < static_cast<size_t>(m_iFurthestInLimit))
                     furthestIn.push_back(pElement);
             }
 
@@ -802,8 +798,8 @@ void CClientStreamer::Restream(bool bMovedFar)
     int          iFurthestIndex = static_cast<int>(furthestIn.size()) - 1;
     unsigned int uiClosestIndex = 0;
 
-    // Up to STREAMER_MAX_SWAPS swaps per frame
-    for (int i = 0; i < STREAMER_MAX_SWAPS; i++)
+    // Up to max swaps per frame
+    for (int i = 0; i < m_iMaxSwaps; i++)
     {
         if (iProcessedIn >= iMaxIn || iProcessedOut >= iMaxOut)
             break;
