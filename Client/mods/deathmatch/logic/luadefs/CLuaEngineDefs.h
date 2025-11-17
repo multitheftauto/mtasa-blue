@@ -100,7 +100,7 @@ public:
     static void EngineRestream(std::optional<RestreamOption> option);
 
     static void EngineStreamingSetLimits(int normalIn, int normalOut, int farIn, int farOut);
-    static int EngineStreamingGetLimits(lua_State* luaVM);
+    static CLuaMultiReturn<int, int, int, int, int, int> EngineStreamingGetLimits();
     static void EngineStreamingResetLimits();
     static void EngineStreamingSetMaxSwaps(int maxSwaps);
     static void EngineStreamingResetMaxSwaps();

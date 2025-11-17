@@ -153,7 +153,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
         {"engineStreamingSetLimits", ArgumentParser<EngineStreamingSetLimits>},
-        {"engineStreamingGetLimits", CLuaEngineDefs::EngineStreamingGetLimits},
+        {"engineStreamingGetLimits", ArgumentParser<EngineStreamingGetLimits>},
         {"engineStreamingResetLimits", ArgumentParser<EngineStreamingResetLimits>},
         {"engineStreamingSetMaxSwaps", ArgumentParser<EngineStreamingSetMaxSwaps>},
         {"engineStreamingResetMaxSwaps", ArgumentParser<EngineStreamingResetMaxSwaps>},
@@ -2635,39 +2635,13 @@ void CLuaEngineDefs::EngineStreamingSetLimits(int normalIn, int normalOut, int f
     g_pClientGame->GetManager()->GetObjectStreamer()->SetStreamerLimits(normalIn, normalOut, farIn, farOut);
 }
 
-int CLuaEngineDefs::EngineStreamingGetLimits(lua_State* luaVM)
+CLuaMultiReturn<int, int, int, int, int, int> CLuaEngineDefs::EngineStreamingGetLimits()
 {
     auto* pStreamer = g_pClientGame->GetManager()->GetObjectStreamer();
     int normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit;
     pStreamer->GetStreamingLimits(normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit);
-    
-    lua_createtable(luaVM, 0, 6);
-    
-    lua_pushstring(luaVM, "normalIn");
-    lua_pushnumber(luaVM, normalIn);
-    lua_settable(luaVM, -3);
-    
-    lua_pushstring(luaVM, "normalOut");
-    lua_pushnumber(luaVM, normalOut);
-    lua_settable(luaVM, -3);
-    
-    lua_pushstring(luaVM, "farIn");
-    lua_pushnumber(luaVM, farIn);
-    lua_settable(luaVM, -3);
-    
-    lua_pushstring(luaVM, "farOut");
-    lua_pushnumber(luaVM, farOut);
-    lua_settable(luaVM, -3);
-    
-    lua_pushstring(luaVM, "maxSwaps");
-    lua_pushnumber(luaVM, maxSwaps);
-    lua_settable(luaVM, -3);
-    
-    lua_pushstring(luaVM, "furthestInLimit");
-    lua_pushnumber(luaVM, furthestInLimit);
-    lua_settable(luaVM, -3);
-    
-    return 1;
+
+    return { normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit };
 }
 
 void CLuaEngineDefs::EngineStreamingResetLimits()
