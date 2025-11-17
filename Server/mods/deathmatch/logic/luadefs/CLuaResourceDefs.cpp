@@ -1075,7 +1075,7 @@ int CLuaResourceDefs::getResourceExportedFunctions(lua_State* luaVM)
 
 namespace
 {
-    CLuaResourceDefs::eResourceFileFilter ParseFilterString(const std::string& strFilter)
+    auto ParseFilterString(const std::string& strFilter) -> CLuaResourceDefs::eResourceFileFilter
     {
         std::string strLower = strFilter;
         std::transform(strLower.begin(), strLower.end(), strLower.begin(), ::tolower);
