@@ -271,14 +271,17 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
                 if (!pSector)
                     continue;
 
-                // Process directly without making a full copy
+                std::vector<CClientStreamElement*> tempElements;
+
                 for (auto iter = pSector->Begin(); iter != pSector->End(); ++iter)
                 {
                     CClientStreamElement* pElement = *iter;
-                    if (!pElement)
-                        continue;
+                    if (pElement)
+                        tempElements.push_back(pElement);
+                }
 
-                    // Should this element be hidden in the new dimension?
+                for (CClientStreamElement* pElement : tempElements)
+                {
                     if (!IsElementShouldVisibleInCurrentDimension(pElement))
                         elementsToHide.push_back(pElement);
                 }
@@ -565,7 +568,7 @@ void CClientStreamer::AddToSortedList(std::list<CClientStreamElement*>* pList, C
             continue;
 
         // Is it further than the one we add?
-        if (pTemp->GetDistanceToBoundingBoxSquared(m_vecPosition) > fDistance)
+        if (pTemp->GetExpDistance() > fDistance)
         {
             // Add it before here
             pList->insert(iter, pElement);
@@ -1024,7 +1027,7 @@ void CClientStreamer::OnElementDimension(CClientStreamElement* pElement)
 void CClientStreamer::SetStreamerLimits(int normalIn, int normalOut, int farIn, int farOut)
 {
     if ((normalIn) < (STREAMER_MAX_IN_DEFAULT / 2) || (normalOut) < (STREAMER_MAX_OUT_DEFAULT / 2) || (farIn) < (STREAMER_MAX_IN_FAR / 2) ||
-        (farOut) < (STREAMER_MAX_OUT_FAR / 2))            // Block too low limits to avoid issues
+        (farOut) < (STREAMER_MAX_OUT_FAR / 2))
     {
         throw std::invalid_argument("Invalid streamer limits");
     }
