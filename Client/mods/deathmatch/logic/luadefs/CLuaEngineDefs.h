@@ -107,6 +107,10 @@ public:
     static void EngineStreamingSetFurthestInLimit(int limit);
     static void EngineStreamingResetFurthestInLimit();
 
+    static void EngineSetMaxObjectStreamCount(int limit);
+    static void EngineResetMaxObjectStreamCount();
+    static int EngineGetMaxObjectStreamCount();
+
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

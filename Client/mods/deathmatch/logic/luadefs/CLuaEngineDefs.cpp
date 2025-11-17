@@ -159,6 +159,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingResetMaxSwaps", ArgumentParser<EngineStreamingResetMaxSwaps>},
         {"engineStreamingSetFurthestInLimit", ArgumentParser<EngineStreamingSetFurthestInLimit>},
         {"engineStreamingResetFurthestInLimit", ArgumentParser<EngineStreamingResetFurthestInLimit>},
+        {"engineSetMaxObjectStreamCount", ArgumentParser<EngineSetMaxObjectStreamCount>},
+        {"engineResetMaxObjectStreamCount", ArgumentParser<EngineResetMaxObjectStreamCount>},
+        {"engineGetMaxObjectStreamCount", ArgumentParser<EngineGetMaxObjectStreamCount>},
 
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
@@ -230,6 +233,9 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
         lua_classfunction(luaVM, "resetMaxSwaps", "engineStreamingResetMaxSwaps");
         lua_classfunction(luaVM, "setFurthestInLimit", "engineStreamingSetFurthestInLimit");
         lua_classfunction(luaVM, "resetFurthestInLimit", "engineStreamingResetFurthestInLimit");
+        lua_classfunction(luaVM, "setMaxObjectStreamCount", "engineSetMaxObjectStreamCount");
+        lua_classfunction(luaVM, "getMaxObjectStreamCount", "engineGetMaxObjectStreamCount");
+        lua_classfunction(luaVM, "resetMaxObjectStreamCount", "engineResetMaxObjectStreamCount");
 
         lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
         lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetBufferSize");
@@ -2667,4 +2673,27 @@ void CLuaEngineDefs::EngineStreamingSetFurthestInLimit(int limit)
 void CLuaEngineDefs::EngineStreamingResetFurthestInLimit()
 {
     g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerFurthestInLimit();
+}
+
+void CLuaEngineDefs::EngineSetMaxObjectStreamCount(int limit)
+{
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager();
+    if (pObjectManager)
+        pObjectManager->SetMaxObjectStreamCount(limit);
+}
+
+void CLuaEngineDefs::EngineResetMaxObjectStreamCount()
+{
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager();
+    if (pObjectManager)
+        pObjectManager->ResetMaxObjectStreamCount();
+}
+
+int CLuaEngineDefs::EngineGetMaxObjectStreamCount()
+{
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager();
+    if (pObjectManager)
+        return pObjectManager->GetMaxObjectStreamCount();
+
+    return 0;
 }

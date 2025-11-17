@@ -431,6 +431,11 @@ CClientGame::~CClientGame()
     g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerMaxSwaps();
     g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerFurthestInLimit();
 
+    // Reset streamer limits
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager();
+    if (pObjectManager)
+        pObjectManager->ResetMaxObjectStreamCount();
+
     // Reset camera shaking
     g_pGame->GetCamera()->SetShakeForce(0.0f);
 
