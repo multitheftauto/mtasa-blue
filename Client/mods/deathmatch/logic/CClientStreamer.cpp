@@ -1025,8 +1025,11 @@ void CClientStreamer::OnElementDimension(CClientStreamElement* pElement)
 
 void CClientStreamer::SetStreamerLimits(int normalIn, int normalOut, int farIn, int farOut)
 {
-    if (normalIn <= 0 || normalOut <= 0 || farIn <= 0 || farOut <= 0)
-        return;
+    if ((normalIn) < (STREAMER_MAX_IN_DEFAULT / 2) || (normalOut) < (STREAMER_MAX_OUT_DEFAULT / 2) || (farIn) < (STREAMER_MAX_IN_FAR / 2) ||
+        (farOut) < (STREAMER_MAX_OUT_FAR / 2))            // Block too low limits to avoid issues
+    {
+        throw std::invalid_argument("Invalid streamer limits");
+    }
 
     m_iMaxInDefault = normalIn;
     m_iMaxOutDefault = normalOut;
@@ -1056,8 +1059,8 @@ void CClientStreamer::GetStreamingLimits(int& normalIn, int& normalOut, int& far
 
 void CClientStreamer::SetStreamerMaxSwaps(int maxSwaps)
 {
-    if (maxSwaps <= 0)
-        return;
+    if (maxSwaps < (STREAMER_MAX_SWAPS / 2))
+        throw std::invalid_argument("Invalid streamer limits");
 
     m_iMaxSwaps = maxSwaps;
 }
@@ -1067,12 +1070,12 @@ void CClientStreamer::ResetStreamerMaxSwaps()
     m_iMaxSwaps = STREAMER_MAX_SWAPS;
 }
 
-void CClientStreamer::SetStreamerFurthestInLimit(int limit)
+void CClientStreamer::SetStreamerFurthestInLimit(int furthestInLimit)
 {
-    if (limit <= 0)
-        return;
+    if (furthestInLimit < (STREAMER_FURTHEST_IN_LIMIT / 2))
+        throw std::invalid_argument("Invalid streamer limits");
 
-    m_iFurthestInLimit = limit;
+    m_iFurthestInLimit = furthestInLimit;
 }
 
 void CClientStreamer::ResetStreamerFurthestInLimit()

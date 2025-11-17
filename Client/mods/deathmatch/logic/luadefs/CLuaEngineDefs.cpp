@@ -153,7 +153,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
         {"engineStreamingSetLimits", ArgumentParser<EngineStreamingSetLimits>},
-        {"engineStreamingGetLimits", ArgumentParser<EngineStreamingGetLimits>},
+        {"engineStreamingGetLimits", CLuaEngineDefs::EngineStreamingGetLimits},
         {"engineStreamingResetLimits", ArgumentParser<EngineStreamingResetLimits>},
         {"engineStreamingSetMaxSwaps", ArgumentParser<EngineStreamingSetMaxSwaps>},
         {"engineStreamingResetMaxSwaps", ArgumentParser<EngineStreamingResetMaxSwaps>},
