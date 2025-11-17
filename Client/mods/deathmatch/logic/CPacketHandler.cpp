@@ -311,6 +311,7 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
         g_pGame->StartGame();
 
         // Fix area name showing for a second when joining to server for first time
+        // HUD_AREA_NAME will be made visible later in the process when the camera fades in (CCameraRPCs::FadeCamera)
         g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     }
 }
