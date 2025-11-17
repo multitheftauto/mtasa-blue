@@ -7,8 +7,6 @@
  *
  *****************************************************************************/
 
-#include <optional>
-
 struct SModelCacheStats;
 
 class CModelCacheManager
