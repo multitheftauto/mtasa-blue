@@ -2641,7 +2641,7 @@ CLuaMultiReturn<int, int, int, int, int, int> CLuaEngineDefs::EngineStreamingGet
     int normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit;
     pStreamer->GetStreamingLimits(normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit);
 
-    return { normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit };
+    return std::tuple(normalIn, normalOut, farIn, farOut, maxSwaps, furthestInLimit);
 }
 
 void CLuaEngineDefs::EngineStreamingResetLimits()
