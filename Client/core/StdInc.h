@@ -32,7 +32,6 @@
 #include <cstdlib>
 #include <iomanip>
 #include <functional>
-#include <optional>
 
 // Localization
 #include "../../vendor/tinygettext/tinygettext.hpp"
