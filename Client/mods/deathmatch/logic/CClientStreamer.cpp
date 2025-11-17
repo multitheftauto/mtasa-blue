@@ -1045,8 +1045,6 @@ void CClientStreamer::ResetStreamerLimits()
     m_iMaxOutDefault = STREAMER_MAX_OUT_DEFAULT;
     m_iMaxInFar = STREAMER_MAX_IN_FAR;
     m_iMaxOutFar = STREAMER_MAX_OUT_FAR;
-    m_iMaxSwaps = STREAMER_MAX_SWAPS;
-    m_iFurthestInLimit = STREAMER_FURTHEST_IN_LIMIT;
 }
 
 void CClientStreamer::GetStreamingLimits(int& normalIn, int& normalOut, int& farIn, int& farOut, int& maxSwaps, int& furthestInLimit) const noexcept
