@@ -122,6 +122,11 @@ public:
     bool IsOnFire() override { return m_pObject ? m_pObject->IsOnFire() : false; }
     bool SetOnFire(bool onFire) override { return m_pObject ? m_pObject->SetOnFire(onFire) : false; };
 
+    void SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash);
+    bool SetAnimationSpeed(float speed);
+
+    unsigned int GetAnimationBlockNameHash() const noexcept { return m_animationBlockNameHash; }
+
 protected:
     void StreamIn(bool bInstantly);
     void StreamOut();
@@ -133,6 +138,8 @@ protected:
     void NotifyDestroy();
 
     void StreamedInPulse();
+
+    void RunAnimation();
 
     class CClientObjectManager*       m_pObjectManager;
     class CClientModelRequestManager* m_pModelRequester;
@@ -157,6 +164,9 @@ protected:
     float         m_fBuoyancyConstant;
     CVector       m_vecCenterOfMass;
     bool          m_bVisibleInAllDimensions = false;
+    bool          m_animationPlaying{false};
+    float         m_animationSpeed{1.0f};
+    bool          m_animationSpeedUpdated{false};
 
     CVector m_vecMoveSpeed;
     CVector m_vecTurnSpeed;
@@ -166,6 +176,9 @@ protected:
     std::vector<CClientObject*>   m_HighLodObjectList;            // List of objects that use this object as a low LOD version
     bool                          m_IsHiddenLowLod;               // true if this object is low LOD and should not be drawn
     std::shared_ptr<CClientModel> m_clientModel;
+
+    CAnimBlendHierarchySAInterface* m_animation{};
+    unsigned int                    m_animationBlockNameHash{0};
 
 public:
     CObject*              m_pObject;

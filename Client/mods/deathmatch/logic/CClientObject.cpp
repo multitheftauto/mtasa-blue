@@ -84,6 +84,14 @@ void CClientObject::Unlink()
     SetLowLodObject(NULL);
     while (!m_HighLodObjectList.empty())
         m_HighLodObjectList[0]->SetLowLodObject(NULL);
+
+    // Remove from ifp list if needed
+    if (m_animationBlockNameHash > 0)
+    {
+        auto ifp = g_pClientGame->GetIFPPointerFromMap(m_animationBlockNameHash);
+        if (ifp)
+            ifp->RemoveEntityUsingThisIFP(this);
+    }
 }
 
 void CClientObject::GetPosition(CVector& vecPosition) const
@@ -436,6 +444,28 @@ void CClientObject::SetHealth(float fHealth)
     m_fHealth = fHealth;
 }
 
+void CClientObject::SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash)
+{
+    m_animation = animation;
+    m_animationBlockNameHash = blockNameHash;
+
+    RunAnimation();
+}
+
+bool CClientObject::SetAnimationSpeed(float speed)
+{
+    m_animationSpeed = speed;
+    m_animationSpeedUpdated = false;
+
+    if (m_pObject && m_pObject->GetRpClump())
+    {
+        m_animationSpeedUpdated = true;
+        return m_pObject->SetAnimationSpeed(speed);
+    }
+
+    return true;
+}
+
 void CClientObject::StreamIn(bool bInstantly)
 {
     // Don't stream the object in, if respawn is disabled and the object is broken
@@ -555,6 +585,9 @@ void CClientObject::Create()
                 if (m_vecCenterOfMass.fX != 0.0f || m_vecCenterOfMass.fY != 0.0f || m_vecCenterOfMass.fZ != 0.0f)
                     m_pObject->SetCenterOfMass(m_vecCenterOfMass);
 
+                m_animationPlaying = false;
+                m_animationSpeedUpdated = false;
+
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities();
 
@@ -657,6 +690,29 @@ void CClientObject::StreamedInPulse()
             UpdateStreamPosition(m_vecPosition);
         }
     }
+
+    if (m_animation && !m_animationPlaying)
+        RunAnimation();
+
+    if (!m_animationSpeedUpdated)
+    {
+        if (m_pObject && m_pObject->GetRpClump())
+        {
+            m_pObject->SetAnimationSpeed(m_animationSpeed);
+            m_animationSpeedUpdated = true;
+        }
+    }
+}
+
+void CClientObject::RunAnimation()
+{
+    if (!m_pObject)
+        return;
+
+    m_pObject->SetAnimation(m_animation);
+    m_pObject->SetAnimationSpeed(m_animationSpeed);
+
+    m_animationPlaying = m_animation != nullptr && m_pObject->GetRpClump();
 }
 
 void CClientObject::GetMoveSpeed(CVector& vecMoveSpeed) const

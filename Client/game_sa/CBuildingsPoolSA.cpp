@@ -60,7 +60,7 @@ CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameIn
     return m_buildingPool.entities[poolIndex].pClientEntity;
 }
 
-CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior)
+CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior, bool anim)
 {
     if (!HasFreeBuildingSlot())
         return nullptr;
@@ -80,7 +80,13 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     instance.position = *vPos;
     instance.rotation = {};
 
+    // Trick to create CAnimatedBuilding
+    bool hasAnimBlend = modelInfo->GetInterface()->bHasAnimBlend;
+    if (anim)
+        modelInfo->GetInterface()->bHasAnimBlend = true;
+
     auto pBuilding = static_cast<CBuildingSAInterface*>(CFileLoaderSA::LoadObjectInstance(&instance));
+    modelInfo->GetInterface()->bHasAnimBlend = hasAnimBlend;
 
     // Disable lod and ipl
     pBuilding->m_pLod = nullptr;

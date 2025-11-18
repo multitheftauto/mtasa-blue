@@ -25,3 +25,12 @@ void HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction)
     MemPut<BYTE>(dwInstallAddress, 0xE8);
     MemPut<DWORD>(dwInstallAddress + 1, dwOffset);
 }
+
+void HookInstallVTBLCall(void* vtblMethodAddress, std::uintptr_t hookFunction)
+{
+    // We need to change the protection of the memory page to be able to write to it as it's in the .rdata section
+    DWORD op;
+    VirtualProtect(vtblMethodAddress, 4, PAGE_EXECUTE_READWRITE, &op);
+    *static_cast<std::uintptr_t*>(vtblMethodAddress) = hookFunction;
+    VirtualProtect(vtblMethodAddress, 4, op, &op);
+}

@@ -168,19 +168,47 @@ public:
     {
         struct
         {
-            unsigned char     bHasBeenPreRendered : 1;            // we use this because we need to apply changes only once
-            unsigned char     bAlphaTransparency : 1;             // bDrawLast
-            unsigned char     bAdditiveRender : 1;
-            unsigned char     bDontWriteZBuffer : 1;
-            unsigned char     bDontCastShadowsOn : 1;
-            unsigned char     bDoWeOwnTheColModel : 1;
-            unsigned char     bIsBackfaceCulled : 1;
-            unsigned char     bIsColLoaded : 1;
-            unsigned char     bIsRoad : 1;
-            unsigned char     bHasComplexHierarchy : 1;
-            unsigned char     bDontCollideWithFlyer : 1;
-            eModelSpecialType eSpecialModelType : 4;
-            unsigned char     bWetRoadReflection : 1;            // Used for tags
+            unsigned char bHasBeenPreRendered : 1;            // we use this because we need to apply changes only once
+            unsigned char bAlphaTransparency : 1;             // bDrawLast
+            unsigned char bAdditiveRender : 1;
+            unsigned char bDontWriteZBuffer : 1;
+            unsigned char bDontCastShadowsOn : 1;
+            unsigned char bDoWeOwnTheColModel : 1;
+            unsigned char bIsBackfaceCulled : 1;
+            unsigned char bIsColLoaded : 1;            // isLod
+
+            union
+            {
+                // Atomic flags
+                struct
+                {
+                    unsigned char     bIsRoad : 1;
+                    unsigned char     bAtomicFlag0x200 : 1;
+                    unsigned char     bDontCollideWithFlyer : 1;
+                    eModelSpecialType eSpecialModelType : 4;
+                    unsigned char     bWetRoadReflection : 1;            // Used for tags
+                };
+
+                // Vehicle flags
+                struct
+                {
+                    unsigned char bUsesVehDummy : 1;
+                    unsigned char unkVehFlag : 1;
+                    unsigned char carMod : 5;
+                    unsigned char bUseCommonVehicleDictionary : 1;
+                };
+
+                // Clump flags
+                struct
+                {
+                    unsigned char bHasAnimBlend : 1;
+                    unsigned char bHasComplexHierarchy : 1;
+                    unsigned char bAnimSomething : 1;
+                    unsigned char bOwnsCollisionModel : 1;
+                    unsigned char unknownClumpFlag : 3;
+                    unsigned char bTagDisabled : 1;
+                };
+            };
         };
 
         unsigned short usFlags;
@@ -232,6 +260,9 @@ public:
     // +726 = Word array as referenced in CVehicleModelInfo::GetVehicleUpgrade(int)
     // +762 = Array of WORD containing something relative to paintjobs
     // +772 = Anim file index
+
+    void AddRef() { ((void(__thiscall*)(CBaseModelInfoSAInterface*))0x4C4BA0)(this); }
+    void RemoveRef() { ((void(__thiscall*)(CBaseModelInfoSAInterface*))0x4C4BB0)(this); }
 };
 static_assert(sizeof(CBaseModelInfoSAInterface) == 0x20, "Invalid size for CBaseModelInfoSAInterface");
 
@@ -252,6 +283,8 @@ public:
         char*    m_animFileName;
         uint32_t m_nAnimFileIndex;
     };
+
+    static RpClump* __fastcall CreateInstance(CClumpModelInfoSAInterface* clumpModelInfo);
 };
 
 class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -355,6 +388,10 @@ protected:
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     static std::map<unsigned short, int>                                         ms_DefaultTxdIDMap;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
+    static std::unordered_set<std::uint32_t>                                     ms_modelsModifiedAnim;
+    CAnimBlendHierarchySAInterface*                                              m_objectAimation{};
+    bool                                                                         m_objectAnimationDisabled{false};
+    unsigned int                                                                 m_objectAnimationBlockNameHash{0};
 
 public:
     CModelInfoSA();
@@ -449,6 +486,10 @@ public:
     void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) override;
     static void  ResetAllVehiclesWheelSizes();
 
+    static void InsertModelIntoModifiedAnimList(std::uint32_t modelId) { ms_modelsModifiedAnim.insert(modelId); }
+    static void RemoveModelFromModifiedAnimList(std::uint32_t modelId) { ms_modelsModifiedAnim.erase(modelId); }
+    static void StaticResetModelAnimations();
+
     // ONLY use for peds
     void GetVoice(short* psVoiceType, short* psVoice);
     void GetVoice(const char** pszVoiceType, const char** szVoice);
@@ -491,6 +532,13 @@ public:
     unsigned short GetObjectPropertiesGroup();
     void           RestoreObjectPropertiesGroup();
     static void    RestoreAllObjectsPropertiesGroups();
+
+    void SetObjectAnimation(CAnimBlendHierarchySAInterface* anim, unsigned int blockNameHash) noexcept override { m_objectAimation = anim; InsertModelIntoModifiedAnimList(m_dwModelID); m_objectAnimationBlockNameHash = blockNameHash; }
+    CAnimBlendHierarchySAInterface* GetObjectAnimation() const noexcept override { return m_objectAimation; }
+    unsigned int                    GetObjectAnimationBlockNameHash() const noexcept override { return m_objectAnimationBlockNameHash; }
+
+    void DisableObjectAnimation(bool disable) noexcept override { m_objectAnimationDisabled = disable; InsertModelIntoModifiedAnimList(m_dwModelID); }
+    bool IsObjectAnimationDisabled() const noexcept override { return m_objectAnimationDisabled; }
 
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;

@@ -156,6 +156,9 @@ public:
     bool IsOnFire() override { return GetObjectInterface()->pFire != nullptr; }
     bool SetOnFire(bool onFire) override;
 
+    void SetAnimation(class CAnimBlendHierarchySAInterface* animation) override;
+    bool SetAnimationSpeed(float speed) override;
+
 private:
     void CheckForGangTag();
 };

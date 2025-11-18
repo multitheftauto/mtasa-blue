@@ -102,4 +102,7 @@ public:
     LUA_DECLARE(SetElementCallPropagationEnabled);
     static bool SetElementLighting(CClientEntity* entity, float lighting);
     static bool SetElementOnFire(CClientEntity* entity, bool onFire) noexcept;
+
+    static bool SetElementAnimation(CClientEntity* entity, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName);
+    static bool SetElementAnimationSpeed(CClientEntity* entity, float speed);
 };

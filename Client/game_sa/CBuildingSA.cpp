@@ -15,6 +15,8 @@
 #include "CGameSA.h"
 #include "CMatrixLinkSA.h"
 #include "CDynamicPool.h"
+#include "CAnimManagerSA.h"
+#include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
 
@@ -68,6 +70,33 @@ void CBuildingSA::SetLod(CBuilding* pLod)
             pGame->GetWorld()->Add(pCurrentLod, CBuilding_SetLod);
         }
     }
+}
+
+void CBuildingSA::SetAnimation(CAnimBlendHierarchySAInterface* animation)
+{
+    if (!m_pInterface || !m_pInterface->m_pRwObject)
+        return;
+
+    RpClump* clump = reinterpret_cast<RpClump*>(m_pInterface->m_pRwObject);
+
+    if (!RpAnimBlendClumpIsInitialized(clump) && animation)
+        RpAnimBlendClumpInit(clump);
+
+    if (animation)
+        pGame->GetAnimManager()->BlendAnimation(clump, animation, ANIMATION_IS_LOOPED, 1.0f);
+}
+
+bool CBuildingSA::SetAnimationSpeed(float speed)
+{
+    if (!m_pInterface || !m_pInterface->m_pRwObject)
+        return false;
+
+    auto assoc = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(GetRpClump());
+    if (!assoc)
+        return false;
+
+    assoc->SetCurrentSpeed(speed);
+    return true;
 }
 
 void CBuildingSA::AllocateMatrix()

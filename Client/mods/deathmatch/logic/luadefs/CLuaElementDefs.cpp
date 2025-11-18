@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto
  *               (Shared logic for modifications)
@@ -100,6 +100,8 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
         {"setElementLighting", ArgumentParser<SetElementLighting>},
         {"setElementOnFire", ArgumentParser<SetElementOnFire>},
+        {"setElementAnimation", ArgumentParser<SetElementAnimation>},
+        {"setElementAnimationSpeed", ArgumentParser<SetElementAnimationSpeed>},
     };
 
     // Add functions
@@ -195,6 +197,8 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStreamable", "setElementStreamable");
     lua_classfunction(luaVM, "setLighting", "setElementLighting");
     lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
+    lua_classfunction(luaVM, "setAnimation", "setElementAnimation");
+    lua_classfunction(luaVM, "setAnimationSpeed", "setElementAnimationSpeed");
 
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
     lua_classvariable(luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad");
@@ -2520,6 +2524,65 @@ bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexc
         return false;
 
     return entity->SetOnFire(onFire);
+}
+
+bool CLuaElementDefs::SetElementAnimation(CClientEntity* entity, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName)
+{
+    if (!IS_OBJECT(entity) && !IS_BUILDING(entity))
+        return false;
+
+    auto getAnimBlockHash = [&](CClientEntity* ent) -> std::uint32_t
+    {
+        return IS_OBJECT(ent) ? static_cast<CClientObject*>(ent)->GetAnimationBlockNameHash() : static_cast<CClientBuilding*>(ent)->GetAnimationBlockNameHash();
+    };
+
+    auto setEntityAnimation = [&](CClientEntity* ent, CAnimBlendHierarchySAInterface* anim, std::uint32_t blockHash)
+    {
+        if (IS_OBJECT(ent))
+            static_cast<CClientObject*>(ent)->SetAnimation(anim, blockHash);
+        else
+            static_cast<CClientBuilding*>(ent)->SetAnimation(anim, blockHash);
+    };
+
+    // Clean up old IFP association before applying a new animation
+    if (auto hash = getAnimBlockHash(entity))
+    {
+        auto ifp = g_pClientGame->GetIFPPointerFromMap(hash);
+        if (ifp)
+            ifp->RemoveEntityUsingThisIFP(entity);
+    }
+
+    if (!ifpOrNil.has_value() || std::holds_alternative<bool>(ifpOrNil.value()))
+    {
+        setEntityAnimation(entity, nullptr, 0);
+        return true;
+    }
+
+    CClientIFP* ifp = std::get<CClientIFP*>(*ifpOrNil);
+    auto        animHierarchy = ifp->GetAnimationHierarchy(animationName.value_or(""));
+    if (!animHierarchy)
+        throw std::invalid_argument("Invalid animation name");
+
+    setEntityAnimation(entity, animHierarchy, ifp->GetBlockNameHash());
+    ifp->InsertEntityUsingThisIFP(entity);
+
+    return true;
+}
+
+bool CLuaElementDefs::SetElementAnimationSpeed(CClientEntity* entity, float speed)
+{
+    if (!IS_OBJECT(entity) && !IS_BUILDING(entity))
+        return false;
+
+    switch (entity->GetType())
+    {
+        case CCLIENTOBJECT:
+            return static_cast<CClientObject*>(entity)->SetAnimationSpeed(speed);
+        case CCLIENTBUILDING:
+            return static_cast<CClientBuilding*>(entity)->SetAnimationSpeed(speed);
+    }
+
+    return false;
 }
 
 int CLuaElementDefs::IsElementLowLod(lua_State* luaVM)

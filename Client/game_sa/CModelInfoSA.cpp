@@ -20,6 +20,7 @@
 #include "CPedSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include "CAnimManagerSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -36,6 +37,7 @@ std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfo
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::unordered_set<std::uint32_t>                                     CModelInfoSA::ms_modelsModifiedAnim;
 
 union tIdeFlags
 {
@@ -1517,6 +1519,28 @@ void CModelInfoSA::ResetAllVehiclesWheelSizes()
     ms_VehicleModelDefaultWheelSizes.clear();
 }
 
+void CModelInfoSA::StaticResetModelAnimations()
+{
+    for (auto& it : ms_modelsModifiedAnim)
+    {
+        CModelInfo* modelInfo = pGame->GetModelInfo(it);
+        if (modelInfo)
+        {
+            modelInfo->DisableObjectAnimation(false);
+            modelInfo->SetObjectAnimation(nullptr, 0);
+        }
+
+        CBaseModelInfoSAInterface* modelInfoInterface = modelInfo->GetInterface();
+        if (modelInfoInterface)
+        {
+            modelInfoInterface->bHasAnimBlend = static_cast<CClumpModelInfoSAInterface*>(modelInfoInterface)->m_nAnimFileIndex != -1;
+            modelInfoInterface->bAnimSomething = modelInfoInterface->bHasAnimBlend;
+        }
+    }
+
+    ms_modelsModifiedAnim.clear();
+}
+
 bool CModelInfoSA::SetCustomModel(RpClump* pClump)
 {
     if (!pClump)
@@ -1938,6 +1962,8 @@ static void __declspec(naked) HOOK_NodeNameStreamRead()
 void CModelInfoSA::StaticSetHooks()
 {
     EZHookInstall(NodeNameStreamRead);
+
+    HookInstallVTBLCall((void*)0x85BD5C, (std::uintptr_t)CClumpModelInfoSAInterface::CreateInstance);
 }
 
 // Recursive RwFrame children searching function
@@ -2182,4 +2208,53 @@ bool CModelInfoSA::ForceUnload()
 bool CVehicleModelInfoSAInterface::IsComponentDamageable(int componentIndex) const
 {
     return pVisualInfo->m_maskComponentDamagable & (1 << componentIndex);
+}
+
+RpClump* __fastcall CClumpModelInfoSAInterface::CreateInstance(CClumpModelInfoSAInterface* clumpModelInfo)
+{
+    if (!clumpModelInfo->pRwObject)
+        return nullptr;
+
+    clumpModelInfo->AddRef();
+
+    RpClump* clump = RpClumpClone(reinterpret_cast<RpClump*>(clumpModelInfo->pRwObject));
+
+    if (IsClumpSkinned(clump) && !clumpModelInfo->bHasComplexHierarchy)
+    {
+        RpHAnimHierarchy* hier = GetAnimHierarchyFromClump(clump);
+        RpClumpForAllAtomics(clump, *(RpClumpForAllAtomicsCB_t*)0x4C4EF0, hier);
+
+        RtAnimAnimation* animForHierarchy = RpAnimBlendCreateAnimationForHierarchy(hier);
+        RtAnimInterpolatorSetCurrentAnim(hier->currentAnim, animForHierarchy);
+        hier->flags = rpHANIMHIERARCHYUPDATEMODELLINGMATRICES | rpHANIMHIERARCHYUPDATELTMS;
+    }
+
+    if (clumpModelInfo->bHasAnimBlend)
+    {
+        CAnimBlendHierarchySAInterface* anim = nullptr;
+        auto* modelInfo = pGame->GetModelInfo(static_cast<CBaseModelInfoSAInterface*>(clumpModelInfo));
+
+        if (clumpModelInfo->m_nAnimFileIndex != -1)
+        {
+            if (!modelInfo || !modelInfo->IsObjectAnimationDisabled())
+            {
+                if (auto block = pGame->GetAnimManager()->GetAnimationBlock(clumpModelInfo->m_nAnimFileIndex))
+                {
+                    if (auto animation = pGame->GetAnimManager()->GetAnimation(clumpModelInfo->ulHashKey, block))
+                        anim = animation->GetInterface();
+                }
+            }
+        }
+        else if (modelInfo)
+            anim = modelInfo->GetObjectAnimation();
+
+        if (anim)
+        {
+            RpAnimBlendClumpInit(clump);
+            pGame->GetAnimManager()->BlendAnimation(clump, anim, ANIMATION_IS_LOOPED, 1.0f);
+        }
+    }
+
+    clumpModelInfo->RemoveRef();
+    return clump;
 }

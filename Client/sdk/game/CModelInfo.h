@@ -254,6 +254,13 @@ public:
     virtual unsigned short GetObjectPropertiesGroup() = 0;
     virtual void           RestoreObjectPropertiesGroup() = 0;
 
+    virtual void SetObjectAnimation(CAnimBlendHierarchySAInterface* anim, unsigned int blockNameHash) noexcept = 0;
+    virtual CAnimBlendHierarchySAInterface* GetObjectAnimation() const noexcept = 0;
+    virtual unsigned int                    GetObjectAnimationBlockNameHash() const noexcept = 0;
+
+    virtual void DisableObjectAnimation(bool disable) noexcept = 0;
+    virtual bool IsObjectAnimationDisabled() const noexcept = 0;
+
     // Vehicle towing functions
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 

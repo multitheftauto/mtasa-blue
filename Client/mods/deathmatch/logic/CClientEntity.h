@@ -30,6 +30,7 @@ class CClientManager;
 #define IS_RADARMARKER(entity) ((entity)->GetType()==CCLIENTRADARMARKER)
 #define IS_VEHICLE(entity) ((entity)->GetType()==CCLIENTVEHICLE)
 #define IS_OBJECT(entity) ((entity)->GetType()==CCLIENTOBJECT)
+#define IS_BUILDING(entity) ((entity)->GetType()==CCLIENTBUILDING)
 #define IS_MARKER(entity) ((entity)->GetType()==CCLIENTMARKER)
 #define IS_PICKUP(entity) ((entity)->GetType()==CCLIENTPICKUP)
 #define IS_RADAR_AREA(entity) ((entity)->GetType()==CCLIENTRADARAREA)

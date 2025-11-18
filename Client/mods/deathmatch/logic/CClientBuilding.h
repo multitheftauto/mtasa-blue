@@ -23,6 +23,8 @@ public:
     CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector &pos, const CVector &rot, uint8_t interior);
     ~CClientBuilding();
 
+    void DoPulse();
+
     void Unlink();
     void GetPosition(CVector& vecPosition) const override { vecPosition = m_vPos; };
     void SetPosition(const CVector& vecPosition) override;
@@ -50,12 +52,16 @@ public:
 
     bool IsValid() const noexcept { return m_pBuilding != nullptr; };
 
-    
     CClientBuilding* GetLowLodBuilding() const noexcept { return m_pLowBuilding; };
     bool SetLowLodBuilding(CClientBuilding* pLod = nullptr);
     bool IsLod() const noexcept { return m_pHighBuilding != nullptr; };
 
     float GetDistanceFromCentreOfMassToBaseOfModel();
+
+    void SetAnimation(class CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash);
+    bool SetAnimationSpeed(float speed);
+
+    unsigned int GetAnimationBlockNameHash() const noexcept { return m_animationBlockNameHash; }
 
 private:
     CClientBuilding* GetHighLodBuilding() const { return m_pHighBuilding; }; 
@@ -66,6 +72,8 @@ private:
         Destroy();
         Create();
     };
+
+    void RunAnimation();
 
 private:
     CClientBuildingManager* m_pBuildingManager;
@@ -79,4 +87,10 @@ private:
 
     CClientBuilding* m_pHighBuilding;
     CClientBuilding* m_pLowBuilding;
+
+    CAnimBlendHierarchySAInterface* m_animation{};
+    unsigned int                    m_animationBlockNameHash{0};
+    bool                            m_animationPlaying{false};
+    float                           m_animationSpeed{1.0f};
+    bool                            m_animationSpeedUpdated{false};
 };

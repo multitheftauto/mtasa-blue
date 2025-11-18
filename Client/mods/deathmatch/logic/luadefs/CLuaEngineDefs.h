@@ -99,6 +99,9 @@ public:
     static bool EngineRestreamModel(std::uint16_t modelId);
     static void EngineRestream(std::optional<RestreamOption> option);
 
+    static bool EngineSetModelAnimation(std::uint16_t modelId, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName);
+    static void EngineRestoreModelAnimation(std::uint16_t modelId);
+
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);
