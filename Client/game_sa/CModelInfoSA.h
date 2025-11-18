@@ -15,6 +15,7 @@
 #include <game/CModelInfo.h>
 #include "CRenderWareSA.h"
 #include "game/RenderWare.h"
+#include <unordered_set>
 
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
