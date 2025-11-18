@@ -540,8 +540,8 @@ void CSettings::CreateGUI()
             return;
         CVector2D buttonSize;
         button->GetSize(buttonSize);
-        const float bottomPadding = 12.0f;
-        const float buttonY = std::max(0.0f, tabPanelSize.fY - buttonSize.fY - bottomPadding);
+        const float bottomPadding = 32.0f;
+        const float buttonY = std::max(0.0f, tabPanelSize.fY - buttonSize.fY - bottomPadding - 4.0f);
         button->SetPosition(CVector2D(std::max(0.0f, tabPanelSize.fX - buttonSize.fX - bottomPadding), buttonY));
     };
 
@@ -1586,7 +1586,7 @@ void CSettings::CreateGUI()
     m_pGridBrowserBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserBlacklist->GetPosition(vecTemp);
     const CVector2D blacklistGridPos = vecTemp;
-    const float browserBottomPadding = 12.0f;
+    const float browserBottomPadding = 32.0f;
     const float browserButtonSpacing = 5.0f;
     const CVector2D blacklistRemoveSize(140.0f, 22.0f);
     const float blacklistHeightAvailable = tabPanelSize.fY - blacklistGridPos.fY - blacklistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
@@ -4223,6 +4223,8 @@ void CSettings::ReloadBrowserLists()
     if (m_bBrowserListsLoadEnabled)
     {
         auto                                  pWebCore = g_pCore->GetWebCore();
+        if (!pWebCore)
+            return;
         std::vector<std::pair<SString, bool>> customBlacklist;
         pWebCore->GetFilterEntriesByType(customBlacklist, eWebFilterType::WEBFILTER_USER);
         for (std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter)
@@ -4684,22 +4686,25 @@ void CSettings::SaveData()
     if (m_bBrowserListsLoadEnabled)
     {
         auto                 pWebCore = g_pCore->GetWebCore();
-        std::vector<SString> customBlacklist;
-        for (int i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
+        if (pWebCore)
         {
-            customBlacklist.push_back(m_pGridBrowserBlacklist->GetItemText(i, 1));
-        }
-        pWebCore->WriteCustomList("customblacklist", customBlacklist);
+            std::vector<SString> customBlacklist;
+            for (int i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
+            {
+                customBlacklist.push_back(m_pGridBrowserBlacklist->GetItemText(i, 1));
+            }
+            pWebCore->WriteCustomList("customblacklist", customBlacklist);
 
-        std::vector<SString> customWhitelist;
-        for (int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
-        {
-            customWhitelist.push_back(m_pGridBrowserWhitelist->GetItemText(i, 1));
-        }
-        pWebCore->WriteCustomList("customwhitelist", customWhitelist);
+            std::vector<SString> customWhitelist;
+            for (int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
+            {
+                customWhitelist.push_back(m_pGridBrowserWhitelist->GetItemText(i, 1));
+            }
+            pWebCore->WriteCustomList("customwhitelist", customWhitelist);
 
-        if (m_bBrowserListsChanged)
-            bBrowserSettingChanged = true;
+            if (m_bBrowserListsChanged)
+                bBrowserSettingChanged = true;
+        }
     }
 
     bool bBrowserGPUEnabled = false;

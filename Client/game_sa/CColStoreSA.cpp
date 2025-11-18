@@ -10,6 +10,9 @@
 
 #include "StdInc.h"
 #include "CColStoreSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 void CColStoreSA::Initialise()
 {
@@ -55,6 +58,22 @@ void CColStoreSA::AddCollisionNeededAtPosition(const CVector& position)
 
 void CColStoreSA::EnsureCollisionIsInMemory(const CVector& position)
 {
+    // Wait for GTA to complete initialization before calling collision functions
+    // Race condition: MTA can trigger streaming/collision operations before GTA completes initialization.
+    // GTA calls CTimer::Initialise at 0x53BDE6 during startup, which sets _timerFunction at 0x56189E.
+    // If called before GTA reaches GS_INIT_PLAYING_GAME, the timer isn't initialized > crash at 0x5619E9 (CTimer::Suspend)
+    
+    if (!pGame || pGame->GetSystemState() < SystemState::GS_INIT_PLAYING_GAME)
+        return;  // GTA not ready yet - skip (will retry on next streaming update)
+    
+    // Just in case
+    constexpr auto ADDR_timerFunction = 0xB7CB28;
+    const auto timerFunction = *reinterpret_cast<void* const*>(ADDR_timerFunction);
+    if (!timerFunction)
+        return;  // Timer not initialized yet - skip
+    
+    // SA function signature: void __cdecl CColStore::EnsureCollisionIsInMemory(const CVector2D&)
+    // CVector implicitly converts to CVector2D (uses x, y components only)
     using Signature = void(__cdecl*)(const CVector&);
     const auto function = reinterpret_cast<Signature>(0x410AD0);
     function(position);

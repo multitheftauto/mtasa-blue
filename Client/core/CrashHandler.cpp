@@ -5,7 +5,8 @@
  *  FILE:        core/CrashHandler.cpp
  *  PURPOSE:     Crash handling functions
  *
- *  THIS FILE CREDITS: "Debugging Applications" (Microsoft Press) by John Robbins
+ *  THIS FILE CREDITS (IS BASED ON): "Debugging Applications" (Microsoft Press) by John Robbins
+ *  Copyright (c) 1997-2000 John Robbins -- All rights reserved
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
@@ -14,10 +15,12 @@
 #define BUGSUTIL_EXPORTS
 #include "StdInc.h"
 #include "CrashHandler.h"
+#include "StackTraceHelpers.h"
 #include "CExceptionInformation_Impl.h"
 #include <SharedUtil.Detours.h>
 #include <SharedUtil.Misc.h>
 #include <SharedUtil.Memory.h>
+#include "../Shared/sdk/CrashTelemetry.h"
 
 #include <algorithm>
 #include <array>
@@ -25,25 +28,36 @@
 #include <chrono>
 #include <cctype>
 #include <cstdint>
+#include <cstring>
 #include <exception>
 #include <errno.h>
 #include <filesystem>
+#include <format>
 #include <intrin.h>
 #include <mutex>
 #include <new>
 #include <optional>
 #include <process.h>
+#include <Psapi.h>
+
+#if defined(_MSC_VER)
+    #pragma comment(lib, "Psapi.lib")
+#endif
+#include <ranges>
+#include <set>
 #include <signal.h>
 #include <stdio.h>
+#include <string>
 #include <string_view>
 #include <variant>
 #include <vector>
+#if defined(_MSC_VER)
+    #include <new.h>
+#endif
 
 #if defined(_MSC_VER)
     #include <corecrt.h>
 #endif
-
-using namespace std::string_literals;
 
 [[nodiscard]] constexpr bool IsMemoryException(DWORD code) noexcept
 {
@@ -60,6 +74,25 @@ using namespace std::string_literals;
     return code == EXCEPTION_INT_DIVIDE_BY_ZERO || code == EXCEPTION_INT_OVERFLOW;
 }
 
+[[nodiscard]] bool IsExceptionFromThirdParty(void* exceptionAddress) noexcept
+{
+    if (!exceptionAddress) [[unlikely]]
+        return false;
+
+    HMODULE hModule{nullptr};
+    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                          static_cast<LPCSTR>(exceptionAddress), &hModule) == 0) [[unlikely]]
+        return false;
+
+    char modulePath[256]{};
+    if (GetModuleFileNameA(hModule, modulePath, sizeof(modulePath)) == 0) [[unlikely]]
+        return false;
+
+    // Libraries with a lot of bogus breakpoints
+    return strstr(modulePath, "libcef.dll") != nullptr || 
+           strstr(modulePath, "chrome_elf.dll") != nullptr;
+}
+
 #ifndef STATUS_INVALID_PARAMETER
 inline constexpr DWORD STATUS_INVALID_PARAMETER = 0xC000000DL;
 #endif
@@ -71,11 +104,20 @@ inline std::atomic<DWORD> g_initializationPhase{INIT_PHASE_MINIMAL};
 
 using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std::exception_ptr>;
 
+#if defined(__cplusplus)
+[[noreturn]] void __cdecl CppNewHandler() noexcept;
+#endif
+
+#if defined(_MSC_VER)
+static int __cdecl CppNewHandlerBridge(size_t size) noexcept;
+#else
+static void CppNewHandlerBridge() noexcept;
+#endif
+
 [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall IsFatalException(DWORD exceptionCode) noexcept
 {
     switch (exceptionCode)
     {
-        case EXCEPTION_BREAKPOINT:
         case EXCEPTION_SINGLE_STEP:
         case EXCEPTION_GUARD_PAGE:
         case EXCEPTION_INVALID_HANDLE:
@@ -85,13 +127,19 @@ using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std:
             return FALSE;
     }
 
+    if (exceptionCode == EXCEPTION_BREAKPOINT)
+    {
+        SafeDebugOutput("IsFatalException: BREAKPOINT - NON-FATAL (debugger will handle if attached)\n");
+        return FALSE;
+    }
+
     switch (exceptionCode)
     {
-        case EXCEPTION_ILLEGAL_INSTRUCTION:
         case EXCEPTION_STACK_OVERFLOW:
         case EXCEPTION_NONCONTINUABLE_EXCEPTION:
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
         case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
+        case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
         case CPP_EXCEPTION_CODE:
         case CUSTOM_EXCEPTION_CODE_OOM:
         case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
@@ -99,6 +147,7 @@ using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std:
         case EXCEPTION_INT_DIVIDE_BY_ZERO:
         case EXCEPTION_INT_OVERFLOW:
         case EXCEPTION_PRIV_INSTRUCTION:
+        case EXCEPTION_ILLEGAL_INSTRUCTION:
         case EXCEPTION_FLT_DIVIDE_BY_ZERO:
         case EXCEPTION_FLT_INVALID_OPERATION:
         case EXCEPTION_FLT_OVERFLOW:
@@ -106,18 +155,16 @@ using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std:
             return TRUE;
     }
 
-    if (IsMemoryException(exceptionCode))
+    if (IsMemoryException(exceptionCode)) [[unlikely]]
     {
-        constexpr auto bufferSize = DEBUG_BUFFER_SIZE;
-        char           debugBuffer[bufferSize];
-        SAFE_DEBUG_PRINT_C(debugBuffer, bufferSize, "IsFatalException: Access violation/page fault 0x%08X - treating as fatal for dump generation\n",
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "IsFatalException: Access violation/page fault 0x%08X - treating as fatal for dump generation\n",
                            exceptionCode);
         return TRUE;
     }
 
-    constexpr auto bufferSize = DEBUG_BUFFER_SIZE;
-    char           debugBuffer[bufferSize];
-    SAFE_DEBUG_PRINT_C(debugBuffer, bufferSize, "IsFatalException: Unknown exception code 0x%08X, treating as non-fatal\n", exceptionCode);
+    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "IsFatalException: Unknown exception code 0x%08X, treating as non-fatal\n", exceptionCode);
     return FALSE;
 }
 
@@ -126,42 +173,39 @@ static void LogBasicExceptionInfo(_EXCEPTION_POINTERS* exception) noexcept
     if (exception == nullptr || exception->ExceptionRecord == nullptr)
         return;
 
-    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-
-    const int result = _snprintf_s(debugBuffer.data(), debugBuffer.size(), _TRUNCATE, "CrashHandler: Exception 0x%08X at 0x%p (TID: %lu)\n",
-                                   exception->ExceptionRecord->ExceptionCode, exception->ExceptionRecord->ExceptionAddress, GetCurrentThreadId());
-
-    if (result <= 0)
-    {
-        OutputDebugStringA("CrashHandler: Exception occurred\n");
-        return;
-    }
-    if (result > 0)
-    {
-        OutputDebugStringA(debugBuffer.data());
-    }
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "Exception 0x%08X at 0x%p (TID: %lu)\n",
+                           exception->ExceptionRecord->ExceptionCode,
+                           exception->ExceptionRecord->ExceptionAddress,
+                           GetCurrentThreadId());
 }
 
 static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
 {
-    if (pException == nullptr || pException->ExceptionRecord == nullptr)
+    if (pException == nullptr || pException->ExceptionRecord == nullptr) [[unlikely]]
         return;
 
     try
     {
-        std::unique_lock<std::mutex> lock(g_exceptionInfoMutex, std::try_to_lock);
-        if (!lock.owns_lock())
+        std::unique_lock lock{g_exceptionInfoMutex, std::try_to_lock};
+        if (!lock.owns_lock()) [[unlikely]]
         {
             LogBasicExceptionInfo(pException);
             return;
         }
 
-        ENHANCED_EXCEPTION_INFO info = {};
-        info.exceptionCode = pException->ExceptionRecord->ExceptionCode;
-        info.exceptionAddress = pException->ExceptionRecord->ExceptionAddress;
-        info.threadId = GetCurrentThreadId();
-        info.processId = GetCurrentProcessId();
-        info.timestamp = std::chrono::system_clock::now();
+        ENHANCED_EXCEPTION_INFO info{
+            .exceptionCode = pException->ExceptionRecord->ExceptionCode,
+            .exceptionAddress = pException->ExceptionRecord->ExceptionAddress,
+            .timestamp = std::chrono::system_clock::now(),
+            .threadId = GetCurrentThreadId(),
+            .processId = GetCurrentProcessId()
+        };
+
+        const auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote();
+        if (!telemetryNote.empty())
+        {
+            info.additionalInfo = telemetryNote;
+        }
 
         g_lastExceptionInfo = info;
     }
@@ -225,6 +269,8 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
             return "Stack Buffer Overrun (Security Check)";
         case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
             return "Invalid C Runtime Parameter";
+        case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
+            return "Fatal Exception in Windows Callback";
         case CUSTOM_EXCEPTION_CODE_OOM:
             return "Out of Memory - Allocation Failure";
         case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
@@ -250,13 +296,13 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogEnhancedExceptionInfo - NULL exception pointers\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - NULL exception pointers\n");
         return;
     }
 
     if (pException->ContextRecord == nullptr)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogEnhancedExceptionInfo - NULL context record\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - NULL context record\n");
         LogBasicExceptionInfo(pException);
         return;
     }
@@ -291,77 +337,66 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
         info.eflags = pException->ContextRecord->EFlags;
 
         CExceptionInformation_Impl moduleHelper;
-        constexpr std::size_t      moduleBufferSize = 512;
-        char                       moduleBuffer[moduleBufferSize]{};
-        void*                      moduleBase = nullptr;
+        std::array<char, 512> moduleBuffer{};
+        void* moduleBase{nullptr};
 
         // For EIP=0 crashes, resolve module from return address at [ESP] instead of EIP
-        void* addressToResolve = info.exceptionAddress;
-        constexpr auto kNullAddress = uintptr_t{0};
+        void* addressToResolve{info.exceptionAddress};
+        constexpr auto kNullAddress{uintptr_t{0}};
         
-        const auto exceptionAddressValue = reinterpret_cast<uintptr_t>(info.exceptionAddress);
+        const auto exceptionAddressValue{reinterpret_cast<uintptr_t>(info.exceptionAddress)};
         
         if (exceptionAddressValue == kNullAddress && info.eip == kNullAddress)
         {
-            const auto espAddr = static_cast<uintptr_t>(info.esp);
-            const auto pReturnAddress = reinterpret_cast<void* const*>(espAddr);
-            
-            constexpr std::size_t kDebugBufferSize = 256;
-            static_assert(kDebugBufferSize > 0, "Debug buffer size must be positive");
-            std::array<char, kDebugBufferSize> debugBuffer{};
-            
-            [[maybe_unused]] const auto written = snprintf(debugBuffer.data(), debugBuffer.size(), 
-                    "%.*sLogEnhancedExceptionInfo - EIP=0 detected (ESP=0x%08X), reading return address...\n", 
-                    static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
-                    static_cast<unsigned int>(espAddr));
-            SafeDebugOutput(debugBuffer.data());
-            
+            const auto espAddr{static_cast<uintptr_t>(info.esp)};
+            const auto pReturnAddress{reinterpret_cast<void* const*>(espAddr)};
+
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                                   "LogEnhancedExceptionInfo - EIP=0 detected (ESP=0x%08X), reading return address...\n",
+                                   static_cast<unsigned int>(espAddr));
+
             if (SharedUtil::IsReadablePointer(pReturnAddress, sizeof(void*)))
             {
                 addressToResolve = *pReturnAddress;
-                
-                const auto returnAddressValue = reinterpret_cast<uintptr_t>(addressToResolve);
-                [[maybe_unused]] const auto written2 = snprintf(debugBuffer.data(), debugBuffer.size(), 
-                        "%.*sLogEnhancedExceptionInfo - Return address: 0x%08X (resolving module from this)\n", 
-                        static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
-                        static_cast<unsigned int>(returnAddressValue));
-                SafeDebugOutput(debugBuffer.data());
+
+                const auto returnAddressValue{reinterpret_cast<uintptr_t>(addressToResolve)};
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                                       "LogEnhancedExceptionInfo - Return address: 0x%08X (resolving module from this)\n",
+                                       static_cast<unsigned int>(returnAddressValue));
             }
             else
             {
-                [[maybe_unused]] const auto written3 = snprintf(debugBuffer.data(), debugBuffer.size(), 
-                        "%.*sLogEnhancedExceptionInfo - ESP not readable (0x%08X), cannot read return address\n", 
-                        static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
-                        static_cast<unsigned int>(espAddr));
-                SafeDebugOutput(debugBuffer.data());
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                                       "LogEnhancedExceptionInfo - ESP not readable (0x%08X), cannot read return address\n",
+                                       static_cast<unsigned int>(espAddr));
             }
         }
 
-        if (moduleHelper.GetModule(addressToResolve, moduleBuffer, sizeof(moduleBuffer), &moduleBase))
+        if (moduleHelper.GetModule(addressToResolve, moduleBuffer.data(), static_cast<int>(moduleBuffer.size()), &moduleBase))
         {
-            info.modulePathName = std::string(moduleBuffer);
+            info.modulePathName = std::string{moduleBuffer.data()};
 
-            const std::string_view moduleView(moduleBuffer);
+            const std::string_view moduleView{moduleBuffer.data()};
             if (const auto pos = moduleView.rfind('\\'); pos != std::string_view::npos)
             {
-                info.moduleName = std::string(moduleView.substr(pos + 1));
+                info.moduleName = std::string{moduleView.substr(pos + 1)};
                 info.moduleBaseName = info.moduleName;
             }
             else
             {
-                info.moduleName = std::string(moduleView);
+                info.moduleName = std::string{moduleView};
                 info.moduleBaseName = info.moduleName;
             }
 
             if (moduleBase != nullptr)
             {
                 // Use addressToResolve for offset calculation (handles EIP=0 return address case)
-                const uintptr_t resolvedAddr = reinterpret_cast<uintptr_t>(addressToResolve);
-                const uintptr_t baseAddr = reinterpret_cast<uintptr_t>(moduleBase);
+                const uintptr_t resolvedAddr{reinterpret_cast<uintptr_t>(addressToResolve)};
+                const uintptr_t baseAddr{reinterpret_cast<uintptr_t>(moduleBase)};
 
                 if (resolvedAddr >= baseAddr)
                 {
-                    const uintptr_t offset = resolvedAddr - baseAddr;
+                    const uintptr_t offset{resolvedAddr - baseAddr};
 
                     if (offset <= UINT_MAX)
                     {
@@ -370,13 +405,13 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
                     else
                     {
                         info.moduleOffset = 0;
-                        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogEnhancedExceptionInfo - Module offset exceeds UINT_MAX\n");
+                        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Module offset exceeds UINT_MAX\n");
                     }
                 }
                 else
                 {
                     info.moduleOffset = 0;
-                    SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogEnhancedExceptionInfo - Exception address before module base\n");
+                    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Exception address before module base\n");
                 }
             }
             else
@@ -386,7 +421,7 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
         }
         else
         {
-            SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogEnhancedExceptionInfo - Failed to get module info\n");
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Failed to get module info\n");
             info.moduleName = "Unknown";
             info.moduleBaseName = "Unknown";
             info.modulePathName = "Unknown";
@@ -394,14 +429,25 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
         }
 
         std::vector<std::string> stackTraceVec;
-        if (CaptureUnifiedStackTrace(pException, 32, &stackTraceVec))
+        // For callback exceptions (0xC000041D), stack walking may fail due to corrupted frames
+        // Wrap in additional protection and accept partial traces
+        bool isCallbackException = (info.exceptionCode == 0xC000041D);
+        if (CaptureUnifiedStackTrace(pException, isCallbackException ? 16 : 32, &stackTraceVec))
         {
             info.stackTrace = stackTraceVec;
             info.hasDetailedStackTrace = !stackTraceVec.empty();
+            if (isCallbackException && stackTraceVec.empty())
+            {
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Callback exception: stack trace empty (expected)\n");
+            }
         }
         else
         {
             info.hasDetailedStackTrace = false;
+            if (isCallbackException)
+            {
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Callback exception: stack capture failed (expected)\n");
+            }
         }
 
         info.uncaughtExceptionCount = std::uncaught_exceptions();
@@ -477,6 +523,12 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
             case EXCEPTION_GUARD_PAGE:
                 info.exceptionType = "SEH:GuardPage";
                 break;
+            case CUSTOM_EXCEPTION_CODE_OOM:
+                info.exceptionType = "User:OutOfMemory";
+                break;
+            case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
+                info.exceptionType = "User:WatchdogTimeout";
+                break;
             default:
                 if (info.exceptionCode >= 0xC0000000 && info.exceptionCode <= 0xCFFFFFFF)
                 {
@@ -495,13 +547,31 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
 
         info.exceptionDescription = GetExceptionCodeDescription(info.exceptionCode);
 
+        if (auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote(); !telemetryNote.empty())
+        {
+            if (!info.additionalInfo.empty())
+            {
+                info.additionalInfo.push_back('\n');
+            }
+            info.additionalInfo += telemetryNote;
+        }
+
         g_lastExceptionInfo = info;
     }
     catch (...)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogEnhancedExceptionInfo - Exception during processing, using basic logging\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Exception during processing, using basic logging\n");
         LogBasicExceptionInfo(pException);
     }
+}
+
+static void CaptureAllocationTelemetry(_EXCEPTION_POINTERS* pException) noexcept
+{
+    if (pException == nullptr || pException->ExceptionRecord == nullptr)
+        return;
+
+    StoreBasicExceptionInfo(pException);
+    LogEnhancedExceptionInfo(pException);
 }
 
 static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTERS* pException) noexcept
@@ -589,16 +659,16 @@ static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTER
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
             exceptionType = "Stack Buffer Overrun";
             break;
+        case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
+            exceptionType = "Fatal User Callback Exception";
+            break;
     }
 
-    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-    const int                           result = _snprintf_s(debugBuffer.data(), debugBuffer.size(), _TRUNCATE, "CrashHandler: %.*s (0x%08X) at 0x%p\n",
-                                                             static_cast<int>(exceptionType.size()), exceptionType.data(), exceptionCode, pRecord->ExceptionAddress);
-
-    if (result > 0)
-    {
-        OutputDebugStringA(debugBuffer.data());
-    }
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "%.*s (0x%08X) at 0x%p\n",
+                           static_cast<int>(exceptionType.size()),
+                           exceptionType.data(),
+                           exceptionCode,
+                           pRecord->ExceptionAddress);
 
     return exceptionCode;
 }
@@ -607,7 +677,12 @@ static std::mutex                                          g_handlerStateMutex;
 static std::atomic<PFNCHFILTFN>                            g_pfnCrashCallback{nullptr};
 static std::atomic<LPTOP_LEVEL_EXCEPTION_FILTER>           g_pfnOrigFilt{nullptr};
 static std::atomic<std::terminate_handler>                 g_pfnOrigTerminate{nullptr};
+#if defined(_MSC_VER)
+using CrtNewHandler = int(__cdecl*)(size_t);
+static std::atomic<CrtNewHandler>                          g_pfnOrigNewHandler{nullptr};
+#else
 static std::atomic<std::new_handler>                       g_pfnOrigNewHandler{nullptr};
+#endif
 static std::atomic<decltype(&SetUnhandledExceptionFilter)> g_pfnKernelSetUnhandledExceptionFilter{nullptr};
 static decltype(&SetUnhandledExceptionFilter)              g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
 
@@ -619,10 +694,202 @@ static std::atomic<bool>                g_bInPureCallHandler{false};
 static std::atomic<bool>                g_bInTerminateHandler{false};
 static std::atomic<bool>                g_bInNewHandler{false};
 
+static std::atomic<bool>                g_symbolsInitialized{false};
+static std::atomic<HANDLE>              g_symbolProcess{nullptr};
+static std::mutex                       g_symbolMutex;
+
+using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, DWORD);
+
+[[nodiscard]] static bool CollectProcessModules(HANDLE process, std::vector<HMODULE>& modules) noexcept
+{
+    const HMODULE psapiModule = GetModuleHandleW(L"Psapi.dll");
+    EnumProcessModulesExFn enumModulesEx = nullptr;
+    if (psapiModule != nullptr)
+        enumModulesEx = reinterpret_cast<EnumProcessModulesExFn>(GetProcAddress(psapiModule, "EnumProcessModulesEx"));
+
+    auto enumModules = [&](HMODULE* buffer, DWORD bufferSize, DWORD* bytesNeeded) noexcept -> BOOL {
+        if (enumModulesEx)
+            return enumModulesEx(process, buffer, bufferSize, bytesNeeded, LIST_MODULES_ALL);
+        return EnumProcessModules(process, buffer, bufferSize, bytesNeeded);
+    };
+
+    DWORD bytesNeeded = 0;
+    if (enumModules(nullptr, 0, &bytesNeeded) == FALSE || bytesNeeded == 0)
+        return false;
+
+    const auto moduleCapacity = bytesNeeded / static_cast<DWORD>(sizeof(HMODULE));
+    modules.resize(moduleCapacity);
+    if (enumModules(modules.data(), bytesNeeded, &bytesNeeded) == FALSE || bytesNeeded == 0)
+        return false;
+
+    modules.resize(bytesNeeded / static_cast<DWORD>(sizeof(HMODULE)));
+    return !modules.empty();
+}
+
+[[nodiscard]] static bool RegisterProcessModulesWithDbgHelp(HANDLE process) noexcept
+{
+    std::vector<HMODULE> modules;
+    if (!CollectProcessModules(process, modules))
+    {
+        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - EnumProcessModules failed to enumerate modules\n");
+        return false;
+    }
+
+    DWORD modulesRegistered = 0;
+    DWORD failuresLogged = 0;
+
+    for (HMODULE moduleHandle : modules)
+    {
+        const DWORD64 moduleBase = static_cast<DWORD64>(reinterpret_cast<std::uintptr_t>(moduleHandle));
+        if (SymGetModuleBase64(process, moduleBase) != 0)
+            continue;
+
+        MODULEINFO moduleInfo{};
+        if (GetModuleInformation(process, moduleHandle, &moduleInfo, sizeof(moduleInfo)) == FALSE)
+            continue;
+
+        std::array<char, MAX_PATH> modulePath{};
+        if (GetModuleFileNameExA(process, moduleHandle, modulePath.data(), static_cast<DWORD>(modulePath.size())) == 0)
+            continue;
+
+        const DWORD64 baseAddress = moduleBase;
+        const DWORD   imageSize = moduleInfo.SizeOfImage;
+
+        SetLastError(ERROR_SUCCESS);
+        if (SymLoadModuleEx(process, nullptr, modulePath.data(), nullptr, baseAddress, imageSize, nullptr, 0) != 0)
+        {
+            ++modulesRegistered;
+        }
+        else if (failuresLogged < 5)
+        {
+            const auto error = GetLastError();
+            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                              "CrashHandler: InitializeSymbolHandler - SymLoadModuleEx failed via EnumProcessModules for %s (error 0x%08X)\n",
+                              modulePath.data(), error);
+            ++failuresLogged;
+        }
+    }
+
+    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                      "CrashHandler: InitializeSymbolHandler - Registered %lu modules via EnumProcessModules (failures=%lu)\n",
+                      modulesRegistered,
+                      failuresLogged);
+
+    return modulesRegistered != 0;
+}
+
+[[nodiscard]] static bool RegisterModuleForAddress(HANDLE process, DWORD64 address) noexcept
+{
+    const auto addressPtr = reinterpret_cast<LPCSTR>(static_cast<std::uintptr_t>(address));
+
+    HMODULE moduleHandle{nullptr};
+    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                           addressPtr,
+                           &moduleHandle) == 0)
+    {
+        const auto error = GetLastError();
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                           "CaptureUnifiedStackTrace - Unable to resolve module for address 0x%llX (error 0x%08X)\n",
+                           address,
+                           error);
+        return false;
+    }
+
+    const DWORD64 moduleBase = static_cast<DWORD64>(reinterpret_cast<std::uintptr_t>(moduleHandle));
+    if (SymGetModuleBase64(process, moduleBase) != 0)
+        return true;
+
+    MODULEINFO moduleInfo{};
+    if (GetModuleInformation(process, moduleHandle, &moduleInfo, sizeof(moduleInfo)) == FALSE)
+    {
+        const auto error = GetLastError();
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                           "CaptureUnifiedStackTrace - GetModuleInformation failed for address 0x%llX (error 0x%08X)\n",
+                           address,
+                           error);
+        return false;
+    }
+
+    std::array<char, MAX_PATH> modulePath{};
+    if (GetModuleFileNameExA(process, moduleHandle, modulePath.data(), static_cast<DWORD>(modulePath.size())) == 0)
+    {
+        const auto error = GetLastError();
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                           "CaptureUnifiedStackTrace - GetModuleFileNameEx failed for address 0x%llX (error 0x%08X)\n",
+                           address,
+                           error);
+        return false;
+    }
+
+    const DWORD   imageSize = moduleInfo.SizeOfImage;
+
+    SetLastError(ERROR_SUCCESS);
+    if (SymLoadModuleEx(process, nullptr, modulePath.data(), nullptr, moduleBase, imageSize, nullptr, 0) == 0)
+    {
+        const auto error = GetLastError();
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                           "CaptureUnifiedStackTrace - SymLoadModuleEx failed for %s (address 0x%llX, error 0x%08X)\n",
+                           modulePath.data(),
+                           address,
+                           error);
+        return false;
+    }
+
+    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                       "CaptureUnifiedStackTrace - Registered module %s (base=0x%llX) for address 0x%llX\n",
+                       modulePath.data(),
+                       moduleBase,
+                       address);
+
+    return true;
+}
+
+#if defined(_MSC_VER)
+static int __cdecl CppNewHandlerBridge(size_t size) noexcept
+{
+    const auto telemetry = CrashTelemetry::CaptureContext();
+    if ((!telemetry.hasData || telemetry.requestedSize == 0) && size > 0)
+    {
+        CrashTelemetry::SetAllocationContext(size, nullptr, "operator new", "std::new_handler");
+    }
+
+    if (auto previous = g_pfnOrigNewHandler.load(std::memory_order_acquire))
+    {
+        return previous(size);
+    }
+
+    CppNewHandler();
+    return 0;
+}
+#else
+static void CppNewHandlerBridge() noexcept
+{
+    const auto telemetry = CrashTelemetry::CaptureContext();
+    if (!telemetry.hasData)
+    {
+        CrashTelemetry::SetAllocationContext(0, nullptr, "operator new", "std::new_handler");
+    }
+
+    if (auto previous = g_pfnOrigNewHandler.load(std::memory_order_acquire))
+    {
+        previous();
+        return;
+    }
+
+    CppNewHandler();
+}
+#endif
+
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
 [[noreturn]] void __cdecl CppTerminateHandler() noexcept;
-[[noreturn]] void __cdecl CppNewHandler() noexcept;
 void __cdecl              AbortSignalHandler(int signal) noexcept;
 [[noreturn]] void __cdecl PureCallHandler() noexcept;
 
@@ -642,9 +909,19 @@ static void LogHandlerEvent(const char* prefix, const char* event) noexcept;
 // Single overload using string_view handles all string types efficiently
 static void SignalSafeOutput(std::string_view message) noexcept
 {
-    if (!message.empty() && message.data() != nullptr)
+    SafeDebugOutput(message);
+}
+
+static void SignalSafePrintPrefixed(std::string_view prefix, std::string_view message) noexcept
+{
+    if (!prefix.empty())
     {
-        OutputDebugStringA(message.data());
+        SignalSafeOutput(prefix);
+    }
+
+    if (!message.empty())
+    {
+        SignalSafeOutput(message);
     }
 }
 
@@ -652,9 +929,19 @@ static void LogHandlerEvent(const char* prefix, const char* event) noexcept
 {
     if (prefix != nullptr && event != nullptr)
     {
-        std::array<char, DEBUG_BUFFER_SIZE> buffer{};
-        SAFE_DEBUG_PRINT_C(buffer.data(), buffer.size(), "%s%s\n", prefix, event);
+        SafeDebugPrintPrefixed(prefix, "%s\n", event);
     }
+}
+
+[[noreturn]] static void TerminateSelfWithExitCode(DWORD exitCode) noexcept
+{
+    if (exitCode == 0)
+    {
+        exitCode = EXIT_CODE_CRASH;
+    }
+
+    TerminateProcess(GetCurrentProcess(), exitCode);
+    _exit(static_cast<int>(exitCode));
 }
 
 inline void InitializeExceptionRecord(EXCEPTION_RECORD* const pRecord, const DWORD code, const void* const address) noexcept
@@ -699,36 +986,38 @@ static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI RedirectedSetUnhandledExceptionFilter
 
 void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
 {
-    bool expected = false;
+    bool expected{false};
     if (!g_bInAbortHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
     {
-        SignalSafeOutput(std::string{DEBUG_PREFIX_ABORT} + "Recursive\n");
-        _exit(EXIT_CODE_CRASH);
+        SignalSafePrintPrefixed(DEBUG_PREFIX_ABORT, "Recursive\n");
+        TerminateSelfWithExitCode(STATUS_STACK_BUFFER_OVERRUN_CODE);
     }
 
     SignalSafeOutput(DEBUG_SEPARATOR);
-    SignalSafeOutput(std::string{DEBUG_PREFIX_ABORT} + "SIGABRT (STATUS_STACK_BUFFER_OVERRUN)\n");
+    SignalSafePrintPrefixed(DEBUG_PREFIX_ABORT, "SIGABRT (STATUS_STACK_BUFFER_OVERRUN)\n");
     SignalSafeOutput(DEBUG_SEPARATOR);
 
     alignas(16) EXCEPTION_RECORD exRecord{};
     alignas(16) CONTEXT          ctx{};
 
-    void* returnAddr = _ReturnAddress();
+    void* returnAddr{_ReturnAddress()};
 
     InitializeExceptionRecord(&exRecord, STATUS_STACK_BUFFER_OVERRUN_CODE, returnAddr);
 
     ctx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
     RtlCaptureContext(&ctx);
 
-    EXCEPTION_POINTERS exPtrs = {};
+    EXCEPTION_POINTERS exPtrs{};
     exPtrs.ExceptionRecord = &exRecord;
     exPtrs.ContextRecord = &ctx;
+
+    CaptureAllocationTelemetry(&exPtrs);
 
     PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
 
     if (callback != nullptr)
     {
-        SignalSafeOutput(std::string{DEBUG_PREFIX_ABORT} + "Calling handler\n");
+        SignalSafePrintPrefixed(DEBUG_PREFIX_ABORT, "Calling handler\n");
 
         try
         {
@@ -736,40 +1025,45 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
         }
         catch (...)
         {
-            SignalSafeOutput(std::string{DEBUG_PREFIX_ABORT} + "Handler exception\n");
+            SignalSafePrintPrefixed(DEBUG_PREFIX_ABORT, "Handler exception\n");
         }
     }
     else
     {
-        SignalSafeOutput(std::string{DEBUG_PREFIX_ABORT} + "No handler\n");
+        SignalSafePrintPrefixed(DEBUG_PREFIX_ABORT, "No handler\n");
     }
 
-    SignalSafeOutput(std::string{DEBUG_PREFIX_ABORT} + "Terminating\n");
+    SignalSafePrintPrefixed(DEBUG_PREFIX_ABORT, "Terminating\n");
 
-    TerminateProcess(GetCurrentProcess(), EXIT_CODE_CRASH);
-    _exit(EXIT_CODE_CRASH);
+    TerminateSelfWithExitCode(STATUS_STACK_BUFFER_OVERRUN_CODE);
 }
 
 [[noreturn]] void __cdecl PureCallHandler() noexcept
 {
-    bool expected = false;
+    bool expected{false};
     if (!g_bInPureCallHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
     {
-        SignalSafeOutput(std::string{DEBUG_PREFIX_PURECALL} + "Recursive\n");
-        _exit(EXIT_CODE_CRASH);
+        SignalSafePrintPrefixed(DEBUG_PREFIX_PURECALL, "Recursive\n");
+        TerminateSelfWithExitCode(EXCEPTION_NONCONTINUABLE_EXCEPTION);
     }
 
     SafeDebugOutput(DEBUG_SEPARATOR);
     LogHandlerEvent(DEBUG_PREFIX_PURECALL.data(), "Pure virtual function call detected");
     SafeDebugOutput(DEBUG_SEPARATOR);
 
-    EXCEPTION_RECORD*  pExRecord = nullptr;
-    CONTEXT*           pCtx = nullptr;
+    EXCEPTION_RECORD*  pExRecord{nullptr};
+    CONTEXT*           pCtx{nullptr};
     EXCEPTION_POINTERS exPtrs{};
+
+    const bool haveContext = BuildExceptionContext(exPtrs, pExRecord, pCtx, EXCEPTION_NONCONTINUABLE_EXCEPTION);
+    if (haveContext)
+    {
+        CaptureAllocationTelemetry(&exPtrs);
+    }
 
     PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
 
-    if (callback != nullptr && BuildExceptionContext(exPtrs, pExRecord, pCtx, EXCEPTION_NONCONTINUABLE_EXCEPTION))
+    if (callback != nullptr && haveContext)
     {
         LogHandlerEvent(DEBUG_PREFIX_PURECALL.data(), "Calling crash handler callback");
 
@@ -794,8 +1088,7 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
     }
 
     LogHandlerEvent(DEBUG_PREFIX_PURECALL.data(), "Terminating process");
-    TerminateProcess(GetCurrentProcess(), EXIT_CODE_CRASH);
-    _exit(EXIT_CODE_CRASH);
+    TerminateSelfWithExitCode(EXCEPTION_NONCONTINUABLE_EXCEPTION);
 }
 
 #pragma warning(disable : 4073)
@@ -808,35 +1101,48 @@ public:
     {
         std::scoped_lock lock{g_handlerStateMutex};
 
-        g_bStackCookieCaptureEnabled.store(false, std::memory_order_seq_cst);
-        g_pfnCrashCallback.store(nullptr, std::memory_order_seq_cst);
+        g_bStackCookieCaptureEnabled.store(false, std::memory_order_release);
+        g_pfnCrashCallback.store(nullptr, std::memory_order_release);
+        
+        if (g_symbolsInitialized.exchange(false, std::memory_order_acq_rel))
+        {
+            if (HANDLE hProcess = g_symbolProcess.exchange(nullptr, std::memory_order_acq_rel); hProcess != nullptr)
+            {
+                SymCleanup(hProcess);
+                SafeDebugOutput("CrashHandler: Symbol handler cleaned up\n");
+            }
+        }
 
-        if (auto terminateHandler = g_pfnOrigTerminate.exchange(nullptr, std::memory_order_seq_cst); terminateHandler != nullptr)
+        if (auto terminateHandler = g_pfnOrigTerminate.exchange(nullptr, std::memory_order_acq_rel); terminateHandler != nullptr)
         {
             std::set_terminate(terminateHandler);
         }
 
-        if (auto newHandler = g_pfnOrigNewHandler.exchange(nullptr, std::memory_order_seq_cst); newHandler != nullptr)
+        if (auto newHandler = g_pfnOrigNewHandler.exchange(nullptr, std::memory_order_acq_rel); newHandler != nullptr)
         {
+    #if defined(_MSC_VER)
+            _set_new_handler(newHandler);
+    #else
             std::set_new_handler(newHandler);
+    #endif
         }
 
-        if (auto abortHandler = g_pfnOrigAbortHandler.exchange(nullptr, std::memory_order_seq_cst); abortHandler != nullptr)
+        if (auto abortHandler = g_pfnOrigAbortHandler.exchange(nullptr, std::memory_order_acq_rel); abortHandler != nullptr)
         {
             signal(SIGABRT, abortHandler);
         }
 
-        if (auto pureCallHandler = g_pfnOrigPureCall.exchange(nullptr, std::memory_order_seq_cst); pureCallHandler != nullptr)
+        if (auto pureCallHandler = g_pfnOrigPureCall.exchange(nullptr, std::memory_order_acq_rel); pureCallHandler != nullptr)
         {
             _set_purecall_handler(pureCallHandler);
         }
 
-        if (auto previousFilter = g_pfnOrigFilt.exchange(nullptr, std::memory_order_seq_cst); previousFilter != nullptr)
+        if (auto previousFilter = g_pfnOrigFilt.exchange(nullptr, std::memory_order_acq_rel); previousFilter != nullptr)
         {
             SetUnhandledExceptionFilter(previousFilter);
         }
 
-        if (auto kernelSetUnhandled = g_pfnKernelSetUnhandledExceptionFilter.exchange(nullptr, std::memory_order_seq_cst); kernelSetUnhandled != nullptr)
+        if (auto kernelSetUnhandled = g_pfnKernelSetUnhandledExceptionFilter.exchange(nullptr, std::memory_order_acq_rel); kernelSetUnhandled != nullptr)
         {
             g_kernelSetUnhandledExceptionFilterTrampoline = kernelSetUnhandled;
             if (!SharedUtil::UndoFunctionDetour(g_kernelSetUnhandledExceptionFilterTrampoline, reinterpret_cast<void*>(RedirectedSetUnhandledExceptionFilter)))
@@ -850,6 +1156,345 @@ public:
 
 static CleanUpCrashHandler g_cBeforeAndAfter;
 
+namespace CrashHandler
+{
+
+[[nodiscard]] const std::vector<std::string>& GetPdbDirectories()
+{
+    static std::once_flag             onceFlag;
+    static std::vector<std::string>   pdbDirs;
+    
+    std::call_once(onceFlag, [] {
+        try
+        {
+            const SString& processDir = SharedUtil::GetMTAProcessBaseDir();
+            
+            if (processDir.empty()) [[unlikely]]
+                return;
+            
+            const std::filesystem::path rootPath{FromUTF8(processDir)};
+            std::error_code             ec{};
+            
+            if (!std::filesystem::exists(rootPath, ec) || !std::filesystem::is_directory(rootPath, ec))
+                return;
+            
+            std::set<std::string> uniqueDirs;
+            
+            constexpr auto options = std::filesystem::directory_options::skip_permission_denied;
+            std::filesystem::recursive_directory_iterator iter{rootPath, options, ec};
+            
+            if (ec) [[unlikely]]
+                return;
+            
+            constexpr auto maxDepth = 256u;
+            
+            for (const auto end = std::filesystem::recursive_directory_iterator{}; iter != end;)
+            {
+                if (iter.depth() > maxDepth) [[unlikely]]
+                    iter.disable_recursion_pending();
+                
+                std::error_code entryEc{};
+                const bool      isSymlink = iter->is_symlink(entryEc);
+                
+                if (entryEc || isSymlink) [[unlikely]]
+                {
+                    iter.increment(ec), ec ? ec.clear() : void();
+                    continue;
+                }
+                
+                const bool isRegularFile = iter->is_regular_file(entryEc);
+                
+                if (entryEc) [[unlikely]]
+                {
+                    iter.increment(ec), ec ? ec.clear() : void();
+                    continue;
+                }
+                
+                if (isRegularFile) [[likely]]
+                {
+                    const auto extension = iter->path().extension().wstring();
+                    
+                    if (extension.size() == 4 && (extension[0] == L'.') && 
+                        (extension[1] == L'p' || extension[1] == L'P') &&
+                        (extension[2] == L'd' || extension[2] == L'D') && 
+                        (extension[3] == L'b' || extension[3] == L'B')) [[unlikely]]
+                    {
+                        const auto parentPath = iter->path().parent_path();
+                        if (!parentPath.empty())
+                        {
+                            const auto parentStr = ToUTF8(parentPath.wstring());
+                            uniqueDirs.insert(std::string{parentStr.c_str()});
+                        }
+                    }
+                }
+                
+                iter.increment(ec), ec ? ec.clear() : void();
+            }
+            
+            pdbDirs.assign(uniqueDirs.begin(), uniqueDirs.end());
+        }
+        catch (...)
+        {
+        }
+    });
+    
+    return pdbDirs;
+}
+
+[[nodiscard]] bool ProcessHasLocalDebugSymbols() noexcept
+{
+    return !GetPdbDirectories().empty();
+}
+
+[[nodiscard]] static bool InitializeSymbolHandler() noexcept
+{
+    std::scoped_lock lock{g_symbolMutex};
+    
+    if (g_symbolsInitialized.load(std::memory_order_acquire))
+        return true;
+    
+    const HANDLE hProcess = GetCurrentProcess();
+    
+    DWORD symOptions = SYMOPT_UNDNAME | 
+                       SYMOPT_DEFERRED_LOADS | 
+                       SYMOPT_LOAD_LINES | 
+                       SYMOPT_FAIL_CRITICAL_ERRORS |
+                       SYMOPT_NO_PROMPTS |
+                       SYMOPT_LOAD_ANYTHING;
+    
+#ifdef _DEBUG
+    symOptions |= SYMOPT_DEBUG;
+    SafeDebugOutput("CrashHandler: InitializeSymbolHandler - SYMOPT_DEBUG enabled for diagnostics\n");
+#endif
+    
+    SymSetOptions(symOptions);
+    
+    std::string symbolPath;
+    const auto& pdbDirs = GetPdbDirectories();
+    
+    if (!pdbDirs.empty()) [[likely]]
+    {
+        auto first{true};
+        for (const auto& dir : pdbDirs)
+        {
+            if (!std::exchange(first, false))
+                symbolPath += ";";
+            symbolPath += dir;
+        }
+    }
+    else [[unlikely]]
+    {
+        const auto& processDir = SharedUtil::GetMTAProcessBaseDir();
+        if (!processDir.empty())
+            symbolPath = processDir.c_str();
+    }
+    
+    std::array<char, 32768> envBuffer{};
+    if (const auto len = GetEnvironmentVariableA("_NT_SYMBOL_PATH", envBuffer.data(), static_cast<DWORD>(envBuffer.size()));
+        len > 0 && len < envBuffer.size())
+    {
+        const std::string_view envPath{envBuffer.data(), len};
+        if (envPath.find("http") == std::string_view::npos && envPath.find("SRV") == std::string_view::npos) [[likely]]
+        {
+            if (!symbolPath.empty())
+                symbolPath += ";";
+            symbolPath += envBuffer.data();
+        }
+    }
+    
+    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+    
+    if (symbolPath.empty())
+    {
+        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - WARNING: Empty symbol search path, symbols may not load\n");
+    }
+    else
+    {
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                          "CrashHandler: InitializeSymbolHandler - Symbol search path (%zu chars): %s\n", 
+                          symbolPath.size(), symbolPath.c_str());
+    }
+    
+    const char* pSymbolPath = symbolPath.empty() ? nullptr : symbolPath.c_str();
+    
+    if (SymInitialize(hProcess, pSymbolPath, TRUE) == FALSE) [[unlikely]]
+    {
+        const auto error = GetLastError();
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                  "CrashHandler: InitializeSymbolHandler - SymInitialize FAILED with error 0x%08X (path: %s)\n", 
+                          error, pSymbolPath ? pSymbolPath : "<null>");
+        
+        constexpr auto kErrorAlreadyExists = 0x000000B7;
+        constexpr auto kErrorFileNotFound = 0x00000002;
+        constexpr auto kErrorAccessDenied  = 0x00000005;
+        
+        if (error == kErrorAlreadyExists) [[unlikely]]
+        {
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR_ALREADY_EXISTS despite lock, forcing cleanup\n");
+            SymCleanup(hProcess);
+        }
+        
+        return false;
+    }
+    
+    if (SymRefreshModuleList(hProcess) == FALSE)
+    {
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                  "CrashHandler: InitializeSymbolHandler - WARNING: SymRefreshModuleList failed\n");
+    }
+
+    RegisterProcessModulesWithDbgHelp(hProcess);
+    
+    auto moduleCount = DWORD{0};
+    auto symbolsLoadedCount = DWORD{0};
+    auto modulesNeedingLoad = DWORD{0};
+
+    auto enumerateModules = [&]() -> bool {
+        moduleCount = 0;
+        symbolsLoadedCount = 0;
+        modulesNeedingLoad = 0;
+
+        struct EnumContext
+        {
+            DWORD* pModuleCount;
+            DWORD* pSymbolsCount;
+            DWORD* pNeedingLoad;
+            HANDLE hProcess;
+        };
+
+        EnumContext enumCtx{&moduleCount, &symbolsLoadedCount, &modulesNeedingLoad, hProcess};
+
+        if (SymEnumerateModules64(hProcess, [](PCSTR ModuleName, DWORD64 BaseOfDll, PVOID UserContext) -> BOOL {
+            auto* pCtx = static_cast<EnumContext*>(UserContext);
+            (*pCtx->pModuleCount)++;
+
+            IMAGEHLP_MODULE64 moduleInfo{};
+            moduleInfo.SizeOfStruct = sizeof(moduleInfo);
+
+            if (SymGetModuleInfo64(pCtx->hProcess, BaseOfDll, &moduleInfo) != FALSE)
+            {
+                const bool hasSymbols = (moduleInfo.SymType != SymNone && 
+                                         moduleInfo.SymType != SymDeferred &&
+                                         moduleInfo.LoadedPdbName[0] != '\0');
+
+                if (hasSymbols)
+                {
+                    (*pCtx->pSymbolsCount)++;
+#ifdef _DEBUG
+                    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+                    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                        "  Module: %s [Base: 0x%llX, SymType: %d, PDB: %s]\n", 
+                        ModuleName ? ModuleName : "<unknown>", BaseOfDll, moduleInfo.SymType,
+                        moduleInfo.LoadedPdbName);
+#endif
+                }
+                else
+                {
+                    (*pCtx->pNeedingLoad)++;
+                    if (ModuleName && ModuleName[0] != '\0')
+                    {
+                        const DWORD64 loadedBase = SymLoadModuleEx(pCtx->hProcess, nullptr, ModuleName, nullptr, BaseOfDll, 0, nullptr, 0);
+                        if (loadedBase != 0)
+                        {
+                            (*pCtx->pSymbolsCount)++;
+#ifdef _DEBUG
+                            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+                            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                                "  Module: %s [Base: 0x%llX] - Symbols loaded via SymLoadModuleEx\n", 
+                                ModuleName, BaseOfDll);
+#endif
+                        }
+#ifdef _DEBUG
+                        else
+                        {
+                            const DWORD loadError = GetLastError();
+                            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+                            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                                "  Module: %s [Base: 0x%llX] - SymLoadModuleEx FAILED (error 0x%08X)\n", 
+                                ModuleName, BaseOfDll, loadError);
+                        }
+#endif
+                    }
+                }
+            }
+#ifdef _DEBUG
+            else
+            {
+                const DWORD moduleInfoError = GetLastError();
+                std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+                SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                    "  Module: %s [Base: 0x%llX] - SymGetModuleInfo64 FAILED (error 0x%08X)\n", 
+                    ModuleName ? ModuleName : "<unknown>", BaseOfDll, moduleInfoError);
+            }
+#endif
+            return TRUE;
+        }, &enumCtx) == FALSE)
+        {
+            const DWORD enumError = GetLastError();
+            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                              "CrashHandler: InitializeSymbolHandler - WARNING: SymEnumerateModules64 failed with error 0x%08X\n",
+                              enumError);
+            return false;
+        }
+
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                          "CrashHandler: InitializeSymbolHandler - Enumerated %lu modules, %lu with symbols (%lu needed explicit load)\n", 
+                          moduleCount, symbolsLoadedCount, modulesNeedingLoad);
+
+        if (symbolsLoadedCount == 0 && moduleCount > 0)
+        {
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - CRITICAL: Zero symbols loaded despite modules present!\n");
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Possible causes: PDB mismatch, wrong paths, or corrupted symbols\n");
+        }
+
+        return true;
+    };
+
+    bool enumerationOk = enumerateModules();
+
+    if ((!enumerationOk || moduleCount == 0) && RegisterProcessModulesWithDbgHelp(hProcess))
+    {
+        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Module table rebuilt after EnumProcessModules registration\n");
+        enumerationOk = enumerateModules();
+    }
+
+    if (!enumerationOk)
+    {
+        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR: Unable to enumerate modules, cleaning up symbol handler\n");
+        SymCleanup(hProcess);
+        return false;
+    }
+
+    if (moduleCount == 0)
+    {
+        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR: Symbol handler initialized but module list is empty\n");
+        SymCleanup(hProcess);
+        return false;
+    }
+    
+    g_symbolProcess.store(hProcess, std::memory_order_release);
+    g_symbolsInitialized.store(true, std::memory_order_release);
+    
+    const auto validationOk = (symbolsLoadedCount > 0 || moduleCount == 0);
+    
+    if (validationOk) [[likely]]
+    {
+        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Symbol handler initialized successfully\n");
+    }
+    else [[unlikely]]
+    {
+        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - WARNING: Initialized but no symbols loaded!\n");
+    }
+    
+    return true;
+}
+
+}  // namespace CrashHandler
+
 [[nodiscard]] BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn) noexcept
 {
     if (pFn == nullptr)
@@ -862,6 +1507,29 @@ static CleanUpCrashHandler g_cBeforeAndAfter;
 
     std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
     SAFE_DEBUG_PRINT(debugBuffer, "%.*sInstalling handlers with callback at 0x%p\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(), reinterpret_cast<const void*>(pFn));
+
+    SafeDebugOutput("========================================\n");
+    SafeDebugOutput("CrashHandler: Starting PDB detection and symbol initialization\n");
+    SafeDebugOutput("========================================\n");
+    
+    // Warm up PDB detection early to avoid filesystem scan during crash handling
+    // This performs the recursive directory search now rather than during exception processing
+    const bool hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
+    
+    SafeDebugOutput("========================================\n");
+    SAFE_DEBUG_PRINT(debugBuffer, "%.*sDebug symbols %s\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(), hasSymbols ? "DETECTED" : "not found");
+    
+    if (hasSymbols)
+    {
+        if (CrashHandler::InitializeSymbolHandler())
+        {
+            SafeDebugOutput("CrashHandler: Symbol handler pre-initialized successfully\n");
+        }
+        else
+        {
+            SafeDebugOutput("CrashHandler: WARNING - Symbol handler pre-initialization failed\n");
+        }
+    }
 
     if (const BOOL phaseResult = SetInitializationPhase(INIT_PHASE_MINIMAL); phaseResult == FALSE)
     {
@@ -953,7 +1621,11 @@ static void InstallCppHandlers() noexcept
 
     if (g_pfnOrigNewHandler.load(std::memory_order_acquire) == nullptr)
     {
-        std::new_handler previous = std::set_new_handler(CppNewHandler);
+#if defined(_MSC_VER)
+        CrtNewHandler previous = _set_new_handler(CppNewHandlerBridge);
+#else
+        std::new_handler previous = std::set_new_handler(CppNewHandlerBridge);
+#endif
         g_pfnOrigNewHandler.store(previous, std::memory_order_release);
         SafeDebugOutput("CrashHandler: C++ new handler installed\n");
     }
@@ -1007,8 +1679,8 @@ static void InstallAbortHandlers() noexcept
     if (length == 0 || length >= buffer.size())
         return false;
 
-    const std::uint8_t rawChar = static_cast<std::uint8_t>(buffer[0]);
-    const char         indicator = static_cast<char>(std::tolower(rawChar));
+    const std::uint8_t rawChar{static_cast<std::uint8_t>(buffer[0])};
+    const char indicator{static_cast<char>(std::tolower(rawChar))};
     outValue = !(indicator == '0' || indicator == 'f' || indicator == 'n');
     return true;
 }
@@ -1020,20 +1692,11 @@ static void InstallAbortHandlers() noexcept
 
     memset(pConfig, 0, sizeof(CRASH_HANDLER_CONFIG));
 
-    bool disableSehDetourBool = false;
-    bool forceSehDetourBool = false;
-    const bool hasDisableSehDetourEnv = TryReadEnvBool("MTA_DISABLE_SEH_DETOUR", disableSehDetourBool);
-    const bool hasForceSehDetourEnv = TryReadEnvBool("MTA_FORCE_SEH_DETOUR", forceSehDetourBool);
+    auto disableSehDetourBool{false};
+    auto forceSehDetourBool{false};
+    [[maybe_unused]] const auto r1 = TryReadEnvBool("MTA_DISABLE_SEH_DETOUR", disableSehDetourBool);
+    [[maybe_unused]] const auto r2 = TryReadEnvBool("MTA_FORCE_SEH_DETOUR", forceSehDetourBool);
 
-    if (!hasDisableSehDetourEnv)
-    {
-        disableSehDetourBool = false;
-    }
-
-    if (!hasForceSehDetourEnv)
-    {
-        forceSehDetourBool = false;
-    }
     pConfig->disableSehDetour = disableSehDetourBool ? TRUE : FALSE;
     pConfig->forceSehDetour = forceSehDetourBool ? TRUE : FALSE;
 
@@ -1053,13 +1716,115 @@ static void InstallAbortHandlers() noexcept
     return TRUE;
 }
 
-[[nodiscard]] BOOL __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames, std::vector<std::string>* pOutTrace) noexcept
+// Helper to perform protected stack walk for callback exceptions
+static BOOL ProtectedStackWalk64(DWORD machineType, HANDLE hProcess, HANDLE hThread, STACKFRAME64* frame, CONTEXT* context,
+                                  const StackTraceHelpers::StackWalkRoutines& routines) noexcept
 {
-    if (pException == nullptr || pException->ContextRecord == nullptr)
+    __try
+    {
+        return StackWalk64(machineType, hProcess, hThread, frame, context, 
+                          routines.readMemory, routines.functionTableAccess, routines.moduleBase, nullptr);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
+// Helper to safely call SymFromAddr using only SEH
+static bool SafeSymFromAddr(HANDLE hProcess, DWORD64 address, PSYMBOL_INFO pSymbol, bool isCallback) noexcept
+{
+    bool result{false};
+    __try
+    {
+        if (SymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE && pSymbol->Name != nullptr)
+        {
+            result = true;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        if (isCallback)
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - SymFromAddr faulted\n");
+        }
+    }
+    return result;
+}
+
+// Helper to safely call SymGetLineFromAddr64 using only SEH
+static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pDisplacement, IMAGEHLP_LINE64* pLineInfo, bool isCallback) noexcept
+{
+    bool result{false};
+    __try
+    {
+        if (SymGetLineFromAddr64(hProcess, address, pDisplacement, pLineInfo) != FALSE)
+        {
+            result = true;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        if (isCallback)
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - SymGetLineFromAddr64 faulted\n");
+        }
+    }
+    return result;
+}
+
+[[nodiscard]] BOOL __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames, std::vector<std::string>* pOutTrace)
+{
+    if (pException == nullptr || pOutTrace == nullptr)
         return FALSE;
 
-    if (pOutTrace == nullptr)
+    const auto hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
+    const auto initializedAtEntry = g_symbolsInitialized.load(std::memory_order_acquire);
+    
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+        "CaptureUnifiedStackTrace - Entry: hasSymbols=%s, initialized=%s\n",
+        hasSymbols ? "true" : "false",
+        initializedAtEntry ? "true" : "false");
+    
+    if (!hasSymbols)
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+            "CaptureUnifiedStackTrace - PDB detection returned FALSE - checking GetPdbDirectories()...\n");
+        const auto& pdbDirs = CrashHandler::GetPdbDirectories();
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+            "CaptureUnifiedStackTrace - GetPdbDirectories() returned %zu directories\n", pdbDirs.size());
+    }
+    
+    if (!hasSymbols)
+    {
+        static std::once_flag logOnce;
+        std::call_once(logOnce, [] {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - capturing without symbols (raw addresses only)\n");
+        });
+    }
+
+    // Check if this is a callback exception - these have special handling requirements
+    const bool isCallbackException = (pException->ExceptionRecord != nullptr && 
+                                      pException->ExceptionRecord->ExceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION);
+    
+    // Handle null ContextRecord - can occur with callbacks and other severe exceptions
+    if (pException->ContextRecord == nullptr)
+    {
+        if (isCallbackException)
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Callback exception has null context, cannot walk stack\n");
+        }
+        else
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Null context record, cannot walk stack\n");
+        }
         return FALSE;
+    }
+    
+    if (isCallbackException)
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Callback exception: using defensive stack capture\n");
+    }
 
     pOutTrace->clear();
 
@@ -1088,6 +1853,17 @@ static void InstallAbortHandlers() noexcept
     CONTEXT      context = *pException->ContextRecord;
     STACKFRAME64 frame{};
 
+    // Verify CONTEXT_CONTROL is present before using Eip/Ebp/Esp for stack walking
+    const bool hasControlContext = (context.ContextFlags & CONTEXT_CONTROL) != 0;
+    if (!hasControlContext)
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+            "CaptureUnifiedStackTrace - Incomplete context (flags=0x%08X), cannot walk stack%s\n",
+            context.ContextFlags,
+            isCallbackException ? " (callback exception)" : "");
+        return FALSE;
+    }
+
     // For EIP=0 crashes, start stack walk from return address at [ESP]
     constexpr auto kNullAddress = uintptr_t{0};
     static_assert(kNullAddress == 0, "Null address constant must be zero");
@@ -1097,23 +1873,17 @@ static void InstallAbortHandlers() noexcept
     if (isNullJump)
     {
         // Try to read return address from [ESP]
-        const auto espAddr = static_cast<uintptr_t>(context.Esp);
-        const auto pReturnAddress = reinterpret_cast<void* const*>(espAddr);
-        
-        constexpr std::size_t kDebugBufferSize = 256;
-        static_assert(kDebugBufferSize > 0, "Debug buffer size must be positive");
-        
+        const auto espAddr{static_cast<uintptr_t>(context.Esp)};
+        const auto pReturnAddress{reinterpret_cast<void* const*>(espAddr)};
+
         if (SharedUtil::IsReadablePointer(pReturnAddress, sizeof(void*)))
         {
-            const auto returnAddr = reinterpret_cast<uintptr_t>(*pReturnAddress);
-            
-            std::array<char, kDebugBufferSize> debugBuffer{};
-            [[maybe_unused]] const auto written = snprintf(debugBuffer.data(), debugBuffer.size(), 
-                    "%.*sCaptureUnifiedStackTrace - EIP=0, starting stack walk from return address: 0x%08X\n", 
-                    static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
-                    static_cast<unsigned int>(returnAddr));
-            SafeDebugOutput(debugBuffer.data());
-            
+            const auto returnAddr{reinterpret_cast<uintptr_t>(*pReturnAddress)};
+
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                                   "CaptureUnifiedStackTrace - EIP=0, starting stack walk from return address: 0x%08X\n",
+                                   static_cast<unsigned int>(returnAddr));
+
             // Start stack walk from return address instead of null EIP
             frame.AddrPC.Offset = returnAddr;
             frame.AddrFrame.Offset = context.Ebp;
@@ -1121,12 +1891,9 @@ static void InstallAbortHandlers() noexcept
         }
         else
         {
-            std::array<char, kDebugBufferSize> debugBuffer{};
-            [[maybe_unused]] const auto written = snprintf(debugBuffer.data(), debugBuffer.size(), 
-                    "%.*sCaptureUnifiedStackTrace - EIP=0, ESP not readable (0x%08X), cannot capture stack\n", 
-                    static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
-                    static_cast<unsigned int>(espAddr));
-            SafeDebugOutput(debugBuffer.data());
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                                   "CaptureUnifiedStackTrace - EIP=0, ESP not readable (0x%08X), cannot capture stack\n",
+                                   static_cast<unsigned int>(espAddr));
             return FALSE;
         }
     }
@@ -1141,77 +1908,192 @@ static void InstallAbortHandlers() noexcept
     frame.AddrFrame.Mode = AddrModeFlat;
     frame.AddrStack.Mode = AddrModeFlat;
 
-    struct SymbolHandlerGuard
+    auto symbolsAvailable = hasSymbols && initializedAtEntry;
+    
+    if (hasSymbols && !symbolsAvailable) [[unlikely]]
     {
-        HANDLE process;
-        bool   initialized;
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+            "CaptureUnifiedStackTrace - Symbols detected but handler not initialized, attempting late init\n");
+        symbolsAvailable = CrashHandler::InitializeSymbolHandler();
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+            "CaptureUnifiedStackTrace - Late init result: %s\n", symbolsAvailable ? "SUCCESS" : "FAILED");
+    }
 
-        SymbolHandlerGuard(HANDLE hProcess) : process(hProcess), initialized(false)
+    const auto useDbgHelp = symbolsAvailable;
+    const HANDLE symHandle = g_symbolProcess.load(std::memory_order_acquire);
+
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+        "CaptureUnifiedStackTrace - Using DbgHelp: %s (symbolsAvailable=%s)\n",
+        useDbgHelp ? "YES" : "NO",
+        symbolsAvailable ? "true" : "false");
+
+    if (useDbgHelp && symHandle != nullptr)
+    {
+        if (SymRefreshModuleList(symHandle) == FALSE)
         {
-            if (process != nullptr && SymInitialize(process, nullptr, TRUE) != FALSE)
-            {
-                initialized = true;
-                constexpr auto symOptions = SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS;
-                SymSetOptions(symOptions);
-            }
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                "CaptureUnifiedStackTrace - SymRefreshModuleList failed before stack walk\n");
+        }
+        else
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                "CaptureUnifiedStackTrace - SymRefreshModuleList succeeded before stack walk\n");
         }
 
-        ~SymbolHandlerGuard()
-        {
-            if (initialized)
-            {
-                SymCleanup(process);
-            }
-        }
+        RegisterProcessModulesWithDbgHelp(symHandle);
+    }
 
-        SymbolHandlerGuard(const SymbolHandlerGuard&) = delete;
-        SymbolHandlerGuard& operator=(const SymbolHandlerGuard&) = delete;
-    };
+    const auto routines = StackTraceHelpers::MakeStackWalkRoutines(useDbgHelp);
 
-    SymbolHandlerGuard symbolGuard(hProcess);
-    if (!symbolGuard.initialized)
-        return FALSE;
-
-    constexpr auto                    kMaxSymbolNameLength = 256;
-    constexpr auto                    symbolBufferSize = sizeof(SYMBOL_INFO) + kMaxSymbolNameLength;
-    alignas(SYMBOL_INFO) std::uint8_t symbolBuffer[symbolBufferSize]{};
-    PSYMBOL_INFO                      pSymbol = reinterpret_cast<PSYMBOL_INFO>(symbolBuffer);
+    constexpr auto kMaxSymbolNameLength = std::size_t{2048};
+    constexpr auto symbolBufferSize = sizeof(SYMBOL_INFO) + kMaxSymbolNameLength;
+    
+    alignas(SYMBOL_INFO) auto symbolBuffer = std::array<std::uint8_t, symbolBufferSize>{};
+    auto* const pSymbol = reinterpret_cast<PSYMBOL_INFO>(symbolBuffer.data());
     pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
     pSymbol->MaxNameLen = kMaxSymbolNameLength;
 
-    for (DWORD frameIndex = 0; frameIndex < actualMaxFrames; ++frameIndex)
+    constexpr auto machineType = IMAGE_FILE_MACHINE_I386;
+    
+    for (auto frameIndex : std::views::iota(DWORD{0}, actualMaxFrames))
     {
-        constexpr auto machineType = IMAGE_FILE_MACHINE_I386;
-        if (const BOOL bWalked = StackWalk64(machineType, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
-            bWalked == FALSE)
-            break;
-
-        if (frame.AddrPC.Offset == 0)
-            break;
-
-        const DWORD64 address = frame.AddrPC.Offset;
-
-        auto symbolName = "0x"s + std::to_string(address);
-        if (const BOOL symResult = SymFromAddr(hProcess, address, nullptr, pSymbol); symResult != FALSE && pSymbol->Name != nullptr)
+        BOOL bWalked = FALSE;
+        
+        if (isCallbackException) [[unlikely]]
         {
-            symbolName = pSymbol->Name;
-        }
-
-        IMAGEHLP_LINE64 lineInfo{};
-        lineInfo.SizeOfStruct = sizeof(lineInfo);
-        DWORD lineDisplacement = 0;
-
-        std::string frameInfo = symbolName;
-        if (const BOOL lineResult = SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo); lineResult != FALSE)
-        {
-            if (lineInfo.FileName != nullptr)
+            bWalked = ProtectedStackWalk64(machineType, hProcess, hThread, &frame, &context, routines);
+            if (bWalked == FALSE) [[unlikely]]
             {
-                frameInfo += " ("s + lineInfo.FileName + ":"s + std::to_string(lineInfo.LineNumber) + ")"s;
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Exception during protected stack walk at frame %lu\n", frameIndex);
+            }
+        }
+        else [[likely]]
+        {
+            bWalked = StackWalk64(machineType, hProcess, hThread, &frame, &context, 
+                                routines.readMemory, routines.functionTableAccess, routines.moduleBase, nullptr);
+        }
+        
+        if (bWalked == FALSE) [[unlikely]]
+            break;
+
+        if (frame.AddrPC.Offset == 0) [[unlikely]]
+            break;
+
+        const auto address = frame.AddrPC.Offset;
+        
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+            "CaptureUnifiedStackTrace - Frame %lu: address=0x%llX, useDbgHelp=%s\n",
+            frameIndex, address, useDbgHelp ? "true" : "false");
+        
+        if (!useDbgHelp) [[unlikely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+                "CaptureUnifiedStackTrace - Frame %lu: Using fallback formatting (no DbgHelp)\n", frameIndex);
+            pOutTrace->emplace_back(StackTraceHelpers::FormatAddressWithModuleAndAbsolute(address));
+            continue;
+        }
+        
+        if (symHandle == nullptr) [[unlikely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+                "CaptureUnifiedStackTrace - Frame %lu: symHandle is NULL\n", frameIndex);
+            pOutTrace->emplace_back(StackTraceHelpers::FormatAddressWithModuleAndAbsolute(address));
+            continue;
+        }
+        
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+            "CaptureUnifiedStackTrace - Frame %lu: symHandle=0x%p\n", frameIndex, symHandle);
+        
+        auto moduleBase = SymGetModuleBase64(symHandle, address);
+
+        if (moduleBase == 0) [[unlikely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                "CaptureUnifiedStackTrace - Frame %lu: Address not in any loaded module, attempting registration\n",
+                frameIndex);
+
+            if (RegisterModuleForAddress(symHandle, address))
+            {
+                moduleBase = SymGetModuleBase64(symHandle, address);
             }
         }
 
-        frameInfo += " [0x"s + std::to_string(address) + "]"s;
-        pOutTrace->push_back(frameInfo);
+        if (moduleBase == 0) [[unlikely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
+                "CaptureUnifiedStackTrace - Frame %lu: Address still not associated with a module after registration attempt\n",
+                frameIndex);
+            pOutTrace->emplace_back(StackTraceHelpers::FormatAddressWithModuleAndAbsolute(address));
+            continue;
+        }
+        
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+            "CaptureUnifiedStackTrace - Frame %lu: moduleBase=0x%llX\n", frameIndex, moduleBase);
+        
+        std::string symbolName;
+        symbolName.resize(64);
+        _snprintf_s(symbolName.data(), symbolName.size(), _TRUNCATE, "0x%llX", address);
+        symbolName.resize(std::strlen(symbolName.c_str()));
+        
+        if (!SafeSymFromAddr(symHandle, address, pSymbol, isCallbackException)) [[unlikely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+                "CaptureUnifiedStackTrace - Frame %lu: SymFromAddr failed\n", frameIndex);
+            symbolName.resize(64);
+            _snprintf_s(symbolName.data(), symbolName.size(), _TRUNCATE, "0x%llX [lookup failed]", address);
+            symbolName.resize(std::strlen(symbolName.c_str()));
+        }
+        else if (const auto nameView = std::string_view{pSymbol->Name ? pSymbol->Name : ""}; nameView.empty()) [[unlikely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+                "CaptureUnifiedStackTrace - Frame %lu: Symbol lookup succeeded but name is empty\n", frameIndex);
+            symbolName.resize(64);
+            _snprintf_s(symbolName.data(), symbolName.size(), _TRUNCATE, "0x%llX [no symbol]", address);
+            symbolName.resize(std::strlen(symbolName.c_str()));
+        }
+        else [[likely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+                "CaptureUnifiedStackTrace - Frame %lu: Resolved symbol '%s'\n", frameIndex, pSymbol->Name);
+            symbolName.assign(nameView.begin(), nameView.end());
+        }
+        
+        IMAGEHLP_LINE64 lineInfo{
+            .SizeOfStruct = sizeof(IMAGEHLP_LINE64)
+        };
+        auto lineDisplacement = DWORD{0};
+        
+        std::string frameInfo;
+        
+        if (!SafeSymGetLineFromAddr64(symHandle, address, &lineDisplacement, &lineInfo, isCallbackException)) [[unlikely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+                "CaptureUnifiedStackTrace - Frame %lu: No line info available\n", frameIndex);
+            frameInfo.resize(256);
+            _snprintf_s(frameInfo.data(), frameInfo.size(), _TRUNCATE, "%s [0x%llX]", symbolName.c_str(), address);
+            frameInfo.resize(std::strlen(frameInfo.c_str()));
+        }
+        else if (const auto fileName = std::string_view{lineInfo.FileName ? lineInfo.FileName : ""}; fileName.empty()) [[unlikely]]
+        {
+            frameInfo.resize(256);
+            _snprintf_s(frameInfo.data(), frameInfo.size(), _TRUNCATE, "%s [0x%llX]", symbolName.c_str(), address);
+            frameInfo.resize(std::strlen(frameInfo.c_str()));
+        }
+        else [[likely]]
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+                "CaptureUnifiedStackTrace - Frame %lu: Line info: %s:%lu\n", 
+                frameIndex, lineInfo.FileName, lineInfo.LineNumber);
+            frameInfo.resize(512);
+            _snprintf_s(frameInfo.data(), frameInfo.size(), _TRUNCATE, "%s (%.*s:%lu) [0x%llX]", 
+                symbolName.c_str(), static_cast<int>(fileName.size()), fileName.data(), lineInfo.LineNumber, address);
+            frameInfo.resize(std::strlen(frameInfo.c_str()));
+        }
+        
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
+            "CaptureUnifiedStackTrace - Frame %lu: Final: %s\n", frameIndex, frameInfo.c_str());
+        
+        pOutTrace->emplace_back(std::move(frameInfo));
     }
 
     return !pOutTrace->empty();
@@ -1230,7 +2112,7 @@ static bool InstallSehHandler() noexcept
     LPTOP_LEVEL_EXCEPTION_FILTER previousFilter = SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
     g_pfnOrigFilt.store(previousFilter, std::memory_order_release);
 
-    bool success = true;
+    bool success{true};
 
     std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
     if (previousFilter != nullptr)
@@ -1242,29 +2124,29 @@ static bool InstallSehHandler() noexcept
         SafeDebugOutput("CrashHandler: SEH installed - no previous filter present\n");
     }
 
-    bool detourEnabled = true;
-    bool detourForced = false;
+    bool detourEnabled{true};
+    bool detourForced{false};
 
     if (CRASH_HANDLER_CONFIG config{}; GetCrashHandlerConfiguration(&config))
     {
-        const bool disableDetour = config.disableSehDetour != FALSE;
-        const bool forceDetour = config.forceSehDetour != FALSE;
+        const bool disableDetour{config.disableSehDetour != FALSE};
+        const bool forceDetour{config.forceSehDetour != FALSE};
 
         SAFE_DEBUG_PRINT(szDebug, "CrashHandler: SEH detour env check - MTA_DISABLE_SEH_DETOUR: %s, MTA_FORCE_SEH_DETOUR: %s\n",
                          disableDetour ? "true" : "false", forceDetour ? "true" : "false");
 
         detourForced = forceDetour;
 
-        if (disableDetour && !detourForced)
+        if (disableDetour && !detourForced) [[unlikely]]
         {
             detourEnabled = false;
         }
     }
 
-    const bool debuggerPresent = IsDebuggerPresent() != FALSE;
+    const bool debuggerPresent{IsDebuggerPresent() != FALSE};
     SAFE_DEBUG_PRINT(szDebug, "CrashHandler: Debugger present: %s\n", debuggerPresent ? "true" : "false");
 
-    if (!detourEnabled)
+    if (!detourEnabled) [[unlikely]]
     {
         SafeDebugOutput("CrashHandler: SEH detour protection disabled by configuration\n");
         return success;
@@ -1340,7 +2222,11 @@ static void UninstallCrashHandlers() noexcept
 
     if (auto newHandler = g_pfnOrigNewHandler.exchange(nullptr, std::memory_order_acq_rel); newHandler != nullptr)
     {
+#if defined(_MSC_VER)
+        _set_new_handler(newHandler);
+#else
         std::set_new_handler(newHandler);
+#endif
     }
 
     if (auto abortHandler = g_pfnOrigAbortHandler.exchange(nullptr, std::memory_order_acq_rel); abortHandler != nullptr)
@@ -1398,7 +2284,7 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
     exRecordGuard.ptr = nullptr;
     ctxGuard.ptr = nullptr;
 
-    void* returnAddr = _ReturnAddress();
+    void* returnAddr{_ReturnAddress()};
     InitializeExceptionRecord(outExRecord, dwExceptionCode, returnAddr);
 
     outCtx->ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
@@ -1430,26 +2316,37 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
     bool expected = false;
     if (!g_bInTerminateHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
     {
-        SignalSafeOutput(std::string{DEBUG_PREFIX_CPP} + "Recursive\n");
-        _exit(EXIT_CODE_CRASH);
+        SignalSafePrintPrefixed(DEBUG_PREFIX_CPP, "Recursive\n");
+        TerminateSelfWithExitCode(CPP_EXCEPTION_CODE);
     }
 
     SafeDebugOutput(DEBUG_SEPARATOR);
-    SafeDebugOutput(std::string{DEBUG_PREFIX_CPP} + "Unhandled C++ exception detected\n");
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "Unhandled C++ exception detected\n");
 
     ReportCurrentCppException();
 
     SafeDebugOutput(DEBUG_SEPARATOR);
 
+    if (auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote(); !telemetryNote.empty())
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "%s\n", telemetryNote.c_str());
+    }
+
     EXCEPTION_RECORD*  pExRecord = nullptr;
     CONTEXT*           pCtx = nullptr;
     EXCEPTION_POINTERS exPtrs{};
 
+    const bool haveContext = BuildExceptionContext(exPtrs, pExRecord, pCtx, CPP_EXCEPTION_CODE);
+    if (haveContext)
+    {
+        CaptureAllocationTelemetry(&exPtrs);
+    }
+
     PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire);
 
-    if (callback != nullptr && BuildExceptionContext(exPtrs, pExRecord, pCtx, CPP_EXCEPTION_CODE))
+    if (callback != nullptr && haveContext)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CPP} + "Calling crash handler callback\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "Calling crash handler callback\n");
 
         try
         {
@@ -1457,7 +2354,7 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
         }
         catch (...)
         {
-            SafeDebugOutput(std::string{DEBUG_PREFIX_CPP} + "Exception in crash handler callback\n");
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "Exception in crash handler callback\n");
         }
     }
 
@@ -1471,9 +2368,8 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
         LocalFree(pExRecord);
     }
 
-    SafeDebugOutput(std::string{DEBUG_PREFIX_CPP} + "Terminating process\n");
-    TerminateProcess(GetCurrentProcess(), EXIT_CODE_CRASH);
-    _exit(EXIT_CODE_CRASH);
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "Terminating process\n");
+    TerminateSelfWithExitCode(CPP_EXCEPTION_CODE);
 }
 
 static void ReportCurrentCppException() noexcept
@@ -1490,11 +2386,11 @@ static void ReportCurrentCppException() noexcept
     }
     catch (const std::bad_array_new_length&)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CPP} + "std::bad_array_new_length caught\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "std::bad_array_new_length caught\n");
     }
     catch (const std::bad_alloc&)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CPP} + "std::bad_alloc caught - OUT OF MEMORY!\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "std::bad_alloc caught - OUT OF MEMORY!\n");
     }
     catch (const std::exception& e)
     {
@@ -1503,7 +2399,7 @@ static void ReportCurrentCppException() noexcept
     }
     catch (...)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CPP} + "Unknown exception type\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CPP, "Unknown exception type\n");
     }
 }
 
@@ -1513,12 +2409,18 @@ static void ReportCurrentCppException() noexcept
     if (!g_bInNewHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
     {
         SignalSafeOutput("C++ NEW HANDLER: Recursive\n");
-        _exit(EXIT_CODE_CRASH);
+        TerminateSelfWithExitCode(STATUS_NO_MEMORY);
     }
 
     SafeDebugOutput(DEBUG_SEPARATOR);
     SafeDebugOutput("C++ NEW HANDLER: Memory allocation failed\n");
     SafeDebugOutput(DEBUG_SEPARATOR);
+
+    if (auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote(); !telemetryNote.empty())
+    {
+        SafeDebugOutput(telemetryNote.c_str());
+        SafeDebugOutput("\n");
+    }
 
     std::terminate();
 }
@@ -1537,7 +2439,7 @@ static void ReportCurrentCppException() noexcept
     return TRUE;
 }
 
-[[nodiscard]] BOOL __stdcall CaptureCurrentException() noexcept
+[[nodiscard]] BOOL __stdcall CaptureCurrentException()
 {
     try
     {
@@ -1561,41 +2463,41 @@ static void ReportCurrentCppException() noexcept
 
 [[nodiscard]] BOOL __stdcall LogExceptionDetails(EXCEPTION_POINTERS* pException) noexcept
 {
-    SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "========================================\n");
-    SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - ENTRY\n");
-    SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "========================================\n");
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "========================================\n");
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ENTRY\n");
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "========================================\n");
 
     if (pException == nullptr)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - pException is NULL\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - pException is NULL\n");
         return FALSE;
     }
 
-    SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - pException OK\n");
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - pException OK\n");
     
     if (pException->ExceptionRecord != nullptr)
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - ExceptionRecord OK\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ExceptionRecord OK\n");
     else
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - ExceptionRecord is NULL\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ExceptionRecord is NULL\n");
     
     if (pException->ContextRecord != nullptr)
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - ContextRecord OK\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ContextRecord OK\n");
     else
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - ContextRecord is NULL (THIS WILL PREVENT ENHANCED INFO)\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ContextRecord is NULL (THIS WILL PREVENT ENHANCED INFO)\n");
 
     LogBasicExceptionInfo(pException);
     StoreBasicExceptionInfo(pException);
 
     try
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - Calling LogEnhancedExceptionInfo...\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - Calling LogEnhancedExceptionInfo...\n");
         LogEnhancedExceptionInfo(pException);
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - LogEnhancedExceptionInfo completed\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - LogEnhancedExceptionInfo completed\n");
         return TRUE;
     }
     catch (...)
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_CRASH} + "LogExceptionDetails - Exception caught in LogEnhancedExceptionInfo\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - Exception caught in LogEnhancedExceptionInfo\n");
         return TRUE;
     }
 }
@@ -1609,19 +2511,36 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    const DWORD dwExceptionCode = pExPtrs->ExceptionRecord->ExceptionCode;
+    const DWORD dwExceptionCode{pExPtrs->ExceptionRecord->ExceptionCode};
 
-    if (IsFatalException(dwExceptionCode) == FALSE)
+    // Special handling for release build-affecting assertions from 3rd-party libs (e.g CEF) that overuse them
+    if (IsDebuggerPresent() == FALSE && pExPtrs->ContextRecord != nullptr)
     {
+        void* exceptionAddr = pExPtrs->ExceptionRecord->ExceptionAddress;
+        if (IsExceptionFromThirdParty(exceptionAddr))
+        {
+            if (dwExceptionCode == EXCEPTION_BREAKPOINT || dwExceptionCode == EXCEPTION_ILLEGAL_INSTRUCTION)
+            {
+                // Don't advance EIP - for EXCEPTION_BREAKPOINT, EIP already points past INT 3
+                // For EXCEPTION_ILLEGAL_INSTRUCTION with UD2, we just continue from current EIP
+                SafeDebugOutput("SEH: Assertion in 3rd-party library - continuing execution\n");
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
+        }
+    }
+
+    if (IsFatalException(dwExceptionCode) == FALSE) [[unlikely]]
+    {
+        // Non-fatal exceptions that are not from 3rd-party libraries
         std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
         SAFE_DEBUG_PRINT_C(szDebug.data(), szDebug.size(), "SEH: Non-fatal exception 0x%08X - ignoring\n", dwExceptionCode);
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    LONG lRet = EXCEPTION_CONTINUE_SEARCH;
+    LONG lRet{EXCEPTION_CONTINUE_SEARCH};
 
     static std::atomic<bool> bHandlerActive{false};
-    bool                     expected = false;
+    bool expected{false};
 
     if (!bHandlerActive.compare_exchange_strong(expected, true, std::memory_order_acq_rel, std::memory_order_relaxed))
     {
@@ -1631,7 +2550,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     SafeDebugOutput(DEBUG_SEPARATOR);
     SafeDebugOutput("SEH: FATAL - Unhandled exception filter triggered\n");
 
-    if (const BOOL logResult = LogExceptionDetails(pExPtrs); logResult == FALSE)
+    if (const BOOL logResult{LogExceptionDetails(pExPtrs)}; logResult == FALSE) [[unlikely]]
     {
         SafeDebugOutput("SEH: WARNING - Failed to log exception details\n");
     }
@@ -1639,6 +2558,11 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     if (STATUS_INVALID_CRUNTIME_PARAMETER_CODE == dwExceptionCode || STATUS_STACK_BUFFER_OVERRUN_CODE == dwExceptionCode)
     {
         SafeDebugOutput("SEH: FATAL - STACK BUFFER OVERRUN (STATUS_STACK_BUFFER_OVERRUN)\n");
+    }
+    else if (STATUS_FATAL_USER_CALLBACK_EXCEPTION == dwExceptionCode)
+    {
+        SafeDebugOutput("SEH: FATAL - Exception in Windows callback - attempting recovery\n");
+        SafeDebugOutput("SEH: Note - Stack may be corrupted, context may be incomplete\n");
     }
     else if (EXCEPTION_STACK_OVERFLOW == dwExceptionCode)
     {
@@ -1749,6 +2673,52 @@ namespace
     inline constexpr std::size_t hardware_destructive_interference_size = 64;
 #endif
 
+    [[nodiscard]] constexpr bool IsHandleValid(HANDLE handle) noexcept
+    {
+        return handle != nullptr && handle != INVALID_HANDLE_VALUE;
+    }
+
+    class HandleGuard
+    {
+    public:
+        HandleGuard() noexcept = default;
+        explicit HandleGuard(HANDLE handle) noexcept : m_handle(handle) {}
+        ~HandleGuard() noexcept { reset(); }
+
+        HandleGuard(const HandleGuard&) = delete;
+        HandleGuard& operator=(const HandleGuard&) = delete;
+
+        HandleGuard(HandleGuard&& other) noexcept : m_handle(other.release()) {}
+        HandleGuard& operator=(HandleGuard&& other) noexcept
+        {
+            if (this != &other)
+            {
+                reset();
+                m_handle = other.release();
+            }
+            return *this;
+        }
+
+        void reset(HANDLE handle = nullptr) noexcept
+        {
+            if (IsHandleValid(m_handle))
+                CloseHandle(m_handle);
+            m_handle = handle;
+        }
+
+        [[nodiscard]] HANDLE get() const noexcept { return m_handle; }
+        [[nodiscard]] HANDLE release() noexcept
+        {
+            HANDLE handle = m_handle;
+            m_handle = nullptr;
+            return handle;
+        }
+        [[nodiscard]] explicit operator bool() const noexcept { return IsHandleValid(m_handle); }
+
+    private:
+        HANDLE m_handle = nullptr;
+    };
+
     struct WatchdogState
     {
         // Cache-line aligned atomics to prevent false sharing between cores
@@ -1794,23 +2764,14 @@ namespace
     
     [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId) noexcept
     {
-        constexpr std::size_t kBufferSize = 512;
-        std::array<char, kBufferSize> debugBuffer{};
-        
-        if ([[maybe_unused]] const auto written = snprintf(std::data(debugBuffer), std::size(debugBuffer),
-            "%.*sFreeze detected (>%u seconds) - triggering crash dump for thread %u\n",
-            static_cast<int>(DEBUG_PREFIX_WATCHDOG.size()), DEBUG_PREFIX_WATCHDOG.data(),
-            g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed),
-            targetThreadId);
-            written > 0)
-        {
-            SafeDebugOutput(std::string_view{std::data(debugBuffer), static_cast<std::size_t>(written)});
-        }
+        AddReportLog(9300, SString("Watchdog freeze detected after %u seconds (thread %u)",
+                                   g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed),
+                                   targetThreadId));
         
         // Suspend the thread once and capture everything while suspended
         if (SuspendThread(targetThread) == static_cast<DWORD>(-1))
         {
-            SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Failed to suspend thread for freeze capture - aborting\n");
+            AddReportLog(9301, SString("Watchdog failed to suspend thread %u", targetThreadId));
             return false;
         }
         
@@ -1820,12 +2781,12 @@ namespace
         
         if (GetThreadContext(targetThread, &context) == FALSE)
         {
-            SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Failed to get thread context - aborting\n");
+            AddReportLog(9302, SString("Watchdog failed to capture thread context for %u", targetThreadId));
             
             // Must resume thread before returning!
             if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
             {
-                SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Err: Failed to resume thread after context failure!\n");
+                AddReportLog(9303, SString("Watchdog failed to resume thread %u after context error", targetThreadId));
             }
             return false;
         }
@@ -1834,7 +2795,7 @@ namespace
         EXCEPTION_RECORD exceptionRecord{};
         exceptionRecord.ExceptionCode = CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT;
         exceptionRecord.ExceptionFlags = EXCEPTION_NONCONTINUABLE;
-        exceptionRecord.ExceptionAddress = reinterpret_cast<PVOID>(context.Eip);
+        exceptionRecord.ExceptionAddress = reinterpret_cast<PVOID>(static_cast<uintptr_t>(context.Eip));
         exceptionRecord.NumberParameters = 2;
         exceptionRecord.ExceptionInformation[0] = targetThreadId;
         exceptionRecord.ExceptionInformation[1] = g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed);
@@ -1854,11 +2815,11 @@ namespace
         // Now we can safely resume the thread - we have everything we need
         if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
         {
-            SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Err: Failed to resume thread after stack capture!\n");
+            AddReportLog(9304, SString("Watchdog failed to resume thread %u after stack capture", targetThreadId));
             // Continue anyway - we still want the crash dump even if resume failed
         }
-        
-        SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Context and stack captured - invoking crash dump handler\n");
+
+        AddReportLog(9305, SString("Watchdog captured context for thread %u", targetThreadId));
         
         // Store enhanced exception info
         try
@@ -1909,7 +2870,7 @@ namespace
             }
             else
             {
-                SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Could not acquire exception info mutex (main thread may be suspended while holding it) - crash dump will proceed without enhanced info\n");
+                AddReportLog(9306, "Watchdog skipped enhanced info capture (mutex busy)");
             }
         }
         catch (...)
@@ -1917,11 +2878,11 @@ namespace
             // To detect exception-during-exception scenarios
             if (std::uncaught_exceptions() > 1)
             {
-                SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Exception while storing enhanced info (during active stack unwinding - nested exception!)\n");
+                AddReportLog(9307, "Watchdog exception while storing enhanced info during stack unwinding");
             }
             else
             {
-                SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Exception while storing enhanced info\n");
+                AddReportLog(9308, "Watchdog exception while storing enhanced info");
             }
         }
         
@@ -1933,7 +2894,7 @@ namespace
     
     [[nodiscard]] static unsigned int __stdcall WatchdogThreadProc(void* /*pParameter*/) noexcept
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Watchdog thread started\n");
+        AddReportLog(9309, "Watchdog thread started");
         
         constexpr auto kCheckInterval = std::chrono::milliseconds{500};
         static_assert(kCheckInterval.count() > 0, "Check interval must be positive");
@@ -1942,78 +2903,59 @@ namespace
         
         // Open handle to target thread
         constexpr DWORD kThreadAccess = THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION;
-        const auto targetThread = OpenThread(kThreadAccess, FALSE, targetThreadId);
-        
-    if (targetThread == nullptr || targetThread == INVALID_HANDLE_VALUE)
-    {
-        constexpr std::size_t kBufferSize = 256;
-        std::array<char, kBufferSize> debugBuffer{};
-        if ([[maybe_unused]] const auto written = snprintf(std::data(debugBuffer), std::size(debugBuffer),
-            "%.*sFailed to open target thread %lu, error %lu\n",
-            static_cast<int>(DEBUG_PREFIX_WATCHDOG.size()), DEBUG_PREFIX_WATCHDOG.data(),
-            targetThreadId, GetLastError());
-            written > 0)
+        HandleGuard targetThread{OpenThread(kThreadAccess, FALSE, targetThreadId)};
+
+        if (!targetThread)
         {
-            SafeDebugOutput(std::string_view{std::data(debugBuffer), static_cast<std::size_t>(written)});
+            AddReportLog(9310, SString("Watchdog failed to open thread %lu (error %lu)", targetThreadId, GetLastError()));
+
+            g_watchdogState.running.store(false, std::memory_order_release);
+            return 1;
         }
-        
-        g_watchdogState.running.store(false, std::memory_order_release);
-        return 1;
-    }
-    
-    // Note: targetThread handle is local to this thread - no global state needed
-    // This prevents data races and ensures clean handle lifetime management
-    
-    while (!g_watchdogState.shouldStop.load(std::memory_order_acquire))
+
+        // Note: targetThread handle is local to this thread - no global state needed
+
+        while (!g_watchdogState.shouldStop.load(std::memory_order_acquire))
         {
             const auto now = std::chrono::steady_clock::now();
             const auto lastBeat = g_watchdogState.lastHeartbeat.load(std::memory_order_acquire);
             const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeat);
             const auto timeoutSecs = g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed);
-            
+
             if (elapsed.count() >= static_cast<std::chrono::seconds::rep>(timeoutSecs))
             {
-                constexpr std::size_t kBufferSize = 256;
-                std::array<char, kBufferSize> debugBuffer{};
-                if ([[maybe_unused]] const auto written = snprintf(std::data(debugBuffer), std::size(debugBuffer),
-                    "%.*sFREEZE DETECTED: No heartbeat for %lld seconds (threshold: %u)\n",
-                    static_cast<int>(DEBUG_PREFIX_WATCHDOG.size()), DEBUG_PREFIX_WATCHDOG.data(),
-                    static_cast<long long>(elapsed.count()), timeoutSecs);
-                    written > 0)
+                AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)",
+                                           static_cast<long long>(elapsed.count()),
+                                           timeoutSecs));
+
+                const bool triggered = TriggerWatchdogException(targetThread.get(), targetThreadId);
+                if (!triggered)
                 {
-                    SafeDebugOutput(std::string_view{std::data(debugBuffer), static_cast<std::size_t>(written)});
+                    AddReportLog(9312, SString("Watchdog trigger failed for thread %u", targetThreadId));
                 }
-                
-                [[maybe_unused]] const bool triggered = TriggerWatchdogException(targetThread, targetThreadId);
-                
+
                 // Exit after triggering - crash dump handler will terminate process
                 break;
             }
-            
+
             std::this_thread::sleep_for(kCheckInterval);
         }
-        
-        SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Watchdog thread stopping\n");
-        
-        // Clean up the target thread handle (local to this thread)
-        if (targetThread != nullptr && targetThread != INVALID_HANDLE_VALUE)
-        {
-            CloseHandle(targetThread);
-        }
-        
+
+        AddReportLog(9313, "Watchdog thread stopping");
+
         g_watchdogState.running.store(false, std::memory_order_release);
-        
+
         return 0;
     }
 }
 
-[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds) noexcept
+[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds)
 {
     // Pprevent race conditions on double-start
     auto expected = false;
     if (!g_watchdogState.running.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
     {
-        SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Watchdog thread already running\n");
+        AddReportLog(9314, "Watchdog thread already running");
         return FALSE;
     }
     
@@ -2024,17 +2966,8 @@ namespace
     
     if (timeoutSeconds < kMinTimeout || timeoutSeconds > kMaxTimeout)
     {
-        constexpr std::size_t kBufferSize = 256;
-        std::array<char, kBufferSize> debugBuffer{};
-        if ([[maybe_unused]] const auto written = snprintf(std::data(debugBuffer), std::size(debugBuffer),
-            "%.*sInvalid timeout %u (must be %u-%u seconds)\n",
-            static_cast<int>(DEBUG_PREFIX_WATCHDOG.size()), DEBUG_PREFIX_WATCHDOG.data(),
-            timeoutSeconds, kMinTimeout, kMaxTimeout);
-            written > 0)
-        {
-            SafeDebugOutput(std::string_view{std::data(debugBuffer), static_cast<std::size_t>(written)});
-        }
-        
+        AddReportLog(9315, SString("Watchdog invalid timeout %u (allowed %u-%u)", timeoutSeconds, kMinTimeout, kMaxTimeout));
+
         g_watchdogState.running.store(false, std::memory_order_release);
         return FALSE;
     }
@@ -2045,58 +2978,40 @@ namespace
     g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
     
     constexpr unsigned int kStackSize = 0;
-    const auto threadHandle = reinterpret_cast<HANDLE>(_beginthreadex(
+    const auto threadHandle{reinterpret_cast<HANDLE>(_beginthreadex(
         nullptr,
         kStackSize,
         WatchdogThreadProc,
         nullptr,
         0,
         nullptr
-    ));
+    ))};
     
-    if (threadHandle == nullptr || threadHandle == INVALID_HANDLE_VALUE)
+    HandleGuard watchdogHandle{threadHandle};
+
+    if (!watchdogHandle)
     {
-        constexpr std::size_t kBufferSize = 256;
-        std::array<char, kBufferSize> debugBuffer{};
-        if ([[maybe_unused]] const auto written = snprintf(std::data(debugBuffer), std::size(debugBuffer),
-            "%.*sFailed to create watchdog thread (error %u)\n",
-            static_cast<int>(DEBUG_PREFIX_WATCHDOG.size()), DEBUG_PREFIX_WATCHDOG.data(),
-            GetLastError());
-            written > 0)
-        {
-            SafeDebugOutput(std::string_view{std::data(debugBuffer), static_cast<std::size_t>(written)});
-        }
-        
+        AddReportLog(9316, SString("Watchdog failed to create thread (error %u)", GetLastError()));
+
         g_watchdogState.running.store(false, std::memory_order_release);
         return FALSE;
     }
-    
-    g_watchdogState.watchdogThreadHandle = threadHandle;
-    
-    {
-        constexpr std::size_t kBufferSize = 256;
-        std::array<char, kBufferSize> debugBuffer{};
-        if ([[maybe_unused]] const auto written = snprintf(std::data(debugBuffer), std::size(debugBuffer),
-            "%.*sWatchdog started - monitoring thread %u with %u second timeout\n",
-            static_cast<int>(DEBUG_PREFIX_WATCHDOG.size()), DEBUG_PREFIX_WATCHDOG.data(),
-            mainThreadId, timeoutSeconds);
-            written > 0)
-        {
-            SafeDebugOutput(std::string_view{std::data(debugBuffer), static_cast<std::size_t>(written)});
-        }
-    }
+
+    g_watchdogState.watchdogThreadHandle = watchdogHandle.release();
+
+    AddReportLog(9317, SString("Watchdog monitoring thread %u with %u second timeout", mainThreadId, timeoutSeconds));
     
     return TRUE;
 }
 
-void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread() noexcept
+void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread()
 {
     if (!g_watchdogState.running.load(std::memory_order_acquire))
     {
         return;
     }
-    
-    SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Stopping watchdog thread...\n");
+
+    AddReportLog(9318, "Stopping watchdog thread");
     g_watchdogState.shouldStop.store(true, std::memory_order_release);
     
     if (g_watchdogState.watchdogThreadHandle != nullptr && 
@@ -2106,7 +3021,7 @@ void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread() noexcept
         if (const auto waitResult = WaitForSingleObject(g_watchdogState.watchdogThreadHandle, kWaitTimeout);
             waitResult != WAIT_OBJECT_0)
         {
-            SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Watchdog thread did not stop gracefully - force terminating\n");
+            AddReportLog(9319, "Watchdog thread forced termination");
             TerminateThread(g_watchdogState.watchdogThreadHandle, 1);
             WaitForSingleObject(g_watchdogState.watchdogThreadHandle, INFINITE);
         }
@@ -2114,8 +3029,8 @@ void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread() noexcept
         CloseHandle(g_watchdogState.watchdogThreadHandle);
         g_watchdogState.watchdogThreadHandle = nullptr;
     }
-    
-    SafeDebugOutput(std::string{DEBUG_PREFIX_WATCHDOG} + "Watchdog thread stopped\n");
+
+    AddReportLog(9320, "Watchdog thread stopped");
 }
 
 void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat() noexcept
@@ -2125,3 +3040,4 @@ void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat() noexcept
         g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
     }
 }
+

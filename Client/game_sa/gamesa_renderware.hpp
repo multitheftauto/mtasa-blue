@@ -96,6 +96,7 @@ void InitRwFunctions()
     LoadCollisionModel = (LoadCollisionModel_t)0x00537580;
     LoadCollisionModelVer2 = (LoadCollisionModelVer2_t)0x00537EE0;
     LoadCollisionModelVer3 = (LoadCollisionModelVer3_t)0x00537CE0;
+    LoadCollisionModelVer4 = (LoadCollisionModelVer4_t)0x00537AE0;
     CTxdStore_LoadTxd = (CTxdStore_LoadTxd_t)0x00731DD0;
     CTxdStore_GetTxd = (CTxdStore_GetTxd_t)0x00408340;
     CTxdStore_RemoveTxd = (CTxdStore_RemoveTxd_t)0x00731E90;

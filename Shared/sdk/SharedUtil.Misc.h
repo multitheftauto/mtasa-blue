@@ -159,6 +159,8 @@ namespace SharedUtil
     // Returns true if the pointer points to committed, readable memory
     bool IsReadablePointer(const void* ptr, size_t size);
 
+    [[nodiscard]] const SString& GetMTAProcessBaseDir();
+
     template <typename TFunction>
     [[nodiscard]] inline bool TryGetProcAddress(HMODULE hModule, const char* functionName, TFunction& outExport) noexcept
     {

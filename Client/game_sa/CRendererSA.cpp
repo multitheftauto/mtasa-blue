@@ -32,9 +32,25 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     if (!pModelInfoSAInterface)
         return;
 
+    // Prevent GC from freeing RwObject during rendering
+    pModelInfo->ModelAddRef(NON_BLOCKING, "CRendererSA::RenderModel");
+
+    // Revalidate interface after AddRef
+    pModelInfoSAInterface = pModelInfo->GetInterface();
+    if (!pModelInfoSAInterface)
+    {
+        pModelInfo->RemoveRef();
+        return;
+    }
+
+    // Check and cache pRwObject
     RwObject* pRwObject = pModelInfoSAInterface->pRwObject;
     if (!pRwObject)
+    {
+        // Release reference before early return to prevent leak
+        pModelInfo->RemoveRef();
         return;
+    }
 
     RwFrame* pFrame = RpGetFrame(pRwObject);
 
@@ -45,20 +61,31 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     rwMatrix.pos = (RwV3d&)matrix.vPos;
     RwFrameTransform(pFrame, &rwMatrix, rwCOMBINEREPLACE);
 
-    // Setup ambient light multiplier
-    SetLightColoursForPedsCarsAndObjects(lighting);
-
-    if (pRwObject->type == RP_TYPE_ATOMIC)
+    // Ensure reference released on exception
+    try
     {
-        RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
-        pRpAtomic->renderCallback(reinterpret_cast<RpAtomic*>(pRwObject));
-    }
-    else
-    {
-        RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
-        RpClumpRender(pClump);
-    }
+        // Setup ambient light multiplier
+        SetLightColoursForPedsCarsAndObjects(lighting);
 
-    // Restore ambient light
-    SetAmbientColours();
+        if (pRwObject->type == RP_TYPE_ATOMIC)
+        {
+            RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
+            pRpAtomic->renderCallback(reinterpret_cast<RpAtomic*>(pRwObject));
+        }
+        else
+        {
+            RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
+            RpClumpRender(pClump);
+        }
+
+        // Restore ambient light
+        SetAmbientColours();
+    }
+        catch (...)
+        {
+            // Release reference on rendering exception
+            pModelInfo->RemoveRef();
+            throw;
+        }    // Release reference - allow GC
+    pModelInfo->RemoveRef();
 }

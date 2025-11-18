@@ -48,10 +48,11 @@ private:
     CRemoteDataSA* RemoteData;
 
 public:
-    ZERO_ON_NEW
+ZERO_ON_NEW
 
-    CMultiplayerSA();
-    void                InitHooks();
+CMultiplayerSA();
+~CMultiplayerSA();
+void                InitHooks();
     void                InitHooks_CrashFixHacks();
     void                Init_13();
     void                InitHooks_13();
@@ -60,6 +61,7 @@ public:
     void                InitHooks_ClothesSpeedUp();
     void                InitHooks_FixBadAnimId();
     void                InitHooks_HookDestructors();
+    void                CleanupHooks_HookDestructors();
     void                InitHooks_RwResources();
     void                InitHooks_ClothesCache();
     void                InitHooks_Files();

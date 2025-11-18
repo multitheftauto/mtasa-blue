@@ -2,81 +2,116 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        core/AjaxResourceHandler.cpp
+ *  FILE:        cefweb/CAjaxResourceHandler.cpp
  *  PURPOSE:     CEF Handler for Ajax Requests with delayed results
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CWebCore.h"
-#include "CWebView.h"
 #include "CAjaxResourceHandler.h"
 #undef min
 
 CAjaxResourceHandler::CAjaxResourceHandler(std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& strMime)
-    : m_vecGetData(vecGet), m_vecPostData(vecPost), m_strMime(strMime)
+    : m_vecGetData(std::move(vecGet)), m_vecPostData(std::move(vecPost)), m_strMime(strMime)
 {
 }
 
-std::vector<SString>& CAjaxResourceHandler::GetGetData()
+CAjaxResourceHandler::~CAjaxResourceHandler()
 {
-    return m_vecGetData;
-}
+    // Ensure callback is released if handler is destroyed before completion
+    if (!m_callback)
+        return;
 
-std::vector<SString>& CAjaxResourceHandler::GetPostData()
-{
-    return m_vecPostData;
+    m_callback = nullptr;
 }
 
 void CAjaxResourceHandler::SetResponse(const SString& data)
 {
+    // Prevent response corruption: ignore subsequent calls after data is set
+    if (m_bHasData) [[unlikely]]
+        return;
+
     m_strResponse = data;
     m_bHasData = true;
 
-    if (m_callback)
-        m_callback->Continue();
+    if (!m_callback)
+        return;
+
+    // Release callback to prevent memory leak
+    auto callback = std::exchange(m_callback, nullptr);
+    if (callback)
+        callback->Continue();
 }
 
 // CefResourceHandler implementation
 void CAjaxResourceHandler::Cancel()
 {
+    // Release callback reference on cancellation to prevent memory leak
+    m_callback = nullptr;
 }
 
 void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl)
 {
-    response->SetStatus(200);
+    if (!response) [[unlikely]]
+        return;
+
+    constexpr int HTTP_OK = 200;
+    response->SetStatus(HTTP_OK);
     response->SetStatusText("OK");
-    response->SetMimeType(m_strMime);
+    
+    // Use default MIME type if none provided
+    if (!m_strMime.empty())
+        response->SetMimeType(m_strMime);
+    else
+        response->SetMimeType("application/octet-stream");
+    
     response_length = -1;
 }
 
-bool CAjaxResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
+bool CAjaxResourceHandler::ProcessRequest([[maybe_unused]] CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
 {
-    // Since we have nothing to process yet, continue
-    callback->Continue();
+    // Don't call Continue() here - let ReadResponse handle async flow
+    // Calling Continue() immediately would use the callback before data is ready
     return true;
 }
 
 bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, CefRefPtr<CefCallback> callback)
 {
+    // Validate input parameters first
+    if (!data_out || bytes_to_read <= 0) [[unlikely]]
+    {
+        bytes_read = 0;
+        return false;
+    }
+
     // If we have no data yet, wait
     if (!m_bHasData)
     {
         bytes_read = 0;
-        m_callback = callback;
-
+        // Store callback only if we don't already have one (prevent overwrite/leak)
+        if (callback && !m_callback)
+            m_callback = callback;
         return true;
     }
 
-    // Are we done?
-    if (m_strResponse.length() - m_DataOffset <= 0)
+    // Are we done or response is empty?
+    const auto responseLength = m_strResponse.length();
+    if (m_DataOffset >= responseLength) [[unlikely]]
+    {
+        bytes_read = 0;
         return false;
+    }
 
-    int copyBytes = std::min((uint)bytes_to_read, m_strResponse.length() - m_DataOffset);
+    const auto remainingBytes = responseLength - m_DataOffset;
+    const auto copyBytes = std::min(static_cast<size_t>(bytes_to_read), remainingBytes);
 
     memcpy(data_out, m_strResponse.c_str() + m_DataOffset, copyBytes);
-    bytes_read = copyBytes;
-
+    
+    // copyBytes is bounded by bytes_to_read (an int), so cast is always safe
+    bytes_read = static_cast<int>(copyBytes);
+    
     m_DataOffset += copyBytes;
 
     return true;

@@ -596,6 +596,13 @@ CMultiplayerSA::CMultiplayerSA()
     m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
 }
 
+CMultiplayerSA::~CMultiplayerSA()
+{
+    // Cleanup hooks that require explicit resource deallocation
+    // This is to prevent resource leaks
+    CleanupHooks_HookDestructors();
+}
+
 void CMultiplayerSA::InitHooks()
 {
     InitKeysyncHooks();
