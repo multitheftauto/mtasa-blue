@@ -140,7 +140,8 @@ bool CPixelsManager::GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CP
             // If not allowed, return dummy data
             uint uiPixelsWidth = 32;
             uint uiPixelsHeight = 32;
-            outPixels.SetSize(uiPixelsWidth * uiPixelsHeight * XRGB_BYTES_PER_PIXEL + SIZEOF_PLAIN_TAIL);
+            if (!outPixels.SetSize(uiPixelsWidth * uiPixelsHeight * XRGB_BYTES_PER_PIXEL + SIZEOF_PLAIN_TAIL))
+                return false;
             memset(outPixels.GetData(), 0xEF, outPixels.GetSize());
             bResult = SetPlainDimensions(outPixels, uiPixelsWidth, uiPixelsHeight);
         }
@@ -530,7 +531,8 @@ bool CPixelsManager::D3DXGetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixel
     {
         if (!FAILED(D3DXSaveSurfaceToFileInMemory(&dxBuffer, dxFileFormat, pD3DSurface, NULL, pRect)))
         {
-            outPixels.SetSize(dxBuffer->GetBufferSize());
+            if (!outPixels.SetSize(dxBuffer->GetBufferSize()))
+                return false;
             char* pPixelsData = outPixels.GetData();
             memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
             return true;
@@ -570,7 +572,8 @@ bool CPixelsManager::D3DXGetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixel
     // Extract pixels from converted texture
     if (!FAILED(D3DXSaveTextureToFileInMemory(&dxBuffer, dxFileFormat, pD3DTempTexture, NULL)))
     {
-        outPixels.SetSize(dxBuffer->GetBufferSize());
+        if (!outPixels.SetSize(dxBuffer->GetBufferSize()))
+            return false;
         char* pPixelsData = outPixels.GetData();
         memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
         return true;
@@ -815,7 +818,8 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
             uint uiWidth, uiHeight;
             if (JpegDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight))
             {
-                newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL);
+                if (!newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL))
+                    return false;
                 return SetPlainDimensions(newPixels, uiWidth, uiHeight);
             }
         }
@@ -824,7 +828,8 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
             uint uiWidth, uiHeight;
             if (PngDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight))
             {
-                newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL);
+                if (!newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL))
+                    return false;
                 return SetPlainDimensions(newPixels, uiWidth, uiHeight);
             }
         }

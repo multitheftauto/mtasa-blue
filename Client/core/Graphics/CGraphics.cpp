@@ -2586,6 +2586,8 @@ bool CGraphics::CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuf
     uint uiLineWidthBytes = SurfDesc.Width * CRenderItemManager::GetBitsPerPixel(SurfDesc.Format) / 8;
 
     outBuffer.SetSize(uiLineWidthBytes * SurfDesc.Height);
+    if (outBuffer.GetSize() != uiLineWidthBytes * SurfDesc.Height)
+        return false;
     char* pOutData = outBuffer.GetData();
 
     if (uiLineWidthBytes == uiSurfPitch)
