@@ -5521,8 +5521,15 @@ void CMultiplayerSA::SetAltWaterOrderEnabled(bool bEnable)
     {
         // Save memory before we blat it
         CBufferWriteStream stream(savedMem);
-        for (uint i = 0; i < NUMELMS(memoryList); i++)
-            stream.WriteBytes((void*)memoryList[i].dwAddress, memoryList[i].uiSize);
+        for (const auto& memory : memoryList)
+            stream.WriteBytes((void*)memory.dwAddress, memory.uiSize);
+
+        // Verify all memory was saved
+        uint uiExpectedSize = 0;
+        for (const auto& memory : memoryList)
+            uiExpectedSize += memory.uiSize;
+        if (savedMem.GetSize() != uiExpectedSize)
+            return;
 
         // Add hooks and things
         // Always render water after other entities (otherwise underwater LODs and trees are rendered
