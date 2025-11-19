@@ -1396,7 +1396,7 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, ServerBrowserType
         const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
         const SString strVerified = pServer->isStatusVerified ? "" : "*";
-        const SString strPlayers = (pServer->nMaxPlayers == 0) ? "0 / 0" : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
+        const SString strPlayers = (pServer->nMaxPlayers == 0) ? SStringX("0 / 0") : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
         const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
 
         const SString strPing = pServer->nPing == 9999 ? SStringX("") : SString("%d", pServer->nPing);
