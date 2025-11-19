@@ -8,6 +8,11 @@
  *
  *****************************************************************************/
 #pragma once
+
+#include <functional>
+#include <string>
+#include <vector>
+
 #include "CWebCoreInterface.h"
 
 class CWebBrowserEventsInterface;

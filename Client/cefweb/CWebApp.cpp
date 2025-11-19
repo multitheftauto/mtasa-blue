@@ -201,6 +201,10 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     vecTmp.reserve(8);  // Reserve space for common query parameter count
                     strGet.Split("&", vecTmp);
 
+                    const size_t paramCount = vecTmp.size();
+                    if (paramCount > 0)
+                        vecGet.reserve(vecGet.size() + paramCount * 2);
+
                     SString key;
                     SString value;
                     for (auto&& param : vecTmp)
@@ -238,6 +242,10 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                         std::vector<SString> vecTmp;
                         vecTmp.reserve(8);
                         postParam.Split("&", vecTmp);
+
+                        const size_t postParamCount = vecTmp.size();
+                        if (postParamCount > 0)
+                            vecPost.reserve(vecPost.size() + postParamCount * 2);
 
                         for (auto&& param : vecTmp)
                         {

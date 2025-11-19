@@ -13,6 +13,7 @@
 #include <core/CAjaxResourceHandlerInterface.h>
 #include <cef3/cef/include/cef_resource_handler.h>
 #include <SString.h>
+#include <string>
 
 class CWebView;
 
@@ -24,7 +25,7 @@ public:
 
     std::vector<std::string>& GetGetData() override { return m_vecGetData; }
     std::vector<std::string>& GetPostData() override { return m_vecPostData; }
-    void SetResponse(const std::string& data) override;
+    void SetResponse(std::string data) override;
 
     // CefResourceHandler
     virtual void Cancel() override;
