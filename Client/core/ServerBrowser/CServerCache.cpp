@@ -59,7 +59,8 @@ public:
     virtual void GetServerCachedInfo(CServerListItem* pItem);
     virtual void SetServerCachedInfo(const CServerListItem* pItem);
     virtual void GetServerListCachedInfo(CServerList* pList);
-    virtual bool GenerateServerList(CServerList* pList);
+    virtual bool GenerateServerList(CServerList* pList, bool bAllowNonResponding = false);
+    virtual void SetServerListCachedInfo(CServerList* pList);
 
     CServerCache();
     ~CServerCache();
@@ -93,7 +94,9 @@ CServerCacheInterface* GetServerCache()
 //
 // CServerCache::CServerCache
 //
-//
+// Initialize server cache by loading from persistent disk storage.
+// The cache file (servercache.xml) is never deleted and persists across sessions.
+// Cache entries are synced (updated) on each session, not regenerated.
 //
 ///////////////////////////////////////////////////////////////
 CServerCache::CServerCache()
@@ -117,6 +120,8 @@ CServerCache::~CServerCache()
 // CServerCache::LoadServerCache
 //
 // Load cache data from config
+// The in-memory cache is cleared and reloaded from disk.
+// The disk file is never deleted; it persists across game sessions.
 //
 ///////////////////////////////////////////////////////////////
 bool CServerCache::LoadServerCache()
@@ -197,7 +202,8 @@ bool CServerCache::LoadServerCache()
 //
 // CServerCache::SaveServerCache
 //
-// Save cache data to config
+// Persist cache changes to disk when data has been modified.
+// Always syncs complete state; never clears the disk file.
 //
 ///////////////////////////////////////////////////////////////
 void CServerCache::SaveServerCache(bool bWaitUntilFinished)
@@ -256,7 +262,9 @@ DWORD CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
 //
 // CServerCache::StaticSaveServerCache
 //
-//
+// Synchronize cache to disk by writing all current in-memory entries.
+// The XML tree is rebuilt on each save (not appended to) for consistency,
+// but the file itself is never deleted. Servers are synced, not purged.
 //
 ///////////////////////////////////////////////////////////////
 void CServerCache::StaticSaveServerCache()
@@ -273,18 +281,17 @@ void CServerCache::StaticSaveServerCache()
     if (!pNode)
         return;
 
-    // Start by clearing out all previous nodes
+    // Clear in-memory XML structure and rebuild from current cache state.
+    // This does NOT delete the disk file; it only rewrites its contents with current data.
     pNode->DeleteAllSubNodes();
 
     // Transfer each item from m_ServerCachedMap into dataSet
     CDataInfoSet dataSet;
-    for (std::map<CCachedKey, CCachedInfo>::iterator it = ms_ServerCachedMap.begin(); it != ms_ServerCachedMap.end(); ++it)
+    for (const auto& [key, info] : ms_ServerCachedMap)
     {
-        const CCachedKey&  key = it->first;
-        const CCachedInfo& info = it->second;
 
-        // Don't save cache of non responding servers
-        if (info.nMaxPlayers == 0 || info.uiCacheNoReplyCount > 3)
+        // Only exclude servers that have failed multiple consecutive query attempts
+        if (info.uiCacheNoReplyCount > 3)
             continue;
 
         SDataInfoItem item;
@@ -327,6 +334,9 @@ void CServerCache::StaticSaveServerCache()
 ///////////////////////////////////////////////////////////////
 void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
 {
+    if (!pItem)
+        return;
+
     CCachedKey key;
     key.ulIp = pItem->Address.s_addr;
     key.usGamePort = pItem->usGamePort;
@@ -378,6 +388,9 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
 ///////////////////////////////////////////////////////////////
 void CServerCache::SetServerCachedInfo(const CServerListItem* pItem)
 {
+    if (!pItem)
+        return;
+
     CCachedKey key;
     key.ulIp = pItem->Address.s_addr;
     key.usGamePort = pItem->usGamePort;
@@ -424,15 +437,21 @@ void CServerCache::SetServerCachedInfo(const CServerListItem* pItem)
 ///////////////////////////////////////////////////////////////
 void CServerCache::GetServerListCachedInfo(CServerList* pList)
 {
-    // Get cached info for each server
-    for (CServerListIterator it = pList->IteratorBegin(); it != pList->IteratorEnd(); it++)
-        GetServerCachedInfo(*it);
+    if (!pList)
+        return;
 
-    // Remove servers not in serverlist from cache
+    for (auto it = pList->IteratorBegin(); it != pList->IteratorEnd(); ++it)
+    {
+        if (*it)
+            GetServerCachedInfo(*it);
+    }
+
     std::map<CCachedKey, CCachedInfo> nextServerCachedMap;
-    for (CServerListIterator it = pList->IteratorBegin(); it != pList->IteratorEnd(); it++)
+    for (auto it = pList->IteratorBegin(); it != pList->IteratorEnd(); ++it)
     {
         CServerListItem* pItem = *it;
+        if (!pItem)
+            continue;
         CCachedKey       key;
         key.ulIp = pItem->Address.s_addr;
         key.usGamePort = pItem->usGamePort;
@@ -444,20 +463,42 @@ void CServerCache::GetServerListCachedInfo(CServerList* pList)
 
 ///////////////////////////////////////////////////////////////
 //
+// CServerCache::SetServerListCachedInfo
+//
+// Cache all servers in list
+//
+///////////////////////////////////////////////////////////////
+void CServerCache::SetServerListCachedInfo(CServerList* pList)
+{
+    if (!pList)
+        return;
+
+    for (auto it = pList->IteratorBegin(); it != pList->IteratorEnd(); ++it)
+    {
+        if (*it)
+            SetServerCachedInfo(*it);
+    }
+}
+
+///////////////////////////////////////////////////////////////
+//
 // CServerCache::GenerateServerList
 //
 // Create serverlist content from the cache
 //
 ///////////////////////////////////////////////////////////////
-bool CServerCache::GenerateServerList(CServerList* pList)
+bool CServerCache::GenerateServerList(CServerList* pList, bool bAllowNonResponding)
 {
-    for (std::map<CCachedKey, CCachedInfo>::iterator it = m_ServerCachedMap.begin(); it != m_ServerCachedMap.end(); ++it)
-    {
-        const CCachedKey&  key = it->first;
-        const CCachedInfo& info = it->second;
+    if (!pList)
+        return false;
 
-        // Don't add non responding servers
-        if (info.nMaxPlayers == 0 || info.uiCacheNoReplyCount > 3)
+    for (const auto& [key, info] : m_ServerCachedMap)
+    {
+
+        // When master server is offline, include all cached servers. Otherwise exclude servers that
+        // have consistently failed to respond (uiCacheNoReplyCount > 3). New servers without response data
+        // should still be included since they may not have been queried yet.
+        if (!bAllowNonResponding && (info.uiCacheNoReplyCount > 3))
             continue;
 
         ushort usGamePort = key.usGamePort;
