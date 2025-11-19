@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-19 08:16+0000\n"
-"PO-Revision-Date: 2025-11-19 14:15\n"
+"PO-Revision-Date: 2025-11-19 19:13\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -113,7 +113,7 @@ msgstr "Завершіть наступні програми для продов
 
 #: Client/loader/MainFunctions.cpp:141
 msgid "Invalid module path detected.\n"
-msgstr ""
+msgstr "Виявлено недійсний шлях до модуля."
 
 #: Client/loader/MainFunctions.cpp:168
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
