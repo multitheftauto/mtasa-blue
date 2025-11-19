@@ -573,6 +573,8 @@ bool CServerListItem::ParseQuery()
     m_iBuildNumber = info.buildNum;
     m_usHttpPort = info.httpPort;
 
+    rules = info.rules;
+
     if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_LIST) == false)
         vecPlayers = info.playersPool;
 

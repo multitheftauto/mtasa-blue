@@ -47,6 +47,7 @@ struct SQueryInfo
     ushort  pingTime;
 
     std::vector<SString> playersPool;
+    std::unordered_map<SString, SString> rules;
 };
 
 class CQueryReceiver
