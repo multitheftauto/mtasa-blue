@@ -465,6 +465,7 @@ public:
                     NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability,
                     ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT);
     void SendPacketBatchEnd();
+    uint GetLastSentHandle() const { return m_LastSentHandle; }
 
     bool IsBulletSyncActive();
     void SendSyncSettings(CPlayer* pPlayer = NULL);
@@ -671,6 +672,7 @@ private:
     int       m_iLatentSendsBandwidth;
     CLuaMain* m_pLatentSendsLuaMain;
     ushort    m_usLatentSendsResourceNetId;
+    uint      m_LastSentHandle;
 
     CMtaVersion m_strPrevMinClientKickRequirement;
     CMtaVersion m_strPrevMinClientConnectRequirement;
