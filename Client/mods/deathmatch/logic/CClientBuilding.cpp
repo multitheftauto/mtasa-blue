@@ -226,10 +226,11 @@ float CClientBuilding::GetDistanceFromCentreOfMassToBaseOfModel()
     return m_pBuilding ? m_pBuilding->GetDistanceFromCentreOfMassToBaseOfModel() : 0.0f;
 }
 
-void CClientBuilding::SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash)
+void CClientBuilding::SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash, std::uint16_t flags)
 {
     m_animation = animation;
     m_animationBlockNameHash = blockNameHash;
+    m_animationFlags = static_cast<eAnimationFlags>(flags);
 
     Recreate();
     RunAnimation();
@@ -254,7 +255,7 @@ void CClientBuilding::RunAnimation()
     if (!m_pBuilding)
         return;
 
-    m_pBuilding->SetAnimation(m_animation);
+    m_pBuilding->SetAnimation(m_animation, m_animationFlags);
     m_pBuilding->SetAnimationSpeed(m_animationSpeed);
     m_animationPlaying = m_animation != nullptr && m_pBuilding->GetRpClump();
 }

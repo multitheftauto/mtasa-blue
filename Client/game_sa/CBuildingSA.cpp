@@ -72,7 +72,7 @@ void CBuildingSA::SetLod(CBuilding* pLod)
     }
 }
 
-void CBuildingSA::SetAnimation(CAnimBlendHierarchySAInterface* animation)
+void CBuildingSA::SetAnimation(CAnimBlendHierarchySAInterface* animation, eAnimationFlags flags)
 {
     if (!m_pInterface || !m_pInterface->m_pRwObject)
         return;
@@ -83,7 +83,7 @@ void CBuildingSA::SetAnimation(CAnimBlendHierarchySAInterface* animation)
         RpAnimBlendClumpInit(clump);
 
     if (animation)
-        pGame->GetAnimManager()->BlendAnimation(clump, animation, ANIMATION_IS_LOOPED, 1.0f);
+        pGame->GetAnimManager()->BlendAnimation(clump, animation, flags, 1.0f);
 }
 
 bool CBuildingSA::SetAnimationSpeed(float speed)

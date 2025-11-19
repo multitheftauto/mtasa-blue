@@ -2625,7 +2625,7 @@ void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
     g_pClientGame->Restream(option);
 }
 
-bool CLuaEngineDefs::EngineSetModelAnimation(std::uint16_t modelId, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName)
+bool CLuaEngineDefs::EngineSetModelAnimation(std::uint16_t modelId, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName, std::optional<std::uint16_t> flags)
 {
     if (!CClientObjectManager::IsValidModel(modelId) && !CClientBuildingManager::IsValidModel(modelId))
         throw std::invalid_argument("Invalid model ID");
@@ -2645,7 +2645,7 @@ bool CLuaEngineDefs::EngineSetModelAnimation(std::uint16_t modelId, std::optiona
     if (!ifpOrNil.has_value() || std::holds_alternative<bool>(ifpOrNil.value()))
     {
         modelInfo->DisableObjectAnimation(true);
-        modelInfo->SetObjectAnimation(nullptr, 0);
+        modelInfo->SetObjectAnimation(nullptr, 0, 0);
     }
     else if (std::holds_alternative<CClientIFP*>(ifpOrNil.value()))
     {
@@ -2655,7 +2655,7 @@ bool CLuaEngineDefs::EngineSetModelAnimation(std::uint16_t modelId, std::optiona
             throw std::invalid_argument("Invalid animation name");
 
         ifp->InsertModelUsingThisIFP(modelId);
-        modelInfo->SetObjectAnimation(animHierarchy, ifp->GetBlockNameHash());
+        modelInfo->SetObjectAnimation(animHierarchy, ifp->GetBlockNameHash(), flags.value_or(eAnimationFlags::ANIMATION_IS_LOOPED));
     }
 
     m_pManager->GetObjectManager()->RestreamObjects(modelId);
@@ -2681,7 +2681,7 @@ void CLuaEngineDefs::EngineRestoreModelAnimation(std::uint16_t modelId)
             ifp->RemoveModelUsingThisIFP(modelId);
     }
 
-    modelInfo->SetObjectAnimation(nullptr, 0);
+    modelInfo->SetObjectAnimation(nullptr, 0, 0);
     
     m_pManager->GetObjectManager()->RestreamObjects(modelId);
     m_pManager->GetBuildingManager()->RestreamBuildings(modelId);

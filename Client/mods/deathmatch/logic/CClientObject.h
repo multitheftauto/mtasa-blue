@@ -122,7 +122,7 @@ public:
     bool IsOnFire() override { return m_pObject ? m_pObject->IsOnFire() : false; }
     bool SetOnFire(bool onFire) override { return m_pObject ? m_pObject->SetOnFire(onFire) : false; };
 
-    void SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash);
+    void SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash, std::uint16_t flags);
     bool SetAnimationSpeed(float speed);
 
     unsigned int GetAnimationBlockNameHash() const noexcept { return m_animationBlockNameHash; }
@@ -179,6 +179,7 @@ protected:
 
     CAnimBlendHierarchySAInterface* m_animation{};
     unsigned int                    m_animationBlockNameHash{0};
+    eAnimationFlags                 m_animationFlags{};
 
 public:
     CObject*              m_pObject;

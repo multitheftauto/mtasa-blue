@@ -58,7 +58,7 @@ public:
 
     float GetDistanceFromCentreOfMassToBaseOfModel();
 
-    void SetAnimation(class CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash);
+    void SetAnimation(class CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash, std::uint16_t flags);
     bool SetAnimationSpeed(float speed);
 
     unsigned int GetAnimationBlockNameHash() const noexcept { return m_animationBlockNameHash; }
@@ -92,5 +92,6 @@ private:
     unsigned int                    m_animationBlockNameHash{0};
     bool                            m_animationPlaying{false};
     float                           m_animationSpeed{1.0f};
+    eAnimationFlags                 m_animationFlags{};
     bool                            m_animationSpeedUpdated{false};
 };

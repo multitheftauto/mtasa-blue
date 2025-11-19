@@ -393,6 +393,7 @@ protected:
     CAnimBlendHierarchySAInterface*                                              m_objectAimation{};
     bool                                                                         m_objectAnimationDisabled{false};
     unsigned int                                                                 m_objectAnimationBlockNameHash{0};
+    eAnimationFlags                                                              m_animationFlags{};
 
 public:
     CModelInfoSA();
@@ -534,9 +535,10 @@ public:
     void           RestoreObjectPropertiesGroup();
     static void    RestoreAllObjectsPropertiesGroups();
 
-    void SetObjectAnimation(CAnimBlendHierarchySAInterface* anim, unsigned int blockNameHash) noexcept override { m_objectAimation = anim; InsertModelIntoModifiedAnimList(m_dwModelID); m_objectAnimationBlockNameHash = blockNameHash; }
+    void SetObjectAnimation(CAnimBlendHierarchySAInterface* anim, unsigned int blockNameHash, std::uint16_t flags) noexcept override { m_objectAimation = anim; InsertModelIntoModifiedAnimList(m_dwModelID); m_objectAnimationBlockNameHash = blockNameHash; m_animationFlags = static_cast<eAnimationFlags>(flags); }
     CAnimBlendHierarchySAInterface* GetObjectAnimation() const noexcept override { return m_objectAimation; }
     unsigned int                    GetObjectAnimationBlockNameHash() const noexcept override { return m_objectAnimationBlockNameHash; }
+    eAnimationFlags                 GetObjectAnimationFlags() const noexcept override { return m_animationFlags; }
 
     void DisableObjectAnimation(bool disable) noexcept override { m_objectAnimationDisabled = disable; InsertModelIntoModifiedAnimList(m_dwModelID); }
     bool IsObjectAnimationDisabled() const noexcept override { return m_objectAnimationDisabled; }

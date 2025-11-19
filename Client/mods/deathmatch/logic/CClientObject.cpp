@@ -444,10 +444,11 @@ void CClientObject::SetHealth(float fHealth)
     m_fHealth = fHealth;
 }
 
-void CClientObject::SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash)
+void CClientObject::SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash, std::uint16_t flags)
 {
     m_animation = animation;
     m_animationBlockNameHash = blockNameHash;
+    m_animationFlags = static_cast<eAnimationFlags>(flags);
 
     RunAnimation();
 }
@@ -709,7 +710,7 @@ void CClientObject::RunAnimation()
     if (!m_pObject)
         return;
 
-    m_pObject->SetAnimation(m_animation);
+    m_pObject->SetAnimation(m_animation, m_animationFlags);
     m_pObject->SetAnimationSpeed(m_animationSpeed);
 
     m_animationPlaying = m_animation != nullptr && m_pObject->GetRpClump();

@@ -27,7 +27,7 @@ public:
     CBuildingSAInterface* GetBuildingInterface() { return static_cast<CBuildingSAInterface*>(GetInterface()); };
 
     void SetLod(CBuilding* pLod) override;
-    void SetAnimation(class CAnimBlendHierarchySAInterface* animation) override;
+    void SetAnimation(class CAnimBlendHierarchySAInterface* animation, eAnimationFlags flags) override;
     bool SetAnimationSpeed(float speed) override;
 
     void AllocateMatrix();

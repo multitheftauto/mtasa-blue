@@ -103,6 +103,6 @@ public:
     static bool SetElementLighting(CClientEntity* entity, float lighting);
     static bool SetElementOnFire(CClientEntity* entity, bool onFire) noexcept;
 
-    static bool SetElementAnimation(CClientEntity* entity, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName);
+    static bool SetElementAnimation(CClientEntity* entity, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName, std::optional<std::uint16_t> flags);
     static bool SetElementAnimationSpeed(CClientEntity* entity, float speed);
 };

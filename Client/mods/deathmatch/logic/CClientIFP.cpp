@@ -41,7 +41,7 @@ void CClientIFP::Unlink()
         {
             CModelInfo* modelInfo = g_pGame->GetModelInfo(model);
             if (modelInfo)
-                modelInfo->SetObjectAnimation(nullptr, 0);
+                modelInfo->SetObjectAnimation(nullptr, 0, 0);
 
             m_pManager->GetObjectManager()->RestreamObjects(model);
             m_pManager->GetBuildingManager()->RestreamBuildings(model);
@@ -50,9 +50,9 @@ void CClientIFP::Unlink()
         for (auto entity : m_entitiesUsingThisIFP)
         {
             if (entity->GetType() == eEntityType::ENTITY_TYPE_OBJECT)
-                static_cast<CClientObject*>(entity)->SetAnimation(nullptr, 0);
+                static_cast<CClientObject*>(entity)->SetAnimation(nullptr, 0, 0);
             else if (entity->GetType() == eEntityType::ENTITY_TYPE_BUILDING)
-                static_cast<CClientBuilding*>(entity)->SetAnimation(nullptr, 0);
+                static_cast<CClientBuilding*>(entity)->SetAnimation(nullptr, 0, 0);
         }
     }
 }

@@ -22,6 +22,6 @@ public:
 
     virtual CBuildingSAInterface* GetBuildingInterface() = 0;
     virtual void                  SetLod(CBuilding* pLod) = 0;
-    virtual void                  SetAnimation(class CAnimBlendHierarchySAInterface* animation) = 0;
+    virtual void                  SetAnimation(class CAnimBlendHierarchySAInterface* animation, enum eAnimationFlags flags) = 0;
     virtual bool                  SetAnimationSpeed(float speed) = 0;
 };

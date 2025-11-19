@@ -2526,7 +2526,7 @@ bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexc
     return entity->SetOnFire(onFire);
 }
 
-bool CLuaElementDefs::SetElementAnimation(CClientEntity* entity, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName)
+bool CLuaElementDefs::SetElementAnimation(CClientEntity* entity, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName, std::optional<std::uint16_t> flags)
 {
     if (!IS_OBJECT(entity) && !IS_BUILDING(entity))
         return false;
@@ -2536,12 +2536,12 @@ bool CLuaElementDefs::SetElementAnimation(CClientEntity* entity, std::optional<s
         return IS_OBJECT(ent) ? static_cast<CClientObject*>(ent)->GetAnimationBlockNameHash() : static_cast<CClientBuilding*>(ent)->GetAnimationBlockNameHash();
     };
 
-    auto setEntityAnimation = [&](CClientEntity* ent, CAnimBlendHierarchySAInterface* anim, std::uint32_t blockHash)
+    auto setEntityAnimation = [&](CClientEntity* ent, CAnimBlendHierarchySAInterface* anim, std::uint32_t blockHash, std::uint16_t flags)
     {
         if (IS_OBJECT(ent))
-            static_cast<CClientObject*>(ent)->SetAnimation(anim, blockHash);
+            static_cast<CClientObject*>(ent)->SetAnimation(anim, blockHash, flags);
         else
-            static_cast<CClientBuilding*>(ent)->SetAnimation(anim, blockHash);
+            static_cast<CClientBuilding*>(ent)->SetAnimation(anim, blockHash, flags);
     };
 
     // Clean up old IFP association before applying a new animation
@@ -2554,7 +2554,7 @@ bool CLuaElementDefs::SetElementAnimation(CClientEntity* entity, std::optional<s
 
     if (!ifpOrNil.has_value() || std::holds_alternative<bool>(ifpOrNil.value()))
     {
-        setEntityAnimation(entity, nullptr, 0);
+        setEntityAnimation(entity, nullptr, 0, 0);
         return true;
     }
 
@@ -2563,7 +2563,7 @@ bool CLuaElementDefs::SetElementAnimation(CClientEntity* entity, std::optional<s
     if (!animHierarchy)
         throw std::invalid_argument("Invalid animation name");
 
-    setEntityAnimation(entity, animHierarchy, ifp->GetBlockNameHash());
+    setEntityAnimation(entity, animHierarchy, ifp->GetBlockNameHash(), flags.value_or(eAnimationFlags::ANIMATION_IS_LOOPED));
     ifp->InsertEntityUsingThisIFP(entity);
 
     return true;

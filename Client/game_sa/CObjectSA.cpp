@@ -325,7 +325,7 @@ bool CObjectSA::SetOnFire(bool onFire)
     return true;
 }
 
-void CObjectSA::SetAnimation(CAnimBlendHierarchySAInterface* animation)
+void CObjectSA::SetAnimation(CAnimBlendHierarchySAInterface* animation, eAnimationFlags flags)
 {
     if (!m_pInterface || !m_pInterface->m_pRwObject)
         return;
@@ -336,7 +336,7 @@ void CObjectSA::SetAnimation(CAnimBlendHierarchySAInterface* animation)
         RpAnimBlendClumpInit(clump);
 
     if (animation)
-        pGame->GetAnimManager()->BlendAnimation(clump, animation, ANIMATION_IS_LOOPED, 1.0f);
+        pGame->GetAnimManager()->BlendAnimation(clump, animation, flags, 1.0f);
     else
     {
         for (auto assoc = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(clump); assoc; assoc = pGame->GetAnimManager()->RpAnimBlendGetNextAssociation(assoc))
