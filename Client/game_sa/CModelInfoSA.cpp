@@ -2222,7 +2222,7 @@ RpClump* __fastcall CClumpModelInfoSAInterface::CreateInstance(CClumpModelInfoSA
     if (IsClumpSkinned(clump) && !clumpModelInfo->bHasComplexHierarchy)
     {
         RpHAnimHierarchy* hier = GetAnimHierarchyFromClump(clump);
-        RpClumpForAllAtomics(clump, *(RpClumpForAllAtomicsCB_t*)0x4C4EF0, hier);
+        RpClumpForAllAtomics(clump, reinterpret_cast<RpClumpForAllAtomicsCB_t>(0x4C4EF0), hier);
 
         RtAnimAnimation* animForHierarchy = RpAnimBlendCreateAnimationForHierarchy(hier);
         RtAnimInterpolatorSetCurrentAnim(hier->currentAnim, animForHierarchy);
