@@ -19,7 +19,7 @@ class CWebView;
 class CAjaxResourceHandler : public CefResourceHandler, public CAjaxResourceHandlerInterface
 {
 public:
-    CAjaxResourceHandler(std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& mimeType);
+    CAjaxResourceHandler(std::vector<SString> vecGet, std::vector<SString> vecPost, const CefString& mimeType);
     ~CAjaxResourceHandler();
 
     std::vector<SString>& GetGetData() override { return m_vecGetData; }
