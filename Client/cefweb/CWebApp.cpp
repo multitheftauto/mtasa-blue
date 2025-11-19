@@ -191,8 +191,8 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 
             if (pWebView->HasAjaxHandler(resourcePath))
             {
-                std::vector<SString> vecGet;
-                std::vector<SString> vecPost;
+                std::vector<std::string> vecGet;
+                std::vector<std::string> vecPost;
 
                 if (urlParts.query.str)
                 {
@@ -248,7 +248,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     }
                 }
 
-                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(vecGet, vecPost, mimeType));
+                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(std::move(vecGet), std::move(vecPost), mimeType));
                 pWebView->HandleAjaxRequest(resourcePath, handler.get());
                 return handler;
             }
