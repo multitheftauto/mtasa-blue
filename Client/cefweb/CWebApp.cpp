@@ -247,7 +247,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     }
                 }
 
-                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(vecGet, vecPost, mimeType));
+                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(std::move(vecGet), std::move(vecPost), mimeType));
                 pWebView->HandleAjaxRequest(resourcePath, handler.get());
                 return handler;
             }
