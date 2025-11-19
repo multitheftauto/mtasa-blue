@@ -109,17 +109,17 @@ public:
     bool CanGoForward();
     bool GoBack();
     bool GoForward();
-    void Refresh(bool ignoreCache);
+    void Refresh(bool bIgnoreCache);
 
     // CefClient methods
-    virtual CefRefPtr<CefRenderHandler>      GetRenderHandler() override { return this; };
-    virtual CefRefPtr<CefLoadHandler>        GetLoadHandler() override { return this; };
-    virtual CefRefPtr<CefRequestHandler>     GetRequestHandler() override { return this; };
-    virtual CefRefPtr<CefLifeSpanHandler>    GetLifeSpanHandler() override { return this; };
-    virtual CefRefPtr<CefJSDialogHandler>    GetJSDialogHandler() override { return this; };
-    virtual CefRefPtr<CefDialogHandler>      GetDialogHandler() override { return this; };
-    virtual CefRefPtr<CefDisplayHandler>     GetDisplayHandler() override { return this; };
-    virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override { return this; };
+    virtual CefRefPtr<CefRenderHandler>      GetRenderHandler() override { return this; }
+    virtual CefRefPtr<CefLoadHandler>        GetLoadHandler() override { return this; }
+    virtual CefRefPtr<CefRequestHandler>     GetRequestHandler() override { return this; }
+    virtual CefRefPtr<CefLifeSpanHandler>    GetLifeSpanHandler() override { return this; }
+    virtual CefRefPtr<CefJSDialogHandler>    GetJSDialogHandler() override { return this; }
+    virtual CefRefPtr<CefDialogHandler>      GetDialogHandler() override { return this; }
+    virtual CefRefPtr<CefDisplayHandler>     GetDisplayHandler() override { return this; }
+    virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override { return this; }
     virtual bool                             OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefProcessId source_process,
                                                                       CefRefPtr<CefProcessMessage> message) override;
 

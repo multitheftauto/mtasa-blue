@@ -90,6 +90,7 @@ private:
     CWebViewInterface*                 m_pWebView;
     CResource*                         m_pResource;
     std::map<SString, ajax_callback_t> m_mapAjaxCallback;
+    bool                               m_bBeingDestroyed = false;
 };
 
 class CClientGUIWebBrowser : public CClientGUIElement
@@ -101,5 +102,5 @@ public:
     CClientWebBrowser* GetBrowser() { return m_pBrowser; }
 
 private:
-    CClientWebBrowser* m_pBrowser;
+    CClientWebBrowser* m_pBrowser = nullptr;
 };

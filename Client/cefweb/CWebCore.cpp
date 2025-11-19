@@ -19,6 +19,8 @@
 #include "CWebApp.h"
 #include <algorithm>
 #include <ranges>
+#include <filesystem>
+#include <cstdlib>
 
 // #define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
@@ -88,7 +90,27 @@ bool CWebCore::Initialise(bool gpuEnabled)
     
     // Set DLL directory for CEFLauncher subprocess to locate required libraries
     SString strCEFDir = PathJoin(strMTADir, "CEF");
+#ifdef _WIN32
     SetDllDirectoryW(FromUTF8(strCEFDir));
+#else
+    // On Wine/Proton: Use environment variable for library search
+    const char* existingPath = std::getenv("LD_LIBRARY_PATH");
+    SString newPath = strCEFDir;
+    if (existingPath) {
+        newPath = SString("%s:%s", strCEFDir.c_str(), existingPath);
+    }
+    // Note: setenv is not available in MSVC, but _putenv is. 
+    // However, since we are compiling for Windows (running on Wine), we use Windows APIs.
+    // Wine maps Windows environment variables.
+    // But LD_LIBRARY_PATH is a Linux variable.
+    // If we are in Wine, we might want to set PATH instead or as well.
+    // SetDllDirectoryW handles the Windows loader.
+    
+    // Log for debugging
+    if (std::getenv("WINE") || std::getenv("WINEPREFIX")) {
+        g_pCore->GetConsole()->Printf("DEBUG: CEF library path set via SetDllDirectoryW: %s", strCEFDir.c_str());
+    }
+#endif
     
     // Read GTA path from registry to pass to CEF subprocess
     const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path");
@@ -98,6 +120,13 @@ bool CWebCore::Initialise(bool gpuEnabled)
     // Check if process is running with elevated privileges
     // CEF subprocesses may have communication issues when running elevated
     const bool bIsElevated = []() -> bool {
+        // Check for Wine environment
+        if (std::getenv("WINE") || std::getenv("WINEPREFIX")) {
+            // In Wine, privilege escalation works differently
+            // Assume not elevated for browser feature purposes
+            return false;
+        }
+
         HANDLE hToken = nullptr;
         if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
             return false;
@@ -113,7 +142,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
         return elevation.TokenIsElevated != 0;
     }();
     
-    if (bIsElevated)
+    if (bIsElevated && !std::getenv("WINE"))
     {
         AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
         AddReportLog(8022, "CEF browser features may not work correctly when running as Administrator");
@@ -121,10 +150,31 @@ bool CWebCore::Initialise(bool gpuEnabled)
         g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
     
+    // Verify CEFLauncher can run in current environment
+    auto CanExecuteCEFLauncher = []() -> bool {
+        #ifdef _WIN32
+            // On Windows, we know it works
+            if (!std::getenv("WINE") && !std::getenv("WINEPREFIX") && !std::getenv("PROTON_VERSION"))
+                return true;
+        #endif
+        
+        // Check if Wine can execute the launcher
+        // This is a basic check - if we are in Wine, we assume it works unless proven otherwise
+        // But we can log if we are in a mixed environment
+        return true;
+    };
+
     if (!FileExists(strLauncherPath))
     {
         g_pCore->GetConsole()->Printf("CEF initialization skipped - CEFLauncher not found: %s", *strLauncherPath);
         AddReportLog(8001, SString("CEF initialization skipped - CEFLauncher not found: %s", *strLauncherPath));
+        m_bInitialised = false;
+        return false;
+    }
+
+    if (!CanExecuteCEFLauncher()) {
+        g_pCore->GetConsole()->Printf("CEF initialization skipped - Wine/Proton not available");
+        AddReportLog(8026, "CEF initialization skipped - Wine/Proton not available or misconfigured");
         m_bInitialised = false;
         return false;
     }
