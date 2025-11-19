@@ -308,6 +308,10 @@ void CWebView::UpdateTexture()
             // Unlock surface
             pSurface->UnlockRect();
         }
+        else
+        {
+            OutputDebugLine("[CWebView] UpdateTexture: LockRect failed");
+        }
     }
 
     m_RenderData.cefThreadState = ECefThreadState::Running;
@@ -427,13 +431,16 @@ bool CWebView::SetAudioVolume(float fVolume)
         "tags = document.getElementsByTagName('video'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }",
         fVolume, fVolume);
 
+    // Note: GetFrameNames is deprecated, but no modern alternative exists for audio volume control
+    // This is a legacy thing that works with CEF3
     std::vector<CefString> frameNames;
     m_pWebView->GetFrameNames(frameNames);
 
     for (auto& name : frameNames)
     {
         auto frame = m_pWebView->GetFrameByName(name);
-        frame->ExecuteJavaScript(strJSCode, "", 0);
+        if (frame)
+            frame->ExecuteJavaScript(strJSCode, "", 0);
     }
     m_fVolume = fVolume;
     return true;
@@ -762,6 +769,7 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transitionType)
 {
+    // Note: TransitionType parameter is deprecated in CEF3 but still required by virtual interface override
     SString strURL = UTF16ToMbUTF8(frame->GetURL());
     if (strURL == "blank")
         return;
@@ -1070,6 +1078,7 @@ bool CWebView::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& title)
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString& message, const CefString& source, int line)
 {
+    // Note: cef_log_severity_t parameter is deprecated in CEF3 but required for virtual override
     // Redirect console message to debug window (if development mode is enabled)
     if (g_pCore->GetWebCore()->IsTestModeEnabled())
     {
