@@ -13,6 +13,7 @@
 #pragma once
 
 #include <game/RenderWare.h>
+#include <cstring>
 
 struct CColModelSAInterface;
 
@@ -207,6 +208,8 @@ typedef void(__cdecl* LoadCollisionModel_t)(unsigned char*, CColModelSAInterface
 typedef void(__cdecl* LoadCollisionModelVer2_t)(unsigned char*, unsigned int, CColModelSAInterface*, const char*);
 typedef void(__cdecl* LoadCollisionModelVer3_t)(unsigned char*, unsigned int, CColModelSAInterface*,
                                                 const char*);            // buf, bufsize, ccolmodel&, keyname
+typedef void(__cdecl* LoadCollisionModelVer4_t)(unsigned char*, unsigned int, CColModelSAInterface*,
+                                                const char*);            // buf, bufsize, ccolmodel&, keyname
 typedef bool(__cdecl* CTxdStore_LoadTxd_t)(unsigned int id, RwStream* filename);
 typedef void(__cdecl* CTxdStore_RemoveTxd_t)(unsigned int id);
 typedef void(__cdecl* CTxdStore_RemoveRef_t)(unsigned int id);
@@ -221,6 +224,7 @@ RWFUNC(LoadModel_t LoadModel, (LoadModel_t)0xDEAD)
 RWFUNC(LoadCollisionModel_t LoadCollisionModel, (LoadCollisionModel_t)0xDEAD)
 RWFUNC(LoadCollisionModelVer2_t LoadCollisionModelVer2, (LoadCollisionModelVer2_t)0xDEAD)
 RWFUNC(LoadCollisionModelVer3_t LoadCollisionModelVer3, (LoadCollisionModelVer3_t)0xDEAD)
+RWFUNC(LoadCollisionModelVer4_t LoadCollisionModelVer4, (LoadCollisionModelVer4_t)0xDEAD)
 RWFUNC(CTxdStore_LoadTxd_t CTxdStore_LoadTxd, (CTxdStore_LoadTxd_t)0xDEAD)
 RWFUNC(CTxdStore_GetTxd_t CTxdStore_GetTxd, (CTxdStore_GetTxd_t)0xDEAD)
 RWFUNC(CTxdStore_RemoveTxd_t CTxdStore_RemoveTxd, (CTxdStore_RemoveTxd_t)0xDEAD)
@@ -238,8 +242,8 @@ inline void RwFrameCopyMatrix(RwFrame* dst, RwFrame* src)
 {
     if (dst == NULL || src == NULL)
         return;
-    MemCpyFast(&dst->modelling, &src->modelling, sizeof(RwMatrix));
-    MemCpyFast(&dst->ltm, &src->ltm, sizeof(RwMatrix));
+    std::memcpy(&dst->modelling, &src->modelling, sizeof(RwMatrix));
+    std::memcpy(&dst->ltm, &src->ltm, sizeof(RwMatrix));
 }
 
 // Recursive RwFrame children searching function

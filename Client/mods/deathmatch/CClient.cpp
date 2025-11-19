@@ -267,8 +267,6 @@ void CClient::RestreamModel(unsigned short usModel)
 
 bool CClient::HandleException(CExceptionInformation* pExceptionInformation)
 {
-#ifndef MTA_DEBUG
-#ifndef MTA_ALLOW_DEBUG
     // Let the clientgame write its dump, then make the core terminate our process
     if (g_pClientGame && pExceptionInformation)
     {
@@ -276,14 +274,6 @@ bool CClient::HandleException(CExceptionInformation* pExceptionInformation)
     }
 
     return false;
-#else
-    // We want to be able to debug using the debugger in debug-mode
-    return true;
-#endif
-#else
-    // We want to be able to debug using the debugger in debug-mode
-    return true;
-#endif
 }
 
 void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)

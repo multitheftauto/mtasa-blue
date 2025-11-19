@@ -31,7 +31,7 @@ public:
     const SString& GetTitle();
     SString        GetURL();
     void           SetRenderingPaused(bool bPaused);
-    const bool     GetRenderingPaused() const { return m_pWebView->GetRenderingPaused(); }
+    const bool     GetRenderingPaused() const { return m_pWebView ? m_pWebView->GetRenderingPaused() : false; }
     void           Focus();
 
     bool ExecuteJavascript(const SString& strJavascriptCode);
@@ -56,7 +56,7 @@ public:
 
     void Resize(const CVector2D& size);
 
-    using ajax_callback_t = const std::function<const SString(std::vector<SString>& vecGet, std::vector<SString>& vecPost)>;
+    using ajax_callback_t = const std::function<const std::string(std::vector<std::string>& vecGet, std::vector<std::string>& vecPost)>;
 
     bool AddAjaxHandler(const SString& strURL, ajax_callback_t& handler);
     bool RemoveAjaxHandler(const SString& strURL);

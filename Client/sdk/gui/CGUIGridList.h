@@ -110,6 +110,7 @@ public:
     virtual void SetSelectedItem(int iRow, int hColumn, bool bReset) = 0;
 
     virtual void SetSortColumnHandler(GUI_CALLBACK Callback) = 0;
+    virtual void SetSelectionHandler(GUI_CALLBACK Callback) = 0;
 
     virtual void SetIgnoreTextSpacer(bool bIgnoreTextSpacer) = 0;
 };

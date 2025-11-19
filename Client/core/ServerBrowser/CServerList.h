@@ -174,6 +174,7 @@ public:
 
     std::string    Pulse(bool bCanSendQuery, bool bRemoveNonResponding = false);
     void           ResetForRefresh();
+    void           CancelPendingQuery();
     unsigned short GetQueryPort();
 
     in_addr        AddressCopy;            // Copy to ensure it doesn't get changed without us knowing
@@ -366,6 +367,7 @@ public:
     virtual void Pulse();
     virtual void Refresh();
     virtual bool RemoveNonResponding() { return true; }
+    virtual void SuspendActivity();
 
     CServerListIterator        IteratorBegin() { return m_Servers.begin(); };
     CServerListIterator        IteratorEnd() { return m_Servers.end(); };
@@ -400,9 +402,10 @@ class CServerListInternet : public CServerList
 {
 public:
     CServerListInternet();
-    ~CServerListInternet();
-    void Pulse();
-    void Refresh();
+    ~CServerListInternet() override;
+    void Pulse() override;
+    void Refresh() override;
+    void SuspendActivity() override;
     bool RemoveNonResponding() { return m_nScanned > 10; }            // Don't remove until net access is confirmed
 
 private:
@@ -414,8 +417,11 @@ private:
 class CServerListLAN : public CServerList
 {
 public:
-    void Pulse();
-    void Refresh();
+    CServerListLAN();
+    ~CServerListLAN() override;
+    void Pulse() override;
+    void Refresh() override;
+    void SuspendActivity() override;
 
 private:
     void Discover();

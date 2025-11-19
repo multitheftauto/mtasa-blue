@@ -44,6 +44,7 @@ CLocalGUI::CLocalGUI()
 
     m_LastSettingsRevision = -1;
     m_LocaleChangeCounter = 0;
+    m_bHasQueuedLocaleChange = false;
 }
 
 CLocalGUI::~CLocalGUI()
@@ -123,8 +124,19 @@ void CLocalGUI::ChangeLocale(const char* szName)
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
     m_LastSettingsRevision = cvars->GetRevision();
 
-    g_pLocalization->SetCurrentLanguage();
-    m_LastLocaleName = szName;
+    g_pLocalization->SetCurrentLanguage(szName ? szName : "");
+
+    SString strCanonicalLocale = g_pLocalization->GetLanguageCode();
+    if (strCanonicalLocale.empty())
+        strCanonicalLocale = CVARS_GET_VALUE<SString>("locale");
+    if (strCanonicalLocale.empty() && szName)
+        strCanonicalLocale = szName;
+
+    m_LastLocaleName = strCanonicalLocale;
+
+    // Attempt CEGUI cleanup
+    if (CGUI* pGUI = CCore::GetSingleton().GetGUI())
+        pGUI->Cleanup();
 
     if (guiWasLoaded)
     {
@@ -211,6 +223,78 @@ void CLocalGUI::DestroyObjects()
     SAFE_DELETE(m_pLabelVersionTag);
 }
 
+void CLocalGUI::RequestLocaleChange(const SString& strLocale)
+{
+    if (strLocale.empty())
+        return;
+
+    if (m_bHasQueuedLocaleChange && strLocale == m_QueuedLocaleChange)
+        return;
+
+    const SString strCurrentLocale = CVARS_GET_VALUE<SString>("locale");
+    if (!m_bHasQueuedLocaleChange && strLocale == strCurrentLocale && strLocale == m_LastLocaleName)
+        return;
+
+    if (m_LocaleChangeCounter > 0)
+        CCore::GetSingleton().RemoveMessageBox();
+
+    m_QueuedLocaleChange = strLocale;
+    m_bHasQueuedLocaleChange = true;
+    m_LocaleChangeCounter = 0;
+
+    // Keep the cvar at the last applied locale so dependent systems remain stable while we rebuild UI
+    if (!m_LastLocaleName.empty() && strCurrentLocale != m_LastLocaleName)
+        CVARS_SET("locale", m_LastLocaleName);
+}
+
+void CLocalGUI::ApplyQueuedLocale()
+{
+    if (!m_bHasQueuedLocaleChange)
+        return;
+
+    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+
+    if (m_QueuedLocaleChange.empty())
+    {
+        m_bHasQueuedLocaleChange = false;
+        m_LocaleChangeCounter = 0;
+        CCore::GetSingleton().RemoveMessageBox();
+        return;
+    }
+
+    if (CCore::GetSingleton().GetModManager()->IsLoaded())
+    {
+        CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing language");
+        if (cvars)
+            cvars->Set("locale", m_LastLocaleName);
+
+        m_bHasQueuedLocaleChange = false;
+        m_QueuedLocaleChange.clear();
+        m_LocaleChangeCounter = 0;
+        CCore::GetSingleton().RemoveMessageBox();
+        return;
+    }
+
+    ChangeLocale(m_QueuedLocaleChange);
+
+    m_bHasQueuedLocaleChange = false;
+    SString strAppliedLocale = m_LastLocaleName;
+    m_QueuedLocaleChange.clear();
+    m_LocaleChangeCounter = 0;
+
+    if (!strAppliedLocale.empty())
+    {
+        SString strCurrentLocale = CVARS_GET_VALUE<SString>("locale");
+        if (strCurrentLocale != strAppliedLocale)
+            CVARS_SET("locale", strAppliedLocale);
+    }
+
+    if (cvars)
+        m_LastSettingsRevision = cvars->GetRevision();
+
+    CCore::GetSingleton().RemoveMessageBox();
+}
+
 void CLocalGUI::DoPulse()
 {
     m_pVersionUpdater->DoPulse();
@@ -247,33 +331,21 @@ void CLocalGUI::DoPulse()
         {
             m_LastLocaleName = currentLocaleName;
         }
-        if (currentLocaleName != m_LastLocaleName)
+        else if (!m_bHasQueuedLocaleChange && currentLocaleName != m_LastLocaleName)
         {
-            m_LocaleChangeCounter++;
-            if (m_LocaleChangeCounter < 5)
-            {
-                // Do GUI stuff for first 5 frames
-                // Force pulse next time
-                m_LastSettingsRevision = cvars->GetRevision() - 1;
-
-                if (m_LocaleChangeCounter == 2)
-                    CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("Changing language, please wait..."), MB_ICON_INFO);
-            }
-            else
-            {
-                // Do actual locale change
-                m_LocaleChangeCounter = 0;
-                CCore::GetSingleton().RemoveMessageBox();
-
-                if (!CCore::GetSingleton().GetModManager()->IsLoaded())
-                    ChangeLocale(currentLocaleName);
-                else
-                {
-                    CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing language");
-                    cvars->Set("locale", m_LastLocaleName);
-                }
-            }
+            RequestLocaleChange(currentLocaleName);
         }
+    }
+
+    if (m_bHasQueuedLocaleChange)
+    {
+        m_LocaleChangeCounter++;
+
+        if (m_LocaleChangeCounter == 2)
+            CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("Changing language, please wait..."), MB_ICON_INFO);
+
+        if (m_LocaleChangeCounter >= 5)
+            ApplyQueuedLocale();
     }
 }
 

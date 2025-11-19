@@ -16,7 +16,7 @@
 #include "CRenderWareSA.ShaderSupport.h"
 
 class CMatchChannelManager;
-class CModelTexturesInfo;
+struct CModelTexturesInfo;
 struct RpAtomic;
 struct SShaderReplacementStats;
 struct STexInfo;
@@ -54,7 +54,7 @@ public:
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
 
-    // Reads and parses a COL3 file with an optional collision key name
+    // Reads and parses a COL file (versions 1-4: COLL, COL2, COL3, COL4)
     CColModel* ReadCOL(const SString& buffer);
 
     // Replaces a CColModel for a specific object identified by the object id (usModelID)

@@ -153,7 +153,16 @@ bool CBassAudio::BeginLoadingMedia()
         m_pVars = new SSoundThreadVariables();
         m_pVars->strURL = m_strPath;
         m_pVars->lFlags = lFlags;
-        CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(&CBassAudio::PlayStreamIntern), m_uiCallbackId, 0, NULL);
+        HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(&CBassAudio::PlayStreamIntern), m_uiCallbackId, 0, NULL);
+        if (!hThread)
+        {
+            g_pCore->GetConsole()->Printf("Could not create audio stream thread for %s", *m_strPath);
+            delete m_pVars;
+            m_pVars = nullptr;
+            return false;
+        }
+
+        CloseHandle(hThread);
         m_bPendingPlay = true;
         OutputDebugLine("[Bass]        stream connect started");
     }
