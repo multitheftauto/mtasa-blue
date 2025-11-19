@@ -328,8 +328,8 @@ void CClientWebBrowser::Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHan
         return;
     }
 
-    auto    callback = callbackMapEntry->second;
-    SString result = callback(pHandler->GetGetData(), pHandler->GetPostData());
+    auto        callback = callbackMapEntry->second;
+    std::string result = callback(pHandler->GetGetData(), pHandler->GetPostData());
     pHandler->SetResponse(result);
 }
 

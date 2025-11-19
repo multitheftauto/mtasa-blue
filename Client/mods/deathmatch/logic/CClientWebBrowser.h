@@ -56,7 +56,7 @@ public:
 
     void Resize(const CVector2D& size);
 
-    using ajax_callback_t = const std::function<const SString(std::vector<SString>& vecGet, std::vector<SString>& vecPost)>;
+    using ajax_callback_t = const std::function<const std::string(std::vector<std::string>& vecGet, std::vector<std::string>& vecPost)>;
 
     bool AddAjaxHandler(const SString& strURL, ajax_callback_t& handler);
     bool RemoveAjaxHandler(const SString& strURL);
