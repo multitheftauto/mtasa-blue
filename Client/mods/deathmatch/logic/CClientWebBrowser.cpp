@@ -16,13 +16,13 @@ CClientWebBrowser::CClientWebBrowser(CClientManager* pManager, ElementID ID, CWe
 {
     m_pResource = nullptr;
     m_pManager = pManager;
+    m_pWebView = nullptr;
     SetTypeName("webbrowser");
 
     // Create the web view
     const auto pWebCore = g_pCore->GetWebCore();
     if (!pWebCore)
     {
-        m_pWebView = nullptr;
         return;
     }
     m_pWebView = pWebCore->CreateWebView(pWebBrowserItem->m_uiSizeX, pWebBrowserItem->m_uiSizeY, bLocal, pWebBrowserItem, bTransparent);
@@ -39,6 +39,15 @@ CClientWebBrowser::CClientWebBrowser(CClientManager* pManager, ElementID ID, CWe
 
 CClientWebBrowser::~CClientWebBrowser()
 {
+    // Mark as being destroyed to prevent event callbacks from executing
+    m_bBeingDestroyed = true;
+
+    // Unlink from tree first to prevent event callbacks from reaching
+    Unlink();
+
+    // Clear AJAX callback map to release any held references
+    m_mapAjaxCallback.clear();
+
     if (m_pWebView)
     {
         // Use GetWebCoreUnchecked() to ensure cleanup even if initialization failed
@@ -47,9 +56,6 @@ CClientWebBrowser::~CClientWebBrowser()
             pWebCore->DestroyWebView(m_pWebView);
         m_pWebView = nullptr;
     }
-
-    // Unlink from tree
-    Unlink();
 }
 
 void CClientWebBrowser::Unlink()
@@ -201,12 +207,18 @@ void CClientWebBrowser::Refresh(bool bIgnoreCache)
 ////////////////////////////////////////////////////////////////////////////
 void CClientWebBrowser::Events_OnCreated()
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     CallEvent("onClientBrowserCreated", Arguments, false);
 }
 
 void CClientWebBrowser::Events_OnLoadingStart(const SString& strURL, bool bMainFrame)
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushBoolean(bMainFrame);
@@ -215,6 +227,9 @@ void CClientWebBrowser::Events_OnLoadingStart(const SString& strURL, bool bMainF
 
 void CClientWebBrowser::Events_OnDocumentReady(const SString& strURL)
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     CallEvent("onClientBrowserDocumentReady", Arguments, false);
@@ -222,6 +237,9 @@ void CClientWebBrowser::Events_OnDocumentReady(const SString& strURL)
 
 void CClientWebBrowser::Events_OnLoadingFailed(const SString& strURL, int errorCode, const SString& errorDescription)
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushNumber(errorCode);
@@ -231,6 +249,9 @@ void CClientWebBrowser::Events_OnLoadingFailed(const SString& strURL, int errorC
 
 void CClientWebBrowser::Events_OnNavigate(const SString& strURL, bool bIsBlocked, bool bIsMainFrame)
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushBoolean(bIsBlocked);
@@ -240,6 +261,9 @@ void CClientWebBrowser::Events_OnNavigate(const SString& strURL, bool bIsBlocked
 
 void CClientWebBrowser::Events_OnPopup(const SString& strTargetURL, const SString& strOpenerURL)
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     Arguments.PushString(strTargetURL);
     Arguments.PushString(strOpenerURL);
@@ -248,6 +272,9 @@ void CClientWebBrowser::Events_OnPopup(const SString& strTargetURL, const SStrin
 
 void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     Arguments.PushNumber(ucCursor);
     CallEvent("onClientBrowserCursorChange", Arguments, false);
@@ -267,6 +294,9 @@ void CClientWebBrowser::Events_OnTriggerEvent(const SString& strEventName, const
 
 void CClientWebBrowser::Events_OnTooltip(const SString& strTooltip)
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     Arguments.PushString(strTooltip);
     CallEvent("onClientBrowserTooltip", Arguments, false);
@@ -274,6 +304,9 @@ void CClientWebBrowser::Events_OnTooltip(const SString& strTooltip)
 
 void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 {
+    if (m_bBeingDestroyed)
+        return;
+    
     CLuaArguments Arguments;
     Arguments.PushBoolean(bGainedFocus);
     CallEvent("onClientBrowserInputFocusChanged", Arguments, false);
@@ -281,6 +314,9 @@ void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 
 bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 {
+    if (m_bBeingDestroyed)
+        return false;
+
     // If no resource is set, we are allowed to use the requested file
     if (!m_pResource)
         return true;
@@ -295,6 +331,9 @@ bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 
 bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuffer& outFileData)
 {
+    if (m_bBeingDestroyed)
+        return false;
+
     // If no resource is set, we do not require to verify the file
     if (!m_pResource)
         return true;
@@ -311,6 +350,9 @@ bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuff
 
 void CClientWebBrowser::Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, unsigned char reason)
 {
+    if (m_bBeingDestroyed)
+        return;
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushString(strDomain);
@@ -320,6 +362,12 @@ void CClientWebBrowser::Events_OnResourceBlocked(const SString& strURL, const SS
 
 void CClientWebBrowser::Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHandler, const SString& strURL)
 {
+    if (m_bBeingDestroyed)
+    {
+        pHandler->SetResponse("");
+        return;
+    }
+
     auto callbackMapEntry = m_mapAjaxCallback.find(strURL);
 
     if (callbackMapEntry == m_mapAjaxCallback.end())
@@ -335,6 +383,9 @@ void CClientWebBrowser::Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHan
 
 void CClientWebBrowser::Events_OnConsoleMessage(const std::string& message, const std::string& source, int line, std::int16_t level)
 {
+    if (m_bBeingDestroyed)
+        return;
+
     CLuaArguments arguments;
     arguments.PushString(message);
     arguments.PushString(source);
@@ -373,16 +424,25 @@ bool CClientWebBrowser::ToggleDevTools(bool visible)
 
 CClientGUIWebBrowser::CClientGUIWebBrowser(bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain,
                                            CGUIElement* pCGUIElement, ElementID ID)
-    : CClientGUIElement(pManager, pLuaMain, pCGUIElement, ID)
+    : CClientGUIElement(pManager, pLuaMain, pCGUIElement, ID), m_pBrowser(nullptr)
 {
     m_pManager = pManager;
-    m_pBrowser = g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser(width, height, isLocal, isTransparent);
 
-    if (m_pBrowser)
+    if (!g_pClientGame || !pLuaMain)
+        return;
+
+    CClientWebBrowser* pBrowser = g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser(width, height, isLocal, isTransparent);
+
+    if (pBrowser)
     {
-        m_pBrowser->SetParent(this);            // m_pBrowser gets deleted automatically by the element tree logic
+        // Store immediately so destructor can always find it
+        m_pBrowser = pBrowser;
 
-        // Set our owner resource
-        m_pBrowser->SetResource(pLuaMain->GetResource());
+        // Set our owner resource BEFORE transferring ownership to element tree
+        pBrowser->SetResource(pLuaMain->GetResource());
+
+        // Transfer ownership to element tree by setting parent
+        // After this call, the element tree is responsible for cleanup
+        pBrowser->SetParent(this);
     }
 }
