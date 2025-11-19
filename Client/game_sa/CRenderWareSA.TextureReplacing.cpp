@@ -319,10 +319,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 
             swapMap[pOldTexture] = pOriginalTexture;
 
-            // Only restore original textures early if this is the last replacement set for this TXD
-            // Otherwise, other replacement sets might still be using the TXD
-            bool isLastReplacement = (pInfo->usedByReplacements.size() == 1);
-            if (pOriginalTexture && isLastReplacement && !RwTexDictionaryContainsTexture(pInfo->pTxd, pOriginalTexture))
+            // Always restore original textures to prevent them from becoming orphaned and GC'd
+            // This is crucial for proper cleanup even when multiple replacement sets use the same TXD
+            if (pOriginalTexture && !RwTexDictionaryContainsTexture(pInfo->pTxd, pOriginalTexture))
                 RwTexDictionaryAddTexture(pInfo->pTxd, pOriginalTexture);
         }
 
@@ -376,7 +375,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         // Free replaced textures that aren't in originalTextures (prevents leak)
         for (RwTexture* pReplacedTexture : perTxdInfo.replacedOriginals)
         {
-            if (pReplacedTexture && !ListContains(pInfo->originalTextures, pReplacedTexture))
+            if (pReplacedTexture && SharedUtil::IsReadablePointer(pReplacedTexture, sizeof(RwTexture)) && !ListContains(pInfo->originalTextures, pReplacedTexture))
                 RwTextureDestroy(pReplacedTexture);
         }
 
