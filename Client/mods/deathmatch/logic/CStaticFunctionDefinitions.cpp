@@ -193,7 +193,7 @@ bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientE
     return false;
 }
 
-bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int iBandwidth,
+uint CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int iBandwidth,
                                                           CLuaMain* pLuaMain, ushort usResourceNetId)
 {
     assert(szName);
@@ -214,11 +214,11 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CC
             return false;
         }
         g_pClientGame->GetLatentTransferManager()->AddSendBatchBegin(PACKET_ID_LUA_EVENT, pBitStream);
-        g_pClientGame->GetLatentTransferManager()->AddSend(0, pBitStream->Version(), iBandwidth, pLuaMain, usResourceNetId);
+        SSendHandle handle = g_pClientGame->GetLatentTransferManager()->AddSend(0, pBitStream->Version(), iBandwidth, pLuaMain, usResourceNetId);
         g_pClientGame->GetLatentTransferManager()->AddSendBatchEnd();
         g_pNet->DeallocateNetBitStream(pBitStream);
 
-        return true;
+        return handle;
     }
 
     return false;
