@@ -861,7 +861,6 @@ ADD_ENUM(_D3DFORMAT::D3DFMT_A32B32G32R32F, "a32b32g32r32f")
 IMPLEMENT_ENUM_CLASS_END("surface-format")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(eShadowTextureType)
-ADD_ENUM(eShadowTextureType::PLANE, "plane")
 ADD_ENUM(eShadowTextureType::CAR, "car")
 ADD_ENUM(eShadowTextureType::PED, "ped")
 ADD_ENUM(eShadowTextureType::HELI, "heli")

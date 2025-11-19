@@ -21,8 +21,6 @@ struct RwColor;
 
 enum class eShadowTextureType
 {
-    // use only color instead of texture
-    PLANE = -1,
     CAR,
     PED,
     HELI,
@@ -35,6 +33,7 @@ enum class eShadowTextureType
     HANDMAN,
     WINCRACK,
     LAMP,
+    COUNT
 };
 
 enum class eShadowType
