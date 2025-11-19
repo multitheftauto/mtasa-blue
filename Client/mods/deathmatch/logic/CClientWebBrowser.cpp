@@ -328,9 +328,9 @@ void CClientWebBrowser::Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHan
         return;
     }
 
-    auto        callback = callbackMapEntry->second;
+    auto&       callback = callbackMapEntry->second;
     std::string result = callback(pHandler->GetGetData(), pHandler->GetPostData());
-    pHandler->SetResponse(result);
+    pHandler->SetResponse(std::move(result));
 }
 
 void CClientWebBrowser::Events_OnConsoleMessage(const std::string& message, const std::string& source, int line, std::int16_t level)

@@ -18,5 +18,5 @@ class CAjaxResourceHandlerInterface
 public:
     virtual std::vector<std::string>& GetGetData() = 0;
     virtual std::vector<std::string>& GetPostData() = 0;
-    virtual void                      SetResponse(const std::string& data) = 0;
+    virtual void                      SetResponse(std::string data) = 0;
 };

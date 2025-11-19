@@ -27,13 +27,13 @@ CAjaxResourceHandler::~CAjaxResourceHandler()
     m_callback = nullptr;
 }
 
-void CAjaxResourceHandler::SetResponse(const std::string& data)
+void CAjaxResourceHandler::SetResponse(std::string data)
 {
     // Prevent response corruption: ignore subsequent calls after data is set
     if (m_bHasData) [[unlikely]]
         return;
 
-    m_strResponse = data;
+    m_strResponse = std::move(data);
     m_bHasData = true;
 
     if (!m_callback)
@@ -72,6 +72,9 @@ void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, i
 
 bool CAjaxResourceHandler::ProcessRequest([[maybe_unused]] CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
 {
+    if (!callback)
+        return false;
+
     // Store callback so SetResponse can resume once data is ready
     m_callback = callback;
 
@@ -79,7 +82,7 @@ bool CAjaxResourceHandler::ProcessRequest([[maybe_unused]] CefRefPtr<CefRequest>
     return true;
 }
 
-bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, CefRefPtr<CefCallback> callback)
+bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, [[maybe_unused]] CefRefPtr<CefCallback> callback)
 {
     // Validate input parameters first
     if (!data_out || bytes_to_read <= 0) [[unlikely]]
