@@ -12,6 +12,7 @@
 #pragma once
 
 #include <game/CFx.h>
+#include <SharedUtil.Misc.h>
 
 struct RwColor;
 class FxSystem_c;
@@ -31,7 +32,7 @@ class FxSystem_c;
 #define FUNC_CFx_TriggerBulletSplash       0x4a10e0
 #define FUNC_CFx_TriggerFootSplash         0x4a1150
 #define FUNC_FXSystem_c_AddParticle        0x4AA440
-
+#define FUNC_FXSystem_BaseShadow           0xC403E0
 class CFxSAInterface
 {
 public:
@@ -77,6 +78,9 @@ public:
     void TriggerBulletSplash(CVector& vecPosition);
     void TriggerFootSplash(CVector& vecPosition);
     void AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife);
+    bool AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
+                   eShadowType shadowType, float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings);
+    static bool IsShadowsLimitReached();
 
 private:
     CFxSAInterface* m_pInterface;

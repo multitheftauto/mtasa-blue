@@ -8076,6 +8076,13 @@ bool CStaticFunctionDefinitions::FxCreateParticle(FxParticleSystems eFxParticle,
     return true;
 }
 
+bool CStaticFunctionDefinitions::FxAddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1,
+                                             const CVector2D& vecOffset2, SColor color, eShadowType shadowType, float fZDistance, bool bDrawOnWater,
+                                             bool bDrawOnBuildings)
+{
+    return g_pGame->GetFx()->AddShadow(shadowTextureType, vecPosition, vecOffset1, vecOffset2, color, shadowType, fZDistance, bDrawOnWater, bDrawOnBuildings);
+}
+
 CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, const SString& strFxName, const CVector& vecPosition, bool bSoundEnable)
 {
     CClientEffect* pFx = m_pManager->GetEffectManager()->Create(strFxName, vecPosition, INVALID_ELEMENT_ID, bSoundEnable);

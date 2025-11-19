@@ -11,11 +11,40 @@
 
 #pragma once
 #include "enums/FxParticleSystems.h"
+#include <SharedUtil.Misc.h>
 
 class CEntity;
 class CVector;
+class CVector2D;
 class CVehicle;
 struct RwColor;
+
+enum class eShadowTextureType
+{
+    // use only color instead of texture
+    PLANE = -1,
+    CAR,
+    PED,
+    HELI,
+    BIKE,
+    RCBARON,
+    EXPLOSION,
+    HEADLIGHT1,
+    HEADLIGHT2,
+    BLOOD,
+    HANDMAN,
+    WINCRACK,
+    LAMP,
+};
+
+enum class eShadowType
+{
+    NONE,
+    DEFAULT,
+    ADDITIVE,
+    INVCOLOR,
+};
+
 
 class CFx
 {
@@ -36,4 +65,6 @@ public:
     virtual void TriggerBulletSplash(CVector& vecPosition) = 0;
     virtual void TriggerFootSplash(CVector& vecPosition) = 0;
     virtual void AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife) = 0;
+    virtual bool AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2,
+                           SharedUtil::SColor color, eShadowType shadowType, float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings) = 0;
 };
