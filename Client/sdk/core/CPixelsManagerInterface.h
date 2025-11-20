@@ -35,7 +35,7 @@ public:
     const char* GetData() const { return externalData.pData ? externalData.pData : buffer.GetData(); }
     uint        GetSize() const { return externalData.pData ? externalData.uiSize : buffer.GetSize(); }
 
-    void SetSize(uint uiSize)
+    bool SetSize(uint uiSize)
     {
         dassert(externalData.pData == NULL || buffer.GetSize() == 0);
         if (externalData.pData)
@@ -43,7 +43,7 @@ public:
             buffer = CBuffer(externalData.pData, externalData.uiSize);
             externalData = SCharStringRef();
         }
-        buffer.SetSize(uiSize);
+        return buffer.SetSize(uiSize);
     }
 
     // Only one can be in use at a time

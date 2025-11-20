@@ -16,9 +16,17 @@
 #include <cef3/cef/include/cef_stream.h>
 #include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
 #include "CAjaxResourceHandler.h"
+#include <cstdlib>
 
 namespace
 {
+    // Helper to detect Wine/Proton environment
+    bool IsRunningOnWine()
+    {
+        HMODULE hNtdll = GetModuleHandle("ntdll.dll");
+        return hNtdll && GetProcAddress(hNtdll, "wine_get_version");
+    }
+
     // Centralises command-line switch setup so both pre-launch callbacks stay in sync
     void ConfigureCommandLineSwitches(const CefRefPtr<CefCommandLine>& commandLine, const CefString& processType)
     {
@@ -30,7 +38,16 @@ namespace
             return;
 
         // Always provide base installation paths so loader-proxy can validate subprocess origin
-        const SString gtaPath = GetCommonRegistryValue("", "GTA:SA Path");
+        SString gtaPath = GetCommonRegistryValue("", "GTA:SA Path");
+        if (gtaPath.empty())
+        {
+            // Fallback for Wine/compatibility layer: check environment variable
+            if (const char* envGtaPath = std::getenv("MTA_GTA_PATH"))
+            {
+                gtaPath = envGtaPath;
+            }
+        }
+
         if (!gtaPath.empty())
         {
             commandLine->AppendSwitchWithValue("mta-gta-path", gtaPath);
@@ -70,6 +87,21 @@ namespace
             }
         }
 
+        // Wine/Proton compatibility: Allow GPU unless explicitly disabled or forced software
+        if (IsRunningOnWine())
+        {
+            if (std::getenv("MTA_FORCE_SOFTWARE_RENDERING"))
+            {
+                disableGpu = true;
+            }
+            else
+            {
+                // In Wine, we generally want to try GPU (DXVK handles it well)
+                // But disable-gpu-compositing is already set above which is key
+                // If user hasn't explicitly disabled GPU in cvars, let it run
+            }
+        }
+
         if (disableGpu)
             commandLine->AppendSwitch("disable-gpu");
     }
@@ -96,19 +128,6 @@ void CWebApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
     if (!command_line)
         return;
 
-    // Add GTA path and MTA base path switches before g_pCore check
-    // This callback runs in both browser process and subprocess
-    // In subprocess, g_pCore is NULL, so switches must be added before that check
-    // Read GTA path from registry
-    int iResult = 0;
-    const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iResult);
-    if (!strGTAPath.empty())
-    {
-        // Pass GTA directory path to CEFLauncher subprocess via command-line switch
-        // CEF's AppendSwitchWithValue handles quoting automatically
-        command_line->AppendSwitchWithValue("mta-gta-path", strGTAPath);
-        // AddReportLog only available in browser process where g_pCore exists
-    }
     const CefString processType = command_line->GetSwitchValue("type");
     ConfigureCommandLineSwitches(command_line, processType);
 }
@@ -191,8 +210,8 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 
             if (pWebView->HasAjaxHandler(resourcePath))
             {
-                std::vector<SString> vecGet;
-                std::vector<SString> vecPost;
+                std::vector<std::string> vecGet;
+                std::vector<std::string> vecPost;
 
                 if (urlParts.query.str)
                 {
@@ -200,6 +219,10 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     std::vector<SString> vecTmp;
                     vecTmp.reserve(8);  // Reserve space for common query parameter count
                     strGet.Split("&", vecTmp);
+
+                    const size_t paramCount = vecTmp.size();
+                    if (paramCount > 0)
+                        vecGet.reserve(vecGet.size() + paramCount * 2);
 
                     SString key;
                     SString value;
@@ -239,6 +262,10 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                         vecTmp.reserve(8);
                         postParam.Split("&", vecTmp);
 
+                        const size_t postParamCount = vecTmp.size();
+                        if (postParamCount > 0)
+                            vecPost.reserve(vecPost.size() + postParamCount * 2);
+
                         for (auto&& param : vecTmp)
                         {
                             param.Split("=", &key, &value);
@@ -248,7 +275,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     }
                 }
 
-                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(vecGet, vecPost, mimeType));
+                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(std::move(vecGet), std::move(vecPost), mimeType));
                 pWebView->HandleAjaxRequest(resourcePath, handler.get());
                 return handler;
             }
