@@ -49,6 +49,11 @@ void CLuaShared::EmbedChunkName(SString strChunkName, const char** pcpOutBuffer,
     // And the rest
     stream.WriteBytes(cpBuffer + 12 + 4 + uiStringSizeOrig, uiSize - 12 - 4 - uiStringSizeOrig);
 
+    // Verify all writes succeede by checking buffer size
+    uint uiExpectedSize = 12 + 4 + strChunkName.length() + (uiSize - 12 - 4 - uiStringSizeOrig);
+    if (store.GetSize() != uiExpectedSize)
+        return;
+
     cpBuffer = store.GetData();
     uiSize = store.GetSize();
 }

@@ -11,22 +11,55 @@
 
 #include "StdInc.h"
 
-#define CGUIGRIDLIST_NAME "CGUI/MultiColumnList"
-#define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList" //MultiColumnListNoFrame
-#define CGUIGRIDLIST_SPACER "   "
+namespace
+{
+    constexpr const char kGridListName[] = "CGUI/MultiColumnList";
+    constexpr const char kGridListNoFrameName[] = "CGUI/MultiColumnList"; // MultiColumnListNoFrame
+    constexpr const char kGridListSpacer[] = "   ";
+    constexpr std::size_t kGridListSpacerLength = (sizeof(kGridListSpacer) / sizeof(char)) - 1;
+    constexpr std::size_t kGridListMaxTextLength = 256;
 
-#define CGUIGRIDLIST_MAX_TEXT_LENGTH    256
+    constexpr CEGUI::ListHeaderSegment::SortDirection ToCeguiSortDirection(SortDirection direction) noexcept
+    {
+        switch (direction)
+        {
+            case SortDirections::Ascending:
+                return CEGUI::ListHeaderSegment::Ascending;
+            case SortDirections::Descending:
+                return CEGUI::ListHeaderSegment::Descending;
+            default:
+                return CEGUI::ListHeaderSegment::None;
+        }
+    }
+
+    constexpr SortDirection FromCeguiSortDirection(CEGUI::ListHeaderSegment::SortDirection direction) noexcept
+    {
+        switch (direction)
+        {
+            case CEGUI::ListHeaderSegment::Ascending:
+                return SortDirections::Ascending;
+            case CEGUI::ListHeaderSegment::Descending:
+                return SortDirections::Descending;
+            default:
+                return SortDirections::None;
+        }
+    }
+
+    inline unsigned int NormalizeSortColumn(unsigned int requestedColumn, unsigned int columnCount) noexcept
+    {
+        if (columnCount == 0)
+            return 0;
+
+        if (requestedColumn == 0 || requestedColumn > columnCount)
+            return columnCount;
+
+        return requestedColumn;
+    }
+}
 
 CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool bFrame)
 {
     SetManager(pGUI);
-
-    // Initialize
-    m_hUniqueHandle = 0;
-    m_iIndex = 0;
-    m_bIgnoreTextSpacer = false;
-    m_OnSortColumn = NULL;
-    m_OnSelectionChanged = NULL;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique[CGUI_CHAR_SIZE];
@@ -34,9 +67,9 @@ CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool
 
     // Create the window and set default settings
     if (bFrame)
-        m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIGRIDLIST_NAME, szUnique);
+        m_pWindow = pGUI->GetWindowManager()->createWindow(kGridListName, szUnique);
     else
-        m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIGRIDLISTNOFRAME_NAME, szUnique);
+        m_pWindow = pGUI->GetWindowManager()->createWindow(kGridListNoFrameName, szUnique);
 
     m_pWindow->setDestroyedByParent(false);
     m_pWindow->setRect(CEGUI::Relative, CEGUI::Rect(0.00f, 0.00f, 0.40f, 0.40f));
@@ -80,6 +113,44 @@ void CGUIGridList_Impl::SetSortingEnabled(bool bEnabled)
 bool CGUIGridList_Impl::IsSortingEnabled()
 {
     return reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->isUserSortControlEnabled();
+}
+
+void CGUIGridList_Impl::SetAutoSortSuppressed(bool bSuppressed)
+{
+    if (m_bAutoSortSuppressed == bSuppressed)
+        return;
+
+    CEGUI::MultiColumnList* pList = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
+
+    if (bSuppressed)
+    {
+        m_bAutoSortSuppressed = true;
+        m_uiPendingSortColumn = static_cast<unsigned int>(pList->getSortColumn() + 1);
+        m_PendingSortDirection = FromCeguiSortDirection(pList->getSortDirection());
+        pList->setSortDirection(CEGUI::ListHeaderSegment::None);
+        UpdateSortIndicator(m_uiPendingSortColumn, m_PendingSortDirection);
+        return;
+    }
+
+    m_bAutoSortSuppressed = false;
+
+    const unsigned int columnCount = static_cast<unsigned int>(pList->getColumnCount());
+    if (columnCount == 0)
+    {
+        m_uiPendingSortColumn = 0;
+        m_PendingSortDirection = SortDirections::None;
+        return;
+    }
+
+    const unsigned int column = NormalizeSortColumn(m_uiPendingSortColumn, columnCount);
+    UpdateSortIndicator(0, SortDirections::None);
+    pList->setSortColumn(GetColumnIndex(column));
+    pList->setSortDirection(ToCeguiSortDirection(m_PendingSortDirection));
+}
+
+bool CGUIGridList_Impl::IsAutoSortSuppressed() const
+{
+    return m_bAutoSortSuppressed;
 }
 
 void CGUIGridList_Impl::RemoveColumn(unsigned int uiColumn)
@@ -203,20 +274,25 @@ int CGUIGridList_Impl::AddRow(bool fast, std::vector<std::pair<SString, bool> >*
 
 int CGUIGridList_Impl::SetRowItemsText(int iRow, std::vector<std::pair<SString, bool> >* m_items)
 {
-    int iSortColumn = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSortColumn() + 1;            // MTA columns start at 1, CEGUI at 0
+    const int sortColumn = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSortColumn() + 1;            // MTA columns start at 1, CEGUI at 0
 
-    std::vector<std::pair<SString, bool> >::iterator it = m_items->begin();
-    int                                              col = 1;
-    for (it; it != m_items->end(); it++)
+    int column = 1;
+    for (const auto& [text, isNumber] : *m_items)
     {
-        // Loop through every item.  We add each one unless it's the sorted by column, which we do last
-        if (col != iSortColumn)
-            SetItemText(iRow, col, it->first.c_str(), it->second, false, true);
-        col++;
+        if (column != sortColumn)
+            SetItemText(iRow, column, text.c_str(), isNumber, false, true);
+        ++column;
     }
-    // Add our sort column text, if it was provided
-    if ((uint)iSortColumn <= m_items->size())
-        iRow = SetItemText(iRow, iSortColumn, m_items->at(iSortColumn - 1).first.c_str(), m_items->at(iSortColumn - 1).second, false, true);
+
+    if (sortColumn > 0)
+    {
+        const std::size_t sortIndex = static_cast<std::size_t>(sortColumn - 1);
+        if (sortIndex < m_items->size())
+        {
+            const auto& [text, isNumber] = m_items->at(sortIndex);
+            iRow = SetItemText(iRow, sortColumn, text.c_str(), isNumber, false, true);
+        }
+    }
 
     return iRow;
 }
@@ -270,10 +346,9 @@ void CGUIGridList_Impl::Clear()
         // reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
         reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->resetList();
 
-        CFastHashMap<CEGUI::ListboxItem*, CGUIListItem_Impl*>::iterator it;
-        for (it = m_Items.begin(); it != m_Items.end(); it++)
+        for (auto& entry : m_Items)
         {
-            delete it->second;
+            delete entry.second;
         }
         m_Items.clear();
     }
@@ -322,16 +397,11 @@ const char* CGUIGridList_Impl::GetItemText(int iRow, int hColumn)
         {
             const char* szRet = pItem->getText().c_str();
 
-            if (!m_bIgnoreTextSpacer)
+            if (!m_bIgnoreTextSpacer && GetColumnIndex(hColumn) == 0)
             {
-                unsigned char ucSpacerSize = (unsigned char)(strlen(CGUIGRIDLIST_SPACER));
-
-                if (GetColumnIndex(hColumn) == 0)
-                {
-                    // Make sure there is a spacer to skip
-                    if (strncmp(szRet, CGUIGRIDLIST_SPACER, strlen(CGUIGRIDLIST_SPACER)) == 0)
-                        szRet += ucSpacerSize;
-                }
+                const unsigned char spacerSize = static_cast<unsigned char>(kGridListSpacerLength);
+                if (strncmp(szRet, kGridListSpacer, spacerSize) == 0)
+                    szRet += spacerSize;
             }
 
             return szRet;
@@ -376,98 +446,49 @@ int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bo
 {
     try
     {
-        CEGUI::MultiColumnList* win = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
-
-        // Get the current item at that offset and set the text
+        CEGUI::MultiColumnList* list = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
+        const int columnIndex = GetColumnIndex(hColumn);
         CGUIListItem_Impl* pItem = reinterpret_cast<CGUIListItem_Impl*>(GetItem(iRow, hColumn));
-        if (pItem)
+
+        if (!pItem)
         {
-            if (bSection)
+            pItem = new CGUIListItem_Impl(szText, bNumber);
+            CEGUI::ListboxItem* pListboxItem = pItem->GetListItem();
+            list->setItem(pListboxItem, CEGUI::MCLGridRef(iRow, columnIndex), bFast);
+            m_Items[pItem->GetListItem()] = pItem;
+        }
+
+        if (bSection)
+        {
+            pItem->SetFont("default-bold-small");
+            pItem->SetDisabled(true);
+            pItem->SetText(szText, szSortText);
+        }
+        else
+        {
+            pItem->SetFont(list->getFont()->getName().c_str());
+            pItem->SetDisabled(false);
+
+            if (columnIndex == 0 && !m_bIgnoreTextSpacer)
             {
-                // Set section properties
-                pItem->SetFont("default-bold-small");
-                pItem->SetDisabled(true);
-                pItem->SetText(szText, szSortText);
+                char szBuf[kGridListMaxTextLength];
+                snprintf(szBuf, kGridListMaxTextLength - 1, "%s%s", kGridListSpacer, szText);
+                szBuf[kGridListMaxTextLength - 1] = '\0';
+                pItem->SetText(szBuf, szSortText);
             }
             else
             {
-                pItem->SetFont(win->getFont()->getName().c_str());            // Reset font to the font of the item's parent (the gridlist)
-                pItem->SetDisabled(false);
-
-                if (GetColumnIndex(hColumn) == 0)
-                {
-                    // Enable some spacing on regular items, if this is the first item
-
-                    char szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH];
-                    if (m_bIgnoreTextSpacer)
-                    {
-                        snprintf(szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s", szText);
-                    }
-                    else
-                    {
-                        snprintf(szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s%s", CGUIGRIDLIST_SPACER, szText);
-                    }
-
-                    szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH - 1] = NULL;
-
-                    pItem->SetText(szBuf, szSortText);
-                }
-                else
-                {
-                    pItem->SetText(szText, szSortText);
-                }
-            }
-        }
-        else
-        {
-            // If it doesn't, create it and set it in the gridlist
-            pItem = new CGUIListItem_Impl(szText, bNumber);
-
-            if (szSortText)
                 pItem->SetText(szText, szSortText);
-
-            CEGUI::ListboxItem* pListboxItem = pItem->GetListItem();
-            win->setItem(pListboxItem, CEGUI::MCLGridRef(iRow, GetColumnIndex(hColumn)), bFast);
-
-            // Put our new item into the map
-            m_Items[pItem->GetListItem()] = pItem;
-
-            if (bSection)
-            {
-                // Set section properties
-                pItem->SetFont("default-bold-small");
-                pItem->SetDisabled(true);
-            }
-            else if (GetColumnIndex(hColumn) == 0)
-            {
-                // Enable some spacing on regular items, if this is the first item
-                char szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH];
-
-                if (m_bIgnoreTextSpacer)
-                {
-                    snprintf(szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s", szText);
-                }
-                else
-                {
-                    snprintf(szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s%s", CGUIGRIDLIST_SPACER, szText);
-                }
-
-                szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH - 1] = NULL;
-                pItem->SetText(szBuf, szSortText);
             }
         }
 
-        // If the list is sorted and we just changed an item in the sorting column,
-        // re-sort the list.
-        if (win->getSortDirection() != SortDirections::None && win->getSortColumn() == GetColumnIndex(hColumn))
+        if (list->getSortDirection() != SortDirections::None && list->getSortColumn() == columnIndex)
         {
-            win->setSortColumn(win->getSortColumn());
+            list->setSortColumn(list->getSortColumn());
             return GetItemRowIndex(pItem);
         }
-        else
-        {
-            return iRow;
-        }
+
+        return iRow;
     }
     catch (CEGUI::Exception)
     {
@@ -749,40 +770,36 @@ void CGUIGridList_Impl::SetSelectedItem(int iRow, int hColumn, bool bReset)
 
 void CGUIGridList_Impl::Sort(unsigned int uiColumn, SortDirection direction)
 {
-    reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setSortColumn(GetColumnIndex(uiColumn));
+    CEGUI::MultiColumnList* pList = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
+    const unsigned int columnCount = static_cast<unsigned int>(pList->getColumnCount());
+    const unsigned int column = NormalizeSortColumn(uiColumn, columnCount);
+    if (column == 0)
+        return;
 
-    switch (direction)
+    if (m_bAutoSortSuppressed)
     {
-        case SortDirections::Ascending:
-            reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setSortDirection(CEGUI::ListHeaderSegment::Ascending);
-            break;
-        case SortDirections::Descending:
-            reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setSortDirection(CEGUI::ListHeaderSegment::Descending);
-            break;
-        default:
-            reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setSortDirection(CEGUI::ListHeaderSegment::None);
-            break;
+        m_uiPendingSortColumn = column;
+        m_PendingSortDirection = direction;
+        UpdateSortIndicator(column, direction);
+        return;
     }
+
+    pList->setSortColumn(GetColumnIndex(column));
+    pList->setSortDirection(ToCeguiSortDirection(direction));
 }
 
 void CGUIGridList_Impl::GetSort(unsigned int& uiColumn, SortDirection& direction)
 {
-    uiColumn = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSortColumn() + 1;
-
-    switch (reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSortDirection())
+    if (m_bAutoSortSuppressed)
     {
-        case CEGUI::ListHeaderSegment::Ascending:
-            direction = SortDirections::Ascending;
-            break;
-
-        case CEGUI::ListHeaderSegment::Descending:
-            direction = SortDirections::Descending;
-            break;
-
-        default:
-            direction = SortDirections::None;
-            break;
+        uiColumn = m_uiPendingSortColumn;
+        direction = m_PendingSortDirection;
+        return;
     }
+
+    CEGUI::MultiColumnList* pList = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
+    uiColumn = pList->getSortColumn() + 1;
+    direction = FromCeguiSortDirection(pList->getSortDirection());
 }
 
 void CGUIGridList_Impl::SetSortColumnHandler(GUI_CALLBACK Callback)
@@ -809,6 +826,28 @@ bool CGUIGridList_Impl::Event_OnSelectionChanged(const CEGUI::EventArgs& e)
     return true;
 }
 
+void CGUIGridList_Impl::UpdateSortIndicator(unsigned int uiColumn, SortDirection direction)
+{
+    try
+    {
+        CEGUI::MultiColumnList* pList = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
+        const auto columnCount = static_cast<int>(pList->getColumnCount());
+        const int targetIndex = (uiColumn > 0) ? static_cast<int>(uiColumn - 1) : -1;
+
+        for (auto i = 0; i < columnCount; ++i)
+        {
+            auto segDirection = CEGUI::ListHeaderSegment::None;
+            if (i == targetIndex && direction != SortDirections::None)
+                segDirection = ToCeguiSortDirection(direction);
+
+            pList->getHeaderSegmentForColumn(i).setSortDirection(segDirection);
+        }
+    }
+    catch (CEGUI::Exception)
+    {
+    }
+}
+
 unsigned int CGUIGridList_Impl::GetUniqueHandle()
 {
     return ++m_hUniqueHandle;
@@ -816,10 +855,8 @@ unsigned int CGUIGridList_Impl::GetUniqueHandle()
 
 CGUIListItem_Impl* CGUIGridList_Impl::GetListItem(CEGUI::ListboxItem* pItem)
 {
-    CFastHashMap<CEGUI::ListboxItem*, CGUIListItem_Impl*>::iterator it;
-    it = m_Items.find(pItem);
-    if (it == m_Items.end())
-        return NULL;
+    if (const auto it = m_Items.find(pItem); it != m_Items.end())
+        return it->second;
 
-    return it->second;
+    return nullptr;
 }
