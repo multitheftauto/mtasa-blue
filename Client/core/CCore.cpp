@@ -81,7 +81,7 @@ inline void PatchMemory(std::uintptr_t address, const T& value)
 {
     DWORD oldProtect;
     VirtualProtect(reinterpret_cast<void*>(address), sizeof(T), PAGE_EXECUTE_READWRITE, &oldProtect);
-    std::memcpy(reinterpret_cast<void*>(address), value, sizeof(T));
+    std::memcpy(reinterpret_cast<void*>(address), &value, sizeof(T));
     VirtualProtect(reinterpret_cast<void*>(address), sizeof(T), oldProtect, &oldProtect);
 }
 
@@ -870,7 +870,7 @@ void CCore::ApplyHooks()
 {
     WriteDebugEvent("CCore::ApplyHooks");
 
-    PatchMemory(0x8747A9, "MTA San Andreas User Files");
+    PatchMemory(0x8747A9, 'M');
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
