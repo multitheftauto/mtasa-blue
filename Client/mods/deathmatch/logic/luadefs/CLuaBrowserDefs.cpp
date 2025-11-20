@@ -1041,7 +1041,7 @@ int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
                 CResourceManager* pResourceManager = m_pResourceManager;
                 auto              netId = pResource->GetNetID();
 
-                bool bResult = pWebBrowser->AddAjaxHandler(strURL, [=](std::vector<SString>& vecGet, std::vector<SString>& vecPost) -> const SString {
+                bool bResult = pWebBrowser->AddAjaxHandler(strURL, [=](std::vector<std::string>& vecGet, std::vector<std::string>& vecPost) -> const std::string {
                     // Make sure the resource is still running
                     if (!pResourceManager->Exists(pResource) || pResource->GetNetID() != netId)
                     {
@@ -1073,7 +1073,7 @@ int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
 
                         CLuaArgument* returnedValue = *result.begin();
                         if (returnedValue->GetType() == LUA_TSTRING)
-                            return returnedValue->GetString();
+                            return std::string(returnedValue->GetString());
                         else
                             return "";
                     }

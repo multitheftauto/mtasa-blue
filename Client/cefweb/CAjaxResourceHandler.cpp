@@ -13,7 +13,7 @@
 #include "CAjaxResourceHandler.h"
 #undef min
 
-CAjaxResourceHandler::CAjaxResourceHandler(std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& strMime)
+CAjaxResourceHandler::CAjaxResourceHandler(std::vector<std::string> vecGet, std::vector<std::string> vecPost, const CefString& strMime)
     : m_vecGetData(std::move(vecGet)), m_vecPostData(std::move(vecPost)), m_strMime(strMime)
 {
 }
@@ -27,13 +27,13 @@ CAjaxResourceHandler::~CAjaxResourceHandler()
     m_callback = nullptr;
 }
 
-void CAjaxResourceHandler::SetResponse(const SString& data)
+void CAjaxResourceHandler::SetResponse(std::string data)
 {
     // Prevent response corruption: ignore subsequent calls after data is set
     if (m_bHasData) [[unlikely]]
         return;
 
-    m_strResponse = data;
+    m_strResponse = std::move(data);
     m_bHasData = true;
 
     if (!m_callback)
@@ -72,12 +72,17 @@ void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, i
 
 bool CAjaxResourceHandler::ProcessRequest([[maybe_unused]] CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
 {
-    // Don't call Continue() here - let ReadResponse handle async flow
-    // Calling Continue() immediately would use the callback before data is ready
+    if (!callback)
+        return false;
+
+    // Store callback so SetResponse can resume once data is ready
+    m_callback = callback;
+
+    // Do not call Continue() yet; SetResponse triggers it after data is prepared
     return true;
 }
 
-bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, CefRefPtr<CefCallback> callback)
+bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, [[maybe_unused]] CefRefPtr<CefCallback> callback)
 {
     // Validate input parameters first
     if (!data_out || bytes_to_read <= 0) [[unlikely]]
@@ -86,13 +91,10 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
         return false;
     }
 
-    // If we have no data yet, wait
+    // If we have no data yet, wait until SetResponse provides it
     if (!m_bHasData)
     {
         bytes_read = 0;
-        // Store callback only if we don't already have one (prevent overwrite/leak)
-        if (callback && !m_callback)
-            m_callback = callback;
         return true;
     }
 
