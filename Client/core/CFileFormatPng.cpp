@@ -192,7 +192,8 @@ bool PngDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& ui
 
     if (pOutBuffer)
     {
-        pOutBuffer->SetSize(width * height * 4);
+        if (!pOutBuffer->SetSize(width * height * 4))
+            return false;
 
         switch (colorType)
         {
