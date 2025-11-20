@@ -56,7 +56,7 @@ public:
 
     void Resize(const CVector2D& size);
 
-    using ajax_callback_t = const std::function<const SString(std::vector<SString>& vecGet, std::vector<SString>& vecPost)>;
+    using ajax_callback_t = const std::function<const std::string(std::vector<std::string>& vecGet, std::vector<std::string>& vecPost)>;
 
     bool AddAjaxHandler(const SString& strURL, ajax_callback_t& handler);
     bool RemoveAjaxHandler(const SString& strURL);
@@ -90,6 +90,7 @@ private:
     CWebViewInterface*                 m_pWebView;
     CResource*                         m_pResource;
     std::map<SString, ajax_callback_t> m_mapAjaxCallback;
+    bool                               m_bBeingDestroyed = false;
 };
 
 class CClientGUIWebBrowser : public CClientGUIElement
@@ -101,5 +102,5 @@ public:
     CClientWebBrowser* GetBrowser() { return m_pBrowser; }
 
 private:
-    CClientWebBrowser* m_pBrowser;
+    CClientWebBrowser* m_pBrowser = nullptr;
 };
