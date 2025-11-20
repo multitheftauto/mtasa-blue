@@ -46,7 +46,6 @@ void CGUI_Impl::DestroyElementRecursive(CGUIElement* pElement)
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
-
 CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), CurrentServerCursorAlpha(255.0f)
 
 CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : 
