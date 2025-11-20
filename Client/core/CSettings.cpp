@@ -540,8 +540,8 @@ void CSettings::CreateGUI()
             return;
         CVector2D buttonSize;
         button->GetSize(buttonSize);
-        const float bottomPadding = 12.0f;
-        const float buttonY = std::max(0.0f, tabPanelSize.fY - buttonSize.fY - bottomPadding);
+        const float bottomPadding = 32.0f;
+        const float buttonY = std::max(0.0f, tabPanelSize.fY - buttonSize.fY - bottomPadding - 4.0f);
         button->SetPosition(CVector2D(std::max(0.0f, tabPanelSize.fX - buttonSize.fX - bottomPadding), buttonY));
     };
 
@@ -1527,6 +1527,7 @@ void CSettings::CreateGUI()
     /**
      * Webbrowser tab
      **/
+    const float browserListButtonWidth = 90.0f;
     const float browserMargin = 10.0f;
     const float availableBrowserWidth = std::max(0.0f, tabPanelSize.fX - browserMargin * 2.0f);
     float       browserColumnWidth = (availableBrowserWidth - kBrowserColumnSpacing) * 0.5f;
@@ -1568,7 +1569,7 @@ void CSettings::CreateGUI()
     m_pEditBrowserBlacklistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserBlacklistAdd->GetPosition(vecTemp);
-    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(browserColumnWidth, 22.0f));
+    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(browserColumnWidth - browserListButtonWidth, 22.0f));
 
     m_pLabelBrowserBlacklistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserBlacklistAdd, _("Enter a domain e.g. google.com")));
     m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
@@ -1586,7 +1587,7 @@ void CSettings::CreateGUI()
     m_pGridBrowserBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserBlacklist->GetPosition(vecTemp);
     const CVector2D blacklistGridPos = vecTemp;
-    const float browserBottomPadding = 12.0f;
+    const float browserBottomPadding = 32.0f;
     const float browserButtonSpacing = 5.0f;
     const CVector2D blacklistRemoveSize(140.0f, 22.0f);
     const float blacklistHeightAvailable = tabPanelSize.fY - blacklistGridPos.fY - blacklistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
@@ -1608,7 +1609,7 @@ void CSettings::CreateGUI()
     m_pEditBrowserWhitelistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserWhitelistAdd->GetPosition(vecTemp);
-    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(browserColumnWidth, 22.0f));
+    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(browserColumnWidth - browserListButtonWidth, 22.0f));
 
     m_pLabelBrowserWhitelistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserWhitelistAdd, _("Enter a domain e.g. google.com")));
     m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);

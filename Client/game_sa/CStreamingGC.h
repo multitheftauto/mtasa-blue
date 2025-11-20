@@ -27,28 +27,28 @@ public:
     static void Shutdown();
 
     // Protect a model from garbage collection
-    static void ProtectModel(uint32 modelId);
+    static void ProtectModel(std::uint32_t modelId);
 
     // Unprotect a model, allowing GC. Returns true if protection was removed
-    [[nodiscard]] static bool UnprotectModel(uint32 modelId);
+    [[nodiscard]] static bool UnprotectModel(std::uint32_t modelId);
 
     // Check if model is protected. Returns true if model is protected from GC
-    static bool IsModelProtected(uint32 modelId);
+    static bool IsModelProtected(std::uint32_t modelId);
 
     // Get count of currently protected models
-    static size_t GetProtectedCount();
+    static std::size_t GetProtectedCount();
 
     // Clear all protections - releases all references (Be careful)
     static void ClearAllProtections();
 
     // Hook callback for model removal - returns true to allow, false to block
-    static bool OnRemoveModel(uint32 modelId);
+    static bool OnRemoveModel(std::uint32_t modelId);
 
     // Guard for automatic model protection
     class Guard
     {
     public:
-        explicit Guard(uint32 modelId) : m_modelId(modelId), m_bActive(true) { ProtectModel(m_modelId); }
+        explicit Guard(std::uint32_t modelId) : m_modelId(modelId), m_bActive(true) { ProtectModel(m_modelId); }
 
         ~Guard() noexcept
         {
@@ -78,12 +78,12 @@ public:
         }
 
     private:
-        uint32 m_modelId;
-        bool   m_bActive;
+        std::uint32_t m_modelId;
+        bool          m_bActive;
     };
 
 private:
-    static std::unordered_map<uint32, uint32> ms_protectedModels;
-    static std::mutex                         ms_mutex;
-    static bool                               ms_bInitialized;
+    static std::unordered_map<std::uint32_t, std::uint32_t> ms_protectedModels;
+    static std::mutex                                        ms_mutex;
+    static bool                                              ms_bInitialized;
 };
