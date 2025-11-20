@@ -82,13 +82,15 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
 
     if (pOutBuffer)
     {
-        pOutBuffer->SetSize(uiWidth * uiHeight * 4);
+        if (!pOutBuffer->SetSize(uiWidth * uiHeight * 4))
+            return false;
         char* pOutData = pOutBuffer->GetData();
 
         /* Process data */
         JSAMPROW row_pointer[1];
         CBuffer  rowBuffer;
-        rowBuffer.SetSize(uiWidth * 3);
+        if (!rowBuffer.SetSize(uiWidth * 3))
+            return false;
         char* pRowTemp = rowBuffer.GetData();
 
         while (cinfo.output_scanline < cinfo.output_height)
@@ -153,7 +155,8 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
 
     /* Process data */
     CBuffer rowBuffer;
-    rowBuffer.SetSize(uiWidth * 3);
+    if (!rowBuffer.SetSize(uiWidth * 3))
+        return false;
     char* pRowTemp = rowBuffer.GetData();
 
     JSAMPROW row_pointer[1];
