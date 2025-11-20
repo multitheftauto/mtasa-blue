@@ -52,6 +52,8 @@ public:
     void SetVerticalScrollBar(bool bEnabled);
     void SetSortingEnabled(bool bEnabled);
     bool IsSortingEnabled();
+    void SetAutoSortSuppressed(bool bSuppressed);
+    [[nodiscard]] bool IsAutoSortSuppressed() const;
     void SetItemImage(int iRow, int hColumn, CGUIStaticImage* pImage);
 
     float GetHorizontalScrollPosition();
@@ -90,17 +92,21 @@ public:
 private:
     bool Event_OnSortColumn(const CEGUI::EventArgs& e);
     bool Event_OnSelectionChanged(const CEGUI::EventArgs& e);
+    void UpdateSortIndicator(unsigned int uiColumn, SortDirection direction);
 
-    int m_iIndex;
+    int m_iIndex = 0;
 
     unsigned int       GetUniqueHandle();
     CGUIListItem_Impl* GetListItem(CEGUI::ListboxItem* pItem);
-    unsigned int       m_hUniqueHandle;
+    unsigned int       m_hUniqueHandle = 0;
 
     CFastHashMap<CEGUI::ListboxItem*, CGUIListItem_Impl*> m_Items;
 
-    GUI_CALLBACK m_OnSortColumn;
-    GUI_CALLBACK m_OnSelectionChanged;
+    GUI_CALLBACK m_OnSortColumn = nullptr;
+    GUI_CALLBACK m_OnSelectionChanged = nullptr;
 
-    bool m_bIgnoreTextSpacer;
+    bool          m_bIgnoreTextSpacer = false;
+    bool          m_bAutoSortSuppressed = false;
+    unsigned int  m_uiPendingSortColumn = 1;
+    SortDirection m_PendingSortDirection = SortDirections::None;
 };

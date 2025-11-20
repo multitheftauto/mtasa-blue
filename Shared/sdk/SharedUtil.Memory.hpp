@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "SharedUtil.Memory.h"
+#include <mutex>
 
 #ifdef _WIN32
     #include <Windows.h>
@@ -185,11 +186,14 @@ namespace SharedUtil
 
     void SetMemoryAllocationFailureHandler()
     {
+        static std::once_flag s_installOnce;
+        std::call_once(s_installOnce, []() {
 #if defined(_WIN32)
-        _set_new_handler(&HandleMemoryAllocationFailure);
-        // _set_new_mode(1 /* call _set_new_handler for malloc failure */);
+            _set_new_handler(&HandleMemoryAllocationFailure);
+            // _set_new_mode(1 /* call _set_new_handler for malloc failure */);
 #else
-        std::set_new_handler(&HandleMemoryAllocationFailure);
+            std::set_new_handler(&HandleMemoryAllocationFailure);
 #endif
+        });
     }
 }            // namespace SharedUtil
