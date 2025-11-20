@@ -7,7 +7,9 @@
  *
  *****************************************************************************/
 
-#include <optional>
+#pragma once
+
+#include <map>
 
 struct SModelCacheStats;
 
@@ -24,7 +26,7 @@ public:
     virtual void OnClientClose() = 0;
     virtual void UpdatePedModelCaching(const std::map<ushort, float>& newNeedCacheList) = 0;
     virtual void UpdateVehicleModelCaching(const std::map<ushort, float>& newNeedCacheList) = 0;
-    virtual void SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) = 0;
+    virtual void SetCustomLimits(const size_t* numVehicles, const size_t* numPeds) = 0;
 };
 
 CModelCacheManager* NewModelCacheManager();
