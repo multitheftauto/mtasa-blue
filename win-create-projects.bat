@@ -10,7 +10,7 @@ rem Update discord-rpc
 utils\premake5.exe install_discord
 
 rem Generate solutions
-utils\premake5.exe vs2022
+utils\premake5.exe vs2026
 
 rem Create a shortcut to the solution - https://superuser.com/questions/392061/how-to-make-a-shortcut-from-cmd
 set SCRIPTFILE="%TEMP%\CreateMyShortcut.vbs"
