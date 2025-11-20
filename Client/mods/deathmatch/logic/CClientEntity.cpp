@@ -279,12 +279,12 @@ void CClientEntity::SetID(ElementID ID)
     }
 }
 
-CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced)
+CLuaArgument* CClientEntity::GetCustomData(const CStringName& name, bool bInheritData, bool* pbIsSynced)
 {
-    assert(szName);
+    assert(name);
 
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_pCustomData->Get(szName);
+    SCustomData* pData = m_pCustomData->Get(name);
     if (pData)
     {
         if (pbIsSynced)
@@ -295,7 +295,7 @@ CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pbIsSynced);
+        return m_pParent->GetCustomData(name, true, pbIsSynced);
     }
 
     // None available
@@ -315,10 +315,10 @@ CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
     return table;
 }
 
-bool CClientEntity::GetCustomDataString(const char* szName, SString& strOut, bool bInheritData)
+bool CClientEntity::GetCustomDataString(const CStringName& name, SString& strOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -350,10 +350,10 @@ bool CClientEntity::GetCustomDataString(const char* szName, SString& strOut, boo
     return false;
 }
 
-bool CClientEntity::GetCustomDataInt(const char* szName, int& iOut, bool bInheritData)
+bool CClientEntity::GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -388,10 +388,10 @@ bool CClientEntity::GetCustomDataInt(const char* szName, int& iOut, bool bInheri
     return false;
 }
 
-bool CClientEntity::GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData)
+bool CClientEntity::GetCustomDataFloat(const CStringName& name, float& fOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -415,10 +415,10 @@ bool CClientEntity::GetCustomDataFloat(const char* szName, float& fOut, bool bIn
     return false;
 }
 
-bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData)
+bool CClientEntity::GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -470,50 +470,50 @@ bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInhe
     return false;
 }
 
-void CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+void CClientEntity::SetCustomData(const CStringName& name, const CLuaArgument& Variable, bool bSynchronized)
 {
-    assert(szName);
-    if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
+    assert(name);
+    if (name->length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
-        CLogger::ErrorPrintf("Custom data name too long (%s)", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+        CLogger::ErrorPrintf("Custom data name too long (%s)", *SStringX(name.ToCString()).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
         return;
     }
 
     // Grab the old variable
     CLuaArgument oldVariable;
-    SCustomData* pData = m_pCustomData->Get(szName);
+    SCustomData* pData = m_pCustomData->Get(name);
     if (pData)
     {
         oldVariable = pData->Variable;
     }
 
     // Set the new data
-    m_pCustomData->Set(szName, Variable, bSynchronized);
+    m_pCustomData->Set(name, Variable, bSynchronized);
 
     // Trigger the onClientElementDataChange event on us
     CLuaArguments Arguments;
-    Arguments.PushString(szName);
+    Arguments.PushString(name);
     Arguments.PushArgument(oldVariable);
     Arguments.PushArgument(Variable);
     CallEvent("onClientElementDataChange", Arguments, true);
 }
 
-void CClientEntity::DeleteCustomData(const char* szName)
+void CClientEntity::DeleteCustomData(const CStringName& name)
 {
     // Grab the old variable
-    SCustomData* pData = m_pCustomData->Get(szName);
+    SCustomData* pData = m_pCustomData->Get(name);
     if (pData)
     {
         CLuaArgument oldVariable;
         oldVariable = pData->Variable;
 
         // Delete the custom data
-        m_pCustomData->Delete(szName);
+        m_pCustomData->Delete(name);
 
         // Trigger the onClientElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
+        Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
         CallEvent("onClientElementDataChange", Arguments, true);
@@ -746,6 +746,14 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
 {
     if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, NULL))
         return false;
+
+    const SString& thisTypeName = GetTypeName();
+    const char* thisTypeNameCStr = !thisTypeName.empty() ? thisTypeName.c_str() : "<unknown>";
+    const ElementID thisId = GetID();
+    SString telemetryDetail;
+    telemetryDetail.Format("%s %s(%u)", szName, thisTypeNameCStr, thisId.Value());
+    // Capture the element+event context so any crash (even core.dll faults) reports the last event being dispatched.
+    CrashTelemetry::Scope entityScope(0, this, "Entity::CallEvent", telemetryDetail.c_str());
 
     TIMEUS startTime = GetTimeUs();
 

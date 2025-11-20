@@ -398,7 +398,10 @@ public:
     void           SetFlags(unsigned short usFlags);
     static void    StaticResetFlags();
     CBoundingBox*  GetBoundingBox();
-    bool           IsValid();
+    [[nodiscard]] bool IsCollisionLoaded() const noexcept;
+    [[nodiscard]] bool IsRwObjectLoaded() const noexcept;
+    void WaitForModelFullyLoaded(std::chrono::milliseconds timeout);
+    bool IsValid();
     bool           IsAllocatedInArchive() const noexcept;
     float          GetDistanceFromCentreOfMassToBaseOfModel();
     unsigned short GetTextureDictionaryID();
@@ -470,7 +473,7 @@ public:
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
-    void         MakePedModel(char* szTexture);
+    void         MakePedModel(const char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;
     void         MakeVehicleAutomobile(ushort usBaseModelID);

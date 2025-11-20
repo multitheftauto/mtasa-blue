@@ -47,6 +47,7 @@
 #include "CRopesSA.h"
 #include "CSettingsSA.h"
 #include "CStatsSA.h"
+#include "CStreamingGC.h"
 #include "CTaskManagementSystemSA.h"
 #include "CTasksSA.h"
 #include "CVisibilityPluginsSA.h"
@@ -97,7 +98,7 @@ CGameSA::CGameSA()
         }
 
         // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-        for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+        for (unsigned char i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
         {
             ObjectGroupsInfo[i].SetGroup(i);
         }
@@ -277,6 +278,9 @@ CGameSA::CGameSA()
 
 CGameSA::~CGameSA()
 {
+    // Shutdown streaming GC hooks
+    CStreamingGC::Shutdown();
+
     delete reinterpret_cast<CPlayerInfoSA*>(m_pPlayerInfo);
 
     for (int i = 0; i < NUM_WeaponInfosTotal; i++)
@@ -493,8 +497,16 @@ void CGameSA::Initialize()
     SetupBrokenModels();
     m_pRenderWare->Initialize();
 
+    // Initialize streaming GC protection hooks
+    CStreamingGC::Initialize();
+
     // *Sebas* Hide the GTA:SA Main menu.
     MemPutFast<BYTE>(CLASS_CMenuManager + 0x5C, 0);
+}
+
+StreamingRemoveModelCallback CGameSA::GetStreamingRemoveModelCallback() const noexcept
+{
+    return &CStreamingGC::OnRemoveModel;
 }
 
 eGameVersion CGameSA::GetGameVersion()
@@ -838,26 +850,28 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     MemPut((void*)0x855432, aCannons);                // 0x855431
     MemPut((void*)0x856BFD, aCannons);                // 0x856BFC
 
+    const auto ucNewLimit = static_cast<BYTE>(newLimit);
+
     // CWaterCannons::Init
-    MemPut<BYTE>(0x728C88, newLimit);
+    MemPut(0x728C88, ucNewLimit);
 
     // CWaterCannons::Update
-    MemPut<BYTE>(0x72A3F2, newLimit);
+    MemPut(0x72A3F2, ucNewLimit);
 
     // CWaterCanons::UpdateOne
-    MemPut<BYTE>(0x728CD4, newLimit);
-    MemPut<BYTE>(0x728CF6, newLimit);
-    MemPut<BYTE>(0x728CFF, newLimit);
-    MemPut<BYTE>(0x728D62, newLimit);
+    MemPut(0x728CD4, ucNewLimit);
+    MemPut(0x728CF6, ucNewLimit);
+    MemPut(0x728CFF, ucNewLimit);
+    MemPut(0x728D62, ucNewLimit);
 
     // CWaterCannons::Render
-    MemPutFast<BYTE>(0x729B38, newLimit);
+    MemPutFast(0x729B38, ucNewLimit);
 
     // 0x85542A
-    MemPut<BYTE>(0x85542B, newLimit);
+    MemPut(0x85542B, ucNewLimit);
 
     // 0x856BF5
-    MemPut<BYTE>(0x856BF6, newLimit);
+    MemPut(0x856BF6, ucNewLimit);
 
     // Free previous allocated memory
     if (!isEnabled && currentACannons != nullptr)
@@ -884,12 +898,13 @@ void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
 
     if (isEnabled)
     {
-        MemSet((void*)0x6511B9, 0x90, 10);            // CCarEnterExit::IsVehicleStealable
-        MemSet((void*)0x643A95, 0x90, 14);            // CTaskComplexEnterCar::CreateFirstSubTask
-        MemSet((void*)0x6900B5, 0x90, 14);            // CTaskComplexCopInCar::ControlSubTask
-        MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter
-
-        MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon
+        // All these patches disable fire state checks (m_pFire != nullptr)
+        // Related crash protection is handled by checks in TaskSA.cpp and CTaskManagementSystemSA.cpp
+        MemSet((void*)0x6511B9, 0x90, 10);            // CCarEnterExit::IsVehicleStealable - fire check
+        MemSet((void*)0x643A95, 0x90, 14);            // CTaskComplexEnterCar::CreateFirstSubTask - fire check
+        MemSet((void*)0x6900B5, 0x90, 14);            // CTaskComplexCopInCar::ControlSubTask - fire check
+        MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter - fire check  
+        MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon - fire check
 
         MemSet((void*)0x53A899, 0x90, 5);             // CFire::ProcessFire
         MemSet((void*)0x53A990, 0x90, 5);             // CFire::ProcessFire

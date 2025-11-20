@@ -83,10 +83,22 @@ CRegisteredCorona* CCoronasSA::FindCorona(DWORD Identifier)
 
 RwTexture* CCoronasSA::GetTexture(CoronaType type)
 {
-    if ((DWORD)type < MAX_CORONA_TEXTURES)
-        return (RwTexture*)(*(DWORD*)(ARRAY_CORONA_TEXTURES + static_cast<DWORD>(type) * sizeof(DWORD)));
-    else
-        return NULL;
+    // Validate enum is within valid range
+    if (static_cast<DWORD>(type) >= MAX_CORONA_TEXTURES) [[unlikely]]
+        return nullptr;
+    
+    // Read texture pointer from array with validation
+    DWORD* pTextureArray = reinterpret_cast<DWORD*>(ARRAY_CORONA_TEXTURES);
+    if (!pTextureArray) [[unlikely]]
+        return nullptr;
+    
+    DWORD textureAddr = pTextureArray[static_cast<DWORD>(type)];
+    if (!textureAddr) [[unlikely]]
+        return nullptr;
+    
+    RwTexture* pTexture = reinterpret_cast<RwTexture*>(textureAddr);
+    
+    return pTexture;
 }
 
 void CCoronasSA::DisableSunAndMoon(bool bDisabled)

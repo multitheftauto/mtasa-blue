@@ -77,7 +77,7 @@ void CRenderWareSA::ClothesAddReplacement(char* pFileData, size_t fileSize, usho
     {
         MapSet(ms_ReplacementClothesFileDataMap, usFileId, pFileData);
         MapSet(ms_OriginalStreamingSizesMap, usFileId, g_clothesDirectory->GetModelStreamingSize(usFileId));
-        g_clothesDirectory->SetModelStreamingSize(usFileId, GetSizeInBlocks(fileSize));
+        g_clothesDirectory->SetModelStreamingSize(usFileId, static_cast<std::uint16_t>(GetSizeInBlocks(fileSize)));
 
         clothesReplacementChanged = true;
     }
@@ -145,7 +145,7 @@ bool CRenderWareSA::ClothesAddFile(const char* fileData, std::size_t fileSize, c
         return false;
 
     DirectoryInfoSA entry{};
-    entry.m_streamingSize = GetSizeInBlocks(fileSize);
+    entry.m_streamingSize = static_cast<std::uint16_t>(GetSizeInBlocks(fileSize));
 
     std::size_t nameSize = sizeof(entry.m_name) - 1;
     std::strncpy(entry.m_name, fileName, nameSize);
@@ -185,6 +185,8 @@ bool CRenderWareSA::ClothesRemoveFile(char* fileData)
         else
             ++iter;
     }
+
+    return clothesReplacementChanged;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -217,14 +219,15 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
     if (ms_ReplacementClothesFileDataMap.empty() && ms_ClothesFileDataMap.empty())
         return false;
 
-    // Initialze lookup map if needed
-    static std::map<std::uint32_t, int>         blockOffsetToFileIdMap;
-    static std::map<std::uint32_t, std::string> blockOffsetToFileNameMap;
-    if (blockOffsetToFileIdMap.empty())
+    static std::map<std::uint32_t, int>     blockOffsetToFileIdMap;
+    std::map<std::uint32_t, std::string>    blockOffsetToFileNameMap;
+
+    if (blockOffsetToFileIdMap.empty() || ms_ClothesFileDataMap.size() > 0)
     {
         // Check is player.img dir has been loaded by GTA
         SPlayerImgItemArray* pItemArray = (SPlayerImgItemArray*)0x00BC12C0;
-        std::uint32_t        maxArraySize = 542 + ms_ClothesFileDataMap.size();
+        std::uint32_t        defaultArraySize = 542;
+        std::uint32_t        maxArraySize = defaultArraySize + ms_ClothesFileDataMap.size();
 
         if (!pItemArray->pItems || pItemArray->uiArraySize != maxArraySize)
             return false;
@@ -232,7 +235,10 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
         for (std::uint32_t i = 0; i < pItemArray->uiArraySize; i++)
         {
             SPlayerImgItem* pImgItem = &pItemArray->pItems[i];
-            MapSet(blockOffsetToFileIdMap, pImgItem->uiBlockOffset, i);
+
+            if (i < defaultArraySize)
+                MapSet(blockOffsetToFileIdMap, pImgItem->uiBlockOffset, i);
+
             MapSet(blockOffsetToFileNameMap, pImgItem->uiBlockOffset, pImgItem->szName);
         }
     }
@@ -283,9 +289,11 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
 #define HOOKSIZE_CStreaming_RequestModel_Mid            5
 DWORD RETURN_CStreaming_RequestModel_MidA = 0x0408960;
 DWORD RETURN_CStreaming_RequestModel_MidB = 0x0408990;
-void _declspec(naked) HOOK_CStreaming_RequestModel_Mid()
+static void __declspec(naked) HOOK_CStreaming_RequestModel_Mid()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi
@@ -301,12 +309,8 @@ void _declspec(naked) HOOK_CStreaming_RequestModel_Mid()
         push    eax
         jmp     RETURN_CStreaming_RequestModel_MidA
 
-
         // Handle load here
-skip:
-        popad
-        pushad
-
+        skip:
         mov     eax, 0
         push    eax
         mov     eax, iReturnFileId

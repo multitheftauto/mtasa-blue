@@ -24,6 +24,7 @@
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
 #include "CDiscordInterface.h"
+#include "FPSLimiterInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -79,8 +80,10 @@ public:
     virtual CCVarsInterface*                   GetCVars() = 0;
     virtual CLocalizationInterface*            GetLocalization() = 0;
     virtual CWebCoreInterface*                 GetWebCore() = 0;
+    virtual CWebCoreInterface*                 GetWebCoreUnchecked() = 0;            // For cleanup in destructors only - bypasses initialization check
     virtual CTrayIconInterface*                GetTrayIcon() = 0;
     virtual std::shared_ptr<CDiscordInterface> GetDiscord() = 0;
+    virtual FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() const noexcept = 0;
 
     // Temporary functions for r1
     virtual void DebugEcho(const char* szText) = 0;
@@ -142,12 +145,6 @@ public:
     virtual void InitiateUpdate(const char* szType, const char* szData, const char* szHost) = 0;
     virtual bool IsOptionalUpdateInfoRequired(const char* szHost) = 0;
     virtual void InitiateDataFilesFix() = 0;
-
-    virtual uint GetFrameRateLimit() = 0;
-    virtual void RecalculateFrameRateLimit(uint uiServerFrameRateLimit = -1, bool bLogToConsole = true) = 0;
-    virtual void ApplyFrameRateLimit(uint uiOverrideRate = -1) = 0;
-    virtual void EnsureFrameRateLimitApplied() = 0;
-    virtual void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit) = 0;
 
     virtual void                 OnPreFxRender() = 0;
     virtual void                 OnPreHUDRender() = 0;

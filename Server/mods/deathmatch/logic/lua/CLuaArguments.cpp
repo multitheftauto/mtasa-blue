@@ -372,6 +372,14 @@ CLuaArgument* CLuaArguments::PushString(const std::string_view& string)
     return arg;
 }
 
+CLuaArgument* CLuaArguments::PushString(const CStringName& string)
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
 CLuaArgument* CLuaArguments::PushString(const char* string)
 {
     CLuaArgument* arg = new CLuaArgument();

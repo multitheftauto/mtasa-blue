@@ -74,6 +74,8 @@ class CVehicleAudioSettingsManager;
 enum eEntityType;
 enum ePedPieceTypes;
 
+using StreamingRemoveModelCallback = bool (*)(unsigned int modelId);
+
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
 typedef void(PostWeaponFireHandler)();
 typedef void(TaskSimpleBeHitHandler)(class CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
@@ -271,17 +273,19 @@ public:
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 
+    virtual StreamingRemoveModelCallback GetStreamingRemoveModelCallback() const noexcept = 0;
+
     virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
 
-    virtual int32_t GetBaseIDforDFF() = 0;
-    virtual int32_t GetBaseIDforTXD() = 0;
-    virtual int32_t GetBaseIDforCOL() = 0;
-    virtual int32_t GetBaseIDforIPL() = 0;
-    virtual int32_t GetBaseIDforDAT() = 0;
-    virtual int32_t GetBaseIDforIFP() = 0;
-    virtual int32_t GetBaseIDforRRR() = 0;
-    virtual int32_t GetBaseIDforSCM() = 0;
-    virtual int32_t GetCountOfAllFileIDs() = 0;
+    virtual uint32_t GetBaseIDforDFF() = 0;
+    virtual uint32_t GetBaseIDforTXD() = 0;
+    virtual uint32_t GetBaseIDforCOL() = 0;
+    virtual uint32_t GetBaseIDforIPL() = 0;
+    virtual uint32_t GetBaseIDforDAT() = 0;
+    virtual uint32_t GetBaseIDforIFP() = 0;
+    virtual uint32_t GetBaseIDforRRR() = 0;
+    virtual uint32_t GetBaseIDforSCM() = 0;
+    virtual uint32_t GetCountOfAllFileIDs() = 0;
 
     virtual void RemoveGameWorld() = 0;
     virtual void RestoreGameWorld() = 0;

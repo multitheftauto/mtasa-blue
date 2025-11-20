@@ -6,7 +6,6 @@ project "Client Webbrowser"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
-		linkoptions { "/SAFESEH:NO" }
 		buildoptions { "-Zm130" }
 
 	filter {}
@@ -37,6 +36,8 @@ project "Client Webbrowser"
 		"**.h",
 		"**.cpp"
 	}
+
+	filter {}
 
 	links {
 		"libcef", "CEF", "Psapi.lib", "version.lib", "Winmm.lib", "Ws2_32.lib", "DbgHelp.lib"

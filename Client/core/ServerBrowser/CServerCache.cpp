@@ -59,15 +59,16 @@ public:
     virtual void GetServerCachedInfo(CServerListItem* pItem);
     virtual void SetServerCachedInfo(const CServerListItem* pItem);
     virtual void GetServerListCachedInfo(CServerList* pList);
-    virtual bool GenerateServerList(CServerList* pList);
+    virtual bool GenerateServerList(CServerList* pList, bool bAllowNonResponding = false);
+    virtual void SetServerListCachedInfo(CServerList* pList);
 
     CServerCache();
     ~CServerCache();
 
 protected:
-    bool         LoadServerCache();
-    static DWORD StaticThreadProc(LPVOID lpdwThreadParam);
-    static void  StaticSaveServerCache();
+    bool                LoadServerCache();
+    static DWORD WINAPI StaticThreadProc(LPVOID lpdwThreadParam);
+    static void         StaticSaveServerCache();
 
     bool                              m_bListChanged;
     std::map<CCachedKey, CCachedInfo> m_ServerCachedMap;
@@ -93,7 +94,9 @@ CServerCacheInterface* GetServerCache()
 //
 // CServerCache::CServerCache
 //
-//
+// Initialize server cache by loading from persistent disk storage.
+// The cache file (servercache.xml) is never deleted and persists across sessions.
+// Cache entries are synced (updated) on each session, not regenerated.
 //
 ///////////////////////////////////////////////////////////////
 CServerCache::CServerCache()
@@ -117,6 +120,8 @@ CServerCache::~CServerCache()
 // CServerCache::LoadServerCache
 //
 // Load cache data from config
+// The in-memory cache is cleared and reloaded from disk.
+// The disk file is never deleted; it persists across game sessions.
 //
 ///////////////////////////////////////////////////////////////
 bool CServerCache::LoadServerCache()
@@ -155,7 +160,7 @@ bool CServerCache::LoadServerCache()
         if (const SString* pString = MapFind(item.attributeMap, "ip"))
             key.ulIp = inet_addr(*pString);
         if (const SString* pString = MapFind(item.attributeMap, "port"))
-            key.usGamePort = atoi(*pString);
+            key.usGamePort = static_cast<ushort>(atoi(*pString));
         if (const SString* pString = MapFind(item.attributeMap, "nPlayers"))
             info.nPlayers.SetFromString(*pString);
         if (const SString* pString = MapFind(item.attributeMap, "nMaxPlayers"))
@@ -197,7 +202,8 @@ bool CServerCache::LoadServerCache()
 //
 // CServerCache::SaveServerCache
 //
-// Save cache data to config
+// Persist cache changes to disk when data has been modified.
+// Always syncs complete state; never clears the disk file.
 //
 ///////////////////////////////////////////////////////////////
 void CServerCache::SaveServerCache(bool bWaitUntilFinished)
@@ -211,7 +217,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         ms_ServerCachedMap = m_ServerCachedMap;
 
         // Start save thread
-        HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CServerCache::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL);
+        HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerCache::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
         if (!hThread)
         {
             CCore::GetSingleton().GetConsole()->Printf("Could not create server cache thread.");
@@ -220,7 +226,14 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         {
             ms_bIsSaving = true;
             SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
-            ResumeThread(hThread);
+
+            if (ResumeThread(hThread) == static_cast<DWORD>(-1))
+            {
+                CCore::GetSingleton().GetConsole()->Printf("Could not start server cache thread.");
+                ms_bIsSaving = false;
+            }
+
+            CloseHandle(hThread);
         }
     }
 
@@ -238,7 +251,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
 // SaveServerCache thread
 //
 ///////////////////////////////////////////////////////////////
-DWORD CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
+DWORD WINAPI CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
 {
     StaticSaveServerCache();
     ms_bIsSaving = false;
@@ -249,7 +262,9 @@ DWORD CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
 //
 // CServerCache::StaticSaveServerCache
 //
-//
+// Synchronize cache to disk by writing all current in-memory entries.
+// The XML tree is rebuilt on each save (not appended to) for consistency,
+// but the file itself is never deleted. Servers are synced, not purged.
 //
 ///////////////////////////////////////////////////////////////
 void CServerCache::StaticSaveServerCache()
@@ -266,18 +281,17 @@ void CServerCache::StaticSaveServerCache()
     if (!pNode)
         return;
 
-    // Start by clearing out all previous nodes
+    // Clear in-memory XML structure and rebuild from current cache state.
+    // This does NOT delete the disk file; it only rewrites its contents with current data.
     pNode->DeleteAllSubNodes();
 
     // Transfer each item from m_ServerCachedMap into dataSet
     CDataInfoSet dataSet;
-    for (std::map<CCachedKey, CCachedInfo>::iterator it = ms_ServerCachedMap.begin(); it != ms_ServerCachedMap.end(); ++it)
+    for (const auto& [key, info] : ms_ServerCachedMap)
     {
-        const CCachedKey&  key = it->first;
-        const CCachedInfo& info = it->second;
 
-        // Don't save cache of non responding servers
-        if (info.nMaxPlayers == 0 || info.uiCacheNoReplyCount > 3)
+        // Only exclude servers that have failed multiple consecutive query attempts
+        if (info.uiCacheNoReplyCount > 3)
             continue;
 
         SDataInfoItem item;
@@ -320,6 +334,9 @@ void CServerCache::StaticSaveServerCache()
 ///////////////////////////////////////////////////////////////
 void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
 {
+    if (!pItem)
+        return;
+
     CCachedKey key;
     key.ulIp = pItem->Address.s_addr;
     key.usGamePort = pItem->usGamePort;
@@ -329,9 +346,9 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
         {
             pItem->SetDataQuality(SERVER_INFO_CACHE);
 
-            pItem->nPlayers = pInfo->nPlayers;
-            pItem->nMaxPlayers = pInfo->nMaxPlayers;
-            pItem->nPing = pInfo->nPing;
+            pItem->nPlayers = static_cast<unsigned short>(pInfo->nPlayers);
+            pItem->nMaxPlayers = static_cast<unsigned short>(pInfo->nMaxPlayers);
+            pItem->nPing = static_cast<unsigned short>(pInfo->nPing);
             pItem->bPassworded = (pInfo->bPassworded != 0);
             pItem->bKeepFlag = (pInfo->bKeepFlag != 0);
             pItem->strName = pInfo->strName;
@@ -339,8 +356,8 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
             pItem->strMap = pInfo->strMap;
             pItem->strVersion = pInfo->strVersion;
             pItem->uiCacheNoReplyCount = pInfo->uiCacheNoReplyCount;
-            pItem->m_usHttpPort = pInfo->usHttpPort;
-            pItem->m_ucSpecialFlags = pInfo->ucSpecialFlags;
+            pItem->m_usHttpPort = static_cast<unsigned short>(pInfo->usHttpPort);
+            pItem->m_ucSpecialFlags = static_cast<unsigned char>(pInfo->ucSpecialFlags);
             pItem->PostChange();
         }
         else if (pItem->GetDataQuality() < SERVER_INFO_QUERY)
@@ -353,11 +370,11 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
             if (pItem->strVersion.empty())
                 pItem->strVersion = pInfo->strVersion;
             if (pItem->nPing == 9999)
-                pItem->nPing = pInfo->nPing;
+                pItem->nPing = static_cast<unsigned short>(pInfo->nPing);
             if (pItem->m_usHttpPort == 0)
-                pItem->m_usHttpPort = pInfo->usHttpPort;
+                pItem->m_usHttpPort = static_cast<unsigned short>(pInfo->usHttpPort);
             if (pItem->m_ucSpecialFlags == 0)
-                pItem->m_ucSpecialFlags = pInfo->ucSpecialFlags;
+                pItem->m_ucSpecialFlags = static_cast<unsigned char>(pInfo->ucSpecialFlags);
         }
     }
 }
@@ -371,6 +388,9 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
 ///////////////////////////////////////////////////////////////
 void CServerCache::SetServerCachedInfo(const CServerListItem* pItem)
 {
+    if (!pItem)
+        return;
+
     CCachedKey key;
     key.ulIp = pItem->Address.s_addr;
     key.usGamePort = pItem->usGamePort;
@@ -417,15 +437,21 @@ void CServerCache::SetServerCachedInfo(const CServerListItem* pItem)
 ///////////////////////////////////////////////////////////////
 void CServerCache::GetServerListCachedInfo(CServerList* pList)
 {
-    // Get cached info for each server
-    for (CServerListIterator it = pList->IteratorBegin(); it != pList->IteratorEnd(); it++)
-        GetServerCachedInfo(*it);
+    if (!pList)
+        return;
 
-    // Remove servers not in serverlist from cache
+    for (auto it = pList->IteratorBegin(); it != pList->IteratorEnd(); ++it)
+    {
+        if (*it)
+            GetServerCachedInfo(*it);
+    }
+
     std::map<CCachedKey, CCachedInfo> nextServerCachedMap;
-    for (CServerListIterator it = pList->IteratorBegin(); it != pList->IteratorEnd(); it++)
+    for (auto it = pList->IteratorBegin(); it != pList->IteratorEnd(); ++it)
     {
         CServerListItem* pItem = *it;
+        if (!pItem)
+            continue;
         CCachedKey       key;
         key.ulIp = pItem->Address.s_addr;
         key.usGamePort = pItem->usGamePort;
@@ -437,20 +463,42 @@ void CServerCache::GetServerListCachedInfo(CServerList* pList)
 
 ///////////////////////////////////////////////////////////////
 //
+// CServerCache::SetServerListCachedInfo
+//
+// Cache all servers in list
+//
+///////////////////////////////////////////////////////////////
+void CServerCache::SetServerListCachedInfo(CServerList* pList)
+{
+    if (!pList)
+        return;
+
+    for (auto it = pList->IteratorBegin(); it != pList->IteratorEnd(); ++it)
+    {
+        if (*it)
+            SetServerCachedInfo(*it);
+    }
+}
+
+///////////////////////////////////////////////////////////////
+//
 // CServerCache::GenerateServerList
 //
 // Create serverlist content from the cache
 //
 ///////////////////////////////////////////////////////////////
-bool CServerCache::GenerateServerList(CServerList* pList)
+bool CServerCache::GenerateServerList(CServerList* pList, bool bAllowNonResponding)
 {
-    for (std::map<CCachedKey, CCachedInfo>::iterator it = m_ServerCachedMap.begin(); it != m_ServerCachedMap.end(); ++it)
-    {
-        const CCachedKey&  key = it->first;
-        const CCachedInfo& info = it->second;
+    if (!pList)
+        return false;
 
-        // Don't add non responding servers
-        if (info.nMaxPlayers == 0 || info.uiCacheNoReplyCount > 3)
+    for (const auto& [key, info] : m_ServerCachedMap)
+    {
+
+        // When master server is offline, include all cached servers. Otherwise exclude servers that
+        // have consistently failed to respond (uiCacheNoReplyCount > 3). New servers without response data
+        // should still be included since they may not have been queried yet.
+        if (!bAllowNonResponding && (info.uiCacheNoReplyCount > 3))
             continue;
 
         ushort usGamePort = key.usGamePort;

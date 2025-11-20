@@ -11,6 +11,28 @@
 #include "StdInc.h"
 #include "CFileFormat.h"
 #include "CPixelsManager.h"
+#include <CrashTelemetry.h>
+
+namespace
+{
+    const char* PixelsFormatToString(EPixelsFormatType format)
+    {
+        switch (format)
+        {
+            case EPixelsFormat::PLAIN:
+                return "plain";
+            case EPixelsFormat::JPEG:
+                return "jpeg";
+            case EPixelsFormat::PNG:
+                return "png";
+            case EPixelsFormat::DDS:
+                return "dds";
+            case EPixelsFormat::UNKNOWN:
+            default:
+                return "unknown";
+        }
+    }
+}
 
 ///////////////////////////////////////////////////////////////
 // Object creation
@@ -118,7 +140,8 @@ bool CPixelsManager::GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CP
             // If not allowed, return dummy data
             uint uiPixelsWidth = 32;
             uint uiPixelsHeight = 32;
-            outPixels.SetSize(uiPixelsWidth * uiPixelsHeight * XRGB_BYTES_PER_PIXEL + SIZEOF_PLAIN_TAIL);
+            if (!outPixels.SetSize(uiPixelsWidth * uiPixelsHeight * XRGB_BYTES_PER_PIXEL + SIZEOF_PLAIN_TAIL))
+                return false;
             memset(outPixels.GetData(), 0xEF, outPixels.GetSize());
             bResult = SetPlainDimensions(outPixels, uiPixelsWidth, uiPixelsHeight);
         }
@@ -508,7 +531,8 @@ bool CPixelsManager::D3DXGetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixel
     {
         if (!FAILED(D3DXSaveSurfaceToFileInMemory(&dxBuffer, dxFileFormat, pD3DSurface, NULL, pRect)))
         {
-            outPixels.SetSize(dxBuffer->GetBufferSize());
+            if (!outPixels.SetSize(dxBuffer->GetBufferSize()))
+                return false;
             char* pPixelsData = outPixels.GetData();
             memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
             return true;
@@ -548,7 +572,8 @@ bool CPixelsManager::D3DXGetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixel
     // Extract pixels from converted texture
     if (!FAILED(D3DXSaveTextureToFileInMemory(&dxBuffer, dxFileFormat, pD3DTempTexture, NULL)))
     {
-        outPixels.SetSize(dxBuffer->GetBufferSize());
+        if (!outPixels.SetSize(dxBuffer->GetBufferSize()))
+            return false;
         char* pPixelsData = outPixels.GetData();
         memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
         return true;
@@ -702,8 +727,8 @@ bool CPixelsManager::SetPlainDimensions(CPixels& pixels, uint uiWidth, uint uiHe
     {
         // Fixup plain format tail
         WORD* pPlainTail = (WORD*)(pData + uiDataSize - SIZEOF_PLAIN_TAIL);
-        pPlainTail[0] = uiWidth;
-        pPlainTail[1] = uiHeight;
+        pPlainTail[0] = static_cast<WORD>(uiWidth);
+        pPlainTail[1] = static_cast<WORD>(uiHeight);
         return true;
     }
 
@@ -750,6 +775,22 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
     if (oldFormat == EPixelsFormat::UNKNOWN || newFormat == EPixelsFormat::UNKNOWN)
         return false;
 
+    const uint sourceBytes = oldPixels.GetSize();
+    uint       width = 0;
+    uint       height = 0;
+    GetPixelsSize(oldPixels, width, height);
+
+    SString telemetryDetail;
+    telemetryDetail.Format("%s->%s q=%d bytes=%u dims=%ux%u",
+                           PixelsFormatToString(oldFormat),
+                           PixelsFormatToString(newFormat),
+                           uiQuality,
+                           sourceBytes,
+                           width,
+                           height);
+    // Tag conversions here so crashes show which pixel formats/dimensions were being processed.
+    CrashTelemetry::Scope conversionScope(sourceBytes, oldPixels.GetData(), "Pixels::ChangeFormat", telemetryDetail.c_str());
+
     if (oldFormat == newFormat)
     {
         // No change
@@ -777,7 +818,8 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
             uint uiWidth, uiHeight;
             if (JpegDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight))
             {
-                newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL);
+                if (!newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL))
+                    return false;
                 return SetPlainDimensions(newPixels, uiWidth, uiHeight);
             }
         }
@@ -786,7 +828,8 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
             uint uiWidth, uiHeight;
             if (PngDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight))
             {
-                newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL);
+                if (!newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL))
+                    return false;
                 return SetPlainDimensions(newPixels, uiWidth, uiHeight);
             }
         }

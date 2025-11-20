@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/packets/CVoiceDataPacket.cpp
  *  PURPOSE:     Voice data packet class
  *
- *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,37 +15,17 @@
 
 CVoiceDataPacket::CVoiceDataPacket()
 {
-    m_pBuffer = NULL;
-    m_usDataBufferSize = 0;
-    m_usActualDataLength = 0;
-
-    AllocateBuffer(1024);
-}
-
-CVoiceDataPacket::CVoiceDataPacket(CPlayer* pPlayer, const unsigned char* pbSrcBuffer, unsigned short usLength)
-{
-    m_pBuffer = NULL;
-    m_usDataBufferSize = 0;
-    m_usActualDataLength = 0;
-
-    SetSourceElement(pPlayer);
-    SetData(pbSrcBuffer, usLength);
-}
-CVoiceDataPacket::~CVoiceDataPacket()
-{
-    DeallocateBuffer();
+    m_voiceBuffer.reserve(2048);
 }
 
 bool CVoiceDataPacket::Read(NetBitStreamInterface& BitStream)
 {
-    if (m_pBuffer)
+    unsigned short voiceBufferLength{};
+
+    if (BitStream.Read(voiceBufferLength) && voiceBufferLength <= m_voiceBuffer.capacity())
     {
-        BitStream.Read(m_usActualDataLength);
-        if (m_usActualDataLength)
-        {
-            BitStream.Read(reinterpret_cast<char*>(m_pBuffer), m_usActualDataLength <= m_usDataBufferSize ? m_usActualDataLength : m_usDataBufferSize);
-        }
-        return true;
+        m_voiceBuffer.resize(voiceBufferLength);
+        return BitStream.Read(reinterpret_cast<char*>(m_voiceBuffer.data()), m_voiceBuffer.size());
     }
 
     return false;
@@ -53,74 +33,29 @@ bool CVoiceDataPacket::Read(NetBitStreamInterface& BitStream)
 
 bool CVoiceDataPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    if (m_usActualDataLength)
+    if (!m_voiceBuffer.empty())
     {
+        const auto voiceBuffer = reinterpret_cast<const char*>(m_voiceBuffer.data());
+        const auto voiceBufferLength = static_cast<uint16_t>(m_voiceBuffer.size());
+
         // Write the source player
-        ElementID ID = m_pSourceElement->GetID();
-        BitStream.Write(ID);
+        BitStream.Write(m_pSourceElement->GetID());
         // Write the length as an unsigned short and then write the string
-        BitStream.Write(m_usActualDataLength);
-        BitStream.Write(reinterpret_cast<const char*>(m_pBuffer), m_usActualDataLength);
+        BitStream.Write(voiceBufferLength);
+        BitStream.Write(voiceBuffer, voiceBufferLength);
         return true;
     }
 
     return false;
 }
 
-void CVoiceDataPacket::AllocateBuffer(unsigned short usBufferSize)
+void CVoiceDataPacket::SetVoiceData(const unsigned char* voiceBuffer, unsigned short voiceBufferLength)
 {
-    // Test to see if we already have an allocated buffer
-    // that will hold the requested size.
-    if (m_usDataBufferSize < usBufferSize)
-    {
-        // It's not... resize the buffer.
-        if (m_pBuffer)
-        {
-            // Free the current buffer.
-            delete[] m_pBuffer;
-        }
+    m_voiceBuffer.clear();
 
-        // Allocate new buffer.
-        m_pBuffer = new unsigned char[usBufferSize];
+    if (!voiceBuffer || !voiceBufferLength || voiceBufferLength > m_voiceBuffer.capacity())
+        return;
 
-        // Clear buffer.
-        memset(m_pBuffer, 0, usBufferSize);
-
-        // Save the new size.
-        m_usDataBufferSize = usBufferSize;
-    }
-}
-
-void CVoiceDataPacket::DeallocateBuffer()
-{
-    if (m_pBuffer)
-    {
-        delete[] m_pBuffer;
-        m_pBuffer = NULL;
-        m_usDataBufferSize = 0;
-        m_usActualDataLength = 0;
-    }
-}
-
-void CVoiceDataPacket::SetData(const unsigned char* pbSrcBuffer, unsigned short usLength)
-{
-    // Allocate new buffer.
-    AllocateBuffer(usLength);
-
-    // Copy in the data.
-    if (m_pBuffer)
-    {
-        memcpy(m_pBuffer, pbSrcBuffer, usLength);
-        m_usActualDataLength = usLength;
-    }
-}
-
-const unsigned char* CVoiceDataPacket::GetData() const
-{
-    return m_pBuffer;
-}
-
-unsigned short CVoiceDataPacket::GetDataLength() const
-{
-    return m_usActualDataLength;
+    m_voiceBuffer.resize(voiceBufferLength);
+    std::copy_n(voiceBuffer, voiceBufferLength, m_voiceBuffer.data());
 }

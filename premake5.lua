@@ -26,7 +26,7 @@ workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 
 	if os.host() == "macosx" then
-		platforms { "x64", "arm64" }
+		platforms { "arm64" }
 	elseif os.host() == "windows" then
 		platforms { "x86", "x64", "arm64" }
 	else
@@ -42,7 +42,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 
-	cppdialect "C++17"
+	cppdialect "C++23"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
@@ -111,11 +111,11 @@ workspace "MTASA"
 		symbolspath "$(SolutionDir)Symbols\\$(Configuration)_$(Platform)\\$(ProjectName).pdb"
 
 	filter "system:windows"
-		toolset "v143"
+		toolset "v145"
 		preferredtoolarchitecture "x86_64"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
-		buildoptions { "/Zc:__cplusplus" }
+		buildoptions { "/Zc:__cplusplus", "/permissive-" }
 		includedirs {
 			path.join(dxdir, "Include")
 		}

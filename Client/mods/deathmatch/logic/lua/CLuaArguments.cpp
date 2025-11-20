@@ -202,6 +202,9 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
     assert(pLuaMain);
     TIMEUS startTime = GetTimeUs();
 
+    const SString& functionTag = pLuaMain->GetFunctionTag(iLuaFunction.ToInt());
+    CrashTelemetry::Scope telemetryScope(0, pLuaMain, "Lua::Call", functionTag.c_str());
+
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
     assert(luaVM);
@@ -244,7 +247,7 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
             lua_pop(luaVM, 1);
     }
 
-    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, functionTag, GetTimeUs() - startTime);
     return true;
 }
 
@@ -253,6 +256,8 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     assert(pLuaMain);
     assert(szFunction);
     TIMEUS startTime = GetTimeUs();
+
+    CrashTelemetry::Scope telemetryScope(0, pLuaMain, "Lua::CallGlobal", szFunction);
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
@@ -344,6 +349,14 @@ CLuaArgument* CLuaArguments::PushString(const std::string& string)
 }
 
 CLuaArgument* CLuaArguments::PushString(const std::string_view& string)
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
+CLuaArgument* CLuaArguments::PushString(const CStringName& string)
 {
     CLuaArgument* arg = new CLuaArgument();
     arg->ReadString(string);

@@ -1196,7 +1196,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     // Replace any path in the error message with our own one
     SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
     strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
-    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, strStatus);
+    argStream.SetCustomError(bIsRawData ? SStringX("raw data") : strFile, strStatus);
     m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1940,8 +1940,34 @@ int CLuaDrawingDefs::DxConvertPixels(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        CPixelsManagerInterface* const pPixelsManager = g_pCore->GetGraphics()->GetPixelsManager();
+        uint                          width = 0;
+        uint                          height = 0;
+        EPixelsFormatType             sourceFormat = EPixelsFormat::UNKNOWN;
+        if (pPixelsManager)
+        {
+            pPixelsManager->GetPixelsSize(pixels, width, height);
+            sourceFormat = pPixelsManager->GetPixelsFormat(pixels);
+        }
+
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+        const char* resourceName = pResource ? pResource->GetName() : "<no-resource>";
+
+        SString telemetryDetail;
+        telemetryDetail.Format("%s %s->%s q=%d bytes=%u dims=%ux%u",
+                               resourceName,
+                               EnumToString(sourceFormat).c_str(),
+                               EnumToString(format).c_str(),
+                               quality,
+                               pixels.GetSize(),
+                               width,
+                               height);
+        // Capture resource + pixel metadata so crash dumps show what attempted the conversion and with which formats.
+        CrashTelemetry::Scope telemetryScope(pixels.GetSize(), pLuaMain, "dxConvertPixels", telemetryDetail.c_str());
+
         CPixels newPixels;
-        if (g_pCore->GetGraphics()->GetPixelsManager()->ChangePixelsFormat(pixels, newPixels, format, quality))
+        if (pPixelsManager && pPixelsManager->ChangePixelsFormat(pixels, newPixels, format, quality))
         {
             lua_pushlstring(luaVM, newPixels.GetData(), newPixels.GetSize());
             return 1;

@@ -464,8 +464,8 @@ bool CNetAPI::IsSmallKeySyncNeeded(CClientPed* pPlayerModel)
         return true;
 
     // Movement direction buttons change ?
-    short LeftStickXDelta = abs(ControllerState.LeftStickX - LastControllerState.LeftStickX);
-    short LeftStickYDelta = abs(ControllerState.LeftStickY - LastControllerState.LeftStickY);
+    auto LeftStickXDelta = static_cast<short>(abs(ControllerState.LeftStickX - LastControllerState.LeftStickX));
+    auto LeftStickYDelta = static_cast<short>(abs(ControllerState.LeftStickY - LastControllerState.LeftStickY));
     if (LeftStickXDelta > 32 || LeftStickYDelta > 32)
     {
         // If movement within -127 to -1 or 1 to 127, then apply analog update limits
@@ -981,6 +981,12 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
     pPlayer->SetOnFire(flags.data.bIsOnFire);
     pPlayer->SetStealthAiming(flags.data.bStealthAiming);
 
+    if (flags.data.hangingDuringClimb && pPlayer->GetMovementState() != eMovementState::MOVEMENTSTATE_HANGING && pPlayer->GetMovementState() != eMovementState::MOVEMENTSTATE_CLIMB)
+        pPlayer->RunClimbingTask();
+
+    if (flags.data.bIsInWater && !pPlayer->IsInWater())
+        pPlayer->RunSwimTask();
+  
     // Remember now as the last puresync time
     pPlayer->SetLastPuresyncTime(CClientTime::GetTime());
     pPlayer->SetLastPuresyncPosition(position.data.vecPosition);
@@ -1112,6 +1118,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.bStealthAiming = (pPlayerModel->IsStealthAiming() == true);
     flags.data.isReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
     flags.data.animInterrupted = pPlayerModel->HasSyncedAnim() && (!pPlayerModel->IsRunningAnimation() || pPlayerModel->m_animationOverridedByClient);
+    flags.data.hangingDuringClimb = pPlayerModel->GetMovementState() == eMovementState::MOVEMENTSTATE_HANGING;
 
     // The animation has been overwritten or interrupted by the client
     if (flags.data.animInterrupted)
@@ -2204,19 +2211,19 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
     bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
 
     if (damage.data.bSyncDoors)
-        for (unsigned int i = 0; i < MAX_DOORS; ++i)
+        for (unsigned char i = 0; i < MAX_DOORS; ++i)
             pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i], flyingComponents);
 
     if (damage.data.bSyncWheels)
-        for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+        for (unsigned char i = 0; i < MAX_WHEELS; ++i)
             pVehicle->SetWheelStatus(i, damage.data.wheels.data.ucStates[i]);
 
     if (damage.data.bSyncPanels)
-        for (unsigned int i = 0; i < MAX_PANELS; ++i)
+        for (unsigned char i = 0; i < MAX_PANELS; ++i)
             pVehicle->SetPanelStatus(i, damage.data.panels.data.ucStates[i], flyingComponents);
 
     if (damage.data.bSyncLights)
-        for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+        for (unsigned char i = 0; i < MAX_LIGHTS; ++i)
             pVehicle->SetLightStatus(i, damage.data.lights.data.ucStates[i]);
 
     static_cast<CDeathmatchVehicle*>(pVehicle)->ResetDamageModelSync();

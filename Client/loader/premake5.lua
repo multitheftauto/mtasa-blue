@@ -3,9 +3,9 @@ project "Loader"
 	kind "SharedLib"
 	targetname "loader"
 	targetdir(buildpath("mta"))
-
-	filter "system:windows"
-		linkoptions { "/SAFESEH:NO" }
+	disablewarnings {
+		"4996", -- use of symbol with __declspec(deprecated)
+	}
 
 	includedirs {
 		"../../Shared/sdk",
