@@ -20,6 +20,7 @@ public:
 
     DECLARE_ELEMENT_RPC(GiveWeapon);
     DECLARE_ELEMENT_RPC(TakeWeapon);
+    DECLARE_ELEMENT_RPC(TakeWeapons);
     DECLARE_ELEMENT_RPC(TakeAllWeapons);
     DECLARE_ELEMENT_RPC(GiveWeaponAmmo);
     DECLARE_ELEMENT_RPC(TakeWeaponAmmo);
