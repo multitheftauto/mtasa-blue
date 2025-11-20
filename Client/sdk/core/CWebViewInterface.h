@@ -8,6 +8,11 @@
  *
  *****************************************************************************/
 #pragma once
+
+#include <functional>
+#include <string>
+#include <vector>
+
 #include "CWebCoreInterface.h"
 
 class CWebBrowserEventsInterface;
@@ -51,7 +56,7 @@ public:
     virtual CVector2D GetSize() = 0;
 
     // Ajax Handlers
-    using ajax_callback_t = const std::function<const SString(std::vector<SString>& vecGet, std::vector<SString>& vecPost)>;
+    using ajax_callback_t = const std::function<const std::string(std::vector<std::string>& vecGet, std::vector<std::string>& vecPost)>;
 
     virtual bool RegisterAjaxHandler(const SString& strURL) = 0;
     virtual bool UnregisterAjaxHandler(const SString& strURL) = 0;
