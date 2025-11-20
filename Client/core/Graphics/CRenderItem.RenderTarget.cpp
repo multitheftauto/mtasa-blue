@@ -246,6 +246,8 @@ bool CRenderTargetItem::ReadPixels(CBuffer& outBuffer, SString& strOutError)
     uint ulScreenHeight = Desc.Height;
     uint ulLineBytes = ulScreenWidth * 4;
     outBuffer.SetSize(ulLineBytes * ulScreenHeight);
+    if (outBuffer.GetSize() != ulLineBytes * ulScreenHeight)
+        return false;
     char* pDest = outBuffer.GetData();
 
     // Copy lines into a buffer

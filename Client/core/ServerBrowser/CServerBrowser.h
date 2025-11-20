@@ -91,8 +91,8 @@ public:
     std::string GetServerPassword(const std::string& strHost);
     void        ClearServerPasswords();
 
-    void SetStatusText(std::string strStatus);
-    void SetAddressBarText(std::string strText);
+    void SetStatusText(std::string_view strStatus);
+    void SetAddressBarText(std::string_view strText);
 
     CServerListItem* FindSelectedServer(ServerBrowserType Type);
     CServerListItem* FindServerFromRow(ServerBrowserType Type, int iRow);
@@ -202,6 +202,7 @@ protected:
 private:
     struct SFilterState;
     struct SListRefreshState;
+    struct SSortState;
 
     enum
     {
@@ -216,6 +217,7 @@ private:
     [[nodiscard]] CServerList* GetServerList(ServerBrowserType Type);
     void         AddServerToList(CServerListItem* pServer, ServerBrowserType Type, const SFilterState& filterState);
     bool         RemoveSelectedServerFromRecentlyPlayedList();
+    void         UpdateFilteredPlayerCountStatus(ServerBrowserType Type, CServerList* pDataList = nullptr);
 
     bool OnClick(CGUIElement* pElement);
     bool OnDoubleClick(CGUIElement* pElement);
@@ -242,6 +244,7 @@ private:
 
     bool OnServerListChangeRow(CGUIKeyEventArgs Args);
     bool OnServerListKeyDown(CGUIKeyEventArgs Args);
+    bool OnServerListSortChanged(CGUIElement* pElement);
 
     ServerBrowserType GetCurrentServerBrowserType();
     ServerBrowserType GetCurrentServerBrowserTypeForSave();
@@ -256,6 +259,8 @@ private:
     bool ProcessServerListRefreshBatch(ServerBrowserType type, std::size_t uiMaxSteps);
     void ProcessPendingListRefreshes();
     void SuspendServerLists();
+    void UpdateSortState(ServerBrowserType type);
+    void ApplyListSort(ServerBrowserType type, unsigned int uiColumn, SortDirection direction, bool bUpdateStoredState = false);
     [[nodiscard]] bool        IsListRefreshInProgress(ServerBrowserType type) const;
     [[nodiscard]] std::size_t GetListRefreshBatchSize() const;
     [[nodiscard]] std::size_t GetHiddenListRefreshBatchSize() const;
@@ -289,6 +294,12 @@ private:
         std::optional<SFilterState> filterSnapshot;
     };
 
+    struct SSortState
+    {
+        unsigned int  uiColumn = 0;
+        SortDirection direction = SortDirections::None;
+    };
+
     CServerListInternet m_ServersInternet;
     CServerListLAN      m_ServersLAN;
     CServerList         m_ServersFavourites;
@@ -318,10 +329,16 @@ private:
     bool m_bPendingFilterUpdate[SERVER_BROWSER_TYPE_COUNT];
     unsigned long m_ulNextFilterUpdateTime[SERVER_BROWSER_TYPE_COUNT];
     SFilterState  m_FilterState[SERVER_BROWSER_TYPE_COUNT];
+    SSortState    m_SortState[SERVER_BROWSER_TYPE_COUNT];
 
     bool          m_bPendingConfigSave;
     unsigned long m_ulNextConfigSaveTime;
     SListRefreshState m_ListRefreshState[SERVER_BROWSER_TYPE_COUNT];
     unsigned long m_ulNextListLayoutTime[SERVER_BROWSER_TYPE_COUNT] = {};
     unsigned long m_ulHiddenRefreshBoostEnableTime = 0;
+    int           m_iIgnoreSortCallbacks = 0;
+
+    // Player list retry tracking - retry queries for servers that haven't responded with player data
+    CServerListItem* m_pLastSelectedServerForPlayerList[SERVER_BROWSER_TYPE_COUNT] = {};
+    std::chrono::milliseconds m_msLastPlayerListQueryRetryTime[SERVER_BROWSER_TYPE_COUNT] = {};
 };
