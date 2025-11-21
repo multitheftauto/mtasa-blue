@@ -4,6 +4,7 @@ project "zip"
 	targetname "zip"
 
 	includedirs  { "../zlib" }
+	defines { "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP", "IOWIN32_USING_WINRT_API=0" }
 
 	vpaths {
 		["Headers/*"] = "**.h",
