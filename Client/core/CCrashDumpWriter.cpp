@@ -1316,7 +1316,11 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    LogExceptionDetails(pException);
+    const BOOL exceptionLogged = LogExceptionDetails(pException);
+    if (exceptionLogged == FALSE)
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - LogExceptionDetails failed\n");
+    }
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: FATAL EXCEPTION - Begin crash processing\n");
