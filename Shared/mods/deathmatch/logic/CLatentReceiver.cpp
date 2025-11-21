@@ -134,8 +134,7 @@ void CLatentReceiver::OnReceive(NetBitStreamInterface* pBitStream)
         activeRx.usCategory = usCategory;
         activeRx.uiRate = uiRate;
         activeRx.usResourceNetId = usResourceNetId;
-        if (!activeRx.buffer.SetSize(uiFinalSize))
-            return OnReceiveError("Failed to allocate buffer (out of mem)");
+        activeRx.buffer.SetSize(uiFinalSize);
         activeRx.uiWritePosition = 0;
     }
 

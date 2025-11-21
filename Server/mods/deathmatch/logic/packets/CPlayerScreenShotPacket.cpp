@@ -64,8 +64,7 @@ bool CPlayerScreenShotPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(usNumBytes))
             return false;
 
-        if (!m_buffer.SetSize(usNumBytes))
-            return false;
+        m_buffer.SetSize(usNumBytes);
         if (!BitStream.Read(m_buffer.GetData(), m_buffer.GetSize()))
             return false;
 
