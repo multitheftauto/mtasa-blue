@@ -102,6 +102,14 @@ CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
+void CStaticFunctionDefinitions::PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents)
+{
+    m_pCore = pCore;
+    m_pGame = pGame;
+    m_pClientGame = pClientGame;
+    m_pEvents = pEvents;
+}
+
 bool CStaticFunctionDefinitions::AddEvent(CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger)
 {
     assert(szName);
@@ -261,6 +269,9 @@ bool CStaticFunctionDefinitions::ClearChatBox()
 
 bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded)
 {
+    if (!m_pCore || !g_pClientGame || !szText)
+        return false;
+
     if (strlen(szText) <= MAX_OUTPUTCHATBOX_LENGTH)
     {
         CLuaArguments Arguments;
