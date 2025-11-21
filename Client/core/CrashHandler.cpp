@@ -1154,8 +1154,8 @@ static void InstallAbortHandlers()
 
     bool disableSehDetourBool{false};
     bool forceSehDetourBool{false};
-    TryReadEnvBool("MTA_DISABLE_SEH_DETOUR", disableSehDetourBool);
-    TryReadEnvBool("MTA_FORCE_SEH_DETOUR", forceSehDetourBool);
+    [[maybe_unused]] const auto readDisableResult = TryReadEnvBool("MTA_DISABLE_SEH_DETOUR", disableSehDetourBool);
+    [[maybe_unused]] const auto readForceResult = TryReadEnvBool("MTA_FORCE_SEH_DETOUR", forceSehDetourBool);
 
     pConfig->disableSehDetour = disableSehDetourBool ? TRUE : FALSE;
     pConfig->forceSehDetour = forceSehDetourBool ? TRUE : FALSE;
@@ -1352,7 +1352,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
             {
                 initialized = true;
                 constexpr auto symOptions = SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS;
-                SymSetOptions(symOptions);
+                [[maybe_unused]] const auto previousOptions = SymSetOptions(symOptions);
             }
         }
 
