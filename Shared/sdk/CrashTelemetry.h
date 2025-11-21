@@ -99,7 +99,7 @@ namespace detail
         }
 
         template <typename Callback>
-        void VisitNewestFirst(Callback&& callback) const noexcept
+        void VisitNewestFirst(Callback&& callback) const
         {
             for (std::size_t i = 0; i < size; ++i)
             {
@@ -149,7 +149,7 @@ namespace detail
     inline void SetAllocationContext(std::size_t sizeBytes,
                                      const void* resourcePtr,
                                      const char* resourceTag,
-                                     const char* detail) noexcept
+                                     const char* detail)
     {
         Context& current = detail::GetThreadState().current;
         current.requestedSize = sizeBytes;
@@ -192,7 +192,7 @@ namespace detail
         return state.current.requestedSize;
     }
 
-    inline std::string BuildAllocationTelemetryNote() noexcept
+    inline std::string BuildAllocationTelemetryNote()
     {
         std::array<Context, detail::kHistoryCapacity> snapshot{};
         std::size_t snapshotCount = 0;
@@ -347,7 +347,7 @@ namespace detail
         Scope(std::size_t sizeBytes,
               const void* resourcePtr,
               const char* resourceTag,
-              const char* detail) noexcept
+              const char* detail)
             : m_previous(CaptureContext()), m_restore(true)
         {
             SetAllocationContext(sizeBytes, resourcePtr, resourceTag, detail);
@@ -356,11 +356,15 @@ namespace detail
             // including nullptr dereferences, retains the last context in telemetry dumps.
             detail::RecordManualScopeSnapshot();
         }
-        ~Scope()
+        ~Scope() noexcept
         {
-            if (m_restore)
-            {
-                RestoreContext(m_previous);
+            try {
+                if (m_restore)
+                {
+                    RestoreContext(m_previous);
+                }
+            } catch (...) {
+                // Destructor must not throw
             }
         }
 
@@ -379,7 +383,7 @@ namespace detail
     inline void SetAllocationContext(std::size_t,
                                      const void*,
                                      const char*,
-                                     const char*) noexcept
+                                     const char*)
     {
     }
 
@@ -387,13 +391,13 @@ namespace detail
 
     inline Context CaptureContext() noexcept { return Context{}; }
     inline void RestoreContext(const Context&) noexcept {}
-    inline std::string BuildAllocationTelemetryNote() noexcept { return {}; }
+    inline std::string BuildAllocationTelemetryNote() { try { return {}; } catch (...) { return {}; } }
 
     class Scope
     {
     public:
         Scope(std::size_t, const void*, const char*, const char*) noexcept {}
-        ~Scope() = default;
+        ~Scope() noexcept = default;
 
         Scope(const Scope&) = delete;
         Scope& operator=(const Scope&) = delete;
