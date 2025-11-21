@@ -31,11 +31,11 @@
 #include <DbgHelp.h>
 #pragma comment(lib, "dbghelp.lib")
 
-static void DebugPrintExceptionInfo([[maybe_unused]] const char* /*message*/) noexcept
+static void DebugPrintExceptionInfo([[maybe_unused]] const char* /*message*/)
 {
 }
 
-[[nodiscard]] static bool ValidateExceptionContext(_EXCEPTION_POINTERS* pException) noexcept
+[[nodiscard]] static bool ValidateExceptionContext(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr)
         return false;
@@ -90,7 +90,7 @@ constexpr std::size_t MAX_STACK_WALK_DEPTH = 16;
 constexpr std::size_t MAX_STACK_FRAMES = 32;
 constexpr std::size_t MAX_SYMBOL_NAME = 256;
 
-[[nodiscard]] static bool CopyModulePathToBuffer(const char* source, char* destination, std::size_t destinationSize, const char* context) noexcept
+[[nodiscard]] static bool CopyModulePathToBuffer(const char* source, char* destination, std::size_t destinationSize, const char* context)
 {
     if (source == nullptr || destination == nullptr || destinationSize == 0U)
         return false;
@@ -129,7 +129,7 @@ constexpr std::size_t MAX_FILE_NAME = 260;
 class SymbolHandlerGuard
 {
 public:
-    explicit SymbolHandlerGuard(HANDLE process) noexcept : m_process(process), m_initialized(false), m_uncaughtExceptions(std::uncaught_exceptions())
+    explicit SymbolHandlerGuard(HANDLE process) : m_process(process), m_initialized(false), m_uncaughtExceptions(std::uncaught_exceptions())
     {
         if (m_process != nullptr)
         {
@@ -148,7 +148,7 @@ public:
         }
     }
 
-    ~SymbolHandlerGuard() noexcept
+    ~SymbolHandlerGuard()
     {
         if (m_initialized)
         {
@@ -165,7 +165,7 @@ public:
     SymbolHandlerGuard(SymbolHandlerGuard&&) = delete;
     SymbolHandlerGuard& operator=(SymbolHandlerGuard&&) = delete;
 
-    bool IsInitialized() const noexcept { return m_initialized; }
+    bool IsInitialized() const { return m_initialized; }
 
 private:
     HANDLE m_process;
@@ -173,7 +173,7 @@ private:
     int    m_uncaughtExceptions;
 };
 
-[[nodiscard]] static std::optional<std::vector<std::string>> CaptureEnhancedStackTrace(_EXCEPTION_POINTERS* pException) noexcept
+[[nodiscard]] static std::optional<std::vector<std::string>> CaptureEnhancedStackTrace(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return std::nullopt;
@@ -269,7 +269,7 @@ private:
     return result;
 }
 
-CExceptionInformation_Impl::CExceptionInformation_Impl() noexcept
+CExceptionInformation_Impl::CExceptionInformation_Impl()
     : m_uiCode(0),
       m_pAddress(nullptr),
       m_szModulePathName(nullptr),
@@ -302,11 +302,11 @@ CExceptionInformation_Impl::CExceptionInformation_Impl() noexcept
 {
 }
 
-CExceptionInformation_Impl::~CExceptionInformation_Impl() noexcept
+CExceptionInformation_Impl::~CExceptionInformation_Impl()
 {
 }
 
-void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException) noexcept
+void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException)
 {
     if (!ValidateExceptionContext(pException))
     {
@@ -679,7 +679,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     }
 }
 
-bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress) noexcept
+bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress)
 {
     if (pQueryAddress == nullptr || szOutputBuffer == nullptr || ppModuleBaseAddress == nullptr)
     {
@@ -775,7 +775,7 @@ struct ExceptionDetails
     bool             isValid;
 };
 
-[[nodiscard]] static ExceptionDetails GetExceptionDetails(_EXCEPTION_POINTERS* pException) noexcept
+[[nodiscard]] static ExceptionDetails GetExceptionDetails(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
     {
@@ -786,7 +786,7 @@ struct ExceptionDetails
     return ExceptionDetails{record.ExceptionCode, record.ExceptionAddress, "Valid exception", true};
 }
 
-std::optional<std::vector<std::string>> CExceptionInformation_Impl::GetStackTrace() const noexcept
+std::optional<std::vector<std::string>> CExceptionInformation_Impl::GetStackTrace() const
 {
     if (!m_hasDetailedStackTrace || m_stackTrace.empty())
         return std::nullopt;
@@ -794,22 +794,22 @@ std::optional<std::vector<std::string>> CExceptionInformation_Impl::GetStackTrac
     return m_stackTrace;
 }
 
-std::optional<std::chrono::system_clock::time_point> CExceptionInformation_Impl::GetTimestamp() const noexcept
+std::optional<std::chrono::system_clock::time_point> CExceptionInformation_Impl::GetTimestamp() const
 {
     return m_timestamp;
 }
 
-DWORD CExceptionInformation_Impl::GetThreadId() const noexcept
+DWORD CExceptionInformation_Impl::GetThreadId() const
 {
     return m_threadId;
 }
 
-DWORD CExceptionInformation_Impl::GetProcessId() const noexcept
+DWORD CExceptionInformation_Impl::GetProcessId() const
 {
     return m_processId;
 }
 
-std::string CExceptionInformation_Impl::GetExceptionDescription() const noexcept
+std::string CExceptionInformation_Impl::GetExceptionDescription() const
 {
     std::string description;
     description.reserve(256);
@@ -835,22 +835,22 @@ std::string CExceptionInformation_Impl::GetExceptionDescription() const noexcept
     return description;
 }
 
-bool CExceptionInformation_Impl::HasDetailedStackTrace() const noexcept
+bool CExceptionInformation_Impl::HasDetailedStackTrace() const
 {
     return m_hasDetailedStackTrace;
 }
 
-std::optional<std::exception_ptr> CExceptionInformation_Impl::GetCapturedException() const noexcept
+std::optional<std::exception_ptr> CExceptionInformation_Impl::GetCapturedException() const
 {
     return m_capturedException ? std::optional{m_capturedException} : std::nullopt;
 }
 
-int CExceptionInformation_Impl::GetUncaughtExceptionCount() const noexcept
+int CExceptionInformation_Impl::GetUncaughtExceptionCount() const
 {
     return m_uncaughtExceptionCount;
 }
 
-void CExceptionInformation_Impl::CaptureCurrentException() noexcept
+void CExceptionInformation_Impl::CaptureCurrentException()
 {
     const int uncaught = std::uncaught_exceptions();
     if (uncaught <= 0)
@@ -872,7 +872,7 @@ void CExceptionInformation_Impl::CaptureCurrentException() noexcept
     m_uncaughtExceptionCount = uncaught;
 }
 
-void CExceptionInformation_Impl::UpdateModuleBaseNameFromCurrentPath() noexcept
+void CExceptionInformation_Impl::UpdateModuleBaseNameFromCurrentPath()
 {
     m_moduleBaseNameStorage.clear();
     m_szModuleBaseName = nullptr;
@@ -894,14 +894,14 @@ void CExceptionInformation_Impl::UpdateModuleBaseNameFromCurrentPath() noexcept
     m_szModuleBaseName = m_moduleBaseNameStorage.c_str();
 }
 
-void CExceptionInformation_Impl::ClearModulePathState() noexcept
+void CExceptionInformation_Impl::ClearModulePathState()
 {
     m_szModulePathName.reset();
     m_moduleBaseNameStorage.clear();
     m_szModuleBaseName = nullptr;
 }
 
-[[nodiscard]] static std::optional<std::string> GetSafeModulePath(std::string_view modulePath) noexcept
+[[nodiscard]] static std::optional<std::string> GetSafeModulePath(std::string_view modulePath)
 {
     try
     {
@@ -922,7 +922,7 @@ void CExceptionInformation_Impl::ClearModulePathState() noexcept
     }
 }
 
-[[nodiscard]] static std::optional<std::vector<uint8_t>> CaptureMemoryDump(void* address, std::size_t size) noexcept
+[[nodiscard]] static std::optional<std::vector<uint8_t>> CaptureMemoryDump(void* address, std::size_t size)
 {
     if (address == nullptr || size == 0)
         return std::nullopt;

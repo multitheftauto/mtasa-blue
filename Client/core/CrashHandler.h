@@ -86,7 +86,7 @@ inline constexpr std::string_view DEBUG_PREFIX_EXCEPTION_INFO = "ExceptionInfo: 
 inline constexpr std::string_view DEBUG_PREFIX_WATCHDOG = "WATCHDOG: ";
 inline constexpr std::string_view DEBUG_SEPARATOR = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 
-inline void SafeDebugOutput(std::string_view message) noexcept
+inline void SafeDebugOutput(std::string_view message)
 {
     const char* data = message.data();
     std::size_t remaining = message.size();
@@ -111,7 +111,7 @@ inline void SafeDebugOutput(std::string_view message) noexcept
 }
 
 // Overload for C-string literals (backward compatibility)
-inline void SafeDebugOutput(const char* message) noexcept
+inline void SafeDebugOutput(const char* message)
 {
     if (message != nullptr)
     {
@@ -120,7 +120,7 @@ inline void SafeDebugOutput(const char* message) noexcept
 }
 
 // Overload for std::string (for string_view concatenation)
-inline void SafeDebugOutput(const std::string& message) noexcept
+inline void SafeDebugOutput(const std::string& message)
 {
     if (!message.empty())
     {
@@ -129,7 +129,7 @@ inline void SafeDebugOutput(const std::string& message) noexcept
 }
 
 template <typename Buffer>
-inline void SafeDebugPrint(Buffer& buffer, const char* format, ...) noexcept
+inline void SafeDebugPrint(Buffer& buffer, const char* format, ...)
 {
     if (format == nullptr)
         return;
@@ -153,7 +153,7 @@ inline void SafeDebugPrint(Buffer& buffer, const char* format, ...) noexcept
     }
 }
 
-inline void SafeDebugPrintC(char* buffer, std::size_t bufferSize, const char* format, ...) noexcept
+inline void SafeDebugPrintC(char* buffer, std::size_t bufferSize, const char* format, ...)
 {
     if (buffer == nullptr || bufferSize == 0 || format == nullptr)
         return;
@@ -172,7 +172,7 @@ inline void SafeDebugPrintC(char* buffer, std::size_t bufferSize, const char* fo
 #define SAFE_DEBUG_PRINT(buffer, ...) SafeDebugPrint((buffer), __VA_ARGS__)
 #define SAFE_DEBUG_PRINT_C(buffer, bufferSize, ...) SafeDebugPrintC((buffer), (bufferSize), __VA_ARGS__)
 
-inline void SafeDebugPrintPrefixed(std::string_view prefix, const char* format, ...) noexcept
+inline void SafeDebugPrintPrefixed(std::string_view prefix, const char* format, ...)
 {
     if (format == nullptr)
         return;
@@ -235,17 +235,17 @@ extern "C"
         std::string additionalInfo;
     } ENHANCED_EXCEPTION_INFO, *PENHANCED_EXCEPTION_INFO;
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn) noexcept;
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn);
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableStackCookieFailureCapture(BOOL bEnable) noexcept;
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableStackCookieFailureCapture(BOOL bEnable);
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetEnhancedExceptionInfo(PENHANCED_EXCEPTION_INFO pExceptionInfo) noexcept;
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetEnhancedExceptionInfo(PENHANCED_EXCEPTION_INFO pExceptionInfo);
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureCurrentException() noexcept;
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureCurrentException();
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall LogExceptionDetails(EXCEPTION_POINTERS* pException) noexcept;
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall LogExceptionDetails(EXCEPTION_POINTERS* pException);
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall IsFatalException(DWORD exceptionCode) noexcept;
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall IsFatalException(DWORD exceptionCode);
 
     typedef struct _CRASH_HANDLER_CONFIG
     {
@@ -260,24 +260,24 @@ extern "C"
         DWORD debugBufferSize;
     } CRASH_HANDLER_CONFIG, *PCRASH_HANDLER_CONFIG;
 
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig) noexcept;
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig);
 
     BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames,
-                                                                  std::vector<std::string>* pOutTrace) noexcept;
+                                                                  std::vector<std::string>* pOutTrace);
 
-    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableSehExceptionHandler() noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableSehExceptionHandler();
 
-    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall SetInitializationPhase(DWORD phase) noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall SetInitializationPhase(DWORD phase);
 
-    [[nodiscard]] DWORD BUGSUTIL_DLLINTERFACE __stdcall GetInitializationPhase() noexcept;
+    [[nodiscard]] DWORD BUGSUTIL_DLLINTERFACE __stdcall GetInitializationPhase();
 
-    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization() noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization();
 
-    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds = 20) noexcept;
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds = 20);
 
-    void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread() noexcept;
+    void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread();
 
-    void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat() noexcept;
+    void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat();
 
 #ifdef __cplusplus
 }
