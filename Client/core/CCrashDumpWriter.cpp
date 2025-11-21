@@ -51,12 +51,12 @@ static constexpr int         SCREEN_MARGIN_PIXELS = 50;
 static constexpr int         EMERGENCY_MSGBOX_WIDTH = 600;
 static constexpr int         EMERGENCY_MSGBOX_HEIGHT = 200;
 
-constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
+constexpr DWORD Milliseconds(std::chrono::milliseconds duration)
 {
     return static_cast<DWORD>(duration.count());
 }
 
-[[nodiscard]] static DWORD ResolveCrashExitCode(const _EXCEPTION_POINTERS* exceptionPtrs) noexcept
+[[nodiscard]] static DWORD ResolveCrashExitCode(const _EXCEPTION_POINTERS* exceptionPtrs)
 {
     if (const auto* record = (exceptionPtrs != nullptr) ? exceptionPtrs->ExceptionRecord : nullptr;
         record != nullptr && record->ExceptionCode != 0)
@@ -67,7 +67,7 @@ constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
     return CRASH_EXIT_CODE;
 }
 
-[[noreturn]] static void TerminateCurrentProcessWithExitCode(DWORD exitCode) noexcept
+[[noreturn]] static void TerminateCurrentProcessWithExitCode(DWORD exitCode)
 {
     if (exitCode == 0)
     {
@@ -82,7 +82,7 @@ constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
 
 class CClientBase;
 
-static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue) noexcept
+static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue)
 {
     __try
     {
@@ -95,7 +95,7 @@ static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue) noexcep
     }
 }
 
-static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInformation_Impl* pExceptionInformation, bool& outHandled) noexcept
+static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInformation_Impl* pExceptionInformation, bool& outHandled)
 {
     outHandled = false;
 
@@ -116,7 +116,7 @@ static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInfo
 
 namespace
 {
-    void ConfigureDbgHelpOptions() noexcept
+    void ConfigureDbgHelpOptions()
     {
         static std::atomic_flag configured = ATOMIC_FLAG_INIT;
         if (!configured.test_and_set(std::memory_order_acq_rel))
@@ -125,7 +125,7 @@ namespace
         }
     }
     
-    std::mutex& GetSymInitMutex() noexcept
+    std::mutex& GetSymInitMutex()
     {
         static std::mutex symMutex;
         return symMutex;
@@ -135,7 +135,7 @@ namespace
 class SymbolHandlerGuard
 {
 public:
-    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) noexcept : m_process(process), m_initialized(false)
+    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) : m_process(process), m_initialized(false)
     {
         if (!enableSymbols)
             return;
@@ -154,7 +154,7 @@ public:
         }
     }
 
-    ~SymbolHandlerGuard() noexcept
+    ~SymbolHandlerGuard()
     {
         if (m_initialized)
             SymCleanup(m_process);
@@ -165,7 +165,7 @@ public:
     SymbolHandlerGuard(SymbolHandlerGuard&&) = delete;
     SymbolHandlerGuard& operator=(SymbolHandlerGuard&&) = delete;
 
-    bool IsInitialized() const noexcept { return m_initialized; }
+    bool IsInitialized() const { return m_initialized; }
 
 private:
     HANDLE m_process;
@@ -280,7 +280,7 @@ static HANDLE                                              ms_hCrashDialogProces
     return candidates;
 }
 
-[[nodiscard]] static inline constexpr bool IsValidHandle(HANDLE handle) noexcept
+[[nodiscard]] static inline constexpr bool IsValidHandle(HANDLE handle)
 {
     return handle != nullptr && handle != INVALID_HANDLE_VALUE;
 }
@@ -288,15 +288,15 @@ static HANDLE                                              ms_hCrashDialogProces
 class UniqueHandle
 {
 public:
-    UniqueHandle() noexcept = default;
-    explicit UniqueHandle(HANDLE handle) noexcept : m_handle(handle) {}
-    ~UniqueHandle() noexcept { reset(); }
+    UniqueHandle() = default;
+    explicit UniqueHandle(HANDLE handle) : m_handle(handle) {}
+    ~UniqueHandle() { reset(); }
 
     UniqueHandle(const UniqueHandle&) = delete;
     UniqueHandle& operator=(const UniqueHandle&) = delete;
 
-    UniqueHandle(UniqueHandle&& other) noexcept : m_handle(other.release()) {}
-    UniqueHandle& operator=(UniqueHandle&& other) noexcept
+    UniqueHandle(UniqueHandle&& other) : m_handle(other.release()) {}
+    UniqueHandle& operator=(UniqueHandle&& other)
     {
         if (this != &other)
         {
@@ -306,29 +306,29 @@ public:
         return *this;
     }
 
-    void reset(HANDLE handle = nullptr) noexcept
+    void reset(HANDLE handle = nullptr)
     {
         if (IsValidHandle(m_handle))
             CloseHandle(m_handle);
         m_handle = handle;
     }
 
-    [[nodiscard]] HANDLE get() const noexcept { return m_handle; }
+    [[nodiscard]] HANDLE get() const { return m_handle; }
 
-    [[nodiscard]] HANDLE release() noexcept
+    [[nodiscard]] HANDLE release()
     {
         HANDLE handle = m_handle;
         m_handle = nullptr;
         return handle;
     }
 
-    [[nodiscard]] explicit operator bool() const noexcept { return IsValidHandle(m_handle); }
+    [[nodiscard]] explicit operator bool() const { return IsValidHandle(m_handle); }
 
 private:
     HANDLE m_handle = nullptr;
 };
 
-static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformation) noexcept
+static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformation)
 {
     if (pExceptionInformation == nullptr)
     {
@@ -528,7 +528,7 @@ static void AppendCrashDiagnostics(const SString& text)
     WriteDebugEvent(text.Replace("\n", " "));
 }
 
-[[nodiscard]] static bool CaptureStackTraceText(_EXCEPTION_POINTERS* pException, SString& outText) noexcept
+[[nodiscard]] static bool CaptureStackTraceText(_EXCEPTION_POINTERS* pException, SString& outText)
 {
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return false;
@@ -650,7 +650,7 @@ static void AppendCrashDiagnostics(const SString& text)
     return !outText.empty();
 }
 
-static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException) noexcept
+static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException)
 {
     bool expected = false;
     if (!ms_bFallbackStackLogged.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
@@ -668,7 +668,7 @@ static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException) noexcept
 }
 
 // Helper function to safely read callback exception context (uses SEH)
-static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException) noexcept
+static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException)
 {
     __try
     {
@@ -1177,7 +1177,7 @@ void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing()
 }
 
 // Helper to safely read exception code using SEH
-static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException) noexcept
+static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException)
 {
     DWORD exceptionCode = 0;
     __try
@@ -1199,7 +1199,7 @@ static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException) noexcept
 }
 
 // Helper to get MTA path as C string for SEH contexts (avoids SString unwinding issues)
-static const char* GetMTAPathForSEH() noexcept
+static const char* GetMTAPathForSEH()
 {
     static char szPath[MAX_PATH] = {0};
     static bool initialized = false;
@@ -1215,7 +1215,7 @@ static const char* GetMTAPathForSEH() noexcept
 }
 
 // Helper to write reentrant flag file using only SEH
-static void TryWriteReentrantFlag(DWORD exceptionCode) noexcept
+static void TryWriteReentrantFlag(DWORD exceptionCode)
 {
     // Use static buffer to avoid SString (which requires object unwinding)
     static char szFlagPath[MAX_PATH];
@@ -1244,7 +1244,7 @@ static void TryWriteReentrantFlag(DWORD exceptionCode) noexcept
 }
 
 // Helper to re-read exception code with SEH protection (no C++ exception handling)
-static DWORD SafeRereadExceptionCode(_EXCEPTION_POINTERS* pException, DWORD fallback) noexcept
+static DWORD SafeRereadExceptionCode(_EXCEPTION_POINTERS* pException, DWORD fallback)
 {
     DWORD exceptionCode = fallback;
     __try
@@ -1906,12 +1906,12 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
                 capturedFrames.reserve(lineCount);
                 
                 std::transform(lines.cbegin(), lines.cend(), std::back_inserter(capturedFrames),
-                    [](const auto& line) noexcept -> std::string {
+                    [](const auto& line) -> std::string {
                         return std::string{line.c_str()};
                     });
 
                 const auto newEnd = std::remove_if(capturedFrames.begin(), capturedFrames.end(),
-                    [](const auto& frame) noexcept -> bool {
+                    [](const auto& frame) -> bool {
                         return frame.empty();
                     });
                 capturedFrames.erase(newEnd, capturedFrames.end());
@@ -1973,7 +1973,7 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         
         [[maybe_unused]] const auto allFramesValid = 
             std::all_of(frames.cbegin(), std::next(frames.cbegin(), static_cast<std::ptrdiff_t>(maxFrames)), 
-                       [](const auto& frame) constexpr noexcept -> bool { return !frame.empty(); });
+                       [](const auto& frame) constexpr -> bool { return !frame.empty(); });
         
         for (std::size_t i{}; i < maxFrames; ++i)
         {
