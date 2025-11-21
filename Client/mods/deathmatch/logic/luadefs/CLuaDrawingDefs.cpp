@@ -1940,34 +1940,8 @@ int CLuaDrawingDefs::DxConvertPixels(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CPixelsManagerInterface* const pPixelsManager = g_pCore->GetGraphics()->GetPixelsManager();
-        uint                          width = 0;
-        uint                          height = 0;
-        EPixelsFormatType             sourceFormat = EPixelsFormat::UNKNOWN;
-        if (pPixelsManager)
-        {
-            pPixelsManager->GetPixelsSize(pixels, width, height);
-            sourceFormat = pPixelsManager->GetPixelsFormat(pixels);
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
-        const char* resourceName = pResource ? pResource->GetName() : "<no-resource>";
-
-        SString telemetryDetail;
-        telemetryDetail.Format("%s %s->%s q=%d bytes=%u dims=%ux%u",
-                               resourceName,
-                               EnumToString(sourceFormat).c_str(),
-                               EnumToString(format).c_str(),
-                               quality,
-                               pixels.GetSize(),
-                               width,
-                               height);
-        // Capture resource + pixel metadata so crash dumps show what attempted the conversion and with which formats.
-        CrashTelemetry::Scope telemetryScope(pixels.GetSize(), pLuaMain, "dxConvertPixels", telemetryDetail.c_str());
-
         CPixels newPixels;
-        if (pPixelsManager && pPixelsManager->ChangePixelsFormat(pixels, newPixels, format, quality))
+        if (g_pCore->GetGraphics()->GetPixelsManager()->ChangePixelsFormat(pixels, newPixels, format, quality))
         {
             lua_pushlstring(luaVM, newPixels.GetData(), newPixels.GetSize());
             return 1;
