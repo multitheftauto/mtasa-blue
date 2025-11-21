@@ -21,4 +21,7 @@ project "tinygettext"
 	}
 
 	filter "system:windows"
-		disablewarnings { "4800", "4309", "4503", "4099", "4503" }
+		disablewarnings { "4800", "4309", "4503", "4099" }
+
+	filter { "system:linux or macosx" }
+		buildoptions { "-Wno-unused-parameter", "-Wno-unused-variable" }

@@ -21,10 +21,10 @@
 #include <fstream>
 #ifdef WIN32
   #include <windows.h>
-  #include <UTF8.h>
+  #include "UTF8.h"
   #include <dirent_win32.h>
   #ifdef TGT_STANDALONE
-    #include <UTF8.hpp>
+    #include "UTF8.hpp"
   #endif
 #else
   #include <dirent.h>
