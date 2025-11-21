@@ -151,7 +151,7 @@ WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
     MoveSequencesWithDummies(pAnimationHierarchy, MapOfSequences);
     WORD cSequences = m_kcIFPSequences + wUnknownSequences;
 
-    // As we need support for all 32 bones, we must change the total sequences count
+    // As we need support for all 64 bones (32 ped + 32 cutscene ped), we must change the total sequences count
     pAnimationHierarchy->SetNumSequences(cSequences);
     return cSequences;
 }
@@ -243,7 +243,7 @@ std::int32_t CClientIFP::ReadSequenceVersion1(SAnim& Anim)
     RoundSize(Anim.Base.Size);
     ReadBytes(&Anim.Name, Anim.Base.Size);
 
-    SString      strBoneName = ConvertStringToKey(Anim.Name);
+    SString      strBoneName = ConvertStringToKey(Anim.Name, true);
     std::int32_t iBoneID = GetBoneIDFromName(strBoneName);
 
     SString strCorrectBoneName = GetCorrectBoneNameFromName(strBoneName);
@@ -769,10 +769,21 @@ void CClientIFP::CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID)
     }
 }
 
-SString CClientIFP::ConvertStringToKey(const SString& strBoneName)
+SString CClientIFP::ConvertStringToKey(const SString& strBoneName, bool isANPK)
 {
-    SString ConvertedString = strBoneName.ToLower();
-    // Remove white spaces
+    SString ConvertedString = strBoneName;
+
+    // Fix for some cutscene bones (like cssuitcase:Pelvis etc.)
+    if (isANPK)
+    {
+        std::size_t pos = ConvertedString.find(":");
+        if (pos != std::string::npos)
+            ConvertedString = ConvertedString.substr(pos + 1);
+    }
+
+    ConvertedString = ConvertedString.ToLower();
+
+    // Remove whitespaces
     ConvertedString.erase(std::remove(ConvertedString.begin(), ConvertedString.end(), ' '), ConvertedString.end());
     return ConvertedString;
 }
@@ -803,8 +814,7 @@ constexpr bool CClientIFP::IsKeyFramesTypeRoot(eFrameType iFrameType)
 
 std::int32_t CClientIFP::GetBoneIDFromName(const SString& strBoneName)
 {
-    // Some cutscene animations have different names like Root suitcase-1, etc
-    if (strBoneName == "root" || strBoneName.substr(0, 4) == "root")
+    if (strBoneName == "root")
         return eBoneType::NORMAL;
     if (strBoneName == "normal")
         return eBoneType::NORMAL;
@@ -1133,8 +1143,7 @@ SString CClientIFP::GetCorrectBoneNameFromID(const std::int32_t& iBoneID)
 
 SString CClientIFP::GetCorrectBoneNameFromName(const SString& strBoneName)
 {
-    // Some cutscene animations have different names like Root suitcase-1, etc
-    if (strBoneName == "root" || strBoneName.substr(0, 4) == "root")
+    if (strBoneName == "root")
         return "Normal";
     if (strBoneName == "normal")
         return "Normal";

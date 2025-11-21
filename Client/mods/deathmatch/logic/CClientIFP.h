@@ -297,7 +297,7 @@ private:
 
     void    InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID);
     void    CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID);
-    SString ConvertStringToKey(const SString& strBoneName);
+    SString ConvertStringToKey(const SString& strBoneName, bool isANPK = false);
 
     constexpr void RoundSize(std::uint32_t& u32Size);
     constexpr bool IsKeyFramesTypeRoot(eFrameType iFrameType);
