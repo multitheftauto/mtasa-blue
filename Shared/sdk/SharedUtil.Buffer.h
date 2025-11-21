@@ -15,9 +15,6 @@
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"
 #include "SString.h"
-#if defined(MTA_CLIENT) && defined(__cplusplus)
-    #include "CrashTelemetry.h"
-#endif
 
 namespace SharedUtil
 {
@@ -60,13 +57,7 @@ namespace SharedUtil
 
         bool IsEmpty() const { return empty(); }
 
-        void Reserve(uint uiSize)
-        {
-    #if defined(MTA_CLIENT) && defined(__cplusplus)
-            CrashTelemetry::Scope telemetryScope(uiSize, this, "SharedUtil::CBuffer::Reserve", nullptr);
-    #endif
-            reserve(uiSize);
-        }
+        void Reserve(uint uiSize) { return reserve(uiSize); }
 
         // Comparison
         bool operator==(const CBuffer& other) const { return size() == other.size() && std::equal(begin(), end(), other.begin()); }
@@ -76,12 +67,6 @@ namespace SharedUtil
         // Status
         void SetSize(uint uiSize, bool bZeroPad = false)
         {
-    #if defined(MTA_CLIENT) && defined(__cplusplus)
-            CrashTelemetry::Scope telemetryScope(uiSize,
-                             this,
-                             "SharedUtil::CBuffer::SetSize",
-                             bZeroPad ? "ZeroPad" : "NoZeroPad");
-    #endif
             uint uiOldSize = (uint)size();
             resize(uiSize);
             if (bZeroPad && uiSize > uiOldSize)
