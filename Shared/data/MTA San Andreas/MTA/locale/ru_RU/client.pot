@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-19 23:21+0000\n"
-"PO-Revision-Date: 2025-11-20 12:15\n"
+"PO-Revision-Date: 2025-11-21 11:43\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -113,7 +113,7 @@ msgstr "Завершите следующие программы для прод
 
 #: Client/loader/MainFunctions.cpp:141
 msgid "Invalid module path detected.\n"
-msgstr ""
+msgstr "Обнаружен недопустимый путь к модулю."
 
 #: Client/loader/MainFunctions.cpp:168
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
@@ -284,7 +284,7 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
-msgstr "Путь к вашей установке «MTA:SA» или «GTA: San Andreas»\n"
+msgstr "Путь к вашей установке MTA:SA или GTA: San Andreas\n"
 "содержит символ ';' (точка с запятой).\n\n"
 "Если у вас возникнут проблемы при запуске MTA:SA,\n"
 "переместите вашу установку в путь, который не содержит точки с запятой."
@@ -320,21 +320,22 @@ msgstr "У основного файла неверное имя (%s)"
 #: Client/loader/MainFunctions.cpp:1336
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr ""
+msgstr "Отсутствует файл %s. Возможна вирусная активность."
 
 #: Client/loader/MainFunctions.cpp:1344
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr ""
+msgstr "Файл %s изменён. Возможна вирусная активность."
 
 #: Client/loader/MainFunctions.cpp:1368
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
-msgstr ""
+msgstr "В каталоге установки найдены файлы .asi.\n\n"
+"Удалите файлы .asi, если у вас возникают проблемы."
 
 #: Client/loader/MainFunctions.cpp:1523
 msgid "Invalid game paths detected."
-msgstr ""
+msgstr "Обнаружены недопустимые пути к игре."
 
 #: Client/loader/MainFunctions.cpp:1531
 msgid "Fix configuration issue"
@@ -342,7 +343,7 @@ msgstr "Исправить проблему конфигурации"
 
 #: Client/loader/MainFunctions.cpp:1630
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
-msgstr ""
+msgstr "GTA: San Andreas возможно запустилась некорректно. Завершить её работу?"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
@@ -353,7 +354,7 @@ msgstr "Неизвестно"
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr "Файл '%s' используется %zu.\n"
+msgstr "Файл %s используется %zu.\n"
 "Вы хотите завершить этот процесс и продолжить обновление?"
 
 #: Client/loader/Install.cpp:479
@@ -610,11 +611,11 @@ msgstr "B - Альтернативный NVidia"
 
 #: Client/loader/Dialogs.cpp:114
 msgid "C - Standard Intel"
-msgstr "C - Стандарт интел"
+msgstr "C - Стандарт Intel"
 
 #: Client/loader/Dialogs.cpp:115
 msgid "D - Alternate Intel"
-msgstr "D - Альтернативный интел"
+msgstr "D - Альтернативный Intel"
 
 #: Client/loader/Dialogs.cpp:116
 msgid "If you get desperate, this might help:"
@@ -662,11 +663,14 @@ msgstr "Я не буду устанавливать антивирус.\n"
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
 "Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
 "Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
-msgstr ""
+msgstr "Сбой произошёл из-за чрезмерного использования памяти серверами.\n\n"
+"Даже при наличии большого объёма оперативной памяти эта игра x86 с ограниченным адресным пространством до 3,6 ГБ, и некоторые сильно неоптимизированные серверы с большим количеством модов/ресурсов (или даже с несколькими плохо написанными скриптами) могут вызвать такую проблему, а также вызывать лаги в игре.\n\n"
+"Свяжитесь с владельцем сервера или поддержкой MTA в официальном Discord (https://discord.gg/mtasa\n"
+") для получения дополнительной информации."
 
 #: Client/loader/Dialogs.cpp:673
 msgid "MTA: San Andreas - Out of Memory Information"
-msgstr ""
+msgstr "MTA: San Andreas - информация о нехватке памяти"
 
 #: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -921,7 +925,7 @@ msgstr "* Время: %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr "Подключение: Сеть не готова, пожалуйста, подождите немного"
+msgstr "Соединение: Сеть не готова, пожалуйста, подождите немного"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -947,21 +951,21 @@ msgstr "подключение: Не удалось выгрузить теку�
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "переподключение: Сеть не готова, пожалуйста, подождите немного"
+msgstr "Переподключение: Сеть не готова, пожалуйста, подождите немного"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "переподключение: неверный номер порта"
+msgstr "Переподключение: неверный номер порта"
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr "переподключение: Подключение к %s:%u..."
+msgstr "Переподключение: Подключение к %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:329
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr "переподключение: к %s:%u не удалось!"
+msgstr "Переподключение: к %s:%u не удалось!"
 
 #: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
@@ -992,7 +996,7 @@ msgstr "Графика"
 
 #: Client/core/CSettings.cpp:550
 msgid "PostFX"
-msgstr ""
+msgstr "Пост эффекты"
 
 #: Client/core/CSettings.cpp:551
 msgid "Audio"
@@ -1313,7 +1317,7 @@ msgstr "Детализация"
 
 #: Client/core/CSettings.cpp:1177
 msgid "V-Sync"
-msgstr ""
+msgstr "Вертикальная синхронизация"
 
 #: Client/core/CSettings.cpp:1254 Client/core/CSettings.cpp:2219
 msgid "Low"
@@ -1424,23 +1428,23 @@ msgstr "Всегда отображать персонажей в высоком
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1436
 msgid "Gamma:"
-msgstr ""
+msgstr "Гамма:"
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1476
 msgid "Contrast:"
-msgstr ""
+msgstr "Контраст:"
 
 #: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1496
 msgid "Saturation:"
-msgstr ""
+msgstr "Насыщенность:"
 
 #: Client/core/CSettings.cpp:1512
 msgid "Apply adjustments in windowed mode"
-msgstr ""
+msgstr "Применять настройки в оконном режиме"
 
 #: Client/core/CSettings.cpp:1518
 msgid "Apply adjustments in fullscreen mode"
-msgstr ""
+msgstr "Применять настройки в полноэкранном режиме"
 
 #: Client/core/CSettings.cpp:1549
 msgid "Enable remote websites"
@@ -1611,7 +1615,7 @@ msgstr "Открыть папку"
 #. Process affinity
 #: Client/core/CSettings.cpp:1852
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr "Установите соответствие CPU 0 для повышения производительности игры."
+msgstr "Установите соответствие CPU 0 для повышения производительности игры"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1858 Client/core/CSettings.cpp:1861
@@ -2147,7 +2151,7 @@ msgstr "показать график производительности"
 
 #: Client/core/CCore.cpp:1482
 msgid "for developers: reload news"
-msgstr "для разработчиков: обновите новости"
+msgstr "Для разработчиков: обновите новости"
 
 #: Client/core/CMainMenu.cpp:332
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -2481,7 +2485,7 @@ msgstr "(Резервная копия списка серверов)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:419
 msgid "Cannot create LAN-broadcast socket"
-msgstr ""
+msgstr "Невозможно создать сокет широковещательной рассылки в локальной сети (LAN)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:429
 msgid "Cannot bind LAN-broadcast socket"
@@ -2655,7 +2659,7 @@ msgstr "Начать поиск"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:378
 msgid "Delete from recent"
-msgstr ""
+msgstr "Удалить из недавних"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2086
