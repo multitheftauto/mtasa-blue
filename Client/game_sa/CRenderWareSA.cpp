@@ -737,9 +737,6 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
 
 void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
-    if (!pTex || !pTXD)
-        return;
-        
     if (pTex->txd != pTXD)
         return;
 
@@ -755,17 +752,6 @@ short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
 
 bool CRenderWareSA::RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
-    // Avoid crashes with freed/invalid textures and TXDs
-    if (!pTex || !pTXD)
-        return false;
-
-    // Prevent crash when texture/TXD has been freed but pointer still exists
-    if (!SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)))
-        return false;
-    
-    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(RwTexDictionary)))
-        return false;
-    
     return pTex->txd == pTXD;
 }
 
