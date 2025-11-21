@@ -427,8 +427,7 @@ bool CPixelsManager::D3DXGetVolumePixels(IDirect3DVolumeTexture9* pD3DVolumeText
             // Extract pixels from converted texture
             if (!FAILED(D3DXSaveTextureToFileInMemory(&dxBuffer, dxFileFormat, pD3DTempTexture, NULL)))
             {
-                if (!outPixels.SetSize(dxBuffer->GetBufferSize()))
-                    return false;
+                outPixels.SetSize(dxBuffer->GetBufferSize());
                 char* pPixelsData = outPixels.GetData();
                 memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
                 return true;
@@ -437,8 +436,7 @@ bool CPixelsManager::D3DXGetVolumePixels(IDirect3DVolumeTexture9* pD3DVolumeText
         else
         {
             // Use source pixels buffer
-            if (!outPixels.SetSize(dxBuffer->GetBufferSize()))
-                return false;
+            outPixels.SetSize(dxBuffer->GetBufferSize());
             char* pPixelsData = outPixels.GetData();
             memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
             return true;
