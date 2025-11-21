@@ -1345,7 +1345,7 @@ namespace CrashHandler
                   "CrashHandler: InitializeSymbolHandler - WARNING: SymRefreshModuleList failed\n");
     }
 
-    RegisterProcessModulesWithDbgHelp(hProcess);
+    [[maybe_unused]] const bool modulesRegistered = RegisterProcessModulesWithDbgHelp(hProcess);
     
     auto moduleCount = DWORD{0};
     auto symbolsLoadedCount = DWORD{0};
@@ -1940,7 +1940,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
                 "CaptureUnifiedStackTrace - SymRefreshModuleList succeeded before stack walk\n");
         }
 
-        RegisterProcessModulesWithDbgHelp(symHandle);
+        [[maybe_unused]] const bool modulesRegistered = RegisterProcessModulesWithDbgHelp(symHandle);
     }
 
     const auto routines = StackTraceHelpers::MakeStackWalkRoutines(useDbgHelp);
