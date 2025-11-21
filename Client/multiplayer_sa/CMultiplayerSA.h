@@ -192,6 +192,9 @@ void                InitHooks();
     float GetFogDistance();
     void  SetFogDistance(float fDistance);
     void  RestoreFogDistance();
+    void  SetGrassDrawDistance(float fCloseDistance, float fFarDistance);
+    void  GetGrassDrawDistance(float& fCloseDistance, float& fFarDistance) const;
+    void  ResetGrassDrawDistance();
     void  GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen,
                       unsigned char& ucCoronaBlue);
     void  SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen,

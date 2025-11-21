@@ -2064,6 +2064,24 @@ void CMultiplayerSA::RestoreFogDistance()
     }
 }
 
+void CMultiplayerSA::SetGrassDrawDistance(float fCloseDistance, float fFarDistance)
+{
+    MemPutFast<float>(0xC02DBC, fCloseDistance);
+    MemPutFast<float>(0x8D132C, fFarDistance);
+}
+
+void CMultiplayerSA::GetGrassDrawDistance(float& fCloseDistance, float& fFarDistance) const
+{
+    fCloseDistance = *(float*)0xC02DBC;
+    fFarDistance = *(float*)0x8D132C;
+}
+
+void CMultiplayerSA::ResetGrassDrawDistance()
+{
+    MemPutFast<float>(0xC02DBC, 3.0f);
+    MemPutFast<float>(0x8D132C, 60.0f);
+}
+
 void CMultiplayerSA::GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed,
                                  unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
 {

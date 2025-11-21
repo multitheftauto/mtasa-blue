@@ -404,6 +404,20 @@ public:
     float GetFogDistance() { return m_fFogDistance; }
     void  SetFogDistance(float& fFogDistance) { m_fFogDistance = fFogDistance; }
 
+    bool HasGrassDrawDistance() { return m_bOverrideGrassDrawDistance; }
+    void SetHasGrassDrawDistance(bool bOverrideGrassDrawDistance) { m_bOverrideGrassDrawDistance = bOverrideGrassDrawDistance; }
+
+    void  GetGrassDrawDistance(float& fCloseDistance, float& fFarDistance)
+    {
+        fCloseDistance = m_fGrassCloseDistance;
+        fFarDistance = m_fGrassFarDistance;
+    }
+    void SetGrassDrawDistance(float fCloseDistance, float fFarDistance)
+    {
+        m_fGrassCloseDistance = fCloseDistance;
+        m_fGrassFarDistance = fFarDistance;
+    }
+
     float GetAircraftMaxHeight() { return m_fAircraftMaxHeight; }
     void  SetAircraftMaxHeight(float fMaxHeight) { m_fAircraftMaxHeight = fMaxHeight; }
 
@@ -639,6 +653,10 @@ private:
 
     bool  m_bOverrideFogDistance;
     float m_fFogDistance;
+
+    bool  m_bOverrideGrassDrawDistance;
+    float m_fGrassCloseDistance;
+    float m_fGrassFarDistance;
 
     SGarageStates m_bGarageStates;
 

@@ -293,5 +293,8 @@ enum eElementRPCFunctions
   
     SET_ELEMENT_ON_FIRE,
 
+    SET_GRASS_DRAW_DISTANCE,
+    RESET_GRASS_DRAW_DISTANCE,
+
     NUM_RPC_FUNCS            // Add above this line
 };

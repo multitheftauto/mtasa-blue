@@ -66,4 +66,6 @@ public:
     DECLARE_RPC(SetSyncIntervals);
     DECLARE_RPC(SetWorldSpecialPropertyEnabled);
     DECLARE_RPC(ResetWorldProperties);
+    DECLARE_RPC(SetGrassDrawDistance);
+    DECLARE_RPC(ResetGrassDrawDistance);
 };

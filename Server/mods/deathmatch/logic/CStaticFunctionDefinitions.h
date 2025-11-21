@@ -605,6 +605,7 @@ public:
     static bool GetWindVelocity(float& fVelX, float& fVelY, float& fVelZ);
     static bool GetFarClipDistance(float& fFarClip);
     static bool GetFogDistance(float& fFogDist);
+    static bool GetGrassDrawDistance(float& fCloseDistance, float& fFarDistance);
     static bool GetAircraftMaxHeight(float& fMaxHeight);
     static bool GetOcclusionsEnabled(bool& bEnabled);
     static bool GetMoonSize(int& iSize);
@@ -644,6 +645,7 @@ public:
     static bool SetWindVelocity(float fVelX, float fVelY, float fVelZ);
     static bool SetFarClipDistance(float fFarClip);
     static bool SetFogDistance(float fFogDist);
+    static bool SetGrassDrawDistance(float fCloseDistance, float fFarDistance);
     static bool SetAircraftMaxHeight(float fMaxHeight);
     static bool SetAircraftMaxVelocity(float fVelocity);
     static bool SetOcclusionsEnabled(bool bEnabled);
@@ -653,6 +655,7 @@ public:
     static bool ResetWindVelocity();
     static bool ResetFarClipDistance();
     static bool ResetFogDistance();
+    static bool ResetGrassDrawDistance();
     static bool RemoveWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior);
     static bool RestoreWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior);
     static bool RestoreAllWorldModels();

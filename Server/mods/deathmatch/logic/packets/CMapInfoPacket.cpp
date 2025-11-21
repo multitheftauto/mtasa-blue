@@ -28,6 +28,7 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
                                unsigned char ucSunCoreR, unsigned char ucSunCoreG, unsigned char ucSunCoreB, unsigned char ucSunCoronaR,
                                unsigned char ucSunCoronaG, unsigned char ucSunCoronaB, bool bOverrideWindVelocity, float fWindVelX, float fWindVelY,
                                float fWindVelZ, bool bOverrideFarClipDistance, float fFarClip, bool bOverrideFogDistance, float fFogDistance,
+                               bool bOverrideGrassDrawDistance, float fGrassCloseDistance, float fGrassFarDistance,
                                float fAircraftMaxHeight, float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize)
 {
     m_ucWeather = ucWeather;
@@ -80,6 +81,9 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
     m_fFarClip = fFarClip;
     m_bOverrideFogDistance = bOverrideFogDistance;
     m_fFogDistance = fFogDistance;
+    m_bOverrideGrassDrawDistance = bOverrideGrassDrawDistance;
+    m_fGrassCloseDistance = fGrassCloseDistance;
+    m_fGrassFarDistance = fGrassFarDistance;
     m_fAircraftMaxHeight = fAircraftMaxHeight;
     m_fAircraftMaxVelocity = fAircraftMaxVelocity;
     m_bOverrideMoonSize = bOverrideMoonSize;
@@ -262,6 +266,14 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     if (m_bOverrideFogDistance)
     {
         BitStream.Write(m_fFogDistance);
+    }
+
+    // Grass draw distance
+    BitStream.WriteBit(m_bOverrideGrassDrawDistance);
+    if (m_bOverrideGrassDrawDistance)
+    {
+        BitStream.Write(m_fGrassCloseDistance);
+        BitStream.Write(m_fGrassFarDistance);
     }
 
     BitStream.Write(m_fAircraftMaxHeight);

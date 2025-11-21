@@ -2544,6 +2544,19 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         g_pMultiplayer->SetFogDistance(fFogDistance);
     }
 
+    // Grass draw distance
+    bool  bOverrideGrassDrawDistance = false;
+    float fGrassCloseDistance, fGrassFarDistance;
+    if (!bitStream.ReadBit(bOverrideGrassDrawDistance))
+        return;
+    if (bOverrideGrassDrawDistance)
+    {
+        if (!bitStream.Read(fGrassCloseDistance) || !bitStream.Read(fGrassFarDistance))
+            return;
+
+        g_pMultiplayer->SetGrassDrawDistance(fGrassCloseDistance, fGrassFarDistance);
+    }
+
     // Aircraft max height
     float fAircraftMaxHeight = 800;
     if (!bitStream.Read(fAircraftMaxHeight))
