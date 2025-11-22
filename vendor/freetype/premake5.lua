@@ -5,7 +5,7 @@ project "freetype"
 	targetname "freetype"
 
 	includedirs { "include", "src",  }
-	defines { "FT2_BUILD_LIBRARY=1", "_UNICODE", "UNICODE", "_LIB", "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP", "IOWIN32_USING_WINRT_API=0" }
+	defines { "FT2_BUILD_LIBRARY=1", "_UNICODE", "UNICODE", "_LIB", "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP" }
 	removedefines { "DEBUG" }
 
 	files {
