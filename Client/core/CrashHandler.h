@@ -86,6 +86,17 @@ inline constexpr std::string_view DEBUG_PREFIX_EXCEPTION_INFO = "ExceptionInfo: 
 inline constexpr std::string_view DEBUG_PREFIX_WATCHDOG = "WATCHDOG: ";
 inline constexpr std::string_view DEBUG_SEPARATOR = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 
+// helpers implemented in CrashHandler.cpp to avoid __try in inline functions
+void OutputDebugStringSafeImpl(const char* message);
+void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
+void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
+
+// Helper to safely call OutputDebugStringA with SEH guards
+inline void OutputDebugStringSafe(const char* message)
+{
+    OutputDebugStringSafeImpl(message);
+}
+
 inline void SafeDebugOutput(std::string_view message)
 {
     const char* data = message.data();
@@ -103,7 +114,7 @@ inline void SafeDebugOutput(std::string_view message)
         const std::size_t chunkLength = std::min<std::size_t>(remaining, DEBUG_BUFFER_SIZE - 1);
         std::memcpy(buffer, data, chunkLength);
         buffer[chunkLength] = '\0';
-        OutputDebugStringA(buffer);
+        OutputDebugStringSafeImpl(buffer);
 
         data += chunkLength;
         remaining -= chunkLength;
@@ -113,10 +124,7 @@ inline void SafeDebugOutput(std::string_view message)
 // Overload for C-string literals (backward compatibility)
 inline void SafeDebugOutput(const char* message)
 {
-    if (message != nullptr)
-    {
-        OutputDebugStringA(message);
-    }
+    OutputDebugStringSafeImpl(message);
 }
 
 // Overload for std::string (for string_view concatenation)
@@ -124,7 +132,7 @@ inline void SafeDebugOutput(const std::string& message)
 {
     if (!message.empty())
     {
-        OutputDebugStringA(message.c_str());
+        OutputDebugStringSafeImpl(message.c_str());
     }
 }
 
@@ -140,17 +148,10 @@ inline void SafeDebugPrint(Buffer& buffer, const char* format, ...)
     if (data == nullptr || size == 0)
         return;
 
-    std::memset(data, 0, size);
-
     va_list args;
     va_start(args, format);
-    const int written = _vsnprintf_s(data, size, _TRUNCATE, format, args);
+    SafeDebugPrintImpl(data, size, format, args);
     va_end(args);
-
-    if (written > 0)
-    {
-        OutputDebugStringA(data);
-    }
 }
 
 inline void SafeDebugPrintC(char* buffer, std::size_t bufferSize, const char* format, ...)
@@ -160,13 +161,8 @@ inline void SafeDebugPrintC(char* buffer, std::size_t bufferSize, const char* fo
 
     va_list args;
     va_start(args, format);
-    const int written = _vsnprintf_s(buffer, bufferSize, _TRUNCATE, format, args);
+    SafeDebugPrintImpl(buffer, bufferSize, format, args);
     va_end(args);
-
-    if (written > 0)
-    {
-        OutputDebugStringA(buffer);
-    }
 }
 
 #define SAFE_DEBUG_PRINT(buffer, ...) SafeDebugPrint((buffer), __VA_ARGS__)
@@ -177,31 +173,10 @@ inline void SafeDebugPrintPrefixed(std::string_view prefix, const char* format, 
     if (format == nullptr)
         return;
 
-    char buffer[DEBUG_BUFFER_SIZE] = {};
-
-    std::size_t offset = 0;
-    if (!prefix.empty())
-    {
-        offset = std::min<std::size_t>(prefix.size(), DEBUG_BUFFER_SIZE - 1);
-        std::memcpy(buffer, prefix.data(), offset);
-    }
-
-    if (offset >= DEBUG_BUFFER_SIZE - 1)
-    {
-        buffer[DEBUG_BUFFER_SIZE - 1] = '\0';
-        OutputDebugStringA(buffer);
-        return;
-    }
-
     va_list args;
     va_start(args, format);
-    const int written = _vsnprintf_s(buffer + offset, DEBUG_BUFFER_SIZE - offset, _TRUNCATE, format, args);
+    SafeDebugPrintPrefixedImpl(prefix.data(), prefix.size(), format, args);
     va_end(args);
-
-    if (written > 0 || offset > 0)
-    {
-        OutputDebugStringA(buffer);
-    }
 }
 #ifdef __cplusplus
 extern "C"
@@ -217,7 +192,7 @@ extern "C"
         std::string                             moduleName;
         std::string                             modulePathName;
         std::string                             moduleBaseName;
-        uint                                    moduleOffset;
+        unsigned int                            moduleOffset;
         std::chrono::system_clock::time_point   timestamp;
         DWORD                                   threadId;
         DWORD                                   processId;
