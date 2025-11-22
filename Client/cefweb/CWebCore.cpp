@@ -593,7 +593,7 @@ void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
-    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    if (m_Whitelist.size() >= 50000)
     {
         // Remove WEBFILTER_REQUEST entries (temporary session entries)
         for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
@@ -613,7 +613,7 @@ void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
-    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    if (m_Whitelist.size() >= 50000)
     {
         // Remove WEBFILTER_REQUEST entries (temporary session entries)
         for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
@@ -762,7 +762,7 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     if ((keyEvent.type == KEYEVENT_CHAR) && isKeyDown(VK_RMENU))
     {
         HKL   current_layout = ::GetKeyboardLayout(0);
-        SHORT scan_res = ::VkKeyScanExW(wParam, current_layout);
+        SHORT scan_res = ::VkKeyScanExW(static_cast<WCHAR>(wParam), current_layout);
         if ((HIBYTE(scan_res) & (2 | 4)) == (2 | 4))
         {
             keyEvent.modifiers &= ~(EVENTFLAG_CONTROL_DOWN | EVENTFLAG_ALT_DOWN);
@@ -1023,6 +1023,9 @@ void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
 
     if (result.bSuccess)
     {
+        if (result.dataSize > 1024 * 1024) [[unlikely]]
+            return;
+
         SString strData = result.pData;
         SString strWhiteRevision, strBlackRevision;
         strData.Split(";", &strWhiteRevision, &strBlackRevision);
@@ -1070,10 +1073,21 @@ void CWebCore::StaticFetchWhitelistFinished(const SHttpDownloadResult& result)
     if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
+    if (result.dataSize > 5 * 1024 * 1024) [[unlikely]]
+    {
+        return;
+    }
+
     CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> whitelist;
     SString              strData = result.pData;
     strData.Split(";", whitelist);
+
+    if (whitelist.size() > 50000) [[unlikely]]
+    {
+        whitelist.resize(50000);
+    }
+
     CXMLNode* pListNode = pRootNode->FindSubNode("globalwhitelist");
     if (!pListNode)
         return;
@@ -1116,10 +1130,21 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
     if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
+    if (result.dataSize > 5 * 1024 * 1024) [[unlikely]]
+    {
+        return;
+    }
+
     CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> blacklist;
     SString              strData = result.pData;
     strData.Split(";", blacklist);
+
+    if (blacklist.size() > 50000) [[unlikely]]
+    {
+        blacklist.resize(50000);
+    }
+
     CXMLNode* pListNode = pRootNode->FindSubNode("globalblacklist");
     if (!pListNode)
         return;
