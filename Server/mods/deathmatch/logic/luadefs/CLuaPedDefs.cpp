@@ -67,6 +67,7 @@ void CLuaPedDefs::LoadFunctions()
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
         {"setPedAnimation", ArgumentParserWarn<false, SetPedAnimation>},
+        {"getPedAnimation", ArgumentParserWarn<false, GetPedAnimation>},
         {"setPedAnimationProgress", SetPedAnimationProgress},
         {"setPedAnimationSpeed", SetPedAnimationSpeed},
         {"setPedOnFire", SetPedOnFire},
@@ -148,6 +149,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setWeaponSlot", "setPedWeaponSlot");
     lua_classfunction(luaVM, "setWalkingStyle", "setPedWalkingStyle");
     lua_classfunction(luaVM, "setAnimation", "setPedAnimation");
+    lua_classfunction(luaVM, "getAnimation", "getPedAnimation");
     lua_classfunction(luaVM, "setAnimationProgress", "setPedAnimationProgress");
     lua_classfunction(luaVM, "setAnimationSpeed", "setPedAnimationSpeed");
     lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");            // introduced in 1.5.5-9.13846
@@ -422,6 +424,26 @@ bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std
     }
 
     return CStaticFunctionDefinitions::SetPedAnimation(pPed, animBlockName, animationName, time.value_or(-1), blendTime.value_or(250), loop.value_or(true), updatePosition.value_or(true), interruptable.value_or(true), freezeLastFrame.value_or(true), restoreTask.value_or(false));
+}
+
+std::variant<bool, CLuaMultiReturn<std::string, std::string, int, bool, bool, bool, bool, int, bool>> CLuaPedDefs::GetPedAnimation(CPed* pPed)
+{
+    const SPlayerAnimData& animData = pPed->GetAnimationData();
+    
+    if (!animData.IsAnimating())
+        return false;
+    
+    return CLuaMultiReturn<std::string, std::string, int, bool, bool, bool, bool, int, bool>(
+        animData.blockName,
+        animData.animName,
+        animData.time,
+        animData.loop,
+        animData.updatePosition,
+        animData.interruptable,
+        animData.freezeLastFrame,
+        animData.blendTime,
+        animData.taskToBeRestoredOnAnimEnd
+    );
 }
 
 int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
