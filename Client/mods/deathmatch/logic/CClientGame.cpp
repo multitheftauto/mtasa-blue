@@ -6851,7 +6851,7 @@ bool CClientGame::RestreamModel(std::uint16_t model)
 
 void CClientGame::RestreamWorld()
 {
-    // If game is shutting down or not streaming is not available, do nothing
+    // If game is shutting down, do nothing for avoid crashes
     if (g_bClientShuttingDown)
         return;
 
