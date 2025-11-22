@@ -17,6 +17,7 @@
 #include <cef3/cef/include/cef_parser.h>
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
+#include "CWebAppAuth.h"            // For GenerateAuthCode()
 #include <algorithm>
 #include <ranges>
 #include <filesystem>
@@ -45,6 +46,9 @@ CWebCore::CWebCore()
     m_bInitialised = false;
     m_iWhitelistRevision = 0;
     m_iBlacklistRevision = 0;
+
+    // Initialize auth code BEFORE CefInitialize (ensures webCore->m_AuthCode populated early)
+    m_AuthCode = WebAppAuth::GenerateAuthCode();
 
     MakeSureXMLNodesExist();
     InitialiseWhiteAndBlacklist();

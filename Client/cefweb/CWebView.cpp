@@ -14,6 +14,7 @@
 #include <cef3/cef/include/cef_task.h>
 #include "CWebDevTools.h"
 #include <chrono>
+#include "CWebViewAuth.h"            // AUTH: IPC validation helpers
 
 namespace
 {
@@ -911,39 +912,10 @@ bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr
 
     CefRefPtr<CefListValue> argList = message->GetArgumentList();
     if (message->GetName() == "TriggerLuaEvent")
-    {
-        if (!m_bIsLocal)
-            return true;
+        return WebViewAuth::HandleTriggerLuaEvent(this, argList, m_bIsLocal);            // AUTH
 
-        // Get event name
-        CefString eventName = argList->GetString(0);
-
-        // Get number of arguments from IPC process message
-        int numArgs = argList->GetInt(1);
-
-        // Get args
-        std::vector<std::string> args;
-        for (int i = 2; i < numArgs + 2; ++i)
-        {
-            args.push_back(argList->GetString(i));
-        }
-
-        // Queue event to run on the main thread
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString(eventName), args);
-        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnProcessMessageReceived1");
-
-        // The message was handled
-        return true;
-    }
     if (message->GetName() == "InputFocus")
-    {
-        // Retrieve arguments from process message
-        m_bHasInputFocus = argList->GetBool(0);
-
-        // Queue event to run on the main thread
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnInputFocusChanged, m_pEventsInterface, m_bHasInputFocus);
-        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnProcessMessageReceived2");
-    }
+        return WebViewAuth::HandleInputFocus(this, argList, m_bIsLocal);            // AUTH
 
     // The message wasn't handled
     return false;
