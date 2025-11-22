@@ -80,39 +80,45 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     uiOutWidth = uiWidth;
     uiOutHeight = uiHeight;
 
-    if (pOutBuffer)
+    try
     {
-        if (!pOutBuffer->SetSize(uiWidth * uiHeight * 4))
-            return false;
-        char* pOutData = pOutBuffer->GetData();
-
-        /* Process data */
-        JSAMPROW row_pointer[1];
-        CBuffer  rowBuffer;
-        if (!rowBuffer.SetSize(uiWidth * 3))
-            return false;
-        char* pRowTemp = rowBuffer.GetData();
-
-        while (cinfo.output_scanline < cinfo.output_height)
+        if (pOutBuffer)
         {
-            BYTE* pRowDest = (BYTE*)pOutData + cinfo.output_scanline * uiWidth * 4;
-            row_pointer[0] = (JSAMPROW)pRowTemp;
+            pOutBuffer->SetSize(uiWidth * uiHeight * 4);
+            char* pOutData = pOutBuffer->GetData();
 
-            JDIMENSION num_scanlines = jpeg_read_scanlines(&cinfo, row_pointer, 1);
+            /* Process data */
+            JSAMPROW row_pointer[1];
+            CBuffer  rowBuffer;
+            rowBuffer.SetSize(uiWidth * 3);
+            char* pRowTemp = rowBuffer.GetData();
 
-            for (uint i = 0; i < uiWidth; i++)
+            while (cinfo.output_scanline < cinfo.output_height)
             {
-                pRowDest[i * 4 + 0] = pRowTemp[i * 3 + 2];
-                pRowDest[i * 4 + 1] = pRowTemp[i * 3 + 1];
-                pRowDest[i * 4 + 2] = pRowTemp[i * 3 + 0];
-                pRowDest[i * 4 + 3] = 255;
+                BYTE* pRowDest = (BYTE*)pOutData + cinfo.output_scanline * uiWidth * 4;
+                row_pointer[0] = (JSAMPROW)pRowTemp;
+
+                JDIMENSION num_scanlines = jpeg_read_scanlines(&cinfo, row_pointer, 1);
+
+                for (uint i = 0; i < uiWidth; i++)
+                {
+                    pRowDest[i * 4 + 0] = pRowTemp[i * 3 + 2];
+                    pRowDest[i * 4 + 1] = pRowTemp[i * 3 + 1];
+                    pRowDest[i * 4 + 2] = pRowTemp[i * 3 + 0];
+                    pRowDest[i * 4 + 3] = 255;
+                }
             }
         }
-
-        // Finish decompression and release memory.
-        jpeg_finish_decompress(&cinfo);
+    }
+    catch (...)
+    {
+        jpeg_destroy_decompress(&cinfo);
+        throw;
     }
 
+    // Finish decompression and release memory.
+    // Must always be called after jpeg_start_decompress()
+    jpeg_finish_decompress(&cinfo);
     jpeg_destroy_decompress(&cinfo);
 
     if (jerr.num_warnings)
@@ -153,35 +159,52 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
     /* Start compressor */
     jpeg_start_compress(&cinfo, TRUE);
 
-    /* Process data */
-    CBuffer rowBuffer;
-    if (!rowBuffer.SetSize(uiWidth * 3))
-        return false;
-    char* pRowTemp = rowBuffer.GetData();
-
-    JSAMPROW row_pointer[1];
-    while (cinfo.next_scanline < cinfo.image_height)
+    bool bSuccess = false;
+    try
     {
-        BYTE* pRowSrc = (BYTE*)pData + cinfo.next_scanline * uiWidth * 4;
-        for (uint i = 0; i < uiWidth; i++)
+        /* Process data */
+        CBuffer rowBuffer;
+        rowBuffer.SetSize(uiWidth * 3);
+        char* pRowTemp = rowBuffer.GetData();
+
+        JSAMPROW row_pointer[1];
+        while (cinfo.next_scanline < cinfo.image_height)
         {
-            pRowTemp[i * 3 + 0] = pRowSrc[i * 4 + 2];
-            pRowTemp[i * 3 + 1] = pRowSrc[i * 4 + 1];
-            pRowTemp[i * 3 + 2] = pRowSrc[i * 4 + 0];
+            BYTE* pRowSrc = (BYTE*)pData + cinfo.next_scanline * uiWidth * 4;
+            for (uint i = 0; i < uiWidth; i++)
+            {
+                pRowTemp[i * 3 + 0] = pRowSrc[i * 4 + 2];
+                pRowTemp[i * 3 + 1] = pRowSrc[i * 4 + 1];
+                pRowTemp[i * 3 + 2] = pRowSrc[i * 4 + 0];
+            }
+            row_pointer[0] = (JSAMPROW)pRowTemp;
+            jpeg_write_scanlines(&cinfo, row_pointer, 1);
         }
-        row_pointer[0] = (JSAMPROW)pRowTemp;
-        jpeg_write_scanlines(&cinfo, row_pointer, 1);
+
+        /* Finish compression and release memory */
+        jpeg_finish_compress(&cinfo);
+
+        // Copy out data and free memory
+        if (membuffer)
+        {
+            outBuffer = CBuffer(membuffer, memlen);
+            free(membuffer);
+            membuffer = NULL;
+            bSuccess = true;
+        }
+    }
+    catch (...)
+    {
+        // Note: Do not call jpeg_finish_compress() on error - it would write garbage
+        jpeg_destroy_compress(&cinfo);
+        if (membuffer)
+            free(membuffer);
+        throw;
     }
 
-    /* Finish compression and release memory */
-    jpeg_finish_compress(&cinfo);
     jpeg_destroy_compress(&cinfo);
 
-    // Copy out data and free memory
-    outBuffer = CBuffer(membuffer, memlen);
-    free(membuffer);
-
-    return true;
+    return bSuccess;
 }
 
 ///////////////////////////////////////////////////////////////
