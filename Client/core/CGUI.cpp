@@ -584,10 +584,29 @@ bool CLocalGUI::IsChatBoxInputEnabled()
 
 void CLocalGUI::EchoChat(const char* szText, bool bColorCoded)
 {
-    if (m_pChat)
+    if (!m_pChat)
+        return;
+
+    std::string finalMessage;
+
+    if (g_pCore->GetCVars()->GetValue<bool>("show_time_in_chat", true))
     {
-        m_pChat->Output(szText, bColorCoded);
+        // Get current time
+        char        szTime[16];
+        std::time_t t = std::time(nullptr);
+        std::tm*    tm_info = std::localtime(&t);
+        std::strftime(szTime, sizeof(szTime), "%H:%M:%S", tm_info);
+
+        // Prepend timestamp to the message
+        finalMessage = std::string("[") + szTime + "] " + szText;
     }
+    else
+    {
+        finalMessage = szText;
+    }
+
+    // Output to chat
+    m_pChat->Output(finalMessage.c_str(), bColorCoded);
 }
 
 bool CLocalGUI::IsWebRequestGUIVisible()
