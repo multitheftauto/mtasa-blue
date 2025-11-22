@@ -93,7 +93,12 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isGarageOpen", isGarageOpen},
                                                                              {"isGlitchEnabled", isGlitchEnabled},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, isWorldSpecialPropertyEnabled>},
-                                                                             {"areTrafficLightsLocked", areTrafficLightsLocked}};
+                                                                             {"areTrafficLightsLocked", areTrafficLightsLocked},
+
+                                                                             // Grass draw distance functions
+                                                                             {"getGrassDrawDistance", ArgumentParser<GetGrassDrawDistance>},
+                                                                             {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
+                                                                             {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -797,6 +802,17 @@ int CLuaWorldDefs::getFogDistance(lua_State* luaVM)
     return 1;
 }
 
+CLuaMultiReturn<float, float> CLuaWorldDefs::GetGrassDrawDistance()
+{
+    float closeDistance, farDistance;
+    bool  bSuccess = CStaticFunctionDefinitions::GetGrassDrawDistance(closeDistance, farDistance);
+
+    if (bSuccess)
+        return {closeDistance, farDistance};
+
+    return {};
+}
+
 int CLuaWorldDefs::setInteriorSoundsEnabled(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
@@ -983,6 +999,11 @@ int CLuaWorldDefs::setFogDistance(lua_State* luaVM)
     return 1;
 }
 
+void CLuaWorldDefs::SetGrassDrawDistance(float closeDistance, float farDistance)
+{
+    CStaticFunctionDefinitions::SetGrassDrawDistance(closeDistance, farDistance);
+}
+
 int CLuaWorldDefs::resetRainLevel(lua_State* luaVM)
 {
     if (CStaticFunctionDefinitions::ResetRainLevel())
@@ -1058,6 +1079,11 @@ int CLuaWorldDefs::resetFogDistance(lua_State* luaVM)
     }
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+void CLuaWorldDefs::ResetGrassDrawDistance()
+{
+    CStaticFunctionDefinitions::ResetGrassDrawDistance();
 }
 
 int CLuaWorldDefs::RemoveWorldModel(lua_State* luaVM)

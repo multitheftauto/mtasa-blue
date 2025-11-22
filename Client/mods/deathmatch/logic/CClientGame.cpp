@@ -6987,6 +6987,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         g_pMultiplayer->ResetSunSize();
         g_pMultiplayer->RestoreWindVelocity();
         g_pMultiplayer->ResetColorFilter();
+        g_pMultiplayer->ResetGrassDrawDistance();
 
         g_pGame->GetWeather()->ResetAmountOfRain();
     }

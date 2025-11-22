@@ -149,7 +149,12 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
                                                                              {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
                                                                              {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>},
-                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>}};
+                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>},
+
+                                                                             // Grass draw distance functions
+                                                                             {"getGrassDrawDistance", ArgumentParser<GetGrassDrawDistance>},
+                                                                             {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
+                                                                             {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -1816,6 +1821,23 @@ int CLuaWorldDefs::ResetFogDistance(lua_State* luaVM)
 
     lua_pushboolean(luaVM, true);
     return 1;
+}
+
+CLuaMultiReturn<float, float> CLuaWorldDefs::GetGrassDrawDistance()
+{
+    float closeDistance, farDistance;
+    g_pMultiplayer->GetGrassDrawDistance(closeDistance, farDistance);
+    return {closeDistance, farDistance};
+}
+
+void CLuaWorldDefs::SetGrassDrawDistance(float closeDistance, float farDistance)
+{
+    g_pMultiplayer->SetGrassDrawDistance(closeDistance, farDistance);
+}
+
+void CLuaWorldDefs::ResetGrassDrawDistance()
+{
+    g_pMultiplayer->ResetGrassDrawDistance();
 }
 
 int CLuaWorldDefs::GetSunColor(lua_State* luaVM)
