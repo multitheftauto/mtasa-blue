@@ -59,22 +59,22 @@
     #include <corecrt.h>
 #endif
 
-[[nodiscard]] constexpr bool IsMemoryException(DWORD code) noexcept
+[[nodiscard]] constexpr bool IsMemoryException(DWORD code)
 {
     return code == EXCEPTION_ACCESS_VIOLATION || code == EXCEPTION_IN_PAGE_ERROR;
 }
 
-[[nodiscard]] constexpr bool IsFloatingPointException(DWORD code) noexcept
+[[nodiscard]] constexpr bool IsFloatingPointException(DWORD code)
 {
     return code >= EXCEPTION_FLT_DENORMAL_OPERAND && code <= EXCEPTION_FLT_UNDERFLOW;
 }
 
-[[nodiscard]] constexpr bool IsIntegerException(DWORD code) noexcept
+[[nodiscard]] constexpr bool IsIntegerException(DWORD code)
 {
     return code == EXCEPTION_INT_DIVIDE_BY_ZERO || code == EXCEPTION_INT_OVERFLOW;
 }
 
-[[nodiscard]] bool IsExceptionFromThirdParty(void* exceptionAddress) noexcept
+[[nodiscard]] bool IsExceptionFromThirdParty(void* exceptionAddress)
 {
     if (!exceptionAddress) [[unlikely]]
         return false;
@@ -105,16 +105,16 @@ inline std::atomic<DWORD> g_initializationPhase{INIT_PHASE_MINIMAL};
 using CrashHandlerResult = std::variant<std::monostate, std::string, DWORD, std::exception_ptr>;
 
 #if defined(__cplusplus)
-[[noreturn]] void __cdecl CppNewHandler() noexcept;
+[[noreturn]] void __cdecl CppNewHandler();
 #endif
 
 #if defined(_MSC_VER)
-static int __cdecl CppNewHandlerBridge(size_t size) noexcept;
+static int __cdecl CppNewHandlerBridge(size_t size);
 #else
-static void CppNewHandlerBridge() noexcept;
+static void CppNewHandlerBridge();
 #endif
 
-[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall IsFatalException(DWORD exceptionCode) noexcept
+[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall IsFatalException(DWORD exceptionCode)
 {
     switch (exceptionCode)
     {
@@ -168,7 +168,7 @@ static void CppNewHandlerBridge() noexcept;
     return FALSE;
 }
 
-static void LogBasicExceptionInfo(_EXCEPTION_POINTERS* exception) noexcept
+static void LogBasicExceptionInfo(_EXCEPTION_POINTERS* exception)
 {
     if (exception == nullptr || exception->ExceptionRecord == nullptr)
         return;
@@ -179,7 +179,7 @@ static void LogBasicExceptionInfo(_EXCEPTION_POINTERS* exception) noexcept
                            GetCurrentThreadId());
 }
 
-static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
+static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr) [[unlikely]]
         return;
@@ -215,7 +215,7 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
     }
 }
 
-[[nodiscard]] static std::string_view GetExceptionCodeDescription(DWORD exceptionCode) noexcept
+[[nodiscard]] static std::string_view GetExceptionCodeDescription(DWORD exceptionCode)
 {
     switch (exceptionCode)
     {
@@ -292,7 +292,7 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
     }
 }
 
-static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
+static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
     {
@@ -565,7 +565,7 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException) noexcept
     }
 }
 
-static void CaptureAllocationTelemetry(_EXCEPTION_POINTERS* pException) noexcept
+static void CaptureAllocationTelemetry(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
         return;
@@ -574,7 +574,7 @@ static void CaptureAllocationTelemetry(_EXCEPTION_POINTERS* pException) noexcept
     LogEnhancedExceptionInfo(pException);
 }
 
-static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTERS* pException) noexcept
+static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
     {
@@ -700,14 +700,14 @@ static std::mutex                       g_symbolMutex;
 
 using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, DWORD);
 
-[[nodiscard]] static bool CollectProcessModules(HANDLE process, std::vector<HMODULE>& modules) noexcept
+[[nodiscard]] static bool CollectProcessModules(HANDLE process, std::vector<HMODULE>& modules)
 {
     const HMODULE psapiModule = GetModuleHandleW(L"Psapi.dll");
     EnumProcessModulesExFn enumModulesEx = nullptr;
     if (psapiModule != nullptr)
         enumModulesEx = reinterpret_cast<EnumProcessModulesExFn>(GetProcAddress(psapiModule, "EnumProcessModulesEx"));
 
-    auto enumModules = [&](HMODULE* buffer, DWORD bufferSize, DWORD* bytesNeeded) noexcept -> BOOL {
+    auto enumModules = [&](HMODULE* buffer, DWORD bufferSize, DWORD* bytesNeeded) -> BOOL {
         if (enumModulesEx)
             return enumModulesEx(process, buffer, bufferSize, bytesNeeded, LIST_MODULES_ALL);
         return EnumProcessModules(process, buffer, bufferSize, bytesNeeded);
@@ -726,7 +726,7 @@ using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, D
     return !modules.empty();
 }
 
-[[nodiscard]] static bool RegisterProcessModulesWithDbgHelp(HANDLE process) noexcept
+[[nodiscard]] static bool RegisterProcessModulesWithDbgHelp(HANDLE process)
 {
     std::vector<HMODULE> modules;
     if (!CollectProcessModules(process, modules))
@@ -780,7 +780,7 @@ using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, D
     return modulesRegistered != 0;
 }
 
-[[nodiscard]] static bool RegisterModuleForAddress(HANDLE process, DWORD64 address) noexcept
+[[nodiscard]] static bool RegisterModuleForAddress(HANDLE process, DWORD64 address)
 {
     const auto addressPtr = reinterpret_cast<LPCSTR>(static_cast<std::uintptr_t>(address));
 
@@ -852,7 +852,7 @@ using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, D
 }
 
 #if defined(_MSC_VER)
-static int __cdecl CppNewHandlerBridge(size_t size) noexcept
+static int __cdecl CppNewHandlerBridge(size_t size)
 {
     const auto telemetry = CrashTelemetry::CaptureContext();
     if ((!telemetry.hasData || telemetry.requestedSize == 0) && size > 0)
@@ -869,7 +869,7 @@ static int __cdecl CppNewHandlerBridge(size_t size) noexcept
     return 0;
 }
 #else
-static void CppNewHandlerBridge() noexcept
+static void CppNewHandlerBridge()
 {
     const auto telemetry = CrashTelemetry::CaptureContext();
     if (!telemetry.hasData)
@@ -889,30 +889,30 @@ static void CppNewHandlerBridge() noexcept
 
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
-[[noreturn]] void __cdecl CppTerminateHandler() noexcept;
-void __cdecl              AbortSignalHandler(int signal) noexcept;
-[[noreturn]] void __cdecl PureCallHandler() noexcept;
+[[noreturn]] void __cdecl CppTerminateHandler();
+void __cdecl              AbortSignalHandler(int signal);
+[[noreturn]] void __cdecl PureCallHandler();
 
-static void InstallCppHandlers() noexcept;
-static bool InstallSehHandler() noexcept;
-static void InstallAbortHandlers() noexcept;
-static void UninstallCrashHandlers() noexcept;
-static void ReportCurrentCppException() noexcept;
+static void InstallCppHandlers();
+static bool InstallSehHandler();
+static void InstallAbortHandlers();
+static void UninstallCrashHandlers();
+static void ReportCurrentCppException();
 
 [[nodiscard]] static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECORD*& outExRecord, CONTEXT*& outCtx,
-                                                DWORD dwExceptionCode) noexcept;
+                                                DWORD dwExceptionCode);
 
-inline void InitializeExceptionRecord(EXCEPTION_RECORD* const pRecord, const DWORD code, const void* const address) noexcept;
+inline void InitializeExceptionRecord(EXCEPTION_RECORD* const pRecord, const DWORD code, const void* const address);
 
-static void LogHandlerEvent(const char* prefix, const char* event) noexcept;
+static void LogHandlerEvent(const char* prefix, const char* event);
 
 // Single overload using string_view handles all string types efficiently
-static void SignalSafeOutput(std::string_view message) noexcept
+static void SignalSafeOutput(std::string_view message)
 {
     SafeDebugOutput(message);
 }
 
-static void SignalSafePrintPrefixed(std::string_view prefix, std::string_view message) noexcept
+static void SignalSafePrintPrefixed(std::string_view prefix, std::string_view message)
 {
     if (!prefix.empty())
     {
@@ -925,7 +925,7 @@ static void SignalSafePrintPrefixed(std::string_view prefix, std::string_view me
     }
 }
 
-static void LogHandlerEvent(const char* prefix, const char* event) noexcept
+static void LogHandlerEvent(const char* prefix, const char* event)
 {
     if (prefix != nullptr && event != nullptr)
     {
@@ -933,7 +933,7 @@ static void LogHandlerEvent(const char* prefix, const char* event) noexcept
     }
 }
 
-[[noreturn]] static void TerminateSelfWithExitCode(DWORD exitCode) noexcept
+[[noreturn]] static void TerminateSelfWithExitCode(DWORD exitCode)
 {
     if (exitCode == 0)
     {
@@ -944,7 +944,7 @@ static void LogHandlerEvent(const char* prefix, const char* event) noexcept
     _exit(static_cast<int>(exitCode));
 }
 
-inline void InitializeExceptionRecord(EXCEPTION_RECORD* const pRecord, const DWORD code, const void* const address) noexcept
+inline void InitializeExceptionRecord(EXCEPTION_RECORD* const pRecord, const DWORD code, const void* const address)
 {
     if (pRecord == nullptr)
     {
@@ -961,7 +961,7 @@ inline void InitializeExceptionRecord(EXCEPTION_RECORD* const pRecord, const DWO
         param = 0;
 }
 
-static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI RedirectedSetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter) noexcept
+static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI RedirectedSetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter)
 {
     std::array szLog{std::array<char, DEBUG_BUFFER_SIZE>{}};
     SAFE_DEBUG_PRINT(szLog, "%.*sIntercepted SetUnhandledExceptionFilter call with arg 0x%p\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
@@ -984,7 +984,7 @@ static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI RedirectedSetUnhandledExceptionFilter
     return kernelSet(lpTopLevelExceptionFilter);
 }
 
-void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
+void __cdecl AbortSignalHandler([[maybe_unused]] int signal)
 {
     bool expected{false};
     if (!g_bInAbortHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
@@ -1038,7 +1038,7 @@ void __cdecl AbortSignalHandler([[maybe_unused]] int signal) noexcept
     TerminateSelfWithExitCode(STATUS_STACK_BUFFER_OVERRUN_CODE);
 }
 
-[[noreturn]] void __cdecl PureCallHandler() noexcept
+[[noreturn]] void __cdecl PureCallHandler()
 {
     bool expected{false};
     if (!g_bInPureCallHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
@@ -1097,7 +1097,7 @@ class CleanUpCrashHandler
 {
 public:
     CleanUpCrashHandler() = default;
-    ~CleanUpCrashHandler() noexcept
+    ~CleanUpCrashHandler()
     {
         std::scoped_lock lock{g_handlerStateMutex};
 
@@ -1241,12 +1241,12 @@ namespace CrashHandler
     return pdbDirs;
 }
 
-[[nodiscard]] bool ProcessHasLocalDebugSymbols() noexcept
+[[nodiscard]] bool ProcessHasLocalDebugSymbols()
 {
     return !GetPdbDirectories().empty();
 }
 
-[[nodiscard]] static bool InitializeSymbolHandler() noexcept
+[[nodiscard]] static bool InitializeSymbolHandler()
 {
     std::scoped_lock lock{g_symbolMutex};
     
@@ -1345,7 +1345,7 @@ namespace CrashHandler
                   "CrashHandler: InitializeSymbolHandler - WARNING: SymRefreshModuleList failed\n");
     }
 
-    RegisterProcessModulesWithDbgHelp(hProcess);
+    [[maybe_unused]] const bool modulesRegistered = RegisterProcessModulesWithDbgHelp(hProcess);
     
     auto moduleCount = DWORD{0};
     auto symbolsLoadedCount = DWORD{0};
@@ -1495,7 +1495,7 @@ namespace CrashHandler
 
 }  // namespace CrashHandler
 
-[[nodiscard]] BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn) noexcept
+[[nodiscard]] BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
 {
     if (pFn == nullptr)
     {
@@ -1554,7 +1554,7 @@ namespace CrashHandler
     return TRUE;
 }
 
-[[nodiscard]] BOOL __stdcall EnableStackCookieFailureCapture(BOOL bEnable) noexcept
+[[nodiscard]] BOOL __stdcall EnableStackCookieFailureCapture(BOOL bEnable)
 {
     const bool bEnableBool = (bEnable != FALSE);
     g_bStackCookieCaptureEnabled.store(bEnableBool, std::memory_order_release);
@@ -1608,7 +1608,7 @@ namespace CrashHandler
     return TRUE;
 }
 
-static void InstallCppHandlers() noexcept
+static void InstallCppHandlers()
 {
     std::scoped_lock lock{g_handlerStateMutex};
 
@@ -1631,7 +1631,7 @@ static void InstallCppHandlers() noexcept
     }
 }
 
-static void InstallAbortHandlers() noexcept
+static void InstallAbortHandlers()
 {
     std::scoped_lock lock{g_handlerStateMutex};
 
@@ -1671,7 +1671,7 @@ static void InstallAbortHandlers() noexcept
     }
 }
 
-[[nodiscard]] static bool TryReadEnvBool(const char* name, bool& outValue) noexcept
+[[nodiscard]] static bool TryReadEnvBool(const char* name, bool& outValue)
 {
     std::array<char, 8> buffer{};
     DWORD               length = GetEnvironmentVariableA(name, buffer.data(), static_cast<DWORD>(buffer.size()));
@@ -1685,7 +1685,7 @@ static void InstallAbortHandlers() noexcept
     return true;
 }
 
-[[nodiscard]] BOOL __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig) noexcept
+[[nodiscard]] BOOL __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig)
 {
     if (pConfig == nullptr)
         return FALSE;
@@ -1700,7 +1700,7 @@ static void InstallAbortHandlers() noexcept
     pConfig->disableSehDetour = disableSehDetourBool ? TRUE : FALSE;
     pConfig->forceSehDetour = forceSehDetourBool ? TRUE : FALSE;
 
-    constexpr auto initDefaults = []() constexpr noexcept { return true; };
+    constexpr auto initDefaults = []() constexpr { return true; };
     static_assert(initDefaults(), "Configuration defaults validation");
     if (initDefaults())
     {
@@ -1718,7 +1718,7 @@ static void InstallAbortHandlers() noexcept
 
 // Helper to perform protected stack walk for callback exceptions
 static BOOL ProtectedStackWalk64(DWORD machineType, HANDLE hProcess, HANDLE hThread, STACKFRAME64* frame, CONTEXT* context,
-                                  const StackTraceHelpers::StackWalkRoutines& routines) noexcept
+                                  const StackTraceHelpers::StackWalkRoutines& routines)
 {
     __try
     {
@@ -1732,7 +1732,7 @@ static BOOL ProtectedStackWalk64(DWORD machineType, HANDLE hProcess, HANDLE hThr
 }
 
 // Helper to safely call SymFromAddr using only SEH
-static bool SafeSymFromAddr(HANDLE hProcess, DWORD64 address, PSYMBOL_INFO pSymbol, bool isCallback) noexcept
+static bool SafeSymFromAddr(HANDLE hProcess, DWORD64 address, PSYMBOL_INFO pSymbol, bool isCallback)
 {
     bool result{false};
     __try
@@ -1753,7 +1753,7 @@ static bool SafeSymFromAddr(HANDLE hProcess, DWORD64 address, PSYMBOL_INFO pSymb
 }
 
 // Helper to safely call SymGetLineFromAddr64 using only SEH
-static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pDisplacement, IMAGEHLP_LINE64* pLineInfo, bool isCallback) noexcept
+static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pDisplacement, IMAGEHLP_LINE64* pLineInfo, bool isCallback)
 {
     bool result{false};
     __try
@@ -1940,7 +1940,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
                 "CaptureUnifiedStackTrace - SymRefreshModuleList succeeded before stack walk\n");
         }
 
-        RegisterProcessModulesWithDbgHelp(symHandle);
+        [[maybe_unused]] const bool modulesRegistered = RegisterProcessModulesWithDbgHelp(symHandle);
     }
 
     const auto routines = StackTraceHelpers::MakeStackWalkRoutines(useDbgHelp);
@@ -2099,7 +2099,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
     return !pOutTrace->empty();
 }
 
-static bool InstallSehHandler() noexcept
+static bool InstallSehHandler()
 {
     std::scoped_lock lock{g_handlerStateMutex};
 
@@ -2206,7 +2206,7 @@ static bool InstallSehHandler() noexcept
     return success;
 }
 
-static void UninstallCrashHandlers() noexcept
+static void UninstallCrashHandlers()
 {
     std::scoped_lock lock{g_handlerStateMutex};
 
@@ -2255,7 +2255,7 @@ static void UninstallCrashHandlers() noexcept
     }
 }
 
-static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECORD*& outExRecord, CONTEXT*& outCtx, DWORD dwExceptionCode) noexcept
+static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECORD*& outExRecord, CONTEXT*& outCtx, DWORD dwExceptionCode)
 {
     struct LocalAllocGuard
     {
@@ -2311,7 +2311,7 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
     return true;
 }
 
-[[noreturn]] void __cdecl CppTerminateHandler() noexcept
+[[noreturn]] void __cdecl CppTerminateHandler()
 {
     bool expected = false;
     if (!g_bInTerminateHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
@@ -2372,7 +2372,7 @@ static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECOR
     TerminateSelfWithExitCode(CPP_EXCEPTION_CODE);
 }
 
-static void ReportCurrentCppException() noexcept
+static void ReportCurrentCppException()
 {
     try
     {
@@ -2403,7 +2403,7 @@ static void ReportCurrentCppException() noexcept
     }
 }
 
-[[noreturn]] void __cdecl CppNewHandler() noexcept
+[[noreturn]] void __cdecl CppNewHandler()
 {
     bool expected = false;
     if (!g_bInNewHandler.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
@@ -2425,7 +2425,7 @@ static void ReportCurrentCppException() noexcept
     std::terminate();
 }
 
-[[nodiscard]] BOOL __stdcall GetEnhancedExceptionInfo(PENHANCED_EXCEPTION_INFO pExceptionInfo) noexcept
+[[nodiscard]] BOOL __stdcall GetEnhancedExceptionInfo(PENHANCED_EXCEPTION_INFO pExceptionInfo)
 {
     if (pExceptionInfo == nullptr)
         return FALSE;
@@ -2461,7 +2461,7 @@ static void ReportCurrentCppException() noexcept
     }
 }
 
-[[nodiscard]] BOOL __stdcall LogExceptionDetails(EXCEPTION_POINTERS* pException) noexcept
+[[nodiscard]] BOOL __stdcall LogExceptionDetails(EXCEPTION_POINTERS* pException)
 {
     SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "========================================\n");
     SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ENTRY\n");
@@ -2599,12 +2599,12 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     return lRet;
 }
 
-[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableSehExceptionHandler() noexcept
+[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableSehExceptionHandler()
 {
     return InstallSehHandler() ? TRUE : FALSE;
 }
 
-[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall SetInitializationPhase(DWORD phase) noexcept
+[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall SetInitializationPhase(DWORD phase)
 {
     constexpr DWORD maxPhase = INIT_PHASE_POST_D3D;
     if (phase > maxPhase)
@@ -2621,12 +2621,12 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     return TRUE;
 }
 
-[[nodiscard]] DWORD BUGSUTIL_DLLINTERFACE __stdcall GetInitializationPhase() noexcept
+[[nodiscard]] DWORD BUGSUTIL_DLLINTERFACE __stdcall GetInitializationPhase()
 {
     return g_initializationPhase.load(std::memory_order_acquire);
 }
 
-[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization() noexcept
+[[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization()
 {
     if (const BOOL phaseResult = SetInitializationPhase(INIT_PHASE_POST_D3D); phaseResult == FALSE)
     {
@@ -2673,7 +2673,7 @@ namespace
     inline constexpr std::size_t hardware_destructive_interference_size = 64;
 #endif
 
-    [[nodiscard]] constexpr bool IsHandleValid(HANDLE handle) noexcept
+    [[nodiscard]] constexpr bool IsHandleValid(HANDLE handle)
     {
         return handle != nullptr && handle != INVALID_HANDLE_VALUE;
     }
@@ -2681,15 +2681,15 @@ namespace
     class HandleGuard
     {
     public:
-        HandleGuard() noexcept = default;
-        explicit HandleGuard(HANDLE handle) noexcept : m_handle(handle) {}
-        ~HandleGuard() noexcept { reset(); }
+        HandleGuard() = default;
+        explicit HandleGuard(HANDLE handle) : m_handle(handle) {}
+        ~HandleGuard() { reset(); }
 
         HandleGuard(const HandleGuard&) = delete;
         HandleGuard& operator=(const HandleGuard&) = delete;
 
-        HandleGuard(HandleGuard&& other) noexcept : m_handle(other.release()) {}
-        HandleGuard& operator=(HandleGuard&& other) noexcept
+        HandleGuard(HandleGuard&& other) : m_handle(other.release()) {}
+        HandleGuard& operator=(HandleGuard&& other)
         {
             if (this != &other)
             {
@@ -2699,21 +2699,21 @@ namespace
             return *this;
         }
 
-        void reset(HANDLE handle = nullptr) noexcept
+        void reset(HANDLE handle = nullptr)
         {
             if (IsHandleValid(m_handle))
                 CloseHandle(m_handle);
             m_handle = handle;
         }
 
-        [[nodiscard]] HANDLE get() const noexcept { return m_handle; }
-        [[nodiscard]] HANDLE release() noexcept
+        [[nodiscard]] HANDLE get() const { return m_handle; }
+        [[nodiscard]] HANDLE release()
         {
             HANDLE handle = m_handle;
             m_handle = nullptr;
             return handle;
         }
-        [[nodiscard]] explicit operator bool() const noexcept { return IsHandleValid(m_handle); }
+        [[nodiscard]] explicit operator bool() const { return IsHandleValid(m_handle); }
 
     private:
         HANDLE m_handle = nullptr;
@@ -2731,7 +2731,7 @@ namespace
         // Non-atomic handle doesn't need cache-line alignment
         HANDLE watchdogThreadHandle{nullptr};
         
-        ~WatchdogState() noexcept
+        ~WatchdogState()
         {
             // Note: watchdogThreadHandle should be closed by StopWatchdogThread,
             // but we close it here as a safety measure in case of abnormal termination
@@ -2762,7 +2762,7 @@ namespace
     
     inline WatchdogState g_watchdogState{};
     
-    [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId) noexcept
+    [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId)
     {
         AddReportLog(9300, SString("Watchdog freeze detected after %u seconds (thread %u)",
                                    g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed),
@@ -2892,7 +2892,7 @@ namespace
         return true;
     }
     
-    [[nodiscard]] static unsigned int __stdcall WatchdogThreadProc(void* /*pParameter*/) noexcept
+    [[nodiscard]] static unsigned int __stdcall WatchdogThreadProc(void* /*pParameter*/)
     {
         AddReportLog(9309, "Watchdog thread started");
         
@@ -3033,7 +3033,7 @@ void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread()
     AddReportLog(9320, "Watchdog thread stopped");
 }
 
-void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat() noexcept
+void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat()
 {
     if (g_watchdogState.running.load(std::memory_order_acquire))
     {

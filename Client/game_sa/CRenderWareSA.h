@@ -16,7 +16,7 @@
 #include "CRenderWareSA.ShaderSupport.h"
 
 class CMatchChannelManager;
-struct CModelTexturesInfo;
+class CModelTexturesInfo;
 struct RpAtomic;
 struct SShaderReplacementStats;
 struct STexInfo;
