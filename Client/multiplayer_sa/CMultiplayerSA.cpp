@@ -16,6 +16,7 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
+#include <game/CSettings.h>
 
 class CEventDamageSAInterface;
 
@@ -594,6 +595,8 @@ CMultiplayerSA::CMultiplayerSA()
     m_fMaddDoggPoolLevel = 1082.73f;
     m_dwLastStaticAnimGroupID = eAnimGroup::ANIM_GROUP_DEFAULT;
     m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
+    m_fGrassCloseDistance = DEFAULT_GRASS_CLOSE_DISTANCE;
+    m_fGrassFarDistance = DEFAULT_GRASS_FAR_DISTANCE;
 }
 
 CMultiplayerSA::~CMultiplayerSA()
@@ -2066,8 +2069,24 @@ void CMultiplayerSA::RestoreFogDistance()
 
 void CMultiplayerSA::SetGrassDrawDistance(float closeDistance, float farDistance)
 {
+    // Store unscaled values
+    m_fGrassCloseDistance = closeDistance;
+    m_fGrassFarDistance = farDistance;
+    
+    // Apply FX quality scaling
+    // 0 = low, 1 = medium, 2 = high, 3 = very high
+    CGameSettings* pSettings = pGameInterface ? pGameInterface->GetSettings() : nullptr;
+    const unsigned int fxQuality = pSettings ? pSettings->GetFXQuality() : 2;
+    float actualFarDistance = farDistance;
+    
+    // Keep base GTA:SA logic
+    if (fxQuality < 2)
+    {
+        actualFarDistance = farDistance / 2.0f;
+    }
+    
     MemPutFast<float>(VAR_CGrassCloseDist, closeDistance);
-    MemPutFast<float>(VAR_CGrassFarDist, farDistance);
+    MemPutFast<float>(VAR_CGrassFarDist, actualFarDistance);
 }
 
 void CMultiplayerSA::GetGrassDrawDistance(float& closeDistance, float& farDistance) const
@@ -2078,8 +2097,29 @@ void CMultiplayerSA::GetGrassDrawDistance(float& closeDistance, float& farDistan
 
 void CMultiplayerSA::ResetGrassDrawDistance()
 {
+    // Store unscaled default values
+    m_fGrassCloseDistance = DEFAULT_GRASS_CLOSE_DISTANCE;
+    m_fGrassFarDistance = DEFAULT_GRASS_FAR_DISTANCE;
+    
+    // Apply FX quality scaling
+    // 0 = low, 1 = medium, 2 = high, 3 = very high
+    CGameSettings* pSettings = pGameInterface ? pGameInterface->GetSettings() : nullptr;
+    const unsigned int fxQuality = pSettings ? pSettings->GetFXQuality() : 2;
+    float actualFarDistance = DEFAULT_GRASS_FAR_DISTANCE;
+    
+    if (fxQuality < 2)
+    {
+        actualFarDistance = DEFAULT_GRASS_FAR_DISTANCE / 2.0f;
+    }
+    
     MemPutFast<float>(VAR_CGrassCloseDist, DEFAULT_GRASS_CLOSE_DISTANCE);
-    MemPutFast<float>(VAR_CGrassFarDist, DEFAULT_GRASS_FAR_DISTANCE);
+    MemPutFast<float>(VAR_CGrassFarDist, actualFarDistance);
+}
+
+void CMultiplayerSA::RefreshGrassDrawDistance()
+{
+    // Re-apply stored grass distances with current FX quality
+    SetGrassDrawDistance(m_fGrassCloseDistance, m_fGrassFarDistance);
 }
 
 void CMultiplayerSA::GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed,

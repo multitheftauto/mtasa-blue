@@ -200,6 +200,7 @@ void                InitHooks();
     void  SetGrassDrawDistance(float closeDistance, float farDistance) override;
     void  GetGrassDrawDistance(float& closeDistance, float& farDistance) const override;
     void  ResetGrassDrawDistance() override;
+    void  RefreshGrassDrawDistance() override;
     void  GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen,
                       unsigned char& ucCoronaBlue);
     void  SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen,
@@ -399,6 +400,8 @@ private:
     eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
+    float               m_fGrassCloseDistance;
+    float               m_fGrassFarDistance;
 
     bool m_isRapidVehicleStopFixEnabled{false};
 
