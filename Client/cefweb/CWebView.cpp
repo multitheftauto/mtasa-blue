@@ -13,6 +13,7 @@
 #include <cef3/cef/include/cef_parser.h>
 #include <cef3/cef/include/cef_task.h>
 #include "CWebDevTools.h"
+#include <chrono>
 
 namespace
 {
@@ -35,6 +36,8 @@ CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool b
 
 CWebView::~CWebView()
 {
+    m_bBeingDestroyed = true;
+
     if (IsMainThread())
     {
         if (auto pWebCore = g_pCore->GetWebCore(); pWebCore)
@@ -54,6 +57,19 @@ CWebView::~CWebView()
     // This is to prevent memory leaks from CWebView <-> CefBrowser cycles
     if (m_pWebView)
     {
+        // Stop any loading immediately
+        m_pWebView->StopLoad();
+
+        // Navigate to blank page to force V8/DOM cleanup and release video/audio resources
+        // We do this BEFORE hiding to ensure the navigation request is processed
+        m_pWebView->GetMainFrame()->LoadURL("about:blank");
+
+        // Notify that the browser is hidden and lost focus to release rendering resources
+        m_pWebView->GetHost()->WasHidden(true);
+        m_pWebView->GetHost()->SetFocus(false);
+
+        // Force close the browser host to ensure the renderer process terminates immediately
+        m_pWebView->GetHost()->CloseBrowser(true);
         m_pWebView = nullptr;
     }
 
@@ -98,7 +114,21 @@ void CWebView::CloseBrowser()
     m_AjaxHandlers.clear();
 
     if (m_pWebView)
+    {
+        // Stop any loading immediately
+        m_pWebView->StopLoad();
+
+        // Navigate to blank page to force V8/DOM cleanup and release video/audio resources
+        // We do this BEFORE hiding to ensure the navigation request is processed
+        m_pWebView->GetMainFrame()->LoadURL("about:blank");
+
+        // Notify that the browser is hidden and lost focus to release rendering resources
+        m_pWebView->GetHost()->WasHidden(true);
+        m_pWebView->GetHost()->SetFocus(false);
+
         m_pWebView->GetHost()->CloseBrowser(true);
+        m_pWebView = nullptr;
+    }
 }
 
 bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded)
@@ -181,6 +211,22 @@ void CWebView::SetRenderingPaused(bool bPaused)
     {
         m_pWebView->GetHost()->WasHidden(bPaused);
         m_bIsRenderingPaused = bPaused;
+
+        if (bPaused)
+        {
+            // Free memory held by render data when paused
+            std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
+            m_RenderData.changed = false;
+            m_RenderData.popupShown = false;
+            m_RenderData.buffer = nullptr;
+            m_RenderData.dirtyRects.clear();
+            m_RenderData.dirtyRects.shrink_to_fit();
+            m_RenderData.popupBuffer.reset();
+
+            // Release any waiting CEF thread
+            m_RenderData.cefThreadState = ECefThreadState::Running;
+            m_RenderData.cefThreadCv.notify_all();
+        }
     }
 }
 
@@ -206,102 +252,306 @@ void CWebView::Focus(bool state)
 
 void CWebView::ClearTexture()
 {
-    IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if (!pD3DSurface)
+    if (!m_pWebBrowserRenderItem) [[unlikely]]
+        return;
+    
+    auto* const pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
+    if (!pD3DSurface) [[unlikely]]
         return;
 
     D3DSURFACE_DESC SurfaceDesc;
-    if (FAILED(pD3DSurface->GetDesc(&SurfaceDesc)))
+    if (FAILED(pD3DSurface->GetDesc(&SurfaceDesc))) [[unlikely]]
         return;
 
     D3DLOCKED_RECT LockedRect;
-    if (SUCCEEDED(pD3DSurface->LockRect(&LockedRect, NULL, D3DLOCK_DISCARD)))
+    if (SUCCEEDED(pD3DSurface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
     {
-        memset(LockedRect.pBits, 0xFF, SurfaceDesc.Height * LockedRect.Pitch);
+        // Check for integer overflow in size calculation: height * pitch must fit in size_t
+        // Ensure both are positive and that multiplication won't overflow
+        if (SurfaceDesc.Height > 0 && LockedRect.Pitch > 0 && 
+            static_cast<size_t>(SurfaceDesc.Height) <= SIZE_MAX / static_cast<size_t>(LockedRect.Pitch)) [[likely]]
+        {
+            const auto memsetSize = static_cast<size_t>(SurfaceDesc.Height) * static_cast<size_t>(LockedRect.Pitch);
+            std::memset(LockedRect.pBits, 0xFF, memsetSize);
+        }
         pD3DSurface->UnlockRect();
     }
 }
 
 void CWebView::UpdateTexture()
 {
-    std::lock_guard<std::mutex> lock(m_RenderData.dataMutex);
+    const std::lock_guard lock(m_RenderData.dataMutex);
 
-    auto pSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if (m_bBeingDestroyed || !pSurface)
+    // Validate render item exists before accessing
+    if (!m_pWebBrowserRenderItem) [[unlikely]]
+    {
         m_RenderData.changed = m_RenderData.popupShown = false;
+        m_RenderData.buffer = nullptr;
+        m_RenderData.dirtyRects.clear();
+        m_RenderData.dirtyRects.shrink_to_fit();
+        m_RenderData.cefThreadState = ECefThreadState::Running;
+        m_RenderData.cefThreadCv.notify_all();
+        return;
+    }
+
+    auto* const pSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
+    if (m_bBeingDestroyed || !pSurface) [[unlikely]]
+    {
+        m_RenderData.changed = m_RenderData.popupShown = false;
+        m_RenderData.buffer = nullptr;
+        m_RenderData.dirtyRects.clear();
+        m_RenderData.dirtyRects.shrink_to_fit();
+        m_RenderData.cefThreadState = ECefThreadState::Running;
+        m_RenderData.cefThreadCv.notify_all();
+        return;
+    }
 
     // Discard current buffer if size doesn't match
     // This happens when resizing the browser as OnPaint is called asynchronously
     if (m_RenderData.changed && (m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height))
+    {
         m_RenderData.changed = false;
+        m_RenderData.buffer = nullptr;
+        m_RenderData.dirtyRects.clear();
+        m_RenderData.dirtyRects.shrink_to_fit();
+    }
 
-    if (m_RenderData.changed || m_RenderData.popupShown)
+    if (m_RenderData.changed || m_RenderData.popupShown) [[likely]]
     {
         // Lock surface
         D3DLOCKED_RECT LockedRect;
         if (SUCCEEDED(pSurface->LockRect(&LockedRect, nullptr, 0)))
         {
             // Dirty rect implementation, don't use this as loops are significantly slower than memcpy
-            const auto destData = static_cast<byte*>(LockedRect.pBits);
-            const auto sourceData = static_cast<const byte*>(m_RenderData.buffer);
+            auto* const destData = static_cast<byte*>(LockedRect.pBits);
+            const auto* const sourceData = static_cast<const byte*>(m_RenderData.buffer);
             const auto destPitch = LockedRect.Pitch;
+
+            // Validate destination pitch
+            if (destPitch <= 0) [[unlikely]]
+            {
+                pSurface->UnlockRect();
+                m_RenderData.changed = false;
+                m_RenderData.popupShown = false;
+                m_RenderData.buffer = nullptr;
+                m_RenderData.dirtyRects.clear();
+                m_RenderData.dirtyRects.shrink_to_fit();
+                m_RenderData.cefThreadState = ECefThreadState::Running;
+                m_RenderData.cefThreadCv.notify_all();
+                return;
+            }
+            
+            // Validate sourcePitch calculation won't overflow
+            constexpr auto maxWidthForPitch = INT_MAX / CEF_PIXEL_STRIDE;
+            if (m_RenderData.width > maxWidthForPitch) [[unlikely]]
+            {
+                pSurface->UnlockRect();
+                m_RenderData.changed = false;
+                m_RenderData.popupShown = false;
+                m_RenderData.buffer = nullptr;
+                m_RenderData.dirtyRects.clear();
+                m_RenderData.dirtyRects.shrink_to_fit();
+                m_RenderData.cefThreadState = ECefThreadState::Running;
+                m_RenderData.cefThreadCv.notify_all();
+                return;
+            }
             const auto sourcePitch = m_RenderData.width * CEF_PIXEL_STRIDE;
 
+            // Validate source buffer exists before accessing it
+            if (!sourceData) [[unlikely]]
+            {
+                pSurface->UnlockRect();
+                m_RenderData.changed = false;
+                m_RenderData.popupShown = false;
+                m_RenderData.buffer = nullptr;
+                m_RenderData.dirtyRects.clear();
+                m_RenderData.dirtyRects.shrink_to_fit();
+                m_RenderData.cefThreadState = ECefThreadState::Running;
+                m_RenderData.cefThreadCv.notify_all();
+                return;
+            }
+
             // Update view area
-            if (m_RenderData.changed)
+            if (m_RenderData.changed) [[likely]]
             {
                 // Update changed state
                 m_RenderData.changed = false;
 
-                if (m_RenderData.dirtyRects.size() > 0 && m_RenderData.dirtyRects[0].width == m_RenderData.width &&
-                    m_RenderData.dirtyRects[0].height == m_RenderData.height)
+                const auto& dirtyRects = m_RenderData.dirtyRects;
+                if (!dirtyRects.empty() && dirtyRects[0].width == m_RenderData.width &&
+                    dirtyRects[0].height == m_RenderData.height)
                 {
                     // Note that D3D texture size can be hardware dependent(especially with dynamic texture)
                     // When destination and source pitches differ we must copy pixels row by row
-                    if (destPitch == sourcePitch)
-                        memcpy(destData, sourceData, destPitch * m_RenderData.height);
+                    if (destPitch == sourcePitch) [[likely]]
+                    {
+                        // Check for integer overflow in size calculation: height * pitch must fit in size_t
+                        if (m_RenderData.height > 0 && 
+                            static_cast<size_t>(m_RenderData.height) > SIZE_MAX / static_cast<size_t>(destPitch)) [[unlikely]]
+                        {
+                            pSurface->UnlockRect();
+                            m_RenderData.changed = false;
+                            m_RenderData.popupShown = false;
+                            m_RenderData.buffer = nullptr;
+                            m_RenderData.dirtyRects.clear();
+                            m_RenderData.dirtyRects.shrink_to_fit();
+                            m_RenderData.cefThreadState = ECefThreadState::Running;
+                            m_RenderData.cefThreadCv.notify_all();
+                            return;
+                        }
+                        std::memcpy(destData, sourceData, static_cast<size_t>(destPitch) * static_cast<size_t>(m_RenderData.height));
+                    }
                     else
                     {
+                        // Ensure both pitches are positive before row-by-row copy
+                        if (destPitch <= 0 || sourcePitch <= 0) [[unlikely]]
+                        {
+                            pSurface->UnlockRect();
+                            m_RenderData.changed = false;
+                            m_RenderData.popupShown = false;
+                            m_RenderData.buffer = nullptr;
+                            m_RenderData.dirtyRects.clear();
+                            m_RenderData.dirtyRects.shrink_to_fit();
+                            m_RenderData.cefThreadState = ECefThreadState::Running;
+                            m_RenderData.cefThreadCv.notify_all();
+                            return;
+                        }
+
+                        // Check for integer overflow in size calculation for row-by-row copy
+                        if (m_RenderData.height > 0 && 
+                            (static_cast<size_t>(m_RenderData.height) > SIZE_MAX / static_cast<size_t>(destPitch) ||
+                             static_cast<size_t>(m_RenderData.height) > SIZE_MAX / static_cast<size_t>(sourcePitch))) [[unlikely]]
+                        {
+                            pSurface->UnlockRect();
+                            m_RenderData.changed = false;
+                            m_RenderData.popupShown = false;
+                            m_RenderData.buffer = nullptr;
+                            m_RenderData.dirtyRects.clear();
+                            m_RenderData.dirtyRects.shrink_to_fit();
+                            m_RenderData.cefThreadState = ECefThreadState::Running;
+                            m_RenderData.cefThreadCv.notify_all();
+                            return;
+                        }
+                        
                         for (int y = 0; y < m_RenderData.height; ++y)
                         {
-                            const int sourceIndex = y * sourcePitch;
-                            const int destIndex = y * destPitch;
+                            // Use size_t for all calculations to prevent overflow
+                            const auto sourceIndex = static_cast<size_t>(y) * static_cast<size_t>(sourcePitch);
+                            const auto destIndex = static_cast<size_t>(y) * static_cast<size_t>(destPitch);
+                            const auto copySize = std::min(static_cast<size_t>(sourcePitch), static_cast<size_t>(destPitch));
 
-                            memcpy(&destData[destIndex], &sourceData[sourceIndex], std::min(sourcePitch, destPitch));
+                            std::memcpy(&destData[destIndex], &sourceData[sourceIndex], copySize);
                         }
                     }
                 }
                 else
                 {
-                    // Update dirty rects
-                    for (const auto& rect : m_RenderData.dirtyRects)
+                    // Check for integer overflow in destination size calculation
+                    if (m_RenderData.height > 0 && 
+                        static_cast<size_t>(m_RenderData.height) > SIZE_MAX / static_cast<size_t>(destPitch)) [[unlikely]]
                     {
-                        for (int y = rect.y; y < rect.y + rect.height; ++y)
+                        pSurface->UnlockRect();
+                        m_RenderData.changed = false;
+                        m_RenderData.popupShown = false;
+                        m_RenderData.buffer = nullptr;
+                        m_RenderData.dirtyRects.clear();
+                        m_RenderData.dirtyRects.shrink_to_fit();
+                        m_RenderData.cefThreadState = ECefThreadState::Running;
+                        m_RenderData.cefThreadCv.notify_all();
+                        return;
+                    }
+
+                    // Update dirty rects
+                    for (const auto& rect : dirtyRects)
+                    {
+                        // Validate dirty rect bounds to prevent buffer overflow
+                        if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0) [[unlikely]]
+                            continue;
+                        
+                        // Check bounds using addition to prevent subtraction underflow
+                        // rect.x + rect.width could overflow, so check rect.x and rect.width separately
+                        if (rect.x >= m_RenderData.width || rect.y >= m_RenderData.height ||
+                            rect.width > m_RenderData.width || rect.height > m_RenderData.height ||
+                            rect.x > m_RenderData.width - rect.width || rect.y > m_RenderData.height - rect.height) [[unlikely]]
+                            continue;
+
+                        // Pre-calculate end to prevent overflow in loop condition
+                        const auto rectEndY = rect.y + rect.height;
+
+                        // Ensure we don't write past the destination pitch
+                        if (static_cast<size_t>(destPitch) < static_cast<size_t>(rect.x + rect.width) * CEF_PIXEL_STRIDE) [[unlikely]]
+                            continue;
+
+                        for (int y = rect.y; y < rectEndY; ++y)
                         {
                             // Note that D3D texture size can be hardware dependent(especially with dynamic texture)
                             // We cannot be sure that source and destination pitches are the same
-                            const int sourceIndex = y * sourcePitch + rect.x * CEF_PIXEL_STRIDE;
-                            const int destIndex = y * destPitch + rect.x * CEF_PIXEL_STRIDE;
+                            // Use size_t for all calculations to prevent integer overflow
+                            const auto sourceIndex = static_cast<size_t>(y) * static_cast<size_t>(sourcePitch) + 
+                                                      static_cast<size_t>(rect.x) * CEF_PIXEL_STRIDE;
+                            const auto destIndex = static_cast<size_t>(y) * static_cast<size_t>(destPitch) + 
+                                                    static_cast<size_t>(rect.x) * CEF_PIXEL_STRIDE;
 
-                            memcpy(&destData[destIndex], &sourceData[sourceIndex], rect.width * CEF_PIXEL_STRIDE);
+                            std::memcpy(&destData[destIndex], &sourceData[sourceIndex], static_cast<size_t>(rect.width) * CEF_PIXEL_STRIDE);
                         }
                     }
                 }
             }
 
             // Update popup area (override certain areas of the view texture)
-            const bool popupSizeMismatches = m_RenderData.popupRect.x + m_RenderData.popupRect.width >= (int)m_pWebBrowserRenderItem->m_uiSizeX ||
-                                             m_RenderData.popupRect.y + m_RenderData.popupRect.height >= (int)m_pWebBrowserRenderItem->m_uiSizeY;
+            // Validate popup rect bounds to prevent integer overflow and out-of-bounds access
+            const auto& popupRect = m_RenderData.popupRect;
+            const auto renderWidth = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX);
+            const auto renderHeight = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY);
+            const auto popupSizeMismatches = 
+                popupRect.x < 0 || popupRect.y < 0 ||
+                popupRect.width <= 0 || popupRect.height <= 0 ||
+                popupRect.x >= renderWidth || popupRect.y >= renderHeight ||
+                popupRect.width > renderWidth || popupRect.height > renderHeight ||
+                popupRect.x > renderWidth - popupRect.width ||
+                popupRect.y > renderHeight - popupRect.height;
 
-            if (m_RenderData.popupShown && !popupSizeMismatches)
+            // Verify popup buffer exists before accessing it
+            if (m_RenderData.popupShown && !popupSizeMismatches && m_RenderData.popupBuffer) [[likely]]
             {
-                const auto popupPitch = m_RenderData.popupRect.width * CEF_PIXEL_STRIDE;
-                for (int y = 0; y < m_RenderData.popupRect.height; ++y)
+                // Validate popup pitch calculation won't overflow
+                constexpr auto maxWidthForPopupPitch = INT_MAX / CEF_PIXEL_STRIDE;
+                if (popupRect.width > maxWidthForPopupPitch) [[unlikely]]
                 {
-                    const int sourceIndex = y * popupPitch;
-                    const int destIndex = (y + m_RenderData.popupRect.y) * destPitch + m_RenderData.popupRect.x * CEF_PIXEL_STRIDE;
+                    pSurface->UnlockRect();
+                    m_RenderData.popupShown = false;
+                    m_RenderData.buffer = nullptr;
+                    m_RenderData.dirtyRects.clear();
+                    m_RenderData.dirtyRects.shrink_to_fit();
+                    m_RenderData.cefThreadState = ECefThreadState::Running;
+                    m_RenderData.cefThreadCv.notify_all();
+                    return;
+                }
+                const auto popupPitch = popupRect.width * CEF_PIXEL_STRIDE;
 
-                    memcpy(&destData[destIndex], &m_RenderData.popupBuffer[sourceIndex], popupPitch);
+                // Ensure we don't write past the destination pitch
+                if (static_cast<size_t>(destPitch) < static_cast<size_t>(popupRect.x + popupRect.width) * CEF_PIXEL_STRIDE) [[unlikely]]
+                {
+                    pSurface->UnlockRect();
+                    m_RenderData.popupShown = false;
+                    m_RenderData.buffer = nullptr;
+                    m_RenderData.dirtyRects.clear();
+                    m_RenderData.dirtyRects.shrink_to_fit();
+                    m_RenderData.cefThreadState = ECefThreadState::Running;
+                    m_RenderData.cefThreadCv.notify_all();
+                    return;
+                }
+                
+                for (int y = 0; y < popupRect.height; ++y)
+                {
+                    // Use size_t for all calculations to prevent integer overflow
+                    const auto sourceIndex = static_cast<size_t>(y) * static_cast<size_t>(popupPitch);
+                    // Calculate destination y coordinate safely
+                    const auto destY = static_cast<size_t>(popupRect.y) + static_cast<size_t>(y);
+                    const auto destIndex = destY * static_cast<size_t>(destPitch) + 
+                                            static_cast<size_t>(popupRect.x) * CEF_PIXEL_STRIDE;
+
+                    std::memcpy(&destData[destIndex], &m_RenderData.popupBuffer[sourceIndex], static_cast<size_t>(popupPitch));
                 }
             }
 
@@ -311,7 +561,17 @@ void CWebView::UpdateTexture()
         else
         {
             OutputDebugLine("[CWebView] UpdateTexture: LockRect failed");
+            // Clear flags to prevent re-attempting to render stale buffer
+            m_RenderData.changed = false;
+            m_RenderData.popupShown = false;
         }
+        
+        // Clear buffer pointer - it's only valid during OnPaint callback and we've used it
+        m_RenderData.buffer = nullptr;
+        
+        // Clear dirty rects and release capacity to prevent memory accumulation
+        m_RenderData.dirtyRects.clear();
+        m_RenderData.dirtyRects.shrink_to_fit();
     }
 
     m_RenderData.cefThreadState = ECefThreadState::Running;
@@ -462,6 +722,10 @@ void CWebView::GetSourceCode(const std::function<void(const std::string& code)>&
 
         virtual void Visit(const CefString& code) override
         {
+            // Avoid UAF
+            if (webView->IsBeingDestroyed())
+                return;
+            
             // Limit to 2MiB for now to prevent freezes (TODO: Optimize that and increase later)
             if (code.size() <= 2097152)
             {
@@ -479,6 +743,10 @@ void CWebView::GetSourceCode(const std::function<void(const std::string& code)>&
 
 void CWebView::Resize(const CVector2D& size)
 {
+    // Validate render item exists
+    if (!m_pWebBrowserRenderItem) [[unlikely]]
+        return;
+    
     // Resize underlying texture
     m_pWebBrowserRenderItem->Resize(size);
 
@@ -491,6 +759,9 @@ void CWebView::Resize(const CVector2D& size)
 
 CVector2D CWebView::GetSize()
 {
+    if (!m_pWebBrowserRenderItem) [[unlikely]]
+        return CVector2D(0.0f, 0.0f);
+    
     return CVector2D(static_cast<float>(m_pWebBrowserRenderItem->m_uiSizeX), static_cast<float>(m_pWebBrowserRenderItem->m_uiSizeY));
 }
 
@@ -626,6 +897,9 @@ void CWebView::Refresh(bool bIgnoreCache)
 bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefProcessId source_process,
                                         CefRefPtr<CefProcessMessage> message)
 {
+    if (m_bBeingDestroyed)
+        return false;
+
     CefRefPtr<CefListValue> argList = message->GetArgumentList();
     if (message->GetName() == "TriggerLuaEvent")
     {
@@ -677,7 +951,7 @@ void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
     rect.x = 0;
     rect.y = 0;
 
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed || !m_pWebBrowserRenderItem) [[unlikely]]
     {
         rect.width = 1;
         rect.height = 1;
@@ -714,11 +988,19 @@ void CWebView::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
 {
     std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
 
+    // If dimensions change, the current popup buffer is no longer valid for the new size
+    // We must release it to prevent UpdateTexture from reading past the end of the buffer
+    // using the new (larger) dimensions
+    if (m_RenderData.popupRect.width != rect.width || m_RenderData.popupRect.height != rect.height)
+    {
+        m_RenderData.popupBuffer.reset();
+    }
+
     // Update rect
     m_RenderData.popupRect = rect;
 
-    // Resize buffer
-    m_RenderData.popupBuffer.reset(new byte[rect.width * rect.height * CEF_PIXEL_STRIDE]);
+    // Note: Don't allocate buffer here - OnPaint may provide different dimensions
+    // Buffer allocation moved to OnPaint to prevent dimension mismatch
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -731,20 +1013,88 @@ void CWebView::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
 void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects,
                        const void* buffer, int width, int height)
 {
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed) [[unlikely]]
         return;
 
-    std::unique_lock<std::mutex> lock(m_RenderData.dataMutex);
+    std::unique_lock lock(m_RenderData.dataMutex);
 
     // Copy popup buffer
     if (paintType == PET_POPUP)
     {
-        if (m_RenderData.popupBuffer)
-        {
-            memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * CEF_PIXEL_STRIDE);
-        }
+        // Validate buffer parameter from CEF
+        if (!buffer || width <= 0 || height <= 0) [[unlikely]]
+            return;
 
-        return;            // We don't have to wait as we've copied the buffer already
+        // Allocate buffer based on actual paint dimensions, not OnPopupSize rect
+        // This prevents buffer overflow when CEF provides different dimensions
+        // Check for integer overflow in size calculation: width * height * CEF_PIXEL_STRIDE must fit in size_t
+        constexpr auto maxDimension = INT_MAX / CEF_PIXEL_STRIDE;
+        if (width > maxDimension || height > maxDimension) [[unlikely]]
+            return;  // Individual dimension too large
+        if (static_cast<size_t>(width) > SIZE_MAX / (static_cast<size_t>(height) * CEF_PIXEL_STRIDE)) [[unlikely]]
+            return;  // width * height * stride would overflow
+        
+        const auto requiredSize = static_cast<size_t>(width) * static_cast<size_t>(height) * CEF_PIXEL_STRIDE;
+        
+        // Calculate current size safely to avoid overflow
+        size_t currentSize = 0;
+        const auto& popupRect = m_RenderData.popupRect;
+        if (popupRect.width > 0 && popupRect.height > 0 &&
+            popupRect.width <= maxDimension && popupRect.height <= maxDimension &&
+            static_cast<size_t>(popupRect.width) <= SIZE_MAX / (static_cast<size_t>(popupRect.height) * CEF_PIXEL_STRIDE)) [[likely]]
+        {
+            currentSize = static_cast<size_t>(popupRect.width) * 
+                         static_cast<size_t>(popupRect.height) * CEF_PIXEL_STRIDE;
+        }
+        
+        // Reallocate if size changed or buffer doesn't exist
+        if (!m_RenderData.popupBuffer || requiredSize != currentSize) [[unlikely]]
+        {
+            m_RenderData.popupBuffer = std::make_unique<byte[]>(requiredSize);
+            // Update rect to reflect actual dimensions
+            m_RenderData.popupRect.width = width;
+            m_RenderData.popupRect.height = height;
+        }
+        
+        std::memcpy(m_RenderData.popupBuffer.get(), buffer, requiredSize);
+
+        // Popup path doesn't wait, so no need to signal
+        return;
+    }
+
+    // Validate main frame buffer parameter
+    if (!buffer || width <= 0 || height <= 0) [[unlikely]]
+    {
+        m_RenderData.changed = false;
+        m_RenderData.buffer = nullptr;
+        m_RenderData.dirtyRects.clear();
+        m_RenderData.dirtyRects.shrink_to_fit();
+        m_RenderData.cefThreadState = ECefThreadState::Running;
+        m_RenderData.cefThreadCv.notify_all();
+        return;
+    }
+
+    // Check for integer overflow in size calculation
+    constexpr auto maxDimension = INT_MAX / CEF_PIXEL_STRIDE;
+    if (width > maxDimension || height > maxDimension) [[unlikely]]
+    {
+        m_RenderData.changed = false;
+        m_RenderData.buffer = nullptr;
+        m_RenderData.dirtyRects.clear();
+        m_RenderData.dirtyRects.shrink_to_fit();
+        m_RenderData.cefThreadState = ECefThreadState::Running;
+        m_RenderData.cefThreadCv.notify_all();
+        return;
+    }
+    if (static_cast<size_t>(width) > SIZE_MAX / (static_cast<size_t>(height) * CEF_PIXEL_STRIDE)) [[unlikely]]
+    {
+        m_RenderData.changed = false;
+        m_RenderData.buffer = nullptr;
+        m_RenderData.dirtyRects.clear();
+        m_RenderData.dirtyRects.shrink_to_fit();
+        m_RenderData.cefThreadState = ECefThreadState::Running;
+        m_RenderData.cefThreadCv.notify_all();
+        return;
     }
 
     // Store render data
@@ -758,7 +1108,16 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
 
     // Wait for the main thread to handle drawing the texture
     m_RenderData.cefThreadState = ECefThreadState::Wait;
-    m_RenderData.cefThreadCv.wait(lock, [&]() { return m_RenderData.cefThreadState == ECefThreadState::Running; });
+    if (!m_RenderData.cefThreadCv.wait_for(lock, std::chrono::milliseconds(250), [&]() { return m_RenderData.cefThreadState == ECefThreadState::Running; }))
+    {
+        // Timed out - rendering is likely stalled or stopped
+        // Clear data to prevent UpdateTexture from using stale buffer and allow CEF to free it
+        m_RenderData.changed = false;
+        m_RenderData.buffer = nullptr;
+        m_RenderData.dirtyRects.clear();
+        m_RenderData.dirtyRects.shrink_to_fit();
+        m_RenderData.cefThreadState = ECefThreadState::Running;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1006,6 +1365,12 @@ bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
+    if (m_bBeingDestroyed)
+    {
+        browser->GetHost()->CloseBrowser(true);
+        return;
+    }
+
     // Set web view reference
     m_pWebView = browser;
 
