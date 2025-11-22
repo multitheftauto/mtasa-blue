@@ -23,7 +23,11 @@ void CGUI_Impl::DestroyElementRecursive(CGUIElement* pElement)
 
     if (auto* pImpl = dynamic_cast<CGUIElement_Impl*>(pElement))
     {
-        DestroyGuiWindowRecursive(pImpl->GetWindow());
+        CEGUI::Window* pWindow = pImpl->GetWindow();
+        if (pWindow)
+            DestroyGuiWindowRecursive(pWindow);
+        else
+            delete pElement;
         return;
     }
 

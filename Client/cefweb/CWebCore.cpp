@@ -17,6 +17,7 @@
 #include <cef3/cef/include/cef_parser.h>
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
+#include "CWebAppAuth.h"            // For GenerateAuthCode()
 #include <algorithm>
 #include <ranges>
 #include <filesystem>
@@ -26,6 +27,14 @@
 #ifdef CEF_ENABLE_SANDBOX
     #pragma comment(lib, "cef_sandbox.lib")
 #endif
+
+CWebCore::EventEntry::EventEntry(const std::function<void()>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_) {}
+
+#ifdef MTA_DEBUG
+CWebCore::EventEntry::EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_) : callback(callback_), pWebView(pWebView_), name(name_) {}
+#endif
+
+CWebCore::TaskEntry::TaskEntry(std::function<void(bool)> callback, CWebView* webView) : task(callback), webView(webView) {}
 
 CWebCore::CWebCore()
 {
@@ -37,6 +46,9 @@ CWebCore::CWebCore()
     m_bInitialised = false;
     m_iWhitelistRevision = 0;
     m_iBlacklistRevision = 0;
+
+    // Initialize auth code BEFORE CefInitialize (ensures webCore->m_AuthCode populated early)
+    m_AuthCode = WebAppAuth::GenerateAuthCode();
 
     MakeSureXMLNodesExist();
     InitialiseWhiteAndBlacklist();
@@ -363,7 +375,7 @@ void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebV
     if (pWebView && pWebView->IsBeingDestroyed())
         return;
 
-    std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+    std::scoped_lock lock(m_EventQueueMutex);
 
     // Prevent unbounded queue growth - drop oldest events if queue is too large
     if (m_EventQueue.size() >= MAX_EVENT_QUEUE_SIZE)
@@ -386,7 +398,7 @@ void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebV
 
 void CWebCore::RemoveWebViewEvents(CWebView* pWebView)
 {
-    std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+    std::scoped_lock lock(m_EventQueueMutex);
 
     for (auto iter = m_EventQueue.begin(); iter != m_EventQueue.end();)
     {
@@ -401,12 +413,16 @@ void CWebCore::DoEventQueuePulse()
 {
     std::list<EventEntry> eventQueue;
     {
-        std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+        std::scoped_lock lock(m_EventQueueMutex);
         std::swap(eventQueue, m_EventQueue);
     }
 
     for (auto& event : eventQueue)
     {
+        // Skip event if the associated WebView is being destroyed
+        if (event.pWebView && event.pWebView->IsBeingDestroyed())
+            continue;
+
         event.callback();
     }
 
@@ -473,13 +489,20 @@ void CWebCore::DoTaskQueuePulse()
 
     for (TaskEntry& entry : taskQueue)
     {
+        // Abort task if the associated WebView is being destroyed
+        if (entry.webView && entry.webView->IsBeingDestroyed())
+        {
+            entry.task(true);
+            continue;
+        }
+
         entry.task(false);
     }
 }
 
 eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
 {
-    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
+    std::scoped_lock lock(m_FilterMutex);
 
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
     static constexpr const char* wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
@@ -491,8 +514,7 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
             return eURLState::WEBPAGE_ALLOWED;
     }
 
-    google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.find(strURL);
-    if (iter != m_Whitelist.end())
+    if (auto iter = m_Whitelist.find(strURL); iter != m_Whitelist.end())
     {
         if (iter->second.first == true)
             return eURLState::WEBPAGE_ALLOWED;
@@ -583,10 +605,10 @@ void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
 
 void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
 {
-    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
+    std::scoped_lock lock(m_FilterMutex);
 
     // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
-    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    if (m_Whitelist.size() >= 50000)
     {
         // Remove WEBFILTER_REQUEST entries (temporary session entries)
         for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
@@ -603,10 +625,10 @@ void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
 
 void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
 {
-    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
+    std::scoped_lock lock(m_FilterMutex);
 
     // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
-    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    if (m_Whitelist.size() >= 50000)
     {
         // Remove WEBFILTER_REQUEST entries (temporary session entries)
         for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
@@ -623,6 +645,13 @@ void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
 
 void CWebCore::RequestPages(const std::vector<SString>& pages, WebRequestCallback* pCallback)
 {
+    if (m_PendingRequests.size() >= MAX_PENDING_REQUESTS)
+    {
+        if (pCallback)
+            (*pCallback)(false, std::unordered_set<SString>(pages.begin(), pages.end()));
+        return;
+    }
+
     // Add to pending pages queue
     bool bNewItem = false;
     for (const auto& page : pages)
@@ -631,8 +660,9 @@ void CWebCore::RequestPages(const std::vector<SString>& pages, WebRequestCallbac
         if (status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED)
             continue;
 
-        m_PendingRequests.insert(page);
-        bNewItem = true;
+        const auto [iter, inserted] = m_PendingRequests.insert(page);
+        if (inserted)
+            bNewItem = true;
     }
 
     if (bNewItem)
@@ -1026,6 +1056,9 @@ void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
 
     if (result.bSuccess)
     {
+        if (result.dataSize > 1024 * 1024) [[unlikely]]
+            return;
+
         SString strData = result.pData;
         SString strWhiteRevision, strBlackRevision;
         strData.Split(";", &strWhiteRevision, &strBlackRevision);
@@ -1073,10 +1106,21 @@ void CWebCore::StaticFetchWhitelistFinished(const SHttpDownloadResult& result)
     if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
+    if (result.dataSize > 5 * 1024 * 1024) [[unlikely]]
+    {
+        return;
+    }
+
     CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> whitelist;
     SString              strData = result.pData;
     strData.Split(";", whitelist);
+
+    if (whitelist.size() > 50000) [[unlikely]]
+    {
+        whitelist.resize(50000);
+    }
+
     CXMLNode* pListNode = pRootNode->FindSubNode("globalwhitelist");
     if (!pListNode)
         return;
@@ -1119,10 +1163,21 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
     if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
+    if (result.dataSize > 5 * 1024 * 1024) [[unlikely]]
+    {
+        return;
+    }
+
     CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> blacklist;
     SString              strData = result.pData;
     strData.Split(";", blacklist);
+
+    if (blacklist.size() > 50000) [[unlikely]]
+    {
+        blacklist.resize(50000);
+    }
+
     CXMLNode* pListNode = pRootNode->FindSubNode("globalblacklist");
     if (!pListNode)
         return;
