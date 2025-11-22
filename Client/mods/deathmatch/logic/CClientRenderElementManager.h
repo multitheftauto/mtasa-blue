@@ -18,6 +18,7 @@ class CClientRenderTarget;
 class CClientScreenSource;
 class CClientWebBrowser;
 class CClientVectorGraphic;
+class CClientGif;
 
 class CClientRenderElementManager
 {
@@ -36,6 +37,7 @@ public:
     CClientScreenSource*  CreateScreenSource(uint uiSizeX, uint uiSizeY);
     CClientWebBrowser*    CreateWebBrowser(uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent);
     CClientVectorGraphic* CreateVectorGraphic(uint width, uint height);
+    CClientGif*           CreateGif(uint width, uint height);
     CClientTexture*       FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
     void                  Remove(CClientRenderElement* pElement);
 
@@ -47,6 +49,7 @@ public:
     uint GetScreenSourceCount() { return m_uiStatsScreenSourceCount; }
     uint GetWebBrowserCount() { return m_uiStatsWebBrowserCount; }
     uint GetVectorGraphicCount() { return m_uiStatsVectorGraphicCount; }
+    uint GetGifCount() { return m_uiStatsGifCount; }
 
 protected:
     CClientManager*                               m_pClientManager;
@@ -61,4 +64,5 @@ protected:
     uint                                          m_uiStatsScreenSourceCount;
     uint                                          m_uiStatsWebBrowserCount;
     uint                                          m_uiStatsVectorGraphicCount;
+    uint                                          m_uiStatsGifCount;
 };
