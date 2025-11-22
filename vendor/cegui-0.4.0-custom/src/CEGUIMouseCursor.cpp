@@ -147,14 +147,12 @@ void MouseCursor::offsetPosition(const Point& offset)
 
 
 /*************************************************************************
-    Set the mouse cursor's alpha
+    Set the mouse cursor's color
 *************************************************************************/
-void MouseCursor::setAlpha(float alpha)
+void MouseCursor::setColor(float r, float g, float b, float alpha) noexcept
 {
-    d_colourRect.setColours(colour(1.0f, 1.0f, 1.0f, alpha));
+    d_colourRect.setColours(colour(r/255.f, g/255.f, b/255.f, alpha/255.f));
 }
-
-
 /*************************************************************************
 	Checks the mouse cursor position is within the current 'constrain'
 	Rect and adjusts as required.
