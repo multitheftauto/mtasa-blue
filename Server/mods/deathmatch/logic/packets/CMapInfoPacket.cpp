@@ -268,14 +268,6 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(m_fFogDistance);
     }
 
-    // Grass draw distance
-    BitStream.WriteBit(m_bOverrideGrassDrawDistance);
-    if (m_bOverrideGrassDrawDistance)
-    {
-        BitStream.Write(m_fGrassCloseDistance);
-        BitStream.Write(m_fGrassFarDistance);
-    }
-
     BitStream.Write(m_fAircraftMaxHeight);
     BitStream.Write(m_fAircraftMaxVelocity);
 
@@ -368,6 +360,14 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
 
     bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled();
     BitStream.WriteBit(bOcclusionsEnabled);
+
+    // Grass draw distance
+    BitStream.WriteBit(m_bOverrideGrassDrawDistance);
+    if (m_bOverrideGrassDrawDistance)
+    {
+        BitStream.Write(m_fGrassCloseDistance);
+        BitStream.Write(m_fGrassFarDistance);
+    }
 
     return true;
 }

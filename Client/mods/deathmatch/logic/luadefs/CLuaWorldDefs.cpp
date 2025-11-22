@@ -1825,21 +1825,19 @@ int CLuaWorldDefs::ResetFogDistance(lua_State* luaVM)
 
 CLuaMultiReturn<float, float> CLuaWorldDefs::GetGrassDrawDistance()
 {
-    float fCloseDistance, fFarDistance;
-    g_pMultiplayer->GetGrassDrawDistance(fCloseDistance, fFarDistance);
-    return {fCloseDistance, fFarDistance};
+    float closeDistance, farDistance;
+    g_pMultiplayer->GetGrassDrawDistance(closeDistance, farDistance);
+    return {closeDistance, farDistance};
 }
 
-bool CLuaWorldDefs::SetGrassDrawDistance(float closeDistance, float farDistance)
+void CLuaWorldDefs::SetGrassDrawDistance(float closeDistance, float farDistance)
 {
     g_pMultiplayer->SetGrassDrawDistance(closeDistance, farDistance);
-    return true;
 }
 
-bool CLuaWorldDefs::ResetGrassDrawDistance()
+void CLuaWorldDefs::ResetGrassDrawDistance()
 {
     g_pMultiplayer->ResetGrassDrawDistance();
-    return true;
 }
 
 int CLuaWorldDefs::GetSunColor(lua_State* luaVM)

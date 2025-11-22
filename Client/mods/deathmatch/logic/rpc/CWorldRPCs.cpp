@@ -359,11 +359,11 @@ void CWorldRPCs::SetFogDistance(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetGrassDrawDistance(NetBitStreamInterface& bitStream)
 {
-    float fCloseDistance, fFarDistance;
+    float closeDistance, farDistance;
 
-    if (bitStream.Read(fCloseDistance) && bitStream.Read(fFarDistance))
+    if (bitStream.Read(closeDistance) && bitStream.Read(farDistance))
     {
-        g_pMultiplayer->SetGrassDrawDistance(fCloseDistance, fFarDistance);
+        g_pMultiplayer->SetGrassDrawDistance(closeDistance, farDistance);
     }
 }
 

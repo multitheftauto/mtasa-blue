@@ -802,15 +802,15 @@ int CLuaWorldDefs::getFogDistance(lua_State* luaVM)
     return 1;
 }
 
-std::variant<CLuaMultiReturn<float, float>, bool> CLuaWorldDefs::GetGrassDrawDistance()
+CLuaMultiReturn<float, float> CLuaWorldDefs::GetGrassDrawDistance()
 {
-    float fCloseDistance, fFarDistance;
-    bool  bSuccess = CStaticFunctionDefinitions::GetGrassDrawDistance(fCloseDistance, fFarDistance);
+    float closeDistance, farDistance;
+    bool  bSuccess = CStaticFunctionDefinitions::GetGrassDrawDistance(closeDistance, farDistance);
 
     if (bSuccess)
-        return std::make_tuple(fCloseDistance, fFarDistance);
-    
-    return false;
+        return {closeDistance, farDistance};
+
+    return {};
 }
 
 int CLuaWorldDefs::setInteriorSoundsEnabled(lua_State* luaVM)
@@ -999,9 +999,9 @@ int CLuaWorldDefs::setFogDistance(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaWorldDefs::SetGrassDrawDistance(float closeDistance, float farDistance)
+void CLuaWorldDefs::SetGrassDrawDistance(float closeDistance, float farDistance)
 {
-    return CStaticFunctionDefinitions::SetGrassDrawDistance(closeDistance, farDistance);
+    CStaticFunctionDefinitions::SetGrassDrawDistance(closeDistance, farDistance);
 }
 
 int CLuaWorldDefs::resetRainLevel(lua_State* luaVM)
@@ -1081,9 +1081,9 @@ int CLuaWorldDefs::resetFogDistance(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaWorldDefs::ResetGrassDrawDistance()
+void CLuaWorldDefs::ResetGrassDrawDistance()
 {
-    return CStaticFunctionDefinitions::ResetGrassDrawDistance();
+    CStaticFunctionDefinitions::ResetGrassDrawDistance();
 }
 
 int CLuaWorldDefs::RemoveWorldModel(lua_State* luaVM)

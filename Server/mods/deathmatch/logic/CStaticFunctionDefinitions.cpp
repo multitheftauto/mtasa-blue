@@ -10686,11 +10686,11 @@ bool CStaticFunctionDefinitions::GetFogDistance(float& fFogDist)
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetGrassDrawDistance(float& fCloseDistance, float& fFarDistance)
+bool CStaticFunctionDefinitions::GetGrassDrawDistance(float& closeDistance, float& farDistance)
 {
     if (g_pGame->HasGrassDrawDistance())
     {
-        g_pGame->GetGrassDrawDistance(fCloseDistance, fFarDistance);
+        g_pGame->GetGrassDrawDistance(closeDistance, farDistance);
         return true;
     }
 
@@ -10881,17 +10881,15 @@ bool CStaticFunctionDefinitions::SetFogDistance(float fFogDist)
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetGrassDrawDistance(float fCloseDistance, float fFarDistance)
+void CStaticFunctionDefinitions::SetGrassDrawDistance(float closeDistance, float farDistance)
 {
-    g_pGame->SetGrassDrawDistance(fCloseDistance, fFarDistance);
+    g_pGame->SetGrassDrawDistance(closeDistance, farDistance);
     g_pGame->SetHasGrassDrawDistance(true);
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write(fCloseDistance);
-    BitStream.pBitStream->Write(fFarDistance);
+    BitStream.pBitStream->Write(closeDistance);
+    BitStream.pBitStream->Write(farDistance);
     m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_GRASS_DRAW_DISTANCE, *BitStream.pBitStream));
-
-    return true;
 }
 
 bool CStaticFunctionDefinitions::SetAircraftMaxHeight(float fMaxHeight)
@@ -10986,14 +10984,12 @@ bool CStaticFunctionDefinitions::ResetFogDistance()
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetGrassDrawDistance()
+void CStaticFunctionDefinitions::ResetGrassDrawDistance()
 {
     g_pGame->SetHasGrassDrawDistance(false);
 
     CBitStream BitStream;
     m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(RESET_GRASS_DRAW_DISTANCE, *BitStream.pBitStream));
-
-    return true;
 }
 
 bool CStaticFunctionDefinitions::RemoveWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior)

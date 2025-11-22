@@ -2064,22 +2064,22 @@ void CMultiplayerSA::RestoreFogDistance()
     }
 }
 
-void CMultiplayerSA::SetGrassDrawDistance(float fCloseDistance, float fFarDistance)
+void CMultiplayerSA::SetGrassDrawDistance(float closeDistance, float farDistance)
 {
-    MemPutFast<float>(0xC02DBC, fCloseDistance);
-    MemPutFast<float>(0x8D132C, fFarDistance);
+    MemPutFast<float>(VAR_CGrassCloseDist, closeDistance);
+    MemPutFast<float>(VAR_CGrassFarDist, farDistance);
 }
 
-void CMultiplayerSA::GetGrassDrawDistance(float& fCloseDistance, float& fFarDistance) const
+void CMultiplayerSA::GetGrassDrawDistance(float& closeDistance, float& farDistance) const
 {
-    fCloseDistance = *(float*)0xC02DBC;
-    fFarDistance = *(float*)0x8D132C;
+    closeDistance = *(float*)VAR_CGrassCloseDist;
+    farDistance = *(float*)VAR_CGrassFarDist;
 }
 
 void CMultiplayerSA::ResetGrassDrawDistance()
 {
-    MemPutFast<float>(0xC02DBC, 3.0f);
-    MemPutFast<float>(0x8D132C, 60.0f);
+    MemPutFast<float>(VAR_CGrassCloseDist, DEFAULT_GRASS_CLOSE_DISTANCE);
+    MemPutFast<float>(VAR_CGrassFarDist, DEFAULT_GRASS_FAR_DISTANCE);
 }
 
 void CMultiplayerSA::GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed,

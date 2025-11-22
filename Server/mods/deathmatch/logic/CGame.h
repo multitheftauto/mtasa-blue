@@ -404,18 +404,18 @@ public:
     float GetFogDistance() { return m_fFogDistance; }
     void  SetFogDistance(float& fFogDistance) { m_fFogDistance = fFogDistance; }
 
-    bool HasGrassDrawDistance() { return m_bOverrideGrassDrawDistance; }
-    void SetHasGrassDrawDistance(bool bOverrideGrassDrawDistance) { m_bOverrideGrassDrawDistance = bOverrideGrassDrawDistance; }
+    bool HasGrassDrawDistance() const noexcept { return m_bOverrideGrassDrawDistance; }
+    void SetHasGrassDrawDistance(bool bOverrideGrassDrawDistance) noexcept { m_bOverrideGrassDrawDistance = bOverrideGrassDrawDistance; }
 
-    void  GetGrassDrawDistance(float& fCloseDistance, float& fFarDistance)
+    void GetGrassDrawDistance(float& closeDistance, float& farDistance) const noexcept
     {
-        fCloseDistance = m_fGrassCloseDistance;
-        fFarDistance = m_fGrassFarDistance;
+        closeDistance = m_fGrassCloseDistance;
+        farDistance = m_fGrassFarDistance;
     }
-    void SetGrassDrawDistance(float fCloseDistance, float fFarDistance)
+    void SetGrassDrawDistance(float closeDistance, float farDistance) noexcept
     {
-        m_fGrassCloseDistance = fCloseDistance;
-        m_fGrassFarDistance = fFarDistance;
+        m_fGrassCloseDistance = closeDistance;
+        m_fGrassFarDistance = farDistance;
     }
 
     float GetAircraftMaxHeight() { return m_fAircraftMaxHeight; }
