@@ -802,15 +802,17 @@ int CLuaWorldDefs::getFogDistance(lua_State* luaVM)
     return 1;
 }
 
-CLuaMultiReturn<float, float> CLuaWorldDefs::GetGrassDrawDistance()
+std::variant<bool, CLuaMultiReturn<float, float>> CLuaWorldDefs::GetGrassDrawDistance()
 {
     float closeDistance, farDistance;
     bool  bSuccess = CStaticFunctionDefinitions::GetGrassDrawDistance(closeDistance, farDistance);
 
     if (bSuccess)
-        return {closeDistance, farDistance};
+    {
+        return CLuaMultiReturn<float, float>(closeDistance, farDistance);
+    }
 
-    return {};
+    return false;
 }
 
 int CLuaWorldDefs::setInteriorSoundsEnabled(lua_State* luaVM)
