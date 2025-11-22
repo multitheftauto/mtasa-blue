@@ -457,7 +457,9 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
 
     // Return whether our event was cancelled or not
     return !eventContext.IsCancelled();
-}bool CElement::DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction)
+}
+
+bool CElement::DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction)
 {
     return m_pEventManager->Delete(pLuaMain, szName, iLuaFunction);
 }
