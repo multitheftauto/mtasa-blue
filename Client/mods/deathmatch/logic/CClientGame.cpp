@@ -6851,6 +6851,10 @@ bool CClientGame::RestreamModel(std::uint16_t model)
 
 void CClientGame::RestreamWorld()
 {
+    // If game is shutting down or not streaming is not available, do nothing
+    if (g_bClientShuttingDown)
+        return;
+
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
     for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
