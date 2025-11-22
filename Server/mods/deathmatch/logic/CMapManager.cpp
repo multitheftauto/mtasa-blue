@@ -533,8 +533,8 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
                                fJetpackMaxHeight, bOverrideWaterColor, ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha, bInteriorSoundsEnabled,
                                bOverrideRainLevel, fRainLevel, bOverrideSunSize, fSunSize, bOverrideSunColor, ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG,
                                ucCoronaB, bOverrideWindVelocity, fWindVelX, fWindVelY, fWindVelZ, bOverrideFarClipDistance, fFarClip, bOverrideFogDistance,
-                               fFogDistance, overrideGrassDrawDistance, grassCloseDistance, grassFarDistance, fAircraftMaxHeight, fAircraftMaxVelocity, 
-                               bOverrideMoonSize, iMoonSize));
+                               fFogDistance, fAircraftMaxHeight, fAircraftMaxVelocity, bOverrideMoonSize, iMoonSize, overrideGrassDrawDistance, grassCloseDistance,
+                               grassFarDistance));
 
     marker.Set("SendMapInfoPacket");
 
