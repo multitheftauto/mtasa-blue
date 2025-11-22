@@ -25,6 +25,9 @@ CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool b
     m_bIsLocal = bIsLocal;
     m_bIsTransparent = bTransparent;
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
+    if (m_pWebBrowserRenderItem)
+        m_pWebBrowserRenderItem->AddRef();
+
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
     m_fVolume = 1.0f;
@@ -45,6 +48,12 @@ CWebView::~CWebView()
             if (pWebCore->GetFocusedWebView() == this)
                 pWebCore->SetFocusedWebView(nullptr);
         }
+    }
+
+    if (m_pWebBrowserRenderItem)
+    {
+        m_pWebBrowserRenderItem->Release();
+        m_pWebBrowserRenderItem = nullptr;
     }
 
     // Make sure we don't dead lock the CEF render thread
@@ -280,7 +289,7 @@ void CWebView::ClearTexture()
 
 void CWebView::UpdateTexture()
 {
-    const std::lock_guard lock(m_RenderData.dataMutex);
+    const std::scoped_lock lock(m_RenderData.dataMutex);
 
     // Validate render item exists before accessing
     if (!m_pWebBrowserRenderItem) [[unlikely]]
@@ -714,7 +723,7 @@ void CWebView::GetSourceCode(const std::function<void(const std::string& code)>&
     class MyStringVisitor : public CefStringVisitor
     {
     private:
-        CWebView*                               webView;
+        CefRefPtr<CWebView>                     webView;
         std::function<void(const std::string&)> callback;
 
     public:
@@ -722,7 +731,7 @@ void CWebView::GetSourceCode(const std::function<void(const std::string& code)>&
 
         virtual void Visit(const CefString& code) override
         {
-            // Avoid UAF
+            // Check if webview is being destroyed to prevent UAF
             if (webView->IsBeingDestroyed())
                 return;
             
@@ -730,7 +739,7 @@ void CWebView::GetSourceCode(const std::function<void(const std::string& code)>&
             if (code.size() <= 2097152)
             {
                 // Call callback on main thread
-                g_pCore->GetWebCore()->AddEventToEventQueue(std::bind(callback, code), webView, "GetSourceCode_Visit");
+                g_pCore->GetWebCore()->AddEventToEventQueue(std::bind(callback, code), webView.get(), "GetSourceCode_Visit");
             }
         }
 
@@ -783,8 +792,8 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
 
 bool CWebView::RegisterAjaxHandler(const SString& strURL)
 {
-    auto result = m_AjaxHandlers.insert(strURL);
-    return result.second;
+    auto [iter, inserted] = m_AjaxHandlers.insert(strURL);
+    return inserted;
 }
 
 bool CWebView::UnregisterAjaxHandler(const SString& strURL)
