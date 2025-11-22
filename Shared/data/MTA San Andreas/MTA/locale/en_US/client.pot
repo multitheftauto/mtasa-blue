@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-21 22:46+0000\n"
+"POT-Creation-Date: 2025-11-22 01:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3058,195 +3058,195 @@ msgstr ""
 msgid "Disconnect to cancel download"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:499
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnected: Invalid nickname"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 msgid "Disconnect from server"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:511
 #, c-format
 msgid ""
 "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
 #, c-format
 msgid ""
 "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:523
 #, c-format
 msgid ""
 "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:524
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Version mismatch"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
 msgid ""
 "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 #, c-format
 msgid ""
 "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:542
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:546
 #, c-format
 msgid ""
 "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:547
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:551
 #, c-format
 msgid ""
 "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:552
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
 msgid "Disconnected: Nick already in use"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
 msgid "Disconnected: Player element could not be created."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:564
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:565
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial verification failed"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 msgid "Disconnected: Serial already in use"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:577
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:586
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:587
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:591
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:598
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "Disconnected: Server shutdown or restarting"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:618
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 msgid "You were kicked from the game"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:619
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Please replace gta_sa.exe"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "This server does not allow virtual machines"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server requires driver signing to be enabled"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Please restart your PC"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server has detected missing anti-cheat components"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Try restarting MTA"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Please replace gta3.img or gta_int.img"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
 msgid "This server does not allow Wine"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:637
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
 msgid "Time Remaining: "
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:657
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -3254,7 +3254,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:671
 msgid "Disconnected"
 msgstr ""
 
