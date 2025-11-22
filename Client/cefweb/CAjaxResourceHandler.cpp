@@ -36,6 +36,12 @@ void CAjaxResourceHandler::SetResponse(SString data)
     m_strResponse = std::move(data);
     m_bHasData = true;
 
+    // Clear request data to free memory as it's no longer needed
+    m_vecGetData.clear();
+    m_vecGetData.shrink_to_fit();
+    m_vecPostData.clear();
+    m_vecPostData.shrink_to_fit();
+
     if (!m_callback)
         return;
 
