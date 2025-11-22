@@ -73,6 +73,8 @@ public:
     void UpdateTexture();
 
     bool HasInputFocus() { return m_bHasInputFocus; }
+    void SetInputFocus(bool bFocus) { m_bHasInputFocus = bFocus; }            // Setter for IPC handlers
+    CWebBrowserEventsInterface* GetEventsInterface() { return m_pEventsInterface; }            // Getter for IPC handlers
 
     void ExecuteJavascript(const SString& strJavascriptCode);
 
