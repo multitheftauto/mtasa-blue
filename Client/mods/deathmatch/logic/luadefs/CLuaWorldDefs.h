@@ -149,4 +149,8 @@ public:
 
     static void RemoveGameWorld();
     static void RestoreGameWorld();
+
+    
+    LUA_DECLARE(SetPlayerGlitchEnabled);
+    LUA_DECLARE(IsPlayerGlitchEnabled);
 };
