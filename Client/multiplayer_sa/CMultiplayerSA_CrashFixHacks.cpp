@@ -980,6 +980,40 @@ cont:
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CAnimBlendAssociation::SetCurrentTime
+// 
+// "this" is invalid
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc32                             0x4CEA80
+#define HOOKSIZE_CrashFix_Misc32                            8
+DWORD RETURN_CrashFix_Misc32 = 0x4CEA88;
+
+void _declspec(naked) HOOK_CrashFix_Misc32()
+{
+    _asm
+    {
+        test    ecx, ecx
+        jz      cont
+
+        // Check hierarchy pointer (offset 0x14)
+        // We can use eax as scratch because it gets overwritten by the first replaced instruction anyway
+        mov     eax, [ecx+14h]
+        test    eax, eax
+        jz      cont
+
+        // Execute replaced code
+        mov     eax, [esp+4]
+        fld     dword ptr [esp+4]
+        jmp     RETURN_CrashFix_Misc32
+
+    cont:
+        push    32
+        call    CrashAverted
+        retn    4
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
 // CClumpModelInfo::GetFrameFromId
 //
 // Invalid frame
@@ -2141,6 +2175,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc28);
     EZHookInstall(CrashFix_Misc29);
     EZHookInstallChecked(CrashFix_Misc30);
+    EZHookInstall(CrashFix_Misc32);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);
