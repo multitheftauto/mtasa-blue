@@ -512,6 +512,44 @@ static void AppendCrashDiagnostics(const SString& text)
     WriteDebugEvent(text.Replace("\n", " "));
 }
 
+static BOOL SafeStackWalk64(DWORD MachineType, HANDLE hProcess, HANDLE hThread, LPSTACKFRAME64 StackFrame, PVOID ContextRecord,
+                            PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine, PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine,
+                            PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine, PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress)
+{
+    __try
+    {
+        return StackWalk64(MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
+static BOOL SafeSymFromAddr(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol)
+{
+    __try
+    {
+        return SymFromAddr(hProcess, Address, Displacement, Symbol);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
+static BOOL SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 dwAddr, PDWORD pdwDisplacement, PIMAGEHLP_LINE64 Line)
+{
+    __try
+    {
+        return SymGetLineFromAddr64(hProcess, dwAddr, pdwDisplacement, Line);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
 [[nodiscard]] static bool CaptureStackTraceText(_EXCEPTION_POINTERS* pException, SString& outText)
 {
     if (pException == nullptr || pException->ContextRecord == nullptr)
@@ -566,7 +604,7 @@ static void AppendCrashDiagnostics(const SString& text)
     for (std::size_t frameIndex = 0; frameIndex < MAX_FALLBACK_STACK_FRAMES; ++frameIndex)
     {
         BOOL bWalked =
-            StackWalk64(IMAGE_FILE_MACHINE_I386, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
+            SafeStackWalk64(IMAGE_FILE_MACHINE_I386, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
         if (bWalked == FALSE)
             break;
 
@@ -584,7 +622,7 @@ static void AppendCrashDiagnostics(const SString& text)
             visitedAddresses[visitedCount++] = address;
 
         SString symbolName = SString("0x%llX", static_cast<unsigned long long>(address));
-        if (SymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE)
+        if (SafeSymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE)
         {
             const auto terminatorIndex = static_cast<std::size_t>(pSymbol->MaxNameLen);
             if (terminatorIndex < MAX_SYM_NAME)
@@ -596,7 +634,7 @@ static void AppendCrashDiagnostics(const SString& text)
     lineInfo.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
         DWORD           lineDisplacement = 0;
         SString         lineDetail = "unknown";
-        if (SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
+        if (SafeSymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
         {
             const char* fileName = lineInfo.FileName != nullptr ? lineInfo.FileName : "unknown";
             lineDetail = SString("%s:%lu", fileName, static_cast<unsigned long>(lineInfo.LineNumber));
@@ -1146,13 +1184,13 @@ static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException)
             exceptionCode = pException->ExceptionRecord->ExceptionCode;
             if (exceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION)
             {
-                OutputDebugStringA("CCrashDumpWriter: 0xC000041D callback exception detected\n");
+                SAFE_DEBUG_OUTPUT("CCrashDumpWriter: 0xC000041D callback exception detected\n");
             }
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        OutputDebugStringA("CCrashDumpWriter: Exception accessing exception record (corrupted frame)\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Exception accessing exception record (corrupted frame)\n");
     }
     return exceptionCode;
 }
