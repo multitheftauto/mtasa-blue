@@ -23,6 +23,8 @@ public:
     CClientBuildingManager(class CClientManager* pManager);
     ~CClientBuildingManager();
 
+    void DoPulse();
+
     void RemoveAll();
     bool Exists(CClientBuilding* pBuilding);
 
@@ -35,6 +37,8 @@ public:
     bool SetPoolCapacity(size_t newCapacity);
 
     void DestroyAllForABit();
+    void RestreamBuildings(std::uint32_t modelId);
+
     void RestoreDestroyed();
     void RestoreDestroyedSafe();
 

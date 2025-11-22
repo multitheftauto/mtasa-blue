@@ -171,6 +171,8 @@ public:
     float GetLength() const noexcept { return GetAnimHierarchy()->GetTotalTime(); }
     void  SetAnimID(short sAnimID) { m_pInterface->sAnimID = sAnimID; }
     void  SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
+
+    short GetFlags() const override { return m_pInterface->m_nFlags; }
     void  SetFlags(short sFlags) { m_pInterface->m_nFlags = sFlags; }
 
 protected:

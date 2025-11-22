@@ -80,6 +80,7 @@ public:
     virtual AnimBlendAssoc_type     AddAnimationAndSync(RpClump* pClump, CAnimBlendAssociation* pAssociation, AssocGroupId animGroup, AnimationId animID) = 0;
     virtual AnimBlendAssoc_type     BlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta) = 0;
     virtual AnimBlendAssoc_type     BlendAnimation(RpClump* pClump, CAnimBlendHierarchy* pHierarchy, int ID, float fBlendDelta) = 0;
+    virtual AnimBlendAssoc_type     BlendAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pHierarchyInterface, int ID, float fBlendDelta) = 0;
 
     virtual void AddAnimBlockRef(int ID) = 0;
     virtual void RemoveAnimBlockRef(int ID) = 0;
