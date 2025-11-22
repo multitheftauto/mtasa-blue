@@ -520,9 +520,9 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
     float fFogDistance = g_pGame->GetFogDistance();
 
     // Grass draw distance
-    bool  bOverrideGrassDrawDistance = g_pGame->HasGrassDrawDistance();
-    float fGrassCloseDistance, fGrassFarDistance;
-    g_pGame->GetGrassDrawDistance(fGrassCloseDistance, fGrassFarDistance);
+    bool  overrideGrassDrawDistance = g_pGame->HasGrassDrawDistance();
+    float grassCloseDistance, grassFarDistance;
+    g_pGame->GetGrassDrawDistance(grassCloseDistance, grassFarDistance);
 
     marker.Set("FirstBit");
 
@@ -533,7 +533,7 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
                                fJetpackMaxHeight, bOverrideWaterColor, ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha, bInteriorSoundsEnabled,
                                bOverrideRainLevel, fRainLevel, bOverrideSunSize, fSunSize, bOverrideSunColor, ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG,
                                ucCoronaB, bOverrideWindVelocity, fWindVelX, fWindVelY, fWindVelZ, bOverrideFarClipDistance, fFarClip, bOverrideFogDistance,
-                               fFogDistance, bOverrideGrassDrawDistance, fGrassCloseDistance, fGrassFarDistance, fAircraftMaxHeight, fAircraftMaxVelocity, 
+                               fFogDistance, overrideGrassDrawDistance, grassCloseDistance, grassFarDistance, fAircraftMaxHeight, fAircraftMaxVelocity, 
                                bOverrideMoonSize, iMoonSize));
 
     marker.Set("SendMapInfoPacket");

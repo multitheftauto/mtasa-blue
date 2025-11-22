@@ -400,8 +400,8 @@ private:
     eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
-    float               m_fGrassCloseDistance;
-    float               m_fGrassFarDistance;
+    float               m_grassCloseDistance;
+    float               m_grassFarDistance;
 
     bool m_isRapidVehicleStopFixEnabled{false};
 

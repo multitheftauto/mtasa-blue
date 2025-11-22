@@ -219,9 +219,9 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_bOverrideWindVelocity = false;
     m_bOverrideFarClip = false;
     m_bOverrideFogDistance = false;
-    m_bOverrideGrassDrawDistance = false;
-    m_fGrassCloseDistance = 3.0f;
-    m_fGrassFarDistance = 60.0f;
+    m_overrideGrassDrawDistance = false;
+    m_grassCloseDistance = 3.0f;
+    m_grassFarDistance = 60.0f;
     m_bOverrideMoonSize = false;
 
     m_pASE = NULL;

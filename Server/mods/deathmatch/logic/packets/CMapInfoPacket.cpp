@@ -27,9 +27,9 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
                                bool bOverrideRainLevel, float fRainLevel, bool bOverrideSunSize, float fSunSize, bool bOverrideSunColor,
                                unsigned char ucSunCoreR, unsigned char ucSunCoreG, unsigned char ucSunCoreB, unsigned char ucSunCoronaR,
                                unsigned char ucSunCoronaG, unsigned char ucSunCoronaB, bool bOverrideWindVelocity, float fWindVelX, float fWindVelY,
-                               float fWindVelZ, bool bOverrideFarClipDistance, float fFarClip, bool bOverrideFogDistance, float fFogDistance,
-                               bool bOverrideGrassDrawDistance, float fGrassCloseDistance, float fGrassFarDistance,
-                               float fAircraftMaxHeight, float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize)
+                               float fWindVelZ, bool bOverrideFarClipDistance, float fFarClip, bool bOverrideFogDistance, float fFogDistance, float fAircraftMaxHeight,
+                               float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize, bool overrideGrassDrawDistance, float grassCloseDistance,
+                               float grassFarDistance)
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -81,9 +81,9 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
     m_fFarClip = fFarClip;
     m_bOverrideFogDistance = bOverrideFogDistance;
     m_fFogDistance = fFogDistance;
-    m_bOverrideGrassDrawDistance = bOverrideGrassDrawDistance;
-    m_fGrassCloseDistance = fGrassCloseDistance;
-    m_fGrassFarDistance = fGrassFarDistance;
+    m_overrideGrassDrawDistance = overrideGrassDrawDistance;
+    m_grassCloseDistance = grassCloseDistance;
+    m_grassFarDistance = grassFarDistance;
     m_fAircraftMaxHeight = fAircraftMaxHeight;
     m_fAircraftMaxVelocity = fAircraftMaxVelocity;
     m_bOverrideMoonSize = bOverrideMoonSize;
@@ -362,11 +362,11 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteBit(bOcclusionsEnabled);
 
     // Grass draw distance
-    BitStream.WriteBit(m_bOverrideGrassDrawDistance);
-    if (m_bOverrideGrassDrawDistance)
+    BitStream.WriteBit(m_overrideGrassDrawDistance);
+    if (m_overrideGrassDrawDistance)
     {
-        BitStream.Write(m_fGrassCloseDistance);
-        BitStream.Write(m_fGrassFarDistance);
+        BitStream.Write(m_grassCloseDistance);
+        BitStream.Write(m_grassFarDistance);
     }
 
     return true;
