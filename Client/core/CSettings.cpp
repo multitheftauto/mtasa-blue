@@ -2852,6 +2852,7 @@ bool CSettings::OnControlsDefaultClick(CGUIElement* pElement)
     m_pMouseSensitivity->SetScrollPosition(gameSettings->GetMouseSensitivity());
     m_pVerticalAimSensitivity->SetScrollPosition(pController->GetVerticalAimSensitivity());
     m_pCheckboxVerticalAimSensitivity->SetSelected(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
+    m_pVerticalAimSensitivity->SetEnabled(!m_pCheckboxVerticalAimSensitivity->GetSelected());
 
     return true;
 }
@@ -3957,6 +3958,7 @@ void CSettings::LoadData()
 
     CVARS_GET("use_mouse_sensitivity_for_aiming", bVar);
     m_pCheckboxVerticalAimSensitivity->SetSelected(bVar);
+    m_pVerticalAimSensitivity->SetEnabled(!m_pCheckboxVerticalAimSensitivity->GetSelected());
 
     // Audio
     m_pCheckBoxAudioEqualizer->SetSelected(gameSettings->IsRadioEqualizerEnabled());
