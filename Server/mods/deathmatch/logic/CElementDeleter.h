@@ -13,6 +13,7 @@
 
 #include "CElement.h"
 #include <list>
+#include <vector>
 
 class CElementDeleter
 {
@@ -20,13 +21,14 @@ public:
     ~CElementDeleter() { DoDeleteAll(); };
 
     void Delete(class CElement* pElement, bool bUnlink = true, bool bUpdatePerPlayerEntities = true);
+    void DeleteTree(CElement* rootElement, bool unlink = true, bool updatePerPlayerEntities = true);
     void DoDeleteAll();
 
-    bool IsBeingDeleted(class CElement* pElement);
-    void Unreference(CElement* pElement);
-
-    void CleanUpForVM(CLuaMain* pLuaMain);
+    bool IsBeingDeleted(CElement* element) const;
+    void Unreference(CElement* element);
+    void CleanUpForVM(CLuaMain* luaMain);
 
 private:
+    void CollectTreeElements(CElement* element, std::vector<CElement*>& elements);
     CElementListType m_List;
 };
