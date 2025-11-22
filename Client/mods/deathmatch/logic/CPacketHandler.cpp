@@ -2548,19 +2548,6 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         g_pMultiplayer->SetFogDistance(fFogDistance);
     }
 
-    // Grass draw distance
-    bool  bOverrideGrassDrawDistance = false;
-    float grassCloseDistance, grassFarDistance;
-    if (!bitStream.ReadBit(bOverrideGrassDrawDistance))
-        return;
-    if (bOverrideGrassDrawDistance)
-    {
-        if (!bitStream.Read(grassCloseDistance) || !bitStream.Read(grassFarDistance))
-            return;
-
-        g_pMultiplayer->SetGrassDrawDistance(grassCloseDistance, grassFarDistance);
-    }
-
     // Aircraft max height
     float fAircraftMaxHeight = 800;
     if (!bitStream.Read(fAircraftMaxHeight))
@@ -2680,6 +2667,19 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     bitStream.ReadBit(bOcclusionsEnabled);
 
     g_pGame->GetWorld()->SetOcclusionsEnabled(bOcclusionsEnabled);
+
+    // Grass draw distance
+    bool  bOverrideGrassDrawDistance = false;
+    float fGrassCloseDistance, fGrassFarDistance;
+    if (!bitStream.ReadBit(bOverrideGrassDrawDistance))
+        return;
+    if (bOverrideGrassDrawDistance)
+    {
+        if (!bitStream.Read(fGrassCloseDistance) || !bitStream.Read(fGrassFarDistance))
+            return;
+
+        g_pMultiplayer->SetGrassDrawDistance(fGrassCloseDistance, fGrassFarDistance);
+    }
 }
 
 void CPacketHandler::Packet_PartialPacketInfo(NetBitStreamInterface& bitStream)
