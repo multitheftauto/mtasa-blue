@@ -18,6 +18,7 @@
 #include <multiplayer/CMultiplayer.h>
 #include <core/CClientBase.h>
 #include "CrashHandler.h"
+#include <CrashTelemetry.h>
 
 #include <process.h>
 #include <DbgHelp.h>
@@ -50,12 +51,12 @@ static constexpr int         SCREEN_MARGIN_PIXELS = 50;
 static constexpr int         EMERGENCY_MSGBOX_WIDTH = 600;
 static constexpr int         EMERGENCY_MSGBOX_HEIGHT = 200;
 
-constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
+constexpr DWORD Milliseconds(std::chrono::milliseconds duration)
 {
     return static_cast<DWORD>(duration.count());
 }
 
-[[nodiscard]] static DWORD ResolveCrashExitCode(const _EXCEPTION_POINTERS* exceptionPtrs) noexcept
+[[nodiscard]] static DWORD ResolveCrashExitCode(const _EXCEPTION_POINTERS* exceptionPtrs)
 {
     if (const auto* record = (exceptionPtrs != nullptr) ? exceptionPtrs->ExceptionRecord : nullptr;
         record != nullptr && record->ExceptionCode != 0)
@@ -66,7 +67,7 @@ constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
     return CRASH_EXIT_CODE;
 }
 
-[[noreturn]] static void TerminateCurrentProcessWithExitCode(DWORD exitCode) noexcept
+[[noreturn]] static void TerminateCurrentProcessWithExitCode(DWORD exitCode)
 {
     if (exitCode == 0)
     {
@@ -81,7 +82,7 @@ constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
 
 class CClientBase;
 
-static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue) noexcept
+static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue)
 {
     __try
     {
@@ -94,7 +95,7 @@ static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue) noexcep
     }
 }
 
-static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInformation_Impl* pExceptionInformation, bool& outHandled) noexcept
+static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInformation_Impl* pExceptionInformation, bool& outHandled)
 {
     outHandled = false;
 
@@ -115,7 +116,7 @@ static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInfo
 
 namespace
 {
-    void ConfigureDbgHelpOptions() noexcept
+    void ConfigureDbgHelpOptions()
     {
         static std::atomic_flag configured = ATOMIC_FLAG_INIT;
         if (!configured.test_and_set(std::memory_order_acq_rel))
@@ -124,7 +125,7 @@ namespace
         }
     }
     
-    std::mutex& GetSymInitMutex() noexcept
+    std::mutex& GetSymInitMutex()
     {
         static std::mutex symMutex;
         return symMutex;
@@ -134,7 +135,7 @@ namespace
 class SymbolHandlerGuard
 {
 public:
-    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) noexcept : m_process(process), m_initialized(false)
+    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) : m_process(process), m_initialized(false)
     {
         if (!enableSymbols)
             return;
@@ -153,7 +154,7 @@ public:
         }
     }
 
-    ~SymbolHandlerGuard() noexcept
+    ~SymbolHandlerGuard()
     {
         if (m_initialized)
             SymCleanup(m_process);
@@ -164,7 +165,7 @@ public:
     SymbolHandlerGuard(SymbolHandlerGuard&&) = delete;
     SymbolHandlerGuard& operator=(SymbolHandlerGuard&&) = delete;
 
-    bool IsInitialized() const noexcept { return m_initialized; }
+    bool IsInitialized() const { return m_initialized; }
 
 private:
     HANDLE m_process;
@@ -279,7 +280,7 @@ static HANDLE                                              ms_hCrashDialogProces
     return candidates;
 }
 
-[[nodiscard]] static inline constexpr bool IsValidHandle(HANDLE handle) noexcept
+[[nodiscard]] static inline constexpr bool IsValidHandle(HANDLE handle)
 {
     return handle != nullptr && handle != INVALID_HANDLE_VALUE;
 }
@@ -287,15 +288,15 @@ static HANDLE                                              ms_hCrashDialogProces
 class UniqueHandle
 {
 public:
-    UniqueHandle() noexcept = default;
-    explicit UniqueHandle(HANDLE handle) noexcept : m_handle(handle) {}
-    ~UniqueHandle() noexcept { reset(); }
+    UniqueHandle() = default;
+    explicit UniqueHandle(HANDLE handle) : m_handle(handle) {}
+    ~UniqueHandle() { reset(); }
 
     UniqueHandle(const UniqueHandle&) = delete;
     UniqueHandle& operator=(const UniqueHandle&) = delete;
 
-    UniqueHandle(UniqueHandle&& other) noexcept : m_handle(other.release()) {}
-    UniqueHandle& operator=(UniqueHandle&& other) noexcept
+    UniqueHandle(UniqueHandle&& other) : m_handle(other.release()) {}
+    UniqueHandle& operator=(UniqueHandle&& other)
     {
         if (this != &other)
         {
@@ -305,29 +306,29 @@ public:
         return *this;
     }
 
-    void reset(HANDLE handle = nullptr) noexcept
+    void reset(HANDLE handle = nullptr)
     {
         if (IsValidHandle(m_handle))
             CloseHandle(m_handle);
         m_handle = handle;
     }
 
-    [[nodiscard]] HANDLE get() const noexcept { return m_handle; }
+    [[nodiscard]] HANDLE get() const { return m_handle; }
 
-    [[nodiscard]] HANDLE release() noexcept
+    [[nodiscard]] HANDLE release()
     {
         HANDLE handle = m_handle;
         m_handle = nullptr;
         return handle;
     }
 
-    [[nodiscard]] explicit operator bool() const noexcept { return IsValidHandle(m_handle); }
+    [[nodiscard]] explicit operator bool() const { return IsValidHandle(m_handle); }
 
 private:
     HANDLE m_handle = nullptr;
 };
 
-static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformation) noexcept
+static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformation)
 {
     if (pExceptionInformation == nullptr)
     {
@@ -527,7 +528,7 @@ static void AppendCrashDiagnostics(const SString& text)
     WriteDebugEvent(text.Replace("\n", " "));
 }
 
-[[nodiscard]] static bool CaptureStackTraceText(_EXCEPTION_POINTERS* pException, SString& outText) noexcept
+[[nodiscard]] static bool CaptureStackTraceText(_EXCEPTION_POINTERS* pException, SString& outText)
 {
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return false;
@@ -649,7 +650,7 @@ static void AppendCrashDiagnostics(const SString& text)
     return !outText.empty();
 }
 
-static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException) noexcept
+static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException)
 {
     bool expected = false;
     if (!ms_bFallbackStackLogged.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
@@ -667,7 +668,7 @@ static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException) noexcept
 }
 
 // Helper function to safely read callback exception context (uses SEH)
-static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException) noexcept
+static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException)
 {
     __try
     {
@@ -684,6 +685,330 @@ static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException) noexcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Failed to read callback exception context\n");
     }
 }
+
+namespace
+{
+    constexpr MINIDUMP_STREAM_TYPE kStreamExceptionSummary = static_cast<MINIDUMP_STREAM_TYPE>(LastReservedStream + 1);
+    constexpr MINIDUMP_STREAM_TYPE kStreamStackTrace = static_cast<MINIDUMP_STREAM_TYPE>(LastReservedStream + 2);
+    constexpr MINIDUMP_STREAM_TYPE kStreamRegisterState = static_cast<MINIDUMP_STREAM_TYPE>(LastReservedStream + 3);
+    constexpr MINIDUMP_STREAM_TYPE kStreamAdditionalInfo = CommentStreamA;
+    constexpr MINIDUMP_STREAM_TYPE kStreamCapturedException = static_cast<MINIDUMP_STREAM_TYPE>(LastReservedStream + 4);
+
+    class MinidumpUserStreamCollection
+    {
+    public:
+        void AddTextStream(MINIDUMP_STREAM_TYPE type, std::string_view text)
+        {
+            if (text.empty())
+                return;
+
+            auto& buffer = m_buffers.emplace_back();
+            buffer.reserve(text.size() + 1);
+            buffer.insert(buffer.end(), text.begin(), text.end());
+            if (buffer.empty() || buffer.back() != '\0')
+                buffer.push_back('\0');
+
+            MINIDUMP_USER_STREAM stream{};
+            stream.Type = type;
+            stream.Buffer = buffer.data();
+            stream.BufferSize = static_cast<ULONG>(buffer.size());
+            m_streams.push_back(stream);
+        }
+
+        PMINIDUMP_USER_STREAM_INFORMATION Build()
+        {
+            if (m_streams.empty())
+            {
+                m_info = MINIDUMP_USER_STREAM_INFORMATION{};
+                return nullptr;
+            }
+
+            m_info.UserStreamArray = m_streams.data();
+            m_info.UserStreamCount = static_cast<ULONG>(m_streams.size());
+            return &m_info;
+        }
+
+    private:
+        std::vector<std::vector<char>>          m_buffers;
+        std::vector<MINIDUMP_USER_STREAM>       m_streams;
+        MINIDUMP_USER_STREAM_INFORMATION        m_info{};
+    };
+
+    std::string FormatExceptionSummary(const ENHANCED_EXCEPTION_INFO& info)
+    {
+        std::string summary;
+        summary.reserve(512);
+        char line[256]{};
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "Exception Code: 0x%08X\n", info.exceptionCode);
+        summary += line;
+
+        if (info.exceptionAddress != nullptr)
+        {
+            _snprintf_s(line, sizeof(line), _TRUNCATE, "Exception Address: 0x%p\n", info.exceptionAddress);
+            summary += line;
+        }
+
+        if (!info.exceptionDescription.empty())
+        {
+            summary += "Description: ";
+            summary += info.exceptionDescription;
+            if (summary.back() != '\n')
+                summary += '\n';
+        }
+
+        if (!info.exceptionType.empty())
+        {
+            summary += "Exception Type: ";
+            summary += info.exceptionType;
+            summary += '\n';
+        }
+
+        if (!info.moduleName.empty())
+        {
+            summary += "Module: ";
+            summary += info.moduleName;
+            summary += '\n';
+        }
+
+        if (!info.modulePathName.empty())
+        {
+            summary += "Module Path: ";
+            summary += info.modulePathName;
+            summary += '\n';
+        }
+
+        if (info.moduleOffset != 0U)
+        {
+            _snprintf_s(line, sizeof(line), _TRUNCATE, "Module Offset: 0x%08X\n", info.moduleOffset);
+            summary += line;
+        }
+
+        if (info.timestamp.time_since_epoch().count() != 0)
+        {
+            const std::time_t timeValue = std::chrono::system_clock::to_time_t(info.timestamp);
+            std::tm           localTime{};
+#if defined(_WIN32)
+            if (localtime_s(&localTime, &timeValue) == 0)
+#else
+            if (localtime_r(&timeValue, &localTime) != nullptr)
+#endif
+            {
+                char timeBuffer[64]{};
+                if (std::strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", &localTime) != 0)
+                {
+                    summary += "Timestamp: ";
+                    summary += timeBuffer;
+                    summary += '\n';
+                }
+            }
+        }
+
+        _snprintf_s(line,
+                    sizeof(line),
+                    _TRUNCATE,
+                    "Thread ID: %lu  Process ID: %lu\n",
+                    static_cast<unsigned long>(info.threadId),
+                    static_cast<unsigned long>(info.processId));
+        summary += line;
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "Uncaught Exceptions: %d\n", info.uncaughtExceptionCount);
+        summary += line;
+
+        summary += "Crash Severity: ";
+        summary += info.isFatal ? "fatal" : "recoverable";
+        summary += '\n';
+
+        return summary;
+    }
+
+    std::string FormatStackTrace(const ENHANCED_EXCEPTION_INFO& info)
+    {
+        if (!info.stackTrace.has_value() || info.stackTrace->empty())
+            return {};
+
+        std::string traceText;
+        traceText.reserve(info.stackTrace->size() * 64);
+        traceText += "Stack Trace (CrashHandler):\n";
+
+        for (std::size_t i = 0; i < info.stackTrace->size(); ++i)
+        {
+            traceText += "  #";
+            traceText += std::to_string(i);
+            traceText += " ";
+            traceText += info.stackTrace->at(i);
+            if (traceText.back() != '\n')
+                traceText += '\n';
+        }
+
+        return traceText;
+    }
+
+    std::string FormatRegisterDump(const ENHANCED_EXCEPTION_INFO& info)
+    {
+        std::string registers;
+        registers.reserve(256);
+        char line[160]{};
+
+        registers += "CPU Registers:\n";
+        _snprintf_s(line,
+                    sizeof(line),
+                    _TRUNCATE,
+                    "  EAX=0x%08X EBX=0x%08X ECX=0x%08X EDX=0x%08X\n",
+                    info.eax,
+                    info.ebx,
+                    info.ecx,
+                    info.edx);
+        registers += line;
+
+        _snprintf_s(line,
+                    sizeof(line),
+                    _TRUNCATE,
+                    "  ESI=0x%08X EDI=0x%08X EBP=0x%08X ESP=0x%08X\n",
+                    info.esi,
+                    info.edi,
+                    info.ebp,
+                    info.esp);
+        registers += line;
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "  EIP=0x%08X EFLAGS=0x%08X\n", info.eip, info.eflags);
+        registers += line;
+
+        _snprintf_s(line,
+                    sizeof(line),
+                    _TRUNCATE,
+                    "  CS=0x%04X DS=0x%04X ES=0x%04X FS=0x%04X GS=0x%04X SS=0x%04X\n",
+                    info.cs,
+                    info.ds,
+                    info.es,
+                    info.fs,
+                    info.gs,
+                    info.ss);
+        registers += line;
+
+        return registers;
+    }
+
+    std::string FormatCapturedExceptionInfo(const ENHANCED_EXCEPTION_INFO& info)
+    {
+        if (info.exceptionType.empty() && !info.capturedException.has_value())
+            return {};
+
+        std::string text;
+        text.reserve(256);
+        text += "Captured Exception Metadata:\n";
+
+        if (!info.exceptionType.empty())
+        {
+            text += "  Type: ";
+            text += info.exceptionType;
+            text += '\n';
+        }
+
+        text += "  exception_ptr captured: ";
+        text += info.capturedException.has_value() ? "yes" : "no";
+        text += '\n';
+
+        if (!info.exceptionDescription.empty())
+        {
+            text += "  Description: ";
+            text += info.exceptionDescription;
+            if (text.back() != '\n')
+                text += '\n';
+        }
+
+        return text;
+    }
+
+    std::string BuildAdditionalInfoPayload(const ENHANCED_EXCEPTION_INFO* info,
+                                           std::string_view telemetryFallback,
+                                           std::string_view fallbackSummary = {})
+    {
+        std::string payload;
+
+        const auto appendBlock = [&](std::string_view block) {
+            if (block.empty())
+                return;
+
+            if (!payload.empty())
+                payload.push_back('\n');
+
+            payload.append(block.begin(), block.end());
+            if (!payload.empty() && payload.back() != '\n')
+                payload.push_back('\n');
+        };
+
+        if (info != nullptr)
+        {
+            appendBlock(info->additionalInfo);
+
+            const std::string summary = FormatExceptionSummary(*info);
+            appendBlock(summary);
+
+            const std::string capturedMeta = FormatCapturedExceptionInfo(*info);
+            appendBlock(capturedMeta);
+
+            const std::string registers = FormatRegisterDump(*info);
+            appendBlock(registers);
+
+            const std::string stackTrace = FormatStackTrace(*info);
+            appendBlock(stackTrace);
+        }
+        else if (!fallbackSummary.empty())
+        {
+            appendBlock(fallbackSummary);
+        }
+
+        const bool hasTelemetry = !telemetryFallback.empty();
+        bool       telemetryAlreadyIncluded = false;
+        if (info != nullptr && hasTelemetry && !info->additionalInfo.empty())
+        {
+            telemetryAlreadyIncluded = info->additionalInfo.find("Allocation telemetry") != std::string::npos;
+        }
+
+        if (hasTelemetry && !telemetryAlreadyIncluded)
+        {
+            appendBlock(telemetryFallback);
+        }
+
+        return payload;
+    }
+
+    std::string BuildBasicExceptionSummary(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation)
+    {
+        if (pException == nullptr || pException->ExceptionRecord == nullptr)
+            return {};
+
+        std::string summary;
+        summary.reserve(256);
+        char line[160]{};
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "Exception Code: 0x%08X\n", pException->ExceptionRecord->ExceptionCode);
+        summary += line;
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "Exception Address: 0x%p\n", pException->ExceptionRecord->ExceptionAddress);
+        summary += line;
+
+        if (pExceptionInformation != nullptr)
+        {
+            if (const char* modulePath = pExceptionInformation->GetModulePathName(); modulePath != nullptr && modulePath[0] != '\0')
+            {
+                summary += "Module: ";
+                summary += modulePath;
+                summary += '\n';
+            }
+
+            _snprintf_s(line,
+                        sizeof(line),
+                        _TRUNCATE,
+                        "Module Offset: 0x%08X\n",
+                        pExceptionInformation->GetAddressModuleOffset());
+            summary += line;
+        }
+
+        return summary;
+    }
+}            // namespace
 
 template <typename SectionGenerator>
 void AppendDumpSection(const SString& targetPath, const char* tryLabel, const char* successLabel, DWORD tagBegin, DWORD tagEnd, SectionGenerator&& generator)
@@ -852,7 +1177,7 @@ void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing()
 }
 
 // Helper to safely read exception code using SEH
-static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException) noexcept
+static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException)
 {
     DWORD exceptionCode = 0;
     __try
@@ -874,7 +1199,7 @@ static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException) noexcept
 }
 
 // Helper to get MTA path as C string for SEH contexts (avoids SString unwinding issues)
-static const char* GetMTAPathForSEH() noexcept
+static const char* GetMTAPathForSEH()
 {
     static char szPath[MAX_PATH] = {0};
     static bool initialized = false;
@@ -890,7 +1215,7 @@ static const char* GetMTAPathForSEH() noexcept
 }
 
 // Helper to write reentrant flag file using only SEH
-static void TryWriteReentrantFlag(DWORD exceptionCode) noexcept
+static void TryWriteReentrantFlag(DWORD exceptionCode)
 {
     // Use static buffer to avoid SString (which requires object unwinding)
     static char szFlagPath[MAX_PATH];
@@ -919,7 +1244,7 @@ static void TryWriteReentrantFlag(DWORD exceptionCode) noexcept
 }
 
 // Helper to re-read exception code with SEH protection (no C++ exception handling)
-static DWORD SafeRereadExceptionCode(_EXCEPTION_POINTERS* pException, DWORD fallback) noexcept
+static DWORD SafeRereadExceptionCode(_EXCEPTION_POINTERS* pException, DWORD fallback)
 {
     DWORD exceptionCode = fallback;
     __try
@@ -991,7 +1316,11 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    LogExceptionDetails(pException);
+    const BOOL exceptionLogged = LogExceptionDetails(pException);
+    if (exceptionLogged == FALSE)
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - LogExceptionDetails failed\n");
+    }
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: FATAL EXCEPTION - Begin crash processing\n");
@@ -1411,6 +1740,19 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         }
     } appendDetailedLine{strDetailed, strDetailedForDialog, hasDetailedSection, hasDetailedSectionForDialog, false};
 
+    bool telemetryNotePresent = false;
+
+    const auto appendTelemetryNoteIfMissing = [&]() {
+        if (telemetryNotePresent)
+            return;
+
+        if (auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote(); !telemetryNote.empty())
+        {
+            appendDetailedLine(SString("Additional Info: %s\n", telemetryNote.c_str()));
+            telemetryNotePresent = true;
+        }
+    };
+
     ENHANCED_EXCEPTION_INFO enhancedInfo = {};
     bool                    hasEnhancedInfo = false;
 
@@ -1482,7 +1824,11 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         appendDetailedLine(SString("Resolved Module Offset: 0x%08X\n", enhancedInfo.moduleOffset));
 
         if (!enhancedInfo.additionalInfo.empty())
+        {
             appendDetailedLine(SString("Additional Info: %s\n", enhancedInfo.additionalInfo.c_str()));
+            if (enhancedInfo.additionalInfo.find("Allocation telemetry") != std::string::npos)
+                telemetryNotePresent = true;
+        }
 
         if (enhancedInfo.capturedException.has_value())
         {
@@ -1533,6 +1879,8 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         appendDetailedLine("Enhanced exception diagnostics unavailable.\n");
     }
 
+    appendTelemetryNoteIfMissing();
+
     // Try to get stack trace from detailed exception information
     if (stackFrames == nullptr && pImpl != nullptr && pImpl->HasDetailedStackTrace())
     {
@@ -1562,12 +1910,12 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
                 capturedFrames.reserve(lineCount);
                 
                 std::transform(lines.cbegin(), lines.cend(), std::back_inserter(capturedFrames),
-                    [](const auto& line) noexcept -> std::string {
+                    [](const auto& line) -> std::string {
                         return std::string{line.c_str()};
                     });
 
                 const auto newEnd = std::remove_if(capturedFrames.begin(), capturedFrames.end(),
-                    [](const auto& frame) noexcept -> bool {
+                    [](const auto& frame) -> bool {
                         return frame.empty();
                     });
                 capturedFrames.erase(newEnd, capturedFrames.end());
@@ -1629,7 +1977,7 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         
         [[maybe_unused]] const auto allFramesValid = 
             std::all_of(frames.cbegin(), std::next(frames.cbegin(), static_cast<std::ptrdiff_t>(maxFrames)), 
-                       [](const auto& frame) constexpr noexcept -> bool { return !frame.empty(); });
+                       [](const auto& frame) constexpr -> bool { return !frame.empty(); });
         
         for (std::size_t i{}; i < maxFrames; ++i)
         {
@@ -1814,8 +2162,36 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                 ExInfo.ExceptionPointers = pException;
                 ExInfo.ClientPointers = FALSE;
 
+                MinidumpUserStreamCollection userStreams;
+
+                const std::string telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote();
+                std::string      basicSummary;
+                ENHANCED_EXCEPTION_INFO enhancedInfo{};
+                const bool             hasEnhancedInfo = (GetEnhancedExceptionInfo(&enhancedInfo) != FALSE);
+
+                if (hasEnhancedInfo)
+                {
+                    userStreams.AddTextStream(kStreamExceptionSummary, FormatExceptionSummary(enhancedInfo));
+                    userStreams.AddTextStream(kStreamStackTrace, FormatStackTrace(enhancedInfo));
+                    userStreams.AddTextStream(kStreamRegisterState, FormatRegisterDump(enhancedInfo));
+                    userStreams.AddTextStream(kStreamCapturedException, FormatCapturedExceptionInfo(enhancedInfo));
+                }
+                else
+                {
+                    basicSummary = BuildBasicExceptionSummary(pException, pExceptionInformation);
+                    userStreams.AddTextStream(kStreamExceptionSummary, basicSummary);
+                }
+
+                const std::string additionalInfoPayload = BuildAdditionalInfoPayload(
+                    hasEnhancedInfo ? &enhancedInfo : nullptr,
+                    telemetryNote,
+                    hasEnhancedInfo ? std::string_view{} : std::string_view{basicSummary});
+                userStreams.AddTextStream(kStreamAdditionalInfo, additionalInfoPayload);
+
+                PMINIDUMP_USER_STREAM_INFORMATION userStreamParam = userStreams.Build();
+
                 BOOL bResult = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
-                                     static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo, nullptr, nullptr);
+                                     static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo, userStreamParam, nullptr);
 
                 if (!bResult)
                 {
@@ -1831,7 +2207,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                         SetEndOfFile(hFile);
                         
                         bResult = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
-                                      MiniDumpNormal, &ExInfo, nullptr, nullptr);
+                                      MiniDumpNormal, &ExInfo, userStreamParam, nullptr);
                         if (bResult)
                         {
                             SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpMiniDump - Retry with MiniDumpNormal succeeded\n");

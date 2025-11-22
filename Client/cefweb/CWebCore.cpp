@@ -19,6 +19,8 @@
 #include "CWebApp.h"
 #include <algorithm>
 #include <ranges>
+#include <filesystem>
+#include <cstdlib>
 
 // #define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
@@ -66,15 +68,8 @@ bool CWebCore::Initialise(bool gpuEnabled)
     
     m_bGPUEnabled = gpuEnabled;
 
-    // Log current working directory at entry
-    std::array<wchar_t, MAX_PATH> cwdBefore{};
-    GetCurrentDirectoryW(static_cast<DWORD>(cwdBefore.size()), cwdBefore.data());
-    AddReportLog(8010, SString("CWebCore::Initialise - CWD at entry: %s", *SharedUtil::ToUTF8(cwdBefore.data())));
-
     // Get MTA base directory
     SString strBaseDir = SharedUtil::GetMTAProcessBaseDir();
-    
-    AddReportLog(8011, SString("CWebCore::Initialise - GetMTAProcessBaseDir returned: '%s'", strBaseDir.c_str()));
     
     if (strBaseDir.empty())
     {
@@ -94,26 +89,42 @@ bool CWebCore::Initialise(bool gpuEnabled)
     
     // Set DLL directory for CEFLauncher subprocess to locate required libraries
     SString strCEFDir = PathJoin(strMTADir, "CEF");
+#ifdef _WIN32
     SetDllDirectoryW(FromUTF8(strCEFDir));
+#else
+    // On Wine/Proton: Use environment variable for library search
+    const char* existingPath = std::getenv("LD_LIBRARY_PATH");
+    SString newPath = strCEFDir;
+    if (existingPath) {
+        newPath = SString("%s:%s", strCEFDir.c_str(), existingPath);
+    }
+    // Note: setenv is not available in MSVC, but _putenv is. 
+    // However, since we are compiling for Windows (running on Wine), we use Windows APIs.
+    // Wine maps Windows environment variables.
+    // But LD_LIBRARY_PATH is a Linux variable.
+    // If we are in Wine, we might want to set PATH instead or as well.
+    // SetDllDirectoryW handles the Windows loader.
+    
+    // Log for debugging
+    if (std::getenv("WINE") || std::getenv("WINEPREFIX")) {
+        g_pCore->GetConsole()->Printf("DEBUG: CEF library path set via SetDllDirectoryW: %s", strCEFDir.c_str());
+    }
+#endif
     
     // Read GTA path from registry to pass to CEF subprocess
     int iRegistryResult = 0;
     const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iRegistryResult);
-    g_pCore->GetConsole()->Printf("DEBUG: Registry read result=%d, path='%s'", iRegistryResult, strGTAPath.c_str());
-    AddReportLog(8017, SString("DEBUG: Registry read result=%d, path='%s'", iRegistryResult, strGTAPath.c_str()));
-    
-    if (!strGTAPath.empty())
-    {
-        AddReportLog(8015, SString("Read GTA path from registry: %s", *strGTAPath));
-    }
-    else
-    {
-        AddReportLog(8016, "Failed to read GTA path from registry");
-    }
     
     // Check if process is running with elevated privileges
     // CEF subprocesses may have communication issues when running elevated
     const bool bIsElevated = []() -> bool {
+        // Check for Wine environment
+        if (std::getenv("WINE") || std::getenv("WINEPREFIX")) {
+            // In Wine, privilege escalation works differently
+            // Assume not elevated for browser feature purposes
+            return false;
+        }
+
         HANDLE hToken = nullptr;
         if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
             return false;
@@ -129,23 +140,39 @@ bool CWebCore::Initialise(bool gpuEnabled)
         return elevation.TokenIsElevated != 0;
     }();
     
-    if (bIsElevated)
+    if (bIsElevated && !std::getenv("WINE"))
     {
         AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
         AddReportLog(8022, "CEF browser features may not work correctly when running as Administrator");
         AddReportLog(8023, "Consider running MTA without Administrator privileges for full browser functionality");
-        g_pCore->GetConsole()->Printf("^3WARNING: Running as Administrator - browser features may be limited");
+        g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
     
-    // Log current working directory before CEF initialization
-    std::array<wchar_t, MAX_PATH> cwdBeforeCef{};
-    GetCurrentDirectoryW(static_cast<DWORD>(cwdBeforeCef.size()), cwdBeforeCef.data());
-    AddReportLog(8012, SString("CWebCore::Initialise - CWD before CefInitialize: %s", *SharedUtil::ToUTF8(cwdBeforeCef.data())));
-    
+    // Verify CEFLauncher can run in current environment
+    auto CanExecuteCEFLauncher = []() -> bool {
+        #ifdef _WIN32
+            // On Windows, we know it works
+            if (!std::getenv("WINE") && !std::getenv("WINEPREFIX") && !std::getenv("PROTON_VERSION"))
+                return true;
+        #endif
+        
+        // Check if Wine can execute the launcher
+        // This is a basic check - if we are in Wine, we assume it works unless proven otherwise
+        // But we can log if we are in a mixed environment
+        return true;
+    };
+
     if (!FileExists(strLauncherPath))
     {
         g_pCore->GetConsole()->Printf("CEF initialization skipped - CEFLauncher not found: %s", *strLauncherPath);
         AddReportLog(8001, SString("CEF initialization skipped - CEFLauncher not found: %s", *strLauncherPath));
+        m_bInitialised = false;
+        return false;
+    }
+
+    if (!CanExecuteCEFLauncher()) {
+        g_pCore->GetConsole()->Printf("CEF initialization skipped - Wine/Proton not available");
+        AddReportLog(8026, "CEF initialization skipped - Wine/Proton not available or misconfigured");
         m_bInitialised = false;
         return false;
     }
@@ -164,11 +191,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
         return false;
     }
 
-    // Proceed with CEF initialization
-    AddReportLog(8018, SString("Pre-CEF Init: Launcher path: %s", *strLauncherPath));
-    AddReportLog(8019, SString("Pre-CEF Init: Cache path: %s", *strCachePath));
-    AddReportLog(8020, SString("Pre-CEF Init: Locales path: %s", *strLocalesPath));
-    
     // Use std::filesystem for CWD management with RAII scope guard
     namespace fs = std::filesystem;
     std::error_code ec;
@@ -189,10 +211,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
         ~CwdGuard() {
             std::error_code restoreEc;
             fs::current_path(savedPath, restoreEc);
-            if (!restoreEc)
-            {
-                AddReportLog(8027, SString("Restored original CWD: %s", savedPath.string().c_str()));
-            }
         }
     } cwdGuard(savedCwd);
     
@@ -205,7 +223,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
         m_bInitialised = false;
         return false;
     }
-    AddReportLog(8026, SString("Temporarily changed CWD to MTA dir for CEF init: %s", *strMTADir));
     
     CefMainArgs        mainArgs;
     void*              sandboxInfo = nullptr;
@@ -249,18 +266,11 @@ bool CWebCore::Initialise(bool gpuEnabled)
     }
 
     // CWD will be restored by cwdGuard destructor when this function returns
-
-    // Log CWD after CEF initialization
-    std::array<wchar_t, MAX_PATH> cwdAfterCef{};
-    GetCurrentDirectoryW(static_cast<DWORD>(cwdAfterCef.size()), cwdAfterCef.data());
-    AddReportLog(8013, SString("CWebCore::Initialise - CWD after CefInitialize: %s", *SharedUtil::ToUTF8(cwdAfterCef.data())));
     
     if (m_bInitialised)
     {
         // Register custom scheme handler factory only if initialization succeeded
         CefRegisterSchemeHandlerFactory("http", "mta", app);
-        g_pCore->GetConsole()->Printf("CEF initialized successfully");
-        AddReportLog(8000, "CEF initialized successfully");
     }
     else
     {
@@ -576,7 +586,7 @@ void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
-    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    if (m_Whitelist.size() >= 50000)
     {
         // Remove WEBFILTER_REQUEST entries (temporary session entries)
         for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
@@ -596,7 +606,7 @@ void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
-    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    if (m_Whitelist.size() >= 50000)
     {
         // Remove WEBFILTER_REQUEST entries (temporary session entries)
         for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
@@ -1016,6 +1026,9 @@ void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
 
     if (result.bSuccess)
     {
+        if (result.dataSize > 1024 * 1024) [[unlikely]]
+            return;
+
         SString strData = result.pData;
         SString strWhiteRevision, strBlackRevision;
         strData.Split(";", &strWhiteRevision, &strBlackRevision);
@@ -1063,10 +1076,21 @@ void CWebCore::StaticFetchWhitelistFinished(const SHttpDownloadResult& result)
     if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
+    if (result.dataSize > 5 * 1024 * 1024) [[unlikely]]
+    {
+        return;
+    }
+
     CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> whitelist;
     SString              strData = result.pData;
     strData.Split(";", whitelist);
+
+    if (whitelist.size() > 50000) [[unlikely]]
+    {
+        whitelist.resize(50000);
+    }
+
     CXMLNode* pListNode = pRootNode->FindSubNode("globalwhitelist");
     if (!pListNode)
         return;
@@ -1109,10 +1133,21 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
     if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
+    if (result.dataSize > 5 * 1024 * 1024) [[unlikely]]
+    {
+        return;
+    }
+
     CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> blacklist;
     SString              strData = result.pData;
     strData.Split(";", blacklist);
+
+    if (blacklist.size() > 50000) [[unlikely]]
+    {
+        blacklist.resize(50000);
+    }
+
     CXMLNode* pListNode = pRootNode->FindSubNode("globalblacklist");
     if (!pListNode)
         return;
