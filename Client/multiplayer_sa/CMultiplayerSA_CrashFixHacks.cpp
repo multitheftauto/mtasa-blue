@@ -1024,6 +1024,7 @@ DWORD RETURN_CrashFix_Misc32 = 0x4CEA88;
 
 void _declspec(naked) HOOK_CrashFix_Misc32()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
     _asm
     {
         test    ecx, ecx
