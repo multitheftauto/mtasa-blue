@@ -84,6 +84,8 @@ void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state)
 
     // Collect all IPL ids
     std::vector<int> iplIds;
+    iplIds.reserve(pool->m_nSize);
+
     for (int i = 1; i < pool->m_nSize; i++)
     {
         if (pool->IsContains(i))
@@ -122,6 +124,8 @@ void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state, std::function<bool(C
 
     // Collect IPL ids that match the filter
     std::vector<int> iplIds;
+    iplIds.reserve(pool->m_nSize);
+
     for (int i = 1; i < pool->m_nSize; i++)
     {
         auto ipl = pool->GetObject(i);
