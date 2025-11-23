@@ -1060,9 +1060,10 @@ DWORD RETURN_CrashFix_Misc33 = 0x7F39F5;
 typedef RwTexDictionary* (__cdecl *PFN_RwTexDictionaryGetCurrent)();
 PFN_RwTexDictionaryGetCurrent pfnRwTexDictionaryGetCurrent = (PFN_RwTexDictionaryGetCurrent)0x7F3A90;
 
-void _declspec(naked) CallOriginalFindNamedTexture()
+static void __declspec(naked) CallOriginalFindNamedTexture()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
     {
         mov     eax, [esp+4]
         push    ebx
@@ -1070,9 +1071,10 @@ void _declspec(naked) CallOriginalFindNamedTexture()
     }
 }
 
-void _declspec(naked) HOOK_CrashFix_Misc33()
+static void __declspec(naked) HOOK_CrashFix_Misc33()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
     {
         // Get first argument (dict)
         mov     ecx, [esp+4]
@@ -2341,6 +2343,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc29);
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
+    EZHookInstall(CrashFix_Misc33);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);
