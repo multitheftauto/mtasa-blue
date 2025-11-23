@@ -30,6 +30,17 @@ namespace fs = std::filesystem;
 static SString g_strMTASAPath;
 static SString g_strGTAPath;
 static HANDLE  g_hMutex = NULL;
+
+// Check if secondary client mode is active
+bool IsSecondaryClient()
+{
+    static int iResult = -1;
+    if (iResult == -1)
+    {
+        iResult = (strstr(GetCommandLine(), "-cl2") != NULL) ? 1 : 0;
+    }
+    return iResult == 1;
+}
 static HMODULE hLibraryModule = NULL;
 HINSTANCE      g_hInstance = NULL;
 
@@ -333,6 +344,9 @@ bool IsGTARunning()
 ///////////////////////////////////////////////////////////////////////////
 void TerminateGTAIfRunning()
 {
+    if (IsSecondaryClient())
+        return;
+
     std::vector<DWORD> processIdList = GetGTAProcessList();
 
     // Try to stop all GTA process id's
@@ -395,6 +409,9 @@ bool IsOtherMTARunning()
 ///////////////////////////////////////////////////////////////////////////
 void TerminateOtherMTAIfRunning()
 {
+    if (IsSecondaryClient())
+        return;
+
     std::vector<DWORD> processIdList = GetOtherMTAProcessList();
 
     if (processIdList.size())
@@ -1193,12 +1210,16 @@ bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 //
 // CreateSingleInstanceMutex
 //
-//
+// Create mutex to prevent multiple instances
+// Secondary client (-cl2) uses a different GUID
 //
 ///////////////////////////////////////////////////////////////////////////
 bool CreateSingleInstanceMutex()
 {
-    HANDLE hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
+    // Use different GUID for secondary client
+    const char* szGuid = IsSecondaryClient() ? MTA_GUID_CL2 : MTA_GUID;
+    
+    HANDLE hMutex = CreateMutex(NULL, FALSE, TEXT(szGuid));
 
     if (GetLastError() == ERROR_ALREADY_EXISTS)
     {
@@ -1220,6 +1241,9 @@ bool CreateSingleInstanceMutex()
 ///////////////////////////////////////////////////////////////////////////
 void ReleaseSingleInstanceMutex()
 {
+    if (IsSecondaryClient())
+        return;
+
     // assert(g_hMutex);
     CloseHandle(g_hMutex);
     g_hMutex = NULL;

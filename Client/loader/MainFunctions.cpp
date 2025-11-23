@@ -707,6 +707,10 @@ void PostRunWatchDogs(int iReturnCode)
 //////////////////////////////////////////////////////////
 void HandleIfGTAIsAlreadyRunning()
 {
+    // Skip GTA check for secondary client to allow multiple GTA instances
+    if (IsSecondaryClient())
+        return;
+
     if (IsGTARunning())
     {
         if (MessageBoxUTF8(0,

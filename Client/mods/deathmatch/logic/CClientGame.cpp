@@ -6755,12 +6755,20 @@ void CClientGame::SetFileCacheRoot()
         // Check exists
         if (!strFileCachePath.empty() && DirectoryExists(strFileCachePath))
         {
-            // Check writable
-            SString strTestFileName = PathJoin(strFileCachePath, "resources", "_test.tmp");
+            // Check writable - use -cl2 suffix for secondary client folders
+            SString strResourcesDir = "resources";
+            SString strPrivDir = "priv";
+            if (g_pCore->IsSecondaryClient())
+            {
+                strResourcesDir = "resources-cl2";
+                strPrivDir = "priv-cl2";
+            }
+            
+            SString strTestFileName = PathJoin(strFileCachePath, strResourcesDir, "_test.tmp");
             if (FileSave(strTestFileName, "x"))
             {
                 FileDelete(strTestFileName);
-                strTestFileName = PathJoin(strFileCachePath, "priv", "_test.tmp");
+                strTestFileName = PathJoin(strFileCachePath, strPrivDir, "_test.tmp");
                 if (FileSave(strTestFileName, "x"))
                 {
                     FileDelete(strTestFileName);

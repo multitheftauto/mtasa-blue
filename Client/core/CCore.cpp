@@ -727,6 +727,20 @@ const char* CCore::GetModInstallRoot(const char* szModName)
     return m_strModInstallRoot;
 }
 
+bool CCore::IsSecondaryClient()
+{
+    static bool bChecked = false;
+    static bool bIsSecondary = false;
+    
+    if (!bChecked)
+    {
+        bIsSecondary = (strstr(GetCommandLine(), "-cl2") != NULL);
+        bChecked = true;
+    }
+    
+    return bIsSecondary;
+}
+
 void CCore::ForceCursorVisible(bool bVisible, bool bToggleControls)
 {
     m_bCursorToggleControls = bToggleControls;
@@ -870,6 +884,23 @@ void CCore::ApplyHooks()
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
     DetourLibraryFunction("kernel32.dll", "LoadLibraryA", Win32LoadLibraryA, SkipDirectPlay_LoadLibraryA);
+
+    // Special thanks for botder too [https://github.com/multitheftauto/mtasa-blue/commit/b08948fcf46746c9d74503a0889996575f93cde5]
+    // Disable code that disallows multiple instances of GTA:SA
+    // Disable `if (IsAppAlreadyRunning())` in WinMain
+    {
+        DWORD oldProtect;
+        VirtualProtect(reinterpret_cast<void*>(0x74872D), 9, PAGE_READWRITE, &oldProtect);
+        memcpy(reinterpret_cast<void*>(0x74872D), "\x90\x90\x90\x90\x90\x90\x90\x90\x90", 9);
+        VirtualProtect(reinterpret_cast<void*>(0x74872D), 9, oldProtect, &oldProtect);
+    }
+    // Create an unnamed semaphore in CdStreamInitThread.
+    {
+        DWORD oldProtect;
+        VirtualProtect(reinterpret_cast<void*>(0x406945), 5, PAGE_READWRITE, &oldProtect);
+        memcpy(reinterpret_cast<void*>(0x406945), "\x6A\x00\x90\x90\x90", 5);
+        VirtualProtect(reinterpret_cast<void*>(0x406945), 5, oldProtect, &oldProtect);
+    }
 }
 
 bool UsingAltD3DSetup()
@@ -1093,8 +1124,14 @@ void CCore::CreateXML()
 
     if (!m_pConfigFile)
     {
-        // Load config XML file
-        m_pConfigFile = m_pXML->CreateXML(CalcMTASAPath(MTA_CONFIG_PATH));
+        // Load config XML file - use -cl2 suffix for secondary client
+        SString strConfigPath = MTA_CONFIG_PATH;
+        if (IsSecondaryClient())
+        {
+            strConfigPath.Replace(".xml", "-cl2.xml");
+        }
+        
+        m_pConfigFile = m_pXML->CreateXML(CalcMTASAPath(strConfigPath));
         if (!m_pConfigFile)
         {
             assert(false);

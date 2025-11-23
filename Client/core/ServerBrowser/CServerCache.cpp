@@ -126,8 +126,14 @@ CServerCache::~CServerCache()
 ///////////////////////////////////////////////////////////////
 bool CServerCache::LoadServerCache()
 {
-    // Load config XML file
-    CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(MTA_SERVER_CACHE_PATH));
+    // Load config XML file - use -cl2 suffix for secondary client
+    SString strCachePath = MTA_SERVER_CACHE_PATH;
+    if (g_pCore->IsSecondaryClient())
+    {
+        strCachePath.Replace(".xml", "-cl2.xml");
+    }
+    
+    CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(strCachePath));
     if (!m_pConfigFile)
         return false;
     m_pConfigFile->Parse();
@@ -269,7 +275,14 @@ DWORD WINAPI CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
 ///////////////////////////////////////////////////////////////
 void CServerCache::StaticSaveServerCache()
 {
-    CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(MTA_SERVER_CACHE_PATH));
+    // Use -cl2 suffix for secondary client
+    SString strCachePath = MTA_SERVER_CACHE_PATH;
+    if (g_pCore->IsSecondaryClient())
+    {
+        strCachePath.Replace(".xml", "-cl2.xml");
+    }
+    
+    CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(strCachePath));
     if (!m_pConfigFile)
         return;
     m_pConfigFile->Parse();
