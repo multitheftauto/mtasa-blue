@@ -1022,10 +1022,10 @@ cont:
 #define HOOKSIZE_CrashFix_Misc32                            8
 DWORD RETURN_CrashFix_Misc32 = 0x4CEA88;
 
-void _declspec(naked) HOOK_CrashFix_Misc32()
+static void __declspec(naked) HOOK_CrashFix_Misc32()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
-    _asm
+    __asm
     {
         test    ecx, ecx
         jz      cont
@@ -2341,7 +2341,6 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc29);
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
-    EZHookInstall(CrashFix_Misc33);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);
