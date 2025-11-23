@@ -267,6 +267,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     // This reduces mem pressure/OOM by encouraging the engine to free unused resources.
     // Note: We do not modify CStreamingInfo::sizeInBlocks as that affects disk I/O during model reload.
     // Only perform this check for new rasters (not copies) to avoid double-counting shared resources.
+    // Always keep this, as it turns out to fix long-standing texture 'leaks': issue #4554, #2869 (Most likely)
     if (!perTxdInfo.bTexturesAreCopies && pGame->GetStreaming())
     {
         uint32_t uiTotalSize = 0;
@@ -274,9 +275,16 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
         {
             if (pNewTexture && SharedUtil::IsReadablePointer(pNewTexture, sizeof(RwTexture)) && pNewTexture->raster)
             {
-                // Estimate texture size (Width * Height * 4 bytes for 32-bit).
-                // This helps the SA streaming system manage memory pressure.
-                uiTotalSize += pNewTexture->raster->width * pNewTexture->raster->height * 4;
+                // VRAM cost: power of two padding + mipmaps
+                // to avoid the same issues with non power of two textures
+                auto NextPow2 = [](uint32_t v) { uint32_t p = 1; while (p < v && p < 0x80000000) p <<= 1; return p; };
+                
+                uint32_t size = NextPow2(pNewTexture->raster->width) * NextPow2(pNewTexture->raster->height) * 4;
+                
+                if (pNewTexture->raster->numLevels > 1)
+                    size += size / 3;
+
+                uiTotalSize += size;
             }
         }
 
