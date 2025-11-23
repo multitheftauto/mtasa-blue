@@ -441,7 +441,8 @@ void HandleNotUsedMainMenu()
 
     // Check current display mode in coreconfig.xml
     {
-        SString strCoreConfigFilename = CalcMTASAPath(PathJoin("mta", "config", "coreconfig.xml"));
+        SString strCoreConfigName = IsSecondaryClient() ? "coreconfig-cl2.xml" : "coreconfig.xml";
+        SString strCoreConfigFilename = CalcMTASAPath(PathJoin("mta", "config", strCoreConfigName));
         SString strCoreConfig;
         FileLoad(strCoreConfigFilename, strCoreConfig);
         SString strWindowed = strCoreConfig.SplitRight("<display_windowed>").Left(1);

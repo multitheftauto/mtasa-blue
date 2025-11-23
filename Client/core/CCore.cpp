@@ -1126,9 +1126,22 @@ void CCore::CreateXML()
     {
         // Load config XML file - use -cl2 suffix for secondary client
         SString strConfigPath = MTA_CONFIG_PATH;
-        if (IsSecondaryClient())
+        bool bIsSecondary = IsSecondaryClient();
+        
+        if (bIsSecondary)
         {
-            strConfigPath.Replace(".xml", "-cl2.xml");
+            strConfigPath = strConfigPath.Replace(".xml", "-cl2.xml");
+            
+            // If CL2 config doesn't exist, copy from the primary config
+            SString strFullPath = CalcMTASAPath(strConfigPath);
+            if (!FileExists(strFullPath))
+            {
+                SString strPrimaryConfig = CalcMTASAPath(MTA_CONFIG_PATH);
+                if (FileExists(strPrimaryConfig))
+                {
+                    FileCopy(strPrimaryConfig, strFullPath);
+                }
+            }
         }
         
         m_pConfigFile = m_pXML->CreateXML(CalcMTASAPath(strConfigPath));

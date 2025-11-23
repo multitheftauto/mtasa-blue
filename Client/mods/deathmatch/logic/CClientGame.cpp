@@ -326,7 +326,12 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     m_pLuaManager = new CLuaManager(this);
     m_pScriptDebugging = new CScriptDebugging(m_pLuaManager);
-    m_pScriptDebugging->SetLogfile(CalcMTASAPath("mta\\logs\\clientscript.log"), 3);
+    SString strScriptLog = "mta\\logs\\clientscript.log";
+    if (g_pCore->IsSecondaryClient())
+    {
+        strScriptLog = "mta\\logs\\clientscript-cl2.log";
+    }
+    m_pScriptDebugging->SetLogfile(CalcMTASAPath(strScriptLog), 3);
 
     CStaticFunctionDefinitions(m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager);
     CLuaFunctionDefs::Initialize(m_pLuaManager, m_pScriptDebugging, this);
