@@ -183,9 +183,20 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
             if (!pTexture)
                 continue;
 
+            if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+                continue;
+
             pTexture->txd = nullptr;
             if (bFilteringEnabled)
-                pTexture->flags = 0x1102;  // Enable filtering (otherwise textures are pixely)
+            {
+                // Enable filtering (0x02) but preserve addressing mode if set
+                // If no addressing is set (common for PNGs), default to Wrap (0x1100)
+                // Also prevents certain issues with applying "vehicle wrap textures"
+                if ((pTexture->flags & 0xFF00) == 0)
+                    pTexture->flags |= 0x1100;
+
+                pTexture->flags = (pTexture->flags & ~0xFF) | 0x02;
+            }
         }
 
         // Make the txd forget it has any textures and destroy it
@@ -238,6 +249,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     // Copy / clone textures
     for (RwTexture* pNewTexture : pReplacementTextures->textures)
     {
+        if (!pNewTexture || !SharedUtil::IsReadablePointer(pNewTexture, sizeof(RwTexture)))
+            continue;
+
         // Use a copy if not first txd
         if (perTxdInfo.bTexturesAreCopies)
         {
@@ -254,15 +268,72 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
         perTxdInfo.usingTextures.push_back(pNewTexture);
     }
 
+    // Request space from the SA streaming system for the new textures.
+    // This reduces mem pressure/OOM by encouraging the engine to free unused resources.
+    // Note: We do not modify CStreamingInfo::sizeInBlocks as that affects disk I/O during model reload.
+    // Only perform this check for new rasters (not copies) to avoid double-counting shared resources.
+    // Always keep this, as it turns out to fix long-standing texture 'leaks': issue #4554, #2869 (Most likely)
+    if (!perTxdInfo.bTexturesAreCopies && pGame->GetStreaming())
+    {
+        uint32_t uiTotalSize = 0;
+        for (RwTexture* pNewTexture : perTxdInfo.usingTextures)
+        {
+            if (pNewTexture && SharedUtil::IsReadablePointer(pNewTexture, sizeof(RwTexture)) && pNewTexture->raster)
+            {
+                // VRAM cost: power of two padding + mipmaps
+                // to avoid the same issues with non power of two textures
+                auto NextPow2 = [](uint32_t v) { uint32_t p = 1; while (p < v && p < 0x80000000) p <<= 1; return p; };
+                
+                uint32_t size = NextPow2(pNewTexture->raster->width) * NextPow2(pNewTexture->raster->height) * 4;
+                
+                if (pNewTexture->raster->numLevels > 1)
+                    size += size / 3;
+
+                uiTotalSize += size;
+            }
+        }
+
+        if (uiTotalSize > 0)
+        {
+            pGame->GetStreaming()->MakeSpaceFor(uiTotalSize);
+        }
+    }
+
     //
     // Add each texture to the target txd
     //
     for (RwTexture* pNewTexture : perTxdInfo.usingTextures)
     {
+        if (!pNewTexture || !SharedUtil::IsReadablePointer(pNewTexture, sizeof(RwTexture)))
+            continue;
+
         // If there is a name clash with an existing texture, replace it
         RwTexture* pExistingTexture = RwTexDictionaryFindNamedTexture(pInfo->pTxd, pNewTexture->name);
+
+        // Handle internal texture names (e.g., "remap" -> "#emap", "white" -> "@hite").
+        // If the TXD contains the internal name, treat it as collided.
+        // Ensure the replacement texture uses the internal name so the game engine can find it.
+        if (!pExistingTexture)
+        {
+            const char* szInternalName = GetInternalTextureName(pNewTexture->name);
+            if (szInternalName != pNewTexture->name)
+            {
+                pExistingTexture = RwTexDictionaryFindNamedTexture(pInfo->pTxd, szInternalName);
+                
+                // Rename the replacement texture to match the internal name expected by the game engine.
+                // This is required even if the original texture is missing, as the game hardcodes lookups for names like "#emap".
+                strncpy(pNewTexture->name, szInternalName, RW_TEXTURE_NAME_LENGTH);
+            }
+        }
+
         if (pExistingTexture)
         {
+            // Copy addressing mode from original texture
+            // 0x0F00 = rwTEXTUREADDRESSUMASK, 0xF000 = rwTEXTUREADDRESSVMASK
+            // Also prevents certain issues with applying "vehicle wrap textures"
+            constexpr uint32_t rwTEXTUREADDRESSMASK = 0xFF00;
+            pNewTexture->flags = (pNewTexture->flags & ~rwTEXTUREADDRESSMASK) | (pExistingTexture->flags & rwTEXTUREADDRESSMASK);
+
             RwTexDictionaryRemoveTexture(pInfo->pTxd, pExistingTexture);
         }
 
@@ -307,6 +378,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         {
             RwTexture* pOldTexture = perTxdInfo.usingTextures[idx];
             if (!pOldTexture)
+                continue;
+
+            if (!SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
                 continue;
 
             RwTexture* pOriginalTexture = (idx < perTxdInfo.replacedOriginals.size()) ? perTxdInfo.replacedOriginals[idx] : nullptr;
@@ -383,6 +457,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         {
             // Skip null/invalid textures (can happen during shutdown)
             if (!pOriginalTexture)
+                continue;
+
+            if (!SharedUtil::IsReadablePointer(pOriginalTexture, sizeof(RwTexture)))
                 continue;
                 
             if (!RwTexDictionaryFindNamedTexture(pInfo->pTxd, pOriginalTexture->name))

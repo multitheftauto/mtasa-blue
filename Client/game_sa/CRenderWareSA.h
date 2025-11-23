@@ -146,6 +146,9 @@ public:
     static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
 
+    static const char* GetInternalTextureName(const char* szExternalName);
+    static const char* GetExternalTextureName(const char* szInternalName);
+
     void OnTextureStreamIn(STexInfo* pTexInfo);
     void OnTextureStreamOut(STexInfo* pTexInfo);
     void DisableGTAVertexShadersForAWhile();

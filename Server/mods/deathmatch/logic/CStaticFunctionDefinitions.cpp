@@ -1628,6 +1628,18 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
     pElement->SetAttachedOffsets(vecPosition, vecRotation);
     pElement->AttachTo(pAttachedToElement);
 
+    if (IS_MARKER(pElement))
+    {
+        CMarker* pMarker = static_cast<CMarker*>(pElement);
+        CVector attachedPosition;
+        pMarker->GetAttachedPosition(attachedPosition);
+        pMarker->SetPosition(attachedPosition);
+
+        CColShape* pColShape = pMarker->GetColShape();
+        if (pColShape)
+            RefreshColShapeColliders(pColShape);
+    }
+
     CBitStream BitStream;
     BitStream.pBitStream->Write(pAttachedToElement->GetID());
     BitStream.pBitStream->Write(vecPosition.fX);
@@ -1675,6 +1687,14 @@ bool CStaticFunctionDefinitions::DetachElements(CElement* pElement, CElement* pA
     // old packets arriving.
     pElement->AttachTo(NULL);
     pElement->GenerateSyncTimeContext();
+
+    if (IS_MARKER(pElement))
+    {
+        CMarker* pMarker = static_cast<CMarker*>(pElement);
+        CColShape* pColShape = pMarker->GetColShape();
+        if (pColShape)
+            RefreshColShapeColliders(pColShape);
+    }
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(pElement->GetSyncTimeContext());
