@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-23 01:11+0000\n"
-"PO-Revision-Date: 2025-11-23 01:30\n"
+"PO-Revision-Date: 2025-11-23 07:30\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -1058,7 +1058,7 @@ msgstr "Pilotează cu mouseul"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
-msgstr ""
+msgstr "Folosește sensibilitatea mouse-ului pentru țintire"
 
 #. Joypad options
 #: Client/core/CSettings.cpp:669
