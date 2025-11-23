@@ -270,6 +270,23 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
         // If there is a name clash with an existing texture, replace it
         RwTexture* pExistingTexture = RwTexDictionaryFindNamedTexture(pInfo->pTxd, pNewTexture->name);
+
+        // Handle internal texture names (e.g., "remap" -> "#emap", "white" -> "@hite").
+        // If the TXD contains the internal name, treat it as collided.
+        // Ensure the replacement texture uses the internal name so the game engine can find it.
+        if (!pExistingTexture)
+        {
+            const char* szInternalName = GetInternalTextureName(pNewTexture->name);
+            if (szInternalName != pNewTexture->name)
+            {
+                pExistingTexture = RwTexDictionaryFindNamedTexture(pInfo->pTxd, szInternalName);
+                
+                // Rename the replacement texture to match the internal name expected by the game engine.
+                // This is required even if the original texture is missing, as the game hardcodes lookups for names like "#emap".
+                strncpy(pNewTexture->name, szInternalName, RW_TEXTURE_NAME_LENGTH);
+            }
+        }
+
         if (pExistingTexture)
         {
             RwTexDictionaryRemoveTexture(pInfo->pTxd, pExistingTexture);
