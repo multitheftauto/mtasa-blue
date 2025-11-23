@@ -332,6 +332,14 @@ std::vector<DWORD> GetGTAProcessList()
 ///////////////////////////////////////////////////////////////////////////
 bool IsGTARunning()
 {
+    // Don't report GTA as running if CL2 is active (to allow coexistence)
+    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
+    if (hCL2Mutex)
+    {
+        CloseHandle(hCL2Mutex);
+        return false;
+    }
+    
     return !GetGTAProcessList().empty();
 }
 
@@ -346,6 +354,14 @@ void TerminateGTAIfRunning()
 {
     if (IsSecondaryClient())
         return;
+    
+    // Don't terminate GTA if CL2 is running
+    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
+    if (hCL2Mutex)
+    {
+        CloseHandle(hCL2Mutex);
+        return;
+    }
 
     std::vector<DWORD> processIdList = GetGTAProcessList();
 
@@ -411,6 +427,14 @@ void TerminateOtherMTAIfRunning()
 {
     if (IsSecondaryClient())
         return;
+    
+    // Don't terminate other MTA if CL2 is running
+    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
+    if (hCL2Mutex)
+    {
+        CloseHandle(hCL2Mutex);
+        return;
+    }
 
     std::vector<DWORD> processIdList = GetOtherMTAProcessList();
 
