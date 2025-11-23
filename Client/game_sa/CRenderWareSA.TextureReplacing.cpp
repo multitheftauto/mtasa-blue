@@ -260,6 +260,29 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
         perTxdInfo.usingTextures.push_back(pNewTexture);
     }
 
+    // Request space from the SA streaming system for the new textures.
+    // This reduces mem pressure/OOM by encouraging the engine to free unused resources.
+    // Note: We do not modify CStreamingInfo::sizeInBlocks as that affects disk I/O during model reload.
+    // Only perform this check for new rasters (not copies) to avoid double-counting shared resources.
+    if (!perTxdInfo.bTexturesAreCopies && pGame->GetStreaming())
+    {
+        uint32_t uiTotalSize = 0;
+        for (RwTexture* pNewTexture : perTxdInfo.usingTextures)
+        {
+            if (pNewTexture && SharedUtil::IsReadablePointer(pNewTexture, sizeof(RwTexture)) && pNewTexture->raster)
+            {
+                // Estimate texture size (Width * Height * 4 bytes for 32-bit).
+                // This helps the SA streaming system manage memory pressure.
+                uiTotalSize += pNewTexture->raster->width * pNewTexture->raster->height * 4;
+            }
+        }
+
+        if (uiTotalSize > 0)
+        {
+            pGame->GetStreaming()->MakeSpaceFor(uiTotalSize);
+        }
+    }
+
     //
     // Add each texture to the target txd
     //
