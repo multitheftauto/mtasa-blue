@@ -363,6 +363,7 @@ void CSettings::ResetGuiPointers()
     m_pLabelVerticalAimSensitivity = NULL;
     m_pVerticalAimSensitivity = NULL;
     m_pLabelVerticalAimSensitivityValue = NULL;
+    m_pCheckboxVerticalAimSensitivity = nullptr;
 
     m_pControlsJoypadLabel = NULL;
     m_pControlsInputTypePane = NULL;
@@ -658,6 +659,10 @@ void CSettings::CreateGUI()
     m_pLabelVerticalAimSensitivityValue->AutoSize("100%");
     FinalizeSliderRow(tabPanelSize.fX, m_pVerticalAimSensitivity, m_pLabelVerticalAimSensitivityValue, 160.0f, kSliderLabelSpacing, m_pLabelVerticalAimSensitivity);
     vecTemp.fY += 30.f;
+
+    m_pCheckboxVerticalAimSensitivity = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabControls, _("Use mouse sensitivity for aiming"), false));
+    m_pCheckboxVerticalAimSensitivity->SetPosition(CVector2D(verticalSliderPos.fX, verticalSliderPos.fY + 20.0f));
+    m_pCheckboxVerticalAimSensitivity->AutoSize(nullptr, 20.0f);
 
     vecTemp.fX = 16;
     // Joypad options
@@ -1965,6 +1970,7 @@ void CSettings::CreateGUI()
     m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
     m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
     m_pProcessAffinityCheckbox->SetClickHandler(GUI_CALLBACK(&CSettings::OnAffinityClick, this));
+    m_pCheckboxVerticalAimSensitivity->SetClickHandler(GUI_CALLBACK(&CSettings::OnMouseAimingClick, this));
 
     // Set up the events for advanced description
     m_pPriorityLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
@@ -2845,6 +2851,8 @@ bool CSettings::OnControlsDefaultClick(CGUIElement* pElement)
     m_pClassicControls->SetSelected(CVARS_GET_VALUE<bool>("classic_controls"));
     m_pMouseSensitivity->SetScrollPosition(gameSettings->GetMouseSensitivity());
     m_pVerticalAimSensitivity->SetScrollPosition(pController->GetVerticalAimSensitivity());
+    m_pCheckboxVerticalAimSensitivity->SetSelected(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
+    m_pVerticalAimSensitivity->SetEnabled(!m_pCheckboxVerticalAimSensitivity->GetSelected());
 
     return true;
 }
@@ -3948,6 +3956,10 @@ void CSettings::LoadData()
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     m_pVerticalAimSensitivity->SetScrollPosition(pController->GetVerticalAimSensitivity());
 
+    CVARS_GET("use_mouse_sensitivity_for_aiming", bVar);
+    m_pCheckboxVerticalAimSensitivity->SetSelected(bVar);
+    m_pVerticalAimSensitivity->SetEnabled(!m_pCheckboxVerticalAimSensitivity->GetSelected());
+
     // Audio
     m_pCheckBoxAudioEqualizer->SetSelected(gameSettings->IsRadioEqualizerEnabled());
     m_pCheckBoxAudioAutotune->SetSelected(gameSettings->IsRadioAutotuneEnabled());
@@ -4274,6 +4286,8 @@ void CSettings::SaveData()
     pController->SetClassicControls(m_pClassicControls->GetSelected());
     pController->SetVerticalAimSensitivity(m_pVerticalAimSensitivity->GetScrollPosition());
     CVARS_SET("vertical_aim_sensitivity", pController->GetVerticalAimSensitivityRawValue());
+    CVARS_SET("use_mouse_sensitivity_for_aiming", m_pCheckboxVerticalAimSensitivity->GetSelected());
+    pController->SetVerticalAimSensitivitySameAsHorizontal(m_pCheckboxVerticalAimSensitivity->GetSelected());
 
     // Video
     // get current
@@ -5818,6 +5832,12 @@ bool CSettings::OnAffinityClick(CGUIElement* pElement)
     pQuestionBox->SetCallback(CPUAffinityQuestionCallBack, m_pProcessAffinityCheckbox);
     pQuestionBox->Show();
 
+    return true;
+}
+
+bool CSettings::OnMouseAimingClick(CGUIElement* pElement)
+{
+    m_pVerticalAimSensitivity->SetEnabled(!m_pCheckboxVerticalAimSensitivity->GetSelected());
     return true;
 }
 

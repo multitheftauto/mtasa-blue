@@ -206,4 +206,5 @@ public:
     virtual void  SetVerticalAimSensitivity(float fSensitivity) = 0;
     virtual float GetVerticalAimSensitivityRawValue() = 0;
     virtual void  SetVerticalAimSensitivityRawValue(float fRawValue) = 0;
+    virtual void  SetVerticalAimSensitivitySameAsHorizontal(bool enable) = 0;
 };
