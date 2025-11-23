@@ -188,7 +188,15 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
 
             pTexture->txd = nullptr;
             if (bFilteringEnabled)
-                pTexture->flags = 0x1102;  // Enable filtering (otherwise textures are pixely)
+            {
+                // Enable filtering (0x02) but preserve addressing mode if set
+                // If no addressing is set (common for PNGs), default to Wrap (0x1100)
+                // Also prevents certain issues with applying "vehicle wrap textures"
+                if ((pTexture->flags & 0xFF00) == 0)
+                    pTexture->flags |= 0x1100;
+
+                pTexture->flags = (pTexture->flags & ~0xFF) | 0x02;
+            }
         }
 
         // Make the txd forget it has any textures and destroy it
@@ -320,6 +328,12 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
         if (pExistingTexture)
         {
+            // Copy addressing mode from original texture
+            // 0x0F00 = rwTEXTUREADDRESSUMASK, 0xF000 = rwTEXTUREADDRESSVMASK
+            // Also prevents certain issues with applying "vehicle wrap textures"
+            constexpr uint32_t rwTEXTUREADDRESSMASK = 0xFF00;
+            pNewTexture->flags = (pNewTexture->flags & ~rwTEXTUREADDRESSMASK) | (pExistingTexture->flags & rwTEXTUREADDRESSMASK);
+
             RwTexDictionaryRemoveTexture(pInfo->pTxd, pExistingTexture);
         }
 
