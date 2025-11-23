@@ -1014,6 +1014,86 @@ void _declspec(naked) HOOK_CrashFix_Misc32()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture
+// 
+// "dict" is invalid
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc33                             0x7F39F0
+#define HOOKSIZE_CrashFix_Misc33                            5
+DWORD RETURN_CrashFix_Misc33 = 0x7F39F5;
+
+typedef RwTexDictionary* (__cdecl *PFN_RwTexDictionaryGetCurrent)();
+PFN_RwTexDictionaryGetCurrent pfnRwTexDictionaryGetCurrent = (PFN_RwTexDictionaryGetCurrent)0x7F3A90;
+
+void _declspec(naked) CallOriginalFindNamedTexture()
+{
+    _asm
+    {
+        mov     eax, [esp+4]
+        push    ebx
+        jmp     RETURN_CrashFix_Misc33
+    }
+}
+
+void _declspec(naked) HOOK_CrashFix_Misc33()
+{
+    _asm
+    {
+        // Get first argument (dict)
+        mov     ecx, [esp+4]
+
+        // Grab name parameter for later reuse
+        mov     edx, [esp+8]
+
+        // Name must be valid
+        test    edx, edx
+        jz      invalid_texture
+
+        // Check for NULL dict
+        test    ecx, ecx
+        jz      invalid_texture
+
+        // Check for valid pointer
+        cmp     ecx, 0x10000
+        jb      invalid_texture
+
+        // Check if it's a dictionary (type 6)
+        cmp     byte ptr [ecx], 6
+        jne     use_current_dict
+
+        // Validate dict->texturesInDict.next (offset 8)
+        mov     eax, [ecx+8]
+        test    eax, eax
+        jz      invalid_texture
+
+        // Execute replaced code
+        jmp     CallOriginalFindNamedTexture
+
+    use_current_dict:
+        // Attempt to recover by using the current dictionary
+        push    edx             // Save name before the call
+        call    pfnRwTexDictionaryGetCurrent
+        pop     edx             // Restore name
+        test    eax, eax
+        jz      invalid_texture
+
+        // Call original function with (dict, name)
+        push    edx             // name
+        push    eax             // dict
+        call    CallOriginalFindNamedTexture
+        add     esp, 8
+        
+        retn                    // Return to caller
+
+    invalid_texture:
+        push    33
+        call    CrashAverted
+        xor     eax, eax        // Return NULL
+        retn                    // cdecl
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
 // CClumpModelInfo::GetFrameFromId
 //
 // Invalid frame
@@ -2176,6 +2256,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc29);
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
+    EZHookInstall(CrashFix_Misc33);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);

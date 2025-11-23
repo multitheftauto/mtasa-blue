@@ -185,6 +185,9 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
             if (!pTexture)
                 continue;
 
+            if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+                continue;
+
             pTexture->txd = nullptr;
             if (bFilteringEnabled)
                 pTexture->flags = 0x1102;  // Enable filtering (otherwise textures are pixely)
@@ -241,6 +244,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     // Copy / clone textures
     for (RwTexture* pNewTexture : pReplacementTextures->textures)
     {
+        if (!pNewTexture || !SharedUtil::IsReadablePointer(pNewTexture, sizeof(RwTexture)))
+            continue;
+
         // Use a copy if not first txd
         if (perTxdInfo.bTexturesAreCopies)
         {
@@ -262,6 +268,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     //
     for (RwTexture* pNewTexture : perTxdInfo.usingTextures)
     {
+        if (!pNewTexture || !SharedUtil::IsReadablePointer(pNewTexture, sizeof(RwTexture)))
+            continue;
+
         // If there is a name clash with an existing texture, replace it
         RwTexture* pExistingTexture = RwTexDictionaryFindNamedTexture(pInfo->pTxd, pNewTexture->name);
         if (pExistingTexture)
@@ -310,6 +319,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         {
             RwTexture* pOldTexture = perTxdInfo.usingTextures[idx];
             if (!pOldTexture)
+                continue;
+
+            if (!SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
                 continue;
 
             RwTexture* pOriginalTexture = (idx < perTxdInfo.replacedOriginals.size()) ? perTxdInfo.replacedOriginals[idx] : nullptr;
@@ -386,6 +398,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         {
             // Skip null/invalid textures (can happen during shutdown)
             if (!pOriginalTexture)
+                continue;
+
+            if (!SharedUtil::IsReadablePointer(pOriginalTexture, sizeof(RwTexture)))
                 continue;
                 
             if (!RwTexDictionaryFindNamedTexture(pInfo->pTxd, pOriginalTexture->name))
