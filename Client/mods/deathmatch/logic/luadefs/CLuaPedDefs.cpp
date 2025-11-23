@@ -2511,11 +2511,11 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
+bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger, std::optional<unsigned int> optSeat)
 {
     CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
     bool            bPassenger = bOptPassenger.value_or(false);
-    return pPed->EnterVehicle(pVehicle, bPassenger);
+    return pPed->EnterVehicle(pVehicle, bPassenger, optSeat);
 }
 
 bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
