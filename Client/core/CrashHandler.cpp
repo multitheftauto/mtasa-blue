@@ -34,6 +34,7 @@
 #include <filesystem>
 #include <format>
 #include <intrin.h>
+#include <malloc.h>
 #include <mutex>
 #include <new>
 #include <optional>
@@ -91,6 +92,74 @@
     // Libraries with a lot of bogus breakpoints
     return strstr(modulePath, "libcef.dll") != nullptr || 
            strstr(modulePath, "chrome_elf.dll") != nullptr;
+}
+
+// Helpers to isolate __try usage and prevent crashes in debug output itself
+void OutputDebugStringSafeImpl(const char* message)
+{
+    if (message == nullptr)
+        return;
+
+    __try
+    {
+        OutputDebugStringA(message);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+}
+
+void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args)
+{
+    if (buffer == nullptr || bufferSize == 0 || format == nullptr)
+        return;
+
+    std::memset(buffer, 0, bufferSize);
+
+    __try
+    {
+        const int written = _vsnprintf_s(buffer, bufferSize, _TRUNCATE, format, args);
+        if (written > 0)
+        {
+            OutputDebugStringSafeImpl(buffer);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        OutputDebugStringSafeImpl("CrashHandler: Exception during debug print formatting\n");
+    }
+}
+
+void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args)
+{
+    char buffer[DEBUG_BUFFER_SIZE] = {};
+
+    std::size_t offset = 0;
+    if (prefix != nullptr && prefixLen > 0)
+    {
+        offset = std::min<std::size_t>(prefixLen, DEBUG_BUFFER_SIZE - 1);
+        std::memcpy(buffer, prefix, offset);
+    }
+
+    if (offset >= DEBUG_BUFFER_SIZE - 1)
+    {
+        buffer[DEBUG_BUFFER_SIZE - 1] = '\0';
+        OutputDebugStringSafeImpl(buffer);
+        return;
+    }
+
+    __try
+    {
+        const int written = _vsnprintf_s(buffer + offset, DEBUG_BUFFER_SIZE - offset, _TRUNCATE, format, args);
+        if (written > 0 || offset > 0)
+        {
+            OutputDebugStringSafeImpl(buffer);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        OutputDebugStringSafeImpl("CrashHandler: Exception during debug print prefixed formatting\n");
+    }
 }
 
 #ifndef STATUS_INVALID_PARAMETER
@@ -309,7 +378,12 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
 
     try
     {
-        std::scoped_lock lock{g_exceptionInfoMutex};
+        std::unique_lock lock{g_exceptionInfoMutex, std::try_to_lock};
+        if (!lock.owns_lock())
+        {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Failed to acquire lock, skipping global state update\n");
+            return;
+        }
 
         ENHANCED_EXCEPTION_INFO info{};
 
@@ -1957,24 +2031,18 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
     
     for (auto frameIndex : std::views::iota(DWORD{0}, actualMaxFrames))
     {
-        BOOL bWalked = FALSE;
+        // Always use protected stack walking as the stack might be corrupted
+        // (e.g. stack overflow, buffer overrun, or just garbage pointers)
+        BOOL bWalked = ProtectedStackWalk64(machineType, hProcess, hThread, &frame, &context, routines);
         
-        if (isCallbackException) [[unlikely]]
+        if (bWalked == FALSE)
         {
-            bWalked = ProtectedStackWalk64(machineType, hProcess, hThread, &frame, &context, routines);
-            if (bWalked == FALSE) [[unlikely]]
+            if (isCallbackException)
             {
                 SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Exception during protected stack walk at frame %lu\n", frameIndex);
             }
-        }
-        else [[likely]]
-        {
-            bWalked = StackWalk64(machineType, hProcess, hThread, &frame, &context, 
-                                routines.readMemory, routines.functionTableAccess, routines.moduleBase, nullptr);
-        }
-        
-        if (bWalked == FALSE) [[unlikely]]
             break;
+        }
 
         if (frame.AddrPC.Offset == 0) [[unlikely]]
             break;
@@ -2430,7 +2498,11 @@ static void ReportCurrentCppException()
     if (pExceptionInfo == nullptr)
         return FALSE;
 
-    std::scoped_lock lock{g_exceptionInfoMutex};
+    std::unique_lock lock{g_exceptionInfoMutex, std::try_to_lock};
+    if (!lock.owns_lock())
+    {
+        return FALSE;
+    }
 
     if (!g_lastExceptionInfo)
         return FALSE;
@@ -2443,7 +2515,11 @@ static void ReportCurrentCppException()
 {
     try
     {
-        std::scoped_lock lock{g_exceptionInfoMutex};
+        std::unique_lock lock{g_exceptionInfoMutex, std::try_to_lock};
+        if (!lock.owns_lock())
+        {
+            return FALSE;
+        }
 
         ENHANCED_EXCEPTION_INFO info = {};
         info.capturedException = std::current_exception();
@@ -2458,6 +2534,23 @@ static void ReportCurrentCppException()
     catch (...)
     {
         return FALSE;
+    }
+}
+
+// Helper to isolate try/catch from SEH in LogExceptionDetails
+static BOOL TryLogEnhancedExceptionInfo(EXCEPTION_POINTERS* pException)
+{
+    try
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - Calling LogEnhancedExceptionInfo...\n");
+        LogEnhancedExceptionInfo(pException);
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - LogEnhancedExceptionInfo completed\n");
+        return TRUE;
+    }
+    catch (...)
+    {
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - Exception caught in LogEnhancedExceptionInfo\n");
+        return TRUE; // Return TRUE to indicate we handled the attempt, even if it failed
     }
 }
 
@@ -2488,24 +2581,54 @@ static void ReportCurrentCppException()
     LogBasicExceptionInfo(pException);
     StoreBasicExceptionInfo(pException);
 
+    return TryLogEnhancedExceptionInfo(pException);
+}
+
+// Helper to isolate SEH for logging in CrashHandlerExceptionFilter
+static BOOL SEHLogExceptionDetails(EXCEPTION_POINTERS* pExPtrs)
+{
+    BOOL result = FALSE;
+    __try
+    {
+        result = LogExceptionDetails(pExPtrs);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        SafeDebugOutput("SEH: CRITICAL - Exception while logging exception details\n");
+        result = FALSE;
+    }
+    return result;
+}
+
+// Helper to isolate SEH for storing basic info in CrashHandlerExceptionFilter
+static void SEHStoreBasicExceptionInfo(EXCEPTION_POINTERS* pExPtrs)
+{
+    __try
+    {
+        StoreBasicExceptionInfo(pExPtrs);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        SafeDebugOutput("SEH: CRITICAL - Exception while storing basic info during stack overflow\n");
+    }
+}
+
+// Helper to isolate try/catch for callback in CrashHandlerExceptionFilter
+static LONG TryCallCrashCallback(PFNCHFILTFN callback, EXCEPTION_POINTERS* pExPtrs)
+{
     try
     {
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - Calling LogEnhancedExceptionInfo...\n");
-        LogEnhancedExceptionInfo(pException);
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - LogEnhancedExceptionInfo completed\n");
-        return TRUE;
+        return callback(pExPtrs);
     }
     catch (...)
     {
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - Exception caught in LogEnhancedExceptionInfo\n");
-        return TRUE;
+        SafeDebugOutput("SEH: CRITICAL - Exception in crash handler callback!\n");
+        return EXCEPTION_CONTINUE_SEARCH;
     }
 }
 
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
 {
-    SafeDebugOutput("SEH: CrashHandlerExceptionFilter - ENTRY\n");
-
     if (pExPtrs == nullptr || pExPtrs->ExceptionRecord == nullptr)
     {
         return EXCEPTION_CONTINUE_SEARCH;
@@ -2547,12 +2670,43 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
+    // Handle Stack Overflow Recovery FIRST
+    if (dwExceptionCode == EXCEPTION_STACK_OVERFLOW)
+    {
+        if (_resetstkoflw())
+        {
+            SafeDebugOutput("SEH: Stack overflow detected - _resetstkoflw() successful\n");
+        }
+        else
+        {
+            SafeDebugOutput("SEH: FATAL - Stack overflow detected - _resetstkoflw() failed\n");
+            // If we can't reset the stack, we can't safely do anything else.
+            // Attempting to log or call handlers will likely trigger another overflow immediately.
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+    }
+
+    SafeDebugOutput("SEH: CrashHandlerExceptionFilter - ENTRY\n");
+
     SafeDebugOutput(DEBUG_SEPARATOR);
     SafeDebugOutput("SEH: FATAL - Unhandled exception filter triggered\n");
 
-    if (const BOOL logResult{LogExceptionDetails(pExPtrs)}; logResult == FALSE) [[unlikely]]
+    // Only attempt enhanced logging if NOT a stack overflow, or if we are feeling lucky.
+    // Enhanced logging uses significant stack space.
+    if (dwExceptionCode != EXCEPTION_STACK_OVERFLOW)
     {
-        SafeDebugOutput("SEH: WARNING - Failed to log exception details\n");
+        if (SEHLogExceptionDetails(pExPtrs) == FALSE) [[unlikely]]
+        {
+            SafeDebugOutput("SEH: WARNING - Failed to log exception details\n");
+            // Fallback to basic logging if enhanced failed
+            LogBasicExceptionInfo(pExPtrs);
+        }
+    }
+    else
+    {
+        SafeDebugOutput("SEH: Stack overflow - skipping enhanced logging to preserve stack\n");
+        LogBasicExceptionInfo(pExPtrs);
+        SEHStoreBasicExceptionInfo(pExPtrs);
     }
 
     if (STATUS_INVALID_CRUNTIME_PARAMETER_CODE == dwExceptionCode || STATUS_STACK_BUFFER_OVERRUN_CODE == dwExceptionCode)
@@ -2564,34 +2718,12 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
         SafeDebugOutput("SEH: FATAL - Exception in Windows callback - attempting recovery\n");
         SafeDebugOutput("SEH: Note - Stack may be corrupted, context may be incomplete\n");
     }
-    else if (EXCEPTION_STACK_OVERFLOW == dwExceptionCode)
-    {
-        SafeDebugOutput("SEH: FATAL - EXCEPTION_STACK_OVERFLOW occurred\n");
-        if (_resetstkoflw() == 0)
-        {
-            SafeDebugOutput("SEH: WARNING - _resetstkoflw failed to reset the stack overflow state\n");
-        }
-    }
-    else
-    {
-        std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
-        SAFE_DEBUG_PRINT_C(szDebug.data(), szDebug.size(), "%.*sFATAL - Exception 0x%08X at 0x%p\n", static_cast<int>(DEBUG_PREFIX_SEH.size()), DEBUG_PREFIX_SEH.data(), dwExceptionCode,
-                           static_cast<const void*>(pExPtrs->ExceptionRecord->ExceptionAddress));
-    }
 
     SafeDebugOutput(DEBUG_SEPARATOR);
 
-    try
+    if (PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire); callback != nullptr)
     {
-        if (PFNCHFILTFN callback = g_pfnCrashCallback.load(std::memory_order_acquire); callback != nullptr)
-        {
-            lRet = callback(pExPtrs);
-        }
-    }
-    catch (...)
-    {
-        SafeDebugOutput("SEH: CRITICAL - Exception in crash handler callback!\n");
-        lRet = EXCEPTION_CONTINUE_SEARCH;
+        lRet = TryCallCrashCallback(callback, pExPtrs);
     }
 
     bHandlerActive.store(false, std::memory_order_release);
@@ -2680,6 +2812,7 @@ namespace
 
     class HandleGuard
     {
+   
     public:
         HandleGuard() = default;
         explicit HandleGuard(HANDLE handle) : m_handle(handle) {}
