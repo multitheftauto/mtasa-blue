@@ -197,7 +197,6 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStreamable", "setElementStreamable");
     lua_classfunction(luaVM, "setLighting", "setElementLighting");
     lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
-    lua_classfunction(luaVM, "onGround", "isElementOnGround");
 
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
     lua_classvariable(luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad");
