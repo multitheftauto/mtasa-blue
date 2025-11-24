@@ -172,6 +172,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getData", "getElementData");
     lua_classfunction(luaVM, "getAllData", "getAllElementData");
     lua_classfunction(luaVM, "isOnFire", "isElementOnFire");
+    lua_classfunction(luaVM, "onGround", "isElementOnGround");
 
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setData", "setElementData");

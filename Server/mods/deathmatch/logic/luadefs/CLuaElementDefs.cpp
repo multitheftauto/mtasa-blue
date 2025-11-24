@@ -195,6 +195,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isLowLOD", "isElementLowLOD");
     lua_classfunction(luaVM, "isAttached", "isElementAttached");
     lua_classfunction(luaVM, "isOnFire", "isElementOnFire");
+    lua_classfunction(luaVM, "onGround", "isElementOnGround");
 
     lua_classvariable(luaVM, "id", "setElementID", "getElementID");
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
