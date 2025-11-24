@@ -42,6 +42,9 @@ CClientWebBrowser::~CClientWebBrowser()
     // Mark as being destroyed to prevent event callbacks from executing
     m_bBeingDestroyed = true;
 
+    if (m_pWebView)
+        m_pWebView->ClearWebBrowserEvents(this);
+
     // Unlink from tree first to prevent event callbacks from reaching
     Unlink();
 
