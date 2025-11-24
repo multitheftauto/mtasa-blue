@@ -15,6 +15,7 @@
 #include "CWebDevTools.h"
 #include <chrono>
 #include "CWebViewAuth.h"            // AUTH: IPC validation helpers
+#include <utility>
 
 namespace
 {
@@ -23,6 +24,7 @@ namespace
 
 CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent)
 {
+    m_pEventTarget = std::make_shared<FEventTarget>();
     m_bIsLocal = bIsLocal;
     m_bIsTransparent = bTransparent;
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
@@ -41,6 +43,9 @@ CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool b
 CWebView::~CWebView()
 {
     m_bBeingDestroyed = true;
+
+    if (m_pEventTarget)
+        m_pEventTarget->Clear(m_pEventsInterface);
 
     if (IsMainThread())
     {
@@ -84,6 +89,41 @@ CWebView::~CWebView()
     }
 
     OutputDebugLine("CWebView::~CWebView");
+}
+
+void CWebView::SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface)
+{
+    m_pEventsInterface = pInterface;
+
+    if (m_pEventTarget)
+        m_pEventTarget->Assign(pInterface);
+}
+
+void CWebView::ClearWebBrowserEvents(CWebBrowserEventsInterface* pInterface)
+{
+    if (m_pEventTarget)
+        m_pEventTarget->Clear(pInterface);
+
+    if (m_pEventsInterface == pInterface)
+        m_pEventsInterface = nullptr;
+}
+
+void CWebView::QueueBrowserEvent(const char* name, std::function<void(CWebBrowserEventsInterface*)>&& fn)
+{
+    auto target = m_pEventTarget;
+    if (!target)
+        return;
+
+    const auto token = target->CreateDispatchToken();
+
+    g_pCore->GetWebCore()->AddEventToEventQueue(
+        [target, token, fn = std::move(fn)]() mutable {
+            if (!target)
+                return;
+
+            target->Dispatch(token, fn);
+        },
+        this, name);
 }
 
 void CWebView::Initialise()
@@ -784,7 +824,11 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
             if (aborted)
                 return;
 
-            result = m_pEventsInterface->Events_OnResourcePathCheck(strPath);
+            auto* events = m_pEventsInterface;
+            if (!events)
+                return;
+
+            result = events->Events_OnResourcePathCheck(strPath);
         },
         this);
 
@@ -813,8 +857,11 @@ void CWebView::HandleAjaxRequest(const SString& strURL, CAjaxResourceHandler* pH
     // Only queue event if not being destroyed to prevent UAF
     if (!m_bBeingDestroyed)
     {
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL);
-        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "AjaxResourceRequest");
+        QueueBrowserEvent(
+            "AjaxResourceRequest",
+            [handler = pHandler, url = strURL](CWebBrowserEventsInterface* iface) {
+                iface->Events_OnAjaxRequest(handler, url);
+            });
     }
 }
 
@@ -835,7 +882,11 @@ bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
             if (aborted)
                 return;
 
-            result = m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+            auto* events = m_pEventsInterface;
+            if (!events)
+                return;
+
+            result = events->Events_OnResourceFileCheck(strPath, outFileData);
         },
         this);
 
@@ -1115,8 +1166,11 @@ void CWebView::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
         return;
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnLoadingStart, m_pEventsInterface, strURL, frame->IsMain());
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadStart");
+    QueueBrowserEvent(
+        "OnLoadStart",
+        [url = strURL, isMain = frame->IsMain()](CWebBrowserEventsInterface* iface) {
+            iface->Events_OnLoadingStart(url, isMain);
+        });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1135,8 +1189,11 @@ void CWebView::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fram
         SString strURL = UTF16ToMbUTF8(frame->GetURL());
 
         // Queue event to run on the main thread
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnDocumentReady, m_pEventsInterface, strURL);
-        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadEnd");
+        QueueBrowserEvent(
+            "OnLoadEnd",
+            [url = strURL](CWebBrowserEventsInterface* iface) {
+                iface->Events_OnDocumentReady(url);
+            });
     }
 }
 
@@ -1153,8 +1210,11 @@ void CWebView::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
     SString strURL = UTF16ToMbUTF8(frame->GetURL());
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnLoadingFailed, m_pEventsInterface, strURL, errorCode, SString(errorText));
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadError");
+    QueueBrowserEvent(
+        "OnLoadError",
+        [url = strURL, errorCode, errorDescription = SString(errorText)](CWebBrowserEventsInterface* iface) mutable {
+            iface->Events_OnLoadingFailed(url, errorCode, errorDescription);
+        });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1200,8 +1260,11 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
     bool bIsMainFrame = frame->IsMain();
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString(request->GetURL()), bResult, bIsMainFrame);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnNavigate");
+    QueueBrowserEvent(
+        "OnNavigate",
+        [url = SString(request->GetURL()), blocked = bResult, isMain = bIsMainFrame](CWebBrowserEventsInterface* iface) mutable {
+            iface->Events_OnNavigate(url, blocked, isMain);
+        });
 
     // Return execution to CEF
     return bResult;
@@ -1264,9 +1327,12 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
             if (urlState != eURLState::WEBPAGE_ALLOWED)
             {
                 // Trigger onClientBrowserResourceBlocked event
-                auto func = std::bind(&CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString(request->GetURL()), domain,
-                                      urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1);
-                g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnResourceBlocked");
+                QueueBrowserEvent(
+                    "OnResourceBlocked",
+                    [url = SString(request->GetURL()), domain, reason = static_cast<unsigned char>(urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1)](
+                        CWebBrowserEventsInterface* iface) mutable {
+                        iface->Events_OnResourceBlocked(url, domain, reason);
+                    });
 
                 return RV_CANCEL;            // Block if explicitly forbidden
             }
@@ -1283,9 +1349,11 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
     }
 
     // Trigger onClientBrowserResourceBlocked event
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString(request->GetURL()), "",
-                          2);            // reason 1 := blocked protocol scheme
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnResourceBlocked");
+    QueueBrowserEvent(
+        "OnResourceBlocked",
+        [url = SString(request->GetURL())](CWebBrowserEventsInterface* iface) mutable {
+            iface->Events_OnResourceBlocked(url, "", 2);
+        });
 
     // Block everything else
     return RV_CANCEL;
@@ -1331,8 +1399,11 @@ bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
     SString strOpenerURL = UTF16ToMbUTF8(frame->GetURL());
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnPopup, m_pEventsInterface, strTagetURL, strOpenerURL);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnBeforePopup");
+    QueueBrowserEvent(
+        "OnBeforePopup",
+        [target = strTagetURL, opener = strOpenerURL](CWebBrowserEventsInterface* iface) {
+            iface->Events_OnPopup(target, opener);
+        });
 
     // Block popups generally
     return true;
@@ -1356,8 +1427,11 @@ void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     m_pWebView = browser;
 
     // Call created event callback
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnCreated, m_pEventsInterface);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnAfterCreated");
+    QueueBrowserEvent(
+        "OnAfterCreated",
+        [](CWebBrowserEventsInterface* iface) {
+            iface->Events_OnCreated();
+        });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1413,8 +1487,11 @@ void CWebView::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& tit
 bool CWebView::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& title)
 {
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnTooltip, m_pEventsInterface, UTF16ToMbUTF8(title));
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnTooltip");
+    QueueBrowserEvent(
+        "OnTooltip",
+        [tooltip = UTF16ToMbUTF8(title)](CWebBrowserEventsInterface* iface) mutable {
+            iface->Events_OnTooltip(tooltip);
+        });
 
     return true;
 }
@@ -1454,8 +1531,11 @@ bool CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cur
     unsigned char cursorIndex = static_cast<unsigned char>(type);
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnCursorChange");
+    QueueBrowserEvent(
+        "OnCursorChange",
+        [cursorIndex](CWebBrowserEventsInterface* iface) {
+            iface->Events_OnChangeCursor(cursorIndex);
+        });
 
     return false;
 }

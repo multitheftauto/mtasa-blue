@@ -1187,13 +1187,13 @@ static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException)
             exceptionCode = pException->ExceptionRecord->ExceptionCode;
             if (exceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION)
             {
-                OutputDebugStringA("CCrashDumpWriter: 0xC000041D callback exception detected\n");
+                SAFE_DEBUG_OUTPUT("CCrashDumpWriter: 0xC000041D callback exception detected\n");
             }
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        OutputDebugStringA("CCrashDumpWriter: Exception accessing exception record (corrupted frame)\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Exception accessing exception record (corrupted frame)\n");
     }
     return exceptionCode;
 }
@@ -1265,7 +1265,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 {
     // Absolute first action - log that we entered the handler (before anything can fail)
     // This is critical for diagnosing exceptions that may fault during handling
-    OutputDebugStringA("CCrashDumpWriter::HandleExceptionGlobal - EMERGENCY ENTRY MARKER\n");
+    OutputDebugStringSafe("CCrashDumpWriter::HandleExceptionGlobal - EMERGENCY ENTRY MARKER\n");
     
     SAFE_DEBUG_OUTPUT("========================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - ENTRY\n");
@@ -1286,7 +1286,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         // Try emergency minimal dump for any reentrant exception
         if (exceptionCodeSafe != 0)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Reentrant exception, attempting minimal dump\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Reentrant exception, attempting minimal dump\n");
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Exception during crash handling - attempting emergency artifacts\n");
             TryWriteReentrantFlag(exceptionCodeSafe);
         }
@@ -1330,14 +1330,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     const bool isCallbackException = (exceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION);
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Entering callback exception special handling\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Entering callback exception special handling\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: STATUS_FATAL_USER_CALLBACK_EXCEPTION detected\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: This exception occurred in a Windows callback\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Stack frames may be incomplete or corrupted\n");
         
         // Try to capture what we can with additional protection
         TryLogCallbackContext(pException);
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception context capture attempted\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception context capture attempted\n");
     }
 
     CExceptionInformation_Impl* pExceptionInformation = nullptr;
@@ -1415,7 +1415,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     // Enhanced emergency logging for all exceptions to track dump generation progress
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception attempting core log\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception attempting core log\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception - attempting dump generation despite potential secondary faults\n");
     }
 
@@ -1423,14 +1423,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting DumpCoreLog\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting DumpCoreLog\n");
         }
         DumpCoreLog(pException, pExceptionInformation);
         coreLogSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Core log dumped successfully\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpCoreLog succeeded\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpCoreLog succeeded\n");
         }
     }
     catch (...)
@@ -1446,14 +1446,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting DumpMiniDump for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting DumpMiniDump for callback exception\n");
         }
         DumpMiniDump(pException, pExceptionInformation);
         miniDumpSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Mini dump created successfully\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpMiniDump succeeded for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpMiniDump succeeded for callback exception\n");
         }
     }
     catch (...)
@@ -1461,7 +1461,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to create mini dump\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpMiniDump FAILED for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpMiniDump FAILED for callback exception\n");
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception may have caused secondary fault during minidump\n");
         }
     }
@@ -1470,7 +1470,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting RunErrorTool for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting RunErrorTool for callback exception\n");
         }
         crashDialogShown = RunErrorTool(pExceptionInformation);
         if (crashDialogShown)
@@ -1478,7 +1478,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Error dialog launched successfully\n");
             if (isCallbackException)
             {
-                OutputDebugStringA("CCrashDumpWriter: EMERGENCY - RunErrorTool succeeded for callback exception\n");
+                OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - RunErrorTool succeeded for callback exception\n");
             }
         }
     }
@@ -1487,7 +1487,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to launch error dialog\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - RunErrorTool FAILED for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - RunErrorTool FAILED for callback exception\n");
         }
     }
 
@@ -1514,7 +1514,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception processing completed, about to terminate\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception processing completed, about to terminate\n");
     }
 
     delete pExceptionInformation;
@@ -1588,7 +1588,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Force terminating crashed process NOW\n");
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - About to call TerminateProcess for callback exception\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - About to call TerminateProcess for callback exception\n");
     }
     TerminateCurrentProcessWithExitCode(crashExitCode);
 
