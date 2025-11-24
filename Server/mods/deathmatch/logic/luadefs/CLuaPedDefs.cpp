@@ -155,7 +155,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
     lua_classvariable(luaVM, "ducked", NULL, "isPedDucked");
     lua_classvariable(luaVM, "inWater", NULL, "isPedInWater");
-    lua_classvariable(luaVM, "onGround", NULL, "isPedOnGround");
     lua_classvariable(luaVM, "onFire", "setPedOnFire", "isPedOnFire");
     lua_classvariable(luaVM, "choking", "setPedChoking", "isPedChoking");
     lua_classvariable(luaVM, "doingGangDriveby", "setPedDoingGangDriveby", "isPedDoingGangDriveby");

@@ -62,6 +62,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementCollisionsEnabled", getElementCollisionsEnabled},
         {"getLowLODElement", getLowLODElement},
         {"isElementOnFire", ArgumentParser<IsElementOnFire>},
+        {"isElementOnGround", ArgumentParser<IsElementOnGround>},
 
         // Attachement
         {"attachElements", attachElements},
@@ -154,6 +155,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
     lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
+    lua_classfunction(luaVM, "onGround", "isElementOnGround");
 
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getChild", "getElementChild");
@@ -222,6 +224,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "angularVelocity", "setElementAngularVelocity", "getElementAngularVelocity", setElementTurnVelocity, OOP_getElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
     lua_classvariable(luaVM, "onFire", "setElementOnFire", "isElementOnFire");
+    lua_classvariable(luaVM, "onGround", NULL, "isElementOnGround");
 
     lua_registerclass(luaVM, "Element");
 }
@@ -2459,4 +2462,20 @@ bool CLuaElementDefs::IsElementOnFire(CElement* element) noexcept
 bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire) noexcept
 {
     return CStaticFunctionDefinitions::SetElementOnFire(element, onFire);
+}
+
+bool CLuaElementDefs::IsElementOnGround(CElement* element) noexcept
+{
+    switch (element->GetType())
+    {
+        case CElement::PLAYER:
+        case CElement::PED:
+            return static_cast<CPed*>(element)->IsOnGround();
+        case CElement::VEHICLE:
+            return static_cast<CVehicle*>(element)->IsOnGround();
+        default:
+            throw std::invalid_argument{"This element type does not support IsElementOnGround"};
+    }
+
+    return false;
 }

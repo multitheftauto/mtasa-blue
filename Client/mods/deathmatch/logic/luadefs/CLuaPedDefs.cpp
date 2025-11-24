@@ -233,7 +233,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "headless", "setPedHeadless", "isPedHeadless");
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
     lua_classvariable(luaVM, "onFire", "setPedOnFire", "isPedOnFire");
-    lua_classvariable(luaVM, "onGround", NULL, "isPedOnGround");
     lua_classvariable(luaVM, "dead", NULL, "isPedDead");
     lua_classvariable(luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classvariable(luaVM, "footBlood", "setPedFootBloodEnabled", NULL);

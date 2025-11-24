@@ -100,6 +100,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
         {"setElementLighting", ArgumentParser<SetElementLighting>},
         {"setElementOnFire", ArgumentParser<SetElementOnFire>},
+        {"isElementOnGround", ArgumentParser<IsElementOnGround>},
     };
 
     // Add functions
@@ -195,6 +196,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStreamable", "setElementStreamable");
     lua_classfunction(luaVM, "setLighting", "setElementLighting");
     lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
+    lua_classfunction(luaVM, "onGround", "isElementOnGround");
 
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
     lua_classvariable(luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad");
@@ -231,6 +233,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
     lua_classvariable(luaVM, "lighting", "setElementLighting", "getElementLighting");
     lua_classvariable(luaVM, "onFire", "setElementOnFire", "isElementOnFire");
+    lua_classvariable(luaVM, "onGround", NULL, "isElementOnGround");
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
     lua_registerclass(luaVM, "Element");
@@ -2659,4 +2662,20 @@ bool CLuaElementDefs::SetElementLighting(CClientEntity* entity, float lighting)
 bool CLuaElementDefs::IsElementOnFire(CClientEntity* entity) noexcept
 {
     return entity->IsOnFire();
+}
+
+bool CLuaElementDefs::IsElementOnGround(CClientEntity* entity) noexcept
+{
+    switch (entity->GetType())
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+            return static_cast<CClientPed*>(entity)->IsOnGround();
+        case CCLIENTVEHICLE:
+            return static_cast<CClientVehicle*>(entity)->IsOnGround();
+        default:
+            throw std::invalid_argument{"This element type does not support IsElementOnGround"};
+    }
+
+    return false;
 }

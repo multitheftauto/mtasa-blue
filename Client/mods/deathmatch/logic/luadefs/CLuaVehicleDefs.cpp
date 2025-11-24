@@ -333,7 +333,6 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "blown", NULL, "isVehicleBlown");
     lua_classvariable(luaVM, "vehicleType", NULL, "getVehicleType");
     lua_classvariable(luaVM, "gear", NULL, "getVehicleCurrentGear");
-    lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "damageProof", NULL, "isVehicleDamageProof");
     lua_classvariable(luaVM, "helicopterRotorSpeed", "setHelicopterRotorSpeed", "getHelicopterRotorSpeed");
     lua_classvariable(luaVM, "heliBladeCollisionsEnabled", "setHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled");

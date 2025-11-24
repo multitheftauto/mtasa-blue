@@ -280,7 +280,6 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
                       OOP_GetVehicleRespawnPosition);
     lua_classvariable(luaVM, "respawnRotation", "setVehicleRespawnRotation", "getVehicleRespawnRotation", SetVehicleRespawnRotation,
                       OOP_GetVehicleRespawnRotation);
-    lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "name", NULL, "getVehicleName");
     lua_classvariable(luaVM, "vehicleType", NULL, "getVehicleType");
     lua_classvariable(luaVM, "sirens", NULL, "getVehicleSirens");
