@@ -22,9 +22,13 @@
 #include <cef3/cef/include/cef_context_menu_handler.h>
 #include <cef3/cef/include/cef_resource_request_handler.h>
 #include <SString.h>
-#include <mmdeviceapi.h>
 #include <audiopolicy.h>
 #include <condition_variable>
+#include <functional>
+#include <memory>
+#include <mmdeviceapi.h>
+#include <mutex>
+#include <cstdint>
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
@@ -52,7 +56,8 @@ public:
     CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false);
     virtual ~CWebView();
     void                  Initialise();
-    void                  SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface) { m_pEventsInterface = pInterface; };
+    void                  SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface);
+    void                  ClearWebBrowserEvents(CWebBrowserEventsInterface* pInterface);
     void                  CloseBrowser();
     CefRefPtr<CefBrowser> GetCefBrowser() { return m_pWebView; };
 
@@ -180,6 +185,60 @@ public:
 
 private:
     void ResumeCefThread();
+    void QueueBrowserEvent(const char* name, std::function<void(CWebBrowserEventsInterface*)>&& fn);
+
+    struct FEventTarget
+    {
+        struct DispatchToken
+        {
+            uint64_t generation = 0;
+        };
+
+        DispatchToken CreateDispatchToken() const
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            return DispatchToken{generation};
+        }
+
+        void Assign(CWebBrowserEventsInterface* ptr)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            if (target == ptr)
+                return;
+
+            target = ptr;
+            ++generation;
+        }
+
+        void Clear(CWebBrowserEventsInterface* expected)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            if (target != expected)
+                return;
+
+            target = nullptr;
+            ++generation;
+        }
+
+        template <typename Fn>
+        void Dispatch(const DispatchToken& token, Fn&& fn)
+        {
+            CWebBrowserEventsInterface* current = nullptr;
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                if (generation != token.generation || !target)
+                    return;
+                current = target;
+            }
+
+            fn(current);
+        }
+
+    private:
+        mutable std::mutex            mutex;
+        CWebBrowserEventsInterface*   target = nullptr;
+        uint64_t                      generation = 0;
+    };
 
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*      m_pWebBrowserRenderItem;
@@ -195,6 +254,7 @@ private:
     std::map<SString, SString> m_Properties;
     bool                       m_bHasInputFocus;
     std::set<std::string>      m_AjaxHandlers;
+    std::shared_ptr<FEventTarget> m_pEventTarget;
 
     struct
     {
