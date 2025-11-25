@@ -529,6 +529,7 @@ void CGame::DoPulse()
     CLOCK_CALL1(m_pAccountManager->DoPulse(););
     CLOCK_CALL1(m_pRegistryManager->DoPulse(););
     CLOCK_CALL1(m_pACLManager->DoPulse(););
+    CLOCK_CALL1(m_pObjectManager->DoPulse(););
 
     // Handle the traffic light sync
     if (m_bTrafficLightsLocked == false)

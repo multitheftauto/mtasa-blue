@@ -68,6 +68,9 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     if (Copy.m_pMoveAnimation != NULL)
     {
         m_pMoveAnimation = new CPositionRotationAnimation(*Copy.m_pMoveAnimation);
+
+        if (m_pMoveAnimation != NULL && m_pMoveAnimation->IsRunning())
+            m_pObjectManager->RegisterMovingObject(this);
     }
 
     m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
@@ -84,6 +87,9 @@ CObject::~CObject()
         delete m_pMoveAnimation;
         m_pMoveAnimation = NULL;
     }
+
+    if (m_pObjectManager)
+        m_pObjectManager->UnregisterMovingObject(this);
 
     // Remove syncer
     SetSyncer(NULL);
@@ -347,6 +353,9 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
         m_pMoveAnimation = new CPositionRotationAnimation(a_rMoveAnimation);
         // Update the values since they might have changed since StopMoving () was called above
         m_pMoveAnimation->SetSourceValue(SPositionRotation(m_vecPosition, m_vecRotation));
+
+        if (m_pObjectManager)
+            m_pObjectManager->RegisterMovingObject(this);
     }
     // If we have a time of 0, move there now
     else
@@ -369,6 +378,9 @@ void CObject::StopMoving()
 
         delete m_pMoveAnimation;
         m_pMoveAnimation = nullptr;
+
+        if (m_pObjectManager)
+            m_pObjectManager->UnregisterMovingObject(this);
 
         UpdateSpatialData();
         NotifyMovementComplete();
