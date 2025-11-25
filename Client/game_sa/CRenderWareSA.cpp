@@ -1114,6 +1114,9 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTe
         return;
     }
 
+    if (outTextureList.empty())
+        outTextureList.reserve(16);
+
     RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
 }
 
