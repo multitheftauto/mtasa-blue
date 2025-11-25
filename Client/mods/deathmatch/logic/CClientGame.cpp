@@ -82,6 +82,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Init the global var with ourself
     g_pClientGame = this;
 
+    CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
+
     // Packet handler
     m_pPacketHandler = new CPacketHandler();
 
@@ -1497,17 +1499,6 @@ void CClientGame::DoPulses()
 
     // Collect async task scheduler results
     m_pAsyncTaskScheduler->CollectResults();
-
-    // Periodically cleanup orphaned texture replacement entries (every ~5 minutes)
-    {
-        static int s_iCleanupFrameCounter = 0;
-        constexpr int CLEANUP_INTERVAL = 18000;            // ~5 minutes at 60 FPS
-        if (++s_iCleanupFrameCounter >= CLEANUP_INTERVAL)
-        {
-            s_iCleanupFrameCounter = 0;
-            g_pGame->GetRenderWare()->ModelInfoTXDCleanupOrphanedEntries();
-        }
-    }
 
     TIMING_CHECKPOINT("-CClientGame::DoPulses");
 }
@@ -6860,6 +6851,10 @@ bool CClientGame::RestreamModel(std::uint16_t model)
 
 void CClientGame::RestreamWorld()
 {
+    // If game is shutting down, do nothing for avoid crashes
+    if (g_bClientShuttingDown)
+        return;
+
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
     for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)

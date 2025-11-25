@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "StackTraceHelpers.h"
 #include <SharedUtil.Misc.h>
 #include <SharedUtil.Detours.h>
 #include <SharedUtil.Memory.h>
@@ -31,19 +32,16 @@
 #include <DbgHelp.h>
 #pragma comment(lib, "dbghelp.lib")
 
-static void DebugPrintExceptionInfo([[maybe_unused]] const char* /*message*/) noexcept
+static void DebugPrintExceptionInfo([[maybe_unused]] const char* /*message*/)
 {
 }
 
-[[nodiscard]] static bool ValidateExceptionContext(_EXCEPTION_POINTERS* pException) noexcept
+[[nodiscard]] static bool ValidateExceptionContext(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr)
         return false;
 
     if (pException->ExceptionRecord == nullptr)
-        return false;
-
-    if (pException->ContextRecord == nullptr)
         return false;
 
     const EXCEPTION_RECORD* pRecord = pException->ExceptionRecord;
@@ -60,7 +58,20 @@ static void DebugPrintExceptionInfo([[maybe_unused]] const char* /*message*/) no
     if (pRecord->ExceptionCode == CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT)
         return true;
 
+    // STATUS_FATAL_USER_CALLBACK_EXCEPTION (0xC000041D) - Windows often provides
+    // null or incomplete context for callback exceptions. Accept them anyway to generate dumps.
+    if (pRecord->ExceptionCode == 0xC000041D)
+    {
+        // Accept callback exceptions even with null context - we'll work with what we have
+        return true;
+    }
+
+    // For other exceptions, require valid context to ensure we can extract meaningful information
+    if (pException->ContextRecord == nullptr)
+        return false;
+
     const CONTEXT* pContext = pException->ContextRecord;
+
     if (pContext->ContextFlags == 0)
         return false;
 
@@ -80,7 +91,7 @@ constexpr std::size_t MAX_STACK_WALK_DEPTH = 16;
 constexpr std::size_t MAX_STACK_FRAMES = 32;
 constexpr std::size_t MAX_SYMBOL_NAME = 256;
 
-[[nodiscard]] static bool CopyModulePathToBuffer(const char* source, char* destination, std::size_t destinationSize, const char* context) noexcept
+[[nodiscard]] static bool CopyModulePathToBuffer(const char* source, char* destination, std::size_t destinationSize, const char* context)
 {
     if (source == nullptr || destination == nullptr || destinationSize == 0U)
         return false;
@@ -119,10 +130,18 @@ constexpr std::size_t MAX_FILE_NAME = 260;
 class SymbolHandlerGuard
 {
 public:
-    explicit SymbolHandlerGuard(HANDLE process) noexcept : m_process(process), m_initialized(false), m_uncaughtExceptions(std::uncaught_exceptions())
+    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols)
+        : m_process(process), m_initialized(false), m_uncaughtExceptions(std::uncaught_exceptions())
     {
+        if (!enableSymbols)
+        {
+            return;
+        }
+
         if (m_process != nullptr)
         {
+            SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS);
+            
             if (SymInitialize(m_process, nullptr, TRUE) != FALSE)
             {
                 m_initialized = true;
@@ -138,7 +157,7 @@ public:
         }
     }
 
-    ~SymbolHandlerGuard() noexcept
+    ~SymbolHandlerGuard()
     {
         if (m_initialized)
         {
@@ -155,7 +174,7 @@ public:
     SymbolHandlerGuard(SymbolHandlerGuard&&) = delete;
     SymbolHandlerGuard& operator=(SymbolHandlerGuard&&) = delete;
 
-    bool IsInitialized() const noexcept { return m_initialized; }
+    bool IsInitialized() const { return m_initialized; }
 
 private:
     HANDLE m_process;
@@ -163,10 +182,19 @@ private:
     int    m_uncaughtExceptions;
 };
 
-[[nodiscard]] static std::optional<std::vector<std::string>> CaptureEnhancedStackTrace(_EXCEPTION_POINTERS* pException) noexcept
+[[nodiscard]] static std::optional<std::vector<std::string>> CaptureEnhancedStackTrace(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return std::nullopt;
+
+    const bool hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
+    if (!hasSymbols)
+    {
+        static std::once_flag logOnce;
+        std::call_once(logOnce, [] {
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_EXCEPTION_INFO, "CaptureEnhancedStackTrace - capturing without symbols (raw addresses only)\n");
+        });
+    }
 
     std::vector<StackFrameInfo> frames;
     frames.reserve(MAX_STACK_FRAMES);
@@ -186,11 +214,13 @@ private:
     frame.AddrFrame.Mode = AddrModeFlat;
     frame.AddrStack.Mode = AddrModeFlat;
 
-    SymbolHandlerGuard symbolGuard(hProcess);
-    if (!symbolGuard.IsInitialized())
-        return std::nullopt;
+    SymbolHandlerGuard symbolGuard(hProcess, hasSymbols);
 
-    SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS);
+    const bool useDbgHelp = symbolGuard.IsInitialized();
+
+    const auto routines = useDbgHelp
+        ? StackTraceHelpers::MakeStackWalkRoutines(true)
+        : StackTraceHelpers::MakeStackWalkRoutines(false);
     alignas(SYMBOL_INFO) std::uint8_t symbolBuffer[sizeof(SYMBOL_INFO) + MAX_SYMBOL_NAME];
     memset(symbolBuffer, 0, sizeof(symbolBuffer));
     PSYMBOL_INFO pSymbol = reinterpret_cast<PSYMBOL_INFO>(symbolBuffer);
@@ -199,8 +229,15 @@ private:
 
     for (std::size_t frameIndex = 0; frameIndex < MAX_STACK_FRAMES; ++frameIndex)
     {
-        BOOL bWalked =
-            StackWalk64(IMAGE_FILE_MACHINE_I386, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
+        BOOL bWalked = StackWalk64(IMAGE_FILE_MACHINE_I386,
+                                  hProcess,
+                                  hThread,
+                                  &frame,
+                                  &context,
+                                  routines.readMemory,
+                                  routines.functionTableAccess,
+                                  routines.moduleBase,
+                                  nullptr);
         if (bWalked == FALSE)
             break;
 
@@ -212,28 +249,31 @@ private:
         frameInfo.isValid = true;
 
         DWORD64 address = frame.AddrPC.Offset;
-        frameInfo.symbolName = std::to_string(address);
+        frameInfo.symbolName = StackTraceHelpers::FormatAddressWithModuleAndAbsolute(address);
 
-        DWORD64 displacement = 0;
-        if (SymFromAddr(hProcess, address, &displacement, pSymbol) != FALSE)
+        if (useDbgHelp)
         {
-            frameInfo.symbolName = pSymbol->Name[0] != '\0' ? pSymbol->Name : "unknown";
-        }
+            DWORD64 displacement = 0;
+            if (SymFromAddr(hProcess, address, &displacement, pSymbol) != FALSE)
+            {
+                frameInfo.symbolName = pSymbol->Name[0] != '\0' ? pSymbol->Name : "unknown";
+            }
 
-        IMAGEHLP_LINE64 lineInfo;
-        memset(&lineInfo, 0, sizeof(lineInfo));
-        lineInfo.SizeOfStruct = sizeof(lineInfo);
-        DWORD lineDisplacement = 0;
+            IMAGEHLP_LINE64 lineInfo;
+            memset(&lineInfo, 0, sizeof(lineInfo));
+            lineInfo.SizeOfStruct = sizeof(lineInfo);
+            DWORD lineDisplacement = 0;
 
-        if (SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
-        {
-            frameInfo.fileName = lineInfo.FileName ? lineInfo.FileName : "unknown";
-            frameInfo.lineNumber = lineInfo.LineNumber;
-        }
-        else
-        {
-            frameInfo.fileName = "unknown";
-            frameInfo.lineNumber = 0;
+            if (SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
+            {
+                frameInfo.fileName = lineInfo.FileName ? lineInfo.FileName : "unknown";
+                frameInfo.lineNumber = lineInfo.LineNumber;
+            }
+            else
+            {
+                frameInfo.fileName.clear();
+                frameInfo.lineNumber = 0;
+            }
         }
 
         frames.push_back(std::move(frameInfo));
@@ -259,7 +299,7 @@ private:
     return result;
 }
 
-CExceptionInformation_Impl::CExceptionInformation_Impl() noexcept
+CExceptionInformation_Impl::CExceptionInformation_Impl()
     : m_uiCode(0),
       m_pAddress(nullptr),
       m_szModulePathName(nullptr),
@@ -292,11 +332,11 @@ CExceptionInformation_Impl::CExceptionInformation_Impl() noexcept
 {
 }
 
-CExceptionInformation_Impl::~CExceptionInformation_Impl() noexcept
+CExceptionInformation_Impl::~CExceptionInformation_Impl()
 {
 }
 
-void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException) noexcept
+void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException)
 {
     if (!ValidateExceptionContext(pException))
     {
@@ -304,10 +344,17 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         return;
     }
 
-    if (pException->ContextRecord == nullptr)
+    // Allow null context for callback exceptions and other special cases (validated above)
+    const bool isCallbackException = (iCode == 0xC000041D);
+    if (pException->ContextRecord == nullptr && !isCallbackException)
     {
-        DebugPrintExceptionInfo("Set - Null context record\n");
+        DebugPrintExceptionInfo("Set - Null context record (exception type requires context)\n");
         return;
+    }
+    
+    if (pException->ContextRecord == nullptr && isCallbackException)
+    {
+        DebugPrintExceptionInfo("Set - Null context for callback exception - proceeding with limited info\n");
     }
 
     if (iCode == 0 || iCode > 0xFFFFFFFF)
@@ -326,6 +373,12 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     if (hasEnhancedInfo && enhancedInfo.exceptionCode == iCode)
     {
         DebugPrintExceptionInfo("Set - Using enhanced exception info from CrashHandler (FRESH)\n");
+        
+        // Additional note for callback exceptions even when we have enhanced info
+        if (iCode == 0xC000041D)
+        {
+            DebugPrintExceptionInfo("Set - Callback exception: enhanced info available but stack/module may be incomplete\n");
+        }
     }
     else if (hasEnhancedInfo && enhancedInfo.exceptionCode != iCode)
     {
@@ -423,22 +476,47 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         m_capturedException = nullptr;
     }
 
-    m_ulEAX = pException->ContextRecord->Eax;
-    m_ulEBX = pException->ContextRecord->Ebx;
-    m_ulECX = pException->ContextRecord->Ecx;
-    m_ulEDX = pException->ContextRecord->Edx;
-    m_ulESI = pException->ContextRecord->Esi;
-    m_ulEDI = pException->ContextRecord->Edi;
-    m_ulEBP = pException->ContextRecord->Ebp;
-    m_ulESP = pException->ContextRecord->Esp;
-    m_ulEIP = pException->ContextRecord->Eip;
-    m_ulCS = pException->ContextRecord->SegCs;
-    m_ulDS = pException->ContextRecord->SegDs;
-    m_ulES = pException->ContextRecord->SegEs;
-    m_ulFS = pException->ContextRecord->SegFs;
-    m_ulGS = pException->ContextRecord->SegGs;
-    m_ulSS = pException->ContextRecord->SegSs;
-    m_ulEFlags = pException->ContextRecord->EFlags;
+    // Only access ContextRecord if it's not null (can be null for certain exception types)
+    if (pException->ContextRecord != nullptr)
+    {
+        m_ulEAX = pException->ContextRecord->Eax;
+        m_ulEBX = pException->ContextRecord->Ebx;
+        m_ulECX = pException->ContextRecord->Ecx;
+        m_ulEDX = pException->ContextRecord->Edx;
+        m_ulESI = pException->ContextRecord->Esi;
+        m_ulEDI = pException->ContextRecord->Edi;
+        m_ulEBP = pException->ContextRecord->Ebp;
+        m_ulESP = pException->ContextRecord->Esp;
+        m_ulEIP = pException->ContextRecord->Eip;
+        m_ulCS = pException->ContextRecord->SegCs;
+        m_ulDS = pException->ContextRecord->SegDs;
+        m_ulES = pException->ContextRecord->SegEs;
+        m_ulFS = pException->ContextRecord->SegFs;
+        m_ulGS = pException->ContextRecord->SegGs;
+        m_ulSS = pException->ContextRecord->SegSs;
+        m_ulEFlags = pException->ContextRecord->EFlags;
+    }
+    else
+    {
+        // No context available - zero out all registers
+        DebugPrintExceptionInfo("Set - Null context, zeroing register values\n");
+        m_ulEAX = 0;
+        m_ulEBX = 0;
+        m_ulECX = 0;
+        m_ulEDX = 0;
+        m_ulESI = 0;
+        m_ulEDI = 0;
+        m_ulEBP = 0;
+        m_ulESP = 0;
+        m_ulEIP = 0;
+        m_ulCS = 0;
+        m_ulDS = 0;
+        m_ulES = 0;
+        m_ulFS = 0;
+        m_ulGS = 0;
+        m_ulSS = 0;
+        m_ulEFlags = 0;
+    }
 
     std::unique_ptr<char[]> modulePathNameBuffer(new (std::nothrow) char[MAX_MODULE_PATH]);
     std::unique_ptr<char[]> tempModulePathBuffer(new (std::nothrow) char[MAX_MODULE_PATH]);
@@ -631,7 +709,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     }
 }
 
-bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress) noexcept
+bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress)
 {
     if (pQueryAddress == nullptr || szOutputBuffer == nullptr || ppModuleBaseAddress == nullptr)
     {
@@ -665,13 +743,29 @@ bool CExceptionInformation_Impl::GetModule(void* pQueryAddress, char* szOutputBu
     }
 
     HMODULE hModule = nullptr;
-    if (pfnGetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, static_cast<LPCSTR>(pQueryAddress),
-                              &hModule) == 0)
+    
+    // Wrap in __try for exception addresses that may be invalid/in guard pages/trampolines
+    // (callbacks, corrupted stacks, etc. can point to invalid memory)
+    __try
     {
-        const DWORD                         dwErrorHandle = GetLastError();
+        if (pfnGetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, static_cast<LPCSTR>(pQueryAddress),
+                                  &hModule) == 0)
+        {
+            const DWORD                         dwErrorHandle = GetLastError();
+            char debugBuffer[DEBUG_BUFFER_SIZE] = {};
+            SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sGetModule - GetModuleHandleExA failed (0x%08X)\n",
+                               static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), dwErrorHandle);
+            
+            // Address may be a system trampoline or invalid memory - don't proceed
+            return false;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
         char debugBuffer[DEBUG_BUFFER_SIZE] = {};
-        SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sGetModule - GetModuleHandleExA failed (0x%08X)\n",
-                           static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), dwErrorHandle);
+        SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sGetModule - Exception accessing address 0x%p (invalid/trampoline address)\n",
+                           static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), pQueryAddress);
+        // Don't proceed with invalid module info
         return false;
     }
 
@@ -711,7 +805,7 @@ struct ExceptionDetails
     bool             isValid;
 };
 
-[[nodiscard]] static ExceptionDetails GetExceptionDetails(_EXCEPTION_POINTERS* pException) noexcept
+[[nodiscard]] static ExceptionDetails GetExceptionDetails(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
     {
@@ -722,7 +816,7 @@ struct ExceptionDetails
     return ExceptionDetails{record.ExceptionCode, record.ExceptionAddress, "Valid exception", true};
 }
 
-std::optional<std::vector<std::string>> CExceptionInformation_Impl::GetStackTrace() const noexcept
+std::optional<std::vector<std::string>> CExceptionInformation_Impl::GetStackTrace() const
 {
     if (!m_hasDetailedStackTrace || m_stackTrace.empty())
         return std::nullopt;
@@ -730,22 +824,22 @@ std::optional<std::vector<std::string>> CExceptionInformation_Impl::GetStackTrac
     return m_stackTrace;
 }
 
-std::optional<std::chrono::system_clock::time_point> CExceptionInformation_Impl::GetTimestamp() const noexcept
+std::optional<std::chrono::system_clock::time_point> CExceptionInformation_Impl::GetTimestamp() const
 {
     return m_timestamp;
 }
 
-DWORD CExceptionInformation_Impl::GetThreadId() const noexcept
+DWORD CExceptionInformation_Impl::GetThreadId() const
 {
     return m_threadId;
 }
 
-DWORD CExceptionInformation_Impl::GetProcessId() const noexcept
+DWORD CExceptionInformation_Impl::GetProcessId() const
 {
     return m_processId;
 }
 
-std::string CExceptionInformation_Impl::GetExceptionDescription() const noexcept
+std::string CExceptionInformation_Impl::GetExceptionDescription() const
 {
     std::string description;
     description.reserve(256);
@@ -771,22 +865,22 @@ std::string CExceptionInformation_Impl::GetExceptionDescription() const noexcept
     return description;
 }
 
-bool CExceptionInformation_Impl::HasDetailedStackTrace() const noexcept
+bool CExceptionInformation_Impl::HasDetailedStackTrace() const
 {
     return m_hasDetailedStackTrace;
 }
 
-std::optional<std::exception_ptr> CExceptionInformation_Impl::GetCapturedException() const noexcept
+std::optional<std::exception_ptr> CExceptionInformation_Impl::GetCapturedException() const
 {
     return m_capturedException ? std::optional{m_capturedException} : std::nullopt;
 }
 
-int CExceptionInformation_Impl::GetUncaughtExceptionCount() const noexcept
+int CExceptionInformation_Impl::GetUncaughtExceptionCount() const
 {
     return m_uncaughtExceptionCount;
 }
 
-void CExceptionInformation_Impl::CaptureCurrentException() noexcept
+void CExceptionInformation_Impl::CaptureCurrentException()
 {
     const int uncaught = std::uncaught_exceptions();
     if (uncaught <= 0)
@@ -808,7 +902,7 @@ void CExceptionInformation_Impl::CaptureCurrentException() noexcept
     m_uncaughtExceptionCount = uncaught;
 }
 
-void CExceptionInformation_Impl::UpdateModuleBaseNameFromCurrentPath() noexcept
+void CExceptionInformation_Impl::UpdateModuleBaseNameFromCurrentPath()
 {
     m_moduleBaseNameStorage.clear();
     m_szModuleBaseName = nullptr;
@@ -830,14 +924,14 @@ void CExceptionInformation_Impl::UpdateModuleBaseNameFromCurrentPath() noexcept
     m_szModuleBaseName = m_moduleBaseNameStorage.c_str();
 }
 
-void CExceptionInformation_Impl::ClearModulePathState() noexcept
+void CExceptionInformation_Impl::ClearModulePathState()
 {
     m_szModulePathName.reset();
     m_moduleBaseNameStorage.clear();
     m_szModuleBaseName = nullptr;
 }
 
-[[nodiscard]] static std::optional<std::string> GetSafeModulePath(std::string_view modulePath) noexcept
+[[nodiscard]] static std::optional<std::string> GetSafeModulePath(std::string_view modulePath)
 {
     try
     {
@@ -858,7 +952,7 @@ void CExceptionInformation_Impl::ClearModulePathState() noexcept
     }
 }
 
-[[nodiscard]] static std::optional<std::vector<uint8_t>> CaptureMemoryDump(void* address, std::size_t size) noexcept
+[[nodiscard]] static std::optional<std::vector<uint8_t>> CaptureMemoryDump(void* address, std::size_t size)
 {
     if (address == nullptr || size == 0)
         return std::nullopt;

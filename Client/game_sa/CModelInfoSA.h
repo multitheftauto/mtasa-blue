@@ -389,7 +389,6 @@ public:
     void           Remove();
     bool           UnloadUnused();
     bool           IsLoaded();
-    bool           IsCollisionLoaded() override;
     bool           DoIsLoaded();
     unsigned short GetFlags();
     unsigned short GetOriginalFlags();
@@ -399,7 +398,10 @@ public:
     void           SetFlags(unsigned short usFlags);
     static void    StaticResetFlags();
     CBoundingBox*  GetBoundingBox();
-    bool           IsValid();
+    [[nodiscard]] bool IsCollisionLoaded() const noexcept;
+    [[nodiscard]] bool IsRwObjectLoaded() const noexcept;
+    void WaitForModelFullyLoaded(std::chrono::milliseconds timeout);
+    bool IsValid();
     bool           IsAllocatedInArchive() const noexcept;
     float          GetDistanceFromCentreOfMassToBaseOfModel();
     unsigned short GetTextureDictionaryID();

@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        core/AjaxResourceHandler.h
+ *  FILE:        cefweb/CAjaxResourceHandler.h
  *  PURPOSE:     CEF Handler for Ajax Requests with delayed results
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
@@ -13,20 +13,19 @@
 #include <core/CAjaxResourceHandlerInterface.h>
 #include <cef3/cef/include/cef_resource_handler.h>
 #include <SString.h>
+#include <string>
 
 class CWebView;
 
 class CAjaxResourceHandler : public CefResourceHandler, public CAjaxResourceHandlerInterface
 {
 public:
-    CAjaxResourceHandler(std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& mimeType);
-    virtual ~CAjaxResourceHandler();
+    CAjaxResourceHandler(std::vector<std::string> vecGet, std::vector<std::string> vecPost, const CefString& mimeType);
+    ~CAjaxResourceHandler();
 
-    virtual std::vector<SString>& GetGetData() override;
-    virtual std::vector<SString>& GetPostData() override;
-    ;
-    virtual void SetResponse(const SString& data) override;
-    ;
+    std::vector<std::string>& GetGetData() override { return m_vecGetData; }
+    std::vector<std::string>& GetPostData() override { return m_vecPostData; }
+    void SetResponse(std::string data) override;
 
     // CefResourceHandler
     virtual void Cancel() override;
@@ -39,10 +38,10 @@ public:
 
 private:
     CefRefPtr<CefCallback> m_callback;
-    std::vector<SString>   m_vecGetData;
-    std::vector<SString>   m_vecPostData;
-    SString                m_strResponse;
-    CefString              m_strMime;
-    bool                   m_bHasData = false;
-    int                    m_DataOffset = 0;
+    std::vector<std::string> m_vecGetData;
+    std::vector<std::string> m_vecPostData;
+    std::string              m_strResponse;
+    CefString                m_strMime;
+    bool                     m_bHasData = false;
+    size_t                   m_DataOffset = 0;
 };

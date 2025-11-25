@@ -363,6 +363,7 @@ void CSettings::ResetGuiPointers()
     m_pLabelVerticalAimSensitivity = NULL;
     m_pVerticalAimSensitivity = NULL;
     m_pLabelVerticalAimSensitivityValue = NULL;
+    m_pCheckboxVerticalAimSensitivity = nullptr;
 
     m_pControlsJoypadLabel = NULL;
     m_pControlsInputTypePane = NULL;
@@ -540,8 +541,8 @@ void CSettings::CreateGUI()
             return;
         CVector2D buttonSize;
         button->GetSize(buttonSize);
-        const float bottomPadding = 12.0f;
-        const float buttonY = std::max(0.0f, tabPanelSize.fY - buttonSize.fY - bottomPadding);
+        const float bottomPadding = 32.0f;
+        const float buttonY = std::max(0.0f, tabPanelSize.fY - buttonSize.fY - bottomPadding - 4.0f);
         button->SetPosition(CVector2D(std::max(0.0f, tabPanelSize.fX - buttonSize.fX - bottomPadding), buttonY));
     };
 
@@ -658,6 +659,10 @@ void CSettings::CreateGUI()
     m_pLabelVerticalAimSensitivityValue->AutoSize("100%");
     FinalizeSliderRow(tabPanelSize.fX, m_pVerticalAimSensitivity, m_pLabelVerticalAimSensitivityValue, 160.0f, kSliderLabelSpacing, m_pLabelVerticalAimSensitivity);
     vecTemp.fY += 30.f;
+
+    m_pCheckboxVerticalAimSensitivity = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabControls, _("Use mouse sensitivity for aiming"), false));
+    m_pCheckboxVerticalAimSensitivity->SetPosition(CVector2D(verticalSliderPos.fX, verticalSliderPos.fY + 20.0f));
+    m_pCheckboxVerticalAimSensitivity->AutoSize(nullptr, 20.0f);
 
     vecTemp.fX = 16;
     // Joypad options
@@ -1527,6 +1532,7 @@ void CSettings::CreateGUI()
     /**
      * Webbrowser tab
      **/
+    const float browserListButtonWidth = 90.0f;
     const float browserMargin = 10.0f;
     const float availableBrowserWidth = std::max(0.0f, tabPanelSize.fX - browserMargin * 2.0f);
     float       browserColumnWidth = (availableBrowserWidth - kBrowserColumnSpacing) * 0.5f;
@@ -1568,7 +1574,7 @@ void CSettings::CreateGUI()
     m_pEditBrowserBlacklistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserBlacklistAdd->GetPosition(vecTemp);
-    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(browserColumnWidth, 22.0f));
+    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(browserColumnWidth - browserListButtonWidth, 22.0f));
 
     m_pLabelBrowserBlacklistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserBlacklistAdd, _("Enter a domain e.g. google.com")));
     m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
@@ -1586,7 +1592,7 @@ void CSettings::CreateGUI()
     m_pGridBrowserBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserBlacklist->GetPosition(vecTemp);
     const CVector2D blacklistGridPos = vecTemp;
-    const float browserBottomPadding = 12.0f;
+    const float browserBottomPadding = 32.0f;
     const float browserButtonSpacing = 5.0f;
     const CVector2D blacklistRemoveSize(140.0f, 22.0f);
     const float blacklistHeightAvailable = tabPanelSize.fY - blacklistGridPos.fY - blacklistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
@@ -1608,7 +1614,7 @@ void CSettings::CreateGUI()
     m_pEditBrowserWhitelistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserWhitelistAdd->GetPosition(vecTemp);
-    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(browserColumnWidth, 22.0f));
+    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(browserColumnWidth - browserListButtonWidth, 22.0f));
 
     m_pLabelBrowserWhitelistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserWhitelistAdd, _("Enter a domain e.g. google.com")));
     m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
@@ -1964,6 +1970,7 @@ void CSettings::CreateGUI()
     m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
     m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
     m_pProcessAffinityCheckbox->SetClickHandler(GUI_CALLBACK(&CSettings::OnAffinityClick, this));
+    m_pCheckboxVerticalAimSensitivity->SetClickHandler(GUI_CALLBACK(&CSettings::OnMouseAimingClick, this));
 
     // Set up the events for advanced description
     m_pPriorityLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
@@ -2844,6 +2851,8 @@ bool CSettings::OnControlsDefaultClick(CGUIElement* pElement)
     m_pClassicControls->SetSelected(CVARS_GET_VALUE<bool>("classic_controls"));
     m_pMouseSensitivity->SetScrollPosition(gameSettings->GetMouseSensitivity());
     m_pVerticalAimSensitivity->SetScrollPosition(pController->GetVerticalAimSensitivity());
+    m_pCheckboxVerticalAimSensitivity->SetSelected(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
+    m_pVerticalAimSensitivity->SetEnabled(!m_pCheckboxVerticalAimSensitivity->GetSelected());
 
     return true;
 }
@@ -3947,6 +3956,10 @@ void CSettings::LoadData()
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     m_pVerticalAimSensitivity->SetScrollPosition(pController->GetVerticalAimSensitivity());
 
+    CVARS_GET("use_mouse_sensitivity_for_aiming", bVar);
+    m_pCheckboxVerticalAimSensitivity->SetSelected(bVar);
+    m_pVerticalAimSensitivity->SetEnabled(!m_pCheckboxVerticalAimSensitivity->GetSelected());
+
     // Audio
     m_pCheckBoxAudioEqualizer->SetSelected(gameSettings->IsRadioEqualizerEnabled());
     m_pCheckBoxAudioAutotune->SetSelected(gameSettings->IsRadioAutotuneEnabled());
@@ -4209,6 +4222,8 @@ void CSettings::ReloadBrowserLists()
     if (m_bBrowserListsLoadEnabled)
     {
         auto                                  pWebCore = g_pCore->GetWebCore();
+        if (!pWebCore)
+            return;
         std::vector<std::pair<SString, bool>> customBlacklist;
         pWebCore->GetFilterEntriesByType(customBlacklist, eWebFilterType::WEBFILTER_USER);
         for (std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter)
@@ -4271,6 +4286,8 @@ void CSettings::SaveData()
     pController->SetClassicControls(m_pClassicControls->GetSelected());
     pController->SetVerticalAimSensitivity(m_pVerticalAimSensitivity->GetScrollPosition());
     CVARS_SET("vertical_aim_sensitivity", pController->GetVerticalAimSensitivityRawValue());
+    CVARS_SET("use_mouse_sensitivity_for_aiming", m_pCheckboxVerticalAimSensitivity->GetSelected());
+    pController->SetVerticalAimSensitivitySameAsHorizontal(m_pCheckboxVerticalAimSensitivity->GetSelected());
 
     // Video
     // get current
@@ -4670,22 +4687,25 @@ void CSettings::SaveData()
     if (m_bBrowserListsLoadEnabled)
     {
         auto                 pWebCore = g_pCore->GetWebCore();
-        std::vector<SString> customBlacklist;
-        for (int i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
+        if (pWebCore)
         {
-            customBlacklist.push_back(m_pGridBrowserBlacklist->GetItemText(i, 1));
-        }
-        pWebCore->WriteCustomList("customblacklist", customBlacklist);
+            std::vector<SString> customBlacklist;
+            for (int i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
+            {
+                customBlacklist.push_back(m_pGridBrowserBlacklist->GetItemText(i, 1));
+            }
+            pWebCore->WriteCustomList("customblacklist", customBlacklist);
 
-        std::vector<SString> customWhitelist;
-        for (int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
-        {
-            customWhitelist.push_back(m_pGridBrowserWhitelist->GetItemText(i, 1));
-        }
-        pWebCore->WriteCustomList("customwhitelist", customWhitelist);
+            std::vector<SString> customWhitelist;
+            for (int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
+            {
+                customWhitelist.push_back(m_pGridBrowserWhitelist->GetItemText(i, 1));
+            }
+            pWebCore->WriteCustomList("customwhitelist", customWhitelist);
 
-        if (m_bBrowserListsChanged)
-            bBrowserSettingChanged = true;
+            if (m_bBrowserListsChanged)
+                bBrowserSettingChanged = true;
+        }
     }
 
     bool bBrowserGPUEnabled = false;
@@ -5812,6 +5832,12 @@ bool CSettings::OnAffinityClick(CGUIElement* pElement)
     pQuestionBox->SetCallback(CPUAffinityQuestionCallBack, m_pProcessAffinityCheckbox);
     pQuestionBox->Show();
 
+    return true;
+}
+
+bool CSettings::OnMouseAimingClick(CGUIElement* pElement)
+{
+    m_pVerticalAimSensitivity->SetEnabled(!m_pCheckboxVerticalAimSensitivity->GetSelected());
     return true;
 }
 

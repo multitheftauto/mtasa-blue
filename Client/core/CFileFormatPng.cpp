@@ -46,23 +46,31 @@ void ParseRGBA(CBuffer& outImage, const png_structp& png_ptr, const png_infop& i
     const png_uint_32 bytesPerRow = png_get_rowbytes(png_ptr, info_ptr);
     byte*             rowData = new byte[bytesPerRow];
 
-    // read single row at a time
-    for (uint rowIdx = 0; rowIdx < height; ++rowIdx)
+    try
     {
-        png_read_row(png_ptr, (png_bytep)rowData, NULL);
-
-        const uint rowOffset = rowIdx * width;
-
-        uint byteIndex = 0;
-        for (uint colIdx = 0; colIdx < width; ++colIdx)
+        // read single row at a time
+        for (uint rowIdx = 0; rowIdx < height; ++rowIdx)
         {
-            pData->R = rowData[byteIndex++];
-            pData->G = rowData[byteIndex++];
-            pData->B = rowData[byteIndex++];
-            pData->A = rowData[byteIndex++];
-            pData++;
+            png_read_row(png_ptr, (png_bytep)rowData, NULL);
+
+            const uint rowOffset = rowIdx * width;
+
+            uint byteIndex = 0;
+            for (uint colIdx = 0; colIdx < width; ++colIdx)
+            {
+                pData->R = rowData[byteIndex++];
+                pData->G = rowData[byteIndex++];
+                pData->B = rowData[byteIndex++];
+                pData->A = rowData[byteIndex++];
+                pData++;
+            }
+            assert(byteIndex == bytesPerRow);
         }
-        assert(byteIndex == bytesPerRow);
+    }
+    catch (...)
+    {
+        delete[] rowData;
+        throw;
     }
 
     delete[] rowData;
@@ -81,23 +89,31 @@ void ParseRGB(CBuffer& outImage, const png_structp& png_ptr, const png_infop& in
     const png_uint_32 bytesPerRow = png_get_rowbytes(png_ptr, info_ptr);
     byte*             rowData = new byte[bytesPerRow];
 
-    // read single row at a time
-    for (uint rowIdx = 0; rowIdx < height; ++rowIdx)
+    try
     {
-        png_read_row(png_ptr, (png_bytep)rowData, NULL);
-
-        const uint rowOffset = rowIdx * width;
-
-        uint byteIndex = 0;
-        for (uint colIdx = 0; colIdx < width; ++colIdx)
+        // read single row at a time
+        for (uint rowIdx = 0; rowIdx < height; ++rowIdx)
         {
-            pData->R = rowData[byteIndex++];
-            pData->G = rowData[byteIndex++];
-            pData->B = rowData[byteIndex++];
-            pData->A = 255;
-            pData++;
+            png_read_row(png_ptr, (png_bytep)rowData, NULL);
+
+            const uint rowOffset = rowIdx * width;
+
+            uint byteIndex = 0;
+            for (uint colIdx = 0; colIdx < width; ++colIdx)
+            {
+                pData->R = rowData[byteIndex++];
+                pData->G = rowData[byteIndex++];
+                pData->B = rowData[byteIndex++];
+                pData->A = 255;
+                pData++;
+            }
+            assert(byteIndex == bytesPerRow);
         }
-        assert(byteIndex == bytesPerRow);
+    }
+    catch (...)
+    {
+        delete[] rowData;
+        throw;
     }
 
     delete[] rowData;
@@ -192,21 +208,29 @@ bool PngDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& ui
 
     if (pOutBuffer)
     {
-        pOutBuffer->SetSize(width * height * 4);
-
-        switch (colorType)
+        try
         {
-            case PNG_COLOR_TYPE_RGB:
-                ParseRGB(*pOutBuffer, png_ptr, info_ptr, width, height);
-                break;
+            pOutBuffer->SetSize(width * height * 4);
 
-            case PNG_COLOR_TYPE_RGB_ALPHA:
-                ParseRGBA(*pOutBuffer, png_ptr, info_ptr, width, height);
-                break;
+            switch (colorType)
+            {
+                case PNG_COLOR_TYPE_RGB:
+                    ParseRGB(*pOutBuffer, png_ptr, info_ptr, width, height);
+                    break;
 
-            default:
-                png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-                return false;
+                case PNG_COLOR_TYPE_RGB_ALPHA:
+                    ParseRGBA(*pOutBuffer, png_ptr, info_ptr, width, height);
+                    break;
+
+                default:
+                    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+                    return false;
+            }
+        }
+        catch (...)
+        {
+            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+            throw;
         }
     }
 
@@ -244,38 +268,67 @@ void my_png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 ///////////////////////////////////////////////////////////////
 bool PngEncode(uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize, CBuffer& outBuffer)
 {
-    // Create the screen data buffer
     BYTE** ppScreenData = NULL;
-    ppScreenData = new BYTE*[uiHeight];
-    for (unsigned short y = 0; y < uiHeight; y++)
+    png_struct* png_ptr = NULL;
+    png_info* info_ptr = NULL;
+
+    try
     {
-        ppScreenData[y] = new BYTE[uiWidth * 4];
+        // Create the screen data buffer
+        ppScreenData = new BYTE*[uiHeight];
+        memset(ppScreenData, 0, sizeof(BYTE*) * uiHeight);
+        for (uint y = 0; y < uiHeight; y++)
+        {
+            ppScreenData[y] = new BYTE[uiWidth * 4];
+        }
+
+        // Copy the surface data into a row-based buffer for libpng
+        unsigned long ulLineWidth = uiWidth * 4;
+        for (unsigned int i = 0; i < uiHeight; i++)
+        {
+            memcpy(ppScreenData[i], (BYTE*)pData + i * ulLineWidth, ulLineWidth);
+        }
+
+        CBufferWriteStream stream(outBuffer);
+
+        png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+        if (!png_ptr)
+            throw std::bad_alloc();
+
+        info_ptr = png_create_info_struct(png_ptr);
+        if (!info_ptr)
+            throw std::bad_alloc();
+
+        png_set_write_fn(png_ptr, &stream, my_png_write_data, NULL);
+        png_set_filter(png_ptr, 0, PNG_FILTER_NONE);
+        png_set_compression_level(png_ptr, 1);
+        png_set_IHDR(png_ptr, info_ptr, uiWidth, uiHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+        png_set_rows(png_ptr, info_ptr, ppScreenData);
+        png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_BGR /*| PNG_TRANSFORM_STRIP_ALPHA*/, NULL);
+        png_write_end(png_ptr, info_ptr);
+    }
+    catch (...)
+    {
+        if (png_ptr)
+            png_destroy_write_struct(&png_ptr, info_ptr ? &info_ptr : NULL);
+
+        if (ppScreenData)
+        {
+            for (uint y = 0; y < uiHeight; y++)
+            {
+                if (ppScreenData[y]) delete[] ppScreenData[y];
+            }
+            delete[] ppScreenData;
+        }
+        throw;
     }
 
-    // Copy the surface data into a row-based buffer for libpng
-    unsigned long ulLineWidth = uiWidth * 4;
-    for (unsigned int i = 0; i < uiHeight; i++)
-    {
-        memcpy(ppScreenData[i], (BYTE*)pData + i * ulLineWidth, ulLineWidth);
-    }
-
-    CBufferWriteStream stream(outBuffer);
-
-    png_struct* png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    png_info*   info_ptr = png_create_info_struct(png_ptr);
-    png_set_write_fn(png_ptr, &stream, my_png_write_data, NULL);
-    png_set_filter(png_ptr, 0, PNG_FILTER_NONE);
-    png_set_compression_level(png_ptr, 1);
-    png_set_IHDR(png_ptr, info_ptr, uiWidth, uiHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-    png_set_rows(png_ptr, info_ptr, ppScreenData);
-    png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_BGR /*| PNG_TRANSFORM_STRIP_ALPHA*/, NULL);
-    png_write_end(png_ptr, info_ptr);
     png_destroy_write_struct(&png_ptr, &info_ptr);
 
     // Clean up the screen data buffer
     if (ppScreenData)
     {
-        for (unsigned short y = 0; y < uiHeight; y++)
+        for (uint y = 0; y < uiHeight; y++)
         {
             delete[] ppScreenData[y];
         }

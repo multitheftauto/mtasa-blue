@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <chrono>
 #include <core/CCoreInterface.h>
 #include "CColModelSA.h"
 #include "CColStoreSA.h"
@@ -488,15 +489,6 @@ bool CModelInfoSA::DoIsLoaded()
     return bLoaded;
 }
 
-bool CModelInfoSA::IsCollisionLoaded()
-{
-    m_pInterface = ppModelInfo[m_dwModelID];
-    if (!m_pInterface || !m_pInterface->pColModel)
-        return false;
-
-    return m_pInterface->pColModel->m_data != nullptr;
-}
-
 unsigned short CModelInfoSA::GetFlags()
 {
     return ppModelInfo[m_dwModelID]->usFlags;
@@ -750,6 +742,25 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
         mov     dwReturn, eax
     }
     return dwReturn;
+}
+
+bool CModelInfoSA::IsCollisionLoaded() const noexcept
+{
+    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    return pInterface && pInterface->pColModel != nullptr;
+}
+
+bool CModelInfoSA::IsRwObjectLoaded() const noexcept
+{
+    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    return pInterface && pInterface->pRwObject != nullptr;
+}
+
+void CModelInfoSA::WaitForModelFullyLoaded(std::chrono::milliseconds timeout)
+{
+    // Implementation placeholder - would need streaming system integration
+    // For now, just ensure the model is requested
+    pGame->GetStreaming()->RequestModel(m_dwModelID, BLOCKING);
 }
 
 bool CModelInfoSA::IsValid()
@@ -1289,15 +1300,11 @@ unsigned int CModelInfoSA::GetNumRemaps()
 
 void* CModelInfoSA::GetVehicleSuspensionData()
 {
-    if (!GetInterface()->pColModel || !GetInterface()->pColModel->m_data)
-        return nullptr;
     return GetInterface()->pColModel->m_data->m_suspensionLines;
 }
 
 void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
 {
-    if (!GetInterface()->pColModel || !GetInterface()->pColModel->m_data)
-        return nullptr;
     CColDataSA* pColData = GetInterface()->pColModel->m_data;
     void*       pOrigSuspensionLines = pColData->m_suspensionLines;
     pColData->m_suspensionLines = reinterpret_cast<CColLineSA*>(pSuspensionLines);
@@ -1533,6 +1540,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::VEHICLE:
+            // ReplaceVehicleModele handles collision preservation internally
             success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::ATOMIC:
@@ -1555,9 +1563,8 @@ void CModelInfoSA::RestoreOriginalModel()
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
-
     // Reset the stored custom vehicle clump
-    m_pCustomClump = NULL;
+    m_pCustomClump = nullptr;
 }
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)
@@ -1630,7 +1637,7 @@ void CModelInfoSA::RestoreColModel()
 
         // Force the game to load the original collision model data, if we applied a custom collision model before
         // there was any object/building, which would've provoked CColStore to request it.
-        if (m_pInterface->pColModel && !m_pInterface->pColModel->m_data && m_dwReferences > 1)
+        if (!m_pInterface->pColModel->m_data && m_dwReferences > 1)
         {
             pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
         }

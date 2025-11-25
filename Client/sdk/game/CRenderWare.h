@@ -11,15 +11,9 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
 #include <vector>
-
-#include "RenderWare.h"
+#include <string>
+#include <tuple>
 
 class CClientEntityBase;
 class CD3DDUMMY;
@@ -28,6 +22,7 @@ class CPixels;
 class CShaderItem;
 class SString;
 class CColModel;
+class CVector;
 struct RpAtomicContainer;
 struct RwFrame;
 struct RwMatrix;
@@ -37,62 +32,22 @@ struct RpClump;
 
 typedef CShaderItem CSHADERDUMMY;
 
-extern int (__cdecl* RwTextureDestroy)(RwTexture* texture);
-inline int (__cdecl*& gRwTextureDestroy)(RwTexture* texture) = RwTextureDestroy;
-
 // A list of custom textures to add to a model's txd
 struct SReplacementTextures
 {
-    struct RwTextureDeleter
-    {
-        void operator()(RwTexture* texture) const noexcept
-        {
-            if (!texture)
-                return;
-
-            // Fast validation: Check if pointer looks reasonable (not in low invalid range)
-            // This catches most corruption cases without expensive VirtualQuery
-            const uintptr_t addr = reinterpret_cast<uintptr_t>(texture);
-            constexpr uintptr_t kMinUserAddress = 0x10000;        // Below this is always invalid (null page protection)
-            
-            // Note: Upper bound check not needed on x86 with LARGEADDRESSAWARE, as MTA has (full 4GB accessible)
-            // On x86, uintptr_t cannot exceed 0xFFFFFFFF, so all pointers >= 0x10000 are potentially valid
-            if (addr < kMinUserAddress)
-                return;
-
-            // Only destroy if texture is orphaned (not owned by any TXD)
-            // If txd != nullptr, the TXD owns it and will destroy it
-            // Note: We access texture->txd without IsReadablePointer for performance.
-            // If the pointer is invalid, we'll crash here, but that's acceptable vs
-            // the cost of VirtualQuery on every texture destruction (1-2ms per 1000 textures).
-            // The address range check above catches most corruption cases.
-            if (texture->txd == nullptr && RwTextureDestroy)
-            {
-                RwTextureDestroy(texture);
-            }
-        }
-    };
-
-    using TextureOwner = std::unique_ptr<RwTexture, RwTextureDeleter>;
-
     struct SPerTxd
     {
         std::vector<RwTexture*> usingTextures;
         std::vector<RwTexture*> replacedOriginals;
-        std::vector<ushort>     modelIdsUsingTxd;
-        std::vector<TextureOwner> ownedClones;
-        ushort                  usTxdId = 0;
-        bool                    bTexturesAreCopies = false;
+        unsigned short          usTxdId;
+        bool                    bTexturesAreCopies;
     };
 
-    std::vector<RwTexture*>   textures;            // Raw pointers to textures (for compatibility)
-    std::vector<SPerTxd>      perTxdList;          // TXD's which have been modified
-    std::vector<ushort>       usedInTxdIds;
-    std::vector<ushort>     usedInModelIds;
-    std::unordered_set<ushort> usedInTxdIdLookup;
-    std::unordered_set<ushort> usedInModelIdLookup;
-    std::unordered_map<ushort, std::size_t> perTxdIndexLookup;
-    std::vector<TextureOwner> ownedTextures;       // Owned textures with automatic lifetime management (MUST BE LAST for binary compatibility)
+    std::vector<RwTexture*> textures;              // List of textures we want to inject into TXD's
+    std::vector<SPerTxd>    perTxdList;            // TXD's which have been modified
+    std::vector<unsigned short> usedInTxdIds;
+    std::vector<unsigned short> usedInModelIds;
+    bool                    bHasRequestedSpace = false;
 };
 
 // Shader layers to render
@@ -124,10 +79,9 @@ class CRenderWare
 public:
     virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer,
                                                       bool bFilteringEnabled) = 0;
-    virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId) = 0;
+    virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
-    virtual void             ModelInfoTXDCleanupOrphanedEntries() = 0;
-    virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId) = 0;
+    virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId) = 0;
     virtual void             ClothesRemoveReplacement(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
     virtual bool             ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) = 0;
@@ -151,21 +105,21 @@ public:
     virtual bool             ReplacePedModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
     virtual void             PulseWorldTextureWatch() = 0;
-    virtual void             GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID) = 0;
-    virtual bool GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelID, std::vector<SString> vTextureNames) = 0;
+    virtual void             GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID) = 0;
+    virtual bool GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames) = 0;
     virtual const char* GetTextureName(CD3DDUMMY* pD3DData) = 0;
-    virtual ushort      GetTXDIDForModelID(ushort usModelID) = 0;
+    virtual unsigned short      GetTXDIDForModelID(unsigned short usModelID) = 0;
 
-    virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask) = 0;
+    virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, unsigned short usModelId, int iTypeMask) = 0;
     virtual SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData) = 0;
     virtual void     AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority,
-                                         bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers) = 0;
+                                         bool bShaderLayered, int iTypeMask, unsigned int uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers) = 0;
     virtual void     AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch) = 0;
     virtual void     RemoveClientEntityRefs(CClientEntityBase* pClientEntity) = 0;
     virtual void     RemoveShaderRefs(CSHADERDUMMY* pShaderItem) = 0;
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
-    virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
-    virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
+    virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, unsigned int uiSizeLimit) = 0;
+    virtual void     TxdForceUnload(unsigned short usTxdId, bool bDestroyTextures) = 0;
 
     virtual void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix) = 0;
     virtual void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut) = 0;

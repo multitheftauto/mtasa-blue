@@ -680,6 +680,7 @@ void CCore::ApplyGameSettings()
     CVARS_GET("dynamic_ped_shadows", bVal);
     pGameSettings->SetDynamicPedShadowsEnabled(bVal);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
+    pController->SetVerticalAimSensitivitySameAsHorizontal(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
     pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
@@ -1195,8 +1196,48 @@ CWebCoreInterface* CCore::GetWebCore()
         cvars->Get("browser_enable_gpu", gpuEnabled);
 
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise(gpuEnabled);
+        if (!m_pWebCore)
+        {
+            WriteDebugEvent("CCore::GetWebCore - CreateModule failed");
+            return nullptr;
+        }
+
+        // Log current working directory
+        wchar_t cwdBeforeWebInit[32768]{};
+        DWORD cwdBeforeWebInitLen = GetCurrentDirectoryW(32768, cwdBeforeWebInit);
+        if (cwdBeforeWebInitLen > 0)
+        {
+            WriteDebugEvent(SString("CCore::GetWebCore - CWD before Initialise: %S", cwdBeforeWebInit));
+        }
+        
+        // Keep m_pWebCore alive even if Initialise() fails
+        // CefInitialize() can only be called once per process
+        // Deleting and recreating m_pWebCore causes repeated initialization attempts
+        // Track initialization state via IsInitialised() instead
+        bool bInitSuccess = false;
+        try
+        {
+            bInitSuccess = m_pWebCore->Initialise(gpuEnabled);
+        }
+        catch (...)
+        {
+            WriteDebugEvent("CCore::GetWebCore - Initialise threw exception");
+            bInitSuccess = false;
+        }
+        
+        if (!bInitSuccess)
+        {
+            WriteDebugEvent("CCore::GetWebCore - Initialise failed");
+            return nullptr;
+        }
     }
+    else
+    {
+        // On subsequent calls, check if initialization succeeded
+        if (!m_pWebCore->IsInitialised())
+            return nullptr;
+    }
+    
     return m_pWebCore;
 }
 
@@ -1509,13 +1550,14 @@ void CCore::Quit(bool bInstantly)
         // Destroy the client
         CModManager::GetSingleton().Unload();
 
-        // Destroy ourself
-        delete CCore::GetSingletonPtr();
-
         WatchDogCompletedSection("Q0");
 
-        // Use TerminateProcess for now as exiting the normal way crashes
+        // Use TerminateProcess before destroying CCore to ensure clean exit code (Exiting the normal way also crashes).
         TerminateProcess(GetCurrentProcess(), 0);
+
+        // Destroy ourself (unreachable but kept for completeness)
+        delete CCore::GetSingletonPtr();
+
     }
     else
     {
@@ -1876,7 +1918,7 @@ void CCore::OnGameTimerUpdate()
 
 void CCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    if (m_pNet != nullptr)            // We have to wait for the network module to be loaded
+    if (m_pNet != nullptr && IsWebCoreLoaded())            // We have to wait for the network module to be loaded
         GetWebCore()->OnFPSLimitChange(fps);
 }
 
