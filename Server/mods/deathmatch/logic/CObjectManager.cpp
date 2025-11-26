@@ -173,12 +173,22 @@ void CObjectManager::RemoveFromList(CObject* pObject)
 void CObjectManager::RegisterMovingObject(CObject* pObject)
 {
     if (!ListContains(m_MovingList, pObject))
+    {
         m_MovingList.push_back(pObject);
+
+        // Call the event
+        CLuaArguments Arguments;
+        pObject->CallEvent("onObjectMoveStart", Arguments);
+    }
 }
 
 void CObjectManager::UnregisterMovingObject(CObject* pObject)
 {
     m_MovingList.remove(pObject);
+
+    // Call the event
+    CLuaArguments Arguments;
+    pObject->CallEvent("onObjectMoveStop", Arguments);
 }
 
 void CObjectManager::DoPulse()
