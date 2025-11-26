@@ -179,8 +179,6 @@ void CObjectManager::RegisterMovingObject(CObject* pObject)
         // Call the event
         CLuaArguments Arguments;
         pObject->CallEvent("onObjectMoveStart", Arguments);
-
-        CLogger::LogPrintf("Object %d started moving.\n", pObject->GetID());
     }
 }
 
