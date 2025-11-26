@@ -24,7 +24,7 @@
 #endif
 
 #ifdef __cpp_lib_string_view
-#include <string_view>
+    #include <string_view>
 #endif
 
 struct ISyncStructure;
@@ -372,18 +372,18 @@ public:
         return ReadStringCharacters(result, uiLength);
     }
 
-    #ifdef MTA_CLIENT
-        #define MAX_ELEMENTS    MAX_CLIENT_ELEMENTS
-    #else
-        #define MAX_ELEMENTS    MAX_SERVER_ELEMENTS
-    #endif
+#ifdef MTA_CLIENT
+    #define MAX_ELEMENTS MAX_CLIENT_ELEMENTS
+#else
+    #define MAX_ELEMENTS MAX_SERVER_ELEMENTS
+#endif
 
     // Write an element ID
     void Write(const ElementID& ID)
     {
         static const unsigned int bitcount = NumberOfSignificantBits<(MAX_ELEMENTS - 1)>::COUNT;
         const unsigned int&       IDref = ID.Value();
-        #ifdef MTA_CLIENT
+#ifdef MTA_CLIENT
         if (IDref != INVALID_ELEMENT_ID && IDref >= MAX_SERVER_ELEMENTS)
         {
             dassert("Sending client side element id to server" && 0);
@@ -391,7 +391,7 @@ public:
             WriteBits(reinterpret_cast<const unsigned char*>(&uiInvalidId), bitcount);
             return;
         }
-        #endif
+#endif
         WriteBits(reinterpret_cast<const unsigned char*>(&IDref), bitcount);
     }
 
