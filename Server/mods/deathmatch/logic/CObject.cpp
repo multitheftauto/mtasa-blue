@@ -71,6 +71,11 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
 
         if (m_pMoveAnimation != NULL && m_pMoveAnimation->IsRunning())
             m_pObjectManager->RegisterMovingObject(this);
+
+        // Call the event
+        CLuaArguments Arguments;
+        Arguments.PushElement(this);
+        CallEvent("onObjectMoveStart", Arguments);
     }
 
     m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
@@ -365,6 +370,11 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
         SetPosition(positionRotation.m_vecPosition);
         SetRotation(positionRotation.m_vecRotation);
     }
+
+    // Call the event
+    CLuaArguments Arguments;
+    Arguments.PushElement(this);
+    CallEvent("onObjectMoveStart", Arguments);
 }
 
 void CObject::StopMoving()
@@ -384,6 +394,11 @@ void CObject::StopMoving()
 
         UpdateSpatialData();
         NotifyMovementComplete();
+
+        // Call the event
+        CLuaArguments Arguments;
+        Arguments.PushElement(this);
+        CallEvent("onObjectMoveStop", Arguments);
     }
 }
 
