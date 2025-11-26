@@ -69,7 +69,7 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     {
         m_pMoveAnimation = new CPositionRotationAnimation(*Copy.m_pMoveAnimation);
 
-        if (m_pMoveAnimation != NULL && m_pMoveAnimation->IsRunning())
+        if (m_pMoveAnimation != NULL)
             m_pObjectManager->RegisterMovingObject(this);
     }
 
