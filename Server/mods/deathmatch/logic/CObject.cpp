@@ -69,7 +69,8 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     {
         m_pMoveAnimation = new CPositionRotationAnimation(*Copy.m_pMoveAnimation);
 
-        if (m_pMoveAnimation != NULL)
+        // Register as moving object
+        if (m_pObjectManager)
             m_pObjectManager->RegisterMovingObject(this);
     }
 
@@ -88,6 +89,7 @@ CObject::~CObject()
         m_pMoveAnimation = NULL;
     }
 
+    // Unregister as moving object
     if (m_pObjectManager)
         m_pObjectManager->UnregisterMovingObject(this);
 
@@ -353,9 +355,6 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
         m_pMoveAnimation = new CPositionRotationAnimation(a_rMoveAnimation);
         // Update the values since they might have changed since StopMoving () was called above
         m_pMoveAnimation->SetSourceValue(SPositionRotation(m_vecPosition, m_vecRotation));
-
-        if (m_pObjectManager)
-            m_pObjectManager->RegisterMovingObject(this);
     }
     // If we have a time of 0, move there now
     else
@@ -365,6 +364,10 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
         SetPosition(positionRotation.m_vecPosition);
         SetRotation(positionRotation.m_vecRotation);
     }
+
+    // Register object as moving
+    if (m_pObjectManager)
+        m_pObjectManager->RegisterMovingObject(this);
 }
 
 void CObject::StopMoving()
@@ -379,6 +382,7 @@ void CObject::StopMoving()
         delete m_pMoveAnimation;
         m_pMoveAnimation = nullptr;
 
+        // Unregister object as moving
         if (m_pObjectManager)
             m_pObjectManager->UnregisterMovingObject(this);
 
