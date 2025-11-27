@@ -863,7 +863,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowSteamClient->AutoSize(NULL, 20.0f);
 
     // Enable camera photos getting saved to documents folder
-    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
+    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to MTA San Andreas User Files folder"), true));
     m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pPhotoSavingCheckbox->GetPosition(vecTemp, false);
     m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
