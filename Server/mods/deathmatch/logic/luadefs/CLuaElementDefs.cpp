@@ -2464,7 +2464,7 @@ bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire) noexcept
     return CStaticFunctionDefinitions::SetElementOnFire(element, onFire);
 }
 
-bool CLuaElementDefs::IsElementOnGround(CElement* element) noexcept
+bool CLuaElementDefs::IsElementOnGround(CElement* element)
 {
     switch (element->GetType())
     {

@@ -108,5 +108,5 @@ public:
     LUA_DECLARE(setLowLODElement);
     LUA_DECLARE(setElementCallPropagationEnabled);
     static bool SetElementOnFire(CElement* element, bool onFire) noexcept;
-    static bool IsElementOnGround(CElement* element) noexcept;
+    static bool IsElementOnGround(CElement* element);
 };

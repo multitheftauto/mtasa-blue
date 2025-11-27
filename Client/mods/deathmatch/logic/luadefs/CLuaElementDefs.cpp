@@ -2664,7 +2664,7 @@ bool CLuaElementDefs::IsElementOnFire(CClientEntity* entity) noexcept
     return entity->IsOnFire();
 }
 
-bool CLuaElementDefs::IsElementOnGround(CClientEntity* entity) noexcept
+bool CLuaElementDefs::IsElementOnGround(CClientEntity* entity)
 {
     switch (entity->GetType())
     {
