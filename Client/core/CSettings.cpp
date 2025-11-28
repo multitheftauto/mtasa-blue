@@ -1594,20 +1594,20 @@ void CSettings::CreateGUI()
     const CVector2D blacklistGridPos = vecTemp;
     const float browserBottomPadding = 32.0f;
     const float browserButtonSpacing = 5.0f;
-    const CVector2D blacklistRemoveSize(140.0f, 22.0f);
+    const CVector2D blacklistRemoveSize(155.0f, 22.0f);
+    const CVector2D blacklistRemoveAllSize(155.0f, 22.0f);
+    const float blacklistRemoveAllSpacing = 165.0f;
     const float blacklistHeightAvailable = tabPanelSize.fY - blacklistGridPos.fY - blacklistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
     m_pGridBrowserBlacklist->SetSize(CVector2D(browserColumnWidth, std::max(80.0f, blacklistHeightAvailable)));
     m_pGridBrowserBlacklist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserBlacklistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
-    m_pButtonBrowserBlacklistRemove->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + m_pGridBrowserBlacklist->GetSize().fY + 5.0f));
-    m_pButtonBrowserBlacklistRemove->SetSize(CVector2D(145.0f, 22.0f));
-
-    m_pButtonBrowserBlacklistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
-    m_pButtonBrowserBlacklistRemoveAll->SetPosition(CVector2D(vecTemp.fX + 155.0f, vecTemp.fY + m_pGridBrowserBlacklist->GetSize().fY + 5.0f));
-    m_pButtonBrowserBlacklistRemoveAll->SetSize(CVector2D(145.0f, 22.0f));
     m_pButtonBrowserBlacklistRemove->SetSize(blacklistRemoveSize);
     m_pButtonBrowserBlacklistRemove->SetPosition(CVector2D(blacklistGridPos.fX, blacklistGridPos.fY + m_pGridBrowserBlacklist->GetSize().fY + browserButtonSpacing));
+
+    m_pButtonBrowserBlacklistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
+    m_pButtonBrowserBlacklistRemoveAll->SetSize(blacklistRemoveAllSize);
+    m_pButtonBrowserBlacklistRemoveAll->SetPosition(CVector2D(vecTemp.fX + blacklistRemoveAllSpacing, vecTemp.fY + m_pGridBrowserBlacklist->GetSize().fY + browserButtonSpacing));
 
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);            // Reset vecTemp
 
@@ -1638,20 +1638,20 @@ void CSettings::CreateGUI()
     m_pGridBrowserWhitelist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserWhitelist->GetPosition(vecTemp);
     const CVector2D whitelistGridPos = vecTemp;
-    const CVector2D whitelistRemoveSize(140.0f, 22.0f);
+    const CVector2D whitelistRemoveSize(155.0f, 22.0f);
+    const CVector2D whitelistRemoveAllSize(155.0f, 22.0f);
+    const float whitelistRemoveAllSpacing = 165.0f;
     const float whitelistHeightAvailable = tabPanelSize.fY - whitelistGridPos.fY - whitelistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
     m_pGridBrowserWhitelist->SetSize(CVector2D(browserColumnWidth, std::max(80.0f, whitelistHeightAvailable)));
     m_pGridBrowserWhitelist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserWhitelistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
-    m_pButtonBrowserWhitelistRemove->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + m_pGridBrowserWhitelist->GetSize().fY + 5.0f));
-    m_pButtonBrowserWhitelistRemove->SetSize(CVector2D(145.0f, 22.0f));
-
-    m_pButtonBrowserWhitelistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
-    m_pButtonBrowserWhitelistRemoveAll->SetPosition(CVector2D(vecTemp.fX + 155.0f, vecTemp.fY + m_pGridBrowserWhitelist->GetSize().fY + 5.0f));
-    m_pButtonBrowserWhitelistRemoveAll->SetSize(CVector2D(145.0f, 22.0f));
     m_pButtonBrowserWhitelistRemove->SetSize(whitelistRemoveSize);
     m_pButtonBrowserWhitelistRemove->SetPosition(CVector2D(whitelistGridPos.fX, whitelistGridPos.fY + m_pGridBrowserWhitelist->GetSize().fY + browserButtonSpacing));
+
+    m_pButtonBrowserWhitelistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
+    m_pButtonBrowserWhitelistRemoveAll->SetSize(whitelistRemoveAllSize);
+    m_pButtonBrowserWhitelistRemoveAll->SetPosition(CVector2D(vecTemp.fX + whitelistRemoveAllSpacing, vecTemp.fY + m_pGridBrowserWhitelist->GetSize().fY + browserButtonSpacing));
 
     /**
      *  Advanced tab
