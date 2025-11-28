@@ -61,6 +61,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementColShape", GetElementColShape},
         {"isElementInWater", IsElementInWater},
         {"isElementSyncer", IsElementSyncer},
+        {"getElementsSyncedByPlayer", ArgumentParser<GetElementsSyncedByPlayer>},
         {"isElementCollidableWith", IsElementCollidableWith},
         {"isElementDoubleSided", IsElementDoubleSided},
         {"getElementCollisionsEnabled", GetElementCollisionsEnabled},
@@ -1476,6 +1477,11 @@ int CLuaElementDefs::IsElementSyncer(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::vector<CClientEntity*> CLuaElementDefs::GetElementsSyncedByPlayer()
+{
+    return CStaticFunctionDefinitions::GetElementsSyncedByPlayer();
 }
 
 int CLuaElementDefs::IsElementCollidableWith(lua_State* luaVM)

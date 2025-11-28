@@ -874,6 +874,36 @@ bool CStaticFunctionDefinitions::IsElementSyncer(CClientEntity& Entity, bool& bI
     return true;
 }
 
+std::vector<CClientEntity*> CStaticFunctionDefinitions::GetElementsSyncedByPlayer()
+{
+    std::vector<CClientEntity*> elements;
+
+    // Check all peds
+    CPedSync* pPedSync = m_pClientGame->GetPedSync();
+    for (auto iter = pPedSync->IterBegin(); iter != pPedSync->IterEnd(); ++iter)
+    {
+        elements.push_back(*iter);
+    }
+
+    // Check all vehicles
+    CUnoccupiedVehicleSync* pVehicleSync = m_pClientGame->GetUnoccupiedVehicleSync();
+    for (auto iter = pVehicleSync->IterBegin(); iter != pVehicleSync->IterEnd(); ++iter)
+    {
+        elements.push_back(*iter);
+    }
+
+#ifdef WITH_OBJECT_SYNC
+    // Check all objects
+    CObjectSync* pObjectSync = m_pClientGame->GetObjectSync();
+    for (auto iter = pObjectSync->IterBegin(); iter != pObjectSync->IterEnd(); ++iter)
+    {
+        elements.push_back(*iter);
+    }
+#endif
+
+    return elements;
+}
+
 bool CStaticFunctionDefinitions::IsElementCollidableWith(CClientEntity& Entity, CClientEntity& ThisEntity, bool& bCanCollide)
 {
     switch (Entity.GetType())

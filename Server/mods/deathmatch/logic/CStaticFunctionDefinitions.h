@@ -74,6 +74,7 @@ public:
     static bool           IsElementInWater(CElement* pElement, bool& bInWater);
     static bool           GetElementAttachedOffsets(CElement* pElement, CVector& vecPosition, CVector& vecRotation);
     static CElement*      GetElementSyncer(CElement* pElement);
+    static std::vector<CElement*> GetElementsSyncedByPlayer(CPlayer* pPlayer);
     static bool           GetElementCollisionsEnabled(CElement* pElement);
     static bool           IsElementFrozen(CElement* pElement, bool& bFrozen);
     static bool           GetLowLodElement(CElement* pElement, CElement*& pOutLowLodElement);

@@ -757,6 +757,40 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer(CElement* pElement)
     return NULL;
 }
 
+std::vector<CElement*> CStaticFunctionDefinitions::GetElementsSyncedByPlayer(CPlayer* pPlayer)
+{
+    assert(pPlayer);
+
+    std::vector<CElement*> elements;
+
+    // Check all vehicles
+    for (CVehicle* pVehicle : m_pVehicleManager->GetVehicles())
+    {
+        if (pVehicle->GetSyncer() == pPlayer)
+            elements.push_back(pVehicle);
+    }
+
+    // Check all peds
+    for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); ++iter)
+    {
+        CPed* pPed = *iter;
+        if (pPed->GetSyncer() == pPlayer)
+            elements.push_back(pPed);
+    }
+
+#ifdef WITH_OBJECT_SYNC
+    // Check all objects
+    for (auto iter = m_pObjectManager->IterBegin(); iter != m_pObjectManager->IterEnd(); ++iter)
+    {
+        CObject* pObject = *iter;
+        if (pObject->GetSyncer() == pPlayer)
+            elements.push_back(pObject);
+    }
+#endif
+
+    return elements;
+}
+
 bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
 {
     assert(pElement);
