@@ -22,6 +22,10 @@
 #include "CResourceClientFileItem.h"
 #include "CResourceScriptItem.h"
 #include "CResourceClientScriptItem.h"
+#include "CResourceTranslationItem.h"
+#include "CGlobalTranslationItem.h"
+#include "CResourceTranslationManager.h"
+#include "CGlobalTranslationManager.h"
 #include "CAccessControlListManager.h"
 #include "CScriptDebugging.h"
 #include "CMapManager.h"
@@ -103,6 +107,9 @@ bool CResource::Load()
     m_bProtected = false;
     m_bStartedManually = false;
     m_bDoneDbConnectMysqlScan = false;
+
+    // Initialize translation manager
+    m_translationManager = std::make_unique<CResourceTranslationManager>(m_strResourceName.c_str());
 
     m_uiVersionMajor = 0;
     m_uiVersionMinor = 0;
@@ -271,7 +278,16 @@ bool CResource::Load()
 
             // Read everything that's included. If one of these fail, delete the XML we created and return
             if (!ReadIncludedResources(pRoot) || !ReadIncludedMaps(pRoot) || !ReadIncludedFiles(pRoot) || !ReadIncludedScripts(pRoot) ||
-                !ReadIncludedHTML(pRoot) || !ReadIncludedExports(pRoot) || !ReadIncludedConfigs(pRoot))
+                !ReadIncludedHTML(pRoot) || !ReadIncludedExports(pRoot) || !ReadIncludedConfigs(pRoot) || !ReadIncludedTranslations(pRoot) ||
+                !ReadIncludedGlobalTranslations(pRoot))
+            {
+                delete pMetaFile;
+                g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+                return false;
+            }
+            
+            // Load translation files into the translation manager
+            if (!LoadTranslations())
             {
                 delete pMetaFile;
                 g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
@@ -936,7 +952,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && StartOptions.bConfigs) ||
             (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && StartOptions.bScripts) ||
             (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && StartOptions.bClientScripts) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && StartOptions.bHTML))
+            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && StartOptions.bHTML) ||
+            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_GLOBAL_TRANSLATION))
         {
             // Start. Failed?
             if (!pResourceFile->Start())
@@ -1076,6 +1093,12 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     // Sort by priority, for start grouping on the client
     m_StartedResources.sort([](CResource* a, CResource* b) { return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup; });
 
+    // Register as global translation provider if marked as such
+    if (m_translationManager && m_translationManager->IsGlobalProvider())
+    {
+        CGlobalTranslationManager::GetSingleton().RegisterProvider(m_strResourceName.c_str(), m_translationManager.get());
+    }
+
     return true;
 }
 
@@ -1132,6 +1155,12 @@ bool CResource::Stop(bool bManualStop)
 
     // Tell the modules we are stopping
     g_pGame->GetLuaManager()->GetLuaModuleManager()->ResourceStopping(m_pVM->GetVirtualMachine());
+
+    // Unregister global translation provider if this resource was one
+    if (m_translationManager && m_translationManager->IsGlobalProvider())
+    {
+        CGlobalTranslationManager::GetSingleton().UnregisterProvider(m_strResourceName.c_str());
+    }
 
     // Remove us from the running resources list
     m_StartedResources.remove(this);
@@ -3212,7 +3241,8 @@ HttpStatusCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpR
             // this filename. If none match, the file not found will be sent back.
             else if (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
                      pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
-                     pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
+                     pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE ||
+                     pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_TRANSLATION)
             {
                 return pResourceFile->Request(ipoHttpRequest, ipoHttpResponse);            // sends back any file in the resource
             }
@@ -3352,6 +3382,91 @@ void CResource::OnPlayerJoin(CPlayer& Player)
 {
     Player.Send(CResourceStartPacket(m_strResourceName.c_str(), this, m_startCounter));
     SendNoClientCacheScripts(&Player);
+}
+
+bool CResource::ReadIncludedTranslations(CXMLNode* pRoot)
+{
+    int i = 0;
+
+    for (CXMLNode* pTranslation = pRoot->FindSubNode("translation", i); pTranslation != nullptr; pTranslation = pRoot->FindSubNode("translation", ++i))
+    {
+        CXMLAttributes& Attributes = pTranslation->GetAttributes();
+        CXMLAttribute* pSrc = Attributes.Find("src");
+
+        if (pSrc)
+        {
+            std::string strFilename = pSrc->GetValue();
+
+            if (!strFilename.empty())
+            {
+                std::string strFullFilename;
+                ReplaceSlashes(strFilename);
+
+                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
+                {
+                    m_ResourceFiles.push_back(new CResourceTranslationItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+                }
+                else
+                {
+                    m_strFailureReason = SString("Couldn't find translation %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+            }
+            else
+            {
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+            }
+        }
+        else
+        {
+            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+        }
+    }
+
+    return true;
+}
+
+bool CResource::ReadIncludedGlobalTranslations(CXMLNode* pRoot)
+{
+    int i = 0;
+
+    // Check for global-translation-provider tag (marks this resource as a provider)
+    if (pRoot->FindSubNode("global-translation-provider", 0))
+    {
+        if (m_translationManager)
+        {
+            m_translationManager->SetAsGlobalProvider(true);
+        }
+    }
+
+    // Loop through global-translation nodes (consumer tags)
+    for (CXMLNode* pGlobalTranslation = pRoot->FindSubNode("global-translation", i); pGlobalTranslation != nullptr; 
+         pGlobalTranslation = pRoot->FindSubNode("global-translation", ++i))
+    {
+        CXMLAttributes& Attributes = pGlobalTranslation->GetAttributes();
+        CXMLAttribute* pSrc = Attributes.Find("src");
+
+        if (pSrc)
+        {
+            std::string strProviderResource = pSrc->GetValue();
+
+            if (!strProviderResource.empty())
+            {
+                m_ResourceFiles.push_back(new CGlobalTranslationItem(this, strProviderResource.c_str(), &Attributes));
+            }
+            else
+            {
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'global-translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+            }
+        }
+        else
+        {
+            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'global-translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+        }
+    }
+
+    return true;
 }
 
 void CResource::SendNoClientCacheScripts(CPlayer* pPlayer)
@@ -3891,4 +4006,34 @@ CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
     }
 
     return nullptr;
+}
+
+bool CResource::LoadTranslations()
+{
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+    {
+        CResourceTranslationItem* pTranslationItem = dynamic_cast<CResourceTranslationItem*>(pResourceFile);
+        if (pTranslationItem)
+        {
+            std::string strFullPath = pTranslationItem->GetFullName();
+            bool isPrimary = pTranslationItem->IsPrimary();
+            if (!m_translationManager->LoadTranslation(strFullPath, isPrimary))
+            {
+                // Use detailed error message from translation manager if available
+                std::string detailedError = m_translationManager->GetLastError();
+                if (!detailedError.empty())
+                {
+                    m_strFailureReason = SString("Failed to load translation file '%s' for resource '%s' (%s)", 
+                                                pTranslationItem->GetName(), m_strResourceName.c_str(), detailedError.c_str());
+                }
+                else
+                {
+                    m_strFailureReason = SString("Failed to load translation file '%s' for resource '%s'", 
+                                                pTranslationItem->GetName(), m_strResourceName.c_str());
+                }
+                return false;
+            }
+        }
+    }
+    return true;
 }
