@@ -514,6 +514,8 @@ public:
     void SetAllowMultiCommandHandlers(MultiCommandHandlerPolicy policy) noexcept { m_allowMultiCommandHandlers = policy; }
     MultiCommandHandlerPolicy GetAllowMultiCommandHandlers() const noexcept { return m_allowMultiCommandHandlers; }
 
+    void OnChatboxLayoutChange();
+
 private:
     // CGUI Callbacks
     bool OnKeyDown(CGUIKeyEventArgs Args);
