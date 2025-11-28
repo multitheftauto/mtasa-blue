@@ -2712,6 +2712,11 @@ void CSettings::UpdateBorderlessAdjustmentControls()
         m_pBorderlessSaturation->SetEnabled(saturationEnabled);
     if (m_pBorderlessSaturationValueLabel)
         m_pBorderlessSaturationValueLabel->SetEnabled(saturationEnabled);
+
+    m_pBorderlessGammaToggle->SetEnabled(applyAdjustments);
+    m_pBorderlessBrightnessToggle->SetEnabled(applyAdjustments);
+    m_pBorderlessContrastToggle->SetEnabled(applyAdjustments);
+    m_pBorderlessSaturationToggle->SetEnabled(applyAdjustments);
 }
 
 void CSettings::ResetGTAVolume()
