@@ -1479,9 +1479,9 @@ int CLuaElementDefs::IsElementSyncer(lua_State* luaVM)
     return 1;
 }
 
-std::vector<CClientEntity*> CLuaElementDefs::GetElementsSyncedByPlayer()
+std::vector<CClientEntity*> CLuaElementDefs::GetElementsSyncedByPlayer(std::optional<std::string> elementType)
 {
-    return CStaticFunctionDefinitions::GetElementsSyncedByPlayer();
+    return CStaticFunctionDefinitions::GetElementsSyncedByPlayer(elementType);
 }
 
 int CLuaElementDefs::IsElementCollidableWith(lua_State* luaVM)

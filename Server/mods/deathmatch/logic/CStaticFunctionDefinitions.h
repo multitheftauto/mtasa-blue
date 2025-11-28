@@ -75,7 +75,7 @@ public:
     static bool           GetElementAttachedOffsets(CElement* pElement, CVector& vecPosition, CVector& vecRotation);
     static CElement*      GetElementSyncer(CElement* pElement);
     static bool           IsElementSyncer(CElement* pElement, CPlayer* pPlayer);
-    static std::vector<CElement*> GetElementsSyncedByPlayer(CPlayer* pPlayer);
+    static std::vector<CElement*> GetElementsSyncedByPlayer(CPlayer* pPlayer, std::optional<std::string> strType);
     static bool           GetElementCollisionsEnabled(CElement* pElement);
     static bool           IsElementFrozen(CElement* pElement, bool& bFrozen);
     static bool           GetLowLodElement(CElement* pElement, CElement*& pOutLowLodElement);

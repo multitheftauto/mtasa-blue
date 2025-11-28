@@ -874,30 +874,39 @@ bool CStaticFunctionDefinitions::IsElementSyncer(CClientEntity& Entity, bool& bI
     return true;
 }
 
-std::vector<CClientEntity*> CStaticFunctionDefinitions::GetElementsSyncedByPlayer()
+std::vector<CClientEntity*> CStaticFunctionDefinitions::GetElementsSyncedByPlayer(std::optional<std::string> strType)
 {
     std::vector<CClientEntity*> elements;
 
     // Check all peds
-    CPedSync* pPedSync = m_pClientGame->GetPedSync();
-    for (auto iter = pPedSync->IterBegin(); iter != pPedSync->IterEnd(); ++iter)
+    if (!strType.has_value() || strType.value() == "ped")
     {
-        elements.push_back(*iter);
+        CPedSync* pPedSync = m_pClientGame->GetPedSync();
+        for (auto iter = pPedSync->IterBegin(); iter != pPedSync->IterEnd(); ++iter)
+        {
+            elements.push_back(*iter);
+        }
     }
 
     // Check all vehicles
-    CUnoccupiedVehicleSync* pVehicleSync = m_pClientGame->GetUnoccupiedVehicleSync();
-    for (auto iter = pVehicleSync->IterBegin(); iter != pVehicleSync->IterEnd(); ++iter)
+    if (!strType.has_value() || strType.value() == "vehicle")
     {
-        elements.push_back(*iter);
+        CUnoccupiedVehicleSync* pVehicleSync = m_pClientGame->GetUnoccupiedVehicleSync();
+        for (auto iter = pVehicleSync->IterBegin(); iter != pVehicleSync->IterEnd(); ++iter)
+        {
+            elements.push_back(*iter);
+        }
     }
 
 #ifdef WITH_OBJECT_SYNC
     // Check all objects
-    CObjectSync* pObjectSync = m_pClientGame->GetObjectSync();
-    for (auto iter = pObjectSync->IterBegin(); iter != pObjectSync->IterEnd(); ++iter)
+    if (!strType.has_value() || strType.value() == "object")
     {
-        elements.push_back(*iter);
+        CObjectSync* pObjectSync = m_pClientGame->GetObjectSync();
+        for (auto iter = pObjectSync->IterBegin(); iter != pObjectSync->IterEnd(); ++iter)
+        {
+            elements.push_back(*iter);
+        }
     }
 #endif
 
