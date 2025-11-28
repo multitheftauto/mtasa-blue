@@ -986,7 +986,7 @@ msgstr "USTAWIENIA"
 
 #: Client/core/CSettings.cpp:549
 msgid "Multiplayer"
-msgstr "Gra wieloosobowa"
+msgstr "Ogólne"
 
 #: Client/core/CSettings.cpp:550
 msgid "Video"
@@ -1132,11 +1132,11 @@ msgstr "Zawsze pokazuj okno pobierania"
 
 #: Client/core/CSettings.cpp:855
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "Zezwól na wyświetlanie aktywności Discord"
+msgstr "Zezwól na wyświetlanie statusu gry na Discordzie"
 
 #: Client/core/CSettings.cpp:860
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr "Wyświetlaj status \"w grze GTA:SA\" na Steam"
+msgstr "Wyświetlaj status w grze GTA:SA na Steam"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:866
@@ -1171,6 +1171,25 @@ msgstr "1024 x 1024 (Domyślnie)"
 #: Client/core/CSettings.cpp:920
 msgid "2048 x 2048"
 msgstr "2048 x 2048"
+
+#. *
+#. *  PostFX
+#. *
+#: Client/core/CSettings.cpp:1481 Client/core/CSettings.cpp:1383
+msgid "Contrast:"
+msgstr "Kontrast:"
+
+#: Client/core/CSettings.cpp:1501 Client/core/CSettings.cpp:1503
+msgid "Saturation:"
+msgstr "Saturacja:"
+
+#: Client/core/CSettings.cpp:1517 Client/core/CSettings.cpp:1519
+msgid "Apply adjustments in windowed mode"
+msgstr "Zastosuj zmiany w trybie okienkowym"
+
+#: Client/core/CSettings.cpp:1523 Client/core/CSettings.cpp:1525
+msgid "Apply adjustments in fullscreen mode"
+msgstr "Zastosuj zmiany w trybie okienkowym"
 
 #. *
 #. *  Audio tab
@@ -1976,8 +1995,8 @@ msgstr "Podaj nick"
 #: Client/core/CSettings.cpp:5966
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr "Podaj nick, który będzie używany w grze.  \n"
-"To będzie Twoja nazwa, gdy łączysz się z serwerem i w trakcie gry"
+msgstr "Wpisz nick, który będzie używany w grze.  \n"
+"Będzie to Twoja nazwa wyświetlana na serwerze podczas gry"
 
 #: Client/core/CSettings.cpp:5984
 msgid "Very experimental feature."
@@ -3010,7 +3029,7 @@ msgstr "Rozłącz z serwerem"
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr "Rozłączono: Twój numer seryjny jest zablokowany.\n"
+msgstr "Rozłączono: Twój numer seryjny jest zbanowany.\n"
 "Powód: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
@@ -3024,7 +3043,7 @@ msgstr "Rozłączono: Zostałeś zbanowany.\n"
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr "Rozłączono: To konto jest zablokowane.\n"
+msgstr "Rozłączono: To konto jest zbanowane.\n"
 "Powód: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
