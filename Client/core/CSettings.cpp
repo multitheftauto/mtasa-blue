@@ -240,19 +240,15 @@ void CSettings::ResetGuiPointers()
     m_pBrightness = NULL;
     m_pBrightnessValueLabel = NULL;
     m_pBorderlessGammaToggle = NULL;
-    m_pBorderlessGammaLabel = NULL;
     m_pBorderlessGamma = NULL;
     m_pBorderlessGammaValueLabel = NULL;
     m_pBorderlessBrightnessToggle = NULL;
-    m_pBorderlessBrightnessLabel = NULL;
     m_pBorderlessBrightness = NULL;
     m_pBorderlessBrightnessValueLabel = NULL;
     m_pBorderlessContrastToggle = NULL;
-    m_pBorderlessContrastLabel = NULL;
     m_pBorderlessContrast = NULL;
     m_pBorderlessContrastValueLabel = NULL;
     m_pBorderlessSaturationToggle = NULL;
-    m_pBorderlessSaturationLabel = NULL;
     m_pBorderlessSaturation = NULL;
     m_pBorderlessSaturationValueLabel = NULL;
     m_pCheckBoxApplyBorderless = NULL;
@@ -1434,13 +1430,9 @@ void CSettings::CreateGUI()
     const float postFxSliderWidth = ComputeSliderWidth(tabPanelSize.fX, postFxSliderColumnX, 220.0f, postFxValueColumnReserve);
     const float postFxValueColumnX = postFxSliderColumnX + postFxSliderWidth + postFxValueColumnPadding;
 
-    m_pBorderlessGammaToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
+    m_pBorderlessGammaToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, "Gamma:"));
     m_pBorderlessGammaToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pBorderlessGammaToggle->AutoSize(nullptr, 20.0f);
-
-    m_pBorderlessGammaLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, _("Gamma:")));
-    m_pBorderlessGammaLabel->SetPosition(CVector2D(postFxLabelColumnX, postFxPos.fY + 2.0f));
-    m_pBorderlessGammaLabel->AutoSize();
 
     m_pBorderlessGamma = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, m_pTabPostFX));
     m_pBorderlessGamma->SetPosition(CVector2D(postFxSliderColumnX, postFxPos.fY));
@@ -1449,18 +1441,14 @@ void CSettings::CreateGUI()
 
     m_pBorderlessGammaValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
     m_pBorderlessGammaValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
-    m_pBorderlessGammaValueLabel->AutoSize("2.00");
-    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessGamma, m_pBorderlessGammaValueLabel, 220.0f, kSliderLabelSpacing, m_pBorderlessGammaLabel);
+    m_pBorderlessGammaValueLabel->AutoSize("2.00x");
+    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessGamma, m_pBorderlessGammaValueLabel, 220.0f, kSliderLabelSpacing);
 
     postFxPos.fY += postFxRowHeight;
 
-    m_pBorderlessBrightnessToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
+    m_pBorderlessBrightnessToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, "Brightness:"));
     m_pBorderlessBrightnessToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pBorderlessBrightnessToggle->AutoSize(nullptr, 20.0f);
-
-    m_pBorderlessBrightnessLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, _("Brightness:")));
-    m_pBorderlessBrightnessLabel->SetPosition(CVector2D(postFxLabelColumnX, postFxPos.fY + 2.0f));
-    m_pBorderlessBrightnessLabel->AutoSize();
 
     m_pBorderlessBrightness = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, m_pTabPostFX));
     m_pBorderlessBrightness->SetPosition(CVector2D(postFxSliderColumnX, postFxPos.fY));
@@ -1470,17 +1458,13 @@ void CSettings::CreateGUI()
     m_pBorderlessBrightnessValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
     m_pBorderlessBrightnessValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
     m_pBorderlessBrightnessValueLabel->AutoSize("2.00x");
-    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessBrightness, m_pBorderlessBrightnessValueLabel, 220.0f, kSliderLabelSpacing, m_pBorderlessBrightnessLabel);
+    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessBrightness, m_pBorderlessBrightnessValueLabel, 220.0f, kSliderLabelSpacing);
 
     postFxPos.fY += postFxRowHeight;
 
-    m_pBorderlessContrastToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
+    m_pBorderlessContrastToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, "Contrast:"));
     m_pBorderlessContrastToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pBorderlessContrastToggle->AutoSize(nullptr, 20.0f);
-
-    m_pBorderlessContrastLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, _("Contrast:")));
-    m_pBorderlessContrastLabel->SetPosition(CVector2D(postFxLabelColumnX, postFxPos.fY + 2.0f));
-    m_pBorderlessContrastLabel->AutoSize();
 
     m_pBorderlessContrast = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, m_pTabPostFX));
     m_pBorderlessContrast->SetPosition(CVector2D(postFxSliderColumnX, postFxPos.fY));
@@ -1490,17 +1474,13 @@ void CSettings::CreateGUI()
     m_pBorderlessContrastValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
     m_pBorderlessContrastValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
     m_pBorderlessContrastValueLabel->AutoSize("2.00x");
-    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessContrast, m_pBorderlessContrastValueLabel, 220.0f, kSliderLabelSpacing, m_pBorderlessContrastLabel);
+    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessContrast, m_pBorderlessContrastValueLabel, 220.0f, kSliderLabelSpacing);
 
     postFxPos.fY += postFxRowHeight;
 
-    m_pBorderlessSaturationToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, ""));
+    m_pBorderlessSaturationToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, "Saturation:"));
     m_pBorderlessSaturationToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pBorderlessSaturationToggle->AutoSize(nullptr, 20.0f);
-
-    m_pBorderlessSaturationLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, _("Saturation:")));
-    m_pBorderlessSaturationLabel->SetPosition(CVector2D(postFxLabelColumnX, postFxPos.fY + 2.0f));
-    m_pBorderlessSaturationLabel->AutoSize();
 
     m_pBorderlessSaturation = reinterpret_cast<CGUIScrollBar*>(pManager->CreateScrollBar(true, m_pTabPostFX));
     m_pBorderlessSaturation->SetPosition(CVector2D(postFxSliderColumnX, postFxPos.fY));
@@ -1510,11 +1490,11 @@ void CSettings::CreateGUI()
     m_pBorderlessSaturationValueLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabPostFX, ""));
     m_pBorderlessSaturationValueLabel->SetPosition(CVector2D(postFxValueColumnX, postFxPos.fY + 2.0f));
     m_pBorderlessSaturationValueLabel->AutoSize("2.00x");
-    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessSaturation, m_pBorderlessSaturationValueLabel, 220.0f, kSliderLabelSpacing, m_pBorderlessSaturationLabel);
+    FinalizeSliderRow(tabPanelSize.fX, m_pBorderlessSaturation, m_pBorderlessSaturationValueLabel, 220.0f, kSliderLabelSpacing);
 
     postFxPos.fY += postFxRowHeight + 8.0f;
 
-    m_pCheckBoxApplyBorderless = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Apply adjustments in windowed mode")));
+    m_pCheckBoxApplyBorderless = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Apply adjustments in windowed/borderless mode")));
     m_pCheckBoxApplyBorderless->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pCheckBoxApplyBorderless->AutoSize(nullptr, 20.0f);
 
@@ -2517,7 +2497,7 @@ void CSettings::UpdatePostFxTab()
     if (m_pBorderlessGamma)
         m_pBorderlessGamma->SetScrollPosition(NormalizeSliderValue(gammaValue, kBorderlessGammaMin, kBorderlessGammaMax));
     if (m_pBorderlessGammaValueLabel)
-        m_pBorderlessGammaValueLabel->SetText(SString("%.2f", gammaValue).c_str());
+        m_pBorderlessGammaValueLabel->SetText(SString("%.2fx", gammaValue).c_str());
 
     if (m_pBorderlessBrightness)
         m_pBorderlessBrightness->SetScrollPosition(NormalizeSliderValue(brightnessValue, kBorderlessBrightnessMin, kBorderlessBrightnessMax));
@@ -2715,29 +2695,21 @@ void CSettings::UpdateBorderlessAdjustmentControls()
 
     if (m_pBorderlessGamma)
         m_pBorderlessGamma->SetEnabled(gammaEnabled);
-    if (m_pBorderlessGammaLabel)
-        m_pBorderlessGammaLabel->SetEnabled(gammaEnabled);
     if (m_pBorderlessGammaValueLabel)
         m_pBorderlessGammaValueLabel->SetEnabled(gammaEnabled);
 
     if (m_pBorderlessBrightness)
         m_pBorderlessBrightness->SetEnabled(brightnessEnabled);
-    if (m_pBorderlessBrightnessLabel)
-        m_pBorderlessBrightnessLabel->SetEnabled(brightnessEnabled);
     if (m_pBorderlessBrightnessValueLabel)
         m_pBorderlessBrightnessValueLabel->SetEnabled(brightnessEnabled);
 
     if (m_pBorderlessContrast)
         m_pBorderlessContrast->SetEnabled(contrastEnabled);
-    if (m_pBorderlessContrastLabel)
-        m_pBorderlessContrastLabel->SetEnabled(contrastEnabled);
     if (m_pBorderlessContrastValueLabel)
         m_pBorderlessContrastValueLabel->SetEnabled(contrastEnabled);
 
     if (m_pBorderlessSaturation)
         m_pBorderlessSaturation->SetEnabled(saturationEnabled);
-    if (m_pBorderlessSaturationLabel)
-        m_pBorderlessSaturationLabel->SetEnabled(saturationEnabled);
     if (m_pBorderlessSaturationValueLabel)
         m_pBorderlessSaturationValueLabel->SetEnabled(saturationEnabled);
 }
@@ -5261,7 +5233,7 @@ bool CSettings::OnBrightnessChanged(CGUIElement* pElement)
 bool CSettings::OnBorderlessGammaChanged(CGUIElement* pElement)
 {
     const float gammaValue = DenormalizeSliderValue(m_pBorderlessGamma->GetScrollPosition(), kBorderlessGammaMin, kBorderlessGammaMax);
-    m_pBorderlessGammaValueLabel->SetText(SString("%.2f", gammaValue).c_str());
+    m_pBorderlessGammaValueLabel->SetText(SString("%.2fx", gammaValue).c_str());
     CVARS_SET("borderless_gamma_power", gammaValue);
     RefreshBorderlessDisplayCalibration();
     return true;
