@@ -308,6 +308,7 @@ protected:
     CGUILabel*     m_pLabelVerticalAimSensitivity;
     CGUIScrollBar* m_pVerticalAimSensitivity;
     CGUILabel*     m_pLabelVerticalAimSensitivityValue;
+    CGUICheckBox*  m_pCheckboxVerticalAimSensitivity;
 
     CGUILabel*       m_pControlsJoypadLabel;
     CGUIScrollPane*  m_pControlsInputTypePane;
@@ -452,6 +453,7 @@ protected:
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
     bool OnAffinityClick(CGUIElement* pElement);
+    bool OnMouseAimingClick(CGUIElement* pElement);
     void ReloadBrowserLists();
 
 private:
