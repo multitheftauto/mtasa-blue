@@ -757,6 +757,32 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer(CElement* pElement)
     return NULL;
 }
 
+bool CStaticFunctionDefinitions::IsElementSyncer(CElement* pElement, CPlayer* pPlayer)
+{
+    switch (pElement->GetType())
+    {
+        case CElement::PED:
+        {
+            CPed* pPed = static_cast<CPed*>(pElement);
+            return pPed->IsSyncable() && pPed->GetSyncer() == pPlayer;
+        }
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            return pVehicle->IsUnoccupiedSyncable() && pVehicle->GetSyncer() == pPlayer;
+        }
+#ifdef WITH_OBJECT_SYNC
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast<CObject*>(pElement);
+            return pObject->IsSyncable() && pObject->GetSyncer() == pPlayer;
+        }
+#endif
+        default:
+            return false;
+    }
+}
+
 std::vector<CElement*> CStaticFunctionDefinitions::GetElementsSyncedByPlayer(CPlayer* pPlayer)
 {
     assert(pPlayer);
