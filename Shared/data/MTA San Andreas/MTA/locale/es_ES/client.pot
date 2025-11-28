@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-23 14:47+0000\n"
-"PO-Revision-Date: 2025-11-28 21:40\n"
+"PO-Revision-Date: 2025-11-28 22:42\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -285,13 +285,14 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
-msgstr "la ruta para tu instalación de  'MTA:SA' o 'GTA: San Andreas' contiene el símbolo ';' (punto y coma).\n\n"
-"Si experimenta problemas al correr MTA:SA,\n"
+msgstr "La ruta para tu instalación de  'MTA:SA' o 'GTA: San Andreas' contiene el símbolo ';' (punto y coma).\n\n"
+"Si experimenta problemas al correr\n"
+" MTA:SA,\n"
 "mueva su(s) archivo(s) de instalación a una ruta que no tenga punto y coma."
 
 #: Client/loader/MainFunctions.cpp:1116
 msgid "Invalid installation paths detected."
-msgstr ""
+msgstr "Rutas de instalación detectadas como inválidas."
 
 #: Client/loader/MainFunctions.cpp:1247
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -320,21 +321,22 @@ msgstr "El archivo principal contiene un nombre incorrecto (%s)"
 #: Client/loader/MainFunctions.cpp:1336
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr ""
+msgstr "Archivo de dato %s está perdido/faltante. Posible virus activo en su sistema."
 
 #: Client/loader/MainFunctions.cpp:1344
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr "Archivo de dato %s está perdido/faltante. Posible actividad de virus /virus activo en el sistema"
+msgstr "Archivo de dato %s está perdido/faltante. Posible virus activo en el sistema."
 
 #: Client/loader/MainFunctions.cpp:1368
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
-msgstr ""
+msgstr "Los archivos .asi están en el directorio de instalación.\n\n"
+"Elimina estos archivos .asi si experimenta problemas."
 
 #: Client/loader/MainFunctions.cpp:1523
 msgid "Invalid game paths detected."
-msgstr ""
+msgstr "Rutas para el juego detectadas como inválidas."
 
 #: Client/loader/MainFunctions.cpp:1531
 msgid "Fix configuration issue"
@@ -342,7 +344,7 @@ msgstr "Arreglar problema de configuración"
 
 #: Client/loader/MainFunctions.cpp:1630
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
-msgstr ""
+msgstr "GTA: San Andreas puede no haberse iniciado correctamente. ¿Quieres cerrar el proceso?"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
@@ -365,7 +367,7 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr "Su instalación puede estar corrupta ahora.\n\n"
 "%zu de %zu archivos no pudieron ser restaurados desde la copia de seguridad.\n\n"
-"Deberías reinstalar Multi Theft Auto desde www.multitheftauto.com\n"
+"Se recomienda reinstalar Multi Theft Auto desde www.multitheftauto.com\n"
 "o intentar correr la actualización con permisos de administrador."
 
 #: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1035
@@ -391,7 +393,7 @@ msgstr "** Ocurrió un problema con los controladores del controlador gráfico *
 
 #: Client/loader/CInstallManager.cpp:458
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr ""
+msgstr "**Sin memoria disponible - este cierre fue causado debido a memoria insuficiente o fragmentada"
 
 #: Client/loader/CInstallManager.cpp:566
 msgid "Install updated MTA:SA files"
@@ -408,7 +410,7 @@ msgstr "Multi Theft Auto no ha sido instalado correctamente; por favor, reinstá
 
 #: Client/loader/CInstallManager.cpp:647
 msgid "Create GTA:SA junctions"
-msgstr "Crear intersecciones en GTA:SA"
+msgstr "Crear uniones/puntos de unión en GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:691
 msgid "MTA:SA cannot launch because copying a file failed:"
@@ -436,7 +438,7 @@ msgstr "MTA:SA no puede iniciarse porque el ejecutable de GTA:SA no existe o es 
 
 #: Client/loader/CInstallManager.cpp:866
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "Por favor verifica tu antivirus por la detección de un falso positivo, intenta añadir una excepción para el ejecutable de GTA:SA y reinicia MTA:SA."
+msgstr "Por favor verifica tu antivirus en busca de un falso positivo, intenta añadir una excepción para el ejecutable de GTA:SA y reinicia MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:872
 msgid "Generate GTA:SA"
@@ -448,11 +450,11 @@ msgstr "MTA:SA no puede iniciarse porque el ejecutable de GTA:SA no se puede car
 
 #: Client/loader/CInstallManager.cpp:894 Client/loader/CInstallManager.cpp:917
 msgid "Patch GTA:SA"
-msgstr "Parchear GTA:SA"
+msgstr "Instalar parche en GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:910
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "MTA:SA no puede iniciarse porque el parcheo de GTA:SA ha fallado:"
+msgstr "MTA:SA no puede iniciarse porque ha fallado la copia de un archivo:"
 
 #: Client/loader/CInstallManager.cpp:1091 Client/core/CCore.cpp:837
 #, c-format
@@ -571,11 +573,11 @@ msgstr "Estos archivos no son necesarios y pueden interferir con las caracterís
 
 #: Client/loader/Dialogs.cpp:99
 msgid "Keep these files, but also show this warning on next start"
-msgstr "Mantenga estos archivos, pero también muestre esta advertencia en el próximo inicio"
+msgstr "Mantener estos archivos, pero también muestre esta advertencia en el próximo inicio"
 
 #: Client/loader/Dialogs.cpp:100
 msgid "Do not remind me about these files again"
-msgstr "No me vuelvas a recordar sobre estos archivos"
+msgstr "No recordarme de nuevo nada sobre estos archivos"
 
 #: Client/loader/Dialogs.cpp:101
 msgid "Rename these files from *.dll to *.dll.bak"
@@ -663,11 +665,13 @@ msgstr "No instalaré un anti-virus.\n"
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
 "Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
 "Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
-msgstr ""
+msgstr "Este fallo/cierre que experimentó se debe a un abuso de memoria por parte de los servidores\n\n"
+"Aún con abundancia de RAM, este es un juego x86 con límites de espacio predeterminados a un máximo de 3.6GB y algunos servidores faltos de optimización con demasiados mods (o unos pocos scripts pobremente escritos) pueden causar escenarios como este, así como causar lag en su juego\n\n"
+"Contacte al dueño del servidor o a soporte de MTA en el discord oficial de MTA (https://discord.gg/mtasa) para más información."
 
 #: Client/loader/Dialogs.cpp:673
 msgid "MTA: San Andreas - Out of Memory Information"
-msgstr ""
+msgstr "MTA: San Andreas - Sin información de Memoria"
 
 #: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -993,7 +997,7 @@ msgstr "Vídeo"
 
 #: Client/core/CSettings.cpp:551
 msgid "PostFX"
-msgstr ""
+msgstr "PostFX"
 
 #: Client/core/CSettings.cpp:552
 msgid "Audio"
@@ -1055,7 +1059,7 @@ msgstr "Volar con ratón"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
-msgstr ""
+msgstr "Use la sensibilidad del ratón para apuntar."
 
 #. Joypad options
 #: Client/core/CSettings.cpp:669
@@ -1135,7 +1139,7 @@ msgstr "Permitir conectar con Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:860
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr ""
+msgstr "Permitir estatus ingame a GTA:SA en Steam."
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:866
@@ -1144,7 +1148,7 @@ msgstr "Guarda las fotos tomadas con la cámara en la carpeta GTA San Andreas Us
 
 #: Client/core/CSettings.cpp:871
 msgid "Ask before disconnecting from server using main menu"
-msgstr ""
+msgstr "Preguntar antes de desconectar del servidor usando el menú principal."
 
 #: Client/core/CSettings.cpp:876
 msgid "Use customized GTA:SA files"
@@ -1318,7 +1322,7 @@ msgstr "Mapeo Mip"
 
 #: Client/core/CSettings.cpp:1182
 msgid "V-Sync"
-msgstr ""
+msgstr "Sincronización Vertical"
 
 #: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2225
 msgid "Low"
@@ -1429,23 +1433,23 @@ msgstr "Renderizar siempre los peds en alto detalle"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1441
 msgid "Gamma:"
-msgstr ""
+msgstr "Gamma: "
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1481
 msgid "Contrast:"
-msgstr ""
+msgstr "Contraste: "
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1501
 msgid "Saturation:"
-msgstr ""
+msgstr "Saturación"
 
 #: Client/core/CSettings.cpp:1517
 msgid "Apply adjustments in windowed mode"
-msgstr ""
+msgstr "Aplicar los ajustes en modo ventana"
 
 #: Client/core/CSettings.cpp:1523
 msgid "Apply adjustments in fullscreen mode"
-msgstr ""
+msgstr "Aplicar los ajustes en modo pantalla completa"
 
 #: Client/core/CSettings.cpp:1554
 msgid "Enable remote websites"
@@ -1966,7 +1970,8 @@ msgstr "CARACTERÍSTICA EXPERIMENTAL"
 #: Client/core/CSettings.cpp:5823
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr ""
+msgstr "Desactivar esta opción no está recomendado a menos que experimente problemas de estabilidad\n\n"
+"¿Está seguro de desactivar la opción?"
 
 #: Client/core/CSettings.cpp:5965
 msgid "Please enter a nickname"
@@ -2044,7 +2049,7 @@ msgstr "Afinidad CPU:"
 
 #: Client/core/CSettings.cpp:6008
 msgid "Only change if you're having stability issues."
-msgstr ""
+msgstr "Solo cámbielo si tiene problemas de estabilidad"
 
 #: Client/core/CCore.cpp:839 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
@@ -2481,7 +2486,7 @@ msgstr "(Copia de seguridad de la lista de servidores)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:419
 msgid "Cannot create LAN-broadcast socket"
-msgstr ""
+msgstr "No se puede crear el socket de transmisión LAN"
 
 #: Client/core/ServerBrowser/CServerList.cpp:429
 msgid "Cannot bind LAN-broadcast socket"
@@ -2655,7 +2660,7 @@ msgstr "Empezar busqueda"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:378
 msgid "Delete from recent"
-msgstr ""
+msgstr "Borrar desde reciente"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2086
@@ -2860,7 +2865,7 @@ msgstr "mover el mapa hacia el oeste"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "attaches the player-map"
-msgstr ""
+msgstr "Une el mapa-jugador"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "reduces player-map opacity"
@@ -3393,7 +3398,7 @@ msgstr "Error de descarga: %s"
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "Error fatal (%u). Si el problema persiste, por favor visite multitheftauto.com para una mejor ayuda"
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3402,7 +3407,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr ""
+msgstr "error de protocolo (%u). Si el problema persiste, por favor visite multitheftauto.com para una mejor ayuda"
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
