@@ -412,7 +412,7 @@ public:
     float m_steeringLeftRight;
 
     // 1424
-    VehicleClass m_vehicleClass;
+    VehicleClass m_vehicleClass; // should be 4 bytes (TODO)
     uint32_t m_vehicleSubClass;
 
     int16_t    m_peviousRemapTxd;
