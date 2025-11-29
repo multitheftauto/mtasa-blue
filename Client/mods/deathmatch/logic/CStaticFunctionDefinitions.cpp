@@ -9963,6 +9963,10 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
     if (pPed->IsLocalEntity() != pVehicle->IsLocalEntity())
         return false;
 
+    // Camper only has 3 seats (0-2)
+    if (static_cast<VehicleType>(pVehicle->GetModel()) == VehicleType::VT_CAMPER && uiSeat > 2)
+        return false;
+
     if (pPed->IsLocalEntity())
     {
         //

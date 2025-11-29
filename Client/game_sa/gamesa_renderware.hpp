@@ -32,6 +32,7 @@ void InitRwFunctions()
     RwTexDictionarySetCurrent = (RwTexDictionarySetCurrent_t)0x007F3A70;
     RwTexDictionaryForAllTextures = (RwTexDictionaryForAllTextures_t)0x007F3730;
     RwTexDictionaryAddTexture = (RwTexDictionaryAddTexture_t)0x007F3980;
+    RwTexDictionaryRemoveTexture = (RwTexDictionaryRemoveTexture_t)0x007F39C0;
     RwTexDictionaryStreamWrite = (RwTexDictionaryStreamWrite_t)0x008049F0;
     rwD3D9NativeTextureRead = (rwD3D9NativeTextureRead_t)0x004CD820;
     RpPrtStdGlobalDataSetStreamEmbedded = (RpPrtStdGlobalDataSetStreamEmbedded_t)0x0041B350;
