@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 #include <string>
+#include <sstream>
+#include <map>
 #include <cef3/cef/include/cef_app.h>
 typedef void (*JavascriptCallback)(CefRefPtr<CefFrame> frame, const CefV8ValueList& arguments);
 

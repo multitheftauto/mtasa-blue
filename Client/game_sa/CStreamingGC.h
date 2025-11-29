@@ -26,8 +26,8 @@ public:
     // Shutdown and remove all hooks
     static void Shutdown();
 
-    // Protect a model from garbage collection
-    static void ProtectModel(std::uint32_t modelId);
+    // Protect a model from garbage collection. Returns true if protection was successful (model loaded)
+    static bool ProtectModel(std::uint32_t modelId);
 
     // Unprotect a model, allowing GC. Returns true if protection was removed
     [[nodiscard]] static bool UnprotectModel(std::uint32_t modelId);
@@ -48,7 +48,7 @@ public:
     class Guard
     {
     public:
-        explicit Guard(std::uint32_t modelId) : m_modelId(modelId), m_bActive(true) { ProtectModel(m_modelId); }
+        explicit Guard(std::uint32_t modelId) : m_modelId(modelId) { m_bActive = ProtectModel(m_modelId); }
 
         ~Guard() noexcept
         {

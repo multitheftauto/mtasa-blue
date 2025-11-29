@@ -27,6 +27,8 @@ public:
                                CClientManager* pManager);
     ~CStaticFunctionDefinitions();
 
+    static void PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents);
+
     static bool AddEvent(CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger);
     static bool AddEventHandler(CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated,
                                 EEventPriorityType eventPriority, float fPriorityMod);
