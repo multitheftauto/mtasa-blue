@@ -16,6 +16,7 @@
 #include <cef3/cef/include/cef_stream.h>
 #include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
 #include "CAjaxResourceHandler.h"
+#include "CWebAppAuth.h"            // IPC code generation
 #include <cstdlib>
 
 namespace
@@ -130,6 +131,11 @@ void CWebApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
 
     const CefString processType = command_line->GetSwitchValue("type");
     ConfigureCommandLineSwitches(command_line, processType);
+    
+    // Attach IPC validation code for render processes
+    // This runs in browser process context where g_pCore and webCore are valid
+    // The auth code is generated in CWebCore constructor and passed to subprocesses
+    WebAppAuth::AttachAuthCodeToCommandLine(command_line);
 }
 
 CefRefPtr<CefBrowserProcessHandler> CWebApp::GetBrowserProcessHandler()

@@ -68,6 +68,7 @@ typedef int(__cdecl* RpMaterialDestroy_t)(RpMaterial* mat);
 typedef RwTexDictionary*(__cdecl* RwTexDictionarySetCurrent_t)(RwTexDictionary* dict);
 typedef const RwTexDictionary*(__cdecl* RwTexDictionaryForAllTextures_t)(const RwTexDictionary* dict, void* callback, void* data);
 typedef RwTexture*(__cdecl* RwTexDictionaryAddTexture_t)(RwTexDictionary* dict, RwTexture* texture);
+typedef RwTexture*(__cdecl* RwTexDictionaryRemoveTexture_t)(RwTexture* texture);
 typedef RwTexDictionary*(__cdecl* RwTexDictionaryGetCurrent_t)();
 typedef RwTexture*(__cdecl* RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
 typedef void(__cdecl* RpPrtStdGlobalDataSetStreamEmbedded_t)(void* value);
@@ -139,6 +140,7 @@ RWFUNC(RwTexDictionaryGetCurrent_t RwTexDictionaryGetCurrent, (RwTexDictionaryGe
 RWFUNC(RwTexDictionarySetCurrent_t RwTexDictionarySetCurrent, (RwTexDictionarySetCurrent_t)0xDEAD)
 RWFUNC(RwTexDictionaryForAllTextures_t RwTexDictionaryForAllTextures, (RwTexDictionaryForAllTextures_t)0xDEAD)
 RWFUNC(RwTexDictionaryAddTexture_t RwTexDictionaryAddTexture, (RwTexDictionaryAddTexture_t)0xDEAD)
+RWFUNC(RwTexDictionaryRemoveTexture_t RwTexDictionaryRemoveTexture, (RwTexDictionaryRemoveTexture_t)0xDEAD)
 RWFUNC(RwTexDictionaryStreamWrite_t RwTexDictionaryStreamWrite, (RwTexDictionaryStreamWrite_t)0xDEAD)
 RWFUNC(rwD3D9NativeTextureRead_t rwD3D9NativeTextureRead, (rwD3D9NativeTextureRead_t)0xDEAD)
 RWFUNC(RpPrtStdGlobalDataSetStreamEmbedded_t RpPrtStdGlobalDataSetStreamEmbedded, (RpPrtStdGlobalDataSetStreamEmbedded_t)0xDEAD)
