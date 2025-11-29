@@ -86,6 +86,12 @@ enum eDxTestMode
     DX_TEST_MODE_NO_SHADER,
 };
 
+struct BasicGPUInfo
+{
+    std::string     name;
+    std::uint32_t   memoryKB;
+};
+
 struct SDxStatus
 {
     eDxTestMode testMode;
@@ -189,6 +195,7 @@ public:
     virtual void     FlushNonAARenderTarget() = 0;
     virtual HRESULT  HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface,
                                        CONST RECT* pDestRect, int Filter) = 0;
+    virtual void    GetBasicGPUInfo(BasicGPUInfo& outInfo) = 0;
 };
 
 ////////////////////////////////////////////////////////////////
