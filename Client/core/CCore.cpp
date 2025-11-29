@@ -680,6 +680,7 @@ void CCore::ApplyGameSettings()
     CVARS_GET("dynamic_ped_shadows", bVal);
     pGameSettings->SetDynamicPedShadowsEnabled(bVal);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
+    pController->SetVerticalAimSensitivitySameAsHorizontal(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
     pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
