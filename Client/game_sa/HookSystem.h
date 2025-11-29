@@ -52,6 +52,7 @@ void* FunctionPointerToVoidP(T func)
 BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
 
 void HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction);
+void HookInstallVTBLCall(void* vtblMethodAddress, std::uintptr_t hookFunction);
 
 template <typename T>
 bool HookInstall(DWORD dwInstallAddress, T dwHookHandler, int iJmpCodeSize = 5)

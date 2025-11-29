@@ -218,6 +218,17 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
+    void InsertModelUsingThisIFP(std::uint32_t modelId) { m_modelsUsingThisIFP.insert(modelId); }
+    void RemoveModelUsingThisIFP(std::uint32_t modelId) { m_modelsUsingThisIFP.erase(modelId); }
+
+    void InsertEntityUsingThisIFP(CClientEntity* entity) { m_entitiesUsingThisIFP.push_back(entity); }
+    void RemoveEntityUsingThisIFP(CClientEntity* entity)
+    {
+        auto it = std::find(m_entitiesUsingThisIFP.begin(), m_entitiesUsingThisIFP.end(), entity);
+        if (it != m_entitiesUsingThisIFP.end())
+            m_entitiesUsingThisIFP.erase(it);
+    }
+
 private:
     bool ReadIFPByVersion();
     void ReadIFPVersion1();
@@ -278,6 +289,9 @@ private:
     bool                            m_bVersion1;
     bool                            m_bUnloading;
     CAnimManager*                   m_pAnimManager;
+
+    std::unordered_set<std::uint32_t> m_modelsUsingThisIFP{};
+    std::vector<CClientEntity*>       m_entitiesUsingThisIFP{};
 
     // 32 because there are 32 bones in a ped model
     const unsigned short m_kcIFPSequences = 32;
