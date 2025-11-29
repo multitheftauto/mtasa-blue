@@ -63,13 +63,8 @@ CWebsiteRequests::CWebsiteRequests()
 
 CWebsiteRequests::~CWebsiteRequests()
 {
-    delete m_pLabel1;
-    delete m_pLabel2;
-    delete m_pAddressMemo;
-    delete m_pCheckRemember;
-    delete m_pButtonAllow;
-    delete m_pButtonDeny;
-    delete m_pWindow;
+    if (m_pWindow)
+        g_pCore->GetGUI()->DestroyElementRecursive(m_pWindow);
 }
 
 void CWebsiteRequests::Show()
@@ -126,8 +121,11 @@ void CWebsiteRequests::Callback(bool bAllow, const std::unordered_set<SString>& 
 bool CWebsiteRequests::OnAllowButtonClick(CGUIElement* pElement)
 {
     Hide();
-    const auto pWebCore = g_pCore->GetWebCore();
-    const auto requests = pWebCore ? pWebCore->AllowPendingPages(m_pCheckRemember->GetSelected()) : std::unordered_set<SString>();
+    std::unordered_set<SString> requests;
+    if (auto pWebCore = g_pCore->GetWebCore(); pWebCore)
+    {
+        requests = pWebCore->AllowPendingPages(m_pCheckRemember->GetSelected());
+    }
     Callback(true, requests);
 
     return true;
@@ -136,8 +134,11 @@ bool CWebsiteRequests::OnAllowButtonClick(CGUIElement* pElement)
 bool CWebsiteRequests::OnDenyButtonClick(CGUIElement* pElement)
 {
     Hide();
-    const auto pWebCore = g_pCore->GetWebCore();
-    const auto requests = pWebCore ? pWebCore->DenyPendingPages() : std::unordered_set<SString>();
+    std::unordered_set<SString> requests;
+    if (auto pWebCore = g_pCore->GetWebCore(); pWebCore)
+    {
+        requests = pWebCore->DenyPendingPages();
+    }
     Callback(false, requests);
 
     return true;
