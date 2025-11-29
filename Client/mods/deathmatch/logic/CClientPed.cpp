@@ -6660,6 +6660,10 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
+    // Validate camper seat to avoid multiple occupants && desyncronization
+    if (vehicleModel == VehicleType::VT_CAMPER && uiSeat > 0 && pVehicle->GetOccupant(uiSeat))
+        return false;
+
     // Call the onClientVehicleStartEnter event for the ped
     // Check if it is cancelled before sending packet
     CLuaArguments Arguments;
