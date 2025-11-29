@@ -12,6 +12,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <array>
 #include <CMatrix.h>
 #include <core/CCoreInterface.h>
 #define RWFUNC_IMPLEMENT
@@ -737,6 +738,9 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
 
 void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
+    if (!pTex || !pTXD)
+        return;
+        
     if (pTex->txd != pTXD)
         return;
 
@@ -752,6 +756,17 @@ short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
 
 bool CRenderWareSA::RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
+    // Avoid crashes with freed/invalid textures and TXDs
+    if (!pTex || !pTXD)
+        return false;
+
+    // Prevent crash when texture/TXD has been freed but pointer still exists
+    if (!SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)))
+        return false;
+    
+    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(RwTexDictionary)))
+        return false;
+    
     return pTex->txd == pTXD;
 }
 
@@ -800,6 +815,62 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
     {
         CTxdStore_RemoveRef(usTxdId);
     }
+}
+
+namespace
+{
+    struct TextureMapping
+    {
+        const char* externalName;
+        const char* internalName;
+    };
+
+    constexpr std::array<TextureMapping, 2> kTextureMappings = {{
+        {"remap", "#emap"},
+        {"white", "@hite"}
+    }};
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetInternalTextureName
+//
+// Maps external texture names (e.g. "remap") to internal GTA:SA names (e.g. "#emap")
+// Returns original name if no mapping exists
+//
+////////////////////////////////////////////////////////////////
+const char* CRenderWareSA::GetInternalTextureName(const char* szExternalName)
+{
+    if (!szExternalName)
+        return nullptr;
+
+    for (const auto& mapping : kTextureMappings)
+    {
+        if (_stricmp(szExternalName, mapping.externalName) == 0)
+            return mapping.internalName;
+    }
+    return szExternalName;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetExternalTextureName
+//
+// Maps internal GTA:SA names (e.g. "#emap") to external texture names (e.g. "remap")
+// Returns original name if no mapping exists
+//
+////////////////////////////////////////////////////////////////
+const char* CRenderWareSA::GetExternalTextureName(const char* szInternalName)
+{
+    if (!szInternalName)
+        return nullptr;
+
+    for (const auto& mapping : kTextureMappings)
+    {
+        if (_stricmp(szInternalName, mapping.internalName) == 0)
+            return mapping.externalName;
+    }
+    return szInternalName;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -875,9 +946,13 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
     std::vector<RwTexture*> textureList;
     GetTxdTextures(textureList, pTXD);
 
-    for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
+    for (RwTexture* pTexture : textureList)
     {
-        outNameList.push_back((*iter)->name);
+        // Fix for #emap corruption:
+        // Some textures (like 'remap') are internally renamed to start with '#' (e.g. '#emap') by SA.
+        // This causes issues when scripts try to access them by their original name.
+        // We detect this case and return the expected name 'remap' instead.
+        outNameList.push_back(GetExternalTextureName(pTexture->name));
     }
 
     if (bLoadedModel)
@@ -937,7 +1012,8 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
 
     for (RwTexture* pTexture : rwTextureList)
     {
-        SString strTextureName = pTexture->name;
+        SString strTextureName = GetExternalTextureName(pTexture->name);
+
         bool    bValidTexture = false;
 
         if (bExcludeTextures)
@@ -1037,6 +1113,9 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTe
                  SString("Texture list already contains %zu textures (limit: %zu)", outTextureList.size(), kMaxReasonableTextures), 5422);
         return;
     }
+
+    if (outTextureList.empty())
+        outTextureList.reserve(16);
 
     RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
 }

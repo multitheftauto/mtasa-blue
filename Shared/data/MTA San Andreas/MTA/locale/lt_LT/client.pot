@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-12 00:53+0000\n"
-"PO-Revision-Date: 2025-10-12 02:01\n"
+"POT-Creation-Date: 2025-11-23 01:11+0000\n"
+"PO-Revision-Date: 2025-11-23 01:30\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -35,11 +35,11 @@ msgstr "Atsiprašome, žaidimas nerastas.\n"
 "Paleiskite Grand Theft Auto: San Andreas ir spustelėkite „Bandyti dar kartą“.\n"
 "Įsitikinkite, kad žaidimas įdiegtas aplanke „Program Files (x86)“."
 
-#: Client/loader/Utils.cpp:597
+#: Client/loader/Utils.cpp:606
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Pasirinkite savo Grand Theft Auto: San Andreas įdiegimo aplanką"
 
-#: Client/loader/Utils.cpp:965 Client/loader/CInstallManager.cpp:369
+#: Client/loader/Utils.cpp:974 Client/loader/CInstallManager.cpp:369
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -48,94 +48,94 @@ msgstr "MTA:SA reikalauja Administratoriaus teisių, kad galėtų:\n\n"
 "'%s'\n\n"
 "Prašome suteikti teises sekančiame žingsnyje."
 
-#: Client/loader/Utils.cpp:1066
+#: Client/loader/Utils.cpp:1075
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Klaida įkeliant %s modulį! (%s)"
 
-#: Client/loader/Utils.cpp:1391 Client/loader/Dialogs.cpp:1054
+#: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
 msgstr "Kopijuojamos bylos..."
 
-#: Client/loader/Utils.cpp:1451 Client/loader/Dialogs.cpp:1059
+#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
 msgstr "Kopijavimas baigtas anksti. Viskas pavyko."
 
-#: Client/loader/Utils.cpp:1457 Client/loader/Dialogs.cpp:1064
+#: Client/loader/Utils.cpp:1466 Client/loader/Dialogs.cpp:1058
 msgid "Finishing..."
 msgstr "Baigiama..."
 
-#: Client/loader/Utils.cpp:1459 Client/loader/Dialogs.cpp:1068
+#: Client/loader/Utils.cpp:1468 Client/loader/Dialogs.cpp:1062
 msgid "Done!"
 msgstr "Baigta!"
 
-#: Client/loader/Utils.cpp:1499
+#: Client/loader/Utils.cpp:1508
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Tai pirmas %s paleidimas.\n\n"
 "Ar norite nukopijuoti nustatymus iš %s ?"
 
-#: Client/loader/Utils.cpp:1538
+#: Client/loader/Utils.cpp:1547
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA nepavyko atidaryti failo '%s'"
 
-#: Client/loader/Utils.cpp:1560
+#: Client/loader/Utils.cpp:1569
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "Trūksta GTA:SA failo '%s'.  "
 
-#: Client/loader/Utils.cpp:1585
+#: Client/loader/Utils.cpp:1594
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA nepavyko įkelti modelio."
 
-#: Client/loader/Utils.cpp:1587
+#: Client/loader/Utils.cpp:1596
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Jei neseniai keitėte gta3.img, tada pabandykite perrašyti GTA:SA."
 
-#: Client/loader/Utils.cpp:1612
+#: Client/loader/Utils.cpp:1621
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA nepavyko pridėti patobulinimo mašinai."
 
-#: Client/loader/Utils.cpp:1631
+#: Client/loader/Utils.cpp:1640
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA surado klaidų faile '%s'"
 
-#: Client/loader/Utils.cpp:1713
+#: Client/loader/Utils.cpp:1722
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Ar jūsų kompiuteris persikrovė bežaidžiant MTA:SA?"
 
-#: Client/loader/Utils.cpp:1778
+#: Client/loader/Utils.cpp:1787
 msgid "Please terminate the following programs before continuing:"
 msgstr "Prašome išjungti sekančias programas prieš tęsdami darbą:"
 
-#: Client/loader/MainFunctions.cpp:64
+#: Client/loader/MainFunctions.cpp:141
 msgid "Invalid module path detected.\n"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:91
+#: Client/loader/MainFunctions.cpp:168
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Neteisingos failo versijos klaida. Perrašykite MTA:SA, jei patirsite nesklandumų.\n"
 
-#: Client/loader/MainFunctions.cpp:99
+#: Client/loader/MainFunctions.cpp:176
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Trūksta kai kurių failų. Perrašykite MTA:SA, jei patirsite nesklandumų.\n"
 
-#: Client/loader/MainFunctions.cpp:110
+#: Client/loader/MainFunctions.cpp:187
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA yra nepalaikomas su Windows 'Safe Mode'.\n\n"
 "Perkraukite savo PC.\n"
 
-#: Client/loader/MainFunctions.cpp:289
+#: Client/loader/MainFunctions.cpp:366
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "Ar jūs turite problemų paleidžiant MTA:SA?.\n\n"
 "Norite sugražinti ankstesnę versiją?"
 
-#: Client/loader/MainFunctions.cpp:317
+#: Client/loader/MainFunctions.cpp:394
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -143,48 +143,48 @@ msgstr "Atrtodo, jog yra problemų paleidžiant MTA:SA.\n"
 "Sugražinant numatytuosius GTA nustatymus kartais padeda sutvarkyti šią problemą.\n\n"
 "Ar norite sugražinti GTA nustatymus dabar?"
 
-#: Client/loader/MainFunctions.cpp:332
+#: Client/loader/MainFunctions.cpp:409
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "GTA nustatymai sugražinti.\n\n"
 "Spauskite Gerai."
 
-#: Client/loader/MainFunctions.cpp:337
+#: Client/loader/MainFunctions.cpp:414
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "Neišėjo ištrinti bylos: '%s'"
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:345
+#: Client/loader/MainFunctions.cpp:422
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "Ar turite problemų paleidžiant MTA:SA?.\n\n"
 "Norėtumėt pamatyti šiek tiek pagalbos tinkle?"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:382
+#: Client/loader/MainFunctions.cpp:459
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "Turite problemų dėl MTA:SA paleidimo?.\n\n"
 "Norite pakeisti šiuos nustatymus?"
 
-#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:1156
-#: Client/core/CSettings.cpp:1654
+#: Client/loader/MainFunctions.cpp:460 Client/core/CSettings.cpp:1161
+#: Client/core/CSettings.cpp:1660
 msgid "Fullscreen mode:"
 msgstr "Pilno ekrano režimas:"
 
-#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:1166
-#: Client/core/CSettings.cpp:2316
+#: Client/loader/MainFunctions.cpp:460 Client/core/CSettings.cpp:1171
+#: Client/core/CSettings.cpp:2323
 msgid "Borderless window"
 msgstr "Langas be kraštų"
 
-#: Client/loader/MainFunctions.cpp:454
+#: Client/loader/MainFunctions.cpp:531
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "Turite problemų dėl MTA:SA paleidimo?.\n\n"
 "Pabandykite išjungti šiuos produktus žaidimui GTA ir MTA:"
 
-#: Client/loader/MainFunctions.cpp:487
+#: Client/loader/MainFunctions.cpp:564
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -192,28 +192,28 @@ msgstr "ĮSPĖJIMAS\n\n"
 "MTA:SA aptiko neįprastą veiklą.\n"
 "Prašome paleisti virusų skenavimo programą, kad įsitikintumėte sistemos saugumu.\n\n"
 
-#: Client/loader/MainFunctions.cpp:490
+#: Client/loader/MainFunctions.cpp:567
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "Aptiktas failas buvo: %s\n"
 
-#: Client/loader/MainFunctions.cpp:636
+#: Client/loader/MainFunctions.cpp:713
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "GTA: San Andreas jau yra paleistas. Šį procesą reikia sunaikinti prieš paleidžiant MTA:SA. Ar norite tai padaryti dabar?"
 
-#: Client/loader/MainFunctions.cpp:637 Client/loader/MainFunctions.cpp:644
-#: Client/loader/MainFunctions.cpp:1543
+#: Client/loader/MainFunctions.cpp:714 Client/loader/MainFunctions.cpp:721
+#: Client/loader/MainFunctions.cpp:1630
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1648
-#: Client/game_sa/CGameSA.cpp:269
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1708
+#: Client/game_sa/CGameSA.cpp:270
 msgid "Information"
 msgstr "Informacija"
 
-#: Client/loader/MainFunctions.cpp:643
+#: Client/loader/MainFunctions.cpp:720
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "Neįmanoma sunaikinti GTA: San Andreas proceso. Jei problema kartosis, prašome perkrauti savo kompiuterį."
 
-#: Client/loader/MainFunctions.cpp:772
+#: Client/loader/MainFunctions.cpp:849
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -227,118 +227,118 @@ msgstr "Problema paleidžiant MTA:SA\n\n"
 #. Show failed message and abort the attempt
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
-#: Client/loader/MainFunctions.cpp:777 Client/loader/MainFunctions.cpp:798
-#: Client/loader/MainFunctions.cpp:802 Client/loader/MainFunctions.cpp:1213
+#: Client/loader/MainFunctions.cpp:854 Client/loader/MainFunctions.cpp:875
+#: Client/loader/MainFunctions.cpp:879 Client/loader/MainFunctions.cpp:1290
 #: Client/loader/CInstallManager.cpp:586 Client/loader/CInstallManager.cpp:595
 #: Client/core/CConnectManager.cpp:86 Client/core/CConnectManager.cpp:117
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
 #: Client/core/CConnectManager.cpp:329 Client/core/CConnectManager.cpp:415
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
-#: Client/core/CSettings.cpp:3816 Client/core/CSettings.cpp:5181
-#: Client/core/CSettings.cpp:5209 Client/core/CSettings.cpp:5921
-#: Client/core/CCore.cpp:1315 Client/core/CGUI.cpp:94
+#: Client/core/CSettings.cpp:3825 Client/core/CSettings.cpp:5201
+#: Client/core/CSettings.cpp:5229 Client/core/CSettings.cpp:5947
+#: Client/core/CCore.cpp:1352 Client/core/CGUI.cpp:94
 #: Client/core/DXHook/CDirect3DHook9.cpp:128
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1544
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1566
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1625
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
-#: Client/game_sa/CGameSA.cpp:262 Client/game_sa/CGameSA.cpp:273
-#: Client/mods/deathmatch/logic/CClientGame.cpp:656
-#: Client/mods/deathmatch/logic/CClientGame.cpp:724
-#: Client/mods/deathmatch/logic/CClientGame.cpp:748
-#: Client/mods/deathmatch/logic/CClientGame.cpp:770
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1182
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1341
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1427
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1439
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1601
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1623
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1682
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1758
+#: Client/game_sa/CGameSA.cpp:263 Client/game_sa/CGameSA.cpp:274
+#: Client/mods/deathmatch/logic/CClientGame.cpp:658
+#: Client/mods/deathmatch/logic/CClientGame.cpp:726
+#: Client/mods/deathmatch/logic/CClientGame.cpp:750
+#: Client/mods/deathmatch/logic/CClientGame.cpp:772
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1429
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:247
+#: Shared/sdk/SharedUtil.Misc.hpp:380
 msgid "Error"
 msgstr "Klaida"
 
-#: Client/loader/MainFunctions.cpp:796
+#: Client/loader/MainFunctions.cpp:873
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "MTA jau yra paleistas.\n\n"
 "Jei problema kartosis, prašome perkrauti savo kompiuterį"
 
-#: Client/loader/MainFunctions.cpp:800
+#: Client/loader/MainFunctions.cpp:877
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "MTA jau yra paleistas.\n\n"
 "Ar norite sunaikinti šį procesą?"
 
-#: Client/loader/MainFunctions.cpp:837
+#: Client/loader/MainFunctions.cpp:914
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "Trūksta reikalingų įvesčių registre. Prašome įdiegti Multi Theft Auto: San Andreas iš naujo."
 
-#: Client/loader/MainFunctions.cpp:843
+#: Client/loader/MainFunctions.cpp:920
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "Nurodyta vieta iki GTA: San Andreas susideda iš nepalaikomų simbolių. Prašome patraukti savo Grand Theft Auto: San Andreas įdiegimo aplanką į palaikomą vietą, kuri susideda tik iš standartinių ASCII simbolių ir įdiekite Multi Theft Auto: San Andreas iš naujo."
 
-#: Client/loader/MainFunctions.cpp:856
+#: Client/loader/MainFunctions.cpp:933
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1039
+#: Client/loader/MainFunctions.cpp:1116
 msgid "Invalid installation paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1170
+#: Client/loader/MainFunctions.cpp:1247
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Įkėlimas nepavyko. Prašome įsitikinti, jog paskutinės data bylos buvo įdiegtos teisingai."
 
-#: Client/loader/MainFunctions.cpp:1179
+#: Client/loader/MainFunctions.cpp:1256
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Įkėlimas nepavyko. Prašome įsitikinti, kad %s yra įdiegtas teisingai."
 
-#: Client/loader/MainFunctions.cpp:1188
+#: Client/loader/MainFunctions.cpp:1265
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Įkėlimas nepavyko. Nerastas gta_sa.exe nurodytoje vietoje %s."
 
-#: Client/loader/MainFunctions.cpp:1202
+#: Client/loader/MainFunctions.cpp:1279
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Įkėlimas nepavyko. %s egzistuoja GTA direktorijoje. Prašome ištrinti prieš tęsiant."
 
-#: Client/loader/MainFunctions.cpp:1212
+#: Client/loader/MainFunctions.cpp:1289
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Pagrindinis failas yra blogai užvadintas (%s)"
 
-#: Client/loader/MainFunctions.cpp:1259
+#: Client/loader/MainFunctions.cpp:1336
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1267
+#: Client/loader/MainFunctions.cpp:1344
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1291
+#: Client/loader/MainFunctions.cpp:1368
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1446
+#: Client/loader/MainFunctions.cpp:1523
 msgid "Invalid game paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1454
+#: Client/loader/MainFunctions.cpp:1531
 msgid "Fix configuration issue"
 msgstr "Sutaisyti konfigūracijos problemas"
 
-#: Client/loader/MainFunctions.cpp:1543
+#: Client/loader/MainFunctions.cpp:1630
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr ""
 
@@ -366,11 +366,11 @@ msgstr "Jūsų diegimas gali būti sugadintas.\n\n"
 "Turėtumėte iš naujo įdiegti „Multi Theft Auto“ iš www.multitheftauto.com\n"
 "arba pabandyti paleisti naujinimą su administratoriaus teisėmis."
 
-#: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1041
+#: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1035
 msgid "Installing update..."
 msgstr "Įrašomas atnaujinimas..."
 
-#: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1049
+#: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1043
 msgid "Extracting files..."
 msgstr "Išskleidžiami failai..."
 
@@ -452,7 +452,7 @@ msgstr "Sutvarkyti GTA:SA"
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr "MTA:SA negalima paleisti, nes nepavyko pataisyti GTA:SA:"
 
-#: Client/loader/CInstallManager.cpp:1091 Client/core/CCore.cpp:836
+#: Client/loader/CInstallManager.cpp:1091 Client/core/CCore.cpp:837
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA negali tęsti darbo, nes diske %s nepakanka laisvos vietos."
@@ -481,24 +481,24 @@ msgstr "Atnaujinti suderinamumo nustatymus"
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/loader/Dialogs.cpp:63 Client/core/CVersionUpdater.cpp:1635
 #: Client/core/CVersionUpdater.cpp:1653 Client/core/CVersionUpdater.cpp:1922
-#: Client/core/CVersionUpdater.cpp:1941 Client/core/CSettings.cpp:2088
-#: Client/core/CSettings.cpp:2112 Client/core/CSettings.cpp:5596
-#: Client/core/CSettings.cpp:5670 Client/core/CSettings.cpp:5700
-#: Client/core/CSettings.cpp:5749 Client/core/CSettings.cpp:5811
+#: Client/core/CVersionUpdater.cpp:1941 Client/core/CSettings.cpp:2095
+#: Client/core/CSettings.cpp:2119 Client/core/CSettings.cpp:5616
+#: Client/core/CSettings.cpp:5690 Client/core/CSettings.cpp:5720
+#: Client/core/CSettings.cpp:5769 Client/core/CSettings.cpp:5831
 #: Client/core/CMainMenu.cpp:1238 Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:481
+#: Client/core/ServerBrowser/CServerInfo.cpp:565
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
 msgstr "Taip"
 
 #: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
 #: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
-#: Client/core/CVersionUpdater.cpp:1940 Client/core/CSettings.cpp:2087
-#: Client/core/CSettings.cpp:2111 Client/core/CSettings.cpp:5595
-#: Client/core/CSettings.cpp:5669 Client/core/CSettings.cpp:5699
-#: Client/core/CSettings.cpp:5748 Client/core/CSettings.cpp:5810
+#: Client/core/CVersionUpdater.cpp:1940 Client/core/CSettings.cpp:2094
+#: Client/core/CSettings.cpp:2118 Client/core/CSettings.cpp:5615
+#: Client/core/CSettings.cpp:5689 Client/core/CSettings.cpp:5719
+#: Client/core/CSettings.cpp:5768 Client/core/CSettings.cpp:5830
 #: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
-#: Client/core/ServerBrowser/CServerInfo.cpp:481
+#: Client/core/ServerBrowser/CServerInfo.cpp:565
 msgid "No"
 msgstr "Ne"
 
@@ -509,8 +509,8 @@ msgstr "Ne"
 #: Client/core/CVersionUpdater.cpp:2001 Client/core/CVersionUpdater.cpp:2019
 #: Client/core/CVersionUpdater.cpp:2031 Client/core/CVersionUpdater.cpp:2183
 #: Client/core/CVersionUpdater.cpp:2192 Client/core/CVersionUpdater.cpp:2201
-#: Client/core/CVersionUpdater.cpp:2215 Client/core/CSettings.cpp:560
-#: Client/core/CSettings.cpp:5942 Client/core/CMainMenu.cpp:1258
+#: Client/core/CVersionUpdater.cpp:2215 Client/core/CSettings.cpp:561
+#: Client/core/CSettings.cpp:5968 Client/core/CMainMenu.cpp:1258
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
 msgstr "Gerai"
@@ -520,14 +520,14 @@ msgid "Quit"
 msgstr "Išeiti"
 
 #: Client/loader/Dialogs.cpp:67
-#: Client/core/ServerBrowser/CServerBrowser.cpp:690
+#: Client/core/ServerBrowser/CServerBrowser.cpp:717
 msgid "Help"
 msgstr "Pagalba"
 
 #. Cancel button
 #: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
 #: Client/core/CVersionUpdater.cpp:1869 Client/core/CVersionUpdater.cpp:1904
-#: Client/core/CSettings.cpp:565 Client/core/CSettings.cpp:5941
+#: Client/core/CSettings.cpp:566 Client/core/CSettings.cpp:5967
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
@@ -657,21 +657,21 @@ msgid "I will not install an anti-virus.\n"
 msgstr "Aš neįsirašinėsiu anti-virsinės sistemos.\n"
 "Noriu, kad mano kompiuteris striginėtų ir būtų valdomas hakerių."
 
-#: Client/loader/Dialogs.cpp:673
+#: Client/loader/Dialogs.cpp:667
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
 "Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
 "Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:679
+#: Client/loader/Dialogs.cpp:673
 msgid "MTA: San Andreas - Out of Memory Information"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:1030
+#: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Ieškoma Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:1033
+#: Client/loader/Dialogs.cpp:1027
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Prašome paleisti Grand Theft Auto San Andreas"
 
@@ -701,47 +701,47 @@ msgstr "Jungiamasi iš naujo prie %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
-#: Client/mods/deathmatch/logic/CClientGame.cpp:672
+#: Client/mods/deathmatch/logic/CClientGame.cpp:674
 msgid "CONNECTING"
 msgstr "JUNGIAMASI"
 
 #: Client/core/CConnectManager.cpp:271
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1341
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
 msgid "Connection timed out"
 msgstr "Baigėsi prisijungimui skirtas laikas"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1391
 msgid "Disconnected: unknown protocol error"
 msgstr "Atjungta: nežinoma protokolo klaida"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1395
 msgid "Disconnected: disconnected remotely"
 msgstr "Atjungta: buvote atjungtas nuotoliniu būdu"
 
 #: Client/core/CConnectManager.cpp:297
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1399
 msgid "Disconnected: connection lost remotely"
 msgstr "Atsijungta: Nutrūko ryšys su nuotoliu"
 
 #: Client/core/CConnectManager.cpp:301
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1403
 msgid "Disconnected: you are banned from this server"
 msgstr "Atjungta: jūsų prisijungimas yra užblokuotas šiame serveryje"
 
 #: Client/core/CConnectManager.cpp:308
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1411
 msgid "Disconnected: disconnected from the server"
 msgstr "Atsijungta: atsijungta nuo serverio "
 
 #: Client/core/CConnectManager.cpp:312
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1415
 msgid "Disconnected: connection to the server was lost"
 msgstr "Atsijungta: ryšys su serveriu buvo prarastas"
 
 #: Client/core/CConnectManager.cpp:319
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1421
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1423
 msgid "Disconnected: connection was refused"
 msgstr "Atjungta: prisijungimas buvo atmestas"
 
@@ -879,7 +879,7 @@ msgstr "ATSISIUNTIMAS BAIGTAS"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr "- Nežinoma problema ties _DialogUpdateResult"
 
-#: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5697
+#: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5717
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "PAKEISTOS GTA:SA BYLOS"
 
@@ -977,843 +977,847 @@ msgid "* Your serial is: %s"
 msgstr "Jūsų serijinis numeris yra: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
-#: Client/core/CSettings.cpp:502
+#: Client/core/CSettings.cpp:503
 msgid "SETTINGS"
 msgstr "NUSTATYMAI"
 
-#: Client/core/CSettings.cpp:548
+#: Client/core/CSettings.cpp:549
 msgid "Multiplayer"
 msgstr "Pagrindinis"
 
-#: Client/core/CSettings.cpp:549
+#: Client/core/CSettings.cpp:550
 msgid "Video"
 msgstr "Vaizdas"
 
-#: Client/core/CSettings.cpp:550
+#: Client/core/CSettings.cpp:551
 msgid "PostFX"
 msgstr ""
 
-#: Client/core/CSettings.cpp:551
+#: Client/core/CSettings.cpp:552
 msgid "Audio"
 msgstr "Garsas"
 
-#: Client/core/CSettings.cpp:552
+#: Client/core/CSettings.cpp:553
 msgid "Binds"
 msgstr "Mygtukų priskirimai"
 
-#: Client/core/CSettings.cpp:553
+#: Client/core/CSettings.cpp:554
 msgid "Controls"
 msgstr "Valdikliai"
 
-#: Client/core/CSettings.cpp:554
+#: Client/core/CSettings.cpp:555
 msgid "Interface"
 msgstr "Sąsaja"
 
-#: Client/core/CSettings.cpp:555
+#: Client/core/CSettings.cpp:556
 msgid "Web Browser"
 msgstr "Interneto Naršyklė"
 
-#: Client/core/CSettings.cpp:556
+#: Client/core/CSettings.cpp:557
 msgid "Advanced"
 msgstr "Išsamiau"
 
-#: Client/core/CSettings.cpp:581 Client/core/CSettings.cpp:785
-#: Client/core/CSettings.cpp:1114 Client/core/CSettings.cpp:1410
+#: Client/core/CSettings.cpp:582 Client/core/CSettings.cpp:790
+#: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
 msgid "Load defaults"
 msgstr "Įkelti numatytuosius"
 
 #. *
 #. *  Controls tab
 #. *
-#: Client/core/CSettings.cpp:598 Client/core/CSettings.cpp:622
+#: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:623
 msgid "Mouse sensitivity:"
 msgstr "Pelės jautrumas:"
 
 #. VerticalAimSensitivity
-#: Client/core/CSettings.cpp:598 Client/core/CSettings.cpp:643
+#: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:644
 msgid "Vertical aim sensitivity:"
 msgstr "Vertikalaus nusitaikymo jautrumas:"
 
 #. Mouse Options
-#: Client/core/CSettings.cpp:601
+#: Client/core/CSettings.cpp:602
 msgid "Mouse options"
 msgstr "Pelės nustatymai"
 
-#: Client/core/CSettings.cpp:608
+#: Client/core/CSettings.cpp:609
 msgid "Invert mouse vertically"
 msgstr "Sukeisti pelės vertikalią ašį"
 
-#: Client/core/CSettings.cpp:612
+#: Client/core/CSettings.cpp:613
 msgid "Steer with mouse"
 msgstr "Vairavimas su pele"
 
-#: Client/core/CSettings.cpp:616
+#: Client/core/CSettings.cpp:617
 msgid "Fly with mouse"
 msgstr "Skraidymas su pele"
 
+#: Client/core/CSettings.cpp:663
+msgid "Use mouse sensitivity for aiming"
+msgstr ""
+
 #. Joypad options
-#: Client/core/CSettings.cpp:664
+#: Client/core/CSettings.cpp:669
 msgid "Joypad options"
 msgstr "Valdymo pulto nustatymai"
 
-#: Client/core/CSettings.cpp:677
+#: Client/core/CSettings.cpp:682
 msgid "Standard controls (Mouse + Keyboard)"
 msgstr "Standartinis valdymas (Pelė + Klaviatūra)"
 
-#: Client/core/CSettings.cpp:684
+#: Client/core/CSettings.cpp:689
 msgid "Classic controls (Joypad)"
 msgstr "Klasikinis valdymas (Valdymo pultas)"
 
-#: Client/core/CSettings.cpp:721
+#: Client/core/CSettings.cpp:726
 msgid "Dead Zone"
 msgstr "Negyvoji Zona"
 
-#: Client/core/CSettings.cpp:726
+#: Client/core/CSettings.cpp:731
 msgid "Saturation"
 msgstr "Sodrumas"
 
-#: Client/core/CSettings.cpp:732
+#: Client/core/CSettings.cpp:737
 msgid "Use the 'Binds' tab for joypad buttons."
 msgstr "Pasirinkite 'Mygtukų priskirimai' valdymo pulto mygtukams."
 
-#: Client/core/CSettings.cpp:771
+#: Client/core/CSettings.cpp:776
 msgid "Left Stick"
 msgstr "Kairioji valdymo pulto svirtis"
 
-#: Client/core/CSettings.cpp:777
+#: Client/core/CSettings.cpp:782
 msgid "Right Stick"
 msgstr "Dešinioji valdymo pulto svirtis"
 
-#: Client/core/CSettings.cpp:792
+#: Client/core/CSettings.cpp:797
 msgid "DESCRIPTION"
 msgstr "APIBŪDINIMAS"
 
-#: Client/core/CSettings.cpp:793
+#: Client/core/CSettings.cpp:798
 msgid "KEY"
 msgstr "MYGTUKAS"
 
-#: Client/core/CSettings.cpp:795
+#: Client/core/CSettings.cpp:800
 msgid "ALT. KEY"
 msgstr "ALT. MYGTUKAS"
 
 #. *
 #. *    Multiplayer tab
 #. *
-#: Client/core/CSettings.cpp:800 Client/core/CSettings.cpp:803
+#: Client/core/CSettings.cpp:805 Client/core/CSettings.cpp:808
 msgid "Nick:"
 msgstr "Slapyvardis:"
 
-#: Client/core/CSettings.cpp:825
+#: Client/core/CSettings.cpp:830
 msgid "Save server passwords"
 msgstr "Išsaugoti serverių slaptažodžius"
 
-#: Client/core/CSettings.cpp:830
+#: Client/core/CSettings.cpp:835
 msgid "Auto-refresh server browser"
 msgstr "Automatiškai naujinti serverių naršyklę"
 
-#: Client/core/CSettings.cpp:835
+#: Client/core/CSettings.cpp:840
 msgid "Allow screen upload"
 msgstr "Leisti siųsti ekrano turinį"
 
-#: Client/core/CSettings.cpp:840
+#: Client/core/CSettings.cpp:845
 msgid "Allow external sounds"
 msgstr "Leisti išorinius garsus"
 
-#: Client/core/CSettings.cpp:845
+#: Client/core/CSettings.cpp:850
 msgid "Always show download window"
 msgstr "Visada rodyti atsisiuntimo langą"
 
-#: Client/core/CSettings.cpp:850
+#: Client/core/CSettings.cpp:855
 msgid "Allow connecting with Discord Rich Presence"
 msgstr "Įjungti ryšį su Discord Rich Presence"
 
-#: Client/core/CSettings.cpp:855
+#: Client/core/CSettings.cpp:860
 msgid "Allow GTA:SA ingame status on Steam"
 msgstr "Įjungti GTA:SA žaidimo būsenos rodymą „Steam“ platformoje"
 
 #. Enable camera photos getting saved to documents folder
-#: Client/core/CSettings.cpp:861
+#: Client/core/CSettings.cpp:866
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
 msgstr "Išsaugoti nuotraukas, padarytas fotoaparatu, į GTA San Andreas naudotojo failų aplanką"
 
-#: Client/core/CSettings.cpp:866
+#: Client/core/CSettings.cpp:871
 msgid "Ask before disconnecting from server using main menu"
 msgstr "Paklausti patvirtinimo prieš atsijungiant nuo serverio per pagrindinį meniu"
 
-#: Client/core/CSettings.cpp:871
+#: Client/core/CSettings.cpp:876
 msgid "Use customized GTA:SA files"
 msgstr "Naudoti modifikuotas GTA:SA bylas"
 
-#: Client/core/CSettings.cpp:876
+#: Client/core/CSettings.cpp:881
 msgid "Map rendering options"
 msgstr "Žemėlapio atkūrimo parinktys"
 
-#: Client/core/CSettings.cpp:884
+#: Client/core/CSettings.cpp:889
 msgid "Opacity:"
 msgstr "Nepermatomumas:"
 
-#: Client/core/CSettings.cpp:907
+#: Client/core/CSettings.cpp:912
 msgid "Image resolution:"
 msgstr "Vaizdo raiška:"
 
-#: Client/core/CSettings.cpp:914
+#: Client/core/CSettings.cpp:919
 msgid "1024 x 1024 (Default)"
 msgstr "1024 x 1024 (Numatytoji)"
 
 #. index 0
-#: Client/core/CSettings.cpp:915
+#: Client/core/CSettings.cpp:920
 msgid "2048 x 2048"
 msgstr "2048 x 2048"
 
 #. *
 #. *  Audio tab
 #. *
-#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:930
+#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:935
 msgid "Master volume:"
 msgstr "Pagrindinis garsas:"
 
-#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:952
+#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:957
 msgid "Radio volume:"
 msgstr "Radijo garsumas:"
 
-#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:974
+#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:979
 msgid "SFX volume:"
 msgstr "Efektų garsumas:"
 
-#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:996
+#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:1001
 msgid "MTA volume:"
 msgstr "MTA garsai:"
 
-#: Client/core/CSettings.cpp:922 Client/core/CSettings.cpp:1018
+#: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1023
 msgid "Voice volume:"
 msgstr "Kalbančiųjų garsumas:"
 
-#: Client/core/CSettings.cpp:922 Client/core/CSettings.cpp:1062
+#: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1067
 msgid "Play mode:"
 msgstr "Grojimo režimas:"
 
-#: Client/core/CSettings.cpp:924 Client/core/CSettings.cpp:1542
-#: Client/core/CSettings.cpp:2893
+#: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1548
+#: Client/core/CSettings.cpp:2902
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 msgid "General"
 msgstr "Bendra"
 
-#: Client/core/CSettings.cpp:1040
+#: Client/core/CSettings.cpp:1045
 msgid "Radio options"
 msgstr "Radijos pasirinkimai"
 
-#: Client/core/CSettings.cpp:1046
+#: Client/core/CSettings.cpp:1051
 msgid "Radio Equalizer"
 msgstr "Radijo Glodintuvas"
 
-#: Client/core/CSettings.cpp:1051
+#: Client/core/CSettings.cpp:1056
 msgid "Radio Auto-tune"
 msgstr "Autom. radijo derinimas"
 
-#: Client/core/CSettings.cpp:1056
+#: Client/core/CSettings.cpp:1061
 msgid "Usertrack options"
 msgstr "Įkeltų dainų parinktys"
 
-#: Client/core/CSettings.cpp:1070 Client/core/CSettings.cpp:3974
+#: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:3987
 msgid "Radio"
 msgstr "Radijas"
 
-#: Client/core/CSettings.cpp:1071 Client/core/CSettings.cpp:3976
+#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:3989
 msgid "Random"
 msgstr "Atsitiktinis"
 
-#: Client/core/CSettings.cpp:1072 Client/core/CSettings.cpp:3978
+#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:3991
 msgid "Sequential"
 msgstr "Nuoseklus"
 
-#: Client/core/CSettings.cpp:1075
+#: Client/core/CSettings.cpp:1080
 msgid "Automatic Media Scan"
 msgstr "Automatinė medijos paieška"
 
-#: Client/core/CSettings.cpp:1082
+#: Client/core/CSettings.cpp:1087
 msgid "Mute options"
 msgstr "Nutildymo pasirinkimai"
 
-#: Client/core/CSettings.cpp:1088
+#: Client/core/CSettings.cpp:1093
 msgid "Mute All sounds when minimized"
 msgstr "Nutildyti visus garsus kol žaidimas nuleistas"
 
-#: Client/core/CSettings.cpp:1093
+#: Client/core/CSettings.cpp:1098
 msgid "Mute Radio sounds when minimized"
 msgstr "Nutildyti radijo garsus kol žaidimas nuleistas"
 
-#: Client/core/CSettings.cpp:1098
+#: Client/core/CSettings.cpp:1103
 msgid "Mute SFX sounds when minimized"
 msgstr "Nutildyti efektų garsus kol žaidimas nuleistas"
 
-#: Client/core/CSettings.cpp:1103
+#: Client/core/CSettings.cpp:1108
 msgid "Mute MTA sounds when minimized"
 msgstr "Nutildyti MTA garsus kol žaidimas nuleistas"
 
-#: Client/core/CSettings.cpp:1108
+#: Client/core/CSettings.cpp:1113
 msgid "Mute Voice sounds when minimized"
 msgstr "Nutildyti šnekančiųjų garsus kol žaidimas nuleistas"
 
 #. *
 #. *  Video tab
 #. *
-#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1130
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1135
 msgid "Resolution:"
 msgstr "Skiriamoji geba:"
 
-#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1185
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1190
 msgid "FOV:"
 msgstr "Matymo laukas:"
 
-#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1204
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1209
 msgid "Draw Distance:"
 msgstr "Matomumo distancija:"
 
-#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1225
-#: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1456
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1230
+#: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1461
 msgid "Brightness:"
 msgstr "Ryškumas:"
 
-#: Client/core/CSettings.cpp:1124 Client/core/CSettings.cpp:1246
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1251
 msgid "FX Quality:"
 msgstr "Efektų kokybė:"
 
-#: Client/core/CSettings.cpp:1125 Client/core/CSettings.cpp:1260
+#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1265
 msgid "Anisotropic filtering:"
 msgstr "Anisotropic filtravimas:"
 
-#: Client/core/CSettings.cpp:1125 Client/core/CSettings.cpp:1297
+#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1302
 msgid "Anti-aliasing:"
 msgstr "Aštrių kraštų glodinimo būdas:"
 
-#: Client/core/CSettings.cpp:1125 Client/core/CSettings.cpp:1311
+#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1316
 msgid "Aspect Ratio:"
 msgstr "Vaizdo santykis:"
 
-#: Client/core/CSettings.cpp:1142
+#: Client/core/CSettings.cpp:1147
 msgid "Windowed"
 msgstr "Paleisti lange"
 
-#: Client/core/CSettings.cpp:1148
+#: Client/core/CSettings.cpp:1153
 msgid "DPI aware"
 msgstr "Atsižvelgti į DPI"
 
-#: Client/core/CSettings.cpp:1165 Client/core/CSettings.cpp:2314
+#: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2321
 msgid "Standard"
 msgstr "Standartinis"
 
-#: Client/core/CSettings.cpp:1167 Client/core/CSettings.cpp:2318
+#: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2325
 msgid "Borderless keep res"
 msgstr "Be kraštų išlaikant rez."
 
-#: Client/core/CSettings.cpp:1170
+#: Client/core/CSettings.cpp:1175
 msgid "Mip Mapping"
 msgstr "Mip Mapping"
 
-#: Client/core/CSettings.cpp:1177
+#: Client/core/CSettings.cpp:1182
 msgid "V-Sync"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1254 Client/core/CSettings.cpp:2218
+#: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2225
 msgid "Low"
 msgstr "Žema"
 
-#: Client/core/CSettings.cpp:1255 Client/core/CSettings.cpp:2220
+#: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2227
 msgid "Medium"
 msgstr "Vidutinė"
 
-#: Client/core/CSettings.cpp:1256 Client/core/CSettings.cpp:1737
-#: Client/core/CSettings.cpp:2222 Client/core/CSettings.cpp:4032
+#: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1743
+#: Client/core/CSettings.cpp:2229 Client/core/CSettings.cpp:4045
 msgid "High"
 msgstr "Aukšta"
 
-#: Client/core/CSettings.cpp:1257 Client/core/CSettings.cpp:2224
+#: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2231
 msgid "Very high"
 msgstr "Labai aukšta"
 
-#: Client/core/CSettings.cpp:1274 Client/core/CSettings.cpp:1277
-#: Client/core/CSettings.cpp:1305 Client/core/CSettings.cpp:1668
-#: Client/core/CSettings.cpp:1722 Client/core/CSettings.cpp:1871
-#: Client/core/CSettings.cpp:2228 Client/core/CSettings.cpp:4039
-#: Client/core/CSettings.cpp:4071 Client/core/CSettings.cpp:4117
-#: Client/core/CSettings.cpp:5341
+#: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
+#: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1674
+#: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:1877
+#: Client/core/CSettings.cpp:2235 Client/core/CSettings.cpp:4052
+#: Client/core/CSettings.cpp:4084 Client/core/CSettings.cpp:4130
+#: Client/core/CSettings.cpp:5361
 msgid "Off"
 msgstr "Išjungta"
 
-#: Client/core/CSettings.cpp:1306 Client/core/CSettings.cpp:2230
+#: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2237
 msgid "1x"
 msgstr "1x"
 
-#: Client/core/CSettings.cpp:1307 Client/core/CSettings.cpp:2232
+#: Client/core/CSettings.cpp:1312 Client/core/CSettings.cpp:2239
 msgid "2x"
 msgstr "2x"
 
-#: Client/core/CSettings.cpp:1308 Client/core/CSettings.cpp:2234
+#: Client/core/CSettings.cpp:1313 Client/core/CSettings.cpp:2241
 msgid "3x"
 msgstr "3x"
 
-#: Client/core/CSettings.cpp:1321 Client/core/CSettings.cpp:1670
-#: Client/core/CSettings.cpp:2240 Client/core/CSettings.cpp:4041
+#: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1676
+#: Client/core/CSettings.cpp:2247 Client/core/CSettings.cpp:4054
 msgid "Auto"
 msgstr "Auto"
 
-#: Client/core/CSettings.cpp:1322 Client/core/CSettings.cpp:2242
+#: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2249
 msgid "4:3"
 msgstr "4:3"
 
-#: Client/core/CSettings.cpp:1323 Client/core/CSettings.cpp:2244
+#: Client/core/CSettings.cpp:1328 Client/core/CSettings.cpp:2251
 msgid "16:10"
 msgstr "16:10"
 
-#: Client/core/CSettings.cpp:1324 Client/core/CSettings.cpp:2246
+#: Client/core/CSettings.cpp:1329 Client/core/CSettings.cpp:2253
 msgid "16:9"
 msgstr "16:9"
 
-#: Client/core/CSettings.cpp:1327
+#: Client/core/CSettings.cpp:1332
 msgid "HUD Match Aspect Ratio"
 msgstr "HUD santykis su ekranu"
 
-#: Client/core/CSettings.cpp:1333
+#: Client/core/CSettings.cpp:1338
 msgid "Volumetric Shadows"
 msgstr "Volumetriniai Šešėliai"
 
-#: Client/core/CSettings.cpp:1337
+#: Client/core/CSettings.cpp:1342
 msgid "Grass effect"
 msgstr "Žolės efektas"
 
-#: Client/core/CSettings.cpp:1341
+#: Client/core/CSettings.cpp:1346
 msgid "Heat haze"
 msgstr "Karščio bangelės"
 
-#: Client/core/CSettings.cpp:1345
+#: Client/core/CSettings.cpp:1350
 msgid "Tyre Smoke etc"
 msgstr "Padangų dūmai ir t.t."
 
-#: Client/core/CSettings.cpp:1349
+#: Client/core/CSettings.cpp:1354
 msgid "Dynamic ped shadows"
 msgstr "Dinamiški pėsčiųjų šešėliai"
 
-#: Client/core/CSettings.cpp:1353
+#: Client/core/CSettings.cpp:1358
 msgid "Motion blur"
 msgstr "Liejimas judesiu"
 
-#: Client/core/CSettings.cpp:1357
+#: Client/core/CSettings.cpp:1362
 msgid "Corona rain reflections"
 msgstr "Vainiko lietaus atspindžiai"
 
-#: Client/core/CSettings.cpp:1362
+#: Client/core/CSettings.cpp:1367
 msgid "Full Screen Minimize"
 msgstr "Pilnas Lango Nuleidimas"
 
-#: Client/core/CSettings.cpp:1374
+#: Client/core/CSettings.cpp:1379
 msgid "Enable Device Selection Dialog"
 msgstr "Įjungti Prietaisų Pasirinkimo Dialogą"
 
-#: Client/core/CSettings.cpp:1386
+#: Client/core/CSettings.cpp:1391
 msgid "Show unsafe resolutions"
 msgstr "Rodyti netinkamas ekrano raiškas"
 
-#: Client/core/CSettings.cpp:1398
+#: Client/core/CSettings.cpp:1403
 msgid "Render vehicles always in high detail"
 msgstr "Visada vaizduoti transporto priemones aukščiausia raiška"
 
-#: Client/core/CSettings.cpp:1402
+#: Client/core/CSettings.cpp:1407
 msgid "Render peds always in high detail"
 msgstr "Visada vaizduoti personažus aukščiausia raiška"
 
-#: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1436
+#: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1441
 msgid "Gamma:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1476
+#: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1481
 msgid "Contrast:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1426 Client/core/CSettings.cpp:1496
+#: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1501
 msgid "Saturation:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1512
+#: Client/core/CSettings.cpp:1517
 msgid "Apply adjustments in windowed mode"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1518
+#: Client/core/CSettings.cpp:1523
 msgid "Apply adjustments in fullscreen mode"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1548
+#: Client/core/CSettings.cpp:1554
 msgid "Enable remote websites"
 msgstr "Naudoti nutolusius tinklalapius"
 
-#: Client/core/CSettings.cpp:1553
+#: Client/core/CSettings.cpp:1559
 msgid "Enable Javascript on remote websites"
 msgstr "Naudoti Javascript nutolusiuose tinklalapiuose"
 
-#: Client/core/CSettings.cpp:1558
+#: Client/core/CSettings.cpp:1564
 msgid "Enable GPU rendering"
 msgstr "Įjungti vaizdo apdorojimą GPU"
 
-#: Client/core/CSettings.cpp:1562
+#: Client/core/CSettings.cpp:1568
 msgid "Custom blacklist"
 msgstr "Juodasis sąrašas"
 
-#: Client/core/CSettings.cpp:1573 Client/core/CSettings.cpp:1613
+#: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1619
 msgid "Enter a domain e.g. google.com"
 msgstr "Įveskite puslapį pvz. google.com"
 
-#: Client/core/CSettings.cpp:1581
+#: Client/core/CSettings.cpp:1587
 msgid "Block"
 msgstr "Blokuoti"
 
-#: Client/core/CSettings.cpp:1594 Client/core/CSettings.cpp:1632
+#: Client/core/CSettings.cpp:1600 Client/core/CSettings.cpp:1638
 msgid "Domain"
 msgstr "Puslapis"
 
-#: Client/core/CSettings.cpp:1596 Client/core/CSettings.cpp:1634
+#: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1640
 msgid "Remove domain"
 msgstr "Panaikinti puslapį"
 
 #. Reset vecTemp
-#: Client/core/CSettings.cpp:1602
+#: Client/core/CSettings.cpp:1608
 msgid "Custom whitelist"
 msgstr "Baltasis sąrašas"
 
-#: Client/core/CSettings.cpp:1621 Client/cefweb/CWebsiteRequests.cpp:51
+#: Client/core/CSettings.cpp:1627 Client/cefweb/CWebsiteRequests.cpp:51
 msgid "Allow"
 msgstr "Leisti"
 
 #. Misc section label
-#: Client/core/CSettings.cpp:1647
+#: Client/core/CSettings.cpp:1653
 msgid "Misc"
 msgstr "Kita"
 
 #. Fast clothes loading
-#: Client/core/CSettings.cpp:1653 Client/core/CSettings.cpp:1661
-#: Client/core/CSettings.cpp:5960
+#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1667
+#: Client/core/CSettings.cpp:5986
 msgid "Fast CJ clothes loading:"
 msgstr "Greitas CJ rūbų krovimas:"
 
 #. Browser scan speed
-#: Client/core/CSettings.cpp:1653 Client/core/CSettings.cpp:1675
-#: Client/core/CSettings.cpp:5962
+#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1681
+#: Client/core/CSettings.cpp:5988
 msgid "Browser speed:"
 msgstr "Naršyklės greitis:"
 
 #. Single download
-#: Client/core/CSettings.cpp:1653 Client/core/CSettings.cpp:1689
-#: Client/core/CSettings.cpp:5964
+#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1695
+#: Client/core/CSettings.cpp:5990
 msgid "Single connection:"
 msgstr "Pavienis prisijungimas:"
 
 #. Packet tag
-#: Client/core/CSettings.cpp:1653 Client/core/CSettings.cpp:1702
-#: Client/core/CSettings.cpp:5966
+#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1708
+#: Client/core/CSettings.cpp:5992
 msgid "Packet tag:"
 msgstr "Paketo etiketė:"
 
 #. Progress animation
-#: Client/core/CSettings.cpp:1654 Client/core/CSettings.cpp:1715
-#: Client/core/CSettings.cpp:5968
+#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1721
+#: Client/core/CSettings.cpp:5994
 msgid "Progress animation:"
 msgstr "Progreso animacija:"
 
 #. Process priority
-#: Client/core/CSettings.cpp:1654 Client/core/CSettings.cpp:1728
-#: Client/core/CSettings.cpp:5958
+#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1734
+#: Client/core/CSettings.cpp:5984
 msgid "Process priority:"
 msgstr "Veiksmų pirmenybė:"
 
 #. Debug setting
-#: Client/core/CSettings.cpp:1654 Client/core/CSettings.cpp:1742
-#: Client/core/CSettings.cpp:5970
+#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1748
+#: Client/core/CSettings.cpp:5996
 msgid "Debug setting:"
 msgstr "Derinimo nustatymas:"
 
 #. Streaming memory
-#: Client/core/CSettings.cpp:1655 Client/core/CSettings.cpp:1765
-#: Client/core/CSettings.cpp:5972
+#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1771
+#: Client/core/CSettings.cpp:5998
 msgid "Streaming memory:"
 msgstr "Laikinoji atmintis:"
 
 #. Update build type
-#: Client/core/CSettings.cpp:1655 Client/core/CSettings.cpp:1885
+#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1891
 msgid "Update build type:"
 msgstr "Versijos atnaujinimo tipas:"
 
 #. UpdateAutoInstall
-#: Client/core/CSettings.cpp:1655 Client/core/CSettings.cpp:1864
+#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1870
 msgid "Install important updates:"
 msgstr "Įrašyti svarbius atnaujinimus:"
 
-#: Client/core/CSettings.cpp:1669 Client/core/CSettings.cpp:1697
-#: Client/core/CSettings.cpp:1710 Client/core/CSettings.cpp:4043
-#: Client/core/CSettings.cpp:4059 Client/core/CSettings.cpp:4066
+#: Client/core/CSettings.cpp:1675 Client/core/CSettings.cpp:1703
+#: Client/core/CSettings.cpp:1716 Client/core/CSettings.cpp:4056
+#: Client/core/CSettings.cpp:4072 Client/core/CSettings.cpp:4079
 msgid "On"
 msgstr "Įjungta"
 
-#: Client/core/CSettings.cpp:1682 Client/core/CSettings.cpp:4048
+#: Client/core/CSettings.cpp:1688 Client/core/CSettings.cpp:4061
 msgid "Very slow"
 msgstr "Labai lėtas"
 
-#: Client/core/CSettings.cpp:1683 Client/core/CSettings.cpp:1696
-#: Client/core/CSettings.cpp:1709 Client/core/CSettings.cpp:1723
-#: Client/core/CSettings.cpp:1749 Client/core/CSettings.cpp:1761
-#: Client/core/CSettings.cpp:1872 Client/core/CSettings.cpp:1892
-#: Client/core/CSettings.cpp:4050 Client/core/CSettings.cpp:4057
-#: Client/core/CSettings.cpp:4064 Client/core/CSettings.cpp:4073
-#: Client/core/CSettings.cpp:4110
+#: Client/core/CSettings.cpp:1689 Client/core/CSettings.cpp:1702
+#: Client/core/CSettings.cpp:1715 Client/core/CSettings.cpp:1729
+#: Client/core/CSettings.cpp:1755 Client/core/CSettings.cpp:1767
+#: Client/core/CSettings.cpp:1878 Client/core/CSettings.cpp:1898
+#: Client/core/CSettings.cpp:4063 Client/core/CSettings.cpp:4070
+#: Client/core/CSettings.cpp:4077 Client/core/CSettings.cpp:4086
+#: Client/core/CSettings.cpp:4123
 msgid "Default"
 msgstr "Numatytas"
 
-#: Client/core/CSettings.cpp:1684 Client/core/CSettings.cpp:4052
+#: Client/core/CSettings.cpp:1690 Client/core/CSettings.cpp:4065
 msgid "Fast"
 msgstr "Greitas"
 
-#: Client/core/CSettings.cpp:1735 Client/core/CSettings.cpp:4028
+#: Client/core/CSettings.cpp:1741 Client/core/CSettings.cpp:4041
 msgid "Normal"
 msgstr "Normalus"
 
-#: Client/core/CSettings.cpp:1736 Client/core/CSettings.cpp:4030
+#: Client/core/CSettings.cpp:1742 Client/core/CSettings.cpp:4043
 msgid "Above normal"
 msgstr "Virš normalaus"
 
-#: Client/core/CSettings.cpp:1772
+#: Client/core/CSettings.cpp:1778
 msgid "Min"
 msgstr "Min"
 
-#: Client/core/CSettings.cpp:1797
+#: Client/core/CSettings.cpp:1803
 msgid "Max"
 msgstr "Maks"
 
 #. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1805
+#: Client/core/CSettings.cpp:1811
 msgid "Windows 8 compatibility:"
 msgstr "Windows 8 suderinamumas:"
 
-#: Client/core/CSettings.cpp:1809
+#: Client/core/CSettings.cpp:1815
 msgid "16-bit color"
 msgstr "16-bitų spalvos"
 
-#: Client/core/CSettings.cpp:1814
+#: Client/core/CSettings.cpp:1820
 msgid "Mouse fix"
 msgstr "Pelės pataisymas"
 
 #. Cache path info
-#: Client/core/CSettings.cpp:1832
+#: Client/core/CSettings.cpp:1838
 msgid "Client resource files:"
 msgstr "Kliento resursų failai:"
 
-#: Client/core/CSettings.cpp:1836
+#: Client/core/CSettings.cpp:1842
 msgid "Show in Explorer"
 msgstr "Rodyti tinklo naršyklėje"
 
 #. Process affinity
-#: Client/core/CSettings.cpp:1851
+#: Client/core/CSettings.cpp:1857
 msgid "Set CPU 0 affinity to improve game performance"
 msgstr "Nustatyti CPU 0 branduolį, kad pagerintumėte žaidimo našumą"
 
 #. Auto updater section label
-#: Client/core/CSettings.cpp:1857 Client/core/CSettings.cpp:1860
+#: Client/core/CSettings.cpp:1863 Client/core/CSettings.cpp:1866
 msgid "Auto updater"
 msgstr "Automatinis naujinimas"
 
 #. Check for updates
-#: Client/core/CSettings.cpp:1898
+#: Client/core/CSettings.cpp:1904
 msgid "Check for update now"
 msgstr "Tikrinti, ar yra atnaujinimų"
 
-#: Client/core/CSettings.cpp:2081
+#: Client/core/CSettings.cpp:2088
 msgid "Some settings will be changed when you next start MTA"
 msgstr "Kai kurie nustatymai pasikeis tik paleidus MTA iš naujo"
 
-#: Client/core/CSettings.cpp:2082
+#: Client/core/CSettings.cpp:2089
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
 "Ar norite perkrauti dabar?"
 
-#: Client/core/CSettings.cpp:2085
+#: Client/core/CSettings.cpp:2092
 msgid "RESTART REQUIRED"
 msgstr "REIKALINGAS PERKROVIMAS"
 
-#: Client/core/CSettings.cpp:2105
+#: Client/core/CSettings.cpp:2112
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr "Kai kurie nustatymai bus pakeisti kai atsijungsite iš serverio"
 
-#: Client/core/CSettings.cpp:2106
+#: Client/core/CSettings.cpp:2113
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
 "Ar norite atsijungti dabar?"
 
-#: Client/core/CSettings.cpp:2109
+#: Client/core/CSettings.cpp:2116
 msgid "DISCONNECT REQUIRED"
 msgstr "ATSIJUNGIMAS BŪTINAS"
 
 #. Update the joystick name
-#: Client/core/CSettings.cpp:2551
+#: Client/core/CSettings.cpp:2558
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "Valdymo pultas nerastas - Patikrinkite jungtis ir perkraukite žaidimą"
 
-#: Client/core/CSettings.cpp:2807
+#: Client/core/CSettings.cpp:2814
 msgid "Binding axis"
 msgstr "Priskiriama ašis"
 
-#: Client/core/CSettings.cpp:2807
+#: Client/core/CSettings.cpp:2814
 msgid "Move an axis to bind, or escape to clear"
 msgstr "Pajudinkite ašį priskirimui, arba ESC išvalymui"
 
-#: Client/core/CSettings.cpp:2884
+#: Client/core/CSettings.cpp:2893
 msgid "Language:"
 msgstr "Kalba:"
 
-#: Client/core/CSettings.cpp:2884
+#: Client/core/CSettings.cpp:2893
 msgid "Skin:"
 msgstr "Išvaizda:"
 
-#: Client/core/CSettings.cpp:2884
+#: Client/core/CSettings.cpp:2893
 msgid "Presets:"
 msgstr "Ruošiniai:"
 
-#: Client/core/CSettings.cpp:2933
+#: Client/core/CSettings.cpp:2942
 msgid "Chat"
 msgstr "Kalb. langas"
 
-#: Client/core/CSettings.cpp:2950
+#: Client/core/CSettings.cpp:2959
 msgid "Load"
 msgstr "Įkelti"
 
-#: Client/core/CSettings.cpp:2962
+#: Client/core/CSettings.cpp:2971
 msgid "Colors"
 msgstr "Spalvos"
 
-#: Client/core/CSettings.cpp:2963
+#: Client/core/CSettings.cpp:2972
 msgid "Layout"
 msgstr "Išsidėstymas"
 
-#: Client/core/CSettings.cpp:2964 Client/core/CSettings.cpp:3210
+#: Client/core/CSettings.cpp:2973 Client/core/CSettings.cpp:3219
 msgid "Options"
 msgstr "Nustatymai"
 
-#: Client/core/CSettings.cpp:2970
+#: Client/core/CSettings.cpp:2979
 msgid "Chat Background"
 msgstr "Susirašinėjimo Fonas"
 
-#: Client/core/CSettings.cpp:2970
+#: Client/core/CSettings.cpp:2979
 msgid "Chat Text"
 msgstr "Kalb. lango tekstas"
 
-#: Client/core/CSettings.cpp:2970
+#: Client/core/CSettings.cpp:2979
 msgid "Input Background"
 msgstr "Įvedimo Fonas"
 
-#: Client/core/CSettings.cpp:2970
+#: Client/core/CSettings.cpp:2979
 msgid "Input Text"
 msgstr "Įvesties lango tekstas"
 
-#: Client/core/CSettings.cpp:2993
+#: Client/core/CSettings.cpp:3002
 msgid "Lines:"
 msgstr "Linijos:"
 
-#: Client/core/CSettings.cpp:2993
+#: Client/core/CSettings.cpp:3002
 msgid "Scale:"
 msgstr "Dydis:"
 
-#: Client/core/CSettings.cpp:2993
+#: Client/core/CSettings.cpp:3002
 msgid "Width:"
 msgstr "Ilgis:"
 
-#: Client/core/CSettings.cpp:2996
+#: Client/core/CSettings.cpp:3005
 msgid "Size"
 msgstr "Dydis"
 
-#: Client/core/CSettings.cpp:3045
+#: Client/core/CSettings.cpp:3054
 msgid "after"
 msgstr "po"
 
-#: Client/core/CSettings.cpp:3045
+#: Client/core/CSettings.cpp:3054
 msgid "for"
 msgstr "kitoms"
 
-#: Client/core/CSettings.cpp:3045
+#: Client/core/CSettings.cpp:3054
 msgid "sec"
 msgstr "sek"
 
-#: Client/core/CSettings.cpp:3048
+#: Client/core/CSettings.cpp:3057
 msgid "Fading"
 msgstr "Blukimas"
 
-#: Client/core/CSettings.cpp:3054
+#: Client/core/CSettings.cpp:3063
 msgid "Fade out old lines"
 msgstr "Paslėpti senas eilutes"
 
-#: Client/core/CSettings.cpp:3094
+#: Client/core/CSettings.cpp:3103
 msgid "Horizontal:"
 msgstr "Horizontalus:"
 
-#: Client/core/CSettings.cpp:3094
+#: Client/core/CSettings.cpp:3103
 msgid "Vertical:"
 msgstr "Vertikalus:"
 
-#: Client/core/CSettings.cpp:3094
+#: Client/core/CSettings.cpp:3103
 msgid "Text-Align:"
 msgstr "Teksto Lygiavimas:"
 
-#: Client/core/CSettings.cpp:3094
+#: Client/core/CSettings.cpp:3103
 msgid "X-Offset:"
 msgstr "X-Kompensacija:"
 
-#: Client/core/CSettings.cpp:3095
+#: Client/core/CSettings.cpp:3104
 msgid "Y-Offset:"
 msgstr "Y-Kompensacija:"
 
-#: Client/core/CSettings.cpp:3101
+#: Client/core/CSettings.cpp:3110
 msgid "Position"
 msgstr "Pozicija"
 
-#: Client/core/CSettings.cpp:3115 Client/core/CSettings.cpp:3143
+#: Client/core/CSettings.cpp:3124 Client/core/CSettings.cpp:3152
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
 msgstr "Kairėn"
 
-#: Client/core/CSettings.cpp:3116 Client/core/CSettings.cpp:3130
+#: Client/core/CSettings.cpp:3125 Client/core/CSettings.cpp:3139
 msgid "Center"
 msgstr "Centre"
 
-#: Client/core/CSettings.cpp:3117 Client/core/CSettings.cpp:3144
+#: Client/core/CSettings.cpp:3126 Client/core/CSettings.cpp:3153
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
 msgstr "Dešinėn"
 
-#: Client/core/CSettings.cpp:3129
+#: Client/core/CSettings.cpp:3138
 msgid "Top"
 msgstr "Viršuj"
 
-#: Client/core/CSettings.cpp:3131
+#: Client/core/CSettings.cpp:3140
 msgid "Bottom"
 msgstr "Apačioj"
 
-#: Client/core/CSettings.cpp:3179
+#: Client/core/CSettings.cpp:3188
 msgid "Font"
 msgstr "Šriftas"
 
-#: Client/core/CSettings.cpp:3216
+#: Client/core/CSettings.cpp:3225
 msgid "Hide background when not typing"
 msgstr "Paslėpti foną, kai nėra rašoma"
 
-#: Client/core/CSettings.cpp:3221
+#: Client/core/CSettings.cpp:3230
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "Slapyvardžio užbaigimas paspaudus \"Tab\" mygtuką"
 
-#: Client/core/CSettings.cpp:3226
+#: Client/core/CSettings.cpp:3235
 msgid "Allow server to flash the window"
 msgstr "Leisti serveriui tvykstelėti langą"
 
-#: Client/core/CSettings.cpp:3231
+#: Client/core/CSettings.cpp:3240
 msgid "Allow tray balloon notifications"
 msgstr "Leisti 'tray balloon' pranešimus"
 
-#: Client/core/CSettings.cpp:3236
+#: Client/core/CSettings.cpp:3245
 msgid "Chat text black/white outline"
 msgstr "Susirašinėjimo teksto juodos/baltos kontūras"
 
@@ -1821,95 +1825,95 @@ msgstr "Susirašinėjimo teksto juodos/baltos kontūras"
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:3485 Client/core/CSettings.cpp:3492
+#: Client/core/CSettings.cpp:3494 Client/core/CSettings.cpp:3501
 msgid "Press a key to bind, or escape to clear"
 msgstr "Spauskite mygtuką priskyrimui, arba ESC išvalymui"
 
-#: Client/core/CSettings.cpp:3486
+#: Client/core/CSettings.cpp:3495
 msgid "Binding a primary key"
 msgstr "Priskiriamas pirminis mygtukas"
 
-#: Client/core/CSettings.cpp:3493
+#: Client/core/CSettings.cpp:3502
 msgid "Binding a secondary key"
 msgstr "Priskiriamas antrinis mygtukas"
 
-#: Client/core/CSettings.cpp:3569
+#: Client/core/CSettings.cpp:3578
 msgid "GTA GAME CONTROLS"
 msgstr "GTA ŽAIDIMO VALDYMAS"
 
-#: Client/core/CSettings.cpp:3571
+#: Client/core/CSettings.cpp:3580
 msgid "MULTIPLAYER CONTROLS"
 msgstr "MTA VALDYMAS"
 
-#: Client/core/CSettings.cpp:3816 Client/core/CSettings.cpp:5921
+#: Client/core/CSettings.cpp:3825 Client/core/CSettings.cpp:5947
 msgid "Your nickname contains invalid characters!"
 msgstr "Jūsų slapyvardyje yra netinkamų simbolių!"
 
-#: Client/core/CSettings.cpp:4410 Client/core/CCore.cpp:699
+#: Client/core/CSettings.cpp:4427 Client/core/CCore.cpp:700
 #: Client/core/CMainMenu.cpp:303
-#: Client/mods/deathmatch/logic/CClientGame.cpp:548
+#: Client/mods/deathmatch/logic/CClientGame.cpp:550
 msgid "Main menu"
 msgstr "Pagrindinis meniu"
 
-#: Client/core/CSettings.cpp:4414 Client/core/CCore.cpp:699
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1098
+#: Client/core/CSettings.cpp:4431 Client/core/CCore.cpp:700
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1100
 #: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
 msgstr "Žaidime"
 
-#: Client/core/CSettings.cpp:4764
+#: Client/core/CSettings.cpp:4784
 msgid "Red:"
 msgstr "Raudona:"
 
-#: Client/core/CSettings.cpp:4764
+#: Client/core/CSettings.cpp:4784
 msgid "Green:"
 msgstr "Žalia:"
 
-#: Client/core/CSettings.cpp:4764
+#: Client/core/CSettings.cpp:4784
 msgid "Blue:"
 msgstr "Mėlyna:"
 
-#: Client/core/CSettings.cpp:4764
+#: Client/core/CSettings.cpp:4784
 msgid "Transparency:"
 msgstr "Permatomumas:"
 
-#: Client/core/CSettings.cpp:4767
+#: Client/core/CSettings.cpp:4787
 msgid "Color"
 msgstr "Spalva"
 
-#: Client/core/CSettings.cpp:4873
+#: Client/core/CSettings.cpp:4893
 msgid "Preview"
 msgstr "Peržiūra"
 
-#: Client/core/CSettings.cpp:5181
+#: Client/core/CSettings.cpp:5201
 msgid "Please disconnect before changing language"
 msgstr "Prašome atsijungti prieš pakeičiant kalbą"
 
-#: Client/core/CSettings.cpp:5209
+#: Client/core/CSettings.cpp:5229
 msgid "Please disconnect before changing skin"
 msgstr "Prašome atsijungti prieš keičiant išvaizdą"
 
-#: Client/core/CSettings.cpp:5589
+#: Client/core/CSettings.cpp:5609
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "Volumetriniai šešėliai gali sukelti sunkumų kai kurioms sistemoms.\n\n"
 "Ar tikrai norite įjungti juos?"
 
-#: Client/core/CSettings.cpp:5593
+#: Client/core/CSettings.cpp:5613
 msgid "PERFORMANCE WARNING"
 msgstr "VEIKIMO ĮSPĖJIMAS"
 
-#: Client/core/CSettings.cpp:5613
+#: Client/core/CSettings.cpp:5633
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "Ekrano siuntimas yra reikalaujamas kai kuriuose serveriuose dėl sukčiavimo susekimo.\n\n"
 "(Kalbėjimo langas ir GUI yra neįtraukiamas į nuotrauką)\n"
 
-#: Client/core/CSettings.cpp:5615
+#: Client/core/CSettings.cpp:5635
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "EKRANO ĮKĖLIMO INFORMACIJA"
 
-#: Client/core/CSettings.cpp:5630
+#: Client/core/CSettings.cpp:5650
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
@@ -1917,11 +1921,11 @@ msgstr "Kai kurie skriptai gali leisti garsus, pvz., radiją, iš interneto.\n\n
 "Išjungus šį nustatymą gali suprasteti tinklo ryšys\n"
 "pralaidumo suvartojimas.\n"
 
-#: Client/core/CSettings.cpp:5633
+#: Client/core/CSettings.cpp:5653
 msgid "EXTERNAL SOUNDS"
 msgstr "IŠORINIAI GARSAI"
 
-#: Client/core/CSettings.cpp:5662
+#: Client/core/CSettings.cpp:5682
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
@@ -1929,11 +1933,11 @@ msgstr "Atrodo, kad turite įjungtą Rich Presence ryšio parinktį.\n"
 "Ar norite leisti serveriams dalintis savo duomenimis?\n\n"
 "Tai apima ir jūsų unikalų ID identifikatorių."
 
-#: Client/core/CSettings.cpp:5667
+#: Client/core/CSettings.cpp:5687
 msgid "CONSENT TO ALLOW DATA SHARING"
 msgstr "SUTIKIMAS LEISTI DUOMENŲ DALINIMĄSI"
 
-#: Client/core/CSettings.cpp:5691
+#: Client/core/CSettings.cpp:5711
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -1943,7 +1947,7 @@ msgstr "Kai kurie failai šio GTA:SA data aplanko vietoje yra pakeisti.\n"
 "Tačiau, PAKEISTOS GTA:SA BYLOS YRA BLOKUOJAMOS DAUGELIO SERVERIŲ\n\n"
 "Ar tikrai norite jas naudoti?"
 
-#: Client/core/CSettings.cpp:5740
+#: Client/core/CSettings.cpp:5760
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -1953,198 +1957,198 @@ msgstr "DPI suvokimo įgalinimas yra eksperimentinė funkcija ir\n"
 "Jei įjungsite šią parinktį, gali kilti grafinių problemų.\n\n"
 "Ar tikrai norite įjungti šią parinktį?"
 
-#: Client/core/CSettings.cpp:5746 Client/core/CSettings.cpp:5801
+#: Client/core/CSettings.cpp:5766 Client/core/CSettings.cpp:5821
 msgid "EXPERIMENTAL FEATURE"
 msgstr "EKSPERIMENTINĖ FUNKCIJA"
 
-#: Client/core/CSettings.cpp:5803
+#: Client/core/CSettings.cpp:5823
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
 msgstr "Šios parinkties išjungimas nerekomenduojamas, nebent patiriate našumo problemų.\n\n"
 "Ar tikrai norite ją išjungti?"
 
-#: Client/core/CSettings.cpp:5939
+#: Client/core/CSettings.cpp:5965
 msgid "Please enter a nickname"
 msgstr "Prašome įvesti slapyvardį"
 
-#: Client/core/CSettings.cpp:5940
+#: Client/core/CSettings.cpp:5966
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "Prašome įvesti slapyvardį, kurį naudosite žaidime. \n"
 "Tai bus jūsų vardas su kuriuo prisijungsite ir žaisite serveryje"
 
-#: Client/core/CSettings.cpp:5958
+#: Client/core/CSettings.cpp:5984
 msgid "Very experimental feature."
 msgstr "Labai eksperimentinė naujovė"
 
-#: Client/core/CSettings.cpp:5960
+#: Client/core/CSettings.cpp:5986
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "Sustabdo strigimus su CJ variacijomis (Naudoja 65MB daugiau RAM)"
 
-#: Client/core/CSettings.cpp:5962
+#: Client/core/CSettings.cpp:5988
 msgid "Older routers may require a slower scan speed."
 msgstr "Senesni maršrutizatoriai gali reikalauti lėtesnio greičio atnaujinant."
 
-#: Client/core/CSettings.cpp:5964
+#: Client/core/CSettings.cpp:5990
 msgid "Switch on to use only one connection when downloading."
 msgstr "Įjunkite, jei norite naudoti tik vieną prisijungimą kol siunčiatės."
 
-#: Client/core/CSettings.cpp:5966
+#: Client/core/CSettings.cpp:5992
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "Žymėti tinklo paketus MTA srauto identifikavimui tiekėjams."
 
-#: Client/core/CSettings.cpp:5968
+#: Client/core/CSettings.cpp:5994
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Besisukančio ratuko animacija ekrano apačioje"
 
-#: Client/core/CSettings.cpp:5970
+#: Client/core/CSettings.cpp:5996
 msgid "Select default always. (This setting is not saved)"
 msgstr "Visada pasirinkite numatytą. (Šis nustatymas neišsaugomas)"
 
-#: Client/core/CSettings.cpp:5972
+#: Client/core/CSettings.cpp:5998
 msgid "Maximum is usually best"
 msgstr "Maksimalus paprastai yra geriausias"
 
-#: Client/core/CSettings.cpp:5974 Client/core/CSettings.cpp:5976
+#: Client/core/CSettings.cpp:6000 Client/core/CSettings.cpp:6002
 msgid "Auto updater:"
 msgstr "Auto naujinimas:"
 
-#: Client/core/CSettings.cpp:5974
+#: Client/core/CSettings.cpp:6000
 msgid "Select default unless you like filling out bug reports."
 msgstr "Pasirinkite numatytą, nebent pageidaujate pildyti klaidų ataskaitas."
 
-#: Client/core/CSettings.cpp:5976
+#: Client/core/CSettings.cpp:6002
 msgid "Select default to automatically install important updates."
 msgstr "Pasirinkite numatytą automatiniam atnaujinimų įrašymui."
 
-#: Client/core/CSettings.cpp:5978
+#: Client/core/CSettings.cpp:6004
 msgid "16-bit color:"
 msgstr "16-bitų spalvos:"
 
-#: Client/core/CSettings.cpp:5978
+#: Client/core/CSettings.cpp:6004
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "Įjungti 16 bitų spalvų režimus - Reikalingas MTA paleidimas iš naujo"
 
-#: Client/core/CSettings.cpp:5980
+#: Client/core/CSettings.cpp:6006
 msgid "Mouse fix:"
 msgstr "Pelės pataisymas:"
 
-#: Client/core/CSettings.cpp:5980
+#: Client/core/CSettings.cpp:6006
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Pelės valdymo pataisymas - Gali prireikti paleisti kompiuterį iš naujo"
 
-#: Client/core/CSettings.cpp:5982
+#: Client/core/CSettings.cpp:6008
 msgid "CPU affinity:"
 msgstr "CPU branduolis:"
 
-#: Client/core/CSettings.cpp:5982
+#: Client/core/CSettings.cpp:6008
 msgid "Only change if you're having stability issues."
 msgstr "Keiskite tik jei kyla stabilumo problemų."
 
-#: Client/core/CCore.cpp:838 Shared/mods/deathmatch/logic/Utils.cpp:129
+#: Client/core/CCore.cpp:839 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
 msgstr "Kritinė klaida"
 
-#: Client/core/CCore.cpp:959
+#: Client/core/CCore.cpp:960
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "KAD PATAISYTI, PAŠALINKITE FAILĄ:"
 
-#: Client/core/CCore.cpp:991
+#: Client/core/CCore.cpp:992
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s modulis yra neteisingas!"
 
-#: Client/core/CCore.cpp:1315
+#: Client/core/CCore.cpp:1352
 msgid "Error executing URL"
 msgstr "Klaida vykdant URL"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1410
+#: Client/core/CCore.cpp:1447
 msgid "this help screen"
 msgstr "šis pagalbos ekranas"
 
-#: Client/core/CCore.cpp:1411 Client/core/CCore.cpp:1412
+#: Client/core/CCore.cpp:1448 Client/core/CCore.cpp:1449
 msgid "exits the application"
 msgstr "išjungia programą"
 
-#: Client/core/CCore.cpp:1413
+#: Client/core/CCore.cpp:1450
 msgid "shows the version"
 msgstr "rodo versiją"
 
-#: Client/core/CCore.cpp:1414
+#: Client/core/CCore.cpp:1451
 msgid "shows the time"
 msgstr "rodo laiką"
 
-#: Client/core/CCore.cpp:1415
+#: Client/core/CCore.cpp:1452
 msgid "shows the hud"
 msgstr "rodo vartotojo sąsają"
 
-#: Client/core/CCore.cpp:1416
+#: Client/core/CCore.cpp:1453
 msgid "shows all the binds"
 msgstr "rodo visus mygtukų priskirimus"
 
-#: Client/core/CCore.cpp:1417
+#: Client/core/CCore.cpp:1454
 msgid "shows your serial"
 msgstr "rodo jūsų serijinį numerį"
 
-#: Client/core/CCore.cpp:1426
+#: Client/core/CCore.cpp:1463
 msgid "connects to a server (host port nick pass)"
 msgstr "jungiasi į serverį (adresas portas slapyvardis slaptažodis)"
 
-#: Client/core/CCore.cpp:1427
+#: Client/core/CCore.cpp:1464
 msgid "connects to a previous server"
 msgstr "jungiasi į ankstesnį serverį"
 
-#: Client/core/CCore.cpp:1428
+#: Client/core/CCore.cpp:1465
 msgid "binds a key (key control)"
 msgstr "priskiria mygtuką (mygtukas valdiklis)"
 
-#: Client/core/CCore.cpp:1429
+#: Client/core/CCore.cpp:1466
 msgid "unbinds a key (key)"
 msgstr "pašalina priskirimą (mygtukas)"
 
-#: Client/core/CCore.cpp:1430
+#: Client/core/CCore.cpp:1467
 msgid "copies the default gta controls"
 msgstr "nukopijuoja numatytuosius gta valdiklius"
 
-#: Client/core/CCore.cpp:1431
+#: Client/core/CCore.cpp:1468
 msgid "outputs a screenshot"
 msgstr "padaro nuotrauką"
 
-#: Client/core/CCore.cpp:1432
+#: Client/core/CCore.cpp:1469
 msgid "immediately saves the config"
 msgstr "nedelsiant išsaugo konfiguraciją"
 
-#: Client/core/CCore.cpp:1434
+#: Client/core/CCore.cpp:1471
 msgid "clears the debug view"
 msgstr "išvalo derinimo vaizdą"
 
-#: Client/core/CCore.cpp:1435
+#: Client/core/CCore.cpp:1472
 msgid "scrolls the chatbox upwards"
 msgstr "paslenka pokalbį aukštyn"
 
-#: Client/core/CCore.cpp:1436
+#: Client/core/CCore.cpp:1473
 msgid "scrolls the chatbox downwards"
 msgstr "paslenka pokalbį žemyn"
 
-#: Client/core/CCore.cpp:1437
+#: Client/core/CCore.cpp:1474
 msgid "scrolls the debug view upwards"
 msgstr "paslenka derinimo tekstą aukštyn"
 
-#: Client/core/CCore.cpp:1438
+#: Client/core/CCore.cpp:1475
 msgid "scrolls the debug view downwards"
 msgstr "paslenka derinimo tekstą žemyn"
 
-#: Client/core/CCore.cpp:1441
+#: Client/core/CCore.cpp:1478
 msgid "shows the memory statistics"
 msgstr "rodo atminties statistikas"
 
-#: Client/core/CCore.cpp:1442
+#: Client/core/CCore.cpp:1479
 msgid "shows the frame timing graph"
 msgstr "rodo kadrų laiko grafiką"
 
-#: Client/core/CCore.cpp:1446
+#: Client/core/CCore.cpp:1483
 msgid "for developers: reload news"
 msgstr "skirta kūrėjams: naujienų perkrovimas"
 
@@ -2378,7 +2382,7 @@ msgstr "Gaujos nurodymas atsitraukti"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "Nepavyko įkelti jūsų pasirinktos išvaizdos bei numatytosios išvaizdos, prašome įdiegti MTA iš naujo."
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1328
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1461
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Ar norite pamatyti šiek tiek pagalbos tinkle apie šia problemą ?"
 
@@ -2436,7 +2440,8 @@ msgstr "Nepavyko paleisti Direct3D9.\n\n"
 msgid "Idle"
 msgstr "Neutralus"
 
-#: Client/core/ServerBrowser/CServerList.cpp:166
+#: Client/core/ServerBrowser/CServerList.cpp:168
+#: Client/core/ServerBrowser/CServerBrowser.cpp:3158
 msgid "player"
 msgid_plural "players"
 msgstr[0] "žaidėjas"
@@ -2444,11 +2449,12 @@ msgstr[1] "žaidėjai"
 msgstr[2] "žaidėjų"
 msgstr[3] "žaidėjai"
 
-#: Client/core/ServerBrowser/CServerList.cpp:167
+#: Client/core/ServerBrowser/CServerList.cpp:169
 msgid "on"
 msgstr "įjungta"
 
-#: Client/core/ServerBrowser/CServerList.cpp:170
+#: Client/core/ServerBrowser/CServerList.cpp:172
+#: Client/core/ServerBrowser/CServerBrowser.cpp:3164
 msgid "server"
 msgid_plural "servers"
 msgstr[0] "serveris"
@@ -2457,34 +2463,34 @@ msgstr[2] "serverių"
 msgstr[3] "serveriai"
 
 #. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:263
+#: Client/core/ServerBrowser/CServerList.cpp:306
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
 msgstr "Laukiamas pirminis serverių sąrašas (praėjo %lu ms)"
 
 #. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:279
+#: Client/core/ServerBrowser/CServerList.cpp:324
 msgid "Master server list could not be parsed."
 msgstr "Pirminis serverių sąrašas nepasiekiamas."
 
 #. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:289
+#: Client/core/ServerBrowser/CServerList.cpp:334
 msgid "Master server list could not be retrieved."
 msgstr "Pirminis serverių sąrašas negautas."
 
-#: Client/core/ServerBrowser/CServerList.cpp:299
+#: Client/core/ServerBrowser/CServerList.cpp:349
 msgid "(Backup server list)"
 msgstr "(Atsarginių serverių sąrašas)"
 
-#: Client/core/ServerBrowser/CServerList.cpp:351
+#: Client/core/ServerBrowser/CServerList.cpp:419
 msgid "Cannot create LAN-broadcast socket"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerList.cpp:361
+#: Client/core/ServerBrowser/CServerList.cpp:429
 msgid "Cannot bind LAN-broadcast socket"
 msgstr "Neįmanoma pririšti LAN-transliavimo prievado"
 
-#: Client/core/ServerBrowser/CServerList.cpp:404
+#: Client/core/ServerBrowser/CServerList.cpp:472
 msgid "Attempting to discover LAN servers"
 msgstr "Bandoma surasti LAN serverius"
 
@@ -2541,7 +2547,7 @@ msgstr "Vėlavimas:"
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
-#: Client/core/ServerBrowser/CServerBrowser.cpp:608
+#: Client/core/ServerBrowser/CServerBrowser.cpp:635
 msgid "Player list"
 msgstr "Žaidėjų sąrašas"
 
@@ -2568,40 +2574,39 @@ msgstr "Prisijungti į serverį, kai tiktai atsiras vietos."
 msgid "PLEASE ENTER SERVER PASSWORD"
 msgstr "PRAŠOME PATEIKTI SERVERIO SLAPTAŽODĮ"
 
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Timed Out"
 msgstr "Baigėsi laikas"
 
 #. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
+#: Client/core/ServerBrowser/CServerInfo.cpp:515
 msgid "Querying..."
 msgstr "Užklausiama..."
 
 #. Create the window
-#: Client/core/ServerBrowser/CServerBrowser.cpp:187
+#: Client/core/ServerBrowser/CServerBrowser.cpp:189
 msgid "SERVER BROWSER"
 msgstr "SERVERIŲ NARŠYKLĖ"
 
 #. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:235
+#: Client/core/ServerBrowser/CServerBrowser.cpp:237
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:90
 msgid "Internet"
 msgstr "Internetas"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:236
+#: Client/core/ServerBrowser/CServerBrowser.cpp:238
 msgid "Local"
 msgstr "Vietinis"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:237
+#: Client/core/ServerBrowser/CServerBrowser.cpp:239
 msgid "Favourites"
 msgstr "Mėgstamiausi"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:238
+#: Client/core/ServerBrowser/CServerBrowser.cpp:240
 msgid "Recent"
 msgstr "Paskutiniai"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:293
+#: Client/core/ServerBrowser/CServerBrowser.cpp:309
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
@@ -2609,144 +2614,144 @@ msgstr "GREITAM PRISIJUNGIMUI:\n\n"
 "Įrašykite adresą ir portą į adresam skirtą lauką.\n"
 "Arba pasirinkite serverį iš naršytųjų ir spauskite 'Jungtis'"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:305
+#: Client/core/ServerBrowser/CServerBrowser.cpp:321
 msgid "HELP"
 msgstr "PAGALBA"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:314
-#: Client/core/ServerBrowser/CServerBrowser.cpp:355
+#: Client/core/ServerBrowser/CServerBrowser.cpp:330
+#: Client/core/ServerBrowser/CServerBrowser.cpp:371
 msgid "Refresh"
 msgstr "Atnaujinti"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:314
-#: Client/core/ServerBrowser/CServerBrowser.cpp:356
+#: Client/core/ServerBrowser/CServerBrowser.cpp:330
+#: Client/core/ServerBrowser/CServerBrowser.cpp:372
 msgid "Add Favorite"
 msgstr "Pridėti prie mėgstamiausiųjų"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:314
-#: Client/core/ServerBrowser/CServerBrowser.cpp:357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:431
-#: Client/core/ServerBrowser/CServerBrowser.cpp:502
+#: Client/core/ServerBrowser/CServerBrowser.cpp:330
+#: Client/core/ServerBrowser/CServerBrowser.cpp:373
+#: Client/core/ServerBrowser/CServerBrowser.cpp:457
+#: Client/core/ServerBrowser/CServerBrowser.cpp:528
 msgid "Connect"
 msgstr "Prisijungti"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:314
-#: Client/core/ServerBrowser/CServerBrowser.cpp:358
+#: Client/core/ServerBrowser/CServerBrowser.cpp:330
+#: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Server information"
 msgstr "Serverio informacija"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:315
-#: Client/core/ServerBrowser/CServerBrowser.cpp:359
+#: Client/core/ServerBrowser/CServerBrowser.cpp:331
+#: Client/core/ServerBrowser/CServerBrowser.cpp:375
 msgid "Search servers"
 msgstr "Ieškoti serverių"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:315
-#: Client/core/ServerBrowser/CServerBrowser.cpp:360
+#: Client/core/ServerBrowser/CServerBrowser.cpp:331
+#: Client/core/ServerBrowser/CServerBrowser.cpp:376
 msgid "Search players"
 msgstr "Ieškoti žaidėjų"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:315
-#: Client/core/ServerBrowser/CServerBrowser.cpp:361
+#: Client/core/ServerBrowser/CServerBrowser.cpp:331
+#: Client/core/ServerBrowser/CServerBrowser.cpp:377
 msgid "Start search"
 msgstr "Pradėti paiešką"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:315
-#: Client/core/ServerBrowser/CServerBrowser.cpp:362
+#: Client/core/ServerBrowser/CServerBrowser.cpp:331
+#: Client/core/ServerBrowser/CServerBrowser.cpp:378
 msgid "Delete from recent"
 msgstr ""
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:429
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2001
+#: Client/core/ServerBrowser/CServerBrowser.cpp:455
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2086
 msgid "Search players..."
 msgstr "Ieškoti žaidėjų..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:552
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1999
+#: Client/core/ServerBrowser/CServerBrowser.cpp:578
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2084
 msgid "Search servers..."
 msgstr "Ieškoti serverių..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:583
+#: Client/core/ServerBrowser/CServerBrowser.cpp:610
 msgid "Name"
 msgstr "Vardas"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:584
+#: Client/core/ServerBrowser/CServerBrowser.cpp:611
 msgid "Players"
 msgstr "Žaidėjai"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:585
+#: Client/core/ServerBrowser/CServerBrowser.cpp:612
 msgid "Ping"
 msgstr "Delsa"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:586
+#: Client/core/ServerBrowser/CServerBrowser.cpp:613
 msgid "Gamemode"
 msgstr "Žaidimo tipas"
 
 #. Include label
-#: Client/core/ServerBrowser/CServerBrowser.cpp:620
+#: Client/core/ServerBrowser/CServerBrowser.cpp:647
 msgid "Include:"
 msgstr "Įtraukti:"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:626
+#: Client/core/ServerBrowser/CServerBrowser.cpp:653
 msgid "Empty"
 msgstr "Tuščias"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:632
+#: Client/core/ServerBrowser/CServerBrowser.cpp:659
 msgid "Full"
 msgstr "Pilnas"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:638
+#: Client/core/ServerBrowser/CServerBrowser.cpp:665
 msgid "Locked"
 msgstr "Užrakintas"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:650
+#: Client/core/ServerBrowser/CServerBrowser.cpp:677
 msgid "Offline"
 msgstr "Išjungtas"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:663
+#: Client/core/ServerBrowser/CServerBrowser.cpp:690
 msgid "Other Versions"
 msgstr "Kitos Versijos"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:684
+#: Client/core/ServerBrowser/CServerBrowser.cpp:711
 msgid "Back"
 msgstr "Atgal"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:977
-#: Client/core/ServerBrowser/CServerBrowser.cpp:991
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1658
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1012
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1026
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1718
 msgid "Loading..."
 msgstr "Įkeliama..."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1506
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2831
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1563
+#: Client/core/ServerBrowser/CServerBrowser.cpp:3039
 msgid "  ..loading.."
 msgstr "..kraunama.."
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1544
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1678
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1601
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1758
 msgid "No address specified!"
 msgstr "Nepateiktas adresas!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1557
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Unknown protocol"
 msgstr "Nežinomas protokolas!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1557
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Please use the mtasa:// protocol!"
 msgstr "Prašome naudoti mtasa:// protokolą!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1566
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1625
-#: Client/mods/deathmatch/logic/CClientGame.cpp:656
-#: Client/mods/deathmatch/logic/CClientGame.cpp:748
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1623
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1682
+#: Client/mods/deathmatch/logic/CClientGame.cpp:658
+#: Client/mods/deathmatch/logic/CClientGame.cpp:750
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Netinkamas slapyvardis! Prašome eiti į nustatymus ir pasirinkti naują slapyvardį!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1648
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 msgid "You have to select a server to connect to."
 msgstr "Kad prisijungtumėte į serverį, jums reikia jį pasirinkti."
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1502
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1619
 msgid "Problem with graphics driver"
 msgstr "Problema su grafikos tvarkykle"
 
@@ -2759,11 +2764,11 @@ msgstr "Nepavyksta rasti tinkamos ekrano raiškos."
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Ar tikrai norite naudoti šią ekrano raišką?"
 
-#: Client/game_sa/CGameSA.cpp:256 Client/game_sa/CGameSA.cpp:267
+#: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
 msgid "Failed initialization game_sa"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:258
+#: Client/game_sa/CGameSA.cpp:259
 msgid "Memory allocations failed"
 msgstr ""
 
@@ -2990,174 +2995,174 @@ msgstr "%s iš %s"
 msgid "Disconnect to cancel download"
 msgstr "Atsijunkite norėdami atšaukti siuntimą"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:499
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnected: Invalid nickname"
 msgstr "Atjungta: netinkamas slapyvardis"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 msgid "Disconnect from server"
 msgstr "Atsijungta iš serverio"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:511
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr "Atjungta: Serijinis numeris užblokuotas.\n"
 "Priežastis: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr "Atjungta: Priėjimas užblokuotas.\n"
 "Priežastis: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:523
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr "Atjungta: Sąskaita užblokuota.\n"
 "Priežastis: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:524
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Version mismatch"
 msgstr "Atjungta: Versija nesutampa"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "Atjungta: Per daug prisijungimų. Prašome palaukti minutę ir bandyti dar kartą."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr "Atjungta: Serveris iš skirtingos šakos.\n"
 "Informacija: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr "Atjungta: Bloga versija.\n"
 "Informacija: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:542
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:546
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr "Atjungta: Serveris naudoja naujesnę versiją.\n"
 "Informacija: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:547
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:551
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr "Atjungta: Serveris naudoja senesnę versiją.\n"
 "Informacija: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:552
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
 msgid "Disconnected: Nick already in use"
 msgstr "Atjungta: Slapyvardis jau naudojamas"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
 msgid "Disconnected: Player element could not be created."
 msgstr "Atsijungta: nepavyko sukurti žaidėjo elemento."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:564
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "Atjungta: Serveris atmetė prisijungimą: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:565
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial verification failed"
 msgstr "Atjungta: Serijinio kodo patvirtinimas nepavyko"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 msgid "Disconnected: Serial already in use"
 msgstr "Atsijungta: serijinis numeris jau naudojamas"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:577
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "Atjungta: Prisijungimo desinchronizacija %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:586
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "Atjungta: %s išmetė jus iš serverio"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:587
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:591
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "Atjungta: %s uždraudė jums priėjimą prie serverio"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:598
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "Atjungta: Serveris išsijungė arba persikrauna"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:618
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 msgid "You were kicked from the game"
 msgstr "Jūs buvote išmestas iš žaidimo"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:619
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr "Šis serveris reikalauja originalaus gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Please replace gta_sa.exe"
 msgstr "Prašome pakeisti gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr "Šis serveris neleidžia modifikuotu D3D9.DLL"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr "Pašalinkite D3D9.DLL iš GTA aplanko ir paleiskite MTA iš naujo"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "This server does not allow virtual machines"
 msgstr "Serveris neleidžia naudoti virtualių mašinų"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server requires driver signing to be enabled"
 msgstr "Šis serveris prašo, kad būtų ijungtas driver signing"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Please restart your PC"
 msgstr "Iš naujo paleiskite kompiuterį"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server has detected missing anti-cheat components"
 msgstr "Serveris aptiko trūkstamų anti-cheat komponentų"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Try restarting MTA"
 msgstr "Perkraukite MTA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr "Serveris prašo originalaus gta3.img ir gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Please replace gta3.img or gta_int.img"
 msgstr "Pakeiskite gta3.img arba gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
 msgid "This server does not allow Wine"
 msgstr "Šis serveris draudžia Wine"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:637
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr "Įsitikinkite, kad jokia kita programa nemodifikuoja MTA:SA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
 msgid "Time Remaining: "
 msgstr "Liko Laiko:"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:657
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
@@ -3166,7 +3171,7 @@ msgstr[1] "%d dienos"
 msgstr[2] "%d dienų"
 msgstr[3] "%d dienos"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
@@ -3175,7 +3180,7 @@ msgstr[1] "%d valandos"
 msgstr[2] "%d valandų"
 msgstr[3] "%d valandos"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
@@ -3184,7 +3189,7 @@ msgstr[1] "%d minutės"
 msgstr[2] "%d minučių"
 msgstr[3] "%d minutės"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -3194,198 +3199,198 @@ msgstr[2] "%d minučių"
 msgstr[3] "%d sekundės"
 
 #. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:671
 msgid "Disconnected"
 msgstr "Atjungta"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Flying a UFO around"
 msgstr "Skraidau su UFO aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Cruising around"
 msgstr "Ramiai važinėju aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Riding the waves of"
 msgstr "Plaukiu bangomis"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Riding the train in"
 msgstr "Važiuoju traukiniu į"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+#: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Flying around"
 msgstr "Skraidau aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+#: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Riding around"
 msgstr "Važinėju aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+#: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Monster truckin' around"
 msgstr "Monstrišku džipu važinėju aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Quaddin' around"
 msgstr "Keturračiu važinėju aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Bunny hopping around"
 msgstr "Šokinėju aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Doing weird stuff in"
 msgstr "Darau keistus dalykus"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+#: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Climbing around in"
 msgstr "Laipioju aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:392
-#: Client/mods/deathmatch/logic/CClientGame.cpp:393
+#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+#: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Doing a drive-by in"
 msgstr "Šaudau iš automobilio važiuojant"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+#: Client/mods/deathmatch/logic/CClientGame.cpp:396
 msgid "Blub blub..."
 msgstr "Blub blub..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:395
+#: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Breathing water"
 msgstr "Kvepuoju vandeniu"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:396
+#: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Drowning in"
 msgstr "Skęstu"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:397
+#: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Ducking for cover in"
 msgstr "Slepiuosi už priedangos"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:398
+#: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Fighting in"
 msgstr "Kovoju"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:399
+#: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Throwing fists in"
 msgstr "Mosikuoju kumščiais"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:400
+#: Client/mods/deathmatch/logic/CClientGame.cpp:402
 msgid "Blastin' fools in"
 msgstr "Šaudau kvailius"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:401
+#: Client/mods/deathmatch/logic/CClientGame.cpp:403
 msgid "Shooting up"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:402
+#: Client/mods/deathmatch/logic/CClientGame.cpp:404
 msgid "Jetpacking in"
 msgstr "Skraidau su jetpack"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:403
+#: Client/mods/deathmatch/logic/CClientGame.cpp:405
 msgid "Literally on fire in"
 msgstr "Literaliai užsidegęs"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:404
+#: Client/mods/deathmatch/logic/CClientGame.cpp:406
 msgid "Burning up in"
 msgstr "Degu"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:405
+#: Client/mods/deathmatch/logic/CClientGame.cpp:407
 msgid "Swimming in"
 msgstr "Plaukiu"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:406
+#: Client/mods/deathmatch/logic/CClientGame.cpp:408
 msgid "Floating around in"
 msgstr "Plūduriuoju aplink"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:407
+#: Client/mods/deathmatch/logic/CClientGame.cpp:409
 msgid "Being chased by a shark"
 msgstr "Persekiojamas ryklio"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:408
+#: Client/mods/deathmatch/logic/CClientGame.cpp:410
 msgid "Choking to death in"
 msgstr "Dustu iki mirties"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:672
+#: Client/mods/deathmatch/logic/CClientGame.cpp:674
 msgid "Entering the game ..."
 msgstr "Įeinama į žaidimą ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:724
+#: Client/mods/deathmatch/logic/CClientGame.cpp:726
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "Neprisijungta; prašome naudoti Jungtis arba komandą 'connect', kad prisijungtumėte į serverį."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:770
+#: Client/mods/deathmatch/logic/CClientGame.cpp:772
 msgid "Could not start the local server. See console for details."
 msgstr "Nepavyko paleisti vietinio serverio. Žvilgtelkite į konsolę, norėdami sužinoti detaliau."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:780
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+#: Client/mods/deathmatch/logic/CClientGame.cpp:782
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
 msgid "Local Server"
 msgstr "Vietinis Serveris"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:780
+#: Client/mods/deathmatch/logic/CClientGame.cpp:782
 msgid "Starting local server ..."
 msgstr "Paleidžiamas vietinis serveris ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1028
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
 msgid "Area 51"
 msgstr "51 zona"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1037
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1039
 msgid "Walking around "
 msgstr "Vaikštau aplink "
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1182
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Jūs buvote išmestas iš žaidimo ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
 msgid "Connecting to local server..."
 msgstr "Jungiamasi prie vietinio serverio..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
 msgid "Error connecting to server."
 msgstr "Klaida jungiantis prie serverio."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
 msgid "Connecting to local server timed out. See console for details."
 msgstr "Prisijungimui prie vietinio serverio baigėsi laikas. Pažvelkite į konsolę detalėms sužinoti."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
 msgid "Connection with the server was lost"
 msgstr "Prisijungimas su serveriu prarastas"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1407
 msgid "Disconnected: the server is currently full"
 msgstr "Atjungta: serveris šiuo metu yra pilnas"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1417
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
 msgid "Disconnected: invalid password specified"
 msgstr "Atjungta: pateiktas neteisingas slaptažodis"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1439
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
 msgid "MTA Client verification failed!"
 msgstr "MTA kliento patvirtinimas nepavyko!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
 msgid "In a ditch"
 msgstr "Griovyje"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
 msgid "En-route to hospital"
 msgstr "Kelyje į ligoninę"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
 msgid "Meeting their maker"
 msgstr "Susitinku su savo kūrėju"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
 msgid "Regretting their decisions"
 msgstr "Gailisi savo pasirinkimų"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
 msgid "Wasted"
 msgstr "Miriau"
 
@@ -3414,11 +3419,11 @@ msgstr ""
 msgid "Connection error"
 msgstr "Prisijungimo klaida"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:247
+#: Shared/sdk/SharedUtil.Misc.hpp:380
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto nebuvo įdiegtas teisingai, prašome įdiegti iš naujo."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:1342
+#: Shared/sdk/SharedUtil.Misc.hpp:1475
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Jūsų naršklė dabar atidarys tinklapį su šiek tiek informacijos.\n\n"
