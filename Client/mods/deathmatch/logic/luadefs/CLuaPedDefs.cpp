@@ -1804,6 +1804,13 @@ int CLuaPedDefs::IsPedDead(lua_State* luaVM)
     {
         // Grab his dead state and return it
         bool bDead = pPed->IsDead() || pPed->IsDying();
+
+        // Check player is already dead on network (#4147)
+        if (auto pPlayer = dynamic_cast<CClientPlayer*>(pPed))
+        {
+            bDead = bDead || pPlayer->IsDeadOnNetwork();
+        }
+
         lua_pushboolean(luaVM, bDead);
         return 1;
     }
