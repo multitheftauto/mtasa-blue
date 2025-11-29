@@ -2012,21 +2012,8 @@ void CClientPed::SetFrozen(bool bFrozen)
                     m_pTaskManager->RemoveTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
             }
 
-            if (m_pPlayerPed)
-            {
-                m_pPlayerPed->GetMatrix(&m_matFrozen);
-                
-                CVector vecFrozenRotation = m_matFrozen.GetRotation();
-                
-                if (vecFrozenRotation.fX == 0.0f && vecFrozenRotation.fY == 0.0f && vecFrozenRotation.fZ == 0.0f)
-                {
-                    m_matFrozen.SetRotation(m_Matrix.GetRotation());
-                }
-            }
-            else
-            {
-                m_matFrozen = m_Matrix;
-            }
+            // Always use the client's cached matrix, it's already updated by SetCurrentRotation
+            m_matFrozen = m_Matrix;
         }
     }
 }
@@ -3366,6 +3353,11 @@ void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
         if (bIncludeTarget)
             m_fTargetRotation = fRotation;
     }
+
+    // Always update m_Matrix rotation so m_matFrozen gets correct value in SetFrozen
+    CVector vecRotation = m_Matrix.GetRotation();
+    vecRotation.fZ = fRotation;
+    m_Matrix.SetRotation(vecRotation);
 }
 
 void CClientPed::SetTargetRotation(float fRotation)
@@ -6667,6 +6659,10 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     {
         return false;
     }
+
+    // Validate camper seat to avoid multiple occupants && desyncronization
+    if (vehicleModel == VehicleType::VT_CAMPER && uiSeat > 0 && pVehicle->GetOccupant(uiSeat))
+        return false;
 
     // Call the onClientVehicleStartEnter event for the ped
     // Check if it is cancelled before sending packet
