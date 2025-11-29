@@ -119,11 +119,12 @@ namespace WebViewAuth
             args.emplace_back(argList->GetString(i).ToString());
         }
 
-        if (!g_pCore || !pWebView->GetEventsInterface()) [[unlikely]]
-            return true;
-
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnTriggerEvent, pWebView->GetEventsInterface(), SString(eventName), std::move(args));
-        g_pCore->GetWebCore()->AddEventToEventQueue(std::move(func), pWebView, "OnProcessMessageReceived1");
+        // Use QueueBrowserEvent for UAF-safe event dispatch (generation token pattern)
+        pWebView->QueueBrowserEvent(
+            "OnProcessMessageReceived1",
+            [eventNameStr = SString(eventName), args = std::move(args)](CWebBrowserEventsInterface* iface) mutable {
+                iface->Events_OnTriggerEvent(eventNameStr, args);
+            });
         return true;
     }
 
@@ -141,13 +142,13 @@ namespace WebViewAuth
 
         pWebView->SetInputFocus(argList->GetBool(0));
 
-        // Validate g_pCore and m_pEventsInterface before use (defensive programming)
-        if (!g_pCore || !pWebView->GetEventsInterface()) [[unlikely]]
-            return true;
-
+        // Use QueueBrowserEvent for UAF-safe event dispatch (generation token pattern)
         const bool hasFocus = pWebView->HasInputFocus();
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnInputFocusChanged, pWebView->GetEventsInterface(), hasFocus);
-        g_pCore->GetWebCore()->AddEventToEventQueue(std::move(func), pWebView, "OnProcessMessageReceived2");
+        pWebView->QueueBrowserEvent(
+            "OnProcessMessageReceived2",
+            [focus = hasFocus](CWebBrowserEventsInterface* iface) {
+                iface->Events_OnInputFocusChanged(focus);
+            });
         return true;
     }
 }
