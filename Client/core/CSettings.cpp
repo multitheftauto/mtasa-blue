@@ -1594,7 +1594,9 @@ void CSettings::CreateGUI()
     const CVector2D blacklistGridPos = vecTemp;
     const float browserBottomPadding = 32.0f;
     const float browserButtonSpacing = 5.0f;
-    const CVector2D blacklistRemoveSize(140.0f, 22.0f);
+    const CVector2D blacklistRemoveSize(155.0f, 22.0f);
+    const CVector2D blacklistRemoveAllSize(155.0f, 22.0f);
+    const float blacklistRemoveAllSpacing = 165.0f;
     const float blacklistHeightAvailable = tabPanelSize.fY - blacklistGridPos.fY - blacklistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
     m_pGridBrowserBlacklist->SetSize(CVector2D(browserColumnWidth, std::max(80.0f, blacklistHeightAvailable)));
     m_pGridBrowserBlacklist->AddColumn(_("Domain"), 0.9f);
@@ -1602,6 +1604,10 @@ void CSettings::CreateGUI()
     m_pButtonBrowserBlacklistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
     m_pButtonBrowserBlacklistRemove->SetSize(blacklistRemoveSize);
     m_pButtonBrowserBlacklistRemove->SetPosition(CVector2D(blacklistGridPos.fX, blacklistGridPos.fY + m_pGridBrowserBlacklist->GetSize().fY + browserButtonSpacing));
+
+    m_pButtonBrowserBlacklistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
+    m_pButtonBrowserBlacklistRemoveAll->SetSize(blacklistRemoveAllSize);
+    m_pButtonBrowserBlacklistRemoveAll->SetPosition(CVector2D(vecTemp.fX + blacklistRemoveAllSpacing, vecTemp.fY + m_pGridBrowserBlacklist->GetSize().fY + browserButtonSpacing));
 
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);            // Reset vecTemp
 
@@ -1632,7 +1638,9 @@ void CSettings::CreateGUI()
     m_pGridBrowserWhitelist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserWhitelist->GetPosition(vecTemp);
     const CVector2D whitelistGridPos = vecTemp;
-    const CVector2D whitelistRemoveSize(140.0f, 22.0f);
+    const CVector2D whitelistRemoveSize(155.0f, 22.0f);
+    const CVector2D whitelistRemoveAllSize(155.0f, 22.0f);
+    const float whitelistRemoveAllSpacing = 165.0f;
     const float whitelistHeightAvailable = tabPanelSize.fY - whitelistGridPos.fY - whitelistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
     m_pGridBrowserWhitelist->SetSize(CVector2D(browserColumnWidth, std::max(80.0f, whitelistHeightAvailable)));
     m_pGridBrowserWhitelist->AddColumn(_("Domain"), 0.9f);
@@ -1640,6 +1648,10 @@ void CSettings::CreateGUI()
     m_pButtonBrowserWhitelistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
     m_pButtonBrowserWhitelistRemove->SetSize(whitelistRemoveSize);
     m_pButtonBrowserWhitelistRemove->SetPosition(CVector2D(whitelistGridPos.fX, whitelistGridPos.fY + m_pGridBrowserWhitelist->GetSize().fY + browserButtonSpacing));
+
+    m_pButtonBrowserWhitelistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
+    m_pButtonBrowserWhitelistRemoveAll->SetSize(whitelistRemoveAllSize);
+    m_pButtonBrowserWhitelistRemoveAll->SetPosition(CVector2D(vecTemp.fX + whitelistRemoveAllSpacing, vecTemp.fY + m_pGridBrowserWhitelist->GetSize().fY + browserButtonSpacing));
 
     /**
      *  Advanced tab
@@ -1963,10 +1975,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
+    m_pButtonBrowserBlacklistRemoveAll->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemoveAll, this));
     m_pEditBrowserBlacklistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddFocused, this));
     m_pEditBrowserBlacklistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddDefocused, this));
     m_pButtonBrowserWhitelistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistAdd, this));
     m_pButtonBrowserWhitelistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemove, this));
+    m_pButtonBrowserWhitelistRemoveAll->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemoveAll, this));
     m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
     m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
     m_pProcessAffinityCheckbox->SetClickHandler(GUI_CALLBACK(&CSettings::OnAffinityClick, this));
@@ -5877,6 +5891,16 @@ bool CSettings::OnBrowserBlacklistRemove(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnBrowserBlacklistRemoveAll(CGUIElement* pElement)
+{
+    if (m_pGridBrowserBlacklist->GetRowCount() > 0)
+    {
+        m_pGridBrowserBlacklist->Clear();
+        m_bBrowserListsChanged = true;
+    }
+    return true;
+}
+
 bool CSettings::OnBrowserBlacklistDomainAddFocused(CGUIElement* pElement)
 {
     m_pLabelBrowserBlacklistAdd->SetVisible(false);
@@ -5920,6 +5944,17 @@ bool CSettings::OnBrowserWhitelistRemove(CGUIElement* pElement)
     if (iSelectedRow > -1)
     {
         m_pGridBrowserWhitelist->RemoveRow(iSelectedRow);
+        m_bBrowserListsChanged = true;
+    }
+
+    return true;
+}
+
+bool CSettings::OnBrowserWhitelistRemoveAll(CGUIElement* pElement)
+{
+    if (m_pGridBrowserWhitelist->GetRowCount() > 0)
+    {
+        m_pGridBrowserWhitelist->Clear();
         m_bBrowserListsChanged = true;
     }
 
