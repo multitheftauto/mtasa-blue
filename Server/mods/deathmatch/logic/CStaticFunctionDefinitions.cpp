@@ -757,6 +757,75 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer(CElement* pElement)
     return NULL;
 }
 
+bool CStaticFunctionDefinitions::IsElementSyncer(CElement* pElement, CPlayer* pPlayer)
+{
+    switch (pElement->GetType())
+    {
+        case CElement::PED:
+        {
+            CPed* pPed = static_cast<CPed*>(pElement);
+            return pPed->IsSyncable() && pPed->GetSyncer() == pPlayer;
+        }
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            return pVehicle->IsUnoccupiedSyncable() && pVehicle->GetSyncer() == pPlayer;
+        }
+#ifdef WITH_OBJECT_SYNC
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast<CObject*>(pElement);
+            return pObject->IsSyncable() && pObject->GetSyncer() == pPlayer;
+        }
+#endif
+        default:
+            return false;
+    }
+}
+
+std::vector<CElement*> CStaticFunctionDefinitions::GetElementsSyncedByPlayer(CPlayer* pPlayer, std::optional<std::string> strType)
+{
+    assert(pPlayer);
+
+    std::vector<CElement*> elements;
+
+    // Check all vehicles
+    if (!strType.has_value() || strType.value() == "vehicle")
+    {
+        for (CVehicle* pVehicle : m_pVehicleManager->GetVehicles())
+        {
+            if (pVehicle->GetSyncer() == pPlayer)
+                elements.push_back(pVehicle);
+        }
+    }
+
+    // Check all peds
+    if (!strType.has_value() || strType.value() == "ped")
+    {
+        for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); ++iter)
+        {
+            CPed* pPed = *iter;
+            if (pPed->GetSyncer() == pPlayer)
+                elements.push_back(pPed);
+        }
+    }
+
+#ifdef WITH_OBJECT_SYNC
+    // Check all objects
+    if (!strType.has_value() || strType.value() == "object")
+    {
+        for (auto iter = m_pObjectManager->IterBegin(); iter != m_pObjectManager->IterEnd(); ++iter)
+        {
+            CObject* pObject = *iter;
+            if (pObject->GetSyncer() == pPlayer)
+                elements.push_back(pObject);
+        }
+    }
+#endif
+
+    return elements;
+}
+
 bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
 {
     assert(pElement);
