@@ -17,6 +17,7 @@
 #define VAR_FlyWithMouse    ( ( BYTE * ) ( 0xC1CC03 ) )
 #define VAR_SteerWithMouse  ( ( BYTE * ) ( 0xC1CC02 ) )
 #define VAR_VerticalAimSensitivity  ( ( float * ) ( 0xB6EC18 ) )
+#define VAR_HorizontalMouseSensitivity 0xB6EC1C
 
 static const float VERTICAL_AIM_SENSITIVITY_MIN = 0.000312f;
 static const float VERTICAL_AIM_SENSITIVITY_DEFAULT = 0.0015f;
@@ -148,4 +149,15 @@ float CControllerConfigManagerSA::GetVerticalAimSensitivityRawValue()
 void CControllerConfigManagerSA::SetVerticalAimSensitivityRawValue(float fRawValue)
 {
     MemPutFast<float>(VAR_VerticalAimSensitivity, fRawValue);
+}
+
+void CControllerConfigManagerSA::SetVerticalAimSensitivitySameAsHorizontal(bool enabled)
+{
+    std::uintptr_t varToUse = enabled ? VAR_HorizontalMouseSensitivity : reinterpret_cast<std::uintptr_t>(VAR_VerticalAimSensitivity);
+
+    MemPut<std::uintptr_t>(0x50F048, varToUse); // CCam::Process_1rstPersonPedOnPC
+    MemPut<std::uintptr_t>(0x50FB28, varToUse); // CCam::Process_FollowPedWithMouse
+    MemPut<std::uintptr_t>(0x510C28, varToUse); // CCam::Process_M16_1stPerson
+    MemPut<std::uintptr_t>(0x511E0A, varToUse); // CCam::Process_Rocket
+    MemPut<std::uintptr_t>(0x52228E, varToUse); // CCam::Process_AimWeapon
 }
