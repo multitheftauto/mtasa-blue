@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-23 14:47+0000\n"
-"PO-Revision-Date: 2025-11-28 22:42\n"
+"PO-Revision-Date: 2025-11-29 00:50\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -703,7 +703,7 @@ msgstr "Estableciendo conexión a %s:%u ..."
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr "Reconectando %s:%u ..."
+msgstr "Reconectando con %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
@@ -926,7 +926,7 @@ msgstr "* La hora es %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr "connect: La red no está lista, por favor espera un momento."
+msgstr "Connect: La red no está lista, por favor espera un momento"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -952,16 +952,16 @@ msgstr "connect: Error al desactivar la modificación actual"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "reconnect: La red no está lista, por favor espera un momento."
+msgstr "Reconnect: La red no está lista, por favor espera un momento"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "reconectar: Puerto incorrecto"
+msgstr "Reconnect: Puerto incorrecto"
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr "reconectar: Reconectando %s:%u..."
+msgstr "Reconnect: Reconectando %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:329
 #, c-format
@@ -1059,7 +1059,7 @@ msgstr "Volar con ratón"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
-msgstr "Use la sensibilidad del ratón para apuntar."
+msgstr "Use la sensibilidad del ratón para apuntar"
 
 #. Joypad options
 #: Client/core/CSettings.cpp:669
@@ -1135,11 +1135,11 @@ msgstr "Mostrar siempre la ventana de descarga"
 
 #: Client/core/CSettings.cpp:855
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "Permitir conectar con Discord Rich Presence"
+msgstr "Permitir conexión con Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:860
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr "Permitir estatus ingame a GTA:SA en Steam."
+msgstr "Permitir estatus ingame a GTA:SA en Steam"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:866
@@ -1148,7 +1148,7 @@ msgstr "Guarda las fotos tomadas con la cámara en la carpeta GTA San Andreas Us
 
 #: Client/core/CSettings.cpp:871
 msgid "Ask before disconnecting from server using main menu"
-msgstr "Preguntar antes de desconectar del servidor usando el menú principal."
+msgstr "Preguntar antes de desconectar del servidor usando el menú principal"
 
 #: Client/core/CSettings.cpp:876
 msgid "Use customized GTA:SA files"
