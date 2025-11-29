@@ -187,32 +187,6 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     if (!g_pClientGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, nullptr, pMapEvent))
                         continue;
 
-                    const char* scriptName = pMapEvent->GetVM()->GetScriptName();
-                    CResource*  pEventResource = pMapEvent->GetVM()->GetResource();
-                    const char* resourceName = pEventResource ? pEventResource->GetName() : "<no-resource>";
-
-                    SString sourceTag = "<null>";
-                    if (pSource)
-                    {
-                        const SString& sourceTypeName = pSource->GetTypeName();
-                        const char* sourceTypeNameCStr = !sourceTypeName.empty() ? sourceTypeName.c_str() : "<unknown>";
-                        sourceTag.Format("%s(%u)", sourceTypeNameCStr, pSource->GetID().Value());
-                    }
-
-                    SString thisTag = "<null>";
-                    if (pThis)
-                    {
-                        const SString& thisTypeName = pThis->GetTypeName();
-                        const char* thisTypeNameCStr = !thisTypeName.empty() ? thisTypeName.c_str() : "<unknown>";
-                        thisTag.Format("%s(%u)", thisTypeNameCStr, pThis->GetID().Value());
-                    }
-
-                    SString telemetryDetail;
-                    telemetryDetail.Format("%s::%s src=%s this=%s", scriptName, resourceName, sourceTag.c_str(), thisTag.c_str());
-                    // Tag each Lua event dispatch so crash dumps show which
-                    // resource/event/element executed last
-                    CrashTelemetry::Scope eventScope(0, pThis, "LuaEvent::Call", telemetryDetail.c_str());
-
                     // Store the current values of the globals
                     lua_getglobal(pState, "source");
                     CLuaArgument OldSource(pState, -1);

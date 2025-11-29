@@ -30,37 +30,41 @@ namespace
     // Use ids instead of points for callback arguments,
     // as it's easier to identify an invalid id
     //
-    CCriticalSection             ms_CallbackCS;
+    std::mutex                   ms_CallbackMutex;
     std::map<void*, CBassAudio*> ms_CallbackIdMap;
     uint                         ms_uiNextCallbackId = 1;
+
+    // Track failed audio file loads to prevent spam and performance hit
+    std::mutex                         ms_FailedFilesMutex;
+    std::unordered_map<SString, DWORD> ms_FailedAudioFiles;
+    constexpr DWORD FAILED_LOAD_RETRY_DELAY = 10000;            // 10 seconds before retrying a failed file
+    constexpr size_t MAX_FAILED_FILES_CACHE_SIZE = 1000;
 
     // Get callback id for this CBassAudio
     void* AddCallbackId(CBassAudio* pBassAudio)
     {
-        ms_CallbackCS.Lock();
+        std::lock_guard<std::mutex> lock(ms_CallbackMutex);
         void* uiId = (void*)(++ms_uiNextCallbackId ? ms_uiNextCallbackId : ++ms_uiNextCallbackId);
         MapSet(ms_CallbackIdMap, uiId, pBassAudio);
-        ms_CallbackCS.Unlock();
         return uiId;
     }
 
     // Mark callback id as no longer valid
     void RemoveCallbackId(void* uiId)
     {
-        ms_CallbackCS.Lock();
+        std::lock_guard<std::mutex> lock(ms_CallbackMutex);
         MapRemove(ms_CallbackIdMap, uiId);
-        ms_CallbackCS.Unlock();
     }
 
-    // Get pointer from id
+    // Get pointer from id (caller must hold lock)
     CBassAudio* LockCallbackId(void* uiId)
     {
-        ms_CallbackCS.Lock();
+        ms_CallbackMutex.lock();
         return MapFindRef(ms_CallbackIdMap, uiId);
     }
 
     // Finish with pointer
-    void UnlockCallbackId() { ms_CallbackCS.Unlock(); }
+    void UnlockCallbackId() { ms_CallbackMutex.unlock(); }
 }            // namespace
 
 CBassAudio::CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D)
@@ -171,6 +175,25 @@ bool CBassAudio::BeginLoadingMedia()
         //
         // For non streams, try to load the sound file
         //
+        // Check if this file has recently failed to load (file-based only, not buffers)
+        const DWORD dwCurrentTime = GetTickCount32();
+        if (!m_pBuffer)
+        {
+            std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
+            const auto it = ms_FailedAudioFiles.find(m_strPath);
+            if (it != ms_FailedAudioFiles.end())
+            {
+                const DWORD dwTimeSinceFailure = dwCurrentTime - it->second;
+                if (dwTimeSinceFailure < FAILED_LOAD_RETRY_DELAY)
+                {
+                    // File failed recently, don't spam it
+                    return false;
+                }
+                // Enough time has passed, remove from failed list and try again
+                ms_FailedAudioFiles.erase(it);
+            }
+        }
+
         // First x streams need to be decoders rather than "real" sounds but that's dependent on if we need streams or not so we need to adapt.
         /*
             We are the Borg. Lower your shields and surrender your ships.
@@ -187,7 +210,26 @@ bool CBassAudio::BeginLoadingMedia()
                 m_pSound = BASS_MusicLoad(false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_RAMP | BASS_MUSIC_PRESCAN | BASS_STREAM_DECODE | BASS_UNICODE,
                                           0);            // Try again
             if (!m_pSound && m_b3D)
-                m_pSound = ConvertFileToMono(m_strPath);            // Last try if 3D
+            {
+                // Last try if 3D - check cache first to avoid spammed mono conversion attempts
+                bool bShouldTry = false;
+                {
+                    std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
+                    const auto it = ms_FailedAudioFiles.find(m_strPath);
+                    if (it == ms_FailedAudioFiles.end() || (dwCurrentTime - it->second) >= FAILED_LOAD_RETRY_DELAY)
+                    {
+                        bShouldTry = true;
+                        // Mark as failed/in-progress immediately
+                        // and to ensure failure is cached if ConvertFileToMono fails
+                        ms_FailedAudioFiles[m_strPath] = dwCurrentTime;
+                    }
+                }
+                
+                if (bShouldTry)
+                {
+                    m_pSound = ConvertFileToMono(m_strPath);
+                }
+            }
         }
         else
         {
@@ -199,11 +241,50 @@ bool CBassAudio::BeginLoadingMedia()
         // Failed to load ?
         if (!m_pSound)
         {
-            g_pCore->GetConsole()->Printf("BASS ERROR %d in LoadMedia  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop);
+            const int nErrorCode = BASS_ErrorGetCode();
+            // Only cache file-not-found errors to prevent spam
+            if (!m_pBuffer && nErrorCode == BASS_ERROR_FILEOPEN)
+            {
+                std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
+                if (ms_FailedAudioFiles.size() >= MAX_FAILED_FILES_CACHE_SIZE)
+                {
+                    // Remove oldest entry
+                    DWORD maxAge = 0;
+                    auto itOldest = ms_FailedAudioFiles.begin();
+                    for (auto it = ms_FailedAudioFiles.begin(); it != ms_FailedAudioFiles.end(); ++it)
+                    {
+                        // Find oldest entry
+                        DWORD age = dwCurrentTime - it->second;
+                        if (age > maxAge)
+                        {
+                            maxAge = age;
+                            itOldest = it;
+                        }
+                    }
+                    ms_FailedAudioFiles.erase(itOldest);
+                }
+                ms_FailedAudioFiles[m_strPath] = dwCurrentTime;
+            }
+            g_pCore->GetConsole()->Printf("BASS ERROR %d in LoadMedia  path:%s  3d:%d  loop:%d", nErrorCode, *m_strPath, m_b3D, m_bLoop);
             return false;
         }
 
-        m_pSound = BASS_FX_ReverseCreate(m_pSound, 2.0f, BASS_STREAM_DECODE | BASS_FX_FREESOURCE | BASS_MUSIC_PRESCAN);
+        // Successfully loaded - remove from failed cache if it was there
+        if (!m_pBuffer)
+        {
+            std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
+            ms_FailedAudioFiles.erase(m_strPath);
+        }
+
+        HSTREAM pReversed = BASS_FX_ReverseCreate(m_pSound, 2.0f, BASS_STREAM_DECODE | BASS_FX_FREESOURCE | BASS_MUSIC_PRESCAN);
+        if (!pReversed)
+        {
+            g_pCore->GetConsole()->Printf("BASS ERROR %d in BASS_FX_ReverseCreate  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop);
+            BASS_StreamFree(m_pSound);
+            m_pSound = 0;
+            return false;
+        }
+        m_pSound = pReversed;
         BASS_ChannelSetAttribute(m_pSound, BASS_ATTRIB_REVERSE_DIR, BASS_FX_RVS_FORWARD);
         // Sucks.
         /*if ( BASS_FX_BPM_CallbackSet ( m_pSound, (BPMPROC*)&BPMCallback, 1, 0, 0, m_uiCallbackId ) == false )
@@ -216,12 +297,6 @@ bool CBassAudio::BeginLoadingMedia()
         {
             g_pCore->GetConsole()->Printf("BASS ERROR %d in BASS_FX_BPM_BeatCallbackSet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D,
                                           m_bLoop);
-        }
-
-        if (!m_pSound)
-        {
-            g_pCore->GetConsole()->Printf("BASS ERROR %d in BASS_FX_ReverseCreate  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop);
-            return false;
         }
         m_pSound = BASS_FX_TempoCreate(m_pSound, lFlags | BASS_FX_FREESOURCE);
         if (!m_pSound)
@@ -359,21 +434,79 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
         BASS_StreamCreateFile(false, FromUTF8(strPath), 0, 0, BASS_STREAM_DECODE | BASS_SAMPLE_MONO | BASS_UNICODE);            // open file for decoding
     if (!decoder)
         return 0;                                                                                           // failed
-    DWORD            length = static_cast<DWORD>(BASS_ChannelGetLength(decoder, BASS_POS_BYTE));            // get the length
-    void*            data = malloc(length);                                                                 // allocate buffer for decoded data
+    
+    QWORD lengthQW = BASS_ChannelGetLength(decoder, BASS_POS_BYTE);
+    if (lengthQW == static_cast<QWORD>(-1) || lengthQW == 0)
+    {
+        BASS_StreamFree(decoder);
+        return 0;                                                                                           // invalid length
+    }
+    
+    if (lengthQW > 0xFFFFFFFF)
+    {
+        BASS_StreamFree(decoder);
+        return 0;                                                                                           // file too large for mono conversion
+    }
+    
+    DWORD length = static_cast<DWORD>(lengthQW);            // Safe cast after validation
+    void* data = malloc(length);                            // allocate buffer for decoded data
+    if (!data)
+    {
+        BASS_StreamFree(decoder);
+        return 0;                                                                                           // allocation failed
+    }
+    
     BASS_CHANNELINFO ci;
-    BASS_ChannelGetInfo(decoder, &ci);            // get sample format
+    if (!BASS_ChannelGetInfo(decoder, &ci))            // get sample format
+    {
+        free(data);
+        BASS_StreamFree(decoder);
+        return 0;                                                                                           // failed to get channel info
+    }
+    
     if (ci.chans > 1)                             // not mono, downmix...
     {
         HSTREAM mixer = BASS_Mixer_StreamCreate(ci.freq, 1, BASS_STREAM_DECODE | BASS_MIXER_END);            // create mono mixer
-        BASS_Mixer_StreamAddChannel(
-            mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE);            // plug-in the decoder (auto-free with the mixer)
+        if (!mixer)
+        {
+            free(data);
+            BASS_StreamFree(decoder);
+            return 0;                                                                                       // mixer creation failed
+        }
+        if (!BASS_Mixer_StreamAddChannel(
+            mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE))            // plug-in the decoder (auto-free with the mixer)
+        {
+            free(data);
+            BASS_StreamFree(mixer);
+            BASS_StreamFree(decoder);
+            return 0;                                                                                       // failed to add channel
+        }
         decoder = mixer;                                                                                 // decode from the mixer
     }
-    length = BASS_ChannelGetData(decoder, data, length);                                                    // decode data
+    
+    DWORD decodedLength = BASS_ChannelGetData(decoder, data, length);                                    // decode data
     BASS_StreamFree(decoder);                                                                               // free the decoder/mixer
+    
+    if (decodedLength == static_cast<DWORD>(-1))
+    {
+        free(data);
+        return 0;                                                                                           // decode failed
+    }
+    
     HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);            // create stream
-    BASS_StreamPutData(stream, data, length);                                                               // set the stream data
+    if (!stream)
+    {
+        free(data);
+        return 0;                                                                                           // stream creation failed
+    }
+    
+    if (!BASS_StreamPutData(stream, data, decodedLength))                                                   // set the stream data
+    {
+        free(data);
+        BASS_StreamFree(stream);
+        return 0;                                                                                           // failed to put data
+    }
+    
     free(data);                                                                                             // free the buffer
     return stream;
 }
@@ -641,9 +774,12 @@ bool CBassAudio::SetPlayPosition(double dPosition)
     // Only relevant for non-streams, which are always ready if valid
     if (m_pSound)
     {
+        QWORD byteLength = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
+        if (byteLength == static_cast<QWORD>(-1) || byteLength == 0)
+            return false;
+        
         // Make sure position is in range
         QWORD bytePosition = BASS_ChannelSeconds2Bytes(m_pSound, dPosition);
-        QWORD byteLength = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
         return BASS_ChannelSetPosition(m_pSound, Clamp<QWORD>(0, bytePosition, byteLength - 1), BASS_POS_BYTE);
     }
     return false;
@@ -889,6 +1025,21 @@ float CBassAudio::GetSoundBPM()
 {
     if (m_fBPM == 0.0f && !m_bStream)
     {
+        // Check failed cache before trying
+        const DWORD dwCurrentTime = GetTickCount32();
+        {
+            std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
+            const auto it = ms_FailedAudioFiles.find(m_strPath);
+            if (it != ms_FailedAudioFiles.end())
+            {
+                const DWORD dwTimeSinceFailure = dwCurrentTime - it->second;
+                if (dwTimeSinceFailure < FAILED_LOAD_RETRY_DELAY)
+                {
+                    return 0.0f;            // File failed recently, don't retry
+                }
+            }
+        }
+        
         float fData = 0.0f;
 
         // open the same file as played but for bpm decoding detection
@@ -907,6 +1058,11 @@ float CBassAudio::GetSoundBPM()
 
         if (BASS_ErrorGetCode() != BASS_OK)
         {
+            // Cache the failure to prevent repeated perf hits
+            {
+                std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
+                ms_FailedAudioFiles[m_strPath] = dwCurrentTime;
+            }
             g_pCore->GetConsole()->Printf("BASS ERROR %d in BASS_FX_BPM_DecodeGet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop);
         }
         else
