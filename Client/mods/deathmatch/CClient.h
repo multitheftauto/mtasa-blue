@@ -13,6 +13,8 @@
 
 #include <core/CClientBase.h>
 
+extern bool g_bClientShuttingDown;
+
 class CClient : public CClientBase
 {
 public:
