@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-23 01:11+0000\n"
-"PO-Revision-Date: 2025-11-23 01:30\n"
+"POT-Creation-Date: 2025-11-23 14:47+0000\n"
+"PO-Revision-Date: 2025-11-28 11:04\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1058,7 +1058,7 @@ msgstr "Управление полётом с мыши"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
-msgstr ""
+msgstr "Использовать чувствительность мыши при прицеливании"
 
 #. Joypad options
 #: Client/core/CSettings.cpp:669
@@ -2797,118 +2797,118 @@ msgstr "Запомнить решение"
 msgid "Deny"
 msgstr "Запретить"
 
-#: Client/mods/deathmatch/CClient.cpp:36
+#: Client/mods/deathmatch/CClient.cpp:37
 msgid "This version has expired."
 msgstr "Эта версия устарела."
 
-#: Client/mods/deathmatch/CClient.cpp:57
+#: Client/mods/deathmatch/CClient.cpp:58
 msgid "disconnect from the game"
 msgstr "отключение от игры"
 
-#: Client/mods/deathmatch/CClient.cpp:58
+#: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the nametags"
 msgstr "показывать неймтеги"
 
-#: Client/mods/deathmatch/CClient.cpp:59
+#: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the chatbox"
 msgstr "показать чат"
 
-#: Client/mods/deathmatch/CClient.cpp:60
+#: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the network statistics"
 msgstr "Показывать статистику соединения"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
+#: Client/mods/deathmatch/CClient.cpp:64
 msgid "open the chat input"
 msgstr "Открыть чат"
 
-#: Client/mods/deathmatch/CClient.cpp:64
+#: Client/mods/deathmatch/CClient.cpp:65
 msgid "transmits voice to other players"
 msgstr "Передавать голос всем игрокам"
 
-#: Client/mods/deathmatch/CClient.cpp:65
+#: Client/mods/deathmatch/CClient.cpp:66
 msgid "enters a car as passenger"
 msgstr "Транспорт: Пассажир"
 
-#: Client/mods/deathmatch/CClient.cpp:66
+#: Client/mods/deathmatch/CClient.cpp:67
 msgid "next radio channel"
 msgstr "След. радиостанция"
 
-#: Client/mods/deathmatch/CClient.cpp:67
+#: Client/mods/deathmatch/CClient.cpp:68
 msgid "previous radio channel"
 msgstr "Пред. радиостанция"
 
-#: Client/mods/deathmatch/CClient.cpp:68
+#: Client/mods/deathmatch/CClient.cpp:69
 msgid "enables the player-map view"
 msgstr "радар: Отобразить/Спрятать"
 
-#: Client/mods/deathmatch/CClient.cpp:69
+#: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map in"
 msgstr "увеличивает масштаб карты игрока в"
 
-#: Client/mods/deathmatch/CClient.cpp:70
+#: Client/mods/deathmatch/CClient.cpp:71
 msgid "zooms the player-map out"
 msgstr "увеличивает масштаб карты игрока из"
 
-#: Client/mods/deathmatch/CClient.cpp:71
+#: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map north"
 msgstr "перемещает карту игрока север"
 
-#: Client/mods/deathmatch/CClient.cpp:72
+#: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map south"
 msgstr "перемещает карту игрока на юг"
 
-#: Client/mods/deathmatch/CClient.cpp:73
+#: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map east"
 msgstr "перемещает карту игрока на восток"
 
-#: Client/mods/deathmatch/CClient.cpp:74
+#: Client/mods/deathmatch/CClient.cpp:75
 msgid "moves the player-map west"
 msgstr "перемещает карту игрока на запад"
 
-#: Client/mods/deathmatch/CClient.cpp:75
+#: Client/mods/deathmatch/CClient.cpp:76
 msgid "attaches the player-map"
 msgstr "прикрепляет карту игрока"
 
-#: Client/mods/deathmatch/CClient.cpp:76
+#: Client/mods/deathmatch/CClient.cpp:77
 msgid "reduces player-map opacity"
 msgstr "уменьшает непрозрачность карты игрока"
 
-#: Client/mods/deathmatch/CClient.cpp:77
+#: Client/mods/deathmatch/CClient.cpp:78
 msgid "increases player-map opacity"
 msgstr "увеличивает непрозрачность карты игрока"
 
-#: Client/mods/deathmatch/CClient.cpp:78
+#: Client/mods/deathmatch/CClient.cpp:79
 msgid "toggles player-map help text"
 msgstr "карта: Вкл/откл помощь"
 
-#: Client/mods/deathmatch/CClient.cpp:79
+#: Client/mods/deathmatch/CClient.cpp:80
 msgid "sends a message to the targetted player"
 msgstr "Сообщение выбранному игроку"
 
-#: Client/mods/deathmatch/CClient.cpp:80
+#: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "Транспорт: След. оружие"
 
-#: Client/mods/deathmatch/CClient.cpp:81
+#: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "Транспорт: Пред. оружие"
 
-#: Client/mods/deathmatch/CClient.cpp:82
+#: Client/mods/deathmatch/CClient.cpp:83
 msgid "outputs info about the current server"
 msgstr "Отобразить информацию о сервере"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
+#: Client/mods/deathmatch/CClient.cpp:86
 msgid "defines the scale multiplier of all text-displays"
 msgstr "Определение масштаба отображения текста"
 
 #. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
+#: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) shows the colshapes"
 msgstr "(Режим разработки) показывать colshapes"
 
-#: Client/mods/deathmatch/CClient.cpp:93
+#: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Режим разработки) писать идентификаторы игровых звуков в окно отладчика"
 

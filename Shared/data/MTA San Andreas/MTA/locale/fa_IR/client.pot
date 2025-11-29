@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-23 01:11+0000\n"
-"PO-Revision-Date: 2025-11-23 01:31\n"
+"POT-Creation-Date: 2025-11-23 14:47+0000\n"
+"PO-Revision-Date: 2025-11-28 17:10\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -113,7 +113,7 @@ msgstr "لطفاً قبل از ادامه، از برنامه های زیر خا
 
 #: Client/loader/MainFunctions.cpp:141
 msgid "Invalid module path detected.\n"
-msgstr ""
+msgstr "مسیر ماژول نامعتبر شناسایی شد.\n"
 
 #: Client/loader/MainFunctions.cpp:168
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
@@ -289,7 +289,7 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:1116
 msgid "Invalid installation paths detected."
-msgstr ""
+msgstr "مسیرهای نصب نامعتبر شناسایی شدند."
 
 #: Client/loader/MainFunctions.cpp:1247
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -318,12 +318,12 @@ msgstr "فایل اصلی نام اشتباهی دارد (%s)"
 #: Client/loader/MainFunctions.cpp:1336
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr ""
+msgstr "فایل داده %s گم شده است. احتمال فعالیت ویروسی وجود دارد."
 
 #: Client/loader/MainFunctions.cpp:1344
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr ""
+msgstr "فایل داده %s تغییر کرده است. احتمال فعالیت ویروسی وجود دارد."
 
 #: Client/loader/MainFunctions.cpp:1368
 msgid ".asi files are in the installation directory.\n\n"
@@ -992,7 +992,7 @@ msgstr "تصویر"
 
 #: Client/core/CSettings.cpp:551
 msgid "PostFX"
-msgstr ""
+msgstr "پست اف‌اکس"
 
 #: Client/core/CSettings.cpp:552
 msgid "Audio"
@@ -1075,7 +1075,7 @@ msgstr "دد زون"
 
 #: Client/core/CSettings.cpp:731
 msgid "Saturation"
-msgstr "اشباع رنگ"
+msgstr "اشباع"
 
 #: Client/core/CSettings.cpp:737
 msgid "Use the 'Binds' tab for joypad buttons."
@@ -1428,23 +1428,23 @@ msgstr "نمایش پدها با جزئیات زیاد"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1441
 msgid "Gamma:"
-msgstr ""
+msgstr "گاما:"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1481
 msgid "Contrast:"
-msgstr ""
+msgstr "کنتراست:"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1501
 msgid "Saturation:"
-msgstr ""
+msgstr "غلظت رنگ:"
 
 #: Client/core/CSettings.cpp:1517
 msgid "Apply adjustments in windowed mode"
-msgstr ""
+msgstr "اعمال تنظیمات در حالت پنجره‌ای"
 
 #: Client/core/CSettings.cpp:1523
 msgid "Apply adjustments in fullscreen mode"
-msgstr ""
+msgstr "اعمال تنظیمات در حالت تمام‌صفحه"
 
 #: Client/core/CSettings.cpp:1554
 msgid "Enable remote websites"
@@ -2785,118 +2785,118 @@ msgstr "بیاد بسپار"
 msgid "Deny"
 msgstr "رد کن"
 
-#: Client/mods/deathmatch/CClient.cpp:36
+#: Client/mods/deathmatch/CClient.cpp:37
 msgid "This version has expired."
 msgstr "این نسخه منقضی شده است."
 
-#: Client/mods/deathmatch/CClient.cpp:57
+#: Client/mods/deathmatch/CClient.cpp:58
 msgid "disconnect from the game"
 msgstr "از بازی قطع اتصال میکند"
 
-#: Client/mods/deathmatch/CClient.cpp:58
+#: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the nametags"
 msgstr "نمایش برجسب‌های نام"
 
-#: Client/mods/deathmatch/CClient.cpp:59
+#: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the chatbox"
 msgstr "محدوده گفت و گو را نشان می دهد"
 
-#: Client/mods/deathmatch/CClient.cpp:60
+#: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the network statistics"
 msgstr "جزییات شبکه را نشان می دهد"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
+#: Client/mods/deathmatch/CClient.cpp:64
 msgid "open the chat input"
 msgstr "ورودی گفت و گو را باز میکند"
 
-#: Client/mods/deathmatch/CClient.cpp:64
+#: Client/mods/deathmatch/CClient.cpp:65
 msgid "transmits voice to other players"
 msgstr "صدا را به بازیکنان دیگر منتقل می کند"
 
-#: Client/mods/deathmatch/CClient.cpp:65
+#: Client/mods/deathmatch/CClient.cpp:66
 msgid "enters a car as passenger"
 msgstr "به عنوان مسافر وارد ماشین می شود"
 
-#: Client/mods/deathmatch/CClient.cpp:66
+#: Client/mods/deathmatch/CClient.cpp:67
 msgid "next radio channel"
 msgstr "کانال رادیویی بعدی"
 
-#: Client/mods/deathmatch/CClient.cpp:67
+#: Client/mods/deathmatch/CClient.cpp:68
 msgid "previous radio channel"
 msgstr "کانال رادیویی قبلی"
 
-#: Client/mods/deathmatch/CClient.cpp:68
+#: Client/mods/deathmatch/CClient.cpp:69
 msgid "enables the player-map view"
 msgstr "فعال سازی نمایش نقشه بازیکن"
 
-#: Client/mods/deathmatch/CClient.cpp:69
+#: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map in"
 msgstr "بزرگ نمایی نقشه بازیکن"
 
-#: Client/mods/deathmatch/CClient.cpp:70
+#: Client/mods/deathmatch/CClient.cpp:71
 msgid "zooms the player-map out"
 msgstr "کوچک نمایی نقشه بازیکن"
 
-#: Client/mods/deathmatch/CClient.cpp:71
+#: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map north"
 msgstr "حرکت نقشه بازیکن به سمت شمال"
 
-#: Client/mods/deathmatch/CClient.cpp:72
+#: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map south"
 msgstr "حرکت نقشه بازیکن به سمت جنوب"
 
-#: Client/mods/deathmatch/CClient.cpp:73
+#: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map east"
 msgstr "حرکت نقشه بازیکن به سمت شرق"
 
-#: Client/mods/deathmatch/CClient.cpp:74
+#: Client/mods/deathmatch/CClient.cpp:75
 msgid "moves the player-map west"
 msgstr "حرکت نقشه بازیکن به سمت غرب"
 
-#: Client/mods/deathmatch/CClient.cpp:75
+#: Client/mods/deathmatch/CClient.cpp:76
 msgid "attaches the player-map"
 msgstr "متصل کردن نقشه بازیکن"
 
-#: Client/mods/deathmatch/CClient.cpp:76
+#: Client/mods/deathmatch/CClient.cpp:77
 msgid "reduces player-map opacity"
 msgstr "کاهش شفافیت نقشه بازیکن"
 
-#: Client/mods/deathmatch/CClient.cpp:77
+#: Client/mods/deathmatch/CClient.cpp:78
 msgid "increases player-map opacity"
 msgstr "افزایش شفافیت نقشه بازیکن"
 
-#: Client/mods/deathmatch/CClient.cpp:78
+#: Client/mods/deathmatch/CClient.cpp:79
 msgid "toggles player-map help text"
 msgstr "تغییر وضعیت متن راهنمای نقشه بازیکن"
 
-#: Client/mods/deathmatch/CClient.cpp:79
+#: Client/mods/deathmatch/CClient.cpp:80
 msgid "sends a message to the targetted player"
 msgstr "پیامی را به بازیکن مورد نظر ارسال می‌کند"
 
-#: Client/mods/deathmatch/CClient.cpp:80
+#: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "درون ماشین اسلحه را به بعدی تغییر میدهد"
 
-#: Client/mods/deathmatch/CClient.cpp:81
+#: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "درون ماشین اسلحه را به قبلی تغییر میدهد"
 
-#: Client/mods/deathmatch/CClient.cpp:82
+#: Client/mods/deathmatch/CClient.cpp:83
 msgid "outputs info about the current server"
 msgstr "اطلاعات مربوط به سرور فعلی را خروجی می دهد"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
+#: Client/mods/deathmatch/CClient.cpp:86
 msgid "defines the scale multiplier of all text-displays"
 msgstr "مقیاس تمام نمایشگرهای متنی را تعریف می‌کند"
 
 #. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
+#: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) shows the colshapes"
 msgstr "(حالت برنامه‌نویس) تمام colshape ها را قابل مشاهده میکند"
 
-#: Client/mods/deathmatch/CClient.cpp:93
+#: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(حالت برنامه‌نویس) شناسه های صدای محیط را در پنجره اشکال زدایی چاپ می کند"
 

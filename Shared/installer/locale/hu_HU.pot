@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-08 22:41\n"
-"PO-Revision-Date: 2025-04-08 23:03\n"
+"POT-Creation-Date: 2025-08-31 20:09\n"
+"PO-Revision-Date: 2025-11-28 18:13\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -18,22 +18,22 @@ msgstr ""
 "X-Crowdin-File-ID: 89\n"
 
 #. GET_XPVISTA_PLEASE
-#: Shared/installer/nightly.nsi:205
+#: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "A letöltött MTA:SA verzió nem támogatja a Windows XP-t vagy a Vistát. Kérjük, tölts le egy alternatív verziót a www.multitheftauto.com oldalról."
 
 #. GET_WIN81_PLEASE
-#: Shared/installer/nightly.nsi:206
+#: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "A letöltött MTA:SA verzió nem támogatja a Windows 7, 8 vagy 8.1 rendszereket. Kérjük, tölts le egy alternatív verziót a www.multitheftauto.com oldalról."
 
 #. GET_MASTER_PLEASE
-#: Shared/installer/nightly.nsi:207
+#: Shared/installer/nightly.nsi:208
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
-msgstr ""
+msgstr "A letöltött MTA:SA verzió régi Windows-verziókhoz készült. Kérjük, tölts le egy alternatív verziót a www.multitheftauto.com oldalról."
 
 #. WELCOME_TEXT
-#: Shared/installer/nightly.nsi:208
+#: Shared/installer/nightly.nsi:209
 msgid "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n"
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
@@ -44,17 +44,17 @@ msgstr "A telepítő segítségedre lesz a $(^Name) ${REVISION_TAG} telepítés�
 "Kattints a Tovább gombra a folytatáshoz."
 
 #. HEADER_Text
-#: Shared/installer/nightly.nsi:212
+#: Shared/installer/nightly.nsi:213
 msgid "Grand Theft Auto: San Andreas location"
 msgstr "Grand Theft Auto: San Andreas útvonala"
 
 #. DIRECTORY_Text_Dest
-#: Shared/installer/nightly.nsi:213
+#: Shared/installer/nightly.nsi:214
 msgid "Grand Theft Auto: San Andreas folder"
 msgstr "Grand Theft Auto: San Andreas mappája"
 
 #. DIRECTORY_Text_Top
-#: Shared/installer/nightly.nsi:214
+#: Shared/installer/nightly.nsi:215
 msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "$\n"
 "You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
@@ -67,152 +67,152 @@ msgstr "Válaszd ki a Grand Theft Auto: San Andreas mappáját.$\n"
 "Kattins a Telepítés gombra a telepítési folyamat megkezdéséhez."
 
 #. DESC_Section10
-#: Shared/installer/nightly.nsi:217
+#: Shared/installer/nightly.nsi:218
 msgid "Create a Start Menu group for installed applications"
 msgstr "Start menü csoport létrehozása a telepített alkalmazásoknak"
 
 #. DESC_Section11
-#: Shared/installer/nightly.nsi:218
+#: Shared/installer/nightly.nsi:219
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
 msgstr "Parancsikon létrehozása az asztalon."
 
 #. DESC_Section12
-#: Shared/installer/nightly.nsi:219
+#: Shared/installer/nightly.nsi:220
 msgid "Register mtasa:// protocol for browser clickable-ness."
 msgstr "mtasa:// protokoll hozzáadása a böngésződhöz."
 
 #. DESC_Section13
-#: Shared/installer/nightly.nsi:220
+#: Shared/installer/nightly.nsi:221
 msgid "Add to Windows Games Explorer (if present)."
 msgstr "Hozzáadás a Windows-Játékokhoz (amennyiben elérhető)."
 
 #. DESC_DirectX
-#: Shared/installer/nightly.nsi:221
+#: Shared/installer/nightly.nsi:222
 msgid "Install or update DirectX (if required)."
 msgstr "Telepítse, vagy frissítse a DirectX-et (amennyiben szükséges)."
 
 #. DESC_Section1
-#: Shared/installer/nightly.nsi:222
+#: Shared/installer/nightly.nsi:223
 msgid "The core components required to run Multi Theft Auto."
 msgstr "Az alapvető komponensek szükségesek a Multi Theft Auto futtatásához."
 
 #. DESC_Section2
-#: Shared/installer/nightly.nsi:223
+#: Shared/installer/nightly.nsi:224
 msgid "The MTA:SA modification, allowing you to play online."
 msgstr "Az MTA:SA módosításai lehetővé teszik az online játékot."
 
 #. DESC_SectionGroupServer
-#: Shared/installer/nightly.nsi:226
+#: Shared/installer/nightly.nsi:227
 msgid "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 msgstr "Az MTA: SA Szerver lehetővé teszi, hogy szervert indíts a saját gépedről. Ehhez gyors internetkapcsolat szükséges."
 
 #. DESC_Section4
-#: Shared/installer/nightly.nsi:227
+#: Shared/installer/nightly.nsi:228
 msgid "The Multi Theft Auto server. This is a required component."
 msgstr "A Multi Theft Auto Szerver. Ez egy nélkülözhetetlen komponens."
 
 #. DESC_Section5
-#: Shared/installer/nightly.nsi:228
+#: Shared/installer/nightly.nsi:229
 msgid "The MTA:SA modification for the server."
 msgstr "Az MTA:SA Szerver módosításai."
 
 #. DESC_Section6
-#: Shared/installer/nightly.nsi:229
+#: Shared/installer/nightly.nsi:230
 msgid "This is a set of required resources for your server."
 msgstr "Szükséges erőforrások a szerveredhez."
 
 #. DESC_Section7
-#: Shared/installer/nightly.nsi:230
+#: Shared/installer/nightly.nsi:231
 msgid "This is an optional set of gamemodes and maps for your server."
 msgstr "Opcionális erőforrások a szerveredhez."
 
 #. DESC_Section8
-#: Shared/installer/nightly.nsi:231
+#: Shared/installer/nightly.nsi:232
 msgid "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
 msgstr "Pályaszerkesztő a szerveredhez. Ezzel elkészítheted a saját pályáidat, amelyeket felhasználhatsz az MTA:SA játékmódjaiban."
 
 #. DESC_Section9
-#: Shared/installer/nightly.nsi:232
+#: Shared/installer/nightly.nsi:233
 msgid "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
 msgstr "Egy szoftverfejlesztői csomag, amely segítségével létrehozhatsz komponenseket a Multi Theft Auto Szerverhez. Telepítése csak abban az esetben javasolt, ha rendelkezel tapasztalattal a C++ programozási nyelv terén."
 
 #. DESC_SectionGroupDev
-#: Shared/installer/nightly.nsi:234
+#: Shared/installer/nightly.nsi:235
 msgid "Development code and tools that aid in the creation of mods for Multi Theft Auto"
 msgstr "Egy fejlesztői kód- és eszközcsomag a mod-ok létrehozásához és szerkesztéséhez."
 
 #. DESC_SectionGroupClient
-#: Shared/installer/nightly.nsi:235
+#: Shared/installer/nightly.nsi:236
 msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr "A kliens, amely segítségével csatlakozhatsz és játszhatsz a Multi Theft Auto szervereken."
 
 #. INST_CLIENTSERVER
-#: Shared/installer/nightly.nsi:444
+#: Shared/installer/nightly.nsi:451
 msgid "Client and Server"
 msgstr "Kliens és Szerver"
 
 #. INST_SERVER
-#: Shared/installer/nightly.nsi:445
+#: Shared/installer/nightly.nsi:452
 msgid "Server only"
 msgstr "Csak szerver"
 
 #. INST_STARTMENU_GROUP
-#: Shared/installer/nightly.nsi:459
+#: Shared/installer/nightly.nsi:466
 msgid "Start menu group"
 msgstr "Start menü csoport"
 
 #. INST_DESKTOP_ICON
-#: Shared/installer/nightly.nsi:460
+#: Shared/installer/nightly.nsi:467
 msgid "Desktop icon"
 msgstr "Parancsikon az asztalon"
 
 #. INST_PROTOCOL
-#: Shared/installer/nightly.nsi:461
+#: Shared/installer/nightly.nsi:468
 msgid "Register mtasa:// protocol"
 msgstr "mtasa:// protokoll regisztráció"
 
 #. INST_GAMES_EXPLORER
-#: Shared/installer/nightly.nsi:462
+#: Shared/installer/nightly.nsi:469
 msgid "Add to Games Explorer"
 msgstr "Hozzáadás a Windows-Játékokhoz"
 
 #. INST_DIRECTX
-#: Shared/installer/nightly.nsi:463
+#: Shared/installer/nightly.nsi:470
 msgid "Install DirectX"
 msgstr "DirectX telepítése"
 
 #. INST_SEC_CLIENT
-#: Shared/installer/nightly.nsi:497
+#: Shared/installer/nightly.nsi:504
 msgid "Game client"
 msgstr "Kliens"
 
 #. INST_SEC_SERVER
-#: Shared/installer/nightly.nsi:498
+#: Shared/installer/nightly.nsi:505
 msgid "Dedicated server"
 msgstr "Dedikált szerver"
 
 #. INST_SEC_CORE
-#: Shared/installer/nightly.nsi:499
+#: Shared/installer/nightly.nsi:506
 msgid "Core components"
 msgstr "Alapvető komponensek"
 
 #. INST_SEC_GAME
-#: Shared/installer/nightly.nsi:500
+#: Shared/installer/nightly.nsi:507
 msgid "Game module"
 msgstr "Játék modul"
 
 #. INFO_INPLACE_UPGRADE
-#: Shared/installer/nightly.nsi:502
+#: Shared/installer/nightly.nsi:509
 msgid "Performing in-place upgrade..."
 msgstr "Helyi frissítés végrehajtása..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: Shared/installer/nightly.nsi:503
+#: Shared/installer/nightly.nsi:510
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "Engedélyek frissítése. Ez eltarthat néhány percig..."
 
 #. MSGBOX_INVALID_GTASA
-#: Shared/installer/nightly.nsi:504
+#: Shared/installer/nightly.nsi:511
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
@@ -221,42 +221,42 @@ msgstr "Az eredeti Grand Theft Auto: San Andreas nem található.$\\r$\n"
 "Telepítsd újra, ha a későbbiekben probléma merül fel."
 
 #. INST_SEC_CORE_RESOURCES
-#: Shared/installer/nightly.nsi:507
+#: Shared/installer/nightly.nsi:514
 msgid "Core Resources"
 msgstr "Alapvető erőforrások"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: Shared/installer/nightly.nsi:508
+#: Shared/installer/nightly.nsi:515
 msgid "Optional Resources"
 msgstr "Opcionális erőforrások"
 
 #. INST_SEC_EDITOR
-#: Shared/installer/nightly.nsi:509
+#: Shared/installer/nightly.nsi:516
 msgid "Editor"
 msgstr "Szerkesztő"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:985
+#: Shared/installer/nightly.nsi:993
 msgid "Development"
 msgstr "Fejlesztés"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1033
+#: Shared/installer/nightly.nsi:1041
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) sikeresen el lett távolítva a számítógépedről."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1040
+#: Shared/installer/nightly.nsi:1048
 msgid "Uninstallation has failed!"
 msgstr "Sikertelen eltávolítás!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1048
+#: Shared/installer/nightly.nsi:1056
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "Biztosan el szeretnéd távolítani az $(^Name)-t és az összes komponensét?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1049
+#: Shared/installer/nightly.nsi:1057
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -265,32 +265,32 @@ msgstr "Frissítés előtt távolítanád el?$\\r$\n"
 "Futtasd az új telepítőt, így megmaradnak a beállításaid."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1062
+#: Shared/installer/nightly.nsi:1070
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Szeretnéd megtartani az adataidat? (mint például erőforrások, képernyőképek és szerver konfiguráció)? Ha a Nem lehetőséget választod, minden erőforrás, beállítás és képernyőkép el fog veszni."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1245
+#: Shared/installer/nightly.nsi:1253
 msgid "This installer requires admin access, try again"
 msgstr "A telepítéshez rendszergazdai jogosultság szükséges, próbáld újra."
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1246
+#: Shared/installer/nightly.nsi:1254
 msgid "This uninstaller requires admin access, try again"
 msgstr "Az eltávolításhoz rendszergazdai jogosultság szükséges, próbáld újra."
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1247
+#: Shared/installer/nightly.nsi:1255
 msgid "Logon service not running, aborting!"
 msgstr "A bejelentkezési szolgáltatás nem fut, megszakítás!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1248
+#: Shared/installer/nightly.nsi:1256
 msgid "Unable to elevate"
 msgstr "A művelet elvégzéséhez magasabb jogosultsági szint szükséges."
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1844
+#: Shared/installer/nightly.nsi:1852
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -301,7 +301,7 @@ msgstr "A Multi Theft Auto $1-nek egy másik verziója már létezik a megadott 
 "Biztosan felül szeretnéd írni a Multi Theft Auto $1-et a $INSTDIR útvonalon?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1848
+#: Shared/installer/nightly.nsi:1856
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -312,7 +312,7 @@ msgstr "A Multi Theft Auto-t nem lehet ugyanabban a mappában telepíteni, mint 
 "$DEFAULT_INSTDIR"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1851
+#: Shared/installer/nightly.nsi:1859
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -321,7 +321,7 @@ msgstr "A kiválasztott mappa nem létezik.$\n"
 "Kérlek válaszd ki a GTA:SA elérési útvonalát."
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1853
+#: Shared/installer/nightly.nsi:1861
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -330,17 +330,17 @@ msgstr "A kiválasztott elérési útvonalon ($GTA_DIR) nem található a GTA:SA
 "Biztosan szeretnéd folytatni?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1971
+#: Shared/installer/nightly.nsi:1979
 msgid "Choose Install Location"
 msgstr "Válaszd ki a telepítés helyét"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1972
+#: Shared/installer/nightly.nsi:1980
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Válaszd ki a mappát, ahova telepíteni szeretnéd a ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}-t"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1973
+#: Shared/installer/nightly.nsi:1981
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -351,62 +351,62 @@ msgstr "A ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} ezen mappában lesz telepít
 "Kattints a Tovább gombra a folytatáshoz."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1975
+#: Shared/installer/nightly.nsi:1983
 msgid "Destination Folder"
 msgstr "Célmappa"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1976
+#: Shared/installer/nightly.nsi:1984
 msgid "Browse..."
 msgstr "Tallózás..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1977
+#: Shared/installer/nightly.nsi:1985
 msgid "Default"
 msgstr "Alapértelmezett"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1978
+#: Shared/installer/nightly.nsi:1986
 msgid "Last used"
 msgstr "Utoljára használt"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1979
+#: Shared/installer/nightly.nsi:1987
 msgid "Custom"
 msgstr "Egyéni"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2157
+#: Shared/installer/nightly.nsi:2165
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Válaszd ki a mappát, ahova telepíteni szeretnéd a ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}-t:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2175
+#: Shared/installer/nightly.nsi:2183
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Figyelmeztetés: A Multi Theft Auto ($1) egy másik verziója már létezik ezen az elérési útvonalon."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2176
+#: Shared/installer/nightly.nsi:2184
 msgid "Installation type:  Upgrade"
 msgstr "Telepítés típusa: Frissítés"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2410
+#: Shared/installer/nightly.nsi:2418
 msgid "Online update"
 msgstr "Online frissítés"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2411
+#: Shared/installer/nightly.nsi:2419
 msgid "Checking for update information"
 msgstr "Frissítési információk ellenőrzése"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2412
+#: Shared/installer/nightly.nsi:2420
 msgid "Checking for installer update information..."
 msgstr "Telepítő frissítési információk ellenőrzése..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2413
+#: Shared/installer/nightly.nsi:2421
 msgid "Please ensure your firewall is not blocking"
 msgstr "Biztosítsd, hogy a tűzfal nem blokkolja a letöltést."
 
