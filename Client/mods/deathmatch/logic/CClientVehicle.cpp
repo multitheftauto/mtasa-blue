@@ -3463,7 +3463,7 @@ unsigned char CClientVehicle::GetPaintjob()
     if (m_pVehicle)
     {
         int iRemap = m_pVehicle->GetRemapIndex();
-        return (iRemap == -1) ? 3 : iRemap;
+        return (iRemap == -1) ? m_ucPaintjob : iRemap;
     }
 
     return m_ucPaintjob;
