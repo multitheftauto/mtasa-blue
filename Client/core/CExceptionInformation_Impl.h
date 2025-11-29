@@ -24,46 +24,46 @@
 class CExceptionInformation_Impl : public CExceptionInformation
 {
 public:
-    CExceptionInformation_Impl() noexcept;
-    ~CExceptionInformation_Impl() noexcept;
+    CExceptionInformation_Impl();
+    ~CExceptionInformation_Impl();
 
-    unsigned int       GetCode() noexcept { return m_uiCode; }
-    void*              GetAddress() noexcept { return m_pAddress; }
-    [[nodiscard]] bool GetModule(void* pQueryAddress, char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress) noexcept;
+    unsigned int       GetCode() { return m_uiCode; }
+    void*              GetAddress() { return m_pAddress; }
+    [[nodiscard]] bool GetModule(void* pQueryAddress, char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress);
 
     virtual const char* GetModulePathName() override { return m_szModulePathName.get(); }
     virtual const char* GetModuleBaseName() override { return m_szModuleBaseName; }
     virtual uint        GetAddressModuleOffset() override { return m_uiAddressModuleOffset; }
 
-    unsigned long GetEAX() noexcept { return m_ulEAX; }
-    unsigned long GetEBX() noexcept { return m_ulEBX; }
-    unsigned long GetECX() noexcept { return m_ulECX; }
-    unsigned long GetEDX() noexcept { return m_ulEDX; }
-    unsigned long GetESI() noexcept { return m_ulESI; }
-    unsigned long GetEDI() noexcept { return m_ulEDI; }
-    unsigned long GetEBP() noexcept { return m_ulEBP; }
-    unsigned long GetESP() noexcept { return m_ulESP; }
-    unsigned long GetEIP() noexcept { return m_ulEIP; }
-    unsigned long GetCS() noexcept { return m_ulCS; }
-    unsigned long GetDS() noexcept { return m_ulDS; }
-    unsigned long GetES() noexcept { return m_ulES; }
-    unsigned long GetFS() noexcept { return m_ulFS; }
-    unsigned long GetGS() noexcept { return m_ulGS; }
-    unsigned long GetSS() noexcept { return m_ulSS; }
-    unsigned long GetEFlags() noexcept { return m_ulEFlags; }
+    unsigned long GetEAX() { return m_ulEAX; }
+    unsigned long GetEBX() { return m_ulEBX; }
+    unsigned long GetECX() { return m_ulECX; }
+    unsigned long GetEDX() { return m_ulEDX; }
+    unsigned long GetESI() { return m_ulESI; }
+    unsigned long GetEDI() { return m_ulEDI; }
+    unsigned long GetEBP() { return m_ulEBP; }
+    unsigned long GetESP() { return m_ulESP; }
+    unsigned long GetEIP() { return m_ulEIP; }
+    unsigned long GetCS() { return m_ulCS; }
+    unsigned long GetDS() { return m_ulDS; }
+    unsigned long GetES() { return m_ulES; }
+    unsigned long GetFS() { return m_ulFS; }
+    unsigned long GetGS() { return m_ulGS; }
+    unsigned long GetSS() { return m_ulSS; }
+    unsigned long GetEFlags() { return m_ulEFlags; }
 
-    void Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException) noexcept;
+    void Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException);
 
-    [[nodiscard]] std::optional<std::vector<std::string>>              GetStackTrace() const noexcept;
-    [[nodiscard]] std::optional<std::chrono::system_clock::time_point> GetTimestamp() const noexcept;
-    [[nodiscard]] DWORD                                                GetThreadId() const noexcept;
-    [[nodiscard]] DWORD                                                GetProcessId() const noexcept;
-    [[nodiscard]] std::string                                          GetExceptionDescription() const noexcept;
-    [[nodiscard]] bool                                                 HasDetailedStackTrace() const noexcept;
+    [[nodiscard]] std::optional<std::vector<std::string>>              GetStackTrace() const;
+    [[nodiscard]] std::optional<std::chrono::system_clock::time_point> GetTimestamp() const;
+    [[nodiscard]] DWORD                                                GetThreadId() const;
+    [[nodiscard]] DWORD                                                GetProcessId() const;
+    [[nodiscard]] std::string                                          GetExceptionDescription() const;
+    [[nodiscard]] bool                                                 HasDetailedStackTrace() const;
 
-    [[nodiscard]] std::optional<std::exception_ptr> GetCapturedException() const noexcept;
-    [[nodiscard]] int                               GetUncaughtExceptionCount() const noexcept;
-    void                                            CaptureCurrentException() noexcept;
+    [[nodiscard]] std::optional<std::exception_ptr> GetCapturedException() const;
+    [[nodiscard]] int                               GetUncaughtExceptionCount() const;
+    void                                            CaptureCurrentException();
 
 private:
     std::uint32_t           m_uiCode;
@@ -98,6 +98,6 @@ private:
     std::exception_ptr m_capturedException;
     int                m_uncaughtExceptionCount;
 
-    void UpdateModuleBaseNameFromCurrentPath() noexcept;
-    void ClearModulePathState() noexcept;
+    void UpdateModuleBaseNameFromCurrentPath();
+    void ClearModulePathState();
 };

@@ -245,8 +245,7 @@ void CScriptFile::DoResourceFileCheck()
 
         // Read data
         CBuffer buffer;
-        if (!buffer.SetSize(lSize))
-            return;
+        buffer.SetSize(lSize);
         m_pFile->FSeek(0, SEEK_SET);
         m_pFile->FRead(buffer.GetData(), buffer.GetSize());
 
