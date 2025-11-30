@@ -68,6 +68,7 @@ public:
     uint32 bAttachedToEntity : 1;
     uint32 b0x4000000 : 1;
     uint32 bTouchingWater : 1;
+
     uint32 bEnableCollision : 1;
     uint32 bDestroyed : 1;
     uint32 b0x40000000 : 1;
@@ -107,7 +108,8 @@ public:
     CVector                   m_vecAttachedRotation;                      // 268
     CVector                   m_vecUnk;                                   // 280
     uint32                    m_pad4;                                     // 292
-    CPtrNodeDoubleLink<void>* m_pControlCodeNodeLink;                           // 296
+    //CPtrNodeDoubleLink<void>* m_pControlCodeNodeLink;                           // 296
+    CEntitySAInterface*       m_entityIgnoredCollision;
     float                     m_fLighting;                                // 300 surface brightness
     float                     m_fLighting2;                               // 304 dynamic lighting (unused, always set to 0 in the GTA code)
     class CShadowDataSA*      m_pShadowData;                              // 308
