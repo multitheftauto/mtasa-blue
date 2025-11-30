@@ -65,13 +65,12 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     jpeg_mem_src(&cinfo, (uchar*)pData, uiDataSize);
 
     /* Read file header, set default decompression parameters */
-    if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK)
-    {
-        jpeg_destroy_decompress(&cinfo);
-        return false;
-    }
+    jpeg_read_header(&cinfo, TRUE);
 
-    /* Allocate output buffer */
+    /* default decompression parameters */
+    // TODO
+
+    /* Allocate output buffer if getting dimensions only */
     if (!pOutBuffer)
     {
         uiOutWidth = cinfo.image_width;
