@@ -26,20 +26,21 @@ void CLuaPostfxDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
-std::variant<float, bool> CLuaPostfxDefs::GetPostFXValue(int type)
+float CLuaPostfxDefs::GetPostFXValue(PostFXType type)
 {
-    switch (static_cast<int>(type))
+    switch (type)
     {
-        case 0: // Gamma
+        case PostFXType::GAMMA:
             return g_pCore->GetCVars()->GetValue<float>("borderless_gamma_power", 0.0f);
-        case 1: // Brightness
+        case PostFXType::BRIGHTNESS:
             return g_pCore->GetCVars()->GetValue<float>("borderless_brightness_scale", 0.0f);
-        case 2: // Contrast
+        case PostFXType::CONTRAST:
             return g_pCore->GetCVars()->GetValue<float>("borderless_contrast_scale", 0.0f);
-        case 3: // Saturation
+        case PostFXType::SATURATION:
             return g_pCore->GetCVars()->GetValue<float>("borderless_saturation_scale", 0.0f);
+
         default:
-            return false;
+            throw std::invalid_argument("Invalid PostFX type");
     }
 }
 
@@ -50,19 +51,20 @@ int CLuaPostfxDefs::GetPostFXMode()
          : 0;
 }
 
-bool CLuaPostfxDefs::IsPostFXEnabled(int type)
+bool CLuaPostfxDefs::IsPostFXEnabled(PostFXType type)
 {
-    switch (static_cast<int>(type))
+    switch (type)
     {
-        case 0: // Gamma
-            return g_pCore->GetCVars()->GetValue<bool>("borderless_gamma_enabled", false);
-        case 1: // Brightness
-            return g_pCore->GetCVars()->GetValue<bool>("borderless_brightness_enabled", false);
-        case 2: // Contrast
-            return g_pCore->GetCVars()->GetValue<bool>("borderless_contrast_enabled", false);
-        case 3: // Saturation
-            return g_pCore->GetCVars()->GetValue<bool>("borderless_saturation_enabled", false);
+        case PostFXType::GAMMA:
+            return g_pCore->GetCVars()->GetValue<float>("borderless_gamma_enabled", false);
+        case PostFXType::BRIGHTNESS:
+            return g_pCore->GetCVars()->GetValue<float>("borderless_brightness_enabled", false);
+        case PostFXType::CONTRAST:
+            return g_pCore->GetCVars()->GetValue<float>("borderless_brightness_enabled", false);
+        case PostFXType::SATURATION:
+            return g_pCore->GetCVars()->GetValue<float>("borderless_saturation_enabled", false);
+
         default:
-            return false;
+            throw std::invalid_argument("Invalid PostFX type");
     }
 }

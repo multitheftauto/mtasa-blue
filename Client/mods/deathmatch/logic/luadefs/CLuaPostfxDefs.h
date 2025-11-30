@@ -17,7 +17,7 @@ public:
     static void LoadFunctions();
 
 private:
-    static std::variant<float, bool> GetPostFXValue(int type);
+    static float GetPostFXValue(PostFXType type);
     static int GetPostFXMode();
-    static bool IsPostFXEnabled(int type);
+    static bool IsPostFXEnabled(PostFXType type);
 };
