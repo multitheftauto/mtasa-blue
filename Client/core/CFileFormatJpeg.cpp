@@ -65,10 +65,21 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     jpeg_mem_src(&cinfo, (uchar*)pData, uiDataSize);
 
     /* Read file header, set default decompression parameters */
-    jpeg_read_header(&cinfo, TRUE);
+    if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK)
+    {
+        jpeg_destroy_decompress(&cinfo);
+        return false;
+    }
 
-    /* default decompression parameters */
-    // TODO
+    /* Allocate output buffer */
+    if (!pOutBuffer)
+    {
+        uiOutWidth = cinfo.image_width;
+        uiOutHeight = cinfo.image_height;
+
+        jpeg_destroy_decompress(&cinfo);
+        return true;
+    }
 
     /* Start decompressor */
     jpeg_start_decompress(&cinfo);
