@@ -70,7 +70,7 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     /* default decompression parameters */
     // TODO
 
-    /* Allocate output buffer if getting dimensions only */
+    /* Return only image dimensions (no output buffer needed) */
     if (!pOutBuffer)
     {
         uiOutWidth = cinfo.image_width;
