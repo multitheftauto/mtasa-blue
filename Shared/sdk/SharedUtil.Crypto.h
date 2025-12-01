@@ -181,6 +181,10 @@ namespace SharedUtil
             SString result;
             SString sIv;
 
+            // Pre-reserve output buffer - AES-CTR output size equals input size
+            // This avoids StringSink's doubling behavior on large inputs
+            result.reserve(sData.size());
+
             sIv.resize(AES::BLOCKSIZE);
             rnd.GenerateBlock((byte*)sIv.data(), sIv.size());
 
@@ -205,6 +209,10 @@ namespace SharedUtil
         {
             sIv.resize(AES::BLOCKSIZE);
             SString result;
+
+            // Pre-reserve output buffer - AES-CTR output size equals input size
+            // This avoids StringSink's doubling behavior on large inputs
+            result.reserve(sData.size());
 
             CTR_Mode<AES>::Decryption aesDecryption;
             aesDecryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
