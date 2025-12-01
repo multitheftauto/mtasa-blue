@@ -253,6 +253,8 @@ void CSettings::ResetGuiPointers()
     m_pBorderlessSaturationValueLabel = NULL;
     m_pCheckBoxApplyBorderless = NULL;
     m_pCheckBoxApplyFullscreen = NULL;
+    m_pPostFXDefButton = NULL;
+
     m_pAnisotropicLabel = NULL;
     m_pAnisotropic = NULL;
     m_pAnisotropicValueLabel = NULL;
@@ -1503,6 +1505,13 @@ void CSettings::CreateGUI()
     m_pCheckBoxApplyFullscreen = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Apply adjustments in fullscreen mode")));
     m_pCheckBoxApplyFullscreen->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pCheckBoxApplyFullscreen->AutoSize(nullptr, 20.0f);
+
+    m_pPostFXDefButton = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabPostFX, _("Load defaults")));
+    m_pPostFXDefButton->SetClickHandler(GUI_CALLBACK(&CSettings::OnPostFXDefaultClick, this));
+    m_pPostFXDefButton->AutoSize(NULL, 20.0f, 8.0f);
+    m_pPostFXDefButton->GetSize(vecSize);
+    placeBottomRightButton(m_pPostFXDefButton);
+    m_pPostFXDefButton->SetZOrderingEnabled(false);
 
     /**
      * Interface/chat Tab
@@ -5324,6 +5333,25 @@ bool CSettings::OnBorderlessApplyFullscreenClicked(CGUIElement* pElement)
 
     UpdateBorderlessAdjustmentControls();
     RefreshBorderlessDisplayCalibration();
+    return true;
+}
+
+bool CSettings::OnPostFXDefaultClick(CGUIElement* pElement)
+{
+    CVARS_SET("borderless_gamma_power", 1.0f);
+    CVARS_SET("borderless_brightness_scale", 1.0f);
+    CVARS_SET("borderless_contrast_scale", 1.0f);
+    CVARS_SET("borderless_saturation_scale", 1.0f);
+
+    CVARS_SET("borderless_gamma_enabled", false);
+    CVARS_SET("borderless_brightness_enabled", false);
+    CVARS_SET("borderless_contrast_enabled", false);
+    CVARS_SET("borderless_saturation_enabled", false);
+
+    CVARS_SET("borderless_apply_windowed", false);
+    CVARS_SET("borderless_apply_fullscreen", false);
+
+    UpdatePostFxTab();
     return true;
 }
 

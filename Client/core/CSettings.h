@@ -199,6 +199,7 @@ protected:
     CGUILabel*     m_pBorderlessSaturationValueLabel;
     CGUICheckBox*  m_pCheckBoxApplyBorderless;
     CGUICheckBox*  m_pCheckBoxApplyFullscreen;
+    CGUIButton*    m_pPostFXDefButton;
     CGUILabel*     m_pAnisotropicLabel;
     CGUIScrollBar* m_pAnisotropic;
     CGUILabel*     m_pAnisotropicValueLabel;
@@ -395,6 +396,7 @@ protected:
     bool OnBorderlessSaturationToggleClicked(CGUIElement* pElement);
     bool OnBorderlessApplyBorderlessClicked(CGUIElement* pElement);
     bool OnBorderlessApplyFullscreenClicked(CGUIElement* pElement);
+    bool OnPostFXDefaultClick(CGUIElement* pElement);
     bool OnAnisotropicChanged(CGUIElement* pElement);
     bool OnMapAlphaChanged(CGUIElement* pElement);
     bool OnMasterVolumeChanged(CGUIElement* pElement);
