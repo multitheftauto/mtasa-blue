@@ -631,12 +631,12 @@ bool CPixelsManager::GetPixelsSize(const CPixels& pixels, uint& uiOutWidth, uint
     }
     else if (format == EPixelsFormat::JPEG)
     {
-        SString strError;
+        std::string strError;
         if (JpegGetDimensions(pixels.GetData(), pixels.GetSize(), uiOutWidth, uiOutHeight, &strError))
             return true;
 
         if (!strError.empty() && g_pCore)
-            g_pCore->DebugEchoColor(SString("JPEG error: %s", *strError), 255, 0, 0);
+            g_pCore->DebugEchoColor(("JPEG error: " + strError).c_str(), 255, 0, 0);
         return false;
     }
 
@@ -774,12 +774,12 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
 
         if (newFormat == EPixelsFormat::JPEG)
         {
-            SString strError;
+            std::string strError;
             if (JpegEncode(uiWidth, uiHeight, uiQuality, oldPixels.GetData(), oldPixels.GetSize() - 4, newPixels.buffer, &strError))
                 return true;
 
             if (!strError.empty() && g_pCore)
-                g_pCore->DebugEchoColor(SString("JPEG encode error: %s", *strError), 255, 0, 0);
+                g_pCore->DebugEchoColor(("JPEG encode error: " + strError).c_str(), 255, 0, 0);
             return false;
         }
         else if (newFormat == EPixelsFormat::PNG)
@@ -791,7 +791,7 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
         if (oldFormat == EPixelsFormat::JPEG)
         {
             uint    uiWidth, uiHeight;
-            SString strError;
+            std::string strError;
             if (JpegDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight, &strError))
             {
                 newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL);
@@ -799,7 +799,7 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
             }
 
             if (!strError.empty() && g_pCore)
-                g_pCore->DebugEchoColor(SString("JPEG decode error: %s", *strError), 255, 0, 0);
+                g_pCore->DebugEchoColor(("JPEG decode error: " + strError).c_str(), 255, 0, 0);
             return false;
         }
         else if (oldFormat == EPixelsFormat::PNG)
