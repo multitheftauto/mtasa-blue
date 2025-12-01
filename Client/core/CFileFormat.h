@@ -8,11 +8,15 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+class SString;
+
 // Jpeg stuff
 bool IsJpeg(const void* pData, uint uiDataSize);
-bool JpegGetDimensions(const void* pData, uint uiDataSize, uint& uiOutWidth, uint& uiOutHeight);
-bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, uint uiDataSize, CBuffer& outBuffer);
-bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& uiOutWidth, uint& uiOutHeight);
+bool JpegGetDimensions(const void* pData, uint uiDataSize, uint& uiOutWidth, uint& uiOutHeight, SString* pOutError = nullptr);
+bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, uint uiDataSize, CBuffer& outBuffer, SString* pOutError = nullptr);
+bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& uiOutWidth, uint& uiOutHeight, SString* pOutError = nullptr);
 
 // Png stuff
 bool IsPng(const void* pData, uint uiDataSize);
