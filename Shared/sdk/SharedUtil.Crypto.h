@@ -174,19 +174,26 @@ namespace SharedUtil
         using namespace CryptoPP;
         using CryptoPP::byte;
 
-        AutoSeededRandomPool rnd;
+        try
+        {
+            AutoSeededRandomPool rnd;
 
-        SString result;
-        SString sIv;
+            SString result;
+            SString sIv;
 
-        sIv.resize(AES::BLOCKSIZE);
-        rnd.GenerateBlock((byte*)sIv.data(), sIv.size());
+            sIv.resize(AES::BLOCKSIZE);
+            rnd.GenerateBlock((byte*)sIv.data(), sIv.size());
 
-        CTR_Mode<AES>::Encryption aesEncryption;
-        aesEncryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
-        StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
+            CTR_Mode<AES>::Encryption aesEncryption;
+            aesEncryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
+            StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
 
-        return {result, sIv};
+            return {result, sIv};
+        }
+        catch (const std::exception&)
+        {
+            return {SString(), SString()};
+        }
     }
 
     inline SString Aes128decode(const SString& sData, const SString& sKey, SString sIv)
@@ -194,14 +201,21 @@ namespace SharedUtil
         using namespace CryptoPP;
         using CryptoPP::byte;
 
-        sIv.resize(AES::BLOCKSIZE);
-        SString result;
+        try
+        {
+            sIv.resize(AES::BLOCKSIZE);
+            SString result;
 
-        CTR_Mode<AES>::Decryption aesDecryption;
-        aesDecryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
-        StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
+            CTR_Mode<AES>::Decryption aesDecryption;
+            aesDecryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
+            StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
 
-        return result;
+            return result;
+        }
+        catch (const std::exception&)
+        {
+            return SString();
+        }
     }
 
     inline bool StringToZLibFormat(const std::string& format, int& outResult)
