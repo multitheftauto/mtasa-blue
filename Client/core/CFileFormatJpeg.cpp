@@ -70,6 +70,16 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     /* default decompression parameters */
     // TODO
 
+    /* Return only image dimensions (no output buffer needed) */
+    if (!pOutBuffer)
+    {
+        uiOutWidth = cinfo.image_width;
+        uiOutHeight = cinfo.image_height;
+
+        jpeg_destroy_decompress(&cinfo);
+        return true;
+    }
+
     /* Start decompressor */
     jpeg_start_decompress(&cinfo);
 
