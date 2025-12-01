@@ -13,6 +13,7 @@
 #include "sha2.hpp"
 #include <random>
 #include <algorithm>
+#include <memory>
 #include "SharedUtil.Hash.h"
 #include "SharedUtil.File.h"
 
@@ -754,24 +755,34 @@ namespace SharedUtil
             return;
         if ((strbuflen % 4) > 0)
             strbuflen += 4 - (strbuflen % 4);
-        unsigned char* strbuf = new unsigned char[strbuflen];
-        memset(strbuf, 0, strbuflen);
-        memcpy(strbuf, str.c_str(), str.length());
 
-        // Encode it!
-        v[1] = 0;
-        for (int i = 0; i < strbuflen; i += 4)
+        try
         {
-            v[0] = *(unsigned int*)&strbuf[i];
+            // Pre-reserve output buffer - TEA produces (strbuflen + 4) bytes
+            // This avoids reallocation during append operations on large inputs
+            out->reserve(strbuflen + 4);
 
-            encodeXtea(&v[0], &w[0], &k[0]);
-            out->append((char*)&w[0], 4);
+            std::unique_ptr<unsigned char[]> strbuf(new unsigned char[strbuflen]);
+            memset(strbuf.get(), 0, strbuflen);
+            memcpy(strbuf.get(), str.c_str(), str.length());
 
-            v[1] = w[1];
+            // Encode it!
+            v[1] = 0;
+            for (int i = 0; i < strbuflen; i += 4)
+            {
+                v[0] = *(unsigned int*)&strbuf[i];
+
+                encodeXtea(&v[0], &w[0], &k[0]);
+                out->append((char*)&w[0], 4);
+
+                v[1] = w[1];
+            }
+            out->append((char*)&v[1], 4);
         }
-        out->append((char*)&v[1], 4);
-
-        delete[] strbuf;
+        catch (const std::exception&)
+        {
+            out->clear();
+        }
     }
 
     void TeaDecode(const SString& str, const SString& key, SString* out)
@@ -803,22 +814,32 @@ namespace SharedUtil
         for (int i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
-        // Create a temporary buffer to store the result
-        unsigned char* buffer = new unsigned char[numPasses * 4 + 4];
-        memset(buffer, 0, numPasses * 4 + 4);
-
-        // Decode it!
-        const char* p = str.c_str();
-        v[1] = *(unsigned int*)&p[numPasses * 4];
-        for (int i = 0; i < numPasses; ++i)
+        try
         {
-            v[0] = *(unsigned int*)&p[(numPasses - i - 1) * 4];
-            decodeXtea(&v[0], &w[0], &k[0]);
-            *(unsigned int*)&buffer[(numPasses - i - 1) * 4] = w[0];
-            v[1] = w[1];
-        }
+            // Pre-reserve output buffer - TEA decode produces (numPasses * 4) bytes
+            // This avoids reallocation during assign on large inputs
+            out->reserve(numPasses * 4);
 
-        out->assign((char*)buffer, numPasses * 4);
-        delete[] buffer;
+            // Create a temporary buffer to store the result
+            std::unique_ptr<unsigned char[]> buffer(new unsigned char[numPasses * 4 + 4]);
+            memset(buffer.get(), 0, numPasses * 4 + 4);
+
+            // Decode it!
+            const char* p = str.c_str();
+            v[1] = *(unsigned int*)&p[numPasses * 4];
+            for (int i = 0; i < numPasses; ++i)
+            {
+                v[0] = *(unsigned int*)&p[(numPasses - i - 1) * 4];
+                decodeXtea(&v[0], &w[0], &k[0]);
+                *(unsigned int*)&buffer[(numPasses - i - 1) * 4] = w[0];
+                v[1] = w[1];
+            }
+
+            out->assign((char*)buffer.get(), numPasses * 4);
+        }
+        catch (const std::exception&)
+        {
+            out->clear();
+        }
     }
 }            // namespace SharedUtil
