@@ -942,3 +942,42 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
     pReplacementTextures->usedInModelIds.clear();
     pReplacementTextures->bHasRequestedSpace = false;
 }
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::StaticResetModelTextureReplacing
+//
+// Clears any remaining texture replacement state.
+// Called during session cleanup to ensure no stale entries remin.
+// across server reconnects if normal cleanup was incomplete.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::StaticResetModelTextureReplacing()
+{
+    // Normally this map should already be empty because
+    // CClientTXD destructors call ModelInfoTXDRemoveTextures which
+    // removes entries when usedByReplacements becomes empty.
+    // This handles edge cases where cleanup was incomplete.
+    for (auto& pair : ms_ModelTexturesInfoMap)
+    {
+        CModelTexturesInfo& info = pair.second;
+        
+        // Release TXD reference if we still hold one.
+        // Each map entry corresponds to one AddRef call made in GetModelTexturesInfo.
+        // Only release if the TXD is still valid and matches our cached pointer.
+        if (info.pTxd != nullptr)
+        {
+            RwTexDictionary* pCurrentTxd = CTxdStore_GetTxd(info.usTxdId);
+            if (pCurrentTxd != nullptr && pCurrentTxd == info.pTxd)
+            {
+                // Verify we actually have refs before removing
+                if (CTxdStore_GetNumRefs(info.usTxdId) > 0)
+                {
+                    CTxdStore_RemoveRef(info.usTxdId);
+                }
+            }
+        }
+    }
+    
+    ms_ModelTexturesInfoMap.clear();
+}
