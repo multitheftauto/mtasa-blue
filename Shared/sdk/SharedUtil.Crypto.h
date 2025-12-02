@@ -178,12 +178,12 @@ namespace SharedUtil
 
         // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
         // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
-        // Probe with 2x input size to account for output buffer + Cryptopp internal processing.
-        constexpr size_t kMaxProbeSize = SIZE_MAX / 2 - 64;
+        // Probe with 3x input size to cover: output buffer + Crypto++ internal buffers + StringSink allocations.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 3 - 256;
         if (sData.size() > kMaxProbeSize)
             return {SString(), SString()};
 
-        void* probe = std::malloc(sData.size() * 2 + 64);
+        void* probe = std::malloc(sData.size() * 3 + 256);
         if (!probe)
             return {SString(), SString()};
         std::free(probe);
@@ -221,12 +221,12 @@ namespace SharedUtil
 
         // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
         // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
-        // Probe with 2x input size to account for output buffer + Cryptopp internal processing.
-        constexpr size_t kMaxProbeSize = SIZE_MAX / 2 - 64;
+        // Probe with 3x input size to cover: output buffer + Crypto++ internal buffers + StringSink allocations.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 3 - 256;
         if (sData.size() > kMaxProbeSize)
             return SString();
 
-        void* probe = std::malloc(sData.size() * 2 + 64);
+        void* probe = std::malloc(sData.size() * 3 + 256);
         if (!probe)
             return SString();
         std::free(probe);
