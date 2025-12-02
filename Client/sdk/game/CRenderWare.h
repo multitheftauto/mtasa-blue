@@ -81,6 +81,7 @@ public:
                                                       bool bFilteringEnabled) = 0;
     virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
+    virtual void             StaticResetModelTextureReplacing() = 0;
     virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId) = 0;
     virtual void             ClothesRemoveReplacement(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
