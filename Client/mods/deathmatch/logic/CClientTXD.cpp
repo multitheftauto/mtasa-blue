@@ -75,10 +75,16 @@ bool CClientTXD::AddClothingTexture(const std::string& modelName)
 
 bool CClientTXD::Import(unsigned short usModelID)
 {
+    m_strLastError.clear();
+
     if (usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST)
     {
         if (m_FileData.empty() && m_bIsRawData)
-            return false;            // Raw data has been freed already because texture was first used as non-clothes
+        {
+            m_strLastError = "[Import:Clothes] Raw data buffer was already freed (texture was first used for non-clothes model)";
+            AddReportLog(9401, m_strLastError);
+            return false;
+        }
 
         // If using for clothes only, unload 'replacing model textures' stuff to save memory
         if (!m_ReplacementTextures.textures.empty() && m_ReplacementTextures.usedInModelIds.empty())
@@ -92,10 +98,19 @@ bool CClientTXD::Import(unsigned short usModelID)
             SString strUseFilename;
 
             if (!GetFilenameToUse(strUseFilename))
+            {
+                if (m_strLastError.empty())
+                    m_strLastError = "[Import:Clothes] Invalid or inaccessible file path";
+                AddReportLog(9401, m_strLastError);
                 return false;
+            }
 
             if (!FileLoad(std::nothrow, strUseFilename, m_FileData))
+            {
+                m_strLastError = "[Import:Clothes] Failed to read TXD file from disk";
+                AddReportLog(9401, m_strLastError);
                 return false;
+            }
         }
         m_bUsingFileDataForClothes = true;
         // Note: ClothesAddReplacement uses the pointer from m_FileData, so don't touch m_FileData until matching ClothesRemove call
@@ -111,15 +126,18 @@ bool CClientTXD::Import(unsigned short usModelID)
             {
                 SString strUseFilename;
                 if (!GetFilenameToUse(strUseFilename))
+                {
+                    if (m_strLastError.empty())
+                        m_strLastError = "[Import:Model] Invalid or inaccessible file path";
+                    AddReportLog(9401, m_strLastError);
                     return false;
-                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled);
-                if (m_ReplacementTextures.textures.empty())
+                }
+                if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled, &m_strLastError))
                     return false;
             }
             else
             {
-                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled);
-                if (m_ReplacementTextures.textures.empty())
+                if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, SString(), m_FileData, m_bFilteringEnabled, &m_strLastError))
                     return false;
             }
         }
@@ -137,6 +155,13 @@ bool CClientTXD::Import(unsigned short usModelID)
             Restream(usModelID);
             return true;
         }
+        else
+        {
+            // ModelInfoTXDAddTextures returns false if already imported or failed to get model info
+            if (m_strLastError.empty())
+                m_strLastError = "[Import:Model] Failed to apply textures (already applied to this model, or invalid model ID)";
+            AddReportLog(9401, m_strLastError);
+        }
     }
 
     return false;
@@ -152,23 +177,35 @@ bool CClientTXD::IsImportableModel(unsigned short usModelID)
 bool CClientTXD::LoadFromFile(SString filePath)
 {
     m_strFilename = std::move(filePath);
+    m_strLastError.clear();
 
     SString strUseFilename;
 
     if (!GetFilenameToUse(strUseFilename))
+    {
+        if (m_strLastError.empty())
+            m_strLastError = "[LoadFromFile] Invalid or inaccessible file path";
+        AddReportLog(9401, m_strLastError);
         return false;
+    }
 
-    return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled);
+    return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled, &m_strLastError);
 }
 
 bool CClientTXD::LoadFromBuffer(SString buffer)
 {
+    m_strLastError.clear();
+
     if (!g_pCore->GetNetwork()->CheckFile("txd", "", buffer.data(), buffer.size()))
+    {
+        m_strLastError = "[LoadFromBuffer] TXD data rejected as invalid";
+        AddReportLog(9401, m_strLastError);
         return false;
+    }
 
     m_FileData = std::move(buffer);
 
-    return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled);
+    return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, SString(), m_FileData, m_bFilteringEnabled, &m_strLastError);
 }
 
 void CClientTXD::Restream(unsigned short usModelID)
@@ -198,7 +235,11 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
 {
     g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, nullptr, 0);
     if (!g_pCore->GetNetwork()->CheckFile("txd", m_strFilename))
+    {
+        m_strLastError = "[GetFilenameToUse] TXD file rejected as invalid";
+        AddReportLog(9401, m_strLastError);
         return false;
+    }
 
     // Default: use original data
     strOutFilename = m_strFilename;

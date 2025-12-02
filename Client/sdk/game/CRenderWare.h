@@ -78,7 +78,7 @@ class CRenderWare
 {
 public:
     virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer,
-                                                      bool bFilteringEnabled) = 0;
+                                                      bool bFilteringEnabled, SString* pOutError = nullptr) = 0;
     virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
     virtual void             StaticResetModelTextureReplacing() = 0;
