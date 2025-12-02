@@ -38,10 +38,8 @@ namespace
 
     void CleanupStalePerTxd(SReplacementTextures::SPerTxd& perTxdInfo, const std::unordered_set<RwTexture*>& texturesToKeep, RwTexDictionary* pDeadTxd)
     {
-        if (!pDeadTxd)
-            return;
-
         // TXD is dead/stale. Perform safe cleanup.
+        // Note: pDeadTxd may be nullptr if TXD was already fully destroyed.
         for (RwTexture* pOldTexture : perTxdInfo.usingTextures)
         {
             if (pOldTexture && SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
@@ -57,9 +55,9 @@ namespace
                         RwTextureDestroy(pOldTexture);
                     }
                 }
-                else if (!pDeadTxd && pOldTexture->txd == nullptr)
+                else if (pOldTexture->txd == nullptr)
                 {
-                    // Texture is detached, safe to destroy if it's a copy
+                    // Texture is already detached (TXD destroyed or texture was removed), safe to destroy if it's a copy
                     if (perTxdInfo.bTexturesAreCopies && texturesToKeep.find(pOldTexture) == texturesToKeep.end())
                     {
                         RwTextureDestroy(pOldTexture);
@@ -347,7 +345,12 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
             if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
                 continue;
 
+            // Detach from the source TXD: clear both the TXD pointer and the linked list pointers.
+            // The TXD will be destroyed shortly, so these pointers would become dangling otherwise.
             pTexture->txd = nullptr;
+            pTexture->TXDList.next = &pTexture->TXDList;
+            pTexture->TXDList.prev = &pTexture->TXDList;
+            
             if (bFilteringEnabled)
             {
                 // Enable filtering (0x02) but preserve addressing mode if set
