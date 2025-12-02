@@ -744,6 +744,16 @@ void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTextur
     if (pTex->txd != pTXD)
         return;
 
+    if (!SharedUtil::IsReadablePointer(pTex->TXDList.next, sizeof(RwListEntry)) ||
+        !SharedUtil::IsReadablePointer(pTex->TXDList.prev, sizeof(RwListEntry)))
+    {
+        // List corrupted - orphan without unlinking
+        pTex->TXDList.next = &pTex->TXDList;
+        pTex->TXDList.prev = &pTex->TXDList;
+        pTex->txd = nullptr;
+        return;
+    }
+
     // Unlink from the TXD's texture list
     pTex->TXDList.next->prev = pTex->TXDList.prev;
     pTex->TXDList.prev->next = pTex->TXDList.next;
