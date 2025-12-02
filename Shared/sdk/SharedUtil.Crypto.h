@@ -18,6 +18,8 @@
 #include <cryptopp/hex.h>
 #include <cryptopp/md5.h>
 #include <zlib/zlib.h>
+#include <cstdint>
+#include <cstdlib>
 #include "SString.h"
 
 namespace SharedUtil
@@ -174,6 +176,18 @@ namespace SharedUtil
         using namespace CryptoPP;
         using CryptoPP::byte;
 
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe with 2x input size to account for output buffer + Cryptopp internal processing.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 2 - 64;
+        if (sData.size() > kMaxProbeSize)
+            return {SString(), SString()};
+
+        void* probe = std::malloc(sData.size() * 2 + 64);
+        if (!probe)
+            return {SString(), SString()};
+        std::free(probe);
+
         try
         {
             AutoSeededRandomPool rnd;
@@ -204,6 +218,18 @@ namespace SharedUtil
     {
         using namespace CryptoPP;
         using CryptoPP::byte;
+
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe with 2x input size to account for output buffer + Cryptopp internal processing.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 2 - 64;
+        if (sData.size() > kMaxProbeSize)
+            return SString();
+
+        void* probe = std::malloc(sData.size() * 2 + 64);
+        if (!probe)
+            return SString();
+        std::free(probe);
 
         try
         {
