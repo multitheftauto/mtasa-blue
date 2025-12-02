@@ -176,7 +176,7 @@ public:
 	\param col
 		colour that is to be set for all four corners of the ColourRect;
 	*/
-	void	setColours(const colour& col);
+    void setColours(const colour& col) noexcept;
 
 
 	/*!
