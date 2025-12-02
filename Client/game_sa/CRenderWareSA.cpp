@@ -744,9 +744,15 @@ void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTextur
     if (pTex->txd != pTXD)
         return;
 
+    // Unlink from the TXD's texture list
     pTex->TXDList.next->prev = pTex->TXDList.prev;
     pTex->TXDList.prev->next = pTex->TXDList.next;
-    pTex->txd = NULL;
+    
+    // Clear the texture's list pointers to prevent dangling references.
+    // Make them self-referencing
+    pTex->TXDList.next = &pTex->TXDList;
+    pTex->TXDList.prev = &pTex->TXDList;
+    pTex->txd = nullptr;
 }
 
 short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
