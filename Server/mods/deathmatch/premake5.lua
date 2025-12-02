@@ -11,30 +11,31 @@ project "Deathmatch"
 		includedirs { "../../../vendor/sparsehash/src/windows" }
 
 	filter {}
-		includedirs {
-			"../../../Shared/sdk",
-			"../../sdk",
-			"../../../vendor/bochs",
-			"../../../vendor/pme",
-			"../../../vendor/zip",
-			"../../../vendor/glob/include",
-			"../../../vendor/zlib",
-			"../../../vendor/pcre",
-			"../../../vendor/json-c",
-			"../../../vendor/lua/src",
-			"../../../Shared/gta",
-			"../../../Shared/mods/deathmatch/logic",
-			"../../../Shared/animation",
-			"../../../Shared/publicsdk/include",
-			"../../../vendor/sparsehash/src/",
-			"logic",
-			"utils",
-			"."
-		}
+	includedirs {
+		"../../../Shared/sdk",
+		"../../sdk",
+		"../../../vendor/bochs",
+		"../../../vendor/pme",
+		"../../../vendor/zip",
+		"../../../vendor/glob/include",
+		"../../../vendor/zlib",
+		"../../../vendor/pcre",
+		"../../../vendor/json-c",
+		"../../../vendor/lua/src",
+		"../../../vendor/tinygettext",
+		"../../../Shared/gta",
+		"../../../Shared/mods/deathmatch/logic",
+		"../../../Shared/animation",
+		"../../../Shared/publicsdk/include",
+		"../../../vendor/sparsehash/src/",
+		"logic",
+		"utils",
+		"."
+	}
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt", "tinygettext",
 	}
 
 	vpaths {

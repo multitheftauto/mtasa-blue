@@ -61,6 +61,7 @@
 #include "packets/CPlayerClothesPacket.h"
 #include "packets/CPlayerWorldSpecialPropertyPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
+#include "CResourceTranslationManager.h"
 #include "packets/CLuaPacket.h"
 #include "../utils/COpenPortsTester.h"
 #include "../utils/CMasterServerAnnouncer.h"
