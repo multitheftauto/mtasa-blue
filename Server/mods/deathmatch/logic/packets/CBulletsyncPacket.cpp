@@ -46,17 +46,6 @@ bool CBulletsyncPacket::IsValidVector(const CVector& vec) noexcept
     return true;
 }
 
-bool CBulletsyncPacket::ValidateVectorBounds(const CVector& vec) const noexcept
-{
-    if (vec.fX < -MAX_WORLD_COORD || vec.fX > MAX_WORLD_COORD)
-        return false;
-    if (vec.fY < -MAX_WORLD_COORD || vec.fY > MAX_WORLD_COORD)
-        return false;
-    if (vec.fZ < -MAX_WORLD_COORD || vec.fZ > MAX_WORLD_COORD)
-        return false;
-    return true;
-}
-
 bool CBulletsyncPacket::IsValidWeaponId(unsigned char weaponId) noexcept
 {
     return CWeaponStatManager::HasWeaponBulletSync(static_cast<uint32_t>(weaponId));
@@ -112,12 +101,6 @@ bool CBulletsyncPacket::ReadWeaponAndPositions(NetBitStreamInterface& stream)
     if (!IsValidVector(m_end))
         return false;
         
-    if (!ValidateVectorBounds(m_start))
-        return false;
-        
-    if (!ValidateVectorBounds(m_end))
-        return false;
-        
     if (!ValidateTrajectory())
         return false;
         
@@ -160,7 +143,8 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
         return false;
     }
 
-    // Validate that target element exists
+    // Check that target element exists (if specified)
+    // Note: m_damaged can be INVALID_ELEMENT_ID when shooting at ground/world
     if (m_damaged != INVALID_ELEMENT_ID)
     {
         CElement* pElement = CElementIDs::GetElement(m_damaged);
@@ -169,16 +153,7 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
             ResetDamageData();
             return false;
         }
-        
-        // Check element type is valid for damage
-        auto elementType = pElement->GetType();
-        if (elementType != CElement::PLAYER &&
-            elementType != CElement::PED &&
-            elementType != CElement::VEHICLE)
-        {
-            ResetDamageData();
-            return false;
-        }
+        // Element exists
     }
     
     return true;
@@ -215,7 +190,9 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         float dz = m_start.fZ - playerPos.fZ;
         float distSq = dx * dx + dy * dy + dz * dz;
         
-        const float maxShootDistanceSq = 50.0f * 50.0f;
+        // Allow larger distance if player is in vehicle (vehicle guns like Hunter have offsets of ~5m,
+        // plus vehicle size, plus network lag compensation)
+        const float maxShootDistanceSq = pPlayer->GetOccupiedVehicle() ? (100.0f * 100.0f) : (50.0f * 50.0f);
         if (distSq > maxShootDistanceSq)
             return false;
             
@@ -260,12 +237,6 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
         return false;
 
     if (!IsValidVector(m_end))
-        return false;
-
-    if (!ValidateVectorBounds(m_start))
-        return false;
-        
-    if (!ValidateVectorBounds(m_end))
         return false;
         
     if (!ValidateTrajectory())

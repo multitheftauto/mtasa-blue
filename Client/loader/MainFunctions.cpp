@@ -14,7 +14,12 @@
 #include "Dialogs.h"
 #include "D3DStuff.h"
 #include <version.h>
+#include <algorithm>
 #include <array>
+#include <chrono>
+#include <cstdint>
+#include <iterator>
+#include <optional>
 #include <locale.h>
 
 // Function must be at the start to fix odd compile error (Didn't happen locally but does in build server)
@@ -22,23 +27,81 @@ namespace
 {
     bool ValidatePath(const SString& path)
     {
-        if (path.empty() || path.length() >= MAX_PATH)            // >= instead of > to leave room for null terminator
-            return false;
-
-        if (path.Contains("..") || path.Contains("..\\") || path.Contains("../"))
-            return false;
-        
-        // Check for null bytes
-        if (path.find('\0') != SString::npos)
-            return false;
-        
-        // Check for special characters
-        if (path.Contains("\\\\?\\") || path.Contains("\\\\.\\")||            // Device namespace paths
-            path.Contains("%") || path.Contains("$"))
-            return false;
-        
+        // Placeholder
         return true;
     }
+}
+
+[[nodiscard]] static bool IsCrashExitCode(DWORD exitCode) noexcept
+{
+    constexpr DWORD kLegacyCrashExitCode = 3;
+
+    if (exitCode == kLegacyCrashExitCode)
+        return true;
+
+    if (exitCode == EXIT_OK || exitCode == EXIT_ERROR || exitCode == STILL_ACTIVE)
+        return false;
+
+    const DWORD kInformationalCrashCodes[] = {
+        0x40000015u, // STATUS_FATAL_APP_EXIT
+        0x40010004u, // DBG_TERMINATE_PROCESS
+    };
+
+    if (std::any_of(std::begin(kInformationalCrashCodes), std::end(kInformationalCrashCodes),
+                    [exitCode](DWORD code) { return exitCode == code; }))
+    {
+        return true;
+    }
+
+    return (exitCode & 0x80000000u) != 0u;
+}
+
+enum class CrashArtifactState : unsigned char
+{
+    Missing,
+    Stale,
+    Fresh,
+};
+
+using FileTimeDuration = std::chrono::duration<std::int64_t, std::ratio<1, 10000000>>; // FILETIME ticks are 100ns
+
+constexpr auto kCrashArtifactStaleTolerance = std::chrono::seconds(2);
+static constexpr std::size_t kCrashArtifactCount = 3;
+
+[[nodiscard]] static constexpr const char* CrashArtifactStateToString(CrashArtifactState state) noexcept
+{
+    switch (state)
+    {
+        case CrashArtifactState::Fresh:
+            return "fresh";
+        case CrashArtifactState::Stale:
+            return "stale";
+        default:
+            return "missing";
+    }
+}
+
+[[nodiscard]] static FileTimeDuration FileTimeToDuration(const FILETIME& value) noexcept
+{
+    const auto combined = (static_cast<unsigned long long>(value.dwHighDateTime) << 32) | value.dwLowDateTime;
+    return FileTimeDuration{static_cast<FileTimeDuration::rep>(combined)};
+}
+
+[[nodiscard]] static CrashArtifactState InspectCrashArtifact(const SString& path,
+                                                             const std::optional<FileTimeDuration>& processCreationTime) noexcept
+{
+    WIN32_FILE_ATTRIBUTE_DATA attributes{};
+    if (!GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &attributes))
+        return CrashArtifactState::Missing;
+
+    if (!processCreationTime.has_value())
+        return CrashArtifactState::Fresh;
+
+    if (const auto lastWrite = FileTimeToDuration(attributes.ftLastWriteTime);
+        lastWrite + kCrashArtifactStaleTolerance < *processCreationTime)
+        return CrashArtifactState::Stale;
+
+    return CrashArtifactState::Fresh;
 }
 
 //////////////////////////////////////////////////////////
@@ -223,6 +286,8 @@ void InitLocalization(bool bShowErrors)
                               _E("CL24"), "core-not-loadable");
         ExitProcess(EXIT_ERROR);
     }
+
+    LoaderResolveCrashHandlerExports(hCoreModule);
 
     // Get locale
     SString strLocale = GetApplicationSetting("locale");
@@ -526,7 +591,10 @@ void HandleCustomStartMessage()
 //////////////////////////////////////////////////////////
 void PreLaunchWatchDogs()
 {
-    assert(!CreateSingleInstanceMutex());
+    // Note: Single instance mutex is properly checked later in the launch sequence
+    // Creating it here just ensures we acquire it early, but we shouldn't assert
+    // because after a crash the mutex won't exist (OS releases it)
+    CreateSingleInstanceMutex();
 
     // Check for unclean stop on previous run
 #ifndef MTA_DEBUG
@@ -709,10 +777,16 @@ void HandleDuplicateLaunching()
     const size_t cmdLineLen = strlen(lpCmdLine);
     if (cmdLineLen >= 32768) ExitProcess(EXIT_ERROR);            // Max Windows command line length
 
+    bool bIsCrashDialog = (cmdLineLen > 0 && strstr(lpCmdLine, "install_stage=crashed") != NULL);
+
     int recheckTime = 2000;            // 2 seconds recheck time
 
     // We can only do certain things if MTA is already running
-    while (!CreateSingleInstanceMutex())
+    // Unless this is a crash dialog launch, which needs to run alongside the crashed instance
+    //
+    // Normal behavior: Loop here if mutex is held, try to pass command line to existing instance
+    // Crash dialog: Skip this entirely (bIsCrashDialog=true), proceed directly to showing dialog
+    while (!bIsCrashDialog && !CreateSingleInstanceMutex())
     {
         if (cmdLineLen > 0)
         {
@@ -815,6 +889,11 @@ void HandleDuplicateLaunching()
             }
             ExitProcess(EXIT_ERROR);
         }
+    }
+
+    if (bIsCrashDialog)
+    {
+        CreateSingleInstanceMutex();
     }
 }
 
@@ -1036,6 +1115,102 @@ void CheckDataFiles()
     {
         DisplayErrorMessageBox(_("Invalid installation paths detected."), _E("CL45"), "invalid-install-paths");
         ExitProcess(EXIT_ERROR);
+    }
+
+    // No-op known incompatible/broken d3d9.dll versions from the launch directory
+	// By using file version we account for variants as well. The array is extendable, but primarily for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
+    {
+        struct SIncompatibleVersion
+        {
+            int iMajor;
+            int iMinor;
+            int iBuild;
+            int iRelease;
+        };
+
+        static const SIncompatibleVersion incompatibleVersions[] = {
+            // The below entry (D3D9.dll 6.3.9600.17415) always crashes the user @ 0x0001F4B3 (CreateSurfaceLH).
+            // Furthermore, it's not a graphical mod or functional. Some GTA:SA distributor just placed their own, outdated Win7 DLL in the folder.
+            {6, 3, 9600, 17415},
+            // The below entry (D3D9.dll 0.3.1.3) is a fully incompatible, modified ENB version ("DirectX 2.0") that crashes the user @ 0002A733
+            {0, 3, 1, 3},
+        };
+
+        static bool bChecked = false;
+        if (!bChecked)
+        {
+            bChecked = true;
+
+			// Check all 3 game roots
+            const std::vector<SString> directoriesToCheck = {
+                GetLaunchPath(), // MTA installation folder root
+                strGTAPath, // Real GTA:SA installation folder root. As chosen by DiscoverGTAPath()
+                PathJoin(GetMTADataPath(), "GTA San Andreas"), // Proxy-mirror that MTA uses for core GTA data files (C:\ProgramData\MTA San Andreas All\<MTA major version>\GTA San Andreas)
+            };
+
+            for (const SString& directory : directoriesToCheck)
+            {
+                if (directory.empty())
+                    continue;
+                if (!ValidatePath(directory))
+                    continue;
+
+                const SString strD3dModuleFilename = PathJoin(directory, "d3d9.dll");
+                if (!ValidatePath(strD3dModuleFilename) || !FileExists(strD3dModuleFilename))
+                    continue;
+
+                SharedUtil::SLibVersionInfo versionInfo = {};
+                if (!SharedUtil::GetLibVersionInfo(strD3dModuleFilename, &versionInfo))
+                    continue;
+
+                bool bIsIncompatible = false;
+                for (const SIncompatibleVersion& entry : incompatibleVersions)
+                {
+                    if (versionInfo.GetFileVersionMajor() == entry.iMajor &&
+                        versionInfo.GetFileVersionMinor() == entry.iMinor &&
+                        versionInfo.GetFileVersionBuild() == entry.iBuild &&
+                        versionInfo.GetFileVersionRelease() == entry.iRelease)
+                    {
+                        bIsIncompatible = true;
+                        break;
+                    }
+                }
+
+                if (!bIsIncompatible)
+                    continue;
+
+                const SString strBackupModuleFilename = PathJoin(directory, "d3d9.bak.incompatible");
+                const WString wideSourcePath = FromUTF8(strD3dModuleFilename);
+                const WString wideBackupPath = FromUTF8(strBackupModuleFilename);
+
+                if (FileExists(strBackupModuleFilename))
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                    DeleteFileW(wideBackupPath.c_str());
+                }
+
+                SetFileAttributesW(wideSourcePath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                bool bRenamed = MoveFileExW(wideSourcePath.c_str(), wideBackupPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+                if (!bRenamed)
+                {
+                    if (!CopyFileW(wideSourcePath.c_str(), wideBackupPath.c_str(), FALSE))
+                        continue;
+
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+                    if (!DeleteFileW(wideSourcePath.c_str()))
+                        continue;
+
+                    bRenamed = true;
+                }
+
+                if (bRenamed)
+                {
+                    SetFileAttributesW(wideBackupPath.c_str(), FILE_ATTRIBUTE_NORMAL);
+                }
+            }
+        }
     }
 
     // Check for essential MTA files
@@ -1395,6 +1570,16 @@ int LaunchGame(SString strCmdLine)
         return 5;
     }
 
+    std::optional<FileTimeDuration> gtaCreationTime;
+    if (HANDLE processHandle = piLoadee.hProcess; processHandle && processHandle != INVALID_HANDLE_VALUE)
+    {
+        if (FILETIME ftCreate{}, ftExit{}, ftKernel{}, ftUser{};
+            GetProcessTimes(processHandle, &ftCreate, &ftExit, &ftKernel, &ftUser))
+        {
+            gtaCreationTime = FileTimeToDuration(ftCreate);
+        }
+    }
+
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
     WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
@@ -1488,10 +1673,58 @@ int LaunchGame(SString strCmdLine)
     WriteDebugEvent("Loader - Finishing");
     EndD3DStuff();
 
+    const DWORD rawExitCode = dwExitCode;
+
+    if (IsCrashExitCode(rawExitCode))
+    {
+        const std::array<SString, kCrashArtifactCount> artifactPaths{
+            CalcMTASAPath("mta\\core.log"),
+            CalcMTASAPath("mta\\core.log.flag"),
+            CalcMTASAPath("mta\\core.dmp")
+        };
+
+        const auto artifactStates = [&] {
+            std::array<CrashArtifactState, kCrashArtifactCount> states{};
+            std::transform(artifactPaths.cbegin(), artifactPaths.cend(), states.begin(),
+                           [&](const SString& path) { return InspectCrashArtifact(path, gtaCreationTime); });
+            return states;
+        }();
+
+        const auto artifactLabels = [&] {
+            std::array<const char*, kCrashArtifactCount> labels{};
+            std::transform(artifactStates.cbegin(), artifactStates.cend(), labels.begin(),
+                           [](const CrashArtifactState state) { return CrashArtifactStateToString(state); });
+            return labels;
+        }();
+
+        if (const bool allArtifactsFresh = std::all_of(artifactStates.cbegin(), artifactStates.cend(),
+                                                       [](const CrashArtifactState state) {
+                                                           return state == CrashArtifactState::Fresh;
+                                                       });
+            !allArtifactsFresh)
+        {
+            const auto [coreLogLabel, coreLogFlagLabel, coreDumpLabel] = artifactLabels;
+            AddReportLog(3147,
+                         SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s)",
+                                 static_cast<unsigned int>(rawExitCode),
+                                 coreLogLabel,
+                                 coreLogFlagLabel,
+                                 coreDumpLabel));
+        }
+    }
+
     // Cleanup
     if (piLoadee.hProcess && piLoadee.hProcess != INVALID_HANDLE_VALUE)
     {
-        TerminateProcess(piLoadee.hProcess, 1);
+        const bool terminateRequired = (dwExitCode == STILL_ACTIVE) || (dwExitCode == static_cast<DWORD>(-1));
+        if (terminateRequired)
+        {
+            if (TerminateProcess(piLoadee.hProcess, EXIT_ERROR) != FALSE)
+            {
+                dwExitCode = EXIT_ERROR;
+            }
+        }
+
         if (piLoadee.hThread && piLoadee.hThread != INVALID_HANDLE_VALUE)
         {
             CloseHandle(piLoadee.hThread);

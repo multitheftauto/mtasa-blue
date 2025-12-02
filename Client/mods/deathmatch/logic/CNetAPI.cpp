@@ -295,7 +295,7 @@ void CNetAPI::DoPulse()
 
         // Grab the local player
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
-        if (pPlayer && !pPlayer->IsDeadOnNetwork())
+        if (pPlayer)
         {
             unsigned long ulCurrentTime = CClientTime::GetTime();
 
@@ -984,6 +984,9 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
     if (flags.data.hangingDuringClimb && pPlayer->GetMovementState() != eMovementState::MOVEMENTSTATE_HANGING && pPlayer->GetMovementState() != eMovementState::MOVEMENTSTATE_CLIMB)
         pPlayer->RunClimbingTask();
 
+    if (flags.data.bIsInWater && !pPlayer->IsInWater())
+        pPlayer->RunSwimTask();
+  
     // Remember now as the last puresync time
     pPlayer->SetLastPuresyncTime(CClientTime::GetTime());
     pPlayer->SetLastPuresyncPosition(position.data.vecPosition);

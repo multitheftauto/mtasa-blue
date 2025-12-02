@@ -31,6 +31,7 @@
 #include <game/TaskJumpFall.h>
 #include <game/TaskPhysicalResponse.h>
 #include <game/TaskAttack.h>
+#include <game/TaskSimpleSwim.h>
 #include "enums/VehicleType.h"
 
 using std::list;
@@ -2011,14 +2012,8 @@ void CClientPed::SetFrozen(bool bFrozen)
                     m_pTaskManager->RemoveTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
             }
 
-            if (m_pPlayerPed)
-            {
-                m_pPlayerPed->GetMatrix(&m_matFrozen);
-            }
-            else
-            {
-                m_matFrozen = m_Matrix;
-            }
+            // Always use the client's cached matrix, it's already updated by SetCurrentRotation
+            m_matFrozen = m_Matrix;
         }
     }
 }
@@ -3326,6 +3321,12 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
 
 float CClientPed::GetCurrentRotation()
 {
+    if (IsFrozen())
+    {
+        CVector vecRotation = m_matFrozen.GetRotation();
+        return vecRotation.fZ;
+    }
+    
     if (m_pPlayerPed)
     {
         return m_pPlayerPed->GetCurrentRotation();
@@ -3352,6 +3353,11 @@ void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
         if (bIncludeTarget)
             m_fTargetRotation = fRotation;
     }
+
+    // Always update m_Matrix rotation so m_matFrozen gets correct value in SetFrozen
+    CVector vecRotation = m_Matrix.GetRotation();
+    vecRotation.fZ = fRotation;
+    m_Matrix.SetRotation(vecRotation);
 }
 
 void CClientPed::SetTargetRotation(float fRotation)
@@ -6654,6 +6660,10 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
+    // Validate camper seat to avoid multiple occupants && desyncronization
+    if (vehicleModel == VehicleType::VT_CAMPER && uiSeat > 0 && pVehicle->GetOccupant(uiSeat))
+        return false;
+
     // Call the onClientVehicleStartEnter event for the ped
     // Check if it is cancelled before sending packet
     CLuaArguments Arguments;
@@ -7237,3 +7247,32 @@ void CClientPed::RunClimbingTask()
 
     climbTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY, true);
 }
+
+CTaskSimpleSwim* CClientPed::GetSwimmingTask() const
+{
+    if (!m_pPlayerPed)
+        return nullptr;
+
+    CTask* simplestTask = const_cast<CTaskManager*>(GetTaskManager())->GetSimplestActiveTask();
+    if (!simplestTask || simplestTask->GetTaskType() != TASK_SIMPLE_SWIM)
+        return nullptr;
+
+    auto* swimmingTask = dynamic_cast<CTaskSimpleSwim*>(simplestTask);
+    return swimmingTask;
+}
+
+void CClientPed::RunSwimTask() const
+{
+    if (!m_pPlayerPed || GetSwimmingTask())
+        return;
+
+    CTaskComplexInWater* inWaterTask = g_pGame->GetTasks()->CreateTaskComplexInWater();
+    if (!inWaterTask)
+        return;
+
+    // Set physical flags (bTouchingWater, bSubmergedInWater)
+    m_pPlayerPed->SetInWaterFlags(true);
+
+    inWaterTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP, true);
+}
+  

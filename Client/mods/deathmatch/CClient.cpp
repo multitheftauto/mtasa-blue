@@ -20,6 +20,7 @@ CGame*                  g_pGame = NULL;
 CMultiplayer*           g_pMultiplayer = NULL;
 CNet*                   g_pNet = NULL;
 CClientGame*            g_pClientGame = NULL;
+bool                    g_bClientShuttingDown = false;
 
 int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
 {
@@ -183,6 +184,9 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
 
 void CClient::ClientShutdown()
 {
+    // Global shutdown flag
+    g_bClientShuttingDown = true;
+
     // Unbind our radio controls
     g_pCore->GetKeyBinds()->RemoveControlFunction("radio_next", CClientGame::HandleRadioNext);
     g_pCore->GetKeyBinds()->RemoveControlFunction("radio_previous", CClientGame::HandleRadioPrevious);
@@ -267,8 +271,6 @@ void CClient::RestreamModel(unsigned short usModel)
 
 bool CClient::HandleException(CExceptionInformation* pExceptionInformation)
 {
-#ifndef MTA_DEBUG
-#ifndef MTA_ALLOW_DEBUG
     // Let the clientgame write its dump, then make the core terminate our process
     if (g_pClientGame && pExceptionInformation)
     {
@@ -276,14 +278,6 @@ bool CClient::HandleException(CExceptionInformation* pExceptionInformation)
     }
 
     return false;
-#else
-    // We want to be able to debug using the debugger in debug-mode
-    return true;
-#endif
-#else
-    // We want to be able to debug using the debugger in debug-mode
-    return true;
-#endif
 }
 
 void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)

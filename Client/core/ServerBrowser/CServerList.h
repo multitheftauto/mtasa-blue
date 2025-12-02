@@ -142,7 +142,7 @@ public:
         isStatusVerified = true;
         bPassworded = false;
         bKeepFlag = false;
-        iRowIndex = -1;
+        iRowIndex[0] = iRowIndex[1] = iRowIndex[2] = iRowIndex[3] = -1;
 
         nPlayers = 0;
         nMaxPlayers = 0;
@@ -153,8 +153,7 @@ public:
         bMaybeOffline = false;
         bMasterServerSaysNoResponse = false;
         uiMasterServerSaysRestrictions = 0;
-        for (int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
-            revisionInList[i] = -1;
+        revisionInList[0] = revisionInList[1] = revisionInList[2] = revisionInList[3] = -1;
 
         strHost = inet_ntoa(Address);
         strName = SString("%s:%d", inet_ntoa(Address), usGamePort);
@@ -174,6 +173,8 @@ public:
 
     std::string    Pulse(bool bCanSendQuery, bool bRemoveNonResponding = false);
     void           ResetForRefresh();
+    void           ClearNoReplyCountForRetry();
+    void           CancelPendingQuery();
     unsigned short GetQueryPort();
 
     in_addr        AddressCopy;            // Copy to ensure it doesn't get changed without us knowing
@@ -196,7 +197,7 @@ public:
     uint           uiQueryRetryCount;
     uint           uiRevision;
     bool           bKeepFlag;
-    int            iRowIndex;
+    int            iRowIndex[SERVER_BROWSER_TYPE_COUNT];  // Row index for each server browser tab - placed here for cache locality
 
     SString strGameName;                  // Game name. Always 'mta'
     SString strVersion;                   // Game version
@@ -353,6 +354,7 @@ public:
     bool             Remove(in_addr Address, ushort usGamePort);
     void             RemoveItem(CServerListItem* pItem);
     void             OnItemChangeAddress(CServerListItem* pItem, in_addr Address, ushort usGamePort);
+    void             Sort(unsigned int uiColumn, int direction);
 };
 
 class CServerList
@@ -365,6 +367,7 @@ public:
     virtual void Pulse();
     virtual void Refresh();
     virtual bool RemoveNonResponding() { return true; }
+    virtual void SuspendActivity();
 
     CServerListIterator        IteratorBegin() { return m_Servers.begin(); };
     CServerListIterator        IteratorEnd() { return m_Servers.end(); };
@@ -381,6 +384,8 @@ public:
     void         SetUpdated(bool bUpdated) { m_bUpdated = bUpdated; };
     int          GetRevision() { return m_iRevision; }
     void         SortByASEVersion();
+    void         Sort(unsigned int uiColumn, int direction);
+    void         RetryNonRespondingServers();  // Reset no-reply counters for cached servers
 
 protected:
     bool                m_bUpdated;
@@ -399,22 +404,28 @@ class CServerListInternet : public CServerList
 {
 public:
     CServerListInternet();
-    ~CServerListInternet();
-    void Pulse();
-    void Refresh();
-    bool RemoveNonResponding() { return m_nScanned > 10; }            // Don't remove until net access is confirmed
+    ~CServerListInternet() override;
+    void Pulse() override;
+    void Refresh() override;
+    void SuspendActivity() override;
+    bool RemoveNonResponding() override;
+    bool IsMasterServerOffline() const { return m_bMasterServerOffline; }
 
 private:
     CMasterServerManagerInterface* m_pMasterServerManager;
     CElapsedTime                   m_ElapsedTime;
+    bool                           m_bMasterServerOffline = false;
 };
 
 // LAN list (scans for LAN-broadcasted servers on refresh)
 class CServerListLAN : public CServerList
 {
 public:
-    void Pulse();
-    void Refresh();
+    CServerListLAN();
+    ~CServerListLAN() override;
+    void Pulse() override;
+    void Refresh() override;
+    void SuspendActivity() override;
 
 private:
     void Discover();

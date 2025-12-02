@@ -183,7 +183,7 @@ bool ReadFileValue(const SString& strFilename, T& value, uint uiOffset)
 template <class T>
 bool WriteFileValue(const SString& strFilename, const T& value, uint uiOffset)
 {
-    SetFileAttributes(strFilename, FILE_ATTRIBUTE_NORMAL);
+    SetFileAttributesW(FromUTF8(strFilename), FILE_ATTRIBUTE_NORMAL);
     std::fstream file(FromUTF8(strFilename), std::ios::in | std::ios::out | std::ios::binary);
     if (file)
     {

@@ -17,7 +17,7 @@ CRemoteCalls::CRemoteCalls()
 
 CRemoteCalls::~CRemoteCalls()
 {
-    for (auto pRemoteCall : m_calls)
+    for (auto* pRemoteCall : m_calls)
     {
         delete pRemoteCall;
     }
@@ -38,7 +38,7 @@ CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments
 
 void CRemoteCalls::OnLuaMainDestroy(CLuaMain* lua)
 {
-    for (auto pRemoteCall : m_calls)
+    for (auto* pRemoteCall : m_calls)
     {
         if (pRemoteCall->GetVM() == lua)
         {
@@ -146,12 +146,22 @@ void CRemoteCall::MakeCall()
 {
     m_iStartTime = GetTickCount64_();
 
-    // GetDomainFromURL requires protocol://, but curl does not (defaults to http)
-    SString strDomain = g_pCore->GetWebCore()->GetDomainFromURL(m_strURL);
-    if (strDomain.empty())
-        strDomain = g_pCore->GetWebCore()->GetDomainFromURL("https://" + m_strURL);
-    // Bypass net module IP check if we are allowed to access the URL
-    bool bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
+    const auto pWebCore = g_pCore->GetWebCore();
+    bool bAnyHost = false;
+    
+    if (pWebCore)
+    {
+        // GetDomainFromURL requires protocol://
+        const SString strDomain = [&]() {
+            SString domain = pWebCore->GetDomainFromURL(m_strURL);
+            if (domain.empty())
+                domain = pWebCore->GetDomainFromURL("https://" + m_strURL);
+            return domain;
+        }();
+        // Bypass net module IP check if allowed to access the URL
+        bAnyHost = (pWebCore->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
+    }
+    
     m_downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
     CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(m_downloadMode);
     pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, m_options);

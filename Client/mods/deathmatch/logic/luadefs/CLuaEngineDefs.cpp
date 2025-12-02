@@ -21,7 +21,11 @@
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
 void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
-    g_pClientGame->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
+    size_t vehicleValue = numVehicles.value_or(0);
+    size_t pedValue = numPeds.value_or(0);
+    const size_t* pVehicles = numVehicles.has_value() ? &vehicleValue : nullptr;
+    const size_t* pPeds = numPeds.has_value() ? &pedValue : nullptr;
+    g_pClientGame->GetModelCacheManager()->SetCustomLimits(pVehicles, pPeds);
 }
 
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
@@ -150,6 +154,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
+        {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
+        {"engineRestream", ArgumentParser<EngineRestream>},
+
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2601,4 +2608,14 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 
     if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
+}
+
+bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
+{
+    return g_pClientGame->RestreamModel(modelId);
+}
+
+void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
+{
+    g_pClientGame->Restream(option);
 }
