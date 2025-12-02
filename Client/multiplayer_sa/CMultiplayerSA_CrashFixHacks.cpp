@@ -1094,6 +1094,56 @@ void _declspec(naked) HOOK_CrashFix_Misc33()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CCustomCarEnvMapPipeline::CustomPipeRenderCB - EnvWave path
+// 
+// NULL env map plugin data pointer (EBP) causes crash in CalculateEnvMap
+// Crash when rendering a car environment map (Accessing [esi+2]).
+// This occurs when a material has MF_HAS_SHINE_WAVE flag set
+// but the env map plugin data slot is NULL.
+//
+// Hook at 0x5D9CB2 replaces: jz loc_5D9E0D (original flag check)
+// Original code flow at loc_5D9CAC:
+//   0x5D9CAC: mov al, [esp+4Ch+var_39]  ; load EnvWave flag
+//   0x5D9CB0: test al, al
+//   0x5D9CB2: jz loc_5D9E0D             ; skip if flag not set <-- HOOKED
+//   0x5D9CB8: mov eax, ds:_RwEngineInstance (EnvWave processing begins)
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc34                             0x5D9CB2
+#define HOOKSIZE_CrashFix_Misc34                            6
+DWORD RETURN_CrashFix_Misc34 = 0x5D9CB8;
+DWORD RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;  // Skip to end of EnvWave block
+void _declspec(naked) HOOK_CrashFix_Misc34()
+{
+    _asm
+    {
+        // Replicate original flag check: ZF was set by previous "test al, al"
+        // If ZF is set (al == 0, flag not set), skip EnvWave (original behavior)
+        // Note: JMP does not modify flags, so ZF from "test al, al" is preserved
+        jz      skip_envwave_normal
+
+        // Flag is set - check if EBP (env map plugin data) is valid
+        // EBP was loaded at loc_5D9A00: mov ebp, [ecx+esi] (material plugin slot)
+        // Check if EBP points to a valid address (catches NULL and low invalid addresses)
+        cmp     ebp, 0x10000
+        jb      skip_envwave_crash
+
+        // EBP is valid, continue with EnvWave processing
+        // Return to 0x5D9CB8: mov eax, ds:_RwEngineInstance
+        jmp     RETURN_CrashFix_Misc34
+
+    skip_envwave_normal:
+        // Normal skip - flag was not set (original behavior)
+        jmp     RETURN_CrashFix_Misc34_Skip
+
+    skip_envwave_crash:
+        // Crash averted - flag was set but EBP was NULL or invalid
+        push    34
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc34_Skip
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
 // CClumpModelInfo::GetFrameFromId
 //
 // Invalid frame
@@ -2257,6 +2307,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
     EZHookInstall(CrashFix_Misc33);
+    EZHookInstall(CrashFix_Misc34);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);
