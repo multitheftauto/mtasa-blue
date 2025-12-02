@@ -36,7 +36,6 @@ CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer(IDirect3DDevice9* InD3DDe
     m_fallbackOffset = 0;
     m_fallbackSize = 0;
     m_fallbackFlags = 0;
-    m_fallbackStorage.resize(std::max<size_t>(static_cast<size_t>(m_iMemUsed), static_cast<size_t>(1)));
 
     m_stats.iCurrentCount++;
     m_stats.iCurrentBytes += m_iMemUsed;
@@ -332,8 +331,7 @@ HRESULT CProxyDirect3DVertexBuffer::Unlock()
     }
     else if (m_fallbackSize == 0)
     {
-        // No bytes were mapped, keep fallback around in case caller retries
-        bShouldRetryLater = true;
+        // No bytes were mapped, nothing to copy back - allow fallback to clear
     }
 
     WriteDebugEvent(SString("Unlock VertexBuffer: fallback completed (offset:%x size:%x flags:%08x retryLater:%u result:%x)", m_fallbackOffset, m_fallbackSize,
@@ -345,6 +343,8 @@ HRESULT CProxyDirect3DVertexBuffer::Unlock()
         m_fallbackOffset = 0;
         m_fallbackSize = 0;
         m_fallbackFlags = 0;
+        m_fallbackStorage.clear();
+        m_fallbackStorage.shrink_to_fit();
     }
 
     return copyResult;
