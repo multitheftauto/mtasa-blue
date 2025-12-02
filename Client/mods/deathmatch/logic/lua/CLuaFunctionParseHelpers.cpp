@@ -978,6 +978,13 @@ ADD_ENUM(VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-
 IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
 
 
+IMPLEMENT_ENUM_CLASS_BEGIN(PostFXType)
+ADD_ENUM(PostFXType::GAMMA, "gamma")
+ADD_ENUM(PostFXType::BRIGHTNESS, "brightness")
+ADD_ENUM(PostFXType::CONTRAST, "contrast")
+ADD_ENUM(PostFXType::SATURATION, "saturation")
+IMPLEMENT_ENUM_CLASS_END("postfx-type")
+
 //
 // CResource from userdata
 //
