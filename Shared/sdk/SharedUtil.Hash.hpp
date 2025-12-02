@@ -14,6 +14,7 @@
 #include <random>
 #include <algorithm>
 #include <memory>
+#include <cstdlib>
 #include "SharedUtil.Hash.h"
 #include "SharedUtil.File.h"
 
@@ -756,33 +757,28 @@ namespace SharedUtil
         if ((strbuflen % 4) > 0)
             strbuflen += 4 - (strbuflen % 4);
 
-        try
+        // Use malloc to bypass MTA's custom OOM handler (which uses non-continuable SEH exceptions).
+        // Unlike new (std::nothrow), malloc does not invoke _set_new_handler
+        std::unique_ptr<unsigned char, decltype(&std::free)> strbuf(
+            static_cast<unsigned char*>(std::malloc(strbuflen)), &std::free);
+        if (!strbuf)
+            return;
+
+        memset(strbuf.get(), 0, strbuflen);
+        memcpy(strbuf.get(), str.c_str(), str.length());
+
+        // Encode it!
+        v[1] = 0;
+        for (int i = 0; i < strbuflen; i += 4)
         {
-            // Pre-reserve output buffer - TEA produces (strbuflen + 4) bytes
-            // This avoids reallocation during append operations on large inputs
-            out->reserve(strbuflen + 4);
+            v[0] = *(unsigned int*)&strbuf.get()[i];
 
-            std::unique_ptr<unsigned char[]> strbuf(new unsigned char[strbuflen]);
-            memset(strbuf.get(), 0, strbuflen);
-            memcpy(strbuf.get(), str.c_str(), str.length());
+            encodeXtea(&v[0], &w[0], &k[0]);
+            out->append((char*)&w[0], 4);
 
-            // Encode it!
-            v[1] = 0;
-            for (int i = 0; i < strbuflen; i += 4)
-            {
-                v[0] = *(unsigned int*)&strbuf[i];
-
-                encodeXtea(&v[0], &w[0], &k[0]);
-                out->append((char*)&w[0], 4);
-
-                v[1] = w[1];
-            }
-            out->append((char*)&v[1], 4);
+            v[1] = w[1];
         }
-        catch (const std::exception&)
-        {
-            out->clear();
-        }
+        out->append((char*)&v[1], 4);
     }
 
     void TeaDecode(const SString& str, const SString& key, SString* out)
@@ -814,32 +810,26 @@ namespace SharedUtil
         for (int i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
-        try
+        // Use malloc to bypass MTA's custom OOM handler (which uses non-continuable SEH exceptions).
+        // Unlike new (std::nothrow), malloc does not invoke _set_new_handler
+        std::unique_ptr<unsigned char, decltype(&std::free)> buffer(
+            static_cast<unsigned char*>(std::malloc(numPasses * 4 + 4)), &std::free);
+        if (!buffer)
+            return;
+
+        memset(buffer.get(), 0, numPasses * 4 + 4);
+
+        // Decode it!
+        const char* p = str.c_str();
+        v[1] = *(unsigned int*)&p[numPasses * 4];
+        for (int i = 0; i < numPasses; ++i)
         {
-            // Pre-reserve output buffer - TEA decode produces (numPasses * 4) bytes
-            // This avoids reallocation during assign on large inputs
-            out->reserve(numPasses * 4);
-
-            // Create a temporary buffer to store the result
-            std::unique_ptr<unsigned char[]> buffer(new unsigned char[numPasses * 4 + 4]);
-            memset(buffer.get(), 0, numPasses * 4 + 4);
-
-            // Decode it!
-            const char* p = str.c_str();
-            v[1] = *(unsigned int*)&p[numPasses * 4];
-            for (int i = 0; i < numPasses; ++i)
-            {
-                v[0] = *(unsigned int*)&p[(numPasses - i - 1) * 4];
-                decodeXtea(&v[0], &w[0], &k[0]);
-                *(unsigned int*)&buffer[(numPasses - i - 1) * 4] = w[0];
-                v[1] = w[1];
-            }
-
-            out->assign((char*)buffer.get(), numPasses * 4);
+            v[0] = *(unsigned int*)&p[(numPasses - i - 1) * 4];
+            decodeXtea(&v[0], &w[0], &k[0]);
+            *(unsigned int*)&buffer.get()[(numPasses - i - 1) * 4] = w[0];
+            v[1] = w[1];
         }
-        catch (const std::exception&)
-        {
-            out->clear();
-        }
+
+        out->assign((char*)buffer.get(), numPasses * 4);
     }
 }            // namespace SharedUtil
