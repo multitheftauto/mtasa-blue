@@ -32,6 +32,7 @@ public:
     bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled);
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
+    void StaticResetModelTextureReplacing();
     void ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId);
     void ClothesRemoveReplacement(char* pFileData);
     bool HasClothesReplacementChanged();
