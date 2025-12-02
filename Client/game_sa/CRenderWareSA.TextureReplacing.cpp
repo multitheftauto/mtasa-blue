@@ -83,7 +83,12 @@ namespace
                     if (perTxdInfo.bTexturesAreCopies && texturesToKeep.find(pOldTexture) == texturesToKeep.end())
                     {
                         if (IsTextureSafeToDestroy(pOldTexture))
+                        {
+                            // Nullify raster before destroying copy - the raster is shared with
+                            // the original texture and must not be destroyed here (no refcount on rasters)
+                            pOldTexture->raster = nullptr;
                             RwTextureDestroy(pOldTexture);
+                        }
                     }
                 }
             }
@@ -730,7 +735,12 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             
             // Only destroy orphaned copies (IsTextureSafeToDestroy checks txd==nullptr)
             if (perTxdInfo.bTexturesAreCopies && IsTextureSafeToDestroy(pOldTexture))
+            {
+                // Nullify raster before destroying copy - the raster is shared with
+                // the original texture and must not be destroyed here (no refcount on rasters)
+                pOldTexture->raster = nullptr;
                 RwTextureDestroy(pOldTexture);
+            }
         }
 
         perTxdInfo.usingTextures.clear();
