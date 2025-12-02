@@ -36,31 +36,54 @@ namespace
     constexpr uint32_t MAX_VRAM_SIZE = 0x7FFFFFFF;
     constexpr uint32_t MAX_TEXTURE_DIMENSION = 0x80000000;
 
+    constexpr int32_t MAX_TEXTURE_REFS = 10000;
+
+    bool IsTextureSafeToDestroy(RwTexture* pTexture)
+    {
+        if (!pTexture)
+            return false;
+
+        if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+            return false;
+
+        // Only destroy orphaned textures to prevent TXD list corruption
+        if (pTexture->txd != nullptr)
+            return false;
+
+        // RwTextureDestroy dereferences the raster
+        if (pTexture->raster && !SharedUtil::IsReadablePointer(pTexture->raster, sizeof(RwRaster)))
+            return false;
+
+        // Garbage refs value indicates corruption
+        if (pTexture->refs < 0 || pTexture->refs > MAX_TEXTURE_REFS)
+            return false;
+
+        return true;
+    }
+
     void CleanupStalePerTxd(SReplacementTextures::SPerTxd& perTxdInfo, const std::unordered_set<RwTexture*>& texturesToKeep, RwTexDictionary* pDeadTxd)
     {
-        // TXD is dead/stale. Perform safe cleanup.
-        // Note: pDeadTxd may be nullptr if TXD was already fully destroyed.
+        // pDeadTxd may be dangling or nullptr - only use for pointer comparison, never dereference
+        
         for (RwTexture* pOldTexture : perTxdInfo.usingTextures)
         {
             if (pOldTexture && SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
             {
-                // Ensure the texture still belongs to the dead TXD before removal
-                if (pDeadTxd && pOldTexture->txd == pDeadTxd)
+                // Orphan texture if it still references the dead TXD
+                if (pOldTexture->txd == pDeadTxd && pDeadTxd != nullptr)
                 {
-                    CRenderWareSA::RwTexDictionaryRemoveTexture(pDeadTxd, pOldTexture);
-                    
-                    // Only destroy if it's a copy and not needed elsewhere
-                    if (perTxdInfo.bTexturesAreCopies && texturesToKeep.find(pOldTexture) == texturesToKeep.end())
-                    {
-                        RwTextureDestroy(pOldTexture);
-                    }
+                    pOldTexture->txd = nullptr;
+                    pOldTexture->TXDList.next = &pOldTexture->TXDList;
+                    pOldTexture->TXDList.prev = &pOldTexture->TXDList;
                 }
-                else if (pOldTexture->txd == nullptr)
+                
+                // Only destroy orphaned textures (txd==nullptr)
+                if (pOldTexture->txd == nullptr)
                 {
-                    // Texture is already detached (TXD destroyed or texture was removed), safe to destroy if it's a copy
                     if (perTxdInfo.bTexturesAreCopies && texturesToKeep.find(pOldTexture) == texturesToKeep.end())
                     {
-                        RwTextureDestroy(pOldTexture);
+                        if (IsTextureSafeToDestroy(pOldTexture))
+                            RwTextureDestroy(pOldTexture);
                     }
                 }
             }
@@ -74,15 +97,19 @@ namespace
                 // Destroy replaced textures not in use by other replacements
                 if (texturesToKeep.find(pReplacedTexture) == texturesToKeep.end())
                 {
+                    // Orphan texture if it still references the dead TXD
+                    if (pReplacedTexture->txd == pDeadTxd && pDeadTxd != nullptr)
+                    {
+                        pReplacedTexture->txd = nullptr;
+                        pReplacedTexture->TXDList.next = &pReplacedTexture->TXDList;
+                        pReplacedTexture->TXDList.prev = &pReplacedTexture->TXDList;
+                    }
+                    
+                    // Only destroy orphaned textures (txd==nullptr)
                     if (pReplacedTexture->txd == nullptr)
                     {
-                        RwTextureDestroy(pReplacedTexture);
-                    }
-                    else if (pDeadTxd && pReplacedTexture->txd == pDeadTxd)
-                    {
-                        // Remove from dead TXD before destruction
-                        CRenderWareSA::RwTexDictionaryRemoveTexture(pDeadTxd, pReplacedTexture);
-                        RwTextureDestroy(pReplacedTexture);
+                        if (IsTextureSafeToDestroy(pReplacedTexture))
+                            RwTextureDestroy(pReplacedTexture);
                     }
                 }
             }
@@ -646,11 +673,19 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 
             swapMap[pOldTexture] = pOriginalTexture;
 
-            // Always restore original textures to prevent them from becoming orphaned and GC'd
-            // This is crucial for proper cleanup even when multiple replacement sets use the same TXD
+            // Restore original texture to the TXD if not already there
             if (pOriginalTexture && pOriginalTexture->txd != pInfo->pTxd)
             {
-                if (pOriginalTexture->txd == nullptr)
+                // Orphan if txd is non-null (may be stale pointer to freed TXD)
+                if (pOriginalTexture->txd != nullptr)
+                {
+                    pOriginalTexture->txd = nullptr;
+                    pOriginalTexture->TXDList.next = &pOriginalTexture->TXDList;
+                    pOriginalTexture->TXDList.prev = &pOriginalTexture->TXDList;
+                }
+
+                // Avoid duplicates by name
+                if (!RwTexDictionaryFindNamedTexture(pInfo->pTxd, pOriginalTexture->name))
                     RwTexDictionaryAddTexture(pInfo->pTxd, pOriginalTexture);
             }
         }
@@ -694,21 +729,19 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 RwTexDictionaryRemoveTexture(pInfo->pTxd, pOldTexture);
 
             dassert(!RwTexDictionaryContainsTexture(pInfo->pTxd, pOldTexture));
-            if (perTxdInfo.bTexturesAreCopies)
-            {
-                // Destroy the copy. RwTextureDestroy will decrement raster ref count, which is correct since RwTextureCreate incremented it.
+            
+            // Only destroy orphaned copies (IsTextureSafeToDestroy checks txd==nullptr)
+            if (perTxdInfo.bTexturesAreCopies && IsTextureSafeToDestroy(pOldTexture))
                 RwTextureDestroy(pOldTexture);
-            }
         }
 
         perTxdInfo.usingTextures.clear();
         
-        // Clean up replaced textures not in original set
+        // Clean up replaced textures not in original set (only if orphaned)
         for (RwTexture* pReplacedTexture : perTxdInfo.replacedOriginals)
         {
-            if (pReplacedTexture && SharedUtil::IsReadablePointer(pReplacedTexture, sizeof(RwTexture)) && 
-                !ListContains(pInfo->originalTextures, pReplacedTexture) &&
-                pReplacedTexture->txd != pInfo->pTxd)
+            if (pReplacedTexture && !ListContains(pInfo->originalTextures, pReplacedTexture) &&
+                IsTextureSafeToDestroy(pReplacedTexture))
             {
                 RwTextureDestroy(pReplacedTexture);
             }
@@ -725,12 +758,20 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
             if (!SharedUtil::IsReadablePointer(pOriginalTexture, sizeof(RwTexture)))
                 continue;
-                
-            // If the original texture object is already in this TXD, we are good.
-            // This avoids an O(N) string search for every texture, which is O(N^2) overall.
+
+            // Already in correct TXD - skip (avoids O(N) string search)
             if (pOriginalTexture->txd == pInfo->pTxd)
                 continue;
 
+            // Orphan if txd is non-null (may be stale pointer to freed TXD)
+            if (pOriginalTexture->txd != nullptr)
+            {
+                pOriginalTexture->txd = nullptr;
+                pOriginalTexture->TXDList.next = &pOriginalTexture->TXDList;
+                pOriginalTexture->TXDList.prev = &pOriginalTexture->TXDList;
+            }
+
+            // Avoid duplicates by name
             if (!RwTexDictionaryFindNamedTexture(pInfo->pTxd, pOriginalTexture->name))
                 RwTexDictionaryAddTexture(pInfo->pTxd, pOriginalTexture);
         }
