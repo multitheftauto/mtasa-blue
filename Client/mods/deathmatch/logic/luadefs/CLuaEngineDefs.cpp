@@ -480,9 +480,14 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                     }
                     else
                     {
+                        // Get specific error from CClientTXD if available
+                        SString strError = pTXD->GetLastError();
+                        if (strError.empty())
+                            strError = "Error loading TXD";
+                        
                         // Delete it again
                         delete pTXD;
-                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading TXD");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, strError);
                     }
                 }
                 else
@@ -649,11 +654,20 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
+            else
+            {
+                // Get specific error from CClientTXD if available
+                SString strError = pTXD->GetLastError();
+                if (strError.empty())
+                    strError = "Failed to import TXD";
+                argStream.SetCustomError(strModelName, strError);
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer(luaVM, "number", 2);
     }
-    else
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
