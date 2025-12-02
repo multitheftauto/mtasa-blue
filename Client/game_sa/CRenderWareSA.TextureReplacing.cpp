@@ -61,62 +61,54 @@ namespace
         return true;
     }
 
-    void CleanupStalePerTxd(SReplacementTextures::SPerTxd& perTxdInfo, const std::unordered_set<RwTexture*>& texturesToKeep, RwTexDictionary* pDeadTxd)
+    // Identify textures to destroy when a TXD gets stale.
+    // Separates 'copies' (shared raster) from 'originals' (owned raster).
+    void CleanupStalePerTxd(SReplacementTextures::SPerTxd& perTxdInfo, RwTexDictionary* pDeadTxd, 
+                            std::unordered_set<RwTexture*>& outCopiesToDestroy,
+                            std::unordered_set<RwTexture*>& outOriginalsToDestroy)
     {
-        // pDeadTxd may be dangling or nullptr - only use for pointer comparison, never dereference
-        
-        for (RwTexture* pOldTexture : perTxdInfo.usingTextures)
+        // Process textures added to the TXD
+        for (RwTexture* pTexture : perTxdInfo.usingTextures)
         {
-            if (pOldTexture && SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
+            if (!pTexture || !SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+                continue;
+
+            // Detach if pointing to dead TXD (pointer comparison only)
+            if (pTexture->txd == pDeadTxd)
             {
-                // Orphan texture if it still references the dead TXD
-                if (pOldTexture->txd == pDeadTxd && pDeadTxd != nullptr)
+                pTexture->txd = nullptr;
+                pTexture->TXDList.next = &pTexture->TXDList;
+                pTexture->TXDList.prev = &pTexture->TXDList;
+            }
+
+            // Queue for destruction if orphaned and is a copy
+            if (pTexture->txd == nullptr)
+            {
+                if (perTxdInfo.bTexturesAreCopies)
                 {
-                    pOldTexture->txd = nullptr;
-                    pOldTexture->TXDList.next = &pOldTexture->TXDList;
-                    pOldTexture->TXDList.prev = &pOldTexture->TXDList;
-                }
-                
-                // Only destroy orphaned textures (txd==nullptr)
-                if (pOldTexture->txd == nullptr)
-                {
-                    if (perTxdInfo.bTexturesAreCopies && texturesToKeep.find(pOldTexture) == texturesToKeep.end())
-                    {
-                        if (IsTextureSafeToDestroy(pOldTexture))
-                        {
-                            // Nullify raster before destroying copy - the raster is shared with
-                            // the original texture and must not be destroyed here (no refcount on rasters)
-                            pOldTexture->raster = nullptr;
-                            RwTextureDestroy(pOldTexture);
-                        }
-                    }
+                    outCopiesToDestroy.insert(pTexture);
                 }
             }
         }
         perTxdInfo.usingTextures.clear();
 
-        for (RwTexture* pReplacedTexture : perTxdInfo.replacedOriginals)
+        // Process textures removed from the TXD
+        for (RwTexture* pReplaced : perTxdInfo.replacedOriginals)
         {
-            if (pReplacedTexture && SharedUtil::IsReadablePointer(pReplacedTexture, sizeof(RwTexture)))
+            if (!pReplaced || !SharedUtil::IsReadablePointer(pReplaced, sizeof(RwTexture)))
+                continue;
+
+            if (pReplaced->txd == pDeadTxd)
             {
-                // Destroy replaced textures not in use by other replacements
-                if (texturesToKeep.find(pReplacedTexture) == texturesToKeep.end())
-                {
-                    // Orphan texture if it still references the dead TXD
-                    if (pReplacedTexture->txd == pDeadTxd && pDeadTxd != nullptr)
-                    {
-                        pReplacedTexture->txd = nullptr;
-                        pReplacedTexture->TXDList.next = &pReplacedTexture->TXDList;
-                        pReplacedTexture->TXDList.prev = &pReplacedTexture->TXDList;
-                    }
-                    
-                    // Only destroy orphaned textures (txd==nullptr)
-                    if (pReplacedTexture->txd == nullptr)
-                    {
-                        if (IsTextureSafeToDestroy(pReplacedTexture))
-                            RwTextureDestroy(pReplacedTexture);
-                    }
-                }
+                pReplaced->txd = nullptr;
+                pReplaced->TXDList.next = &pReplaced->TXDList;
+                pReplaced->TXDList.prev = &pReplaced->TXDList;
+            }
+
+            // Queue for destruction if orphaned
+            if (pReplaced->txd == nullptr)
+            {
+                outOriginalsToDestroy.insert(pReplaced);
             }
         }
         perTxdInfo.replacedOriginals.clear();
@@ -222,23 +214,23 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
         {
             // The TXD has been reloaded or unloaded by the game
 
-            // Clear old replacement references when swapping TXDs
+            // Collect textures associated with the stale TXD to prevent premature destruction.
             std::unordered_set<RwTexture*> texturesToKeep;
-            // Don't insert originalTextures as they belong to the stale TXD and are likely invalid
-            // texturesToKeep.insert(info.originalTextures.begin(), info.originalTextures.end());
-
-            // Collect all textures currently in use by all replacements for this TXD
             for (SReplacementTextures* pReplacement : info.usedByReplacements)
             {
-                auto itPerTxd = std::find_if(pReplacement->perTxdList.begin(), pReplacement->perTxdList.end(), 
-                    [usTxdId](const SReplacementTextures::SPerTxd& item) { return item.usTxdId == usTxdId; });
-                
-                if (itPerTxd != pReplacement->perTxdList.end())
+                for (const auto& perTxd : pReplacement->perTxdList)
                 {
-                    texturesToKeep.insert(itPerTxd->usingTextures.begin(), itPerTxd->usingTextures.end());
-                    texturesToKeep.insert(itPerTxd->replacedOriginals.begin(), itPerTxd->replacedOriginals.end());
+                    if (perTxd.usTxdId == usTxdId)
+                    {
+                        texturesToKeep.insert(perTxd.usingTextures.begin(), perTxd.usingTextures.end());
+                        texturesToKeep.insert(perTxd.replacedOriginals.begin(), perTxd.replacedOriginals.end());
+                    }
                 }
             }
+
+            // Clean up replacements using the old TXD
+            std::unordered_set<RwTexture*> copiesToDestroy;
+            std::unordered_set<RwTexture*> originalsToDestroy;
 
             for (SReplacementTextures* pReplacement : info.usedByReplacements)
             {
@@ -248,7 +240,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
                 if (itPerTxd != pReplacement->perTxdList.end())
                 {
-                    CleanupStalePerTxd(*itPerTxd, texturesToKeep, info.pTxd);
+                    CleanupStalePerTxd(*itPerTxd, info.pTxd, copiesToDestroy, originalsToDestroy);
                     
                     // Remove this TXD from the replacement's list
                     pReplacement->perTxdList.erase(itPerTxd);
@@ -269,6 +261,31 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     else
                     {
                         ++itModel;
+                    }
+                }
+            }
+
+            // Destroy copies (nullify raster to prevent double-free of shared raster)
+            for (RwTexture* pTexture : copiesToDestroy)
+            {
+                if (texturesToKeep.find(pTexture) == texturesToKeep.end())
+                {
+                    if (IsTextureSafeToDestroy(pTexture))
+                    {
+                        pTexture->raster = nullptr;
+                        RwTextureDestroy(pTexture);
+                    }
+                }
+            }
+
+            // Destroy originals (keep raster to prevent leak)
+            for (RwTexture* pTexture : originalsToDestroy)
+            {
+                if (texturesToKeep.find(pTexture) == texturesToKeep.end())
+                {
+                    if (IsTextureSafeToDestroy(pTexture))
+                    {
+                        RwTextureDestroy(pTexture);
                     }
                 }
             }
@@ -618,17 +635,42 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 if (pOtherReplacement == pReplacementTextures)
                     continue;
 
-                auto itPerTxd = std::find_if(pOtherReplacement->perTxdList.begin(), pOtherReplacement->perTxdList.end(), 
-                    [usTxdId](const SReplacementTextures::SPerTxd& item) { return item.usTxdId == usTxdId; });
-                
-                if (itPerTxd != pOtherReplacement->perTxdList.end())
+                for (const auto& perTxd : pOtherReplacement->perTxdList)
                 {
-                    texturesToKeep.insert(itPerTxd->usingTextures.begin(), itPerTxd->usingTextures.end());
-                    texturesToKeep.insert(itPerTxd->replacedOriginals.begin(), itPerTxd->replacedOriginals.end());
+                    texturesToKeep.insert(perTxd.usingTextures.begin(), perTxd.usingTextures.end());
+                    texturesToKeep.insert(perTxd.replacedOriginals.begin(), perTxd.replacedOriginals.end());
                 }
             }
 
-            CleanupStalePerTxd(perTxdInfo, texturesToKeep, pInfo->pTxd);
+            std::unordered_set<RwTexture*> copiesToDestroy;
+            std::unordered_set<RwTexture*> originalsToDestroy;
+
+            CleanupStalePerTxd(perTxdInfo, pInfo->pTxd, copiesToDestroy, originalsToDestroy);
+
+            // Destroy copies (nullify raster to prevent double-free of shared raster)
+            for (RwTexture* pTexture : copiesToDestroy)
+            {
+                if (texturesToKeep.find(pTexture) == texturesToKeep.end())
+                {
+                    if (IsTextureSafeToDestroy(pTexture))
+                    {
+                        pTexture->raster = nullptr;
+                        RwTextureDestroy(pTexture);
+                    }
+                }
+            }
+
+            // Destroy originals (keep raster to prevent leak)
+            for (RwTexture* pTexture : originalsToDestroy)
+            {
+                if (texturesToKeep.find(pTexture) == texturesToKeep.end())
+                {
+                    if (IsTextureSafeToDestroy(pTexture))
+                    {
+                        RwTextureDestroy(pTexture);
+                    }
+                }
+            }
 
             ListRemove(pInfo->usedByReplacements, pReplacementTextures);
             ListRemove(pReplacementTextures->usedInTxdIds, usTxdId);
@@ -679,7 +721,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             // Restore original texture to the TXD if not already there
             if (pOriginalTexture && pOriginalTexture->txd != pInfo->pTxd)
             {
-                // Orphan if txd is non-null (may be stale pointer to freed TXD)
+                // Ensure texture is detached before re-adding.
+                // Handles stale/invalid txd pointers.
                 if (pOriginalTexture->txd != nullptr)
                 {
                     pOriginalTexture->txd = nullptr;
@@ -736,8 +779,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             // Only destroy orphaned copies (IsTextureSafeToDestroy checks txd==nullptr)
             if (perTxdInfo.bTexturesAreCopies && IsTextureSafeToDestroy(pOldTexture))
             {
-                // Nullify raster before destroying copy - the raster is shared with
-                // the original texture and must not be destroyed here (no refcount on rasters)
+                // Nullify raster to prevent double-free of shared raster
                 pOldTexture->raster = nullptr;
                 RwTextureDestroy(pOldTexture);
             }
