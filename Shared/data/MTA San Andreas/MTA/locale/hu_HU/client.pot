@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-03 04:26+0000\n"
-"PO-Revision-Date: 2025-12-03 04:31\n"
+"PO-Revision-Date: 2025-12-03 05:30\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -1487,7 +1487,7 @@ msgstr "Domain törlése"
 
 #: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
 msgid "Remove all"
-msgstr ""
+msgstr "Összes törlése"
 
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:1614
