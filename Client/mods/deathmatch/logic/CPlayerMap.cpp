@@ -121,11 +121,14 @@ CPlayerMap::~CPlayerMap()
     // Release custom map textures
     for (int i = 0; i < 2; i++)
     {
-        if (!m_customMapData[i].pTextureElement && m_customMapData[i].pTexture)
+        if (m_customMapData[i].bHasCustomMap && m_customMapData[i].pTexture && !m_customMapData[i].pTextureElement)
         {
             SAFE_RELEASE(m_customMapData[i].pTexture);
-            m_customMapData[i].pTexture = nullptr;
         }
+        m_customMapData[i].pTexture = nullptr;
+        m_customMapData[i].pTextureElement = nullptr;
+        m_customMapData[i].pResource = nullptr;
+        m_customMapData[i].bHasCustomMap = false;
     }
     
     for (uint i = 0; i < m_markerTextureList.size(); i++)
