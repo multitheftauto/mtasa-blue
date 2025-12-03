@@ -122,7 +122,10 @@ CPlayerMap::~CPlayerMap()
     for (int i = 0; i < 2; i++)
     {
         if (!m_customMapData[i].pTextureElement && m_customMapData[i].pTexture)
+        {
             SAFE_RELEASE(m_customMapData[i].pTexture);
+            m_customMapData[i].pTexture = nullptr;
+        }
     }
     
     for (uint i = 0; i < m_markerTextureList.size(); i++)
@@ -819,7 +822,10 @@ bool CPlayerMap::SetCustomMapImage(const std::string& strTexturePath, uint uiSiz
 
     // Release old texture if it existed and was not element-based
     if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+    {
         SAFE_RELEASE(m_customMapData[idx].pTexture);
+        m_customMapData[idx].pTexture = nullptr;
+    }
     
     m_customMapData[idx].pTexture = pNewTexture;
     m_customMapData[idx].strPath = strFullPath;
@@ -857,7 +863,10 @@ bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, uint uiS
 
     // Release old texture if it existed and was not element-based
     if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+    {
         SAFE_RELEASE(m_customMapData[idx].pTexture);
+        m_customMapData[idx].pTexture = nullptr;
+    }
 
     m_customMapData[idx].pTexture = pTextureItem;
     m_customMapData[idx].strPath = "";
@@ -884,7 +893,10 @@ void CPlayerMap::ResetCustomMapImage(uint uiSize)
     std::size_t idx = (uiSize == 1024) ? 0 : 1;
     
     if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+    {
         SAFE_RELEASE(m_customMapData[idx].pTexture);
+        m_customMapData[idx].pTexture = nullptr;
+    }
     
     m_customMapData[idx].bHasCustomMap = false;
     m_customMapData[idx].strPath = "";
@@ -968,6 +980,7 @@ void CPlayerMap::OnResourceStopping(CResource* pResource)
             if (!m_customMapData[i].pTextureElement && m_customMapData[i].pTexture)
             {
                 SAFE_RELEASE(m_customMapData[i].pTexture);
+                m_customMapData[i].pTexture = nullptr;
             }
             else
             {
