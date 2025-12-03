@@ -41,12 +41,15 @@ public:
     void ToggleHelpText();
 
     bool  SetCustomMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource = nullptr);
-    bool  SetCustomMapImageFromTexture(CClientTexture* pTexture, CResource* pResource = nullptr);
-    void  ResetCustomMapImage();
+    bool  SetCustomMapImageFromTexture(CClientTexture* pTexture, uint uiSize, CResource* pResource = nullptr);
+    void  ResetCustomMapImage(uint uiSize = 0);
     bool  SetMapOpacity(uchar ucOpacity, CResource* pResource = nullptr);
     void  ResetMapOpacity();
     uchar GetMapOpacity() const;
-    bool  HasCustomMapImage() const { return m_bHasCustomMapImage; }
+    bool  HasCustomMapImage(uint uiSize) const { 
+        std::size_t idx = (uiSize == 1024) ? 0 : 1;
+        return m_customMapData[idx].bHasCustomMap; 
+    }
     void  OnResourceStopping(CResource* pResource);
     bool  SetRadarMapDisabled(bool bDisabled, CResource* pResource);
 
@@ -139,14 +142,18 @@ private:
     bool m_bRadarVisible;
     bool m_bDebugVisible;
     bool m_bTextVisible;
-    bool           m_bHasCustomMapImage;
-    CTextureItem*  m_customMapImageTexture;
-    std::string    m_strCustomMapImagePath;
-    CClientTexture* m_pCustomTextureElement;
+    struct CustomMapData
+    {
+        bool           bHasCustomMap = false;
+        CTextureItem*  pTexture = nullptr;
+        std::string    strPath = "";
+        CClientTexture* pTextureElement = nullptr;
+        CResource*     pResource = nullptr;
+    };
+    CustomMapData  m_customMapData[2];  // [0] = 1024, [1] = 2048
     std::size_t    m_defaultMapImageIndex;
     uchar          m_ucCustomMapOpacity;
     bool           m_bHasCustomMapOpacity;
-    CResource*     m_pCustomMapResource;
     CResource*     m_pCustomOpacityResource;
     bool           m_bRadarMapDisabled;
     CResource*     m_pRadarMapDisabledResource;

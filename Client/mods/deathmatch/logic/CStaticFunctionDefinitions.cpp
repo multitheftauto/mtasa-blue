@@ -8002,14 +8002,14 @@ bool CStaticFunctionDefinitions::SetPlayerMapImage(const std::string& strTexture
     return m_pPlayerMap->SetCustomMapImage(strTexturePath, uiSize, pResource);
 }
 
-bool CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(CClientTexture* pTexture, CResource* pResource)
+bool CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(CClientTexture* pTexture, uint uiSize, CResource* pResource)
 {
-    return m_pPlayerMap->SetCustomMapImageFromTexture(pTexture, pResource);
+    return m_pPlayerMap->SetCustomMapImageFromTexture(pTexture, uiSize, pResource);
 }
 
-bool CStaticFunctionDefinitions::ResetPlayerMapImage()
+bool CStaticFunctionDefinitions::ResetPlayerMapImage(uint uiSize)
 {
-    m_pPlayerMap->ResetCustomMapImage();
+    m_pPlayerMap->ResetCustomMapImage(uiSize);
     return true;
 }
 

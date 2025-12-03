@@ -1075,7 +1075,9 @@ bool CLuaPlayerDefs::SetPlayerMapImage(lua_State* luaVM, std::variant<std::strin
     if (std::holds_alternative<CClientTexture*>(texturePathOrElement))
     {
         CClientTexture* pTexture = std::get<CClientTexture*>(texturePathOrElement);
-        return CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(pTexture, pResource);
+        if (!size.has_value())
+            return false;
+        return CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(pTexture, size.value(), pResource);
     }
     else
     {
@@ -1086,9 +1088,18 @@ bool CLuaPlayerDefs::SetPlayerMapImage(lua_State* luaVM, std::variant<std::strin
     }
 }
 
-bool CLuaPlayerDefs::ResetPlayerMapImage()
+bool CLuaPlayerDefs::ResetPlayerMapImage(std::optional<uint> size)
 {
-    return CStaticFunctionDefinitions::ResetPlayerMapImage();
+    if (size.has_value())
+    {
+        if (*size != 1024 && *size != 2048)
+            throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
+        return CStaticFunctionDefinitions::ResetPlayerMapImage(*size);
+    }
+    else
+    {
+        return CStaticFunctionDefinitions::ResetPlayerMapImage(0);
+    }
 }
 
 bool CLuaPlayerDefs::SetPlayerMapOpacity(lua_State* luaVM, uchar opacity)

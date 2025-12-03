@@ -63,13 +63,8 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_playerMarkerTexture = nullptr;
 
     // Custom map image variables
-    m_bHasCustomMapImage = false;
-    m_customMapImageTexture = nullptr;
-    m_strCustomMapImagePath = "";
-    m_pCustomTextureElement = nullptr;
     m_ucCustomMapOpacity = 255;
     m_bHasCustomMapOpacity = false;
-    m_pCustomMapResource = nullptr;
     m_pCustomOpacityResource = nullptr;
     m_bRadarMapDisabled = false;
     m_pRadarMapDisabledResource = nullptr;
@@ -122,8 +117,14 @@ CPlayerMap::~CPlayerMap()
     // Delete our images
     SAFE_RELEASE(m_mapImageTexture);
     SAFE_RELEASE(m_playerMarkerTexture);
-    if (!m_pCustomTextureElement)
-        SAFE_RELEASE(m_customMapImageTexture);
+    
+    // Release custom map textures
+    for (int i = 0; i < 2; i++)
+    {
+        if (!m_customMapData[i].pTextureElement && m_customMapData[i].pTexture)
+            SAFE_RELEASE(m_customMapData[i].pTexture);
+    }
+    
     for (uint i = 0; i < m_markerTextureList.size(); i++)
         SAFE_RELEASE(m_markerTextureList[i]);
     m_markerTextureList.clear();
@@ -311,6 +312,24 @@ void CPlayerMap::DoRender()
     // Render if showing and textures are all loaded
     if (isMapShowing && !m_failedToLoadTextures)
     {
+        // Check if the current size texture element is still valid
+        std::size_t currentIdx = m_playerMapImageIndex;
+        if (m_customMapData[currentIdx].bHasCustomMap && m_customMapData[currentIdx].pTextureElement)
+        {
+            if (m_customMapData[currentIdx].pTextureElement->IsBeingDeleted())
+            {
+                // Delete the texture, reset
+                m_customMapData[currentIdx].pTexture = nullptr;
+                m_customMapData[currentIdx].bHasCustomMap = false;
+                m_customMapData[currentIdx].strPath = "";
+                m_customMapData[currentIdx].pResource = nullptr;
+                m_customMapData[currentIdx].pTextureElement = nullptr;
+
+                // Try to load a user custom map if it exists
+                LoadUserCustomMapIfExists();
+            }
+        }
+        
         // Get the alpha value from the settings
         uchar mapAlpha = GetMapOpacity();
         const SColorARGB mapColor(mapAlpha, 255, 255, 255);
@@ -320,11 +339,13 @@ void CPlayerMap::DoRender()
         if (mapImageIndex != m_playerMapImageIndex)
         {
             UpdateOrRevertMapTexture(mapImageIndex);
-            if (!m_bHasCustomMapImage)
+            if (!m_customMapData[m_playerMapImageIndex].bHasCustomMap)
                 LoadUserCustomMapIfExists();
         }
 
-        CTextureItem* pMapTexture = m_bHasCustomMapImage ? m_customMapImageTexture : m_mapImageTexture;
+        CTextureItem* pMapTexture = m_customMapData[m_playerMapImageIndex].bHasCustomMap 
+                                    ? m_customMapData[m_playerMapImageIndex].pTexture 
+                                    : m_mapImageTexture;
 
         g_pCore->GetGraphics()->DrawTexture(pMapTexture, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
                                             m_fMapSize / pMapTexture->m_uiSizeX, m_fMapSize / pMapTexture->m_uiSizeY, 0.0f, 0.0f, 0.0f, mapColor);
@@ -421,6 +442,9 @@ void CPlayerMap::DoRender()
 
 void CPlayerMap::SetPlayerMapEnabled(bool show)
 {
+    if (m_bRadarMapDisabled && show)
+        return;
+        
     bool alreadyEnabled = (m_bIsPlayerMapEnabled || m_bForcedState);
     bool definitiveShow = (show || m_bForcedState);
     if (alreadyEnabled != definitiveShow)
@@ -780,65 +804,101 @@ SString CPlayerMap::GetBoundKeyName(const SString& strCommand)
 bool CPlayerMap::SetCustomMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource)
 {
     if (uiSize != 1024 && uiSize != 2048)
-        return false;
+        throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
 
     if (!pResource)
         return false;
 
+    std::size_t idx = (uiSize == 1024) ? 0 : 1;
     SString strFullPath = pResource->GetResourceDirectoryPath() + strTexturePath;
     
     CTextureItem* pNewTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(strFullPath, nullptr, false, uiSize, uiSize, RFORMAT_DXT1);
     
     if (!pNewTexture)
-        return false;
+        throw std::invalid_argument("Failed to load texture from path: " + strTexturePath);
 
-    if (!m_pCustomTextureElement)
-        SAFE_RELEASE(m_customMapImageTexture);
+    // Release old texture if it existed and was not element-based
+    if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+        SAFE_RELEASE(m_customMapData[idx].pTexture);
     
-    m_customMapImageTexture = pNewTexture;
-    m_strCustomMapImagePath = strFullPath;
-    m_bHasCustomMapImage = true;
-    m_pCustomMapResource = pResource;
-    m_pCustomTextureElement = nullptr;
+    m_customMapData[idx].pTexture = pNewTexture;
+    m_customMapData[idx].strPath = strFullPath;
+    m_customMapData[idx].bHasCustomMap = true;
+    m_customMapData[idx].pResource = pResource;
+    m_customMapData[idx].pTextureElement = nullptr;
 
     return true;
 }
 
-bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, CResource* pResource)
+bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, uint uiSize, CResource* pResource)
 {
     if (!pTexture || !pResource)
         return false;
 
+    if (uiSize != 1024 && uiSize != 2048)
+        throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
+
     CTextureItem* pTextureItem = pTexture->GetTextureItem();
     if (!pTextureItem)
-        return false;
+        throw std::invalid_argument("Invalid texture element");
 
-    if (!m_pCustomTextureElement)
-        SAFE_RELEASE(m_customMapImageTexture);
+    std::size_t idx = (uiSize == 1024) ? 0 : 1;
+    
+    // If the current map index does not match, update it
+    if (idx != m_playerMapImageIndex)
+    {
+        m_playerMapImageIndex = idx;
+        try {
+            CreateOrUpdateMapTexture();
+        } catch (...) {
+            // Ignore errors
+        }
+    }
 
-    m_customMapImageTexture = pTextureItem;
-    m_strCustomMapImagePath = "";
-    m_bHasCustomMapImage = true;
-    m_pCustomMapResource = pResource;
-    m_pCustomTextureElement = pTexture;
+    // Release old texture if it existed and was not element-based
+    if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+        SAFE_RELEASE(m_customMapData[idx].pTexture);
+
+    m_customMapData[idx].pTexture = pTextureItem;
+    m_customMapData[idx].strPath = "";
+    m_customMapData[idx].bHasCustomMap = true;
+    m_customMapData[idx].pResource = pResource;
+    m_customMapData[idx].pTextureElement = pTexture;
 
     return true;
 }
 
-void CPlayerMap::ResetCustomMapImage()
+void CPlayerMap::ResetCustomMapImage(uint uiSize)
 {
-    if (!m_pCustomTextureElement)
-        SAFE_RELEASE(m_customMapImageTexture);
+    // If size is 0, reset both sizes
+    if (uiSize == 0)
+    {
+        ResetCustomMapImage(1024);
+        ResetCustomMapImage(2048);
+        return;
+    }
     
-    m_bHasCustomMapImage = false;
-    m_strCustomMapImagePath = "";
-    m_pCustomMapResource = nullptr;
-    m_pCustomTextureElement = nullptr;
+    if (uiSize != 1024 && uiSize != 2048)
+        return;
+        
+    std::size_t idx = (uiSize == 1024) ? 0 : 1;
+    
+    if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+        SAFE_RELEASE(m_customMapData[idx].pTexture);
+    
+    m_customMapData[idx].bHasCustomMap = false;
+    m_customMapData[idx].strPath = "";
+    m_customMapData[idx].pResource = nullptr;
+    m_customMapData[idx].pTextureElement = nullptr;
+
+    // Try to load the user custom map if it exists
+    if (idx == m_playerMapImageIndex)
+        LoadUserCustomMapIfExists();
 }
 
 bool CPlayerMap::SetMapOpacity(uchar ucOpacity, CResource* pResource)
 {
-    m_ucCustomMapOpacity = ucOpacity;
+    m_ucCustomMapOpacity = static_cast<uchar>(Clamp(0, static_cast<int>(ucOpacity), 255));
     m_bHasCustomMapOpacity = true;
     m_pCustomOpacityResource = pResource;
     return true;
@@ -870,7 +930,13 @@ bool CPlayerMap::SetRadarMapDisabled(bool bDisabled, CResource* pResource)
 
 void CPlayerMap::LoadUserCustomMapIfExists()
 {
-    const std::uint32_t mapSize = MAP_IMAGE_SIZES[m_playerMapImageIndex];
+    std::size_t idx = m_playerMapImageIndex;
+
+    // If already has a script-set custom map for this size, do not override
+    if (m_customMapData[idx].bHasCustomMap && m_customMapData[idx].pResource != nullptr)
+        return;
+        
+    const std::uint32_t mapSize = MAP_IMAGE_SIZES[idx];
     const SString customFileName = CalcMTASAPath(SString("MTA\\cgui\\images\\radar\\map_%d-custom.png", mapSize));
 
     if (FileExists(customFileName))
@@ -879,32 +945,44 @@ void CPlayerMap::LoadUserCustomMapIfExists()
         
         if (pCustomTexture)
         {
-            if (!m_pCustomTextureElement)
-                SAFE_RELEASE(m_customMapImageTexture);
+            // Release old texture if it existed and was not element-based
+            if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+                SAFE_RELEASE(m_customMapData[idx].pTexture);
             
-            m_customMapImageTexture = pCustomTexture;
-            m_strCustomMapImagePath = customFileName;
-            m_bHasCustomMapImage = true;
-            m_pCustomMapResource = nullptr;
-            m_pCustomTextureElement = nullptr;
+            m_customMapData[idx].pTexture = pCustomTexture;
+            m_customMapData[idx].strPath = customFileName;
+            m_customMapData[idx].bHasCustomMap = true;
+            m_customMapData[idx].pResource = nullptr;
+            m_customMapData[idx].pTextureElement = nullptr;
         }
     }
 }
 
 void CPlayerMap::OnResourceStopping(CResource* pResource)
 {
-    if (m_bHasCustomMapImage && m_pCustomMapResource == pResource)
+    // Check both size custom maps
+    for (int i = 0; i < 2; i++)
     {
-        if (!m_pCustomTextureElement)
-            SAFE_RELEASE(m_customMapImageTexture);
-        
-        m_bHasCustomMapImage = false;
-        m_strCustomMapImagePath = "";
-        m_pCustomMapResource = nullptr;
-        m_pCustomTextureElement = nullptr;
-        
-        LoadUserCustomMapIfExists();
+        if (m_customMapData[i].bHasCustomMap && m_customMapData[i].pResource == pResource)
+        {
+            if (!m_customMapData[i].pTextureElement && m_customMapData[i].pTexture)
+            {
+                SAFE_RELEASE(m_customMapData[i].pTexture);
+            }
+            else
+            {
+                m_customMapData[i].pTexture = nullptr;
+            }
+            
+            m_customMapData[i].bHasCustomMap = false;
+            m_customMapData[i].strPath = "";
+            m_customMapData[i].pResource = nullptr;
+            m_customMapData[i].pTextureElement = nullptr;
+        }
     }
+
+    // If the current map size had a custom map, try to load the user custom map
+    LoadUserCustomMapIfExists();
 
     if (m_bHasCustomMapOpacity && m_pCustomOpacityResource == pResource)
     {

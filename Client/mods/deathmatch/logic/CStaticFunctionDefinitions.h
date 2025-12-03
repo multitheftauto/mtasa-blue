@@ -725,8 +725,8 @@ public:
     static bool IsPlayerMapVisible(bool& bVisible);
     static bool GetPlayerMapBoundingBox(CVector& vecMin, CVector& vecMax);
     static bool SetPlayerMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource);
-    static bool SetPlayerMapImageFromTexture(CClientTexture* pTexture, CResource* pResource);
-    static bool ResetPlayerMapImage();
+    static bool SetPlayerMapImageFromTexture(CClientTexture* pTexture, uint uiSize, CResource* pResource);
+    static bool ResetPlayerMapImage(uint uiSize = 0);
     static bool SetPlayerMapOpacity(uchar ucOpacity, CResource* pResource);
     static bool ResetPlayerMapOpacity();
     static bool DisableRadarMap(bool bDisable, CResource* pResource);
