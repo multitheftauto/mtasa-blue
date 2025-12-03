@@ -82,6 +82,181 @@ constexpr DWORD Milliseconds(std::chrono::milliseconds duration)
 
 class CClientBase;
 
+// Record crash registers in scenario that a failure to create .dmp is likely
+namespace EmergencyCrashLogging
+{
+    // Result codes for SEH-protected read operations
+    enum class ReadResult : int
+    {
+        Success = 1,
+        NullPointer = 0,
+        AccessFault = -1
+    };
+
+    static void DoAddReportLog(int id, const char* msg)
+    {
+        SharedUtil::AddReportLog(id, msg);
+    }
+
+    static bool TryAddReportLog(int id, const char* msg)
+    {
+        __try
+        {
+            DoAddReportLog(id, msg);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
+    static void SafeEmergencyLog(const char* msg)
+    {
+        // Always output to debugger first (guaranteed crash-safe)
+        OutputDebugStringA(msg);
+        OutputDebugStringA("\n");
+
+        TryAddReportLog(9800, msg);
+    }
+
+    // SEH-isolated reader for exception record
+    #pragma warning(push)
+    #pragma warning(disable: 4702)
+    static ReadResult TryReadExceptionRecord(const _EXCEPTION_POINTERS* pException, 
+                                              char* buf, size_t bufSize)
+    {
+        ReadResult result = ReadResult::AccessFault;
+        __try
+        {
+            if (pException->ExceptionRecord != nullptr)
+            {
+                sprintf_s(buf, bufSize, "Code=0x%08lX Addr=0x%08lX ThreadId=%lu",
+                          static_cast<unsigned long>(pException->ExceptionRecord->ExceptionCode),
+                          static_cast<unsigned long>(reinterpret_cast<uintptr_t>(
+                              pException->ExceptionRecord->ExceptionAddress)),
+                          static_cast<unsigned long>(GetCurrentThreadId()));
+                result = ReadResult::Success;
+            }
+            else
+            {
+                result = ReadResult::NullPointer;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = ReadResult::AccessFault;
+        }
+        return result;
+    }
+
+    // SEH-isolated reader for context record
+    static ReadResult TryReadContextRecord(const _EXCEPTION_POINTERS* pException,
+                                            char* buf1, size_t buf1Size,
+                                            char* buf2, size_t buf2Size)
+    {
+        ReadResult result = ReadResult::AccessFault;
+        __try
+        {
+            if (pException->ContextRecord != nullptr)
+            {
+                const CONTEXT* ctx = pException->ContextRecord;
+
+                sprintf_s(buf1, buf1Size, "EAX=0x%08lX EBX=0x%08lX ECX=0x%08lX EDX=0x%08lX",
+                          ctx->Eax, ctx->Ebx, ctx->Ecx, ctx->Edx);
+
+                sprintf_s(buf2, buf2Size, "ESI=0x%08lX EDI=0x%08lX EBP=0x%08lX ESP=0x%08lX EIP=0x%08lX EFL=0x%08lX",
+                          ctx->Esi, ctx->Edi, ctx->Ebp, ctx->Esp, ctx->Eip, ctx->EFlags);
+
+                result = ReadResult::Success;
+            }
+            else
+            {
+                result = ReadResult::NullPointer;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = ReadResult::AccessFault;
+        }
+        return result;
+    }
+    #pragma warning(pop)
+
+}  // namespace EmergencyCrashLogging
+
+// Call SEH-isolated readers
+static void LogEmergencyExceptionRecord(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    std::array<char, 128> buf{};
+    
+    const auto result = TryReadExceptionRecord(pException, buf.data(), buf.size());
+    
+    switch (result)
+    {
+        case ReadResult::Success:
+            SafeEmergencyLog(buf.data());
+            break;
+        case ReadResult::NullPointer:
+            SafeEmergencyLog("[!] ExceptionRecord is NULL");
+            break;
+        case ReadResult::AccessFault:
+            SafeEmergencyLog("[!] Fault reading ExceptionRecord");
+            break;
+        default:
+            SafeEmergencyLog("[!] Unknown result reading ExceptionRecord");
+            break;
+    }
+}
+
+static void LogEmergencyContextRecord(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    std::array<char, 128> buf1{};
+    std::array<char, 128> buf2{};
+    
+    const auto result = TryReadContextRecord(pException, 
+                                              buf1.data(), buf1.size(),
+                                              buf2.data(), buf2.size());
+    
+    switch (result)
+    {
+        case ReadResult::Success:
+            SafeEmergencyLog(buf1.data());
+            SafeEmergencyLog(buf2.data());
+            break;
+        case ReadResult::NullPointer:
+            SafeEmergencyLog("[!] ContextRecord is NULL");
+            break;
+        case ReadResult::AccessFault:
+            SafeEmergencyLog("[!] Fault reading context");
+            break;
+        default:
+            SafeEmergencyLog("[!] Unknown result reading ContextRecord");
+            break;
+    }
+}
+
+static void LogEmergencyCrashContext(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    SafeEmergencyLog("=== EMERGENCY CRASH CONTEXT ===");
+
+    if (pException == nullptr)
+    {
+        SafeEmergencyLog("[!] pException is NULL");
+        return;
+    }
+
+    LogEmergencyExceptionRecord(pException);
+
+    LogEmergencyContextRecord(pException);
+}
+
 static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue)
 {
     __try
@@ -1266,6 +1441,11 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     // Absolute first action - log that we entered the handler (before anything can fail)
     // This is critical for diagnosing exceptions that may fault during handling
     OutputDebugStringSafe("CCrashDumpWriter::HandleExceptionGlobal - EMERGENCY ENTRY MARKER\n");
+    
+    // Log exception code and registers immediately - ensures crash context is captured
+    // even if subsequent processing fails and no dump is generated (stale artifact scenario)
+    // Uses SafeEmergencyLog internally which is SEH-protected
+    LogEmergencyCrashContext(pException);
     
     SAFE_DEBUG_OUTPUT("========================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - ENTRY\n");
