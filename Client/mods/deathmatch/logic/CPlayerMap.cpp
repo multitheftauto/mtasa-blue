@@ -12,6 +12,7 @@
 #include "StdInc.h"
 
 using SharedUtil::CalcMTASAPath;
+using SharedUtil::FileExists;
 using std::list;
 
 enum
@@ -61,6 +62,18 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_mapImageTexture = nullptr;
     m_playerMarkerTexture = nullptr;
 
+    // Custom map image variables
+    m_bHasCustomMapImage = false;
+    m_customMapImageTexture = nullptr;
+    m_strCustomMapImagePath = "";
+    m_pCustomTextureElement = nullptr;
+    m_ucCustomMapOpacity = 255;
+    m_bHasCustomMapOpacity = false;
+    m_pCustomMapResource = nullptr;
+    m_pCustomOpacityResource = nullptr;
+    m_bRadarMapDisabled = false;
+    m_pRadarMapDisabledResource = nullptr;
+
     // Create all map textures
     CreateAllTextures();
 
@@ -109,6 +122,8 @@ CPlayerMap::~CPlayerMap()
     // Delete our images
     SAFE_RELEASE(m_mapImageTexture);
     SAFE_RELEASE(m_playerMarkerTexture);
+    if (!m_pCustomTextureElement)
+        SAFE_RELEASE(m_customMapImageTexture);
     for (uint i = 0; i < m_markerTextureList.size(); i++)
         SAFE_RELEASE(m_markerTextureList[i]);
     m_markerTextureList.clear();
@@ -118,7 +133,7 @@ CPlayerMap::~CPlayerMap()
 void CPlayerMap::CreateOrUpdateMapTexture()
 {
     const std::uint32_t mapSize = MAP_IMAGE_SIZES[m_playerMapImageIndex];
-    const SString       fileName("MTA\\cgui\\images\\map_%d.png", mapSize);
+    const SString       fileName("MTA\\cgui\\images\\radar\\map_%d.png", mapSize);
 
     auto* newTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, mapSize, mapSize, RFORMAT_DXT1);
     if (!newTexture)
@@ -156,6 +171,7 @@ void CPlayerMap::CreateAllTextures()
     {
         // Create the map texture
         m_playerMapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
+        m_defaultMapImageIndex = m_playerMapImageIndex;
         CreateOrUpdateMapTexture();
 
         // Create the player blip texture
@@ -163,6 +179,9 @@ void CPlayerMap::CreateAllTextures()
 
         // Create the other marker textures
         CreateMarkerTextures();
+
+        // Try to load a user custom map if it exists
+        LoadUserCustomMapIfExists();
     }
     catch (const std::exception& e)
     {
@@ -293,8 +312,7 @@ void CPlayerMap::DoRender()
     if (isMapShowing && !m_failedToLoadTextures)
     {
         // Get the alpha value from the settings
-        int mapAlpha;
-        g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
+        uchar mapAlpha = GetMapOpacity();
         const SColorARGB mapColor(mapAlpha, 255, 255, 255);
 
         // Update the image if the user changed it via a setting
@@ -302,10 +320,14 @@ void CPlayerMap::DoRender()
         if (mapImageIndex != m_playerMapImageIndex)
         {
             UpdateOrRevertMapTexture(mapImageIndex);
+            if (!m_bHasCustomMapImage)
+                LoadUserCustomMapIfExists();
         }
 
-        g_pCore->GetGraphics()->DrawTexture(m_mapImageTexture, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
-                                            m_fMapSize / m_mapImageTexture->m_uiSizeX, m_fMapSize / m_mapImageTexture->m_uiSizeY, 0.0f, 0.0f, 0.0f, mapColor);
+        CTextureItem* pMapTexture = m_bHasCustomMapImage ? m_customMapImageTexture : m_mapImageTexture;
+
+        g_pCore->GetGraphics()->DrawTexture(pMapTexture, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
+                                            m_fMapSize / pMapTexture->m_uiSizeX, m_fMapSize / pMapTexture->m_uiSizeY, 0.0f, 0.0f, 0.0f, mapColor);
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
@@ -718,6 +740,9 @@ void CPlayerMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
 
 bool CPlayerMap::IsPlayerMapShowing()
 {
+    if (m_bRadarMapDisabled)
+        return false;
+    
     return ((m_bIsPlayerMapEnabled || m_bForcedState) && m_mapImageTexture && m_playerMarkerTexture && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
 }
 
@@ -751,4 +776,146 @@ SString CPlayerMap::GetBoundKeyName(const SString& strCommand)
     if (!pCommandBind)
         return strCommand;
     return pCommandBind->boundKey->szKey;
+}
+bool CPlayerMap::SetCustomMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource)
+{
+    if (uiSize != 1024 && uiSize != 2048)
+        return false;
+
+    if (!pResource)
+        return false;
+
+    SString strFullPath = pResource->GetResourceDirectoryPath() + strTexturePath;
+    
+    CTextureItem* pNewTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(strFullPath, nullptr, false, uiSize, uiSize, RFORMAT_DXT1);
+    
+    if (!pNewTexture)
+        return false;
+
+    if (!m_pCustomTextureElement)
+        SAFE_RELEASE(m_customMapImageTexture);
+    
+    m_customMapImageTexture = pNewTexture;
+    m_strCustomMapImagePath = strFullPath;
+    m_bHasCustomMapImage = true;
+    m_pCustomMapResource = pResource;
+    m_pCustomTextureElement = nullptr;
+
+    return true;
+}
+
+bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, CResource* pResource)
+{
+    if (!pTexture || !pResource)
+        return false;
+
+    CTextureItem* pTextureItem = pTexture->GetTextureItem();
+    if (!pTextureItem)
+        return false;
+
+    if (!m_pCustomTextureElement)
+        SAFE_RELEASE(m_customMapImageTexture);
+
+    m_customMapImageTexture = pTextureItem;
+    m_strCustomMapImagePath = "";
+    m_bHasCustomMapImage = true;
+    m_pCustomMapResource = pResource;
+    m_pCustomTextureElement = pTexture;
+
+    return true;
+}
+
+void CPlayerMap::ResetCustomMapImage()
+{
+    if (!m_pCustomTextureElement)
+        SAFE_RELEASE(m_customMapImageTexture);
+    
+    m_bHasCustomMapImage = false;
+    m_strCustomMapImagePath = "";
+    m_pCustomMapResource = nullptr;
+    m_pCustomTextureElement = nullptr;
+}
+
+bool CPlayerMap::SetMapOpacity(uchar ucOpacity, CResource* pResource)
+{
+    m_ucCustomMapOpacity = ucOpacity;
+    m_bHasCustomMapOpacity = true;
+    m_pCustomOpacityResource = pResource;
+    return true;
+}
+
+void CPlayerMap::ResetMapOpacity()
+{
+    m_bHasCustomMapOpacity = false;
+    m_ucCustomMapOpacity = 255;
+    m_pCustomOpacityResource = nullptr;
+}
+
+uchar CPlayerMap::GetMapOpacity() const
+{
+    if (m_bHasCustomMapOpacity)
+        return m_ucCustomMapOpacity;
+    
+    int mapAlpha;
+    g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
+    return static_cast<uchar>(Clamp(0, mapAlpha, 255));
+}
+
+bool CPlayerMap::SetRadarMapDisabled(bool bDisabled, CResource* pResource)
+{
+    m_bRadarMapDisabled = bDisabled;
+    m_pRadarMapDisabledResource = pResource;
+    return true;
+}
+
+void CPlayerMap::LoadUserCustomMapIfExists()
+{
+    const std::uint32_t mapSize = MAP_IMAGE_SIZES[m_playerMapImageIndex];
+    const SString customFileName = CalcMTASAPath(SString("MTA\\cgui\\images\\radar\\map_%d-custom.png", mapSize));
+
+    if (FileExists(customFileName))
+    {
+        CTextureItem* pCustomTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(customFileName, nullptr, false, mapSize, mapSize, RFORMAT_DXT1);
+        
+        if (pCustomTexture)
+        {
+            if (!m_pCustomTextureElement)
+                SAFE_RELEASE(m_customMapImageTexture);
+            
+            m_customMapImageTexture = pCustomTexture;
+            m_strCustomMapImagePath = customFileName;
+            m_bHasCustomMapImage = true;
+            m_pCustomMapResource = nullptr;
+            m_pCustomTextureElement = nullptr;
+        }
+    }
+}
+
+void CPlayerMap::OnResourceStopping(CResource* pResource)
+{
+    if (m_bHasCustomMapImage && m_pCustomMapResource == pResource)
+    {
+        if (!m_pCustomTextureElement)
+            SAFE_RELEASE(m_customMapImageTexture);
+        
+        m_bHasCustomMapImage = false;
+        m_strCustomMapImagePath = "";
+        m_pCustomMapResource = nullptr;
+        m_pCustomTextureElement = nullptr;
+        
+        LoadUserCustomMapIfExists();
+    }
+
+    if (m_bHasCustomMapOpacity && m_pCustomOpacityResource == pResource)
+    {
+        m_bHasCustomMapOpacity = false;
+        m_ucCustomMapOpacity = 255;
+        m_pCustomOpacityResource = nullptr;
+    }
+
+    if (m_bRadarMapDisabled && m_pRadarMapDisabledResource == pResource)
+    {
+        m_bRadarMapDisabled = false;
+        m_pRadarMapDisabledResource = nullptr;
+    }
 }

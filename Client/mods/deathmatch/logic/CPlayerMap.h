@@ -16,6 +16,9 @@
 #include <CClientTextDisplay.h>
 #include <gui/CGUI.h>
 
+class CResource;
+class CClientTexture;
+
 class CPlayerMap
 {
 public:
@@ -37,6 +40,16 @@ public:
 
     void ToggleHelpText();
 
+    bool  SetCustomMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource = nullptr);
+    bool  SetCustomMapImageFromTexture(CClientTexture* pTexture, CResource* pResource = nullptr);
+    void  ResetCustomMapImage();
+    bool  SetMapOpacity(uchar ucOpacity, CResource* pResource = nullptr);
+    void  ResetMapOpacity();
+    uchar GetMapOpacity() const;
+    bool  HasCustomMapImage() const { return m_bHasCustomMapImage; }
+    void  OnResourceStopping(CResource* pResource);
+    bool  SetRadarMapDisabled(bool bDisabled, CResource* pResource);
+
 protected:
     void InternalSetPlayerMapEnabled(bool bEnabled);
 
@@ -46,6 +59,7 @@ protected:
     void          CreateOrUpdateMapTexture();
     void          UpdateOrRevertMapTexture(std::size_t imageIndex);
     void          CreateAllTextures();
+    void          LoadUserCustomMapIfExists();
 
 public:
     bool IsAttachedToLocalPlayer() const { return m_bIsAttachedToLocal; };
@@ -125,4 +139,15 @@ private:
     bool m_bRadarVisible;
     bool m_bDebugVisible;
     bool m_bTextVisible;
+    bool           m_bHasCustomMapImage;
+    CTextureItem*  m_customMapImageTexture;
+    std::string    m_strCustomMapImagePath;
+    CClientTexture* m_pCustomTextureElement;
+    std::size_t    m_defaultMapImageIndex;
+    uchar          m_ucCustomMapOpacity;
+    bool           m_bHasCustomMapOpacity;
+    CResource*     m_pCustomMapResource;
+    CResource*     m_pCustomOpacityResource;
+    bool           m_bRadarMapDisabled;
+    CResource*     m_pRadarMapDisabledResource;
 };

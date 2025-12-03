@@ -53,6 +53,11 @@ void CLuaPlayerDefs::LoadFunctions()
         {"isPlayerMapVisible", IsPlayerMapVisible},
         {"getPlayerMapBoundingBox", GetPlayerMapBoundingBox},
         {"getPlayerMapOpacity", ArgumentParser<GetPlayerMapOpacity>},
+        {"setPlayerMapImage", ArgumentParser<SetPlayerMapImage>},
+        {"resetPlayerMapImage", ArgumentParser<ResetPlayerMapImage>},
+        {"setPlayerMapOpacity", ArgumentParser<SetPlayerMapOpacity>},
+        {"resetPlayerMapOpacity", ArgumentParser<ResetPlayerMapOpacity>},
+        {"disableRadarMap", ArgumentParser<DisableRadarMap>},
         {"getPlayerHudComponentProperty", ArgumentParser<GetPlayerHudComponentProperty>},
     };
 
@@ -78,6 +83,11 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "forceMap", "forcePlayerMap");
     lua_classfunction(luaVM, "isMapForced", "isPlayerMapForced");
     lua_classfunction(luaVM, "isMapVisible", "isPlayerMapVisible");
+    lua_classfunction(luaVM, "setMapImage", "setPlayerMapImage");
+    lua_classfunction(luaVM, "resetMapImage", "resetPlayerMapImage");
+    lua_classfunction(luaVM, "setMapOpacity", "setPlayerMapOpacity");
+    lua_classfunction(luaVM, "resetMapOpacity", "resetPlayerMapOpacity");
+    lua_classfunction(luaVM, "disableRadarMap", "disableRadarMap");
     lua_classfunction(luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible");
     lua_classfunction(luaVM, "toggleControl", "toggleControl");
     lua_classfunction(luaVM, "setHudComponentProperty", "setPlayerHudComponentProperty");
@@ -1052,4 +1062,56 @@ std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiR
     }
 
     return false;
+}
+
+bool CLuaPlayerDefs::SetPlayerMapImage(lua_State* luaVM, std::variant<std::string, CClientTexture*> texturePathOrElement, std::optional<uint> size)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+        
+    CResource* pResource = pLuaMain->GetResource();
+    
+    if (std::holds_alternative<CClientTexture*>(texturePathOrElement))
+    {
+        CClientTexture* pTexture = std::get<CClientTexture*>(texturePathOrElement);
+        return CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(pTexture, pResource);
+    }
+    else
+    {
+        std::string strPath = std::get<std::string>(texturePathOrElement);
+        if (!size.has_value())
+            return false;
+        return CStaticFunctionDefinitions::SetPlayerMapImage(strPath, size.value(), pResource);
+    }
+}
+
+bool CLuaPlayerDefs::ResetPlayerMapImage()
+{
+    return CStaticFunctionDefinitions::ResetPlayerMapImage();
+}
+
+bool CLuaPlayerDefs::SetPlayerMapOpacity(lua_State* luaVM, uchar opacity)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+        
+    CResource* pResource = pLuaMain->GetResource();
+    return CStaticFunctionDefinitions::SetPlayerMapOpacity(opacity, pResource);
+}
+
+bool CLuaPlayerDefs::ResetPlayerMapOpacity()
+{
+    return CStaticFunctionDefinitions::ResetPlayerMapOpacity();
+}
+
+bool CLuaPlayerDefs::DisableRadarMap(lua_State* luaVM, bool disable)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+        
+    CResource* pResource = pLuaMain->GetResource();
+    return CStaticFunctionDefinitions::DisableRadarMap(disable, pResource);
 }

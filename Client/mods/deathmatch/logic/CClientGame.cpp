@@ -551,6 +551,12 @@ CClientGame::~CClientGame()
         discord->UpdatePresence();
     }
 
+    if (m_pPlayerMap)
+    {
+        m_pPlayerMap->ResetCustomMapImage();
+        m_pPlayerMap->ResetMapOpacity();
+    }
+
     // Destroy our stuff
     SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop
 
