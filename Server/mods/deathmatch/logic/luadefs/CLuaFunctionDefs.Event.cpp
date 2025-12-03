@@ -310,7 +310,8 @@ int CLuaFunctionDefs::TriggerLatentClientEvent(lua_State* luaVM)
         markerLatentEvent.SetAndStoreString(SString("Get args (%d,%s)", sendList.size(), *strName));
 
         // Trigger it
-        if (CStaticFunctionDefinitions::TriggerLatentClientEvent(sendList, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId))
+        uint handle = CStaticFunctionDefinitions::TriggerLatentClientEvent(sendList, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId);
+        if (handle >= 0)
         {
             markerLatentEvent.Set("End");
 
@@ -318,7 +319,8 @@ int CLuaFunctionDefs::TriggerLatentClientEvent(lua_State* luaVM)
             if (CPerfStatDebugInfo::GetSingleton()->IsActive("TriggerLatentClientEvent"))
                 CPerfStatDebugInfo::GetSingleton()->AddLine("TriggerLatentClientEvent", markerLatentEvent.GetString());
 
-            lua_pushboolean(luaVM, true);
+            // Return the handle id
+            lua_pushnumber(luaVM, handle);
             return 1;
         }
     }
