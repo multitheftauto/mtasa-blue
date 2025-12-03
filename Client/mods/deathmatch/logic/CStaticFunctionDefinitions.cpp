@@ -8024,7 +8024,7 @@ bool CStaticFunctionDefinitions::ResetPlayerMapOpacity()
     return true;
 }
 
-bool CStaticFunctionDefinitions::DisableRadarMap(bool bDisable, CResource* pResource)
+bool CStaticFunctionDefinitions::DisablePlayerMap(bool bDisable, CResource* pResource)
 {
     return m_pPlayerMap->SetRadarMapDisabled(bDisable, pResource);
 }

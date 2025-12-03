@@ -59,5 +59,5 @@ public:
     static bool ResetPlayerMapImage(std::optional<uint> size);
     static bool SetPlayerMapOpacity(lua_State* luaVM, uchar opacity);
     static bool ResetPlayerMapOpacity();
-    static bool DisableRadarMap(lua_State* luaVM, bool disable);
+    static bool DisablePlayerMap(lua_State* luaVM, bool disable);
 };
