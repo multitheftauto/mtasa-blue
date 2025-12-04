@@ -555,7 +555,6 @@ CClientGame::~CClientGame()
     {
         m_pPlayerMap->ResetCustomMapImage();
         m_pPlayerMap->ResetMapOpacity();
-        m_pPlayerMap->SetPlayerMapEnabled(true);
     }
 
     // Destroy our stuff
