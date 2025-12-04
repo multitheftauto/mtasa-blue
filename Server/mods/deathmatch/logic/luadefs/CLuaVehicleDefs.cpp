@@ -3067,12 +3067,12 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
 
 float CLuaVehicleDefs::GetVehicleRotorSpeed(CVehicle* pVehicle)
 {
-    float fRotorSpeed = 0.0f;
-    CStaticFunctionDefinitions::GetVehicleRotorSpeed(pVehicle, fRotorSpeed);
-    return fRotorSpeed;
+    float rotorSpeed = 0.0f;
+    CStaticFunctionDefinitions::GetVehicleRotorSpeed(pVehicle, rotorSpeed);
+    return rotorSpeed;
 }
 
-bool CLuaVehicleDefs::SetVehicleRotorSpeed(CElement* pElement, float fRotorSpeed)
+bool CLuaVehicleDefs::SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed)
 {
-    return CStaticFunctionDefinitions::SetVehicleRotorSpeed(pElement, fRotorSpeed);
+    return CStaticFunctionDefinitions::SetVehicleRotorSpeed(pElement, rotorSpeed);
 }

@@ -130,5 +130,5 @@ public:
     static bool SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept;
 
     static float GetVehicleRotorSpeed(CVehicle* pVehicle);
-    static bool  SetVehicleRotorSpeed(CElement* pElement, float fRotorSpeed);
+    static bool  SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed);
 };

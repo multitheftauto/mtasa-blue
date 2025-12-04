@@ -12693,20 +12693,20 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleRotorSpeed(CVehicle* pVehicle, float& fRotorSpeed)
+bool CStaticFunctionDefinitions::GetVehicleRotorSpeed(CVehicle* pVehicle, float& rotorSpeed)
 {
     if (pVehicle != NULL)
     {
-        fRotorSpeed = pVehicle->GetRotorSpeed();
+        rotorSpeed = pVehicle->GetRotorSpeed();
         return true;
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float fRotorSpeed)
+bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleRotorSpeed(*iter, fRotorSpeed))
+    RUN_CHILDREN(SetVehicleRotorSpeed(*iter, rotorSpeed))
 
     if (IS_VEHICLE(pElement))
     {
@@ -12716,7 +12716,7 @@ bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float 
         if (vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_PLANE)
             return false;
 
-        float fClampedSpeed = std::max(0.0f, std::min(fRotorSpeed, 0.22f));
+        float fClampedSpeed = std::max(0.0f, std::min(rotorSpeed, 0.22f));
         pVehicle->SetRotorSpeed(fClampedSpeed);
 
         unsigned char ucRotorSpeed = static_cast<unsigned char>((fClampedSpeed / 0.22f) * 100.0f);

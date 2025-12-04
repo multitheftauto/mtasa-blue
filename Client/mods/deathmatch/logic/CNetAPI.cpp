@@ -1546,8 +1546,8 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
         unsigned char ucRotorSpeed;
         if (BitStream.Read(ucRotorSpeed))
         {
-            float fRotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
-            pVehicle->SetRotorSpeed(fRotorSpeed);
+            float rotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
+            pVehicle->SetRotorSpeed(rotorSpeed);
         }
     }
 
@@ -1750,9 +1750,9 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(ControllerState.RightShoulder2 != 0);
 
         // Write rotor speed
-        float fRotorSpeed = 0.0f;
-        pVehicle->GetRotorSpeed(fRotorSpeed);
-        unsigned char ucRotorSpeed = static_cast<unsigned char>((fRotorSpeed / 0.22f) * 100.0f);
+        float rotorSpeed = 0.0f;
+        pVehicle->GetRotorSpeed(rotorSpeed);
+        unsigned char ucRotorSpeed = static_cast<unsigned char>((rotorSpeed / 0.22f) * 100.0f);
         BitStream.Write(ucRotorSpeed);
     }
 

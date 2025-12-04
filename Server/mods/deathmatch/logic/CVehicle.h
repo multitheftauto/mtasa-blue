@@ -264,8 +264,8 @@ public:
     bool IsLandingGearDown() { return m_bLandingGearDown; };
     void SetLandingGearDown(bool bLandingGearDown) { m_bLandingGearDown = bLandingGearDown; };
 
-    float GetRotorSpeed() { return m_fRotorSpeed; };
-    void  SetRotorSpeed(float fRotorSpeed) { m_fRotorSpeed = fRotorSpeed; };
+    float GetRotorSpeed() { return m_rotorSpeed; };
+    void  SetRotorSpeed(float rotorSpeed) { m_rotorSpeed = rotorSpeed; };
 
     unsigned short GetAdjustableProperty() { return m_usAdjustableProperty; };
     void           SetAdjustableProperty(unsigned short usAdjustable) { m_usAdjustableProperty = usAdjustable; };
@@ -488,7 +488,7 @@ private:
     bool           m_bSirenActive;
     bool           m_bTaxiLightState;
     bool           m_bLandingGearDown;
-    float          m_fRotorSpeed;
+    float          m_rotorSpeed;
     unsigned short m_usAdjustableProperty;
     bool           m_bCollisionsEnabled;
 
