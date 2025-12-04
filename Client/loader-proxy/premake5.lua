@@ -4,6 +4,9 @@ project "Loader Proxy"
 	targetname "mtasa"
 	targetdir(buildpath("mta"))
 
+	filter "configurations:Debug"
+		targetsuffix "_d"
+
 	filter "configurations:Release or configurations:Nightly"
 		targetsuffix ""
 
