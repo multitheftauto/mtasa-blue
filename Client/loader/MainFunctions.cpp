@@ -131,8 +131,8 @@ void CheckLibVersions() {
     for (uint i = 0; i < NUMELMS(moduleList); i++)
     {
         SString strFilename = moduleList[i];
-        // Skip _d suffix for LOADER_PROXY_DLL_NAME as it already has the correct name
-        if (strFilename.find(LOADER_PROXY_DLL_NAME) == SString::npos)
+        // Skip _d suffix for LOADER_PROXY_DLL_NAME and netc.dll as they don't use _d
+        if (strFilename.find(LOADER_PROXY_DLL_NAME) == SString::npos && strFilename.find("netc.dll") == SString::npos)
         {
 #ifdef MTA_DEBUG
             strFilename = ExtractBeforeExtension(strFilename) + "_d." + ExtractExtension(strFilename);

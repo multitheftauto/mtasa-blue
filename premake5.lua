@@ -89,6 +89,12 @@ workspace "MTASA"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
 
+	filter "configurations:Release"
+		defines { "MTA_RELEASE" }
+
+	filter "configurations:Nightly"
+		defines { "MTA_NIGHTLY" }
+
 	filter "configurations:Release or configurations:Nightly"
 		optimize "Speed"	-- "On"=MS:/Ox GCC:/O2  "Speed"=MS:/O2 GCC:/O3  "Full"=MS:/Ox GCC:/O3
 
