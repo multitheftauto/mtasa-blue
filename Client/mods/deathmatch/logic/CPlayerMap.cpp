@@ -840,24 +840,6 @@ bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, ECustomM
         throw std::invalid_argument("Invalid texture element");
 
     std::size_t idx = MapResolutionToIndex(resolution);
-    
-    // If the current map index does not match, update it
-    if (idx != m_playerMapImageIndex)
-    {
-        m_playerMapImageIndex = idx;
-        try {
-            CreateOrUpdateMapTexture();
-        } catch (...) {
-            // Ignore errors
-        }
-    }
-
-    // Release old texture if it existed and was not element-based
-    if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
-    {
-        SAFE_RELEASE(m_customMapData[idx].pTexture);
-        m_customMapData[idx].pTexture = nullptr;
-    }
 
     m_customMapData[idx].pTexture = pTextureItem;
     m_customMapData[idx].strPath = "";
@@ -959,19 +941,13 @@ void CPlayerMap::OnResourceStopping(CResource* pResource)
         if (m_customMapData[i].bHasCustomMap && m_customMapData[i].pResource == pResource)
         {
             if (!m_customMapData[i].pTextureElement && m_customMapData[i].pTexture)
-            {
                 SAFE_RELEASE(m_customMapData[i].pTexture);
-                m_customMapData[i].pTexture = nullptr;
-            }
-            else
-            {
-                m_customMapData[i].pTexture = nullptr;
-            }
-            
+
+            m_customMapData[i].pTexture = nullptr;
+            m_customMapData[i].pTextureElement = nullptr;
             m_customMapData[i].bHasCustomMap = false;
             m_customMapData[i].strPath = "";
             m_customMapData[i].pResource = nullptr;
-            m_customMapData[i].pTextureElement = nullptr;
         }
     }
 
