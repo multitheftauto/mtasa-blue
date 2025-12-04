@@ -25,6 +25,7 @@ void CVehicleRPCs::LoadFunctions()
     AddHandler(SET_VEHICLE_SIRENE_ON, SetVehicleSireneOn, "SetVehicleSireneOn");
     AddHandler(SET_VEHICLE_LANDING_GEAR_DOWN, SetVehicleLandingGearDown, "SetVehicleLandingGearDown");
     AddHandler(SET_VEHICLE_ROTOR_SPEED, SetVehicleRotorSpeed, "SetVehicleRotorSpeed");
+    AddHandler(SET_VEHICLE_ROTOR_STATE, SetVehicleRotorState, "SetVehicleRotorState");
     AddHandler(ADD_VEHICLE_UPGRADE, AddVehicleUpgrade, "AddVehicleUpgrade");
     AddHandler(ADD_ALL_VEHICLE_UPGRADES, AddAllVehicleUpgrades, "AddAllVehicleUpgrades");
     AddHandler(REMOVE_VEHICLE_UPGRADE, RemoveVehicleUpgrade, "RemoveVehicleUpgrade");
@@ -233,21 +234,6 @@ void CVehicleRPCs::SetVehicleLandingGearDown(CClientEntity* pSource, NetBitStrea
                 bLandingGearDown = true;
 
             pVehicle->SetLandingGearDown(bLandingGearDown);
-        }
-    }
-}
-
-void CVehicleRPCs::SetVehicleRotorSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
-{
-    CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
-    if (pVehicle)
-    {
-        unsigned char ucRotorSpeed;
-        if (bitStream.Read(ucRotorSpeed))
-        {
-            // Convert the given rotor speed from between 0-100 to 0-0.22
-            float rotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
-            pVehicle->SetRotorSpeed(rotorSpeed);
         }
     }
 }
@@ -693,3 +679,30 @@ void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBit
         vehicle->SetNitroLevel(vehicle->GetNitroLevel() + 1.0001f);
 }
 
+void CVehicleRPCs::SetVehicleRotorSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
+    if (pVehicle)
+    {
+        unsigned char ucRotorSpeed;
+        if (bitStream.Read(ucRotorSpeed))
+        {
+            // Convert the given rotor speed from between 0-100 to 0-0.22
+            float rotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
+            pVehicle->SetRotorSpeed(rotorSpeed);
+        }
+    }
+}
+
+void CVehicleRPCs::SetVehicleRotorState(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
+    if (pVehicle)
+    {
+        bool rotorState;
+        if (bitStream.ReadBit(rotorState))
+        {
+            pVehicle->SetVehicleRotorState(rotorState, true);
+        }
+    }
+}

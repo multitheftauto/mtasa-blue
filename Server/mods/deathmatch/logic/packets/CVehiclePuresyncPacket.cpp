@@ -405,6 +405,13 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     float rotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
                     pVehicle->SetRotorSpeed(rotorSpeed);
                 }
+
+                // Read rotor state
+                bool rotorState;
+                if (BitStream.ReadBit(rotorState))
+                {
+                    pVehicle->SetRotorState(rotorState);
+                }
             }
 
             pSourcePlayer->GetPad()->NewControllerState(ControllerState);
@@ -613,6 +620,14 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             {
                 BitStream.WriteBit(ControllerState.LeftShoulder2 != 0);
                 BitStream.WriteBit(ControllerState.RightShoulder2 != 0);
+
+                // Write rotor speed
+                float rotorSpeed = pVehicle->GetRotorSpeed();
+                unsigned char ucRotorSpeed = static_cast<unsigned char>((rotorSpeed / 0.22f) * 100.0f);
+                BitStream.Write(ucRotorSpeed);
+
+                // Write rotor state
+                BitStream.WriteBit(pVehicle->GetRotorState());
             }
 
             // Write parts state

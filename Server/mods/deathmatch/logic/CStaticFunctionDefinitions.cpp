@@ -12728,3 +12728,37 @@ bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float 
 
     return false;
 }
+
+bool CStaticFunctionDefinitions::GetVehicleRotorState(CVehicle* pVehicle, bool& rotorState)
+{
+    if (pVehicle != NULL)
+    {
+        rotorState = pVehicle->GetRotorState();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleRotorState(CElement* pElement, bool rotorState)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetVehicleRotorState(*iter, rotorState))
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+
+        eVehicleType vehicleType = pVehicle->GetVehicleType();
+        if (vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_PLANE)
+            return false;
+
+        pVehicle->SetRotorState(rotorState);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit(rotorState);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_ROTOR_STATE, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}

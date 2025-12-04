@@ -41,6 +41,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleTurretPosition", GetVehicleTurretPosition},
         {"getVehicleMaxPassengers", GetVehicleMaxPassengers},
         {"getVehicleRotorSpeed", ArgumentParser<GetVehicleRotorSpeed>},
+        {"getVehicleRotorState", ArgumentParser<GetVehicleRotorState>},
         {"isVehicleLocked", IsVehicleLocked},
         {"getVehiclesOfType", GetVehiclesOfType},
         {"getVehicleUpgradeOnSlot", GetVehicleUpgradeOnSlot},
@@ -79,6 +80,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleColor", SetVehicleColor},
         {"setVehicleLandingGearDown", SetVehicleLandingGearDown},
         {"setVehicleRotorSpeed", ArgumentParser<SetVehicleRotorSpeed>},
+        {"setVehicleRotorState", ArgumentParser<SetVehicleRotorState>},
         {"setVehicleLocked", SetVehicleLocked},
         {"setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable},
         {"setVehicleSirensOn", SetVehicleSirensOn},
@@ -164,6 +166,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "removeSirens", "removeVehicleSirens");
     lua_classfunction(luaVM, "addSirens", "addVehicleSirens");
     lua_classfunction(luaVM, "getRotorSpeed", "getVehicleRotorSpeed");
+    lua_classfunction(luaVM, "getRotorState", "getVehicleRotorState");
 
     lua_classfunction(luaVM, "isDamageProof", "isVehicleDamageProof");
     lua_classfunction(luaVM, "isFuelTankExplodable", "isVehicleFuelTankExplodable");
@@ -248,6 +251,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");            // Reduce confusion
     lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
     lua_classfunction(luaVM, "setRotorSpeed", "setVehicleRotorSpeed");
+    lua_classfunction(luaVM, "setRotorState", "setVehicleRotorState");
 
     lua_classvariable(luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof");
     lua_classvariable(luaVM, "locked", "setVehicleLocked", "isVehicleLocked");
@@ -3075,4 +3079,16 @@ float CLuaVehicleDefs::GetVehicleRotorSpeed(CVehicle* pVehicle)
 bool CLuaVehicleDefs::SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed)
 {
     return CStaticFunctionDefinitions::SetVehicleRotorSpeed(pElement, rotorSpeed);
+}
+
+bool CLuaVehicleDefs::GetVehicleRotorState(CVehicle* pVehicle)
+{
+    bool rotorState = false;
+    CStaticFunctionDefinitions::GetVehicleRotorState(pVehicle, rotorState);
+    return rotorState;
+}
+
+bool CLuaVehicleDefs::SetVehicleRotorState(CElement* pElement, bool rotorState)
+{
+    return CStaticFunctionDefinitions::SetVehicleRotorState(pElement, rotorState);
 }

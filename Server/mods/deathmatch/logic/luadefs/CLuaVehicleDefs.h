@@ -131,4 +131,6 @@ public:
 
     static float GetVehicleRotorSpeed(CVehicle* pVehicle);
     static bool  SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed);
+    static bool  GetVehicleRotorState(CVehicle* pVehicle);
+    static bool  SetVehicleRotorState(CElement* pElement, bool rotorState);
 };
