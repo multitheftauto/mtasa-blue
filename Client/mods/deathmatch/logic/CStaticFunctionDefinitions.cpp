@@ -8024,11 +8024,6 @@ bool CStaticFunctionDefinitions::ResetPlayerMapOpacity()
     return true;
 }
 
-bool CStaticFunctionDefinitions::DisablePlayerMap(bool bDisable, CResource* pResource)
-{
-    return m_pPlayerMap->SetRadarMapDisabled(bDisable, pResource);
-}
-
 bool CStaticFunctionDefinitions::FxAddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
     g_pGame->GetFx()->AddBlood(vecPosition, vecDirection, iCount, fBrightness);

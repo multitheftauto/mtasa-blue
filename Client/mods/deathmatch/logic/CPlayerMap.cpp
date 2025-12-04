@@ -66,7 +66,6 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_ucCustomMapOpacity = 255;
     m_bHasCustomMapOpacity = false;
     m_pCustomOpacityResource = nullptr;
-    m_bRadarMapDisabled = false;
     m_pRadarMapDisabledResource = nullptr;
 
     // Create all map textures
@@ -448,9 +447,6 @@ void CPlayerMap::DoRender()
 
 void CPlayerMap::SetPlayerMapEnabled(bool show)
 {
-    if (m_bRadarMapDisabled && show)
-        return;
-        
     bool alreadyEnabled = (m_bIsPlayerMapEnabled || m_bForcedState);
     bool definitiveShow = (show || m_bForcedState);
     if (alreadyEnabled != definitiveShow)
@@ -770,9 +766,6 @@ void CPlayerMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
 
 bool CPlayerMap::IsPlayerMapShowing()
 {
-    if (m_bRadarMapDisabled)
-        return false;
-    
     return ((m_bIsPlayerMapEnabled || m_bForcedState) && m_mapImageTexture && m_playerMarkerTexture && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
 }
 
@@ -936,13 +929,6 @@ uchar CPlayerMap::GetMapOpacity() const
     return static_cast<uchar>(Clamp(0, mapAlpha, 255));
 }
 
-bool CPlayerMap::SetRadarMapDisabled(bool bDisabled, CResource* pResource)
-{
-    m_bRadarMapDisabled = bDisabled;
-    m_pRadarMapDisabledResource = pResource;
-    return true;
-}
-
 void CPlayerMap::LoadUserCustomMapIfExists()
 {
     std::size_t idx = m_playerMapImageIndex;
@@ -1005,11 +991,5 @@ void CPlayerMap::OnResourceStopping(CResource* pResource)
         m_bHasCustomMapOpacity = false;
         m_ucCustomMapOpacity = 255;
         m_pCustomOpacityResource = nullptr;
-    }
-
-    if (m_bRadarMapDisabled && m_pRadarMapDisabledResource == pResource)
-    {
-        m_bRadarMapDisabled = false;
-        m_pRadarMapDisabledResource = nullptr;
     }
 }

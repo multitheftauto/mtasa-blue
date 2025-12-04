@@ -51,7 +51,6 @@ public:
         return m_customMapData[idx].bHasCustomMap; 
     }
     void  OnResourceStopping(CResource* pResource);
-    bool  SetRadarMapDisabled(bool bDisabled, CResource* pResource);
 
 protected:
     void InternalSetPlayerMapEnabled(bool bEnabled);
@@ -155,6 +154,5 @@ private:
     uchar          m_ucCustomMapOpacity;
     bool           m_bHasCustomMapOpacity;
     CResource*     m_pCustomOpacityResource;
-    bool           m_bRadarMapDisabled;
     CResource*     m_pRadarMapDisabledResource;
 };

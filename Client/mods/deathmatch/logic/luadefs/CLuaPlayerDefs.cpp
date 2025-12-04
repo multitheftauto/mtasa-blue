@@ -57,7 +57,6 @@ void CLuaPlayerDefs::LoadFunctions()
         {"resetPlayerMapImage", ArgumentParser<ResetPlayerMapImage>},
         {"setPlayerMapOpacity", ArgumentParser<SetPlayerMapOpacity>},
         {"resetPlayerMapOpacity", ArgumentParser<ResetPlayerMapOpacity>},
-        {"disablePlayerMap", ArgumentParser<DisablePlayerMap>},
         {"getPlayerHudComponentProperty", ArgumentParser<GetPlayerHudComponentProperty>},
     };
 
@@ -87,7 +86,6 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "resetMapImage", "resetPlayerMapImage");
     lua_classfunction(luaVM, "setMapOpacity", "setPlayerMapOpacity");
     lua_classfunction(luaVM, "resetMapOpacity", "resetPlayerMapOpacity");
-    lua_classfunction(luaVM, "disableMap", "disablePlayerMap");
     lua_classfunction(luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible");
     lua_classfunction(luaVM, "toggleControl", "toggleControl");
     lua_classfunction(luaVM, "setHudComponentProperty", "setPlayerHudComponentProperty");
@@ -1115,14 +1113,4 @@ bool CLuaPlayerDefs::SetPlayerMapOpacity(lua_State* luaVM, uchar opacity)
 bool CLuaPlayerDefs::ResetPlayerMapOpacity()
 {
     return CStaticFunctionDefinitions::ResetPlayerMapOpacity();
-}
-
-bool CLuaPlayerDefs::DisablePlayerMap(lua_State* luaVM, bool disable)
-{
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-        return false;
-        
-    CResource* pResource = pLuaMain->GetResource();
-    return CStaticFunctionDefinitions::DisablePlayerMap(disable, pResource);
 }

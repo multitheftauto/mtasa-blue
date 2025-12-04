@@ -729,7 +729,6 @@ public:
     static bool ResetPlayerMapImage(uint uiSize = 0);
     static bool SetPlayerMapOpacity(uchar ucOpacity, CResource* pResource);
     static bool ResetPlayerMapOpacity();
-    static bool DisablePlayerMap(bool bDisable, CResource* pResource);
 
     // Fx funcs
     static bool           FxAddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
