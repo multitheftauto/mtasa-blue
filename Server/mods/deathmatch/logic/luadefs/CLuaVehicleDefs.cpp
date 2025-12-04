@@ -40,6 +40,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleTurnVelocity", GetVehicleTurnVelocity},
         {"getVehicleTurretPosition", GetVehicleTurretPosition},
         {"getVehicleMaxPassengers", GetVehicleMaxPassengers},
+        {"getVehicleRotorSpeed", ArgumentParser<GetVehicleRotorSpeed>},
         {"isVehicleLocked", IsVehicleLocked},
         {"getVehiclesOfType", GetVehiclesOfType},
         {"getVehicleUpgradeOnSlot", GetVehicleUpgradeOnSlot},
@@ -77,6 +78,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
         {"setVehicleColor", SetVehicleColor},
         {"setVehicleLandingGearDown", SetVehicleLandingGearDown},
+        {"setVehicleRotorSpeed", ArgumentParser<SetVehicleRotorSpeed>},
         {"setVehicleLocked", SetVehicleLocked},
         {"setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable},
         {"setVehicleSirensOn", SetVehicleSirensOn},
@@ -3059,4 +3061,16 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
 
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
     return true;
+}
+
+float CLuaVehicleDefs::GetVehicleRotorSpeed(CVehicle* pVehicle)
+{
+    float fRotorSpeed = 0.0f;
+    CStaticFunctionDefinitions::GetVehicleRotorSpeed(pVehicle, fRotorSpeed);
+    return fRotorSpeed;
+}
+
+bool CLuaVehicleDefs::SetVehicleRotorSpeed(CElement* pElement, float fRotorSpeed)
+{
+    return CStaticFunctionDefinitions::SetVehicleRotorSpeed(pElement, fRotorSpeed);
 }

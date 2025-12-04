@@ -24,7 +24,7 @@ void CVehicleRPCs::LoadFunctions()
     AddHandler(SET_VEHICLE_DOORS_UNDAMAGEABLE, SetVehicleDoorsUndamageable, "");
     AddHandler(SET_VEHICLE_SIRENE_ON, SetVehicleSireneOn, "SetVehicleSireneOn");
     AddHandler(SET_VEHICLE_LANDING_GEAR_DOWN, SetVehicleLandingGearDown, "SetVehicleLandingGearDown");
-    AddHandler(SET_HELICOPTER_ROTOR_SPEED, SetHelicopterRotorSpeed, "SetHelicopterRotorSpeed");
+    AddHandler(SET_VEHICLE_ROTOR_SPEED, SetVehicleRotorSpeed, "SetVehicleRotorSpeed");
     AddHandler(ADD_VEHICLE_UPGRADE, AddVehicleUpgrade, "AddVehicleUpgrade");
     AddHandler(ADD_ALL_VEHICLE_UPGRADES, AddAllVehicleUpgrades, "AddAllVehicleUpgrades");
     AddHandler(REMOVE_VEHICLE_UPGRADE, RemoveVehicleUpgrade, "RemoveVehicleUpgrade");
@@ -237,7 +237,7 @@ void CVehicleRPCs::SetVehicleLandingGearDown(CClientEntity* pSource, NetBitStrea
     }
 }
 
-void CVehicleRPCs::SetHelicopterRotorSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+void CVehicleRPCs::SetVehicleRotorSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
     if (pVehicle)
@@ -247,7 +247,7 @@ void CVehicleRPCs::SetHelicopterRotorSpeed(CClientEntity* pSource, NetBitStreamI
         {
             // Convert the given rotor speed from between 0-100 to 0-0.22
             float fRotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
-            pVehicle->SetHeliRotorSpeed(fRotorSpeed);
+            pVehicle->SetRotorSpeed(fRotorSpeed);
         }
     }
 }

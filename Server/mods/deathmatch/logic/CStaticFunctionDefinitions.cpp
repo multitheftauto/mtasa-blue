@@ -12692,3 +12692,39 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
 
     return true;
 }
+
+bool CStaticFunctionDefinitions::GetVehicleRotorSpeed(CVehicle* pVehicle, float& fRotorSpeed)
+{
+    if (pVehicle != NULL)
+    {
+        fRotorSpeed = pVehicle->GetRotorSpeed();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float fRotorSpeed)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetVehicleRotorSpeed(*iter, fRotorSpeed))
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+
+        eVehicleType vehicleType = pVehicle->GetVehicleType();
+        if (vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_PLANE)
+            return false;
+
+        float fClampedSpeed = std::max(0.0f, std::min(fRotorSpeed, 0.22f));
+        pVehicle->SetRotorSpeed(fClampedSpeed);
+
+        unsigned char ucRotorSpeed = static_cast<unsigned char>((fClampedSpeed / 0.22f) * 100.0f);
+        CBitStream    BitStream;
+        BitStream.pBitStream->Write(ucRotorSpeed);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_ROTOR_SPEED, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}

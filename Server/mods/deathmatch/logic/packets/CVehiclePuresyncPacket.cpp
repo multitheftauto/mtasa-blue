@@ -397,6 +397,14 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             {
                 ControllerState.LeftShoulder2 = BitStream.ReadBit() * 255;
                 ControllerState.RightShoulder2 = BitStream.ReadBit() * 255;
+
+                // Read rotor speed
+                unsigned char ucRotorSpeed;
+                if (BitStream.Read(ucRotorSpeed))
+                {
+                    float fRotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
+                    pVehicle->SetRotorSpeed(fRotorSpeed);
+                }
             }
 
             pSourcePlayer->GetPad()->NewControllerState(ControllerState);
