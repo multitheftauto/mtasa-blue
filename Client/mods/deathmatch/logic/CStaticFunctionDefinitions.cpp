@@ -7997,19 +7997,19 @@ bool CStaticFunctionDefinitions::GetPlayerMapBoundingBox(CVector& vecMin, CVecto
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPlayerMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource)
+bool CStaticFunctionDefinitions::SetPlayerMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource)
 {
-    return m_pPlayerMap->SetCustomMapImage(strTexturePath, uiSize, pResource);
+    return m_pPlayerMap->SetCustomMapImage(strTexturePath, resolution, pResource);
 }
 
-bool CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(CClientTexture* pTexture, uint uiSize, CResource* pResource)
+bool CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource)
 {
-    return m_pPlayerMap->SetCustomMapImageFromTexture(pTexture, uiSize, pResource);
+    return m_pPlayerMap->SetCustomMapImageFromTexture(pTexture, resolution, pResource);
 }
 
-bool CStaticFunctionDefinitions::ResetPlayerMapImage(uint uiSize)
+bool CStaticFunctionDefinitions::ResetPlayerMapImage(std::optional<ECustomMapResolution> resolution)
 {
-    m_pPlayerMap->ResetCustomMapImage(uiSize);
+    m_pPlayerMap->ResetCustomMapImage(resolution);
     return true;
 }
 

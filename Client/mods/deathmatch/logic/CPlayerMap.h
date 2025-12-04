@@ -19,6 +19,35 @@
 class CResource;
 class CClientTexture;
 
+enum class ECustomMapResolution : std::uint32_t
+{
+    Res_1024 = 1024,
+    Res_2048 = 2048
+};
+
+inline std::size_t MapResolutionToIndex(ECustomMapResolution resolution)
+{
+    return resolution == ECustomMapResolution::Res_1024 ? 0 : 1;
+}
+
+inline std::uint32_t MapResolutionToSize(ECustomMapResolution resolution)
+{
+    return static_cast<std::uint32_t>(resolution);
+}
+
+inline std::optional<ECustomMapResolution> UIntToMapResolution(std::uint32_t value)
+{
+    switch (value)
+    {
+        case static_cast<std::uint32_t>(ECustomMapResolution::Res_1024):
+            return ECustomMapResolution::Res_1024;
+        case static_cast<std::uint32_t>(ECustomMapResolution::Res_2048):
+            return ECustomMapResolution::Res_2048;
+        default:
+            return std::nullopt;
+    }
+}
+
 class CPlayerMap
 {
 public:
@@ -40,17 +69,16 @@ public:
 
     void ToggleHelpText();
 
-    bool  SetCustomMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource = nullptr);
-    bool  SetCustomMapImageFromTexture(CClientTexture* pTexture, uint uiSize, CResource* pResource = nullptr);
-    void  ResetCustomMapImage(uint uiSize = 0);
-    bool  SetMapOpacity(uchar ucOpacity, CResource* pResource = nullptr);
-    void  ResetMapOpacity();
+    bool SetCustomMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource = nullptr);
+    bool SetCustomMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource = nullptr);
+    void ResetCustomMapImage(std::optional<ECustomMapResolution> resolution = std::nullopt);
+    bool SetMapOpacity(uchar ucOpacity, CResource* pResource = nullptr);
+    void ResetMapOpacity();
     uchar GetMapOpacity() const;
-    bool  HasCustomMapImage(uint uiSize) const { 
-        std::size_t idx = (uiSize == 1024) ? 0 : 1;
-        return m_customMapData[idx].bHasCustomMap; 
+    bool HasCustomMapImage(ECustomMapResolution resolution) const { 
+        return m_customMapData[MapResolutionToIndex(resolution)].bHasCustomMap; 
     }
-    void  OnResourceStopping(CResource* pResource);
+    void OnResourceStopping(CResource* pResource);
 
 protected:
     void InternalSetPlayerMapEnabled(bool bEnabled);

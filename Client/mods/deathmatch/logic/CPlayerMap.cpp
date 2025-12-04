@@ -800,15 +800,13 @@ SString CPlayerMap::GetBoundKeyName(const SString& strCommand)
         return strCommand;
     return pCommandBind->boundKey->szKey;
 }
-bool CPlayerMap::SetCustomMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource)
+bool CPlayerMap::SetCustomMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource)
 {
-    if (uiSize != 1024 && uiSize != 2048)
-        throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
-
     if (!pResource)
         return false;
 
-    std::size_t idx = (uiSize == 1024) ? 0 : 1;
+    std::size_t idx = MapResolutionToIndex(resolution);
+    std::uint32_t uiSize = MapResolutionToSize(resolution);
     SString strFullPath = pResource->GetResourceDirectoryPath() + strTexturePath;
     
     CTextureItem* pNewTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(strFullPath, nullptr, false, uiSize, uiSize, RFORMAT_DXT1);
@@ -832,19 +830,16 @@ bool CPlayerMap::SetCustomMapImage(const std::string& strTexturePath, uint uiSiz
     return true;
 }
 
-bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, uint uiSize, CResource* pResource)
+bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource)
 {
     if (!pTexture || !pResource)
         return false;
-
-    if (uiSize != 1024 && uiSize != 2048)
-        throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
 
     CTextureItem* pTextureItem = pTexture->GetTextureItem();
     if (!pTextureItem)
         throw std::invalid_argument("Invalid texture element");
 
-    std::size_t idx = (uiSize == 1024) ? 0 : 1;
+    std::size_t idx = MapResolutionToIndex(resolution);
     
     // If the current map index does not match, update it
     if (idx != m_playerMapImageIndex)
@@ -873,20 +868,17 @@ bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, uint uiS
     return true;
 }
 
-void CPlayerMap::ResetCustomMapImage(uint uiSize)
+void CPlayerMap::ResetCustomMapImage(std::optional<ECustomMapResolution> resolution)
 {
-    // If size is 0, reset both sizes
-    if (uiSize == 0)
+    // If resolution is not provided, reset both sizes
+    if (!resolution.has_value())
     {
-        ResetCustomMapImage(1024);
-        ResetCustomMapImage(2048);
+        ResetCustomMapImage(ECustomMapResolution::Res_1024);
+        ResetCustomMapImage(ECustomMapResolution::Res_2048);
         return;
     }
-    
-    if (uiSize != 1024 && uiSize != 2048)
-        return;
         
-    std::size_t idx = (uiSize == 1024) ? 0 : 1;
+    std::size_t idx = MapResolutionToIndex(resolution.value());
     
     if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
     {

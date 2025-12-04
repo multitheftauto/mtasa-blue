@@ -724,9 +724,9 @@ public:
     static bool IsPlayerMapForced(bool& bForced);
     static bool IsPlayerMapVisible(bool& bVisible);
     static bool GetPlayerMapBoundingBox(CVector& vecMin, CVector& vecMax);
-    static bool SetPlayerMapImage(const std::string& strTexturePath, uint uiSize, CResource* pResource);
-    static bool SetPlayerMapImageFromTexture(CClientTexture* pTexture, uint uiSize, CResource* pResource);
-    static bool ResetPlayerMapImage(uint uiSize = 0);
+    static bool SetPlayerMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource);
+    static bool SetPlayerMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource);
+    static bool ResetPlayerMapImage(std::optional<ECustomMapResolution> resolution = std::nullopt);
     static bool SetPlayerMapOpacity(uchar ucOpacity, CResource* pResource);
     static bool ResetPlayerMapOpacity();
 

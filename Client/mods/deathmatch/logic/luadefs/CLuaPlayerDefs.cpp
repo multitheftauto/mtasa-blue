@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaPlayerDefs.h"
+#include "CPlayerMap.h"
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaPlayerDefs::LoadFunctions()
@@ -1070,19 +1072,22 @@ bool CLuaPlayerDefs::SetPlayerMapImage(lua_State* luaVM, std::variant<std::strin
         
     CResource* pResource = pLuaMain->GetResource();
     
+    if (!size.has_value())
+        return false;
+
+    auto resolution = UIntToMapResolution(size.value());
+    if (!resolution.has_value())
+        throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
+    
     if (std::holds_alternative<CClientTexture*>(texturePathOrElement))
     {
         CClientTexture* pTexture = std::get<CClientTexture*>(texturePathOrElement);
-        if (!size.has_value())
-            return false;
-        return CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(pTexture, size.value(), pResource);
+        return CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(pTexture, resolution.value(), pResource);
     }
     else
     {
         std::string strPath = std::get<std::string>(texturePathOrElement);
-        if (!size.has_value())
-            return false;
-        return CStaticFunctionDefinitions::SetPlayerMapImage(strPath, size.value(), pResource);
+        return CStaticFunctionDefinitions::SetPlayerMapImage(strPath, resolution.value(), pResource);
     }
 }
 
@@ -1090,13 +1095,15 @@ bool CLuaPlayerDefs::ResetPlayerMapImage(std::optional<uint> size)
 {
     if (size.has_value())
     {
-        if (*size != 1024 && *size != 2048)
+        auto resolution = UIntToMapResolution(*size);
+        if (!resolution.has_value())
             throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
-        return CStaticFunctionDefinitions::ResetPlayerMapImage(*size);
+        
+        return CStaticFunctionDefinitions::ResetPlayerMapImage(resolution.value());
     }
     else
     {
-        return CStaticFunctionDefinitions::ResetPlayerMapImage(0);
+        return CStaticFunctionDefinitions::ResetPlayerMapImage(std::nullopt);
     }
 }
 
