@@ -374,6 +374,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "wheelScale", "setVehicleWheelScale", "getVehicleWheelScale");
     lua_classvariable(luaVM, "rotorState", "setVehicleRotorState", "getVehicleRotorState");
     lua_classvariable(luaVM, "audioSettings", nullptr, "getVehicleAudioSettings");
+    lua_classvariable(luaVM, "smokeTrailEnabled", "setVehicleSmokeTrailEnabled", "isVehicleSmokeTrailEnabled");
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
