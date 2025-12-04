@@ -163,6 +163,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "toggleRespawn", "toggleVehicleRespawn");
     lua_classfunction(luaVM, "removeSirens", "removeVehicleSirens");
     lua_classfunction(luaVM, "addSirens", "addVehicleSirens");
+    lua_classfunction(luaVM, "getRotorSpeed", "getVehicleRotorSpeed");
 
     lua_classfunction(luaVM, "isDamageProof", "isVehicleDamageProof");
     lua_classfunction(luaVM, "isFuelTankExplodable", "isVehicleFuelTankExplodable");
@@ -246,6 +247,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");            // Reduce confusion
     lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
+    lua_classfunction(luaVM, "setRotorSpeed", "setVehicleRotorSpeed");
 
     lua_classvariable(luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof");
     lua_classvariable(luaVM, "locked", "setVehicleLocked", "isVehicleLocked");
