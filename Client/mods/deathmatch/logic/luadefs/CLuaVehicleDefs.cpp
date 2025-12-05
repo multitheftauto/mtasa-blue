@@ -219,6 +219,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getPlateText", "getVehiclePlateText");
     lua_classfunction(luaVM, "getOccupants", "getVehicleOccupants");
     lua_classfunction(luaVM, "getHelicopterRotorSpeed", "getHelicopterRotorSpeed");
+    lua_classfunction(luaVM, "getRotorSpeed", "getVehicleRotorSpeed");
     lua_classfunction(luaVM, "areHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled");
     lua_classfunction(luaVM, "getPaintjob", "getVehiclePaintjob");
     lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
@@ -325,6 +326,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "removeUpgrade", "removeVehicleUpgrade");
 
     lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
+    lua_classfunction(luaVM, "setRotorSpeed", "setVehicleRotorSpeed");
 
     lua_classvariable(luaVM, "locked", "setVehicleLocked", "isVehicleLocked");
     lua_classvariable(luaVM, "controller", NULL, "getVehicleController");
@@ -336,6 +338,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "damageProof", NULL, "isVehicleDamageProof");
     lua_classvariable(luaVM, "helicopterRotorSpeed", "setHelicopterRotorSpeed", "getHelicopterRotorSpeed");
+    lua_classvariable(luaVM, "rotorSpeed", "setVehicleRotorSpeed", "getVehicleRotorSpeed");
     lua_classvariable(luaVM, "heliBladeCollisionsEnabled", "setHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled");
     lua_classvariable(luaVM, "sirenParams", nullptr, "getVehicleSirenParams");
     lua_classvariable(luaVM, "sirensOn", "setVehicleSirensOn", "getVehicleSirensOn");

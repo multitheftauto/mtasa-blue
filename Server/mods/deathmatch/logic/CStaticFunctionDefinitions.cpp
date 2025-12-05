@@ -12692,3 +12692,74 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
 
     return true;
 }
+
+bool CStaticFunctionDefinitions::GetVehicleRotorSpeed(CVehicle* pVehicle, float& rotorSpeed)
+{
+    if (pVehicle != NULL)
+    {
+        rotorSpeed = pVehicle->GetRotorSpeed();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetVehicleRotorSpeed(*iter, rotorSpeed))
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+
+        eVehicleType vehicleType = pVehicle->GetVehicleType();
+        if (vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_PLANE)
+            return false;
+
+        float fClampedSpeed = std::max(0.0f, std::min(rotorSpeed, 0.22f));
+        pVehicle->SetRotorSpeed(fClampedSpeed);
+
+        unsigned char ucRotorSpeed = static_cast<unsigned char>((fClampedSpeed / 0.22f) * 100.0f);
+        CBitStream    BitStream;
+        BitStream.pBitStream->Write(ucRotorSpeed);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_ROTOR_SPEED, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleRotorState(CVehicle* pVehicle, bool& rotorState)
+{
+    if (pVehicle != NULL)
+    {
+        rotorState = pVehicle->GetRotorState();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleRotorState(CElement* pElement, bool rotorState, std::optional<bool> stopRotor)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetVehicleRotorState(*iter, rotorState, stopRotor))
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+
+        eVehicleType vehicleType = pVehicle->GetVehicleType();
+        if (vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_PLANE)
+            return false;
+
+        pVehicle->SetRotorState(rotorState);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit(rotorState);
+        BitStream.pBitStream->WriteBit(stopRotor.value_or(true));
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_ROTOR_STATE, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
