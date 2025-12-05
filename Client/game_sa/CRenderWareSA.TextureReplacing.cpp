@@ -67,16 +67,24 @@ namespace
                             std::unordered_set<RwTexture*>& outCopiesToDestroy,
                             std::unordered_set<RwTexture*>& outOriginalsToDestroy)
     {
+        const bool bDeadTxdValid = pDeadTxd && SharedUtil::IsReadablePointer(pDeadTxd, sizeof(RwTexDictionary));
+
         // Process textures added to the TXD
         for (RwTexture* pTexture : perTxdInfo.usingTextures)
         {
             if (!pTexture || !SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
                 continue;
 
-            // Detach if pointing to dead TXD (pointer comparison only)
-            if (pTexture->txd == pDeadTxd)
+            // Detach safely if pointing to the dead TXD: unlink first, then null the node
+            if (bDeadTxdValid && pTexture->txd == pDeadTxd)
             {
+                CRenderWareSA::RwTexDictionaryRemoveTexture(pDeadTxd, pTexture);
                 pTexture->txd = nullptr;
+                pTexture->TXDList.next = &pTexture->TXDList;
+                pTexture->TXDList.prev = &pTexture->TXDList;
+            }
+            else if (!pDeadTxd && pTexture->txd == nullptr)
+            {
                 pTexture->TXDList.next = &pTexture->TXDList;
                 pTexture->TXDList.prev = &pTexture->TXDList;
             }
@@ -98,9 +106,16 @@ namespace
             if (!pReplaced || !SharedUtil::IsReadablePointer(pReplaced, sizeof(RwTexture)))
                 continue;
 
-            if (pReplaced->txd == pDeadTxd)
+            // Detach safely if still linked to the dead TXD
+            if (bDeadTxdValid && pReplaced->txd == pDeadTxd)
             {
+                CRenderWareSA::RwTexDictionaryRemoveTexture(pDeadTxd, pReplaced);
                 pReplaced->txd = nullptr;
+                pReplaced->TXDList.next = &pReplaced->TXDList;
+                pReplaced->TXDList.prev = &pReplaced->TXDList;
+            }
+            else if (!pDeadTxd && pReplaced->txd == nullptr)
+            {
                 pReplaced->TXDList.next = &pReplaced->TXDList;
                 pReplaced->TXDList.prev = &pReplaced->TXDList;
             }
@@ -665,10 +680,18 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         RwTexDictionary* pCurrentTxd = CTxdStore_GetTxd(usTxdId);
         bool bTxdIsValid = (pInfo->pTxd == pCurrentTxd) && (pInfo->pTxd != nullptr);
 
+        // Recover if the cached pointer was nulled but the TXD is actually loaded
+        if (!bTxdIsValid && !pInfo->pTxd && pCurrentTxd)
+        {
+            pInfo->pTxd = pCurrentTxd;
+            bTxdIsValid = true;
+        }
+
         if (!bTxdIsValid)
         {
             std::unordered_set<RwTexture*> texturesToKeep;
-            texturesToKeep.insert(pInfo->originalTextures.begin(), pInfo->originalTextures.end());
+            // Don't insert originalTextures as they belong to the stale TXD and are likely invalid
+            // texturesToKeep.insert(pInfo->originalTextures.begin(), pInfo->originalTextures.end());
 
             // Collect textures from other replacements
             for (SReplacementTextures* pOtherReplacement : pInfo->usedByReplacements)
@@ -990,11 +1013,11 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             DestroyTexture(pTexture);
     }
 
-    // Reset all states
+    // Reset all states except usedInModelIds which is needed by the caller for restreaming
     pReplacementTextures->textures.clear();
     pReplacementTextures->perTxdList.clear();
     pReplacementTextures->usedInTxdIds.clear();
-    pReplacementTextures->usedInModelIds.clear();
+    // Note: usedInModelIds is NOT cleared here as CClientTXD destructor needs it for Restream()
     pReplacementTextures->bHasRequestedSpace = false;
 }
 
