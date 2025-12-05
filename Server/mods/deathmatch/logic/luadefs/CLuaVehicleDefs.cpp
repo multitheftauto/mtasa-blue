@@ -3088,7 +3088,7 @@ bool CLuaVehicleDefs::GetVehicleRotorState(CVehicle* pVehicle)
     return rotorState;
 }
 
-bool CLuaVehicleDefs::SetVehicleRotorState(CElement* pElement, bool rotorState)
+bool CLuaVehicleDefs::SetVehicleRotorState(CElement* pElement, bool rotorState, std::optional<bool> stopRotor)
 {
-    return CStaticFunctionDefinitions::SetVehicleRotorState(pElement, rotorState);
+    return CStaticFunctionDefinitions::SetVehicleRotorState(pElement, rotorState, stopRotor);
 }

@@ -12739,10 +12739,10 @@ bool CStaticFunctionDefinitions::GetVehicleRotorState(CVehicle* pVehicle, bool& 
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleRotorState(CElement* pElement, bool rotorState)
+bool CStaticFunctionDefinitions::SetVehicleRotorState(CElement* pElement, bool rotorState, std::optional<bool> stopRotor)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleRotorState(*iter, rotorState))
+    RUN_CHILDREN(SetVehicleRotorState(*iter, rotorState, stopRotor))
 
     if (IS_VEHICLE(pElement))
     {
@@ -12756,6 +12756,7 @@ bool CStaticFunctionDefinitions::SetVehicleRotorState(CElement* pElement, bool r
 
         CBitStream BitStream;
         BitStream.pBitStream->WriteBit(rotorState);
+        BitStream.pBitStream->WriteBit(stopRotor.value_or(true));
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_ROTOR_STATE, *BitStream.pBitStream));
         return true;
     }

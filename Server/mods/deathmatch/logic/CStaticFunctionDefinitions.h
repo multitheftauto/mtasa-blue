@@ -305,7 +305,7 @@ public:
     static bool SetVehicleColor(CElement* pElement, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CElement* pElement, bool bLandingGearDown);
     static bool SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed);
-    static bool SetVehicleRotorState(CElement* pElement, bool rotorState);
+    static bool SetVehicleRotorState(CElement* pElement, bool rotorState, std::optional<bool> stopRotor);
     static bool SetVehicleLocked(CElement* pElement, bool bLocked);
     static bool SetVehicleDoorsUndamageable(CElement* pElement, bool bDoorsUndamageable);
     static bool SetVehicleRotation(CElement* pElement, const CVector& vecRotation);

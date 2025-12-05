@@ -700,9 +700,10 @@ void CVehicleRPCs::SetVehicleRotorState(CClientEntity* pSource, NetBitStreamInte
     if (pVehicle)
     {
         bool rotorState;
-        if (bitStream.ReadBit(rotorState))
+        bool stopRotor;
+        if (bitStream.ReadBit(rotorState) && bitStream.ReadBit(stopRotor))
         {
-            pVehicle->SetVehicleRotorState(rotorState, true);
+            pVehicle->SetVehicleRotorState(rotorState, stopRotor);
         }
     }
 }
