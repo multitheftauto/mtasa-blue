@@ -9,6 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#ifdef MTA_CLIENT
+    #include <SharedUtil.SysInfo.h>
+#endif
 #include "CLuaUtilDefs.h"
 #include "CScriptArgReader.h"
 #include "Utils.h"
@@ -73,6 +76,10 @@ void CLuaUtilDefs::LoadFunctions()
         {"gettok", GetTok},
         {"tocolor", tocolor},
         {"getProcessMemoryStats", ArgumentParser<GetProcessMemoryStats>},
+
+#ifdef MTA_CLIENT
+        {"getSystemInfo", ArgumentParser<GetSystemInfo>},
+#endif
     };
 
     // Add functions
@@ -728,8 +735,8 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Make it into an unsigned long
-        unsigned long ulColor = COLOR_RGBA(static_cast<unsigned char>(iRed), static_cast<unsigned char>(iGreen),
-                                           static_cast<unsigned char>(iBlue), static_cast<unsigned char>(iAlpha));
+        unsigned long ulColor = COLOR_RGBA(static_cast<unsigned char>(iRed), static_cast<unsigned char>(iGreen), static_cast<unsigned char>(iBlue),
+                                           static_cast<unsigned char>(iAlpha));
         lua_pushinteger(luaVM, static_cast<lua_Integer>(ulColor));
         return 1;
     }
@@ -739,3 +746,35 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
     return 1;
 }
+
+#ifdef MTA_CLIENT
+const MainTable& CLuaUtilDefs::GetSystemInfo()
+{
+    static const MainTable outValue = []() -> MainTable
+    {
+        MainTable table;
+        auto info = SharedUtil::GetWMISystemInfo();
+
+        table.emplace("CPU", DataSubTable{
+                                 {"MaxClockSpeed", static_cast<lua_Number>(info.CPU.MaxClockSpeed)},
+                                 {"Name", info.CPU.Name},
+                                 {"NumberOfCores", static_cast<lua_Number>(info.CPU.NumberOfCores)},
+                                 {"NumberOfLogicalProcessors", static_cast<lua_Number>(info.CPU.NumberOfLogicalProcessors)},
+                             });
+
+        table["TotalPhysicalMemory"] = static_cast<lua_Number>(info.TotalPhysicalMemory);
+
+        BasicGPUInfo gpu;
+        g_pCore->GetGraphics()->GetRenderItemManager()->GetBasicGPUInfo(gpu);
+        table.emplace("GPU", DataSubTable{
+                                 {"RAM", static_cast<lua_Number>(gpu.memoryKB)},
+                                 {"Name", gpu.name},
+                             });
+
+        return table;
+    }();
+
+    return outValue;
+}
+
+#endif

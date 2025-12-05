@@ -538,4 +538,36 @@ bool SharedUtil::Is64BitOS()
     return bIs64BitOS;
 }
 
+SharedUtil::WMISystemInfo SharedUtil::GetWMISystemInfo()
+{
+    // Cache result, because these wont change while the PC is running
+    static WMISystemInfo info = []() -> WMISystemInfo
+    {
+        WMISystemInfo temp;
+
+        temp.TotalPhysicalMemory = GetWMITotalPhysicalMemory() / 1024;
+
+        SQueryWMIResult result;
+        QueryWMI(result, "Win32_Processor", "MaxClockSpeed,Name,NumberOfCores,NumberOfLogicalProcessors");
+
+        if (!result.empty())
+        {
+            const auto& row = result[0];
+            if (row.size() >= 4)
+            {
+                auto& cpu = temp.CPU;
+
+                cpu.MaxClockSpeed = static_cast<std::uint32_t>(std::atoll(row[0]));
+                cpu.Name = row[1].TrimEnd(" ");            // Remove whitespace from the end
+                cpu.NumberOfCores = static_cast<std::uint32_t>(std::atoll(row[2]));
+                cpu.NumberOfLogicalProcessors = static_cast<std::uint32_t>(std::atoll(row[3]));
+            }
+        }
+
+        return temp;
+    }();
+
+    return info;
+}
+
 #endif  // MTA_CLIENT
