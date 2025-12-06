@@ -12695,12 +12695,11 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
 
 bool CStaticFunctionDefinitions::GetVehicleRotorSpeed(CVehicle* pVehicle, float& rotorSpeed)
 {
-    if (pVehicle != NULL)
-    {
-        rotorSpeed = pVehicle->GetRotorSpeed();
-        return true;
-    }
-    return false;
+    if (!pVehicle)
+        return false;
+
+    rotorSpeed = pVehicle->GetRotorSpeed();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed)
@@ -12731,12 +12730,11 @@ bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float 
 
 bool CStaticFunctionDefinitions::GetVehicleRotorState(CVehicle* pVehicle, bool& rotorState)
 {
-    if (pVehicle != NULL)
-    {
-        rotorState = pVehicle->GetRotorState();
-        return true;
-    }
-    return false;
+    if (!pVehicle)
+        return false;
+
+    rotorState = pVehicle->GetRotorState();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleRotorState(CElement* pElement, bool rotorState, std::optional<bool> stopRotor)
