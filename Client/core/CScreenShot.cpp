@@ -136,7 +136,7 @@ void CScreenShot::InitiateScreenShot(bool bIsCameraShot)
         if (savePhotoInDocuments)
         {
             // Set the screenshot path to camera gallery path
-            ms_strScreenDirectoryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
+            ms_strScreenDirectoryPath = PathJoin(GetSystemPersonalPath(), "MTA San Andreas User Files", "Gallery");
         }
     }
     else
