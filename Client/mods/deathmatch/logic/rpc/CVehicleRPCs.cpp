@@ -687,7 +687,9 @@ void CVehicleRPCs::SetVehicleRotorSpeed(CClientEntity* pSource, NetBitStreamInte
         unsigned char ucRotorSpeed;
         if (bitStream.Read(ucRotorSpeed))
         {
-            pVehicle->SetRotorSpeed(ucRotorSpeed);
+            // Convert the given rotor speed from between 0-100 to 0-0.22
+            float rotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
+            pVehicle->SetRotorSpeed(rotorSpeed);
         }
     }
 }
@@ -699,10 +701,9 @@ void CVehicleRPCs::SetVehicleRotorState(CClientEntity* pSource, NetBitStreamInte
     {
         bool rotorState;
         bool stopRotor;
-
-        bitStream.ReadBit(rotorState);
-        bitStream.ReadBit(stopRotor);
-
-        pVehicle->SetVehicleRotorState(rotorState, stopRotor);
+        if (bitStream.ReadBit(rotorState) && bitStream.ReadBit(stopRotor))
+        {
+            pVehicle->SetVehicleRotorState(rotorState, stopRotor);
+        }
     }
 }
