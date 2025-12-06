@@ -323,6 +323,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("chat_text_alignment", Chat::Text::Align::LEFT);                          // chatbox horizontal text alignment
     DEFAULT("server_can_flash_window", true);                                         // allow server to flash the window
     DEFAULT("allow_tray_notifications", true);                                        // allow scripts to create tray balloon notifications
+    DEFAULT("show_time_in_chat", false);                                              // show time prefix in chat messages
     DEFAULT("text_scale", 1.0f);                                                      // text scale
     DEFAULT("invert_mouse", false);                                                   // mouse inverting
     DEFAULT("fly_with_mouse", false);                                                 // flying with mouse controls

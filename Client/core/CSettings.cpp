@@ -411,6 +411,7 @@ void CSettings::ResetGuiPointers()
     m_pChatLineFadeout = NULL;
     m_pFlashWindow = NULL;
     m_pTrayBalloon = NULL;
+    m_pChatShowTimestamps = NULL;
 
     m_pLabelBrowserGeneral = NULL;
     m_pCheckBoxRemoteBrowser = NULL;
@@ -3260,6 +3261,11 @@ void CSettings::CreateInterfaceTabGUI()
             m_pChatTextBlackOutline->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY));
             m_pChatTextBlackOutline->GetPosition(vecTemp);
             m_pChatTextBlackOutline->AutoSize(NULL, 20.0f);
+
+            m_pChatShowTimestamps = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabOptions, _("Show timestamps in chat messages")));
+            m_pChatShowTimestamps->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY));
+            m_pChatShowTimestamps->GetPosition(vecTemp);
+            m_pChatShowTimestamps->AutoSize(NULL, 20.0f);
         }
     }
 }
@@ -4182,6 +4188,8 @@ void CSettings::LoadData()
     m_pChatNickCompletion->SetSelected(bVar);
     CVARS_GET("chat_text_outline", bVar);
     m_pChatTextBlackOutline->SetSelected(bVar);
+    CVARS_GET("show_time_in_chat", bVar);
+    m_pChatShowTimestamps->SetSelected(bVar);
 
     {
         int iVar;
@@ -4216,6 +4224,8 @@ void CSettings::LoadData()
     m_pFlashWindow->SetSelected(bVar);
     CVARS_GET("allow_tray_notifications", bVar);
     m_pTrayBalloon->SetSelected(bVar);
+    CVARS_GET("show_time_in_chat", bVar);
+    m_pChatShowTimestamps->SetSelected(bVar);
 
     // Browser
     CVARS_GET("browser_remote_websites", bVar);
@@ -4650,6 +4660,7 @@ void CSettings::SaveData()
     CVARS_SET("chat_text_outline", m_pChatTextBlackOutline->GetSelected());
     CVARS_SET("chat_line_life", GetMilliseconds(m_pChatLineLife));
     CVARS_SET("chat_line_fade_out", GetMilliseconds(m_pChatLineFadeout));
+    CVARS_SET("show_time_in_chat", m_pChatShowTimestamps->GetSelected());
 
     CVARS_SET("chat_position_offset_x", m_pChatOffsetX->GetText());
     CVARS_SET("chat_position_offset_y", m_pChatOffsetY->GetText());
@@ -4672,6 +4683,7 @@ void CSettings::SaveData()
     // Interface
     CVARS_SET("server_can_flash_window", m_pFlashWindow->GetSelected());
     CVARS_SET("allow_tray_notifications", m_pTrayBalloon->GetSelected());
+    CVARS_SET("show_time_in_chat", m_pChatShowTimestamps->GetSelected());
 
     // Set our new skin last, as it'll destroy all our GUI
     pItem = m_pInterfaceSkinSelector->GetSelectedItem();
