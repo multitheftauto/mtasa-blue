@@ -3454,11 +3454,12 @@ retry:
                     bool bTaxiLightState = bitStream.ReadBit();
 
                     // Read rotor state for helicopters and planes
-                    bool bRotorState = true;
-                    if (pVehicle->GetVehicleType() == CLIENTVEHICLE_HELI || pVehicle->GetVehicleType() == CLIENTVEHICLE_PLANE)
+                    eClientVehicleType vehicleType = pVehicle->GetVehicleType();
+                    bool rotorState = true;
+
+                    if (vehicleType == CLIENTVEHICLE_HELI || vehicleType == CLIENTVEHICLE_PLANE)
                     {
-                        bRotorState = bitStream.ReadBit();
-                        pVehicle->SetVehicleRotorState(bRotorState, true);
+                        pVehicle->SetVehicleRotorState(bitStream.ReadBit(), true);
                     }
 
                     // If the vehicle has a landing gear, set landing gear state

@@ -87,8 +87,6 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_ucVariant = ucVariant;
     m_ucVariant2 = ucVariant2;
     m_onFire = false;
-    m_rotorSpeed = 0.0f;
-    m_rotorState = true;
 
     // Initialize the occupied Players
     for (int i = 0; i < MAX_VEHICLE_SEATS; i++)

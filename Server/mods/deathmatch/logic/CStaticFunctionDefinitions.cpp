@@ -12695,12 +12695,11 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
 
 bool CStaticFunctionDefinitions::GetVehicleRotorSpeed(CVehicle* pVehicle, float& rotorSpeed)
 {
-    if (pVehicle != NULL)
-    {
-        rotorSpeed = pVehicle->GetRotorSpeed();
-        return true;
-    }
-    return false;
+    if (!pVehicle)
+        return false;
+
+    rotorSpeed = pVehicle->GetRotorSpeed();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed)
@@ -12716,13 +12715,13 @@ bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float 
         if (vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_PLANE)
             return false;
 
-        float fClampedSpeed = std::max(0.0f, std::min(rotorSpeed, 0.22f));
-        pVehicle->SetRotorSpeed(fClampedSpeed);
+        pVehicle->SetRotorSpeed(rotorSpeed);
 
-        unsigned char ucRotorSpeed = static_cast<unsigned char>((fClampedSpeed / 0.22f) * 100.0f);
-        CBitStream    BitStream;
-        BitStream.pBitStream->Write(ucRotorSpeed);
+        CBitStream BitStream;
+        BitStream.pBitStream->Write(rotorSpeed);
+
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_ROTOR_SPEED, *BitStream.pBitStream));
+
         return true;
     }
 
@@ -12731,12 +12730,11 @@ bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float 
 
 bool CStaticFunctionDefinitions::GetVehicleRotorState(CVehicle* pVehicle, bool& rotorState)
 {
-    if (pVehicle != NULL)
-    {
-        rotorState = pVehicle->GetRotorState();
-        return true;
-    }
-    return false;
+    if (!pVehicle)
+        return false;
+
+    rotorState = pVehicle->GetRotorState();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleRotorState(CElement* pElement, bool rotorState, std::optional<bool> stopRotor)
