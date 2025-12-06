@@ -9,21 +9,65 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-using std::list;
+#include "CClientGame.h"
+#include <cmath>
+#include <algorithm>
 
-void* CClientStreamer::pAddingElement = NULL;
+extern CClientGame* g_pClientGame;
+
+void* CClientStreamer::pAddingElement = nullptr;
+
+// Constants
+#define STREAMER_MOVEMENT_THRESHOLD 50.0f
+#define STREAMER_MAX_OUT_DEFAULT    6
+#define STREAMER_MAX_IN_DEFAULT     6
+#define STREAMER_MAX_OUT_FAR        1000
+#define STREAMER_MAX_IN_FAR         1000
+#define STREAMER_MAX_SWAPS          10
+#define STREAMER_FURTHEST_IN_LIMIT  50
+
+// Element categories
+enum class ElementCategory
+{
+    PLAYER,
+    VEHICLE,
+    OBJECT,
+    OTHER
+};
+
+inline ElementCategory GetElementCategory(CClientStreamElement* pElement)
+{
+    if (IS_PLAYER(pElement))
+        return ElementCategory::PLAYER;
+
+    if (IS_VEHICLE(pElement))
+        return ElementCategory::VEHICLE;
+
+    if (IS_OBJECT(pElement))
+        return ElementCategory::OBJECT;
+
+    return ElementCategory::OTHER;
+}
 
 CClientStreamer::CClientStreamer(StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance, float fSectorSize, float fRowSize)
-    : m_fSectorSize(fSectorSize), m_fRowSize(fRowSize)
+    : m_fSectorSize(fSectorSize),
+      m_fRowSize(fRowSize),
+      m_pRow(nullptr),
+      m_pSector(nullptr),
+      m_fMaxDistanceExp(fMaxDistance * fMaxDistance),
+      m_fMaxDistanceThreshold((fMaxDistance + 50.0f) * (fMaxDistance + 50.0f)),
+      m_usDimension(0),
+      m_vecPosition(0.0f, 0.0f, 0.0f),
+      m_pLimitReachedFunc(pLimitReachedFunc),
+      m_iMaxInDefault(STREAMER_MAX_IN_DEFAULT),
+      m_iMaxOutDefault(STREAMER_MAX_OUT_DEFAULT),
+      m_iMaxInFar(STREAMER_MAX_IN_FAR),
+      m_iMaxOutFar(STREAMER_MAX_OUT_FAR),
+      m_iMaxSwaps(STREAMER_MAX_SWAPS),
+      m_iFurthestInLimit(STREAMER_FURTHEST_IN_LIMIT)
 {
-    // Setup our distance variables
-    m_fMaxDistanceExp = fMaxDistance * fMaxDistance;
-    m_fMaxDistanceThreshold = (fMaxDistance + 50.0f) * (fMaxDistance + 50.0f);
-    m_usDimension = 0;
-
     // We need the limit reached func
     assert(pLimitReachedFunc);
-    m_pLimitReachedFunc = pLimitReachedFunc;
 
     // Create our main world sectors covering the mainland
     CVector2D size(m_fSectorSize, m_fRowSize);
@@ -33,39 +77,49 @@ CClientStreamer::CClientStreamer(StreamerLimitReachedFunction* pLimitReachedFunc
 
     // Find our row and sector
     m_pRow = FindOrCreateRow(m_vecPosition);
-    m_pSector = NULL;
-    OnEnterSector(m_pRow->FindOrCreateSector(m_vecPosition));
+    if (!m_pRow)
+        return;
+
+    CClientStreamSector* pInitialSector = m_pRow->FindOrCreateSector(m_vecPosition);
+    if (pInitialSector)
+        OnEnterSector(pInitialSector);
 }
 
 CClientStreamer::~CClientStreamer()
 {
     // Clear our mainland rows
-    list<CClientStreamSectorRow*>::iterator iter = m_WorldRows.begin();
-    for (; iter != m_WorldRows.end(); iter++)
-    {
-        delete *iter;
-    }
+    for (CClientStreamSectorRow* pRow : m_WorldRows)
+        delete pRow;
+
     m_WorldRows.clear();
 
     // Clear our extra rows
-    iter = m_ExtraRows.begin();
-    for (; iter != m_ExtraRows.end(); iter++)
-    {
-        delete *iter;
-    }
+    for (CClientStreamSectorRow* pRow : m_ExtraRows)
+        delete pRow;
+
     m_ExtraRows.clear();
 }
 
 void CClientStreamer::CreateSectors(std::list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight)
 {
+    if (!pList)
+        return;
+
     // Creates our sectors within rows, filling up our rectangle, connecting each sector and row
-    CClientStreamSector *   pCurrent = NULL, *pPrevious = NULL, *pPreviousRowSector = NULL;
-    CClientStreamSectorRow *pCurrentRow = NULL, *pPreviousRow = NULL;
-    float                   fX = vecBottomLeft.fX, fY = vecBottomLeft.fY;
+    CClientStreamSector*    pCurrent = nullptr;
+    CClientStreamSector*    pPrevious = nullptr;
+    CClientStreamSector*    pPreviousRowSector = nullptr;
+    CClientStreamSectorRow* pCurrentRow = nullptr;
+    CClientStreamSectorRow* pPreviousRow = nullptr;
+    float                   fX = vecBottomLeft.fX;
+    float                   fY = vecBottomLeft.fY;
 
     while (fY < vecTopRight.fY)
     {
         pCurrentRow = new CClientStreamSectorRow(fY, fY + vecSize.fY, m_fSectorSize, m_fRowSize);
+        if (!pCurrentRow)
+            break;
+
         pCurrentRow->m_pBottom = pPreviousRow;
         pList->push_back(pCurrentRow);
 
@@ -79,6 +133,9 @@ void CClientStreamer::CreateSectors(std::list<CClientStreamSectorRow*>* pList, C
 
             pPrevious = pCurrent;
             pCurrent = new CClientStreamSector(pCurrentRow, bottomLeft, topRight);
+            if (!pCurrent)
+                break;
+
             pCurrentRow->Add(pCurrent);
             pCurrent->m_pLeft = pPrevious;
 
@@ -95,8 +152,8 @@ void CClientStreamer::CreateSectors(std::list<CClientStreamSectorRow*>* pList, C
             fX += vecSize.fX;
         }
 
-        pPrevious = NULL;
-        pCurrent = NULL;
+        pPrevious = nullptr;
+        pCurrent = nullptr;
         pPreviousRow = pCurrentRow;
         pPreviousRowSector = pPreviousRow->Front();
         fX = vecBottomLeft.fX;
@@ -106,6 +163,9 @@ void CClientStreamer::CreateSectors(std::list<CClientStreamSectorRow*>* pList, C
 
 void CClientStreamer::ConnectRow(CClientStreamSectorRow* pRow)
 {
+    if (!pRow)
+        return;
+
     float fTop, fBottom;
     pRow->GetPosition(fTop, fBottom);
 
@@ -116,73 +176,65 @@ void CClientStreamer::ConnectRow(CClientStreamSectorRow* pRow)
     // Connect the other rows to us
     if (pRow->m_pTop)
         pRow->m_pTop->m_pBottom = pRow;
+
     if (pRow->m_pBottom)
         pRow->m_pBottom->m_pTop = pRow;
 }
 
-#include "..\deathmatch\logic\CClientGame.h"
-extern CClientGame* g_pClientGame;
-void                CClientStreamer::DoPulse(CVector& vecPosition)
+void CClientStreamer::DoPulse(CVector& vecPosition)
 {
-    /* Debug code
-    CClientStreamSector * pSector;
-    list < CClientStreamSector * > ::iterator iterSector;
-    list < CClientStreamSectorRow * > ::iterator iterRow = m_WorldRows.begin ();
-    for ( ; iterRow != m_WorldRows.end () ; iterRow++ )
+    // Validate position
+    if (!std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ))
     {
-        iterSector = (*iterRow)->Begin ();
-        for ( ; iterSector != (*iterRow)->End () ; iterSector++ )
-        {
-            pSector = *iterSector;
-            if ( !pSector->m_pArea )
-            {
-                pSector->m_pArea = new CClientRadarArea ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID );
-                pSector->m_pArea->SetPosition ( pSector->m_vecBottomLeft );
-                CVector2D vecSize ( pSector->m_vecTopRight.fX - pSector->m_vecBottomLeft.fX, pSector->m_vecTopRight.fY - pSector->m_vecBottomLeft.fY );
-                pSector->m_pArea->SetSize ( vecSize );
-                pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
-            }
-            pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
-        }
+        // Invalid position, use last valid position
+        vecPosition = m_vecPosition;
+        return;
     }
-    iterRow = m_ExtraRows.begin ();
-    for ( ; iterRow != m_ExtraRows.end () ; iterRow++ )
-    {
-        iterSector = (*iterRow)->Begin ();
-        for ( ; iterSector != (*iterRow)->End () ; iterSector++ )
-        {
-            pSector = *iterSector;
-            if ( !pSector->m_pArea )
-            {
-                pSector->m_pArea = new CClientRadarArea ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID );
-                pSector->m_pArea->SetPosition ( pSector->m_vecBottomLeft );
-                CVector2D vecSize ( pSector->m_vecTopRight.fX - pSector->m_vecBottomLeft.fX, pSector->m_vecTopRight.fY - pSector->m_vecBottomLeft.fY );
-                pSector->m_pArea->SetSize ( vecSize );
-                pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
-            }
-            pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
-        }
-    }
-    */
 
+    bool bPositionChanged = false;
     bool bMovedFar = false;
+
     // Has our position changed?
     if (vecPosition != m_vecPosition)
     {
-        bMovedFar = ((m_vecPosition - vecPosition).LengthSquared() > (50 * 50));
+        bPositionChanged = true;
+        const float fDistSquared = (m_vecPosition - vecPosition).LengthSquared();
+        bMovedFar = (fDistSquared > (STREAMER_MOVEMENT_THRESHOLD * STREAMER_MOVEMENT_THRESHOLD));
         m_vecPosition = vecPosition;
+
+        // Ensure m_pRow exists
+        if (!m_pRow)
+        {
+            m_pRow = FindOrCreateRow(vecPosition);
+            if (!m_pRow)
+                return;
+
+            CClientStreamSector* pSector = m_pRow->FindOrCreateSector(vecPosition);
+            if (pSector)
+                OnEnterSector(pSector);
+
+            return;
+        }
 
         // Have we changed row?
         if (!m_pRow->DoesContain(vecPosition))
         {
-            m_pRow = FindOrCreateRow(vecPosition, m_pRow);
-            OnEnterSector(m_pRow->FindOrCreateSector(vecPosition));
+            CClientStreamSectorRow* pNewRow = FindOrCreateRow(vecPosition, m_pRow);
+            if (!pNewRow)
+                return;
+
+            m_pRow = pNewRow;
+            CClientStreamSector* pSector = m_pRow->FindOrCreateSector(vecPosition);
+            if (pSector)
+                OnEnterSector(pSector);
         }
         // Have we changed sector?
-        else if (!m_pSector->DoesContain(vecPosition))
+        else if (m_pSector && !m_pSector->DoesContain(vecPosition))
         {
             // Grab our new sector
-            OnEnterSector(m_pRow->FindOrCreateSector(vecPosition, m_pSector));
+            CClientStreamSector* pNewSector = m_pRow->FindOrCreateSector(vecPosition, m_pSector);
+            if (pNewSector)
+                OnEnterSector(pNewSector);
         }
     }
 
@@ -196,120 +248,193 @@ void                CClientStreamer::DoPulse(CVector& vecPosition)
 void CClientStreamer::SetDimension(unsigned short usDimension)
 {
     // Different dimension than before?
-    if (usDimension != m_usDimension)
-    {
-        // Set the new dimension
-        m_usDimension = usDimension;
+    if (usDimension == m_usDimension)
+        return;
 
-        // That means all of the currently streamed in elements will have to
-        // go. Unstream all elements that are streamed in.
-        CClientStreamElement*                 pElement = NULL;
-        list<CClientStreamElement*>::iterator iter = m_ActiveElements.begin();
-        for (; iter != m_ActiveElements.end(); iter++)
+    // Set the new dimension
+    m_usDimension = usDimension;
+
+    // Reserve space for vectors
+    std::vector<CClientStreamElement*> elementsToHide;
+    std::vector<CClientStreamElement*> elementsToShow;
+
+    // Collect elements from sectors that need to be hidden
+    auto collectFromRows = [this, &elementsToHide](std::list<CClientStreamSectorRow*>& rowList)
+    {
+        for (CClientStreamSectorRow* pSectorRow : rowList)
         {
-            pElement = *iter;
-            if (pElement->IsStreamedIn())
+            if (!pSectorRow)
+                continue;
+
+            for (CClientStreamSector* pSector : pSectorRow->GetList())
             {
-                if (!pElement->IsVisibleInAllDimensions())
+                if (!pSector)
+                    continue;
+
+                std::vector<CClientStreamElement*> tempElements;
+
+                for (auto iter = pSector->Begin(); iter != pSector->End(); ++iter)
                 {
-                    // Unstream it
-                    m_ToStreamOut.push_back(pElement);
+                    CClientStreamElement* pElement = *iter;
+                    if (pElement)
+                        tempElements.push_back(pElement);
+                }
+
+                for (CClientStreamElement* pElement : tempElements)
+                {
+                    if (!IsElementShouldVisibleInCurrentDimension(pElement))
+                        elementsToHide.push_back(pElement);
                 }
             }
         }
+    };
+
+    collectFromRows(m_WorldRows);
+    collectFromRows(m_ExtraRows);
+
+    // Collect elements that should be shown in new dimension
+    for (CClientStreamElement* pElement : m_outsideCurrentDimensionElements)
+    {
+        if (!pElement)
+            continue;
+
+        // Should this element be visible in new dimension?
+        if (pElement->GetDimension() == usDimension || pElement->IsVisibleInAllDimensions())
+            elementsToShow.push_back(pElement);
+    }
+
+    // Process elements to hide
+    for (CClientStreamElement* pElement : elementsToHide)
+    {
+        if (!pElement)
+            continue;
+
+        CClientStreamSector* pSector = pElement->GetStreamSector();
+        if (!pSector)
+            continue;
+
+        pSector->Remove(pElement);
+        pElement->SetStreamSector(nullptr);
+        m_ActiveElements.remove(pElement);
+        m_outsideCurrentDimensionElements.push_back(pElement);
+
+        if (pElement->IsStreamedIn())
+            m_ToStreamOut.push_back(pElement);
+    }
+
+    // Process elements to show
+    for (CClientStreamElement* pElement : elementsToShow)
+    {
+        if (!pElement)
+            continue;
+
+        m_outsideCurrentDimensionElements.remove(pElement);
+        AddElementInSectors(pElement);
     }
 }
 
 CClientStreamSectorRow* CClientStreamer::FindOrCreateRow(CVector& vecPosition, CClientStreamSectorRow* pSurrounding)
 {
+    // Validate position
+    if (!std::isfinite(vecPosition.fY))
+        return nullptr;
+
     // Do we have a row to check around first?
     if (pSurrounding)
     {
         // Check the above and below rows
         if (pSurrounding->m_pTop && pSurrounding->m_pTop->DoesContain(vecPosition))
             return pSurrounding->m_pTop;
+
         if (pSurrounding->m_pBottom && pSurrounding->m_pBottom->DoesContain(vecPosition))
             return pSurrounding->m_pBottom;
     }
 
     // Search through our main world rows
-    CClientStreamSectorRow*                 pRow = NULL;
-    list<CClientStreamSectorRow*>::iterator iter = m_WorldRows.begin();
-    for (; iter != m_WorldRows.end(); iter++)
+    for (CClientStreamSectorRow* pRow : m_WorldRows)
     {
-        pRow = *iter;
-        if (pRow->DoesContain(vecPosition))
-        {
+        if (pRow && pRow->DoesContain(vecPosition))
             return pRow;
-        }
     }
 
     // Search through our extra rows
-    iter = m_ExtraRows.begin();
-    for (; iter != m_ExtraRows.end(); iter++)
+    for (CClientStreamSectorRow* pRow : m_ExtraRows)
     {
-        pRow = *iter;
-        if (pRow->DoesContain(vecPosition))
-        {
+        if (pRow && pRow->DoesContain(vecPosition))
             return pRow;
-        }
     }
+
     // We need a new row, align it with the others
-    float fBottom = float((int)(vecPosition.fY / m_fRowSize)) * m_fRowSize;
+    float fBottom = static_cast<float>(static_cast<int>(vecPosition.fY / m_fRowSize)) * m_fRowSize;
     if (vecPosition.fY < 0.0f)
         fBottom -= m_fRowSize;
-    pRow = new CClientStreamSectorRow(fBottom, fBottom + m_fRowSize, m_fSectorSize, m_fRowSize);
+
+    CClientStreamSectorRow* pRow = new CClientStreamSectorRow(fBottom, fBottom + m_fRowSize, m_fSectorSize, m_fRowSize);
+    if (!pRow)
+        return nullptr;
+
     ConnectRow(pRow);
     pRow->SetExtra(true);
     m_ExtraRows.push_back(pRow);
+
     return pRow;
 }
 
 CClientStreamSectorRow* CClientStreamer::FindRow(float fY)
 {
     // Search through our main world rows
-    CClientStreamSectorRow*                 pRow = NULL;
-    list<CClientStreamSectorRow*>::iterator iter = m_WorldRows.begin();
-    for (; iter != m_WorldRows.end(); iter++)
+    for (CClientStreamSectorRow* pRow : m_WorldRows)
     {
-        pRow = *iter;
-        if (pRow->DoesContain(fY))
-        {
+        if (pRow && pRow->DoesContain(fY))
             return pRow;
-        }
     }
 
     // Search through our extra rows
-    iter = m_ExtraRows.begin();
-    for (; iter != m_ExtraRows.end(); iter++)
+    for (CClientStreamSectorRow* pRow : m_ExtraRows)
     {
-        pRow = *iter;
-        if (pRow->DoesContain(fY))
-        {
+        if (pRow && pRow->DoesContain(fY))
             return pRow;
-        }
     }
-    return NULL;
+
+    return nullptr;
 }
 
 void CClientStreamer::OnUpdateStreamPosition(CClientStreamElement* pElement)
 {
-    CVector                 vecPosition = pElement->GetStreamPosition();
+    if (!pElement || !pElement->GetStreamSector())
+        return;
+
+    CVector vecPosition = pElement->GetStreamPosition();
+
+    // Validate element position
+    if (!std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ))
+        return;
+
     CClientStreamSectorRow* pRow = pElement->GetStreamRow();
     CClientStreamSector*    pSector = pElement->GetStreamSector();
+
+    if (!pRow || !pSector)
+        return;
 
     // Have we changed row?
     if (!pRow->DoesContain(vecPosition))
     {
         pRow = FindOrCreateRow(vecPosition);
+        if (!pRow)
+            return;
+
         pElement->SetStreamRow(pRow);
-        OnElementEnterSector(pElement, pRow->FindOrCreateSector(vecPosition));
+        CClientStreamSector* pNewSector = pRow->FindOrCreateSector(vecPosition);
+        if (pNewSector)
+            OnElementEnterSector(pElement, pNewSector);
     }
     // Have we changed sector?
     else if (!pSector->DoesContain(vecPosition))
     {
         // Grab our new sector
-        OnElementEnterSector(pElement, pRow->FindOrCreateSector(vecPosition, pSector));
+        CClientStreamSector* pNewSector = pRow->FindOrCreateSector(vecPosition, pSector);
+        if (pNewSector)
+            OnElementEnterSector(pElement, pNewSector);
     }
     else
     {
@@ -318,41 +443,117 @@ void CClientStreamer::OnUpdateStreamPosition(CClientStreamElement* pElement)
     }
 }
 
+void CClientStreamer::AddElementInSectors(CClientStreamElement* pElement)
+{
+    if (!pElement)
+        return;
+
+    // Check if already in a sector
+    if (pElement->GetStreamSector())
+    {
+        // Element already in a sector, update its position instead
+        OnUpdateStreamPosition(pElement);
+        return;
+    }
+
+    assert(pAddingElement == nullptr);
+    pAddingElement = pElement;
+
+    CVector vecPosition = pElement->GetStreamPosition();
+
+    // Validate position
+    if (!std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ))
+    {
+        pAddingElement = nullptr;
+        return;
+    }
+
+    CClientStreamSectorRow* pRow = FindOrCreateRow(vecPosition);
+    if (!pRow)
+    {
+        pAddingElement = nullptr;
+        return;
+    }
+
+    pElement->SetStreamRow(pRow);
+    CClientStreamSector* pSector = pRow->FindOrCreateSector(vecPosition);
+    if (pSector)
+        OnElementEnterSector(pElement, pSector);
+
+    pAddingElement = nullptr;
+}
+
+void CClientStreamer::RemoveElementFromSectors(CClientStreamElement* pElement)
+{
+    if (!pElement)
+        return;
+
+    OnElementEnterSector(pElement, nullptr);
+
+    // Clear row and sector
+    pElement->SetStreamRow(nullptr);
+
+    // Remove from active elements
+    m_ToStreamOut.remove(pElement);
+}
+
+bool CClientStreamer::IsElementShouldVisibleInCurrentDimension(CClientStreamElement* pElement)
+{
+    if (!pElement)
+        return false;
+
+    return pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions();
+}
+
 void CClientStreamer::AddElement(CClientStreamElement* pElement)
 {
-    assert(pAddingElement == NULL);
-    pAddingElement = pElement;
-    CVector                 vecPosition = pElement->GetStreamPosition();
-    CClientStreamSectorRow* pRow = FindOrCreateRow(vecPosition);
-    pElement->SetStreamRow(pRow);
-    OnElementEnterSector(pElement, pRow->FindOrCreateSector(vecPosition));
-    pAddingElement = NULL;
+    if (!pElement)
+        return;
+
+    if (IsElementShouldVisibleInCurrentDimension(pElement))
+        AddElementInSectors(pElement);
+    else
+        m_outsideCurrentDimensionElements.push_back(pElement);
 }
 
 void CClientStreamer::RemoveElement(CClientStreamElement* pElement)
 {
-    OnElementEnterSector(pElement, NULL);
+    if (!pElement)
+        return;
+
+    if (pElement->GetStreamSector())
+    {
+        CClientStreamSector* pSector = pElement->GetStreamSector();
+        pSector->Remove(pElement);
+        pElement->SetStreamSector(nullptr);
+    }
+
     m_ActiveElements.remove(pElement);
     m_ToStreamOut.remove(pElement);
+    m_outsideCurrentDimensionElements.remove(pElement);
 }
 
-void CClientStreamer::SetExpDistances(list<CClientStreamElement*>* pList)
+void CClientStreamer::SetExpDistances(std::list<CClientStreamElement*>* pList)
 {
-    // Run through our list setting distances to world center
-    CClientStreamElement*                 pElement = NULL;
-    list<CClientStreamElement*>::iterator iter = pList->begin();
-    for (; iter != pList->end(); iter++)
+    if (!pList)
+        return;
+
+    for (CClientStreamElement* pElement : *pList)
     {
-        pElement = *iter;
-        // Set its distance ^ 2
+        if (!pElement)
+            continue;
+
         pElement->SetExpDistance(pElement->GetDistanceToBoundingBoxSquared(m_vecPosition));
     }
 }
 
-void CClientStreamer::AddToSortedList(list<CClientStreamElement*>* pList, CClientStreamElement* pElement)
+void CClientStreamer::AddToSortedList(std::list<CClientStreamElement*>* pList, CClientStreamElement* pElement)
 {
-    // Make sure it's exp distance is updated
-    float fDistance = pElement->GetDistanceToBoundingBoxSquared(m_vecPosition);
+    if (!pList || !pElement)
+        return;
+
+    // Make sure its exp distance is updated
+    const float fDistance = pElement->GetDistanceToBoundingBoxSquared(m_vecPosition);
     pElement->SetExpDistance(fDistance);
 
     // Don't add if already in the list
@@ -360,14 +561,14 @@ void CClientStreamer::AddToSortedList(list<CClientStreamElement*>* pList, CClien
         return;
 
     // Search through our list. Add it behind the first item further away than this
-    CClientStreamElement*                 pTemp = NULL;
-    list<CClientStreamElement*>::iterator iter = pList->begin();
-    for (; iter != pList->end(); iter++)
+    for (auto iter = pList->begin(); iter != pList->end(); ++iter)
     {
-        pTemp = *iter;
+        CClientStreamElement* pTemp = *iter;
+        if (!pTemp)
+            continue;
 
         // Is it further than the one we add?
-        if (pTemp->GetDistanceToBoundingBoxSquared(m_vecPosition) > fDistance)
+        if (pTemp->GetExpDistance() > fDistance)
         {
             // Add it before here
             pList->insert(iter, pElement);
@@ -381,296 +582,325 @@ void CClientStreamer::AddToSortedList(list<CClientStreamElement*>* pList, CClien
 
 bool CClientStreamer::CompareExpDistance(CClientStreamElement* p1, CClientStreamElement* p2)
 {
+    if (!p1 || !p2)
+        return false;
+
     return p1->GetExpDistance() < p2->GetExpDistance();
 }
 
 bool CClientStreamer::IsActiveElement(CClientStreamElement* pElement)
 {
-    list<CClientStreamElement*>::iterator iter = m_ActiveElements.begin();
-    for (; iter != m_ActiveElements.end(); iter++)
+    if (!pElement)
+        return false;
+
+    for (CClientStreamElement* pActive : m_ActiveElements)
     {
-        if (*iter == pElement)
-        {
+        if (pActive == pElement)
             return true;
-        }
     }
+
     return false;
 }
 
 void CClientStreamer::Restream(bool bMovedFar)
 {
-    // Limit distance stream in/out rate
-    // Vehicles might have to ignore this to reduce blocking loads elsewhere.
-    int iMaxOut = 6;
-    int iMaxIn = 6;
-    if (bMovedFar)
-    {
-        iMaxOut = 1000;
-        iMaxIn = 1000;
-    }
+    // Adjust stream-in/out limits (large movement allows massive updates)
+    const int iMaxOut = bMovedFar ? m_iMaxOutFar : m_iMaxOutDefault;
+    const int iMaxIn = bMovedFar ? m_iMaxInFar : m_iMaxInDefault;
 
-    // Do we have any elements waiting to be streamed out?
-    while (!m_ToStreamOut.empty())
-    {
-        CClientStreamElement* pElement = m_ToStreamOut.front();
-        // Make sure we have no stream-references
-        if (pElement->GetTotalStreamReferences() == 0)
-        {
-            // Stream out 1 of them per frame
-            pElement->InternalStreamOut();
-            iMaxOut--;
-        }
-        m_ToStreamOut.remove(pElement);
+    // Process pending stream-out elements
+    int  iProcessedOut = 0;
+    auto iter = m_ToStreamOut.begin();
 
-        if (iMaxOut <= 0)
-            break;
-    }
-
-    static std::vector<CClientStreamElement*> ClosestStreamedOutList;
-    static std::vector<CClientStreamElement*> FurthestStreamedInList;
-    ClosestStreamedOutList.clear();
-    FurthestStreamedInList.clear();
-
-    bool bReachedLimit = ReachedLimit();
-    // Loop through our active elements list (they should be ordered closest to furthest)
-    list<CClientStreamElement*>::iterator iter = m_ActiveElements.begin();
-    for (; iter != m_ActiveElements.end(); iter++)
+    while (iter != m_ToStreamOut.end() && iProcessedOut < iMaxOut)
     {
         CClientStreamElement* pElement = *iter;
-        float                 fElementDistanceExp = pElement->GetExpDistance();
 
-        // Is this element streamed in?
-        if (pElement->IsStreamedIn())
+        if (!pElement)
         {
-            if (IS_VEHICLE(pElement))
+            iter = m_ToStreamOut.erase(iter);
+            continue;
+        }
+
+        // Only stream out if no references remain
+        if (pElement->GetTotalStreamReferences() == 0)
+        {
+            pElement->InternalStreamOut();
+            iter = m_ToStreamOut.erase(iter);
+            iProcessedOut++;
+        }
+        else
+        {
+            ++iter;
+        }
+    }
+
+    // Prepare temporary lists
+    std::vector<CClientStreamElement*> closestOut;
+    std::vector<CClientStreamElement*> furthestIn;
+
+    bool bReachedLimit = ReachedLimit();
+    int  iProcessedIn = 0;
+
+    // Elements are sorted: nearest -> furthest
+    for (CClientStreamElement* pElement : m_ActiveElements)
+    {
+        if (!pElement)
+            continue;
+
+        // Early exit if we've processed enough
+        if (iProcessedIn >= iMaxIn && iProcessedOut >= iMaxOut && !bMovedFar)
+            break;
+
+        const float     fDist = pElement->GetExpDistance();
+        ElementCategory category = GetElementCategory(pElement);
+        const bool      bIsIn = pElement->IsStreamedIn();
+
+        if (bIsIn)
+        {
+            // Extra handling for vehicles and players
+            switch (category)
             {
-                CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pElement);
-                if (pVehicle)
+                case ElementCategory::VEHICLE:
                 {
+                    auto* pVehicle = DynamicCast<CClientVehicle>(pElement);
+                    if (!pVehicle)
+                        break;
+
+                    // Skip if player in vehicle had a lightsync update
                     if (pVehicle->GetOccupant() && IS_PLAYER(pVehicle->GetOccupant()))
                     {
-                        CClientPlayer* pPlayer = DynamicCast<CClientPlayer>(pVehicle->GetOccupant());
-                        if (pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
+                        auto* pPlayer = DynamicCast<CClientPlayer>(pVehicle->GetOccupant());
+                        if (pPlayer && pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
                         {
-                            // if the last packet was ls he shouldn't be streamed in
                             m_ToStreamOut.push_back(pElement);
+                            continue;
                         }
                     }
 
-                    // Is this a trailer?
-                    if (pVehicle->GetTowedByVehicle() != NULL)
+                    // Towed vehicles are handled by the tow vehicle
+                    if (pVehicle->GetTowedByVehicle())
+                        continue;
+                }
+                break;
+
+                case ElementCategory::PLAYER:
+                {
+                    auto* pPlayer = DynamicCast<CClientPlayer>(pElement);
+
+                    // Lightsync players should not be loaded
+                    if (pPlayer && pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
                     {
-                        // Don't stream it out (this is handled by the towing vehicle)
+                        m_ToStreamOut.push_back(pElement);
                         continue;
                     }
                 }
+                break;
+
+                default:
+                    break;
             }
-            if (IS_PLAYER(pElement))
+
+            // Too far -> stream out (use threshold to avoid flickering)
+            if (fDist > m_fMaxDistanceThreshold)
             {
-                CClientPlayer* pPlayer = DynamicCast<CClientPlayer>(pElement);
-                if (pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
+                if (iProcessedOut < iMaxOut && pElement->GetTotalStreamReferences() == 0)
                 {
-                    // if the last packet was ls he isn't/shouldn't be streamed in
-                    m_ToStreamOut.push_back(pElement);
-                }
-            }
-            // Too far away? Use the threshold so we won't flicker load it if it's on the border moving.
-            if (fElementDistanceExp > m_fMaxDistanceThreshold)
-            {
-                // Unstream it now?
-                if (iMaxOut > 0)
-                {
-                    // Make sure we have no stream-references
-                    if (pElement->GetTotalStreamReferences() == 0)
-                    {
-                        // Stream out now
-                        pElement->InternalStreamOut();
-                        iMaxOut--;
-                    }
-                    m_ToStreamOut.remove(pElement);
+                    pElement->InternalStreamOut();
+                    iProcessedOut++;
                 }
                 else
                 {
-                    // or later
                     m_ToStreamOut.push_back(pElement);
                 }
             }
             else
             {
-                FurthestStreamedInList.push_back(pElement);
+                // Still inside distance -> keep track for possible swapping
+                if (furthestIn.size() < static_cast<size_t>(m_iFurthestInLimit))
+                    furthestIn.push_back(pElement);
             }
+
+            continue;
+        }
+
+        // Too far -> ignore
+        if (fDist > m_fMaxDistanceExp)
+            continue;
+
+        // Special rules for vehicles / players
+        switch (category)
+        {
+            case ElementCategory::VEHICLE:
+            {
+                auto* pVehicle = DynamicCast<CClientVehicle>(pElement);
+                if (!pVehicle)
+                    break;
+
+                // Lightsync driver -> do not stream in
+                if (pVehicle->GetOccupant() && IS_PLAYER(pVehicle->GetOccupant()))
+                {
+                    auto* pPlayer = DynamicCast<CClientPlayer>(pVehicle->GetOccupant());
+                    if (pPlayer && pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
+                        continue;
+                }
+
+                // Towed vehicles are handled elsewhere
+                if (pVehicle->GetTowedByVehicle())
+                    continue;
+            }
+            break;
+
+            case ElementCategory::PLAYER:
+            {
+                auto* pPlayer = DynamicCast<CClientPlayer>(pElement);
+                if (pPlayer && pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
+                    continue;
+            }
+            break;
+
+            default:
+                break;
+        }
+
+        // Attached element: only load if LOD does not match
+        if (auto* pAttached = DynamicCast<CClientStreamElement>(pElement->GetAttachedTo()))
+        {
+            if (!pAttached->IsStreamedIn())
+            {
+                auto* pObject = DynamicCast<CClientObject>(pElement);
+                auto* pObjectAtt = DynamicCast<CClientObject>(pAttached);
+                if (!pObject || !pObjectAtt || pObject->IsLowLod() == pObjectAtt->IsLowLod())
+                    continue;
+            }
+        }
+
+        // Reached streaming limit -> mark as candidate
+        if (bReachedLimit)
+        {
+            if (static_cast<int>(closestOut.size()) < iMaxIn)
+                closestOut.push_back(pElement);
         }
         else
         {
-            // Same dimension as us?
-            if (pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions())
+            // Stream in now (instant if moved far)
+            if (iProcessedIn < iMaxIn)
             {
-                // Too far away? Stop here.
-                if (fElementDistanceExp > m_fMaxDistanceExp)
-                    continue;
+                pElement->InternalStreamIn(bMovedFar);
+                iProcessedIn++;
 
-                if (IS_VEHICLE(pElement))
-                {
-                    CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pElement);
-                    if (pVehicle && pVehicle->GetOccupant() && IS_PLAYER(pVehicle->GetOccupant()))
-                    {
-                        CClientPlayer* pPlayer = DynamicCast<CClientPlayer>(pVehicle->GetOccupant());
-                        if (pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
-                        {
-                            // if the last packet was ls he isn't streaming in soon.
-                            continue;
-                        }
-                    }
-
-                    if (pVehicle && pVehicle->GetTowedByVehicle())
-                    {
-                        // Streaming in of towed vehicles is done in CClientVehicle::StreamIn by the towing vehicle
-                        continue;
-                    }
-                }
-                if (IS_PLAYER(pElement))
-                {
-                    CClientPlayer* pPlayer = DynamicCast<CClientPlayer>(pElement);
-                    if (pPlayer->GetLastPuresyncType() == PURESYNC_TYPE_LIGHTSYNC)
-                    {
-                        // if the last packet was ls he isn't streaming in soon.
-                        continue;
-                    }
-                }
-                // If attached and attached-to is streamed out, don't consider for streaming in
-                CClientStreamElement* pAttachedTo = DynamicCast<CClientStreamElement>(pElement->GetAttachedTo());
-                if (pAttachedTo && !pAttachedTo->IsStreamedIn())
-                {
-                    // ...unless attached to low LOD version
-                    CClientObject* pAttachedToObject = DynamicCast<CClientObject>(pAttachedTo);
-                    CClientObject* pObject = DynamicCast<CClientObject>(pElement);
-                    if (!pObject || !pAttachedToObject || pObject->IsLowLod() == pAttachedToObject->IsLowLod())
-                        continue;
-                }
-
-                // Not room to stream in more elements?
-                if (bReachedLimit)
-                {
-                    // Add to the list that might be streamed in during the final phase
-                    if ((int)ClosestStreamedOutList.size() < iMaxIn)            // (only add if there is a chance it will be used)
-                        ClosestStreamedOutList.push_back(pElement);
-                }
-                else
-                {
-                    // Stream in the new element. Don't do it instantly unless moved from far away.
-                    pElement->InternalStreamIn(bMovedFar);
-                    bReachedLimit = ReachedLimit();
-
-                    if (!bReachedLimit)
-                    {
-                        iMaxIn--;
-                        if (iMaxIn <= 0)
-                            break;
-                    }
-                }
+                bReachedLimit = ReachedLimit();
             }
         }
     }
 
-    // Complex code of doom:
-    //      ClosestStreamedOutList is {nearest to furthest} list of streamed out elements within streaming distance
-    //      FurthestStreamedInList is {nearest to furthest} list of streamed in elements
-    if (bReachedLimit)
+    // Swap logic when at streaming limit
+    if (!bReachedLimit || closestOut.empty() || furthestIn.empty())
+        return;
+
+    int          iFurthestIndex = static_cast<int>(furthestIn.size()) - 1;
+    unsigned int uiClosestIndex = 0;
+
+    // Up to max swaps per frame
+    for (int i = 0; i < m_iMaxSwaps; i++)
     {
-        // Check 'furthest streamed in' against 'closest streamed out' to see if the state can be swapped
-        int  iFurthestStreamedInIndex = FurthestStreamedInList.size() - 1;
-        uint uiClosestStreamedOutIndex = 0;
-        for (uint i = 0; i < 10; i++)
+        if (iProcessedIn >= iMaxIn || iProcessedOut >= iMaxOut)
+            break;
+
+        if (iFurthestIndex < 0)
+            break;
+
+        if (uiClosestIndex >= closestOut.size())
+            break;
+
+        auto* pFurthestIn = furthestIn[iFurthestIndex];
+        auto* pClosestOut = closestOut[uiClosestIndex];
+
+        if (!pFurthestIn || !pClosestOut)
+            break;
+
+        // Only swap if the streamed-out item is closer
+        if (pClosestOut->GetExpDistance() >= pFurthestIn->GetExpDistance())
+            break;
+
+        // Stream out the furthest streamed-in item
+        if (pFurthestIn->GetTotalStreamReferences() == 0)
         {
-            // Check limits for this frame
-            if (iMaxIn <= 0 || iMaxOut <= 0)
-                break;
+            pFurthestIn->InternalStreamOut();
+            iProcessedOut++;
+        }
 
-            // Check indicies are valid
-            if (iFurthestStreamedInIndex < 0)
-                break;
-            if (uiClosestStreamedOutIndex >= ClosestStreamedOutList.size())
-                break;
+        m_ToStreamOut.remove(pFurthestIn);
+        --iFurthestIndex;
 
-            // See if ClosestStreamedOut is nearer than FurthestStreamedIn
-            CClientStreamElement* pFurthestStreamedIn = FurthestStreamedInList[iFurthestStreamedInIndex];
-            CClientStreamElement* pClosestStreamedOut = ClosestStreamedOutList[uiClosestStreamedOutIndex];
-            if (pClosestStreamedOut->GetExpDistance() >= pFurthestStreamedIn->GetExpDistance())
-                break;
-
-            // Stream out FurthestStreamedIn candidate if possible
-            if (pFurthestStreamedIn->GetTotalStreamReferences() == 0)
-            {
-                // Stream out now
-                pFurthestStreamedIn->InternalStreamOut();
-                iMaxOut--;
-            }
-            m_ToStreamOut.remove(pFurthestStreamedIn);
-            iFurthestStreamedInIndex--;            // Always advance to the next candidate
-
-            // Stream in ClosestStreamedOut candidate if possible
-            if (!ReachedLimit())
-            {
-                // Stream in the new element. No need to do it instantly unless moved from far away.
-                pClosestStreamedOut->InternalStreamIn(bMovedFar);
-                iMaxIn--;
-                uiClosestStreamedOutIndex++;
-            }
+        // Stream in the closest streamed-out item
+        if (!ReachedLimit())
+        {
+            pClosestOut->InternalStreamIn(bMovedFar);
+            iProcessedIn++;
+            ++uiClosestIndex;
         }
     }
 }
 
 void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
 {
-    CClientStreamElement* pElement = NULL;
-    if (m_pSector)
-    {
-        // Grab the unwanted sectors
-        list<CClientStreamSector*> common, uncommon;
-        pSector->CompareSurroundings(m_pSector, &common, &uncommon, true);
+    if (!pSector)
+        return;
 
-        // Deactivate the unwanted sectors
-        CClientStreamSector*                 pTempSector = NULL;
-        list<CClientStreamSector*>::iterator iter = uncommon.begin();
-        for (; iter != uncommon.end(); iter++)
+    if (!m_pSector)
+    {
+        m_pSector = pSector;
+        SetExpDistances(&m_ActiveElements);
+        m_ActiveElements.sort(CompareExpDistance);
+        return;
+    }
+
+    // Grab the unwanted sectors
+    std::list<CClientStreamSector*> common;
+    std::list<CClientStreamSector*> uncommon;
+    pSector->CompareSurroundings(m_pSector, &common, &uncommon, true);
+
+    // Deactivate the unwanted sectors
+    for (CClientStreamSector* pTempSector : uncommon)
+    {
+        if (!pTempSector)
+            continue;
+
+        // Make sure we dont unload our new sector
+        if (pTempSector == pSector)
+            continue;
+
+        if (!pTempSector->IsActivated())
+            continue;
+
+        for (auto elemIter = pTempSector->Begin(); elemIter != pTempSector->End(); ++elemIter)
         {
-            pTempSector = *iter;
-            // Make sure we dont unload our new sector
-            if (pTempSector != pSector)
-            {
-                if (pTempSector->IsActivated())
-                {
-                    list<CClientStreamElement*>::iterator iter = pTempSector->Begin();
-                    for (; iter != pTempSector->End(); iter++)
-                    {
-                        pElement = *iter;
-                        if (pElement->IsStreamedIn())
-                        {
-                            // Add it to our streaming out list
-                            m_ToStreamOut.push_back(pElement);
-                        }
-                    }
-                    pTempSector->RemoveElements(&m_ActiveElements);
-                    pTempSector->SetActivated(false);
-                }
-            }
+            CClientStreamElement* pElement = *elemIter;
+            if (pElement && pElement->IsStreamedIn())
+                m_ToStreamOut.push_back(pElement);
         }
 
-        // Grab the wanted sectors
-        m_pSector->CompareSurroundings(pSector, &common, &uncommon, true);
+        pTempSector->RemoveElements(&m_ActiveElements);
+        pTempSector->SetActivated(false);
+    }
 
-        // Activate the unwanted sectors
-        iter = uncommon.begin();
-        for (; iter != uncommon.end(); iter++)
+    // Grab the wanted sectors
+    m_pSector->CompareSurroundings(pSector, &common, &uncommon, true);
+
+    // Activate the wanted sectors
+    for (CClientStreamSector* pTempSector : uncommon)
+    {
+        if (!pTempSector)
+            continue;
+
+        if (!pTempSector->IsActivated())
         {
-            pTempSector = *iter;
-            if (!pTempSector->IsActivated())
-            {
-                pTempSector->AddElements(&m_ActiveElements);
-                pTempSector->SetActivated(true);
-            }
+            pTempSector->AddElements(&m_ActiveElements);
+            pTempSector->SetActivated(true);
         }
     }
+
     m_pSector = pSector;
     SetExpDistances(&m_ActiveElements);
     m_ActiveElements.sort(CompareExpDistance);
@@ -678,16 +908,20 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
 
 void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClientStreamSector* pSector)
 {
+    if (!pElement)
+        return;
+
     CClientStreamSector* pPreviousSector = pElement->GetStreamSector();
     if (pPreviousSector)
     {
         // Skip if disconnecting
-        if (g_pClientGame->IsBeingDeleted())
+        if (g_pClientGame && g_pClientGame->IsBeingDeleted())
             return;
 
         // Remove the element from its old sector
         pPreviousSector->Remove(pElement);
     }
+
     if (pSector)
     {
         // Add the element to its new sector
@@ -698,15 +932,16 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
         {
             // Was the previous sector not active?
             if (!pPreviousSector || !pPreviousSector->IsActivated())
-            {
-                // Add this element to our active-elements list
                 AddToSortedList(&m_ActiveElements, pElement);
-            }
         }
         else
         {
+            // Should we deactivate the element?
+            if (pPreviousSector && pPreviousSector->IsActivated())
+                m_ActiveElements.remove(pElement);
+
             // Should we activate this sector?
-            if (pSector->IsExtra() && (m_pSector->IsMySurroundingSector(pSector) || m_pSector == pSector))
+            if (m_pSector && pSector->IsExtra() && (m_pSector->IsMySurroundingSector(pSector) || m_pSector == pSector))
             {
                 pSector->AddElements(&m_ActiveElements);
                 pSector->SetActivated(true);
@@ -718,36 +953,131 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
             }
         }
     }
+    else if (pPreviousSector && pPreviousSector->IsActivated())
+    {
+        // The element was removed from sectors.
+        // Remove it from active elements too.
+        m_ActiveElements.remove(pElement);
+    }
+
+    // Update the element's sector pointer
     pElement->SetStreamSector(pSector);
+
+    // If the element no longer has a sector, clear the row pointer too
+    if (!pSector)
+        pElement->SetStreamRow(nullptr);
 }
 
 void CClientStreamer::OnElementForceStreamIn(CClientStreamElement* pElement)
 {
+    if (!pElement)
+        return;
+
     // Make sure we're streamed in
     pElement->InternalStreamIn(true);
 }
 
 void CClientStreamer::OnElementForceStreamOut(CClientStreamElement* pElement)
 {
+    if (!pElement)
+        return;
+
     // Make sure we're streamed out if need be
     if (!IsActiveElement(pElement))
-    {
         m_ToStreamOut.push_back(pElement);
-    }
 }
 
 void CClientStreamer::OnElementDimension(CClientStreamElement* pElement)
 {
-    // Grab its new dimenson
-    unsigned short usDimension = pElement->GetDimension();
-    // Is it streamed in?
-    if (pElement->IsStreamedIn())
+    if (!pElement)
+        return;
+
+    const bool bShouldBeVisible = IsElementShouldVisibleInCurrentDimension(pElement);
+    const bool bCurrentlyInSector = (pElement->GetStreamSector() != nullptr);
+
+    // Should be visible but not in sector -> Add it
+    if (bShouldBeVisible && !bCurrentlyInSector)
     {
-        // Has it moved to a different dimension to us?
-        if (usDimension != m_usDimension)
-        {
-            // Stream it out
-            m_ToStreamOut.push_back(pElement);
-        }
+        m_outsideCurrentDimensionElements.remove(pElement);
+        AddElementInSectors(pElement);
+        return;
     }
+
+    // Should NOT be visible but IS in sector -> Remove it
+    if (!bShouldBeVisible && bCurrentlyInSector)
+    {
+        // Remove from sector
+        CClientStreamSector* pSector = pElement->GetStreamSector();
+        if (pSector)
+            pSector->Remove(pElement);
+
+        pElement->SetStreamSector(nullptr);
+        m_ActiveElements.remove(pElement);
+        m_outsideCurrentDimensionElements.push_back(pElement);
+
+        // Stream out if needed
+        if (pElement->IsStreamedIn())
+            m_ToStreamOut.push_back(pElement);
+
+        // Clear row pointer
+        pElement->SetStreamRow(nullptr);
+    }
+}
+
+void CClientStreamer::SetStreamerLimits(int normalIn, int normalOut, int farIn, int farOut)
+{
+    if ((normalIn) < (STREAMER_MAX_IN_DEFAULT / 2) || (normalOut) < (STREAMER_MAX_OUT_DEFAULT / 2) || (farIn) < (STREAMER_MAX_IN_FAR / 2) ||
+        (farOut) < (STREAMER_MAX_OUT_FAR / 2))
+    {
+        throw std::invalid_argument("Invalid streamer limits");
+    }
+
+    m_iMaxInDefault = normalIn;
+    m_iMaxOutDefault = normalOut;
+    m_iMaxInFar = farIn;
+    m_iMaxOutFar = farOut;
+}
+
+void CClientStreamer::ResetStreamerLimits()
+{
+    m_iMaxInDefault = STREAMER_MAX_IN_DEFAULT;
+    m_iMaxOutDefault = STREAMER_MAX_OUT_DEFAULT;
+    m_iMaxInFar = STREAMER_MAX_IN_FAR;
+    m_iMaxOutFar = STREAMER_MAX_OUT_FAR;
+}
+
+void CClientStreamer::GetStreamingLimits(int& normalIn, int& normalOut, int& farIn, int& farOut, int& maxSwaps, int& furthestInLimit) const noexcept
+{
+    normalIn = m_iMaxInDefault;
+    normalOut = m_iMaxOutDefault;
+    farIn = m_iMaxInFar;
+    farOut = m_iMaxOutFar;
+    maxSwaps = m_iMaxSwaps;
+    furthestInLimit = m_iFurthestInLimit;
+}
+
+void CClientStreamer::SetStreamerMaxSwaps(int maxSwaps)
+{
+    if (maxSwaps < (STREAMER_MAX_SWAPS / 2))
+        throw std::invalid_argument("Invalid streamer limits");
+
+    m_iMaxSwaps = maxSwaps;
+}
+
+void CClientStreamer::ResetStreamerMaxSwaps()
+{
+    m_iMaxSwaps = STREAMER_MAX_SWAPS;
+}
+
+void CClientStreamer::SetStreamerFurthestInLimit(int furthestInLimit)
+{
+    if (furthestInLimit < (STREAMER_FURTHEST_IN_LIMIT / 2))
+        throw std::invalid_argument("Invalid streamer limits");
+
+    m_iFurthestInLimit = furthestInLimit;
+}
+
+void CClientStreamer::ResetStreamerFurthestInLimit()
+{
+    m_iFurthestInLimit = STREAMER_FURTHEST_IN_LIMIT;
 }
