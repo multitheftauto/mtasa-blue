@@ -2133,6 +2133,7 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         pPlayer->SetHealth(0.0f);
         pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
+        pPlayer->SetHasJetPack(false);
 
         // Reset his vehicle action, but only if not jacking
         // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
