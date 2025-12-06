@@ -1432,7 +1432,7 @@ void CSettings::CreateGUI()
     const float postFxSliderWidth = ComputeSliderWidth(tabPanelSize.fX, postFxSliderColumnX, 220.0f, postFxValueColumnReserve);
     const float postFxValueColumnX = postFxSliderColumnX + postFxSliderWidth + postFxValueColumnPadding;
 
-    m_pBorderlessGammaToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, "Gamma:"));
+    m_pBorderlessGammaToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Gamma:")));
     m_pBorderlessGammaToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pBorderlessGammaToggle->AutoSize(nullptr, 20.0f);
 
@@ -1448,7 +1448,7 @@ void CSettings::CreateGUI()
 
     postFxPos.fY += postFxRowHeight;
 
-    m_pBorderlessBrightnessToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, "Brightness:"));
+    m_pBorderlessBrightnessToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Brightness:")));
     m_pBorderlessBrightnessToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pBorderlessBrightnessToggle->AutoSize(nullptr, 20.0f);
 
@@ -1464,7 +1464,7 @@ void CSettings::CreateGUI()
 
     postFxPos.fY += postFxRowHeight;
 
-    m_pBorderlessContrastToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, "Contrast:"));
+    m_pBorderlessContrastToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Contrast:")));
     m_pBorderlessContrastToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pBorderlessContrastToggle->AutoSize(nullptr, 20.0f);
 
@@ -1480,7 +1480,7 @@ void CSettings::CreateGUI()
 
     postFxPos.fY += postFxRowHeight;
 
-    m_pBorderlessSaturationToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, "Saturation:"));
+    m_pBorderlessSaturationToggle = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabPostFX, _("Saturation:")));
     m_pBorderlessSaturationToggle->SetPosition(CVector2D(postFxCheckboxColumnX, postFxPos.fY));
     m_pBorderlessSaturationToggle->AutoSize(nullptr, 20.0f);
 
