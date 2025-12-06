@@ -402,7 +402,8 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 unsigned char ucRotorSpeed;
                 if (BitStream.Read(ucRotorSpeed))
                 {
-                    pVehicle->SetRotorSpeed(ucRotorSpeed);
+                    float rotorSpeed = (static_cast<float>(ucRotorSpeed) / 100.0f * 0.22f);
+                    pVehicle->SetRotorSpeed(rotorSpeed);
                 }
 
                 // Read rotor state
