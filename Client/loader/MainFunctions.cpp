@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <iterator>
 #include <optional>
+#include <string>
 #include <locale.h>
 
 // Function must be at the start to fix odd compile error (Didn't happen locally but does in build server)
@@ -132,9 +133,13 @@ void CheckLibVersions()
     for (uint i = 0; i < NUMELMS(moduleList); i++)
     {
         SString strFilename = moduleList[i];
+        // Skip _d suffix for LOADER_PROXY_DLL_NAME and netc.dll as they don't use _d
+        if (strFilename.find(LOADER_PROXY_DLL_NAME) == std::string::npos && strFilename.find("netc.dll") == std::string::npos)
+        {
 #ifdef MTA_DEBUG
-        strFilename = ExtractBeforeExtension(strFilename) + "_d." + ExtractExtension(strFilename);
+            strFilename = ExtractBeforeExtension(strFilename) + "_d." + ExtractExtension(strFilename);
 #endif
+        }
         SString fullPath = CalcMTASAPath(strFilename);
         if (!ValidatePath(fullPath))
         {
