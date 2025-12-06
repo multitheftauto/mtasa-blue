@@ -621,9 +621,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.WriteBit(ControllerState.RightShoulder2 != 0);
 
                 // Write rotor speed
-                float rotorSpeed = pVehicle->GetRotorSpeed();
-                unsigned char ucRotorSpeed = static_cast<unsigned char>((rotorSpeed / 0.22f) * 100.0f);
-                BitStream.Write(ucRotorSpeed);
+                BitStream.Write(pVehicle->GetRotorSpeed());
 
                 // Write rotor state
                 BitStream.WriteBit(pVehicle->GetRotorState());
