@@ -130,4 +130,7 @@ public:
     virtual void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) = 0;
     virtual void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale) = 0;
     virtual void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale) = 0;
+
+    // New methods MUST be added at the end to preserve vtable order.
+    virtual void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) = 0;
 };
