@@ -485,6 +485,17 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             {
                 // Unloaded: We need to reload it
                 pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
+                
+                // Custom TXDs may get reassigned to a different pool slot during Request() if the original
+                // slot was freed. Check for ID change to prevent orphaning the stale map entry.
+                unsigned short uiNewTxdId = pModelInfo->GetTextureDictionaryID();
+                
+                if (uiNewTxdId != usTxdId)
+                {
+                    MapRemove(ms_ModelTexturesInfoMap, usTxdId);
+                    return nullptr;
+                }
+                
                 CTxdStore_AddRef(usTxdId);
                 CTxdStore_RemoveRef(usTxdId);
                 pCurrentTxd = CTxdStore_GetTxd(usTxdId);
