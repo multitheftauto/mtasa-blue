@@ -779,7 +779,8 @@ bool CModelInfoSA::IsValid()
 
 bool CModelInfoSA::IsAllocatedInArchive() const noexcept
 {
-    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
+    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+    return pStreamingInfo && pStreamingInfo->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -1081,7 +1082,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(*it);
+        if (pStreamingInfo)
+            pStreamingInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 
@@ -1799,6 +1802,9 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
     CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
     CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
 
+    if (!pBaseModelStreamingInfo || !pTargetModelStreamingInfo)
+        return;
+
     *pTargetModelStreamingInfo = CStreamingInfo{};
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
     pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
@@ -1934,7 +1940,10 @@ void CModelInfoSA::DeallocateModel(void)
     }
 
     ppModelInfo[m_dwModelID] = nullptr;
-    *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
+
+    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+    if (pStreamingInfo)
+        *pStreamingInfo = CStreamingInfo{};
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //

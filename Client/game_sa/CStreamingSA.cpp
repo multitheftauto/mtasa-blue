@@ -18,6 +18,7 @@
 #include "CGameSA.h"
 
 extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 // count: 26316 in unmodified game
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
@@ -334,6 +335,8 @@ void CStreamingSA::ReinitStreaming()
 void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
+    if (!pItemInfo)
+        return;
 
     // We remove the existing RwObject because, after switching the archive, the streamer will load a new one.
     // ReInit doesn't delete all RwObjects unless certain conditions are met.
@@ -373,6 +376,10 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
 
 CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)
 {
+    const uint maxStreamingID = pGame->GetCountOfAllFileIDs();
+    if (modelid >= maxStreamingID)
+        return nullptr;
+
     return &ms_aInfoForModel[modelid];
 }
 
