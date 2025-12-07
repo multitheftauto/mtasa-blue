@@ -26,6 +26,18 @@
 #define FAKE_RWTEXTURE_NO_TEXTURE   ( (RwTexture*)-10 )
 #define FAKE_NAME_NO_TEXTURE        "unnamed"
 
+// CFastHashMap key funcs for CD3DDUMMY* - must be declared before CFastHashMap<CD3DDUMMY*, ...> is used
+// These override the default template keys (-3, -4) to use our values
+inline CD3DDUMMY* GetEmptyMapKey(CD3DDUMMY**)
+{
+    return FAKE_D3DTEXTURE_EMPTY_KEY;
+}
+
+inline CD3DDUMMY* GetDeletedMapKey(CD3DDUMMY**)
+{
+    return FAKE_D3DTEXTURE_DELETED_KEY;
+}
+
 class CMatchChannel;
 class CMatchChannelManager;
 struct STexNameInfo;
