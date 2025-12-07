@@ -1543,7 +1543,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
         ControllerState.RightShoulder2 = BitStream.ReadBit() * 255;
 
         // Read rotor speed
-        SFloatSync<1, 7> rotorSpeed;
+        SFloatSync<2, 14> rotorSpeed;
         BitStream.Read(&rotorSpeed);
         pVehicle->SetRotorSpeed(rotorSpeed.data.fValue);
 
@@ -1750,7 +1750,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(ControllerState.RightShoulder2 != 0);
 
         // Write rotor speed
-        SFloatSync<1, 7> rotorSpeed;
+        SFloatSync<2, 14> rotorSpeed;
         pVehicle->GetRotorSpeed(rotorSpeed.data.fValue);
         BitStream.Write(&rotorSpeed);
 

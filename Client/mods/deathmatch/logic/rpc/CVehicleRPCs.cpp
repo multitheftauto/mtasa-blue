@@ -684,7 +684,7 @@ void CVehicleRPCs::SetVehicleRotorSpeed(CClientEntity* pSource, NetBitStreamInte
     CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
     if (pVehicle)
     {
-        SFloatSync<1, 7> rotorSpeed;
+        SFloatSync<2, 14> rotorSpeed;
         if (bitStream.Read(&rotorSpeed))
         {
             pVehicle->SetRotorSpeed(rotorSpeed.data.fValue);
