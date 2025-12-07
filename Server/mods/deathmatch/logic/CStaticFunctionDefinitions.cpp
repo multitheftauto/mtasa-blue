@@ -12718,9 +12718,7 @@ bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CElement* pElement, float 
         pVehicle->SetRotorSpeed(rotorSpeed);
 
         CBitStream BitStream;
-        SFloatSync<1, 7> syncRotorSpeed;
-        syncRotorSpeed.data.fValue = rotorSpeed;
-        BitStream.pBitStream->Write(&syncRotorSpeed);
+        BitStream.pBitStream->Write(rotorSpeed);
 
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_ROTOR_SPEED, *BitStream.pBitStream));
 
