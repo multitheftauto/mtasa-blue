@@ -63,6 +63,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
         {"setPedBleeding", ArgumentParser<SetPedBleeding>},
         {"playPedVoiceLine", ArgumentParser<PlayPedVoiceLine>},
+        {"setPedWearingJetpack", ArgumentParser<SetPedWearingJetpack>},
 
         {"getPedVoice", GetPedVoice},
         {"getElementBonePosition", ArgumentParserWarn<false, GetElementBonePosition>},
@@ -213,6 +214,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
     lua_classfunction(luaVM, "setBleeding", "setPedBleeding");
     lua_classfunction(luaVM, "playVoiceLine", "playPedVoiceLine");
+    lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -2566,4 +2568,12 @@ void CLuaPedDefs::PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<
         throw LuaFunctionError("The argument probability cannot have a negative value.");
 
     ped->Say(speechContextId, probability.value_or(1.0f));
+}
+
+bool CLuaPedDefs::SetPedWearingJetpack(CClientPed* ped, bool state)
+{
+    if (!ped->IsLocalEntity())
+        return false;
+
+    return ped->SetHasJetPack(state);
 }
