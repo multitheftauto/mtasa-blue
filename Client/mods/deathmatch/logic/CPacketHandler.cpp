@@ -3455,8 +3455,6 @@ retry:
 
                     // Read rotor state for helicopters and planes
                     eClientVehicleType vehicleType = pVehicle->GetVehicleType();
-                    bool rotorState = true;
-
                     if (vehicleType == CLIENTVEHICLE_HELI || vehicleType == CLIENTVEHICLE_PLANE)
                     {
                         pVehicle->SetVehicleRotorState(bitStream.ReadBit(), true);

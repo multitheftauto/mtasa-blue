@@ -406,11 +406,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 }
 
                 // Read rotor state
-                bool rotorState;
-                if (BitStream.ReadBit(rotorState))
-                {
-                    pVehicle->SetRotorState(rotorState);
-                }
+                pVehicle->SetRotorState(BitStream.ReadBit());
             }
 
             pSourcePlayer->GetPad()->NewControllerState(ControllerState);
