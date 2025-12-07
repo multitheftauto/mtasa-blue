@@ -35,18 +35,27 @@ void CClientModelManager::RemoveAll(void)
 
 void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
 {
-    if (m_Models[pModel->GetModelID()] != nullptr)
+    int modelId = pModel->GetModelID();
+    
+    if (modelId < 0 || modelId >= static_cast<int>(g_pGame->GetBaseIDforCOL()))
+        return;
+    
+    if (m_Models[modelId] != nullptr)
     {
-        dassert(m_Models[pModel->GetModelID()].get() == pModel.get());
+        dassert(m_Models[modelId].get() == pModel.get());
         return;
     }
-    m_Models[pModel->GetModelID()] = pModel;
+    m_Models[modelId] = pModel;
     m_modelCount++;
 }
 
 bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 {
     int modelId = pModel->GetModelID();
+    
+    if (modelId < 0 || modelId >= static_cast<int>(g_pGame->GetBaseIDforCOL()))
+        return false;
+    
     if (m_Models[modelId] != nullptr)
     {
         CResource* parentResource = m_Models[modelId]->GetParentResource();
@@ -77,9 +86,16 @@ int CClientModelManager::GetFirstFreeModelID(void)
 int CClientModelManager::GetFreeTxdModelID()
 {
     std::uint16_t usTxdId = g_pGame->GetPools()->GetTxdPool().GetFreeTextureDictonarySlot();
-    if (usTxdId == -1)
+    if (usTxdId == static_cast<std::uint16_t>(-1))
         return INVALID_MODEL_ID;
-    return MAX_MODEL_DFF_ID + usTxdId;
+
+    const int iModelID = MAX_MODEL_DFF_ID + usTxdId;
+    
+    const uint maxStreamingID = g_pGame->GetCountOfAllFileIDs();
+    if (iModelID >= MAX_MODEL_TXD_ID || iModelID >= static_cast<int>(maxStreamingID))
+        return INVALID_MODEL_ID;
+
+    return iModelID;
 }
 
 std::shared_ptr<CClientModel>  CClientModelManager::FindModelByID(int iModelID)
