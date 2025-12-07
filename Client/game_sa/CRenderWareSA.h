@@ -137,6 +137,8 @@ public:
     void      InitTextureWatchHooks();
     void      StreamingAddedTexture(unsigned short usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);
     void      StreamingRemovedTxd(unsigned short usTxdId);
+    void      RemoveStreamingTexture(unsigned short usTxdId, CD3DDUMMY* pD3DData);
+    bool      IsTexInfoRegistered(CD3DDUMMY* pD3DData) const;
     void      ScriptAddedTxd(RwTexDictionary* pTxd);
     void      ScriptRemovedTexture(RwTexture* pTex);
     void      SpecialAddedTexture(RwTexture* texture, const char* szTextureName = NULL);
@@ -146,6 +148,9 @@ public:
 
     static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
+
+    // Rebind clump material textures to current TXD textures (fixes stale texture pointers after TXD reload
+    void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) override;
 
     static const char* GetInternalTextureName(const char* szExternalName);
     static const char* GetExternalTextureName(const char* szInternalName);

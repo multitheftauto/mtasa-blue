@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 #include <array>
+#include <unordered_set>
 #include <CMatrix.h>
 #include <core/CCoreInterface.h>
 #define RWFUNC_IMPLEMENT
@@ -345,16 +346,55 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 
 //
 // Returns list of atomics inside a clump
+// Uses a visited set to detect cycles in corrupted linked lists
 //
 void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList)
 {
-    RpClumpForAllAtomics(
-        pClump,
-        [](RpAtomic* pAtomic, void* pData) {
-            reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
+    // Track visited atomics to detect cycles from corrupted linked lists.
+    struct VisitedTracker
+    {
+        std::vector<RpAtomic*>* pList;
+        std::unordered_set<void*> visited;
+        std::size_t iterations;
+        bool bStop;
+        std::size_t maxAtomics;
+        
+        VisitedTracker(std::vector<RpAtomic*>* list, std::size_t maxCount)
+            : pList(list), iterations(0), bStop(false), maxAtomics(maxCount)
+        {
+        }
+    };
+
+    auto ForAllAtomicsCB = [](RpAtomic* pAtomic, void* pData) -> bool {
+        auto* t = reinterpret_cast<VisitedTracker*>(pData);
+
+        if (t->bStop)
+            return false;  // Stop iteration once we decided to bail
+
+        if (++t->iterations > t->maxAtomics)
+        {
+            t->bStop = true;
+            return false;
+        }
+
+        // Check if we've seen this atomic before (cycle detection)
+        if (t->visited.find(pAtomic) != t->visited.end())
+        {
+            // Skip duplicates but keep iterating to avoid truncating legitshared atomics
             return true;
-        },
-        &outAtomicList);
+        }
+
+        t->visited.insert(pAtomic);
+
+        if (pAtomic && SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
+            t->pList->push_back(pAtomic);
+
+        return true;
+    };
+
+    VisitedTracker tracker(&outAtomicList, 4096);
+
+    RpClumpForAllAtomics(pClump, ForAllAtomicsCB, &tracker);
 }
 
 //
@@ -396,6 +436,94 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
         return false;
 
     return true;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::RebindClumpTexturesToTxd
+//
+// Rebinds all material textures in a clump to current TXD textures.
+// This fixes stale texture pointers that occur when a TXD is reloaded
+// after a custom DFF has been loaded. Without this fix, shader texture
+// replacement fails because the materials point to old/destroyed textures.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId)
+{
+    if (!pClump || !SharedUtil::IsReadablePointer(pClump, sizeof(RpClump)))
+        return;
+
+    RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
+    if (!pTxd || !SharedUtil::IsReadablePointer(pTxd, sizeof(RwTexDictionary)))
+        return;
+
+    // Iterate through all atomics in the clump
+    std::vector<RpAtomic*> atomicList;
+    GetClumpAtomicList(pClump, atomicList);
+
+    for (RpAtomic* pAtomic : atomicList)
+    {
+        if (!pAtomic || !SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
+            continue;
+
+        RpGeometry* pGeometry = pAtomic->geometry;
+        if (!pGeometry || !SharedUtil::IsReadablePointer(pGeometry, sizeof(RpGeometry)))
+            continue;
+
+        RpMaterials& materials = pGeometry->materials;
+
+        // Validate materials array exists and entries is sane
+        if (!materials.materials || materials.entries <= 0)
+            continue;
+
+        // Sanity check - reject obviously corrupted values.
+        // Normal geometry has at most a few hundred materials.
+        constexpr int MAX_REASONABLE_MATERIALS = 10000;
+        int materialCount = materials.entries;
+        if (materialCount > MAX_REASONABLE_MATERIALS)
+            continue;
+
+        // Validate materials array is readable
+        if (!SharedUtil::IsReadablePointer(materials.materials, materialCount * sizeof(RpMaterial*)))
+            continue;
+
+        // Iterate through all materials in the geometry
+        for (int idx = 0; idx < materialCount; ++idx)
+        {
+            RpMaterial* pMaterial = materials.materials[idx];
+            if (!pMaterial || !SharedUtil::IsReadablePointer(pMaterial, sizeof(RpMaterial)))
+                continue;
+
+            RwTexture* pOldTexture = pMaterial->texture;
+            if (!pOldTexture || !SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
+                continue;
+
+            // Get the current texture's name (RwTexture::name is char[32], always check first char)
+            const char* szTextureName = pOldTexture->name;
+            if (!szTextureName[0])
+                continue;
+
+            // Look up the texture by name from the current TXD
+            RwTexture* pCurrentTexture = RwTexDictionaryFindNamedTexture(pTxd, szTextureName);
+
+            // Also try internal name mapping (e.g., "remap" -> "#emap")
+            if (!pCurrentTexture)
+            {
+                const char* szInternalName = GetInternalTextureName(szTextureName);
+                // GetInternalTextureName returns input if no mapping, so compare pointers first
+                if (szInternalName && szInternalName != szTextureName)
+                    pCurrentTexture = RwTexDictionaryFindNamedTexture(pTxd, szInternalName);
+            }
+
+            // If we found a texture and it's different from the material's current texture, update it
+            // Validate the found texture to prevent crash from corrupted/freed texture in TXD
+            if (pCurrentTexture && pCurrentTexture != pOldTexture && 
+                SharedUtil::IsReadablePointer(pCurrentTexture, sizeof(RwTexture)))
+            {
+                RpMaterialSetTexture(pMaterial, pCurrentTexture);
+            }
+        }
+    }
 }
 
 // Replaces a vehicle/weapon/ped model
