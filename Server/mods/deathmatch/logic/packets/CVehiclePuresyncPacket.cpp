@@ -399,11 +399,10 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 ControllerState.RightShoulder2 = BitStream.ReadBit() * 255;
 
                 // Read rotor speed
-                float rotorSpeed;
-                if (BitStream.Read(rotorSpeed))
-                {
-                    pVehicle->SetRotorSpeed(rotorSpeed);
-                }
+                SFloatSync<8, 17> rotorSpeed;
+                if (!BitStream.Read(&rotorSpeed))
+                    return false;
+                pVehicle->SetRotorSpeed(rotorSpeed.data.fValue);
 
                 // Read rotor state
                 pVehicle->SetRotorState(BitStream.ReadBit());
@@ -617,7 +616,9 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.WriteBit(ControllerState.RightShoulder2 != 0);
 
                 // Write rotor speed
-                BitStream.Write(pVehicle->GetRotorSpeed());
+                SFloatSync<8, 17> rotorSpeed;
+                rotorSpeed.data.fValue = pVehicle->GetRotorSpeed();
+                BitStream.Write(&rotorSpeed);
 
                 // Write rotor state
                 BitStream.WriteBit(pVehicle->GetRotorState());
