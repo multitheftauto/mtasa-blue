@@ -1311,18 +1311,8 @@ const char* CRenderWareSA::GetTextureName(CD3DDUMMY* pD3DData)
     return "";
 }
 
-//
-// CFastHashMap functions
-//
-CD3DDUMMY* GetEmptyMapKey(CD3DDUMMY**)
-{
-    return FAKE_D3DTEXTURE_EMPTY_KEY;
-}
-
-CD3DDUMMY* GetDeletedMapKey(CD3DDUMMY**)
-{
-    return FAKE_D3DTEXTURE_DELETED_KEY;
-}
+// Note: GetEmptyMapKey/GetDeletedMapKey for CD3DDUMMY* are now declared in CRenderWareSA.ShaderSupport.h
+// to ensure they are visible before CFastHashMap<CD3DDUMMY*, ...> template instantiatin
 
 RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
 {

@@ -190,8 +190,18 @@ void CRenderWareSA::PulseWorldTextureWatch()
             for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
             {
                 RwTexture*  texture = *iter;
+                
+                // Check texture pointer - TXD could have been unloaded between GetTxdTextures and now,
+                // leaving us with a dangling pointer that could contain garbage data
+                if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
+                    continue;
+                
                 const char* szTextureName = texture->name;
-                CD3DDUMMY*  pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+                
+                // Check raster pointer
+                CD3DDUMMY*  pD3DData = (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster)))
+                    ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+                
                 if (!MapContains(m_SpecialTextures, texture))
                     StreamingAddedTexture(action.usTxdId, szTextureName, pD3DData);
             }
@@ -472,8 +482,14 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
 void CRenderWareSA::DestroyTexInfo(STexInfo* pTexInfo)
 {
     // Remove from D3DData lookup map
-    if (MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData) == pTexInfo)
+    // Always remove if the current entry matches this pTexInfo to prevent dangling pointers.
+    // Multiple STexInfo objects could reference the same D3D data (e.g., same texture in different TXDs),
+    // so we only remove if this specific STexInfo is the registered one.
+    STexInfo* pCurrentEntry = MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
+    if (pCurrentEntry == pTexInfo)
+    {
         MapRemove(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
+    }
 
     delete pTexInfo;
 }
