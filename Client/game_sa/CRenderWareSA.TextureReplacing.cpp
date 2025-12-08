@@ -521,22 +521,44 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 auto* pRenderWareSA = pGame->GetRenderWareSA();
                 if (pRenderWareSA)
                 {
+                    // When multiple replacement sets share the same TXD, only re-apply the FIRST one
+                    // to avoid texture name collisions. Other replacement sets will lose their textures
+                    // on this TXD until explicitly re-applied by the script.
+                    bool bTxdAlreadyPopulated = false;
+                    
                     for (auto& entry : replacementsToReapply)
                     {
-                        for (unsigned short modelId : entry.second)
+                        if (bTxdAlreadyPopulated)
                         {
-                            const bool applied = pRenderWareSA->ModelInfoTXDAddTextures(entry.first, modelId);
+                            // TXD already has textures from another replacement set.
+                            // Do NOT restore model tracking - let the replacement set remain untracked
+                            // for this TXD/models so scripts can re-apply it later if needed.
+                            continue;
+                        }
+                        
+                        // Re-apply this replacement set to its first model only.
+                        // Additional models using the same replacement+TXD will be handled
+                        // by ModelInfoTXDAddTextures's check in usedInTxdIds.
+                        if (!entry.second.empty())
+                        {
+                            unsigned short firstModelId = entry.second[0];
+                            const bool applied = pRenderWareSA->ModelInfoTXDAddTextures(entry.first, firstModelId);
                             if (applied)
                             {
-                                if (!ListContains(entry.first->usedInModelIds, modelId))
-                                    entry.first->usedInModelIds.push_back(modelId);
+                                bTxdAlreadyPopulated = true;
+                                // ModelInfoTXDAddTextures already added firstModelId to usedInModelIds
+                                
+                                // For remaining models with the same replacement, restore tracking.
+                                // The check at line 734 (usedInTxdIds) will handle them (adds to usedInModelIds without re-adding textures).
+                                for (size_t i = 1; i < entry.second.size(); ++i)
+                                {
+                                    unsigned short modelId = entry.second[i];
+                                    // Call ModelInfoTXDAddTextures which will hit the early-out at line 734
+                                    // and just add the modelId to tracking
+                                    pRenderWareSA->ModelInfoTXDAddTextures(entry.first, modelId);
+                                }
                             }
-                            else
-                            {
-                                // Restore bookkeeping so future retries are possible
-                                if (!ListContains(entry.first->usedInModelIds, modelId))
-                                    entry.first->usedInModelIds.push_back(modelId);
-                            }
+                            // If applied == false, leave models untracked
                         }
                     }
                 }
