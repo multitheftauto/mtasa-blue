@@ -14,6 +14,7 @@
 #include <game/CRenderWare.h>
 #include "CModelInfoSA.h"
 #include "CRenderWareSA.ShaderSupport.h"
+#include <unordered_set>
 
 class CMatchChannelManager;
 struct CModelTexturesInfo;
@@ -99,6 +100,7 @@ public:
     bool               GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames);
     void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, unsigned short usTxdId);
     static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
+    static void        GetTxdTextures(std::unordered_set<RwTexture*>& outTextureSet, RwTexDictionary* pTXD);
     const char*        GetTextureName(CD3DDUMMY* pD3DData);
     void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, unsigned short usModelId, int iTypeMask);
     SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData);
@@ -133,6 +135,7 @@ public:
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
     static bool  StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList);
+    static bool  StaticGetTextureSetCB(RwTexture* texture, std::unordered_set<RwTexture*>* pTextureSet);
 
     void      InitTextureWatchHooks();
     void      StreamingAddedTexture(unsigned short usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);
