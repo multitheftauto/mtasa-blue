@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <tuple>
+#include <unordered_set>
 
 class CClientEntityBase;
 class CD3DDUMMY;
@@ -45,8 +46,8 @@ struct SReplacementTextures
 
     std::vector<RwTexture*> textures;              // List of textures we want to inject into TXD's
     std::vector<SPerTxd>    perTxdList;            // TXD's which have been modified
-    std::vector<unsigned short> usedInTxdIds;
-    std::vector<unsigned short> usedInModelIds;
+    std::unordered_set<unsigned short> usedInTxdIds;   // O(1) contains/erase for streaming hot path
+    std::unordered_set<unsigned short> usedInModelIds; // O(1) contains/erase for streaming hot path
     bool                    bHasRequestedSpace = false;
 };
 

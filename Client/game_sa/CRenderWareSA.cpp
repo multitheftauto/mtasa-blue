@@ -1296,6 +1296,70 @@ bool CRenderWareSA::StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::GetTxdTextures (unordered_set overload)
+//
+// Get textures from a TXD into unordered_set for O(1) contains
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::GetTxdTextures(std::unordered_set<RwTexture*>& outTextureSet, RwTexDictionary* pTXD)
+{
+    if (!pTXD)
+        return;
+
+    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
+        return;
+
+    RwListEntry* firstNode = pTXD->textures.root.next;
+    if (!SharedUtil::IsReadablePointer(firstNode, sizeof(RwListEntry)))
+        return;
+
+    // Check for empty list (next points back to root - valid case)
+    if (firstNode == &pTXD->textures.root)
+        return;  // Empty TXD is valid
+
+    RwTexture* firstTexture = (RwTexture*)((char*)firstNode - 8);
+    if (!SharedUtil::IsReadablePointer(firstTexture, sizeof(RwTexture)))
+        return;
+
+    if (!SharedUtil::IsReadablePointer(firstNode->next, sizeof(RwListEntry)))
+        return;
+
+    constexpr std::size_t kMaxReasonableTextures = 8192;
+    if (outTextureSet.size() >= kMaxReasonableTextures)
+    {
+        LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                 SString("Texture set already contains %zu textures (limit: %zu)", outTextureSet.size(), kMaxReasonableTextures), 5422);
+        return;
+    }
+
+    if (outTextureSet.empty())
+        outTextureSet.reserve(16);
+
+    RwTexDictionaryForAllTextures(pTXD, StaticGetTextureSetCB, &outTextureSet);
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::StaticGetTextureSetCB
+//
+// Callback for unordered_set variant of GetTxdTextures
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::StaticGetTextureSetCB(RwTexture* texture, std::unordered_set<RwTexture*>* pTextureSet)
+{
+    if (!texture || !pTextureSet)
+        return false;
+
+    constexpr std::size_t kMaxReasonableTextures = 8192;
+    if (pTextureSet->size() >= kMaxReasonableTextures)
+        return false;
+
+    pTextureSet->insert(texture);
+    return true;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::GetTextureName
 //
 // Only called by CRenderItemManager::GetVisibleTextureNames ?
