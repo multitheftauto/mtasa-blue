@@ -1145,6 +1145,14 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
 
     AddCapsReport(Adapter, pDirect3D, *ppReturnedDeviceInterface, bFixCaps);
 
+    // Get current refresh rate and set it
+    if (hResult == D3D_OK)
+    {
+        D3DDISPLAYMODE DisplayMode;
+        if (pDirect3D->GetAdapterDisplayMode(Adapter, &DisplayMode) == D3D_OK)
+            CCore::GetSingleton().SetCurrentRefreshRate(DisplayMode.RefreshRate);
+    }
+
     if (uiDiagnosticLogLevel)
     {
         // Prevent statup warning in loader
