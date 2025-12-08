@@ -23,9 +23,9 @@ CClientTXD::~CClientTXD()
     g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);
 
     // Restream affected models
-    for (uint i = 0; i < m_ReplacementTextures.usedInModelIds.size(); i++)
+    for (unsigned short modelId : m_ReplacementTextures.usedInModelIds)
     {
-        Restream(m_ReplacementTextures.usedInModelIds[i]);
+        Restream(modelId);
     }
 
     // Remove us from all the clothes replacement doo dah
