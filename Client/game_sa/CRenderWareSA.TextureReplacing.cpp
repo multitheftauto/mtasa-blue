@@ -112,9 +112,11 @@ namespace
         {
             // TXD pointer is stale/invalid. We cannot safely manipulate the linked list
             // because neighboring nodes would still point to this texture, causing corruption
-            // when they're traversed. Just null the txd pointer and leave list pointers alone.
-            // The texture is effectively orphaned from MTA's perspective.
+            // when they're traversed. Orphan the texture and self-reference list pointers
+            // to prevent crashes during traversal.
             pTexture->txd = nullptr;
+            pTexture->TXDList.next = &pTexture->TXDList;
+            pTexture->TXDList.prev = &pTexture->TXDList;
         }
         // If txd is already nullptr, texture is already orphaned
     }
@@ -159,22 +161,45 @@ namespace
             if (!pTexture || !SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
                 continue;
 
-            // Detach safely if pointing to the dead TXD: unlink first, then null the node
+            // Detach safely if pointing to the dead TXD
+            // RwTexDictionaryRemoveTexture handles unlinking and self-referencing list pointers
+            bool bNeedsDestruction = false;
             if (bDeadTxdValid && pTexture->txd == pDeadTxd)
             {
                 CRenderWareSA::RwTexDictionaryRemoveTexture(pDeadTxd, pTexture);
+                // Only queue if successfully orphaned (txd set to nullptr by RemoveTexture)
+                if (pTexture->txd == nullptr)
+                {
+                    bNeedsDestruction = true;
+                }
+                else
+                {
+                    // RemoveTexture failed unexpectedly - manually orphan to prevent corruption
+                    pTexture->txd = nullptr;
+                    pTexture->TXDList.next = &pTexture->TXDList;
+                    pTexture->TXDList.prev = &pTexture->TXDList;
+                    bNeedsDestruction = true;
+                }
+            }
+            else if (!bDeadTxdValid && pTexture->txd == nullptr)
+            {
+                // Texture already orphaned with null txd - ensure list pointers are self-referencing
+                pTexture->TXDList.next = &pTexture->TXDList;
+                pTexture->TXDList.prev = &pTexture->TXDList;
+                bNeedsDestruction = true;
+            }
+            else if (!bDeadTxdValid && pTexture->txd == pDeadTxd)
+            {
+                // TXD is unreadable but texture still points to it - manually orphan without unlinking
+                // Cannot call RwTexDictionaryRemoveTexture on freed memory
                 pTexture->txd = nullptr;
                 pTexture->TXDList.next = &pTexture->TXDList;
                 pTexture->TXDList.prev = &pTexture->TXDList;
-            }
-            else if (!pDeadTxd && pTexture->txd == nullptr)
-            {
-                pTexture->TXDList.next = &pTexture->TXDList;
-                pTexture->TXDList.prev = &pTexture->TXDList;
+                bNeedsDestruction = true;
             }
 
             // Queue for destruction if orphaned and is a copy
-            if (pTexture->txd == nullptr)
+            if (bNeedsDestruction)
             {
                 if (perTxdInfo.bTexturesAreCopies)
                 {
@@ -191,21 +216,44 @@ namespace
                 continue;
 
             // Detach safely if still linked to the dead TXD
+            // RwTexDictionaryRemoveTexture handles unlinking and self-referencing list pointers
+            bool bNeedsDestruction = false;
             if (bDeadTxdValid && pReplaced->txd == pDeadTxd)
             {
                 CRenderWareSA::RwTexDictionaryRemoveTexture(pDeadTxd, pReplaced);
+                // Only queue if successfully orphaned (txd set to nullptr by RemoveTexture)
+                if (pReplaced->txd == nullptr)
+                {
+                    bNeedsDestruction = true;
+                }
+                else
+                {
+                    // RemoveTexture failed unexpectedly - manually orphan to prevent corruption
+                    pReplaced->txd = nullptr;
+                    pReplaced->TXDList.next = &pReplaced->TXDList;
+                    pReplaced->TXDList.prev = &pReplaced->TXDList;
+                    bNeedsDestruction = true;
+                }
+            }
+            else if (!bDeadTxdValid && pReplaced->txd == nullptr)
+            {
+                // Texture already orphaned with null txd - ensure list pointers are self-referencing
+                pReplaced->TXDList.next = &pReplaced->TXDList;
+                pReplaced->TXDList.prev = &pReplaced->TXDList;
+                bNeedsDestruction = true;
+            }
+            else if (!bDeadTxdValid && pReplaced->txd == pDeadTxd)
+            {
+                // TXD is unreadable but texture still points to it - manually orphan without unlinking
+                // Cannot call RwTexDictionaryRemoveTexture on freed memory
                 pReplaced->txd = nullptr;
                 pReplaced->TXDList.next = &pReplaced->TXDList;
                 pReplaced->TXDList.prev = &pReplaced->TXDList;
-            }
-            else if (!pDeadTxd && pReplaced->txd == nullptr)
-            {
-                pReplaced->TXDList.next = &pReplaced->TXDList;
-                pReplaced->TXDList.prev = &pReplaced->TXDList;
+                bNeedsDestruction = true;
             }
 
             // Queue for destruction if orphaned
-            if (pReplaced->txd == nullptr)
+            if (bNeedsDestruction)
             {
                 outOriginalsToDestroy.insert(pReplaced);
             }
@@ -524,7 +572,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 }
                 else
                 {
-                    // Failed to load
+                    // BLOCKING request failed to load TXD - streaming issue or its unavailable
                     MapRemove(ms_ModelTexturesInfoMap, usTxdId);
                     return nullptr;
                 }
@@ -613,7 +661,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
     }
 
     if (!pTxd)
-        return nullptr;
+        return nullptr;  // BLOCKING request failed - streaming issue or its unavailable
 
     // Add new info
     auto [iter, inserted] = ms_ModelTexturesInfoMap.emplace(usTxdId, CModelTexturesInfo{});
@@ -678,8 +726,8 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
         if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
             continue;
 
-        // Detach from the source TXD: clear both the TXD pointer and the linked list pointers.
-        // The TXD will be destroyed shortly, so these pointers would become dangling otherwise.
+        // Detach from the source TXD to prevent dangling references when TXD is destroyed.
+        // Make texture orphaned (txd=nullptr) with self-referencing list pointers.
         pTexture->txd = nullptr;
         pTexture->TXDList.next = &pTexture->TXDList;
         pTexture->TXDList.prev = &pTexture->TXDList;
@@ -853,8 +901,16 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     {
         RwListEntry* pNode = pInfo->pTxd->textures.root.next;
         RwListEntry* pRoot = &pInfo->pTxd->textures.root;
+        // Cycle detection: Reserve typical TXD size to minimize allocations (most TXDs have 10-50 textures)
+        // Note: Only detects cycles, not non-cyclic corruption (e.g., nodes pointing to freed memory)
+        std::unordered_set<RwListEntry*> visitedNodes;
+        visitedNodes.reserve(32);
         while (pNode != pRoot && SharedUtil::IsReadablePointer(pNode, sizeof(RwListEntry)))
         {
+            // Detect cycles - prevents client freeze if somehow list is corrupted
+            if (!visitedNodes.insert(pNode).second)
+                break;  // Already visited this node - circular list detected
+            
             RwTexture* pTxdTexture = (RwTexture*)((char*)pNode - offsetof(RwTexture, TXDList));
             if (SharedUtil::IsReadablePointer(pTxdTexture, sizeof(RwTexture)))
             {
@@ -1228,8 +1284,15 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         {
             RwListEntry* pNode = pInfo->pTxd->textures.root.next;
             RwListEntry* pRoot = &pInfo->pTxd->textures.root;
+            // Cycle detection: Reserve capacity to minimize allocations
+            std::unordered_set<RwListEntry*> visitedNodes;
+            visitedNodes.reserve(32);
             while (pNode != pRoot && SharedUtil::IsReadablePointer(pNode, sizeof(RwListEntry)))
             {
+                // Detect cycles - prevents client freeze if list is somehow corrupted
+                if (!visitedNodes.insert(pNode).second)
+                    break;  // Already visited this node - circular list detected
+                
                 RwTexture* pTxdTexture = (RwTexture*)((char*)pNode - offsetof(RwTexture, TXDList));
                 if (SharedUtil::IsReadablePointer(pTxdTexture, sizeof(RwTexture)))
                 {
@@ -1365,8 +1428,15 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         {
             RwListEntry* pNode = pInfo->pTxd->textures.root.next;
             RwListEntry* pRoot = &pInfo->pTxd->textures.root;
+            // Cycle detection: Reserve capacity to minimize allocations
+            std::unordered_set<RwListEntry*> visitedNodes;
+            visitedNodes.reserve(32);
             while (pNode != pRoot && SharedUtil::IsReadablePointer(pNode, sizeof(RwListEntry)))
             {
+                // Detect cycles - prevents client freeze if list is somehow corrupted
+                if (!visitedNodes.insert(pNode).second)
+                    break;  // Already visited this node - circular list detected
+                
                 RwTexture* pTxdTexture = (RwTexture*)((char*)pNode - offsetof(RwTexture, TXDList));
                 if (SharedUtil::IsReadablePointer(pTxdTexture, sizeof(RwTexture)))
                 {
