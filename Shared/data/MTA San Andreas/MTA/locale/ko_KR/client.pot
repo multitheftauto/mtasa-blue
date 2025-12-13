@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-23 01:11+0000\n"
-"PO-Revision-Date: 2025-11-23 01:30\n"
+"POT-Creation-Date: 2025-12-03 04:26+0000\n"
+"PO-Revision-Date: 2025-12-03 04:31\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -166,12 +166,12 @@ msgstr "MTA:SA를 실행하는 데 문제가 있습니까?\n\n"
 "다음 설정을 변경하시겠습니까?"
 
 #: Client/loader/MainFunctions.cpp:460 Client/core/CSettings.cpp:1161
-#: Client/core/CSettings.cpp:1660
+#: Client/core/CSettings.cpp:1672
 msgid "Fullscreen mode:"
 msgstr "전체 화면 모드:"
 
 #: Client/loader/MainFunctions.cpp:460 Client/core/CSettings.cpp:1171
-#: Client/core/CSettings.cpp:2323
+#: Client/core/CSettings.cpp:2337
 msgid "Borderless window"
 msgstr "경계 없는 창 모드"
 
@@ -231,8 +231,8 @@ msgstr "MTA:SA를 다시 시작하는 동안 문제가 발생했습니다.\n\n"
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
 #: Client/core/CConnectManager.cpp:329 Client/core/CConnectManager.cpp:415
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
-#: Client/core/CSettings.cpp:3825 Client/core/CSettings.cpp:5201
-#: Client/core/CSettings.cpp:5229 Client/core/CSettings.cpp:5947
+#: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5215
+#: Client/core/CSettings.cpp:5243 Client/core/CSettings.cpp:5982
 #: Client/core/CCore.cpp:1352 Client/core/CGUI.cpp:94
 #: Client/core/DXHook/CDirect3DHook9.cpp:128
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1601
@@ -240,17 +240,17 @@ msgstr "MTA:SA를 다시 시작하는 동안 문제가 발생했습니다.\n\n"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1758
 #: Client/game_sa/CGameSA.cpp:263 Client/game_sa/CGameSA.cpp:274
-#: Client/mods/deathmatch/logic/CClientGame.cpp:658
-#: Client/mods/deathmatch/logic/CClientGame.cpp:726
-#: Client/mods/deathmatch/logic/CClientGame.cpp:750
-#: Client/mods/deathmatch/logic/CClientGame.cpp:772
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1429
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:733
+#: Client/mods/deathmatch/logic/CClientGame.cpp:757
+#: Client/mods/deathmatch/logic/CClientGame.cpp:779
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1191
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1271
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1350
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1387
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1436
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1448
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:380
@@ -478,10 +478,10 @@ msgstr "호환성 설정 업데이트"
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/loader/Dialogs.cpp:63 Client/core/CVersionUpdater.cpp:1635
 #: Client/core/CVersionUpdater.cpp:1653 Client/core/CVersionUpdater.cpp:1922
-#: Client/core/CVersionUpdater.cpp:1941 Client/core/CSettings.cpp:2095
-#: Client/core/CSettings.cpp:2119 Client/core/CSettings.cpp:5616
-#: Client/core/CSettings.cpp:5690 Client/core/CSettings.cpp:5720
-#: Client/core/CSettings.cpp:5769 Client/core/CSettings.cpp:5831
+#: Client/core/CVersionUpdater.cpp:1941 Client/core/CSettings.cpp:2109
+#: Client/core/CSettings.cpp:2133 Client/core/CSettings.cpp:5630
+#: Client/core/CSettings.cpp:5704 Client/core/CSettings.cpp:5734
+#: Client/core/CSettings.cpp:5783 Client/core/CSettings.cpp:5845
 #: Client/core/CMainMenu.cpp:1238 Client/core/CQuestionBox.cpp:195
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
@@ -490,10 +490,10 @@ msgstr "예"
 
 #: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
 #: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
-#: Client/core/CVersionUpdater.cpp:1940 Client/core/CSettings.cpp:2094
-#: Client/core/CSettings.cpp:2118 Client/core/CSettings.cpp:5615
-#: Client/core/CSettings.cpp:5689 Client/core/CSettings.cpp:5719
-#: Client/core/CSettings.cpp:5768 Client/core/CSettings.cpp:5830
+#: Client/core/CVersionUpdater.cpp:1940 Client/core/CSettings.cpp:2108
+#: Client/core/CSettings.cpp:2132 Client/core/CSettings.cpp:5629
+#: Client/core/CSettings.cpp:5703 Client/core/CSettings.cpp:5733
+#: Client/core/CSettings.cpp:5782 Client/core/CSettings.cpp:5844
 #: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 msgid "No"
@@ -507,7 +507,7 @@ msgstr "아니오"
 #: Client/core/CVersionUpdater.cpp:2031 Client/core/CVersionUpdater.cpp:2183
 #: Client/core/CVersionUpdater.cpp:2192 Client/core/CVersionUpdater.cpp:2201
 #: Client/core/CVersionUpdater.cpp:2215 Client/core/CSettings.cpp:561
-#: Client/core/CSettings.cpp:5968 Client/core/CMainMenu.cpp:1258
+#: Client/core/CSettings.cpp:6003 Client/core/CMainMenu.cpp:1258
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
 msgstr "확인"
@@ -524,7 +524,7 @@ msgstr "도움말"
 #. Cancel button
 #: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
 #: Client/core/CVersionUpdater.cpp:1869 Client/core/CVersionUpdater.cpp:1904
-#: Client/core/CSettings.cpp:566 Client/core/CSettings.cpp:5967
+#: Client/core/CSettings.cpp:566 Client/core/CSettings.cpp:6002
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
@@ -698,47 +698,47 @@ msgstr ""
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
-#: Client/mods/deathmatch/logic/CClientGame.cpp:674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:681
 msgid "CONNECTING"
 msgstr "연결 중"
 
 #: Client/core/CConnectManager.cpp:271
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1350
 msgid "Connection timed out"
 msgstr "연결 시간이 초과되었습니다."
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1391
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
 msgid "Disconnected: unknown protocol error"
 msgstr "연결 끊김: 알 수 없는 프로토콜 오류"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1395
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1402
 msgid "Disconnected: disconnected remotely"
 msgstr "연결 끊김: 원격으로 연결이 끊어짐"
 
 #: Client/core/CConnectManager.cpp:297
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1399
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: connection lost remotely"
 msgstr "연결 끊김: 원격으로 연결이 끊어짐"
 
 #: Client/core/CConnectManager.cpp:301
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1403
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1410
 msgid "Disconnected: you are banned from this server"
 msgstr "연결 끊김: 이 서버에서 밴되었습니다"
 
 #: Client/core/CConnectManager.cpp:308
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1411
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1418
 msgid "Disconnected: disconnected from the server"
 msgstr "연결 끊김: 서버와의 연결이 끊어졌습니다"
 
 #: Client/core/CConnectManager.cpp:312
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1415
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1422
 msgid "Disconnected: connection to the server was lost"
 msgstr "연결 끊김: 서버에 대한 연결이 끊어졌습니다"
 
 #: Client/core/CConnectManager.cpp:319
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1423
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1430
 msgid "Disconnected: connection was refused"
 msgstr "연결 끊김: 연결이 거부되었습니다"
 
@@ -875,7 +875,7 @@ msgstr "다운로드 완료"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - _DialogUpdateResult의 알 수 없는 문제"
 
-#: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5717
+#: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5731
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "사용자 정의된 GTA:SA 파일"
 
@@ -1193,7 +1193,7 @@ msgid "Play mode:"
 msgstr "재생 모드:"
 
 #: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1548
-#: Client/core/CSettings.cpp:2902
+#: Client/core/CSettings.cpp:2916
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 msgid "General"
 msgstr "일반"
@@ -1214,15 +1214,15 @@ msgstr "라디오 오토튠"
 msgid "Usertrack options"
 msgstr "사용자 트랙 설정"
 
-#: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:3987
+#: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:4001
 msgid "Radio"
 msgstr "라디오"
 
-#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:3989
+#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:4003
 msgid "Random"
 msgstr "랜덤"
 
-#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:3991
+#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:4005
 msgid "Sequential"
 msgstr "순차적"
 
@@ -1298,11 +1298,11 @@ msgstr "창 모드"
 msgid "DPI aware"
 msgstr "DPI aware"
 
-#: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2321
+#: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2335
 msgid "Standard"
 msgstr "기본"
 
-#: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2325
+#: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2339
 msgid "Borderless keep res"
 msgstr "테두리 없는 창 해상도 유지"
 
@@ -1314,58 +1314,58 @@ msgstr "밉 맵"
 msgid "V-Sync"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2225
+#: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2239
 msgid "Low"
 msgstr "낮음"
 
-#: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2227
+#: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2241
 msgid "Medium"
 msgstr "중간"
 
-#: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1743
-#: Client/core/CSettings.cpp:2229 Client/core/CSettings.cpp:4045
+#: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1755
+#: Client/core/CSettings.cpp:2243 Client/core/CSettings.cpp:4059
 msgid "High"
 msgstr "높음"
 
-#: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2231
+#: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2245
 msgid "Very high"
 msgstr "매우 높음"
 
 #: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
-#: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1674
-#: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:1877
-#: Client/core/CSettings.cpp:2235 Client/core/CSettings.cpp:4052
-#: Client/core/CSettings.cpp:4084 Client/core/CSettings.cpp:4130
-#: Client/core/CSettings.cpp:5361
+#: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1686
+#: Client/core/CSettings.cpp:1740 Client/core/CSettings.cpp:1889
+#: Client/core/CSettings.cpp:2249 Client/core/CSettings.cpp:4066
+#: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4144
+#: Client/core/CSettings.cpp:5375
 msgid "Off"
 msgstr "끄기"
 
-#: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2237
+#: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2251
 msgid "1x"
 msgstr "1x"
 
-#: Client/core/CSettings.cpp:1312 Client/core/CSettings.cpp:2239
+#: Client/core/CSettings.cpp:1312 Client/core/CSettings.cpp:2253
 msgid "2x"
 msgstr "2x"
 
-#: Client/core/CSettings.cpp:1313 Client/core/CSettings.cpp:2241
+#: Client/core/CSettings.cpp:1313 Client/core/CSettings.cpp:2255
 msgid "3x"
 msgstr "3x"
 
-#: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1676
-#: Client/core/CSettings.cpp:2247 Client/core/CSettings.cpp:4054
+#: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1688
+#: Client/core/CSettings.cpp:2261 Client/core/CSettings.cpp:4068
 msgid "Auto"
 msgstr "자동"
 
-#: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2249
+#: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2263
 msgid "4:3"
 msgstr "4:3"
 
-#: Client/core/CSettings.cpp:1328 Client/core/CSettings.cpp:2251
+#: Client/core/CSettings.cpp:1328 Client/core/CSettings.cpp:2265
 msgid "16:10"
 msgstr "16:10"
 
-#: Client/core/CSettings.cpp:1329 Client/core/CSettings.cpp:2253
+#: Client/core/CSettings.cpp:1329 Client/core/CSettings.cpp:2267
 msgid "16:9"
 msgstr "16:9"
 
@@ -1457,7 +1457,7 @@ msgstr ""
 msgid "Custom blacklist"
 msgstr "사용자 지정 블랙리스트"
 
-#: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1619
+#: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1625
 msgid "Enter a domain e.g. google.com"
 msgstr "도메인 입력 (예: google.com)"
 
@@ -1465,355 +1465,359 @@ msgstr "도메인 입력 (예: google.com)"
 msgid "Block"
 msgstr "차단"
 
-#: Client/core/CSettings.cpp:1600 Client/core/CSettings.cpp:1638
+#: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1646
 msgid "Domain"
 msgstr "도메인"
 
-#: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1640
+#: Client/core/CSettings.cpp:1604 Client/core/CSettings.cpp:1648
 msgid "Remove domain"
 msgstr "도메인 제거"
 
+#: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
+msgid "Remove all"
+msgstr ""
+
 #. Reset vecTemp
-#: Client/core/CSettings.cpp:1608
+#: Client/core/CSettings.cpp:1614
 msgid "Custom whitelist"
 msgstr "사용자 지정 화이트리스트"
 
-#: Client/core/CSettings.cpp:1627 Client/cefweb/CWebsiteRequests.cpp:51
+#: Client/core/CSettings.cpp:1633 Client/cefweb/CWebsiteRequests.cpp:51
 msgid "Allow"
 msgstr "허용"
 
 #. Misc section label
-#: Client/core/CSettings.cpp:1653
+#: Client/core/CSettings.cpp:1665
 msgid "Misc"
 msgstr "기타"
 
 #. Fast clothes loading
-#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1667
-#: Client/core/CSettings.cpp:5986
+#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1679
+#: Client/core/CSettings.cpp:6021
 msgid "Fast CJ clothes loading:"
 msgstr "빠른 CJ 옷 로딩:"
 
 #. Browser scan speed
-#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1681
-#: Client/core/CSettings.cpp:5988
+#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1693
+#: Client/core/CSettings.cpp:6023
 msgid "Browser speed:"
 msgstr "브라우저 속도:"
 
 #. Single download
-#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1695
-#: Client/core/CSettings.cpp:5990
+#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1707
+#: Client/core/CSettings.cpp:6025
 msgid "Single connection:"
 msgstr "단일 연결:"
 
 #. Packet tag
-#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1708
-#: Client/core/CSettings.cpp:5992
+#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1720
+#: Client/core/CSettings.cpp:6027
 msgid "Packet tag:"
 msgstr "패킷 태그:"
 
 #. Progress animation
-#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1721
-#: Client/core/CSettings.cpp:5994
+#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1733
+#: Client/core/CSettings.cpp:6029
 msgid "Progress animation:"
 msgstr "진행 애니메이션:"
 
 #. Process priority
-#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1734
-#: Client/core/CSettings.cpp:5984
+#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1746
+#: Client/core/CSettings.cpp:6019
 msgid "Process priority:"
 msgstr "프로세스 우선도:"
 
 #. Debug setting
-#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1748
-#: Client/core/CSettings.cpp:5996
+#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1760
+#: Client/core/CSettings.cpp:6031
 msgid "Debug setting:"
 msgstr "디버그 설정:"
 
 #. Streaming memory
-#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1771
-#: Client/core/CSettings.cpp:5998
+#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1783
+#: Client/core/CSettings.cpp:6033
 msgid "Streaming memory:"
 msgstr "스트리밍 메모리:"
 
 #. Update build type
-#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1891
+#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1903
 msgid "Update build type:"
 msgstr "빌드 유형 업데이트:"
 
 #. UpdateAutoInstall
-#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1870
+#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1882
 msgid "Install important updates:"
 msgstr "중요한 업데이트를 설치합니다:"
 
-#: Client/core/CSettings.cpp:1675 Client/core/CSettings.cpp:1703
-#: Client/core/CSettings.cpp:1716 Client/core/CSettings.cpp:4056
-#: Client/core/CSettings.cpp:4072 Client/core/CSettings.cpp:4079
+#: Client/core/CSettings.cpp:1687 Client/core/CSettings.cpp:1715
+#: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:4070
+#: Client/core/CSettings.cpp:4086 Client/core/CSettings.cpp:4093
 msgid "On"
 msgstr "켜기"
 
-#: Client/core/CSettings.cpp:1688 Client/core/CSettings.cpp:4061
+#: Client/core/CSettings.cpp:1700 Client/core/CSettings.cpp:4075
 msgid "Very slow"
 msgstr "매우 느리게"
 
-#: Client/core/CSettings.cpp:1689 Client/core/CSettings.cpp:1702
-#: Client/core/CSettings.cpp:1715 Client/core/CSettings.cpp:1729
-#: Client/core/CSettings.cpp:1755 Client/core/CSettings.cpp:1767
-#: Client/core/CSettings.cpp:1878 Client/core/CSettings.cpp:1898
-#: Client/core/CSettings.cpp:4063 Client/core/CSettings.cpp:4070
-#: Client/core/CSettings.cpp:4077 Client/core/CSettings.cpp:4086
-#: Client/core/CSettings.cpp:4123
+#: Client/core/CSettings.cpp:1701 Client/core/CSettings.cpp:1714
+#: Client/core/CSettings.cpp:1727 Client/core/CSettings.cpp:1741
+#: Client/core/CSettings.cpp:1767 Client/core/CSettings.cpp:1779
+#: Client/core/CSettings.cpp:1890 Client/core/CSettings.cpp:1910
+#: Client/core/CSettings.cpp:4077 Client/core/CSettings.cpp:4084
+#: Client/core/CSettings.cpp:4091 Client/core/CSettings.cpp:4100
+#: Client/core/CSettings.cpp:4137
 msgid "Default"
 msgstr "기본값"
 
-#: Client/core/CSettings.cpp:1690 Client/core/CSettings.cpp:4065
+#: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
 msgid "Fast"
 msgstr "빠르게"
 
-#: Client/core/CSettings.cpp:1741 Client/core/CSettings.cpp:4041
+#: Client/core/CSettings.cpp:1753 Client/core/CSettings.cpp:4055
 msgid "Normal"
 msgstr "보통"
 
-#: Client/core/CSettings.cpp:1742 Client/core/CSettings.cpp:4043
+#: Client/core/CSettings.cpp:1754 Client/core/CSettings.cpp:4057
 msgid "Above normal"
 msgstr "보통 이상"
 
-#: Client/core/CSettings.cpp:1778
+#: Client/core/CSettings.cpp:1790
 msgid "Min"
 msgstr "최소"
 
-#: Client/core/CSettings.cpp:1803
+#: Client/core/CSettings.cpp:1815
 msgid "Max"
 msgstr "최대"
 
 #. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1811
+#: Client/core/CSettings.cpp:1823
 msgid "Windows 8 compatibility:"
 msgstr "윈도우 8 호환성:"
 
-#: Client/core/CSettings.cpp:1815
+#: Client/core/CSettings.cpp:1827
 msgid "16-bit color"
 msgstr "16비트 색상"
 
-#: Client/core/CSettings.cpp:1820
+#: Client/core/CSettings.cpp:1832
 msgid "Mouse fix"
 msgstr "마우스 수정"
 
 #. Cache path info
-#: Client/core/CSettings.cpp:1838
+#: Client/core/CSettings.cpp:1850
 msgid "Client resource files:"
 msgstr "클라이언트 리소스 파일:"
 
-#: Client/core/CSettings.cpp:1842
+#: Client/core/CSettings.cpp:1854
 msgid "Show in Explorer"
 msgstr "탐색기에 표시"
 
 #. Process affinity
-#: Client/core/CSettings.cpp:1857
+#: Client/core/CSettings.cpp:1869
 msgid "Set CPU 0 affinity to improve game performance"
 msgstr ""
 
 #. Auto updater section label
-#: Client/core/CSettings.cpp:1863 Client/core/CSettings.cpp:1866
+#: Client/core/CSettings.cpp:1875 Client/core/CSettings.cpp:1878
 msgid "Auto updater"
 msgstr "자동 업데이터"
 
 #. Check for updates
-#: Client/core/CSettings.cpp:1904
+#: Client/core/CSettings.cpp:1916
 msgid "Check for update now"
 msgstr "업데이트 확인"
 
-#: Client/core/CSettings.cpp:2088
+#: Client/core/CSettings.cpp:2102
 msgid "Some settings will be changed when you next start MTA"
 msgstr "일부 설정은 다음에 MTA를 시작할 때 변경됩니다."
 
-#: Client/core/CSettings.cpp:2089
+#: Client/core/CSettings.cpp:2103
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
 "지금 다시 시작하시겠습니까?"
 
-#: Client/core/CSettings.cpp:2092
+#: Client/core/CSettings.cpp:2106
 msgid "RESTART REQUIRED"
 msgstr "재시작 필요"
 
-#: Client/core/CSettings.cpp:2112
+#: Client/core/CSettings.cpp:2126
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr "일부 설정은 현재 서버의 연결을 끊을 때 변경됩니다."
 
-#: Client/core/CSettings.cpp:2113
+#: Client/core/CSettings.cpp:2127
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
 "지금 연결을 끊으시겠습니까?"
 
-#: Client/core/CSettings.cpp:2116
+#: Client/core/CSettings.cpp:2130
 msgid "DISCONNECT REQUIRED"
 msgstr "연결 끊기 필요"
 
 #. Update the joystick name
-#: Client/core/CSettings.cpp:2558
+#: Client/core/CSettings.cpp:2572
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "조이패드가 인식되지 않음 - 연결을 확인하고 게임을 다시 시작하십시오."
 
-#: Client/core/CSettings.cpp:2814
+#: Client/core/CSettings.cpp:2828
 msgid "Binding axis"
 msgstr "바인딩 축"
 
-#: Client/core/CSettings.cpp:2814
+#: Client/core/CSettings.cpp:2828
 msgid "Move an axis to bind, or escape to clear"
 msgstr "축을 움직여 바인드 하거나, Esc를 눌러 지우십시오"
 
-#: Client/core/CSettings.cpp:2893
+#: Client/core/CSettings.cpp:2907
 msgid "Language:"
 msgstr "언어:"
 
-#: Client/core/CSettings.cpp:2893
+#: Client/core/CSettings.cpp:2907
 msgid "Skin:"
 msgstr "스킨:"
 
-#: Client/core/CSettings.cpp:2893
+#: Client/core/CSettings.cpp:2907
 msgid "Presets:"
 msgstr "프리셋:"
 
-#: Client/core/CSettings.cpp:2942
+#: Client/core/CSettings.cpp:2956
 msgid "Chat"
 msgstr "채팅"
 
-#: Client/core/CSettings.cpp:2959
+#: Client/core/CSettings.cpp:2973
 msgid "Load"
 msgstr "불러오기"
 
-#: Client/core/CSettings.cpp:2971
+#: Client/core/CSettings.cpp:2985
 msgid "Colors"
 msgstr "색상"
 
-#: Client/core/CSettings.cpp:2972
+#: Client/core/CSettings.cpp:2986
 msgid "Layout"
 msgstr "레이아웃"
 
-#: Client/core/CSettings.cpp:2973 Client/core/CSettings.cpp:3219
+#: Client/core/CSettings.cpp:2987 Client/core/CSettings.cpp:3233
 msgid "Options"
 msgstr "설정"
 
-#: Client/core/CSettings.cpp:2979
+#: Client/core/CSettings.cpp:2993
 msgid "Chat Background"
 msgstr "채팅 배경"
 
-#: Client/core/CSettings.cpp:2979
+#: Client/core/CSettings.cpp:2993
 msgid "Chat Text"
 msgstr "채팅 텍스트"
 
-#: Client/core/CSettings.cpp:2979
+#: Client/core/CSettings.cpp:2993
 msgid "Input Background"
 msgstr "채팅 배경"
 
-#: Client/core/CSettings.cpp:2979
+#: Client/core/CSettings.cpp:2993
 msgid "Input Text"
 msgstr "텍스트 입력"
 
-#: Client/core/CSettings.cpp:3002
+#: Client/core/CSettings.cpp:3016
 msgid "Lines:"
 msgstr "줄:"
 
-#: Client/core/CSettings.cpp:3002
+#: Client/core/CSettings.cpp:3016
 msgid "Scale:"
 msgstr "스케일:"
 
-#: Client/core/CSettings.cpp:3002
+#: Client/core/CSettings.cpp:3016
 msgid "Width:"
 msgstr "너비:"
 
-#: Client/core/CSettings.cpp:3005
+#: Client/core/CSettings.cpp:3019
 msgid "Size"
 msgstr "크기:"
 
-#: Client/core/CSettings.cpp:3054
+#: Client/core/CSettings.cpp:3068
 msgid "after"
 msgstr "후"
 
-#: Client/core/CSettings.cpp:3054
+#: Client/core/CSettings.cpp:3068
 msgid "for"
 msgstr "동안"
 
-#: Client/core/CSettings.cpp:3054
+#: Client/core/CSettings.cpp:3068
 msgid "sec"
 msgstr "초"
 
-#: Client/core/CSettings.cpp:3057
+#: Client/core/CSettings.cpp:3071
 msgid "Fading"
 msgstr "페이딩"
 
-#: Client/core/CSettings.cpp:3063
+#: Client/core/CSettings.cpp:3077
 msgid "Fade out old lines"
 msgstr "오래된 줄 사라짐"
 
-#: Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3117
 msgid "Horizontal:"
 msgstr "수평:"
 
-#: Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3117
 msgid "Vertical:"
 msgstr "수직:"
 
-#: Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3117
 msgid "Text-Align:"
 msgstr "텍스트 정렬:"
 
-#: Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3117
 msgid "X-Offset:"
 msgstr "X-오프셋:"
 
-#: Client/core/CSettings.cpp:3104
+#: Client/core/CSettings.cpp:3118
 msgid "Y-Offset:"
 msgstr "Y-오프셋:"
 
-#: Client/core/CSettings.cpp:3110
+#: Client/core/CSettings.cpp:3124
 msgid "Position"
 msgstr "위치"
 
-#: Client/core/CSettings.cpp:3124 Client/core/CSettings.cpp:3152
+#: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
 msgstr "왼쪽"
 
-#: Client/core/CSettings.cpp:3125 Client/core/CSettings.cpp:3139
+#: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
 msgid "Center"
 msgstr "중앙"
 
-#: Client/core/CSettings.cpp:3126 Client/core/CSettings.cpp:3153
+#: Client/core/CSettings.cpp:3140 Client/core/CSettings.cpp:3167
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
 msgstr "오른쪽"
 
-#: Client/core/CSettings.cpp:3138
+#: Client/core/CSettings.cpp:3152
 msgid "Top"
 msgstr "상단"
 
-#: Client/core/CSettings.cpp:3140
+#: Client/core/CSettings.cpp:3154
 msgid "Bottom"
 msgstr "하단"
 
-#: Client/core/CSettings.cpp:3188
+#: Client/core/CSettings.cpp:3202
 msgid "Font"
 msgstr "폰트"
 
-#: Client/core/CSettings.cpp:3225
+#: Client/core/CSettings.cpp:3239
 msgid "Hide background when not typing"
 msgstr "입력하지 않을 때 배경 숨기기"
 
-#: Client/core/CSettings.cpp:3230
+#: Client/core/CSettings.cpp:3244
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "\"탭\" 키를 사용하여 닉네임 완성"
 
-#: Client/core/CSettings.cpp:3235
+#: Client/core/CSettings.cpp:3249
 msgid "Allow server to flash the window"
 msgstr "서버가 창을 깜박일 수 있도록 허용"
 
-#: Client/core/CSettings.cpp:3240
+#: Client/core/CSettings.cpp:3254
 msgid "Allow tray balloon notifications"
 msgstr "트레이 풍선 알림 허용"
 
-#: Client/core/CSettings.cpp:3245
+#: Client/core/CSettings.cpp:3259
 msgid "Chat text black/white outline"
 msgstr "채팅 텍스트 검은색/흰색 윤곽선"
 
@@ -1821,116 +1825,116 @@ msgstr "채팅 텍스트 검은색/흰색 윤곽선"
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:3494 Client/core/CSettings.cpp:3501
+#: Client/core/CSettings.cpp:3508 Client/core/CSettings.cpp:3515
 msgid "Press a key to bind, or escape to clear"
 msgstr "원하는 키를 누르거나, Esc를 눌러 초기화하세요."
 
-#: Client/core/CSettings.cpp:3495
+#: Client/core/CSettings.cpp:3509
 msgid "Binding a primary key"
 msgstr "주 키 바인딩"
 
-#: Client/core/CSettings.cpp:3502
+#: Client/core/CSettings.cpp:3516
 msgid "Binding a secondary key"
 msgstr "부가 키 바인딩"
 
-#: Client/core/CSettings.cpp:3578
+#: Client/core/CSettings.cpp:3592
 msgid "GTA GAME CONTROLS"
 msgstr "GTA 게임 컨트롤"
 
-#: Client/core/CSettings.cpp:3580
+#: Client/core/CSettings.cpp:3594
 msgid "MULTIPLAYER CONTROLS"
 msgstr "멀티플레이 컨트롤"
 
-#: Client/core/CSettings.cpp:3825 Client/core/CSettings.cpp:5947
+#: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5982
 msgid "Your nickname contains invalid characters!"
 msgstr "닉네임에 잘못된 문자가 포함되어 있습니다!"
 
-#: Client/core/CSettings.cpp:4427 Client/core/CCore.cpp:700
+#: Client/core/CSettings.cpp:4441 Client/core/CCore.cpp:700
 #: Client/core/CMainMenu.cpp:303
 #: Client/mods/deathmatch/logic/CClientGame.cpp:550
 msgid "Main menu"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4431 Client/core/CCore.cpp:700
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1100
+#: Client/core/CSettings.cpp:4445 Client/core/CCore.cpp:700
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1107
 #: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4784
+#: Client/core/CSettings.cpp:4798
 msgid "Red:"
 msgstr "빨강:"
 
-#: Client/core/CSettings.cpp:4784
+#: Client/core/CSettings.cpp:4798
 msgid "Green:"
 msgstr "초록:"
 
-#: Client/core/CSettings.cpp:4784
+#: Client/core/CSettings.cpp:4798
 msgid "Blue:"
 msgstr "파랑:"
 
-#: Client/core/CSettings.cpp:4784
+#: Client/core/CSettings.cpp:4798
 msgid "Transparency:"
 msgstr "투명도:"
 
-#: Client/core/CSettings.cpp:4787
+#: Client/core/CSettings.cpp:4801
 msgid "Color"
 msgstr "색상:"
 
-#: Client/core/CSettings.cpp:4893
+#: Client/core/CSettings.cpp:4907
 msgid "Preview"
 msgstr "미리보기"
 
-#: Client/core/CSettings.cpp:5201
+#: Client/core/CSettings.cpp:5215
 msgid "Please disconnect before changing language"
 msgstr "언어를 변경하기 전에 연결을 끊으십시오"
 
-#: Client/core/CSettings.cpp:5229
+#: Client/core/CSettings.cpp:5243
 msgid "Please disconnect before changing skin"
 msgstr "스킨을 변경하기 전에 연결을 끊으십시오"
 
-#: Client/core/CSettings.cpp:5609
+#: Client/core/CSettings.cpp:5623
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "그림자로 인해 일부 시스템의 속도가 느려질 수 있습니다.\n\n"
 "사용하도록 설정하시겠습니까?"
 
-#: Client/core/CSettings.cpp:5613
+#: Client/core/CSettings.cpp:5627
 msgid "PERFORMANCE WARNING"
 msgstr "성능 주의"
 
-#: Client/core/CSettings.cpp:5633
+#: Client/core/CSettings.cpp:5647
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "부정행위 방지를 위해 일부 서버에서 화면 업로드가 필요합니다.\n\n"
 "(채팅창 및 GUI는 업로드 대상에서 제외)\n"
 
-#: Client/core/CSettings.cpp:5635
+#: Client/core/CSettings.cpp:5649
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "화면 업로드 정보"
 
-#: Client/core/CSettings.cpp:5650
+#: Client/core/CSettings.cpp:5664
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr "일부 스크립트는 인터넷에서 라디오와 같은 소리를 재생할 수 있습니다.\n\n"
 "이 설정을 비활성화하면 네트워크 대역폭 소비가 감소할 수 있습니다.\n"
 
-#: Client/core/CSettings.cpp:5653
+#: Client/core/CSettings.cpp:5667
 msgid "EXTERNAL SOUNDS"
 msgstr "외부 사운드"
 
-#: Client/core/CSettings.cpp:5682
+#: Client/core/CSettings.cpp:5696
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
 msgstr ""
 
-#: Client/core/CSettings.cpp:5687
+#: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
 msgstr ""
 
-#: Client/core/CSettings.cpp:5711
+#: Client/core/CSettings.cpp:5725
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -1940,7 +1944,7 @@ msgstr "GTA:SA 데이터 디렉토리의 일부 파일이 사용자 정의됩니
 "그러나 사용자 정의된 GTA:SA 파일이 많은 서버에 의해 차단되었습니다.\n\n"
 "사용하시겠습니까?"
 
-#: Client/core/CSettings.cpp:5760
+#: Client/core/CSettings.cpp:5774
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -1950,90 +1954,90 @@ msgstr "DPI awareness을 활성화하는 것은 실험적인 기능입니다.\n"
 "이 옵션을 활성화하면 그래픽 문제가 발생할 수 있습니다.\n\n"
 "이 옵션을 활성화하시겠습니까?"
 
-#: Client/core/CSettings.cpp:5766 Client/core/CSettings.cpp:5821
+#: Client/core/CSettings.cpp:5780 Client/core/CSettings.cpp:5835
 msgid "EXPERIMENTAL FEATURE"
 msgstr "실험적인 기능"
 
-#: Client/core/CSettings.cpp:5823
+#: Client/core/CSettings.cpp:5837
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:5965
+#: Client/core/CSettings.cpp:6000
 msgid "Please enter a nickname"
 msgstr "닉네임을 입력하십시오."
 
-#: Client/core/CSettings.cpp:5966
+#: Client/core/CSettings.cpp:6001
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "게임 내에서 사용할 닉네임을 입력하십시오. \n"
 "이것은 서버에 연결하고 서버에서 재생할 때 귀하의 이름이 될 것입니다."
 
-#: Client/core/CSettings.cpp:5984
+#: Client/core/CSettings.cpp:6019
 msgid "Very experimental feature."
 msgstr "매우 실험적인 기능."
 
-#: Client/core/CSettings.cpp:5986
+#: Client/core/CSettings.cpp:6021
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "CJ 버전으로 스톨 중지(65MB 이상의 RAM 사용)"
 
-#: Client/core/CSettings.cpp:5988
+#: Client/core/CSettings.cpp:6023
 msgid "Older routers may require a slower scan speed."
 msgstr "구형 라우터는 스캔 속도가 느려질 수 있습니다."
 
-#: Client/core/CSettings.cpp:5990
+#: Client/core/CSettings.cpp:6025
 msgid "Switch on to use only one connection when downloading."
 msgstr "다운로드할 때 연결을 하나만 사용하려면 켜십시오."
 
-#: Client/core/CSettings.cpp:5992
+#: Client/core/CSettings.cpp:6027
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "ISP가 MTA 트래픽을 식별할 수 있도록 네트워크 패킷에 태그를 지정합니다."
 
-#: Client/core/CSettings.cpp:5994
+#: Client/core/CSettings.cpp:6029
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "화면 하단의 회전 원 애니메이션"
 
-#: Client/core/CSettings.cpp:5996
+#: Client/core/CSettings.cpp:6031
 msgid "Select default always. (This setting is not saved)"
 msgstr "항상 기본값을 선택합니다. (이 설정은 저장되지 않음)"
 
-#: Client/core/CSettings.cpp:5998
+#: Client/core/CSettings.cpp:6033
 msgid "Maximum is usually best"
 msgstr "일반적으로 최대값이 가장 좋습니다."
 
-#: Client/core/CSettings.cpp:6000 Client/core/CSettings.cpp:6002
+#: Client/core/CSettings.cpp:6035 Client/core/CSettings.cpp:6037
 msgid "Auto updater:"
 msgstr "자동 업데이터:"
 
-#: Client/core/CSettings.cpp:6000
+#: Client/core/CSettings.cpp:6035
 msgid "Select default unless you like filling out bug reports."
 msgstr "버그 보고서 작성을 원하지 않는 경우 기본값을 선택하십시오."
 
-#: Client/core/CSettings.cpp:6002
+#: Client/core/CSettings.cpp:6037
 msgid "Select default to automatically install important updates."
 msgstr "중요한 업데이트를 자동으로 설치하려면 기본값을 선택하십시오."
 
-#: Client/core/CSettings.cpp:6004
+#: Client/core/CSettings.cpp:6039
 msgid "16-bit color:"
 msgstr "16비트 색상:"
 
-#: Client/core/CSettings.cpp:6004
+#: Client/core/CSettings.cpp:6039
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "16비트 색상 모드 사용 - MTA를 다시 시작해야 합니다."
 
-#: Client/core/CSettings.cpp:6006
+#: Client/core/CSettings.cpp:6041
 msgid "Mouse fix:"
 msgstr "마우스 수정:"
 
-#: Client/core/CSettings.cpp:6006
+#: Client/core/CSettings.cpp:6041
 msgid "Mouse movement fix - May need PC restart"
 msgstr "마우스 이동 수정 - PC를 다시 시작해야 할 수 있습니다."
 
-#: Client/core/CSettings.cpp:6008
+#: Client/core/CSettings.cpp:6043
 msgid "CPU affinity:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:6008
+#: Client/core/CSettings.cpp:6043
 msgid "Only change if you're having stability issues."
 msgstr ""
 
@@ -2728,8 +2732,8 @@ msgstr "Mtasa:// 프로토콜을 사용하십시오!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1623
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
-#: Client/mods/deathmatch/logic/CClientGame.cpp:658
-#: Client/mods/deathmatch/logic/CClientGame.cpp:750
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:757
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "잘못된 닉네임입니다! 설정으로 이동하여 새 닉네임을 설정하십시오!"
 
@@ -2738,7 +2742,7 @@ msgid "You have to select a server to connect to."
 msgstr "연결할 서버를 선택해야 합니다."
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1619
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1671
 msgid "Problem with graphics driver"
 msgstr "그래픽 드라이버 문제"
 
@@ -2779,118 +2783,118 @@ msgstr "기억하기"
 msgid "Deny"
 msgstr "거부"
 
-#: Client/mods/deathmatch/CClient.cpp:36
+#: Client/mods/deathmatch/CClient.cpp:37
 msgid "This version has expired."
 msgstr "이 버전은 만료되었습니다."
 
-#: Client/mods/deathmatch/CClient.cpp:57
+#: Client/mods/deathmatch/CClient.cpp:58
 msgid "disconnect from the game"
 msgstr "서버와 연결 끊기"
 
-#: Client/mods/deathmatch/CClient.cpp:58
+#: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the nametags"
 msgstr "네임태그 표시"
 
-#: Client/mods/deathmatch/CClient.cpp:59
+#: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the chatbox"
 msgstr "채팅창 표시"
 
-#: Client/mods/deathmatch/CClient.cpp:60
+#: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the network statistics"
 msgstr "인터넷 통계 표시"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
+#: Client/mods/deathmatch/CClient.cpp:64
 msgid "open the chat input"
 msgstr "채팅 입력창 열기"
 
-#: Client/mods/deathmatch/CClient.cpp:64
+#: Client/mods/deathmatch/CClient.cpp:65
 msgid "transmits voice to other players"
 msgstr "다른 플레이어에게 음성 전송"
 
-#: Client/mods/deathmatch/CClient.cpp:65
+#: Client/mods/deathmatch/CClient.cpp:66
 msgid "enters a car as passenger"
 msgstr "승객으로 탑승"
 
-#: Client/mods/deathmatch/CClient.cpp:66
+#: Client/mods/deathmatch/CClient.cpp:67
 msgid "next radio channel"
 msgstr "다음 라디오 채널"
 
-#: Client/mods/deathmatch/CClient.cpp:67
+#: Client/mods/deathmatch/CClient.cpp:68
 msgid "previous radio channel"
 msgstr "이전 라디오 채널"
 
-#: Client/mods/deathmatch/CClient.cpp:68
+#: Client/mods/deathmatch/CClient.cpp:69
 msgid "enables the player-map view"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:69
+#: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map in"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:70
+#: Client/mods/deathmatch/CClient.cpp:71
 msgid "zooms the player-map out"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:71
+#: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map north"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:72
+#: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map south"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:73
+#: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map east"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:74
+#: Client/mods/deathmatch/CClient.cpp:75
 msgid "moves the player-map west"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:75
+#: Client/mods/deathmatch/CClient.cpp:76
 msgid "attaches the player-map"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:76
+#: Client/mods/deathmatch/CClient.cpp:77
 msgid "reduces player-map opacity"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:77
+#: Client/mods/deathmatch/CClient.cpp:78
 msgid "increases player-map opacity"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:78
+#: Client/mods/deathmatch/CClient.cpp:79
 msgid "toggles player-map help text"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:79
+#: Client/mods/deathmatch/CClient.cpp:80
 msgid "sends a message to the targetted player"
 msgstr "대상 플레이어에게 메시지를 보냅니다"
 
-#: Client/mods/deathmatch/CClient.cpp:80
+#: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "차량에 탑승하는 동안 다음 무기로 변경"
 
-#: Client/mods/deathmatch/CClient.cpp:81
+#: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "차량에 탑승하는 동안 이전 무기로 변경"
 
-#: Client/mods/deathmatch/CClient.cpp:82
+#: Client/mods/deathmatch/CClient.cpp:83
 msgid "outputs info about the current server"
 msgstr "현재 서버에 대한 정보 출력"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
+#: Client/mods/deathmatch/CClient.cpp:86
 msgid "defines the scale multiplier of all text-displays"
 msgstr "모든 텍스트 디스플레이의 스케일 멀티플러를 정의"
 
 #. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
+#: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) shows the colshapes"
 msgstr "(개발자 모드) colshapes 표시"
 
-#: Client/mods/deathmatch/CClient.cpp:93
+#: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(개발자 모드) 월드 사운드 Id를 디버그 창에 출력"
 
@@ -3287,85 +3291,85 @@ msgstr ""
 msgid "Choking to death in"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:681
 msgid "Entering the game ..."
 msgstr "게임에 접속하는 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:726
+#: Client/mods/deathmatch/logic/CClientGame.cpp:733
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "연결되지 않았습니다. 빠른 연결 또는 '연결' 명령을 사용하여 서버에 연결하십시오."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:772
+#: Client/mods/deathmatch/logic/CClientGame.cpp:779
 msgid "Could not start the local server. See console for details."
 msgstr "로컬 서버를 시작할 수 없습니다. 자세한 내용은 콘솔을 참조하십시오."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:782
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+#: Client/mods/deathmatch/logic/CClientGame.cpp:789
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
 msgid "Local Server"
 msgstr "로컬 서버"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:782
+#: Client/mods/deathmatch/logic/CClientGame.cpp:789
 msgid "Starting local server ..."
 msgstr "로컬 서버 시작 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1037
 msgid "Area 51"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1039
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1046
 msgid "Walking around "
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1191
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "당신은 게임에서 추방되었습니다. (%s)"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
 msgid "Connecting to local server..."
 msgstr "로컬 서버에 연결 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1271
 msgid "Error connecting to server."
 msgstr "서버에 접속 중 오류 발생."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 msgid "Connecting to local server timed out. See console for details."
 msgstr "로컬 서버에 접속 중 타임아웃 되었습니다. 자세한 사항은 콘솔을 확인하십시오."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1387
 msgid "Connection with the server was lost"
 msgstr "서버와의 연결이 끊어졌습니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1407
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1414
 msgid "Disconnected: the server is currently full"
 msgstr "연결 끊김: 서버 인원이 꽉 찼습니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1426
 msgid "Disconnected: invalid password specified"
 msgstr "연결 끊김: 잘못된 암호입니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1448
 msgid "MTA Client verification failed!"
 msgstr "MTA 클라이언트 인증 실패!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "In a ditch"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "En-route to hospital"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "Meeting their maker"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "Regretting their decisions"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "Wasted"
 msgstr ""
 

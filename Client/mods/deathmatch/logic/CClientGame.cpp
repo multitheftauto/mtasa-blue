@@ -553,6 +553,13 @@ CClientGame::~CClientGame()
 
     // Destroy our stuff
     SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop
+
+    // Clear any remaining texture replacement state that may have
+    // survived if a CClientTXD destructor failed to complete cleanup properly.
+    // Prevents stale entries from persisting between server reconnects.
+    if (g_pGame && g_pGame->GetRenderWare())
+        g_pGame->GetRenderWare()->StaticResetModelTextureReplacing();
+
     SAFE_DELETE(m_pNametags);
     SAFE_DELETE(m_pSyncDebug);
     SAFE_DELETE(m_pNetworkStats);
