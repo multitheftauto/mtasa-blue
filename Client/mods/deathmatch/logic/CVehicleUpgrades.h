@@ -40,7 +40,7 @@ public:
     void               AddAllUpgrades();
     void               ForceAddUpgrade(unsigned short usUpgrade);
     bool               HasUpgrade(unsigned short usUpgrade);
-    bool               RemoveUpgrade(unsigned short usUpgrade, bool bRestoreRwObject = true);
+    bool               RemoveUpgrade(unsigned short usUpgrade);
     unsigned short     GetSlotState(unsigned char ucSlot);
     const SSlotStates& GetSlotStates() { return m_SlotStates; }
     static const char* GetSlotName(unsigned char ucSlot);
@@ -49,7 +49,6 @@ public:
     void RemoveAll(bool bRipFromVehicle);
 
     void RestreamVehicleUpgrades(unsigned short usModel);
-    void RestoreOriginalRwObject(unsigned short usParentID);
 
 protected:
     SSlotStates     m_SlotStates;

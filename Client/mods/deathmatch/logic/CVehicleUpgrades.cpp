@@ -694,20 +694,6 @@ void CVehicleUpgrades::RestreamVehicleUpgrades(unsigned short usUpgrade)
     }
 }
 
-void CVehicleUpgrades::RestoreOriginalRwObject(unsigned short usParentID)
-{
-    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(usParentID);
-    if (pParentModelInfo)
-    {
-        // Set to NULL to clear any swapped pointer
-        pParentModelInfo->SetRwObject(NULL);
-        
-        // Force reload the parent model to get fresh RwObject
-        pParentModelInfo->RemoveRef();
-        pParentModelInfo->Request(BLOCKING, "CVehicleUpgrades::RestoreOriginalRwObject");
-    }
-}
-
 bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
 {
     unsigned char ucSlot = 0;
@@ -720,7 +706,7 @@ bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
     return false;
 }
 
-bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade, bool bRestoreRwObject)
+bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade)
 {
     if (HasUpgrade(usUpgrade))
     {
@@ -729,20 +715,6 @@ bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade, bool bRestoreRwOb
             CVehicle* pVehicle = m_pVehicle->GetGameVehicle();
             if (pVehicle)
             {
-                // Restore parent model if custom upgrade
-                if (bRestoreRwObject)
-                {
-                    auto* upgradeModelInfo = g_pGame->GetModelInfo(usUpgrade);
-                    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
-                    {
-                        unsigned int parentID = upgradeModelInfo->GetParentID();
-                        if (IsUpgrade(static_cast<unsigned short>(parentID)))
-                        {
-                            RestoreOriginalRwObject(static_cast<unsigned short>(parentID));
-                        }
-                    }
-                }
-                
                 pVehicle->RemoveVehicleUpgrade(usUpgrade);
             }
 
