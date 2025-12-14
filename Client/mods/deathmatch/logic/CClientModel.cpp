@@ -254,6 +254,14 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
                     CClientVehicle* pVehicle = *iter;
                     if (pVehicle && pVehicle->GetUpgrades() && pVehicle->GetUpgrades()->HasUpgrade(usParentID))
                     {
+                        CVehicle* pGameVehicle = pVehicle->GetGameVehicle();
+                        if (pGameVehicle)
+                        {
+                            // Force reload upgrade with restored RwObject
+                            pGameVehicle->RemoveVehicleUpgrade(usParentID);
+                            pGameVehicle->AddVehicleUpgrade(usParentID);
+                        }
+                        
                         if (pVehicle->IsStreamedIn())
                         {
                             pVehicle->StreamOutForABit();
