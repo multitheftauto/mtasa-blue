@@ -230,7 +230,6 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         }
         case eClientModelType::VEHICLE_UPGRADE:
         {
-            // Remove the custom upgrade from all vehicles using it
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
             const auto             usParentID = static_cast<unsigned short>(g_pGame->GetModelInfo(m_iModelID)->GetParentID());
 
@@ -248,7 +247,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
                     }
                 }
                 
-                // Force restream all vehicles using this parent upgrade
+                // Restream all vehicles using this parent upgrade
                 for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
                 {
                     CClientVehicle* pVehicle = *iter;
@@ -257,7 +256,6 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
                         CVehicle* pGameVehicle = pVehicle->GetGameVehicle();
                         if (pGameVehicle)
                         {
-                            // Force reload upgrade with restored RwObject
                             pGameVehicle->RemoveVehicleUpgrade(usParentID);
                             pGameVehicle->AddVehicleUpgrade(usParentID);
                         }
@@ -270,23 +268,15 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
                 }
             }
 
-            for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
-            {
-                CClientVehicle* pVehicle = *iter;
-                if (pVehicle && pVehicle->GetUpgrades() && pVehicle->GetUpgrades()->HasUpgrade(m_iModelID))
-                {
-                    // Remove the custom upgrade
-                    pVehicle->GetUpgrades()->RemoveUpgrade(m_iModelID);
-
-                    // Re-add the parent upgrade if it was there
+            // Remove custom upgrade and restore parent
+            unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID, 
+                [=](auto& element) {
+                    element.GetUpgrades()->RemoveUpgrade(m_iModelID);
                     if (usParentID >= 1000 && usParentID <= 1193)
                     {
-                        pVehicle->GetUpgrades()->AddUpgrade(usParentID, false);
+                        element.GetUpgrades()->AddUpgrade(usParentID, false);
                     }
-
-                    callElementChangeEvent(*pVehicle, usParentID, m_iModelID);
-                }
-            }
+                });
             break;
         }
     }
