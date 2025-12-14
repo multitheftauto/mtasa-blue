@@ -671,6 +671,13 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
             
             // Add the upgrade (uses parent ID internally)
             pVehicle->AddVehicleUpgrade(usUpgrade);
+
+            // If custom upgrade was added, force restream to apply the swapped RwObject
+            if (pModelInfo && pModelInfo->GetParentID() != 0)
+            {
+                pVehicle->RemoveVehicleUpgrade(usUpgrade);
+                pVehicle->AddVehicleUpgrade(usUpgrade);
+            }
         }
 
         // Add it to the slot
