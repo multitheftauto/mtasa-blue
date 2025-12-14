@@ -234,6 +234,34 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
             const auto             usParentID = static_cast<unsigned short>(g_pGame->GetModelInfo(m_iModelID)->GetParentID());
 
+            // Restore original parent RwObject before freeing custom model
+            if (usParentID >= 1000 && usParentID <= 1193)
+            {
+                auto it = s_OriginalParentRwObjects.find(usParentID);
+                if (it != s_OriginalParentRwObjects.end())
+                {
+                    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(usParentID);
+                    if (pParentModelInfo)
+                    {
+                        pParentModelInfo->SetRwObject(it->second);
+                        s_OriginalParentRwObjects.erase(it);
+                    }
+                }
+                
+                // Force restream all vehicles using this parent upgrade
+                for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
+                {
+                    CClientVehicle* pVehicle = *iter;
+                    if (pVehicle && pVehicle->GetUpgrades() && pVehicle->GetUpgrades()->HasUpgrade(usParentID))
+                    {
+                        if (pVehicle->IsStreamedIn())
+                        {
+                            pVehicle->StreamOutForABit();
+                        }
+                    }
+                }
+            }
+
             for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
             {
                 CClientVehicle* pVehicle = *iter;
