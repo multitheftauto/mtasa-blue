@@ -109,37 +109,15 @@ bool CClientModel::Deallocate()
     // If this is a custom vehicle upgrade model, clean it up from all vehicles
     if (m_eModelType == eClientModelType::VEHICLE_UPGRADE)
     {
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
-        if (pModelInfo)
+        CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
+        if (pVehicleManager)
         {
-            unsigned int parentID = pModelInfo->GetParentID();
-            
-            CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
-            if (pVehicleManager)
+            for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
             {
-                // STEP 1: Restore original RwObject FIRST (before any removal)
-                if (parentID != 0)
+                CClientVehicle* pVehicle = *iter;
+                if (pVehicle && pVehicle->GetUpgrades() && pVehicle->GetUpgrades()->HasUpgrade(m_iModelID))
                 {
-                    bool bRestored = false;
-                    for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd() && !bRestored; ++iter)
-                    {
-                        CClientVehicle* pVehicle = *iter;
-                        if (pVehicle && pVehicle->GetUpgrades())
-                        {
-                            pVehicle->GetUpgrades()->RestoreOriginalRwObject(static_cast<unsigned short>(parentID));
-                            bRestored = true;
-                        }
-                    }
-                }
-                
-                // STEP 2: Remove upgrade WITHOUT restoring RwObject (it's being deallocated)
-                for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
-                {
-                    CClientVehicle* pVehicle = *iter;
-                    if (pVehicle && pVehicle->GetUpgrades() && pVehicle->GetUpgrades()->HasUpgrade(m_iModelID))
-                    {
-                        pVehicle->GetUpgrades()->RemoveUpgrade(m_iModelID, false);
-                    }
+                    pVehicle->GetUpgrades()->RemoveUpgrade(m_iModelID, true);
                 }
             }
         }

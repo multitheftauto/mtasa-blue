@@ -56,5 +56,4 @@ protected:
     CClientVehicle* m_pVehicle;
     ushort          m_usLastLocalAddNitroType;
     CElapsedTime    m_lastLocalAddNitroTimer;
-    std::map<unsigned short, RwObject*> m_OriginalRwObjects;
 };
