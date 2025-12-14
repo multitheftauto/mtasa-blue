@@ -52,6 +52,16 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     unsigned short     us = usUpgrade;
     eClientVehicleType vehicleType = m_pVehicle->GetVehicleType();
 
+    auto* upgradeModelInfo = g_pGame->GetModelInfo(us);
+    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
+    {
+        unsigned int parentID = upgradeModelInfo->GetParentID();
+        if (IsUpgrade(static_cast<unsigned short>(parentID)))
+        {
+            us = static_cast<unsigned short>(parentID);
+        }
+    }
+
     // No upgrades for trains/boats
     if (vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT)
         return false;
@@ -452,6 +462,17 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 
 bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSlot)
 {
+    // Check if this is a custom upgrade model
+    auto* upgradeModelInfo = g_pGame->GetModelInfo(us);
+    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
+    {
+        unsigned int parentID = upgradeModelInfo->GetParentID();
+        if (IsUpgrade(static_cast<unsigned short>(parentID)))
+        {
+            us = static_cast<unsigned short>(parentID);
+        }
+    }
+
     if (us == 1011 || us == 1012 || us == 1111 || us == 1112 || us == 1142 || /* bonet */
         us == 1143 || us == 1144 || us == 1145)
     {
@@ -611,18 +632,48 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
         CVehicle* pVehicle = m_pVehicle->GetGameVehicle();
         if (pVehicle)
         {
-            // Grab the upgrade model
+            // Load the upgrade model
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usUpgrade);
             if (pModelInfo)
             {
                 if (!g_pGame->IsASyncLoadingEnabled() || !pModelInfo->IsLoaded())
                 {
-                    // Request and load now
                     pModelInfo->Request(BLOCKING, "CVehicleUpgrades::ForceAddUpgrade");
                 }
-                // Add the upgrade
-                pVehicle->AddVehicleUpgrade(usUpgrade);
+                
+                // If this is a custom model with parent ID, swap RwObjects
+                unsigned int parentID = pModelInfo->GetParentID();
+                if (parentID != 0 && IsUpgrade(static_cast<unsigned short>(parentID)))
+                {
+                    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(static_cast<unsigned short>(parentID));
+                    if (pParentModelInfo)
+                    {
+                        if (!g_pGame->IsASyncLoadingEnabled() || !pParentModelInfo->IsLoaded())
+                        {
+                            pParentModelInfo->Request(BLOCKING, "CVehicleUpgrades::ForceAddUpgrade (parent)");
+                        }
+                        
+                        // Wait for both to be loaded
+                        if (pModelInfo->IsLoaded() && pParentModelInfo->IsLoaded())
+                        {
+                            RwObject* pCustomRwObject = pModelInfo->GetRwObject();
+                            RwObject* pParentRwObject = pParentModelInfo->GetRwObject();
+                            
+                            if (pCustomRwObject && pParentRwObject)
+                            {
+                                // ALWAYS update the stored original (parent model may have been reloaded)
+                                m_OriginalRwObjects[static_cast<unsigned short>(parentID)] = pParentRwObject;
+                                
+                                // Swap RwObject
+                                pParentModelInfo->SetRwObject(pCustomRwObject);
+                            }
+                        }
+                    }
+                }
             }
+            
+            // Add the upgrade (uses parent ID internally)
+            pVehicle->AddVehicleUpgrade(usUpgrade);
         }
 
         // Add it to the slot
@@ -646,6 +697,24 @@ void CVehicleUpgrades::RestreamVehicleUpgrades(unsigned short usUpgrade)
     }
 }
 
+void CVehicleUpgrades::RestoreOriginalRwObject(unsigned short usParentID)
+{
+    auto it = m_OriginalRwObjects.find(usParentID);
+    if (it != m_OriginalRwObjects.end())
+    {
+        // Instead of restoring the old pointer, FORCE RELOAD the parent model
+        // This ensures we get a fresh, valid RwObject
+        CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(usParentID);
+        if (pParentModelInfo)
+        {
+            // Force the parent model to reload its original geometry
+            pParentModelInfo->RemoveRef();
+            pParentModelInfo->Request(BLOCKING, "CVehicleUpgrades::RestoreOriginalRwObject");
+        }
+        m_OriginalRwObjects.erase(it);
+    }
+}
+
 bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
 {
     unsigned char ucSlot = 0;
@@ -658,7 +727,7 @@ bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
     return false;
 }
 
-bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade)
+bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade, bool bRestoreRwObject)
 {
     if (HasUpgrade(usUpgrade))
     {
@@ -667,6 +736,46 @@ bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade)
             CVehicle* pVehicle = m_pVehicle->GetGameVehicle();
             if (pVehicle)
             {
+                // Restore original RwObject if custom upgrade AND restore is enabled
+                if (bRestoreRwObject)
+                {
+                    auto* upgradeModelInfo = g_pGame->GetModelInfo(usUpgrade);
+                    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
+                    {
+                        unsigned int parentID = upgradeModelInfo->GetParentID();
+                        if (IsUpgrade(static_cast<unsigned short>(parentID)))
+                        {
+                            auto it = m_OriginalRwObjects.find(static_cast<unsigned short>(parentID));
+                            if (it != m_OriginalRwObjects.end())
+                            {
+                                CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(static_cast<unsigned short>(parentID));
+                                if (pParentModelInfo)
+                                {
+                                    RwObject* pCurrentParentRwObject = pParentModelInfo->GetRwObject();
+                                    if (pCurrentParentRwObject != it->second && it->second)
+                                    {
+                                        pParentModelInfo->SetRwObject(it->second);
+                                    }
+                                }
+                                m_OriginalRwObjects.erase(it);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Just clear from map without restore (deallocation scenario)
+                    auto* upgradeModelInfo = g_pGame->GetModelInfo(usUpgrade);
+                    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
+                    {
+                        unsigned int parentID = upgradeModelInfo->GetParentID();
+                        if (IsUpgrade(static_cast<unsigned short>(parentID)))
+                        {
+                            m_OriginalRwObjects.erase(static_cast<unsigned short>(parentID));
+                        }
+                    }
+                }
+                
                 pVehicle->RemoveVehicleUpgrade(usUpgrade);
             }
 
@@ -717,6 +826,17 @@ void CVehicleUpgrades::ReAddAll()
 
 void CVehicleUpgrades::RemoveAll(bool bRipFromVehicle)
 {
+    // Restore all original RwObjects
+    for (auto& pair : m_OriginalRwObjects)
+    {
+        CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(pair.first);
+        if (pParentModelInfo)
+        {
+            pParentModelInfo->SetRwObject(pair.second);
+        }
+    }
+    m_OriginalRwObjects.clear();
+    
     unsigned char ucSlot = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
     {

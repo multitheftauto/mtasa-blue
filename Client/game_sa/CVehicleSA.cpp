@@ -765,7 +765,19 @@ void CVehicleSA::LockDoors(bool bLocked)
 
 void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
 {
-    if (dwModelID >= 1000 && dwModelID <= 1193)
+    DWORD dwActualModelID = dwModelID;
+
+    CModelInfo* pModelInfo = pGame->GetModelInfo(dwModelID);
+    if (pModelInfo && pModelInfo->GetParentID() != 0)
+    {
+        unsigned int parentID = pModelInfo->GetParentID();
+        if (parentID >= 1000 && parentID <= 1193)
+        {
+            dwActualModelID = parentID;
+        }
+    }
+    
+    if (dwActualModelID >= 1000 && dwActualModelID <= 1193)
     {
         DWORD dwThis = (DWORD)m_pInterface;
 
@@ -773,7 +785,7 @@ void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
         __asm
         {
             mov     ecx, dwThis
-            push    dwModelID
+            push    dwActualModelID
             call    dwFunc
         }
     }
@@ -781,13 +793,31 @@ void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
 
 void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
 {
+    DWORD dwActualModelID = dwModelID;
+
+    CModelInfo* pModelInfo = pGame->GetModelInfo(dwModelID);
+    if (pModelInfo && pModelInfo->GetParentID() != 0)
+    {
+        unsigned int parentID = pModelInfo->GetParentID();
+        if (parentID >= 1000 && parentID <= 1193)
+        {
+            dwActualModelID = parentID;
+
+            CModelInfo* pParentModelInfo = pGame->GetModelInfo(parentID);
+            if (pParentModelInfo)
+            {
+                pParentModelInfo->Request(BLOCKING, "CVehicleSA::RemoveVehicleUpgrade restore");
+            }
+        }
+    }
+    
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CVehicle_RemoveVehicleUpgrade;
 
     __asm
     {
         mov     ecx, dwThis
-        push    dwModelID
+        push    dwActualModelID
         call    dwFunc
     }
 

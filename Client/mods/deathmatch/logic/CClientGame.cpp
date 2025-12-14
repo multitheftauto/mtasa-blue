@@ -6906,7 +6906,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     if (option == RestreamOption::ALL || option == RestreamOption::OBJECTS)
     {
         static constexpr eClientModelType restreamTypes[] = {eClientModelType::OBJECT, eClientModelType::OBJECT_DAMAGEABLE, eClientModelType::TIMED_OBJECT,
-                                                             eClientModelType::CLUMP};
+                                                             eClientModelType::CLUMP, eClientModelType::VEHICLE_UPGRADE};
 
         for (eClientModelType type : restreamTypes)
         {

@@ -954,6 +954,9 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                             case eClientModelType::VEHICLE:
                                 usParentID = static_cast<ushort>(VehicleType::VT_LANDSTAL);
                                 break;
+                            case eClientModelType::VEHICLE_UPGRADE:
+                                usParentID = 1025;
+                                break;
                             default:
                                 break;
                         }

@@ -83,6 +83,15 @@ bool CClientModel::Allocate(ushort usParentID)
                 return true;
             }
             break;
+        case eClientModelType::VEHICLE_UPGRADE:
+        {
+            if (CVehicleUpgrades::IsUpgrade(usParentID))
+            {
+                pModelInfo->MakeVehicleUpgradeModel(usParentID);
+                return true;
+            }
+            break;
+        }
         default:
             return false;
     }
@@ -96,6 +105,45 @@ bool CClientModel::Deallocate()
         return false;
 
     SetParentResource(nullptr);
+
+    // If this is a custom vehicle upgrade model, clean it up from all vehicles
+    if (m_eModelType == eClientModelType::VEHICLE_UPGRADE)
+    {
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
+        if (pModelInfo)
+        {
+            unsigned int parentID = pModelInfo->GetParentID();
+            
+            CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
+            if (pVehicleManager)
+            {
+                // STEP 1: Restore original RwObject FIRST (before any removal)
+                if (parentID != 0)
+                {
+                    bool bRestored = false;
+                    for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd() && !bRestored; ++iter)
+                    {
+                        CClientVehicle* pVehicle = *iter;
+                        if (pVehicle && pVehicle->GetUpgrades())
+                        {
+                            pVehicle->GetUpgrades()->RestoreOriginalRwObject(static_cast<unsigned short>(parentID));
+                            bRestored = true;
+                        }
+                    }
+                }
+                
+                // STEP 2: Remove upgrade WITHOUT restoring RwObject (it's being deallocated)
+                for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
+                {
+                    CClientVehicle* pVehicle = *iter;
+                    if (pVehicle && pVehicle->GetUpgrades() && pVehicle->GetUpgrades()->HasUpgrade(m_iModelID))
+                    {
+                        pVehicle->GetUpgrades()->RemoveUpgrade(m_iModelID, false);
+                    }
+                }
+            }
+        }
+    }
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
     if (!pModelInfo || !pModelInfo->IsValid())

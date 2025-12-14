@@ -20,6 +20,7 @@ enum class eClientModelType
     OBJECT,
     OBJECT_DAMAGEABLE,
     VEHICLE,
+    VEHICLE_UPGRADE,
     TIMED_OBJECT,
     CLUMP,
     TXD,
