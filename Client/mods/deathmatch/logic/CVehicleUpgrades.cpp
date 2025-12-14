@@ -670,22 +670,15 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
                                 m_SlotStates[ucSlot] = usUpgrade;
                                 if (ucSlot == 12)
                                     m_pVehicle->ResetWheelScale();
+
                                 return;
                             }
                         }
                     }
                 }
             }
-            
-            // Add the upgrade (uses parent ID internally)
-            pVehicle->AddVehicleUpgrade(usUpgrade);
 
-            // If custom upgrade was added, force restream to apply the swapped RwObject
-            if (pModelInfo && pModelInfo->GetParentID() != 0)
-            {
-                pVehicle->RemoveVehicleUpgrade(usUpgrade);
-                pVehicle->AddVehicleUpgrade(usUpgrade);
-            }
+            pVehicle->AddVehicleUpgrade(usUpgrade);
         }
 
         // Add it to the slot
