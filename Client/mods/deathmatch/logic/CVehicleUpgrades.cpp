@@ -10,8 +10,6 @@
 
 #include <StdInc.h>
 
-std::map<unsigned short, RwObject*> s_OriginalParentRwObjects;
-
 char szUpgradeNameEmpty[] = "";
 
 struct SUpgradeName
@@ -663,14 +661,16 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
                             
                             if (pCustomRwObject && pParentRwObject)
                             {
-                                // Store original parent RwObject if not already stored
-                                if (s_OriginalParentRwObjects.find(static_cast<unsigned short>(parentID)) == s_OriginalParentRwObjects.end())
-                                {
-                                    s_OriginalParentRwObjects[static_cast<unsigned short>(parentID)] = pParentRwObject;
-                                }
-                                
-                                // Swap to custom RwObject
+                                // Temporarily swap to custom RwObject ONLY during AddVehicleUpgrade call
                                 pParentModelInfo->SetRwObject(pCustomRwObject);
+                                pVehicle->AddVehicleUpgrade(usUpgrade);
+                                pParentModelInfo->SetRwObject(pParentRwObject);
+                                
+                                // Early return since we already added the upgrade
+                                m_SlotStates[ucSlot] = usUpgrade;
+                                if (ucSlot == 12)
+                                    m_pVehicle->ResetWheelScale();
+                                return;
                             }
                         }
                     }

@@ -12,9 +12,6 @@
 
 #define VEHICLE_UPGRADE_SLOTS 17
 
-struct RwObject;
-extern std::map<unsigned short, RwObject*> s_OriginalParentRwObjects;
-
 class CClientVehicle;
 
 enum eVehicleUpgrade
