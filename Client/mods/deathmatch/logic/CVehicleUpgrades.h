@@ -10,12 +10,9 @@
 
 #pragma once
 
-#include <map>
-
 #define VEHICLE_UPGRADE_SLOTS 17
 
 class CClientVehicle;
-struct RwObject;
 
 enum eVehicleUpgrade
 {
