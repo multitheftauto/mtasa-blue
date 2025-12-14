@@ -802,12 +802,6 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
         if (parentID >= 1000 && parentID <= 1193)
         {
             dwActualModelID = parentID;
-
-            CModelInfo* pParentModelInfo = pGame->GetModelInfo(parentID);
-            if (pParentModelInfo)
-            {
-                pParentModelInfo->Request(BLOCKING, "CVehicleSA::RemoveVehicleUpgrade restore");
-            }
         }
     }
     
@@ -825,7 +819,7 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
     // In the case of hydraulics and nitro, this function does not return false and the upgrade is never removed from the array
     for (std::int16_t& upgrade : GetVehicleInterface()->m_upgrades)
     {
-        if (upgrade == dwModelID)
+        if (upgrade == dwModelID || upgrade == dwActualModelID)
         {
             upgrade = -1;
             break;
