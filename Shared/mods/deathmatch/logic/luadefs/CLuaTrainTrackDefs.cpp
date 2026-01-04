@@ -38,6 +38,6 @@ auto CLuaTrainTrackDefs::GetDefaultTrack(uchar trackID) -> CLuaTrainTrackDefs::T
 #ifdef MTA_CLIENT
     return trackID;
 #else
-    return g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(trackID);
+    return g_pGame->GetTrainTrackManager()->GetDefaultTrackByIndex(trackID);
 #endif
 }
