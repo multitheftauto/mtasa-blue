@@ -34,4 +34,11 @@ public:
     // Shared scripting is the only place where we need the async task scheduler
     // so just go with a hack here
     static SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler();
+
+// Only enable train tracks for custom builds, as this is work in progress and the API may change
+#if MTASA_VERSION_TYPE == VERSION_TYPE_CUSTOM
+    const static bool m_CustomTrainTracks = true;
+#else
+    const static bool m_CustomTrainTracks = false;
+#endif
 };
