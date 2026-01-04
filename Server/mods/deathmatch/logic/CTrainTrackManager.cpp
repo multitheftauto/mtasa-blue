@@ -15,7 +15,12 @@
 
 CTrainTrackManager::CTrainTrackManager()
 {
-    Reset();
+    // Create default tracks
+    for (uchar i = 0; i < 4; ++i)
+    {
+        // Create train tracks
+        CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, i);
+    }
 }
 
 CTrainTrack* CTrainTrackManager::CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId)
@@ -41,17 +46,4 @@ CTrainTrack* CTrainTrackManager::GetTrainTrackByIndex(unsigned int index)
         return nullptr;
 
     return m_Tracks[index];
-}
-
-void CTrainTrackManager::Reset()
-{
-    // Clear tracks
-    m_Tracks.clear();
-
-    // Create default tracks
-    for (uchar i = 0; i < 4; ++i)
-    {
-        // Create train tracks
-        CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, i);
-    }
 }
