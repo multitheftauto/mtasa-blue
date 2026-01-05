@@ -35,8 +35,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(ucTimeContext))
             return false;
 
-        // Only read this packet if it matches the current time context that
-        // player is in.
+        // Only read this packet if it matches the current time context
+        // Time context is validated for all players (alive and dead) to prevent stale packets
         if (!pSourcePlayer->CanUpdateSync(ucTimeContext))
         {
             return false;
@@ -65,6 +65,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         if (flags.data.animInterrupted)
             pSourcePlayer->SetAnimationData({});
+
+        pSourcePlayer->SetHanging(flags.data.hangingDuringClimb);
 
         // Contact element
         CElement* pContactElement = NULL;
@@ -374,6 +376,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || pSourcePlayer->IsSyncingVelocity());
         flags.data.bStealthAiming = (pSourcePlayer->IsStealthAiming() == true);
         flags.data.isReloadingWeapon = pSourcePlayer->IsReloadingWeapon();
+        flags.data.hangingDuringClimb = pSourcePlayer->IsHanging();
 
         CVector vecPosition = pSourcePlayer->GetPosition();
         if (pContactElement)

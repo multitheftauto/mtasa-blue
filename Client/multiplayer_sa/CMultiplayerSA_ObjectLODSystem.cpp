@@ -87,9 +87,11 @@ void OnMY_CRenderer_SetupEntityVisibility_Post(int result, CEntitySAInterface* p
 #define HOOKPOS_CRenderer_SetupEntityVisibility         0x554230
 #define HOOKSIZE_CRenderer_SetupEntityVisibility        8
 DWORD RETURN_CRenderer_SetupEntityVisibility = 0x554238;
-void _declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
+static void __declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
 ////////////////////
         pushad
@@ -147,9 +149,11 @@ void OnMY_CWorldScan_ScanWorld_Pre(CVector2D* pVec, int iValue, void(__cdecl* fu
 #define HOOKSIZE_CWorldScan_ScanWorld               5
 DWORD RETURN_CWorldScan_ScanWorlda = 0x555563;
 DWORD RETURN_CWorldScan_ScanWorldb = 0x72CAE0;
-void _declspec(naked) HOOK_CWorldScan_ScanWorld()
+static void __declspec(naked) HOOK_CWorldScan_ScanWorld()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         call    second
         jmp     RETURN_CWorldScan_ScanWorlda   // 555563
@@ -188,9 +192,11 @@ int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre(CBaseModelInfoSAInter
 #define HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha       0x732500
 #define HOOKSIZE_CVisibilityPlugins_CalculateFadingAtomicAlpha      5
 DWORD RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha = 0x732505;
-void _declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha()
+static void __declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*3]

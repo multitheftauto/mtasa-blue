@@ -14,8 +14,10 @@
 #include "CBmxSA.h"
 #include "CBoatSA.h"
 #include "CBuildingSA.h"
+#include "CColModelSA.h"
 #include "CGameSA.h"
 #include "CHeliSA.h"
+#include "CModelInfoSA.h"
 #include "CMonsterTruckSA.h"
 #include "CPlaneSA.h"
 #include "CPlayerPedSA.h"
@@ -78,6 +80,30 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
 {
     if (m_vehiclePool.ulCount >= MAX_VEHICLES)
         return nullptr;
+
+    // Ensure collision model is fully loaded to prevent crash at 0x002a65ef in SetupSuspensionLines
+    CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(model));
+    if (!pModelInfo || !pModelInfo->GetInterface())
+        return nullptr;
+    
+    CBaseModelInfoSAInterface* pModelInterface = pModelInfo->GetInterface();
+
+    // Ensure collision model pointer exists
+    if (!pModelInterface->pColModel)
+    {
+        // Collision model pointer is NULL - try loading
+        pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
+        
+        // Re-fetch interface as loading may have invalidated pointer
+        pModelInterface = pModelInfo->GetInterface();
+        
+        // Still NULL means model has no collision (or loading failed) - block creation
+        if (!pModelInterface->pColModel)
+            return nullptr;
+    }
+
+    // Note: Vehicles with custom DFFs (no embedded collision) are handled in CModelInfoSA::SetCustomModel
+    // where collision is reloaded after SetClump to restore pool-managed collision data
 
     MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
     MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
@@ -504,7 +530,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
-    _asm {
+    __asm {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
         call    dwFunction
@@ -1073,7 +1099,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             mov     ecx, [ecx]

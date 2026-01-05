@@ -15,8 +15,10 @@
 #include "CModelInfoSA.h"
 #include "Fileapi.h"
 #include "processthreadsapi.h"
+#include "CGameSA.h"
 
 extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 // count: 26316 in unmodified game
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
@@ -228,7 +230,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     if (IsUpgradeModelId(dwModelID))
     {
         DWORD dwFunc = FUNC_RequestVehicleUpgrade;
-        _asm
+        __asm
         {
             push    dwFlags
             push    dwModelID
@@ -239,7 +241,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     else
     {
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
-        _asm
+        __asm
         {
             push    dwFlags
             push    dwModelID
@@ -262,7 +264,7 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
-    _asm
+    __asm
     {
         push    dwOnlyPriorityModels
         call    dwFunction
@@ -283,7 +285,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         bool  bReturn;
         DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
-        _asm
+        __asm
         {
             push    dwModelID
             call    dwFunc
@@ -296,7 +298,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
         bool  bReturn = 0;
-        _asm
+        __asm
         {
             push    dwModelID
             call    dwFunc
@@ -311,7 +313,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
     DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
-    _asm
+    __asm
     {
         push    channel
         push    szTexture
@@ -333,6 +335,24 @@ void CStreamingSA::ReinitStreaming()
 void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
+    if (!pItemInfo)
+        return;
+
+    // We remove the existing RwObject because, after switching the archive, the streamer will load a new one.
+    // ReInit doesn't delete all RwObjects unless certain conditions are met.
+    // In this case, we must force-remove the RwObject from memory, because it is no longer used,
+    // and due to the archive change the streamer no longer detects it and therefore won't delete it.
+    // As a result, a memory leak occurs after every call to engineImageLinkDFF.
+    const auto baseTxdId = g_pCore->GetGame()->GetBaseIDforTXD();
+    if (modelid < static_cast<uint>(baseTxdId))
+    {
+        if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid, true))
+        {
+            // Only DFF models got RwObjects, TXDs don't, so we only flush those here (or crash)
+            if (modelInfo->GetRwObject())
+                RemoveModel(modelid);
+        }
+    }
 
     // Change nextInImg field for prev model
     for (CStreamingInfo& info : ms_aInfoForModel)
@@ -356,6 +376,10 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
 
 CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)
 {
+    const uint maxStreamingID = pGame->GetCountOfAllFileIDs();
+    if (modelid >= maxStreamingID)
+        return nullptr;
+
     return &ms_aInfoForModel[modelid];
 }
 

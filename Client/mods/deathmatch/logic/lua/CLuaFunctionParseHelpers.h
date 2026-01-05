@@ -25,6 +25,7 @@
 #include "enums/SoundEffectParams.h"
 #include "enums/SoundEffectType.h"
 #include "enums/ObjectGroupPhysicalProperties.h"
+#include "enums/PostFXType.h"
 
 enum eLuaType
 {
@@ -98,9 +99,11 @@ DECLARE_ENUM(ePools);
 DECLARE_ENUM_CLASS(WorldProperty);
 DECLARE_ENUM_CLASS(eModelLoadState);
 DECLARE_ENUM_CLASS(PreloadAreaOption);
+DECLARE_ENUM_CLASS(RestreamOption);
 DECLARE_ENUM_CLASS(taskType);
 DECLARE_ENUM(eEntityType);
 DECLARE_ENUM_CLASS(VehicleAudioSettingProperty);
+DECLARE_ENUM_CLASS(PostFXType);
 
 class CRemoteCall;
 

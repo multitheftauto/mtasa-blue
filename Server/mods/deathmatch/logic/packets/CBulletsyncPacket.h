@@ -25,7 +25,6 @@ public:
     static constexpr float EPSILON = 0.0001f;
     static constexpr float EPSILON_SQ = EPSILON * EPSILON;
     static constexpr unsigned char MAX_BODY_ZONE = 9;
-    static constexpr float MAX_WORLD_COORD = 3000.0f;
     static constexpr float MAX_DAMAGE = 200.0f;
     
     CBulletsyncPacket() = default;
@@ -42,7 +41,6 @@ private:
     bool ReadWeaponAndPositions(NetBitStreamInterface& stream);
     bool ReadOptionalDamage(NetBitStreamInterface& stream);
     bool ValidateTrajectory() const noexcept;
-    bool ValidateVectorBounds(const CVector& vec) const noexcept;
     void ResetDamageData() noexcept;
     
     static constexpr bool IsNaN(float value) noexcept { return value != value; }

@@ -87,6 +87,7 @@
 #define DEFAULT_AIRCRAFT_MAXHEIGHT   800
 #define DEFAULT_AIRCRAFT_MAXVELOCITY 1.5f
 #define DEFAULT_MINUTE_DURATION      1000
+#define NUM_CLIENT_EVENT_ERROR_GAP   1000
 
 #ifndef WIN32
     #include <limits.h>
@@ -1555,6 +1556,9 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
 
         Player.CallEvent("onPlayerQuit", Arguments);
 
+        // Tell the resource manager
+        m_pResourceManager->OnPlayerQuit(Player);
+
         // Tell the map manager
         m_pMapManager->OnPlayerQuit(Player);
 
@@ -2521,20 +2525,20 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (player->GetWeaponTotalAmmo(slot) <= 0)
         return;
 
-    if (player->GetWeaponAmmoInClip(slot) <= 0)
-        return;
+    // Note: Don't check ammo in clip here - it can be out of sync due to network timing
+    // The total ammo check above is sufficient
 
     const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
     const auto level = player->GetPlayerStat(stat);
     auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
 
-    const float distance = (packet.m_start - packet.m_end).LengthSquared();
+    const float distanceSq = (packet.m_start - packet.m_end).LengthSquared();
     const float range = stats->GetWeaponRange();
-    const float rangesq = range * range;
+    const float rangeSq = range * range;
 
-    const float delta = std::fabs(distance - rangesq);
-    const float max = std::max(distance, rangesq);
-    if (delta > max * FLOAT_EPSILON)
+
+    const float maxRangeSq = rangeSq * 1.1f; // 10% tolerance for floating point
+    if (distanceSq > maxRangeSq)
         return;
 
     CLuaArguments args;
@@ -2670,7 +2674,12 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
             }
 
         }
-            else
+        else
+        {
+            // Limit this error to prevent debug / log files being flooded.
+            static std::uint64_t s_lastClientEventErrorLog = 0;
+            auto now = GetTickCount64_();
+            if (now - s_lastClientEventErrorLog > NUM_CLIENT_EVENT_ERROR_GAP)
             {
                 CLuaArguments arguments;
                 arguments.PushString(szName);
@@ -2678,7 +2687,9 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
                 arguments.PushBoolean(false);
                 pCaller->CallEvent("onPlayerTriggerInvalidEvent", arguments);
                 m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName);
+                s_lastClientEventErrorLog = now;
             }
+        }
 
         RegisterClientTriggeredEventUsage(pCaller, szName);
     }
@@ -2702,7 +2713,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
             // Ignore if the wrong length
             if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
             {
-                CLogger::ErrorPrintf("Received oversized custom data name from %s (%s)", Packet.GetSourcePlayer()->GetNick(),
+                CLogger::ErrorPrintf("Received oversized custom data name from %s (%s)\n", Packet.GetSourcePlayer()->GetNick(),
                                      *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
                 return;
             }
@@ -2716,7 +2727,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                                                                                            : clientChangesMode == eCustomDataClientTrust::ALLOW;
             if (!changesAllowed)
             {
-                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)", Packet.GetSourcePlayer()->GetNick(),
+                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", Packet.GetSourcePlayer()->GetNick(),
                                      szName);
 
                 CLuaArguments arguments;
@@ -2727,25 +2738,45 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                 return;
             }
 
-            if (lastSyncType != ESyncType::LOCAL)
+            if (pElement->SetCustomData(szName, Value, lastSyncType, pSourcePlayer))
             {
-                // Tell our clients to update their data. Send to everyone but the one we got this packet from.
+                if (lastSyncType != ESyncType::LOCAL)
+                {
+                    // Tell our clients to update their data. Send to everyone but the one we got this packet from.
+                    unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+                    CBitStream     BitStream;
+                    BitStream.pBitStream->WriteCompressed(usNameLength);
+                    BitStream.pBitStream->Write(szName, usNameLength);
+                    Value.WriteToBitStream(*BitStream.pBitStream);
+                    if (lastSyncType == ESyncType::BROADCAST)
+                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
+                    else
+                        m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName,
+                                                                  pSourcePlayer);
+
+                    CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(szName, m_pPlayerManager->Count(),
+                                                                                             BitStream.pBitStream->GetNumberOfBytesUsed());
+                }
+            }
+            else
+            {
+                // Event was cancelled; sync the authoritative value back to the source player
                 unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
                 CBitStream     BitStream;
                 BitStream.pBitStream->WriteCompressed(usNameLength);
                 BitStream.pBitStream->Write(szName, usNameLength);
-                Value.WriteToBitStream(*BitStream.pBitStream);
-                if (lastSyncType == ESyncType::BROADCAST)
-                    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
+
+                if (CLuaArgument* pServerValue = pElement->GetCustomData(szName, false))
+                {
+                    pServerValue->WriteToBitStream(*BitStream.pBitStream);
+                    pSourcePlayer->Send(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+                }
                 else
-                    m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName,
-                                                              pSourcePlayer);
-
-                CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(szName, m_pPlayerManager->Count(),
-                                                                                         BitStream.pBitStream->GetNumberOfBytesUsed());
+                {
+                    BitStream.pBitStream->WriteBit(false);
+                    pSourcePlayer->Send(CElementRPCPacket(pElement, REMOVE_ELEMENT_DATA, *BitStream.pBitStream));
+                }
             }
-
-            pElement->SetCustomData(szName, Value, lastSyncType, pSourcePlayer);
         }
     }
 }
@@ -3406,6 +3437,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 unsigned int occupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 if (pPed == pVehicle->GetOccupant(occupiedSeat))
                                 {
+                                    // Reset the occupant changed flag before calling the event
+                                    pVehicle->m_bOccupantChanged = false;
+                                    
                                     // Call the exiting vehicle event
                                     CLuaArguments Arguments;
                                     Arguments.PushElement(pPed);                       // player / ped
@@ -3414,12 +3448,23 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     Arguments.PushNumber(Packet.GetDoor());            // door being used
                                     if (pVehicle->CallEvent("onVehicleStartExit", Arguments) && pPed->GetOccupiedVehicle() == pVehicle)
                                     {
-                                        // Mark him as exiting the vehicle
-                                        pPed->SetVehicleAction(CPed::VEHICLEACTION_EXITING);
+                                        // Check if the occupant was changed during the event (e.g., by warpPedIntoVehicle)
+                                        if (!pVehicle->m_bOccupantChanged)
+                                        {
+                                            // Mark him as exiting the vehicle
+                                            pPed->SetVehicleAction(CPed::VEHICLEACTION_EXITING);
 
-                                        // Tell everyone he can start exiting the vehicle
-                                        CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_REQUEST_OUT_CONFIRMED, Packet.GetDoor());
-                                        m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                                            // Tell everyone he can start exiting the vehicle
+                                            CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_REQUEST_OUT_CONFIRMED, Packet.GetDoor());
+                                            m_pPlayerManager->BroadcastOnlyJoined(Reply);
+                                        }
+                                        else
+                                        {
+                                            // Script interfered with the exit process
+                                            // Don't proceed with the exit, send failure response
+                                            CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
+                                            pPlayer->Send(Reply);
+                                        }
                                     }
                                     else
                                     {
@@ -3859,9 +3904,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
 
     if (m_pMainConfig->IsVoiceEnabled())            // Shouldn't really be receiving voice packets at all if voice is disabled
     {
-        usDataLength = Packet.GetDataLength();
-
-        if (usDataLength > 0)
+        if (!Packet.IsEmpty())
         {
             CPlayer* pPlayer = Packet.GetSourcePlayer();
 
@@ -3890,9 +3933,6 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                 if (pPlayer->GetVoiceState() ==
                     VOICESTATE_TRANSMITTING)            // If we reach here, and we're still in idle state, then the event was cancelled
                 {
-                    const unsigned char* pBuffer = Packet.GetData();
-                    CVoiceDataPacket     VoicePacket(pPlayer, pBuffer, usDataLength);
-
                     // Make list of players to send the voice packet to
                     std::set<CPlayer*> playerSendMap;
 
@@ -3935,7 +3975,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                     }
 
                     // Send to all players in the send list
-                    CPlayerManager::Broadcast(VoicePacket, playerSendMap);
+                    CPlayerManager::Broadcast(Packet, playerSendMap);
                 }
             }
         }
@@ -4177,17 +4217,16 @@ void CGame::Packet_PlayerNetworkStatus(CPlayerNetworkStatusPacket& Packet)
 
 void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
 {
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer)
-    {
-        CResource* pResource = Packet.GetResource();
-        if (pResource)
-        {
-            CLuaArguments Arguments;
-            Arguments.PushResource(pResource);
-            pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
-        }
-    }
+    CPlayer*     sourcePlayer = Packet.GetSourcePlayer();
+    CResource*   resource = Packet.GetResource();
+    unsigned int playerStartCounter = Packet.GetStartCounter();
+
+    if (!sourcePlayer || !resource || !resource->CanPlayerTriggerResourceStart(sourcePlayer, playerStartCounter))
+        return;
+
+    CLuaArguments Arguments;
+    Arguments.PushResource(resource);
+    sourcePlayer->CallEvent("onPlayerResourceStart", Arguments, nullptr);
 }
 
 void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket& packet) noexcept
@@ -4721,9 +4760,10 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
     uchar ucAllowFastSprintFix = true;
     uchar ucAllowDrivebyAnimFix = true;
     uchar ucAllowShotgunDamageFix = true;
+    std::uint8_t multiCommandHandlerPolicy = static_cast<std::uint8_t>(m_pMainConfig->GetAllowMultiCommandHandlers());
 
     CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs,
-                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix);
+                               ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix, multiCommandHandlerPolicy);
     if (pPlayer)
         pPlayer->Send(packet);
     else

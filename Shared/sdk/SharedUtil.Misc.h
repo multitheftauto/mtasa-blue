@@ -16,11 +16,16 @@
 #include <list>
 #include <map>
 #include <set>
+#include <type_traits>
+#include <mutex>
+#include <utility>
+#include <functional>
 
 #include "SString.h"
 #include "WString.h"
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.Map.h"
+#include "SharedUtil.Logging.h"
 
 #if __cplusplus >= 201703L // C++17
     #ifndef __GLIBCXX__
@@ -47,28 +52,78 @@
     #endif
 #endif
 
+#ifdef WIN32
+// Forward declare basic windows types to avoid including windows.h here
+#ifdef STRICT
+struct HGLOBAL__;
+using WinHGlobalHandle = struct HGLOBAL__*;
+#else
+using WinHGlobalHandle = void*;
+#endif
+
+struct HWND__;
+    #ifndef _WINDOWS_
+typedef HWND__* HWND;
+typedef unsigned int UINT;
+        #ifndef HINSTANCE__
+struct HINSTANCE__;
+        #endif
+typedef HINSTANCE__* HINSTANCE;
+typedef HINSTANCE HMODULE;
+    #ifndef BOOL
+typedef int BOOL;
+    #endif
+    #ifndef WINAPI
+        #define WINAPI __stdcall
+    #endif
+    #ifndef NO_ERROR
+        #define NO_ERROR 0L
+    #endif
+    extern "C" __declspec(dllimport) void WINAPI SetLastError(DWORD dwErrCode);
+    extern "C" __declspec(dllimport) DWORD WINAPI GetLastError(void);
+    extern "C" __declspec(dllimport) BOOL WINAPI GlobalUnlock(WinHGlobalHandle hMem);
+    #endif
+#endif
+
 namespace SharedUtil
 {
     class CArgMap;
 #ifdef WIN32
 
+    namespace Details
+    {
+        inline void* GetProcAddressRaw(HMODULE hModule, const char* functionName) noexcept
+        {
+#ifdef _WINDOWS_
+            if (hModule != nullptr)
+            {
+                return reinterpret_cast<void*>(::GetProcAddress(hModule, functionName));
+            }
+#else
+            (void)hModule;
+            (void)functionName;
+#endif
+            return nullptr;
+        }
+    }
+
     SString GetMajorVersionString();
 
     // Get a system registry value
-    SString GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName);
+    SString GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName, int* iResult = nullptr);
 
     // Get/set registry values for the current version
     void    SetRegistryValue(const SString& strPath, const SString& strName, const SString& strValue, bool bFlush = false);
-    SString GetRegistryValue(const SString& strPath, const SString& strName);
+    SString GetRegistryValue(const SString& strPath, const SString& strName, int* iResult = nullptr);
     bool    RemoveRegistryKey(const SString& strPath);
 
     // Get/set registry values for a particular version
     void    SetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue);
-    SString GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName);
+    SString GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, int* iResult = nullptr);
 
     // Get/set registry values for all versions (Common)
     void    SetCommonRegistryValue(const SString& strPath, const SString& strName, const SString& strValue);
-    SString GetCommonRegistryValue(const SString& strPath, const SString& strName);
+    SString GetCommonRegistryValue(const SString& strPath, const SString& strName, int* iResult = nullptr);
 
     bool ShellExecuteBlocking(const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "",
                               int nShowCmd = 1);
@@ -79,9 +134,7 @@ namespace SharedUtil
     // Output a UTF8 encoded messagebox
     // Used in the Win32 Client only
     //
-    #ifdef _WINDOWS_
     int MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType);
-    #endif
 
     //
     // Return full path and filename of parent exe
@@ -102,6 +155,146 @@ namespace SharedUtil
 
     // Returns true if current process is GTA (i.e not MTA process)
     bool IsGTAProcess();
+
+    // Returns true if the pointer points to committed, readable memory
+    bool IsReadablePointer(const void* ptr, size_t size);
+
+    [[nodiscard]] const SString& GetMTAProcessBaseDir();
+
+    template <typename TFunction>
+    [[nodiscard]] inline bool TryGetProcAddress(HMODULE hModule, const char* functionName, TFunction& outExport) noexcept
+    {
+        static_assert(std::is_pointer_v<TFunction>, "TryGetProcAddress expects a pointer type");
+
+        void* address = nullptr;
+
+    #if defined(_WIN32)
+        address = Details::GetProcAddressRaw(hModule, functionName);
+    #else
+        (void)hModule;
+        (void)functionName;
+    #endif
+
+        if (address != nullptr)
+        {
+            outExport = reinterpret_cast<TFunction>(address);
+            return true;
+        }
+
+        outExport = nullptr;
+        return false;
+    }
+
+    class GlobalUnlockGuard
+    {
+    public:
+    using MutexGuard = std::scoped_lock<std::mutex>;
+
+        GlobalUnlockGuard() noexcept = default;
+        explicit GlobalUnlockGuard(WinHGlobalHandle handle) noexcept : m_handle(handle) {}
+        ~GlobalUnlockGuard() { UnlockAndLog("during destruction"); }
+
+        GlobalUnlockGuard(const GlobalUnlockGuard&) = delete;
+        GlobalUnlockGuard& operator=(const GlobalUnlockGuard&) = delete;
+
+        GlobalUnlockGuard(GlobalUnlockGuard&& other) noexcept : m_handle(other.release()) {}
+
+        GlobalUnlockGuard& operator=(GlobalUnlockGuard&& other) noexcept
+        {
+            if (this != &other)
+            {
+                WithLock([&]() noexcept {
+                    DWORD errorCode = NO_ERROR;
+                    UnlockLocked("during move assignment", &errorCode);
+                    m_handle = other.release();
+                });
+            }
+            return *this;
+        }
+
+        [[nodiscard]] bool UnlockChecked(DWORD* failureCode = nullptr) noexcept
+        {
+            return WithLock([&]() noexcept { return UnlockInternal(failureCode); });
+        }
+
+    void reset(WinHGlobalHandle handle = nullptr) noexcept
+        {
+            WithLock([&]() noexcept {
+                DWORD errorCode = NO_ERROR;
+                UnlockLocked("during reset", &errorCode);
+                m_handle = handle;
+            });
+        }
+
+    [[nodiscard]] WinHGlobalHandle release() noexcept
+        {
+            return WithLock([&]() noexcept { return std::exchange(m_handle, nullptr); });
+        }
+
+    [[nodiscard]] WinHGlobalHandle get() const noexcept
+        {
+            return WithLock([&]() noexcept { return m_handle; });
+        }
+
+        [[nodiscard]] explicit operator bool() const noexcept { return get() != nullptr; }
+
+    private:
+        void UnlockAndLog(const char* context) noexcept
+        {
+            WithLock([&]() noexcept {
+                DWORD errorCode = NO_ERROR;
+                UnlockLocked(context, &errorCode);
+            });
+        }
+
+        template <typename Fn>
+        decltype(auto) WithLock(Fn&& fn) const noexcept(noexcept(std::invoke(std::forward<Fn>(fn))))
+        {
+            MutexGuard lock(m_mutex);
+            return std::invoke(std::forward<Fn>(fn));
+        }
+
+        template <typename Fn>
+        decltype(auto) WithLock(Fn&& fn) noexcept(noexcept(static_cast<const GlobalUnlockGuard*>(this)->WithLock(std::forward<Fn>(fn))))
+        {
+            return static_cast<const GlobalUnlockGuard*>(this)->WithLock(std::forward<Fn>(fn));
+        }
+
+        bool UnlockLocked(const char* context, DWORD* failureCode) noexcept
+        {
+            const bool ok = UnlockInternal(failureCode);
+            if (!ok && context && failureCode && *failureCode != NO_ERROR)
+                OutputDebugLine(SString("[GlobalUnlockGuard] GlobalUnlock %s failed (error %lu)", context, static_cast<unsigned long>(*failureCode)));
+            return ok;
+        }
+
+        bool UnlockInternal(DWORD* failureCode) noexcept
+        {
+            if (!m_handle)
+            {
+                if (failureCode)
+                    *failureCode = NO_ERROR;
+                return true;
+            }
+
+            SetLastError(NO_ERROR);
+            const BOOL unlocked = GlobalUnlock(m_handle);
+            const DWORD lastError = GetLastError();
+            const bool failed = (unlocked == 0 && lastError != NO_ERROR);
+            if (failureCode)
+                *failureCode = failed ? lastError : NO_ERROR;
+            m_handle = nullptr;
+            return !failed;
+        }
+
+        WinHGlobalHandle   m_handle = nullptr;
+        mutable std::mutex m_mutex;
+    };
+
+    [[nodiscard]] inline GlobalUnlockGuard MakeGlobalUnlockGuard(WinHGlobalHandle handle) noexcept
+    {
+        return GlobalUnlockGuard(handle);
+    }
 
     //
     // Run ShellExecute with these parameters after exit

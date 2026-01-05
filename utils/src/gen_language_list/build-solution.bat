@@ -8,7 +8,7 @@ pause
 exit /b 1
 
 :FindVisualStudio
-for /f "usebackq tokens=*" %%i in (`call "%VSWHERE%" -latest -requires Microsoft.Component.MSBuild -find "**\VsDevCmd.bat"`) do (
+for /f "usebackq tokens=*" %%i in (`call "%VSWHERE%" -products * -latest -requires Microsoft.Component.MSBuild -find "**\VsDevCmd.bat"`) do (
     set VSDEVCMD=%%i
 )
 
@@ -21,7 +21,7 @@ exit /b 1
 :SetupEnv
 echo Found Visual Studio environment setup batch file:
 echo ^>^> %VSDEVCMD%
-call "%VSDEVCMD%" -arch=arm64 -host_arch=amd64 >NUL
+call "%VSDEVCMD%" -arch=amd64 -host_arch=amd64 >NUL
 
 where MSBuild.exe >NUL 2>&1
 if %ERRORLEVEL% == 0 goto :Build

@@ -40,7 +40,7 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
     DWORD dwThis = (DWORD)internalInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CPedIntelligence_TestForStealthKill;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    bUnk
@@ -66,6 +66,19 @@ CTaskSimpleUseGun* CPedIntelligenceSA::GetTaskUseGun()
     CTask* secondaryTask = taskMgr->GetTaskSecondary(TASK_SECONDARY_ATTACK);
     if (secondaryTask && secondaryTask->GetTaskType() == TASK_SIMPLE_USE_GUN)
         return dynamic_cast<CTaskSimpleUseGun*>(secondaryTask);
+
+    return nullptr;
+}
+
+CTaskSimpleFight* CPedIntelligenceSA::GetFightTask()
+{
+    CTaskManager* taskMgr = GetTaskManager();
+    if (!taskMgr)
+        return nullptr;
+
+    CTask* secondaryTask = taskMgr->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+    if (secondaryTask && secondaryTask->GetTaskType() == TASK_SIMPLE_FIGHT)
+        return dynamic_cast<CTaskSimpleFight*>(secondaryTask);
 
     return nullptr;
 }

@@ -43,7 +43,7 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, T3DMarkerType dwType, CV
 
     DWORD dwFunc = FUNC_PlaceMarker;
     DWORD dwReturn = 0;
-    _asm
+    __asm
     {
         push    bZCheck     // zCheck  ##SA##
         push    0           // normalZ ##SA##

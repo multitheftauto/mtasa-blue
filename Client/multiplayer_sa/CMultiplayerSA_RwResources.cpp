@@ -10,10 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <cstddef>
 
 namespace
 {
     SRwResourceStats ms_Stats;
+
+    constexpr std::size_t kTextureRefsReadableSize = offsetof(RwTexture, refs) + sizeof(int);
+    constexpr std::size_t kGeometryRefsReadableSize = offsetof(RwGeometry, refs) + sizeof(short);
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +32,9 @@ void OnMY_RwTextureCreate_Pre(DWORD calledFrom)
 
 void OnMY_RwTextureCreate_Post(RwTexture* pTexture, DWORD calledFrom)
 {
+    if (!pTexture)
+        return;
+
     ms_Stats.uiTextures++;
 }
 
@@ -34,9 +42,11 @@ void OnMY_RwTextureCreate_Post(RwTexture* pTexture, DWORD calledFrom)
 #define HOOKPOS_RwTextureCreate                            0x7F37C0
 #define HOOKSIZE_RwTextureCreate                           5
 DWORD RETURN_RwTextureCreate = 0x7F37C5;
-void _declspec(naked) HOOK_RwTextureCreate()
+static void __declspec(naked) HOOK_RwTextureCreate()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -70,7 +80,17 @@ inner:
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_RwTextureDestroy(RwTexture* pTexture, DWORD calledFrom)
 {
-    if (pTexture->refs == 1)
+    if (!pTexture)
+        return;
+
+    if (SharedUtil::IsReadablePointer(pTexture, kTextureRefsReadableSize))
+    {
+        if (pTexture->refs == 1 && ms_Stats.uiTextures > 0)
+            ms_Stats.uiTextures--;
+        return;
+    }
+
+    if (ms_Stats.uiTextures > 0)
         ms_Stats.uiTextures--;
 }
 
@@ -78,9 +98,11 @@ void OnMY_RwTextureDestroy(RwTexture* pTexture, DWORD calledFrom)
 #define HOOKPOS_RwTextureDestroy                            0x7F3820
 #define HOOKSIZE_RwTextureDestroy                           5
 DWORD RETURN_RwTextureDestroy = 0x7F3825;
-void _declspec(naked) HOOK_RwTextureDestroy()
+static void __declspec(naked) HOOK_RwTextureDestroy()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         push    esi
         mov         esi,dword ptr [esp+8]
@@ -109,9 +131,11 @@ void OnMY_RwRasterCreate(DWORD calledFrom)
 #define HOOKPOS_RwRasterCreate                            0x7FB230
 #define HOOKSIZE_RwRasterCreate                           5
 DWORD RETURN_RwRasterCreate = 0x7FB235;
-void _declspec(naked) HOOK_RwRasterCreate()
+static void __declspec(naked) HOOK_RwRasterCreate()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         mov         eax,dword ptr ds:[00C97B24h]
 
@@ -139,9 +163,11 @@ void OnMY_RwRasterDestroy(DWORD calledFrom)
 #define HOOKPOS_RwRasterDestroy                            0x7FB020
 #define HOOKSIZE_RwRasterDestroy                           5
 DWORD RETURN_RwRasterDestroy = 0x7FB025;
-void _declspec(naked) HOOK_RwRasterDestroy()
+static void __declspec(naked) HOOK_RwRasterDestroy()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         push    esi
         mov         esi,dword ptr [esp+8]
@@ -166,6 +192,9 @@ void OnMY_RwGeometryCreate_Pre(DWORD calledFrom)
 
 void OnMY_RwGeometryCreate_Post(RwGeometry* pGeometry, DWORD calledFrom)
 {
+    if (!pGeometry)
+        return;
+
     ms_Stats.uiGeometries++;
 }
 
@@ -173,9 +202,11 @@ void OnMY_RwGeometryCreate_Post(RwGeometry* pGeometry, DWORD calledFrom)
 #define HOOKPOS_RwGeometryCreate                            0x74CA90
 #define HOOKSIZE_RwGeometryCreate                           7
 DWORD RETURN_RwGeometryCreate = 0x74CA97;
-void _declspec(naked) HOOK_RwGeometryCreate()
+static void __declspec(naked) HOOK_RwGeometryCreate()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -212,7 +243,17 @@ inner:
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_RwGeometryDestroy(DWORD calledFrom, RwGeometry* pGeometry)
 {
-    if (pGeometry->refs == 1)
+    if (!pGeometry)
+        return;
+
+    if (SharedUtil::IsReadablePointer(pGeometry, kGeometryRefsReadableSize))
+    {
+        if (pGeometry->refs == 1 && ms_Stats.uiGeometries > 0)
+            ms_Stats.uiGeometries--;
+        return;
+    }
+
+    if (ms_Stats.uiGeometries > 0)
         ms_Stats.uiGeometries--;
 }
 
@@ -220,9 +261,11 @@ void OnMY_RwGeometryDestroy(DWORD calledFrom, RwGeometry* pGeometry)
 #define HOOKPOS_RwGeometryDestroy                            0x74CCC0
 #define HOOKSIZE_RwGeometryDestroy                           5
 DWORD RETURN_RwGeometryDestroy = 0x74CCC5;
-void _declspec(naked) HOOK_RwGeometryDestroy()
+static void __declspec(naked) HOOK_RwGeometryDestroy()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*1]

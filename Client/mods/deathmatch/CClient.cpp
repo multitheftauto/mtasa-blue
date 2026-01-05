@@ -20,6 +20,7 @@ CGame*                  g_pGame = NULL;
 CMultiplayer*           g_pMultiplayer = NULL;
 CNet*                   g_pNet = NULL;
 CClientGame*            g_pClientGame = NULL;
+bool                    g_bClientShuttingDown = false;
 
 int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
 {
@@ -31,10 +32,10 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
 
 #if defined(MTA_DM_EXPIRE_DAYS)
     // Make public client test builds expire
+	// Unused relic from 10+ years ago (as of 2025) but could still be used. Defined by net.
     if (GetDaysUntilExpire() < -1)
     {
-        MessageBoxA(NULL, _("This version has expired."), SStringX("MTA: San Andreas " MTA_DM_BUILDTAG_LONG) + _E("CD64"),
-                    MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST);
+        MessageBox(NULL, _("This version has expired."), (std::string("MTA: San Andreas ") + MTA_DM_BUILDTAG_LONG + _E("CD64")).c_str(), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST);
         TerminateProcess(GetCurrentProcess(), 1);
     }
 #endif
@@ -183,6 +184,9 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
 
 void CClient::ClientShutdown()
 {
+    // Global shutdown flag
+    g_bClientShuttingDown = true;
+
     // Unbind our radio controls
     g_pCore->GetKeyBinds()->RemoveControlFunction("radio_next", CClientGame::HandleRadioNext);
     g_pCore->GetKeyBinds()->RemoveControlFunction("radio_previous", CClientGame::HandleRadioPrevious);
@@ -267,8 +271,6 @@ void CClient::RestreamModel(unsigned short usModel)
 
 bool CClient::HandleException(CExceptionInformation* pExceptionInformation)
 {
-#ifndef MTA_DEBUG
-#ifndef MTA_ALLOW_DEBUG
     // Let the clientgame write its dump, then make the core terminate our process
     if (g_pClientGame && pExceptionInformation)
     {
@@ -276,14 +278,6 @@ bool CClient::HandleException(CExceptionInformation* pExceptionInformation)
     }
 
     return false;
-#else
-    // We want to be able to debug using the debugger in debug-mode
-    return true;
-#endif
-#else
-    // We want to be able to debug using the debugger in debug-mode
-    return true;
-#endif
 }
 
 void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)

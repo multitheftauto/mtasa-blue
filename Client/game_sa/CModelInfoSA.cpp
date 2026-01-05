@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <chrono>
 #include <core/CCoreInterface.h>
 #include "CColModelSA.h"
 #include "CColStoreSA.h"
@@ -110,7 +111,7 @@ bool CModelInfoSA::IsBoat()
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -125,7 +126,7 @@ bool CModelInfoSA::IsCar()
     DWORD dwFunction = FUNC_IsCarModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -140,7 +141,7 @@ bool CModelInfoSA::IsTrain()
     DWORD dwFunction = FUNC_IsTrainModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -155,7 +156,7 @@ bool CModelInfoSA::IsHeli()
     DWORD dwFunction = FUNC_IsHeliModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -170,7 +171,7 @@ bool CModelInfoSA::IsPlane()
     DWORD dwFunction = FUNC_IsPlaneModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -185,7 +186,7 @@ bool CModelInfoSA::IsBike()
     DWORD dwFunction = FUNC_IsBikeModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -200,7 +201,7 @@ bool CModelInfoSA::IsFakePlane()
     DWORD dwFunction = FUNC_IsFakePlaneModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -215,7 +216,7 @@ bool CModelInfoSA::IsMonsterTruck()
     DWORD dwFunction = FUNC_IsMonsterTruckModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -230,7 +231,7 @@ bool CModelInfoSA::IsQuadBike()
     DWORD dwFunction = FUNC_IsQuadBikeModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -245,7 +246,7 @@ bool CModelInfoSA::IsBmx()
     DWORD dwFunction = FUNC_IsBmxModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -260,7 +261,7 @@ bool CModelInfoSA::IsTrailer()
     DWORD dwFunction = FUNC_IsTrailerModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -317,7 +318,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
-        _asm
+        __asm
         {
             push    eax
             push    ebx
@@ -349,7 +350,7 @@ uint CModelInfoSA::GetAnimFileIndex()
     uint  uiReturn = 0;
     if (dwFunc)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
@@ -733,7 +734,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
     DWORD         dwFunc = FUNC_GetBoundingBox;
     DWORD         ModelID = m_dwModelID;
     CBoundingBox* dwReturn = 0;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunc
@@ -741,6 +742,25 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
         mov     dwReturn, eax
     }
     return dwReturn;
+}
+
+bool CModelInfoSA::IsCollisionLoaded() const noexcept
+{
+    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    return pInterface && pInterface->pColModel != nullptr;
+}
+
+bool CModelInfoSA::IsRwObjectLoaded() const noexcept
+{
+    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    return pInterface && pInterface->pRwObject != nullptr;
+}
+
+void CModelInfoSA::WaitForModelFullyLoaded(std::chrono::milliseconds timeout)
+{
+    // Implementation placeholder - would need streaming system integration
+    // For now, just ensure the model is requested
+    pGame->GetStreaming()->RequestModel(m_dwModelID, BLOCKING);
 }
 
 bool CModelInfoSA::IsValid()
@@ -759,7 +779,8 @@ bool CModelInfoSA::IsValid()
 
 bool CModelInfoSA::IsAllocatedInArchive() const noexcept
 {
-    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
+    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+    return pStreamingInfo && pStreamingInfo->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -767,7 +788,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     float fReturn = 0;
-    _asm {
+    __asm {
         mov     eax, ModelID
 
         push    ecx
@@ -1018,7 +1039,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
-                    _asm
+                    __asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -1042,7 +1063,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
-                    _asm
+                    __asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -1061,7 +1082,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(*it);
+        if (pStreamingInfo)
+            pStreamingInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 
@@ -1118,7 +1141,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         {
             DWORD                      dwFunction = FUNC_RemoveRef;
             CBaseModelInfoSAInterface* pInterface = m_pInterface;
-            _asm
+            __asm
             {
                 mov     ecx, pInterface
                 call    dwFunction
@@ -1191,7 +1214,7 @@ short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
     if (usUpgrade >= 1000 && usUpgrade <= 1193)
     {
         DWORD ModelID = m_dwModelID;
-        _asm
+        __asm
         {
             mov     eax, ModelID
 
@@ -1213,7 +1236,7 @@ bool CModelInfoSA::IsUpgradeAvailable(eVehicleUpgradePosn posn)
 {
     bool  bRet = false;
     DWORD ModelID = m_dwModelID;
-    _asm
+    __asm
     {
         mov     eax, ModelID
         mov ecx, dword ptr[ARRAY_ModelInfo]
@@ -1239,7 +1262,7 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
 {
     char* szStoredText;
     DWORD ModelID = m_dwModelID;
-    _asm
+    __asm
     {
         push    ecx
         mov     ecx, ModelID
@@ -1263,7 +1286,7 @@ unsigned int CModelInfoSA::GetNumRemaps()
     DWORD        dwFunc = FUNC_CVehicleModelInfo__GetNumRemaps;
     DWORD        ModelID = m_dwModelID;
     unsigned int uiReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, ModelID
 
@@ -1520,6 +1543,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::VEHICLE:
+            // ReplaceVehicleModele handles collision preservation internally
             success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::ATOMIC:
@@ -1531,7 +1555,42 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             break;
     }
 
-    m_pCustomClump = success ? pClump : nullptr;
+    if (success)
+    {
+        m_pCustomClump = pClump;
+
+        // Rebind texture pointers in the GAME's clump to current TXD textures.
+        // ReplaceModel clones the input clump, so we must rebind the ACTUAL clump the game is using.
+        // This is needed because the TXD may contain replacement textures (via engineImportTXD),
+        // but the DFF's materials still point to old/original textures from when it was loaded.
+        // Without this fix, shader texture replacement fails on custom DFF models.
+        eModelInfoType modelType = GetModelType();
+        switch (modelType)
+        {
+            case eModelInfoType::PED:
+            case eModelInfoType::WEAPON:
+            case eModelInfoType::VEHICLE:
+            case eModelInfoType::CLUMP:
+            case eModelInfoType::UNKNOWN:
+            {
+                RpClump* pGameClump = reinterpret_cast<RpClump*>(GetRwObject());
+                if (pGameClump && pGame)
+                {
+                    CRenderWare* pRenderWare = pGame->GetRenderWare();
+                    if (pRenderWare)
+                        pRenderWare->RebindClumpTexturesToTxd(pGameClump, GetTextureDictionaryID());
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    else
+    {
+        m_pCustomClump = nullptr;
+    }
+
     return success;
 }
 
@@ -1542,9 +1601,8 @@ void CModelInfoSA::RestoreOriginalModel()
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
-
     // Reset the stored custom vehicle clump
-    m_pCustomClump = NULL;
+    m_pCustomClump = nullptr;
 }
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)
@@ -1634,7 +1692,23 @@ void CModelInfoSA::MakeCustomModel()
     // We have a custom model?
     if (m_pCustomClump)
     {
-        SetCustomModel(m_pCustomClump);
+        // Store and clear m_pCustomClump BEFORE calling SetCustomModel to prevent recursive calls.
+        // SetCustomModel may trigger LoadAllRequestedModels which can recursively call MakeCustomModel
+        // on the same model (via the streaming hook) if the custom DFF lacks embedded collision.
+        RpClump* pClumpToSet = m_pCustomClump;
+        m_pCustomClump = nullptr;
+        
+        if (!SetCustomModel(pClumpToSet))
+        {
+            // SetCustomModel failed, restore the custom clump for retry on next stream-in
+            m_pCustomClump = pClumpToSet;
+        }
+        else
+        {
+            // Preserve the custom clump pointer for restream/retry paths
+            m_pCustomClump = pClumpToSet;
+            // Note: SetCustomModel now handles RebindClumpTexturesToTxd internally after successful replacement
+        }
     }
 
     // Custom collision model is not NULL and it's different from the original?
@@ -1727,6 +1801,9 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
 {
     CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
     CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+
+    if (!pBaseModelStreamingInfo || !pTargetModelStreamingInfo)
+        return;
 
     *pTargetModelStreamingInfo = CStreamingInfo{};
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
@@ -1863,7 +1940,10 @@ void CModelInfoSA::DeallocateModel(void)
     }
 
     ppModelInfo[m_dwModelID] = nullptr;
-    *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
+
+    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+    if (pStreamingInfo)
+        *pStreamingInfo = CStreamingInfo{};
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1892,9 +1972,11 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 #define HOOKPOS_NodeNameStreamRead                         0x072FA68
 #define HOOKSIZE_NodeNameStreamRead                        15
 DWORD RETURN_NodeNameStreamRead = 0x072FA77;
-void _declspec(naked) HOOK_NodeNameStreamRead()
+static void __declspec(naked) HOOK_NodeNameStreamRead()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    edi

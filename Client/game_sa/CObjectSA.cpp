@@ -27,17 +27,19 @@ static void CObject_PreRender(CObjectSAInterface* objectInterface)
 }
 
 const std::uintptr_t RETURN_CCObject_PreRender = 0x59FD56;
-static void _declspec(naked) HOOK_CCObject_PreRender()
+static void __declspec(naked) HOOK_CCObject_PreRender()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     __asm
     {
-        push ecx
-        call CObject_PreRender
-        pop  ecx
-        sub  esp, 10h
-        push esi
-        mov  esi, ecx
-        jmp  RETURN_CCObject_PreRender
+        push    ecx
+        call    CObject_PreRender
+        pop     ecx
+        sub     esp, 16
+        push    esi
+        mov     esi, ecx
+        jmp     RETURN_CCObject_PreRender
     }
 }
 
@@ -89,7 +91,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 {
     DWORD CObjectCreate = FUNC_CObject_Create;
     DWORD dwObjectPtr = 0;
-    _asm
+    __asm
     {
         push    1
         push    dwModel
@@ -165,7 +167,7 @@ void CObjectSA::Explode()
     DWORD dwFunc = FUNC_CObject_Explode;
     DWORD dwThis = (DWORD)GetInterface();
 
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -179,7 +181,7 @@ void CObjectSA::Break()
 
     float fHitVelocity = 1000.0f;            // has no direct influence, but should be high enough to trigger the break (effect)
 
-    _asm
+    __asm
     {
         push    32h // most cases: between 30 and 37
         push    0 // colliding entity. To ignore it, we can set it to 0
@@ -197,7 +199,7 @@ void CObjectSA::Break()
         float fZ = 0.0f;
         dwFunc = FUNC_CGlass_WindowRespondsToCollision;
 
-        _asm
+        __asm
         {
             push 0
             push fZ
@@ -261,7 +263,7 @@ bool CObjectSA::IsGlass()
     DWORD dwThis = (DWORD)GetInterface();
     bool  bResult;
 
-    _asm
+    __asm
     {
         push dwThis
         call dwFunc

@@ -32,6 +32,12 @@ struct RwTexture;
 
 #define SIZEOF_CHELI                            2584
 
+// Suspension line sizes for different vehicle types
+#define MAX_SUSPENSION_LINES                    6
+#define SUSPENSION_SIZE_STANDARD                0x20  // Standard wheel: 32 bytes
+#define SUSPENSION_SIZE_BIKE                    0x80  // Bike: 128 bytes (2 wheels with extra data)
+#define SUSPENSION_SIZE_MONSTER_TRUCK           0x90  // Monster truck: 144 bytes
+
 #define FUNC_CCarCtrlCreateCarForScript         0x431f80
 #define FUNC_CVehicle_AddVehicleUpgrade         0x6E3290
 #define FUNC_CVehicle_RemoveVehicleUpgrade      0x6DF930
@@ -204,15 +210,15 @@ struct CTransmissionGear
 struct CTransmission
 {
     CTransmissionGear gears[6];
-    byte              driveType;
-    byte              engineType;
-    byte              numOfGears;
-    byte              pad;
+    uint8_t           driveType;
+    uint8_t           engineType;
+    uint8_t           numOfGears;
+    uint8_t           pad;
     DWORD             handlingFlags;
     float             engineAcceleration;
     float             engineInertia;
     float             maxGearVelocity;
-    byte              pad2[4];
+    uint8_t           pad2[4];
     float             minGearVelocity;
     float             curSpeed;
 };
@@ -450,6 +456,7 @@ public:
     ~CVehicleSA();
 
     CVehicleSAInterface* GetVehicleInterface() { return reinterpret_cast<CVehicleSAInterface*>(GetInterface()); }
+    CVehicleSAInterface* GetVehicleInterface() const { return reinterpret_cast<CVehicleSAInterface*>(m_pInterface); }
 
     void Init();
 

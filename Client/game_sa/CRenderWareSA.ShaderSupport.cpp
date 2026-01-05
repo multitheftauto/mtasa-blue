@@ -85,17 +85,19 @@ __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 }
 
 // called from streaming on TXD create
-void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
+static void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Hooked from 731D55  6 bytes
 
         // eax - txd id
         pushad
-        push eax
-        call OnStreamingAddedTxd
-        add esp, 4
+        push    eax
+        call    OnStreamingAddedTxd
+        add     esp, 4
         popad
 
         // orig
@@ -118,17 +120,19 @@ __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 }
 
 // called from streaming on TXD destroy
-void _declspec(naked) HOOK_CTxdStore_RemoveTxd()
+static void __declspec(naked) HOOK_CTxdStore_RemoveTxd()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         // Hooked from 731E90  6 bytes
 
         // esi - txd id + 20000
         pushad
-        push esi
-        call OnStreamingRemoveTxd
-        add esp, 4
+        push    esi
+        call    OnStreamingRemoveTxd
+        add     esp, 4
         popad
 
         // orig
@@ -190,8 +194,18 @@ void CRenderWareSA::PulseWorldTextureWatch()
             for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
             {
                 RwTexture*  texture = *iter;
+                
+                // Check texture pointer - TXD could have been unloaded between GetTxdTextures and now,
+                // leaving us with a dangling pointer that could contain garbage data
+                if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
+                    continue;
+                
                 const char* szTextureName = texture->name;
-                CD3DDUMMY*  pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+                
+                // Check raster pointer
+                CD3DDUMMY*  pD3DData = (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster)))
+                    ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+                
                 if (!MapContains(m_SpecialTextures, texture))
                     StreamingAddedTexture(action.usTxdId, szTextureName, pD3DData);
             }
@@ -220,6 +234,10 @@ void CRenderWareSA::PulseWorldTextureWatch()
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StreamingAddedTexture(ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData)
 {
+    // Skip textures without valid D3D data or name - shader matching requires both
+    if (!pD3DData || strTextureName.empty())
+        return;
+
     STexInfo* pTexInfo = CreateTexInfo(usTxdId, strTextureName, pD3DData);
     OnTextureStreamIn(pTexInfo);
 }
@@ -256,6 +274,50 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::RemoveStreamingTexture
+//
+// Remove a single texture that was added via StreamingAddedTexture.
+// Finds the texture by matching TXD ID and D3D data pointer.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::RemoveStreamingTexture(unsigned short usTxdId, CD3DDUMMY* pD3DData)
+{
+    if (!pD3DData)
+        return;
+
+    typedef std::multimap<ushort, STexInfo*>::iterator IterType;
+    std::pair<IterType, IterType> range = m_TexInfoMap.equal_range(usTxdId);
+    for (IterType iter = range.first; iter != range.second;)
+    {
+        STexInfo* pTexInfo = iter->second;
+        if (pTexInfo && pTexInfo->pD3DData == pD3DData)
+        {
+            OnTextureStreamOut(pTexInfo);
+            DestroyTexInfo(pTexInfo);
+            m_TexInfoMap.erase(iter++);
+            return;  // Only one entry per D3D data
+        }
+        else
+            ++iter;
+    }
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::IsTexInfoRegistered
+//
+// Check if a D3D data pointer is already registered in the shader system.
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::IsTexInfoRegistered(CD3DDUMMY* pD3DData) const
+{
+    if (!pD3DData)
+        return false;
+    return MapContains(m_D3DDataTexInfoMap, pD3DData);
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::ScriptAddedTxd
 //
 // Called when a TXD is loaded outside of streaming
@@ -265,13 +327,28 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
 void CRenderWareSA::ScriptAddedTxd(RwTexDictionary* pTxd)
 {
     TIMING_CHECKPOINT("+ScriptAddedTxd");
+
+    // Validate TXD pointer before iterating
+    if (!pTxd || !SharedUtil::IsReadablePointer(pTxd, sizeof(RwTexDictionary)))
+    {
+        TIMING_CHECKPOINT("-ScriptAddedTxd");
+        return;
+    }
+
     std::vector<RwTexture*> textureList;
     GetTxdTextures(textureList, pTxd);
     for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
     {
         RwTexture*  texture = *iter;
+        if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
+            continue;
+
         const char* szTextureName = texture->name;
-        CD3DDUMMY*  pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+        CD3DDUMMY*  pD3DData = (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster)))
+            ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+
+        if (!pD3DData || !szTextureName[0])
+            continue;
 
         // Added texture
         STexInfo* pTexInfo = CreateTexInfo(texture, szTextureName, pD3DData);
@@ -316,12 +393,21 @@ void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::SpecialAddedTexture(RwTexture* texture, const char* szTextureName)
 {
+    if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
+        return;
+
     if (!szTextureName)
         szTextureName = texture->name;
+    if (!szTextureName || !szTextureName[0])
+        return;
+
+    CD3DDUMMY* pD3DData = (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster)))
+        ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+
+    if (!pD3DData)
+        return;
 
     OutputDebug(SString("Adding special texture %s", szTextureName));
-
-    CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
 
     // Added texture
     STexInfo* pTexInfo = CreateTexInfo(texture, szTextureName, pD3DData);
@@ -400,8 +486,14 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
 void CRenderWareSA::DestroyTexInfo(STexInfo* pTexInfo)
 {
     // Remove from D3DData lookup map
-    if (MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData) == pTexInfo)
+    // Always remove if the current entry matches this pTexInfo to prevent dangling pointers.
+    // Multiple STexInfo objects could reference the same D3D data (e.g., same texture in different TXDs),
+    // so we only remove if this specific STexInfo is the registered one.
+    STexInfo* pCurrentEntry = MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
+    if (pCurrentEntry == pTexInfo)
+    {
         MapRemove(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
+    }
 
     delete pTexInfo;
 }
@@ -690,9 +782,11 @@ __declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTextur
 #define HOOKPOS_RwTextureSetName     0x7F38A0
 #define HOOKSIZE_RwTextureSetName    9
 DWORD RETURN_RwTextureSetName = 0x7F38A9;
-void _declspec(naked) HOOK_RwTextureSetName()
+static void __declspec(naked) HOOK_RwTextureSetName()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -724,9 +818,11 @@ __declspec(noinline) void OnMY_RwTextureDestroy_Mid(RwTexture* pTexture)
 #define HOOKPOS_RwTextureDestroy_Mid     0x07F3834
 #define HOOKSIZE_RwTextureDestroy_Mid    5
 DWORD RETURN_RwTextureDestroy_Mid = 0x07F3839;
-void _declspec(naked) HOOK_RwTextureDestroy_Mid()
+static void __declspec(naked) HOOK_RwTextureDestroy_Mid()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    esi
@@ -768,9 +864,11 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 #define HOOKPOS_RwIm3DRenderIndexedPrimitive     0x07EF550
 #define HOOKSIZE_RwIm3DRenderIndexedPrimitive    5
 DWORD RETURN_RwIm3DRenderIndexedPrimitive = 0x07EF555;
-void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
+static void __declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -781,7 +879,7 @@ void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
         push    [esp+4*3]
         push    [esp+4*3]
         push    [esp+4*3]
-        call inner
+        call    inner
         add     esp, 4*3
 
         pushad
@@ -790,7 +888,8 @@ void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
         add     esp, 4*1
         popad
         retn
-inner:
+
+        inner:
         mov     eax, ds:0x0C9C078
         jmp     RETURN_RwIm3DRenderIndexedPrimitive
     }
@@ -817,9 +916,11 @@ __declspec(noinline) void OnMY_RwIm3DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 #define HOOKPOS_RwIm3DRenderPrimitive    0x07EF6B0
 #define HOOKSIZE_RwIm3DRenderPrimitive   6
 DWORD RETURN_RwIm3DRenderPrimitive = 0x07EF6B6;
-void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
+static void __declspec(naked) HOOK_RwIm3DRenderPrimitive()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -830,7 +931,7 @@ void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
         push    [esp+4*3]
         push    [esp+4*3]
         push    [esp+4*3]
-        call inner
+        call    inner
         add     esp, 4*3
 
         pushad
@@ -839,7 +940,8 @@ void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
         add     esp, 4*1
         popad
         retn
-inner:
+
+        inner:
         mov     ecx, ds:0x0C97B24
         jmp     RETURN_RwIm3DRenderPrimitive
     }
@@ -866,9 +968,11 @@ __declspec(noinline) void OnMY_RwIm2DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 #define HOOKPOS_RwIm2DRenderIndexedPrimitive     0x0734EA1
 #define HOOKSIZE_RwIm2DRenderIndexedPrimitive    5
 DWORD RETURN_RwIm2DRenderIndexedPrimitive = 0x0403927;
-void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
+static void __declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -881,7 +985,7 @@ void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
         push    [esp+4*5]
         push    [esp+4*5]
         push    [esp+4*5]
-        call inner
+        call    inner
         add     esp, 4*5
 
         pushad
@@ -891,7 +995,7 @@ void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
         popad
         retn
 
-inner:
+        inner:
         jmp     RETURN_RwIm2DRenderIndexedPrimitive
     }
 }
@@ -917,9 +1021,11 @@ __declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 #define HOOKPOS_RwIm2DRenderPrimitive                0x0734E90
 #define HOOKSIZE_RwIm2DRenderPrimitive               5
 DWORD RETURN_RwIm2DRenderPrimitive = 0x0734E95;
-void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
+static void __declspec(naked) HOOK_RwIm2DRenderPrimitive()
 {
-    _asm
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -930,7 +1036,7 @@ void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
         push    [esp+4*3]
         push    [esp+4*3]
         push    [esp+4*3]
-        call inner
+        call    inner
         add     esp, 4*3
 
         pushad
@@ -940,7 +1046,7 @@ void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
         popad
         retn
 
-inner:
+        inner:
         mov     eax, ds:0x0C97B24
         jmp     RETURN_RwIm2DRenderPrimitive
     }
