@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <chrono>
+#include <cstddef>
+#include <iterator>
 #include "CServerCache.h"
 
 using namespace std;
@@ -33,6 +37,24 @@ CServerBrowser* CSingleton<CServerBrowser>::m_pSingleton = NULL;
 #define TAB_SIZE_Y 25                       // Fixed CEGUI size of the Tab in a tab panel
 
 #define CONNECT_HISTORY_LIMIT 20
+
+namespace
+{
+    constexpr unsigned long SERVER_BROWSER_CONFIG_SAVE_DELAY = 250UL;              // Delay (ms) before committing queued config saves
+    constexpr unsigned long SERVER_BROWSER_CONFIG_SAVE_VISIBLE_GRACE = 5000UL;     // Extra delay (ms) before writing while UI is visible
+    constexpr unsigned long SERVER_BROWSER_FILTER_UPDATE_DELAY = 50UL;             // Delay (ms) before applying search filter changes
+    constexpr std::size_t   SERVER_BROWSER_FILTER_UPDATE_BATCH_SIZE = 250U;       // Servers processed per frame during deferred rebuild
+    constexpr std::size_t SERVER_BROWSER_SLOW_BATCH_MIN = 10;
+    constexpr std::size_t SERVER_BROWSER_SLOW_BATCH_DIVISOR = 6;
+    constexpr std::size_t SERVER_BROWSER_HIDDEN_REFRESH_MULTIPLIER = 6;
+    constexpr std::size_t SERVER_BROWSER_FAST_BATCH_MULTIPLIER = 2;
+    constexpr int        SERVER_BROWSER_SPEED_SLOW = 0;
+    constexpr int        SERVER_BROWSER_SPEED_DEFAULT = 1;
+    constexpr int        SERVER_BROWSER_SPEED_FAST = 2;
+    constexpr unsigned long SERVER_BROWSER_LAZY_LAYOUT_INTERVAL_DEFAULT = 100UL;   // Minimum ms between GUI ForceUpdate while refreshing
+    constexpr unsigned long SERVER_BROWSER_HIDDEN_REFRESH_DELAY = 200UL;            // Delay (ms) before using hidden refresh acceleration
+    constexpr unsigned long SERVER_BROWSER_REFRESH_FRAME_BUDGET_MS = 33;     // Time budget per frame for refresh batching (increased for faster filtering)
+}
 
 //
 // Local helper
@@ -60,6 +82,88 @@ CServerBrowser::CServerBrowser()
     m_uiIsUsingTempTab = 0;
     m_BeforeTempServerBrowserType = ServerBrowserTypes::INTERNET;
     m_llLastGeneralHelpTime = 0;
+    m_bPendingConfigSave = false;
+    m_ulNextConfigSaveTime = 0;
+    m_bHistoryListDirty = true;
+    m_ulHiddenRefreshBoostEnableTime = 0;
+
+    m_pFrame = nullptr;
+    m_pTopWindow = nullptr;
+    m_pPanel = nullptr;
+    m_pLockedIcon = nullptr;
+    m_pQuickConnectHelpWindow = nullptr;
+    m_pGeneralHelpWindow = nullptr;
+
+    for (std::size_t i = 0; i < std::size(m_pSearchIcons); ++i)
+    {
+        m_pSearchIcons[i] = nullptr;
+        m_szSearchTypePath[i] = nullptr;
+    }
+
+    for (std::size_t i = 0; i < std::size(m_pTab); ++i)
+    {
+        m_pTab[i] = nullptr;
+        m_pServerList[i] = nullptr;
+        m_pServerListRevision[i] = 0;
+        m_pServerPlayerListLabel[i] = nullptr;
+        m_pServerPlayerList[i] = nullptr;
+        m_pEditServerSearch[i] = nullptr;
+        m_pServerSearchIcon[i] = nullptr;
+        m_pLabelInclude[i] = nullptr;
+        m_pIncludeEmpty[i] = nullptr;
+        m_pIncludeFull[i] = nullptr;
+        m_pIncludeLocked[i] = nullptr;
+        m_pIncludeOffline[i] = nullptr;
+        m_pIncludeOtherVersions[i] = nullptr;
+        m_pButtonConnect[i] = nullptr;
+        m_pButtonConnectIcon[i] = nullptr;
+        m_pButtonRefresh[i] = nullptr;
+        m_pButtonRefreshIcon[i] = nullptr;
+        m_pButtonInfo[i] = nullptr;
+        m_pButtonInfoIcon[i] = nullptr;
+        m_pButtonFavourites[i] = nullptr;
+        m_pEditAddress[i] = nullptr;
+        m_pLabelAddressDescription[i] = nullptr;
+        m_pComboAddressHistory[i] = nullptr;
+        m_pSearchTypeIcon[i] = nullptr;
+        m_pAddressFavoriteIcon[i] = nullptr;
+        m_pRemoveFromRecentIcon[i] = nullptr;
+        m_pComboSearchType[i] = nullptr;
+        m_pEditSearch[i] = nullptr;
+        m_pLabelSearchDescription[i] = nullptr;
+        m_pLabelPassword[i] = nullptr;
+        m_pEditPassword[i] = nullptr;
+        m_pServerListStatus[i] = nullptr;
+        m_pButtonBack[i] = nullptr;
+        m_pButtonGeneralHelp[i] = nullptr;
+        m_iSelectedServer[i] = -1;
+        m_hVersion[i] = CGUIHandle();
+        m_hLocked[i] = CGUIHandle();
+        m_hName[i] = CGUIHandle();
+        m_hPing[i] = CGUIHandle();
+        m_hPlayers[i] = CGUIHandle();
+        m_hHost[i] = CGUIHandle();
+        m_hGame[i] = CGUIHandle();
+        m_hMap[i] = CGUIHandle();
+        m_hPlayerName[i] = CGUIHandle();
+        m_FlashSearchBox[i].uiCount = 0;
+        m_FlashSearchBox[i].uiNextTime = 0;
+        m_bInitialRefreshDone[i] = false;
+        m_bPendingRefresh[i] = false;
+        m_bPendingFilterUpdate[i] = false;
+        m_ulNextFilterUpdateTime[i] = 0;
+        m_FilterState[i].searchText.clear();
+        m_FilterState[i].searchType = -1;
+        m_FilterState[i].includeEmpty = false;
+        m_FilterState[i].includeFull = false;
+        m_FilterState[i].includeLocked = false;
+        m_FilterState[i].includeOffline = false;
+        m_FilterState[i].includeOtherVersions = false;
+        m_ListRefreshState[i].bActive = false;
+        m_ulNextListLayoutTime[i] = 0;
+        m_pLastSelectedServerForPlayerList[i] = nullptr;
+        m_msLastPlayerListQueryRetryTime[i] = std::chrono::milliseconds(0);
+    }
 
     // Do some initial math
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
@@ -121,7 +225,7 @@ CServerBrowser::CServerBrowser()
     m_szSearchTypePath[SearchTypes::SERVERS] = "cgui\\images\\serverbrowser\\search-servers.png";
     m_szSearchTypePath[SearchTypes::PLAYERS] = "cgui\\images\\serverbrowser\\search-players.png";
 
-    for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
+    for (std::size_t i = 0; i < std::size(m_pSearchIcons); ++i)
     {
         m_pSearchIcons[i] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
         m_pSearchIcons[i]->SetVisible(false);
@@ -138,11 +242,25 @@ CServerBrowser::CServerBrowser()
     // Load options
     LoadOptions(CCore::GetSingletonPtr()->GetConfig()->FindSubNode(CONFIG_NODE_SERVER_OPTIONS));
 
+    // Load favorites, recent, and history lists from config
+    CXMLNode* pConfig = CCore::GetSingletonPtr()->GetConfig();
+    LoadServerList(pConfig->FindSubNode(CONFIG_NODE_SERVER_FAV), CONFIG_FAVOURITE_LIST_TAG, GetFavouritesList());
+    LoadServerList(pConfig->FindSubNode(CONFIG_NODE_SERVER_REC), CONFIG_RECENT_LIST_TAG, GetRecentList());
+    LoadServerList(pConfig->FindSubNode(CONFIG_NODE_SERVER_HISTORY), CONFIG_HISTORY_LIST_TAG, GetHistoryList());
+
+    CServerCacheInterface* pCache = GetServerCache();
+    if (pCache)
+    {
+        pCache->GetServerListCachedInfo(&m_ServersFavourites);
+        pCache->GetServerListCachedInfo(&m_ServersRecent);
+        pCache->GetServerListCachedInfo(&m_ServersHistory);
+    }
+
     // Save the active tab, needs to be done after at least one tab exists
     m_pPanel->SetSelectionHandler(GUI_CALLBACK(&CServerBrowser::OnTabChanged, this));
 
     // Attach some editbox handlers, also must be done after full creation
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::size_t i = 0; i < std::size(m_pEditAddress); ++i)
     {
         m_pEditAddress[i]->SetActivateHandler(GUI_CALLBACK(&CServerBrowser::OnAddressFocused, this));
         m_pEditAddress[i]->SetDeactivateHandler(GUI_CALLBACK(&CServerBrowser::OnAddressDefocused, this));
@@ -210,7 +328,7 @@ CServerBrowser::CServerBrowser()
     m_pGeneralHelpWindow->SetDeactivateHandler(GUI_CALLBACK(&CServerBrowser::OnGeneralHelpDeactivate, this));
 
     float fMaxLeft = pManager->CGUI_GetMaxTextExtent("default-normal", _("Refresh"), _("Add Favorite"), _("Connect"), _("Server information"));
-    float fMaxRight = pManager->CGUI_GetMaxTextExtent("default-normal", _("Search servers"), _("Search players"), _("Start search"));
+    float fMaxRight = pManager->CGUI_GetMaxTextExtent("default-normal", _("Search servers"), _("Search players"), _("Start search"), _("Delete from recent"));
 
     CVector2D generalHelpSize(80 + fMaxLeft + 80 + fMaxRight, 160);
     CVector2D generalHelpPos = helpButtonPos - generalHelpSize + CVector2D(helpButtonSize.fX, 0);
@@ -233,9 +351,10 @@ CServerBrowser::CServerBrowser()
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 0 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-servers.png"},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 1 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-players.png"},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 2 + 5, 16, 16, "cgui\\images\\serverbrowser\\search.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 3 + 5, 16, 16, "cgui\\images\\serverbrowser\\trashcan.png"},
         };
 
-        for (uint i = 0; i < NUMELMS(iconInfoList); i++)
+        for (std::size_t i = 0; i < std::size(iconInfoList); ++i)
         {
             CGUIStaticImage* pIcon = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pGeneralHelpWindow));
             pIcon->SetPosition(CVector2D(iconInfoList[i].x, iconInfoList[i].y));
@@ -256,9 +375,10 @@ CServerBrowser::CServerBrowser()
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 0, _("Search servers")},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 1, _("Search players")},
             {80 + static_cast<int>(fMaxLeft), iBase + iGap * 2, _("Start search")},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 3, _("Delete from recent")},
         };
 
-        for (uint i = 0; i < NUMELMS(helpInfoList); i++)
+        for (std::size_t i = 0; i < std::size(helpInfoList); ++i)
         {
             CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pGeneralHelpWindow, ""));
             pLabel->SetText(SString("  -   %s", helpInfoList[i].strDesc.c_str()));
@@ -270,9 +390,20 @@ CServerBrowser::CServerBrowser()
 
 CServerBrowser::~CServerBrowser()
 {
+    // Suspend all server list activity and cancel pending network operations FIRST
+    // This must be done before DeleteTab() destroys the server lists, and while
+    // the network subsystem is still available (it may be destroyed before this destructor)
+    SuspendServerLists();
+
     // Save options now and disable selection handler
-    SaveOptions();
-    m_pPanel->SetSelectionHandler(nullptr);
+    SaveOptions(true);
+    if (m_pPanel)
+        m_pPanel->SetSelectionHandler(GUI_CALLBACK());
+
+    // Persist cache to disk before cleanup
+    CServerCacheInterface* pCache = GetServerCache();
+    if (pCache)
+        pCache->SaveServerCache(true);
 
     // Delete the Tabs
     DeleteTab(ServerBrowserTypes::INTERNET);
@@ -280,18 +411,43 @@ CServerBrowser::~CServerBrowser()
     DeleteTab(ServerBrowserTypes::FAVOURITES);
     DeleteTab(ServerBrowserTypes::RECENTLY_PLAYED);
 
-    // Unload the icon
-    m_pLockedIcon->Clear();
-    for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
-        m_pSearchIcons[i]->Clear();
+    if (m_pGeneralHelpWindow)
+    {
+    m_pGeneralHelpWindow->SetVisible(false);
+    m_pGeneralHelpWindow->SetDeactivateHandler(GUI_CALLBACK());  // Avoid callbacks during destruction
+    }
 
-    // Delete the GUI items
-    delete m_pTopWindow;
+    if (m_pLockedIcon)
+    {
+        m_pLockedIcon->Clear();
+        SAFE_DELETE(m_pLockedIcon);
+    }
+
+    for (std::size_t i = 0; i < std::size(m_pSearchIcons); ++i)
+    {
+        if (m_pSearchIcons[i])
+        {
+            m_pSearchIcons[i]->Clear();
+            SAFE_DELETE(m_pSearchIcons[i]);
+        }
+    }
+
+    SAFE_DELETE(m_pQuickConnectHelpWindow);
+    SAFE_DELETE(m_pGeneralHelpWindow);
+
+    CGUIElement* pTopWindow = m_pTopWindow;
+    m_pTopWindow = nullptr;
+    m_pPanel = nullptr;
+    m_pFrame = nullptr;
+    SAFE_DELETE(pTopWindow);
 }
 
 void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
 {
     CGUI* pManager = g_pCore->GetGUI();
+
+    m_bInitialRefreshDone[type] = false;
+    m_bPendingRefresh[type] = false;
 
     m_pTab[type] = m_pPanel->CreateTab(szName);
 
@@ -400,7 +556,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pComboSearchType[type]->SetPosition(CVector2D(fX, fY + (SB_BUTTON_SIZE_Y - SB_SEARCHBAR_COMBOBOX_SIZE_Y) / 2), false);
     m_pComboSearchType[type]->SetSize(CVector2D(SB_SEARCHBAR_COMBOBOX_SIZE_X, 80), false);
 
-    for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
+    for (std::size_t i = 0; i < std::size(m_pSearchIcons); ++i)
         m_pComboSearchType[type]->AddItem(m_pSearchIcons[i]);
 
     m_pComboSearchType[type]->SetReadOnly(true);
@@ -445,6 +601,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pServerList[type]->SetSize(CVector2D(fWidth, fHeight), false);
     m_pServerList[type]->SetIgnoreTextSpacer(true);
     m_pServerList[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnClick, this));
+    m_pServerList[type]->SetSelectionHandler(GUI_CALLBACK(&CServerBrowser::OnClick, this));
     m_pServerListRevision[type] = 0;
 
     // Server List Columns
@@ -477,10 +634,14 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     // Player List Columns
     m_hPlayerName[type] = m_pServerPlayerList[type]->AddColumn(_("Player list"), 0.75f);
 
+    // Create a companion label now so the destructor can safely clean it up later.
+    m_pServerPlayerListLabel[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTab[type], ""));
+    m_pServerPlayerListLabel[type]->SetVisible(false);
+
     // Filters
     float fLineHeight = SB_BACK_BUTTON_SIZE_Y / 2;
     fX = SB_SMALL_SPACER;
-    fY = m_WidgetSize.fY - SB_SMALL_SPACER / 2 - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
+    fY = m_WidgetSize.fY - (SB_SMALL_SPACER * 0.5f) - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
 
     // Include label
     m_pLabelInclude[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTab[type], _("Include:")));
@@ -574,6 +735,12 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pServerList[type]->SetEnterKeyHandler(GUI_CALLBACK(&CServerBrowser::OnDoubleClick, this));
     m_pServerList[type]->SetDoubleClickHandler(GUI_CALLBACK(&CServerBrowser::OnDoubleClick, this));
     m_pServerList[type]->SetKeyDownHandler(GUI_CALLBACK_KEY(&CServerBrowser::OnServerListKeyDown, this));
+    // Track the user sorting actions so we can preserve the sort state while
+    // rebuilding the list (e.g. while filtering). This avoids the visual
+    // behaviour where the sort disappears when the filter is applied.
+    m_pServerList[type]->SetSortColumnHandler(GUI_CALLBACK(&CServerBrowser::OnServerListSortChanged, this));
+    // Record initial sort (if any) so it can be reapplied by the list refresh
+    UpdateSortState(type);
 
     // If any of the include checkboxes overlap with the help/back buttons, we move them down - next to the status bar.
     CVector2D                  vecButtonPos = m_pButtonGeneralHelp[type]->GetPosition();
@@ -585,47 +752,215 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     for (std::vector<CGUICheckBox*>::iterator iter = pCheckBox.begin(); iter != pCheckBox.end(); ++iter)
         if ((*iter) != NULL && (((*iter)->GetPosition(false).fX + (*iter)->GetSize(false).fX) > vecButtonPos.fX))
             (*iter)->SetPosition(CVector2D(fMoveX += -SB_SPACER - (*iter)->GetSize(false).fX, m_pServerListStatus[type]->GetPosition().fY));
+
+    m_FilterState[type] = CaptureFilterState(type);
 }
 
 void CServerBrowser::DeleteTab(ServerBrowserType type)
 {
-    delete m_pButtonConnect[type];
-    delete m_pButtonRefresh[type];
+    if (m_pButtonConnect[type])
+    {
+        m_pButtonConnect[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonConnect[type];
+        m_pButtonConnect[type] = nullptr;
+    }
 
-    delete m_pEditAddress[type];
-    delete m_pComboSearchType[type];
+    if (m_pButtonRefresh[type])
+    {
+        m_pButtonRefresh[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonRefresh[type];
+        m_pButtonRefresh[type] = nullptr;
+    }
+
+    if (m_pEditAddress[type])
+    {
+        m_pEditAddress[type]->SetTextAcceptedHandler(GUI_CALLBACK());
+        m_pEditAddress[type]->SetTextChangedHandler(GUI_CALLBACK());
+        m_pEditAddress[type]->SetActivateHandler(GUI_CALLBACK());
+        m_pEditAddress[type]->SetDeactivateHandler(GUI_CALLBACK());
+        delete m_pEditAddress[type];
+        m_pEditAddress[type] = nullptr;
+    }
+
+    if (m_pComboSearchType[type])
+    {
+        m_pComboSearchType[type]->SetSelectionHandler(GUI_CALLBACK());
+        delete m_pComboSearchType[type];
+        m_pComboSearchType[type] = nullptr;
+    }
+
     delete m_pSearchTypeIcon[type];
+    m_pSearchTypeIcon[type] = nullptr;
+
     delete m_pServerSearchIcon[type];
+    m_pServerSearchIcon[type] = nullptr;
+
     delete m_pButtonInfoIcon[type];
+    m_pButtonInfoIcon[type] = nullptr;
+
     delete m_pButtonConnectIcon[type];
+    m_pButtonConnectIcon[type] = nullptr;
 
-    // Remove handler to prevent unwanted events during delete
-    m_pComboAddressHistory[type]->SetDropListRemoveHandler(NULL);
-    delete m_pComboAddressHistory[type];
+    if (m_pComboAddressHistory[type])
+    {
+        m_pComboAddressHistory[type]->SetSelectionHandler(GUI_CALLBACK());
+        m_pComboAddressHistory[type]->SetDropListRemoveHandler(GUI_CALLBACK());
+        delete m_pComboAddressHistory[type];
+        m_pComboAddressHistory[type] = nullptr;
+    }
 
-    delete m_pAddressFavoriteIcon[type];
+    if (m_pLabelAddressDescription[type])
+    {
+        delete m_pLabelAddressDescription[type];
+        m_pLabelAddressDescription[type] = nullptr;
+    }
+
+    if (m_pAddressFavoriteIcon[type])
+    {
+        m_pAddressFavoriteIcon[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pAddressFavoriteIcon[type];
+        m_pAddressFavoriteIcon[type] = nullptr;
+    }
+
     if (type == ServerBrowserTypes::RECENTLY_PLAYED)
-        delete m_pRemoveFromRecentIcon[type];
-    delete m_pEditSearch[type];
+    {
+        if (m_pRemoveFromRecentIcon[type])
+        {
+            m_pRemoveFromRecentIcon[type]->SetClickHandler(GUI_CALLBACK());
+            delete m_pRemoveFromRecentIcon[type];
+            m_pRemoveFromRecentIcon[type] = nullptr;
+        }
+    }
+
+    if (m_pEditSearch[type])
+    {
+        m_pEditSearch[type]->SetTextChangedHandler(GUI_CALLBACK());
+        m_pEditSearch[type]->SetActivateHandler(GUI_CALLBACK());
+        m_pEditSearch[type]->SetDeactivateHandler(GUI_CALLBACK());
+        delete m_pEditSearch[type];
+        m_pEditSearch[type] = nullptr;
+    }
+
+    if (m_pLabelSearchDescription[type])
+    {
+        delete m_pLabelSearchDescription[type];
+        m_pLabelSearchDescription[type] = nullptr;
+    }
+
     delete m_pButtonRefreshIcon[type];
+    m_pButtonRefreshIcon[type] = nullptr;
 
     delete m_pLabelInclude[type];
-    delete m_pIncludeEmpty[type];
-    delete m_pIncludeFull[type];
-    delete m_pIncludeLocked[type];
-    delete m_pIncludeOtherVersions[type];
+    m_pLabelInclude[type] = nullptr;
+
+    if (m_pIncludeEmpty[type])
+    {
+        m_pIncludeEmpty[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pIncludeEmpty[type];
+        m_pIncludeEmpty[type] = nullptr;
+    }
+
+    if (m_pIncludeFull[type])
+    {
+        m_pIncludeFull[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pIncludeFull[type];
+        m_pIncludeFull[type] = nullptr;
+    }
+
+    if (m_pIncludeLocked[type])
+    {
+        m_pIncludeLocked[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pIncludeLocked[type];
+        m_pIncludeLocked[type] = nullptr;
+    }
+
+    if (m_pIncludeOtherVersions[type])
+    {
+        m_pIncludeOtherVersions[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pIncludeOtherVersions[type];
+        m_pIncludeOtherVersions[type] = nullptr;
+    }
 
     if (m_pIncludeOffline[type])
     {
+        m_pIncludeOffline[type]->SetClickHandler(GUI_CALLBACK());
         delete m_pIncludeOffline[type];
+        m_pIncludeOffline[type] = nullptr;
+    }
+
+    if (m_pLabelPassword[type])
+    {
+        delete m_pLabelPassword[type];
+        m_pLabelPassword[type] = nullptr;
+    }
+
+    if (m_pEditPassword[type])
+    {
+        m_pEditPassword[type]->SetTextAcceptedHandler(GUI_CALLBACK());
+        m_pEditPassword[type]->SetTextChangedHandler(GUI_CALLBACK());
+        delete m_pEditPassword[type];
+        m_pEditPassword[type] = nullptr;
     }
 
     delete m_pServerPlayerList[type];
+    m_pServerPlayerList[type] = nullptr;
 
     delete m_pServerListStatus[type];
+    m_pServerListStatus[type] = nullptr;
 
-    delete m_pServerList[type];
-    delete m_pTab[type];
+    if (m_pServerPlayerListLabel[type])
+    {
+        delete m_pServerPlayerListLabel[type];
+        m_pServerPlayerListLabel[type] = nullptr;
+    }
+
+    if (m_pButtonInfo[type])
+    {
+        m_pButtonInfo[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonInfo[type];
+        m_pButtonInfo[type] = nullptr;
+    }
+
+    if (m_pButtonBack[type])
+    {
+        m_pButtonBack[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonBack[type];
+        m_pButtonBack[type] = nullptr;
+    }
+
+    if (m_pButtonFavourites[type])
+    {
+        m_pButtonFavourites[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonFavourites[type];
+        m_pButtonFavourites[type] = nullptr;
+    }
+
+    if (m_pButtonGeneralHelp[type])
+    {
+        m_pButtonGeneralHelp[type]->SetClickHandler(GUI_CALLBACK());
+        delete m_pButtonGeneralHelp[type];
+        m_pButtonGeneralHelp[type] = nullptr;
+    }
+
+    if (m_pServerList[type])
+    {
+        m_pServerList[type]->SetEnterKeyHandler(GUI_CALLBACK());
+        m_pServerList[type]->SetDoubleClickHandler(GUI_CALLBACK());
+        m_pServerList[type]->SetKeyDownHandler(GUI_CALLBACK_KEY());
+        m_pServerList[type]->SetSortColumnHandler(GUI_CALLBACK());
+        m_pServerList[type]->SetSelectionHandler(GUI_CALLBACK());
+        delete m_pServerList[type];
+        m_pServerList[type] = nullptr;
+    }
+
+    if (m_pTab[type])
+    {
+        delete m_pTab[type];
+        m_pTab[type] = nullptr;
+    }
+
+    m_bInitialRefreshDone[type] = false;
+    m_bPendingRefresh[type] = false;
 }
 
 ServerBrowserType CServerBrowser::GetCurrentServerBrowserTypeForSave()
@@ -661,10 +996,62 @@ ServerBrowserType CServerBrowser::GetCurrentServerBrowserType()
     return currentServerBrowserType;
 }
 
+void CServerBrowser::EnsureRefreshFor(ServerBrowserType type, bool bAutoRefreshEnabled, bool bForceOnFirstView)
+{
+    const auto index = static_cast<std::size_t>(type);
+    if (index >= std::size(m_pServerListStatus))
+        return;
+
+    if (auto* statusLabel = m_pServerListStatus[index]; statusLabel == nullptr)
+        return;
+
+    const bool bNeedsInitialRefresh = !m_bInitialRefreshDone[index];
+    if (!bNeedsInitialRefresh && !bAutoRefreshEnabled && !bForceOnFirstView)
+        return;
+
+    m_pServerListStatus[index]->SetText(_("Loading..."));
+    m_iSelectedServer[index] = -1;
+    m_bPendingRefresh[index] = true;
+}
+
+void CServerBrowser::StartRefresh(ServerBrowserType type)
+{
+    const auto index = static_cast<std::size_t>(type);
+    if (index >= std::size(m_pServerListStatus))
+        return;
+
+    if (auto* pList = GetServerList(type))
+    {
+        if (m_pServerListStatus[index])
+            m_pServerListStatus[index]->SetText(_("Loading..."));
+
+        m_iSelectedServer[index] = -1;
+        m_bPendingRefresh[index] = false;
+        
+        // Cancel any in-progress batch refresh to prevent iterator invalidation
+        // when pList->Refresh() calls Clear() on the server list
+        m_ListRefreshState[index].bActive = false;
+        m_ListRefreshState[index].pList = nullptr;
+        m_ListRefreshState[index].filterSnapshot.reset();
+        
+        pList->Refresh();
+        m_bInitialRefreshDone[index] = true;
+    }
+}
+
 void CServerBrowser::Update()
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
     CServerList*      pList = GetServerList(Type);
+
+    if (IsVisible())
+    {
+        for (std::size_t i = 0; i < std::size(m_bPendingRefresh); ++i)
+        {
+            if (m_bPendingRefresh[i])
+                StartRefresh(static_cast<ServerBrowserType>(i));
+        }
+    }
 
     if (m_bFocusTextEdit)
     {
@@ -682,7 +1069,8 @@ void CServerBrowser::Update()
     }
 
     // If an update is needed, the serverbrowser is visible and it has gone some time since last update
-    if ((pList->IsUpdated() || m_PrevServerBrowserType != Type) && m_ulLastUpdateTime < CClientTime::GetTime() - SERVER_BROWSER_UPDATE_INTERVAL)
+    if (IsVisible() && !IsListRefreshInProgress(Type) && (pList->IsUpdated() || m_PrevServerBrowserType != Type) &&
+        m_ulLastUpdateTime < CClientTime::GetTime() - SERVER_BROWSER_UPDATE_INTERVAL)
     {
         // Update the GUI
         UpdateServerList(Type, Type == ServerBrowserTypes::RECENTLY_PLAYED);
@@ -710,6 +1098,27 @@ void CServerBrowser::Update()
             m_FlashSearchBox[Type].uiNextTime = GetTickCount32() + 100;
         }
     }
+
+    if (IsVisible())
+    {
+        unsigned long ulNow = CClientTime::GetTime();
+        for (std::size_t i = 0; i < std::size(m_bPendingFilterUpdate); ++i)
+        {
+            if (m_bPendingFilterUpdate[i] && ulNow >= m_ulNextFilterUpdateTime[i])
+            {
+                m_bPendingFilterUpdate[i] = false;
+                m_ulNextFilterUpdateTime[i] = 0;
+                ServerBrowserType queuedType = static_cast<ServerBrowserType>(i);
+                const auto        batchSize = GetListRefreshBatchSize();
+                BeginServerListRefresh(queuedType, true, true);
+                ProcessServerListRefreshBatch(queuedType, batchSize);
+            }
+        }
+
+        ProcessPendingListRefreshes();
+    }
+
+    ProcessPendingConfigSave();
 }
 
 void CServerBrowser::SetVisible(bool bVisible)
@@ -729,22 +1138,29 @@ void CServerBrowser::SetVisible(bool bVisible)
     // Are we making this window visible?
     if (bVisible)
     {
-        bool bAutoRefresh = false;
-        CVARS_GET("auto_refresh_browser", bAutoRefresh);
-
-        // Start loading all servers (if needed).
-        for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        // Load cache for Internet list on first view to ensure quick populating
+        if (m_bFirstTimeBrowseServer && m_ServersInternet.GetServerCount() == 0)
         {
-            // Don't refresh Internet unless it's activated or needed.
-            if (i != ServerBrowserTypes::INTERNET || m_bFirstTimeBrowseServer || bAutoRefresh)
+            if (auto pCache = GetServerCache())
             {
-                m_pServerListStatus[i]->SetText(_("Loading..."));
-                m_iSelectedServer[i] = -1;
-                GetServerList((ServerBrowserType)i)->Refresh();
+                pCache->GenerateServerList(&m_ServersInternet, true);  // true = allow all cached servers
+                pCache->GetServerListCachedInfo(&m_ServersInternet);
             }
         }
 
-        CreateHistoryList();
+        bool             bAutoRefresh = false;
+        CVARS_GET("auto_refresh_browser", bAutoRefresh);
+        ServerBrowserType currentType = GetCurrentServerBrowserType();
+
+        for (std::size_t i = 0; i < std::size(m_pTab); ++i)
+        {
+            const auto type = static_cast<ServerBrowserType>(i);
+            const bool bForceInitialRefresh = m_bFirstTimeBrowseServer && type == currentType;
+            EnsureRefreshFor(type, bAutoRefresh, bForceInitialRefresh);
+        }
+
+        if (m_bHistoryListDirty)
+            CreateHistoryList();
 
         if (m_bFirstTimeBrowseServer)
             m_bFirstTimeBrowseServer = false;
@@ -762,11 +1178,13 @@ void CServerBrowser::SetVisible(bool bVisible)
         m_pEditAddress[Type]->SetCaretAtEnd();
 
         // Flash search box if it is not empty
-        for (uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        for (std::size_t i = 0; i < std::size(m_FlashSearchBox); ++i)
         {
-            m_FlashSearchBox[i].uiCount = m_pEditSearch[i]->GetText().empty() ? 0 : 15;
-            m_FlashSearchBox[Type].uiNextTime = 0;
+            m_FlashSearchBox[i].uiCount = m_pEditSearch[i]->GetText().empty() ? 0U : 15U;
         }
+        m_FlashSearchBox[Type].uiNextTime = 0;
+
+        m_ulHiddenRefreshBoostEnableTime = CClientTime::GetTime() + SERVER_BROWSER_HIDDEN_REFRESH_DELAY;
     }
     else
     {
@@ -775,14 +1193,19 @@ void CServerBrowser::SetVisible(bool bVisible)
         m_pQuickConnectHelpWindow->SetVisible(false);
         CServerInfo::GetSingletonPtr()->Hide();
 
-        for (uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        for (std::size_t i = 0; i < std::size(m_FlashSearchBox); ++i)
         {
             m_FlashSearchBox[i].uiCount = 0;
         }
+
+        m_ulHiddenRefreshBoostEnableTime = CClientTime::GetTime() + SERVER_BROWSER_HIDDEN_REFRESH_DELAY;
+
+        SuspendServerLists();
+        ProcessPendingConfigSave();
     }
 }
 
-bool CServerBrowser::IsVisible()
+bool CServerBrowser::IsVisible() const
 {
     return m_pTopWindow && m_pTopWindow->IsVisible();
 }
@@ -806,104 +1229,14 @@ bool CServerBrowser::CanBrowseVersion(const SString& strVersion)
 
 void CServerBrowser::UpdateServerList(ServerBrowserType Type, bool bClearServerList)
 {
-    GetVersionUpdater()->GetBrowseVersionMaps(m_blockedVersionMap, m_allowedVersionMap);
-
-#if MTA_DEBUG
-    // Selecting 'Nightly update' in debug build will show other versions
-    SString strUpdateBuildType;
-    CVARS_GET("update_build_type", strUpdateBuildType);
-    if (strUpdateBuildType == "2")
-    {
-        m_blockedVersionMap.clear();
-        m_allowedVersionMap.clear();
-    }
-#endif
-
-    // Setting this in coreconfig will show other versions
-    bool bForceBrowseOtherVersions = false;
-    CVARS_GET("force_browse_other_versions", bForceBrowseOtherVersions);
-    if (bForceBrowseOtherVersions)
-    {
-        m_blockedVersionMap.clear();
-        m_allowedVersionMap.clear();
-    }
-
-    // Save sort info
-    uint          uiSortColumn;
-    SortDirection sortDirection;
-    m_pServerList[Type]->GetSort(uiSortColumn, sortDirection);
-
-    // Disable sorting
-    m_pServerList[Type]->Sort(uiSortColumn, SortDirections::None);
-
-    // Get the appropriate server list
-    CServerList* pList = GetServerList(Type);
-
-    bool bGetListsCleared = pList->GetRevision() != m_pServerListRevision[Type] || bClearServerList;
-    if (bGetListsCleared)
-    {
-        m_pServerListRevision[Type] = pList->GetRevision();
-
-        // Clear current list
-        m_pServerList[Type]->Clear();
-
-        // Clear the player lists
-        m_pServerPlayerList[Type]->Clear();
-    }
-
-    bool didUpdateRowIndices = false;
-
-    // Loop the server list
-    for (CServerListIterator it = pList->IteratorBegin(); it != pList->IteratorEnd(); it++)
-    {
-        CServerListItem* pServer = *it;
-
-        if (bGetListsCleared)
-            pServer->iRowIndex = -1;
-
-        // Find info from server cache for favourites and recent
-        if (Type == ServerBrowserType::FAVOURITES || Type == ServerBrowserType::RECENTLY_PLAYED)
-            GetServerCache()->GetServerCachedInfo(pServer);
-
-        // Add/update/remove the item to the list
-        if (pServer->revisionInList[Type] != pServer->uiRevision || bClearServerList)
-        {
-            if (!didUpdateRowIndices)
-            {
-                UpdateRowIndexMembers(Type);
-                didUpdateRowIndices = true;
-            }
-
-            pServer->revisionInList[Type] = pServer->uiRevision;
-            AddServerToList(pServer, Type);
-        }
-    }
-    bool              bIncludeOtherVersions = m_pIncludeOtherVersions[Type]->GetSelected();
-    ServerBrowserType type = Type;
-
-    if (bIncludeOtherVersions)
-    {
-        m_pServerList[type]->SetColumnWidth(1, 34, false);
-    }
-    else
-    {
-        m_pServerList[type]->SetColumnWidth(1, 0.03f, true);
-    }
-
-    // Re-enable sorting
-    m_pServerList[Type]->Sort(uiSortColumn, sortDirection);
-
-    m_pServerList[Type]->ForceUpdate();
-    pList->SetUpdated(false);
-
-    if (Type == ServerBrowserTypes::RECENTLY_PLAYED)
-        m_pRemoveFromRecentIcon[Type]->SetAlpha(0.3f);
+    BeginServerListRefresh(Type, bClearServerList, false);
+    ProcessServerListRefreshBatch(Type, GetListRefreshBatchSize());
 }
 
 void CServerBrowser::CreateHistoryList()
 {
     // Clear our combo boxes first
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::size_t i = 0; i < std::size(m_pComboAddressHistory); ++i)
     {
         m_pComboAddressHistory[i]->Clear();
     }
@@ -917,7 +1250,7 @@ void CServerBrowser::CreateHistoryList()
         if (pServer->strEndpoint)
         {
             bEmpty = false;
-            for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+            for (std::size_t i = 0; i < std::size(m_pComboAddressHistory); ++i)
             {
                 m_pComboAddressHistory[i]->AddItem(("mtasa://" + pServer->strEndpoint).c_str())->SetData(pServer->strEndpoint.c_str());
             }
@@ -925,12 +1258,13 @@ void CServerBrowser::CreateHistoryList()
     }
 
     m_ServersHistory.Refresh();
+    m_bHistoryListDirty = false;
 }
 
 void CServerBrowser::UpdateHistoryList()
 {
     // Assume our type is 0, then update all fields when appropriate
-    unsigned int Type = 0;
+    std::size_t Type = 0;
 
     // Look through our combo box and process each item
     CGUIComboBox* pServerList = m_pComboAddressHistory[Type];
@@ -948,7 +1282,7 @@ void CServerBrowser::UpdateHistoryList()
             {
                 if (pServer->strEndpoint != pServer->strName)            // Do we have a real name for the server?
                 {
-                    for (unsigned int index = 0; index < SERVER_BROWSER_TYPE_COUNT; index++)
+                    for (std::size_t index = 0; index < std::size(m_pComboAddressHistory); ++index)
                     {
                         m_pComboAddressHistory[index]->SetItemText(i, ("mtasa://" + pServer->strEndpoint + " | " + pServer->strName).c_str());
                     }
@@ -959,17 +1293,18 @@ void CServerBrowser::UpdateHistoryList()
     }
 }
 
-void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrowserType Type)
+void CServerBrowser::AddServerToList(CServerListItem* pServer, ServerBrowserType Type, const SFilterState& filterState)
 {
-    bool bIncludeEmpty = m_pIncludeEmpty[Type]->GetSelected();
-    bool bIncludeFull = m_pIncludeFull[Type]->GetSelected();
-    bool bIncludeLocked = m_pIncludeLocked[Type]->GetSelected();
-    bool bIncludeOffline = m_pIncludeOffline[Type] && m_pIncludeOffline[Type]->GetSelected();
-    bool bIncludeOtherVersions = m_pIncludeOtherVersions[Type]->GetSelected();
+    const bool        bIncludeEmpty = filterState.includeEmpty;
+    const bool        bIncludeFull = filterState.includeFull;
+    const bool        bIncludeLocked = filterState.includeLocked;
+    const bool        bIncludeOffline = filterState.includeOffline;
+    const bool        bIncludeOtherVersions = filterState.includeOtherVersions;
+    const std::string& strServerSearchText = filterState.searchText;
+    const int          iCurrentSearchType = filterState.searchType;
+
     bool bServerSearchFound = true;
 
-    std::string strServerSearchText = m_pEditSearch[Type]->GetText();
-    int         iCurrentSearchType = m_pComboSearchType[Type]->GetSelectedItemIndex();
     if (!strServerSearchText.empty())
     {
         if (iCurrentSearchType == SearchTypes::SERVERS)
@@ -985,7 +1320,7 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
             if (pServer->nPlayers > 0)
             {
                 // Search for the search text in the names of the players in the server
-                for (unsigned int i = 0; i < pServer->vecPlayers.size(); i++)
+                for (std::size_t i = 0; i < pServer->vecPlayers.size(); ++i)
                 {
                     SString strPlayerName = pServer->vecPlayers[i];
 
@@ -1016,9 +1351,12 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
     bool bIsBlockedVersion = bIsOtherVersion && !CanBrowseVersion(pServer->strVersion);
     bool bIsBlockedServer = (pServer->uiMasterServerSaysRestrictions & RESTRICTION_BLOCK_SERVER) != false;
 
-    if ((!pServer->strVersion.empty() || bIsOffline) && (!bLowQuality || bIsOffline) && (!bIsEmpty || bIncludeEmpty) && (!bIsFull || bIncludeFull) &&
+    bool bMasterServerOffline = (pServer->uiMasterServerSaysRestrictions == 0);
+    bool bAllowLowQuality = bIsOffline || bMasterServerOffline;
+
+    if ((!bLowQuality || bAllowLowQuality) && (!bIsEmpty || bIncludeEmpty) && (!bIsFull || bIncludeFull) &&
         (!bIsLocked || bIncludeLocked) && (!bIsOffline || bIncludeOffline || bWasGoodNowFailing) && (!bIsOtherVersion || bIncludeOtherVersions) &&
-        (!bIsBlockedVersion) && (!bIsBlockedServer) && (bServerSearchFound))
+        (!bIsBlockedVersion) && (!bIsBlockedServer) && (bServerSearchFound) && (!pServer->strVersion.empty() || bIsOffline))
     {
         bAddServer = true;
     }
@@ -1032,11 +1370,11 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
         //
         // Remove server from list
         //
-        int iIndex = pServer->iRowIndex;
+        int iIndex = pServer->iRowIndex[Type];
         if (iIndex != -1)
         {
             m_pServerList[Type]->RemoveRow(iIndex);
-            pServer->iRowIndex = -1;
+            pServer->iRowIndex[Type] = -1;
             UpdateRowIndexMembers(Type);
         }
     }
@@ -1047,18 +1385,18 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
         //
 
         // Get existing row or create a new row if not found
-        int iIndex = pServer->iRowIndex;
+        int iIndex = pServer->iRowIndex[Type];
         if (iIndex == -1)
         {
             iIndex = m_pServerList[Type]->AddRow(true);
-            pServer->iRowIndex = iIndex;
+            pServer->iRowIndex[Type] = iIndex;
         }
 
         const SString strVersion = !bIncludeOtherVersions ? SStringX("") : pServer->strVersion;
         const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
         const SString strVerified = pServer->isStatusVerified ? "" : "*";
-        const SString strPlayers = pServer->nMaxPlayers == 0 ? SStringX("") : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
+        const SString strPlayers = (pServer->nMaxPlayers == 0) ? SStringX("0 / 0") : SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified);
         const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
 
         const SString strPing = pServer->nPing == 9999 ? SStringX("") : SString("%d", pServer->nPing);
@@ -1109,7 +1447,7 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
         }
 
         // If the index was modified from the original, then update all indexes because it means there was some sort
-        if (pServer->iRowIndex != iIndex)
+        if (pServer->iRowIndex[Type] != iIndex)
             UpdateRowIndexMembers(Type);
     }
 }
@@ -1172,8 +1510,10 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
         for (i = i_b; i != i_e; i++)
         {
             CServerListItem* pServer = *i;
+            if (!pServer || !CServerListItem::StaticIsValid(pServer))
+                continue;
 
-            for (unsigned int j = 0; j < pServer->vecPlayers.size(); j++)
+            for (std::size_t j = 0; j < pServer->vecPlayers.size(); ++j)
             {
                 std::string strPlayerName = pServer->vecPlayers[j].c_str();
                 if (strPlayerName.compare(strSelectedPlayerName) == 0)
@@ -1211,7 +1551,7 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
         if (pServer)
         {
             // We found the server, add all the players
-            for (unsigned int j = 0; j < pServer->vecPlayers.size(); j++)
+            for (std::size_t j = 0; j < pServer->vecPlayers.size(); ++j)
             {
                 int k = m_pServerPlayerList[Type]->AddRow();
                 m_pServerPlayerList[Type]->SetItemText(k, m_hPlayerName[Type], pServer->vecPlayers[j].c_str());
@@ -1308,7 +1648,9 @@ void CServerBrowser::NotifyServerExists(in_addr Address, ushort usPort)
         CServerListItem* pLast = *pHistoryList->IteratorBegin();
         pHistoryList->Remove(pLast->Address, pLast->usGamePort);
     }
-    CreateHistoryList();
+    m_bHistoryListDirty = true;
+    if (IsVisible())
+        CreateHistoryList();
     SaveRecentlyPlayedList();
 }
 
@@ -1350,7 +1692,10 @@ bool CServerBrowser::ConnectToSelectedServer()
 
             if (strPassword.empty())            // No password could be found, popup password entry.
             {
-                CServerInfo::GetSingletonPtr()->Show(eWindowTypes::SERVER_INFO_PASSWORD, pServer->strHost.c_str(), pServer->usGamePort, "", pServer);
+                if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+                {
+                    pServerInfo->Show(eWindowTypes::SERVER_INFO_PASSWORD, pServer->strHost.c_str(), pServer->usGamePort, "", pServer);
+                }
                 return true;
             }
         }
@@ -1369,16 +1714,40 @@ bool CServerBrowser::OnRefreshClick(CGUIElement* pElement)
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
 
-    GetServerList(Type)->Refresh();
+    if (m_pServerListStatus[Type])
+        m_pServerListStatus[Type]->SetText(_("Loading..."));
+
+    m_iSelectedServer[Type] = -1;
+    StartRefresh(Type);
 
     return true;
 }
 
 bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 {
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    
+    // First try to get the selected server from the list
+    CServerListItem* pServer = FindSelectedServer(Type);
+    if (pServer && CServerListItem::StaticIsValid(pServer) && 
+        pServer->Address.s_addr != 0 && pServer->usGamePort != 0 && 
+        !pServer->strHost.empty())
+    {
+        // Use the selected server's information directly
+        const SString& strHost = pServer->strHost;
+        unsigned short usPort = pServer->usGamePort;
+
+        if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+        {
+            pServerInfo->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, "", pServer);
+            return true;
+        }
+    }
+    
+    // Fallback to using the address bar if no server is selected
     unsigned short usPort;
     std::string    strHost, strNick, strPassword;
-    SString        strURI = m_pEditAddress[GetCurrentServerBrowserType()]->GetText();
+    SString        strURI = m_pEditAddress[Type]->GetText();
 
     // Trim leading spaces from the URI
     strURI = strURI.TrimStart(" ");
@@ -1392,7 +1761,10 @@ bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
 
-    CServerInfo::GetSingletonPtr()->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str());
+    if (CServerInfo* pServerInfo = CServerInfo::GetSingletonPtr())
+    {
+        pServerInfo->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str(), nullptr);
+    }
     return true;
 }
 
@@ -1414,10 +1786,10 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
         if (m_ServersFavourites.Remove(Address, usPort))
         {
             SaveFavouritesList();
-            UpdateServerList(ServerBrowserTypes::FAVOURITES, true);
-            for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+            RequestFilterRefresh(ServerBrowserTypes::FAVOURITES, true);
+            for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
             {
-                m_pAddressFavoriteIcon[i]->SetAlpha(0.3f);
+                m_pAddressFavoriteIcon[iconIndex]->SetAlpha(0.3f);
             }
             return true;
         }
@@ -1425,10 +1797,10 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
         if (m_ServersFavourites.AddUnique(Address, usPort))
         {
             SaveFavouritesList();
-            UpdateServerList(ServerBrowserTypes::FAVOURITES, true);
-            for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+            RequestFilterRefresh(ServerBrowserTypes::FAVOURITES, true);
+            for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
             {
-                m_pAddressFavoriteIcon[i]->SetAlpha(1.0f);
+                m_pAddressFavoriteIcon[iconIndex]->SetAlpha(1.0f);
             }
         }
     }
@@ -1449,9 +1821,10 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
 
     // Adjust our other address bars to be consistent
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::size_t i = 0; i < std::size(m_pEditAddress); ++i)
     {
-        if ((i != Type) && (strURI != m_pEditAddress[i]->GetText()))
+        const auto otherType = static_cast<ServerBrowserType>(i);
+        if ((otherType != Type) && (strURI != m_pEditAddress[i]->GetText()))
             m_pEditAddress[i]->SetText(strURI.c_str());
     }
 
@@ -1460,18 +1833,20 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
         {
-            for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+            for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
             {
-                m_pAddressFavoriteIcon[i]->SetAlpha(1.0f);
+                m_pAddressFavoriteIcon[iconIndex]->SetAlpha(1.0f);
             }
             return true;
         }
     }
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
     {
-        m_pAddressFavoriteIcon[i]->SetAlpha(0.3f);
+        m_pAddressFavoriteIcon[iconIndex]->SetAlpha(0.3f);
     }
     return true;
 }
@@ -1528,11 +1903,14 @@ bool CServerBrowser::OnSearchTypeSelected(CGUIElement* pElement)
 
     OnSearchDefocused(pElement);
 
-    // Don't bother doing anything if the search bar is empty
-    if (m_pEditSearch[Type]->GetText().empty())
+    SFilterState newState = CaptureFilterState(Type);
+    bool         bStateChanged = FilterStateChanged(Type, newState);
+    m_FilterState[Type] = newState;
+
+    if (m_pEditSearch[Type]->GetText().empty() || !bStateChanged)
         return true;
 
-    UpdateServerList(GetCurrentServerBrowserType(), true);
+    RequestFilterRefresh(Type, true);
     return true;
 }
 
@@ -1540,7 +1918,7 @@ bool CServerBrowser::OnBackClick(CGUIElement* pElement)
 {
     CMainMenu* pMainMenu = CLocalGUI::GetSingleton().GetMainMenu();
 
-    m_pTopWindow->SetVisible(false);
+    SetVisible(false);
     pMainMenu->m_bIsInSubWindow = false;
 
     SaveOptions();
@@ -1632,7 +2010,31 @@ bool CServerBrowser::OnMouseDoubleClick(CGUIMouseEventArgs Args)
 
 bool CServerBrowser::OnFilterChanged(CGUIElement* pElement)
 {
-    UpdateServerList(GetCurrentServerBrowserType(), true);
+    ServerBrowserType detectedType = GetCurrentServerBrowserType();
+
+    if (pElement)
+    {
+        for (std::size_t i = 0; i < std::size(m_pEditSearch); ++i)
+        {
+            if (pElement == m_pEditSearch[i] || pElement == m_pIncludeEmpty[i] || pElement == m_pIncludeFull[i] ||
+                pElement == m_pIncludeLocked[i] || (m_pIncludeOffline[i] && pElement == m_pIncludeOffline[i]) ||
+                pElement == m_pIncludeOtherVersions[i])
+            {
+                detectedType = static_cast<ServerBrowserType>(i);
+                break;
+            }
+        }
+    }
+
+    bool bImmediate = (pElement && pElement != m_pEditSearch[detectedType]);
+
+    SFilterState newState = CaptureFilterState(detectedType);
+    if (!FilterStateChanged(detectedType, newState))
+        return true;
+
+    m_FilterState[detectedType] = newState;
+
+    RequestFilterRefresh(detectedType, bImmediate);
     // SaveOptions ( );  Slow
 
     return true;
@@ -1650,6 +2052,10 @@ bool CServerBrowser::OnTabChanged(CGUIElement* pElement)
     OnAddressFocused(pElement);
     OnSearchDefocused(pElement);
     OnAddressDefocused(pElement);
+
+    bool bAutoRefresh = false;
+    CVARS_GET("auto_refresh_browser", bAutoRefresh);
+    EnsureRefreshFor(GetCurrentServerBrowserType(), bAutoRefresh, false);
     return true;
 }
 
@@ -1709,8 +2115,8 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
         return false;
 
     // Loop through all subnodes looking for relevant nodes
-    unsigned int uiCount = pNode->GetSubNodeCount();
-    for (unsigned int i = 0; i < uiCount; i++)
+    const auto subNodeCount = pNode->GetSubNodeCount();
+    for (std::size_t i = 0; i < subNodeCount; ++i)
     {
         pSubNode = pNode->GetSubNode(i);
         if (pSubNode && pSubNode->GetTagName().compare(strTagName) == 0)
@@ -1746,6 +2152,17 @@ void CServerBrowser::SaveRecentlyPlayedList()
     if (!pHistory)
         pHistory = pConfig->CreateSubNode(CONFIG_NODE_SERVER_HISTORY);
     SaveServerList(pHistory, CONFIG_HISTORY_LIST_TAG, GetHistoryList(), CONNECT_HISTORY_LIMIT);
+
+    // Sync both recent and history servers with cache and persist to disk
+    CServerCacheInterface* pCache = GetServerCache();
+    if (pCache)
+    {
+        pCache->SetServerListCachedInfo(&m_ServersRecent);
+        pCache->SetServerListCachedInfo(&m_ServersHistory);
+        pCache->SaveServerCache(false);  // Non-blocking save
+    }
+
+    RequestConfigSave(false);
 }
 
 void CServerBrowser::SaveFavouritesList()
@@ -1755,6 +2172,16 @@ void CServerBrowser::SaveFavouritesList()
     if (!pFavourites)
         pFavourites = pConfig->CreateSubNode(CONFIG_NODE_SERVER_FAV);
     SaveServerList(pFavourites, CONFIG_FAVOURITE_LIST_TAG, GetFavouritesList());
+
+    // Sync favorite servers with cache and persist to disk
+    CServerCacheInterface* pCache = GetServerCache();
+    if (pCache)
+    {
+        pCache->SetServerListCachedInfo(&m_ServersFavourites);
+        pCache->SaveServerCache(false);  // Non-blocking save
+    }
+
+    RequestConfigSave(false);
 }
 
 bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagName, CServerList* pList, unsigned int iLimit)
@@ -1773,6 +2200,8 @@ bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagNa
         if (iLimit && iProcessed == iLimit)
             break;
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
 
         // Add the item to the node
         CXMLNode* pSubNode = pNode->CreateSubNode(strTagName.c_str());
@@ -1802,8 +2231,8 @@ void CServerBrowser::LoadOptions(CXMLNode* pNode)
     }
 
     // loop through all subnodes
-    unsigned int uiCount = pNode->GetSubNodeCount();
-    for (unsigned int ui = 0; ui < uiCount; ui++)
+    const auto subNodeCount = pNode->GetSubNodeCount();
+    for (std::size_t ui = 0; ui < subNodeCount; ++ui)
     {
         CXMLNode* pSubNode = pNode->GetSubNode(ui);
         if (pSubNode && pSubNode->GetTagName().compare("list") == 0)
@@ -1815,52 +2244,56 @@ void CServerBrowser::LoadOptions(CXMLNode* pNode)
                 int i = atoi(pListID->GetValue().c_str());
                 if (i >= 0 && i < SERVER_BROWSER_TYPE_COUNT)
                 {
+                    const auto listIndex = static_cast<std::size_t>(i);
                     // load all checkbox options
                     CXMLAttribute* pIncludeEmpty = pSubNode->GetAttributes().Find("include_empty");
                     if (pIncludeEmpty)
-                        m_pIncludeEmpty[i]->SetSelected(pIncludeEmpty->GetValue().compare("1") == 0);
+                        m_pIncludeEmpty[listIndex]->SetSelected(pIncludeEmpty->GetValue().compare("1") == 0);
 
                     CXMLAttribute* pIncludeFull = pSubNode->GetAttributes().Find("include_full");
                     if (pIncludeFull)
-                        m_pIncludeFull[i]->SetSelected(pIncludeFull->GetValue().compare("1") == 0);
+                        m_pIncludeFull[listIndex]->SetSelected(pIncludeFull->GetValue().compare("1") == 0);
 
                     CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes().Find("include_locked");
                     if (pIncludeLocked)
-                        m_pIncludeLocked[i]->SetSelected(pIncludeLocked->GetValue().compare("1") == 0);
+                        m_pIncludeLocked[listIndex]->SetSelected(pIncludeLocked->GetValue().compare("1") == 0);
 
                     // CXMLAttribute* pIncludeOtherVersions = pSubNode->GetAttributes ( ).Find ( "include_other_versions" );
                     // if ( pIncludeOtherVersions )
                     //    m_pIncludeOtherVersions[ i ]->SetSelected ( pIncludeOtherVersions->GetValue ( ).compare ( "1" ) == 0 );
 
                     // load 'include offline' if the checkbox exists
-                    if (m_pIncludeOffline[i])
+                    if (m_pIncludeOffline[listIndex])
                     {
                         CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes().Find("include_offline");
                         if (pIncludeOffline)
-                            m_pIncludeOffline[i]->SetSelected(pIncludeOffline->GetValue().compare("1") == 0);
+                            m_pIncludeOffline[listIndex]->SetSelected(pIncludeOffline->GetValue().compare("1") == 0);
                     }
 
                     CXMLAttribute* pDisabled = pSubNode->GetAttributes().Find("disabled");
                     if (pDisabled)
-                        m_pTab[i]->SetEnabled(pDisabled->GetValue().compare("1") == 0);
+                        m_pTab[listIndex]->SetEnabled(pDisabled->GetValue().compare("1") == 0);
 
                     // restore the active tab
                     CXMLAttribute* pActiveTab = pSubNode->GetAttributes().Find("active");
                     if (pActiveTab && pActiveTab->GetValue().compare("1") == 0)
-                        m_pPanel->SetSelectedTab(m_pTab[i]);
+                        m_pPanel->SetSelectedTab(m_pTab[listIndex]);
 
                     // restore the search field contents
                     std::string strSearch = pSubNode->GetTagContent();
                     if (strSearch.length() > 0)
-                        m_pEditSearch[i]->SetText(strSearch.c_str());
+                        m_pEditSearch[listIndex]->SetText(strSearch.c_str());
                 }
             }
         }
     }
     m_bOptionsLoaded = true;
+
+    for (std::size_t ui = 0; ui < std::size(m_FilterState); ++ui)
+        m_FilterState[ui] = CaptureFilterState(static_cast<ServerBrowserType>(ui));
 }
 
-void CServerBrowser::SaveOptions()
+void CServerBrowser::SaveOptions(bool bForceSave)
 {
     // Check to make sure if the options were loaded yet, if not the 'changed' events might screw up
     if (!m_bOptionsLoaded)
@@ -1881,14 +2314,14 @@ void CServerBrowser::SaveOptions()
     int iCurrentType = GetCurrentServerBrowserTypeForSave();
 
     // Save the options for all four lists
-    for (unsigned int ui = 0; ui < SERVER_BROWSER_TYPE_COUNT; ui++)
+    for (std::size_t ui = 0; ui < std::size(m_pIncludeEmpty); ++ui)
     {
         CXMLNode* pSubNode = pOptions->CreateSubNode("list");
         if (pSubNode)
         {
             // ID of the list to save
             CXMLAttribute* pListID = pSubNode->GetAttributes().Create("id");
-            pListID->SetValue(ui);
+            pListID->SetValue(static_cast<int>(ui));
 
             // Checkboxes
             CXMLAttribute* pIncludeEmpty = pSubNode->GetAttributes().Create("include_empty");
@@ -1931,7 +2364,427 @@ void CServerBrowser::SaveOptions()
             }
         }
     }
+
+    RequestConfigSave(bForceSave);
+}
+
+void CServerBrowser::RequestConfigSave(bool bForceImmediate)
+{
+    if (bForceImmediate)
+    {
+        m_bPendingConfigSave = false;
+        m_ulNextConfigSaveTime = 0;
+        g_pCore->SaveConfig();
+        return;
+    }
+
+    m_bPendingConfigSave = true;
+    m_ulNextConfigSaveTime = CClientTime::GetTime() + SERVER_BROWSER_CONFIG_SAVE_DELAY;
+}
+
+void CServerBrowser::ProcessPendingConfigSave()
+{
+    if (!m_bPendingConfigSave)
+        return;
+
+    unsigned long ulNow = CClientTime::GetTime();
+
+    if (ulNow < m_ulNextConfigSaveTime)
+        return;
+
+    if (IsVisible() && ulNow < m_ulNextConfigSaveTime + SERVER_BROWSER_CONFIG_SAVE_VISIBLE_GRACE)
+        return;
+
+    m_bPendingConfigSave = false;
+    m_ulNextConfigSaveTime = 0;
     g_pCore->SaveConfig();
+}
+
+void CServerBrowser::RequestFilterRefresh(ServerBrowserType type, bool bImmediate)
+{
+    const auto index = static_cast<std::size_t>(type);
+    if (index >= std::size(m_bPendingFilterUpdate))
+        return;
+
+    const bool bProcessNow = bImmediate && IsVisible();
+
+    if (bProcessNow)
+    {
+        m_bPendingFilterUpdate[index] = false;
+        m_ulNextFilterUpdateTime[index] = 0;
+        if (const auto batchSize = GetListRefreshBatchSize(); batchSize > 0)
+        {
+            BeginServerListRefresh(type, true, true);
+            ProcessServerListRefreshBatch(type, batchSize);
+        }
+        return;
+    }
+
+    m_bPendingFilterUpdate[index] = true;
+    m_ulNextFilterUpdateTime[index] = CClientTime::GetTime() + SERVER_BROWSER_FILTER_UPDATE_DELAY;
+}
+
+CServerBrowser::SFilterState CServerBrowser::CaptureFilterState(ServerBrowserType type)
+{
+    SFilterState state;
+    state.searchText = m_pEditSearch[type] ? m_pEditSearch[type]->GetText() : std::string();
+    state.searchType = m_pComboSearchType[type] ? m_pComboSearchType[type]->GetSelectedItemIndex() : 0;
+    state.includeEmpty = m_pIncludeEmpty[type] && m_pIncludeEmpty[type]->GetSelected();
+    state.includeFull = m_pIncludeFull[type] && m_pIncludeFull[type]->GetSelected();
+    state.includeLocked = m_pIncludeLocked[type] && m_pIncludeLocked[type]->GetSelected();
+    state.includeOffline = m_pIncludeOffline[type] && m_pIncludeOffline[type]->GetSelected();
+    state.includeOtherVersions = m_pIncludeOtherVersions[type] && m_pIncludeOtherVersions[type]->GetSelected();
+    return state;
+}
+
+bool CServerBrowser::FilterStateChanged(ServerBrowserType type, const SFilterState& newState) const
+{
+    const SFilterState& current = m_FilterState[type];
+    if (current.searchType != newState.searchType)
+        return true;
+    if (current.searchText != newState.searchText)
+        return true;
+    if (current.includeEmpty != newState.includeEmpty)
+        return true;
+    if (current.includeFull != newState.includeFull)
+        return true;
+    if (current.includeLocked != newState.includeLocked)
+        return true;
+    if (current.includeOffline != newState.includeOffline)
+        return true;
+    if (current.includeOtherVersions != newState.includeOtherVersions)
+        return true;
+    return false;
+}
+
+void CServerBrowser::BeginServerListRefresh(ServerBrowserType type, bool bClearServerList, bool bForceRestart)
+{
+    const auto index = static_cast<std::size_t>(type);
+    if (index >= std::size(m_ListRefreshState))
+        return;
+
+    SListRefreshState& state = m_ListRefreshState[index];
+
+    if (!m_pServerList[index])
+        return;
+
+    if (state.bActive && !bForceRestart)
+    {
+        if (bClearServerList && !state.bClearServerList)
+        {
+            state.bClearServerList = true;
+            state.bNeedsListClear = true;
+        }
+        // Check if sort order has changed - if so, need to restart the batch
+        unsigned int currentColumn = 0;
+        SortDirection currentDirection = SortDirections::None;
+        m_pServerList[index]->GetSort(currentColumn, currentDirection);
+        if (currentDirection != state.sortDirection || (currentDirection != SortDirections::None && currentColumn != state.uiSortColumn))
+        {
+            // Sort order changed during refresh - restart with new sort state
+            bForceRestart = true;
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    if (state.bActive && !bClearServerList && !bForceRestart)
+        m_pServerList[index]->Sort(state.uiSortColumn, state.sortDirection);
+
+    state.bActive = false;
+    state.filterSnapshot.reset();
+    state.pList = GetServerList(type);
+    if (!state.pList)
+        return;
+
+    GetVersionUpdater()->GetBrowseVersionMaps(m_blockedVersionMap, m_allowedVersionMap);
+
+#if MTA_DEBUG
+    // Selecting 'Nightly update' in debug build will show other versions
+    SString strUpdateBuildType;
+    CVARS_GET("update_build_type", strUpdateBuildType);
+    if (strUpdateBuildType == "2")
+    {
+        m_blockedVersionMap.clear();
+        m_allowedVersionMap.clear();
+    }
+#endif
+
+    bool bForceBrowseOtherVersions = false;
+    CVARS_GET("force_browse_other_versions", bForceBrowseOtherVersions);
+    if (bForceBrowseOtherVersions)
+    {
+        m_blockedVersionMap.clear();
+        m_allowedVersionMap.clear();
+    }
+
+    state.bClearServerList = bClearServerList;
+    state.bNeedsListClear = state.pList->GetRevision() != m_pServerListRevision[index] || bClearServerList;
+    state.bDidUpdateRowIndices = false;
+    unsigned int currentColumn = 0;
+    SortDirection currentDirection = SortDirections::None;
+    m_pServerList[index]->GetSort(currentColumn, currentDirection);
+    // If the UI gridlist currently reports no active sort, attempt to use
+    // the last saved user sort state (as the GUI may clear its internal
+    // sort indicator when rebuilt). This preserves sort across filter
+    // and rebuild operations.
+    if (currentDirection == SortDirections::None && m_SortState[index].direction != SortDirections::None)
+    {
+        currentColumn = m_SortState[index].uiColumn;
+        currentDirection = m_SortState[index].direction;
+    }
+    state.uiSortColumn = (currentDirection == SortDirections::None) ? 0U : (currentColumn ? currentColumn : 1U);
+    state.sortDirection = currentDirection;
+
+    if (state.bNeedsListClear)
+    {
+        m_pServerListRevision[index] = state.pList->GetRevision();
+        m_pServerList[index]->Clear();
+        m_pServerPlayerList[index]->Clear();
+
+        // Sort the data list before populating the GUI list (only once per refresh)
+        // This ensures items are added in correct order without needing UI-side sorting
+        unsigned int uiLogicalColumn = 0;
+        if (state.uiSortColumn == m_hVersion[index])
+            uiLogicalColumn = 1;
+        else if (state.uiSortColumn == m_hLocked[index])
+            uiLogicalColumn = 2;
+        else if (state.uiSortColumn == m_hName[index])
+            uiLogicalColumn = 3;
+        else if (state.uiSortColumn == m_hPlayers[index])
+            uiLogicalColumn = 4;
+        else if (state.uiSortColumn == m_hPing[index])
+            uiLogicalColumn = 5;
+        else if (state.uiSortColumn == m_hGame[index])
+            uiLogicalColumn = 6;
+
+        // Convert SortDirection enum to int (0=None, 1=Ascending, 2=Descending)
+        int iDirection = (int)state.sortDirection;
+        if (state.pList)
+            state.pList->Sort(uiLogicalColumn, iDirection);
+
+        // Disable auto-sorting during population to improve performance while keeping the sort indicator
+        m_pServerList[index]->SetAutoSortSuppressed(true);
+    }
+
+    state.iterator = state.pList->IteratorBegin();
+    state.endIterator = state.pList->IteratorEnd();
+    state.filterSnapshot = m_FilterState[index];
+    state.bActive = true;
+    m_ulNextListLayoutTime[index] = CClientTime::GetTime();
+}
+
+bool CServerBrowser::ProcessServerListRefreshBatch(ServerBrowserType type, size_t uiMaxSteps)
+{
+    const auto index = static_cast<std::size_t>(type);
+    if (index >= std::size(m_ListRefreshState))
+        return true;
+
+    SListRefreshState& state = m_ListRefreshState[index];
+    if (!state.bActive || !state.pList)
+        return true;
+
+    if (!state.filterSnapshot)
+        state.filterSnapshot = m_FilterState[index];
+
+    if (!state.filterSnapshot)
+        return true;
+
+    const SFilterState& activeFilter = *state.filterSnapshot;
+    const bool          bHiddenBoost = ShouldUseHiddenRefreshAcceleration();
+    const auto          frameBudget = std::chrono::milliseconds{bHiddenBoost ? SERVER_BROWSER_REFRESH_FRAME_BUDGET_MS * static_cast<int>(SERVER_BROWSER_HIDDEN_REFRESH_MULTIPLIER) : SERVER_BROWSER_REFRESH_FRAME_BUDGET_MS};
+    const auto          frameStart = std::chrono::steady_clock::now();
+
+    size_t processed = 0;
+    while (state.iterator != state.endIterator && processed < uiMaxSteps)
+    {
+        CServerListItem* pServer = *state.iterator;
+
+        // The list can briefly hand us null if an item was erased between batches
+        if (!pServer)
+        {
+            ++state.iterator;
+            state.bNeedsListClear = true;
+            continue;
+        }
+
+        // Skip entries that were removed from the list while we were waiting to process them
+        if (!CServerListItem::StaticIsValid(pServer))
+        {
+            ++state.iterator;
+            state.bNeedsListClear = true;
+            continue;
+        }
+
+        // Additional safety check before accessing members
+        if (state.bNeedsListClear)
+            pServer->iRowIndex[0] = pServer->iRowIndex[1] = pServer->iRowIndex[2] = pServer->iRowIndex[3] = -1;
+
+        if (type == ServerBrowserTypes::FAVOURITES || type == ServerBrowserTypes::RECENTLY_PLAYED)
+        {
+            if (pServer && pServer->Address.s_addr != 0 && pServer->usGamePort != 0)
+            {
+                CServerCacheInterface* pCache = GetServerCache();
+                if (pCache)
+                    pCache->GetServerCachedInfo(pServer);
+            }
+        }
+
+        if (pServer && (pServer->revisionInList[type] != pServer->uiRevision || state.bClearServerList))
+        {
+            if (!state.bDidUpdateRowIndices)
+            {
+                UpdateRowIndexMembers(type);
+                state.bDidUpdateRowIndices = true;
+            }
+
+            pServer->revisionInList[type] = pServer->uiRevision;
+            AddServerToList(pServer, type, activeFilter);
+        }
+
+        ++state.iterator;
+        ++processed;
+
+        if (std::chrono::steady_clock::now() - frameStart >= frameBudget)
+            break;
+    }
+
+    if (state.iterator != state.endIterator)
+    {
+        if (processed > 0)
+        {
+            unsigned long ulNow = CClientTime::GetTime();
+            auto         layoutIntervalSetting = static_cast<unsigned int>(SERVER_BROWSER_LAZY_LAYOUT_INTERVAL_DEFAULT);
+            CVARS_GET("browser_layout_interval_ms", layoutIntervalSetting);
+            const auto layoutInterval = std::chrono::milliseconds{layoutIntervalSetting};
+            if (ulNow >= m_ulNextListLayoutTime[index])
+            {
+                m_ulNextListLayoutTime[index] = ulNow + static_cast<unsigned long>(layoutInterval.count());
+                m_pServerList[index]->ForceUpdate();
+                // Update player count status with filtered results from data list
+                // Pass data list to show accurate counts while GUI is being rebuilt
+                UpdateFilteredPlayerCountStatus(type, state.pList);
+                // Periodically cache server data as they respond to keep player counts up to date
+                GetServerCache()->SetServerListCachedInfo(state.pList);
+            }
+        }
+        return false;
+    }
+
+    const bool bIncludeOtherVersions = state.filterSnapshot ? state.filterSnapshot->includeOtherVersions :
+                                                                 (m_pIncludeOtherVersions[index] &&
+                                                                  m_pIncludeOtherVersions[index]->GetSelected());
+    if (bIncludeOtherVersions)
+        m_pServerList[index]->SetColumnWidth(1, 34, false);
+    else
+        m_pServerList[index]->SetColumnWidth(1, 0.03f, true);
+
+    m_pServerList[index]->SetAutoSortSuppressed(false);
+
+    // Apply sort to UI list as final guarantee of correct visual order
+    // (items should already be in correct order from data list pre-sort, but this ensures it)
+    if (!state.bClearServerList && state.sortDirection != SortDirections::None && state.uiSortColumn != 0)
+        m_pServerList[index]->Sort(state.uiSortColumn, state.sortDirection);
+    m_pServerList[index]->ForceUpdate();
+
+    // Update status with final filtered player counts after all batch processing is done
+    // Pass data list to ensure counts reflect all filtered servers
+    UpdateFilteredPlayerCountStatus(type, state.pList);
+
+    state.pList->SetUpdated(false);
+
+    if (type == ServerBrowserTypes::RECENTLY_PLAYED)
+        m_pRemoveFromRecentIcon[index]->SetAlpha(0.3f);
+
+    state.bActive = false;
+    state.pList = nullptr;
+    state.filterSnapshot.reset();
+    return true;
+}
+
+void CServerBrowser::ProcessPendingListRefreshes()
+{
+    if (!IsVisible())
+        return;
+
+    const bool bHiddenBoost = ShouldUseHiddenRefreshAcceleration();
+    const auto batchSize = bHiddenBoost ? GetHiddenListRefreshBatchSize() : GetListRefreshBatchSize();
+
+    for (std::size_t i = 0; i < std::size(m_ListRefreshState); ++i)
+    {
+        if (m_ListRefreshState[i].bActive)
+            ProcessServerListRefreshBatch(static_cast<ServerBrowserType>(i), batchSize);
+    }
+}
+
+void CServerBrowser::SuspendServerLists()
+{
+    for (std::size_t i = 0; i < std::size(m_ListRefreshState); ++i)
+    {
+        const auto type = static_cast<ServerBrowserType>(i);
+        if (CServerList* pList = GetServerList(type))
+            pList->SuspendActivity();
+
+        if (m_pServerList[i])
+            m_pServerList[i]->SetAutoSortSuppressed(false);
+
+        m_ListRefreshState[i].bActive = false;
+        m_ListRefreshState[i].pList = nullptr;
+        m_ListRefreshState[i].filterSnapshot.reset();
+        m_bPendingFilterUpdate[i] = false;
+        m_ulNextFilterUpdateTime[i] = 0;
+        m_bPendingRefresh[i] = false;
+        m_ulNextListLayoutTime[i] = 0;
+
+        if (type != ServerBrowserTypes::INTERNET)
+        {
+            // Non-internet tabs previously refreshed automatically every time the UI opened.
+            // Reset their "initial" flag so EnsureRefreshFor() schedules a new refresh on resume.
+            m_bInitialRefreshDone[i] = false;
+        }
+    }
+
+    m_ServersHistory.SuspendActivity();
+    m_ulLastUpdateTime = 0;
+}
+
+bool CServerBrowser::ShouldUseHiddenRefreshAcceleration() const
+{
+    return !IsVisible() && CClientTime::GetTime() >= m_ulHiddenRefreshBoostEnableTime;
+}
+
+bool CServerBrowser::IsListRefreshInProgress(ServerBrowserType type) const
+{
+    const auto index = static_cast<std::size_t>(type);
+    if (index >= std::size(m_ListRefreshState))
+        return false;
+
+    return m_ListRefreshState[index].bActive;
+}
+
+std::size_t CServerBrowser::GetListRefreshBatchSize() const
+{
+    auto browserSpeed = SERVER_BROWSER_SPEED_DEFAULT;
+    CVARS_GET("browser_speed", browserSpeed);
+
+    switch (browserSpeed)
+    {
+        case SERVER_BROWSER_SPEED_SLOW:            // Very slow
+            return std::max<std::size_t>(SERVER_BROWSER_SLOW_BATCH_MIN,
+                                         SERVER_BROWSER_FILTER_UPDATE_BATCH_SIZE / SERVER_BROWSER_SLOW_BATCH_DIVISOR);
+        case SERVER_BROWSER_SPEED_FAST:            // Fast
+            return SERVER_BROWSER_FILTER_UPDATE_BATCH_SIZE * SERVER_BROWSER_FAST_BATCH_MULTIPLIER;
+        default:                                   // Default
+            return SERVER_BROWSER_FILTER_UPDATE_BATCH_SIZE;
+    }
+}
+
+std::size_t CServerBrowser::GetHiddenListRefreshBatchSize() const
+{
+    const auto baseBatchSize = GetListRefreshBatchSize();
+    return std::max<std::size_t>(baseBatchSize, baseBatchSize * SERVER_BROWSER_HIDDEN_REFRESH_MULTIPLIER);
 }
 
 void CServerBrowser::SetServerPassword(const std::string& strHost, const std::string& strPassword)
@@ -1948,7 +2801,8 @@ void CServerBrowser::SetServerPassword(const std::string& strHost, const std::st
         pServerPasswords = pConfig->CreateSubNode(CONFIG_NODE_SERVER_SAVED);
     }
     // Check if the server password already exists
-    for (unsigned int i = 0; i < pServerPasswords->GetSubNodeCount(); i++)
+    const auto subNodeCount = pServerPasswords->GetSubNodeCount();
+    for (std::size_t i = 0; i < subNodeCount; ++i)
     {
         CXMLAttributes* pAttributes = &(pServerPasswords->GetSubNode(i)->GetAttributes());
         if (pAttributes->Find("host"))
@@ -1972,6 +2826,8 @@ void CServerBrowser::SetServerPassword(const std::string& strHost, const std::st
     pHostAttribute->SetValue(strHost.c_str());
     CXMLAttribute* pPasswordAttribute = pNode->GetAttributes().Create("password");
     pPasswordAttribute->SetValue(strPassword.c_str());
+
+    RequestConfigSave(false);
 }
 
 std::string CServerBrowser::GetServerPassword(const std::string& strHost)
@@ -1989,7 +2845,8 @@ std::string CServerBrowser::GetServerPassword(const std::string& strHost)
         pServerPasswords = pConfig->CreateSubNode(CONFIG_NODE_SERVER_SAVED);
     }
     // Check if the server password already exists
-    for (unsigned int i = 0; i < pServerPasswords->GetSubNodeCount(); i++)
+    const auto subNodeCount = pServerPasswords->GetSubNodeCount();
+    for (std::size_t i = 0; i < subNodeCount; ++i)
     {
         CXMLAttributes* pAttributes = &(pServerPasswords->GetSubNode(i)->GetAttributes());
         if (pAttributes->Find("host"))
@@ -2018,6 +2875,8 @@ void CServerBrowser::ClearServerPasswords()
         pServerPasswords->DeleteAllSubNodes();
         pConfig->DeleteSubNode(pServerPasswords);
     }
+
+    RequestConfigSave(false);
 }
 
 /////////////////////////////////////////////////////////////////
@@ -2069,6 +2928,8 @@ CServerListItem* CServerBrowser::FindServer(const std::string& strHost, unsigned
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
             return pServer;
     }
@@ -2089,6 +2950,8 @@ unsigned short CServerBrowser::FindServerHttpPort(const std::string& strHost, un
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
         CServerListItem* pServer = *i;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
             return pServer->m_usHttpPort;
     }
@@ -2110,7 +2973,9 @@ void CServerBrowser::UpdateRowIndexMembers(ServerBrowserType Type)
     for (int iRowIndex = 0; iRowIndex < iRowCount; iRowIndex++)
     {
         CServerListItem* pServer = (CServerListItem*)pServerList->GetItemData(iRowIndex, DATA_PSERVER);
-        pServer->iRowIndex = iRowIndex;
+        if (!pServer || !CServerListItem::StaticIsValid(pServer))
+            continue;
+        pServer->iRowIndex[Type] = iRowIndex;
     }
 }
 
@@ -2123,44 +2988,84 @@ void CServerBrowser::UpdateRowIndexMembers(ServerBrowserType Type)
 /////////////////////////////////////////////////////////////////
 void CServerBrowser::UpdateSelectedServerPlayerList(ServerBrowserType Type)
 {
-    // If there is one item selected
-    if (m_pServerList[Type]->GetSelectedCount() >= 1)
+    // Only process player list updates if a server is actually selected
+    if (m_pServerList[Type]->GetSelectedCount() < 1)
     {
-        // Get the selected row
-        int iSelectedIndex = m_pServerList[Type]->GetSelectedItemRow();
+        // Clear the player list if nothing is selected
+        const auto typeIndex = static_cast<std::size_t>(Type);
+        m_pLastSelectedServerForPlayerList[typeIndex] = nullptr;
+        m_msLastPlayerListQueryRetryTime[typeIndex] = std::chrono::milliseconds(0);
+        return;
+    }
 
-        // Get number of players as defined in the gridlist
-        int iNumPlayers = atoi(m_pServerList[Type]->GetItemText(iSelectedIndex, m_hPlayers[Type]));
+    // Get the selected row
+    const int iSelectedIndex = m_pServerList[Type]->GetSelectedItemRow();
 
-        // Get number of rows in the gui player list
-        int iNumPlayerRows = m_pServerPlayerList[Type]->GetRowCount();
-
-        // If number of rows in player list is less than number of players in server item,
-        if (iNumPlayers > iNumPlayerRows || iNumPlayerRows == 1 && iNumPlayers == 1)
+    // Get number of players as defined in the gridlist
+    const char* szPlayerCount = m_pServerList[Type]->GetItemText(iSelectedIndex, m_hPlayers[Type]);
+    int iNumPlayers = 0;
+    if (szPlayerCount && *szPlayerCount)
+    {
+        try
         {
-            // find server item
-            CServerListItem* pServer = FindSelectedServer(Type);
+            iNumPlayers = std::stoi(szPlayerCount);
+        }
+        catch (const std::invalid_argument&)
+        {
+            iNumPlayers = 0;
+        }
+        catch (const std::out_of_range&)
+        {
+            iNumPlayers = 0;
+        }
+    }
 
-            if (pServer && pServer->vecPlayers.size() > 0)
+    // Get number of rows in the gui player list
+    const int iNumPlayerRows = m_pServerPlayerList[Type]->GetRowCount();
+
+    // Find the selected server
+    CServerListItem* const pServer = FindSelectedServer(Type);
+    const auto typeIndex = static_cast<std::size_t>(Type);
+
+    // If number of rows in player list is less than number of players in server item,
+    if (iNumPlayers > iNumPlayerRows || (iNumPlayerRows == 1 && iNumPlayers == 1))
+    {
+        if (pServer && !pServer->vecPlayers.empty())
+        {
+            bool bUpdatePlayerList = false;
+            if (iNumPlayerRows == 1 && pServer->vecPlayers.size() == 1)
             {
-                bool bUpdatePlayerList = false;
-                if (iNumPlayerRows == 1 && pServer->vecPlayers.size() == 1)
-                {
-                    SString strPlayerName = m_pServerPlayerList[Type]->GetItemText(0, m_hPlayerName[Type]);
-                    if (strPlayerName == _("  ..loading.."))
-                        bUpdatePlayerList = true;
-                }
-                if ((int)pServer->vecPlayers.size() > iNumPlayerRows || bUpdatePlayerList)
-                {
-                    m_pServerPlayerList[Type]->Clear();
+                const SString strPlayerName = m_pServerPlayerList[Type]->GetItemText(0, m_hPlayerName[Type]);
+                if (strPlayerName == _("  ..loading.."))
+                    bUpdatePlayerList = true;
+            }
+            if (static_cast<int>(pServer->vecPlayers.size()) > iNumPlayerRows || bUpdatePlayerList)
+            {
+                m_pServerPlayerList[Type]->Clear();
 
-                    // Add all the players
-                    for (unsigned int j = 0; j < pServer->vecPlayers.size(); j++)
-                    {
-                        int k = m_pServerPlayerList[Type]->AddRow();
-                        m_pServerPlayerList[Type]->SetItemText(k, m_hPlayerName[Type], pServer->vecPlayers[j].c_str());
-                    }
+                // Add all the players (player names only, not counts)
+                for (const auto& playerName : pServer->vecPlayers)
+                {
+                    const int k = m_pServerPlayerList[Type]->AddRow();
+                    m_pServerPlayerList[Type]->SetItemText(k, m_hPlayerName[Type], playerName.c_str());
                 }
+            }
+        }
+
+        // Retry player list query if loading (only when server is actually selected)
+        if (pServer && pServer->nPlayers && pServer->vecPlayers.empty())
+        {
+            // Check if enough time has passed since last retry attempt
+            const auto now = std::chrono::milliseconds(CClientTime::GetTime());
+            constexpr auto PLAYER_LIST_RETRY_INTERVAL = std::chrono::milliseconds(2000);
+
+            if (pServer != m_pLastSelectedServerForPlayerList[typeIndex] ||
+                now >= m_msLastPlayerListQueryRetryTime[typeIndex] + PLAYER_LIST_RETRY_INTERVAL)
+            {
+                // New server or retry time has elapsed - send query
+                m_pLastSelectedServerForPlayerList[typeIndex] = pServer;
+                m_msLastPlayerListQueryRetryTime[typeIndex] = now;
+                pServer->Query();
             }
         }
     }
@@ -2189,19 +3094,89 @@ void CServerBrowser::GetVisibleEndPointList(std::vector<SAddressPort>& outEndpoi
     }
 }
 
-void CServerBrowser::SetStatusText(std::string strStatus)
+void CServerBrowser::SetStatusText(std::string_view strStatus)
 {
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (auto* pStatusElement : m_pServerListStatus)
     {
-        m_pServerListStatus[i]->SetText(strStatus.c_str());
+        if (pStatusElement)
+            pStatusElement->SetText(strStatus.data());
     }
 }
 
-void CServerBrowser::SetAddressBarText(std::string strText)
+void CServerBrowser::UpdateFilteredPlayerCountStatus(ServerBrowserType Type, CServerList* pDataList)
 {
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    const auto index = static_cast<std::size_t>(Type);
+    if (index >= std::size(m_pServerList) || !m_pServerList[index])
+        return;
+
+    std::uint32_t uiVisibleServers = 0;
+    std::uint32_t uiVisiblePlayers = 0;
+    std::uint32_t uiVisibleTotalSlots = 0;
+
+    // If a data list is provided (during batch refresh), calculate from it instead of GUI
+    // This prevents showing 0 players while the GUI list is being rebuilt
+    if (pDataList)
     {
-        m_pEditAddress[i]->SetText(strText.c_str());
+        for (auto it = pDataList->IteratorBegin(); it != pDataList->IteratorEnd(); ++it)
+        {
+            auto pServer = *it;
+            if (!pServer || !CServerListItem::StaticIsValid(pServer))
+                continue;
+
+            if (pServer->nMaxPlayers > 0 && !pServer->bSkipped && !pServer->MaybeWontRespond())
+            {
+                ++uiVisibleServers;
+                uiVisibleTotalSlots += pServer->nMaxPlayers;
+                uiVisiblePlayers += pServer->nPlayers;
+            }
+        }
+    }
+    else
+    {
+        // Calculate from visible GUI list rows when no data list provided
+        const int iRowCount = m_pServerList[index]->GetRowCount();
+        for (int i = 0; i < iRowCount; ++i)
+        {
+            const auto pServer = static_cast<CServerListItem*>(m_pServerList[index]->GetItemData(i, DATA_PSERVER));
+            if (!pServer || !CServerListItem::StaticIsValid(pServer))
+                continue;
+
+            if (pServer->nMaxPlayers > 0 && !pServer->bSkipped && !pServer->MaybeWontRespond())
+            {
+                ++uiVisibleServers;
+                uiVisibleTotalSlots += pServer->nMaxPlayers;
+                uiVisiblePlayers += pServer->nPlayers;
+            }
+        }
+    }
+
+    // Build status string with filtered counts
+    SString statusMessage = "   ";
+
+    if (uiVisibleTotalSlots > 0)
+    {
+        const SString strPlayersString = _tn("player", "players", uiVisiblePlayers);
+        SString strPlayersLine;
+        strPlayersLine.Format("%u %s %s ", uiVisiblePlayers, *strPlayersString, *_(("on")));
+        statusMessage += strPlayersLine;
+    }
+
+    const SString strServersString = _tn("server", "servers", uiVisibleServers);
+    SString strServersLine;
+    strServersLine.Format("%u %s", uiVisibleServers, *strServersString);
+    statusMessage += strServersLine;
+
+    // Update status text for this tab
+    if (auto* const pStatusElement = m_pServerListStatus[index])
+        pStatusElement->SetText(*statusMessage);
+}
+
+void CServerBrowser::SetAddressBarText(std::string_view strText)
+{
+    for (auto* pAddressElement : m_pEditAddress)
+    {
+        if (pAddressElement)
+            pAddressElement->SetText(strText.data());
     }
 }
 
@@ -2227,7 +3202,7 @@ void CServerBrowser::SetNextHistoryText(bool bDown)
             i = bDown ? i + 1 : i - 1;
 
             // Ensure we're in range
-            i = Clamp<int>(0, i, pServerList->GetItemCount() - 1);
+            i = std::clamp(i, 0, static_cast<int>(pServerList->GetItemCount()) - 1);
             SetAddressBarText(std::string("mtasa://") + (const char*)pServerList->GetItemByIndex(i)->GetData());
             m_pEditAddress[Type]->SetCaretAtEnd();
             return;
@@ -2316,6 +3291,67 @@ bool CServerBrowser::OnServerListKeyDown(CGUIKeyEventArgs Args)
     }
 
     return true;
+}
+bool CServerBrowser::OnServerListSortChanged(CGUIElement* pElement)
+{
+    if (m_iIgnoreSortCallbacks > 0)
+        return true;
+
+    // Determine which tab raised the sort column event and persist the
+    // selected sort state so it can be restored after rebuilding lists.
+    auto it = std::find(std::begin(m_pServerList), std::end(m_pServerList), pElement);
+    if (it != std::end(m_pServerList))
+    {
+        const auto i = std::distance(std::begin(m_pServerList), it);
+
+        unsigned int uiColumn = 0;
+        SortDirection dir = SortDirections::None;
+        m_pServerList[i]->GetSort(uiColumn, dir);
+        m_SortState[i] = {uiColumn, dir};
+
+        // Also update the active list refresh state if one exists.
+        if (m_ListRefreshState[i].bActive)
+        {
+            m_ListRefreshState[i].uiSortColumn = (dir == SortDirections::None) ? 0U : (uiColumn ? uiColumn : 1U);
+            m_ListRefreshState[i].sortDirection = dir;
+        }
+    }
+    return true;
+}
+
+void CServerBrowser::UpdateSortState(ServerBrowserType type)
+{
+    const auto index = static_cast<std::size_t>(type);
+    if (index >= std::size(m_pServerList))
+        return;
+
+    unsigned int uiColumn = 0;
+    SortDirection dir = SortDirections::None;
+    if (m_pServerList[index])
+        m_pServerList[index]->GetSort(uiColumn, dir);
+
+    if (dir == SortDirections::None && m_SortState[index].direction != SortDirections::None)
+    {
+        uiColumn = m_SortState[index].uiColumn;
+        dir = m_SortState[index].direction;
+    }
+    m_SortState[index] = {uiColumn, dir};
+}
+
+void CServerBrowser::ApplyListSort(ServerBrowserType type, unsigned int uiColumn, SortDirection direction, bool bUpdateStoredState)
+{
+    const auto index = static_cast<std::size_t>(type);
+    if (index >= std::size(m_pServerList))
+        return;
+
+    if (m_pServerList[index])
+    {
+        m_pServerList[index]->Sort(uiColumn, direction);
+        if (bUpdateStoredState)
+        {
+            m_SortState[index] = {uiColumn, direction};
+        }
+    }
 }
 
 void CServerBrowser::SetSelectedIndex(unsigned int uiIndex)

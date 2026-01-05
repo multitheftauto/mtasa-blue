@@ -124,7 +124,7 @@ CTaskSimpleChoking* CTasksSA::CreateTaskSimpleChoking(CPed* pAttacker, bool bIsT
     return pTask;
 }
 
-CTaskSimpleClimb* CTasksSA::CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
+CTaskSimpleClimb* CTasksSA::CreateTaskSimpleClimb(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight,
                                                   const bool bForceClimb)
 {
     CTaskSimpleClimbSA* pTask = NewTask<CTaskSimpleClimbSA>(pClimbEnt, vecTarget, fHeading, nSurfaceType, nHeight, bForceClimb);
@@ -158,6 +158,13 @@ CTaskSimpleRunNamedAnim* CTasksSA::CreateTaskSimpleRunNamedAnim(const char* pAni
         NewTask<CTaskSimpleRunNamedAnimSA>(pAnimName, pAnimGroupName, flags, fBlendDelta, iTime, bDontInterrupt, bRunInSequence, bOffsetPed, bHoldLastFrame);
     m_pTaskManagementSystem->AddTask(pTask);
     return pTask;
+}
+
+CTaskComplexInWater* CTasksSA::CreateTaskComplexInWater()
+{
+    CTaskComplexInWaterSA* task = NewTask<CTaskComplexInWaterSA>();
+    m_pTaskManagementSystem->AddTask(task);
+    return task;
 }
 
 CTaskComplexDie* CTasksSA::CreateTaskComplexDie(const eWeaponType eMeansOfDeath, const AssocGroupId animGroup, const AnimationId anim, const float fBlendDelta,

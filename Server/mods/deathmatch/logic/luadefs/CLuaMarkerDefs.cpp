@@ -434,7 +434,7 @@ bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CMarker* marker, std::option
     return CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(marker, color, size.value_or(marker->GetSize() * 0.625f));
 }
 
-std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(CMarker* marker)
+std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(CMarker* marker) noexcept
 {
     if (!marker->HasTarget() || marker->GetMarkerType() != CMarker::TYPE_CHECKPOINT)
         return false;

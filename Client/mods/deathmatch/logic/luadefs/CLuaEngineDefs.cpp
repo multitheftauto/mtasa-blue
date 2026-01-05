@@ -21,7 +21,11 @@
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
 void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
-    g_pClientGame->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
+    size_t vehicleValue = numVehicles.value_or(0);
+    size_t pedValue = numPeds.value_or(0);
+    const size_t* pVehicles = numVehicles.has_value() ? &vehicleValue : nullptr;
+    const size_t* pPeds = numPeds.has_value() ? &pedValue : nullptr;
+    g_pClientGame->GetModelCacheManager()->SetCustomLimits(pVehicles, pPeds);
 }
 
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
@@ -150,6 +154,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
+        {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
+        {"engineRestream", ArgumentParser<EngineRestream>},
+
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -473,9 +480,14 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                     }
                     else
                     {
+                        // Get specific error from CClientTXD if available
+                        SString strError = pTXD->GetLastError();
+                        if (strError.empty())
+                            strError = "Error loading TXD";
+                        
                         // Delete it again
                         delete pTXD;
-                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading TXD");
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, strError);
                     }
                 }
                 else
@@ -642,11 +654,20 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
+            else
+            {
+                // Get specific error from CClientTXD if available
+                SString strError = pTXD->GetLastError();
+                if (strError.empty())
+                    strError = "Failed to import TXD";
+                argStream.SetCustomError(strModelName, strError);
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer(luaVM, "number", 2);
     }
-    else
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
@@ -2588,7 +2609,11 @@ eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t m
     if (modelId >= g_pGame->GetCountOfAllFileIDs())
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    return g_pGame->GetStreaming()->GetStreamingInfo(modelId)->loadState;
+    auto* pStreamingInfo = g_pGame->GetStreaming()->GetStreamingInfo(modelId);
+    if (!pStreamingInfo)
+        return eModelLoadState::LOADSTATE_NOT_LOADED;
+
+    return pStreamingInfo->loadState;
 }
 
 void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option)
@@ -2601,4 +2626,14 @@ void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<Prel
 
     if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
         g_pGame->GetStreaming()->LoadSceneCollision(&position);
+}
+
+bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
+{
+    return g_pClientGame->RestreamModel(modelId);
+}
+
+void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
+{
+    g_pClientGame->Restream(option);
 }

@@ -12,6 +12,9 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <tuple>
+#include <unordered_set>
 
 class CClientEntityBase;
 class CD3DDUMMY;
@@ -20,6 +23,7 @@ class CPixels;
 class CShaderItem;
 class SString;
 class CColModel;
+class CVector;
 struct RpAtomicContainer;
 struct RwFrame;
 struct RwMatrix;
@@ -35,14 +39,16 @@ struct SReplacementTextures
     struct SPerTxd
     {
         std::vector<RwTexture*> usingTextures;
-        ushort                  usTxdId;
+        std::vector<RwTexture*> replacedOriginals;
+        unsigned short          usTxdId;
         bool                    bTexturesAreCopies;
     };
 
     std::vector<RwTexture*> textures;              // List of textures we want to inject into TXD's
     std::vector<SPerTxd>    perTxdList;            // TXD's which have been modified
-    std::vector<ushort>     usedInTxdIds;
-    std::vector<ushort>     usedInModelIds;
+    std::unordered_set<unsigned short> usedInTxdIds;   // O(1) contains/erase for streaming hot path
+    std::unordered_set<unsigned short> usedInModelIds; // O(1) contains/erase for streaming hot path
+    bool                    bHasRequestedSpace = false;
 };
 
 // Shader layers to render
@@ -73,10 +79,11 @@ class CRenderWare
 {
 public:
     virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer,
-                                                      bool bFilteringEnabled) = 0;
-    virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId) = 0;
+                                                      bool bFilteringEnabled, SString* pOutError = nullptr) = 0;
+    virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
-    virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId) = 0;
+    virtual void             StaticResetModelTextureReplacing() = 0;
+    virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId) = 0;
     virtual void             ClothesRemoveReplacement(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
     virtual bool             ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) = 0;
@@ -100,21 +107,21 @@ public:
     virtual bool             ReplacePedModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
     virtual void             PulseWorldTextureWatch() = 0;
-    virtual void             GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID) = 0;
-    virtual bool GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelID, std::vector<SString> vTextureNames) = 0;
+    virtual void             GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID) = 0;
+    virtual bool GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames) = 0;
     virtual const char* GetTextureName(CD3DDUMMY* pD3DData) = 0;
-    virtual ushort      GetTXDIDForModelID(ushort usModelID) = 0;
+    virtual unsigned short      GetTXDIDForModelID(unsigned short usModelID) = 0;
 
-    virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask) = 0;
+    virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, unsigned short usModelId, int iTypeMask) = 0;
     virtual SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData) = 0;
     virtual void     AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority,
-                                         bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers) = 0;
+                                         bool bShaderLayered, int iTypeMask, unsigned int uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers) = 0;
     virtual void     AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch) = 0;
     virtual void     RemoveClientEntityRefs(CClientEntityBase* pClientEntity) = 0;
     virtual void     RemoveShaderRefs(CSHADERDUMMY* pShaderItem) = 0;
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
-    virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
-    virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
+    virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, unsigned int uiSizeLimit) = 0;
+    virtual void     TxdForceUnload(unsigned short usTxdId, bool bDestroyTextures) = 0;
 
     virtual void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix) = 0;
     virtual void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut) = 0;
@@ -124,4 +131,7 @@ public:
     virtual void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) = 0;
     virtual void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale) = 0;
     virtual void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale) = 0;
+
+    // New methods MUST be added at the end to preserve vtable order.
+    virtual void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) = 0;
 };

@@ -92,9 +92,9 @@ public:
     LUA_DECLARE(SetVehicleRespawnRotation);
     LUA_DECLARE_OOP(GetVehicleRespawnPosition);
     LUA_DECLARE_OOP(GetVehicleRespawnRotation);
-    static bool IsVehicleRespawnable(CVehicle* vehicle);
-    static uint32_t GetVehicleRespawnDelay(CVehicle* vehicle);
-    static uint32_t GetVehicleIdleRespawnDelay(CVehicle* vehicle);
+    static bool IsVehicleRespawnable(CVehicle* vehicle) noexcept;
+    static uint32_t GetVehicleRespawnDelay(CVehicle* vehicle) noexcept;
+    static uint32_t GetVehicleIdleRespawnDelay(CVehicle* vehicle) noexcept;
     LUA_DECLARE(ToggleVehicleRespawn);
     LUA_DECLARE(ResetVehicleExplosionTime);
     LUA_DECLARE(ResetVehicleIdleTime);
@@ -127,5 +127,5 @@ public:
     LUA_DECLARE(SetVehiclePlateText);
     
     static bool SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime);
-    static bool SetVehicleNitroActivated(CVehicle* vehicle, bool state);
+    static bool SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept;
 };

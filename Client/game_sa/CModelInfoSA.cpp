@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <chrono>
 #include <core/CCoreInterface.h>
 #include "CColModelSA.h"
 #include "CColStoreSA.h"
@@ -743,6 +744,25 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
     return dwReturn;
 }
 
+bool CModelInfoSA::IsCollisionLoaded() const noexcept
+{
+    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    return pInterface && pInterface->pColModel != nullptr;
+}
+
+bool CModelInfoSA::IsRwObjectLoaded() const noexcept
+{
+    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    return pInterface && pInterface->pRwObject != nullptr;
+}
+
+void CModelInfoSA::WaitForModelFullyLoaded(std::chrono::milliseconds timeout)
+{
+    // Implementation placeholder - would need streaming system integration
+    // For now, just ensure the model is requested
+    pGame->GetStreaming()->RequestModel(m_dwModelID, BLOCKING);
+}
+
 bool CModelInfoSA::IsValid()
 {
     if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
@@ -759,7 +779,8 @@ bool CModelInfoSA::IsValid()
 
 bool CModelInfoSA::IsAllocatedInArchive() const noexcept
 {
-    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
+    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+    return pStreamingInfo && pStreamingInfo->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -1061,7 +1082,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(*it);
+        if (pStreamingInfo)
+            pStreamingInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 
@@ -1520,6 +1543,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::VEHICLE:
+            // ReplaceVehicleModele handles collision preservation internally
             success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::ATOMIC:
@@ -1531,7 +1555,42 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             break;
     }
 
-    m_pCustomClump = success ? pClump : nullptr;
+    if (success)
+    {
+        m_pCustomClump = pClump;
+
+        // Rebind texture pointers in the GAME's clump to current TXD textures.
+        // ReplaceModel clones the input clump, so we must rebind the ACTUAL clump the game is using.
+        // This is needed because the TXD may contain replacement textures (via engineImportTXD),
+        // but the DFF's materials still point to old/original textures from when it was loaded.
+        // Without this fix, shader texture replacement fails on custom DFF models.
+        eModelInfoType modelType = GetModelType();
+        switch (modelType)
+        {
+            case eModelInfoType::PED:
+            case eModelInfoType::WEAPON:
+            case eModelInfoType::VEHICLE:
+            case eModelInfoType::CLUMP:
+            case eModelInfoType::UNKNOWN:
+            {
+                RpClump* pGameClump = reinterpret_cast<RpClump*>(GetRwObject());
+                if (pGameClump && pGame)
+                {
+                    CRenderWare* pRenderWare = pGame->GetRenderWare();
+                    if (pRenderWare)
+                        pRenderWare->RebindClumpTexturesToTxd(pGameClump, GetTextureDictionaryID());
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    else
+    {
+        m_pCustomClump = nullptr;
+    }
+
     return success;
 }
 
@@ -1542,9 +1601,8 @@ void CModelInfoSA::RestoreOriginalModel()
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
-
     // Reset the stored custom vehicle clump
-    m_pCustomClump = NULL;
+    m_pCustomClump = nullptr;
 }
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)
@@ -1634,7 +1692,23 @@ void CModelInfoSA::MakeCustomModel()
     // We have a custom model?
     if (m_pCustomClump)
     {
-        SetCustomModel(m_pCustomClump);
+        // Store and clear m_pCustomClump BEFORE calling SetCustomModel to prevent recursive calls.
+        // SetCustomModel may trigger LoadAllRequestedModels which can recursively call MakeCustomModel
+        // on the same model (via the streaming hook) if the custom DFF lacks embedded collision.
+        RpClump* pClumpToSet = m_pCustomClump;
+        m_pCustomClump = nullptr;
+        
+        if (!SetCustomModel(pClumpToSet))
+        {
+            // SetCustomModel failed, restore the custom clump for retry on next stream-in
+            m_pCustomClump = pClumpToSet;
+        }
+        else
+        {
+            // Preserve the custom clump pointer for restream/retry paths
+            m_pCustomClump = pClumpToSet;
+            // Note: SetCustomModel now handles RebindClumpTexturesToTxd internally after successful replacement
+        }
     }
 
     // Custom collision model is not NULL and it's different from the original?
@@ -1727,6 +1801,9 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
 {
     CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
     CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+
+    if (!pBaseModelStreamingInfo || !pTargetModelStreamingInfo)
+        return;
 
     *pTargetModelStreamingInfo = CStreamingInfo{};
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
@@ -1863,7 +1940,10 @@ void CModelInfoSA::DeallocateModel(void)
     }
 
     ppModelInfo[m_dwModelID] = nullptr;
-    *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
+
+    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+    if (pStreamingInfo)
+        *pStreamingInfo = CStreamingInfo{};
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //

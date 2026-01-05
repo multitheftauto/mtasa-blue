@@ -599,11 +599,28 @@ bool CResource::GenerateChecksums()
 
     for (auto& task : checksumTasks)
     {
-        const auto& result = task.get();
-        if (!result.empty())
+        try
         {
-            m_strFailureReason = result;
-            CLogger::LogPrintf(result);
+            const auto& result = task.get();
+            if (!result.empty())
+            {
+                m_strFailureReason = result;
+                CLogger::LogPrintf(result);
+                bOk = false;
+            }
+        }
+        catch (const std::future_error& e)
+        {
+            // Became invalid (e.g., during shutdown)
+            m_strFailureReason = SString("Checksum task failed: %s", e.what());
+            CLogger::LogPrintf(m_strFailureReason);
+            bOk = false;
+        }
+        catch (const std::exception& e)
+        {
+            // Task threw
+            m_strFailureReason = SString("Checksum error: %s", e.what());
+            CLogger::LogPrintf(m_strFailureReason);
             bOk = false;
         }
     }

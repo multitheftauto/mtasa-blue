@@ -550,7 +550,18 @@ void CKeyBinds::RemoveDeletedBinds()
 void CKeyBinds::ClearCommandsAndControls()
 {
     const auto predicate = [](const KeyBindPtr& bind) {
-        return !bind->isBeingDeleted && bind->type != KeyBindType::FUNCTION && bind->type != KeyBindType::CONTROL_FUNCTION;
+        if (bind->isBeingDeleted)
+            return false;
+            
+        if (bind->type == KeyBindType::COMMAND)
+        {
+            auto commandBind = static_cast<const CCommandBind*>(bind.get());
+            // Only remove resource bindings, preserve user bindings
+            return commandBind->context == BindingContext::RESOURCE;
+        }
+        
+        // Remove all control bindings (GTA_CONTROL)
+        return bind->type == KeyBindType::GTA_CONTROL;
     };
     RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
@@ -612,9 +623,11 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
         CCommandBind* pUserAddedBind = FindCommandMatch(NULL, szCommand, szArguments, szResource, szKey, true, bState, true, false);
         if (pUserAddedBind)
         {
-            // Upgrade
+            // Upgrade user binding to resource binding
             pUserAddedBind->wasCreatedByScript = true;
             pUserAddedBind->isReplacingScriptKey = true;
+            pUserAddedBind->context = BindingContext::RESOURCE;
+            pUserAddedBind->sourceResource = szResource;
             assert(pUserAddedBind->originalScriptKey == szKey);
             return true;
         }
@@ -631,12 +644,19 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
     if (szResource)
     {
         bind->resource = szResource;
+        bind->sourceResource = szResource;
         bind->wasCreatedByScript = bScriptCreated;
+        bind->context = BindingContext::RESOURCE;
 
         if (bScriptCreated)
             bind->originalScriptKey = szKey;
         else if (szOriginalScriptKey)
             bind->originalScriptKey = szOriginalScriptKey;            // Will wait for script to addcommand before doing replace
+    }
+    else
+    {
+        // User-created binding (via /bind command)
+        bind->context = BindingContext::USER;
     }
 
     m_binds.emplace_back(bind.release());
@@ -1950,7 +1970,7 @@ void CKeyBinds::DoPostFramePulse()
 
             // * Enter Exit
             // * Change View
-            cs.ButtonSquare = (!bEnteringVehicle && g_bcControls[11].bState) ? 255 : 0;            // Jump
+            cs.ButtonSquare = (!bEnteringVehicle && !bAimingWeapon && g_bcControls[11].bState) ? 255 : 0;            // Jump
             cs.ButtonCross = (g_bcControls[12].bState) ? 255 : 0;                                  // Sprint
             cs.ShockButtonR = (g_bcControls[13].bState) ? 255 : 0;                                 // Look Behind
             cs.ShockButtonL = (g_bcControls[14].bState) ? 255 : 0;                                 // Crouch
@@ -2631,4 +2651,148 @@ bool CKeyBinds::TriggerKeyStrokeHandler(const SString& strKey, bool bState, bool
         return m_KeyStrokeHandler(strKey, bState, bIsConsoleInputKey);
     }
     return true;
+}
+
+bool CKeyBinds::CommandExistsInContext(const char* key, const char* command, BindingContext context, bool checkState, bool state, const char* arguments, const char* resource)
+{
+    if (!key || !command)
+        return false;
+
+    for (const KeyBindPtr& bind : m_binds)
+    {
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
+            continue;
+
+        auto commandBind = static_cast<const CCommandBind*>(bind.get());
+        
+        if (commandBind->context != context)
+            continue;
+
+        if (stricmp(commandBind->boundKey->szKey, key) != 0)
+            continue;
+
+        if (stricmp(commandBind->command.c_str(), command) != 0)
+            continue;
+
+        if (checkState && commandBind->triggerState != state)
+            continue;
+
+        if (arguments && commandBind->arguments != arguments)
+            continue;
+
+        if (resource && commandBind->resource != resource)
+            continue;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CKeyBinds::RemoveCommandFromContext(const char* key, const char* command, BindingContext context, bool checkState, bool state, const char* arguments, const char* resource)
+{
+    if (!key || !command)
+        return false;
+
+    const auto predicate = [&](const KeyBindPtr& bind) {
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
+            return false;
+
+        auto commandBind = static_cast<const CCommandBind*>(bind.get());
+        
+        if (commandBind->context != context)
+            return false;
+
+        if (stricmp(commandBind->boundKey->szKey, key) != 0)
+            return false;
+
+        if (stricmp(commandBind->command.c_str(), command) != 0)
+            return false;
+
+        if (checkState && commandBind->triggerState != state)
+            return false;
+
+        if (arguments && commandBind->arguments != arguments)
+            return false;
+
+        if (resource && commandBind->resource != resource)
+            return false;
+
+        return true;
+    };
+
+    return RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
+}
+
+bool CKeyBinds::HasAnyBindingForKey(const char* key, bool checkState, bool state)
+{
+    if (!key)
+        return false;
+
+    for (const KeyBindPtr& bind : m_binds)
+    {
+        if (bind->isBeingDeleted)
+            continue;
+
+        if (bind->type == KeyBindType::COMMAND)
+        {
+            auto commandBind = static_cast<const CCommandBind*>(bind.get());
+            if (stricmp(commandBind->boundKey->szKey, key) == 0)
+            {
+                if (!checkState || commandBind->triggerState == state)
+                    return true;
+            }
+        }
+        else if (bind->type == KeyBindType::FUNCTION)
+        {
+            auto functionBind = static_cast<const CKeyFunctionBind*>(bind.get());
+            if (stricmp(functionBind->boundKey->szKey, key) == 0)
+            {
+                if (!checkState || functionBind->triggerState == state)
+                    return true;
+            }
+        }
+        else if (bind->type == KeyBindType::CONTROL_FUNCTION)
+        {
+            auto controlBind = static_cast<const CControlFunctionBind*>(bind.get());
+            if (stricmp(controlBind->boundKey->szKey, key) == 0)
+            {
+                if (!checkState || controlBind->triggerState == state)
+                    return true;
+            }
+        }
+        else if (bind->type == KeyBindType::GTA_CONTROL)
+        {
+            auto gtaBind = static_cast<const CGTAControlBind*>(bind.get());
+            if (stricmp(gtaBind->boundKey->szKey, key) == 0)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool CKeyBinds::HasBindingInContext(const char* key, BindingContext context, bool checkState, bool state)
+{
+    if (!key)
+        return false;
+
+    for (const KeyBindPtr& bind : m_binds)
+    {
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
+            continue;
+
+        auto commandBind = static_cast<const CCommandBind*>(bind.get());
+        
+        if (commandBind->context != context)
+            continue;
+
+        if (stricmp(commandBind->boundKey->szKey, key) != 0)
+            continue;
+
+        if (!checkState || commandBind->triggerState == state)
+            return true;
+    }
+
+    return false;
 }

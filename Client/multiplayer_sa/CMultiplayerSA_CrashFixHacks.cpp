@@ -1014,6 +1014,175 @@ cont:
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CAnimBlendAssociation::SetCurrentTime
+// 
+// "this" is invalid
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc32                             0x4CEA80
+#define HOOKSIZE_CrashFix_Misc32                            8
+DWORD RETURN_CrashFix_Misc32 = 0x4CEA88;
+
+static void __declspec(naked) HOOK_CrashFix_Misc32()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
+    {
+        test    ecx, ecx
+        jz      cont
+
+        // Check hierarchy pointer (offset 0x14)
+        // We can use eax as scratch because it gets overwritten by the first replaced instruction anyway
+        mov     eax, [ecx+14h]
+        test    eax, eax
+        jz      cont
+
+        // Execute replaced code
+        mov     eax, [esp+4]
+        fld     dword ptr [esp+4]
+        jmp     RETURN_CrashFix_Misc32
+
+    cont:
+        push    32
+        call    CrashAverted
+        retn    4
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture
+// 
+// "dict" is invalid
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc33                             0x7F39F0
+#define HOOKSIZE_CrashFix_Misc33                            5
+DWORD RETURN_CrashFix_Misc33 = 0x7F39F5;
+
+typedef RwTexDictionary* (__cdecl *PFN_RwTexDictionaryGetCurrent)();
+PFN_RwTexDictionaryGetCurrent pfnRwTexDictionaryGetCurrent = (PFN_RwTexDictionaryGetCurrent)0x7F3A90;
+
+static void __declspec(naked) CallOriginalFindNamedTexture()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
+    {
+        mov     eax, [esp+4]
+        push    ebx
+        jmp     RETURN_CrashFix_Misc33
+    }
+}
+
+static void __declspec(naked) HOOK_CrashFix_Misc33()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
+    {
+        // Get first argument (dict)
+        mov     ecx, [esp+4]
+
+        // Grab name parameter for later reuse
+        mov     edx, [esp+8]
+
+        // Name must be valid
+        test    edx, edx
+        jz      invalid_texture
+
+        // Check for NULL dict
+        test    ecx, ecx
+        jz      invalid_texture
+
+        // Check for valid pointer
+        cmp     ecx, 0x10000
+        jb      invalid_texture
+
+        // Check if it's a dictionary (type 6)
+        cmp     byte ptr [ecx], 6
+        jne     use_current_dict
+
+        // Validate dict->texturesInDict.next (offset 8)
+        mov     eax, [ecx+8]
+        test    eax, eax
+        jz      invalid_texture
+
+        // Execute replaced code
+        jmp     CallOriginalFindNamedTexture
+
+    use_current_dict:
+        // Attempt to recover by using the current dictionary
+        push    edx             // Save name before the call
+        call    pfnRwTexDictionaryGetCurrent
+        pop     edx             // Restore name
+        test    eax, eax
+        jz      invalid_texture
+
+        // Call original function with (dict, name)
+        push    edx             // name
+        push    eax             // dict
+        call    CallOriginalFindNamedTexture
+        add     esp, 8
+        
+        retn                    // Return to caller
+
+    invalid_texture:
+        push    33
+        call    CrashAverted
+        xor     eax, eax        // Return NULL
+        retn                    // cdecl
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// CCustomCarEnvMapPipeline::CustomPipeRenderCB - EnvWave path
+//
+// NULL env map plugin data pointer (EBP) causes crash in CalculateEnvMap
+// Crash when rendering a car environment map (Accessing [esi+2])
+// This occurs when a material has MF_HAS_SHINE_WAVE flag set
+// but the env map plugin data slot is NULL.
+//
+// Hook at 0x5D9CB2 replaces: jz loc_5D9E0D (original flag check)
+//
+// Original code flow at loc_5D9CAC:
+//  0x5D9CAC: mov al, [esp+4Ch+var_39]  ; load EnvWave flag
+//  0x5D9CB0: test al, al
+//  0x5D9CB2: jz loc_5D9E0D             ; skip if flag not set <-- HOOKED
+//  0x5D9CB8: mov eax, ds:_RwEngineInstance (EnvWave processing begins)
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc34                             0x5D9CB2
+#define HOOKSIZE_CrashFix_Misc34                            6
+DWORD RETURN_CrashFix_Misc34 = 0x5D9CB8;
+DWORD RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;  // Skip to end of EnvWave block
+static void __declspec(naked) HOOK_CrashFix_Misc34()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
+    {
+        // Replicate original flag check: ZF was set by previous "test al, al"
+        // If ZF is set (al == 0, flag not set), skip EnvWave (original behavior)
+        // Note: JMP does not modify flags, so ZF from "test al, al" is preserved
+        jz      skip_envwave_normal
+
+        // Flag is set - check if EBP (env map plugin data) is valid
+        // EBP was loaded at loc_5D9A00: mov ebp, [ecx+esi] (material plugin slot)
+        // Check if EBP points to a valid address (catches NULL and low invalid addresses)
+        cmp     ebp, 0x10000
+        jb      skip_envwave_crash
+
+        // EBP is valid, continue with EnvWave processing
+        // Return to 0x5D9CB8: mov eax, ds:_RwEngineInstance
+        jmp     RETURN_CrashFix_Misc34
+
+    skip_envwave_normal:
+        // Normal skip - flag was not set (original behavior)
+        jmp     RETURN_CrashFix_Misc34_Skip
+
+    skip_envwave_crash:
+        // Crash averted - flag was set but EBP was NULL or invalid
+        push    34
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc34_Skip
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
 // CClumpModelInfo::GetFrameFromId
 //
 // Invalid frame
@@ -1154,10 +1323,17 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
         {
             // Crash will occur at offset 00134134
             CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfo(usModelId);
-            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
-                               pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel, pStreamingInfo->flg,
-                               pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks, pStreamingInfo->loadState);
-            LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
+            if (pStreamingInfo)
+            {
+                SString strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
+                                   pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel, pStreamingInfo->flg,
+                                   pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks, pStreamingInfo->loadState);
+                LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
+            }
+            else
+            {
+                LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d (invalid streaming info)", usModelId), 5415);
+            }
             CArgMap argMap;
             argMap.Set("id", usModelId);
             argMap.Set("reason", "collision");
@@ -1572,22 +1748,37 @@ cont:
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInterface)
 {
-    // Crash will occur at offset 0xCFCD6
+    if (!pInterface)
+        return;
+
+	// Crash will occur at offset 0x000CFCD6
     OnCrashAverted(32);
     CAnimBlendAssociationSAInterface* pAnimAssoc = pInterface->pAnimBlendAssociation;
-    CAnimBlendSequenceSAInterface*    pAnimSequence = pInterface->pAnimSequence;
-    CAnimBlendHierarchySAInterface*   pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
+    if (!pAnimAssoc)
+        return;
 
-    bool                           bSequenceExistsInHierarchy = false;
-    CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
-    for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
+    CAnimBlendSequenceSAInterface* pAnimSequence = pInterface->pAnimSequence;
+    if (!pAnimSequence)
+        return;
+
+    CAnimBlendHierarchySAInterface* pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
+    if (!pAnimHierarchy)
+        return;
+
+    bool bSequenceExistsInHierarchy = false;
+
+    if (pAnimHierarchy->pSequences && pAnimHierarchy->usNumSequences > 0 && pAnimHierarchy->usNumSequences < 1000)
     {
-        if (pAnimHierSequence == pAnimSequence)
+        CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
+        for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
         {
-            bSequenceExistsInHierarchy = true;
-            break;
+            if (pAnimHierSequence == pAnimSequence)
+            {
+                bSequenceExistsInHierarchy = true;
+                break;
+            }
+            pAnimHierSequence++;
         }
-        pAnimHierSequence++;
     }
 
     LogEvent(588, "GetCurrentTranslation", "Incorrect endKeyFrameIndex",
@@ -1608,30 +1799,30 @@ static void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     __asm
-    {
-        // if end key frame index is greater than 10,000 then return
+        {
+            // if end key frame index is greater than 10,000 then return
         cmp     eax, 0x2710
         jg      altcode
 
+             // Normal path - execute original code
         push    ebx
         mov     bl, [edx + 4]
         shr     bl, 1
         jmp     RETURN_CAnimBlendNode_GetCurrentTranslation
 
-        // do alternate code
-        altcode :
+             // Crash prevention path
+        altcode:
+         // Save registers before logging
         pushad
-        push    ebp // this
+        push    ebp            // Pass 'this' pointer
         call    OnMY_CAnimBlendNode_GetCurrentTranslation
-        add     esp, 4 * 1
+        add     esp, 4
         popad
 
-        pop     edi
-        pop     esi
-        pop     ebp
-        add     esp, 18h
+             // Return safely without executing original buggy code
+             // The function expects 8 bytes of parameters
         retn    8
-    }
+        }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2210,6 +2401,9 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc28);
     EZHookInstall(CrashFix_Misc29);
     EZHookInstallChecked(CrashFix_Misc30);
+    EZHookInstall(CrashFix_Misc32);
+    EZHookInstall(CrashFix_Misc33);
+    EZHookInstall(CrashFix_Misc34);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);

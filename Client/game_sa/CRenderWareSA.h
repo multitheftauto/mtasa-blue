@@ -14,9 +14,10 @@
 #include <game/CRenderWare.h>
 #include "CModelInfoSA.h"
 #include "CRenderWareSA.ShaderSupport.h"
+#include <unordered_set>
 
 class CMatchChannelManager;
-class CModelTexturesInfo;
+struct CModelTexturesInfo;
 struct RpAtomic;
 struct SShaderReplacementStats;
 struct STexInfo;
@@ -29,10 +30,11 @@ public:
     CRenderWareSA();
     ~CRenderWareSA();
     void Initialize();
-    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled);
-    bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId);
+    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled, SString* pOutError = nullptr) override;
+    bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
-    void ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId);
+    void StaticResetModelTextureReplacing();
+    void ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId);
     void ClothesRemoveReplacement(char* pFileData);
     bool HasClothesReplacementChanged();
     bool ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) override;
@@ -54,7 +56,7 @@ public:
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
 
-    // Reads and parses a COL3 file with an optional collision key name
+    // Reads and parses a COL file (versions 1-4: COLL, COL2, COL3, COL4)
     CColModel* ReadCOL(const SString& buffer);
 
     // Replaces a CColModel for a specific object identified by the object id (usModelID)
@@ -92,22 +94,23 @@ public:
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
     bool ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName);
 
-    ushort             GetTXDIDForModelID(ushort usModelID);
+    unsigned short     GetTXDIDForModelID(unsigned short usModelID);
     void               PulseWorldTextureWatch();
-    void               GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID);
-    bool               GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelID, std::vector<SString> vTextureNames);
-    void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, ushort usTxdId);
+    void               GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID);
+    bool               GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames);
+    void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, unsigned short usTxdId);
     static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
+    static void        GetTxdTextures(std::unordered_set<RwTexture*>& outTextureSet, RwTexDictionary* pTXD);
     const char*        GetTextureName(CD3DDUMMY* pD3DData);
-    void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask);
+    void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, unsigned short usModelId, int iTypeMask);
     SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData);
     void               AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority,
-                                           bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers);
+                                           bool bShaderLayered, int iTypeMask, unsigned int uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers);
     void               AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch);
     void               RemoveClientEntityRefs(CClientEntityBase* pClientEntity);
     void               RemoveShaderRefs(CSHADERDUMMY* pShaderItem);
-    bool               RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit);
-    void               TxdForceUnload(ushort usTxdId, bool bDestroyTextures);
+    bool               RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, unsigned int uiSizeLimit);
+    void               TxdForceUnload(unsigned short usTxdId, bool bDestroyTextures);
 
     void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix);
     void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut);
@@ -119,10 +122,10 @@ public:
     void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale);
 
     // CRenderWareSA methods
-    RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
+    RwTexture*          RightSizeTexture(RwTexture* pTexture, unsigned int uiSizeLimit, SString& strError);
     void                ResetStats();
     void                GetShaderReplacementStats(SShaderReplacementStats& outStats);
-    CModelTexturesInfo* GetModelTexturesInfo(ushort usModelId);
+    CModelTexturesInfo* GetModelTexturesInfo(unsigned short usModelId);
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
 
@@ -132,10 +135,13 @@ public:
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
     static bool  StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList);
+    static bool  StaticGetTextureSetCB(RwTexture* texture, std::unordered_set<RwTexture*>* pTextureSet);
 
     void      InitTextureWatchHooks();
-    void      StreamingAddedTexture(ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);
-    void      StreamingRemovedTxd(ushort usTxdId);
+    void      StreamingAddedTexture(unsigned short usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);
+    void      StreamingRemovedTxd(unsigned short usTxdId);
+    void      RemoveStreamingTexture(unsigned short usTxdId, CD3DDUMMY* pD3DData);
+    bool      IsTexInfoRegistered(CD3DDUMMY* pD3DData) const;
     void      ScriptAddedTxd(RwTexDictionary* pTxd);
     void      ScriptRemovedTexture(RwTexture* pTex);
     void      SpecialAddedTexture(RwTexture* texture, const char* szTextureName = NULL);
@@ -146,6 +152,12 @@ public:
     static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
 
+    // Rebind clump material textures to current TXD textures (fixes stale texture pointers after TXD reload
+    void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) override;
+
+    static const char* GetInternalTextureName(const char* szExternalName);
+    static const char* GetExternalTextureName(const char* szInternalName);
+
     void OnTextureStreamIn(STexInfo* pTexInfo);
     void OnTextureStreamOut(STexInfo* pTexInfo);
     void DisableGTAVertexShadersForAWhile();
@@ -153,10 +165,10 @@ public:
     void SetGTAVertexShadersEnabled(bool bEnable);
 
     // Watched world textures
-    std::multimap<ushort, STexInfo*>    m_TexInfoMap;
+    std::multimap<unsigned short, STexInfo*>    m_TexInfoMap;
     CFastHashMap<CD3DDUMMY*, STexInfo*> m_D3DDataTexInfoMap;
     CClientEntityBase*                  m_pRenderingClientEntity;
-    ushort                              m_usRenderingEntityModelId;
+    unsigned short                              m_usRenderingEntityModelId;
     int                                 m_iRenderingEntityType;
     CMatchChannelManager*               m_pMatchChannelManager;
     int                                 m_uiReplacementRequestCounter;

@@ -946,6 +946,13 @@ ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
 ADD_ENUM(PreloadAreaOption::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("preload-area-option")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(RestreamOption)
+ADD_ENUM(RestreamOption::ALL, "world")
+ADD_ENUM(RestreamOption::VEHICLES, "vehicles")
+ADD_ENUM(RestreamOption::PEDS, "peds")
+ADD_ENUM(RestreamOption::OBJECTS, "objects")
+IMPLEMENT_ENUM_CLASS_END("restream-option")
+
 
 IMPLEMENT_ENUM_CLASS_BEGIN(taskType)
 ADD_ENUM(taskType::PRIMARY_TASK, "primary")
@@ -980,6 +987,13 @@ ADD_ENUM(VehicleAudioSettingProperty::ENGINE_UPGRADE, "engine-upgrade")
 ADD_ENUM(VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-audio")
 IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
 
+
+IMPLEMENT_ENUM_CLASS_BEGIN(PostFXType)
+ADD_ENUM(PostFXType::GAMMA, "gamma")
+ADD_ENUM(PostFXType::BRIGHTNESS, "brightness")
+ADD_ENUM(PostFXType::CONTRAST, "contrast")
+ADD_ENUM(PostFXType::SATURATION, "saturation")
+IMPLEMENT_ENUM_CLASS_END("postfx-type")
 
 //
 // CResource from userdata

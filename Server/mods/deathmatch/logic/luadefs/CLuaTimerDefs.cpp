@@ -115,7 +115,7 @@ int CLuaTimerDefs::KillTimer(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaTimerDefs::IsTimerPaused(CLuaTimer* timer)
+bool CLuaTimerDefs::IsTimerPaused(CLuaTimer* timer) noexcept
 {
     return timer->IsPaused();
 }

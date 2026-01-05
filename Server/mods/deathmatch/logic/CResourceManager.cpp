@@ -172,19 +172,42 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
         if (!strJustThisResource.empty() && strJustThisResource != info.strName)
             continue;
 
-        if (!info.bPathIssue)
+        if (info.bPathIssue)
+            continue;
+
+        auto* pResource = GetResource(info.strName);
+
+        if (bRefreshAll || !pResource || !pResource->CheckIfStartable())
         {
-            CResource* pResource = GetResource(info.strName);
+            if (g_pServerInterface->IsRequestingExit())
+                return false;
 
-            if (bRefreshAll || !pResource || !pResource->CheckIfStartable())
-            {
-                if (g_pServerInterface->IsRequestingExit())
-                    return false;
-
-                // Add the resource
-                Load(!info.bIsDir, info.strAbsPath, info.strName);
-            }
+            // Add the resource
+            Load(!info.bIsDir, info.strAbsPath, info.strName);
+            continue;
         }
+
+        if (!pResource)
+            continue;
+
+        // For existing resources, refresh ACL permissions without full reload
+        std::string strPath;
+        if (!pResource->GetFilePath("meta.xml", strPath))
+            continue;
+
+        std::unique_ptr<CXMLFile> pMetaFile(g_pServerInterface->GetXML()->CreateXML(strPath.c_str()));
+        if (!pMetaFile || !pMetaFile->Parse())
+            continue;
+
+        CXMLNode* pRoot = pMetaFile->GetRootNode();
+        if (!pRoot)
+            continue;
+
+        CXMLNode* pNodeAclRequest = pRoot->FindSubNode("aclrequest", 0);
+        if (pNodeAclRequest)
+            pResource->RefreshAutoPermissions(pNodeAclRequest);
+        else
+            pResource->RemoveAutoPermissions();
     }
 
     marker.Set("AddNew");

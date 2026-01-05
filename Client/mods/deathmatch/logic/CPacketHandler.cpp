@@ -309,6 +309,10 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
     if (g_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         g_pGame->StartGame();
+
+        // Fix area name showing for a second when joining to server for first time
+        // HUD_AREA_NAME will be made visible later in the process when the camera fades in (CCameraRPCs::FadeCamera)
+        g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     }
 }
 
@@ -1138,6 +1142,11 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
         // He's no longer dead
         pPlayer->SetDeadOnNetwork(false);
 
+        // Reset death processing flag for new life
+        if (pPlayer->IsLocalPlayer()) {
+            g_pClientGame->ResetDeathProcessingFlag();
+        }
+
         // Reset weapons
         pPlayer->RemoveAllWeapons();
 
@@ -1216,6 +1225,12 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
             }
             // Update our sync-time context
             pPed->SetSyncTimeContext(ucTimeContext);
+
+            // Clear stale damage data if this is the local player
+            // This prevents DoWastedCheck from firing with stale data when server processes death
+            if (pPed->IsLocalPlayer()) {
+                g_pClientGame->ClearDamageData();
+            }
 
             // To at least here needs to be done on the local player to avoid desync
             // Caz: Issue 8148 - Desync when calling spawnPlayer from an event handler remotely triggered from within onClientPlayerWasted
@@ -2351,9 +2366,9 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Apply world sea level (to world sea level water only)
     g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fSeaLevel, nullptr, false, true, false);
 
-    unsigned short usFPSLimit = 36;
-    bitStream.ReadCompressed(usFPSLimit);
-    g_pCore->RecalculateFrameRateLimit(usFPSLimit);
+    std::uint16_t fps = 36; // Default to 36
+    bitStream.ReadCompressed(fps);
+    CStaticFunctionDefinitions::SetServerFPSLimit(fps);
 
     // Read out the garage door states
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();
@@ -2874,7 +2889,7 @@ retry:
                         CLuaArgument Argument;
                         Argument.ReadFromBitStream(bitStream);
 
-                        pCustomData->Set(strName, Argument);
+                        pCustomData->Set(CStringName{strName}, Argument);
                     }
                     else
                     {
@@ -3016,8 +3031,7 @@ retry:
                             return;
                         }
 
-                        if (bitStream.ReadBit())
-                            pObject->SetDoubleSided(true);
+                        pObject->SetDoubleSided(bitStream.ReadBit());
 
                         pObject->SetBreakable(bitStream.ReadBit());
 
@@ -3255,7 +3269,7 @@ retry:
                     // Read out the vehicle model
                     std::uint16_t usModel = 0xFFFF;
                     bitStream.Read(usModel);
-                    
+
                     if (!CClientVehicleManager::IsValidModel(usModel))
                     {
                         RaiseEntityAddError(39);

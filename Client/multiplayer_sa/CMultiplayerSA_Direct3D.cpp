@@ -20,6 +20,7 @@ namespace
     DWORD                  ms_BehaviorFlags = 0;
     D3DPRESENT_PARAMETERS* ms_pPresentationParameters = NULL;
     IDirect3DDevice9**     ms_ppReturnedDeviceInterface = NULL;
+    bool                   ms_hasDeviceArgs = false;
 }            // namespace
 
 DWORD RESTORE_Addr_PreCreateDevice;
@@ -36,17 +37,33 @@ BYTE  RESTORE_Bytes_PreCreateDevice[6];
 void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD* BehaviorFlags,
                               D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
-    // Unpatch
-    MemCpy((PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice);
+    // Safely unpatch with validation
+    if (RESTORE_Addr_PreCreateDevice && 
+        RESTORE_Size_PreCreateDevice > 0 && 
+        RESTORE_Size_PreCreateDevice <= sizeof(RESTORE_Bytes_PreCreateDevice))
+    {
+        MemCpy((PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice);
+    }
 
-    // g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
-    ms_pDirect3D = pDirect3D;
-    ms_Adapter = Adapter;
-    ms_DeviceType = DeviceType;
-    ms_hFocusWindow = hFocusWindow;
-    ms_BehaviorFlags = *BehaviorFlags;
-    ms_pPresentationParameters = pPresentationParameters;
-    ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
+    // Validate critical parameters before dereferencing
+    if (BehaviorFlags && pPresentationParameters && ppReturnedDeviceInterface)
+    {
+        ms_pDirect3D = pDirect3D;
+        ms_Adapter = Adapter;
+        ms_DeviceType = DeviceType;
+        ms_hFocusWindow = hFocusWindow;
+        ms_BehaviorFlags = *BehaviorFlags;
+        ms_pPresentationParameters = pPresentationParameters;
+        ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
+        ms_hasDeviceArgs = true;
+    }
+    else
+    {
+        ms_hasDeviceArgs = false;
+        SString message;
+        message = "OnPreCreateDevice: missing device arguments for alt startup path";
+        AddReportLog(8740, message);
+    }
 }
 
 // Hook info
@@ -59,30 +76,39 @@ static void __declspec(naked) HOOK_PreCreateDevice()
 
     __asm
     {
-        // Run replaced code
-        mov     ecx,dword ptr ds:[0C97C20h]
-        push    0C97C28h
-        push    0C9C040h
-        push    eax
-        mov     eax,dword ptr ds:[00C97C1Ch]
+        // Run replaced code - these pushes create the original function parameters
+        mov     ecx,dword ptr ds:[0C97C20h]        // pDirect3D
+        push    0C97C28h                           // ppReturnedDeviceInterface
+        push    0C9C040h                           // pPresentationParameters  
+        push    eax                                // BehaviorFlags (original eax)
+        mov     eax,dword ptr ds:[00C97C1Ch]       
         mov     edx,  [ecx]
-        push    eax
+        push    eax                                // hFocusWindow
         mov     eax,dword ptr ds:[008E2428h]
-        push    eax
+        push    eax                                // DeviceType
 
-        mov     eax, ds:0x0C97C24       // __RwD3DAdapterIndex
-        push    eax
-        push    ecx
+        mov     eax, ds:0x0C97C24                  // __RwD3DAdapterIndex
+        push    eax                                // Adapter
+        push    ecx                                // pDirect3D
 
-        pushad
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        lea     eax,[esp+32+4*6]    // Turn BehaviorFlags into a pointer so we can modify it
+        // Now we have 7 parameters on stack (28 bytes)
+        // Stack layout at ESP: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
+
+        pushad  // Save all registers (32 bytes), ESP now at ESP-32
+        
+        // Pass parameters to OnPreCreateDevice
+        // After pushad, params start at ESP+32. Each push decreases ESP by 4,
+        // so [esp+32+4*6] effectively walks backward through the params:
+        // 1st access: ESP+56 = ppReturnedDeviceInterface, then ESP -= 4
+        // 2nd access: ESP+56 = pPresentationParameters (was at ESP+52), etc.
+        push    [esp+32+4*6]                       // ppReturnedDeviceInterface
+        push    [esp+32+4*6]                       // pPresentationParameters
+        lea     eax,[esp+32+4*6]                   // BehaviorFlags as pointer
         push    eax
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
+        push    [esp+32+4*6]                       // hFocusWindow
+        push    [esp+32+4*6]                       // DeviceType
+        push    [esp+32+4*6]                       // Adapter
+        push    [esp+32+4*6]                       // pDirect3D
         call    OnPreCreateDevice
         add     esp, 4*7
         popad
@@ -101,8 +127,42 @@ static void __declspec(naked) HOOK_PreCreateDevice()
 ////////////////////////////////////////////////////////////////
 HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
 {
-    return g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
-                                       ms_ppReturnedDeviceInterface);
+    if (!g_pCore)
+    {
+        ms_hasDeviceArgs = false;
+        return hResult;
+    }
+
+    if (!ms_hasDeviceArgs)
+    {
+        SString message;
+        message = "OnPostCreateDevice: device arguments were not captured; skipping alt startup logic";
+        AddReportLog(8741, message);
+        return hResult;
+    }
+
+    if (!SharedUtil::IsReadablePointer(ms_ppReturnedDeviceInterface, sizeof(*ms_ppReturnedDeviceInterface)))
+    {
+        SString message;
+        message.Format("OnPostCreateDevice: invalid device pointer reference %p", ms_ppReturnedDeviceInterface);
+        AddReportLog(8742, message);
+        ms_hasDeviceArgs = false;
+        return hResult;
+    }
+
+    if (!SharedUtil::IsReadablePointer(ms_pPresentationParameters, sizeof(*ms_pPresentationParameters)))
+    {
+        SString message;
+        message.Format("OnPostCreateDevice: invalid presentation parameters pointer %p", ms_pPresentationParameters);
+        AddReportLog(8743, message);
+        ms_hasDeviceArgs = false;
+        return hResult;
+    }
+
+    HRESULT result = g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
+                                                 ms_ppReturnedDeviceInterface);
+    ms_hasDeviceArgs = false;
+    return result;
 }
 
 // Hook info
