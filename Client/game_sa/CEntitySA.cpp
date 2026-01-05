@@ -642,10 +642,30 @@ bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
     RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (!rwBoneMatrix)
         return false;
-        
+
     CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
     boneMatrix.SetTranslateOnly(position);
     boneMatrix.UpdateRW();
+    return true;
+}
+
+bool CEntitySA::GetBoneScale(eBone boneId, CVector& scale)
+{
+    RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    if (!rwBoneMatrix)
+        return false;
+
+    pGame->GetRenderWare()->RwMatrixGetScale(*rwBoneMatrix, scale);
+    return true;
+}
+
+bool CEntitySA::SetBoneScale(eBone boneId, const CVector& scale)
+{
+    RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    if (!rwBoneMatrix)
+        return false;
+
+    RwMatrixScale(rwBoneMatrix, (RwV3d*)&scale, TRANSFORM_BEFORE);
     return true;
 }
 

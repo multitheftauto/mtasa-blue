@@ -1128,6 +1128,77 @@ CVector* CClientPed::GetTransformedBonePosition(eBone bone, CVector& vecPosition
     return NULL;
 }
 
+bool CClientPed::SetBoneScale(eBone boneId, const CVector& scale)
+{
+    if (!m_pPlayerPed)
+        return false;
+
+    if (boneId < BONE_ROOT || boneId > BONE_LEFTBREAST)
+        return false;
+
+    m_boneScales[boneId] = scale;
+    m_pPlayerPed->SetBoneScale(boneId, scale);
+    return true;
+}
+
+bool CClientPed::GetBoneScale(eBone boneId, CVector& scale) const
+{
+    auto it = m_boneScales.find(boneId);
+    if (it != m_boneScales.end())
+    {
+        scale = it->second;
+        return true;
+    }
+
+    if (!m_pPlayerPed)
+        return false;
+
+    return m_pPlayerPed->GetBoneScale(boneId, scale);
+}
+
+bool CClientPed::ResetBoneScale(eBone boneId)
+{
+    auto it = m_boneScales.find(boneId);
+    if (it == m_boneScales.end())
+        return false;
+
+    m_boneScales.erase(it);
+
+    if (m_pPlayerPed)
+        m_pPlayerPed->SetBoneScale(boneId, CVector(1.0f, 1.0f, 1.0f));
+
+    return true;
+}
+
+void CClientPed::ResetAllBoneScales()
+{
+    m_boneScales.clear();
+
+    if (!m_pPlayerPed)
+        return;
+
+    CVector defaultScale(1.0f, 1.0f, 1.0f);
+    for (int i = BONE_ROOT; i <= BONE_HEAD; ++i)
+        m_pPlayerPed->SetBoneScale(static_cast<eBone>(i), defaultScale);
+    for (int i = BONE_RIGHTUPPERTORSO; i <= BONE_RIGHTTHUMB; ++i)
+        m_pPlayerPed->SetBoneScale(static_cast<eBone>(i), defaultScale);
+    for (int i = BONE_LEFTUPPERTORSO; i <= BONE_LEFTTHUMB; ++i)
+        m_pPlayerPed->SetBoneScale(static_cast<eBone>(i), defaultScale);
+    for (int i = BONE_LEFTHIP; i <= BONE_LEFTFOOT; ++i)
+        m_pPlayerPed->SetBoneScale(static_cast<eBone>(i), defaultScale);
+    for (int i = BONE_RIGHTHIP; i <= BONE_RIGHTFOOT; ++i)
+        m_pPlayerPed->SetBoneScale(static_cast<eBone>(i), defaultScale);
+}
+
+void CClientPed::ApplyBoneScales()
+{
+    if (m_boneScales.empty() || !m_pPlayerPed)
+        return;
+
+    for (const auto& [bone, scale] : m_boneScales)
+        m_pPlayerPed->SetBoneScale(bone, scale);
+}
+
 CClientVehicle* CClientPed::GetRealOccupiedVehicle()
 {
     if (m_pPlayerPed)
