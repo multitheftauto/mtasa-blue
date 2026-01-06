@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CProjectileSA.h
  *  PURPOSE:     Header file for projectile entity class
@@ -14,27 +14,19 @@
 #include <game/CProjectile.h>
 #include "CObjectSA.h"
 
-class CProjectileSAInterface : public CObjectSAInterface            // entirely inherited from CObject
-{
-public:
-    bool IsProjectableVTBL() const { return GetVTBL() == (void*)0x867030; };
-};
-
 class CProjectileSA : public virtual CProjectile, public virtual CObjectSA
 {
 private:
-    CProjectileSAInterface* internalInterface;
-    class CProjectileInfo*  projectileInfo;
-    bool                    m_bDestroyed;
+    class CProjectileInfo*  m_projectileInfo;
+    bool                    m_destroyed;
+    
+public:
+    CProjectileSA(CObjectSAInterface* object, class CProjectileInfoSA* info);
+    ~CProjectileSA();
+
+    void Destroy(bool blow = true) override;
+    bool CorrectPhysics() override;
 
 public:
-    CProjectileSA(class CProjectileSAInterface* projectileInterface);
-    ~CProjectileSA();
-    void Destroy(bool bBlow = true);
-    CProjectileSAInterface* GetProjectileInterface() const { return static_cast<CProjectileSAInterface*>(m_pInterface); };
-
-    bool CalculateImpactPosition(CEntitySAInterface* pCollidedWith, CVector vecInputStart, CVector& vecInputEnd);
-
-    void SetProjectileInfo(CProjectileInfo* pProjectileInfo) { projectileInfo = pProjectileInfo; }
-    bool CorrectPhysics();
+    CObjectSAInterface* m_object;
 };

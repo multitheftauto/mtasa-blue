@@ -194,6 +194,17 @@ public:
         return false;
     }
 
+    static CVector Multiply3x3(const CVector& right, const CVector& forward, const CVector& up, const CVector& in)
+    {
+        CVector out;
+
+        out.fX = right.fX * in.fX + forward.fX * in.fY + up.fX * in.fZ;
+        out.fY = right.fY * in.fX + forward.fY * in.fY + up.fY * in.fZ;
+        out.fZ = right.fZ * in.fX + forward.fZ * in.fY + up.fZ * in.fZ;
+
+        return out;
+    }
+
     bool IsValid() const
     {
         const float values[3] = {fX, fY, fZ};

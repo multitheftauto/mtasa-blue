@@ -86,10 +86,6 @@ typedef void(BulletFireHandler)(class CPed* pInitiator, const CVector* pvecStart
 typedef bool(DamageHandler)(class CPed* pDamagePed, class CEventDamage* pEvent);
 typedef void(DeathHandler)(class CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
 typedef bool(FireHandler)(class CEntitySAInterface* target, class CEntitySAInterface* creator);
-typedef bool(ProjectileStopHandler)(class CEntity* owner, enum eWeaponType weaponType, class CVector* origin, float fForce, class CVector* target,
-                                    class CEntity* targetEntity);
-typedef void(ProjectileHandler)(class CEntity* owner, class CProjectile* projectile, class CProjectileInfo* projectileInfo, enum eWeaponType weaponType,
-                                class CVector* origin, float fForce, class CVector* target, class CEntity* targetEntity);
 typedef bool(BreakTowLinkHandler)(class CVehicle* towingVehicle);
 typedef bool(ProcessCamHandler)(class CCam* pCam);
 typedef void(DrawRadarAreasHandler)();
@@ -226,8 +222,6 @@ public:
     virtual void  SetFireHandler(FireHandler* pFireHandler) = 0;
     virtual void  SetProcessCamHandler(ProcessCamHandler* pProcessCamHandler) = 0;
     virtual void  SetChokingHandler(ChokingHandler* pChokingHandler) = 0;
-    virtual void  SetProjectileHandler(ProjectileHandler* pProjectileHandler) = 0;
-    virtual void  SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler) = 0;
     virtual void  SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler) = 0;

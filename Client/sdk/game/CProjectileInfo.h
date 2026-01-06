@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/game/CProjectileInfo.h
  *  PURPOSE:     Projectile entity information interface
@@ -12,19 +12,21 @@
 #pragma once
 
 class CEntity;
-class CPlayerPed;
 class CProjectile;
 class CVector;
+
+using ProjectileHandler = bool(*)(CEntity* creator, CProjectile* projectile, CProjectileInfo* projectileInfo, eWeaponType projectileType, CVector* pos, float force, CVector* target, CEntity* targetEntity);
+using GameProjectileDestructHandler = void(CEntitySAInterface* entity);
 
 class CProjectileInfo
 {
 public:
-    virtual bool             AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
-    virtual CProjectile*     GetProjectile(void* projectilePointer) = 0;                      // hack, don't use please
-    virtual CProjectileInfo* GetProjectileInfo(void* projectileInfoInterface) = 0;            // don't use
-    virtual void             RemoveProjectile(CProjectileInfo* pProjectileInfo, CProjectile* pProjectile, bool bBlow = true) = 0;
-    virtual CProjectileInfo* GetProjectileInfo(DWORD Index) = 0;
-    virtual void             RemoveEntityReferences(CEntity* entity) = 0;
+    virtual CProjectileInfo* AddProjectile(CEntity* creator, eWeaponType weapon, CVector origin, float force, CVector* target, CEntity* targetEntity) const = 0;
+    virtual CProjectile*     GetProjectileObject() = 0;
+
+    virtual void RemoveProjectile(CProjectileInfo* projectileInfo, CProjectile* projectile, bool blow = true) const = 0;
+
+    virtual void RemoveEntityReferences(CEntity* entity) = 0;
 
     virtual CEntity* GetTarget() = 0;
     virtual void     SetTarget(CEntity* pEntity) = 0;
@@ -33,4 +35,11 @@ public:
 
     virtual void  SetCounter(DWORD dwCounter) = 0;
     virtual DWORD GetCounter() = 0;
+
+    virtual eWeaponType GetType() const = 0;
+
+    virtual CProjectileInfo* GetProjectileInfo(std::uint32_t Index) const noexcept = 0;
+
+    virtual void SetProjectileCreationHandler(ProjectileHandler handler) = 0;
+    virtual void SetGameProjectileDestructHandler(GameProjectileDestructHandler* handler) = 0;
 };

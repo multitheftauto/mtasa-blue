@@ -276,8 +276,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetDamageHandler(CClientGame::StaticDamageHandler);
     g_pMultiplayer->SetDeathHandler(CClientGame::StaticDeathHandler);
     g_pMultiplayer->SetFireHandler(CClientGame::StaticFireHandler);
-    g_pMultiplayer->SetProjectileStopHandler(CClientProjectileManager::Hook_StaticProjectileAllow);
-    g_pMultiplayer->SetProjectileHandler(CClientProjectileManager::Hook_StaticProjectileCreation);
     g_pMultiplayer->SetRender3DStuffHandler(CClientGame::StaticRender3DStuffHandler);
     g_pMultiplayer->SetPreRenderSkyHandler(CClientGame::StaticPreRenderSkyHandler);
     g_pMultiplayer->SetRenderHeliLightHandler(CClientGame::StaticRenderHeliLightHandler);
@@ -306,7 +304,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetGameObjectDestructHandler(CClientGame::StaticGameObjectDestructHandler);
     g_pMultiplayer->SetGameVehicleDestructHandler(CClientGame::StaticGameVehicleDestructHandler);
     g_pMultiplayer->SetGamePlayerDestructHandler(CClientGame::StaticGamePlayerDestructHandler);
-    g_pMultiplayer->SetGameProjectileDestructHandler(CClientGame::StaticGameProjectileDestructHandler);
+    //g_pMultiplayer->SetGameProjectileDestructHandler(CClientGame::StaticGameProjectileDestructHandler);
     g_pMultiplayer->SetGameModelRemoveHandler(CClientGame::StaticGameModelRemoveHandler);
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
@@ -323,6 +321,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(CClientGame::StaticKeyStrokeHandler);
     g_pCore->GetKeyBinds()->SetCharacterKeyHandler(CClientGame::StaticCharacterKeyHandler);
     g_pNet->RegisterPacketHandler(CClientGame::StaticProcessPacket);
+
+    g_pGame->GetProjectileInfo()->SetProjectileCreationHandler(CClientProjectileManager::Hook_StaticProjectileCreation);
+    g_pGame->GetProjectileInfo()->SetGameProjectileDestructHandler(CClientGame::StaticGameProjectileDestructHandler);
 
     m_pLuaManager = new CLuaManager(this);
     m_pScriptDebugging = new CScriptDebugging(m_pLuaManager);
@@ -484,8 +485,6 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetDrawRadarAreasHandler(NULL);
     g_pMultiplayer->SetDamageHandler(NULL);
     g_pMultiplayer->SetFireHandler(NULL);
-    g_pMultiplayer->SetProjectileStopHandler(NULL);
-    g_pMultiplayer->SetProjectileHandler(NULL);
     g_pMultiplayer->SetProcessCamHandler(nullptr);
     g_pMultiplayer->SetRender3DStuffHandler(NULL);
     g_pMultiplayer->SetPreRenderSkyHandler(NULL);
@@ -3887,14 +3886,6 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
         pProjectile->SetInterior(pProjectile->GetCreator()->GetInterior());
         pProjectile->SetDimension(pProjectile->GetCreator()->GetDimension());
     }
-
-    // Validate the projectile for our element tree
-    pProjectile->SetParent(m_pRootEntity);
-
-    // Call our creation event
-    CLuaArguments Arguments;
-    Arguments.PushElement(pProjectile->GetCreator());
-    pProjectile->CallEvent("onClientProjectileCreation", Arguments, true);
 }
 
 void CClientGame::Render3DStuffHandler()
@@ -4978,15 +4969,14 @@ void CClientGame::GamePlayerDestructHandler(CEntitySAInterface* pPlayer)
     // m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
 }
 
-void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
+void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* projectileObject)
 {
-    CClientProjectile* pClientProjectile = m_pManager->GetProjectileManager()->Get(pProjectile);
-    // Happens when destroyElement is called rather than letting the projectile expire
-    // Normal code path is destruction from CProjectileSAInterface -> CProjectileSA -> CClientProjectile
-    // destroyElement is CClientProjectile -> CProjectileSA -> CProjectileSAInterface
-    // which means the CClientProjectile element is deleted when we get here
-    if (pClientProjectile)
-        CStaticFunctionDefinitions::DestroyElement(*pClientProjectile);
+    CClientProjectile* clientProjectile = m_pManager->GetProjectileManager()->Get(projectileObject);
+    // Called BEFORE the projectile is destroyed (e.g., explodes or expires) (CProjectile::~CProjectile)
+    // First, we destroy the client-side element; then the game object itself will be destroyed.
+    // (This is possible thanks to our custom projectile implementation.)
+    if (clientProjectile)
+        CStaticFunctionDefinitions::DestroyElement(*clientProjectile);
 }
 
 void CClientGame::GameModelRemoveHandler(ushort usModelId)

@@ -100,6 +100,9 @@ public:
     CTxdPool&       GetTxdPool() noexcept { return m_TxdPool; };
     CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept override { return m_PtrNodeSingleLinkPool; };
 
+    [[nodiscard]]
+    std::uint16_t GetObjectHandle(CObjectSAInterface* object) const override;
+
 private:
     // Pools
     SPoolData<CVehicleSA, CVehicleSAInterface, MAX_VEHICLES>    m_vehiclePool;

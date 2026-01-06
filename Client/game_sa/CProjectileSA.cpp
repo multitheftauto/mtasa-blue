@@ -17,16 +17,13 @@
 
 extern CGameSA* pGame;
 
-CProjectileSA::CProjectileSA(CProjectileSAInterface* projectileInterface) : CObjectSA(projectileInterface)
+CProjectileSA::CProjectileSA(CObjectSAInterface* object, CProjectileInfoSA* info) : CObjectSA(object), m_object(object), m_projectileInfo(info)
 {
-    internalInterface = projectileInterface;
-    projectileInfo = NULL;
     BeingDeleted = false;
     DoNotRemoveFromGame = false;
-    internalInterface->bStreamingDontDelete = true;
-    internalInterface->bDontStream = true;
-    internalInterface->bRemoveFromWorld = false;
-    m_bDestroyed = false;
+    m_destroyed = false;
+
+    SetInterface(object);
 }
 
 CProjectileSA::~CProjectileSA()
@@ -63,15 +60,14 @@ CProjectileSA::~CProjectileSA()
         //delete this;
         //OutputDebugString("Destroying Object\n");
     }*/
-    Destroy();
 }
 
 void CProjectileSA::Destroy(bool bBlow)
 {
-    if (m_bDestroyed == false)
+    if (m_destroyed == false)
     {
-        pGame->GetProjectileInfo()->RemoveProjectile(projectileInfo, this, bBlow);
-        m_bDestroyed = true;
+        pGame->GetProjectileInfo()->RemoveProjectile(m_projectileInfo, this, bBlow);
+        m_destroyed = true;
     }
 }
 

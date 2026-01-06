@@ -392,8 +392,6 @@ BulletFireHandler*                         m_pBulletFireHandler = NULL;
 DamageHandler*                             m_pDamageHandler = NULL;
 DeathHandler*                              m_pDeathHandler = NULL;
 FireHandler*                               m_pFireHandler = NULL;
-ProjectileHandler*                         m_pProjectileHandler = NULL;
-ProjectileStopHandler*                     m_pProjectileStopHandler = NULL;
 ProcessCamHandler*                         m_pProcessCamHandler = NULL;
 ChokingHandler*                            m_pChokingHandler = NULL;
 ExplosionHandler*                          m_pExplosionHandler = NULL;
@@ -580,8 +578,6 @@ CMultiplayerSA::CMultiplayerSA()
     m_pDrawRadarAreasHandler = NULL;
     m_pDamageHandler = NULL;
     m_pFireHandler = NULL;
-    m_pProjectileHandler = NULL;
-    m_pProjectileStopHandler = NULL;
 
     MemSetFast(&localStatsData, 0, sizeof(CStatsData));
     localStatsData.StatTypesFloat[24] = 569.0f;            // Max Health
@@ -2601,16 +2597,6 @@ void CMultiplayerSA::DisableExplosions(bool bDisabled)
 void CMultiplayerSA::SetExplosionHandler(ExplosionHandler* pExplosionHandler)
 {
     m_pExplosionHandler = pExplosionHandler;
-}
-
-void CMultiplayerSA::SetProjectileHandler(ProjectileHandler* pProjectileHandler)
-{
-    m_pProjectileHandler = pProjectileHandler;
-}
-
-void CMultiplayerSA::SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler)
-{
-    m_pProjectileStopHandler = pProjectileHandler;
 }
 
 void CMultiplayerSA::SetBreakTowLinkHandler(BreakTowLinkHandler* pBreakTowLinkHandler)

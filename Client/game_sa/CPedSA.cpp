@@ -79,15 +79,6 @@ void CPedSA::SetModelIndex(std::uint32_t modelIndex)
     GetPedInterface()->pedSound.m_bIsFemale = type == 5 || type == 22;
 }
 
-bool CPedSA::AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity)
-{
-    CProjectileInfo* projectileInfo = pGame->GetProjectileInfo();
-    if (!projectileInfo)
-        return false;
-
-    return projectileInfo->AddProjectile(static_cast<CEntitySA*>(this), weaponType, origin, force, const_cast<CVector*>(target), const_cast<CEntity*>(targetEntity));
-}
-
 void CPedSA::DetachPedFromEntity()
 {
     // void __thiscall CPed::DettachPedFromEntity(CPed *this)
@@ -548,12 +539,12 @@ void CPedSA::Say(const ePedSpeechContext& speechId, float probability)
 void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
 {
     // Array of projectiles objects
-    auto** projectilesArray = reinterpret_cast<CProjectileSAInterface**>(ARRAY_CProjectile);
-    CProjectileSAInterface*  projectileInterface = nullptr;
+    auto** projectilesArray = reinterpret_cast<CProjectileSA**>(ARRAY_CProjectile);
+    CProjectileSA*  projectileInterface = nullptr;
 
     // Array of projectiles infos
-    auto* projectilesInfoArray = reinterpret_cast<CProjectileInfoSAInterface*>(ARRAY_CProjectileInfo);
-    CProjectileInfoSAInterface* projectileInfoInterface = nullptr;
+    auto* projectilesInfoArray = reinterpret_cast<CProjectileInfoSA*>(ARRAY_CProjectileInfo);
+    CProjectileInfoSA* projectileInfoInterface = nullptr;
 
     satchelsList.reserve(PROJECTILE_COUNT);
 
@@ -563,18 +554,18 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
         projectileInterface = projectilesArray[i];
 
         // is attached to our ped?
-        if (!projectileInterface || projectileInterface->m_pAttachedEntity != m_pInterface)
+        if (!projectileInterface || projectileInterface->m_object->m_pAttachedEntity != m_pInterface)
             continue;
 
         // index is always the same for both arrays
         projectileInfoInterface = &projectilesInfoArray[i];
 
         // We are only interested in satchels
-        if (!projectileInfoInterface || projectileInfoInterface->dwProjectileType != eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
+        if (!projectileInfoInterface || projectileInfoInterface->GetType() != eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
             continue;
 
         // Push satchel into the array. There is no need to check the counter because for satchels it restarts until the player detonates the charges
-        satchelsList.emplace_back(projectileInterface, &projectileInterface->m_vecAttachedOffset, &projectileInterface->m_vecAttachedRotation);
+        satchelsList.emplace_back(projectileInterface, &projectileInterface->m_object->m_vecAttachedOffset, &projectileInterface->m_object->m_vecAttachedRotation);
     }
 }
 
