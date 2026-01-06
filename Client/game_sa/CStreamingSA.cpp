@@ -240,6 +240,10 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
     else
     {
+        CBaseModelInfoSAInterface** ppModelInfo = reinterpret_cast<CBaseModelInfoSAInterface**>(ARRAY_ModelInfo);
+        if (dwModelID < MODELINFO_DFF_MAX && !ppModelInfo[dwModelID])
+            return;
+
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
         _asm
         {
@@ -371,7 +375,7 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     pItemInfo->archiveId = usStreamID;
     pItemInfo->offsetInBlocks = uiOffset;
     pItemInfo->sizeInBlocks = usSize;
-    pItemInfo->nextInImg = uiNextInImg;
+    pItemInfo->nextInImg = static_cast<uint16_t>(uiNextInImg);
 }
 
 CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)

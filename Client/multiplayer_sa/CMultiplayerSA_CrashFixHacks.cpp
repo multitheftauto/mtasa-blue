@@ -28,7 +28,9 @@ void CPlayerPed__ProcessControl_Abort();
 void OnCrashAverted(uint uiId);
 void OnEnterCrashZone(uint uiId);
 
-void _declspec(naked) CrashAverted()
+void OnRequestDeferredStreamingMemoryRelief();
+
+static void _declspec(naked) CrashAverted()
 {
     _asm
     {
@@ -40,6 +42,143 @@ void _declspec(naked) CrashAverted()
         popad
         popfd
         retn    4
+    }
+}
+
+static bool HasReadAccess(DWORD dwProtect)
+{
+    if (dwProtect & PAGE_GUARD)
+        return false;
+
+    dwProtect &= 0xFF;
+
+    if (dwProtect == PAGE_NOACCESS)
+        return false;
+
+    return dwProtect == PAGE_READONLY || dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE ||
+           dwProtect == PAGE_EXECUTE_READ || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
+}
+
+static bool HasWriteAccess(DWORD dwProtect)
+{
+    if (dwProtect & PAGE_GUARD)
+        return false;
+
+    dwProtect &= 0xFF;
+
+    return dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
+}
+
+static bool QueryRegionCached(uintptr_t uiAddress, MEMORY_BASIC_INFORMATION& outMbi, uintptr_t& outStart, uintptr_t& outEnd)
+{
+    static thread_local MEMORY_BASIC_INFORMATION s_mbi;
+    static thread_local uintptr_t                s_start = 0;
+    static thread_local uintptr_t                s_end = 0;
+
+    if (s_start != 0 && uiAddress >= s_start && uiAddress <= s_end)
+    {
+        outMbi = s_mbi;
+        outStart = s_start;
+        outEnd = s_end;
+        return true;
+    }
+
+    MEMORY_BASIC_INFORMATION mbi;
+    SIZE_T                   mbiResult = VirtualQuery(reinterpret_cast<LPCVOID>(uiAddress), &mbi, sizeof(mbi));
+    if (mbiResult != sizeof(mbi))
+        return false;
+
+    s_mbi = mbi;
+    s_start = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+
+    const uintptr_t uiSize = static_cast<uintptr_t>(mbi.RegionSize);
+    if (uiSize == 0)
+        s_end = s_start;
+    else
+    {
+        const uintptr_t uiEndPlusOne = s_start + uiSize;
+        s_end = (uiEndPlusOne <= s_start) ? static_cast<uintptr_t>(-1) : (uiEndPlusOne - 1);
+    }
+
+    outMbi = s_mbi;
+    outStart = s_start;
+    outEnd = s_end;
+    return true;
+}
+
+static bool IsReadablePtr(const void* pPtr, size_t uiSize)
+{
+    if (pPtr == nullptr || uiSize == 0)
+        return false;
+
+    const uintptr_t uiStart = reinterpret_cast<uintptr_t>(pPtr);
+    if (uiStart < 0x10000)
+        return false;
+
+    const uintptr_t uiEnd = uiStart + uiSize - 1;
+    if (uiEnd < uiStart)
+        return false;
+
+    uintptr_t uiCur = uiStart;
+    while (true)
+    {
+        MEMORY_BASIC_INFORMATION mbi;
+        uintptr_t                uiRegionStart = 0;
+        uintptr_t                uiRegionEnd = 0;
+        if (!QueryRegionCached(uiCur, mbi, uiRegionStart, uiRegionEnd))
+            return false;
+
+        if (mbi.State != MEM_COMMIT)
+            return false;
+
+        if (!HasReadAccess(mbi.Protect))
+            return false;
+
+        if (uiRegionEnd >= uiEnd)
+            return true;
+
+        if (uiRegionEnd < uiCur || uiRegionEnd == static_cast<uintptr_t>(-1))
+            return false;
+
+        uiCur = uiRegionEnd + 1;
+    }
+}
+
+static bool IsWritablePtr(void* pPtr, size_t uiSize)
+{
+    if (pPtr == nullptr || uiSize == 0)
+        return false;
+
+    const uintptr_t uiStart = reinterpret_cast<uintptr_t>(pPtr);
+    if (uiStart < 0x10000)
+        return false;
+
+    const uintptr_t uiEnd = uiStart + uiSize - 1;
+    if (uiEnd < uiStart)
+        return false;
+
+    uintptr_t uiCur = uiStart;
+    while (true)
+    {
+        MEMORY_BASIC_INFORMATION mbi;
+        uintptr_t                uiRegionStart = 0;
+        uintptr_t                uiRegionEnd = 0;
+        if (!QueryRegionCached(uiCur, mbi, uiRegionStart, uiRegionEnd))
+            return false;
+
+        if (mbi.State != MEM_COMMIT)
+            return false;
+
+        if (!HasWriteAccess(mbi.Protect))
+            return false;
+
+        if (uiRegionEnd >= uiEnd)
+            return true;
+
+        if (uiRegionEnd < uiCur || uiRegionEnd == static_cast<uintptr_t>(-1))
+            return false;
+
+        uiCur = uiRegionEnd + 1;
     }
 }
 
@@ -1140,6 +1279,191 @@ void _declspec(naked) HOOK_CrashFix_Misc34()
         push    34
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc34_Skip
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryForAllTextures
+//
+// Invalid list entry pointer (crash at 0x7F374A: mov esi, [eax])
+// (https://pastebin.com/hFduf1JB)
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc35                              0x7F374A
+#define HOOKSIZE_CrashFix_Misc35                             5
+#define HOOKCHECK_CrashFix_Misc35                            0x8B
+DWORD RETURN_CrashFix_Misc35 = 0x7F374F;
+DWORD RETURN_CrashFix_Misc35_Abort = 0x7F3760;
+void _declspec(naked) HOOK_CrashFix_Misc35()
+{
+    _asm
+    {
+        pushad
+        push    4
+        push    eax
+        call    IsReadablePtr
+        add     esp, 8
+        test    eax, eax
+        popad
+        jnz     ok
+
+        push    35
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc35_Abort
+
+    ok:
+        mov     esi, [eax]
+        add     eax, 0FFFFFFF8h
+        jmp     RETURN_CrashFix_Misc35
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture
+//
+// Invalid list entry pointer or corrupted texture name pointer
+// (crash at 0x7F3A17: mov cl, [esi])
+// (https://pastebin.com/buBbyWRx and next up: https://pastebin.com/1wTeTwu2)
+//
+// Flow after hook: ecx = ebx+8 (texture name ptr), esi = ecx, then mov cl,[esi]
+// We need to validate both ebx (list node) AND ecx (texture name) are readable.
+//
+// Known bad pointer patterns:
+//   - 0xFF1B1B1B: >= 0x80000000
+//   - 0x4E505444: ASCII garbage in pointer field (readable but invalid data)
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc36                              0x7F3A09
+#define HOOKSIZE_CrashFix_Misc36                             6
+#define HOOKCHECK_CrashFix_Misc36                            0x8D
+DWORD RETURN_CrashFix_Misc36 = 0x7F3A0F;
+DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
+void _declspec(naked) HOOK_CrashFix_Misc36()
+{
+    _asm
+    {
+        cmp     ebx, 40000000h
+        jae     abort
+
+        pushad
+        push    0Ch
+        push    ebx
+        call    IsReadablePtr
+        add     esp, 8
+        test    eax, eax
+        popad
+        jz      abort
+
+        lea     eax, [ebx-8]
+        lea     ecx, [eax+10h]
+
+        cmp     ecx, 40000000h
+        jae     abort
+
+        pushad
+        push    1
+        push    ecx
+        call    IsReadablePtr
+        add     esp, 8
+        test    eax, eax
+        popad
+        jnz     ok
+
+    abort:
+        push    36
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc36_Abort
+
+    ok:
+        jmp     RETURN_CrashFix_Misc36
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryAddTexture
+//
+// Invalid list head pointer (crash at 0x7F39B3: mov [esi+4], edx)
+// (https://pastebin.com/pkWwsSih)
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc37                              0x7F39B3
+#define HOOKSIZE_CrashFix_Misc37                             5
+#define HOOKCHECK_CrashFix_Misc37                            0x89
+DWORD RETURN_CrashFix_Misc37 = 0x7F39B8;
+void _declspec(naked) HOOK_CrashFix_Misc37()
+{
+    _asm
+    {
+        pushad
+        push    8
+        push    esi
+        call    IsWritablePtr
+        add     esp, 8
+        test    eax, eax
+        popad
+        jz      bad
+
+        cmp     esi, ecx
+        jz      ok
+
+        cmp     dword ptr [esi+4], ecx
+        jz      ok
+
+    bad:
+        push    37
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc37
+
+    ok:
+        mov     [edx], esi
+        mov     [esi+4], edx
+        mov     [ecx], edx
+        jmp     RETURN_CrashFix_Misc37
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9SkinGeometryReinstance
+//
+// NULL pointer (out of video mem crash at 0x003C91CC: mov ebx, [esi])
+// Hook at loc_7C91C0 validates [eax]
+// On NULL, skip to loc_7C91DA (after the call block) to continue the loop.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc38                              0x7C91C0
+#define HOOKSIZE_CrashFix_Misc38                             6
+#define HOOKCHECK_CrashFix_Misc38                            0x8B
+DWORD RETURN_CrashFix_Misc38 = 0x7C91C6;
+DWORD RETURN_CrashFix_Misc38_Skip = 0x7C91DA;            // loc_7C91DA: after call block, safe loop continuation
+
+constexpr std::uint32_t NUM_VRAM_RELIEF_THROTTLE_MS = 500;
+
+static void OnVideoMemoryExhausted()
+{
+    static DWORD s_dwLastReliefTick = 0;
+    const DWORD dwNow = GetTickCount32();
+
+    if (dwNow - s_dwLastReliefTick < NUM_VRAM_RELIEF_THROTTLE_MS)
+        return;
+
+    s_dwLastReliefTick = dwNow;
+    OnRequestDeferredStreamingMemoryRelief();
+}
+
+void _declspec(naked) HOOK_CrashFix_Misc38()
+{
+    _asm
+    {
+        mov     esi, [eax]
+        test    esi, esi
+        jnz     ok
+
+        pushad
+        call    OnVideoMemoryExhausted
+        popad
+        push    38
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc38_Skip
+
+    ok:
+        lea     ecx, [esp+ecx*4+18h]
+        jmp     RETURN_CrashFix_Misc38
     }
 }
 
@@ -2315,6 +2639,10 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc32);
     EZHookInstall(CrashFix_Misc33);
     EZHookInstall(CrashFix_Misc34);
+    EZHookInstallChecked(CrashFix_Misc35);
+    EZHookInstallChecked(CrashFix_Misc36);
+    EZHookInstallChecked(CrashFix_Misc37);
+    EZHookInstallChecked(CrashFix_Misc38);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);

@@ -227,7 +227,6 @@ public:
     void ApplyQueuedFrameRateLimit();
     void EnsureFrameRateLimitApplied();
     void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit);
-    void SetCurrentRefreshRate(uint value);
     void DoReliablePulse();
 
     bool IsTimingCheckpoints();
@@ -294,6 +293,9 @@ public:
 
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
+
+    void         SetCurrentRefreshRate(uint uiRefreshRate);
+    uint         GetCurrentRefreshRate() const { return m_CurrentRefreshRate; }
 
     void OnPostColorFilterRender() override;
 

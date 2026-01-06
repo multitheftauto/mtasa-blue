@@ -72,6 +72,9 @@ void CMatchChannelManager::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CCl
 //////////////////////////////////////////////////////////////////
 void CMatchChannelManager::InsertTexture(STexInfo* pTexInfo)
 {
+    if (!pTexInfo)
+        return;
+    
     // Find/create TexNameInfo
     STexNameInfo* pTexNameInfo = MapFindRef(m_AllTextureList, pTexInfo->strTextureName);
     if (!pTexNameInfo)
@@ -121,6 +124,9 @@ void CMatchChannelManager::InsertTexture(STexInfo* pTexInfo)
 //////////////////////////////////////////////////////////////////
 void CMatchChannelManager::RemoveTexture(STexInfo* pTexInfo)
 {
+    if (!pTexInfo)
+        return;
+    
     STexNameInfo* pTexNameInfo = pTexInfo->pAssociatedTexNameInfo;
     
     if (!pTexNameInfo) [[unlikely]]
@@ -268,10 +274,16 @@ void CMatchChannelManager::UpdateTexShaderReplacementNoEntity(STexNameInfo* pTex
 //////////////////////////////////////////////////////////////////
 SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity(STexInfo* pTexInfo, CClientEntityBase* pClientEntity, int iEntityType)
 {
+    if (!pTexInfo)
+        return nullptr;
+    
     if (m_bChangesPending)
         FlushChanges();
 
     STexNameInfo* pTexNameInfo = pTexInfo->pAssociatedTexNameInfo;
+    
+    if (!pTexNameInfo)
+        return nullptr;
 
     // Ignore unknown client entities
     if (pClientEntity)
@@ -397,10 +409,12 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
         if (pClientEntity == iter->first.pClientEntity)
         {
             CMatchChannel* pChannel = iter->second;
-            pChannel->RemoveShaderAndEntity(iter->first);
+            if (pChannel)
+            {
+                pChannel->RemoveShaderAndEntity(iter->first);
+                MapInsert(affectedChannels, pChannel);
+            }
             m_ChannelUsageMap.erase(iter++);
-
-            MapInsert(affectedChannels, pChannel);
         }
         else
             ++iter;
@@ -409,8 +423,14 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
     // Flag affected textures to re-calc shader results
     for (CMatchChannel* pChannel : affectedChannels)
     {
+        if (!pChannel)
+            continue;
+        
         for (STexNameInfo* pTexNameInfo : pChannel->m_MatchedTextureList)
-            pTexNameInfo->ResetReplacementResults();
+        {
+            if (pTexNameInfo)
+                pTexNameInfo->ResetReplacementResults();
+        }
 
         // Also delete channel if is not refed anymore
         if (pChannel->GetShaderAndEntityCount() == 0)
@@ -458,10 +478,12 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
         if (pShaderInfo == iter->first.pShaderInfo)
         {
             CMatchChannel* pChannel = iter->second;
-            pChannel->RemoveShaderAndEntity(iter->first);
+            if (pChannel)
+            {
+                pChannel->RemoveShaderAndEntity(iter->first);
+                MapInsert(affectedChannels, pChannel);
+            }
             m_ChannelUsageMap.erase(iter++);
-
-            MapInsert(affectedChannels, pChannel);
         }
         else
             ++iter;
@@ -471,8 +493,14 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
     for (CFastHashSet<CMatchChannel*>::iterator iter = affectedChannels.begin(); iter != affectedChannels.end(); ++iter)
     {
         CMatchChannel* pChannel = *iter;
+        if (!pChannel)
+            continue;
+        
         for (CFastHashSet<STexNameInfo*>::iterator iter = pChannel->m_MatchedTextureList.begin(); iter != pChannel->m_MatchedTextureList.end(); ++iter)
-            (*iter)->ResetReplacementResults();
+        {
+            if (*iter)
+                (*iter)->ResetReplacementResults();
+        }
 
         // Also delete channel if is not refed anymore
         if (pChannel->GetShaderAndEntityCount() == 0)
