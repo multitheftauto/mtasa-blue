@@ -649,7 +649,7 @@ bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
     return true;
 }
 
-bool CEntitySA::GetBoneScale(eBone boneId, CVector& scale) const
+bool CEntitySA::GetBoneScale(eBone boneId, CVector& scale)
 {
     RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (!rwBoneMatrix)

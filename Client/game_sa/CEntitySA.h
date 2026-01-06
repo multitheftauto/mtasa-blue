@@ -313,7 +313,7 @@ public:
     bool SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w);
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
-    bool GetBoneScale(eBone boneId, CVector& scale) const override;
+    bool GetBoneScale(eBone boneId, CVector& scale) override;
     bool SetBoneScale(eBone boneId, const CVector& scale) override;
 
     bool IsOnFire() override { return false; }
