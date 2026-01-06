@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "StackTraceHelpers.h"
 #include <SharedUtil.Misc.h>
 #include <game/CGame.h>
 #include <game/CPools.h>
@@ -32,6 +33,7 @@
 #include <ctime>
 #include <optional>
 #include <utility>
+#include <mutex>
 
 static constexpr DWORD       CRASH_EXIT_CODE = 3;
 static constexpr std::size_t LOG_EVENT_SIZE = 200;
@@ -294,21 +296,35 @@ namespace
         static std::atomic_flag configured = ATOMIC_FLAG_INIT;
         if (!configured.test_and_set(std::memory_order_acq_rel))
         {
-            [[maybe_unused]] const auto previousOptions = SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS);
+            SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_DEFERRED_LOADS);
         }
+    }
+    
+    std::mutex& GetSymInitMutex()
+    {
+        static std::mutex symMutex;
+        return symMutex;
     }
 }            // namespace
 
 class SymbolHandlerGuard
 {
 public:
-    explicit SymbolHandlerGuard(HANDLE process) : m_process(process), m_initialized(false)
+    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) : m_process(process), m_initialized(false)
     {
+        if (!enableSymbols)
+            return;
+
         if (m_process != nullptr)
         {
+            std::lock_guard<std::mutex> lock{GetSymInitMutex()};
+            
             ConfigureDbgHelpOptions();
+            
+            const SString& processDir = SharedUtil::GetMTAProcessBaseDir();
+            const char* searchPath = processDir.empty() ? nullptr : processDir.c_str();
 
-            if (SymInitialize(m_process, nullptr, TRUE) != FALSE)
+            if (SymInitialize(m_process, searchPath, TRUE) != FALSE)
                 m_initialized = true;
         }
     }
@@ -687,48 +703,19 @@ static void AppendCrashDiagnostics(const SString& text)
     WriteDebugEvent(text.Replace("\n", " "));
 }
 
-static BOOL SafeStackWalk64(DWORD MachineType, HANDLE hProcess, HANDLE hThread, LPSTACKFRAME64 StackFrame, PVOID ContextRecord,
-                            PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine, PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine,
-                            PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine, PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress)
-{
-    __try
-    {
-        return StackWalk64(MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        return FALSE;
-    }
-}
-
-static BOOL SafeSymFromAddr(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol)
-{
-    __try
-    {
-        return SymFromAddr(hProcess, Address, Displacement, Symbol);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        return FALSE;
-    }
-}
-
-static BOOL SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 dwAddr, PDWORD pdwDisplacement, PIMAGEHLP_LINE64 Line)
-{
-    __try
-    {
-        return SymGetLineFromAddr64(hProcess, dwAddr, pdwDisplacement, Line);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        return FALSE;
-    }
-}
-
 [[nodiscard]] static bool CaptureStackTraceText(_EXCEPTION_POINTERS* pException, SString& outText)
 {
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return false;
+
+    const bool hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
+    if (!hasSymbols)
+    {
+        static std::once_flag logOnce;
+        std::call_once(logOnce, [] {
+            SAFE_DEBUG_OUTPUT("CaptureStackTraceText: capturing without symbols (raw addresses only)\n");
+        });
+    }
 
     // For callback exceptions (0xC000041D), context and stack may be unreliable
     const bool isCallbackException = (pException->ExceptionRecord != nullptr && 
@@ -762,9 +749,12 @@ static BOOL SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 dwAddr, PDWORD pdw
     frame.AddrFrame.Mode = AddrModeFlat;
     frame.AddrStack.Mode = AddrModeFlat;
 
-    SymbolHandlerGuard symbolGuard(hProcess);
-    if (!symbolGuard.IsInitialized())
-        return false;
+    SymbolHandlerGuard symbolGuard(hProcess, hasSymbols);
+
+    const bool useDbgHelp = symbolGuard.IsInitialized();
+    const auto routines = useDbgHelp 
+        ? StackTraceHelpers::MakeStackWalkRoutines(true)
+        : StackTraceHelpers::MakeStackWalkRoutines(false);
 
     static_assert(MAX_SYM_NAME > 1, "MAX_SYM_NAME must include room for a terminator");
     constexpr DWORD                    kSymbolNameCapacity = MAX_SYM_NAME - 1;
@@ -778,8 +768,15 @@ static BOOL SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 dwAddr, PDWORD pdw
 
     for (std::size_t frameIndex = 0; frameIndex < MAX_FALLBACK_STACK_FRAMES; ++frameIndex)
     {
-        BOOL bWalked =
-            SafeStackWalk64(IMAGE_FILE_MACHINE_I386, hProcess, hThread, &frame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
+        BOOL bWalked = StackWalk64(IMAGE_FILE_MACHINE_I386,
+                                   hProcess,
+                                   hThread,
+                                   &frame,
+                                   &context,
+                                   routines.readMemory,
+                                   routines.functionTableAccess,
+                                   routines.moduleBase,
+                                   nullptr);
         if (bWalked == FALSE)
             break;
 
@@ -797,7 +794,7 @@ static BOOL SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 dwAddr, PDWORD pdw
             visitedAddresses[visitedCount++] = address;
 
         SString symbolName = SString("0x%llX", static_cast<unsigned long long>(address));
-        if (SafeSymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE)
+        if (useDbgHelp && SymFromAddr(hProcess, address, nullptr, pSymbol) != FALSE)
         {
             const auto terminatorIndex = static_cast<std::size_t>(pSymbol->MaxNameLen);
             if (terminatorIndex < MAX_SYM_NAME)
@@ -805,14 +802,20 @@ static BOOL SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 dwAddr, PDWORD pdw
             symbolName = pSymbol->Name;
         }
 
-    IMAGEHLP_LINE64 lineInfo{};
-    lineInfo.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+        IMAGEHLP_LINE64 lineInfo{};
+        lineInfo.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
         DWORD           lineDisplacement = 0;
-        SString         lineDetail = "unknown";
-        if (SafeSymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
+        SString         lineDetail;
+        
+        if (useDbgHelp && SymGetLineFromAddr64(hProcess, address, &lineDisplacement, &lineInfo) != FALSE)
         {
             const char* fileName = lineInfo.FileName != nullptr ? lineInfo.FileName : "unknown";
             lineDetail = SString("%s:%lu", fileName, static_cast<unsigned long>(lineInfo.LineNumber));
+        }
+        else
+        {
+            const std::string formatted = StackTraceHelpers::FormatAddressWithModule(address);
+            lineDetail = formatted.c_str();
         }
 
         outText += SString("#%02u %s [0x%llX] (%s)\n", static_cast<unsigned int>(frameIndex), symbolName.c_str(), static_cast<unsigned long long>(address),
@@ -1435,8 +1438,9 @@ static DWORD SafeRereadExceptionCode(_EXCEPTION_POINTERS* pException, DWORD fall
 
 long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pException)
 {
-    // Absolute first action: guaranteed crash-safe debug marker (no heap, no I/O)
-    OutputDebugStringA("CCrashDumpWriter::HandleExceptionGlobal - ENTRY\n");
+    // Absolute first action - log that we entered the handler (before anything can fail)
+    // This is critical for diagnosing exceptions that may fault during handling
+    OutputDebugStringSafe("CCrashDumpWriter::HandleExceptionGlobal - EMERGENCY ENTRY MARKER\n");
     
     // Log exception code and registers immediately - ensures crash context is captured
     // even if subsequent processing fails and no dump is generated (stale artifact scenario)
@@ -1462,7 +1466,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         // Try emergency minimal dump for any reentrant exception
         if (exceptionCodeSafe != 0)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Reentrant exception, attempting minimal dump\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Reentrant exception, attempting minimal dump\n");
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Exception during crash handling - attempting emergency artifacts\n");
             TryWriteReentrantFlag(exceptionCodeSafe);
         }
@@ -1492,7 +1496,11 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    LogExceptionDetails(pException);
+    const BOOL exceptionLogged = LogExceptionDetails(pException);
+    if (exceptionLogged == FALSE)
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - LogExceptionDetails failed\n");
+    }
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: FATAL EXCEPTION - Begin crash processing\n");
@@ -1502,14 +1510,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     const bool isCallbackException = (exceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION);
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Entering callback exception special handling\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Entering callback exception special handling\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: STATUS_FATAL_USER_CALLBACK_EXCEPTION detected\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: This exception occurred in a Windows callback\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Stack frames may be incomplete or corrupted\n");
         
         // Try to capture what we can with additional protection
         TryLogCallbackContext(pException);
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception context capture attempted\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception context capture attempted\n");
     }
 
     CExceptionInformation_Impl* pExceptionInformation = nullptr;
@@ -1587,7 +1595,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     // Enhanced emergency logging for all exceptions to track dump generation progress
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception attempting core log\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception attempting core log\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception - attempting dump generation despite potential secondary faults\n");
     }
 
@@ -1595,14 +1603,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting DumpCoreLog\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting DumpCoreLog\n");
         }
         DumpCoreLog(pException, pExceptionInformation);
         coreLogSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Core log dumped successfully\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpCoreLog succeeded\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpCoreLog succeeded\n");
         }
     }
     catch (...)
@@ -1618,14 +1626,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting DumpMiniDump for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting DumpMiniDump for callback exception\n");
         }
         DumpMiniDump(pException, pExceptionInformation);
         miniDumpSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Mini dump created successfully\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpMiniDump succeeded for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpMiniDump succeeded for callback exception\n");
         }
     }
     catch (...)
@@ -1633,7 +1641,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to create mini dump\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpMiniDump FAILED for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpMiniDump FAILED for callback exception\n");
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception may have caused secondary fault during minidump\n");
         }
     }
@@ -1642,7 +1650,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting RunErrorTool for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting RunErrorTool for callback exception\n");
         }
         crashDialogShown = RunErrorTool(pExceptionInformation);
         if (crashDialogShown)
@@ -1650,7 +1658,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Error dialog launched successfully\n");
             if (isCallbackException)
             {
-                OutputDebugStringA("CCrashDumpWriter: EMERGENCY - RunErrorTool succeeded for callback exception\n");
+                OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - RunErrorTool succeeded for callback exception\n");
             }
         }
     }
@@ -1659,7 +1667,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to launch error dialog\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - RunErrorTool FAILED for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - RunErrorTool FAILED for callback exception\n");
         }
     }
 
@@ -1686,7 +1694,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception processing completed, about to terminate\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception processing completed, about to terminate\n");
     }
 
     delete pExceptionInformation;
@@ -1760,7 +1768,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Force terminating crashed process NOW\n");
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - About to call TerminateProcess for callback exception\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - About to call TerminateProcess for callback exception\n");
     }
     TerminateCurrentProcessWithExitCode(crashExitCode);
 

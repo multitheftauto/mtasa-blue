@@ -238,7 +238,7 @@ namespace SharedUtil
             if (ulDist < ulBestDist)
             {
                 ulBestDist = ulDist;
-                ucBestMatch = i;
+                ucBestMatch = static_cast<uchar>(i);
             }
         }
         return ucBestMatch;
@@ -246,7 +246,7 @@ namespace SharedUtil
 
     SColor CVehicleColor::GetRGBFromPaletteIndex(uchar ucColor)
     {
-        ucColor = std::min<uchar>(ucColor, static_cast<uint>(NUMELMS(paletteColorTable8) / 4));
+        ucColor = std::min<uchar>(ucColor, static_cast<uchar>(NUMELMS(paletteColorTable8) / 4));
         uchar r = paletteColorTable8[ucColor * 4];
         uchar g = paletteColorTable8[ucColor * 4 + 1];
         uchar b = paletteColorTable8[ucColor * 4 + 2];

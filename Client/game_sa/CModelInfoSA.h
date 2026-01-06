@@ -472,7 +472,6 @@ public:
 
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
-    // CModelInfoSA methods
     void         MakePedModel(char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;

@@ -51,7 +51,26 @@ bool CTxdPoolSA::IsFreeTextureDictonarySlot(std::uint32_t uiTxdId)
     return (*m_ppTxdPoolInterface)->IsEmpty(uiTxdId);
 }
 
-std::uint16_t CTxdPoolSA::GetFreeTextureDictonarySlot()
+std::uint32_t CTxdPoolSA::GetFreeTextureDictonarySlot()
 {
     return (*m_ppTxdPoolInterface)->GetFreeSlot();
+}
+
+CTextureDictonarySAInterface* CTxdPoolSA::GetTextureDictonarySlot(std::uint32_t uiTxdId) noexcept
+{
+    if (!(*m_ppTxdPoolInterface)->IsContains(uiTxdId))
+        return nullptr;
+
+    return (*m_ppTxdPoolInterface)->GetObject(uiTxdId);
+}
+
+bool CTxdPoolSA::SetTextureDictonarySlot(std::uint32_t uiTxdId, RwTexDictionary* pTxd, std::uint16_t usParentIndex) noexcept
+{
+    CTextureDictonarySAInterface* pSlot = GetTextureDictonarySlot(uiTxdId);
+    if (!pSlot)
+        return false;
+
+    pSlot->rwTexDictonary = pTxd;
+    pSlot->usParentIndex = usParentIndex;
+    return true;
 }
