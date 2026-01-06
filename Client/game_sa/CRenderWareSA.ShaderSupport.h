@@ -176,9 +176,9 @@ struct STexNameInfo
         {
             shader.bValid = false;
         }
-        for (auto& [entity, replacement] : texEntityShaderMap)
+        for (auto& pair : texEntityShaderMap)
         {
-            replacement.bValid = false;
+            pair.second.bValid = false;
         }
     }
 
@@ -197,7 +197,7 @@ struct STexNameInfo
         }
     }
 
-    [[nodiscard]] STexShaderReplacement& GetTexNoEntityShader(int iEntityType)
+    STexShaderReplacement& GetTexNoEntityShader(int iEntityType)
     {
         static constexpr char table[] = {-1, 0, 1, -1, 2, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, 4};
         dassert(iEntityType >= 0 && iEntityType < static_cast<int>(std::size(table)));

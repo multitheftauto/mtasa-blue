@@ -82,6 +82,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Init the global var with ourself
     g_pClientGame = this;
 
+    g_pCore->UpdateWerCrashModuleBases();
+
     CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
 
     // Packet handler
@@ -551,14 +553,11 @@ CClientGame::~CClientGame()
         discord->UpdatePresence();
     }
 
+    // Destruction order matters: destroy CClientTXD entities (via m_pManager) BEFORE
+    // StaticReset calls. TXD destructors need intact bookkeeping to clean up propery.
+
     // Destroy our stuff
     SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop
-
-    // Clear any remaining texture replacement state that may have
-    // survived if a CClientTXD destructor failed to complete cleanup properly.
-    // Prevents stale entries from persisting between server reconnects.
-    if (g_pGame && g_pGame->GetRenderWare())
-        g_pGame->GetRenderWare()->StaticResetModelTextureReplacing();
 
     SAFE_DELETE(m_pNametags);
     SAFE_DELETE(m_pSyncDebug);
@@ -579,6 +578,15 @@ CClientGame::~CClientGame()
     SAFE_DELETE(m_pResourceFileDownloadManager);
 
     SAFE_DELETE(m_pRootEntity);
+
+    // Clear any remaining texture replacement/shader state after destroying entities.
+    // This ordering prevents global reset from running before late element destructors
+    // (e.g. CClientTXD) have a chance to clean up using RenderWare bookkeeping.
+    if (g_pGame && g_pGame->GetRenderWare())
+    {
+        g_pGame->GetRenderWare()->StaticResetModelTextureReplacing();
+        g_pGame->GetRenderWare()->StaticResetShaderSupport();
+    }
 
     SAFE_DELETE(m_pModelCacheManager);
     // SAFE_DELETE(m_pGameEntityXRefManager);

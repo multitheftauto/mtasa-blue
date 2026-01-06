@@ -240,6 +240,10 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
     else
     {
+        CBaseModelInfoSAInterface** ppModelInfo = reinterpret_cast<CBaseModelInfoSAInterface**>(ARRAY_ModelInfo);
+        if (dwModelID < MODELINFO_DFF_MAX && !ppModelInfo[dwModelID])
+            return;
+
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
         __asm
         {
