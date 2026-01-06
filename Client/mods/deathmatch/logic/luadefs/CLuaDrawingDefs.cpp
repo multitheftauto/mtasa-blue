@@ -1050,15 +1050,21 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                             // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
                             // ElementGroup? **
                             pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+                            lua_pushelement(luaVM, pTexture);
+                            return 1;
                         }
-                        lua_pushelement(luaVM, pTexture);
-                        return 1;
+                        else
+                        {
+                            m_pScriptDebugging->LogCustom(luaVM, SString("[DxCreateTexture] Failed to create texture from file '%s' (may be corrupt, unsupported format, or out of memory)", strFilePath.c_str()));
+                            lua_pushnil(luaVM);
+                            return 1;
+                        }
                     }
                     else
-                        argStream.SetCustomError(strFilePath, "File not found");
+                        argStream.SetCustomError(strFilePath, "[DxCreateTexture] File not found");
                 }
                 else
-                    argStream.SetCustomError(strFilePath, "Bad file path");
+                    argStream.SetCustomError(strFilePath, "[DxCreateTexture] Bad file path");
             }
             else if (pixels.GetSize())
             {
@@ -1068,9 +1074,15 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                 if (pTexture)
                 {
                     pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+                    lua_pushelement(luaVM, pTexture);
+                    return 1;
                 }
-                lua_pushelement(luaVM, pTexture);
-                return 1;
+                else
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "[DxCreateTexture:Pixels] Failed to create texture from pixel data (invalid format or out of memory)");
+                    lua_pushnil(luaVM);
+                    return 1;
+                }
             }
             else
             {
@@ -1080,9 +1092,15 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                 if (pTexture)
                 {
                     pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+                    lua_pushelement(luaVM, pTexture);
+                    return 1;
                 }
-                lua_pushelement(luaVM, pTexture);
-                return 1;
+                else
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, SString("[DxCreateTexture:Blank] Failed to create blank texture %dx%d (invalid dimensions or out of memory)", width, height));
+                    lua_pushnil(luaVM);
+                    return 1;
+                }
             }
         }
     }

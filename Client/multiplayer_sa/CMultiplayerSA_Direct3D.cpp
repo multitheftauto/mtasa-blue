@@ -92,19 +92,23 @@ static void __declspec(naked) HOOK_PreCreateDevice()
         push    ecx                                // pDirect3D
 
         // Now we have 7 parameters on stack (28 bytes)
-        // Stack layout: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
+        // Stack layout at ESP: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
 
-        pushad  // Save all registers (32 bytes)
+        pushad  // Save all registers (32 bytes), ESP now at ESP-32
         
-        // Pass parameters to OnPreCreateDevice - stack offset is now 32 (pushad) + 28 (pushes) = 60
-        push    [esp+60+24]                        // ppReturnedDeviceInterface
-        push    [esp+60+20]                        // pPresentationParameters
-        lea     eax,[esp+60+16]                    // BehaviorFlags as pointer
-        push    eax                                
-        push    [esp+60+12]                        // hFocusWindow
-        push    [esp+60+8]                         // DeviceType
-        push    [esp+60+4]                         // Adapter
-        push    [esp+60+0]                         // pDirect3D
+        // Pass parameters to OnPreCreateDevice
+        // After pushad, params start at ESP+32. Each push decreases ESP by 4,
+        // so [esp+32+4*6] effectively walks backward through the params:
+        // 1st access: ESP+56 = ppReturnedDeviceInterface, then ESP -= 4
+        // 2nd access: ESP+56 = pPresentationParameters (was at ESP+52), etc.
+        push    [esp+32+4*6]                       // ppReturnedDeviceInterface
+        push    [esp+32+4*6]                       // pPresentationParameters
+        lea     eax,[esp+32+4*6]                   // BehaviorFlags as pointer
+        push    eax
+        push    [esp+32+4*6]                       // hFocusWindow
+        push    [esp+32+4*6]                       // DeviceType
+        push    [esp+32+4*6]                       // Adapter
+        push    [esp+32+4*6]                       // pDirect3D
         call    OnPreCreateDevice
         add     esp, 4*7
         popad

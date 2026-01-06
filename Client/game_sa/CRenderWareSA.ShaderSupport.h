@@ -26,6 +26,18 @@
 #define FAKE_RWTEXTURE_NO_TEXTURE   ( (RwTexture*)-10 )
 #define FAKE_NAME_NO_TEXTURE        "unnamed"
 
+// CFastHashMap key funcs for CD3DDUMMY* - must be declared before CFastHashMap<CD3DDUMMY*, ...> is used
+// These override the default template keys (-3, -4) to use our values
+inline CD3DDUMMY* GetEmptyMapKey(CD3DDUMMY**)
+{
+    return FAKE_D3DTEXTURE_EMPTY_KEY;
+}
+
+inline CD3DDUMMY* GetDeletedMapKey(CD3DDUMMY**)
+{
+    return FAKE_D3DTEXTURE_DELETED_KEY;
+}
+
 class CMatchChannel;
 class CMatchChannelManager;
 struct STexNameInfo;
@@ -164,9 +176,9 @@ struct STexNameInfo
         {
             shader.bValid = false;
         }
-        for (auto& [entity, replacement] : texEntityShaderMap)
+        for (auto& pair : texEntityShaderMap)
         {
-            replacement.bValid = false;
+            pair.second.bValid = false;
         }
     }
 
@@ -185,7 +197,7 @@ struct STexNameInfo
         }
     }
 
-    [[nodiscard]] STexShaderReplacement& GetTexNoEntityShader(int iEntityType)
+    STexShaderReplacement& GetTexNoEntityShader(int iEntityType)
     {
         static constexpr char table[] = {-1, 0, 1, -1, 2, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, 4};
         dassert(iEntityType >= 0 && iEntityType < static_cast<int>(std::size(table)));

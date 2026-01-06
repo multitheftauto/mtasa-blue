@@ -559,22 +559,31 @@ bool CGUIGridList_Impl::IsColumnSegmentSizingEnabled(int hColumn)
 
 void CGUIGridList_Impl::SetItemImage(int iRow, int hColumn, CGUIStaticImage* pImage)
 {
-    // Get the current item at that offset
-    CGUIListItem* pItem = GetItem(iRow, hColumn);
-    if (pItem != NULL)
+    try
     {
-        pItem->SetImage(pImage);
-    }
-    else
-    // if ( pImage )
-    {
-        // If it doesn't, create it and set it in the gridlist
-        CGUIListItem_Impl*  pNewItem = new CGUIListItem_Impl("", CGUIListItem_Impl::ImageItem, (CGUIStaticImage_Impl*)pImage);
-        CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem();
-        reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setItem(pListboxItem, CEGUI::MCLGridRef(iRow, GetColumnIndex(hColumn)), true);
+        CEGUI::MultiColumnList* pMultiColumnList = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
+        if ((uint)iRow >= pMultiColumnList->getRowCount() || (uint)GetColumnIndex(hColumn) >= pMultiColumnList->getColumnCount())
+            return;
 
-        // Put our new item in the map
-        m_Items[pNewItem->GetListItem()] = pNewItem;
+        // Get the current item at that offset
+        CGUIListItem* pItem = GetItem(iRow, hColumn);
+        if (pItem != NULL)
+        {
+            pItem->SetImage(pImage);
+        }
+        else
+        {
+            // If it doesn't, create it and set it in the gridlist
+            CGUIListItem_Impl*  pNewItem = new CGUIListItem_Impl("", CGUIListItem_Impl::ImageItem, (CGUIStaticImage_Impl*)pImage);
+            CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem();
+            pMultiColumnList->setItem(pListboxItem, CEGUI::MCLGridRef(iRow, GetColumnIndex(hColumn)), true);
+
+            // Put our new item in the map
+            m_Items[pNewItem->GetListItem()] = pNewItem;
+        }
+    }
+    catch (CEGUI::Exception)
+    {
     }
 }
 
