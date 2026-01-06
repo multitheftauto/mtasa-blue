@@ -37,7 +37,7 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 Prerequisites
 - [Visual Studio 2026](https://visualstudio.microsoft.com/vs/) with:
   - Desktop development with C++
-  - Optional component *C++ MFC for latest v145 build tools (x86 & x64)*
+  - Optional component *C++ MFC for latest v145 build tools (x86 & x64)* or if that's missing *C++ MFC for x64/x86 (Latest MSVC)*
 - [Microsoft DirectX SDK](https://wiki.multitheftauto.com/wiki/Compiling_MTASA#Microsoft_DirectX_SDK)
 - [Git for Windows](https://git-scm.com/download/win) (Optional)
 
