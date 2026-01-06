@@ -30,7 +30,7 @@ void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "TrainTrack", "Element");
 }
 
-auto CLuaTrainTrackDefs::GetDefaultTrack(uchar trackID) -> CLuaTrainTrackDefs::TrainTrack
+CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::GetDefaultTrack(uchar trackID)
 {
     if (trackID > 3)
         throw std::invalid_argument("Bad default track ID (0-3)");

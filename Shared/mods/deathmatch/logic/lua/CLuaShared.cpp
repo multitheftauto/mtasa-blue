@@ -81,7 +81,7 @@ void CLuaShared::LoadFunctions()
     CLuaUTFDefs::LoadFunctions();
     CLuaUtilDefs::LoadFunctions();
 
-    if (m_CustomTrainTracks)
+    if (CustomTrainTracks)
         CLuaTrainTrackDefs::LoadFunctions();
 }
 
@@ -91,7 +91,7 @@ void CLuaShared::AddClasses(lua_State* luaVM)
     CLuaPathDefs::AddClass(luaVM);
     CLuaXMLDefs::AddClass(luaVM);
 
-    if (m_CustomTrainTracks)
+    if (CustomTrainTracks)
         CLuaTrainTrackDefs::AddClass(luaVM);
 }
 

@@ -37,8 +37,8 @@ public:
 
 // Only enable train tracks for custom builds, as this is work in progress and the API may change
 #if MTASA_VERSION_TYPE == VERSION_TYPE_CUSTOM
-    const static bool m_CustomTrainTracks = true;
+    const static bool CustomTrainTracks = true;
 #else
-    const static bool m_CustomTrainTracks = false;
+    const static bool CustomTrainTracks = false;
 #endif
 };
