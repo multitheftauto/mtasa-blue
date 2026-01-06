@@ -277,20 +277,36 @@ static bool& GetBindableKeyState(const SBindableKey* key)
     return bindableKeyStates[index];
 }
 
-// Ensure zero length strings are NULL
-static void NullEmptyStrings(const char*& a, const char*& b = *(const char**)NULL, const char*& c = *(const char**)NULL, const char*& d = *(const char**)NULL,
-                             const char*& e = *(const char**)NULL)
+static void NullIfEmpty(const char*& str)
 {
-    if (&a && a && a[0] == 0)
-        a = NULL;
-    if (&b && b && b[0] == 0)
-        b = NULL;
-    if (&c && c && c[0] == 0)
-        c = NULL;
-    if (&d && d && d[0] == 0)
-        d = NULL;
-    if (&e && e && e[0] == 0)
-        e = NULL;
+    if (str && str[0] == 0)
+        str = nullptr;
+}
+
+static void NullEmptyStrings(const char*& a)
+{
+    NullIfEmpty(a);
+}
+
+static void NullEmptyStrings(const char*& a, const char*& b)
+{
+    NullIfEmpty(a);
+    NullIfEmpty(b);
+}
+
+static void NullEmptyStrings(const char*& a, const char*& b, const char*& c)
+{
+    NullIfEmpty(a);
+    NullIfEmpty(b);
+    NullIfEmpty(c);
+}
+
+static void NullEmptyStrings(const char*& a, const char*& b, const char*& c, const char*& d)
+{
+    NullIfEmpty(a);
+    NullIfEmpty(b);
+    NullIfEmpty(c);
+    NullIfEmpty(d);
 }
 
 template <typename Container, typename Predicate, typename UnaryFunction>
@@ -2118,12 +2134,17 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
                                     pAttribute = pNode->GetAttributes().Find("default");
                                     SString strOriginalScriptKey = pAttribute ? pAttribute->GetValue() : "";
 
-                                    AddCommand(strKey.c_str(), strCommand.c_str(), strArguments.c_str(), bState, strResource.c_str(), false,
-                                               strOriginalScriptKey);
-                                    SetCommandActive(strKey.c_str(), strCommand.c_str(), bState, strArguments.c_str(), strResource.c_str(), false, true);
+                                    const char* szArgs = strArguments.empty() ? nullptr : strArguments.c_str();
+                                    const char* szOrigKey = strOriginalScriptKey.empty() ? nullptr : strOriginalScriptKey.c_str();
+
+                                    AddCommand(strKey.c_str(), strCommand.c_str(), szArgs, bState, strResource.c_str(), false, szOrigKey);
+                                    SetCommandActive(strKey.c_str(), strCommand.c_str(), bState, szArgs, strResource.c_str(), false, true);
                                 }
                                 else if (!CommandExists(strKey.c_str(), strCommand.c_str(), true, bState))
-                                    AddCommand(strKey.c_str(), strCommand.c_str(), strArguments.c_str(), bState);
+                                {
+                                    const char* szArgs = strArguments.empty() ? nullptr : strArguments.c_str();
+                                    AddCommand(strKey.c_str(), strCommand.c_str(), szArgs, bState);
+                                }
                             }
                         }
                         else
@@ -2301,7 +2322,7 @@ void CKeyBinds::BindCommand(const char* szCmdLine)
 {
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
-    char* szError = "* Syntax: bind <defaults/key> [<up/down>] <command> [<arguments>]";
+    const char* szError = "* Syntax: bind <defaults/key> [<up/down>] <command> [<arguments>]";
     if (szCmdLine == NULL)
     {
         pConsole->Print(szError);
@@ -2384,7 +2405,7 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
 {
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
-    char* szError = "* Syntax: unbind <all/key> [<up/down/both> <command>]";
+    const char* szError = "* Syntax: unbind <all/key> [<up/down/both> <command>]";
     if (szCmdLine == NULL)
     {
         pConsole->Print(szError);
