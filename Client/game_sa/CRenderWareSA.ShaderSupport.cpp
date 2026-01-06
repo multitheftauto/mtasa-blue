@@ -187,7 +187,6 @@ void CRenderWareSA::PulseWorldTextureWatch()
 
             // Get list of texture names and data to add
 
-            // Note: If txd has been unloaded since, textureList will be empty
             std::vector<RwTexture*> textureList;
             GetTxdTextures(textureList, action.usTxdId);
 
@@ -195,8 +194,7 @@ void CRenderWareSA::PulseWorldTextureWatch()
             {
                 RwTexture*  texture = *iter;
                 
-                // Check texture pointer - TXD could have been unloaded between GetTxdTextures and now,
-                // leaving us with a dangling pointer that could contain garbage data
+                // Validate texture pointer (TXD could unload mid-iteration)
                 if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
                     continue;
                 
@@ -221,6 +219,8 @@ void CRenderWareSA::PulseWorldTextureWatch()
     }
 
     ms_txdStreamEventList.clear();
+
+    ProcessPendingIsolatedTxdParents();
     TIMING_CHECKPOINT("-TextureWatch");
 }
 
@@ -229,7 +229,10 @@ void CRenderWareSA::PulseWorldTextureWatch()
 // CRenderWareSA::StreamingAddedTexture
 //
 // Called when a TXD is loaded.
-// Create a texinfo for the texture
+// Create a texinfo for the texture.
+// Note: We register textures with their actual GTA internal name (e.g., "#emap").
+// The pattern matching in AppendAdditiveMatch/AppendSubtractiveMatch handles
+// mapping external names in scripts (e.g. "remap*") to internal names.
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StreamingAddedTexture(ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData)
@@ -259,7 +262,7 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
     for (ConstIterType iter = range.first; iter != range.second;)
     {
         STexInfo* pTexInfo = iter->second;
-        if (pTexInfo->texTag == usTxdId)
+        if (pTexInfo && pTexInfo->texTag == usTxdId)
         {
             OnTextureStreamOut(pTexInfo);
             DestroyTexInfo(pTexInfo);
@@ -372,7 +375,7 @@ void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
     for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
     {
         STexInfo* pTexInfo = iter->second;
-        if (pTexInfo->texTag == pTex)
+        if (pTexInfo && pTexInfo->texTag == pTex)
         {
             OnTextureStreamOut(pTexInfo);
             DestroyTexInfo(pTexInfo);
@@ -436,7 +439,7 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
     for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
     {
         STexInfo* pTexInfo = iter->second;
-        if (pTexInfo->texTag == pTex)
+        if (pTexInfo && pTexInfo->texTag == pTex)
         {
             OutputDebug(SString("     %s", *pTexInfo->strTextureName));
             OnTextureStreamOut(pTexInfo);
@@ -485,10 +488,10 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::DestroyTexInfo(STexInfo* pTexInfo)
 {
-    // Remove from D3DData lookup map
-    // Always remove if the current entry matches this pTexInfo to prevent dangling pointers.
-    // Multiple STexInfo objects could reference the same D3D data (e.g., same texture in different TXDs),
-    // so we only remove if this specific STexInfo is the registered one.
+    if (!pTexInfo)
+        return;
+
+    // Only remove if this specific STexInfo is the registered one
     STexInfo* pCurrentEntry = MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
     if (pCurrentEntry == pTexInfo)
     {
@@ -558,6 +561,10 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData
 void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* szTextureNameMatch, float fShaderPriority,
                                         bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers)
 {
+    // NULL or empty pattern would cause issues
+    if (!szTextureNameMatch || !szTextureNameMatch[0])
+        return;
+
     TIMING_CHECKPOINT("+AppendAddMatch");
 
     // Make previous versions usage of "CJ" work with new way
@@ -565,8 +572,52 @@ void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntity
     if (strTextureNameMatch.CompareI("cj"))
         strTextureNameMatch = "cj_ped_*";
 
+    // Register the pattern as provided by script
     m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strTextureNameMatch, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime,
                                                 bShaderUsesVertexShader, bAppendLayers);
+
+    // Also register with internal texture name variant if pattern contains a known external name.
+    // This handles the case where script uses external names (e.g. "remap") but GTA internally
+    // renames textures (e.g., "#emap"). We register both patterns so the shader matches either.
+    // Handles: "remap", "remap*", "*remap*", "vehicleremap", etc.
+    SString strLower = strTextureNameMatch.ToLower();
+    bool bHasRemap = strLower.Contains("remap");
+    bool bHasWhite = strLower.Contains("white");
+    
+    // Check for "remap" anywhere in the pattern (case-insensitive)
+    if (bHasRemap)
+    {
+        SString strInternalPattern = strTextureNameMatch.ReplaceI("remap", "#emap");
+        // Only register if actually different (avoid duplicates)
+        if (strInternalPattern != strTextureNameMatch)
+        {
+            m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strInternalPattern, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime,
+                                                        bShaderUsesVertexShader, bAppendLayers);
+            
+            // If pattern also contains "white", register the doubly-transformed variant
+            // e.g., "white_remap*" -> "@hite_#emap*"
+            if (bHasWhite)
+            {
+                SString strBothInternal = strInternalPattern.ReplaceI("white", "@hite");
+                if (strBothInternal != strInternalPattern)
+                {
+                    m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strBothInternal, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime,
+                                                                bShaderUsesVertexShader, bAppendLayers);
+                }
+            }
+        }
+    }
+    // Check for "white" anywhere in the pattern (case-insensitive)
+    if (bHasWhite)
+    {
+        SString strInternalPattern = strTextureNameMatch.ReplaceI("white", "@hite");
+        if (strInternalPattern != strTextureNameMatch)
+        {
+            m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strInternalPattern, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime,
+                                                        bShaderUsesVertexShader, bAppendLayers);
+        }
+    }
+
     TIMING_CHECKPOINT("-AppendAddMatch");
 }
 
@@ -579,6 +630,10 @@ void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntity
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* szTextureNameMatch)
 {
+    // NULL or empty pattern would cause problems
+    if (!szTextureNameMatch || !szTextureNameMatch[0])
+        return;
+
     TIMING_CHECKPOINT("+AppendSubMatch");
 
     // Make previous versions usage of "CJ" work with new way
@@ -586,7 +641,41 @@ void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEnt
     if (strTextureNameMatch.CompareI("cj"))
         strTextureNameMatch = "cj_ped_*";
 
+    // Register the pattern as provided by script
     m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strTextureNameMatch);
+
+    // Also register with internal texture name variant (same logic as AppendAdditiveMatch)
+    SString strLower = strTextureNameMatch.ToLower();
+    bool bHasRemap = strLower.Contains("remap");
+    bool bHasWhite = strLower.Contains("white");
+    
+    if (bHasRemap)
+    {
+        SString strInternalPattern = strTextureNameMatch.ReplaceI("remap", "#emap");
+        if (strInternalPattern != strTextureNameMatch)
+        {
+            m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strInternalPattern);
+            
+            // If pattern also contains "white", register the doubly-transformed variant
+            if (bHasWhite)
+            {
+                SString strBothInternal = strInternalPattern.ReplaceI("white", "@hite");
+                if (strBothInternal != strInternalPattern)
+                {
+                    m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strBothInternal);
+                }
+            }
+        }
+    }
+    if (bHasWhite)
+    {
+        SString strInternalPattern = strTextureNameMatch.ReplaceI("white", "@hite");
+        if (strInternalPattern != strTextureNameMatch)
+        {
+            m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strInternalPattern);
+        }
+    }
+
     TIMING_CHECKPOINT("-AppendSubMatch");
 }
 
@@ -599,6 +688,9 @@ void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEnt
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::OnTextureStreamIn(STexInfo* pTexInfo)
 {
+    if (!pTexInfo)
+        return;
+    
     // Insert into all channels that match the name
     m_pMatchChannelManager->InsertTexture(pTexInfo);
 }
@@ -612,6 +704,9 @@ void CRenderWareSA::OnTextureStreamIn(STexInfo* pTexInfo)
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::OnTextureStreamOut(STexInfo* pTexInfo)
 {
+    if (!pTexInfo)
+        return;
+    
     m_pMatchChannelManager->RemoveTexture(pTexInfo);
 }
 

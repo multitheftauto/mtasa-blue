@@ -69,15 +69,36 @@ bool CRenderWareSA::RightSizeTxd(const SString& strInTxdFilename, const SString&
         if (pNewRwTexture && pNewRwTexture != pTexture)
         {
             // Replace texture in txd if changed
-            RwTextureDestroy(pTexture);
-            RwTexDictionaryAddTexture(pTxd, pNewRwTexture);
-            bChanged = true;
+            // Remove old texture from TXD safely before destroying it
+            pGame->GetRenderWareSA()->RwTexDictionaryRemoveTexture(pTxd, pTexture);
+            if (pTexture->txd == nullptr)
+            {
+                RwTextureDestroy(pTexture);
+                // Initialize new texture's TXDList before adding
+                pNewRwTexture->TXDList.next = &pNewRwTexture->TXDList;
+                pNewRwTexture->TXDList.prev = &pNewRwTexture->TXDList;
+                pNewRwTexture->txd = nullptr;
+                RwTexDictionaryAddTexture(pTxd, pNewRwTexture);
+                bChanged = true;
+            }
+            else
+            {
+                // Unlink failed - discard new texture to avoid corruption
+                pNewRwTexture->TXDList.next = &pNewRwTexture->TXDList;
+                pNewRwTexture->TXDList.prev = &pNewRwTexture->TXDList;
+                pNewRwTexture->txd = nullptr;
+                RwTextureDestroy(pNewRwTexture);
+            }
         }
         else
         {
-            // Keep texture (Reinsert to preserve order for easier debugging)
-            RwTexDictionaryRemoveTexture(pTxd, pTexture);
-            RwTexDictionaryAddTexture(pTxd, pTexture);
+            // Reinsert to preserve order (only if texture still linked to this TXD)
+            if (pTexture && pTexture->txd == pTxd)
+            {
+                pGame->GetRenderWareSA()->RwTexDictionaryRemoveTexture(pTxd, pTexture);
+                if (pTexture->txd == nullptr)
+                    RwTexDictionaryAddTexture(pTxd, pTexture);
+            }
         }
     }
 
