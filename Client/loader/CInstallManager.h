@@ -32,6 +32,7 @@ public:
 
 protected:
     SString _ShowCrashFailDialog();
+    SString _CheckForWerCrash();
     SString _CheckOnRestartCommand();
     SString _MaybeSwitchToTempExe();
     SString _SwitchBackFromTempExe();

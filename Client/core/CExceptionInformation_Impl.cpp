@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "StackTraceHelpers.h"
+#include "FastFailCrashHandler/WerCrashHandler.h"
 #include <SharedUtil.Misc.h>
 #include <SharedUtil.Detours.h>
 #include <SharedUtil.Memory.h>
@@ -299,6 +300,128 @@ private:
     return result;
 }
 
+//////////////////////////////////////////////////////////
+//
+// ResolveModuleFromRegistrySafe_Inner
+//
+// Inner function that does the actual registry resolution work.
+// Separated to allow SEH exception handling in the wrapper.
+// This function may allocate memory and access registry, both of which
+// can fail in a corrupted crash state.
+//
+//////////////////////////////////////////////////////////
+struct ResolutionDiagnostics
+{
+    DWORD eipUsed = 0;
+    int failReason = 0;
+    int chunkCount = 0;
+    int moduleCount = 0;
+    int innerFailReason = 0;
+};
+
+static bool ResolveModuleFromRegistrySafe_Inner(
+    _EXCEPTION_POINTERS* pException,
+    void* pAddress,
+    CExceptionInformation_Impl::ResolvedInfo& outInfo,
+    std::string& outNameStorage,
+    ResolutionDiagnostics& diag)
+{
+    const DWORD eipForResolution = (pException->ContextRecord != nullptr)
+        ? pException->ContextRecord->Eip
+        : reinterpret_cast<DWORD>(pAddress);
+
+    diag.eipUsed = eipForResolution;
+
+    if (eipForResolution == 0)
+    {
+        diag.failReason = 1;
+        return false;
+    }
+
+    auto resolvedInfo = WerCrash::ResolveAddressToModule(eipForResolution);
+
+    diag.chunkCount = resolvedInfo.debugChunkCount;
+    diag.moduleCount = resolvedInfo.debugModuleCount;
+    diag.innerFailReason = resolvedInfo.debugFailReason;
+
+    if (!resolvedInfo.resolved)
+    {
+        diag.failReason = 2;
+        return false;
+    }
+
+    outInfo.resolved = true;
+    outInfo.moduleBase = resolvedInfo.moduleBase;
+    outInfo.rva = resolvedInfo.rva;
+    outInfo.idaAddress = resolvedInfo.idaAddress;
+    outNameStorage = resolvedInfo.moduleName.c_str();
+    return true;
+}
+
+//////////////////////////////////////////////////////////
+//
+// ResolveModuleFromRegistrySafe_SEH
+//
+// SEH-protected wrapper that catches ALL exceptions including access violations.
+// Uses __try/__except which catches structured exceptions that C++ try-catch misses.
+// CRITICAL: This must be in a separate function because SEH and C++ exception
+// handling cannot coexist in the same function with local objects that have destructors.
+// NO C++ objects with destructors allowed in this function!
+//
+//////////////////////////////////////////////////////////
+static bool ResolveModuleFromRegistrySafe_SEH(
+    _EXCEPTION_POINTERS* pException,
+    void* pAddress,
+    CExceptionInformation_Impl::ResolvedInfo& outInfo,
+    std::string& outNameStorage,
+    ResolutionDiagnostics& diag)
+{
+    __try
+    {
+        return ResolveModuleFromRegistrySafe_Inner(pException, pAddress, outInfo, outNameStorage, diag);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        diag.failReason = 99;
+        return false;
+    }
+}
+
+void CExceptionInformation_Impl::ResolveModuleFromRegistrySafe(_EXCEPTION_POINTERS* pException)
+{
+    OutputDebugStringA(">>> ResolveModuleFromRegistrySafe ENTRY <<<\n");
+
+    m_resolvedModuleInfo = {};
+    m_resolvedModuleNameStorage.clear();
+
+    if (pException == nullptr)
+    {
+        OutputDebugStringA("ResolveModule: pException is NULL\n");
+        return;
+    }
+
+    ResolutionDiagnostics diag = {};
+
+    if (ResolveModuleFromRegistrySafe_SEH(pException, m_pAddress, m_resolvedModuleInfo, m_resolvedModuleNameStorage, diag))
+    {
+        char buf[256];
+        sprintf_s(buf, sizeof(buf), "ResolveModule: OK EIP=0x%08X Base=0x%08X RVA=0x%08X IDA=0x%08X Chunks=%d Mods=%d\n",
+            diag.eipUsed, m_resolvedModuleInfo.moduleBase, m_resolvedModuleInfo.rva, m_resolvedModuleInfo.idaAddress,
+            diag.chunkCount, diag.moduleCount);
+        OutputDebugStringA(buf);
+    }
+    else
+    {
+        char buf[256];
+        sprintf_s(buf, sizeof(buf), "ResolveModule: FAIL EIP=0x%08X Reason=%d Chunks=%d Mods=%d InnerFail=%d\n",
+            diag.eipUsed, diag.failReason, diag.chunkCount, diag.moduleCount, diag.innerFailReason);
+        OutputDebugStringA(buf);
+
+        m_resolvedModuleInfo = {};
+        m_resolvedModuleNameStorage.clear();
+    }
+}
+
 CExceptionInformation_Impl::CExceptionInformation_Impl()
     : m_uiCode(0),
       m_pAddress(nullptr),
@@ -328,7 +451,9 @@ CExceptionInformation_Impl::CExceptionInformation_Impl()
       m_processId(GetCurrentProcessId()),
       m_hasDetailedStackTrace(false),
       m_capturedException(nullptr),
-      m_uncaughtExceptionCount(std::uncaught_exceptions())
+      m_uncaughtExceptionCount(std::uncaught_exceptions()),
+      m_resolvedModuleInfo(),
+      m_resolvedModuleNameStorage()
 {
 }
 
@@ -338,6 +463,8 @@ CExceptionInformation_Impl::~CExceptionInformation_Impl()
 
 void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException)
 {
+    OutputDebugStringA(">>> CExceptionInformation_Impl::Set ENTRY <<<\n");
+
     if (!ValidateExceptionContext(pException))
     {
         DebugPrintExceptionInfo("Set - Invalid exception context\n");
@@ -367,8 +494,23 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     m_pAddress = pException->ExceptionRecord->ExceptionAddress;
     ClearModulePathState();
 
+    OutputDebugStringA(">>> Set: Passed all validation, checking enhanced info <<<\n");
+
     ENHANCED_EXCEPTION_INFO enhancedInfo = {};
     bool                    hasEnhancedInfo = (GetEnhancedExceptionInfo(&enhancedInfo) != FALSE);
+
+    {
+        char debugBuf[128];
+        sprintf_s(debugBuf, sizeof(debugBuf), ">>> Set: GetEnhancedExceptionInfo returned %s <<<\n",
+            hasEnhancedInfo ? "TRUE" : "FALSE");
+        OutputDebugStringA(debugBuf);
+        if (hasEnhancedInfo)
+        {
+            sprintf_s(debugBuf, sizeof(debugBuf), ">>> Set: Enhanced code=0x%08X, current code=0x%08X <<<\n",
+                enhancedInfo.exceptionCode, iCode);
+            OutputDebugStringA(debugBuf);
+        }
+    }
 
     if (hasEnhancedInfo && enhancedInfo.exceptionCode == iCode)
     {
@@ -442,6 +584,8 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
             m_hasDetailedStackTrace = true;
         }
 
+        OutputDebugStringA(">>> Set: Enhanced path - calling ResolveModuleFromRegistrySafe <<<\n");
+        ResolveModuleFromRegistrySafe(pException);
         return;
     }
 
@@ -688,6 +832,14 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     {
         m_uiAddressModuleOffset = 0;
     }
+
+    OutputDebugStringA(">>> Set: About to call ResolveModuleFromRegistrySafe <<<\n");
+
+    // Resolve module info from registry as an independent source of truth
+    // This uses pre-captured module bases and provides IDA-compatible offsets
+    // CRITICAL: This is done in a separate phase AFTER all essential crash data is collected
+    // to ensure a secondary failure here doesn't prevent core crash handling
+    ResolveModuleFromRegistrySafe(pException);
 
     try
     {

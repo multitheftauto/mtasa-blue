@@ -43,6 +43,7 @@ static_assert(DEBUG_BUFFER_SIZE > 1, "DEBUG_BUFFER_SIZE must allow for null term
 constexpr DWORD CPP_EXCEPTION_CODE = 0xE06D7363;
 constexpr DWORD STATUS_INVALID_CRUNTIME_PARAMETER_CODE = 0xC0000417;
 constexpr DWORD STATUS_STACK_BUFFER_OVERRUN_CODE = 0xC0000409;
+constexpr DWORD STATUS_HEAP_CORRUPTION_CODE = 0xC0000374;
 // STATUS_FATAL_USER_CALLBACK_EXCEPTION (0xC000041D):
 // This exception type occurs when an exception happens inside a Windows system callback
 // (e.g., window procedures, DLL callbacks, kernel-to-user transitions) and cannot be
@@ -218,6 +219,8 @@ extern "C"
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableStackCookieFailureCapture(BOOL bEnable);
+
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall ConfigureWerForFailFast();
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall GetEnhancedExceptionInfo(PENHANCED_EXCEPTION_INFO pExceptionInfo);
 
