@@ -146,6 +146,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
 
     // Copy the results into a array in case m_EventsMap is modified during the call
     std::vector<CMapEvent*> matchingEvents;
+    matchingEvents.reserve(8);
     for (EventsIter iter = itPair.first; iter != itPair.second; ++iter)
         matchingEvents.push_back(iter->second);
 

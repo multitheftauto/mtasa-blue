@@ -23,6 +23,7 @@
 #define MAX_EVENT_QUEUE_SIZE 10000
 #define MAX_TASK_QUEUE_SIZE 1000
 #define MAX_WHITELIST_SIZE 50000
+#define MAX_PENDING_REQUESTS 100
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
@@ -36,23 +37,23 @@ class CWebCore : public CWebCoreInterface
     struct EventEntry
     {
         std::function<void()> callback;
-        CWebView*             pWebView;
+        CefRefPtr<CWebView>   pWebView;
     #ifdef MTA_DEBUG
         SString name;
     #endif
 
-        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_) {}
+        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_);
 #ifdef MTA_DEBUG
-        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_) : callback(callback_), pWebView(pWebView_), name(name_) {}
+        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_);
 #endif
     };
 
     struct TaskEntry
     {
         std::packaged_task<void(bool)> task;
-        CWebView*                      webView;
+        CefRefPtr<CWebView>            webView;
 
-        TaskEntry(std::function<void(bool)> callback, CWebView* webView) : task(callback), webView(webView) {}
+        TaskEntry(std::function<void(bool)> callback, CWebView* webView);
     };
 
 public:
@@ -142,4 +143,9 @@ private:
     // Shouldn't be changed after init
     bool m_bGPUEnabled;
     bool m_bInitialised = false;            // Track if CefInitialize() succeeded
+
+    // ===== AUTH: IPC message validation =====
+public:
+    std::string m_AuthCode;            // Random 30-char code for validating browser IPC messages
+    // ===== END AUTH =====
 };

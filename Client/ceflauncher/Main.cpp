@@ -27,7 +27,7 @@ struct HINSTANCE__;
 using HINSTANCE = HINSTANCE__*;
 using LPSTR = char*;
 
-[[nodiscard("InitCEF return value must be used")]] __declspec(dllimport) auto InitCEF() -> int;
+extern "C" [[nodiscard("InitCEF return value must be used")]] __declspec(dllimport) int __cdecl InitCEF();
 
 // Users are faced with vague crashes in CEFLauncher.exe, so rather than over-engineering all this is intended
 // Do note that CEFLauncher.exe ends up hosting any GPU rendering processes of CEF

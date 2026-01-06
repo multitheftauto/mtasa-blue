@@ -68,6 +68,7 @@ typedef int(__cdecl* RpMaterialDestroy_t)(RpMaterial* mat);
 typedef RwTexDictionary*(__cdecl* RwTexDictionarySetCurrent_t)(RwTexDictionary* dict);
 typedef const RwTexDictionary*(__cdecl* RwTexDictionaryForAllTextures_t)(const RwTexDictionary* dict, void* callback, void* data);
 typedef RwTexture*(__cdecl* RwTexDictionaryAddTexture_t)(RwTexDictionary* dict, RwTexture* texture);
+typedef RwTexture*(__cdecl* RwTexDictionaryRemoveTexture_t)(RwTexture* texture);
 typedef RwTexDictionary*(__cdecl* RwTexDictionaryGetCurrent_t)();
 typedef RwTexture*(__cdecl* RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
 typedef void(__cdecl* RpPrtStdGlobalDataSetStreamEmbedded_t)(void* value);
@@ -80,6 +81,7 @@ typedef RwV3d*(__cdecl* RwV3dTransformVector_t)(RwV3d* out, const RwV3d* in, con
 typedef void(__cdecl* _rwObjectHasFrameSetFrame_t)(void* object, RwFrame* frame);
 typedef RwCamera*(__cdecl* RwCameraClone_t)(RwCamera* camera);
 typedef RpClump*(__cdecl* RpClumpClone_t)(RpClump* clone);
+typedef RwTexDictionary*(__cdecl* RwTexDictionaryCreate_t)();
 typedef int(__cdecl* RwTexDictionaryDestroy_t)(RwTexDictionary* txd);
 typedef int(__cdecl* RwTextureDestroy_t)(RwTexture* texture);
 typedef int(__cdecl* RwStreamFindChunk_t)(RwStream* stream, unsigned int type, unsigned int* lengthOut, unsigned int* versionOut);
@@ -139,6 +141,7 @@ RWFUNC(RwTexDictionaryGetCurrent_t RwTexDictionaryGetCurrent, (RwTexDictionaryGe
 RWFUNC(RwTexDictionarySetCurrent_t RwTexDictionarySetCurrent, (RwTexDictionarySetCurrent_t)0xDEAD)
 RWFUNC(RwTexDictionaryForAllTextures_t RwTexDictionaryForAllTextures, (RwTexDictionaryForAllTextures_t)0xDEAD)
 RWFUNC(RwTexDictionaryAddTexture_t RwTexDictionaryAddTexture, (RwTexDictionaryAddTexture_t)0xDEAD)
+RWFUNC(RwTexDictionaryRemoveTexture_t RwTexDictionaryRemoveTexture, (RwTexDictionaryRemoveTexture_t)0xDEAD)
 RWFUNC(RwTexDictionaryStreamWrite_t RwTexDictionaryStreamWrite, (RwTexDictionaryStreamWrite_t)0xDEAD)
 RWFUNC(rwD3D9NativeTextureRead_t rwD3D9NativeTextureRead, (rwD3D9NativeTextureRead_t)0xDEAD)
 RWFUNC(RpPrtStdGlobalDataSetStreamEmbedded_t RpPrtStdGlobalDataSetStreamEmbedded, (RpPrtStdGlobalDataSetStreamEmbedded_t)0xDEAD)
@@ -184,6 +187,7 @@ RWFUNC(RpWorldAddLight_t RpWorldAddLight, (RpWorldAddLight_t)0xDEAD)
 RWFUNC(RpLightSetColor_t RpLightSetColor, (RpLightSetColor_t)0xDEAD)
 RWFUNC(RwCameraClone_t RwCameraClone, (RwCameraClone_t)0xDEAD)
 RWFUNC(RpClumpClone_t RpClumpClone, (RpClumpClone_t)0xDEAD)
+RWFUNC(RwTexDictionaryCreate_t RwTexDictionaryCreate, (RwTexDictionaryCreate_t)0xDEAD)
 RWFUNC(RwTexDictionaryDestroy_t RwTexDictionaryDestroy, (RwTexDictionaryDestroy_t)0xDEAD)
 RWFUNC(RwTextureDestroy_t RwTextureDestroy, (RwTextureDestroy_t)0xDEAD)
 RWFUNC(RwRasterUnlock_t RwRasterUnlock, (RwRasterUnlock_t)0xDEAD)
@@ -216,6 +220,7 @@ typedef void(__cdecl* CTxdStore_RemoveRef_t)(unsigned int id);
 typedef void(__cdecl* CTxdStore_AddRef_t)(unsigned int id);
 typedef int(__cdecl* CTxdStore_GetNumRefs_t)(unsigned int id);
 typedef RwTexDictionary*(__cdecl* CTxdStore_GetTxd_t)(unsigned int id);
+typedef void(__cdecl* CTxdStore_SetupTxdParent_t)(unsigned int id);
 typedef RwTexture*(__cdecl* CClothesBuilder_CopyTexture_t)(RwTexture* texture);
 
 RWFUNC(SetTextureDict_t SetTextureDict, (SetTextureDict_t)0xDEAD)
@@ -231,6 +236,7 @@ RWFUNC(CTxdStore_RemoveTxd_t CTxdStore_RemoveTxd, (CTxdStore_RemoveTxd_t)0xDEAD)
 RWFUNC(CTxdStore_RemoveRef_t CTxdStore_RemoveRef, (CTxdStore_RemoveRef_t)0xDEAD)
 RWFUNC(CTxdStore_AddRef_t CTxdStore_AddRef, (CTxdStore_AddRef_t)0xDEAD)
 RWFUNC(CTxdStore_GetNumRefs_t CTxdStore_GetNumRefs, (CTxdStore_GetNumRefs_t)0xDEAD)
+RWFUNC(CTxdStore_SetupTxdParent_t CTxdStore_SetupTxdParent, (CTxdStore_SetupTxdParent_t)0xDEAD)
 RWFUNC(CClothesBuilder_CopyTexture_t CClothesBuilder_CopyTexture, (CClothesBuilder_CopyTexture_t)0xDEAD)
 
 /*****************************************************************************/

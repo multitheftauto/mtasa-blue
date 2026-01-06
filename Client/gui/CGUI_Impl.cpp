@@ -23,7 +23,11 @@ void CGUI_Impl::DestroyElementRecursive(CGUIElement* pElement)
 
     if (auto* pImpl = dynamic_cast<CGUIElement_Impl*>(pElement))
     {
-        DestroyGuiWindowRecursive(pImpl->GetWindow());
+        CEGUI::Window* pWindow = pImpl->GetWindow();
+        if (pWindow)
+            DestroyGuiWindowRecursive(pWindow);
+        else
+            delete pElement;
         return;
     }
 
@@ -1410,11 +1414,18 @@ bool CGUI_Impl::Event_RedrawRequested(const CEGUI::EventArgs& Args)
 {
     const CEGUI::WindowEventArgs& e = reinterpret_cast<const CEGUI::WindowEventArgs&>(Args);
 
-    CGUIElement* pElement = reinterpret_cast<CGUIElement*>((e.window)->getUserData());
+    // Get the master window (walks up parent hierarchy for child widgets)
+    CEGUI::Window* pMasterWindow = GetMasterWindow(e.window);
+    
+    CGUIElement* pElement = reinterpret_cast<CGUIElement*>(pMasterWindow->getUserData());
     if (pElement)
+    {
+        // Add to queue for crash-protected deferred redraw
         AddToRedrawQueue(pElement);
-    else
-        e.window->forceRedraw();
+    }
+    
+    // Always redraw the event source immediately for responsiveness
+    e.window->forceRedraw();
 
     return true;
 }

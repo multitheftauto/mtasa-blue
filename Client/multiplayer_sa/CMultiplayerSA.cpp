@@ -22,6 +22,8 @@ class CEventDamageSAInterface;
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
+void ProcessDeferredStreamingMemoryRelief();
+
 using namespace std;
 
 char* CMultiplayerSA::ms_PlayerImgCachePtr = NULL;
@@ -5157,6 +5159,9 @@ void __cdecl HandleIdle()
         LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
                  SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
     }
+
+    ProcessDeferredStreamingMemoryRelief();
+
     m_pIdleHandler();
 }
 
