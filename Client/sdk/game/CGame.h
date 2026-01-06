@@ -243,6 +243,9 @@ public:
     virtual bool IsVehicleBurnExplosionsEnabled() const noexcept = 0;
     virtual void SetVehicleBurnExplosionsEnabled(bool isEnabled) = 0;
 
+    virtual bool IsVehiclesVannilaDirtEnabled() const noexcept = 0;
+    virtual void SetVehiclesVannilaDirtEnabled(bool isEnabled) const noexcept = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
