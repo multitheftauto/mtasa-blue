@@ -32,7 +32,6 @@
 #include <exception>
 #include <errno.h>
 #include <filesystem>
-#include <format>
 #include <intrin.h>
 #include <malloc.h>
 #include <mutex>
@@ -44,7 +43,6 @@
 #if defined(_MSC_VER)
     #pragma comment(lib, "Psapi.lib")
 #endif
-#include <ranges>
 #include <set>
 #include <signal.h>
 #include <stdio.h>
@@ -59,6 +57,11 @@
 #if defined(_MSC_VER)
     #include <corecrt.h>
 #endif
+
+#include <werapi.h>
+
+using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
+static std::atomic<bool> g_bWerLocalDumpConfigured{false};
 
 [[nodiscard]] constexpr bool IsMemoryException(DWORD code)
 {
@@ -207,6 +210,7 @@ static void CppNewHandlerBridge();
         case EXCEPTION_STACK_OVERFLOW:
         case EXCEPTION_NONCONTINUABLE_EXCEPTION:
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
+        case STATUS_HEAP_CORRUPTION_CODE:
         case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
         case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
         case CPP_EXCEPTION_CODE:
@@ -343,7 +347,7 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException)
             return "Out of Memory - Allocation Failure";
         case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
             return "Watchdog Timeout - Application Freeze Detected";
-        case 0xC0000374:
+        case STATUS_HEAP_CORRUPTION_CODE:
             return "Heap Corruption Detected";
         case 0xC0000420:
             return "Assertion Failure";
@@ -556,6 +560,9 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
             case STATUS_STACK_BUFFER_OVERRUN_CODE:
                 info.exceptionType = "SEH:BufferOverrun";
                 break;
+            case STATUS_HEAP_CORRUPTION_CODE:
+                info.exceptionType = "SEH:HeapCorruption";
+                break;
             case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
                 info.exceptionType = "SEH:InvalidCRTParameter";
                 break;
@@ -731,6 +738,9 @@ static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTER
             break;
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
             exceptionType = "Stack Buffer Overrun";
+            break;
+        case STATUS_HEAP_CORRUPTION_CODE:
+            exceptionType = "Heap Corruption";
             break;
         case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
             exceptionType = "Fatal User Callback Exception";
@@ -969,6 +979,7 @@ void __cdecl              AbortSignalHandler(int signal);
 static void InstallCppHandlers();
 static bool InstallSehHandler();
 static void InstallAbortHandlers();
+static bool ConfigureWerLocalDumps();
 static void UninstallCrashHandlers();
 static void ReportCurrentCppException();
 
@@ -1638,6 +1649,9 @@ namespace CrashHandler
     if (bEnableBool)
     {
         SafeDebugOutput("CrashHandler: Stack cookie capture enabled - call SetCrashHandlerFilter to activate\n");
+
+        ConfigureWerLocalDumps();
+
         if (g_pfnCrashCallback.load(std::memory_order_acquire) != nullptr)
         {
             InstallAbortHandlers();
@@ -1679,6 +1693,11 @@ namespace CrashHandler
     }
 
     return TRUE;
+}
+
+[[nodiscard]] BOOL __stdcall ConfigureWerForFailFast()
+{
+    return ConfigureWerLocalDumps() ? TRUE : FALSE;
 }
 
 static void InstallCppHandlers()
@@ -1742,6 +1761,164 @@ static void InstallAbortHandlers()
         g_pfnOrigPureCall.store(previous, std::memory_order_release);
         SafeDebugOutput("CrashHandler: Pure virtual call handler installed\n");
     }
+}
+
+static bool ConfigureWerLocalDumps()
+{
+    if (g_bWerLocalDumpConfigured.exchange(true, std::memory_order_acq_rel))
+    {
+        return true;
+    }
+
+    wchar_t modulePath[MAX_PATH]{};
+    if (GetModuleFileNameW(nullptr, modulePath, MAX_PATH) == 0)
+    {
+        SafeDebugOutput("CrashHandler: WARNING - Failed to get module path for WER config\n");
+        return false;
+    }
+
+    const SString& baseDir = SharedUtil::GetMTAProcessBaseDir();
+    SString mtaDumpPath = PathJoin(baseDir, "mta\\dumps\\private");
+
+    if (!CreateDirectoryA(PathJoin(baseDir, "mta\\dumps"), nullptr))
+    {
+        if (GetLastError() != ERROR_ALREADY_EXISTS)
+        {
+            SafeDebugOutput("CrashHandler: WARNING - Failed to create mta\\dumps directory\n");
+        }
+    }
+
+    if (!CreateDirectoryA(mtaDumpPath, nullptr))
+    {
+        if (GetLastError() != ERROR_ALREADY_EXISTS)
+        {
+            SafeDebugOutput("CrashHandler: WARNING - Failed to create mta\\dumps\\private directory\n");
+        }
+    }
+
+    std::wstring dumpPathW = MbUTF8ToUTF16(mtaDumpPath);
+
+    // Dynamically load WerRegisterAppLocalDump to support older Windows versions
+    // The function is only available on Windows 10 1709 (build 16299) and later
+    HMODULE hWer = LoadLibraryW(L"wer.dll");
+    if (hWer)
+    {
+        auto pfnWerRegisterAppLocalDump = reinterpret_cast<WerRegisterAppLocalDumpFn>(
+            GetProcAddress(hWer, "WerRegisterAppLocalDump"));
+
+        if (pfnWerRegisterAppLocalDump)
+        {
+            HRESULT hr = pfnWerRegisterAppLocalDump(dumpPathW.c_str());
+            if (SUCCEEDED(hr))
+            {
+                SafeDebugOutput("CrashHandler: WER app-local dump registered to MTA dumps folder\n");
+                SafeDebugOutput("CrashHandler: Fail-fast exceptions (0xC0000409, 0xC0000374) will now generate dumps in mta\\dumps\\private\n");
+                return true;
+            }
+
+            if (hr == HRESULT_FROM_WIN32(ERROR_ALREADY_REGISTERED))
+            {
+                SafeDebugOutput("CrashHandler: WER app-local dump already registered\n");
+                return true;
+            }
+
+            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                               "CrashHandler: WerRegisterAppLocalDump failed with 0x%08X, trying registry fallback\n",
+                               static_cast<unsigned int>(hr));
+        }
+        else
+        {
+            SafeDebugOutput("CrashHandler: WerRegisterAppLocalDump not available (Windows 10 1709+ required), trying registry fallback\n");
+        }
+    }
+    else
+    {
+        SafeDebugOutput("CrashHandler: Could not load wer.dll, trying registry fallback\n");
+    }
+
+    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+
+    HKEY hKey = nullptr;
+    const wchar_t* exeName = wcsrchr(modulePath, L'\\');
+    exeName = exeName ? exeName + 1 : modulePath;
+
+    wchar_t regPath[512]{};
+    _snwprintf_s(regPath, _countof(regPath), _TRUNCATE,
+                 L"SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\\%s", exeName);
+
+    // LocalDumps registry settings are only supported in HKEY_LOCAL_MACHINE (requires admin to write)
+    // First try to create/open with write access - succeeds if running as admin
+    // Use KEY_WOW64_64KEY to write to the 64-bit registry view.
+    // WER is a 64-bit system service that reads from the native 64-bit registry,
+    // not the WOW6432Node that 32-bit apps normally access.
+    LONG result = RegCreateKeyExW(HKEY_LOCAL_MACHINE, regPath, 0, nullptr,
+                                  REG_OPTION_NON_VOLATILE, KEY_SET_VALUE | KEY_WOW64_64KEY, nullptr, &hKey, nullptr);
+    if (result == ERROR_SUCCESS)
+    {
+        // We have write access (running as admin) - update values to ensure correct path
+        // DumpType: 0=Custom, 1=MiniDump, 2=FullDump - use 1 for smaller dumps
+        DWORD dumpType = 1;
+        RegSetValueExW(hKey, L"DumpType", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dumpType), sizeof(dumpType));
+
+        DWORD dumpCount = 10;
+        RegSetValueExW(hKey, L"DumpCount", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dumpCount), sizeof(dumpCount));
+
+        RegSetValueExW(hKey, L"DumpFolder", 0, REG_EXPAND_SZ,
+                       reinterpret_cast<const BYTE*>(dumpPathW.c_str()),
+                       static_cast<DWORD>((dumpPathW.length() + 1) * sizeof(wchar_t)));
+
+        RegCloseKey(hKey);
+
+        SafeDebugOutput("CrashHandler: WER LocalDumps configured via registry (admin access)\n");
+        SafeDebugOutput("CrashHandler: Fail-fast exceptions should now generate dumps in mta\\dumps\\private\n");
+        return true;
+    }
+
+    // Can't write - check if key already exists and has correct values
+    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, regPath, 0, KEY_READ | KEY_WOW64_64KEY, &hKey);
+    if (result == ERROR_SUCCESS)
+    {
+        wchar_t existingPath[MAX_PATH]{};
+        DWORD pathSize = sizeof(existingPath);
+        DWORD pathType = 0;
+
+        bool pathCorrect = false;
+        if (RegQueryValueExW(hKey, L"DumpFolder", nullptr, &pathType,
+                             reinterpret_cast<BYTE*>(existingPath), &pathSize) == ERROR_SUCCESS)
+        {
+            if (pathType == REG_SZ || pathType == REG_EXPAND_SZ)
+            {
+                std::wstring existingPathStr(existingPath);
+                pathCorrect = (existingPathStr == dumpPathW);
+            }
+        }
+
+        RegCloseKey(hKey);
+
+        if (pathCorrect)
+        {
+            SafeDebugOutput("CrashHandler: WER LocalDumps registry key exists with correct path\n");
+            SafeDebugOutput("CrashHandler: Fail-fast exceptions should generate dumps in mta\\dumps\\private\n");
+            return true;
+        }
+        else
+        {
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                               "CrashHandler: WARNING - WER LocalDumps exists but points to wrong path!\n");
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                               "CrashHandler: Expected: %s\n", ToUTF8(dumpPathW).c_str());
+            SafeDebugOutput("CrashHandler: Run MTA as admin once OR reinstall to fix WER dump path\n");
+            return false;
+        }
+    }
+
+    // Neither write nor read succeeded - WER dumps won't work
+    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                       "CrashHandler: Failed to access WER registry key in HKLM (error %ld)\n", result);
+    SafeDebugOutput("CrashHandler: WER LocalDumps requires either admin privileges or installer setup\n");
+    SafeDebugOutput("CrashHandler: NOTE: Reinstall MTA or run as admin once to enable WER crash dumps\n");
+    return false;
 }
 
 [[nodiscard]] static bool TryReadEnvBool(const char* name, bool& outValue)
@@ -2710,6 +2887,10 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     if (STATUS_INVALID_CRUNTIME_PARAMETER_CODE == dwExceptionCode || STATUS_STACK_BUFFER_OVERRUN_CODE == dwExceptionCode)
     {
         SafeDebugOutput("SEH: FATAL - STACK BUFFER OVERRUN (STATUS_STACK_BUFFER_OVERRUN)\n");
+    }
+    else if (STATUS_HEAP_CORRUPTION_CODE == dwExceptionCode)
+    {
+        SafeDebugOutput("SEH: FATAL - HEAP CORRUPTION (STATUS_HEAP_CORRUPTION)\n");
     }
     else if (STATUS_FATAL_USER_CALLBACK_EXCEPTION == dwExceptionCode)
     {

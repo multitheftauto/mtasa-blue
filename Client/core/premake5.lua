@@ -27,6 +27,11 @@ project "Client Core"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
+	filter { "files:FastFailCrashHandler/WerCrashHandler.cpp" }
+		flags { "NoPCH" }
+
+	filter {}
+
 	vpaths {
 		["Headers/*"] = {"**.h", "**.hpp"},
 		["Sources/*"] = "**.cpp",
