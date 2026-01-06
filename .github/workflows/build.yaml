@@ -30,8 +30,13 @@ jobs:
         shell: powershell
 
       - name: Restore vs2022
-        run: git revert c757a89f7c92fa7c814572b28384ca5985fff5bb
-        shell: powershell
+        run: |
+          git fetch origin c757a89f7c92fa7c814572b28384ca5985fff5bb
+          git revert c757a89f7c92fa7c814572b28384ca5985fff5bb
+          git checkout $GITHUB_SHA -- README.md
+          git add README.md
+          git revert --continue
+        shell: bash
 
       - name: Install CEF
         run: utils\premake5 install_cef
