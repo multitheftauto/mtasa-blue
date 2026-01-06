@@ -372,7 +372,24 @@ Function .onInstSuccess
 
     # Add 'MaxLoaderThreads' DWORD value for gta_sa.exe to disable multi-threaded loading of DLLs.
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads" 1
-	
+
+    # Configure Windows Error Reporting to save crash dumps to MTA's folder
+    # This enables capture of fail-fast crashes (0xC0000409, 0xC0000374) that bypass normal exception handling
+    # WER is a 64-bit system service that reads from the native 64-bit registry,
+    # so we must use SetRegView 64 to write to the correct location (not WOW6432Node)
+    SetRegView 64
+    # Configure for gta_sa.exe (game process)
+    ; DumpType: 0=Custom, 1=MiniDump, 2=FullDump - use 1 for smaller dumps
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\gta_sa.exe" "DumpType" 1
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\gta_sa.exe" "DumpCount" 10
+    WriteRegExpandStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\gta_sa.exe" "DumpFolder" "$INSTDIR\MTA\dumps\private"
+    # Configure for Multi Theft Auto.exe (loader process)
+    ; DumpType: 0=Custom, 1=MiniDump, 2=FullDump - use 1 for smaller dumps
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Multi Theft Auto.exe" "DumpType" 1
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Multi Theft Auto.exe" "DumpCount" 10
+    WriteRegExpandStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Multi Theft Auto.exe" "DumpFolder" "$INSTDIR\MTA\dumps\private"
+    SetRegView 32
+
 	# Initilize variables holding paths and names
 	Call MTAInitFileNamesAndPaths
     ; Start menu items
@@ -538,6 +555,10 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         # Ensure install dir exists so the permissions can be set
         SetOutPath "$INSTDIR\MTA"
         SetOverwrite on
+
+        # Create dumps directory for WER crash dumps
+        CreateDirectory "$INSTDIR\MTA\dumps"
+        CreateDirectory "$INSTDIR\MTA\dumps\private"
 
         #############################################################
         # Make the directory "$INSTDIR" read write accessible by all users
@@ -1150,6 +1171,13 @@ Section Uninstall
         # Remove 'MaxLoaderThreads' DWORD value for gta_sa.exe.
         DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads"
         DeleteRegKey /ifempty HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe"
+
+        # Remove WER LocalDumps configuration for gta_sa.exe and Multi Theft Auto.exe
+        # WER config is in 64-bit registry (not WOW6432Node), so use SetRegView 64
+        SetRegView 64
+        DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\gta_sa.exe"
+        DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Multi Theft Auto.exe"
+        SetRegView 32
 
         ${GameExplorer_RemoveGame} ${GUID}
 

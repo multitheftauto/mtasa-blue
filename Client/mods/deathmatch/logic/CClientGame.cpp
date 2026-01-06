@@ -80,6 +80,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Init the global var with ourself
     g_pClientGame = this;
 
+    g_pCore->UpdateWerCrashModuleBases();
+
     CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
 
     // Packet handler

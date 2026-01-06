@@ -252,6 +252,7 @@ public:
     void                 OnDeviceRestore();
     void                 OnCrashAverted(uint uiId);
     void                 OnEnterCrashZone(uint uiId);
+    void                 UpdateWerCrashModuleBases();
     void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
     bool                 GetDebugIdEnabled(uint uiDebugId);
     EDiagnosticDebugType GetDiagnosticDebug();
@@ -358,6 +359,7 @@ private:
 
     unsigned short    m_menuFrame{};
     bool              m_isNetworkReady{};
+    bool              m_bCrashDumpEncryptionDone{};
     bool              m_bIsOfflineMod;
     bool              m_bCursorToggleControls;
     pfnProcessMessage m_pfnMessageProcessor;
