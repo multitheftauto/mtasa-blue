@@ -33,7 +33,9 @@ public:
     bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled, SString* pOutError = nullptr) override;
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
+    void CleanupIsolatedTxdForModel(unsigned short usModelId) override;
     void StaticResetModelTextureReplacing();
+    void StaticResetShaderSupport();
     void ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId);
     void ClothesRemoveReplacement(char* pFileData);
     bool HasClothesReplacementChanged();
@@ -96,6 +98,7 @@ public:
 
     unsigned short     GetTXDIDForModelID(unsigned short usModelID);
     void               PulseWorldTextureWatch();
+    void               ProcessPendingIsolatedTxdParents();
     void               GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID);
     bool               GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames);
     void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, unsigned short usTxdId);
@@ -125,7 +128,7 @@ public:
     RwTexture*          RightSizeTexture(RwTexture* pTexture, unsigned int uiSizeLimit, SString& strError);
     void                ResetStats();
     void                GetShaderReplacementStats(SShaderReplacementStats& outStats);
-    CModelTexturesInfo* GetModelTexturesInfo(unsigned short usModelId);
+    CModelTexturesInfo* GetModelTexturesInfo(unsigned short usModelId, const char* callsiteTag = "unknown");
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
 
@@ -134,8 +137,8 @@ public:
     static void  RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
-    static bool  StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList);
-    static bool  StaticGetTextureSetCB(RwTexture* texture, std::unordered_set<RwTexture*>* pTextureSet);
+    static void  DebugTxdAddRef(unsigned short usTxdId, const char* tag = nullptr, bool enableSafetyPin = true);
+    static void  DebugTxdRemoveRef(unsigned short usTxdId, const char* tag = nullptr);
 
     void      InitTextureWatchHooks();
     void      StreamingAddedTexture(unsigned short usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);

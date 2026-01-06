@@ -293,6 +293,9 @@ public:
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
+    void         SetCurrentRefreshRate(uint uiRefreshRate) { m_uiCurrentRefreshRate = uiRefreshRate; }
+    uint         GetCurrentRefreshRate() const { return m_uiCurrentRefreshRate; }
+
     void OnPostColorFilterRender() override;
 
 private:
@@ -391,6 +394,7 @@ private:
     bool    m_bFakeLagCommandEnabled;
 
     SString m_strLastConnectedServerName{};
+    uint    m_uiCurrentRefreshRate{};
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
