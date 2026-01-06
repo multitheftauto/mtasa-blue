@@ -64,7 +64,7 @@ public:
     static bool SetElementBoneScale(CClientPed* ped, const std::uint16_t bone, const float scaleX, const float scaleY, const float scaleZ);
 
     static bool ResetElementBoneScale(CClientPed* ped, const std::uint16_t bone);
-    static bool ResetAllElementBoneScales(CClientPed* ped);
+    static void ResetAllElementBoneScales(CClientPed* ped);
 
     static bool UpdateElementRpHAnim(CClientPed* ped);
 

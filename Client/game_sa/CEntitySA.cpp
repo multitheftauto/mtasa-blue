@@ -665,7 +665,7 @@ bool CEntitySA::SetBoneScale(eBone boneId, const CVector& scale)
     if (!rwBoneMatrix)
         return false;
 
-    RwMatrixScale(rwBoneMatrix, (RwV3d*)&scale, TRANSFORM_BEFORE);
+    RwMatrixScale(rwBoneMatrix, reinterpret_cast<const RwV3d*>(&scale), TRANSFORM_BEFORE);
     return true;
 }
 

@@ -1151,10 +1151,9 @@ bool CLuaPedDefs::ResetElementBoneScale(CClientPed* ped, const std::uint16_t bon
     return ped->ResetBoneScale(static_cast<eBone>(bone));
 }
 
-bool CLuaPedDefs::ResetAllElementBoneScales(CClientPed* ped)
+void CLuaPedDefs::ResetAllElementBoneScales(CClientPed* ped)
 {
     ped->ResetAllBoneScales();
-    return true;
 }
 
 bool CLuaPedDefs::UpdateElementRpHAnim(CClientPed* ped)

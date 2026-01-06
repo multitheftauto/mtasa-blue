@@ -24,7 +24,7 @@ class CClientPed;
 #include <game/CPad.h>
 #include <game/TaskTypes.h>
 #include <game/CPed.h>
-#include <map>
+#include <unordered_map>
 
 class CAnimBlock;
 class CClientCamera;
@@ -816,7 +816,7 @@ public:
     bool m_animationOverridedByClient{};
 
     // Bone scaling
-    std::map<eBone, CVector> m_boneScales;
+    std::unordered_map<eBone, CVector> m_boneScales;
 
 public:
     bool SetBoneScale(eBone boneId, const CVector& scale);
@@ -824,5 +824,4 @@ public:
     bool ResetBoneScale(eBone boneId);
     void ResetAllBoneScales();
     void ApplyBoneScales();
-    bool HasBoneScales() const { return !m_boneScales.empty(); }
 };

@@ -1130,10 +1130,7 @@ CVector* CClientPed::GetTransformedBonePosition(eBone bone, CVector& vecPosition
 
 bool CClientPed::SetBoneScale(eBone boneId, const CVector& scale)
 {
-    if (!m_pPlayerPed)
-        return false;
-
-    if (boneId < BONE_ROOT || boneId > BONE_LEFTBREAST)
+    if (!m_pPlayerPed || boneId < BONE_ROOT || boneId > BONE_LEFTBREAST)
         return false;
 
     m_boneScales[boneId] = scale;
