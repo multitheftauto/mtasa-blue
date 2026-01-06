@@ -144,7 +144,7 @@ public:
 
     // GUI
     bool IsSettingsVisible();
-    bool IsMenuVisible();
+    bool IsMenuVisible() const noexcept;
     bool IsCursorForcedVisible();
     bool IsCursorControlsToggled() { return m_bCursorToggleControls; }
     void HideMainMenu();

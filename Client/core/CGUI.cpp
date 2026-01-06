@@ -437,12 +437,6 @@ void CLocalGUI::SetConsoleVisible(bool bVisible)
 
         // Set the visible state
         m_pConsole->SetVisible(bVisible);
-
-        CGUI* pGUI = CCore::GetSingleton().GetGUI();
-        if (bVisible)
-            pGUI->SetCursorAlpha(1.0f);
-        else if (!g_pCore->IsMenuVisible())
-            pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
     }
 }
 
@@ -486,10 +480,8 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
         else
         {
             pGUI->SelectInputHandlers(INPUT_MOD);
-        }
-
-        if (!bVisible)
-            pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
+            pGUI->RestoreCurrentServerCursorColor();            // Restore the cursor color when we close the main menu
+        }        
     }
 }
 

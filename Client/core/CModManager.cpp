@@ -136,6 +136,39 @@ bool CModManager::Start()
 
     bool success = false;
 
+        // Reset chatbox status (so it won't prevent further input), and clear it
+        /*CLocalGUI::GetSingleton ().GetChatBox ()->SetInputEnabled ( false );
+        CLocalGUI::GetSingleton ().GetChatBox ()->Clear ();*/
+        CLocalGUI::GetSingleton().GetChat()->SetInputVisible(false);
+        CLocalGUI::GetSingleton().GetChat()->Clear();
+        CLocalGUI::GetSingleton().SetChatBoxVisible(true);
+
+        // Reset the debugview status
+        CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false, true);
+        CLocalGUI::GetSingleton().GetDebugView()->Clear();
+        CLocalGUI::GetSingleton().SetDebugViewVisible(false);
+
+        // NULL the message processor and the unhandled command handler
+        CCore::GetSingleton().SetClientMessageProcessor(NULL);
+        CCore::GetSingleton().GetCommands()->SetExecuteHandler(NULL);
+
+        // Reset cursor color
+        CCore::GetSingleton().GetGUI()->ResetCursorColorVariables();
+
+        // Reset the modules
+        CCore::GetSingleton().GetGame()->Reset();
+        CCore::GetSingleton().GetMultiplayer()->Reset();
+        CCore::GetSingleton().GetNetwork()->Reset();
+        assert(CCore::GetSingleton().GetNetwork()->GetServerBitStreamVersion() == 0);
+
+        // Enable the console again
+        CCore::GetSingleton().GetConsole()->SetEnabled(true);
+
+        // Force the mainmenu back
+        CCore::GetSingleton().SetConnected(false);
+        CLocalGUI::GetSingleton().GetMainMenu()->SetIsIngame(false);
+        CLocalGUI::GetSingleton().GetMainMenu()->SetVisible(true, false);
+
     CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(false);
     {
         success = TryStart();
