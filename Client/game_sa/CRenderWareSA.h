@@ -14,6 +14,7 @@
 #include <game/CRenderWare.h>
 #include "CModelInfoSA.h"
 #include "CRenderWareSA.ShaderSupport.h"
+#include <unordered_set>
 
 class CMatchChannelManager;
 struct CModelTexturesInfo;
@@ -32,7 +33,9 @@ public:
     bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled, SString* pOutError = nullptr) override;
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
+    void CleanupIsolatedTxdForModel(unsigned short usModelId) override;
     void StaticResetModelTextureReplacing();
+    void StaticResetShaderSupport();
     void ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId);
     void ClothesRemoveReplacement(char* pFileData);
     bool HasClothesReplacementChanged();
@@ -95,10 +98,12 @@ public:
 
     unsigned short     GetTXDIDForModelID(unsigned short usModelID);
     void               PulseWorldTextureWatch();
+    void               ProcessPendingIsolatedTxdParents();
     void               GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID);
     bool               GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames);
     void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, unsigned short usTxdId);
     static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
+    static void        GetTxdTextures(std::unordered_set<RwTexture*>& outTextureSet, RwTexDictionary* pTXD);
     const char*        GetTextureName(CD3DDUMMY* pD3DData);
     void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, unsigned short usModelId, int iTypeMask);
     SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData);
@@ -123,7 +128,7 @@ public:
     RwTexture*          RightSizeTexture(RwTexture* pTexture, unsigned int uiSizeLimit, SString& strError);
     void                ResetStats();
     void                GetShaderReplacementStats(SShaderReplacementStats& outStats);
-    CModelTexturesInfo* GetModelTexturesInfo(unsigned short usModelId);
+    CModelTexturesInfo* GetModelTexturesInfo(unsigned short usModelId, const char* callsiteTag = "unknown");
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
 
@@ -132,11 +137,14 @@ public:
     static void  RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
-    static bool  StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList);
+    static void  DebugTxdAddRef(unsigned short usTxdId, const char* tag = nullptr, bool enableSafetyPin = true);
+    static void  DebugTxdRemoveRef(unsigned short usTxdId, const char* tag = nullptr);
 
     void      InitTextureWatchHooks();
     void      StreamingAddedTexture(unsigned short usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);
     void      StreamingRemovedTxd(unsigned short usTxdId);
+    void      RemoveStreamingTexture(unsigned short usTxdId, CD3DDUMMY* pD3DData);
+    bool      IsTexInfoRegistered(CD3DDUMMY* pD3DData) const;
     void      ScriptAddedTxd(RwTexDictionary* pTxd);
     void      ScriptRemovedTexture(RwTexture* pTex);
     void      SpecialAddedTexture(RwTexture* texture, const char* szTextureName = NULL);
@@ -146,6 +154,9 @@ public:
 
     static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
+
+    // Rebind clump material textures to current TXD textures (fixes stale texture pointers after TXD reload
+    void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) override;
 
     static const char* GetInternalTextureName(const char* szExternalName);
     static const char* GetExternalTextureName(const char* szInternalName);
