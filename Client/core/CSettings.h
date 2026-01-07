@@ -308,6 +308,7 @@ protected:
     CGUILabel*     m_pLabelVerticalAimSensitivity;
     CGUIScrollBar* m_pVerticalAimSensitivity;
     CGUILabel*     m_pLabelVerticalAimSensitivityValue;
+    CGUICheckBox*  m_pCheckboxVerticalAimSensitivity;
 
     CGUILabel*       m_pControlsJoypadLabel;
     CGUIScrollPane*  m_pControlsInputTypePane;
@@ -365,12 +366,14 @@ protected:
     CGUIButton*   m_pButtonBrowserBlacklistAdd;
     CGUIGridList* m_pGridBrowserBlacklist;
     CGUIButton*   m_pButtonBrowserBlacklistRemove;
+    CGUIButton*   m_pButtonBrowserBlacklistRemoveAll;
     CGUILabel*    m_pLabelBrowserCustomWhitelist;
     CGUIEdit*     m_pEditBrowserWhitelistAdd;
     CGUILabel*    m_pLabelBrowserWhitelistAdd;
     CGUIButton*   m_pButtonBrowserWhitelistAdd;
     CGUIGridList* m_pGridBrowserWhitelist;
     CGUIButton*   m_pButtonBrowserWhitelistRemove;
+    CGUIButton*   m_pButtonBrowserWhitelistRemoveAll;
     CGUICheckBox* m_pCheckBoxBrowserGPUEnabled;
     bool          m_bBrowserListsChanged;
     bool          m_bBrowserListsLoadEnabled;
@@ -420,10 +423,12 @@ protected:
     bool OnVerticalAimSensitivityChanged(CGUIElement* pElement);
     bool OnBrowserBlacklistAdd(CGUIElement* pElement);
     bool OnBrowserBlacklistRemove(CGUIElement* pElement);
+    bool OnBrowserBlacklistRemoveAll(CGUIElement* pElement);
     bool OnBrowserBlacklistDomainAddFocused(CGUIElement* pElement);
     bool OnBrowserBlacklistDomainAddDefocused(CGUIElement* pElement);
     bool OnBrowserWhitelistAdd(CGUIElement* pElement);
     bool OnBrowserWhitelistRemove(CGUIElement* pElement);
+    bool OnBrowserWhitelistRemoveAll(CGUIElement* pElement);
     bool OnBrowserWhitelistDomainAddFocused(CGUIElement* pElement);
     bool OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement);
 
@@ -448,6 +453,7 @@ protected:
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
     bool OnAffinityClick(CGUIElement* pElement);
+    bool OnMouseAimingClick(CGUIElement* pElement);
     void ReloadBrowserLists();
 
 private:

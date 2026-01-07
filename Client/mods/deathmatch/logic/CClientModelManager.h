@@ -15,6 +15,8 @@ class CClientModelManager;
 #include <list>
 #include <vector>
 #include <memory>
+#include <mutex>
+#include <cstdint>
 #include "CClientModel.h"
 
 #define MAX_MODEL_DFF_ID 20000
@@ -32,9 +34,11 @@ public:
     void RemoveAll(void);
 
     void Add(const std::shared_ptr<CClientModel>& pModel);
+    bool TryAdd(const std::shared_ptr<CClientModel>& pModel);
     bool Remove(const std::shared_ptr<CClientModel>& pModel);
 
     int GetFirstFreeModelID(void);
+    void ReleaseModelID(int iModelID);
     int GetFreeTxdModelID();
 
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
@@ -47,4 +51,6 @@ public:
 private:
     std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
     unsigned int                                     m_modelCount = 0;
+    std::mutex                                       m_idMutex;
+    std::vector<std::uint8_t>                        m_reserved;
 };

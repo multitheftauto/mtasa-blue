@@ -50,9 +50,9 @@ void CServerList::Clear()
 
 void CServerList::SuspendActivity()
 {
-    for (CServerListIterator iter = m_Servers.begin(); iter != m_Servers.end(); ++iter)
+    for (auto it = m_Servers.begin(); it != m_Servers.end(); ++it)
     {
-        if (CServerListItem* pServer = *iter)
+        if (CServerListItem* pServer = *it)
             pServer->CancelPendingQuery();
     }
 
@@ -106,7 +106,7 @@ void CServerList::Pulse()
         std::vector<SAddressPort> endpointList;
         CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser()->GetVisibleEndPointList(endpointList);
 
-        for (std::vector<SAddressPort>::iterator iter = endpointList.begin(); iter != endpointList.end(); ++iter)
+        for (auto iter = endpointList.begin(); iter != endpointList.end(); ++iter)
         {
             CServerListItem* pServer = m_Servers.Find((in_addr&)iter->m_ulIp, iter->m_usPort);
             if (pServer && pServer->WaitingToSendQuery())
@@ -121,9 +121,11 @@ void CServerList::Pulse()
     }
 
     // Scan all servers in our list, and keep the value of scanned servers
-    for (CServerListIterator i = m_Servers.begin(); i != m_Servers.end(); i++)
+    for (auto i = m_Servers.begin(); i != m_Servers.end(); ++i)
     {
         CServerListItem* pServer = *i;
+        if (!pServer)
+            continue;
         uint             uiPrevRevision = pServer->uiRevision;
         std::string      strResult = pServer->Pulse((int)(uiQueriesSent /*+ uiQueriesResent*/) < iNumQueries, bRemoveNonResponding);
         if (uiPrevRevision != pServer->uiRevision)
@@ -137,7 +139,7 @@ void CServerList::Pulse()
         else if (strResult == "NoReply")
             uiNoReplies++;
 
-        if (pServer->nMaxPlayers && !pServer->bMaybeOffline && !pServer->MaybeWontRespond())
+        if (pServer->nMaxPlayers > 0)
         {
             uiActiveServers++;
             uiTotalSlots += pServer->nMaxPlayers;
@@ -195,9 +197,9 @@ void CServerList::Refresh()
 {            // Assumes we already have a (saved) list of servers, so we just need to refresh
 
     // Reinitialize each server list item
-    for (std::list<CServerListItem*>::iterator iter = m_Servers.begin(); iter != m_Servers.end(); iter++)
+    for (auto it = m_Servers.begin(); it != m_Servers.end(); ++it)
     {
-        CServerListItem* pOldItem = *iter;
+        CServerListItem* pOldItem = *it;
         assert(pOldItem->m_pItemList == &m_Servers);
         pOldItem->ResetForRefresh();
     }
@@ -232,12 +234,34 @@ void CServerListInternet::SuspendActivity()
 void CServerListInternet::Refresh()
 {            // Gets the server list from the master server and refreshes
     m_ElapsedTime.Reset();
+
+    // Load from cache first to ensure servers are always available instantly
+    // This populates the list with cached server data before fetching fresh data
+    if (m_Servers.size() == 0)
+    {
+        GetServerCache()->GenerateServerList(this, true);  // true = allow all cached servers
+        GetServerCache()->GetServerListCachedInfo(this);
+    }
+
+    // Reset no-reply counters to retry previously non-responding servers
+    // This is called on manual refresh via button click
+    RetryNonRespondingServers();
+
     m_pMasterServerManager->Refresh();
     m_iPass = 1;
     m_bUpdated = true;
+    m_bMasterServerOffline = false;  // Reset offline flag on refresh attempt
 
-    // Clear the previous server list
-    Clear();
+    // Don't clear the list - keep cached servers available while fetching fresh data
+    // Only reset servers for refresh without losing the cache
+    for (auto it = m_Servers.begin(); it != m_Servers.end(); ++it)
+    {
+        CServerListItem* pServer = *it;
+        if (pServer)
+            pServer->ResetForRefresh();
+    }
+    m_nScanned = 0;
+    m_nSkipped = 0;
 }
 
 static bool SortByASEVersionCallback(const CServerListItem* const d1, const CServerListItem* const d2)
@@ -251,6 +275,25 @@ static bool SortByASEVersionCallback(const CServerListItem* const d1, const CSer
 void CServerList::SortByASEVersion()
 {
     m_Servers.GetList().sort(SortByASEVersionCallback);
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CServerList::RetryNonRespondingServers
+//
+// Reset no-reply counters for cached servers to give them another chance
+// Called during manual refresh via button click
+//
+///////////////////////////////////////////////////////////////
+void CServerList::RetryNonRespondingServers()
+{
+    for (auto it = m_Servers.begin(); it != m_Servers.end(); ++it)
+    {
+        if (CServerListItem* pServer = *it)
+        {
+            pServer->ClearNoReplyCountForRetry();
+        }
+    }
 }
 
 void CServerListInternet::Pulse()
@@ -270,6 +313,8 @@ void CServerListInternet::Pulse()
             if (m_pMasterServerManager->ParseList(m_Servers))
             {
                 m_iPass++;
+                // Cache all newly discovered servers from the master list
+                GetServerCache()->SetServerListCachedInfo(this);
                 GetServerCache()->GetServerListCachedInfo(this);
                 SortByASEVersion();
             }
@@ -292,9 +337,14 @@ void CServerListInternet::Pulse()
         }
         if (m_iPass == 0)
         {
-            // If query failed, load from backup
-            GetServerCache()->GenerateServerList(this);
+            // If query failed, mark master server as offline and load from backup
+            m_bMasterServerOffline = true;
+            GetServerCache()->GenerateServerList(this, true);  // true = allow all cached servers
             GetServerCache()->GetServerListCachedInfo(this);
+
+            // Reset no-reply counters for cached servers to give them another chance
+            RetryNonRespondingServers();
+
             SortByASEVersion();
             m_strStatus2 = "  " + _("(Backup server list)");
             m_iPass = 2;
@@ -305,6 +355,24 @@ void CServerListInternet::Pulse()
         // We are scanning our known servers (second pass)
         CServerList::Pulse();
     }
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CServerListInternet::RemoveNonResponding
+//
+// Override to prevent removing servers when master server is offline
+//
+///////////////////////////////////////////////////////////////
+bool CServerListInternet::RemoveNonResponding()
+{
+    // Don't remove non-responding servers if master server is offline
+    // This allows cached servers to be retained and queried
+    if (m_bMasterServerOffline)
+        return false;
+
+    // Otherwise, use standard logic: Don't remove until net access is confirmed
+    return m_nScanned > 10;
 }
 
 void CServerListLAN::Pulse()
@@ -477,7 +545,9 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
             if (bRemoveNonResponding)
             {
                 bMaybeOffline = true;            // Flag to help 'Include offline' browser option
-                nPlayers = 0;                    // We don't have player names, so zero this now
+                // Don't zero nPlayers - preserve last known count from master list or previous query
+                // Only zero vecPlayers since we don't have the actual player list
+                vecPlayers.clear();
             }
             uiRevision++;            // To flag browser gui update
 
@@ -542,38 +612,40 @@ bool CServerListItem::ParseQuery()
     nPing = info.pingTime;
 
     // Only use info from server query if master list allows it
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_GAME_NAME) == false)
+    bool bMasterServerOffline = (uiMasterServerSaysRestrictions == 0);
+
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_GAME_NAME) == false)
         strGameName = info.gameName;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERVER_NAME) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_SERVER_NAME) == false)
         strName = info.serverName;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_GAME_MODE) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_GAME_MODE) == false)
         strGameMode = info.gameType;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_MAP_NAME) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_MAP_NAME) == false)
         strMap = info.mapName;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERVER_VERSION) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_SERVER_VERSION) == false)
         strVersion = info.versionText;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_PASSWORDED_FLAG) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_PASSWORDED_FLAG) == false)
         bPassworded = info.isPassworded;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERIALS_FLAG) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_SERIALS_FLAG) == false)
         bSerials = info.serials;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_COUNT) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_COUNT) == false)
         nPlayers = info.players;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
         nMaxPlayers = info.playerSlot;
 
     m_iBuildType = info.buildType;
     m_iBuildNumber = info.buildNum;
     m_usHttpPort = info.httpPort;
 
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_LIST) == false)
+    if (bMasterServerOffline || (uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_LIST) == false)
         vecPlayers = info.playersPool;
 
     isStatusVerified = info.isStatusVerified;
@@ -760,6 +832,27 @@ void CServerListItem::ResetForRefresh()
     bMaybeOffline = false;
 }
 
+///////////////////////////////////////////////////////////////
+//
+// CServerListItem::ClearNoReplyCountForRetry
+//
+// Reset no-reply counter to allow retrying previously non-responding servers
+// Called on manual refresh to give cached servers another chance
+//
+///////////////////////////////////////////////////////////////
+void CServerListItem::ClearNoReplyCountForRetry()
+{
+    // Only reset for servers that had some failures
+    if (uiCacheNoReplyCount > 0)
+    {
+        // Don't completely reset - just reduce to allow retries
+        // This way if a server is permanently down, it will accumulate again
+        uiCacheNoReplyCount = 0;
+        bSkipped = false;
+        uiQueryRetryCount = 0;
+    }
+}
+
 void CServerListItem::CancelPendingQuery()
 {
     queryReceiver.InvalidateSocket();
@@ -778,4 +871,122 @@ void CServerListItem::ChangeAddress(in_addr _Address, unsigned short _usGamePort
         Address = _Address;
         usGamePort = _usGamePort;
     }
+}
+
+namespace
+{
+    // Comparators
+    bool CompareVersionAsc(const CServerListItem* a, const CServerListItem* b)
+    {
+        return a->strVersionSortKey < b->strVersionSortKey;
+    }
+    bool CompareVersionDesc(const CServerListItem* a, const CServerListItem* b)
+    {
+        return a->strVersionSortKey > b->strVersionSortKey;
+    }
+
+    bool CompareLockedAsc(const CServerListItem* a, const CServerListItem* b)
+    {
+        if (a->bPassworded != b->bPassworded)
+            return a->bPassworded < b->bPassworded;
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+    bool CompareLockedDesc(const CServerListItem* a, const CServerListItem* b)
+    {
+        if (a->bPassworded != b->bPassworded)
+            return a->bPassworded > b->bPassworded;
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+
+    bool CompareNameAsc(const CServerListItem* a, const CServerListItem* b)
+    {
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+    bool CompareNameDesc(const CServerListItem* a, const CServerListItem* b)
+    {
+        return a->strNameSortKey > b->strNameSortKey;
+    }
+
+    bool ComparePlayersAsc(const CServerListItem* a, const CServerListItem* b)
+    {
+        if (a->nPlayers != b->nPlayers)
+            return a->nPlayers < b->nPlayers;
+        if (a->nMaxPlayers != b->nMaxPlayers)
+            return a->nMaxPlayers < b->nMaxPlayers;
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+    bool ComparePlayersDesc(const CServerListItem* a, const CServerListItem* b)
+    {
+        if (a->nPlayers != b->nPlayers)
+            return a->nPlayers > b->nPlayers;
+        if (a->nMaxPlayers != b->nMaxPlayers)
+            return a->nMaxPlayers > b->nMaxPlayers;
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+
+    bool ComparePingAsc(const CServerListItem* a, const CServerListItem* b)
+    {
+        if (a->nPing != b->nPing)
+            return a->nPing < b->nPing;
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+    bool ComparePingDesc(const CServerListItem* a, const CServerListItem* b)
+    {
+        if (a->nPing != b->nPing)
+            return a->nPing > b->nPing;
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+
+    bool CompareGameModeAsc(const CServerListItem* a, const CServerListItem* b)
+    {
+        int cmp = a->strGameMode.CompareI(b->strGameMode);
+        if (cmp != 0)
+            return cmp < 0;
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+    bool CompareGameModeDesc(const CServerListItem* a, const CServerListItem* b)
+    {
+        int cmp = a->strGameMode.CompareI(b->strGameMode);
+        if (cmp != 0)
+            return cmp > 0;
+        return a->strNameSortKey < b->strNameSortKey;
+    }
+}
+
+void CServerListItemList::Sort(unsigned int uiColumn, int direction)
+{
+    if (direction == 0)  // SortDirections::None
+        return;
+
+    bool asc = (direction == 1);  // SortDirections::Ascending
+
+    switch (uiColumn)
+    {
+        case 1:            // Version
+            m_List.sort(asc ? CompareVersionAsc : CompareVersionDesc);
+            break;
+        case 2:            // Locked
+            m_List.sort(asc ? CompareLockedAsc : CompareLockedDesc);
+            break;
+        case 3:            // Name
+            m_List.sort(asc ? CompareNameAsc : CompareNameDesc);
+            break;
+        case 4:            // Players
+            m_List.sort(asc ? ComparePlayersAsc : ComparePlayersDesc);
+            break;
+        case 5:            // Ping
+            m_List.sort(asc ? ComparePingAsc : ComparePingDesc);
+            break;
+        case 6:            // Gamemode
+            m_List.sort(asc ? CompareGameModeAsc : CompareGameModeDesc);
+            break;
+        default:
+            // Invalid column - no sort applied
+            break;
+    }
+}
+
+void CServerList::Sort(unsigned int uiColumn, int direction)
+{
+    m_Servers.Sort(uiColumn, direction);
 }

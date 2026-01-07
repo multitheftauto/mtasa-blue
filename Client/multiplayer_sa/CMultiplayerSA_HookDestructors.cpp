@@ -515,14 +515,17 @@ static void __declspec(naked) HOOK_CEntityAddMid1()
 
     __asm
     {
-        mov     eax, [esp+4]
-        mov     edx, ecx
+        // At hook entry: ECX = list pointer (thiscall this), [esp] = entity pointer (pushed arg)
+        mov     eax, [esp]          // Entity pointer from stack arg
+        mov     edx, ecx            // List pointer from ECX
         
         pushad
         pushfd
         
-        push    edx
-        push    eax
+        // cdecl: push args right-to-left, so arg2 first, arg1 second
+        // Handler: OnCEntityAddMid1(list, entity)
+        push    eax                 // arg2: entity
+        push    edx                 // arg1: list
         call    OnCEntityAddMid1
         add     esp, 4*2
         
@@ -579,14 +582,17 @@ static void __declspec(naked) HOOK_CEntityAddMid2()
 
     __asm
     {
-        mov     eax, [esp+4]
-        mov     edx, ecx
+        // At hook entry: ECX = list pointer (thiscall this), [esp] = entity pointer (pushed arg)
+        mov     eax, [esp]          // Entity pointer from stack arg
+        mov     edx, ecx            // List pointer from ECX
         
         pushad
         pushfd
         
-        push    edx
-        push    eax
+        // cdecl: push args right-to-left, so arg2 first, arg1 second
+        // Handler: OnCEntityAddMid2(list, entity)
+        push    eax                 // arg2: entity
+        push    edx                 // arg1: list
         call    OnCEntityAddMid2
         add     esp, 4*2
         
@@ -643,14 +649,17 @@ static void __declspec(naked) HOOK_CEntityAddMid3()
 
     __asm
     {
-        mov     eax, [esp+4]
-        mov     edx, ecx
+        // At hook entry: ECX = list pointer (thiscall this), [esp] = entity pointer (pushed arg)
+        mov     eax, [esp]          // Entity pointer from stack arg
+        mov     edx, ecx            // List pointer from ECX
         
         pushad
         pushfd
         
-        push    edx
-        push    eax
+        // cdecl: push args right-to-left, so arg2 first, arg1 second
+        // Handler: OnCEntityAddMid3(list, entity)
+        push    eax                 // arg2: entity
+        push    edx                 // arg1: list
         call    OnCEntityAddMid3
         add     esp, 4*2
         
