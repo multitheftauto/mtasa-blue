@@ -25,7 +25,7 @@ void CFileTextureItem::PostConstruct(CRenderItemManager* pManager, const SString
     m_TextureType = textureType;
     m_TextureAddress = textureAddress;
 
-    // @ZeusHay - Store for recreation
+    // Store for recreation
     m_bMipMaps = bMipMaps;
     m_uiCreateSizeX = uiSizeX;
     m_uiCreateSizeY = uiSizeY;
@@ -187,7 +187,7 @@ void CFileTextureItem::CreateUnderlyingData(const SString& strFilename, bool bMi
 
     HRESULT hr = E_FAIL;
     
-    // @ZeusHay - Changed D3DPOOL_MANAGED to D3DPOOL_DEFAULT to prevent system memory backup leak
+    // Changed D3DPOOL_MANAGED to D3DPOOL_DEFAULT to prevent system memory backup leak
     if (imageInfo.ResourceType == D3DRTYPE_VOLUMETEXTURE)
     {
         // It's a volume texture!
@@ -267,7 +267,7 @@ void CFileTextureItem::CreateUnderlyingData(const CPixels* pInPixels, bool bMipM
     D3DFORMAT      D3DFormat = (D3DFORMAT)format;
     int            iMipMaps = bMipMaps ? D3DX_DEFAULT : 1;
 
-    // @ZeusHay - Changed D3DPOOL_MANAGED to D3DPOOL_DEFAULT
+    // Changed D3DPOOL_MANAGED to D3DPOOL_DEFAULT
     if (FAILED(D3DXCreateTextureFromFileInMemoryEx(m_pDevice,                     //__in     LPDIRECT3DDEVICE9 pDevice,
                                                    pPixels->GetData(),            //__in     LPCVOID pSrcData,
                                                    pPixels->GetSize(),            //__in     UINT SrcDataSize,
@@ -319,7 +319,7 @@ void CFileTextureItem::CreateUnderlyingData(bool bMipMaps, uint uiSizeX, uint ui
     m_uiSurfaceSizeX = uiSizeX;
     m_uiSurfaceSizeY = uiSizeY;
 
-    // @ZeusHay - Changed D3DPOOL_MANAGED to D3DPOOL_DEFAULT
+    // Changed D3DPOOL_MANAGED to D3DPOOL_DEFAULT
     if (textureType == D3DRTYPE_VOLUMETEXTURE)
     {
         if (FAILED(D3DXCreateVolumeTexture(m_pDevice,                  //__in   LPDIRECT3DDEVICE9 pDevice,
