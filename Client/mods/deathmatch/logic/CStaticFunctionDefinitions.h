@@ -76,7 +76,6 @@ public:
     static bool           GetElementModel(CClientEntity& Entity, unsigned short& usModel);
     static bool           IsElementInWater(CClientEntity& Entity, bool& bInWater);
     static bool           IsElementSyncer(CClientEntity& Entity, bool& bIsSyncer);
-    static std::vector<CClientEntity*> GetElementsSyncedByPlayer();
     static bool           IsElementCollidableWith(CClientEntity& Entity, CClientEntity& ThisEntity, bool& bCanCollide);
     static bool           GetElementCollisionsEnabled(CClientEntity& Entity);
     static bool           IsElementFrozen(CClientEntity& Entity, bool& bFrozen);

@@ -1481,7 +1481,32 @@ int CLuaElementDefs::IsElementSyncer(lua_State* luaVM)
 
 std::vector<CClientEntity*> CLuaElementDefs::GetElementsSyncedByPlayer()
 {
-    return CStaticFunctionDefinitions::GetElementsSyncedByPlayer();
+    std::vector<CClientEntity*> elements;
+
+    // Check all peds
+    CPedSync* pPedSync = m_pClientGame->GetPedSync();
+    for (auto iter = pPedSync->IterBegin(); iter != pPedSync->IterEnd(); ++iter)
+    {
+        elements.push_back(*iter);
+    }
+
+    // Check all vehicles
+    CUnoccupiedVehicleSync* pVehicleSync = m_pClientGame->GetUnoccupiedVehicleSync();
+    for (auto iter = pVehicleSync->IterBegin(); iter != pVehicleSync->IterEnd(); ++iter)
+    {
+        elements.push_back(*iter);
+    }
+
+#ifdef WITH_OBJECT_SYNC
+    // Check all objects
+    CObjectSync* pObjectSync = m_pClientGame->GetObjectSync();
+    for (auto iter = pObjectSync->IterBegin(); iter != pObjectSync->IterEnd(); ++iter)
+    {
+        elements.push_back(*iter);
+    }
+#endif
+
+    return elements;
 }
 
 int CLuaElementDefs::IsElementCollidableWith(lua_State* luaVM)

@@ -1386,7 +1386,34 @@ int CLuaElementDefs::getElementSyncer(lua_State* luaVM)
 
 std::vector<CElement*> CLuaElementDefs::GetElementsSyncedByPlayer(CPlayer* player)
 {
-    return CStaticFunctionDefinitions::GetElementsSyncedByPlayer(player);
+    std::vector<CElement*> elements;
+
+    // Check all vehicles
+    for (CVehicle* pVehicle : m_pVehicleManager->GetVehicles())
+    {
+        if (pVehicle->GetSyncer() == player)
+            elements.push_back(pVehicle);
+    }
+
+    // Check all peds
+    for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); ++iter)
+    {
+        CPed* pPed = *iter;
+        if (pPed->GetSyncer() == player)
+            elements.push_back(pPed);
+    }
+
+#ifdef WITH_OBJECT_SYNC
+    // Check all objects
+    for (auto iter = m_pObjectManager->IterBegin(); iter != m_pObjectManager->IterEnd(); ++iter)
+    {
+        CObject* pObject = *iter;
+        if (pObject->GetSyncer() == player)
+            elements.push_back(pObject);
+    }
+#endif
+
+    return elements;
 }
 
 int CLuaElementDefs::getElementCollisionsEnabled(lua_State* luaVM)
