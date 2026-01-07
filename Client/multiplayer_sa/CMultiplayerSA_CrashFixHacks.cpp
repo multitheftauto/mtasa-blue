@@ -291,7 +291,8 @@ static void __declspec(naked) HOOK_CrashFix_Misc5()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-    __asm {
+    __asm
+    {
         mov edi, dword ptr[ARRAY_ModelInfo]
         mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]

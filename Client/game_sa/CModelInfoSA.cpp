@@ -823,7 +823,8 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     float fReturn = 0;
-    __asm {
+    __asm
+    {
         mov     eax, ModelID
 
         push    ecx

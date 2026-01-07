@@ -530,7 +530,8 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
-    __asm {
+    __asm
+    {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
         call    dwFunction
