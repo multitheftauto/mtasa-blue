@@ -55,10 +55,10 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     auto* upgradeModelInfo = g_pGame->GetModelInfo(us);
     if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
     {
-        unsigned short parentID = static_cast<unsigned short>(upgradeModelInfo->GetParentID());
-        if (IsUpgrade(static_cast<unsigned short>(parentID)))
+        unsigned short parentID = upgradeModelInfo->GetParentID();
+        if (IsUpgrade(parentID))
         {
-            us = static_cast<unsigned short>(parentID);
+            us = parentID;
         }
     }
 
@@ -466,10 +466,10 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
     auto* upgradeModelInfo = g_pGame->GetModelInfo(us);
     if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
     {
-        unsigned short parentID = static_cast<unsigned short>(upgradeModelInfo->GetParentID());
-        if (IsUpgrade(static_cast<unsigned short>(parentID)))
+        unsigned short parentID = upgradeModelInfo->GetParentID();
+        if (IsUpgrade(parentID))
         {
-            us = static_cast<unsigned short>(parentID);
+            us = parentID;
         }
     }
 
@@ -643,9 +643,9 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
                 
                 // If this is a custom model with parent ID, swap RwObjects
                 unsigned short parentID = static_cast<unsigned short>(pModelInfo->GetParentID());
-                if (parentID != 0 && IsUpgrade(static_cast<unsigned short>(parentID)))
+                if (parentID != 0 && IsUpgrade(parentID))
                 {
-                    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(static_cast<unsigned short>(parentID));
+                    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(parentID);
                     if (pParentModelInfo)
                     {
                         if (!g_pGame->IsASyncLoadingEnabled() || !pParentModelInfo->IsLoaded())
