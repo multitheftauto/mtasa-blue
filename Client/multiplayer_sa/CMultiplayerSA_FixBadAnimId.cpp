@@ -99,6 +99,8 @@ static void __declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -112,6 +114,8 @@ static void __declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
         add     esp, 10h
         jmp     RETURN_GetAnimHierarchyFromSkinClump
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

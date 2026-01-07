@@ -39,6 +39,8 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -58,6 +60,8 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
         movzx   esi, [esp + 0Ch]
         jmp     CONTINUE_CDamageManager__ProgressDoorDamage
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

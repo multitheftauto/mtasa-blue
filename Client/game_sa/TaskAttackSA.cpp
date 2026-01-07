@@ -23,6 +23,7 @@ CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const
     DWORD dwFunc = FUNC_CTaskSimpleGangDriveBy__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -34,6 +35,7 @@ CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const
         push    dwTargetEntity
         call    dwFunc
     }
+    // clang-format on
 }
 
 CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate)
@@ -46,6 +48,7 @@ CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarg
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
     float fTargetX = vecTarget.fX, fTargetY = vecTarget.fY, fTargetZ = vecTarget.fZ;
     DWORD dwBurstLength = nBurstLength;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -58,6 +61,7 @@ CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarg
         push    dwTargetEntity
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CTaskSimpleUseGunSA::SetPedPosition(CPed* pPed)
@@ -73,6 +77,8 @@ bool CTaskSimpleUseGunSA::SetPedPosition(CPed* pPed)
 
     BYTE currentWeaponSlot = dwPedInterface->bCurrentWeaponSlot;
 
+    // clang-format off
+
     __asm
     {
         mov     ecx, dwThisInterface
@@ -80,6 +86,8 @@ bool CTaskSimpleUseGunSA::SetPedPosition(CPed* pPed)
         call    dwFunc
         mov     bReturn, al
     }
+
+    // clang-format on
     return bReturn;
 }
 
@@ -88,6 +96,7 @@ void CTaskSimpleUseGunSA::FireGun(CPed* pPed, bool bFlag)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_FireGun;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -95,6 +104,7 @@ void CTaskSimpleUseGunSA::FireGun(CPed* pPed, bool bFlag)
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CTaskSimpleUseGunSA::ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand)
@@ -104,6 +114,7 @@ bool CTaskSimpleUseGunSA::ControlGun(CPed* pPed, CEntity* pTargetEntity, char nC
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -113,6 +124,7 @@ bool CTaskSimpleUseGunSA::ControlGun(CPed* pPed, CEntity* pTargetEntity, char nC
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -121,6 +133,7 @@ bool CTaskSimpleUseGunSA::ControlGunMove(CVector2D* pMoveVec)
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ControlGunMove;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -128,6 +141,7 @@ bool CTaskSimpleUseGunSA::ControlGunMove(CVector2D* pMoveVec)
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -139,6 +153,7 @@ void CTaskSimpleUseGunSA::Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecT
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
     float fTargetX = vecTarget.fX, fTargetY = vecTarget.fY, fTargetZ = vecTarget.fZ;
     DWORD dwBurstLength = nBurstLength;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -151,6 +166,7 @@ void CTaskSimpleUseGunSA::Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecT
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 int CTaskSimpleUseGunSA::GetTaskType()
@@ -158,12 +174,14 @@ int CTaskSimpleUseGunSA::GetTaskType()
     int   iReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetTaskType;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     iReturn, eax
     }
+    // clang-format on
     return iReturn;
 }
 
@@ -175,6 +193,7 @@ bool CTaskSimpleUseGunSA::MakeAbortable(CPed* pPed, int iPriority, CEvent const*
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_MakeAbortable;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -184,6 +203,7 @@ bool CTaskSimpleUseGunSA::MakeAbortable(CPed* pPed, int iPriority, CEvent const*
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -193,6 +213,7 @@ bool CTaskSimpleUseGunSA::ProcessPed(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ProcessPed;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -200,6 +221,7 @@ bool CTaskSimpleUseGunSA::ProcessPed(CPed* pPed)
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -208,12 +230,14 @@ void CTaskSimpleUseGunSA::AbortIK(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_AbortIK;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CTaskSimpleUseGunSA::AimGun(CPed* pPed)
@@ -221,12 +245,14 @@ void CTaskSimpleUseGunSA::AimGun(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_AimGun;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CTaskSimpleUseGunSA::ClearAnim(CPed* pPed)
@@ -234,12 +260,14 @@ void CTaskSimpleUseGunSA::ClearAnim(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ClearAnim;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 signed char CTaskSimpleUseGunSA::GetCurrentCommand()
@@ -247,12 +275,14 @@ signed char CTaskSimpleUseGunSA::GetCurrentCommand()
     signed char bReturn;
     DWORD       dwFunc = FUNC_CTaskSimpleUseGun_GetCurrentCommand;
     DWORD       dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -261,12 +291,14 @@ bool CTaskSimpleUseGunSA::GetDoneFiring()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetDoneFiring;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -275,12 +307,14 @@ bool CTaskSimpleUseGunSA::GetIsFinished()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsFinished;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -289,12 +323,14 @@ bool CTaskSimpleUseGunSA::IsLineOfSightBlocked()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_IsLineOfSightBlocked;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -303,12 +339,14 @@ bool CTaskSimpleUseGunSA::GetIsFiring()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsFiring;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -317,12 +355,14 @@ bool CTaskSimpleUseGunSA::GetIsReloading()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetIsReloading;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -331,12 +371,14 @@ bool CTaskSimpleUseGunSA::GetSkipAim()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_GetSkipAim;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -345,12 +387,14 @@ bool CTaskSimpleUseGunSA::PlayerPassiveControlGun()
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_PlayerPassiveControlGun;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -359,6 +403,7 @@ void CTaskSimpleUseGunSA::RemoveStanceAnims(CPed* pPed, float f)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_RemoveStanceAnims;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -366,6 +411,7 @@ void CTaskSimpleUseGunSA::RemoveStanceAnims(CPed* pPed, float f)
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CTaskSimpleUseGunSA::RequirePistolWhip(CPed* pPed, CEntity* pTargetEntity)
@@ -374,6 +420,7 @@ bool CTaskSimpleUseGunSA::RequirePistolWhip(CPed* pPed, CEntity* pTargetEntity)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ControlGun;
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
+    // clang-format off
     __asm
     {
         push    dwTargetEntity
@@ -381,6 +428,7 @@ bool CTaskSimpleUseGunSA::RequirePistolWhip(CPed* pPed, CEntity* pTargetEntity)
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -388,12 +436,14 @@ void CTaskSimpleUseGunSA::SetBurstLength(short a)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_SetBurstLength;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         push    a
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CTaskSimpleUseGunSA::SetMoveAnim(CPed* pPed)
@@ -401,12 +451,14 @@ void CTaskSimpleUseGunSA::SetMoveAnim(CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_SetMoveAnim;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CTaskSimpleUseGunSA::StartAnim(class CPed* pPed)
@@ -414,18 +466,21 @@ void CTaskSimpleUseGunSA::StartAnim(class CPed* pPed)
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_StartAnim;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CTaskSimpleUseGunSA::StartCountDown(unsigned char a, bool b)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_StartCountDown;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -433,6 +488,7 @@ void CTaskSimpleUseGunSA::StartCountDown(unsigned char a, bool b)
         push    a
         call    dwFunc
     }
+    // clang-format on
 }
 
 CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod)
@@ -443,6 +499,7 @@ CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, uns
     DWORD dwFunc = FUNC_CTaskSimpleFight__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwTargetEntity = (pTargetEntity) ? (DWORD)pTargetEntity->GetInterface() : 0;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -451,4 +508,5 @@ CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, uns
         push    dwTargetEntity
         call    dwFunc
     }
+    // clang-format on
 }

@@ -401,6 +401,8 @@ static void __declspec(naked) Hook6E9E23()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         check:
@@ -415,6 +417,8 @@ static void __declspec(naked) Hook6E9E23()
         lea     ebx, [eax+4*eax]
         jmp     dwHook6E9E23continue
     }
+
+    // clang-format on
 }
 
 DWORD dwHook6EFCD7continue = 0x6EFCDD;
@@ -422,6 +426,8 @@ DWORD dwHook6EFCD7skip = 0x6EFE5E;
 static void __declspec(naked) Hook6EFCD7()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -437,12 +443,16 @@ static void __declspec(naked) Hook6EFCD7()
         jz      check
         jmp     dwHook6EFCD7continue
     }
+
+    // clang-format on
 }
 
 DWORD dwHook6EFBD8continue = 0x6EFBDE;
 static void __declspec(naked) Hook6EFBD8()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -458,6 +468,8 @@ static void __declspec(naked) Hook6EFBD8()
         cont:
         jmp dwHook6EFBD8continue
     }
+
+    // clang-format on
 }
 
 void CWaterManagerSA::InstallHooks()

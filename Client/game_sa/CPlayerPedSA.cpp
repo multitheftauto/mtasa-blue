@@ -36,6 +36,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
 
     DWORD dwPedPointer = 0;
+    // clang-format off
     __asm
     {
         push    SIZEOF_CPLAYERPED
@@ -49,6 +50,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
         push    1
         call    CPlayerPedConstructor
     }
+    // clang-format on
 
     SetInterface((CEntitySAInterface*)dwPedPointer);
 
@@ -162,12 +164,14 @@ void CPlayerPedSA::SetInitialState()
     DWORD dwUnknown = 1;
     DWORD dwFunction = FUNC_SetInitialState;
     DWORD dwThis = (DWORD)m_pInterface;
+    // clang-format off
     __asm
     {
         push    dwUnknown
         mov     ecx, dwThis
         call    dwFunction
     }
+    // clang-format on
 
     // Avoid direction locks for respawning after a jump
     GetPlayerPedInterface()->pedFlags.bIsLanding = false;
@@ -293,11 +297,13 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
 
     DWORD dwThis = (DWORD)pedInterface;
     DWORD dwFunc = FUNC_CPlayerPed_ReApplyMoveAnims;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 CEntity* CPlayerPedSA::GetTargetedEntity() const
@@ -447,6 +453,8 @@ static void __declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -462,6 +470,8 @@ static void __declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 
         jmp     RETURN_CPlayerPed_ProcessAnimGroups_Mid
     }
+
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -501,6 +511,8 @@ static void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         mov     eax, 0x05A7FB0      // CClothes::GetPlayerMotionGroupToLoad
@@ -516,6 +528,8 @@ static void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
         mov     eax,[esp-32-4*1]    // Get temp
         jmp     RETURN_CClothes_GetDefaultPlayerMotionGroup
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

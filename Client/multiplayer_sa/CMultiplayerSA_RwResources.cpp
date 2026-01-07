@@ -46,6 +46,8 @@ static void __declspec(naked) HOOK_RwTextureCreate()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -71,6 +73,8 @@ inner:
         mov     eax,dword ptr ds:[00C97B24h]
         jmp     RETURN_RwTextureCreate
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +106,8 @@ static void __declspec(naked) HOOK_RwTextureDestroy()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         push    esi
@@ -115,6 +121,8 @@ static void __declspec(naked) HOOK_RwTextureDestroy()
 
         jmp     RETURN_RwTextureDestroy
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -135,6 +143,8 @@ static void __declspec(naked) HOOK_RwRasterCreate()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         mov         eax,dword ptr ds:[00C97B24h]
@@ -147,6 +157,8 @@ static void __declspec(naked) HOOK_RwRasterCreate()
 
         jmp     RETURN_RwRasterCreate
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -167,6 +179,8 @@ static void __declspec(naked) HOOK_RwRasterDestroy()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         push    esi
@@ -179,6 +193,8 @@ static void __declspec(naked) HOOK_RwRasterDestroy()
 
         jmp     RETURN_RwRasterDestroy
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -205,6 +221,8 @@ DWORD RETURN_RwGeometryCreate = 0x74CA97;
 static void __declspec(naked) HOOK_RwGeometryCreate()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -234,6 +252,8 @@ inner:
         sub     esp, 8
         jmp     RETURN_RwGeometryCreate
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -265,6 +285,8 @@ static void __declspec(naked) HOOK_RwGeometryDestroy()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -278,6 +300,8 @@ static void __declspec(naked) HOOK_RwGeometryDestroy()
         mov         esi,dword ptr [esp+8]
         jmp     RETURN_RwGeometryDestroy
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

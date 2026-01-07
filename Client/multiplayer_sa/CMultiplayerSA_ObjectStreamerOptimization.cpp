@@ -19,6 +19,8 @@ static void __declspec(naked) HOOK_CEntryInfoNodePool__New()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         inc CEntryInfoNodePool_UsedSpaces
@@ -27,6 +29,8 @@ static void __declspec(naked) HOOK_CEntryInfoNodePool__New()
         pop esi
         ret
     }
+
+    // clang-format on
 }
 
 #define HOOKPOS_CEntryInfoNode__operator_delete 0x536DF1
@@ -36,6 +40,8 @@ static void __declspec(naked) HOOK_CEntryInfoNode__operator_delete()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         dec CEntryInfoNodePool_UsedSpaces
@@ -44,6 +50,8 @@ static void __declspec(naked) HOOK_CEntryInfoNode__operator_delete()
         or byte ptr [eax], 0x80
         jmp RETURN_CEntryInfoNode__operator_delete
     }
+
+    // clang-format on
 }
 
 #define HOOKPOS_CEntryInfoList__Flush 0x536E6C
@@ -53,6 +61,8 @@ static void __declspec(naked) HOOK_CEntryInfoList__Flush()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         dec CEntryInfoNodePool_UsedSpaces
@@ -61,6 +71,8 @@ static void __declspec(naked) HOOK_CEntryInfoList__Flush()
         mov [eax], bl
         jmp RETURN_CEntryInfoList__Flush
     }
+
+    // clang-format on
 }
 
 #define HOOKPOS_CPtrNodeDoubleLinkPool__New 0x55233E
@@ -68,6 +80,8 @@ static void __declspec(naked) HOOK_CEntryInfoList__Flush()
 static void __declspec(naked) HOOK_CPtrNodeDoubleLinkPool__New()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -77,6 +91,8 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLinkPool__New()
         pop esi
         ret
     }
+
+    // clang-format on
 }
 
 #define HOOKPOS_CPtrNodeDoubleLink__operator_delete 0x5523F0
@@ -86,6 +102,8 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLink__operator_delete()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         dec CPtrNodeDoubleLinkPool_UsedSpaces
@@ -94,6 +112,8 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLink__operator_delete()
         or byte ptr [eax], 0x80
         jmp RETURN_CPtrNodeDoubleLink__operator_delete
     }
+
+    // clang-format on
 }
 
 #define HOOKPOS_CPtrListDoubleLink__Flush 0x5524CB
@@ -103,6 +123,8 @@ static void __declspec(naked) HOOK_CPtrListDoubleLink__Flush()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         dec CPtrNodeDoubleLinkPool_UsedSpaces
@@ -111,6 +133,8 @@ static void __declspec(naked) HOOK_CPtrListDoubleLink__Flush()
         mov [eax], bl
         jmp RETURN_CPtrListDoubleLink__Flush
     }
+
+    // clang-format on
 }
 
 void CMultiplayerSA::InitHooks_ObjectStreamerOptimization()

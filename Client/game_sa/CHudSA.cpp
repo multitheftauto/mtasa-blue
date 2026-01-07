@@ -901,6 +901,8 @@ static void __declspec(naked) HOOK_RenderWanted()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         cmp     ebp, edi
@@ -918,6 +920,8 @@ static void __declspec(naked) HOOK_RenderWanted()
 
         jmp     CONTINUE_RenderWanted
     }
+
+    // clang-format on
 }
 
 static void HOOK_RenderHudBar(int playerId, int x, int y)

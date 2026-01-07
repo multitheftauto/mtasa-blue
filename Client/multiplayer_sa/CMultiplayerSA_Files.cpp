@@ -52,6 +52,8 @@ static void __declspec(naked) HOOK_Rtl_fopen()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         push    [esp+4*3]
@@ -75,6 +77,8 @@ inner:
         push    [esp+0x0c]
         jmp     RETURN_Rtl_fopen
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -98,6 +102,8 @@ static void __declspec(naked) HOOK_Rtl_fclose()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -111,6 +117,8 @@ static void __declspec(naked) HOOK_Rtl_fclose()
         push    0x887EC8
         jmp     RETURN_Rtl_fclose
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

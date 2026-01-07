@@ -30,6 +30,8 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
+        // clang-format off
+
         __asm
         {
             mov     ecx, dwThisInterface
@@ -37,6 +39,8 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
             push    dwVehiclePtr
             call    dwFunc
         }
+
+        // clang-format on
     }
 }
 
@@ -72,6 +76,7 @@ CTaskSimpleCarSetPedInAsPassengerSA::CTaskSimpleCarSetPedInAsPassengerSA(CVehicl
         DWORD dwFunc = FUNC_CTaskSimpleCarSetPedInAsPassenger__Constructor;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
+        // clang-format off
         __asm
         {
             mov     ecx, dwThisInterface
@@ -80,6 +85,7 @@ CTaskSimpleCarSetPedInAsPassengerSA::CTaskSimpleCarSetPedInAsPassengerSA(CVehicl
             push    dwVehiclePtr
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -115,6 +121,7 @@ CTaskSimpleCarSetPedOutSA::CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, i
         DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__Constructor;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
+        // clang-format off
         __asm
         {
             mov     ecx, dwThisInterface
@@ -125,6 +132,7 @@ CTaskSimpleCarSetPedOutSA::CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, i
             push    dwVehiclePtr
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -154,6 +162,7 @@ void CTaskSimpleCarSetPedOutSA::PositionPedOutOfCollision(CPed* ped, CVehicle* v
     DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision;
     DWORD dwVehiclePtr = (DWORD)((CEntitySA*)vehicle)->GetInterface();
     DWORD dwPedPtr = (DWORD)((CEntitySA*)ped)->GetInterface();
+    // clang-format off
     __asm
     {
         push    nDoor
@@ -161,4 +170,5 @@ void CTaskSimpleCarSetPedOutSA::PositionPedOutOfCollision(CPed* ped, CVehicle* v
         push    dwPedPtr
         call    dwFunc
     }
+    // clang-format on
 }

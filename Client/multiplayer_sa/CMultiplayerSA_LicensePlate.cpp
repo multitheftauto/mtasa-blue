@@ -65,6 +65,8 @@ static void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingSta
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -78,6 +80,8 @@ static void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingSta
         mov     eax, [eax+24h]
         jmp     RETURN_CAutomobile_CustomCarPlate_BeforeRenderingStart
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -122,6 +126,8 @@ static void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -134,6 +140,8 @@ static void __declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop
         mov     eax, [eax+24h]
         jmp     RETURN_CAutomobile_CustomCarPlate_AfterRenderingStop
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -160,6 +168,8 @@ static void __declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture(
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -174,6 +184,8 @@ static void __declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture(
         mov     edi, [esp+8]
         jmp     RETURN_CCustomCarPlateMgr_SetupMaterialPlateTexture
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -206,6 +218,8 @@ static void __declspec(naked) HOOK_CVehicleModelInfo_SetCarCustomPlate()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -227,6 +241,8 @@ inner:
         mov     esi, ecx
         jmp     RETURN_CVehicleModelInfo_SetCarCustomPlate
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -243,6 +259,8 @@ DWORD RETURN_CCustomCarPlateMgr_CreatePlateTexture = 0x006FDEA5;
 static void __declspec(naked) HOOK_CCustomCarPlateMgr_CreatePlateTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -271,6 +289,8 @@ inner:
         mov     bl, [esp+0x0c]
         jmp     RETURN_CCustomCarPlateMgr_CreatePlateTexture
     }
+
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

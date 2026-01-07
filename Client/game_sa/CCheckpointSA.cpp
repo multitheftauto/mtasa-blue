@@ -163,6 +163,8 @@ static void __declspec(naked) HOOK_CCheckpoint__Render()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         push    esi
@@ -171,6 +173,8 @@ static void __declspec(naked) HOOK_CCheckpoint__Render()
 
         jmp RETURN_CCheckpoint__Render
     }
+
+    // clang-format on
 }
 
 void CCheckpointSA::StaticSetHooks()

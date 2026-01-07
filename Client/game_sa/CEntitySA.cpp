@@ -125,11 +125,13 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
         // If it's a train, recalculate its rail position parameter (does not affect derailed state)
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
     }
     if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
     {
@@ -166,11 +168,13 @@ void CEntitySA::Render()
     // This function may use m_pInterface->Render()
     DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;
     DWORD dwThis = (DWORD)m_pInterface;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CEntitySA::SetOrientation(float fX, float fY, float fZ)
@@ -181,18 +185,22 @@ void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x446F90;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     dwFunc = 0x532B00;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
     {
@@ -207,18 +215,22 @@ void CEntitySA::FixBoatOrientation()
     pGame->GetWorld()->Remove(this, CEntity_FixBoatOrientation);
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x446F90;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     dwFunc = 0x532B00;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     pGame->GetWorld()->Add(this, CEntity_FixBoatOrientation);
 }
@@ -318,11 +330,13 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
         {
             DWORD dwThis = (DWORD) m_pInterface;
             DWORD dwFunc = 0x6F6CC0;
+            // clang-format off
             __asm
             {
                 mov     ecx, dwThis
                 call    dwFunc
             }
+            // clang-format on
 
             //OutputDebugString ( "Set train position on tracks (matrix)!\n" );
         }
@@ -331,18 +345,22 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
         pGame->GetWorld()->Remove(this, CEntity_SetMatrix);
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = 0x446F90;            // CEntity::UpdateRwMatrix
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
 
         dwFunc = 0x532B00;            // CEntity::UpdateRwFrame
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
 
         if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
         {
@@ -368,12 +386,14 @@ float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwFunc = FUNC_GetDistanceFromCentreOfMassToBaseOfModel;
     DWORD dwThis = (DWORD)m_pInterface;
     float fReturn;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         fstp    fReturn
     }
+    // clang-format on
     return fReturn;
 }
 
@@ -408,12 +428,14 @@ void CEntitySA::SetAlpha(DWORD dwAlpha)
 {
     DWORD dwFunc = FUNC_SetRwObjectAlpha;
     DWORD dwThis = (DWORD)m_pInterface;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         push    dwAlpha
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CEntitySA::IsOnScreen()
@@ -421,12 +443,14 @@ bool CEntitySA::IsOnScreen()
     DWORD dwFunc = FUNC_IsVisible;
     DWORD dwThis = (DWORD)m_pInterface;
     bool  bReturn = false;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -457,6 +481,7 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
+        // clang-format off
         __asm
         {
             push    iUnknown
@@ -466,6 +491,7 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
             mov     ecx, matrixPadded
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -475,6 +501,7 @@ void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int 
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
+        // clang-format off
         __asm
         {
             push    iUnknown
@@ -484,6 +511,7 @@ void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int 
             mov     ecx, matrixPadded
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -493,6 +521,8 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     DWORD dwFunc = FUNC_RpAnimBlendClumpGetAssociation;
     DWORD dwThis = (DWORD)m_pInterface->m_pRwObject;
 
+    // clang-format off
+
     __asm
     {
         push    szAnimName
@@ -501,6 +531,8 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
         add     esp, 8
         mov     dwReturn, eax
     }
+
+    // clang-format on
     if (dwReturn) return true;
     else return false;
 }

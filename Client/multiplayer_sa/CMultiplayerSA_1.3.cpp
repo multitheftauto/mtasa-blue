@@ -339,6 +339,8 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -349,8 +351,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
         // Grab our siren vehicle
         mov pVehicleWithTheSiren, esi
     }
+
+    // clang-format on
     //   Call our Get siren type function which edits dwSirenType to our desired type
     GetVehicleSirenType();
+    // clang-format off
     __asm
     {
         popad
@@ -359,6 +364,7 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
         // Jump back to the original code
         JMP RETN_CVehicle_ProcessStuff_TestSirenTypeSingle
     }
+    // clang-format on
 }
 
 void SetupSirenColour(CVehicle* pVehicle)
@@ -572,6 +578,8 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSi
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         // Get our siren position into edx
@@ -582,10 +590,13 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSi
         // Put edx into our position variable
         mov vecRelativeSirenPosition, edx
     }
+
+    // clang-format on
     bPointLights = false;
     // Call our main siren Process function
     if (ProcessVehicleSirenPosition())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -602,9 +613,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSi
             // return back to SA
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -617,6 +630,7 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSi
             // return back to SA
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle
         }
+        // clang-format on
     }
 }
 
@@ -639,6 +653,8 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         // Grab our default siren type into edi
@@ -649,8 +665,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
         // Store our post hook default siren type
         mov dwSirenTypePostHook, edi
     }
+
+    // clang-format on
     //   Do our test and edit dwSirenType2 appropriately
     TestSirenTypeDualDefaultFix();
+    // clang-format off
     __asm
     {
         popad
@@ -659,11 +678,14 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
         // Return back to SA
         JMP RETN_CVehicle_ProcessStuff_TestSirenTypeDual
     }
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -679,11 +701,14 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
         mov dwGreen, edx
         mov dwBlue, ecx
     }
+
+    // clang-format on
     bPointLights = false;
 
     // Call our main process siren function
     if (ProcessVehicleSirenPosition())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -701,9 +726,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
             // Return control
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -721,12 +748,15 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
             // Return control
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1
         }
+        // clang-format on
     }
 }
 
 static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -741,11 +771,14 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
         mov dwGreen, edx
         mov dwBlue, ecx
     }
+
+    // clang-format on
     bPointLights = false;
 
     // Call our main process siren function
     if (ProcessVehicleSirenPosition())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -763,9 +796,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
             // Return control
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -783,6 +818,7 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
             // Return control
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2
         }
+        // clang-format on
     }
 }
 
@@ -808,15 +844,20 @@ static void __declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
         // Grab our vehicle interface
         mov pVehicleWithTheSiren, ecx
     }
+
+    // clang-format on
     //   Test our vehicle for sirens
     if (TestVehicleForSiren())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -825,9 +866,11 @@ static void __declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
             // Return
             jmp RETN_CVehicleDoesVehicleUseSirenRetn
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -836,6 +879,7 @@ static void __declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
             // Return
             jmp RETN_CVehicleDoesVehicleUseSirenRetn
         }
+        // clang-format on
     }
 }
 bool SirenCheckCameraPosition()
@@ -863,15 +907,20 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
         // Grab our vehicle
         mov pVehicleWithTheSiren, esi
     }
+
+    // clang-format on
     //   Check if we disable or enable the 360 effect
     if (SirenCheckCameraPosition())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -879,9 +928,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
             // Carry on
             jmp RETN_CVehicle_ProcessStuff_TestCameraPosition
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -892,6 +943,7 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
             // Carry on
             jmp RETN_CVehicle_ProcessStuff_TestCameraPosition2
         }
+        // clang-format on
     }
 }
 bool DisableVehicleSiren()
@@ -912,27 +964,35 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
     }
+
+    // clang-format on
     if (DisableVehicleSiren())
     {
+        // clang-format off
         __asm
         {
             popad
             mov dl, 0
             jmp RETN_CVehicleAudio_GetVehicleSirenType
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
             mov dl, [ecx+42Dh]
             jmp RETN_CVehicleAudio_GetVehicleSirenType
         }
+        // clang-format on
     }
 }
 DWORD CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
@@ -940,11 +1000,17 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         mov pVehicleWithTheSiren, edi
         pushad
     }
+
+    // clang-format on
+
+    // clang-format off
 
     __asm
     {
@@ -952,17 +1018,25 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1()
         call CALL_CVehicleAudio_ProcessCarHorn
         jmp RETN_CVehicleAudio_ProcessSirenSound1
     }
+
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         mov pVehicleWithTheSiren, edi
         pushad
     }
+
+    // clang-format on
+
+    // clang-format off
 
     __asm
     {
@@ -970,11 +1044,15 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2()
         call CALL_CVehicleAudio_ProcessCarHorn
         jmp RETN_CVehicleAudio_ProcessSirenSound2
     }
+
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound3()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -982,12 +1060,18 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound3()
         pushad
     }
 
+    // clang-format on
+
+    // clang-format off
+
     __asm
     {
         popad
         call CALL_CVehicleAudio_ProcessCarHorn
         jmp RETN_CVehicleAudio_ProcessSirenSound3
     }
+
+    // clang-format on
 }
 
 DWORD RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1 = 0x6BD4DB;
@@ -995,6 +1079,8 @@ DWORD RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1 = 0x6BD4DB;
 static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -1007,10 +1093,13 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue
         mov vecRelativeSirenPosition, eax
     }
 
+    // clang-format on
+
     bPointLights = false;
     // Call our main process siren function
     if (ProcessVehicleSirenPosition())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1028,9 +1117,11 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue
             // Return control
             JMP RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1045,12 +1136,15 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue
             // Return control
             JMP RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1
         }
+        // clang-format on
     }
 }
 
 static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -1061,10 +1155,13 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed(
         mov vecRelativeSirenPosition, edx
     }
 
+    // clang-format on
+
     bPointLights = false;
     // Call our main process siren function
     if (ProcessVehicleSirenPosition())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1084,9 +1181,11 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed(
             // Return control
             JMP RETN_CMotorBike_ProcessStuff_PushSirenPositionDualRed
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1102,33 +1201,40 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed(
             // Return control
             JMP RETN_CMotorBike_ProcessStuff_PushSirenPositionDualRed
         }
+        // clang-format on
     }
 }
 DWORD RETN_CMotorbike_ProcessStuff_TestVehicleModel2 = 0x6BD41B;
 static void __declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel()
 {
+    // clang-format off
     __asm
     {
         pushad
         mov pVehicleWithTheSiren, esi
     }
+    // clang-format on
     if (TestVehicleForSiren())
     {
+        // clang-format off
         __asm
         {
             popad
             cmp word ptr [esi+22h], 20Bh
             jmp RETN_CMotorbike_ProcessStuff_TestVehicleModel2
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
             cmp word ptr [esi+22h], 20Bh
             jmp RETN_CMotorbike_ProcessStuff_TestVehicleModel
         }
+        // clang-format on
     }
 }
 DWORD dwValue = 0x858B4C;
@@ -1136,14 +1242,19 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
         mov esi, pVehicleWithTheSiren
     }
+
+    // clang-format on
     bPointLights = true;
     if (ProcessVehicleSirenPosition())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1164,9 +1275,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights()
             fild    dword ptr [esp+30h]
             JMP RETN_CVehicle_ProcessStuff_PushRGBPointLights
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1183,6 +1296,7 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights()
             fild    dword ptr [esp+30h]
             JMP RETN_CVehicle_ProcessStuff_PushRGBPointLights
         }
+        // clang-format on
     }
 }
 
@@ -1190,13 +1304,18 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_StartPointLightCode()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
         mov pVehicleWithTheSiren, esi
     }
+
+    // clang-format on
     if (DoesVehicleHaveSiren())
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1205,9 +1324,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_StartPointLightCode()
             fadd st, st
             jmp RETN_CVehicle_ProcessStuff_StartPointLightCode
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1215,6 +1336,7 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_StartPointLightCode()
             mov     [esp+50h], eax
             jmp RETN_CVehicle_ProcessStuff_IgnorePointLightCode
         }
+        // clang-format on
     }
 }
 // Water Cannon Stuff
@@ -1241,6 +1363,8 @@ static void __declspec(naked) HOOK_CEventHitByWaterCannon()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
@@ -1251,17 +1375,22 @@ static void __declspec(naked) HOOK_CEventHitByWaterCannon()
         mov pPedHitByWaterCannonInterface, esi
         mov pVehicleWithTheCannonMounted, eax
     }
+
+    // clang-format on
     if (TriggerTheEvent())
     {
+        // clang-format off
         __asm
         {
             popad
             // Cancel.
             jmp RETURN_CWaterCannon_PushPeds_RETN_Cancel
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
@@ -1274,6 +1403,7 @@ static void __declspec(naked) HOOK_CEventHitByWaterCannon()
             // Go back to execution
             jmp RETURN_CWaterCannon_PushPeds_RETN
         }
+        // clang-format on
     }
 }
 CPedSAInterface* pPedUsingJetpack;
@@ -1287,12 +1417,14 @@ bool             IsUsingJetPack()
         {
             DWORD CPedIntelligence_FindJetpackTask = 0x601110;
             DWORD dwReturn = 0;
+            // clang-format off
             __asm
             {
                 mov ecx, dwJetpackPedIntelligence
                 call CPedIntelligence_FindJetpackTask
                 mov dwReturn, eax
             }
+            // clang-format on
             return dwReturn > 0;
         }
     }
@@ -1318,26 +1450,34 @@ static void __declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         mov pPedUsingJetpack, edi
         pushad
     }
+
+    // clang-format on
     if (AllowJetPack())
     {
+        // clang-format off
         __asm
         {
             popad
             jmp RETN_CTaskSimpleJetpack_ProcessInputEnable
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
             jmp RETN_CTaskSimpleJetpack_ProcessInputDisabled
         }
+        // clang-format on
     }
 }
 
@@ -1345,28 +1485,36 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
         mov pPedUsingJetpack, esi
     }
+
+    // clang-format on
     if (AllowJetPack())
     {
+        // clang-format off
         __asm
         {
             popad
             xor al, al
             jmp RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             popad
             call RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call
             jmp RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire
         }
+        // clang-format on
     }
 }
 
@@ -1390,6 +1538,7 @@ static void __declspec(naked) HOOK_CWorld_RemoveFallenPeds()
 
     // If it's going to skip the code anyway just do it otherwise check if he's in a vehicle as the vehicle will be respawned anyway and he will be warped with
     // it.
+    // clang-format off
     __asm
     {
         test ah, 5
@@ -1397,20 +1546,25 @@ static void __declspec(naked) HOOK_CWorld_RemoveFallenPeds()
         pushad
         mov pFallingPedInterface, esi
     }
+    // clang-format on
     if (CWorld_Remove_FallenPedsCheck())
     {
+        // clang-format off
         __asm
         {
             popad
 RemoveFallenPeds_Cancel:
             jmp RETURN_CWorld_RemoveFallenPeds_Cancel
         }
+        // clang-format on
     }
+    // clang-format off
     __asm
     {
         popad
         jmp RETURN_CWorld_RemoveFallenPeds_Cont
     }
+    // clang-format on
 }
 
 void CMultiplayerSA::SetVehicleFellThroughMapHandler(VehicleFellThroughMapHandler* pHandler)
@@ -1439,19 +1593,24 @@ static void __declspec(naked) HOOK_CWorld_RemoveFallenCars()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // If the vehicle fell through the map give it another try to respawn.
+    // clang-format off
     __asm
     {
         pushad
         mov pFallingVehicleInterface, esi
     }
+    // clang-format on
     if (CWorld_Remove_FallenVehiclesCheck())
     {
+        // clang-format off
         __asm
         {
             popad
             jmp RETURN_CWorld_RemoveFallenCars_Cancel
         }
+        // clang-format on
     }
+    // clang-format off
     __asm
     {
         popad
@@ -1463,6 +1622,7 @@ static void __declspec(naked) HOOK_CWorld_RemoveFallenCars()
      RemoveFallenCars_Cancel:
         jmp HOOK_CWorld_RemoveFallenCars_Cont1
     }
+    // clang-format on
 }
 
 void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
@@ -1508,15 +1668,18 @@ static void __declspec(naked) HOOK_CVehicleModelInterface_SetClump()
 
     // Grab our currently loading clump
     // Get our Handling ID because that's all that's in the interface
+    // clang-format off
     __asm
     {
         pushad
         mov pLoadingClump, eax
         mov pLoadingModelInfo, esi
     }
+    // clang-format on
     //   Init our supported upgrades structure for this model info
     CVehicleModelInterface_SetClump();
     // Perform overwrite sequence and jump back
+    // clang-format off
     __asm
     {
         popad
@@ -1525,11 +1688,14 @@ static void __declspec(naked) HOOK_CVehicleModelInterface_SetClump()
         mov dword ptr [esp+14h], 0FFFFFFFFh
         jmp RETURN_CVehicleModelInterface_SetClump
     }
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_CBoat_ApplyDamage()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -1541,18 +1707,24 @@ static void __declspec(naked) HOOK_CBoat_ApplyDamage()
         fst  dword ptr [esi+4C0h]
     }
 
+    // clang-format on
+
 boatCanBeDamaged:
+    // clang-format off
     __asm
     {
         pop eax
         jmp RETURN_CBoat_ApplyDamage
     }
+    // clang-format on
 }
 
 // fixes a crash where a vehicle is the source of a tear gas projectile.
 static void __declspec(naked) HOOK_CProjectile_FixTearGasCrash()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -1567,6 +1739,8 @@ static void __declspec(naked) HOOK_CProjectile_FixTearGasCrash()
         // dundundundundun
         // dundundundundun
     }
+
+    // clang-format on
 }
 
 void CMultiplayerSA::SetBoatWaterSplashEnabled(bool bEnabled)
@@ -1620,20 +1794,28 @@ static void __declspec(naked) HOOK_CMultiplayerSA_ToggleTyreSmoke()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         pushad
         mov pTyreSmokePed, ecx
     }
 
+    // clang-format on
+
     if (!IsPlayerPedLocal())
     {
+        // clang-format off
         __asm
         {
             popad
             jmp dwReturnIgnorePed
         }
+        // clang-format on
     }
+
+    // clang-format off
 
     __asm
     {
@@ -1645,6 +1827,8 @@ static void __declspec(naked) HOOK_CMultiplayerSA_ToggleTyreSmoke()
     ToggleTyreSmoke_Cancel:
         jmp dwReturnIgnorePed
     }
+
+    // clang-format on
 }
 
 void CMultiplayerSA::SetTyreSmokeEnabled(bool bEnabled)
@@ -1715,12 +1899,17 @@ static void __declspec(naked) HOOK_CProjectile_FixExplosionLocation()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
+
     __asm
     {
         mov pExplosionEntity, esi
         pushad
     }
+
+    // clang-format on
     UpdateExplosionLocation();
+    // clang-format off
     __asm
     {
         popad
@@ -1733,12 +1922,15 @@ skip:
         lea eax, [esi+4]
         jmp RETURN_CProjectile_FixExplosionLocation
     }
+    // clang-format on
 }
 
 DWORD CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom = 0;
 static void __declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
 
     __asm
     {
@@ -1752,26 +1944,36 @@ static void __declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
         mov eax, [esi+480h]
     }
 
+    // clang-format on
+
     // Called from CTaskSimpleJetPack::ProcessPed
     if (CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom == 0x68025F)
     {
+        // clang-format off
         __asm
         {
             mov pPedUsingJetpack, esi
         }
+        // clang-format on
 
         if (AllowJetPack())
         {
+            // clang-format off
             __asm
             {
                 pop esi
                 retn 4
             }
+            // clang-format on
         }
     }
+
+    // clang-format off
 
     __asm
     {
         jmp RETURN_CPed_RemoveWeaponWhenEnteringVehicle
     }
+
+    // clang-format on
 }

@@ -43,12 +43,16 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTarget
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
+        // clang-format off
+
         __asm
         {
             mov     ecx, dwThisInterface
             push    dwVehiclePtr
             call    dwFunc
         }
+
+        // clang-format on
     }
 }
 
@@ -71,6 +75,8 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* p
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
+        // clang-format off
+
         __asm
         {
             push    edx
@@ -83,6 +89,8 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* p
             call    dwFunc
             pop     edx
         }
+
+        // clang-format on
     }
 }
 
@@ -104,12 +112,16 @@ CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTarg
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
+        // clang-format off
+
         __asm
         {
             mov     ecx, dwThisInterface
             push    dwVehiclePtr
             call    dwFunc
         }
+
+        // clang-format on
     }
 }
 
@@ -138,6 +150,8 @@ CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const i
         if (iTargetDoor >= 0 && iTargetDoor <= 5)
             dwDoorIdx = s_iCarNodeIndexes[iTargetDoor];
 
+        // clang-format off
+
         __asm
         {
             mov     ecx, dwThisInterface
@@ -153,5 +167,7 @@ CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const i
             call    dwFunc
             pop     ebx
         }
+
+        // clang-format on
     }
 }
