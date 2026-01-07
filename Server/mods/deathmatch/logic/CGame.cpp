@@ -529,6 +529,7 @@ void CGame::DoPulse()
     CLOCK_CALL1(m_pAccountManager->DoPulse(););
     CLOCK_CALL1(m_pRegistryManager->DoPulse(););
     CLOCK_CALL1(m_pACLManager->DoPulse(););
+    CLOCK_CALL1(m_pObjectManager->DoPulse(););
 
     // Handle the traffic light sync
     if (m_bTrafficLightsLocked == false)
@@ -1605,6 +1606,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerVoiceStop", "", NULL, false);
 
     // Object events
+    m_Events.AddEvent("onObjectMoveStart", "", NULL, false);
+    m_Events.AddEvent("onObjectMoveStop", "", NULL, false);
 
     // Pickup events
     m_Events.AddEvent("onPickupHit", "player", NULL, false);
