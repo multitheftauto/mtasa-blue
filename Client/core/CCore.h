@@ -251,6 +251,7 @@ public:
     void                 OnDeviceRestore();
     void                 OnCrashAverted(uint uiId);
     void                 OnEnterCrashZone(uint uiId);
+    void                 UpdateWerCrashModuleBases();
     void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
     bool                 GetDebugIdEnabled(uint uiDebugId);
     EDiagnosticDebugType GetDiagnosticDebug();
@@ -292,6 +293,9 @@ public:
 
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
+
+    void         SetCurrentRefreshRate(uint uiRefreshRate) { m_uiCurrentRefreshRate = uiRefreshRate; }
+    uint         GetCurrentRefreshRate() const { return m_uiCurrentRefreshRate; }
 
     void OnPostColorFilterRender() override;
 
@@ -355,6 +359,7 @@ private:
 
     unsigned short    m_menuFrame{};
     bool              m_isNetworkReady{};
+    bool              m_bCrashDumpEncryptionDone{};
     bool              m_bIsOfflineMod;
     bool              m_bCursorToggleControls;
     pfnProcessMessage m_pfnMessageProcessor;
@@ -391,6 +396,7 @@ private:
     bool    m_bFakeLagCommandEnabled;
 
     SString m_strLastConnectedServerName{};
+    uint    m_uiCurrentRefreshRate{};
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);

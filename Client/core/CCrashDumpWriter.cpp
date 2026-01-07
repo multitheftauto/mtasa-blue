@@ -605,7 +605,7 @@ static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformat
             case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
                 exceptionType = "Watchdog Timeout - Thread Freeze Detected";
                 break;
-            case 0xC0000374:
+            case STATUS_HEAP_CORRUPTION_CODE:
                 exceptionType = "Heap Corruption Detected";
                 break;
             case 0xC0000420:
@@ -634,7 +634,38 @@ static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformat
         if (moduleBaseName == nullptr || moduleBaseName[0] == '\0')
             moduleBaseName = "unknown";
 
-        strReason = SString("\n\nReason: %s at %s+0x%08X", exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset());
+        // If we still have "unknown", try registry-resolved module info as fallback
+        CExceptionInformation_Impl* pImpl = dynamic_cast<CExceptionInformation_Impl*>(pExceptionInformation);
+        const char* resolvedModuleName = nullptr;
+        DWORD resolvedIdaAddress = 0;
+        bool hasResolvedInfo = false;
+
+        if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+        {
+            resolvedModuleName = pImpl->GetResolvedModuleName();
+            resolvedIdaAddress = pImpl->GetResolvedIdaAddress();
+            hasResolvedInfo = true;
+        }
+
+        // Build the reason string with best available module info
+        if (strcmp(moduleBaseName, "unknown") == 0 && hasResolvedInfo && resolvedModuleName != nullptr && resolvedModuleName[0] != '\0')
+        {
+            // Use registry-resolved info when basic module resolution failed
+            strReason = SString("\n\nReason: %s at %s+0x%08X (IDA: 0x%08X)",
+                exceptionType.c_str(), resolvedModuleName, pImpl->GetResolvedRva(), resolvedIdaAddress);
+        }
+        else if (hasResolvedInfo && resolvedModuleName != nullptr && resolvedModuleName[0] != '\0')
+        {
+            // Include IDA address as additional info when we have both sources
+            strReason = SString("\n\nReason: %s at %s+0x%08X (IDA via %s: 0x%08X)",
+                exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset(),
+                resolvedModuleName, resolvedIdaAddress);
+        }
+        else
+        {
+            // Original format when no registry-resolved info available
+            strReason = SString("\n\nReason: %s at %s+0x%08X", exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset());
+        }
 
         if (ms_uiInCrashZone != 0)
             strReason += SString(" (CrashZone=%u)", ms_uiInCrashZone);
@@ -1234,6 +1265,15 @@ void CCrashDumpWriter::LogEvent(const char* szType, const char* szContext, const
 void CCrashDumpWriter::SetHandlers()
 {
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Setting up crash handlers\n");
+
+    if (!EnableStackCookieFailureCapture(TRUE))
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - Failed to enable stack cookie failure capture\n");
+    }
+    else
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Stack cookie failure capture enabled\n");
+    }
 
     // Install crash filter as absolute first action to catch early exceptions
     // This improves the catching of crashes during window creation or early init
@@ -2059,6 +2099,19 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         appendDetailedLine("Enhanced exception diagnostics unavailable.\n");
     }
 
+    // Registry-resolved module info (independent source of truth with IDA-compatible offsets)
+    // This uses pre-captured module bases from before the crash occurred
+    if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+    {
+        appendDetailedLine("\n");
+        appendDetailedLine("=== Registry-Resolved Module Info (IDA-compatible) ===\n");
+        appendDetailedLine(SString("Resolved Module: %s\n", pImpl->GetResolvedModuleName()));
+        appendDetailedLine(SString("Resolved Module Base: 0x%08X\n", pImpl->GetResolvedModuleBase()));
+        appendDetailedLine(SString("Resolved RVA: 0x%08X\n", pImpl->GetResolvedRva()));
+        appendDetailedLine(SString("Resolved IDA Address: 0x%08X\n", pImpl->GetResolvedIdaAddress()));
+        appendDetailedLine("======================================================\n");
+    }
+
     appendTelemetryNoteIfMissing();
 
     // Try to get stack trace from detailed exception information
@@ -2228,6 +2281,18 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
     SetApplicationSettingInt("diagnostics", "last-crash-code", pExceptionInformation->GetCode());
     SetApplicationSetting("diagnostics", "last-crash-extra", "");
     SetApplicationSetting("diagnostics", "pending-invalid-parameter-warning", "");
+
+    // Store registry-resolved module info as separate diagnostic settings
+    if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+    {
+        SetApplicationSetting("diagnostics", "last-crash-resolved-module", pImpl->GetResolvedModuleName());
+        SetApplicationSetting("diagnostics", "last-crash-resolved-ida-addr", SString("0x%08X", pImpl->GetResolvedIdaAddress()));
+    }
+    else
+    {
+        SetApplicationSetting("diagnostics", "last-crash-resolved-module", "");
+        SetApplicationSetting("diagnostics", "last-crash-resolved-ida-addr", "");
+    }
 
     SString strInfoForDebug = strInfoForSettings;
     strInfoForDebug.Replace("\n", " ");
@@ -2458,15 +2523,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                     PathConform(CalcMTASAPath("")).Split(PATH_SEPERATOR, parts);
                     for (uint i = 0; i < parts.size(); i++)
                     {
-                        if (parts[i].CompareI("Program Files"))
-                            strPathCode += "Pr";
-                        else if (parts[i].CompareI("Program Files (x86)"))
-                            strPathCode += "Px";
-                        else if (parts[i].CompareI("MTA San Andreas"))
-                            strPathCode += "Mt";
-                        else if (parts[i].BeginsWithI("MTA San Andreas"))
-                            strPathCode += "Mb";
-                        else
+                        if (!parts[i].empty())
                             strPathCode += parts[i].Left(1).ToUpper();
                     }
                 }
@@ -2578,6 +2635,14 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Already called, returning\n");
         return false;
+    }
+
+    const DWORD exceptionCode = pExceptionInformation->GetCode();
+
+    if (exceptionCode == 0xC0000409 || exceptionCode == 0xC0000374)
+    {
+        SetApplicationSetting("diagnostics", "debugger-crash-capture", "1");
+        AddReportLog(7210, SString("Core - Fail-fast crash detected (0x%08X), debugger capture flag SET for next launch", exceptionCode));
     }
 
     SString strMessage(

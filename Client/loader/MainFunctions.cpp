@@ -13,15 +13,20 @@
 #include "Utils.h"
 #include "Dialogs.h"
 #include "D3DStuff.h"
+#include "../core/FastFailCrashHandler/WerCrashHandler.h"
 #include <version.h>
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstdint>
 #include <iterator>
+#include <map>
 #include <optional>
+#include <set>
 #include <string>
 #include <locale.h>
+#include <DbgHelp.h>
+#pragma comment(lib, "dbghelp.lib")
 
 // Function must be at the start to fix odd compile error (Didn't happen locally but does in build server)
 namespace
@@ -57,14 +62,190 @@ namespace
     return (exitCode & 0x80000000u) != 0u;
 }
 
+[[nodiscard]] static bool IsFailFastException(DWORD exceptionCode) noexcept
+{
+    return exceptionCode == 0xC0000409 || exceptionCode == 0xC0000374;
+}
+
+struct DebuggerCrashCapture
+{
+    DWORD exceptionCode = 0;
+    DWORD threadId = 0;
+    CONTEXT threadContext{};
+    bool captured = false;
+    SString dumpPath;
+    ModuleCrashInfo moduleInfo;  // Resolved at capture time while process is alive
+};
+
+static void WriteFailFastDump(HANDLE hProcess, DWORD processId, DWORD threadId,
+                              PEXCEPTION_RECORD pExceptionRecord, PCONTEXT pContext,
+                              DebuggerCrashCapture& capture)
+{
+    SString dumpDir = CalcMTASAPath("mta\\dumps\\private");
+    MakeSureDirExists(dumpDir + "/");
+
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    SString dumpFile = SString("failfast_%04d%02d%02d_%02d%02d%02d.dmp",
+        st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+    SString dumpPath = PathJoin(dumpDir, dumpFile);
+
+    HANDLE hFile = CreateFileA(dumpPath, GENERIC_WRITE, 0, nullptr,
+                               CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (hFile == INVALID_HANDLE_VALUE)
+    {
+        WriteDebugEvent(SString("Failed to create dump file: %s (error %lu)", dumpPath.c_str(), GetLastError()));
+        return;
+    }
+
+    MINIDUMP_EXCEPTION_INFORMATION mei{};
+    EXCEPTION_POINTERS ep{};
+    ep.ExceptionRecord = pExceptionRecord;
+    ep.ContextRecord = pContext;
+    mei.ThreadId = threadId;
+    mei.ExceptionPointers = &ep;
+    mei.ClientPointers = FALSE;
+
+    BOOL success = MiniDumpWriteDump(hProcess, processId, hFile, MiniDumpNormal, &mei, nullptr, nullptr);
+    CloseHandle(hFile);
+
+    if (success)
+    {
+        capture.dumpPath = dumpPath;
+        WriteDebugEvent(SString("Fail-fast dump saved: %s", dumpPath.c_str()));
+        AddReportLog(3148, SString("Loader captured fail-fast dump: %s", dumpFile.c_str()));
+    }
+    else
+    {
+        DeleteFileA(dumpPath);
+        WriteDebugEvent(SString("MiniDumpWriteDump failed: %lu", GetLastError()));
+    }
+}
+
+using FileTimeDuration = std::chrono::duration<std::int64_t, std::ratio<1, 10000000>>;
+
+[[nodiscard]] static FileTimeDuration FileTimeToDuration(const FILETIME& value) noexcept
+{
+    const auto combined = (static_cast<unsigned long long>(value.dwHighDateTime) << 32) | value.dwLowDateTime;
+    return FileTimeDuration{static_cast<FileTimeDuration::rep>(combined)};
+}
+
+using WerDumpResult = WerCrash::WerDumpResult;
+
+[[nodiscard]] static WerDumpResult FindAndRenameWerDump(const SString& moduleName, DWORD offset, DWORD exceptionCode,
+                                                        const std::optional<FileTimeDuration>& processCreationTime)
+{
+    const SString dumpDir = CalcMTASAPath("mta\\dumps\\private");
+    WerDumpResult result = WerCrash::FindAndRenameWerDump(dumpDir, moduleName, offset, exceptionCode, processCreationTime);
+
+    if (!result.path.empty())
+    {
+        SetApplicationSetting("diagnostics", "last-dump-save", result.path);
+        SetApplicationSetting("diagnostics", "last-dump-complete", "1");
+        WriteDebugEvent(SString("WER crash dump queued for upload: %s", ExtractFilename(result.path).c_str()));
+    }
+
+    if (!result.sourceFilename.empty())
+        SetApplicationSetting("diagnostics", "last-wer-dump-shown", result.sourceFilename);
+
+    return result;
+}
+
+static DWORD RunDebuggerLoop(HANDLE hProcess, DWORD processId, DebuggerCrashCapture& capture)
+{
+    DEBUG_EVENT debugEvent{};
+    DWORD continueStatus = DBG_CONTINUE;
+    DWORD exitCode = 0;
+    bool processExited = false;
+
+    while (!processExited)
+    {
+        if (!WaitForDebugEvent(&debugEvent, 1000))
+        {
+            if (GetLastError() == ERROR_SEM_TIMEOUT)
+                continue;
+            break;
+        }
+
+        continueStatus = DBG_CONTINUE;
+
+        switch (debugEvent.dwDebugEventCode)
+        {
+            case EXCEPTION_DEBUG_EVENT:
+            {
+                DWORD exCode = debugEvent.u.Exception.ExceptionRecord.ExceptionCode;
+
+                if (debugEvent.u.Exception.dwFirstChance)
+                {
+                    if (IsFailFastException(exCode) && !capture.captured)
+                    {
+                        capture.exceptionCode = exCode;
+                        capture.threadId = debugEvent.dwThreadId;
+
+                        HANDLE hThread = OpenThread(THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION,
+                                                    FALSE, debugEvent.dwThreadId);
+                        if (hThread)
+                        {
+                            capture.threadContext.ContextFlags = CONTEXT_ALL;
+                            if (GetThreadContext(hThread, &capture.threadContext))
+                            {
+                                capture.captured = true;
+
+                                // Resolve crash address to module NOW while process is still alive
+                                // This provides fallback if registry-based resolution fails
+                                capture.moduleInfo = ResolveModuleCrashAddress(
+                                    capture.threadContext.Eip, hProcess);
+
+                                WriteFailFastDump(hProcess, processId, debugEvent.dwThreadId,
+                                                  &debugEvent.u.Exception.ExceptionRecord,
+                                                  &capture.threadContext, capture);
+
+                                WriteDebugEvent(SString("Captured fail-fast 0x%08X: EIP=0x%08X ESP=0x%08X",
+                                    exCode, capture.threadContext.Eip, capture.threadContext.Esp));
+                            }
+                            CloseHandle(hThread);
+                        }
+                    }
+                    continueStatus = DBG_EXCEPTION_NOT_HANDLED;
+                }
+                else
+                {
+                    continueStatus = DBG_EXCEPTION_NOT_HANDLED;
+                }
+                break;
+            }
+
+            case EXIT_PROCESS_DEBUG_EVENT:
+                exitCode = debugEvent.u.ExitProcess.dwExitCode;
+                processExited = true;
+                break;
+
+            case CREATE_PROCESS_DEBUG_EVENT:
+                if (debugEvent.u.CreateProcessInfo.hFile)
+                    CloseHandle(debugEvent.u.CreateProcessInfo.hFile);
+                break;
+
+            case LOAD_DLL_DEBUG_EVENT:
+                if (debugEvent.u.LoadDll.hFile)
+                    CloseHandle(debugEvent.u.LoadDll.hFile);
+                break;
+
+            default:
+                break;
+        }
+
+        ContinueDebugEvent(debugEvent.dwProcessId, debugEvent.dwThreadId, continueStatus);
+    }
+
+    return exitCode;
+}
+
 enum class CrashArtifactState : unsigned char
 {
     Missing,
     Stale,
     Fresh,
 };
-
-using FileTimeDuration = std::chrono::duration<std::int64_t, std::ratio<1, 10000000>>; // FILETIME ticks are 100ns
 
 constexpr auto kCrashArtifactStaleTolerance = std::chrono::seconds(2);
 static constexpr std::size_t kCrashArtifactCount = 3;
@@ -80,12 +261,6 @@ static constexpr std::size_t kCrashArtifactCount = 3;
         default:
             return "missing";
     }
-}
-
-[[nodiscard]] static FileTimeDuration FileTimeToDuration(const FILETIME& value) noexcept
-{
-    const auto combined = (static_cast<unsigned long long>(value.dwHighDateTime) << 32) | value.dwLowDateTime;
-    return FileTimeDuration{static_cast<FileTimeDuration::rep>(combined)};
 }
 
 [[nodiscard]] static CrashArtifactState InspectCrashArtifact(const SString& path,
@@ -577,6 +752,104 @@ void HandleCustomStartMessage()
 
 //////////////////////////////////////////////////////////
 //
+// ConfigureWerDumpPath
+//
+// Configure Windows Error Reporting to save crash dumps to MTA's folder.
+// This is critical for capturing fail-fast crashes (0xC0000409, 0xC0000374)
+// that bypass normal exception handling.
+// Called early in loader before core.dll is loaded.
+//
+//////////////////////////////////////////////////////////
+void ConfigureWerDumpPath()
+{
+    using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
+
+    // Get loader's own path directly - this is the install root where Multi Theft Auto.exe lives
+    wchar_t loaderPath[MAX_PATH * 2];
+    DWORD len = GetModuleFileNameW(NULL, loaderPath, NUMELMS(loaderPath));
+    if (len == 0 || len >= NUMELMS(loaderPath))
+        return;
+
+    // Extract directory from full path
+    wchar_t* lastSlash = wcsrchr(loaderPath, L'\\');
+    if (!lastSlash)
+        lastSlash = wcsrchr(loaderPath, L'/');
+    if (!lastSlash)
+        return;  // No directory separator found - cannot determine install root
+    *lastSlash = L'\0';
+
+    // Sanity check - ensure we have a non-empty directory
+    if (loaderPath[0] == L'\0')
+        return;
+
+    // Build dump path: <install root>\MTA\dumps\private
+    std::wstring dumpPathW = loaderPath;
+    dumpPathW += L"\\MTA\\dumps\\private";
+
+    SString mtaDumpPath = UTF16ToMbUTF8(dumpPathW);
+    if (mtaDumpPath.empty())
+        return;
+
+    MakeSureDirExists(mtaDumpPath + "/");
+
+    bool loaderConfigured = false;
+
+    HMODULE hWer = LoadLibraryW(L"wer.dll");
+    if (hWer)
+    {
+        auto pfnWerRegisterAppLocalDump = reinterpret_cast<WerRegisterAppLocalDumpFn>(
+            GetProcAddress(hWer, "WerRegisterAppLocalDump"));
+
+        if (pfnWerRegisterAppLocalDump)
+        {
+            loaderConfigured = SUCCEEDED(pfnWerRegisterAppLocalDump(dumpPathW.c_str()));
+        }
+        FreeLibrary(hWer);
+    }
+
+    // WerRegisterAppLocalDump only affects current process and doesn't work for desktop apps anyway.
+    // Always use registry fallback for gta_sa.exe (child process), and for Multi Theft Auto.exe
+    // if WerRegisterAppLocalDump failed.
+    // Note: WER LocalDumps only reads from HKLM, not HKCU (per Microsoft documentation).
+    // Without admin privileges, we cannot update HKLM and stale entries from previous installs may persist.
+    const wchar_t* exeNames[] = {
+        L"gta_sa.exe",
+        loaderConfigured ? nullptr : L"Multi Theft Auto.exe"
+    };
+
+    for (const wchar_t* exeName : exeNames)
+    {
+        if (!exeName)
+            continue;
+
+        SString regSubPath = SString("SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\\%S", exeName);
+        std::wstring regSubPathW = MbUTF8ToUTF16(regSubPath);
+
+        HKEY hKey = nullptr;
+        // Use KEY_WOW64_64KEY to write to the 64-bit registry view.
+        // WER is a 64-bit system service that reads from the native 64-bit registry,
+        // not the WOW6432Node that 32-bit apps normally access.
+        LONG result = RegCreateKeyExW(HKEY_LOCAL_MACHINE, regSubPathW.c_str(), 0, nullptr,
+                                      REG_OPTION_NON_VOLATILE, KEY_SET_VALUE | KEY_WOW64_64KEY, nullptr, &hKey, nullptr);
+        if (result == ERROR_SUCCESS)
+        {
+            DWORD dumpType = 1;
+            RegSetValueExW(hKey, L"DumpType", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dumpType), sizeof(dumpType));
+
+            DWORD dumpCount = 10;
+            RegSetValueExW(hKey, L"DumpCount", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dumpCount), sizeof(dumpCount));
+
+            RegSetValueExW(hKey, L"DumpFolder", 0, REG_EXPAND_SZ,
+                           reinterpret_cast<const BYTE*>(dumpPathW.c_str()),
+                           static_cast<DWORD>((dumpPathW.length() + 1) * sizeof(wchar_t)));
+
+            RegCloseKey(hKey);
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////
+//
 // PreLaunchWatchDogs
 //
 // Various checks to alert the user to problems which will make MTA not work correctly
@@ -623,6 +896,10 @@ void PreLaunchWatchDogs()
     {
         WatchDogSetLastRunCrash(false);
     }
+
+    // Note: WER dump detection for fail-fast crashes (0xC0000409, 0xC0000374) is now
+    // handled in CInstallManager::_CheckForWerCrash() which runs during the sequencer,
+    // before this function is called.
 
     // Reset counter if gta game was run last time
     if (!WatchDogIsSectionOpen("L1"))
@@ -1446,18 +1723,30 @@ void CheckDataFiles()
 // StartGtaProcess
 //
 // Start GTA as an independent process
+// If bAsDebugger is true, launches with DEBUG_ONLY_THIS_PROCESS flag
 //
 //////////////////////////////////////////////////////////
 BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandLine, const SString& lpCurrentDirectory,
-                     LPPROCESS_INFORMATION lpProcessInformation, DWORD& dwOutError, SString& strOutErrorContext)
+                     LPPROCESS_INFORMATION lpProcessInformation, DWORD& dwOutError, SString& strOutErrorContext,
+                     bool bAsDebugger = false)
 {
     STARTUPINFOW startupInfo{};
     startupInfo.cb = sizeof(startupInfo);
-    BOOL wasProcessCreated = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
+
+    DWORD creationFlags = bAsDebugger ? DEBUG_ONLY_THIS_PROCESS : 0;
+
+    BOOL wasProcessCreated = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, creationFlags, nullptr,
                                             *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
 
     if (wasProcessCreated)
         return true;
+
+    if (bAsDebugger)
+    {
+        dwOutError = GetLastError();
+        strOutErrorContext = "CreateProcess-Debug";
+        return false;
+    }
 
     std::vector<DWORD> processIdListBefore = GetGTAProcessList();
 
@@ -1515,6 +1804,8 @@ BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandL
 //////////////////////////////////////////////////////////
 int LaunchGame(SString strCmdLine)
 {
+    WriteDebugEvent(SString("[7206] Loader - LaunchGame entry, cmdLine='%s'", strCmdLine.c_str()));
+
     CheckAndShowModelProblems();
     CheckAndShowUpgradeProblems();
     CheckAndShowImgProblems();
@@ -1564,10 +1855,40 @@ int LaunchGame(SString strCmdLine)
     }
 
     // Launch GTA using CreateProcess
+    // Note: Our Debugger mode (DEBUG_ONLY_THIS_PROCESS) can capture fail-fast crashes
+    // (like 0xC0000374, 0xC0000409, Subcode: 0x7 FAST_FAIL_FATAL_APP_EXIT, "abort" signal @ minkernel\crts\ucrt\src\appcrt\startup\abort.cpp)
+    // .. with full context, but it interferes with core.dll's normal crash handler. Only enable for diagnostics.
     PROCESS_INFORMATION piLoadee = {};
     DWORD dwError = 0;
     SString strErrorContext;
-    if (!StartGtaProcess(strGTAEXEPath, sanitizedCmdLine, strGTAPath, &piLoadee, dwError, strErrorContext))
+    bool bLaunchedAsDebugger = false;
+    DebuggerCrashCapture debugCapture{};
+
+    const SString debuggerFlagValue = GetApplicationSetting("diagnostics", "debugger-crash-capture");
+    const bool bUseDebuggerMode = (debuggerFlagValue == "1");
+    WriteDebugEvent(SString("[7200] Loader - Debugger flag check: value='%s' useDebugger=%d", debuggerFlagValue.c_str(), bUseDebuggerMode ? 1 : 0));
+
+    if (bUseDebuggerMode)
+    {
+        WriteDebugEvent("Loader - Debugger crash capture was requested (one-shot)");
+        AddReportLog(7201, "Loader - Attempting debugger launch for fail-fast capture");
+
+        if (StartGtaProcess(strGTAEXEPath, sanitizedCmdLine, strGTAPath, &piLoadee, dwError, strErrorContext, true))
+        {
+            bLaunchedAsDebugger = true;
+            SetApplicationSetting("diagnostics", "debugger-crash-capture", "");
+            WriteDebugEvent("Loader - Launched as debugger for fail-fast crash detection (diagnostic mode)");
+            AddReportLog(7202, "Loader - Debugger launch successful");
+        }
+        else
+        {
+            WriteDebugEvent(SString("Loader - Debugger launch FAILED: %s error %d", strErrorContext.c_str(), dwError));
+            AddReportLog(7203, SString("Loader - Debugger launch failed: %s error %d, falling back to normal launch", strErrorContext.c_str(), dwError));
+            SetApplicationSetting("diagnostics", "debugger-crash-capture", "");
+        }
+    }
+
+    if (!bLaunchedAsDebugger && !StartGtaProcess(strGTAEXEPath, sanitizedCmdLine, strGTAPath, &piLoadee, dwError, strErrorContext, false))
     {
         // Handle process creation failure
         SString strError = SString("Failed to launch GTA: San Andreas. [%s: %d]", *strErrorContext, dwError);
@@ -1601,77 +1922,91 @@ int LaunchGame(SString strCmdLine)
     {
         BsodDetectionOnGameBegin();
 
-        // Wait for game window
-        DWORD status = WAIT_TIMEOUT;
-        for (uint i = 0; i < 20 && status == WAIT_TIMEOUT; ++i)            // Max 20 iterations
+        if (bLaunchedAsDebugger)
         {
-            status = WaitForSingleObject(piLoadee.hProcess, 1000);            // 1 second timeout
+            HideSplash();
+            WriteDebugEvent("Loader - Running debugger loop for crash capture");
+            dwExitCode = RunDebuggerLoop(piLoadee.hProcess, piLoadee.dwProcessId, debugCapture);
 
-            if (!WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown
+            if (debugCapture.captured)
             {
-                WriteDebugEvent("Loader - L3 closed");
-                break;
-            }
-
-            // Check for device selection dialog
-            if (IsDeviceSelectionDialogOpen(piLoadee.dwProcessId) && i > 0)
-            {
-                --i;            // Don't count this iteration
-                Sleep(100);
+                WriteDebugEvent(SString("Loader - Captured fail-fast crash 0x%08X", debugCapture.exceptionCode));
             }
         }
-
-        HideSplash();
-
-        // Handle process if stuck at startup
-        if (status == WAIT_TIMEOUT)
+        else
         {
-            CStuckProcessDetector detector(piLoadee.hProcess, 5000);
-            while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown
+            // Wait for game window
+            DWORD status = WAIT_TIMEOUT;
+            for (uint i = 0; i < 20 && status == WAIT_TIMEOUT; ++i)            // Max 20 iterations
             {
-                if (detector.UpdateIsStuck())
-                {
-                    WriteDebugEvent("Detected stuck process at startup");
-                    if (MessageBoxUTF8(0, _("GTA: San Andreas may not have launched correctly. Terminate it?"), _("Information") + _E("CL25"),
-                                       MB_YESNO | MB_ICONQUESTION | MB_TOPMOST) == IDYES)
-                    {
-                        TerminateProcess(piLoadee.hProcess, 1);
-                    }
-                    break;
-                }
                 status = WaitForSingleObject(piLoadee.hProcess, 1000);            // 1 second timeout
-            }
-        }
 
-        // Wait for game to exit
-        WriteDebugEvent("Loader - Wait for game to exit");
-        while (status == WAIT_TIMEOUT)
-        {
-            status = WaitForSingleObject(piLoadee.hProcess, 1500);
-
-            // If core is closing and gta_sa.exe process memory usage is not changing, terminate
-            CStuckProcessDetector detector(piLoadee.hProcess, 5000);
-            while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("Q0"))            // Gets closed when quit is detected as frozen
-            {
-                if (detector.UpdateIsStuck())
+                if (!WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown
                 {
-                    WriteDebugEvent("Detected stuck process at quit");
-                #ifndef MTA_DEBUG
-                    TerminateProcess(piLoadee.hProcess, 1);
-                    status = WAIT_FAILED;
+                    WriteDebugEvent("Loader - L3 closed");
                     break;
-                #endif
                 }
-                status = WaitForSingleObject(piLoadee.hProcess, 1000);
+
+                // Check for device selection dialog
+                if (IsDeviceSelectionDialogOpen(piLoadee.dwProcessId) && i > 0)
+                {
+                    --i;            // Don't count this iteration
+                    Sleep(100);
+                }
+            }
+
+            HideSplash();
+
+            // Handle process if stuck at startup
+            if (status == WAIT_TIMEOUT)
+            {
+                CStuckProcessDetector detector(piLoadee.hProcess, 5000);
+                while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown
+                {
+                    if (detector.UpdateIsStuck())
+                    {
+                        WriteDebugEvent("Detected stuck process at startup");
+                        if (MessageBoxUTF8(0, _("GTA: San Andreas may not have launched correctly. Terminate it?"), _("Information") + _E("CL25"),
+                                           MB_YESNO | MB_ICONQUESTION | MB_TOPMOST) == IDYES)
+                        {
+                            TerminateProcess(piLoadee.hProcess, 1);
+                        }
+                        break;
+                    }
+                    status = WaitForSingleObject(piLoadee.hProcess, 1000);            // 1 second timeout
+                }
+            }
+
+            // Wait for game to exit
+            WriteDebugEvent("Loader - Wait for game to exit");
+            while (status == WAIT_TIMEOUT)
+            {
+                status = WaitForSingleObject(piLoadee.hProcess, 1500);
+
+                // If core is closing and gta_sa.exe process memory usage is not changing, terminate
+                CStuckProcessDetector detector(piLoadee.hProcess, 5000);
+                while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("Q0"))            // Gets closed when quit is detected as frozen
+                {
+                    if (detector.UpdateIsStuck())
+                    {
+                        WriteDebugEvent("Detected stuck process at quit");
+                    #ifndef MTA_DEBUG
+                        TerminateProcess(piLoadee.hProcess, 1);
+                        status = WAIT_FAILED;
+                        break;
+                    #endif
+                    }
+                    status = WaitForSingleObject(piLoadee.hProcess, 1000);
+                }
+            }
+
+            if (!GetExitCodeProcess(piLoadee.hProcess, &dwExitCode))
+            {
+                dwExitCode = static_cast<DWORD>(-1);
             }
         }
 
         BsodDetectionOnGameEnd();
-
-        if (!GetExitCodeProcess(piLoadee.hProcess, &dwExitCode))
-        {
-            dwExitCode = static_cast<DWORD>(-1);
-        }
     }
 
     AddReportLog(7104, "Loader - Finishing");
@@ -1709,12 +2044,196 @@ int LaunchGame(SString strCmdLine)
             !allArtifactsFresh)
         {
             const auto [coreLogLabel, coreLogFlagLabel, coreDumpLabel] = artifactLabels;
-            AddReportLog(3147,
-                         SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s)",
-                                 static_cast<unsigned int>(rawExitCode),
-                                 coreLogLabel,
-                                 coreLogFlagLabel,
-                                 coreDumpLabel));
+
+            if (debugCapture.captured)
+            {
+                AddReportLog(3147,
+                             SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s "
+                                     "EIP=0x%08X ESP=0x%08X EBP=0x%08X EAX=0x%08X dump=%s)",
+                                     static_cast<unsigned int>(rawExitCode),
+                                     coreLogLabel,
+                                     coreLogFlagLabel,
+                                     coreDumpLabel,
+                                     debugCapture.threadContext.Eip,
+                                     debugCapture.threadContext.Esp,
+                                     debugCapture.threadContext.Ebp,
+                                     debugCapture.threadContext.Eax,
+                                     debugCapture.dumpPath.empty() ? "none" : ExtractFilename(debugCapture.dumpPath).c_str()));
+
+                // Use the pre-resolved module info from capture time (when process was alive)
+                // This ensures we have module info even for early crashes before registry storage
+                if (debugCapture.moduleInfo.resolved)
+                {
+                    AddReportLog(3148, SString("Crash in %s: RVA=0x%08X IDA=0x%08X (base=0x%08X)",
+                                               debugCapture.moduleInfo.moduleName.c_str(),
+                                               debugCapture.moduleInfo.rva,
+                                               debugCapture.moduleInfo.idaAddress,
+                                               debugCapture.moduleInfo.moduleBase));
+                }
+            }
+            else
+            {
+                WerCrashInfo werInfo = QueryWerCrashInfo(rawExitCode);
+
+                if (werInfo.found)
+                {
+                    // WER faultOffset is already the RVA (offset within the module)
+                    // We can directly compute IDA address: IDA_BASE + RVA
+                    DWORD rva = 0;
+                    SString offsetStr;
+                    const bool hasValidOffset = !werInfo.faultOffset.empty();
+
+                    if (hasValidOffset)
+                    {
+                        offsetStr = werInfo.faultOffset;
+                        offsetStr.Replace("0x", "");
+                        offsetStr.Replace("0X", "");
+                        rva = static_cast<DWORD>(strtoull(offsetStr.c_str(), nullptr, 16));
+                    }
+
+                    SString offsetText;
+                    if (offsetStr.empty())
+                        offsetText = "unknown";
+                    else
+                        offsetText = SString("0x%s", offsetStr.c_str());
+
+                    constexpr DWORD IDA_DEFAULT_DLL_BASE = 0x10000000;
+                    const DWORD idaAddress = IDA_DEFAULT_DLL_BASE + rva;
+                    SString idaAddressText;
+                    if (hasValidOffset && rva != 0)
+                        idaAddressText = SString("0x%08X", idaAddress);
+                    else
+                        idaAddressText = "unknown";
+
+                    // Give WER time to finish writing the dump file (it can take a moment after process exit)
+                    Sleep(1000);
+
+                    // Try to find and rename WER dump to MTA format (with retry)
+                    WerDumpResult dumpResult;
+                    for (int attempt = 0; attempt < 3 && dumpResult.path.empty(); ++attempt)
+                    {
+                        if (attempt > 0)
+                            Sleep(500);
+                        dumpResult = FindAndRenameWerDump(werInfo.moduleName, rva, werInfo.exceptionCode, gtaCreationTime);
+                    }
+                    const char* dumpLabel = dumpResult.path.empty() ? coreDumpLabel : "fresh";
+
+                    // Set up crash info for dialog with register details
+                    if (!dumpResult.path.empty())
+                    {
+                        const char* exceptionName = (werInfo.exceptionCode == 0xC0000409) ? "Stack Buffer Overrun" :
+                                                    (werInfo.exceptionCode == 0xC0000374) ? "Heap Corruption" : "Security Exception";
+
+                        SString crashReason = SString(
+                            "Security Exception - %s (0x%08X) detected.\n"
+                            "Module: %s\n"
+                            "Offset: %s\n"
+                            "IDA Address: %s (assuming default DLL base 0x10000000)\n"
+                            "Crash dump: %s",
+                            exceptionName, werInfo.exceptionCode,
+                            werInfo.moduleName.empty() ? "unknown" : werInfo.moduleName.c_str(),
+                            offsetText.c_str(),
+                            idaAddressText.c_str(),
+                            ExtractFilename(dumpResult.path).c_str());
+
+                        SetApplicationSetting("diagnostics", "last-crash-reason", crashReason);
+                        SetApplicationSettingInt("diagnostics", "last-crash-code", werInfo.exceptionCode);
+
+                        // Mark this WER report as handled to prevent _CheckForWerCrash from reprocessing
+                        if (!werInfo.reportId.empty())
+                            SetApplicationSetting("diagnostics", "last-wer-report-shown", werInfo.reportId);
+
+                        // Build core.log entry
+                        SYSTEMTIME st{};
+                        GetLocalTime(&st);
+                        const auto strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG,
+                            *GetApplicationSetting("mta-version-ext").SplitRight(".", nullptr, -2));
+
+                        SString coreLogEntry;
+                        coreLogEntry += SString("Version = %s\n", strMTAVersionFull.c_str());
+                        coreLogEntry += SString("Time = %04d-%02d-%02d %02d:%02d:%02d\n", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+                        coreLogEntry += SString("Module = %s\n", werInfo.moduleName.empty() ? "unknown" : werInfo.moduleName.c_str());
+                        coreLogEntry += SString("Code = 0x%08X (%s)\n", werInfo.exceptionCode, exceptionName);
+                        coreLogEntry += SString("Offset = %s\n", offsetText.c_str());
+                        coreLogEntry += SString("IDA Address = %s\n\n", idaAddressText.c_str());
+
+                        if (dumpResult.regs.valid)
+                        {
+                            coreLogEntry += SString(
+                                "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n"
+                                "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n"
+                                "CS=%04X   DS=%04X  SS=%04X  ES=%04X   FS=%04X  GS=%04X\n\n",
+                                dumpResult.regs.eax, dumpResult.regs.ebx, dumpResult.regs.ecx, dumpResult.regs.edx, dumpResult.regs.esi,
+                                dumpResult.regs.edi, dumpResult.regs.ebp, dumpResult.regs.esp, dumpResult.regs.eip, dumpResult.regs.eflags,
+                                dumpResult.regs.cs, dumpResult.regs.ds, dumpResult.regs.ss, dumpResult.regs.es, dumpResult.regs.fs, dumpResult.regs.gs);
+                        }
+
+                        if (!dumpResult.stackTrace.empty())
+                        {
+                            coreLogEntry += "Stack trace:\n";
+                            coreLogEntry += dumpResult.stackTrace;
+                            coreLogEntry += "\n";
+                        }
+
+                        coreLogEntry += "Source: Windows Error Reporting (fail-fast exception)\n";
+                        coreLogEntry += SString("Dump: %s\n", ExtractFilename(dumpResult.path).c_str());
+
+                        SetApplicationSetting("diagnostics", "last-crash-info", coreLogEntry);
+
+                        // Write to core.log
+                        FILE* pFile = File::Fopen(CalcMTASAPath("mta\\core.log"), "a");
+                        if (pFile)
+                        {
+                            fprintf(pFile, "%s", "** -- Unhandled exception -- **\n\n");
+                            fprintf(pFile, "%s", coreLogEntry.c_str());
+                            fprintf(pFile, "%s", "** -- End of unhandled exception -- **\n\n\n");
+                            fclose(pFile);
+                        }
+                    }
+
+                    // Enhanced log with IDA-ready address (computed from WER offset)
+                    if (hasValidOffset && rva != 0)
+                    {
+                        AddReportLog(3147,
+                                     SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s module=%s offset=%s) "
+                                             "-> IDA=0x%08X",
+                                             static_cast<unsigned int>(rawExitCode),
+                                             coreLogLabel,
+                                             coreLogFlagLabel,
+                                             dumpLabel,
+                                             werInfo.moduleName.empty() ? "unknown" : werInfo.moduleName.c_str(),
+                                             werInfo.faultOffset.c_str(),
+                                             idaAddress));
+                    }
+                    else
+                    {
+                        AddReportLog(3147,
+                                     SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s module=%s offset=%s)",
+                                             static_cast<unsigned int>(rawExitCode),
+                                             coreLogLabel,
+                                             coreLogFlagLabel,
+                                             dumpLabel,
+                                             werInfo.moduleName.empty() ? "unknown" : werInfo.moduleName.c_str(),
+                                             werInfo.faultOffset.empty() ? "unknown" : werInfo.faultOffset.c_str()));
+                    }
+                }
+                else
+                {
+                    AddReportLog(3147,
+                                 SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s)",
+                                         static_cast<unsigned int>(rawExitCode),
+                                         coreLogLabel,
+                                         coreLogFlagLabel,
+                                         coreDumpLabel));
+                }
+
+                if (IsFailFastException(rawExitCode))
+                {
+                    SetApplicationSetting("diagnostics", "debugger-crash-capture", "1");
+                    WriteDebugEvent(SString("Loader - Enabled one-shot debugger capture for next run (exit code 0x%08X)", rawExitCode));
+                    AddReportLog(7204, SString("Loader - One-shot debugger flag SET for next launch (exit code 0x%08X)", rawExitCode));
+                }
+            }
         }
     }
 
