@@ -79,8 +79,9 @@ namespace SharedUtil::Details
         #undef GetModuleBaseNameW
     #endif
 
-    #include <bit>
+#if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
     #include <filesystem>
+#endif
 
 struct HKeyDeleter
 {
@@ -1766,8 +1767,8 @@ static bool MyShellExecute(bool bBlocking, const SString& strAction, const SStri
     }
     else
     {
-        int iResult = (int)ShellExecute(NULL, strAction, strFile, strParameters, strDirectory, nShowCmd);
-        return iResult > 32;
+        const auto result = reinterpret_cast<INT_PTR>(ShellExecute(NULL, strAction, strFile, strParameters, strDirectory, nShowCmd));
+        return result > 32;
     }
 }
 
@@ -2013,7 +2014,7 @@ DWORD SharedUtil::GetMainThreadId()
 
         if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)) != 0)
         {
-            processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
+            processEntryPointAddress = static_cast<DWORD>(reinterpret_cast<uintptr_t>(moduleInfo.EntryPoint));
         }
 
         // Find oldest thread in the current process ( https://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
