@@ -3071,26 +3071,57 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
     return true;
 }
 
-float CLuaVehicleDefs::GetVehicleRotorSpeed(CVehicle* pVehicle)
+float CLuaVehicleDefs::GetVehicleRotorSpeed(CVehicle* vehicle)
 {
-    float rotorSpeed = 0.0f;
-    CStaticFunctionDefinitions::GetVehicleRotorSpeed(pVehicle, rotorSpeed);
-    return rotorSpeed;
+    if (!vehicle)
+        return 0.0f;
+
+    return vehicle->GetRotorSpeed();
 }
 
-bool CLuaVehicleDefs::SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed)
+bool CLuaVehicleDefs::SetVehicleRotorSpeed(CVehicle* vehicle, float rotorSpeed)
 {
-    return CStaticFunctionDefinitions::SetVehicleRotorSpeed(pElement, rotorSpeed);
+    if (!vehicle)
+        return false;
+
+    eVehicleType vehicleType = vehicle->GetVehicleType();
+    if (vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_PLANE)
+        return false;
+
+    vehicle->SetRotorSpeed(rotorSpeed);
+
+    CBitStream BitStream;
+    SFloatSync<2, 14> syncRotorSpeed;
+    syncRotorSpeed.data.fValue = rotorSpeed;
+    BitStream.pBitStream->Write(&syncRotorSpeed);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_ROTOR_SPEED, *BitStream.pBitStream));
+
+    return true;
 }
 
-bool CLuaVehicleDefs::GetVehicleRotorState(CVehicle* pVehicle)
+bool CLuaVehicleDefs::GetVehicleRotorState(CVehicle* vehicle)
 {
-    bool rotorState = false;
-    CStaticFunctionDefinitions::GetVehicleRotorState(pVehicle, rotorState);
-    return rotorState;
+    if (!vehicle)
+        return false;
+
+    return vehicle->GetRotorState();
 }
 
-bool CLuaVehicleDefs::SetVehicleRotorState(CElement* pElement, bool rotorState, std::optional<bool> stopRotor)
+bool CLuaVehicleDefs::SetVehicleRotorState(CVehicle* vehicle, bool rotorState, std::optional<bool> stopRotor)
 {
-    return CStaticFunctionDefinitions::SetVehicleRotorState(pElement, rotorState, stopRotor);
+    if (!vehicle)
+        return false;
+
+    eVehicleType vehicleType = vehicle->GetVehicleType();
+    if (vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_PLANE)
+        return false;
+
+    vehicle->SetRotorState(rotorState);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(rotorState);
+    BitStream.pBitStream->WriteBit(stopRotor.value_or(true));
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_ROTOR_STATE, *BitStream.pBitStream));
+    return true;
 }

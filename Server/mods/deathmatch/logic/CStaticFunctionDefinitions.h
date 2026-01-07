@@ -281,8 +281,6 @@ public:
     static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
     static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
     static bool  GetVehicleDoorOpenRatio(CVehicle* pVehicle, unsigned char ucDoor, float& fRatio);
-    static bool  GetVehicleRotorSpeed(CVehicle* pVehicle, float& rotorSpeed);
-    static bool  GetVehicleRotorState(CVehicle* pVehicle, bool& rotorState);
 
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, float& fValue);
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue);
@@ -304,8 +302,6 @@ public:
     static bool BlowVehicle(CElement* pElement, std::optional<bool> withExplosion);
     static bool SetVehicleColor(CElement* pElement, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CElement* pElement, bool bLandingGearDown);
-    static bool SetVehicleRotorSpeed(CElement* pElement, float rotorSpeed);
-    static bool SetVehicleRotorState(CElement* pElement, bool rotorState, std::optional<bool> stopRotor);
     static bool SetVehicleLocked(CElement* pElement, bool bLocked);
     static bool SetVehicleDoorsUndamageable(CElement* pElement, bool bDoorsUndamageable);
     static bool SetVehicleRotation(CElement* pElement, const CVector& vecRotation);
