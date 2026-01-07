@@ -22,7 +22,6 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVec
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -34,7 +33,6 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVec
         push    pClimbEnt
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -52,7 +50,6 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -62,6 +59,5 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
         push    pVecTargetPos
         call    dwFunc
     }
-
     // clang-format on
 }

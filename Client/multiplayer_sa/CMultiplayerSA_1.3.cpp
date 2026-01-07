@@ -340,7 +340,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -351,7 +350,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
         // Grab our siren vehicle
         mov pVehicleWithTheSiren, esi
     }
-
     // clang-format on
     //   Call our Get siren type function which edits dwSirenType to our desired type
     GetVehicleSirenType();
@@ -579,7 +577,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSi
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Get our siren position into edx
@@ -590,7 +587,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSi
         // Put edx into our position variable
         mov vecRelativeSirenPosition, edx
     }
-
     // clang-format on
     bPointLights = false;
     // Call our main siren Process function
@@ -654,7 +650,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Grab our default siren type into edi
@@ -665,7 +660,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
         // Store our post hook default siren type
         mov dwSirenTypePostHook, edi
     }
-
     // clang-format on
     //   Do our test and edit dwSirenType2 appropriately
     TestSirenTypeDualDefaultFix();
@@ -686,7 +680,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Grab our siren position vector
@@ -701,7 +694,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
         mov dwGreen, edx
         mov dwBlue, ecx
     }
-
     // clang-format on
     bPointLights = false;
 
@@ -757,7 +749,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Grab our siren position vector
@@ -771,7 +762,6 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDu
         mov dwGreen, edx
         mov dwBlue, ecx
     }
-
     // clang-format on
     bPointLights = false;
 
@@ -845,14 +835,12 @@ static void __declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         // Grab our vehicle interface
         mov pVehicleWithTheSiren, ecx
     }
-
     // clang-format on
     //   Test our vehicle for sirens
     if (TestVehicleForSiren())
@@ -908,14 +896,12 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         // Grab our vehicle
         mov pVehicleWithTheSiren, esi
     }
-
     // clang-format on
     //   Check if we disable or enable the 360 effect
     if (SirenCheckCameraPosition())
@@ -965,12 +951,10 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
     if (DisableVehicleSiren())
     {
@@ -1001,24 +985,20 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov pVehicleWithTheSiren, edi
         pushad
     }
-
     // clang-format on
 
     // clang-format off
-
     __asm
     {
         popad
         call CALL_CVehicleAudio_ProcessCarHorn
         jmp RETN_CVehicleAudio_ProcessSirenSound1
     }
-
     // clang-format on
 }
 
@@ -1027,24 +1007,20 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov pVehicleWithTheSiren, edi
         pushad
     }
-
     // clang-format on
 
     // clang-format off
-
     __asm
     {
         popad
         call CALL_CVehicleAudio_ProcessCarHorn
         jmp RETN_CVehicleAudio_ProcessSirenSound2
     }
-
     // clang-format on
 }
 
@@ -1053,24 +1029,20 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound3()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov pVehicleWithTheSiren, edi
         pushad
     }
-
     // clang-format on
 
     // clang-format off
-
     __asm
     {
         popad
         call CALL_CVehicleAudio_ProcessCarHorn
         jmp RETN_CVehicleAudio_ProcessSirenSound3
     }
-
     // clang-format on
 }
 
@@ -1081,7 +1053,6 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Grab our siren position vector
@@ -1092,7 +1063,6 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue
         // move our position vector pointer into our position variable
         mov vecRelativeSirenPosition, eax
     }
-
     // clang-format on
 
     bPointLights = false;
@@ -1145,7 +1115,6 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed(
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -1154,7 +1123,6 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed(
         // move our position vector pointer into our position variable
         mov vecRelativeSirenPosition, edx
     }
-
     // clang-format on
 
     bPointLights = false;
@@ -1243,13 +1211,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov esi, pVehicleWithTheSiren
     }
-
     // clang-format on
     bPointLights = true;
     if (ProcessVehicleSirenPosition())
@@ -1305,13 +1271,11 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_StartPointLightCode()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pVehicleWithTheSiren, esi
     }
-
     // clang-format on
     if (DoesVehicleHaveSiren())
     {
@@ -1364,7 +1328,6 @@ static void __declspec(naked) HOOK_CEventHitByWaterCannon()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -1375,7 +1338,6 @@ static void __declspec(naked) HOOK_CEventHitByWaterCannon()
         mov pPedHitByWaterCannonInterface, esi
         mov pVehicleWithTheCannonMounted, eax
     }
-
     // clang-format on
     if (TriggerTheEvent())
     {
@@ -1451,13 +1413,11 @@ static void __declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov pPedUsingJetpack, edi
         pushad
     }
-
     // clang-format on
     if (AllowJetPack())
     {
@@ -1486,13 +1446,11 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pPedUsingJetpack, esi
     }
-
     // clang-format on
     if (AllowJetPack())
     {
@@ -1696,7 +1654,6 @@ static void __declspec(naked) HOOK_CBoat_ApplyDamage()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push eax
@@ -1706,7 +1663,6 @@ static void __declspec(naked) HOOK_CBoat_ApplyDamage()
         jz   boatCanBeDamaged
         fst  dword ptr [esi+4C0h]
     }
-
     // clang-format on
 
 boatCanBeDamaged:
@@ -1725,7 +1681,6 @@ static void __declspec(naked) HOOK_CProjectile_FixTearGasCrash()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         cmp ebp, 0h
@@ -1739,7 +1694,6 @@ static void __declspec(naked) HOOK_CProjectile_FixTearGasCrash()
         // dundundundundun
         // dundundundundun
     }
-
     // clang-format on
 }
 
@@ -1795,13 +1749,11 @@ static void __declspec(naked) HOOK_CMultiplayerSA_ToggleTyreSmoke()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pTyreSmokePed, ecx
     }
-
     // clang-format on
 
     if (!IsPlayerPedLocal())
@@ -1816,7 +1768,6 @@ static void __declspec(naked) HOOK_CMultiplayerSA_ToggleTyreSmoke()
     }
 
     // clang-format off
-
     __asm
     {
         popad
@@ -1827,7 +1778,6 @@ static void __declspec(naked) HOOK_CMultiplayerSA_ToggleTyreSmoke()
     ToggleTyreSmoke_Cancel:
         jmp dwReturnIgnorePed
     }
-
     // clang-format on
 }
 
@@ -1900,13 +1850,11 @@ static void __declspec(naked) HOOK_CProjectile_FixExplosionLocation()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov pExplosionEntity, esi
         pushad
     }
-
     // clang-format on
     UpdateExplosionLocation();
     // clang-format off
@@ -1931,7 +1879,6 @@ static void __declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push eax
@@ -1943,7 +1890,6 @@ static void __declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
         mov esi, ecx
         mov eax, [esi+480h]
     }
-
     // clang-format on
 
     // Called from CTaskSimpleJetPack::ProcessPed
@@ -1969,11 +1915,9 @@ static void __declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
     }
 
     // clang-format off
-
     __asm
     {
         jmp RETURN_CPed_RemoveWeaponWhenEnteringVehicle
     }
-
     // clang-format on
 }

@@ -75,7 +75,6 @@ static void __declspec(naked) HOOK_PreCreateDevice()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Run replaced code - these pushes create the original function parameters
@@ -118,7 +117,6 @@ static void __declspec(naked) HOOK_PreCreateDevice()
         // Continue
         jmp     RETURN_PreCreateDevice
     }
-
     // clang-format on
 }
 
@@ -179,7 +177,6 @@ static void __declspec(naked) HOOK_PostCreateDevice()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Replaced code
@@ -200,7 +197,6 @@ static void __declspec(naked) HOOK_PostCreateDevice()
 ok:
         jmp     RETURN_PostCreateDeviceB
     }
-
     // clang-format on
 }
 

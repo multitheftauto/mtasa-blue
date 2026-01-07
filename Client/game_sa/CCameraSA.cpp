@@ -364,7 +364,6 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
         return;
         
     // clang-format off
-        
     __asm
     {
         mov     ecx, cameraInterface
@@ -376,7 +375,6 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
         push    fDistance
         call    dwFunc
     }
-        
     // clang-format on
 }
 
@@ -502,7 +500,6 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
         return;
         
     // clang-format off
-        
     __asm
     {
         mov     ecx, cameraInterface
@@ -510,7 +507,6 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
         push    fFadeOutTime
         call    dwFunc
     }
-        
     // clang-format on
 }
 
@@ -619,7 +615,6 @@ static void __declspec(naked) HOOK_Camera_CollisionDetection()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -631,7 +626,6 @@ static void __declspec(naked) HOOK_Camera_CollisionDetection()
         push    ebp
         jmp     RETURN_Camera_CollisionDetection
     }
-
     // clang-format on
 }
 

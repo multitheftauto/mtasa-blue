@@ -70,7 +70,6 @@ static void __declspec(naked) HOOK_CClothesDeleteRwObject()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -83,7 +82,6 @@ static void __declspec(naked) HOOK_CClothesDeleteRwObject()
         //call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject()
         jmp     RETURN_CClothesDeleteRwObject
     }
-
     // clang-format on
 }
 
@@ -113,7 +111,6 @@ static void __declspec(naked) HOOK_PostCPedDress()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -126,7 +123,6 @@ static void __declspec(naked) HOOK_PostCPedDress()
         push    eax
         jmp     RETURN_PostCPedDress
     }
-
     // clang-format on
 }
 

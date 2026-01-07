@@ -382,7 +382,6 @@ static void __declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -426,7 +425,6 @@ inside:
         sub     esp, 0D4h
         jmp     RETURN_CClothesBuilderCreateSkinnedClump
     }
-
     // clang-format on
 }
 

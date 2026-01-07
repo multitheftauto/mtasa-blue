@@ -2812,7 +2812,6 @@ static void __declspec(naked) HOOK_FindPlayerCoors()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Only set our world of center if we have a center of world set
@@ -2845,7 +2844,6 @@ static void __declspec(naked) HOOK_FindPlayerCoors()
         add     ecx, 6
         jmp     ecx
     }
-
     // clang-format on
 }
 
@@ -2859,13 +2857,11 @@ static void __declspec(naked) HOOK_CStreaming_Update_Caller()
     */
 
     // clang-format off
-
     __asm
     {
         // Store all registers
         pushad
     }
-
     // clang-format on
 
     // We're now in the streaming update
@@ -2888,7 +2884,6 @@ static void __declspec(naked) HOOK_CStreaming_Update_Caller()
     }
 
     // clang-format off
-
     __asm
     {
         mov     edi, eax
@@ -2897,7 +2892,6 @@ static void __declspec(naked) HOOK_CStreaming_Update_Caller()
         mov     eax, FUNC_CStreaming_Update
         call    eax
     }
-
     // clang-format on
 
     // We have an entity for streaming?
@@ -2999,7 +2993,6 @@ static void __declspec(naked) HOOK_CHud_Draw_Caller()
     }
 
     // clang-format off
-
     __asm
     {
         popad
@@ -3008,7 +3001,6 @@ static void __declspec(naked) HOOK_CHud_Draw_Caller()
         add     eax, 10
         jmp     eax
     }
-
     // clang-format on
 }
 
@@ -3022,7 +3014,6 @@ static void __declspec(naked) HOOK_FindPlayerCentreOfWorld()
     */
 
     // clang-format off
-
     __asm
     {
         mov     al, bSetCenterOfWorld
@@ -3041,7 +3032,6 @@ static void __declspec(naked) HOOK_FindPlayerCentreOfWorld()
         lea     eax, vecCenterOfWorld
         retn
     }
-
     // clang-format on
 }
 
@@ -3055,7 +3045,6 @@ static void __declspec(naked) HOOK_FindPlayerHeading()
     */
 
     // clang-format off
-
     __asm
     {
         // Jump if bSetCenterOfWorld is true
@@ -3078,7 +3067,6 @@ static void __declspec(naked) HOOK_FindPlayerHeading()
         fld     fFalseHeading
         retn
     }
-
     // clang-format on
 }
 
@@ -3088,7 +3076,6 @@ static void __declspec(naked) HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         cmp     esi, 0
@@ -3104,7 +3091,6 @@ no_render:
         mov     edx, 0x6FF40B
         jmp     edx
     }
-
     // clang-format on
 }
 
@@ -3124,24 +3110,20 @@ static void __declspec(naked) HOOK_CRadar__DrawRadarGangOverlay()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (m_pDrawRadarAreasHandler) m_pDrawRadarAreasHandler();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -3152,13 +3134,11 @@ static void __declspec(naked) HOOK_Trailer_BreakTowLink()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     towingVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     if (CallBreakTowLinkHandler(towingVehicle))
@@ -3182,14 +3162,12 @@ static void __declspec(naked) HOOK_Trailer_BreakTowLink()
     }
 
     // clang-format off
-
     __asm
     {
         mov     ecx, HOOKPOS_Trailer_BreakTowLink
         add     ecx, 6
         jmp     ecx
     }
-
     // clang-format on
 }
 
@@ -3224,7 +3202,6 @@ static void __declspec(naked) HOOK_CExplosion_AddExplosion()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Check if explosions are disabled.
@@ -3272,7 +3249,6 @@ static void __declspec(naked) HOOK_CExplosion_AddExplosion()
         // Store registers for calling this handler
         pushad
     }
-
     // clang-format on
 
     // Call the explosion handler
@@ -3297,7 +3273,6 @@ static void __declspec(naked) HOOK_CExplosion_AddExplosion()
     }
 
     // clang-format off
-
     __asm
     {
         noexplosionhandler:
@@ -3313,7 +3288,6 @@ static void __declspec(naked) HOOK_CExplosion_AddExplosion()
         add     edx, 6
         jmp     edx
     }
-
     // clang-format on
 }
 
@@ -3347,7 +3321,6 @@ static void __declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     pedPosition, eax
@@ -3359,7 +3332,6 @@ static void __declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
         mov     eax, pedPosition
         pushad
     }
-
     // clang-format on
 
     if (processGrab())
@@ -3395,7 +3367,6 @@ static void __declspec(naked) HOOK_FxManager_CreateFxSystem()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Store the explosion type
@@ -3409,7 +3380,6 @@ static void __declspec(naked) HOOK_FxManager_CreateFxSystem()
         // Store all the registers on the stack
         pushad
     }
-
     // clang-format on
 
     // If we got a matrix and it is an explosion type?
@@ -3429,7 +3399,6 @@ static void __declspec(naked) HOOK_FxManager_CreateFxSystem()
     }
 
     // clang-format off
-
     __asm
     {
         // Restore the registers
@@ -3446,7 +3415,6 @@ static void __declspec(naked) HOOK_FxManager_CreateFxSystem()
         // Jump back to the rest of the function we hooked
         jmp         RETURN_FxManager_CreateFxSystem
     }
-
     // clang-format on
 }
 
@@ -3458,7 +3426,6 @@ static void __declspec(naked) HOOK_FxManager_DestroyFxSystem()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Grab the FxSystem that's being destroyed
@@ -3468,7 +3435,6 @@ static void __declspec(naked) HOOK_FxManager_DestroyFxSystem()
         // Store all the registers on the stack
         pushad
     }
-
     // clang-format on
 
     // Grab the matrix pointer in it
@@ -3478,7 +3444,6 @@ static void __declspec(naked) HOOK_FxManager_DestroyFxSystem()
     RemoveFxSystemPointer(pDestroyFxSystem_Matrix);
 
     // clang-format off
-
     __asm
     {
         // Restore the registers
@@ -3493,7 +3458,6 @@ static void __declspec(naked) HOOK_FxManager_DestroyFxSystem()
         // Jump back to the rest of the function we hooked
         jmp         RETURN_FxManager_DestroyFxSystem
     }
-
     // clang-format on
 }
 
@@ -3515,12 +3479,10 @@ static void __declspec(naked) HOOK_CCam_ProcessFixed()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov CCam_ProcessFixed_pCam, ecx
     }
-
     // clang-format on
 
     if (CCam_ProcessFixed(CCam_ProcessFixed_pCam))
@@ -3552,24 +3514,20 @@ static void __declspec(naked) HOOK_Render3DStuff()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
     if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
 
     // clang-format off
-
     __asm
     {
         popad
         mov eax, FUNC_Render3DStuff
         jmp eax
     }
-
     // clang-format on
 }
 
@@ -3816,24 +3774,20 @@ static void __declspec(naked) HOOK_CRunningScript_Process()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     CRunningScript_Process();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -3980,19 +3934,16 @@ static void __declspec(naked) HOOK_CVehicle_SetupRender()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwAlphaEntity, esi
         pushad
     }
-
     // clang-format on
 
     SetVehicleAlpha();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -4000,7 +3951,6 @@ static void __declspec(naked) HOOK_CVehicle_SetupRender()
         test    eax, eax
         jmp     dwCVehicle_SetupRender_ret
     }
-
     // clang-format on
 }
 
@@ -4010,18 +3960,15 @@ static void __declspec(naked) HOOK_CVehicle_ResetAfterRender()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     RestoreAlphaValues();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -4029,7 +3976,6 @@ static void __declspec(naked) HOOK_CVehicle_ResetAfterRender()
         test    eax, eax
         jmp     dwCVehicle_ResetAfterRender_ret
     }
-
     // clang-format on
 }
 
@@ -4089,7 +4035,6 @@ static void __declspec(naked) HOOK_CObject_Render()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    ecx
@@ -4097,7 +4042,6 @@ static void __declspec(naked) HOOK_CObject_Render()
         add     esp, 4
         retn
     }
-
     // clang-format on
 }
 
@@ -4158,13 +4102,11 @@ static void __declspec(naked) HOOK_EndWorldColors()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
      // clang-format off
-
      __asm
     {
         call DoEndWorldColorsPokes
         ret
     }
-
      // clang-format on
 }
 
@@ -4181,7 +4123,6 @@ static void __declspec(naked) HOOK_CWorld_ProcessVerticalLineSectorList()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         test    ebp, ebp
@@ -4203,7 +4144,6 @@ stop_looping:
         mov     dwObjectsChecked, 0
         jmp     dwProcessVerticalEndLooping
     }
-
     // clang-format on
 }
 
@@ -4216,7 +4156,6 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Get weapon type before pushad to avoid stack offset corruption
@@ -4246,7 +4185,6 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         mov     eax, [ecx+0x47C]
         jmp     dwChokingChoke
     }
-
     // clang-format on
 }
 
@@ -4597,12 +4535,10 @@ static void __declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8)
@@ -4620,14 +4556,12 @@ static void __declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
     else ucDesignatedLightState = 2;            // Red
 
     // clang-format off
-
     __asm
     {
         popad
         mov al, ucDesignatedLightState
         retn
     }
-
     // clang-format on
 }
 
@@ -4636,12 +4570,10 @@ static void __declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7)
@@ -4659,14 +4591,12 @@ static void __declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState()
     else ucDesignatedLightState = 2;            // Red
 
     // clang-format off
-
     __asm
     {
         popad
         mov al, ucDesignatedLightState
         retn
     }
-
     // clang-format on
 }
 
@@ -4675,12 +4605,10 @@ static void __declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (ucTrafficLightState == 2)
@@ -4691,14 +4619,12 @@ static void __declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
     else { ucDesignatedLightState = 2; }
 
     // clang-format off
-
     __asm
     {
         popad
         movzx eax, ucDesignatedLightState
         jmp RETURN_CTrafficLights_DisplayActualLight
     }
-
     // clang-format on
 }
 
@@ -4726,7 +4652,6 @@ static void __declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push eax
@@ -4736,13 +4661,11 @@ static void __declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
         pop eax
         pushad
     }
-
     // clang-format on
 
     CheckVehicleMaxGear();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -4750,7 +4673,6 @@ static void __declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
         mov edx, [eax]
         jmp RETURN_Transmission_CalculateDriveAcceleration
     }
-
     // clang-format on
 }
 
@@ -4894,7 +4816,6 @@ static void __declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fmul    ds : 0x871DDC   // Original constant used in code
@@ -4902,7 +4823,6 @@ static void __declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
         fdiv    kfTimeStepOrg   // Divide by desired timestep, used at 30fps
         jmp     RETURN_CVehicle_ApplyBoatWaterResistance
     }
-
     // clang-format on
 }
 
@@ -4911,7 +4831,6 @@ static void __declspec(naked) HOOK_CPhysical_ApplyGravity()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push esi
@@ -4919,7 +4838,6 @@ static void __declspec(naked) HOOK_CPhysical_ApplyGravity()
         add esp, 4
         jmp RETURN_CPhysical_ApplyGravity
     }
-
     // clang-format on
 }
 
@@ -4997,7 +4915,6 @@ static void __declspec(naked) HOOK_VehicleCamStart()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push edi
@@ -5014,7 +4931,6 @@ fail:
         add esp, 4
         jmp RETURN_VehicleCamStart_failure
     }
-
     // clang-format on
 }
 
@@ -5031,7 +4947,6 @@ static void __declspec(naked) HOOK_VehicleCamTargetZTweak()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fstp st
@@ -5055,7 +4970,6 @@ static void __declspec(naked) HOOK_VehicleCamTargetZTweak()
         cmp eax, 1
         jmp RETURN_VehicleCamTargetZTweak
     }
-
     // clang-format on
 }
 
@@ -5074,7 +4988,6 @@ static void __declspec(naked) HOOK_VehicleCamLookDir1()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov eax, 0x59C910       // CVector::Normalise
@@ -5087,7 +5000,6 @@ static void __declspec(naked) HOOK_VehicleCamLookDir1()
 
         jmp RETURN_VehicleCamLookDir1
     }
-
     // clang-format on
 }
 
@@ -5113,7 +5025,6 @@ static void __declspec(naked) HOOK_VehicleCamLookDir2()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push esi
@@ -5125,7 +5036,6 @@ static void __declspec(naked) HOOK_VehicleCamLookDir2()
         push 4
         jmp RETURN_VehicleCamLookDir2
     }
-
     // clang-format on
 }
 
@@ -5145,7 +5055,6 @@ static void __declspec(naked) HOOK_VehicleCamHistory()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push [esp+0x0+0x7C]       // zoom
@@ -5160,7 +5069,6 @@ static void __declspec(naked) HOOK_VehicleCamHistory()
         mov eax, [esp+0x24]
         jmp RETURN_VehicleCamHistory
     }
-
     // clang-format on
 }
 
@@ -5184,7 +5092,6 @@ static void __declspec(naked) HOOK_VehicleCamUp()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov edx, ecx
@@ -5205,7 +5112,6 @@ docustom:
         add esp, 4
         ret
     }
-
     // clang-format on
 }
 
@@ -5228,7 +5134,6 @@ static void __declspec(naked) HOOK_VehicleCamEnd()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov ds:[0xB6F020], edx
@@ -5239,7 +5144,6 @@ static void __declspec(naked) HOOK_VehicleCamEnd()
 
         jmp RETURN_VehicleCamEnd
     }
-
     // clang-format on
 }
 
@@ -5257,7 +5161,6 @@ static void __declspec(naked) HOOK_VehicleLookBehind()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push [esp+0x14]
@@ -5280,7 +5183,6 @@ static void __declspec(naked) HOOK_VehicleLookBehind()
         mov eax, ebx            // pEntity
         jmp RETURN_VehicleLookBehind
     }
-
     // clang-format on
 }
 
@@ -5298,7 +5200,6 @@ static void __declspec(naked) HOOK_VehicleLookAside()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push [esp+0x14]
@@ -5313,7 +5214,6 @@ static void __declspec(naked) HOOK_VehicleLookAside()
         mov ecx, [esi+0x21C]
         jmp RETURN_VehicleLookAside
     }
-
     // clang-format on
 }
 
@@ -5342,7 +5242,6 @@ static void __declspec(naked) HOOK_OccupiedVehicleBurnCheck()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push eax
@@ -5350,7 +5249,6 @@ static void __declspec(naked) HOOK_OccupiedVehicleBurnCheck()
         add esp, 4
         jmp RETURN_OccupiedVehicleBurnCheck
     }
-
     // clang-format on
 }
 
@@ -5359,7 +5257,6 @@ static void __declspec(naked) HOOK_UnoccupiedVehicleBurnCheck()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov word ptr [esp+0x78], cx
@@ -5369,7 +5266,6 @@ static void __declspec(naked) HOOK_UnoccupiedVehicleBurnCheck()
         add esp, 4
         jmp RETURN_UnoccupiedVehicleBurnCheck
     }
-
     // clang-format on
 }
 
@@ -5396,7 +5292,6 @@ static void __declspec(naked) HOOK_ApplyCarBlowHop()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push esi
@@ -5410,7 +5305,6 @@ static void __declspec(naked) HOOK_ApplyCarBlowHop()
         mov [esi+0x36], dl
         jmp RETURN_ApplyCarBlowHop
     }
-
     // clang-format on
 }
 
@@ -5438,7 +5332,6 @@ static void __declspec(naked) HOOK_CGame_Process()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -5451,7 +5344,6 @@ static void __declspec(naked) HOOK_CGame_Process()
         popad
         jmp     RETURN_CGame_Process;
     }
-
     // clang-format on
 }
 
@@ -5497,7 +5389,6 @@ static void __declspec(naked) HOOK_Idle()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -5508,7 +5399,6 @@ static void __declspec(naked) HOOK_Idle()
         mov     ecx, 0B6BC90h
         jmp     RETURN_Idle
     }
-
     // clang-format on
 }
 
@@ -5518,7 +5408,6 @@ static void __declspec(naked) HOOK_PreFxRender()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -5526,20 +5415,17 @@ static void __declspec(naked) HOOK_PreFxRender()
         cmp     eax,0
         jne skip
     }
-
     // clang-format on
 
     if (m_pPreFxRenderHandler) m_pPreFxRenderHandler();
 
     // clang-format off
-
     __asm
     {
 skip:
         popad
         jmp     RETURN_PreFxRender  // 00404D1E
     }
-
     // clang-format on
 }
 
@@ -5549,25 +5435,21 @@ static void __declspec(naked) HOOK_PostColorFilterRender()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (m_pPostColorFilterRenderHandler) m_pPostColorFilterRenderHandler();
 
     // clang-format off
-
     __asm
     {
         popad
         mov al, ds:0C402BAh
         jmp     RETURN_PostColorFilterRender  // 0070509E
     }
-
     // clang-format on
 }
 
@@ -5577,25 +5459,21 @@ static void __declspec(naked) HOOK_PreHUDRender()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (m_pPreHudRenderHandler) m_pPreHudRenderHandler();
 
     // clang-format off
-
     __asm
     {
         popad
         mov     eax, ds:0B6F0B8h
         jmp     RETURN_PreHUDRender  // 0053EADD
     }
-
     // clang-format on
 }
 
@@ -5664,7 +5542,6 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     pLightsVehicleInterface, ecx
@@ -5672,7 +5549,6 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights()
         sub     esp,3Ch
         jmp     RETURN_CVehicle_DoVehicleLights
     }
-
     // clang-format on
 }
 
@@ -5699,14 +5575,12 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightBeam_1()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     pHeadLightBeamVehicleInterface, ecx
         sub     esp, 94h
         jmp     RETURN_CVehicle_DoHeadLightBeam_1
     }
-
     // clang-format on
 }
 
@@ -5729,7 +5603,6 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     eax, [esp]
@@ -5738,20 +5611,17 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2()
         mov     uiHeadLightNumVerts, eax
         pushad
     }
-
     // clang-format on
 
     CVehicle_DoHeadLightBeam();
 
     // clang-format off
-
     __asm
     {
         popad
         mov     dword ptr ds:[0C4B950h],5
         jmp     RETURN_CVehicle_DoHeadLightBeam_2
     }
-
     // clang-format on
 }
 
@@ -5761,18 +5631,15 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 160.0f, 160.0f, 140.0f);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -5789,7 +5656,6 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1()
         add     esp,54h
         jmp     RETURN_CVehicle_DoHeadLightEffect_1
     }
-
     // clang-format on
 }
 
@@ -5798,18 +5664,15 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 160.0f, 160.0f, 140.0f);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -5826,7 +5689,6 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2()
         add     esp, 54h
         jmp     RETURN_CVehicle_DoHeadLightEffect_2
     }
-
     // clang-format on
 }
 
@@ -5836,18 +5698,15 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 45.0f, 45.0f, 45.0f);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -5862,7 +5721,6 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
         add     esp, 4Ch
         jmp     RETURN_CVehicle_DoHeadLightReflectionTwin
     }
-
     // clang-format on
 }
 
@@ -5871,18 +5729,15 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 45.0f, 45.0f, 45.0f);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -5897,7 +5752,6 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
         add     esp, 30h
         jmp     RETURN_CVehicle_DoHeadLightReflectionSingle
     }
-
     // clang-format on
 }
 
@@ -6092,7 +5946,6 @@ static void __declspec(naked) HOOK_RenderScene_Plants()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -6111,7 +5964,6 @@ static void __declspec(naked) HOOK_RenderScene_Plants()
         popad
         ret
     }
-
     // clang-format on
 }
 
@@ -6120,7 +5972,6 @@ static void __declspec(naked) HOOK_RenderScene_end()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -6143,7 +5994,6 @@ static void __declspec(naked) HOOK_RenderScene_end()
         mov eax, 0x7113B0
         jmp eax
     }
-
     // clang-format on
 }
 
@@ -6228,7 +6078,6 @@ static void __declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     pBikeDamageInterface, ecx
@@ -6238,19 +6087,16 @@ static void __declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse()
 
         pushad
     }
-
     // clang-format on
     CEventHandler_ComputeKnockOffBikeResponse();
 
     // clang-format off
-
     __asm
     {
         popad
         call    dw_CEventDamage_AffectsPed
         jmp     RETURN_CEventHandler_ComputeKnockOffBikeResponse
     }
-
     // clang-format on
 }
 
@@ -6300,7 +6146,6 @@ static void __declspec(naked) HOOK_CPed_GetWeaponSkill()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     weaponSkillPed, ecx
@@ -6308,7 +6153,6 @@ static void __declspec(naked) HOOK_CPed_GetWeaponSkill()
         mov     weaponSkillWeapon, eax
         pushad
     }
-
     // clang-format on
 
     if (CPed_GetWeaponSkill())
@@ -6351,7 +6195,6 @@ static void __declspec(naked) HOOK_CPed_AddGogglesModel()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push esi
@@ -6367,7 +6210,6 @@ static void __declspec(naked) HOOK_CPed_AddGogglesModel()
     skip:
         jmp RETURN_CPed_AddGogglesModel
     }
-
     // clang-format on
 }
 
@@ -6457,14 +6299,12 @@ static void __declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     pCollisionPhysicalThis, esi
         mov     pCollisionPhysical, edi
         pushad
     }
-
     // clang-format on
 
     // Carry on with collision? (sets the CElement->bUsesCollision flag check)
@@ -6580,7 +6420,6 @@ static void __declspec(naked) HOOK_CheckAnimMatrix()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Replaced code
@@ -6597,7 +6436,6 @@ static void __declspec(naked) HOOK_CheckAnimMatrix()
         push    eax
         jmp     RETURN_CheckAnimMatrix      // 7C5A61
     }
-
     // clang-format on
 }
 
@@ -6618,7 +6456,6 @@ static void __declspec(naked) HOOK_VehCol()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Get vehColors for this vehicle
@@ -6639,7 +6476,6 @@ static void __declspec(naked) HOOK_VehCol()
 
         jmp     RETURN_VehCol  // 006D660C
     }
-
     // clang-format on
 }
 
@@ -6648,7 +6484,6 @@ static void __declspec(naked) HOOK_VehColCB()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Hooked from 004C838D  29 bytes
@@ -6665,7 +6500,6 @@ static void __declspec(naked) HOOK_VehColCB()
 
         jmp     RETURN_VehColCB  // 004C83AA
     }
-
     // clang-format on
 }
 
@@ -6688,14 +6522,12 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwSwingingDoorAutomobile, esi
         mov     ecx, [esi+eax*4+0x648]
         pushad
     }
-
     // clang-format on
 
     if (AllowSwingingDoors())
@@ -6763,13 +6595,11 @@ static void __declspec(naked) HOOK_ProcessVehicleCollision()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     pSuspensionInterface, esi
         pushad
     }
-
     // clang-format on
 
     if (CheckHasSuspensionChanged())
@@ -6879,13 +6709,11 @@ static void __declspec(naked) HOOK_LoadIPLInstance()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pEntityWorldAdd, ecx
     }
-
     // clang-format on
     if (pEntityWorldAdd)
     {
@@ -6946,13 +6774,11 @@ static void __declspec(naked) HOOK_CWorld_LOD_SETUP()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pLODInterface, esi
     }
-
     // clang-format on
     HideEntitySomehow();
     // clang-format off
@@ -6980,13 +6806,11 @@ static void __declspec(naked) Hook_AddBuildingInstancesToWorld()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pBuildingAdd, edx
     }
-
     // clang-format on
     StorePointerToBuilding();
     // clang-format off
@@ -7020,14 +6844,12 @@ static void __declspec(naked) Hook_CWorld_ADD_CPopulation_ConvertToRealObject()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pBuildingAdd, esi
         mov pLODInterface, esi
     }
-
     // clang-format on
     StorePointerToBuilding();
     // clang-format off
@@ -7067,14 +6889,12 @@ static void __declspec(naked) HOOK_ConvertToObject_CPopulationManageDummy()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pBuildingAdd, edx
         mov pLODInterface, edx
     }
-
     // clang-format on
     // clang-format off
     __asm
@@ -7128,7 +6948,6 @@ static void __declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObjec
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -7140,7 +6959,6 @@ static void __declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObjec
 
         jmp     dwCWorldRemove
     }
-
     // clang-format on
 }
 
@@ -7173,7 +6991,6 @@ static void __declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -7191,7 +7008,6 @@ static void __declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
         call    CALL_CWorld_Add_CPopulation_ConvertToDummyObject
         jmp     JMP_RETN_Called_CPopulation_ConvertToDummyObject
     }
-
     // clang-format on
 }
 
@@ -7201,13 +7017,11 @@ static void __declspec(naked) Hook_CBuilding_DTR()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pBuildingRemove, ecx
     }
-
     // clang-format on
     RemovePointerToBuilding();
     // clang-format off
@@ -7224,13 +7038,11 @@ static void __declspec(naked) Hook_CDummy_DTR()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pBuildingRemove, ecx
     }
-
     // clang-format on
     RemovePointerToBuilding();
     // clang-format off
@@ -7248,13 +7060,11 @@ static void __declspec(naked) Hook_CObject_DTR()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
         mov pBuildingRemove, esi
     }
-
     // clang-format on
     RemovePointerToBuilding();
     // clang-format off
@@ -7274,7 +7084,6 @@ static void __declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    0xB6FA74
@@ -7283,20 +7092,17 @@ static void __declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale()
         mov     eax, [esi]
         mov     dwEntityVtbl, eax
     }
-
     // clang-format on
 
     if (dwEntityVtbl == 0x866F60) goto IsOnScreen_IsObject;
 
     // clang-format off
-
     __asm
     {
         popad
         mov     esi, ecx
         jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
     }
-
     // clang-format on
 
 IsOnScreen_IsObject:
@@ -7322,7 +7128,6 @@ static void __declspec(naked) HOOK_CClothes_RebuildPlayer()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    esi
@@ -7338,7 +7143,6 @@ static void __declspec(naked) HOOK_CClothes_RebuildPlayer()
     cont:
         jmp     RETURN_CClothes_RebuildPlayerb  // 005A837F
     }
-
     // clang-format on
 }
 
@@ -7484,7 +7288,6 @@ static void __declspec(naked) HOOK_CObject_ProcessDamage()
     // .text:005A0E0D                 fst     dword ptr [esi+154h]
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -7492,7 +7295,6 @@ static void __declspec(naked) HOOK_CObject_ProcessDamage()
         mov     pObjectAttacker, edi
         fst     dword ptr fNewObjectHealth
     }
-
     // clang-format on
     if (TriggerObjectDamageEvent())
     {
@@ -7536,12 +7338,10 @@ static void __declspec(naked) HOOK_CObject_ProcessBreak()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
     ucColDamageEffect = *(unsigned char*)((DWORD)pDamagedObject + 324);
 
@@ -7564,14 +7364,12 @@ static void __declspec(naked) HOOK_CObject_ProcessBreak()
     }
 
     // clang-format off
-
     __asm
     {
         popad
         cmp     eax, 0C9h
         jmp     RETURN_CObject_ProcessBreak
     }
-
     // clang-format on
 }
 
@@ -7610,7 +7408,6 @@ static void __declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push eax
@@ -7618,7 +7415,6 @@ static void __declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
         mov WindowRespondsToCollision_CalledFrom, eax
         pop eax
     }
-
     // clang-format on
 
     pObjectAttacker = nullptr;
@@ -7713,7 +7509,6 @@ static void __declspec(naked) HOOK_CGlass__BreakGlassPhysically()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     pDamagedObject, esi
@@ -7722,7 +7517,6 @@ static void __declspec(naked) HOOK_CGlass__BreakGlassPhysically()
         mov     pObjectAttacker, ecx
         pop     ecx
     }
-
     // clang-format on
 
     if (TriggerObjectBreakEvent())
@@ -7767,19 +7561,16 @@ static void __declspec(naked) HOOK_FxManager_c__DestroyFxSystem()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov pFxSystemToBeDestroyed, edi
         pushad
     }
-
     // clang-format on
 
     FxManager_c__DestroyFxSystem();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -7791,7 +7582,6 @@ static void __declspec(naked) HOOK_FxManager_c__DestroyFxSystem()
         pop ecx
         retn 4
     }
-
     // clang-format on
 }
 
@@ -8012,7 +7802,6 @@ static void __declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex()
     // al has the random number picked (music id the game wants to play)
 
     // clang-format off
-
     __asm
     {
         add esp, 8              // fix the stack from the function call above as we overrote this instruction
@@ -8020,7 +7809,6 @@ static void __declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex()
         mov dwStationID, esi    // save esi, we need the station ID above
         mov bTrackID, al        // save our track ID which we need to figure out if we can play it.
     }
-
     // clang-format on
 
     // returns true if this is a restricted song
@@ -8058,7 +7846,6 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // push our argument
@@ -8069,7 +7856,6 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli()
         // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli
     }
-
     // clang-format on
 }
 
@@ -8079,7 +7865,6 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // push our argument
@@ -8090,7 +7875,6 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
         // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
     }
-
     // clang-format on
 }
 
@@ -8100,7 +7884,6 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fsub    st, st(1)
@@ -8129,7 +7912,6 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
 
         jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
     }
-
     // clang-format on
 }
 
@@ -8167,14 +7949,12 @@ static void __declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
        call CWorld_ProcessPedsAfterPreRender
        call PostCWorld_ProcessPedsAfterPreRender
        jmp RETURN_Idle_CWorld_ProcessPedsAfterPreRender
     }
-
     // clang-format on
 }
 
@@ -8197,7 +7977,6 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackA
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    [esi+3]
@@ -8210,7 +7989,6 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackA
         add     esp, 36
         retn
     }
-
     // clang-format on
 }
 
@@ -8220,7 +7998,6 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackA
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    0
@@ -8233,7 +8010,6 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackA
         add     esp, 36
         retn
     }
-
     // clang-format on
 }
 
@@ -8264,7 +8040,6 @@ static void __declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         lea eax, [esp + 0x1C]
@@ -8276,7 +8051,6 @@ static void __declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
 
         jmp RETURN_CAutomobile__dmgDrawCarCollidingParticles
     }
-
     // clang-format on
 }
 
@@ -8293,7 +8067,6 @@ static void __declspec(naked) HOOK_CWeapon__TakePhotograph()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Restore instructions replaced by hook
@@ -8305,7 +8078,6 @@ static void __declspec(naked) HOOK_CWeapon__TakePhotograph()
         // Go back
         jmp     RETURN_CWeapon__TakePhotograph
     }
-
     // clang-format on
 }
 
@@ -8341,7 +8113,6 @@ static void __declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Restore instructions replaced by hook
@@ -8366,6 +8137,5 @@ static void __declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
     out1: jmp   RETURN_CCollision__CheckCameraCollisionObjects
     out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
     }
-
     // clang-format on
 }

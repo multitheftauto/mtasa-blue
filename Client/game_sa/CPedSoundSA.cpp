@@ -87,7 +87,6 @@ short CPedSoundSA::GetVoiceTypeIDFromName(const char* szVoiceTypeName)
     short sVoiceTypeID;
 
     // clang-format off
-
     __asm
     {
         push    szVoiceTypeName
@@ -95,7 +94,6 @@ short CPedSoundSA::GetVoiceTypeIDFromName(const char* szVoiceTypeName)
         add     esp, 4
         mov     sVoiceTypeID, ax
     }
-
     // clang-format on
     return sVoiceTypeID;
 }
@@ -106,7 +104,6 @@ short CPedSoundSA::GetVoiceIDFromName(short sVoiceTypeID, const char* szVoiceNam
     short sVoiceID;
 
     // clang-format off
-
     __asm
     {
         movzx eax, sVoiceTypeID
@@ -116,7 +113,6 @@ short CPedSoundSA::GetVoiceIDFromName(short sVoiceTypeID, const char* szVoiceNam
         add     esp, 8
         mov     sVoiceID, ax
     }
-
     // clang-format on
     return sVoiceID;
 }

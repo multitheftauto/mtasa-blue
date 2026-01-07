@@ -79,12 +79,10 @@ static void __declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (bDisableCallsToCAnimBlendNode)
@@ -99,7 +97,6 @@ static void __declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
     }
 
     // clang-format off
-
     __asm
     {
         popad
@@ -107,7 +104,6 @@ static void __declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
         fld     [esp+4]
         jmp     RETURN_CAnimBlendAssociation_SetCurrentTime_NORMALFLOW
     }
-
     // clang-format on
 }
 
@@ -117,12 +113,10 @@ static void __declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (bDisableCallsToCAnimBlendNode)
@@ -137,7 +131,6 @@ static void __declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
     }
 
     // clang-format off
-
     __asm
     {
         popad
@@ -145,7 +138,6 @@ static void __declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
         mov     eax, ds:[0B5F878h]
         jmp     RETURN_RpAnimBlendClumpUpdateAnimations_NORMALFLOW
     }
-
     // clang-format on
 }
 
@@ -174,7 +166,6 @@ static void __declspec(naked) HOOK_CAnimManager_AddAnimation()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         lea     edx, [esp + 8]  // animationGroupID address
@@ -185,7 +176,6 @@ static void __declspec(naked) HOOK_CAnimManager_AddAnimation()
         add     esp, 8
         pushad
     }
-
     // clang-format on
 
     if (m_pAddAnimationHandler)
@@ -211,7 +201,6 @@ static void __declspec(naked) HOOK_CAnimManager_AddAnimation()
     }
 
     // clang-format off
-
     __asm
     {
         popad
@@ -219,7 +208,6 @@ static void __declspec(naked) HOOK_CAnimManager_AddAnimation()
         mov     edx, dword ptr ds : [0B4EA34h]
         jmp     RETURN_CAnimManager_AddAnimation_NORMAL_FLOW
     }
-
     // clang-format on
 }
 
@@ -229,7 +217,6 @@ static void __declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
      // clang-format off
-
      __asm
      {
          lea     edx, [esp + 12] // animationGroup address
@@ -240,7 +227,6 @@ static void __declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
          add     esp, 8
          pushad
      }
-
      // clang-format on
 
     if (m_pAddAnimationAndSyncHandler)
@@ -265,7 +251,6 @@ static void __declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
     }
 
      // clang-format off
-
      __asm
      {
 
@@ -274,7 +259,6 @@ static void __declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
              mov     edx, dword ptr ds : [0B4EA34h]
              jmp     RETURN_CAnimManager_AddAnimationAndSync_NORMAL_FLOW
      }
-
      // clang-format on
 }
 
@@ -284,12 +268,10 @@ static void __declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if (m_pBlendAnimationHierarchyHandler)
@@ -341,7 +323,6 @@ static void __declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
     }
 
     // clang-format off
-
     __asm
     {
         NORMAL_FLOW_BlendAnimation_Hierarchy:
@@ -363,7 +344,6 @@ static void __declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
         call    FUNC_UncompressAnimation
         jmp    RETURN_CAnimManager_BlendAnimation_Hierarchy
     }
-
     // clang-format on
 }
 

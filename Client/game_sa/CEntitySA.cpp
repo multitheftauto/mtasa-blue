@@ -522,7 +522,6 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     DWORD dwThis = (DWORD)m_pInterface->m_pRwObject;
 
     // clang-format off
-
     __asm
     {
         push    szAnimName
@@ -531,7 +530,6 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
         add     esp, 8
         mov     dwReturn, eax
     }
-
     // clang-format on
     if (dwReturn) return true;
     else return false;

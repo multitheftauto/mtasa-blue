@@ -137,7 +137,6 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                     return;
 
                 // clang-format off
-
                 __asm
                 {
                     mov     ecx, dwThis
@@ -145,7 +144,6 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                     push    carNodeIndex
                     call    dwFunction
                 }
-
                 // clang-format on
             }
             else

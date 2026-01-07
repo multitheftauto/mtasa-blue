@@ -284,7 +284,6 @@ static void __declspec(naked) HOOK_CTask_Operator_Delete()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -299,6 +298,5 @@ static void __declspec(naked) HOOK_CTask_Operator_Delete()
         add     eax, 6
         jmp     eax
     }
-
     // clang-format on
 }

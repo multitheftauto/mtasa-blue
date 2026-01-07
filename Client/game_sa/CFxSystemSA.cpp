@@ -173,7 +173,6 @@ static void __declspec(naked) HOOK_FxSystem_c_Update_MidA()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -197,7 +196,6 @@ inner:
         push    ebp
         jmp     RETURN_FxSystem_c_Update_MidA
     }
-
     // clang-format on
 }
 
@@ -247,7 +245,6 @@ static void __declspec(naked) HOOK_FxSystem_c_Update_MidB()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -266,7 +263,6 @@ static void __declspec(naked) HOOK_FxSystem_c_Update_MidB()
 
         jmp     RETURN_FxSystem_c_Update_MidB
     }
-
     // clang-format on
 }
 

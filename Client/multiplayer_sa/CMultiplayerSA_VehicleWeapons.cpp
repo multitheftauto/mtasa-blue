@@ -60,7 +60,6 @@ static void __declspec(naked) HOOK_CWaterCannon__Render()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -76,7 +75,6 @@ static void __declspec(naked) HOOK_CWaterCannon__Render()
         push    3E4CCCCDh
         jmp     CONTINUE_CWaterCannon__Render
     }
-
     // clang-format on
 }
 

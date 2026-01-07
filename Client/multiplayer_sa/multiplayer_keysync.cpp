@@ -535,7 +535,6 @@ static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
     SwitchContext((CPedSAInterface*)dwCurrentPlayerPed);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -543,19 +542,16 @@ static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -564,7 +560,6 @@ static void __declspec(naked) CPlayerPed__ProcessControl_Abort()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // restore stuff
@@ -578,19 +573,16 @@ static void __declspec(naked) CPlayerPed__ProcessControl_Abort()
         mov     edi, PlayerPed__ProcessControl_Saved.edi
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -601,19 +593,16 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -621,19 +610,16 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -644,19 +630,16 @@ static void __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -664,19 +647,16 @@ static void __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -687,19 +667,16 @@ static void __declspec(naked) HOOK_CTrailer__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -707,19 +684,16 @@ static void __declspec(naked) HOOK_CTrailer__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -730,19 +704,16 @@ static void __declspec(naked) HOOK_CQuadBike__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -750,19 +721,16 @@ static void __declspec(naked) HOOK_CQuadBike__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -773,19 +741,16 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -793,19 +758,16 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -816,19 +778,16 @@ static void __declspec(naked) HOOK_CBmx__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -836,19 +795,16 @@ static void __declspec(naked) HOOK_CBmx__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -859,19 +815,16 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -879,19 +832,16 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -902,19 +852,16 @@ static void __declspec(naked) HOOK_CBoat__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -922,19 +869,16 @@ static void __declspec(naked) HOOK_CBoat__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -945,19 +889,16 @@ static void __declspec(naked) HOOK_CBike__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -965,19 +906,16 @@ static void __declspec(naked) HOOK_CBike__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -988,19 +926,16 @@ static void __declspec(naked) HOOK_CHeli__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
-
     // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     // clang-format off
-
     __asm
     {
         popad
@@ -1008,18 +943,15 @@ static void __declspec(naked) HOOK_CHeli__ProcessControl()
         call    edx
         pushad
     }
-
     // clang-format on
 
     ReturnContextToLocalPlayer();
 
     // clang-format off
-
     __asm
     {
         popad
         retn
     }
-
     // clang-format on
 }

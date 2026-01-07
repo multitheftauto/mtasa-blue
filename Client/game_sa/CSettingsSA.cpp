@@ -377,7 +377,6 @@ static void __declspec(naked) HOOK_GetFxQuality()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -393,7 +392,6 @@ static void __declspec(naked) HOOK_GetFxQuality()
         mov     eax, dwFxQualityValue
         retn
     }
-
     // clang-format on
 }
 
@@ -403,7 +401,6 @@ static void __declspec(naked) HOOK_StoreShadowForVehicle()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Hooked from 0x70BDA0  5 bytes
@@ -416,7 +413,6 @@ static void __declspec(naked) HOOK_StoreShadowForVehicle()
         call    eax
         jmp     RETURN_StoreShadowForVehicle
     }
-
     // clang-format on
 }
 
@@ -990,7 +986,6 @@ static void __declspec(naked) HOOK_SelectDevice()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -1011,7 +1006,6 @@ static void __declspec(naked) HOOK_SelectDevice()
         single:
         jmp     RETURN_SelectDeviceSingle
     }
-
     // clang-format on
 }
 

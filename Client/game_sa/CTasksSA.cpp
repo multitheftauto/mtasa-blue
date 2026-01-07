@@ -287,7 +287,6 @@ static void __declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -304,7 +303,6 @@ static void __declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
         call    CTaskSimpleBeHit_constructor
         jmp     RETURN_CEventHandler_ComputeDamageResponse_Mid
     }
-
     // clang-format on
 }
 

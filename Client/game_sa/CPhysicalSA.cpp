@@ -118,14 +118,12 @@ void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
     DWORD dwReturn = 0;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
     }
-
     // clang-format on
     MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
 
@@ -213,13 +211,11 @@ void CPhysicalSA::ProcessCollision()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -229,13 +225,11 @@ void CPhysicalSA::AddToMovingList()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -306,7 +300,6 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
         return;
 
     // clang-format off
-
     __asm
     {
         push    bUnk
@@ -316,7 +309,6 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
         mov     ecx, dwThis
         call    dwFunc
     }
-
     // clang-format on
 }
 

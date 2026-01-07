@@ -246,7 +246,6 @@ static void __declspec(naked) HOOK_CFire_Extinguish()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     [eax+730h], edi
@@ -266,7 +265,6 @@ static void __declspec(naked) HOOK_CFire_Extinguish()
         pop     ebx
         jmp     CONTINUE_CFire_Extinguish
     }
-
     // clang-format on
 }
 

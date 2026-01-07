@@ -343,7 +343,6 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD dwReturn = 0;
 
         // clang-format off
-
         __asm
         {
             push    eax
@@ -366,7 +365,6 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     ebx
             pop     eax
         }
-
         // clang-format on
     return (char*)dwReturn;
 }
@@ -853,9 +851,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     float fReturn = 0;
-    // clang-format off
-    __asm
-    {
+    __asm {
         mov     eax, ModelID
 
         push    ecx
@@ -871,7 +867,6 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
         fstp    fReturn
 skip:
     }
-    // clang-format on
     return fReturn;
 }
 
@@ -2206,7 +2201,6 @@ static void __declspec(naked) HOOK_NodeNameStreamRead()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -2219,7 +2213,6 @@ static void __declspec(naked) HOOK_NodeNameStreamRead()
 
         jmp     RETURN_NodeNameStreamRead
     }
-
     // clang-format on
 }
 

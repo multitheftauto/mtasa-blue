@@ -62,7 +62,6 @@ void CAudioEngineSA::StopRadio()
     DWORD dwFunc = 0x4E9823;            // Some function CAudio::StopRadio jumps to immediately
 
     // clang-format off
-
     __asm
     {
         // This doesn't work anymore because we've
@@ -93,7 +92,6 @@ void CAudioEngineSA::StopRadio()
 
         retpoint:
     }
-
     // clang-format on
 }
 
@@ -458,7 +456,6 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -473,7 +470,6 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
         xor     ecx, ecx
         jmp     RETURN_CAEAmbienceTrackManager_CheckForPause
     }
-
     // clang-format on
 }
 
@@ -552,7 +548,6 @@ static void __declspec(naked) HOOK_CAESoundManager_RequestNewSound()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -573,7 +568,6 @@ static void __declspec(naked) HOOK_CAESoundManager_RequestNewSound()
         xor     esi, esi
         jmp     RETURN_CAESoundManager_RequestNewSound
     }
-
     // clang-format on
 }
 

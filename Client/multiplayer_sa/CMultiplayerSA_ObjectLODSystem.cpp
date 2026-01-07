@@ -92,7 +92,6 @@ static void __declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
 ////////////////////
@@ -126,7 +125,6 @@ second:
         mov     esi,dword ptr [esp+1Ch]
         jmp     RETURN_CRenderer_SetupEntityVisibility   // 0x554238
     }
-
     // clang-format on
 }
 
@@ -158,7 +156,6 @@ static void __declspec(naked) HOOK_CWorldScan_ScanWorld()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         call    second
@@ -175,7 +172,6 @@ second:
 
         jmp     RETURN_CWorldScan_ScanWorldb   // 72CAE0
     }
-
     // clang-format on
 }
 
@@ -205,7 +201,6 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -236,7 +231,6 @@ second:
         mov     ecx, [esp+8]
         jmp     RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha
     }
-
     // clang-format on
 }
 

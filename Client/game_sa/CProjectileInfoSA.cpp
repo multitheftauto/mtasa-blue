@@ -116,7 +116,6 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
     }
 
     // clang-format off
-
     __asm
     {
         push    eax
@@ -136,7 +135,6 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
 
         pop     eax
     }
-
     // clang-format on
     pGame->GetWorld()->IgnoreEntity(nullptr);
     return dwReturn != 0;

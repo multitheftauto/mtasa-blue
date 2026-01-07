@@ -24,7 +24,6 @@ static void __declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fld ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
@@ -36,7 +35,6 @@ static void __declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
         fstp st(0)
         jmp RETURN_CTaskSimpleUseGun__SetMoveAnim
     }
-
     // clang-format on
 }
 
@@ -49,7 +47,6 @@ static void __declspec(naked) HOOK_CCamera__Process()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fld ds:[0x858C80]           // 5.0f
@@ -59,7 +56,6 @@ static void __declspec(naked) HOOK_CCamera__Process()
         fstp ds:[0xB6EC30]
         jmp RETURN_CCamera__Process
     }
-
     // clang-format on
 }
 
@@ -72,7 +68,6 @@ static void __declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov ax, [esi+0x22]
@@ -93,7 +88,6 @@ static void __declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
         fadd [esi+0x84C]
         jmp RETURN_CHeli__ProcessFlyingCarStuff
     }
-
     // clang-format on
 }
 
@@ -106,7 +100,6 @@ static void __declspec(naked) HOOK_CClouds__MovingFog_Update()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
@@ -120,7 +113,6 @@ static void __declspec(naked) HOOK_CClouds__MovingFog_Update()
         fdiv kOriginalTimeStep      // 1.666f
         jmp RETURN_CClouds__MovingFog_Update
     }
-
     // clang-format on
 }
 
@@ -133,7 +125,6 @@ static void __declspec(naked) HOOK_CFallingGlassPane__Update_A()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fld [esp+0x28]
@@ -150,7 +141,6 @@ static void __declspec(naked) HOOK_CFallingGlassPane__Update_A()
         fadd [esi]
         jmp RETURN_CFallingGlassPane__Update_A
     }
-
     // clang-format on
 }
 
@@ -163,7 +153,6 @@ static void __declspec(naked) HOOK_CFallingGlassPane__Update_B()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fld [eax]
@@ -182,7 +171,6 @@ static void __declspec(naked) HOOK_CFallingGlassPane__Update_B()
         mov [esp+0x2C], ecx
         jmp RETURN_CFallingGlassPane__Update_B
     }
-
     // clang-format on
 }
 
@@ -195,7 +183,6 @@ static void __declspec(naked) HOOK_CFallingGlassPane__Update_C()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fld [eax]
@@ -214,7 +201,6 @@ static void __declspec(naked) HOOK_CFallingGlassPane__Update_C()
         mov [esp+0x38], edx
         jmp RETURN_CFallingGlassPane__Update_C
     }
-
     // clang-format on
 }
 
@@ -226,7 +212,6 @@ static void __declspec(naked) HOOK_CTimer__Update()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         add esp, 0x4
@@ -248,7 +233,6 @@ static void __declspec(naked) HOOK_CTimer__Update()
         add esp, 0xC
         ret
     }
-
     // clang-format on
 }
 
@@ -261,7 +245,6 @@ static void __declspec(naked) HOOK_BreakObject_c__Update()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx edx, bWouldBeNewFrame
@@ -276,7 +259,6 @@ static void __declspec(naked) HOOK_BreakObject_c__Update()
     skip:
         jmp RETURN_BreakObject_c__Update
     }
-
     // clang-format on
 }
 
@@ -291,7 +273,6 @@ static void __declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -305,7 +286,6 @@ static void __declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
     skip:
         jmp RETURN_CWaterCannon__Update_OncePerFrame_SKIP
     }
-
     // clang-format on
 }
 
@@ -319,7 +299,6 @@ static void __declspec(naked) HOOK_CPlayerInfo__Process()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx edx, bWouldBeNewFrame
@@ -332,7 +311,6 @@ static void __declspec(naked) HOOK_CPlayerInfo__Process()
     skip:
         jmp RETURN_CPlayerInfo__Process_SKIP
     }
-
     // clang-format on
 }
 
@@ -346,7 +324,6 @@ static void __declspec(naked) HOOK_CProjectileInfo__Update()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx edx, bWouldBeNewFrame
@@ -360,7 +337,6 @@ static void __declspec(naked) HOOK_CProjectileInfo__Update()
     skip:
         jmp RETURN_CProjectileInfo__Update_SKIP
     }
-
     // clang-format on
 }
 
@@ -373,7 +349,6 @@ static void __declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx edx, bWouldBeNewFrame
@@ -388,7 +363,6 @@ static void __declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
         xor eax, eax
         retn 0x10
     }
-
     // clang-format on
 }
 
@@ -402,7 +376,6 @@ static void __declspec(naked) HOOK_CPlane__PreRender()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -415,7 +388,6 @@ static void __declspec(naked) HOOK_CPlane__PreRender()
     skip:
         jmp RETURN_CPlane__PreRender_SKIP
     }
-
     // clang-format on
 }
 
@@ -429,7 +401,6 @@ static void __declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix(
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx edx, bWouldBeNewFrame
@@ -442,7 +413,6 @@ static void __declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix(
     skip:
         jmp RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP
     }
-
     // clang-format on
 }
 
@@ -456,7 +426,6 @@ static void __declspec(naked) HOOK_CWaterCannon__Render_FxFix()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx edx, bWouldBeNewFrame
@@ -467,7 +436,6 @@ static void __declspec(naked) HOOK_CWaterCannon__Render_FxFix()
     skip:
         jmp RETURN_CWaterCannon__Render_FxFix_SKIP
     }
-
     // clang-format on
 }
 
@@ -481,7 +449,6 @@ static void __declspec(naked) HOOK_CPed__PreRenderAfterTest()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -494,7 +461,6 @@ static void __declspec(naked) HOOK_CPed__PreRenderAfterTest()
     skip:
         jmp RETURN_CPed__PreRenderAfterTest_SKIP
     }
-
     // clang-format on
 }
 
@@ -507,7 +473,6 @@ static void __declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -520,7 +485,6 @@ static void __declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
     skip:
         retn 0x2C
     }
-
     // clang-format on
 }
 
@@ -533,7 +497,6 @@ static void __declspec(naked) HOOK_CWeather__AddRain()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -548,7 +511,6 @@ static void __declspec(naked) HOOK_CWeather__AddRain()
         add esp, 0x84
         ret
     }
-
     // clang-format on
 }
 
@@ -562,7 +524,6 @@ static void __declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -575,7 +536,6 @@ static void __declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
     skip:
         jmp RETURN_CPlane__ProcessFlyingCarStuff_SKIP
     }
-
     // clang-format on
 }
 
@@ -589,7 +549,6 @@ static void __declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -602,7 +561,6 @@ static void __declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
     skip:
         jmp RETURN_CAutomobile__UpdateWheelMatrix_SKIP
     }
-
     // clang-format on
 }
 
@@ -615,7 +573,6 @@ static void __declspec(naked) HOOK_CVehicle__DoBoatSplashes()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -628,7 +585,6 @@ static void __declspec(naked) HOOK_CVehicle__DoBoatSplashes()
     skip:
         retn 4
     }
-
     // clang-format on
 }
 
@@ -641,7 +597,6 @@ static void __declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -654,7 +609,6 @@ static void __declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
     skip:
         ret
     }
-
     // clang-format on
 }
 
@@ -668,7 +622,6 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx edx, bWouldBeNewFrame
@@ -682,7 +635,6 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl()
     skip:
         jmp RETURN_CPlane__ProcessControl_SKIP
     }
-
     // clang-format on
 }
 
@@ -695,7 +647,6 @@ static void __declspec(naked) HOOK_CVehicle__AddExhaustParticles()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx edx, bWouldBeNewFrame
@@ -708,7 +659,6 @@ static void __declspec(naked) HOOK_CVehicle__AddExhaustParticles()
     skip:
         ret
     }
-
     // clang-format on
 }
 
@@ -722,7 +672,6 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -736,7 +685,6 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
     skip:
         jmp RETURN_CTaskSimpleSwim__ProcessEffects_SKIP
     }
-
     // clang-format on
 }
 
@@ -750,7 +698,6 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         movzx eax, bWouldBeNewFrame
@@ -764,7 +711,6 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
     skip:
         jmp RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP
     }
-
     // clang-format on
 }
 
@@ -777,7 +723,6 @@ static void __declspec(naked) HOOK_CWeapon_Update()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Temp fix for camera
@@ -811,7 +756,6 @@ static void __declspec(naked) HOOK_CWeapon_Update()
         mov eax, ds:[0xB7CB84]
         jmp RETURN_CWeapon_Update
     }
-
     // clang-format on
 }
 
@@ -823,7 +767,6 @@ static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         fld ds:[0x862CD0]            // 0.99000001f
@@ -844,7 +787,6 @@ static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
         fstp [esi+0x58]
         jmp RETURN_CPhysical__ApplyAirResistance
     }
-
     // clang-format on
 }
 

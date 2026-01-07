@@ -42,7 +42,6 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, m_bVehicleSunGlare
@@ -57,7 +56,6 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
         push    6ABD04h
         retn
     }
-
     // clang-format on
 }
 
@@ -103,7 +101,6 @@ static void __declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     esi, ecx
@@ -120,7 +117,6 @@ static void __declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
         skip:
         jmp     RETURN_CHeli_ProcessFlyingCarStuff
     }
-
     // clang-format on
 }
 
@@ -131,7 +127,6 @@ static void __declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    esi
@@ -149,7 +144,6 @@ static void __declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
         skip:
         jmp     RETURN_CPlane_ProcessFlyingCarStuff
     }
-
     // clang-format on
 }
 
@@ -809,14 +803,12 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
     DWORD dwFunc = FUNC_CVehicle_RemoveVehicleUpgrade;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         push    dwModelID
         call    dwFunc
     }
-
     // clang-format on
 
     // GTA SA only does this when CVehicle::ClearVehicleUpgradeFlags returns false.
@@ -850,7 +842,6 @@ DWORD CVehicleSA::GetBaseVehicleType()
     DWORD dwReturn = 0;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
@@ -858,7 +849,6 @@ DWORD CVehicleSA::GetBaseVehicleType()
         mov     dwReturn, eax
 
     }
-
     // clang-format on
 
     return dwReturn;
@@ -901,14 +891,12 @@ bool CVehicleSA::IsUpsideDown()
     bool  bReturn = false;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     bReturn, al
     }
-
     // clang-format on
 
     return bReturn;
@@ -921,14 +909,12 @@ void CVehicleSA::SetEngineOn(bool bEngineOn)
     DWORD dwFunc = FUNC_CVehicle_SetEngineOn;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         push    dwEngineOn
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -982,13 +968,11 @@ void CVehicleSA::PlaceBikeOnRoadProperly()
     DWORD dwBike = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwBike
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -998,13 +982,11 @@ void CVehicleSA::PlaceAutomobileOnRoadProperly()
     DWORD dwAutomobile = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwAutomobile
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -1292,14 +1274,12 @@ void CVehicleSA::PickupEntityWithWinch(CEntity* pEntity)
         DWORD dwEntityInterface = (DWORD)pEntitySA->GetInterface();
 
         // clang-format off
-
         __asm
         {
             push    dwEntityInterface
             mov     ecx, dwThis
             call    dwFunc
         }
-
         // clang-format on
     }
 }
@@ -1310,13 +1290,11 @@ void CVehicleSA::ReleasePickedUpEntityWithWinch()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -1326,14 +1304,12 @@ void CVehicleSA::SetRopeHeightForHeli(float fRopeHeight)
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         push    fRopeHeight
         mov     ecx, dwThis
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -1555,14 +1531,12 @@ void CVehicleSA::SetTaxiLightOn(bool bLightOn)
     DWORD dwFunc = FUNC_CAutomobile_SetTaxiLight;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         push    dwState
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -2529,7 +2503,6 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     bool bReturn = false;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
@@ -2537,7 +2510,6 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
         call    dwFunc
         mov     bReturn, al
     }
-
     // clang-format on
     return bReturn;
 }

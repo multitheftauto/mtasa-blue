@@ -530,18 +530,13 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
-    // clang-format off
-
-    __asm
-    {
+    __asm {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
         call    dwFunction
         add     esp, 0x4
         mov     dwReturn, eax
     }
-
-    // clang-format on
 
     CPedSAInterface* pInterface = (CPedSAInterface*)dwReturn;
     return pInterface;

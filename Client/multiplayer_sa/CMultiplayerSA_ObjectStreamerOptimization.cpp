@@ -20,7 +20,6 @@ static void __declspec(naked) HOOK_CEntryInfoNodePool__New()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         inc CEntryInfoNodePool_UsedSpaces
@@ -29,7 +28,6 @@ static void __declspec(naked) HOOK_CEntryInfoNodePool__New()
         pop esi
         ret
     }
-
     // clang-format on
 }
 
@@ -41,7 +39,6 @@ static void __declspec(naked) HOOK_CEntryInfoNode__operator_delete()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         dec CEntryInfoNodePool_UsedSpaces
@@ -50,7 +47,6 @@ static void __declspec(naked) HOOK_CEntryInfoNode__operator_delete()
         or byte ptr [eax], 0x80
         jmp RETURN_CEntryInfoNode__operator_delete
     }
-
     // clang-format on
 }
 
@@ -62,7 +58,6 @@ static void __declspec(naked) HOOK_CEntryInfoList__Flush()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         dec CEntryInfoNodePool_UsedSpaces
@@ -71,7 +66,6 @@ static void __declspec(naked) HOOK_CEntryInfoList__Flush()
         mov [eax], bl
         jmp RETURN_CEntryInfoList__Flush
     }
-
     // clang-format on
 }
 
@@ -82,7 +76,6 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLinkPool__New()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         inc CPtrNodeDoubleLinkPool_UsedSpaces
@@ -91,7 +84,6 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLinkPool__New()
         pop esi
         ret
     }
-
     // clang-format on
 }
 
@@ -103,7 +95,6 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLink__operator_delete()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         dec CPtrNodeDoubleLinkPool_UsedSpaces
@@ -112,7 +103,6 @@ static void __declspec(naked) HOOK_CPtrNodeDoubleLink__operator_delete()
         or byte ptr [eax], 0x80
         jmp RETURN_CPtrNodeDoubleLink__operator_delete
     }
-
     // clang-format on
 }
 
@@ -124,7 +114,6 @@ static void __declspec(naked) HOOK_CPtrListDoubleLink__Flush()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         dec CPtrNodeDoubleLinkPool_UsedSpaces
@@ -133,7 +122,6 @@ static void __declspec(naked) HOOK_CPtrListDoubleLink__Flush()
         mov [eax], bl
         jmp RETURN_CPtrListDoubleLink__Flush
     }
-
     // clang-format on
 }
 

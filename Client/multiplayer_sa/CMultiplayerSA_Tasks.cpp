@@ -31,7 +31,6 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // return false and keep task alive
@@ -60,7 +59,6 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
         skip:
         jmp SKIP_CTaskSimplePlayerOnFoot__MakeAbortable
     }
-
     // clang-format on
 }
 

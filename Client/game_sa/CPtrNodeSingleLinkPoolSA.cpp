@@ -45,7 +45,6 @@ static void __declspec(naked) HOOK_CPtrListSingleLink_Flush()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     edi, ecx    // save register
@@ -58,7 +57,6 @@ static void __declspec(naked) HOOK_CPtrListSingleLink_Flush()
         mov     ecx, edi    // restore register
         jmp     CONTINUE_CPtrListSingleLink_Flush
     }
-
     // clang-format on
 }
 

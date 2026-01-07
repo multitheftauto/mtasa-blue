@@ -110,7 +110,6 @@ static __declspec(naked) void Hook_Calculate()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     eax, [esp+4]
@@ -126,7 +125,6 @@ static __declspec(naked) void Hook_Calculate()
         mov     eax, 6F5085h
         jmp     eax
     }
-
     // clang-format on
 }
 

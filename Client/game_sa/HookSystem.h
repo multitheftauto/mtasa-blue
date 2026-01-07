@@ -31,14 +31,12 @@
 // 
 // IMPORTANT: We can't use static_assert because __LOCAL_SIZE is not a compile-time constant.
 //            If you're going to change this macro, then copy your changes to the copy in multiplayer_sa.
-// clang-format off
 #define MTA_VERIFY_HOOK_LOCAL_SIZE                     \
 {                                                      \
     __asm {              push   eax                };  \
     __asm { _localSize:  mov    eax, __LOCAL_SIZE  };  \
     __asm {              pop    eax                };  \
 }
-// clang-format on
 
 template <typename T>
 void* FunctionPointerToVoidP(T func)

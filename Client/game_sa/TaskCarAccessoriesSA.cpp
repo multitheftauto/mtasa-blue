@@ -31,7 +31,6 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
         DWORD dwThisInterface = (DWORD)GetInterface();
 
         // clang-format off
-
         __asm
         {
             mov     ecx, dwThisInterface
@@ -39,7 +38,6 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
             push    dwVehiclePtr
             call    dwFunc
         }
-
         // clang-format on
     }
 }

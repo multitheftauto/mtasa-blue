@@ -605,7 +605,6 @@ static void __declspec(naked) HOOK_CPed_PreRenderAfterTest()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Replaced code
@@ -629,7 +628,6 @@ static void __declspec(naked) HOOK_CPed_PreRenderAfterTest()
         // Skip code at start of CPed::PreRenderAfterTest
         jmp     RETURN_CPed_PreRenderAfterTestSkip
     }
-
     // clang-format on
 }
 
@@ -650,7 +648,6 @@ static void __declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Check what to do
@@ -667,7 +664,6 @@ static void __declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
         // Skip code at mid of CPed::PreRenderAfterTest
         jmp     RETURN_CPed_PreRenderAfterTest_MidSkip
     }
-
     // clang-format on
 }
 

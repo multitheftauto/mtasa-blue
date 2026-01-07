@@ -59,7 +59,6 @@ static void __declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -78,7 +77,6 @@ static void __declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
         push    848E10h
         jmp     RETURN_CWeapon_GenerateDamageEvent
     }
-
     // clang-format on
 }
 
@@ -155,7 +153,6 @@ static void __declspec(naked) HOOK_CShotInfo_Update()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -163,7 +160,6 @@ static void __declspec(naked) HOOK_CShotInfo_Update()
         popad
         retn
     }
-
     // clang-format on
 }
 
@@ -202,7 +198,6 @@ static void __declspec(naked) HOOK_Fx_AddBulletImpact()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -216,7 +211,6 @@ static void __declspec(naked) HOOK_Fx_AddBulletImpact()
         mov     eax, ds:0x0B6F03C
         jmp     RETURN_Fx_AddBulletImpact
     }
-
     // clang-format on
 }
 
@@ -235,7 +229,6 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov eax, 5DF4E0h
@@ -249,7 +242,6 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
 
         jmp CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC
     }
-
     // clang-format on
 }
 
@@ -274,7 +266,6 @@ static void _declspec(naked) HOOK_CWaterLevel_TestLineAgainstWater()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // [esp+4]  from.x
@@ -294,7 +285,6 @@ static void _declspec(naked) HOOK_CWaterLevel_TestLineAgainstWater()
         sub     esp, 88h
         jmp CONTINUE_CWaterLevel_TestLineAgainstWater
     }
-
     // clang-format on
 }
 

@@ -68,7 +68,6 @@ static void __declspec(naked) HOOK_CAutomobile_BurstTyre()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -90,7 +89,6 @@ cont:
         mov     ecx, ebx
         jmp     RETURN_CAutomobile_BurstTyre_A
     }
-
     // clang-format on
 }
 
@@ -111,7 +109,6 @@ static void __declspec(naked) HOOK_CBike_BurstTyre()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -134,7 +131,6 @@ cont:
         lea     ecx, [esi+138h]
         jmp     RETURN_CBike_BurstTyre_A
     }
-
     // clang-format on
 }
 
@@ -166,7 +162,6 @@ static void __declspec(naked) HOOK_CVehicle_InflictDamage()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -191,7 +186,6 @@ cont:
         push    0FFFFFFFFh
         jmp     RETURN_CVehicle_InflictDamage
     }
-
     // clang-format on
 }
 
@@ -226,7 +220,6 @@ static void __declspec(naked) HOOK_CAutomobile_VehicleDamage1()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -246,7 +239,6 @@ static void __declspec(naked) HOOK_CAutomobile_VehicleDamage1()
         push    [0x847FD8]
         jmp     RETURN_CAutomobile_VehicleDamage1
     }
-
     // clang-format on
 }
 
@@ -291,7 +283,6 @@ static void __declspec(naked) HOOK_CAutomobile_VehicleDamage2()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -307,7 +298,6 @@ static void __declspec(naked) HOOK_CAutomobile_VehicleDamage2()
         fsubr   dword ptr [esi+4C0h]
         jmp     RETURN_CAutomobile_VehicleDamage2
     }
-
     // clang-format on
 }
 
@@ -328,7 +318,6 @@ static void __declspec(naked) HOOK_CPlane_VehicleDamage1()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -348,7 +337,6 @@ static void __declspec(naked) HOOK_CPlane_VehicleDamage1()
         mov     eax, dword ptr ds:[0x08D33E4]
         jmp     RETURN_CPlane_VehicleDamage1
     }
-
     // clang-format on
 }
 
@@ -369,7 +357,6 @@ static void __declspec(naked) HOOK_CPlane_VehicleDamage2()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -385,7 +372,6 @@ static void __declspec(naked) HOOK_CPlane_VehicleDamage2()
         fsubr   dword ptr [esi+4C0h]
         jmp     RETURN_CPlane_VehicleDamage2
     }
-
     // clang-format on
 }
 
@@ -406,7 +392,6 @@ static void __declspec(naked) HOOK_CBike_VehicleDamage1()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -426,7 +411,6 @@ static void __declspec(naked) HOOK_CBike_VehicleDamage1()
         fld     [esp+8]
         jmp     RETURN_CBike_VehicleDamage1
     }
-
     // clang-format on
 }
 
@@ -447,7 +431,6 @@ static void __declspec(naked) HOOK_CBike_VehicleDamage2()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -463,7 +446,6 @@ static void __declspec(naked) HOOK_CBike_VehicleDamage2()
         fsubr   dword ptr [esi+4C0h]
         jmp     RETURN_CBike_VehicleDamage2
     }
-
     // clang-format on
 }
 

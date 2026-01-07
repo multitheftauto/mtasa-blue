@@ -91,7 +91,6 @@ static void __declspec(naked) HOOK_FallenPeds()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         call    IsUnderWorldWarpEnabled
@@ -105,7 +104,6 @@ static void __declspec(naked) HOOK_FallenPeds()
         mov     ebx, ds:0B74490h
         jmp     CONTINUE_CWorld_FallenPeds
     }
-
     // clang-format on
 }
 
@@ -114,7 +112,6 @@ static void __declspec(naked) HOOK_FallenCars()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         call    IsUnderWorldWarpEnabled
@@ -128,7 +125,6 @@ static void __declspec(naked) HOOK_FallenCars()
         mov     ebx, ds:0B74494h
         jmp     CONTINUE_CWorld_FallenCars
     }
-
     // clang-format on
 }
 
@@ -453,7 +449,6 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, flags.bCheckCarTires);
 
     // clang-format off
-
     __asm
     {
         push    flags.bShootThroughStuff
@@ -473,7 +468,6 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         mov     bReturn, al
         add     esp, 0x30
     }
-
     // clang-format on
 
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, 0);
@@ -631,7 +625,6 @@ bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd
     // bool bIgnoreSomeObjectsForCamera = false
 
     // clang-format off
-
     __asm
     {
         push    flags.bIgnoreSomeObjectsForCamera
@@ -647,7 +640,6 @@ bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd
         mov     bReturn, al
         add     esp, 0x24
     }
-
     // clang-format on
     return bReturn;
 }
@@ -746,7 +738,6 @@ void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, i
     DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition;            // __cdecl
 
     // clang-format off
-
     __asm
     {
         push pOutVecPosition
@@ -755,7 +746,6 @@ void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, i
         call dwFunc
         add  esp, 3*4
     }
-
     // clang-format on
 }
 

@@ -31,7 +31,6 @@ static void __declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    esi
@@ -46,7 +45,6 @@ static void __declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
         add     esp, 20h
         retn
     }
-
     // clang-format on
 }
 

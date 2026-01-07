@@ -43,14 +43,12 @@ CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA(const int iDuration)
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
         push    iDuration
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -65,7 +63,6 @@ CTaskSimpleRunAnimSA::CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const A
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -77,7 +74,6 @@ CTaskSimpleRunAnimSA::CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const A
         push    animGroup
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -93,7 +89,6 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA(const char* pAnimName, cons
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -108,7 +103,6 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA(const char* pAnimName, cons
         push    pAnimName
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -124,7 +118,6 @@ CTaskComplexDieSA::CTaskComplexDieSA(const eWeaponType eMeansOfDeath, const Asso
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -139,7 +132,6 @@ CTaskComplexDieSA::CTaskComplexDieSA(const eWeaponType eMeansOfDeath, const Asso
         push    eMeansOfDeath
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -154,7 +146,6 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, con
     DWORD dwPedInterface = (DWORD)pPed->GetPedInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -163,7 +154,6 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, con
         push    bKiller
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -176,7 +166,6 @@ CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -184,7 +173,6 @@ CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
         push    uiDeathTimeMS
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -198,7 +186,6 @@ CTaskSimpleBeHitSA::CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBod
     DWORD dwPedInterface = (DWORD)pPedAttacker->GetPedInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -208,7 +195,6 @@ CTaskSimpleBeHitSA::CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBod
         push    dwPedInterface
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -225,7 +211,6 @@ CTaskComplexSunbatheSA::CTaskComplexSunbatheSA(CObject* pTowel, const bool bStar
         dwObjectInterface = (DWORD)pTowel->GetObjectInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -233,7 +218,6 @@ CTaskComplexSunbatheSA::CTaskComplexSunbatheSA(CObject* pTowel, const bool bStar
         push    dwObjectInterface;
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -255,13 +239,11 @@ CTaskSimplePlayerOnFootSA::CTaskSimplePlayerOnFootSA()
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -277,13 +259,11 @@ CTaskComplexFacialSA::CTaskComplexFacialSA()
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
         call    dwFunc
     }
-
     // clang-format on
 }
 

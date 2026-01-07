@@ -32,7 +32,6 @@ static void __declspec(naked) HOOK_CCObject_PreRender()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    ecx
@@ -43,7 +42,6 @@ static void __declspec(naked) HOOK_CCObject_PreRender()
         mov     esi, ecx
         jmp     RETURN_CCObject_PreRender
     }
-
     // clang-format on
 }
 
@@ -174,13 +172,11 @@ void CObjectSA::Explode()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
-
     // clang-format on
 }
 
@@ -192,7 +188,6 @@ void CObjectSA::Break()
     float fHitVelocity = 1000.0f;            // has no direct influence, but should be high enough to trigger the break (effect)
 
     // clang-format off
-
     __asm
     {
         push    32h // most cases: between 30 and 37
@@ -203,7 +198,6 @@ void CObjectSA::Break()
         mov     ecx, dwThis
         call    dwFunc
     }
-
     // clang-format on
 
     if (IsGlass())
@@ -214,7 +208,6 @@ void CObjectSA::Break()
         dwFunc = FUNC_CGlass_WindowRespondsToCollision;
 
         // clang-format off
-
         __asm
         {
             push 0
@@ -229,7 +222,6 @@ void CObjectSA::Break()
             call dwFunc
             add esp, 24h
         }
-
         // clang-format on
     }
 }
@@ -282,7 +274,6 @@ bool CObjectSA::IsGlass()
     bool  bResult;
 
     // clang-format off
-
     __asm
     {
         push dwThis
@@ -290,7 +281,6 @@ bool CObjectSA::IsGlass()
         mov bResult, al
         add esp, 4
     }
-
     // clang-format on
     return bResult;
 }

@@ -78,7 +78,6 @@ bool CTaskSimpleUseGunSA::SetPedPosition(CPed* pPed)
     BYTE currentWeaponSlot = dwPedInterface->bCurrentWeaponSlot;
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThisInterface
@@ -86,7 +85,6 @@ bool CTaskSimpleUseGunSA::SetPedPosition(CPed* pPed)
         call    dwFunc
         mov     bReturn, al
     }
-
     // clang-format on
     return bReturn;
 }

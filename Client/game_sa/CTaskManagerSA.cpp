@@ -88,14 +88,12 @@ CTask* CTaskManagerSA::GetSimplestActiveTask()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
     }
-
     // clang-format on
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);

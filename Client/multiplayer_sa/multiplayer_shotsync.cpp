@@ -477,7 +477,6 @@ static void __declspec(naked) HOOK_IKChainManager_PointArm()
     }
 
     // clang-format off
-
     __asm
     {
         // Restore all the registers from the stack
@@ -492,7 +491,6 @@ static void __declspec(naked) HOOK_IKChainManager_PointArm()
         add     edx, 7
         jmp     edx
     }
-
     // clang-format on
 }
 
@@ -549,7 +547,6 @@ static void __declspec(naked) HOOK_IKChainManager_LookAt()
     }
 
     // clang-format off
-
     __asm
     {
         // Restore all the registers from the stack
@@ -564,7 +561,6 @@ static void __declspec(naked) HOOK_IKChainManager_LookAt()
         add     edx, 7
         jmp     edx
     }
-
     // clang-format on
 }
 
@@ -573,7 +569,6 @@ static void __declspec(naked) HOOK_CWeapon__Fire()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push    ebx
@@ -590,7 +585,6 @@ static void __declspec(naked) HOOK_CWeapon__Fire()
 
         pushad
     }
-
     // clang-format on
 
     // Weapon inaccuracy and animations problems may be fixed by blanking out the CWeapon variables nTimer and beyond.
@@ -610,7 +604,6 @@ static void __declspec(naked) HOOK_CWeapon__Fire()
     }
 
      // clang-format off
-
      __asm
     {
         popad
@@ -620,18 +613,15 @@ static void __declspec(naked) HOOK_CWeapon__Fire()
         push    esi
         push    edi
     }
-
      // clang-format on
 
     // clang-format off
-
     __asm
     {
         mov     esi, HOOKPOS_CWeapon__Fire
         add     esi, 6
         jmp     esi
     }
-
     // clang-format on
 }
 
@@ -640,18 +630,15 @@ static void __declspec(naked) HOOK_CWeapon__PostFire()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     Event_PostFire();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -662,7 +649,6 @@ static void __declspec(naked) HOOK_CWeapon__PostFire()
         add     esp, 3Ch
         ret     18h
     }
-
     // clang-format on
 }
 
@@ -671,18 +657,15 @@ static void __declspec(naked) HOOK_CWeapon__PostFire2()            // handles th
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     Event_PostFire();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -690,7 +673,6 @@ static void __declspec(naked) HOOK_CWeapon__PostFire2()            // handles th
         add     esp, 3Ch
         ret     18h
     }
-
     // clang-format on
 }
 
@@ -700,7 +682,6 @@ static void __declspec(naked) HOOK_CWeapon_DoBulletImpact()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     eax, [esp+4]
@@ -713,13 +694,11 @@ static void __declspec(naked) HOOK_CWeapon_DoBulletImpact()
         mov     pBulletImpactEndPosition, eax
         pushad
     }
-
     // clang-format on
 
     Event_BulletImpact();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -727,7 +706,6 @@ static void __declspec(naked) HOOK_CWeapon_DoBulletImpact()
         push    0x00848E50
         jmp     CWeapon_DoBulletImpact_RET
     }
-
     // clang-format on
 }
 
@@ -769,7 +747,6 @@ static void __declspec(naked) HOOK_CPedIK__PointGunInDirection()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     pPedIKInterface, ecx
@@ -780,7 +757,6 @@ static void __declspec(naked) HOOK_CPedIK__PointGunInDirection()
         mov     fDirectionY, edx
         pushad
     }
-
     // clang-format on
 
     // either store or change the data
@@ -817,13 +793,11 @@ static void __declspec(naked) HOOK_CWeapon__Fire_Sniper()
     */
 
     // clang-format off
-
     __asm
     {
         mov     pPedInterfaceTemp, edi
         pushad
     }
-
     // clang-format on
 
     if (IsLocalPlayer(pPedInterfaceTemp))
@@ -895,7 +869,6 @@ static void __declspec(naked) HOOK_CEventDamage__AffectsPed()
     */
 
     // clang-format off
-
     __asm
     {
         push    esi
@@ -908,7 +881,6 @@ static void __declspec(naked) HOOK_CEventDamage__AffectsPed()
 
         pushad
     }
-
     // clang-format on
 
     if (ProcessDamageEvent(event, affectsPed))
@@ -934,14 +906,12 @@ static void __declspec(naked) HOOK_CEventDamage__AffectsPed()
         // they want the player to escape unscathed
 
         // clang-format off
-
         __asm
         {
             popad
             xor     eax, eax
             retn    4 // return from the function
         }
-
         // clang-format on
     }
 }
@@ -956,7 +926,6 @@ static void __declspec(naked) HOOK_CFireManager__StartFire()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         push esi
@@ -985,7 +954,6 @@ static void __declspec(naked) HOOK_CFireManager__StartFire()
         abortCreatingFire:
         jmp SKIP_CFireManager_StartFire
     }
-
     // clang-format on
 }
 
@@ -1090,7 +1058,6 @@ static void __declspec(naked) HOOK_CProjectileInfo__AddProjectile()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     edx, [esp+4]
@@ -1113,7 +1080,6 @@ static void __declspec(naked) HOOK_CProjectileInfo__AddProjectile()
 
         pushad
     }
-
     // clang-format on
     if (ProcessProjectileAdd())
     {            // projectile should be created
@@ -1145,20 +1111,17 @@ static void __declspec(naked) HOOK_CProjectile__CProjectile()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     dwProjectileInfoIndex, ebx // it happens to be in here, luckily
         mov     pProjectile, ecx
         pushad
     }
-
     // clang-format on
 
     ProcessProjectile();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -1166,7 +1129,6 @@ static void __declspec(naked) HOOK_CProjectile__CProjectile()
         mov     edx, RETURN_CProjectile__CProjectile
         jmp     edx
     }
-
     // clang-format on
 }
 
@@ -1187,7 +1149,6 @@ static void CheckInVehicleDamage()
                 DWORD       dwFunc = FUNC_CWeapon_CheckForShootingVehicleOccupant;
 
                 // clang-format off
-
                 __asm
                 {
                     push    pInstantHitStart
@@ -1198,7 +1159,6 @@ static void CheckInVehicleDamage()
                     call    dwFunc
                     add     esp, 0x14
                 }
-
                 // clang-format on
             }
         }
@@ -1255,7 +1215,6 @@ static void __declspec(naked) HOOK_CWeapon_FireInstantHit_Mid()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -1287,7 +1246,6 @@ static void __declspec(naked) HOOK_CWeapon_FireInstantHit_Mid()
         push        eax
         jmp     RETURN_CWeapon_FireInstantHit_Mid
     }
-
     // clang-format on
 }
 
@@ -1342,7 +1300,6 @@ static void __declspec(naked) HOOK_CWeapon_FireSniper_Mid()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Do original code
@@ -1378,7 +1335,6 @@ static void __declspec(naked) HOOK_CWeapon_FireSniper_Mid()
         // Continue
         jmp     RETURN_CWeapon_FireSniper_Mid
     }
-
     // clang-format on
 }
 
@@ -1489,26 +1445,22 @@ static void __declspec(naked) HOOK_CWeapon_FireInstantHit()
     HandleRemoteInstantHit();
 
     // clang-format off
-
     __asm
     {
         popad
         call        dwFunc_CWorld_ProcessLineOfSight
         pushad
     }
-
     // clang-format on
 
     CheckInVehicleDamage();
 
     // clang-format off
-
     __asm
     {
         popad
         jmp         dwFunc_CWeapon_FireInstantHit_ret
     }
-
     // clang-format on
 }
 
@@ -1737,7 +1689,6 @@ static void __declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
     }
 
     // clang-format off
-
     __asm
     {
         popad
@@ -1747,7 +1698,6 @@ static void __declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
         pop     ebx
         retn    0x18
     }
-
     // clang-format on
 }
 
@@ -1767,12 +1717,10 @@ static void __declspec(naked) HOOK_CWeapon__FireShotgun()
     */
 
     // clang-format off
-
     __asm
     {
         pushad
     }
-
     // clang-format on
 
     if(IsNotInLocalContext() && GetContextSwitchPedID())
@@ -1828,7 +1776,6 @@ static void __declspec(naked) HOOK_CWeapon__FireShotgun()
     }
 
     // clang-format off
-
     __asm
     {
         popad
@@ -1837,7 +1784,6 @@ static void __declspec(naked) HOOK_CWeapon__FireShotgun()
         add     edx, 20
         jmp     edx
     }
-
     // clang-format on
 }
 #endif
@@ -1864,7 +1810,6 @@ static void __declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         // Save the ped
@@ -1884,14 +1829,12 @@ static void __declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
 
         pushad
     }
-
     // clang-format on
 
     // Notify Deathmatch about the death
     CEventVehicleExplosion_NotifyDeathmatch();
 
     // clang-format off
-
     __asm
     {
         popad
@@ -1899,6 +1842,5 @@ static void __declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
 return_from:
         retn 4
     }
-
     // clang-format on
 }

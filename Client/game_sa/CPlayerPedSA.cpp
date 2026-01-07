@@ -454,7 +454,6 @@ static void __declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         pushad
@@ -470,7 +469,6 @@ static void __declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 
         jmp     RETURN_CPlayerPed_ProcessAnimGroups_Mid
     }
-
     // clang-format on
 }
 
@@ -512,7 +510,6 @@ static void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov     eax, 0x05A7FB0      // CClothes::GetPlayerMotionGroupToLoad
@@ -528,7 +525,6 @@ static void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
         mov     eax,[esp-32-4*1]    // Get temp
         jmp     RETURN_CClothes_GetDefaultPlayerMotionGroup
     }
-
     // clang-format on
 }
 

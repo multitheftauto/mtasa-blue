@@ -40,7 +40,6 @@ static void __declspec(naked) HOOK_CTempColModels__Initialise()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov ds:[0x968FE4], edx
@@ -49,7 +48,6 @@ static void __declspec(naked) HOOK_CTempColModels__Initialise()
 
         jmp RETURN_CTempColModels__Initialise
     }
-
     // clang-format on
 }
 
@@ -61,7 +59,6 @@ static void __declspec(naked) HOOK_CFileLoader__LoadWeaponObject()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
-
     __asm
     {
         mov eax, [esp+0x8]
@@ -81,7 +78,6 @@ static void __declspec(naked) HOOK_CFileLoader__LoadWeaponObject()
         push offset colModelGrenade
         jmp RETURN_CFileLoader__LoadWeaponObject
     }
-
     // clang-format on
 }
 
