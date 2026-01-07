@@ -20,12 +20,14 @@
 // compilation, and it must be zero.
 // 
 // NOTE: This was copied from game_sa. Check the comment there for more details.
+// clang-format off
 #define MTA_VERIFY_HOOK_LOCAL_SIZE                     \
 {                                                      \
     __asm {              push   eax                };  \
     __asm { _localSize:  mov    eax, __LOCAL_SIZE  };  \
     __asm {              pop    eax                };  \
 }
+// clang-format on
 
 VOID  HookInstallMethod(DWORD dwInstallAddress, DWORD dwHookFunction);
 VOID  HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction);
