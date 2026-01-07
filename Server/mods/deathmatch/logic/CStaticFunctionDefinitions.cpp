@@ -757,7 +757,6 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer(CElement* pElement)
     return NULL;
 }
 
-
 bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
 {
     assert(pElement);

@@ -874,7 +874,6 @@ bool CStaticFunctionDefinitions::IsElementSyncer(CClientEntity& Entity, bool& bI
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::IsElementCollidableWith(CClientEntity& Entity, CClientEntity& ThisEntity, bool& bCanCollide)
 {
     switch (Entity.GetType())
