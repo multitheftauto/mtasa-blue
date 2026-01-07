@@ -13,6 +13,10 @@
 #include "sha2.hpp"
 #include <random>
 #include <algorithm>
+#include <memory>
+#include <climits>
+#include <cstdint>
+#include <cstdlib>
 #include "SharedUtil.Hash.h"
 #include "SharedUtil.File.h"
 
@@ -749,20 +753,39 @@ namespace SharedUtil
             k[i] = keybuffer[i];
 
         // Copy the input string to a buffer of size multiple of 4
-        int strbuflen = str.length();
-        if (strbuflen == 0)
+        if (str.length() == 0 || str.length() > static_cast<size_t>(INT_MAX - 4))
             return;
+        int strbuflen = static_cast<int>(str.length());
         if ((strbuflen % 4) > 0)
             strbuflen += 4 - (strbuflen % 4);
-        unsigned char* strbuf = new unsigned char[strbuflen];
-        memset(strbuf, 0, strbuflen);
-        memcpy(strbuf, str.c_str(), str.length());
+
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe for working buffer (strbuflen) + output string with capacity headroom (2 * (strbuflen + 4))
+        // to account for std::string's capacity doubling behavior during repeated appends.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 3 - 8;
+        if (static_cast<size_t>(strbuflen) > kMaxProbeSize)
+            return;
+
+        size_t totalProbeSize = static_cast<size_t>(strbuflen) * 3 + 8;
+        void* probe = std::malloc(totalProbeSize);
+        if (!probe)
+            return;
+        std::free(probe);
+
+        std::unique_ptr<unsigned char, decltype(&std::free)> strbuf(
+            static_cast<unsigned char*>(std::malloc(strbuflen)), &std::free);
+        if (!strbuf)
+            return;
+
+        memset(strbuf.get(), 0, strbuflen);
+        memcpy(strbuf.get(), str.c_str(), str.length());
 
         // Encode it!
         v[1] = 0;
         for (int i = 0; i < strbuflen; i += 4)
         {
-            v[0] = *(unsigned int*)&strbuf[i];
+            v[0] = *(unsigned int*)&strbuf.get()[i];
 
             encodeXtea(&v[0], &w[0], &k[0]);
             out->append((char*)&w[0], 4);
@@ -770,8 +793,6 @@ namespace SharedUtil
             v[1] = w[1];
         }
         out->append((char*)&v[1], 4);
-
-        delete[] strbuf;
     }
 
     void TeaDecode(const SString& str, const SString& key, SString* out)
@@ -789,7 +810,9 @@ namespace SharedUtil
         out->clear();
 
         // Count the number of passes that we need
-        int numBlocks = str.length() / 4;
+        if (str.length() > static_cast<size_t>(INT_MAX))
+            return;
+        int numBlocks = static_cast<int>(str.length() / 4);
         int numPasses = numBlocks - 1;
 
         if (numPasses <= 0)
@@ -803,9 +826,26 @@ namespace SharedUtil
         for (int i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
-        // Create a temporary buffer to store the result
-        unsigned char* buffer = new unsigned char[numPasses * 4 + 4];
-        memset(buffer, 0, numPasses * 4 + 4);
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe for working buffer (numPasses * 4 + 4) + output string (numPasses * 4) to cover out->assign() allocation.
+        constexpr size_t kMaxNumPasses = (SIZE_MAX - 4) / 8;
+        if (static_cast<size_t>(numPasses) > kMaxNumPasses)
+            return;
+
+        size_t workingSize = static_cast<size_t>(numPasses) * 4 + 4;
+        size_t outputSize = static_cast<size_t>(numPasses) * 4;
+        void* probe = std::malloc(workingSize + outputSize);
+        if (!probe)
+            return;
+        std::free(probe);
+
+        std::unique_ptr<unsigned char, decltype(&std::free)> buffer(
+            static_cast<unsigned char*>(std::malloc(workingSize)), &std::free);
+        if (!buffer)
+            return;
+
+        memset(buffer.get(), 0, workingSize);
 
         // Decode it!
         const char* p = str.c_str();
@@ -814,11 +854,10 @@ namespace SharedUtil
         {
             v[0] = *(unsigned int*)&p[(numPasses - i - 1) * 4];
             decodeXtea(&v[0], &w[0], &k[0]);
-            *(unsigned int*)&buffer[(numPasses - i - 1) * 4] = w[0];
+            *(unsigned int*)&buffer.get()[(numPasses - i - 1) * 4] = w[0];
             v[1] = w[1];
         }
 
-        out->assign((char*)buffer, numPasses * 4);
-        delete[] buffer;
+        out->assign((char*)buffer.get(), numPasses * 4);
     }
 }            // namespace SharedUtil

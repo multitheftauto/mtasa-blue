@@ -82,6 +82,181 @@ constexpr DWORD Milliseconds(std::chrono::milliseconds duration)
 
 class CClientBase;
 
+// Record crash registers in scenario that a failure to create .dmp is likely
+namespace EmergencyCrashLogging
+{
+    // Result codes for SEH-protected read operations
+    enum class ReadResult : int
+    {
+        Success = 1,
+        NullPointer = 0,
+        AccessFault = -1
+    };
+
+    static void DoAddReportLog(int id, const char* msg)
+    {
+        SharedUtil::AddReportLog(id, msg);
+    }
+
+    static bool TryAddReportLog(int id, const char* msg)
+    {
+        __try
+        {
+            DoAddReportLog(id, msg);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
+    static void SafeEmergencyLog(const char* msg)
+    {
+        // Always output to debugger first (guaranteed crash-safe)
+        OutputDebugStringA(msg);
+        OutputDebugStringA("\n");
+
+        TryAddReportLog(9800, msg);
+    }
+
+    // SEH-isolated reader for exception record
+    #pragma warning(push)
+    #pragma warning(disable: 4702)
+    static ReadResult TryReadExceptionRecord(const _EXCEPTION_POINTERS* pException, 
+                                              char* buf, size_t bufSize)
+    {
+        ReadResult result = ReadResult::AccessFault;
+        __try
+        {
+            if (pException->ExceptionRecord != nullptr)
+            {
+                sprintf_s(buf, bufSize, "Code=0x%08lX Addr=0x%08lX ThreadId=%lu",
+                          static_cast<unsigned long>(pException->ExceptionRecord->ExceptionCode),
+                          static_cast<unsigned long>(reinterpret_cast<uintptr_t>(
+                              pException->ExceptionRecord->ExceptionAddress)),
+                          static_cast<unsigned long>(GetCurrentThreadId()));
+                result = ReadResult::Success;
+            }
+            else
+            {
+                result = ReadResult::NullPointer;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = ReadResult::AccessFault;
+        }
+        return result;
+    }
+
+    // SEH-isolated reader for context record
+    static ReadResult TryReadContextRecord(const _EXCEPTION_POINTERS* pException,
+                                            char* buf1, size_t buf1Size,
+                                            char* buf2, size_t buf2Size)
+    {
+        ReadResult result = ReadResult::AccessFault;
+        __try
+        {
+            if (pException->ContextRecord != nullptr)
+            {
+                const CONTEXT* ctx = pException->ContextRecord;
+
+                sprintf_s(buf1, buf1Size, "EAX=0x%08lX EBX=0x%08lX ECX=0x%08lX EDX=0x%08lX",
+                          ctx->Eax, ctx->Ebx, ctx->Ecx, ctx->Edx);
+
+                sprintf_s(buf2, buf2Size, "ESI=0x%08lX EDI=0x%08lX EBP=0x%08lX ESP=0x%08lX EIP=0x%08lX EFL=0x%08lX",
+                          ctx->Esi, ctx->Edi, ctx->Ebp, ctx->Esp, ctx->Eip, ctx->EFlags);
+
+                result = ReadResult::Success;
+            }
+            else
+            {
+                result = ReadResult::NullPointer;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = ReadResult::AccessFault;
+        }
+        return result;
+    }
+    #pragma warning(pop)
+
+}  // namespace EmergencyCrashLogging
+
+// Call SEH-isolated readers
+static void LogEmergencyExceptionRecord(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    std::array<char, 128> buf{};
+    
+    const auto result = TryReadExceptionRecord(pException, buf.data(), buf.size());
+    
+    switch (result)
+    {
+        case ReadResult::Success:
+            SafeEmergencyLog(buf.data());
+            break;
+        case ReadResult::NullPointer:
+            SafeEmergencyLog("[!] ExceptionRecord is NULL");
+            break;
+        case ReadResult::AccessFault:
+            SafeEmergencyLog("[!] Fault reading ExceptionRecord");
+            break;
+        default:
+            SafeEmergencyLog("[!] Unknown result reading ExceptionRecord");
+            break;
+    }
+}
+
+static void LogEmergencyContextRecord(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    std::array<char, 128> buf1{};
+    std::array<char, 128> buf2{};
+    
+    const auto result = TryReadContextRecord(pException, 
+                                              buf1.data(), buf1.size(),
+                                              buf2.data(), buf2.size());
+    
+    switch (result)
+    {
+        case ReadResult::Success:
+            SafeEmergencyLog(buf1.data());
+            SafeEmergencyLog(buf2.data());
+            break;
+        case ReadResult::NullPointer:
+            SafeEmergencyLog("[!] ContextRecord is NULL");
+            break;
+        case ReadResult::AccessFault:
+            SafeEmergencyLog("[!] Fault reading context");
+            break;
+        default:
+            SafeEmergencyLog("[!] Unknown result reading ContextRecord");
+            break;
+    }
+}
+
+static void LogEmergencyCrashContext(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    SafeEmergencyLog("=== EMERGENCY CRASH CONTEXT ===");
+
+    if (pException == nullptr)
+    {
+        SafeEmergencyLog("[!] pException is NULL");
+        return;
+    }
+
+    LogEmergencyExceptionRecord(pException);
+
+    LogEmergencyContextRecord(pException);
+}
+
 static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue)
 {
     __try
@@ -430,7 +605,7 @@ static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformat
             case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
                 exceptionType = "Watchdog Timeout - Thread Freeze Detected";
                 break;
-            case 0xC0000374:
+            case STATUS_HEAP_CORRUPTION_CODE:
                 exceptionType = "Heap Corruption Detected";
                 break;
             case 0xC0000420:
@@ -459,7 +634,38 @@ static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformat
         if (moduleBaseName == nullptr || moduleBaseName[0] == '\0')
             moduleBaseName = "unknown";
 
-        strReason = SString("\n\nReason: %s at %s+0x%08X", exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset());
+        // If we still have "unknown", try registry-resolved module info as fallback
+        CExceptionInformation_Impl* pImpl = dynamic_cast<CExceptionInformation_Impl*>(pExceptionInformation);
+        const char* resolvedModuleName = nullptr;
+        DWORD resolvedIdaAddress = 0;
+        bool hasResolvedInfo = false;
+
+        if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+        {
+            resolvedModuleName = pImpl->GetResolvedModuleName();
+            resolvedIdaAddress = pImpl->GetResolvedIdaAddress();
+            hasResolvedInfo = true;
+        }
+
+        // Build the reason string with best available module info
+        if (strcmp(moduleBaseName, "unknown") == 0 && hasResolvedInfo && resolvedModuleName != nullptr && resolvedModuleName[0] != '\0')
+        {
+            // Use registry-resolved info when basic module resolution failed
+            strReason = SString("\n\nReason: %s at %s+0x%08X (IDA: 0x%08X)",
+                exceptionType.c_str(), resolvedModuleName, pImpl->GetResolvedRva(), resolvedIdaAddress);
+        }
+        else if (hasResolvedInfo && resolvedModuleName != nullptr && resolvedModuleName[0] != '\0')
+        {
+            // Include IDA address as additional info when we have both sources
+            strReason = SString("\n\nReason: %s at %s+0x%08X (IDA via %s: 0x%08X)",
+                exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset(),
+                resolvedModuleName, resolvedIdaAddress);
+        }
+        else
+        {
+            // Original format when no registry-resolved info available
+            strReason = SString("\n\nReason: %s at %s+0x%08X", exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset());
+        }
 
         if (ms_uiInCrashZone != 0)
             strReason += SString(" (CrashZone=%u)", ms_uiInCrashZone);
@@ -1060,6 +1266,15 @@ void CCrashDumpWriter::SetHandlers()
 {
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Setting up crash handlers\n");
 
+    if (!EnableStackCookieFailureCapture(TRUE))
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - Failed to enable stack cookie failure capture\n");
+    }
+    else
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Stack cookie failure capture enabled\n");
+    }
+
     // Install crash filter as absolute first action to catch early exceptions
     // This improves the catching of crashes during window creation or early init
     if (!SetCrashHandlerFilter(CCrashDumpWriter::HandleExceptionGlobal))
@@ -1266,6 +1481,11 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     // Absolute first action - log that we entered the handler (before anything can fail)
     // This is critical for diagnosing exceptions that may fault during handling
     OutputDebugStringSafe("CCrashDumpWriter::HandleExceptionGlobal - EMERGENCY ENTRY MARKER\n");
+    
+    // Log exception code and registers immediately - ensures crash context is captured
+    // even if subsequent processing fails and no dump is generated (stale artifact scenario)
+    // Uses SafeEmergencyLog internally which is SEH-protected
+    LogEmergencyCrashContext(pException);
     
     SAFE_DEBUG_OUTPUT("========================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - ENTRY\n");
@@ -1879,6 +2099,19 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         appendDetailedLine("Enhanced exception diagnostics unavailable.\n");
     }
 
+    // Registry-resolved module info (independent source of truth with IDA-compatible offsets)
+    // This uses pre-captured module bases from before the crash occurred
+    if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+    {
+        appendDetailedLine("\n");
+        appendDetailedLine("=== Registry-Resolved Module Info (IDA-compatible) ===\n");
+        appendDetailedLine(SString("Resolved Module: %s\n", pImpl->GetResolvedModuleName()));
+        appendDetailedLine(SString("Resolved Module Base: 0x%08X\n", pImpl->GetResolvedModuleBase()));
+        appendDetailedLine(SString("Resolved RVA: 0x%08X\n", pImpl->GetResolvedRva()));
+        appendDetailedLine(SString("Resolved IDA Address: 0x%08X\n", pImpl->GetResolvedIdaAddress()));
+        appendDetailedLine("======================================================\n");
+    }
+
     appendTelemetryNoteIfMissing();
 
     // Try to get stack trace from detailed exception information
@@ -2048,6 +2281,18 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
     SetApplicationSettingInt("diagnostics", "last-crash-code", pExceptionInformation->GetCode());
     SetApplicationSetting("diagnostics", "last-crash-extra", "");
     SetApplicationSetting("diagnostics", "pending-invalid-parameter-warning", "");
+
+    // Store registry-resolved module info as separate diagnostic settings
+    if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+    {
+        SetApplicationSetting("diagnostics", "last-crash-resolved-module", pImpl->GetResolvedModuleName());
+        SetApplicationSetting("diagnostics", "last-crash-resolved-ida-addr", SString("0x%08X", pImpl->GetResolvedIdaAddress()));
+    }
+    else
+    {
+        SetApplicationSetting("diagnostics", "last-crash-resolved-module", "");
+        SetApplicationSetting("diagnostics", "last-crash-resolved-ida-addr", "");
+    }
 
     SString strInfoForDebug = strInfoForSettings;
     strInfoForDebug.Replace("\n", " ");
@@ -2278,15 +2523,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                     PathConform(CalcMTASAPath("")).Split(PATH_SEPERATOR, parts);
                     for (uint i = 0; i < parts.size(); i++)
                     {
-                        if (parts[i].CompareI("Program Files"))
-                            strPathCode += "Pr";
-                        else if (parts[i].CompareI("Program Files (x86)"))
-                            strPathCode += "Px";
-                        else if (parts[i].CompareI("MTA San Andreas"))
-                            strPathCode += "Mt";
-                        else if (parts[i].BeginsWithI("MTA San Andreas"))
-                            strPathCode += "Mb";
-                        else
+                        if (!parts[i].empty())
                             strPathCode += parts[i].Left(1).ToUpper();
                     }
                 }
@@ -2398,6 +2635,14 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Already called, returning\n");
         return false;
+    }
+
+    const DWORD exceptionCode = pExceptionInformation->GetCode();
+
+    if (exceptionCode == 0xC0000409 || exceptionCode == 0xC0000374)
+    {
+        SetApplicationSetting("diagnostics", "debugger-crash-capture", "1");
+        AddReportLog(7210, SString("Core - Fail-fast crash detected (0x%08X), debugger capture flag SET for next launch", exceptionCode));
     }
 
     SString strMessage(
