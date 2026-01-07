@@ -472,6 +472,16 @@ class CFileTextureItem : public CTextureItem
 
     uint         m_uiVolumeDepth;
     ETextureType m_TextureType;
+
+    // @ZeusHay - Data for restoration
+    SString       m_strFilename;
+    CBuffer       m_PixelData;
+    bool          m_bMipMaps;
+    uint          m_uiCreateSizeX;
+    uint          m_uiCreateSizeY;
+    ERenderFormat m_CreateFormat;
+    bool          m_bIsFromFile;
+    bool          m_bIsBlank;
 };
 
 ////////////////////////////////////////////////////////////////
