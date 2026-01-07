@@ -59,7 +59,6 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementHealth", getElementHealth},
         {"getElementModel", getElementModel},
         {"getElementSyncer", getElementSyncer},
-        {"isElementSyncer", ArgumentParser<isElementSyncer>},
         {"getElementsSyncedByPlayer", ArgumentParser<GetElementsSyncedByPlayer>},
         {"getElementCollisionsEnabled", getElementCollisionsEnabled},
         {"getLowLODElement", getLowLODElement},
@@ -1383,11 +1382,6 @@ int CLuaElementDefs::getElementSyncer(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
-}
-
-bool CLuaElementDefs::isElementSyncer(CElement* element, CPlayer* player)
-{
-    return CStaticFunctionDefinitions::IsElementSyncer(element, player);
 }
 
 std::vector<CElement*> CLuaElementDefs::GetElementsSyncedByPlayer(CPlayer* player, std::optional<std::string> elementType)
