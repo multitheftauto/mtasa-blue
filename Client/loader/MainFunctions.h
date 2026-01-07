@@ -18,6 +18,7 @@ void HandleOnQuitCommand();
 void HandleTrouble();
 void HandleResetSettings();
 void HandleNotUsedMainMenu();
+void ConfigureWerDumpPath();
 void PreLaunchWatchDogs();
 void PostRunWatchDogs(int iReturnCode);
 void HandleIfGTAIsAlreadyRunning();

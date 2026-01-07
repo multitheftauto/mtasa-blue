@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-23 01:11+0000\n"
-"PO-Revision-Date: 2025-11-23 01:31\n"
+"POT-Creation-Date: 2025-12-03 04:26+0000\n"
+"PO-Revision-Date: 2025-12-03 04:31\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -169,12 +169,12 @@ msgstr "MTA:SA'yı çalıştırırken sorun mu yaşıyorsunuz?.\n\n"
 "Şu ayarı değiştirmek ister misiniz?"
 
 #: Client/loader/MainFunctions.cpp:460 Client/core/CSettings.cpp:1161
-#: Client/core/CSettings.cpp:1660
+#: Client/core/CSettings.cpp:1672
 msgid "Fullscreen mode:"
 msgstr "Ekran modu:"
 
 #: Client/loader/MainFunctions.cpp:460 Client/core/CSettings.cpp:1171
-#: Client/core/CSettings.cpp:2323
+#: Client/core/CSettings.cpp:2337
 msgid "Borderless window"
 msgstr "Çerçevesiz pencere"
 
@@ -234,8 +234,8 @@ msgstr "MTA:SA yeniden başlatılırken hata oluştu\n\n"
 #: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:271
 #: Client/core/CConnectManager.cpp:329 Client/core/CConnectManager.cpp:415
 #: Client/core/CConnectManager.cpp:422 Client/core/CConnectManager.cpp:432
-#: Client/core/CSettings.cpp:3825 Client/core/CSettings.cpp:5201
-#: Client/core/CSettings.cpp:5229 Client/core/CSettings.cpp:5947
+#: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5215
+#: Client/core/CSettings.cpp:5243 Client/core/CSettings.cpp:5982
 #: Client/core/CCore.cpp:1352 Client/core/CGUI.cpp:94
 #: Client/core/DXHook/CDirect3DHook9.cpp:128
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1601
@@ -243,17 +243,17 @@ msgstr "MTA:SA yeniden başlatılırken hata oluştu\n\n"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1758
 #: Client/game_sa/CGameSA.cpp:263 Client/game_sa/CGameSA.cpp:274
-#: Client/mods/deathmatch/logic/CClientGame.cpp:658
-#: Client/mods/deathmatch/logic/CClientGame.cpp:726
-#: Client/mods/deathmatch/logic/CClientGame.cpp:750
-#: Client/mods/deathmatch/logic/CClientGame.cpp:772
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1429
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:733
+#: Client/mods/deathmatch/logic/CClientGame.cpp:757
+#: Client/mods/deathmatch/logic/CClientGame.cpp:779
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1191
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1271
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1350
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1387
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1436
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1448
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:380
@@ -481,10 +481,10 @@ msgstr "Uyumluluk ayarlarını güncelle"
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/loader/Dialogs.cpp:63 Client/core/CVersionUpdater.cpp:1635
 #: Client/core/CVersionUpdater.cpp:1653 Client/core/CVersionUpdater.cpp:1922
-#: Client/core/CVersionUpdater.cpp:1941 Client/core/CSettings.cpp:2095
-#: Client/core/CSettings.cpp:2119 Client/core/CSettings.cpp:5616
-#: Client/core/CSettings.cpp:5690 Client/core/CSettings.cpp:5720
-#: Client/core/CSettings.cpp:5769 Client/core/CSettings.cpp:5831
+#: Client/core/CVersionUpdater.cpp:1941 Client/core/CSettings.cpp:2109
+#: Client/core/CSettings.cpp:2133 Client/core/CSettings.cpp:5630
+#: Client/core/CSettings.cpp:5704 Client/core/CSettings.cpp:5734
+#: Client/core/CSettings.cpp:5783 Client/core/CSettings.cpp:5845
 #: Client/core/CMainMenu.cpp:1238 Client/core/CQuestionBox.cpp:195
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
@@ -493,10 +493,10 @@ msgstr "Evet"
 
 #: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
 #: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
-#: Client/core/CVersionUpdater.cpp:1940 Client/core/CSettings.cpp:2094
-#: Client/core/CSettings.cpp:2118 Client/core/CSettings.cpp:5615
-#: Client/core/CSettings.cpp:5689 Client/core/CSettings.cpp:5719
-#: Client/core/CSettings.cpp:5768 Client/core/CSettings.cpp:5830
+#: Client/core/CVersionUpdater.cpp:1940 Client/core/CSettings.cpp:2108
+#: Client/core/CSettings.cpp:2132 Client/core/CSettings.cpp:5629
+#: Client/core/CSettings.cpp:5703 Client/core/CSettings.cpp:5733
+#: Client/core/CSettings.cpp:5782 Client/core/CSettings.cpp:5844
 #: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 msgid "No"
@@ -510,7 +510,7 @@ msgstr "Hayır"
 #: Client/core/CVersionUpdater.cpp:2031 Client/core/CVersionUpdater.cpp:2183
 #: Client/core/CVersionUpdater.cpp:2192 Client/core/CVersionUpdater.cpp:2201
 #: Client/core/CVersionUpdater.cpp:2215 Client/core/CSettings.cpp:561
-#: Client/core/CSettings.cpp:5968 Client/core/CMainMenu.cpp:1258
+#: Client/core/CSettings.cpp:6003 Client/core/CMainMenu.cpp:1258
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
 msgstr "TAMAM"
@@ -527,7 +527,7 @@ msgstr "Yardım"
 #. Cancel button
 #: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
 #: Client/core/CVersionUpdater.cpp:1869 Client/core/CVersionUpdater.cpp:1904
-#: Client/core/CSettings.cpp:566 Client/core/CSettings.cpp:5967
+#: Client/core/CSettings.cpp:566 Client/core/CSettings.cpp:6002
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
@@ -701,47 +701,47 @@ msgstr "%s:%u adresine yeniden bağlanılıyor..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
-#: Client/mods/deathmatch/logic/CClientGame.cpp:674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:681
 msgid "CONNECTING"
 msgstr "BAĞLANILIYOR"
 
 #: Client/core/CConnectManager.cpp:271
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1343
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1350
 msgid "Connection timed out"
 msgstr "Bağlantı zaman aşımına uğradı"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1391
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
 msgid "Disconnected: unknown protocol error"
 msgstr "Bağlantı kesildi: Bilinmeyen protokol hatası"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1395
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1402
 msgid "Disconnected: disconnected remotely"
 msgstr "Bağlantı kesildi: bağlantı uzaktan kesildi."
 
 #: Client/core/CConnectManager.cpp:297
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1399
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: connection lost remotely"
 msgstr "Bağlanti kesildi: bağlantı uzaktan kaybedildi"
 
 #: Client/core/CConnectManager.cpp:301
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1403
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1410
 msgid "Disconnected: you are banned from this server"
 msgstr "Bağlantı kesildi: bu sunucudan yasaklandınız"
 
 #: Client/core/CConnectManager.cpp:308
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1411
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1418
 msgid "Disconnected: disconnected from the server"
 msgstr "Bağlantı kesildi: sunucu ile olan bağlantı kesildi"
 
 #: Client/core/CConnectManager.cpp:312
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1415
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1422
 msgid "Disconnected: connection to the server was lost"
 msgstr "Bağlantı kesildi: sunucu ile yapılan bağlantı koptu"
 
 #: Client/core/CConnectManager.cpp:319
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1423
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1430
 msgid "Disconnected: connection was refused"
 msgstr "Bağlantı Koptu: bağlantı reddedildi"
 
@@ -879,7 +879,7 @@ msgstr "İNDİRME TAMAMLANDI"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr "_DialogUpdateResult 'ta bilinmeyen bir problem."
 
-#: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5717
+#: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5731
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "DEĞİŞTİRİLMİŞ GTA:SA DOSYALARI"
 
@@ -1197,7 +1197,7 @@ msgid "Play mode:"
 msgstr "Oyun modu:"
 
 #: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1548
-#: Client/core/CSettings.cpp:2902
+#: Client/core/CSettings.cpp:2916
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 msgid "General"
 msgstr "Genel"
@@ -1218,15 +1218,15 @@ msgstr "Radyo Otomatik Açıcı"
 msgid "Usertrack options"
 msgstr "Kullanıcı radyosu ayarları"
 
-#: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:3987
+#: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:4001
 msgid "Radio"
 msgstr "Radyo"
 
-#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:3989
+#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:4003
 msgid "Random"
 msgstr "Rastgele"
 
-#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:3991
+#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:4005
 msgid "Sequential"
 msgstr "Ardışık Sıralı"
 
@@ -1302,11 +1302,11 @@ msgstr "Pencere modu"
 msgid "DPI aware"
 msgstr "DPI hassaslığı"
 
-#: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2321
+#: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2335
 msgid "Standard"
 msgstr "Standart"
 
-#: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2325
+#: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2339
 msgid "Borderless keep res"
 msgstr "Çerçevesiz tam ekran"
 
@@ -1318,58 +1318,58 @@ msgstr "Mip Haritalaması"
 msgid "V-Sync"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2225
+#: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2239
 msgid "Low"
 msgstr "Düşük"
 
-#: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2227
+#: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2241
 msgid "Medium"
 msgstr "Orta"
 
-#: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1743
-#: Client/core/CSettings.cpp:2229 Client/core/CSettings.cpp:4045
+#: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1755
+#: Client/core/CSettings.cpp:2243 Client/core/CSettings.cpp:4059
 msgid "High"
 msgstr "Yüksek"
 
-#: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2231
+#: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2245
 msgid "Very high"
 msgstr "Çok yüksek"
 
 #: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
-#: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1674
-#: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:1877
-#: Client/core/CSettings.cpp:2235 Client/core/CSettings.cpp:4052
-#: Client/core/CSettings.cpp:4084 Client/core/CSettings.cpp:4130
-#: Client/core/CSettings.cpp:5361
+#: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1686
+#: Client/core/CSettings.cpp:1740 Client/core/CSettings.cpp:1889
+#: Client/core/CSettings.cpp:2249 Client/core/CSettings.cpp:4066
+#: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4144
+#: Client/core/CSettings.cpp:5375
 msgid "Off"
 msgstr "Kapalı"
 
-#: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2237
+#: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2251
 msgid "1x"
 msgstr "1x"
 
-#: Client/core/CSettings.cpp:1312 Client/core/CSettings.cpp:2239
+#: Client/core/CSettings.cpp:1312 Client/core/CSettings.cpp:2253
 msgid "2x"
 msgstr "2x"
 
-#: Client/core/CSettings.cpp:1313 Client/core/CSettings.cpp:2241
+#: Client/core/CSettings.cpp:1313 Client/core/CSettings.cpp:2255
 msgid "3x"
 msgstr "3x"
 
-#: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1676
-#: Client/core/CSettings.cpp:2247 Client/core/CSettings.cpp:4054
+#: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1688
+#: Client/core/CSettings.cpp:2261 Client/core/CSettings.cpp:4068
 msgid "Auto"
 msgstr "Otomatik"
 
-#: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2249
+#: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2263
 msgid "4:3"
 msgstr "4:3"
 
-#: Client/core/CSettings.cpp:1328 Client/core/CSettings.cpp:2251
+#: Client/core/CSettings.cpp:1328 Client/core/CSettings.cpp:2265
 msgid "16:10"
 msgstr "16:10"
 
-#: Client/core/CSettings.cpp:1329 Client/core/CSettings.cpp:2253
+#: Client/core/CSettings.cpp:1329 Client/core/CSettings.cpp:2267
 msgid "16:9"
 msgstr "16:9"
 
@@ -1461,7 +1461,7 @@ msgstr "GPU renderlamayı etkinleştir"
 msgid "Custom blacklist"
 msgstr "Engelli siteler"
 
-#: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1619
+#: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1625
 msgid "Enter a domain e.g. google.com"
 msgstr "Alan adı girin, örneğin: google.com"
 
@@ -1469,355 +1469,359 @@ msgstr "Alan adı girin, örneğin: google.com"
 msgid "Block"
 msgstr "Engelle"
 
-#: Client/core/CSettings.cpp:1600 Client/core/CSettings.cpp:1638
+#: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1646
 msgid "Domain"
 msgstr "Alan Adı"
 
-#: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1640
+#: Client/core/CSettings.cpp:1604 Client/core/CSettings.cpp:1648
 msgid "Remove domain"
 msgstr "Alan adını kaldır"
 
+#: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
+msgid "Remove all"
+msgstr ""
+
 #. Reset vecTemp
-#: Client/core/CSettings.cpp:1608
+#: Client/core/CSettings.cpp:1614
 msgid "Custom whitelist"
 msgstr "İzinli siteler"
 
-#: Client/core/CSettings.cpp:1627 Client/cefweb/CWebsiteRequests.cpp:51
+#: Client/core/CSettings.cpp:1633 Client/cefweb/CWebsiteRequests.cpp:51
 msgid "Allow"
 msgstr "İzin ver"
 
 #. Misc section label
-#: Client/core/CSettings.cpp:1653
+#: Client/core/CSettings.cpp:1665
 msgid "Misc"
 msgstr "Diğer"
 
 #. Fast clothes loading
-#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1667
-#: Client/core/CSettings.cpp:5986
+#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1679
+#: Client/core/CSettings.cpp:6021
 msgid "Fast CJ clothes loading:"
 msgstr "Hızlı CJ giysileri yükleme:"
 
 #. Browser scan speed
-#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1681
-#: Client/core/CSettings.cpp:5988
+#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1693
+#: Client/core/CSettings.cpp:6023
 msgid "Browser speed:"
 msgstr "Tarayıcı hızı:"
 
 #. Single download
-#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1695
-#: Client/core/CSettings.cpp:5990
+#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1707
+#: Client/core/CSettings.cpp:6025
 msgid "Single connection:"
 msgstr "Tek bağlantı:"
 
 #. Packet tag
-#: Client/core/CSettings.cpp:1659 Client/core/CSettings.cpp:1708
-#: Client/core/CSettings.cpp:5992
+#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1720
+#: Client/core/CSettings.cpp:6027
 msgid "Packet tag:"
 msgstr "Paket etiketi:"
 
 #. Progress animation
-#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1721
-#: Client/core/CSettings.cpp:5994
+#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1733
+#: Client/core/CSettings.cpp:6029
 msgid "Progress animation:"
 msgstr "Yükleme animasyonu:"
 
 #. Process priority
-#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1734
-#: Client/core/CSettings.cpp:5984
+#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1746
+#: Client/core/CSettings.cpp:6019
 msgid "Process priority:"
 msgstr "İşlem önceliği:"
 
 #. Debug setting
-#: Client/core/CSettings.cpp:1660 Client/core/CSettings.cpp:1748
-#: Client/core/CSettings.cpp:5996
+#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1760
+#: Client/core/CSettings.cpp:6031
 msgid "Debug setting:"
 msgstr "Geliştirici ayarları:"
 
 #. Streaming memory
-#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1771
-#: Client/core/CSettings.cpp:5998
+#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1783
+#: Client/core/CSettings.cpp:6033
 msgid "Streaming memory:"
 msgstr "Görüntüleme belleği:"
 
 #. Update build type
-#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1891
+#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1903
 msgid "Update build type:"
 msgstr "Güncelleme türü:"
 
 #. UpdateAutoInstall
-#: Client/core/CSettings.cpp:1661 Client/core/CSettings.cpp:1870
+#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1882
 msgid "Install important updates:"
 msgstr "Önemli güncellemeleri kur:"
 
-#: Client/core/CSettings.cpp:1675 Client/core/CSettings.cpp:1703
-#: Client/core/CSettings.cpp:1716 Client/core/CSettings.cpp:4056
-#: Client/core/CSettings.cpp:4072 Client/core/CSettings.cpp:4079
+#: Client/core/CSettings.cpp:1687 Client/core/CSettings.cpp:1715
+#: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:4070
+#: Client/core/CSettings.cpp:4086 Client/core/CSettings.cpp:4093
 msgid "On"
 msgstr "Açık"
 
-#: Client/core/CSettings.cpp:1688 Client/core/CSettings.cpp:4061
+#: Client/core/CSettings.cpp:1700 Client/core/CSettings.cpp:4075
 msgid "Very slow"
 msgstr "Çok yavaş"
 
-#: Client/core/CSettings.cpp:1689 Client/core/CSettings.cpp:1702
-#: Client/core/CSettings.cpp:1715 Client/core/CSettings.cpp:1729
-#: Client/core/CSettings.cpp:1755 Client/core/CSettings.cpp:1767
-#: Client/core/CSettings.cpp:1878 Client/core/CSettings.cpp:1898
-#: Client/core/CSettings.cpp:4063 Client/core/CSettings.cpp:4070
-#: Client/core/CSettings.cpp:4077 Client/core/CSettings.cpp:4086
-#: Client/core/CSettings.cpp:4123
+#: Client/core/CSettings.cpp:1701 Client/core/CSettings.cpp:1714
+#: Client/core/CSettings.cpp:1727 Client/core/CSettings.cpp:1741
+#: Client/core/CSettings.cpp:1767 Client/core/CSettings.cpp:1779
+#: Client/core/CSettings.cpp:1890 Client/core/CSettings.cpp:1910
+#: Client/core/CSettings.cpp:4077 Client/core/CSettings.cpp:4084
+#: Client/core/CSettings.cpp:4091 Client/core/CSettings.cpp:4100
+#: Client/core/CSettings.cpp:4137
 msgid "Default"
 msgstr "Varsayılan"
 
-#: Client/core/CSettings.cpp:1690 Client/core/CSettings.cpp:4065
+#: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
 msgid "Fast"
 msgstr "Hızlı"
 
-#: Client/core/CSettings.cpp:1741 Client/core/CSettings.cpp:4041
+#: Client/core/CSettings.cpp:1753 Client/core/CSettings.cpp:4055
 msgid "Normal"
 msgstr "Normal"
 
-#: Client/core/CSettings.cpp:1742 Client/core/CSettings.cpp:4043
+#: Client/core/CSettings.cpp:1754 Client/core/CSettings.cpp:4057
 msgid "Above normal"
 msgstr "Normal üstü"
 
-#: Client/core/CSettings.cpp:1778
+#: Client/core/CSettings.cpp:1790
 msgid "Min"
 msgstr "Min"
 
-#: Client/core/CSettings.cpp:1803
+#: Client/core/CSettings.cpp:1815
 msgid "Max"
 msgstr "Maks"
 
 #. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1811
+#: Client/core/CSettings.cpp:1823
 msgid "Windows 8 compatibility:"
 msgstr "Windows 8 uyumluluğu:"
 
-#: Client/core/CSettings.cpp:1815
+#: Client/core/CSettings.cpp:1827
 msgid "16-bit color"
 msgstr "16-bit renk"
 
-#: Client/core/CSettings.cpp:1820
+#: Client/core/CSettings.cpp:1832
 msgid "Mouse fix"
 msgstr "Fareyi düzelt"
 
 #. Cache path info
-#: Client/core/CSettings.cpp:1838
+#: Client/core/CSettings.cpp:1850
 msgid "Client resource files:"
 msgstr "İndirilen sunucu dosyaları: "
 
-#: Client/core/CSettings.cpp:1842
+#: Client/core/CSettings.cpp:1854
 msgid "Show in Explorer"
 msgstr "Dosyalarda göster"
 
 #. Process affinity
-#: Client/core/CSettings.cpp:1857
+#: Client/core/CSettings.cpp:1869
 msgid "Set CPU 0 affinity to improve game performance"
 msgstr "Oyunun performansını artırmak için CPU 0 bağlanırlığını ayarla"
 
 #. Auto updater section label
-#: Client/core/CSettings.cpp:1863 Client/core/CSettings.cpp:1866
+#: Client/core/CSettings.cpp:1875 Client/core/CSettings.cpp:1878
 msgid "Auto updater"
 msgstr "Otomatik güncelleyici"
 
 #. Check for updates
-#: Client/core/CSettings.cpp:1904
+#: Client/core/CSettings.cpp:1916
 msgid "Check for update now"
 msgstr "Güncellemeleri kontrol et"
 
-#: Client/core/CSettings.cpp:2088
+#: Client/core/CSettings.cpp:2102
 msgid "Some settings will be changed when you next start MTA"
 msgstr "Bazı ayarlar MTA'yı bir sonraki başlattığınızda değişmiş olacak"
 
-#: Client/core/CSettings.cpp:2089
+#: Client/core/CSettings.cpp:2103
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
 "Şimdi yeniden başlatmak istiyor musun?"
 
-#: Client/core/CSettings.cpp:2092
+#: Client/core/CSettings.cpp:2106
 msgid "RESTART REQUIRED"
 msgstr "YENİDEN BAŞLATMA GEREKİYOR"
 
-#: Client/core/CSettings.cpp:2112
+#: Client/core/CSettings.cpp:2126
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr "Şu anki sunucudan çıktığınızda bazı ayarlar değiştirilecektir"
 
-#: Client/core/CSettings.cpp:2113
+#: Client/core/CSettings.cpp:2127
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
 "Bağlantıyı şimdi kesmek istiyor musun?"
 
-#: Client/core/CSettings.cpp:2116
+#: Client/core/CSettings.cpp:2130
 msgid "DISCONNECT REQUIRED"
 msgstr "BAĞLANTINIZI KESMENİZ GEREKMEKTEDİR"
 
 #. Update the joystick name
-#: Client/core/CSettings.cpp:2558
+#: Client/core/CSettings.cpp:2572
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "Joypad bulunamadı -  Girişleri kontrol edip oyunu tekrar başlatın"
 
-#: Client/core/CSettings.cpp:2814
+#: Client/core/CSettings.cpp:2828
 msgid "Binding axis"
 msgstr "Bağlama ekseni"
 
-#: Client/core/CSettings.cpp:2814
+#: Client/core/CSettings.cpp:2828
 msgid "Move an axis to bind, or escape to clear"
 msgstr "Bind için bir ekseni hareket ettir, yada temizlemek için ESC'ye bas."
 
-#: Client/core/CSettings.cpp:2893
+#: Client/core/CSettings.cpp:2907
 msgid "Language:"
 msgstr "Dil:"
 
-#: Client/core/CSettings.cpp:2893
+#: Client/core/CSettings.cpp:2907
 msgid "Skin:"
 msgstr "Tema:"
 
-#: Client/core/CSettings.cpp:2893
+#: Client/core/CSettings.cpp:2907
 msgid "Presets:"
 msgstr "Kayıtlılar:"
 
-#: Client/core/CSettings.cpp:2942
+#: Client/core/CSettings.cpp:2956
 msgid "Chat"
 msgstr "Sohbet"
 
-#: Client/core/CSettings.cpp:2959
+#: Client/core/CSettings.cpp:2973
 msgid "Load"
 msgstr "Yükle"
 
-#: Client/core/CSettings.cpp:2971
+#: Client/core/CSettings.cpp:2985
 msgid "Colors"
 msgstr "Renkler"
 
-#: Client/core/CSettings.cpp:2972
+#: Client/core/CSettings.cpp:2986
 msgid "Layout"
 msgstr "Düzen"
 
-#: Client/core/CSettings.cpp:2973 Client/core/CSettings.cpp:3219
+#: Client/core/CSettings.cpp:2987 Client/core/CSettings.cpp:3233
 msgid "Options"
 msgstr "Seçenekler"
 
-#: Client/core/CSettings.cpp:2979
+#: Client/core/CSettings.cpp:2993
 msgid "Chat Background"
 msgstr "Sohbet Arka Planı"
 
-#: Client/core/CSettings.cpp:2979
+#: Client/core/CSettings.cpp:2993
 msgid "Chat Text"
 msgstr "Sohbet Yazısı"
 
-#: Client/core/CSettings.cpp:2979
+#: Client/core/CSettings.cpp:2993
 msgid "Input Background"
 msgstr "Giriş Arka planı"
 
-#: Client/core/CSettings.cpp:2979
+#: Client/core/CSettings.cpp:2993
 msgid "Input Text"
 msgstr "Yazı Girişi"
 
-#: Client/core/CSettings.cpp:3002
+#: Client/core/CSettings.cpp:3016
 msgid "Lines:"
 msgstr "Satırlar:"
 
-#: Client/core/CSettings.cpp:3002
+#: Client/core/CSettings.cpp:3016
 msgid "Scale:"
 msgstr "Ölçek:"
 
-#: Client/core/CSettings.cpp:3002
+#: Client/core/CSettings.cpp:3016
 msgid "Width:"
 msgstr "Genişlik:"
 
-#: Client/core/CSettings.cpp:3005
+#: Client/core/CSettings.cpp:3019
 msgid "Size"
 msgstr "Boyut"
 
-#: Client/core/CSettings.cpp:3054
+#: Client/core/CSettings.cpp:3068
 msgid "after"
 msgstr "sonra"
 
-#: Client/core/CSettings.cpp:3054
+#: Client/core/CSettings.cpp:3068
 msgid "for"
 msgstr "için"
 
-#: Client/core/CSettings.cpp:3054
+#: Client/core/CSettings.cpp:3068
 msgid "sec"
 msgstr "saniye"
 
-#: Client/core/CSettings.cpp:3057
+#: Client/core/CSettings.cpp:3071
 msgid "Fading"
 msgstr "Solma"
 
-#: Client/core/CSettings.cpp:3063
+#: Client/core/CSettings.cpp:3077
 msgid "Fade out old lines"
 msgstr "Eski satırları soldurt"
 
-#: Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3117
 msgid "Horizontal:"
 msgstr "Yatay:"
 
-#: Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3117
 msgid "Vertical:"
 msgstr "Dikey:"
 
-#: Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3117
 msgid "Text-Align:"
 msgstr "Yazı-Hizası:"
 
-#: Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3117
 msgid "X-Offset:"
 msgstr "X-Dengesi:"
 
-#: Client/core/CSettings.cpp:3104
+#: Client/core/CSettings.cpp:3118
 msgid "Y-Offset:"
 msgstr "Y-Dengesi:"
 
-#: Client/core/CSettings.cpp:3110
+#: Client/core/CSettings.cpp:3124
 msgid "Position"
 msgstr "Pozisyon"
 
-#: Client/core/CSettings.cpp:3124 Client/core/CSettings.cpp:3152
+#: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
 msgstr "Sol"
 
-#: Client/core/CSettings.cpp:3125 Client/core/CSettings.cpp:3139
+#: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
 msgid "Center"
 msgstr "Merkez"
 
-#: Client/core/CSettings.cpp:3126 Client/core/CSettings.cpp:3153
+#: Client/core/CSettings.cpp:3140 Client/core/CSettings.cpp:3167
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
 msgstr "Sağ"
 
-#: Client/core/CSettings.cpp:3138
+#: Client/core/CSettings.cpp:3152
 msgid "Top"
 msgstr "En Üst"
 
-#: Client/core/CSettings.cpp:3140
+#: Client/core/CSettings.cpp:3154
 msgid "Bottom"
 msgstr "En Alt"
 
-#: Client/core/CSettings.cpp:3188
+#: Client/core/CSettings.cpp:3202
 msgid "Font"
 msgstr "Yazı tipi"
 
-#: Client/core/CSettings.cpp:3225
+#: Client/core/CSettings.cpp:3239
 msgid "Hide background when not typing"
 msgstr "Yazı yazmıyorken arkaplanı gizle"
 
-#: Client/core/CSettings.cpp:3230
+#: Client/core/CSettings.cpp:3244
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "\"Tab\" tuşuyla isim tamamlama"
 
-#: Client/core/CSettings.cpp:3235
+#: Client/core/CSettings.cpp:3249
 msgid "Allow server to flash the window"
 msgstr "Sunucunun pencereyi yanıp söndürmesine izin ver"
 
-#: Client/core/CSettings.cpp:3240
+#: Client/core/CSettings.cpp:3254
 msgid "Allow tray balloon notifications"
 msgstr "Balon bildirimlere izin ver"
 
-#: Client/core/CSettings.cpp:3245
+#: Client/core/CSettings.cpp:3259
 msgid "Chat text black/white outline"
 msgstr "Chat mesajlarına siyah/beyaz çerçeve ekle"
 
@@ -1825,95 +1829,95 @@ msgstr "Chat mesajlarına siyah/beyaz çerçeve ekle"
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:3494 Client/core/CSettings.cpp:3501
+#: Client/core/CSettings.cpp:3508 Client/core/CSettings.cpp:3515
 msgid "Press a key to bind, or escape to clear"
 msgstr "Atamak istediğin tuşa bas veya tuşu temizlemek için ESC'ye bas"
 
-#: Client/core/CSettings.cpp:3495
+#: Client/core/CSettings.cpp:3509
 msgid "Binding a primary key"
 msgstr "Ana tuş ataması"
 
-#: Client/core/CSettings.cpp:3502
+#: Client/core/CSettings.cpp:3516
 msgid "Binding a secondary key"
 msgstr "İkincil tuş ataması"
 
-#: Client/core/CSettings.cpp:3578
+#: Client/core/CSettings.cpp:3592
 msgid "GTA GAME CONTROLS"
 msgstr "GTA OYUN KONTROLLERİ"
 
-#: Client/core/CSettings.cpp:3580
+#: Client/core/CSettings.cpp:3594
 msgid "MULTIPLAYER CONTROLS"
 msgstr "ÇOKLU OYUNCU KONTROLLERİ"
 
-#: Client/core/CSettings.cpp:3825 Client/core/CSettings.cpp:5947
+#: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5982
 msgid "Your nickname contains invalid characters!"
 msgstr "İsminde izin verilmeyen karakterler var!"
 
-#: Client/core/CSettings.cpp:4427 Client/core/CCore.cpp:700
+#: Client/core/CSettings.cpp:4441 Client/core/CCore.cpp:700
 #: Client/core/CMainMenu.cpp:303
 #: Client/mods/deathmatch/logic/CClientGame.cpp:550
 msgid "Main menu"
 msgstr "Ana menü"
 
-#: Client/core/CSettings.cpp:4431 Client/core/CCore.cpp:700
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1100
+#: Client/core/CSettings.cpp:4445 Client/core/CCore.cpp:700
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1107
 #: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
 msgstr "Oyunda"
 
-#: Client/core/CSettings.cpp:4784
+#: Client/core/CSettings.cpp:4798
 msgid "Red:"
 msgstr "Kırmızı:"
 
-#: Client/core/CSettings.cpp:4784
+#: Client/core/CSettings.cpp:4798
 msgid "Green:"
 msgstr "Yeşil:"
 
-#: Client/core/CSettings.cpp:4784
+#: Client/core/CSettings.cpp:4798
 msgid "Blue:"
 msgstr "Mavi:"
 
-#: Client/core/CSettings.cpp:4784
+#: Client/core/CSettings.cpp:4798
 msgid "Transparency:"
 msgstr "Şeffaflık:"
 
-#: Client/core/CSettings.cpp:4787
+#: Client/core/CSettings.cpp:4801
 msgid "Color"
 msgstr "Renk"
 
-#: Client/core/CSettings.cpp:4893
+#: Client/core/CSettings.cpp:4907
 msgid "Preview"
 msgstr "Ön izleme"
 
-#: Client/core/CSettings.cpp:5201
+#: Client/core/CSettings.cpp:5215
 msgid "Please disconnect before changing language"
 msgstr "Lütfen dilinizi değiştirmeden önce sunucudan ayrılın"
 
-#: Client/core/CSettings.cpp:5229
+#: Client/core/CSettings.cpp:5243
 msgid "Please disconnect before changing skin"
 msgstr "Lütfen temanızı değiştirmeden önce sunucudan ayrılın"
 
-#: Client/core/CSettings.cpp:5609
+#: Client/core/CSettings.cpp:5623
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "Volumetrik gölgeler bazı sistemlerin yavaşlamasına neden olabilir.\n\n"
 "Etkinleştirmek istediğine emin misin?"
 
-#: Client/core/CSettings.cpp:5613
+#: Client/core/CSettings.cpp:5627
 msgid "PERFORMANCE WARNING"
 msgstr "PERFORMANS UYARISI"
 
-#: Client/core/CSettings.cpp:5633
+#: Client/core/CSettings.cpp:5647
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "Ekran görüntüsü paylaşımı, bazı sunucular için anti-hile amacıyla gerekmektedir.\n\n"
 "(Sohbet kutusu ve kullanıcı arayüzü yüklemenin dışındadır)\n"
 
-#: Client/core/CSettings.cpp:5635
+#: Client/core/CSettings.cpp:5649
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "EKRAN YÜKLEME BİLGİSİ"
 
-#: Client/core/CSettings.cpp:5650
+#: Client/core/CSettings.cpp:5664
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
@@ -1921,11 +1925,11 @@ msgstr "Bazı scriptler, internetten -radyo gibi- sesleri oynatabilir.\n\n"
 "Bu ayarı kapatmak internet\n"
 "bant genişliğini rahatlatabilir\n"
 
-#: Client/core/CSettings.cpp:5653
+#: Client/core/CSettings.cpp:5667
 msgid "EXTERNAL SOUNDS"
 msgstr "HARİCİ SESLER"
 
-#: Client/core/CSettings.cpp:5682
+#: Client/core/CSettings.cpp:5696
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
@@ -1933,11 +1937,11 @@ msgstr "Görünüşe göre Rich Presence bağlantı seçeneğini etkinleştirmi�
 "Sunucuların verilerini paylaşmasına izin vermek istiyor musunuz?\n\n"
 "Bu sizin benzersiz kimlik tanımlayıcınızı içerir."
 
-#: Client/core/CSettings.cpp:5687
+#: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
 msgstr "VERI PAYLAŞIMINA IZIN VERMEK IÇIN ONAY VER"
 
-#: Client/core/CSettings.cpp:5711
+#: Client/core/CSettings.cpp:5725
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -1947,7 +1951,7 @@ msgstr "GTA:SA klasörünüzdeki bazı dosyalar değiştirilmiş.\n"
 "Ancak, DEĞİŞTİRİLMİŞ GTA:SA DOSYALARI ÇOĞU SUNUCU TARAFINDAN ENGELLENMİŞTİR.\n\n"
 "Bu dosyaları kullanmak istediğinize emin misiniz?"
 
-#: Client/core/CSettings.cpp:5760
+#: Client/core/CSettings.cpp:5774
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -1957,91 +1961,91 @@ msgstr "DPI hassasiyetini aktif etmek, deneysel bir özellik ve sadece\n"
 "Aksi taktirde bazı grafiksel problemlerle karşılaşabilirsiniz.\n\n"
 "Bu özelliği aktif etmek istiyor musunuz?"
 
-#: Client/core/CSettings.cpp:5766 Client/core/CSettings.cpp:5821
+#: Client/core/CSettings.cpp:5780 Client/core/CSettings.cpp:5835
 msgid "EXPERIMENTAL FEATURE"
 msgstr "DENEYSEL ÖZELLİK"
 
-#: Client/core/CSettings.cpp:5823
+#: Client/core/CSettings.cpp:5837
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
 msgstr "Bu seçeneğin devre dışı bırakılması, performans sorunları yaşıyorsanız önerilmez.\n\n"
 "Devre dışı bırakmak istediğinizden emin misiniz?"
 
-#: Client/core/CSettings.cpp:5965
+#: Client/core/CSettings.cpp:6000
 msgid "Please enter a nickname"
 msgstr "Lütfen bir isim girin"
 
-#: Client/core/CSettings.cpp:5966
+#: Client/core/CSettings.cpp:6001
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "Oyunda kullanılmak üzere bir nick girin. \n"
 "Bu, girdiğiniz sunucularda sizin adınız olarak kullanılacak"
 
-#: Client/core/CSettings.cpp:5984
+#: Client/core/CSettings.cpp:6019
 msgid "Very experimental feature."
 msgstr "Çok deneysel özellik."
 
-#: Client/core/CSettings.cpp:5986
+#: Client/core/CSettings.cpp:6021
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "CJ varyasyonlarındaki takılmaları durdurur (65MB daha fazla RAM kullanır)"
 
-#: Client/core/CSettings.cpp:5988
+#: Client/core/CSettings.cpp:6023
 msgid "Older routers may require a slower scan speed."
 msgstr "Eski modemler daha yavaş tarama hızı gerektirebilir."
 
-#: Client/core/CSettings.cpp:5990
+#: Client/core/CSettings.cpp:6025
 msgid "Switch on to use only one connection when downloading."
 msgstr "İndirme yaparken sadece bir bağlantı üzerinden indirme yapmak için aktif edin."
 
-#: Client/core/CSettings.cpp:5992
+#: Client/core/CSettings.cpp:6027
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "Ağ paketlerini etiketleyerek MTA trafiğini tanıyabilmesi için Internet Servis Sağlayıcılarına yardımcı olun."
 
-#: Client/core/CSettings.cpp:5994
+#: Client/core/CSettings.cpp:6029
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Ekranın alt kısmındaki dönen daire animasyonu"
 
-#: Client/core/CSettings.cpp:5996
+#: Client/core/CSettings.cpp:6031
 msgid "Select default always. (This setting is not saved)"
 msgstr "Varsayılanı seçin. (Bu ayar kaydedilmez)"
 
-#: Client/core/CSettings.cpp:5998
+#: Client/core/CSettings.cpp:6033
 msgid "Maximum is usually best"
 msgstr "Maximum genellikle en iyidir"
 
-#: Client/core/CSettings.cpp:6000 Client/core/CSettings.cpp:6002
+#: Client/core/CSettings.cpp:6035 Client/core/CSettings.cpp:6037
 msgid "Auto updater:"
 msgstr "Otomatik güncelleyici:"
 
-#: Client/core/CSettings.cpp:6000
+#: Client/core/CSettings.cpp:6035
 msgid "Select default unless you like filling out bug reports."
 msgstr "Eğer hata raporu doldurmayı sevmiyorsanız varsayılanı seçin."
 
-#: Client/core/CSettings.cpp:6002
+#: Client/core/CSettings.cpp:6037
 msgid "Select default to automatically install important updates."
 msgstr "Önemli güncelleştirmeleri otomatik olarak yüklemek için varsayılan'ı seçin."
 
-#: Client/core/CSettings.cpp:6004
+#: Client/core/CSettings.cpp:6039
 msgid "16-bit color:"
 msgstr "16-bit renk:"
 
-#: Client/core/CSettings.cpp:6004
+#: Client/core/CSettings.cpp:6039
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "16-bit renk modunu etkinleştir - MTA'yı yeniden başlatmanı gerektirir"
 
-#: Client/core/CSettings.cpp:6006
+#: Client/core/CSettings.cpp:6041
 msgid "Mouse fix:"
 msgstr "Fare düzeltmesi:"
 
-#: Client/core/CSettings.cpp:6006
+#: Client/core/CSettings.cpp:6041
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Fare hareketini düzelt - Bilgisayarı yeniden başlatmayı gerektirebilir"
 
-#: Client/core/CSettings.cpp:6008
+#: Client/core/CSettings.cpp:6043
 msgid "CPU affinity:"
 msgstr "CPU bağlanırlığı:"
 
-#: Client/core/CSettings.cpp:6008
+#: Client/core/CSettings.cpp:6043
 msgid "Only change if you're having stability issues."
 msgstr "Yalnızca kararlılık sorunları yaşıyorsanız değiştirin."
 
@@ -2737,8 +2741,8 @@ msgstr "Lütfen mtasa:// protokolünü kullanın!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1623
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
-#: Client/mods/deathmatch/logic/CClientGame.cpp:658
-#: Client/mods/deathmatch/logic/CClientGame.cpp:750
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:757
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Geçersiz isim! Ayarlardan yeni bir isim belirleyin!"
 
@@ -2747,7 +2751,7 @@ msgid "You have to select a server to connect to."
 msgstr "Bağlanmak için bir sunucu seçmeniz gerekiyor."
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1619
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1671
 msgid "Problem with graphics driver"
 msgstr "Ekran kartı sürücüsü ile problem"
 
@@ -2788,118 +2792,118 @@ msgstr "Seçimi hatırla"
 msgid "Deny"
 msgstr "Reddet"
 
-#: Client/mods/deathmatch/CClient.cpp:36
+#: Client/mods/deathmatch/CClient.cpp:37
 msgid "This version has expired."
 msgstr "Bu versiyon zaman aşımına uğradı."
 
-#: Client/mods/deathmatch/CClient.cpp:57
+#: Client/mods/deathmatch/CClient.cpp:58
 msgid "disconnect from the game"
 msgstr "oyundan ayrıl"
 
-#: Client/mods/deathmatch/CClient.cpp:58
+#: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the nametags"
 msgstr "isim etiketlerini gösterir"
 
-#: Client/mods/deathmatch/CClient.cpp:59
+#: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the chatbox"
 msgstr "konuşma kutusunu gösterir"
 
-#: Client/mods/deathmatch/CClient.cpp:60
+#: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the network statistics"
 msgstr "bağlantı istatistiklerini gösterir"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
+#: Client/mods/deathmatch/CClient.cpp:64
 msgid "open the chat input"
 msgstr "sohbet girişini aç"
 
-#: Client/mods/deathmatch/CClient.cpp:64
+#: Client/mods/deathmatch/CClient.cpp:65
 msgid "transmits voice to other players"
 msgstr "sesi diğer oyunculara iletir"
 
-#: Client/mods/deathmatch/CClient.cpp:65
+#: Client/mods/deathmatch/CClient.cpp:66
 msgid "enters a car as passenger"
 msgstr "bir araca yolcu olarak biner"
 
-#: Client/mods/deathmatch/CClient.cpp:66
+#: Client/mods/deathmatch/CClient.cpp:67
 msgid "next radio channel"
 msgstr "sonraki radyo kanalı"
 
-#: Client/mods/deathmatch/CClient.cpp:67
+#: Client/mods/deathmatch/CClient.cpp:68
 msgid "previous radio channel"
 msgstr "önceki radyo kanalı"
 
-#: Client/mods/deathmatch/CClient.cpp:68
+#: Client/mods/deathmatch/CClient.cpp:69
 msgid "enables the player-map view"
 msgstr "oyuncu harita görünümünü etkinleştirir"
 
-#: Client/mods/deathmatch/CClient.cpp:69
+#: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map in"
 msgstr "oyuncu haritasını yakınlaştırır"
 
-#: Client/mods/deathmatch/CClient.cpp:70
+#: Client/mods/deathmatch/CClient.cpp:71
 msgid "zooms the player-map out"
 msgstr "oyuncu haritasını uzaklaştırır"
 
-#: Client/mods/deathmatch/CClient.cpp:71
+#: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map north"
 msgstr "oyuncu haritasını kuzeye hareket ettirir"
 
-#: Client/mods/deathmatch/CClient.cpp:72
+#: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map south"
 msgstr "oyuncu haritasını güneye hareket ettirir"
 
-#: Client/mods/deathmatch/CClient.cpp:73
+#: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map east"
 msgstr "oyuncu haritasını doğuya hareket ettirir"
 
-#: Client/mods/deathmatch/CClient.cpp:74
+#: Client/mods/deathmatch/CClient.cpp:75
 msgid "moves the player-map west"
 msgstr "oyuncu haritasını batıya hareket ettirir"
 
-#: Client/mods/deathmatch/CClient.cpp:75
+#: Client/mods/deathmatch/CClient.cpp:76
 msgid "attaches the player-map"
 msgstr "oyuncu haritasını iliştirir"
 
-#: Client/mods/deathmatch/CClient.cpp:76
+#: Client/mods/deathmatch/CClient.cpp:77
 msgid "reduces player-map opacity"
 msgstr "oyuncu haritasının saydamlığını azaltır"
 
-#: Client/mods/deathmatch/CClient.cpp:77
+#: Client/mods/deathmatch/CClient.cpp:78
 msgid "increases player-map opacity"
 msgstr "oyuncu haritasının saydamlığını artırır"
 
-#: Client/mods/deathmatch/CClient.cpp:78
+#: Client/mods/deathmatch/CClient.cpp:79
 msgid "toggles player-map help text"
 msgstr "oyuncu haritası yardım metnini açar veya kapatır"
 
-#: Client/mods/deathmatch/CClient.cpp:79
+#: Client/mods/deathmatch/CClient.cpp:80
 msgid "sends a message to the targetted player"
 msgstr "hedeflenen oyuncuya bir mesaj gönderir"
 
-#: Client/mods/deathmatch/CClient.cpp:80
+#: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "araç içindeyken bir sonraki silaha geçer"
 
-#: Client/mods/deathmatch/CClient.cpp:81
+#: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "araç içindeyken bir önceki silaha geçer"
 
-#: Client/mods/deathmatch/CClient.cpp:82
+#: Client/mods/deathmatch/CClient.cpp:83
 msgid "outputs info about the current server"
 msgstr "mevcut sunucu hakkında bilgi sunar"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
+#: Client/mods/deathmatch/CClient.cpp:86
 msgid "defines the scale multiplier of all text-displays"
 msgstr "yazı görüntülerinin boyut ayarını belirtir"
 
 #. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
+#: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) shows the colshapes"
 msgstr "(Geliştirme Modu) colshapeleri gösterir"
 
-#: Client/mods/deathmatch/CClient.cpp:93
+#: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Geliştirme Modu) dünya seslerinin id'lerini debug ekranına yollar"
 
@@ -3300,85 +3304,85 @@ msgstr "Bir köpekbalığı tarafından kovalanmak"
 msgid "Choking to death in"
 msgstr "Boğulma sonucu ölüm"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:674
+#: Client/mods/deathmatch/logic/CClientGame.cpp:681
 msgid "Entering the game ..."
 msgstr "Oyuna giriliyor ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:726
+#: Client/mods/deathmatch/logic/CClientGame.cpp:733
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "Bağlanmadı; lütfen Hızlı Bağlan veya 'connect' komutunu kullanın ve bir sunucuya bağlanın."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:772
+#: Client/mods/deathmatch/logic/CClientGame.cpp:779
 msgid "Could not start the local server. See console for details."
 msgstr "Yerel sunucu başlatılamadı. Ayrıntılar için konsola bakın. "
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:782
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+#: Client/mods/deathmatch/logic/CClientGame.cpp:789
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
 msgid "Local Server"
 msgstr "Yerel Sunucu"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:782
+#: Client/mods/deathmatch/logic/CClientGame.cpp:789
 msgid "Starting local server ..."
 msgstr "Yerel sunucu başlatılıyor ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1037
 msgid "Area 51"
 msgstr "51. Bölge"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1039
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1046
 msgid "Walking around "
 msgstr "Etrafta dolaşmak"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1191
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Oyundan atıldınız ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
 msgid "Connecting to local server..."
 msgstr "Yerel sunucuya bağlanılıyor..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1271
 msgid "Error connecting to server."
 msgstr "Sunucuya bağlanırken hata."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1274
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 msgid "Connecting to local server timed out. See console for details."
 msgstr "Yerel sunucuya bağlantı zaman aşımına uğradı. Detaylar için konsola bakınız."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1387
 msgid "Connection with the server was lost"
 msgstr "Sunucuyla bağlantı koptu."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1407
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1414
 msgid "Disconnected: the server is currently full"
 msgstr "Bağlantı Kesildi: sunucu dolu"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1426
 msgid "Disconnected: invalid password specified"
 msgstr "Bağlantı Kesildi: yanlış şifre girildi"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1441
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1448
 msgid "MTA Client verification failed!"
 msgstr "MTA İstemci doğrulaması yapılamadı!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "In a ditch"
 msgstr "Bir çukurda"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "En-route to hospital"
 msgstr "Hastane yolunda"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "Meeting their maker"
 msgstr "Yaratıcılarıyla tanışmak"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "Regretting their decisions"
 msgstr "Kararlarından pişman oluyor"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5683
 msgid "Wasted"
 msgstr "Yakalandı"
 
