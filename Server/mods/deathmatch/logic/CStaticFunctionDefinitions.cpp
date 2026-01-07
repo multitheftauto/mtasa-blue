@@ -12692,4 +12692,3 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
 
     return true;
 }
-
