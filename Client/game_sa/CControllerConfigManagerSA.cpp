@@ -35,6 +35,7 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -43,12 +44,14 @@ void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControlle
         push    action
         call    dwFunc
     }
+    // clang-format on
 }
 
 int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -57,6 +60,7 @@ int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eController
         call    dwFunc
         mov     iReturn, eax
     }
+    // clang-format on
     return iReturn;
 }
 
@@ -64,6 +68,7 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
 {
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -71,12 +76,14 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
         call    dwFunc
         mov     iReturn, eax
     }
+    // clang-format on
     return iReturn;
 }
 
 void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -84,6 +91,7 @@ void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAc
         push    action
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)
