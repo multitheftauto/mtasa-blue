@@ -72,7 +72,7 @@ public:
     LUA_DECLARE(IsElementCallPropagationEnabled);
     LUA_DECLARE(IsElementWaitingForGroundToLoad);
     static bool IsElementOnFire(CClientEntity* entity) noexcept;
-    static bool IsElementOnGround(CClientEntity* entity);
+    static bool IsElementOnGround(std::variant<CClientPlayer*, CClientPed*, CClientVehicle*> element);
 
     // Element set funcs
     LUA_DECLARE(CreateElement);

@@ -2464,17 +2464,17 @@ bool CLuaElementDefs::SetElementOnFire(CElement* element, bool onFire) noexcept
     return CStaticFunctionDefinitions::SetElementOnFire(element, onFire);
 }
 
-bool CLuaElementDefs::IsElementOnGround(CElement* element)
+bool CLuaElementDefs::IsElementOnGround(std::variant<CPlayer*, CPed*, CVehicle*> element)
 {
-    switch (element->GetType())
+    auto* pElement = std::visit([](auto* p) -> CElement* { return p; }, element);
+
+    switch (pElement->GetType())
     {
         case CElement::PLAYER:
         case CElement::PED:
-            return static_cast<CPed*>(element)->IsOnGround();
+            return static_cast<CPed*>(pElement)->IsOnGround();
         case CElement::VEHICLE:
-            return static_cast<CVehicle*>(element)->IsOnGround();
-        default:
-            throw std::invalid_argument{"This element type does not support IsElementOnGround"};
+            return static_cast<CVehicle*>(pElement)->IsOnGround();
     }
 
     return false;

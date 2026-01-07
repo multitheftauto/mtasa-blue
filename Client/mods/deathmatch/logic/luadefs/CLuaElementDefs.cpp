@@ -2664,17 +2664,17 @@ bool CLuaElementDefs::IsElementOnFire(CClientEntity* entity) noexcept
     return entity->IsOnFire();
 }
 
-bool CLuaElementDefs::IsElementOnGround(CClientEntity* entity)
+bool CLuaElementDefs::IsElementOnGround(std::variant<CClientPlayer*, CClientPed*, CClientVehicle*> element)
 {
-    switch (entity->GetType())
+    auto* pElement = std::visit([](auto* p) -> CClientEntity* { return p; }, element);
+
+    switch (pElement->GetType())
     {
         case CCLIENTPLAYER:
         case CCLIENTPED:
-            return static_cast<CClientPed*>(entity)->IsOnGround();
+            return static_cast<CClientPed*>(pElement)->IsOnGround();
         case CCLIENTVEHICLE:
-            return static_cast<CClientVehicle*>(entity)->IsOnGround();
-        default:
-            throw std::invalid_argument{"This element type does not support IsElementOnGround"};
+            return static_cast<CClientVehicle*>(pElement)->IsOnGround();
     }
 
     return false;
