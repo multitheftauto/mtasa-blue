@@ -31,9 +31,9 @@ project "lunasvg"
 	}
 
 	includedirs {
-		"plutovg",
-		"source",
-		"include"
+		"plutovg/include",
+		"include",
+		"source"
 	}
 
 	filter "system:windows"
