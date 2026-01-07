@@ -125,8 +125,11 @@ namespace {
         }
 
         // Let install manager figure out what MTASA path to use
+        // This must be called before ConfigureWerDumpPath which uses CalcMTASAPath
         pInstallManager->SetMTASAPathSource(safeCmdLine);
         
+        ConfigureWerDumpPath();
+
         // Start logging.....now
         BeginEventLog();
         
@@ -272,6 +275,7 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPre
     // Go for launch
     // Initialize return code with safe default
     int iReturnCode = 0;
+    WriteDebugEvent(SString("[7207] Loader - About to call LaunchGameSafely, cmdLine='%s'", strCmdLine.c_str()));
     iReturnCode = LaunchGameSafely(strCmdLine);
 
     PostRunWatchDogs(iReturnCode);
