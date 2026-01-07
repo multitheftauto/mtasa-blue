@@ -57,7 +57,7 @@ public:
     LUA_DECLARE(getElementModel);
     LUA_DECLARE(isElementInWater);
     LUA_DECLARE(getElementSyncer);
-    static std::vector<CElement*> GetElementsSyncedByPlayer(CPlayer* player, std::optional<std::string> elementType);
+    static std::vector<CElement*> GetElementsSyncedByPlayer(CPlayer* player);
     LUA_DECLARE(getElementCollisionsEnabled);
     LUA_DECLARE(isElementFrozen);
     LUA_DECLARE(getLowLODElement);

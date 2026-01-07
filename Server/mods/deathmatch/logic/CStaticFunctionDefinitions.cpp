@@ -757,43 +757,34 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer(CElement* pElement)
     return NULL;
 }
 
-std::vector<CElement*> CStaticFunctionDefinitions::GetElementsSyncedByPlayer(CPlayer* pPlayer, std::optional<std::string> strType)
+std::vector<CElement*> CStaticFunctionDefinitions::GetElementsSyncedByPlayer(CPlayer* pPlayer)
 {
     assert(pPlayer);
 
     std::vector<CElement*> elements;
 
     // Check all vehicles
-    if (!strType.has_value() || strType.value() == "vehicle")
+    for (CVehicle* pVehicle : m_pVehicleManager->GetVehicles())
     {
-        for (CVehicle* pVehicle : m_pVehicleManager->GetVehicles())
-        {
-            if (pVehicle->GetSyncer() == pPlayer)
-                elements.push_back(pVehicle);
-        }
+        if (pVehicle->GetSyncer() == pPlayer)
+            elements.push_back(pVehicle);
     }
 
     // Check all peds
-    if (!strType.has_value() || strType.value() == "ped")
+    for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); ++iter)
     {
-        for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); ++iter)
-        {
-            CPed* pPed = *iter;
-            if (pPed->GetSyncer() == pPlayer)
-                elements.push_back(pPed);
-        }
+        CPed* pPed = *iter;
+        if (pPed->GetSyncer() == pPlayer)
+            elements.push_back(pPed);
     }
 
 #ifdef WITH_OBJECT_SYNC
     // Check all objects
-    if (!strType.has_value() || strType.value() == "object")
+    for (auto iter = m_pObjectManager->IterBegin(); iter != m_pObjectManager->IterEnd(); ++iter)
     {
-        for (auto iter = m_pObjectManager->IterBegin(); iter != m_pObjectManager->IterEnd(); ++iter)
-        {
-            CObject* pObject = *iter;
-            if (pObject->GetSyncer() == pPlayer)
-                elements.push_back(pObject);
-        }
+        CObject* pObject = *iter;
+        if (pObject->GetSyncer() == pPlayer)
+            elements.push_back(pObject);
     }
 #endif
 
