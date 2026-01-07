@@ -802,7 +802,7 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     // GitHub Issue #602
     MemPut(0x6811E9, &kOriginalTimeStep);
     MemPut(0x68128A, &kOriginalTimeStep);
-    MemPut(0x68131B, &kOriginalTimeStep);
+    // MemPut(0x68131B, &kOriginalTimeStep); // This will break climbing on high fps, keep it on default (m_nGetToPosCounter).
 
     // CTimer::m_FrameCounter fixes
     EZHookInstall(CTimer__Update);
