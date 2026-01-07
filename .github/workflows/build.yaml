@@ -32,6 +32,13 @@ jobs:
         run: Expand-Archive -Path utils/DXFiles.zip -DestinationPath utils/DXFiles
         shell: powershell
 
+      - name: Restore vs2022
+        run: |
+          git fetch origin c757a89f7c92fa7c814572b28384ca5985fff5bb
+          git checkout c757a89f7c92fa7c814572b28384ca5985fff5bb -- README.md
+          git revert c757a89f7c92fa7c814572b28384ca5985fff5bb --no-commit
+        shell: bash
+
       - name: Install CEF
         run: utils\premake5 install_cef
 
