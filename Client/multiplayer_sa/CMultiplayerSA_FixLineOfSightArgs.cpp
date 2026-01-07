@@ -55,6 +55,7 @@ static void __declspec(naked) HOOK_CWorld_ProcessLineOfSight()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -68,6 +69,7 @@ static void __declspec(naked) HOOK_CWorld_ProcessLineOfSight()
         cmp     word ptr ds:[0B7CD78h], 0FFFFh
         jmp     RETURN_CWorld_ProcessLineOfSight
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -90,6 +92,7 @@ static void __declspec(naked) HOOK_CWorld_GetIsLineOfSightClear()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -103,6 +106,7 @@ static void __declspec(naked) HOOK_CWorld_GetIsLineOfSightClear()
         cmp     word ptr ds:[0B7CD78h], 0FFFFh
         jmp     RETURN_CWorld_GetIsLineOfSightClear
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
