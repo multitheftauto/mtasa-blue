@@ -40,17 +40,33 @@ bool CSVGFontManager::RegisterFont(const SString& strFontFamily, const SString& 
     if (!FileExists(strAbsPath))
         return false;
 
-    SString fontData;
-    if (!FileLoad(strAbsPath, fontData))
-        return false;
-
-    if (fontData.empty())
+    // Get file size
+    uint64 fileSize = FileSize(strAbsPath);
+    if (fileSize == 0 || fileSize > 100 * 1024 * 1024) // Sanity check: max 100MB
         return false;
 
     // Allocate memory for font data that will be owned by LunaSVG
-    size_t dataSize = fontData.size();
-    char* pFontData = new char[dataSize];
-    memcpy(pFontData, fontData.data(), dataSize);
+    size_t dataSize = static_cast<size_t>(fileSize);
+    char* pFontData = new (std::nothrow) char[dataSize];
+    if (!pFontData)
+        return false;
+
+    // Read file directly into our allocated buffer
+    FILE* pFile = File::Fopen(strAbsPath, "rb");
+    if (!pFile)
+    {
+        delete[] pFontData;
+        return false;
+    }
+
+    size_t bytesRead = fread(pFontData, 1, dataSize, pFile);
+    fclose(pFile);
+
+    if (bytesRead != dataSize)
+    {
+        delete[] pFontData;
+        return false;
+    }
 
     // Register font with LunaSVG using data API
     // LunaSVG takes ownership of the data and will call our destroy callback when done
