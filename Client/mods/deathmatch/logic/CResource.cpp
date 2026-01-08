@@ -13,7 +13,6 @@
 #define DECLARE_PROFILER_SECTION_CResource
 #include "profiler/SharedUtil.Profiler.h"
 #include "CServerIdManager.h"
-#include "CSVGFontManager.h"
 
 using namespace std;
 
@@ -95,9 +94,6 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
 CResource::~CResource()
 {
-    // Unregister SVG fonts registered by this resource
-    CSVGFontManager::GetSingleton().UnregisterResourceFonts(this);
-
     // Remove refrences from requested models
     m_modelStreamer.ReleaseAll();
 

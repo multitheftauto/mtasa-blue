@@ -10,7 +10,6 @@
 #include "StdInc.h"
 #include "lua/CLuaFunctionParser.h"
 #include "CLuaVectorGraphicDefs.h"
-#include "../CSVGFontManager.h"
 
 void CLuaVectorGraphicDefs::LoadFunctions()
 {
@@ -21,8 +20,7 @@ void CLuaVectorGraphicDefs::LoadFunctions()
         {"svgGetSize", ArgumentParser<SVGGetSize>},
         {"svgSetSize", ArgumentParser<SVGSetSize>},
         {"svgSetUpdateCallback", ArgumentParser<SVGSetUpdateCallback>},
-        {"svgRegisterFont", ArgumentParser<SVGRegisterFont>},
-        {"svgUnregisterFont", ArgumentParser<SVGUnregisterFont>},
+
     };
 
     // Add functions
@@ -272,31 +270,4 @@ std::variant<CLuaFunctionRef, bool> CLuaVectorGraphicDefs::SVGGetUpdateCallback(
         return func;
 
     return false;
-}
-
-bool CLuaVectorGraphicDefs::SVGRegisterFont(lua_State* luaVM, std::string fontFamily, std::string fontPath)
-{
-    if (fontFamily.empty())
-        throw std::invalid_argument("Font family name cannot be empty");
-
-    if (fontPath.empty())
-        throw std::invalid_argument("Font path cannot be empty");
-
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-        return false;
-
-    CResource* pResource = pLuaMain->GetResource();
-    if (!pResource)
-        return false;
-
-    return CSVGFontManager::GetSingleton().RegisterFont(fontFamily, fontPath, pResource);
-}
-
-bool CLuaVectorGraphicDefs::SVGUnregisterFont(std::string fontFamily)
-{
-    if (fontFamily.empty())
-        throw std::invalid_argument("Font family name cannot be empty");
-
-    return CSVGFontManager::GetSingleton().UnregisterFont(fontFamily);
 }
