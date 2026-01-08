@@ -102,7 +102,8 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
             pGameInterface->GetStreaming()->LoadAllRequestedModels(true);
             if (bLoadingBigModel)
                 pGameInterface->GetStreaming()->LoadAllRequestedModels(false);
-            assert(!bLoadingBigModel);
+            if (bLoadingBigModel)
+                return false;
         }
 
         int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
