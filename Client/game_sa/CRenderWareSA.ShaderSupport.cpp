@@ -89,6 +89,7 @@ static void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Hooked from 731D55  6 bytes
@@ -104,6 +105,7 @@ static void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
         mov     esi, ds:00C8800Ch
         jmp     RETURN_CTxdStore_SetupTxdParent  // 731D5B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -124,6 +126,7 @@ static void __declspec(naked) HOOK_CTxdStore_RemoveTxd()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Hooked from 731E90  6 bytes
@@ -139,6 +142,7 @@ static void __declspec(naked) HOOK_CTxdStore_RemoveTxd()
         mov     ecx, ds:00C8800Ch
         jmp     RETURN_CTxdStore_RemoveTxd      // 731E96
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -881,6 +885,7 @@ static void __declspec(naked) HOOK_RwTextureSetName()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -895,6 +900,7 @@ static void __declspec(naked) HOOK_RwTextureSetName()
         mov     ecx, ds:0x0C97B24
         jmp     RETURN_RwTextureSetName
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -917,6 +923,7 @@ static void __declspec(naked) HOOK_RwTextureDestroy_Mid()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -928,6 +935,7 @@ static void __declspec(naked) HOOK_RwTextureDestroy_Mid()
         push    0x08E23CC
         jmp     RETURN_RwTextureDestroy_Mid
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -963,6 +971,7 @@ static void __declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -988,6 +997,7 @@ static void __declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
         mov     eax, ds:0x0C9C078
         jmp     RETURN_RwIm3DRenderIndexedPrimitive
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1015,6 +1025,7 @@ static void __declspec(naked) HOOK_RwIm3DRenderPrimitive()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1040,6 +1051,7 @@ static void __declspec(naked) HOOK_RwIm3DRenderPrimitive()
         mov     ecx, ds:0x0C97B24
         jmp     RETURN_RwIm3DRenderPrimitive
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1067,6 +1079,7 @@ static void __declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1093,6 +1106,7 @@ static void __declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
         inner:
         jmp     RETURN_RwIm2DRenderIndexedPrimitive
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1120,6 +1134,7 @@ static void __declspec(naked) HOOK_RwIm2DRenderPrimitive()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1145,6 +1160,7 @@ static void __declspec(naked) HOOK_RwIm2DRenderPrimitive()
         mov     eax, ds:0x0C97B24
         jmp     RETURN_RwIm2DRenderPrimitive
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

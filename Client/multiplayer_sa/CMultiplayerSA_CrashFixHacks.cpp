@@ -32,6 +32,7 @@ static void __declspec(naked) CrashAverted()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
         {
         pushfd
@@ -43,6 +44,7 @@ static void __declspec(naked) CrashAverted()
         popfd
         retn    4
         }
+    // clang-format on
 }
 
 static bool HasReadAccess(DWORD dwProtect)
@@ -194,6 +196,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax,dword ptr [esp+18h]
@@ -210,6 +213,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc1()
     cont:
         jmp     RETURN_CrashFix_Misc1
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -225,6 +229,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    eax,eax
@@ -247,6 +252,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc2()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc2B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -262,6 +268,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc4()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx,ecx
@@ -276,6 +283,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc4()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc4B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,6 +332,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc6()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -337,6 +346,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc6()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc6B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -354,6 +364,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc7()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -367,6 +378,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc7()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc7B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -384,6 +396,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc8()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -397,6 +410,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc8()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc8B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -414,6 +428,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc9()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    esi, esi
@@ -427,6 +442,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc9()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc9B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -444,6 +460,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc10()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     ecx, 0x80
@@ -461,6 +478,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc10()
         mov     dword ptr [ecx+8],0
         jmp     RETURN_CrashFix_Misc10B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -478,6 +496,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc11()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -491,6 +510,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc11()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc11B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -508,6 +528,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc12()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    edi, edi
@@ -521,6 +542,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc12()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc12B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -536,6 +558,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc13()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 0x2480
@@ -549,6 +572,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc13()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc13B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -563,6 +587,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc14()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
         {
         mov     eax, dword ptr ds:[0BD00F8h]
@@ -577,6 +602,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc14()
         add     esp, 12
         retn    12
         }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -610,6 +636,7 @@ static void __declspec(naked) HOOK_FreezeFix_Misc15()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pop eax
@@ -623,6 +650,7 @@ static void __declspec(naked) HOOK_FreezeFix_Misc15()
         popad
         jmp     RETURN_FreezeFix_Misc15
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -637,6 +665,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc16()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 0
@@ -653,6 +682,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc16()
         add     esp, 96
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -668,6 +698,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc17()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 0
@@ -682,6 +713,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc17()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc17B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -696,6 +728,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc18()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
         {
         cmp     ebp, 0
@@ -718,6 +751,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc18()
         pop         ebp
         ret         0Ch
         }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -733,6 +767,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc19()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     esi, 0
@@ -749,6 +784,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc19()
         test    edx,edx
         jmp     RETURN_CrashFix_Misc19B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -763,6 +799,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc20()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     ecx, 0
@@ -778,6 +815,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc20()
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -816,6 +854,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc21()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -837,6 +876,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc21()
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -851,6 +891,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc22()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov         edx,dword ptr [edi+0Ch]
@@ -888,6 +929,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc22()
         jl          altcode
         jmp     RETURN_CrashFix_Misc22
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -902,6 +944,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc23()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Ensure door index is reasonable
@@ -921,6 +964,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc23()
         lea     eax, [edx+edx*2]
         jmp     RETURN_CrashFix_Misc23
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -935,6 +979,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc24()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     ebp, 0x480
@@ -951,6 +996,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc24()
         mov     eax, 0
         jmp     RETURN_CrashFix_Misc24
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -965,6 +1011,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc25()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Check for zero pointer to vehicle
@@ -985,6 +1032,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc25()
         pop     ecx
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -999,6 +1047,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc26()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Check for incorrect pointer
@@ -1020,6 +1069,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc26()
         test    edi,edi
         jmp     RETURN_CrashFix_Misc26
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1034,6 +1084,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc27()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Execute replaced code
@@ -1051,6 +1102,7 @@ cont:
         // Continue standard path
         jmp     RETURN_CrashFix_Misc27
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1066,6 +1118,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc28()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Execute replaced code
@@ -1084,6 +1137,7 @@ cont:
         // Continue standard path
         jmp     RETURN_CrashFix_Misc28
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1099,6 +1153,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc29()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Execute replaced code
@@ -1117,6 +1172,7 @@ cont:
             // Skip much code
         jmp     RETURN_CrashFix_Misc29B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1133,6 +1189,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc30()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Check for incorrect pointer
@@ -1150,6 +1207,7 @@ cont:
             // Skip much code
         jmp     RETURN_CrashFix_Misc30B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1164,6 +1222,7 @@ DWORD RETURN_CrashFix_Misc32 = 0x4CEA88;
 static void __declspec(naked) HOOK_CrashFix_Misc32()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
         {
         test    ecx, ecx
@@ -1185,12 +1244,128 @@ static void __declspec(naked) HOOK_CrashFix_Misc32()
         call    CrashAverted
         retn    4
         }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
-// RwTexDictionaryFindNamedTexture
+// CVehicleModelInfo::FindTextureCB (0x4C7510)
+// SA's inlined strcpy to 32-byte buffer overruns if name >= 31 chars > 0xC0000409
+// Reimplement it using safe string handling
 //
-// "dict" is invalid
+// Hook interaction: This calls RwTexDictionaryFindNamedTexture (0x7F39F0) which has
+// Misc33 hook. Direct calls causes re-entry and stack corruption.
+// Solution: CallOriginalRwTexDictionaryFindNamedTexture replicates Misc33's overwritten
+// bytes (mov eax,[esp+4]; push ebx) and jumps to 0x7F39F5 to work around the hook.
+////////////////////////////////////////////////////////////////////////
+typedef RwTexture* (__cdecl *RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
+typedef RwTexDictionary* (__cdecl *RwTexDictionaryGetCurrent_t)();
+
+static RwTexDictionaryGetCurrent_t pfnRwTexDictionaryGetCurrentForMisc39 = (RwTexDictionaryGetCurrent_t)0x7F3A90;
+
+// Trampoline to call the ORIGINAL RwTexDictionaryFindNamedTexture at 0x7F39F0,
+// thereby working around HOOK_CrashFix_Misc33.
+// Replicates the 5 overwritten bytes (mov eax,[esp+4]; push ebx) then jumps to 0x7F39F5.
+static constexpr DWORD AddrFindNamedTexture_Continue = 0x7F39F5;
+static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+4]
+        push    ebx
+        jmp     AddrFindNamedTexture_Continue
+    }
+    // clang-format on
+}
+
+static constexpr std::size_t TextureNameSize = 32;
+static constexpr char RemapPrefix[] = "remap";
+
+static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
+{
+
+    if (name == nullptr)
+        return nullptr;
+
+    const auto RwTexDictionaryFindNamedTexture = reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(TrampolineRwTexDictionaryFindNamedTexture);
+    const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
+    
+    RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
+    if (vehicleTxd != nullptr)
+    {
+        RwTexture* tex = RwTexDictionaryFindNamedTexture(vehicleTxd, name);
+        if (tex != nullptr)
+        {
+            return tex;
+        }
+    }
+
+    RwTexDictionary* currentTxd = RwTexDictionaryGetCurrent();
+    if (currentTxd == nullptr)
+        return nullptr;
+
+    RwTexture* tex = RwTexDictionaryFindNamedTexture(currentTxd, name);
+
+    if (std::strncmp(name, RemapPrefix, sizeof(RemapPrefix) - 1) == 0)
+    {
+        if (tex == nullptr)
+        {
+            const std::size_t nameLen = strnlen(name, TextureNameSize);
+            if (nameLen >= TextureNameSize)
+            {
+                OnCrashAverted(39);
+                return nullptr;
+            }
+            char tmp[TextureNameSize];
+            std::memcpy(tmp, name, nameLen + 1);
+            tmp[0] = '#';
+            return RwTexDictionaryFindNamedTexture(currentTxd, tmp);
+        }
+        else
+        {
+            if (IsWritablePtr(tex, sizeof(RwTexture)))
+            {
+                tex->name[0] = '#';
+            }
+        }
+    }
+
+    return tex;
+}
+
+#define HOOKPOS_CrashFix_Misc39                             0x4C7510
+#define HOOKSIZE_CrashFix_Misc39                            5
+static void __declspec(naked) HOOK_CrashFix_Misc39()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        push    [esp+4]
+        call    OnMY_FindTextureCB
+        add     esp, 4
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture (0x7F39F0)
+//
+// Crash occur when dict pointer is NULL or invalid (not a valid RwTexDictionary).
+// This can happen with corrupted texture dictionary chains or during streaming issues.
+//
+// Validates the dict pointer before calling the SA function
+//
+// Overwrites the first 5 bytes at 0x7F39F0:
+//   Original: 8B 44 24 04 53  (mov eax,[esp+4]; push ebx)
+//   Replaced: E9 xx xx xx xx  (jmp HOOK_CrashFix_Misc33)
+//
+// HOOK_CrashFix_Misc39 (FindTextureCB replacement) needs to call this function
+// but has to dodge this hook (risk of re-entry and stack corruption)
+// See CallOriginalRwTexDictionaryFindNamedTexture in the Misc39 code for the
+// trampoline that replicates the overwritten bytes and jumps to 0x7F39F5.
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc33  0x7F39F0
 #define HOOKSIZE_CrashFix_Misc33 5
@@ -1199,20 +1374,26 @@ DWORD RETURN_CrashFix_Misc33 = 0x7F39F5;
 typedef RwTexDictionary*(__cdecl* PFN_RwTexDictionaryGetCurrent)();
 PFN_RwTexDictionaryGetCurrent pfnRwTexDictionaryGetCurrent = (PFN_RwTexDictionaryGetCurrent)0x7F3A90;
 
+// Helper to execute the original func's overwritten prologue and continue.
+// Used by HOOK_CrashFix_Misc33 when validation passes.
 static void __declspec(naked) CallOriginalFindNamedTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
     {
-        mov     eax, [esp+4]
-        push    ebx
-        jmp     RETURN_CrashFix_Misc33
+        // Replicate overwritten bytes at 0x7F39F0
+        mov     eax, [esp+4]        // Original: mov eax, [esp+dict]
+        push    ebx                  // Original: push ebx
+        jmp     RETURN_CrashFix_Misc33  // Continue at 0x7F39F5: add eax, 8
     }
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_CrashFix_Misc33()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
     {
         // Get first argument (dict)
@@ -1233,7 +1414,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc33()
         cmp     ecx, 0x10000
         jb      invalid_texture
 
-            // Check if it's a dictionary (type 6)
+        // Check if it's a dictionary (RwObject type 6 at offset 0)
         cmp     byte ptr [ecx], 6
         jne     use_current_dict
 
@@ -1242,31 +1423,30 @@ static void __declspec(naked) HOOK_CrashFix_Misc33()
         test    eax, eax
         jz      invalid_texture
 
-            // Execute replaced code
+        // All validation passed - execute original function
         jmp     CallOriginalFindNamedTexture
 
     use_current_dict:
-        // Attempt to recover by using the current dictionary
-        push    edx            // Save name before the call
+        // Dict exists but is not type 6, try to recover using current dictionary
+        // Save name in edx across the call
+        push    edx
         call    pfnRwTexDictionaryGetCurrent
-        pop     edx            // Restore name
+        pop     edx
         test    eax, eax
         jz      invalid_texture
 
-            // Call original function with (dict, name)
-        push    edx            // name
-        push    eax            // dict
-        call    CallOriginalFindNamedTexture
-        add     esp, 8
-        
-        retn            // Return to caller
+        // Replace the invalid dict argument on stack with current one
+        mov     [esp+4], eax
+        // Continue with corrected dict
+        jmp     CallOriginalFindNamedTexture
 
     invalid_texture:
         push    33
         call    CrashAverted
-        xor     eax, eax            // Return NULL
-        retn            // cdecl
+        xor     eax, eax            // Return null (texture not found)
+        retn                        // cdecl
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1292,6 +1472,7 @@ DWORD                         RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;           
 static void __declspec(naked) HOOK_CrashFix_Misc34()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
     {
         // Replicate original flag check: ZF was set by previous "test al, al"
@@ -1319,6 +1500,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc34()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc34_Skip
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1335,6 +1517,7 @@ DWORD                 RETURN_CrashFix_Misc35_Abort = 0x7F3760;
 static void _declspec(naked) HOOK_CrashFix_Misc35()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
     {
         pushad
@@ -1355,68 +1538,77 @@ static void _declspec(naked) HOOK_CrashFix_Misc35()
         add     eax, 0FFFFFFF8h
         jmp     RETURN_CrashFix_Misc35
     }
+    // clang-format on
 }
 
-////////////////////////////////////////////////////////////////////////
-// RwTexDictionaryFindNamedTexture
-//
-// Invalid list entry pointer or corrupted texture name pointer
-// (crash at 0x7F3A17: mov cl, [esi])
-// (https://pastebin.com/buBbyWRx and next up: https://pastebin.com/1wTeTwu2)
-//
-// Flow after hook: ecx = ebx+8 (texture name ptr), esi = ecx, then mov cl,[esi]
-// We need to validate both ebx (list node) AND ecx (texture name) are readable.
-//
-// Known bad pointer patterns:
-//   - 0xFF1B1B1B: >= 0x80000000
-//   - 0x4E505444: ASCII garbage in pointer field (readable but invalid data)
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture - Invalid/corrupted texture name pointer
+// Crash: 0x7F3A17 (mov cl,[esi]), see https://pastebin.com/buBbyWRx and https://pastebin.com/1wTeTwu2
+// Flow: validate ebx > compute ecx=ebx+8 > range-check > IsReadablePtr(ecx)
+// Bad ptrs: 0xFF1B1B1B (high), 0x4E505444 (unmapped ASCII)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+//          Use push eax/ecx/edx + pushfd instead (16 bytes vs 32)
+///////////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc36                              0x7F3A09
 #define HOOKSIZE_CrashFix_Misc36                             6
 #define HOOKCHECK_CrashFix_Misc36                            0x8D
 DWORD RETURN_CrashFix_Misc36 = 0x7F3A0F;
 DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
+
+static bool CheckTextureName(DWORD ecxValue)
+{
+    return IsReadablePtr((const void*)ecxValue, 1);
+}
+
 static void _declspec(naked) HOOK_CrashFix_Misc36()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
-        cmp     ebx, 40000000h
+        cmp     ebx, 0x10000
+        jb      abort
+        cmp     ebx, 0x80000000
         jae     abort
 
-        pushad
-        push    0Ch
-        push    ebx
-        call    IsReadablePtr
-        add     esp, 8
-        test    eax, eax
-        popad
-        jz      abort
-
+        // Replicate original code
         lea     eax, [ebx-8]
         lea     ecx, [eax+10h]
 
-        cmp     ecx, 40000000h
+        // Quick check: ecx (texture name ptr) must make sense
+        cmp     ecx, 0x10000
+        jb      abort
+        cmp     ecx, 0x80000000
         jae     abort
 
-        pushad
-        push    1
+        // ecx must point readable memory
+        // save all state before call
+        push    eax
         push    ecx
-        call    IsReadablePtr
-        add     esp, 8
-        test    eax, eax
-        popad
-        jnz     ok
+        push    edx
+        pushfd
+        
+        push    ecx
+        call    CheckTextureName
+        add     esp, 4
+        test    al, al
+        
+        popfd
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      abort
+
+        // Continue to original code at test ecx, ecx
+        jmp     RETURN_CrashFix_Misc36
 
     abort:
         push    36
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc36_Abort
-
-    ok:
-        jmp     RETURN_CrashFix_Misc36
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1432,6 +1624,7 @@ DWORD RETURN_CrashFix_Misc37 = 0x7F39B8;
 static void _declspec(naked) HOOK_CrashFix_Misc37()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
     {
         pushad
@@ -1460,6 +1653,7 @@ static void _declspec(naked) HOOK_CrashFix_Misc37()
         mov     [ecx], edx
         jmp     RETURN_CrashFix_Misc37
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1493,6 +1687,7 @@ static void _declspec(naked) HOOK_CrashFix_Misc38()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     esi, [eax]
@@ -1510,6 +1705,7 @@ static void _declspec(naked) HOOK_CrashFix_Misc38()
         lea     ecx, [esp+ecx*4+18h]
         jmp     RETURN_CrashFix_Misc38
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1559,6 +1755,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
         RwFrame* pNewFrameResult = NULL;
         uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
         DWORD    dwFunc = 0x4C53C0;            // CClumpModelInfo::GetFrameFromId
+        // clang-format off
         __asm
         {
             push    uiNewId
@@ -1567,6 +1764,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
             add     esp, 8
             mov     pNewFrameResult,eax
         }
+        // clang-format on
 
         if (pNewFrameResult)
         {
@@ -1593,6 +1791,7 @@ static void __declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         push    [esp+4*2]
@@ -1620,6 +1819,7 @@ inner:
         mov     eax,dword ptr [esp+10h]
         jmp     RETURN_CClumpModelInfo_GetFrameFromId
     }
+    // clang-format on
 }
 
 CStreamingInfo* GetStreamingInfo(uint id)
@@ -1682,6 +1882,7 @@ static void __declspec(naked) HOOK_CEntity_GetBoundRect()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1695,6 +1896,7 @@ static void __declspec(naked) HOOK_CEntity_GetBoundRect()
         mov     edx, [eax]
         jmp     RETURN_CEntity_GetBoundRect
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1725,6 +1927,7 @@ static void __declspec(naked) HOOK_CVehicle_AddUpgrade()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1749,6 +1952,7 @@ inner:
         mov     ebx, [esp+16]
         jmp     RETURN_CVehicle_AddUpgrade
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1775,6 +1979,7 @@ static void __declspec(naked) HOOK_TrainCrossingBarrierCrashFix()
     TrainCrossingFix_ReturnAddress = ReturnAddress;
     TrainCrossingFix_InvalidReturnAddress = InvalidReturnAddress;
 
+    // clang-format off
     __asm
     {
         test eax, eax            // Check if pLinkedBarrierPost exists
@@ -1786,6 +1991,7 @@ static void __declspec(naked) HOOK_TrainCrossingBarrierCrashFix()
 jmp_invalid:
         jmp TrainCrossingFix_InvalidReturnAddress
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1802,12 +2008,14 @@ static void __declspec(naked) HOOK_ResetFurnitureObjectCounter()
 
     *(int*)0xBB3A18 = 0;            // InteriorManager_c::ms_objectCounter
 
+    // clang-format off
     __asm
     {
         // original instruction
         mov eax, fs:[0]
         jmp RETURN_ResetFurnitureObjectCounter
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1835,6 +2043,7 @@ static void __declspec(naked) HOOK_CVolumetricShadowMgr_Render()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1854,6 +2063,7 @@ inner:
         mov     ecx, 0A9AE00h
         jmp     RETURN_CVolumetricShadowMgr_Render
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1881,6 +2091,7 @@ static void __declspec(naked) HOOK_CVolumetricShadowMgr_Update()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1901,6 +2112,7 @@ inner:
         mov     ecx, 0A9AE00h
         jmp     RETURN_CVolumetricShadowMgr_Update
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1931,6 +2143,7 @@ static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1947,6 +2160,7 @@ static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1968,6 +2182,7 @@ static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSu
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test eax, eax
@@ -1982,6 +2197,7 @@ static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSu
         popad
         jmp RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask_Invalid
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2027,6 +2243,7 @@ static void __declspec(naked) HOOK_printf()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -2041,6 +2258,7 @@ static void __declspec(naked) HOOK_printf()
         push    887DC0h
         jmp     RETURN_printf
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2056,6 +2274,7 @@ static void __declspec(naked) HOOK_RwMatrixMultiply()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax, [esp+0Ch]
@@ -2070,6 +2289,7 @@ cont:
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2185,6 +2405,7 @@ static void __declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         push    [esp + 4]
@@ -2192,6 +2413,7 @@ static void __declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
         add     esp, 0x4
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2252,6 +2474,7 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -2261,6 +2484,7 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
         popad
         jmp     CONTINUE_CTrain__ProcessControl
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2286,6 +2510,7 @@ static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__Cr
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
         {
         test    eax, eax
@@ -2301,6 +2526,7 @@ static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__Cr
         pop     esi
         retn    4
         }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2329,6 +2555,7 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    eax, eax
@@ -2350,6 +2577,7 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
         lea     eax, [edi - 1]
         jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_1
     }
+    // clang-format on
 }
 
 //     0x5B6CA5 | E8 96 EC F0 FF | call  CModelInfo::GetModelInfo
@@ -2365,6 +2593,7 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    eax, eax
@@ -2386,6 +2615,7 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
         lea     eax, [edi - 1]
         jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_2
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2406,6 +2636,7 @@ static void __declspec(naked) HOOK_CPlaceName__Process()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -2423,6 +2654,7 @@ static void __declspec(naked) HOOK_CPlaceName__Process()
         mov     ecx, [eax + 46Ch]
         jmp     CONTINUE_CPlaceName__Process
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2453,6 +2685,7 @@ static void __declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov eax, [edx*4+0xA9B0C8]            // CModelInfo::ms_modelInfoPtrs
@@ -2474,6 +2707,7 @@ static void __declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 
         jmp RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2494,6 +2728,7 @@ static void __declspec(naked) HOOK_RpClumpForAllAtomics()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
@@ -2506,6 +2741,7 @@ static void __declspec(naked) HOOK_RpClumpForAllAtomics()
         push    ebp
         jmp     CONTINUE_RpClumpForAllAtomics
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2524,6 +2760,7 @@ static void __declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
@@ -2535,6 +2772,7 @@ static void __declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
         mov     ecx, ds:[0xB5F878]
         jmp     CONTINUE_RpAnimBlendClumpGetFirstAssociation
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2554,6 +2792,7 @@ static void __declspec(naked) HOOK_CAnimManager__BlendAnimation()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
@@ -2566,6 +2805,7 @@ static void __declspec(naked) HOOK_CAnimManager__BlendAnimation()
         mov     ecx, [esp+18h]
         jmp     CONTINUE_CAnimManager__BlendAnimation
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2619,6 +2859,7 @@ static void __declspec(naked) HOOK_FxSystemBP_c__Load()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
         {
         pushad
@@ -2634,6 +2875,7 @@ static void __declspec(naked) HOOK_FxSystemBP_c__Load()
         add     esp, 5E8h
         retn    0Ch
         }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2653,6 +2895,7 @@ static void __declspec(naked) HOOK_FxPrim_c__Enable()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
         {
         test    ecx, ecx
@@ -2663,6 +2906,7 @@ static void __declspec(naked) HOOK_FxPrim_c__Enable()
         returnFromFunction:
         retn    4
         }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2680,6 +2924,7 @@ static void __declspec(naked) HOOK_CFire_ProcessFire()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test byte ptr [esi], 1            // If the "active" flag has been set to 0, we skip processing attached entities
@@ -2693,6 +2938,7 @@ static void __declspec(naked) HOOK_CFire_ProcessFire()
         mov ecx, esi
         jmp SKIP_CFire_ProcessFire
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -2738,6 +2984,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_Misc36);
     EZHookInstallChecked(CrashFix_Misc37);
     EZHookInstallChecked(CrashFix_Misc38);
+    EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);
