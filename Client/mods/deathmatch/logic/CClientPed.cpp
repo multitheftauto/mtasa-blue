@@ -6626,14 +6626,9 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger, std::op
 
     if (optSeat.has_value())
     {
-        // Explicit seat specified - validate it (reuse validation logic from warpPedIntoVehicle)
+        // Explicit seat specified
         uiSeat = optSeat.value();
-        const unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
-        
-        if (uiSeat > ucMaxPassengers)
-            return false;
-
-        if (uiSeat > 0 && ucMaxPassengers == 255)
+        if (!CClientVehicleManager::IsValidSeat(pVehicle->GetModel(), static_cast<unsigned char>(uiSeat)))
             return false;
     }
     else
