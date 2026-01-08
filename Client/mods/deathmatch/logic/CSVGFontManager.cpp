@@ -28,7 +28,7 @@ bool CSVGFontManager::RegisterFont(const SString& strFontFamily, const SString& 
     if (strFontFamily.empty() || strFontPath.empty() || !pResource)
         return false;
 
-    if (m_RegisteredFonts.find(strFontFamily) != m_RegisteredFonts.end())
+    if (IsFontRegistered(strFontFamily))
         return false;
 
     SString strAbsPath;
@@ -103,7 +103,7 @@ bool CSVGFontManager::UnregisterFont(const SString& strFontFamily)
 
 bool CSVGFontManager::IsFontRegistered(const SString& strFontFamily) const
 {
-    return m_RegisteredFonts.find(strFontFamily) != m_RegisteredFonts.end();
+    return m_RegisteredFonts.contains(strFontFamily);
 }
 
 CResource* CSVGFontManager::GetFontOwnerResource(const SString& strFontFamily) const
