@@ -1248,9 +1248,124 @@ static void __declspec(naked) HOOK_CrashFix_Misc32()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// RwTexDictionaryFindNamedTexture
+// CVehicleModelInfo::FindTextureCB (0x4C7510)
+// SA's inlined strcpy to 32-byte buffer overruns if name >= 31 chars > 0xC0000409
+// Reimplement it using safe string handling
 //
-// "dict" is invalid
+// Hook interaction: This calls RwTexDictionaryFindNamedTexture (0x7F39F0) which has
+// Misc33 hook. Direct calls causes re-entry and stack corruption.
+// Solution: CallOriginalRwTexDictionaryFindNamedTexture replicates Misc33's overwritten
+// bytes (mov eax,[esp+4]; push ebx) and jumps to 0x7F39F5 to work around the hook.
+////////////////////////////////////////////////////////////////////////
+typedef RwTexture* (__cdecl *RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
+typedef RwTexDictionary* (__cdecl *RwTexDictionaryGetCurrent_t)();
+
+static RwTexDictionaryGetCurrent_t pfnRwTexDictionaryGetCurrentForMisc39 = (RwTexDictionaryGetCurrent_t)0x7F3A90;
+
+// Trampoline to call the ORIGINAL RwTexDictionaryFindNamedTexture at 0x7F39F0,
+// thereby working around HOOK_CrashFix_Misc33.
+// Replicates the 5 overwritten bytes (mov eax,[esp+4]; push ebx) then jumps to 0x7F39F5.
+static constexpr DWORD AddrFindNamedTexture_Continue = 0x7F39F5;
+static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+4]
+        push    ebx
+        jmp     AddrFindNamedTexture_Continue
+    }
+    // clang-format on
+}
+
+static constexpr std::size_t TextureNameSize = 32;
+static constexpr char RemapPrefix[] = "remap";
+
+static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
+{
+
+    if (name == nullptr)
+        return nullptr;
+
+    const auto RwTexDictionaryFindNamedTexture = reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(TrampolineRwTexDictionaryFindNamedTexture);
+    const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
+    
+    RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
+    if (vehicleTxd != nullptr)
+    {
+        RwTexture* tex = RwTexDictionaryFindNamedTexture(vehicleTxd, name);
+        if (tex != nullptr)
+        {
+            return tex;
+        }
+    }
+
+    RwTexDictionary* currentTxd = RwTexDictionaryGetCurrent();
+    if (currentTxd == nullptr)
+        return nullptr;
+
+    RwTexture* tex = RwTexDictionaryFindNamedTexture(currentTxd, name);
+
+    if (std::strncmp(name, RemapPrefix, sizeof(RemapPrefix) - 1) == 0)
+    {
+        if (tex == nullptr)
+        {
+            const std::size_t nameLen = strnlen(name, TextureNameSize);
+            if (nameLen >= TextureNameSize)
+            {
+                OnCrashAverted(39);
+                return nullptr;
+            }
+            char tmp[TextureNameSize];
+            std::memcpy(tmp, name, nameLen + 1);
+            tmp[0] = '#';
+            return RwTexDictionaryFindNamedTexture(currentTxd, tmp);
+        }
+        else
+        {
+            if (IsWritablePtr(tex, sizeof(RwTexture)))
+            {
+                tex->name[0] = '#';
+            }
+        }
+    }
+
+    return tex;
+}
+
+#define HOOKPOS_CrashFix_Misc39                             0x4C7510
+#define HOOKSIZE_CrashFix_Misc39                            5
+static void __declspec(naked) HOOK_CrashFix_Misc39()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        push    [esp+4]
+        call    OnMY_FindTextureCB
+        add     esp, 4
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture (0x7F39F0)
+//
+// Crash occur when dict pointer is NULL or invalid (not a valid RwTexDictionary).
+// This can happen with corrupted texture dictionary chains or during streaming issues.
+//
+// Validates the dict pointer before calling the SA function
+//
+// Overwrites the first 5 bytes at 0x7F39F0:
+//   Original: 8B 44 24 04 53  (mov eax,[esp+4]; push ebx)
+//   Replaced: E9 xx xx xx xx  (jmp HOOK_CrashFix_Misc33)
+//
+// HOOK_CrashFix_Misc39 (FindTextureCB replacement) needs to call this function
+// but has to dodge this hook (risk of re-entry and stack corruption)
+// See CallOriginalRwTexDictionaryFindNamedTexture in the Misc39 code for the
+// trampoline that replicates the overwritten bytes and jumps to 0x7F39F5.
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc33  0x7F39F0
 #define HOOKSIZE_CrashFix_Misc33 5
@@ -1259,15 +1374,18 @@ DWORD RETURN_CrashFix_Misc33 = 0x7F39F5;
 typedef RwTexDictionary*(__cdecl* PFN_RwTexDictionaryGetCurrent)();
 PFN_RwTexDictionaryGetCurrent pfnRwTexDictionaryGetCurrent = (PFN_RwTexDictionaryGetCurrent)0x7F3A90;
 
+// Helper to execute the original func's overwritten prologue and continue.
+// Used by HOOK_CrashFix_Misc33 when validation passes.
 static void __declspec(naked) CallOriginalFindNamedTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
-        mov     eax, [esp+4]
-        push    ebx
-        jmp     RETURN_CrashFix_Misc33
+        // Replicate overwritten bytes at 0x7F39F0
+        mov     eax, [esp+4]        // Original: mov eax, [esp+dict]
+        push    ebx                  // Original: push ebx
+        jmp     RETURN_CrashFix_Misc33  // Continue at 0x7F39F5: add eax, 8
     }
     // clang-format on
 }
@@ -1296,7 +1414,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc33()
         cmp     ecx, 0x10000
         jb      invalid_texture
 
-            // Check if it's a dictionary (type 6)
+        // Check if it's a dictionary (RwObject type 6 at offset 0)
         cmp     byte ptr [ecx], 6
         jne     use_current_dict
 
@@ -1305,30 +1423,28 @@ static void __declspec(naked) HOOK_CrashFix_Misc33()
         test    eax, eax
         jz      invalid_texture
 
-            // Execute replaced code
+        // All validation passed - execute original function
         jmp     CallOriginalFindNamedTexture
 
     use_current_dict:
-        // Attempt to recover by using the current dictionary
-        push    edx            // Save name before the call
+        // Dict exists but is not type 6, try to recover using current dictionary
+        // Save name in edx across the call
+        push    edx
         call    pfnRwTexDictionaryGetCurrent
-        pop     edx            // Restore name
+        pop     edx
         test    eax, eax
         jz      invalid_texture
 
-            // Call original function with (dict, name)
-        push    edx            // name
-        push    eax            // dict
-        call    CallOriginalFindNamedTexture
-        add     esp, 8
-        
-        retn            // Return to caller
+        // Replace the invalid dict argument on stack with current one
+        mov     [esp+4], eax
+        // Continue with corrected dict
+        jmp     CallOriginalFindNamedTexture
 
     invalid_texture:
         push    33
         call    CrashAverted
-        xor     eax, eax            // Return NULL
-        retn            // cdecl
+        xor     eax, eax            // Return null (texture not found)
+        retn                        // cdecl
     }
     // clang-format on
 }
@@ -1425,25 +1541,25 @@ static void _declspec(naked) HOOK_CrashFix_Misc35()
     // clang-format on
 }
 
-////////////////////////////////////////////////////////////////////////
-// RwTexDictionaryFindNamedTexture
-//
-// Invalid list entry pointer or corrupted texture name pointer
-// (crash at 0x7F3A17: mov cl, [esi])
-// (https://pastebin.com/buBbyWRx and next up: https://pastebin.com/1wTeTwu2)
-//
-// Flow after hook: ecx = ebx+8 (texture name ptr), esi = ecx, then mov cl,[esi]
-// We need to validate both ebx (list node) AND ecx (texture name) are readable.
-//
-// Known bad pointer patterns:
-//   - 0xFF1B1B1B: >= 0x80000000
-//   - 0x4E505444: ASCII garbage in pointer field (readable but invalid data)
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture - Invalid/corrupted texture name pointer
+// Crash: 0x7F3A17 (mov cl,[esi]), see https://pastebin.com/buBbyWRx and https://pastebin.com/1wTeTwu2
+// Flow: validate ebx > compute ecx=ebx+8 > range-check > IsReadablePtr(ecx)
+// Bad ptrs: 0xFF1B1B1B (high), 0x4E505444 (unmapped ASCII)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+//          Use push eax/ecx/edx + pushfd instead (16 bytes vs 32)
+///////////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc36                              0x7F3A09
 #define HOOKSIZE_CrashFix_Misc36                             6
 #define HOOKCHECK_CrashFix_Misc36                            0x8D
 DWORD RETURN_CrashFix_Misc36 = 0x7F3A0F;
 DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
+
+static bool CheckTextureName(DWORD ecxValue)
+{
+    return IsReadablePtr((const void*)ecxValue, 1);
+}
+
 static void _declspec(naked) HOOK_CrashFix_Misc36()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1451,40 +1567,46 @@ static void _declspec(naked) HOOK_CrashFix_Misc36()
     // clang-format off
     __asm
     {
-        cmp     ebx, 40000000h
+        cmp     ebx, 0x10000
+        jb      abort
+        cmp     ebx, 0x80000000
         jae     abort
 
-        pushad
-        push    0Ch
-        push    ebx
-        call    IsReadablePtr
-        add     esp, 8
-        test    eax, eax
-        popad
-        jz      abort
-
+        // Replicate original code
         lea     eax, [ebx-8]
         lea     ecx, [eax+10h]
 
-        cmp     ecx, 40000000h
+        // Quick check: ecx (texture name ptr) must make sense
+        cmp     ecx, 0x10000
+        jb      abort
+        cmp     ecx, 0x80000000
         jae     abort
 
-        pushad
-        push    1
+        // ecx must point readable memory
+        // save all state before call
+        push    eax
         push    ecx
-        call    IsReadablePtr
-        add     esp, 8
-        test    eax, eax
-        popad
-        jnz     ok
+        push    edx
+        pushfd
+        
+        push    ecx
+        call    CheckTextureName
+        add     esp, 4
+        test    al, al
+        
+        popfd
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      abort
+
+        // Continue to original code at test ecx, ecx
+        jmp     RETURN_CrashFix_Misc36
 
     abort:
         push    36
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc36_Abort
-
-    ok:
-        jmp     RETURN_CrashFix_Misc36
     }
     // clang-format on
 }
@@ -2862,6 +2984,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_Misc36);
     EZHookInstallChecked(CrashFix_Misc37);
     EZHookInstallChecked(CrashFix_Misc38);
+    EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);
