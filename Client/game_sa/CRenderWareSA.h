@@ -134,7 +134,7 @@ public:
 
     static void  StaticSetHooks();
     static void  StaticSetClothesReplacingHooks();
-    static void  RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex);
+    static bool  RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
     static void  DebugTxdAddRef(unsigned short usTxdId, const char* tag = nullptr, bool enableSafetyPin = true);

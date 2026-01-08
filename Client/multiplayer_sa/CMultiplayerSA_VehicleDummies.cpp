@@ -98,6 +98,7 @@ static void __declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -119,6 +120,7 @@ static void __declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
         mov     [esp+0D4h-8Ch], edx
         jmp     CONTINUE_CVehicle_AddExhaustParticles_1
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +142,7 @@ static void __declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -158,6 +161,7 @@ static void __declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
         add     edx, 84h
         jmp     CONTINUE_CVehicle_AddExhaustParticles_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -179,6 +183,7 @@ static void __declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -201,6 +206,7 @@ static void __declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
         add     ecx, 54h
         jmp     CONTINUE_CVehicle_AddDamagedVehicleParticles
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -222,6 +228,7 @@ static void __declspec(naked) HOOK_CFire_ProcessFire()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -244,6 +251,7 @@ static void __declspec(naked) HOOK_CFire_ProcessFire()
         mov     edx, [eax]
         jmp     CONTINUE_CFire_ProcessFire
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -265,6 +273,7 @@ static void __declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -287,6 +296,7 @@ static void __declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
         add     ecx, 48h
         jmp     CONTINUE_CAutomobile_DoNitroEffect_1
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -338,6 +348,7 @@ static void __declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -351,6 +362,7 @@ static void __declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
         test    [esi+40h], edi
         jmp     CONTINUE_CAutomobile_DoNitroEffect_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -375,6 +387,7 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -397,6 +410,7 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
         add     eax, 18h
         jmp     CONTINUE_CVehicle_DoVehicleLights_1
     }
+    // clang-format on
 }
 
 //     0x6E22C6 | 8B 04 85 C8 B0 A9 00 | mov eax, CModelInfo::ms_modelInfoPtrs
@@ -411,6 +425,7 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -433,6 +448,7 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
         add     ecx, 18h
         jmp     CONTINUE_CVehicle_DoVehicleLights_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -454,6 +470,7 @@ static void __declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -476,6 +493,7 @@ static void __declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
         add     eax, 54h
         jmp     CONTINUE_CAutomobile_ProcessCarOnFireAndExplode
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -497,6 +515,7 @@ static void __declspec(naked) HOOK_CBike_FixHandsToBars()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -519,6 +538,7 @@ static void __declspec(naked) HOOK_CBike_FixHandsToBars()
         add     eax, 78h
         jmp     CONTINUE_CBike_FixHandsToBars
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -540,6 +560,7 @@ static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -563,6 +584,7 @@ static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
         mov     edi, [edi+5Ch]
         jmp     CONTINUE_CPed_SetPedPositionInCar_1
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -584,6 +606,7 @@ static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -607,6 +630,7 @@ static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
         add     eax, 3Ch
         jmp     CONTINUE_CPed_SetPedPositionInCar_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -628,6 +652,7 @@ static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -651,6 +676,7 @@ static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
         mov     edi, [edi+5Ch]
         jmp     CONTINUE_CPed_SetPedPositionInCar_3
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -672,6 +698,7 @@ static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -695,6 +722,7 @@ static void __declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
         add     edx, 3Ch
         jmp     CONTINUE_CPed_SetPedPositionInCar_4
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -716,6 +744,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -738,6 +767,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
         lea     ecx, [ebx+ebx*2]
         jmp     CONTINUE_CVehicle_DoHeadLightEffect
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -760,6 +790,7 @@ static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -784,6 +815,7 @@ static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect()
         mov     ebx, [esp+4+30h]
         jmp     CONTINUE_CVehicle_DoTailLightEffect
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -805,6 +837,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -827,6 +860,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
         mov     eax, [edx]
         jmp     CONTINUE_CVehicle_DoHeadLightReflectionSingle
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -848,6 +882,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -870,6 +905,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
         mov     eax, [edx]
         jmp     CONTINUE_CVehicle_DoHeadLightReflectionTwin
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -892,6 +928,7 @@ static void __declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -916,6 +953,7 @@ static void __declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
         mov     eax, [eax+5Ch]
         jmp     CONTINUE_CVehicle_GetPlaneGunsPosition
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -937,6 +975,7 @@ static void __declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -959,6 +998,7 @@ static void __declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
         add     eax, 9Ch
         jmp     CONTINUE_CVehicle_GetPlaneOrdnancePosition
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -980,6 +1020,7 @@ static void __declspec(naked) HOOK_CVehicle_CanBeDriven()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1002,6 +1043,7 @@ static void __declspec(naked) HOOK_CVehicle_CanBeDriven()
         mov     eax, [eax+5Ch]
         jmp     CONTINUE_CVehicle_CanBeDriven
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1023,6 +1065,7 @@ static void __declspec(naked) HOOK_CPlane_PreRender_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1045,6 +1088,7 @@ static void __declspec(naked) HOOK_CPlane_PreRender_1()
         add     ecx, 84h
         jmp     CONTINUE_CPlane_PreRender_1
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1066,6 +1110,7 @@ static void __declspec(naked) HOOK_CPlane_PreRender_2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1088,6 +1133,7 @@ static void __declspec(naked) HOOK_CPlane_PreRender_2()
         add     eax, 6Ch
         jmp     CONTINUE_CPlane_PreRender_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1109,6 +1155,7 @@ static void __declspec(naked) HOOK_CPlane_PreRender_3()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1131,6 +1178,7 @@ static void __declspec(naked) HOOK_CPlane_PreRender_3()
         add     eax, 78h
         jmp     CONTINUE_CPlane_PreRender_3
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1152,6 +1200,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1174,6 +1223,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
         mov     eax, [esp+98h+4h]
         jmp     CONTINUE_CVehicle_DoHeadLightBeam
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -102,7 +102,8 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
             pGameInterface->GetStreaming()->LoadAllRequestedModels(true);
             if (bLoadingBigModel)
                 pGameInterface->GetStreaming()->LoadAllRequestedModels(false);
-            assert(!bLoadingBigModel);
+            if (bLoadingBigModel)
+                return false;
         }
 
         int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
@@ -131,6 +132,7 @@ static void __declspec(naked) HOOK_CallCStreamingInfoAddToList()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -165,6 +167,7 @@ skip:
         add     esp, 4*1
         jmp     RETURN_CallCStreamingInfoAddToListB
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,6 +196,7 @@ static void __declspec(naked) HOOK_CStreamingLoadRequestedModels()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -212,6 +216,7 @@ skip:
         popad
         jmp     RETURN_CStreamingLoadRequestedModelsB
     }
+    // clang-format on
 }
 
 //
@@ -242,6 +247,7 @@ static void __declspec(naked) HOOK_LoadingPlayerImgDir()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // hook from 005A69E3 5 bytes
+    // clang-format off
     __asm
     {
         pushad
@@ -260,6 +266,7 @@ skip:
         popad
         jmp     RETURN_LoadingPlayerImgDirB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

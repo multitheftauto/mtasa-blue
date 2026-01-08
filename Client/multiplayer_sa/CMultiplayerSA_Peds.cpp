@@ -37,6 +37,7 @@ static void __declspec(naked) HOOK_CPed_DoFootLanded()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -53,6 +54,7 @@ static void __declspec(naked) HOOK_CPed_DoFootLanded()
         mov     esi, ecx
         jmp     CONTINUE_CPed_DoFootLanded
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
