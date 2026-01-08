@@ -43,6 +43,7 @@ CCredits::CCredits()
         "Chris \"ccw\" Cockwanger\n"
         "Adge \"Jax\" Cutler\n"
         "Cecill \"ijs\" Etheredge\n"
+        "Patrik Juvonen\n"
         "Danish \"Saml1er\" Khan\n"
         "Marek \"botder\" Kulik\n"
         "Sebas \"x86\" Lamers\n"
@@ -65,7 +66,6 @@ CCredits::CCredits()
         "\n\n"
 
         "Patrik \"Pirulax\" Jankovics-Szmolenicki\n"
-        "Patrik \"myonlake\" Juvonen\n"
         "Uladzislau \"TheNormalnij\" Nikalayevich\n"
         "Nikita \"StrixG\" Obrecht\n"
         "Arran\n"
