@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-08 15:06+0000\n"
-"PO-Revision-Date: 2026-01-08 17:19\n"
+"PO-Revision-Date: 2026-01-08 18:15\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -399,7 +399,7 @@ msgstr "** Nincs elég memória – a hibát az elégtelen szabad vagy töredeze
 
 #: Client/loader/CInstallManager.cpp:476
 msgid "** Enhanced crash capture will be attempted on next launch. **"
-msgstr ""
+msgstr "** A program a következő indításkor részletesebb hibajelentést fog készíteni. **"
 
 #: Client/loader/CInstallManager.cpp:1059
 msgid "Install updated MTA:SA files"
@@ -1948,7 +1948,9 @@ msgstr "KÜLSŐ HANGOK"
 msgid "Rich Presence is currently enabled.\n"
 "Do you want to allow data sharing with servers you connect to?\n\n"
 "This includes your Discord client ID, and game state info."
-msgstr ""
+msgstr "A Rich Presence jelenleg be van kapcsolva.\n"
+"Szeretnéd engedélyezni az adatmegosztást azokkal a szerverekkel, amelyekhez csatlakozol?\n\n"
+"Ez magában foglalja a Discord kliensazonosítódat és a játék állapotára vonatkozó információkat."
 
 #: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
