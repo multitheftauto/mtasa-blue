@@ -57,6 +57,5 @@ private:
 
     std::vector<STrackNode> m_Nodes;
     bool                    m_LinkLastNodes;
-    bool                    m_Default;
     uchar                   m_DefaultTrackId;
 };
