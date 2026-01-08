@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-08 15:06+0000\n"
-"PO-Revision-Date: 2026-01-08 17:18\n"
+"PO-Revision-Date: 2026-01-08 18:15\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -397,7 +397,7 @@ msgstr "** Out of memory - acest crash a fost cauzat de memorie insuficientă sa
 
 #: Client/loader/CInstallManager.cpp:476
 msgid "** Enhanced crash capture will be attempted on next launch. **"
-msgstr ""
+msgstr "** Captură sporită crash va fi încercată la următoarea pornire. **"
 
 #: Client/loader/CInstallManager.cpp:1059
 msgid "Install updated MTA:SA files"
@@ -1944,7 +1944,9 @@ msgstr "SUNETE EXTERNE"
 msgid "Rich Presence is currently enabled.\n"
 "Do you want to allow data sharing with servers you connect to?\n\n"
 "This includes your Discord client ID, and game state info."
-msgstr ""
+msgstr "Rich Presence este moment activat.\n"
+"Dorești să permiți partajarea datelor cu serverele la care te conectezi?\n\n"
+"Acestea includ client ID-ul tău Discord, și informații despre starea jocului."
 
 #: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
