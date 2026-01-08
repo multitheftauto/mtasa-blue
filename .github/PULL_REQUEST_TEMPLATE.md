@@ -17,5 +17,5 @@
 
 #### Checklist
 
-* [ ] Your code should following the [coding guidelines](https://wiki.multitheftauto.com/index.php?title=Coding_guidelines).
+* [ ] Your code should follow the [coding guidelines](https://wiki.multitheftauto.com/index.php?title=Coding_guidelines).
 * [ ] Smaller pull requests are easier to review. If your pull request is beefy, your pull request should be reviewable commit-by-commit.
