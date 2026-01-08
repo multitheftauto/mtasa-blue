@@ -10,6 +10,7 @@
 #include "StdInc.h"
 #include "CSVGFontManager.h"
 #include <lunasvg.h>
+#include <ranges>
 
 CSVGFontManager& CSVGFontManager::GetSingleton()
 {
@@ -42,7 +43,7 @@ bool CSVGFontManager::RegisterFont(const SString& strFontFamily, const SString& 
 
     // Get file size
     uint64 fileSize = FileSize(strAbsPath);
-    if (fileSize == 0 || fileSize > 100 * 1024 * 1024) // Sanity check: max 100MB
+    if (fileSize == 0 || fileSize > 10 * 1024 * 1024) // max 10MB
         return false;
 
     // Allocate memory for font data that will be owned by LunaSVG
@@ -133,11 +134,6 @@ void CSVGFontManager::UnregisterResourceFonts(CResource* pResource)
 
 std::vector<SString> CSVGFontManager::GetRegisteredFonts() const
 {
-    std::vector<SString> fonts;
-    fonts.reserve(m_RegisteredFonts.size());
-    
-    for (const auto& pair : m_RegisteredFonts)
-        fonts.push_back(pair.first);
-    
-    return fonts;
+    auto keys = std::views::keys(m_RegisteredFonts);
+    return {keys.begin(), keys.end()};
 }
