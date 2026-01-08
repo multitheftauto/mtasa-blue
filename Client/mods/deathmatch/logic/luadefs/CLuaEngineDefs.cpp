@@ -683,7 +683,12 @@ bool CLuaEngineDefs::EngineAddClothingTXD(CClientTXD* pTXD, std::string strModel
         throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)strModelName.length(), strModelName.data()));
 
     if (!pTXD->AddClothingTexture(strModelName))
-        throw std::invalid_argument(SString("Texture already added (%*s)", (int)strModelName.length(), strModelName.data()));
+    {
+        SString strError = pTXD->GetLastError();
+        if (strError.empty())
+            strError = SString("Failed to add clothing texture (%*s)", (int)strModelName.length(), strModelName.data());
+        throw std::invalid_argument(strError);
+    }
 
     return true;
 }

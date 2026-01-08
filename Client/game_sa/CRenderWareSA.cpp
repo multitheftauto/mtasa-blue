@@ -217,6 +217,7 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
     // Add atomic to container
     data->pReplacements[data->uiReplacements].atomic = atomic;
     strncpy(&data->pReplacements[data->uiReplacements].szName[0], &Frame->szName[0], 16);
+    data->pReplacements[data->uiReplacements].szName[16] = '\0';
 
     // and increment the counter
     data->uiReplacements++;
@@ -249,10 +250,10 @@ CRenderWareSA::~CRenderWareSA()
 // Reads and parses a TXD file specified by a path (szTXD)
 RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SString& buffer)
 {
-    constexpr std::size_t RW_CHUNK_HEADER_SIZE = 12;  // type(4) + size(4) + version(4)
+    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
+    constexpr std::uint32_t RW_CHUNK_TYPE_TXD = 0x16;
     constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
 
-    // Must have either a filename or buffer data
     if (buffer.empty() && strFilename.empty())
         return nullptr;
 
@@ -261,104 +262,77 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
     std::uint32_t chunkType = 0;
     std::uint32_t chunkSize = 0;
 
-    // Pre-validate the source before giving it to RW
     if (!bUsingBuffer)
     {
-        FILE* pFile = File::Fopen(*strFilename, "rb");
-        if (!pFile)
+        SString headerData;
+        if (!FileLoad(std::nothrow, strFilename, headerData, RW_CHUNK_HEADER_SIZE))
             return nullptr;
 
-        std::array<char, RW_CHUNK_HEADER_SIZE> headerBytes{};
-        std::size_t bytesRead = fread(headerBytes.data(), 1, RW_CHUNK_HEADER_SIZE, pFile);
+        if (headerData.size() < RW_CHUNK_HEADER_SIZE)
+            return nullptr;
 
-        if (bytesRead < RW_CHUNK_HEADER_SIZE)
-        {
-            fclose(pFile);
-            return nullptr;  // Can't read header - file incomplete
-        }
+        std::memcpy(&chunkType, headerData.data(), sizeof(chunkType));
+        std::memcpy(&chunkSize, headerData.data() + 4, sizeof(chunkSize));
 
-        std::memcpy(&chunkType, headerBytes.data(), sizeof(chunkType));
-        std::memcpy(&chunkSize, headerBytes.data() + 4, sizeof(chunkSize));
-
-        if (chunkType != 0x16)
-        {
-            fclose(pFile);
-            return nullptr;  // Not a TXD file
-        }
+        if (chunkType != RW_CHUNK_TYPE_TXD)
+            return nullptr;
 
         if (chunkSize > MAX_SANE_CHUNK_SIZE)
-        {
-            fclose(pFile);
             return nullptr;
-        }
 
-        // Validate file contains full chunk data
-        fseek(pFile, 0, SEEK_END);
-        long fileSize = ftell(pFile);
-        fclose(pFile);
-
-        // File must be at least: header (12 bytes) + chunkSize bytes
-        if (fileSize < 0 || static_cast<std::uint32_t>(fileSize) < RW_CHUNK_HEADER_SIZE + chunkSize)
-            return nullptr;  // File incomplete
+        std::uint64_t fileSize = FileSize(strFilename);
+        if (fileSize < RW_CHUNK_HEADER_SIZE + chunkSize)
+            return nullptr;
     }
     else
     {
         if (buffer.size() < RW_CHUNK_HEADER_SIZE)
-            return nullptr;  // Buffer too small
+            return nullptr;
 
         std::memcpy(&chunkType, buffer.data(), sizeof(chunkType));
         std::memcpy(&chunkSize, buffer.data() + 4, sizeof(chunkSize));
 
-        if (chunkType != 0x16)
-            return nullptr;  // Not a TXD
+        if (chunkType != RW_CHUNK_TYPE_TXD)
+            return nullptr;
 
         if (chunkSize > MAX_SANE_CHUNK_SIZE)
             return nullptr;
 
         if (buffer.size() < RW_CHUNK_HEADER_SIZE + chunkSize)
-            return nullptr;  // Buffer incomplete
+            return nullptr;
     }
 
-    // open the stream
-    RwStream* streamTexture;
-    RwBuffer  streamBuffer;
+    RwStream* pStream = nullptr;
+    RwBuffer  rwBuffer{};
+
     if (bUsingBuffer)
     {
-        streamBuffer.ptr = (void*)buffer.data();
-        streamBuffer.size = buffer.size();
-        streamTexture = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
+        rwBuffer.ptr = const_cast<char*>(buffer.data());
+        rwBuffer.size = static_cast<unsigned int>(buffer.size());
+        pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
     }
     else
     {
-        streamTexture = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
+        pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
     }
 
-    // check for errors
-    if (streamTexture == NULL)
-        return NULL;
+    if (!pStream)
+        return nullptr;
 
-    // TXD header id: 0x16
-    // find our txd chunk (dff loads textures, so correct loading order is: txd, dff)
-    if (RwStreamFindChunk(streamTexture, 0x16, NULL, NULL) == false)
+    if (!RwStreamFindChunk(pStream, RW_CHUNK_TYPE_TXD, nullptr, nullptr))
     {
-        RwStreamClose(streamTexture, NULL);
-        return NULL;
-    }
-
-    // read the texture dictionary from our model (txd)
-    RwTexDictionary* pTex = RwTexDictionaryGtaStreamRead(streamTexture);
-    if (!pTex)
-    {
-        RwStreamClose(streamTexture, NULL);
+        RwStreamClose(pStream, nullptr);
         return nullptr;
     }
 
-    // close the stream
-    RwStreamClose(streamTexture, NULL);
+    RwTexDictionary* pTxd = RwTexDictionaryGtaStreamRead(pStream);
+    RwStreamClose(pStream, nullptr);
 
-    ScriptAddedTxd(pTex);
+    if (!pTxd)
+        return nullptr;
 
-    return pTex;
+    ScriptAddedTxd(pTxd);
+    return pTxd;
 }
 
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
@@ -366,7 +340,6 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
 // Any custom TXD should be imported before this call
 RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions)
 {
-    // Set correct TXD as materials are processed at the same time
     if (usModelID != 0)
     {
         CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
@@ -377,31 +350,81 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         }
     }
 
-    // open the stream
-    RwStream* streamModel;
-    RwBuffer  streamBuffer;
-    if (!buffer.empty())
+    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
+    constexpr std::uint32_t RW_CHUNK_TYPE_DFF = 0x10;
+    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
+
+    const bool bUsingBuffer = !buffer.empty();
+
+    std::uint32_t chunkType = 0;
+    std::uint32_t chunkSize = 0;
+
+    if (!bUsingBuffer)
     {
-        streamBuffer.ptr = (void*)buffer.data();
-        streamBuffer.size = buffer.size();
-        streamModel = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
+        if (strFilename.empty())
+            return nullptr;
+
+        SString headerData;
+        if (!FileLoad(std::nothrow, strFilename, headerData, RW_CHUNK_HEADER_SIZE))
+            return nullptr;
+
+        if (headerData.size() < RW_CHUNK_HEADER_SIZE)
+            return nullptr;
+
+        std::memcpy(&chunkType, headerData.data(), sizeof(chunkType));
+        std::memcpy(&chunkSize, headerData.data() + 4, sizeof(chunkSize));
+
+        if (chunkType != RW_CHUNK_TYPE_DFF)
+            return nullptr;
+
+        if (chunkSize > MAX_SANE_CHUNK_SIZE)
+            return nullptr;
+
+        std::uint64_t fileSize = FileSize(strFilename);
+        if (fileSize < RW_CHUNK_HEADER_SIZE + chunkSize)
+            return nullptr;
     }
     else
-        streamModel = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
+    {
+        if (buffer.size() < RW_CHUNK_HEADER_SIZE)
+            return nullptr;
 
-    // get the modelinfo array
+        std::memcpy(&chunkType, buffer.data(), sizeof(chunkType));
+        std::memcpy(&chunkSize, buffer.data() + 4, sizeof(chunkSize));
+
+        if (chunkType != RW_CHUNK_TYPE_DFF)
+            return nullptr;
+
+        if (chunkSize > MAX_SANE_CHUNK_SIZE)
+            return nullptr;
+
+        if (buffer.size() < RW_CHUNK_HEADER_SIZE + chunkSize)
+            return nullptr;
+    }
+
+    RwStream* pStream = nullptr;
+    RwBuffer  rwBuffer{};
+
+    if (bUsingBuffer)
+    {
+        rwBuffer.ptr = const_cast<char*>(buffer.data());
+        rwBuffer.size = static_cast<unsigned int>(buffer.size());
+        pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
+    }
+    else
+    {
+        pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
+    }
+
     DWORD* pPool = (DWORD*)ARRAY_ModelInfo;
 
-    // check for errors
-    if (streamModel == NULL)
-        return NULL;
+    if (!pStream)
+        return nullptr;
 
-    // DFF header id: 0x10
-    // find our dff chunk
-    if (RwStreamFindChunk(streamModel, 0x10, NULL, NULL) == false)
+    if (!RwStreamFindChunk(pStream, RW_CHUNK_TYPE_DFF, nullptr, nullptr))
     {
-        RwStreamClose(streamModel, NULL);
-        return NULL;
+        RwStreamClose(pStream, nullptr);
+        return nullptr;
     }
 
     if (bLoadEmbeddedCollisions)
@@ -425,7 +448,7 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
     }
 
     // read the clump with all its extensions
-    RpClump* pClump = RpClumpStreamRead(streamModel);
+    RpClump* pClump = RpClumpStreamRead(pStream);
 
     if (bLoadEmbeddedCollisions)
     {
@@ -436,8 +459,7 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         ((void(__cdecl*)())0x4C75C0)();
     }
 
-    // close the stream
-    RwStreamClose(streamModel, NULL);
+    RwStreamClose(pStream, nullptr);
 
     return pClump;
 }
@@ -1035,61 +1057,33 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
     }
 }
 
-void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
+bool CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
     if (!pTex || !pTXD ||
         !SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)) ||
         !SharedUtil::IsReadablePointer(pTXD, sizeof(RwTexDictionary)))
-        return;
-        
+        return false;
+
     if (pTex->txd != pTXD)
-        return;
+        return false;
 
-    if (!SharedUtil::IsReadablePointer(pTex->TXDList.next, sizeof(RwListEntry)) ||
-        !SharedUtil::IsReadablePointer(pTex->TXDList.prev, sizeof(RwListEntry)))
-    {
-        // List corrupted - orphan without unlinking
-        pTex->TXDList.next = &pTex->TXDList;
-        pTex->TXDList.prev = &pTex->TXDList;
-        pTex->txd = nullptr;
-        return;
-    }
+    RwListEntry* pNext = pTex->TXDList.next;
+    RwListEntry* pPrev = pTex->TXDList.prev;
 
-    if (pTex->TXDList.next == nullptr || pTex->TXDList.prev == nullptr)
-    {
-        // Null neighbors - orphan without unlinking
-        pTex->TXDList.next = &pTex->TXDList;
-        pTex->TXDList.prev = &pTex->TXDList;
-        pTex->txd = nullptr;
-        return;
-    }
+    if (!pNext || !pPrev ||
+        !SharedUtil::IsReadablePointer(pNext, sizeof(RwListEntry)) ||
+        !SharedUtil::IsReadablePointer(pPrev, sizeof(RwListEntry)))
+        return false;
 
-    // Verify neighboring nodes point back to us
-    if (pTex->TXDList.next->prev != &pTex->TXDList || 
-        pTex->TXDList.prev->next != &pTex->TXDList)
-    {
-        // Recovery: orphan texture if it points at root but root doesn't point back
-        RwListEntry* pRoot = &pTXD->textures.root;
-        if (pTex->TXDList.next == pRoot && pTex->TXDList.prev == pRoot &&
-            pRoot->next != &pTex->TXDList && pRoot->prev != &pTex->TXDList)
-        {
-            pTex->TXDList.next = &pTex->TXDList;
-            pTex->TXDList.prev = &pTex->TXDList;
-            pTex->txd = nullptr;
-            return;
-        }
-        return;  // Can't safely unlink
-    }
+    if (pNext->prev != &pTex->TXDList || pPrev->next != &pTex->TXDList)
+        return false;
 
-    // Unlink from the TXD's texture list
-    pTex->TXDList.next->prev = pTex->TXDList.prev;
-    pTex->TXDList.prev->next = pTex->TXDList.next;
-    
-    // Clear the texture's list pointers to prevent dangling references.
-    // Make them self-referencing
+    pPrev->next = pNext;
+    pNext->prev = pPrev;
     pTex->TXDList.next = &pTex->TXDList;
     pTex->TXDList.prev = &pTex->TXDList;
     pTex->txd = nullptr;
+    return true;
 }
 
 short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
