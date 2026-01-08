@@ -20,6 +20,7 @@ CSVGFontManager& CSVGFontManager::GetSingleton()
 
 void CSVGFontManager::FontDataDestroyCallback(void* pData)
 {
+    // We don't need to worry about our own tracking here (already handled), just free the memory
     delete[] static_cast<char*>(pData);
 }
 
@@ -70,7 +71,7 @@ bool CSVGFontManager::RegisterFont(const SString& strFontFamily, const SString& 
     }
 
     // Register font with LunaSVG using data API
-    // LunaSVG takes ownership of the data and will call our destroy callback when done
+    // LunaSVG takes ownership of the data, we provide a callback to implement destruct behaviour, and notify when we're done
     if (!lunasvg_add_font_face_from_data(strFontFamily.c_str(), false, false, pFontData, dataSize, FontDataDestroyCallback, pFontData))
     {
         // Registration failed, clean up the memory ourselves
@@ -95,8 +96,7 @@ bool CSVGFontManager::UnregisterFont(const SString& strFontFamily)
     if (it == m_RegisteredFonts.end())
         return false;
 
-    // Remove from our tracking
-    // Note: The font data memory will be freed by LunaSVG via our destroy callback
+    // TODO: unregister font face with lunasvg here (see https://github.com/sammycage/lunasvg/issues/258)
     m_RegisteredFonts.erase(it);
     return true;
 }
@@ -129,7 +129,7 @@ void CSVGFontManager::UnregisterResourceFonts(CResource* pResource)
 
     // Remove collected fonts from our tracking
     for (const auto& fontFamily : fontsToRemove)
-        m_RegisteredFonts.erase(fontFamily);
+        UnregisterFont(fontFamily);
 }
 
 std::vector<SString> CSVGFontManager::GetRegisteredFonts() const
