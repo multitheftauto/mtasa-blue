@@ -245,8 +245,12 @@ bool CClientObjectManager::StaticIsLowLodObjectLimitReached()
 
 bool CClientObjectManager::IsObjectLimitReached()
 {
-    if (IsHardObjectLimitReached() || m_uiStreamedInCount >= m_uiMaxStreamedInCount)
+    if (IsHardObjectLimitReached() || (m_uiCustomMaxStreamedInCount > 0 && m_uiStreamedInCount >= m_uiCustomMaxStreamedInCount) ||
+        m_uiStreamedInCount >= m_uiMaxStreamedInCount)
+    {
         return true;
+    }
+
     return false;
 }
 
@@ -332,4 +336,25 @@ void CClientObjectManager::RemoveFromLists(CClientObject* pObject)
 bool CClientObjectManager::Exists(CClientObject* pObject)
 {
     return ListContains(m_Objects, pObject);
+}
+
+void CClientObjectManager::SetMaxObjectStreamCount(int cValue)
+{
+    if (cValue < m_uiMaxStreamedInCount)
+        throw std::invalid_argument("Custom limit must be greater than or equal to default limit");
+
+    m_uiCustomMaxStreamedInCount = cValue;
+}
+
+void CClientObjectManager::ResetMaxObjectStreamCount()
+{
+    m_uiCustomMaxStreamedInCount = 0;
+}
+
+int CClientObjectManager::GetMaxObjectStreamCount()
+{
+    if (m_uiCustomMaxStreamedInCount > 0)
+        return m_uiCustomMaxStreamedInCount;
+
+    return m_uiMaxStreamedInCount;
 }

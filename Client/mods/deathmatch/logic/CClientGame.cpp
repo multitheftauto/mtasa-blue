@@ -430,6 +430,16 @@ CClientGame::~CClientGame()
     // ...and restore the buffer size too
     g_pGame->GetStreaming()->SetStreamingBufferSize(g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks());
 
+    // Reset streamer limits
+    g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerLimits();
+    g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerMaxSwaps();
+    g_pClientGame->GetManager()->GetObjectStreamer()->ResetStreamerFurthestInLimit();
+
+    // Reset streamer limits
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager();
+    if (pObjectManager)
+        pObjectManager->ResetMaxObjectStreamCount();
+
     // Reset camera shaking
     g_pGame->GetCamera()->SetShakeForce(0.0f);
 
