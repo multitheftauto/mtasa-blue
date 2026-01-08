@@ -33,6 +33,7 @@ static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Save result of comparing camera and corona direction
@@ -44,6 +45,7 @@ behind_corona:
         mov     bCameraFacingCorona, eax
         jmp     RETURN_CVehicle_DoTailLightEffect_Mid
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +65,7 @@ static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         movzx   eax, byte ptr [esp+0Fh]
@@ -82,6 +85,7 @@ no_corona:
         sub     esp, 54h
         jmp     RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <array>
+#include <cstddef>
+#include <cstring>
+#include <unordered_map>
+#include <unordered_set>
+#include <algorithm>
 #include <CMatrix.h>
 #include <core/CCoreInterface.h>
 #define RWFUNC_IMPLEMENT
@@ -26,6 +32,20 @@
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
+
+void CRenderWareSA::DebugTxdAddRef(unsigned short usTxdId, const char* /*tag*/, bool /*enableSafetyPin*/)
+{
+    if (!pGame || !pGame->GetRenderWareSA())
+        return;
+    CTxdStore_AddRef(usTxdId);
+}
+
+void CRenderWareSA::DebugTxdRemoveRef(unsigned short usTxdId, const char* /*tag*/)
+{
+    if (!pGame || !pGame->GetRenderWareSA())
+        return;
+    CTxdStore_RemoveRef(usTxdId);
+}
 
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
 struct SReplaceParts
@@ -177,8 +197,7 @@ static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
     return true;
 }
 
-// RpClumpForAllAtomics struct and callback used to load the atomics from a specific clump into a container
-// Stores atomic pointers without transferring ownership - caller must manage lifetime
+// Load atomics from clump into container (caller manages lifetime)
 struct SLoadAtomics
 {
     RpAtomicContainer* pReplacements;             // replacement atomics
@@ -198,6 +217,7 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
     // Add atomic to container
     data->pReplacements[data->uiReplacements].atomic = atomic;
     strncpy(&data->pReplacements[data->uiReplacements].szName[0], &Frame->szName[0], 16);
+    data->pReplacements[data->uiReplacements].szName[16] = '\0';
 
     // and increment the counter
     data->uiReplacements++;
@@ -230,39 +250,89 @@ CRenderWareSA::~CRenderWareSA()
 // Reads and parses a TXD file specified by a path (szTXD)
 RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SString& buffer)
 {
-    // open the stream
-    RwStream* streamTexture;
-    RwBuffer  streamBuffer;
-    if (!buffer.empty())
+    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
+    constexpr std::uint32_t RW_CHUNK_TYPE_TXD = 0x16;
+    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
+
+    if (buffer.empty() && strFilename.empty())
+        return nullptr;
+
+    const bool bUsingBuffer = !buffer.empty();
+
+    std::uint32_t chunkType = 0;
+    std::uint32_t chunkSize = 0;
+
+    if (!bUsingBuffer)
     {
-        streamBuffer.ptr = (void*)buffer.data();
-        streamBuffer.size = buffer.size();
-        streamTexture = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
+        SString headerData;
+        if (!FileLoad(std::nothrow, strFilename, headerData, RW_CHUNK_HEADER_SIZE))
+            return nullptr;
+
+        if (headerData.size() < RW_CHUNK_HEADER_SIZE)
+            return nullptr;
+
+        std::memcpy(&chunkType, headerData.data(), sizeof(chunkType));
+        std::memcpy(&chunkSize, headerData.data() + 4, sizeof(chunkSize));
+
+        if (chunkType != RW_CHUNK_TYPE_TXD)
+            return nullptr;
+
+        if (chunkSize > MAX_SANE_CHUNK_SIZE)
+            return nullptr;
+
+        std::uint64_t fileSize = FileSize(strFilename);
+        if (fileSize < RW_CHUNK_HEADER_SIZE + chunkSize)
+            return nullptr;
     }
     else
-        streamTexture = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
-
-    // check for errors
-    if (streamTexture == NULL)
-        return NULL;
-
-    // TXD header id: 0x16
-    // find our txd chunk (dff loads textures, so correct loading order is: txd, dff)
-    if (RwStreamFindChunk(streamTexture, 0x16, NULL, NULL) == false)
     {
-        RwStreamClose(streamTexture, NULL);
-        return NULL;
+        if (buffer.size() < RW_CHUNK_HEADER_SIZE)
+            return nullptr;
+
+        std::memcpy(&chunkType, buffer.data(), sizeof(chunkType));
+        std::memcpy(&chunkSize, buffer.data() + 4, sizeof(chunkSize));
+
+        if (chunkType != RW_CHUNK_TYPE_TXD)
+            return nullptr;
+
+        if (chunkSize > MAX_SANE_CHUNK_SIZE)
+            return nullptr;
+
+        if (buffer.size() < RW_CHUNK_HEADER_SIZE + chunkSize)
+            return nullptr;
     }
 
-    // read the texture dictionary from our model (txd)
-    RwTexDictionary* pTex = RwTexDictionaryGtaStreamRead(streamTexture);
+    RwStream* pStream = nullptr;
+    RwBuffer  rwBuffer{};
 
-    // close the stream
-    RwStreamClose(streamTexture, NULL);
+    if (bUsingBuffer)
+    {
+        rwBuffer.ptr = const_cast<char*>(buffer.data());
+        rwBuffer.size = static_cast<unsigned int>(buffer.size());
+        pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
+    }
+    else
+    {
+        pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
+    }
 
-    ScriptAddedTxd(pTex);
+    if (!pStream)
+        return nullptr;
 
-    return pTex;
+    if (!RwStreamFindChunk(pStream, RW_CHUNK_TYPE_TXD, nullptr, nullptr))
+    {
+        RwStreamClose(pStream, nullptr);
+        return nullptr;
+    }
+
+    RwTexDictionary* pTxd = RwTexDictionaryGtaStreamRead(pStream);
+    RwStreamClose(pStream, nullptr);
+
+    if (!pTxd)
+        return nullptr;
+
+    ScriptAddedTxd(pTxd);
+    return pTxd;
 }
 
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
@@ -270,38 +340,91 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
 // Any custom TXD should be imported before this call
 RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions)
 {
-    // Set correct TXD as materials are processed at the same time
     if (usModelID != 0)
     {
-        unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-        SetTextureDict(usTxdId);
+        CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
+        if (pModelInfo)
+        {
+            unsigned short usTxdId = pModelInfo->usTextureDictionary;
+            SetTextureDict(usTxdId);
+        }
     }
 
-    // open the stream
-    RwStream* streamModel;
-    RwBuffer  streamBuffer;
-    if (!buffer.empty())
+    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
+    constexpr std::uint32_t RW_CHUNK_TYPE_DFF = 0x10;
+    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
+
+    const bool bUsingBuffer = !buffer.empty();
+
+    std::uint32_t chunkType = 0;
+    std::uint32_t chunkSize = 0;
+
+    if (!bUsingBuffer)
     {
-        streamBuffer.ptr = (void*)buffer.data();
-        streamBuffer.size = buffer.size();
-        streamModel = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
+        if (strFilename.empty())
+            return nullptr;
+
+        SString headerData;
+        if (!FileLoad(std::nothrow, strFilename, headerData, RW_CHUNK_HEADER_SIZE))
+            return nullptr;
+
+        if (headerData.size() < RW_CHUNK_HEADER_SIZE)
+            return nullptr;
+
+        std::memcpy(&chunkType, headerData.data(), sizeof(chunkType));
+        std::memcpy(&chunkSize, headerData.data() + 4, sizeof(chunkSize));
+
+        if (chunkType != RW_CHUNK_TYPE_DFF)
+            return nullptr;
+
+        if (chunkSize > MAX_SANE_CHUNK_SIZE)
+            return nullptr;
+
+        std::uint64_t fileSize = FileSize(strFilename);
+        if (fileSize < RW_CHUNK_HEADER_SIZE + chunkSize)
+            return nullptr;
     }
     else
-        streamModel = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
+    {
+        if (buffer.size() < RW_CHUNK_HEADER_SIZE)
+            return nullptr;
 
-    // get the modelinfo array
+        std::memcpy(&chunkType, buffer.data(), sizeof(chunkType));
+        std::memcpy(&chunkSize, buffer.data() + 4, sizeof(chunkSize));
+
+        if (chunkType != RW_CHUNK_TYPE_DFF)
+            return nullptr;
+
+        if (chunkSize > MAX_SANE_CHUNK_SIZE)
+            return nullptr;
+
+        if (buffer.size() < RW_CHUNK_HEADER_SIZE + chunkSize)
+            return nullptr;
+    }
+
+    RwStream* pStream = nullptr;
+    RwBuffer  rwBuffer{};
+
+    if (bUsingBuffer)
+    {
+        rwBuffer.ptr = const_cast<char*>(buffer.data());
+        rwBuffer.size = static_cast<unsigned int>(buffer.size());
+        pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
+    }
+    else
+    {
+        pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
+    }
+
     DWORD* pPool = (DWORD*)ARRAY_ModelInfo;
 
-    // check for errors
-    if (streamModel == NULL)
-        return NULL;
+    if (!pStream)
+        return nullptr;
 
-    // DFF header id: 0x10
-    // find our dff chunk
-    if (RwStreamFindChunk(streamModel, 0x10, NULL, NULL) == false)
+    if (!RwStreamFindChunk(pStream, RW_CHUNK_TYPE_DFF, nullptr, nullptr))
     {
-        RwStreamClose(streamModel, NULL);
-        return NULL;
+        RwStreamClose(pStream, nullptr);
+        return nullptr;
     }
 
     if (bLoadEmbeddedCollisions)
@@ -325,7 +448,7 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
     }
 
     // read the clump with all its extensions
-    RpClump* pClump = RpClumpStreamRead(streamModel);
+    RpClump* pClump = RpClumpStreamRead(pStream);
 
     if (bLoadEmbeddedCollisions)
     {
@@ -336,24 +459,62 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         ((void(__cdecl*)())0x4C75C0)();
     }
 
-    // close the stream
-    RwStreamClose(streamModel, NULL);
+    RwStreamClose(pStream, nullptr);
 
     return pClump;
 }
 
 //
 // Returns list of atomics inside a clump
+// Uses a visited set to detect cycles in corrupted linked lists
 //
 void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList)
 {
-    RpClumpForAllAtomics(
-        pClump,
-        [](RpAtomic* pAtomic, void* pData) {
-            reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
+    // Track visited atomics to detect cycles from corrupted linked lists.
+    struct VisitedTracker
+    {
+        std::vector<RpAtomic*>* pList;
+        std::unordered_set<void*> visited;
+        std::size_t iterations;
+        bool bStop;
+        std::size_t maxAtomics;
+        
+        VisitedTracker(std::vector<RpAtomic*>* list, std::size_t maxCount)
+            : pList(list), iterations(0), bStop(false), maxAtomics(maxCount)
+        {
+        }
+    };
+
+    auto ForAllAtomicsCB = [](RpAtomic* pAtomic, void* pData) -> bool {
+        auto* t = reinterpret_cast<VisitedTracker*>(pData);
+
+        if (t->bStop)
+            return false;  // Stop iteration once we decided to bail
+
+        if (++t->iterations > t->maxAtomics)
+        {
+            t->bStop = true;
+            return false;
+        }
+
+        // Check if we've seen this atomic before (cycle detection)
+        if (t->visited.find(pAtomic) != t->visited.end())
+        {
+            // Skip duplicates but keep iterating to avoid truncating legitshared atomics
             return true;
-        },
-        &outAtomicList);
+        }
+
+        t->visited.insert(pAtomic);
+
+        if (pAtomic && SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
+            t->pList->push_back(pAtomic);
+
+        return true;
+    };
+
+    VisitedTracker tracker(&outAtomicList, 4096);
+
+    RpClumpForAllAtomics(pClump, ForAllAtomicsCB, &tracker);
 }
 
 //
@@ -395,6 +556,162 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
         return false;
 
     return true;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::RebindClumpTexturesToTxd
+//
+// Rebinds all material textures in a clump to current TXD textures.
+// This fixes stale texture pointers that occur when a TXD is reloaded
+// after a custom DFF has been loaded. Without this fix, shader texture
+// replacement fails because the materials point to old/destroyed textures.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId)
+{
+    if (!pClump || !SharedUtil::IsReadablePointer(pClump, sizeof(RpClump)))
+        return;
+
+    RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
+    if (!pTxd || !SharedUtil::IsReadablePointer(pTxd, sizeof(RwTexDictionary)))
+        return;
+
+    // Build a safe name->texture map once.
+    // Calling RW's FindNamedTexture can freeze if the TXD's internal linked list is bad
+    std::vector<RwTexture*> txdTextures;
+    GetTxdTextures(txdTextures, pTxd);
+
+    struct TextureNameHash
+    {
+        std::size_t operator()(const char* s) const noexcept
+        {
+            if (!s)
+                return 0;
+
+            std::size_t h = 2166136261u;
+            for (std::size_t i = 0; i < RW_TEXTURE_NAME_LENGTH; ++i)
+            {
+                const unsigned char c = static_cast<unsigned char>(s[i]);
+                if (c == 0)
+                    break;
+                h ^= c;
+                h *= 16777619u;
+            }
+            return h;
+        }
+    };
+
+    struct TextureNameEq
+    {
+        bool operator()(const char* a, const char* b) const noexcept
+        {
+            if (a == b)
+                return true;
+            if (!a || !b)
+                return false;
+            return strncmp(a, b, RW_TEXTURE_NAME_LENGTH) == 0;
+        }
+    };
+
+    using TxdTextureMap = std::unordered_map<const char*, RwTexture*, TextureNameHash, TextureNameEq>;
+    TxdTextureMap txdTextureMap;
+    if (!txdTextures.empty())
+    {
+        txdTextureMap.reserve(txdTextures.size());
+        for (RwTexture* pTexture : txdTextures)
+        {
+            if (!pTexture || !SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+                continue;
+
+            const char* name = pTexture->name;
+            const std::size_t nameLen = strnlen(name, RW_TEXTURE_NAME_LENGTH);
+            if (nameLen >= RW_TEXTURE_NAME_LENGTH)
+                continue;
+
+            txdTextureMap[name] = pTexture;
+        }
+    }
+
+    // Iterate through all atomics in the clump
+    std::vector<RpAtomic*> atomicList;
+    GetClumpAtomicList(pClump, atomicList);
+
+    for (RpAtomic* pAtomic : atomicList)
+    {
+        if (!pAtomic || !SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
+            continue;
+
+        RpGeometry* pGeometry = pAtomic->geometry;
+        if (!pGeometry || !SharedUtil::IsReadablePointer(pGeometry, sizeof(RpGeometry)))
+            continue;
+
+        RpMaterials& materials = pGeometry->materials;
+
+        // Validate materials array exists and entries is sane
+        if (!materials.materials || materials.entries <= 0)
+            continue;
+
+        // Sanity check - reject obviously corrupted values.
+        // Normal geometry has at most a few hundred materials.
+        constexpr int MAX_REASONABLE_MATERIALS = 10000;
+        int materialCount = materials.entries;
+        if (materialCount > MAX_REASONABLE_MATERIALS)
+            continue;
+
+        // Validate materials array is readable
+        if (!SharedUtil::IsReadablePointer(materials.materials, materialCount * sizeof(RpMaterial*)))
+            continue;
+
+        // Iterate through all materials in the geometry
+        for (int idx = 0; idx < materialCount; ++idx)
+        {
+            RpMaterial* pMaterial = materials.materials[idx];
+            if (!pMaterial || !SharedUtil::IsReadablePointer(pMaterial, sizeof(RpMaterial)))
+                continue;
+
+            RwTexture* pOldTexture = pMaterial->texture;
+            if (!pOldTexture || !SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
+                continue;
+
+            // Get the current texture's name (RwTexture::name is char[32], always check first char)
+            const char* szTextureName = pOldTexture->name;
+            if (!szTextureName[0])
+                continue;
+
+            RwTexture* pCurrentTexture = nullptr;
+            const std::size_t nameLen = strnlen(szTextureName, RW_TEXTURE_NAME_LENGTH);
+            if (nameLen < RW_TEXTURE_NAME_LENGTH)
+            {
+                auto itFound = txdTextureMap.find(szTextureName);
+                if (itFound != txdTextureMap.end())
+                    pCurrentTexture = itFound->second;
+
+                if (!pCurrentTexture)
+                {
+                    const char* szInternalName = GetInternalTextureName(szTextureName);
+                    if (szInternalName && szInternalName != szTextureName)
+                    {
+                        const std::size_t internalLen = strnlen(szInternalName, RW_TEXTURE_NAME_LENGTH);
+                        if (internalLen < RW_TEXTURE_NAME_LENGTH)
+                        {
+                            auto itInternal = txdTextureMap.find(szInternalName);
+                            if (itInternal != txdTextureMap.end())
+                                pCurrentTexture = itInternal->second;
+                        }
+                    }
+                }
+            }
+
+            // If we found a texture and it's different from the material's current texture, update it
+            // Validate the found texture to prevent crash from corrupted/freed texture in TXD
+            if (pCurrentTexture && pCurrentTexture != pOldTexture && 
+                SharedUtil::IsReadablePointer(pCurrentTexture, sizeof(RwTexture)))
+            {
+                RpMaterialSetTexture(pMaterial, pCurrentTexture);
+            }
+        }
+    }
 }
 
 // Replaces a vehicle/weapon/ped model
@@ -586,9 +903,8 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     relatedModelInfo.bDeleteOldRwObject = true;
     CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);
 
-    // The above function adds a reference to the model's TXD by either
-    // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
-    CTxdStore_RemoveRef(pData->usTxdID);
+    // The above function adds a reference to the model's TXD. Remove it again.
+    CRenderWareSA::DebugTxdRemoveRef(pData->usTxdID);
     return true;
 }
 
@@ -615,7 +931,13 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
 
             // Replace the atomics
             SAtomicsReplacer data;
-            data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+            CBaseModelInfoSAInterface* pModelInfoInterface = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
+            if (!pModelInfoInterface)
+            {
+                RpClumpDestroy(pCopy);
+                return false;
+            }
+            data.usTxdID = pModelInfoInterface->usTextureDictionary;
             data.pClump = pCopy;
 
             MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
@@ -735,17 +1057,33 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
     }
 }
 
-void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
+bool CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
-    if (!pTex || !pTXD)
-        return;
-        
-    if (pTex->txd != pTXD)
-        return;
+    if (!pTex || !pTXD ||
+        !SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)) ||
+        !SharedUtil::IsReadablePointer(pTXD, sizeof(RwTexDictionary)))
+        return false;
 
-    pTex->TXDList.next->prev = pTex->TXDList.prev;
-    pTex->TXDList.prev->next = pTex->TXDList.next;
-    pTex->txd = NULL;
+    if (pTex->txd != pTXD)
+        return false;
+
+    RwListEntry* pNext = pTex->TXDList.next;
+    RwListEntry* pPrev = pTex->TXDList.prev;
+
+    if (!pNext || !pPrev ||
+        !SharedUtil::IsReadablePointer(pNext, sizeof(RwListEntry)) ||
+        !SharedUtil::IsReadablePointer(pPrev, sizeof(RwListEntry)))
+        return false;
+
+    if (pNext->prev != &pTex->TXDList || pPrev->next != &pTex->TXDList)
+        return false;
+
+    pPrev->next = pNext;
+    pNext->prev = pPrev;
+    pTex->TXDList.next = &pTex->TXDList;
+    pTex->TXDList.prev = &pTex->TXDList;
+    pTex->txd = nullptr;
+    return true;
 }
 
 short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
@@ -755,15 +1093,9 @@ short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
 
 bool CRenderWareSA::RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
-    // Avoid crashes with freed/invalid textures and TXDs
-    if (!pTex || !pTXD)
-        return false;
-
-    // Prevent crash when texture/TXD has been freed but pointer still exists
-    if (!SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)))
-        return false;
-    
-    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(RwTexDictionary)))
+    if (!pTex || !pTXD ||
+        !SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)) ||
+        !SharedUtil::IsReadablePointer(pTXD, sizeof(RwTexDictionary)))
         return false;
     
     return pTex->txd == pTXD;
@@ -806,14 +1138,109 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
 
     // Need to have at least one ref for RemoveRef to work correctly
     if (CTxdStore_GetNumRefs(usTxdId) == 0)
-    {
-        CTxdStore_AddRef(usTxdId);
-    }
+        CRenderWareSA::DebugTxdAddRef(usTxdId);
 
     while (CTxdStore_GetNumRefs(usTxdId) > 0)
+        CRenderWareSA::DebugTxdRemoveRef(usTxdId);
+}
+
+namespace
+{
+    struct TextureMapping
     {
-        CTxdStore_RemoveRef(usTxdId);
+        const char* externalPrefix;    // e.g., "remap"
+        const char* internalPrefix;    // e.g., "#emap"
+        size_t      externalLength;    // strlen(externalPrefix)
+        size_t      internalLength;    // strlen(internalPrefix)
+    };
+
+    // Static mappings for texture name transformations
+    // GTA:SA renames certain texture prefixes internally in CVehicleModelInfo::FindTextureCB
+    // This specifically handles vehicle paintjob textures.
+    // Note: This may false positive on non-vehicle textures with matching prefixes,
+    // but the fallback lookup pattern (try original first, then transformed) mitigates this.
+    constexpr std::array<TextureMapping, 2> kTextureMappings = {{
+        {"remap", "#emap", 5, 5},
+        {"white", "@hite", 5, 5}
+    }};
+    
+    // Thread-local buffers for transformed texture names (avoids allocation)
+    // Note: These are overwritten on each call - do not store the returned pointer
+    // for use after another call to these functions.
+    thread_local char s_szInternalNameBuffer[RW_TEXTURE_NAME_LENGTH + 1];
+    thread_local char s_szExternalNameBuffer[RW_TEXTURE_NAME_LENGTH + 1];
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetInternalTextureName
+//
+// Maps external texture names to internal GTA:SA names.
+// Handles prefix-based matches (e.g., "remap_body" -> "#emap_body").
+// Returns original name if no mapping exists.
+//
+// Note: Returns pointer to thread-local static buffer when transformation
+// occurs. The returned string is only valid until the next call to this function
+// on the same thread. Copy the result if you need to preserve it.
+//
+////////////////////////////////////////////////////////////////
+const char* CRenderWareSA::GetInternalTextureName(const char* szExternalName)
+{
+    if (!szExternalName || !szExternalName[0])
+        return szExternalName;
+
+    for (const auto& mapping : kTextureMappings)
+    {
+        // Check if the external name starts with this prefix (case-insensitive)
+        if (_strnicmp(szExternalName, mapping.externalPrefix, mapping.externalLength) == 0)
+        {
+            // Build internal name: internal prefix + rest of original name
+            const char* szSuffix = szExternalName + mapping.externalLength;
+            
+            // Build the transformed name (only snprintf is safe for it)
+            snprintf(s_szInternalNameBuffer, sizeof(s_szInternalNameBuffer), "%s%s", 
+                     mapping.internalPrefix, szSuffix);
+            
+            return s_szInternalNameBuffer;
+        }
     }
+    return szExternalName;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetExternalTextureName
+//
+// Maps internal GTA:SA names to external texture names.
+// Handles prefix-based matches (e.g., "#emap_body" -> "remap_body").
+// Returns original name if no mapping exists.
+//
+// Note: Returns pointer to thread-local static buffer when transformation
+// occurs. The returned string is only valid until the next call to this function
+// on the same thread. Copy the result if you need to preserve it.
+//
+////////////////////////////////////////////////////////////////
+const char* CRenderWareSA::GetExternalTextureName(const char* szInternalName)
+{
+    if (!szInternalName || !szInternalName[0])
+        return szInternalName;
+
+    for (const auto& mapping : kTextureMappings)
+    {
+        // Check if the internal name starts with this prefix (case-insensitive)
+        if (_strnicmp(szInternalName, mapping.internalPrefix, mapping.internalLength) == 0)
+        {
+            // Build external name: external prefix + rest of original name
+            const char* szSuffix = szInternalName + mapping.internalLength;
+            
+            // Build the transformed name (only snprintf is safe for it)
+            snprintf(s_szExternalNameBuffer, sizeof(s_szExternalNameBuffer), "%s%s",
+                     mapping.externalPrefix, szSuffix);
+            
+            return s_szExternalNameBuffer;
+        }
+    }
+    return szInternalName;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -889,9 +1316,13 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
     std::vector<RwTexture*> textureList;
     GetTxdTextures(textureList, pTXD);
 
-    for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
+    for (RwTexture* pTexture : textureList)
     {
-        outNameList.push_back((*iter)->name);
+        // Fix for #emap corruption:
+        // Some textures (like 'remap') are internally renamed to start with '#' (e.g. '#emap') by SA.
+        // This causes issues when scripts try to access them by their original name.
+        // We detect this case and return the expected name 'remap' instead.
+        outNameList.push_back(GetExternalTextureName(pTexture->name));
     }
 
     if (bLoadedModel)
@@ -951,7 +1382,8 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
 
     for (RwTexture* pTexture : rwTextureList)
     {
-        SString strTextureName = pTexture->name;
+        SString strTextureName = GetExternalTextureName(pTexture->name);
+
         bool    bValidTexture = false;
 
         if (bExcludeTextures)
@@ -1022,28 +1454,6 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTe
     if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
         return;
 
-    // Validate the linked list structure to prevent crash at 0x007F374A
-    // The crash occurs when next pointer is invalid and gets deref'd during iteration
-    RwListEntry* firstNode = pTXD->textures.root.next;
-    if (!SharedUtil::IsReadablePointer(firstNode, sizeof(RwListEntry)))
-        return;
-
-    // Check for empty list (next points back to root - valid case)
-    if (firstNode == &pTXD->textures.root)
-        return;  // Empty TXD is valid
-
-    // Validate the first texture node structure
-    // The texture pointer is at (node - offsetof(RwTexture, TXDList))
-    // which is (node - 8) since TXDList is at offset 8 in RwTexture
-    RwTexture* firstTexture = (RwTexture*)((char*)firstNode - 8);
-    if (!SharedUtil::IsReadablePointer(firstTexture, sizeof(RwTexture)))
-        return;
-
-    // Validate that first node's next pointer is also readable
-    // This catches most corruption cases where the list is broken
-    if (!SharedUtil::IsReadablePointer(firstNode->next, sizeof(RwListEntry)))
-        return;
-
     constexpr std::size_t kMaxReasonableTextures = 8192;
     if (outTextureList.size() >= kMaxReasonableTextures)
     {
@@ -1052,37 +1462,111 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTe
         return;
     }
 
-    RwTexDictionaryForAllTextures(pTXD, StaticGetTextureCB, &outTextureList);
+    if (outTextureList.empty())
+        outTextureList.reserve(16);
+
+    // Manual iteration avoids freezes on bad TXD lists.
+    RwListEntry* const pRoot = &pTXD->textures.root;
+    RwListEntry*       pNode = pRoot->next;
+
+    if (pNode == nullptr)
+        return;
+
+    if (pNode == pRoot)
+        return;  // Empty TXD
+
+    std::size_t iterations = 0;
+    while (pNode != pRoot)
+    {
+        if (++iterations > kMaxReasonableTextures)
+        {
+            LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                     SString("Texture list enumeration exceeded %zu iterations (possible TXD corruption/cycle)", kMaxReasonableTextures), 5422);
+            return;
+        }
+
+        if (!SharedUtil::IsReadablePointer(pNode, sizeof(RwListEntry)))
+            return;
+
+        RwTexture* pTexture = reinterpret_cast<RwTexture*>(reinterpret_cast<char*>(pNode) - offsetof(RwTexture, TXDList));
+        if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+            return;
+
+        outTextureList.push_back(pTexture);
+        if (outTextureList.size() >= kMaxReasonableTextures)
+            return;
+
+        if (!SharedUtil::IsReadablePointer(pNode->next, sizeof(RwListEntry)))
+            return;
+
+        pNode = pNode->next;
+    }
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::StaticGetTextureCB
+// CRenderWareSA::GetTxdTextures (unordered_set overload)
 //
-// Callback used in GetTxdTextures
-// Returns false to stop enumeration if limits are hit
+// Get textures from a TXD into unordered_set for O(1) contains
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList)
+void CRenderWareSA::GetTxdTextures(std::unordered_set<RwTexture*>& outTextureSet, RwTexDictionary* pTXD)
 {
-    // Fast null check before any heavy validation
-    if (!texture || !pTextureList)
-        return false;
+    if (!pTXD)
+        return;
 
-    // Prevent excessive allocations from corrupted TXDs
+    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
+        return;
+
     constexpr std::size_t kMaxReasonableTextures = 8192;
-    if (pTextureList->size() >= kMaxReasonableTextures)
-        return false;            // Stop enumeration
+    if (outTextureSet.size() >= kMaxReasonableTextures)
+    {
+        LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                 SString("Texture set already contains %zu textures (limit: %zu)", outTextureSet.size(), kMaxReasonableTextures), 5422);
+        return;
+    }
 
-    // Note: We don't validate readability here for performance reasons.
-    // The upfront validation in GetTxdTextures catches the first two nodes,
-    // and the SA function crashes before calling this callback if the
-    // linked list is corrupted mid-iteration. If we reach here with a bad
-    // pointer, we'll crash in push_back, but that's acceptable vs the cost
-    // of VirtualQuery on every texture in every TXD.
-    
-    pTextureList->push_back(texture);
-    return true;
+    if (outTextureSet.empty())
+        outTextureSet.reserve(16);
+
+    // Manual iteration avoids freezes on bad TXD lists.
+    RwListEntry* const pRoot = &pTXD->textures.root;
+    RwListEntry*       pNode = pRoot->next;
+
+    if (pNode == nullptr)
+        return;
+
+    if (pNode == pRoot)
+        return;  // Empty TXD
+
+    // The set size doesnt grow on duplicates; cap iterations separately.
+    std::size_t iterations = 0;
+    while (pNode != pRoot)
+    {
+        if (++iterations > kMaxReasonableTextures)
+        {
+            LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                     SString("Texture set enumeration exceeded %zu iterations (possible TXD corruption/cycle)", kMaxReasonableTextures), 5422);
+            return;
+        }
+
+        if (!SharedUtil::IsReadablePointer(pNode, sizeof(RwListEntry)))
+            return;
+
+        RwTexture* pTexture = reinterpret_cast<RwTexture*>(reinterpret_cast<char*>(pNode) - offsetof(RwTexture, TXDList));
+        if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+            return;
+
+        if (outTextureSet.size() >= kMaxReasonableTextures)
+            return;
+
+        outTextureSet.insert(pTexture);
+
+        if (!SharedUtil::IsReadablePointer(pNode->next, sizeof(RwListEntry)))
+            return;
+
+        pNode = pNode->next;
+    }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -1102,18 +1586,8 @@ const char* CRenderWareSA::GetTextureName(CD3DDUMMY* pD3DData)
     return "";
 }
 
-//
-// CFastHashMap functions
-//
-CD3DDUMMY* GetEmptyMapKey(CD3DDUMMY**)
-{
-    return FAKE_D3DTEXTURE_EMPTY_KEY;
-}
-
-CD3DDUMMY* GetDeletedMapKey(CD3DDUMMY**)
-{
-    return FAKE_D3DTEXTURE_DELETED_KEY;
-}
+// Note: GetEmptyMapKey/GetDeletedMapKey for CD3DDUMMY* are now declared in CRenderWareSA.ShaderSupport.h
+// to ensure they are visible before CFastHashMap<CD3DDUMMY*, ...> template instantiatin
 
 RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
 {

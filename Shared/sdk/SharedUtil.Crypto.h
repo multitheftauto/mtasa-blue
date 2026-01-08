@@ -20,6 +20,8 @@
 #include <cryptopp/hex.h>
 #include <cryptopp/md5.h>
 #include <zlib/zlib.h>
+#include <cstdint>
+#include <cstdlib>
 #include "SString.h"
 
 namespace SharedUtil
@@ -176,19 +178,42 @@ namespace SharedUtil
         using namespace CryptoPP;
         using CryptoPP::byte;
 
-        AutoSeededRandomPool rnd;
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe with 3x input size to cover: output buffer + Crypto++ internal buffers + StringSink allocations.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 3 - 256;
+        if (sData.size() > kMaxProbeSize)
+            return {SString(), SString()};
 
-        SString result;
-        SString sIv;
+        void* probe = std::malloc(sData.size() * 3 + 256);
+        if (!probe)
+            return {SString(), SString()};
+        std::free(probe);
 
-        sIv.resize(AES::BLOCKSIZE);
-        rnd.GenerateBlock((byte*)sIv.data(), sIv.size());
+        try
+        {
+            AutoSeededRandomPool rnd;
 
-        CTR_Mode<AES>::Encryption aesEncryption;
-        aesEncryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
-        StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
+            SString result;
+            SString sIv;
 
-        return {result, sIv};
+            // Pre-reserve output buffer - AES-CTR output size equals input size
+            // This avoids StringSink's doubling behavior on large inputs
+            result.reserve(sData.size());
+
+            sIv.resize(AES::BLOCKSIZE);
+            rnd.GenerateBlock((byte*)sIv.data(), sIv.size());
+
+            CTR_Mode<AES>::Encryption aesEncryption;
+            aesEncryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
+            StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
+
+            return {result, sIv};
+        }
+        catch (const std::exception&)
+        {
+            return {SString(), SString()};
+        }
     }
 
     inline SString Aes128decode(const SString& sData, const SString& sKey, SString sIv)
@@ -196,14 +221,37 @@ namespace SharedUtil
         using namespace CryptoPP;
         using CryptoPP::byte;
 
-        sIv.resize(AES::BLOCKSIZE);
-        SString result;
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe with 3x input size to cover: output buffer + Crypto++ internal buffers + StringSink allocations.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 3 - 256;
+        if (sData.size() > kMaxProbeSize)
+            return SString();
 
-        CTR_Mode<AES>::Decryption aesDecryption;
-        aesDecryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
-        StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
+        void* probe = std::malloc(sData.size() * 3 + 256);
+        if (!probe)
+            return SString();
+        std::free(probe);
 
-        return result;
+        try
+        {
+            sIv.resize(AES::BLOCKSIZE);
+            SString result;
+
+            // Pre-reserve output buffer - AES-CTR output size equals input size
+            // This avoids StringSink's doubling behavior on large inputs
+            result.reserve(sData.size());
+
+            CTR_Mode<AES>::Decryption aesDecryption;
+            aesDecryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
+            StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
+
+            return result;
+        }
+        catch (const std::exception&)
+        {
+            return SString();
+        }
     }
 
     inline bool StringToZLibFormat(const std::string& format, int& outResult)

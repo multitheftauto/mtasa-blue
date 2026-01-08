@@ -10,19 +10,22 @@
 #pragma warning (disable:4250)
 
 #include <windows.h>
-#define MTA_CLIENT
-#define SHARED_UTIL_WITH_HASH_MAP
-#define SHARED_UTIL_WITH_FAST_HASH_MAP
-#include "SharedUtil.h"
-#include "SharedUtil.MemAccess.h"
-#include <stdio.h>
 
 #include <algorithm>
 #include <list>
 #include <map>
 #include <set>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
+#include <stdio.h>
+
+#define MTA_CLIENT
+#define SHARED_UTIL_WITH_HASH_MAP
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#include "SharedUtil.h"
+#include "SharedUtil.MemAccess.h"
 
 // Game includes
 #include "HookSystem.h"

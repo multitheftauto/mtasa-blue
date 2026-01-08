@@ -140,8 +140,7 @@ void CLatentTransferManager::AddSendBatchBegin(unsigned char ucPacketId, NetBitS
     uint uiHeadSize = buffer.GetSize();
 
     // Copy data from bitstream into buffer
-    if (!buffer.SetSize(uiHeadSize + uiBitStreamBytesUsed))
-        return;  // Allocation failed (OOM)
+    buffer.SetSize(uiHeadSize + uiBitStreamBytesUsed);
     *(buffer.GetData() + buffer.GetSize() - 1) = 0;            // Zero last byte of destination buffer
     pBitStream->ResetReadPointer();
     pBitStream->ReadBits(buffer.GetData() + uiHeadSize, uiBitStreamBitsUsed);

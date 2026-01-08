@@ -82,6 +82,10 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Init the global var with ourself
     g_pClientGame = this;
 
+    g_pCore->UpdateWerCrashModuleBases();
+
+    CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
+
     // Packet handler
     m_pPacketHandler = new CPacketHandler();
 
@@ -549,8 +553,12 @@ CClientGame::~CClientGame()
         discord->UpdatePresence();
     }
 
+    // Destruction order matters: destroy CClientTXD entities (via m_pManager) BEFORE
+    // StaticReset calls. TXD destructors need intact bookkeeping to clean up propery.
+
     // Destroy our stuff
     SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop
+
     SAFE_DELETE(m_pNametags);
     SAFE_DELETE(m_pSyncDebug);
     SAFE_DELETE(m_pNetworkStats);
@@ -570,6 +578,15 @@ CClientGame::~CClientGame()
     SAFE_DELETE(m_pResourceFileDownloadManager);
 
     SAFE_DELETE(m_pRootEntity);
+
+    // Clear any remaining texture replacement/shader state after destroying entities.
+    // This ordering prevents global reset from running before late element destructors
+    // (e.g. CClientTXD) have a chance to clean up using RenderWare bookkeeping.
+    if (g_pGame && g_pGame->GetRenderWare())
+    {
+        g_pGame->GetRenderWare()->StaticResetModelTextureReplacing();
+        g_pGame->GetRenderWare()->StaticResetShaderSupport();
+    }
 
     SAFE_DELETE(m_pModelCacheManager);
     // SAFE_DELETE(m_pGameEntityXRefManager);
@@ -6849,6 +6866,10 @@ bool CClientGame::RestreamModel(std::uint16_t model)
 
 void CClientGame::RestreamWorld()
 {
+    // If game is shutting down, do nothing for avoid crashes
+    if (g_bClientShuttingDown)
+        return;
+
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
     for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
