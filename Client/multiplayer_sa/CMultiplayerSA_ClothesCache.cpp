@@ -277,6 +277,9 @@ public:
 
         const SSavedClumpInfo& info = savedClumpList[bestIndex];
 
+        if (!info.bUnused)
+            return false;
+
 #ifdef CLOTHES_REF_TEST
         if (info.pClump && info.pClump->atomics.root.next && 
             info.pClump->atomics.root.next != &info.pClump->atomics.root)
@@ -292,7 +295,6 @@ public:
         }
 #endif
         RpClumpDestroy(info.pClump);
-        assert(info.bUnused);
         m_Stats.uiNumTotal--;
         m_Stats.uiNumUnused--;
         m_Stats.uiNumRemoved++;
