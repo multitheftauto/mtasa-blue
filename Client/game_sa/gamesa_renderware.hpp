@@ -32,6 +32,7 @@ void InitRwFunctions()
     RwTexDictionarySetCurrent = (RwTexDictionarySetCurrent_t)0x007F3A70;
     RwTexDictionaryForAllTextures = (RwTexDictionaryForAllTextures_t)0x007F3730;
     RwTexDictionaryAddTexture = (RwTexDictionaryAddTexture_t)0x007F3980;
+    RwTexDictionaryRemoveTexture = (RwTexDictionaryRemoveTexture_t)0x007F39C0;
     RwTexDictionaryStreamWrite = (RwTexDictionaryStreamWrite_t)0x008049F0;
     rwD3D9NativeTextureRead = (rwD3D9NativeTextureRead_t)0x004CD820;
     RpPrtStdGlobalDataSetStreamEmbedded = (RpPrtStdGlobalDataSetStreamEmbedded_t)0x0041B350;
@@ -77,6 +78,7 @@ void InitRwFunctions()
     RpLightSetColor = (RpLightSetColor_t)0x00751A90;
     RwCameraClone = (RwCameraClone_t)0x007EF3B0;
     RpClumpClone = (RpClumpClone_t)0x00749F70;
+    RwTexDictionaryCreate = (RwTexDictionaryCreate_t)0x007F3600;
     RwTexDictionaryDestroy = (RwTexDictionaryDestroy_t)0x007F36A0;
     RwTextureDestroy = (RwTextureDestroy_t)0x007F3820;
     RwRasterUnlock = (RwRasterUnlock_t)0x007FAEC0;
@@ -103,5 +105,6 @@ void InitRwFunctions()
     CTxdStore_RemoveRef = (CTxdStore_RemoveRef_t)0x00731A30;
     CTxdStore_AddRef = (CTxdStore_AddRef_t)0x00731A00;
     CTxdStore_GetNumRefs = (CTxdStore_GetNumRefs_t)0x00731AA0;
+    CTxdStore_SetupTxdParent = (CTxdStore_SetupTxdParent_t)0x00731D50;
     CClothesBuilder_CopyTexture = (CClothesBuilder_CopyTexture_t)0x005A5730;
 }

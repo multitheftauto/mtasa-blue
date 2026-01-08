@@ -1099,6 +1099,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
@@ -1107,6 +1108,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
             mov     iOut, eax
 
         }
+        // clang-format on
     }
 
     return iOut;

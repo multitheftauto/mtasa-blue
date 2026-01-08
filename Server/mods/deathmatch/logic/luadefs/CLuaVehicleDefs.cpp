@@ -17,6 +17,8 @@
 #include "CScriptArgReader.h"
 #include "packets/CElementRPCPacket.h"
 
+#include "lua/CLuaShared.h"            // for CLuaShared::CustomTrainTracks
+
 void CLuaVehicleDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -64,7 +66,6 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isTrainDerailable", IsTrainDerailable},
         {"getTrainDirection", GetTrainDirection},
         {"getTrainSpeed", GetTrainSpeed},
-        //{"getTrainTrack", ArgumentParser<GetTrainTrack>},
         {"getTrainPosition", GetTrainPosition},
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
@@ -115,7 +116,6 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
         {"setTrainSpeed", SetTrainSpeed},
-        //{"setTrainTrack", ArgumentParser<SetTrainTrack>},
         {"setTrainPosition", SetTrainPosition},
         {"setVehicleHeadLightColor", SetVehicleHeadLightColor},
         {"setVehicleTurretPosition", SetVehicleTurretPosition},
@@ -133,6 +133,13 @@ void CLuaVehicleDefs::LoadFunctions()
     // Add functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
+
+    // Add train track related functions
+    if (CLuaShared::CustomTrainTracks)
+    {
+        CLuaCFunctions::AddFunction("getTrainTrack", ArgumentParser<GetTrainTrack>);
+        CLuaCFunctions::AddFunction("setTrainTrack", ArgumentParser<SetTrainTrack>);
+    }
 }
 
 void CLuaVehicleDefs::AddClass(lua_State* luaVM)
@@ -175,7 +182,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSirens", "getVehicleSirens");
     lua_classfunction(luaVM, "getDirection", "getTrainDirection");
     lua_classfunction(luaVM, "getTrainSpeed", "getTrainSpeed");
-    // lua_classfunction(luaVM, "getTrack", "getTrainTrack");
+    if (CLuaShared::CustomTrainTracks)
+        lua_classfunction(luaVM, "getTrainTrack", "getTrainTrack");
     lua_classfunction(luaVM, "getTrainPosition", "getTrainPosition");
     lua_classfunction(luaVM, "getHeadLightColor", "getVehicleHeadLightColor");
     lua_classfunction(luaVM, "getColor", "getVehicleColor");
@@ -240,7 +248,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setDerailable", "setTrainDerailable");
     lua_classfunction(luaVM, "setDerailed", "setTrainDerailed");
     lua_classfunction(luaVM, "setDirection", "setTrainDirection");
-    // lua_classfunction(luaVM, "setTrack", "setTrainTrack");
+    if (CLuaShared::CustomTrainTracks)
+        lua_classfunction(luaVM, "setTrainTrack", "setTrainTrack");
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");            // Reduce confusion
     lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
@@ -252,7 +261,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "blown", "blowVehicle", "isVehicleBlown");
     lua_classvariable(luaVM, "direction", "setTrainDirection", "getTrainDirection");
     lua_classvariable(luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed");
-    // lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
+    if (CLuaShared::CustomTrainTracks)
+        lua_classvariable(luaVM, "trainTrack", "setTrainTrack", "getTrainTrack");
     lua_classvariable(luaVM, "trainPosition", "setTrainPosition", "getTrainPosition");
     lua_classvariable(luaVM, "taxiLightOn", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn");
     lua_classvariable(luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable");
@@ -2813,9 +2823,7 @@ bool CLuaVehicleDefs::SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrainTrack
     if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
         return false;
     else if (pVehicle->IsDerailed())
-    {
         return false;
-    }
 
     // TODO(qaisjp, feature/custom-train-tracks): this needs to support non-default train tracks
     if (!pTrainTrack->IsDefault())
