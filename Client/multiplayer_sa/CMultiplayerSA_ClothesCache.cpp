@@ -277,6 +277,9 @@ public:
 
         const SSavedClumpInfo& info = savedClumpList[bestIndex];
 
+        if (!info.bUnused)
+            return false;
+
 #ifdef CLOTHES_REF_TEST
         if (info.pClump && info.pClump->atomics.root.next && 
             info.pClump->atomics.root.next != &info.pClump->atomics.root)
@@ -292,7 +295,6 @@ public:
         }
 #endif
         RpClumpDestroy(info.pClump);
-        assert(info.bUnused);
         m_Stats.uiNumTotal--;
         m_Stats.uiNumUnused--;
         m_Stats.uiNumRemoved++;
@@ -381,6 +383,7 @@ static void __declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -424,6 +427,7 @@ inside:
         sub     esp, 0D4h
         jmp     RETURN_CClothesBuilderCreateSkinnedClump
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

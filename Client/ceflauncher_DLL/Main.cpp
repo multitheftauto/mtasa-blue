@@ -23,7 +23,11 @@
 #include <delayimp.h>
 
 #include "CCefApp.h"
-#include "SharedUtil.h"
+#include <string>
+#include <string_view>
+#include <algorithm>
+#include <iterator>
+#include <SharedUtil.h>
 
 #ifdef CEF_ENABLE_SANDBOX
 #include <cef3/cef/include/cef_sandbox_win.h>
@@ -122,6 +126,23 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, [[maybe_unused]] LPVOID l
 
 extern "C" [[nodiscard]] __declspec(dllexport) auto InitCEF() noexcept -> int
 {
+    // Parse command line for auth code in render processes (BEFORE CefExecuteProcess)
+    const std::wstring_view cmdLine{GetCommandLineW()};
+    if (const auto pos = cmdLine.find(L"--kgfiv8n="); pos != std::wstring_view::npos)
+    {
+        const auto valueStart = pos + 11;  // Skip "--kgfiv8n="
+        const auto valueEnd = cmdLine.find_first_of(L" \t\"", valueStart);
+        const auto authCodeW = cmdLine.substr(valueStart, 
+            valueEnd == std::wstring_view::npos ? 30 : std::min<size_t>(30, valueEnd - valueStart));
+        
+        std::string authCode;
+        authCode.reserve(30);
+        std::transform(authCodeW.begin(), authCodeW.end(), std::back_inserter(authCode),
+            [](const wchar_t wc) { return static_cast<char>(wc); });
+        
+        CefAppAuth::AuthCodeStorage() = std::move(authCode);
+    }
+
     const auto baseDir = SharedUtil::GetMTAProcessBaseDir();
     if (baseDir.empty())
         return CEF_INIT_ERROR_NO_BASE_DIR;

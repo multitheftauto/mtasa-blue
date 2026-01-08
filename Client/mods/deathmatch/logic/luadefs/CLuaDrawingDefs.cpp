@@ -1050,15 +1050,21 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                             // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
                             // ElementGroup? **
                             pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+                            lua_pushelement(luaVM, pTexture);
+                            return 1;
                         }
-                        lua_pushelement(luaVM, pTexture);
-                        return 1;
+                        else
+                        {
+                            m_pScriptDebugging->LogCustom(luaVM, SString("[DxCreateTexture] Failed to create texture from file '%s' (may be corrupt, unsupported format, or out of memory)", strFilePath.c_str()));
+                            lua_pushnil(luaVM);
+                            return 1;
+                        }
                     }
                     else
-                        argStream.SetCustomError(strFilePath, "File not found");
+                        argStream.SetCustomError(strFilePath, "[DxCreateTexture] File not found");
                 }
                 else
-                    argStream.SetCustomError(strFilePath, "Bad file path");
+                    argStream.SetCustomError(strFilePath, "[DxCreateTexture] Bad file path");
             }
             else if (pixels.GetSize())
             {
@@ -1068,9 +1074,15 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                 if (pTexture)
                 {
                     pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+                    lua_pushelement(luaVM, pTexture);
+                    return 1;
                 }
-                lua_pushelement(luaVM, pTexture);
-                return 1;
+                else
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "[DxCreateTexture:Pixels] Failed to create texture from pixel data (invalid format or out of memory)");
+                    lua_pushnil(luaVM);
+                    return 1;
+                }
             }
             else
             {
@@ -1080,9 +1092,15 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                 if (pTexture)
                 {
                     pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+                    lua_pushelement(luaVM, pTexture);
+                    return 1;
                 }
-                lua_pushelement(luaVM, pTexture);
-                return 1;
+                else
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, SString("[DxCreateTexture:Blank] Failed to create blank texture %dx%d (invalid dimensions or out of memory)", width, height));
+                    lua_pushnil(luaVM);
+                    return 1;
+                }
             }
         }
     }
@@ -1940,34 +1958,8 @@ int CLuaDrawingDefs::DxConvertPixels(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CPixelsManagerInterface* const pPixelsManager = g_pCore->GetGraphics()->GetPixelsManager();
-        uint                          width = 0;
-        uint                          height = 0;
-        EPixelsFormatType             sourceFormat = EPixelsFormat::UNKNOWN;
-        if (pPixelsManager)
-        {
-            pPixelsManager->GetPixelsSize(pixels, width, height);
-            sourceFormat = pPixelsManager->GetPixelsFormat(pixels);
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
-        const char* resourceName = pResource ? pResource->GetName() : "<no-resource>";
-
-        SString telemetryDetail;
-        telemetryDetail.Format("%s %s->%s q=%d bytes=%u dims=%ux%u",
-                               resourceName,
-                               EnumToString(sourceFormat).c_str(),
-                               EnumToString(format).c_str(),
-                               quality,
-                               pixels.GetSize(),
-                               width,
-                               height);
-        // Capture resource + pixel metadata so crash dumps show what attempted the conversion and with which formats.
-        CrashTelemetry::Scope telemetryScope(pixels.GetSize(), pLuaMain, "dxConvertPixels", telemetryDetail.c_str());
-
         CPixels newPixels;
-        if (pPixelsManager && pPixelsManager->ChangePixelsFormat(pixels, newPixels, format, quality))
+        if (g_pCore->GetGraphics()->GetPixelsManager()->ChangePixelsFormat(pixels, newPixels, format, quality))
         {
             lua_pushlstring(luaVM, newPixels.GetData(), newPixels.GetSize());
             return 1;
