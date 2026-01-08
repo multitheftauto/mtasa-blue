@@ -5693,9 +5693,8 @@ static void ShowRichPresenceShareDataCallback(void* ptr, unsigned int uiButton)
 void CSettings::ShowRichPresenceShareDataQuestionBox() const
 {
     SStringX strMessage(
-        _("It seems that you have the Rich Presence connection option enabled."
-          "\nDo you want to allow servers to share their data?"
-          "\n\nThis includes yours unique ID identifier."));
+        _("Rich Presence is currently enabled."
+          "\nDo you want to allow servers to share their data, including your unique ID?"));
     CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pQuestionBox->Reset();
     pQuestionBox->SetTitle(_("CONSENT TO ALLOW DATA SHARING"));
