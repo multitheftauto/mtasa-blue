@@ -290,7 +290,23 @@ bool CLuaVectorGraphicDefs::SVGRegisterFont(lua_State* luaVM, std::string fontFa
     if (!pResource)
         return false;
 
-    return CSVGFontManager::GetSingleton().RegisterFont(fontFamily, fontPath, pResource);
+    // Check if the font is already registered
+    CSVGFontManager& fontManager = CSVGFontManager::GetSingleton();
+    if (fontManager.IsFontRegistered(fontFamily))
+    {
+        CResource* pOwnerResource = fontManager.GetFontOwnerResource(fontFamily);
+        if (pOwnerResource)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Font '%s' is already registered by resource '%s'", fontFamily.c_str(), pOwnerResource->GetName());
+        }
+        else
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Font '%s' is already registered", fontFamily.c_str());
+        }
+        return false;
+    }
+
+    return fontManager.RegisterFont(fontFamily, fontPath, pResource);
 }
 
 bool CLuaVectorGraphicDefs::SVGUnregisterFont(std::string fontFamily)

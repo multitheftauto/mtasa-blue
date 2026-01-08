@@ -89,6 +89,14 @@ bool CSVGFontManager::IsFontRegistered(const SString& strFontFamily) const
     return m_RegisteredFonts.find(strFontFamily) != m_RegisteredFonts.end();
 }
 
+CResource* CSVGFontManager::GetFontOwnerResource(const SString& strFontFamily) const
+{
+    auto it = m_RegisteredFonts.find(strFontFamily);
+    if (it != m_RegisteredFonts.end())
+        return it->second.pOwnerResource;
+    return nullptr;
+}
+
 void CSVGFontManager::UnregisterResourceFonts(CResource* pResource)
 {
     if (!pResource)

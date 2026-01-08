@@ -31,6 +31,7 @@ public:
     bool RegisterFont(const SString& strFontFamily, const SString& strFontPath, CResource* pResource);
     bool UnregisterFont(const SString& strFontFamily);
     bool IsFontRegistered(const SString& strFontFamily) const;
+    CResource* GetFontOwnerResource(const SString& strFontFamily) const;
     void UnregisterResourceFonts(CResource* pResource);
     std::vector<SString> GetRegisteredFonts() const;
 
