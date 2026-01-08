@@ -5694,7 +5694,8 @@ void CSettings::ShowRichPresenceShareDataQuestionBox() const
 {
     SStringX strMessage(
         _("Rich Presence is currently enabled."
-          "\nDo you want to allow servers to share their data, including your unique ID?"));
+          "\nDo you want to allow data sharing with servers you connect to?"
+            "\n\nThis includes your Discord client ID, and game state info."));
     CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pQuestionBox->Reset();
     pQuestionBox->SetTitle(_("CONSENT TO ALLOW DATA SHARING"));
