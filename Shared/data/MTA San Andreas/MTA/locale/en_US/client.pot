@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-08 04:09+0000\n"
+"POT-Creation-Date: 2026-01-08 15:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2000,10 +2000,10 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:5696
 msgid ""
-"It seems that you have the Rich Presence connection option enabled.\n"
-"Do you want to allow servers to share their data?\n"
+"Rich Presence is currently enabled.\n"
+"Do you want to allow data sharing with servers you connect to?\n"
 "\n"
-"This includes yours unique ID identifier."
+"This includes your Discord client ID, and game state info."
 msgstr ""
 
 #: Client/core/CSettings.cpp:5701
