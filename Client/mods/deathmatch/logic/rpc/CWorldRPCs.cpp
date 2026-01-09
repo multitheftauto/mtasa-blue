@@ -73,6 +73,9 @@ void CWorldRPCs::LoadFunctions()
     AddHandler(SET_WORLD_SPECIAL_PROPERTY, SetWorldSpecialPropertyEnabled, "SetWorldSpecialPropertyEnabled");
 
     AddHandler(RESET_WORLD_PROPERTIES, ResetWorldProperties, "ResetWorldProperties");
+
+    AddHandler(SET_GRASS_DRAW_DISTANCE, SetGrassDrawDistance, "SetGrassDrawDistance");
+    AddHandler(RESET_GRASS_DRAW_DISTANCE, ResetGrassDrawDistance, "ResetGrassDrawDistance");
 }
 
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
@@ -354,6 +357,16 @@ void CWorldRPCs::SetFogDistance(NetBitStreamInterface& bitStream)
     }
 }
 
+void CWorldRPCs::SetGrassDrawDistance(NetBitStreamInterface& bitStream)
+{
+    float closeDistance, farDistance;
+
+    if (bitStream.Read(closeDistance) && bitStream.Read(farDistance))
+    {
+        g_pMultiplayer->SetGrassDrawDistance(closeDistance, farDistance);
+    }
+}
+
 void CWorldRPCs::SetAircraftMaxHeight(NetBitStreamInterface& bitStream)
 {
     float fMaxHeight;
@@ -412,6 +425,11 @@ void CWorldRPCs::ResetFarClipDistance(NetBitStreamInterface& bitStream)
 void CWorldRPCs::ResetFogDistance(NetBitStreamInterface& bitStream)
 {
     g_pMultiplayer->RestoreFogDistance();
+}
+
+void CWorldRPCs::ResetGrassDrawDistance(NetBitStreamInterface& bitStream)
+{
+    g_pMultiplayer->ResetGrassDrawDistance();
 }
 
 void CWorldRPCs::SetWeaponProperty(NetBitStreamInterface& bitStream)
