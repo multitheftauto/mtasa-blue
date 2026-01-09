@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-08 15:06+0000\n"
-"PO-Revision-Date: 2026-01-08 17:18\n"
+"PO-Revision-Date: 2026-01-09 16:01\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
 msgstr "Inicia Grand Theft Auto: San Andreas.\n"
-"Asegúrate de que el juego está en la carpeta «Archivos de programa (x86)»."
+"Asegúrate de que el juego se encuentra en la carpeta «Archivos de programa (x86)»."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
@@ -32,8 +32,8 @@ msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
 msgstr "Lo sentimos, no se ha encontrado el juego.\n"
-"Inicia Grand Theft Auto: San Andreas y haz clic en reintentar.\n"
-"Asegúrate de que el juego está en la carpeta «Archivos de programa (x86)»."
+"Inicia Grand Theft Auto: San Andreas y haz clic en «Reintentar».\n"
+"Asegúrate de que el juego se encuentra en la carpeta «Archivos de programa (x86)»."
 
 #: Client/loader/Utils.cpp:606
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -113,7 +113,7 @@ msgstr "Por favor, cierra los siguientes programas antes de continuar:"
 
 #: Client/loader/MainFunctions.cpp:321
 msgid "Invalid module path detected.\n"
-msgstr "Ruta inválida para el módulo detectada."
+msgstr "Se ha detectado una ruta de módulo no válida."
 
 #: Client/loader/MainFunctions.cpp:348
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
@@ -285,14 +285,14 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
-msgstr "La ruta para tu instalación de  'MTA:SA' o 'GTA: San Andreas' contiene el símbolo ';' (punto y coma).\n\n"
-"Si experimenta problemas al correr\n"
-" MTA:SA,\n"
-"mueva su(s) archivo(s) de instalación a una ruta que no tenga punto y coma."
+msgstr "La ruta de instalación de «MTA:SA» o «GTA: San Andreas»\n"
+"contiene un «;» (punto y coma).\n\n"
+"Si experimentas problemas al ejecutar MTA:SA,\n"
+"mueve tu instalación o instalaciones a una ruta que no contenga un punto y coma."
 
 #: Client/loader/MainFunctions.cpp:1398
 msgid "Invalid installation paths detected."
-msgstr "Rutas de instalación detectadas como inválidas."
+msgstr "Se han detectado rutas de instalación no válidas."
 
 #: Client/loader/MainFunctions.cpp:1529
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -397,7 +397,7 @@ msgstr "**Sin memoria disponible - este cierre fue causado debido a memoria insu
 
 #: Client/loader/CInstallManager.cpp:476
 msgid "** Enhanced crash capture will be attempted on next launch. **"
-msgstr ""
+msgstr "** Se intentará mejorar la captura de errores en el próximo inicio. **"
 
 #: Client/loader/CInstallManager.cpp:1059
 msgid "Install updated MTA:SA files"
@@ -1492,7 +1492,7 @@ msgstr "Eliminar dominio"
 
 #: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
 msgid "Remove all"
-msgstr ""
+msgstr "Eliminar todo"
 
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:1614
@@ -1946,7 +1946,9 @@ msgstr "SONIDOS EXTERNOS"
 msgid "Rich Presence is currently enabled.\n"
 "Do you want to allow data sharing with servers you connect to?\n\n"
 "This includes your Discord client ID, and game state info."
-msgstr ""
+msgstr "Rich Presence está habilitado actualmente.\n"
+"¿Deseas permitir el intercambio de datos con los servidores a los que te conectas?\n\n"
+"Esto incluye tu ID de cliente Discord y la información del estado del juego."
 
 #: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
