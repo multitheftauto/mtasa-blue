@@ -80,6 +80,15 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
     return Win32LoadLibraryA(fileName);
 }
 
+template <typename T>
+inline void PatchMemory(std::uintptr_t address, const T& value)
+{
+    DWORD oldProtect;
+    VirtualProtect(reinterpret_cast<void*>(address), sizeof(T), PAGE_EXECUTE_READWRITE, &oldProtect);
+    std::memcpy(reinterpret_cast<void*>(address), &value, sizeof(T));
+    VirtualProtect(reinterpret_cast<void*>(address), sizeof(T), oldProtect, &oldProtect);
+}
+
 CCore::CCore()
 {
     // Initialize the global pointer
@@ -870,6 +879,8 @@ void CCore::ShowServerInfo(unsigned int WindowType)
 void CCore::ApplyHooks()
 {
     WriteDebugEvent("CCore::ApplyHooks");
+
+    PatchMemory(0x8747A9, 'M');
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();

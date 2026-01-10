@@ -1604,7 +1604,7 @@ SString CInstallManager::_ProcessLangFileChecks()
     const char* langFileNames[] = {"american.gxt", "french.gxt", "german.gxt", "italian.gxt", "spanish.gxt"};
 
     // Get language that will be used
-    SString strSettingsFilename = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "gta_sa.set");
+    SString strSettingsFilename = PathJoin(GetSystemPersonalPath(), "MTA San Andreas User Files", "gta_sa.set");
     FILE*   fh = File::Fopen(strSettingsFilename, "rb");
     if (fh)
     {
