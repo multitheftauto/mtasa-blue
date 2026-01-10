@@ -25,7 +25,7 @@ jobs:
 
       - name: Run clang-format
         shell: pwsh
-        run: ./utils/clang-format.ps1
+        run: ./utils/clang-format.ps1 -Verbose
 
       - name: Upload formatting diff
         if: hashFiles('clang-format-diff/formatting.diff') != ''
