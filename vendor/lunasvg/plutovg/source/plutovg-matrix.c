@@ -10,9 +10,7 @@ void plutovg_matrix_init(plutovg_matrix_t* matrix, float a, float b, float c, fl
 
 void plutovg_matrix_init_identity(plutovg_matrix_t* matrix)
 {
-    matrix->a = 1; matrix->b = 0;
-    matrix->c = 0; matrix->d = 1;
-    matrix->e = 0; matrix->f = 0;
+    plutovg_matrix_init(matrix, 1, 0, 0, 1, 0, 0);
 }
 
 void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, float tx, float ty)

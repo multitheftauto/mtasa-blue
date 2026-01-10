@@ -54,6 +54,10 @@ bool CClientVectorGraphic::SetDocument(CXMLNode* node)
     m_pXMLDocument = node;
     m_pSVGDocument = lunasvg::Document::loadFromData(node->ToString());
 
+    // Check if LunaSVG successfully parsed the document
+    if (!m_pSVGDocument)
+        return false;
+
     m_pVectorGraphicDisplay->Update();
 
     return true;

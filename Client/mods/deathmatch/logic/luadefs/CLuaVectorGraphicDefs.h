@@ -26,6 +26,10 @@ public:
     static CLuaMultiReturn<int, int> SVGGetSize(CClientVectorGraphic* vectorGraphic);
     static bool                      SVGSetSize(CClientVectorGraphic* vectorGraphic, CVector2D size, std::optional<CLuaFunctionRef> luaFunctionRef);
 
+    // Font management functions
+    static bool SVGRegisterFont(lua_State* luaVM, std::string fontFamily, std::string fontPath);
+    static bool SVGUnregisterFont(std::string fontFamily);
+
 private:
     static bool LoadFromData(lua_State* luaVM, CClientVectorGraphic* vectorGraphic, std::string rawData);
     static bool LoadFromFile(lua_State* luaVM, CClientVectorGraphic* vectorGraphic, CScriptFile* file, std::string path, CResource* parentResource);
