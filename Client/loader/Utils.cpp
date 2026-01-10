@@ -581,11 +581,13 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
         if (pathList[i].empty())
         {
             WriteDebugEvent(SString("GetGamePath: pathList[%d] is empty", i));
+            AddReportLog(3201, SString("GetGamePath: Registry GTA:SA Path is empty (index %d)", i));
             continue;
         }
 
         WriteDebugEvent(SString("GetGamePath: Checking '%s' for '%s'", pathList[i].c_str(), MTA_GTA_KNOWN_FILE_NAME));
-        if (FileExists(PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME)))
+        SString strCheckPath = PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME);
+        if (FileExists(strCheckPath))
         {
             strOutResult = pathList[i];
             // Update registry.
@@ -593,15 +595,23 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
             WriteDebugEvent(SString("GetGamePath: Found GTA at '%s'", strOutResult.c_str()));
             return GAME_PATH_OK;
         }
+        else
+        {
+            AddReportLog(3202, SString("GetGamePath: File check failed - '%s' not found", strCheckPath.c_str()));
+        }
     }
 
     WriteDebugEvent("GetGamePath: No valid GTA path found in registry");
 
     // Try to find?
     if (!bFindIfMissing)
+    {
+        AddReportLog(3203, "GetGamePath: No valid GTA path and bFindIfMissing=false");
         return GAME_PATH_MISSING;
+    }
 
     // Ask user to browse for GTA
+    AddReportLog(3204, "GetGamePath: Prompting user to browse for GTA folder");
     BROWSEINFOW bi = {0};
     WString     strMessage(_("Select your Grand Theft Auto: San Andreas Installation Directory"));
     bi.lpszTitle = strMessage;
@@ -614,6 +624,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
         if (SHGetPathFromIDListW(pidl, szBuffer))
         {
             strOutResult = ToUTF8(szBuffer);
+            AddReportLog(3205, SString("GetGamePath: User browsed to '%s'", strOutResult.c_str()));
         }
 
         // free memory used
@@ -624,21 +635,31 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
             imalloc->Release();
         }
     }
+    else
+    {
+        AddReportLog(3206, "GetGamePath: User cancelled browse dialog");
+    }
 
     // Check browse result
-    if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
+    SString strBrowseCheckPath = PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME);
+    if (!FileExists(strBrowseCheckPath))
     {
+        AddReportLog(3207, SString("GetGamePath: Browse result invalid - '%s' not found, trying DoUserAssistedSearch", strBrowseCheckPath.c_str()));
         // If browse didn't help, try another method
         strOutResult = DoUserAssistedSearch();
 
-        if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
+        SString strSearchCheckPath = PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME);
+        if (!FileExists(strSearchCheckPath))
         {
+            AddReportLog(3208, SString("GetGamePath: DoUserAssistedSearch failed - '%s' not found, giving up", strSearchCheckPath.c_str()));
             // If still not found, give up
             return GAME_PATH_MISSING;
         }
+        AddReportLog(3209, SString("GetGamePath: DoUserAssistedSearch succeeded - found '%s'", strOutResult.c_str()));
     }
 
     // File found. Update registry.
+    AddReportLog(3210, SString("GetGamePath: Success - GTA found at '%s'", strOutResult.c_str()));
     SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
     return GAME_PATH_OK;
 }
