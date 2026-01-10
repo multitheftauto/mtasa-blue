@@ -15,11 +15,11 @@ project "lunasvg"
 	vpaths {
 		["Headers"] = "source/**.h",
 		["Headers/*"] = "include/**.h",
-		["Headers/3rdparty/*"] = "3rdparty/**.h",
+		["Headers/plutovg/*"] = "plutovg/**.h",
 		["Sources"] = "source/**.cpp",
         ["Sources/*"] = "source/**.c",
-		["Sources/3rdparty"] = "3rdparty/**.cpp",
-		["Sources/3rdparty/*"] = "3rdparty/**.c",
+		["Sources/plutovg"] = "plutovg/**.cpp",
+		["Sources/plutovg/*"] = "plutovg/**.c",
 		["*"] = "premake5.lua"
 	}
 
@@ -31,9 +31,9 @@ project "lunasvg"
 	}
 
 	includedirs {
-		"3rdparty/plutovg",
-		"source",
-		"include"
+		"plutovg/include",
+		"include",
+		"source"
 	}
 
 	filter "system:windows"
