@@ -18,7 +18,7 @@ try {
             Write-Host "clang-format.exe hash mismatch, re-downloading"
         }
     }
-    
+
     if ($shouldDownload) {
         Write-Host "Downloading clang-format.exe..."
         if (-not (Test-Path $binDir)) {
@@ -32,10 +32,10 @@ try {
         }
         Write-Host "clang-format.exe downloaded successfully"
     }
-    
+
     # compute list of files to format
     $searchFolders = "Client", "Server", "Shared"
-    $files = Get-ChildItem -Path $searchFolders -Include *.c,*.cc,*.cpp,*.h,*.hh,*.hpp -Recurse | 
+    $files = Get-ChildItem -Path $searchFolders -Include *.c,*.cc,*.cpp,*.h,*.hh,*.hpp -Recurse |
             Select-Object -ExpandProperty FullName
 
     # save files to a temp file
