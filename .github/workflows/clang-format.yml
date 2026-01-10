@@ -9,6 +9,8 @@ on:
       - '**.h'
       - '**.hh'
       - '**.hpp'
+      - '.github/workflows/clang-format.yml'
+      - 'utils/clang-format.ps1'
   pull_request:
     paths: *paths
   workflow_dispatch:
