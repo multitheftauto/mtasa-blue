@@ -19,6 +19,7 @@ function Get-ClangFormat {
     $binDir = Join-Path $RepoRoot "Build" "tmp"
     $clangFormatPath = Join-Path $binDir $clangFormatFilename
 
+    # Check existing file
     if (Test-Path $clangFormatPath) {
         $currentHash = (Get-FileHash -Path $clangFormatPath -Algorithm SHA256).Hash
         if ($currentHash -eq $expectedHash) {
@@ -27,6 +28,7 @@ function Get-ClangFormat {
         Write-Warning "clang-format hash mismatch, re-downloading..."
     }
 
+    # Download process
     Write-Host "Downloading clang-format..." -ForegroundColor Cyan
     if (-not (Test-Path $binDir)) {
         New-Item -ItemType Directory -Path $binDir | Out-Null
@@ -37,6 +39,15 @@ function Get-ClangFormat {
         chmod +x $clangFormatPath
     }
 
+    # Verify hash
+    $downloadedHash = (Get-FileHash -Path $clangFormatPath -Algorithm SHA256).Hash
+    if ($downloadedHash -ne $expectedHash.ToUpper()) {
+        Remove-Item $clangFormatPath -ErrorAction SilentlyContinue
+        Write-Error "SHA256 hash mismatch! Expected: $expectedHash, Got: $downloadedHash. The download may be corrupted."
+        exit 1
+    }
+
+    Write-Verbose "clang-format downloaded and verified successfully." -ForegroundColor Green
     return $clangFormatPath
 }
 
