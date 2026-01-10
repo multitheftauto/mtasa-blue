@@ -15,7 +15,6 @@ on:
 
 jobs:
   clang-format:
-    name: clang-format
     runs-on: ubuntu-latest
 
     steps:
