@@ -94,7 +94,6 @@ function Invoke-ClangFormat {
         $searchFolders = "Client", "Server", "Shared"
         $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
 
-
         $tmp = [System.IO.Path]::GetTempFileName()
         $files | Out-File $tmp -Encoding utf8
         Write-Verbose "List of files to format written to temporary file: $tmp"
