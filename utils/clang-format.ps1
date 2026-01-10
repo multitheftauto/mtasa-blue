@@ -6,10 +6,19 @@ Push-Location $repoRoot
 
 try {
     # download clang-format if needed
-    $clangFormatUrl = "https://github.com/multitheftauto/llvm-project/releases/download/llvmorg-21.1.8/clang-format.exe"
+    if ($isLinux) {
+        $clangFormatUrl = "https://github.com/multitheftauto/llvm-project/releases/download/llvmorg-21.1.8/clang-format-armv7a-linux-gnueabihf"
+        $clangFormatFilename = "clang-format"
+        # TODO: Update this hash with the actual Linux binary hash
+        $expectedHash = "LINUX_HASH_PLACEHOLDER"
+    } else {
+        $clangFormatUrl = "https://github.com/multitheftauto/llvm-project/releases/download/llvmorg-21.1.8/clang-format.exe"
+        $clangFormatFilename = "clang-format.exe"
+        $expectedHash = "b77927335fd4caece863ea0c09ec8c4dfbdab545510c9091205ccfb528d5abf2"
+    }
+
     $binDir = Join-Path $repoRoot "Build" "tmp"
-    $clangFormatPath = Join-Path $binDir "clang-format.exe"
-    $expectedHash = "b77927335fd4caece863ea0c09ec8c4dfbdab545510c9091205ccfb528d5abf2".ToLower()
+    $clangFormatPath = Join-Path $binDir $clangFormatFilename
 
     $shouldDownload = $true
     if (Test-Path $clangFormatPath) {
@@ -22,7 +31,7 @@ try {
     }
 
     if ($shouldDownload) {
-        Write-Host "Downloading clang-format.exe..."
+        Write-Host "Downloading clang-format..."
         if (-not (Test-Path $binDir)) {
             New-Item -ItemType Directory -Path $binDir | Out-Null
         }
@@ -32,7 +41,13 @@ try {
             Write-Error "SHA256 hash mismatch! Expected: $expectedHash, Got: $downloadedHash"
             exit 1
         }
-        Write-Host "clang-format.exe downloaded successfully"
+
+        # Make executable on Linux
+        if ($isLinux) {
+            chmod +x $clangFormatPath
+        }
+
+        Write-Host "clang-format downloaded successfully"
     }
 
     # compute list of files to format
