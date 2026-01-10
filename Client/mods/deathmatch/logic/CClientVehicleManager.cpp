@@ -486,6 +486,24 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
     return 0xFF;
 }
 
+bool CClientVehicleManager::IsValidSeat(unsigned long ulModel, unsigned char ucSeat)
+{
+    // Camper only has 3 seats (0-2)
+    if (static_cast<VehicleType>(ulModel) == VehicleType::VT_CAMPER && ucSeat > 2)
+        return false;
+
+    // Get the maximum passenger count for the vehicle
+    unsigned char ucMaxPassengers = GetMaxPassengerCount(ulModel);
+    if (ucSeat > ucMaxPassengers)
+        return false;
+
+    // Vehicles with unknown passenger count (255) can only have driver in seat 0
+    if (ucSeat > 0 && ucMaxPassengers == 255)
+        return false;
+
+    return true;
+}
+
 void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
 {
     RandomizeRandomSeed();
