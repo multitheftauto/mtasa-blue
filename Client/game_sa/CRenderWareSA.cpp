@@ -1124,8 +1124,10 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
     constexpr int kMaxTextureUnrefs = 10000;
     constexpr int kMaxTxdUnrefs = 1000;
 
+    // Optionally destroy textures first. Skipping is safer but leaks memory.
     if (bDestroyTextures)
     {
+        // Remove extra refs from each texture, then destroy when refs == 1
         std::vector<RwTexture*> textureList;
         GetTxdTextures(textureList, pTxd);
         for (RwTexture* pTexture : textureList)
@@ -1155,6 +1157,7 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
         }
     }
 
+    // Ensure at least one ref exists so RemoveRef can trigger cleanup
     if (CTxdStore_GetNumRefs(usTxdId) == 0)
         CRenderWareSA::DebugTxdAddRef(usTxdId);
 
