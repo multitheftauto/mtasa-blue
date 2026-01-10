@@ -7,13 +7,13 @@ function Get-ClangFormat {
     )
 
     if ($isLinux) {
-        $clangFormatUrl = "https://github.com/StMartin81/clang-tools-static-binaries/releases/download/${Version}/clang-format-21_linux-amd64"
+        $clangFormatUrl = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/${Version}/clang-format-21_linux-amd64"
         $clangFormatFilename = "clang-format"
         $expectedHash = "3d75779cdc69b06f7e39946b0e50d6ce3dccda1d766e355bf4cf507b1ae13303"
     } else {
-        $clangFormatUrl = "https://github.com/StMartin81/clang-tools-static-binaries/releases/download/${Version}/clang-format-21_windows-amd64.exe"
+        $clangFormatUrl = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/${Version}/clang-format-21_windows-amd64.exe"
         $clangFormatFilename = "clang-format.exe"
-        $expectedHash = "a8e156abc2465069cc74e201b6f2cfea4b4fe73e05ee9bac2bf1fbb31efb67c6"
+        $expectedHash = "11defe615493876745f36fb77e9783e7eed03a7f800044ff58619d9293e79409"
     }
 
     $binDir = Join-Path $RepoRoot "Build" "tmp"
