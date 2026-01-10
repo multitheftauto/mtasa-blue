@@ -73,6 +73,9 @@ function New-GitDiffArtifact {
     $diffOutput | Out-File $diffFile -Encoding utf8
     Write-Host "Diff saved to $diffFile" -ForegroundColor Green
     Write-Output "::set-output name=diff-created::true"
+
+    Write-Error "Code formatting issues detected. Please run clang-format locally and commit the changes."
+    exit 1
 }
 
 function Invoke-ClangFormat {
