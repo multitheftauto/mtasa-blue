@@ -83,9 +83,10 @@ function Invoke-ClangFormat {
                 Write-Host "No formatting changes detected." -ForegroundColor Green
                 exit 0
             } else {
-                Write-Verbose "Formatting changes detected in:"
-                Write-Verbose ($diffOutput -join "`n")
-                Write-Error "Code formatting issues detected in $($diffOutput.Count) files. Run utils/clang-format.ps1 locally and commit the changes."
+                Write-Host "::group::Files with formatting issues ($($diffOutput.Count) files)"
+                $diffOutput | ForEach-Object { Write-Host $_ }
+                Write-Host "::endgroup::"
+                Write-Error "Code formatting issues detected. Run utils/clang-format.ps1 locally and commit the changes."
                 exit 1
             }
         }
