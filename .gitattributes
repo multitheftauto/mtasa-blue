@@ -24,6 +24,7 @@
 *.nsh       text
 *.xsd       text
 *.po        text
+*.ps1       text eol=lf
 *.ico       binary
 *.png       binary
 *.bmp       binary
