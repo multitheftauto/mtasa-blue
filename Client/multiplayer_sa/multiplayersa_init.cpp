@@ -90,3 +90,31 @@ void CallGameEntityRenderHandler(CEntitySAInterface* pEntity)
         if (pGameEntityRenderHandler)
             pGameEntityRenderHandler(pEntity);
 }
+
+void OnRequestStreamingMemoryRelief(std::uint32_t bytesNeeded)
+{
+    if (!pGameInterface)
+        return;
+
+    auto* pStreaming = pGameInterface->GetStreaming();
+    if (!pStreaming)
+        return;
+
+    pStreaming->MakeSpaceFor(bytesNeeded);
+}
+
+static volatile bool s_bStreamingReliefRequested = false;
+
+void OnRequestDeferredStreamingMemoryRelief()
+{
+    s_bStreamingReliefRequested = true;
+}
+
+void ProcessDeferredStreamingMemoryRelief()
+{
+    if (!s_bStreamingReliefRequested)
+        return;
+
+    s_bStreamingReliefRequested = false;
+    OnRequestStreamingMemoryRelief(4 * 1024 * 1024);
+}

@@ -6530,25 +6530,19 @@ void CClientPed::UpdateStreamPosition(const CVector& vecInPosition)
 // Asks server for permission to start entering vehicle
 //
 //////////////////////////////////////////////////////////////////
-bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
+bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger, std::optional<unsigned int> optSeat)
 {
     // Are we local player or ped we are syncing
     if (!IsSyncing() && !IsLocalPlayer() && !IsLocalEntity())
-    {
         return false;
-    }
 
     // Are we already inside a vehicle
     if (GetOccupiedVehicle())
-    {
         return false;
-    }
 
     // We dead or in water?
     if (IsDead())
-    {
         return false;
-    }
 
     // Are we already sending an in/out request or not allowed to create a new in/out?
     if (m_bNoNewVehicleTask                                  // Are we permitted to even enter a vehicle?
@@ -6567,9 +6561,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 
     // Streamed?
     if (!m_pPlayerPed)
-    {
         return false;
-    }
 
     unsigned int uiDoor = 0;
     // Do we want to enter a specific vehicle?
@@ -6594,43 +6586,31 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 
     // Dead vehicle?
     if (pVehicle->GetHealth() <= 0.0f)
-    {
         return false;
-    }
 
+    // Stop if the vehicle is not enterable
     if (!pVehicle->IsEnterable(IsLocalEntity()))
-    {
-        // Stop if the vehicle is not enterable
         return false;
-    }
 
     // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
     auto vehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
 
     if (IsInWater() && !(vehicleModel == VehicleType::VT_SKIMMER || vehicleModel == VehicleType::VT_SEASPAR || vehicleModel == VehicleType::VT_LEVIATHN || vehicleModel == VehicleType::VT_VORTEX))
-    {
         return false;
-    }
 
     // If the Jump task is playing and we are in water - I know right
     // Kill the task.
     CTask* pTask = GetCurrentPrimaryTask();
     if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)            // Kill jump task - breaks warp in entry and doesn't really matter
     {
-        if (pVehicle->IsInWater() ||
-            IsInWater())            // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
-        {
+        if (pVehicle->IsInWater() || IsInWater())            // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
             KillTask(3, true);            // Kill jump task if we are about to warp in
-        }
     }
 
     // Make sure we don't have any other primary tasks running, otherwise our 'enter-vehicle'
     // task will replace it and fuck it up!
     if (GetCurrentPrimaryTask())
-    {
-        // We already have a primary task, so stop.
         return false;
-    }
 
     if (IsClimbing()                       // Make sure we're not currently climbing
         || HasJetPack()                    // Make sure we don't have a jetpack
@@ -6641,17 +6621,31 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    unsigned int uiSeat = uiDoor;
-    if (bPassenger && uiDoor == 0)
+    // Determine seat - either explicitly specified or auto-determined from door/passenger flag
+    unsigned int uiSeat;
+
+    if (optSeat.has_value())
     {
-        // We're trying to enter as a passenger, yet our closest door
-        // is the driver's door. Force an enter for the passenger seat.
-        uiSeat = 1;
+        // Explicit seat specified
+        uiSeat = optSeat.value();
+        if (!CClientVehicleManager::IsValidSeat(pVehicle->GetModel(), static_cast<unsigned char>(uiSeat)))
+            return false;
     }
-    else if (!bPassenger)
+    else
     {
-        // We want to drive. Force our seat to the driver's seat.
-        uiSeat = 0;
+        // Legacy behavior - auto-determine seat from door/passenger flag
+        uiSeat = uiDoor;
+        if (bPassenger && uiDoor == 0)
+        {
+            // We're trying to enter as a passenger, yet our closest door
+            // is the driver's door. Force an enter for the passenger seat.
+            uiSeat = 1;
+        }
+        else if (!bPassenger)
+        {
+            // We want to drive. Force our seat to the driver's seat.
+            uiSeat = 0;
+        }
     }
 
     // If the vehicle's a boat, make sure we're standing on it (we need a dif task to enter boats properly)

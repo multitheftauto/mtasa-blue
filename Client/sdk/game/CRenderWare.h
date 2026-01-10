@@ -11,9 +11,11 @@
 
 #pragma once
 
+#include <cstdint>
 #include <vector>
 #include <string>
 #include <tuple>
+#include <unordered_set>
 
 class CClientEntityBase;
 class CD3DDUMMY;
@@ -41,12 +43,18 @@ struct SReplacementTextures
         std::vector<RwTexture*> replacedOriginals;
         unsigned short          usTxdId;
         bool                    bTexturesAreCopies;
+        SString                 strDebugSource;     // filename/resource for diagnostics
+        SString                 strDebugHash;       // Short hash of source data for deduping logs
     };
 
     std::vector<RwTexture*> textures;              // List of textures we want to inject into TXD's
     std::vector<SPerTxd>    perTxdList;            // TXD's which have been modified
-    std::vector<unsigned short> usedInTxdIds;
-    std::vector<unsigned short> usedInModelIds;
+    std::unordered_set<unsigned short> usedInTxdIds;   // contains/erase for streaming hot path
+    std::unordered_set<unsigned short> usedInModelIds; // contains/erase for streaming hot path
+    uint32_t                uiSessionId = 0;           // Texture-replacing session generation (used to ignore stale cross-session cleanup)
+    SString                 strDebugName;              // Source path or description for logging
+    SString                 strDebugHash;              // Short hash of the loaded TXD bytes
+    SString                 strDebugResource;          // Resource name, if known
     bool                    bHasRequestedSpace = false;
 };
 
@@ -78,9 +86,11 @@ class CRenderWare
 {
 public:
     virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer,
-                                                      bool bFilteringEnabled) = 0;
+                                                      bool bFilteringEnabled, SString* pOutError = nullptr) = 0;
     virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
+    virtual void             StaticResetModelTextureReplacing() = 0;
+    virtual void             StaticResetShaderSupport() = 0;
     virtual void             ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId) = 0;
     virtual void             ClothesRemoveReplacement(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
@@ -129,4 +139,10 @@ public:
     virtual void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) = 0;
     virtual void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale) = 0;
     virtual void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale) = 0;
+
+    // New methods MUST be added at the end to preserve vtable order.
+    virtual void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) = 0;
+
+    // Cleanup TXD slots created to isolate engineRequestModel clones.
+    virtual void CleanupIsolatedTxdForModel(unsigned short usModelId) = 0;
 };

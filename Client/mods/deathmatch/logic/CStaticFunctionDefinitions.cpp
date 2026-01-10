@@ -9963,8 +9963,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
     if (pPed->IsLocalEntity() != pVehicle->IsLocalEntity())
         return false;
 
-    // Camper only has 3 seats (0-2)
-    if (static_cast<VehicleType>(pVehicle->GetModel()) == VehicleType::VT_CAMPER && uiSeat > 2)
+    if (!CClientVehicleManager::IsValidSeat(pVehicle->GetModel(), static_cast<unsigned char>(uiSeat)))
         return false;
 
     if (pPed->IsLocalEntity())
@@ -9975,14 +9974,6 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
 
         // Ped and vehicle alive?
         if (pPed->IsDead() || pVehicle->GetHealth() <= 0.0f)
-            return false;
-
-        // Valid seat id for that vehicle?
-        uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
-        if (uiSeat > ucMaxPassengers)
-            return false;
-
-        if (uiSeat > 0 && ucMaxPassengers == 255)
             return false;
 
         // Toss the previous player out of it if neccessary

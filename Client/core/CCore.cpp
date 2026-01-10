@@ -15,6 +15,9 @@
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include <filesystem>
+#include <fstream>
+#include <array>
+#include <algorithm>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
@@ -28,6 +31,7 @@
 #include "CDiscordRichPresence.h"
 #include "CSteamClient.h"
 #include "CCrashDumpWriter.h"
+#include "FastFailCrashHandler/WerCrashHandler.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -140,6 +144,9 @@ CCore::CCore()
 
     WriteDebugEvent("CCore::CCore");
 
+    // Store initial module bases (will be updated more comprehensively later)
+    WerCrash::UpdateModuleBases();
+
     m_pKeyBinds = new CKeyBinds(this);
 
     m_pMouseControl = new CMouseControl();
@@ -183,6 +190,8 @@ CCore::CCore()
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    StopWatchdogThread();
 
     // Reset Discord rich presence
     if (m_pDiscordRichPresence)
@@ -1287,6 +1296,8 @@ void CCore::DoPreFramePulse()
 {
     TIMING_CHECKPOINT("+CorePreFrame");
 
+    UpdateWatchdogHeartbeat();
+
     m_pKeyBinds->DoPreFramePulse();
 
     // Notify the mod manager
@@ -1342,10 +1353,22 @@ void CCore::DoPostFramePulse()
         {
             WatchDogCompletedSection("L2");            // gta_sa.set seems ok
             WatchDogCompletedSection("L3");            // No hang on startup
-            HandleCrashDumpEncryption();
+
+            // Start watchdog thread now that initial loading is complete
+            // Use 120 second timeout to allow for large mod asset loading
+            if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+            {
+                WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+            }
 
             // Disable vsync while it's all dark
             m_pGame->DisableVSync();
+        }
+
+        if (!m_bCrashDumpEncryptionDone && m_menuFrame >= 5 && m_pNet && m_pNet->IsReady())
+        {
+            m_bCrashDumpEncryptionDone = true;
+            HandleCrashDumpEncryption();
         }
 
         if (m_menuFrame >= 5 && !m_isNetworkReady && m_pNet->IsReady())
@@ -2117,6 +2140,11 @@ void CCore::OnEnterCrashZone(uint uiId)
     CCrashDumpWriter::OnEnterCrashZone(uiId);
 }
 
+void CCore::UpdateWerCrashModuleBases()
+{
+    WerCrash::UpdateModuleBases();
+}
+
 //
 // LogEvent
 //
@@ -2192,6 +2220,52 @@ void CCore::HandleIdlePulse()
         m_pModManager->GetClient()->IdleHandler();
 }
 
+namespace
+{
+    bool IsCoreDump(const SString& filePath)
+    {
+        constexpr std::array<std::uint32_t, 4> markers = {
+            0x734C4F50,  // 'POLs'
+            0x73443344,  // 'D3Ds'
+            0x73474F4C,  // 'LOGs'
+            0x73524557   // 'WERs' - WER fail-fast crash info
+        };
+
+        constexpr std::size_t tailSize = 64 * 1024;
+        constexpr std::size_t minFileSize = 1024;
+
+        std::ifstream file(FromUTF8(filePath), std::ios::binary | std::ios::ate);
+        if (!file)
+            return false;
+
+        const auto fileSize = file.tellg();
+        if (fileSize < static_cast<std::streamoff>(minFileSize))
+            return false;
+
+        const auto readSize = std::min(static_cast<std::size_t>(fileSize), tailSize);
+        const auto readStart = static_cast<std::streamoff>(fileSize) - static_cast<std::streamoff>(readSize);
+
+        file.seekg(readStart);
+        std::vector<char> buffer(readSize);
+        file.read(buffer.data(), static_cast<std::streamsize>(readSize));
+
+        const auto bytesRead = static_cast<std::size_t>(file.gcount());
+        if (bytesRead < sizeof(std::uint32_t))
+            return false;
+
+        for (std::size_t i = 0; i + sizeof(std::uint32_t) <= bytesRead; ++i)
+        {
+            std::uint32_t value;
+            std::memcpy(&value, buffer.data() + i, sizeof(std::uint32_t));
+
+            if (std::find(markers.begin(), markers.end(), value) != markers.end())
+                return true;
+        }
+
+        return false;
+    }
+}
+
 //
 // Handle encryption of Windows crash dump files
 //
@@ -2225,7 +2299,13 @@ void CCore::HandleCrashDumpEncryption()
             SString        strPublicPathFilename = PathJoin(strDumpDirPublicPath, strPublicFilename);
             if (!FileExists(strPublicPathFilename))
             {
-                GetNetwork()->EncryptDumpfile(strPrivatePathFilename, strPublicPathFilename);
+                if (!IsCoreDump(strPrivatePathFilename))
+                    continue;
+
+                if (CNet* pNet = GetNetwork(); pNet && pNet->IsReady())
+                {
+                    pNet->EncryptDumpfile(strPrivatePathFilename, strPublicPathFilename);
+                }
             }
         }
     }
