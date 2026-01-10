@@ -2518,11 +2518,28 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
+bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<std::variant<bool, unsigned int>> seatOrPassenger)
 {
     CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
-    bool            bPassenger = bOptPassenger.value_or(false);
-    return pPed->EnterVehicle(pVehicle, bPassenger);
+    bool            bPassenger = false;
+    std::optional<unsigned int> optSeat;
+
+    // Parse third argument: either a bool (passenger flag) or int (seat number)
+    if (seatOrPassenger.has_value())
+    {
+        if (std::holds_alternative<bool>(seatOrPassenger.value()))
+        {
+            // Third argument is bool - treat as passenger flag
+            bPassenger = std::get<bool>(seatOrPassenger.value());
+        }
+        else if (std::holds_alternative<unsigned int>(seatOrPassenger.value()))
+        {
+            // Third argument is int - treat as seat number
+            optSeat = std::get<unsigned int>(seatOrPassenger.value());
+        }
+    }
+
+    return pPed->EnterVehicle(pVehicle, bPassenger, optSeat);
 }
 
 bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
