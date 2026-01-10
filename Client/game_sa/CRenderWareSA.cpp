@@ -1121,27 +1121,58 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
     if (!pTxd)
         return;
 
-    // We can abandon the textures instead of destroy. It might be safer, but will cause a memory leak
+    constexpr int kMaxTextureUnrefs = 10000;
+    constexpr int kMaxTxdUnrefs = 1000;
+
     if (bDestroyTextures)
     {
-        // Unref the textures
         std::vector<RwTexture*> textureList;
-        pGame->GetRenderWareSA()->GetTxdTextures(textureList, pTxd);
-        for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
+        GetTxdTextures(textureList, pTxd);
+        for (RwTexture* pTexture : textureList)
         {
-            RwTexture* pTexture = *iter;
-            while (pTexture->refs > 1)
+            if (!pTexture)
+                continue;
+
+            if (pTexture->refs < 1)
+                continue;
+
+            int textureUnrefCount = 0;
+            while (pTexture->refs > 1 && textureUnrefCount < kMaxTextureUnrefs)
+            {
                 RwTextureDestroy(pTexture);
-            RwTextureDestroy(pTexture);
+                ++textureUnrefCount;
+            }
+
+            int remainingRefs = pTexture->refs;
+            if (textureUnrefCount >= kMaxTextureUnrefs && remainingRefs > 1)
+            {
+                AddReportLog(8625, SString("TxdForceUnload: Texture unref limit hit for TXD %d (refs remaining: %d)", usTxdId, remainingRefs));
+                continue;
+            }
+
+            if (remainingRefs == 1)
+                RwTextureDestroy(pTexture);
         }
     }
 
-    // Need to have at least one ref for RemoveRef to work correctly
     if (CTxdStore_GetNumRefs(usTxdId) == 0)
         CRenderWareSA::DebugTxdAddRef(usTxdId);
 
-    while (CTxdStore_GetNumRefs(usTxdId) > 0)
+    int txdUnrefCount = 0;
+    while (CTxdStore_GetNumRefs(usTxdId) > 0 && txdUnrefCount < kMaxTxdUnrefs)
+    {
         CRenderWareSA::DebugTxdRemoveRef(usTxdId);
+        ++txdUnrefCount;
+    }
+
+    if (txdUnrefCount >= kMaxTxdUnrefs)
+    {
+        int remainingTxdRefs = CTxdStore_GetNumRefs(usTxdId);
+        if (remainingTxdRefs > 0)
+        {
+            AddReportLog(8626, SString("TxdForceUnload: TXD unref limit hit for TXD %d (refs remaining: %d)", usTxdId, remainingTxdRefs));
+        }
+    }
 }
 
 namespace
