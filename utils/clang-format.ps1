@@ -47,39 +47,37 @@ function Get-ClangFormat {
         exit 1
     }
 
-    Write-Verbose "clang-format downloaded and verified successfully." -ForegroundColor Green
+    Write-Verbose "clang-format downloaded and verified successfully."
     return $clangFormatPath
 }
 
 function Invoke-ClangFormat {
-    [CmdletBinding(SupportsShouldProcess = $true)]
+    [CmdletBinding()]
     param()
 
     $repoRoot = Split-Path -Parent $PSScriptRoot
     Push-Location $repoRoot
+    Write-Verbose "Changed directory to repository root: $repoRoot"
+
 
     try {
+        Write-Verbose "Searching for source files to format..."
         $clangFormatPath = Get-ClangFormat -RepoRoot $repoRoot
         $searchFolders = "Client", "Server", "Shared"
         $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
 
-        if (-not $files) {
-            Write-Host "No files found to format."
-            return
-        }
 
-        if ($PSCmdlet.ShouldProcess("$($files.Count) files", "Format source code using clang-format")) {
-            $tmp = [System.IO.Path]::GetTempFileName()
-            $files | Out-File $tmp -Encoding utf8
+        $tmp = [System.IO.Path]::GetTempFileName()
+        $files | Out-File $tmp -Encoding utf8
+        Write-Verbose "List of files to format written to temporary file: $tmp"
 
-            & $clangFormatPath -i --files=$tmp
+        & $clangFormatPath -i --files=$tmp
 
-            Remove-Item $tmp
-            Write-Host "Successfully formatted $($files.Count) files." -ForegroundColor Green
-        }
+        Remove-Item $tmp
+        Write-Verbose "Successfully formatted $($files.Count) files."
     } finally {
         Pop-Location
     }
 }
 
-Invoke-ClangFormat
+Invoke-ClangFormat @args
