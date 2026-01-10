@@ -64,14 +64,17 @@ static void __declspec(naked) HOOK_CAutomobile_ProcessControl_VehicleDamage()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
         mov pCollisionVehicle, ecx
     }
+    // clang-format on
 
     TriggerVehicleCollisionEvent();
 
+    // clang-format off
     __asm
     {
         popad
@@ -81,6 +84,7 @@ static void __declspec(naked) HOOK_CAutomobile_ProcessControl_VehicleDamage()
         call    dword ptr[eax + 0E0h]
         jmp     CONTINUE_CAutomobile_ProcessControl_VehicleDamage
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -99,14 +103,17 @@ static void __declspec(naked) HOOK_CBike_ProcessControl_VehicleDamage()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
         mov pCollisionVehicle, ecx
     }
+    // clang-format on
 
     TriggerVehicleCollisionEvent();
 
+    // clang-format off
     __asm
     {
         popad
@@ -116,6 +123,7 @@ static void __declspec(naked) HOOK_CBike_ProcessControl_VehicleDamage()
         call    dword ptr[eax + 0E0h]
         jmp     CONTINUE_CBike_ProcessControl_VehicleDamage
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -135,14 +143,17 @@ static void __declspec(naked) HOOK_CBoat_ProcessControl_VehicleDamage()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
         mov pCollisionVehicle, ecx
     }
+    // clang-format on
 
     TriggerVehicleCollisionEvent();
 
+    // clang-format off
     __asm
     {
         popad
@@ -151,6 +162,7 @@ static void __declspec(naked) HOOK_CBoat_ProcessControl_VehicleDamage()
         call    FUNC_CVehicle_ProcessCarAlarm
         jmp     CONTINUE_CBoat_ProcessControl_VehicleDamage
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -169,14 +181,17 @@ static void __declspec(naked) HOOK_CTrain_ProcessControl_VehicleDamage()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
         mov pCollisionVehicle, esi
     }
+    // clang-format on
 
     TriggerVehicleCollisionEvent();
 
+    // clang-format off
     __asm
     {
         popad
@@ -184,6 +199,7 @@ static void __declspec(naked) HOOK_CTrain_ProcessControl_VehicleDamage()
         mov     al, ds:[0BA6728h]
         jmp     CONTINUE_CTrain_ProcessControl_VehicleDamage
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
