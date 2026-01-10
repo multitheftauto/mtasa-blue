@@ -156,6 +156,39 @@ bool IsErrorCodeLoggable(const std::error_code& ec);
  */
 bool IsNativeArm64Host();
 
+struct WerCrashInfo
+{
+    SString moduleName;
+    SString faultOffset;
+    SString reportId;
+    DWORD   exceptionCode = 0;
+    bool    found = false;
+};
+
+WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode = 0);
+
+struct ModuleCrashInfo
+{
+    SString moduleName;
+    DWORD   moduleBase = 0;
+    DWORD   crashAddress = 0;
+    DWORD   rva = 0;              // Relative Virtual Address (crash - base)
+    DWORD   idaAddress = 0;       // IDA-friendly address (0x10000000 + rva for DLLs)
+    bool    resolved = false;
+};
+
+// Resolves a crash address to a known MTA module using stored module bases.
+// crashAddress: The absolute crash address from the crash report.
+// return: ModuleCrashInfo with resolved module name, RVA, and IDA address if found.
+ModuleCrashInfo ResolveModuleCrashAddress(DWORD crashAddress);
+
+// Resolves a crash address to a known MTA module with process handle fallback.
+// If registry-based resolution fails, enumerates modules from the target process.
+// crashAddress: The absolute crash address from the crash report.
+// hProcess: Handle to the target process (for fallback enumeration).
+// Returns ModuleCrashInfo with resolved module name, RVA, and IDA address if found.
+ModuleCrashInfo ResolveModuleCrashAddress(DWORD crashAddress, HANDLE hProcess);
+
 /**
  * @brief Queries the integer value of a specific value item from the registry.
  */

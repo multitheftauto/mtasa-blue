@@ -18,6 +18,9 @@
 #include <bassmix.h>
 #include <basswma.h>
 #include <bass_fx.h>
+#include <atomic>
+#include <condition_variable>
+#include <chrono>
 
 void CALLBACK BPMCallback(int handle, float bpm, void* user);
 void CALLBACK BeatCallback(DWORD chan, double beatpos, void* user);
@@ -39,6 +42,12 @@ namespace
     std::unordered_map<SString, DWORD> ms_FailedAudioFiles;
     constexpr DWORD FAILED_LOAD_RETRY_DELAY = 10000;            // 10 seconds before retrying a failed file
     constexpr size_t MAX_FAILED_FILES_CACHE_SIZE = 1000;
+
+    // Track active streaming threads to ensure they complete before DLL unload
+    std::atomic<int> ms_iActiveStreamingThreads{0};
+    std::atomic<bool> ms_bShuttingDown{false};
+    std::mutex ms_StreamingThreadMutex;
+    std::condition_variable ms_StreamingThreadCV;
 
     // Get callback id for this CBassAudio
     void* AddCallbackId(CBassAudio* pBassAudio)
@@ -66,6 +75,19 @@ namespace
     // Finish with pointer
     void UnlockCallbackId() { ms_CallbackMutex.unlock(); }
 }            // namespace
+
+// Signal streaming threads that we're shutting down - they should exit ASAP after their blocking call returns
+void SignalStreamingThreadsToStop()
+{
+    ms_bShuttingDown.store(true);
+}
+
+// Wait for all active streaming threads to complete (called during shutdown after BASS is freed)
+void WaitForAllStreamingThreads(unsigned int uiTimeoutMs)
+{
+    std::unique_lock<std::mutex> lock(ms_StreamingThreadMutex);
+    ms_StreamingThreadCV.wait_for(lock, std::chrono::milliseconds(uiTimeoutMs), []() { return ms_iActiveStreamingThreads.load() == 0; });
+}
 
 CBassAudio::CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D)
     : m_bStream(bStream), m_strPath(strPath), m_bLoop(bLoop), m_bThrottle(bThrottle), m_b3D(b3D)
@@ -589,6 +611,19 @@ void CALLBACK BeatCallback(DWORD chan, double beatpos, void* user)
 
 DWORD CBassAudio::PlayStreamIntern(LPVOID argument)
 {
+    // Track this thread so DLL unload can wait for it.
+    // This needs be incremented at the very start and decremented at the very end
+    // to ensure the main thread waits for it before unloading the DLL.
+    ++ms_iActiveStreamingThreads;
+
+    // Check if we're already shutting down
+    if (ms_bShuttingDown.load())
+    {
+        --ms_iActiveStreamingThreads;
+        ms_StreamingThreadCV.notify_all();
+        return 0;
+    }
+
     CBassAudio* pBassAudio = LockCallbackId(argument);
     if (pBassAudio)
     {
@@ -598,26 +633,43 @@ DWORD CBassAudio::PlayStreamIntern(LPVOID argument)
         pBassAudio->m_pVars->criticalSection.Unlock();
         UnlockCallbackId();
 
-        // This can take a while
+        // This can take a long time (30+ seconds on slow/failing connections).
+        // The main thread will wait for it with WaitForAllStreamingThreads().
         HSTREAM pSound = BASS_StreamCreateURL(FromUTF8(strURL), 0, lFlags | BASS_UNICODE, NULL, NULL);
 
-        CBassAudio* pBassAudio = LockCallbackId(argument);
-        if (pBassAudio)
+        // After BASS_StreamCreateURL returns, minimize work before decrementing counter.
+        // If shutting down, skip all processing and exit quickly - BASS is already freed
+        // So we shouldnt call any BASS functions or access game objects.
+        if (!ms_bShuttingDown.load())
         {
-            pBassAudio->m_pVars->criticalSection.Lock();
-            pBassAudio->m_pVars->bStreamCreateResult = true;
-            pBassAudio->m_pVars->pSound = pSound;
-            pBassAudio->m_pVars->criticalSection.Unlock();
+            CBassAudio* pBassAudio = LockCallbackId(argument);
+            if (pBassAudio)
+            {
+                pBassAudio->m_pVars->criticalSection.Lock();
+                pBassAudio->m_pVars->bStreamCreateResult = true;
+                pBassAudio->m_pVars->pSound = pSound;
+                pBassAudio->m_pVars->criticalSection.Unlock();
+            }
+            else if (pSound)
+            {
+                // Deal with unwanted pSound unless we're disconnecting already
+                if (g_pClientGame != nullptr && !g_pClientGame->IsBeingDeleted())
+                    g_pClientGame->GetManager()->GetSoundManager()->QueueChannelStop(pSound);
+            }
+            UnlockCallbackId();
         }
-        else
-        {
-            // Deal with unwanted pSound unless we're disconnecting already
-            if (g_pClientGame != nullptr && !g_pClientGame->IsBeingDeleted())
-                g_pClientGame->GetManager()->GetSoundManager()->QueueChannelStop(pSound);
-        }
+        // If shutting down: BASS is already freed, so pSound is invalid - just discard it.
+        // Do NOT call BASS_StreamFree or any BASS API here.
+    }
+    else
+    {
+        UnlockCallbackId();
     }
 
-    UnlockCallbackId();
+    // Signal that this thread is done - this allows WaitForAllStreamingThreads to return
+    --ms_iActiveStreamingThreads;
+    ms_StreamingThreadCV.notify_all();
+
     return 0;
 }
 

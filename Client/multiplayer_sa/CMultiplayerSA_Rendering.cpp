@@ -52,6 +52,7 @@ static void __declspec(naked) HOOK_CallIdle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -68,6 +69,7 @@ static void __declspec(naked) HOOK_CallIdle()
 
         jmp     RETURN_CallIdle
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -120,6 +122,7 @@ static void __declspec(naked) HOOK_CEntity_Render()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -142,6 +145,7 @@ inner:
         mov     eax,dword ptr [esi+18h]
         jmp     RETURN_CEntity_Render
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +179,7 @@ static void __declspec(naked) HOOK_CEntity_RenderOneNonRoad()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -202,6 +207,7 @@ inner:
         mov     esi, [esp+08h]
         jmp     RETURN_CEntity_RenderOneNonRoad
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -224,6 +230,7 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -236,6 +243,7 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(
         mov     ecx,dword ptr [ebx+4F4h]
         jmp     RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -257,6 +265,7 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End(
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -268,6 +277,7 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End(
         add         esp,0Ch
         ret
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -285,6 +295,7 @@ static void __declspec(naked) HOOK_Check_NoOfVisibleLods()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 999            // Array limit is 1000
@@ -294,6 +305,7 @@ limit:
         mov     dword ptr ds:[00B76840h],eax        // NoOfVisibleLods
         jmp     RETURN_Check_NoOfVisibleLods
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -311,6 +323,7 @@ static void __declspec(naked) HOOK_Check_NoOfVisibleEntities()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 999        // Array limit is 1000
@@ -320,6 +333,7 @@ limit:
         mov     dword ptr ds:[00B76844h],eax        // NoOfVisibleEntities
         jmp     RETURN_Check_NoOfVisibleEntities
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -341,6 +355,7 @@ static void __declspec(naked) HOOK_WinLoop()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -350,6 +365,7 @@ static void __declspec(naked) HOOK_WinLoop()
         mov     eax, ds:0x0C8D4C0
         jmp     RETURN_WinLoop
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -366,13 +382,16 @@ static void __declspec(naked) HOOK_CTimer_Update()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
     g_pCore->OnGameTimerUpdate();
 
+    // clang-format off
     __asm
     {
         popad
@@ -381,6 +400,7 @@ static void __declspec(naked) HOOK_CTimer_Update()
         mov     ecx, dword ptr ds:[0B7CB28h]
         jmp     CONTINUE_CTimer_Update
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -484,6 +504,7 @@ static void __declspec(naked) HOOK_psGrabScreen()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -506,6 +527,7 @@ use_rect:
 
         jmp     RETURN_psGrabScreen_YesChange
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -530,6 +552,7 @@ static void __declspec(naked) HOOK_CClouds_RenderSkyPolys()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -539,6 +562,7 @@ static void __declspec(naked) HOOK_CClouds_RenderSkyPolys()
         mov     eax, ds:0x0B6F03C
         jmp     RETURN_CClouds_RenderSkyPolys
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -587,6 +611,7 @@ static void __declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -602,6 +627,7 @@ static void __declspec(naked) HOOK_RwCameraSetNearClipPlane()
         push    esi
         jmp     RETURN_RwCameraSetNearClipPlane
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -620,20 +646,24 @@ static void __declspec(naked) HOOK_RenderEffects_HeliLight()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
     // Call render handler
     if (pRenderHeliLightHandler) pRenderHeliLightHandler();
 
+    // clang-format off
     __asm
     {
         popad
         mov     eax, ds:[0xC1C96C]
         jmp     RETURN_RenderEffects_HeliLight
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -781,6 +811,7 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         push esi;
@@ -802,6 +833,7 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
         pop esi;
         retn;
     }
+    // clang-format on
 }
 
 // Hook info
@@ -813,14 +845,17 @@ static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
     if (pRenderEverythingBarRoadsHandler)
         pRenderEverythingBarRoadsHandler();
 
+    // clang-format off
     __asm
     {
         popad
@@ -828,6 +863,7 @@ static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
         jmp RETURN_CRenderer_EverythingBarRoads
 
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

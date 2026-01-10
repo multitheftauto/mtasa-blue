@@ -18,6 +18,7 @@
 #include "CGameSA.h"
 
 extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 // count: 26316 in unmodified game
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
@@ -229,6 +230,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     if (IsUpgradeModelId(dwModelID))
     {
         DWORD dwFunc = FUNC_RequestVehicleUpgrade;
+        // clang-format off
         __asm
         {
             push    dwFlags
@@ -236,10 +238,16 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
             call    dwFunc
             add     esp, 8
         }
+        // clang-format on
     }
     else
     {
+        CBaseModelInfoSAInterface** ppModelInfo = reinterpret_cast<CBaseModelInfoSAInterface**>(ARRAY_ModelInfo);
+        if (dwModelID < MODELINFO_DFF_MAX && !ppModelInfo[dwModelID])
+            return;
+
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
+        // clang-format off
         __asm
         {
             push    dwFlags
@@ -247,6 +255,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
             call    dwFunction
             add     esp, 8
         }
+        // clang-format on
     }
 }
 
@@ -263,12 +272,14 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
+    // clang-format off
     __asm
     {
         push    dwOnlyPriorityModels
         call    dwFunction
         add     esp, 4
     }
+    // clang-format on
 
     if (IS_TIMING_CHECKPOINTS())
     {
@@ -284,6 +295,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         bool  bReturn;
         DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
+        // clang-format off
         __asm
         {
             push    dwModelID
@@ -291,12 +303,14 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
             add     esp, 0x4
             mov     bReturn, al
         }
+        // clang-format on
         return bReturn;
     }
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
         bool  bReturn = 0;
+        // clang-format off
         __asm
         {
             push    dwModelID
@@ -304,6 +318,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
             mov     bReturn, al
             pop     eax
         }
+        // clang-format on
 
         return bReturn;
     }
@@ -312,6 +327,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
     DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
+    // clang-format off
     __asm
     {
         push    channel
@@ -320,6 +336,7 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
         call    dwFunc
         add     esp, 0xC
     }
+    // clang-format on
 }
 
 void CStreamingSA::ReinitStreaming()
@@ -334,6 +351,8 @@ void CStreamingSA::ReinitStreaming()
 void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
+    if (!pItemInfo)
+        return;
 
     // We remove the existing RwObject because, after switching the archive, the streamer will load a new one.
     // ReInit doesn't delete all RwObjects unless certain conditions are met.
@@ -373,6 +392,10 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
 
 CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)
 {
+    const uint maxStreamingID = pGame->GetCountOfAllFileIDs();
+    if (modelid >= maxStreamingID)
+        return nullptr;
+
     return &ms_aInfoForModel[modelid];
 }
 
