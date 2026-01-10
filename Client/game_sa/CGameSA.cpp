@@ -372,6 +372,28 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
     return nullptr;
 }
 
+CModelInfo* CGameSA::GetModelInfo(CBaseModelInfoSAInterface* baseModelInfo)
+{
+    static std::unordered_map<CBaseModelInfoSAInterface*, CModelInfoSA*> s_cache;
+
+    auto it = s_cache.find(baseModelInfo);
+    if (it != s_cache.end())
+        return it->second;
+
+    const std::size_t count = GetCountOfAllFileIDs();
+    for (std::size_t i = 0; i < count; i++)
+    {
+        CModelInfoSA* modelInfo = &ModelInfo[i];
+        if (modelInfo && modelInfo->IsValid() && modelInfo->GetInterface() == baseModelInfo)
+        {
+            s_cache[baseModelInfo] = modelInfo;
+            return modelInfo;
+        }
+    }
+
+    return nullptr;
+}
+
 /**
  * Starts the game
  * \todo make addresses into constants
@@ -1153,6 +1175,11 @@ void CGameSA::ResetModelFlags()
 void CGameSA::ResetModelTimes()
 {
     CModelInfoSA::StaticResetModelTimes();
+}
+
+void CGameSA::ResetModelAnimations()
+{
+    CModelInfoSA::StaticResetModelAnimations();
 }
 
 void CGameSA::ResetAlphaTransparencies()

@@ -91,6 +91,12 @@ void InitRwFunctions()
     RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51A0;
     RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5120;
     RtQuatRotate = (RtQuatRotate_t)0x7EB7C0;
+    RwStreamReadChunkHeader = reinterpret_cast<RwStreamReadChunkHeader_t>(0x7ED0F0);
+    IsClumpSkinned = reinterpret_cast<IsClumpSkinned_t>(0x4C4DC0);
+    RpAnimBlendCreateAnimationForHierarchy = reinterpret_cast<RpAnimBlendCreateAnimationForHierarchy_t>(0x4D60E0);
+    RtAnimInterpolatorSetCurrentAnim = reinterpret_cast<RtAnimInterpolatorSetCurrentAnim_t>(0x7CD5A0);
+    RpAnimBlendClumpInit = reinterpret_cast<RpAnimBlendClumpInit_t>(0x4D6720);
+    RpAnimBlendClumpIsInitialized = reinterpret_cast<RpAnimBlendClumpIsInitialized_t>(0x4D6760);
     
     SetTextureDict = (SetTextureDict_t)0x007319C0;
     LoadClumpFile = (LoadClumpFile_t)0x005371F0;

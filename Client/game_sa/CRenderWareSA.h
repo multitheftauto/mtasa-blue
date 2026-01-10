@@ -46,6 +46,9 @@ public:
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);
 
+    // Checks whether a DFF file contains an HAnimPLG chunk
+    bool DoContainHAnimPLG(const SString& filename, const SString& buffer);
+
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
     RpClump* ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions);
 

@@ -108,6 +108,12 @@ typedef RpHAnimHierarchy*(__cdecl* GetAnimHierarchyFromSkinClump_t)(RpClump*);
 typedef int(__cdecl* RpHAnimIDGetIndex_t)(RpHAnimHierarchy*, int);
 typedef RwMatrix*(__cdecl* RpHAnimHierarchyGetMatrixArray_t)(RpHAnimHierarchy*);
 typedef RtQuat*(__cdecl* RtQuatRotate_t)(RtQuat* quat, const RwV3d* axis, float angle, RwOpCombineType combineOp);
+typedef bool(__cdecl* RwStreamReadChunkHeader_t)(RwStream* stream, int* chunkType, int* chunkLength, int* version, int* buildNum);
+typedef bool(__cdecl* IsClumpSkinned_t)(RpClump* clump);
+typedef RtAnimAnimation*(__cdecl* RpAnimBlendCreateAnimationForHierarchy_t)(RpHAnimHierarchy* hierarchy);
+typedef void(__cdecl* RtAnimInterpolatorSetCurrentAnim_t)(RtAnimInterpolator* interpolator, RtAnimAnimation* animation);
+typedef void(__cdecl* RpAnimBlendClumpInit_t)(RpClump* clump);
+typedef bool(__cdecl* RpAnimBlendClumpIsInitialized_t)(RpClump* clump);
 
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
@@ -200,6 +206,12 @@ RWFUNC(GetAnimHierarchyFromSkinClump_t GetAnimHierarchyFromSkinClump, (GetAnimHi
 RWFUNC(RpHAnimIDGetIndex_t RpHAnimIDGetIndex, (RpHAnimIDGetIndex_t)0xDEAD)
 RWFUNC(RpHAnimHierarchyGetMatrixArray_t RpHAnimHierarchyGetMatrixArray, (RpHAnimHierarchyGetMatrixArray_t)0xDEAD)
 RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
+RWFUNC(RwStreamReadChunkHeader_t RwStreamReadChunkHeader, (RwStreamReadChunkHeader_t)0xDEAD)
+RWFUNC(IsClumpSkinned_t IsClumpSkinned, (IsClumpSkinned_t)0xDEAD)
+RWFUNC(RpAnimBlendCreateAnimationForHierarchy_t RpAnimBlendCreateAnimationForHierarchy, (RpAnimBlendCreateAnimationForHierarchy_t)0xDEAD)
+RWFUNC(RtAnimInterpolatorSetCurrentAnim_t RtAnimInterpolatorSetCurrentAnim, (RtAnimInterpolatorSetCurrentAnim_t)0xDEAD)
+RWFUNC(RpAnimBlendClumpInit_t RpAnimBlendClumpInit, (RpAnimBlendClumpInit_t)0xDEAD)
+RWFUNC(RpAnimBlendClumpIsInitialized_t RpAnimBlendClumpIsInitialized, (RpAnimBlendClumpIsInitialized_t)0xDEAD)
 
 /*****************************************************************************/
 /** GTA function definitions and mappings                                   **/
