@@ -87,6 +87,15 @@ bool CClientModel::Allocate(ushort usParentID)
                 allocated = true;
             }
             break;
+        case eClientModelType::VEHICLE_UPGRADE:
+        {
+            if (CVehicleUpgrades::IsUpgrade(usParentID))
+            {
+                pModelInfo->MakeVehicleUpgradeModel(usParentID);
+                return true;
+            }
+            break;
+        }
         default:
             return false;
     }
@@ -140,6 +149,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
         case eClientModelType::CLUMP:
         case eClientModelType::TIMED_OBJECT:
         case eClientModelType::VEHICLE:
+        case eClientModelType::VEHICLE_UPGRADE:
             RestoreDFF(pModelInfo);
             return;
         case eClientModelType::TXD:
@@ -249,6 +259,22 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 
             unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
                                       [usParentID](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });
+            break;
+        }
+        case eClientModelType::VEHICLE_UPGRADE:
+        {
+            CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
+            const auto             usParentID = static_cast<unsigned short>(g_pGame->GetModelInfo(m_iModelID)->GetParentID());
+
+            // Remove custom upgrade and restore parent
+            unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID, 
+                [=](auto& element) {
+                    element.GetUpgrades()->RemoveUpgrade(m_iModelID);
+                    if (usParentID >= 1000 && usParentID <= 1193)
+                    {
+                        element.GetUpgrades()->AddUpgrade(usParentID, false);
+                    }
+                });
             break;
         }
     }

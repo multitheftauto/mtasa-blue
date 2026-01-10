@@ -471,12 +471,14 @@ public:
     void SetModelID(DWORD dwModelID) { m_dwModelID = dwModelID; }
 
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
+    void      SetRwObject(RwObject* pRwObject) { if (m_pInterface) m_pInterface->pRwObject = pRwObject; }
 
     // CModelInfoSA methods
     void         MakePedModel(const char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;
     void         MakeVehicleAutomobile(ushort usBaseModelID);
+    void         MakeVehicleUpgradeModel(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
     void         MakeClumpModel(ushort usBaseModelID);
     void         DeallocateModel(void);
