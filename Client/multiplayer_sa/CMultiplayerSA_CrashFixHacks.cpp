@@ -47,7 +47,7 @@ static void __declspec(naked) CrashAverted()
     // clang-format on
 }
 
-static bool HasReadAccess(DWORD dwProtect)
+static bool HasReadAccess(DWORD dwProtect) noexcept
 {
     if (dwProtect & PAGE_GUARD)
         return false;
@@ -61,7 +61,7 @@ static bool HasReadAccess(DWORD dwProtect)
            dwProtect == PAGE_EXECUTE_READ || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
 }
 
-static bool HasWriteAccess(DWORD dwProtect)
+static bool HasWriteAccess(DWORD dwProtect) noexcept
 {
     if (dwProtect & PAGE_GUARD)
         return false;
@@ -71,116 +71,124 @@ static bool HasWriteAccess(DWORD dwProtect)
     return dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
 }
 
-static bool QueryRegionCached(uintptr_t uiAddress, MEMORY_BASIC_INFORMATION& outMbi, uintptr_t& outStart, uintptr_t& outEnd)
-{
-    static thread_local MEMORY_BASIC_INFORMATION s_mbi;
-    static thread_local uintptr_t                s_start = 0;
-    static thread_local uintptr_t                s_end = 0;
+static constexpr std::size_t REGION_CACHE_SIZE = 8;
+static constexpr std::uintptr_t NUM_LOWMEM_THRESHOLD = 0x10000;
 
-    if (s_start != 0 && uiAddress >= s_start && uiAddress <= s_end)
+#define NUM_LOWMEM_THRESHOLD_ASM 0x10000
+
+struct CachedRegion
+{
+    std::uintptr_t start{};
+    std::uintptr_t end{};
+    DWORD          state{};
+    DWORD          protect{};
+};
+
+static bool QueryRegionCached(std::uintptr_t address, DWORD& outState, DWORD& outProtect, std::uintptr_t& outEnd) noexcept
+{
+    static thread_local CachedRegion s_cache[REGION_CACHE_SIZE]{};
+    static thread_local std::size_t  s_nextSlot{};
+
+    for (const auto& entry : s_cache)
     {
-        outMbi = s_mbi;
-        outStart = s_start;
-        outEnd = s_end;
-        return true;
+        if (entry.start != 0 && address >= entry.start && address <= entry.end)
+        {
+            outState = entry.state;
+            outProtect = entry.protect;
+            outEnd = entry.end;
+            return true;
+        }
     }
 
-    MEMORY_BASIC_INFORMATION mbi;
-    SIZE_T                   mbiResult = VirtualQuery(reinterpret_cast<LPCVOID>(uiAddress), &mbi, sizeof(mbi));
-    if (mbiResult != sizeof(mbi))
+    MEMORY_BASIC_INFORMATION mbi{};
+    if (VirtualQuery(reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi)) != sizeof(mbi))
         return false;
 
-    s_mbi = mbi;
-    s_start = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+    const auto regionSize = static_cast<std::uintptr_t>(mbi.RegionSize);
+    if (regionSize == 0)
+        return false;
 
-    const uintptr_t uiSize = static_cast<uintptr_t>(mbi.RegionSize);
-    if (uiSize == 0)
-        s_end = s_start;
-    else
-    {
-        const uintptr_t uiEndPlusOne = s_start + uiSize;
-        s_end = (uiEndPlusOne <= s_start) ? static_cast<uintptr_t>(-1) : (uiEndPlusOne - 1);
-    }
+    auto& slot = s_cache[s_nextSlot];
+    s_nextSlot = (s_nextSlot + 1) % REGION_CACHE_SIZE;
 
-    outMbi = s_mbi;
-    outStart = s_start;
-    outEnd = s_end;
+    slot.start = reinterpret_cast<std::uintptr_t>(mbi.BaseAddress);
+    slot.state = mbi.State;
+    slot.protect = mbi.Protect;
+
+    const auto endPlusOne = slot.start + regionSize;
+    slot.end = (endPlusOne <= slot.start) ? static_cast<std::uintptr_t>(-1) : (endPlusOne - 1);
+
+    outState = slot.state;
+    outProtect = slot.protect;
+    outEnd = slot.end;
     return true;
 }
 
-static bool IsReadablePtr(const void* pPtr, size_t uiSize)
+static bool IsReadablePtr(const void* ptr, std::size_t size) noexcept
 {
-    if (pPtr == nullptr || uiSize == 0)
+    if (ptr == nullptr || size == 0)
         return false;
 
-    const uintptr_t uiStart = reinterpret_cast<uintptr_t>(pPtr);
-    if (uiStart < 0x10000)
+    const auto start = reinterpret_cast<std::uintptr_t>(ptr);
+    if (start < NUM_LOWMEM_THRESHOLD)
         return false;
 
-    const uintptr_t uiEnd = uiStart + uiSize - 1;
-    if (uiEnd < uiStart)
+    const auto end = start + size - 1;
+    if (end < start)
         return false;
 
-    uintptr_t uiCur = uiStart;
-    while (true)
+    auto cur = start;
+    for (;;)
     {
-        MEMORY_BASIC_INFORMATION mbi;
-        uintptr_t                uiRegionStart = 0;
-        uintptr_t                uiRegionEnd = 0;
-        if (!QueryRegionCached(uiCur, mbi, uiRegionStart, uiRegionEnd))
+        DWORD          state{}, protect{};
+        std::uintptr_t regionEnd{};
+        if (!QueryRegionCached(cur, state, protect, regionEnd))
             return false;
 
-        if (mbi.State != MEM_COMMIT)
+        if (state != MEM_COMMIT || !HasReadAccess(protect))
             return false;
 
-        if (!HasReadAccess(mbi.Protect))
-            return false;
-
-        if (uiRegionEnd >= uiEnd)
+        if (regionEnd >= end)
             return true;
 
-        if (uiRegionEnd < uiCur || uiRegionEnd == static_cast<uintptr_t>(-1))
+        if (regionEnd < cur || regionEnd == static_cast<std::uintptr_t>(-1))
             return false;
 
-        uiCur = uiRegionEnd + 1;
+        cur = regionEnd + 1;
     }
 }
 
-static bool IsWritablePtr(void* pPtr, size_t uiSize)
+static bool IsWritablePtr(void* ptr, std::size_t size) noexcept
 {
-    if (pPtr == nullptr || uiSize == 0)
+    if (ptr == nullptr || size == 0)
         return false;
 
-    const uintptr_t uiStart = reinterpret_cast<uintptr_t>(pPtr);
-    if (uiStart < 0x10000)
+    const auto start = reinterpret_cast<std::uintptr_t>(ptr);
+    if (start < NUM_LOWMEM_THRESHOLD)
         return false;
 
-    const uintptr_t uiEnd = uiStart + uiSize - 1;
-    if (uiEnd < uiStart)
+    const auto end = start + size - 1;
+    if (end < start)
         return false;
 
-    uintptr_t uiCur = uiStart;
-    while (true)
+    auto cur = start;
+    for (;;)
     {
-        MEMORY_BASIC_INFORMATION mbi;
-        uintptr_t                uiRegionStart = 0;
-        uintptr_t                uiRegionEnd = 0;
-        if (!QueryRegionCached(uiCur, mbi, uiRegionStart, uiRegionEnd))
+        DWORD          state{}, protect{};
+        std::uintptr_t regionEnd{};
+        if (!QueryRegionCached(cur, state, protect, regionEnd))
             return false;
 
-        if (mbi.State != MEM_COMMIT)
+        if (state != MEM_COMMIT || !HasWriteAccess(protect))
             return false;
 
-        if (!HasWriteAccess(mbi.Protect))
-            return false;
-
-        if (uiRegionEnd >= uiEnd)
+        if (regionEnd >= end)
             return true;
 
-        if (uiRegionEnd < uiCur || uiRegionEnd == static_cast<uintptr_t>(-1))
+        if (regionEnd < cur || regionEnd == static_cast<std::uintptr_t>(-1))
             return false;
 
-        uiCur = uiRegionEnd + 1;
+        cur = regionEnd + 1;
     }
 }
 
@@ -1508,35 +1516,44 @@ static void __declspec(naked) HOOK_CrashFix_Misc34()
 //
 // Invalid list entry pointer (crash at 0x7F374A: mov esi, [eax])
 // (https://pastebin.com/hFduf1JB)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc35   0x7F374A
 #define HOOKSIZE_CrashFix_Misc35  5
 #define HOOKCHECK_CrashFix_Misc35 0x8B
 DWORD                 RETURN_CrashFix_Misc35 = 0x7F374F;
 DWORD                 RETURN_CrashFix_Misc35_Abort = 0x7F3760;
-static void _declspec(naked) HOOK_CrashFix_Misc35()
+
+static void __declspec(naked) HOOK_CrashFix_Misc35()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
-        pushad
+        cmp     eax, NUM_LOWMEM_THRESHOLD_ASM
+        jb      abort
+
+        push    eax
+        push    ecx
+        push    edx
         push    4
         push    eax
         call    IsReadablePtr
         add     esp, 8
-        test    eax, eax
-        popad
-        jnz     ok
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      abort
 
-        push    35
-        call    CrashAverted
-        jmp     RETURN_CrashFix_Misc35_Abort
-
-    ok:
         mov     esi, [eax]
         add     eax, 0FFFFFFF8h
         jmp     RETURN_CrashFix_Misc35
+
+    abort:
+        push    35
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc35_Abort
     }
     // clang-format on
 }
@@ -1555,46 +1572,31 @@ static void _declspec(naked) HOOK_CrashFix_Misc35()
 DWORD RETURN_CrashFix_Misc36 = 0x7F3A0F;
 DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
 
-static bool CheckTextureName(DWORD ecxValue)
-{
-    return IsReadablePtr((const void*)ecxValue, 1);
-}
-
-static void _declspec(naked) HOOK_CrashFix_Misc36()
+static void __declspec(naked) HOOK_CrashFix_Misc36()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
     __asm
     {
-        cmp     ebx, 0x10000
+        cmp     ebx, NUM_LOWMEM_THRESHOLD_ASM
         jb      abort
-        cmp     ebx, 0x80000000
-        jae     abort
 
         // Replicate original code
         lea     eax, [ebx-8]
         lea     ecx, [eax+10h]
 
-        // Quick check: ecx (texture name ptr) must make sense
-        cmp     ecx, 0x10000
+        cmp     ecx, NUM_LOWMEM_THRESHOLD_ASM
         jb      abort
-        cmp     ecx, 0x80000000
-        jae     abort
 
-        // ecx must point readable memory
-        // save all state before call
         push    eax
         push    ecx
         push    edx
-        pushfd
-        
+        push    1
         push    ecx
-        call    CheckTextureName
-        add     esp, 4
+        call    IsReadablePtr
+        add     esp, 8
         test    al, al
-        
-        popfd
         pop     edx
         pop     ecx
         pop     eax
@@ -1616,24 +1618,33 @@ static void _declspec(naked) HOOK_CrashFix_Misc36()
 //
 // Invalid list head pointer (crash at 0x7F39B3: mov [esi+4], edx)
 // (https://pastebin.com/pkWwsSih)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc37                              0x7F39B3
 #define HOOKSIZE_CrashFix_Misc37                             5
 #define HOOKCHECK_CrashFix_Misc37                            0x89
 DWORD RETURN_CrashFix_Misc37 = 0x7F39B8;
-static void _declspec(naked) HOOK_CrashFix_Misc37()
+
+static void __declspec(naked) HOOK_CrashFix_Misc37()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
-        pushad
+        cmp     esi, NUM_LOWMEM_THRESHOLD_ASM
+        jb      bad
+
+        push    eax
+        push    ecx
+        push    edx
         push    8
         push    esi
         call    IsWritablePtr
         add     esp, 8
-        test    eax, eax
-        popad
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
         jz      bad
 
         cmp     esi, ecx
@@ -1683,7 +1694,8 @@ static void OnVideoMemoryExhausted()
     OnRequestDeferredStreamingMemoryRelief();
 }
 
-static void _declspec(naked) HOOK_CrashFix_Misc38()
+// No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+static void __declspec(naked) HOOK_CrashFix_Misc38()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -1694,9 +1706,15 @@ static void _declspec(naked) HOOK_CrashFix_Misc38()
         test    esi, esi
         jnz     ok
 
-        pushad
+        // Save only volatile registers before call
+        push    eax
+        push    ecx
+        push    edx
         call    OnVideoMemoryExhausted
-        popad
+        pop     edx
+        pop     ecx
+        pop     eax
+
         push    38
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc38_Skip
