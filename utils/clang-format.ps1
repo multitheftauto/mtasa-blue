@@ -1,3 +1,5 @@
+#!/usr/bin/env pwsh
+
 # cd to parent location
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
