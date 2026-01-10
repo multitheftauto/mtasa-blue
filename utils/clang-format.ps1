@@ -60,7 +60,6 @@ function Invoke-ClangFormat {
     Push-Location $repoRoot
     Write-Verbose "Changed directory to repository root: $repoRoot"
 
-
     try {
         Write-Verbose "Searching for source files to format..."
         $clangFormatPath = Get-ClangFormat -RepoRoot $repoRoot
