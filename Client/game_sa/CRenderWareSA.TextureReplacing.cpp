@@ -225,6 +225,55 @@ namespace
         return pTexture != nullptr;
     }
 
+    std::unordered_set<RwTexture*> MakeTextureSet(const std::vector<RwTexture*>& textures)
+    {
+        return std::unordered_set<RwTexture*>(textures.begin(), textures.end());
+    }
+
+    std::unordered_map<RwRaster*, RwTexture*> MakeRasterMap(const std::vector<RwTexture*>& textures)
+    {
+        std::unordered_map<RwRaster*, RwTexture*> out;
+        out.reserve(textures.size());
+        for (RwTexture* tex : textures)
+        {
+            if (!tex || !tex->raster)
+                continue;
+            auto it = out.find(tex->raster);
+            if (it == out.end())
+            {
+                out.emplace(tex->raster, tex);
+            }
+            else if (!IsReadableTexture(it->second) && IsReadableTexture(tex))
+            {
+                it->second = tex;
+            }
+        }
+        return out;
+    }
+
+    RwTexture* FindReadableMasterForRaster(const std::unordered_map<RwRaster*, RwTexture*>& masterRasterMap,
+                                           const std::vector<RwTexture*>& masters,
+                                           RwRaster* raster)
+    {
+        if (!raster)
+            return nullptr;
+
+        auto it = masterRasterMap.find(raster);
+        if (it != masterRasterMap.end() && IsReadableTexture(it->second))
+            return it->second;
+
+        for (RwTexture* tex : masters)
+        {
+            if (!tex || tex->raster != raster)
+                continue;
+
+            if (IsReadableTexture(tex))
+                return tex;
+        }
+
+        return nullptr;
+    }
+
     // Capture all TXD textures for restoration
     void PopulateOriginalTextures(CModelTexturesInfo& info, RwTexDictionary* pTxd)
     {
@@ -466,10 +515,18 @@ namespace
 
     void CleanupStalePerTxd(SReplacementTextures::SPerTxd& perTxdInfo, RwTexDictionary* pDeadTxd,
                             SReplacementTextures* pReplacementTextures,
+                            const std::unordered_set<RwTexture*>* pMasterTextures,
                             std::unordered_set<RwTexture*>& outCopiesToDestroy,
                             std::unordered_set<RwTexture*>& outOriginalsToDestroy)
     {
         const bool bDeadTxdValid = pDeadTxd != nullptr;
+
+        std::unordered_set<RwTexture*> localMasterTextures;
+        if (!perTxdInfo.bTexturesAreCopies && pReplacementTextures && !pMasterTextures)
+        {
+            localMasterTextures = MakeTextureSet(pReplacementTextures->textures);
+            pMasterTextures = &localMasterTextures;
+        }
 
         for (RwTexture* pTexture : perTxdInfo.usingTextures)
         {
@@ -494,13 +551,8 @@ namespace
             if (bNeedsDestruction && CanDestroyOrphanedTexture(pTexture))
             {
                 bool bIsActuallyCopy = perTxdInfo.bTexturesAreCopies;
-                if (!bIsActuallyCopy && pReplacementTextures)
-                {
-                    auto it = std::find(pReplacementTextures->textures.begin(),
-                                       pReplacementTextures->textures.end(),
-                                       pTexture);
-                    bIsActuallyCopy = (it == pReplacementTextures->textures.end());
-                }
+                if (!bIsActuallyCopy && pReplacementTextures && pMasterTextures)
+                    bIsActuallyCopy = pMasterTextures->find(pTexture) == pMasterTextures->end();
                 
                 if (bIsActuallyCopy)
                     outCopiesToDestroy.insert(pTexture);
@@ -1116,22 +1168,45 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 }
             }
 
-            // Only add vehicle.txd fallback for vehicle-type models or clones thereof
             bool bNeedVehicleFallback = false;
-            for (SReplacementTextures* pRepl : info.usedByReplacements)
+            if (!info.usedByReplacements.empty())
             {
-                if (!pRepl)
-                    continue;
-                for (unsigned short modelIdForCheck : pRepl->usedInModelIds)
+                if (info.usedByReplacements.size() == 1)
                 {
-                    if (ShouldUseVehicleTxdFallback(modelIdForCheck))
+                    SReplacementTextures* pRepl = info.usedByReplacements.front();
+                    if (pRepl)
                     {
-                        bNeedVehicleFallback = true;
-                        break;
+                        for (unsigned short modelIdForCheck : pRepl->usedInModelIds)
+                        {
+                            if (ShouldUseVehicleTxdFallback(modelIdForCheck))
+                            {
+                                bNeedVehicleFallback = true;
+                                break;
+                            }
+                        }
                     }
                 }
-                if (bNeedVehicleFallback)
-                    break;
+                else
+                {
+                    std::unordered_set<unsigned short> checkedVehicleFallback;
+                    for (SReplacementTextures* pRepl : info.usedByReplacements)
+                    {
+                        if (!pRepl)
+                            continue;
+                        for (unsigned short modelIdForCheck : pRepl->usedInModelIds)
+                        {
+                            if (!checkedVehicleFallback.insert(modelIdForCheck).second)
+                                continue;
+                            if (ShouldUseVehicleTxdFallback(modelIdForCheck))
+                            {
+                                bNeedVehicleFallback = true;
+                                break;
+                            }
+                        }
+                        if (bNeedVehicleFallback)
+                            break;
+                    }
+                }
             }
             if (bNeedVehicleFallback)
                 AddVehicleTxdFallback(parentTxdMap);
@@ -1198,7 +1273,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                         [txdId = itPerTxd->usTxdId](CD3DDUMMY* pD3D) { RemoveShaderEntryByD3DData(txdId, pD3D); });
                     ClearShaderRegs(pReplacement, itPerTxd->usTxdId);
 
-                    CleanupStalePerTxd(*itPerTxd, info.pTxd, pReplacement, copiesToDestroy, originalsToDestroy);
+                    CleanupStalePerTxd(*itPerTxd, info.pTxd, pReplacement, nullptr, copiesToDestroy, originalsToDestroy);
 
                     pReplacement->perTxdList.erase(itPerTxd);
                     pReplacement->bHasRequestedSpace = false;
@@ -1744,7 +1819,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
             std::unordered_set<RwTexture*> copiesToDestroy;
             std::unordered_set<RwTexture*> originalsToDestroy;
-            CleanupStalePerTxd(*itPerTxd, pOldTxd, pReplacementTextures, copiesToDestroy, originalsToDestroy);
+            CleanupStalePerTxd(*itPerTxd, pOldTxd, pReplacementTextures, nullptr, copiesToDestroy, originalsToDestroy);
 
             for (RwTexture* pTexture : copiesToDestroy)
             {
@@ -1872,6 +1947,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
     perTxdInfo.replacedOriginals.resize(perTxdInfo.usingTextures.size(), nullptr);
 
+    const auto masterTextures = MakeTextureSet(pReplacementTextures->textures);
+
     RwTexDictionary* const pTargetTxd = pInfo->pTxd;
     const bool bTargetTxdOk = pTargetTxd != nullptr;
     TxdTextureMap targetTxdTextureMap;
@@ -1958,14 +2035,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
         if (pExistingTexture && bTargetTxdOk && pExistingTexture->txd == pTargetTxd && !bRemovedExisting)
         {
-            bool bIsCopyTexture = perTxdInfo.bTexturesAreCopies;  // Destroy copies to avoid leaks
-            if (!bIsCopyTexture && pReplacementTextures)
-            {
-                auto it = std::find(pReplacementTextures->textures.begin(),
-                                    pReplacementTextures->textures.end(),
-                                    pNewTexture);
-                bIsCopyTexture = (it == pReplacementTextures->textures.end());
-            }
+            bool bIsCopyTexture = perTxdInfo.bTexturesAreCopies || masterTextures.find(pNewTexture) == masterTextures.end();
             if (bIsCopyTexture && CanDestroyOrphanedTexture(pNewTexture))
             {
                 SafeDestroyTexture(pNewTexture);
@@ -2028,14 +2098,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
             }
             
             // Destroy copies to prevent leaks (never destroy masters)
-            bool bIsCopyTexture = perTxdInfo.bTexturesAreCopies;
-            if (!bIsCopyTexture && pReplacementTextures)
-            {
-                auto it = std::find(pReplacementTextures->textures.begin(),
-                                    pReplacementTextures->textures.end(),
-                                    pNewTexture);
-                bIsCopyTexture = (it == pReplacementTextures->textures.end());
-            }
+            bool bIsCopyTexture = perTxdInfo.bTexturesAreCopies || masterTextures.find(pNewTexture) == masterTextures.end();
 
             if (bIsCopyTexture)
             {
@@ -2358,6 +2421,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         return;
     }
 
+    const auto masterTextures = MakeTextureSet(pReplacementTextures->textures);
+    const auto masterRasterMap = MakeRasterMap(pReplacementTextures->textures);
+
     // Track destroyed textures across all perTxdInfo iterations to prevent double-free
     std::unordered_set<RwTexture*> destroyedTextures;
     std::unordered_set<RwTexture*> leakedTextures;  // Still in TXD - must not destroy
@@ -2396,14 +2462,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 if (!IsReadableTexture(pTex))
                     continue;
 
-                bool bIsCopy = perTxdInfo.bTexturesAreCopies;
-                if (!bIsCopy && pReplacementTextures)
-                {
-                    auto it = std::find(pReplacementTextures->textures.begin(),
-                                        pReplacementTextures->textures.end(),
-                                        pTex);
-                    bIsCopy = (it == pReplacementTextures->textures.end());
-                }
+                bool bIsCopy = perTxdInfo.bTexturesAreCopies || masterTextures.find(pTex) == masterTextures.end();
 
                 if (!bIsCopy)
                 {
@@ -2412,18 +2471,13 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                     continue;
                 }
 
-                bool bMasterLeaked = false;  // Prefer leaking master that owns raster
-                if (pReplacementTextures && pTex->raster)
+                bool bMasterLeaked = false;
+                if (pTex->raster)
                 {
-                    for (RwTexture* pMaster : pReplacementTextures->textures)
+                    if (RwTexture* pMaster = FindReadableMasterForRaster(masterRasterMap, pReplacementTextures->textures, pTex->raster))
                     {
-                        if (!IsReadableTexture(pMaster) || pMaster->raster != pTex->raster)
-                            continue;
-
                         leakedTextures.insert(pMaster);
-
                         bMasterLeaked = true;
-                        break;
                     }
                 }
 
@@ -2431,17 +2485,10 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 {
                     leakedTextures.insert(pTex);
 
-                    if (pReplacementTextures && pTex->raster)  // Also leak any master sharing raster
+                    if (pTex->raster)
                     {
-                        for (RwTexture* pMaster : pReplacementTextures->textures)
-                        {
-                            if (!IsReadableTexture(pMaster) || pMaster->raster != pTex->raster)
-                                continue;
-
+                        if (RwTexture* pMaster = FindReadableMasterForRaster(masterRasterMap, pReplacementTextures->textures, pTex->raster))
                             leakedTextures.insert(pMaster);
-
-                            break;
-                        }
                     }
                 }
             }
@@ -2482,7 +2529,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             std::unordered_set<RwTexture*> copiesToDestroy;
             std::unordered_set<RwTexture*> originalsToDestroy;
 
-            CleanupStalePerTxd(perTxdInfo, pInfo->pTxd, pReplacementTextures, copiesToDestroy, originalsToDestroy);
+            CleanupStalePerTxd(perTxdInfo, pInfo->pTxd, pReplacementTextures, &masterTextures, copiesToDestroy, originalsToDestroy);
 
             for (RwTexture* pCopy : copiesToDestroy)  // Leak to prevent crashes
             {
@@ -2492,15 +2539,10 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 bool bMasterLeaked = false;
                 if (pReplacementTextures && pCopy->raster)
                 {
-                    for (RwTexture* pMaster : pReplacementTextures->textures)
+                    if (RwTexture* pMaster = FindReadableMasterForRaster(masterRasterMap, pReplacementTextures->textures, pCopy->raster))
                     {
-                        if (!IsReadableTexture(pMaster) || pMaster->raster != pCopy->raster)
-                            continue;
-
                         leakedTextures.insert(pMaster);
-
                         bMasterLeaked = true;
-                        break;
                     }
                 }
 
@@ -2510,15 +2552,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
                     if (pReplacementTextures && pCopy->raster)
                     {
-                        for (RwTexture* pMaster : pReplacementTextures->textures)
-                        {
-                            if (!IsReadableTexture(pMaster) || pMaster->raster != pCopy->raster)
-                                continue;
-
+                        if (RwTexture* pMaster = FindReadableMasterForRaster(masterRasterMap, pReplacementTextures->textures, pCopy->raster))
                             leakedTextures.insert(pMaster);
-
-                            break;
-                        }
                     }
                 }
             }
@@ -2573,12 +2608,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
                 bool bIsCopy = perTxdInfo.bTexturesAreCopies;
                 if (!bIsCopy && pReplacementTextures)
-                {
-                    auto it = std::find(pReplacementTextures->textures.begin(),
-                                        pReplacementTextures->textures.end(),
-                                        pTex);
-                    bIsCopy = (it == pReplacementTextures->textures.end());
-                }
+                    bIsCopy = (masterTextures.find(pTex) == masterTextures.end());
 
                 if (!bIsCopy)
                 {
@@ -2590,15 +2620,10 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 bool bMasterLeaked = false;
                 if (pReplacementTextures && pTex->raster)
                 {
-                    for (RwTexture* pMaster : pReplacementTextures->textures)
+                    if (RwTexture* pMaster = FindReadableMasterForRaster(masterRasterMap, pReplacementTextures->textures, pTex->raster))
                     {
-                        if (!IsReadableTexture(pMaster) || pMaster->raster != pTex->raster)
-                            continue;
-
                         leakedTextures.insert(pMaster);
-
                         bMasterLeaked = true;
-                        break;
                     }
                 }
 
@@ -2608,15 +2633,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
                     if (pReplacementTextures && pTex->raster)
                     {
-                        for (RwTexture* pMaster : pReplacementTextures->textures)
-                        {
-                            if (!IsReadableTexture(pMaster) || pMaster->raster != pTex->raster)
-                                continue;
-
+                        if (RwTexture* pMaster = FindReadableMasterForRaster(masterRasterMap, pReplacementTextures->textures, pTex->raster))
                             leakedTextures.insert(pMaster);
-
-                            break;
-                        }
                     }
                 }
             }
@@ -2819,25 +2837,15 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
                 bool bIsCopy = perTxdInfo.bTexturesAreCopies;  // Also leak master sharing raster
                 if (!bIsCopy && pReplacementTextures && pOldTexture)
-                {
-                    auto it = std::find(pReplacementTextures->textures.begin(),
-                                       pReplacementTextures->textures.end(),
-                                       pOldTexture);
-                    bIsCopy = (it == pReplacementTextures->textures.end());
-                }
+                    bIsCopy = (masterTextures.find(pOldTexture) == masterTextures.end());
 
                 bool bMasterLeaked = false;
                 if (bIsCopy && pReplacementTextures && pOldTexture && pOldTexture->raster)
                 {
-                    for (RwTexture* pMaster : pReplacementTextures->textures)
+                    if (RwTexture* pMaster = FindReadableMasterForRaster(masterRasterMap, pReplacementTextures->textures, pOldTexture->raster))
                     {
-                        if (!IsReadableTexture(pMaster) || pMaster->raster != pOldTexture->raster)
-                            continue;
-
                         leakedTextures.insert(pMaster);
-
                         bMasterLeaked = true;
-                        break;
                     }
                 }
 
@@ -2850,15 +2858,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                     // Also leak any readable master sharing the raster
                     if (pReplacementTextures && pOldTexture->raster)
                     {
-                        for (RwTexture* pMaster : pReplacementTextures->textures)
-                        {
-                            if (!IsReadableTexture(pMaster) || pMaster->raster != pOldTexture->raster)
-                                continue;
-
+                        if (RwTexture* pMaster = FindReadableMasterForRaster(masterRasterMap, pReplacementTextures->textures, pOldTexture->raster))
                             leakedTextures.insert(pMaster);
-
-                            break;
-                        }
                     }
                 }
                 continue;
@@ -2871,10 +2872,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             if (!bIsActuallyCopy && pReplacementTextures)
             {
                 // If not in master list, it's a renamed copy
-                auto it = std::find(pReplacementTextures->textures.begin(), 
-                                   pReplacementTextures->textures.end(), 
-                                   pOldTexture);
-                bIsActuallyCopy = (it == pReplacementTextures->textures.end());
+                bIsActuallyCopy = (masterTextures.find(pOldTexture) == masterTextures.end());
             }
             
             // Only destroy orphaned copies (prevent double-free via destroyedTextures check)
