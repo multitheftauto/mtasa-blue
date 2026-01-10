@@ -3,17 +3,17 @@
 function Get-ClangFormat {
     param(
         [Parameter(Mandatory)] [string]$RepoRoot,
-        [string]$Version = "21.1.8"
+        [string]$Version = "v21.1.7"
     )
 
     if ($isLinux) {
-        $clangFormatUrl = "https://github.com/multitheftauto/llvm-project/releases/download/llvmorg-${Version}/clang-format-${Version}-armv7a-linux-gnueabihf"
+        $clangFormatUrl = "https://github.com/StMartin81/clang-tools-static-binaries/releases/download/${Version}/clang-format-21_linux-amd64"
         $clangFormatFilename = "clang-format"
-        $expectedHash = "6cb0689cd3288568690d1e681165e8c715d04498d007f7c9310a00d154e50d70"
+        $expectedHash = "3d75779cdc69b06f7e39946b0e50d6ce3dccda1d766e355bf4cf507b1ae13303"
     } else {
-        $clangFormatUrl = "https://github.com/multitheftauto/llvm-project/releases/download/llvmorg-${Version}/clang-format-${Version}-x86_64-pc-windows-msvc.exe"
+        $clangFormatUrl = "https://github.com/StMartin81/clang-tools-static-binaries/releases/download/${Version}/clang-format-21_windows-amd64.exe"
         $clangFormatFilename = "clang-format.exe"
-        $expectedHash = "b77927335fd4caece863ea0c09ec8c4dfbdab545510c9091205ccfb528d5abf2"
+        $expectedHash = "a8e156abc2465069cc74e201b6f2cfea4b4fe73e05ee9bac2bf1fbb31efb67c6"
     }
 
     $binDir = Join-Path $RepoRoot "Build" "tmp"
