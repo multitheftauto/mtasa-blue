@@ -80,11 +80,12 @@ function Invoke-ClangFormat {
         if ($isLinux) {
             $diffOutput = git diff --name-only
             if ([string]::IsNullOrWhiteSpace($diffOutput)) {
-                Write-Verbose "No formatting changes detected."
+                Write-Host "No formatting changes detected." -ForegroundColor Green
                 exit 0
             } else {
-                Write-Host "Formatting changes detected in $($diffOutput.Split("`n").Count) files:" -ForegroundColor Yellow
-                Write-Host $diffOutput -ForegroundColor Yellow
+                Write-Verbose "Formatting changes detected in:"
+                Write-Verbose $diffOutput
+                Write-Error "Code formatting issues detected in $($diffOutput.Split("`n").Count) files. Run utils/clang-format.ps1 locally and commit the changes."
                 exit 1
             }
         }
