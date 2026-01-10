@@ -2093,39 +2093,67 @@ void CModelInfoSA::DeallocateModel(void)
     // mapping leak into a later model that reuses the same ID.
     ms_DefaultTxdIDMap.erase(static_cast<unsigned short>(m_dwModelID));
 
-    // Force streaming system to unload regardless of reference count,
-    // since we're about to delete the model info memory
+    CBaseModelInfoSAInterface* pInterfaceToDelete = ppModelInfo[m_dwModelID];
+    
+    if (!pInterfaceToDelete)
+        return;
+
+    if (pInterfaceToDelete->usNumberOfRefs > 0)
+    {
+        g_pCore->LogEvent(550, "Model deallocation", "", 
+            SString("Blocked DeallocateModel for model %d with %d active references", 
+                    m_dwModelID, pInterfaceToDelete->usNumberOfRefs), 5550);
+        return;
+    }
+
+    // Capture model type and damageability BEFORE nulling the array entry.
+    // pInterfaceToDelete remains valid (it's a local pointer to the heap object),
+    // but we extract this info now to avoid any issues if vtable access were affected.
+    eModelInfoType modelType = ((eModelInfoType(*)())pInterfaceToDelete->VFTBL->GetModelType)();
+    bool isDamageableAtomic = false;
+    if (modelType == eModelInfoType::ATOMIC || modelType == eModelInfoType::LOD_ATOMIC)
+    {
+        void* asDamageable = ((void* (*)())pInterfaceToDelete->VFTBL->AsDamageAtomicModelInfoPtr)();
+        isDamageableAtomic = (asDamageable != nullptr);
+    }
+
+    // Force streaming system to unload the model
     pGame->GetStreaming()->RemoveModel(m_dwModelID);
 
-    switch (GetModelType())
+    // Null the array entry BEFORE delete for fail-fast if anything tries to access it during deletion
+    ppModelInfo[m_dwModelID] = nullptr;
+
+    switch (modelType)
     {
         case eModelInfoType::VEHICLE:
-            delete reinterpret_cast<CVehicleModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            delete reinterpret_cast<CVehicleModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         case eModelInfoType::PED:
-            delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            delete reinterpret_cast<CPedModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         case eModelInfoType::ATOMIC:
-            if (IsDamageableAtomic())
+        case eModelInfoType::LOD_ATOMIC:
+            if (isDamageableAtomic)
             {
-                delete reinterpret_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+                delete reinterpret_cast<CDamageableModelInfoSAInterface*>(pInterfaceToDelete);
             }
             else
             {
-                delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+                delete reinterpret_cast<CBaseModelInfoSAInterface*>(pInterfaceToDelete);
             }
             break;
+        case eModelInfoType::WEAPON:
         case eModelInfoType::CLUMP:
-            delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            delete reinterpret_cast<CClumpModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         case eModelInfoType::TIME:
-            delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            delete reinterpret_cast<CTimeModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         default:
-            break;
+            AddReportLog(5551, SString("Unknown model type %d for model %d - memory leaked to prevent corruption",
+                                       static_cast<int>(modelType), m_dwModelID));
+            return;
     }
-
-    ppModelInfo[m_dwModelID] = nullptr;
 
     CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
     if (pStreamingInfo)
