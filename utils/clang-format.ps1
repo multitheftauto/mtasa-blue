@@ -51,6 +51,30 @@ function Get-ClangFormat {
     return $clangFormatPath
 }
 
+function New-GitDiffArtifact {
+    Write-Host "Creating git diff artifact..." -ForegroundColor Cyan
+
+    # Create git diff
+    $diffOutput = git diff
+
+    if ([string]::IsNullOrWhiteSpace($diffOutput)) {
+        Write-Host "No formatting changes detected." -ForegroundColor Green
+        return
+    }
+
+    # Save diff to file
+    $artifactDir = "clang-format-diff"
+    $diffFile = Join-Path $artifactDir "formatting.diff"
+
+    if (-not (Test-Path $artifactDir)) {
+        New-Item -ItemType Directory -Path $artifactDir | Out-Null
+    }
+
+    $diffOutput | Out-File $diffFile -Encoding utf8
+    Write-Host "Diff saved to $diffFile" -ForegroundColor Green
+    Write-Output "::set-output name=diff-created::true"
+}
+
 function Invoke-ClangFormat {
     [CmdletBinding()]
     param()
@@ -75,6 +99,11 @@ function Invoke-ClangFormat {
 
         Remove-Item $tmp
         Write-Verbose "Successfully formatted $($files.Count) files."
+
+        # GitHub Actions should save an auto-fix
+        if ($isLinux) {
+            New-GitDiffArtifact
+        }
     } finally {
         Pop-Location
     }

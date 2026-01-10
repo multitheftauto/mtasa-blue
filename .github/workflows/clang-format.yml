@@ -1,0 +1,35 @@
+name: clang-format
+
+on:
+  push:
+    paths: &paths
+      - '**.c'
+      - '**.cc'
+      - '**.cpp'
+      - '**.h'
+      - '**.hh'
+      - '**.hpp'
+  pull_request:
+    paths: *paths
+  workflow_dispatch:
+
+jobs:
+  clang-format:
+    name: clang-format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run clang-format
+        shell: pwsh
+        run: ./utils/clang-format.ps1
+
+      - name: Upload formatting diff
+        if: hashFiles('clang-format-diff/formatting.diff') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-format-diff
+          path: clang-format-diff/
+          if-no-files-found: ignore
