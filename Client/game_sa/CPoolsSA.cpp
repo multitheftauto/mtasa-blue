@@ -269,6 +269,13 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
+        CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(dwModelID));
+        if (!pModelInfo || !pModelInfo->GetInterface())
+        {
+            AddReportLog(5552, SString("Failed to create object with model %d - model invalid or deallocated", dwModelID));
+            return nullptr;
+        }
+
         pObject = new (std::nothrow) CObjectSA(dwModelID, bBreakingDisabled);
 
         if (pObject && AddObjectToPool(pClientObject, pObject))
