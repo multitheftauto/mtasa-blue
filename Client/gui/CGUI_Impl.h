@@ -16,6 +16,7 @@ class CGUI_Impl;
 #include <gui/CGUI.h>
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 #include <cstdint>
 #include <windows.h>
 
@@ -330,7 +331,7 @@ private:
     CGUIFont_Impl* m_pSansFont;
     CGUIFont_Impl* m_pUniFont;
 
-    std::list<std::uint32_t> m_RedrawQueue;
+    std::unordered_set<std::uint32_t> m_RedrawQueue;
     std::unordered_map<std::uint32_t, CGUIElement*> m_RedrawRegistry;
     std::uint32_t                               m_nextRedrawHandle;
 
