@@ -38,6 +38,7 @@ function Get-ClangFormat {
     if ($isLinux) {
         chmod +x $clangFormatPath
     }
+    Write-Verbose "Downloaded clang-format to $clangFormatPath"
 
     # Verify hash
     $downloadedHash = (Get-FileHash -Path $clangFormatPath -Algorithm SHA256).Hash
@@ -47,7 +48,7 @@ function Get-ClangFormat {
         exit 1
     }
 
-    Write-Verbose "clang-format downloaded and verified successfully."
+    Write-Verbose "clang-format verified successfully."
     return $clangFormatPath
 }
 
@@ -98,7 +99,7 @@ function Invoke-ClangFormat {
         $files | Out-File $tmp -Encoding utf8
         Write-Verbose "List of files to format written to temporary file: $tmp"
 
-        & $clangFormatPath -i --files=$tmp
+        & "$clangFormatPath" -i --files=$tmp
 
         Remove-Item $tmp
         Write-Verbose "Successfully formatted $($files.Count) files."
