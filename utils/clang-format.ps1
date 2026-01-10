@@ -79,13 +79,13 @@ function Invoke-ClangFormat {
         # Check git diff only on Linux (CI's checkout starts off clean)
         if ($isLinux) {
             $diffOutput = git diff --name-only
-            if ([string]::IsNullOrWhiteSpace($diffOutput)) {
+            if ($diffOutput.Count -eq 0) {
                 Write-Host "No formatting changes detected." -ForegroundColor Green
                 exit 0
             } else {
                 Write-Verbose "Formatting changes detected in:"
-                Write-Verbose $diffOutput
-                Write-Error "Code formatting issues detected in $($diffOutput.Split("`n").Count) files. Run utils/clang-format.ps1 locally and commit the changes."
+                Write-Verbose ($diffOutput -join "`n")
+                Write-Error "Code formatting issues detected in $($diffOutput.Count) files. Run utils/clang-format.ps1 locally and commit the changes."
                 exit 1
             }
         }
