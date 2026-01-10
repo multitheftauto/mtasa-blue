@@ -76,15 +76,17 @@ function Invoke-ClangFormat {
         Remove-Item $tmp
         Write-Verbose "Successfully formatted $($files.Count) files."
 
-        # Check git diff
-        $diffOutput = git diff --name-only
-        if ([string]::IsNullOrWhiteSpace($diffOutput)) {
-            Write-Verbose "No formatting changes detected."
-            exit 0
-        } else {
-            Write-Host "Formatting changes detected in $($diffOutput.Split("`n").Count) files:" -ForegroundColor Yellow
-            Write-Host $diffOutput -ForegroundColor Yellow
-            exit 1
+        # Check git diff only on Linux (CI's checkout starts off clean)
+        if ($isLinux) {
+            $diffOutput = git diff --name-only
+            if ([string]::IsNullOrWhiteSpace($diffOutput)) {
+                Write-Verbose "No formatting changes detected."
+                exit 0
+            } else {
+                Write-Host "Formatting changes detected in $($diffOutput.Split("`n").Count) files:" -ForegroundColor Yellow
+                Write-Host $diffOutput -ForegroundColor Yellow
+                exit 1
+            }
         }
     } finally {
         Pop-Location
