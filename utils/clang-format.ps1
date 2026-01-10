@@ -35,8 +35,7 @@ try {
 
     # compute list of files to format
     $searchFolders = "Client", "Server", "Shared"
-    $files = Get-ChildItem -Path $searchFolders -Include *.c,*.cc,*.cpp,*.h,*.hh,*.hpp -Recurse |
-            Select-Object -ExpandProperty FullName
+    $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse | Select-Object -ExpandProperty FullName
 
     # save files to a temp file
     $tmp = [System.IO.Path]::GetTempFileName()
