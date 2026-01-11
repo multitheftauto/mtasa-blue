@@ -558,51 +558,33 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
     return true;
 }
 
-////////////////////////////////////////////////////////////////
-//
-// CRenderWareSA::RebindClumpTexturesToTxd
-//
-// Rebinds all material textures in a clump to current TXD textures.
-// This fixes stale texture pointers that occur when a TXD is reloaded
-// after a custom DFF has been loaded. Without this fix, shader texture
-// replacement fails because the materials point to old/destroyed textures.
-//
-////////////////////////////////////////////////////////////////
-void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId)
+// Helpers for rebinding model textures to a different TXD.
+// When a model's TXD slot is changed, its loaded RwObject still holds pointers
+// to textures from the old TXD. These helpers update material texture pointers
+// to reference matching textures from the new TXD by name lookup.
+namespace
 {
-    if (!pClump || !SharedUtil::IsReadablePointer(pClump, sizeof(RpClump)))
-        return;
-
-    RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
-    if (!pTxd || !SharedUtil::IsReadablePointer(pTxd, sizeof(RwTexDictionary)))
-        return;
-
-    // Build a safe name->texture map once.
-    // Calling RW's FindNamedTexture can freeze if the TXD's internal linked list is bad
-    std::vector<RwTexture*> txdTextures;
-    GetTxdTextures(txdTextures, pTxd);
-
-    struct TextureNameHash
+    // Hash functor for texture name lookup (bounded to RW_TEXTURE_NAME_LENGTH)
+    struct TxdTextureNameHash
     {
+        static constexpr std::size_t HASH_INIT = 2166136261u;
+        static constexpr std::size_t HASH_MULTIPLIER = 16777619u;
+
         std::size_t operator()(const char* s) const noexcept
         {
             if (!s)
                 return 0;
-
-            std::size_t h = 2166136261u;
-            for (std::size_t i = 0; i < RW_TEXTURE_NAME_LENGTH; ++i)
+            std::size_t h = HASH_INIT;
+            for (std::size_t i = 0; i < RW_TEXTURE_NAME_LENGTH && s[i]; ++i)
             {
-                const unsigned char c = static_cast<unsigned char>(s[i]);
-                if (c == 0)
-                    break;
-                h ^= c;
-                h *= 16777619u;
+                h ^= static_cast<unsigned char>(s[i]);
+                h *= HASH_MULTIPLIER;
             }
             return h;
         }
     };
 
-    struct TextureNameEq
+    struct TxdTextureNameEq
     {
         bool operator()(const char* a, const char* b) const noexcept
         {
@@ -614,104 +596,124 @@ void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usT
         }
     };
 
-    using TxdTextureMap = std::unordered_map<const char*, RwTexture*, TextureNameHash, TextureNameEq>;
-    TxdTextureMap txdTextureMap;
-    if (!txdTextures.empty())
+    using TxdTextureMap = std::unordered_map<const char*, RwTexture*, TxdTextureNameHash, TxdTextureNameEq>;
+
+    // Build name->texture map for a TXD slot. Keys point directly into RwTexture::name buffers.
+    TxdTextureMap BuildTxdTextureMap(unsigned short usTxdId)
     {
-        txdTextureMap.reserve(txdTextures.size());
+        TxdTextureMap result;
+
+        RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
+        if (!pTxd)
+            return result;
+
+        std::vector<RwTexture*> txdTextures;
+        CRenderWareSA::GetTxdTextures(txdTextures, pTxd);
+
+        if (txdTextures.empty())
+            return result;
+
+        result.reserve(txdTextures.size());
         for (RwTexture* pTexture : txdTextures)
         {
-            if (!pTexture || !SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+            if (!pTexture)
                 continue;
 
             const char* name = pTexture->name;
-            const std::size_t nameLen = strnlen(name, RW_TEXTURE_NAME_LENGTH);
-            if (nameLen >= RW_TEXTURE_NAME_LENGTH)
-                continue;
-
-            txdTextureMap[name] = pTexture;
+            if (strnlen(name, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
+                result[name] = pTexture;
         }
+
+        return result;
     }
 
-    // Iterate through all atomics in the clump
-    std::vector<RpAtomic*> atomicList;
-    GetClumpAtomicList(pClump, atomicList);
-
-    for (RpAtomic* pAtomic : atomicList)
+    // Update each material's texture pointer to the matching texture from txdTextureMap.
+    // Falls back to internal name mapping if direct lookup fails.
+    void RebindAtomicMaterials(RpAtomic* pAtomic, const TxdTextureMap& txdTextureMap)
     {
-        if (!pAtomic || !SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
-            continue;
+        if (!pAtomic)
+            return;
 
         RpGeometry* pGeometry = pAtomic->geometry;
-        if (!pGeometry || !SharedUtil::IsReadablePointer(pGeometry, sizeof(RpGeometry)))
-            continue;
+        if (!pGeometry)
+            return;
 
         RpMaterials& materials = pGeometry->materials;
-
-        // Validate materials array exists and entries is sane
         if (!materials.materials || materials.entries <= 0)
-            continue;
+            return;
 
-        // Sanity check - reject obviously corrupted values.
-        // Normal geometry has at most a few hundred materials.
         constexpr int MAX_REASONABLE_MATERIALS = 10000;
-        int materialCount = materials.entries;
-        if (materialCount > MAX_REASONABLE_MATERIALS)
-            continue;
+        if (materials.entries > MAX_REASONABLE_MATERIALS)
+            return;
 
-        // Validate materials array is readable
-        if (!SharedUtil::IsReadablePointer(materials.materials, materialCount * sizeof(RpMaterial*)))
-            continue;
-
-        // Iterate through all materials in the geometry
-        for (int idx = 0; idx < materialCount; ++idx)
+        for (int idx = 0; idx < materials.entries; ++idx)
         {
             RpMaterial* pMaterial = materials.materials[idx];
-            if (!pMaterial || !SharedUtil::IsReadablePointer(pMaterial, sizeof(RpMaterial)))
+            if (!pMaterial)
                 continue;
 
             RwTexture* pOldTexture = pMaterial->texture;
-            if (!pOldTexture || !SharedUtil::IsReadablePointer(pOldTexture, sizeof(RwTexture)))
+            if (!pOldTexture)
                 continue;
 
-            // Get the current texture's name (RwTexture::name is char[32], always check first char)
             const char* szTextureName = pOldTexture->name;
             if (!szTextureName[0])
                 continue;
 
-            RwTexture* pCurrentTexture = nullptr;
-            const std::size_t nameLen = strnlen(szTextureName, RW_TEXTURE_NAME_LENGTH);
-            if (nameLen < RW_TEXTURE_NAME_LENGTH)
-            {
-                auto itFound = txdTextureMap.find(szTextureName);
-                if (itFound != txdTextureMap.end())
-                    pCurrentTexture = itFound->second;
+            if (strnlen(szTextureName, RW_TEXTURE_NAME_LENGTH) >= RW_TEXTURE_NAME_LENGTH)
+                continue;
 
-                if (!pCurrentTexture)
+            RwTexture* pNewTexture = nullptr;
+            auto itFound = txdTextureMap.find(szTextureName);
+            if (itFound != txdTextureMap.end())
+                pNewTexture = itFound->second;
+
+            if (!pNewTexture)
+            {
+                const char* szInternalName = CRenderWareSA::GetInternalTextureName(szTextureName);
+                if (szInternalName && szInternalName != szTextureName)
                 {
-                    const char* szInternalName = GetInternalTextureName(szTextureName);
-                    if (szInternalName && szInternalName != szTextureName)
+                    if (strnlen(szInternalName, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
                     {
-                        const std::size_t internalLen = strnlen(szInternalName, RW_TEXTURE_NAME_LENGTH);
-                        if (internalLen < RW_TEXTURE_NAME_LENGTH)
-                        {
-                            auto itInternal = txdTextureMap.find(szInternalName);
-                            if (itInternal != txdTextureMap.end())
-                                pCurrentTexture = itInternal->second;
-                        }
+                        auto itInternal = txdTextureMap.find(szInternalName);
+                        if (itInternal != txdTextureMap.end())
+                            pNewTexture = itInternal->second;
                     }
                 }
             }
 
-            // If we found a texture and it's different from the material's current texture, update it
-            // Validate the found texture to prevent crash from corrupted/freed texture in TXD
-            if (pCurrentTexture && pCurrentTexture != pOldTexture && 
-                SharedUtil::IsReadablePointer(pCurrentTexture, sizeof(RwTexture)))
-            {
-                RpMaterialSetTexture(pMaterial, pCurrentTexture);
-            }
+            if (pNewTexture && pNewTexture != pOldTexture)
+                RpMaterialSetTexture(pMaterial, pNewTexture);
         }
     }
+}
+
+void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId)
+{
+    if (!pClump)
+        return;
+
+    TxdTextureMap txdTextureMap = BuildTxdTextureMap(usTxdId);
+    if (txdTextureMap.empty())
+        return;
+
+    std::vector<RpAtomic*> atomicList;
+    GetClumpAtomicList(pClump, atomicList);
+
+    for (RpAtomic* pAtomic : atomicList)
+        RebindAtomicMaterials(pAtomic, txdTextureMap);
+}
+
+void CRenderWareSA::RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId)
+{
+    if (!pAtomic || !pAtomic->geometry)
+        return;
+
+    TxdTextureMap txdTextureMap = BuildTxdTextureMap(usTxdId);
+    if (txdTextureMap.empty())
+        return;
+
+    RebindAtomicMaterials(pAtomic, txdTextureMap);
 }
 
 // Replaces a vehicle/weapon/ped model
