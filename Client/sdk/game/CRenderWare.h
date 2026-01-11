@@ -132,6 +132,13 @@ public:
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, unsigned int uiSizeLimit) = 0;
     virtual void     TxdForceUnload(unsigned short usTxdId, bool bDestroyTextures) = 0;
+<<<<<<< HEAD
+=======
+    virtual RpAtomic*          GetFirstAtomic(RpClump* clump) = 0;
+
+    virtual std::uint32_t RpGeometryGet2dFxCount(RpGeometry* geometry) = 0;
+    virtual RpAtomic*     Get2DEffectAtomic(RpClump* clump) = 0;
+>>>>>>> 6b784a49d (Read frame data)
 
     virtual void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix) = 0;
     virtual void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut) = 0;
