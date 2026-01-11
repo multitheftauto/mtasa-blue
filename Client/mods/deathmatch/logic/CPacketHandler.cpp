@@ -3222,11 +3222,6 @@ retry:
                         // Create the pickup with the given position and model
                         CClientPickup* pPickup = new CClientPickup(g_pClientGame->m_pManager, EntityID, usModel, position.data.vecPosition);
                         pEntity = pPickup;
-                        if (!pPickup)
-                        {
-                            RaiseEntityAddError(64);
-                            return;
-                        }
 
                         pPickup->m_ucType = pickupType.data.ucType;
                         switch (pickupType.data.ucType)
@@ -4436,8 +4431,12 @@ void CPacketHandler::Packet_PickupHideShow(NetBitStreamInterface& bitStream)
             CClientPickup* pPickup = g_pClientGame->m_pPickupManager->Get(PickupID);
             if (pPickup)
             {
+                // Only update model if it changed (avoids unnecessary recreate)
+                if (pPickup->GetModel() != usPickupModel)
+                {
+                    pPickup->SetModel(usPickupModel);
+                }
                 // Show/hide it
-                pPickup->SetModel(usPickupModel);
                 pPickup->SetVisible(bShow);
             }
         }

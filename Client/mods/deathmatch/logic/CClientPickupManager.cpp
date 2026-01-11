@@ -51,6 +51,13 @@ CClientPickup* CClientPickupManager::Get(ElementID ID)
 
 void CClientPickupManager::DeleteAll()
 {
+    // Disable pickup processing during mass deletion to prevent crashes
+    bool wasDisabled = m_bPickupProcessingDisabled;
+    if (!wasDisabled)
+    {
+        SetPickupProcessingDisabled(true);
+    }
+
     // Delete each pickup
     m_bDontRemoveFromList = true;
     list<CClientPickup*>::const_iterator iter = m_List.begin();
@@ -63,6 +70,12 @@ void CClientPickupManager::DeleteAll()
 
     // Clear the list
     m_List.clear();
+    
+    // Restore previous processing state
+    if (!wasDisabled)
+    {
+        SetPickupProcessingDisabled(false);
+    }
 }
 
 bool CClientPickupManager::Exists(CClientPickup* pPickup)
@@ -97,8 +110,8 @@ bool CClientPickupManager::IsValidWeaponID(unsigned short usWeaponID)
 
 bool CClientPickupManager::IsPickupLimitReached()
 {
-    // Max 600 pickups
-    return (m_uiPickupCount >= 64);
+    // GTA:SA supports max 620 pickups
+    return (m_uiPickupCount >= 620);
 }
 
 unsigned short CClientPickupManager::GetWeaponModel(unsigned int uiWeaponID)
