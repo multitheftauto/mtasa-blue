@@ -1400,6 +1400,11 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
     if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
+    // TXD slots occupy IDs from BaseIDforTXD to BaseIDforCOL-1
+    const unsigned short usMaxTxdSlots = static_cast<unsigned short>(g_pGame->GetBaseIDforCOL() - g_pGame->GetBaseIDforTXD());
+    if (usTxdId >= usMaxTxdSlots)
+        throw std::invalid_argument("Expected a valid TXD ID at argument 2");
+
     // Clean up TXD isolation before changing TXD slot
     if (pModelInfo->GetParentID() != 0)
     {
