@@ -1910,7 +1910,11 @@ void CModelInfoSA::AddColRef()
     }
     else
     {
-        originalColModel = GetInterface()->pColModel;
+        CBaseModelInfoSAInterface* pInterface = GetInterface();
+        if (pInterface)
+            originalColModel = pInterface->pColModel;
+        else
+            AddReportLog(5552, SString("AddColRef called with null interface for model %u", m_dwModelID), 10);
     }
 
     if (originalColModel)
@@ -1931,7 +1935,11 @@ void CModelInfoSA::RemoveColRef()
     }
     else
     {
-        originalColModel = GetInterface()->pColModel;
+        CBaseModelInfoSAInterface* pInterface = GetInterface();
+        if (pInterface)
+            originalColModel = pInterface->pColModel;
+        else
+            AddReportLog(5553, SString("RemoveColRef called with null interface for model %u", m_dwModelID), 10);
     }
 
     if (originalColModel)
@@ -2089,22 +2097,41 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 
 void CModelInfoSA::DeallocateModel(void)
 {
-    // Model IDs can be reused (engineRequestModel); do not let a previous model's stored default TXD
-    // mapping leak into a later model that reuses the same ID.
-    ms_DefaultTxdIDMap.erase(static_cast<unsigned short>(m_dwModelID));
-
     CBaseModelInfoSAInterface* pInterfaceToDelete = ppModelInfo[m_dwModelID];
     
     if (!pInterfaceToDelete)
         return;
 
+    // GTA's destructors (e.g. CObject at 0x4C4BB0) access ppModelInfo[] during cleanup.
+    // Block deletion while refs > 0 to avoid null pointer crash.
     if (pInterfaceToDelete->usNumberOfRefs > 0)
     {
-        g_pCore->LogEvent(550, "Model deallocation", "", 
-            SString("Blocked DeallocateModel for model %d with %d active references", 
-                    m_dwModelID, pInterfaceToDelete->usNumberOfRefs), 5550);
+        AddReportLog(5550, SString("Blocked DeallocateModel for model %u with %u active refs to prevent crash at 0x4C4BB0", 
+                    m_dwModelID, static_cast<unsigned int>(pInterfaceToDelete->usNumberOfRefs)));
+        
+        m_pInterface = pInterfaceToDelete;
+        
+        // Clear custom model pointers to prevent use-after-free on later RemoveRef calls
+        m_pCustomClump = nullptr;
+        m_pCustomColModel = nullptr;
+        m_pOriginalColModelInterface = nullptr;
+        m_originalFlags = 0;
+        
+        // Keep m_dwReferences and TXD mapping intact - model still in use
+        // Tradeoff: interface leaks until refs hit 0, model ID stays occupied
         return;
     }
+
+    // Clear stored defaults so they don't leak to a model that reuses this ID
+    ms_DefaultTxdIDMap.erase(static_cast<unsigned short>(m_dwModelID));
+    ms_ModelDefaultFlagsMap.erase(m_dwModelID);
+    ms_ModelDefaultLodDistanceMap.erase(m_dwModelID);
+    ms_ModelDefaultAlphaTransparencyMap.erase(m_dwModelID);
+    ms_OriginalObjectPropertiesGroups.erase(m_dwModelID);
+    ms_ModelDefaultDummiesPosition.erase(m_dwModelID);
+    ms_VehicleModelDefaultWheelSizes.erase(m_dwModelID);
+
+    pGame->GetStreaming()->RemoveModel(m_dwModelID);
 
     // Capture model type and damageability BEFORE nulling the array entry.
     // pInterfaceToDelete remains valid (it's a local pointer to the heap object),
@@ -2117,11 +2144,31 @@ void CModelInfoSA::DeallocateModel(void)
         isDamageableAtomic = (asDamageable != nullptr);
     }
 
-    // Force streaming system to unload the model
-    pGame->GetStreaming()->RemoveModel(m_dwModelID);
+    // TIME model map uses interface pointer as key - must clean up before delete
+    if (modelType == eModelInfoType::TIME)
+    {
+        CTimeInfoSAInterface* pTimeInfo = &static_cast<CTimeModelInfoSAInterface*>(pInterfaceToDelete)->timeInfo;
+        auto it = ms_ModelDefaultModelTimeInfo.find(pTimeInfo);
+        if (it != ms_ModelDefaultModelTimeInfo.end())
+        {
+            delete it->second;
+            ms_ModelDefaultModelTimeInfo.erase(it);
+        }
+    }
 
     // Null the array entry BEFORE delete for fail-fast if anything tries to access it during deletion
     ppModelInfo[m_dwModelID] = nullptr;
+
+    // Reset wrapper state - this object persists and may be reused for a new model
+    m_pInterface = nullptr;
+    m_dwReferences = 0;
+    m_dwPendingInterfaceRef = 0;
+    m_dwParentID = 0;
+    m_pCustomClump = nullptr;
+    m_pCustomColModel = nullptr;
+    m_pOriginalColModelInterface = nullptr;
+    m_originalFlags = 0;
+    m_ModelSupportedUpgrades.Reset();
 
     switch (modelType)
     {
@@ -2150,7 +2197,7 @@ void CModelInfoSA::DeallocateModel(void)
             delete reinterpret_cast<CTimeModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         default:
-            AddReportLog(5551, SString("Unknown model type %d for model %d - memory leaked to prevent corruption",
+            AddReportLog(5551, SString("Unknown model type %d for model %u - memory leaked to prevent corruption",
                                        static_cast<int>(modelType), m_dwModelID));
             return;
     }
