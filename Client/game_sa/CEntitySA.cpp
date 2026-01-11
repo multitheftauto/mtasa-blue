@@ -100,6 +100,10 @@ bool CEntitySA::SetScaleInternal(const CVector& scale)
 void CEntitySA::SetPosition(float fX, float fY, float fZ)
 {
     // Remove & add to world?
+    if (std::isnan(fX) || std::isnan(fY) || std::isnan(fZ) ||
+        std::isinf(fX) || std::isinf(fY) || std::isinf(fZ))
+        return;
+
     CVector* vecPos;
     if (m_pInterface->matrix)
     {
@@ -141,6 +145,10 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
 
 void CEntitySA::Teleport(float fX, float fY, float fZ)
 {
+    if (std::isnan(fX) || std::isnan(fY) || std::isnan(fZ) ||
+        std::isinf(fX) || std::isinf(fY) || std::isinf(fZ))
+        return;
+
     if (m_pInterface->matrix)
     {
         SetPosition(fX, fY, fZ);
@@ -312,7 +320,7 @@ CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
 
 void CEntitySA::SetMatrix(CMatrix* matrix)
 {
-    if (m_pInterface->matrix && matrix)
+    if (m_pInterface->matrix && matrix && IsValidMatrix(*matrix))
     {
         OnChangingPosition(matrix->vPos);
 
@@ -591,7 +599,7 @@ bool CEntitySA::GetBoneRotationQuat(eBone boneId, float& x, float& y, float& z, 
     RpClump* clump = GetRpClump();
     if (!clump)
         return false;
-        
+
     // updating the bone frame orientation will also update its children
     // This rotation is only applied when UpdateElementRpHAnim is called
     auto* clumpDataInterface = *pGame->GetClumpData(clump);
@@ -612,21 +620,21 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
     RpClump* clump = GetRpClump();
     if (!clump)
         return false;
-        
+
     // updating the bone frame orientation will also update its children
     // This rotation is only applied when UpdateElementRpHAnim is called
     auto* clumpDataInterface = *pGame->GetClumpData(clump);
     auto* frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
     if (!frameData)
         return false;
-        
+
     RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
     RwV3d angles = { yaw, roll, pitch };
     BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
     CEntitySAInterface* theInterface = GetInterface();
     if (theInterface)
         theInterface->bDontUpdateHierarchy = false;
-        
+
     return true;
 }
 
@@ -635,7 +643,7 @@ bool CEntitySA::SetBoneRotationQuat(eBone boneId, float x, float y, float z, flo
     RpClump* clump = GetRpClump();
     if (!clump)
         return false;
-        
+
     // updating the bone frame orientation will also update its children
     // This rotation is only applied when UpdateElementRpHAnim is called
     auto* clumpDataInterface = *pGame->GetClumpData(clump);
@@ -651,7 +659,7 @@ bool CEntitySA::SetBoneRotationQuat(eBone boneId, float x, float y, float z, flo
     CEntitySAInterface* theInterface = GetInterface();
     if (theInterface)
         theInterface->bDontUpdateHierarchy = false;
-        
+
     return true;
 }
 
@@ -672,7 +680,7 @@ bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
     RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (!rwBoneMatrix)
         return false;
-        
+
     CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
     boneMatrix.SetTranslateOnly(position);
     boneMatrix.UpdateRW();
