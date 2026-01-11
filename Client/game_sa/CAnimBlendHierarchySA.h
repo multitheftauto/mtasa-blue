@@ -32,7 +32,7 @@ public:
     CAnimBlendSequenceSAInterface* pSequences;
     unsigned short                 usNumSequences;
     bool                           bRunningCompressed;
-    BYTE                           pad;
+    bool                           keepCompressed;
     int                            iAnimBlockID;
     float                          fTotalTime;
     DWORD*                         pLinkPtr;

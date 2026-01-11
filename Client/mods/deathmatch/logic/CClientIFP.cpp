@@ -111,6 +111,10 @@ void CClientIFP::ReadIFPVersion1()
 
         Animation.pHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy();
         InitializeAnimationHierarchy(Animation.pHierarchy, Animation.Name, Dgan.Info.Entries);
+
+        // ANPK animations are uncompressed
+        Animation.pHierarchy->SetRunningCompressed(false);
+
         Animation.pSequencesMemory = AllocateSequencesMemory(Animation.pHierarchy);
         Animation.pHierarchy->SetSequences(reinterpret_cast<CAnimBlendSequenceSAInterface*>(Animation.pSequencesMemory + 4));
 
@@ -193,7 +197,7 @@ WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAn
         InitializeAnimationSequence(pAnimationSequence, Anim.Name, iBoneID);
 
         eFrameType iFrameType = ReadKfrm();
-        if ((ReadSequenceKeyFrames(pAnimationSequence, iFrameType, Anim.Frames)) && (!bUnknownSequence))
+        if ((ReadSequenceKeyFrames(pAnimationSequence, iFrameType, Anim.Frames, true)) && (!bUnknownSequence))
         {
             MapOfSequences[iBoneID] = std::move(pAnimationSequence);
         }
@@ -273,14 +277,17 @@ void CClientIFP::ReadSequenceVersion2(SSequenceHeaderV2& ObjectNode)
     strncpy(ObjectNode.Name, strCorrectBoneName, strCorrectBoneName.size() + 1);
 }
 
-bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames)
+bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames, bool loadUncompressed)
 {
     size_t iCompressedFrameSize = GetSizeOfCompressedFrame(iFrameType);
     if (iCompressedFrameSize)
     {
         BYTE* pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(iCompressedFrameSize * cFrames);
-        pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed, pKeyFrames);
-        ReadKeyFramesAsCompressed(pAnimationSequence, iFrameType, cFrames);
+        pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed && !loadUncompressed, pKeyFrames);
+
+        if (!loadUncompressed)
+            ReadKeyFramesAsCompressed(pAnimationSequence, iFrameType, cFrames);
+
         return true;
     }
     return false;
