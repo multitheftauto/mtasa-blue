@@ -885,28 +885,66 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
-    // CBaseModelInfo::AddRef adds references to model and TXD
-    // We need transfer added references from old TXD to new TXD
-    size_t referencesCount = m_pInterface->usNumberOfRefs;
+    unsigned short usOldTxdId = m_pInterface->usTextureDictionary;
+    if (usOldTxdId == usID)
+        return;
 
-    // +1 reference for active rwObject
-    // The current textures will be removed in RpAtomicDestroy
-    // RenderWare uses an additional reference counter per texture
+    size_t referencesCount = m_pInterface->usNumberOfRefs;
     if (m_pInterface->pRwObject)
         referencesCount++;
 
-    for (size_t i = 0; i < referencesCount; i++)
-        CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
-
-    // Store vanilla TXD ID
     if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
-        ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = m_pInterface->usTextureDictionary;
+        ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
 
-    // Set new TXD and increase ref of it
     m_pInterface->usTextureDictionary = usID;
 
+    // Pin the new TXD before rebinding so textures remain valid during the switch
     for (size_t i = 0; i < referencesCount; i++)
         CTxdStore_AddRef(usID);
+
+    // Rebind loaded model's material textures to the new TXD.
+    // Without this, material->texture pointers would become stale when the old TXD is released.
+    if (m_pInterface->pRwObject)
+    {
+        eModelInfoType modelType = GetModelType();
+        switch (modelType)
+        {
+            case eModelInfoType::PED:
+            case eModelInfoType::WEAPON:
+            case eModelInfoType::VEHICLE:
+            case eModelInfoType::CLUMP:
+            case eModelInfoType::UNKNOWN:
+            {
+                RpClump* pGameClump = reinterpret_cast<RpClump*>(m_pInterface->pRwObject);
+                if (pGame)
+                {
+                    CRenderWare* pRenderWare = pGame->GetRenderWare();
+                    if (pRenderWare)
+                        pRenderWare->RebindClumpTexturesToTxd(pGameClump, usID);
+                }
+                break;
+            }
+            case eModelInfoType::ATOMIC:
+            case eModelInfoType::LOD_ATOMIC:
+            case eModelInfoType::TIME:
+            {
+                RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(m_pInterface->pRwObject);
+                if (pGame)
+                {
+                    CRenderWare* pRenderWare = pGame->GetRenderWare();
+                    if (pRenderWare)
+                        pRenderWare->RebindAtomicTexturesToTxd(pAtomic, usID);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    // Release old TXD refs after rebinding completes
+    for (size_t i = 0; i < referencesCount; i++)
+        CTxdStore_RemoveRef(usOldTxdId);
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()
@@ -1797,6 +1835,19 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
                     CRenderWare* pRenderWare = pGame->GetRenderWare();
                     if (pRenderWare)
                         pRenderWare->RebindClumpTexturesToTxd(pGameClump, GetTextureDictionaryID());
+                }
+                break;
+            }
+            case eModelInfoType::ATOMIC:
+            case eModelInfoType::LOD_ATOMIC:
+            case eModelInfoType::TIME:
+            {
+                RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(GetRwObject());
+                if (pAtomic && pGame)
+                {
+                    CRenderWare* pRenderWare = pGame->GetRenderWare();
+                    if (pRenderWare)
+                        pRenderWare->RebindAtomicTexturesToTxd(pAtomic, GetTextureDictionaryID());
                 }
                 break;
             }

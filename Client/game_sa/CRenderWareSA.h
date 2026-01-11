@@ -155,8 +155,11 @@ public:
     static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
 
-    // Rebind clump material textures to current TXD textures (fixes stale texture pointers after TXD reload
+    // Rebind clump material textures to current TXD textures (fixes stale texture pointers after TXD reload)
     void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) override;
+
+    // Rebind single atomic's material textures to current TXD textures
+    void RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId) override;
 
     static const char* GetInternalTextureName(const char* szExternalName);
     static const char* GetExternalTextureName(const char* szInternalName);
