@@ -189,7 +189,7 @@ bool CClientPickup::Create()
             }
 
             // Create our collision sphere
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), nullptr, m_vecPosition, 1.0f);
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), ElementID(INVALID_ELEMENT_ID), m_vecPosition, 1.0f);
             m_pCollision->m_pOwningPickup = this;
             m_pCollision->SetHitCallback(this);
             m_pCollision->SetCanBeDestroyedByScript(false);
@@ -289,7 +289,7 @@ void CClientPickup::NotifyUnableToCreate()
         delete m_pCollision;
         m_pCollision = nullptr;
     }
-    
+
     // Notify the streamer we were unable to create the pickup
     CClientStreamElement::NotifyUnableToCreate();
 }
