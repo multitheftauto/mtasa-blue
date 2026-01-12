@@ -21,6 +21,8 @@
 #include <bochs_internal/bochs_crc32.h>
 #include "CChecksum.h"
 #include "CSingularFileDownload.h"
+#include <map>
+#include <cstdint>
 
 class CSingularFileDownloadManager
 {
@@ -36,6 +38,12 @@ public:
 
     bool AllComplete();
 
+    CSingularFileDownload* FindDownloadByHandler(std::uint32_t handlerId) const;
+    bool AbortDownload(std::uint32_t handlerId);
+    void RemoveDownload(CSingularFileDownload* pDownload);
+
 protected:
     std::list<CSingularFileDownload*> m_Downloads;
+    std::map<std::uint32_t, CSingularFileDownload*> m_HandlerMap;
+    std::uint32_t m_nextHandlerId;
 };
