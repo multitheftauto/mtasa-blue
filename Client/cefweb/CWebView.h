@@ -24,7 +24,6 @@
 #include <cef3/cef/include/cef_values.h>
 #include <SString.h>
 #include <audiopolicy.h>
-#include <condition_variable>
 #include <functional>
 #include <memory>
 #include <mmdeviceapi.h>
@@ -42,12 +41,6 @@ namespace WebViewAuth
     bool HandleTriggerLuaEvent(CWebView*, CefRefPtr<CefListValue>, const bool);
     bool HandleInputFocus(CWebView*, CefRefPtr<CefListValue>, const bool);
 }
-
-enum class ECefThreadState
-{
-    Running = 0,            // CEF thread is currently running
-    Wait                    // CEF thread is waiting for the main thread
-};
 
 class CWebView : public CWebViewInterface,
                  private CefClient,
@@ -199,7 +192,6 @@ public:
                                      CefRefPtr<CefMenuModel> model) override;
 
 private:
-    void ResumeCefThread();
     void QueueBrowserEvent(const char* name, std::function<void(CWebBrowserEventsInterface*)>&& fn);
 
     struct FEventTarget
@@ -275,11 +267,12 @@ private:
     {
         bool                    changed = false;
         std::mutex              dataMutex;
-        ECefThreadState         cefThreadState = ECefThreadState::Running;
-        std::condition_variable cefThreadCv;
 
-        const void*                buffer;
-        int                        width, height;
+        // Main frame buffer - we now own this buffer (copied in OnPaint)
+        std::unique_ptr<byte[]> buffer;
+        size_t                  bufferSize = 0;
+        int                     width = 0;
+        int                     height = 0;
         CefRenderHandler::RectList dirtyRects;
 
         CefRect                 popupRect;
