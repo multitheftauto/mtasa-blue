@@ -225,6 +225,16 @@ void CWebView::QueueBrowserEvent(const char* name, std::function<void(CWebBrowse
 
 void CWebView::Initialise()
 {
+    // Lazy browser creation: We don't create the CEF browser here.
+    // The browser will be created on first LoadURL() call via EnsureBrowserCreated().
+    // This saves memory and CPU for browsers that are created but never used.
+}
+
+bool CWebView::EnsureBrowserCreated()
+{
+    if (m_bBrowserCreated || m_bBeingDestroyed)
+        return m_bBrowserCreated;
+
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
     browserSettings.windowless_frame_rate = g_pCore->GetFPSLimiter()->GetFPSTarget();
@@ -250,6 +260,8 @@ void CWebView::Initialise()
     windowInfo.external_begin_frame_enabled = true;
 
     CefBrowserHost::CreateBrowser(windowInfo, this, "", browserSettings, nullptr, nullptr);
+    m_bBrowserCreated = true;
+    return true;
 }
 
 void CWebView::CloseBrowser()
@@ -280,6 +292,9 @@ void CWebView::CloseBrowser()
 
 bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded)
 {
+    // Lazy creation: create browser on first use
+    EnsureBrowserCreated();
+
     if (!m_pWebView)
         return false;
 

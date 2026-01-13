@@ -64,6 +64,7 @@ public:
     void                  SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface);
     void                  ClearWebBrowserEvents(CWebBrowserEventsInterface* pInterface);
     void                  CloseBrowser();
+    bool                  EnsureBrowserCreated();  // Lazy creation: creates browser on first use
     CefRefPtr<CefBrowser> GetCefBrowser() { return m_pWebView; };
 
     bool IsBeingDestroyed() { return m_bBeingDestroyed; }
@@ -254,6 +255,7 @@ private:
     bool                       m_bIsLocal;
     bool                       m_bIsRenderingPaused;
     bool                       m_bIsTransparent;
+    bool                       m_bBrowserCreated = false;  // Lazy creation: tracks if CEF browser has been created
     POINT                      m_vecMousePosition;
     bool                       m_mouseButtonStates[3];
     SString                    m_CurrentTitle;
