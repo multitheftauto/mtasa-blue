@@ -885,28 +885,66 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
-    // CBaseModelInfo::AddRef adds references to model and TXD
-    // We need transfer added references from old TXD to new TXD
-    size_t referencesCount = m_pInterface->usNumberOfRefs;
+    unsigned short usOldTxdId = m_pInterface->usTextureDictionary;
+    if (usOldTxdId == usID)
+        return;
 
-    // +1 reference for active rwObject
-    // The current textures will be removed in RpAtomicDestroy
-    // RenderWare uses an additional reference counter per texture
+    size_t referencesCount = m_pInterface->usNumberOfRefs;
     if (m_pInterface->pRwObject)
         referencesCount++;
 
-    for (size_t i = 0; i < referencesCount; i++)
-        CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
-
-    // Store vanilla TXD ID
     if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
-        ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = m_pInterface->usTextureDictionary;
+        ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
 
-    // Set new TXD and increase ref of it
     m_pInterface->usTextureDictionary = usID;
 
+    // Pin the new TXD before rebinding so textures remain valid during the switch
     for (size_t i = 0; i < referencesCount; i++)
         CTxdStore_AddRef(usID);
+
+    // Rebind loaded model's material textures to the new TXD.
+    // Without this, material->texture pointers would become stale when the old TXD is released.
+    if (m_pInterface->pRwObject)
+    {
+        eModelInfoType modelType = GetModelType();
+        switch (modelType)
+        {
+            case eModelInfoType::PED:
+            case eModelInfoType::WEAPON:
+            case eModelInfoType::VEHICLE:
+            case eModelInfoType::CLUMP:
+            case eModelInfoType::UNKNOWN:
+            {
+                RpClump* pGameClump = reinterpret_cast<RpClump*>(m_pInterface->pRwObject);
+                if (pGame)
+                {
+                    CRenderWare* pRenderWare = pGame->GetRenderWare();
+                    if (pRenderWare)
+                        pRenderWare->RebindClumpTexturesToTxd(pGameClump, usID);
+                }
+                break;
+            }
+            case eModelInfoType::ATOMIC:
+            case eModelInfoType::LOD_ATOMIC:
+            case eModelInfoType::TIME:
+            {
+                RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(m_pInterface->pRwObject);
+                if (pGame)
+                {
+                    CRenderWare* pRenderWare = pGame->GetRenderWare();
+                    if (pRenderWare)
+                        pRenderWare->RebindAtomicTexturesToTxd(pAtomic, usID);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    // Release old TXD refs after rebinding completes
+    for (size_t i = 0; i < referencesCount; i++)
+        CTxdStore_RemoveRef(usOldTxdId);
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()
@@ -1800,6 +1838,19 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
                 }
                 break;
             }
+            case eModelInfoType::ATOMIC:
+            case eModelInfoType::LOD_ATOMIC:
+            case eModelInfoType::TIME:
+            {
+                RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(GetRwObject());
+                if (pAtomic && pGame)
+                {
+                    CRenderWare* pRenderWare = pGame->GetRenderWare();
+                    if (pRenderWare)
+                        pRenderWare->RebindAtomicTexturesToTxd(pAtomic, GetTextureDictionaryID());
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -1948,7 +1999,11 @@ void CModelInfoSA::AddColRef()
     }
     else
     {
-        originalColModel = GetInterface()->pColModel;
+        CBaseModelInfoSAInterface* pInterface = GetInterface();
+        if (pInterface)
+            originalColModel = pInterface->pColModel;
+        else
+            AddReportLog(5552, SString("AddColRef called with null interface for model %u", m_dwModelID), 10);
     }
 
     if (originalColModel)
@@ -1969,7 +2024,11 @@ void CModelInfoSA::RemoveColRef()
     }
     else
     {
-        originalColModel = GetInterface()->pColModel;
+        CBaseModelInfoSAInterface* pInterface = GetInterface();
+        if (pInterface)
+            originalColModel = pInterface->pColModel;
+        else
+            AddReportLog(5553, SString("RemoveColRef called with null interface for model %u", m_dwModelID), 10);
     }
 
     if (originalColModel)
@@ -2127,43 +2186,110 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 
 void CModelInfoSA::DeallocateModel(void)
 {
-    // Model IDs can be reused (engineRequestModel); do not let a previous model's stored default TXD
-    // mapping leak into a later model that reuses the same ID.
-    ms_DefaultTxdIDMap.erase(static_cast<unsigned short>(m_dwModelID));
+    CBaseModelInfoSAInterface* pInterfaceToDelete = ppModelInfo[m_dwModelID];
+    
+    if (!pInterfaceToDelete)
+        return;
 
-    // Force streaming system to unload regardless of reference count,
-    // since we're about to delete the model info memory
+    // GTA's destructors (e.g. CObject at 0x4C4BB0) access ppModelInfo[] during cleanup.
+    // Block deletion while refs > 0 to avoid null pointer crash.
+    if (pInterfaceToDelete->usNumberOfRefs > 0)
+    {
+        AddReportLog(5550, SString("Blocked DeallocateModel for model %u with %u active refs to prevent crash at 0x4C4BB0", 
+                    m_dwModelID, static_cast<unsigned int>(pInterfaceToDelete->usNumberOfRefs)));
+        
+        m_pInterface = pInterfaceToDelete;
+        
+        // Clear custom model pointers to prevent use-after-free on later RemoveRef calls
+        m_pCustomClump = nullptr;
+        m_pCustomColModel = nullptr;
+        m_pOriginalColModelInterface = nullptr;
+        m_originalFlags = 0;
+        
+        // Keep m_dwReferences and TXD mapping intact - model still in use
+        // Tradeoff: interface leaks until refs hit 0, model ID stays occupied
+        return;
+    }
+
+    // Clear stored defaults so they don't leak to a model that reuses this ID
+    ms_DefaultTxdIDMap.erase(static_cast<unsigned short>(m_dwModelID));
+    ms_ModelDefaultFlagsMap.erase(m_dwModelID);
+    ms_ModelDefaultLodDistanceMap.erase(m_dwModelID);
+    ms_ModelDefaultAlphaTransparencyMap.erase(m_dwModelID);
+    ms_OriginalObjectPropertiesGroups.erase(m_dwModelID);
+    ms_ModelDefaultDummiesPosition.erase(m_dwModelID);
+    ms_VehicleModelDefaultWheelSizes.erase(m_dwModelID);
+
     pGame->GetStreaming()->RemoveModel(m_dwModelID);
 
-    switch (GetModelType())
+    // Capture model type and damageability BEFORE nulling the array entry.
+    // pInterfaceToDelete remains valid (it's a local pointer to the heap object),
+    // but we extract this info now to avoid any issues if vtable access were affected.
+    eModelInfoType modelType = ((eModelInfoType(*)())pInterfaceToDelete->VFTBL->GetModelType)();
+    bool isDamageableAtomic = false;
+    if (modelType == eModelInfoType::ATOMIC || modelType == eModelInfoType::LOD_ATOMIC)
+    {
+        void* asDamageable = ((void* (*)())pInterfaceToDelete->VFTBL->AsDamageAtomicModelInfoPtr)();
+        isDamageableAtomic = (asDamageable != nullptr);
+    }
+
+    // TIME model map uses interface pointer as key - must clean up before delete
+    if (modelType == eModelInfoType::TIME)
+    {
+        CTimeInfoSAInterface* pTimeInfo = &static_cast<CTimeModelInfoSAInterface*>(pInterfaceToDelete)->timeInfo;
+        auto it = ms_ModelDefaultModelTimeInfo.find(pTimeInfo);
+        if (it != ms_ModelDefaultModelTimeInfo.end())
+        {
+            delete it->second;
+            ms_ModelDefaultModelTimeInfo.erase(it);
+        }
+    }
+
+    // Null the array entry BEFORE delete for fail-fast if anything tries to access it during deletion
+    ppModelInfo[m_dwModelID] = nullptr;
+
+    // Reset wrapper state - this object persists and may be reused for a new model
+    m_pInterface = nullptr;
+    m_dwReferences = 0;
+    m_dwPendingInterfaceRef = 0;
+    m_dwParentID = 0;
+    m_pCustomClump = nullptr;
+    m_pCustomColModel = nullptr;
+    m_pOriginalColModelInterface = nullptr;
+    m_originalFlags = 0;
+    m_ModelSupportedUpgrades.Reset();
+
+    switch (modelType)
     {
         case eModelInfoType::VEHICLE:
-            delete reinterpret_cast<CVehicleModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            delete reinterpret_cast<CVehicleModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         case eModelInfoType::PED:
-            delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            delete reinterpret_cast<CPedModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         case eModelInfoType::ATOMIC:
-            if (IsDamageableAtomic())
+        case eModelInfoType::LOD_ATOMIC:
+            if (isDamageableAtomic)
             {
-                delete reinterpret_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+                delete reinterpret_cast<CDamageableModelInfoSAInterface*>(pInterfaceToDelete);
             }
             else
             {
-                delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+                delete reinterpret_cast<CBaseModelInfoSAInterface*>(pInterfaceToDelete);
             }
             break;
+        case eModelInfoType::WEAPON:
         case eModelInfoType::CLUMP:
-            delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            delete reinterpret_cast<CClumpModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         case eModelInfoType::TIME:
-            delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            delete reinterpret_cast<CTimeModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         default:
-            break;
+            AddReportLog(5551, SString("Unknown model type %d for model %u - memory leaked to prevent corruption",
+                                       static_cast<int>(modelType), m_dwModelID));
+            return;
     }
-
-    ppModelInfo[m_dwModelID] = nullptr;
 
     CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
     if (pStreamingInfo)

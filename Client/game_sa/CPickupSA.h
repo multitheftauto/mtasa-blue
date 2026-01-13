@@ -69,7 +69,7 @@ public:
     long         GetMonetaryValue();
     void         SetMonetaryValue(long lMonetaryValue);
     BYTE         IsNearby();
-    void         GiveUsAPickUpObject(int ForcedObjectIndex = -1);
+    bool         GiveUsAPickUpObject(int ForcedObjectIndex = -1);
     void         GetRidOfObjects();
     void         Remove();
 };
