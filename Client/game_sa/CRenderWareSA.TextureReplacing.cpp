@@ -1158,17 +1158,15 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 for (unsigned short modelId : pReplacement->usedInModelIds)
                 {
                     auto itCache = modelInfoCache.find(modelId);
-                    if (!pModelInfo)
-                    {
-                        CModelInfoSA* pModInfo = itCache->second;
-                        if (pModInfo->GetTextureDictionaryID() == usTxdId)
-                        {
-
-                    if (!pModelInfo->GetRwObject())
+                    if (itCache == modelInfoCache.end() || !itCache->second)
                         continue;
-                            modelIds.push_back(modelId);
-                        }
-                    }
+
+                    CModelInfoSA* pModInfo = itCache->second;
+                    if (!pModInfo->GetRwObject())
+                        continue;
+
+                    if (pModInfo->GetTextureDictionaryID() == usTxdId)
+                        modelIds.push_back(modelId);
                 }
                 if (!pReplacement->textures.empty() && !modelIds.empty())
                 {
