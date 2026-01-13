@@ -60,6 +60,7 @@ CCredits::CCredits()
         "Dutchman101\n"
         "Gamesnert\n"
         "Jusonex\n"
+        "Lpsd\n"
         "\n"
         "\n";
 
@@ -76,7 +77,6 @@ CCredits::CCredits()
         "Iztas\n"
         "JoeBullet\n"
         "lopezloo\n"
-        "Lpsd\n"
         "MX_Master\n"
         "Remp\n"
         "SugarD-x\n"
