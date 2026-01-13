@@ -449,9 +449,10 @@ void CWebView::UpdateTexture()
 
     if (m_RenderData.changed || m_RenderData.popupShown) [[likely]]
     {
-        // Lock surface
+        // Lock surface with D3DLOCK_DISCARD for dynamic textures - tells driver we'll overwrite entire content
+        // This avoids GPU stalls waiting for previous frame to finish rendering
         D3DLOCKED_RECT LockedRect;
-        if (SUCCEEDED(pSurface->LockRect(&LockedRect, nullptr, 0)))
+        if (SUCCEEDED(pSurface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
         {
             auto* const destData = static_cast<byte*>(LockedRect.pBits);
             const auto* const sourceData = m_RenderData.buffer.get();
