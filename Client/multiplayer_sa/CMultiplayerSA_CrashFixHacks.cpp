@@ -1985,7 +1985,8 @@ inner:
 void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo(uiModelId);
-    if (pModelInfo->GetInterface()->pRwObject == NULL)
+    CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+    if (!pInterface || pInterface->pRwObject == nullptr)
     {
         // Crash will occur at offset 00349b7b
         LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);

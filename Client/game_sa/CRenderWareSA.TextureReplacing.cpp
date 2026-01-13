@@ -629,39 +629,68 @@ namespace
         return true;
     }
 
-    void ReplaceTextureInModel(CModelInfoSA* pModelInfo, TextureSwapMap& swapMap)
+    bool ReplaceTextureInModel(CModelInfoSA* pModelInfo, TextureSwapMap& swapMap)
     {
         if (!pModelInfo || swapMap.empty())
-            return;
+            return false;
 
         RwObject* pRwObject = pModelInfo->GetRwObject();
         if (!pRwObject)
-            return;
+            return false;
 
-        switch (pModelInfo->GetModelType())
+        const unsigned char rwType = pRwObject->type;
+        const eModelInfoType modelType = pModelInfo->GetModelType();
+
+        if (modelType == eModelInfoType::UNKNOWN)
+        {
+            if (rwType == RP_TYPE_ATOMIC)
+            {
+                auto* pAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
+                ReplaceTextureInGeometry(pAtomic ? pAtomic->geometry : nullptr, swapMap);
+                return true;
+            }
+
+            if (rwType == RP_TYPE_CLUMP)
+            {
+                auto* pClump = reinterpret_cast<RpClump*>(pRwObject);
+                if (pClump)
+                    RpClumpForAllAtomics(pClump, ReplaceTextureInAtomicCB, &swapMap);
+                return true;
+            }
+
+            return false;
+        }
+
+        switch (modelType)
         {
             case eModelInfoType::ATOMIC:
             case eModelInfoType::TIME:
             case eModelInfoType::LOD_ATOMIC:
             {
+                if (rwType != RP_TYPE_ATOMIC)
+                    return false;
+
                 RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
-                if (pAtomic)
-                    ReplaceTextureInGeometry(pAtomic->geometry, swapMap);
-                break;
+                ReplaceTextureInGeometry(pAtomic ? pAtomic->geometry : nullptr, swapMap);
+                return true;
             }
 
             case eModelInfoType::WEAPON:
             case eModelInfoType::CLUMP:
             case eModelInfoType::VEHICLE:
             case eModelInfoType::PED:
-            case eModelInfoType::UNKNOWN:
-            default:
             {
+                if (rwType != RP_TYPE_CLUMP)
+                    return false;
+
                 RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
                 if (pClump)
                     RpClumpForAllAtomics(pClump, ReplaceTextureInAtomicCB, &swapMap);
-                break;
+                return true;
             }
+
+            default:
+                return false;
         }
     }
 
@@ -750,7 +779,7 @@ namespace
             // This prevents ModelInfoTXDAddTextures from failing due to a model referencing a dead/reused slot.
             if (pModelInfo->GetTextureDictionaryID() == txdId)
             {
-                if (slot && slot->rwTexDictonary && slot->usParentIndex == parentTxdId)
+                if (slot && slot->rwTexDictonary && slot->usParentIndex == parentTxdId && CTxdStore_GetNumRefs(txdId) == 0)
                 {
                     RwTexDictionary* pTxd = slot->rwTexDictonary;
                     RwListEntry* pRoot = &pTxd->textures.root;
@@ -952,6 +981,17 @@ void CRenderWareSA::ProcessPendingIsolatedTxdParents()
         const unsigned short childTxdId = it->second.usTxdId;
         const unsigned short parentTxdId = it->second.usParentTxdId;
 
+        auto* pModelInfoForCheck = static_cast<CModelInfoSA*>(pGame->GetModelInfo(modelId));
+        if (!pModelInfoForCheck || !pModelInfoForCheck->IsAllocatedInArchive())
+        {
+            g_PendingIsolatedTxdParentsByModelId.erase(modelId);
+            g_IsolatedTxdSlotsByModelId.erase(modelId);
+            continue;
+        }
+
+        if (!pModelInfoForCheck->GetRwObject())
+            continue;
+
         if (CTxdStore_GetTxd(parentTxdId) == nullptr)
             continue;
 
@@ -969,14 +1009,20 @@ void CRenderWareSA::ProcessPendingIsolatedTxdParents()
             RwObject* pRwObject = pModelInfo->GetRwObject();
             if (pRwObject)
             {
-                const eModelInfoType modelType = pModelInfo->GetModelType();
+                eModelInfoType modelType = pModelInfo->GetModelType();
+                if (modelType == eModelInfoType::UNKNOWN)
+                {
+                    if (pRwObject->type == RP_TYPE_ATOMIC)
+                        modelType = eModelInfoType::ATOMIC;
+                    else if (pRwObject->type == RP_TYPE_CLUMP)
+                        modelType = eModelInfoType::CLUMP;
+                }
                 switch (modelType)
                 {
                     case eModelInfoType::PED:
                     case eModelInfoType::WEAPON:
                     case eModelInfoType::VEHICLE:
                     case eModelInfoType::CLUMP:
-                    case eModelInfoType::UNKNOWN:
                     {
                         RebindClumpTexturesToTxd(reinterpret_cast<RpClump*>(pRwObject), childTxdId);
                         break;
@@ -1112,11 +1158,14 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 for (unsigned short modelId : pReplacement->usedInModelIds)
                 {
                     auto itCache = modelInfoCache.find(modelId);
-                    if (itCache != modelInfoCache.end() && itCache->second)
+                    if (!pModelInfo)
                     {
                         CModelInfoSA* pModInfo = itCache->second;
                         if (pModInfo->GetTextureDictionaryID() == usTxdId)
                         {
+
+                    if (!pModelInfo->GetRwObject())
+                        continue;
                             modelIds.push_back(modelId);
                         }
                     }
@@ -1432,8 +1481,6 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
     else
     {
         CRenderWareSA::DebugTxdAddRef(usTxdId, "GetModelTexturesInfo-cache-hit");
-        if (pModelInfo->GetModelType() == eModelInfoType::PED)
-            ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
     }
 
     if (!pTxd)
@@ -1585,9 +1632,6 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 const unsigned short usParentTxdId = pParentInfo ? pParentInfo->GetTextureDictionaryID() : 0;
 
                 EnsureIsolatedTxdForRequestedModel(usModelId);
-
-                if (pModelInfo->GetTextureDictionaryID() == usParentTxdId && usParentTxdId != 0)
-                    return false;
             }
         }
     }
@@ -1796,25 +1840,13 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 for (unsigned short modelId : pReplacementTextures->usedInModelIds)
                 {
                     CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(modelId));
-                    if (pModelInfo)
-                        targetModels.insert(pModelInfo);
+                    if (!pModelInfo || !pModelInfo->GetRwObject())
+                        continue;
+                    targetModels.insert(pModelInfo);
                 }
 
                 for (CModelInfoSA* pModelInfo : targetModels)
                     ReplaceTextureInModel(pModelInfo, swapMap);
-
-                for (CModelInfoSA* pModelInfo : targetModels)
-                {
-                    if (!pModelInfo->GetRwObject())
-                    {
-                        for (const auto& entry : swapMap)
-                        {
-                            if (entry.first)
-                                texturesStillReferenced.insert(entry.first);
-                        }
-                        break;
-                    }
-                }
             }
 
             std::unordered_set<RwTexture*> copiesToDestroy;
@@ -2754,7 +2786,6 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             }
         }
 
-        bool bSwapFailed = false;
         if (!swapMap.empty())
         {
             std::vector<CModelInfoSA*> targetModels;
@@ -2767,22 +2798,20 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 if (!pModelInfo)
                     continue;
 
+                if (!pModelInfo->GetRwObject())
+                    continue;
+
                 if (seenModels.insert(pModelInfo).second)
                     targetModels.push_back(pModelInfo);
             }
 
             for (CModelInfoSA* pModelInfo : targetModels)
             {
-                ReplaceTextureInModel(pModelInfo, swapMap);
-            }
+                if (!pModelInfo)
+                    continue;
 
-            for (CModelInfoSA* pModelInfo : targetModels)
-            {
-                if (!pModelInfo->GetRwObject())
-                {
-                    bSwapFailed = true;
-                    break;
-                }
+                if (pModelInfo->GetRwObject())
+                    ReplaceTextureInModel(pModelInfo, swapMap);
             }
         }
 
@@ -2792,9 +2821,6 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 continue;
 
             bool bWasSwapped = swapMap.find(pOldTexture) != swapMap.end();
-
-            if (bSwapFailed && bWasSwapped)
-                continue;
 
             if (!bWasSwapped && !IsReadableTexture(pOldTexture))
                 continue;
