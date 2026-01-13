@@ -28,6 +28,28 @@ void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void* (*)[2])0x8E4CAC;
 
 namespace
 {
+    bool IsValidPtr(const void* ptr) noexcept
+    {
+        if (!ptr)
+            return false;
+
+        __try
+        {
+            const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
+            const auto* v = p->VFTBL;
+            if (!v)
+                return false;
+
+            volatile DWORD test = v->Destructor;
+            static_cast<void>(test);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
     //
     // Used in LoadAllRequestedModels to record state
     //
@@ -241,8 +263,23 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     else
     {
         CBaseModelInfoSAInterface** ppModelInfo = reinterpret_cast<CBaseModelInfoSAInterface**>(ARRAY_ModelInfo);
-        if (dwModelID < MODELINFO_DFF_MAX && !ppModelInfo[dwModelID])
-            return;
+        if (dwModelID < MODELINFO_DFF_MAX)
+        {
+            CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[dwModelID];
+            if (!IsValidPtr(pModelInfo))
+            {
+                ppModelInfo[dwModelID] = nullptr;
+
+                CStreamingInfo* pStreamInfo = GetStreamingInfo(dwModelID);
+                if (pStreamInfo)
+                {
+                    pStreamInfo->prevId = static_cast<unsigned short>(-1);
+                    pStreamInfo->nextId = static_cast<unsigned short>(-1);
+                    pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
+                    pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+                }
+            }
+        }
 
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
         _asm
@@ -342,20 +379,11 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     if (!pItemInfo)
         return;
 
-    // We remove the existing RwObject because, after switching the archive, the streamer will load a new one.
-    // ReInit doesn't delete all RwObjects unless certain conditions are met.
-    // In this case, we must force-remove the RwObject from memory, because it is no longer used,
-    // and due to the archive change the streamer no longer detects it and therefore won't delete it.
-    // As a result, a memory leak occurs after every call to engineImageLinkDFF.
     const auto baseTxdId = g_pCore->GetGame()->GetBaseIDforTXD();
     if (modelid < static_cast<uint>(baseTxdId))
     {
-        if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid, true))
-        {
-            // Only DFF models got RwObjects, TXDs don't, so we only flush those here (or crash)
-            if (modelInfo->GetRwObject())
-                RemoveModel(modelid);
-        }
+        if (pItemInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+            RemoveModel(modelid);
     }
 
     // Change nextInImg field for prev model
