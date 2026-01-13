@@ -42,6 +42,7 @@ CCredits::CCredits()
         "Dan \"Talidan\" Chowdhury\n"
         "Chris \"ccw\" Cockwanger\n"
         "Adge \"Jax\" Cutler\n"
+        "Leonard \"lopsi\" Drumsticks\n"
         "Cecill \"ijs\" Etheredge\n"
         "Patrik Juvonen\n"
         "Danish \"Saml1er\" Khan\n"
@@ -60,7 +61,6 @@ CCredits::CCredits()
         "Dutchman101\n"
         "Gamesnert\n"
         "Jusonex\n"
-        "Lpsd\n"
         "\n"
         "\n";
 
