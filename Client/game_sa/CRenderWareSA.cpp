@@ -799,7 +799,10 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
                 // Re-fetch interface pointer after model reload
                 pModelInfoInterface = pModelInfo->GetInterface();
                 if (!pModelInfoInterface)
+                {
+                    RpClumpDestroy(pOldClump);
                     return false;
+                }
             }
             
             RpClumpDestroy(pOldClump);

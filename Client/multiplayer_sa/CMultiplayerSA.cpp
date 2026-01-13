@@ -6118,7 +6118,7 @@ void* SetModelSuspensionLinesToVehiclePrivate(CVehicleSAInterface* pVehicleIntf)
 
     void* pPrivateSuspensionLines = pVehicle->GetPrivateSuspensionLines();
     if (!pPrivateSuspensionLines)
-        return pOriginalSuspensionLines;
+        return nullptr;
 
     pModelInfo->SetVehicleSuspensionData(pPrivateSuspensionLines);
     return pOriginalSuspensionLines;
@@ -6126,7 +6126,14 @@ void* SetModelSuspensionLinesToVehiclePrivate(CVehicleSAInterface* pVehicleIntf)
 
 void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensionLines)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicleIntf->m_pVehicle->GetModelIndex());
+    if (!pVehicleIntf || !pSuspensionLines)
+        return;
+
+    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
+    if (!pVehicle)
+        return;
+
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
     if (!pModelInfo)
         return;
 
