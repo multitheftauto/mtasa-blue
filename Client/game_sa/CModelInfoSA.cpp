@@ -345,9 +345,6 @@ bool CModelInfoSA::IsVehicle() const
     if (!IsValidModelInfoPtr(model))
         return false;
 
-    if (m_dwModelID < 400 || m_dwModelID > 611)
-        return reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
-
     return reinterpret_cast<intptr_t>(model->VFTBL) == vftable_CVehicleModelInfo;
 }
 
@@ -810,7 +807,7 @@ void CModelInfoSA::StaticResetFlags()
         CBaseModelInfoSAInterface* pInterface = ppModelInfo[iter->first];
         if (!IsValidModelInfoPtr(pInterface))
         {
-            ++iter;
+            iter = ms_ModelDefaultFlagsMap.erase(iter);
             continue;
         }
 
@@ -1178,7 +1175,7 @@ void CModelInfoSA::StaticResetLodDistances()
         CBaseModelInfoSAInterface* pInterface = ppModelInfo[iter->first];
         if (!IsValidModelInfoPtr(pInterface))
         {
-            ++iter;
+            iter = ms_ModelDefaultLodDistanceMap.erase(iter);
             continue;
         }
 
@@ -1522,7 +1519,7 @@ void CModelInfoSA::StaticResetAlphaTransparencies()
         CBaseModelInfoSAInterface* pInterface = ppModelInfo[iter->first];
         if (!IsValidModelInfoPtr(pInterface))
         {
-            ++iter;
+            iter = ms_ModelDefaultAlphaTransparencyMap.erase(iter);
             continue;
         }
 
@@ -1962,7 +1959,7 @@ void CModelInfoSA::ResetAllVehiclesWheelSizes()
         auto* pVehicleModel = static_cast<CVehicleModelInfoSAInterface*>(pModelInfoSA->GetInterface());
         if (!pVehicleModel)
         {
-            ++it;
+            it = ms_VehicleModelDefaultWheelSizes.erase(it);
             continue;
         }
 
@@ -2150,6 +2147,9 @@ void CModelInfoSA::RestoreColModel()
     if (!IsValidModelInfoPtr(m_pInterface))
     {
         m_pInterface = nullptr;
+        m_pCustomColModel = nullptr;
+        m_pOriginalColModelInterface = nullptr;
+        m_originalFlags = 0;
         return;
     }
 
@@ -2224,10 +2224,14 @@ void CModelInfoSA::AddColRef()
     if (originalColModel)
         m_usColSlot = originalColModel->m_sphere.m_collisionSlot;
 
-    if (m_usColSlot != 0xFFFF)
+    if (m_usColSlot != 0xFFFF && pGame)
     {
-        pGame->GetCollisionStore()->AddRef(m_usColSlot);
-        ++m_colRefCount;
+        auto* pColStore = pGame->GetCollisionStore();
+        if (pColStore)
+        {
+            pColStore->AddRef(m_usColSlot);
+            ++m_colRefCount;
+        }
     }
 }
 
@@ -2256,7 +2260,14 @@ void CModelInfoSA::RemoveColRef()
     if (slot == 0xFFFF)
         return;
 
-    pGame->GetCollisionStore()->RemoveRef(slot);
+    if (!pGame)
+        return;
+
+    auto* pColStore = pGame->GetCollisionStore();
+    if (!pColStore)
+        return;
+
+    pColStore->RemoveRef(slot);
     if (m_colRefCount > 0)
         --m_colRefCount;
     if (m_colRefCount == 0)
@@ -2581,7 +2592,7 @@ void CModelInfoSA::DeallocateModel()
     m_pCustomClump = nullptr;
     m_pCustomColModel = nullptr;
     m_pOriginalColModelInterface = nullptr;
-    if (m_colRefCount > 0 && m_usColSlot != 0xFFFF)
+    if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && pGame)
     {
         auto* pColStore = pGame->GetCollisionStore();
         if (pColStore)
@@ -2900,7 +2911,7 @@ bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
 bool CModelInfoSA::IsDamageableAtomic()
 {
     CBaseModelInfoSAInterface* pInterface = GetInterface();
-    if (!pInterface)
+    if (!pInterface || !pInterface->VFTBL)
         return false;
 
     void* asDamageable = ((void* (*)())pInterface->VFTBL->AsDamageAtomicModelInfoPtr)();

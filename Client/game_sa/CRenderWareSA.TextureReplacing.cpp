@@ -646,7 +646,8 @@ namespace
             if (rwType == RP_TYPE_ATOMIC)
             {
                 auto* pAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
-                ReplaceTextureInGeometry(pAtomic ? pAtomic->geometry : nullptr, swapMap);
+                if (pAtomic && pAtomic->geometry)
+                    ReplaceTextureInGeometry(pAtomic->geometry, swapMap);
                 return true;
             }
 
@@ -671,7 +672,8 @@ namespace
                     return false;
 
                 RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
-                ReplaceTextureInGeometry(pAtomic ? pAtomic->geometry : nullptr, swapMap);
+                if (pAtomic && pAtomic->geometry)
+                    ReplaceTextureInGeometry(pAtomic->geometry, swapMap);
                 return true;
             }
 
@@ -1004,7 +1006,8 @@ void CRenderWareSA::ProcessPendingIsolatedTxdParents()
 
         CTxdStore_SetupTxdParent(childTxdId);
 
-        if (auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(modelId)))
+        CModelInfoSA* pModelInfo = pModelInfoForCheck;
+        if (pModelInfo)
         {
             RwObject* pRwObject = pModelInfo->GetRwObject();
             if (pRwObject)
@@ -2805,9 +2808,6 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
             for (CModelInfoSA* pModelInfo : targetModels)
             {
-                if (!pModelInfo)
-                    continue;
-
                 if (pModelInfo->GetRwObject())
                     ReplaceTextureInModel(pModelInfo, swapMap);
             }
@@ -2824,13 +2824,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 continue;
 
             if (bWasSwapped && pInfo->pTxd && pOldTexture->txd == pInfo->pTxd)
-            {
                 CRenderWareSA::RwTexDictionaryRemoveTexture(pInfo->pTxd, pOldTexture);
-
-                if (pOldTexture->txd != nullptr)
-                {
-                }
-            }
 
             if (!bWasSwapped)  // No original - must leak
             {
@@ -2854,10 +2848,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 markLeakedTxd(usTxdId, pInfo);
 
                 if (IsReadableTexture(pOldTexture))
-                {
                     leakedTextures.insert(pOldTexture);
-
-                }
 
                 bool bIsCopy = perTxdInfo.bTexturesAreCopies;  // Also leak master sharing raster
                 if (!bIsCopy && pReplacementTextures && pOldTexture)

@@ -278,6 +278,8 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
                     pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
                     pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
                 }
+
+                return;
             }
         }
 

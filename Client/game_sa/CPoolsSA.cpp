@@ -104,6 +104,8 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
         
         // Re-fetch interface as loading may have invalidated pointer
         pModelInterface = pModelInfo->GetInterface();
+        if (!pModelInterface)
+            return nullptr;
         
         // Still NULL means model has no collision (or loading failed) - block creation
         if (!pModelInterface->pColModel)
