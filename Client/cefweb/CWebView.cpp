@@ -15,10 +15,111 @@
 #include "CWebDevTools.h"
 #include "CWebViewAuth.h"            // AUTH: IPC validation helpers
 #include <utility>
+#include <algorithm>
 
 namespace
 {
     const int CEF_PIXEL_STRIDE = 4;
+
+    // Threshold for switching from dirty rect updates to full frame copy
+    // If dirty area exceeds this fraction of total area, full copy is more efficient
+    constexpr float DIRTY_RECT_THRESHOLD = 0.25f;
+
+    // Calculate total area covered by dirty rects (accounting for overlaps approximately)
+    size_t CalculateDirtyArea(const CefRenderHandler::RectList& dirtyRects, int frameWidth, int frameHeight)
+    {
+        if (dirtyRects.empty())
+            return 0;
+
+        // For a single rect, just return its area
+        if (dirtyRects.size() == 1)
+        {
+            const auto& rect = dirtyRects[0];
+            return static_cast<size_t>(rect.width) * static_cast<size_t>(rect.height);
+        }
+
+        // For multiple rects, calculate bounding box area as upper bound estimate
+        // This is faster than precise overlap calculation and gives good results
+        int minX = frameWidth, minY = frameHeight;
+        int maxX = 0, maxY = 0;
+        size_t totalRectArea = 0;
+
+        for (const auto& rect : dirtyRects)
+        {
+            if (rect.width <= 0 || rect.height <= 0)
+                continue;
+
+            minX = std::min(minX, rect.x);
+            minY = std::min(minY, rect.y);
+            maxX = std::max(maxX, rect.x + rect.width);
+            maxY = std::max(maxY, rect.y + rect.height);
+            totalRectArea += static_cast<size_t>(rect.width) * static_cast<size_t>(rect.height);
+        }
+
+        // Use the smaller of: sum of rect areas, or bounding box area
+        // This gives a reasonable estimate without expensive overlap calculation
+        const size_t boundingArea = static_cast<size_t>(maxX - minX) * static_cast<size_t>(maxY - minY);
+        return std::min(totalRectArea, boundingArea);
+    }
+
+    // Check if two rects are adjacent or overlapping (can be merged)
+    bool RectsAreAdjacent(const CefRect& a, const CefRect& b, int tolerance = 1)
+    {
+        // Check if rects overlap or touch within tolerance
+        return !(a.x + a.width + tolerance < b.x ||
+                 b.x + b.width + tolerance < a.x ||
+                 a.y + a.height + tolerance < b.y ||
+                 b.y + b.height + tolerance < a.y);
+    }
+
+    // Merge two rects into their bounding box
+    CefRect MergeRects(const CefRect& a, const CefRect& b)
+    {
+        const int minX = std::min(a.x, b.x);
+        const int minY = std::min(a.y, b.y);
+        const int maxX = std::max(a.x + a.width, b.x + b.width);
+        const int maxY = std::max(a.y + a.height, b.y + b.height);
+        return CefRect(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    // Merge adjacent dirty rects to reduce number of copy operations
+    // Returns optimized list with fewer, larger rects
+    std::vector<CefRect> MergeAdjacentRects(const CefRenderHandler::RectList& dirtyRects)
+    {
+        if (dirtyRects.size() <= 1)
+            return std::vector<CefRect>(dirtyRects.begin(), dirtyRects.end());
+
+        std::vector<CefRect> merged(dirtyRects.begin(), dirtyRects.end());
+
+        // Simple greedy merge - keep merging until no more merges possible
+        // Limited iterations to prevent excessive processing
+        constexpr int maxIterations = 3;
+        for (int iter = 0; iter < maxIterations; ++iter)
+        {
+            bool mergedAny = false;
+
+            for (size_t i = 0; i < merged.size() && merged.size() > 1; ++i)
+            {
+                for (size_t j = i + 1; j < merged.size(); ++j)
+                {
+                    if (RectsAreAdjacent(merged[i], merged[j]))
+                    {
+                        merged[i] = MergeRects(merged[i], merged[j]);
+                        merged.erase(merged.begin() + j);
+                        mergedAny = true;
+                        break;
+                    }
+                }
+                if (mergedAny)
+                    break;
+            }
+
+            if (!mergedAny)
+                break;
+        }
+
+        return merged;
+    }
 }
 
 CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent)
@@ -391,8 +492,20 @@ void CWebView::UpdateTexture()
                 m_RenderData.changed = false;
 
                 const auto& dirtyRects = m_RenderData.dirtyRects;
-                if (!dirtyRects.empty() && dirtyRects[0].width == m_RenderData.width &&
-                    dirtyRects[0].height == m_RenderData.height)
+                const auto frameArea = static_cast<size_t>(m_RenderData.width) * static_cast<size_t>(m_RenderData.height);
+
+                // Determine if we should do full frame copy or partial dirty rect update
+                // Full copy is more efficient when dirty area exceeds threshold due to fewer memcpy calls
+                bool doFullCopy = dirtyRects.empty() ||
+                    (dirtyRects.size() == 1 && dirtyRects[0].width == m_RenderData.width && dirtyRects[0].height == m_RenderData.height);
+
+                if (!doFullCopy && frameArea > 0)
+                {
+                    const auto dirtyArea = CalculateDirtyArea(dirtyRects, m_RenderData.width, m_RenderData.height);
+                    doFullCopy = (static_cast<float>(dirtyArea) / static_cast<float>(frameArea)) > DIRTY_RECT_THRESHOLD;
+                }
+
+                if (doFullCopy)
                 {
                     // Full frame update - copy entire buffer
                     if (destPitch == sourcePitch) [[likely]]
@@ -440,7 +553,7 @@ void CWebView::UpdateTexture()
                 }
                 else
                 {
-                    // Partial update using dirty rects
+                    // Partial update using optimized dirty rects
                     if (m_RenderData.height > 0 &&
                         static_cast<size_t>(m_RenderData.height) > SIZE_MAX / static_cast<size_t>(destPitch)) [[unlikely]]
                     {
@@ -450,7 +563,10 @@ void CWebView::UpdateTexture()
                         return;
                     }
 
-                    for (const auto& rect : dirtyRects)
+                    // Merge adjacent rects to reduce number of copy operations
+                    const auto mergedRects = MergeAdjacentRects(dirtyRects);
+
+                    for (const auto& rect : mergedRects)
                     {
                         if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0) [[unlikely]]
                             continue;
