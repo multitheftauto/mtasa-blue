@@ -117,7 +117,7 @@ static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
 {
     if (!atomic || !pData) [[unlikely]]
         return false;
-    
+
     SReplaceWheels* data = reinterpret_cast<SReplaceWheels*>(pData);
     RwFrame*        Frame = RpGetFrame(atomic);
 
@@ -729,10 +729,7 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
         RpClump* pOldClump = (RpClump*)pModelInfo->GetRwObject();
         if (pOldClump != pNew && !DoContainTheSameGeometry(pNew, pOldClump, NULL))
         {
-            if (pModelInfo->IsVehicle())
-            {
-                pModelInfo->ResetSupportedUpgrades();
-            }
+            const bool shouldResetUpgrades = (dwSetClumpFunction == FUNC_LoadVehicleModel);
 
             // Make new clump container for the model geometry
             // Clone twice as the geometry render order seems to be reversed each time it is cloned.
@@ -745,7 +742,7 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             if (dwSetClumpFunction == FUNC_LoadVehicleModel)
             {
                 auto pVehicleModelInfoInterface = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface();
-                if (pVehicleModelInfoInterface->pVisualInfo)
+                if (pVehicleModelInfoInterface && pVehicleModelInfoInterface->pVisualInfo)
                 {
                     auto pVisualInfo = pVehicleModelInfoInterface->pVisualInfo;
                     CVehicleModelInfo_CVehicleStructure_Destructor(pVisualInfo);
@@ -755,11 +752,42 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             }
 
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
+            if (!pModelInfoInterface)
+            {
+                RpClumpDestroy(pNewClone);
+                return false;
+            }
             CBaseModelInfo_SetClump(pModelInfoInterface, pNewClone);
-            
+
+            CBaseModelInfoSAInterface* pInterfaceAfterSet = pModelInfoInterface;
             // Re-fetch interface pointer after SetClump (may relocate/change)
             pModelInfoInterface = pModelInfo->GetInterface();
-            
+
+            // Not happy
+            if (!pModelInfoInterface)
+            {
+                CBaseModelInfoSAInterface* fallback = nullptr;
+                auto* arrayEntry = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
+                if (arrayEntry && SharedUtil::IsReadablePointer(arrayEntry, sizeof(*arrayEntry)))
+                    fallback = arrayEntry;
+                else if (pInterfaceAfterSet && SharedUtil::IsReadablePointer(pInterfaceAfterSet, sizeof(*pInterfaceAfterSet)))
+                    fallback = pInterfaceAfterSet;
+                bool restored = false;
+                const bool oldClumpReadable = pOldClump && SharedUtil::IsReadablePointer(pOldClump, sizeof(*pOldClump));
+                if (fallback && oldClumpReadable && SharedUtil::IsReadablePointer(fallback->VFTBL, sizeof(*fallback->VFTBL)))
+                {
+                    fallback->pRwObject = &pOldClump->object;
+                    CBaseModelInfo_SetClump(fallback, pOldClump);
+                    restored = true;
+                }
+                AddReportLog(8627, SString("ReplaceModel: lost interface after SetClump, model:%d restored:%d", usModelID, restored ? 1 : 0));
+                RpClumpDestroy(pNewClone);
+                return false;
+            }
+
+            if (shouldResetUpgrades)
+                pModelInfo->ResetSupportedUpgrades();
+
             // Fix for custom DFF without embedded collision:
             // SetClump clears pColModel when DFF has no collision data, but vehicles need collision from .col pool.
             // Solution: Remove + Request + Load to restore pool-managed collision from data/vehicles.col
@@ -770,8 +798,13 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
                 pGame->GetStreaming()->LoadAllRequestedModels(false, "CRenderWareSA::ReplaceVehicleModel");
                 // Re-fetch interface pointer after model reload
                 pModelInfoInterface = pModelInfo->GetInterface();
+                if (!pModelInfoInterface)
+                {
+                    RpClumpDestroy(pOldClump);
+                    return false;
+                }
             }
-            
+
             RpClumpDestroy(pOldClump);
         }
     }
@@ -933,7 +966,7 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
 
             // Replace the atomics
             SAtomicsReplacer data;
-            CBaseModelInfoSAInterface* pModelInfoInterface = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
+            CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
             if (!pModelInfoInterface)
             {
                 RpClumpDestroy(pCopy);

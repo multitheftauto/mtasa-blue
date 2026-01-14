@@ -29,6 +29,8 @@ static void* ARRAY_ModelLoaded = (char*)CStreaming__ms_aInfoForModel + 0x10;
 
 #define     FUNC_CStreaming__HasModelLoaded 0x4044C0
 
+#define     NUM_INVALID_PTR_THRESHOLD       0x10000
+
 // CModelInfo/ARRAY_ModelInfo __thiscall to load/replace vehicle models
 #define     FUNC_LoadVehicleModel           0x4C95C0
 #define     FUNC_LoadWeaponModel            0x4C9910
@@ -343,6 +345,8 @@ protected:
     DWORD                                                                        m_dwPendingInterfaceRef;
     CColModel*                                                                   m_pCustomColModel;
     CColModelSAInterface*                                                        m_pOriginalColModelInterface;
+    std::uint32_t                                                                m_colRefCount = 0;
+    unsigned short                                                               m_usColSlot = 0xFFFF;
     std::uint16_t                                                                m_originalFlags = 0;
     RpClump*                                                                     m_pCustomClump;
     static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
@@ -350,11 +354,12 @@ protected:
     static std::map<DWORD, unsigned short>                                       ms_ModelDefaultFlagsMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                ms_ModelDefaultModelTimeInfo;
+    static std::map<DWORD, CTimeInfoSAInterface>                                ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
     static std::map<unsigned short, int>                                         ms_DefaultTxdIDMap;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
+    static void                                                                  ClearModelDefaults(DWORD modelId);
 
 public:
     CModelInfoSA();
@@ -418,6 +423,7 @@ public:
     bool           GetTime(char& cHourOn, char& cHourOff);
     bool           SetTime(char cHourOn, char cHourOff);
     static void    StaticResetModelTimes();
+    static void    ClearModelDefaults();
 
     void        SetAlphaTransparencyEnabled(bool bEnabled);
     bool        IsAlphaTransparencyEnabled();
@@ -470,7 +476,11 @@ public:
 
     void SetModelID(DWORD dwModelID) { m_dwModelID = dwModelID; }
 
-    RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
+    RwObject* GetRwObject()
+    {
+        auto* pInterface = GetInterface();
+        return pInterface ? pInterface->pRwObject : NULL;
+    }
 
     // CModelInfoSA methods
     void         MakePedModel(const char* szTexture);
@@ -479,7 +489,7 @@ public:
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
     void         MakeClumpModel(ushort usBaseModelID);
-    void         DeallocateModel(void);
+    void         DeallocateModel();
     unsigned int GetParentID() { return m_dwParentID; };
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }

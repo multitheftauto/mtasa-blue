@@ -1811,10 +1811,14 @@ bool CVehicleSA::UpdateMovingCollision(float fAngle)
 
 void* CVehicleSA::GetPrivateSuspensionLines()
 {
-    if (m_pSuspensionLines == NULL)
+    if (m_pSuspensionLines == nullptr)
     {
         CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-        CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->m_data;
+        if (!pModelInfo)
+            return nullptr;
+
+        CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
+        CColDataSA* pColData = (pInterface && pInterface->pColModel) ? pInterface->pColModel->m_data : nullptr;
         if (pModelInfo->IsMonsterTruck())
         {
             // Monster truck suspension data is 0x90 BYTES rather than 0x80 (some extra stuff I guess)
@@ -1828,7 +1832,8 @@ void* CVehicleSA::GetPrivateSuspensionLines()
         else
         {
             // CAutomobile allocates wheels * 32 (0x20)
-            m_pSuspensionLines = new BYTE[pColData->m_numSuspensionLines * 0x20];
+            const std::size_t numLines = pColData ? std::min<std::size_t>(pColData->m_numSuspensionLines, MAX_SUSPENSION_LINES) : MAX_SUSPENSION_LINES;
+            m_pSuspensionLines = new BYTE[numLines * SUSPENSION_SIZE_STANDARD];
         }
     }
 
@@ -1888,7 +1893,7 @@ void CVehicleSA::RecalculateSuspensionLines()
     const std::uint32_t dwModel = GetModelIndex();
 
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
-    if (!pModelInfo)
+    if (!pModelInfo || !pModelInfo->GetInterface())
         return;
 
     // Only for vehicles with suspension lines
@@ -2451,7 +2456,15 @@ bool CVehicleSA::SetPlateText(const SString& strText)
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
     if (!pModelInfo)
         return false;
-    CVehicleModelInfoSAInterface* pVehicleModelInfo = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface();
+
+    auto* pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(pModelInfo->GetInterface());
+    if (!pVehicleModelInfo)
+    {
+        pModelInfo->Request(BLOCKING, "SetPlateText");
+        pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(pModelInfo->GetInterface());
+        if (!pVehicleModelInfo)
+            return false;
+    }
 
     // Copy text
     strncpy(pVehicleModelInfo->plateText, *strText, 8);
