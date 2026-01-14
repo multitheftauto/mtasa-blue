@@ -200,6 +200,8 @@ CProxyDirect3DDevice9*                  g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 SGammaState                             g_GammaState;
 
+CProxyDirect3DDevice9::SMemoryState g_StaticMemoryState;
+
 namespace
 {
 uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance)
