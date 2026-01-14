@@ -553,7 +553,7 @@ namespace
                 bool bIsActuallyCopy = perTxdInfo.bTexturesAreCopies;
                 if (!bIsActuallyCopy && pReplacementTextures && pMasterTextures)
                     bIsActuallyCopy = pMasterTextures->find(pTexture) == pMasterTextures->end();
-
+                
                 if (bIsActuallyCopy)
                     outCopiesToDestroy.insert(pTexture);
             }
@@ -889,7 +889,7 @@ namespace
                 g_IsolatedTxdSlotsByModelId.emplace(usModelId, adopted);
                 return true;
             }
-
+            
             // Can't adopt - reset model to parent so we can create a fresh isolated TXD
             pModelInfo->SetTextureDictionaryID(usParentTxdId);
         }
@@ -1138,7 +1138,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
         }
 
         const bool bIsStaleEntry = (info.pTxd != pCurrentTxd) || (!info.pTxd && !pCurrentTxd);
-
+        
         if (bIsStaleEntry)
         {
 
@@ -1161,14 +1161,15 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 for (unsigned short modelId : pReplacement->usedInModelIds)
                 {
                     auto itCache = modelInfoCache.find(modelId);
-                    if (itCache != modelInfoCache.end() && itCache->second)
-                    {
-                        CModelInfoSA* pModInfo = itCache->second;
-                        if (pModInfo->GetTextureDictionaryID() == usTxdId)
-                        {
-                            modelIds.push_back(modelId);
-                        }
-                    }
+                    if (itCache == modelInfoCache.end() || !itCache->second)
+                        continue;
+
+                    CModelInfoSA* pModInfo = itCache->second;
+                    if (!pModInfo->GetRwObject())
+                        continue;
+
+                    if (pModInfo->GetTextureDictionaryID() == usTxdId)
+                        modelIds.push_back(modelId);
                 }
                 if (!pReplacement->textures.empty() && !modelIds.empty())
                 {
@@ -1265,7 +1266,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
             for (SReplacementTextures* pReplacement : info.usedByReplacements)
             {
-                auto itPerTxd = std::find_if(pReplacement->perTxdList.begin(), pReplacement->perTxdList.end(),
+                auto itPerTxd = std::find_if(pReplacement->perTxdList.begin(), pReplacement->perTxdList.end(), 
                     [usTxdId](const SReplacementTextures::SPerTxd& item) { return item.usTxdId == usTxdId; });
 
                 if (itPerTxd != pReplacement->perTxdList.end())
@@ -1372,7 +1373,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 unsigned int uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
                 pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
                 pGame->GetStreaming()->LoadAllRequestedModels(true, "CRenderWareSA::GetModelTexturesInfo-TXD");
-
+                
                 pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
 
                 unsigned short uiNewTxdId = pModelInfo->GetTextureDictionaryID();
@@ -1386,7 +1387,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     MapRemove(ms_ModelTexturesInfoMap, usTxdId);
                     return nullptr;
                 }
-
+                
                 pCurrentTxd = CTxdStore_GetTxd(usTxdId);
 
                 if (pCurrentTxd)
@@ -1492,7 +1493,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
     newInfo.pTxd = pTxd;
 
     PopulateOriginalTextures(newInfo, pTxd);
-
+    
     return &newInfo;
 }
 
@@ -1610,7 +1611,7 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
             *pOutError = "[ModelInfoTXDLoadTextures] TXD parsed successfully but contains no valid textures";
         return false;
     }
-
+    
     return true;
 }
 
@@ -1651,9 +1652,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
         auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
         if (!pModelInfo)
             return false;
-
+        
         pModelInfo->Request(BLOCKING, "CRenderWareSA::ModelInfoTXDAddTextures");
-
+        
         pInfo = GetModelTexturesInfo(usModelId, "ModelInfoTXDAddTextures-after-blocking");
         if (!pInfo)
             return false;
@@ -1680,7 +1681,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     bool bBuiltTxdTextureMap = false;
     TxdTextureMap txdTextureMap;
     RwTexDictionary* pTxdToCheck = nullptr;
-
+    
     if (pReplacementTextures->usedInTxdIds.find(pInfo->usTxdId) != pReplacementTextures->usedInTxdIds.end())
     {
         auto itPerTxd = std::find_if(pReplacementTextures->perTxdList.begin(), pReplacementTextures->perTxdList.end(),
@@ -1760,7 +1761,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
             TextureSwapMap swapMap;
             swapMap.reserve(itPerTxd->usingTextures.size());
             const bool bCurrentTxdOk = pCurrentTxd != nullptr;
-
+            
             const bool bCanReuseMap = bBuiltTxdTextureMap && pTxdToCheck == pCurrentTxd;
             if (bCurrentTxdOk && !bCanReuseMap)
             {
@@ -2601,7 +2602,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                     }
                 }
             }
-
+            
             (void)originalsToDestroy;
 
             ListRemove(pInfo->usedByReplacements, pReplacementTextures);
@@ -2999,7 +3000,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 // Originals keep shader registration (never removed)
             }
         }
-                    
+        
         // Don't destroy failed originals (leak safe, destroy corrupts)
         (void)failedRestorations;
 
