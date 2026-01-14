@@ -257,6 +257,10 @@ private:
     bool                       m_bIsRenderingPaused;
     bool                       m_bIsTransparent;
     bool                       m_bBrowserCreated = false;  // Lazy creation: tracks if CEF browser has been created
+    SString                    m_strPendingURL;            // Lazy creation: URL to load when browser is ready
+    bool                       m_bPendingURLFilterEnabled = true;
+    SString                    m_strPendingPostData;
+    bool                       m_bPendingURLEncoded = true;
     POINT                      m_vecMousePosition;
     POINT                      m_vecPendingMousePosition;      // Pending position for throttled mouse move
     bool                       m_bHasPendingMouseMove = false; // Whether there's a pending throttled mouse move

@@ -295,8 +295,15 @@ bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString
     // Lazy creation: create browser on first use
     EnsureBrowserCreated();
 
+    // If browser isn't ready yet (async creation), store the URL to load when ready
     if (!m_pWebView)
-        return false;
+    {
+        m_strPendingURL = strURL;
+        m_bPendingURLFilterEnabled = bFilterEnabled;
+        m_strPendingPostData = strPostData;
+        m_bPendingURLEncoded = bURLEncoded;
+        return true;  // Return true - we'll load it when browser is ready
+    }
 
     CefURLParts urlParts;
     if (strURL.empty() || !CefParseURL(strURL, urlParts))
@@ -1505,6 +1512,22 @@ void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 
     // Set web view reference
     m_pWebView = browser;
+
+    // If we have a pending URL from lazy loading, load it now
+    if (!m_strPendingURL.empty())
+    {
+        SString pendingURL = m_strPendingURL;
+        bool filterEnabled = m_bPendingURLFilterEnabled;
+        SString postData = m_strPendingPostData;
+        bool urlEncoded = m_bPendingURLEncoded;
+
+        // Clear pending state before loading to prevent recursion
+        m_strPendingURL.clear();
+        m_strPendingPostData.clear();
+
+        // Load the pending URL
+        LoadURL(pendingURL, filterEnabled, postData, urlEncoded);
+    }
 
     // Call created event callback
     QueueBrowserEvent(
