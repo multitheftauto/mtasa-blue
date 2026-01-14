@@ -896,24 +896,32 @@ namespace
 
         const std::uint16_t usNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlot();
         if (usNewTxdId == static_cast<std::uint16_t>(-1))
+        {
+            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot for model %u", usModelId));
             return false;
+        }
 
         std::string txdName = SString("mta_req_%u", usModelId);
         if (txdName.size() > 24)
             txdName.resize(24);
 
         if (pTxdPoolSA->AllocateTextureDictonarySlot(usNewTxdId, txdName) == static_cast<std::uint32_t>(-1))
+        {
+            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: AllocateTextureDictonarySlot failed for model %u txdId=%u", usModelId, usNewTxdId));
             return false;
+        }
 
         RwTexDictionary* pChildTxd = RwTexDictionaryCreate();
         if (!pChildTxd)
         {
+            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: RwTexDictionaryCreate failed for model %u", usModelId));
             pTxdPoolSA->RemoveTextureDictonarySlot(usNewTxdId);
             return false;
         }
 
         if (!pTxdPoolSA->SetTextureDictonarySlot(usNewTxdId, pChildTxd, usParentTxdId))
         {
+            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: SetTextureDictonarySlot failed for model %u txdId=%u parentTxdId=%u", usModelId, usNewTxdId, usParentTxdId));
             RwTexDictionaryDestroy(pChildTxd);
             pTxdPoolSA->RemoveTextureDictonarySlot(usNewTxdId);
             return false;
@@ -925,12 +933,14 @@ namespace
         const std::uint32_t usTxdStreamId = usNewTxdId + pGame->GetBaseIDforTXD();
         if (usTxdStreamId >= pGame->GetCountOfAllFileIDs())
         {
+            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Stream ID %u out of range for model %u", usTxdStreamId, usModelId));
             pTxdPoolSA->RemoveTextureDictonarySlot(usNewTxdId);
             return false;
         }
         CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(usTxdStreamId);
         if (!pStreamInfo)
         {
+            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: GetStreamingInfo failed for model %u streamId=%u", usModelId, usTxdStreamId));
             pTxdPoolSA->RemoveTextureDictonarySlot(usNewTxdId);
             return false;
         }
@@ -1473,6 +1483,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
     if (!pTxd)
     {
+        AddReportLog(9401, SString("GetModelTexturesInfo: CTxdStore_GetTxd returned null for model %u txdId=%u (before blocking request)", usModelId, usTxdId));
         pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
         ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
         pTxd = CTxdStore_GetTxd(usTxdId);
@@ -1485,7 +1496,10 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
     }
 
     if (!pTxd)
+    {
+        AddReportLog(9401, SString("GetModelTexturesInfo: CTxdStore_GetTxd returned null for model %u txdId=%u (after blocking request)", usModelId, usTxdId));
         return nullptr;
+    }
 
     auto itInserted = ms_ModelTexturesInfoMap.emplace(usTxdId, CModelTexturesInfo{});
     CModelTexturesInfo& newInfo = itInserted.first->second;
@@ -1619,7 +1633,10 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
 bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId)
 {
     if (!pGame || !pReplacementTextures)
+    {
+        AddReportLog(9401, SString("ModelInfoTXDAddTextures: Failed early - pGame=%p pReplacementTextures=%p model=%u", pGame, pReplacementTextures, usModelId));
         return false;
+    }
 
     if (!g_bInTxdReapply)
     {
@@ -1632,7 +1649,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usParentModelId));
                 const unsigned short usParentTxdId = pParentInfo ? pParentInfo->GetTextureDictionaryID() : 0;
 
-                EnsureIsolatedTxdForRequestedModel(usModelId);
+                const bool bIsolatedOk = EnsureIsolatedTxdForRequestedModel(usModelId);
+                if (!bIsolatedOk)
+                    AddReportLog(9401, SString("ModelInfoTXDAddTextures: EnsureIsolatedTxdForRequestedModel failed for model %u (parent=%u parentTxd=%u)", usModelId, usParentModelId, usParentTxdId));
             }
         }
     }
@@ -1651,13 +1670,19 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     {
         auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
         if (!pModelInfo)
+        {
+            AddReportLog(9401, SString("ModelInfoTXDAddTextures: No model info for model %u", usModelId));
             return false;
+        }
         
         pModelInfo->Request(BLOCKING, "CRenderWareSA::ModelInfoTXDAddTextures");
         
         pInfo = GetModelTexturesInfo(usModelId, "ModelInfoTXDAddTextures-after-blocking");
         if (!pInfo)
+        {
+            AddReportLog(9401, SString("ModelInfoTXDAddTextures: GetModelTexturesInfo failed after blocking request for model %u (txdId=%u)", usModelId, pModelInfo->GetTextureDictionaryID()));
             return false;
+        }
     }
 
     RwTexDictionary* pCurrentTxd = CTxdStore_GetTxd(pInfo->usTxdId);
@@ -1667,7 +1692,10 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     if (!pOldTxd)
     {
         if (!pCurrentTxd)
+        {
+            AddReportLog(9401, SString("ModelInfoTXDAddTextures: Both pOldTxd and pCurrentTxd are null for model %u txdId=%u", usModelId, pInfo->usTxdId));
             return false;
+        }
 
         bNeedTxdUpdate = true;
         pOldTxd = nullptr;
@@ -1749,6 +1777,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
             if (!bNeedTxdUpdate)
             {
+                AddReportLog(9401, SString("ModelInfoTXDAddTextures: Stale replacement cleanup return false for model %u txdId=%u", usModelId, pInfo->usTxdId));
                 pReplacementTextures->perTxdList.erase(itPerTxd);
                 pReplacementTextures->usedInTxdIds.erase(pInfo->usTxdId);
                 SwapPopRemove(pInfo->usedByReplacements, pReplacementTextures);
@@ -2154,8 +2183,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
     if (!anyAdded)
     {
-        SString strDebug = SString("ModelInfoTXDAddTextures: No textures were added to TXD %d for model %d", 
-            pInfo->usTxdId, usModelId);
+        SString strDebug = SString("ModelInfoTXDAddTextures: No textures were added to TXD %d for model %d (pTargetTxd=%p bTargetTxdOk=%d usingTextures.size=%u textures.size=%u)", 
+            pInfo->usTxdId, usModelId, pTargetTxd, bTargetTxdOk ? 1 : 0, (unsigned)perTxdInfo.usingTextures.size(), (unsigned)pReplacementTextures->textures.size());
         WriteDebugEvent(strDebug);
         AddReportLog(9401, strDebug);
 
