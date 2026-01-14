@@ -6557,13 +6557,38 @@ void* SetModelSuspensionLinesToVehiclePrivate(CVehicleSAInterface* pVehicleIntf)
     // Set the per-model suspension line data of the vehicle's model to the per-vehicle
     // suspension line data so that collision processing will use that instead.
     CVehicle*   pVehicle = pVehicleIntf->m_pVehicle;
+    if (!pVehicle)
+        return nullptr;
+
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
-    return pModelInfo->SetVehicleSuspensionData(pVehicle->GetPrivateSuspensionLines());
+    if (!pModelInfo)
+        return nullptr;
+
+    void* pOriginalSuspensionLines = pModelInfo->GetVehicleSuspensionData();
+    if (!pOriginalSuspensionLines)
+        return nullptr;
+
+    void* pPrivateSuspensionLines = pVehicle->GetPrivateSuspensionLines();
+    if (!pPrivateSuspensionLines)
+        return nullptr;
+
+    pModelInfo->SetVehicleSuspensionData(pPrivateSuspensionLines);
+    return pOriginalSuspensionLines;
 }
 
 void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensionLines)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicleIntf->m_pVehicle->GetModelIndex());
+    if (!pVehicleIntf || !pSuspensionLines)
+        return;
+
+    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
+    if (!pVehicle)
+        return;
+
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
+    if (!pModelInfo)
+        return;
+
     pModelInfo->SetVehicleSuspensionData(pSuspensionLines);
 }
 // Some variables.
@@ -6581,7 +6606,7 @@ bool                 CheckHasSuspensionChanged()
             return false;
 
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
-        if (pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
+        if (pModelInfo && pModelInfo->GetInterface() && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
             return true;
         else
             return false;
