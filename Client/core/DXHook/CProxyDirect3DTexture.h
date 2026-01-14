@@ -59,5 +59,5 @@ protected:
     IDirect3DTexture9*                      m_pOriginal;
     int                                     m_iMemUsed;
     DWORD                                   m_dwUsage;
-    CProxyDirect3DDevice9::SResourceMemory& m_stats;
+    CProxyDirect3DDevice9::SResourceMemory* m_pStats;
 };
