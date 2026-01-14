@@ -92,6 +92,10 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     if (!surface)
         return;
 
+    // Check for valid SVG dimensions to avoid division by zero
+    if (svgDocument->width() <= 0 || svgDocument->height() <= 0)
+        return;
+
     // SVG has a predefined width and height. We need transform it to the requested size
     const Matrix transformationMatrix(pVectorGraphicItem->m_uiSizeX / svgDocument->width(), 0, 0, pVectorGraphicItem->m_uiSizeY / svgDocument->height(), 0, 0);
 
