@@ -1198,39 +1198,17 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
     {
         m_RenderData.buffer = std::make_unique<byte[]>(requiredSize);
         m_RenderData.bufferSize = requiredSize;
+        // Zero-initialize new buffer to avoid garbage pixels in areas not painted yet
+        std::memset(m_RenderData.buffer.get(), 0, requiredSize);
     }
 
-    // Copy buffer - with external_begin_frame_enabled, we control timing
-    // Optimize: only copy dirty regions when buffer size hasn't changed
-    if (bSizeChanged || dirtyRects.empty())
-    {
-        // Full copy needed for new/resized buffer or if no dirty rects specified
-        std::memcpy(m_RenderData.buffer.get(), buffer, requiredSize);
-    }
-    else
-    {
-        // Partial copy - only copy dirty regions
-        const auto srcData = static_cast<const byte*>(buffer);
-        auto* dstData = m_RenderData.buffer.get();
-        const auto pitch = static_cast<size_t>(width) * CEF_PIXEL_STRIDE;
-
-        for (const auto& rect : dirtyRects)
-        {
-            // Validate rect bounds
-            if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0) [[unlikely]]
-                continue;
-            if (rect.x + rect.width > width || rect.y + rect.height > height) [[unlikely]]
-                continue;
-
-            // Copy each row of the dirty rect
-            const auto rectPitch = static_cast<size_t>(rect.width) * CEF_PIXEL_STRIDE;
-            for (int y = rect.y; y < rect.y + rect.height; ++y)
-            {
-                const auto offset = static_cast<size_t>(y) * pitch + static_cast<size_t>(rect.x) * CEF_PIXEL_STRIDE;
-                std::memcpy(&dstData[offset], &srcData[offset], rectPitch);
-            }
-        }
-    }
+    // Always do a full copy from CEF's buffer
+    // CEF's buffer contains the complete frame state, and dirty rects indicate what changed
+    // However, we must copy the full buffer because:
+    // 1. Our intermediate buffer may be stale if frames were skipped
+    // 2. CEF may combine multiple
+    // 3. Partial copies can cause rendering artifacts with popups/modals
+    std::memcpy(m_RenderData.buffer.get(), buffer, requiredSize);
 
     m_RenderData.width = width;
     m_RenderData.height = height;
