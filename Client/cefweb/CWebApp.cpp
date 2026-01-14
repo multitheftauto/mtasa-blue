@@ -100,7 +100,6 @@ namespace
             else
             {
                 // In Wine, we generally want to try GPU (DXVK handles it well)
-                // But disable-gpu-compositing is already set above which is key
                 // If user hasn't explicitly disabled GPU in cvars, let it run
             }
         }
