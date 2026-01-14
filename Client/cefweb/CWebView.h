@@ -29,6 +29,7 @@
 #include <mmdeviceapi.h>
 #include <mutex>
 #include <cstdint>
+#include <chrono>
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
@@ -257,6 +258,9 @@ private:
     bool                       m_bIsTransparent;
     bool                       m_bBrowserCreated = false;  // Lazy creation: tracks if CEF browser has been created
     POINT                      m_vecMousePosition;
+    POINT                      m_vecPendingMousePosition;      // Pending position for throttled mouse move
+    bool                       m_bHasPendingMouseMove = false; // Whether there's a pending throttled mouse move
+    std::chrono::steady_clock::time_point m_lastMouseMoveTime; // For mouse move throttling
     bool                       m_mouseButtonStates[3];
     SString                    m_CurrentTitle;
     float                      m_fVolume;

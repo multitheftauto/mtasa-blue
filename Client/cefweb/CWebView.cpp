@@ -699,11 +699,32 @@ void CWebView::InjectMouseMove(int iPosX, int iPosY)
     if (!m_pWebView)
         return;
 
+    // Throttle mouse move events to reduce excessive CEF repaints
+    // Allow ~60 mouse updates per second (16ms interval)
+    constexpr auto MOUSE_THROTTLE_INTERVAL = std::chrono::milliseconds(16);
+    auto now = std::chrono::steady_clock::now();
+
+    // Always update the pending position
+    m_vecPendingMousePosition.x = iPosX;
+    m_vecPendingMousePosition.y = iPosY;
+
+    // Check if enough time has passed since last mouse move
+    if (now - m_lastMouseMoveTime < MOUSE_THROTTLE_INTERVAL)
+    {
+        // Store as pending - will be sent on next allowed interval or on click
+        m_bHasPendingMouseMove = true;
+        return;
+    }
+
+    // Send the mouse move event
+    m_lastMouseMoveTime = now;
+    m_bHasPendingMouseMove = false;
+
     CefMouseEvent mouseEvent;
     mouseEvent.x = iPosX;
     mouseEvent.y = iPosY;
 
-    // Set modifiers from mouse states (yeah, using enum values as indices isn't best practise, but it's the easiest solution here)
+    // Set modifiers from mouse states
     if (m_mouseButtonStates[BROWSER_MOUSEBUTTON_LEFT])
         mouseEvent.modifiers |= EVENTFLAG_LEFT_MOUSE_BUTTON;
     if (m_mouseButtonStates[BROWSER_MOUSEBUTTON_MIDDLE])
@@ -721,6 +742,19 @@ void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton, int count)
 {
     if (!m_pWebView)
         return;
+
+    // Flush any pending mouse move before click to ensure accurate position
+    if (m_bHasPendingMouseMove)
+    {
+        m_vecMousePosition.x = m_vecPendingMousePosition.x;
+        m_vecMousePosition.y = m_vecPendingMousePosition.y;
+        m_bHasPendingMouseMove = false;
+
+        CefMouseEvent moveEvent;
+        moveEvent.x = m_vecMousePosition.x;
+        moveEvent.y = m_vecMousePosition.y;
+        m_pWebView->GetHost()->SendMouseMoveEvent(moveEvent, false);
+    }
 
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
@@ -1152,15 +1186,44 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
     }
 
     // Allocate or reallocate buffer if size changed
-    if (!m_RenderData.buffer || m_RenderData.bufferSize != requiredSize) [[unlikely]]
+    const bool bSizeChanged = !m_RenderData.buffer || m_RenderData.bufferSize != requiredSize;
+    if (bSizeChanged) [[unlikely]]
     {
         m_RenderData.buffer = std::make_unique<byte[]>(requiredSize);
         m_RenderData.bufferSize = requiredSize;
     }
 
-    // Copy the buffer immediately - with external_begin_frame_enabled, we control timing
-    // so we copy here rather than storing a pointer and blocking
-    std::memcpy(m_RenderData.buffer.get(), buffer, requiredSize);
+    // Copy buffer - with external_begin_frame_enabled, we control timing
+    // Optimize: only copy dirty regions when buffer size hasn't changed
+    if (bSizeChanged || dirtyRects.empty())
+    {
+        // Full copy needed for new/resized buffer or if no dirty rects specified
+        std::memcpy(m_RenderData.buffer.get(), buffer, requiredSize);
+    }
+    else
+    {
+        // Partial copy - only copy dirty regions
+        const auto srcData = static_cast<const byte*>(buffer);
+        auto* dstData = m_RenderData.buffer.get();
+        const auto pitch = static_cast<size_t>(width) * CEF_PIXEL_STRIDE;
+
+        for (const auto& rect : dirtyRects)
+        {
+            // Validate rect bounds
+            if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0) [[unlikely]]
+                continue;
+            if (rect.x + rect.width > width || rect.y + rect.height > height) [[unlikely]]
+                continue;
+
+            // Copy each row of the dirty rect
+            const auto rectPitch = static_cast<size_t>(rect.width) * CEF_PIXEL_STRIDE;
+            for (int y = rect.y; y < rect.y + rect.height; ++y)
+            {
+                const auto offset = static_cast<size_t>(y) * pitch + static_cast<size_t>(rect.x) * CEF_PIXEL_STRIDE;
+                std::memcpy(&dstData[offset], &srcData[offset], rectPitch);
+            }
+        }
+    }
 
     m_RenderData.width = width;
     m_RenderData.height = height;
