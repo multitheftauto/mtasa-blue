@@ -58,9 +58,6 @@
 #include "plutovg-ft-raster.h"
 #include "plutovg-ft-math.h"
 
-#define PVG_FT_BEGIN_STMNT  do {
-#define PVG_FT_END_STMNT    } while ( 0 )
-
 #include <setjmp.h>
 
 #define pvg_ft_setjmp   setjmp

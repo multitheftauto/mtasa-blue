@@ -29,7 +29,7 @@ public:
     const Length& letter_spacing() const { return m_letter_spacing; }
     const Length& word_spacing() const { return m_word_spacing; }
 
-    const BaselineShift& baseline_shit() const { return m_baseline_shit; }
+    const BaselineShift& baseline_shift() const { return m_baseline_shift; }
     const Length& stroke_width() const { return m_stroke_width; }
     const Length& stroke_dashoffset() const { return m_stroke_dashoffset; }
     const LengthList& stroke_dasharray() const { return m_stroke_dasharray; }
@@ -87,7 +87,7 @@ private:
     Length m_letter_spacing{0.f, LengthUnits::None};
     Length m_word_spacing{0.f, LengthUnits::None};
 
-    BaselineShift m_baseline_shit;
+    BaselineShift m_baseline_shift;
     Length m_stroke_width{1.f, LengthUnits::None};
     Length m_stroke_dashoffset{0.f, LengthUnits::None};
     LengthList m_stroke_dasharray;

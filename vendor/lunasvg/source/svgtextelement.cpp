@@ -475,7 +475,7 @@ void SVGTextPositioningElement::layoutElement(const SVGLayoutState& state)
     m_letter_spacing = lengthContext.valueForLength(state.letter_spacing(), LengthDirection::Diagonal);
     m_word_spacing = lengthContext.valueForLength(state.word_spacing(), LengthDirection::Diagonal);
 
-    m_baseline_offset = convertBaselineOffset(state.baseline_shit());
+    m_baseline_offset = convertBaselineOffset(state.baseline_shift());
     m_alignment_baseline = state.alignment_baseline();
     m_dominant_baseline = state.dominant_baseline();
     m_text_anchor = state.text_anchor();

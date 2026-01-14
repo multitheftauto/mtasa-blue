@@ -483,7 +483,7 @@ SVGLayoutState::SVGLayoutState(const SVGLayoutState& parent, const SVGElement* e
             m_word_spacing = parseLengthOrNormal(input);
             break;
         case PropertyID::Baseline_Shift:
-            m_baseline_shit = parseBaselineShift(input);
+            m_baseline_shift = parseBaselineShift(input);
             break;
         case PropertyID::Stroke_Width:
             m_stroke_width = parseLength(input, LengthNegativeMode::Forbid, Length(1.f, LengthUnits::None));
