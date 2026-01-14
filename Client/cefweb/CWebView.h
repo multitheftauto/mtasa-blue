@@ -276,7 +276,6 @@ private:
     struct
     {
         bool                    changed = false;
-        bool                    needsFullCopy = true;  // Force full copy on first update or after texture reset
         std::mutex              dataMutex;
 
         // Main frame buffer - we now own this buffer (copied in OnPaint)
@@ -284,7 +283,6 @@ private:
         size_t                  bufferSize = 0;
         int                     width = 0;
         int                     height = 0;
-        CefRenderHandler::RectList dirtyRects;
 
         CefRect                 popupRect;
         bool                    popupShown = false;

@@ -75,6 +75,7 @@ void CWebBrowserItem::OnLostDevice()
 void CWebBrowserItem::OnResetDevice()
 {
     CreateUnderlyingData();
+    m_bTextureWasRecreated = true;  // Force full repaint after device reset
 }
 
 ////////////////////////////////////////////////////////////////
