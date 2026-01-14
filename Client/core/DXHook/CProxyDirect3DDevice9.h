@@ -562,6 +562,7 @@ public:
 };
 
 extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;
+extern CProxyDirect3DDevice9::SMemoryState g_StaticMemoryState;
 
 // GTA scene tracking helpers
 void ResetGTASceneState();

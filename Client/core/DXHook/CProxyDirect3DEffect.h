@@ -167,7 +167,7 @@ public:
 
 protected:
     ID3DXEffect*                            m_pOriginal;
-    CProxyDirect3DDevice9::SResourceMemory& m_stats;
+    CProxyDirect3DDevice9::SResourceMemory* m_pStats;
 };
 
 HRESULT WINAPI MyD3DXCreateEffectFromFile(LPDIRECT3DDEVICE9 pDevice, LPCSTR pSrcFile, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, DWORD Flags,

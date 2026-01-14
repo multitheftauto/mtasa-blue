@@ -28,6 +28,28 @@ void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void* (*)[2])0x8E4CAC;
 
 namespace
 {
+    bool IsValidPtr(const void* ptr) noexcept
+    {
+        if (!ptr)
+            return false;
+
+        __try
+        {
+            const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
+            const auto* v = p->VFTBL;
+            if (!v)
+                return false;
+
+            volatile DWORD test = v->Destructor;
+            static_cast<void>(test);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
     //
     // Used in LoadAllRequestedModels to record state
     //
@@ -243,8 +265,25 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     else
     {
         CBaseModelInfoSAInterface** ppModelInfo = reinterpret_cast<CBaseModelInfoSAInterface**>(ARRAY_ModelInfo);
-        if (dwModelID < MODELINFO_DFF_MAX && !ppModelInfo[dwModelID])
-            return;
+        if (dwModelID < MODELINFO_DFF_MAX)
+        {
+            CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[dwModelID];
+            if (!IsValidPtr(pModelInfo))
+            {
+                ppModelInfo[dwModelID] = nullptr;
+
+                CStreamingInfo* pStreamInfo = GetStreamingInfo(dwModelID);
+                if (pStreamInfo)
+                {
+                    pStreamInfo->prevId = static_cast<unsigned short>(-1);
+                    pStreamInfo->nextId = static_cast<unsigned short>(-1);
+                    pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
+                    pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+                }
+
+                return;
+            }
+        }
 
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
         // clang-format off
@@ -362,12 +401,8 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     const auto baseTxdId = g_pCore->GetGame()->GetBaseIDforTXD();
     if (modelid < static_cast<uint>(baseTxdId))
     {
-        if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid, true))
-        {
-            // Only DFF models got RwObjects, TXDs don't, so we only flush those here (or crash)
-            if (modelInfo->GetRwObject())
-                RemoveModel(modelid);
-        }
+        if (pItemInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+            RemoveModel(modelid);
     }
 
     // Change nextInImg field for prev model
@@ -472,7 +507,7 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
     numBlocks += numBlocks % 2; // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
-    
+
     // Check if the size is the same already
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
         return true;
