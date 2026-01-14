@@ -58,7 +58,7 @@ protected:
     DWORD                                   m_dwUsage;
     DWORD                                   m_dwFVF;
     D3DPOOL                                 m_pool;
-    CProxyDirect3DDevice9::SResourceMemory& m_stats;
+    CProxyDirect3DDevice9::SResourceMemory* m_pStats;
 
     bool                 m_bFallbackActive;
     UINT                 m_fallbackOffset;
