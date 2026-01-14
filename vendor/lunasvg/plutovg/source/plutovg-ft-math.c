@@ -46,9 +46,6 @@ static inline int clz(unsigned int x) {
 #define PVG_FT_PAD_ROUND(x, n) PVG_FT_PAD_FLOOR((x) + ((n) / 2), n)
 #define PVG_FT_PAD_CEIL(x, n) PVG_FT_PAD_FLOOR((x) + ((n)-1), n)
 
-#define PVG_FT_BEGIN_STMNT do {
-#define PVG_FT_END_STMNT } while (0)
-
 /* transfer sign leaving a positive number */
 #define PVG_FT_MOVE_SIGN(x, s) \
     PVG_FT_BEGIN_STMNT         \
