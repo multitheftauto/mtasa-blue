@@ -107,6 +107,11 @@ namespace SharedUtil
     namespace File
     {
         FILE* Fopen(const char* szFilename, const char* szMode);
+        FILE* FopenExclusive(const char* szFilename, const char* szMode);
+#if defined(_WIN32) && defined(MTA_CLIENT)
+        FILE* TryFopen(const char* szFilename, const char* szMode);
+        FILE* TryFopenExclusive(const char* szFilename, const char* szMode);
+#endif
         int   Mkdir(const char* szPath, int iMode = 0775);
         int   Chdir(const char* szPath);
         int   Rmdir(const char* szPath);
