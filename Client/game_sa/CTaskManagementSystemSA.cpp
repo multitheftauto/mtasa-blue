@@ -138,12 +138,14 @@ CTaskSA* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
     DWORD dwFunc = pVTBL->GetTaskType;
     if (dwFunc && dwFunc != 0x82263A)
     {
+        // clang-format off
         __asm
         {
             mov     ecx, pTaskInterface
             call    dwFunc
             mov     iTaskType, eax
         }
+        // clang-format on
     }
 
     // Create it and add it to our list
@@ -281,6 +283,7 @@ static void __declspec(naked) HOOK_CTask_Operator_Delete()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -295,4 +298,5 @@ static void __declspec(naked) HOOK_CTask_Operator_Delete()
         add     eax, 6
         jmp     eax
     }
+    // clang-format on
 }

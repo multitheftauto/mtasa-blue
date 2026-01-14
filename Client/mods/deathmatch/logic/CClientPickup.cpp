@@ -84,7 +84,7 @@ void CClientPickup::SetPosition(const CVector& vecPosition)
 
 void CClientPickup::SetModel(unsigned short usModel)
 {
-    // Different from our current id?
+    // Different from our current model?
     if (m_usModel != usModel)
     {
         // Set the model and recreate the pickup
@@ -114,7 +114,13 @@ void CClientPickup::SetVisible(bool bVisible)
     if (IsStreamedIn())
     {
         if (bVisible)
-            Create();
+        {
+            // Attempt to create - revert visibility if failed
+            if (!Create())
+            {
+                m_bVisible = false;
+            }
+        }
         else
             Destroy();
     }
@@ -122,41 +128,68 @@ void CClientPickup::SetVisible(bool bVisible)
 
 void CClientPickup::StreamIn(bool bInstantly)
 {
-    // Create it
-    Create();
+    // Invisible pickups don't need a game object - just notify streamer
+    if (!m_bVisible)
+    {
+        NotifyCreate();
+        return;
+    }
 
-    // Notify the streamer we've created it
-    NotifyCreate();
+    // Create the pickup and notify the streamer of the result
+    if (Create())
+    {
+        NotifyCreate();
+    }
+    else
+    {
+        NotifyUnableToCreate();
+    }
 }
 
 void CClientPickup::StreamOut()
 {
-    // Destroy it
+    // Destroy the pickup
     Destroy();
 }
 
-void CClientPickup::Create()
+bool CClientPickup::Create()
 {
     if (!m_pPickup && m_bVisible)
     {
+        // Grab the attributes from the MTA interface for this pickup
+        unsigned char  ucAreaCode = GetInterior();
+        unsigned short usDimension = GetDimension();
+
         // Create the pickup
         m_pPickup = g_pGame->GetPickups()->CreatePickup(&m_vecPosition, m_usModel, PickupType::PICKUP_ONCE);
-        m_pObject = NULL;
+        m_pObject = nullptr;
         if (m_pPickup)
         {
-            // Grab the attributes from the MTA interface for this pickup
-            unsigned char  ucAreaCode = GetInterior();
-            unsigned short usDimension = GetDimension();
-
-            // Make sure we have an object
+            // Make sure we have an object - request one if needed
             if (!m_pPickup->GetObject())
-                m_pPickup->GiveUsAPickUpObject();
+            {
+                if (!m_pPickup->GiveUsAPickUpObject())
+                {
+                    // Failed to create object - clean up and fail
+                    m_pPickup->Remove();
+                    m_pPickup = nullptr;
+                    return false;
+                }
+            }
 
             // Store our pickup's object
             m_pObject = m_pPickup->GetObject();
+            
+            // Validate the object was stored correctly
+            if (!m_pObject)
+            {
+                m_pPickup->Remove();
+                m_pPickup = nullptr;
+                return false;
+            }
 
-            // Create our collision
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, m_vecPosition, 1.0f);
+            // Create our collision sphere
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), ElementID(INVALID_ELEMENT_ID), m_vecPosition, 1.0f);
             m_pCollision->m_pOwningPickup = this;
             m_pCollision->SetHitCallback(this);
             m_pCollision->SetCanBeDestroyedByScript(false);
@@ -170,37 +203,42 @@ void CClientPickup::Create()
 
             // Reattach to an entity + any entities attached to this
             ReattachEntities();
+            return true;
         }
     }
+    return false;
 }
 
 void CClientPickup::Destroy()
 {
+    // Delete the collision sphere
     if (m_pCollision)
     {
         delete m_pCollision;
-        m_pCollision = NULL;
+        m_pCollision = nullptr;
     }
+    // Delete the pickup
     if (m_pPickup)
     {
-        // Delete the pickup
+        // Clear object reference before Remove() to prevent dangling pointer
+        m_pObject = nullptr;
         m_pPickup->Remove();
-        m_pPickup = NULL;
-        m_pObject = NULL;
+        m_pPickup = nullptr;
 
         // Decrement pickup counter
         --m_pPickupManager->m_uiPickupCount;
     }
 }
 
-void CClientPickup::ReCreate()
+bool CClientPickup::ReCreate()
 {
     // If we had a pickup, destroy and recreate it
     if (m_pPickup)
     {
         Destroy();
-        Create();
+        return Create();
     }
+    return false;
 }
 
 void CClientPickup::Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity)
@@ -241,4 +279,17 @@ void CClientPickup::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Enti
         Arguments2.PushBoolean(bMatchingDimensions);
         Entity.CallEvent("onClientPlayerPickupLeave", Arguments2, true);
     }
+}
+
+void CClientPickup::NotifyUnableToCreate()
+{
+    // Clean up any collision sphere we may have created
+    if (m_pCollision)
+    {
+        delete m_pCollision;
+        m_pCollision = nullptr;
+    }
+
+    // Notify the streamer we were unable to create the pickup
+    CClientStreamElement::NotifyUnableToCreate();
 }

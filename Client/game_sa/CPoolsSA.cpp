@@ -81,23 +81,28 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     if (m_vehiclePool.ulCount >= MAX_VEHICLES)
         return nullptr;
 
-    // Ensure collision model is fully loaded to prevent crash at 0x002a65ef in SetupSuspensionLines
     CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(model));
-    if (!pModelInfo || !pModelInfo->GetInterface())
+    if (!pModelInfo)
         return nullptr;
-    
+
+    if (!pModelInfo->GetInterface())
+    {
+        pGame->GetStreaming()->RequestModel(model, 0x16);
+        pGame->GetStreaming()->LoadAllRequestedModels(true, "CPoolsSA::AddVehicle");
+        if (!pModelInfo->GetInterface())
+            return nullptr;
+    }
+
     CBaseModelInfoSAInterface* pModelInterface = pModelInfo->GetInterface();
 
-    // Ensure collision model pointer exists
     if (!pModelInterface->pColModel)
     {
-        // Collision model pointer is NULL - try loading
         pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
-        
-        // Re-fetch interface as loading may have invalidated pointer
+
         pModelInterface = pModelInfo->GetInterface();
-        
-        // Still NULL means model has no collision (or loading failed) - block creation
+        if (!pModelInterface)
+            return nullptr;
+
         if (!pModelInterface->pColModel)
             return nullptr;
     }
@@ -269,6 +274,21 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
+        CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(dwModelID));
+        if (!pModelInfo)
+            return nullptr;
+
+        if (!pModelInfo->GetInterface())
+        {
+            pGame->GetStreaming()->RequestModel(dwModelID, 0x16);
+            pGame->GetStreaming()->LoadAllRequestedModels(true, "CPoolsSA::AddObject");
+            if (!pModelInfo->GetInterface())
+            {
+                AddReportLog(5552, SString("Failed to create object with model %d - model invalid or deallocated", dwModelID));
+                return nullptr;
+            }
+        }
+
         pObject = new (std::nothrow) CObjectSA(dwModelID, bBreakingDisabled);
 
         if (pObject && AddObjectToPool(pClientObject, pObject))
@@ -693,7 +713,7 @@ DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
     {
         return MAX_PEDS;
     }
-    return ((pInterface - pTheObjects) / dwAlignedSize); 
+    return ((pInterface - pTheObjects) / dwAlignedSize);
 }
 
 DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
@@ -764,10 +784,37 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 
     unsigned int NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
 
+    auto isValidPtr = [](const void* ptr) noexcept -> bool {
+        if (!ptr)
+            return false;
+
+        __try
+        {
+            const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
+            const auto* v = p->VFTBL;
+            if (!v)
+                return false;
+
+            volatile DWORD test = v->Destructor;
+            static_cast<void>(test);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    };
+
     for (uint i = 1; i < NUMBER_OF_MODELS; i++)
     {
-        CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[i];
-        if (m_pInterface && m_pInterface->pRwObject == (RwObject*)pRpClump)
+        CBaseModelInfoSAInterface* pInterface = ppModelInfo[i];
+        if (!pInterface)
+            continue;
+
+        if (!isValidPtr(pInterface))
+            continue;
+
+        if (pInterface->pRwObject == (RwObject*)pRpClump)
         {
             return i;
         }
@@ -1099,6 +1146,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
@@ -1107,6 +1155,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
             mov     iOut, eax
 
         }
+        // clang-format on
     }
 
     return iOut;
