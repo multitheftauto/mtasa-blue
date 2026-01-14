@@ -276,6 +276,7 @@ private:
     struct
     {
         bool                    changed = false;
+        bool                    needsFullCopy = true;  // Force full copy on first update or after texture reset
         std::mutex              dataMutex;
 
         // Main frame buffer - we now own this buffer (copied in OnPaint)

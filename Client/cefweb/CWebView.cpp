@@ -392,6 +392,7 @@ void CWebView::SetRenderingPaused(bool bPaused)
             m_RenderData.dirtyRects.clear();
             m_RenderData.dirtyRects.shrink_to_fit();
             m_RenderData.popupBuffer.reset();
+            m_RenderData.needsFullCopy = true;  // Force full copy when unpaused
         }
     }
 }
@@ -467,6 +468,7 @@ void CWebView::UpdateTexture()
     if (m_RenderData.changed && (m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height))
     {
         m_RenderData.changed = false;
+        m_RenderData.needsFullCopy = true;  // Force full copy after size change
     }
 
     if (m_RenderData.changed || m_RenderData.popupShown) [[likely]]
@@ -518,8 +520,9 @@ void CWebView::UpdateTexture()
                 const auto frameArea = static_cast<size_t>(m_RenderData.width) * static_cast<size_t>(m_RenderData.height);
 
                 // Determine if we should do full frame copy or partial dirty rect update
-                // Full copy is more efficient when dirty area exceeds threshold due to fewer memcpy calls
-                bool doFullCopy = dirtyRects.empty() ||
+                // Always do full copy on first update (texture may have garbage data)
+                // Full copy is also more efficient when dirty area exceeds threshold
+                bool doFullCopy = m_RenderData.needsFullCopy || dirtyRects.empty() ||
                     (dirtyRects.size() == 1 && dirtyRects[0].width == m_RenderData.width && dirtyRects[0].height == m_RenderData.height);
 
                 if (!doFullCopy && frameArea > 0)
@@ -530,6 +533,9 @@ void CWebView::UpdateTexture()
 
                 if (doFullCopy)
                 {
+                    // Clear the needsFullCopy flag after we do a full copy
+                    m_RenderData.needsFullCopy = false;
+
                     // Full frame update - copy entire buffer
                     if (destPitch == sourcePitch) [[likely]]
                     {
