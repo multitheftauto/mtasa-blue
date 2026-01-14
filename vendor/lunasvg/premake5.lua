@@ -5,6 +5,7 @@ project "lunasvg"
 	targetdir(buildpath("mta"))
 	floatingpoint "Fast"
 	rtti "Off"
+	warnings "Off"
 
 	defines {
 		"PLUTOVG_BUILD",
@@ -44,6 +45,6 @@ project "lunasvg"
 
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
-	
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }

@@ -407,7 +407,7 @@ void CMemStats::Draw()
 ///////////////////////////////////////////////////////////////
 void CMemStats::UpdateFrameStats()
 {
-    m_MemStatsNow.d3dMemory = g_pDeviceState->MemoryState;
+    m_MemStatsNow.d3dMemory = g_StaticMemoryState;
 
     static CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {&m_MemStatsNow.d3dMemory.StaticVertexBuffer,
                                                                       &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
@@ -454,8 +454,8 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
     //
     // Update 'now' state
     //
-    memStatsInfo.d3dMemory = g_pDeviceState->MemoryState;
-    memStatsInfo.frameStats = g_pDeviceState->FrameStats;
+    memStatsInfo.d3dMemory = g_StaticMemoryState;
+    memStatsInfo.frameStats = g_pDeviceState ? g_pDeviceState->FrameStats : CProxyDirect3DDevice9::SFrameStats{};
 
     g_pGraphics->GetRenderItemManager()->GetDxStatus(memStatsInfo.dxStatus);
 

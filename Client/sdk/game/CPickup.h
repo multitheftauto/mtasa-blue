@@ -41,6 +41,6 @@ public:
     virtual void         SetMonetaryValue(long lMonetaryValue) = 0;
     virtual BYTE         IsNearby() = 0;
     virtual void         Remove() = 0;
-    virtual void         GiveUsAPickUpObject(int ForcedObjectIndex = -1) = 0;
+    virtual bool         GiveUsAPickUpObject(int ForcedObjectIndex = -1) = 0;
     virtual void         GetRidOfObjects() = 0;
 };

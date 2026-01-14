@@ -54,7 +54,9 @@ namespace SharedUtil
     bool CMD5Hasher::Calculate(const char* szFilename, MD5& md5Result)
     {
         // CRYPT_START
-        // Try to load the file
+        if (!FileExists(szFilename))
+            return false;
+
         FILE* pFile = File::Fopen(szFilename, "rb");
         if (pFile)
         {
@@ -691,6 +693,9 @@ namespace SharedUtil
 
     SString GenerateHashHexStringFromFile(EHashFunctionType hashFunction, const SString& strFilename, int iMaxSize, int iOffset)
     {
+        if (!FileExists(strFilename))
+            return GenerateHashHexString(hashFunction, nullptr, 0);
+
         FILE* fh = File::Fopen(strFilename, "rb");
         if (fh)
         {
