@@ -14,6 +14,7 @@
 
 #include <variant>
 #include "SharedUtil.Hash.h"
+#include "SharedUtil.File.h"
 #include "SString.h"
 #include <bochs_internal/bochs_crc32.h>
 
@@ -36,7 +37,9 @@ public:
     // GenerateChecksumFromFile returns either a CChecksum or an error message.
     static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
-        // Reset error number before using it to report an error
+        if (!SharedUtil::FileExists(strFilename))
+            return SString("CRC could not open file: %s", "File not found or not accessible");
+
         errno = 0;
 
         CChecksum result;
