@@ -59,33 +59,34 @@ namespace SharedUtil
         template <typename Func, typename... Args>
         auto enqueue(Func&& f, Args&&... args)
         {
+#if __cplusplus < 201703L // C++17
+            using ReturnT = typename std::result_of<Func(Args...)>::type;
+#else
+            using ReturnT = std::invoke_result_t<Func, Args...>;
+#endif
 
-	#if __cplusplus < 201703L // C++17
-	    using ReturnT = typename std::result_of<Func(Args...)>::type;
-	#else
-	    using ReturnT = std::invoke_result_t<Func, Args...>;
-	#endif
-
-    auto  ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
-    auto task = std::make_shared<std::packaged_task<ReturnT()>>(ff);
-
-    // Package the task in a wrapper with a common void result
-    // plus a skip flag for destruction without running the task
-    std::packaged_task<void(bool)> resultTask([task](bool skip) {
-        if (!skip)
-            (*task)();
-        // task automatically deleted when shared_ptr goes out of scope
-    });
-
-            // Add task to queue and return future
+            auto ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
+            auto task = std::make_shared<std::packaged_task<ReturnT()>>(ff);
             std::future<ReturnT> res = task->get_future();
+
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
                 if (m_exit)
                 {
-                    // Pool is shutting down - reject new tasks
-                    throw std::runtime_error("Cannot enqueue task: thread pool is shutting down");
+                    // Return failed future instead of throwing (avoids crash if caller ignores result)
+                    lock.unlock();
+                    std::promise<ReturnT> failedPromise;
+                    failedPromise.set_exception(std::make_exception_ptr(
+                        std::runtime_error("Cannot enqueue task: thread pool is shutting down")));
+                    return failedPromise.get_future();
                 }
+
+                // Wrap task with skip flag for shutdown cleanup
+                std::packaged_task<void(bool)> resultTask([task](bool skip) {
+                    if (!skip)
+                        (*task)();
+                });
+
                 m_tasks.emplace(std::move(resultTask));
             }
             m_cv.notify_one();
@@ -96,11 +97,11 @@ namespace SharedUtil
         {
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
-                
+
                 // Already shutting down or shut down
                 if (m_exit)
                     return;
-                
+
                 m_exit = true;
 
                 // Clear all remaining tasks (they will be destroyed automatically)

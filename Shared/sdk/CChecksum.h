@@ -13,7 +13,10 @@
 #define __CChecksum_H
 
 #include <variant>
+#include <thread>
+#include <chrono>
 #include "SharedUtil.Hash.h"
+#include "SharedUtil.File.h"
 #include "SString.h"
 #include <bochs_internal/bochs_crc32.h>
 
@@ -21,12 +24,7 @@
 class CChecksum
 {
 public:
-    // Initialize to zeros
-    CChecksum()
-    {
-        ulCRC = 0;
-        memset(md5.data, 0, sizeof(md5.data));
-    }
+    CChecksum() : ulCRC(0), md5{} {}
 
     // Comparison operators
     bool operator==(const CChecksum& other) const { return ulCRC == other.ulCRC && memcmp(md5.data, other.md5.data, sizeof(md5.data)) == 0; }
@@ -36,21 +34,53 @@ public:
     // GenerateChecksumFromFile returns either a CChecksum or an error message.
     static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
-        // Reset error number before using it to report an error
-        errno = 0;
+        constexpr int maxRetries = 3;
+        constexpr int retryDelayMs = 50;
+        int lastErrno = 0;
+        int attemptsMade = 0;
 
-        CChecksum result;
-        result.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
+        for (int attempt = 0; attempt < maxRetries; ++attempt)
+        {
+            ++attemptsMade;
 
-        if (!result.ulCRC && errno)
-            return SString("CRC could not open file: %s", std::strerror(errno));
+            if (attempt > 0)
+                std::this_thread::sleep_for(std::chrono::milliseconds(retryDelayMs * attempt));
 
-        bool success = CMD5Hasher().Calculate(strFilename, result.md5);
+            errno = 0;
 
-        if (!success)
-            return SString("MD5 could not open file: %s", std::strerror(errno));
+            CChecksum result;
+            result.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
 
-        return result;
+            if (errno)
+            {
+                lastErrno = errno;
+                if (errno == ENOENT)
+                    break;
+                continue;
+            }
+
+            errno = 0;
+            bool success = CMD5Hasher().Calculate(strFilename, result.md5);
+
+            if (!success)
+            {
+                lastErrno = errno ? errno : EIO;
+                if (errno == ENOENT)
+                    break;
+                continue;
+            }
+
+            return result;
+        }
+
+        if (lastErrno == ENOENT)
+            return SString("File not found: %s", strFilename.c_str());
+
+        return SString("Could not checksum '%s' after %d attempt%s: %s", 
+                       strFilename.c_str(),
+                       attemptsMade, 
+                       attemptsMade == 1 ? "" : "s",
+                       lastErrno ? std::strerror(lastErrno) : "Unknown error");
     }
 
     // GenerateChecksumFromFileUnsafe should never ever be used unless you are a bad person. Or unless you really know what you're doing.

@@ -53,35 +53,38 @@ namespace SharedUtil
 
     bool CMD5Hasher::Calculate(const char* szFilename, MD5& md5Result)
     {
-        // CRYPT_START
-        // Try to load the file
-        FILE* pFile = File::Fopen(szFilename, "rb");
+        FILE* pFile = File::FopenExclusive(szFilename, "rb");
         if (pFile)
         {
-            // Init
             Init();
 
-            // Hash it
-            unsigned char Buffer[65536];
-            while (unsigned int uiRead = static_cast<unsigned int>(fread(Buffer, 1, 65536, pFile)))
+            constexpr size_t bufferSize = 65536;
+            unsigned char Buffer[bufferSize];
+            while (true)
             {
-                Update(Buffer, uiRead);
+                size_t bytesRead = fread(Buffer, 1, bufferSize, pFile);
+                if (bytesRead == 0)
+                {
+                    if (ferror(pFile))
+                    {
+                        fclose(pFile);
+                        errno = EIO;
+                        return false;
+                    }
+                    break;
+                }
+                Update(Buffer, static_cast<unsigned int>(bytesRead));
             }
 
-            // Finalize
             Finalize();
 
-            // Close it
             fclose(pFile);
 
-            // Success
             memcpy(md5Result.data, m_digest, 16);
             return true;
         }
 
-        // Failed
         return false;
-        // CRYPT_END
     }
 
     bool CMD5Hasher::Calculate(const void* pBuffer, size_t sizeLength, MD5& md5Result)
