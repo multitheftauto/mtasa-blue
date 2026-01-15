@@ -1471,6 +1471,11 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
         
         if (bIsStaleEntry)
         {
+            unsigned int uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
+            CStreamingInfo* pStreamInfoBusyCheck = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
+            bool bBusy = pStreamInfoBusyCheck && (pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_READING || pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_FINISHING);
+            if (bBusy && !pCurrentTxd)
+                return nullptr;
 
             // Cache replacement textures to re-apply after TXD reload
             std::unordered_map<unsigned short, CModelInfoSA*> modelInfoCache;
@@ -1485,8 +1490,11 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             }
 
             std::vector<std::pair<SReplacementTextures*, std::vector<unsigned short>>> replacementsToReapply;
+            std::vector<SReplacementTextures*> originalUsed;
             for (SReplacementTextures* pReplacement : info.usedByReplacements)
             {
+                if (pReplacement)
+                    originalUsed.push_back(pReplacement);
                 std::vector<unsigned short> modelIds;
                 for (unsigned short modelId : pReplacement->usedInModelIds)
                 {
@@ -1693,18 +1701,47 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             }
             info.usedByReplacements.clear();
 
+            auto restoreState = [&]()
+            {
+                for (SReplacementTextures* pReplacement : originalUsed)
+                {
+                    if (!pReplacement)
+                        continue;
+                    if (std::find(info.usedByReplacements.begin(), info.usedByReplacements.end(), pReplacement) == info.usedByReplacements.end())
+                        info.usedByReplacements.push_back(pReplacement);
+                }
+                for (auto& entry : replacementsToReapply)
+                {
+                    SReplacementTextures* pReplacement = entry.first;
+                    if (!pReplacement)
+                        continue;
+                    for (unsigned short modelId : entry.second)
+                        pReplacement->usedInModelIds.insert(modelId);
+                }
+            };
+
             if (pCurrentTxd)
             {
                 info.pTxd = pCurrentTxd;
                 PopulateOriginalTextures(info, pCurrentTxd);
+                restoreState();
             }
             else
             {
                 unsigned int uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
-                pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
-                pGame->GetStreaming()->LoadAllRequestedModels(true, "CRenderWareSA::GetModelTexturesInfo-TXD");
-                
-                pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
+                CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
+                bool bLoaded = pStreamInfo && pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED;
+                bool bBusyStream = pStreamInfo && (pStreamInfo->loadState == eModelLoadState::LOADSTATE_READING || pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING);
+                if (bBusyStream)
+                {
+                    restoreState();
+                    return nullptr;
+                }
+                if (!bLoaded)
+                {
+                    pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                    pGame->GetStreaming()->LoadAllRequestedModels(false, "GetModelTexturesInfo-txd");
+                }
 
                 unsigned short uiNewTxdId = pModelInfo->GetTextureDictionaryID();
 
@@ -1727,12 +1764,69 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 }
                 else
                 {
-                    if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
-                        CRenderWareSA::DebugTxdRemoveRef(usTxdId, "GetModelTexturesInfo-blocking-fail");
-                    else if (info.bHasLeakedTextures)
-                        g_PendingLeakedTxdRefs.insert(usTxdId);
-                    MapRemove(ms_ModelTexturesInfoMap, usTxdId);
-                    return nullptr;
+                    pGame->GetStreaming()->LoadAllRequestedModels(false, "GetModelTexturesInfo-txd-retry");
+                    pCurrentTxd = CTxdStore_GetTxd(usTxdId);
+
+                    if (pCurrentTxd)
+                    {
+                        info.pTxd = pCurrentTxd;
+                        PopulateOriginalTextures(info, pCurrentTxd);
+                        restoreState();
+                    }
+                    else
+                    {
+                        CStreamingInfo* pStreamInfoRetry = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
+                        bool bBusyRetry = pStreamInfoRetry && (pStreamInfoRetry->loadState == eModelLoadState::LOADSTATE_READING || pStreamInfoRetry->loadState == eModelLoadState::LOADSTATE_FINISHING);
+                        if (bBusyRetry)
+                        {
+                            restoreState();
+                            return nullptr;
+                        }
+
+                        // Second pass: if TXD still not present and stream isn't marked loaded, push a fresh request before the final load pass.
+                        if (!pStreamInfoRetry || pStreamInfoRetry->loadState != eModelLoadState::LOADSTATE_LOADED)
+                            pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                        pGame->GetStreaming()->LoadAllRequestedModels(false, "GetModelTexturesInfo-txd-retry2");
+                        pCurrentTxd = CTxdStore_GetTxd(usTxdId);
+
+                        if (pCurrentTxd)
+                        {
+                            info.pTxd = pCurrentTxd;
+                            PopulateOriginalTextures(info, pCurrentTxd);
+                        }
+                        else
+                        {
+                            CStreamingInfo* pStreamInfoRetry2 = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
+                            bool bBusy = pStreamInfoRetry2 && (pStreamInfoRetry2->loadState == eModelLoadState::LOADSTATE_READING || pStreamInfoRetry2->loadState == eModelLoadState::LOADSTATE_FINISHING);
+                            if (bBusy)
+                            {
+                                restoreState();
+                                return nullptr;
+                            }
+
+                            if (!pStreamInfoRetry2 || pStreamInfoRetry2->loadState != eModelLoadState::LOADSTATE_LOADED)
+                                pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                            pGame->GetStreaming()->LoadAllRequestedModels(true, "GetModelTexturesInfo-txd-retry3");
+                            pCurrentTxd = CTxdStore_GetTxd(usTxdId);
+
+                            if (pCurrentTxd)
+                            {
+                                info.pTxd = pCurrentTxd;
+                                PopulateOriginalTextures(info, pCurrentTxd);
+                                restoreState();
+                            }
+                            else
+                            {
+                                restoreState();
+                                if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
+                                    CRenderWareSA::DebugTxdRemoveRef(usTxdId, "GetModelTexturesInfo-blocking-fail");
+                                else if (info.bHasLeakedTextures)
+                                    g_PendingLeakedTxdRefs.insert(usTxdId);
+                                MapRemove(ms_ModelTexturesInfoMap, usTxdId);
+                                return nullptr;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1807,10 +1901,39 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
     if (!pTxd)
     {
         unsigned int uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
-        pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
-        pGame->GetStreaming()->LoadAllRequestedModels(true, "CRenderWareSA::GetModelTexturesInfo-TXD");
-
+        CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
+        bool bLoaded = pStreamInfo && pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED;
+        if (!bLoaded)
+        {
+            pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+            pGame->GetStreaming()->LoadAllRequestedModels(false, "GetModelTexturesInfo-txd");
+        }
         pTxd = CTxdStore_GetTxd(usTxdId);
+
+        if (!pTxd)
+        {
+            CStreamingInfo* pStreamInfoRetry = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
+            bool bBusy = pStreamInfoRetry && (pStreamInfoRetry->loadState == eModelLoadState::LOADSTATE_READING || pStreamInfoRetry->loadState == eModelLoadState::LOADSTATE_FINISHING);
+            if (bBusy)
+                return nullptr;
+
+            pGame->GetStreaming()->LoadAllRequestedModels(false, "GetModelTexturesInfo-txd-retry");
+            pTxd = CTxdStore_GetTxd(usTxdId);
+
+            if (!pTxd)
+            {
+                CStreamingInfo* pStreamInfoRetry2 = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
+                bool bBusyRetry = pStreamInfoRetry2 && (pStreamInfoRetry2->loadState == eModelLoadState::LOADSTATE_READING || pStreamInfoRetry2->loadState == eModelLoadState::LOADSTATE_FINISHING);
+                if (bBusyRetry)
+                    return nullptr;
+
+                if (!pStreamInfoRetry2 || pStreamInfoRetry2->loadState != eModelLoadState::LOADSTATE_LOADED)
+                    pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                pGame->GetStreaming()->LoadAllRequestedModels(false, "GetModelTexturesInfo-txd-retry2");
+                pTxd = CTxdStore_GetTxd(usTxdId);
+            }
+        }
+
         if (pTxd)
             CRenderWareSA::DebugTxdAddRef(usTxdId, "GetModelTexturesInfo-cache-miss");
     }
