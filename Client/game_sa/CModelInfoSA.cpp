@@ -125,6 +125,59 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
     }
 }
 
+static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept
+{
+    __try
+    {
+        *pOut = pColModel->m_sphere.m_collisionSlot;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+static bool SafeReadColData(CColModelSAInterface* pColModel, CColDataSA** pOut) noexcept
+{
+    __try
+    {
+        *pOut = pColModel->m_data;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+static bool SafeReadSuspLines(CColDataSA* pColData, void** pOut) noexcept
+{
+    __try
+    {
+        *pOut = pColData->m_suspensionLines;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+static bool SafeSwapSuspLines(CColDataSA* pColData, void* pNew, void** pOld) noexcept
+{
+    __try
+    {
+        *pOld = pColData->m_suspensionLines;
+        pColData->m_suspensionLines = reinterpret_cast<CColLineSA*>(pNew);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
@@ -150,9 +203,16 @@ CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
         m_pInterface = nullptr;
         return nullptr;
     }
-    if (m_pInterface && m_usColSlot == 0xFFFF && m_pInterface->pColModel)
+    if (m_usColSlot == 0xFFFF && m_pInterface->pColModel)
     {
-        m_usColSlot = m_pInterface->pColModel->m_sphere.m_collisionSlot;
+        unsigned short slot;
+        if (!SafeReadColSlot(m_pInterface->pColModel, &slot))
+        {
+            AddReportLog(5553, SString("GetInterface: pColModel access failed for model %u", m_dwModelID), 10);
+            m_pInterface = nullptr;
+            return nullptr;
+        }
+        m_usColSlot = slot;
     }
     return m_pInterface;
 }
@@ -1688,20 +1748,41 @@ void* CModelInfoSA::GetVehicleSuspensionData()
     if (!pColModel)
         return nullptr;
 
-    CColDataSA* pColData = pColModel->m_data;
+    CColDataSA* pColData = nullptr;
+    if (!SafeReadColData(pColModel, &pColData))
+    {
+        AddReportLog(5554, SString("GetVehicleSuspensionData: ColData read failed for model %u", m_dwModelID), 10);
+        return nullptr;
+    }
+
     if (!pColData)
     {
-        const unsigned short slot = pColModel->m_sphere.m_collisionSlot;
-        const DWORD          colId = static_cast<DWORD>(RESOURCE_ID_COL + slot);
+        unsigned short slot;
+        if (!SafeReadColSlot(pColModel, &slot))
+        {
+            AddReportLog(5554, SString("GetVehicleSuspensionData: ColSlot read failed for model %u", m_dwModelID), 10);
+            return nullptr;
+        }
+        const DWORD colId = static_cast<DWORD>(RESOURCE_ID_COL + slot);
         pGame->GetStreaming()->RequestModel(colId, 0x16);
         pGame->GetStreaming()->LoadAllRequestedModels(true, "GetVehicleSuspensionData");
 
-        pColData = pColModel->m_data;
+        if (!SafeReadColData(pColModel, &pColData))
+        {
+            AddReportLog(5554, SString("GetVehicleSuspensionData: ColData read failed post-load for model %u", m_dwModelID), 10);
+            return nullptr;
+        }
         if (!pColData)
             return nullptr;
     }
 
-    return pColData->m_suspensionLines;
+    void* pLines = nullptr;
+    if (!SafeReadSuspLines(pColData, &pLines))
+    {
+        AddReportLog(5554, SString("GetVehicleSuspensionData: SuspLines read failed for model %u", m_dwModelID), 10);
+        return nullptr;
+    }
+    return pLines;
 }
 
 void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
@@ -1719,22 +1800,41 @@ void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
     if (!pColModel)
         return nullptr;
 
-    CColDataSA* pColData = pColModel->m_data;
+    CColDataSA* pColData = nullptr;
+    if (!SafeReadColData(pColModel, &pColData))
+    {
+        AddReportLog(5555, SString("SetVehicleSuspensionData: ColData read failed for model %u", m_dwModelID), 10);
+        return nullptr;
+    }
+
     if (!pColData)
     {
-        const unsigned short slot = pColModel->m_sphere.m_collisionSlot;
-        const DWORD          colId = static_cast<DWORD>(RESOURCE_ID_COL + slot);
+        unsigned short slot;
+        if (!SafeReadColSlot(pColModel, &slot))
+        {
+            AddReportLog(5555, SString("SetVehicleSuspensionData: ColSlot read failed for model %u", m_dwModelID), 10);
+            return nullptr;
+        }
+        const DWORD colId = static_cast<DWORD>(RESOURCE_ID_COL + slot);
         pGame->GetStreaming()->RequestModel(colId, 0x16);
         pGame->GetStreaming()->LoadAllRequestedModels(true, "SetVehicleSuspensionData");
 
-        pColData = pColModel->m_data;
+        if (!SafeReadColData(pColModel, &pColData))
+        {
+            AddReportLog(5555, SString("SetVehicleSuspensionData: ColData read failed post-load for model %u", m_dwModelID), 10);
+            return nullptr;
+        }
         if (!pColData)
             return nullptr;
     }
 
-    void* pOrigSuspensionLines = pColData->m_suspensionLines;
-    pColData->m_suspensionLines = reinterpret_cast<CColLineSA*>(pSuspensionLines);
-    return pOrigSuspensionLines;
+    void* pOld = nullptr;
+    if (!SafeSwapSuspLines(pColData, pSuspensionLines, &pOld))
+    {
+        AddReportLog(5555, SString("SetVehicleSuspensionData: SuspLines swap failed for model %u", m_dwModelID), 10);
+        return nullptr;
+    }
+    return pOld;
 }
 
 CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
@@ -2123,13 +2223,23 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
     if (IsValidModelInfoPtr(m_pInterface))
     {
-        // If no collision model has been set before, store the original in case we want to restore it
         if (!m_pOriginalColModelInterface)
         {
             m_pOriginalColModelInterface = m_pInterface->pColModel;
             m_originalFlags = GetOriginalFlags();
             if (m_pOriginalColModelInterface)
-                m_usColSlot = m_pOriginalColModelInterface->m_sphere.m_collisionSlot;
+            {
+                unsigned short slot;
+                if (!SafeReadColSlot(m_pOriginalColModelInterface, &slot))
+                {
+                    AddReportLog(5556, SString("SetColModel: pColModel access failed for model %u", m_dwModelID), 10);
+                    m_pOriginalColModelInterface = nullptr;
+                }
+                else
+                {
+                    m_usColSlot = slot;
+                }
+            }
         }
 
         // Apply some low-level hacks
@@ -2189,9 +2299,21 @@ void CModelInfoSA::RestoreColModel()
 
         m_pInterface->usFlags = m_originalFlags;
 
-        if (!m_pInterface->pColModel->m_data && m_dwReferences > 1)
+        CColDataSA*    pColData = nullptr;
+        unsigned short slot = 0xFFFF;
+        if (m_pInterface->pColModel)
         {
-            pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
+            if (!SafeReadColData(m_pInterface->pColModel, &pColData))
+            {
+                AddReportLog(5559, SString("RestoreColModel: ColData read failed for model %u", m_dwModelID), 10);
+            }
+            else if (!pColData && m_dwReferences > 1)
+            {
+                if (SafeReadColSlot(m_pInterface->pColModel, &slot))
+                    pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + slot);
+                else
+                    AddReportLog(5559, SString("RestoreColModel: ColSlot read failed for model %u", m_dwModelID), 10);
+            }
         }
     }
 
@@ -2246,15 +2368,27 @@ void CModelInfoSA::AddColRef()
             AddReportLog(5552, SString("AddColRef called with null/invalid interface for model %u", m_dwModelID), 10);
     }
 
+    unsigned short slot = m_usColSlot;
     if (originalColModel)
-        m_usColSlot = originalColModel->m_sphere.m_collisionSlot;
+    {
+        unsigned short readSlot;
+        if (SafeReadColSlot(originalColModel, &readSlot))
+        {
+            slot = readSlot;
+            m_usColSlot = slot;
+        }
+        else
+        {
+            AddReportLog(5557, SString("AddColRef: pColModel access failed for model %u", m_dwModelID), 10);
+        }
+    }
 
-    if (m_usColSlot != 0xFFFF && pGame)
+    if (slot != 0xFFFF && pGame)
     {
         auto* pColStore = pGame->GetCollisionStore();
         if (pColStore)
         {
-            pColStore->AddRef(m_usColSlot);
+            pColStore->AddRef(slot);
             ++m_colRefCount;
         }
     }
@@ -2278,9 +2412,17 @@ void CModelInfoSA::RemoveColRef()
 
     unsigned short slot = 0xFFFF;
     if (originalColModel)
-        slot = originalColModel->m_sphere.m_collisionSlot;
+    {
+        if (!SafeReadColSlot(originalColModel, &slot))
+        {
+            AddReportLog(5558, SString("RemoveColRef: pColModel access failed for model %u", m_dwModelID), 10);
+            slot = m_usColSlot;
+        }
+    }
     else
+    {
         slot = m_usColSlot;
+    }
 
     if (slot == 0xFFFF)
         return;
