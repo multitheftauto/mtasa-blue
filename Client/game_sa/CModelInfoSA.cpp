@@ -125,6 +125,11 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
     }
 }
 
+static bool IsValidGtaSaCodePtr(DWORD addr) noexcept
+{
+    return addr >= 0x401000 && addr < 0x900000;
+}
+
 static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept
 {
     __try
@@ -487,19 +492,19 @@ uint CModelInfoSA::GetAnimFileIndex()
         return 0xFFFFFFFF;
 
     DWORD dwFunc = m_pInterface->VFTBL->GetAnimFileIndex;
+    if (!IsValidGtaSaCodePtr(dwFunc))
+        return 0xFFFFFFFF;
+
     DWORD dwThis = (DWORD)m_pInterface;
     uint  uiReturn = 0;
-    if (dwFunc)
+    // clang-format off
+    __asm
     {
-        // clang-format off
-        __asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-            mov     uiReturn, eax
-        }
-        // clang-format on
+        mov     ecx, dwThis
+        call    dwFunc
+        mov     uiReturn, eax
     }
+    // clang-format on
     return uiReturn;
 }
 
@@ -868,7 +873,12 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
         case eModelIdeFlag::IS_CRANE:
             return m_pInterface->eSpecialModelType == eModelSpecialType::CRANE;
         case eModelIdeFlag::IS_DAMAGABLE:
-            return ((bool (*)())m_pInterface->VFTBL->AsDamageAtomicModelInfoPtr)();
+        {
+            DWORD funcAddr = m_pInterface->VFTBL->AsDamageAtomicModelInfoPtr;
+            if (!IsValidGtaSaCodePtr(funcAddr))
+                return false;
+            return ((bool (*)())funcAddr)();
+        }
         case eModelIdeFlag::DOES_NOT_COLLIDE_WITH_FLYER:
             return m_pInterface->bDontCollideWithFlyer;
         case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
@@ -1183,7 +1193,13 @@ void CModelInfoSA::StaticResetModelTimes()
             continue;
         }
 
-        const eModelInfoType modelType = ((eModelInfoType(*)())pInterface->VFTBL->GetModelType)();
+        DWORD funcAddr = pInterface->VFTBL->GetModelType;
+        if (!IsValidGtaSaCodePtr(funcAddr))
+        {
+            it = ms_ModelDefaultModelTimeInfo.erase(it);
+            continue;
+        }
+        const eModelInfoType modelType = ((eModelInfoType(*)())funcAddr)();
         if (modelType != eModelInfoType::TIME)
         {
             it = ms_ModelDefaultModelTimeInfo.erase(it);
@@ -2736,14 +2752,23 @@ void CModelInfoSA::DeallocateModel()
     pGame->GetStreaming()->RemoveModel(m_dwModelID);
 
     // Capture model type and damageability BEFORE nulling the array entry.
-    // pInterfaceToDelete remains valid (it's a local pointer to the heap object),
-    // but we extract this info now to avoid any issues if vtable access were affected.
-    eModelInfoType modelType = ((eModelInfoType(*)())pInterfaceToDelete->VFTBL->GetModelType)();
+    eModelInfoType modelType = eModelInfoType::UNKNOWN;
     bool isDamageableAtomic = false;
-    if (modelType == eModelInfoType::ATOMIC || modelType == eModelInfoType::LOD_ATOMIC)
+    if (pInterfaceToDelete->VFTBL)
     {
-        void* asDamageable = ((void* (*)())pInterfaceToDelete->VFTBL->AsDamageAtomicModelInfoPtr)();
-        isDamageableAtomic = (asDamageable != nullptr);
+        DWORD typeFunc = pInterfaceToDelete->VFTBL->GetModelType;
+        if (IsValidGtaSaCodePtr(typeFunc))
+            modelType = ((eModelInfoType(*)())typeFunc)();
+
+        if (modelType == eModelInfoType::ATOMIC || modelType == eModelInfoType::LOD_ATOMIC)
+        {
+            DWORD damageFunc = pInterfaceToDelete->VFTBL->AsDamageAtomicModelInfoPtr;
+            if (IsValidGtaSaCodePtr(damageFunc))
+            {
+                void* asDamageable = ((void* (*)())damageFunc)();
+                isDamageableAtomic = (asDamageable != nullptr);
+            }
+        }
     }
 
     ms_ModelDefaultModelTimeInfo.erase(m_dwModelID);
@@ -3043,10 +3068,15 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 
 eModelInfoType CModelInfoSA::GetModelType()
 {
-    if (auto pInterface = GetInterface())
-        return ((eModelInfoType(*)())pInterface->VFTBL->GetModelType)();
+    auto pInterface = GetInterface();
+    if (!pInterface || !pInterface->VFTBL)
+        return eModelInfoType::UNKNOWN;
 
-    return eModelInfoType::UNKNOWN;
+    DWORD funcAddr = pInterface->VFTBL->GetModelType;
+    if (!IsValidGtaSaCodePtr(funcAddr))
+        return eModelInfoType::UNKNOWN;
+
+    return ((eModelInfoType(*)())funcAddr)();
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
@@ -3085,7 +3115,11 @@ bool CModelInfoSA::IsDamageableAtomic()
     if (!pInterface || !pInterface->VFTBL)
         return false;
 
-    void* asDamageable = ((void* (*)())pInterface->VFTBL->AsDamageAtomicModelInfoPtr)();
+    DWORD funcAddr = pInterface->VFTBL->AsDamageAtomicModelInfoPtr;
+    if (!IsValidGtaSaCodePtr(funcAddr))
+        return false;
+
+    void* asDamageable = ((void* (*)())funcAddr)();
     return asDamageable != nullptr;
 }
 
