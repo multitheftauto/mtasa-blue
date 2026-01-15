@@ -1664,8 +1664,6 @@ bool SharedUtil::FileLoadWithTimeout(const SString& filePath, SString& outBuffer
     DWORD fileSize = attr.nFileSizeLow;
     if (fileSize == 0)
         return true;
-    if (fileSize > 512 * 1024 * 1024)
-        return false;
 
     HANDLE fh = CreateFileW(wideFilePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                             nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
