@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CChecksum.h"
 
 using std::list;
 
@@ -19,6 +20,8 @@ CResourceManager::CResourceManager()
 
 CResourceManager::~CResourceManager()
 {
+    CChecksum::ClearChecksumCache();
+
     while (!m_resources.empty())
     {
         CResource* pResource = m_resources.back();
