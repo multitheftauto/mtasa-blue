@@ -851,11 +851,21 @@ void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOut
 
 void CVehicle::GenerateHandlingData() noexcept
 {
-    const auto* handlingManager = g_pGame->GetHandlingManager();
+    auto* const handlingManager = g_pGame->GetHandlingManager();
 
-    // Make a new CHandlingEntry
+    // Make a new entry
     if (!m_HandlingEntry)
-        m_HandlingEntry = handlingManager->CreateHandlingData();
+    {
+        try
+        {
+            m_HandlingEntry = handlingManager->CreateHandlingData();
+        }
+        catch (const std::bad_alloc&)
+        {
+            CLogger::ErrorPrintf("Failed alloc handling entry, Vehicle - ID: %d, Model: %d\n", m_ID.Value(), m_usModel);
+            return;
+        }
+    }
 
     // Apply the model handling info
     m_HandlingEntry->ApplyHandlingData(handlingManager->GetModelHandlingData(m_usModel));
