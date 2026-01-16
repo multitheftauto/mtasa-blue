@@ -13,7 +13,7 @@
 #include "CWeaponNames.h"
 
 CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType,
-                                                   float WeaponRange, CControllerState& sharedControllerState, bool bHasJetPack)
+                                                   float WeaponRange, CControllerState& sharedControllerState, bool hasJetPack)
 
     : m_PlayerID(PlayerID),
       m_PlayerLatency(PlayerLatency),
