@@ -21,7 +21,7 @@ CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort Pl
       m_PlayerGotWeaponType(PlayerGotWeaponType),
       m_WeaponRange(WeaponRange),
       m_sharedControllerState(sharedControllerState),
-      m_bHasJetPack(bHasJetPack)
+      m_hasJetPack(hasJetPack)
 {
 }
 
