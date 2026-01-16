@@ -181,7 +181,7 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
     }
 
     // Enforce we use server-side jetpack state
-    m_Cache.flags.data.bHasJetPack = m_bHasJetPack;
+    m_Cache.flags.data.bHasJetPack = m_hasJetPack;
 
     // Success
     return true;
