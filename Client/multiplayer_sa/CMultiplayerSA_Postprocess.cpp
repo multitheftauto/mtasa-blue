@@ -64,7 +64,7 @@ namespace GrainEffect
     float NightModifier::fMultiplier = 1.0f;
     float RainModifier::fMultiplier = 1.0f;
     float OverlayModifier::fMultiplier = 1.0f;
-}  // namespace GrainEffect
+}
 
 void CMultiplayerSA::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)
 {

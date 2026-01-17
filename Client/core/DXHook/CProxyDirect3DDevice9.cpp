@@ -184,7 +184,7 @@ namespace BorderlessGamma
                std::fabs(saturationScale - 1.0f) > epsilon;
     }
 
-}  // namespace BorderlessGamma
+}
 
 using namespace BorderlessGamma;
 std::mutex            g_proxyDeviceMutex;
