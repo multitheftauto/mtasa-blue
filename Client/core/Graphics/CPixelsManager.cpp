@@ -790,7 +790,7 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
         // Decode
         if (oldFormat == EPixelsFormat::JPEG)
         {
-            uint    uiWidth, uiHeight;
+            uint        uiWidth, uiHeight;
             std::string strError;
             if (JpegDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight, &strError))
             {

@@ -94,4 +94,4 @@ namespace V8Helpers
         CefRefPtr<CefV8Value> func = CefV8Value::CreateFunction(name, handler);
         object->SetValue(name, func, V8_PROPERTY_ATTRIBUTE_NONE);
     }
-}            // namespace V8Helpers
+}

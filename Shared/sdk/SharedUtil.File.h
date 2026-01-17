@@ -34,7 +34,6 @@ namespace SharedUtil
     bool FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs) noexcept;
 #endif
 
-
     //
     // Save to a file
     //
@@ -117,10 +116,10 @@ namespace SharedUtil
         FILE* TryFopen(const char* szFilename, const char* szMode);
         FILE* TryFopenExclusive(const char* szFilename, const char* szMode);
 #endif
-        int   Mkdir(const char* szPath, int iMode = 0775);
-        int   Chdir(const char* szPath);
-        int   Rmdir(const char* szPath);
-        int   Delete(const char* szFilename);
-        int   Rename(const char* szOldFilename, const char* szNewFilename);
-    }            // namespace File
-}            // namespace SharedUtil
+        int Mkdir(const char* szPath, int iMode = 0775);
+        int Chdir(const char* szPath);
+        int Rmdir(const char* szPath);
+        int Delete(const char* szFilename);
+        int Rename(const char* szOldFilename, const char* szNewFilename);
+    }
+}

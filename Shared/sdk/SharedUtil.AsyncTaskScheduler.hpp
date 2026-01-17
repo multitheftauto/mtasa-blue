@@ -67,5 +67,5 @@ namespace SharedUtil
             }
         }
     }
-}            // namespace SharedUtil
+}
 #endif

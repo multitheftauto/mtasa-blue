@@ -108,7 +108,7 @@ bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString
 
     CefURLParts urlParts;
     if (strURL.empty() || !CefParseURL(strURL, urlParts))
-        return false;            // Invalid URL
+        return false;  // Invalid URL
 
     // Are we allowed to browse this website?
     if (bFilterEnabled)
@@ -197,7 +197,7 @@ void CWebView::Focus(bool state)
     auto pWebCore = g_pCore->GetWebCore();
     if (!pWebCore)
         return;
-    
+
     if (state)
         pWebCore->SetFocusedWebView(this);
     else if (pWebCore->GetFocusedWebView() == this)
@@ -492,7 +492,8 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
     bool result = false;
 
     g_pCore->GetWebCore()->WaitForTask(
-        [&](bool aborted) {
+        [&](bool aborted)
+        {
             if (aborted)
                 return;
 
@@ -543,7 +544,8 @@ bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
     bool result = false;
 
     g_pCore->GetWebCore()->WaitForTask(
-        [&](bool aborted) {
+        [&](bool aborted)
+        {
             if (aborted)
                 return;
 
@@ -737,7 +739,7 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
             memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * CEF_PIXEL_STRIDE);
         }
 
-        return;            // We don't have to wait as we've copied the buffer already
+        return;  // We don't have to wait as we've copied the buffer already
     }
 
     // Store render data
@@ -828,7 +830,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 
     CefURLParts urlParts;
     if (!CefParseURL(request->GetURL(), urlParts))
-        return true;            // Cancel if invalid URL (this line will normally not be executed)
+        return true;  // Cancel if invalid URL (this line will normally not be executed)
 
     bool    bResult;
     WString scheme = urlParts.scheme.str;
@@ -838,15 +840,15 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
         if (host != "mta")
         {
             if (IsLocal() || g_pCore->GetWebCore()->GetDomainState(host, true) != eURLState::WEBPAGE_ALLOWED)
-                bResult = true;            // Block remote here
+                bResult = true;  // Block remote here
             else
-                bResult = false;            // Allow
+                bResult = false;  // Allow
         }
         else
             bResult = false;
     }
     else
-        bResult = true;            // Block other schemes
+        bResult = true;  // Block other schemes
 
     // Check if we're in the browser's main frame or only a frame element of the current page
     bool bIsMainFrame = frame->IsMain();
@@ -872,7 +874,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
     // Mostly the same as CWebView::OnBeforeBrowse
     CefURLParts urlParts;
     if (!CefParseURL(request->GetURL(), urlParts))
-        return RV_CANCEL;            // Cancel if invalid URL (this line will normally not be executed)
+        return RV_CANCEL;  // Cancel if invalid URL (this line will normally not be executed)
 
     SString domain = UTF16ToMbUTF8(urlParts.host.str);
 
@@ -910,7 +912,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
         if (domain != "mta")
         {
             if (IsLocal())
-                return RV_CANCEL;            // Block remote requests in local mode generally
+                return RV_CANCEL;  // Block remote requests in local mode generally
 
             eURLState urlState = g_pCore->GetWebCore()->GetDomainState(domain, true);
             if (urlState != eURLState::WEBPAGE_ALLOWED)
@@ -920,7 +922,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
                                       urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1);
                 g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnResourceBlocked");
 
-                return RV_CANCEL;            // Block if explicitly forbidden
+                return RV_CANCEL;  // Block if explicitly forbidden
             }
 
             // Allow
@@ -936,7 +938,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 
     // Trigger onClientBrowserResourceBlocked event
     auto func = std::bind(&CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString(request->GetURL()), "",
-                          2);            // reason 1 := blocked protocol scheme
+                          2);  // reason 1 := blocked protocol scheme
     g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnResourceBlocked");
 
     // Block everything else
@@ -1077,10 +1079,9 @@ bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_
     if (g_pCore->GetWebCore()->IsTestModeEnabled())
     {
         g_pCore->GetWebCore()->AddEventToEventQueue(
-            [message, source]() {
-                g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str());
-            },
-            this, "OnConsoleMessage");
+            [message, source]()
+            { g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str()); }, this,
+            "OnConsoleMessage");
     }
 
     return true;

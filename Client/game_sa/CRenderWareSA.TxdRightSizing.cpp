@@ -243,14 +243,13 @@ RwTexture* CRenderWareSA::RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit
     header.TextureFormat.vAddressing = (pTexture->flags & 0xf000) >> 12;
     memcpy(header.TextureFormat.name, pTexture->name, 32);
     memcpy(header.TextureFormat.maskName, pTexture->mask, 32);
-    header.RasterFormat.rasterFormat = (pRaster->format & 0x0f)
-                                       << 8;            // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
+    header.RasterFormat.rasterFormat = (pRaster->format & 0x0f) << 8;  // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
     header.RasterFormat.d3dFormat = pD3DRaster->format;
     header.RasterFormat.width = static_cast<unsigned short>(uiReqWidth);
     header.RasterFormat.height = static_cast<unsigned short>(uiReqHeight);
     header.RasterFormat.depth = static_cast<unsigned char>(pRaster->depth);
     header.RasterFormat.numLevels = 1;
-    header.RasterFormat.rasterType = pRaster->type;            // dxt1 = 4 / dxt3 = 4
+    header.RasterFormat.rasterType = pRaster->type;  // dxt1 = 4 / dxt3 = 4
     header.RasterFormat.alpha = bHasAlpha;
     header.RasterFormat.cubeTexture = bIsCubeTexture;
     header.RasterFormat.autoMipMaps = false;
@@ -260,7 +259,7 @@ RwTexture* CRenderWareSA::RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit
     CBuffer            nativeData;
     CBufferWriteStream stream(nativeData);
     stream.Write(1);
-    stream.Write(0);            // Size ignored
+    stream.Write(0);  // Size ignored
     stream.Write(0x1803FFFF);
     stream.WriteBytes(&header, sizeof(header));
     stream.Write(newPixelBuffer.GetSize());

@@ -47,10 +47,10 @@ namespace lua
             }
         }
     };
-}            // namespace lua
+}
 
 #ifdef MTA_DEBUG
-#define LUA_STACK_EXPECT(i) lua::CLuaStackChecker invalidHiddenName(L, i)
+    #define LUA_STACK_EXPECT(i) lua::CLuaStackChecker invalidHiddenName(L, i)
 #else
-#define LUA_STACK_EXPECT(i)
+    #define LUA_STACK_EXPECT(i)
 #endif

@@ -17,22 +17,22 @@ struct SPDTVertex
     float             u, v;
 };
 
-#define WRITE_PDT_VERTEX(buf,fX,fY,fZ,dwColor,fU,fV) \
-        buf->x = fX; \
-        buf->y = fY; \
-        buf->z = fZ; \
-        buf->color = dwColor; \
-        buf->u = fU; \
-        buf->v = fV; \
-        buf++;
+#define WRITE_PDT_VERTEX(buf, fX, fY, fZ, dwColor, fU, fV) \
+    buf->x = fX; \
+    buf->y = fY; \
+    buf->z = fZ; \
+    buf->color = dwColor; \
+    buf->u = fU; \
+    buf->v = fV; \
+    buf++;
 
-#define WRITE_QUAD_INDICES(buf,row0,row1) \
-        *buf++ = (row0); \
-        *buf++ = (row0) + 1; \
-        *buf++ = (row1); \
-        *buf++ = (row1); \
-        *buf++ = (row0) + 1; \
-        *buf++ = (row1) + 1;
+#define WRITE_QUAD_INDICES(buf, row0, row1) \
+    *buf++ = (row0); \
+    *buf++ = (row0) + 1; \
+    *buf++ = (row1); \
+    *buf++ = (row1); \
+    *buf++ = (row0) + 1; \
+    *buf++ = (row1) + 1;
 
 //
 // Batches draws using the same material

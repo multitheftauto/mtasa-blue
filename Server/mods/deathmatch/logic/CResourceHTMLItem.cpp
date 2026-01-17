@@ -122,15 +122,15 @@ HttpStatusCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespo
         m_currentResponse = ipoHttpResponse;
         CLuaArguments querystring(formData);
         CLuaArguments args;
-        args.PushTable(&headers);                                         // requestHeaders
-        args.PushTable(&formData);                                        // form
-        args.PushTable(&cookies);                                         // cookies
-        args.PushString(ipoHttpRequest->GetAddress().c_str());            // hostname
-        args.PushString(ipoHttpRequest->sOriginalUri.c_str());            // url
-        args.PushTable(&querystring);                                     // querystring
+        args.PushTable(&headers);                               // requestHeaders
+        args.PushTable(&formData);                              // form
+        args.PushTable(&cookies);                               // cookies
+        args.PushString(ipoHttpRequest->GetAddress().c_str());  // hostname
+        args.PushString(ipoHttpRequest->sOriginalUri.c_str());  // url
+        args.PushTable(&querystring);                           // querystring
         args.PushAccount(account);
-        args.PushString(ipoHttpRequest->sBody);            // requestBody
-        args.PushString(sMethod);                          // method
+        args.PushString(ipoHttpRequest->sBody);  // requestBody
+        args.PushString(sMethod);                // method
 
         // g_pGame->Lock(); // get the mutex (blocking)
         args.CallGlobal(m_pVM, "renderPage");
@@ -244,7 +244,7 @@ bool CResourceHTMLItem::Start()
         bool        bIsShorthandCodeBlock = false;
         std::string strScript;
         strScript += "function renderPage ( requestHeaders, form, cookies, hostname, url, querystring, user, requestBody, method )\n";
-        strScript += "\nhttpWrite ( \"";            // bit hacky, possibly can be terminated straight away
+        strScript += "\nhttpWrite ( \"";  // bit hacky, possibly can be terminated straight away
         unsigned char c;
         int           i = 0;
         while (!feof(pFile))
@@ -253,19 +253,19 @@ bool CResourceHTMLItem::Start()
             if (feof(pFile))
                 break;
 
-            if (bInCode == false)            // we're in a plain HTML section
+            if (bInCode == false)  // we're in a plain HTML section
             {
                 if (c == '<' && !feof(pFile))
                 {
                     c = ReadChar(pFile);
-                    if (c == '*')            // we've found <*
+                    if (c == '*')  // we've found <*
                     {
                         bInCode = true;
                         bJustStartedCodeBlock = true;
-                        strScript.append("\" )\n");            // add ") to the end to terminate our last non-code section
+                        strScript.append("\" )\n");  // add ") to the end to terminate our last non-code section
                     }
                     else
-                    {            // we found < but not a *, so just output both characters we read
+                    {  // we found < but not a *, so just output both characters we read
                         strScript += '<';
                         strScript += c;
                     }
@@ -293,22 +293,22 @@ bool CResourceHTMLItem::Start()
                 }
             }
             else
-            {            // we're in a code block
+            {  // we're in a code block
                 if (c == '*' && !feof(pFile))
                 {
                     c = ReadChar(pFile);
-                    if (c == '>')            // we've found *>
+                    if (c == '>')  // we've found *>
                     {
                         bInCode = false;
                         if (bIsShorthandCodeBlock)
                         {
                             bIsShorthandCodeBlock = false;
-                            strScript += ')';            // terminate the 'httpWrite' function
+                            strScript += ')';  // terminate the 'httpWrite' function
                         }
-                        strScript.append("\nhttpWrite ( \"");            // add httpWrite ( " to start a new non-code section
+                        strScript.append("\nhttpWrite ( \"");  // add httpWrite ( " to start a new non-code section
                     }
                     else
-                    {            // we found * but not a >, so just output both characters we read
+                    {  // we found * but not a >, so just output both characters we read
                         strScript += '*';
                         strScript += c;
                     }
@@ -320,7 +320,7 @@ bool CResourceHTMLItem::Start()
                 }
                 else
                 {
-                    if (c != '\t' && c != ' ')            // we allow whitespace before the shorthand '=' sign
+                    if (c != '\t' && c != ' ')  // we allow whitespace before the shorthand '=' sign
                         bJustStartedCodeBlock = false;
                     strScript += c;
                 }

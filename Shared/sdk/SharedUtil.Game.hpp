@@ -76,7 +76,7 @@ namespace SharedUtil
     CVehicleColor::CVehicleColor()
     {
         // Init
-        m_ucPaletteColors[0] = 0;            // Palette color 0 is black
+        m_ucPaletteColors[0] = 0;  // Palette color 0 is black
         m_ucPaletteColors[1] = 0;
         m_ucPaletteColors[2] = 0;
         m_ucPaletteColors[3] = 0;
@@ -253,4 +253,4 @@ namespace SharedUtil
         return SColorRGBA(r, g, b, 0);
     }
 
-}            // namespace SharedUtil
+}
