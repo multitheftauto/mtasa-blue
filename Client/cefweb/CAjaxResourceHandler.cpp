@@ -36,6 +36,12 @@ void CAjaxResourceHandler::SetResponse(std::string data)
     m_strResponse = std::move(data);
     m_bHasData = true;
 
+    // Clear request data to free memory as it's no longer needed
+    m_vecGetData.clear();
+    m_vecGetData.shrink_to_fit();
+    m_vecPostData.clear();
+    m_vecPostData.shrink_to_fit();
+
     if (!m_callback)
         return;
 
@@ -60,13 +66,13 @@ void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, i
     constexpr int HTTP_OK = 200;
     response->SetStatus(HTTP_OK);
     response->SetStatusText("OK");
-    
+
     // Use default MIME type if none provided
     if (!m_strMime.empty())
         response->SetMimeType(m_strMime);
     else
         response->SetMimeType("application/octet-stream");
-    
+
     response_length = -1;
 }
 
@@ -110,10 +116,10 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
     const auto copyBytes = std::min(static_cast<size_t>(bytes_to_read), remainingBytes);
 
     memcpy(data_out, m_strResponse.c_str() + m_DataOffset, copyBytes);
-    
+
     // copyBytes is bounded by bytes_to_read (an int), so cast is always safe
     bytes_read = static_cast<int>(copyBytes);
-    
+
     m_DataOffset += copyBytes;
 
     return true;

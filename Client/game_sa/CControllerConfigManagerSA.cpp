@@ -12,11 +12,12 @@
 #include "StdInc.h"
 #include "CControllerConfigManagerSA.h"
 
-#define VAR_InputType       ( ( BYTE * ) ( 0xB6EC2E ) )
-#define VAR_MouseInverted   ( ( BYTE * ) ( 0xBA6745 ) )
-#define VAR_FlyWithMouse    ( ( BYTE * ) ( 0xC1CC03 ) )
-#define VAR_SteerWithMouse  ( ( BYTE * ) ( 0xC1CC02 ) )
-#define VAR_VerticalAimSensitivity  ( ( float * ) ( 0xB6EC18 ) )
+#define VAR_InputType                  ((BYTE*)(0xB6EC2E))
+#define VAR_MouseInverted              ((BYTE*)(0xBA6745))
+#define VAR_FlyWithMouse               ((BYTE*)(0xC1CC03))
+#define VAR_SteerWithMouse             ((BYTE*)(0xC1CC02))
+#define VAR_VerticalAimSensitivity     ((float*)(0xB6EC18))
+#define VAR_HorizontalMouseSensitivity 0xB6EC1C
 
 static const float VERTICAL_AIM_SENSITIVITY_MIN = 0.000312f;
 static const float VERTICAL_AIM_SENSITIVITY_DEFAULT = 0.0015f;
@@ -28,12 +29,13 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
     // Get initial settings
     m_bSteerWithMouse = *VAR_FlyWithMouse != 0;
     m_bFlyWithMouse = *VAR_SteerWithMouse != 0;
-    MemSet((void*)0x5BC7B4, 0x90, 10);            // Stop vertical aim sensitivity value reset
+    MemSet((void*)0x5BC7B4, 0x90, 10);  // Stop vertical aim sensitivity value reset
 }
 
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -42,12 +44,14 @@ void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControlle
         push    action
         call    dwFunc
     }
+    // clang-format on
 }
 
 int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -56,6 +60,7 @@ int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eController
         call    dwFunc
         mov     iReturn, eax
     }
+    // clang-format on
     return iReturn;
 }
 
@@ -63,6 +68,7 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
 {
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -70,12 +76,14 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
         call    dwFunc
         mov     iReturn, eax
     }
+    // clang-format on
     return iReturn;
 }
 
 void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -83,6 +91,7 @@ void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAc
         push    action
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)
@@ -130,7 +139,7 @@ void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings()
 float CControllerConfigManagerSA::GetVerticalAimSensitivity()
 {
     float fRawValue = GetVerticalAimSensitivityRawValue();
-    return UnlerpClamped(VERTICAL_AIM_SENSITIVITY_MIN, fRawValue, VERTICAL_AIM_SENSITIVITY_MAX);            // Remap to 0-1
+    return UnlerpClamped(VERTICAL_AIM_SENSITIVITY_MIN, fRawValue, VERTICAL_AIM_SENSITIVITY_MAX);  // Remap to 0-1
 }
 
 void CControllerConfigManagerSA::SetVerticalAimSensitivity(float fSensitivity)
@@ -148,4 +157,15 @@ float CControllerConfigManagerSA::GetVerticalAimSensitivityRawValue()
 void CControllerConfigManagerSA::SetVerticalAimSensitivityRawValue(float fRawValue)
 {
     MemPutFast<float>(VAR_VerticalAimSensitivity, fRawValue);
+}
+
+void CControllerConfigManagerSA::SetVerticalAimSensitivitySameAsHorizontal(bool enabled)
+{
+    std::uintptr_t varToUse = enabled ? VAR_HorizontalMouseSensitivity : reinterpret_cast<std::uintptr_t>(VAR_VerticalAimSensitivity);
+
+    MemPut<std::uintptr_t>(0x50F048, varToUse);  // CCam::Process_1rstPersonPedOnPC
+    MemPut<std::uintptr_t>(0x50FB28, varToUse);  // CCam::Process_FollowPedWithMouse
+    MemPut<std::uintptr_t>(0x510C28, varToUse);  // CCam::Process_M16_1stPerson
+    MemPut<std::uintptr_t>(0x511E0A, varToUse);  // CCam::Process_Rocket
+    MemPut<std::uintptr_t>(0x52228E, varToUse);  // CCam::Process_AimWeapon
 }

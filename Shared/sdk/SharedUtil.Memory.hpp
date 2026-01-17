@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "SharedUtil.Memory.h"
-#include <mutex>
 
 #ifdef _WIN32
     #include <Windows.h>
@@ -103,7 +102,7 @@ namespace SharedUtil
 
         if (!success && GetLastError() == ERROR_BAD_LENGTH)
         {
-            workingSetInfo->NumberOfEntries += 64;            // Insurance in case the number of entries changes.
+            workingSetInfo->NumberOfEntries += 64;  // Insurance in case the number of entries changes.
             workingSetBuffer.resize(workingSetInfo->NumberOfEntries * sizeof(PSAPI_WORKING_SET_BLOCK) + sizeof(PSAPI_WORKING_SET_INFORMATION));
             workingSetInfo = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(workingSetBuffer.data());
             success = QueryWorkingSet(process, workingSetBuffer.data(), workingSetBuffer.size());
@@ -186,14 +185,11 @@ namespace SharedUtil
 
     void SetMemoryAllocationFailureHandler()
     {
-        static std::once_flag s_installOnce;
-        std::call_once(s_installOnce, []() {
 #if defined(_WIN32)
-            _set_new_handler(&HandleMemoryAllocationFailure);
-            // _set_new_mode(1 /* call _set_new_handler for malloc failure */);
+        _set_new_handler(&HandleMemoryAllocationFailure);
+        // _set_new_mode(1 /* call _set_new_handler for malloc failure */);
 #else
-            std::set_new_handler(&HandleMemoryAllocationFailure);
+        std::set_new_handler(&HandleMemoryAllocationFailure);
 #endif
-        });
     }
-}            // namespace SharedUtil
+}  // namespace SharedUtil

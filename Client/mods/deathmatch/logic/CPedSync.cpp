@@ -15,7 +15,7 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 
-#define PED_SYNC_RATE   ( g_TickRateSettings.iPedSync )
+#define PED_SYNC_RATE (g_TickRateSettings.iPedSync)
 
 CPedSync::CPedSync(CClientPedManager* pPedManager)
 {
@@ -124,7 +124,7 @@ void CPedSync::Packet_PedStartSync(NetBitStreamInterface& BitStream)
             float fHealth, fArmor;
             BitStream.Read(fHealth);
             BitStream.Read(fArmor);
-            
+
             float cameraRotation{};
             BitStream.Read(cameraRotation);
             pPed->SetCameraRotation(cameraRotation);
@@ -186,7 +186,7 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             std::uint8_t flags2{};
             BitStream.Read(flags2);
 
-            CVector vecPosition{ CVector::NoInit{} }, vecMoveSpeed{ CVector::NoInit{} };
+            CVector vecPosition{CVector::NoInit{}}, vecMoveSpeed{CVector::NoInit{}};
             float   fRotation, fHealth, fArmor;
             bool    bOnFire;
             bool    bIsInWater;

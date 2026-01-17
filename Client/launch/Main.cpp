@@ -12,21 +12,21 @@
 #include "StdInc.h"
 
 // C++ STL
-#include <array>               // std::array for safe command buffer
-#include <bit>                 // std::bit_cast for safe function pointer conversion
-#include <expected>            // std::expected/std::unexpected for error handling
-#include <format>              // std::format for string formatting
-#include <ranges>              // std::ranges::copy/copy_n for safe copying
-#include <span>                // std::span for memory view with bounds checking
-#include <string_view>         // std::string_view for string parameters and constants
-#include <type_traits>         // std::is_trivially_copyable_v for compile-time checks
-#include <utility>             // std::forward for perfect forwarding
+#include <array>        // std::array for safe command buffer
+#include <bit>          // std::bit_cast for safe function pointer conversion
+#include <expected>     // std::expected/std::unexpected for error handling
+#include <format>       // std::format for string formatting
+#include <ranges>       // std::ranges::copy/copy_n for safe copying
+#include <span>         // std::span for memory view with bounds checking
+#include <string_view>  // std::string_view for string parameters and constants
+#include <type_traits>  // std::is_trivially_copyable_v for compile-time checks
+#include <utility>      // std::forward for perfect forwarding
 
 // C STL
-#include <cstring>             // std::strlen for C string length
+#include <cstring>  // std::strlen for C string length
 
 // Platform-specific headers
-#include <psapi.h>             // GetModuleInformation, MODULEINFO
+#include <psapi.h>  // GetModuleInformation, MODULEINFO
 
 /*
     IMPORTANT
@@ -43,17 +43,17 @@ namespace mta::launcher
 {
     enum class LoadResult : std::uint32_t
     {
-        Success       = 0,
-        PathError     = 1,
-        LoadError     = 2,
+        Success = 0,
+        PathError = 1,
+        LoadError = 2,
         FunctionError = 3
     };
 
     enum class DllLoadError : std::uint32_t
     {
         FileNotFound = 1,
-        InvalidPath  = 2,
-        LoadFailed   = 3
+        InvalidPath = 2,
+        LoadFailed = 3
     };
 
     // concepts for type safety
@@ -71,20 +71,15 @@ namespace mta::launcher
     {
         DWORD saved_error_;
 
-public:
-        LastErrorPreserver() noexcept : saved_error_(GetLastError())
-        {
-        }
-        
-        ~LastErrorPreserver() noexcept
-        {
-            SetLastError(saved_error_);
-        }
-        
-        LastErrorPreserver(const LastErrorPreserver&)            = delete;
+    public:
+        LastErrorPreserver() noexcept : saved_error_(GetLastError()) {}
+
+        ~LastErrorPreserver() noexcept { SetLastError(saved_error_); }
+
+        LastErrorPreserver(const LastErrorPreserver&) = delete;
         LastErrorPreserver& operator=(const LastErrorPreserver&) = delete;
-        LastErrorPreserver(LastErrorPreserver&&)                 = delete;
-        LastErrorPreserver& operator=(LastErrorPreserver&&)      = delete;
+        LastErrorPreserver(LastErrorPreserver&&) = delete;
+        LastErrorPreserver& operator=(LastErrorPreserver&&) = delete;
     };
 
     // RAII scope_exit with perfect forwarding
@@ -93,19 +88,14 @@ public:
     {
         F f;
 
-        explicit scope_exit(F&& func) noexcept : f(std::forward<F>(func))
-        {
-        }
-        
-        ~scope_exit() noexcept
-        {
-            f();
-        }
+        explicit scope_exit(F&& func) noexcept : f(std::forward<F>(func)) {}
 
-        scope_exit(const scope_exit&)            = delete;
+        ~scope_exit() noexcept { f(); }
+
+        scope_exit(const scope_exit&) = delete;
         scope_exit& operator=(const scope_exit&) = delete;
-        scope_exit(scope_exit&&)                 = delete;
-        scope_exit& operator=(scope_exit&&)      = delete;
+        scope_exit(scope_exit&&) = delete;
+        scope_exit& operator=(scope_exit&&) = delete;
     };
 
     template <typename F>
@@ -120,7 +110,7 @@ public:
         std::wstring original_dir;
         bool         changed = false;
 
-public:
+    public:
         DllDirectoryGuard()
         {
             LastErrorPreserver error_guard;
@@ -129,10 +119,12 @@ public:
             {
                 try
                 {
-                    original_dir.resize_and_overwrite(len, [](wchar_t* buf, std::size_t n) -> std::size_t {
-                        DWORD copied = GetDllDirectoryW(static_cast<DWORD>(n), buf);
-                        return copied < n ? copied : 0;
-                    });
+                    original_dir.resize_and_overwrite(len,
+                                                      [](wchar_t* buf, std::size_t n) -> std::size_t
+                                                      {
+                                                          DWORD copied = GetDllDirectoryW(static_cast<DWORD>(n), buf);
+                                                          return copied < n ? copied : 0;
+                                                      });
                 }
                 catch (...)
                 {
@@ -159,10 +151,10 @@ public:
                 SetDllDirectoryW(original_dir.empty() ? nullptr : original_dir.c_str());
         }
 
-        DllDirectoryGuard(const DllDirectoryGuard&)            = delete;
+        DllDirectoryGuard(const DllDirectoryGuard&) = delete;
         DllDirectoryGuard& operator=(const DllDirectoryGuard&) = delete;
-        DllDirectoryGuard(DllDirectoryGuard&&)                 = delete;
-        DllDirectoryGuard& operator=(DllDirectoryGuard&&)      = delete;
+        DllDirectoryGuard(DllDirectoryGuard&&) = delete;
+        DllDirectoryGuard& operator=(DllDirectoryGuard&&) = delete;
     };
 
     // COM initialization with error handling
@@ -189,15 +181,17 @@ public:
         std::wstring      dll_name_w;
         try
         {
-            dll_name_w.resize_and_overwrite(dll_name.size() * 2, [&dll_name](wchar_t* buf, std::size_t n) -> std::size_t {
-                SString temp{dll_name.data(), dll_name.size()};
-                WString wide = FromUTF8(temp);
-                if (wide.empty())
-                    return 0;
-                std::size_t len = std::min(n, wide.length());
-                std::ranges::copy_n(wide.c_str(), len, buf);
-                return len;
-            });
+            dll_name_w.resize_and_overwrite(dll_name.size() * 2,
+                                            [&dll_name](wchar_t* buf, std::size_t n) -> std::size_t
+                                            {
+                                                SString temp{dll_name.data(), dll_name.size()};
+                                                WString wide = FromUTF8(temp);
+                                                if (wide.empty())
+                                                    return 0;
+                                                std::size_t len = std::min(n, wide.length());
+                                                std::ranges::copy_n(wide.c_str(), len, buf);
+                                                return len;
+                                            });
         }
         catch (...)
         {
@@ -249,7 +243,7 @@ public:
         }
 
         // Command line handling
-        constexpr std::size_t     MAX_CMD = 8192;
+        constexpr std::size_t MAX_CMD = 8192;
         static_assert(ValidBufferSize<MAX_CMD>);
 
         std::array<char, MAX_CMD> safe_cmd{};
@@ -314,7 +308,7 @@ public:
         AddReportLog(5730, std::format("Launcher Main: MTA directory not found from: '{}'", launch_path));
         return std::unexpected(LoadResult::PathError);
     }
-}            // namespace mta::launcher
+}  // namespace mta::launcher
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -337,7 +331,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     [[maybe_unused]] HRESULT hr = SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto " MTA_STR(MTASA_VERSION_MAJOR) L"." MTA_STR(MTASA_VERSION_MINOR));
 
     // Path discovery
-    SString launch_path     = GetLaunchPath();
+    SString launch_path = GetLaunchPath();
     auto    mta_path_result = FindMtaPath(launch_path);
 
     if (!mta_path_result) [[unlikely]]
@@ -356,7 +350,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     if (!module_result) [[unlikely]]
     {
         DWORD   error = GetLastError();
-        SString msg   = std::format("Launcher Main: Failed to load: '{}'\n\n{}", dll_path, GetSystemErrorMessage(error));
+        SString msg = std::format("Launcher Main: Failed to load: '{}'\n\n{}", dll_path, GetSystemErrorMessage(error));
         AddReportLog(5711, msg);
 
         // Pattern matching
@@ -378,10 +372,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     HMODULE module = module_result.value();
 
     // RAII module cleanup
-    auto module_cleanup = make_scope_exit([module]() noexcept {
-        if (module)
-            FreeLibrary(module);
-    });
+    auto module_cleanup = make_scope_exit(
+        [module]() noexcept
+        {
+            if (module)
+                FreeLibrary(module);
+        });
 
     // Execution with concepts
     auto exec_result = ExecuteDoWinMain(module, hInstance, hPrevInstance, lpCmdLine, nCmdShow);

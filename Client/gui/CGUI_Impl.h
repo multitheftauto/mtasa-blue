@@ -16,6 +16,7 @@ class CGUI_Impl;
 #include <gui/CGUI.h>
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 #include <cstdint>
 #include <windows.h>
 
@@ -57,7 +58,7 @@ namespace CEGUI
     class EventArgs;
     class GUISheet;
     typedef GUISheet DefaultWindow;
-}            // namespace CEGUI
+}
 
 class CGUI_Impl : public CGUI, public CGUITabList
 {
@@ -86,7 +87,7 @@ public:
     eInputMode           GetGUIInputMode();
     static CEGUI::String GetUTFString(const char* szInput);
     static CEGUI::String GetUTFString(const std::string& strInput);
-    static CEGUI::String GetUTFString(const CEGUI::String& strInput);            // Not defined
+    static CEGUI::String GetUTFString(const CEGUI::String& strInput);  // Not defined
     //
     CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags);
 
@@ -330,9 +331,9 @@ private:
     CGUIFont_Impl* m_pSansFont;
     CGUIFont_Impl* m_pUniFont;
 
-    std::list<std::uint32_t> m_RedrawQueue;
+    std::unordered_set<std::uint32_t>               m_RedrawQueue;
     std::unordered_map<std::uint32_t, CGUIElement*> m_RedrawRegistry;
-    std::uint32_t                               m_nextRedrawHandle;
+    std::uint32_t                                   m_nextRedrawHandle;
 
     std::uint32_t RegisterRedrawHandle(CGUIElement_Impl* pElement);
     void          ReleaseRedrawHandle(std::uint32_t handle);

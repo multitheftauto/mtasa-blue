@@ -21,8 +21,8 @@ public:
     ~CProxyDirectInputDevice8();
     /*** IUnknown methods ***/
     virtual HRESULT __stdcall QueryInterface(REFIID riid, LPVOID* ppvObj);
-    virtual ULONG __stdcall AddRef();
-    virtual ULONG __stdcall Release();
+    virtual ULONG __stdcall   AddRef();
+    virtual ULONG __stdcall   Release();
 
     /*** IDirectInputDevice8A methods ***/
     virtual HRESULT __stdcall GetCapabilities(LPDIDEVCAPS a);

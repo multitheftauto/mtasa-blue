@@ -129,10 +129,10 @@ bool CPickup::ReadSpecialData(const int iLine)
             m_usModel = CPickupManager::GetArmorModel();
         }
         else if (IsNumericString(szBuffer))
-        {            // could be a weapon
+        {  // could be a weapon
             usBuffer = static_cast<unsigned short>(atoi(szBuffer));
             if (CPickupManager::IsValidWeaponID(usBuffer))
-            {            // its a weapon
+            {  // its a weapon
                 m_ucType = WEAPON;
                 m_usModel = CPickupManager::GetWeaponModel(m_ucWeaponType);
             }
@@ -243,7 +243,7 @@ bool CPickup::ReadSpecialData(const int iLine)
         if (GetCustomDataInt("model", iTemp, true))
         {
             // Valid id?
-            if (CObjectManager::IsValidModel(iTemp) || iTemp == 370)            // 370 = jetpack - sort of a hack
+            if (CObjectManager::IsValidModel(iTemp) || iTemp == 370)  // 370 = jetpack - sort of a hack
             {
                 // Set the object id
                 m_usModel = static_cast<unsigned short>(iTemp);
@@ -406,13 +406,13 @@ void CPickup::Use(CPlayer& Player)
     if (!CallEvent("onPickupUse", Arguments))
     {
         CLuaArguments Arguments2;
-        Arguments2.PushElement(this);            // pickup
+        Arguments2.PushElement(this);  // pickup
         Player.CallEvent("onPlayerPickupUse", Arguments2);
     }
     else
     {
         CLuaArguments Arguments2;
-        Arguments2.PushElement(this);            // pickup
+        Arguments2.PushElement(this);  // pickup
         if (Player.CallEvent("onPlayerPickupUse", Arguments2))
         {
             // Tell all the other players to hide it if the respawn intervals are bigger than 0
@@ -497,7 +497,7 @@ void CPickup::Callback_OnCollision(CColShape& Shape, CElement& Element)
                     bool bContinue1 = CallEvent("onPickupHit", Arguments);
 
                     CLuaArguments Arguments2;
-                    Arguments2.PushElement(this);            // pickup
+                    Arguments2.PushElement(this);  // pickup
                     bool bContinue2 = Element.CallEvent("onPlayerPickupHit", Arguments2);
 
                     if (bContinue1 && bContinue2)
@@ -540,7 +540,7 @@ void CPickup::Callback_OnLeave(CColShape& Shape, CElement& Element)
                     CallEvent("onPickupLeave", Arguments);
 
                     CLuaArguments Arguments2;
-                    Arguments2.PushElement(this);            // pickup
+                    Arguments2.PushElement(this);  // pickup
                     Element.CallEvent("onPlayerPickupLeave", Arguments2);
                 }
             }

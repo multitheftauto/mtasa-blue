@@ -13,8 +13,7 @@
 
 using namespace lunasvg;
 
-CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID)
-    : CClientDisplay(ID)
+CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID) : CClientDisplay(ID)
 {
     m_pVectorGraphic = pVectorGraphic;
     m_bVisible = true;
@@ -90,6 +89,10 @@ void CClientVectorGraphicDisplay::UpdateTexture()
 
     IDirect3DSurface9* surface = m_pVectorGraphic->GetRenderItem()->m_pD3DRenderTargetSurface;
     if (!surface)
+        return;
+
+    // Check for valid SVG dimensions to avoid division by zero
+    if (svgDocument->width() <= 0 || svgDocument->height() <= 0)
         return;
 
     // SVG has a predefined width and height. We need transform it to the requested size

@@ -42,6 +42,9 @@ CClientWebBrowser::~CClientWebBrowser()
     // Mark as being destroyed to prevent event callbacks from executing
     m_bBeingDestroyed = true;
 
+    if (m_pWebView)
+        m_pWebView->ClearWebBrowserEvents(this);
+
     // Unlink from tree first to prevent event callbacks from reaching
     Unlink();
 
@@ -104,7 +107,7 @@ bool CClientWebBrowser::ExecuteJavascript(const SString& strJavascriptCode)
 {
     if (!m_pWebView)
         return false;
-    
+
     // Don't allow javascript code execution on remote websites
     if (!m_pWebView->IsLocal())
         return false;
@@ -209,7 +212,7 @@ void CClientWebBrowser::Events_OnCreated()
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     CallEvent("onClientBrowserCreated", Arguments, false);
 }
@@ -218,7 +221,7 @@ void CClientWebBrowser::Events_OnLoadingStart(const SString& strURL, bool bMainF
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushBoolean(bMainFrame);
@@ -229,7 +232,7 @@ void CClientWebBrowser::Events_OnDocumentReady(const SString& strURL)
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     CallEvent("onClientBrowserDocumentReady", Arguments, false);
@@ -239,7 +242,7 @@ void CClientWebBrowser::Events_OnLoadingFailed(const SString& strURL, int errorC
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushNumber(errorCode);
@@ -251,7 +254,7 @@ void CClientWebBrowser::Events_OnNavigate(const SString& strURL, bool bIsBlocked
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushBoolean(bIsBlocked);
@@ -263,7 +266,7 @@ void CClientWebBrowser::Events_OnPopup(const SString& strTargetURL, const SStrin
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strTargetURL);
     Arguments.PushString(strOpenerURL);
@@ -274,7 +277,7 @@ void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushNumber(ucCursor);
     CallEvent("onClientBrowserCursorChange", Arguments, false);
@@ -296,7 +299,7 @@ void CClientWebBrowser::Events_OnTooltip(const SString& strTooltip)
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strTooltip);
     CallEvent("onClientBrowserTooltip", Arguments, false);
@@ -306,7 +309,7 @@ void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushBoolean(bGainedFocus);
     CallEvent("onClientBrowserInputFocusChanged", Arguments, false);
@@ -321,7 +324,7 @@ bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
     if (!m_pResource)
         return true;
 
-    CResource* pTempResource = m_pResource;            // Make a copy to ignore a changed resource
+    CResource* pTempResource = m_pResource;  // Make a copy to ignore a changed resource
 
     if (CResourceManager::ParseResourcePathInput(strURL, pTempResource, &strURL))
         return true;
@@ -398,7 +401,7 @@ bool CClientWebBrowser::AddAjaxHandler(const SString& strURL, ajax_callback_t& h
 {
     if (!m_pWebView)
         return false;
-    
+
     if (!m_pWebView->RegisterAjaxHandler(strURL))
         return false;
 
@@ -410,7 +413,7 @@ bool CClientWebBrowser::RemoveAjaxHandler(const SString& strURL)
 {
     if (!m_pWebView)
         return false;
-    
+
     if (!m_pWebView->UnregisterAjaxHandler(strURL))
         return false;
 

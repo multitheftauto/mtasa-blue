@@ -12,7 +12,7 @@
 #pragma once
 
 #ifdef WIN32
-#include <windows.h>
+    #include <windows.h>
 #endif
 
 typedef void (*FuncPtr_t)();
@@ -31,9 +31,9 @@ public:
     bool      CheckMtaVersion(const char* szLibName);
 
 private:
-    #ifdef WIN32
+#ifdef WIN32
     HMODULE m_hModule;
-    #else
+#else
     void* m_hModule;
-    #endif
+#endif
 };
