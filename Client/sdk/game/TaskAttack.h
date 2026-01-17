@@ -19,7 +19,7 @@ class CVector;
 class CTaskSimpleGangDriveBy : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleGangDriveBy(){};
+    virtual ~CTaskSimpleGangDriveBy() {};
 };
 
 enum eGunCommand
@@ -39,7 +39,7 @@ class CVector2D;
 class CTaskSimpleUseGun : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleUseGun(){};
+    virtual ~CTaskSimpleUseGun() {};
 
     virtual bool ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand) = 0;
     virtual bool ControlGunMove(CVector2D* pMoveVec) = 0;
@@ -51,5 +51,5 @@ public:
 class CTaskSimpleFight : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleFight(){};
+    virtual ~CTaskSimpleFight() {};
 };

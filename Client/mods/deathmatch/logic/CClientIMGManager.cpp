@@ -22,7 +22,7 @@ CClientIMGManager::CClientIMGManager(CClientManager* pManager)
     // TODO: In the default gta3.img the biggest file is 1260 sectors, so to be fail safe, we double it
     // ideally, we'd just take this value from the game, but there's no clean/easy way to do that [without loading the img archives]
     // so, for now, this is good enough
-    m_LargestFileSizeBlocks = m_GTALargestFileSizeBlocks = 1260 * 2; 
+    m_LargestFileSizeBlocks = m_GTALargestFileSizeBlocks = 1260 * 2;
 }
 
 CClientIMGManager::~CClientIMGManager()

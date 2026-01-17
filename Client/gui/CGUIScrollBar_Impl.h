@@ -27,7 +27,7 @@ public:
 
     eCGUIType GetType() { return CGUI_SCROLLBAR; };
 
-    #include "CGUIElement_Inc.h"
+#include "CGUIElement_Inc.h"
 
 private:
     bool Event_OnScroll(const CEGUI::EventArgs& e);

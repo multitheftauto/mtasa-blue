@@ -21,7 +21,7 @@
 #include "CMapManager.h"
 
 CAccountManager::CAccountManager(const SString& strDbPathFilename)
-    : m_AccountProtect(6, 30000, 60000 * 1)            // Max of 6 attempts per 30 seconds, then 1 minute ignore
+    : m_AccountProtect(6, 30000, 60000 * 1)  // Max of 6 attempts per 30 seconds, then 1 minute ignore
 {
     m_llLastTimeSaved = GetTickCount64_();
     m_bChangedSinceSaved = false;
@@ -591,7 +591,7 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const std::s
     CLuaArguments Arguments;
     Arguments.PushAccount(pCurrentAccount);
     Arguments.PushAccount(pAccount);
-    Arguments.PushBoolean(false);            // was bAutoLogin
+    Arguments.PushBoolean(false);  // was bAutoLogin
     if (!pPlayer->CallEvent("onPlayerLogin", Arguments))
     {
         // DENIED!
@@ -723,7 +723,7 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
                 break;
 
             default:
-                dassert(0);            // It never should hit this, if so, something corrupted
+                dassert(0);  // It never should hit this, if so, something corrupted
                 break;
         }
     }
@@ -777,14 +777,14 @@ bool CAccountManager::CopyAccountData(CAccount* pFromAccount, CAccount* pToAccou
     // list to store pFromAccount data to
     std::map<SString, CAccountData> copiedData;
 
-    if (!pFromAccount->IsRegistered())            // is not registered account, retrieve data from memory
+    if (!pFromAccount->IsRegistered())  // is not registered account, retrieve data from memory
     {
         for (const auto& iter : *pFromAccount)
         {
             MapSet(copiedData, iter.second.GetKey(), CAccountData(iter.second.GetKey(), iter.second.GetStrValue(), iter.second.GetType()));
         }
     }
-    else            // is registered account, retrieve from database
+    else  // is registered account, retrieve from database
     {
         SString strKey;
         SString strValue;
@@ -813,17 +813,17 @@ bool CAccountManager::CopyAccountData(CAccount* pFromAccount, CAccount* pToAccou
         }
     }
 
-    if (copiedData.size() > 0)            // got anything to copy?
+    if (copiedData.size() > 0)  // got anything to copy?
     {
         std::map<SString, CAccountData>::iterator iter = copiedData.begin();
 
         for (; iter != copiedData.end(); iter++)
         {
-            if (!pToAccount->IsRegistered())            // store to memory
+            if (!pToAccount->IsRegistered())  // store to memory
             {
                 pToAccount->SetData(iter->second.GetKey(), iter->second.GetStrValue(), iter->second.GetType());
             }
-            else            // store to database
+            else  // store to database
             {
                 CRegistryResult subResult;
 
@@ -1011,7 +1011,7 @@ CAccount* CAccountManager::AddConsoleAccount(const SString& strName)
 CAccount* CAccountManager::AddPlayerAccount(const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial,
                                             const SString& strHttpPassAppend)
 {
-    CAccount* pAccount = new CAccount(this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial, strHttpPassAppend);
+    CAccount*     pAccount = new CAccount(this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial, strHttpPassAppend);
     CLuaArguments Arguments;
     Arguments.PushAccount(pAccount);
     g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
@@ -1146,7 +1146,7 @@ bool CAccountManager::IsAuthorizedSerialRequired(CAccount* pAccount)
 bool CAccountManager::IsHttpLoginAllowed(CAccount* pAccount, const SString& strIp)
 {
     return !g_pGame->GetConfig()->GetAuthSerialHttpEnabled() || g_pGame->GetConfig()->IsAuthSerialHttpIpException(strIp) ||
-        !IsAuthorizedSerialRequired(pAccount) || pAccount->IsIpAuthorized(strIp);
+           !IsAuthorizedSerialRequired(pAccount) || pAccount->IsIpAuthorized(strIp);
 }
 
 //

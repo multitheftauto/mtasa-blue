@@ -15,39 +15,40 @@
 #include "CLanguageSelector.h"
 #include "CDiscordRichPresence.h"
 
-#define NATIVE_RES_X    1280.0f
-#define NATIVE_RES_Y    1024.0f
+#define NATIVE_RES_X 1280.0f
+#define NATIVE_RES_Y 1024.0f
 
-#define NATIVE_BG_X     1280.0f
-#define NATIVE_BG_Y     649.0f
+#define NATIVE_BG_X 1280.0f
+#define NATIVE_BG_Y 649.0f
 
-#define NATIVE_LOGO_X     1058.0f
-#define NATIVE_LOGO_Y     540.0f
+#define NATIVE_LOGO_X 1058.0f
+#define NATIVE_LOGO_Y 540.0f
 
-#define CORE_MTA_MENUITEMS_START_X  0.168
+#define CORE_MTA_MENUITEMS_START_X 0.168
 
-#define CORE_MTA_BG_MAX_ALPHA       1.00f   //ACHTUNG: Set to 1 for now due to GTA main menu showing through (no delay inserted between Entering game... and loading screen)
-#define CORE_MTA_BG_INGAME_ALPHA    0.90f
-#define CORE_MTA_FADER              0.05f // 1/20
-#define CORE_MTA_FADER_CREDITS      0.01f
+#define CORE_MTA_BG_MAX_ALPHA \
+    1.00f  // ACHTUNG: Set to 1 for now due to GTA main menu showing through (no delay inserted between Entering game... and loading screen)
+#define CORE_MTA_BG_INGAME_ALPHA 0.90f
+#define CORE_MTA_FADER           0.05f  // 1/20
+#define CORE_MTA_FADER_CREDITS   0.01f
 
-#define CORE_MTA_HOVER_SCALE        1.0f
-#define CORE_MTA_NORMAL_SCALE       0.6f
-#define CORE_MTA_HOVER_ALPHA        1.0f
-#define CORE_MTA_NORMAL_ALPHA       0.6f
+#define CORE_MTA_HOVER_SCALE  1.0f
+#define CORE_MTA_NORMAL_SCALE 0.6f
+#define CORE_MTA_HOVER_ALPHA  1.0f
+#define CORE_MTA_NORMAL_ALPHA 0.6f
 
-#define CORE_MTA_HIDDEN_ALPHA       0.0f
-#define CORE_MTA_DISABLED_ALPHA     0.4f
-#define CORE_MTA_ENABLED_ALPHA      1.0f
+#define CORE_MTA_HIDDEN_ALPHA   0.0f
+#define CORE_MTA_DISABLED_ALPHA 0.4f
+#define CORE_MTA_ENABLED_ALPHA  1.0f
 
 #define CORE_MTA_ANIMATION_TIME_IN  200
 #define CORE_MTA_ANIMATION_TIME_OUT 100
 #define CORE_MTA_MOVE_ANIM_TIME     600
 
-#define CORE_MTA_STATIC_BG          "cgui\\images\\background.png"
-#define CORE_MTA_LOGO               "cgui\\images\\background_logo.png"
-#define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
-#define CORE_MTA_VERSION            "cgui\\images\\version.png"
+#define CORE_MTA_STATIC_BG "cgui\\images\\background.png"
+#define CORE_MTA_LOGO      "cgui\\images\\background_logo.png"
+#define CORE_MTA_FILLER    "cgui\\images\\mta_filler.png"
+#define CORE_MTA_VERSION   "cgui\\images\\version.png"
 
 static const SColor headlineColors[] = {SColorRGBA(233, 234, 106, 255), SColorRGBA(233 / 6 * 4, 234 / 6 * 4, 106 / 6 * 4, 255),
                                         SColorRGBA(233 / 7 * 3, 234 / 7 * 3, 106 / 7 * 3, 255)};
@@ -88,7 +89,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     int iBackgroundSizeY;
 
     // First let's work out our x and y offsets
-    if (ScreenSize.fX > ScreenSize.fY)            // If the monitor is a normal landscape one
+    if (ScreenSize.fX > ScreenSize.fY)  // If the monitor is a normal landscape one
     {
         float iRatioSizeY = ScreenSize.fY / NATIVE_RES_Y;
         m_iMenuSizeX = NATIVE_RES_X * iRatioSizeY;
@@ -100,7 +101,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
         iBackgroundSizeX = ScreenSize.fX;
         iBackgroundSizeY = NATIVE_BG_Y * iRatioSizeX;
     }
-    else            // Otherwise our monitor is in a portrait resolution, so we cant fill the background by y
+    else  // Otherwise our monitor is in a portrait resolution, so we cant fill the background by y
     {
         float iRatioSizeX = ScreenSize.fX / NATIVE_RES_X;
         m_iMenuSizeY = NATIVE_RES_Y * iRatioSizeX;
@@ -194,9 +195,9 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_iSecondItemCentre = (m_menuItems[1]->image)->GetPosition().fY + fSecondItemSize * 0.5f;
 
     // Store some mouse over bounding box positions
-    m_menuAX = (0.168f * m_iMenuSizeX) + m_iXOff;                                                                      // Left side of the items
-    m_menuAY = m_iFirstItemCentre - fFirstItemSize * (CORE_MTA_HOVER_SCALE / CORE_MTA_NORMAL_SCALE) * 0.5f;            // Top side of the items
-    m_menuBX = m_menuAX + ((390 / NATIVE_RES_X) * m_iMenuSizeX);            // Right side of the items. We add the longest picture (browse_servers)
+    m_menuAX = (0.168f * m_iMenuSizeX) + m_iXOff;                                                            // Left side of the items
+    m_menuAY = m_iFirstItemCentre - fFirstItemSize * (CORE_MTA_HOVER_SCALE / CORE_MTA_NORMAL_SCALE) * 0.5f;  // Top side of the items
+    m_menuBX = m_menuAX + ((390 / NATIVE_RES_X) * m_iMenuSizeX);  // Right side of the items. We add the longest picture (browse_servers)
     m_menuAY += BODGE_FACTOR_1;
 
     m_pMenuArea = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pCanvas));
@@ -223,7 +224,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     float fDrawSizeX = (vecNativeSize.fX / NATIVE_RES_X) * m_iMenuSizeX;
     float fDrawSizeY = (vecNativeSize.fY / NATIVE_RES_Y) * m_iMenuSizeY;
     m_pLatestNews->SetSize(CVector2D(fDrawSizeX, fDrawSizeY), false);
-    float fDrawPosX = 0.83f * m_iMenuSizeX - fDrawSizeX;            // Right aligned
+    float fDrawPosX = 0.83f * m_iMenuSizeX - fDrawSizeX;  // Right aligned
     float fDrawPosY = 0.61f * m_iMenuSizeY;
     m_pLatestNews->SetPosition(CVector2D(fDrawPosX, fDrawPosY), false);
     m_pLatestNews->SetVisible(false);
@@ -320,7 +321,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     // Add feature branch alert
     m_pFeatureBranchAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
     std::int32_t buffer = 0xFFFF0000;
-    m_pFeatureBranchAlertTexture->LoadFromMemory(&buffer, 1, 1);            // HACK: Load red dot
+    m_pFeatureBranchAlertTexture->LoadFromMemory(&buffer, 1, 1);  // HACK: Load red dot
 
     m_pFeatureBranchAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
     m_pFeatureBranchAlertImage->LoadFromTexture(m_pFeatureBranchAlertTexture.get());
@@ -341,7 +342,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     // Add annonying alert
     m_pAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
     std::int32_t buffer = 0xFFFF0000;
-    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1);            // HACK: Load red dot
+    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1);  // HACK: Load red dot
 
     m_pAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
     m_pAlertImage->LoadFromTexture(m_pAlertTexture.get());
@@ -358,7 +359,8 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
 CMainMenu::~CMainMenu()
 {
-    auto destroyElement = [this](auto*& element) {
+    auto destroyElement = [this](auto*& element)
+    {
         if (!element)
             return;
         m_pManager->DestroyElementRecursive(element);
@@ -444,9 +446,9 @@ void CMainMenu::SetMenuVerticalPosition(int iPosY)
     m_pMenuArea->SetSize(CVector2D(m_menuBX - m_menuAX, m_menuBY - m_menuAY) + BODGE_FACTOR_6, false);
 }
 
-void CMainMenu::SetMenuUnhovered()            // Dehighlight all our items
+void CMainMenu::SetMenuUnhovered()  // Dehighlight all our items
 {
-    if (m_bIsIngame)            // CEGUI hack
+    if (m_bIsIngame)  // CEGUI hack
     {
         float fAlpha = m_pDisconnect->image->GetAlpha();
         m_pDisconnect->image->SetAlpha(0.35f);
@@ -478,8 +480,8 @@ void CMainMenu::Update()
     }
 
     // Get the game interface and the system state
-    CGame*       pGame = CCore::GetSingleton().GetGame();
-    SystemState  systemState = pGame->GetSystemState();
+    CGame*      pGame = CCore::GetSingleton().GetGame();
+    SystemState systemState = pGame->GetSystemState();
 
     m_Credits.Update();
     m_Settings.Update();
@@ -490,7 +492,7 @@ void CMainMenu::Update()
     if (m_bHideGame)
         m_pGraphics->DrawRectangle(0, 0, m_ScreenSize.fX, m_ScreenSize.fY, 0xFF000000);
 
-    if (m_bIsIngame)            // CEGUI hack
+    if (m_bIsIngame)  // CEGUI hack
     {
         float fAlpha = m_pDisconnect->image->GetAlpha();
         m_pDisconnect->image->SetAlpha(0.35f);
@@ -567,7 +569,8 @@ void CMainMenu::Update()
         {
             // Let's work out what the target progress should be by working out the time passed
             // Min of 0.5 progress fixes occasional graphical glitchekal
-            float newProgress = (*it)->animProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME_OUT) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
+            float newProgress =
+                (*it)->animProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME_OUT) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
             if (SetItemHoverProgress((*it), newProgress, false))
             {
                 std::set<sMenuItem*>::iterator itToErase = it++;
@@ -602,7 +605,7 @@ void CMainMenu::Update()
 
                 float fTopItemSize = m_pDisconnect->image->GetSize(false).fY;
                 float fTopItemCentre = m_pDisconnect->image->GetPosition(false).fY + fTopItemSize * 0.5f;
-                m_menuAY = fTopItemCentre - fTopItemSize * (CORE_MTA_HOVER_SCALE / CORE_MTA_NORMAL_SCALE) * 0.5f;            // Top side of the items
+                m_menuAY = fTopItemCentre - fTopItemSize * (CORE_MTA_HOVER_SCALE / CORE_MTA_NORMAL_SCALE) * 0.5f;  // Top side of the items
                 m_menuAY += BODGE_FACTOR_1;
 
                 m_pMenuArea->SetPosition(CVector2D(m_menuAX - m_iXOff, m_menuAY - m_iYOff) + BODGE_FACTOR_5, false);
@@ -626,7 +629,7 @@ void CMainMenu::Update()
 
         if (m_fFader > 0.0f)
         {
-            m_bIsVisible = true;            // Make cursor appear faster
+            m_bIsVisible = true;  // Make cursor appear faster
 
             if (!m_bCursorAlphaReset)
             {
@@ -646,7 +649,6 @@ void CMainMenu::Update()
             m_ucFade = FADE_VISIBLE;
             m_bIsVisible = true;
             m_bIsFullyVisible = true;
-
         }
     }
     // Fade out
@@ -661,10 +663,9 @@ void CMainMenu::Update()
 
         if (m_fFader < 1.0f)
         {
-            m_bIsVisible = false;            // Make cursor disappear faster
+            m_bIsVisible = false;  // Make cursor disappear faster
             m_bCursorAlphaReset = false;
         }
-
 
         // If the fade is complete
         if (m_fFader <= 0)
@@ -706,8 +707,7 @@ void CMainMenu::Update()
     if (m_bIsVisible && systemState != SystemState::GS_INIT_PLAYING_GAME)
     {
         // If we're at the game's mainmenu, or ingame when m_bIsIngame is true show the background
-        if (systemState == SystemState::GS_FRONTEND ||
-            systemState == SystemState::GS_PLAYING_GAME && !m_bIsIngame)
+        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME && !m_bIsIngame)
         {
             if (m_ucFade == FADE_INVISIBLE)
                 Show(false);

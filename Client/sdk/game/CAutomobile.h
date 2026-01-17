@@ -20,5 +20,5 @@ class CDoor;
 class CAutomobile : public virtual CVehicle
 {
 public:
-    virtual ~CAutomobile(){};
+    virtual ~CAutomobile() {};
 };
