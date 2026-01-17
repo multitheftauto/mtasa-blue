@@ -175,4 +175,4 @@ namespace StackTraceHelpers
             return "<format_error>";
         }
     }
-}  // namespace StackTraceHelpers
+}

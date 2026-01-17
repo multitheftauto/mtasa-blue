@@ -47,4 +47,4 @@ namespace FPSLimiter
         virtual void OnFrameStart() = 0;      // Event handler called at the start of each frame
         virtual void OnFrameEnd() = 0;        // Event handler called at the end of each frame
     };
-}  // namespace FPSLimiter
+}
