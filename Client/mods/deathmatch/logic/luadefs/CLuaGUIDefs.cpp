@@ -2424,7 +2424,7 @@ int CLuaGUIDefs::GUIGridListInsertRowAfter(lua_State* luaVM)
         else
         {
             // Vector containing our string arguments.  We add a bool to store whether it was originally a number.
-            std::vector<std::pair<SString, bool>> m_items;
+            std::vector<std::pair<SString, bool> >     m_items;
             for (CLuaArgument* pArgument : Arguments)
             {
                 SString strItemText;
@@ -2569,7 +2569,7 @@ int CLuaGUIDefs::GUIGridListGetSelectedItem(lua_State* luaVM)
         int iRow = static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement())->GetSelectedItemRow();
         int iColumn = static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement())->GetSelectedItemColumn();
         lua_pushnumber(luaVM, iRow);
-        lua_pushnumber(luaVM, iColumn + 1);  // columns start at 1
+        lua_pushnumber(luaVM, iColumn + 1);            // columns start at 1
         return 2;
     }
     else

@@ -1,13 +1,13 @@
 /*****************************************************************************
- *
- *  PROJECT:     Multi Theft Auto v1.0
- *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        multiplayer_sa/CMultiplayerSA_HookDestructors.cpp
- *  PURPOSE:     Game destructor hooks and entity lifecycle tracking
- *
- *  Multi Theft Auto is available from https://www.multitheftauto.com/
- *
- *****************************************************************************/
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        multiplayer_sa/CMultiplayerSA_HookDestructors.cpp
+*  PURPOSE:     Game destructor hooks and entity lifecycle tracking
+*
+*  Multi Theft Auto is available from https://www.multitheftauto.com/
+*
+*****************************************************************************/
 
 #include "StdInc.h"
 #include <atomic>
@@ -16,21 +16,21 @@
 namespace
 {
     // Handler pointers for game destructors
-    CAnimBlendAssocDestructorHandler*    m_pCAnimBlendAssocDestructorHandler = nullptr;
-    GameObjectDestructHandler*           pGameObjectDestructHandler = nullptr;
-    GameVehicleDestructHandler*          pGameVehicleDestructHandler = nullptr;
-    GamePlayerDestructHandler*           pGamePlayerDestructHandler = nullptr;
-    GameProjectileDestructHandler*       pGameProjectileDestructHandler = nullptr;
+    CAnimBlendAssocDestructorHandler*  m_pCAnimBlendAssocDestructorHandler = nullptr;
+    GameObjectDestructHandler*         pGameObjectDestructHandler = nullptr;
+    GameVehicleDestructHandler*        pGameVehicleDestructHandler = nullptr;
+    GamePlayerDestructHandler*         pGamePlayerDestructHandler = nullptr;
+    GameProjectileDestructHandler*     pGameProjectileDestructHandler = nullptr;
     std::atomic<GameModelRemoveHandler*> pGameModelRemoveHandler{nullptr};
-    GameRunNamedAnimDestructorHandler*   pRunNamedAnimDestructorHandler = nullptr;
+    GameRunNamedAnimDestructorHandler* pRunNamedAnimDestructorHandler = nullptr;
 
     // Reentrancy protection for CStreamingRemoveModel
     static std::atomic<bool> g_bStreamingRemoveModelInProgress{false};
     static std::atomic_flag  g_streamingRemoveModelLock{};
 
-#define FUNC_CPtrListSingleLink_Remove      0x0533610
-#define FUNC_CPtrListDoubleLink_Remove      0x05336B0
-#define FUNC_CPhysical_RemoveFromMovingList 0x542860
+    #define FUNC_CPtrListSingleLink_Remove      0x0533610
+    #define FUNC_CPtrListDoubleLink_Remove      0x05336B0
+    #define FUNC_CPhysical_RemoveFromMovingList 0x542860
 
     struct SStreamSectorEntrySingle
     {
@@ -53,13 +53,13 @@ namespace
     };
 
     CFastHashMap<CEntitySAInterface*, SEntitySAInterfaceExtraInfo> ms_EntitySAInterfaceExtraInfoMap;
-    std::mutex                                                     ms_EntityMapMutex;  // Protects ms_EntitySAInterfaceExtraInfoMap
+    std::mutex ms_EntityMapMutex;  // Protects ms_EntitySAInterfaceExtraInfoMap
 
     void RemoveEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface)
     {
         const std::lock_guard<std::mutex> lock(ms_EntityMapMutex);
         MapRemove(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface);
-    }  //
+    }    //
     // CPtrListSingleLink contains item
     //
     [[nodiscard]] bool CPtrListSingleLink_Contains(SStreamSectorEntrySingle* pStreamEntry, CEntitySAInterface* pCheckEntity) noexcept
@@ -128,19 +128,19 @@ namespace
             // Copy sector lists while holding lock to prevent dangling pointers
             std::vector<SStreamSectorEntrySingle**> sectorSingleList;
             std::vector<SStreamSectorEntryDouble**> sectorDoubleList;
-
+            
             {
                 const std::lock_guard<std::mutex> lock(ms_EntityMapMutex);  // Can throw std::system_error
-                auto* const                       pInfo = MapFind(ms_EntitySAInterfaceExtraInfoMap, pEntity);
-
+                auto* const pInfo = MapFind(ms_EntitySAInterfaceExtraInfoMap, pEntity);
+                
                 if (!pInfo) [[unlikely]]
                     return;
-
+                
                 // Remove map entry FIRST, before moving vectors, to prevent leak if move throws.
                 // Use std::move for exception safety (move hardly throws).
                 sectorSingleList = std::move(pInfo->AddedSectorSingleList);  // Usually noexcept
                 sectorDoubleList = std::move(pInfo->AddedSectorDoubleList);  // Usually noexcept
-
+                
                 // Now safe to remove - entry has been emptied
                 MapRemove(ms_EntitySAInterfaceExtraInfoMap, pEntity);
             }
@@ -166,7 +166,7 @@ namespace
             // This is acceptable as entity destructor will eventually clean up
         }
     }
-}  // namespace
+}            // namespace
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -178,8 +178,8 @@ void __cdecl CAnimBlendAssoc_destructor(CAnimBlendAssociationSAInterface* pThis)
     }
 }
 
-#define HOOKPOS_CAnimBlendAssoc_destructor 0x4CECF0
-static DWORD                  RETURN_CAnimBlendAssoc_destructor = 0x4CECF6;
+#define HOOKPOS_CAnimBlendAssoc_destructor       0x4CECF0
+static DWORD RETURN_CAnimBlendAssoc_destructor = 0x4CECF6;
 static void __declspec(naked) HOOK_CAnimBlendAssoc_destructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -222,9 +222,9 @@ void _cdecl OnCObjectDestructor(DWORD calledFrom, CObjectSAInterface* pObject)
 }
 
 // Hook info
-#define HOOKPOS_CObjectDestructor  0x59F660
-#define HOOKSIZE_CObjectDestructor 7
-DWORD                         RETURN_CObjectDestructor = 0x59F667;
+#define HOOKPOS_CObjectDestructor        0x59F660
+#define HOOKSIZE_CObjectDestructor       7
+DWORD RETURN_CObjectDestructor = 0x59F667;
 static void __declspec(naked) HOOK_CObjectDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -269,10 +269,9 @@ void _cdecl OnVehicleDestructor(DWORD calledFrom, CVehicleSAInterface* pVehicle)
 }
 
 // Hook info
-#define HOOKPOS_CVehicleDestructor  0x6E2B40
-#define HOOKSIZE_CVehicleDestructor 7
-DWORD RETURN_CVehicleDestructor =
-    0x6E2B47;  // Avoid SA's anti-disasm obfuscation at 0x401355 (which had been the return address for years), jump directly to real destructor body
+#define HOOKPOS_CVehicleDestructor           0x6E2B40
+#define HOOKSIZE_CVehicleDestructor          7
+DWORD RETURN_CVehicleDestructor = 0x6E2B47;  // Avoid SA's anti-disasm obfuscation at 0x401355 (which had been the return address for years), jump directly to real destructor body
 static void __declspec(naked) HOOK_CVehicleDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -316,9 +315,9 @@ void _cdecl OnCPlayerPedDestructor(DWORD calledFrom, CPedSAInterface* pPlayerPed
 }
 
 // Hook info
-#define HOOKPOS_CPlayerPedDestructor  0x6093B0
-#define HOOKSIZE_CPlayerPedDestructor 7
-DWORD                         RETURN_CPlayerPedDestructor = 0x6093B7;
+#define HOOKPOS_CPlayerPedDestructor        0x6093B0
+#define HOOKSIZE_CPlayerPedDestructor       7
+DWORD RETURN_CPlayerPedDestructor = 0x6093B7;
 static void __declspec(naked) HOOK_CPlayerPedDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -359,9 +358,9 @@ void _cdecl OnCProjectileDestructor(DWORD calledFrom, CEntitySAInterface* pProje
 }
 
 // Hook info
-#define HOOKPOS_CProjectileDestructor  0x5A40E0
-#define HOOKSIZE_CProjectileDestructor 6
-DWORD                         RETURN_CProjectileDestructor = 0x5A40E6;
+#define HOOKPOS_CProjectileDestructor        0x5A40E0
+#define HOOKSIZE_CProjectileDestructor       6
+DWORD RETURN_CProjectileDestructor = 0x5A40E6;
 static void __declspec(naked) HOOK_CProjectileDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -408,7 +407,7 @@ void _cdecl OnCPhysicalDestructor(DWORD calledFrom, CPhysicalSAInterface* pEntit
             // Called from naked asm hook - MUST NOT throw or stack is corrupted
             // If SString alloc fails, skip logging but continue cleanup
         }
-
+        
         // Always perform the actual removal, even if logging failed
         DWORD dwFunc = FUNC_CPhysical_RemoveFromMovingList;
         // clang-format off
@@ -422,9 +421,9 @@ void _cdecl OnCPhysicalDestructor(DWORD calledFrom, CPhysicalSAInterface* pEntit
 }
 
 // Hook info
-#define HOOKPOS_CPhysicalDestructor  0x542450
-#define HOOKSIZE_CPhysicalDestructor 7
-DWORD                         RETURN_CPhysicalDestructor = 0x542457;
+#define HOOKPOS_CPhysicalDestructor        0x542450
+#define HOOKSIZE_CPhysicalDestructor       7
+DWORD RETURN_CPhysicalDestructor = 0x542457;
 static void __declspec(naked) HOOK_CPhysicalDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -464,9 +463,9 @@ void _cdecl OnCEntityDestructor(DWORD calledFrom, CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntityDestructor  0x535E97
-#define HOOKSIZE_CEntityDestructor 6
-DWORD                         RETURN_CEntityDestructor = 0x535E9D;
+#define HOOKPOS_CEntityDestructor        0x535E97
+#define HOOKSIZE_CEntityDestructor       6
+DWORD RETURN_CEntityDestructor = 0x535E9D;
 static void __declspec(naked) HOOK_CEntityDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -502,7 +501,7 @@ void cdecl OnCEntityAddMid1(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
     try
     {
         const std::lock_guard<std::mutex> lock(ms_EntityMapMutex);
-
+        
         // Find or create entry - use find() first to prevent empty entry leak if push_back throws
         auto it = ms_EntitySAInterfaceExtraInfoMap.find(pEntitySAInterface);
         if (it != ms_EntitySAInterfaceExtraInfoMap.end())
@@ -514,7 +513,7 @@ void cdecl OnCEntityAddMid1(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
         {
             // Entry doesn't exist - create with initial value to avoid empty entry leak
             SEntitySAInterfaceExtraInfo info;
-            info.AddedSectorSingleList.push_back(ppStreamEntryList);                 // May throw - info is local, no leak
+            info.AddedSectorSingleList.push_back(ppStreamEntryList);  // May throw - info is local, no leak
             ms_EntitySAInterfaceExtraInfoMap[pEntitySAInterface] = std::move(info);  // Move assignment (noexcept)
         }
     }
@@ -526,10 +525,10 @@ void cdecl OnCEntityAddMid1(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
 }
 
 // Hook info
-#define HOOKPOS_CEntityAddMid1   0x5348FB
-#define HOOKSIZE_CEntityAddMid1  5
-#define HOOKCHECK_CEntityAddMid1 0xE8
-DWORD                         RETURN_CEntityAddMid1 = 0x534900;
+#define HOOKPOS_CEntityAddMid1        0x5348FB
+#define HOOKSIZE_CEntityAddMid1       5
+#define HOOKCHECK_CEntityAddMid1      0xE8
+DWORD RETURN_CEntityAddMid1 = 0x534900;
 static void __declspec(naked) HOOK_CEntityAddMid1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -571,7 +570,7 @@ void cdecl OnCEntityAddMid2(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
     try
     {
         const std::lock_guard<std::mutex> lock(ms_EntityMapMutex);
-
+        
         // Find or create entry - use find() first to prevent empty entry leak if push_back throws
         auto it = ms_EntitySAInterfaceExtraInfoMap.find(pEntitySAInterface);
         if (it != ms_EntitySAInterfaceExtraInfoMap.end())
@@ -583,7 +582,7 @@ void cdecl OnCEntityAddMid2(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
         {
             // Entry doesn't exist - create with initial value to avoid empty entry leak
             SEntitySAInterfaceExtraInfo info;
-            info.AddedSectorSingleList.push_back(ppStreamEntryList);                 // May throw - info is local, no leak
+            info.AddedSectorSingleList.push_back(ppStreamEntryList);  // May throw - info is local, no leak
             ms_EntitySAInterfaceExtraInfoMap[pEntitySAInterface] = std::move(info);  // Move assignment (noexcept)
         }
     }
@@ -595,10 +594,10 @@ void cdecl OnCEntityAddMid2(SStreamSectorEntrySingle** ppStreamEntryList, CEntit
 }
 
 // Hook info
-#define HOOKPOS_CEntityAddMid2   0x534A10
-#define HOOKSIZE_CEntityAddMid2  5
-#define HOOKCHECK_CEntityAddMid2 0xE8
-DWORD                         RETURN_CEntityAddMid2 = 0x534A15;
+#define HOOKPOS_CEntityAddMid2        0x534A10
+#define HOOKSIZE_CEntityAddMid2       5
+#define HOOKCHECK_CEntityAddMid2      0xE8
+DWORD RETURN_CEntityAddMid2 = 0x534A15;
 static void __declspec(naked) HOOK_CEntityAddMid2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -634,13 +633,13 @@ static void __declspec(naked) HOOK_CEntityAddMid2()
 //
 void cdecl OnCEntityAddMid3(SStreamSectorEntryDouble** ppStreamEntryList, CEntitySAInterface* pEntitySAInterface) noexcept
 {
-    if (!ppStreamEntryList || !pEntitySAInterface) [[unlikely]]
+    if (!ppStreamEntryList || !pEntitySAInterface) [[unlikely]] 
         return;
 
     try
     {
         const std::lock_guard<std::mutex> lock(ms_EntityMapMutex);
-
+        
         // Find or create entry - use find() first to prevent empty entry leak if push_back throws
         auto it = ms_EntitySAInterfaceExtraInfoMap.find(pEntitySAInterface);
         if (it != ms_EntitySAInterfaceExtraInfoMap.end())
@@ -652,7 +651,7 @@ void cdecl OnCEntityAddMid3(SStreamSectorEntryDouble** ppStreamEntryList, CEntit
         {
             // Entry doesn't exist - create with initial value to avoid empty entry leak
             SEntitySAInterfaceExtraInfo info;
-            info.AddedSectorDoubleList.push_back(ppStreamEntryList);                 // May throw - info is local, no leak
+            info.AddedSectorDoubleList.push_back(ppStreamEntryList);  // May throw - info is local, no leak
             ms_EntitySAInterfaceExtraInfoMap[pEntitySAInterface] = std::move(info);  // Move assignment (noexcept)
         }
     }
@@ -664,10 +663,10 @@ void cdecl OnCEntityAddMid3(SStreamSectorEntryDouble** ppStreamEntryList, CEntit
 }
 
 // Hook info
-#define HOOKPOS_CEntityAddMid3   0x534AA2
-#define HOOKSIZE_CEntityAddMid3  5
-#define HOOKCHECK_CEntityAddMid3 0xE8
-DWORD                         RETURN_CEntityAddMid3 = 0x534AA7;
+#define HOOKPOS_CEntityAddMid3        0x534AA2
+#define HOOKSIZE_CEntityAddMid3       5
+#define HOOKCHECK_CEntityAddMid3      0xE8
+DWORD RETURN_CEntityAddMid3 = 0x534AA7;
 static void __declspec(naked) HOOK_CEntityAddMid3()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -710,10 +709,10 @@ void cdecl OnCEntityRemovePost(CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntityRemove   0x534AE0
-#define HOOKSIZE_CEntityRemove  5
-#define HOOKCHECK_CEntityRemove 0x83
-DWORD                         RETURN_CEntityRemove = 0x534AE5;
+#define HOOKPOS_CEntityRemove        0x534AE0
+#define HOOKSIZE_CEntityRemove       5
+#define HOOKCHECK_CEntityRemove      0x83
+DWORD RETURN_CEntityRemove = 0x534AE5;
 static void __declspec(naked) HOOK_CEntityRemove()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -754,6 +753,7 @@ inner:
     // clang-format on
 }
 
+
 static void CallGameModelRemoveHandlerSafe(GameModelRemoveHandler* handler, ushort modelId)
 {
     __try
@@ -772,12 +772,12 @@ void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, int modelId) noexcept
 
     bool bLockAcquired = false;
     bool bTimeout = false;
-    int  attemptCount = 0;
-
+    int attemptCount = 0;
+    
     // Acquire spinlock with timeout
     constexpr int MAX_SPIN_ATTEMPTS = 50000;  // ~50ms on most CPU's
-    int           spinCount = 0;
-
+    int spinCount = 0;
+    
     while (g_streamingRemoveModelLock.test_and_set(std::memory_order_acquire))
     {
         if (++spinCount > MAX_SPIN_ATTEMPTS)
@@ -788,31 +788,32 @@ void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, int modelId) noexcept
         }
         SwitchToThread();
     }
-
+    
     if (!bTimeout)
     {
         bLockAcquired = true;
-
+        
         // Call handler with exception protection
         auto* const handler = pGameModelRemoveHandler.load(std::memory_order_acquire);
         if (handler) [[likely]]
         {
             CallGameModelRemoveHandlerSafe(handler, static_cast<ushort>(modelId));
         }
-
+        
         // Release spinlock
         g_streamingRemoveModelLock.clear(std::memory_order_release);
     }
-
+    
     // Always release reentrancy flag
     g_bStreamingRemoveModelInProgress.store(false, std::memory_order_release);
-
+    
     // Log timeout (SString can throw, so wrap in try/catch)
     if (bTimeout)
     {
         try
         {
-            AddReportLog(8641, SString("Failed to acquire CStreamingRemoveModel lock after %d attempts (modelId=%d)", attemptCount, modelId));
+            AddReportLog(8641, SString("Failed to acquire CStreamingRemoveModel lock after %d attempts (modelId=%d)", 
+                                       attemptCount, modelId));
         }
         catch (...)
         {
@@ -823,9 +824,9 @@ void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, int modelId) noexcept
 }
 
 // Hook info
-#define HOOKPOS_CStreamingRemoveModel  0x4089A0
-#define HOOKSIZE_CStreamingRemoveModel 6
-DWORD                         RETURN_CStreamingRemoveModel = 0x4089A6;
+#define HOOKPOS_CStreamingRemoveModel        0x4089A0
+#define HOOKSIZE_CStreamingRemoveModel       6
+DWORD RETURN_CStreamingRemoveModel = 0x4089A6;
 static void __declspec(naked) HOOK_CStreamingRemoveModel()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -867,9 +868,9 @@ void _cdecl OnCTaskSimpleRunNamedAnimDestructor(class CTaskSimpleRunNamedAnimSAI
 }
 
 // Hook info
-#define HOOKPOS_CTaskSimpleRunNamedAnimDestructor  0x61BEF0
-#define HOOKSIZE_CTaskSimpleRunNamedAnimDestructor 8
-DWORD                         RETURN_CTaskSimpleRunNamedAnim = 0x61BEF8;
+#define HOOKPOS_CTaskSimpleRunNamedAnimDestructor        0x61BEF0
+#define HOOKSIZE_CTaskSimpleRunNamedAnimDestructor       8
+DWORD RETURN_CTaskSimpleRunNamedAnim = 0x61BEF8;
 static void __declspec(naked) HOOK_CTaskSimpleRunNamedAnimDestructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

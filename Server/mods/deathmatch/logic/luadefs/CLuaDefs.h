@@ -34,7 +34,7 @@
 #include "../CDatabaseManager.h"
 #include <lua/CLuaFunctionParser.h>
 
-#define LUA_DECLARE(x)     static int x(lua_State* luaVM);
+#define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 #define LUA_DECLARE_OOP(x) LUA_DECLARE(x) LUA_DECLARE(OOP_##x)
 
 class CLuaDefs

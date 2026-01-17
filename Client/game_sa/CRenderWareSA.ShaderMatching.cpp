@@ -74,19 +74,19 @@ void CMatchChannelManager::InsertTexture(STexInfo* pTexInfo)
 {
     if (!pTexInfo)
         return;
-
+    
     // Find/create TexNameInfo
     STexNameInfo* pTexNameInfo = MapFindRef(m_AllTextureList, pTexInfo->strTextureName);
     if (!pTexNameInfo)
     {
         // Create TexNameInfo
         STexNameInfo* pNewTexNameInfo = new STexNameInfo(pTexInfo->strTextureName);
-
+        
         try
         {
             MapSet(m_AllTextureList, pTexInfo->strTextureName, pNewTexNameInfo);
             pTexNameInfo = MapFindRef(m_AllTextureList, pTexInfo->strTextureName);
-
+            
             if (!pTexNameInfo) [[unlikely]]
             {
                 delete pNewTexNameInfo;
@@ -126,9 +126,9 @@ void CMatchChannelManager::RemoveTexture(STexInfo* pTexInfo)
 {
     if (!pTexInfo)
         return;
-
+    
     STexNameInfo* pTexNameInfo = pTexInfo->pAssociatedTexNameInfo;
-
+    
     if (!pTexNameInfo) [[unlikely]]
         return;
 
@@ -276,12 +276,12 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity(STexInfo* pTex
 {
     if (!pTexInfo)
         return nullptr;
-
+    
     if (m_bChangesPending)
         FlushChanges();
 
     STexNameInfo* pTexNameInfo = pTexInfo->pAssociatedTexNameInfo;
-
+    
     if (!pTexNameInfo)
         return nullptr;
 
@@ -301,7 +301,7 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity(STexInfo* pTex
             pTexShaderReplacement = UpdateTexShaderReplacement(pTexNameInfo, pClientEntity, iEntityType);
         }
 
-#ifdef SHADER_DEBUG_CHECKS
+    #ifdef SHADER_DEBUG_CHECKS
         if (pTexNameInfo->iDebugCounter1++ > 400)
         {
             // Check cached shader is correct
@@ -327,7 +327,7 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity(STexInfo* pTex
             FinalizeLayers(shaderLayersCheck1);
             assert(pTexShaderReplacement->shaderLayers == shaderLayersCheck1);
         }
-#endif
+    #endif
 
         // Return layers for this entity
         return &pTexShaderReplacement->shaderLayers;
@@ -341,7 +341,7 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity(STexInfo* pTex
             UpdateTexShaderReplacementNoEntity(pTexNameInfo, texNoEntityShader, iEntityType);
         }
 
-#ifdef SHADER_DEBUG_CHECKS
+    #ifdef SHADER_DEBUG_CHECKS
         if (pTexNameInfo->iDebugCounter2++ > 400)
         {
             // Check cached shader is correct
@@ -351,7 +351,7 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity(STexInfo* pTex
             FinalizeLayers(shaderLayersCheck2);
             assert(texNoEntityShader.shaderLayers == shaderLayersCheck2);
         }
-#endif
+    #endif
 
         // Return layers for any entity
         return &texNoEntityShader.shaderLayers;
@@ -425,7 +425,7 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
     {
         if (!pChannel)
             continue;
-
+        
         for (STexNameInfo* pTexNameInfo : pChannel->m_MatchedTextureList)
         {
             if (pTexNameInfo)
@@ -495,7 +495,7 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
         CMatchChannel* pChannel = *iter;
         if (!pChannel)
             continue;
-
+        
         for (CFastHashSet<STexNameInfo*>::iterator iter = pChannel->m_MatchedTextureList.begin(); iter != pChannel->m_MatchedTextureList.end(); ++iter)
         {
             if (*iter)
@@ -677,7 +677,7 @@ void CMatchChannelManager::ProcessRematchTexturesQueue()
         {
             pChannel->RemoveTexture(pTexNameInfo);
             MapRemove(pTexNameInfo->matchChannelList, pChannel);
-            pTexNameInfo->ResetReplacementResults();  // Do this here as it won't get picked up in RecalcEverything now
+            pTexNameInfo->ResetReplacementResults();            // Do this here as it won't get picked up in RecalcEverything now
         }
 
         // Rematch against texture list

@@ -164,10 +164,10 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post()
 }
 
 // Hook info
-#define HOOKCHECK_FxSystem_c_Update_MidA 0x83
-#define HOOKPOS_FxSystem_c_Update_MidA   0x04AAF70
-#define HOOKSIZE_FxSystem_c_Update_MidA  5
-DWORD                         RETURN_FxSystem_c_Update_MidA = 0x04AAF75;
+#define HOOKCHECK_FxSystem_c_Update_MidA            0x83
+#define HOOKPOS_FxSystem_c_Update_MidA              0x04AAF70
+#define HOOKSIZE_FxSystem_c_Update_MidA             5
+DWORD RETURN_FxSystem_c_Update_MidA = 0x04AAF75;
 static void __declspec(naked) HOOK_FxSystem_c_Update_MidA()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -236,10 +236,10 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post()
 }
 
 // Hook info
-#define HOOKCHECK_FxSystem_c_Update_MidB 0x83
-#define HOOKPOS_FxSystem_c_Update_MidB   0x04AB21D
-#define HOOKSIZE_FxSystem_c_Update_MidB  7
-DWORD                         RETURN_FxSystem_c_Update_MidB = 0x04AB224;
+#define HOOKCHECK_FxSystem_c_Update_MidB           0x83
+#define HOOKPOS_FxSystem_c_Update_MidB             0x04AB21D
+#define HOOKSIZE_FxSystem_c_Update_MidB            7
+DWORD RETURN_FxSystem_c_Update_MidB = 0x04AB224;
 static void __declspec(naked) HOOK_FxSystem_c_Update_MidB()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

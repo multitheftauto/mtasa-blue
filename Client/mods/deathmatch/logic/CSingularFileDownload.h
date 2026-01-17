@@ -13,9 +13,9 @@
 
 #ifndef _WINDOWS_
 
-    #define WIN32_LEAN_AND_MEAN  // Exclude all uncommon functions from windows.h to reduce build time by 100ms
+#define WIN32_LEAN_AND_MEAN     // Exclude all uncommon functions from windows.h to reduce build time by 100ms
 
-    #include <windows.h>
+#include <windows.h>
 #endif
 
 #include <bochs_internal/bochs_crc32.h>

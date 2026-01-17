@@ -36,7 +36,7 @@ namespace
     public:
         CLuaMainMemoryMap LuaMainMemoryMap;
     };
-}  // namespace
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -296,7 +296,7 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
         int ScreenSourceCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetScreenSourceCount();
         int WebBrowserCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetWebBrowserCount();
         int VectorGraphicCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetVectorGraphicCount();
-        TextItemCount = std::max(TextItemCount - 4, 0);  // Remove count for radar items
+        TextItemCount = std::max(TextItemCount - 4, 0);            // Remove count for radar items
         row[c++] = !TextItemCount ? SStringX("-") : SString("%d", TextItemCount);
         row[c++] = !DxFontCount ? SStringX("-") : SString("%d", DxFontCount);
         row[c++] = !GuiFontCount ? SStringX("-") : SString("%d", GuiFontCount);

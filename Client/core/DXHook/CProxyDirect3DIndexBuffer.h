@@ -16,8 +16,8 @@ class CProxyDirect3DIndexBuffer : public IDirect3DIndexBuffer9
 public:
     /*** IUnknown methods ***/
     HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    ULONG __stdcall   AddRef() { return m_pOriginal->AddRef(); }
-    ULONG __stdcall   Release();
+    ULONG __stdcall AddRef() { return m_pOriginal->AddRef(); }
+    ULONG __stdcall Release();
 
     /*** IDirect3DResource9 methods ***/
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice) { return m_pOriginal->GetDevice(ppDevice); }
@@ -27,9 +27,9 @@ public:
     }
     HRESULT __stdcall GetPrivateData(REFGUID refguid, void* pData, DWORD* pSizeOfData) { return m_pOriginal->GetPrivateData(refguid, pData, pSizeOfData); }
     HRESULT __stdcall FreePrivateData(REFGUID refguid) { return m_pOriginal->FreePrivateData(refguid); }
-    DWORD __stdcall   SetPriority(DWORD PriorityNew) { return m_pOriginal->SetPriority(PriorityNew); }
-    DWORD __stdcall   GetPriority() { return m_pOriginal->GetPriority(); }
-    void __stdcall    PreLoad() { return m_pOriginal->PreLoad(); }
+    DWORD __stdcall SetPriority(DWORD PriorityNew) { return m_pOriginal->SetPriority(PriorityNew); }
+    DWORD __stdcall GetPriority() { return m_pOriginal->GetPriority(); }
+    void __stdcall PreLoad() { return m_pOriginal->PreLoad(); }
     D3DRESOURCETYPE __stdcall GetType() { return m_pOriginal->GetType(); }
 
     /*** IDirect3DIndexBuffer9 methods ***/

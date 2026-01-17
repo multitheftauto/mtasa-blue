@@ -21,7 +21,7 @@ bool CPlayerStatsPacket::Write(NetBitStreamInterface& BitStream) const
     // Write the source elements's ID
     BitStream.Write(m_pSourceElement->GetID());
 
-    BitStream.WriteCompressed(static_cast<unsigned short>(m_map.size()));  // Write stat count
+    BitStream.WriteCompressed(static_cast<unsigned short>(m_map.size()));            // Write stat count
     for (auto&& [statID, value] : m_map)
     {
         BitStream.Write(statID);
@@ -36,10 +36,10 @@ void CPlayerStatsPacket::Add(unsigned short usID, float fValue)
     if (auto iter = m_map.find(usID); iter != m_map.end())
     {
         if (fValue == 0.0f)
-            m_map.erase(iter);  // Erase stat
+            m_map.erase(iter);            // Erase stat
         else
-            iter->second = fValue;  // Update value
+            iter->second = fValue;            // Update value
     }
-    else  // Not in map
+    else            // Not in map
         m_map.emplace(usID, fValue);
 }

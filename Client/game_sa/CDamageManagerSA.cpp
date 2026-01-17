@@ -146,7 +146,8 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                 }
                 // clang-format on
             }
-            else reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
+            else
+                reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
         }
     }
 }
@@ -272,19 +273,19 @@ int CDamageManagerSA::GetCarNodeIndexFromPanel(std::uint8_t panelId) noexcept
     switch (panelId)
     {
         case 0:
-            index = 15;  // PANEL_WING_LF
+            index = 15; // PANEL_WING_LF
             break;
         case 1:
-            index = 14;  // PANEL_WING_RF
+            index = 14; // PANEL_WING_RF
             break;
         case 4:
-            index = 18;  // PANEL_WINDSCREEN
+            index = 18; // PANEL_WINDSCREEN
             break;
         case 5:
-            index = 12;  // BUMP_FRONT
+            index = 12; // BUMP_FRONT
             break;
         case 6:
-            index = 13;  // BUMP_REAR
+            index = 13; // BUMP_REAR
             break;
     }
 

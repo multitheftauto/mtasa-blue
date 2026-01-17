@@ -250,7 +250,7 @@ void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool b
 
     // Assign the class metatable
     lua_getclass(luaVM, szClass);
-    lua_setmetatable(luaVM, -2);  // element
+    lua_setmetatable(luaVM, -2);            // element
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector)
@@ -342,30 +342,30 @@ void lua_newclass(lua_State* luaVM)
 
 void lua_getclass(lua_State* luaVM, const char* szName)
 {
-    lua_pushstring(luaVM, "mt");           // "mt"
-    lua_rawget(luaVM, LUA_REGISTRYINDEX);  // mt
+    lua_pushstring(luaVM, "mt");                     // "mt"
+    lua_rawget(luaVM, LUA_REGISTRYINDEX);            // mt
 
     assert(lua_istable(luaVM, -1));
 
-    lua_pushstring(luaVM, szName);  // mt, class name
-    lua_rawget(luaVM, -2);          // mt, class
+    lua_pushstring(luaVM, szName);            // mt, class name
+    lua_rawget(luaVM, -2);                    // mt, class
 
-    lua_remove(luaVM, -2);  // class
+    lua_remove(luaVM, -2);            // class
 }
 
 void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParent, bool bRegisterWithEnvironment)
 {
     if (szParent != NULL)
     {
-        lua_pushstring(luaVM, "mt");           // class table, "mt"
-        lua_rawget(luaVM, LUA_REGISTRYINDEX);  // class table, mt table
-        lua_getfield(luaVM, -1, szParent);     // class table, mt table, parent table
+        lua_pushstring(luaVM, "mt");                     // class table, "mt"
+        lua_rawget(luaVM, LUA_REGISTRYINDEX);            // class table, mt table
+        lua_getfield(luaVM, -1, szParent);               // class table, mt table, parent table
 
         assert(lua_istable(luaVM, -1));
 
-        lua_setfield(luaVM, -3, "__parent");  // class table, mt table
+        lua_setfield(luaVM, -3, "__parent");            // class table, mt table
 
-        lua_pop(luaVM, 1);  // class table
+        lua_pop(luaVM, 1);            // class table
     }
 
     lua_pushstring(luaVM, "mt");

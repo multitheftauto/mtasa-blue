@@ -35,15 +35,16 @@ extern CGameSA* pGame;
 
 CEntity* CCamSA::GetTargetEntity() const
 {
+
     if (!m_pInterface)
         return nullptr;
 
     if (!pGame)
         return nullptr;
-
+        
     CEntitySAInterface* pInterface = m_pInterface->CamTargetEntity;
     if (pInterface)
-    {
+    {           
         CPools* pPools = pGame->GetPools();
         if (pPools)
             return pPools->GetEntity((DWORD*)pInterface);
@@ -55,13 +56,13 @@ void CCamSA::SetTargetEntity(CEntity* pEntity)
 {
     if (!m_pInterface)
         return;
-
+        
     if (pEntity)
     {
         auto pEntityInterface = pEntity->GetInterface();
         if (!pEntityInterface)
             return;
-
+            
         m_pInterface->CamTargetEntity = pEntityInterface;
     }
     else
@@ -96,11 +97,11 @@ void CCamSA::SetDirection(float fHorizontal, float fVertical)
 {
     if (!m_pInterface)
         return;
-
+        
     // Validate input float values
     if (!std::isfinite(fHorizontal) || !std::isfinite(fVertical))
         return;
-
+        
     m_pInterface->m_fHorizontalAngle = WrapAngleRad(fHorizontal);
     m_pInterface->m_fVerticalAngle = WrapAngleRad(fVertical);
 }

@@ -18,10 +18,10 @@
 const NetServerPlayerID NET_INVALID_PLAYER_ID;
 #define NET_INVALID_PLAYER_INDEX 255;
 
-#define NET_MAX_PLAYER_COUNT  64
-#define NET_MAX_VEHICLE_COUNT 250
+#define NET_MAX_PLAYER_COUNT        64
+#define NET_MAX_VEHICLE_COUNT       250
 
-#define NET_MAX_PLAYER_NAME_LENGTH 32
+#define NET_MAX_PLAYER_NAME_LENGTH  32
 
 typedef struct __static_client_data_t
 {
@@ -48,7 +48,7 @@ enum NetServerPacketReliability
     PACKET_RELIABILITY_UNRELIABLE_SEQUENCED,
     PACKET_RELIABILITY_RELIABLE,
     PACKET_RELIABILITY_RELIABLE_ORDERED,
-    PACKET_RELIABILITY_RELIABLE_SEQUENCED  //     Can drop packets
+    PACKET_RELIABILITY_RELIABLE_SEQUENCED            //     Can drop packets
 };
 
 // Copy of raknet statistics

@@ -70,8 +70,8 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
 
                 if (pSourcePlayer->GetWeaponType() != ucClientWeaponType)
                 {
-                    bWeaponCorrect = false;                // Possibly old weapon data.
-                    ucUseWeaponType = ucClientWeaponType;  // Use the packet supplied weapon type to skip over the correct amount of data
+                    bWeaponCorrect = false;                          // Possibly old weapon data.
+                    ucUseWeaponType = ucClientWeaponType;            // Use the packet supplied weapon type to skip over the correct amount of data
                 }
 
                 // Read out the current weapon slot and set it
@@ -131,7 +131,7 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
         {
             ReadVehicleSpecific(pVehicle, BitStream);
 
-            if (pVehicle->GetUpgrades()->HasUpgrade(1087))  // Hydraulics?
+            if (pVehicle->GetUpgrades()->HasUpgrade(1087))            // Hydraulics?
             {
                 short sRightStickX, sRightStickY;
                 if (!BitStream.Read(sRightStickX) || !BitStream.Read(sRightStickY))
@@ -235,7 +235,7 @@ bool CKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
         {
             WriteVehicleSpecific(pVehicle, BitStream);
 
-            if (pVehicle->GetUpgrades()->HasUpgrade(1087))  // Hydraulics?
+            if (pVehicle->GetUpgrades()->HasUpgrade(1087))            // Hydraulics?
             {
                 BitStream.Write(ControllerState.RightStickX);
                 BitStream.Write(ControllerState.RightStickY);

@@ -22,8 +22,8 @@ struct CColModelSAInterface;
 /*****************************************************************************/
 
 /* RenderWare macros */
-#define RpGetFrame(__c)      ((RwFrame*)(((RwObject*)(__c))->parent))
-#define RpSetFrame(__c, __f) ((((RwObject*)(__c))->parent) = (void*)(__f))
+#define RpGetFrame(__c)            ((RwFrame*)(((RwObject *)(__c))->parent))
+#define RpSetFrame(__c,__f)        ((((RwObject *)(__c))->parent) = (void *)(__f))
 
 /* RenderWare function defines */
 typedef RpAtomic*(__cdecl* RpAtomicCreate_t)();
@@ -114,9 +114,9 @@ typedef RtQuat*(__cdecl* RtQuatRotate_t)(RtQuat* quat, const RwV3d* axis, float 
 /*****************************************************************************/
 
 #ifdef RWFUNC_IMPLEMENT
-    #define RWFUNC(a, b) a = b;
+    #define RWFUNC(a,b) a = b;
 #else
-    #define RWFUNC(a, b) extern a;
+    #define RWFUNC(a,b) extern a;
 #endif
 
 // US Versions
@@ -206,14 +206,14 @@ RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
 /*****************************************************************************/
 
 typedef bool(__cdecl* SetTextureDict_t)(unsigned short id);
-typedef bool(__cdecl* LoadClumpFile_t)(RwStream* stream, unsigned int id);  // (stream, model id)
-typedef bool(__cdecl* LoadModel_t)(RwBuffer* filename, unsigned int id);    // (memory chunk, model id)
+typedef bool(__cdecl* LoadClumpFile_t)(RwStream* stream, unsigned int id);            // (stream, model id)
+typedef bool(__cdecl* LoadModel_t)(RwBuffer* filename, unsigned int id);              // (memory chunk, model id)
 typedef void(__cdecl* LoadCollisionModel_t)(unsigned char*, CColModelSAInterface*, const char*);
 typedef void(__cdecl* LoadCollisionModelVer2_t)(unsigned char*, unsigned int, CColModelSAInterface*, const char*);
 typedef void(__cdecl* LoadCollisionModelVer3_t)(unsigned char*, unsigned int, CColModelSAInterface*,
-                                                const char*);  // buf, bufsize, ccolmodel&, keyname
+                                                const char*);            // buf, bufsize, ccolmodel&, keyname
 typedef void(__cdecl* LoadCollisionModelVer4_t)(unsigned char*, unsigned int, CColModelSAInterface*,
-                                                const char*);  // buf, bufsize, ccolmodel&, keyname
+                                                const char*);            // buf, bufsize, ccolmodel&, keyname
 typedef bool(__cdecl* CTxdStore_LoadTxd_t)(unsigned int id, RwStream* filename);
 typedef void(__cdecl* CTxdStore_RemoveTxd_t)(unsigned int id);
 typedef void(__cdecl* CTxdStore_RemoveRef_t)(unsigned int id);

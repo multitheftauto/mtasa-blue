@@ -17,7 +17,7 @@
 #include "CLatentTransferManager.h"
 #include "CDebugHookManager.h"
 
-#define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST "1.3.0-9.04570"
+#define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
 
 extern CTimeUsMarker<20> markerLatentEvent;
 
@@ -81,7 +81,7 @@ int CLuaFunctionDefs::AddEventHandler(lua_State* luaVM)
         }
 
         if (!StringToEnum(strPriority, eventPriority))
-            argStream.SetTypeError(GetEnumTypeName(eventPriority), 5);  // priority is argument #5
+            argStream.SetTypeError(GetEnumTypeName(eventPriority), 5);            // priority is argument #5
     }
 
     if (!argStream.HasErrors())

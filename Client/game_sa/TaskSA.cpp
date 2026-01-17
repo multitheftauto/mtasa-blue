@@ -131,7 +131,7 @@ int CTaskSA::GetTaskType()
     DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
     int   iReturn = 9999;
 
-    if (dwFunc && dwFunc != 0x82263A)  // some functions have no task type 0x82263A is purecal (assert?)
+    if (dwFunc && dwFunc != 0x82263A)            // some functions have no task type 0x82263A is purecal (assert?)
     {
         // clang-format off
         __asm
@@ -178,7 +178,7 @@ bool CTaskSA::MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEven
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwFunc = GetInterface()->VTBL->MakeAbortable;
     bool  bReturn = 0;
-    if (dwFunc != 0x82263A && dwFunc)  // 82263A = purecall
+    if (dwFunc != 0x82263A && dwFunc)            // 82263A = purecall
     {
         // clang-format off
         __asm
@@ -209,8 +209,8 @@ const char* CTaskSA::GetTaskName()
 
 void CTaskSA::Destroy()
 {
-    if (m_bBeingDestroyed)  // we want to make sure we don't delete this twice or we get crashes :)
-        return;             // our hook in CTaskManagementSystem will try to delete this otherwise
+    if (m_bBeingDestroyed)            // we want to make sure we don't delete this twice or we get crashes :)
+        return;                       // our hook in CTaskManagementSystem will try to delete this otherwise
     m_bBeingDestroyed = true;
 
     DWORD dwThisInterface = (DWORD)GetInterface();
@@ -246,8 +246,8 @@ void CTaskSA::Destroy()
 
 void CTaskSA::DestroyJustThis()
 {
-    if (m_bBeingDestroyed)  // we want to make sure we don't delete this twice or we get crashes :)
-        return;             // our hook in CTaskManagementSystem will try to delete this otherwise
+    if (m_bBeingDestroyed)            // we want to make sure we don't delete this twice or we get crashes :)
+        return;                       // our hook in CTaskManagementSystem will try to delete this otherwise
     m_bBeingDestroyed = true;
 
     delete this;

@@ -62,6 +62,6 @@ private:
 
     CServerBase*    m_pBase;
     CDynamicLibrary m_Library;
-    SString         m_strServerPath;  // Root path
-    SString         m_strModPath;     // root/mods/deathmatch
+    SString         m_strServerPath;            // Root path
+    SString         m_strModPath;               // root/mods/deathmatch
 };

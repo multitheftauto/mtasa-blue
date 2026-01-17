@@ -29,5 +29,5 @@ private:
     class CXMLFile* m_pXMLFile;
     CXMLNode*       m_pXMLRootNode;
 
-    bool m_bInvalid;  // it failed to load
+    bool m_bInvalid;            // it failed to load
 };

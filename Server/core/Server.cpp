@@ -35,26 +35,26 @@ MTAEXPORT int Run(int iArgumentCount, char* szArguments[])
         }
     }
 
-#ifdef WIN32
+    #ifdef WIN32
     // Disable critical error message boxes
     SetErrorMode(SEM_FAILCRITICALERRORS);
-#endif
+    #endif
 
-#ifdef WIN_x86
+    #ifdef WIN_x86
     // Apply file hooks if not already done by the client
     bool bSkipFileHooks = false;
     for (int i = 1; i < iArgumentCount; i++)
         bSkipFileHooks |= SStringX(szArguments[i]).Contains("--clientfeedback");
     if (!bSkipFileHooks)
         AddUtf8FileHooks();
-#endif
+    #endif
 
-    // Create the server
-#ifdef WIN32
+        // Create the server
+    #ifdef WIN32
     CServerImpl Server(&g_CommandQueue);
-#else
+    #else
     CServerImpl Server;
-#endif
+    #endif
 
     // Run the main func
     int iReturn;
@@ -63,10 +63,10 @@ MTAEXPORT int Run(int iArgumentCount, char* szArguments[])
         iReturn = Server.Run(iArgumentCount, szArguments);
     } while (iReturn == SERVER_RESET_RETURN);
 
-// Done
-#ifdef WIN_x86
+    // Done
+    #ifdef WIN_x86
     RemoveUtf8FileHooks();
-#endif
+    #endif
 
     // Overwrite the exit code, if we are stopping gracefully without errors
     if (iReturn == ERROR_NO_ERROR)

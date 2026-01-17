@@ -21,8 +21,8 @@ using std::list;
 unsigned long CClientTask::m_ulLastUniqueIdentifier = 0;
 
 // Temporary until we start using ids
-#define VERIFY_PLAYER(player)   (m_pManager->GetPlayerManager()->Exists(player) && !player->IsBeingDeleted())
-#define VERIFY_VEHICLE(vehicle) (m_pManager->GetVehicleManager()->Exists(vehicle) && !vehicle->IsBeingDeleted())
+#define VERIFY_PLAYER(player) (m_pManager->GetPlayerManager ()->Exists(player)&&!player->IsBeingDeleted())
+#define VERIFY_VEHICLE(vehicle) (m_pManager->GetVehicleManager ()->Exists(vehicle)&&!vehicle->IsBeingDeleted())
 
 CClientTask::CClientTask(CClientManager* pManager)
 {
@@ -617,8 +617,8 @@ CTask* CClientTask::CreateTask(bool& bTaskPrimary, int& iTaskPriority)
         iTaskPriority = TASK_PRIORITY_PRIMARY;
 
         // Create the task
-        return g_pGame->GetTasks()->CreateTaskSimpleClimb(NULL, vecTarget, fHeading, static_cast<unsigned char>(fSurfaceType),
-                                                          static_cast<eClimbHeights>(fClimbStage), bForceClimb);
+        return g_pGame->GetTasks()->CreateTaskSimpleClimb(NULL, vecTarget, fHeading, static_cast<unsigned char>(fSurfaceType), static_cast<eClimbHeights>(fClimbStage),
+                                                          bForceClimb);
     }
 
     // Choking task?

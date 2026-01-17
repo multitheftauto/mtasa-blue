@@ -98,7 +98,7 @@ void SetHeight(float fY, bool bRelative = false)
     CGUIElement_Impl::SetHeight(fY, bRelative);
 };
 
-#ifndef EXCLUDE_SET_SIZE  // WTF? TODO: Refactor this
+#ifndef EXCLUDE_SET_SIZE // WTF? TODO: Refactor this
 void SetSize(const CVector2D& vecSize, bool bRelative = false)
 {
     CGUIElement_Impl::SetSize(vecSize, bRelative);

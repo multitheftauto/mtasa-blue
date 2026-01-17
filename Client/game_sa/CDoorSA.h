@@ -13,10 +13,10 @@
 
 #include <game/CDoor.h>
 
-#define FUNC_GetAngleOpenRatio 0x6f47e0
-#define FUNC_IsClosed          0x6f4800
-#define FUNC_IsFullyOpen       0x6f4820
-#define FUNC_Open              0x6f4790
+#define FUNC_GetAngleOpenRatio      0x6f47e0
+#define FUNC_IsClosed               0x6f4800
+#define FUNC_IsFullyOpen            0x6f4820
+#define FUNC_Open                   0x6f4790
 
 class CDoorSAInterface
 {
@@ -45,9 +45,9 @@ public:
     void              SetInterface(CDoorSAInterface* doorInterface) { internalInterface = doorInterface; }
     CDoorSAInterface* GetInterface() { return internalInterface; };
 
-    float     GetAngleOpenRatio();
-    bool      IsClosed();
-    bool      IsFullyOpen();
-    void      Open(float fOpenRatio);
+    float      GetAngleOpenRatio();
+    bool       IsClosed();
+    bool       IsFullyOpen();
+    void       Open(float fOpenRatio);
     DoorState GetDoorState() { return (DoorState)GetInterface()->m_nDoorState; };
 };

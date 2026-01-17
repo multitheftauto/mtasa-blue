@@ -12,12 +12,12 @@
 #pragma once
 
 // Not sure if R* used these
-#define DT_ENGINE_OK                 (0)
-#define DT_ENGINE_RADIATOR_BURST     (100)
-#define DT_ENGINE_ENGINE_OVERHEAT    (150)
-#define DT_ENGINE_ENGINE_PIPES_BURST (200)
-#define DT_ENGINE_ON_FIRE            (225)
-#define DT_ENGINE_FUCKED             (250)
+#define DT_ENGINE_OK                    (0)
+#define DT_ENGINE_RADIATOR_BURST        (100)
+#define DT_ENGINE_ENGINE_OVERHEAT       (150)
+#define DT_ENGINE_ENGINE_PIPES_BURST    (200)
+#define DT_ENGINE_ON_FIRE               (225)
+#define DT_ENGINE_FUCKED                (250)
 
 /*
 const unsigned char DT_ENG_INOPERABLE = 0x01;
@@ -97,11 +97,11 @@ enum ePanels
     FRONT_RIGHT_PANEL,
     REAR_LEFT_PANEL,
     REAR_RIGHT_PANEL,
-    WINDSCREEN_PANEL,  // needs to be in same order as in component.h
+    WINDSCREEN_PANEL,            // needs to be in same order as in component.h
     FRONT_BUMPER,
     REAR_BUMPER,
 
-    MAX_PANELS  // MUST BE 8 OR LESS
+    MAX_PANELS            // MUST BE 8 OR LESS
 };
 
 enum eLights
@@ -118,7 +118,7 @@ enum eLights
         REAR_LEFT_INDICATOR,
         REAR_RIGHT_INDICATOR,*/
 
-    MAX_LIGHTS  // MUST BE 16 OR LESS
+    MAX_LIGHTS            // MUST BE 16 OR LESS
 };
 
 enum class eCarNodes
@@ -182,7 +182,7 @@ public:
     virtual void          SetLightStatus(BYTE bLight, BYTE bLightStatus) = 0;
     virtual void          SetLightStatus(unsigned char ucStatus) = 0;
     virtual BYTE          GetAeroplaneCompStatus(BYTE CompID) = 0;
-    virtual void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status) = 0;  // component ids begin at 12 - probably
+    virtual void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status) = 0;            // component ids begin at 12 - probably
 
     virtual void FuckCarCompletely(bool bKeepWheels) = 0;
 };

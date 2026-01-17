@@ -36,7 +36,7 @@ namespace
     };
     std::list<STimingFunction> ms_TimingFunctionStack;
     bool                       ms_bRegisterdPostCallHook = false;
-}  // namespace
+}            // namespace
 
 CElementDeleter*           CLuaDefs::m_pElementDeleter = NULL;
 CBlipManager*              CLuaDefs::m_pBlipManager = NULL;

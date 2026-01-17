@@ -63,14 +63,14 @@ namespace SharedUtil
     public:
     };
 
-///////////////////////////////////////////////////////////////
-//
-// GetNextUnclockIndex
-//
-// Search forward from supplied index looking for an (unpaired) unclock marker
-//
-///////////////////////////////////////////////////////////////
-#define INVALID_INDEX -1
+    ///////////////////////////////////////////////////////////////
+    //
+    // GetNextUnclockIndex
+    //
+    // Search forward from supplied index looking for an (unpaired) unclock marker
+    //
+    ///////////////////////////////////////////////////////////////
+    #define INVALID_INDEX -1
     int GetNextUnclockIndex(std::vector<SFrameEvent>& eventList, int i)
     {
         if (i < 0 || i >= (int)eventList.size())
@@ -105,7 +105,7 @@ namespace SharedUtil
     {
         // check has even number of events
         if (eventList.size() & 1)
-            return;  // Error
+            return;            // Error
 
         // remove recursive Clock/Unclocks
         for (int i = 0; i < (int)eventList.size() - 1; i += 2)
@@ -114,16 +114,16 @@ namespace SharedUtil
             SFrameEvent& endEvent = eventList[i + 1];
 
             if (startEvent.type == STATS_CLOCK && endEvent.type == STATS_UNCLOCK)
-                continue;  // Fast simple case of unclock following a clock
+                continue;            // Fast simple case of unclock following a clock
 
             if (startEvent.type != STATS_CLOCK)
-                return;  // Error
+                return;            // Error
 
             int iClockIdx = i;
             int iUnclockIdx = GetNextUnclockIndex(eventList, iClockIdx + 1);
 
             if (iUnclockIdx == INVALID_INDEX)
-                return;  // Error
+                return;            // Error
 
             assert(iUnclockIdx != iClockIdx + 1);
             {
@@ -176,10 +176,7 @@ namespace SharedUtil
     //
     //
     ////////////////////////////////////////////////
-    CStatEvents::CStatEvents() : m_bEnabled(false), m_ItemBuffer(0), m_BufferPos(0), m_BufferPosMax(0), m_BufferPosMaxUsing(0)
-    {
-        ClearBuffer(true);
-    }
+    CStatEvents::CStatEvents() : m_bEnabled(false), m_ItemBuffer(0), m_BufferPos(0), m_BufferPosMax(0), m_BufferPosMaxUsing(0) { ClearBuffer(true); }
 
     ///////////////////////////////////////////////////////////////
     //
@@ -314,7 +311,7 @@ namespace SharedUtil
                         continue;
                     }
 
-                    float StartMs = (StartEvent.timeStamp - baseTimeStamp) * (1 / 1000.0f);  // TIMEUS to ms
+                    float StartMs = (StartEvent.timeStamp - baseTimeStamp) * (1 / 1000.0f);            // TIMEUS to ms
                     float EndMs = (EndEvent.timeStamp - baseTimeStamp) * (1 / 1000.0f);
                     float LengthMs = EndMs - StartMs;
                     fTotalMs += LengthMs;
@@ -350,10 +347,7 @@ namespace SharedUtil
     //
     //
     ///////////////////////////////////////////////////////////////
-    CStatResults::CStatResults()
-    {
-        m_fNextMaxClearTime = 0;
-    }
+    CStatResults::CStatResults() { m_fNextMaxClearTime = 0; }
 
     ///////////////////////////////////////////////////////////////
     //
@@ -449,4 +443,4 @@ namespace SharedUtil
         UNCLOCK("Profiling", "Compile stats");
     }
 
-}
+}            // namespace SharedUtil

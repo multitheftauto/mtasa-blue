@@ -17,7 +17,7 @@
 class CGUIScrollBar : public CGUIElement
 {
 public:
-    virtual ~CGUIScrollBar() {};
+    virtual ~CGUIScrollBar(){};
 
     virtual void SetOnScrollHandler(const GUI_CALLBACK& Callback) = 0;
 

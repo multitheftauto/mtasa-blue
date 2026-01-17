@@ -26,7 +26,7 @@ static void CObject_PreRender(CObjectSAInterface* objectInterface)
         objectEntity->pEntity->SetPreRenderRequired(true);
 }
 
-const std::uintptr_t          RETURN_CCObject_PreRender = 0x59FD56;
+const std::uintptr_t RETURN_CCObject_PreRender = 0x59FD56;
 static void __declspec(naked) HOOK_CCObject_PreRender()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -66,10 +66,10 @@ struct CFileObjectInstance
     float rx;
     float ry;
     float rz;
-    float rr;  // = 1
+    float rr;            // = 1
     DWORD modelId;
     DWORD areaNumber;
-    long  flags;  // = -1
+    long  flags;            // = -1
 };
 
 CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
@@ -185,7 +185,7 @@ void CObjectSA::Break()
     DWORD dwFunc = 0x5A0D90;
     DWORD dwThis = (DWORD)GetInterface();
 
-    float fHitVelocity = 1000.0f;  // has no direct influence, but should be high enough to trigger the break (effect)
+    float fHitVelocity = 1000.0f;            // has no direct influence, but should be high enough to trigger the break (effect)
 
     // clang-format off
     __asm

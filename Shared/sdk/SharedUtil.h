@@ -29,13 +29,13 @@
 
 // Vendor
 #ifndef _
-    #define _  // Use a dummy localisation define for modules that don't need it
+#define _ //Use a dummy localisation define for modules that don't need it
 #endif
 
 #include "SString.h"
 #include "WString.h"
 
-#define _E(code) SString(" [%s]", code)
+#define _E(code) SString(" [%s]",code)
 
 #include "SharedUtil.Legacy.h"
 #include "SharedUtil.Map.h"
@@ -67,21 +67,21 @@
 #include "CDuplicateLineFilter.h"
 
 #ifdef _MSC_VER
-    #define snprintf _snprintf
+#define snprintf _snprintf
 #endif
 
 #ifndef stricmp
-    #ifdef _MSC_VER
-        #define stricmp _stricmp
-    #else
-        #define stricmp strcasecmp
-    #endif
+#ifdef _MSC_VER
+#define stricmp _stricmp
+#else
+#define stricmp strcasecmp
+#endif
 #endif
 
 #ifndef strnicmp
-    #ifdef _MSC_VER
-        #define strnicmp _strnicmp
-    #else
-        #define strnicmp strncasecmp
-    #endif
+#ifdef _MSC_VER
+#define strnicmp _strnicmp
+#else
+#define strnicmp strncasecmp
+#endif
 #endif

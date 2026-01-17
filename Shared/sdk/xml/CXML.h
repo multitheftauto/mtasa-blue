@@ -19,7 +19,7 @@ class CXMLAttribute;
 typedef struct SXMLString
 {
     CXMLNode* node;
-    virtual ~SXMLString() {};
+    virtual ~SXMLString(){};
 } SXMLString;
 
 class CXML

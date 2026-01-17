@@ -18,7 +18,7 @@ class CWanted;
 class CPlayerPed : public virtual CPed
 {
 public:
-    virtual ~CPlayerPed() {};
+    virtual ~CPlayerPed(){};
 
     virtual CWanted* GetWanted() = 0;
 

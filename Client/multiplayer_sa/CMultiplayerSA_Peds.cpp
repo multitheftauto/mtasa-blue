@@ -29,8 +29,8 @@ static void __cdecl DoFootLanded(CPedSAInterface* pPedSAInterface, short footId,
         pPedStepHandler(pPedSAInterface, footId == LANDED_PED_LEFT_FOOT ? true : false);
 }
 
-#define HOOKPOS_CPed_DoFootLanded  0x5E5380
-#define HOOKSIZE_CPed_DoFootLanded 6
+#define HOOKPOS_CPed_DoFootLanded               0x5E5380
+#define HOOKSIZE_CPed_DoFootLanded              6
 static const DWORD CONTINUE_CPed_DoFootLanded = 0x5E5386;
 
 static void __declspec(naked) HOOK_CPed_DoFootLanded()

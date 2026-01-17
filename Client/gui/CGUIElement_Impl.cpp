@@ -14,9 +14,9 @@
 
 // Define no-drawing zones, a.k.a. the inside borders in the FrameWindow of BlueLook in pixels
 // If something is drawn inside of these areas, the theme border is drawn on top of it
-#define CGUI_NODRAW_LEFT   9.0f
-#define CGUI_NODRAW_RIGHT  9.0f
-#define CGUI_NODRAW_TOP    9.0f
+#define CGUI_NODRAW_LEFT 9.0f
+#define CGUI_NODRAW_RIGHT 9.0f
+#define CGUI_NODRAW_TOP 9.0f
 #define CGUI_NODRAW_BOTTOM 9.0f
 
 CGUIElement_Impl::CGUIElement_Impl()
@@ -220,7 +220,7 @@ void CGUIElement_Impl::AutoSize(const char* Text, float fPaddingX, float fPaddin
     const CEGUI::Font* pFont = m_pWindow->getFont();
     m_pWindow->setSize(CEGUI::Absolute,
                        CEGUI::Size(pFont->getTextExtent(CGUI_Impl::GetUTFString(Text ? Text : GetText())) + fPaddingX,
-                                   pFont->getFontHeight() + fPaddingY));  // Add hack factor to height to allow for long characters such as 'g' or 'j'
+                                   pFont->getFontHeight() + fPaddingY));            // Add hack factor to height to allow for long characters such as 'g' or 'j'
 }
 
 void CGUIElement_Impl::SetMinimumSize(const CVector2D& vecSize)

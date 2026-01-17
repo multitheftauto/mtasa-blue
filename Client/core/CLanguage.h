@@ -31,6 +31,6 @@ public:
 
 private:
     Dictionary m_Dict;
-    SString    m_strCode;  // Language code
-    SString    m_strName;  // Human readable name
+    SString    m_strCode;            // Language code
+    SString    m_strName;            // Human readable name
 };

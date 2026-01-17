@@ -520,6 +520,7 @@ bool CLuaAccountDefs::SetAccountSerial(CAccount* account, std::string serial) no
     return CStaticFunctionDefinitions::SetAccountSerial(account, serial);
 }
 
+
 int CLuaAccountDefs::SetAccountName(lua_State* luaVM)
 {
     // bool setAccountPassword ( account theAccount, string name[, bool allowCaseVariations = false ] )

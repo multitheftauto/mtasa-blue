@@ -76,10 +76,8 @@ public:
     void          SortCommandBinds();
 
     // Context-aware binding methods
-    bool CommandExistsInContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true,
-                                const char* arguments = NULL, const char* resource = NULL);
-    bool RemoveCommandFromContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true,
-                                  const char* arguments = NULL, const char* resource = NULL);
+    bool CommandExistsInContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true, const char* arguments = NULL, const char* resource = NULL);
+    bool RemoveCommandFromContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true, const char* arguments = NULL, const char* resource = NULL);
     bool HasAnyBindingForKey(const char* key, bool checkState = false, bool state = true);
     bool HasBindingInContext(const char* key, BindingContext context, bool checkState = false, bool state = true);
 

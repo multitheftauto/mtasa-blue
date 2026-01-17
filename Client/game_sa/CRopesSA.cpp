@@ -14,7 +14,7 @@
 
 DWORD dwDurationAddress = 0x558D1El;
 
-CRopesSAInterface (&CRopesSA::ms_aRopes)[8] = *(CRopesSAInterface (*)[8])0xB768B8;
+CRopesSAInterface (&CRopesSA::ms_aRopes)[8] = *(CRopesSAInterface(*)[8])0xB768B8;
 
 int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
 {

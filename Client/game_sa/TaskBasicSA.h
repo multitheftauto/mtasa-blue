@@ -19,17 +19,17 @@
 class CVehicleSAInterface;
 class CObjectSAInterface;
 
-#define FUNC_CTaskComplexUseMobilePhone__Constructor 0x6348A0
-#define FUNC_CTaskSimpleRunAnim__Constructor         0x61A900
-#define FUNC_CTaskSimpleRunNamedAnim__Constructor    0x61A990
-#define FUNC_CTaskComplexDie__Constructor            0x630040
-#define FUNC_CTaskSimpleStealthKill__Constructor     0x6225F0
-#define FUNC_CTaskSimpleDead__Constructor            0x630590
-#define FUNC_CTaskSimpleBeHit__Constructor           0x620780
-#define FUNC_CTaskComplexSunbathe__Constructor       0x631F80
-#define FUNC_CTASKSimplePlayerOnFoot__Constructor    0x685750
-#define FUNC_CTASKComplexFacial__Constructor         0x690D20
-#define VTBL_CTaskSimpleCarFallOut                   0x86EFD0
+#define FUNC_CTaskComplexUseMobilePhone__Constructor        0x6348A0
+#define FUNC_CTaskSimpleRunAnim__Constructor                0x61A900
+#define FUNC_CTaskSimpleRunNamedAnim__Constructor           0x61A990
+#define FUNC_CTaskComplexDie__Constructor                   0x630040
+#define FUNC_CTaskSimpleStealthKill__Constructor            0x6225F0
+#define FUNC_CTaskSimpleDead__Constructor                   0x630590
+#define FUNC_CTaskSimpleBeHit__Constructor                  0x620780
+#define FUNC_CTaskComplexSunbathe__Constructor              0x631F80
+#define FUNC_CTASKSimplePlayerOnFoot__Constructor           0x685750
+#define FUNC_CTASKComplexFacial__Constructor                0x690D20
+#define VTBL_CTaskSimpleCarFallOut                          0x86EFD0
 
 ///////////////////////
 // Use a mobile phone
@@ -47,8 +47,8 @@ public:
 class CTaskComplexUseMobilePhoneSA : public virtual CTaskComplexSA, public virtual CTaskComplexUseMobilePhone
 {
 public:
-    CTaskComplexUseMobilePhoneSA() {};
-    CTaskComplexUseMobilePhoneSA(const int iDuration);  // Default is -1
+    CTaskComplexUseMobilePhoneSA(){};
+    CTaskComplexUseMobilePhoneSA(const int iDuration);            // Default is -1
 };
 
 // temporary
@@ -77,18 +77,18 @@ public:
 class CTaskSimpleAnimSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleAnim
 {
 public:
-    CTaskSimpleAnimSA() {};
+    CTaskSimpleAnimSA(){};
 };
 
 class CTaskSimpleRunAnimSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleRunAnim
 {
 public:
-    CTaskSimpleRunAnimSA() {};
+    CTaskSimpleRunAnimSA(){};
     CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const AnimationId animID, const float fBlendDelta, const int iTaskType, const char* pTaskName,
                          const bool bHoldLastFrame = false);
 };
 
-#define ANIM_NAMELEN      24
+#define ANIM_NAMELEN 24
 #define ANIMBLOCK_NAMELEN 16
 
 class CTaskSimpleRunNamedAnimSAInterface : public CTaskSimpleAnimSAInterface
@@ -109,7 +109,7 @@ public:
 class CTaskSimpleRunNamedAnimSA : public virtual CTaskSimpleAnimSA, public virtual CTaskSimpleRunNamedAnim
 {
 public:
-    CTaskSimpleRunNamedAnimSA() {};
+    CTaskSimpleRunNamedAnimSA(){};
     CTaskSimpleRunNamedAnimSA(const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta, const int iTime = -1,
                               const bool bDontInterrupt = false, const bool bRunInSequence = false, const bool bOffsetPed = false,
                               const bool bHoldLastFrame = false);
@@ -129,7 +129,7 @@ public:
 class CTaskComplexDieSA : public virtual CTaskComplexSA, public virtual CTaskComplexDie
 {
 public:
-    CTaskComplexDieSA() {};
+    CTaskComplexDieSA(){};
     CTaskComplexDieSA(const eWeaponType eMeansOfDeath /*=WEAPONTYPE_UNARMED*/, const AssocGroupId animGroup = 0 /*ANIM_STD_PED*/,
                       const AnimationId anim = 0 /*ANIM_STD_KO_FRONT*/, const float fBlendDelta = 4.0f, const float fAnimSpeed = 0.0f,
                       const bool bBeingKilledByStealth = false, const bool bFallingToDeath = false, const int iFallToDeathDir = 0,
@@ -144,7 +144,7 @@ public:
 class CTaskSimpleStealthKillSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleStealthKill
 {
 public:
-    CTaskSimpleStealthKillSA() {};
+    CTaskSimpleStealthKillSA(){};
     CTaskSimpleStealthKillSA(bool bKiller, class CPed* pPed, const AssocGroupId animGroup);
 };
 
@@ -158,40 +158,40 @@ public:
 class CTaskSimpleDeadSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleDead
 {
 public:
-    CTaskSimpleDeadSA() {};
+    CTaskSimpleDeadSA(){};
     CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2);
 };
 
 class CTaskSimpleBeHitSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    CPed* pPedAttacker;  // 0x08
-    uchar a;             // 0x0c
-    uchar b;             // 0x0d
-    uchar c;             // 0x0e
-    uchar d;             // 0x0f
-    uint  e;             // 0x10   inited with 0x000000BF
-    uint  f;             // 0x14   inited with 0
-    uint  hitBodyPart;   // 0x18
-    uint  weaponType;    // 0x1C
-    uint  hitBodySide;   // 0x20
-    uint  g;             // 0x24   inited with 0
+    CPed* pPedAttacker;            // 0x08
+    uchar a;                       // 0x0c
+    uchar b;                       // 0x0d
+    uchar c;                       // 0x0e
+    uchar d;                       // 0x0f
+    uint  e;                       // 0x10   inited with 0x000000BF
+    uint  f;                       // 0x14   inited with 0
+    uint  hitBodyPart;             // 0x18
+    uint  weaponType;              // 0x1C
+    uint  hitBodySide;             // 0x20
+    uint  g;                       // 0x24   inited with 0
 };
 
 class CTaskSimpleBeHitSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleBeHit
 {
 public:
-    CTaskSimpleBeHitSA() {};
+    CTaskSimpleBeHitSA(){};
     CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 };
 
 class CTaskSimpleCarFallOutSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    uint                 a;          // 0x08
-    uint                 b;          // 0x0c
-    CVehicleSAInterface* pVehicle;   // 0x10
-    uint                 doorIndex;  // 0x14
+    uint                 a;                    // 0x08
+    uint                 b;                    // 0x0c
+    CVehicleSAInterface* pVehicle;             // 0x10
+    uint                 doorIndex;            // 0x14
 };
 
 class CAnimBlock;
@@ -216,7 +216,7 @@ public:
 class CTaskComplexSunbatheSA : public virtual CTaskComplexSA, public virtual CTaskComplexSunbathe
 {
 public:
-    CTaskComplexSunbatheSA() {};
+    CTaskComplexSunbatheSA(){};
     CTaskComplexSunbatheSA(class CObject* pTowel, const bool bStartStanding);
 
     void SetEndTime(DWORD dwTime);

@@ -57,7 +57,7 @@ bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLeng
 void CModManager::DoPulsePreFrame()
 {
     TIMING_GRAPH("+DoPulsePreFrame");
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameStart();  // Prepare FPS limiting for this frame
+    CCore::GetSingleton().GetFPSLimiter()->OnFrameStart();            // Prepare FPS limiting for this frame
 
     if (m_client)
     {
@@ -88,7 +88,7 @@ void CModManager::DoPulsePostFrame()
 
     TIMING_GRAPH("+DoPulsePostFrame");
 
-    handleStateChange();  // Handle state changes before pulse
+    handleStateChange();            // Handle state changes before pulse
 
     if (m_client)
     {
@@ -99,12 +99,12 @@ void CModManager::DoPulsePostFrame()
         CCore::GetSingleton().GetNetwork()->DoPulse();
     }
 
-    CCore::GetSingleton().DoReliablePulse();  // Do reliable pulse
+    CCore::GetSingleton().DoReliablePulse();            // Do reliable pulse
 
-    handleStateChange();  // Handle state changes after pulse
+    handleStateChange();            // Handle state changes after pulse
 
     // TODO: ENSURE "CModManager::DoPulsePostFrame" IS THE LAST THING BEFORE THE FRAME ENDS
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();  // Apply FPS limiting
+    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();            // Apply FPS limiting
 
     TIMING_GRAPH("-DoPulsePostFrame");
     TIMING_GRAPH("");
@@ -187,7 +187,7 @@ bool CModManager::TryStart()
         return false;
     }
 
-    using InitClientFn = CClientBase*(__cdecl*)();
+    using InitClientFn = CClientBase* (__cdecl*)();
     InitClientFn initClient = nullptr;
     if (!SharedUtil::TryGetProcAddress(library, "InitClient", initClient))
     {

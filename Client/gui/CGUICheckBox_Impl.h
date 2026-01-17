@@ -25,5 +25,5 @@ public:
 
     eCGUIType GetType() { return CGUI_CHECKBOX; };
 
-#include "CGUIElement_Inc.h"
+    #include "CGUIElement_Inc.h"
 };

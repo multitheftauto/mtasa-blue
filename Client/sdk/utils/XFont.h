@@ -32,7 +32,7 @@
 #include <crtdbg.h>
 
 #ifndef XFONT_H
-    #define XFONT_H
+#define XFONT_H
 
 typedef struct _tagFONT_PROPERTIES
 {
@@ -73,17 +73,17 @@ typedef struct _tagTT_OFFSET_TABLE
 
 typedef struct _tagTT_TABLE_DIRECTORY
 {
-    char  szTag[4];   // table name
-    ULONG uCheckSum;  // Check sum
-    ULONG uOffset;    // Offset from beginning of file
-    ULONG uLength;    // length of the table in bytes
+    char  szTag[4];             // table name
+    ULONG uCheckSum;            // Check sum
+    ULONG uOffset;              // Offset from beginning of file
+    ULONG uLength;              // length of the table in bytes
 } TT_TABLE_DIRECTORY;
 
 typedef struct _tagTT_NAME_TABLE_HEADER
 {
-    USHORT uFSelector;      // format selector. Always 0
-    USHORT uNRCount;        // Name Records count
-    USHORT uStorageOffset;  // Offset for strings storage, from start of the table
+    USHORT uFSelector;                // format selector. Always 0
+    USHORT uNRCount;                  // Name Records count
+    USHORT uStorageOffset;            // Offset for strings storage, from start of the table
 } TT_NAME_TABLE_HEADER;
 
 typedef struct _tagTT_NAME_RECORD
@@ -93,11 +93,11 @@ typedef struct _tagTT_NAME_RECORD
     USHORT uLanguageID;
     USHORT uNameID;
     USHORT uStringLength;
-    USHORT uStringOffset;  // from start of storage area
+    USHORT uStringOffset;            // from start of storage area
 } TT_NAME_RECORD;
 
-    #define SWAPWORD(x) MAKEWORD(HIBYTE(x), LOBYTE(x))
-    #define SWAPLONG(x) MAKELONG(SWAPWORD(HIWORD(x)), SWAPWORD(LOWORD(x)))
+#define SWAPWORD(x)        MAKEWORD(HIBYTE(x), LOBYTE(x))
+#define SWAPLONG(x)        MAKELONG(SWAPWORD(HIWORD(x)), SWAPWORD(LOWORD(x)))
 
 BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
 {
@@ -108,14 +108,14 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
 
     HANDLE hFile = INVALID_HANDLE_VALUE;
     hFile = ::CreateFile(lpszFilePath,
-                         GENERIC_READ,  // | GENERIC_WRITE,
+                         GENERIC_READ,            // | GENERIC_WRITE,
                          0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
     if (hFile == INVALID_HANDLE_VALUE)
     {
         // Windows 8 fix
         hFile = ::CreateFile(lpszFilePath,
-                             GENERIC_READ,  // | GENERIC_WRITE,
+                             GENERIC_READ,            // | GENERIC_WRITE,
                              FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     }
 
@@ -141,7 +141,7 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
     // Create a file mapping object that is the current size of the file
     HANDLE hMappedFile = NULL;
     hMappedFile = ::CreateFileMapping(hFile, NULL,
-                                      PAGE_READONLY,  // PAGE_READWRITE,
+                                      PAGE_READONLY,            // PAGE_READWRITE,
                                       0, dwFileSize, NULL);
 
     if (hMappedFile == NULL)
@@ -151,11 +151,11 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
         return FALSE;
     }
 
-    LPBYTE lpMapAddress = (LPBYTE)::MapViewOfFile(hMappedFile,    // handle to file-mapping object
-                                                  FILE_MAP_READ,  // FILE_MAP_WRITE,            // access mode
-                                                  0,              // high-order DWORD of offset
-                                                  0,              // low-order DWORD of offset
-                                                  0);             // number of bytes to map
+    LPBYTE lpMapAddress = (LPBYTE)::MapViewOfFile(hMappedFile,              // handle to file-mapping object
+                                                  FILE_MAP_READ,            // FILE_MAP_WRITE,            // access mode
+                                                  0,                        // high-order DWORD of offset
+                                                  0,                        // low-order DWORD of offset
+                                                  0);                       // number of bytes to map
 
     if (lpMapAddress == NULL)
     {
@@ -239,7 +239,7 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
 
             if (ttRecord.uNameID == 1 || ttRecord.uNameID == 0 || ttRecord.uNameID == 4 || ttRecord.uNameID == 7)
             {
-                int nPos = index;  // f.GetPosition();
+                int nPos = index;            // f.GetPosition();
 
                 index = tblDir.uOffset + ttRecord.uStringOffset + ttNTHeader.uStorageOffset;
 
@@ -321,4 +321,4 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
     return bRetVal;
 }
 
-#endif  // XFONT_H
+#endif //XFONT_H

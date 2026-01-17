@@ -118,7 +118,7 @@ void CTaskSimpleIKManagerSA::RemoveIKChainTask(int slotID)
     {
         // Grab the task
         CTask* pTask = m_pTaskManagementSystem->GetTask(pInterface->m_pIKChainTasks[slotID]);
-        assert(pTask);  // Leave this here temporarily for debugging (shouldn't ever be null)
+        assert(pTask);            // Leave this here temporarily for debugging (shouldn't ever be null)
         pTask->Destroy();
         pInterface->m_pIKChainTasks[slotID] = NULL;
     }
@@ -142,7 +142,7 @@ CTaskSimpleIKChain* CTaskSimpleIKManagerSA::GetTaskAtSlot(int slotID)
     {
         // Grab the task
         CTask* pTask = m_pTaskManagementSystem->GetTask(pInterface->m_pIKChainTasks[slotID]);
-        assert(pTask);  // Leave this here temporarily for debugging (shouldn't ever be null)
+        assert(pTask);            // Leave this here temporarily for debugging (shouldn't ever be null)
         return dynamic_cast<CTaskSimpleIKChain*>(pTask);
     }
     return NULL;

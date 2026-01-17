@@ -46,7 +46,7 @@ void CLuaTimer::ExecuteTimer(CLuaMain* pLuaMain)
     {
         lua_State* pState = pLuaMain->GetVM();
 
-        LUA_CHECKSTACK(pState, 1);  // Ensure some room
+        LUA_CHECKSTACK(pState, 1);            // Ensure some room
 
         // Store the current values of the globals
         lua_getglobal(pState, "sourceTimer");

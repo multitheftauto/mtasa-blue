@@ -14,13 +14,13 @@
 #include "CPacket.h"
 #include "../../Config.h"
 
-#define CHATCOLOR_SAY        235, 221, 178
-#define CHATCOLOR_TEAMSAY    235, 221, 178
-#define CHATCOLOR_MESSAGE    255, 168, 0
-#define CHATCOLOR_INFO       255, 100, 100
-#define CHATCOLOR_ME         255, 0, 255
-#define CHATCOLOR_ADMINSAY   131, 205, 241
-#define CHATCOLOR_CONSOLESAY 223, 149, 232
+#define CHATCOLOR_SAY           235, 221, 178
+#define CHATCOLOR_TEAMSAY       235, 221, 178
+#define CHATCOLOR_MESSAGE       255, 168, 0
+#define CHATCOLOR_INFO          255, 100, 100
+#define CHATCOLOR_ME            255, 0, 255
+#define CHATCOLOR_ADMINSAY      131, 205, 241
+#define CHATCOLOR_CONSOLESAY    223, 149, 232
 
 enum eMessageType
 {

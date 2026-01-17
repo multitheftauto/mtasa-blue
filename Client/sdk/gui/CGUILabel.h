@@ -16,7 +16,7 @@
 class CGUILabel : public CGUIElement
 {
 public:
-    virtual ~CGUILabel() {};
+    virtual ~CGUILabel(){};
 
     virtual void SetText(const char* Text) = 0;
 

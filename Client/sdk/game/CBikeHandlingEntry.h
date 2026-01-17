@@ -15,7 +15,7 @@ class CBikeHandlingEntry
 {
 public:
     // Destructor
-    virtual ~CBikeHandlingEntry() {};
+    virtual ~CBikeHandlingEntry(){};
 
     // Use this to copy data from an another handling class to this
     virtual void Assign(const CBikeHandlingEntry* pData) = 0;

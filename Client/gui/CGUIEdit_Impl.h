@@ -47,7 +47,7 @@ public:
 
     eCGUIType GetType() { return CGUI_EDIT; };
 
-#include "CGUIElement_Inc.h"
+    #include "CGUIElement_Inc.h"
 
 protected:
     bool Event_OnTextChanged(const CEGUI::EventArgs& e);

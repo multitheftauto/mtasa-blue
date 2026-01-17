@@ -34,7 +34,7 @@ CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const st
     m_pManager->AddToList(this);
 
     if (m_Password.SetPassword(strPassword))
-        m_pManager->MarkAsChanged(this);  // Save if password upgraded
+        m_pManager->MarkAsChanged(this);            // Save if password upgraded
 }
 
 CAccount::~CAccount()
@@ -143,7 +143,7 @@ std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
                 break;
 
             default:
-                dassert(0);  // It never should hit this, if so, something corrupted
+                dassert(0);            // It never should hit this, if so, something corrupted
                 break;
         }
     }
@@ -263,12 +263,9 @@ bool CAccount::IsValidSerial(const std::string& serial) const noexcept
 {
     const std::regex serialPattern("^[A-Fa-f0-9]{32}$");
 
-    try
-    {
+    try{
         return std::regex_match(serial, serialPattern);
-    }
-    catch (...)
-    {
+    } catch (...) {
         return false;
     }
 }

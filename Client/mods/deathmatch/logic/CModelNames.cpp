@@ -4808,7 +4808,7 @@ struct
     333,
     "Golf_Club",
     334,
-    "Night_Strick",  // typo here retained for BC
+    "Night_Strick",            // typo here retained for BC
     334,
     "Night_Stick",
     335,
@@ -29324,7 +29324,7 @@ uint32 CModelNames::ResolveModelID(const SString& strModelName)
     {
         uint32 usModelID = atoi(strModelName.SubStr(3));
         if (usModelID)
-            return g_pGame->GetBaseIDforTXD() + usModelID;  // Encode global txd as model id 20000+
+            return g_pGame->GetBaseIDforTXD() + usModelID;            // Encode global txd as model id 20000+
     }
 
     // Now search for the name

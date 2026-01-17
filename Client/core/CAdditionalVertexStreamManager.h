@@ -85,7 +85,7 @@ public:
 
     static CAdditionalVertexStreamManager* GetSingleton();
     static CAdditionalVertexStreamManager* GetExistingSingleton();
-    static void                            DestroySingleton();
+    static void DestroySingleton();
 
 protected:
     bool SetAdditionalVertexStream(SCurrentStateInfo& renderState);

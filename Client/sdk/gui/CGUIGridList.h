@@ -50,7 +50,7 @@ using SortDirections::SortDirection;
 class CGUIGridList : public CGUIElement
 {
 public:
-    virtual ~CGUIGridList() {};
+    virtual ~CGUIGridList(){};
 
     virtual unsigned int AddColumn(const char* szTitle, float fWidth) = 0;
     virtual void         RemoveColumn(unsigned int uiColumn) = 0;

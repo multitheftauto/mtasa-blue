@@ -467,7 +467,7 @@ CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
 
 void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
 {
-    static bool bIsDeletingPedAlready = false;  // to prevent delete being called twice
+    static bool bIsDeletingPedAlready = false;            // to prevent delete being called twice
 
     if (!bIsDeletingPedAlready)
     {
@@ -628,8 +628,8 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
 static void CreateMissionTrain(const CVector& vecPos, bool bDirection, std::uint32_t uiTrainType, CTrainSAInterface** ppTrainBeginning,
                                CTrainSAInterface** ppTrainEnd, int iNodeIndex, int iTrackId, bool bMissionTrain) noexcept
 {
-    auto createMissionTrain = reinterpret_cast<void(__cdecl*)(CVector, bool, std::uint32_t, CTrainSAInterface**, CTrainSAInterface**, int, int, bool)>(
-        FUNC_CTrain_CreateMissionTrain);
+    auto createMissionTrain = reinterpret_cast<void(__cdecl*)(CVector, bool, std::uint32_t, CTrainSAInterface**, CTrainSAInterface**,
+                                                              int, int, bool)>(FUNC_CTrain_CreateMissionTrain);
 
     createMissionTrain(vecPos, bDirection, uiTrainType, ppTrainBeginning, ppTrainEnd, iNodeIndex, iTrackId, bMissionTrain);
 }
@@ -784,8 +784,7 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 
     unsigned int NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
 
-    auto isValidPtr = [](const void* ptr) noexcept -> bool
-    {
+    auto isValidPtr = [](const void* ptr) noexcept -> bool {
         if (!ptr)
             return false;
 
@@ -832,17 +831,17 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
         case PED_POOL:
             return 140;
         case OBJECT_POOL:
-            return 350;  // Modded to 700   @ CGameSA.cpp
+            return 350;            // Modded to 700   @ CGameSA.cpp
         case DUMMY_POOL:
             return 2500;
         case VEHICLE_POOL:
             return 110;
         case COL_MODEL_POOL:
-            return 10150;  // Modded to 12000  @ CGameSA.cpp
+            return 10150;            // Modded to 12000  @ CGameSA.cpp
         case TASK_POOL:
-            return 500;  // Modded to 5000   @ CGameSA.cpp
+            return 500;            // Modded to 5000   @ CGameSA.cpp
         case EVENT_POOL:
-            return 200;  // Modded to 5000   @ CGameSA.cpp
+            return 200;            // Modded to 5000   @ CGameSA.cpp
         case TASK_ALLOCATOR_POOL:
             return 16;
         case PED_INTELLIGENCE_POOL:
@@ -850,7 +849,7 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
         case PED_ATTRACTOR_POOL:
             return 64;
         case ENTRY_INFO_NODE_POOL:
-            return 500;  // Modded to 4096   @ CGameSA.cpp
+            return 500;            // Modded to 4096   @ CGameSA.cpp
         case NODE_ROUTE_POOL:
             return 64;
         case PATROL_ROUTE_POOL:
@@ -858,15 +857,15 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
         case POINT_ROUTE_POOL:
             return 64;
         case POINTER_DOUBLE_LINK_POOL:
-            return 3200;  // Modded to 8000   @ CGameSA.cpp
+            return 3200;            // Modded to 8000   @ CGameSA.cpp
         case POINTER_SINGLE_LINK_POOL:
             return 70000;
         case ENV_MAP_MATERIAL_POOL:
-            return 4096;  // Modded to 16000   @ CGameSA.cpp
+            return 4096;            // Modded to 16000   @ CGameSA.cpp
         case ENV_MAP_ATOMIC_POOL:
-            return 1024;  // Modded to 8000    @ CGameSA.cpp
+            return 1024;            // Modded to 8000    @ CGameSA.cpp
         case SPEC_MAP_MATERIAL_POOL:
-            return 4096;  // Modded to 16000   @ CGameSA.cpp
+            return 4096;            // Modded to 16000   @ CGameSA.cpp
     }
     return 0;
 }
@@ -1026,25 +1025,25 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
             break;
         case TASK_ALLOCATOR_POOL:
             cPtr = 0x55124E;
-            break;  // 0 - 127
+            break;            // 0 - 127
         case PED_INTELLIGENCE_POOL:
             iPtr = 0x551283;
             break;
         case PED_ATTRACTOR_POOL:
             cPtr = 0x5512BB;
-            break;  // 0 - 127
+            break;            // 0 - 127
         case ENTRY_INFO_NODE_POOL:
             iPtr = 0x550FBA;
             break;
         case NODE_ROUTE_POOL:
             cPtr = 0x551218;
-            break;  // 0 - 127
+            break;            // 0 - 127
         case PATROL_ROUTE_POOL:
             cPtr = 0x5511E4;
-            break;  // 0 - 127
+            break;            // 0 - 127
         case POINT_ROUTE_POOL:
             cPtr = 0x5511AF;
-            break;  // 0 - 127
+            break;            // 0 - 127
         case POINTER_DOUBLE_LINK_POOL:
             iPtr = 0x550F82;
             break;

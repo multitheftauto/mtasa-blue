@@ -31,18 +31,17 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     if (CommandExists(szKey, nullptr))
     {
         const MultiCommandHandlerPolicy allowMultiHandlers = g_pClientGame->GetAllowMultiCommandHandlers();
-
+        
         switch (allowMultiHandlers)
         {
             case MultiCommandHandlerPolicy::BLOCK:
-                g_pClientGame->GetScriptDebugging()->LogError(
-                    pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
+                g_pClientGame->GetScriptDebugging()->LogError(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
                 return false;
-
+            
             case MultiCommandHandlerPolicy::WARN:
                 g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: Attempt to register duplicate command '%s'", szKey);
                 break;
-
+            
             case MultiCommandHandlerPolicy::ALLOW:
             default:
                 break;

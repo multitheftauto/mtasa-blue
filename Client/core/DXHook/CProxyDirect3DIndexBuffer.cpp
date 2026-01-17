@@ -90,7 +90,7 @@ ULONG CProxyDirect3DIndexBuffer::Release()
     if (count == 0)
     {
         // now, the Original Object has deleted itself, so do we here
-        delete this;  // destructor will be called automatically
+        delete this;            // destructor will be called automatically
     }
 
     return count;

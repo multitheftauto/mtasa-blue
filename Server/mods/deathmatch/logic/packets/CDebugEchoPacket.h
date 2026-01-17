@@ -14,9 +14,9 @@
 #include "CPacket.h"
 #include "../../Config.h"
 
-#define DEBUGCOLOR_WARNING 255, 128, 0
-#define DEBUGCOLOR_ERROR   255, 0, 0
-#define DEBUGCOLOR_INFO    0, 255, 0
+#define DEBUGCOLOR_WARNING          255, 128, 0
+#define DEBUGCOLOR_ERROR            255, 0, 0
+#define DEBUGCOLOR_INFO             0, 255, 0
 
 class CDebugEchoPacket final : public CPacket
 {

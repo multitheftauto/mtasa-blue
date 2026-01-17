@@ -154,4 +154,4 @@ namespace SharedUtil
     SString GenerateHashHexString(EHashFunctionType hashFunction, const void* pData, uint uiLength);
     SString GenerateHashHexString(EHashFunctionType hashFunction, const SString& strData);
     SString GenerateHashHexStringFromFile(EHashFunctionType hashFunction, const SString& strFilename, int iMaxSize = INT_MAX, int iOffset = 0);
-}
+}            // namespace SharedUtil

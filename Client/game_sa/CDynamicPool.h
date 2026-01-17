@@ -120,8 +120,7 @@ public:
         return size;
     }
 
-    bool SetCapacity(std::size_t newSize)
-    {
+    bool SetCapacity(std::size_t newSize) {
         if (newSize == 0)
             return false;
 
@@ -164,7 +163,7 @@ public:
                     return true;
             }
         }
-
+        
         return true;
     }
 

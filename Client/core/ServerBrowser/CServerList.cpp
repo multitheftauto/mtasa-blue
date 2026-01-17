@@ -126,10 +126,10 @@ void CServerList::Pulse()
         CServerListItem* pServer = *i;
         if (!pServer)
             continue;
-        uint        uiPrevRevision = pServer->uiRevision;
-        std::string strResult = pServer->Pulse((int)(uiQueriesSent /*+ uiQueriesResent*/) < iNumQueries, bRemoveNonResponding);
+        uint             uiPrevRevision = pServer->uiRevision;
+        std::string      strResult = pServer->Pulse((int)(uiQueriesSent /*+ uiQueriesResent*/) < iNumQueries, bRemoveNonResponding);
         if (uiPrevRevision != pServer->uiRevision)
-            m_bUpdated |= true;  // Flag GUI update
+            m_bUpdated |= true;            // Flag GUI update
         if (strResult == "SentQuery")
             uiQueriesSent++;
         else if (strResult == "ResentQuery")
@@ -194,7 +194,7 @@ bool CServerList::Remove(in_addr Address, ushort usGamePort)
 }
 
 void CServerList::Refresh()
-{  // Assumes we already have a (saved) list of servers, so we just need to refresh
+{            // Assumes we already have a (saved) list of servers, so we just need to refresh
 
     // Reinitialize each server list item
     for (auto it = m_Servers.begin(); it != m_Servers.end(); ++it)
@@ -232,7 +232,7 @@ void CServerListInternet::SuspendActivity()
 }
 
 void CServerListInternet::Refresh()
-{  // Gets the server list from the master server and refreshes
+{            // Gets the server list from the master server and refreshes
     m_ElapsedTime.Reset();
 
     // Load from cache first to ensure servers are always available instantly
@@ -297,7 +297,7 @@ void CServerList::RetryNonRespondingServers()
 }
 
 void CServerListInternet::Pulse()
-{  // We also need to take care of the master server list here
+{            // We also need to take care of the master server list here
     unsigned long ulTime = m_ElapsedTime.Get();
 
     if (m_iPass == 1)
@@ -405,7 +405,7 @@ void CServerListLAN::Pulse()
 }
 
 void CServerListLAN::Refresh()
-{  // Gets the server list from LAN-broadcasting servers
+{            // Gets the server list from LAN-broadcasting servers
     m_iPass = 1;
     m_bUpdated = true;
 
@@ -483,7 +483,7 @@ void CServerListLAN::Discover()
 }
 
 std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding)
-{  // Queries the server on it's query port (ASE protocol)
+{            // Queries the server on it's query port (ASE protocol)
     // and returns whether it is done scanning
     if (bScanned || bSkipped)
         return "Done";
@@ -505,8 +505,8 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
             bMaybeOffline = false;
             SetDataQuality(SERVER_INFO_QUERY);
             uiCacheNoReplyCount = 0;
-            uiRevision++;                                 // To flag browser gui update
-            GetServerCache()->SetServerCachedInfo(this);  // Save parsed info in the cache
+            uiRevision++;                                           // To flag browser gui update
+            GetServerCache()->SetServerCachedInfo(this);            // Save parsed info in the cache
             return "ParsedQuery";
         }
 
@@ -544,18 +544,18 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
 
             if (bRemoveNonResponding)
             {
-                bMaybeOffline = true;  // Flag to help 'Include offline' browser option
+                bMaybeOffline = true;            // Flag to help 'Include offline' browser option
                 // Don't zero nPlayers - preserve last known count from master list or previous query
                 // Only zero vecPlayers since we don't have the actual player list
                 vecPlayers.clear();
             }
-            uiRevision++;  // To flag browser gui update
+            uiRevision++;            // To flag browser gui update
 
             if (uiQueryRetryCount < GetMaxRetries())
             {
                 // Try again
                 uiQueryRetryCount++;
-                uiRevision++;  // To flag browser gui update
+                uiRevision++;            // To flag browser gui update
                 if (GetDataQuality() > SERVER_INFO_ASE_0)
                     GetServerCache()->SetServerCachedInfo(this);
                 Query();
@@ -565,12 +565,12 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
             {
                 // Give up
                 queryReceiver.InvalidateSocket();
-                uiRevision++;  // To flag browser gui update
+                uiRevision++;            // To flag browser gui update
 
                 if (bRemoveNonResponding)
                 {
-                    uiCacheNoReplyCount++;  // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from
-                                            // the Server Cache)
+                    uiCacheNoReplyCount++;            // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from
+                                                      // the Server Cache)
                     bSkipped = true;
                     if (GetDataQuality() > SERVER_INFO_ASE_0)
                         GetServerCache()->SetServerCachedInfo(this);
@@ -595,7 +595,7 @@ unsigned short CServerListItem::GetQueryPort()
 }
 
 void CServerListItem::Query()
-{  // Performs a query according to ASE protocol
+{            // Performs a query according to ASE protocol
 
     queryReceiver.RequestQuery(Address, GetQueryPort());
 }
@@ -962,22 +962,22 @@ void CServerListItemList::Sort(unsigned int uiColumn, int direction)
 
     switch (uiColumn)
     {
-        case 1:  // Version
+        case 1:            // Version
             m_List.sort(asc ? CompareVersionAsc : CompareVersionDesc);
             break;
-        case 2:  // Locked
+        case 2:            // Locked
             m_List.sort(asc ? CompareLockedAsc : CompareLockedDesc);
             break;
-        case 3:  // Name
+        case 3:            // Name
             m_List.sort(asc ? CompareNameAsc : CompareNameDesc);
             break;
-        case 4:  // Players
+        case 4:            // Players
             m_List.sort(asc ? ComparePlayersAsc : ComparePlayersDesc);
             break;
-        case 5:  // Ping
+        case 5:            // Ping
             m_List.sort(asc ? ComparePingAsc : ComparePingDesc);
             break;
-        case 6:  // Gamemode
+        case 6:            // Gamemode
             m_List.sort(asc ? CompareGameModeAsc : CompareGameModeDesc);
             break;
         default:

@@ -85,7 +85,10 @@ private:
 public:
     SCurrentStateInfo2() { ZERO_POD_STRUCT(this); }
 
-    ~SCurrentStateInfo2() { ReleaseComReferences(); }
+    ~SCurrentStateInfo2()
+    {
+        ReleaseComReferences();
+    }
 
     // Info to DrawIndexPrimitive
     struct
@@ -135,7 +138,7 @@ public:
 
     static CVertexStreamBoundingBoxManager* GetSingleton();
     static CVertexStreamBoundingBoxManager* GetExistingSingleton();
-    static void                             DestroySingleton();
+    static void DestroySingleton();
 
 protected:
     float CalcDistanceSq(const SCurrentStateInfo2& state, const CBox& boundingBox);

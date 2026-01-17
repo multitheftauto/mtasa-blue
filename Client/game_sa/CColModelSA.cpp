@@ -17,7 +17,7 @@ CColModelSA::CColModelSA()
     m_pInterface = new CColModelSAInterface;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CColModel_Constructor;
-
+    
     try
     {
         // clang-format off
@@ -28,14 +28,13 @@ CColModelSA::CColModelSA()
         }
         // clang-format on
     }
-    catch (...)
-    {
-        // Clean up on constructor failure
-        delete m_pInterface;
-        m_pInterface = nullptr;
-        throw;
-    }
-    m_bDestroyInterface = true;
+        catch (...)
+        {
+            // Clean up on constructor failure
+            delete m_pInterface;
+            m_pInterface = nullptr;
+            throw;
+        }    m_bDestroyInterface = true;
     m_bValid = true;
 }
 
@@ -49,12 +48,12 @@ CColModelSA::CColModelSA(CColModelSAInterface* pInterface)
 CColModelSA::~CColModelSA()
 {
     m_bValid = false;
-
+    
     if (m_bDestroyInterface && m_pInterface)
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CColModel_Destructor;
-
+        
         try
         {
             // clang-format off
@@ -69,7 +68,7 @@ CColModelSA::~CColModelSA()
         {
             // Ensure cleanup completes on exception
         }
-
+        
         delete m_pInterface;
         m_pInterface = nullptr;
     }

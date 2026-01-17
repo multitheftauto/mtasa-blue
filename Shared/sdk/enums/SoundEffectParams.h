@@ -99,4 +99,4 @@ namespace eSoundEffectParams
         REVERB_TIME,
         HIGH_FREQ_RT_RATIO,
     };
-}
+}            // namespace eSoundEffectParams

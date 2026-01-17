@@ -44,7 +44,7 @@ public:
     void ShowDropList();
     void HideDropList();
 
-#include "CGUIElement_Inc.h"
+    #include "CGUIElement_Inc.h"
 
 protected:
     CFastHashMap<CEGUI::ListboxItem*, CGUIListItem_Impl*> m_Items;

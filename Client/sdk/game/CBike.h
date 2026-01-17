@@ -18,7 +18,7 @@ class CBikeHandlingEntry;
 class CBike : public virtual CVehicle
 {
 public:
-    virtual ~CBike() {};
+    virtual ~CBike(){};
 
     virtual CBikeHandlingEntry* GetBikeHandlingData() = 0;
     virtual void                SetBikeHandlingData(CBikeHandlingEntry* pHandling) = 0;

@@ -18,18 +18,12 @@
 ////////////////////////////////////////////////
 namespace
 {
-// #define     ARRAY_ModelInfo                 0xA9B0C8
-#define LOW_LOD_DRAW_DISTANCE_SCALE 5
+    // #define     ARRAY_ModelInfo                 0xA9B0C8
+    #define     LOW_LOD_DRAW_DISTANCE_SCALE     5
 
-    void SetGlobalDrawDistanceScale(float fValue)
-    {
-        MemPut<float>(0x858FD8, 300.f * fValue);
-    }
+    void SetGlobalDrawDistanceScale(float fValue) { MemPut<float>(0x858FD8, 300.f * fValue); }
 
-    float GetDrawDistanceSetting()
-    {
-        return *(float*)0xB6F118;
-    }
+    float GetDrawDistanceSetting() { return *(float*)0xB6F118; }
 
     float CalculateLowLodFadeAlpha(CBaseModelInfoSAInterface* pModelInfo, float fDist)
     {
@@ -46,7 +40,7 @@ namespace
         float                      fLodDistanceUnscaled;
         CBaseModelInfoSAInterface* pModelInfo;
     } saved = {false, 0.f, NULL};
-}  // namespace
+}            // namespace
 
 ////////////////////////////////////////////////
 //
@@ -90,9 +84,9 @@ void OnMY_CRenderer_SetupEntityVisibility_Post(int result, CEntitySAInterface* p
 }
 
 // Hook info
-#define HOOKPOS_CRenderer_SetupEntityVisibility  0x554230
-#define HOOKSIZE_CRenderer_SetupEntityVisibility 8
-DWORD                         RETURN_CRenderer_SetupEntityVisibility = 0x554238;
+#define HOOKPOS_CRenderer_SetupEntityVisibility         0x554230
+#define HOOKSIZE_CRenderer_SetupEntityVisibility        8
+DWORD RETURN_CRenderer_SetupEntityVisibility = 0x554238;
 static void __declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -153,10 +147,10 @@ void OnMY_CWorldScan_ScanWorld_Pre(CVector2D* pVec, int iValue, void(__cdecl* fu
 }
 
 // Hook info
-#define HOOKPOS_CWorldScan_ScanWorld  0x55555E
-#define HOOKSIZE_CWorldScan_ScanWorld 5
-DWORD                         RETURN_CWorldScan_ScanWorlda = 0x555563;
-DWORD                         RETURN_CWorldScan_ScanWorldb = 0x72CAE0;
+#define HOOKPOS_CWorldScan_ScanWorld                0x55555E
+#define HOOKSIZE_CWorldScan_ScanWorld               5
+DWORD RETURN_CWorldScan_ScanWorlda = 0x555563;
+DWORD RETURN_CWorldScan_ScanWorldb = 0x72CAE0;
 static void __declspec(naked) HOOK_CWorldScan_ScanWorld()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -199,9 +193,9 @@ int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre(CBaseModelInfoSAInter
 }
 
 // Hook info
-#define HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha  0x732500
-#define HOOKSIZE_CVisibilityPlugins_CalculateFadingAtomicAlpha 5
-DWORD                         RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha = 0x732505;
+#define HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha       0x732500
+#define HOOKSIZE_CVisibilityPlugins_CalculateFadingAtomicAlpha      5
+DWORD RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha = 0x732505;
 static void __declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -257,7 +251,7 @@ void CMultiplayerSA::SetLODSystemEnabled(bool bEnable)
     // Memory saved here
     static CBuffer savedMem;
     SHookInfo      hookInfoList[] = {MAKE_HOOK_INFO(CRenderer_SetupEntityVisibility), MAKE_HOOK_INFO(CWorldScan_ScanWorld),
-                                     MAKE_HOOK_INFO(CVisibilityPlugins_CalculateFadingAtomicAlpha)};
+                                MAKE_HOOK_INFO(CVisibilityPlugins_CalculateFadingAtomicAlpha)};
 
     // Enable or not?
     if (bEnable)

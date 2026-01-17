@@ -189,10 +189,10 @@ int CLuaDrawingDefs::DxDrawLine(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawLine3D(lua_State* luaVM)
 {
     //  bool dxDrawLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, int color[, int width, bool postGUI ] )
-    CVector      vecBegin;
-    CVector      vecEnd;
-    SColor       color;
-    float        fWidth;
+    CVector vecBegin;
+    CVector vecEnd;
+    SColor  color;
+    float   fWidth;
     eRenderStage renderStage{eRenderStage::POST_FX};
 
     CScriptArgReader argStream(luaVM);
@@ -232,7 +232,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     SColor           color;
     CVector          vecFaceToward;
     bool             bUseFaceToward = false;
-    eRenderStage     renderStage{eRenderStage::POST_FX};
+    eRenderStage renderStage{eRenderStage::POST_FX};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecBegin);
@@ -282,7 +282,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     SColor           color;
     CVector          vecFaceToward;
     bool             bUseFaceToward = false;
-    eRenderStage     renderStage{eRenderStage::POST_FX};
+    eRenderStage renderStage{eRenderStage::POST_FX};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecBegin);
@@ -598,7 +598,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     // bool DxDrawPrimitive3D (string primitiveType, bool postGUI, table vertice1, ...)
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveVertice>();
-    eRenderStage     renderStage{eRenderStage::POST_FX};
+    eRenderStage renderStage{eRenderStage::POST_FX};
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
     if (argStream.NextIsBool())
@@ -651,7 +651,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
     CClientMaterial* pMaterialElement;
-    eRenderStage     renderStage{eRenderStage::POST_FX};
+    eRenderStage renderStage{eRenderStage::POST_FX};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
@@ -1055,10 +1055,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                         }
                         else
                         {
-                            m_pScriptDebugging->LogCustom(
-                                luaVM,
-                                SString("[DxCreateTexture] Failed to create texture from file '%s' (may be corrupt, unsupported format, or out of memory)",
-                                        strFilePath.c_str()));
+                            m_pScriptDebugging->LogCustom(luaVM, SString("[DxCreateTexture] Failed to create texture from file '%s' (may be corrupt, unsupported format, or out of memory)", strFilePath.c_str()));
                             lua_pushnil(luaVM);
                             return 1;
                         }
@@ -1100,8 +1097,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                 }
                 else
                 {
-                    m_pScriptDebugging->LogCustom(
-                        luaVM, SString("[DxCreateTexture:Blank] Failed to create blank texture %dx%d (invalid dimensions or out of memory)", width, height));
+                    m_pScriptDebugging->LogCustom(luaVM, SString("[DxCreateTexture:Blank] Failed to create blank texture %dx%d (invalid dimensions or out of memory)", width, height));
                     lua_pushnil(luaVM);
                     return 1;
                 }
@@ -1228,9 +1224,9 @@ int CLuaDrawingDefs::DxCreateRenderTarget(lua_State* luaVM)
 {
     //  element dxCreateRenderTarget( int sizeX, int sizeY [, int withAlphaChannel = false ] )
     //  element dxCreateRenderTarget( int sizeX, int sizeY, SurfaceFormat surfaceFormat )
-    CVector2D  vecSize;
-    bool       bWithAlphaChannel = false;
-    bool       bHasSurfaceFormat = false;
+    CVector2D vecSize;
+    bool      bWithAlphaChannel = false;
+    bool      bHasSurfaceFormat = false;
     _D3DFORMAT surfaceFormat;
 
     CScriptArgReader argStream(luaVM);
@@ -1425,11 +1421,11 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
             float fBuffer[16]{};
             uint  i = 0;
 
-            lua_pushnil(luaVM);  // Loop through our table, beginning at the first key
+            lua_pushnil(luaVM);            // Loop through our table, beginning at the first key
             while (lua_next(luaVM, argStream.m_iIndex) != 0 && i < NUMELMS(fBuffer))
             {
-                fBuffer[i++] = static_cast<float>(lua_tonumber(luaVM, -1));  // Ignore the index at -2, and just read the value
-                lua_pop(luaVM, 1);                                           // Remove the item and keep the key for the next iteration
+                fBuffer[i++] = static_cast<float>(lua_tonumber(luaVM, -1));            // Ignore the index at -2, and just read the value
+                lua_pop(luaVM, 1);                                                     // Remove the item and keep the key for the next iteration
             }
             bool bResult = pShader->GetShaderItem()->SetValue(strName, fBuffer, i);
             lua_pushboolean(luaVM, bResult);
@@ -1778,29 +1774,27 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_settable(luaVM, -3);
 
         lua::Push(luaVM, "SettingDebugMode");
-        lua::Push(luaVM,
-                  []
-                  {
-                      switch (g_pCore->GetDiagnosticDebug())
-                      {
-                          case EDiagnosticDebug::GRAPHICS_6734:
-                              return "#6734 Graphics";
-                          case EDiagnosticDebug::D3D_6732:
-                              return "#6732 D3D";
-                          case EDiagnosticDebug::LOG_TIMING_0000:
-                              return "#0000 Log timing";
-                          case EDiagnosticDebug::JOYSTICK_0000:
-                              return "#0000 Joystick";
-                          case EDiagnosticDebug::LUA_TRACE_0000:
-                              return "#0000 Lua trace";
-                          case EDiagnosticDebug::RESIZE_ALWAYS_0000:
-                              return "#0000 Resize always";
-                          case EDiagnosticDebug::RESIZE_NEVER_0000:
-                              return "#0000 Resize never";
-                          default:
-                              return "Default";
-                      }
-                  }());
+        lua::Push(luaVM, [] {
+            switch (g_pCore->GetDiagnosticDebug())
+            {
+                case EDiagnosticDebug::GRAPHICS_6734:
+                    return "#6734 Graphics";
+                case EDiagnosticDebug::D3D_6732:
+                    return "#6732 D3D";
+                case EDiagnosticDebug::LOG_TIMING_0000:
+                    return "#0000 Log timing";
+                case EDiagnosticDebug::JOYSTICK_0000:
+                    return "#0000 Joystick";
+                case EDiagnosticDebug::LUA_TRACE_0000:
+                    return "#0000 Lua trace";
+                case EDiagnosticDebug::RESIZE_ALWAYS_0000:
+                    return "#0000 Resize always";
+                case EDiagnosticDebug::RESIZE_NEVER_0000:
+                    return "#0000 Resize never";
+                default:
+                    return "Default";
+            }
+        }());
         lua_settable(luaVM, -3);
 
         return 1;
@@ -1815,8 +1809,7 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetTexturePixels(lua_State* luaVM)
 {
-    //  string dxGetTexturePixels( [ int surfaceIndex, ] element texture [, string pixelsFormat = "plain" [, string textureFormat = "argb"] [, bool mipmaps =
-    //  true]]
+    //  string dxGetTexturePixels( [ int surfaceIndex, ] element texture [, string pixelsFormat = "plain" [, string textureFormat = "argb"] [, bool mipmaps = true]]
     //                             [, int x, int y, int width, int height ] )
     CClientTexture*   pTexture;
     CVector2D         vecPosition;
@@ -2148,8 +2141,7 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
     return true;
 }
 
-bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale,
-                                    const std::optional<float> lighting)
+bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale, const std::optional<float> lighting)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelID);
     if (!pModelInfo)
@@ -2163,6 +2155,6 @@ bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVe
 
     ConvertDegreesToRadians(rotation);
 
-    return g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo, CMatrix{position, rotation, scale.value_or(CVector{1.0f, 1.0f, 1.0f})},
-                                                           lighting.value_or(0.0f));
+    return g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo,
+        CMatrix{position, rotation, scale.value_or(CVector{1.0f, 1.0f, 1.0f})}, lighting.value_or(0.0f));
 }

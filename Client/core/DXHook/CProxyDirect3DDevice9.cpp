@@ -27,172 +27,173 @@ void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3
 namespace
 {
 
-}  // unnamed namespace
+
+} // unnamed namespace
 
 namespace BorderlessGamma
 {
-    const float kGammaMin = 0.5f;
-    const float kGammaMax = 2.0f;
-    const float kBrightnessMin = 0.5f;
-    const float kBrightnessMax = 2.0f;
-    const float kContrastMin = 0.5f;
-    const float kContrastMax = 2.0f;
-    const float kSaturationMin = 0.5f;
-    const float kSaturationMax = 2.0f;
+const float kGammaMin = 0.5f;
+const float kGammaMax = 2.0f;
+const float kBrightnessMin = 0.5f;
+const float kBrightnessMax = 2.0f;
+const float kContrastMin = 0.5f;
+const float kContrastMax = 2.0f;
+const float kSaturationMin = 0.5f;
+const float kSaturationMax = 2.0f;
 
-    // Cache CVAR-derived values to avoid repeated string lookups on every frame.
-    struct CachedSettings
+// Cache CVAR-derived values to avoid repeated string lookups on every frame.
+struct CachedSettings
+{
+    std::mutex                            updateMutex;
+    std::atomic<int>                      revision;
+    std::atomic<const CClientVariables*>  source;
+    std::atomic<float>                    gammaPower;
+    std::atomic<float>                    brightnessScale;
+    std::atomic<float>                    contrastScale;
+    std::atomic<float>                    saturationScale;
+    std::atomic<bool>                     gammaEnabled;
+    std::atomic<bool>                     brightnessEnabled;
+    std::atomic<bool>                     contrastEnabled;
+    std::atomic<bool>                     saturationEnabled;
+    std::atomic<bool>                     applyWindowed;
+    std::atomic<bool>                     applyFullscreen;
+
+    CachedSettings()
+        : revision(-1)
+        , source(nullptr)
+        , gammaPower(1.0f)
+        , brightnessScale(1.0f)
+        , contrastScale(1.0f)
+        , saturationScale(1.0f)
+        , gammaEnabled(false)
+        , brightnessEnabled(false)
+        , contrastEnabled(false)
+        , saturationEnabled(false)
+        , applyWindowed(false)
+        , applyFullscreen(false)
     {
-        std::mutex                           updateMutex;
-        std::atomic<int>                     revision;
-        std::atomic<const CClientVariables*> source;
-        std::atomic<float>                   gammaPower;
-        std::atomic<float>                   brightnessScale;
-        std::atomic<float>                   contrastScale;
-        std::atomic<float>                   saturationScale;
-        std::atomic<bool>                    gammaEnabled;
-        std::atomic<bool>                    brightnessEnabled;
-        std::atomic<bool>                    contrastEnabled;
-        std::atomic<bool>                    saturationEnabled;
-        std::atomic<bool>                    applyWindowed;
-        std::atomic<bool>                    applyFullscreen;
+    }
+};
 
-        CachedSettings()
-            : revision(-1),
-              source(nullptr),
-              gammaPower(1.0f),
-              brightnessScale(1.0f),
-              contrastScale(1.0f),
-              saturationScale(1.0f),
-              gammaEnabled(false),
-              brightnessEnabled(false),
-              contrastEnabled(false),
-              saturationEnabled(false),
-              applyWindowed(false),
-              applyFullscreen(false)
-        {
-        }
-    };
+static CachedSettings g_cachedSettings;
 
-    static CachedSettings g_cachedSettings;
+void RefreshCacheIfNeeded()
+{
+    CClientVariables* cvars = CClientVariables::GetSingletonPtr();
+    const CClientVariables* currentSource = cvars;
+    const int currentRevision = cvars ? cvars->GetRevision() : -1;
 
-    void RefreshCacheIfNeeded()
+    const CClientVariables* cachedSource = g_cachedSettings.source.load(std::memory_order_relaxed);
+    const int cachedRevision = g_cachedSettings.revision.load(std::memory_order_relaxed);
+
+    if (cachedSource == currentSource && cachedRevision == currentRevision)
+        return;
+
+    std::lock_guard<std::mutex> guard(g_cachedSettings.updateMutex);
+
+    const CClientVariables* doubleCheckSource = g_cachedSettings.source.load(std::memory_order_relaxed);
+    const int doubleCheckRevision = g_cachedSettings.revision.load(std::memory_order_relaxed);
+    if (doubleCheckSource == currentSource && doubleCheckRevision == currentRevision)
+        return;
+
+    float gammaPower = 1.0f;
+    float brightnessScale = 1.0f;
+    float contrastScale = 1.0f;
+    float saturationScale = 1.0f;
+    bool  gammaEnabled = false;
+    bool  brightnessEnabled = false;
+    bool  contrastEnabled = false;
+    bool  saturationEnabled = false;
+    bool  applyWindowed = false;
+    bool  applyFullscreen = false;
+
+    if (cvars)
     {
-        CClientVariables*       cvars = CClientVariables::GetSingletonPtr();
-        const CClientVariables* currentSource = cvars;
-        const int               currentRevision = cvars ? cvars->GetRevision() : -1;
+        cvars->Get("borderless_gamma_power", gammaPower);
+        cvars->Get("borderless_brightness_scale", brightnessScale);
+        cvars->Get("borderless_contrast_scale", contrastScale);
+        cvars->Get("borderless_saturation_scale", saturationScale);
+        cvars->Get("borderless_gamma_enabled", gammaEnabled);
+        cvars->Get("borderless_brightness_enabled", brightnessEnabled);
+        cvars->Get("borderless_contrast_enabled", contrastEnabled);
+        cvars->Get("borderless_saturation_enabled", saturationEnabled);
+        cvars->Get("borderless_apply_windowed", applyWindowed);
+        cvars->Get("borderless_apply_fullscreen", applyFullscreen);
 
-        const CClientVariables* cachedSource = g_cachedSettings.source.load(std::memory_order_relaxed);
-        const int               cachedRevision = g_cachedSettings.revision.load(std::memory_order_relaxed);
-
-        if (cachedSource == currentSource && cachedRevision == currentRevision)
-            return;
-
-        std::lock_guard<std::mutex> guard(g_cachedSettings.updateMutex);
-
-        const CClientVariables* doubleCheckSource = g_cachedSettings.source.load(std::memory_order_relaxed);
-        const int               doubleCheckRevision = g_cachedSettings.revision.load(std::memory_order_relaxed);
-        if (doubleCheckSource == currentSource && doubleCheckRevision == currentRevision)
-            return;
-
-        float gammaPower = 1.0f;
-        float brightnessScale = 1.0f;
-        float contrastScale = 1.0f;
-        float saturationScale = 1.0f;
-        bool  gammaEnabled = false;
-        bool  brightnessEnabled = false;
-        bool  contrastEnabled = false;
-        bool  saturationEnabled = false;
-        bool  applyWindowed = false;
-        bool  applyFullscreen = false;
-
-        if (cvars)
+        if (!cvars->Exists("borderless_apply_windowed"))
         {
-            cvars->Get("borderless_gamma_power", gammaPower);
-            cvars->Get("borderless_brightness_scale", brightnessScale);
-            cvars->Get("borderless_contrast_scale", contrastScale);
-            cvars->Get("borderless_saturation_scale", saturationScale);
-            cvars->Get("borderless_gamma_enabled", gammaEnabled);
-            cvars->Get("borderless_brightness_enabled", brightnessEnabled);
-            cvars->Get("borderless_contrast_enabled", contrastEnabled);
-            cvars->Get("borderless_saturation_enabled", saturationEnabled);
-            cvars->Get("borderless_apply_windowed", applyWindowed);
-            cvars->Get("borderless_apply_fullscreen", applyFullscreen);
-
-            if (!cvars->Exists("borderless_apply_windowed"))
-            {
-                bool legacyEnable = false;
-                cvars->Get("borderless_enable_srgb", legacyEnable);
-                applyWindowed = legacyEnable;
-            }
-
-            if (!std::isfinite(gammaPower))
-                gammaPower = 1.0f;
-            if (!std::isfinite(brightnessScale))
-                brightnessScale = 1.0f;
-            if (!std::isfinite(contrastScale))
-                contrastScale = 1.0f;
-            if (!std::isfinite(saturationScale))
-                saturationScale = 1.0f;
-
-            gammaPower = std::clamp(gammaPower, kGammaMin, kGammaMax);
-            brightnessScale = std::clamp(brightnessScale, kBrightnessMin, kBrightnessMax);
-            contrastScale = std::clamp(contrastScale, kContrastMin, kContrastMax);
-            saturationScale = std::clamp(saturationScale, kSaturationMin, kSaturationMax);
+            bool legacyEnable = false;
+            cvars->Get("borderless_enable_srgb", legacyEnable);
+            applyWindowed = legacyEnable;
         }
 
-        g_cachedSettings.gammaPower.store(gammaPower, std::memory_order_relaxed);
-        g_cachedSettings.brightnessScale.store(brightnessScale, std::memory_order_relaxed);
-        g_cachedSettings.contrastScale.store(contrastScale, std::memory_order_relaxed);
-        g_cachedSettings.saturationScale.store(saturationScale, std::memory_order_relaxed);
-        g_cachedSettings.gammaEnabled.store(gammaEnabled, std::memory_order_relaxed);
-        g_cachedSettings.brightnessEnabled.store(brightnessEnabled, std::memory_order_relaxed);
-        g_cachedSettings.contrastEnabled.store(contrastEnabled, std::memory_order_relaxed);
-        g_cachedSettings.saturationEnabled.store(saturationEnabled, std::memory_order_relaxed);
-        g_cachedSettings.applyWindowed.store(applyWindowed, std::memory_order_relaxed);
-        g_cachedSettings.applyFullscreen.store(applyFullscreen, std::memory_order_relaxed);
-        g_cachedSettings.source.store(currentSource, std::memory_order_relaxed);
-        g_cachedSettings.revision.store(currentRevision, std::memory_order_release);
+        if (!std::isfinite(gammaPower))
+            gammaPower = 1.0f;
+        if (!std::isfinite(brightnessScale))
+            brightnessScale = 1.0f;
+        if (!std::isfinite(contrastScale))
+            contrastScale = 1.0f;
+        if (!std::isfinite(saturationScale))
+            saturationScale = 1.0f;
+
+        gammaPower = std::clamp(gammaPower, kGammaMin, kGammaMax);
+        brightnessScale = std::clamp(brightnessScale, kBrightnessMin, kBrightnessMax);
+        contrastScale = std::clamp(contrastScale, kContrastMin, kContrastMax);
+        saturationScale = std::clamp(saturationScale, kSaturationMin, kSaturationMax);
     }
 
-    void FetchSettings(float& gammaPower, float& brightnessScale, float& contrastScale, float& saturationScale, bool& applyWindowed, bool& applyFullscreen)
-    {
-        RefreshCacheIfNeeded();
-
-        const float cachedGammaPower = g_cachedSettings.gammaPower.load(std::memory_order_acquire);
-        const float cachedBrightness = g_cachedSettings.brightnessScale.load(std::memory_order_acquire);
-        const float cachedContrast = g_cachedSettings.contrastScale.load(std::memory_order_acquire);
-        const float cachedSaturation = g_cachedSettings.saturationScale.load(std::memory_order_acquire);
-        const bool  gammaEnabled = g_cachedSettings.gammaEnabled.load(std::memory_order_acquire);
-        const bool  brightnessEnabled = g_cachedSettings.brightnessEnabled.load(std::memory_order_acquire);
-        const bool  contrastEnabled = g_cachedSettings.contrastEnabled.load(std::memory_order_acquire);
-        const bool  saturationEnabled = g_cachedSettings.saturationEnabled.load(std::memory_order_acquire);
-
-        gammaPower = gammaEnabled ? cachedGammaPower : 1.0f;
-        brightnessScale = brightnessEnabled ? cachedBrightness : 1.0f;
-        contrastScale = contrastEnabled ? cachedContrast : 1.0f;
-        saturationScale = saturationEnabled ? cachedSaturation : 1.0f;
-
-        applyWindowed = g_cachedSettings.applyWindowed.load(std::memory_order_acquire);
-        applyFullscreen = g_cachedSettings.applyFullscreen.load(std::memory_order_acquire);
-    }
-
-    bool ShouldApplyAdjustments(float gammaPower, float brightnessScale, float contrastScale, float saturationScale)
-    {
-        constexpr float epsilon = 0.001f;
-        return std::fabs(gammaPower - 1.0f) > epsilon || std::fabs(brightnessScale - 1.0f) > epsilon || std::fabs(contrastScale - 1.0f) > epsilon ||
-               std::fabs(saturationScale - 1.0f) > epsilon;
-    }
-
+    g_cachedSettings.gammaPower.store(gammaPower, std::memory_order_relaxed);
+    g_cachedSettings.brightnessScale.store(brightnessScale, std::memory_order_relaxed);
+    g_cachedSettings.contrastScale.store(contrastScale, std::memory_order_relaxed);
+    g_cachedSettings.saturationScale.store(saturationScale, std::memory_order_relaxed);
+    g_cachedSettings.gammaEnabled.store(gammaEnabled, std::memory_order_relaxed);
+    g_cachedSettings.brightnessEnabled.store(brightnessEnabled, std::memory_order_relaxed);
+    g_cachedSettings.contrastEnabled.store(contrastEnabled, std::memory_order_relaxed);
+    g_cachedSettings.saturationEnabled.store(saturationEnabled, std::memory_order_relaxed);
+    g_cachedSettings.applyWindowed.store(applyWindowed, std::memory_order_relaxed);
+    g_cachedSettings.applyFullscreen.store(applyFullscreen, std::memory_order_relaxed);
+    g_cachedSettings.source.store(currentSource, std::memory_order_relaxed);
+    g_cachedSettings.revision.store(currentRevision, std::memory_order_release);
 }
 
+void FetchSettings(float& gammaPower, float& brightnessScale, float& contrastScale, float& saturationScale, bool& applyWindowed, bool& applyFullscreen)
+{
+    RefreshCacheIfNeeded();
+
+    const float cachedGammaPower = g_cachedSettings.gammaPower.load(std::memory_order_acquire);
+    const float cachedBrightness = g_cachedSettings.brightnessScale.load(std::memory_order_acquire);
+    const float cachedContrast = g_cachedSettings.contrastScale.load(std::memory_order_acquire);
+    const float cachedSaturation = g_cachedSettings.saturationScale.load(std::memory_order_acquire);
+    const bool  gammaEnabled = g_cachedSettings.gammaEnabled.load(std::memory_order_acquire);
+    const bool  brightnessEnabled = g_cachedSettings.brightnessEnabled.load(std::memory_order_acquire);
+    const bool  contrastEnabled = g_cachedSettings.contrastEnabled.load(std::memory_order_acquire);
+    const bool  saturationEnabled = g_cachedSettings.saturationEnabled.load(std::memory_order_acquire);
+
+    gammaPower = gammaEnabled ? cachedGammaPower : 1.0f;
+    brightnessScale = brightnessEnabled ? cachedBrightness : 1.0f;
+    contrastScale = contrastEnabled ? cachedContrast : 1.0f;
+    saturationScale = saturationEnabled ? cachedSaturation : 1.0f;
+
+    applyWindowed = g_cachedSettings.applyWindowed.load(std::memory_order_acquire);
+    applyFullscreen = g_cachedSettings.applyFullscreen.load(std::memory_order_acquire);
+}
+
+bool ShouldApplyAdjustments(float gammaPower, float brightnessScale, float contrastScale, float saturationScale)
+{
+    constexpr float epsilon = 0.001f;
+    return std::fabs(gammaPower - 1.0f) > epsilon || std::fabs(brightnessScale - 1.0f) > epsilon || std::fabs(contrastScale - 1.0f) > epsilon ||
+           std::fabs(saturationScale - 1.0f) > epsilon;
+}
+
+} // namespace BorderlessGamma
+
 using namespace BorderlessGamma;
-std::mutex            g_proxyDeviceMutex;
-std::mutex            g_gammaStateMutex;
-std::mutex            g_deviceStateMutex;
-std::atomic<uint64_t> g_proxyRegistrationCounter{0};
-std::atomic<uint>     g_gtaSceneActiveCount{0};
-uint64_t              g_activeProxyRegistrationId = 0;
+std::mutex               g_proxyDeviceMutex;
+std::mutex               g_gammaStateMutex;
+std::mutex               g_deviceStateMutex;
+std::atomic<uint64_t>    g_proxyRegistrationCounter{0};
+std::atomic<uint>        g_gtaSceneActiveCount{0};
+uint64_t                 g_activeProxyRegistrationId = 0;
 
 std::atomic<bool>                       g_bInGTAScene{false};
 CProxyDirect3DDevice9*                  g_pProxyDevice = NULL;
@@ -203,37 +204,37 @@ CProxyDirect3DDevice9::SMemoryState g_StaticMemoryState;
 
 namespace
 {
-    uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance)
+uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance)
+{
+    std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
+    const uint64_t registrationId = g_proxyRegistrationCounter.fetch_add(1, std::memory_order_relaxed) + 1;
+    g_pProxyDevice = instance;
+    g_activeProxyRegistrationId = registrationId;
     {
-        std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
-        const uint64_t              registrationId = g_proxyRegistrationCounter.fetch_add(1, std::memory_order_relaxed) + 1;
-        g_pProxyDevice = instance;
-        g_activeProxyRegistrationId = registrationId;
-        {
-            std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
-            g_pDeviceState = instance ? &instance->DeviceState : nullptr;
-        }
-        return registrationId;
+        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+        g_pDeviceState = instance ? &instance->DeviceState : nullptr;
     }
+    return registrationId;
+}
 
-    bool UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registrationId)
+bool UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registrationId)
+{
+    std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
+    if (g_pProxyDevice != instance)
+        return false;
+
+    if (g_activeProxyRegistrationId != registrationId)
+        return false;
+
+    g_pProxyDevice = nullptr;
+    g_activeProxyRegistrationId = 0;
     {
-        std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
-        if (g_pProxyDevice != instance)
-            return false;
-
-        if (g_activeProxyRegistrationId != registrationId)
-            return false;
-
-        g_pProxyDevice = nullptr;
-        g_activeProxyRegistrationId = 0;
-        {
-            std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
-            g_pDeviceState = nullptr;
-        }
-        return true;
+        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+        g_pDeviceState = nullptr;
     }
-}  // namespace
+    return true;
+}
+} // namespace
 
 void IncrementGTASceneState()
 {
@@ -260,8 +261,13 @@ void ResetGTASceneState()
 // Proxy constructor and destructor.
 // Constructor performs heavy initialization; defer global registration until the end to avoid exposing a partially built object.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
-    : m_pDevice(pDevice), m_pData(nullptr), m_lRefCount(1), m_registrationToken(0), m_lastTestCooperativeLevelResult(D3D_OK)
+    : m_pDevice(pDevice)
+    , m_pData(nullptr)
+    , m_lRefCount(1)
+    , m_registrationToken(0)
+    , m_lastTestCooperativeLevelResult(D3D_OK)
 {
+
     struct DeviceRefGuard
     {
         IDirect3DDevice9* device;
@@ -295,14 +301,14 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
         if (!pD3D9)
         {
             m_pDevice->GetDirect3D(&pD3D9);
-            bNeedRelease = true;  // GetDirect3D increments reference count
+            bNeedRelease = true;        // GetDirect3D increments reference count
         }
 
         if (pD3D9)
         {
             D3DADAPTER_IDENTIFIER9 adaptIdent;
-            HRESULT                hr = pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
-
+            HRESULT hr = pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
+            
             if (SUCCEEDED(hr))
             {
                 // GetAdapterIdentifier succeeded - use adapter info
@@ -395,9 +401,9 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 {
     const bool bWasRegistered = UnregisterProxyDevice(this, m_registrationToken);
 
-    bool         bRestoreGamma = false;
-    UINT         lastSwapChain = 0;
-    D3DGAMMARAMP originalGammaRamp{};
+    bool          bRestoreGamma = false;
+    UINT          lastSwapChain = 0;
+    D3DGAMMARAMP  originalGammaRamp{};
 
     if (bWasRegistered)
     {
@@ -434,6 +440,7 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
         m_pDevice->Release();
         m_pDevice = nullptr;
     }
+    
 }
 
 /*** IUnknown methods ***/
@@ -441,9 +448,9 @@ HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
 {
     if (!ppvObj)
         return E_POINTER;
-
+        
     *ppvObj = nullptr;
-
+    
     // Check if its for IUnknown or IDirect3DDevice9
     if (riid == IID_IUnknown || riid == IID_IDirect3DDevice9)
     {
@@ -451,7 +458,7 @@ HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
         AddRef();
         return S_OK;
     }
-
+    
     // For any other interface, forward to underlying device
     // But this means the caller gets the underlying device, not our proxy
     return m_pDevice->QueryInterface(riid, ppvObj);
@@ -459,17 +466,17 @@ HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
 
 ULONG CProxyDirect3DDevice9::AddRef()
 {
-    // Only increment proxy reference count
+	// Only increment proxy reference count
     // We keep a single reference to the underlying device throughout the lifetime
     LONG lNewRefCount = m_lRefCount.fetch_add(1, std::memory_order_relaxed) + 1;
     return static_cast<ULONG>(lNewRefCount);
 }
 
 ULONG CProxyDirect3DDevice9::Release()
-{
-    // Only decrement proxy reference count
+{  
+    // Only decrement proxy reference count  
     LONG lNewRefCount = m_lRefCount.fetch_sub(1, std::memory_order_acq_rel) - 1;
-
+    
     if (lNewRefCount == 0)
     {
         // Call event handler
@@ -485,11 +492,11 @@ ULONG CProxyDirect3DDevice9::Release()
 HRESULT CProxyDirect3DDevice9::TestCooperativeLevel()
 {
     HRESULT hResult = m_pDevice->TestCooperativeLevel();
-
+    
     if (hResult != m_lastTestCooperativeLevelResult)
     {
         m_lastTestCooperativeLevelResult = hResult;
-
+        
         // Additional safety for when transitioning to/from lost states
         if (hResult == D3DERR_DEVICELOST || hResult == D3DERR_DEVICENOTRESET)
         {
@@ -497,7 +504,7 @@ HRESULT CProxyDirect3DDevice9::TestCooperativeLevel()
             Sleep(1);
         }
     }
-
+    
     return hResult;
 }
 
@@ -690,6 +697,7 @@ static bool WaitForGpuIdle(IDirect3DDevice9* pDevice)
 
 HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
+
     // Validate input parameters
     if (!pPresentationParameters)
     {
@@ -705,7 +713,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         g_GammaState = SGammaState();
         gammaStateCleared = true;
     }
-
+    
     // Check cooperative level before attempting reset
     HRESULT hCoopLevel = m_pDevice->TestCooperativeLevel();
     if (hCoopLevel == D3DERR_DEVICELOST)
@@ -740,7 +748,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     WaitForGpuIdle(m_pDevice);
 
     Sleep(1);
-
+    
     // Call the real reset routine.
     hResult = DoResetDevice(m_pDevice, pPresentationParameters, presentationParametersOrig);
 
@@ -796,7 +804,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         // Ensure scene state is properly restored
         // Call our event handler.
         CDirect3DEvents9::OnRestore(m_pDevice);
-
+        
         // Additional sync point for GPU driver
         if (BeginSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
         {
@@ -814,6 +822,7 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
 
     return hResult;
 }
+
 
 HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion)
 {
@@ -1048,8 +1057,7 @@ HRESULT CProxyDirect3DDevice9::CreateRenderTarget(UINT Width, UINT Height, D3DFO
 HRESULT CProxyDirect3DDevice9::CreateDepthStencilSurface(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality,
                                                          BOOL Discard, IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
 {
-    return CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(m_pDevice, Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface,
-                                                              pSharedHandle);
+    return CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(m_pDevice, Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
 }
 
 HRESULT CProxyDirect3DDevice9::UpdateSurface(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestinationSurface,
@@ -1425,8 +1433,9 @@ HRESULT CProxyDirect3DDevice9::DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, UIN
 HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitive(D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex,
                                                     UINT primCount)
 {
-    SetCallType(SCallState::DRAW_INDEXED_PRIMITIVE, {PrimitiveType, BaseVertexIndex, static_cast<int>(MinVertexIndex), static_cast<int>(NumVertices),
-                                                     static_cast<int>(startIndex), static_cast<int>(primCount)});
+    SetCallType(SCallState::DRAW_INDEXED_PRIMITIVE,
+                {PrimitiveType, BaseVertexIndex, static_cast<int>(MinVertexIndex), static_cast<int>(NumVertices), static_cast<int>(startIndex),
+                 static_cast<int>(primCount)});
     HRESULT hr = CDirect3DEvents9::OnDrawIndexedPrimitive(m_pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
     SetCallType(SCallState::NONE);
     return hr;
@@ -1442,8 +1451,8 @@ HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE Primitive
                                                       CONST void* pIndexData, D3DFORMAT IndexDataFormat, CONST void* pVertexStreamZeroData,
                                                       UINT VertexStreamZeroStride)
 {
-    return CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(m_pDevice, PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat,
-                                                           pVertexStreamZeroData, VertexStreamZeroStride);
+    return CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(m_pDevice, PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData,
+                                                          IndexDataFormat, pVertexStreamZeroData, VertexStreamZeroStride);
 }
 
 HRESULT CProxyDirect3DDevice9::ProcessVertices(UINT SrcStartIndex, UINT DestIndex, UINT VertexCount, IDirect3DVertexBuffer9* pDestBuffer,
@@ -1750,7 +1759,8 @@ bool EndSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner)
     return true;
 }
 
-CScopedActiveProxyDevice::CScopedActiveProxyDevice() : m_pProxy(AcquireActiveProxyDevice())
+CScopedActiveProxyDevice::CScopedActiveProxyDevice()
+    : m_pProxy(AcquireActiveProxyDevice())
 {
 }
 

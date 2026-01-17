@@ -16,23 +16,23 @@ static float WEATHER_FAKE_ACCUMULATOR;
 
 unsigned char CWeatherSA::Get()
 {
-    return *(unsigned char*)0xC81318;  // CWeather::ForcedWeatherType
+    return *(unsigned char*)0xC81318; // CWeather::ForcedWeatherType
 }
 
 void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
 {
-    MemPutFast<unsigned char>(0xC81320, primary);    // CWeather::OldWeatherType
-    MemPutFast<unsigned char>(0xC8131C, secondary);  // CWeather::NewWeatherType
+    MemPutFast<unsigned char>(0xC81320, primary); // CWeather::OldWeatherType
+    MemPutFast<unsigned char>(0xC8131C, secondary); // CWeather::NewWeatherType
 }
 
 void CWeatherSA::Release()
 {
-    MemPutFast<unsigned char>(0xC81318, 0xFF);  // CWeather::ForcedWeatherType
+    MemPutFast<unsigned char>(0xC81318, 0xFF); // CWeather::ForcedWeatherType
 }
 
 float CWeatherSA::GetAmountOfRain()
 {
-    return *(float*)0xC81324;  // CWeather::Rain
+    return *(float*)0xC81324; // CWeather::Rain
 }
 
 void CWeatherSA::SetAmountOfRain(float fAmount)
@@ -44,12 +44,12 @@ void CWeatherSA::SetAmountOfRain(float fAmount)
     MemSet((void*)0x72BC72, 0x90, 5);
 
     // Set the amount of rain
-    MemPutFast<float>(0xC81324, fAmount);  // CWeather::Rain
+    MemPutFast<float>(0xC81324, fAmount); // CWeather::Rain
 }
 
 void CWeatherSA::ResetAmountOfRain()
 {
-    BYTE originalMov[5] = {0xA3, 0x24, 0x13, 0xC8, 0x00};  // 0x72BC72
+    BYTE originalMov[5] = {0xA3, 0x24, 0x13, 0xC8, 0x00};                    // 0x72BC72
     MemCpy((LPVOID)0x72BC72, &originalMov, 5);
 
     static constexpr DWORD originalAddr = 0x00C81324;

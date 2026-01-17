@@ -22,9 +22,9 @@
 #define GTA_KEY_MXB2            7
 #define GTA_KEY_SPACE           32
 #define GTA_KEY_COMMA           44
-#define GTA_KEY_MINUS           45 /* - on main keyboard */
-#define GTA_KEY_PERIOD          46 /* . on main keyboard */
-#define GTA_KEY_SLASH           47 /* / on main keyboard */
+#define GTA_KEY_MINUS           45      /* - on main keyboard */
+#define GTA_KEY_PERIOD          46    /* . on main keyboard */
+#define GTA_KEY_SLASH           47    /* / on main keyboard */
 #define GTA_KEY_0               48
 #define GTA_KEY_1               49
 #define GTA_KEY_2               50
@@ -68,7 +68,7 @@
 #define GTA_KEY_LBRACKET        91
 #define GTA_KEY_BACKSLASH       92
 #define GTA_KEY_RBRACKET        93
-#define GTA_KEY_GRAVE           96 /* accent grave */
+#define GTA_KEY_GRAVE           96    /* accent grave */
 #define GTA_KEY_F1              1001
 #define GTA_KEY_F2              1002
 #define GTA_KEY_F3              1003
@@ -81,21 +81,21 @@
 #define GTA_KEY_F10             1010
 #define GTA_KEY_F11             1011
 #define GTA_KEY_F12             1012
-#define GTA_KEY_INSERT          1013 /* Insert on arrow keypad */
-#define GTA_KEY_DELETE          1014 /* Delete on arrow keypad */
-#define GTA_KEY_HOME            1015 /* Home on arrow keypad */
-#define GTA_KEY_END             1016 /* End on arrow keypad */
-#define GTA_KEY_PGUP            1017 /* PgUp on arrow keypad */
-#define GTA_KEY_PGDN            1018 /* PgDn on arrow keypad */
-#define GTA_KEY_UP              1019 /* UpArrow on arrow keypad */
-#define GTA_KEY_DOWN            1020 /* DownArrow on arrow keypad */
-#define GTA_KEY_LEFT            1021 /* LeftArrow on arrow keypad */
-#define GTA_KEY_RIGHT           1022 /* RightArrow on arrow keypad */
-#define GTA_KEY_DIVIDE          1023 /* / on numeric keypad */
-#define GTA_KEY_MULTIPLY        1024 /* * on numeric keypad */
-#define GTA_KEY_ADD             1025 /* + on numeric keypad */
-#define GTA_KEY_SUBTRACT        1026 /* - on numeric keypad */
-#define GTA_KEY_DECIMAL         1027 /* . on numeric keypad */
+#define GTA_KEY_INSERT          1013    /* Insert on arrow keypad */
+#define GTA_KEY_DELETE          1014    /* Delete on arrow keypad */
+#define GTA_KEY_HOME            1015    /* Home on arrow keypad */
+#define GTA_KEY_END             1016    /* End on arrow keypad */
+#define GTA_KEY_PGUP            1017    /* PgUp on arrow keypad */
+#define GTA_KEY_PGDN            1018    /* PgDn on arrow keypad */
+#define GTA_KEY_UP              1019    /* UpArrow on arrow keypad */
+#define GTA_KEY_DOWN            1020    /* DownArrow on arrow keypad */
+#define GTA_KEY_LEFT            1021    /* LeftArrow on arrow keypad */
+#define GTA_KEY_RIGHT           1022    /* RightArrow on arrow keypad */
+#define GTA_KEY_DIVIDE          1023    /* / on numeric keypad */
+#define GTA_KEY_MULTIPLY        1024    /* * on numeric keypad */
+#define GTA_KEY_ADD             1025    /* + on numeric keypad */
+#define GTA_KEY_SUBTRACT        1026    /* - on numeric keypad */
+#define GTA_KEY_DECIMAL         1027    /* . on numeric keypad */
 #define GTA_KEY_NUMPAD1         1028
 #define GTA_KEY_NUMPAD2         1029
 #define GTA_KEY_NUMPAD3         1030
@@ -107,21 +107,21 @@
 #define GTA_KEY_NUMPAD8         1036
 #define GTA_KEY_NUMPAD9         1037
 #define GTA_KEY_NUMPAD0         1038
-#define GTA_KEY_NUMPADENTER     1039 /* Enter on numeric keypad */
-#define GTA_KEY_SCROLL          1040 /* Scroll Lock */
-#define GTA_KEY_PAUSE           1041 /* Pause */
-#define GTA_KEY_BACK            1042 /* backspace */
+#define GTA_KEY_NUMPADENTER     1039    /* Enter on numeric keypad */
+#define GTA_KEY_SCROLL          1040    /* Scroll Lock */
+#define GTA_KEY_PAUSE           1041    /* Pause */
+#define GTA_KEY_BACK            1042    /* backspace */
 #define GTA_KEY_TAB             1043
-#define GTA_KEY_CAPSLOCK        1044 /* Caps Lock */
-#define GTA_KEY_RETURN          1045 /* Enter on main keyboard */
+#define GTA_KEY_CAPSLOCK        1044    /* Caps Lock */
+#define GTA_KEY_RETURN          1045    /* Enter on main keyboard */
 #define GTA_KEY_LSHIFT          1046
 #define GTA_KEY_RSHIFT          1047
 #define GTA_KEY_LCONTROL        1049
 #define GTA_KEY_RCONTROL        1050
-#define GTA_KEY_LMENU           1051 /* left Alt */
-#define GTA_KEY_RMENU           1052 /* right Alt */
-#define GTA_KEY_LWIN            1053 /* Left Windows key */
-#define GTA_KEY_RWIN            1054 /* Right Windows key */
+#define GTA_KEY_LMENU           1051    /* left Alt */
+#define GTA_KEY_RMENU           1052    /* right Alt */
+#define GTA_KEY_LWIN            1053    /* Left Windows key */
+#define GTA_KEY_RWIN            1054    /* Right Windows key */
 #define NO_KEY_DEFINED          1056
 
 /*

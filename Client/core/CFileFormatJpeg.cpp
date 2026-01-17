@@ -11,8 +11,8 @@
 #include "StdInc.h"
 #include "jinclude.h"
 #include "jpeglib.h"
-#include "jerror.h"  /* get library error codes too */
-#include "cderror.h" /* get application-specific error codes */
+#include "jerror.h"         /* get library error codes too */
+#include "cderror.h"        /* get application-specific error codes */
 
 // Custom error handler for libjpeg - allows recovery instead of exit()
 struct JpegErrorManager
@@ -95,11 +95,11 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     }
 
     // Validate dimensions (libjpeg max: 65500)
-    if (cinfo.image_width == 0 || cinfo.image_height == 0 || cinfo.image_width > JPEG_MAX_DIMENSION || cinfo.image_height > JPEG_MAX_DIMENSION)
+    if (cinfo.image_width == 0 || cinfo.image_height == 0 ||
+        cinfo.image_width > JPEG_MAX_DIMENSION || cinfo.image_height > JPEG_MAX_DIMENSION)
     {
         if (pOutError)
-            *pOutError = "Invalid JPEG dimensions: " + std::to_string(cinfo.image_width) + "x" + std::to_string(cinfo.image_height) + " (max " +
-                         std::to_string(JPEG_MAX_DIMENSION) + ")";
+            *pOutError = "Invalid JPEG dimensions: " + std::to_string(cinfo.image_width) + "x" + std::to_string(cinfo.image_height) + " (max " + std::to_string(JPEG_MAX_DIMENSION) + ")";
         jpeg_destroy_decompress(&cinfo);
         return false;
     }
@@ -136,8 +136,7 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     if (uiRequiredSize > UINT_MAX)
     {
         if (pOutError)
-            *pOutError = "JPEG dimensions too large for buffer: " + std::to_string(uiWidth) + "x" + std::to_string(uiHeight) + " requires " +
-                         std::to_string(uiRequiredSize) + " bytes";
+            *pOutError = "JPEG dimensions too large for buffer: " + std::to_string(uiWidth) + "x" + std::to_string(uiHeight) + " requires " + std::to_string(uiRequiredSize) + " bytes";
         jpeg_destroy_decompress(&cinfo);
         return false;
     }
@@ -176,15 +175,14 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     while (cinfo.output_scanline < cinfo.output_height)
     {
         uint64 uiRowOffset = static_cast<uint64>(cinfo.output_scanline) * uiWidth * 4;
-        BYTE*  pRowDest = (BYTE*)pOutData + static_cast<size_t>(uiRowOffset);
+        BYTE* pRowDest = (BYTE*)pOutData + static_cast<size_t>(uiRowOffset);
         row_pointer[0] = (JSAMPROW)pRowTemp;
 
         JDIMENSION num_read = jpeg_read_scanlines(&cinfo, row_pointer, 1);
         if (num_read != 1)
         {
             if (pOutError)
-                *pOutError = "Failed to read JPEG scanline " + std::to_string(cinfo.output_scanline) + " of " + std::to_string(cinfo.output_height) +
-                             " (truncated image?)";
+                *pOutError = "Failed to read JPEG scanline " + std::to_string(cinfo.output_scanline) + " of " + std::to_string(cinfo.output_height) + " (truncated image?)";
             jpeg_destroy_decompress(&cinfo);
             return false;
         }
@@ -195,7 +193,7 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
             pRowDest[i * 4 + 0] = pRowTemp[i * 3 + 2];  // B
             pRowDest[i * 4 + 1] = pRowTemp[i * 3 + 1];  // G
             pRowDest[i * 4 + 2] = pRowTemp[i * 3 + 0];  // R
-            pRowDest[i * 4 + 3] = 255;                  // A
+            pRowDest[i * 4 + 3] = 255;                   // A
         }
     }
 
@@ -227,8 +225,7 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
     if (uiWidth > JPEG_MAX_DIMENSION || uiHeight > JPEG_MAX_DIMENSION)
     {
         if (pOutError)
-            *pOutError =
-                "JPEG dimensions too large: " + std::to_string(uiWidth) + "x" + std::to_string(uiHeight) + " (max " + std::to_string(JPEG_MAX_DIMENSION) + ")";
+            *pOutError = "JPEG dimensions too large: " + std::to_string(uiWidth) + "x" + std::to_string(uiHeight) + " (max " + std::to_string(JPEG_MAX_DIMENSION) + ")";
         return false;
     }
 
@@ -248,8 +245,7 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
     if (uiDataSize != static_cast<uint>(uiExpectedSize))
     {
         if (pOutError)
-            *pOutError =
-                "Input buffer size mismatch: expected " + std::to_string(static_cast<uint>(uiExpectedSize)) + " bytes, got " + std::to_string(uiDataSize);
+            *pOutError = "Input buffer size mismatch: expected " + std::to_string(static_cast<uint>(uiExpectedSize)) + " bytes, got " + std::to_string(uiDataSize);
         return false;
     }
 
@@ -271,7 +267,7 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
     jpeg_create_compress(&cinfo);
 
     unsigned char* membuffer_ptr = nullptr;
-    size_t         memlen_val = 0;
+    size_t memlen_val = 0;
     jpeg_mem_dest(&cinfo, &membuffer_ptr, &memlen_val);
 
     cinfo.image_width = uiWidth;
@@ -302,12 +298,12 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
 
     char* pRowTemp = rowBuffer.GetData();
 
-    bool     bSuccess = false;
+    bool bSuccess = false;
     JSAMPROW row_pointer[1];
     while (cinfo.next_scanline < cinfo.image_height)
     {
         uint64 uiRowOffset = static_cast<uint64>(cinfo.next_scanline) * uiWidth * 4;
-        BYTE*  pRowSrc = (BYTE*)pData + static_cast<size_t>(uiRowOffset);
+        BYTE* pRowSrc = (BYTE*)pData + static_cast<size_t>(uiRowOffset);
 
         // Convert BGRA to RGB
         for (uint i = 0; i < uiWidth; i++)

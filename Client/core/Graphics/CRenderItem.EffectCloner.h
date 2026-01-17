@@ -57,6 +57,6 @@ private:
 
     CElapsedTime                                           m_TidyupTimer;
     CRenderItemManager*                                    m_pManager;
-    std::unordered_map<SEffectInvariant, CEffectTemplate*> m_ValidMap;  // Active and files not changed since first created
-    std::vector<CEffectTemplate*>                          m_OldList;   // Active but files changed since first created
+    std::unordered_map<SEffectInvariant, CEffectTemplate*> m_ValidMap;            // Active and files not changed since first created
+    std::vector<CEffectTemplate*>                          m_OldList;             // Active but files changed since first created
 };

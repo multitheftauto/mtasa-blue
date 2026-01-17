@@ -13,8 +13,8 @@
 
 #include "CWeaponInfo.h"
 
-#define STATS_OFFSET       120
-#define STATS_BLANK_OFFSET 320
+#define STATS_OFFSET        120
+#define STATS_BLANK_OFFSET  320
 
 enum
 {
@@ -35,7 +35,7 @@ enum
     DIST_HELICOPTOR,
     DIST_PLANE,
 
-    LONGEST_WHEELIE_DIST,  // 10
+    LONGEST_WHEELIE_DIST,            // 10
     LONGEST_STOPPIE_DIST,
     LONGEST_2WHEEL_DIST,
 
@@ -50,7 +50,7 @@ enum
     LONGEST_STOPPIE_TIME,
     LONGEST_2WHEEL_TIME,
 
-    FOOD_BUDGET,  // 20
+    FOOD_BUDGET,            // 20
 
     FAT,
     STAMINA,
@@ -65,7 +65,7 @@ enum
     DIST_TREADMILL,
     DIST_EXCERSISE_BIKE,
 
-    TATTOO_BUDGET,  // 30
+    TATTOO_BUDGET,            // 30
     HAIRDRESSING_BUDGET,
     NOT_USED_FLOAT_6,
     PROSTITUTE_BUDGET,
@@ -77,7 +77,7 @@ enum
     BIGGEST_GAMBLING_WIN,
     BIGGEST_GAMBLING_LOSS,
 
-    LARGEST_BURGLARY_SWAG,  // 40
+    LARGEST_BURGLARY_SWAG,            // 40
     MONEY_MADE_BURGLARY,
 
     NOT_USED_FLOAT_3,
@@ -91,7 +91,7 @@ enum
 
     BEST_TIME_HOTRING,
     BEST_TIME_BMX,
-    NOT_USED_INT_11,  // 50
+    NOT_USED_INT_11,            // 50
 
     LONGEST_CHASE_TIME,
     LAST_CHASE_TIME,
@@ -107,7 +107,7 @@ enum
     NOT_USED_INT_3,
     NOT_USED_INT_4,
 
-    NOT_USED_INT_19,  // 60
+    NOT_USED_INT_19,            // 60
     NOT_USED_INT_5,
     TOTAL_SHOPPING_BUDGET,
 
@@ -119,23 +119,23 @@ enum
     RESPECT_FITNESS,
     RESPECT,
 
-    WEAPONTYPE_PISTOL_SKILL,           // weapon types   // 69
-    WEAPONTYPE_PISTOL_SILENCED_SKILL,  // 70
-    WEAPONTYPE_DESERT_EAGLE_SKILL,     // 71
-    WEAPONTYPE_SHOTGUN_SKILL,          // 72
-    WEAPONTYPE_SAWNOFF_SHOTGUN_SKILL,  // 73
-    WEAPONTYPE_SPAS12_SHOTGUN_SKILL,   // 74
-    WEAPONTYPE_MICRO_UZI_SKILL,        // 75
-    WEAPONTYPE_MP5_SKILL,              // 76
-    WEAPONTYPE_AK47_SKILL,             // 77
-    WEAPONTYPE_M4_SKILL,               // 78
-    WEAPONTYPE_SNIPERRIFLE_SKILL,      // 79
+    WEAPONTYPE_PISTOL_SKILL,                     // weapon types   // 69
+    WEAPONTYPE_PISTOL_SILENCED_SKILL,            // 70
+    WEAPONTYPE_DESERT_EAGLE_SKILL,               // 71
+    WEAPONTYPE_SHOTGUN_SKILL,                    // 72
+    WEAPONTYPE_SAWNOFF_SHOTGUN_SKILL,            // 73
+    WEAPONTYPE_SPAS12_SHOTGUN_SKILL,             // 74
+    WEAPONTYPE_MICRO_UZI_SKILL,                  // 75
+    WEAPONTYPE_MP5_SKILL,                        // 76
+    WEAPONTYPE_AK47_SKILL,                       // 77
+    WEAPONTYPE_M4_SKILL,                         // 78
+    WEAPONTYPE_SNIPERRIFLE_SKILL,                // 79
 
     SEX_APPEAL_CLOTHES,
 
     GAMBLING,
 
-    MAX_FLOAT_STATS  // must be last
+    MAX_FLOAT_STATS            // must be last
 };
 
 enum
@@ -144,7 +144,7 @@ enum
      ALL INT/BOOL VALUES TO BE ADDED HERE
      ************************************/
 
-    PEOPLE_KILLED_BY_OTHERS = STATS_OFFSET,  // 120 starts off at STATS_OFFSET
+    PEOPLE_KILLED_BY_OTHERS = STATS_OFFSET,            // 120 starts off at STATS_OFFSET
     PEOPLE_KILLED_BY_PLAYER,
 
     CARS_DESTROYED,
@@ -157,7 +157,7 @@ enum
 
     BULLETS_HIT,
     TYRES_POPPED,
-    HEADS_POPPED,  // 130
+    HEADS_POPPED,            // 130
 
     WANTED_STARS_ATTAINED,
     WANTED_STARS_EVADED,
@@ -171,7 +171,7 @@ enum
     SPRAYINGS,
 
     MAX_JUMP_DISTANCE,
-    MAX_JUMP_HEIGHT,  // 140
+    MAX_JUMP_HEIGHT,            // 140
     MAX_JUMP_FLIPS,
     MAX_JUMP_SPINS,
 
@@ -185,7 +185,7 @@ enum
     TOTAL_MISSIONS,
 
     TAXI_MONEY_MADE,
-    PASSENGERS_DELIVERED_IN_TAXI,  // 150
+    PASSENGERS_DELIVERED_IN_TAXI,            // 150
     LIVES_SAVED,
     CRIMINALS_CAUGHT,
     FIRES_EXTINGUISHED,
@@ -197,7 +197,7 @@ enum
     AMBULANCE_LEVEL,
     FIREFIGHTER_LEVEL,
 
-    DRIVING_SKILL,  // 160
+    DRIVING_SKILL,            // 160
     TRUCK_MISSIONS_PASSED,
     TRUCK_MONEY_MADE,
 
@@ -211,7 +211,7 @@ enum
     KILL_FRENZIES_PASSED,
 
     FLIGHT_TIME,
-    TIMES_DROWNED,  // 170
+    TIMES_DROWNED,            // 170
     NUM_GIRLS_PIMPED,
 
     BEST_POSITION_HOTRING,
@@ -226,7 +226,7 @@ enum
     BLOODRING_KILLS,
     BLOODRING_TIME,
 
-    NO_MORE_HURRICANES,  // 180
+    NO_MORE_HURRICANES,            // 180
     CITIES_PASSED,
 
     // new stats for SA:
@@ -250,7 +250,7 @@ enum
     VISITS_TO_GYM,
     NOT_USED_INT_6,
 
-    MEALS_EATEN,  // 200
+    MEALS_EATEN,            // 200
 
     QUARRY_MONEY_MADE,
     QUARRY_COMPLETION_TIME,
@@ -264,7 +264,7 @@ enum
     HIGHEST_COP_VEHICLES_DESTROYED_ON_SPREE,
     HIGHEST_TANKS_DESTROYED_ON_SPREE,
 
-    PIMPING_LEVEL,  // 210
+    PIMPING_LEVEL,            // 210
 
     KICKSTART_BEST_SCORE,
     BEST_LAP_TIME_HOTRING,
@@ -293,7 +293,7 @@ enum
 
     RESPECT_MISSION_TOTAL,
     BIKE_SKILL,
-    CYCLE_SKILL,  // 230
+    CYCLE_SKILL,            // 230
 
     SNAPSHOTS_TAKEN,
     TOTAL_SNAPSHOTS,
@@ -306,7 +306,7 @@ enum
     HIGHEST_NUMBER_TERRITORIES_HELD,
     NUMBER_GANG_MEMBERS_RECRUITED,
     NUMBER_ENEMY_GANG_MEMBERS_KILLED,
-    NUMBER_FRIENDLY_GANG_MEMBERS_KILLED,  // 240
+    NUMBER_FRIENDLY_GANG_MEMBERS_KILLED,            // 240
 
     HORSESHOES_COLLECTED,
     TOTAL_HORSESHOES,
@@ -416,7 +416,7 @@ enum
     STARTED_BADLANDS,
     STARTED_CAT2,
     STARTED_CRASH1,
-    MAX_INT_FLOAT_STATS,  // this must be the last
+    MAX_INT_FLOAT_STATS,            // this must be the last
 };
 
 enum
@@ -437,9 +437,9 @@ enum
     CURRENT_WEAPON_SKILL,
     WEAPON_SKILLS,
 
-    PILOT_RANKING,  // 330
+    PILOT_RANKING,            // 330
 
-    STRONGEST_GANG_1,  // 331
+    STRONGEST_GANG_1,            // 331
     STRONGEST_GANG_2,
     STRONGEST_GANG_3,
 
@@ -448,7 +448,7 @@ enum
     GANG_MEMBER_COUNT,
     TERRITORY_UNDER_CONTROL,
 
-    MAX_BLANK_STATS  // this is the last in list
+    MAX_BLANK_STATS            // this is the last in list
 };
 
 //
@@ -472,9 +472,9 @@ enum
     STAT_INC_BOAT_SKILL,
     STAT_INC_BODY_MUSCLE,
     STAT_INC_BREATH_UNDERWATER,
-    STAT_INC_MAX_HEALTH,  // 11
+    STAT_INC_MAX_HEALTH,            // 11
 
-    STAT_INC_PISTOL_SKILL,  // 12
+    STAT_INC_PISTOL_SKILL,            // 12
     STAT_INC_PISTOL_SILENCED_SKILL,
     STAT_INC_DESERT_EAGLE_SKILL,
     STAT_INC_SHOTGUN_SKILL,
@@ -484,24 +484,24 @@ enum
     STAT_INC_MP5_SKILL,
     STAT_INC_AK47_SKILL,
     STAT_INC_M4_SKILL,
-    STAT_INC_SNIPERRIFLE_SKILL,  // 22
+    STAT_INC_SNIPERRIFLE_SKILL,            // 22
 
-    STAT_DEC_FAT,  // 23
+    STAT_DEC_FAT,            // 23
     STAT_DEC_BODY_MUSCLE,
-    STAT_DEC_MAX_HEALTH,  // 25
+    STAT_DEC_MAX_HEALTH,            // 25
 
-    STAT_EXERCISE_RATE_CYCLE,  // 26
+    STAT_EXERCISE_RATE_CYCLE,            // 26
     STAT_EXERCISE_RATE_CYCLE_SPRINT,
     STAT_EXERCISE_RATE_SWIM,
     STAT_EXERCISE_RATE_SWIM_SPRINT,
     STAT_EXERCISE_RATE_SPRINT,
     STAT_EXERCISE_RATE_RUN,
-    STAT_EXERCISE_RATE_FIGHT,  // 32
+    STAT_EXERCISE_RATE_FIGHT,            // 32
 
     //
     // time intervals when the stats get changed (in sec?):
     //
-    STAT_TIMELIMIT_CYCLE_STAMINA,  // 33
+    STAT_TIMELIMIT_CYCLE_STAMINA,            // 33
     STAT_TIMELIMIT_SWIM_STAMINA,
     STAT_TIMELIMIT_SPRINT_STAMINA,
     STAT_TIMELIMIT_RUNNING,
@@ -513,12 +513,12 @@ enum
     STAT_TIMELIMIT_FAT_ADJUST,
     STAT_TIMELIMIT_FAT_ADJUST_STRENUOUS,
     STAT_TIMELIMIT_BREATH_UNDERWATER,
-    STAT_TIMELIMIT_MAX_HEALTH,  // 45
+    STAT_TIMELIMIT_MAX_HEALTH,            // 45
 
     //
     // limits that are not time (ie count limits):
     //
-    STAT_TIMELIMIT_PISTOL_SKILL,  // 46
+    STAT_TIMELIMIT_PISTOL_SKILL,            // 46
     STAT_TIMELIMIT_PISTOL_SILENCED_SKILL,
     STAT_TIMELIMIT_DESERT_EAGLE_SKILL,
     STAT_TIMELIMIT_SHOTGUN_SKILL,
@@ -528,20 +528,20 @@ enum
     STAT_TIMELIMIT_MP5_SKILL,
     STAT_TIMELIMIT_M4_SKILL,
     STAT_TIMELIMIT_AK47_SKILL,
-    STAT_TIMELIMIT_SNIPERRIFLE_SKILL,  // 56
+    STAT_TIMELIMIT_SNIPERRIFLE_SKILL,            // 56
 
     // every time player dies and gets respawned we count it up
     // so we can decrement max health
-    STAT_TIMELIMIT_DEATH_HEALTH,   // 57
-                                   // every time player adds to their health we count it up
-                                   // so this limit is a direct amount of health added
-    STAT_TIMELIMIT_ADD_TO_HEALTH,  // 58
+    STAT_TIMELIMIT_DEATH_HEALTH,             // 57
+                                             // every time player adds to their health we count it up
+                                             // so this limit is a direct amount of health added
+    STAT_TIMELIMIT_ADD_TO_HEALTH,            // 58
 
     MAX_REACTION_STATS
 };
 
 #define MAX_INT_STATS (MAX_INT_FLOAT_STATS - STATS_OFFSET)
-#define MAX_STATS     (MAX_INT_STATS + MAX_FLOAT_STATS)
+#define MAX_STATS (MAX_INT_STATS + MAX_FLOAT_STATS)
 
 class CStats
 {

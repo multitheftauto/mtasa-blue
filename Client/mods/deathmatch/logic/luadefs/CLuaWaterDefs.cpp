@@ -41,7 +41,7 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "createWater");
     lua_classfunction(luaVM, "testLineAgainst", "testLineAgainstWater");
-    lua_classfunction(luaVM, "isDrawnLast", "isWaterDrawnLast");  // Drawn last property affects all water instances
+    lua_classfunction(luaVM, "isDrawnLast", "isWaterDrawnLast");            // Drawn last property affects all water instances
     lua_classfunction(luaVM, "setDrawnLast", "setWaterDrawnLast");
 
     // Static variables (not implemented yet!)
@@ -80,7 +80,7 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
     argStream.ReadVector3D(v1);
     argStream.ReadVector3D(v2);
     argStream.ReadVector3D(v3);
-    bool bIsQuad = argStream.NextCouldBeNumber(2);  // Check for existence of v4.fZ
+    bool bIsQuad = argStream.NextCouldBeNumber(2);            // Check for existence of v4.fZ
     if (bIsQuad)
     {
         argStream.ReadVector3D(v4);

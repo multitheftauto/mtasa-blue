@@ -15,7 +15,7 @@ class CFlyingHandlingEntry
 {
 public:
     // Destructor
-    virtual ~CFlyingHandlingEntry() {};
+    virtual ~CFlyingHandlingEntry(){};
 
     // Use this to copy data from an another handling class to this
     virtual void Assign(const CFlyingHandlingEntry* pData) = 0;

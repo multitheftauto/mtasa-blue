@@ -92,9 +92,9 @@ void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHie
     }
 }
 
-#define HOOKPOS_GetAnimHierarchyFromSkinClump  0x734A5D
-#define HOOKSIZE_GetAnimHierarchyFromSkinClump 7
-DWORD                         RETURN_GetAnimHierarchyFromSkinClump = 0x734A64;
+#define HOOKPOS_GetAnimHierarchyFromSkinClump        0x734A5D
+#define HOOKSIZE_GetAnimHierarchyFromSkinClump       7
+DWORD RETURN_GetAnimHierarchyFromSkinClump = 0x734A64;
 static void __declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

@@ -14,7 +14,7 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 
-#pragma warning(disable : 4355)  // warning C4355: 'this' : used in base member initializer list
+#pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 
 CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
 {
@@ -308,8 +308,8 @@ CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
 
     for (auto it = m_pCustomData->IterBegin(); it != m_pCustomData->IterEnd(); it++)
     {
-        table->PushString(it->first);              // key
-        table->PushArgument(it->second.Variable);  // value
+        table->PushString(it->first);                        // key
+        table->PushArgument(it->second.Variable);            // value
     }
 
     return table;
@@ -515,7 +515,7 @@ void CClientEntity::DeleteCustomData(const CStringName& name)
         CLuaArguments Arguments;
         Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
-        Arguments.PushArgument(CLuaArgument());  // Use nil as the new value to indicate the data has been removed
+        Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
         CallEvent("onClientElementDataChange", Arguments, true);
     }
 }
@@ -792,7 +792,7 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
     if (!m_Children.empty())
     {
         CElementListSnapshotRef pChildrenSnapshot = GetChildrenListSnapshot();
-        for (CClientEntity* pEntity : *pChildrenSnapshot)
+		for (CClientEntity* pEntity : *pChildrenSnapshot)
         {
             if (!pEntity->IsBeingDeleted())
             {
@@ -1105,7 +1105,7 @@ bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break;  // This should not be possible, but you never know
+                break;            // This should not be possible, but you never know
         }
 
         return false;

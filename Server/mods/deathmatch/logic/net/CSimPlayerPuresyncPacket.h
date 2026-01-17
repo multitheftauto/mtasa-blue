@@ -73,13 +73,13 @@ public:
         CVector              vecCamFwd;
 
         bool   bWeaponCorrect;
-        uchar  ucWeaponSlot;  // Only valid if bWeaponCorrect
-        ushort usAmmoInClip;  // Only valid if bWeaponCorrect
-        ushort usTotalAmmo;   // Only valid if bWeaponCorrect
+        uchar  ucWeaponSlot;            // Only valid if bWeaponCorrect
+        ushort usAmmoInClip;            // Only valid if bWeaponCorrect
+        ushort usTotalAmmo;             // Only valid if bWeaponCorrect
 
         bool    bIsAimFull;
-        float   fAimDirection;    // Only valid if bWeaponCorrect
-        CVector vecSniperSource;  // Only valid if bWeaponCorrect and bIsAimFull
-        CVector vecTargetting;    // Only valid if bWeaponCorrect and bIsAimFull
+        float   fAimDirection;              // Only valid if bWeaponCorrect
+        CVector vecSniperSource;            // Only valid if bWeaponCorrect and bIsAimFull
+        CVector vecTargetting;              // Only valid if bWeaponCorrect and bIsAimFull
     } m_Cache;
 };

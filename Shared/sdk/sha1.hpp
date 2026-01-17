@@ -31,13 +31,13 @@
 #include "sha1.h"
 
 #if defined(POLARSSL_FS_IO) || defined(POLARSSL_SELF_TEST)
-    #include <stdio.h>
+#include <stdio.h>
 #endif
 
 #if defined(POLARSSL_PLATFORM_C)
-    #include "polarssl/platform.h"
+#include "polarssl/platform.h"
 #else
-    #define polarssl_printf printf
+#define polarssl_printf printf
 #endif
 
 /* Implementation that should never be optimized out by the compiler */
@@ -50,25 +50,28 @@ static void polarssl_zeroize(void* v, size_t n)
 
 #if !defined(POLARSSL_SHA1_ALT)
 
-    /*
-     * 32-bit integer manipulation macros (big endian)
-     */
-    #ifndef GET_UINT32_BE
-        #define GET_UINT32_BE(n, b, i) \
-            { \
-                (n) = ((uint32_t)(b)[(i)] << 24) | ((uint32_t)(b)[(i) + 1] << 16) | ((uint32_t)(b)[(i) + 2] << 8) | ((uint32_t)(b)[(i) + 3]); \
-            }
-    #endif
+/*
+ * 32-bit integer manipulation macros (big endian)
+ */
+#ifndef GET_UINT32_BE
+#define GET_UINT32_BE(n,b,i)                            \
+{                                                       \
+    (n) = ( (uint32_t) (b)[(i)    ] << 24 )             \
+        | ( (uint32_t) (b)[(i) + 1] << 16 )             \
+        | ( (uint32_t) (b)[(i) + 2] <<  8 )             \
+        | ( (uint32_t) (b)[(i) + 3]       );            \
+}
+#endif
 
-    #ifndef PUT_UINT32_BE
-        #define PUT_UINT32_BE(n, b, i) \
-            { \
-                (b)[(i)] = (unsigned char)((n) >> 24); \
-                (b)[(i) + 1] = (unsigned char)((n) >> 16); \
-                (b)[(i) + 2] = (unsigned char)((n) >> 8); \
-                (b)[(i) + 3] = (unsigned char)((n)); \
-            }
-    #endif
+#ifndef PUT_UINT32_BE
+#define PUT_UINT32_BE(n,b,i)                            \
+{                                                       \
+    (b)[(i)    ] = (unsigned char) ( (n) >> 24 );       \
+    (b)[(i) + 1] = (unsigned char) ( (n) >> 16 );       \
+    (b)[(i) + 2] = (unsigned char) ( (n) >>  8 );       \
+    (b)[(i) + 3] = (unsigned char) ( (n)       );       \
+}
+#endif
 
 void sha1_init(sha1_context* ctx)
 {
@@ -119,15 +122,19 @@ void sha1_process(sha1_context* ctx, const unsigned char data[64])
     GET_UINT32_BE(W[14], data, 56);
     GET_UINT32_BE(W[15], data, 60);
 
-    #define S(x, n) ((x << n) | ((x & 0xFFFFFFFF) >> (32 - n)))
+#define S(x,n) ((x << n) | ((x & 0xFFFFFFFF) >> (32 - n)))
 
-    #define R(t) (temp = W[(t - 3) & 0x0F] ^ W[(t - 8) & 0x0F] ^ W[(t - 14) & 0x0F] ^ W[t & 0x0F], (W[t & 0x0F] = S(temp, 1)))
+#define R(t)                                            \
+(                                                       \
+    temp = W[( t -  3 ) & 0x0F] ^ W[( t - 8 ) & 0x0F] ^ \
+           W[( t - 14 ) & 0x0F] ^ W[  t       & 0x0F],  \
+    ( W[t & 0x0F] = S(temp,1) )                         \
+)
 
-    #define P(a, b, c, d, e, x) \
-        { \
-            e += S(a, 5) + F(b, c, d) + K + x; \
-            b = S(b, 30); \
-        }
+#define P(a,b,c,d,e,x)                                  \
+{                                                       \
+    e += S(a,5) + F(b,c,d) + K + x; b = S(b,30);        \
+}
 
     A = ctx->state[0];
     B = ctx->state[1];
@@ -135,8 +142,8 @@ void sha1_process(sha1_context* ctx, const unsigned char data[64])
     D = ctx->state[3];
     E = ctx->state[4];
 
-    #define F(x, y, z) (z ^ (x & (y ^ z)))
-    #define K          0x5A827999
+#define F(x,y,z) (z ^ (x & (y ^ z)))
+#define K 0x5A827999
 
     P(A, B, C, D, E, W[0]);
     P(E, A, B, C, D, W[1]);
@@ -159,11 +166,11 @@ void sha1_process(sha1_context* ctx, const unsigned char data[64])
     P(C, D, E, A, B, R(18));
     P(B, C, D, E, A, R(19));
 
-    #undef K
-    #undef F
+#undef K
+#undef F
 
-    #define F(x, y, z) (x ^ y ^ z)
-    #define K          0x6ED9EBA1
+#define F(x,y,z) (x ^ y ^ z)
+#define K 0x6ED9EBA1
 
     P(A, B, C, D, E, R(20));
     P(E, A, B, C, D, R(21));
@@ -186,11 +193,11 @@ void sha1_process(sha1_context* ctx, const unsigned char data[64])
     P(C, D, E, A, B, R(38));
     P(B, C, D, E, A, R(39));
 
-    #undef K
-    #undef F
+#undef K
+#undef F
 
-    #define F(x, y, z) ((x & y) | (z & (x | y)))
-    #define K          0x8F1BBCDC
+#define F(x,y,z) ((x & y) | (z & (x | y)))
+#define K 0x8F1BBCDC
 
     P(A, B, C, D, E, R(40));
     P(E, A, B, C, D, R(41));
@@ -213,11 +220,11 @@ void sha1_process(sha1_context* ctx, const unsigned char data[64])
     P(C, D, E, A, B, R(58));
     P(B, C, D, E, A, R(59));
 
-    #undef K
-    #undef F
+#undef K
+#undef F
 
-    #define F(x, y, z) (x ^ y ^ z)
-    #define K          0xCA62C1D6
+#define F(x,y,z) (x ^ y ^ z)
+#define K 0xCA62C1D6
 
     P(A, B, C, D, E, R(60));
     P(E, A, B, C, D, R(61));
@@ -240,11 +247,11 @@ void sha1_process(sha1_context* ctx, const unsigned char data[64])
     P(C, D, E, A, B, R(78));
     P(B, C, D, E, A, R(79));
 
-    #undef K
-    #undef F
-    #undef S
-    #undef R
-    #undef P
+#undef K
+#undef F
+#undef S
+#undef R
+#undef P
 
     ctx->state[0] += A;
     ctx->state[1] += B;

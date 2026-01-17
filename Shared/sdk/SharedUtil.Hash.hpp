@@ -24,36 +24,32 @@ namespace bcrypt
 {
     extern "C"
     {
-#include <bcrypt/ow-crypt.h>
+        #include <bcrypt/ow-crypt.h>
     }
-}
+}            // namespace bcrypt
 
 namespace SharedUtil
 {
-#define S11 7
-#define S12 12
-#define S13 17
-#define S14 22
-#define S21 5
-#define S22 9
-#define S23 14
-#define S24 20
-#define S31 4
-#define S32 11
-#define S33 16
-#define S34 23
-#define S41 6
-#define S42 10
-#define S43 15
-#define S44 21
+    #define S11 7
+    #define S12 12
+    #define S13 17
+    #define S14 22
+    #define S21 5
+    #define S22 9
+    #define S23 14
+    #define S24 20
+    #define S31 4
+    #define S32 11
+    #define S33 16
+    #define S34 23
+    #define S41 6
+    #define S42 10
+    #define S43 15
+    #define S44 21
 
-    CMD5Hasher::CMD5Hasher()
-    {
-    }
+    CMD5Hasher::CMD5Hasher() {}
 
-    CMD5Hasher::~CMD5Hasher()
-    {
-    }
+    CMD5Hasher::~CMD5Hasher() {}
 
     bool CMD5Hasher::Calculate(const char* szFilename, MD5& md5Result)
     {
@@ -63,7 +59,7 @@ namespace SharedUtil
             Init();
 
             constexpr size_t bufferSize = 65536;
-            unsigned char    Buffer[bufferSize];
+            unsigned char Buffer[bufferSize];
             while (true)
             {
                 size_t bytesRead = fread(Buffer, 1, bufferSize, pFile);
@@ -158,7 +154,7 @@ namespace SharedUtil
     {
         // CRYPT_START
         unsigned int input_index, buffer_index;
-        unsigned int buffer_space;  // how much space is left in buffer
+        unsigned int buffer_space;            // how much space is left in buffer
 
         // Compute number of bytes mod 64
         buffer_index = (unsigned int)((m_count[0] >> 3) & 0x3F);
@@ -171,10 +167,10 @@ namespace SharedUtil
 
         m_count[1] += ((unsigned int)input_length >> 29);
 
-        buffer_space = 64 - buffer_index;  // how much space is left in buffer
+        buffer_space = 64 - buffer_index;            // how much space is left in buffer
 
         // Transform as many times as possible.
-        if (input_length >= buffer_space)  // ie. we have enough to fill the buffer
+        if (input_length >= buffer_space)            // ie. we have enough to fill the buffer
         {
             // fill the rest of the buffer and transform
             memcpy(m_buffer + buffer_index, input, buffer_space);
@@ -186,11 +182,11 @@ namespace SharedUtil
                 Transform(input + input_index);
             }
 
-            buffer_index = 0;  // so we can buffer remaining
+            buffer_index = 0;            // so we can buffer remaining
         }
         else
         {
-            input_index = 0;  // so we can buffer the whole input
+            input_index = 0;            // so we can buffer the whole input
         }
 
         // and here we do the buffering:
@@ -223,10 +219,7 @@ namespace SharedUtil
         memset(m_buffer, 0, sizeof(m_buffer));
     }
 
-    const unsigned char* CMD5Hasher::GetResult() const
-    {
-        return m_digest;
-    }
+    const unsigned char* CMD5Hasher::GetResult() const { return m_digest; }
 
     void CMD5Hasher::Transform(unsigned char block[64])
     {
@@ -337,30 +330,15 @@ namespace SharedUtil
                 ((unsigned int)input[j]) | (((unsigned int)input[j + 1]) << 8) | (((unsigned int)input[j + 2]) << 16) | (((unsigned int)input[j + 3]) << 24);
     }
 
-    inline unsigned int CMD5Hasher::RotateLeft(unsigned int x, unsigned int n)
-    {
-        return (x << n) | (x >> (32 - n));
-    }
+    inline unsigned int CMD5Hasher::RotateLeft(unsigned int x, unsigned int n) { return (x << n) | (x >> (32 - n)); }
 
-    inline unsigned int CMD5Hasher::F(unsigned int x, unsigned int y, unsigned int z)
-    {
-        return (x & y) | (~x & z);
-    }
+    inline unsigned int CMD5Hasher::F(unsigned int x, unsigned int y, unsigned int z) { return (x & y) | (~x & z); }
 
-    inline unsigned int CMD5Hasher::G(unsigned int x, unsigned int y, unsigned int z)
-    {
-        return (x & z) | (y & ~z);
-    }
+    inline unsigned int CMD5Hasher::G(unsigned int x, unsigned int y, unsigned int z) { return (x & z) | (y & ~z); }
 
-    inline unsigned int CMD5Hasher::H(unsigned int x, unsigned int y, unsigned int z)
-    {
-        return x ^ y ^ z;
-    }
+    inline unsigned int CMD5Hasher::H(unsigned int x, unsigned int y, unsigned int z) { return x ^ y ^ z; }
 
-    inline unsigned int CMD5Hasher::I(unsigned int x, unsigned int y, unsigned int z)
-    {
-        return y ^ (x | ~z);
-    }
+    inline unsigned int CMD5Hasher::I(unsigned int x, unsigned int y, unsigned int z) { return y ^ (x | ~z); }
 
     inline void CMD5Hasher::FF(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac)
     {
@@ -390,21 +368,18 @@ namespace SharedUtil
     // Implementation of Bob Jenkin's awesome hash function
     // Ref: https://burtleburtle.net/bob/hash/doobs.html
     //
-    unsigned int HashString(const char* szString)
-    {
-        return HashString(szString, (unsigned int)strlen(szString));
-    }
+    unsigned int HashString(const char* szString) { return HashString(szString, (unsigned int)strlen(szString)); }
 
     unsigned int HashString(const char* szString, unsigned int length)
     {
-        const char*  k;        //< pointer to the string data to be hashed
-        unsigned int a, b, c;  //< temporary variables
-        unsigned int len;      //< length of the string left
+        const char*  k;                  //< pointer to the string data to be hashed
+        unsigned int a, b, c;            //< temporary variables
+        unsigned int len;                //< length of the string left
 
         k = szString;
         len = length;
         a = b = 0x9e3779b9;
-        c = 0xabcdef89;  // initval, arbitrarily set
+        c = 0xabcdef89;            // initval, arbitrarily set
 
         while (len >= 12)
         {
@@ -448,7 +423,7 @@ namespace SharedUtil
         // Handle the last 11 remaining bytes
         // Note: All cases fall through
 
-        c += length;  // Lower byte of c gets used for length
+        c += length;            // Lower byte of c gets used for length
 
         switch (len)
         {
@@ -577,32 +552,20 @@ namespace SharedUtil
             if (c < 16)
             {
                 if ((i & 1) == 0)
-                    pOutput[i / 2] = (c << 4);  // First nibble
+                    pOutput[i / 2] = (c << 4);            // First nibble
                 else
-                    pOutput[i / 2] |= c;  // Second nibble
+                    pOutput[i / 2] |= c;            // Second nibble
             }
         }
     }
 
-    void GenerateSha256(const void* pData, uint uiLength, uchar output[32])
-    {
-        sha256((const uchar*)pData, uiLength, output);
-    }
+    void GenerateSha256(const void* pData, uint uiLength, uchar output[32]) { sha256((const uchar*)pData, uiLength, output); }
 
-    SString GenerateSha256HexString(const void* pData, uint uiLength)
-    {
-        return GenerateHashHexString(EHashFunction::SHA256, pData, uiLength);
-    }
+    SString GenerateSha256HexString(const void* pData, uint uiLength) { return GenerateHashHexString(EHashFunction::SHA256, pData, uiLength); }
 
-    SString GenerateSha256HexString(const SString& strData)
-    {
-        return GenerateHashHexString(EHashFunction::SHA256, strData);
-    }
+    SString GenerateSha256HexString(const SString& strData) { return GenerateHashHexString(EHashFunction::SHA256, strData); }
 
-    SString GenerateSha256HexStringFromFile(const SString& strFilename)
-    {
-        return GenerateHashHexStringFromFile(EHashFunction::SHA256, strFilename);
-    }
+    SString GenerateSha256HexStringFromFile(const SString& strFilename) { return GenerateHashHexStringFromFile(EHashFunction::SHA256, strFilename); }
 
     SString GenerateHashHexString(EHashFunctionType hashFunction, const void* pData, uint uiLength)
     {
@@ -808,12 +771,13 @@ namespace SharedUtil
             return;
 
         size_t totalProbeSize = static_cast<size_t>(strbuflen) * 3 + 8;
-        void*  probe = std::malloc(totalProbeSize);
+        void* probe = std::malloc(totalProbeSize);
         if (!probe)
             return;
         std::free(probe);
 
-        std::unique_ptr<unsigned char, decltype(&std::free)> strbuf(static_cast<unsigned char*>(std::malloc(strbuflen)), &std::free);
+        std::unique_ptr<unsigned char, decltype(&std::free)> strbuf(
+            static_cast<unsigned char*>(std::malloc(strbuflen)), &std::free);
         if (!strbuf)
             return;
 
@@ -874,12 +838,13 @@ namespace SharedUtil
 
         size_t workingSize = static_cast<size_t>(numPasses) * 4 + 4;
         size_t outputSize = static_cast<size_t>(numPasses) * 4;
-        void*  probe = std::malloc(workingSize + outputSize);
+        void* probe = std::malloc(workingSize + outputSize);
         if (!probe)
             return;
         std::free(probe);
 
-        std::unique_ptr<unsigned char, decltype(&std::free)> buffer(static_cast<unsigned char*>(std::malloc(workingSize)), &std::free);
+        std::unique_ptr<unsigned char, decltype(&std::free)> buffer(
+            static_cast<unsigned char*>(std::malloc(workingSize)), &std::free);
         if (!buffer)
             return;
 
@@ -898,4 +863,4 @@ namespace SharedUtil
 
         out->assign((char*)buffer.get(), numPasses * 4);
     }
-}
+}            // namespace SharedUtil

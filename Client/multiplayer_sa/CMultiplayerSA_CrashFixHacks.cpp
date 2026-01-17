@@ -71,7 +71,7 @@ static bool HasWriteAccess(DWORD dwProtect) noexcept
     return dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
 }
 
-static constexpr std::size_t    REGION_CACHE_SIZE = 8;
+static constexpr std::size_t REGION_CACHE_SIZE = 8;
 static constexpr std::uintptr_t NUM_LOWMEM_THRESHOLD = 0x10000;
 
 #define NUM_LOWMEM_THRESHOLD_ASM 0x10000
@@ -312,7 +312,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc5()
         mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
         test    edi, edi
-        je      cont  // Skip much code if edi is zero
+        je      cont            // Skip much code if edi is zero
 
         mov edi, dword ptr[ARRAY_ModelInfo]
         mov     edi, dword ptr [ecx*4+edi]
@@ -1265,15 +1265,15 @@ static void __declspec(naked) HOOK_CrashFix_Misc32()
 // Solution: CallOriginalRwTexDictionaryFindNamedTexture replicates Misc33's overwritten
 // bytes (mov eax,[esp+4]; push ebx) and jumps to 0x7F39F5 to work around the hook.
 ////////////////////////////////////////////////////////////////////////
-typedef RwTexture*(__cdecl* RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
-typedef RwTexDictionary*(__cdecl* RwTexDictionaryGetCurrent_t)();
+typedef RwTexture* (__cdecl *RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
+typedef RwTexDictionary* (__cdecl *RwTexDictionaryGetCurrent_t)();
 
 static RwTexDictionaryGetCurrent_t pfnRwTexDictionaryGetCurrentForMisc39 = (RwTexDictionaryGetCurrent_t)0x7F3A90;
 
 // Trampoline to call the ORIGINAL RwTexDictionaryFindNamedTexture at 0x7F39F0,
 // thereby working around HOOK_CrashFix_Misc33.
 // Replicates the 5 overwritten bytes (mov eax,[esp+4]; push ebx) then jumps to 0x7F39F5.
-static constexpr DWORD        AddrFindNamedTexture_Continue = 0x7F39F5;
+static constexpr DWORD AddrFindNamedTexture_Continue = 0x7F39F5;
 static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1288,16 +1288,17 @@ static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 }
 
 static constexpr std::size_t TextureNameSize = 32;
-static constexpr char        RemapPrefix[] = "remap";
+static constexpr char RemapPrefix[] = "remap";
 
 static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
 {
+
     if (name == nullptr)
         return nullptr;
 
     const auto RwTexDictionaryFindNamedTexture = reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(TrampolineRwTexDictionaryFindNamedTexture);
     const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
-
+    
     RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
     if (vehicleTxd != nullptr)
     {
@@ -1341,8 +1342,8 @@ static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
     return tex;
 }
 
-#define HOOKPOS_CrashFix_Misc39  0x4C7510
-#define HOOKSIZE_CrashFix_Misc39 5
+#define HOOKPOS_CrashFix_Misc39                             0x4C7510
+#define HOOKSIZE_CrashFix_Misc39                            5
 static void __declspec(naked) HOOK_CrashFix_Misc39()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1475,7 +1476,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc33()
 #define HOOKPOS_CrashFix_Misc34  0x5D9CB2
 #define HOOKSIZE_CrashFix_Misc34 6
 DWORD                         RETURN_CrashFix_Misc34 = 0x5D9CB8;
-DWORD                         RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;  // Skip to end of EnvWave block
+DWORD                         RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;            // Skip to end of EnvWave block
 static void __declspec(naked) HOOK_CrashFix_Misc34()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1520,8 +1521,8 @@ static void __declspec(naked) HOOK_CrashFix_Misc34()
 #define HOOKPOS_CrashFix_Misc35   0x7F374A
 #define HOOKSIZE_CrashFix_Misc35  5
 #define HOOKCHECK_CrashFix_Misc35 0x8B
-DWORD RETURN_CrashFix_Misc35 = 0x7F374F;
-DWORD RETURN_CrashFix_Misc35_Abort = 0x7F3760;
+DWORD                 RETURN_CrashFix_Misc35 = 0x7F374F;
+DWORD                 RETURN_CrashFix_Misc35_Abort = 0x7F3760;
 
 static void __declspec(naked) HOOK_CrashFix_Misc35()
 {
@@ -1565,9 +1566,9 @@ static void __declspec(naked) HOOK_CrashFix_Misc35()
 // WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 //          Use push eax/ecx/edx + pushfd instead (16 bytes vs 32)
 ///////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc36   0x7F3A09
-#define HOOKSIZE_CrashFix_Misc36  6
-#define HOOKCHECK_CrashFix_Misc36 0x8D
+#define HOOKPOS_CrashFix_Misc36                              0x7F3A09
+#define HOOKSIZE_CrashFix_Misc36                             6
+#define HOOKCHECK_CrashFix_Misc36                            0x8D
 DWORD RETURN_CrashFix_Misc36 = 0x7F3A0F;
 DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
 
@@ -1619,9 +1620,9 @@ static void __declspec(naked) HOOK_CrashFix_Misc36()
 // (https://pastebin.com/pkWwsSih)
 // WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc37   0x7F39B3
-#define HOOKSIZE_CrashFix_Misc37  5
-#define HOOKCHECK_CrashFix_Misc37 0x89
+#define HOOKPOS_CrashFix_Misc37                              0x7F39B3
+#define HOOKSIZE_CrashFix_Misc37                             5
+#define HOOKCHECK_CrashFix_Misc37                            0x89
 DWORD RETURN_CrashFix_Misc37 = 0x7F39B8;
 
 static void __declspec(naked) HOOK_CrashFix_Misc37()
@@ -1673,18 +1674,18 @@ static void __declspec(naked) HOOK_CrashFix_Misc37()
 // Hook at loc_7C91C0 validates [eax]
 // On NULL, skip to loc_7C91DA (after the call block) to continue the loop.
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc38   0x7C91C0
-#define HOOKSIZE_CrashFix_Misc38  6
-#define HOOKCHECK_CrashFix_Misc38 0x8B
+#define HOOKPOS_CrashFix_Misc38                              0x7C91C0
+#define HOOKSIZE_CrashFix_Misc38                             6
+#define HOOKCHECK_CrashFix_Misc38                            0x8B
 DWORD RETURN_CrashFix_Misc38 = 0x7C91C6;
-DWORD RETURN_CrashFix_Misc38_Skip = 0x7C91DA;  // loc_7C91DA: after call block, safe loop continuation
+DWORD RETURN_CrashFix_Misc38_Skip = 0x7C91DA;            // loc_7C91DA: after call block, safe loop continuation
 
 constexpr std::uint32_t NUM_VRAM_RELIEF_THROTTLE_MS = 500;
 
 static void OnVideoMemoryExhausted()
 {
     static DWORD s_dwLastReliefTick = 0;
-    const DWORD  dwNow = GetTickCount32();
+    const DWORD dwNow = GetTickCount32();
 
     if (dwNow - s_dwLastReliefTick < NUM_VRAM_RELIEF_THROTTLE_MS)
         return;
@@ -1736,10 +1737,10 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
         return pFrameResult;
 
     // Don't check frame if call can legitimately return NULL
-    if (calledFrom == 0x6D308F      // CVehicle::SetWindowOpenFlag
-        || calledFrom == 0x6D30BF   // CVehicle::ClearWindowOpenFlag
-        || calledFrom == 0x4C7DDE   // CVehicleModelInfo::GetOriginalCompPosition
-        || calledFrom == 0x4C96BD)  // CVehicleModelInfo::CreateInstance
+    if (calledFrom == 0x6D308F                // CVehicle::SetWindowOpenFlag
+        || calledFrom == 0x6D30BF             // CVehicle::ClearWindowOpenFlag
+        || calledFrom == 0x4C7DDE             // CVehicleModelInfo::GetOriginalCompPosition
+        || calledFrom == 0x4C96BD)            // CVehicleModelInfo::CreateInstance
         return NULL;
 
     // Ignore external calls
@@ -1753,14 +1754,14 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
     int   iModelId = 0;
     DWORD pVehicle = NULL;
 
-    if (calledFrom == 0x6D3847)  // CVehicle::AddReplacementUpgrade
+    if (calledFrom == 0x6D3847)            // CVehicle::AddReplacementUpgrade
         pVehicle = _ebx;
-    else if (calledFrom == 0x6DFA61      // CVehicle::AddUpgrade
-             || calledFrom == 0x6D3A62)  // CVehicle::GetReplacementUpgrade
+    else if (calledFrom == 0x6DFA61                // CVehicle::AddUpgrade
+             || calledFrom == 0x6D3A62)            // CVehicle::GetReplacementUpgrade
         pVehicle = _edi;
-    else if (calledFrom == 0x06AC740     // CAutomobile::PreRender (Forklift)
-             || calledFrom == 0x6D39F3   // CVehicle::RemoveReplacementUpgrade
-             || calledFrom == 0x6D3A32)  // CVehicle::RemoveReplacementUpgrade2
+    else if (calledFrom == 0x06AC740               // CAutomobile::PreRender (Forklift)
+             || calledFrom == 0x6D39F3             // CVehicle::RemoveReplacementUpgrade
+             || calledFrom == 0x6D3A32)            // CVehicle::RemoveReplacementUpgrade2
         pVehicle = _esi;
 
     if (pVehicle > 0x1000)
@@ -1771,7 +1772,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
     {
         RwFrame* pNewFrameResult = NULL;
         uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
-        DWORD    dwFunc = 0x4C53C0;  // CClumpModelInfo::GetFrameFromId
+        DWORD    dwFunc = 0x4C53C0;            // CClumpModelInfo::GetFrameFromId
         // clang-format off
         __asm
         {
@@ -2023,7 +2024,7 @@ static void __declspec(naked) HOOK_ResetFurnitureObjectCounter()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-    *(int*)0xBB3A18 = 0;  // InteriorManager_c::ms_objectCounter
+    *(int*)0xBB3A18 = 0;            // InteriorManager_c::ms_objectCounter
 
     // clang-format off
     __asm
@@ -2139,7 +2140,7 @@ inner:
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
-    CModelInfo*                pModelInfo = pGameInterface->GetModelInfo(uiModelId);
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(uiModelId);
     CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
     if (!pInterface || pInterface->pRwObject == nullptr)
     {
@@ -2382,7 +2383,7 @@ static void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
         altcode:
          // Save registers before logging
         pushad
-        push    ebp  // Pass 'this' pointer
+        push    ebp            // Pass 'this' pointer
         call    OnMY_CAnimBlendNode_GetCurrentTranslation
         add     esp, 4
         popad

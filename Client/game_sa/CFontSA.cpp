@@ -14,7 +14,7 @@
 
 void CFontSA::PrintChar(float x, float y, char character)
 {
-    // Call CFont::PrintChar
+    // Call CFont::PrintChar    
     ((void(_cdecl*)(float, float, char))0x718A10)(x, y, character);
 }
 

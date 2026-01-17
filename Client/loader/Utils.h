@@ -172,8 +172,8 @@ struct ModuleCrashInfo
     SString moduleName;
     DWORD   moduleBase = 0;
     DWORD   crashAddress = 0;
-    DWORD   rva = 0;         // Relative Virtual Address (crash - base)
-    DWORD   idaAddress = 0;  // IDA-friendly address (0x10000000 + rva for DLLs)
+    DWORD   rva = 0;              // Relative Virtual Address (crash - base)
+    DWORD   idaAddress = 0;       // IDA-friendly address (0x10000000 + rva for DLLs)
     bool    resolved = false;
 };
 
@@ -262,7 +262,7 @@ public:
 };
 
 // For NtQuerySystemInformation
-#define STATUS_INFO_LENGTH_MISMATCH       ((NTSTATUS)0xC0000004L)
+#define STATUS_INFO_LENGTH_MISMATCH    ((NTSTATUS)0xC0000004L)
 #define SystemProcessImageNameInformation ((SYSTEM_INFORMATION_CLASS)88)
 typedef struct _SYSTEM_PROCESS_IMAGE_NAME_INFORMATION
 {

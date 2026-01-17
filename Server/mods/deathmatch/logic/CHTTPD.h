@@ -23,7 +23,7 @@ class CResource;
 class CHTTPD : public EHS
 {
 public:
-    CHTTPD();  // start the initial server
+    CHTTPD();            // start the initial server
     ~CHTTPD();
     // EHS interface
     HttpResponse*  RouteRequest(HttpRequest* ipoHttpRequest);
@@ -43,7 +43,7 @@ public:
 private:
     CResource*  m_resource{};
     CHTTPD*     m_server{};
-    std::string m_strDefaultResourceName;  // default resource name
+    std::string m_strDefaultResourceName;            // default resource name
 
     EHSServerParameters m_Parameters;
 

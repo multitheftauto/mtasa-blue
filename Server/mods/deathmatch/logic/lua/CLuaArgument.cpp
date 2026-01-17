@@ -21,7 +21,7 @@
 extern CGame* g_pGame;
 
 #ifndef VERIFY_ELEMENT
-    #define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement()->IsMyChild(element, true) && !element->IsBeingDeleted())
+#define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
 #endif
 
 using namespace std;
@@ -853,9 +853,9 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
             }
             else
             {
-                if (pElement)  // eg toJSON() with valid element
+                if (pElement)            // eg toJSON() with valid element
                     g_pGame->GetScriptDebugging()->LogError(NULL, "Couldn't convert userdata argument to JSON, elements not allowed for this function.");
-                else if (!bSerialize)  // eg toJSON() with invalid element
+                else if (!bSerialize)            // eg toJSON() with invalid element
                     g_pGame->GetScriptDebugging()->LogError(
                         NULL, "Couldn't convert userdata argument to JSON, only valid resources can be included for this function.");
                 else
@@ -1038,7 +1038,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                 {
                     switch (strString[1])
                     {
-                        case 'E':  // element
+                        case 'E':            // element
                         {
                             int       id = atoi(strString.c_str() + 3);
                             CElement* element = NULL;
@@ -1056,7 +1056,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                             }
                             break;
                         }
-                        case 'R':  // resource
+                        case 'R':            // resource
                         {
                             CResource* resource = g_pGame->GetResourceManager()->GetResource(strString.c_str() + 3);
                             if (resource)
@@ -1070,7 +1070,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                             }
                             break;
                         }
-                        case 'T':  // Table reference
+                        case 'T':            // Table reference
                         {
                             unsigned long ulTableID = static_cast<unsigned long>(atol(strString.c_str() + 3));
                             if (pKnownTables && ulTableID < pKnownTables->size())

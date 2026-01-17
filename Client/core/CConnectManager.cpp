@@ -83,7 +83,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (!CheckNickProvided((char*)szNick))
     {
         SString strBuffer = _("Connecting failed. Invalid nick provided!");
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC20"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);  // Invalid nick provided
+        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC20"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid nick provided
         return false;
     }
 
@@ -114,7 +114,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (!CServerListItem::Parse(m_strHost.c_str(), m_Address))
     {
         SString strBuffer = _("Connecting failed. Invalid host provided!");
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC21"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);  // Invalid host provided
+        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC21"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid host provided
         return false;
     }
 
@@ -130,7 +130,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (m_usPort && !pNet->StartNetwork(strAddress, m_usPort, CVARS_GET_VALUE<bool>("packet_tag")))
     {
         SString strBuffer(_("Connecting to %s at port %u failed!"), m_strHost.c_str(), m_usPort);
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);  // Failed to connect
+        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Failed to connect
         return false;
     }
 
@@ -283,11 +283,11 @@ void CConnectManager::DoPulse()
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
                         strError = _("Disconnected: unknown protocol error");
-                        strErrorCode = _E("CC24");  // encryption key mismatch
+                        strErrorCode = _E("CC24");            // encryption key mismatch
                         break;
                     case RID_INCOMPATIBLE_PROTOCOL_VERSION:
                         strError = _("Disconnected: unknown protocol error");
-                        strErrorCode = _E("CC34");  // old raknet version
+                        strErrorCode = _E("CC34");            // old raknet version
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
                         strError = _("Disconnected: disconnected remotely");
@@ -328,7 +328,7 @@ void CConnectManager::DoPulse()
                 {
                     CCore::GetSingleton().ShowNetErrorMessageBox(_("Error") + strErrorCode, strError);
                 }
-                else  // Otherwise, remove the message box and hide quick connect
+                else            // Otherwise, remove the message box and hide quick connect
                 {
                     CCore::GetSingleton().RemoveMessageBox(false);
                 }
@@ -412,7 +412,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 {
                     // Failed loading the mod
                     strArguments.Format(_("No such mod installed (%s)"), strModName.c_str());
-                    CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC31"), strArguments, MB_BUTTON_OK | MB_ICON_ERROR);  // Mod loading failed
+                    CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC31"), strArguments, MB_BUTTON_OK | MB_ICON_ERROR);            // Mod loading failed
                     g_pConnectManager->Abort();
                 }
             }

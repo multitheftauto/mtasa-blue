@@ -14,17 +14,17 @@
 
 using std::list;
 
-#define MELEE_VISIBLE_RANGE      60.0f
-#define AIM_VISIBLE_RANGE        300.0f
-#define SNIPER_AIM_VISIBLE_RANGE 300.0f
-#define WEAPON_RANGE_FACTOR      3.0f
-#define NAMETAG_BEGIN_FADE_TIME  0
-#define NAMETAG_END_FADE_TIME    700
-#define NAMETAG_FONT_SIZE        0.8f
-#define MAX_ALPHA                180.0f  // max value is 255
+#define MELEE_VISIBLE_RANGE         60.0f
+#define AIM_VISIBLE_RANGE           300.0f
+#define SNIPER_AIM_VISIBLE_RANGE    300.0f
+#define WEAPON_RANGE_FACTOR         3.0f
+#define NAMETAG_BEGIN_FADE_TIME     0
+#define NAMETAG_END_FADE_TIME       700
+#define NAMETAG_FONT_SIZE           0.8f
+#define MAX_ALPHA                   180.0f // max value is 255
 
-#define DEFAULT_VIEW_RANGE     45.0f
-#define DEFAULT_VIEW_RANGE_EXP ((DEFAULT_VIEW_RANGE) * (DEFAULT_VIEW_RANGE))
+#define DEFAULT_VIEW_RANGE          45.0f
+#define DEFAULT_VIEW_RANGE_EXP      ((DEFAULT_VIEW_RANGE)*(DEFAULT_VIEW_RANGE))
 
 const bool bRenderOwn = false;
 
@@ -310,11 +310,11 @@ void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha)
             float fRemovedWidth = fWidth - (fHealth / 512.0f * fWidth);
             float fTopArmorOffset = fTopOffset + fHeight - 0.01f * fResWidth;
             float fMaxArmor = 100.0f;
-            float fArmorAlpha = (fArmor / fMaxArmor) * (ucAlpha / 255.0f);  // 0->1
+            float fArmorAlpha = (fArmor / fMaxArmor) * (ucAlpha / 255.0f);            // 0->1
 
             unsigned char ucArmorAlpha = (unsigned char)(255.0f * fArmorAlpha);
 
-#define ARMOR_BORDER_COLOR COLOR_ABGR(ucArmorAlpha, 167, 177, 179)
+            #define ARMOR_BORDER_COLOR COLOR_ABGR(ucArmorAlpha,167,177,179)
 
             // Base rectangle
             CVector vecTopLeftBase(vecScreenPosition.fX - fWidth * 0.5f, vecScreenPosition.fY + fTopOffset, 0);

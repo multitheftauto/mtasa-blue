@@ -14,135 +14,135 @@
 
 extern CCoreInterface* g_pCore;
 
-#define FUNC_CPed__RenderTargetMarker 0x60BA80
+#define FUNC_CPed__RenderTargetMarker                       0x60BA80
 
 WaterCannonHitHandler* m_pWaterCannonHitHandler = NULL;
 
 VehicleFellThroughMapHandler* m_pVehicleFellThroughMapHandler = NULL;
 
-#define HOOKPOS_CEventHitByWaterCannon 0x729899
+#define HOOKPOS_CEventHitByWaterCannon                      0x729899
 DWORD RETURN_CWaterCannon_PushPeds_RETN = 0x7298A7;
 DWORD CALL_CEventHitByWaterCannon = 0x4B1290;
 DWORD RETURN_CWaterCannon_PushPeds_RETN_Cancel = 0x729AEB;
 
 void HOOK_CEventHitByWaterCannon();
 
-#define HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle 0x6AB366
+#define HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle       0x6AB366
 DWORD RETN_CVehicle_ProcessStuff_TestSirenTypeSingle = 0x6AB36D;
 
-#define HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle 0x6ABC51
+#define HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle    0x6ABC51
 DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle = 0x6ABC64;
 
-#define HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeDual 0x6AB382
+#define HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeDual         0x6AB382
 DWORD RETN_CVehicle_ProcessStuff_TestSirenTypeDual = 0x6AB389;
 
-#define HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1 0x6ABA47
+#define HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1    0x6ABA47
 DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1 = 0x6ABA5E;
 
-#define HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2 0x6AB9F7
+#define HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2    0x6AB9F7
 DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2 = 0x6ABA07;
 
-#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue 0x6BD4C3
+#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue   0x6BD4C3
 DWORD RETN_CMotorBike_ProcessStuff_PushSirenPositionDualBlue = 0x6BD4DB;
 
-#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed 0x6BD516
+#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed    0x6BD516
 DWORD RETN_CMotorBike_ProcessStuff_PushSirenPositionDualRed = 0x6BD52C;
 
-#define HOOKPOS_CMotorbike_ProcessStuff_TestVehicleModel 0x6BD40F
+#define HOOKPOS_CMotorbike_ProcessStuff_TestVehicleModel        0x6BD40F
 DWORD RETN_CMotorbike_ProcessStuff_TestVehicleModel = 0x6BD415;
 
-#define HOOKPOS_CVehicle_DoesVehicleUseSiren 0x6D8470
+#define HOOKPOS_CVehicle_DoesVehicleUseSiren                    0x6D8470
 DWORD RETN_CVehicleDoesVehicleUseSirenRetn = 0x6D8497;
 
-#define HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition 0x6ABC17
+#define HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition        0x6ABC17
 DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition = 0x6ABC1C;
 DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition2 = 0x6ABC1E;
 
-#define HOOKPOS_CVehicleAudio_ProcessSirenSound1 0x501FC2
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound1                 0x501FC2
 DWORD RETN_CVehicleAudio_ProcessSirenSound1 = 0x501FC7;
 
-#define HOOKPOS_CVehicleAudio_ProcessSirenSound2 0x502067
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound2                0x502067
 DWORD RETN_CVehicleAudio_ProcessSirenSound2 = 0x50206C;
 
-#define HOOKPOS_CVehicleAudio_ProcessSirenSound3 0x5021AE
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound3                0x5021AE
 DWORD RETN_CVehicleAudio_ProcessSirenSound3 = 0x5021B3;
 
-#define HOOKPOS_CVehicleAudio_ProcessSirenSound 0x4F62BB
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound             0x4F62BB
 DWORD RETN_CVehicleAudio_GetVehicleSirenType = 0x4F62C1;
 
-#define HOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights 0x6AB7A5
+#define HOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights        0x6AB7A5
 DWORD RETN_CVehicle_ProcessStuff_PushRGBPointLights = 0x6AB7D5;
 
-#define HOOKPOS_CVehicle_ProcessStuff_StartPointLightCode 0x6AB722
+#define HOOKPOS_CVehicle_ProcessStuff_StartPointLightCode       0x6AB722
 DWORD RETN_CVehicle_ProcessStuff_StartPointLightCode = 0x6AB729;
 DWORD RETN_CVehicle_ProcessStuff_IgnorePointLightCode = 0x6AB823;
 
-#define HOOKPOS_CTaskSimpleJetpack_ProcessInput 0x67E7F1
+#define HOOKPOS_CTaskSimpleJetpack_ProcessInput                 0x67E7F1
 DWORD RETN_CTaskSimpleJetpack_ProcessInputEnable = 0x67E812;
 DWORD RETN_CTaskSimpleJetpack_ProcessInputDisabled = 0x67E821;
 
-#define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire 0x685ABA
+#define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire           0x685ABA
 DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire = 0x685ABF;
 DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call = 0x540670;
 
-#define HOOKPOS_CWorld_RemoveFallenPeds 0x565D0D
+#define HOOKPOS_CWorld_RemoveFallenPeds                     0x565D0D
 DWORD RETURN_CWorld_RemoveFallenPeds_Cont = 0x565D13;
 DWORD RETURN_CWorld_RemoveFallenPeds_Cancel = 0x565E6F;
 
-#define HOOKPOS_CWorld_RemoveFallenCars 0x565F52
+#define HOOKPOS_CWorld_RemoveFallenCars                     0x565F52
 DWORD RETURN_CWorld_RemoveFallenCars_Cont = 0x565F59;
 DWORD RETURN_CWorld_RemoveFallenCars_Cancel = 0x56609B;
 
-#define HOOKPOS_CVehicleModelInterface_SetClump 0x4C9606
+#define HOOKPOS_CVehicleModelInterface_SetClump             0x4C9606
 DWORD RETURN_CVehicleModelInterface_SetClump = 0x4C9611;
 
-#define HOOKPOS_CBoat_ApplyDamage 0x6F1C32
+#define HOOKPOS_CBoat_ApplyDamage                           0x6F1C32
 DWORD RETURN_CBoat_ApplyDamage = 0x6F1C3E;
 
-#define HOOKPOS_CProjectile_FixTearGasCrash 0x4C0403
+#define HOOKPOS_CProjectile_FixTearGasCrash                 0x4C0403
 DWORD RETURN_CProjectile_FixTearGasCrash_Fix = 0x4C05B9;
 DWORD RETURN_CProjectile_FixTearGasCrash_Cont = 0x4C0409;
 
-#define HOOKPOS_CVehicle_ProcessTyreSmoke_Initial     0x6DE8A2
-#define HOOKPOS_CVehicle_ProcessTyreSmoke_Burnouts    0x6DF197
-#define HOOKPOS_CVehicle_ProcessTyreSmoke_Braking     0x6DECED
-#define HOOKPOS_CVehicle_ProcessTyreSmoke_HookAddress 0x6DF308
+#define HOOKPOS_CVehicle_ProcessTyreSmoke_Initial           0x6DE8A2
+#define HOOKPOS_CVehicle_ProcessTyreSmoke_Burnouts          0x6DF197
+#define HOOKPOS_CVehicle_ProcessTyreSmoke_Braking           0x6DECED
+#define HOOKPOS_CVehicle_ProcessTyreSmoke_HookAddress       0x6DF308
 
-#define HOOKPOS_CProjectile_FixExplosionLocation 0x738A77
+#define HOOKPOS_CProjectile_FixExplosionLocation            0x738A77
 DWORD RETURN_CProjectile_FixExplosionLocation = 0x738A86;
 
 #define HOOKPOS_CPed_RemoveWeaponWhenEnteringVehicle 0x5E6370
 DWORD RETURN_CPed_RemoveWeaponWhenEnteringVehicle = 0x5E6379;
 
-void          HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle();
-void          HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle();
-void          HOOK_CVehicle_ProcessStuff_TestSirenTypeDual();
-void          HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed();
-void          HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue();
-void          HOOK_CVehicle_DoesVehicleUseSiren();
-void          HOOK_CVehicle_ProcessStuff_TestCameraPosition();
-void          HOOK_CVehicleAudio_ProcessSirenSound();
-void          HOOK_CVehicleAudio_ProcessSirenSound1();
-void          HOOK_CVehicleAudio_ProcessSirenSound2();
-void          HOOK_CVehicleAudio_ProcessSirenSound3();
-void          HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue();
-void          HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed();
-void          HOOK_CMotorBike_ProcessStuff_PushSirenPosition2();
-void          HOOK_CMotorbike_ProcessStuff_TestVehicleModel();
-void          HOOK_CVehicle_ProcessStuff_PushRGBPointLights();
-void          HOOK_CVehicle_ProcessStuff_StartPointLightCode();
-void          HOOK_CTaskSimpleJetpack_ProcessInput();
-void          HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire();
-void          HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2();
-void          HOOK_CWorld_RemoveFallenPeds();
-void          HOOK_CWorld_RemoveFallenCars();
-void          HOOK_CVehicleModelInterface_SetClump();
-void          HOOK_CBoat_ApplyDamage();
-void          HOOK_CProjectile_FixTearGasCrash();
-void          HOOK_CProjectile_FixExplosionLocation();
-void          HOOK_CPed_RemoveWeaponWhenEnteringVehicle();
+void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle();
+void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle();
+void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual();
+void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed();
+void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue();
+void HOOK_CVehicle_DoesVehicleUseSiren();
+void HOOK_CVehicle_ProcessStuff_TestCameraPosition();
+void HOOK_CVehicleAudio_ProcessSirenSound();
+void HOOK_CVehicleAudio_ProcessSirenSound1();
+void HOOK_CVehicleAudio_ProcessSirenSound2();
+void HOOK_CVehicleAudio_ProcessSirenSound3();
+void HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue();
+void HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed();
+void HOOK_CMotorBike_ProcessStuff_PushSirenPosition2();
+void HOOK_CMotorbike_ProcessStuff_TestVehicleModel();
+void HOOK_CVehicle_ProcessStuff_PushRGBPointLights();
+void HOOK_CVehicle_ProcessStuff_StartPointLightCode();
+void HOOK_CTaskSimpleJetpack_ProcessInput();
+void HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire();
+void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2();
+void HOOK_CWorld_RemoveFallenPeds();
+void HOOK_CWorld_RemoveFallenCars();
+void HOOK_CVehicleModelInterface_SetClump();
+void HOOK_CBoat_ApplyDamage();
+void HOOK_CProjectile_FixTearGasCrash();
+void HOOK_CProjectile_FixExplosionLocation();
+void HOOK_CPed_RemoveWeaponWhenEnteringVehicle();
 void* __cdecl HOOK_CMemoryMgr_MallocAlign(int size, int alignment, int nHint);
-void __cdecl  HOOK_CMemoryMgr_FreeAlign(void* ptr);
+void __cdecl HOOK_CMemoryMgr_FreeAlign(void* ptr);
 
 void CMultiplayerSA::Init_13()
 {
@@ -157,18 +157,18 @@ void CMultiplayerSA::InitHooks_13()
 
     // Siren hooks
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle,
-                7);  // Test siren type is single for a jump
+                7);            // Test siren type is single for a jump
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle,
-                19);  // mov before Push for the siren position (overhook so we can get RGBA)
+                19);            // mov before Push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeDual, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeDual,
-                7);  // test siren type is dual for a jump
+                7);            // test siren type is dual for a jump
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed,
-                15);  // mov before push for the siren position (overhook so we can get RGBA)
+                15);            // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue,
-                15);  // mov before push for the siren position (overhook so we can get RGBA)
-    HookInstall(HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5);  // Does vehicle have a siren
+                15);            // mov before push for the siren position (overhook so we can get RGBA)
+    HookInstall(HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5);            // Does vehicle have a siren
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition,
-                5);  // Fix for single sirens being 360 degrees
+                5);            // Fix for single sirens being 360 degrees
     // Breaks Rear wheel rendering leave for now
     // HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue, 15 ); // mov before the
     // push for the sien position (overhook so we can get RGBA) HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed,
@@ -228,7 +228,7 @@ void CMultiplayerSA::InitMemoryCopies_13()
     MemPut<BYTE>(0x040892A, 0x53);
     MemPut<BYTE>(0x040892B, 0x90);
 
-    MemPut<BYTE>(0x04341C0, 0xC3);  // Skip CCarCtrl::GenerateRandomCars
+    MemPut<BYTE>(0x04341C0, 0xC3);            // Skip CCarCtrl::GenerateRandomCars
 
     // Prevent garages deleting vehicles
     MemPut<BYTE>(0x0449C50, 0xC3);
@@ -979,7 +979,7 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
         // clang-format on
     }
 }
-DWORD                         CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
+DWORD CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
 static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1172,7 +1172,7 @@ static void __declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed(
         // clang-format on
     }
 }
-DWORD                         RETN_CMotorbike_ProcessStuff_TestVehicleModel2 = 0x6BD41B;
+DWORD RETN_CMotorbike_ProcessStuff_TestVehicleModel2 = 0x6BD41B;
 static void __declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel()
 {
     // clang-format off
@@ -1205,7 +1205,7 @@ static void __declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel()
         // clang-format on
     }
 }
-DWORD                         dwValue = 0x858B4C;
+DWORD dwValue = 0x858B4C;
 static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1665,8 +1665,8 @@ static void __declspec(naked) HOOK_CBoat_ApplyDamage()
     }
     // clang-format on
 
-    boatCanBeDamaged :
-        // clang-format off
+boatCanBeDamaged:
+    // clang-format off
     __asm
     {
         pop eax
@@ -1873,7 +1873,7 @@ skip:
     // clang-format on
 }
 
-DWORD                         CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom = 0;
+DWORD CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom = 0;
 static void __declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

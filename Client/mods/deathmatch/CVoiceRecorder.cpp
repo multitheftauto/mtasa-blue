@@ -56,7 +56,7 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
 {
     m_bEnabled = bEnabled;
 
-    if (!bEnabled)  // If we aren't enabled, don't bother continuing
+    if (!bEnabled)            // If we aren't enabled, don't bother continuing
         return;
 
     std::lock_guard<std::mutex> lock(m_Mutex);
@@ -322,7 +322,7 @@ void CVoiceRecorder::DoPulse()
         }
     }
 
-    if (m_VoiceState == VOICESTATE_RECORDING_LAST_PACKET)  // End of voice data (for events)
+    if (m_VoiceState == VOICESTATE_RECORDING_LAST_PACKET)            // End of voice data (for events)
     {
         m_VoiceState = VOICESTATE_AWAITING_INPUT;
 

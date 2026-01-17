@@ -20,14 +20,14 @@
 
 #pragma once
 
-#ifdef WIN32  // Win32 threads
+#ifdef WIN32            // Win32 threads
     #define _WIN32_WINNT 0x400
     #define WIN32_LEAN_AND_MEAN
     #include <windows.h>
 
 typedef HANDLE           ThreadHandle;
 typedef CRITICAL_SECTION ThreadMutex;
-#else  // POSIX threads
+#else                   // POSIX threads
     #include <stdio.h>
     #include <pthread.h>
 
@@ -59,9 +59,9 @@ protected:
     CThreadData* Arg() const;
     void         Arg(CThreadData* pData);
 
-#ifdef WIN32  // Win32 threads
+#ifdef WIN32    // Win32 threads
     static DWORD WINAPI EntryPoint(void*);
-#else  // POSIX threads
+#else           // POSIX threads
     static void* EntryPoint(void*);
 #endif
 

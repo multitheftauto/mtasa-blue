@@ -17,15 +17,15 @@
 #include <future>
 #include <core/CWebCoreInterface.h>
 #include <cef3/cef/include/cef_app.h>
-#define MTA_BROWSERDATA_PATH         "mta/cef/browserdata.xml"
-#define BROWSER_LIST_UPDATE_INTERVAL (24 * 60 * 60)
-#define BROWSER_UPDATE_URL           "https://cef.multitheftauto.com/get.php"
-#define MAX_EVENT_QUEUE_SIZE         10000
-#define MAX_TASK_QUEUE_SIZE          1000
-#define MAX_WHITELIST_SIZE           50000
-#define MAX_PENDING_REQUESTS         100
-#define GetNextSibling(hwnd)         GetWindow(hwnd, GW_HWNDNEXT)  // Re-define the conflicting macro
-#define GetFirstChild(hwnd)          GetTopWindow(hwnd)
+#define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
+#define BROWSER_LIST_UPDATE_INTERVAL (24*60*60)
+#define BROWSER_UPDATE_URL "https://cef.multitheftauto.com/get.php"
+#define MAX_EVENT_QUEUE_SIZE 10000
+#define MAX_TASK_QUEUE_SIZE 1000
+#define MAX_WHITELIST_SIZE 50000
+#define MAX_PENDING_REQUESTS 100
+#define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
+#define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
 class CWebBrowserItem;
 class CWebsiteRequests;
@@ -38,9 +38,9 @@ class CWebCore : public CWebCoreInterface
     {
         std::function<void()> callback;
         CefRefPtr<CWebView>   pWebView;
-#ifdef MTA_DEBUG
+    #ifdef MTA_DEBUG
         SString name;
-#endif
+    #endif
 
         EventEntry(const std::function<void()>& callback_, CWebView* pWebView_);
 #ifdef MTA_DEBUG
@@ -142,10 +142,10 @@ private:
 
     // Shouldn't be changed after init
     bool m_bGPUEnabled;
-    bool m_bInitialised = false;  // Track if CefInitialize() succeeded
+    bool m_bInitialised = false;            // Track if CefInitialize() succeeded
 
     // ===== AUTH: IPC message validation =====
 public:
-    std::string m_AuthCode;  // Random 30-char code for validating browser IPC messages
+    std::string m_AuthCode;            // Random 30-char code for validating browser IPC messages
     // ===== END AUTH =====
 };

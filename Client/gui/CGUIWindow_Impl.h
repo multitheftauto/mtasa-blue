@@ -35,7 +35,7 @@ public:
 
     eCGUIType GetType() { return CGUI_WINDOW; };
 
-#include "CGUIElement_Inc.h"
+    #include "CGUIElement_Inc.h"
 
 protected:
     bool Event_OnCloseClick(const CEGUI::EventArgs& e);

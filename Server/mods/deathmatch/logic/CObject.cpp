@@ -248,7 +248,7 @@ const CVector& CObject::GetPosition()
     }
 
     if (vecOldPosition != m_vecPosition)
-        UpdateSpatialData();  // This is necessary because 'GetAttachedPosition ( m_vecPosition )' can change alter this objects position
+        UpdateSpatialData();            // This is necessary because 'GetAttachedPosition ( m_vecPosition )' can change alter this objects position
     // Finally, return it
     return m_vecPosition;
 }
@@ -377,7 +377,7 @@ void CObject::StopMoving()
 
 const CPositionRotationAnimation* CObject::GetMoveAnimation()
 {
-    if (IsMoving())  // Call IsMoving since it will make sure the anim is stopped if it's finished
+    if (IsMoving())            // Call IsMoving since it will make sure the anim is stopped if it's finished
     {
         return m_pMoveAnimation;
     }

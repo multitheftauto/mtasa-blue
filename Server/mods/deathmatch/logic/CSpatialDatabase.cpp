@@ -211,7 +211,7 @@ bool CSpatialDatabaseImpl::IsValidSphere(const CSphere& sphere)
         return false;
 
     // Check radius within limits
-    if (sphere.fRadius < -12000 || sphere.fRadius > 12000)  // radius = sqrt(worldlimits*worldlimits + worldlimits*worldlimits)
+    if (sphere.fRadius < -12000 || sphere.fRadius > 12000)            // radius = sqrt(worldlimits*worldlimits + worldlimits*worldlimits)
         return false;
 
     // Check position within limits

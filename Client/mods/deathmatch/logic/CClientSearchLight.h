@@ -25,7 +25,7 @@ public:
     eClientEntityType GetType() const { return CCLIENTSEARCHLIGHT; }
 
     // CClientEntity methods
-    virtual void GetPosition(CVector& vecPosition) const override { vecPosition = m_StartPosition; }  // required for streaming
+    virtual void GetPosition(CVector& vecPosition) const override { vecPosition = m_StartPosition; }            // required for streaming
     virtual void SetPosition(const CVector& vecPosition) override {}
 
     // CClientStreamElement methods

@@ -1,6 +1,6 @@
 
 // Pragmas
-#pragma warning(disable : 4250)
+#pragma warning (disable:4250)
 
 #include <windows.h>
 #define MTA_CLIENT
