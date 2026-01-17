@@ -24,13 +24,13 @@ DECLARE_ENUM(EStateGroup)
 
 enum EReadableAsType
 {
-    TYPE_INT,                      // int
-    TYPE_D3DCOLOR,                 // Can be read as float4 or DWORD color
-    TYPE_IFLOAT,                   // Can be read as float or as int on float memory
-    TYPE_D3DCOLORVALUE,            // float4
-    TYPE_FLOAT,                    // float
-    TYPE_VECTOR3,                  // float3
-    TYPE_MATRIX,                   // float4x4
+    TYPE_INT,            // int
+    TYPE_D3DCOLOR,       // Can be read as float4 or DWORD color
+    TYPE_IFLOAT,         // Can be read as float or as int on float memory
+    TYPE_D3DCOLORVALUE,  // float4
+    TYPE_FLOAT,          // float
+    TYPE_VECTOR3,        // float3
+    TYPE_MATRIX,         // float4x4
     TYPE_TEXTURE,
 };
 
@@ -50,7 +50,7 @@ namespace RegMap
         Matrix2Matrix,
         Texture2Texture,
     };
-}            // namespace RegMap
+}
 
 // Map effect parameter to something
 struct STypeMapping

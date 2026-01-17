@@ -14,7 +14,7 @@
 #define CCLIENTOBJECT_MAX 250
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+    #define M_PI 3.14159265358979323846
 #endif
 
 CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod)
@@ -144,7 +144,7 @@ void CClientObject::GetRotationDegrees(CVector& vecRotation) const
 
 void CClientObject::GetRotationRadians(CVector& vecRotation) const
 {
-    if (m_pObject && m_pAttachedToEntity)            // Temp fix for static objects->
+    if (m_pObject && m_pAttachedToEntity)  // Temp fix for static objects->
     {
         // We've been returning the rotation that got set last so far (::m_vecRotation)..
         //   but we need to get the real rotation for when the game moves the objects..
@@ -557,9 +557,9 @@ void CClientObject::Create()
                 // Apply our data to the object
                 m_pObject->Teleport(m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ);
                 m_pObject->SetOrientation(m_vecRotation.fX, m_vecRotation.fY, m_vecRotation.fZ);
-                #ifndef MTA_BUILDINGS
+#ifndef MTA_BUILDINGS
                 m_pObject->ProcessCollision();
-                #endif
+#endif
                 m_pObject->SetupLighting();
                 m_pObject->SetFrozen(m_bIsFrozen);
 

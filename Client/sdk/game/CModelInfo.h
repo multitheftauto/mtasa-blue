@@ -41,7 +41,7 @@ enum class eModelIdeFlag
     IS_ROAD,
     DRAW_LAST,
     ADDITIVE,
-    IGNORE_LIGHTING,            // Used with animated objects
+    IGNORE_LIGHTING,  // Used with animated objects
     NO_ZBUFFER_WRITE,
     DONT_RECEIVE_SHADOWS,
     IS_GLASS_TYPE_1,

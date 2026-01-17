@@ -98,6 +98,7 @@ void InitRwFunctions()
     RpAnimBlendClumpInit = reinterpret_cast<RpAnimBlendClumpInit_t>(0x4D6720);
     RpAnimBlendClumpIsInitialized = reinterpret_cast<RpAnimBlendClumpIsInitialized_t>(0x4D6760);
     
+
     SetTextureDict = (SetTextureDict_t)0x007319C0;
     LoadClumpFile = (LoadClumpFile_t)0x005371F0;
     LoadModel = (LoadModel_t)0x0040C6B0;

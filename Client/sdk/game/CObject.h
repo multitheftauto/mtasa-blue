@@ -20,7 +20,7 @@ class CVehicle;
 class CObject : public virtual CPhysical
 {
 public:
-    virtual ~CObject(){};
+    virtual ~CObject() {};
 
     virtual CObjectSAInterface* GetObjectInterface() = 0;
 

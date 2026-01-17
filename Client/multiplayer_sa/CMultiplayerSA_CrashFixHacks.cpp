@@ -47,7 +47,7 @@ static void __declspec(naked) CrashAverted()
     // clang-format on
 }
 
-static bool HasReadAccess(DWORD dwProtect)
+static bool HasReadAccess(DWORD dwProtect) noexcept
 {
     if (dwProtect & PAGE_GUARD)
         return false;
@@ -61,7 +61,7 @@ static bool HasReadAccess(DWORD dwProtect)
            dwProtect == PAGE_EXECUTE_READ || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
 }
 
-static bool HasWriteAccess(DWORD dwProtect)
+static bool HasWriteAccess(DWORD dwProtect) noexcept
 {
     if (dwProtect & PAGE_GUARD)
         return false;
@@ -71,116 +71,124 @@ static bool HasWriteAccess(DWORD dwProtect)
     return dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
 }
 
-static bool QueryRegionCached(uintptr_t uiAddress, MEMORY_BASIC_INFORMATION& outMbi, uintptr_t& outStart, uintptr_t& outEnd)
-{
-    static thread_local MEMORY_BASIC_INFORMATION s_mbi;
-    static thread_local uintptr_t                s_start = 0;
-    static thread_local uintptr_t                s_end = 0;
+static constexpr std::size_t    REGION_CACHE_SIZE = 8;
+static constexpr std::uintptr_t NUM_LOWMEM_THRESHOLD = 0x10000;
 
-    if (s_start != 0 && uiAddress >= s_start && uiAddress <= s_end)
+#define NUM_LOWMEM_THRESHOLD_ASM 0x10000
+
+struct CachedRegion
+{
+    std::uintptr_t start{};
+    std::uintptr_t end{};
+    DWORD          state{};
+    DWORD          protect{};
+};
+
+static bool QueryRegionCached(std::uintptr_t address, DWORD& outState, DWORD& outProtect, std::uintptr_t& outEnd) noexcept
+{
+    static thread_local CachedRegion s_cache[REGION_CACHE_SIZE]{};
+    static thread_local std::size_t  s_nextSlot{};
+
+    for (const auto& entry : s_cache)
     {
-        outMbi = s_mbi;
-        outStart = s_start;
-        outEnd = s_end;
-        return true;
+        if (entry.start != 0 && address >= entry.start && address <= entry.end)
+        {
+            outState = entry.state;
+            outProtect = entry.protect;
+            outEnd = entry.end;
+            return true;
+        }
     }
 
-    MEMORY_BASIC_INFORMATION mbi;
-    SIZE_T                   mbiResult = VirtualQuery(reinterpret_cast<LPCVOID>(uiAddress), &mbi, sizeof(mbi));
-    if (mbiResult != sizeof(mbi))
+    MEMORY_BASIC_INFORMATION mbi{};
+    if (VirtualQuery(reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi)) != sizeof(mbi))
         return false;
 
-    s_mbi = mbi;
-    s_start = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+    const auto regionSize = static_cast<std::uintptr_t>(mbi.RegionSize);
+    if (regionSize == 0)
+        return false;
 
-    const uintptr_t uiSize = static_cast<uintptr_t>(mbi.RegionSize);
-    if (uiSize == 0)
-        s_end = s_start;
-    else
-    {
-        const uintptr_t uiEndPlusOne = s_start + uiSize;
-        s_end = (uiEndPlusOne <= s_start) ? static_cast<uintptr_t>(-1) : (uiEndPlusOne - 1);
-    }
+    auto& slot = s_cache[s_nextSlot];
+    s_nextSlot = (s_nextSlot + 1) % REGION_CACHE_SIZE;
 
-    outMbi = s_mbi;
-    outStart = s_start;
-    outEnd = s_end;
+    slot.start = reinterpret_cast<std::uintptr_t>(mbi.BaseAddress);
+    slot.state = mbi.State;
+    slot.protect = mbi.Protect;
+
+    const auto endPlusOne = slot.start + regionSize;
+    slot.end = (endPlusOne <= slot.start) ? static_cast<std::uintptr_t>(-1) : (endPlusOne - 1);
+
+    outState = slot.state;
+    outProtect = slot.protect;
+    outEnd = slot.end;
     return true;
 }
 
-static bool IsReadablePtr(const void* pPtr, size_t uiSize)
+static bool IsReadablePtr(const void* ptr, std::size_t size) noexcept
 {
-    if (pPtr == nullptr || uiSize == 0)
+    if (ptr == nullptr || size == 0)
         return false;
 
-    const uintptr_t uiStart = reinterpret_cast<uintptr_t>(pPtr);
-    if (uiStart < 0x10000)
+    const auto start = reinterpret_cast<std::uintptr_t>(ptr);
+    if (start < NUM_LOWMEM_THRESHOLD)
         return false;
 
-    const uintptr_t uiEnd = uiStart + uiSize - 1;
-    if (uiEnd < uiStart)
+    const auto end = start + size - 1;
+    if (end < start)
         return false;
 
-    uintptr_t uiCur = uiStart;
-    while (true)
+    auto cur = start;
+    for (;;)
     {
-        MEMORY_BASIC_INFORMATION mbi;
-        uintptr_t                uiRegionStart = 0;
-        uintptr_t                uiRegionEnd = 0;
-        if (!QueryRegionCached(uiCur, mbi, uiRegionStart, uiRegionEnd))
+        DWORD          state{}, protect{};
+        std::uintptr_t regionEnd{};
+        if (!QueryRegionCached(cur, state, protect, regionEnd))
             return false;
 
-        if (mbi.State != MEM_COMMIT)
+        if (state != MEM_COMMIT || !HasReadAccess(protect))
             return false;
 
-        if (!HasReadAccess(mbi.Protect))
-            return false;
-
-        if (uiRegionEnd >= uiEnd)
+        if (regionEnd >= end)
             return true;
 
-        if (uiRegionEnd < uiCur || uiRegionEnd == static_cast<uintptr_t>(-1))
+        if (regionEnd < cur || regionEnd == static_cast<std::uintptr_t>(-1))
             return false;
 
-        uiCur = uiRegionEnd + 1;
+        cur = regionEnd + 1;
     }
 }
 
-static bool IsWritablePtr(void* pPtr, size_t uiSize)
+static bool IsWritablePtr(void* ptr, std::size_t size) noexcept
 {
-    if (pPtr == nullptr || uiSize == 0)
+    if (ptr == nullptr || size == 0)
         return false;
 
-    const uintptr_t uiStart = reinterpret_cast<uintptr_t>(pPtr);
-    if (uiStart < 0x10000)
+    const auto start = reinterpret_cast<std::uintptr_t>(ptr);
+    if (start < NUM_LOWMEM_THRESHOLD)
         return false;
 
-    const uintptr_t uiEnd = uiStart + uiSize - 1;
-    if (uiEnd < uiStart)
+    const auto end = start + size - 1;
+    if (end < start)
         return false;
 
-    uintptr_t uiCur = uiStart;
-    while (true)
+    auto cur = start;
+    for (;;)
     {
-        MEMORY_BASIC_INFORMATION mbi;
-        uintptr_t                uiRegionStart = 0;
-        uintptr_t                uiRegionEnd = 0;
-        if (!QueryRegionCached(uiCur, mbi, uiRegionStart, uiRegionEnd))
+        DWORD          state{}, protect{};
+        std::uintptr_t regionEnd{};
+        if (!QueryRegionCached(cur, state, protect, regionEnd))
             return false;
 
-        if (mbi.State != MEM_COMMIT)
+        if (state != MEM_COMMIT || !HasWriteAccess(protect))
             return false;
 
-        if (!HasWriteAccess(mbi.Protect))
-            return false;
-
-        if (uiRegionEnd >= uiEnd)
+        if (regionEnd >= end)
             return true;
 
-        if (uiRegionEnd < uiCur || uiRegionEnd == static_cast<uintptr_t>(-1))
+        if (regionEnd < cur || regionEnd == static_cast<std::uintptr_t>(-1))
             return false;
 
-        uiCur = uiRegionEnd + 1;
+        cur = regionEnd + 1;
     }
 }
 
@@ -304,7 +312,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc5()
         mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
         test    edi, edi
-        je      cont            // Skip much code if edi is zero
+        je      cont  // Skip much code if edi is zero
 
         mov edi, dword ptr[ARRAY_ModelInfo]
         mov     edi, dword ptr [ecx*4+edi]
@@ -1257,15 +1265,15 @@ static void __declspec(naked) HOOK_CrashFix_Misc32()
 // Solution: CallOriginalRwTexDictionaryFindNamedTexture replicates Misc33's overwritten
 // bytes (mov eax,[esp+4]; push ebx) and jumps to 0x7F39F5 to work around the hook.
 ////////////////////////////////////////////////////////////////////////
-typedef RwTexture* (__cdecl *RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
-typedef RwTexDictionary* (__cdecl *RwTexDictionaryGetCurrent_t)();
+typedef RwTexture*(__cdecl* RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
+typedef RwTexDictionary*(__cdecl* RwTexDictionaryGetCurrent_t)();
 
 static RwTexDictionaryGetCurrent_t pfnRwTexDictionaryGetCurrentForMisc39 = (RwTexDictionaryGetCurrent_t)0x7F3A90;
 
 // Trampoline to call the ORIGINAL RwTexDictionaryFindNamedTexture at 0x7F39F0,
 // thereby working around HOOK_CrashFix_Misc33.
 // Replicates the 5 overwritten bytes (mov eax,[esp+4]; push ebx) then jumps to 0x7F39F5.
-static constexpr DWORD AddrFindNamedTexture_Continue = 0x7F39F5;
+static constexpr DWORD        AddrFindNamedTexture_Continue = 0x7F39F5;
 static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1280,17 +1288,16 @@ static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 }
 
 static constexpr std::size_t TextureNameSize = 32;
-static constexpr char RemapPrefix[] = "remap";
+static constexpr char        RemapPrefix[] = "remap";
 
 static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
 {
-
     if (name == nullptr)
         return nullptr;
 
     const auto RwTexDictionaryFindNamedTexture = reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(TrampolineRwTexDictionaryFindNamedTexture);
     const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
-    
+
     RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
     if (vehicleTxd != nullptr)
     {
@@ -1334,8 +1341,8 @@ static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
     return tex;
 }
 
-#define HOOKPOS_CrashFix_Misc39                             0x4C7510
-#define HOOKSIZE_CrashFix_Misc39                            5
+#define HOOKPOS_CrashFix_Misc39  0x4C7510
+#define HOOKSIZE_CrashFix_Misc39 5
 static void __declspec(naked) HOOK_CrashFix_Misc39()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1468,7 +1475,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc33()
 #define HOOKPOS_CrashFix_Misc34  0x5D9CB2
 #define HOOKSIZE_CrashFix_Misc34 6
 DWORD                         RETURN_CrashFix_Misc34 = 0x5D9CB8;
-DWORD                         RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;            // Skip to end of EnvWave block
+DWORD                         RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;  // Skip to end of EnvWave block
 static void __declspec(naked) HOOK_CrashFix_Misc34()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1508,35 +1515,44 @@ static void __declspec(naked) HOOK_CrashFix_Misc34()
 //
 // Invalid list entry pointer (crash at 0x7F374A: mov esi, [eax])
 // (https://pastebin.com/hFduf1JB)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc35   0x7F374A
 #define HOOKSIZE_CrashFix_Misc35  5
 #define HOOKCHECK_CrashFix_Misc35 0x8B
-DWORD                 RETURN_CrashFix_Misc35 = 0x7F374F;
-DWORD                 RETURN_CrashFix_Misc35_Abort = 0x7F3760;
-static void _declspec(naked) HOOK_CrashFix_Misc35()
+DWORD RETURN_CrashFix_Misc35 = 0x7F374F;
+DWORD RETURN_CrashFix_Misc35_Abort = 0x7F3760;
+
+static void __declspec(naked) HOOK_CrashFix_Misc35()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
-        pushad
+        cmp     eax, NUM_LOWMEM_THRESHOLD_ASM
+        jb      abort
+
+        push    eax
+        push    ecx
+        push    edx
         push    4
         push    eax
         call    IsReadablePtr
         add     esp, 8
-        test    eax, eax
-        popad
-        jnz     ok
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      abort
 
-        push    35
-        call    CrashAverted
-        jmp     RETURN_CrashFix_Misc35_Abort
-
-    ok:
         mov     esi, [eax]
         add     eax, 0FFFFFFF8h
         jmp     RETURN_CrashFix_Misc35
+
+    abort:
+        push    35
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc35_Abort
     }
     // clang-format on
 }
@@ -1549,52 +1565,37 @@ static void _declspec(naked) HOOK_CrashFix_Misc35()
 // WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 //          Use push eax/ecx/edx + pushfd instead (16 bytes vs 32)
 ///////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc36                              0x7F3A09
-#define HOOKSIZE_CrashFix_Misc36                             6
-#define HOOKCHECK_CrashFix_Misc36                            0x8D
+#define HOOKPOS_CrashFix_Misc36   0x7F3A09
+#define HOOKSIZE_CrashFix_Misc36  6
+#define HOOKCHECK_CrashFix_Misc36 0x8D
 DWORD RETURN_CrashFix_Misc36 = 0x7F3A0F;
 DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
 
-static bool CheckTextureName(DWORD ecxValue)
-{
-    return IsReadablePtr((const void*)ecxValue, 1);
-}
-
-static void _declspec(naked) HOOK_CrashFix_Misc36()
+static void __declspec(naked) HOOK_CrashFix_Misc36()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
     __asm
     {
-        cmp     ebx, 0x10000
+        cmp     ebx, NUM_LOWMEM_THRESHOLD_ASM
         jb      abort
-        cmp     ebx, 0x80000000
-        jae     abort
 
         // Replicate original code
         lea     eax, [ebx-8]
         lea     ecx, [eax+10h]
 
-        // Quick check: ecx (texture name ptr) must make sense
-        cmp     ecx, 0x10000
+        cmp     ecx, NUM_LOWMEM_THRESHOLD_ASM
         jb      abort
-        cmp     ecx, 0x80000000
-        jae     abort
 
-        // ecx must point readable memory
-        // save all state before call
         push    eax
         push    ecx
         push    edx
-        pushfd
-        
+        push    1
         push    ecx
-        call    CheckTextureName
-        add     esp, 4
+        call    IsReadablePtr
+        add     esp, 8
         test    al, al
-        
-        popfd
         pop     edx
         pop     ecx
         pop     eax
@@ -1616,24 +1617,33 @@ static void _declspec(naked) HOOK_CrashFix_Misc36()
 //
 // Invalid list head pointer (crash at 0x7F39B3: mov [esi+4], edx)
 // (https://pastebin.com/pkWwsSih)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc37                              0x7F39B3
-#define HOOKSIZE_CrashFix_Misc37                             5
-#define HOOKCHECK_CrashFix_Misc37                            0x89
+#define HOOKPOS_CrashFix_Misc37   0x7F39B3
+#define HOOKSIZE_CrashFix_Misc37  5
+#define HOOKCHECK_CrashFix_Misc37 0x89
 DWORD RETURN_CrashFix_Misc37 = 0x7F39B8;
-static void _declspec(naked) HOOK_CrashFix_Misc37()
+
+static void __declspec(naked) HOOK_CrashFix_Misc37()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
-        pushad
+        cmp     esi, NUM_LOWMEM_THRESHOLD_ASM
+        jb      bad
+
+        push    eax
+        push    ecx
+        push    edx
         push    8
         push    esi
         call    IsWritablePtr
         add     esp, 8
-        test    eax, eax
-        popad
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
         jz      bad
 
         cmp     esi, ecx
@@ -1663,18 +1673,18 @@ static void _declspec(naked) HOOK_CrashFix_Misc37()
 // Hook at loc_7C91C0 validates [eax]
 // On NULL, skip to loc_7C91DA (after the call block) to continue the loop.
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc38                              0x7C91C0
-#define HOOKSIZE_CrashFix_Misc38                             6
-#define HOOKCHECK_CrashFix_Misc38                            0x8B
+#define HOOKPOS_CrashFix_Misc38   0x7C91C0
+#define HOOKSIZE_CrashFix_Misc38  6
+#define HOOKCHECK_CrashFix_Misc38 0x8B
 DWORD RETURN_CrashFix_Misc38 = 0x7C91C6;
-DWORD RETURN_CrashFix_Misc38_Skip = 0x7C91DA;            // loc_7C91DA: after call block, safe loop continuation
+DWORD RETURN_CrashFix_Misc38_Skip = 0x7C91DA;  // loc_7C91DA: after call block, safe loop continuation
 
 constexpr std::uint32_t NUM_VRAM_RELIEF_THROTTLE_MS = 500;
 
 static void OnVideoMemoryExhausted()
 {
     static DWORD s_dwLastReliefTick = 0;
-    const DWORD dwNow = GetTickCount32();
+    const DWORD  dwNow = GetTickCount32();
 
     if (dwNow - s_dwLastReliefTick < NUM_VRAM_RELIEF_THROTTLE_MS)
         return;
@@ -1683,7 +1693,8 @@ static void OnVideoMemoryExhausted()
     OnRequestDeferredStreamingMemoryRelief();
 }
 
-static void _declspec(naked) HOOK_CrashFix_Misc38()
+// No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+static void __declspec(naked) HOOK_CrashFix_Misc38()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -1694,9 +1705,15 @@ static void _declspec(naked) HOOK_CrashFix_Misc38()
         test    esi, esi
         jnz     ok
 
-        pushad
+        // Save only volatile registers before call
+        push    eax
+        push    ecx
+        push    edx
         call    OnVideoMemoryExhausted
-        popad
+        pop     edx
+        pop     ecx
+        pop     eax
+
         push    38
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc38_Skip
@@ -1719,10 +1736,10 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
         return pFrameResult;
 
     // Don't check frame if call can legitimately return NULL
-    if (calledFrom == 0x6D308F                // CVehicle::SetWindowOpenFlag
-        || calledFrom == 0x6D30BF             // CVehicle::ClearWindowOpenFlag
-        || calledFrom == 0x4C7DDE             // CVehicleModelInfo::GetOriginalCompPosition
-        || calledFrom == 0x4C96BD)            // CVehicleModelInfo::CreateInstance
+    if (calledFrom == 0x6D308F      // CVehicle::SetWindowOpenFlag
+        || calledFrom == 0x6D30BF   // CVehicle::ClearWindowOpenFlag
+        || calledFrom == 0x4C7DDE   // CVehicleModelInfo::GetOriginalCompPosition
+        || calledFrom == 0x4C96BD)  // CVehicleModelInfo::CreateInstance
         return NULL;
 
     // Ignore external calls
@@ -1736,14 +1753,14 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
     int   iModelId = 0;
     DWORD pVehicle = NULL;
 
-    if (calledFrom == 0x6D3847)            // CVehicle::AddReplacementUpgrade
+    if (calledFrom == 0x6D3847)  // CVehicle::AddReplacementUpgrade
         pVehicle = _ebx;
-    else if (calledFrom == 0x6DFA61                // CVehicle::AddUpgrade
-             || calledFrom == 0x6D3A62)            // CVehicle::GetReplacementUpgrade
+    else if (calledFrom == 0x6DFA61      // CVehicle::AddUpgrade
+             || calledFrom == 0x6D3A62)  // CVehicle::GetReplacementUpgrade
         pVehicle = _edi;
-    else if (calledFrom == 0x06AC740               // CAutomobile::PreRender (Forklift)
-             || calledFrom == 0x6D39F3             // CVehicle::RemoveReplacementUpgrade
-             || calledFrom == 0x6D3A32)            // CVehicle::RemoveReplacementUpgrade2
+    else if (calledFrom == 0x06AC740     // CAutomobile::PreRender (Forklift)
+             || calledFrom == 0x6D39F3   // CVehicle::RemoveReplacementUpgrade
+             || calledFrom == 0x6D3A32)  // CVehicle::RemoveReplacementUpgrade2
         pVehicle = _esi;
 
     if (pVehicle > 0x1000)
@@ -1754,7 +1771,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
     {
         RwFrame* pNewFrameResult = NULL;
         uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
-        DWORD    dwFunc = 0x4C53C0;            // CClumpModelInfo::GetFrameFromId
+        DWORD    dwFunc = 0x4C53C0;  // CClumpModelInfo::GetFrameFromId
         // clang-format off
         __asm
         {
@@ -2006,7 +2023,7 @@ static void __declspec(naked) HOOK_ResetFurnitureObjectCounter()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-    *(int*)0xBB3A18 = 0;            // InteriorManager_c::ms_objectCounter
+    *(int*)0xBB3A18 = 0;  // InteriorManager_c::ms_objectCounter
 
     // clang-format off
     __asm
@@ -2122,8 +2139,9 @@ inner:
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(uiModelId);
-    if (pModelInfo->GetInterface()->pRwObject == NULL)
+    CModelInfo*                pModelInfo = pGameInterface->GetModelInfo(uiModelId);
+    CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+    if (!pInterface || pInterface->pRwObject == nullptr)
     {
         // Crash will occur at offset 00349b7b
         LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
@@ -2364,7 +2382,7 @@ static void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
         altcode:
          // Save registers before logging
         pushad
-        push    ebp            // Pass 'this' pointer
+        push    ebp  // Pass 'this' pointer
         call    OnMY_CAnimBlendNode_GetCurrentTranslation
         add     esp, 4
         popad

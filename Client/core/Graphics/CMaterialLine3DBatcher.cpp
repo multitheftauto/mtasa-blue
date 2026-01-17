@@ -293,7 +293,7 @@ void CMaterialLine3DBatcher::DrawBatch(const CVector& vecCameraPos, uint* pBatch
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
 
         // Do shader passes
-        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;  // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint  uiNumPasses = 0;
         pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
 

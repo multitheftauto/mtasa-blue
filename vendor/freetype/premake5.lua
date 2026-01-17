@@ -3,6 +3,7 @@ project "freetype"
 	language "C"
 	kind "StaticLib"
 	targetname "freetype"
+	warnings "Off"
 
 	includedirs { "include", "src",  }
 	defines { "FT2_BUILD_LIBRARY=1", "_UNICODE", "UNICODE", "_LIB" }

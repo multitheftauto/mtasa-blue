@@ -165,7 +165,8 @@ bool CClientTXD::Import(unsigned short usModelID)
                     return false;
                 }
 
-                if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled, &m_strLastError))
+                if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled,
+                                                                        &m_strLastError))
                 {
                     if (m_strLastError.empty())
                         m_strLastError = SString("Failed to load textures for model %d: %s", usModelID, ExtractFilename(strUseFilename).c_str());
@@ -283,11 +284,11 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
     CDownloadableResource* pResFile = nullptr;
     bool                   bChecksumAlreadyValidated = false;
 
-    static const CChecksum  zeroChecksum;
+    static const CChecksum zeroChecksum;
 
-    CChecksum               serverChecksum;
-    bool                   bServerHasChecksum = false;
-    long long              cachedFileSize = -1;
+    CChecksum serverChecksum;
+    bool      bServerHasChecksum = false;
+    long long cachedFileSize = -1;
 
     if (g_pClientGame)
     {
@@ -318,7 +319,8 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
             }
             if (cachedFileSize != expectedSize)
             {
-                m_strLastError = SString("Download incomplete: %s (got %lld of %lld bytes)", ExtractFilename(m_strFilename).c_str(), cachedFileSize, expectedSize);
+                m_strLastError =
+                    SString("Download incomplete: %s (got %lld of %lld bytes)", ExtractFilename(m_strFilename).c_str(), cachedFileSize, expectedSize);
                 return false;
             }
         }
@@ -357,7 +359,7 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
     if (pResFile)
     {
         const long long expectedSize = static_cast<long long>(pResFile->GetDownloadSize());
-        
+
         // Cache file size for reuse (also used in RightSizeTxd logging)
         if (cachedFileSize < 0)
             cachedFileSize = static_cast<long long>(FileSize(m_strFilename));
@@ -448,8 +450,8 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
             FileAppend(strShrunkFilename, GenerateSha256HexStringFromFile(strShrunkFilename));
             // Use cached file size if available, otherwise compute it
             const long long originalSizeKB = (cachedFileSize >= 0 ? cachedFileSize : FileSize(m_strFilename)) / 1024;
-            AddReportLog(9400, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8),
-                                       (uint)originalSizeKB, (uint)(FileSize(strShrunkFilename) / 1024)));
+            AddReportLog(9400, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8), (uint)originalSizeKB,
+                                       (uint)(FileSize(strShrunkFilename) / 1024)));
         }
         else
         {

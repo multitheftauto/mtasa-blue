@@ -20,7 +20,6 @@ class CBuildingSA;
 class CBuildingsPool
 {
 public:
-
     // Buildings pool
     virtual CBuilding* AddBuilding(class CClientBuilding*, std::uint16_t modelId, CVector* vPos, CVector* vRot, std::uint8_t interior, bool anim) = 0;
     virtual void       RemoveBuilding(CBuilding* pObject) = 0;

@@ -37,9 +37,9 @@ public:
     bool TryAdd(const std::shared_ptr<CClientModel>& pModel);
     bool Remove(const std::shared_ptr<CClientModel>& pModel);
 
-    int GetFirstFreeModelID(void);
+    int  GetFirstFreeModelID(void);
     void ReleaseModelID(int iModelID);
-    int GetFreeTxdModelID();
+    int  GetFreeTxdModelID();
 
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
     std::shared_ptr<CClientModel> Request(CClientManager* pManager, int iModelID, eClientModelType eType);

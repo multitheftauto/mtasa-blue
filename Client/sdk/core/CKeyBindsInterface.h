@@ -64,10 +64,10 @@ struct SBindableGTAControl
 enum class KeyBindType
 {
     UNDEFINED,
-    COMMAND,                     // bind key function args
-    GTA_CONTROL,                 // bind key gta_control
-    FUNCTION,                    // script bind key to function
-    CONTROL_FUNCTION,            // script bind gta_control to function (pressing control, calls function)
+    COMMAND,           // bind key function args
+    GTA_CONTROL,       // bind key gta_control
+    FUNCTION,          // script bind key to function
+    CONTROL_FUNCTION,  // script bind gta_control to function (pressing control, calls function)
 };
 
 class CKeyBind
@@ -91,14 +91,14 @@ public:
 
 public:
     bool state{false};
-    bool triggerState{false};            // true == "down", false == "up"
+    bool triggerState{false};  // true == "down", false == "up"
 };
 
 enum class BindingContext
 {
-    USER,       // Created by user via /bind command
-    RESOURCE,   // Created by resource via bindKey
-    SYSTEM      // Created by system/default
+    USER,      // Created by user via /bind command
+    RESOURCE,  // Created by resource via bindKey
+    SYSTEM     // Created by system/default
 };
 
 class CCommandBind : public CKeyBindWithState
@@ -107,13 +107,13 @@ public:
     CCommandBind() : CKeyBindWithState(KeyBindType::COMMAND) {}
 
 public:
-    std::string command;
-    std::string arguments;
-    std::string resource;
-    std::string originalScriptKey;            // Original key set by script
-    std::string sourceResource;               // Resource that created this binding
-    bool        wasCreatedByScript{false};
-    bool        isReplacingScriptKey{false};  // true if script set key is not being used
+    std::string    command;
+    std::string    arguments;
+    std::string    resource;
+    std::string    originalScriptKey;  // Original key set by script
+    std::string    sourceResource;     // Resource that created this binding
+    bool           wasCreatedByScript{false};
+    bool           isReplacingScriptKey{false};    // true if script set key is not being used
     BindingContext context{BindingContext::USER};  // Context of this binding
 };
 
@@ -184,8 +184,10 @@ public:
     virtual CCommandBind* FindMatchingUpBind(CCommandBind* pBind) = 0;
 
     // Context-aware binding methods
-    virtual bool CommandExistsInContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true, const char* arguments = NULL, const char* resource = NULL) = 0;
-    virtual bool RemoveCommandFromContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true, const char* arguments = NULL, const char* resource = NULL) = 0;
+    virtual bool CommandExistsInContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true,
+                                        const char* arguments = NULL, const char* resource = NULL) = 0;
+    virtual bool RemoveCommandFromContext(const char* key, const char* command, BindingContext context, bool checkState = false, bool state = true,
+                                          const char* arguments = NULL, const char* resource = NULL) = 0;
     virtual bool HasAnyBindingForKey(const char* key, bool checkState = false, bool state = true) = 0;
     virtual bool HasBindingInContext(const char* key, BindingContext context, bool checkState = false, bool state = true) = 0;
 

@@ -125,9 +125,13 @@ void CClientBuilding::SetModel(uint16_t model)
 {
     if (CClientBuildingManager::IsValidModel(model))
     {
-        m_usModelId = model;
-        m_pModelInfo = g_pGame->GetModelInfo(model);
-        Recreate();
+        if (model != m_usModelId)
+        {
+            Destroy();
+            m_usModelId = model;
+            m_pModelInfo = g_pGame->GetModelInfo(model);
+            Create();
+        }
     }
 }
 
@@ -159,8 +163,8 @@ void CClientBuilding::Create()
     if (!m_pBuilding)
         return;
 
-	if (m_bDoubleSidedInit)
-		m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
+    if (m_bDoubleSidedInit)
+        m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
 
     if (!m_usesCollision)
     {
