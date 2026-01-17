@@ -35,8 +35,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(ucTimeContext))
             return false;
 
-        // Only read this packet if it matches the current time context that
-        // player is in.
+        // Only read this packet if it matches the current time context
+        // Time context is validated for all players (alive and dead) to prevent stale packets
         if (!pSourcePlayer->CanUpdateSync(ucTimeContext))
         {
             return false;
@@ -94,9 +94,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     break;
             }
 
-            if (radius > -1 && 
-                (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), static_cast<float>(radius)) ||
-                    pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
+            if (radius > -1 && (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), static_cast<float>(radius)) ||
+                                pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
             {
                 pContactElement = nullptr;
                 // Use current player position. They are not reporting their absolute position so we have to disregard it.
@@ -110,7 +109,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         {
             position.data.vecPosition = pSourcePlayer->GetPosition();
         }
-        
+
         CElement* pPreviousContactElement = pSourcePlayer->GetContactElement();
         pSourcePlayer->SetContactElement(pContactElement);
 
@@ -145,7 +144,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         // if (position.data.vecPosition.fX != 0.0f || position.data.vecPosition.fY != 0.0f || position.data.vecPosition.fZ != 0.0f)
         {
             CVector playerPosition = pSourcePlayer->GetPosition();
-            float playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);
+            float   playerDistancePosition = DistanceBetweenPoints3D(playerPosition, position.data.vecPosition);
             if (playerDistancePosition >= g_TickRateSettings.playerTeleportAlert)
             {
                 if (!pSourcePlayer->GetTeleported())
@@ -221,8 +220,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
             if (pSourcePlayer->GetWeaponType() != ucClientWeaponType)
             {
-                bWeaponCorrect = false;                          // Possibly old weapon data.
-                ucUseWeaponType = ucClientWeaponType;            // Use the packet supplied weapon type to skip over the correct amount of data
+                bWeaponCorrect = false;                // Possibly old weapon data.
+                ucUseWeaponType = ucClientWeaponType;  // Use the packet supplied weapon type to skip over the correct amount of data
             }
 
             // Update check counts

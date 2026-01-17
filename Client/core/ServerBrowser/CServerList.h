@@ -23,22 +23,22 @@ class CMasterServerManagerInterface;
 #include "CSingleton.h"
 
 // Master server list URL
-#define SERVER_LIST_MASTER_URL              "https://master.multitheftauto.com/ase/mta/"
+#define SERVER_LIST_MASTER_URL "https://master.multitheftauto.com/ase/mta/"
 
 // Query response data buffer
-#define SERVER_LIST_QUERY_BUFFER            4096
+#define SERVER_LIST_QUERY_BUFFER 4096
 
 // Master server list timeout (in ms)
-#define SERVER_LIST_MASTER_TIMEOUT          10000
+#define SERVER_LIST_MASTER_TIMEOUT 10000
 
 // Maximum amount of server queries per pulse (so the list gradually streams in)
-#define SERVER_LIST_QUERIES_PER_PULSE       2
+#define SERVER_LIST_QUERIES_PER_PULSE 2
 
 // LAN packet broadcasting interval (in ms)
-#define SERVER_LIST_BROADCAST_REFRESH       2000
+#define SERVER_LIST_BROADCAST_REFRESH 2000
 
 // Timeout for one server in the server list to respond to a query (in ms)
-#define SERVER_LIST_ITEM_TIMEOUT       8000
+#define SERVER_LIST_ITEM_TIMEOUT 8000
 
 enum
 {
@@ -142,7 +142,7 @@ public:
         isStatusVerified = true;
         bPassworded = false;
         bKeepFlag = false;
-        iRowIndex = -1;
+        iRowIndex[0] = iRowIndex[1] = iRowIndex[2] = iRowIndex[3] = -1;
 
         nPlayers = 0;
         nMaxPlayers = 0;
@@ -153,8 +153,7 @@ public:
         bMaybeOffline = false;
         bMasterServerSaysNoResponse = false;
         uiMasterServerSaysRestrictions = 0;
-        for (int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
-            revisionInList[i] = -1;
+        revisionInList[0] = revisionInList[1] = revisionInList[2] = revisionInList[3] = -1;
 
         strHost = inet_ntoa(Address);
         strName = SString("%s:%d", inet_ntoa(Address), usGamePort);
@@ -174,19 +173,20 @@ public:
 
     std::string    Pulse(bool bCanSendQuery, bool bRemoveNonResponding = false);
     void           ResetForRefresh();
+    void           ClearNoReplyCountForRetry();
     void           CancelPendingQuery();
     unsigned short GetQueryPort();
 
-    in_addr        AddressCopy;            // Copy to ensure it doesn't get changed without us knowing
+    in_addr        AddressCopy;  // Copy to ensure it doesn't get changed without us knowing
     unsigned short usGamePortCopy;
-    in_addr        Address;                // IP-address
-    unsigned short usGamePort;             // Game port
-    unsigned short nPlayers;               // Current players
-    unsigned short nMaxPlayers;            // Maximum players
-    unsigned short nPing;                  // Ping time
-    bool           isStatusVerified;       // Ping status verified
-    bool           bPassworded;            // Password protected
-    bool           bSerials;               // Serial verification on
+    in_addr        Address;           // IP-address
+    unsigned short usGamePort;        // Game port
+    unsigned short nPlayers;          // Current players
+    unsigned short nMaxPlayers;       // Maximum players
+    unsigned short nPing;             // Ping time
+    bool           isStatusVerified;  // Ping status verified
+    bool           bPassworded;       // Password protected
+    bool           bSerials;          // Serial verification on
     bool           bScanned;
     bool           bSkipped;
     bool           bMaybeOffline;
@@ -197,26 +197,26 @@ public:
     uint           uiQueryRetryCount;
     uint           uiRevision;
     bool           bKeepFlag;
-    int            iRowIndex;
+    int            iRowIndex[SERVER_BROWSER_TYPE_COUNT];  // Row index for each server browser tab - placed here for cache locality
 
-    SString strGameName;                  // Game name. Always 'mta'
-    SString strVersion;                   // Game version
-    SString strName;                      // Server name
-    SString strSearchableName;            // Server name to use for searches
-    SString strHost;                      // Server host as IP
-    SString strHostName;                  // Server host as name
-    SString strGameMode;                  // Gamemode
-    SString strMap;                       // Map name
-    SString strEndpoint;                  // IP:port as a string
+    SString strGameName;        // Game name. Always 'mta'
+    SString strVersion;         // Game version
+    SString strName;            // Server name
+    SString strSearchableName;  // Server name to use for searches
+    SString strHost;            // Server host as IP
+    SString strHostName;        // Server host as name
+    SString strGameMode;        // Gamemode
+    SString strMap;             // Map name
+    SString strEndpoint;        // IP:port as a string
 
-    int    m_iBuildType;              // 9=release
-    int    m_iBuildNumber;            // 00000 and up
+    int    m_iBuildType;    // 9=release
+    int    m_iBuildNumber;  // 00000 and up
     ushort m_usHttpPort;
     uchar  m_ucSpecialFlags;
 
-    SString strNameSortKey;                // Server name as a sortable string
-    SString strVersionSortKey;             // Game version as a sortable string
-    SString strEndpointSortKey;            // IP:port as a sortable string
+    SString strNameSortKey;      // Server name as a sortable string
+    SString strVersionSortKey;   // Game version as a sortable string
+    SString strEndpointSortKey;  // IP:port as a sortable string
     uint    uiTieBreakPosition;
     SString strTieBreakSortKey;
 
@@ -354,6 +354,7 @@ public:
     bool             Remove(in_addr Address, ushort usGamePort);
     void             RemoveItem(CServerListItem* pItem);
     void             OnItemChangeAddress(CServerListItem* pItem, in_addr Address, ushort usGamePort);
+    void             Sort(unsigned int uiColumn, int direction);
 };
 
 class CServerList
@@ -383,6 +384,8 @@ public:
     void         SetUpdated(bool bUpdated) { m_bUpdated = bUpdated; };
     int          GetRevision() { return m_iRevision; }
     void         SortByASEVersion();
+    void         Sort(unsigned int uiColumn, int direction);
+    void         RetryNonRespondingServers();  // Reset no-reply counters for cached servers
 
 protected:
     bool                m_bUpdated;
@@ -405,11 +408,13 @@ public:
     void Pulse() override;
     void Refresh() override;
     void SuspendActivity() override;
-    bool RemoveNonResponding() { return m_nScanned > 10; }            // Don't remove until net access is confirmed
+    bool RemoveNonResponding() override;
+    bool IsMasterServerOffline() const { return m_bMasterServerOffline; }
 
 private:
     CMasterServerManagerInterface* m_pMasterServerManager;
     CElapsedTime                   m_ElapsedTime;
+    bool                           m_bMasterServerOffline = false;
 };
 
 // LAN list (scans for LAN-broadcasted servers on refresh)

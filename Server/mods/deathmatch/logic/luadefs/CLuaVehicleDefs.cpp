@@ -17,6 +17,8 @@
 #include "CScriptArgReader.h"
 #include "packets/CElementRPCPacket.h"
 
+#include "lua/CLuaShared.h"  // for CLuaShared::CustomTrainTracks
+
 void CLuaVehicleDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -64,7 +66,6 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isTrainDerailable", IsTrainDerailable},
         {"getTrainDirection", GetTrainDirection},
         {"getTrainSpeed", GetTrainSpeed},
-        //{"getTrainTrack", ArgumentParser<GetTrainTrack>},
         {"getTrainPosition", GetTrainPosition},
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
@@ -115,7 +116,6 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
         {"setTrainSpeed", SetTrainSpeed},
-        //{"setTrainTrack", ArgumentParser<SetTrainTrack>},
         {"setTrainPosition", SetTrainPosition},
         {"setVehicleHeadLightColor", SetVehicleHeadLightColor},
         {"setVehicleTurretPosition", SetVehicleTurretPosition},
@@ -133,6 +133,13 @@ void CLuaVehicleDefs::LoadFunctions()
     // Add functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
+
+    // Add train track related functions
+    if (CLuaShared::CustomTrainTracks)
+    {
+        CLuaCFunctions::AddFunction("getTrainTrack", ArgumentParser<GetTrainTrack>);
+        CLuaCFunctions::AddFunction("setTrainTrack", ArgumentParser<SetTrainTrack>);
+    }
 }
 
 void CLuaVehicleDefs::AddClass(lua_State* luaVM)
@@ -175,7 +182,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSirens", "getVehicleSirens");
     lua_classfunction(luaVM, "getDirection", "getTrainDirection");
     lua_classfunction(luaVM, "getTrainSpeed", "getTrainSpeed");
-    // lua_classfunction(luaVM, "getTrack", "getTrainTrack");
+    if (CLuaShared::CustomTrainTracks)
+        lua_classfunction(luaVM, "getTrainTrack", "getTrainTrack");
     lua_classfunction(luaVM, "getTrainPosition", "getTrainPosition");
     lua_classfunction(luaVM, "getHeadLightColor", "getVehicleHeadLightColor");
     lua_classfunction(luaVM, "getColor", "getVehicleColor");
@@ -198,7 +206,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTowingVehicle", "getVehicleTowingVehicle");
     lua_classfunction(luaVM, "getTurnVelocity", "getVehicleTurnVelocity", CLuaVehicleDefs::OOP_GetVehicleTurnVelocity);
     lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
-    lua_classfunction(luaVM, "getVehicleType", "getVehicleType");            // This isn't "getType" because it would overwrite Element.getType
+    lua_classfunction(luaVM, "getVehicleType", "getVehicleType");  // This isn't "getType" because it would overwrite Element.getType
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getUpgrades", "getVehicleUpgrades");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
@@ -240,9 +248,10 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setDerailable", "setTrainDerailable");
     lua_classfunction(luaVM, "setDerailed", "setTrainDerailed");
     lua_classfunction(luaVM, "setDirection", "setTrainDirection");
-    // lua_classfunction(luaVM, "setTrack", "setTrainTrack");
+    if (CLuaShared::CustomTrainTracks)
+        lua_classfunction(luaVM, "setTrainTrack", "setTrainTrack");
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
-    lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");            // Reduce confusion
+    lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");  // Reduce confusion
     lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
 
     lua_classvariable(luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof");
@@ -252,7 +261,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "blown", "blowVehicle", "isVehicleBlown");
     lua_classvariable(luaVM, "direction", "setTrainDirection", "getTrainDirection");
     lua_classvariable(luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed");
-    // lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
+    if (CLuaShared::CustomTrainTracks)
+        lua_classvariable(luaVM, "trainTrack", "setTrainTrack", "getTrainTrack");
     lua_classvariable(luaVM, "trainPosition", "setTrainPosition", "getTrainPosition");
     lua_classvariable(luaVM, "taxiLightOn", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn");
     lua_classvariable(luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable");
@@ -638,37 +648,37 @@ int CLuaVehicleDefs::GetVehicleSirenParams(lua_State* luaVM)
     argStream.ReadUserData(pVehicle);
     if (argStream.HasErrors() == false)
     {
-        tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Create a new table
+        tSirenInfo = pVehicle->m_tSirenBeaconInfo;  // Create a new table
         lua_newtable(luaVM);
 
         lua_pushstring(luaVM, "SirenCount");
         lua_pushnumber(luaVM, tSirenInfo.m_ucSirenCount);
-        lua_settable(luaVM, -3);            // End of SirenCount Property
+        lua_settable(luaVM, -3);  // End of SirenCount Property
 
         lua_pushstring(luaVM, "SirenType");
         lua_pushnumber(luaVM, tSirenInfo.m_ucSirenType);
-        lua_settable(luaVM, -3);            // End of SirenType Property
+        lua_settable(luaVM, -3);  // End of SirenType Property
 
         lua_pushstring(luaVM, "Flags");
         lua_newtable(luaVM);
 
         lua_pushstring(luaVM, "360");
         lua_pushboolean(luaVM, tSirenInfo.m_b360Flag);
-        lua_settable(luaVM, -3);            // End of 360 Property
+        lua_settable(luaVM, -3);  // End of 360 Property
 
         lua_pushstring(luaVM, "DoLOSCheck");
         lua_pushboolean(luaVM, tSirenInfo.m_bDoLOSCheck);
-        lua_settable(luaVM, -3);            // End of DoLOSCheck Property
+        lua_settable(luaVM, -3);  // End of DoLOSCheck Property
 
         lua_pushstring(luaVM, "UseRandomiser");
         lua_pushboolean(luaVM, tSirenInfo.m_bUseRandomiser);
-        lua_settable(luaVM, -3);            // End of UseRandomiser Property
+        lua_settable(luaVM, -3);  // End of UseRandomiser Property
 
         lua_pushstring(luaVM, "Silent");
         lua_pushboolean(luaVM, tSirenInfo.m_bSirenSilent);
-        lua_settable(luaVM, -3);            // End of Silent Property
+        lua_settable(luaVM, -3);  // End of Silent Property
 
-        lua_settable(luaVM, -3);            // End of Flags table
+        lua_settable(luaVM, -3);  // End of Flags table
 
         return 1;
     }
@@ -688,7 +698,7 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
     argStream.ReadUserData(pVehicle);
     if (argStream.HasErrors() == false)
     {
-        tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Create a new table
+        tSirenInfo = pVehicle->m_tSirenBeaconInfo;  // Create a new table
         lua_newtable(luaVM);
 
         for (int i = 0; i < tSirenInfo.m_ucSirenCount; i++)
@@ -700,37 +710,37 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
 
             lua_pushstring(luaVM, "Min_Alpha");
             lua_pushnumber(luaVM, info.m_dwMinSirenAlpha);
-            lua_settable(luaVM, -3);            // End of Min_Alpha property
+            lua_settable(luaVM, -3);  // End of Min_Alpha property
 
             lua_pushstring(luaVM, "Red");
             lua_pushnumber(luaVM, info.m_RGBBeaconColour.R);
-            lua_settable(luaVM, -3);            // End of Red property
+            lua_settable(luaVM, -3);  // End of Red property
 
             lua_pushstring(luaVM, "Green");
             lua_pushnumber(luaVM, info.m_RGBBeaconColour.G);
-            lua_settable(luaVM, -3);            // End of Green property
+            lua_settable(luaVM, -3);  // End of Green property
 
             lua_pushstring(luaVM, "Blue");
             lua_pushnumber(luaVM, info.m_RGBBeaconColour.B);
-            lua_settable(luaVM, -3);            // End of Blue property
+            lua_settable(luaVM, -3);  // End of Blue property
 
             lua_pushstring(luaVM, "Alpha");
             lua_pushnumber(luaVM, info.m_RGBBeaconColour.A);
-            lua_settable(luaVM, -3);            // End of Alpha property
+            lua_settable(luaVM, -3);  // End of Alpha property
 
             lua_pushstring(luaVM, "x");
             lua_pushnumber(luaVM, info.m_vecSirenPositions.fX);
-            lua_settable(luaVM, -3);            // End of X property
+            lua_settable(luaVM, -3);  // End of X property
 
             lua_pushstring(luaVM, "y");
             lua_pushnumber(luaVM, info.m_vecSirenPositions.fY);
-            lua_settable(luaVM, -3);            // End of Y property
+            lua_settable(luaVM, -3);  // End of Y property
 
             lua_pushstring(luaVM, "z");
             lua_pushnumber(luaVM, info.m_vecSirenPositions.fZ);
-            lua_settable(luaVM, -3);            // End of Z property
+            lua_settable(luaVM, -3);  // End of Z property
 
-            lua_settable(luaVM, -3);            // End of Table
+            lua_settable(luaVM, -3);  // End of Table
         }
 
         return 1;
@@ -1471,7 +1481,7 @@ int CLuaVehicleDefs::GetVehiclePlateText(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        char szPlateText[9] = {0};            // 8 chars + \0
+        char szPlateText[9] = {0};  // 8 chars + \0
         if (CStaticFunctionDefinitions::GetVehiclePlateText(pVehicle, szPlateText))
         {
             lua_pushstring(luaVM, szPlateText);
@@ -2813,9 +2823,7 @@ bool CLuaVehicleDefs::SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrainTrack
     if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
         return false;
     else if (pVehicle->IsDerailed())
-    {
         return false;
-    }
 
     // TODO(qaisjp, feature/custom-train-tracks): this needs to support non-default train tracks
     if (!pTrainTrack->IsDefault())
@@ -2990,10 +2998,12 @@ int CLuaVehicleDefs::SetVehiclePlateText(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime)
+bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType,
+                                                  std::optional<std::uint32_t> removalTime)
 {
     auto partNodeIndex = static_cast<eCarNodes>(nodeIndex);
-    auto collisionType = componentCollisionType.has_value() ? static_cast<eCarComponentCollisionTypes>(componentCollisionType.value()) : eCarComponentCollisionTypes::COL_NODE_PANEL;
+    auto collisionType = componentCollisionType.has_value() ? static_cast<eCarComponentCollisionTypes>(componentCollisionType.value())
+                                                            : eCarComponentCollisionTypes::COL_NODE_PANEL;
 
     if (nodeIndex < 1 || partNodeIndex >= eCarNodes::NUM_NODES)
         throw std::invalid_argument("Invalid component index");

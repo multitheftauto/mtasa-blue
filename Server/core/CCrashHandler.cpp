@@ -46,9 +46,9 @@ static SString ms_strDumpPathFilename;
 static SString ms_strDumpPath;
 
 #ifdef WIN32
-#include <ctime>
-#include <tchar.h>
-#include <dbghelp.h>
+    #include <ctime>
+    #include <tchar.h>
+    #include <dbghelp.h>
 
 typedef BOOL(WINAPI* MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
                                         CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
@@ -63,10 +63,10 @@ void CCrashHandler::Init(const SString& strInServerPath)
         strServerPath = GetSystemCurrentDirectory();
     ms_strDumpPath = PathJoin(strServerPath, SERVER_DUMP_PATH);
 
-    // Set a global filter
-    #ifdef WIN32
+// Set a global filter
+#ifdef WIN32
     SetCrashHandlerFilter(HandleExceptionGlobal);
-    #else
+#else
 
     // Prepare initial dumpfile name
     time_t     pTime = time(NULL);
@@ -75,17 +75,17 @@ void CCrashHandler::Init(const SString& strInServerPath)
     ms_strDumpPathFilename = PathJoin(ms_strDumpPath, strFilename);
     MakeSureDirExists(ms_strDumpPathFilename);
 
-        #ifdef WITH_BACKTRACE_ONLY
+    #ifdef WITH_BACKTRACE_ONLY
     signal(SIGSEGV, HandleExceptionGlobal);
-        #else
-            #ifdef __APPLE__
+    #else
+        #ifdef __APPLE__
     static google_breakpad::ExceptionHandler eh(ms_strDumpPath, NULL, DumpCallback, NULL, true, NULL);
-            #else
-    google_breakpad::MinidumpDescriptor descriptor(ms_strDumpPath);
+        #else
+    google_breakpad::MinidumpDescriptor      descriptor(ms_strDumpPath);
     static google_breakpad::ExceptionHandler eh(descriptor, NULL, DumpCallback, NULL, true, -1);
-            #endif
         #endif
     #endif
+#endif
 }
 
 #ifndef WIN32
@@ -142,16 +142,16 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
     }
 }
 
-// Linux/Mac crash callback when using google-breakpad
-#ifdef __APPLE__
+    // Linux/Mac crash callback when using google-breakpad
+    #ifdef __APPLE__
 bool DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded)
 {
     auto path = PathJoin(dump_dir, SString("%s.dmp", minidump_id));
-#else
+    #else
 bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded)
 {
     auto path = descriptor.path();
-#endif
+    #endif
     // Set inital dump file name (Safeish)
     File::Rename(path, ms_strDumpPathFilename);
 
@@ -232,9 +232,9 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
             if (strModuleName.length() == 0)
                 strModuleName = "unknown";
 
-            #ifdef _WIN64
+    #ifdef _WIN64
             strModuleName += "64";
-            #endif
+    #endif
 
             SString strFilename("server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, strModuleName.c_str(),
                                 pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetCode() & 0xffff, SystemTime.wYear, SystemTime.wMonth,

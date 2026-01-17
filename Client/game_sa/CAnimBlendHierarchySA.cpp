@@ -35,56 +35,66 @@ void CAnimBlendHierarchySA::SetName(const char* szName)
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_SetName;
+    // clang-format off
     __asm
     {
         push    szName
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAnimBlendHierarchySA::RemoveAnimSequences()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveAnimSequences;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAnimBlendHierarchySA::RemoveFromUncompressedCache()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveFromUncompressedCache;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAnimBlendHierarchySA::RemoveQuaternionFlips()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveQuaternionFlips;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAnimBlendHierarchySA::CalculateTotalTime()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_CalculateTotalTime;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 CAnimBlendSequenceSAInterface* CAnimBlendHierarchySA::GetSequence(DWORD dwIndex)

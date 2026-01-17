@@ -17,13 +17,31 @@
 #include <cef3/cef/include/cef_parser.h>
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
+#include "CWebAppAuth.h"  // For GenerateAuthCode()
 #include <algorithm>
 #include <ranges>
+#include <filesystem>
+#include <cstdlib>
 
 // #define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
     #pragma comment(lib, "cef_sandbox.lib")
 #endif
+
+CWebCore::EventEntry::EventEntry(const std::function<void()>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_)
+{
+}
+
+#ifdef MTA_DEBUG
+CWebCore::EventEntry::EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_)
+    : callback(callback_), pWebView(pWebView_), name(name_)
+{
+}
+#endif
+
+CWebCore::TaskEntry::TaskEntry(std::function<void(bool)> callback, CWebView* webView) : task(callback), webView(webView)
+{
+}
 
 CWebCore::CWebCore()
 {
@@ -36,6 +54,9 @@ CWebCore::CWebCore()
     m_iWhitelistRevision = 0;
     m_iBlacklistRevision = 0;
 
+    // Initialize auth code BEFORE CefInitialize (ensures webCore->m_AuthCode populated early)
+    m_AuthCode = WebAppAuth::GenerateAuthCode();
+
     MakeSureXMLNodesExist();
     InitialiseWhiteAndBlacklist();
 
@@ -45,10 +66,12 @@ CWebCore::CWebCore()
 
 CWebCore::~CWebCore()
 {
-    std::ranges::for_each(m_WebViews, [](const auto& pWebView) {
-        if (pWebView) [[likely]]
-            pWebView->CloseBrowser();
-    });
+    std::ranges::for_each(m_WebViews,
+                          [](const auto& pWebView)
+                          {
+                              if (pWebView) [[likely]]
+                                  pWebView->CloseBrowser();
+                          });
     m_WebViews.clear();
     CefClearSchemeHandlerFactories();
 
@@ -63,12 +86,12 @@ bool CWebCore::Initialise(bool gpuEnabled)
     // CefInitialize() can only be called once per process lifetime
     // Do not call this function again or recreate CWebCore if initialization fails
     // Repeated calls cause "Timeout of new browser info response for frame" errors
-    
+
     m_bGPUEnabled = gpuEnabled;
 
     // Get MTA base directory
     SString strBaseDir = SharedUtil::GetMTAProcessBaseDir();
-    
+
     if (strBaseDir.empty())
     {
         g_pCore->GetConsole()->Printf("CEF initialization skipped - Unable to determine MTA base directory");
@@ -76,49 +99,95 @@ bool CWebCore::Initialise(bool gpuEnabled)
         m_bInitialised = false;
         return false;
     }
-    
+
     SString strMTADir = PathJoin(strBaseDir, "MTA");
-    
+
 #ifndef MTA_DEBUG
     SString strLauncherPath = PathJoin(strMTADir, "CEF", "CEFLauncher.exe");
 #else
     SString strLauncherPath = PathJoin(strMTADir, "CEF", "CEFLauncher_d.exe");
 #endif
-    
+
     // Set DLL directory for CEFLauncher subprocess to locate required libraries
     SString strCEFDir = PathJoin(strMTADir, "CEF");
+#ifdef _WIN32
     SetDllDirectoryW(FromUTF8(strCEFDir));
-    
+#else
+    // On Wine/Proton: Use environment variable for library search
+    const char* existingPath = std::getenv("LD_LIBRARY_PATH");
+    SString     newPath = strCEFDir;
+    if (existingPath)
+    {
+        newPath = SString("%s:%s", strCEFDir.c_str(), existingPath);
+    }
+    // Note: setenv is not available in MSVC, but _putenv is.
+    // However, since we are compiling for Windows (running on Wine), we use Windows APIs.
+    // Wine maps Windows environment variables.
+    // But LD_LIBRARY_PATH is a Linux variable.
+    // If we are in Wine, we might want to set PATH instead or as well.
+    // SetDllDirectoryW handles the Windows loader.
+
+    // Log for debugging
+    if (std::getenv("WINE") || std::getenv("WINEPREFIX"))
+    {
+        g_pCore->GetConsole()->Printf("DEBUG: CEF library path set via SetDllDirectoryW: %s", strCEFDir.c_str());
+    }
+#endif
+
     // Read GTA path from registry to pass to CEF subprocess
-    int iRegistryResult = 0;
+    int           iRegistryResult = 0;
     const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iRegistryResult);
-    
+
     // Check if process is running with elevated privileges
     // CEF subprocesses may have communication issues when running elevated
-    const bool bIsElevated = []() -> bool {
+    const bool bIsElevated = []() -> bool
+    {
+        // Check for Wine environment
+        if (std::getenv("WINE") || std::getenv("WINEPREFIX"))
+        {
+            // In Wine, privilege escalation works differently
+            // Assume not elevated for browser feature purposes
+            return false;
+        }
+
         HANDLE hToken = nullptr;
         if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
             return false;
-        
+
         // RAII wrapper for token handle
         const std::unique_ptr<void, decltype(&CloseHandle)> tokenGuard(hToken, &CloseHandle);
-        
+
         TOKEN_ELEVATION elevation{};
-        DWORD dwSize = sizeof(elevation);
+        DWORD           dwSize = sizeof(elevation);
         if (!GetTokenInformation(hToken, TokenElevation, &elevation, sizeof(elevation), &dwSize))
             return false;
-        
+
         return elevation.TokenIsElevated != 0;
     }();
-    
-    if (bIsElevated)
+
+    if (bIsElevated && !std::getenv("WINE"))
     {
         AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
         AddReportLog(8022, "CEF browser features may not work correctly when running as Administrator");
         AddReportLog(8023, "Consider running MTA without Administrator privileges for full browser functionality");
         g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
-    
+
+    // Verify CEFLauncher can run in current environment
+    auto CanExecuteCEFLauncher = []() -> bool
+    {
+#ifdef _WIN32
+        // On Windows, we know it works
+        if (!std::getenv("WINE") && !std::getenv("WINEPREFIX") && !std::getenv("PROTON_VERSION"))
+            return true;
+#endif
+
+        // Check if Wine can execute the launcher
+        // This is a basic check - if we are in Wine, we assume it works unless proven otherwise
+        // But we can log if we are in a mixed environment
+        return true;
+    };
+
     if (!FileExists(strLauncherPath))
     {
         g_pCore->GetConsole()->Printf("CEF initialization skipped - CEFLauncher not found: %s", *strLauncherPath);
@@ -127,10 +196,18 @@ bool CWebCore::Initialise(bool gpuEnabled)
         return false;
     }
 
+    if (!CanExecuteCEFLauncher())
+    {
+        g_pCore->GetConsole()->Printf("CEF initialization skipped - Wine/Proton not available");
+        AddReportLog(8026, "CEF initialization skipped - Wine/Proton not available or misconfigured");
+        m_bInitialised = false;
+        return false;
+    }
+
     // Ensure cache directory can be created
     const SString strCachePath = PathJoin(strMTADir, "CEF", "cache");
     MakeSureDirExists(strCachePath);
-    
+
     // Verify locales directory exists
     const SString strLocalesPath = PathJoin(strMTADir, "CEF", "locales");
     if (!DirectoryExists(strLocalesPath))
@@ -153,17 +230,19 @@ bool CWebCore::Initialise(bool gpuEnabled)
         m_bInitialised = false;
         return false;
     }
-    
+
     // RAII scope guard to restore CWD, even if CefInitialize throws or returns early
-    struct CwdGuard {
+    struct CwdGuard
+    {
         fs::path savedPath;
         explicit CwdGuard(fs::path path) : savedPath(std::move(path)) {}
-        ~CwdGuard() {
+        ~CwdGuard()
+        {
             std::error_code restoreEc;
             fs::current_path(savedPath, restoreEc);
         }
     } cwdGuard(savedCwd);
-    
+
     // Temporarily change CWD to MTA directory for CefInitialize
     // CEFLauncher.exe requires this to locate CEF dependencies
     fs::current_path(fs::path(FromUTF8(strMTADir)), ec);
@@ -173,9 +252,9 @@ bool CWebCore::Initialise(bool gpuEnabled)
         m_bInitialised = false;
         return false;
     }
-    
-    CefMainArgs        mainArgs;
-    void*              sandboxInfo = nullptr;
+
+    CefMainArgs mainArgs;
+    void*       sandboxInfo = nullptr;
 
     CefRefPtr<CWebApp> app(new CWebApp);
 
@@ -216,7 +295,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
     }
 
     // CWD will be restored by cwdGuard destructor when this function returns
-    
+
     if (m_bInitialised)
     {
         // Register custom scheme handler factory only if initialization succeeded
@@ -228,7 +307,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
         g_pCore->GetConsole()->Printf("CefInitialize failed - CEF features will be disabled");
         AddReportLog(8004, "CefInitialize failed - CEF features will be disabled");
     }
-    
+
     return m_bInitialised;
 }
 
@@ -253,18 +332,18 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     {
         // Mark as being destroyed to prevent new events/tasks
         pWebView->SetBeingDestroyed(true);
-        
+
         // Ensure that no attached events or tasks are in the queue
         RemoveWebViewEvents(pWebView.get());
         RemoveWebViewTasks(pWebView.get());
 
         // Remove from list before closing to break reference cycles early
         m_WebViews.remove(pWebView);
-        
+
         // CloseBrowser will eventually trigger OnBeforeClose which clears m_pWebView
         // This breaks the circular reference: CWebView -> CefBrowser -> CWebView
         pWebView->CloseBrowser();
-        
+
         // Note: Do not call Release() - let CefRefPtr manage the lifecycle
         // The circular reference is broken via OnBeforeClose setting m_pWebView = nullptr
     }
@@ -313,14 +392,14 @@ void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebV
     if (pWebView && pWebView->IsBeingDestroyed())
         return;
 
-    std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+    std::scoped_lock lock(m_EventQueueMutex);
 
     // Prevent unbounded queue growth - drop oldest events if queue is too large
     if (m_EventQueue.size() >= MAX_EVENT_QUEUE_SIZE)
     {
         // Log warning even in release builds as this indicates a serious issue
         g_pCore->GetConsole()->Printf("WARNING: Browser event queue size limit reached (%d), dropping oldest events", MAX_EVENT_QUEUE_SIZE);
-        
+
         // Remove oldest 10% of events to make room
         auto removeCount = static_cast<size_t>(MAX_EVENT_QUEUE_SIZE / 10);
         for (auto i = size_t{0}; i < removeCount && !m_EventQueue.empty(); ++i)
@@ -336,7 +415,7 @@ void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebV
 
 void CWebCore::RemoveWebViewEvents(CWebView* pWebView)
 {
-    std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+    std::scoped_lock lock(m_EventQueueMutex);
 
     for (auto iter = m_EventQueue.begin(); iter != m_EventQueue.end();)
     {
@@ -351,12 +430,16 @@ void CWebCore::DoEventQueuePulse()
 {
     std::list<EventEntry> eventQueue;
     {
-        std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+        std::scoped_lock lock(m_EventQueueMutex);
         std::swap(eventQueue, m_EventQueue);
     }
 
     for (auto& event : eventQueue)
     {
+        // Skip event if the associated WebView is being destroyed
+        if (event.pWebView && event.pWebView->IsBeingDestroyed())
+            continue;
+
         event.callback();
     }
 
@@ -378,7 +461,7 @@ void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
     std::future<void> result;
     {
         std::scoped_lock lock(m_TaskQueueMutex);
-        
+
         // Prevent unbounded queue growth - abort new task if queue is too large
         if (m_TaskQueue.size() >= MAX_TASK_QUEUE_SIZE) [[unlikely]]
         {
@@ -391,7 +474,7 @@ void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
             task(true);
             return;
         }
-        
+
         m_TaskQueue.emplace_back(TaskEntry{task, webView});
         result = m_TaskQueue.back().task.get_future();
     }
@@ -403,14 +486,16 @@ void CWebCore::RemoveWebViewTasks(CWebView* webView)
 {
     std::scoped_lock lock(m_TaskQueueMutex);
 
-    std::erase_if(m_TaskQueue, [webView](TaskEntry& entry) {
-        if (entry.webView == webView)
-        {
-            entry.task(true);
-            return true;
-        }
-        return false;
-    });
+    std::erase_if(m_TaskQueue,
+                  [webView](TaskEntry& entry)
+                  {
+                      if (entry.webView == webView)
+                      {
+                          entry.task(true);
+                          return true;
+                      }
+                      return false;
+                  });
 }
 
 void CWebCore::DoTaskQueuePulse()
@@ -423,17 +508,24 @@ void CWebCore::DoTaskQueuePulse()
 
     for (TaskEntry& entry : taskQueue)
     {
+        // Abort task if the associated WebView is being destroyed
+        if (entry.webView && entry.webView->IsBeingDestroyed())
+        {
+            entry.task(true);
+            continue;
+        }
+
         entry.task(false);
     }
 }
 
 eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
 {
-    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
+    std::scoped_lock lock(m_FilterMutex);
 
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
     static constexpr const char* wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
-                                                         "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
+                                                        "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
     for (const auto& pattern : wildcardWhitelist)
     {
@@ -441,8 +533,7 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
             return eURLState::WEBPAGE_ALLOWED;
     }
 
-    google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.find(strURL);
-    if (iter != m_Whitelist.end())
+    if (auto iter = m_Whitelist.find(strURL); iter != m_Whitelist.end())
     {
         if (iter->second.first == true)
             return eURLState::WEBPAGE_ALLOWED;
@@ -533,10 +624,10 @@ void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
 
 void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
 {
-    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
+    std::scoped_lock lock(m_FilterMutex);
 
     // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
-    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    if (m_Whitelist.size() >= 50000)
     {
         // Remove WEBFILTER_REQUEST entries (temporary session entries)
         for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
@@ -553,10 +644,10 @@ void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
 
 void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
 {
-    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
+    std::scoped_lock lock(m_FilterMutex);
 
     // Prevent unbounded whitelist growth - remove old REQUEST entries if limit reached
-    if (m_Whitelist.size() >= MAX_WHITELIST_SIZE)
+    if (m_Whitelist.size() >= 50000)
     {
         // Remove WEBFILTER_REQUEST entries (temporary session entries)
         for (auto iter = m_Whitelist.begin(); iter != m_Whitelist.end();)
@@ -573,6 +664,13 @@ void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
 
 void CWebCore::RequestPages(const std::vector<SString>& pages, WebRequestCallback* pCallback)
 {
+    if (m_PendingRequests.size() >= MAX_PENDING_REQUESTS)
+    {
+        if (pCallback)
+            (*pCallback)(false, std::unordered_set<SString>(pages.begin(), pages.end()));
+        return;
+    }
+
     // Add to pending pages queue
     bool bNewItem = false;
     for (const auto& page : pages)
@@ -581,8 +679,9 @@ void CWebCore::RequestPages(const std::vector<SString>& pages, WebRequestCallbac
         if (status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED)
             continue;
 
-        m_PendingRequests.insert(page);
-        bNewItem = true;
+        const auto [iter, inserted] = m_PendingRequests.insert(page);
+        if (inserted)
+            bNewItem = true;
     }
 
     if (bNewItem)
@@ -620,7 +719,7 @@ std::unordered_set<SString> CWebCore::AllowPendingPages(bool bRemember)
 
     if (bRemember)
     {
-        std::vector<std::pair<SString, bool>> result;            // Contains only allowed entries
+        std::vector<std::pair<SString, bool>> result;  // Contains only allowed entries
         GetFilterEntriesByType(result, eWebFilterType::WEBFILTER_USER, eWebFilterState::WEBFILTER_ALLOWED);
         std::vector<SString> customWhitelist;
         for (std::vector<std::pair<SString, bool>>::iterator iter = result.begin(); iter != result.end(); ++iter)
@@ -630,7 +729,7 @@ std::unordered_set<SString> CWebCore::AllowPendingPages(bool bRemember)
     }
 
     auto allowedRequests(std::move(m_PendingRequests));
-    m_PendingRequests.clear();            // MSVC's move constructor already clears the list which isn't specified by the C++ standard though
+    m_PendingRequests.clear();  // MSVC's move constructor already clears the list which isn't specified by the C++ standard though
 
     return allowedRequests;
 }
@@ -684,7 +783,7 @@ void CWebCore::OnPostScreenshot()
 
 void CWebCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    dassert(g_pCore->GetNetwork() != nullptr);            // Ensure network module is loaded
+    dassert(g_pCore->GetNetwork() != nullptr);  // Ensure network module is loaded
     for (auto& webView : m_WebViews)
     {
         if (auto browser = webView->GetCefBrowser(); browser) [[likely]]
@@ -976,6 +1075,9 @@ void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
 
     if (result.bSuccess)
     {
+        if (result.dataSize > 1024 * 1024) [[unlikely]]
+            return;
+
         SString strData = result.pData;
         SString strWhiteRevision, strBlackRevision;
         strData.Split(";", &strWhiteRevision, &strBlackRevision);
@@ -1023,10 +1125,21 @@ void CWebCore::StaticFetchWhitelistFinished(const SHttpDownloadResult& result)
     if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
+    if (result.dataSize > 5 * 1024 * 1024) [[unlikely]]
+    {
+        return;
+    }
+
     CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> whitelist;
     SString              strData = result.pData;
     strData.Split(";", whitelist);
+
+    if (whitelist.size() > 50000) [[unlikely]]
+    {
+        whitelist.resize(50000);
+    }
+
     CXMLNode* pListNode = pRootNode->FindSubNode("globalwhitelist");
     if (!pListNode)
         return;
@@ -1069,10 +1182,21 @@ void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
     if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
+    if (result.dataSize > 5 * 1024 * 1024) [[unlikely]]
+    {
+        return;
+    }
+
     CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> blacklist;
     SString              strData = result.pData;
     strData.Split(";", blacklist);
+
+    if (blacklist.size() > 50000) [[unlikely]]
+    {
+        blacklist.resize(50000);
+    }
+
     CXMLNode* pListNode = pRootNode->FindSubNode("globalblacklist");
     if (!pListNode)
         return;

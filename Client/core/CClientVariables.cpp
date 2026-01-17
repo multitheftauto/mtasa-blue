@@ -242,7 +242,6 @@ void CClientVariables::ValidateValues()
     FPSLimits::IsValidAndSetValid(fps, fps);
     CVARS_SET("fps_limit", fps);
 
-
     ClampValue("chat_font", 0, 3);
     ClampValue("chat_lines", 3, 62);
     ClampValue("chat_color", CColor(0, 0, 0, 0), CColor(255, 255, 255, 255));
@@ -286,118 +285,120 @@ void CClientVariables::LoadDefaults()
 
     if (!Exists("nick"))
     {
-        DEFAULT("nick", _S(CNickGen::GetRandomNickname()));            // nickname
-        CCore::GetSingleton().RequestNewNickOnStart();                 // Request the user to set a new nickname
+        DEFAULT("nick", _S(CNickGen::GetRandomNickname()));  // nickname
+        CCore::GetSingleton().RequestNewNickOnStart();       // Request the user to set a new nickname
     }
 
-    DEFAULT("host", _S("127.0.0.1"));                                    // hostname
-    DEFAULT("port", 22003);                                              // port
-    DEFAULT("password", _S(""));                                         // password
-    DEFAULT("debugfile", _S(""));                                        // debug filename
-    DEFAULT("console_pos", CVector2D(0, 0));                             // console position
-    DEFAULT("console_size", CVector2D(200, 200));                        // console size
-    DEFAULT("serverbrowser_size", CVector2D(720.0f, 495.0f));            // serverbrowser size
-    DEFAULT("fps_limit", 100);                                           // frame limiter
-    DEFAULT("vsync", true);                                              // vsync
-    DEFAULT("chat_font", 2);                                             // chatbox font type
-    DEFAULT("chat_lines", 10);                                           // chatbox lines
-    DEFAULT("chat_color", CColor(0, 0, 0, 0));                           // chatbox background color
-    DEFAULT("chat_text_color", CColor(172, 213, 254, 255));              // chatbox text color
+    DEFAULT("host", _S("127.0.0.1"));                          // hostname
+    DEFAULT("port", 22003);                                    // port
+    DEFAULT("password", _S(""));                               // password
+    DEFAULT("debugfile", _S(""));                              // debug filename
+    DEFAULT("console_pos", CVector2D(0, 0));                   // console position
+    DEFAULT("console_size", CVector2D(200, 200));              // console size
+    DEFAULT("serverbrowser_size", CVector2D(720.0f, 495.0f));  // serverbrowser size
+    DEFAULT("fps_limit", 100);                                 // frame limiter
+    DEFAULT("vsync", true);                                    // vsync
+    DEFAULT("chat_font", 2);                                   // chatbox font type
+    DEFAULT("chat_lines", 10);                                 // chatbox lines
+    DEFAULT("chat_color", CColor(0, 0, 0, 0));                 // chatbox background color
+    DEFAULT("chat_text_color", CColor(172, 213, 254, 255));    // chatbox text color
     DEFAULT("chat_text_outline", false);
-    DEFAULT("chat_input_color", CColor(0, 0, 0, 0));                           // chatbox input background color
-    DEFAULT("chat_input_prefix_color", CColor(172, 213, 254, 255));            // chatbox input prefix color
-    DEFAULT("chat_input_text_color", CColor(172, 213, 254, 255));              // chatbox input text color
-    DEFAULT("chat_scale", CVector2D(1.0f, 1.0f));                              // chatbox scale
-    DEFAULT("chat_width", 1.5f);                                               // chatbox width
+    DEFAULT("chat_input_color", CColor(0, 0, 0, 0));                 // chatbox input background color
+    DEFAULT("chat_input_prefix_color", CColor(172, 213, 254, 255));  // chatbox input prefix color
+    DEFAULT("chat_input_text_color", CColor(172, 213, 254, 255));    // chatbox input text color
+    DEFAULT("chat_scale", CVector2D(1.0f, 1.0f));                    // chatbox scale
+    DEFAULT("chat_width", 1.5f);                                     // chatbox width
 
-    DEFAULT("chat_css_style_text", false);                                            // chatbox css/hl style text
-    DEFAULT("chat_css_style_background", false);                                      // chatbox css/hl style background
-    DEFAULT("chat_line_life", 12000);                                                 // chatbox line life time
-    DEFAULT("chat_line_fade_out", 3000);                                              // chatbox line fade out time
-    DEFAULT("chat_use_cegui", false);                                                 // chatbox uses cegui
-    DEFAULT("chat_nickcompletion", true);                                             // chatbox nick completion
-    DEFAULT("chat_position_offset_x", 0.0125f);                                       // chatbox relative x position offset
-    DEFAULT("chat_position_offset_y", 0.015f);                                        // chatbox relative y position offset
-    DEFAULT("chat_position_horizontal", Chat::Position::Horizontal::LEFT);            // chatbox horizontal position
-    DEFAULT("chat_position_vertical", Chat::Position::Vertical::TOP);                 // chatbox vertical position
-    DEFAULT("chat_text_alignment", Chat::Text::Align::LEFT);                          // chatbox horizontal text alignment
-    DEFAULT("server_can_flash_window", true);                                         // allow server to flash the window
-    DEFAULT("allow_tray_notifications", true);                                        // allow scripts to create tray balloon notifications
-    DEFAULT("text_scale", 1.0f);                                                      // text scale
-    DEFAULT("invert_mouse", false);                                                   // mouse inverting
-    DEFAULT("fly_with_mouse", false);                                                 // flying with mouse controls
-    DEFAULT("steer_with_mouse", false);                                               // steering with mouse controls
-    DEFAULT("classic_controls", false);                                               // classic/standard controls
-    DEFAULT("mastervolume", 1.0f);                                                    // master volume
-    DEFAULT("mtavolume", 1.0f);                                                       // custom sound's volume
-    DEFAULT("voicevolume", 1.0f);                                                     // voice chat output volume
-    DEFAULT("mapalpha", 155);                                                         // player map alpha
-    DEFAULT("mapimage", 0);                                                           // player map image
-    DEFAULT("browser_speed", 1);                                                      // Browser speed
-    DEFAULT("single_download", 0);                                                    // Single connection for downloads
-    DEFAULT("packet_tag", 0);                                                         // Tag network packets
-    DEFAULT("progress_animation", 1);                                                 // Progress spinner at the bottom of the screen
-    DEFAULT("update_build_type", 0);                                                  // 0-stable 1-test 2-nightly
-    DEFAULT("update_auto_install", 1);                                                // 0-off 1-on
-    DEFAULT("volumetric_shadows", 0);                                                 // Enable volumetric shadows
-    DEFAULT("aspect_ratio", 0);                                                       // Display aspect ratio
-    DEFAULT("hud_match_aspect_ratio", 1);                                             // GTA HUD should match the display aspect ratio
-    DEFAULT("anisotropic", 0);                                                        // Anisotropic filtering
-    DEFAULT("grass", 1);                                                              // Enable grass
-    DEFAULT("heat_haze", 1);                                                          // Enable heat haze
-    DEFAULT("tyre_smoke_enabled", 1);                                                 // Enable tyre smoke
-    DEFAULT("high_detail_vehicles", 0);                                               // Disable rendering high detail vehicles all the time
-    DEFAULT("high_detail_peds", 0);                                                   // Disable rendering high detail peds all the time
-    DEFAULT("blur", 1);                                                               // Enable blur
-    DEFAULT("corona_reflections", 0);                                                 // Disable corona rain reflections
-    DEFAULT("dynamic_ped_shadows", 0);                                                // Disable dynamic ped shadows
-    DEFAULT("fast_clothes_loading", 1);                                               // 0-off 1-auto 2-on
-    DEFAULT("allow_screen_upload", 1);                                                // 0-off 1-on
-    DEFAULT("allow_external_sounds", 1);                                              // 0-off 1-on
-    DEFAULT("max_clientscript_log_kb", 5000);                                         // Max size in KB (0-No limit)
-    DEFAULT("display_fullscreen_style", 0);                                           // 0-standard 1-borderless 2-borderless keep res 3-borderless stretch
-    DEFAULT("display_windowed", 0);                                                   // 0-off 1-on
-    DEFAULT("multimon_fullscreen_minimize", 1);                                       // 0-off 1-on
-    DEFAULT("borderless_gamma_power", 0.95f);                                         // Gamma exponent applied to windowed gamma ramp (1.0 = unchanged)
-    DEFAULT("borderless_brightness_scale", 1.03f);                                    // Brightness multiplier for windowed gamma ramp (1.0 = unchanged)
-    DEFAULT("borderless_contrast_scale", 1.0f);                                       // Contrast multiplier for borderless presentation (1.0 = unchanged)
-    DEFAULT("borderless_saturation_scale", 1.0f);                                     // Saturation multiplier for borderless presentation (1.0 = unchanged)
-    DEFAULT("borderless_enable_srgb", false);                                         // Enable sRGB correction when running borderless
-    DEFAULT("borderless_gamma_enabled", false);                                       // Apply gamma adjustment while borderless tuning active
-    DEFAULT("borderless_brightness_enabled", false);                                  // Apply brightness adjustment while borderless tuning active
-    DEFAULT("borderless_contrast_enabled", false);                                    // Apply contrast adjustment while borderless tuning active
-    DEFAULT("borderless_saturation_enabled", false);                                  // Apply saturation adjustment while borderless tuning active
-    DEFAULT("borderless_apply_windowed", false);                                      // Apply display adjustments while windowed/borderless
-    DEFAULT("borderless_apply_fullscreen", false);                                   // Apply display adjustments while in exclusive fullscreen
+    DEFAULT("chat_css_style_text", false);                                  // chatbox css/hl style text
+    DEFAULT("chat_css_style_background", false);                            // chatbox css/hl style background
+    DEFAULT("chat_line_life", 12000);                                       // chatbox line life time
+    DEFAULT("chat_line_fade_out", 3000);                                    // chatbox line fade out time
+    DEFAULT("chat_use_cegui", false);                                       // chatbox uses cegui
+    DEFAULT("chat_nickcompletion", true);                                   // chatbox nick completion
+    DEFAULT("chat_position_offset_x", 0.0125f);                             // chatbox relative x position offset
+    DEFAULT("chat_position_offset_y", 0.015f);                              // chatbox relative y position offset
+    DEFAULT("chat_position_horizontal", Chat::Position::Horizontal::LEFT);  // chatbox horizontal position
+    DEFAULT("chat_position_vertical", Chat::Position::Vertical::TOP);       // chatbox vertical position
+    DEFAULT("chat_text_alignment", Chat::Text::Align::LEFT);                // chatbox horizontal text alignment
+    DEFAULT("server_can_flash_window", true);                               // allow server to flash the window
+    DEFAULT("allow_tray_notifications", true);                              // allow scripts to create tray balloon notifications
+    DEFAULT("text_scale", 1.0f);                                            // text scale
+    DEFAULT("invert_mouse", false);                                         // mouse inverting
+    DEFAULT("fly_with_mouse", false);                                       // flying with mouse controls
+    DEFAULT("steer_with_mouse", false);                                     // steering with mouse controls
+    DEFAULT("classic_controls", false);                                     // classic/standard controls
+    DEFAULT("mastervolume", 1.0f);                                          // master volume
+    DEFAULT("mtavolume", 1.0f);                                             // custom sound's volume
+    DEFAULT("voicevolume", 1.0f);                                           // voice chat output volume
+    DEFAULT("mapalpha", 155);                                               // player map alpha
+    DEFAULT("mapimage", 0);                                                 // player map image
+    DEFAULT("browser_speed", 1);                                            // Browser speed
+    DEFAULT("single_download", 0);                                          // Single connection for downloads
+    DEFAULT("packet_tag", 0);                                               // Tag network packets
+    DEFAULT("progress_animation", 1);                                       // Progress spinner at the bottom of the screen
+    DEFAULT("update_build_type", 0);                                        // 0-stable 1-test 2-nightly
+    DEFAULT("update_auto_install", 1);                                      // 0-off 1-on
+    DEFAULT("volumetric_shadows", 0);                                       // Enable volumetric shadows
+    DEFAULT("aspect_ratio", 0);                                             // Display aspect ratio
+    DEFAULT("hud_match_aspect_ratio", 1);                                   // GTA HUD should match the display aspect ratio
+    DEFAULT("anisotropic", 0);                                              // Anisotropic filtering
+    DEFAULT("grass", 1);                                                    // Enable grass
+    DEFAULT("heat_haze", 1);                                                // Enable heat haze
+    DEFAULT("tyre_smoke_enabled", 1);                                       // Enable tyre smoke
+    DEFAULT("high_detail_vehicles", 0);                                     // Disable rendering high detail vehicles all the time
+    DEFAULT("high_detail_peds", 0);                                         // Disable rendering high detail peds all the time
+    DEFAULT("blur", 1);                                                     // Enable blur
+    DEFAULT("corona_reflections", 0);                                       // Disable corona rain reflections
+    DEFAULT("dynamic_ped_shadows", 0);                                      // Disable dynamic ped shadows
+    DEFAULT("fast_clothes_loading", 1);                                     // 0-off 1-auto 2-on
+    DEFAULT("allow_screen_upload", 1);                                      // 0-off 1-on
+    DEFAULT("allow_external_sounds", 1);                                    // 0-off 1-on
+    DEFAULT("max_clientscript_log_kb", 5000);                               // Max size in KB (0-No limit)
+    DEFAULT("display_fullscreen_style", 0);                                 // 0-standard 1-borderless 2-borderless keep res 3-borderless stretch
+    DEFAULT("display_windowed", 0);                                         // 0-off 1-on
+    DEFAULT("multimon_fullscreen_minimize", 1);                             // 0-off 1-on
+    DEFAULT("borderless_gamma_power", 0.95f);                               // Gamma exponent applied to windowed gamma ramp (1.0 = unchanged)
+    DEFAULT("borderless_brightness_scale", 1.03f);                          // Brightness multiplier for windowed gamma ramp (1.0 = unchanged)
+    DEFAULT("borderless_contrast_scale", 1.0f);                             // Contrast multiplier for borderless presentation (1.0 = unchanged)
+    DEFAULT("borderless_saturation_scale", 1.0f);                           // Saturation multiplier for borderless presentation (1.0 = unchanged)
+    DEFAULT("borderless_enable_srgb", false);                               // Enable sRGB correction when running borderless
+    DEFAULT("borderless_gamma_enabled", false);                             // Apply gamma adjustment while borderless tuning active
+    DEFAULT("borderless_brightness_enabled", false);                        // Apply brightness adjustment while borderless tuning active
+    DEFAULT("borderless_contrast_enabled", false);                          // Apply contrast adjustment while borderless tuning active
+    DEFAULT("borderless_saturation_enabled", false);                        // Apply saturation adjustment while borderless tuning active
+    DEFAULT("borderless_apply_windowed", false);                            // Apply display adjustments while windowed/borderless
+    DEFAULT("borderless_apply_fullscreen", false);                          // Apply display adjustments while in exclusive fullscreen
 
     if (Exists("borderless_enable_srgb"))
     {
-    bool legacyEnable = false;
+        bool legacyEnable = false;
         Get("borderless_enable_srgb", legacyEnable);
         Set("borderless_apply_windowed", legacyEnable);
     }
-    DEFAULT("vertical_aim_sensitivity", 0.0015f);                                     // 0.0015f is GTA default setting
-    DEFAULT("process_priority", 0);                                                   // 0-normal 1-above normal 2-high
-    DEFAULT("process_dpi_aware", false);                                              // Enable DPI awareness in core initialization
-    DEFAULT("mute_master_when_minimized", 0);                                         // 0-off 1-on
-    DEFAULT("mute_sfx_when_minimized", 0);                                            // 0-off 1-on
-    DEFAULT("mute_radio_when_minimized", 0);                                          // 0-off 1-on
-    DEFAULT("mute_mta_when_minimized", 0);                                            // 0-off 1-on
-    DEFAULT("mute_voice_when_minimized", 0);                                          // 0-off 1-on
-    DEFAULT("share_file_cache", 1);                                                   // 0-no 1-share client resource file cache with other MTA installs
-    DEFAULT("show_unsafe_resolutions", 0);                                            // 0-off 1-show resolutions that are higher that the desktop
-    DEFAULT("fov", 70);                                                               // Camera field of view
-    DEFAULT("browser_remote_websites", true);                                         // Load remote websites?
-    DEFAULT("browser_remote_javascript", true);                                       // Execute javascript on remote websites?
-    DEFAULT("filter_duplicate_log_lines", true);                                      // Filter duplicate log lines for debug view and clientscript.log
-    DEFAULT("always_show_transferbox", false);                                        // Should the transfer box always be visible for downloads? (and ignore scripted control)
-    DEFAULT("allow_discord_rpc", true);                                               // Enable Discord Rich Presence
-    DEFAULT("discord_rpc_share_data", false);                                         // Consistent Rich Presence data sharing
-    DEFAULT("discord_rpc_share_data_firsttime", false);                               // Display the user data sharing consent dialog box - for the first time
-    DEFAULT("browser_enable_gpu", true);                                              // Enable GPU in CEF? (allows stuff like WebGL to function)
-    DEFAULT("process_cpu_affinity", true);                                            // Set CPU 0 affinity to improve game performance and fix the known issue in single-threaded games
-    DEFAULT("ask_before_disconnect", true);                                           // Ask before disconnecting from a server
-    DEFAULT("allow_steam_client", false);                                             // Allow connecting with the local Steam client (to set GTA:SA ingame status)
+    DEFAULT("vertical_aim_sensitivity", 0.0015f);        // 0.0015f is GTA default setting
+    DEFAULT("process_priority", 0);                      // 0-normal 1-above normal 2-high
+    DEFAULT("process_dpi_aware", false);                 // Enable DPI awareness in core initialization
+    DEFAULT("mute_master_when_minimized", 0);            // 0-off 1-on
+    DEFAULT("mute_sfx_when_minimized", 0);               // 0-off 1-on
+    DEFAULT("mute_radio_when_minimized", 0);             // 0-off 1-on
+    DEFAULT("mute_mta_when_minimized", 0);               // 0-off 1-on
+    DEFAULT("mute_voice_when_minimized", 0);             // 0-off 1-on
+    DEFAULT("share_file_cache", 1);                      // 0-no 1-share client resource file cache with other MTA installs
+    DEFAULT("show_unsafe_resolutions", 0);               // 0-off 1-show resolutions that are higher that the desktop
+    DEFAULT("fov", 70);                                  // Camera field of view
+    DEFAULT("browser_remote_websites", true);            // Load remote websites?
+    DEFAULT("browser_remote_javascript", true);          // Execute javascript on remote websites?
+    DEFAULT("filter_duplicate_log_lines", true);         // Filter duplicate log lines for debug view and clientscript.log
+    DEFAULT("always_show_transferbox", false);           // Should the transfer box always be visible for downloads? (and ignore scripted control)
+    DEFAULT("allow_discord_rpc", true);                  // Enable Discord Rich Presence
+    DEFAULT("discord_rpc_share_data", false);            // Consistent Rich Presence data sharing
+    DEFAULT("discord_rpc_share_data_firsttime", false);  // Display the user data sharing consent dialog box - for the first time
+    DEFAULT("browser_enable_gpu", true);                 // Enable GPU in CEF? (allows stuff like WebGL to function)
+    DEFAULT("process_cpu_affinity", true);               // Set CPU 0 affinity to improve game performance and fix the known issue in single-threaded games
+    DEFAULT("ask_before_disconnect", true);              // Ask before disconnecting from a server
+    DEFAULT("allow_steam_client", false);                // Allow connecting with the local Steam client (to set GTA:SA ingame status)
+    DEFAULT("use_mouse_sensitivity_for_aiming",
+            false);  // It uses the horizontal mouse sensitivity for aiming, making the Y-axis sensitivity the same as the X-axis
 
     if (!Exists("locale"))
     {
@@ -420,5 +421,4 @@ void CClientVariables::LoadDefaults()
 
 #undef DEFAULT
 #undef _S
-
 }

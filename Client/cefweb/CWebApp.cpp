@@ -16,9 +16,18 @@
 #include <cef3/cef/include/cef_stream.h>
 #include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
 #include "CAjaxResourceHandler.h"
+#include "CWebAppAuth.h"  // IPC code generation
+#include <cstdlib>
 
 namespace
 {
+    // Helper to detect Wine/Proton environment
+    bool IsRunningOnWine()
+    {
+        HMODULE hNtdll = GetModuleHandle("ntdll.dll");
+        return hNtdll && GetProcAddress(hNtdll, "wine_get_version");
+    }
+
     // Centralises command-line switch setup so both pre-launch callbacks stay in sync
     void ConfigureCommandLineSwitches(const CefRefPtr<CefCommandLine>& commandLine, const CefString& processType)
     {
@@ -30,7 +39,16 @@ namespace
             return;
 
         // Always provide base installation paths so loader-proxy can validate subprocess origin
-        const SString gtaPath = GetCommonRegistryValue("", "GTA:SA Path");
+        SString gtaPath = GetCommonRegistryValue("", "GTA:SA Path");
+        if (gtaPath.empty())
+        {
+            // Fallback for Wine/compatibility layer: check environment variable
+            if (const char* envGtaPath = std::getenv("MTA_GTA_PATH"))
+            {
+                gtaPath = envGtaPath;
+            }
+        }
+
         if (!gtaPath.empty())
         {
             commandLine->AppendSwitchWithValue("mta-gta-path", gtaPath);
@@ -70,17 +88,29 @@ namespace
             }
         }
 
+        // Wine/Proton compatibility: Allow GPU unless explicitly disabled or forced software
+        if (IsRunningOnWine())
+        {
+            if (std::getenv("MTA_FORCE_SOFTWARE_RENDERING"))
+            {
+                disableGpu = true;
+            }
+            else
+            {
+                // In Wine, we generally want to try GPU (DXVK handles it well)
+                // But disable-gpu-compositing is already set above which is key
+                // If user hasn't explicitly disabled GPU in cvars, let it run
+            }
+        }
+
         if (disableGpu)
             commandLine->AppendSwitch("disable-gpu");
     }
-}            // namespace
+}  // namespace
 
 [[nodiscard]] CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
 {
-    auto stream = CefStreamReader::CreateForData(
-        (void*)strError.c_str(), 
-        strError.length()
-    );
+    auto stream = CefStreamReader::CreateForData((void*)strError.c_str(), strError.length());
     if (!stream)
         return nullptr;
     return CefRefPtr<CefResourceHandler>(new CefStreamResourceHandler(uiError, strError, "text/plain", CefResponse::HeaderMap(), stream));
@@ -96,21 +126,13 @@ void CWebApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
     if (!command_line)
         return;
 
-    // Add GTA path and MTA base path switches before g_pCore check
-    // This callback runs in both browser process and subprocess
-    // In subprocess, g_pCore is NULL, so switches must be added before that check
-    // Read GTA path from registry
-    int iResult = 0;
-    const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iResult);
-    if (!strGTAPath.empty())
-    {
-        // Pass GTA directory path to CEFLauncher subprocess via command-line switch
-        // CEF's AppendSwitchWithValue handles quoting automatically
-        command_line->AppendSwitchWithValue("mta-gta-path", strGTAPath);
-        // AddReportLog only available in browser process where g_pCore exists
-    }
     const CefString processType = command_line->GetSwitchValue("type");
     ConfigureCommandLineSwitches(command_line, processType);
+
+    // Attach IPC validation code for render processes
+    // This runs in browser process context where g_pCore and webCore are valid
+    // The auth code is generated in CWebCore constructor and passed to subprocesses
+    WebAppAuth::AttachAuthCodeToCommandLine(command_line);
 }
 
 CefRefPtr<CefBrowserProcessHandler> CWebApp::GetBrowserProcessHandler()
@@ -158,10 +180,10 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
         if (std::size(path) < 2)
             return HandleError("404 - Not found", 404);
 
-        path = path.substr(1);            // Remove slash at the front
+        path = path.substr(1);  // Remove slash at the front
         if (const auto slashPos = path.find('/'); slashPos == std::string::npos)
         {
-            static constexpr auto ERROR_404 = "404 - Not found";
+            static constexpr auto         ERROR_404 = "404 - Not found";
             static constexpr unsigned int CODE_404 = 404;
             return HandleError(ERROR_404, CODE_404);
         }
@@ -172,7 +194,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 
             if (resourcePath.empty())
             {
-                static constexpr auto ERROR_404 = "404 - Not found";
+                static constexpr auto         ERROR_404 = "404 - Not found";
                 static constexpr unsigned int CODE_404 = 404;
                 return HandleError(ERROR_404, CODE_404);
             }
@@ -191,8 +213,8 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 
             if (pWebView->HasAjaxHandler(resourcePath))
             {
-                std::vector<SString> vecGet;
-                std::vector<SString> vecPost;
+                std::vector<std::string> vecGet;
+                std::vector<std::string> vecPost;
 
                 if (urlParts.query.str)
                 {
@@ -200,6 +222,10 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     std::vector<SString> vecTmp;
                     vecTmp.reserve(8);  // Reserve space for common query parameter count
                     strGet.Split("&", vecTmp);
+
+                    const size_t paramCount = vecTmp.size();
+                    if (paramCount > 0)
+                        vecGet.reserve(vecGet.size() + paramCount * 2);
 
                     SString key;
                     SString value;
@@ -222,7 +248,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     {
                         // Limit to 5MiB and allow byte data only
                         constexpr size_t MAX_POST_SIZE = 5 * 1024 * 1024;
-                        size_t bytesCount = post->GetBytesCount();
+                        size_t           bytesCount = post->GetBytesCount();
                         if (bytesCount > MAX_POST_SIZE || post->GetType() != CefPostDataElement::Type::PDE_TYPE_BYTES)
                             continue;
 
@@ -239,6 +265,10 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                         vecTmp.reserve(8);
                         postParam.Split("&", vecTmp);
 
+                        const size_t postParamCount = vecTmp.size();
+                        if (postParamCount > 0)
+                            vecPost.reserve(vecPost.size() + postParamCount * 2);
+
                         for (auto&& param : vecTmp)
                         {
                             param.Split("=", &key, &value);
@@ -248,7 +278,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     }
                 }
 
-                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(vecGet, vecPost, mimeType));
+                CefRefPtr<CAjaxResourceHandler> handler(new CAjaxResourceHandler(std::move(vecGet), std::move(vecPost), mimeType));
                 pWebView->HandleAjaxRequest(resourcePath, handler.get());
                 return handler;
             }
@@ -261,7 +291,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                 // Calculate absolute path
                 if (!pWebView->GetFullPathFromLocal(path))
                 {
-                    static constexpr auto ERROR_404 = "404 - Not found";
+                    static constexpr auto         ERROR_404 = "404 - Not found";
                     static constexpr unsigned int CODE_404 = 404;
                     return HandleError(ERROR_404, CODE_404);
                 }
@@ -270,7 +300,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                 CBuffer fileData;
                 if (!pWebView->VerifyFile(path, fileData))
                 {
-                    static constexpr auto ERROR_403 = "403 - Access Denied";
+                    static constexpr auto         ERROR_403 = "403 - Access Denied";
                     static constexpr unsigned int CODE_403 = 403;
                     return HandleError(ERROR_403, CODE_403);
                 }
@@ -282,17 +312,14 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     fileData = CBuffer(emptyStr, std::size(emptyStr));
                 }
 
-                auto stream = CefStreamReader::CreateForData(
-                    fileData.GetData(),
-                    fileData.GetSize()
-                );
+                auto stream = CefStreamReader::CreateForData(fileData.GetData(), fileData.GetSize());
                 if (!stream)
                 {
-                    static constexpr auto ERROR_404 = "404 - Not found";
+                    static constexpr auto         ERROR_404 = "404 - Not found";
                     static constexpr unsigned int CODE_404 = 404;
                     return HandleError(ERROR_404, CODE_404);
                 }
-                    
+
                 return CefRefPtr<CefResourceHandler>(new CefStreamResourceHandler(mimeType, stream));
             }
         }

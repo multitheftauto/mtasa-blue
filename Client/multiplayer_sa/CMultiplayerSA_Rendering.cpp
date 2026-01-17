@@ -9,14 +9,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-extern CCoreInterface*   g_pCore;
-GameEntityRenderHandler* pGameEntityRenderHandler = nullptr;
-PreRenderSkyHandler*     pPreRenderSkyHandlerHandler = nullptr;
-RenderHeliLightHandler*  pRenderHeliLightHandler = nullptr;
-RenderEverythingBarRoadsHandler*  pRenderEverythingBarRoadsHandler = nullptr;
+extern CCoreInterface*           g_pCore;
+GameEntityRenderHandler*         pGameEntityRenderHandler = nullptr;
+PreRenderSkyHandler*             pPreRenderSkyHandlerHandler = nullptr;
+RenderHeliLightHandler*          pRenderHeliLightHandler = nullptr;
+RenderEverythingBarRoadsHandler* pRenderEverythingBarRoadsHandler = nullptr;
 
-#define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
-#define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
+#define VAR_CCullZones_NumMirrorAttributeZones 0x0C87AC4  // int
+#define VAR_CMirrors_d3dRestored               0x0C7C729  // uchar
 
 namespace
 {
@@ -24,7 +24,7 @@ namespace
     CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
     bool                ms_bIsMinimizedAndNotConnected = false;
     int                 ms_iSavedNumMirrorZones = 0;
-}            // namespace
+}  // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -44,14 +44,15 @@ void OnMY_CallIdle_Post(RwGeometry* pGeometry, DWORD calledFrom)
 }
 
 // Hook info
-#define HOOKPOS_CallIdle                         0x53ECBD
-#define HOOKSIZE_CallIdle                        5
-DWORD RETURN_CallIdle = 0x53ECC2;
-DWORD DO_CallIdle = 0x53E920;
+#define HOOKPOS_CallIdle  0x53ECBD
+#define HOOKSIZE_CallIdle 5
+DWORD                         RETURN_CallIdle = 0x53ECC2;
+DWORD                         DO_CallIdle = 0x53E920;
 static void __declspec(naked) HOOK_CallIdle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -68,6 +69,7 @@ static void __declspec(naked) HOOK_CallIdle()
 
         jmp     RETURN_CallIdle
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -108,18 +110,19 @@ void OnMY_CEntity_Render_Post()
     if (ms_Rendering)
     {
         ms_Rendering = NULL;
-        CallGameEntityRenderHandler(ms_RenderingOneNonRoad);            // restore value set in RenderOneNonRoad
+        CallGameEntityRenderHandler(ms_RenderingOneNonRoad);  // restore value set in RenderOneNonRoad
     }
 }
 
 // Hook info
-#define HOOKPOS_CEntity_Render                         0x534310
-#define HOOKSIZE_CEntity_Render                        6
-DWORD RETURN_CEntity_Render = 0x534317;
+#define HOOKPOS_CEntity_Render  0x534310
+#define HOOKSIZE_CEntity_Render 6
+DWORD                         RETURN_CEntity_Render = 0x534317;
 static void __declspec(naked) HOOK_CEntity_Render()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -142,6 +145,7 @@ inner:
         mov     eax,dword ptr [esi+18h]
         jmp     RETURN_CEntity_Render
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -168,13 +172,14 @@ void OnMY_CEntity_RenderOneNonRoad_Post(CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntity_RenderOneNonRoad                         0x553260
-#define HOOKSIZE_CEntity_RenderOneNonRoad                        5
-DWORD RETURN_CEntity_RenderOneNonRoad = 0x553265;
+#define HOOKPOS_CEntity_RenderOneNonRoad  0x553260
+#define HOOKSIZE_CEntity_RenderOneNonRoad 5
+DWORD                         RETURN_CEntity_RenderOneNonRoad = 0x553265;
 static void __declspec(naked) HOOK_CEntity_RenderOneNonRoad()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -202,6 +207,7 @@ inner:
         mov     esi, [esp+08h]
         jmp     RETURN_CEntity_RenderOneNonRoad
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -217,13 +223,14 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(CPedSAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid                0x733080
-#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid               6
-DWORD RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid  0x733080
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid 6
+DWORD                         RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
 static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -236,6 +243,7 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(
         mov     ecx,dword ptr [ebx+4F4h]
         jmp     RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -251,12 +259,13 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 }
 
 // Hook info
-#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_End                0x73314D
-#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End               5
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_End  0x73314D
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End 5
 static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -268,6 +277,7 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End(
         add         esp,0Ch
         ret
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -278,13 +288,14 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End(
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_Check_NoOfVisibleLods                         0x5534F9
-#define HOOKSIZE_Check_NoOfVisibleLods                        6
-DWORD RETURN_Check_NoOfVisibleLods = 0x5534FF;
+#define HOOKPOS_Check_NoOfVisibleLods  0x5534F9
+#define HOOKSIZE_Check_NoOfVisibleLods 6
+DWORD                         RETURN_Check_NoOfVisibleLods = 0x5534FF;
 static void __declspec(naked) HOOK_Check_NoOfVisibleLods()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 999            // Array limit is 1000
@@ -294,6 +305,7 @@ limit:
         mov     dword ptr ds:[00B76840h],eax        // NoOfVisibleLods
         jmp     RETURN_Check_NoOfVisibleLods
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -304,13 +316,14 @@ limit:
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_Check_NoOfVisibleEntities                         0x55352D
-#define HOOKSIZE_Check_NoOfVisibleEntities                        6
-DWORD RETURN_Check_NoOfVisibleEntities = 0x553533;
+#define HOOKPOS_Check_NoOfVisibleEntities  0x55352D
+#define HOOKSIZE_Check_NoOfVisibleEntities 6
+DWORD                         RETURN_Check_NoOfVisibleEntities = 0x553533;
 static void __declspec(naked) HOOK_Check_NoOfVisibleEntities()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 999        // Array limit is 1000
@@ -320,6 +333,7 @@ limit:
         mov     dword ptr ds:[00B76844h],eax        // NoOfVisibleEntities
         jmp     RETURN_Check_NoOfVisibleEntities
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -334,13 +348,14 @@ void OnMY_WinLoop()
 }
 
 // Hook info
-#define HOOKPOS_WinLoop                            0x748A93
-#define HOOKSIZE_WinLoop                           5
-DWORD RETURN_WinLoop = 0x748A98;
+#define HOOKPOS_WinLoop  0x748A93
+#define HOOKSIZE_WinLoop 5
+DWORD                         RETURN_WinLoop = 0x748A98;
 static void __declspec(naked) HOOK_WinLoop()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -350,6 +365,7 @@ static void __declspec(naked) HOOK_WinLoop()
         mov     eax, ds:0x0C8D4C0
         jmp     RETURN_WinLoop
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -359,25 +375,90 @@ static void __declspec(naked) HOOK_WinLoop()
 // Just before GTA calculates frame time deltas
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTimer_Update               0x561B10
-#define HOOKSIZE_CTimer_Update              6
-static const DWORD CONTINUE_CTimer_Update = 0x561B16;
+#define HOOKPOS_CTimer_Update  0x561B10
+#define HOOKSIZE_CTimer_Update 6
+static const DWORD            CONTINUE_CTimer_Update = 0x561B16;
 static void __declspec(naked) HOOK_CTimer_Update()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
     g_pCore->OnGameTimerUpdate();
 
+    // clang-format off
     __asm
     {
         popad
-        mov     ecx,dword ptr ds:[0B7CB28h]
+        // Original code: mov ecx, ds:_timerFunction
+        // GTA has its own NULL check at 0x561B19, so we just execute the original instruction
+        mov     ecx, dword ptr ds:[0B7CB28h]
         jmp     CONTINUE_CTimer_Update
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CTimer::Suspend / CTimer::Resume
+//
+// Prevent crashes if _timerFunction is NULL during init
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CTimer_Suspend  0x5619E9
+#define HOOKSIZE_CTimer_Suspend 6
+static const DWORD           CONTINUE_CTimer_Suspend = 0x5619EF;
+static void _declspec(naked) HOOK_CTimer_Suspend()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    _asm
+    {
+        // Check if _timerFunction is NULL
+        mov     eax, dword ptr ds:[0B7CB28h]
+        test    eax, eax
+        jz      skip_suspend
+
+             // Original code: call [_timerFunction]
+        call    eax
+        jmp     CONTINUE_CTimer_Suspend
+        
+    skip_suspend:
+        // If NULL, return zero timestamp (EAX:EDX = 0) to avoid corrupting pause time
+        xor     eax, eax
+        xor     edx, edx
+        jmp     CONTINUE_CTimer_Suspend
+    }
+}
+
+#define HOOKPOS_CTimer_Resume  0x561A11
+#define HOOKSIZE_CTimer_Resume 6
+static const DWORD           CONTINUE_CTimer_Resume = 0x561A17;
+static void _declspec(naked) HOOK_CTimer_Resume()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    _asm
+    {
+        // Check if _timerFunction is NULL
+        mov     eax, dword ptr ds:[0B7CB28h]
+        test    eax, eax
+        jz      skip_resume
+
+             // Original code: call [_timerFunction]
+        call    eax
+        jmp     CONTINUE_CTimer_Resume
+        
+    skip_resume:
+        // If NULL, return zero timestamp (EAX:EDX = 0) to avoid corrupting resume time calculations
+        xor     eax, eax
+        xor     edx, edx
+        jmp     CONTINUE_CTimer_Resume
     }
 }
 
@@ -415,14 +496,15 @@ bool OnMY_psGrabScreen_ShouldUseRect()
 }
 
 // Hook info
-#define HOOKPOS_psGrabScreen                        0x7452FC
-#define HOOKSIZE_psGrabScreen                       5
-DWORD RETURN_psGrabScreen_YesChange = 0x745311;
-DWORD RETURN_psGrabScreen_NoChange = 0x745336;
+#define HOOKPOS_psGrabScreen  0x7452FC
+#define HOOKSIZE_psGrabScreen 5
+DWORD                         RETURN_psGrabScreen_YesChange = 0x745311;
+DWORD                         RETURN_psGrabScreen_NoChange = 0x745336;
 static void __declspec(naked) HOOK_psGrabScreen()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -445,6 +527,7 @@ use_rect:
 
         jmp     RETURN_psGrabScreen_YesChange
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -461,14 +544,15 @@ void OnMY_CClouds_RenderSkyPolys()
 }
 
 // Hook info
-#define HOOKCHECK_CClouds_RenderSkyPolys            0xA1
-#define HOOKPOS_CClouds_RenderSkyPolys              0x714650
-#define HOOKSIZE_CClouds_RenderSkyPolys             5
-DWORD RETURN_CClouds_RenderSkyPolys = 0x714655;
+#define HOOKCHECK_CClouds_RenderSkyPolys 0xA1
+#define HOOKPOS_CClouds_RenderSkyPolys   0x714650
+#define HOOKSIZE_CClouds_RenderSkyPolys  5
+DWORD                         RETURN_CClouds_RenderSkyPolys = 0x714655;
 static void __declspec(naked) HOOK_CClouds_RenderSkyPolys()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -478,6 +562,7 @@ static void __declspec(naked) HOOK_CClouds_RenderSkyPolys()
         mov     eax, ds:0x0B6F03C
         jmp     RETURN_CClouds_RenderSkyPolys
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -518,14 +603,15 @@ float OnMY_RwCameraSetNearClipPlane(DWORD dwCalledFrom, void* pUnknown, float fD
 }
 
 // Hook info
-#define HOOKCHECK_RwCameraSetNearClipPlane          0xD9
-#define HOOKPOS_RwCameraSetNearClipPlane            0x7EE1D0
-#define HOOKSIZE_RwCameraSetNearClipPlane           5
-DWORD RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
+#define HOOKCHECK_RwCameraSetNearClipPlane 0xD9
+#define HOOKPOS_RwCameraSetNearClipPlane   0x7EE1D0
+#define HOOKSIZE_RwCameraSetNearClipPlane  5
+DWORD                         RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
 static void __declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -541,6 +627,7 @@ static void __declspec(naked) HOOK_RwCameraSetNearClipPlane()
         push    esi
         jmp     RETURN_RwCameraSetNearClipPlane
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -552,27 +639,31 @@ static void __declspec(naked) HOOK_RwCameraSetNearClipPlane()
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_RenderEffects_HeliLight                           0x53E1B9
-#define HOOKSIZE_RenderEffects_HeliLight                          5
-DWORD RETURN_RenderEffects_HeliLight = 0x53E1BE;
+#define HOOKPOS_RenderEffects_HeliLight  0x53E1B9
+#define HOOKSIZE_RenderEffects_HeliLight 5
+DWORD                         RETURN_RenderEffects_HeliLight = 0x53E1BE;
 static void __declspec(naked) HOOK_RenderEffects_HeliLight()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
     // Call render handler
     if (pRenderHeliLightHandler) pRenderHeliLightHandler();
 
+    // clang-format off
     __asm
     {
         popad
         mov     eax, ds:[0xC1C96C]
         jmp     RETURN_RenderEffects_HeliLight
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -676,34 +767,29 @@ bool IsMatrixValid(RwMatrix* pMatrix)
     constexpr float maxValue = 100000.0;
     constexpr float minValue = -100000.0;
 
-    return
-        pMatrix->at.x >= minValue && pMatrix->at.x <= maxValue
-        && pMatrix->at.y >= minValue && pMatrix->at.y <= maxValue
-        && pMatrix->at.z >= minValue && pMatrix->at.y <= maxValue
+    return pMatrix->at.x >= minValue && pMatrix->at.x <= maxValue && pMatrix->at.y >= minValue && pMatrix->at.y <= maxValue && pMatrix->at.z >= minValue &&
+           pMatrix->at.y <= maxValue
 
-        && pMatrix->right.x >= minValue && pMatrix->right.x <= maxValue
-        && pMatrix->right.y >= minValue && pMatrix->right.y <= maxValue
-        && pMatrix->right.z >= minValue && pMatrix->right.y <= maxValue
+           && pMatrix->right.x >= minValue && pMatrix->right.x <= maxValue && pMatrix->right.y >= minValue && pMatrix->right.y <= maxValue &&
+           pMatrix->right.z >= minValue && pMatrix->right.y <= maxValue
 
-        && pMatrix->up.x >= minValue && pMatrix->up.x <= maxValue
-        && pMatrix->up.y >= minValue && pMatrix->up.y <= maxValue
-        && pMatrix->up.z >= minValue && pMatrix->up.y <= maxValue
+           && pMatrix->up.x >= minValue && pMatrix->up.x <= maxValue && pMatrix->up.y >= minValue && pMatrix->up.y <= maxValue && pMatrix->up.z >= minValue &&
+           pMatrix->up.y <= maxValue
 
-        && pMatrix->pos.x >= minValue && pMatrix->pos.x <= maxValue
-        && pMatrix->pos.y >= minValue && pMatrix->pos.y <= maxValue
-        && pMatrix->pos.z >= minValue && pMatrix->pos.y <= maxValue;
+           && pMatrix->pos.x >= minValue && pMatrix->pos.x <= maxValue && pMatrix->pos.y >= minValue && pMatrix->pos.y <= maxValue &&
+           pMatrix->pos.z >= minValue && pMatrix->pos.y <= maxValue;
 }
 
 bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
 {
-    uint32 atomicSkinOffset = *(uint32*)0xC978A4;
+    uint32            atomicSkinOffset = *(uint32*)0xC978A4;
     RpHAnimHierarchy* pSkinPluginData = *(RpHAnimHierarchy**)((char*)pAtomic + atomicSkinOffset);
 
     if (!pSkinPluginData)
         return true;
 
     unsigned __int32 count = pSkinPluginData->numNodes;
-    RwMatrix* pMatrixArray = pSkinPluginData->pMatrixArray;
+    RwMatrix*        pMatrixArray = pSkinPluginData->pMatrixArray;
 
     for (unsigned int i = 0; i < count; i++)
     {
@@ -714,12 +800,13 @@ bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
     return true;
 }
 
-#define HOOKPOS_CVisibilityPlugins_RenderPedCB                        0x7335B0
-#define HOOKSIZE_CVisibilityPlugins_RenderPedCB                       5
+#define HOOKPOS_CVisibilityPlugins_RenderPedCB  0x7335B0
+#define HOOKSIZE_CVisibilityPlugins_RenderPedCB 5
 static void __declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         push esi;
@@ -741,25 +828,28 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
         pop esi;
         retn;
     }
+    // clang-format on
 }
 
 // Hook info
-#define HOOKPOS_CRenderer_EverythingBarRoads                         0x553C78
-#define HOOKSIZE_CRenderer_EverythingBarRoads                        5
-DWORD RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
-DWORD DO_CRenderer_EverythingBarRoads = 0x7EE180;
+#define HOOKPOS_CRenderer_EverythingBarRoads  0x553C78
+#define HOOKSIZE_CRenderer_EverythingBarRoads 5
+DWORD                         RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
+DWORD                         DO_CRenderer_EverythingBarRoads = 0x7EE180;
 static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
-    if (pRenderEverythingBarRoadsHandler)
-        pRenderEverythingBarRoadsHandler();
+    if (pRenderEverythingBarRoadsHandler) pRenderEverythingBarRoadsHandler();
 
+    // clang-format off
     __asm
     {
         popad
@@ -767,6 +857,7 @@ static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
         jmp RETURN_CRenderer_EverythingBarRoads
 
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -788,6 +879,8 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstall(Check_NoOfVisibleEntities);
     EZHookInstall(WinLoop);
     EZHookInstall(CTimer_Update);
+    EZHookInstall(CTimer_Suspend);
+    EZHookInstall(CTimer_Resume);
     EZHookInstall(psGrabScreen);
     EZHookInstallChecked(CClouds_RenderSkyPolys);
     EZHookInstallChecked(RwCameraSetNearClipPlane);

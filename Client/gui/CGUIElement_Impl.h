@@ -20,7 +20,7 @@ namespace CEGUI
 {
     class Window;
     class EventArgs;
-}            // namespace CEGUI
+}
 class CGUI_Impl;
 
 class CGUIElement_Impl : public CGUIElement

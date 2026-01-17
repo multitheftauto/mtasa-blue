@@ -247,3 +247,15 @@ b42518e64803762d27fe6277b36044d1a71fc2c4
 # Date:   Mon Jun 12 19:01:59 2023 +0300
 #
 # Apply win-apply-clang-format.bat
+
+466c162fbd1af45b290849cc0771fab66f55ba34
+# Author: Dutchman101 <mcak105@outlook.com>
+# Date:   Wed April 9 19:01:39 2025 +0300
+#
+# Eliminate the use of http:// across whole project
+
+e7c3619a5d5e0b6bf352befde6ff33c5921032b2
+# Author: qaisjp
+# Date:   Wed Jan 7 16:42:45 2026 -0500
+#
+# codemod: disable clang-format for `__asm` directives (#4611)

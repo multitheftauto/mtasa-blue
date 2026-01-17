@@ -13,7 +13,7 @@
 #include "CAjaxResourceHandler.h"
 #undef min
 
-CAjaxResourceHandler::CAjaxResourceHandler(std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& strMime)
+CAjaxResourceHandler::CAjaxResourceHandler(std::vector<std::string> vecGet, std::vector<std::string> vecPost, const CefString& strMime)
     : m_vecGetData(std::move(vecGet)), m_vecPostData(std::move(vecPost)), m_strMime(strMime)
 {
 }
@@ -27,14 +27,20 @@ CAjaxResourceHandler::~CAjaxResourceHandler()
     m_callback = nullptr;
 }
 
-void CAjaxResourceHandler::SetResponse(const SString& data)
+void CAjaxResourceHandler::SetResponse(std::string data)
 {
     // Prevent response corruption: ignore subsequent calls after data is set
     if (m_bHasData) [[unlikely]]
         return;
 
-    m_strResponse = data;
+    m_strResponse = std::move(data);
     m_bHasData = true;
+
+    // Clear request data to free memory as it's no longer needed
+    m_vecGetData.clear();
+    m_vecGetData.shrink_to_fit();
+    m_vecPostData.clear();
+    m_vecPostData.shrink_to_fit();
 
     if (!m_callback)
         return;
@@ -60,24 +66,29 @@ void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, i
     constexpr int HTTP_OK = 200;
     response->SetStatus(HTTP_OK);
     response->SetStatusText("OK");
-    
+
     // Use default MIME type if none provided
     if (!m_strMime.empty())
         response->SetMimeType(m_strMime);
     else
         response->SetMimeType("application/octet-stream");
-    
+
     response_length = -1;
 }
 
 bool CAjaxResourceHandler::ProcessRequest([[maybe_unused]] CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
 {
-    // Don't call Continue() here - let ReadResponse handle async flow
-    // Calling Continue() immediately would use the callback before data is ready
+    if (!callback)
+        return false;
+
+    // Store callback so SetResponse can resume once data is ready
+    m_callback = callback;
+
+    // Do not call Continue() yet; SetResponse triggers it after data is prepared
     return true;
 }
 
-bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, CefRefPtr<CefCallback> callback)
+bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, [[maybe_unused]] CefRefPtr<CefCallback> callback)
 {
     // Validate input parameters first
     if (!data_out || bytes_to_read <= 0) [[unlikely]]
@@ -86,13 +97,10 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
         return false;
     }
 
-    // If we have no data yet, wait
+    // If we have no data yet, wait until SetResponse provides it
     if (!m_bHasData)
     {
         bytes_read = 0;
-        // Store callback only if we don't already have one (prevent overwrite/leak)
-        if (callback && !m_callback)
-            m_callback = callback;
         return true;
     }
 
@@ -108,10 +116,10 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
     const auto copyBytes = std::min(static_cast<size_t>(bytes_to_read), remainingBytes);
 
     memcpy(data_out, m_strResponse.c_str() + m_DataOffset, copyBytes);
-    
+
     // copyBytes is bounded by bytes_to_read (an int), so cast is always safe
     bytes_read = static_cast<int>(copyBytes);
-    
+
     m_DataOffset += copyBytes;
 
     return true;

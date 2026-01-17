@@ -227,13 +227,13 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
                                            iRenderTargetSizeY, g_pDeviceState->AdapterState.Name.c_str()));
             }
         }
-        m_iCacheTextureRevision = -1;            // Make sure the graphics will be updated
+        m_iCacheTextureRevision = -1;  // Make sure the graphics will be updated
     }
 
     // If we can't get a rendertarget for some reason, just render the text directly to the screen
     if (!m_pCacheTexture)
     {
-        drawList.bOutline = false;            // Outline too slow without cache texture
+        drawList.bOutline = false;  // Outline too slow without cache texture
         DrawDrawList(drawList, chatTopLeft);
         return;
     }
@@ -359,7 +359,7 @@ void CChat::GetDrawList(SDrawList& outDrawList, bool bUsingOutline)
 
         uiLine = (uiLine + 1) % CHAT_MAX_LINES;
         uiLinesDrawn++;
-        if (uiLine == m_uiMostRecentLine)            // Went through all lines?
+        if (uiLine == m_uiMostRecentLine)  // Went through all lines?
             break;
     }
 }
@@ -466,21 +466,21 @@ void CChat::UpdateSmoothScroll(float* pfPixelScroll, int* piLineScroll)
     // Also update CssStyle override alpha
     //
     float fTarget = (!m_bCssStyleText || m_bInputVisible || m_iScrollingBack) ? 1.0f : 0.0f;
-    float fMaxAmount = fDeltaSeconds * 2.0f;            // 0.5 seconds fade time
+    float fMaxAmount = fDeltaSeconds * 2.0f;  // 0.5 seconds fade time
     m_fCssStyleOverrideAlpha += Clamp(-fMaxAmount, fTarget - m_fCssStyleOverrideAlpha, fMaxAmount);
 
     //
     // Also update background alpha
     //
     fTarget = (!m_bCssStyleBackground || m_bInputVisible || m_iScrollingBack) ? 1.0f : 0.0f;
-    fMaxAmount = fDeltaSeconds * 5.0f;            // 0.2 seconds fade time
+    fMaxAmount = fDeltaSeconds * 5.0f;  // 0.2 seconds fade time
     m_fBackgroundAlpha += Clamp(-fMaxAmount, fTarget - m_fBackgroundAlpha, fMaxAmount);
 
     //
     // Also update input background alpha
     //
     fTarget = (m_bInputVisible) ? 1.0f : 0.0f;
-    fMaxAmount = fDeltaSeconds * 5.0f;            // 0.2 seconds fade time
+    fMaxAmount = fDeltaSeconds * 5.0f;  // 0.2 seconds fade time
     m_fInputBackgroundAlpha += Clamp(-fMaxAmount, fTarget - m_fInputBackgroundAlpha, fMaxAmount);
 }
 
@@ -660,14 +660,14 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                 else if (m_strCommand.compare("login") != 0)
                 {
                     // If the input is a command, check that it isn't the 'login' command, if it is censor it
-                    char szInput[256];
+                    char         szInput[256];
                     unsigned int uiLength = sizeof(szInput) - 1;
 
                     strncpy(szInput, m_strInputText.c_str() + 1, uiLength);
                     szInput[uiLength] = '\0';
 
                     const char* szCommand = strtok(szInput, " ");
-                    
+
                     if (szCommand && (strcmp(szCommand, "login") != 0))
                         m_pInputHistory->Add(m_strInputText);
                     else if ((m_pInputHistory->Empty() || m_pInputHistory->GetLast() != std::string("/login")))
@@ -768,7 +768,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             if (m_strLastPlayerName.size() != 0)
                 m_strLastPlayerName.clear();
 
-            if (KeyboardArgs.codepoint == 127)            // "delete" char, used to remove the previous word from input
+            if (KeyboardArgs.codepoint == 127)  // "delete" char, used to remove the previous word from input
             {
                 if (m_strInputText.size() > 0)
                 {
@@ -808,13 +808,13 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                 if (KeyboardArgs.codepoint >= 32)
                 {
                     unsigned int uiCharacter = KeyboardArgs.codepoint;
-                    if (uiCharacter < 127)            // we have any char from ASCII
+                    if (uiCharacter < 127)  // we have any char from ASCII
                     {
                         // injecting as is
                         m_strInputText += static_cast<char>(KeyboardArgs.codepoint);
                         SetInputText(m_strInputText.c_str());
                     }
-                    else            // we have any char from Extended ASCII, any ANSI code page or UNICODE range
+                    else  // we have any char from Extended ASCII, any ANSI code page or UNICODE range
                     {
                         // Generate a null-terminating string for our character
                         wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiCharacter), '\0'};
@@ -1195,21 +1195,21 @@ const char* CChatLine::Format(const char* text, float width, CColor& color, bool
     const wchar_t* sectionEnd = szString;
     const wchar_t* lastWrapPoint = szString;
     bool           lastSection = false;
-    while (!lastSection)            // iterate over sections
+    while (!lastSection)  // iterate over sections
     {
         m_Sections.resize(m_Sections.size() + 1);
         CChatLineSection& section = *(m_Sections.end() - 1);
         section.SetColor(color);
 
-        if (m_Sections.size() > 1 && colorCoded)            // If we've processed sections before
-            sectionEnd += 7;                               // skip the color code
+        if (m_Sections.size() > 1 && colorCoded)  // If we've processed sections before
+            sectionEnd += 7;                      // skip the color code
 
         sectionStart = sectionEnd;
         lastWrapPoint = sectionStart;
         unsigned int seekPos = 0;
         std::wstring strSectionStart = sectionStart;
 
-        while (true)            // find end of this section
+        while (true)  // find end of this section
         {
             float sectionWidth = CChat::GetTextExtent(UTF16ToMbUTF8(strSectionStart.substr(0, seekPos)).c_str(), g_pChat->m_vecScale.fX);
 

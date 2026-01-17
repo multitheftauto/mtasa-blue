@@ -43,19 +43,23 @@ CProjectileSA::~CProjectileSA()
 
         DWORD dwThis = (DWORD)this->GetInterface();
         DWORD dwFunc = this->GetInterface()->vtbl->Remove;
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
 
         dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             push    1           //delete too
             call    dwFunc
         }
+        // clang-format on
 
         this->BeingDeleted = true;
         //((CPoolsSA *)pGame->GetPools())->RemoveObject((CObject *)(CObjectSA *)this);

@@ -13,10 +13,10 @@
 
 #include <game/CStats.h>
 
-#define FUNC_GetStatValue                   0x558E40
-#define FUNC_ModifyStat                     0x55D090
-#define FUNC_SetStatValue                   0x55A070
-#define FUNC_CWeaponInfo_GetSkillStatIndex  0x743CD0
+#define FUNC_GetStatValue                  0x558E40
+#define FUNC_ModifyStat                    0x55D090
+#define FUNC_SetStatValue                  0x55A070
+#define FUNC_CWeaponInfo_GetSkillStatIndex 0x743CD0
 
 class CStatsSA : public CStats
 {

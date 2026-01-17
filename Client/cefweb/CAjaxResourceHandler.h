@@ -13,18 +13,19 @@
 #include <core/CAjaxResourceHandlerInterface.h>
 #include <cef3/cef/include/cef_resource_handler.h>
 #include <SString.h>
+#include <string>
 
 class CWebView;
 
 class CAjaxResourceHandler : public CefResourceHandler, public CAjaxResourceHandlerInterface
 {
 public:
-    CAjaxResourceHandler(std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& mimeType);
+    CAjaxResourceHandler(std::vector<std::string> vecGet, std::vector<std::string> vecPost, const CefString& mimeType);
     ~CAjaxResourceHandler();
 
-    std::vector<SString>& GetGetData() override { return m_vecGetData; }
-    std::vector<SString>& GetPostData() override { return m_vecPostData; }
-    void SetResponse(const SString& data) override;
+    std::vector<std::string>& GetGetData() override { return m_vecGetData; }
+    std::vector<std::string>& GetPostData() override { return m_vecPostData; }
+    void                      SetResponse(std::string data) override;
 
     // CefResourceHandler
     virtual void Cancel() override;
@@ -36,11 +37,11 @@ public:
     DISALLOW_COPY_AND_ASSIGN(CAjaxResourceHandler);
 
 private:
-    CefRefPtr<CefCallback> m_callback;
-    std::vector<SString>   m_vecGetData;
-    std::vector<SString>   m_vecPostData;
-    SString                m_strResponse;
-    CefString              m_strMime;
-    bool                   m_bHasData = false;
-    size_t                 m_DataOffset = 0;
+    CefRefPtr<CefCallback>   m_callback;
+    std::vector<std::string> m_vecGetData;
+    std::vector<std::string> m_vecPostData;
+    std::string              m_strResponse;
+    CefString                m_strMime;
+    bool                     m_bHasData = false;
+    size_t                   m_DataOffset = 0;
 };

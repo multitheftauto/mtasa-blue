@@ -30,7 +30,7 @@
 extern CGame* g_pGame;
 
 #if defined(_MSC_VER)
-#pragma warning(disable : 4355)            // warning C4355: 'this' : used in base member initializer list
+    #pragma warning(disable : 4355)  // warning C4355: 'this' : used in base member initializer list
 #endif
 
 CElement::CElement(CElement* pParent)
@@ -356,7 +356,7 @@ void CElement::ClearChildren()
     assert(m_pParent != this);
 
     // Process our children - Move up to our parent
-    if (!m_Children.empty())            // This check reduces cpu usage when unloading large maps (due to recursion)
+    if (!m_Children.empty())  // This check reduces cpu usage when unloading large maps (due to recursion)
     {
         while (!m_Children.empty())
             (*m_Children.begin())->SetParentObject(m_pParent, false);
@@ -438,10 +438,11 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
         return false;
 
-    CEvents* pEvents = g_pGame->GetEvents();
+    CEvents*      pEvents = g_pGame->GetEvents();
+    CEventContext eventContext;
 
     // Make sure our event-manager knows we're about to call an event
-    pEvents->PreEventPulse();
+    pEvents->PreEventPulse(&eventContext);
 
     // Call the event on our parents/us first
     CallParentEvent(szName, Arguments, this, pCaller);
@@ -450,12 +451,12 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     CallEventNoParent(szName, Arguments, this, pCaller);
 
     // Tell the event manager that we're done calling the event
-    pEvents->PostEventPulse();
+    pEvents->PostEventPulse(&eventContext);
 
     g_pGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, pCaller);
 
     // Return whether our event was cancelled or not
-    return (!pEvents->WasEventCancelled());
+    return !eventContext.IsCancelled();
 }
 
 bool CElement::DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction)
@@ -543,8 +544,8 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
     auto iter = m_CustomData.IterBegin();
     for (; iter != m_CustomData.IterEnd(); iter++)
     {
-        table->PushString(iter->first);                        // key
-        table->PushArgument(iter->second.Variable);            // value
+        table->PushString(iter->first);              // key
+        table->PushArgument(iter->second.Variable);  // value
     }
 
     return table;
@@ -768,7 +769,7 @@ bool CElement::DeleteCustomData(const CStringName& name)
         CLuaArguments Arguments;
         Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
-        Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
+        Arguments.PushArgument(CLuaArgument());  // Use nil as the new value to indicate the data has been removed
         if (!CallEvent("onElementDataChange", Arguments))
         {
             // Event was cancelled, restore previous value
@@ -865,7 +866,7 @@ bool CElement::LoadFromCustomData(CEvents* pEvents, CXMLNode& Node)
 void CElement::OnSubtreeAdd(CElement* pElement)
 {
     // Call the event on the elements that references us
-    if (!m_ElementReferenced.empty())            // This check reduces cpu usage when loading large maps (due to recursion)
+    if (!m_ElementReferenced.empty())  // This check reduces cpu usage when loading large maps (due to recursion)
     {
         std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
         for (; iter != m_ElementReferenced.end(); iter++)
@@ -884,7 +885,7 @@ void CElement::OnSubtreeAdd(CElement* pElement)
 void CElement::OnSubtreeRemove(CElement* pElement)
 {
     // Call the event on the elements that references us
-    if (!m_ElementReferenced.empty())            // This check reduces cpu usage when unloading large maps (due to recursion)
+    if (!m_ElementReferenced.empty())  // This check reduces cpu usage when unloading large maps (due to recursion)
     {
         std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
         for (; iter != m_ElementReferenced.end(); iter++)
@@ -1038,7 +1039,7 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
 
     // Call it on all our children
     CElementListSnapshotRef childrenList = GetChildrenListSnapshot();
-	for (CElement* pElement : *childrenList)
+    for (CElement* pElement : *childrenList)
     {
         if (!pElement->IsBeingDeleted())
         {
@@ -1198,7 +1199,7 @@ bool CElement::IsAttachedToElement(CElement* pElement, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break;            // This should not be possible, but you never know
+                break;  // This should not be possible, but you never know
         }
 
         return false;

@@ -50,7 +50,7 @@ using SortDirections::SortDirection;
 class CGUIGridList : public CGUIElement
 {
 public:
-    virtual ~CGUIGridList(){};
+    virtual ~CGUIGridList() {};
 
     virtual unsigned int AddColumn(const char* szTitle, float fWidth) = 0;
     virtual void         RemoveColumn(unsigned int uiColumn) = 0;
@@ -82,6 +82,8 @@ public:
     virtual void SetVerticalScrollBar(bool bEnabled) = 0;
     virtual void SetSortingEnabled(bool bEnabled) = 0;
     virtual bool IsSortingEnabled() = 0;
+    virtual void SetAutoSortSuppressed(bool bSuppressed) = 0;
+    virtual bool IsAutoSortSuppressed() const = 0;
     virtual void SetItemImage(int iRow, int hColumn, CGUIStaticImage* pImage) = 0;
 
     virtual float GetHorizontalScrollPosition() = 0;

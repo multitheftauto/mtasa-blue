@@ -23,7 +23,7 @@ public:
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
     LUA_DECLARE(Dereference);
     LUA_DECLARE(Reference);
-    LUA_DECLARE(GetTickCount_);            // Trailing underscore to prevent macro issues
+    LUA_DECLARE(GetTickCount_);  // Trailing underscore to prevent macro issues
     LUA_DECLARE(GetCTime);
     LUA_DECLARE(Split);
     LUA_DECLARE(IsOOPEnabled);
