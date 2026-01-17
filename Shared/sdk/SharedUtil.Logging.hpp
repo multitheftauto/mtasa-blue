@@ -131,7 +131,7 @@ namespace SharedUtil
         if (info.iCount < 0)
             OutputDebugLine(SString("[InstanceCount] Count is negative (%d) for %s", info.iCount, *strName));
     }
-}  // namespace SharedUtil
+}
 
 #endif  // MTA_DEBUG
 

@@ -121,5 +121,5 @@ namespace SharedUtil
         int Rmdir(const char* szPath);
         int Delete(const char* szFilename);
         int Rename(const char* szOldFilename, const char* szNewFilename);
-    }  // namespace File
-}  // namespace SharedUtil
+    }
+}

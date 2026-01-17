@@ -132,4 +132,4 @@ namespace FPSLimits
         outValidFps = fpsToValidate;
         return true;
     }
-}  // namespace FPSLimits
+}

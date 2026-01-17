@@ -449,4 +449,4 @@ namespace SharedUtil
         UNCLOCK("Profiling", "Compile stats");
     }
 
-}  // namespace SharedUtil
+}

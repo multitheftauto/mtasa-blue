@@ -46,4 +46,4 @@ namespace SharedUtil
     { \
         dassert(IsSlowMem((const void*)(addr), size)); \
     }
-}  // namespace SharedUtil
+}

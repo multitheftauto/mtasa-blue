@@ -165,4 +165,4 @@ namespace SharedUtil
         hMem.dwFirstPage = 0;  // Invalidate handle
     }
 
-}  // namespace SharedUtil
+}

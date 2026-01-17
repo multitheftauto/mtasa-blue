@@ -119,4 +119,4 @@ namespace SharedUtil
         void Signal() { pthread_cond_signal(&cond); }
     };
 
-}  // namespace SharedUtil
+}

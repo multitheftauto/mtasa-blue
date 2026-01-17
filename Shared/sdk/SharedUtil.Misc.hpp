@@ -2936,7 +2936,7 @@ namespace SharedUtil
         return false;
     }
 
-}  // namespace SharedUtil
+}
 
 //
 // For checking MTA library module versions

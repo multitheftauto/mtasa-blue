@@ -280,4 +280,4 @@ namespace SharedUtil
         std::vector<SItem> itemList;
     };
 
-}  // namespace SharedUtil
+}

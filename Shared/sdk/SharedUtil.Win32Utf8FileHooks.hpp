@@ -366,4 +366,4 @@ namespace SharedUtil
 
         DetourTransactionCommit();
     }
-}  // namespace SharedUtil
+}

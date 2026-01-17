@@ -144,4 +144,4 @@ namespace SharedUtil
         float                 m_fNextMaxClearTime;
     };
 
-}  // namespace SharedUtil
+}

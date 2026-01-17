@@ -29,7 +29,7 @@ namespace SharedUtil
             AUTO,
             DISABLED,
         };
-    }  // namespace TrafficLight
+    }
 
     unsigned char GetTrafficLightStateFromColors(TrafficLight::EColor eColorNS, TrafficLight::EColor eColorEW);
 
@@ -132,4 +132,4 @@ namespace SharedUtil
 #define WD_COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME    "CR1"  // Counts consecutive crashes before the online game starts
 #define WD_COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN "CR2"  // Counts consecutive crashes before the loading screen is shown
 #define WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU "CR3"  // Counts consecutive crashes before the main menu is used
-}  // namespace SharedUtil
+}

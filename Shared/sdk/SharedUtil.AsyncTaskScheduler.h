@@ -96,5 +96,5 @@ namespace SharedUtil
         std::vector<std::unique_ptr<SBaseTask>> m_TaskResults;
         std::mutex                              m_TaskResultsMutex;
     };
-}  // namespace SharedUtil
+}
 #endif

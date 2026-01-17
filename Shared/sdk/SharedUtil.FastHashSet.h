@@ -67,6 +67,6 @@ namespace SharedUtil
         return true;
     }
 
-}  // namespace SharedUtil
+}
 
 #endif  // WITH_ALLOC_TRACKING

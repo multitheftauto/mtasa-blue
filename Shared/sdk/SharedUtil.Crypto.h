@@ -332,4 +332,4 @@ namespace SharedUtil
         return result;
     }
 
-}  // namespace SharedUtil
+}
