@@ -253,4 +253,4 @@ namespace SharedUtil
         return SColorRGBA(r, g, b, 0);
     }
 
-}  // namespace SharedUtil
+}

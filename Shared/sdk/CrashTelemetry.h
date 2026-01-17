@@ -144,7 +144,7 @@ namespace CrashTelemetry
             state.lastManualScope.hasData = true;
             state.lastManualScopeValid = true;
         }
-    }  // namespace detail
+    }
 
     inline void SetAllocationContext(std::size_t sizeBytes, const void* resourcePtr, const char* resourceTag, const char* detail) noexcept
     {
@@ -373,5 +373,5 @@ namespace CrashTelemetry
         Scope& operator=(Scope&&) = delete;
     };
     #endif
-}  // namespace CrashTelemetry
+}
 #endif

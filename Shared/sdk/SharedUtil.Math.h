@@ -142,4 +142,4 @@ namespace SharedUtil
         return (b - a) > std::max(std::fabs(a), std::fabs(b)) * epsilon;
     }
 
-}  // namespace SharedUtil
+}

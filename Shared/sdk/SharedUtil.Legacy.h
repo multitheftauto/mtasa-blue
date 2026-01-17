@@ -26,7 +26,7 @@ namespace SharedUtil
     {
         return a > b ? a : b;
     }
-}  // namespace SharedUtil
+}
 
 #ifndef PRId64
     #define PRId64 "lld"

@@ -235,7 +235,7 @@ namespace SharedUtil
     };
 
     CPerModuleTickCount ms_PerModuleTickCount;
-}  // namespace SharedUtil
+}
 
 long long SharedUtil::GetModuleTickCount64()
 {

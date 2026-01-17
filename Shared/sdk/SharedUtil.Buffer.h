@@ -395,4 +395,4 @@ namespace SharedUtil
 #endif
     };
 
-}  // namespace SharedUtil
+}

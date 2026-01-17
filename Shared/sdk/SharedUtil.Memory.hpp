@@ -192,4 +192,4 @@ namespace SharedUtil
         std::set_new_handler(&HandleMemoryAllocationFailure);
 #endif
     }
-}  // namespace SharedUtil
+}

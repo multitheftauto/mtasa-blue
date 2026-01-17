@@ -119,4 +119,4 @@ namespace SharedUtil
         pTimer->Reset();
     }
 
-}  // namespace SharedUtil
+}

@@ -136,7 +136,7 @@ namespace SharedUtil
         }
         return it->second;
     }
-}  // namespace SharedUtil
+}
 
 inline SString GetEmptyMapKey(SString*)
 {

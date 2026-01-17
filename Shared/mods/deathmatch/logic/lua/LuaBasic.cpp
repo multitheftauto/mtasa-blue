@@ -49,4 +49,4 @@ namespace lua
     }
 
     // Int types aren't Poppable directly, because they need to be checked for under/overflow, NaN, inf
-}  // namespace lua
+}

@@ -27,4 +27,4 @@ namespace SharedUtil
     bool TryGetProcessMemoryStats(ProcessMemoryStats& out);
 
     void SetMemoryAllocationFailureHandler();
-}  // namespace SharedUtil
+}

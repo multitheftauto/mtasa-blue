@@ -26,7 +26,7 @@ namespace bcrypt
     {
 #include <bcrypt/ow-crypt.h>
     }
-}  // namespace bcrypt
+}
 
 namespace SharedUtil
 {
@@ -898,4 +898,4 @@ namespace SharedUtil
 
         out->assign((char*)buffer.get(), numPasses * 4);
     }
-}  // namespace SharedUtil
+}

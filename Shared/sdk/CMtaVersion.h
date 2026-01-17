@@ -55,4 +55,4 @@ namespace SharedUtil
         SString GetGeneration() const { return SStringX(*this).SubStr(0, 3); }
     };
 
-}  // namespace SharedUtil
+}

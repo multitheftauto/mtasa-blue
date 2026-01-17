@@ -45,6 +45,6 @@ namespace SharedUtil
     bool         IsHotFixInstalled(const SString& strHotFixId);
     bool         GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo);
     bool         Is64BitOS();
-}  // namespace SharedUtil
+}
 
 #endif

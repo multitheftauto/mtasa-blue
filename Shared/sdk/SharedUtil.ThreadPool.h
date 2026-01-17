@@ -159,4 +159,4 @@ namespace SharedUtil
     {
         return CThreadPool::getDefaultThreadPool().enqueue(std::forward<Args>(args)...);
     }
-}  // namespace SharedUtil
+}

@@ -226,7 +226,7 @@ namespace std
     {
     public:
     };
-}  // namespace std
+}
 
     // Replace std classes
     // Not safe - do not enable this in distributed builds
