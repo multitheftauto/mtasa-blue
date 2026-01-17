@@ -320,17 +320,17 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
         ucSlot = 3;
         return true;
     }
-    if (us == 1115 || us == 1116)            // front bullbars
+    if (us == 1115 || us == 1116)  // front bullbars
     {
         ucSlot = 4;
         return true;
     }
-    if (us == 1109 || us == 1110)            // rear bullbars
+    if (us == 1109 || us == 1110)  // rear bullbars
     {
         ucSlot = 5;
         return true;
     }
-    if (us == 1013 || us == 1024)            // lamps
+    if (us == 1013 || us == 1024)  // lamps
     {
         ucSlot = 6;
         return true;
@@ -342,17 +342,17 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
         ucSlot = 7;
         return true;
     }
-    if (us == 1008 || us == 1009 || us == 1010)            // nitro
+    if (us == 1008 || us == 1009 || us == 1010)  // nitro
     {
         ucSlot = 8;
         return true;
     }
-    if (us == 1087)            // hydraulics
+    if (us == 1087)  // hydraulics
     {
         ucSlot = 9;
         return true;
     }
-    if (us == 1086)            // stereo
+    if (us == 1086)  // stereo
     {
         ucSlot = 10;
         return true;

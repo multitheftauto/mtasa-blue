@@ -25,7 +25,7 @@ public:
 
     eCGUIType GetType() { return CGUI_PROGRESSBAR; };
 
-    #include "CGUIElement_Inc.h"
+#include "CGUIElement_Inc.h"
 
 private:
 };

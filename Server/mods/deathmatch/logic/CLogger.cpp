@@ -106,7 +106,7 @@ void CLogger::ErrorPrintvf(const char* format, va_list vlist)
 
 void CLogger::DebugPrintf(const char* szFormat, ...)
 {
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     // Compose the formatted message
     char    szBuffer[MAX_STRING_LENGTH];
     va_list marker;
@@ -116,7 +116,7 @@ void CLogger::DebugPrintf(const char* szFormat, ...)
 
     // Timestamp and send to the console and logfile
     HandleLogPrint(true, "DEBUG: ", szBuffer, true, true, false);
-    #endif
+#endif
 }
 
 void CLogger::AuthPrintf(const char* szFormat, ...)

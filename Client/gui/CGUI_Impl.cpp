@@ -34,46 +34,46 @@ void CGUI_Impl::DestroyElementRecursive(CGUIElement* pElement)
     delete pElement;
 }
 
-#define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>
-#define CGUI_MTA_DEFAULT_FONT_BOLD  "tahomabd.ttf"      // %WINDIR%/font/<...>
-#define CGUI_MTA_CLEAR_FONT         "verdana.ttf"       // %WINDIR%/font/<...>
+#define CGUI_MTA_DEFAULT_FONT      "tahoma.ttf"    // %WINDIR%/font/<...>
+#define CGUI_MTA_DEFAULT_FONT_BOLD "tahomabd.ttf"  // %WINDIR%/font/<...>
+#define CGUI_MTA_CLEAR_FONT        "verdana.ttf"   // %WINDIR%/font/<...>
 
-#define CGUI_MTA_DEFAULT_REG        "Tahoma (TrueType)"
-#define CGUI_MTA_DEFAULT_REG_BOLD   "Tahoma Bold (TrueType)"
-#define CGUI_MTA_CLEAR_REG          "Verdana (TrueType)"
+#define CGUI_MTA_DEFAULT_REG      "Tahoma (TrueType)"
+#define CGUI_MTA_DEFAULT_REG_BOLD "Tahoma Bold (TrueType)"
+#define CGUI_MTA_CLEAR_REG        "Verdana (TrueType)"
 
-#define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont.ttf"  // GTA/MTA/<...>
-#define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
-#define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
-#define CGUI_SA_GOTHIC_FONT         "cgui/sagothic.ttf" // GTA/MTA/<...>
-#define CGUI_SA_HEADER_SIZE         26
-#define CGUI_SA_GOTHIC_SIZE         47
-#define CGUI_MTA_SANS_FONT_SIZE     9
+#define CGUI_MTA_SUBSTITUTE_FONT "cgui/unifont.ttf"   // GTA/MTA/<...>
+#define CGUI_MTA_SANS_FONT       "cgui/sans.ttf"      // GTA/MTA/<...>
+#define CGUI_SA_HEADER_FONT      "cgui/saheader.ttf"  // GTA/MTA/<...>
+#define CGUI_SA_GOTHIC_FONT      "cgui/sagothic.ttf"  // GTA/MTA/<...>
+#define CGUI_SA_HEADER_SIZE      26
+#define CGUI_SA_GOTHIC_SIZE      47
+#define CGUI_MTA_SANS_FONT_SIZE  9
 
-CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : 
-    m_HasSchemeLoaded(false), 
-    m_fCurrentServerCursorAlpha(1.0f),
-    m_pDevice(pDevice),
-    m_pRenderer(nullptr),
-    m_pSystem(nullptr),
-    m_pFontManager(nullptr),
-    m_pImageSetManager(nullptr),
-    m_pSchemeManager(nullptr),
-    m_pWindowManager(nullptr),
-    m_pTop(nullptr),
-    m_pCursor(nullptr),
-    m_pDefaultFont(nullptr),
-    m_pSmallFont(nullptr),
-    m_pBoldFont(nullptr),
-    m_pClearFont(nullptr),
-    m_pSAHeaderFont(nullptr),
-    m_pSAGothicFont(nullptr),
-    m_pSansFont(nullptr),
-    m_pUniFont(nullptr),
-    m_nextRedrawHandle(1),
-    m_ulPreviousUnique(0),
-    m_eInputMode(INPUTMODE_NO_BINDS_ON_EDIT),
-    m_Channel(INPUT_CORE)
+CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
+    : m_HasSchemeLoaded(false),
+      m_fCurrentServerCursorAlpha(1.0f),
+      m_pDevice(pDevice),
+      m_pRenderer(nullptr),
+      m_pSystem(nullptr),
+      m_pFontManager(nullptr),
+      m_pImageSetManager(nullptr),
+      m_pSchemeManager(nullptr),
+      m_pWindowManager(nullptr),
+      m_pTop(nullptr),
+      m_pCursor(nullptr),
+      m_pDefaultFont(nullptr),
+      m_pSmallFont(nullptr),
+      m_pBoldFont(nullptr),
+      m_pClearFont(nullptr),
+      m_pSAHeaderFont(nullptr),
+      m_pSAGothicFont(nullptr),
+      m_pSansFont(nullptr),
+      m_pUniFont(nullptr),
+      m_nextRedrawHandle(1),
+      m_ulPreviousUnique(0),
+      m_eInputMode(INPUTMODE_NO_BINDS_ON_EDIT),
+      m_Channel(INPUT_CORE)
 {
     m_RenderOkTimer.SetMaxIncrement(100);
 
@@ -142,7 +142,7 @@ CGUI_Impl::~CGUI_Impl()
     delete m_pSAHeaderFont;
     delete m_pSAGothicFont;
     delete m_pSansFont;
-    
+
     // Clean up CEGUI system - this automatically deletes the renderer
     delete CEGUI::System::getSingletonPtr();
     // DO NOT delete m_pRenderer - it's already deleted by System destructor
@@ -384,13 +384,13 @@ eInputMode CGUI_Impl::GetGUIInputMode()
 
 CEGUI::String CGUI_Impl::GetUTFString(const char* szInput)
 {
-    CEGUI::String strUTF = (CEGUI::utf8*)szInput;            // Convert into a CEGUI String
+    CEGUI::String strUTF = (CEGUI::utf8*)szInput;  // Convert into a CEGUI String
     return strUTF;
 }
 
 CEGUI::String CGUI_Impl::GetUTFString(const std::string& strInput)
 {
-    CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str();            // Convert into a CEGUI String
+    CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str();  // Convert into a CEGUI String
     return strUTF;
 }
 
@@ -860,7 +860,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
                 if (Wnd->getType() == "CGUI/Editbox" || Wnd->getType() == "CGUI/MultiLineEditbox")
                 {
-                    SString clipboardUtf8 = SharedUtil::GetClipboardText();
+                    SString      clipboardUtf8 = SharedUtil::GetClipboardText();
                     std::wstring strClipboardText;
                     try
                     {
@@ -1416,13 +1416,13 @@ bool CGUI_Impl::Event_RedrawRequested(const CEGUI::EventArgs& Args)
 
     // Get the master window (walks up parent hierarchy for child widgets)
     CEGUI::Window* pMasterWindow = GetMasterWindow(e.window);
-    
+
     CGUIElement* pElement = reinterpret_cast<CGUIElement*>(pMasterWindow->getUserData());
     if (pElement)
     {
         AddToRedrawQueue(pElement);
     }
-    
+
     // Immediate redraw of event source for visual responsiveness
     e.window->forceRedraw();
 
