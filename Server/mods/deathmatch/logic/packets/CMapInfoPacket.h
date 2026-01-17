@@ -32,12 +32,12 @@ public:
                             float fWaveHeight, const SWorldWaterLevelInfo& worldWaterLevelInfo, bool bHasSkyGradient, const SGarageStates& garageStates,
                             unsigned char ucSkyGradientTR, unsigned char ucSkyGradientTG, unsigned char ucSkyGradientTB, unsigned char ucSkyGradientBR,
                             unsigned char ucSkyGradientBG, unsigned char ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
-                            unsigned short fps = FPSLimits::FPS_MIN, bool bCloudsEnabled = true, float fJetpackMaxHeight = 100,
-                            bool bOverrideWaterColor = false, unsigned char ucWaterRed = 0, unsigned char ucWaterGreen = 0, unsigned char ucWaterBlue = 0,
-                            unsigned char ucWaterAlpha = 0, bool bInteriorSoundsEnabled = true, bool bOverrideRainLevel = false, float fRainLevel = 0,
-                            bool bOverrideSunSize = false, float fSunSize = 0, bool bOverrideSunColor = false, unsigned char ucSunCoreR = 0,
-                            unsigned char ucSunCoreG = 0, unsigned char ucSunCoreB = 0, unsigned char ucSunCoronaR = 0, unsigned char ucSunCoronaG = 0,
-                            unsigned char ucSunCoronaB = 0, bool bOverrideWindVelocity = false, float fWindVelX = 0, float fWindVelY = 0, float fWindVelZ = 0,
+                            unsigned short fps = FPSLimits::FPS_MIN, bool bCloudsEnabled = true, float fJetpackMaxHeight = 100, bool bOverrideWaterColor = false,
+                            unsigned char ucWaterRed = 0, unsigned char ucWaterGreen = 0, unsigned char ucWaterBlue = 0, unsigned char ucWaterAlpha = 0,
+                            bool bInteriorSoundsEnabled = true, bool bOverrideRainLevel = false, float fRainLevel = 0, bool bOverrideSunSize = false,
+                            float fSunSize = 0, bool bOverrideSunColor = false, unsigned char ucSunCoreR = 0, unsigned char ucSunCoreG = 0,
+                            unsigned char ucSunCoreB = 0, unsigned char ucSunCoronaR = 0, unsigned char ucSunCoronaG = 0, unsigned char ucSunCoronaB = 0,
+                            bool bOverrideWindVelocity = false, float fWindVelX = 0, float fWindVelY = 0, float fWindVelZ = 0,
                             bool bOverrideFarClipDistance = false, float fFarClip = 0, bool bOverrideFogDistance = false, float fFogDistance = 0,
                             float fAircraftMaxHeight = 800, float fAircraftMaxVelocity = 1.5f, bool bOverrideMoonSize = false, int iMoonSize = 3);
 

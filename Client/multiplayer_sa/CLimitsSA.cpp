@@ -19,8 +19,8 @@
 
 #include "StdInc.h"
 
-#define INTEGER_AT(addr) *(int*)(addr)
-#define FLOAT_AT(addr)   *(float*)(addr)
+#define INTEGER_AT(addr) *(int *)(addr)
+#define FLOAT_AT(addr) *(float *)(addr)
 
 int CLimitsSA::GetIPLFiles() const
 {

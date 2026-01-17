@@ -23,8 +23,8 @@
 #include "CDatabaseManager.h"
 #include "CRegistry.h"
 
-#define BLOCKED_DB_FILE_NAME  "fileblock.db"
-#define BLOCKED_DB_TABLE_NAME "`block_reasons`"
+#define BLOCKED_DB_FILE_NAME    "fileblock.db"
+#define BLOCKED_DB_TABLE_NAME   "`block_reasons`"
 
 // SResInfo - Item in list of potential resources - Used in Refresh()
 struct SResInfo
@@ -549,7 +549,7 @@ CResource* CResourceManager::GetResourceFromNetID(unsigned short usNetID)
     {
         if ((*iter)->GetNetID() == usNetID)
         {
-            assert(0);  // Should be in map
+            assert(0);            // Should be in map
             return (*iter);
         }
     }
@@ -1359,11 +1359,11 @@ void CResourceManager::ReevaluateSyncMapElementDataOption()
     {
         if (iter->second)
         {
-            bSyncMapElementData = true;  // Any 'true' will stop the set
+            bSyncMapElementData = true;            // Any 'true' will stop the set
             break;
         }
         else
-            bSyncMapElementData = false;  // Need at least one 'false' to set
+            bSyncMapElementData = false;            // Need at least one 'false' to set
     }
 
     // Apply

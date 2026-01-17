@@ -142,7 +142,7 @@ void CResourceFileDownloadManager::DoPulse()
         AddReportLog(7106, SString("Game - HTTPError (%s)", *m_strLastHTTPError));
 
         g_pCore->GetModManager()->RequestUnload();
-        g_pCore->ShowMessageBox(_("Error") + _E("CD20"), *m_strLastHTTPError, MB_BUTTON_OK | MB_ICON_ERROR);  // HTTP Error
+        g_pCore->ShowMessageBox(_("Error") + _E("CD20"), *m_strLastHTTPError, MB_BUTTON_OK | MB_ICON_ERROR);            // HTTP Error
         m_bIsTransferingFiles = false;
         return;
     }

@@ -198,7 +198,8 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql(CDatabas
     {
         SString strServerPath = g_pServerInterface->GetModManager()->GetServerPath();
         m_DbconmyLib.Load(PathJoin(strServerPath, SERVER_BIN_PATH_MOD, LIB_DBCONMY));
-        m_pfnNewDatabaseConnection = reinterpret_cast<NewDatabaseConnectionMySql_t*>(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql"));
+        m_pfnNewDatabaseConnection =
+            reinterpret_cast<NewDatabaseConnectionMySql_t*>(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql"));
     }
 
     if (!m_pfnNewDatabaseConnection)

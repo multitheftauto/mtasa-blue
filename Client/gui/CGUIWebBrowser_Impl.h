@@ -60,9 +60,9 @@ private:
 
     CWebViewInterface* m_pWebView;
 
-#define EXCLUDE_SET_SIZE  // WTF? TODO: Refactor this
-#include "CGUIElement_Inc.h"
-#undef EXCLUDE_SET_SIZE
+    #define EXCLUDE_SET_SIZE // WTF? TODO: Refactor this
+    #include "CGUIElement_Inc.h"
+    #undef EXCLUDE_SET_SIZE
 };
 
 // The purpose of this class is to provide an externally managed DirectX texture
@@ -75,12 +75,12 @@ public:
     virtual ushort getHeight() const override;
 
     // Override with empty function (--> eliminate the functinions from DirectX9Texture)
-    virtual void loadFromFile(const CEGUI::String& filename, const CEGUI::String& resourceGroup) override {};
-    virtual void loadFromMemory(const void* buffPtr, uint buffWidth, uint buffHeight) override {};
+    virtual void loadFromFile(const CEGUI::String& filename, const CEGUI::String& resourceGroup) override{};
+    virtual void loadFromMemory(const void* buffPtr, uint buffWidth, uint buffHeight) override{};
 
     virtual LPDIRECT3DTEXTURE9 getD3DTexture() const override;
-    virtual void               preD3DReset() {};
-    virtual void               postD3DReset() {};
+    virtual void               preD3DReset(){};
+    virtual void               postD3DReset(){};
 
 private:
     CWebViewInterface* m_pWebView;

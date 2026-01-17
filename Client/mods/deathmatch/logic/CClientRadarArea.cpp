@@ -48,7 +48,7 @@ void CClientRadarArea::DoPulse()
 
 void CClientRadarArea::DoPulse(bool bRender)
 {
-#define RADAR_FLASH_CYCLETIME 1000
+    #define RADAR_FLASH_CYCLETIME 1000
 
     // Suppose to show?
     if (m_bStreamedIn)

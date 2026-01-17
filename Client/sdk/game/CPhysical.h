@@ -16,7 +16,7 @@
 class CPhysical : public virtual CEntity
 {
 public:
-    virtual ~CPhysical() {};
+    virtual ~CPhysical(){};
 
     virtual CVector* GetMoveSpeed(CVector* vecMoveSpeed) = 0;
     virtual CVector* GetTurnSpeed(CVector* vecTurnSpeed) = 0;

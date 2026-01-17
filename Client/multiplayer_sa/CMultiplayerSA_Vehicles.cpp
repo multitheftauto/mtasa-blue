@@ -31,8 +31,8 @@ static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 //     0x6C2321 | 56             | push    esi
 //     0x6C2322 | 0F B6 74 24 0C | movzx   esi, [esp + doorId]
 //     0x6C2327 | 85 F6          | test    esi, esi
-#define HOOKPOS_CDamageManager__ProgressDoorDamage  0x6C2320
-#define HOOKSIZE_CDamageManager__ProgressDoorDamage 7
+#define HOOKPOS_CDamageManager__ProgressDoorDamage         0x6C2320
+#define HOOKSIZE_CDamageManager__ProgressDoorDamage        7
 static DWORD CONTINUE_CDamageManager__ProgressDoorDamage = 0x6C2327;
 
 static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()

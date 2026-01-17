@@ -16,5 +16,5 @@
 class CQuadBike : public virtual CAutomobile
 {
 public:
-    virtual ~CQuadBike() {};
+    virtual ~CQuadBike(){};
 };

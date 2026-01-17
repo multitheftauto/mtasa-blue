@@ -13,9 +13,13 @@
 void CLuaTeamDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"getTeamFromName", ArgumentParserWarn<false, GetTeamFromName>},   {"getTeamName", ArgumentParserWarn<false, GetTeamName>},
-        {"getTeamColor", ArgumentParserWarn<false, GetTeamColor>},         {"getTeamFriendlyFire", ArgumentParserWarn<false, GetTeamFriendlyFire>},
-        {"getPlayersInTeam", ArgumentParserWarn<false, GetPlayersInTeam>}, {"countPlayersInTeam", ArgumentParserWarn<false, CountPlayersInTeam>}};
+        {"getTeamFromName", ArgumentParserWarn<false, GetTeamFromName>},
+        {"getTeamName", ArgumentParserWarn<false, GetTeamName>},
+        {"getTeamColor", ArgumentParserWarn<false, GetTeamColor>},
+        {"getTeamFriendlyFire", ArgumentParserWarn<false, GetTeamFriendlyFire>},
+        {"getPlayersInTeam", ArgumentParserWarn<false, GetPlayersInTeam>},
+        {"countPlayersInTeam", ArgumentParserWarn<false, CountPlayersInTeam>}
+    };
 
     // Add functions
     for (const auto& [name, func] : functions)

@@ -30,7 +30,7 @@ void    ShowOOMMessageBox(HINSTANCE hInstance);
 
 struct GraphicsLibrary
 {
-    SString stem;  // filename without the final extension
+    SString stem;            // filename without the final extension
     SString absoluteFilePath;
     SString md5Hash;
     SString appLastHash;

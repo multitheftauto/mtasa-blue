@@ -14,12 +14,12 @@
 #include <list>
 
 #ifndef _MSC_VER
-    #include <stdint.h>
+#include <stdint.h>
 typedef int64_t __int64;
 #endif
 
-#define LIGHTSYNC_HEALTH_THRESHOLD         2.0f
-#define LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD 50.0f
+#define LIGHTSYNC_HEALTH_THRESHOLD          2.0f
+#define LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD  50.0f
 
 class CLightsyncManager
 {

@@ -15,7 +15,7 @@ template <typename Ret, typename Arguments>
 class CCallbackInterface
 {
 public:
-    virtual ~CCallbackInterface() {};
+    virtual ~CCallbackInterface(){};
 
     virtual Ret operator()(Arguments) const = 0;
 };
@@ -42,7 +42,7 @@ class CCallbackMethod : public CCallbackInterface<Ret, Arguments>
     typedef Ret (T::*F)(Arguments);
 
 public:
-    CCallbackMethod(F pfnMethod, T* pClass) : m_pfnMethod(pfnMethod), m_pClass(pClass) {};
+    CCallbackMethod(F pfnMethod, T* pClass) : m_pfnMethod(pfnMethod), m_pClass(pClass){};
 
     virtual Ret operator()(Arguments Args) const { return (m_pClass->*m_pfnMethod)(Args); }
 

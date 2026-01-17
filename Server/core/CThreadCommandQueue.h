@@ -13,8 +13,8 @@
 
 #ifdef WIN32
 
-    #include <list>
-    #include <string>
+#include <list>
+#include <string>
 
 class CThreadCommandQueue
 {

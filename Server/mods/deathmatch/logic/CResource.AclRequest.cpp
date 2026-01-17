@@ -123,6 +123,7 @@ bool CResource::HasAutoPermissions(CXMLNode* pNodeAclRequest)
 ///////////////////////////////////////////////////////////////
 void CResource::RefreshAutoPermissions(CXMLNode* pNodeAclRequest)
 {
+
     // Ensure group and acl exist
     CAccessControlListGroup* pAutoGroup = g_pGame->GetACLManager()->AddGroup(GetAutoGroupName());
     pAutoGroup->AddACL(GetAutoAcl());

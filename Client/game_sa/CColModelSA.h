@@ -16,8 +16,8 @@
 #include <game/CColPoint.h>
 #include "CCompressedVectorSA.h"
 
-#define FUNC_CColModel_Constructor 0x40FB60
-#define FUNC_CColModel_Destructor  0x40F700
+#define FUNC_CColModel_Constructor      0x40FB60
+#define FUNC_CColModel_Destructor       0x40F700
 
 struct CBoxSA
 {
@@ -65,9 +65,12 @@ struct CSphereSA
 {
     CVector m_center;
     float   m_radius;
-
+    
     // Validate radius is finite and non-negative
-    bool IsValidRadius() const { return std::isfinite(m_radius) && m_radius >= 0.0f && m_radius < 1000000.0f; }
+    bool IsValidRadius() const
+    {
+        return std::isfinite(m_radius) && m_radius >= 0.0f && m_radius < 1000000.0f;
+    }
 };
 static_assert(sizeof(CSphereSA) == 0x10, "Invalid size for CSphereSA");
 
@@ -100,10 +103,16 @@ struct CColSphereSA : CSphereSA
     std::uint8_t m_light{};
 
     CColSphereSA() = default;
-    CColSphereSA(const CSphereSA& sp) : CSphereSA{sp} {}
-
+    CColSphereSA(const CSphereSA& sp) :
+        CSphereSA{ sp }
+    {
+    }
+    
     // Validate material enum is in valid range
-    bool IsValidMaterial() const { return static_cast<std::uint8_t>(m_material) < static_cast<std::uint8_t>(EColSurfaceValue::SIZE); }
+    bool IsValidMaterial() const
+    {
+        return static_cast<std::uint8_t>(m_material) < static_cast<std::uint8_t>(EColSurfaceValue::SIZE);
+    }
 };
 static_assert(sizeof(CColSphereSA) == 0x14, "Invalid size for CColSphereSA");
 
@@ -112,12 +121,20 @@ struct CColTriangleSA
     std::uint16_t m_indices[3];
     EColSurface   m_material;
     CColLighting  m_lighting;
-
+    
     // Validate material enum is in valid range
-    bool IsValidMaterial() const { return static_cast<std::uint8_t>(m_material) < static_cast<std::uint8_t>(EColSurfaceValue::SIZE); }
-
+    bool IsValidMaterial() const
+    {
+        return static_cast<std::uint8_t>(m_material) < static_cast<std::uint8_t>(EColSurfaceValue::SIZE);
+    }
+    
     // Validate indices are within vertex count bounds
-    bool IsValidIndices(std::uint16_t numVertices) const { return m_indices[0] < numVertices && m_indices[1] < numVertices && m_indices[2] < numVertices; }
+    bool IsValidIndices(std::uint16_t numVertices) const
+    {
+        return m_indices[0] < numVertices && 
+               m_indices[1] < numVertices && 
+               m_indices[2] < numVertices;
+    }
 };
 static_assert(sizeof(CColTriangleSA) == 0x8, "Invalid size for CColTriangleSA");
 

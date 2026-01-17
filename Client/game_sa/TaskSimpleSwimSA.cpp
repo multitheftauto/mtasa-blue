@@ -18,6 +18,5 @@ CTaskSimpleSwimSA::CTaskSimpleSwimSA(CPed* ped, CVector* pos)
         return;
 
     // Call the constructor
-    ((void(__thiscall*)(CTaskSimpleSwimSAInterface*, CVector*, CPedSAInterface*))0x688930)(static_cast<CTaskSimpleSwimSAInterface*>(GetInterface()), pos,
-                                                                                           ped ? ped->GetPedInterface() : nullptr);
+    ((void(__thiscall*)(CTaskSimpleSwimSAInterface*, CVector*, CPedSAInterface*))0x688930)(static_cast<CTaskSimpleSwimSAInterface*>(GetInterface()), pos, ped ? ped->GetPedInterface() : nullptr);
 }

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#define MAX_GTA_CONTROLS        44
+#define MAX_GTA_CONTROLS 44
 #define MAX_GTA_ANALOG_CONTROLS 14
 
 class CClientPed;

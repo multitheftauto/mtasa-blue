@@ -17,6 +17,7 @@
 #include <d3d9.h>
 #include <nvapi/nvapi.h>
 
+
 namespace
 {
     SString GUIDToString(const GUID& g)
@@ -64,7 +65,7 @@ namespace
     using EnableHandlersFn = BOOL(WINAPI*)(void);
     std::atomic<EnableHandlersFn> g_enableHandlersImpl{nullptr};
     std::atomic<bool>             g_enableHandlersPending{false};
-}  // namespace
+}            // namespace
 
 // Loader is built without core crash handler code; defer to the implementation once core.dll is loaded.
 extern "C" BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization(void) noexcept
@@ -138,8 +139,8 @@ bool NvOptimusDetect()
     bool bFoundOptimus = false;
     for (NvU32 i = 0; i < uiGpuCount; i++)
     {
-        NV_SYSTEM_TYPE    SystemType = (NV_SYSTEM_TYPE)-1;  // 1-Laptop 2-Desktop
-        NV_GPU_TYPE       GpuType = (NV_GPU_TYPE)-1;        // 1-Integrated 2-Discrete
+        NV_SYSTEM_TYPE    SystemType = (NV_SYSTEM_TYPE)-1;            // 1-Laptop 2-Desktop
+        NV_GPU_TYPE       GpuType = (NV_GPU_TYPE)-1;                  // 1-Integrated 2-Discrete
         NvAPI_ShortString szName = "-";
 
         NvAPI_GPU_GetSystemType(nvGPUHandle[i], &SystemType);
@@ -254,10 +255,11 @@ void BeginD3DStuff()
         SetApplicationSettingInt("nvhacks", "optimus-export-enablement", 0);
         SetApplicationSettingInt("nvhacks", "optimus-force-windowed", 0);
     }
-
+    
     // Crash handler enablement now occurs inside the game process once the
     // Direct3D device is fully created (see CGraphics::OnDeviceCreate).
 }
+
 
 //////////////////////////////////////////////////////////
 //

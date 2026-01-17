@@ -19,7 +19,7 @@
 #include <game/CSettings.h>
 #include <game/CVehicle.h>
 
-#define MOUSE_CONTROL_MULTIPLIER 35
+#define MOUSE_CONTROL_MULTIPLIER    35
 
 extern CCore* g_pCore;
 
@@ -75,11 +75,11 @@ bool CMouseControl::ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     bool bVar;
     CVARS_GET("fly_with_mouse", bVar);
-    if (pModelInfo->IsPlane() || pModelInfo->IsHeli() && !bVar)  // Are we in a plane, but not have mouse flight enabled?
+    if (pModelInfo->IsPlane() || pModelInfo->IsHeli() && !bVar)            // Are we in a plane, but not have mouse flight enabled?
         return false;
 
     CVARS_GET("steer_with_mouse", bVar);
-    if (!bVar)  // Are we in another type of vehicle, but not have mouse steering enabled?
+    if (!bVar)            // Are we in another type of vehicle, but not have mouse steering enabled?
         return false;
 
     // Let's calculate our mouse movement directions

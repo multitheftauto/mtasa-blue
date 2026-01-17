@@ -112,7 +112,7 @@ namespace
             return S_OK;
         }
     };
-}  // namespace
+}            // namespace
 
 ////////////////////////////////////////////////////////////////
 //
@@ -153,7 +153,7 @@ void CEffectTemplate::PreDestruct()
 int CEffectTemplate::GetTicksSinceLastUsed()
 {
     if (m_uiCloneCount != 0)
-        return 0;  // Used right now
+        return 0;            // Used right now
 
     CTickCount delta = CTickCount::Now(true) - m_TickCountLastUsed;
     return static_cast<int>(delta.ToLongLong()) + 1;
@@ -224,7 +224,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     macroList.back().Definition = NULL;
 
     // Compile effect
-    DWORD dwFlags = D3DXFX_LARGEADDRESSAWARE;  // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
+    DWORD dwFlags = D3DXFX_LARGEADDRESSAWARE;            // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
     if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 

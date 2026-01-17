@@ -39,7 +39,7 @@
 
 // Min and max number of characters in chat echos
 #define MIN_CHATECHO_LENGTH 1
-#define MAX_CHATECHO_LENGTH (MAX_CHAT_LENGTH + MAX_PLAYER_NICK_LENGTH + 2)  // +2 is for ": " between player nick and the message
+#define MAX_CHATECHO_LENGTH (MAX_CHAT_LENGTH + MAX_PLAYER_NICK_LENGTH + 2) // +2 is for ": " between player nick and the message
 
 // Min and max number of characters in outputChatBox from the server
 #define MIN_OUTPUTCHATBOX_LENGTH 1
@@ -89,41 +89,41 @@
 #define GAME_TYPE_STRING "MTA:SA"
 
 // Banlist filename
-#define FILENAME_BANLIST "banlist.xml"
+#define FILENAME_BANLIST    "banlist.xml"
 
 // Settings filename
-#define FILENAME_SETTINGS "settings.xml"
+#define FILENAME_SETTINGS   "settings.xml"
 
 // Settings root-node
-#define ROOTNODE_SETTINGS "settings"
+#define ROOTNODE_SETTINGS   "settings"
 
 // Settings prefixes and delimiters
-#define SETTINGS_PREFIX_PRIVATE   '@'                 // Private prefix
-#define SETTINGS_PREFIX_PROTECTED '#'                 // Protected prefix
-#define SETTINGS_PREFIX_PUBLIC    '*'                 // Public prefix
-#define SETTINGS_NO_PREFIX        CSettings::Private  // Access type when no prefix is used
-#define SETTINGS_DELIMITER        '.'                 // Delimiter
+#define SETTINGS_PREFIX_PRIVATE     '@'                     // Private prefix
+#define SETTINGS_PREFIX_PROTECTED   '#'                     // Protected prefix
+#define SETTINGS_PREFIX_PUBLIC      '*'                     // Public prefix
+#define SETTINGS_NO_PREFIX          CSettings::Private      // Access type when no prefix is used
+#define SETTINGS_DELIMITER          '.'                     // Delimiter
 
 // Maximum length for names and values in settings registry
-#define MAX_SETTINGS_LENGTH 256
+#define MAX_SETTINGS_LENGTH         256
 
 // Maximum resource length
-#define MAX_RESOURCE_LENGTH 64
+#define MAX_RESOURCE_LENGTH         64
 
 // SQL variable placeholder (replaces with actual variable content)
-#define SQL_VARIABLE_PLACEHOLDER '?'
+#define SQL_VARIABLE_PLACEHOLDER    '?'
 
 // Server FPS limit (in milliseconds)
-#define FPS_LIMIT 16
+#define FPS_LIMIT                   16
 
 // Max garages
-#define MAX_GARAGES 50
+#define MAX_GARAGES                 50
 
 // MTA master server query URL (Inputs: game port, ase port, http port, version, extra, serverip)
 #define QUERY_URL_MTA_MASTER_SERVER "https://master.multitheftauto.com/ase/add.php?g=%GAME%&a=%ASE%&h=%HTTP%&v=%VER%&x=%EXTRA%&ip=%IP%"
 
 // MTA port tester URL
-#define PORT_TESTER_URL "https://nightly.multitheftauto.com/ports/"
+#define PORT_TESTER_URL             "https://nightly.multitheftauto.com/ports/"
 
 // MTA minclientversion auto update and others
-#define HQCOMMS_URL "https://updatesa.multitheftauto.com/sa/server/hqcomms/"
+#define HQCOMMS_URL                 "https://updatesa.multitheftauto.com/sa/server/hqcomms/"

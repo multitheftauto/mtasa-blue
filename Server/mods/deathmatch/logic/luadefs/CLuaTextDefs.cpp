@@ -174,14 +174,14 @@ int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
     {
         unsigned char ucFormat = 0;
         if (strHorzAlign == "center")
-            ucFormat |= 0x00000001;  // DT_CENTER
+            ucFormat |= 0x00000001;            // DT_CENTER
         else if (strHorzAlign == "right")
-            ucFormat |= 0x00000002;  // DT_RIGHT
+            ucFormat |= 0x00000002;            // DT_RIGHT
 
         if (strVertAlign == "center")
-            ucFormat |= 0x00000004;  // DT_VCENTER
+            ucFormat |= 0x00000004;            // DT_VCENTER
         else if (strVertAlign == "bottom")
-            ucFormat |= 0x00000008;  // DT_BOTTOM
+            ucFormat |= 0x00000008;            // DT_BOTTOM
 
         // Grab our virtual machine
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);

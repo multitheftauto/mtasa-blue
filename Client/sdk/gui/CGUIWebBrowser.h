@@ -16,7 +16,7 @@
 class CGUIWebBrowser : public CGUIElement
 {
 public:
-    virtual ~CGUIWebBrowser() {};
+    virtual ~CGUIWebBrowser(){};
 
     virtual void LoadFromWebView(class CWebViewInterface* pWebView) = 0;
 

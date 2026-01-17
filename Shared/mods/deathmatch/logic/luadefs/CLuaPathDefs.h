@@ -19,7 +19,7 @@ public:
 
 private:
     static std::optional<std::vector<std::string>> pathListDir(lua_State* luaVM, std::string path);
-
+    
     static bool pathIsFile(lua_State* luaVM, std::string path);
     static bool pathIsDirectory(lua_State* luaVM, std::string path);
 };

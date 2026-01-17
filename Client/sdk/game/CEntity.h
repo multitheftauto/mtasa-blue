@@ -46,14 +46,14 @@ enum eEntityStatus
     STATUS_PLANE,
     STATUS_REMOTE_CONTROLLED,
     STATUS_PLAYER_DISABLED,
-    STATUS_TRAILER,        // ToDo: Check this. I can't reproduce that this is set for trailers
-    STATUS_SIMPLE_TRAILER  // Same here
+    STATUS_TRAILER,                  // ToDo: Check this. I can't reproduce that this is set for trailers
+    STATUS_SIMPLE_TRAILER            // Same here
 };
 
 class CEntity
 {
 public:
-    virtual ~CEntity() {};
+    virtual ~CEntity(){};
 
     //  virtual VOID                        SetModelAlpha ( int iAlpha )=0;
     virtual class CEntitySAInterface* GetInterface() = 0;

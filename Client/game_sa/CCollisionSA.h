@@ -13,8 +13,7 @@
 
 #include "game/CCollision.h"
 
-class CCollisionSA : CCollision
-{
+class CCollisionSA : CCollision {
 public:
     bool TestLineSphere(const CColLineSA& line, const CColSphereSA& sphere) const override;
 };

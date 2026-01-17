@@ -19,7 +19,7 @@
 class CPlayer;
 class CGame;
 
-#define DECLARE_RPC(a) static void a(NetBitStreamInterface& bitStream);
+#define DECLARE_RPC(a) static void a ( NetBitStreamInterface& bitStream );
 
 class CRPCFunctions
 {

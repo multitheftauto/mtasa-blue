@@ -65,7 +65,7 @@ void InitLocalization(bool bShowErrors)
         DisplayErrorMessageBox(("Load failed.  Please ensure that "
                                 "the file " MTA_DLL_NAME " is in the modules "
                                 "directory within the MTA root directory."),
-                               _E("CL23"), "core-missing");  // Core.dll missing
+                               _E("CL23"), "core-missing");            // Core.dll missing
 
         return ExitProcess(EXIT_ERROR);
     }
@@ -249,7 +249,8 @@ void HandleDuplicateLaunching()
                       "If the problem persists, open Task Manager and\n"
                       "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
                       "Try to launch MTA:SA again?");
-                if (MessageBoxUTF8(0, strMessage, _("Error") + _E("CL04"), MB_ICONWARNING | MB_YESNO | MB_TOPMOST) == IDYES)  // Trouble restarting MTA:SA
+                if (MessageBoxUTF8(0, strMessage, _("Error") + _E("CL04"), MB_ICONWARNING | MB_YESNO | MB_TOPMOST) ==
+                    IDYES)            // Trouble restarting MTA:SA
                 {
                     TerminateGTAIfRunning();
                     TerminateOtherMTAIfRunning();
@@ -381,7 +382,7 @@ void HandleNotUsedMainMenu()
         }
         else if (!strWindowed.empty() && !strFullscreenStyle.empty())
         {
-            if (strWindowed == "0" && strFullscreenStyle == "0")  // 0=FULLSCREEN_STANDARD
+            if (strWindowed == "0" && strFullscreenStyle == "0")            // 0=FULLSCREEN_STANDARD
             {
                 // Inform user
                 SString strMessage = _("Are you having problems running MTA:SA?.\n\nDo you want to change the following setting?");
@@ -496,7 +497,7 @@ void PreLaunchWatchDogs()
 #ifndef MTA_DEBUG
     if (WatchDogIsSectionOpen("L0"))
     {
-        WatchDogSetUncleanStop(true);  // Flag to maybe do things differently if MTA exit code on last run was not 0
+        WatchDogSetUncleanStop(true);            // Flag to maybe do things differently if MTA exit code on last run was not 0
         CheckAndShowFileOpenFailureMessage();
     }
     else
@@ -507,7 +508,7 @@ void PreLaunchWatchDogs()
     if (FileExists(strCrashFlagFilename))
     {
         FileDelete(strCrashFlagFilename);
-        WatchDogSetLastRunCrash(true);  // Flag to maybe do things differently if MTA crashed last run
+        WatchDogSetLastRunCrash(true);            // Flag to maybe do things differently if MTA crashed last run
     }
     else
         WatchDogSetLastRunCrash(false);
@@ -526,7 +527,7 @@ void PreLaunchWatchDogs()
     // Check for possible gta_sa.set problems
     if (WatchDogIsSectionOpen("L2"))
     {
-        WatchDogIncCounter("CR2");  // Did not reach loading screen last time
+        WatchDogIncCounter("CR2");            // Did not reach loading screen last time
         WatchDogCompletedSection("L2");
     }
     else
@@ -563,8 +564,8 @@ void PreLaunchWatchDogs()
     // Clear down freeze on quit detection
     WatchDogCompletedSection("Q0");
 
-    WatchDogBeginSection("L0");  // Gets closed if MTA exits with a return code of 0
-    WatchDogBeginSection("L1");  // Gets closed when online game has started
+    WatchDogBeginSection("L0");            // Gets closed if MTA exits with a return code of 0
+    WatchDogBeginSection("L1");            // Gets closed when online game has started
     SetApplicationSetting("diagnostics", "gta-fopen-fail", "");
     SetApplicationSetting("diagnostics", "last-crash-reason", "");
     SetApplicationSetting("diagnostics", "last-crash-module", "");
@@ -855,9 +856,9 @@ void CheckDataFiles()
     if (!VerifyEmbeddedSignature(PathJoin(strMTASAPath, MTA_EXE_NAME)))
     {
         SString strMessage(_("Main file is unsigned. Possible virus activity.\n\nSee online help if MTA does not work correctly."));
-#if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_PUBLIC_CONNECTIONS) && !defined(MTA_DEBUG)
+        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_PUBLIC_CONNECTIONS) && !defined(MTA_DEBUG)
         DisplayErrorMessageBox(strMessage, _E("CL29"), "maybe-virus1");
-#endif
+        #endif
     }
 
     struct
@@ -993,9 +994,9 @@ void CheckLibVersions()
     for (uint i = 0; i < NUMELMS(moduleList); i++)
     {
         SString strFilename = moduleList[i];
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
         strFilename = ExtractBeforeExtension(strFilename) + "_d." + ExtractExtension(strFilename);
-    #endif
+#endif
         SLibVersionInfo fileInfo;
         if (FileExists(CalcMTASAPath(strFilename)))
         {
@@ -1129,9 +1130,9 @@ int LaunchGame(SString strCmdLine)
     BeginD3DStuff();
     LogSettings();
 
-    WatchDogBeginSection("L2");                           // Gets closed when loading screen is shown
-    WatchDogBeginSection("L3");                           // Gets closed when loading screen is shown, or a startup problem is handled elsewhere
-    WatchDogBeginSection(WD_SECTION_NOT_USED_MAIN_MENU);  // Gets closed when the main menu is used
+    WatchDogBeginSection("L2");                                     // Gets closed when loading screen is shown
+    WatchDogBeginSection("L3");                                     // Gets closed when loading screen is shown, or a startup problem is handled elsewhere
+    WatchDogBeginSection(WD_SECTION_NOT_USED_MAIN_MENU);            // Gets closed when the main menu is used
 
     // Extract 'done-admin' flag from command line
     bool bDoneAdmin = strCmdLine.Contains("/done-admin");
@@ -1166,7 +1167,7 @@ int LaunchGame(SString strCmdLine)
                                              "Please try restarting, or if the problem persists,"
                                              "contact MTA at www.multitheftauto.com. \n\n[%s]"),
                                            *strError),
-                                   _E("CL22"), "createprocess-fail&err=" + strError);  // Could not start GTA:SA
+                                   _E("CL22"), "createprocess-fail&err=" + strError);            // Could not start GTA:SA
             return 5;
         }
     }
@@ -1177,7 +1178,7 @@ int LaunchGame(SString strCmdLine)
     // Clear previous on quit commands
     SetOnQuitCommand("");
 
-    ShowSplash(g_hInstance);  // Bring splash to the front
+    ShowSplash(g_hInstance);            // Bring splash to the front
 
     if (piLoadee.hProcess)
     {
@@ -1192,7 +1193,7 @@ int LaunchGame(SString strCmdLine)
             if (status != WAIT_TIMEOUT)
                 break;
 
-            if (!WatchDogIsSectionOpen("L3"))  // Gets closed when loading screen is shown
+            if (!WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown
             {
                 WriteDebugEvent("Loader - L3 closed");
                 break;
@@ -1212,7 +1213,7 @@ int LaunchGame(SString strCmdLine)
         if (status == WAIT_TIMEOUT)
         {
             CStuckProcessDetector stuckProcessDetector(piLoadee.hProcess, 5000);
-            while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))  // Gets closed when loading screen is shown
+            while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown
             {
                 if (stuckProcessDetector.UpdateIsStuck())
                 {
@@ -1237,16 +1238,16 @@ int LaunchGame(SString strCmdLine)
 
             // If core is closing and gta_sa.exe process memory usage is not changing, terminate
             CStuckProcessDetector stuckProcessDetector(piLoadee.hProcess, 5000);
-            while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("Q0"))  // Gets closed when quit has completed
+            while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("Q0"))            // Gets closed when quit has completed
             {
                 if (stuckProcessDetector.UpdateIsStuck())
                 {
                     WriteDebugEvent("Detected stuck process at quit");
-#ifndef MTA_DEBUG
+                #ifndef MTA_DEBUG
                     TerminateProcess(piLoadee.hProcess, 1);
                     status = WAIT_FAILED;
                     break;
-#endif
+                #endif
                 }
                 status = WaitForSingleObject(piLoadee.hProcess, 1000);
             }
@@ -1311,7 +1312,7 @@ void HandleOnQuitCommand()
             CheckService(CHECK_SERVICE_RESTART_GAME);
         }
         else
-            CheckService(CHECK_SERVICE_POST_GAME);  // Stop service here if quit command is not 'restart'
+            CheckService(CHECK_SERVICE_POST_GAME);            // Stop service here if quit command is not 'restart'
 
         LPCTSTR lpOperation = strOperation == "" ? NULL : strOperation.c_str();
         LPCTSTR lpFile = strFile.c_str();
@@ -1326,5 +1327,5 @@ void HandleOnQuitCommand()
         }
     }
     else
-        CheckService(CHECK_SERVICE_POST_GAME);  // Stop service here if quit command is empty
+        CheckService(CHECK_SERVICE_POST_GAME);            // Stop service here if quit command is empty
 }

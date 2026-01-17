@@ -30,7 +30,7 @@ void CMarkerSA::Init()
     internalInterface->bBlipFade = false;
     internalInterface->nBlipDisplayFlag = (BYTE)MarkerDisplay::MARKER_DISPLAY_BLIPONLY;
     internalInterface->nBlipSprite = (BYTE)RadarSprite::RADAR_SPRITE_NONE;
-#define COORD_BLIP_APPEARANCE_NORMAL 0
+    #define COORD_BLIP_APPEARANCE_NORMAL 0
     internalInterface->nCoordBlipAppearance = COORD_BLIP_APPEARANCE_NORMAL;
     internalInterface->pEntryExit = nullptr;
 }

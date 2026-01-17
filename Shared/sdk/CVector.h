@@ -30,13 +30,11 @@ public:
     float fY;
     float fZ;
 
-    struct NoInit
-    {
-    };
+    struct NoInit {};
     CVector(NoInit) noexcept {}
 
     constexpr CVector() noexcept : fX(0.0f), fY(0.0f), fZ(0.0f) {}
-
+    
     constexpr explicit CVector(float x, float y = 0.0f, float z = 0.0f) noexcept : fX(x), fY(y), fZ(z) {}
 
     constexpr CVector(const CVector4D& vec) noexcept : fX(vec.fX), fY(vec.fY), fZ(vec.fZ) {}
@@ -144,8 +142,8 @@ public:
     }
 
     // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-    bool IntersectsSegmentTriangle(const CVector& dir, const CVector& vecVert1, const CVector& vecVert2, const CVector& vecVert3, CVector* outVec,
-                                   CVector* outHitBary = nullptr) const noexcept
+    bool IntersectsSegmentTriangle(const CVector& dir, const CVector& vecVert1, const CVector& vecVert2, const CVector& vecVert3,
+                                   CVector* outVec, CVector* outHitBary = nullptr) const noexcept
     {
         constexpr float fEpsilon = 1e-6f;
 
@@ -187,9 +185,8 @@ public:
         if (t > fEpsilon && t <= dir.Length())
         {
             *outVec = *this + vecRay * t;
-            if (outHitBary)
-            {                                              // Calculate all barycentric coords if necessary
-                *outHitBary = CVector(1.f - u - v, u, v);  // For vertices A, B, C [I assume?]
+            if (outHitBary) { // Calculate all barycentric coords if necessary
+                *outHitBary = CVector( 1.f - u - v, u, v ); // For vertices A, B, C [I assume?]
             }
             return true;
         }

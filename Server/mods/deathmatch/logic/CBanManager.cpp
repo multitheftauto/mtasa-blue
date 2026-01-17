@@ -224,7 +224,7 @@ CBan* CBanManager::GetBanFromIP(const char* szIP)
                 if (a == b)
                 {
                     if (a == 0)
-                        return *iter;  // Full match
+                        return *iter;            // Full match
                 }
                 else
                 {
@@ -238,7 +238,7 @@ CBan* CBanManager::GetBanFromIP(const char* szIP)
         }
         else if (strIP == szIP)
         {
-            return *iter;  // Full match
+            return *iter;            // Full match
         }
     }
     return pBanWildcardMatch;

@@ -47,7 +47,7 @@ class CBikeSAInterface : public CVehicleSAInterface
 public:
     RwFrame*             m_apModelNodes[static_cast<std::size_t>(eBikeNodes::NUM_NODES)];
     int8                 m_bLeanMatrixCalculated;
-    int8                 pad0[3];  // Maybe prev value is int32
+    int8                 pad0[3];            // Maybe prev value is int32
     int8                 m_mLeanMatrix[72];
     int8                 m_cDamageFlags;
     int8                 pad1[27];

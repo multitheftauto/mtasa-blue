@@ -31,59 +31,56 @@
     #define MAYBE_UNUSED
 #endif
 
-namespace
-{
+namespace {
     // Error codes enum for better maintainability
-    enum ErrorCode : int
-    {
+    enum ErrorCode : int {
         ERROR_NULL_INSTANCE = -1,
         ERROR_NULL_INSTALL_MANAGER = -2,
         ERROR_LAUNCH_EXCEPTION = -3,
         ERROR_INSTALL_CONTINUE = -4
     };
-
+    
     // Command line constants
     constexpr size_t MAX_CMD_LINE_LENGTH = 4096;
-
+    
     // Report log IDs
     constexpr int LOG_ID_END = 1044;
     constexpr int LOG_ID_CONTINUE_EXCEPTION = 1045;
     constexpr int LOG_ID_LAUNCH_EXCEPTION = 1046;
-
-    // Compile-time checks
+    
+    // Compile-time checks  
     static_assert(MAX_CMD_LINE_LENGTH > 0, "Command line buffer size must be positive");
     static_assert(MAX_CMD_LINE_LENGTH <= 65536, "Command line buffer size seems unreasonably large");
     static_assert(sizeof(DWORD) >= sizeof(int), "DWORD must be at least as large as int");
 
-    class Utf8FileHooksGuard
-    {
+    class Utf8FileHooksGuard {
     private:
         bool m_released = false;
-
+        
     public:
-        Utf8FileHooksGuard() { AddUtf8FileHooks(); }
-
-        ~Utf8FileHooksGuard() noexcept
-        {
-            if (!m_released)
-            {
+        Utf8FileHooksGuard() { 
+            AddUtf8FileHooks(); 
+        }
+        
+        ~Utf8FileHooksGuard() noexcept { 
+            if (!m_released) {
                 RemoveUtf8FileHooks();
             }
         }
-
+        
         // Called when we want to keep hooks active (early return with error)
-        void release() noexcept { m_released = true; }
-
+        void release() noexcept { 
+            m_released = true; 
+        }
+        
         // Called when we want to remove hooks early (on GetInstallManager failure)
-        void removeNow() noexcept
-        {
-            if (!m_released)
-            {
+        void removeNow() noexcept {
+            if (!m_released) {
                 RemoveUtf8FileHooks();
                 m_released = true;
             }
         }
-
+        
         // Disable copy and move
         Utf8FileHooksGuard(const Utf8FileHooksGuard&) = delete;
         Utf8FileHooksGuard& operator=(const Utf8FileHooksGuard&) = delete;
@@ -91,98 +88,83 @@ namespace
         Utf8FileHooksGuard& operator=(Utf8FileHooksGuard&&) = delete;
     };
 
-    inline void SafeCopyCommandLine(LPSTR lpCmdLine, char* safeCmdLine, size_t bufferSize) noexcept
-    {
+    inline void SafeCopyCommandLine(LPSTR lpCmdLine, char* safeCmdLine, size_t bufferSize) noexcept {
         // Preconditions (only in debug builds)
         assert(safeCmdLine != nullptr && "Destination buffer must not be null");
         assert(bufferSize > 0 && "Buffer size must be positive");
-
-        if (!safeCmdLine || bufferSize == 0)
-        {
+        
+        if (!safeCmdLine || bufferSize == 0) {
             return;
         }
-
+        
         // If source is null, destination remains zero-initialized
-        if (!lpCmdLine)
-        {
+        if (!lpCmdLine) {
             return;
         }
-
+        
         const size_t maxCopyLen = bufferSize - 1;
         const size_t cmdLineLen = strnlen(lpCmdLine, maxCopyLen);
-
+        
         memcpy(safeCmdLine, lpCmdLine, cmdLineLen);
         safeCmdLine[cmdLineLen] = '\0';
     }
 
-    inline DWORD GetSafeProcessId() noexcept
-    {
-        try
-        {
+    inline DWORD GetSafeProcessId() noexcept {
+        try {
             return GetCurrentProcessId();
         }
-        catch (...)
-        {
+        catch (...) {
             return 0;
         }
     }
 
-    CInstallManager* PerformEarlyInitialization(const char* safeCmdLine)
-    {
+    CInstallManager* PerformEarlyInitialization(const char* safeCmdLine) {
         auto* pInstallManager = GetInstallManager();
-        if (!pInstallManager)
-        {
+        if (!pInstallManager) {
             return nullptr;
         }
 
         // Let install manager figure out what MTASA path to use
         // This must be called before ConfigureWerDumpPath which uses CalcMTASAPath
         pInstallManager->SetMTASAPathSource(safeCmdLine);
-
+        
         ConfigureWerDumpPath();
 
         // Start logging.....now
         BeginEventLog();
-
+        
         // Start localization if possible
         InitLocalization(false);
-
+        
         // Handle commands from the installer
         HandleSpecialLaunchOptions();
-
+        
         // Check MTA is launched only once
         HandleDuplicateLaunching();
-
+        
         return pInstallManager;
     }
 
-    SString ContinueUpdateProcedure(CInstallManager* pInstallManager)
-    {
-        if (!pInstallManager)
-        {
+    SString ContinueUpdateProcedure(CInstallManager* pInstallManager) {
+        if (!pInstallManager) {
             return SString();
         }
-
-        try
-        {
+        
+        try {
             return pInstallManager->Continue();
         }
-        catch (...)
-        {
+        catch (...) {
             AddReportLog(LOG_ID_CONTINUE_EXCEPTION, "Exception in InstallManager::Continue()");
             return SString();
         }
     }
 
-    // Launch the game with exception handling
-    int LaunchGameSafely(const SString& strCmdLine)
-    {
-        try
-        {
+	// Launch the game with exception handling
+    int LaunchGameSafely(const SString& strCmdLine) {
+        try {
             return LaunchGame(strCmdLine);
         }
-        catch (...)
-        {
+        catch (...) {
             AddReportLog(LOG_ID_LAUNCH_EXCEPTION, "Exception in LaunchGame()");
             return static_cast<int>(ERROR_LAUNCH_EXCEPTION);
         }
@@ -201,17 +183,17 @@ namespace
 //         (Which may then call it again as admin)
 //
 ///////////////////////////////////////////////////////////////
-MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPrevInstance, LPSTR lpCmdLine, MAYBE_UNUSED int nCmdShow)
+MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPrevInstance, 
+                        LPSTR lpCmdLine, MAYBE_UNUSED int nCmdShow)
 {
-// Silence unused parameter warnings for older compilers
-#if __cplusplus < 201703L
-    (void)hPrevInstance;
-    (void)nCmdShow;
-#endif
+    // Silence unused parameter warnings for older compilers
+    #if __cplusplus < 201703L
+        (void)hPrevInstance;
+        (void)nCmdShow;
+    #endif
 
     // Check for null parameters before use
-    if (!hLauncherInstance)
-    {
+    if (!hLauncherInstance) {
         return static_cast<int>(ERROR_NULL_INSTANCE);
     }
 
@@ -221,33 +203,32 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPre
     // Log the command line we're receiving
     {
         char debugBuf[512];
-        _snprintf_s(debugBuf, sizeof(debugBuf), _TRUNCATE,
-                    "========================================\nMain.cpp - Command line received: '%s'\n========================================\n",
-                    safeCmdLine);
+        _snprintf_s(debugBuf, sizeof(debugBuf), _TRUNCATE, 
+                   "========================================\nMain.cpp - Command line received: '%s'\n========================================\n", 
+                   safeCmdLine);
         OutputDebugStringA(debugBuf);
     }
 
     // RAII guard for UTF8 file hooks
     Utf8FileHooksGuard utf8Guard;
 
-#if defined(MTA_DEBUG)
+    #if defined(MTA_DEBUG)
     SharedUtil_Tests();
-#endif
+    #endif
 
     //
     // Init
     //
 
     auto* pInstallManager = PerformEarlyInitialization(safeCmdLine);
-    if (!pInstallManager)
-    {
+    if (!pInstallManager) {
         // Remove hooks when install manager fails
         utf8Guard.removeNow();
         return static_cast<int>(ERROR_NULL_INSTALL_MANAGER);
     }
 
     HINSTANCE hInstanceToUse = hLauncherInstance;
-
+    
     // Show logo
     ShowSplash(hInstanceToUse);
 
@@ -256,6 +237,7 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPre
 
     // Find GTA path to use
     ValidateGTAPath();
+
 
     // Continue any update procedure
     SString strCmdLine = ContinueUpdateProcedure(pInstallManager);
@@ -269,9 +251,9 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, MAYBE_UNUSED HINSTANCE hPre
     // Stuff
     HandleCustomStartMessage();
 
-#if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
+    #if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     ForbodenProgramsMessage();
-#endif
+    #endif
 
     CycleEventLog();
     BsodDetectionPreLaunch();

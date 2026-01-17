@@ -64,11 +64,11 @@ bool CSimKeysyncPacket::Read(NetBitStreamInterface& BitStream)
 
             if (m_ucPlayerGotWeaponType != ucClientWeaponType)
             {
-                bWeaponCorrect = false;                // Possibly old weapon data.
-                ucUseWeaponType = ucClientWeaponType;  // Use the packet supplied weapon type to skip over the correct amount of data
+                bWeaponCorrect = false;                          // Possibly old weapon data.
+                ucUseWeaponType = ucClientWeaponType;            // Use the packet supplied weapon type to skip over the correct amount of data
             }
 
-            m_Cache.bWeaponCorrect = bWeaponCorrect;  // Copied from PlayerPuresyncPacket
+            m_Cache.bWeaponCorrect = bWeaponCorrect;            // Copied from PlayerPuresyncPacket
 
             // Read out the current weapon slot and set it
             SWeaponSlotSync slot;
@@ -168,7 +168,7 @@ bool CSimKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
     if (m_sharedControllerState.ButtonCircle || (m_sharedControllerState.RightShoulder1))
     {
         // Write his current weapon slot
-        unsigned int    uiSlot = m_Cache.ucWeaponSlot;  // check m_Cache.bWeaponCorrect !
+        unsigned int    uiSlot = m_Cache.ucWeaponSlot;            // check m_Cache.bWeaponCorrect !
         SWeaponSlotSync slot;
         slot.data.uiSlot = uiSlot;
         BitStream.Write(&slot);

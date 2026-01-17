@@ -25,22 +25,22 @@
 // Used to check fast version of getElementsByType
 // #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
-#define IS_BLIP(element)             ((element)->GetType() == CElement::BLIP)
-#define IS_COLSHAPE(element)         ((element)->GetType() == CElement::COLSHAPE)
-#define IS_DUMMY(element)            ((element)->GetType() == CElement::DUMMY)
-#define IS_FILE(element)             ((element)->GetType() == CElement::SCRIPTFILE)
-#define IS_MARKER(element)           ((element)->GetType() == CElement::MARKER)
-#define IS_OBJECT(element)           ((element)->GetType() == CElement::OBJECT)
+#define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
+#define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
+#define IS_DUMMY(element)    ((element)->GetType()==CElement::DUMMY)
+#define IS_FILE(element)     ((element)->GetType()==CElement::SCRIPTFILE)
+#define IS_MARKER(element)   ((element)->GetType()==CElement::MARKER)
+#define IS_OBJECT(element)   ((element)->GetType()==CElement::OBJECT)
 #define IS_PERPLAYER_ENTITY(element) ((element)->IsPerPlayerEntity())
-#define IS_PICKUP(element)           ((element)->GetType() == CElement::PICKUP)
-#define IS_PED(element)              ((element)->GetType() == CElement::PLAYER || (element)->GetType() == CElement::PED)
-#define IS_PLAYER(element)           ((element)->GetType() == CElement::PLAYER)
-#define IS_RADAR_AREA(element)       ((element)->GetType() == CElement::RADAR_AREA)
-#define IS_VEHICLE(element)          ((element)->GetType() == CElement::VEHICLE)
-#define IS_CONSOLE(element)          ((element)->GetType() == CElement::CONSOLE)
-#define IS_TEAM(element)             ((element)->GetType() == CElement::TEAM)
-#define IS_WATER(element)            ((element)->GetType() == CElement::WATER)
-#define IS_WEAPON(element)           ((element)->GetType() == CElement::WEAPON)
+#define IS_PICKUP(element)   ((element)->GetType()==CElement::PICKUP)
+#define IS_PED(element)      ((element)->GetType()==CElement::PLAYER||(element)->GetType()==CElement::PED)
+#define IS_PLAYER(element)   ((element)->GetType()==CElement::PLAYER)
+#define IS_RADAR_AREA(element) ((element)->GetType()==CElement::RADAR_AREA)
+#define IS_VEHICLE(element)  ((element)->GetType()==CElement::VEHICLE)
+#define IS_CONSOLE(element)  ((element)->GetType()==CElement::CONSOLE)
+#define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
+#define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
+#define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
 
 class CLuaMain;
 
@@ -84,7 +84,7 @@ public:
         ROOT,
         UNKNOWN,
         BUILDING,
-        _POINTLIGHTS,  // client only
+        _POINTLIGHTS, // client only
     };
 
 public:
@@ -139,8 +139,7 @@ public:
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
     CCustomData&   GetCustomDataManager() { return m_CustomData; }
-    CLuaArgument*  GetCustomData(const CStringName& name, bool bInheritData, ESyncType* pSyncType = nullptr,
-                                 eCustomDataClientTrust* clientChangesMode = nullptr);
+    CLuaArgument*  GetCustomData(const CStringName& name, bool bInheritData, ESyncType* pSyncType = nullptr, eCustomDataClientTrust* clientChangesMode = nullptr);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const CStringName& name, char* pOut, size_t sizeBuffer, bool bInheritData);
     bool           GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData);
@@ -177,7 +176,7 @@ public:
     void OnSubtreeAdd(CElement* pElement);
     void OnSubtreeRemove(CElement* pElement);
 
-    virtual void UpdatePerPlayer() {};
+    virtual void UpdatePerPlayer(){};
     void         UpdatePerPlayerEntities();
 
     void                                  AddCollision(class CColShape* pShape) { m_Collisions.push_back(pShape); }
@@ -291,8 +290,8 @@ protected:
     bool                   m_bDoubleSided;
     bool                   m_bUpdatingSpatialData;
     bool                   m_bCallPropagationEnabled;
-    bool                   m_canBeDestroyedByScript = true;  // If true, destroyElement function will
-                                                             // have no effect on this element
+    bool                   m_canBeDestroyedByScript = true;            // If true, destroyElement function will
+                                                                       // have no effect on this element
     // Optimization for getElementsByType starting at root
 public:
     static void StartupEntitiesFromRoot();

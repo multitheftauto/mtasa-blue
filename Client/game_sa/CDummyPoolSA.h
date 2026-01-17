@@ -33,7 +33,7 @@ private:
     void UpdateLodsOffestInPool(const std::uint32_t offset);
 
 private:
-    CPoolSAInterface<CEntitySAInterface>** m_ppDummyPoolInterface;
+    CPoolSAInterface<CEntitySAInterface>**  m_ppDummyPoolInterface;
 
     using building_buffer_t = std::uint8_t[sizeof(CEntitySAInterface)];
     using pool_backup_t = std::array<std::pair<bool, building_buffer_t>, MAX_DUMMIES_DEFAULT>;

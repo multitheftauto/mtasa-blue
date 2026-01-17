@@ -20,15 +20,15 @@ CPtrNodeSingleLinkPoolSA::CPtrNodeSingleLinkPoolSA()
         m_customPool = new CPtrNodeSingleLinkPoolSA::pool_t();
 }
 
-constexpr std::uint32_t                               HOOKPOS_SingleLinkNodeConstructor = 0x552380;
-constexpr std::size_t                                 HOOKSIZE_SingleLinkNodeConstructor = 6;
+constexpr std::uint32_t HOOKPOS_SingleLinkNodeConstructor = 0x552380;
+constexpr std::size_t   HOOKSIZE_SingleLinkNodeConstructor = 6;
 static CPtrNodeSingleLinkPoolSA::pool_item_t* __cdecl HOOK_SingleLinkNodeConstructor()
 {
     return CPtrNodeSingleLinkPoolSA::GetPoolInstance()->AllocateItem();
 }
 
-constexpr std::uint32_t                               HOOKPOS_SingleLinkNodeDestructor = 0x552390;
-constexpr std::size_t                                 HOOKSIZE_SingleLinkNodeDestructor = 6;
+constexpr std::uint32_t HOOKPOS_SingleLinkNodeDestructor = 0x552390;
+constexpr std::size_t   HOOKSIZE_SingleLinkNodeDestructor = 6;
 static CPtrNodeSingleLinkPoolSA::pool_item_t* __cdecl HOOK_SingleLinkNodeDestructor(CPtrNodeSingleLinkPoolSA::pool_item_t* item)
 {
     CPtrNodeSingleLinkPoolSA::GetPoolInstance()->RemoveItem(item);
@@ -37,9 +37,9 @@ static CPtrNodeSingleLinkPoolSA::pool_item_t* __cdecl HOOK_SingleLinkNodeDestruc
 }
 
 // Replace pool->RemoveItem here
-constexpr std::uint32_t       HOOKPOS_CPtrListSingleLink_Flush = 0x55243B;
-constexpr std::size_t         HOOKSIZE_CPtrListSingleLink_Flush = 6;
-constexpr std::uint32_t       CONTINUE_CPtrListSingleLink_Flush = 0x55245B;
+constexpr std::uint32_t      HOOKPOS_CPtrListSingleLink_Flush = 0x55243B;
+constexpr std::size_t        HOOKSIZE_CPtrListSingleLink_Flush = 6;
+constexpr std::uint32_t      CONTINUE_CPtrListSingleLink_Flush = 0x55245B;
 static void __declspec(naked) HOOK_CPtrListSingleLink_Flush()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -69,3 +69,4 @@ void CPtrNodeSingleLinkPoolSA::StaticSetHooks()
     // Skip the original pool initialization
     MemCpy((void*)0x550F26, "\xEB\x2D", 2);
 }
+

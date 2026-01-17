@@ -37,8 +37,8 @@ void CModelRenderer::Update()
         // Insert transparent entities into a sorted list
         if (modelDesc.pModelInfo->GetIdeFlag(eModelIdeFlag::DRAW_LAST))
         {
-            const CVector& vecCameraPosition = *(CVector*)0xB76870;  // CRenderer::ms_vecCameraPosition
-            const float    fDistance = (modelDesc.matrix.GetPosition() - vecCameraPosition).Length();
+            const CVector& vecCameraPosition = *(CVector*)0xB76870; // CRenderer::ms_vecCameraPosition
+            const float fDistance = (modelDesc.matrix.GetPosition() - vecCameraPosition).Length();
 
             pVisibilityPlugins->InsertEntityIntoEntityList(&modelDesc, fDistance, RenderEntity);
         }
@@ -48,7 +48,7 @@ void CModelRenderer::Update()
 void CModelRenderer::Render()
 {
     CRenderer* pRenderer = g_pGame->GetRenderer();
-    assert(pRenderer);
+    assert(pRenderer);    
 
     // Draw opaque entities
     for (auto& modelDesc : m_Queue)

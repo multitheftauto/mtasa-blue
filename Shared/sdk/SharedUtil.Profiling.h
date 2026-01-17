@@ -74,24 +74,25 @@ namespace SharedUtil
     // Global CStatEvents instance
     extern class CStatEvents g_StatEvents;
 
-// Macros for clocking areas
-#define CLOCK(section, name)   g_StatEvents.Add(section, name, STATS_CLOCK)
-#define UNCLOCK(section, name) g_StatEvents.Add(section, name, STATS_UNCLOCK)
+    // Macros for clocking areas
+    #define CLOCK(section,name)     g_StatEvents.Add( section, name, STATS_CLOCK )
+    #define UNCLOCK(section,name)   g_StatEvents.Add( section, name, STATS_UNCLOCK )
 
-// Macro for clocking enclosed code
-#define CLOCK_CALL(section, code) \
-    { \
-        CLOCK(section, #code); \
-        code; \
-        UNCLOCK(section, #code); \
-    }
+    // Macro for clocking enclosed code
+    #define CLOCK_CALL(section,code) \
+        { \
+            CLOCK( section, #code ); \
+            code; \
+            UNCLOCK( section, #code ); \
+        }
 
-// Macros using a common section name
-#define CLOCK_SET_SECTION(tag) const char* szClockSectionTag = tag
+    // Macros using a common section name
+    #define CLOCK_SET_SECTION(tag) \
+        const char* szClockSectionTag = tag
 
-#define CLOCK1(name)      CLOCK(szClockSectionTag, name)
-#define UNCLOCK1(name)    UNCLOCK(szClockSectionTag, name)
-#define CLOCK_CALL1(code) CLOCK_CALL(szClockSectionTag, code)
+    #define CLOCK1(name)        CLOCK( szClockSectionTag, name )
+    #define UNCLOCK1(name)      UNCLOCK( szClockSectionTag, name)
+    #define CLOCK_CALL1(code)   CLOCK_CALL( szClockSectionTag, code )
 
     //
     // Performance stat resulting
@@ -144,4 +145,4 @@ namespace SharedUtil
         float                 m_fNextMaxClearTime;
     };
 
-}
+}            // namespace SharedUtil

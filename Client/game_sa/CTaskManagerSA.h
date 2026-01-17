@@ -17,15 +17,15 @@ class CTaskSAInterface;
 class CTaskManagementSystemSA;
 class CTaskSA;
 
-#define FUNC_SetTask                0x681AF0
-#define FUNC_GetActiveTask          0x681720
-#define FUNC_GetSimplestActiveTask  0x6819D0
-#define FUNC_GetSimplestTask        0x681A00
-#define FUNC_FindActiveTaskByType   0x681740
-#define FUNC_FindTaskByType         0x6817D0
-#define FUNC_SetTaskSecondary       0x681B60
-#define FUNC_ClearTaskEventResponse 0x681BD0
-#define FUNC_HasTaskSecondary       0x681820
+#define FUNC_SetTask                    0x681AF0
+#define FUNC_GetActiveTask              0x681720
+#define FUNC_GetSimplestActiveTask      0x6819D0
+#define FUNC_GetSimplestTask            0x681A00
+#define FUNC_FindActiveTaskByType       0x681740
+#define FUNC_FindTaskByType             0x6817D0
+#define FUNC_SetTaskSecondary           0x681B60
+#define FUNC_ClearTaskEventResponse     0x681BD0
+#define FUNC_HasTaskSecondary           0x681820
 
 // pointer for this at +1148+4? (see 0x568A20)
 class CTaskManagerSAInterface
@@ -59,8 +59,8 @@ public:
     void   RemoveTaskSecondary(const int iTaskPriority);
     bool   RemoveTaskSecondary(const int taskPriority, const int taskType);
     void   SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType);
-    CTask* GetTaskSecondary(const int iType);              // code it
-    bool   HasTaskSecondary(const CTask* pTaskSecondary);  // code it
+    CTask* GetTaskSecondary(const int iType);                        // code it
+    bool   HasTaskSecondary(const CTask* pTaskSecondary);            // code it
     void   ClearTaskEventResponse();
     void   Flush(const int iPriority);
 };

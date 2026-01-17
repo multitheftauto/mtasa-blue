@@ -21,7 +21,7 @@ namespace
     bool               ms_bEnableRequest = false;
     CNetServerBuffer*  ms_pNetServerBuffer = NULL;
     CSimPlayerManager* ms_pSimPlayerManager = NULL;
-}  // namespace
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //

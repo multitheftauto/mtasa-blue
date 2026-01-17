@@ -48,13 +48,13 @@ public:
     void  SetItemColor(int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha);
     bool  GetItemColor(int iRow, int hColumn, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
 
-    void               SetHorizontalScrollBar(bool bEnabled);
-    void               SetVerticalScrollBar(bool bEnabled);
-    void               SetSortingEnabled(bool bEnabled);
-    bool               IsSortingEnabled();
-    void               SetAutoSortSuppressed(bool bSuppressed);
+    void SetHorizontalScrollBar(bool bEnabled);
+    void SetVerticalScrollBar(bool bEnabled);
+    void SetSortingEnabled(bool bEnabled);
+    bool IsSortingEnabled();
+    void SetAutoSortSuppressed(bool bSuppressed);
     [[nodiscard]] bool IsAutoSortSuppressed() const;
-    void               SetItemImage(int iRow, int hColumn, CGUIStaticImage* pImage);
+    void SetItemImage(int iRow, int hColumn, CGUIStaticImage* pImage);
 
     float GetHorizontalScrollPosition();
     float GetVerticalScrollPosition();
@@ -87,7 +87,7 @@ public:
     void      SetIgnoreTextSpacer(bool bIgnoreTextSpacer) { m_bIgnoreTextSpacer = bIgnoreTextSpacer; };
     eCGUIType GetType() { return CGUI_GRIDLIST; };
 
-#include "CGUIElement_Inc.h"
+    #include "CGUIElement_Inc.h"
 
 private:
     bool Event_OnSortColumn(const CEGUI::EventArgs& e);

@@ -18,7 +18,7 @@ class CVehicleAudioSettingsManager
 public:
     virtual std::unique_ptr<CVehicleAudioSettingsEntry> CreateVehicleAudioSettingsData(uint32_t modelId) = 0;
     virtual CVehicleAudioSettingsEntry&                 GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept = 0;
-
+    
     virtual void ResetModelSettings(uint32_t modelId) noexcept = 0;
     virtual void ResetAudioSettingsData() noexcept = 0;
     virtual void SetNextSettings(CVehicleAudioSettingsEntry const* pSettings) noexcept = 0;

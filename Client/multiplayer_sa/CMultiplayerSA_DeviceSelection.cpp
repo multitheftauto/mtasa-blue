@@ -94,7 +94,7 @@ struct RwSubSystemInfo
     char name[80];
 };
 
-using rwDeviceSystemRequest = RwSubSystemInfo*(__cdecl*)(RwDevice * device, std::int32_t requestId, RwSubSystemInfo* pOut, void* pInOut, std::int32_t numIn);
+using rwDeviceSystemRequest = RwSubSystemInfo*(__cdecl*)(RwDevice* device, std::int32_t requestId, RwSubSystemInfo* pOut, void* pInOut, std::int32_t numIn);
 static RwSubSystemInfo* RwEngineGetSubSystemInfo_Hooked(RwSubSystemInfo* subSystemInfo, std::int32_t subSystemIndex)
 {
     auto* rwGlobals = *(RwGlobals**)CLASS_RwGlobals;

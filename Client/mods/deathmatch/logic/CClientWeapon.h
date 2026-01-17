@@ -124,7 +124,7 @@ private:
     eBone                m_targetBone;
     int                  m_itargetWheel;
     SWeaponConfiguration m_weaponConfig;
-    CClientPlayerPtr     m_pOwner;  // For lag compensation
+    CClientPlayerPtr     m_pOwner;            // For lag compensation
     int                  m_nAmmoTotal;
     int                  m_nAmmoInClip;
     eWeaponState         m_PreviousState;
@@ -132,5 +132,5 @@ private:
     CElapsedTime         m_reloadTimer;
     unsigned char        m_ucCounter;
     int                  m_iWeaponFireRate;
-    CVector              m_vecFireRotationNoTarget;  // Rotation adjustment when firing directly forward
+    CVector              m_vecFireRotationNoTarget;            // Rotation adjustment when firing directly forward
 };

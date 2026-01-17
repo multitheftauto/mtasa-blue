@@ -15,7 +15,7 @@
 #include "ehs/ehs.h"
 
 #ifndef MAX_PATH
-    #define MAX_PATH 260
+#define MAX_PATH        260
 #endif
 
 class CResourceHTMLItem : public CResourceFile
@@ -43,11 +43,11 @@ private:
     char ReadChar(FILE* pFile) { return (unsigned char)fgetc(pFile); }
     void GetMimeType(const char* szFilename);
 
-    bool        m_bIsBeingRequested;  // crude mutex
+    bool        m_bIsBeingRequested;            // crude mutex
     bool        m_bIsRaw;
     CLuaMain*   m_pVM;
-    std::string m_strPageBuffer;  // contains what we're sending
-    bool        m_bDefault;       // is this the default page for this resource?
+    std::string m_strPageBuffer;            // contains what we're sending
+    bool        m_bDefault;                 // is this the default page for this resource?
     std::string m_strMime;
     bool        m_bRestricted;
 

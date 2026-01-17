@@ -16,7 +16,7 @@
 #include "net/bitstream.h"
 #include "net/CNetHTTPDownloadManagerInterface.h"
 
-#define MAX_CALL_REMOTE_QUEUES 100
+#define MAX_CALL_REMOTE_QUEUES  100
 
 namespace EDownloadMode
 {
@@ -26,7 +26,7 @@ namespace EDownloadMode
         CORE_ASE_LIST,
         CORE_UPDATER,
         WEBBROWSER_LISTS,
-        CORE_LAST,  // Download modes after this one will be reset on server disconnect
+        CORE_LAST,            // Download modes after this one will be reset on server disconnect
         RESOURCE_INITIAL_FILES_INTERNAL,
         RESOURCE_INITIAL_FILES_EXTERNAL,
         RESOURCE_SINGULAR_FILES,

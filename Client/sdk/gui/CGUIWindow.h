@@ -16,7 +16,7 @@
 class CGUIWindow : public CGUIElement
 {
 public:
-    virtual ~CGUIWindow() {};
+    virtual ~CGUIWindow(){};
 
     virtual void SetMovable(bool bMovable) = 0;
     virtual bool IsMovable() = 0;

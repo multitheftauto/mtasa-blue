@@ -14,9 +14,9 @@
 
 enum EServerInfoSyncFlag : uint8
 {
-    SERVER_INFO_FLAG_ALL = 0xFF,        // 0b11111111
-    SERVER_INFO_FLAG_MAX_PLAYERS = 1,   // 0b00000001
-    SERVER_INFO_FLAG_RESERVED = 1 << 1  // 0b00000010 and so on
+    SERVER_INFO_FLAG_ALL = 0xFF,                  // 0b11111111
+    SERVER_INFO_FLAG_MAX_PLAYERS = 1,             // 0b00000001
+    SERVER_INFO_FLAG_RESERVED = 1 << 1            // 0b00000010 and so on
 };
 
 class CServerInfoSyncPacket final : public CPacket
@@ -37,7 +37,7 @@ private:
         struct
         {
             bool maxPlayers : 1;
-            bool reserved : 7;  // for future?
+            bool reserved : 7;            // for future?
         };
     };
 };

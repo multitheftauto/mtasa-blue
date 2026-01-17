@@ -10,7 +10,8 @@
 
 #pragma once
 
-#define TIMING_GRAPH(name) GetGraphStats()->AddTimingPoint(name);
+#define TIMING_GRAPH(name) \
+    GetGraphStats()->AddTimingPoint( name );
 
 //
 // CGraphStatsInterface for measuring and displaying a timing graph

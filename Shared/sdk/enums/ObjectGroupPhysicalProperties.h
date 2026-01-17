@@ -74,4 +74,4 @@ namespace ObjectGroupPhysicalProperties
         BY_GUN,
         SMASHABLE,
     };
-}
+}            // namespace ObjectGroupPhysicalProperties

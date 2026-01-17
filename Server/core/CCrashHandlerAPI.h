@@ -21,16 +21,16 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 
 #ifdef WIN32
 
-    #ifndef WIN32_LEAN_AND_MEAN
-        #define WIN32_LEAN_AND_MEAN
-    #endif
-    #include <windows.h>
-    #define BUGSUTIL_DLLINTERFACE
+#ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#define BUGSUTIL_DLLINTERFACE
 
-    #ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-    #endif  //__cplusplus
+#endif  //__cplusplus
 
     /*//////////////////////////////////////////////////////////////////////
                                 Type Definitions
@@ -59,8 +59,8 @@ extern "C"
     ----------------------------------------------------------------------*/
     BOOL BUGSUTIL_DLLINTERFACE __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn);
 
-    #ifdef __cplusplus
+#ifdef __cplusplus
 }
-    #endif  //__cplusplus
+#endif  //__cplusplus
 
 #endif

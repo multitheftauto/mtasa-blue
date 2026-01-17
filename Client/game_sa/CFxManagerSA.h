@@ -12,9 +12,9 @@
 
 #include <game/CFxManager.h>
 
-#define FUNC_FxManager_c__CreateFxSystem  0x4A9BE0
-#define FUNC_FxManager_c__DestroyFxSystem 0x4A9810
-#define FUNC_FxManager_c__GetSystemByName 0x4A9360
+#define FUNC_FxManager_c__CreateFxSystem    0x4A9BE0
+#define FUNC_FxManager_c__DestroyFxSystem   0x4A9810
+#define FUNC_FxManager_c__GetSystemByName   0x4A9360
 
 class CFxSystemBPSAInterface;
 class CFxSystemSAInterface;
@@ -28,32 +28,32 @@ class CFxMemoryPoolSAInterface
     int          unk;
 };
 
-class CFxManagerSAInterface  // FxManager_c
+class CFxManagerSAInterface            // FxManager_c
 {
 public:
     // List_c<FxSystemBP_c>
-    CFxSystemBPSAInterface* pFirstFxBlueprint;    // 0x00
-    CFxSystemBPSAInterface* pUnknownFxBlueprint;  // 0x04
-    unsigned int            uiBlueprintCount;     // 0x08
+    CFxSystemBPSAInterface* pFirstFxBlueprint;              // 0x00
+    CFxSystemBPSAInterface* pUnknownFxBlueprint;            // 0x04
+    unsigned int            uiBlueprintCount;               // 0x08
 
     // List_c<FxSystem_c>
-    CFxSystemSAInterface* pFirstFxSystem;    // 0x0C
-    CFxSystemSAInterface* pUnknownFxSystem;  // 0x10
-    unsigned int          uiFxSystemCount;   // 0x14
+    CFxSystemSAInterface* pFirstFxSystem;              // 0x0C
+    CFxSystemSAInterface* pUnknownFxSystem;            // 0x10
+    unsigned int          uiFxSystemCount;             // 0x14
 
     void* pUnk;
     // List_c<FxEmitter_c>
-    CFxEmitterSAInterface* pFirstFxEmitter;    // 0x18
-    CFxEmitterSAInterface* pUnknownFxEmitter;  // 0x1C
-    unsigned int           uiFxEmitterCount;   // 0x20
+    CFxEmitterSAInterface* pFirstFxEmitter;              // 0x18
+    CFxEmitterSAInterface* pUnknownFxEmitter;            // 0x1C
+    unsigned int           uiFxEmitterCount;             // 0x20
 
-    int                      iTxdSlot;           // 0x24
-    CVector*                 pvecWindDirection;  // 0x28
-    float                    fWindStrength;      // 0x2C
-    int                      unk[21];            // 0x30 (at least partially) Frustrum info
-    int                      iCurrentMatrix;     // 0x88
-    RwMatrix*                apmatMatrices[8];   // 0x8C
-    CFxMemoryPoolSAInterface fxMemoryPool;       // 0xAC
+    int                      iTxdSlot;                     // 0x24
+    CVector*                 pvecWindDirection;            // 0x28
+    float                    fWindStrength;                // 0x2C
+    int                      unk[21];                      // 0x30 (at least partially) Frustrum info
+    int                      iCurrentMatrix;               // 0x88
+    RwMatrix*                apmatMatrices[8];             // 0x8C
+    CFxMemoryPoolSAInterface fxMemoryPool;                 // 0xAC
 };
 static_assert(sizeof(CFxManagerSAInterface) == 0xB8, "Invalid size for CFxManagerSAInterface");
 

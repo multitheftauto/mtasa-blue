@@ -11,7 +11,7 @@
 #include "StdInc.h"
 #include "CIdArray.h"
 
-#define SHARED_ARRAY_BASE_ID 0x02000000
+#define SHARED_ARRAY_BASE_ID    0x02000000
 
 CStack<SArrayId, 1>   CIdArray::m_IDStack;
 std::vector<SIdEntry> CIdArray::m_Elements;
@@ -35,7 +35,7 @@ void CIdArray::Initialize()
         m_uiCapacity = 0;
         m_bInitialized = true;
         m_uiPopIdCounter = 0;
-        m_uiMinTicksBetweenIdReuse = 1000 * 60 * 60;  // 1 hour
+        m_uiMinTicksBetweenIdReuse = 1000 * 60 * 60;            // 1 hour
         m_LastPeriodStart = CTickCount::Now();
         ExpandBy(2000);
     }

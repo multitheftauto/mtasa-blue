@@ -9,7 +9,7 @@
  *****************************************************************************/
 #pragma once
 
-#define WEBSITEREQUESTS_WINDOW_DEFAULTWIDTH  476
+#define WEBSITEREQUESTS_WINDOW_DEFAULTWIDTH 476
 #define WEBSITEREQUESTS_WINDOW_DEFAULTHEIGHT 297
 class CGUIWindow;
 class CGUILabel;

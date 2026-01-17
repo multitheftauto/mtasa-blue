@@ -33,7 +33,7 @@
 */
 
 typedef unsigned long SArrayId;
-#define INVALID_ARRAY_ID 0xFFFFFFFF
+#define INVALID_ARRAY_ID    0xFFFFFFFF
 
 namespace EIdClass
 {

@@ -17,7 +17,7 @@ namespace CEGUI
 {
     class Texture;
     class Renderer;
-}
+}            // namespace CEGUI
 
 class CGUITexture_Impl : public CGUITexture
 {

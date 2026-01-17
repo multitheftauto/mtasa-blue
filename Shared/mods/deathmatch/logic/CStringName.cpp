@@ -15,7 +15,7 @@
 
 extern "C"
 {
-#include "lua/src/lstring.h"
+    #include "lua/src/lstring.h"
 }
 
 static StringNameHash MakeStringNameHash(const std::string_view& str)
@@ -37,8 +37,8 @@ public:
             return &ZERO_NAME_DATA;
         }
 
-        const StringNameHash                         hash = MakeStringNameHash(str);
-        const uint32_t                               idx = hash & CStringName::STRING_TABLE_MASK;
+        const StringNameHash hash = MakeStringNameHash(str);
+        const uint32_t idx = hash & CStringName::STRING_TABLE_MASK;
         CIntrusiveDoubleLinkedList<CStringNameData>& list = m_table[idx];
 
         CStringNameData* data = list.First();
@@ -59,7 +59,7 @@ public:
         data->AddRef();
 
         return data;
-    }
+    } 
 
     void Release(CStringNameData* data)
     {
@@ -71,7 +71,7 @@ public:
 
     CStringNameData* Find(const std::string_view& str, StringNameHash hash)
     {
-        const uint32_t                               idx = hash & CStringName::STRING_TABLE_MASK;
+        const uint32_t idx = hash & CStringName::STRING_TABLE_MASK;
         CIntrusiveDoubleLinkedList<CStringNameData>& list = m_table[idx];
 
         for (CStringNameData& data : list)
@@ -95,7 +95,7 @@ private:
     std::array<CIntrusiveDoubleLinkedList<CStringNameData>, CStringName::STRING_TABLE_LEN> m_table;
 };
 
-CStringNameData CStringNameStorage::ZERO_NAME_DATA{{}, 0u, 1};
+CStringNameData CStringNameStorage::ZERO_NAME_DATA{ {}, 0u, 1 };
 
 /*
     CStringNameData
@@ -119,29 +119,35 @@ void CStringNameData::RemoveRef()
 */
 const CStringName CStringName::ZERO{};
 
-CStringName::CStringName() : m_data(CStringNameStorage::Instance().Get({}))
+CStringName::CStringName() :
+    m_data(CStringNameStorage::Instance().Get({}))
 {
 }
 
-CStringName::CStringName(const char* str) : m_data(CStringNameStorage::Instance().Get(str))
+CStringName::CStringName(const char* str) :
+    m_data(CStringNameStorage::Instance().Get(str))
 {
 }
 
-CStringName::CStringName(const std::string& str) : m_data(CStringNameStorage::Instance().Get(str))
+CStringName::CStringName(const std::string& str) :
+    m_data(CStringNameStorage::Instance().Get(str))
 {
 }
 
-CStringName::CStringName(const std::string_view& str) : m_data(CStringNameStorage::Instance().Get(str))
+CStringName::CStringName(const std::string_view& str) :
+     m_data(CStringNameStorage::Instance().Get(str))
 {
 }
 
-CStringName::CStringName(const CStringName& name) : m_data(name.m_data)
+CStringName::CStringName(const CStringName& name) :
+    m_data(name.m_data)
 {
     if (m_data)
         m_data->AddRef();
 }
 
-CStringName::CStringName(CStringNameData* data) : m_data(data)
+CStringName::CStringName(CStringNameData* data) :
+    m_data(data)
 {
     if (m_data)
         m_data->AddRef();

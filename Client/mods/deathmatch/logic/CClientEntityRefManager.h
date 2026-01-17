@@ -9,9 +9,11 @@
  *****************************************************************************/
 
 #ifdef MTA_DEBUG
-    #define ENTITY_REF_DEBUG(ptr, desc) SString("%08x %s", (int)ptr, desc)
+    #define ENTITY_REF_DEBUG( ptr, desc ) \
+        SString ( "%08x %s", (int)ptr, desc )
 #else
-    #define ENTITY_REF_DEBUG(ptr, desc) NULL
+    #define ENTITY_REF_DEBUG( ptr, desc ) \
+        NULL
 #endif
 
 //

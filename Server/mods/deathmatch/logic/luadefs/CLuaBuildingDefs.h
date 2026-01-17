@@ -19,5 +19,5 @@ public:
     static void AddClass(lua_State* luaVM);
 
     static CBuilding* CreateBuilding(lua_State* const luaVM, std::uint16_t modelId, CVector pos, std::optional<CVector> rot,
-                                     std::optional<std::uint8_t> interior);
+                                           std::optional<std::uint8_t> interior);
 };

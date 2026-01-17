@@ -40,9 +40,9 @@ namespace FPSLimiter
         void SetUserDefinedFPS(std::uint16_t fps) override;
         void SetDisplayVSync(bool enabled) override;
 
-        void OnFPSLimitChange() override;  // Event handler called when the active frame rate limit changes
-        void OnFrameStart() override;      // Event handler called at the start of each frame
-        void OnFrameEnd() override;        // Event handler called at the end of each frame
+        void OnFPSLimitChange() override;            // Event handler called when the active frame rate limit changes
+        void OnFrameStart() override;                // Event handler called at the start of each frame
+        void OnFrameEnd() override;                  // Event handler called at the end of each frame
 
     private:
         // Internal
@@ -57,11 +57,11 @@ namespace FPSLimiter
         LARGE_INTEGER m_lastFrameTime;
         std::uint64_t m_lastFrameTSC;
         HANDLE        m_hTimer;
-        std::uint16_t m_serverEnforcedFps;   // Maximum FPS enforced by the server
-        std::uint16_t m_clientEnforcedFps;   // Maximum FPS enforced by the client
-        std::uint16_t m_userDefinedFps;      // Maximum FPS defined by the user (see `fps_limit` cvar)
-        std::uint16_t m_displayRefreshRate;  // Refresh rate of the display aka VSync (see `vsync` cvar)
-        std::uint16_t m_fpsTarget;           // Currently target FPS limit (0 = no limit)
-        bool          m_appliedThisFrame;    // Whether the FPS limit was applied in the current frame
+        std::uint16_t m_serverEnforcedFps;             // Maximum FPS enforced by the server
+        std::uint16_t m_clientEnforcedFps;             // Maximum FPS enforced by the client
+        std::uint16_t m_userDefinedFps;                // Maximum FPS defined by the user (see `fps_limit` cvar)
+        std::uint16_t m_displayRefreshRate;            // Refresh rate of the display aka VSync (see `vsync` cvar)
+        std::uint16_t m_fpsTarget;                     // Currently target FPS limit (0 = no limit)
+        bool          m_appliedThisFrame;              // Whether the FPS limit was applied in the current frame
     };
-}
+}            // namespace FPSLimiter

@@ -36,7 +36,7 @@ CScriptDebugging::~CScriptDebugging()
         if (m_flushTimerHandle)
         {
             // delete our flush timer
-            DeleteTimerQueueTimer(nullptr, m_flushTimerHandle, INVALID_HANDLE_VALUE);  // INVALID_HANDLE_VALUE = wait for running callbacks to finish
+            DeleteTimerQueueTimer(nullptr, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
         fclose(m_pLogFile);
         m_pLogFile = nullptr;
@@ -71,7 +71,7 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
         if (m_flushTimerHandle)
         {
             // delete our flush timer
-            DeleteTimerQueueTimer(nullptr, m_flushTimerHandle, INVALID_HANDLE_VALUE);  // INVALID_HANDLE_VALUE = wait for running callbacks to finish
+            DeleteTimerQueueTimer(nullptr, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
         fclose(m_pLogFile);
         m_pLogFile = nullptr;
@@ -116,29 +116,30 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
     return false;
 }
 
+
 void CScriptDebugging::UpdateLogOutput()
 {
     SLogLine line;
     while (m_DuplicateLineFilter.PopOutputLine(line))
     {
-        bool sufficientDebugLevel =
-            CheckForSufficientDebugLevel(static_cast<std::uint8_t>(m_uiLogFileLevel), static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
+        bool sufficientDebugLevel = CheckForSufficientDebugLevel(static_cast<std::uint8_t>(m_uiLogFileLevel),
+                                                                 static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
 
         if (sufficientDebugLevel)
         {
             PrintLog(line.strText);
         }
-
-#ifdef MTA_DEBUG
+        
+    #ifdef MTA_DEBUG
         if (!g_pCore->IsDebugVisible())
             return;
-#endif
-
+    #endif
+        
         std::uint8_t clientDebugLevel = 0;
-        auto*        localPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
+        auto* localPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
         if (localPlayer)
             clientDebugLevel = localPlayer->GetPlayerScriptDebugLevel();
-
+        
         bool shouldDisplayInConsole = CheckForSufficientDebugLevel(clientDebugLevel, static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
         if (shouldDisplayInConsole)
             g_pCore->DebugEchoColor(line.strText, line.ucRed, line.ucGreen, line.ucBlue);

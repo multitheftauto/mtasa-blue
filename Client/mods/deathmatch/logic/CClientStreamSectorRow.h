@@ -10,7 +10,7 @@
 
 #pragma once
 
-#define WORLD_SIZE 6000.0f  // was 3000.0f
+#define WORLD_SIZE          6000.0f     // was 3000.0f
 
 #include "CClientCommon.h"
 #include <list>

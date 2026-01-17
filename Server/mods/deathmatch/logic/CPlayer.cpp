@@ -97,7 +97,7 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
     m_ucNametagB = 0xFF;
     m_bNametagShowing = true;
 
-    m_ucBlurLevel = 36;  // Default
+    m_ucBlurLevel = 36;            // Default
 
     // Sync stuff
     m_bSyncingVelocity = false;
@@ -542,7 +542,7 @@ void CPlayer::Reset()
     // functions clientside and serverside possibly returning different results.
     memset(&m_fStats[0], 0, sizeof(m_fStats));
     m_pPlayerStatsPacket->Clear();
-    SetPlayerStat(24, 569.0f);  // default max_health
+    SetPlayerStat(24, 569.0f);            // default max_health
 
     m_pClothes->DefaultClothes();
     m_bHasJetPack = false;
@@ -556,7 +556,7 @@ void CPlayer::Reset()
     m_bCursorShowing = false;
 
     // Added
-    m_ucFightingStyle = 15;  // STYLE_GRAB_KICK
+    m_ucFightingStyle = 15;            // STYLE_GRAB_KICK
 
     SetNametagText(NULL);
     m_ucAlpha = 255;
@@ -633,7 +633,7 @@ bool CPlayer::IsTimeForPuresyncFar()
     {
         int iSlowSyncRate = g_pBandwidthSettings->ZoneUpdateIntervals[ZONE3];
         m_llNextFarPuresyncTime = llTime + iSlowSyncRate;
-        m_llNextFarPuresyncTime += rand() % (1 + iSlowSyncRate / 10);  // Extra bit to help distribute the load
+        m_llNextFarPuresyncTime += rand() % (1 + iSlowSyncRate / 10);            // Extra bit to help distribute the load
 
         // No far sync if light sync is enabled
         if (g_pBandwidthSettings->bLightSyncEnabled)
@@ -646,7 +646,7 @@ bool CPlayer::IsTimeForPuresyncFar()
             g_pStats->lightsync.llSyncBytesSkipped += iNumPackets * GetApproxPuresyncPacketSize();
             g_pStats->lightsync.llSyncPacketsSkipped += iNumSkipped;
             g_pStats->lightsync.llSyncBytesSkipped += iNumSkipped * GetApproxPuresyncPacketSize();
-            return false;  // No far sync if light sync is enabled
+            return false;            // No far sync if light sync is enabled
         }
 
         // Add stats
@@ -740,11 +740,11 @@ void CPlayer::MaybeUpdateOthersNearList()
     else
         // or player has moved too far
         if ((m_vecUpdateNearLastPosition - GetPosition()).LengthSquared() > MOVEMENT_UPDATE_THRESH * MOVEMENT_UPDATE_THRESH)
-        {
-            CLOCK("RelayPlayerPuresync", "UpdateNearList_Movement");
-            UpdateOthersNearList();
-            UNCLOCK("RelayPlayerPuresync", "UpdateNearList_Movement");
-        }
+    {
+        CLOCK("RelayPlayerPuresync", "UpdateNearList_Movement");
+        UpdateOthersNearList();
+        UNCLOCK("RelayPlayerPuresync", "UpdateNearList_Movement");
+    }
 }
 
 // Put this player in other players nearlist if this player can observe them in some way
@@ -1091,7 +1091,7 @@ int CPlayer::GetPuresyncZone(CPlayer* pOther)
         vecDirToHere.Normalize();
         float fDot = vecOtherCamFwd.DotProduct(&vecDirToHere);
         //  1=0 deg   0=90 deg  -1=180 deg
-        if (fDot > 0.643)  // 100 deg fov  [cos ( DEG2RAD( 100 ) * 0.5f )]
+        if (fDot > 0.643)            // 100 deg fov  [cos ( DEG2RAD( 100 ) * 0.5f )]
             iZone = g_pBandwidthSettings->iMaxZoneIfOtherCanSee;
     }
 

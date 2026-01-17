@@ -16,7 +16,7 @@
 #include <list>
 
 #ifndef MAX_PATH
-    #define MAX_PATH 260
+#define MAX_PATH        260
 #endif
 
 class CResourceConfigItem : public CDownloadableResource

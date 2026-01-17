@@ -92,10 +92,10 @@ bool CClientModelManager::TryAdd(const std::shared_ptr<CClientModel>& pModel)
 bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 {
     int modelId = pModel->GetModelID();
-
+    
     if (modelId < 0 || modelId >= static_cast<int>(g_pGame->GetBaseIDforCOL()))
         return false;
-
+    
     std::shared_ptr<CClientModel> model;
     {
         std::lock_guard<std::mutex> lock(m_idMutex);
@@ -172,7 +172,7 @@ int CClientModelManager::GetFreeTxdModelID()
     return static_cast<int>(MAX_MODEL_DFF_ID + usTxdId);
 }
 
-std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
+std::shared_ptr<CClientModel>  CClientModelManager::FindModelByID(int iModelID)
 {
     int32_t iMaxModelId = g_pGame->GetBaseIDforCOL();
 

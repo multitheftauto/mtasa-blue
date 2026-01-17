@@ -10,7 +10,7 @@
 #include <cef3/cef/include/cef_app.h>
 #include <string>
 #include "V8Helpers.h"
-#include "CCefAppAuth.h"  // IPC message append helpers
+#include "CCefAppAuth.h"            // IPC message append helpers
 using V8Helpers::CV8Handler;
 
 class CCefApp : public CefApp, public CefRenderProcessHandler
@@ -77,7 +77,7 @@ public:
             return;
 
         CefRefPtr<CefProcessMessage> message = V8Helpers::SerialiseV8Arguments("TriggerLuaEvent", arguments);
-        if (!CefAppAuth::AppendAuthCodeToMessage(message)) [[unlikely]]  // AUTH: race condition check
+        if (!CefAppAuth::AppendAuthCodeToMessage(message)) [[unlikely]]            // AUTH: race condition check
             return;
         frame->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
     }

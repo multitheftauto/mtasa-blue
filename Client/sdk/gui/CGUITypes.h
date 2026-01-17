@@ -17,7 +17,7 @@
 #include <list>
 
 #ifndef NULL
-    #define NULL 0
+#define NULL 0
 #endif
 
 typedef int       CGUIHandle;
@@ -40,7 +40,7 @@ enum CGUIMouseInput
     CGUI_MI_MOUSEWHEEL
 };
 
-enum CGUIMouseButton  // Synchronized with CEGUI::MouseButton in ceguiinputevent.h
+enum CGUIMouseButton            // Synchronized with CEGUI::MouseButton in ceguiinputevent.h
 {
     LeftButton,
     RightButton,
@@ -100,8 +100,8 @@ struct CGUIMouse
         MiddleButton,
         X1Button,
         X2Button,
-        MouseButtonCount,  //<! Dummy value that is == to the maximum number of mouse buttons supported.
-        NoButton           //!< Value set for no mouse button.  NB: This is not 0, do not assume!
+        MouseButtonCount,            //<! Dummy value that is == to the maximum number of mouse buttons supported.
+        NoButton                     //!< Value set for no mouse button.  NB: This is not 0, do not assume!
     };
 };
 

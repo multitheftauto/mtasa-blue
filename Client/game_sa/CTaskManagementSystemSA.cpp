@@ -114,7 +114,7 @@ CTaskSA* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
     // GTA SA base is around 0x400000-0x900000 range
     constexpr DWORD GTA_BASE_MIN = 0x400000;
     constexpr DWORD GTA_BASE_MAX = 0x900000;
-    DWORD           dwVTableAddr = reinterpret_cast<DWORD>(pVTBL);
+    DWORD dwVTableAddr = reinterpret_cast<DWORD>(pVTBL);
     if (dwVTableAddr < GTA_BASE_MIN || dwVTableAddr > GTA_BASE_MAX)
         return nullptr;
 

@@ -19,11 +19,11 @@ class CPlayerScreenShotPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_SCREENSHOT; };
-    unsigned long GetFlags() const { return 0; };  // Not used
+    unsigned long GetFlags() const { return 0; };            // Not used
 
     bool Read(NetBitStreamInterface& BitStream);
 
-    uchar m_ucStatus;  // 1 = has image, 2 = minimized, 3 = disabled, 4 = error
+    uchar m_ucStatus;            // 1 = has image, 2 = minimized, 3 = disabled, 4 = error
 
     // With every packet if status is 1
     ushort  m_usScreenShotId;

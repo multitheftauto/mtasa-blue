@@ -20,24 +20,24 @@
 class CAnimBlendAssociation;
 class FxSystem_c;
 
-#define FUNC_CTaskSimpleClimb__Constructor   0x67A110
-#define FUNC_CTaskSimpleJetPack__Constructor 0x67B4E0
+#define FUNC_CTaskSimpleClimb__Constructor                          0x67A110
+#define FUNC_CTaskSimpleJetPack__Constructor                        0x67B4E0
 
 class CTaskSimpleClimbSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    bool                m_bIsFinished;
-    bool                m_bChangeAnimation;
-    bool                m_bChangePosition;
-    bool                m_bForceClimb;
-    bool                m_bInvalidClimb;
-    eClimbHeights       m_nHeightForAnim;
-    eClimbHeights       m_nHeightForPos;
-    unsigned char       m_nSurfaceType;
-    char                m_nFallAfterVault;
-    float               m_fHandholdHeading;
-    CVector             m_vecHandholdPos;
-    CEntitySAInterface* m_pClimbEnt;
+    bool          m_bIsFinished;
+    bool          m_bChangeAnimation;
+    bool          m_bChangePosition;
+    bool          m_bForceClimb;
+    bool          m_bInvalidClimb;
+    eClimbHeights m_nHeightForAnim;
+    eClimbHeights m_nHeightForPos;
+    unsigned char m_nSurfaceType;
+    char          m_nFallAfterVault;
+    float         m_fHandholdHeading;
+    CVector       m_vecHandholdPos;
+    CEntitySAInterface*      m_pClimbEnt;
 
     short                  m_nGetToPosCounter;
     CAnimBlendAssociation* m_pAnim;
@@ -46,7 +46,7 @@ public:
 class CTaskSimpleClimbSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleClimb
 {
 public:
-    CTaskSimpleClimbSA() {};
+    CTaskSimpleClimbSA(){};
     CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight = CLIMB_GRAB,
                        const bool bForceClimb = false);
 
@@ -100,7 +100,7 @@ public:
 class CTaskSimpleJetPackSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleJetPack
 {
 public:
-    CTaskSimpleJetPackSA() {};
+    CTaskSimpleJetPackSA(){};
     CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float fCruiseHeight = 10.0f, int nHoverTime = 0);
 
     bool IsFinished() const override { return static_cast<const CTaskSimpleJetPackSAInterface*>(GetInterface())->m_bIsFinished; }

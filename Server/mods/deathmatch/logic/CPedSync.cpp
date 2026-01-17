@@ -163,7 +163,7 @@ void CPedSync::StartSync(CPlayer* pPlayer, CPed* pPed)
 
     // Call the onElementStartSync event
     CLuaArguments Arguments;
-    Arguments.PushElement(pPlayer);  // New syncer
+    Arguments.PushElement(pPlayer);            // New syncer
     pPed->CallEvent("onElementStartSync", Arguments);
 }
 
@@ -180,7 +180,7 @@ void CPedSync::StopSync(CPed* pPed)
 
     // Call the onElementStopSync event
     CLuaArguments Arguments;
-    Arguments.PushElement(pSyncer);  // Old syncer
+    Arguments.PushElement(pSyncer);            // Old syncer
     pPed->CallEvent("onElementStopSync", Arguments);
 }
 

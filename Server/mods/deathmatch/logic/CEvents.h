@@ -54,10 +54,10 @@ private:
 
     CFastHashMap<SString, SEvent*> m_EventHashMap;
 
-    std::vector<int> m_CancelledList;
-    bool             m_bEventCancelled;
-    bool             m_bWasEventCancelled;
-    SString          m_strLastError;
+    std::vector<int>               m_CancelledList;
+    bool                           m_bEventCancelled;
+    bool                           m_bWasEventCancelled;
+    SString                        m_strLastError;
 
-    std::vector<CEventContext*> m_ContextStack;
+    std::vector<CEventContext*>    m_ContextStack;
 };

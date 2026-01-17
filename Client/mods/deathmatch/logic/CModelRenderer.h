@@ -17,10 +17,15 @@ public:
     struct SModelToRender final
     {
         CModelInfo* pModelInfo;
-        CMatrix     matrix;
-        float       lighting;
+        CMatrix matrix;
+        float lighting;
 
-        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f) : pModelInfo(pModelInfo), matrix(matrix), lighting(lighting) {}
+        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f) :
+            pModelInfo(pModelInfo),
+            matrix(matrix),
+            lighting(lighting)
+        {
+        }
     };
 
     bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting);
@@ -31,6 +36,7 @@ public:
 
     static void RenderEntity(SModelToRender* entity, float distance);
 
-private:
+private:  
+
     std::vector<SModelToRender> m_Queue;
 };

@@ -23,7 +23,7 @@ class CMainMenu;
 class CNewsBrowser;
 class CLanguageSelector;
 
-#define CORE_MTA_NEWS_ITEMS 3
+#define CORE_MTA_NEWS_ITEMS         3
 
 struct sMenuItem
 {

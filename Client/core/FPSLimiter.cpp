@@ -16,7 +16,7 @@
 
 namespace FPSLimiter
 {
-    constexpr std::uint16_t DEFAULT_FPS_VSYNC = 60;  // Default user-defined FPS limit
+    constexpr std::uint16_t DEFAULT_FPS_VSYNC = 60;            // Default user-defined FPS limit
 
     FPSLimiter::FPSLimiter()
 
@@ -130,7 +130,7 @@ namespace FPSLimiter
                 return validFps;
             }
         }
-        return DEFAULT_FPS_VSYNC;  // Shouldn't happen, sane default
+        return DEFAULT_FPS_VSYNC;            // Shouldn't happen, sane default
     }
 
     void FPSLimiter::CalculateCurrentFPSLimit()
@@ -169,12 +169,12 @@ namespace FPSLimiter
         std::stringstream ss;
         ss << "FPSLimiter: FPS limit changed to " << (m_fpsTarget == 0 ? "unlimited" : std::to_string(m_fpsTarget));
         ss << " (Enforced by: " << EnumToString(GetEnforcer()) << ")";
-#ifdef MTA_DEBUG
+    #ifdef MTA_DEBUG
         ss << " [Server: " << (m_serverEnforcedFps == 0 ? "unlimited" : std::to_string(m_serverEnforcedFps));
         ss << ", Client: " << (m_clientEnforcedFps == 0 ? "unlimited" : std::to_string(m_clientEnforcedFps));
         ss << ", User: " << (m_userDefinedFps == 0 ? "unlimited" : std::to_string(m_userDefinedFps));
         ss << ", VSync: " << (m_displayRefreshRate == 0 ? "unlimited" : std::to_string(m_displayRefreshRate)) << "]";
-#endif
+    #endif
         auto* pConsole = CCore::GetSingleton().GetConsole();
         if (pConsole)
             CCore::GetSingleton().GetConsole()->Print(ss.str().c_str());
@@ -207,7 +207,7 @@ namespace FPSLimiter
             LARGE_INTEGER start, end;
             std::uint64_t tscStart = __rdtsc();
             QueryPerformanceCounter(&start);
-            Sleep(10);  // Short calibration period
+            Sleep(10);            // Short calibration period
             QueryPerformanceCounter(&end);
             std::uint64_t tscEnd = __rdtsc();
 
@@ -229,7 +229,7 @@ namespace FPSLimiter
         {
             std::uint64_t lastMeasuredTSC = __rdtsc();
             std::uint64_t remaining = targetTSC - lastMeasuredTSC;
-            if (remaining > 10000)  // > ~3us at 3GHz
+            if (remaining > 10000)            // > ~3us at 3GHz
             {
                 // Long wait: check every ~1000 cycles
                 do
@@ -237,7 +237,7 @@ namespace FPSLimiter
                     for (int i = 0; i < 250; ++i)
                         _mm_pause();
                     lastMeasuredTSC = __rdtsc();
-                } while (lastMeasuredTSC + 5000 < targetTSC);  // Stop 5000 cycles early
+                } while (lastMeasuredTSC + 5000 < targetTSC);            // Stop 5000 cycles early
             }
 
             // Final precision loop
@@ -264,7 +264,7 @@ namespace FPSLimiter
                     if (SharedUtil::TryGetProcAddress(ntdll, "NtSetTimerResolution", setRes))
                     {
                         ULONG actualRes;
-                        setRes(10000, TRUE, &actualRes);  // 1ms in 100ns units
+                        setRes(10000, TRUE, &actualRes);            // 1ms in 100ns units
                         resolutionSet = true;
                     }
                 }
@@ -294,7 +294,7 @@ namespace FPSLimiter
 
                 if (m_hTimer)
                 {
-                    double timerWaitMs = waitTimeMs - 1.0;  // Leave margin for spin
+                    double timerWaitMs = waitTimeMs - 1.0;            // Leave margin for spin
                     if (timerWaitMs > 0.5)
                     {
                         LARGE_INTEGER dueTime;
@@ -364,4 +364,4 @@ namespace FPSLimiter
     ADD_ENUM(EnforcerType::Server, "server")
     IMPLEMENT_ENUM_END("EnforcerType");
 
-};  // namespace FPSLimiter
+};            // namespace FPSLimiter

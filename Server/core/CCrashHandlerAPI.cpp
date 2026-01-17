@@ -27,9 +27,9 @@ CONDITIONAL COMPILATION :
 #include "CCrashHandlerAPI.h"
 #ifdef WIN32
 
-    #ifdef _M_IX86
-        #include <SharedUtil.Detours.h>
-    #endif
+#ifdef _M_IX86
+    #include <SharedUtil.Detours.h>
+#endif
 
 /*//////////////////////////////////////////////////////////////////////
                       File Scope Global Variables
@@ -46,13 +46,13 @@ static LPTOP_LEVEL_EXCEPTION_FILTER g_pfnOrigFilt = NULL;
 // The exception handler
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
-    /*//////////////////////////////////////////////////////////////////////
-                                Destructor Class
-    //////////////////////////////////////////////////////////////////////*/
-    // See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
-    // Turn off warning : initializers put in library initialization area
-    #pragma warning(disable : 4073)
-    #pragma init_seg(lib)
+/*//////////////////////////////////////////////////////////////////////
+                            Destructor Class
+//////////////////////////////////////////////////////////////////////*/
+// See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
+// Turn off warning : initializers put in library initialization area
+#pragma warning (disable : 4073)
+#pragma init_seg(lib)
 class CleanUpCrashHandler
 {
 public:
@@ -102,12 +102,11 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
         {
             g_pfnOrigFilt = SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
 
-    #ifdef _M_IX86
+#ifdef _M_IX86
             // Stop the OS from turning off our handler
             // Ref: https://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
             LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI * RedirectedSetUnhandledExceptionFilter)
-            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER
-            {
+            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER {
                 // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
                 // our handler will not get removed.
                 return 0;
@@ -116,7 +115,7 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
                           "invalid type of RedirectedSetUnhandledExceptionFilter");
 
             DetourLibraryFunction("kernel32.dll", "SetUnhandledExceptionFilter", RedirectedSetUnhandledExceptionFilter);
-    #endif
+#endif
         }
     }
     return (TRUE);

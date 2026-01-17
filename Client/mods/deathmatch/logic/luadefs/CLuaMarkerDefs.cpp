@@ -182,9 +182,8 @@ int CLuaMarkerDefs::GetMarkerColor(lua_State* luaVM)
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.G));
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.B));
 
-        if (!pMarker->AreAlphaLimitsIgnored() &&
-            (pMarker->GetMarkerType() == CClientMarker::MARKER_CHECKPOINT || pMarker->GetMarkerType() == CClientMarker::MARKER_ARROW))
-            lua_pushnumber(luaVM, 255);  // fake alpha
+        if (!pMarker->AreAlphaLimitsIgnored() && (pMarker->GetMarkerType() == CClientMarker::MARKER_CHECKPOINT || pMarker->GetMarkerType() == CClientMarker::MARKER_ARROW))
+            lua_pushnumber(luaVM, 255); // fake alpha
         else
             lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
 
@@ -428,8 +427,7 @@ bool CLuaMarkerDefs::IsCoronaReflectionEnabled(CClientMarker* pMarker)
     return pCorona->IsReflectionEnabled();
 }
 
-bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CClientMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
-                                                    std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size)
+bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CClientMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size)
 {
     SColor color;
     color.R = r.value_or(255);
@@ -440,8 +438,7 @@ bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CClientMarker* marker, std::
     return CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(*marker, color, size.value_or(marker->GetSize() * 0.625f));
 }
 
-std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(
-    CClientMarker* marker) noexcept
+std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(CClientMarker* marker) noexcept
 {
     CClientCheckpoint* checkpoint = marker->GetCheckpoint();
     if (!checkpoint)

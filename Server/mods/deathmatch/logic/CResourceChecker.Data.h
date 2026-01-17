@@ -15,7 +15,7 @@ namespace
     // Minimum version requirements for functions/events
     //
 
-#if 0  // Activate the counterpart in CResourceChecker::CheckVersionRequirements when you add items to these lists
+#if 0 // Activate the counterpart in CResourceChecker::CheckVersionRequirements when you add items to these lists
     struct SVersionItem
     {
         SString functionName;
@@ -213,7 +213,7 @@ namespace
         {false, "getPlayerOccupiedVehicleSeat", "getPedOccupiedVehicleSeat"},
         {false, "isPlayerInVehicle", "isPedInVehicle"},
         {false, "getPlayerFromNick", "getPlayerFromName"},
-
+      
         // Client
         {false, "getClientName", "getPlayerName"},
         {false, "getClientIP", "getPlayerIP"},
@@ -241,8 +241,9 @@ namespace
         // Base Encoding & Decoding
         {true, "base64Encode", "Please manually change this to encodeString (different syntax). Refer to the wiki for details"},
         {true, "base64Decode", "Please manually change this to decodeString (different syntax). Refer to the wiki for details"},
-
+    
         // Ped
         {false, "setPedOnFire", "setElementOnFire"},
-        {false, "isPedOnFire", "isElementOnFire"}};
-}  // namespace
+        {false, "isPedOnFire", "isElementOnFire"}
+    };
+}            // namespace

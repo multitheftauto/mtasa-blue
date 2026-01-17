@@ -98,8 +98,8 @@ CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFile, const SStrin
 
         if (!strReport.empty())
         {
-            strReport += SString("[effects cur:%d created:%d dest:%d]", g_StaticMemoryState.Effect.iCurrentCount, g_StaticMemoryState.Effect.iCreatedCount,
-                                 g_StaticMemoryState.Effect.iDestroyedCount);
+            strReport += SString("[effects cur:%d created:%d dest:%d]", g_StaticMemoryState.Effect.iCurrentCount,
+                                 g_StaticMemoryState.Effect.iCreatedCount, g_StaticMemoryState.Effect.iDestroyedCount);
             AddReportLog(7544, SString("NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFile));
         }
         if (!pEffectTemplate)
@@ -171,7 +171,7 @@ void CEffectCloner::MaybeTidyUp(bool bForceDrasticMeasures)
     int   iTicks = static_cast<int>((1 - fTicksAlpha * fTicksAlpha) * 30 * 60 * 1000) + 1000;
 
 #ifdef MTA_DEBUG
-    iTicks /= 60;  // Mins to seconds for debug
+    iTicks /= 60;            // Mins to seconds for debug
 #endif
 
     // Valid Effect not used for a little while can go

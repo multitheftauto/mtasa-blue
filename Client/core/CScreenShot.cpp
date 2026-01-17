@@ -42,83 +42,83 @@ static bool savePhotoInDocuments = false;
 
 namespace
 {
-    float Clamp(float value, float minValue, float maxValue)
+float Clamp(float value, float minValue, float maxValue)
+{
+    if (value < minValue)
+        return minValue;
+    if (value > maxValue)
+        return maxValue;
+    return value;
+}
+
+void ApplyBorderlessAdjustmentsToBuffer(void* rawData, uint width, uint height)
+{
+    if (!rawData || width == 0 || height == 0)
+        return;
+
+    bool isBorderless = false;
+    if (CVideoModeManagerInterface* videoModeManager = GetVideoModeManager())
+        isBorderless = videoModeManager->IsDisplayModeWindowed() || videoModeManager->IsDisplayModeFullScreenWindow();
+
+    if (!isBorderless && ::g_pDeviceState)
+        isBorderless = (::g_pDeviceState->CreationState.PresentationParameters.Windowed != 0);
+
+    float gammaPower = 1.0f;
+    float brightnessScale = 1.0f;
+    float contrastScale = 1.0f;
+    float saturationScale = 1.0f;
+    bool  applyWindowed = true;
+    bool  applyFullscreen = false;
+    ::BorderlessGamma::FetchSettings(gammaPower, brightnessScale, contrastScale, saturationScale, applyWindowed, applyFullscreen);
+
+    const bool adjustmentsEnabled = isBorderless ? applyWindowed : applyFullscreen;
+    if (!adjustmentsEnabled)
+        return;
+
+    if (!::BorderlessGamma::ShouldApplyAdjustments(gammaPower, brightnessScale, contrastScale, saturationScale))
+        return;
+
+    BYTE*       data = static_cast<BYTE*>(rawData);
+    const size_t pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height);
+    const float  inv255 = 1.0f / 255.0f;
+    const float  contrastPivot = 0.5f;
+
+    for (size_t i = 0; i < pixelCount; ++i)
     {
-        if (value < minValue)
-            return minValue;
-        if (value > maxValue)
-            return maxValue;
-        return value;
+        float r = Clamp(data[0] * inv255, 0.0f, 1.0f);
+        float g = Clamp(data[1] * inv255, 0.0f, 1.0f);
+        float b = Clamp(data[2] * inv255, 0.0f, 1.0f);
+
+        r = powf(r, gammaPower);
+        g = powf(g, gammaPower);
+        b = powf(b, gammaPower);
+
+        r *= brightnessScale;
+        g *= brightnessScale;
+        b *= brightnessScale;
+
+        r = (r - contrastPivot) * contrastScale + contrastPivot;
+        g = (g - contrastPivot) * contrastScale + contrastPivot;
+        b = (b - contrastPivot) * contrastScale + contrastPivot;
+
+        float luminance = Clamp(0.299f * r + 0.587f * g + 0.114f * b, 0.0f, 1.0f);
+
+        r = luminance + (r - luminance) * saturationScale;
+        g = luminance + (g - luminance) * saturationScale;
+        b = luminance + (b - luminance) * saturationScale;
+
+        r = Clamp(r, 0.0f, 1.0f);
+        g = Clamp(g, 0.0f, 1.0f);
+        b = Clamp(b, 0.0f, 1.0f);
+
+        data[0] = static_cast<BYTE>(r * 255.0f + 0.5f);
+        data[1] = static_cast<BYTE>(g * 255.0f + 0.5f);
+        data[2] = static_cast<BYTE>(b * 255.0f + 0.5f);
+
+        data += 4;
     }
-
-    void ApplyBorderlessAdjustmentsToBuffer(void* rawData, uint width, uint height)
-    {
-        if (!rawData || width == 0 || height == 0)
-            return;
-
-        bool isBorderless = false;
-        if (CVideoModeManagerInterface* videoModeManager = GetVideoModeManager())
-            isBorderless = videoModeManager->IsDisplayModeWindowed() || videoModeManager->IsDisplayModeFullScreenWindow();
-
-        if (!isBorderless && ::g_pDeviceState)
-            isBorderless = (::g_pDeviceState->CreationState.PresentationParameters.Windowed != 0);
-
-        float gammaPower = 1.0f;
-        float brightnessScale = 1.0f;
-        float contrastScale = 1.0f;
-        float saturationScale = 1.0f;
-        bool  applyWindowed = true;
-        bool  applyFullscreen = false;
-        ::BorderlessGamma::FetchSettings(gammaPower, brightnessScale, contrastScale, saturationScale, applyWindowed, applyFullscreen);
-
-        const bool adjustmentsEnabled = isBorderless ? applyWindowed : applyFullscreen;
-        if (!adjustmentsEnabled)
-            return;
-
-        if (!::BorderlessGamma::ShouldApplyAdjustments(gammaPower, brightnessScale, contrastScale, saturationScale))
-            return;
-
-        BYTE*        data = static_cast<BYTE*>(rawData);
-        const size_t pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height);
-        const float  inv255 = 1.0f / 255.0f;
-        const float  contrastPivot = 0.5f;
-
-        for (size_t i = 0; i < pixelCount; ++i)
-        {
-            float r = Clamp(data[0] * inv255, 0.0f, 1.0f);
-            float g = Clamp(data[1] * inv255, 0.0f, 1.0f);
-            float b = Clamp(data[2] * inv255, 0.0f, 1.0f);
-
-            r = powf(r, gammaPower);
-            g = powf(g, gammaPower);
-            b = powf(b, gammaPower);
-
-            r *= brightnessScale;
-            g *= brightnessScale;
-            b *= brightnessScale;
-
-            r = (r - contrastPivot) * contrastScale + contrastPivot;
-            g = (g - contrastPivot) * contrastScale + contrastPivot;
-            b = (b - contrastPivot) * contrastScale + contrastPivot;
-
-            float luminance = Clamp(0.299f * r + 0.587f * g + 0.114f * b, 0.0f, 1.0f);
-
-            r = luminance + (r - luminance) * saturationScale;
-            g = luminance + (g - luminance) * saturationScale;
-            b = luminance + (b - luminance) * saturationScale;
-
-            r = Clamp(r, 0.0f, 1.0f);
-            g = Clamp(g, 0.0f, 1.0f);
-            b = Clamp(b, 0.0f, 1.0f);
-
-            data[0] = static_cast<BYTE>(r * 255.0f + 0.5f);
-            data[1] = static_cast<BYTE>(g * 255.0f + 0.5f);
-            data[2] = static_cast<BYTE>(b * 255.0f + 0.5f);
-
-            data += 4;
-        }
-    }
-}  // namespace
+}
+} // namespace
 
 void CScreenShot::InitiateScreenShot(bool bIsCameraShot)
 {
@@ -224,8 +224,8 @@ DWORD WINAPI CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
         ppScreenData[y] = new BYTE[ms_uiWidth * 4];
     }
 
-// Copy the surface data into a row-based buffer for libpng
-#define BYTESPERPIXEL 4
+    // Copy the surface data into a row-based buffer for libpng
+    #define BYTESPERPIXEL 4
     unsigned long ulLineWidth = ms_uiWidth * 4;
     for (unsigned int i = 0; i < ms_uiHeight; i++)
     {

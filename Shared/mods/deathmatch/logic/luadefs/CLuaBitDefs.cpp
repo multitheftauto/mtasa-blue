@@ -184,7 +184,7 @@ int CLuaBitDefs::bitLRotate(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        iDisp &= (32 - 1);  // iDisp %= 32
+        iDisp &= (32 - 1);            // iDisp %= 32
         uint uiResult = (uiVar << iDisp) | (uiVar >> (32 - iDisp));
 
         lua_pushnumber(luaVM, uiResult);
@@ -209,7 +209,7 @@ int CLuaBitDefs::bitRRotate(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        iDisp &= (32 - 1);  // iDisp %= 32
+        iDisp &= (32 - 1);            // iDisp %= 32
         uint uiResult = (uiVar >> iDisp) | (uiVar << (32 - iDisp));
 
         lua_pushnumber(luaVM, uiResult);

@@ -9,15 +9,14 @@ class CPlantColEntEntry
 {
 public:
     CEntitySAInterface* m_Entity;
-    CPlantLocTri**      m_Objects;
-    uint16              m_numTriangles;
-    CPlantColEntEntry*  m_NextEntry;
-    CPlantColEntEntry*  m_PrevEntry;
+    CPlantLocTri**     m_Objects;
+    uint16             m_numTriangles;
+    CPlantColEntEntry* m_NextEntry;
+    CPlantColEntEntry* m_PrevEntry;
 
 public:
-    void ReleaseEntry()
-    {
-        using CPlantColEntEntry_ReleaseEntry = void*(__thiscall*)(CPlantColEntEntry*);
+    void               ReleaseEntry() {
+        using CPlantColEntEntry_ReleaseEntry = void* ( __thiscall *)(CPlantColEntEntry*);
         ((CPlantColEntEntry_ReleaseEntry)0x5DB8A0)(this);
     };
 };

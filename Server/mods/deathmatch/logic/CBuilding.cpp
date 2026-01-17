@@ -209,3 +209,4 @@ bool CBuilding::SetLowLodBuilding(CBuilding* pNewLowLodBuilding) noexcept
         return true;
     }
 }
+

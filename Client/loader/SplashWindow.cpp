@@ -24,7 +24,7 @@ using hrc = std::chrono::high_resolution_clock;
 ///////////////////////////////////////////////////////////////////////////
 //
 // Splash window logic.
-//
+// 
 ///////////////////////////////////////////////////////////////////////////
 
 class Splash final
@@ -111,7 +111,7 @@ bool Splash::CreateSplashWindow(HINSTANCE instance)
     windowClass.style = 0;
     windowClass.hInstance = instance;
     windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    windowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110));  // IDI_ICON1 from Launcher
+    windowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110));            // IDI_ICON1 from Launcher
     windowClass.lpszClassName = TEXT("SplashWindow");
 
     if (!RegisterClass(&windowClass))
@@ -144,7 +144,7 @@ bool Splash::CreateSplashWindow(HINSTANCE instance)
     m_barX = {};
     m_barY = ScaleToDpi(197, dpi);
     m_barWidth = m_width;
-    m_barHeight = ScaleToDpi(5, dpi) + 1;  // We add 1 pixel because scaling can cause the bar to be too small.
+    m_barHeight = ScaleToDpi(5, dpi) + 1;            // We add 1 pixel because scaling can cause the bar to be too small.
 
     m_windowClass = windowClass;
     m_window = window;

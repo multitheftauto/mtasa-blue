@@ -13,9 +13,9 @@
 
 #ifndef _WINDOWS_
 
-    #define WIN32_LEAN_AND_MEAN  // Exclude all uncommon functions from windows.h to reduce build time by 100ms
+#define WIN32_LEAN_AND_MEAN     // Exclude all uncommon functions from windows.h to reduce build time by 100ms
 
-    #include <windows.h>
+#include <windows.h>
 #endif
 
 #include <bochs_internal/bochs_crc32.h>
@@ -74,8 +74,8 @@ protected:
     CChecksum m_ServerChecksum;
 
     bool m_bAutoDownload;
-    bool m_bInDownloadQueue;  // File in auto download queue
-    bool m_bDownloaded;       // File has been downloaded and is ready to use
+    bool m_bInDownloadQueue;            // File in auto download queue
+    bool m_bDownloaded;                 // File has been downloaded and is ready to use
     uint m_uiDownloadSize;
     uint m_uiHttpServerIndex;
     bool m_bModifedByScript;

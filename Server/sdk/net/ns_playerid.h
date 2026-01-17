@@ -47,7 +47,7 @@ public:
         m_usPort = usPort;
     };
 
-    ~NetServerPlayerID() {};
+    ~NetServerPlayerID(){};
 
     friend inline int operator==(const NetServerPlayerID& left, const NetServerPlayerID& right)
     {

@@ -11,28 +11,28 @@
 #include "StdInc.h"
 #include "CLanguageSelector.h"
 
-#define LANGUAGE_ICON_SIZE_X      20
-#define LANGUAGE_ICON_SIZE_Y      24
-#define LANGUAGE_ICON_LABEL_GAP_X 10  // Gap between language icon and label
+#define LANGUAGE_ICON_SIZE_X         20
+#define LANGUAGE_ICON_SIZE_Y         24
+#define LANGUAGE_ICON_LABEL_GAP_X    10            // Gap between language icon and label
 
-#define LABEL_SIZE_X 165
-#define LABEL_SIZE_Y 16
+#define LABEL_SIZE_X                 165
+#define LABEL_SIZE_Y                 16
 
 #define LANGUAGE_ICON_LABEL_OFFSET_Y ((LANGUAGE_ICON_SIZE_Y - LABEL_SIZE_Y) / 2)
 
 // Language icon and label combo
-#define ITEM_SIZE_X 165
-#define ITEM_SIZE_Y 24
+#define ITEM_SIZE_X                  165
+#define ITEM_SIZE_Y                  24
 
 // Current language button
-#define BUTTON_MARGIN_X 20
-#define BUTTON_MARGIN_Y 5
+#define BUTTON_MARGIN_X              20
+#define BUTTON_MARGIN_Y              5
 
 // All languages list
-#define LIST_MARGIN_X       20
-#define LIST_MARGIN_Y       18
-#define LIST_ITEM_SPACING_X 10
-#define LIST_ITEM_SPACING_Y 1
+#define LIST_MARGIN_X                20
+#define LIST_MARGIN_Y                18
+#define LIST_ITEM_SPACING_X          10
+#define LIST_ITEM_SPACING_Y          1
 
 ///////////////////////////////////////////////////////////////
 //
@@ -57,8 +57,7 @@ CLanguageSelector::~CLanguageSelector()
 {
     CGUI* pGUI = g_pCore ? g_pCore->GetGUI() : nullptr;
 
-    auto destroyElement = [pGUI](auto*& element)
-    {
+    auto destroyElement = [pGUI](auto*& element) {
         if (!element)
             return;
 
@@ -126,17 +125,17 @@ void CLanguageSelector::CreateGUI(CGUIElement* pMainMenuCanvas)
         pLabel->SetZOrderingEnabled(false);
         pLabel->SetText(g_pLocalization->GetLanguageNativeName());
 
-        m_ButtonItem.strLocale = "";
-        m_ButtonItem.pContainerPane = pContainerPane;
-        m_ButtonItem.pIcon = pIcon;
-        m_ButtonItem.vecIconInitialPos = pIcon->GetPosition();
-        m_ButtonItem.vecIconInitialSize = pIcon->GetSize();
-        m_ButtonItem.pLabel = pLabel;
-        m_ButtonItem.vecLabelInitialPos = pLabel->GetPosition();
-        m_ButtonItem.vecLabelInitialSize = pLabel->GetSize();
-        m_ButtonItem.pContainerPane->SetMouseButtonDownHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonClick, this));
-        m_ButtonItem.pContainerPane->SetMouseEnterHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonEnter, this));
-        m_ButtonItem.pContainerPane->SetMouseLeaveHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonLeave, this));
+    m_ButtonItem.strLocale = "";
+    m_ButtonItem.pContainerPane = pContainerPane;
+    m_ButtonItem.pIcon = pIcon;
+    m_ButtonItem.vecIconInitialPos = pIcon->GetPosition();
+    m_ButtonItem.vecIconInitialSize = pIcon->GetSize();
+    m_ButtonItem.pLabel = pLabel;
+    m_ButtonItem.vecLabelInitialPos = pLabel->GetPosition();
+    m_ButtonItem.vecLabelInitialSize = pLabel->GetSize();
+    m_ButtonItem.pContainerPane->SetMouseButtonDownHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonClick, this));
+    m_ButtonItem.pContainerPane->SetMouseEnterHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonEnter, this));
+    m_ButtonItem.pContainerPane->SetMouseLeaveHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonLeave, this));
     }
 
     //

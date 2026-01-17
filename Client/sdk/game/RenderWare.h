@@ -22,10 +22,10 @@
     #define RWFORCEENUMSIZEINT ((std::int32_t)((~((std::uint32_t)0)) >> 1))
 #endif
 #define RWPLUGINOFFSET(_type, _base, _offset) ((_type*)((std::uint8_t*)(_base) + (_offset)))
-#define RW_STRUCT_ALIGN                       ((int)((~((unsigned int)0)) >> 1))
-#define RW_TEXTURE_NAME_LENGTH                32
-#define RW_FRAME_NAME_LENGTH                  23
-#define RW_MAX_TEXTURE_COORDS                 8
+#define RW_STRUCT_ALIGN           ((int)((~((unsigned int)0))>>1))
+#define RW_TEXTURE_NAME_LENGTH    32
+#define RW_FRAME_NAME_LENGTH      23
+#define RW_MAX_TEXTURE_COORDS     8
 
 /* Type IDs */
 
@@ -59,11 +59,11 @@ typedef RpClump* (*RpClumpCallback)(RpClump* clump, void* data);
 
 // RenderWare primitive types
 struct RwV2d
-{  // 8-byte
+{            // 8-byte
     float x, y;
 };
 struct RwV3d
-{  // 12-byte
+{            // 12-byte
     float x, y, z;
 };
 struct RwPlane
@@ -207,7 +207,7 @@ struct RwObject
     unsigned char subtype;
     unsigned char flags;
     unsigned char privateFlags;
-    void*         parent;  // should be RwFrame with RpClump
+    void*         parent;            // should be RwFrame with RpClump
 };
 struct RwVertex
 {
@@ -226,18 +226,18 @@ struct RwList
 };
 struct RwFrame
 {
-    RwObject        object;       // 0
-    void *          pad1, *pad2;  // 8
-    RwMatrix        modelling;    // 16
-    RwMatrix        ltm;          // 32
-    RwList          objects;      // 48
-    struct RwFrame* child;        // 56
-    struct RwFrame* next;         // 60
-    struct RwFrame* root;         // 64
+    RwObject        object;                 // 0
+    void *          pad1, *pad2;            // 8
+    RwMatrix        modelling;              // 16
+    RwMatrix        ltm;                    // 32
+    RwList          objects;                // 48
+    struct RwFrame* child;                  // 56
+    struct RwFrame* next;                   // 60
+    struct RwFrame* root;                   // 64
 
     // Rockstar Frame extension (0x253F2FE) (24 bytes)
-    unsigned char pluginData[8];                     // padding
-    char          szName[RW_FRAME_NAME_LENGTH + 1];  // name (as stored in the frame extension)
+    unsigned char pluginData[8];                               // padding
+    char          szName[RW_FRAME_NAME_LENGTH + 1];            // name (as stored in the frame extension)
 };
 struct RwTexDictionary
 {
@@ -261,11 +261,11 @@ struct RwTextureCoordinates
 };
 struct RwRaster
 {
-    RwRaster*      parent;                // 0
-    unsigned char* pixels;                // 4
-    unsigned char* palette;               // 8
-    int            width, height, depth;  // 12, 16 / 0x10, 20
-    int            numLevels;             // 24 / 0x18
+    RwRaster*      parent;                          // 0
+    unsigned char* pixels;                          // 4
+    unsigned char* palette;                         // 8
+    int            width, height, depth;            // 12, 16 / 0x10, 20
+    int            numLevels;                       // 24 / 0x18
     short          u, v;
     unsigned char  type;
     unsigned char  flags;
@@ -273,7 +273,7 @@ struct RwRaster
     unsigned char  format;
     unsigned char* origPixels;
     int            origWidth, origHeight, origDepth;
-    void*          renderResource;  // RwD3D9Raster continues from here
+    void*          renderResource;            // RwD3D9Raster continues from here
 };
 struct RwColorFloat
 {
@@ -372,7 +372,7 @@ struct RpLight
     unsigned short unknown2;
 };
 struct RpClump
-{  // RenderWare (plugin) Clump (used by GTA)
+{            // RenderWare (plugin) Clump (used by GTA)
     RwObject        object;
     RwList          atomics;
     RwList          lights;
@@ -407,9 +407,9 @@ struct RpTriangle
 struct RpMorphTarget
 {
     RpGeometry* parentGeom;
-    RwSphere    boundingSphere;
-    RwV3d*      verts;
-    RwV3d*      normals;
+    RwSphere   boundingSphere;
+    RwV3d* verts;
+    RwV3d* normals;
 };
 struct RpGeometry
 {
@@ -432,34 +432,31 @@ struct RpGeometry
     RpMorphTarget*        morph_target;
 };
 
-inline auto rwObjectGetParent(RwObject* o)
-{
+inline auto rwObjectGetParent(RwObject* o) {
     return (RwObject*)o->parent;
 }
 
-inline auto RpAtomicGetFrame(RpAtomic* atomic)
-{
+inline auto RpAtomicGetFrame(RpAtomic* atomic) {
     return (RwFrame*)atomic->object.object.parent;
 }
 
-inline auto RwFrameGetParent(RwFrame* f)
-{
+inline auto RwFrameGetParent(RwFrame* f) {
     return (RwFrame*)rwObjectGetParent((RwObject*)f);
 }
 
-inline RwMatrix* RwFrameGetMatrix(RwFrame* f)
-{
+inline RwMatrix* RwFrameGetMatrix(RwFrame* f) {
     return &f->modelling;
 }
 
-inline void _rpAtomicResyncInterpolatedSphere(RpAtomic* atomic)
-{
+inline void _rpAtomicResyncInterpolatedSphere(RpAtomic* atomic) {
     reinterpret_cast<void(__cdecl*)(RpAtomic*)>(0x7491F0)(atomic);
 }
 
 /* NB "RpAtomicGetBoundingSphere(atomic++)" will break it */
-#define RpAtomicGetBoundingSphere(_atomic) \
-    ((((_atomic)->interpolator.flags & rpINTERPOLATORDIRTYSPHERE) ? _rpAtomicResyncInterpolatedSphere(_atomic), 0 : 0), &((_atomic)->boundingSphere))
+#define RpAtomicGetBoundingSphere(_atomic)                              \
+    ((((_atomic)->interpolator.flags & rpINTERPOLATORDIRTYSPHERE)?      \
+      _rpAtomicResyncInterpolatedSphere(_atomic), 0: 0),                \
+      &((_atomic)->boundingSphere))
 
 /*****************************************************************************/
 /** RenderWare I/O                                                          **/
@@ -557,13 +554,13 @@ struct RwDevice
 typedef bool (*RwStandardFunc)(void*, void*, std::int32_t);
 struct RwGlobals
 {
-    void*          curCamera;
-    void*          curWorld;
-    std::uint16_t  renderFrame;
-    std::uint16_t  lightFrame;
-    std::uint16_t  pad[2];
-    RwDevice       dOpenDevice;
-    RwStandardFunc stdFunc[29];
+    void*               curCamera;
+    void*               curWorld;
+    std::uint16_t       renderFrame;
+    std::uint16_t       lightFrame;
+    std::uint16_t       pad[2];
+    RwDevice            dOpenDevice;
+    RwStandardFunc      stdFunc[29];
     // RwLinkList          dirtyFrameList;
     // RwFileFunctions     fileFuncs;
     // RwStringFunctions   stringFuncs;
@@ -574,4 +571,4 @@ struct RwGlobals
     // RwEngineStatus      engineStatus;
     // RwUInt32            resArenaInitSize;
 };
-// static_assert(sizeof(RwGlobals) == 0x158, "Incorrect class size: RwGlobals");
+//static_assert(sizeof(RwGlobals) == 0x158, "Incorrect class size: RwGlobals");

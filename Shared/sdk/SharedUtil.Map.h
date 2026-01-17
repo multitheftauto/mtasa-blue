@@ -216,4 +216,4 @@ namespace SharedUtil
         return std::get<bool>(collection.insert(item));
     }
 
-}
+}            // namespace SharedUtil

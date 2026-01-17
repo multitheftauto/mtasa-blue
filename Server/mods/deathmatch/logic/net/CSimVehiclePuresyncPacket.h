@@ -69,7 +69,7 @@ private:
         CVector vecCamPosition;
         CVector vecCamFwd;
 
-        CVector VehPosition;  // Same as PlrPosition ?
+        CVector VehPosition;            // Same as PlrPosition ?
         CVector VehRotationDeg;
         CVector BothVelocity;
         CVector VehTurnSpeed;

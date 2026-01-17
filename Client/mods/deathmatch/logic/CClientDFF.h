@@ -48,9 +48,9 @@ public:
     static bool IsDFFData(const SString& strData);
 
     // Sorta a hack that these are required by CClientEntity...
-    void Unlink() {};
+    void Unlink(){};
     void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition) {};
+    void SetPosition(const CVector& vecPosition){};
 
 private:
     bool LoadFromFile(SString filePath);

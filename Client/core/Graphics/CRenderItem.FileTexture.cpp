@@ -175,20 +175,20 @@ void CFileTextureItem::CreateUnderlyingData(const CPixels* pInPixels, bool bMipM
     D3DFORMAT      D3DFormat = (D3DFORMAT)format;
     int            iMipMaps = bMipMaps ? D3DX_DEFAULT : 1;
 
-    if (FAILED(D3DXCreateTextureFromFileInMemoryEx(m_pDevice,           //__in     LPDIRECT3DDEVICE9 pDevice,
-                                                   pPixels->GetData(),  //__in     LPCVOID pSrcData,
-                                                   pPixels->GetSize(),  //__in     UINT SrcDataSize,
-                                                   D3DX_DEFAULT,        //__in     UINT Width,
-                                                   D3DX_DEFAULT,        //__in     UINT Height,
-                                                   iMipMaps,            //__in     UINT MipLevels,
-                                                   0,                   //__in     DWORD Usage,
-                                                   D3DFormat,           //__in     D3DFORMAT Format,
-                                                   D3DPOOL_MANAGED,     //__in     D3DPOOL Pool,
-                                                   D3DX_DEFAULT,        //__in     DWORD Filter,
-                                                   D3DX_DEFAULT,        //__in     DWORD MipFilter,
-                                                   0,                   //__in     D3DCOLOR ColorKey,
-                                                   &imageInfo,          //__inout  D3DXIMAGE_INFO *pSrcInfo,
-                                                   NULL,                //__out    PALETTEENTRY *pPalette,
+    if (FAILED(D3DXCreateTextureFromFileInMemoryEx(m_pDevice,                     //__in     LPDIRECT3DDEVICE9 pDevice,
+                                                   pPixels->GetData(),            //__in     LPCVOID pSrcData,
+                                                   pPixels->GetSize(),            //__in     UINT SrcDataSize,
+                                                   D3DX_DEFAULT,                  //__in     UINT Width,
+                                                   D3DX_DEFAULT,                  //__in     UINT Height,
+                                                   iMipMaps,                      //__in     UINT MipLevels,
+                                                   0,                             //__in     DWORD Usage,
+                                                   D3DFormat,                     //__in     D3DFORMAT Format,
+                                                   D3DPOOL_MANAGED,               //__in     D3DPOOL Pool,
+                                                   D3DX_DEFAULT,                  //__in     DWORD Filter,
+                                                   D3DX_DEFAULT,                  //__in     DWORD MipFilter,
+                                                   0,                             //__in     D3DCOLOR ColorKey,
+                                                   &imageInfo,                    //__inout  D3DXIMAGE_INFO *pSrcInfo,
+                                                   NULL,                          //__out    PALETTEENTRY *pPalette,
                                                    (IDirect3DTexture9**)&m_pD3DTexture)))
         return;
 
@@ -228,37 +228,37 @@ void CFileTextureItem::CreateUnderlyingData(bool bMipMaps, uint uiSizeX, uint ui
 
     if (textureType == D3DRTYPE_VOLUMETEXTURE)
     {
-        if (FAILED(D3DXCreateVolumeTexture(m_pDevice,        //__in   LPDIRECT3DDEVICE9 pDevice,
-                                           uiSizeX,          //__in   UINT Width,
-                                           uiSizeY,          //__in   UINT Height,
-                                           uiVolumeDepth,    //__in   UINT Depth,
-                                           iMipMaps,         //__in   UINT MipLevels,
-                                           0,                //__in   DWORD Usage,
-                                           D3DFormat,        //__in   D3DFORMAT Format,
-                                           D3DPOOL_MANAGED,  //__in   D3DPOOL Pool,
+        if (FAILED(D3DXCreateVolumeTexture(m_pDevice,                  //__in   LPDIRECT3DDEVICE9 pDevice,
+                                           uiSizeX,                    //__in   UINT Width,
+                                           uiSizeY,                    //__in   UINT Height,
+                                           uiVolumeDepth,              //__in   UINT Depth,
+                                           iMipMaps,                   //__in   UINT MipLevels,
+                                           0,                          //__in   DWORD Usage,
+                                           D3DFormat,                  //__in   D3DFORMAT Format,
+                                           D3DPOOL_MANAGED,            //__in   D3DPOOL Pool,
                                            (IDirect3DVolumeTexture9**)&m_pD3DTexture)))
             return;
     }
     else if (textureType == D3DRTYPE_CUBETEXTURE)
     {
-        if (FAILED(D3DXCreateCubeTexture(m_pDevice,        //__in   LPDIRECT3DDEVICE9 pDevice,
-                                         uiSizeX,          //__in   UINT Width,
-                                         iMipMaps,         //__in   UINT MipLevels,
-                                         0,                //__in   DWORD Usage,
-                                         D3DFormat,        //__in   D3DFORMAT Format,
-                                         D3DPOOL_MANAGED,  //__in   D3DPOOL Pool,
+        if (FAILED(D3DXCreateCubeTexture(m_pDevice,                  //__in   LPDIRECT3DDEVICE9 pDevice,
+                                         uiSizeX,                    //__in   UINT Width,
+                                         iMipMaps,                   //__in   UINT MipLevels,
+                                         0,                          //__in   DWORD Usage,
+                                         D3DFormat,                  //__in   D3DFORMAT Format,
+                                         D3DPOOL_MANAGED,            //__in   D3DPOOL Pool,
                                          (IDirect3DCubeTexture9**)&m_pD3DTexture)))
             return;
     }
     else
     {
-        if (FAILED(D3DXCreateTexture(m_pDevice,        //__in   LPDIRECT3DDEVICE9 pDevice,
-                                     uiSizeX,          //__in   UINT Width,
-                                     uiSizeY,          //__in   UINT Height,
-                                     iMipMaps,         //__in   UINT MipLevels,
-                                     0,                //__in   DWORD Usage,
-                                     D3DFormat,        //__in   D3DFORMAT Format,
-                                     D3DPOOL_MANAGED,  //__in   D3DPOOL Pool,
+        if (FAILED(D3DXCreateTexture(m_pDevice,                  //__in   LPDIRECT3DDEVICE9 pDevice,
+                                     uiSizeX,                    //__in   UINT Width,
+                                     uiSizeY,                    //__in   UINT Height,
+                                     iMipMaps,                   //__in   UINT MipLevels,
+                                     0,                          //__in   DWORD Usage,
+                                     D3DFormat,                  //__in   D3DFORMAT Format,
+                                     D3DPOOL_MANAGED,            //__in   D3DPOOL Pool,
                                      (IDirect3DTexture9**)&m_pD3DTexture)))
             return;
 

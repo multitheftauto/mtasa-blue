@@ -102,8 +102,8 @@ void CDeathmatchObject::UpdateMovement()
 
     if (!bStillRunning)
     {
-        _StopMovement(false);  // We don't unregister ourselves here since CDeathmatchObject::UpdateMovement is called from an iteration in
-                               // CMovingObjectsManager::DoPulse
+        _StopMovement(false);            // We don't unregister ourselves here since CDeathmatchObject::UpdateMovement is called from an iteration in
+                                         // CMovingObjectsManager::DoPulse
         // and we are automatically removed from the list after CDeathmatchObject::UpdateMovement if we are finished
     }
 }

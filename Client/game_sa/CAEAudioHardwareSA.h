@@ -13,10 +13,10 @@
 
 #include <game/CAEAudioHardware.h>
 
-#define FUNC_CAEAudioHardware__IsSoundBankLoaded 0x4D88C0
-#define FUNC_CAEAudioHardware__LoadSoundBank     0x4D88A0
+#define FUNC_CAEAudioHardware__IsSoundBankLoaded                            0x4D88C0
+#define FUNC_CAEAudioHardware__LoadSoundBank                                0x4D88A0
 
-#define CLASS_CAEAudioHardware 0xB5F8B8
+#define CLASS_CAEAudioHardware                                              0xB5F8B8
 
 class CAEAudioHardwareSAInterface
 {

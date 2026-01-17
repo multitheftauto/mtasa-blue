@@ -153,8 +153,8 @@ public:
  */
 class LibraryRedirectionPatch final
 {
-    static constexpr auto LIBRARY_NAME_BEFORE = "WINMM.dll";           // Do not correct this value. It must be equal to the one in the original binary.
-    static constexpr auto LIBRARY_NAME_AFTER = LOADER_PROXY_DLL_NAME;  // This must be equal to the library produced by 'Loader Proxy' project.
+    static constexpr auto LIBRARY_NAME_BEFORE = "WINMM.dll";            // Do not correct this value. It must be equal to the one in the original binary.
+    static constexpr auto LIBRARY_NAME_AFTER = LOADER_PROXY_DLL_NAME;            // This must be equal to the library produced by 'Loader Proxy' project.
 
     static auto GetImportDescriptor(PatchableExecutable& pe) -> IMAGE_IMPORT_DESCRIPTOR*
     {
@@ -278,8 +278,8 @@ class HighPerformanceGraphicsPatch final
             item.rvaName = EXPORT_DIRECTORY_VA + offset;
 
             auto value = reinterpret_cast<char*>(base + offset);
-            std::copy(item.name.data(), item.name.data() + item.name.size() + 1, value);  // Plus one for null byte.
-            offset += item.name.size() + 1;                                               // Length plus null byte.
+            std::copy(item.name.data(), item.name.data() + item.name.size() + 1, value);            // Plus one for null byte.
+            offset += item.name.size() + 1;                                                         // Length plus null byte.
         }
 
         // Write export name RVAs.

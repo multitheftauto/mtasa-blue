@@ -143,7 +143,7 @@ inline void SafeDebugPrint(Buffer& buffer, const char* format, ...)
     if (format == nullptr)
         return;
 
-    auto*             data = buffer.data();
+    auto* data = buffer.data();
     const std::size_t size = buffer.size();
 
     if (data == nullptr || size == 0)
@@ -166,7 +166,7 @@ inline void SafeDebugPrintC(char* buffer, std::size_t bufferSize, const char* fo
     va_end(args);
 }
 
-#define SAFE_DEBUG_PRINT(buffer, ...)               SafeDebugPrint((buffer), __VA_ARGS__)
+#define SAFE_DEBUG_PRINT(buffer, ...) SafeDebugPrint((buffer), __VA_ARGS__)
 #define SAFE_DEBUG_PRINT_C(buffer, bufferSize, ...) SafeDebugPrintC((buffer), (bufferSize), __VA_ARGS__)
 
 inline void SafeDebugPrintPrefixed(std::string_view prefix, const char* format, ...)
@@ -246,7 +246,7 @@ extern "C"
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames,
-                                                                                std::vector<std::string>* pOutTrace);
+                                                                  std::vector<std::string>* pOutTrace);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableSehExceptionHandler();
 

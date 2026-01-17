@@ -13,31 +13,31 @@
 
 #include <game/CWorld.h>
 
-#define FUNC_Add                                     0x563220
-#define FUNC_Remove                                  0x563280
-#define FUNC_ProcessLineOfSight                      0x56BA00
-#define FUNC_FindGroundZFor3DCoord                   0x5696C0
-#define FUNC_IsLineOfSightClear                      0x56A490
-#define FUNC_HasCollisionBeenLoaded                  0x410CE0
-#define FUNC_RemoveBuildingsNotInArea                0x4094B0
-#define FUNC_RemoveReferencesToDeletedObject         0x565510
-#define FUNC_COcclusion_ProcessBeforeRendering       0x7201C0
-#define VAR_COcclusion_NumActiveOccluders            0xC73CC0
-#define CALL_CCullZones_FindTunnelAttributesForCoors 0x55570D
-#define FUNC_CWorld_FindPositionForTrackPosition     0x6F59E0
-#define FUNC_CWorld_TestSphereAgainstWorld           0x569E20
+#define FUNC_Add                                            0x563220
+#define FUNC_Remove                                         0x563280
+#define FUNC_ProcessLineOfSight                             0x56BA00
+#define FUNC_FindGroundZFor3DCoord                          0x5696C0
+#define FUNC_IsLineOfSightClear                             0x56A490
+#define FUNC_HasCollisionBeenLoaded                         0x410CE0
+#define FUNC_RemoveBuildingsNotInArea                       0x4094B0
+#define FUNC_RemoveReferencesToDeletedObject                0x565510
+#define FUNC_COcclusion_ProcessBeforeRendering              0x7201C0
+#define VAR_COcclusion_NumActiveOccluders                   0xC73CC0
+#define CALL_CCullZones_FindTunnelAttributesForCoors        0x55570D
+#define FUNC_CWorld_FindPositionForTrackPosition            0x6F59E0
+#define FUNC_CWorld_TestSphereAgainstWorld                  0x569E20
 
-#define VAR_IgnoredEntity           0xB7CD68
-#define VAR_currArea                0xB72914
-#define ARRAY_StreamSectors         0xB7D0B8
-#define NUM_StreamSectorRows        120
-#define NUM_StreamSectorCols        120
-#define ARRAY_StreamRepeatSectors   0xB992B8
-#define NUM_StreamRepeatSectorRows  16
-#define NUM_StreamRepeatSectorCols  16
-#define VAR_fJetpackMaxHeight       0x8703D8
-#define VTBL_CBUILDING              0x8585C8
-#define VAR_CWorld_bIncludeCarTires 0xB7CD70
+#define VAR_IgnoredEntity                                   0xB7CD68
+#define VAR_currArea                                        0xB72914
+#define ARRAY_StreamSectors                                 0xB7D0B8
+#define NUM_StreamSectorRows                                120
+#define NUM_StreamSectorCols                                120
+#define ARRAY_StreamRepeatSectors                           0xB992B8
+#define NUM_StreamRepeatSectorRows                          16
+#define NUM_StreamRepeatSectorCols                          16
+#define VAR_fJetpackMaxHeight                               0x8703D8
+#define VTBL_CBUILDING                                      0x8585C8
+#define VAR_CWorld_bIncludeCarTires                         0xB7CD70
 
 class CWorldSA : public CWorld
 {
@@ -75,10 +75,9 @@ public:
     void          ResetAllSurfaceInfo() override;
     bool          ResetSurfaceInfo(short sSurfaceID) override;
 
-    CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds,
-                                    bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) override;
+    CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) override;
 
 private:
-    float         m_fAircraftMaxHeight;
-    CSurfaceType* m_pSurfaceInfo;
+    float                                                     m_fAircraftMaxHeight;
+    CSurfaceType*                                             m_pSurfaceInfo;
 };

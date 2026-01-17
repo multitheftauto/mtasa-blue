@@ -29,13 +29,13 @@ namespace CefAppAuth
             return false;
 
         auto& authCode = AuthCodeStorage();
-
+        
         // Block messages until initialized (prevents race condition)
         if (authCode.empty()) [[unlikely]]
             return false;
-
+        
         CefRefPtr<CefListValue> args = message->GetArgumentList();
-        const auto              size = args->GetSize();
+        const auto size = args->GetSize();
         args->SetSize(size + 1);
         args->SetString(size, authCode.c_str());
         return true;

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 #include "../../vendor/tinygettext/log.hpp"
-#define MTA_LOCALE_TEXTDOMAIN "client"
+#define MTA_LOCALE_TEXTDOMAIN       "client"
 // TRANSLATORS: Replace with your language native name
 #define NATIVE_LANGUAGE_NAME _td("English")
 
@@ -20,7 +20,7 @@ struct NativeLanguageName
     std::string locale;
     std::string name;
 } g_nativeLanguageNames[] = {
-#include "languages.generated.h"
+    #include "languages.generated.h"
 };
 
 CLocalization::CLocalization(const SString& strLocale, const SString& strLocalePath)
@@ -107,8 +107,7 @@ CLanguage* CLocalization::GetLanguage(SString strLocale)
 
     try
     {
-        std::unique_ptr<CLanguage> pLanguage =
-            std::make_unique<CLanguage>(m_DictManager.get_dictionary(Lang, MTA_LOCALE_TEXTDOMAIN), Lang.str(), Lang.get_name());
+        std::unique_ptr<CLanguage> pLanguage = std::make_unique<CLanguage>(m_DictManager.get_dictionary(Lang, MTA_LOCALE_TEXTDOMAIN), Lang.str(), Lang.get_name());
         CLanguage* pLanguagePtr = pLanguage.get();
         m_LanguageMap.emplace(strLocale, std::move(pLanguage));
         return pLanguagePtr;
@@ -238,7 +237,7 @@ SString CLocalization::GetLanguageDirectory(CLanguage* pLanguage)
     if (!pSelectLang)
         return SString();
 
-    SString strFullPath = pSelectLang->GetDictionary().get_filepath();
+    SString    strFullPath = pSelectLang->GetDictionary().get_filepath();
 
     // Replace all backslashes with forward slashes
     int idx = 0;

@@ -30,14 +30,14 @@ enum class PedState
     PED_DUMMY,
     PED_PAUSE,
     PED_ATTACK,
-    PED_FIGHT,  // new close combat fist fight mode
+    PED_FIGHT,            // new close combat fist fight mode
     PED_FACE_PHONE,
     PED_MAKE_PHONECALL,
     PED_CHAT,
     PED_MUG,
     PED_AIMGUN,
     PED_AI_CONTROL,
-    PED_SEEK_CAR,  // 24
+    PED_SEEK_CAR,            // 24
     PED_SEEK_BOAT_POSITION,
     PED_FOLLOW_ROUTE,
     PED_CPR,
@@ -51,7 +51,7 @@ enum class PedState
     PED_JOG,
     PED_ANSWER_MOBILE,
     PED_HANG_OUT,
-    PED_STATES_NO_AI,  // only put states after here that do not require AI, put other ones before this
+    PED_STATES_NO_AI,            // only put states after here that do not require AI, put other ones before this
     PED_ABSEIL_FROM_HELI,
     PED_SIT,
     PED_JUMP,
@@ -59,11 +59,11 @@ enum class PedState
     PED_GETUP,
     PED_STAGGER,
     PED_EVADE_DIVE,
-    PED_STATES_CAN_SHOOT,  // only put states before here than ped can be shot during
+    PED_STATES_CAN_SHOOT,            // only put states before here than ped can be shot during
     PED_ENTER_TRAIN,
     PED_EXIT_TRAIN,
     PED_ARREST_PLAYER,
-    PED_DRIVING,  // 50
+    PED_DRIVING,            // 50
     PED_PASSENGER,
     PED_TAXI_PASSENGER,
     PED_OPEN_DOOR,

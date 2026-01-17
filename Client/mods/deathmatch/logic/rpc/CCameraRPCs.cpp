@@ -26,18 +26,18 @@ void CCameraRPCs::SetCameraMatrix(NetBitStreamInterface& bitStream)
     uchar ucTimeContext;
     if (!bitStream.Read(ucTimeContext))
         return;
-
+        
     if (m_pCamera)
         m_pCamera->SetSyncTimeContext(ucTimeContext);
 
     CVector vecPosition, vecLookAt;
     float   fRoll = 0.0f;
     float   fFOV = 70.0f;
-
-    if (!bitStream.Read(vecPosition.fX) || !bitStream.Read(vecPosition.fY) || !bitStream.Read(vecPosition.fZ) || !bitStream.Read(vecLookAt.fX) ||
-        !bitStream.Read(vecLookAt.fY) || !bitStream.Read(vecLookAt.fZ))
+    
+    if (!bitStream.Read(vecPosition.fX) || !bitStream.Read(vecPosition.fY) || !bitStream.Read(vecPosition.fZ) || 
+        !bitStream.Read(vecLookAt.fX) || !bitStream.Read(vecLookAt.fY) || !bitStream.Read(vecLookAt.fZ))
     {
-        return;  // Invalid data
+        return; // Invalid data
     }
 
     const unsigned int unreadBits = bitStream.GetNumberOfUnreadBits();
@@ -53,10 +53,11 @@ void CCameraRPCs::SetCameraMatrix(NetBitStreamInterface& bitStream)
     }
 
     // Validate float values to prevent potential issues
-    if (!std::isfinite(fRoll) || !std::isfinite(fFOV) || !std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ) ||
+    if (!std::isfinite(fRoll) || !std::isfinite(fFOV) || 
+        !std::isfinite(vecPosition.fX) || !std::isfinite(vecPosition.fY) || !std::isfinite(vecPosition.fZ) ||
         !std::isfinite(vecLookAt.fX) || !std::isfinite(vecLookAt.fY) || !std::isfinite(vecLookAt.fZ))
     {
-        return;  // Invalid float values (NaN, infinity, etc.)
+        return; // Invalid float values (NaN, infinity, etc.)
     }
 
     if (fFOV <= 0.0f)
@@ -92,7 +93,7 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
     uchar ucTimeContext;
     if (!bitStream.Read(ucTimeContext))
         return;
-
+        
     if (m_pCamera)
         m_pCamera->SetSyncTimeContext(ucTimeContext);
 
@@ -159,7 +160,7 @@ void CCameraRPCs::FadeCamera(NetBitStreamInterface& bitStream)
 {
     unsigned char ucFadeIn;
     float         fFadeTime = 1.0f;
-
+    
     if (!bitStream.Read(ucFadeIn) || !bitStream.Read(fFadeTime))
         return;
 
@@ -172,7 +173,7 @@ void CCameraRPCs::FadeCamera(NetBitStreamInterface& bitStream)
     if (ucFadeIn)
     {
         m_pCamera->FadeIn(fFadeTime);
-
+        
         // Validate game and HUD pointers
         if (g_pGame && g_pGame->GetHud())
         {
@@ -189,7 +190,7 @@ void CCameraRPCs::FadeCamera(NetBitStreamInterface& bitStream)
             return;
 
         m_pCamera->FadeOut(fFadeTime, ucRed, ucGreen, ucBlue);
-
+        
         // Validate game and HUD pointers
         if (g_pGame && g_pGame->GetHud())
         {

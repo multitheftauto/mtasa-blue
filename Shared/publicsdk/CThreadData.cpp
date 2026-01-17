@@ -22,21 +22,21 @@ CThreadData::CThreadData()
 {
     bAbortThread = false;
 
-// Initialize the mutexes
-#ifdef WIN32  // Win32 threads
+    // Initialize the mutexes
+    #ifdef WIN32    // Win32 threads
     InitializeCriticalSection(&MutexPrimary);
     InitializeCriticalSection(&MutexLogical);
-#else  // POSIX threads
+    #else           // POSIX threads
     pthread_mutex_init(&MutexPrimary, NULL);
     pthread_mutex_init(&MutexLogical, NULL);
-#endif
+    #endif
 }
 
 CThreadData::~CThreadData()
 {
-#ifdef WIN32
+    #ifdef WIN32
     DeleteCriticalSection(&MutexPrimary);
     DeleteCriticalSection(&MutexLogical);
-#else
-#endif
+    #else
+    #endif
 }

@@ -18,26 +18,26 @@
 
 // #include "../game_sa/CPedIKSA.h"
 
-#define HOOKPOS_CWeapon__Fire                        0x742300
-#define HOOKPOS_CWeapon__PostFire                    0x742A02  // if the function returns true
-#define HOOKPOS_CWeapon__PostFire2                   0x742423  // if the function returns false
-#define HOOKPOS_CPedIK__PointGunInDirection          0x5FDC00
-#define HOOKPOS_CTaskSimpleGangDriveBy__PlayerTarget 0x621A57
-#define HOOKPOS_CWeapon__Fire_Sniper                 0x7424A6
-#define HOOKRET_CWeapon__Fire_Sniper                 0x7424D7
-#define HOOKPOS_CEventDamage__AffectsPed             0x4B35A0
-#define HOOKPOS_CEventVehicleExplosion__AffectsPed   0x4B0E58
-#define HOOKPOS_CFireManager__StartFire              0x53A050
-#define HOOKPOS_CProjectileInfo__AddProjectile       0x737C80
-#define HOOKPOS_CProjectile__CProjectile             0x5A4030
-#define HOOKPOS_IKChainManager_PointArm              0x618B66
-#define HOOKPOS_IKChainManager_LookAt                0x618970
-#define HOOKPOS_IKChainManager_SkipAim               0x62AEE7
-#define HOOKPOS_CTaskSimpleUsegun_ProcessPed         0x62A380
-#define HOOKPOS_CWeapon_FireInstantHit               0x740B42
-#define HOOKPOS_CWeapon_FireInstantHit_CameraMode    0x74036D
-#define HOOKPOS_CWeapon_FireInstantHit_IsPlayer      0x74034C
-#define HOOKPOS_CWeapon_DoBulletImpact               0x73B550
+#define HOOKPOS_CWeapon__Fire                           0x742300
+#define HOOKPOS_CWeapon__PostFire                       0x742A02 // if the function returns true
+#define HOOKPOS_CWeapon__PostFire2                      0x742423 // if the function returns false
+#define HOOKPOS_CPedIK__PointGunInDirection             0x5FDC00
+#define HOOKPOS_CTaskSimpleGangDriveBy__PlayerTarget    0x621A57
+#define HOOKPOS_CWeapon__Fire_Sniper                    0x7424A6
+#define HOOKRET_CWeapon__Fire_Sniper                    0x7424D7
+#define HOOKPOS_CEventDamage__AffectsPed                0x4B35A0
+#define HOOKPOS_CEventVehicleExplosion__AffectsPed      0x4B0E58
+#define HOOKPOS_CFireManager__StartFire                 0x53A050
+#define HOOKPOS_CProjectileInfo__AddProjectile          0x737C80
+#define HOOKPOS_CProjectile__CProjectile                0x5A4030
+#define HOOKPOS_IKChainManager_PointArm                 0x618B66
+#define HOOKPOS_IKChainManager_LookAt                   0x618970
+#define HOOKPOS_IKChainManager_SkipAim                  0x62AEE7
+#define HOOKPOS_CTaskSimpleUsegun_ProcessPed            0x62A380
+#define HOOKPOS_CWeapon_FireInstantHit                  0x740B42
+#define HOOKPOS_CWeapon_FireInstantHit_CameraMode       0x74036D
+#define HOOKPOS_CWeapon_FireInstantHit_IsPlayer         0x74034C
+#define HOOKPOS_CWeapon_DoBulletImpact                  0x73B550
 
 // our stuff
 VOID           InitShotsyncHooks();

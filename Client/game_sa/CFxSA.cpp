@@ -193,7 +193,7 @@ void CFxSA::TriggerGunshot(CEntity* pEntity, CVector& vecPosition, CVector& vecD
     CVector* pvecDirection = &vecDirection;
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerGunshot;
-    // clang-format off
+        // clang-format off
         __asm
     {
         mov     ecx, dwThis
@@ -203,7 +203,7 @@ void CFxSA::TriggerGunshot(CEntity* pEntity, CVector& vecPosition, CVector& vecD
         push    dwEntity
         call    dwFunc
     }
-    // clang-format on
+        // clang-format on
 }
 
 void CFxSA::TriggerTankFire(CVector& vecPosition, CVector& vecDirection)
@@ -268,11 +268,10 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     // clang-format on
 }
 
-void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA,
-                        bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
+void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
 {
     // Init our own FxPrtMult struct
-    FxPrtMult_c fxPrt{{fR, fG, fB, fA}, fSize, 0, fLife};
+    FxPrtMult_c fxPrt{{fR,fG,fB,fA}, fSize, 0, fLife};
     CVector     newDirection;
 
     FxSystem_c* fxParticleSystem;
@@ -355,7 +354,6 @@ void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPositio
         newDirection.fZ = (rand() % 10000) * 0.0001f * 4 - 2 + newDirection.fZ;
 
         // Call FxSystem_c::AddParticle
-        ((int(__thiscall*)(FxSystem_c*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(
-            fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
+        ((int(__thiscall*)(FxSystem_c*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
     }
 }

@@ -13,7 +13,7 @@
 #include "HeapTrace.h"
 
 #ifdef DETECT_LEAKS
-    #include <list>
+#include <list>
 using namespace std;
 
 struct ALLOC_INFO

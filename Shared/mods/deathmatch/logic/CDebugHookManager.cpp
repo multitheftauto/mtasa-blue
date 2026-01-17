@@ -33,10 +33,10 @@ CDebugHookManager::CDebugHookManager()
 {
     m_MaskArgumentsMap = {
 #ifndef MTA_CLIENT
-        {"logIn", {{EArgType::Password, 2}}},               // player, account, 2=PASSWORD
-        {"addAccount", {{EArgType::Password, 1}}},          // name, 1=PASSWORD
-        {"getAccount", {{EArgType::Password, 1}}},          // name, 1=PASSWORD
-        {"setAccountPassword", {{EArgType::Password, 1}}},  // account, 1=PASSWORD
+        {"logIn", {{EArgType::Password, 2}}},                         // player, account, 2=PASSWORD
+        {"addAccount", {{EArgType::Password, 1}}},                    // name, 1=PASSWORD
+        {"getAccount", {{EArgType::Password, 1}}},                    // name, 1=PASSWORD
+        {"setAccountPassword", {{EArgType::Password, 1}}},            // account, 1=PASSWORD
         {"dbConnect", {{EArgType::MaxArgs, 0}}},
         {"dbExec", {{EArgType::MaxArgs, 0}}},
         {"dbFree", {{EArgType::MaxArgs, 0}}},
@@ -44,15 +44,15 @@ CDebugHookManager::CDebugHookManager()
         {"dbPrepareString", {{EArgType::MaxArgs, 0}}},
         {"dbQuery", {{EArgType::MaxArgs, 0}}},
         {"executeSQLQuery", {{EArgType::MaxArgs, 0}}},
-        {"callRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},  // 0=URL, ...
+        {"callRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},            // 0=URL, ...
 #endif
-        {"fetchRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},  // 0=URL, ...
-        {"passwordHash", {{EArgType::Password, 0}}},                    // 0=PASSWORD, ...
-        {"passwordVerify", {{EArgType::Password, 0}}},                  // 0=PASSWORD, ...
-        {"encodeString", {{EArgType::MaxArgs, 2}}},                     // algorithm, input, 2=SECRETKEY, ...
-        {"decodeString", {{EArgType::MaxArgs, 2}}},                     // algorithm, input, 2=SECRETKEY, ...
-        {"teaEncode", {{EArgType::Password, 1}}},                       // input, 1=SECRETKEY
-        {"teaDecode", {{EArgType::Password, 1}}},                       // input, 1=SECRETKEY
+        {"fetchRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},            // 0=URL, ...
+        {"passwordHash", {{EArgType::Password, 0}}},                              // 0=PASSWORD, ...
+        {"passwordVerify", {{EArgType::Password, 0}}},                            // 0=PASSWORD, ...
+        {"encodeString", {{EArgType::MaxArgs, 2}}},                               // algorithm, input, 2=SECRETKEY, ...
+        {"decodeString", {{EArgType::MaxArgs, 2}}},                               // algorithm, input, 2=SECRETKEY, ...
+        {"teaEncode", {{EArgType::Password, 1}}},                                 // input, 1=SECRETKEY
+        {"teaDecode", {{EArgType::Password, 1}}},                                 // input, 1=SECRETKEY
     };
 }
 
@@ -534,10 +534,10 @@ bool CDebugHookManager::IsNameAllowed(const char* szName, const std::vector<SDeb
         const SDebugHookCallInfo& info = eventHookList[i];
 
         if (info.allowedNameMap.empty() && !bNameMustBeExplicitlyAllowed)
-            return true;  // All names allowed
+            return true;            // All names allowed
 
         if (MapContains(info.allowedNameMap, szName))
-            return true;  // Name allowed
+            return true;            // Name allowed
     }
     return false;
 }

@@ -33,7 +33,7 @@ void CLightsyncManager::RegisterPlayer(CPlayer* pPlayer)
     entry.ullTime = GetTickCount64_();
     entry.pPlayer = pPlayer;
     entry.eType = SYNC_PLAYER;
-    entry.uiContext = 0;  // Unused
+    entry.uiContext = 0;            // Unused
     m_Queue.push_back(entry);
 }
 

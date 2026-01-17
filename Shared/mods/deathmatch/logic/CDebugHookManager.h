@@ -16,7 +16,7 @@
 
 #ifdef MTA_CLIENT
     #define CElement CClientEntity
-    #define CPlayer  CClientPlayer
+    #define CPlayer CClientPlayer
 #endif
 
 class CLuaMain;

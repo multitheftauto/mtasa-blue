@@ -1,7 +1,7 @@
 
 // Pragmas
-#pragma warning(disable : 4995)
-#pragma warning(disable : 4244)
+#pragma warning (disable:4995)
+#pragma warning (disable:4244)
 
 // #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
