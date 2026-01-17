@@ -3367,6 +3367,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     // Mark him as successfully entered
                                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
+                                    // Remove jetpack from him
+                                    if (pPed->IsPlayer() && pPed->HasJetPack())
+                                        pPed->SetHasJetPack(false);
+
                                     // Update our engine State
                                     if (g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART))
                                         pVehicle->SetEngineOn(true);
