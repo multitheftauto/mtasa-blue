@@ -9,7 +9,7 @@ project "freetype"
 	defines { "FT2_BUILD_LIBRARY=1", "_UNICODE", "UNICODE", "_LIB" }
 	removedefines { "DEBUG" }
 
-	if MAETRO_BUILD then
+	if MTA_MAETRO then
 		defines { "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP" }
 	end
 
