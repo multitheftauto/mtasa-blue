@@ -25,10 +25,6 @@ jobs:
           git checkout release/maetro
           git merge master --no-ff --no-edit --no-commit || true
 
-          # Discard locale conflicts
-          git checkout --ours -- Shared/installer/locale "Shared/data/MTA San Andreas/MTA/locale"
-          git add --verbose Shared/installer/locale "Shared/data/MTA San Andreas/MTA/locale"
-
           # Discard d3dcompiler_47.dll conflicts (Due to old CEF version on maetro)
           git checkout --ours -- "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
           git add --verbose "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
