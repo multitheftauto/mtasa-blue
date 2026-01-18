@@ -609,7 +609,7 @@ protected:
 public:
     void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
     // Used to control and sync entering/exiting
-    bool EnterVehicle(CClientVehicle* pVehicle, bool bPassenger);
+    bool EnterVehicle(CClientVehicle* pVehicle, bool bPassenger, std::optional<unsigned int> optSeat = std::nullopt);
     bool ExitVehicle();
     void ResetVehicleInOut();
     void UpdateVehicleInOut();

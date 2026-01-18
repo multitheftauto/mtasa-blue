@@ -30,6 +30,11 @@ namespace SharedUtil
     bool FileLoad(const SString& strFilename, SString& strBuffer, int iMaxSize = INT_MAX, int iOffset = 0);
     bool FileLoad(std::nothrow_t, const SString& filePath, SString& outBuffer, size_t maxSize = INT_MAX, size_t offset = 0) noexcept;
 
+#if defined(_WIN32) && defined(MTA_CLIENT)
+    bool FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs) noexcept;
+#endif
+
+
     //
     // Save to a file
     //
@@ -107,6 +112,11 @@ namespace SharedUtil
     namespace File
     {
         FILE* Fopen(const char* szFilename, const char* szMode);
+        FILE* FopenExclusive(const char* szFilename, const char* szMode);
+#if defined(_WIN32) && defined(MTA_CLIENT)
+        FILE* TryFopen(const char* szFilename, const char* szMode);
+        FILE* TryFopenExclusive(const char* szFilename, const char* szMode);
+#endif
         int   Mkdir(const char* szPath, int iMode = 0775);
         int   Chdir(const char* szPath);
         int   Rmdir(const char* szPath);

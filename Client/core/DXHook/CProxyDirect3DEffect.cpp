@@ -18,11 +18,11 @@
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DEffect::CProxyDirect3DEffect(IDirect3DDevice9* InD3DDevice9, ID3DXEffect* pOriginal) : m_stats(g_pDeviceState->MemoryState.Effect)
+CProxyDirect3DEffect::CProxyDirect3DEffect(IDirect3DDevice9* InD3DDevice9, ID3DXEffect* pOriginal) : m_pStats(&g_StaticMemoryState.Effect)
 {
     m_pOriginal = pOriginal;
-    m_stats.iCurrentCount++;
-    m_stats.iCreatedCount++;
+    m_pStats->iCurrentCount++;
+    m_pStats->iCreatedCount++;
 }
 
 /////////////////////////////////////////////////////////////
@@ -34,8 +34,11 @@ CProxyDirect3DEffect::CProxyDirect3DEffect(IDirect3DDevice9* InD3DDevice9, ID3DX
 /////////////////////////////////////////////////////////////
 CProxyDirect3DEffect::~CProxyDirect3DEffect()
 {
-    m_stats.iCurrentCount--;
-    m_stats.iDestroyedCount++;
+    if (m_pStats)
+    {
+        m_pStats->iCurrentCount--;
+        m_pStats->iDestroyedCount++;
+    }
 }
 
 /////////////////////////////////////////////////////////////

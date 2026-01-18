@@ -688,7 +688,12 @@ bool CLuaEngineDefs::EngineAddClothingTXD(CClientTXD* pTXD, std::string strModel
         throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)strModelName.length(), strModelName.data()));
 
     if (!pTXD->AddClothingTexture(strModelName))
-        throw std::invalid_argument(SString("Texture already added (%*s)", (int)strModelName.length(), strModelName.data()));
+    {
+        SString strError = pTXD->GetLastError();
+        if (strError.empty())
+            strError = SString("Failed to add clothing texture (%*s)", (int)strModelName.length(), strModelName.data());
+        throw std::invalid_argument(strError);
+    }
 
     return true;
 }
@@ -1410,6 +1415,11 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 
     if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    // TXD slots occupy IDs from BaseIDforTXD to BaseIDforCOL-1
+    const unsigned short usMaxTxdSlots = static_cast<unsigned short>(g_pGame->GetBaseIDforCOL() - g_pGame->GetBaseIDforTXD());
+    if (usTxdId >= usMaxTxdSlots)
+        throw std::invalid_argument("Expected a valid TXD ID at argument 2");
 
     // Clean up TXD isolation before changing TXD slot
     if (pModelInfo->GetParentID() != 0)

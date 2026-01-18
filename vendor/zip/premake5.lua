@@ -2,6 +2,7 @@ project "zip"
 	language "C"
 	kind "StaticLib"
 	targetname "zip"
+	warnings "Off"
 
 	includedirs  { "../zlib" }
 

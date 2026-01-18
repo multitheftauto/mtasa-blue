@@ -31,6 +31,7 @@ struct RwMatrix;
 struct RwTexDictionary;
 struct RwTexture;
 struct RpClump;
+struct RpAtomic;
 
 typedef CShaderItem CSHADERDUMMY;
 
@@ -145,4 +146,7 @@ public:
 
     // Cleanup TXD slots created to isolate engineRequestModel clones.
     virtual void CleanupIsolatedTxdForModel(unsigned short usModelId) = 0;
+
+    // Rebind single atomic's material textures to current TXD textures
+    virtual void RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId) = 0;
 };
