@@ -99,6 +99,18 @@ public:
     static bool EngineRestreamModel(std::uint16_t modelId);
     static void EngineRestream(std::optional<RestreamOption> option);
 
+    static void EngineStreamingSetLimits(int normalIn, int normalOut, int farIn, int farOut);
+    static CLuaMultiReturn<int, int, int, int, int, int> EngineStreamingGetLimits();
+    static void EngineStreamingResetLimits();
+    static void EngineStreamingSetMaxSwaps(int maxSwaps);
+    static void EngineStreamingResetMaxSwaps();
+    static void EngineStreamingSetFurthestInLimit(int limit);
+    static void EngineStreamingResetFurthestInLimit();
+
+    static void EngineSetMaxObjectStreamCount(int limit);
+    static void EngineResetMaxObjectStreamCount();
+    static int EngineGetMaxObjectStreamCount();
+
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

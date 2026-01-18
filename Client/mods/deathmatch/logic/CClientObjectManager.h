@@ -42,6 +42,9 @@ public:
     bool        IsObjectLimitReached();
     bool        IsLowLodObjectLimitReached();
     bool        IsHardObjectLimitReached();
+    int         GetMaxObjectStreamCount();
+    void        SetMaxObjectStreamCount(int customCount);
+    void        ResetMaxObjectStreamCount();
 
     void RestreamObjects(unsigned short usModel);
     void RestreamAllObjects();
@@ -58,6 +61,7 @@ protected:
     int  m_iEntryInfoNodeEntries;
     int  m_iPointerNodeDoubleLinkEntries;
     uint m_uiMaxStreamedInCount;
+    uint m_uiCustomMaxStreamedInCount;
     uint m_uiMaxLowLodStreamedInCount;
     uint m_uiStreamedInCount;
     uint m_uiLowLodStreamedInCount;

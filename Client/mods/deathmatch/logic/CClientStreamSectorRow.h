@@ -28,6 +28,7 @@ public:
     std::list<CClientStreamSector*>::iterator Begin() { return m_Sectors.begin(); }
     std::list<CClientStreamSector*>::iterator End() { return m_Sectors.end(); }
     CClientStreamSector*                      Front() { return m_Sectors.front(); }
+    std::list<CClientStreamSector*>&          GetList() { return m_Sectors; }
     void                                      Add(CClientStreamSector* pSector);
     void                                      Remove(CClientStreamSector* pSector);
     unsigned int                              CountSectors() { return m_Sectors.size(); }
