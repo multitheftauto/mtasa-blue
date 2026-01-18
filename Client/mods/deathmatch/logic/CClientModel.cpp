@@ -91,7 +91,7 @@ bool CClientModel::Allocate(ushort usParentID)
         {
             if (CVehicleUpgrades::IsUpgrade(usParentID))
             {
-                pModelInfo->MakeVehicleUpgradeModel(usParentID);
+                pModelInfo->MakeObjectModel(usParentID);
                 return true;
             }
             break;
