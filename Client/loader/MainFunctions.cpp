@@ -1588,7 +1588,7 @@ void CheckDataFiles()
         const char* fileName;
     };
 
-    struct IntegrityCheck integrityCheckList[] = {
+    static const IntegrityCheck integrityCheckList[] = {
         {"DE5C08577EAA65309974F9860E303F53", "bass.dll"},
         {"1D5A1AEF041255DEA49CD4780CAE4CCC", "bass_aac.dll"},
         {"8A1AC2AAD7F1691943635CA42F7F2940", "bass_ac3.dll"},
@@ -1605,7 +1605,11 @@ void CheckDataFiles()
         {"4B3932359373F11CBC542CC96D9A9285", "tags.dll"},
         {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"},
         {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
+#ifdef MTA_MAETRO
         {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
+#else
+        {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"},
+#endif
         {"F1CA5A1E77965777AC26A81EAF345A7A", "XInput9_1_0_mta.dll"}
     };
 

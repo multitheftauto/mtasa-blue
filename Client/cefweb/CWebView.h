@@ -171,10 +171,17 @@ public:
 
     // CefLifeSpawnHandler methods
     virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
+#ifdef MTA_MAETRO
     virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name,
                                CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures,
                                CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, CefRefPtr<CefDictionaryValue>& extra_info,
                                bool* no_javascript_access) override;
+#else
+    virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int popup_id, const CefString& target_url,
+                               const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture,
+                               const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings,
+                               CefRefPtr<CefDictionaryValue>& extra_info, bool* no_javascript_access) override;
+#endif
     virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
 
     // CefJSDialogHandler methods
@@ -183,8 +190,14 @@ public:
                             bool& suppress_message) override;
 
     // CefDialogHandler methods
+#ifdef MTA_MAETRO
     virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
                               const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback) override;
+#else
+    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+        const std::vector<CefString>& accept_filters, const std::vector<CefString>& accept_extensions, const std::vector<CefString>& accept_descriptions,
+        CefRefPtr<CefFileDialogCallback> callback) override;
+#endif
 
     // CefDisplayHandler methods
     virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
