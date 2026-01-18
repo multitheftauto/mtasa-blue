@@ -40,9 +40,6 @@ jobs:
           # Discard cefweb conflicts
           git checkout --ours -- Client/cefweb/CWebView.cpp
           git add --verbose Client/cefweb/CWebView.cpp
-
-          git checkout --ours -- "Client/loader/MainFunctions.cpp"
-          git add --verbose "Client/loader/MainFunctions.cpp"
           
           # We should be done with the merge now
           printf "Synchronize changes from 1.6 master branch [ci skip]\n\n" > commit.txt
