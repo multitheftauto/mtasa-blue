@@ -62,6 +62,10 @@ workspace "MTASA"
 		"_TIMESPEC_DEFINED"
 	}
 
+	if MTA_MAETRO then
+		defines { "MTA_MAETRO" }
+	end
+
 	-- Helper function for output path
 	buildpath = function(p) return "%{wks.location}/../Bin/"..p.."/" end
 	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} \"%{wks.location}../Bin/"..p.."/\"" end
