@@ -14,6 +14,10 @@
 #include "CWaterManager.h"
 #include "CLogger.h"
 
+#include <net/rpc_enums.h>
+#include "packets/CElementRPCPacket.h"
+#include "CGame.h"
+
 CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, EWaterType waterType, bool bShallow) : CElement(pParent)
 {
     m_pWaterManager = pWaterManager;
@@ -200,4 +204,13 @@ void CWater::RoundVertex(int index)
 bool CWater::IsVertexWithinWorld(int index)
 {
     return m_Vertices[index].fX >= -3000.0f && m_Vertices[index].fX <= 3000.0f && m_Vertices[index].fY >= -3000.0f && m_Vertices[index].fY <= 3000.0f;
+}
+
+void CWater::ResetLevel()
+{
+    SetLevel(m_iDefaultLevel);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(m_iDefaultLevel);
+    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CElementRPCPacket(this, SET_ELEMENT_WATER_LEVEL, *BitStream.pBitStream));
 }

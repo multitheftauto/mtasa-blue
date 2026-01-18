@@ -31,10 +31,13 @@ public:
     void              SetPosition(const CVector& vecPosition);
     bool              SetVertexPosition(int iVertexIndex, CVector& vecPosition, void* pChangeSource = nullptr);
     bool              SetLevel(float fWaterLevel, void* pChangeSource = nullptr);
+    float             GetLevel() const;
+    void              ResetLevel();
     void              Unlink();
 
     void SetDimension(unsigned short usDimension);
     void RelateDimension(unsigned short usWorldDimension);
+    
 
 private:
     CWaterPoly*          m_pPoly;
@@ -42,6 +45,8 @@ private:
     bool                 m_bTriangle;            // Is this water a triangle or a quad type?
     bool                 m_bShallow;             // Shallow water?
     std::vector<CVector> m_Vertices;             // List of vertices for this water
+
+    float m_iDefaultLevel{};
 
     friend class CClientWaterManager;
 };
