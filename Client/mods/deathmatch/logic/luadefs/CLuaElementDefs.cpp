@@ -100,6 +100,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
         {"setElementLighting", ArgumentParser<SetElementLighting>},
         {"setElementOnFire", ArgumentParser<SetElementOnFire>},
+        {"isElementOnGround", ArgumentParser<IsElementOnGround>},
     };
 
     // Add functions
@@ -171,6 +172,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getData", "getElementData");
     lua_classfunction(luaVM, "getAllData", "getAllElementData");
     lua_classfunction(luaVM, "isOnFire", "isElementOnFire");
+    lua_classfunction(luaVM, "onGround", "isElementOnGround");
 
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setData", "setElementData");
@@ -231,6 +233,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
     lua_classvariable(luaVM, "lighting", "setElementLighting", "getElementLighting");
     lua_classvariable(luaVM, "onFire", "setElementOnFire", "isElementOnFire");
+    lua_classvariable(luaVM, "onGround", NULL, "isElementOnGround");
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
     lua_registerclass(luaVM, "Element");
@@ -2659,4 +2662,20 @@ bool CLuaElementDefs::SetElementLighting(CClientEntity* entity, float lighting)
 bool CLuaElementDefs::IsElementOnFire(CClientEntity* entity) noexcept
 {
     return entity->IsOnFire();
+}
+
+bool CLuaElementDefs::IsElementOnGround(std::variant<CClientPlayer*, CClientPed*, CClientVehicle*> element)
+{
+    auto* pElement = std::visit([](auto* p) -> CClientEntity* { return p; }, element);
+
+    switch (pElement->GetType())
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+            return static_cast<CClientPed*>(pElement)->IsOnGround();
+        case CCLIENTVEHICLE:
+            return static_cast<CClientVehicle*>(pElement)->IsOnGround();
+    }
+
+    return false;
 }
