@@ -718,7 +718,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
         File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
         File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
-        File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+        !ifdef MTA_MAETRO
+            File /oname=d3dcompiler_47.dll "${FILES_ROOT}\mta\d3dcompiler_47.maetro.dll"
+        !else
+            File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+        !endif
 
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
@@ -761,7 +765,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
 
             File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
-            File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+            !ifdef MTA_MAETRO
+                File /oname=d3dcompiler_47.dll "${FILES_ROOT}\mta\d3dcompiler_47.maetro.dll"
+            !else
+                File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+            !endif
 
             SetOutPath "$INSTDIR\MTA\data"
             File "${FILES_ROOT}\mta\data\gta_sa_diff.dat"
