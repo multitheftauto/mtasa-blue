@@ -24,14 +24,10 @@ jobs:
 
           git checkout release/maetro
           git merge master --no-ff --no-edit --no-commit || true
-          
+
           # Discard locale conflicts
           git checkout --ours -- Shared/installer/locale "Shared/data/MTA San Andreas/MTA/locale"
           git add --verbose Shared/installer/locale "Shared/data/MTA San Andreas/MTA/locale"
-          
-          # Discard install_cef.lua conflicts
-          git checkout --ours -- utils/buildactions/install_cef.lua
-          git add --verbose utils/buildactions/install_cef.lua
 
           # Discard d3dcompiler_47.dll conflicts (Due to old CEF version on maetro)
           git checkout --ours -- "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
@@ -40,7 +36,7 @@ jobs:
           # Discard cefweb conflicts
           git checkout --ours -- Client/cefweb/CWebView.cpp
           git add --verbose Client/cefweb/CWebView.cpp
-          
+
           # We should be done with the merge now
           printf "Synchronize changes from 1.6 master branch [ci skip]\n\n" > commit.txt
           git log --expand-tabs=4 --pretty=format:'%h %s' release/maetro..master >> commit.txt

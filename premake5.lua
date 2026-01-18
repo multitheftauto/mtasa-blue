@@ -15,6 +15,7 @@ else
 	CI_BUILD = false
 end
 GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
+MAETRO_BUILD = os.getenv("MTA_MAETRO") == "true"
 
 newoption {
 	trigger     = "gccprefix",
