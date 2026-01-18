@@ -41,7 +41,11 @@ public:
             if (!node)
                 return;
 
+#ifdef MTA_MAETRO
+            if (node->GetType() == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && !node->GetFormControlElementType().empty())
+#else
             if (node->GetType() == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && node->GetFormControlElementType() != CefDOMNode::FormControlType::DOM_FORM_CONTROL_TYPE_UNSUPPORTED)
+#endif
             {
                 auto message = CefProcessMessage::Create("InputFocus");
                 message->GetArgumentList()->SetBool(0, true);

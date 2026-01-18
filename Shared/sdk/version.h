@@ -64,6 +64,8 @@
 #define MTA_DM_FULL_STRING "MTA:SA Server"
 #endif
 
+// MTA_MAETRO is defined in premake5.lua
+
 // Compile types
 #define VERSION_TYPE_CUSTOM         0x01
 #define VERSION_TYPE_EXPERIMENTAL   0x03

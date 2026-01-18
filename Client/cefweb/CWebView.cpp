@@ -747,7 +747,11 @@ bool CWebView::SetAudioVolume(float fVolume)
 
     for (auto& name : frameNames)
     {
+#ifdef MTA_MAETRO
+        auto frame = m_pWebView->GetFrame(name);
+#else
         auto frame = m_pWebView->GetFrameByName(name);
+#endif
         if (frame)
             frame->ExecuteJavaScript(strJSCode, "", 0);
     }
@@ -1421,10 +1425,17 @@ void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
+#ifdef MTA_MAETRO
+bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name,
+                             CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures,
+                             CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, CefRefPtr<CefDictionaryValue>& extra_info,
+                             bool* no_javascript_access)
+#else
 bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int popup_id, const CefString& target_url,
                              const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture,
                              const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings,
                              CefRefPtr<CefDictionaryValue>& extra_info, bool* no_javascript_access)
+#endif
 {
     // ATTENTION: This method is called on the IO thread
 
@@ -1493,9 +1504,14 @@ bool CWebView::OnJSDialog(CefRefPtr<CefBrowser> browser, const CefString& origin
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
+#ifdef MTA_MAETRO
+bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                            const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback)
+#else
 bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, FileDialogMode mode, const CefString& title, const CefString& default_file_path,
         const std::vector<CefString>& accept_filters, const std::vector<CefString>& accept_extensions, const std::vector<CefString>& accept_descriptions,
         CefRefPtr<CefFileDialogCallback> callback)
+#endif
 {
     // Don't show the dialog
     return true;
