@@ -43,11 +43,13 @@ void CFxSystemSA::PlayAndKill()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_FxSystem_c__PlayAndKill;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CFxSystemSA::GetMatrix(CMatrix& matrix)
@@ -170,6 +172,7 @@ static void __declspec(naked) HOOK_FxSystem_c_Update_MidA()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -193,6 +196,7 @@ inner:
         push    ebp
         jmp     RETURN_FxSystem_c_Update_MidA
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -240,6 +244,7 @@ static void __declspec(naked) HOOK_FxSystem_c_Update_MidB()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -258,6 +263,7 @@ static void __declspec(naked) HOOK_FxSystem_c_Update_MidB()
 
         jmp     RETURN_FxSystem_c_Update_MidB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

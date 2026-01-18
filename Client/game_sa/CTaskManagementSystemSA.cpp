@@ -102,8 +102,21 @@ void CTaskManagementSystemSA::RemoveTask(CTaskSAInterface* pTaskInterface)
 CTaskSA* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
 {
     // Return NULL if we got passed NULL
-    if (pTaskInterface == 0)
-        return NULL;
+    if (!pTaskInterface)
+        return nullptr;
+
+    // Check vtable pointer to prevent crash from corrupted task objects
+    TaskVTBL* pVTBL = pTaskInterface->VTBL;
+    if (!pVTBL)
+        return nullptr;
+
+    // Vtable should be in executable memory range (.text/.rdata sections)
+    // GTA SA base is around 0x400000-0x900000 range
+    constexpr DWORD GTA_BASE_MIN = 0x400000;
+    constexpr DWORD GTA_BASE_MAX = 0x900000;
+    DWORD dwVTableAddr = reinterpret_cast<DWORD>(pVTBL);
+    if (dwVTableAddr < GTA_BASE_MIN || dwVTableAddr > GTA_BASE_MAX)
+        return nullptr;
 
     // Find it in our list
     STaskListItem*                       pListItem;
@@ -122,15 +135,17 @@ CTaskSA* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
     // its not existed before, lets create the task
     // First, we create a temp task
     int   iTaskType = 9999;
-    DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
+    DWORD dwFunc = pVTBL->GetTaskType;
     if (dwFunc && dwFunc != 0x82263A)
     {
+        // clang-format off
         __asm
         {
             mov     ecx, pTaskInterface
             call    dwFunc
             mov     iTaskType, eax
         }
+        // clang-format on
     }
 
     // Create it and add it to our list
@@ -268,6 +283,7 @@ static void __declspec(naked) HOOK_CTask_Operator_Delete()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -282,4 +298,5 @@ static void __declspec(naked) HOOK_CTask_Operator_Delete()
         add     eax, 6
         jmp     eax
     }
+    // clang-format on
 }

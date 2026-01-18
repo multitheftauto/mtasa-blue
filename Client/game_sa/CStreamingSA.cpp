@@ -15,8 +15,10 @@
 #include "CModelInfoSA.h"
 #include "Fileapi.h"
 #include "processthreadsapi.h"
+#include "CGameSA.h"
 
 extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 // count: 26316 in unmodified game
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
@@ -26,6 +28,28 @@ void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void* (*)[2])0x8E4CAC;
 
 namespace
 {
+    bool IsValidPtr(const void* ptr) noexcept
+    {
+        if (!ptr)
+            return false;
+
+        __try
+        {
+            const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
+            const auto* v = p->VFTBL;
+            if (!v)
+                return false;
+
+            volatile DWORD test = v->Destructor;
+            static_cast<void>(test);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
     //
     // Used in LoadAllRequestedModels to record state
     //
@@ -228,6 +252,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     if (IsUpgradeModelId(dwModelID))
     {
         DWORD dwFunc = FUNC_RequestVehicleUpgrade;
+        // clang-format off
         __asm
         {
             push    dwFlags
@@ -235,10 +260,33 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
             call    dwFunc
             add     esp, 8
         }
+        // clang-format on
     }
     else
     {
+        CBaseModelInfoSAInterface** ppModelInfo = reinterpret_cast<CBaseModelInfoSAInterface**>(ARRAY_ModelInfo);
+        if (dwModelID < MODELINFO_DFF_MAX)
+        {
+            CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[dwModelID];
+            if (!IsValidPtr(pModelInfo))
+            {
+                ppModelInfo[dwModelID] = nullptr;
+
+                CStreamingInfo* pStreamInfo = GetStreamingInfo(dwModelID);
+                if (pStreamInfo)
+                {
+                    pStreamInfo->prevId = static_cast<unsigned short>(-1);
+                    pStreamInfo->nextId = static_cast<unsigned short>(-1);
+                    pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
+                    pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+                }
+
+                return;
+            }
+        }
+
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
+        // clang-format off
         __asm
         {
             push    dwFlags
@@ -246,6 +294,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
             call    dwFunction
             add     esp, 8
         }
+        // clang-format on
     }
 }
 
@@ -262,12 +311,14 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
+    // clang-format off
     __asm
     {
         push    dwOnlyPriorityModels
         call    dwFunction
         add     esp, 4
     }
+    // clang-format on
 
     if (IS_TIMING_CHECKPOINTS())
     {
@@ -283,6 +334,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         bool  bReturn;
         DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
+        // clang-format off
         __asm
         {
             push    dwModelID
@@ -290,12 +342,14 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
             add     esp, 0x4
             mov     bReturn, al
         }
+        // clang-format on
         return bReturn;
     }
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
         bool  bReturn = 0;
+        // clang-format off
         __asm
         {
             push    dwModelID
@@ -303,6 +357,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
             mov     bReturn, al
             pop     eax
         }
+        // clang-format on
 
         return bReturn;
     }
@@ -311,6 +366,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
     DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
+    // clang-format off
     __asm
     {
         push    channel
@@ -319,6 +375,7 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
         call    dwFunc
         add     esp, 0xC
     }
+    // clang-format on
 }
 
 void CStreamingSA::ReinitStreaming()
@@ -333,6 +390,20 @@ void CStreamingSA::ReinitStreaming()
 void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
+    if (!pItemInfo)
+        return;
+
+    // We remove the existing RwObject because, after switching the archive, the streamer will load a new one.
+    // ReInit doesn't delete all RwObjects unless certain conditions are met.
+    // In this case, we must force-remove the RwObject from memory, because it is no longer used,
+    // and due to the archive change the streamer no longer detects it and therefore won't delete it.
+    // As a result, a memory leak occurs after every call to engineImageLinkDFF.
+    const auto baseTxdId = g_pCore->GetGame()->GetBaseIDforTXD();
+    if (modelid < static_cast<uint>(baseTxdId))
+    {
+        if (pItemInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+            RemoveModel(modelid);
+    }
 
     // Change nextInImg field for prev model
     for (CStreamingInfo& info : ms_aInfoForModel)
@@ -356,6 +427,10 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
 
 CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)
 {
+    const uint maxStreamingID = pGame->GetCountOfAllFileIDs();
+    if (modelid >= maxStreamingID)
+        return nullptr;
+
     return &ms_aInfoForModel[modelid];
 }
 
@@ -432,7 +507,7 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
     numBlocks += numBlocks % 2; // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
-    
+
     // Check if the size is the same already
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
         return true;

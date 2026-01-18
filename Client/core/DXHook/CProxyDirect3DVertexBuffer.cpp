@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////
 CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer(IDirect3DDevice9* InD3DDevice9, IDirect3DVertexBuffer9* pOriginal, UINT Length, DWORD Usage, DWORD FVF,
                                                        D3DPOOL Pool)
-    : m_stats(Usage & D3DUSAGE_DYNAMIC ? g_pDeviceState->MemoryState.DynamicVertexBuffer : g_pDeviceState->MemoryState.StaticVertexBuffer)
+    : m_pStats(Usage & D3DUSAGE_DYNAMIC ? &g_StaticMemoryState.DynamicVertexBuffer : &g_StaticMemoryState.StaticVertexBuffer)
 {
     m_pOriginal = pOriginal;
     m_iMemUsed = Length;
@@ -36,12 +36,11 @@ CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer(IDirect3DDevice9* InD3DDe
     m_fallbackOffset = 0;
     m_fallbackSize = 0;
     m_fallbackFlags = 0;
-    m_fallbackStorage.resize(std::max<size_t>(static_cast<size_t>(m_iMemUsed), static_cast<size_t>(1)));
 
-    m_stats.iCurrentCount++;
-    m_stats.iCurrentBytes += m_iMemUsed;
-    m_stats.iCreatedCount++;
-    m_stats.iCreatedBytes += m_iMemUsed;
+    m_pStats->iCurrentCount++;
+    m_pStats->iCurrentBytes += m_iMemUsed;
+    m_pStats->iCreatedCount++;
+    m_pStats->iCreatedBytes += m_iMemUsed;
 }
 
 /////////////////////////////////////////////////////////////
@@ -58,10 +57,13 @@ CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer()
     if (CVertexStreamBoundingBoxManager* pBoundingBoxManager = CVertexStreamBoundingBoxManager::GetExistingSingleton())
         pBoundingBoxManager->OnVertexBufferDestroy(m_pOriginal);
 
-    m_stats.iCurrentCount--;
-    m_stats.iCurrentBytes -= m_iMemUsed;
-    m_stats.iDestroyedCount++;
-    m_stats.iDestroyedBytes += m_iMemUsed;
+    if (m_pStats)
+    {
+        m_pStats->iCurrentCount--;
+        m_pStats->iCurrentBytes -= m_iMemUsed;
+        m_pStats->iDestroyedCount++;
+        m_pStats->iDestroyedBytes += m_iMemUsed;
+    }
 }
 
 /////////////////////////////////////////////////////////////
@@ -111,7 +113,8 @@ ULONG CProxyDirect3DVertexBuffer::Release()
 /////////////////////////////////////////////////////////////
 HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags)
 {
-    m_stats.iLockedCount++;
+    if (m_pStats)
+        m_pStats->iLockedCount++;
 
     if ((Flags & D3DLOCK_READONLY) == 0)
     {
@@ -332,8 +335,7 @@ HRESULT CProxyDirect3DVertexBuffer::Unlock()
     }
     else if (m_fallbackSize == 0)
     {
-        // No bytes were mapped, keep fallback around in case caller retries
-        bShouldRetryLater = true;
+        // No bytes were mapped, nothing to copy back - allow fallback to clear
     }
 
     WriteDebugEvent(SString("Unlock VertexBuffer: fallback completed (offset:%x size:%x flags:%08x retryLater:%u result:%x)", m_fallbackOffset, m_fallbackSize,
@@ -345,6 +347,8 @@ HRESULT CProxyDirect3DVertexBuffer::Unlock()
         m_fallbackOffset = 0;
         m_fallbackSize = 0;
         m_fallbackFlags = 0;
+        m_fallbackStorage.clear();
+        m_fallbackStorage.shrink_to_fit();
     }
 
     return copyResult;

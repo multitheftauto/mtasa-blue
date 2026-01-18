@@ -104,6 +104,14 @@ CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
+void CStaticFunctionDefinitions::PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents)
+{
+    m_pCore = pCore;
+    m_pGame = pGame;
+    m_pClientGame = pClientGame;
+    m_pEvents = pEvents;
+}
+
 bool CStaticFunctionDefinitions::AddEvent(CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger)
 {
     assert(szName);
@@ -263,15 +271,18 @@ bool CStaticFunctionDefinitions::ClearChatBox()
 
 bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded)
 {
-    if (!szText || szText[0] == '\0')
+    // Early null-safety checks to prevent crashes when called before initialization
+    if (!m_pCore || !g_pClientGame || !szText || szText[0] == '\0')
         return false;
     
+    // Calculate length without color codes when bColorCoded is true for accurate visible text length
     SString textToProcess = bColorCoded ? RemoveColorCodes(szText) : SStringX(szText);
     
-    if (textToProcess.length() > MAX_OUTPUTCHATBOX_LENGTH) {
+    // Reject messages that exceed the maximum length
+    if (textToProcess.length() > MAX_OUTPUTCHATBOX_LENGTH)
         return false;
-    }
 
+    // Fire the onClientChatMessage event
     CLuaArguments Arguments;
     Arguments.PushString(szText);
     Arguments.PushNumber(ucRed);
@@ -279,7 +290,8 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char
     Arguments.PushNumber(ucBlue);
 
     bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent("onClientChatMessage", Arguments, false);
-    if (!bCancelled) {
+    if (!bCancelled)
+    {
         m_pCore->ChatPrintfColor("%s", bColorCoded, ucRed, ucGreen, ucBlue, szText);
         return true;
     }
@@ -9951,6 +9963,9 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
     if (pPed->IsLocalEntity() != pVehicle->IsLocalEntity())
         return false;
 
+    if (!CClientVehicleManager::IsValidSeat(pVehicle->GetModel(), static_cast<unsigned char>(uiSeat)))
+        return false;
+
     if (pPed->IsLocalEntity())
     {
         //
@@ -9959,14 +9974,6 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
 
         // Ped and vehicle alive?
         if (pPed->IsDead() || pVehicle->GetHealth() <= 0.0f)
-            return false;
-
-        // Valid seat id for that vehicle?
-        uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
-        if (uiSeat > ucMaxPassengers)
-            return false;
-
-        if (uiSeat > 0 && ucMaxPassengers == 255)
             return false;
 
         // Toss the previous player out of it if neccessary

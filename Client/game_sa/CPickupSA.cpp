@@ -121,11 +121,12 @@ BYTE CPickupSA::IsNearby()
     return GetInterface()->bIsPickupNearby;
 }
 
-void CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
+bool CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
 {
     DWORD GiveUsAPickUpObject = FUNC_GIVEUSAPICKUP;
     DWORD dwObject = (DWORD) & (GetInterface()->pObject);
     DWORD dwThis = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         push    ForcedObjectIndex
@@ -133,6 +134,8 @@ void CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
         mov     ecx, dwThis
         call    GiveUsAPickUpObject
     }
+    // clang-format on
+
     if (GetInterface()->pObject)
     {
         if (object)
@@ -140,9 +143,10 @@ void CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
             ((CEntitySA*)object)->DoNotRemoveFromGame = true;
             delete object;
         }
-
         object = new CObjectSA(GetInterface()->pObject);
+        return true;
     }
+    return false;
 }
 
 void CPickupSA::GetRidOfObjects()
@@ -154,25 +158,29 @@ void CPickupSA::GetRidOfObjects()
     {
         ((CEntitySA*)object)->DoNotRemoveFromGame = true;
         delete object;
-        object = NULL;
+        object = nullptr;
     }
+
+    GetInterface()->pObject = nullptr;
 }
 
 void CPickupSA::Remove()
 {
     DWORD dwFunc = FUNC_CPickup_Remove;
     DWORD dwThis = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     // CPickup::Remove also destroys the owned object, so we need to delete our CObjectSA class
     if (object)
     {
         ((CEntitySA*)object)->DoNotRemoveFromGame = true;
         delete object;
-        object = NULL;
+        object = nullptr;
     }
 }

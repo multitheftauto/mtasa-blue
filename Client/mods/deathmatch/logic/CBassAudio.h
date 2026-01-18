@@ -159,3 +159,9 @@ private:
     HSYNC m_hSyncFree;
     HSYNC m_hSyncMeta;
 };
+
+// Signal streaming threads that shutdown is in progress - they should exit ASAP
+void SignalStreamingThreadsToStop();
+
+// Wait for streaming threads to complete. Call after BASS_Free() which aborts pending operations.
+void WaitForAllStreamingThreads(unsigned int uiTimeoutMs = 3000);

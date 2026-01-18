@@ -196,8 +196,6 @@ bool CResource::Load()
             else
                 RemoveAutoPermissions();
 
-            m_strACLRequestFingerprint = CalculateACLRequestFingerprint();
-
             // Find any map sync option
             m_bSyncMapElementData = true;
             m_bSyncMapElementDataDefined = false;
@@ -353,7 +351,6 @@ bool CResource::Unload()
     m_strResourceZip = "";
     m_strResourceCachePath = "";
     m_strResourceDirectoryPath = "";
-    m_strACLRequestFingerprint.clear();
     m_eState = EResourceState::None;
 
     return true;
@@ -405,8 +402,6 @@ CResource::~CResource()
 
 void CResource::TidyUp()
 {
-    RemoveAutoPermissions();
-
     // Close the zipfile stuff
     if (m_zipfile)
         unzClose(m_zipfile);
@@ -604,11 +599,28 @@ bool CResource::GenerateChecksums()
 
     for (auto& task : checksumTasks)
     {
-        const auto& result = task.get();
-        if (!result.empty())
+        try
         {
-            m_strFailureReason = result;
-            CLogger::LogPrintf(result);
+            const auto& result = task.get();
+            if (!result.empty())
+            {
+                m_strFailureReason = result;
+                CLogger::LogPrintf(result);
+                bOk = false;
+            }
+        }
+        catch (const std::future_error& e)
+        {
+            // Became invalid (e.g., during shutdown)
+            m_strFailureReason = SString("Checksum task failed: %s", e.what());
+            CLogger::LogPrintf(m_strFailureReason);
+            bOk = false;
+        }
+        catch (const std::exception& e)
+        {
+            // Task threw
+            m_strFailureReason = SString("Checksum error: %s", e.what());
+            CLogger::LogPrintf(m_strFailureReason);
             bOk = false;
         }
     }
@@ -681,11 +693,6 @@ bool CResource::HasResourceChanged()
         CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
         if (checksum != m_metaChecksum)
             return true;
-    }
-
-    if (HasACLRequestsChanged())
-    {
-        return true;
     }
 
     return false;
@@ -1204,9 +1211,6 @@ bool CResource::Stop(bool bManualStop)
 
     // Clear the list of players where this resource is running
     std::exchange(m_isRunningForPlayer, {});
-
-    // Remove ACL permissions when stopping
-    RemoveAutoPermissions();
 
     OnResourceStateChange("loaded");
     m_eState = EResourceState::Loaded;

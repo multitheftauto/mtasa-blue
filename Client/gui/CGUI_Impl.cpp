@@ -23,7 +23,11 @@ void CGUI_Impl::DestroyElementRecursive(CGUIElement* pElement)
 
     if (auto* pImpl = dynamic_cast<CGUIElement_Impl*>(pElement))
     {
-        DestroyGuiWindowRecursive(pImpl->GetWindow());
+        CEGUI::Window* pWindow = pImpl->GetWindow();
+        if (pWindow)
+            DestroyGuiWindowRecursive(pWindow);
+        else
+            delete pElement;
         return;
     }
 
@@ -1410,11 +1414,17 @@ bool CGUI_Impl::Event_RedrawRequested(const CEGUI::EventArgs& Args)
 {
     const CEGUI::WindowEventArgs& e = reinterpret_cast<const CEGUI::WindowEventArgs&>(Args);
 
-    CGUIElement* pElement = reinterpret_cast<CGUIElement*>((e.window)->getUserData());
+    // Get the master window (walks up parent hierarchy for child widgets)
+    CEGUI::Window* pMasterWindow = GetMasterWindow(e.window);
+    
+    CGUIElement* pElement = reinterpret_cast<CGUIElement*>(pMasterWindow->getUserData());
     if (pElement)
+    {
         AddToRedrawQueue(pElement);
-    else
-        e.window->forceRedraw();
+    }
+    
+    // Immediate redraw of event source for visual responsiveness
+    e.window->forceRedraw();
 
     return true;
 }
@@ -1475,35 +1485,23 @@ void CGUI_Impl::AddToRedrawQueue(CGUIElement* pWindow)
     if (handle == kInvalidRedrawHandle)
         return;
 
-    // Manage the redraw queue, if we redraw the parent of the window passed,
-    // we should not add it to the redraw queue, and if the children are queued,
-    // remove them.
-    for (auto iter = m_RedrawQueue.begin(); iter != m_RedrawQueue.end(); )
+    if (m_RedrawRegistry.find(handle) == m_RedrawRegistry.end())
+        return;
+
+    // If parent is already queued, skip adding chidl
+    // (parent redraw will cover children)
+    if (CGUIElement* pParent = pWindow->GetParent())
     {
-        CGUIElement* pQueued = ResolveRedrawHandle(*iter);
-        if (!pQueued)
+        if (auto* pParentImpl = dynamic_cast<CGUIElement_Impl*>(pParent))
         {
-            iter = m_RedrawQueue.erase(iter);
-            continue;
+            const std::uint32_t parentHandle = pParentImpl->GetRedrawHandle();
+            if (parentHandle != kInvalidRedrawHandle && m_RedrawQueue.count(parentHandle) > 0)
+                return;
         }
-
-        if (pWindow->GetParent() == pQueued)
-        {
-            return;
-        }
-        if (pQueued->GetParent() == pWindow)
-        {
-            iter = m_RedrawQueue.erase(iter);
-            continue;
-        }
-        if (pQueued == pWindow)
-        {
-            return;
-        }
-
-        ++iter;
     }
-    m_RedrawQueue.push_back(handle);
+
+    // insertion with automatic deduplication
+    m_RedrawQueue.insert(handle);
 }
 
 void CGUI_Impl::RemoveFromRedrawQueue(CGUIElement* pWindow)
@@ -1516,7 +1514,7 @@ void CGUI_Impl::RemoveFromRedrawQueue(CGUIElement* pWindow)
     if (handle == kInvalidRedrawHandle)
         return;
 
-    m_RedrawQueue.remove(handle);
+    m_RedrawQueue.erase(handle);
 }
 
 std::uint32_t CGUI_Impl::RegisterRedrawHandle(CGUIElement_Impl* pElement)
@@ -1540,7 +1538,7 @@ void CGUI_Impl::ReleaseRedrawHandle(std::uint32_t handle)
         return;
 
     m_RedrawRegistry.erase(handle);
-    m_RedrawQueue.remove(handle);
+    m_RedrawQueue.erase(handle);
 }
 
 CGUIElement* CGUI_Impl::ResolveRedrawHandle(std::uint32_t handle) const

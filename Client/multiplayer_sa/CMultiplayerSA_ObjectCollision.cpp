@@ -50,6 +50,7 @@ static void __declspec(naked) HOOK_CObject_Init()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -65,6 +66,7 @@ static void __declspec(naked) HOOK_CObject_Init()
 
         jmp     CONTINUE_CObject_Init
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +93,7 @@ static void __declspec(naked) HOOK_CObject_Destructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -100,6 +103,7 @@ static void __declspec(naked) HOOK_CObject_Destructor()
         popad
         jmp     CONTINUE_CObject_Destructor
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

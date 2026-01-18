@@ -18,6 +18,7 @@
 #include <multiplayer/CMultiplayer.h>
 #include <core/CClientBase.h>
 #include "CrashHandler.h"
+#include <CrashTelemetry.h>
 
 #include <process.h>
 #include <DbgHelp.h>
@@ -50,12 +51,12 @@ static constexpr int         SCREEN_MARGIN_PIXELS = 50;
 static constexpr int         EMERGENCY_MSGBOX_WIDTH = 600;
 static constexpr int         EMERGENCY_MSGBOX_HEIGHT = 200;
 
-constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
+constexpr DWORD Milliseconds(std::chrono::milliseconds duration)
 {
     return static_cast<DWORD>(duration.count());
 }
 
-[[nodiscard]] static DWORD ResolveCrashExitCode(const _EXCEPTION_POINTERS* exceptionPtrs) noexcept
+[[nodiscard]] static DWORD ResolveCrashExitCode(const _EXCEPTION_POINTERS* exceptionPtrs)
 {
     if (const auto* record = (exceptionPtrs != nullptr) ? exceptionPtrs->ExceptionRecord : nullptr;
         record != nullptr && record->ExceptionCode != 0)
@@ -66,7 +67,7 @@ constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
     return CRASH_EXIT_CODE;
 }
 
-[[noreturn]] static void TerminateCurrentProcessWithExitCode(DWORD exitCode) noexcept
+[[noreturn]] static void TerminateCurrentProcessWithExitCode(DWORD exitCode)
 {
     if (exitCode == 0)
     {
@@ -81,7 +82,182 @@ constexpr DWORD Milliseconds(std::chrono::milliseconds duration) noexcept
 
 class CClientBase;
 
-static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue) noexcept
+// Record crash registers in scenario that a failure to create .dmp is likely
+namespace EmergencyCrashLogging
+{
+    // Result codes for SEH-protected read operations
+    enum class ReadResult : int
+    {
+        Success = 1,
+        NullPointer = 0,
+        AccessFault = -1
+    };
+
+    static void DoAddReportLog(int id, const char* msg)
+    {
+        SharedUtil::AddReportLog(id, msg);
+    }
+
+    static bool TryAddReportLog(int id, const char* msg)
+    {
+        __try
+        {
+            DoAddReportLog(id, msg);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
+    static void SafeEmergencyLog(const char* msg)
+    {
+        // Always output to debugger first (guaranteed crash-safe)
+        OutputDebugStringA(msg);
+        OutputDebugStringA("\n");
+
+        TryAddReportLog(9800, msg);
+    }
+
+    // SEH-isolated reader for exception record
+    #pragma warning(push)
+    #pragma warning(disable: 4702)
+    static ReadResult TryReadExceptionRecord(const _EXCEPTION_POINTERS* pException, 
+                                              char* buf, size_t bufSize)
+    {
+        ReadResult result = ReadResult::AccessFault;
+        __try
+        {
+            if (pException->ExceptionRecord != nullptr)
+            {
+                sprintf_s(buf, bufSize, "Code=0x%08lX Addr=0x%08lX ThreadId=%lu",
+                          static_cast<unsigned long>(pException->ExceptionRecord->ExceptionCode),
+                          static_cast<unsigned long>(reinterpret_cast<uintptr_t>(
+                              pException->ExceptionRecord->ExceptionAddress)),
+                          static_cast<unsigned long>(GetCurrentThreadId()));
+                result = ReadResult::Success;
+            }
+            else
+            {
+                result = ReadResult::NullPointer;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = ReadResult::AccessFault;
+        }
+        return result;
+    }
+
+    // SEH-isolated reader for context record
+    static ReadResult TryReadContextRecord(const _EXCEPTION_POINTERS* pException,
+                                            char* buf1, size_t buf1Size,
+                                            char* buf2, size_t buf2Size)
+    {
+        ReadResult result = ReadResult::AccessFault;
+        __try
+        {
+            if (pException->ContextRecord != nullptr)
+            {
+                const CONTEXT* ctx = pException->ContextRecord;
+
+                sprintf_s(buf1, buf1Size, "EAX=0x%08lX EBX=0x%08lX ECX=0x%08lX EDX=0x%08lX",
+                          ctx->Eax, ctx->Ebx, ctx->Ecx, ctx->Edx);
+
+                sprintf_s(buf2, buf2Size, "ESI=0x%08lX EDI=0x%08lX EBP=0x%08lX ESP=0x%08lX EIP=0x%08lX EFL=0x%08lX",
+                          ctx->Esi, ctx->Edi, ctx->Ebp, ctx->Esp, ctx->Eip, ctx->EFlags);
+
+                result = ReadResult::Success;
+            }
+            else
+            {
+                result = ReadResult::NullPointer;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = ReadResult::AccessFault;
+        }
+        return result;
+    }
+    #pragma warning(pop)
+
+}  // namespace EmergencyCrashLogging
+
+// Call SEH-isolated readers
+static void LogEmergencyExceptionRecord(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    std::array<char, 128> buf{};
+    
+    const auto result = TryReadExceptionRecord(pException, buf.data(), buf.size());
+    
+    switch (result)
+    {
+        case ReadResult::Success:
+            SafeEmergencyLog(buf.data());
+            break;
+        case ReadResult::NullPointer:
+            SafeEmergencyLog("[!] ExceptionRecord is NULL");
+            break;
+        case ReadResult::AccessFault:
+            SafeEmergencyLog("[!] Fault reading ExceptionRecord");
+            break;
+        default:
+            SafeEmergencyLog("[!] Unknown result reading ExceptionRecord");
+            break;
+    }
+}
+
+static void LogEmergencyContextRecord(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    std::array<char, 128> buf1{};
+    std::array<char, 128> buf2{};
+    
+    const auto result = TryReadContextRecord(pException, 
+                                              buf1.data(), buf1.size(),
+                                              buf2.data(), buf2.size());
+    
+    switch (result)
+    {
+        case ReadResult::Success:
+            SafeEmergencyLog(buf1.data());
+            SafeEmergencyLog(buf2.data());
+            break;
+        case ReadResult::NullPointer:
+            SafeEmergencyLog("[!] ContextRecord is NULL");
+            break;
+        case ReadResult::AccessFault:
+            SafeEmergencyLog("[!] Fault reading context");
+            break;
+        default:
+            SafeEmergencyLog("[!] Unknown result reading ContextRecord");
+            break;
+    }
+}
+
+static void LogEmergencyCrashContext(const _EXCEPTION_POINTERS* pException)
+{
+    using namespace EmergencyCrashLogging;
+    
+    SafeEmergencyLog("=== EMERGENCY CRASH CONTEXT ===");
+
+    if (pException == nullptr)
+    {
+        SafeEmergencyLog("[!] pException is NULL");
+        return;
+    }
+
+    LogEmergencyExceptionRecord(pException);
+
+    LogEmergencyContextRecord(pException);
+}
+
+static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue)
 {
     __try
     {
@@ -94,7 +270,7 @@ static bool SafeReadGameByte(uintptr_t address, unsigned char& outValue) noexcep
     }
 }
 
-static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInformation_Impl* pExceptionInformation, bool& outHandled) noexcept
+static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInformation_Impl* pExceptionInformation, bool& outHandled)
 {
     outHandled = false;
 
@@ -115,7 +291,7 @@ static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInfo
 
 namespace
 {
-    void ConfigureDbgHelpOptions() noexcept
+    void ConfigureDbgHelpOptions()
     {
         static std::atomic_flag configured = ATOMIC_FLAG_INIT;
         if (!configured.test_and_set(std::memory_order_acq_rel))
@@ -124,7 +300,7 @@ namespace
         }
     }
     
-    std::mutex& GetSymInitMutex() noexcept
+    std::mutex& GetSymInitMutex()
     {
         static std::mutex symMutex;
         return symMutex;
@@ -134,7 +310,7 @@ namespace
 class SymbolHandlerGuard
 {
 public:
-    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) noexcept : m_process(process), m_initialized(false)
+    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) : m_process(process), m_initialized(false)
     {
         if (!enableSymbols)
             return;
@@ -153,7 +329,7 @@ public:
         }
     }
 
-    ~SymbolHandlerGuard() noexcept
+    ~SymbolHandlerGuard()
     {
         if (m_initialized)
             SymCleanup(m_process);
@@ -164,7 +340,7 @@ public:
     SymbolHandlerGuard(SymbolHandlerGuard&&) = delete;
     SymbolHandlerGuard& operator=(SymbolHandlerGuard&&) = delete;
 
-    bool IsInitialized() const noexcept { return m_initialized; }
+    bool IsInitialized() const { return m_initialized; }
 
 private:
     HANDLE m_process;
@@ -279,7 +455,7 @@ static HANDLE                                              ms_hCrashDialogProces
     return candidates;
 }
 
-[[nodiscard]] static inline constexpr bool IsValidHandle(HANDLE handle) noexcept
+[[nodiscard]] static inline constexpr bool IsValidHandle(HANDLE handle)
 {
     return handle != nullptr && handle != INVALID_HANDLE_VALUE;
 }
@@ -287,15 +463,15 @@ static HANDLE                                              ms_hCrashDialogProces
 class UniqueHandle
 {
 public:
-    UniqueHandle() noexcept = default;
-    explicit UniqueHandle(HANDLE handle) noexcept : m_handle(handle) {}
-    ~UniqueHandle() noexcept { reset(); }
+    UniqueHandle() = default;
+    explicit UniqueHandle(HANDLE handle) : m_handle(handle) {}
+    ~UniqueHandle() { reset(); }
 
     UniqueHandle(const UniqueHandle&) = delete;
     UniqueHandle& operator=(const UniqueHandle&) = delete;
 
-    UniqueHandle(UniqueHandle&& other) noexcept : m_handle(other.release()) {}
-    UniqueHandle& operator=(UniqueHandle&& other) noexcept
+    UniqueHandle(UniqueHandle&& other) : m_handle(other.release()) {}
+    UniqueHandle& operator=(UniqueHandle&& other)
     {
         if (this != &other)
         {
@@ -305,29 +481,29 @@ public:
         return *this;
     }
 
-    void reset(HANDLE handle = nullptr) noexcept
+    void reset(HANDLE handle = nullptr)
     {
         if (IsValidHandle(m_handle))
             CloseHandle(m_handle);
         m_handle = handle;
     }
 
-    [[nodiscard]] HANDLE get() const noexcept { return m_handle; }
+    [[nodiscard]] HANDLE get() const { return m_handle; }
 
-    [[nodiscard]] HANDLE release() noexcept
+    [[nodiscard]] HANDLE release()
     {
         HANDLE handle = m_handle;
         m_handle = nullptr;
         return handle;
     }
 
-    [[nodiscard]] explicit operator bool() const noexcept { return IsValidHandle(m_handle); }
+    [[nodiscard]] explicit operator bool() const { return IsValidHandle(m_handle); }
 
 private:
     HANDLE m_handle = nullptr;
 };
 
-static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformation) noexcept
+static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformation)
 {
     if (pExceptionInformation == nullptr)
     {
@@ -429,7 +605,7 @@ static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformat
             case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
                 exceptionType = "Watchdog Timeout - Thread Freeze Detected";
                 break;
-            case 0xC0000374:
+            case STATUS_HEAP_CORRUPTION_CODE:
                 exceptionType = "Heap Corruption Detected";
                 break;
             case 0xC0000420:
@@ -458,7 +634,38 @@ static void EnsureCrashReasonForDialog(CExceptionInformation* pExceptionInformat
         if (moduleBaseName == nullptr || moduleBaseName[0] == '\0')
             moduleBaseName = "unknown";
 
-        strReason = SString("\n\nReason: %s at %s+0x%08X", exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset());
+        // If we still have "unknown", try registry-resolved module info as fallback
+        CExceptionInformation_Impl* pImpl = dynamic_cast<CExceptionInformation_Impl*>(pExceptionInformation);
+        const char* resolvedModuleName = nullptr;
+        DWORD resolvedIdaAddress = 0;
+        bool hasResolvedInfo = false;
+
+        if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+        {
+            resolvedModuleName = pImpl->GetResolvedModuleName();
+            resolvedIdaAddress = pImpl->GetResolvedIdaAddress();
+            hasResolvedInfo = true;
+        }
+
+        // Build the reason string with best available module info
+        if (strcmp(moduleBaseName, "unknown") == 0 && hasResolvedInfo && resolvedModuleName != nullptr && resolvedModuleName[0] != '\0')
+        {
+            // Use registry-resolved info when basic module resolution failed
+            strReason = SString("\n\nReason: %s at %s+0x%08X (IDA: 0x%08X)",
+                exceptionType.c_str(), resolvedModuleName, pImpl->GetResolvedRva(), resolvedIdaAddress);
+        }
+        else if (hasResolvedInfo && resolvedModuleName != nullptr && resolvedModuleName[0] != '\0')
+        {
+            // Include IDA address as additional info when we have both sources
+            strReason = SString("\n\nReason: %s at %s+0x%08X (IDA via %s: 0x%08X)",
+                exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset(),
+                resolvedModuleName, resolvedIdaAddress);
+        }
+        else
+        {
+            // Original format when no registry-resolved info available
+            strReason = SString("\n\nReason: %s at %s+0x%08X", exceptionType.c_str(), moduleBaseName, pExceptionInformation->GetAddressModuleOffset());
+        }
 
         if (ms_uiInCrashZone != 0)
             strReason += SString(" (CrashZone=%u)", ms_uiInCrashZone);
@@ -527,7 +734,7 @@ static void AppendCrashDiagnostics(const SString& text)
     WriteDebugEvent(text.Replace("\n", " "));
 }
 
-[[nodiscard]] static bool CaptureStackTraceText(_EXCEPTION_POINTERS* pException, SString& outText) noexcept
+[[nodiscard]] static bool CaptureStackTraceText(_EXCEPTION_POINTERS* pException, SString& outText)
 {
     if (pException == nullptr || pException->ContextRecord == nullptr)
         return false;
@@ -649,7 +856,7 @@ static void AppendCrashDiagnostics(const SString& text)
     return !outText.empty();
 }
 
-static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException) noexcept
+static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException)
 {
     bool expected = false;
     if (!ms_bFallbackStackLogged.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
@@ -667,7 +874,7 @@ static void AppendFallbackStackTrace(_EXCEPTION_POINTERS* pException) noexcept
 }
 
 // Helper function to safely read callback exception context (uses SEH)
-static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException) noexcept
+static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException)
 {
     __try
     {
@@ -684,6 +891,330 @@ static void TryLogCallbackContext(_EXCEPTION_POINTERS* pException) noexcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Failed to read callback exception context\n");
     }
 }
+
+namespace
+{
+    constexpr MINIDUMP_STREAM_TYPE kStreamExceptionSummary = static_cast<MINIDUMP_STREAM_TYPE>(LastReservedStream + 1);
+    constexpr MINIDUMP_STREAM_TYPE kStreamStackTrace = static_cast<MINIDUMP_STREAM_TYPE>(LastReservedStream + 2);
+    constexpr MINIDUMP_STREAM_TYPE kStreamRegisterState = static_cast<MINIDUMP_STREAM_TYPE>(LastReservedStream + 3);
+    constexpr MINIDUMP_STREAM_TYPE kStreamAdditionalInfo = CommentStreamA;
+    constexpr MINIDUMP_STREAM_TYPE kStreamCapturedException = static_cast<MINIDUMP_STREAM_TYPE>(LastReservedStream + 4);
+
+    class MinidumpUserStreamCollection
+    {
+    public:
+        void AddTextStream(MINIDUMP_STREAM_TYPE type, std::string_view text)
+        {
+            if (text.empty())
+                return;
+
+            auto& buffer = m_buffers.emplace_back();
+            buffer.reserve(text.size() + 1);
+            buffer.insert(buffer.end(), text.begin(), text.end());
+            if (buffer.empty() || buffer.back() != '\0')
+                buffer.push_back('\0');
+
+            MINIDUMP_USER_STREAM stream{};
+            stream.Type = type;
+            stream.Buffer = buffer.data();
+            stream.BufferSize = static_cast<ULONG>(buffer.size());
+            m_streams.push_back(stream);
+        }
+
+        PMINIDUMP_USER_STREAM_INFORMATION Build()
+        {
+            if (m_streams.empty())
+            {
+                m_info = MINIDUMP_USER_STREAM_INFORMATION{};
+                return nullptr;
+            }
+
+            m_info.UserStreamArray = m_streams.data();
+            m_info.UserStreamCount = static_cast<ULONG>(m_streams.size());
+            return &m_info;
+        }
+
+    private:
+        std::vector<std::vector<char>>          m_buffers;
+        std::vector<MINIDUMP_USER_STREAM>       m_streams;
+        MINIDUMP_USER_STREAM_INFORMATION        m_info{};
+    };
+
+    std::string FormatExceptionSummary(const ENHANCED_EXCEPTION_INFO& info)
+    {
+        std::string summary;
+        summary.reserve(512);
+        char line[256]{};
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "Exception Code: 0x%08X\n", info.exceptionCode);
+        summary += line;
+
+        if (info.exceptionAddress != nullptr)
+        {
+            _snprintf_s(line, sizeof(line), _TRUNCATE, "Exception Address: 0x%p\n", info.exceptionAddress);
+            summary += line;
+        }
+
+        if (!info.exceptionDescription.empty())
+        {
+            summary += "Description: ";
+            summary += info.exceptionDescription;
+            if (summary.back() != '\n')
+                summary += '\n';
+        }
+
+        if (!info.exceptionType.empty())
+        {
+            summary += "Exception Type: ";
+            summary += info.exceptionType;
+            summary += '\n';
+        }
+
+        if (!info.moduleName.empty())
+        {
+            summary += "Module: ";
+            summary += info.moduleName;
+            summary += '\n';
+        }
+
+        if (!info.modulePathName.empty())
+        {
+            summary += "Module Path: ";
+            summary += info.modulePathName;
+            summary += '\n';
+        }
+
+        if (info.moduleOffset != 0U)
+        {
+            _snprintf_s(line, sizeof(line), _TRUNCATE, "Module Offset: 0x%08X\n", info.moduleOffset);
+            summary += line;
+        }
+
+        if (info.timestamp.time_since_epoch().count() != 0)
+        {
+            const std::time_t timeValue = std::chrono::system_clock::to_time_t(info.timestamp);
+            std::tm           localTime{};
+#if defined(_WIN32)
+            if (localtime_s(&localTime, &timeValue) == 0)
+#else
+            if (localtime_r(&timeValue, &localTime) != nullptr)
+#endif
+            {
+                char timeBuffer[64]{};
+                if (std::strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", &localTime) != 0)
+                {
+                    summary += "Timestamp: ";
+                    summary += timeBuffer;
+                    summary += '\n';
+                }
+            }
+        }
+
+        _snprintf_s(line,
+                    sizeof(line),
+                    _TRUNCATE,
+                    "Thread ID: %lu  Process ID: %lu\n",
+                    static_cast<unsigned long>(info.threadId),
+                    static_cast<unsigned long>(info.processId));
+        summary += line;
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "Uncaught Exceptions: %d\n", info.uncaughtExceptionCount);
+        summary += line;
+
+        summary += "Crash Severity: ";
+        summary += info.isFatal ? "fatal" : "recoverable";
+        summary += '\n';
+
+        return summary;
+    }
+
+    std::string FormatStackTrace(const ENHANCED_EXCEPTION_INFO& info)
+    {
+        if (!info.stackTrace.has_value() || info.stackTrace->empty())
+            return {};
+
+        std::string traceText;
+        traceText.reserve(info.stackTrace->size() * 64);
+        traceText += "Stack Trace (CrashHandler):\n";
+
+        for (std::size_t i = 0; i < info.stackTrace->size(); ++i)
+        {
+            traceText += "  #";
+            traceText += std::to_string(i);
+            traceText += " ";
+            traceText += info.stackTrace->at(i);
+            if (traceText.back() != '\n')
+                traceText += '\n';
+        }
+
+        return traceText;
+    }
+
+    std::string FormatRegisterDump(const ENHANCED_EXCEPTION_INFO& info)
+    {
+        std::string registers;
+        registers.reserve(256);
+        char line[160]{};
+
+        registers += "CPU Registers:\n";
+        _snprintf_s(line,
+                    sizeof(line),
+                    _TRUNCATE,
+                    "  EAX=0x%08X EBX=0x%08X ECX=0x%08X EDX=0x%08X\n",
+                    info.eax,
+                    info.ebx,
+                    info.ecx,
+                    info.edx);
+        registers += line;
+
+        _snprintf_s(line,
+                    sizeof(line),
+                    _TRUNCATE,
+                    "  ESI=0x%08X EDI=0x%08X EBP=0x%08X ESP=0x%08X\n",
+                    info.esi,
+                    info.edi,
+                    info.ebp,
+                    info.esp);
+        registers += line;
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "  EIP=0x%08X EFLAGS=0x%08X\n", info.eip, info.eflags);
+        registers += line;
+
+        _snprintf_s(line,
+                    sizeof(line),
+                    _TRUNCATE,
+                    "  CS=0x%04X DS=0x%04X ES=0x%04X FS=0x%04X GS=0x%04X SS=0x%04X\n",
+                    info.cs,
+                    info.ds,
+                    info.es,
+                    info.fs,
+                    info.gs,
+                    info.ss);
+        registers += line;
+
+        return registers;
+    }
+
+    std::string FormatCapturedExceptionInfo(const ENHANCED_EXCEPTION_INFO& info)
+    {
+        if (info.exceptionType.empty() && !info.capturedException.has_value())
+            return {};
+
+        std::string text;
+        text.reserve(256);
+        text += "Captured Exception Metadata:\n";
+
+        if (!info.exceptionType.empty())
+        {
+            text += "  Type: ";
+            text += info.exceptionType;
+            text += '\n';
+        }
+
+        text += "  exception_ptr captured: ";
+        text += info.capturedException.has_value() ? "yes" : "no";
+        text += '\n';
+
+        if (!info.exceptionDescription.empty())
+        {
+            text += "  Description: ";
+            text += info.exceptionDescription;
+            if (text.back() != '\n')
+                text += '\n';
+        }
+
+        return text;
+    }
+
+    std::string BuildAdditionalInfoPayload(const ENHANCED_EXCEPTION_INFO* info,
+                                           std::string_view telemetryFallback,
+                                           std::string_view fallbackSummary = {})
+    {
+        std::string payload;
+
+        const auto appendBlock = [&](std::string_view block) {
+            if (block.empty())
+                return;
+
+            if (!payload.empty())
+                payload.push_back('\n');
+
+            payload.append(block.begin(), block.end());
+            if (!payload.empty() && payload.back() != '\n')
+                payload.push_back('\n');
+        };
+
+        if (info != nullptr)
+        {
+            appendBlock(info->additionalInfo);
+
+            const std::string summary = FormatExceptionSummary(*info);
+            appendBlock(summary);
+
+            const std::string capturedMeta = FormatCapturedExceptionInfo(*info);
+            appendBlock(capturedMeta);
+
+            const std::string registers = FormatRegisterDump(*info);
+            appendBlock(registers);
+
+            const std::string stackTrace = FormatStackTrace(*info);
+            appendBlock(stackTrace);
+        }
+        else if (!fallbackSummary.empty())
+        {
+            appendBlock(fallbackSummary);
+        }
+
+        const bool hasTelemetry = !telemetryFallback.empty();
+        bool       telemetryAlreadyIncluded = false;
+        if (info != nullptr && hasTelemetry && !info->additionalInfo.empty())
+        {
+            telemetryAlreadyIncluded = info->additionalInfo.find("Allocation telemetry") != std::string::npos;
+        }
+
+        if (hasTelemetry && !telemetryAlreadyIncluded)
+        {
+            appendBlock(telemetryFallback);
+        }
+
+        return payload;
+    }
+
+    std::string BuildBasicExceptionSummary(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation)
+    {
+        if (pException == nullptr || pException->ExceptionRecord == nullptr)
+            return {};
+
+        std::string summary;
+        summary.reserve(256);
+        char line[160]{};
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "Exception Code: 0x%08X\n", pException->ExceptionRecord->ExceptionCode);
+        summary += line;
+
+        _snprintf_s(line, sizeof(line), _TRUNCATE, "Exception Address: 0x%p\n", pException->ExceptionRecord->ExceptionAddress);
+        summary += line;
+
+        if (pExceptionInformation != nullptr)
+        {
+            if (const char* modulePath = pExceptionInformation->GetModulePathName(); modulePath != nullptr && modulePath[0] != '\0')
+            {
+                summary += "Module: ";
+                summary += modulePath;
+                summary += '\n';
+            }
+
+            _snprintf_s(line,
+                        sizeof(line),
+                        _TRUNCATE,
+                        "Module Offset: 0x%08X\n",
+                        pExceptionInformation->GetAddressModuleOffset());
+            summary += line;
+        }
+
+        return summary;
+    }
+}            // namespace
 
 template <typename SectionGenerator>
 void AppendDumpSection(const SString& targetPath, const char* tryLabel, const char* successLabel, DWORD tagBegin, DWORD tagEnd, SectionGenerator&& generator)
@@ -734,6 +1265,15 @@ void CCrashDumpWriter::LogEvent(const char* szType, const char* szContext, const
 void CCrashDumpWriter::SetHandlers()
 {
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Setting up crash handlers\n");
+
+    if (!EnableStackCookieFailureCapture(TRUE))
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - Failed to enable stack cookie failure capture\n");
+    }
+    else
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Stack cookie failure capture enabled\n");
+    }
 
     // Install crash filter as absolute first action to catch early exceptions
     // This improves the catching of crashes during window creation or early init
@@ -852,7 +1392,7 @@ void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing()
 }
 
 // Helper to safely read exception code using SEH
-static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException) noexcept
+static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException)
 {
     DWORD exceptionCode = 0;
     __try
@@ -862,19 +1402,19 @@ static DWORD SafeReadExceptionCode(_EXCEPTION_POINTERS* pException) noexcept
             exceptionCode = pException->ExceptionRecord->ExceptionCode;
             if (exceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION)
             {
-                OutputDebugStringA("CCrashDumpWriter: 0xC000041D callback exception detected\n");
+                SAFE_DEBUG_OUTPUT("CCrashDumpWriter: 0xC000041D callback exception detected\n");
             }
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        OutputDebugStringA("CCrashDumpWriter: Exception accessing exception record (corrupted frame)\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Exception accessing exception record (corrupted frame)\n");
     }
     return exceptionCode;
 }
 
 // Helper to get MTA path as C string for SEH contexts (avoids SString unwinding issues)
-static const char* GetMTAPathForSEH() noexcept
+static const char* GetMTAPathForSEH()
 {
     static char szPath[MAX_PATH] = {0};
     static bool initialized = false;
@@ -890,7 +1430,7 @@ static const char* GetMTAPathForSEH() noexcept
 }
 
 // Helper to write reentrant flag file using only SEH
-static void TryWriteReentrantFlag(DWORD exceptionCode) noexcept
+static void TryWriteReentrantFlag(DWORD exceptionCode)
 {
     // Use static buffer to avoid SString (which requires object unwinding)
     static char szFlagPath[MAX_PATH];
@@ -919,7 +1459,7 @@ static void TryWriteReentrantFlag(DWORD exceptionCode) noexcept
 }
 
 // Helper to re-read exception code with SEH protection (no C++ exception handling)
-static DWORD SafeRereadExceptionCode(_EXCEPTION_POINTERS* pException, DWORD fallback) noexcept
+static DWORD SafeRereadExceptionCode(_EXCEPTION_POINTERS* pException, DWORD fallback)
 {
     DWORD exceptionCode = fallback;
     __try
@@ -940,7 +1480,12 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 {
     // Absolute first action - log that we entered the handler (before anything can fail)
     // This is critical for diagnosing exceptions that may fault during handling
-    OutputDebugStringA("CCrashDumpWriter::HandleExceptionGlobal - EMERGENCY ENTRY MARKER\n");
+    OutputDebugStringSafe("CCrashDumpWriter::HandleExceptionGlobal - EMERGENCY ENTRY MARKER\n");
+    
+    // Log exception code and registers immediately - ensures crash context is captured
+    // even if subsequent processing fails and no dump is generated (stale artifact scenario)
+    // Uses SafeEmergencyLog internally which is SEH-protected
+    LogEmergencyCrashContext(pException);
     
     SAFE_DEBUG_OUTPUT("========================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - ENTRY\n");
@@ -961,7 +1506,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         // Try emergency minimal dump for any reentrant exception
         if (exceptionCodeSafe != 0)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Reentrant exception, attempting minimal dump\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Reentrant exception, attempting minimal dump\n");
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Exception during crash handling - attempting emergency artifacts\n");
             TryWriteReentrantFlag(exceptionCodeSafe);
         }
@@ -991,7 +1536,11 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    LogExceptionDetails(pException);
+    const BOOL exceptionLogged = LogExceptionDetails(pException);
+    if (exceptionLogged == FALSE)
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - LogExceptionDetails failed\n");
+    }
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: FATAL EXCEPTION - Begin crash processing\n");
@@ -1001,14 +1550,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     const bool isCallbackException = (exceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION);
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Entering callback exception special handling\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Entering callback exception special handling\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: STATUS_FATAL_USER_CALLBACK_EXCEPTION detected\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: This exception occurred in a Windows callback\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Stack frames may be incomplete or corrupted\n");
         
         // Try to capture what we can with additional protection
         TryLogCallbackContext(pException);
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception context capture attempted\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception context capture attempted\n");
     }
 
     CExceptionInformation_Impl* pExceptionInformation = nullptr;
@@ -1086,7 +1635,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     // Enhanced emergency logging for all exceptions to track dump generation progress
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception attempting core log\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception attempting core log\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception - attempting dump generation despite potential secondary faults\n");
     }
 
@@ -1094,14 +1643,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting DumpCoreLog\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting DumpCoreLog\n");
         }
         DumpCoreLog(pException, pExceptionInformation);
         coreLogSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Core log dumped successfully\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpCoreLog succeeded\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpCoreLog succeeded\n");
         }
     }
     catch (...)
@@ -1117,14 +1666,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting DumpMiniDump for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting DumpMiniDump for callback exception\n");
         }
         DumpMiniDump(pException, pExceptionInformation);
         miniDumpSucceeded = true;
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Mini dump created successfully\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpMiniDump succeeded for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpMiniDump succeeded for callback exception\n");
         }
     }
     catch (...)
@@ -1132,7 +1681,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to create mini dump\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - DumpMiniDump FAILED for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - DumpMiniDump FAILED for callback exception\n");
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Callback exception may have caused secondary fault during minidump\n");
         }
     }
@@ -1141,7 +1690,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Starting RunErrorTool for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Starting RunErrorTool for callback exception\n");
         }
         crashDialogShown = RunErrorTool(pExceptionInformation);
         if (crashDialogShown)
@@ -1149,7 +1698,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
             SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Error dialog launched successfully\n");
             if (isCallbackException)
             {
-                OutputDebugStringA("CCrashDumpWriter: EMERGENCY - RunErrorTool succeeded for callback exception\n");
+                OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - RunErrorTool succeeded for callback exception\n");
             }
         }
     }
@@ -1158,7 +1707,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ERROR - Failed to launch error dialog\n");
         if (isCallbackException)
         {
-            OutputDebugStringA("CCrashDumpWriter: EMERGENCY - RunErrorTool FAILED for callback exception\n");
+            OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - RunErrorTool FAILED for callback exception\n");
         }
     }
 
@@ -1185,7 +1734,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - Callback exception processing completed, about to terminate\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - Callback exception processing completed, about to terminate\n");
     }
 
     delete pExceptionInformation;
@@ -1259,7 +1808,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Force terminating crashed process NOW\n");
     if (isCallbackException)
     {
-        OutputDebugStringA("CCrashDumpWriter: EMERGENCY - About to call TerminateProcess for callback exception\n");
+        OutputDebugStringSafe("CCrashDumpWriter: EMERGENCY - About to call TerminateProcess for callback exception\n");
     }
     TerminateCurrentProcessWithExitCode(crashExitCode);
 
@@ -1411,6 +1960,19 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         }
     } appendDetailedLine{strDetailed, strDetailedForDialog, hasDetailedSection, hasDetailedSectionForDialog, false};
 
+    bool telemetryNotePresent = false;
+
+    const auto appendTelemetryNoteIfMissing = [&]() {
+        if (telemetryNotePresent)
+            return;
+
+        if (auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote(); !telemetryNote.empty())
+        {
+            appendDetailedLine(SString("Additional Info: %s\n", telemetryNote.c_str()));
+            telemetryNotePresent = true;
+        }
+    };
+
     ENHANCED_EXCEPTION_INFO enhancedInfo = {};
     bool                    hasEnhancedInfo = false;
 
@@ -1482,7 +2044,11 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         appendDetailedLine(SString("Resolved Module Offset: 0x%08X\n", enhancedInfo.moduleOffset));
 
         if (!enhancedInfo.additionalInfo.empty())
+        {
             appendDetailedLine(SString("Additional Info: %s\n", enhancedInfo.additionalInfo.c_str()));
+            if (enhancedInfo.additionalInfo.find("Allocation telemetry") != std::string::npos)
+                telemetryNotePresent = true;
+        }
 
         if (enhancedInfo.capturedException.has_value())
         {
@@ -1533,6 +2099,21 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         appendDetailedLine("Enhanced exception diagnostics unavailable.\n");
     }
 
+    // Registry-resolved module info (independent source of truth with IDA-compatible offsets)
+    // This uses pre-captured module bases from before the crash occurred
+    if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+    {
+        appendDetailedLine("\n");
+        appendDetailedLine("=== Registry-Resolved Module Info (IDA-compatible) ===\n");
+        appendDetailedLine(SString("Resolved Module: %s\n", pImpl->GetResolvedModuleName()));
+        appendDetailedLine(SString("Resolved Module Base: 0x%08X\n", pImpl->GetResolvedModuleBase()));
+        appendDetailedLine(SString("Resolved RVA: 0x%08X\n", pImpl->GetResolvedRva()));
+        appendDetailedLine(SString("Resolved IDA Address: 0x%08X\n", pImpl->GetResolvedIdaAddress()));
+        appendDetailedLine("======================================================\n");
+    }
+
+    appendTelemetryNoteIfMissing();
+
     // Try to get stack trace from detailed exception information
     if (stackFrames == nullptr && pImpl != nullptr && pImpl->HasDetailedStackTrace())
     {
@@ -1562,12 +2143,12 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
                 capturedFrames.reserve(lineCount);
                 
                 std::transform(lines.cbegin(), lines.cend(), std::back_inserter(capturedFrames),
-                    [](const auto& line) noexcept -> std::string {
+                    [](const auto& line) -> std::string {
                         return std::string{line.c_str()};
                     });
 
                 const auto newEnd = std::remove_if(capturedFrames.begin(), capturedFrames.end(),
-                    [](const auto& frame) noexcept -> bool {
+                    [](const auto& frame) -> bool {
                         return frame.empty();
                     });
                 capturedFrames.erase(newEnd, capturedFrames.end());
@@ -1629,7 +2210,7 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         
         [[maybe_unused]] const auto allFramesValid = 
             std::all_of(frames.cbegin(), std::next(frames.cbegin(), static_cast<std::ptrdiff_t>(maxFrames)), 
-                       [](const auto& frame) constexpr noexcept -> bool { return !frame.empty(); });
+                       [](const auto& frame) constexpr -> bool { return !frame.empty(); });
         
         for (std::size_t i{}; i < maxFrames; ++i)
         {
@@ -1700,6 +2281,18 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
     SetApplicationSettingInt("diagnostics", "last-crash-code", pExceptionInformation->GetCode());
     SetApplicationSetting("diagnostics", "last-crash-extra", "");
     SetApplicationSetting("diagnostics", "pending-invalid-parameter-warning", "");
+
+    // Store registry-resolved module info as separate diagnostic settings
+    if (pImpl != nullptr && pImpl->HasResolvedModuleInfo())
+    {
+        SetApplicationSetting("diagnostics", "last-crash-resolved-module", pImpl->GetResolvedModuleName());
+        SetApplicationSetting("diagnostics", "last-crash-resolved-ida-addr", SString("0x%08X", pImpl->GetResolvedIdaAddress()));
+    }
+    else
+    {
+        SetApplicationSetting("diagnostics", "last-crash-resolved-module", "");
+        SetApplicationSetting("diagnostics", "last-crash-resolved-ida-addr", "");
+    }
 
     SString strInfoForDebug = strInfoForSettings;
     strInfoForDebug.Replace("\n", " ");
@@ -1814,8 +2407,36 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                 ExInfo.ExceptionPointers = pException;
                 ExInfo.ClientPointers = FALSE;
 
+                MinidumpUserStreamCollection userStreams;
+
+                const std::string telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote();
+                std::string      basicSummary;
+                ENHANCED_EXCEPTION_INFO enhancedInfo{};
+                const bool             hasEnhancedInfo = (GetEnhancedExceptionInfo(&enhancedInfo) != FALSE);
+
+                if (hasEnhancedInfo)
+                {
+                    userStreams.AddTextStream(kStreamExceptionSummary, FormatExceptionSummary(enhancedInfo));
+                    userStreams.AddTextStream(kStreamStackTrace, FormatStackTrace(enhancedInfo));
+                    userStreams.AddTextStream(kStreamRegisterState, FormatRegisterDump(enhancedInfo));
+                    userStreams.AddTextStream(kStreamCapturedException, FormatCapturedExceptionInfo(enhancedInfo));
+                }
+                else
+                {
+                    basicSummary = BuildBasicExceptionSummary(pException, pExceptionInformation);
+                    userStreams.AddTextStream(kStreamExceptionSummary, basicSummary);
+                }
+
+                const std::string additionalInfoPayload = BuildAdditionalInfoPayload(
+                    hasEnhancedInfo ? &enhancedInfo : nullptr,
+                    telemetryNote,
+                    hasEnhancedInfo ? std::string_view{} : std::string_view{basicSummary});
+                userStreams.AddTextStream(kStreamAdditionalInfo, additionalInfoPayload);
+
+                PMINIDUMP_USER_STREAM_INFORMATION userStreamParam = userStreams.Build();
+
                 BOOL bResult = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
-                                     static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo, nullptr, nullptr);
+                                     static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo, userStreamParam, nullptr);
 
                 if (!bResult)
                 {
@@ -1831,7 +2452,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                         SetEndOfFile(hFile);
                         
                         bResult = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
-                                      MiniDumpNormal, &ExInfo, nullptr, nullptr);
+                                      MiniDumpNormal, &ExInfo, userStreamParam, nullptr);
                         if (bResult)
                         {
                             SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpMiniDump - Retry with MiniDumpNormal succeeded\n");
@@ -1902,15 +2523,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                     PathConform(CalcMTASAPath("")).Split(PATH_SEPERATOR, parts);
                     for (uint i = 0; i < parts.size(); i++)
                     {
-                        if (parts[i].CompareI("Program Files"))
-                            strPathCode += "Pr";
-                        else if (parts[i].CompareI("Program Files (x86)"))
-                            strPathCode += "Px";
-                        else if (parts[i].CompareI("MTA San Andreas"))
-                            strPathCode += "Mt";
-                        else if (parts[i].BeginsWithI("MTA San Andreas"))
-                            strPathCode += "Mb";
-                        else
+                        if (!parts[i].empty())
                             strPathCode += parts[i].Left(1).ToUpper();
                     }
                 }
@@ -2022,6 +2635,14 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     {
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - Already called, returning\n");
         return false;
+    }
+
+    const DWORD exceptionCode = pExceptionInformation->GetCode();
+
+    if (exceptionCode == 0xC0000409 || exceptionCode == 0xC0000374)
+    {
+        SetApplicationSetting("diagnostics", "debugger-crash-capture", "1");
+        AddReportLog(7210, SString("Core - Fail-fast crash detected (0x%08X), debugger capture flag SET for next launch", exceptionCode));
     }
 
     SString strMessage(

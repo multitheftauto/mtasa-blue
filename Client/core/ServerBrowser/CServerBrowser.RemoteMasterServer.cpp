@@ -465,6 +465,9 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
         {
             pItem->SetDataQuality(uiDataQuality);
 
+            // Remember previous no-response
+            bool bWasPreviouslyMarkedNoResponse = pItem->bMasterServerSaysNoResponse;
+
             if (bHasPlayerCount)
                 stream.Read(pItem->nPlayers);
             if (bHasMaxPlayerCount)
@@ -502,6 +505,11 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
             if (bHasRespondingFlag)
             {
                 stream.Read(pItem->bMasterServerSaysNoResponse);
+            }
+            else if (bWasPreviouslyMarkedNoResponse)
+            {
+                // Reset no-response flag when server reappears in master list without responding flag
+                pItem->bMasterServerSaysNoResponse = false;
             }
 
             if (bHasRestrictionFlags)

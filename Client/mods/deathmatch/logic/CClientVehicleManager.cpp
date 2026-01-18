@@ -21,7 +21,7 @@ const SFixedArray<unsigned char, 212> g_ucMaxPassengers = {3, 1,   1,   1,   3, 
                                                            0, 1,   1,   255, 1,   8, 3,   1,  3, 0, 1, 1,   1, 3, 0, 1,            // 432->447
                                                            0, 1,   255, 1,   0,   0, 0,   1,  1, 1, 3, 3,   1, 1, 1,               // 448->462
                                                            1, 1,   1,   3,   3,   1, 1,   3,  1, 0, 0, 1,   1, 0, 1, 1,            // 463->478
-                                                           3, 1,   0,   3,   1,   0, 0,   0,  3, 1, 1, 3,   1, 3, 0, 1,            // 479->494
+                                                           3, 1,   0,   3,   3,   0, 0,   0,  3, 1, 1, 3,   1, 3, 0, 1,            // 479->494
                                                            1, 1,   3,   3,   1,   1, 1,   1,  1, 1, 1, 1,   3, 1, 0, 0,            // 495->510
                                                            1, 0,   0,   1,   1,   3, 1,   1,  0, 0, 1, 1,   1, 1, 1, 1,            // 511->526
                                                            1, 1,   3,   0,   0,   0, 1,   1,  1, 1, 1, 1,   0, 3, 1,               // 527->541
@@ -484,6 +484,24 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 
     // Invalid index
     return 0xFF;
+}
+
+bool CClientVehicleManager::IsValidSeat(unsigned long ulModel, unsigned char ucSeat)
+{
+    // Camper only has 3 seats (0-2)
+    if (static_cast<VehicleType>(ulModel) == VehicleType::VT_CAMPER && ucSeat > 2)
+        return false;
+
+    // Get the maximum passenger count for the vehicle
+    unsigned char ucMaxPassengers = GetMaxPassengerCount(ulModel);
+    if (ucSeat > ucMaxPassengers)
+        return false;
+
+    // Vehicles with unknown passenger count (255) can only have driver in seat 0
+    if (ucSeat > 0 && ucMaxPassengers == 255)
+        return false;
+
+    return true;
 }
 
 void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2)

@@ -111,11 +111,13 @@ void CCameraSA::Restore()
         return;
 
     DWORD               dwFunc = FUNC_Restore;
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CCameraSA::RestoreWithJumpCut()
@@ -124,17 +126,21 @@ void CCameraSA::RestoreWithJumpCut()
     if (!cameraInterface)
         return;
     DWORD               dwFunc = 0x50BD40;
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
     }
+    // clang-format on
     dwFunc = 0x50BAB0;
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 /**
@@ -163,6 +169,7 @@ void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
         CamSwitchStyle = 10;
 
     DWORD CCamera__TakeControl = FUNC_TakeControl;
+    // clang-format off
     __asm
     {
         mov ecx, cameraInterface
@@ -172,6 +179,7 @@ void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
         push entityInterface
         call CCamera__TakeControl
     }
+    // clang-format on
 }
 
 void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
@@ -203,6 +211,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         }*/
 
     DWORD CCamera__TakeControlNoEntity = FUNC_TakeControlNoEntity;
+    // clang-format off
     __asm
         {
         mov ecx, cameraInterface
@@ -211,8 +220,10 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         push position
         call CCamera__TakeControlNoEntity
         }
+    // clang-format on
 
     DWORD dwFunc = 0x50BEC0;
+    // clang-format off
     __asm
     {
         mov ecx, cameraInterface
@@ -221,6 +232,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         push    position
         call    dwFunc
     }
+    // clang-format on
 }
 
 // LSOD recovery
@@ -349,6 +361,7 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
     if (!cameraInterface)
         return;
         
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
@@ -360,6 +373,7 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
         push    fDistance
         call    dwFunc
     }
+    // clang-format on
 }
 
 float CCameraSA::Find3rdPersonQuickAimPitch()
@@ -370,12 +384,14 @@ float CCameraSA::Find3rdPersonQuickAimPitch()
 
     float               fReturn;
     DWORD               dwFunc = FUNC_Find3rdPersonQuickAimPitch;
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
         fstp    fReturn
     }
+    // clang-format on
     return fReturn;
 }
 
@@ -431,12 +447,14 @@ bool CCameraSA::IsFading()
     if (!cameraInterface)
         return false;
     bool                bRet = false;
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
         mov     bRet, al
     }
+    // clang-format on
     return bRet;
 }
 
@@ -447,12 +465,14 @@ int CCameraSA::GetFadingDirection()
     if (!cameraInterface)
         return 0;
     int                 dwRet = false;
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
         mov     dwRet, eax
     }
+    // clang-format on
     return dwRet;
 }
 
@@ -477,6 +497,7 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
     if (!cameraInterface)
         return;
         
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
@@ -484,6 +505,7 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
         push    fFadeOutTime
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
@@ -495,6 +517,7 @@ void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigne
     DWORD               dwRed = ucRed;
     DWORD               dwGreen = ucGreen;
     DWORD               dwBlue = ucBlue;
+    // clang-format off
     __asm
     {
         mov     ecx, cameraInterface
@@ -503,6 +526,7 @@ void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigne
         push    dwRed
         call    dwFunc
     }
+    // clang-format on
 }
 
 float CCameraSA::GetCameraRotation()
@@ -588,6 +612,7 @@ static void __declspec(naked) HOOK_Camera_CollisionDetection()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -599,6 +624,7 @@ static void __declspec(naked) HOOK_Camera_CollisionDetection()
         push    ebp
         jmp     RETURN_Camera_CollisionDetection
     }
+    // clang-format on
 }
 
 BYTE CCameraSA::GetCameraVehicleViewMode()

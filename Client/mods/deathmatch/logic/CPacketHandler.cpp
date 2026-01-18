@@ -309,6 +309,10 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
     if (g_pGame->GetSystemState() == SystemState::GS_FRONTEND)
     {
         g_pGame->StartGame();
+
+        // Fix area name showing for a second when joining to server for first time
+        // HUD_AREA_NAME will be made visible later in the process when the camera fades in (CCameraRPCs::FadeCamera)
+        g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     }
 }
 
@@ -3201,11 +3205,6 @@ retry:
                         // Create the pickup with the given position and model
                         CClientPickup* pPickup = new CClientPickup(g_pClientGame->m_pManager, EntityID, usModel, position.data.vecPosition);
                         pEntity = pPickup;
-                        if (!pPickup)
-                        {
-                            RaiseEntityAddError(64);
-                            return;
-                        }
 
                         pPickup->m_ucType = pickupType.data.ucType;
                         switch (pickupType.data.ucType)
@@ -4386,8 +4385,12 @@ void CPacketHandler::Packet_PickupHideShow(NetBitStreamInterface& bitStream)
             CClientPickup* pPickup = g_pClientGame->m_pPickupManager->Get(PickupID);
             if (pPickup)
             {
+                // Only update model if it changed (avoids unnecessary recreate)
+                if (pPickup->GetModel() != usPickupModel)
+                {
+                    pPickup->SetModel(usPickupModel);
+                }
                 // Show/hide it
-                pPickup->SetModel(usPickupModel);
                 pPickup->SetVisible(bShow);
             }
         }
