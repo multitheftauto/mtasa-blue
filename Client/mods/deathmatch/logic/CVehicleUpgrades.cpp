@@ -42,25 +42,31 @@ CVehicleUpgrades::CVehicleUpgrades(CClientVehicle* pVehicle)
     m_usLastLocalAddNitroType = 0;
 }
 
+static unsigned short GetCustomUpgradeParentModelID(unsigned short usModelID)
+{
+    auto* upgradeModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
+    {
+        unsigned short parentID = upgradeModelInfo->GetParentID();
+        if (parentID >= 1000 && parentID <= 1193)
+        {
+            return parentID;
+        }
+    }
+    return usModelID;
+}
+
 bool CVehicleUpgrades::IsUpgrade(unsigned short usModel)
 {
+    usModel = GetCustomUpgradeParentModelID(usModel);
+
     return (usModel >= 1000 && usModel <= 1193);
 }
 
 bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 {
-    unsigned short     us = usUpgrade;
+    unsigned short us = GetCustomUpgradeParentModelID(usUpgrade);
     eClientVehicleType vehicleType = m_pVehicle->GetVehicleType();
-
-    auto* upgradeModelInfo = g_pGame->GetModelInfo(us);
-    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
-    {
-        unsigned short parentID = upgradeModelInfo->GetParentID();
-        if (IsUpgrade(parentID))
-        {
-            us = parentID;
-        }
-    }
 
     // No upgrades for trains/boats
     if (vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT)
@@ -463,15 +469,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSlot)
 {
     // Check if this is a custom upgrade model
-    auto* upgradeModelInfo = g_pGame->GetModelInfo(us);
-    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
-    {
-        unsigned short parentID = upgradeModelInfo->GetParentID();
-        if (IsUpgrade(parentID))
-        {
-            us = parentID;
-        }
-    }
+    us = GetCustomUpgradeParentModelID(us);
 
     if (us == 1011 || us == 1012 || us == 1111 || us == 1112 || us == 1142 || /* bonet */
         us == 1143 || us == 1144 || us == 1145)
