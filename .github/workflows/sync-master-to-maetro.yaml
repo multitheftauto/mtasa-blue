@@ -33,10 +33,6 @@ jobs:
           git checkout --ours -- "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
           git add --verbose "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
 
-          # Discard cefweb conflicts
-          git checkout --ours -- Client/cefweb/CWebView.cpp
-          git add --verbose Client/cefweb/CWebView.cpp
-
           # We should be done with the merge now
           printf "Synchronize changes from 1.6 master branch [ci skip]\n\n" > commit.txt
           git log --expand-tabs=4 --pretty=format:'%h %s' release/maetro..master >> commit.txt
