@@ -5,7 +5,6 @@ project "zip"
 	warnings "Off"
 
 	includedirs  { "../zlib" }
-	defines { "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP" }
 
 	if MTA_MAETRO then
 		defines { "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP" }
