@@ -20,6 +20,11 @@
 #include "SString.h"
 #include <bochs_internal/bochs_crc32.h>
 
+#if defined(_WIN32) && defined(MTA_CLIENT)
+#include <unordered_map>
+#include <mutex>
+#endif
+
 // Depends on CMD5Hasher and CRCGenerator
 class CChecksum
 {
@@ -31,7 +36,74 @@ public:
 
     bool operator!=(const CChecksum& other) const { return !operator==(other); }
 
-    // GenerateChecksumFromFile returns either a CChecksum or an error message.
+#if defined(_WIN32) && defined(MTA_CLIENT)
+private:
+    struct CacheEntry { std::uint64_t size, mtime; unsigned long crc; MD5 md5; };
+    static std::unordered_map<std::string, CacheEntry>& Cache() { static std::unordered_map<std::string, CacheEntry> c; return c; }
+    static std::mutex& CacheMtx() { static std::mutex m; return m; }
+
+public:
+    static void ClearChecksumCache() { std::lock_guard<std::mutex> l(CacheMtx()); Cache().clear(); }
+
+    static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
+    {
+        std::string key = strFilename;
+        for (char& c : key) {
+            if (c >= 'A' && c <= 'Z') c += 32;
+            if (c == '\\') c = '/';
+        }
+
+        WIN32_FILE_ATTRIBUTE_DATA attr;
+        WString wide;
+        try { wide = SharedUtil::FromUTF8(strFilename); } catch (...) {}
+        bool hasMeta = !wide.empty() && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr);
+        std::uint64_t sz = 0, mt = 0;
+        if (hasMeta) {
+            sz = (std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
+            mt = (std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime;
+            std::lock_guard<std::mutex> l(CacheMtx());
+            auto it = Cache().find(key);
+            if (it != Cache().end() && it->second.size == sz && it->second.mtime == mt) {
+                CChecksum cached; cached.ulCRC = it->second.crc; cached.md5 = it->second.md5;
+                return cached;
+            }
+        }
+
+        SString buf;
+        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 10000))
+        {
+            if (!SharedUtil::FileExists(strFilename))
+                return SString("File not found: %s", strFilename.c_str());
+
+            CChecksum r;
+            errno = 0;
+            r.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
+            if (errno || !CMD5Hasher().Calculate(strFilename, r.md5))
+                return SString("Could not read: %s", strFilename.c_str());
+
+            if (hasMeta && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr) &&
+                sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
+                mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime)) {
+                std::lock_guard<std::mutex> l(CacheMtx()); Cache()[key] = {sz, mt, r.ulCRC, r.md5};
+            }
+            return r;
+        }
+
+        CChecksum r;
+        r.ulCRC = CRCGenerator::GetCRCFromBuffer(buf.data(), buf.size());
+        CMD5Hasher().Calculate(buf.data(), buf.size(), r.md5);
+
+        if (hasMeta && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr) &&
+            sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
+            mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime)) {
+            std::lock_guard<std::mutex> l(CacheMtx()); Cache()[key] = {sz, mt, r.ulCRC, r.md5};
+        }
+        return r;
+    }
+#else
+    static void ClearChecksumCache() {}
+
+    // Server and non-Windows builds use the original implementation
     static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
         constexpr int maxRetries = 3;
@@ -82,6 +154,8 @@ public:
                        attemptsMade == 1 ? "" : "s",
                        lastErrno ? std::strerror(lastErrno) : "Unknown error");
     }
+#endif
+
 
     // GenerateChecksumFromFileUnsafe should never ever be used unless you are a bad person. Or unless you really know what you're doing.
     // If it's the latter, please leave a code comment somewhere explaining why. Otherwise we'll think it's just code that hasn't been migrated yet.

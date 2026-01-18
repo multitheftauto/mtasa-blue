@@ -1642,3 +1642,53 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath) noexcept
 
     return entries;
 }
+#if defined(_WIN32) && defined(MTA_CLIENT)
+bool SharedUtil::FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs) noexcept
+{
+    outBuffer.clear();
+
+    if (!File::IsPathSafe(filePath.c_str()))
+        return false;
+
+    WString wideFilePath;
+    try { wideFilePath = FromUTF8(filePath); }
+    catch (...) { return false; }
+
+    if (wideFilePath.empty())
+        return false;
+
+    WIN32_FILE_ATTRIBUTE_DATA attr;
+    if (!GetFileAttributesExW(wideFilePath.c_str(), GetFileExInfoStandard, &attr) || attr.nFileSizeHigh > 0)
+        return false;
+
+    DWORD fileSize = attr.nFileSizeLow;
+    if (fileSize == 0)
+        return true;
+
+    HANDLE fh = CreateFileW(wideFilePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                            nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
+    if (fh == INVALID_HANDLE_VALUE)
+        return false;
+
+    HANDLE ev = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (!ev) { CloseHandle(fh); return false; }
+
+    bool ok = false;
+    try { outBuffer.resize(fileSize); } catch (...) { goto done; }
+
+    {
+        OVERLAPPED ov{}; ov.hEvent = ev;
+        DWORD n = 0;
+        if (!ReadFile(fh, &outBuffer[0], fileSize, &n, &ov) && GetLastError() == ERROR_IO_PENDING)
+        {
+            if (WaitForSingleObject(ev, timeoutMs) != WAIT_OBJECT_0)
+            { CancelIo(fh); GetOverlappedResult(fh, &ov, &n, TRUE); goto done; }
+        }
+        ok = GetOverlappedResult(fh, &ov, &n, FALSE) && n == fileSize;
+    }
+done:
+    CloseHandle(ev); CloseHandle(fh);
+    if (!ok) outBuffer.clear();
+    return ok;
+}
+#endif
