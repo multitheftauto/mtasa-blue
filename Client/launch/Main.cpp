@@ -356,7 +356,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     if (!module_result) [[unlikely]]
     {
         DWORD   error = GetLastError();
-        SString msg   = std::format("Launcher Main: Failed to load: '{}'\n\n{}", dll_path, GetSystemErrorMessage(error));
+        SString msg = std::format("Launcher Main: Failed to load: '{}'\n\n{}", dll_path.data(), GetSystemErrorMessage(error).data());
         AddReportLog(5711, msg);
 
         // Pattern matching
