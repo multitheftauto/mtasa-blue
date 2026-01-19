@@ -48,37 +48,6 @@ public:
     CReference* m_pFreeList;
 };
 
-class CMatrixEx
-{
-public:
-    CMatrix_Padded matrix;
-    CMatrix*       pMatrix;                 // usually not initialized
-    void*          haveRwMatrix;            // unknown pointer
-};
-
-class XYZ
-{
-public:
-    CMatrixEx                    matrix;
-    class CPlaceableSAInterface* pRef;
-    XYZ*                         pPrev;
-    XYZ*                         pNext;
-};
-static_assert(sizeof(XYZ) == 0x54, "Invalid size for XYZ");
-
-class XYZStore
-{
-public:
-    XYZ  head;
-    XYZ  tail;
-    XYZ  allocatedListHead;
-    XYZ  allocatedListTail;
-    XYZ  freeListHead;
-    XYZ  freeListTail;
-    XYZ* pPool;
-};
-static_assert(sizeof(XYZStore) == 0x1FC, "Invalid size for XYZStore");
-
 class CEntitySAInterface : public CPlaceableSAInterface
 {
 public:
