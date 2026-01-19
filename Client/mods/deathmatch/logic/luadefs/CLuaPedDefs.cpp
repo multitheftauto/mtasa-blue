@@ -39,6 +39,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setElementBoneRotation", ArgumentParserWarn<false, SetElementBoneRotation>},
         {"setElementBoneQuaternion", ArgumentParserWarn<false, SetElementBoneQuaternion>},
         {"setElementBoneMatrix", ArgumentParserWarn<false, SetElementBoneMatrix>},
+        {"setElementBoneScale", ArgumentParserWarn<false, SetElementBoneScale>},
         {"setPedRotation", SetPedRotation},
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedCanBeKnockedOffBike", SetPedCanBeKnockedOffBike},
@@ -69,6 +70,7 @@ void CLuaPedDefs::LoadFunctions()
         {"getElementBoneRotation", ArgumentParserWarn<false, GetElementBoneRotation>},
         {"getElementBoneQuaternion", ArgumentParserWarn<false, GetElementBoneQuaternion>},
         {"getElementBoneMatrix", ArgumentParserWarn<false, GetElementBoneMatrix>},
+        {"getElementBoneScale", ArgumentParserWarn<false, GetElementBoneScale>},
         {"getPedRotation", GetPedRotation},
         {"getPedWeaponSlot", GetPedWeaponSlot},
         {"canPedBeKnockedOffBike", CanPedBeKnockedOffBike},
@@ -118,6 +120,9 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedDead", IsPedDead},
         {"isPedReloadingWeapon", ArgumentParserWarn<false, IsPedReloadingWeapon>},
         {"killPedTask", ArgumentParser<killPedTask>},
+
+        {"resetElementBoneScale", ArgumentParserWarn<false, ResetElementBoneScale>},
+        {"resetAllElementBoneScales", ArgumentParserWarn<false, ResetAllElementBoneScales>},
     };
 
     // Add functions
@@ -1118,6 +1123,39 @@ bool CLuaPedDefs::SetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone
     return entity->SetBoneMatrix(static_cast<eBone>(bone), matrix);
 }
 
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneScale(CClientPed* ped, const std::uint16_t bone)
+{
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    CVector scale;
+    if (!ped->GetBoneScale(static_cast<eBone>(bone), scale))
+        return false;
+
+    return CLuaMultiReturn<float, float, float>(scale.fX, scale.fY, scale.fZ);
+}
+
+bool CLuaPedDefs::SetElementBoneScale(CClientPed* ped, const std::uint16_t bone, const float scaleX, const float scaleY, const float scaleZ)
+{
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    return ped->SetBoneScale(static_cast<eBone>(bone), CVector(scaleX, scaleY, scaleZ));
+}
+
+bool CLuaPedDefs::ResetElementBoneScale(CClientPed* ped, const std::uint16_t bone)
+{
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    return ped->ResetBoneScale(static_cast<eBone>(bone));
+}
+
+void CLuaPedDefs::ResetAllElementBoneScales(CClientPed* ped)
+{
+    ped->ResetAllBoneScales();
+}
+
 bool CLuaPedDefs::UpdateElementRpHAnim(CClientPed* ped)
 {
     CEntity* entity = ped->GetGameEntity();
@@ -1128,15 +1166,17 @@ bool CLuaPedDefs::UpdateElementRpHAnim(CClientPed* ped)
     entity->UpdateRpHAnim();
 
     if (entity->GetModelIndex() != 0)
+    {
+        ped->ApplyBoneScales();
         return true;
+    }
 
     RpClump* clump = entity->GetRpClump();
 
     if (clump)
-    {
-        ((void(__cdecl*)(RpClump*))0x5DF560)(clump); // CPed::ShoulderBoneRotation
-    }
+        ((void(__cdecl*)(RpClump*))0x5DF560)(clump);            // CPed::ShoulderBoneRotation
 
+    ped->ApplyBoneScales();
     return true;
 }
 

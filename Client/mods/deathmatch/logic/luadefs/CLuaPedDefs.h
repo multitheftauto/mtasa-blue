@@ -55,11 +55,16 @@ public:
     static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBoneRotation(CClientPed* ped, const std::uint16_t bone);
     static std::variant<bool, CLuaMultiReturn<float, float, float, float>> GetElementBoneQuaternion(CClientPed* ped, const std::uint16_t bone);
     static std::variant<bool, std::array<std::array<float, 4>, 4>>         GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBoneScale(CClientPed* ped, const std::uint16_t bone);
 
     static bool SetElementBonePosition(CClientPed* ped, const std::uint16_t bone, const CVector position);
     static bool SetElementBoneRotation(CClientPed* ped, const std::uint16_t bone, const float yaw, const float pitch, const float roll);
     static bool SetElementBoneQuaternion(CClientPed* ped, const std::uint16_t bone, const float x, const float y, const float z, const float w);
     static bool SetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone, const CMatrix matrix);
+    static bool SetElementBoneScale(CClientPed* ped, const std::uint16_t bone, const float scaleX, const float scaleY, const float scaleZ);
+
+    static bool ResetElementBoneScale(CClientPed* ped, const std::uint16_t bone);
+    static void ResetAllElementBoneScales(CClientPed* ped);
 
     static bool UpdateElementRpHAnim(CClientPed* ped);
 
