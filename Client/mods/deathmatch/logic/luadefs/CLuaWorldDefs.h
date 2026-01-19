@@ -149,4 +149,5 @@ public:
 
     static void RemoveGameWorld();
     static void RestoreGameWorld();
+    static void ResetMapInfo();
 };

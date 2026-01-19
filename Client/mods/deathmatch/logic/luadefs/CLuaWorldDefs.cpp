@@ -138,7 +138,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
                                                                              {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
                                                                              {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
-                                                                             {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},    
+                                                                             {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},
+                                                                             {"resetMapInfo", ArgumentParser<ResetMapInfo>},    
       
                                                                              // World check funcs
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
@@ -2338,6 +2339,11 @@ bool CLuaWorldDefs::IsDynamicPedShadowsEnabled() noexcept
 bool CLuaWorldDefs::ResetDynamicPedShadows() noexcept
 {
     return g_pGame->GetSettings()->ResetDynamicPedShadows();
+}
+
+void CLuaWorldDefs::ResetMapInfo()
+{
+    g_pClientGame->ResetMapInfo();
 }
 
 CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> CLuaWorldDefs::TestSphereAgainstWorld(CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles, std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore)
