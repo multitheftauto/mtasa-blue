@@ -15,13 +15,18 @@ $ToolConfig = @{
     }
 }
 
-function Get-ClangFormat {
+function Get-ClangTool {
     param(
-        [Parameter(Mandatory)] [string]$RepoRoot
+        [Parameter(Mandatory)] [string]$RepoRoot,
+        [Parameter(Mandatory)] [string]$ToolName
     )
 
     $platform = if ($isLinux) { "linux-amd64" } else { "windows-amd64" }
-    $toolConfig = $ToolConfig["clang-format"][$platform]
+    $toolConfig = $ToolConfig[$ToolName][$platform]
+    if (-not $toolConfig) {
+        Write-Error "No configuration found for tool '$ToolName' on platform '$platform'"
+        exit 1
+    }
 
     $binDir = Join-Path $RepoRoot "Build" "tmp"
     if (-not (Test-Path $binDir)) {
@@ -29,33 +34,33 @@ function Get-ClangFormat {
     }
 
     # Check existing file
-    $clangFormatPath = Join-Path $binDir $toolConfig.filename
-    if (Test-Path $clangFormatPath) {
-        $currentHash = (Get-FileHash -Path $clangFormatPath -Algorithm SHA256).Hash
+    $toolPath = Join-Path $binDir $toolConfig.filename
+    if (Test-Path $toolPath) {
+        $currentHash = (Get-FileHash -Path $toolPath -Algorithm SHA256).Hash
         if ($currentHash -eq $toolConfig.hash) {
-            return $clangFormatPath
+            return $toolPath
         }
-        Write-Warning "clang-format hash mismatch, re-downloading..."
+        Write-Warning "$ToolName hash mismatch, re-downloading..."
     }
 
     # Download process
-    Write-Host "Downloading clang-format..." -ForegroundColor Cyan
-    Invoke-WebRequest -Uri $toolConfig.url -OutFile $clangFormatPath
+    Write-Host "Downloading $ToolName..." -ForegroundColor Cyan
+    Invoke-WebRequest -Uri $toolConfig.url -OutFile $toolPath
     if ($isLinux) {
-        chmod +x $clangFormatPath
+        chmod +x $toolPath
     }
-    Write-Verbose "Downloaded clang-format to $clangFormatPath"
+    Write-Verbose "Downloaded $ToolName to $toolPath"
 
     # Verify hash
-    $downloadedHash = (Get-FileHash -Path $clangFormatPath -Algorithm SHA256).Hash
+    $downloadedHash = (Get-FileHash -Path $toolPath -Algorithm SHA256).Hash
     if ($downloadedHash -ne $toolConfig.hash) {
-        Remove-Item $clangFormatPath -ErrorAction SilentlyContinue
+        Remove-Item $toolPath -ErrorAction SilentlyContinue
         Write-Error "SHA256 hash mismatch! The download may be corrupted. Expected: $($toolConfig.hash) Got: $downloadedHash"
         exit 1
     }
 
-    Write-Verbose "clang-format verified successfully."
-    return $clangFormatPath
+    Write-Verbose "$ToolName verified successfully."
+    return $toolPath
 }
 
 function Invoke-ClangFormat {
@@ -68,7 +73,7 @@ function Invoke-ClangFormat {
 
     try {
         Write-Verbose "Searching for source files to format..."
-        $clangFormatPath = Get-ClangFormat -RepoRoot $repoRoot
+        $clangFormatPath = Get-ClangTool -RepoRoot $repoRoot -ToolName "clang-format"
         $searchFolders = "Client", "Server", "Shared"
         $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
 
