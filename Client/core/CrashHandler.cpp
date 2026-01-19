@@ -1577,7 +1577,7 @@ namespace CrashHandler
     return true;
 }
 
-}  // namespace CrashHandler
+}
 
 [[nodiscard]] BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
 {
