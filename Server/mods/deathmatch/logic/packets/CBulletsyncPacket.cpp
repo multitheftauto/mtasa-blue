@@ -189,6 +189,9 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
 
     if (!ReadOptionalDamage(stream))
     {
+        // todo: do we really need to reset damage data when we're returning
+        // false? returning false deletes the packet, and other packets don't
+        // reset internal data based on validation failures.
         ResetDamageData();
         return false;
     }
