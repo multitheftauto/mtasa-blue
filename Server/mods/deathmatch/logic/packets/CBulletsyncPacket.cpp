@@ -147,12 +147,6 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         // Check if player is spawned and alive
         if (!pPlayer->IsSpawned() || pPlayer->IsDead())
             return false;
-
-        // Check player position is reasonable relative to bullet start
-        const CVector& playerPos = pPlayer->GetPosition();
-        const float    maxShootDistance = 50.0f;  // Max distance from player to bullet start
-
-        // This check will be done after we read positions
     }
 
     if (!ReadWeaponAndPositions(stream))
