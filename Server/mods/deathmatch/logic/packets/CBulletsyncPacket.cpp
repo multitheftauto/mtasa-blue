@@ -141,14 +141,10 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
     if (!m_pSourceElement)
         return false;
 
-    // todo: is this condition always true?
-    CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
-    if (pPlayer)
-    {
-        // Check if player is spawned and alive
-        if (!pPlayer->IsSpawned() || pPlayer->IsDead())
-            return false;
-    }
+    // Check if player is spawned and alive
+    CPlayer* pPlayer = GetSourcePlayer();
+    if (!pPlayer->IsSpawned() || pPlayer->IsDead())
+        return false;
 
     if (!ReadWeaponAndPositions(stream))
         return false;
