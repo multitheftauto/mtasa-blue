@@ -66,8 +66,21 @@ CConsole::~CConsole()
 
 void CConsole::Echo(const char* szText)
 {
-    // Add to add buffer
-    m_strPendingAdd += szText;
+    std::string finalMessage = szText;
+
+    // Prepend timestamp for console display
+    if (g_pCore->GetCVars()->GetValue<bool>("show_time_in_chat", true))
+    {
+        char        szTime[16];            // HH:MM:SS
+        std::time_t t = std::time(nullptr);
+        std::tm*    tm_info = std::localtime(&t);
+        std::strftime(szTime, sizeof(szTime), "%H:%M:%S", tm_info);
+
+        finalMessage = std::string("[") + szTime + "] " + szText;
+    }
+
+    // Add to console buffer
+    m_strPendingAdd += finalMessage;
     if (!m_strPendingAdd.EndsWith("\n"))
         m_strPendingAdd += "\n";
 
