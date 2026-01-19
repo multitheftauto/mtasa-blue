@@ -375,6 +375,7 @@ protected:
     CGUIButton*   m_pButtonBrowserWhitelistRemove;
     CGUIButton*   m_pButtonBrowserWhitelistRemoveAll;
     CGUICheckBox* m_pCheckBoxBrowserGPUEnabled;
+    CGUICheckBox* m_pCheckBoxBrowserVideoAccelEnabled;
     bool          m_bBrowserListsChanged;
     bool          m_bBrowserListsLoadEnabled;
 

@@ -428,6 +428,7 @@ void CSettings::ResetGuiPointers()
     m_pGridBrowserWhitelist = NULL;
     m_pButtonBrowserWhitelistRemove = NULL;
     m_pCheckBoxBrowserGPUEnabled = NULL;
+    m_pCheckBoxBrowserVideoAccelEnabled = NULL;
 }
 
 CSettings::CSettings()
@@ -1565,6 +1566,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxBrowserGPUEnabled->SetPosition(CVector2D(browserRightColumnX, vecTemp.fY - 25.0f));
     m_pCheckBoxBrowserGPUEnabled->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxBrowserVideoAccelEnabled = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable video acceleration"), true));
+    m_pCheckBoxBrowserVideoAccelEnabled->SetPosition(CVector2D(browserRightColumnX, vecTemp.fY));
+    m_pCheckBoxBrowserVideoAccelEnabled->AutoSize(NULL, 20.0f);
+
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);
@@ -2391,7 +2396,7 @@ void CSettings::PopulateResolutionComboBox()
 
     if (!m_pComboResolution)
         return;
-        
+
     m_pComboResolution->Clear();
     numVidModes = gameSettings->GetNumVideoModes();
 
@@ -2428,7 +2433,7 @@ void CSettings::PopulateResolutionComboBox()
                 break;
             }
         }
-        
+
         if (!bDuplicate)
             resolutions.push_back(resData);
     }
@@ -4224,6 +4229,8 @@ void CSettings::LoadData()
     m_pCheckBoxRemoteJavascript->SetSelected(bVar);
     CVARS_GET("browser_enable_gpu", bVar);
     m_pCheckBoxBrowserGPUEnabled->SetSelected(bVar);
+    CVARS_GET("browser_enable_video_acceleration", bVar);
+    m_pCheckBoxBrowserVideoAccelEnabled->SetSelected(bVar);
 
     ReloadBrowserLists();
 }
@@ -4729,6 +4736,13 @@ void CSettings::SaveData()
     bool bBrowserGPUSettingChanged = (bBrowserGPUSetting != bBrowserGPUEnabled);
     CVARS_SET("browser_enable_gpu", bBrowserGPUSetting);
 
+    bool bBrowserVideoAccelEnabled = false;
+    CVARS_GET("browser_enable_video_acceleration", bBrowserVideoAccelEnabled);
+
+    bool bBrowserVideoAccelSetting = m_pCheckBoxBrowserVideoAccelEnabled->GetSelected();
+    bool bBrowserVideoAccelSettingChanged = (bBrowserVideoAccelSetting != bBrowserVideoAccelEnabled);
+    CVARS_SET("browser_enable_video_acceleration", bBrowserVideoAccelSetting);
+
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues();
 
@@ -4738,7 +4752,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged || bBrowserVideoAccelSettingChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();

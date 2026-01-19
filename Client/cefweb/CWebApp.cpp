@@ -63,8 +63,7 @@ namespace
         // Prevent Chromium from dropping privileges; required for elevated launches (see chromium/3960)
         commandLine->AppendSwitch("do-not-de-elevate");
 
-        // Must apply essential CEF switches regardless of WebCore availability
-        commandLine->AppendSwitch("disable-gpu-compositing");
+        // Enable external begin frame scheduling for MTA-controlled rendering
         commandLine->AppendSwitch("enable-begin-frame-scheduling");
         // Explicitly block account sign-in to avoid crashes when Google API keys are registered on the system
         commandLine->AppendSwitchWithValue("allow-browser-signin", "false");
@@ -77,6 +76,7 @@ namespace
         }
 
         bool disableGpu = false;
+        bool enableVideoAccel = true;
         if (g_pCore && IsReadablePointer(g_pCore, sizeof(void*)))
         {
             auto* cvars = g_pCore->GetCVars();
@@ -85,6 +85,8 @@ namespace
                 bool gpuEnabled = true;
                 cvars->Get("browser_enable_gpu", gpuEnabled);
                 disableGpu = !gpuEnabled;
+
+                cvars->Get("browser_enable_video_acceleration", enableVideoAccel);
             }
         }
 
@@ -98,20 +100,29 @@ namespace
             else
             {
                 // In Wine, we generally want to try GPU (DXVK handles it well)
-                // But disable-gpu-compositing is already set above which is key
                 // If user hasn't explicitly disabled GPU in cvars, let it run
             }
         }
 
         if (disableGpu)
+        {
             commandLine->AppendSwitch("disable-gpu");
+            // Also disable GPU compositing when GPU is disabled
+            commandLine->AppendSwitch("disable-gpu-compositing");
+        }
+
+        // Hardware video decoding - enable when GPU is enabled and video acceleration is requested
+        if (!disableGpu && enableVideoAccel)
+        {
+            commandLine->AppendSwitch("enable-accelerated-video-decode");
+        }
     }
 }            // namespace
 
 [[nodiscard]] CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
 {
     auto stream = CefStreamReader::CreateForData(
-        (void*)strError.c_str(), 
+        (void*)strError.c_str(),
         strError.length()
     );
     if (!stream)
@@ -131,7 +142,7 @@ void CWebApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line)
 
     const CefString processType = command_line->GetSwitchValue("type");
     ConfigureCommandLineSwitches(command_line, processType);
-    
+
     // Attach IPC validation code for render processes
     // This runs in browser process context where g_pCore and webCore are valid
     // The auth code is generated in CWebCore constructor and passed to subprocesses
@@ -325,7 +336,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                     static constexpr unsigned int CODE_404 = 404;
                     return HandleError(ERROR_404, CODE_404);
                 }
-                    
+
                 return CefRefPtr<CefResourceHandler>(new CefStreamResourceHandler(mimeType, stream));
             }
         }

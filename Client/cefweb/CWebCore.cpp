@@ -77,12 +77,12 @@ bool CWebCore::Initialise(bool gpuEnabled)
     // CefInitialize() can only be called once per process lifetime
     // Do not call this function again or recreate CWebCore if initialization fails
     // Repeated calls cause "Timeout of new browser info response for frame" errors
-    
+
     m_bGPUEnabled = gpuEnabled;
 
     // Get MTA base directory
     SString strBaseDir = SharedUtil::GetMTAProcessBaseDir();
-    
+
     if (strBaseDir.empty())
     {
         g_pCore->GetConsole()->Printf("CEF initialization skipped - Unable to determine MTA base directory");
@@ -90,15 +90,15 @@ bool CWebCore::Initialise(bool gpuEnabled)
         m_bInitialised = false;
         return false;
     }
-    
+
     SString strMTADir = PathJoin(strBaseDir, "MTA");
-    
+
 #ifndef MTA_DEBUG
     SString strLauncherPath = PathJoin(strMTADir, "CEF", "CEFLauncher.exe");
 #else
     SString strLauncherPath = PathJoin(strMTADir, "CEF", "CEFLauncher_d.exe");
 #endif
-    
+
     // Set DLL directory for CEFLauncher subprocess to locate required libraries
     SString strCEFDir = PathJoin(strMTADir, "CEF");
 #ifdef _WIN32
@@ -110,23 +110,23 @@ bool CWebCore::Initialise(bool gpuEnabled)
     if (existingPath) {
         newPath = SString("%s:%s", strCEFDir.c_str(), existingPath);
     }
-    // Note: setenv is not available in MSVC, but _putenv is. 
+    // Note: setenv is not available in MSVC, but _putenv is.
     // However, since we are compiling for Windows (running on Wine), we use Windows APIs.
     // Wine maps Windows environment variables.
     // But LD_LIBRARY_PATH is a Linux variable.
     // If we are in Wine, we might want to set PATH instead or as well.
     // SetDllDirectoryW handles the Windows loader.
-    
+
     // Log for debugging
     if (std::getenv("WINE") || std::getenv("WINEPREFIX")) {
         g_pCore->GetConsole()->Printf("DEBUG: CEF library path set via SetDllDirectoryW: %s", strCEFDir.c_str());
     }
 #endif
-    
+
     // Read GTA path from registry to pass to CEF subprocess
     int iRegistryResult = 0;
     const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iRegistryResult);
-    
+
     // Check if process is running with elevated privileges
     // CEF subprocesses may have communication issues when running elevated
     const bool bIsElevated = []() -> bool {
@@ -140,18 +140,18 @@ bool CWebCore::Initialise(bool gpuEnabled)
         HANDLE hToken = nullptr;
         if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
             return false;
-        
+
         // RAII wrapper for token handle
         const std::unique_ptr<void, decltype(&CloseHandle)> tokenGuard(hToken, &CloseHandle);
-        
+
         TOKEN_ELEVATION elevation{};
         DWORD dwSize = sizeof(elevation);
         if (!GetTokenInformation(hToken, TokenElevation, &elevation, sizeof(elevation), &dwSize))
             return false;
-        
+
         return elevation.TokenIsElevated != 0;
     }();
-    
+
     if (bIsElevated && !std::getenv("WINE"))
     {
         AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
@@ -159,7 +159,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
         AddReportLog(8023, "Consider running MTA without Administrator privileges for full browser functionality");
         g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
-    
+
     // Verify CEFLauncher can run in current environment
     auto CanExecuteCEFLauncher = []() -> bool {
         #ifdef _WIN32
@@ -167,7 +167,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
             if (!std::getenv("WINE") && !std::getenv("WINEPREFIX") && !std::getenv("PROTON_VERSION"))
                 return true;
         #endif
-        
+
         // Check if Wine can execute the launcher
         // This is a basic check - if we are in Wine, we assume it works unless proven otherwise
         // But we can log if we are in a mixed environment
@@ -192,7 +192,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
     // Ensure cache directory can be created
     const SString strCachePath = PathJoin(strMTADir, "CEF", "cache");
     MakeSureDirExists(strCachePath);
-    
+
     // Verify locales directory exists
     const SString strLocalesPath = PathJoin(strMTADir, "CEF", "locales");
     if (!DirectoryExists(strLocalesPath))
@@ -215,7 +215,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
         m_bInitialised = false;
         return false;
     }
-    
+
     // RAII scope guard to restore CWD, even if CefInitialize throws or returns early
     struct CwdGuard {
         fs::path savedPath;
@@ -225,7 +225,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
             fs::current_path(savedPath, restoreEc);
         }
     } cwdGuard(savedCwd);
-    
+
     // Temporarily change CWD to MTA directory for CefInitialize
     // CEFLauncher.exe requires this to locate CEF dependencies
     fs::current_path(fs::path(FromUTF8(strMTADir)), ec);
@@ -235,7 +235,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
         m_bInitialised = false;
         return false;
     }
-    
+
     CefMainArgs        mainArgs;
     void*              sandboxInfo = nullptr;
 
@@ -278,7 +278,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
     }
 
     // CWD will be restored by cwdGuard destructor when this function returns
-    
+
     if (m_bInitialised)
     {
         // Register custom scheme handler factory only if initialization succeeded
@@ -290,7 +290,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
         g_pCore->GetConsole()->Printf("CefInitialize failed - CEF features will be disabled");
         AddReportLog(8004, "CefInitialize failed - CEF features will be disabled");
     }
-    
+
     return m_bInitialised;
 }
 
@@ -315,18 +315,18 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     {
         // Mark as being destroyed to prevent new events/tasks
         pWebView->SetBeingDestroyed(true);
-        
+
         // Ensure that no attached events or tasks are in the queue
         RemoveWebViewEvents(pWebView.get());
         RemoveWebViewTasks(pWebView.get());
 
         // Remove from list before closing to break reference cycles early
         m_WebViews.remove(pWebView);
-        
+
         // CloseBrowser will eventually trigger OnBeforeClose which clears m_pWebView
         // This breaks the circular reference: CWebView -> CefBrowser -> CWebView
         pWebView->CloseBrowser();
-        
+
         // Note: Do not call Release() - let CefRefPtr manage the lifecycle
         // The circular reference is broken via OnBeforeClose setting m_pWebView = nullptr
     }
@@ -382,7 +382,7 @@ void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebV
     {
         // Log warning even in release builds as this indicates a serious issue
         g_pCore->GetConsole()->Printf("WARNING: Browser event queue size limit reached (%d), dropping oldest events", MAX_EVENT_QUEUE_SIZE);
-        
+
         // Remove oldest 10% of events to make room
         auto removeCount = static_cast<size_t>(MAX_EVENT_QUEUE_SIZE / 10);
         for (auto i = size_t{0}; i < removeCount && !m_EventQueue.empty(); ++i)
@@ -426,7 +426,20 @@ void CWebCore::DoEventQueuePulse()
         event.callback();
     }
 
-    // Invoke paint method if necessary on the main thread
+    // Request new frames from CEF using external begin frame scheduling
+    // This synchronizes CEF rendering with MTA's render loop, eliminating
+    // the previous 250ms blocking wait in OnPaint
+    for (auto& view : m_WebViews)
+    {
+        if (view->IsBeingDestroyed() || view->GetRenderingPaused())
+            continue;
+
+        auto browser = view->GetCefBrowser();
+        if (browser)
+            browser->GetHost()->SendExternalBeginFrame();
+    }
+
+    // Copy rendered data to D3D textures on the main thread
     for (auto& view : m_WebViews)
     {
         view->UpdateTexture();
@@ -444,7 +457,7 @@ void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
     std::future<void> result;
     {
         std::scoped_lock lock(m_TaskQueueMutex);
-        
+
         // Prevent unbounded queue growth - abort new task if queue is too large
         if (m_TaskQueue.size() >= MAX_TASK_QUEUE_SIZE) [[unlikely]]
         {
@@ -457,7 +470,7 @@ void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
             task(true);
             return;
         }
-        
+
         m_TaskQueue.emplace_back(TaskEntry{task, webView});
         result = m_TaskQueue.back().task.get_future();
     }
