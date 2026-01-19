@@ -104,7 +104,7 @@ C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
 
 void C3DMarkersSA::ReinitMarkers()
 {
-    using Function_ShutdownMarkers = void(__cdecl *)();
+    using Function_ShutdownMarkers = void(__cdecl*)();
     auto shutdownMarkers = reinterpret_cast<Function_ShutdownMarkers>(0x722710);
 
     using Function_InitMarkers = void(__cdecl*)();

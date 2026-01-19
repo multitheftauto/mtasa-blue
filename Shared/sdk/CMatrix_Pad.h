@@ -20,14 +20,14 @@
 class CMatrix_Padded
 {
 public:
-    CVector vRight;                    // 0            RIGHT
-    DWORD   dwPadRoll;                 // 12
-    CVector vFront;                    // 16   FOREWARDS
-    DWORD   dwPadDirection;            // 28
-    CVector vUp;                       // 32          UP
-    DWORD   dwPadWas;                  // 44
-    CVector vPos;                      // 48        TRANSLATE
-    DWORD   dwPadPos;                  // 60
+    CVector vRight;          // 0            RIGHT
+    DWORD   dwPadRoll;       // 12
+    CVector vFront;          // 16   FOREWARDS
+    DWORD   dwPadDirection;  // 28
+    CVector vUp;             // 32          UP
+    DWORD   dwPadWas;        // 44
+    CVector vPos;            // 48        TRANSLATE
+    DWORD   dwPadPos;        // 60
 
     CMatrix_Padded() { memset(this, 0, sizeof(CMatrix_Padded)); }
 

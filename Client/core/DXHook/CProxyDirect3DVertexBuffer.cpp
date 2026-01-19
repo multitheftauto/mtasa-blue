@@ -126,14 +126,13 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
 
     SharedUtil::CAutoCSLock fallbackGuard(m_fallbackCS);
 
-
     if (m_bFallbackActive)
     {
         if (ppbData)
             *ppbData = nullptr;
 
         SString strMessage("Lock VertexBuffer: fallback still pending - refusing new lock (Offset:%x Size:%x Flags:%08x)", m_fallbackOffset, m_fallbackSize,
-                            m_fallbackFlags);
+                           m_fallbackFlags);
         WriteDebugEvent(strMessage);
         AddReportLog(8624, strMessage);
         CCore::GetSingleton().LogEvent(624, "Lock VertexBuffer", "", strMessage);
@@ -159,8 +158,8 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
 
     if (bPointerNullEvent)
     {
-        WriteDebugEvent(SString("Lock VertexBuffer: initial pointer null (Usage:%08x Flags:%08x Offset:%x Size:%x)", m_dwUsage, Flags, OffsetToLock,
-                                 SizeToLock));
+        WriteDebugEvent(
+            SString("Lock VertexBuffer: initial pointer null (Usage:%08x Flags:%08x Offset:%x Size:%x)", m_dwUsage, Flags, OffsetToLock, SizeToLock));
 
         // Retry once for dynamic buffers using DISCARD
         if ((m_dwUsage & D3DUSAGE_DYNAMIC) && (Flags & D3DLOCK_READONLY) == 0)
@@ -230,8 +229,8 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
 
             hr = D3D_OK;
 
-            WriteDebugEvent(SString("Lock VertexBuffer: engaged fallback buffer (Offset:%x Size:%x Flags:%08x)", m_fallbackOffset, m_fallbackSize,
-                                     m_fallbackFlags));
+            WriteDebugEvent(
+                SString("Lock VertexBuffer: engaged fallback buffer (Offset:%x Size:%x Flags:%08x)", m_fallbackOffset, m_fallbackSize, m_fallbackFlags));
         }
     }
 
@@ -257,9 +256,9 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
         SString strMessage(
             "Lock VertexBuffer [%s] hr:%x origHr:%x returnHr:%x pointerNull:%u retryAttempted:%u retrySucceeded:%u fallback:%u fallbackSize:%x fallbackFlags:%x"
             " unlockedAfterNull:%u Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x retryFlags:%x",
-            info.szText, reportHr, originalHr, hr, static_cast<uint>(bPointerNullEvent), static_cast<uint>(bRetryAttempted),
-            static_cast<uint>(bRetrySucceeded), static_cast<uint>(bFallbackUsed), m_fallbackSize, m_fallbackFlags, static_cast<uint>(bUnlockedAfterNull),
-            m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags, retryFlags);
+            info.szText, reportHr, originalHr, hr, static_cast<uint>(bPointerNullEvent), static_cast<uint>(bRetryAttempted), static_cast<uint>(bRetrySucceeded),
+            static_cast<uint>(bFallbackUsed), m_fallbackSize, m_fallbackFlags, static_cast<uint>(bUnlockedAfterNull), m_iMemUsed, m_dwUsage, m_dwFVF, m_pool,
+            OffsetToLock, SizeToLock, Flags, retryFlags);
         WriteDebugEvent(strMessage);
         AddReportLog(info.uiReportId, strMessage);
         CCore::GetSingleton().LogEvent(info.uiLogEventId, "Lock VertexBuffer", "", strMessage);
@@ -322,8 +321,8 @@ HRESULT CProxyDirect3DVertexBuffer::Unlock()
                 if (SUCCEEDED(lockHr))
                     m_pOriginal->Unlock();
 
-                WriteDebugEvent(SString("Unlock VertexBuffer: failed to copy fallback data (lockHr:%x offset:%x size:%x flags:%08x)", lockHr, offset, size,
-                                           writeFlags));
+                WriteDebugEvent(
+                    SString("Unlock VertexBuffer: failed to copy fallback data (lockHr:%x offset:%x size:%x flags:%08x)", lockHr, offset, size, writeFlags));
                 copyResult = FAILED(lockHr) ? lockHr : D3DERR_INVALIDCALL;
                 bShouldRetryLater = true;
             }
@@ -339,7 +338,7 @@ HRESULT CProxyDirect3DVertexBuffer::Unlock()
     }
 
     WriteDebugEvent(SString("Unlock VertexBuffer: fallback completed (offset:%x size:%x flags:%08x retryLater:%u result:%x)", m_fallbackOffset, m_fallbackSize,
-                             m_fallbackFlags, static_cast<uint>(bShouldRetryLater), copyResult));
+                            m_fallbackFlags, static_cast<uint>(bShouldRetryLater), copyResult));
 
     m_bFallbackActive = bShouldRetryLater ? m_bFallbackActive : false;
     if (!m_bFallbackActive)
