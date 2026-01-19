@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-19 01:08\n"
-"PO-Revision-Date: 2026-01-19 01:20\n"
+"PO-Revision-Date: 2026-01-19 05:20\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -20,7 +20,7 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "Multi Theft Auto does not support Windows XP or Vista.  Please upgrade your computer."
-msgstr ""
+msgstr "Multi Theft Auto nu suportă Windows XP sau Vista. Te rugăm să faci upgrade la computer."
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:207
