@@ -4194,7 +4194,7 @@ retry:
                 {
                     assert(0);
                     break;
-                }
+                }       
             }
 
             if (pEntity)
@@ -4277,6 +4277,27 @@ retry:
     }
     newEntitiesStuff.clear();
     g_pCore->UpdateDummyProgress(0);
+
+
+        unsigned int count = 0;
+    bitStream.ReadCompressed(count);
+    for (unsigned int i = 0; i < count; ++i)
+    {
+        ElementID id1, id2;
+        bool      canCollide;
+        bitStream.Read(id1);
+        bitStream.Read(id2);
+        bitStream.ReadBit(canCollide);
+        // Use id1, id2, canCollide
+
+        CClientEntity* pEntity1 = CElementIDs::GetElement(id1);
+        CClientEntity* pEntity2 = CElementIDs::GetElement(id2);
+
+        pEntity1->SetCollidableWith(pEntity2, canCollide);
+    }
+    SString strCount = SString("Collision pairs count: %u", count);
+    CStaticFunctionDefinitions::OutputConsole(strCount);
+
 }
 
 void CPacketHandler::Packet_EntityRemove(NetBitStreamInterface& bitStream)

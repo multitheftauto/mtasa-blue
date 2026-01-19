@@ -12692,3 +12692,38 @@ bool CStaticFunctionDefinitions::SpawnVehicleFlyingComponent(CVehicle* const veh
 
     return true;
 }
+
+bool CStaticFunctionDefinitions::SetElementCollidableWith(CElement* element, CElement* withElement, bool canCollide)
+{
+    switch (element->GetType())
+    {
+        case EElementType::PLAYER:
+        case EElementType::PED:
+        case EElementType::OBJECT:
+        case EElementType::WEAPON:
+        case EElementType::VEHICLE:
+        {
+            switch (withElement->GetType())
+            {
+                case EElementType::PLAYER:
+                case EElementType::PED:
+                case EElementType::OBJECT:
+                case EElementType::WEAPON:
+                case EElementType::VEHICLE:
+                {
+                    CBitStream BitStream;
+                    BitStream.pBitStream->Write(withElement->GetID());
+                    BitStream.pBitStream->WriteBit(canCollide);
+                    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, SET_ELEMENT_COLLIDABLE_WITH, *BitStream.pBitStream));
+                    return true;
+                }
+                default:
+                break;
+            }
+            break;
+        }
+        default:
+        break;
+    }
+    return false;
+}
