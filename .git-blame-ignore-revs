@@ -260,6 +260,12 @@ e7c3619a5d5e0b6bf352befde6ff33c5921032b2
 #
 # codemod: disable clang-format for `__asm` directives (#4611)
 
+c2a0ba939f0fabba96450d02ec56a111658230d6
+# Author: qaisjp <qaisjp@gmail.com>
+# Date:   Sat Jan 17 10:20:18 2026 -0500
+#
+# Run ./utils/clang-format.ps1
+
 6be278d2d37f5f9686984856b72573290852ed74
 # Author: Qais Patankar <qaisjp@gmail.com>
 # Date:   Sat Jan 17 17:14:10 2026 -0500
