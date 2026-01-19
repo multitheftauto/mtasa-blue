@@ -13,18 +13,18 @@ $ToolConfig = @{
             "hash" = "11defe615493876745f36fb77e9783e7eed03a7f800044ff58619d9293e79409"
         }
     }
-    "clang-tidy" = @{
-        "linux-amd64" = @{
-            "url" = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/v21.1.7/clang-tidy-21_linux-amd64"
-            "filename" = "clang-tidy"
-            "hash" = "7b35986c04b7c4fc7040c254ac2b5eb0b01ece87c91cccb32e3a4d6ecfa9695f"
-        }
-        "windows-amd64" = @{
-            "url" = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/v21.1.7/clang-tidy-21_windows-amd64.exe"
-            "filename" = "clang-tidy.exe"
-            "hash" = "e6afe42eb50ec9dcdf945d88b220b6b36971573cec7c5b6db22d3535c6cc61c4"
-        }
-    }
+    # "clang-tidy" = @{
+    #     "linux-amd64" = @{
+    #         "url" = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/v21.1.7/clang-tidy-21_linux-amd64"
+    #         "filename" = "clang-tidy"
+    #         "hash" = "7b35986c04b7c4fc7040c254ac2b5eb0b01ece87c91cccb32e3a4d6ecfa9695f"
+    #     }
+    #     "windows-amd64" = @{
+    #         "url" = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/v21.1.7/clang-tidy-21_windows-amd64.exe"
+    #         "filename" = "clang-tidy.exe"
+    #         "hash" = "e6afe42eb50ec9dcdf945d88b220b6b36971573cec7c5b6db22d3535c6cc61c4"
+    #     }
+    # }
 }
 
 function Get-ClangTool {
@@ -85,7 +85,7 @@ function Invoke-ClangFormat {
 
     try {
         $clangFormatPath = Get-ClangTool -RepoRoot $repoRoot -ToolName "clang-format"
-        $clangTidyPath = Get-ClangTool -RepoRoot $repoRoot -ToolName "clang-tidy"
+        # $clangTidyPath = Get-ClangTool -RepoRoot $repoRoot -ToolName "clang-tidy"
 
         Write-Verbose "Searching for source files to format..."
         $searchFolders = "Client", "Server", "Shared"
