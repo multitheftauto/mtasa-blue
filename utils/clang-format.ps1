@@ -1,55 +1,78 @@
 #!/usr/bin/env pwsh
 
-function Get-ClangFormat {
+$ToolConfig = @{
+    "clang-format" = @{
+        "linux-amd64" = @{
+            "url" = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/v21.1.7/clang-format-21_linux-amd64"
+            "filename" = "clang-format"
+            "hash" = "3d75779cdc69b06f7e39946b0e50d6ce3dccda1d766e355bf4cf507b1ae13303"
+        }
+        "windows-amd64" = @{
+            "url" = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/v21.1.7/clang-format-21_windows-amd64.exe"
+            "filename" = "clang-format.exe"
+            "hash" = "11defe615493876745f36fb77e9783e7eed03a7f800044ff58619d9293e79409"
+        }
+    }
+    # "clang-tidy" = @{
+    #     "linux-amd64" = @{
+    #         "url" = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/v21.1.7/clang-tidy-21_linux-amd64"
+    #         "filename" = "clang-tidy"
+    #         "hash" = "7b35986c04b7c4fc7040c254ac2b5eb0b01ece87c91cccb32e3a4d6ecfa9695f"
+    #     }
+    #     "windows-amd64" = @{
+    #         "url" = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/v21.1.7/clang-tidy-21_windows-amd64.exe"
+    #         "filename" = "clang-tidy.exe"
+    #         "hash" = "e6afe42eb50ec9dcdf945d88b220b6b36971573cec7c5b6db22d3535c6cc61c4"
+    #     }
+    # }
+}
+
+function Get-ClangTool {
     param(
         [Parameter(Mandatory)] [string]$RepoRoot,
-        [string]$Version = "v21.1.7"
+        [Parameter(Mandatory)] [string]$ToolName
     )
 
-    if ($isLinux) {
-        $clangFormatUrl = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/${Version}/clang-format-21_linux-amd64"
-        $clangFormatFilename = "clang-format"
-        $expectedHash = "3d75779cdc69b06f7e39946b0e50d6ce3dccda1d766e355bf4cf507b1ae13303"
-    } else {
-        $clangFormatUrl = "https://github.com/multitheftauto/clang-tools-static-binaries/releases/download/${Version}/clang-format-21_windows-amd64.exe"
-        $clangFormatFilename = "clang-format.exe"
-        $expectedHash = "11defe615493876745f36fb77e9783e7eed03a7f800044ff58619d9293e79409"
+    $platform = if ($isLinux) { "linux-amd64" } else { "windows-amd64" }
+    $toolConfig = $ToolConfig[$ToolName][$platform]
+    if (-not $toolConfig) {
+        Write-Error "No configuration found for tool '$ToolName' on platform '$platform'"
+        exit 1
     }
 
     $binDir = Join-Path $RepoRoot "Build" "tmp"
-    $clangFormatPath = Join-Path $binDir $clangFormatFilename
-
-    # Check existing file
-    if (Test-Path $clangFormatPath) {
-        $currentHash = (Get-FileHash -Path $clangFormatPath -Algorithm SHA256).Hash
-        if ($currentHash -eq $expectedHash) {
-            return $clangFormatPath
-        }
-        Write-Warning "clang-format hash mismatch, re-downloading..."
-    }
-
-    # Download process
-    Write-Host "Downloading clang-format..." -ForegroundColor Cyan
     if (-not (Test-Path $binDir)) {
         New-Item -ItemType Directory -Path $binDir | Out-Null
     }
 
-    Invoke-WebRequest -Uri $clangFormatUrl -OutFile $clangFormatPath
-    if ($isLinux) {
-        chmod +x $clangFormatPath
+    # Check existing file
+    $toolPath = Join-Path $binDir $toolConfig.filename
+    if (Test-Path $toolPath) {
+        $currentHash = (Get-FileHash -Path $toolPath -Algorithm SHA256).Hash
+        if ($currentHash -eq $toolConfig.hash) {
+            return $toolPath
+        }
+        Write-Warning "$ToolName hash mismatch, re-downloading..."
     }
-    Write-Verbose "Downloaded clang-format to $clangFormatPath"
+
+    # Download process
+    Write-Host "Downloading $ToolName..." -ForegroundColor Cyan
+    Invoke-WebRequest -Uri $toolConfig.url -OutFile $toolPath
+    if ($isLinux) {
+        chmod +x $toolPath
+    }
+    Write-Verbose "Downloaded $ToolName to $toolPath"
 
     # Verify hash
-    $downloadedHash = (Get-FileHash -Path $clangFormatPath -Algorithm SHA256).Hash
-    if ($downloadedHash -ne $expectedHash.ToUpper()) {
-        Remove-Item $clangFormatPath -ErrorAction SilentlyContinue
-        Write-Error "SHA256 hash mismatch! Expected: $expectedHash, Got: $downloadedHash. The download may be corrupted."
+    $downloadedHash = (Get-FileHash -Path $toolPath -Algorithm SHA256).Hash
+    if ($downloadedHash -ne $toolConfig.hash) {
+        Remove-Item $toolPath -ErrorAction SilentlyContinue
+        Write-Error "SHA256 hash mismatch! The download may be corrupted. Expected: $($toolConfig.hash) Got: $downloadedHash"
         exit 1
     }
 
-    Write-Verbose "clang-format verified successfully."
-    return $clangFormatPath
+    Write-Verbose "$ToolName verified successfully."
+    return $toolPath
 }
 
 function Invoke-ClangFormat {
@@ -61,8 +84,10 @@ function Invoke-ClangFormat {
     Write-Verbose "Changed directory to repository root: $repoRoot"
 
     try {
+        $clangFormatPath = Get-ClangTool -RepoRoot $repoRoot -ToolName "clang-format"
+        # $clangTidyPath = Get-ClangTool -RepoRoot $repoRoot -ToolName "clang-tidy"
+
         Write-Verbose "Searching for source files to format..."
-        $clangFormatPath = Get-ClangFormat -RepoRoot $repoRoot
         $searchFolders = "Client", "Server", "Shared"
         $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
 
