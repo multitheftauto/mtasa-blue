@@ -105,7 +105,7 @@ void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterfa
 {
     // Read out the name length
     unsigned short usNameLength;
-    bool           bRecursive;            // Unused
+    bool           bRecursive;  // Unused
     if (bitStream.ReadCompressed(usNameLength))
     {
         SString strName;

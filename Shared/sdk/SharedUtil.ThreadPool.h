@@ -27,46 +27,48 @@ namespace SharedUtil
             m_vecThreads.reserve(threads);
             for (std::size_t i = 0; i < threads; ++i)
             {
-                m_vecThreads.emplace_back([this] {
-                    while (true)
+                m_vecThreads.emplace_back(
+                    [this]
                     {
-                        std::packaged_task<void(bool)> task;
+                        while (true)
                         {
-                            // Wait until either exit is signalled or a new task arrives
-                            std::unique_lock<std::mutex> lock(m_mutex);
-                            m_cv.wait(lock, [this] { return m_exit || !m_tasks.empty(); });
-                            if (m_exit && m_tasks.empty())
-                                return;
-                            task = std::move(m_tasks.front());
-                            m_tasks.pop();
+                            std::packaged_task<void(bool)> task;
+                            {
+                                // Wait until either exit is signalled or a new task arrives
+                                std::unique_lock<std::mutex> lock(m_mutex);
+                                m_cv.wait(lock, [this] { return m_exit || !m_tasks.empty(); });
+                                if (m_exit && m_tasks.empty())
+                                    return;
+                                task = std::move(m_tasks.front());
+                                m_tasks.pop();
+                            }
+                            // Run the task (catch exceptions to prevent thread death)
+                            try
+                            {
+                                task(false);
+                            }
+                            catch (...)
+                            {
+                                // Exception is automatically captured by std::packaged_task
+                                // and will be re-thrown when future.get() is called.
+                                // We must catch here to prevent the worker thread from terminating.
+                            }
                         }
-                        // Run the task (catch exceptions to prevent thread death)
-                        try
-                        {
-                            task(false);
-                        }
-                        catch (...)
-                        {
-                            // Exception is automatically captured by std::packaged_task
-                            // and will be re-thrown when future.get() is called.
-                            // We must catch here to prevent the worker thread from terminating.
-                        }
-                    }
-                });
+                    });
             }
         };
 
         template <typename Func, typename... Args>
         auto enqueue(Func&& f, Args&&... args)
         {
-#if __cplusplus < 201703L // C++17
+#if __cplusplus < 201703L  // C++17
             using ReturnT = typename std::result_of<Func(Args...)>::type;
 #else
             using ReturnT = std::invoke_result_t<Func, Args...>;
 #endif
 
-            auto ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
-            auto task = std::make_shared<std::packaged_task<ReturnT()>>(ff);
+            auto                 ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
+            auto                 task = std::make_shared<std::packaged_task<ReturnT()>>(ff);
             std::future<ReturnT> res = task->get_future();
 
             {
@@ -76,16 +78,17 @@ namespace SharedUtil
                     // Return failed future instead of throwing (avoids crash if caller ignores result)
                     lock.unlock();
                     std::promise<ReturnT> failedPromise;
-                    failedPromise.set_exception(std::make_exception_ptr(
-                        std::runtime_error("Cannot enqueue task: thread pool is shutting down")));
+                    failedPromise.set_exception(std::make_exception_ptr(std::runtime_error("Cannot enqueue task: thread pool is shutting down")));
                     return failedPromise.get_future();
                 }
 
                 // Wrap task with skip flag for shutdown cleanup
-                std::packaged_task<void(bool)> resultTask([task](bool skip) {
-                    if (!skip)
-                        (*task)();
-                });
+                std::packaged_task<void(bool)> resultTask(
+                    [task](bool skip)
+                    {
+                        if (!skip)
+                            (*task)();
+                    });
 
                 m_tasks.emplace(std::move(resultTask));
             }
@@ -155,4 +158,4 @@ namespace SharedUtil
     {
         return CThreadPool::getDefaultThreadPool().enqueue(std::forward<Args>(args)...);
     }
-}            // namespace SharedUtil
+}  // namespace SharedUtil

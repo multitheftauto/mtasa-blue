@@ -12,11 +12,11 @@
 #include "StdInc.h"
 #include "CControllerConfigManagerSA.h"
 
-#define VAR_InputType       ( ( BYTE * ) ( 0xB6EC2E ) )
-#define VAR_MouseInverted   ( ( BYTE * ) ( 0xBA6745 ) )
-#define VAR_FlyWithMouse    ( ( BYTE * ) ( 0xC1CC03 ) )
-#define VAR_SteerWithMouse  ( ( BYTE * ) ( 0xC1CC02 ) )
-#define VAR_VerticalAimSensitivity  ( ( float * ) ( 0xB6EC18 ) )
+#define VAR_InputType              ((BYTE*)(0xB6EC2E))
+#define VAR_MouseInverted          ((BYTE*)(0xBA6745))
+#define VAR_FlyWithMouse           ((BYTE*)(0xC1CC03))
+#define VAR_SteerWithMouse         ((BYTE*)(0xC1CC02))
+#define VAR_VerticalAimSensitivity ((float*)(0xB6EC18))
 
 static const float VERTICAL_AIM_SENSITIVITY_MIN = 0.000312f;
 static const float VERTICAL_AIM_SENSITIVITY_DEFAULT = 0.0015f;
@@ -28,7 +28,7 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
     // Get initial settings
     m_bSteerWithMouse = *VAR_FlyWithMouse != 0;
     m_bFlyWithMouse = *VAR_SteerWithMouse != 0;
-    MemSet((void*)0x5BC7B4, 0x90, 10);            // Stop vertical aim sensitivity value reset
+    MemSet((void*)0x5BC7B4, 0x90, 10);  // Stop vertical aim sensitivity value reset
 }
 
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
@@ -130,7 +130,7 @@ void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings()
 float CControllerConfigManagerSA::GetVerticalAimSensitivity()
 {
     float fRawValue = GetVerticalAimSensitivityRawValue();
-    return UnlerpClamped(VERTICAL_AIM_SENSITIVITY_MIN, fRawValue, VERTICAL_AIM_SENSITIVITY_MAX);            // Remap to 0-1
+    return UnlerpClamped(VERTICAL_AIM_SENSITIVITY_MIN, fRawValue, VERTICAL_AIM_SENSITIVITY_MAX);  // Remap to 0-1
 }
 
 void CControllerConfigManagerSA::SetVerticalAimSensitivity(float fSensitivity)

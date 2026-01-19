@@ -110,16 +110,16 @@ public:
     virtual void ResetComponentFontAlignment(const eHudComponent& component) noexcept = 0;
     virtual void ResetComponentFontProportional(const eHudComponent& component) noexcept = 0;
 
-    virtual CVector2D      GetComponentPosition(const eHudComponent& component) const noexcept = 0;
-    virtual CVector2D      GetComponentSize(const eHudComponent& component) const noexcept = 0;
+    virtual CVector2D GetComponentPosition(const eHudComponent& component) const noexcept = 0;
+    virtual CVector2D GetComponentSize(const eHudComponent& component) const noexcept = 0;
 
-    virtual SColor         GetComponentColor(const eHudComponent& component) const noexcept = 0;
-    virtual SColor         GetComponentSecondaryColor(const eHudComponent& component) const noexcept = 0;
-    virtual SColor         GetComponentFontDropColor(const eHudComponent& component) const = 0;
+    virtual SColor GetComponentColor(const eHudComponent& component) const noexcept = 0;
+    virtual SColor GetComponentSecondaryColor(const eHudComponent& component) const noexcept = 0;
+    virtual SColor GetComponentFontDropColor(const eHudComponent& component) const = 0;
 
-    virtual bool           GetComponentDrawBlackBorder(const eHudComponent& component) const noexcept = 0;
-    virtual bool           GetComponentDrawPercentage(const eHudComponent& component) const noexcept = 0;
-    virtual float          GetHealthBarBlinkingValue(const eHudComponent& component) const noexcept = 0;
+    virtual bool  GetComponentDrawBlackBorder(const eHudComponent& component) const noexcept = 0;
+    virtual bool  GetComponentDrawPercentage(const eHudComponent& component) const noexcept = 0;
+    virtual float GetHealthBarBlinkingValue(const eHudComponent& component) const noexcept = 0;
 
     virtual float          GetComponentFontOutline(const eHudComponent& component) const = 0;
     virtual float          GetComponentFontShadow(const eHudComponent& component) const = 0;
@@ -127,7 +127,7 @@ public:
     virtual eFontAlignment GetComponentFontAlignment(const eHudComponent& component) const = 0;
     virtual bool           GetComponentFontProportional(const eHudComponent& component) const = 0;
 
-    virtual bool           GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept = 0;
+    virtual bool GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept = 0;
 
-    virtual CVector2D      GetComponentTextSize(const eHudComponent& component) const = 0;
+    virtual CVector2D GetComponentTextSize(const eHudComponent& component) const = 0;
 };

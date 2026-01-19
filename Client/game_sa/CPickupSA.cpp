@@ -158,7 +158,7 @@ void CPickupSA::GetRidOfObjects()
         delete object;
         object = nullptr;
     }
-    
+
     GetInterface()->pObject = nullptr;
 }
 

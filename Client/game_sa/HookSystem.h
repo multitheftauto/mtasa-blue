@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define     MAX_JUMPCODE_SIZE           20
+#define MAX_JUMPCODE_SIZE 20
 
 template <typename T>
 void* FunctionPointerToVoidP(T func)
@@ -45,8 +45,7 @@ bool HookInstall(DWORD dwInstallAddress, T dwHookHandler, int iJmpCodeSize = 5)
 BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
 
 // Auto detect requirement of US/EU hook installation
-#define EZHookInstall(type) \
-    HookInstall(HOOKPOS_##type, (DWORD)HOOK_##type, HOOKSIZE_##type);
+#define EZHookInstall(type) HookInstall(HOOKPOS_##type, (DWORD)HOOK_##type, HOOKSIZE_##type);
 
 // Structure for holding hook info
 struct SHookInfo
@@ -60,7 +59,7 @@ struct SHookInfo
     uint  uiSize;
 };
 
-#define MAKE_HOOK_INFO(type)  SHookInfo ( HOOKPOS_##type, HOOK_##type, HOOKSIZE_##type )
+#define MAKE_HOOK_INFO(type) SHookInfo(HOOKPOS_##type, HOOK_##type, HOOKSIZE_##type)
 
 // Structure for holding poke info
 struct SPokeInfo

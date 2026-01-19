@@ -37,7 +37,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
 
     DWORD dwPedPointer = 0;
     _asm
-    {
+        {
         push    SIZEOF_CPLAYERPED
         call    CPedOperatorNew
         add     esp, 4
@@ -45,14 +45,14 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
         mov     dwPedPointer, eax
 
         mov     ecx, eax
-        push    0 // set to 0 and they'll behave like AI peds
+        push    0  // set to 0 and they'll behave like AI peds
         push    1
         call    CPlayerPedConstructor
-    }
+        }
 
     SetInterface((CEntitySAInterface*)dwPedPointer);
 
-    Init();            // init our interfaces
+    Init();  // init our interfaces
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
@@ -163,11 +163,11 @@ void CPlayerPedSA::SetInitialState()
     DWORD dwFunction = FUNC_SetInitialState;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
-    {
+        {
         push    dwUnknown
         mov     ecx, dwThis
         call    dwFunction
-    }
+        }
 
     // Avoid direction locks for respawning after a jump
     GetPlayerPedInterface()->pedFlags.bIsLanding = false;
@@ -263,7 +263,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         if (pAnimBlock && !pAnimBlock->IsLoaded())
         {
             pAnimBlock->Request(BLOCKING, true);
-            MapInsert(ms_DoneAnimBlockRefMap, strBlockName);            // Request() adds a ref for us
+            MapInsert(ms_DoneAnimBlockRefMap, strBlockName);  // Request() adds a ref for us
         }
 
         // Load fail?
@@ -440,9 +440,9 @@ __declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAI
 }
 
 // Hook info
-#define HOOKPOS_CPlayerPed_ProcessAnimGroups_Mid        0x0609A44
-#define HOOKSIZE_CPlayerPed_ProcessAnimGroups_Mid       6
-DWORD RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
+#define HOOKPOS_CPlayerPed_ProcessAnimGroups_Mid  0x0609A44
+#define HOOKSIZE_CPlayerPed_ProcessAnimGroups_Mid 6
+DWORD                 RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
 void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
     _asm
@@ -451,12 +451,12 @@ void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
         push    eax
         push    esi
         call    OnCPlayerPed_ProcessAnimGroups_Mid
-        mov     [esp+0],eax         // Put temp
+        mov     [esp+0],eax  // Put temp
         add     esp, 4*2
         popad
 
-        mov     eax,[esp-32-4*2]    // Get temp
-        cmp     [esi+4D4h], eax     // pPed->iMoveAnim
+        mov     eax,[esp-32-4*2]  // Get temp
+        cmp     [esi+4D4h], eax  // pPed->iMoveAnim
 
         jmp     RETURN_CPlayerPed_ProcessAnimGroups_Mid
     }
@@ -492,24 +492,24 @@ __declspec(noinline) int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqM
 }
 
 // Hook info
-#define HOOKPOS_CClothes_GetDefaultPlayerMotionGroup        0x05A81B0
-#define HOOKSIZE_CClothes_GetDefaultPlayerMotionGroup       5
-DWORD RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
+#define HOOKPOS_CClothes_GetDefaultPlayerMotionGroup  0x05A81B0
+#define HOOKSIZE_CClothes_GetDefaultPlayerMotionGroup 5
+DWORD                 RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
 void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 {
     _asm
     {
-        mov     eax, 0x05A7FB0      // CClothes::GetPlayerMotionGroupToLoad
+        mov     eax, 0x05A7FB0  // CClothes::GetPlayerMotionGroupToLoad
         call    eax
 
         pushad
         push    eax
         call    OnCClothes_GetDefaultPlayerMotionGroup
-        mov     [esp+0],eax         // Put temp
+        mov     [esp+0],eax  // Put temp
         add     esp, 4*1
         popad
 
-        mov     eax,[esp-32-4*1]    // Get temp
+        mov     eax,[esp-32-4*1]  // Get temp
         jmp     RETURN_CClothes_GetDefaultPlayerMotionGroup
     }
 }

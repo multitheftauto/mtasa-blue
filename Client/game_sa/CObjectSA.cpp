@@ -26,7 +26,7 @@ static void CObject_PreRender(CObjectSAInterface* objectInterface)
         objectEntity->pEntity->SetPreRenderRequired(true);
 }
 
-const std::uintptr_t RETURN_CCObject_PreRender = 0x59FD56;
+const std::uintptr_t         RETURN_CCObject_PreRender = 0x59FD56;
 static void _declspec(naked) HOOK_CCObject_PreRender()
 {
     __asm
@@ -62,10 +62,10 @@ struct CFileObjectInstance
     float rx;
     float ry;
     float rz;
-    float rr;            // = 1
+    float rr;  // = 1
     DWORD modelId;
     DWORD areaNumber;
-    long  flags;            // = -1
+    long  flags;  // = -1
 };
 
 CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
@@ -177,14 +177,14 @@ void CObjectSA::Break()
     DWORD dwFunc = 0x5A0D90;
     DWORD dwThis = (DWORD)GetInterface();
 
-    float fHitVelocity = 1000.0f;            // has no direct influence, but should be high enough to trigger the break (effect)
+    float fHitVelocity = 1000.0f;  // has no direct influence, but should be high enough to trigger the break (effect)
 
     _asm
     {
-        push    32h // most cases: between 30 and 37
-        push    0 // colliding entity. To ignore it, we can set it to 0
-        push    0B73710h // vecCollisionImpactVelocity
-        push    0 // vecCollisionLastPos
+        push    32h  // most cases: between 30 and 37
+        push    0  // colliding entity. To ignore it, we can set it to 0
+        push    0B73710h  // vecCollisionImpactVelocity
+        push    0  // vecCollisionLastPos
         push    fHitVelocity
         mov     ecx, dwThis
         call    dwFunc
@@ -198,7 +198,7 @@ void CObjectSA::Break()
         dwFunc = FUNC_CGlass_WindowRespondsToCollision;
 
         _asm
-        {
+            {
             push 0
             push fZ
             push fY
@@ -210,7 +210,7 @@ void CObjectSA::Break()
             push dwThis
             call dwFunc
             add esp, 24h
-        }
+            }
     }
 }
 
@@ -262,12 +262,12 @@ bool CObjectSA::IsGlass()
     bool  bResult;
 
     _asm
-    {
+        {
         push dwThis
         call dwFunc
         mov bResult, al
         add esp, 4
-    }
+        }
     return bResult;
 }
 

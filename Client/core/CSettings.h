@@ -17,9 +17,9 @@ class CSettings;
 #include "CMainMenu.h"
 #include "CCore.h"
 
-#define SKINS_PATH                    "skins/*"
-#define CHAT_PRESETS_PATH             "mta/config/chatboxpresets.xml"
-#define CHAT_PRESETS_ROOT             "chatboxpresets"
+#define SKINS_PATH        "skins/*"
+#define CHAT_PRESETS_PATH "mta/config/chatboxpresets.xml"
+#define CHAT_PRESETS_ROOT "chatboxpresets"
 
 // #define SHOWALLSETTINGS
 
@@ -56,7 +56,7 @@ struct SKeyBindSection
         if (szOriginalTitle)
             delete[] szOriginalTitle;
     }
-    int                 currentIndex;            // temporarily stores the index while the list is being created
+    int                 currentIndex;  // temporarily stores the index while the list is being created
     char*               szTitle;
     char*               szOriginalTitle;
     int                 rowCount;
@@ -123,28 +123,28 @@ public:
     void ShowRichPresenceShareDataQuestionBox() const;
 
 protected:
-    const static int SecKeyNum = 3;            // Number of secondary keys
+    const static int SecKeyNum = 3;  // Number of secondary keys
 
     // Keep these protected so we can access them in the event handlers of CClientGame
-    CGUIElement*  m_pWindow;
-    CGUITabPanel* m_pTabs;
-    CGUITab*      m_pTabMultiplayer;
-    CGUITab*      m_pTabVideo;
-    CGUITab*      m_pTabInterface;
-    CGUITab*      m_pTabBrowser;
-    CGUITab*      m_pTabPostFX;
-    CGUITab*      m_pTabAudio;
-    CGUITab*      m_pTabBinds;
-    CGUITab*      m_pTabControls;
-    CGUITab*      m_pTabAdvanced;
-    CGUIButton*   m_pButtonOK;
-    CGUIButton*   m_pButtonCancel;
-    CGUILabel*    m_pLabelNick;
-    CGUIButton*   m_pButtonGenerateNick;
-    CGUIStaticImage*   m_pButtonGenerateNickIcon;
-    CGUIEdit*     m_pEditNick;
-    CGUICheckBox* m_pSavePasswords;
-    CGUICheckBox* m_pAutoRefreshBrowser;
+    CGUIElement*     m_pWindow;
+    CGUITabPanel*    m_pTabs;
+    CGUITab*         m_pTabMultiplayer;
+    CGUITab*         m_pTabVideo;
+    CGUITab*         m_pTabInterface;
+    CGUITab*         m_pTabBrowser;
+    CGUITab*         m_pTabPostFX;
+    CGUITab*         m_pTabAudio;
+    CGUITab*         m_pTabBinds;
+    CGUITab*         m_pTabControls;
+    CGUITab*         m_pTabAdvanced;
+    CGUIButton*      m_pButtonOK;
+    CGUIButton*      m_pButtonCancel;
+    CGUILabel*       m_pLabelNick;
+    CGUIButton*      m_pButtonGenerateNick;
+    CGUIStaticImage* m_pButtonGenerateNickIcon;
+    CGUIEdit*        m_pEditNick;
+    CGUICheckBox*    m_pSavePasswords;
+    CGUICheckBox*    m_pAutoRefreshBrowser;
 
     CGUILabel*     m_pVideoGeneralLabel;
     CGUILabel*     m_pVideoResolutionLabel;

@@ -19,8 +19,7 @@ extern CGameSA* pGame;
 CFireManagerSA::CFireManagerSA()
 {
     for (int i = 0; i < MAX_FIRES; i++)
-        Fires[i] = new CFireSA(
-            (CFireSAInterface*)(CLASS_CFireManager + 40 * i));            // + 4 because thats the position of CFire array in CFireManager (see source)
+        Fires[i] = new CFireSA((CFireSAInterface*)(CLASS_CFireManager + 40 * i));  // + 4 because thats the position of CFire array in CFireManager (see source)
 }
 
 CFireManagerSA::~CFireManagerSA()

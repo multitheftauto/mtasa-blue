@@ -84,8 +84,8 @@ bool IsValidFilePath(const char* szDir)
     // iterate through the char array
     for (unsigned int i = 0; i < uiLen; i++)
     {
-        c = szDir[i];                                          // current character
-        c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        c = szDir[i];                                // current character
+        c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;  // one character ahead, if any
         if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
             return false;
     }
@@ -102,8 +102,8 @@ bool IsValidFilePath(const char* szDir, size_t length)
     // iterate through the char array
     for (size_t i = 0; i < length; i++)
     {
-        c = szDir[i];                                          // current character
-        c_d = (i < (length - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        c = szDir[i];                                 // current character
+        c_d = (i < (length - 1)) ? szDir[i + 1] : 0;  // one character ahead, if any
         if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
             return false;
     }
@@ -119,9 +119,9 @@ void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
 
 void RaiseFatalError(unsigned int uiCode)
 {
-#ifdef MTA_DEBUG
+    #ifdef MTA_DEBUG
     assert(0);
-#endif
+    #endif
 
     // Populate the message and show the box
     SString strBuffer(_("Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."), uiCode);
@@ -142,7 +142,7 @@ void RaiseProtocolError(unsigned int uiCode)
     // Populate the message and show the box
     SString strBuffer(_("Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."), uiCode);
     SString strTroubleLink(SString("protocol-error&code=%d", uiCode));
-    g_pCore->ShowErrorMessageBox(_("Connection error") + _E("CD63"), strBuffer, strTroubleLink);            // Protocol error
+    g_pCore->ShowErrorMessageBox(_("Connection error") + _E("CD63"), strBuffer, strTroubleLink);  // Protocol error
 
     // Request the mod unload
     g_pCore->GetModManager()->RequestUnload();
@@ -202,16 +202,16 @@ void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
 
 bool DoesDirectoryExist(const char* szPath)
 {
-#ifdef WIN32
+    #ifdef WIN32
     DWORD dwAtr = GetFileAttributes(szPath);
     if (dwAtr == INVALID_FILE_ATTRIBUTES)
         return false;
     return ((dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0);
-#else
+    #else
     struct stat Info;
     stat(szPath, &Info);
     return (S_ISDIR(Info.st_mode));
-#endif
+    #endif
 }
 
 bool CheckNickProvided(const char* szNick)
@@ -376,22 +376,22 @@ void DisconnectConnectionDesync(CGame* pGame, CPlayer& Player, unsigned int uiCo
 
 bool InitializeSockets()
 {
-#ifdef WIN32
+    #ifdef WIN32
     WSADATA wsaData;
     if (WSAStartup(0x202, &wsaData) == SOCKET_ERROR)
     {
         WSACleanup();
         return false;
     }
-#endif
+    #endif
     return true;
 }
 
 bool CleanupSockets()
 {
-#ifdef WIN32
+    #ifdef WIN32
     WSACleanup();
-#endif
+    #endif
     return true;
 }
 #endif
@@ -461,7 +461,7 @@ bool IsValidFilePath(const char* szDir)
 
     unsigned int uiLen = strlen(szDir);
 
-    if (uiLen > 0 && szDir[uiLen - 1] == '/')            // will return false if ending with an invalid character, mainly used for linux (#6871)
+    if (uiLen > 0 && szDir[uiLen - 1] == '/')  // will return false if ending with an invalid character, mainly used for linux (#6871)
         return false;
 
     unsigned char c, c_d;
@@ -469,8 +469,8 @@ bool IsValidFilePath(const char* szDir)
     // iterate through the char array
     for (unsigned int i = 0; i < uiLen; i++)
     {
-        c = szDir[i];                                          // current character
-        c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        c = szDir[i];                                // current character
+        c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;  // one character ahead, if any
         if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
             return false;
     }
@@ -487,8 +487,8 @@ bool IsValidFilePath(const char* szDir, size_t length)
     // iterate through the char array
     for (size_t i = 0; i < length; i++)
     {
-        c = szDir[i];                                           // current character
-        c_d = (i < (length - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        c = szDir[i];                                 // current character
+        c_d = (i < (length - 1)) ? szDir[i + 1] : 0;  // one character ahead, if any
         if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
             return false;
     }
@@ -502,7 +502,7 @@ bool IsValidOrganizationPath(const char* szDir)
 
     unsigned int uiLen = strlen(szDir);
 
-    if (uiLen > 0 && szDir[uiLen - 1] == '/')            // will return false if ending with an invalid character, mainly used for linux (#6871)
+    if (uiLen > 0 && szDir[uiLen - 1] == '/')  // will return false if ending with an invalid character, mainly used for linux (#6871)
         return false;
 
     unsigned char c;
@@ -511,7 +511,7 @@ bool IsValidOrganizationPath(const char* szDir)
     // iterate through the char array
     for (unsigned int i = 0; i < uiLen; i++)
     {
-        c = szDir[i];            // current character
+        c = szDir[i];  // current character
 
         // Enforce braces around visible letters
         if (!bInsideBraces && IsVisibleCharacter(c) && c != '[' && c != ']' && c != '/' && c != '\\')
@@ -520,21 +520,21 @@ bool IsValidOrganizationPath(const char* szDir)
         if (c == '[')
         {
             if (bInsideBraces)
-                return false;            // Duplicate braces (e.g. "[hel[lo]world]")
+                return false;  // Duplicate braces (e.g. "[hel[lo]world]")
             else
                 bInsideBraces = true;
         }
         else if (c == ']')
         {
             if (!bInsideBraces)
-                return false;            // Ending brace without opening brace (e.g. "hello]")
+                return false;  // Ending brace without opening brace (e.g. "hello]")
             else
                 bInsideBraces = false;
         }
         else if (c == '/' || c == '\\')
         {
             if (bInsideBraces)
-                return false;            // Slash within braches (e.g. "[hell/o]")
+                return false;  // Slash within braches (e.g. "[hell/o]")
         }
     }
 
@@ -738,10 +738,10 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
     if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
-            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+            sButtonSquare = (short)keys.data.ucButtonSquare;  // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;  // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -761,16 +761,16 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
 void WriteSmallKeysync(const CControllerState& ControllerState, NetBitStreamInterface& BitStream)
 {
     SSmallKeysyncSync keys;
-    keys.data.bLeftShoulder1 = (ControllerState.LeftShoulder1 != 0);                   // Action / Secondary-Fire
-    keys.data.bRightShoulder1 = (ControllerState.RightShoulder1 != 0);                 // Aim-Weapon / Handbrake
-    keys.data.bButtonSquare = (ControllerState.ButtonSquare != 0);                     // Jump / Reverse
-    keys.data.bButtonCross = (ControllerState.ButtonCross != 0);                       // Sprint / Accelerate
-    keys.data.bButtonCircle = (ControllerState.ButtonCircle != 0);                     // Fire // Fire
-    keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);                 // Enter/Exit/Special-Attack / Enter/exit
-    keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);                     // Crouch / Horn
-    keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                            // Walk / -
-    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;            // Reverse
-    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;              // Accelerate
+    keys.data.bLeftShoulder1 = (ControllerState.LeftShoulder1 != 0);         // Action / Secondary-Fire
+    keys.data.bRightShoulder1 = (ControllerState.RightShoulder1 != 0);       // Aim-Weapon / Handbrake
+    keys.data.bButtonSquare = (ControllerState.ButtonSquare != 0);           // Jump / Reverse
+    keys.data.bButtonCross = (ControllerState.ButtonCross != 0);             // Sprint / Accelerate
+    keys.data.bButtonCircle = (ControllerState.ButtonCircle != 0);           // Fire // Fire
+    keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);       // Enter/Exit/Special-Attack / Enter/exit
+    keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);           // Crouch / Horn
+    keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                  // Walk / -
+    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;  // Reverse
+    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;    // Accelerate
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
@@ -793,10 +793,10 @@ bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& B
     if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
-            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+            sButtonSquare = (short)keys.data.ucButtonSquare;  // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;  // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -861,10 +861,10 @@ void ReadCameraOrientation(const CVector& vecBasePosition, NetBitStreamInterface
         uint  uiNumBits;
         float fRange;
     } bitCountTable[4] = {
-        {3, 4.0f},                // 3 bits is +-4        12 bits total
-        {5, 16.0f},               // 5 bits is +-16       18 bits total
-        {9, 256.0f},              // 9 bits is +-256      30 bits total
-        {14, 8192.0f},            // 14 bits is +-8192    45 bits total
+        {3, 4.0f},      // 3 bits is +-4        12 bits total
+        {5, 16.0f},     // 5 bits is +-16       18 bits total
+        {9, 256.0f},    // 9 bits is +-256      30 bits total
+        {14, 8192.0f},  // 14 bits is +-8192    45 bits total
     };
     // Read flag
     bool bUseAbsolutePosition = false;
@@ -1011,7 +1011,7 @@ SString LongToDottedIP(unsigned long ulIP)
 CVector euler_ZXY_to_ZYX(const CVector& a_vZXY)
 {
     CVector vZXY(a_vZXY);
-    ConvertDegreesToRadiansNoWrap(vZXY);            // NoWrap for this conversion since it's used for cos/sin only
+    ConvertDegreesToRadiansNoWrap(vZXY);  // NoWrap for this conversion since it's used for cos/sin only
 
     float cx = cos(vZXY.fX);
     float sx = sin(vZXY.fX);
@@ -1043,7 +1043,7 @@ CVector euler_ZXY_to_ZYX(const CVector& a_vZXY)
 CVector euler_ZYX_to_ZXY(const CVector& a_vZYX)
 {
     CVector vZYX(a_vZYX);
-    ConvertDegreesToRadiansNoWrap(vZYX);            // NoWrap for this conversion since it's used for cos/sin only
+    ConvertDegreesToRadiansNoWrap(vZYX);  // NoWrap for this conversion since it's used for cos/sin only
 
     float cx = cos(vZYX.fX);
     float sx = sin(vZYX.fX);

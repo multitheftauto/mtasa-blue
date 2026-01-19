@@ -204,7 +204,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
-    else            // It's already a string
+    else  // It's already a string
         argStream.ReadString(strDelimiter);
 
     if (!argStream.HasErrors())
@@ -664,7 +664,7 @@ int CLuaUtilDefs::GetTok(lua_State* luaVM)
         wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
-    else            // It's already a string
+    else  // It's already a string
         argStream.ReadString(strDelimiter);
 
     if (!argStream.HasErrors())

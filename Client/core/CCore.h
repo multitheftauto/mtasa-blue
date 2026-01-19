@@ -54,15 +54,15 @@ class CDiscordInterface;
 #define MTA_CONSOLE_LOG_PATH       "mta/logs/console.log"
 #define MTA_CONSOLE_INPUT_LOG_PATH "mta/logs/console-input.log"
 #define CONFIG_ROOT                "mainconfig"
-#define CONFIG_NODE_CVARS          "settings"            // cvars node
-#define CONFIG_NODE_KEYBINDS       "binds"               // keybinds node
+#define CONFIG_NODE_CVARS          "settings"  // cvars node
+#define CONFIG_NODE_KEYBINDS       "binds"     // keybinds node
 #define CONFIG_NODE_JOYPAD         "joypad"
 #define CONFIG_NODE_UPDATER        "updater"
-#define CONFIG_NODE_SERVER_INT     "internet_servers"                   // backup of last successful master server list query
-#define CONFIG_NODE_SERVER_FAV     "favourite_servers"                  // favourite servers list node
-#define CONFIG_NODE_SERVER_REC     "recently_played_servers"            // recently played servers list node
-#define CONFIG_NODE_SERVER_OPTIONS "serverbrowser_options"              // saved options for the server browser
-#define CONFIG_NODE_SERVER_SAVED   "server_passwords"                   // This contains saved passwords (as appose to save_server_passwords which is a setting)
+#define CONFIG_NODE_SERVER_INT     "internet_servers"         // backup of last successful master server list query
+#define CONFIG_NODE_SERVER_FAV     "favourite_servers"        // favourite servers list node
+#define CONFIG_NODE_SERVER_REC     "recently_played_servers"  // recently played servers list node
+#define CONFIG_NODE_SERVER_OPTIONS "serverbrowser_options"    // saved options for the server browser
+#define CONFIG_NODE_SERVER_SAVED   "server_passwords"         // This contains saved passwords (as appose to save_server_passwords which is a setting)
 #define CONFIG_NODE_SERVER_HISTORY "connect_history"
 #define CONFIG_INTERNET_LIST_TAG   "internet_server"
 #define CONFIG_FAVOURITE_LIST_TAG  "favourite_server"
@@ -104,7 +104,7 @@ public:
     CLocalGUI*                         GetLocalGUI();
     CLocalizationInterface*            GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*                 GetWebCore();
-    CWebCoreInterface*                 GetWebCoreUnchecked() { return m_pWebCore; }            // For cleanup in destructors only - bypasses initialization check
+    CWebCoreInterface*                 GetWebCoreUnchecked() { return m_pWebCore; }  // For cleanup in destructors only - bypasses initialization check
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
     CSteamClient*                      GetSteamClient() { return m_steamClient.get(); }
@@ -215,7 +215,7 @@ public:
 
     // Misc
     void RegisterCommands();
-    bool IsValidNick(const char* szNick);            // Move somewhere else
+    bool IsValidNick(const char* szNick);  // Move somewhere else
     void Quit(bool bInstantly = true);
     void InitiateUpdate(const char* szType, const char* szData, const char* szHost) { m_pLocalGUI->InitiateUpdate(szType, szData, szHost); }
     bool IsOptionalUpdateInfoRequired(const char* szHost) { return m_pLocalGUI->IsOptionalUpdateInfoRequired(szHost); }
@@ -295,8 +295,8 @@ public:
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
-    void         SetCurrentRefreshRate(uint uiRefreshRate);
-    uint         GetCurrentRefreshRate() const { return m_CurrentRefreshRate; }
+    void SetCurrentRefreshRate(uint uiRefreshRate);
+    uint GetCurrentRefreshRate() const { return m_CurrentRefreshRate; }
 
     void OnPostColorFilterRender() override;
 
@@ -407,8 +407,8 @@ private:
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
-    std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
-    const char*                        m_szCommandLineArgs;             // Everything that comes after the options
+    std::map<std::string, std::string> m_CommandLineOptions;  // e.g. "-o option" -> {"o" = "option"}
+    const char*                        m_szCommandLineArgs;   // Everything that comes after the options
 
     long long m_timeDiscordAppLastUpdate;
 };

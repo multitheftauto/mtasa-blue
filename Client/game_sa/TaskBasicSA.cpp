@@ -13,7 +13,6 @@
 #include "TaskBasicSA.h"
 #include "CPedSA.h"
 
-
 CTaskSimpleRunNamedAnimSAInterface* CTaskSimpleRunNamedAnimSA::GetAnimationInterface() noexcept
 {
     return reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(this->GetInterface());

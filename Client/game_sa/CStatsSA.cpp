@@ -34,12 +34,12 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
     DWORD dwStatIndex = usIndex;
 
     _asm
-    {
+        {
         push    fAmmount
         push    dwStatIndex
         call    dwFunc
         add     esp, 8
-    }
+        }
 }
 
 void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
@@ -48,12 +48,12 @@ void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
     DWORD dwStatIndex = usIndex;
 
     _asm
-    {
+        {
         push    fAmmount
         push    dwStatIndex
         call    dwFunc
         add     esp, 8
-    }
+        }
 }
 
 unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)

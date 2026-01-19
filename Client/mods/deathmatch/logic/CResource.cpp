@@ -39,7 +39,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
     m_pLuaManager = g_pClientGame->GetLuaManager();
     m_pRootEntity = g_pClientGame->GetRootEntity();
-    m_pDefaultElementGroup = new CElementGroup();            // for use by scripts
+    m_pDefaultElementGroup = new CElementGroup();  // for use by scripts
     m_pResourceEntity = pResourceEntity;
     m_pResourceDynamicEntity = pResourceDynamicEntity;
 

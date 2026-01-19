@@ -69,18 +69,18 @@ namespace
         ushort usNext;
         ushort usPrev;
 
-        ushort uiUnknown1;            // Parent ?
-        uchar  uiUnknown2;            // 0x12 when loading, 0x02 when finished loading
+        ushort uiUnknown1;  // Parent ?
+        uchar  uiUnknown2;  // 0x12 when loading, 0x02 when finished loading
         uchar  ucImgId;
 
         int  iBlockOffset;
         int  iBlockCount;
-        uint uiLoadflag;            // 0-not loaded  2-requested  3-loaded  1-processed
+        uint uiLoadflag;  // 0-not loaded  2-requested  3-loaded  1-processed
     };
 
     int   iReturnFileId;
     char* pReturnBuffer;
-}            // namespace
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -94,8 +94,8 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
 
     if (pImgGTAInfo->ucImgId == 5)
     {
-        // If bLoadingBigModel is set, try to get it unset
-        #define VAR_CStreaming_bLoadingBigModel     0x08E4A58
+// If bLoadingBigModel is set, try to get it unset
+#define VAR_CStreaming_bLoadingBigModel 0x08E4A58
         BYTE& bLoadingBigModel = *(BYTE*)VAR_CStreaming_bLoadingBigModel;
         if (bLoadingBigModel)
         {
@@ -124,10 +124,10 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
 }
 
 // Hook info
-#define HOOKPOS_CallCStreamingInfoAddToList             0x408962
-#define HOOKSIZE_CallCStreamingInfoAddToList            5
-DWORD RETURN_CallCStreamingInfoAddToListA = 0x408967;
-DWORD RETURN_CallCStreamingInfoAddToListB = 0x408990;
+#define HOOKPOS_CallCStreamingInfoAddToList  0x408962
+#define HOOKSIZE_CallCStreamingInfoAddToList 5
+DWORD                 RETURN_CallCStreamingInfoAddToListA = 0x408967;
+DWORD                 RETURN_CallCStreamingInfoAddToListB = 0x408990;
 void _declspec(naked) HOOK_CallCStreamingInfoAddToList()
 {
     _asm
@@ -140,13 +140,12 @@ void _declspec(naked) HOOK_CallCStreamingInfoAddToList()
         cmp     al, 0
         jnz     skip
 
-        // Continue with standard code
+         // Continue with standard code
         popad
         call    FUNC_CStreamingInfoAddToList
         jmp     RETURN_CallCStreamingInfoAddToListA
 
-
-        // Handle load here
+             // Handle load here
 skip:
         popad
         pushad
@@ -184,10 +183,10 @@ bool _cdecl ShouldSkipLoadRequestedModels(DWORD calledFrom)
 }
 
 // Hook info
-#define HOOKPOS_CStreamingLoadRequestedModels        0x15670A0
-#define HOOKSIZE_CStreamingLoadRequestedModels       5
-DWORD RETURN_CStreamingLoadRequestedModels = 0x15670A5;
-DWORD RETURN_CStreamingLoadRequestedModelsB = 0x156711B;
+#define HOOKPOS_CStreamingLoadRequestedModels  0x15670A0
+#define HOOKSIZE_CStreamingLoadRequestedModels 5
+DWORD                 RETURN_CStreamingLoadRequestedModels = 0x15670A5;
+DWORD                 RETURN_CStreamingLoadRequestedModelsB = 0x156711B;
 void _declspec(naked) HOOK_CStreamingLoadRequestedModels()
 {
     _asm
@@ -199,12 +198,12 @@ void _declspec(naked) HOOK_CStreamingLoadRequestedModels()
         cmp     al, 0
         jnz     skip
 
-        // Continue with standard code
+         // Continue with standard code
         popad
         mov     al,byte ptr ds:[008E4A58h]
         jmp     RETURN_CStreamingLoadRequestedModels
 
-        // Skip LoadRequestedModels
+         // Skip LoadRequestedModels
 skip:
         popad
         jmp     RETURN_CStreamingLoadRequestedModelsB
@@ -230,9 +229,9 @@ bool IsPlayerImgDirLoaded()
 
 // Hook info
 #define HOOKSIZE_LoadingPlayerImgDir 5
-#define HOOKPOS_LoadingPlayerImgDir  0x5A69E3                               // 005A69D6 -> CClothesBuilder::CreateSkinnedClump -> playerImgEntries
-static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirA = 0x5A69E8;     // push 00000226 { 550 }
-static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;     // return of CreateSkinnedClump function
+#define HOOKPOS_LoadingPlayerImgDir  0x5A69E3                            // 005A69D6 -> CClothesBuilder::CreateSkinnedClump -> playerImgEntries
+static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirA = 0x5A69E8;  // push 00000226 { 550 }
+static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;  // return of CreateSkinnedClump function
 
 void _declspec(naked) HOOK_LoadingPlayerImgDir()
 {
@@ -270,9 +269,9 @@ bool SetClothingDirectorySize(int directorySize)
         return false;
 
     // CClothesBuilder::LoadCdDirectory(void)
-    MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));      // push    offset _playerImgEntries; headers
-    MemPut<std::uint16_t>(0x5A4195 + 1, directorySize);                                     // push    550             ; count
-    MemPut<std::uint16_t>(0x5A69E8 + 1, directorySize);                                     // push    550             ; count
+    MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));  // push    offset _playerImgEntries; headers
+    MemPut<std::uint16_t>(0x5A4195 + 1, directorySize);                                 // push    550             ; count
+    MemPut<std::uint16_t>(0x5A69E8 + 1, directorySize);                                 // push    550             ; count
 
     g_playerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
     g_playerImgSize = directorySize;

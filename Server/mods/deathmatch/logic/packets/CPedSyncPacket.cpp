@@ -48,7 +48,7 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
 
         // Did we recieve position?
         if (ucFlags & 0x01)
-        {    
+        {
             if (!(BitStream.Can(eBitStreamVersion::PedSync_Revision) ? Data.ReadSpatialData(BitStream) : Data.ReadSpatialDataBC(BitStream)))
                 return false;
         }
@@ -181,21 +181,21 @@ bool CPedSyncPacket::SyncData::ReadSpatialData(NetBitStreamInterface& BitStream)
 {
     // Did we recieve position?
     if (ucFlags & 0x01)
-    {            
+    {
         if (!BitStream.Read(&position))
             return false;
     }
 
     // Rotation
     if (ucFlags & 0x02)
-    {            
+    {
         if (!BitStream.Read(&rotation))
             return false;
     }
 
     // Velocity
     if (ucFlags & 0x04)
-    {           
+    {
         if (!BitStream.Read(&velocity))
             return false;
     }

@@ -11,8 +11,7 @@
 #ifndef CGRAPHSTATS_H
 #define CGRAPHSTATS_H
 
-#define TIMING_GRAPH(name) \
-    GetGraphStats()->AddTimingPoint( name );
+#define TIMING_GRAPH(name) GetGraphStats()->AddTimingPoint(name);
 
 //
 // CGraphStatsInterface for measuring and displaying a timing graph
@@ -31,4 +30,4 @@ public:
 
 CGraphStatsInterface* GetGraphStats();
 
-#endif // CGRAPHSTATS_H
+#endif  // CGRAPHSTATS_H

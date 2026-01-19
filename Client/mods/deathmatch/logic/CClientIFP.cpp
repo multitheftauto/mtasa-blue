@@ -551,7 +551,7 @@ void CClientIFP::CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID)
 {
     switch (dwBoneID)
     {
-        case eBoneType::NORMAL:            // Normal or Root, both are same
+        case eBoneType::NORMAL:  // Normal or Root, both are same
         {
             // This is a root frame. It contains translation as well, but it's compressed just like quaternion
             BYTE FrameData[16] = {0x1F, 0x00, 0x00, 0x00, 0x53, 0x0B, 0x4D, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00};
@@ -1102,7 +1102,7 @@ CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString&
 {
     const unsigned int uiAnimationNameHash = HashString(strAnimationName.ToLower());
     auto               it = std::find_if(m_pVecAnimations->begin(), m_pVecAnimations->end(),
-                           [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
+                                         [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
     if (it != m_pVecAnimations->end())
     {
         return it->pHierarchy->GetInterface();

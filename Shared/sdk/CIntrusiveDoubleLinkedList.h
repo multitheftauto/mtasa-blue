@@ -23,21 +23,19 @@ struct CIntrusiveDoubleLinkedListNode
 };
 
 // Double-linked list template class. Elements must inherit from CIntrusiveDoubleLinkedListNode.
-template <class T> class CIntrusiveDoubleLinkedList
+template <class T>
+class CIntrusiveDoubleLinkedList
 {
 public:
     struct SIterator
     {
         using iterator_category = std::bidirectional_iterator_tag;
-        using difference_type   = std::ptrdiff_t;
-        using value_type        = T;
-        using pointer           = T*;
-        using reference         = T&;
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
 
-        SIterator(T* ptr) :
-            m_ptr(ptr)
-        {
-        }
+        SIterator(T* ptr) : m_ptr(ptr) {}
 
         // Point to the node value.
         reference operator*() const { return *m_ptr; }
@@ -78,10 +76,10 @@ public:
         }
 
         // Test for equality with another iterator.
-        friend bool operator== (const SIterator& a, const SIterator& b) { return a.m_ptr == b.m_ptr; };
+        friend bool operator==(const SIterator& a, const SIterator& b) { return a.m_ptr == b.m_ptr; };
 
         // Test for inequality with another iterator.
-        friend bool operator!= (const SIterator& a, const SIterator& b) { return a.m_ptr != b.m_ptr; };
+        friend bool operator!=(const SIterator& a, const SIterator& b) { return a.m_ptr != b.m_ptr; };
 
     private:
         T* m_ptr;
@@ -90,15 +88,12 @@ public:
     struct SConstIterator
     {
         using iterator_category = std::bidirectional_iterator_tag;
-        using difference_type   = std::ptrdiff_t;
-        using value_type        = T;
-        using pointer           = T*;
-        using reference         = T&;
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
 
-        SConstIterator(T* ptr) :
-            m_ptr(ptr)
-        {
-        }
+        SConstIterator(T* ptr) : m_ptr(ptr) {}
 
         // Point to the node value.
         const reference operator*() const { return *m_ptr; }
@@ -139,20 +134,17 @@ public:
         }
 
         // Test for equality with another iterator.
-        friend bool operator== (const SConstIterator& a, const SConstIterator& b) { return a.m_ptr == b.m_ptr; };
+        friend bool operator==(const SConstIterator& a, const SConstIterator& b) { return a.m_ptr == b.m_ptr; };
 
         // Test for inequality with another iterator.
-        friend bool operator!= (const SConstIterator& a, const SConstIterator& b) { return a.m_ptr != b.m_ptr; };
+        friend bool operator!=(const SConstIterator& a, const SConstIterator& b) { return a.m_ptr != b.m_ptr; };
 
     private:
         T* m_ptr;
     };
 
     // Construct empty.
-    CIntrusiveDoubleLinkedList() :
-        m_head(nullptr)
-    {
-    }
+    CIntrusiveDoubleLinkedList() : m_head(nullptr) {}
 
     // Non-copyable.
     CIntrusiveDoubleLinkedList(const CIntrusiveDoubleLinkedList<T>& list) = delete;
@@ -165,13 +157,10 @@ public:
     }
 
     // Non-assignable.
-    CIntrusiveDoubleLinkedList<T>& operator =(const CIntrusiveDoubleLinkedList<T>& list) = delete;
+    CIntrusiveDoubleLinkedList<T>& operator=(const CIntrusiveDoubleLinkedList<T>& list) = delete;
 
     // Destruct.
-    ~CIntrusiveDoubleLinkedList()
-    {
-        Clear();
-    }
+    ~CIntrusiveDoubleLinkedList() { Clear(); }
 
     // Remove all elements.
     void Clear()
@@ -223,7 +212,7 @@ public:
     void Detach(T* element)
     {
         assert(element);
-        
+
         T* previous = Previous(element);
         T* next = Next(element);
 
@@ -239,7 +228,7 @@ public:
         // Invalidate element's references
         element->m_previous = nullptr;
         element->m_next = nullptr;
-    }    
+    }
 
     // Return first element, or null if empty.
     T* First() const { return m_head; }
@@ -260,7 +249,7 @@ public:
     T* Previous(T* element) const { return element ? static_cast<T*>(element->m_previous) : nullptr; }
 
     // Return next element, or null if no more elements.
-    T* Next(T* element) const { return element ? static_cast<T*>(element->m_next) : nullptr; }   
+    T* Next(T* element) const { return element ? static_cast<T*>(element->m_next) : nullptr; }
 
     // Return whether is empty.
     bool Empty() const { return m_head == nullptr; }

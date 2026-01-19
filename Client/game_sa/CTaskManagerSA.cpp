@@ -26,7 +26,7 @@ CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface* taskManagerInterface, CP
 
 void CTaskManagerSA::RemoveTask(const int iTaskPriority)
 {
-    if (iTaskPriority != TASK_PRIORITY_DEFAULT)            // TASK_PRIORITY_DEFAULT removed = crash
+    if (iTaskPriority != TASK_PRIORITY_DEFAULT)  // TASK_PRIORITY_DEFAULT removed = crash
     {
         SetTask(NULL, iTaskPriority);
     }
@@ -64,11 +64,11 @@ CTask* CTaskManagerSA::GetActiveTask()
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     _asm
-    {
+        {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
-    }
+        }
 
     CTaskSAInterface* pActiveTask = (CTaskSAInterface*)dwReturn;
     if (dwReturn)

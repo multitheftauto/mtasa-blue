@@ -25,7 +25,7 @@ public:
 
     std::vector<SString>& GetGetData() override { return m_vecGetData; }
     std::vector<SString>& GetPostData() override { return m_vecPostData; }
-    void SetResponse(SString data) override;
+    void                  SetResponse(SString data) override;
 
     // CefResourceHandler
     virtual void Cancel() override;

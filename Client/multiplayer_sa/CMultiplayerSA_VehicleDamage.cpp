@@ -24,7 +24,7 @@ namespace
     CVector             ms_SavedDamagedPos;
 
     VehicleDamageHandler* m_pVehicleDamageHandler = NULL;
-}            // namespace
+}  // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -58,11 +58,11 @@ bool OnMY_CVehicle_BurstTyre(CVehicleSAInterface* pVehicle, uchar ucTyre)
 }
 
 // Hook info
-#define HOOKPOS_CAutomobile_BurstTyre                       0x06A331C
-#define HOOKSIZE_CAutomobile_BurstTyre                      5
-#define HOOKCHECK_CAutomobile_BurstTyre                     0x6A
-DWORD RETURN_CAutomobile_BurstTyre_A = 0x06A3321;
-DWORD RETURN_CAutomobile_BurstTyre_B = 0x06A3425;
+#define HOOKPOS_CAutomobile_BurstTyre   0x06A331C
+#define HOOKSIZE_CAutomobile_BurstTyre  5
+#define HOOKCHECK_CAutomobile_BurstTyre 0x6A
+DWORD                 RETURN_CAutomobile_BurstTyre_A = 0x06A3321;
+DWORD                 RETURN_CAutomobile_BurstTyre_B = 0x06A3425;
 void _declspec(naked) HOOK_CAutomobile_BurstTyre()
 {
     _asm
@@ -95,11 +95,11 @@ cont:
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_CBike_BurstTyre                         0x06BEB94
-#define HOOKSIZE_CBike_BurstTyre                        10
-#define HOOKCHECK_CBike_BurstTyre                       0x6A
-DWORD RETURN_CBike_BurstTyre_A = 0x06BEB9E;
-DWORD RETURN_CBike_BurstTyre_B = 0x06BECA5;
+#define HOOKPOS_CBike_BurstTyre   0x06BEB94
+#define HOOKSIZE_CBike_BurstTyre  10
+#define HOOKCHECK_CBike_BurstTyre 0x6A
+DWORD                 RETURN_CBike_BurstTyre_A = 0x06BEB9E;
+DWORD                 RETURN_CBike_BurstTyre_B = 0x06BECA5;
 void _declspec(naked) HOOK_CBike_BurstTyre()
 {
     _asm
@@ -145,10 +145,10 @@ bool OnMY_CVehicle_InflictDamage(CVehicleSAInterface* pVehicle, CEntitySAInterfa
 }
 
 // Hook info
-#define HOOKPOS_CVehicle_InflictDamage                          0x06D7C90
-#define HOOKSIZE_CVehicle_InflictDamage                         5
-#define HOOKCHECK_CVehicle_InflictDamage                        0x6A
-DWORD RETURN_CVehicle_InflictDamage = 0x0404CDC;
+#define HOOKPOS_CVehicle_InflictDamage   0x06D7C90
+#define HOOKSIZE_CVehicle_InflictDamage  5
+#define HOOKCHECK_CVehicle_InflictDamage 0x6A
+DWORD                 RETURN_CVehicle_InflictDamage = 0x0404CDC;
 void _declspec(naked) HOOK_CVehicle_InflictDamage()
 {
     _asm
@@ -199,10 +199,10 @@ void OnMY_CVehicle_VehicleDamage1(CVehicleSAInterface* pVehicle, float f, ushort
 }
 
 // Hook info
-#define HOOKPOS_CAutomobile_VehicleDamage1                      0x06A7650
-#define HOOKSIZE_CAutomobile_VehicleDamage1                     7
-#define HOOKCHECK_CAutomobile_VehicleDamage1                    0x6A
-DWORD RETURN_CAutomobile_VehicleDamage1 = 0x06A7657;
+#define HOOKPOS_CAutomobile_VehicleDamage1   0x06A7650
+#define HOOKSIZE_CAutomobile_VehicleDamage1  7
+#define HOOKCHECK_CAutomobile_VehicleDamage1 0x6A
+DWORD                 RETURN_CAutomobile_VehicleDamage1 = 0x06A7657;
 void _declspec(naked) HOOK_CAutomobile_VehicleDamage1()
 {
     _asm
@@ -219,7 +219,7 @@ void _declspec(naked) HOOK_CAutomobile_VehicleDamage1()
         add     esp, 4*6+4
         popad
 
-        // Continue replaced code
+             // Continue replaced code
         push    0FFFFFFFFh
         push    [0x847FD8]
         jmp     RETURN_CAutomobile_VehicleDamage1
@@ -258,24 +258,24 @@ float OnMY_CVehicle_VehicleDamage2(CVehicleSAInterface* pVehicle, float fDamage)
 }
 
 // Hook info
-#define HOOKPOS_CAutomobile_VehicleDamage2                      0x06A8325
-#define HOOKSIZE_CAutomobile_VehicleDamage2                     6
-#define HOOKCHECK_CAutomobile_VehicleDamage2                    0xD8
-DWORD RETURN_CAutomobile_VehicleDamage2 = 0x06A832B;
+#define HOOKPOS_CAutomobile_VehicleDamage2   0x06A8325
+#define HOOKSIZE_CAutomobile_VehicleDamage2  6
+#define HOOKCHECK_CAutomobile_VehicleDamage2 0xD8
+DWORD                 RETURN_CAutomobile_VehicleDamage2 = 0x06A832B;
 void _declspec(naked) HOOK_CAutomobile_VehicleDamage2()
 {
     _asm
     {
         pushad
-        fstp    [esp-4] // Pop loss
+        fstp    [esp-4]  // Pop loss
         push    [esp-4]
         push    esi
         call    OnMY_CVehicle_VehicleDamage2
         add     esp, 4*2
         popad
 
-        // Loss is on fp stack (from function return)
-        // Continue replaced code
+             // Loss is on fp stack (from function return)
+             // Continue replaced code
         fsubr   dword ptr [esi+4C0h]
         jmp     RETURN_CAutomobile_VehicleDamage2
     }
@@ -289,10 +289,10 @@ void _declspec(naked) HOOK_CAutomobile_VehicleDamage2()
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_CPlane_VehicleDamage1                       0x06CC4B0
-#define HOOKSIZE_CPlane_VehicleDamage1                      8
-#define HOOKCHECK_CPlane_VehicleDamage1                     0x83
-DWORD RETURN_CPlane_VehicleDamage1 = 0x06CC4B8;
+#define HOOKPOS_CPlane_VehicleDamage1   0x06CC4B0
+#define HOOKSIZE_CPlane_VehicleDamage1  8
+#define HOOKCHECK_CPlane_VehicleDamage1 0x83
+DWORD                 RETURN_CPlane_VehicleDamage1 = 0x06CC4B8;
 void _declspec(naked) HOOK_CPlane_VehicleDamage1()
 {
     _asm
@@ -309,7 +309,7 @@ void _declspec(naked) HOOK_CPlane_VehicleDamage1()
         add     esp, 4*6+4
         popad
 
-        // Continue replaced code
+             // Continue replaced code
         sub     esp, 48h
         mov     eax, dword ptr ds:[0x08D33E4]
         jmp     RETURN_CPlane_VehicleDamage1
@@ -324,24 +324,24 @@ void _declspec(naked) HOOK_CPlane_VehicleDamage1()
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_CPlane_VehicleDamage2                       0x06CC6C8
-#define HOOKSIZE_CPlane_VehicleDamage2                      6
-#define HOOKCHECK_CPlane_VehicleDamage2                     0xD8
-DWORD RETURN_CPlane_VehicleDamage2 = 0x06CC6CE;
+#define HOOKPOS_CPlane_VehicleDamage2   0x06CC6C8
+#define HOOKSIZE_CPlane_VehicleDamage2  6
+#define HOOKCHECK_CPlane_VehicleDamage2 0xD8
+DWORD                 RETURN_CPlane_VehicleDamage2 = 0x06CC6CE;
 void _declspec(naked) HOOK_CPlane_VehicleDamage2()
 {
     _asm
     {
         pushad
-        fstp    [esp-4] // Pop loss
+        fstp    [esp-4]  // Pop loss
         push    [esp-4]
         push    esi
         call    OnMY_CVehicle_VehicleDamage2
         add     esp, 4*2
         popad
 
-        // Loss is on fp stack (from function return)
-        // Continue replaced code
+             // Loss is on fp stack (from function return)
+             // Continue replaced code
         fsubr   dword ptr [esi+4C0h]
         jmp     RETURN_CPlane_VehicleDamage2
     }
@@ -355,10 +355,10 @@ void _declspec(naked) HOOK_CPlane_VehicleDamage2()
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_CBike_VehicleDamage1                        0x06B8EC0
-#define HOOKSIZE_CBike_VehicleDamage1                       5
-#define HOOKCHECK_CBike_VehicleDamage1                      0x51
-DWORD RETURN_CBike_VehicleDamage1 = 0x06B8EC5;
+#define HOOKPOS_CBike_VehicleDamage1   0x06B8EC0
+#define HOOKSIZE_CBike_VehicleDamage1  5
+#define HOOKCHECK_CBike_VehicleDamage1 0x51
+DWORD                 RETURN_CBike_VehicleDamage1 = 0x06B8EC5;
 void _declspec(naked) HOOK_CBike_VehicleDamage1()
 {
     _asm
@@ -375,7 +375,7 @@ void _declspec(naked) HOOK_CBike_VehicleDamage1()
         add     esp, 4*6+4
         popad
 
-        // Continue replaced code
+             // Continue replaced code
         push    ecx
         fld     [esp+8]
         jmp     RETURN_CBike_VehicleDamage1
@@ -390,24 +390,24 @@ void _declspec(naked) HOOK_CBike_VehicleDamage1()
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_CBike_VehicleDamage2                        0x06B91C2
-#define HOOKSIZE_CBike_VehicleDamage2                       6
-#define HOOKCHECK_CBike_VehicleDamage2                      0xD8
-DWORD RETURN_CBike_VehicleDamage2 = 0x06B91C8;
+#define HOOKPOS_CBike_VehicleDamage2   0x06B91C2
+#define HOOKSIZE_CBike_VehicleDamage2  6
+#define HOOKCHECK_CBike_VehicleDamage2 0xD8
+DWORD                 RETURN_CBike_VehicleDamage2 = 0x06B91C8;
 void _declspec(naked) HOOK_CBike_VehicleDamage2()
 {
     _asm
     {
         pushad
-        fstp    [esp-4] // Pop loss
+        fstp    [esp-4]  // Pop loss
         push    [esp-4]
         push    esi
         call    OnMY_CVehicle_VehicleDamage2
         add     esp, 4*2
         popad
 
-        // Loss is on fp stack (from function return)
-        // Continue replaced code
+             // Loss is on fp stack (from function return)
+             // Continue replaced code
         fsubr   dword ptr [esi+4C0h]
         jmp     RETURN_CBike_VehicleDamage2
     }

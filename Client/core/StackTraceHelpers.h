@@ -32,15 +32,10 @@ namespace StackTraceHelpers
 
         bool operator==(const StackWalkRoutines& other) const noexcept
         {
-            return readMemory == other.readMemory &&
-                   functionTableAccess == other.functionTableAccess &&
-                   moduleBase == other.moduleBase;
+            return readMemory == other.readMemory && functionTableAccess == other.functionTableAccess && moduleBase == other.moduleBase;
         }
 
-        bool operator!=(const StackWalkRoutines& other) const noexcept
-        {
-            return !(*this == other);
-        }
+        bool operator!=(const StackWalkRoutines& other) const noexcept { return !(*this == other); }
     };
 
     inline BOOL __stdcall LocalReadProcessMemory(HANDLE /*process*/, DWORD64 baseAddress, PVOID buffer, DWORD size, LPDWORD bytesRead) noexcept
@@ -83,7 +78,7 @@ namespace StackTraceHelpers
             return 0;
 
         MEMORY_BASIC_INFORMATION mbi{};
-        const auto addr32 = static_cast<std::uint32_t>(address);
+        const auto               addr32 = static_cast<std::uint32_t>(address);
         if (VirtualQuery(reinterpret_cast<LPCVOID>(static_cast<std::uintptr_t>(addr32)), &mbi, sizeof(mbi)) == 0) [[unlikely]]
             return 0;
 
@@ -117,15 +112,9 @@ namespace StackTraceHelpers
         std::string name;
         DWORD64     base;
 
-        bool operator==(const ModuleAddressInfo& other) const noexcept
-        {
-            return name == other.name && base == other.base;
-        }
+        bool operator==(const ModuleAddressInfo& other) const noexcept { return name == other.name && base == other.base; }
 
-        bool operator!=(const ModuleAddressInfo& other) const noexcept
-        {
-            return !(*this == other);
-        }
+        bool operator!=(const ModuleAddressInfo& other) const noexcept { return !(*this == other); }
     };
 
     [[nodiscard]] inline std::optional<ModuleAddressInfo> DescribeModule(DWORD64 address)
@@ -158,10 +147,8 @@ namespace StackTraceHelpers
         }
 
         const std::string_view modulePathView{modulePath.data(), pathLen};
-        const auto lastSlash = modulePathView.find_last_of("\\/");
-        const std::string_view moduleName = (lastSlash != std::string_view::npos) 
-            ? modulePathView.substr(lastSlash + 1) 
-            : modulePathView;
+        const auto             lastSlash = modulePathView.find_last_of("\\/");
+        const std::string_view moduleName = (lastSlash != std::string_view::npos) ? modulePathView.substr(lastSlash + 1) : modulePathView;
 
         ModuleAddressInfo info;
         info.name = std::string{moduleName};
@@ -176,7 +163,7 @@ namespace StackTraceHelpers
         if (const auto moduleInfo = DescribeModule(address))
         {
             const auto& name = moduleInfo->name;
-            const auto base = moduleInfo->base;
+            const auto  base = moduleInfo->base;
 
             if (address < base)
             {
@@ -196,8 +183,8 @@ namespace StackTraceHelpers
     [[nodiscard]] inline std::string FormatAddressWithModuleAndAbsolute(DWORD64 address)
     {
         std::array<char, 512> buffer{};
-        const auto moduleStr = FormatAddressWithModule(address);
+        const auto            moduleStr = FormatAddressWithModule(address);
         _snprintf_s(buffer.data(), buffer.size(), _TRUNCATE, "%s [0x%llX]", moduleStr.c_str(), address);
         return std::string{buffer.data()};
     }
-} // namespace StackTraceHelpers
+}  // namespace StackTraceHelpers

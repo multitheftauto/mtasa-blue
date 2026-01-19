@@ -166,7 +166,7 @@ bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArgume
             if (m_pACLManager->CanObjectUseRight(
                     pClient->GetAccount()->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, (*iter)->strKey,
                     CAccessControlListRight::RIGHT_TYPE_COMMAND,
-                    !(*iter)->bRestricted))            // If this command is restricted, the default access should be false unless granted specially
+                    !(*iter)->bRestricted))  // If this command is restricted, the default access should be false unless granted specially
             {
                 // Call it
                 CallCommandHandler((*iter)->pLuaMain, (*iter)->iLuaFunction, (*iter)->strKey, szArguments, pClient);

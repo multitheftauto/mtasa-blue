@@ -26,7 +26,7 @@ static bool __IsIgnoreFireStateEnabled()
 #define HOOKSIZE_CTaskSimplePlayerOnFoot__MakeAbortable 6
 static constexpr std::uintptr_t RETURN_CTaskSimplePlayerOnFoot__MakeAbortable = 0x68585F;
 static constexpr std::uintptr_t SKIP_CTaskSimplePlayerOnFoot__MakeAbortable = 0x685855;
-static void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
+static void _declspec(naked)    HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
 {
     _asm
     {
@@ -35,7 +35,7 @@ static void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
         cmp eax, 3Dh
         jl skip
 
-        // if eventPriority == 66 (EventOnFire) && IsIgnoreFireStateEnabled()
+            // if eventPriority == 66 (EventOnFire) && IsIgnoreFireStateEnabled()
         cmp eax, 42h
         jne continue_logic
 
@@ -43,7 +43,7 @@ static void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
         test al, al
         jz continue_logic
 
-        // return true but keep task alive
+            // return true but keep task alive
         pop edi
         pop esi
         pop ebx

@@ -73,7 +73,7 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem(const std::string& strIP)
     }
 
 #if MTA_DEBUG
-#if 0
+    #if 0
     // Dump info
     const CConnectHistoryItem& historyItem = iter->second;
     if ( !historyItem.joinTimes.empty () )
@@ -86,7 +86,7 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem(const std::string& strIP)
         strInfo += "\n";
         OutputDebugString ( strInfo );
     }
-#endif
+    #endif
 #endif
 
     return iter->second;

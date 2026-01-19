@@ -20,9 +20,10 @@
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
-void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
-    size_t vehicleValue = numVehicles.value_or(0);
-    size_t pedValue = numPeds.value_or(0);
+void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds)
+{
+    size_t        vehicleValue = numVehicles.value_or(0);
+    size_t        pedValue = numPeds.value_or(0);
     const size_t* pVehicles = numVehicles.has_value() ? &vehicleValue : nullptr;
     const size_t* pPeds = numPeds.has_value() ? &pedValue : nullptr;
     g_pClientGame->GetModelCacheManager()->SetCustomLimits(pVehicles, pPeds);
@@ -40,39 +41,49 @@ std::uint32_t EngineStreamingGetUsedMemory()
 }
 
 // Set the streaming memory size to a custom value
-void EngineStreamingSetMemorySize(size_t sizeBytes) {
-    if (sizeBytes == 0) {
+void EngineStreamingSetMemorySize(size_t sizeBytes)
+{
+    if (sizeBytes == 0)
+    {
         throw std::invalid_argument{"Memory size must be > 0"};
     }
     g_pCore->SetCustomStreamingMemory(sizeBytes);
 }
 
 // Restore memory size to cvar
-void EngineStreamingRestoreMemorySize() {
+void EngineStreamingRestoreMemorySize()
+{
     g_pCore->SetCustomStreamingMemory(0);
 }
 
 // Get the streaming memory size [In bytes] - This is the limit, not the amount currently used! [See `EngineStreamingGetUsedMemory`]
-size_t EngineStreamingGetMemorySize() {
+size_t EngineStreamingGetMemorySize()
+{
     return g_pCore->GetStreamingMemory();
 }
 
 // Set streaming buffer size
-bool EngineStreamingSetBufferSize(size_t sizeBytes) {
+bool EngineStreamingSetBufferSize(size_t sizeBytes)
+{
     const auto sizeBlocks = sizeBytes / 2048;
-    if (sizeBlocks > g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks()) { // Can't allow it to be less than the largest file
+    if (sizeBlocks > g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks())
+    {  // Can't allow it to be less than the largest file
         return g_pGame->GetStreaming()->SetStreamingBufferSize(sizeBlocks);
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
 
-void EngineStreamingRestoreBufferSize() {
+void EngineStreamingRestoreBufferSize()
+{
     g_pGame->GetStreaming()->SetStreamingBufferSize(g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks());
 }
 
 // Get current streaming buffer size
-size_t EngineStreamingGetBufferSize() {
+size_t EngineStreamingGetBufferSize()
+{
     return g_pGame->GetStreaming()->GetStreamingBufferSize();
 }
 
@@ -154,7 +165,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
-        
+
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
         // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
@@ -431,7 +442,7 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
     bool             bFilteringEnabled = true;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(input);
-    if (argStream.NextIsBool())            // Some scripts have a number here (in error)
+    if (argStream.NextIsBool())  // Some scripts have a number here (in error)
         argStream.ReadBool(bFilteringEnabled, true);
 
     if (!argStream.HasErrors())
@@ -488,7 +499,7 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                         SString strError = pTXD->GetLastError();
                         if (strError.empty())
                             strError = "Error loading TXD";
-                        
+
                         // Delete it again
                         delete pTXD;
                         argStream.SetCustomError(bIsRawData ? "raw data" : input, strError);
@@ -775,7 +786,7 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<si
 {
     std::string buffer;
 
-    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))            // Get file might throw
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))  // Get file might throw
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     return buffer;
@@ -1584,7 +1595,7 @@ std::variant<bool, CLuaMultiReturn<char, char>> CLuaEngineDefs::EngineGetModelVi
         {
             return std::tuple(cHourOn, cHourOff);
         }
-        else            // Model is incompatible, don't let confuse user.
+        else  // Model is incompatible, don't let confuse user.
         {
             return std::tuple(0, 24);
         }
@@ -2146,9 +2157,12 @@ std::unordered_map<ObjectGroupPhysicalProperties::Modifiable, std::function<void
     {ObjectGroupPhysicalProperties::Modifiable::ELASTICITY, [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetElasticity(fValue); }},
     {ObjectGroupPhysicalProperties::Modifiable::BUOYANCY, [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetBuoyancy(fValue); }},
     {ObjectGroupPhysicalProperties::Modifiable::UPROOTLIMIT, [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetUprootLimit(fValue); }},
-    {ObjectGroupPhysicalProperties::Modifiable::COLDAMAGEMULTIPLIER, [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetCollisionDamageMultiplier(fValue); }},
-    {ObjectGroupPhysicalProperties::Modifiable::SMASHMULTIPLIER, [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetSmashMultiplier(fValue); }},
-    {ObjectGroupPhysicalProperties::Modifiable::BREAKVELOCITYRAND, [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetBreakVelocityRandomness(fValue); }},
+    {ObjectGroupPhysicalProperties::Modifiable::COLDAMAGEMULTIPLIER,
+     [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetCollisionDamageMultiplier(fValue); }},
+    {ObjectGroupPhysicalProperties::Modifiable::SMASHMULTIPLIER,
+     [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetSmashMultiplier(fValue); }},
+    {ObjectGroupPhysicalProperties::Modifiable::BREAKVELOCITYRAND,
+     [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetBreakVelocityRandomness(fValue); }},
 };
 std::unordered_map<ObjectGroupPhysicalProperties::Modifiable, std::function<void(CObjectGroupPhysicalProperties*, bool)>> g_GroupPropertiesSettersBool{
     {ObjectGroupPhysicalProperties::Modifiable::CAMERAAVOID, [](CObjectGroupPhysicalProperties* pGroup, bool bValue) { pGroup->SetCameraAvoidObject(bValue); }},
@@ -2157,13 +2171,14 @@ std::unordered_map<ObjectGroupPhysicalProperties::Modifiable, std::function<void
 };
 std::unordered_map<ObjectGroupPhysicalProperties::Modifiable, std::function<void(CObjectGroupPhysicalProperties*, CVector)>> g_GroupPropertiesSettersVector{
     {ObjectGroupPhysicalProperties::Modifiable::FXOFFSET, [](CObjectGroupPhysicalProperties* pGroup, CVector vecValue) { pGroup->SetFxOffset(vecValue); }},
-    {ObjectGroupPhysicalProperties::Modifiable::BREAKVELOCITY, [](CObjectGroupPhysicalProperties* pGroup, CVector vecValue) { pGroup->SetBreakVelocity(vecValue); }},
+    {ObjectGroupPhysicalProperties::Modifiable::BREAKVELOCITY,
+     [](CObjectGroupPhysicalProperties* pGroup, CVector vecValue) { pGroup->SetBreakVelocity(vecValue); }},
 };
 
 int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
 {
     //  bool engineSetObjectGroupPhysicalProperty ( int groupID, string property, ...)
-    int                      iGivenGroup;
+    int                                       iGivenGroup;
     ObjectGroupPhysicalProperties::Modifiable eProperty;
 
     CScriptArgReader argStream(luaVM);
@@ -2330,7 +2345,8 @@ std::unordered_map<ObjectGroupPhysicalProperties::Modifiable, std::function<floa
     {ObjectGroupPhysicalProperties::Modifiable::ELASTICITY, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetElasticity(); }},
     {ObjectGroupPhysicalProperties::Modifiable::BUOYANCY, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetBuoyancy(); }},
     {ObjectGroupPhysicalProperties::Modifiable::UPROOTLIMIT, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetUprootLimit(); }},
-    {ObjectGroupPhysicalProperties::Modifiable::COLDAMAGEMULTIPLIER, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetCollisionDamageMultiplier(); }},
+    {ObjectGroupPhysicalProperties::Modifiable::COLDAMAGEMULTIPLIER,
+     [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetCollisionDamageMultiplier(); }},
     {ObjectGroupPhysicalProperties::Modifiable::SMASHMULTIPLIER, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetSmashMultiplier(); }},
     {ObjectGroupPhysicalProperties::Modifiable::BREAKVELOCITYRAND, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetBreakVelocityRandomness(); }},
 };
@@ -2346,7 +2362,7 @@ std::unordered_map<ObjectGroupPhysicalProperties::Modifiable, std::function<CVec
 int CLuaEngineDefs::EngineGetObjectGroupPhysicalProperty(lua_State* luaVM)
 {
     //  bool engineGetObjectGroupPhysicalProperty ( int groupID, string property )
-    int                      iGivenGroup;
+    int                                       iGivenGroup;
     ObjectGroupPhysicalProperties::Modifiable eProperty;
 
     CScriptArgReader argStream(luaVM);
@@ -2559,7 +2575,7 @@ std::variant<bool, uint> CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM
     if (iModelID == INVALID_MODEL_ID)
         return false;
 
-    auto modelManager = m_pManager->GetModelManager();
+    auto                          modelManager = m_pManager->GetModelManager();
     std::shared_ptr<CClientModel> pModel = modelManager->Request(m_pManager, iModelID, eClientModelType::TXD);
 
     if (!pModel)
@@ -2581,7 +2597,7 @@ std::variant<bool, uint> CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM
 
 bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
-    auto modelManager = m_pManager->GetModelManager();
+    auto                          modelManager = m_pManager->GetModelManager();
     std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(MAX_MODEL_DFF_ID + txdID);
 
     // Use the manager removal path so RestoreTXD runs and the TXD slot is actually freed.

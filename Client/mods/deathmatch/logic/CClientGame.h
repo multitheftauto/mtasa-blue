@@ -129,7 +129,7 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
-        _DATABASE_CONNECTION, // server only
+        _DATABASE_CONNECTION,  // server only
         TRAIN_TRACK,
         ROOT,
         UNKNOWN,
@@ -592,7 +592,8 @@ private:
                                                RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     bool        VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
-                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity, bool isProjectile);
+                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity,
+                                        bool isProjectile);
     bool        VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                      const CVector& vecDamagePos, uchar ucTyre);
     bool        HeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
@@ -628,7 +629,8 @@ public:
     bool VerifySADataFiles(int iEnableClientChecks = 0);
     void DebugElementRender();
 
-    void SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin = nullptr, std::optional<VehicleBlowState> vehicleBlowState = std::nullopt);
+    void SendExplosionSync(const CVector& vecPosition, eExplosionType Type, CClientEntity* pOrigin = nullptr,
+                           std::optional<VehicleBlowState> vehicleBlowState = std::nullopt);
     void SendFireSync(CFire* pFire);
     void SendProjectileSync(CClientProjectile* pProjectile);
 
@@ -805,7 +807,7 @@ private:
     long long m_llLastTransgressionTime;
     SString   m_strLastDiagnosticStatus;
 
-    bool m_bBeingDeleted;            // To enable speedy disconnect
+    bool m_bBeingDeleted;  // To enable speedy disconnect
 
     bool m_bWasMinimized;
     bool m_bFocused;
@@ -871,7 +873,7 @@ private:
     AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
     // Key is the task and value is the CClientPed*
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
-    
+
     long long m_timeLastDiscordStateUpdate;
 };
 

@@ -26,6 +26,12 @@ namespace SharedUtil
     void      CloseMemWrite(SMemWrite& hMem);
     bool      ismemset(const void* pAddr, int cValue, uint uiAmount);
 
-    #define DEBUG_CHECK_IS_FAST_MEM(addr,size) { dassert( !IsSlowMem( (const void*)(addr), size ) ); }
-    #define DEBUG_CHECK_IS_SLOW_MEM(addr,size) { dassert( IsSlowMem( (const void*)(addr), size ) ); }
-}            // namespace SharedUtil
+#define DEBUG_CHECK_IS_FAST_MEM(addr, size) \
+    { \
+        dassert(!IsSlowMem((const void*)(addr), size)); \
+    }
+#define DEBUG_CHECK_IS_SLOW_MEM(addr, size) \
+    { \
+        dassert(IsSlowMem((const void*)(addr), size)); \
+    }
+}  // namespace SharedUtil

@@ -48,17 +48,17 @@
 #include "version.h"
 namespace SharedUtil
 {
-namespace Details
-{
-    constexpr size_t kMaxClipboardBytes = 100u * 1024u * 1024u;
-    constexpr size_t kMaxClipboardChars = kMaxClipboardBytes / sizeof(wchar_t);
-
-    inline std::mutex& ClipboardMutex() noexcept
+    namespace Details
     {
-        static std::mutex mutex;
-        return mutex;
+        constexpr size_t kMaxClipboardBytes = 100u * 1024u * 1024u;
+        constexpr size_t kMaxClipboardChars = kMaxClipboardBytes / sizeof(wchar_t);
+
+        inline std::mutex& ClipboardMutex() noexcept
+        {
+            static std::mutex mutex;
+            return mutex;
+        }
     }
-}
 }
 
 #if defined(SHAREDUTIL_PLATFORM_WINDOWS)
@@ -78,71 +78,71 @@ namespace Details
         #undef GetModuleBaseNameW
     #endif
 
-#if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
-    #include <filesystem>
-#endif
+    #if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
+        #include <filesystem>
+    #endif
 
 namespace SharedUtil
 {
-namespace Details
-{
-    class UniqueHGlobal
+    namespace Details
     {
-    public:
-        UniqueHGlobal() noexcept = default;
-        explicit UniqueHGlobal(HGLOBAL value) noexcept : m_handle(value) {}
-        ~UniqueHGlobal() { reset(); }
-
-        UniqueHGlobal(const UniqueHGlobal&) = delete;
-        UniqueHGlobal& operator=(const UniqueHGlobal&) = delete;
-
-        UniqueHGlobal(UniqueHGlobal&& other) noexcept : m_handle(other.release()) {}
-
-        UniqueHGlobal& operator=(UniqueHGlobal&& other) noexcept
+        class UniqueHGlobal
         {
-            if (this != &other)
-                reset(other.release());
-            return *this;
-        }
+        public:
+            UniqueHGlobal() noexcept = default;
+            explicit UniqueHGlobal(HGLOBAL value) noexcept : m_handle(value) {}
+            ~UniqueHGlobal() { reset(); }
 
-        void reset(HGLOBAL value = nullptr) noexcept
-        {
-            if (m_handle)
-                GlobalFree(m_handle);
-            m_handle = value;
-        }
+            UniqueHGlobal(const UniqueHGlobal&) = delete;
+            UniqueHGlobal& operator=(const UniqueHGlobal&) = delete;
 
-        [[nodiscard]] HGLOBAL get() const noexcept { return m_handle; }
+            UniqueHGlobal(UniqueHGlobal&& other) noexcept : m_handle(other.release()) {}
 
-        [[nodiscard]] HGLOBAL release() noexcept { return std::exchange(m_handle, nullptr); }
+            UniqueHGlobal& operator=(UniqueHGlobal&& other) noexcept
+            {
+                if (this != &other)
+                    reset(other.release());
+                return *this;
+            }
 
-        [[nodiscard]] explicit operator bool() const noexcept { return m_handle != nullptr; }
+            void reset(HGLOBAL value = nullptr) noexcept
+            {
+                if (m_handle)
+                    GlobalFree(m_handle);
+                m_handle = value;
+            }
 
-    private:
-        HGLOBAL m_handle = nullptr;
-    };
-}            // namespace SharedUtil::Details
-}            // namespace SharedUtil
+            [[nodiscard]] HGLOBAL get() const noexcept { return m_handle; }
+
+            [[nodiscard]] HGLOBAL release() noexcept { return std::exchange(m_handle, nullptr); }
+
+            [[nodiscard]] explicit operator bool() const noexcept { return m_handle != nullptr; }
+
+        private:
+            HGLOBAL m_handle = nullptr;
+        };
+    }  // namespace SharedUtil::Details
+}  // namespace SharedUtil
 
 static void InitializeProcessBaseDir(SString& strProcessBaseDir)
 {
     try
     {
-        const size_t bufferSize       = MAX_PATH * 2;
-        const size_t MAX_UNICODE_PATH = 32767;
+        const size_t         bufferSize = MAX_PATH * 2;
+        const size_t         MAX_UNICODE_PATH = 32767;
         std::vector<wchar_t> coreFileName(bufferSize);
 
         // Get core.dll module handle to determine base directory
         // Try debug build first (core_d.dll), then release build (core.dll)
-        const wchar_t* coreDllDebug   = L"core_d.dll";
+        const wchar_t* coreDllDebug = L"core_d.dll";
         const wchar_t* coreDllRelease = L"core.dll";
 
-        HMODULE hCoreModule      = nullptr;
+        HMODULE hCoreModule = nullptr;
         bool    bCoreModuleFound = false;
-#ifdef MTA_DEBUG
+    #ifdef MTA_DEBUG
         bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllDebug, &hCoreModule) != FALSE;
         if (!bCoreModuleFound)
-#endif
+    #endif
             bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllRelease, &hCoreModule) != FALSE;
 
         // Fallback: Use current module if core.dll isn't loaded yet
@@ -164,7 +164,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                 if (bufferTooSmall)
                 {
                     corePathBuffer.resize(MAX_UNICODE_PATH);
-                    
+
                     lengthCore = GetModuleFileNameW(hCoreModule, &corePathBuffer[0], static_cast<DWORD>(corePathBuffer.size()));
                     if (lengthCore > 0 && static_cast<size_t>(lengthCore) < corePathBuffer.size())
                     {
@@ -177,18 +177,19 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                 }
 
                 std::vector<wchar_t> fullPath(bufferSize);
-                
+
                 DWORD lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr);
                 if (lengthFull > 0)
                 {
                     // Process path and extract base directory
                     // The directory above /MTA/ is always the base directory
-                    const auto processPath = [&strProcessBaseDir](const std::wstring& fullPathStr) {
+                    const auto processPath = [&strProcessBaseDir](const std::wstring& fullPathStr)
+                    {
                         const size_t lastSeparator = fullPathStr.find_last_of(L"\\/");
                         if (lastSeparator != std::wstring::npos)
                         {
                             std::wstring currentPath = fullPathStr.substr(0, lastSeparator);
-                            
+
                             // Walk up to find MTA/ folder
                             // Stop at first MTA folder found - it's guaranteed to be the correct one
                             // Check current directory and up to 2 parent levels
@@ -196,13 +197,11 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                             {
                                 // Extract folder name from current path
                                 const size_t lastSep = currentPath.find_last_of(L"\\/");
-                                std::wstring folderName = (lastSep != std::wstring::npos) 
-                                    ? currentPath.substr(lastSep + 1) 
-                                    : currentPath;
-                                
+                                std::wstring folderName = (lastSep != std::wstring::npos) ? currentPath.substr(lastSep + 1) : currentPath;
+
                                 // Convert to lowercase for case-insensitive comparison
                                 std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
-                                
+
                                 if (folderName == L"mta")
                                 {
                                     // Found MTA folder - base directory is its parent
@@ -217,7 +216,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                                     }
                                     return;  // Always stop at first MTA folder found
                                 }
-                                
+
                                 // Move up one level
                                 if (lastSep != std::wstring::npos)
                                     currentPath = currentPath.substr(0, lastSep);
@@ -232,7 +231,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                     {
                         if (static_cast<size_t>(lengthFull) > MAX_UNICODE_PATH)
                             return;  // Path too long, validation failed
-                        
+
                         std::wstring fullPathBuffer;
                         fullPathBuffer.resize(static_cast<size_t>(lengthFull));
                         lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPathBuffer.size()), &fullPathBuffer[0], nullptr);
@@ -258,7 +257,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
 
 [[nodiscard]] const SString& SharedUtil::GetMTAProcessBaseDir()
 {
-    static auto strProcessBaseDir = SString{};
+    static auto           strProcessBaseDir = SString{};
     static std::once_flag initFlag;
 
     std::call_once(initFlag, InitializeProcessBaseDir, std::ref(strProcessBaseDir));
@@ -269,13 +268,13 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
-    # define _GNU_SOURCE    /* See feature_test_macros(7) */
+        #define _GNU_SOURCE /* See feature_test_macros(7) */
     #endif
     #include <sched.h>
     #include <sys/time.h>
     #include <sys/resource.h>
     #ifndef RUSAGE_THREAD
-        #define    RUSAGE_THREAD    1        /* only the calling thread */
+        #define RUSAGE_THREAD 1 /* only the calling thread */
     #endif
 #endif
 
@@ -300,15 +299,15 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 
 #ifdef MTA_CLIENT
 
-#define PRODUCT_REGISTRY_PATH       "Software\\Multi Theft Auto: San Andreas All"       // HKLM
-#define PRODUCT_COMMON_DATA_DIR     "MTA San Andreas All"                               // C:\ProgramData
-#define TROUBLE_URL1 "https://help.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
+    #define PRODUCT_REGISTRY_PATH   "Software\\Multi Theft Auto: San Andreas All"  // HKLM
+    #define PRODUCT_COMMON_DATA_DIR "MTA San Andreas All"                          // C:\ProgramData
+    #define TROUBLE_URL1            "https://help.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
-//
-// Output a UTF8 encoded messagebox
-// Used in the Win32 Client only
-//
-#ifdef _WINDOWS_ //Only for modules that use windows.h
+    //
+    // Output a UTF8 encoded messagebox
+    // Used in the Win32 Client only
+    //
+    #ifdef _WINDOWS_  // Only for modules that use windows.h
 int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType)
 {
     // Default to warning icon
@@ -321,7 +320,7 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
     WString strCaption = MbUTF8ToUTF16(lpCaption);
     return MessageBoxW(hWnd, strText.c_str(), strCaption.c_str(), uType);
 }
-#endif
+    #endif
 
 //
 // Return full path and filename of parent exe
@@ -342,7 +341,7 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
                     WCHAR szModuleName[MAX_PATH * 2] = {0};
                     DWORD dwSize = GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName) - 1);
                     CloseHandle(hProcess);
-                    
+
                     if (dwSize > 0)
                     {
                         // Ensure null termination
@@ -413,25 +412,28 @@ bool SharedUtil::IsGTAProcess()
 bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
 {
     // Guard against null or overflow before touching platform APIs
-    if (!ptr || size == 0) return false;
+    if (!ptr || size == 0)
+        return false;
 
-    const uintptr_t start = reinterpret_cast<uintptr_t>(ptr);
+    const uintptr_t     start = reinterpret_cast<uintptr_t>(ptr);
     constexpr uintptr_t maxAddress = std::numeric_limits<uintptr_t>::max();
-    if (size > maxAddress - start) return false;
+    if (size > maxAddress - start)
+        return false;
 
     const uintptr_t end = start + size;
 
-#ifdef SHAREDUTIL_PLATFORM_WINDOWS
+    #ifdef SHAREDUTIL_PLATFORM_WINDOWS
     constexpr DWORD readableMask = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
     for (uintptr_t current = start; current < end;)
     {
         MEMORY_BASIC_INFORMATION mbi{};
-        if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0) return false;
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0)
+            return false;
 
         const uintptr_t regionStart = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
         const uintptr_t regionSize = static_cast<uintptr_t>(mbi.RegionSize);
         const uintptr_t regionEnd = regionStart + regionSize;
-        const DWORD protection = mbi.Protect;
+        const DWORD     protection = mbi.Protect;
         if (regionSize == 0 || current < regionStart || regionStart > maxAddress - regionSize || regionEnd <= current || mbi.State != MEM_COMMIT ||
             (protection & PAGE_GUARD) || (protection & readableMask) == 0)
             return false;
@@ -440,16 +442,17 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     }
 
     return true;
-#elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    #elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
     static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long), "Unexpected uintptr_t size");
 
     std::ifstream maps("/proc/self/maps");
     if (!maps.is_open())
         return false;
 
-    const auto parseAddress = [maxAddress](const std::string& token, uintptr_t& out) -> bool {
+    const auto parseAddress = [maxAddress](const std::string& token, uintptr_t& out) -> bool
+    {
         errno = 0;
-        char* endPtr = nullptr;
+        char*              endPtr = nullptr;
         unsigned long long value = std::strtoull(token.c_str(), &endPtr, 16);
         if (errno != 0 || endPtr == token.c_str() || *endPtr != '\0' || value > maxAddress)
             return false;
@@ -458,50 +461,59 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     };
 
     uintptr_t coverage = start;
-    bool coveringRange = false;
+    bool      coveringRange = false;
     for (std::string line; std::getline(maps, line);)
     {
-        if (line.empty()) continue;
+        if (line.empty())
+            continue;
         std::istringstream iss(line);
-        std::string range, perms;
-        if (!(iss >> range >> perms)) continue;
+        std::string        range, perms;
+        if (!(iss >> range >> perms))
+            continue;
         const size_t dashPos = range.find('-');
-        if (dashPos == std::string::npos) continue;
-    uintptr_t regionStart = 0;
-    uintptr_t regionEnd = 0;
-    if (!parseAddress(range.substr(0, dashPos), regionStart) || !parseAddress(range.substr(dashPos + 1), regionEnd)) continue;
-        if (regionEnd <= regionStart || regionEnd <= coverage) continue;
+        if (dashPos == std::string::npos)
+            continue;
+        uintptr_t regionStart = 0;
+        uintptr_t regionEnd = 0;
+        if (!parseAddress(range.substr(0, dashPos), regionStart) || !parseAddress(range.substr(dashPos + 1), regionEnd))
+            continue;
+        if (regionEnd <= regionStart || regionEnd <= coverage)
+            continue;
         if (coveringRange)
         {
-            if (regionStart > coverage) return false;
+            if (regionStart > coverage)
+                return false;
         }
         else if (regionStart > coverage || coverage >= regionEnd)
         {
             continue;
         }
-        else coveringRange = true;
+        else
+            coveringRange = true;
 
-        if (perms.empty() || perms[0] != 'r') return false;
+        if (perms.empty() || perms[0] != 'r')
+            return false;
         coverage = regionEnd;
-        if (coverage >= end) return true;
+        if (coverage >= end)
+            return true;
     }
 
     return false;
-#elif defined(APPLE_x64) || defined(APPLE_arm64)
-    mach_vm_address_t queryAddress = static_cast<mach_vm_address_t>(start);
-    const mach_vm_address_t targetEnd = static_cast<mach_vm_address_t>(end);
-    constexpr mach_vm_address_t maxAddressMac = std::numeric_limits<mach_vm_address_t>::max();
+    #elif defined(APPLE_x64) || defined(APPLE_arm64)
+    mach_vm_address_t              queryAddress = static_cast<mach_vm_address_t>(start);
+    const mach_vm_address_t        targetEnd = static_cast<mach_vm_address_t>(end);
+    constexpr mach_vm_address_t    maxAddressMac = std::numeric_limits<mach_vm_address_t>::max();
     vm_region_basic_info_data_64_t info;
-    mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
-    mach_port_t objectName = MACH_PORT_NULL;
+    mach_msg_type_number_t         infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+    mach_port_t                    objectName = MACH_PORT_NULL;
 
     while (queryAddress < targetEnd)
     {
         mach_vm_size_t regionSize = 0;
         infoCount = VM_REGION_BASIC_INFO_COUNT_64;
         mach_vm_address_t regionAddress = queryAddress;
-        kern_return_t kr = mach_vm_region(mach_task_self(), &regionAddress, &regionSize, VM_REGION_BASIC_INFO_64,
-                                          reinterpret_cast<vm_region_info_t>(&info), &infoCount, &objectName);
+        kern_return_t     kr = mach_vm_region(mach_task_self(), &regionAddress, &regionSize, VM_REGION_BASIC_INFO_64, reinterpret_cast<vm_region_info_t>(&info),
+                                              &infoCount, &objectName);
         if (objectName != MACH_PORT_NULL)
         {
             mach_port_deallocate(mach_task_self(), objectName);
@@ -520,9 +532,9 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     }
 
     return true;
-#else
+    #else
     return false;
-#endif
+    #endif
 }
 
 //
@@ -564,7 +576,6 @@ static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const 
         DWORD dwBufferSize;
         if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS)
         {
-
             CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
             if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
             {
@@ -737,12 +748,11 @@ SString SharedUtil::GetPostUpdateConnect()
     time_t timeThen = 0;
     if (!strTimeString.empty())
     {
-        char* endptr;
+        char*     endptr;
         long long result = strtoll(strTimeString.c_str(), &endptr, 10);
-        
+
         // Check for valid conversion
-        if (endptr != strTimeString.c_str() && *endptr == '\0' && 
-            result >= 0 && result <= LLONG_MAX)
+        if (endptr != strTimeString.c_str() && *endptr == '\0' && result >= 0 && result <= LLONG_MAX)
         {
             timeThen = static_cast<time_t>(result);
         }
@@ -794,15 +804,15 @@ int SharedUtil::GetApplicationSettingInt(const SString& strPath, const SString& 
         return 0;
 
     char* endptr;
-    long result = strtol(strValue.c_str(), &endptr, 10);
-    
+    long  result = strtol(strValue.c_str(), &endptr, 10);
+
     // Check for conversion errors
     if (endptr == strValue.c_str() || *endptr != '\0')
         return 0;  // Invalid conversion
 
     if (result > INT_MAX || result < INT_MIN)
         return 0;
-    
+
     return static_cast<int>(result);
 }
 
@@ -1258,8 +1268,7 @@ void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLi
         MakeSureDirExists(strPathFilename);
 
         SString strMessage;
-        strMessage.Format("%u: %s %s [%s] - ", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
-                          GetReportLogProcessTag().c_str());
+        strMessage.Format("%u: %s %s [%s] - ", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(), GetReportLogProcessTag().c_str());
         strMessage += strText;
         strMessage += "\n";
         FileAppend(strPathFilename, &strMessage.at(0), strMessage.length());
@@ -1283,11 +1292,9 @@ void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, c
     GetSystemTime(&s);
 
     // Use _snprintf_s to prevent buffer overflow and ensure null termination
-    int result = _snprintf_s(szOutput, TOTAL_BUFFER_SIZE, _TRUNCATE, 
-                            "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", 
-                            uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, 
-                            (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown", 
-                            (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
+    int result = _snprintf_s(szOutput, TOTAL_BUFFER_SIZE, _TRUNCATE, "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", uiId, s.wYear,
+                             s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown",
+                             (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
 
     OutputDebugString("[ReportLog] ");
     OutputDebugString(&szOutput[0]);
@@ -1374,9 +1381,9 @@ void WriteEvent(const char* szType, const SString& strText)
     SString strPathFilename = CalcMTASAPath(PathJoin("mta", "logs", "logfile.txt"));
     SString strMessage("%s - %s %s", *GetLocalTimeString(), szType, *strText);
     FileAppend(strPathFilename, strMessage + "\n");
-#ifdef MTA_DEBUG
+    #ifdef MTA_DEBUG
     OutputDebugLine(strMessage);
-#endif
+    #endif
 }
 
 void SharedUtil::WriteDebugEvent(const SString& strText)
@@ -1514,7 +1521,7 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 #endif  // MTA_CLIENT
 
 #ifdef SHAREDUTIL_PLATFORM_WINDOWS
-#define _WIN32_WINNT_WIN8                   0x0602
+    #define _WIN32_WINNT_WIN8 0x0602
 ///////////////////////////////////////////////////////////////////////////
 //
 // SharedUtil::IsWindowsVersionOrGreater
@@ -1701,14 +1708,14 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
 
         if (lookup.module)
             lookup.function = static_cast<FunctionPointer>(static_cast<void*>(GetProcAddress(lookup.module, "NtQueryInformationThread")));
-        else 
-            return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
+        else
+            return 0xC0000135L;  // STATUS_DLL_NOT_FOUND
     }
 
     if (lookup.function)
         return lookup.function(ThreadHandle, ThreadInformationClass, ThreadInformation, ThreadInformationLength, ReturnLength);
     else
-        return 0xC00000BBL;            // STATUS_NOT_SUPPORTED
+        return 0xC00000BBL;  // STATUS_NOT_SUPPORTED
 }
 
 bool SharedUtil::QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress)
@@ -1830,7 +1837,7 @@ int SharedUtil::GetBuildAge()
     return (int)(time(NULL) - mktime(&when)) / (60 * 60 * 24);
 }
 
-#if defined(MTA_DM_EXPIRE_DAYS)
+    #if defined(MTA_DM_EXPIRE_DAYS)
 int SharedUtil::GetDaysUntilExpire()
 {
     tm when;
@@ -1841,7 +1848,7 @@ int SharedUtil::GetDaysUntilExpire()
     return (int)(mktime(&when) - time(NULL)) / (60 * 60 * 24);
 }
 
-#endif
+    #endif
 #endif
 
 //
@@ -1963,7 +1970,6 @@ char* SharedUtil::Trim(char* szText)
     return static_cast<char*>(memmove(szOriginal, szText, uiLen + 1));
 }
 
-
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
 std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)
 {
@@ -1999,16 +2005,16 @@ std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
     if (input.empty())
         return L"";
-        
+
     size_t len = mbstowcs(NULL, input.c_str(), input.length());
     if (len == (size_t)-1)
         return L"?";
-    
+
     std::vector<wchar_t> wcsOutput(len + 1);  // Use vector for automatic cleanup
-    size_t result = mbstowcs(wcsOutput.data(), input.c_str(), len);
+    size_t               result = mbstowcs(wcsOutput.data(), input.c_str(), len);
     if (result == (size_t)-1 || result != len)
         return L"?";
-    
+
     wcsOutput[len] = 0;  // Null terminate the string
     return std::wstring(wcsOutput.data());
 }
@@ -2029,14 +2035,14 @@ bool SharedUtil::IsLuaCompiledScript(const void* pData, uint uiLength)
         pCharData += 3;
         uiLength -= 3;
     }
-    return (uiLength > 0 && pCharData[0] == 0x1B);            // Do the same check as what the Lua parser does
+    return (uiLength > 0 && pCharData[0] == 0x1B);  // Do the same check as what the Lua parser does
 }
 
 // Check for obfuscated script
 bool SharedUtil::IsLuaObfuscatedScript(const void* pData, uint uiLength)
 {
     const uchar* pCharData = (const uchar*)pData;
-    return (uiLength > 0 && pCharData[0] == 0x1C);            // Look for our special marker
+    return (uiLength > 0 && pCharData[0] == 0x1C);  // Look for our special marker
 }
 
 //
@@ -2129,9 +2135,15 @@ namespace SharedUtil
         m_cEscapeCharacter = '#';
     }
 
-    void CArgMap::SetEscapeCharacter(char cEscapeCharacter) { m_cEscapeCharacter = cEscapeCharacter; }
+    void CArgMap::SetEscapeCharacter(char cEscapeCharacter)
+    {
+        m_cEscapeCharacter = cEscapeCharacter;
+    }
 
-    void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues) { MergeFromString(other.ToString(), bAllowMultiValues); }
+    void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues)
+    {
+        MergeFromString(other.ToString(), bAllowMultiValues);
+    }
 
     void CArgMap::SetFromString(const SString& strLine, bool bAllowMultiValues)
     {
@@ -2149,7 +2161,7 @@ namespace SharedUtil
             parts[i].Split(m_strArgSep, &strCmd, &strArg);
             if (!bAllowMultiValues)
                 m_Map.erase(strCmd);
-            if (strCmd.length())            // Key can not be empty
+            if (strCmd.length())  // Key can not be empty
                 MapInsert(m_Map, strCmd, strArg);
         }
     }
@@ -2184,9 +2196,15 @@ namespace SharedUtil
             SetFromString(ToString(), false);
     }
 
-    SString CArgMap::Escape(const SString& strIn) const { return EscapeString(strIn, m_strDisallowedChars, m_cEscapeCharacter); }
+    SString CArgMap::Escape(const SString& strIn) const
+    {
+        return EscapeString(strIn, m_strDisallowedChars, m_cEscapeCharacter);
+    }
 
-    SString CArgMap::Unescape(const SString& strIn) const { return UnescapeString(strIn, m_cEscapeCharacter); }
+    SString CArgMap::Unescape(const SString& strIn) const
+    {
+        return UnescapeString(strIn, m_cEscapeCharacter);
+    }
 
     // Set a unique key string value
     void CArgMap::Set(const SString& strCmd, const SString& strValue)
@@ -2203,17 +2221,23 @@ namespace SharedUtil
     }
 
     // Insert a key int value
-    void CArgMap::Insert(const SString& strCmd, int iValue) { Insert(strCmd, SString("%d", iValue)); }
+    void CArgMap::Insert(const SString& strCmd, int iValue)
+    {
+        Insert(strCmd, SString("%d", iValue));
+    }
 
     // Insert a key string value
     void CArgMap::Insert(const SString& strCmd, const SString& strValue)
     {
-        if (strCmd.length())            // Key can not be empty
+        if (strCmd.length())  // Key can not be empty
             MapInsert(m_Map, Escape(strCmd), Escape(strValue));
     }
 
     // Test if key exists
-    bool CArgMap::Contains(const SString& strCmd) const { return MapFind(m_Map, Escape(strCmd)) != NULL; }
+    bool CArgMap::Contains(const SString& strCmd) const
+    {
+        return MapFind(m_Map, Escape(strCmd)) != NULL;
+    }
 
     // First result as string
     bool CArgMap::Get(const SString& strCmd, SString& strOut, const char* szDefault) const
@@ -2315,7 +2339,6 @@ namespace SharedUtil
         };
 
         static ProcessorNumberLookup lookup = {};
-																																		   
 
         if (!lookup.once)
         {
@@ -2614,7 +2637,7 @@ namespace SharedUtil
         return false;
     }
 
-}            // namespace SharedUtil
+}  // namespace SharedUtil
 
 //
 // For checking MTA library module versions
