@@ -564,7 +564,7 @@ void HandleResetSettings()
 
     CheckAndShowMissingFileMessage();
 
-    SString strSaveFilePath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files");
+    SString strSaveFilePath = PathJoin(GetSystemPersonalPath(), "MTA San Andreas User Files");
     SString strSettingsFilename = PathJoin(strSaveFilePath, "gta_sa.set");
     SString strSettingsFilenameBak = PathJoin(strSaveFilePath, "gta_sa_old.set");
 
