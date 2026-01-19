@@ -16,7 +16,7 @@
 class CSyncSettingsPacket final : public CPacket
 {
 public:
-    CSyncSettingsPacket(){};
+    CSyncSettingsPacket() {};
     CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
                         short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix, std::uint8_t multiCommandHandlerPolicy);

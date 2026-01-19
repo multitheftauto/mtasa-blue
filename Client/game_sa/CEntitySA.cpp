@@ -62,7 +62,7 @@ CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
     TransformFromObjectSpace(point, vecMax);
     rect.StretchToPoint(point.fX, point.fY);
     *pRect = rect;
-    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    pRect->FixIncorrectTopLeft();  // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
 }
 
@@ -100,8 +100,7 @@ bool CEntitySA::SetScaleInternal(const CVector& scale)
 void CEntitySA::SetPosition(float fX, float fY, float fZ)
 {
     // Remove & add to world?
-    if (std::isnan(fX) || std::isnan(fY) || std::isnan(fZ) ||
-        std::isinf(fX) || std::isinf(fY) || std::isinf(fZ))
+    if (std::isnan(fX) || std::isnan(fY) || std::isnan(fZ) || std::isinf(fX) || std::isinf(fY) || std::isinf(fZ))
         return;
 
     CVector* vecPos;
@@ -145,8 +144,7 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
 
 void CEntitySA::Teleport(float fX, float fY, float fZ)
 {
-    if (std::isnan(fX) || std::isnan(fY) || std::isnan(fZ) ||
-        std::isinf(fX) || std::isinf(fY) || std::isinf(fZ))
+    if (std::isnan(fX) || std::isnan(fY) || std::isnan(fZ) || std::isinf(fX) || std::isinf(fY) || std::isinf(fZ))
         return;
 
     if (m_pInterface->matrix)
@@ -174,7 +172,7 @@ void CEntitySA::SetupLighting()
 void CEntitySA::Render()
 {
     // This function may use m_pInterface->Render()
-    DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;
+    DWORD dwFunc = 0x59F180;  // m_pInterface->vtbl->Render;
     DWORD dwThis = (DWORD)m_pInterface;
     // clang-format off
     __asm
@@ -352,7 +350,7 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
 
         pGame->GetWorld()->Remove(this, CEntity_SetMatrix);
         DWORD dwThis = (DWORD)m_pInterface;
-        DWORD dwFunc = 0x446F90;            // CEntity::UpdateRwMatrix
+        DWORD dwFunc = 0x446F90;  // CEntity::UpdateRwMatrix
         // clang-format off
         __asm
         {
@@ -361,7 +359,7 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
         }
         // clang-format on
 
-        dwFunc = 0x532B00;            // CEntity::UpdateRwFrame
+        dwFunc = 0x532B00;  // CEntity::UpdateRwFrame
         // clang-format off
         __asm
         {
@@ -418,7 +416,7 @@ eEntityStatus CEntitySA::GetEntityStatus()
 RwFrame* CEntitySA::GetFrameFromId(int id)
 {
     // CClumpModelInfo::GetFrameFromId
-    return ((RwFrame*(_cdecl*)(RpClump*, int))0x4C53C0)(m_pInterface->m_pRwObject, id);
+    return ((RwFrame * (_cdecl*)(RpClump*, int))0x4C53C0)(m_pInterface->m_pRwObject, id);
 }
 
 RpClump* CEntitySA::GetRpClump()
@@ -429,7 +427,7 @@ RpClump* CEntitySA::GetRpClump()
 RwMatrix* CEntitySA::GetLTMFromId(int id)
 {
     // RwFrameGetLTM
-    return ((RwMatrix*(_cdecl*)(RwFrame*))0x7F0990)(GetFrameFromId(id));
+    return ((RwMatrix * (_cdecl*)(RwFrame*))0x7F0990)(GetFrameFromId(id));
 }
 
 void CEntitySA::SetAlpha(DWORD dwAlpha)
@@ -629,7 +627,7 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
         return false;
 
     RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
-    RwV3d angles = { yaw, roll, pitch };
+    RwV3d   angles = {yaw, roll, pitch};
     BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
     CEntitySAInterface* theInterface = GetInterface();
     if (theInterface)

@@ -23,12 +23,11 @@ extern IDirectInput8* g_pDirectInput8;
 // Helper stuff
 //
 
-#ifndef NUMELMS     // in DShow.h
-    #define NUMELMS(aa) (sizeof(aa)/sizeof((aa)[0]))
+#ifndef NUMELMS  // in DShow.h
+    #define NUMELMS(aa) (sizeof(aa) / sizeof((aa)[0]))
 #endif
 
-#define VALID_INDEX_FOR( array, index ) \
-            ( index >= 0 && index < NUMELMS(array) )
+#define VALID_INDEX_FOR(array, index) (index >= 0 && index < NUMELMS(array))
 
 SString GUIDToString(const GUID& g)
 {
@@ -75,10 +74,10 @@ enum eStick
 
 struct SMappingLine
 {
-    eJoy   SourceAxisIndex;            // 0 - 7
-    eDir   SourceAxisDir;              // 0 - 2
-    eStick OutputAxisIndex;            // 0/1 2/3 4 5
-    eDir   OutputAxisDir;              // 0 - 1
+    eJoy   SourceAxisIndex;  // 0 - 7
+    eDir   SourceAxisDir;    // 0 - 2
+    eStick OutputAxisIndex;  // 0/1 2/3 4 5
+    eDir   OutputAxisDir;    // 0 - 1
     bool   bEnabled;
     int    MaxValue;
 };
@@ -116,7 +115,7 @@ struct SJoystickState
     BYTE  rgbButtons[32]; /* 32 buttons                           */
     BYTE  rgbButtonsWas[32];
     BYTE  povButtonsWas[4];
-    BYTE  axisButtonsWas[14];            // Axis as buttons
+    BYTE  axisButtonsWas[14];  // Axis as buttons
 };
 
 ///////////////////////////////////////////////////////////////
@@ -325,7 +324,7 @@ BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdido
         range.diph.dwSize = sizeof(DIPROPRANGE);
         range.diph.dwHeaderSize = sizeof(DIPROPHEADER);
         range.diph.dwHow = DIPH_BYID;
-        range.diph.dwObj = pdidoi->dwType;            // Specify the enumerated axis
+        range.diph.dwObj = pdidoi->dwType;  // Specify the enumerated axis
         range.lMin = -1000;
         range.lMax = +1000;
 
@@ -348,10 +347,10 @@ BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdido
         dead.diph.dwHeaderSize = sizeof dead.diph;
         dead.diph.dwHow = DIPH_BYID;
         dead.diph.dwObj = pdidoi->dwType;
-        dead.dwData = 0;            // No Deadzone
+        dead.dwData = 0;  // No Deadzone
 
         sat = dead;
-        sat.dwData = 10000;            // No Saturation
+        sat.dwData = 10000;  // No Saturation
 
         m_DevInfo.pDevice->SetProperty(DIPROP_DEADZONE, &dead.diph);
         m_DevInfo.pDevice->SetProperty(DIPROP_SATURATION, &sat.diph);
@@ -400,7 +399,7 @@ BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdido
         WriteDebugEvent("                    " + strStatus);
 
 #ifdef MTA_DEBUG
-#if 0
+    #if 0
         if ( CCore::GetSingleton ().GetConsole () )
             CCore::GetSingleton ().GetConsole ()->Printf(
                             "%p  dwHow:%d  dwObj:%d  guid:%x  index:%d  lMin:%d  lMax:%d"
@@ -413,7 +412,7 @@ BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdido
                             ,range.lMax
                             );
 
-#endif
+    #endif
 #endif
     }
 
@@ -481,7 +480,7 @@ void CJoystickManager::InitDirectInput()
     }
 
     PreferredJoyCfg.dwSize = sizeof(PreferredJoyCfg);
-    if (SUCCEEDED(pJoyConfig->GetConfig(0, &PreferredJoyCfg, DIJC_GUIDINSTANCE)))            // This function is expected to fail if no Joystick is attached
+    if (SUCCEEDED(pJoyConfig->GetConfig(0, &PreferredJoyCfg, DIJC_GUIDINSTANCE)))  // This function is expected to fail if no Joystick is attached
         m_bPreferredJoyCfgValid = true;
     SAFE_RELEASE(pJoyConfig);
 
@@ -693,7 +692,7 @@ void CJoystickManager::ReadCurrentState()
     for (int i = 0; i < 32; i++)
         m_JoystickState.rgbButtons[i] = 0;
 
-    DIJOYSTATE2 js;            // DInput joystick state
+    DIJOYSTATE2 js;  // DInput joystick state
 
     if (ReadInputSubsystem(js))
     {
@@ -763,7 +762,7 @@ void CJoystickManager::ReadCurrentState()
                     range.diph.dwSize = sizeof(DIPROPRANGE);
                     range.diph.dwHeaderSize = sizeof(DIPROPHEADER);
                     range.diph.dwHow = DIPH_BYID;
-                    range.diph.dwObj = m_DevInfo.axis[a].dwType;            // Specify the enumerated axis
+                    range.diph.dwObj = m_DevInfo.axis[a].dwType;  // Specify the enumerated axis
                     range.lMin = -2001;
                     range.lMax = +2001;
 
@@ -813,7 +812,7 @@ void CJoystickManager::ReadCurrentState()
         {
             CGraphicsInterface* pGraphics = CCore::GetSingleton().GetGraphics();
             int                 x = 20;
-            int                 y = 20;            // pGraphics->GetViewportHeight() / 2;
+            int                 y = 20;  // pGraphics->GetViewportHeight() / 2;
             pGraphics->DrawRectQueued(x, y, 350, 150, 0xaf000000, true);
             pGraphics->DrawStringQueued(x + 10, y + 10, 0, 0, 0xFFFFFFFF, strStatus, 1, 1, DT_NOCLIP, NULL, true);
         }
@@ -1081,7 +1080,7 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
 
     // Debug output
 #ifdef MTA_DEBUG
-#if 0
+    #if 0
 
     SString strBuffer = SString::Printf ( "LeftShoulder1: %u\n"
                                 "LeftShoulder2: %u\n"
@@ -1153,7 +1152,7 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
 
     CCore::GetSingleton ().GetGraphics ()->DrawString ( 20, 550, 0xFFFFFFFF, 1, strBuffer );
 
-#endif
+    #endif
 #endif
 }
 
@@ -1195,7 +1194,7 @@ void CJoystickManager::SetDeadZone(int iDeadZone)
 {
     m_SettingsRevision++;
     if (iDeadZone != m_DevInfo.iDeadZone)
-        m_bAutoDeadZoneEnabled = false;            // Disable auto dead zone on change (user edit)
+        m_bAutoDeadZoneEnabled = false;  // Disable auto dead zone on change (user edit)
     m_DevInfo.iDeadZone = Clamp(0, iDeadZone, 49);
 }
 

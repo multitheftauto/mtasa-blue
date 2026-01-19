@@ -20,15 +20,15 @@
 #define MTA_EXE_NAME_RELEASE    "Multi Theft Auto.exe"
 
 #ifdef MTA_DEBUG
-    #define MTA_EXE_NAME            "Multi Theft Auto_d.exe"
-    #define MTA_DLL_NAME            "core_d.dll"
-    #define CHECK_DM_LUA_NAME       "mods\\deathmatch\\lua5.1c_d.dll"
-    #define CHECK_DM_CLIENT_NAME    "mods\\deathmatch\\Client_d.dll"
-    #define LOADER_PROXY_DLL_NAME   "mtasa_d.dll"
+    #define MTA_EXE_NAME          "Multi Theft Auto_d.exe"
+    #define MTA_DLL_NAME          "core_d.dll"
+    #define CHECK_DM_LUA_NAME     "mods\\deathmatch\\lua5.1c_d.dll"
+    #define CHECK_DM_CLIENT_NAME  "mods\\deathmatch\\Client_d.dll"
+    #define LOADER_PROXY_DLL_NAME "mtasa_d.dll"
 #else
-    #define MTA_EXE_NAME            "Multi Theft Auto.exe"
-    #define MTA_DLL_NAME            "core.dll"
-    #define CHECK_DM_LUA_NAME       "mods\\deathmatch\\lua5.1c.dll"
-    #define CHECK_DM_CLIENT_NAME    "mods\\deathmatch\\Client.dll"
-    #define LOADER_PROXY_DLL_NAME   "mtasa.dll"
+    #define MTA_EXE_NAME          "Multi Theft Auto.exe"
+    #define MTA_DLL_NAME          "core.dll"
+    #define CHECK_DM_LUA_NAME     "mods\\deathmatch\\lua5.1c.dll"
+    #define CHECK_DM_CLIENT_NAME  "mods\\deathmatch\\Client.dll"
+    #define LOADER_PROXY_DLL_NAME "mtasa.dll"
 #endif

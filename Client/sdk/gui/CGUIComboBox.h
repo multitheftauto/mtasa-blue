@@ -17,7 +17,7 @@
 class CGUIComboBox : public CGUIElement
 {
 public:
-    virtual ~CGUIComboBox(){};
+    virtual ~CGUIComboBox() {};
 
     virtual void          SetReadOnly(bool bRead) = 0;
     virtual CGUIListItem* AddItem(const char* szText) = 0;

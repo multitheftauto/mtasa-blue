@@ -116,8 +116,8 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         if (m_PlayerGotWeaponType != ucClientWeaponType)
         {
-            bWeaponCorrect = false;                          // Possibly old weapon data.
-            ucUseWeaponType = ucClientWeaponType;            // Use the packet supplied weapon type to skip over the correct amount of data
+            bWeaponCorrect = false;                // Possibly old weapon data.
+            ucUseWeaponType = ucClientWeaponType;  // Use the packet supplied weapon type to skip over the correct amount of data
         }
 
         // Update check counts
@@ -235,7 +235,7 @@ bool CSimPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     if (m_Cache.flags.data.bHasAWeapon)
     {
-        unsigned int    uiSlot = m_Cache.ucWeaponSlot;            // check m_Cache.bWeaponCorrect !
+        unsigned int    uiSlot = m_Cache.ucWeaponSlot;  // check m_Cache.bWeaponCorrect !
         SWeaponSlotSync slot;
         slot.data.uiSlot = uiSlot;
         BitStream.Write(&slot);

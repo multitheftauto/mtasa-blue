@@ -13,8 +13,7 @@
 
 using namespace lunasvg;
 
-CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID)
-    : CClientDisplay(ID)
+CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID) : CClientDisplay(ID)
 {
     m_pVectorGraphic = pVectorGraphic;
     m_bVisible = true;

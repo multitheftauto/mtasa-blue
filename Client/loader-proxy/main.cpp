@@ -123,7 +123,7 @@ VOID OnGameLaunch()
 
     // Log current working directory
     wchar_t inheritedCwd[32768]{};
-    DWORD inheritedCwdLen = GetCurrentDirectoryW(32768, inheritedCwd);
+    DWORD   inheritedCwdLen = GetCurrentDirectoryW(32768, inheritedCwd);
     if (inheritedCwdLen > 0)
     {
         AddLaunchLog("loader-proxy OnGameLaunch - Inherited CWD: %S", inheritedCwd);
@@ -139,34 +139,34 @@ VOID OnGameLaunch()
     // - Read from gta_path.txt file written by parent process
     // - Check MTA_GTA_PATH environment variable
     // - Use current_path() as fallback
-    
+
     // Parse CEF command-line switch
     std::array<wchar_t, 4096> gtaPathFromCmdLine{};
-    DWORD cmdLinePathLen = 0;
+    DWORD                     cmdLinePathLen = 0;
     std::array<wchar_t, 4096> mtaBasePathFromCmdLine{};
-    DWORD mtaBasePathLen = 0;
+    DWORD                     mtaBasePathLen = 0;
     {
         const LPWSTR cmdLine = GetCommandLineW();
         if (cmdLine)
         {
             AddLaunchLog("loader-proxy OnGameLaunch - Full command line: %S", cmdLine);
-            
+
             // Parse for --mta-gta-path=<path>
             // CEF command-line format: --switch=value or --switch=\"value with spaces\"
             constexpr std::wstring_view switchPrefix = L"--mta-gta-path=";
             if (const wchar_t* switchPos = wcsstr(cmdLine, switchPrefix.data()))
             {
                 const wchar_t* const pathStartBase = switchPos + switchPrefix.length();
-                const wchar_t* pathStart = pathStartBase;
-                
+                const wchar_t*       pathStart = pathStartBase;
+
                 // Skip opening quote if present
                 if (*pathStart == L'"')
                     pathStart++;
-                
+
                 // Find end of path (closing quote or space)
                 const wchar_t* pathEnd = pathStart;
-                const bool isQuoted = (pathStartBase[0] == L'"');
-                
+                const bool     isQuoted = (pathStartBase[0] == L'"');
+
                 while (*pathEnd != L'\0')
                 {
                     if (isQuoted && *pathEnd == L'"')
@@ -179,7 +179,7 @@ VOID OnGameLaunch()
                     }
                     pathEnd++;
                 }
-                
+
                 const size_t pathLen = pathEnd - pathStart;
                 if (pathLen > 0 && pathLen < gtaPathFromCmdLine.size())
                 {
@@ -202,16 +202,16 @@ VOID OnGameLaunch()
             if (const wchar_t* mtaSwitchPos = wcsstr(cmdLine, mtaSwitchPrefix.data()))
             {
                 const wchar_t* const mtaPathStartBase = mtaSwitchPos + mtaSwitchPrefix.length();
-                const wchar_t* mtaPathStart = mtaPathStartBase;
-                
+                const wchar_t*       mtaPathStart = mtaPathStartBase;
+
                 // Skip opening quote if present
                 if (*mtaPathStart == L'"')
                     mtaPathStart++;
-                
+
                 // Find end of path (closing quote or space)
                 const wchar_t* mtaPathEnd = mtaPathStart;
-                const bool mtaIsQuoted = (mtaPathStartBase[0] == L'"');
-                
+                const bool     mtaIsQuoted = (mtaPathStartBase[0] == L'"');
+
                 while (*mtaPathEnd != L'\0')
                 {
                     if (mtaIsQuoted && *mtaPathEnd == L'"')
@@ -224,7 +224,7 @@ VOID OnGameLaunch()
                     }
                     mtaPathEnd++;
                 }
-                
+
                 const size_t mtaPathLength = mtaPathEnd - mtaPathStart;
                 if (mtaPathLength > 0 && mtaPathLength < mtaBasePathFromCmdLine.size())
                 {
@@ -235,15 +235,15 @@ VOID OnGameLaunch()
             }
         }
     }
-    
+
     // Read from file
     std::array<wchar_t, 4096> gtaPathFromFile{};
-    DWORD filePathLen = 0;
-    const fs::path gtaPathFile = fs::current_path(ec) / L".." / L".." / L"MTA" / L"CEF" / L"gta_path.txt";
+    DWORD                     filePathLen = 0;
+    const fs::path            gtaPathFile = fs::current_path(ec) / L".." / L".." / L"MTA" / L"CEF" / L"gta_path.txt";
     if (FILE* pFile = nullptr; _wfopen_s(&pFile, gtaPathFile.c_str(), L"r") == 0 && pFile)
     {
         std::array<char, 8192> buffer{};
-        const size_t bytesRead = fread(buffer.data(), 1, buffer.size() - 1, pFile);
+        const size_t           bytesRead = fread(buffer.data(), 1, buffer.size() - 1, pFile);
         fclose(pFile);
         if (bytesRead > 0)
         {
@@ -255,12 +255,13 @@ VOID OnGameLaunch()
             }
         }
     }
-    
+
     // Check environment variable
     std::array<wchar_t, 4096> gtaPathFromEnv{};
-    const DWORD envLen = GetEnvironmentVariableW(L"MTA_GTA_PATH", gtaPathFromEnv.data(), static_cast<DWORD>(gtaPathFromEnv.size()));
-    
-    const fs::path gtaDirectory = [&]() -> fs::path {
+    const DWORD               envLen = GetEnvironmentVariableW(L"MTA_GTA_PATH", gtaPathFromEnv.data(), static_cast<DWORD>(gtaPathFromEnv.size()));
+
+    const fs::path gtaDirectory = [&]() -> fs::path
+    {
         // CEF command-line switch
         if (cmdLinePathLen > 0 && cmdLinePathLen < gtaPathFromCmdLine.size())
         {
@@ -382,7 +383,8 @@ VOID OnGameLaunch()
     // Check if the MTA subdirectory exists.
     // Use --mta-base-path from command-line if available,
     // otherwise fall back to parent process path
-    const fs::path mtaRootDirectory = [&]() -> fs::path {
+    const fs::path mtaRootDirectory = [&]() -> fs::path
+    {
         if (bIsCefSubprocess && mtaBasePathLen > 0 && mtaBasePathLen < mtaBasePathFromCmdLine.size())
         {
             AddLaunchLog("Using MTA base path from CEF command-line switch: %S", mtaBasePathFromCmdLine.data());

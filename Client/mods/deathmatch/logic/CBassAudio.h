@@ -7,7 +7,7 @@
  *
  *****************************************************************************/
 
-#define CUT_OFF 5.0f            // Cut off point at which volume is regarded as 0 in the function e^-x
+#define CUT_OFF 5.0f  // Cut off point at which volume is regarded as 0 in the function e^-x
 
 enum eSoundEventType
 {
