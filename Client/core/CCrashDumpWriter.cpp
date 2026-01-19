@@ -183,7 +183,7 @@ namespace EmergencyCrashLogging
     }
     #pragma warning(pop)
 
-}  // namespace EmergencyCrashLogging
+}
 
 // Call SEH-isolated readers
 static void LogEmergencyExceptionRecord(const _EXCEPTION_POINTERS* pException)

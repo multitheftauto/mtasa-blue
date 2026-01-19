@@ -163,7 +163,7 @@ bool Validate(T* pointer, ValidationMode mode = ValidationMode::Default)
     }
 }
 
-}  // namespace ComPtrValidation
+}
 
 template <typename T>
 bool IsValidComInterfacePointer(T* pointer, ComPtrValidation::ValidationMode mode = ComPtrValidation::ValidationMode::Default)
