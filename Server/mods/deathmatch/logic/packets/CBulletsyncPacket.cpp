@@ -141,6 +141,7 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
     if (!m_pSourceElement)
         return false;
 
+    // todo: is this condition always true?
     CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
     if (pPlayer)
     {
@@ -207,6 +208,7 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
     if (id == INVALID_ELEMENT_ID)
         return false;
 
+    // why?
     if (id == 0)
         return false;
 
