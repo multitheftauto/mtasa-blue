@@ -56,5 +56,5 @@ protected:
     int              m_iModelID;
     eClientModelType m_eModelType;
     bool             m_bAllocatedByUs = false;
-    CResource*       m_pParentResource = nullptr;            // Resource that allocated model
+    CResource*       m_pParentResource = nullptr;  // Resource that allocated model
 };
