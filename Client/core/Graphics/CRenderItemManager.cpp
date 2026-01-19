@@ -852,6 +852,19 @@ void CRenderItemManager::UpdateMemoryUsage()
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::GetBasicGPUInfo
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::GetBasicGPUInfo(BasicGPUInfo& outInfo)
+{
+    outInfo.name = m_strVideoCardName;
+    outInfo.memoryKB = m_iVideoCardMemoryKBTotal;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::GetDxStatus
 //
 //

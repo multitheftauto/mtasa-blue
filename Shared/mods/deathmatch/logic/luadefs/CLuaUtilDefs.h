@@ -11,6 +11,9 @@
 #pragma once
 #include "luadefs/CLuaDefs.h"
 
+using DataSubTable = std::unordered_map<std::string, std::variant<std::string, lua_Number>>;
+using MainTable = std::unordered_map<std::string, std::variant<DataSubTable, lua_Number>>;
+
 class CLuaUtilDefs : public CLuaDefs
 {
 public:
@@ -52,4 +55,8 @@ public:
     // Utility functions
     LUA_DECLARE(GetTok);
     LUA_DECLARE(tocolor);
+
+    #ifdef MTA_CLIENT
+        static const MainTable& GetSystemInfo();
+    #endif
 };
