@@ -10,8 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/Common.h"
+#include "game/RenderWare.h"
+#include "CVector2D.h"
 #include "CFxSA.h"
 #include "CEntitySA.h"
+;
+using StoreShadowToBeRendered_t = int(__cdecl*)(eShadowType, RwTexture*, const CVector*, float, float, float, float, short, unsigned char, unsigned char,
+                                                unsigned char, float, bool, float, class CRealTimeShadow*, bool);
+inline auto            StoreShadowToBeRendered = reinterpret_cast<StoreShadowToBeRendered_t>(FUNC_FXSystem_StoreShadows);
+inline unsigned short& CShadows_ShadowsStoredToBeRendered = *(unsigned short*)VAR_FXSystem_StoreShadows;
 
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
@@ -356,4 +364,26 @@ void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPositio
         // Call FxSystem_c::AddParticle
         ((int(__thiscall*)(FxSystem_c*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
     }
+}
+
+bool CFxSA::IsShadowsLimitReached()
+{
+    // GTA:SA can handle max 48 shadows per frame
+    return CShadows_ShadowsStoredToBeRendered >= 48;
+}
+
+bool CFxSA::AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
+                      eShadowType shadowType, float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings)
+{
+    // Check if we can add more shadows this frame
+    if (IsShadowsLimitReached() || shadowTextureType >= eShadowTextureType::COUNT)
+        return false;
+
+    // Get the RwTexture for the shadow
+    void*      textureAddress = *(void**)(TEXTURE_FXSystem_Shadow + (int)shadowTextureType * 4);
+    RwTexture* pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
+
+    // Store the shadow to be rendered
+    return StoreShadowToBeRendered(shadowType, pRwTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G,
+                                   color.B, fZDistance, bDrawOnWater, 1, 0, bDrawOnBuildings);
 }

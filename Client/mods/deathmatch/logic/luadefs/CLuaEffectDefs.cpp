@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "lua/CLuaFunctionParser.h"
+#include <game/CFx.h>
 
 void CLuaEffectDefs::LoadFunctions()
 {
@@ -35,6 +36,7 @@ void CLuaEffectDefs::LoadFunctions()
         {"setEffectDensity", SetEffectDensity},
         {"getEffectDensity", GetEffectDensity},
         {"fxCreateParticle", ArgumentParser<FxCreateParticle>},
+        {"fxAddShadow", ArgumentParser<FxAddShadow>},
     };
 
     // Add functions
@@ -62,6 +64,7 @@ void CLuaEffectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "addWaterSplash", "fxAddWaterSplash");
     lua_classfunction(luaVM, "addWood", "fxAddWood");
     lua_classfunction(luaVM, "createParticle", "fxCreateParticle");
+    lua_classfunction(luaVM, "createShadow", "fxAddShadow");
 
     lua_classfunction(luaVM, "setDensity", "setEffectDensity");
     lua_classfunction(luaVM, "setSpeed", "setEffectSpeed");
@@ -646,4 +649,24 @@ int CLuaEffectDefs::SetEffectDensity(lua_State* luaVM)
 bool CLuaEffectDefs::FxCreateParticle(FxParticleSystems eParticleSystem, CVector vecPosition, CVector vecDirection, float fR, float fG, float fB, float fA, std::optional<bool> bRandomizeColors, std::optional<std::uint32_t> iCount, std::optional<float> fBrightness, std::optional<float> fSize, std::optional<bool> bRandomizeSizes, std::optional<float> fLife)
 {
     return CStaticFunctionDefinitions::FxCreateParticle(eParticleSystem, vecPosition, vecDirection, fR/255, fG/255, fB/255, fA/255, bRandomizeColors.value_or(false), iCount.value_or(1), fBrightness.value_or(1.0f), fSize.value_or(0.3f), bRandomizeSizes.value_or(false), fLife.value_or(1.0f));
+}
+
+bool CLuaEffectDefs::FxAddShadow(eShadowTextureType shadowTextureType, CVector vecPosition, CVector2D vecOffset1, CVector2D vecOffset2, SColor color,
+                                 eShadowType shadowType,
+                 float zDistance, bool bDrawOnWater, bool bDrawOnBuildings)
+{
+    if (vecOffset1.Length() > 32)
+    {
+        throw std::invalid_argument("First offset can not be longer than 32 units");
+    }
+    else if (vecOffset2.Length() > 32)            // bigger and close to limit shadows size can be partially invisible
+    {
+        throw std::invalid_argument("Second offset can not be longer than 32 units");
+    }
+    else if (zDistance < 0 || zDistance > 3000)            // negative distance not working
+    {
+        throw std::invalid_argument("Z Distance must be between 0.0 and 3000.0");
+    }
+    return CStaticFunctionDefinitions::FxAddShadow(shadowTextureType, vecPosition, vecOffset1, vecOffset2, color, shadowType, zDistance, bDrawOnWater,
+                                                   bDrawOnBuildings);
 }
