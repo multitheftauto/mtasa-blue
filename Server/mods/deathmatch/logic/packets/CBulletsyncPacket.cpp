@@ -100,41 +100,28 @@ bool CBulletsyncPacket::ReadWeaponAndPositions(NetBitStreamInterface& stream)
     return true;
 }
 
+// Returns false when there's a validation error.
+// Make sure to reset damage data to defaults when that happens.
 bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
 {
     if (!stream.ReadBit())
-    {
-        ResetDamageData();
         return true;
-    }
 
     stream.Read(m_damage);
     stream.Read(m_zone);
     stream.Read(m_damaged);
 
     if (IsNaN(m_damage))
-    {
-        ResetDamageData();
         return false;
-    }
 
     if (m_damage < 0.0f || m_damage > MAX_DAMAGE)
-    {
-        ResetDamageData();
         return false;
-    }
 
     if (m_zone > MAX_BODY_ZONE)
-    {
-        ResetDamageData();
         return false;
-    }
 
     if (m_damaged == 0)
-    {
-        ResetDamageData();
         return false;
-    }
 
     // Check that target element exists (if specified)
     // Note: m_damaged can be INVALID_ELEMENT_ID when shooting at ground/world
@@ -142,10 +129,7 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
     {
         CElement* pElement = CElementIDs::GetElement(m_damaged);
         if (!pElement)
-        {
-            ResetDamageData();
             return false;
-        }
         // Element exists
     }
 
@@ -204,7 +188,10 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         return false;
 
     if (!ReadOptionalDamage(stream))
+    {
+        ResetDamageData();
         return false;
+    }
 
     return true;
 }
