@@ -17,29 +17,29 @@
 #include "CGarageSA.h"
 #include "CEntitySA.h"
 
-#define FUNC_TakeControl                    0x50C7C0
-#define FUNC_TakeControlNoEntity            0x50C8B0
-#define FUNC_Restore                        0x50B930
+#define FUNC_TakeControl         0x50C7C0
+#define FUNC_TakeControlNoEntity 0x50C8B0
+#define FUNC_Restore             0x50B930
 
-#define FUNC_Find3rdPersonCamTargetVector   0x514970
-#define FUNC_Find3rdPersonQuickAimPitch     0x50AD40
-#define FUNC_GetFadingDirection             0x50ADF0
-#define FUNC_GetFading                      0x50ADE0
-#define FUNC_Fade                           0x50AC20
-#define FUNC_SetFadeColour                  0x50BF00
-#define FUNC_ShakeCam                       0x50A9F0
+#define FUNC_Find3rdPersonCamTargetVector 0x514970
+#define FUNC_Find3rdPersonQuickAimPitch   0x50AD40
+#define FUNC_GetFadingDirection           0x50ADF0
+#define FUNC_GetFading                    0x50ADE0
+#define FUNC_Fade                         0x50AC20
+#define FUNC_SetFadeColour                0x50BF00
+#define FUNC_ShakeCam                     0x50A9F0
 
-#define VAR_CameraRotation                  0xB6F178 // used for controling where the player faces
-#define VAR_VehicleCameraView               0xB6F0DC
-#define VAR_PedCameraView                   0xB6F0F0
+#define VAR_CameraRotation    0xB6F178  // used for controling where the player faces
+#define VAR_VehicleCameraView 0xB6F0DC
+#define VAR_PedCameraView     0xB6F0F0
 
-#define MAX_CAMS                            3
+#define MAX_CAMS 3
 
-#define MAX_NUM_OF_NODES                    800 // for trains
+#define MAX_NUM_OF_NODES 800  // for trains
 
 /*** R* Defines ***/
 #define NUMBER_OF_VECTORS_FOR_AVERAGE 2
-#define MAX_NUM_OF_SPLINETYPES (4)
+#define MAX_NUM_OF_SPLINETYPES        (4)
 /*** END R* Defines ***/
 
 /*** BEGIN PURE R* CLASSES ***/
@@ -51,15 +51,15 @@ public:
     {
         MAXPATHLENGTH = 800
     };
-    float* m_arr_PathData;            //    FLOAT m_arr_PathData[MAXPATHLENGTH];
+    float* m_arr_PathData;  //    FLOAT m_arr_PathData[MAXPATHLENGTH];
 };
 
 class CQueuedMode
 {
 public:
-    short Mode;                        // CameraMode
-    float Duration;                    // How long for (<0.0f -> indefinately)
-    short MinZoom, MaxZoom;            // How far is player allowed to zoom in & out
+    short Mode;              // CameraMode
+    float Duration;          // How long for (<0.0f -> indefinately)
+    short MinZoom, MaxZoom;  // How far is player allowed to zoom in & out
 };
 
 class CTrainCamNode
@@ -67,9 +67,9 @@ class CTrainCamNode
 public:
     CVector m_cvecCamPosition;
     CVector m_cvecPointToLookAt;
-    CVector m_cvecMinPointInRange;            // this is the minimum required distance the train has to be to the camera to
+    CVector m_cvecMinPointInRange;  // this is the minimum required distance the train has to be to the camera to
     // allow a switch to the node cam
-    CVector m_cvecMaxPointInRange;            // this is the minimum required distance the train has to be to from the camera
+    CVector m_cvecMaxPointInRange;  // this is the minimum required distance the train has to be to from the camera
     float   m_fDesiredFOV;
     float   m_fNearClip;
     // to switch from the  the node cam
@@ -88,7 +88,7 @@ public:
     bool          m_bCameraJustRestored;
     bool          m_bcutsceneFinished;
     bool          m_bCullZoneChecksOn;
-    bool          m_bFirstPersonBeingUsed;            // To indicate if the m_bFirstPersonBeingUsed viewer is being used.
+    bool          m_bFirstPersonBeingUsed;  // To indicate if the m_bFirstPersonBeingUsed viewer is being used.
     bool          m_bJustJumpedOutOf1stPersonBecauseOfTarget;
     bool          m_bIdleOn;
     bool          m_bInATunnelAndABigVehicle;
@@ -98,8 +98,8 @@ public:
     bool          m_bPlayerIsInGarage;
     bool          m_bPlayerWasOnBike;
     bool          m_bJustCameOutOfGarage;
-    bool          m_bJustInitalised;            // Just so the speed thingy doesn't go mad right at the start
-    unsigned char m_bJust_Switched;             // Variable to indicate that we have jumped somewhere, Raymond needs this for the audio engine
+    bool          m_bJustInitalised;  // Just so the speed thingy doesn't go mad right at the start
+    unsigned char m_bJust_Switched;   // Variable to indicate that we have jumped somewhere, Raymond needs this for the audio engine
     bool          m_bLookingAtPlayer;
     bool          m_bLookingAtVector;
     bool          m_bMoveCamToAvoidGeom;
@@ -109,14 +109,14 @@ public:
     bool          m_bUseNearClipScript;
     bool          m_bStartInterScript;
     unsigned char m_bStartingSpline;
-    bool          m_bTargetJustBeenOnTrain;            // this variable is needed to be able to restore the camera
+    bool          m_bTargetJustBeenOnTrain;  // this variable is needed to be able to restore the camera
     bool          m_bTargetJustCameOffTrain;
     bool          m_bUseSpecialFovTrain;
     bool          m_bUseTransitionBeta;
     bool          m_bUseScriptZoomValuePed;
     bool          m_bUseScriptZoomValueCar;
     bool          m_bWaitForInterpolToFinish;
-    bool          m_bItsOkToLookJustAtThePlayer;            // Used when interpolating
+    bool          m_bItsOkToLookJustAtThePlayer;  // Used when interpolating
     bool          m_bWantsToSwitchWidescreenOff;
     bool          m_WideScreenOn;
     bool          m_1rstPersonRunCloseToAWall;
@@ -138,42 +138,42 @@ public:
     bool m_vecDoingSpecialInterPolation;
     bool m_bScriptParametersSetForInterPol;
 
-    bool m_bFading;            // to indicate that we are fading
+    bool m_bFading;  // to indicate that we are fading
     bool m_bMusicFading;
     bool m_bMusicFadedOut;
 
     bool m_bFailedCullZoneTestPreviously;
-    bool m_FadeTargetIsSplashScreen;            // used as hack for fading
-    bool WorldViewerBeingUsed;                  // To indicate if the world viewer is being used.
+    bool m_FadeTargetIsSplashScreen;  // used as hack for fading
+    bool WorldViewerBeingUsed;        // To indicate if the world viewer is being used.
 
-    unsigned char m_uiTransitionJUSTStarted;            // This is the first frame of a transition.
-    unsigned char m_uiTransitionState;                  // 0:one mode 1:transition
-    unsigned char ActiveCam;                            // Which one at the moment (0 or 1)
-                                                        // Their is a fudge at the end when the renderware matrix will receive either
-                                                        // the active camera or the worldviewer camera
-    unsigned int m_uiCamShakeStart;                     // When did the camera shake start.
+    unsigned char m_uiTransitionJUSTStarted;  // This is the first frame of a transition.
+    unsigned char m_uiTransitionState;        // 0:one mode 1:transition
+    unsigned char ActiveCam;                  // Which one at the moment (0 or 1)
+                                              // Their is a fudge at the end when the renderware matrix will receive either
+                                              // the active camera or the worldviewer camera
+    unsigned int m_uiCamShakeStart;           // When did the camera shake start.
     unsigned int m_uiFirstPersonCamLastInputTime;
     unsigned int m_uiLongestTimeInMill;
     unsigned int m_uiNumberOfTrainCamNodes;
     unsigned int m_uiTimeLastChange;
     unsigned int m_uiTimeWeLeftIdle_StillNoInput;
     unsigned int m_uiTimeWeEnteredIdle;
-    unsigned int m_uiTimeTransitionStart;            // When was the transition started ?
-    unsigned int m_uiTransitionDuration;             // How long does the transition take ?
+    unsigned int m_uiTimeTransitionStart;  // When was the transition started ?
+    unsigned int m_uiTransitionDuration;   // How long does the transition take ?
     unsigned int m_uiTransitionDurationTargetCoors;
     int          m_BlurBlue;
     int          m_BlurGreen;
     int          m_BlurRed;
     int          m_BlurType;
-    int          m_iWorkOutSpeedThisNumFrames;            // duh
-    int          m_iNumFramesSoFar;                       // counter
-    int          m_iCurrentTrainCamNode;                  // variable indicating which camera node we are at for the train
-    int          m_motionBlur;                            // to indicate that we are fading
+    int          m_iWorkOutSpeedThisNumFrames;  // duh
+    int          m_iNumFramesSoFar;             // counter
+    int          m_iCurrentTrainCamNode;        // variable indicating which camera node we are at for the train
+    int          m_motionBlur;                  // to indicate that we are fading
 
     int m_imotionBlurAddAlpha;
     int m_iCheckCullZoneThisNumFrames;
     int m_iZoneCullFrameNumWereAt;
-    int WhoIsInControlOfTheCamera;            // to discern between obbe and scripts
+    int WhoIsInControlOfTheCamera;  // to discern between obbe and scripts
 
     //  float   CarZoomIndicator;
     //  float   CarZoomValue;
@@ -183,23 +183,23 @@ public:
     //  float   m_fPedZoomValue;
     //  float   m_fPedZoomValueSmooth;
     //  float   m_fPedZoomValueScript;
-    int   m_nCarZoom;                    // store zoom index
-    float m_fCarZoomBase;                // store base zoom distance from index
-    float m_fCarZoomTotal;               // store total zoom after modded by camera modes
-    float m_fCarZoomSmoothed;            // buffered version of the var above
+    int   m_nCarZoom;          // store zoom index
+    float m_fCarZoomBase;      // store base zoom distance from index
+    float m_fCarZoomTotal;     // store total zoom after modded by camera modes
+    float m_fCarZoomSmoothed;  // buffered version of the var above
     float m_fCarZoomValueScript;
-    int   m_nPedZoom;                    // store zoom index
-    float m_fPedZoomBase;                // store base zoom distance from index
-    float m_fPedZoomTotal;               // store total zoom after modded by camera modes
-    float m_fPedZoomSmoothed;            // buffered version of the var above
+    int   m_nPedZoom;          // store zoom index
+    float m_fPedZoomBase;      // store base zoom distance from index
+    float m_fPedZoomTotal;     // store total zoom after modded by camera modes
+    float m_fPedZoomSmoothed;  // buffered version of the var above
     float m_fPedZoomValueScript;
 
     float CamFrontXNorm, CamFrontYNorm;
     float DistanceToWater;
     float HeightOfNearestWater;
     float FOVDuringInter;
-    float LODDistMultiplier;                   // This takes into account the FOV and the standard LOD multiplier Smaller aperture->bigger LOD multipliers.
-    float GenerationDistMultiplier;            // This takes into account the FOV but noy the standard LOD multiplier
+    float LODDistMultiplier;         // This takes into account the FOV and the standard LOD multiplier Smaller aperture->bigger LOD multipliers.
+    float GenerationDistMultiplier;  // This takes into account the FOV but noy the standard LOD multiplier
 
     float m_fAlphaSpeedAtStartInter;
     float m_fAlphaWhenInterPol;
@@ -213,47 +213,47 @@ public:
     float m_fStartingAlphaForInterPol;
     float m_PedOrientForBehindOrInFront;
 
-    float m_CameraAverageSpeed;            // this is an average depending on how many frames we work it out
-    float m_CameraSpeedSoFar;              // this is a running total
-    float m_fCamShakeForce;                // How severe is the camera shake.
+    float m_CameraAverageSpeed;  // this is an average depending on how many frames we work it out
+    float m_CameraSpeedSoFar;    // this is a running total
+    float m_fCamShakeForce;      // How severe is the camera shake.
     float m_fFovForTrain;
     float m_fFOV_Wide_Screen;
 
     float m_fNearClipScript;
-    float m_fOldBetaDiff;                    // Needed for interpolation between 2 modes
-    float m_fPositionAlongSpline;            // Variable used to indicate how far along the spline we are 0-1 for started to completed respectively
+    float m_fOldBetaDiff;          // Needed for interpolation between 2 modes
+    float m_fPositionAlongSpline;  // Variable used to indicate how far along the spline we are 0-1 for started to completed respectively
     float m_ScreenReductionPercentage;
     float m_ScreenReductionSpeed;
     float m_AlphaForPlayerAnim1rstPerson;
 
-    float Orientation;                     // The orientation of the camera. Used for peds walking.
-    float PlayerExhaustion;                // How tired is player (inaccurate sniping) 0.0f-1.0f
-                                           // The following things are used by the sound code to
-                                           // play reverb depending on the surroundings. From a point
-                                           // in front of the camera the disance is measured to the
-                                           // nearest obstacle (building)
-    float SoundDistUp;                     //, SoundDistLeft, SoundDistRight;     // These ones are buffered and should be used by the audio
-    float SoundDistUpAsRead;               //, SoundDistLeftAsRead, SoundDistRightAsRead;
-    float SoundDistUpAsReadOld;            //, SoundDistLeftAsReadOld, SoundDistRightAsReadOld;
-                                           // Very rough distance to the nearest water for the sound to use
-                                           // Front vector X&Y normalised to 1. Used by loads of stuff.
+    float Orientation;           // The orientation of the camera. Used for peds walking.
+    float PlayerExhaustion;      // How tired is player (inaccurate sniping) 0.0f-1.0f
+                                 // The following things are used by the sound code to
+                                 // play reverb depending on the surroundings. From a point
+                                 // in front of the camera the disance is measured to the
+                                 // nearest obstacle (building)
+    float SoundDistUp;           //, SoundDistLeft, SoundDistRight;     // These ones are buffered and should be used by the audio
+    float SoundDistUpAsRead;     //, SoundDistLeftAsRead, SoundDistRightAsRead;
+    float SoundDistUpAsReadOld;  //, SoundDistLeftAsReadOld, SoundDistRightAsReadOld;
+                                 // Very rough distance to the nearest water for the sound to use
+                                 // Front vector X&Y normalised to 1. Used by loads of stuff.
 
     float m_fAvoidTheGeometryProbsTimer;
     short m_nAvoidTheGeometryProbsDirn;
 
-    float m_fWideScreenReductionAmount;            // 0 for not reduced 1 for fully reduced (Variable for Les)
+    float m_fWideScreenReductionAmount;  // 0 for not reduced 1 for fully reduced (Variable for Les)
     float m_fStartingFOVForInterPol;
 
     // These ones are static so that they don't get cleared in CCamera::Init()
-    static float m_fMouseAccelHorzntl;             // acceleration multiplier for 1st person controls
-    static float m_fMouseAccelVertical;            // acceleration multiplier for 1st person controls
+    static float m_fMouseAccelHorzntl;   // acceleration multiplier for 1st person controls
+    static float m_fMouseAccelVertical;  // acceleration multiplier for 1st person controls
     static float m_f3rdPersonCHairMultX;
     static float m_f3rdPersonCHairMultY;
 
-    CCamSAInterface Cams[3];            // The actual cameras (usually only one of the two is active)
-                                        // And to complicate this we have a third camera, this camera is
-                                        // used for debugging when we want to have a look at the world.
-                                        // We can't change the camera mode because other objects depend on their
+    CCamSAInterface Cams[3];  // The actual cameras (usually only one of the two is active)
+                              // And to complicate this we have a third camera, this camera is
+                              // used for debugging when we want to have a look at the world.
+                              // We can't change the camera mode because other objects depend on their
 
     // #########################################//
     // DATA NOT UPDATED FOR SA  BELOW HERE!!!!! //
@@ -266,10 +266,10 @@ public:
     // for the sniper mode and rocket launcher mode.
     // This one overwrites the m_PlayerMode above.
     CQueuedMode PlayerWeaponMode;
-    CVector     m_PreviousCameraPosition;            // needed to work out speed
-    CVector m_RealPreviousCameraPosition;            // This cane be used by stuff outside the camera code. The one above is the same as the current coordinates
-                                                     // outwidth the camera code. an active camera for range finding etc
-    CVector m_cvecAimingTargetCoors;                 // Coors to look at with Gordons aiming thing
+    CVector     m_PreviousCameraPosition;      // needed to work out speed
+    CVector     m_RealPreviousCameraPosition;  // This cane be used by stuff outside the camera code. The one above is the same as the current coordinates
+                                               // outwidth the camera code. an active camera for range finding etc
+    CVector m_cvecAimingTargetCoors;           // Coors to look at with Gordons aiming thing
     // The player camera that is waiting to be used
     // This camera can replace the default camera where this is
     // needed (in tricky situations like tunnels for instance)
@@ -290,9 +290,9 @@ public:
     CVector m_vecGameCamPos;
     CVector SourceDuringInter, TargetDuringInter, UpDuringInter;
 
-    CVector m_vecAttachedCamOffset;            // for attaching the camera to a ped or vehicle (set by level designers for use in cutscenes)
+    CVector m_vecAttachedCamOffset;  // for attaching the camera to a ped or vehicle (set by level designers for use in cutscenes)
     CVector m_vecAttachedCamLookAt;
-    float   m_fAttachedCamAngle;            // for giving the attached camera a tilt.
+    float   m_fAttachedCamAngle;  // for giving the attached camera a tilt.
 
     // RenderWare camera pointer
     RwCamera* m_pRwCamera;
@@ -300,7 +300,7 @@ public:
     CEntitySAInterface* pTargetEntity;
     CEntitySAInterface* pAttachedEntity;
     // CVector CutScene;
-    CCamPathSplines m_arrPathArray[MAX_NUM_OF_SPLINETYPES];            // These only get created when the script calls the load splines function
+    CCamPathSplines m_arrPathArray[MAX_NUM_OF_SPLINETYPES];  // These only get created when the script calls the load splines function
     // maybe this shouldn't be here depends if GTA_TRAIN is defined (its not)
     // CTrainCamNode     m_arrTrainCamNode[MAX_NUM_OF_NODES];
 
@@ -343,7 +343,7 @@ public:
     CVector m_vecOldFrontForInter;
     CVector m_vecOldUpForInter;
     float   m_vecOldFOVForInter;
-    float   m_fFLOATingFade;            // variable representing the FLOAT version of CDraw::Fade. Necessary to stop loss of precision
+    float   m_fFLOATingFade;  // variable representing the FLOAT version of CDraw::Fade. Necessary to stop loss of precision
     float   m_fFLOATingFadeMusic;
     float   m_fTimeToFadeOut;
     float   m_fTimeToFadeMusic;
@@ -382,45 +382,45 @@ public:
     ~CCameraSA();
 
     CCameraSAInterface* GetInterface() const noexcept { return internalInterface; }
-    
+
     // CCamera interface implementation
-    void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle) override;
-    void                TakeControl(CVector* position, int CamSwitchStyle) override;
-    void                Restore() override;
-    void                RestoreWithJumpCut() override;
-    CMatrix*            GetMatrix(CMatrix* matrix) override;
-    void                SetMatrix(CMatrix* matrix) override;
-    void                Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget) override;
-    float               Find3rdPersonQuickAimPitch() override;
-    BYTE                GetActiveCam() override;
-    CCam*               GetCam(BYTE bCameraID) override;
-    void                SetWidescreen(bool bWidescreen) override;
-    bool                GetWidescreen() override;
-    bool                IsFading() override;
-    int                 GetFadingDirection() override;
-    void                Fade(float fFadeOutTime, int iOutOrIn) override;
-    void                SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue) override;
-    float               GetCameraRotation() override;
-    RwMatrix*           GetLTM() override;
-    CEntity*            GetTargetEntity() override;
-    void                SetCameraClip(bool bObjects, bool bVehicles) override;
-    void                GetCameraClip(bool& bObjects, bool& bVehicles) override;
-    BYTE                GetCameraVehicleViewMode() override;
-    BYTE                GetCameraPedViewMode() override;
-    void                SetCameraVehicleViewMode(BYTE dwCamMode) override;
-    void                SetCameraPedViewMode(BYTE dwCamMode) override;
-    void                SetShakeForce(float fShakeForce) override;
-    float               GetShakeForce() override;
-    void                ShakeCamera(float radius, float x, float y, float z) noexcept override;
-    void                ResetShakeCamera() noexcept override;
-    std::uint8_t        GetTransitionState() const override;
-    bool                IsInTransition() const override;
-    float               GetTransitionFOV() const override;
-    bool                GetTransitionMatrix(CMatrix& matrix) const override;
+    void         TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle) override;
+    void         TakeControl(CVector* position, int CamSwitchStyle) override;
+    void         Restore() override;
+    void         RestoreWithJumpCut() override;
+    CMatrix*     GetMatrix(CMatrix* matrix) override;
+    void         SetMatrix(CMatrix* matrix) override;
+    void         Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget) override;
+    float        Find3rdPersonQuickAimPitch() override;
+    BYTE         GetActiveCam() override;
+    CCam*        GetCam(BYTE bCameraID) override;
+    void         SetWidescreen(bool bWidescreen) override;
+    bool         GetWidescreen() override;
+    bool         IsFading() override;
+    int          GetFadingDirection() override;
+    void         Fade(float fFadeOutTime, int iOutOrIn) override;
+    void         SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue) override;
+    float        GetCameraRotation() override;
+    RwMatrix*    GetLTM() override;
+    CEntity*     GetTargetEntity() override;
+    void         SetCameraClip(bool bObjects, bool bVehicles) override;
+    void         GetCameraClip(bool& bObjects, bool& bVehicles) override;
+    BYTE         GetCameraVehicleViewMode() override;
+    BYTE         GetCameraPedViewMode() override;
+    void         SetCameraVehicleViewMode(BYTE dwCamMode) override;
+    void         SetCameraPedViewMode(BYTE dwCamMode) override;
+    void         SetShakeForce(float fShakeForce) override;
+    float        GetShakeForce() override;
+    void         ShakeCamera(float radius, float x, float y, float z) noexcept override;
+    void         ResetShakeCamera() noexcept override;
+    std::uint8_t GetTransitionState() const override;
+    bool         IsInTransition() const override;
+    float        GetTransitionFOV() const override;
+    bool         GetTransitionMatrix(CMatrix& matrix) const override;
 
     // Additional overload not in base interface
     virtual CCam* GetCam(CCamSAInterface* camInterface);
-    
+
     // Additional methods
-    void      RestoreLastGoodState();
+    void RestoreLastGoodState();
 };

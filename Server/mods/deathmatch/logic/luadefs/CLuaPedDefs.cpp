@@ -35,7 +35,7 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedTotalAmmo", GetPedTotalAmmo},
         {"getPedWeapon", GetPedWeapon},
         {"getPedClothes", GetPedClothes},
-        {"isPedWearingJetpack", DoesPedHaveJetPack},            // introduced in 1.5.5-9.13846
+        {"isPedWearingJetpack", DoesPedHaveJetPack},  // introduced in 1.5.5-9.13846
         {"isPedOnGround", IsPedOnGround},
         {"getPedFightingStyle", GetPedFightingStyle},
         {"getPedWalkingStyle", GetPedMoveAnim},
@@ -58,7 +58,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedStat", SetPedStat},
         {"addPedClothes", AddPedClothes},
         {"removePedClothes", RemovePedClothes},
-        {"setPedWearingJetpack", SetPedWearingJetpack},            // introduced in 1.5.5-9.13846
+        {"setPedWearingJetpack", SetPedWearingJetpack},  // introduced in 1.5.5-9.13846
         {"setPedFightingStyle", SetPedFightingStyle},
         {"setPedWalkingStyle", SetPedMoveAnim},
         {"setPedGravity", SetPedGravity},
@@ -106,7 +106,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "removeClothes", "removePedClothes");
     lua_classfunction(luaVM, "removeFromVehicle", "removePedFromVehicle");
     lua_classfunction(luaVM, "removeJetPack", "removePedJetPack");
-    lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack");            // deprecated in 1.5.5-9.13846
+    lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack");  // deprecated in 1.5.5-9.13846
 
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "isDucked", "isPedDucked");
@@ -118,7 +118,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isDoingGangDriveby", "isPedDoingGangDriveby");
     lua_classfunction(luaVM, "isFrozen", "isPedFrozen");
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
-    lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");  // introduced in 1.5.5-9.13846
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
 
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
@@ -150,7 +150,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAnimation", "setPedAnimation");
     lua_classfunction(luaVM, "setAnimationProgress", "setPedAnimationProgress");
     lua_classfunction(luaVM, "setAnimationSpeed", "setPedAnimationSpeed");
-    lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");  // introduced in 1.5.5-9.13846
 
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
     lua_classvariable(luaVM, "ducked", NULL, "isPedDucked");
@@ -170,7 +170,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "contactElement", NULL, "getPedContactElement");
     lua_classvariable(luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
-    lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");  // introduced in 1.5.5-9.13846
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
     // TODO(qaisjp): setting this to any value will kill the ped. add OOP_KillPed that only allows `true`.
@@ -421,7 +421,9 @@ bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std
                 throw LuaFunctionError("Animation name cannot be true. Possible values: nil, false, string.");
     }
 
-    return CStaticFunctionDefinitions::SetPedAnimation(pPed, animBlockName, animationName, time.value_or(-1), blendTime.value_or(250), loop.value_or(true), updatePosition.value_or(true), interruptable.value_or(true), freezeLastFrame.value_or(true), restoreTask.value_or(false));
+    return CStaticFunctionDefinitions::SetPedAnimation(pPed, animBlockName, animationName, time.value_or(-1), blendTime.value_or(250), loop.value_or(true),
+                                                       updatePosition.value_or(true), interruptable.value_or(true), freezeLastFrame.value_or(true),
+                                                       restoreTask.value_or(false));
 }
 
 int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
@@ -1371,8 +1373,8 @@ int CLuaPedDefs::WarpPedIntoVehicle(lua_State* luaVM)
     return 1;
 }
 
-#define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE  "1.3.0-9.04482"
-#define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE    "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE   "1.3.0-9.04482"
 int CLuaPedDefs::OOP_WarpPedIntoVehicle(lua_State* luaVM)
 {
     //  ped.vehicle = element vehicle

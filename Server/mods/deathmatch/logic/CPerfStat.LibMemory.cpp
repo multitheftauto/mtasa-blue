@@ -46,7 +46,7 @@ namespace
         CDynamicLibrary* pLibrary;
         PFNGETALLOCSTATS pfnGetAllocStats;
     };
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -217,16 +217,16 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
             {
                 CLibraryInfo info;
                 info.strName = libs[i];
-                #if MTA_DEBUG
+#if MTA_DEBUG
                 info.strName += "_d";
-                #endif
-                #ifdef WIN32
+#endif
+#ifdef WIN32
                 info.strName += ".dll";
-                #elif defined(__APPLE__)
+#elif defined(__APPLE__)
                 info.strName += ".dylib";
-                #else
+#else
                 info.strName += ".so";
-                #endif
+#endif
                 info.pLibrary = new CDynamicLibrary();
 
                 SString strPathFilename = g_pServerInterface->GetAbsolutePath(info.strName);
