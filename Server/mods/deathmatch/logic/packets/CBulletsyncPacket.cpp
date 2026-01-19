@@ -18,7 +18,6 @@
 #include "CWeaponNames.h"
 
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
-    : m_weapon(WEAPONTYPE_UNARMED), m_start(), m_end(), m_order(0), m_damage(0.0f), m_zone(0), m_damaged(INVALID_ELEMENT_ID)
 {
     m_pSourceElement = player;
 }

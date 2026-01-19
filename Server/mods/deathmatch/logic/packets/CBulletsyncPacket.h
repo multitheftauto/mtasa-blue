@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/packets/CBulletsyncPacket.h
  *  PURPOSE:     Bullet synchronization packet class
@@ -8,9 +8,6 @@
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
-
-#ifndef __CBULLETSYNCPACKET_H
-#define __CBULLETSYNCPACKET_H
 
 #pragma once
 
@@ -48,13 +45,11 @@ private:
     static bool           IsValidWeaponId(unsigned char weaponId) noexcept;
 
 public:
-    eWeaponType  m_weapon{};
+    eWeaponType  m_weapon = WEAPONTYPE_UNARMED;
     CVector      m_start{};
     CVector      m_end{};
-    std::uint8_t m_order{};
-    float        m_damage{};
-    std::uint8_t m_zone{};
-    ElementID    m_damaged{INVALID_ELEMENT_ID};
+    std::uint8_t m_order = 0;
+    float        m_damage = 0.0f;
+    std::uint8_t m_zone = 0;
+    ElementID    m_damaged = INVALID_ELEMENT_ID;
 };
-
-#endif  // __CBULLETSYNCPACKET_H
