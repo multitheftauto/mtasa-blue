@@ -22,7 +22,7 @@ CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments
 {
     m_strName.AssignLeft(szName, MAX_EVENT_NAME_LENGTH);
     m_ElementID = ID;
-    m_pArguments = pArguments;            // Use a pointer to save copying the arguments
+    m_pArguments = pArguments;  // Use a pointer to save copying the arguments
 }
 
 bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)

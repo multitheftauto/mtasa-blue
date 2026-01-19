@@ -186,7 +186,7 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
                     {
                         // call onClientSoundStarted
                         CLuaArguments Arguments;
-                        Arguments.PushString("play");            // Reason
+                        Arguments.PushString("play");  // Reason
                         pSound->CallEvent("onClientSoundStarted", Arguments, false);
 
                         lua_pushelement(luaVM, pSound);
@@ -246,7 +246,7 @@ int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
                     {
                         // call onClientSoundStarted
                         CLuaArguments Arguments;
-                        Arguments.PushString("play");            // Reason
+                        Arguments.PushString("play");  // Reason
                         pSound->CallEvent("onClientSoundStarted", Arguments, false);
 
                         lua_pushelement(luaVM, pSound);
@@ -1407,12 +1407,12 @@ struct SPlayerVoiceWrapper
 
     bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
     {
-        CClientPlayerVoice* pVoice = pPlayer->GetVoice();        
+        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
         return pVoice ? pVoice->SetFxEffectParameters(uiFxEffect, params) : false;
     }
     bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
     {
-        CClientPlayerVoice* pVoice = pPlayer->GetVoice();        
+        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
         return pVoice ? pVoice->GetFxEffectParameters(uiFxEffect, params) : false;
     }
 };
@@ -1420,14 +1420,15 @@ struct SPlayerVoiceWrapper
 int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 {
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
-    CClientSound* pSound{};
+    CClientSound*       pSound{};
     SPlayerVoiceWrapper playerVoice;
-    SoundEffectType eEffectType;
+    SoundEffectType     eEffectType;
 
-    CScriptArgReader argStream(luaVM);    
+    CScriptArgReader argStream(luaVM);
 
     // Call `SetFxEffectParameters` and log errors if any
-    const auto SetParamWithErrorLog = [luaVM, &eEffectType](auto* pSound, auto effectParam, auto& params) {
+    const auto SetParamWithErrorLog = [luaVM, &eEffectType](auto* pSound, auto effectParam, auto& params)
+    {
         // Try setting parameter
         if (pSound->SetFxEffectParameters((uint)eEffectType, &params))
         {
@@ -1451,7 +1452,8 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
         return 1;
     };
 
-    const auto ProcessSoundParams = [&eEffectType, luaVM, &argStream, &SetParamWithErrorLog](auto* pSound) {
+    const auto ProcessSoundParams = [&eEffectType, luaVM, &argStream, &SetParamWithErrorLog](auto* pSound)
+    {
         if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
             return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
 
@@ -1864,7 +1866,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
         lua_pushboolean(luaVM, false);
         return 1;
     };
-   
+
     if (argStream.NextIsUserDataOfType<CClientSound>())
         argStream.ReadUserData(pSound);
     else if (argStream.NextIsUserDataOfType<CClientPlayer>())
@@ -1896,13 +1898,14 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
 {
     //  table getSoundEffectParameters ( sound/player sound, string effectName )
-    CClientSound* pSound{};
+    CClientSound*       pSound{};
     SPlayerVoiceWrapper playerVoice;
-    SoundEffectType eEffectType;
+    SoundEffectType     eEffectType;
 
     CScriptArgReader argStream(luaVM);
 
-    const auto ProcessSoundParams = [luaVM, &eEffectType](auto* pSound) {
+    const auto ProcessSoundParams = [luaVM, &eEffectType](auto* pSound)
+    {
         if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
             return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
 

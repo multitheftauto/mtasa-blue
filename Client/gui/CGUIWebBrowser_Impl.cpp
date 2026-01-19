@@ -108,7 +108,7 @@ void CGUIWebBrowser_Impl::LoadFromWebView(CWebViewInterface* pWebView)
     // Define an image and get its pointer
     m_pImageset->defineImage(szUnique, CEGUI::Point(0, 0), CEGUI::Size(pCEGUITexture->getWidth(), pCEGUITexture->getHeight()), CEGUI::Point(0, 0));
     m_pImage = const_cast<CEGUI::Image*>(
-        &m_pImageset->getImage(szUnique));            // const_cast here is a huge hack, but is okay here since all images generated here are unique
+        &m_pImageset->getImage(szUnique));  // const_cast here is a huge hack, but is okay here since all images generated here are unique
 
     // Set the image just loaded as the image to be drawn for the widget
     reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->setImage(m_pImage);

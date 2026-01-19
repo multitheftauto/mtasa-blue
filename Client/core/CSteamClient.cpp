@@ -49,30 +49,30 @@ using HandleScope = std::unique_ptr<std::remove_pointer_t<HANDLE>, HandleDeleter
 
 namespace
 {
-DWORD GetProcessBaseName(HANDLE process, LPWSTR buffer, DWORD bufferLength)
-{
-    using ModuleBaseNameFn = DWORD(WINAPI*)(HANDLE, HMODULE, LPWSTR, DWORD);
-    ModuleBaseNameFn       moduleBaseNameFn = nullptr;
-
-    if (HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll"); kernel32 != nullptr)
+    DWORD GetProcessBaseName(HANDLE process, LPWSTR buffer, DWORD bufferLength)
     {
-        if (SharedUtil::TryGetProcAddress(kernel32, "K32GetModuleBaseNameW", moduleBaseNameFn) ||
-            SharedUtil::TryGetProcAddress(kernel32, "GetModuleBaseNameW", moduleBaseNameFn))
+        using ModuleBaseNameFn = DWORD(WINAPI*)(HANDLE, HMODULE, LPWSTR, DWORD);
+        ModuleBaseNameFn moduleBaseNameFn = nullptr;
+
+        if (HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll"); kernel32 != nullptr)
         {
-            return moduleBaseNameFn(process, nullptr, buffer, bufferLength);
+            if (SharedUtil::TryGetProcAddress(kernel32, "K32GetModuleBaseNameW", moduleBaseNameFn) ||
+                SharedUtil::TryGetProcAddress(kernel32, "GetModuleBaseNameW", moduleBaseNameFn))
+            {
+                return moduleBaseNameFn(process, nullptr, buffer, bufferLength);
+            }
         }
+
+        HMODULE psapi = GetModuleHandleW(L"psapi.dll");
+        if (psapi == nullptr)
+            psapi = LoadLibraryW(L"psapi.dll");
+
+        if (psapi != nullptr && SharedUtil::TryGetProcAddress(psapi, "GetModuleBaseNameW", moduleBaseNameFn))
+            return moduleBaseNameFn(process, nullptr, buffer, bufferLength);
+
+        return 0;
     }
-
-    HMODULE psapi = GetModuleHandleW(L"psapi.dll");
-    if (psapi == nullptr)
-        psapi = LoadLibraryW(L"psapi.dll");
-
-    if (psapi != nullptr && SharedUtil::TryGetProcAddress(psapi, "GetModuleBaseNameW", moduleBaseNameFn))
-        return moduleBaseNameFn(process, nullptr, buffer, bufferLength);
-
-    return 0;
-}
-}            // namespace
+}  // namespace
 
 struct SignerInfo
 {

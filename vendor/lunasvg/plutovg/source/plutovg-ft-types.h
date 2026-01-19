@@ -170,4 +170,7 @@ typedef unsigned int            PVG_FT_UInt32;
 #define FALSE  0
 #endif
 
+#define PVG_FT_BEGIN_STMNT do {
+#define PVG_FT_END_STMNT } while (0)
+
 #endif // PLUTOVG_FT_TYPES_H

@@ -74,11 +74,19 @@ bool CClientTXD::Load(bool isRaw, SString input, bool enableFiltering)
 
 bool CClientTXD::AddClothingTexture(const std::string& modelName)
 {
+    m_strLastError.clear();
+
     if (modelName.empty())
+    {
+        m_strLastError = "Model name is empty";
         return false;
+    }
 
     if (m_FileData.empty() && m_bIsRawData)
+    {
+        m_strLastError = "Raw data buffer unavailable (texture was first used for non-clothes model)";
         return false;
+    }
 
     if (m_FileData.empty())
     {
@@ -86,10 +94,19 @@ bool CClientTXD::AddClothingTexture(const std::string& modelName)
         if (!GetFilenameToUse(strUseFilename))
             return false;
         if (!FileLoad(std::nothrow, strUseFilename, m_FileData))
+        {
+            m_strLastError = SString("Failed to read file: %s", ExtractFilename(strUseFilename).c_str());
             return false;
+        }
     }
 
-    return g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), modelName.c_str());
+    if (!g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), modelName.c_str()))
+    {
+        m_strLastError = SString("Failed to add clothing texture: %s", modelName.c_str());
+        return false;
+    }
+
+    return true;
 }
 
 bool CClientTXD::Import(unsigned short usModelID)
@@ -100,8 +117,7 @@ bool CClientTXD::Import(unsigned short usModelID)
     {
         if (m_FileData.empty() && m_bIsRawData)
         {
-            m_strLastError = "[Import:Clothes] Raw data buffer was already freed (texture was first used for non-clothes model)";
-            AddReportLog(9401, m_strLastError);
+            m_strLastError = "Raw data buffer unavailable (texture was first used for non-clothes model)";
             return false;
         }
 
@@ -119,15 +135,13 @@ bool CClientTXD::Import(unsigned short usModelID)
             if (!GetFilenameToUse(strUseFilename))
             {
                 if (m_strLastError.empty())
-                    m_strLastError = "[Import:Clothes] Invalid or inaccessible file path";
-                AddReportLog(9401, m_strLastError);
+                    m_strLastError = SString("Cannot access file: %s", ExtractFilename(m_strFilename).c_str());
                 return false;
             }
 
             if (!FileLoad(std::nothrow, strUseFilename, m_FileData))
             {
-                m_strLastError = "[Import:Clothes] Failed to read TXD file from disk";
-                AddReportLog(9401, m_strLastError);
+                m_strLastError = SString("Failed to read file: %s", ExtractFilename(strUseFilename).c_str());
                 return false;
             }
         }
@@ -147,20 +161,26 @@ bool CClientTXD::Import(unsigned short usModelID)
                 if (!GetFilenameToUse(strUseFilename))
                 {
                     if (m_strLastError.empty())
-                        m_strLastError = "[Import:Model] Invalid or inaccessible file path";
-                    AddReportLog(9401, SString("[CClientTXD::Import] GetFilenameToUse failed for model %d: %s", usModelID, m_strLastError.c_str()));
+                        m_strLastError = SString("Cannot access file for model %d: %s", usModelID, ExtractFilename(m_strFilename).c_str());
                     return false;
                 }
-                if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled, &m_strLastError))
+
+                if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled,
+                                                                        &m_strLastError))
                 {
-                    AddReportLog(9401, SString("[CClientTXD::Import] ModelInfoTXDLoadTextures failed for model %d: %s", usModelID, m_strLastError.c_str()));
+                    if (m_strLastError.empty())
+                        m_strLastError = SString("Failed to load textures for model %d: %s", usModelID, ExtractFilename(strUseFilename).c_str());
                     return false;
                 }
             }
             else
             {
                 if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, SString(), m_FileData, m_bFilteringEnabled, &m_strLastError))
+                {
+                    if (m_strLastError.empty())
+                        m_strLastError = SString("Failed to load textures for model %d from buffer", usModelID);
                     return false;
+                }
             }
         }
 
@@ -171,19 +191,14 @@ bool CClientTXD::Import(unsigned short usModelID)
             SString().swap(m_FileData);
         }
 
-        // Have we got textures and haven't already imported into this model?
         if (g_pGame->GetRenderWare()->ModelInfoTXDAddTextures(&m_ReplacementTextures, usModelID))
         {
             Restream(usModelID);
             return true;
         }
-        else
-        {
-            // ModelInfoTXDAddTextures returns false if already imported or failed to get model info
-            if (m_strLastError.empty())
-                m_strLastError = "[Import:Model] Failed to apply textures (already applied to this model, or invalid model ID)";
-            AddReportLog(9401, SString("[CClientTXD::Import] ModelInfoTXDAddTextures failed for model %d: %s", usModelID, m_strLastError.c_str()));
-        }
+
+        if (m_strLastError.empty())
+            m_strLastError = SString("Cannot apply textures to model %d (already applied or invalid model)", usModelID);
     }
 
     return false;
@@ -206,12 +221,15 @@ bool CClientTXD::LoadFromFile(SString filePath)
     if (!GetFilenameToUse(strUseFilename))
     {
         if (m_strLastError.empty())
-            m_strLastError = "[LoadFromFile] Invalid or inaccessible file path";
-        AddReportLog(9401, m_strLastError);
+            m_strLastError = SString("Invalid or inaccessible file: %s", ExtractFilename(m_strFilename).c_str());
         return false;
     }
 
-    return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled, &m_strLastError);
+    const bool ok = g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled, &m_strLastError);
+    if (!ok && m_strLastError.empty())
+        m_strLastError = SString("Failed to load TXD: %s", ExtractFilename(m_strFilename).c_str());
+
+    return ok;
 }
 
 bool CClientTXD::LoadFromBuffer(SString buffer)
@@ -220,14 +238,17 @@ bool CClientTXD::LoadFromBuffer(SString buffer)
 
     if (!g_pCore->GetNetwork()->CheckFile("txd", "", buffer.data(), buffer.size()))
     {
-        m_strLastError = "[LoadFromBuffer] TXD data rejected as invalid";
-        AddReportLog(9401, m_strLastError);
+        m_strLastError = SString("TXD data rejected as invalid (%u bytes)", static_cast<unsigned>(buffer.size()));
         return false;
     }
 
     m_FileData = std::move(buffer);
 
-    return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, SString(), m_FileData, m_bFilteringEnabled, &m_strLastError);
+    const bool ok = g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, SString(), m_FileData, m_bFilteringEnabled, &m_strLastError);
+    if (!ok && m_strLastError.empty())
+        m_strLastError = SString("Failed to load TXD from buffer (%u bytes)", static_cast<unsigned>(m_FileData.size()));
+
+    return ok;
 }
 
 void CClientTXD::Restream(unsigned short usModelID)
@@ -252,80 +273,82 @@ void CClientTXD::Restream(unsigned short usModelID)
     }
 }
 
-// Return filename to use, or false if not valid
 bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
 {
-    // Early out: file must exist
     if (!FileExists(m_strFilename))
     {
-        m_strLastError = "[GetFilenameToUse] TXD file not yet available";
+        m_strLastError = SString("File not found: %s", ExtractFilename(m_strFilename).c_str());
         return false;
     }
 
     CDownloadableResource* pResFile = nullptr;
-    bool bChecksumAlreadyValidated = false;
-    
-    // Static zero checksum - only constructed once
+    bool                   bChecksumAlreadyValidated = false;
+
     static const CChecksum zeroChecksum;
-    
-    // Cached values computed once when pResFile is available
+
     CChecksum serverChecksum;
-    bool bServerHasChecksum = false;
+    bool      bServerHasChecksum = false;
     long long cachedFileSize = -1;
 
-    // Block partial/downloading TXD files
     if (g_pClientGame)
     {
         if (auto* pResMgr = g_pClientGame->GetResourceManager())
         {
             SString strLookup = PathConform(m_strFilename).ToLower();
             pResFile = pResMgr->GetDownloadableResourceFile(strLookup);
-            
-            // Cache server checksum once for this pResFile
+
             if (pResFile)
             {
                 serverChecksum = pResFile->GetServerChecksum();
                 bServerHasChecksum = (serverChecksum != zeroChecksum);
             }
-            
-            if (pResFile && pResFile->IsAutoDownload() && !pResFile->IsDownloaded())
+        }
+    }
+
+    if (pResFile && pResFile->IsAutoDownload() && !pResFile->IsDownloaded())
+    {
+        const long long expectedSize = static_cast<long long>(pResFile->GetDownloadSize());
+
+        if (expectedSize > 0)
+        {
+            cachedFileSize = static_cast<long long>(FileSize(m_strFilename));
+            if (cachedFileSize < 0)
             {
-                // File found in map, is auto-download, but not marked as downloaded yet.
-                // This can happen when another resource tries to access a file before SetDownloaded() is called.
-                // If the file exists and checksum matches server, it's actually ready to use.
-                
-                if (bServerHasChecksum)
-                {
-                    const CChecksum clientChecksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strFilename);
-                    
-                    // Check if checksum generation failed (file locked, I/O error, etc.)
-                    if (clientChecksum == zeroChecksum)
-                    {
-                        m_strLastError = "[GetFilenameToUse] TXD not yet downloaded (cannot read file)";
-                        return false;
-                    }
-                    
-                    if (clientChecksum == serverChecksum)
-                    {
-                        // File exists with correct checksum - it's ready to use!
-                        // Mark it as downloaded to avoid repeated checksum calculations
-                        pResFile->SetDownloaded();
-                        bChecksumAlreadyValidated = true;
-                    }
-                    else
-                    {
-                        // File exists but checksum doesn't match - still downloading or corrupted
-                        m_strLastError = "[GetFilenameToUse] TXD not yet downloaded (wait for onClientFileDownloadComplete)";
-                        return false;
-                    }
-                }
-                else
-                {
-                    // No server checksum to verify against - block until marked as downloaded
-                    m_strLastError = "[GetFilenameToUse] TXD not yet downloaded (wait for onClientFileDownloadComplete)";
-                    return false;
-                }
+                m_strLastError = SString("Cannot read file: %s (download may be in progress)", ExtractFilename(m_strFilename).c_str());
+                return false;
             }
+            if (cachedFileSize != expectedSize)
+            {
+                m_strLastError =
+                    SString("Download incomplete: %s (got %lld of %lld bytes)", ExtractFilename(m_strFilename).c_str(), cachedFileSize, expectedSize);
+                return false;
+            }
+        }
+
+        if (bServerHasChecksum)
+        {
+            const CChecksum clientChecksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strFilename);
+            if (clientChecksum == zeroChecksum)
+            {
+                m_strLastError = SString("Download incomplete: %s (checksum unavailable)", ExtractFilename(m_strFilename).c_str());
+                return false;
+            }
+
+            if (clientChecksum == serverChecksum)
+            {
+                pResFile->SetDownloaded();
+                bChecksumAlreadyValidated = true;
+            }
+            else
+            {
+                m_strLastError = SString("Download incomplete: %s (checksum mismatch during transfer)", ExtractFilename(m_strFilename).c_str());
+                return false;
+            }
+        }
+        else
+        {
+            m_strLastError = SString("Download incomplete: %s (awaiting server verification)", ExtractFilename(m_strFilename).c_str());
+            return false;
         }
     }
 
@@ -336,25 +359,20 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
     if (pResFile)
     {
         const long long expectedSize = static_cast<long long>(pResFile->GetDownloadSize());
-        
-        // Cache file size for reuse (also used in RightSizeTxd logging)
-        cachedFileSize = static_cast<long long>(FileSize(m_strFilename));
 
-        // Fail if we can't read the file size
+        // Cache file size for reuse (also used in RightSizeTxd logging)
+        if (cachedFileSize < 0)
+            cachedFileSize = static_cast<long long>(FileSize(m_strFilename));
+
         if (cachedFileSize < 0)
         {
-            AddReportLog(9402, SString("[CClientTXD::GetFilenameToUse] Cannot read file size for '%s'",
-                m_strFilename.c_str()));
-            m_strLastError = "[GetFilenameToUse] Cannot read TXD file";
+            m_strLastError = SString("Cannot read file: %s", ExtractFilename(m_strFilename).c_str());
             return false;
         }
 
-        // Check size first (cheap) before computing checksum (expensive)
         if (expectedSize > 0 && cachedFileSize != expectedSize)
         {
-            AddReportLog(9402, SString("[CClientTXD::GetFilenameToUse] Size mismatch for '%s': expected=%lld got=%lld",
-                m_strFilename.c_str(), expectedSize, cachedFileSize));
-            m_strLastError = "[GetFilenameToUse] TXD download size mismatch";
+            m_strLastError = SString("Size mismatch: %s (expected %lld, got %lld bytes)", ExtractFilename(m_strFilename).c_str(), expectedSize, cachedFileSize);
             return false;
         }
 
@@ -365,40 +383,25 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
         {
             const CChecksum clientChecksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strFilename);
 
-            // Check if checksum generation failed (returned zero checksum)
             if (clientChecksum == zeroChecksum)
             {
-                AddReportLog(9402, SString("[CClientTXD::GetFilenameToUse] Failed to compute checksum for '%s'",
-                    m_strFilename.c_str()));
-                m_strLastError = "[GetFilenameToUse] Failed to compute TXD checksum";
+                m_strLastError = SString("Cannot verify file: %s (checksum computation failed)", ExtractFilename(m_strFilename).c_str());
                 return false;
             }
 
             if (clientChecksum != serverChecksum)
             {
-                char szMd5Expected[33];
                 char szMd5Got[33];
-                CMD5Hasher::ConvertToHex(serverChecksum.md5, szMd5Expected);
                 CMD5Hasher::ConvertToHex(clientChecksum.md5, szMd5Got);
-
-                AddReportLog(9402, SString("[CClientTXD::GetFilenameToUse] Checksum mismatch for '%s': expected=%s got=%s",
-                    m_strFilename.c_str(), szMd5Expected, szMd5Got));
-                m_strLastError = "[GetFilenameToUse] TXD download checksum mismatch";
+                m_strLastError = SString("Checksum mismatch: %s (file hash: %.8s...)", ExtractFilename(m_strFilename).c_str(), szMd5Got);
                 return false;
             }
-        }
-        else if (expectedSize <= 0 && !bServerHasChecksum)
-        {
-            // Server provided no size or checksum - log but allow (backwards compatibility)
-            AddReportLog(9403, SString("[CClientTXD::GetFilenameToUse] No server validation data for '%s' - skipping integrity check",
-                m_strFilename.c_str()));
         }
     }
 
     if (!g_pCore->GetNetwork()->CheckFile("txd", m_strFilename))
     {
-        m_strLastError = "[GetFilenameToUse] TXD file rejected as invalid";
-        AddReportLog(9401, m_strLastError);
+        m_strLastError = SString("File rejected as invalid: %s", ExtractFilename(m_strFilename).c_str());
         return false;
     }
 
@@ -447,8 +450,8 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
             FileAppend(strShrunkFilename, GenerateSha256HexStringFromFile(strShrunkFilename));
             // Use cached file size if available, otherwise compute it
             const long long originalSizeKB = (cachedFileSize >= 0 ? cachedFileSize : FileSize(m_strFilename)) / 1024;
-            AddReportLog(9400, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8),
-                                       (uint)originalSizeKB, (uint)(FileSize(strShrunkFilename) / 1024)));
+            AddReportLog(9400, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8), (uint)originalSizeKB,
+                                       (uint)(FileSize(strShrunkFilename) / 1024)));
         }
         else
         {
