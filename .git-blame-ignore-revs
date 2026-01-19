@@ -253,3 +253,15 @@ b42518e64803762d27fe6277b36044d1a71fc2c4
 # Date:   Wed April 9 19:01:39 2025 +0300
 #
 # Eliminate the use of http:// across whole project
+
+7cd17bc67c5c2d631b6aaac1ac48521b6922045e
+# Author: qaisjp <qaisjp@gmail.com>
+# Date:   Mon Jan 19 01:50:18 2026 -0500
+#
+# fastmod '}  // namespace [a-zA-Z0-9]+$' '}' Client/ Server/ Shared/
+
+e75ba93362c6ae99d30a95d3f20a1e04ba46a22e
+# Author: qaisjp <qaisjp@gmail.com>
+# Date:   Mon Jan 19 02:08:21 2026 -0500
+#
+# Run utils/clang-format.ps1
