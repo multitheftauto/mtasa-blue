@@ -605,8 +605,8 @@ static int RunInstall()
         return 0;
 
     // Check if server is installed, if not, skip server files during update
-    const bool bServerInstalled = DirectoryExists(PathJoin(targetRoot, "server")) && FileExists(PathJoin(targetRoot, "server/MTA Server.exe"));
-    if (!bServerInstalled)
+    const bool serverInstalled = DirectoryExists(PathJoin(targetRoot, "server")) && FileExists(PathJoin(targetRoot, "server/MTA Server.exe"));
+    if (!serverInstalled)
     {
         // Filter out server files
         size_t originalCount = archiveFiles.size();
