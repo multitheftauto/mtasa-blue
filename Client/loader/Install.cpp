@@ -604,6 +604,22 @@ static int RunInstall()
     if (archiveFiles.empty())
         return 0;
 
+    // Check if server is installed, if not, skip server files during update
+    const bool bServerInstalled = DirectoryExists(PathJoin(targetRoot, "server")) && FileExists(PathJoin(targetRoot, "server/MTA Server.exe"));
+    if (!bServerInstalled)
+    {
+        // Filter out server files
+        size_t originalCount = archiveFiles.size();
+        archiveFiles.erase(std::remove_if(archiveFiles.begin(), archiveFiles.end(),
+            [](const ManifestFile& file) {
+                return file.relativePath.compare(0, 7, "server/") == 0 || file.relativePath.compare(0, 7, "server\\") == 0;
+            }), archiveFiles.end());
+
+        size_t filteredCount = originalCount - archiveFiles.size();
+        if (filteredCount > 0)
+            OutputDebugLine(SString("RunInstall: Skipped %zu server files (server not installed)", filteredCount));
+    }
+
     // Create a backup directory for disaster recovery.
     const SString backupRoot = CreateWritableDirectory(sourceRoot + "_bak_");
 
