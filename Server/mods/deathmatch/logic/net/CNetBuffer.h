@@ -111,26 +111,110 @@ public:
     virtual void SetNetOptions(const SNetOptions& options);
     virtual void GenerateRandomData(void* pOutData, uint uiLength);
 
-    //
-    // Macros of doom to declare function argument structures
-    //
-    #define DOTYPE(func) const static int TYPE_##func = __COUNTER__;
-    #define SETTYPE(func) type=TYPE_##func;
+//
+// Macros of doom to declare function argument structures
+//
+#define DOTYPE(func)  const static int TYPE_##func = __COUNTER__;
+#define SETTYPE(func) type = TYPE_##func;
 
-    #define DECLARE_FUNC_ARGS0(func)                                        DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( ) {SETTYPE(func)} };
-    #define DECLARE_FUNC_ARGS1(func,t1,n1)                                  DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1 ) : n1(n1) {SETTYPE(func)} t1 n1; };
-    #define DECLARE_FUNC_ARGS2(func,t1,n1,t2,n2)                            DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2 ) : n1(n1), n2(n2) {SETTYPE(func)} t1 n1; t2 n2; };
-    #define DECLARE_FUNC_ARGS3(func,t1,n1,t2,n2,t3,n3)                      DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3 ) : n1(n1), n2(n2), n3(n3) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; };
-    #define DECLARE_FUNC_ARGS4(func,t1,n1,t2,n2,t3,n3,t4,n4)                DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4 ) : n1(n1), n2(n2), n3(n3), n4(n4) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; };
-    #define DECLARE_FUNC_ARGS5(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5)          DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4,t5 n5 ) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; t5 n5; };
-    #define DECLARE_FUNC_ARGS6(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5,t6,n6)    DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4,t5 n5,t6 n6 ) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5), n6(n6) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; t5 n5; t6 n6; };
+#define DECLARE_FUNC_ARGS0(func) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args() { SETTYPE(func) } \
+    };
+#define DECLARE_FUNC_ARGS1(func, t1, n1) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1) : n1(n1){SETTYPE(func)} t1 n1; \
+    };
+#define DECLARE_FUNC_ARGS2(func, t1, n1, t2, n2) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2) : n1(n1), n2(n2){SETTYPE(func)} t1 n1; \
+        t2 n2; \
+    };
+#define DECLARE_FUNC_ARGS3(func, t1, n1, t2, n2, t3, n3) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2, t3 n3) : n1(n1), n2(n2), n3(n3){SETTYPE(func)} t1 n1; \
+        t2 n2; \
+        t3 n3; \
+    };
+#define DECLARE_FUNC_ARGS4(func, t1, n1, t2, n2, t3, n3, t4, n4) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2, t3 n3, t4 n4) : n1(n1), n2(n2), n3(n3), n4(n4){SETTYPE(func)} t1 n1; \
+        t2 n2; \
+        t3 n3; \
+        t4 n4; \
+    };
+#define DECLARE_FUNC_ARGS5(func, t1, n1, t2, n2, t3, n3, t4, n4, t5, n5) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2, t3 n3, t4 n4, t5 n5) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5){SETTYPE(func)} t1 n1; \
+        t2 n2; \
+        t3 n3; \
+        t4 n4; \
+        t5 n5; \
+    };
+#define DECLARE_FUNC_ARGS6(func, t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2, t3 n3, t4 n4, t5 n5, t6 n6) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5), n6(n6){SETTYPE(func)} t1 n1; \
+        t2 n2; \
+        t3 n3; \
+        t4 n4; \
+        t5 n5; \
+        t6 n6; \
+    };
 
-    #define DECLARE_FUNC_ARGS0R(ret,func)                                           DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( ) {SETTYPE(func)} ret result; };
-    #define DECLARE_FUNC_ARGS1R(ret,func,t1,n1)                                     DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1 ) : n1(n1) {SETTYPE(func)} t1 n1; ret result; };
-    #define DECLARE_FUNC_ARGS2R(ret,func,t1,n1,t2,n2)                               DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2 ) : n1(n1), n2(n2) {SETTYPE(func)} t1 n1; t2 n2; ret result; };
-    #define DECLARE_FUNC_ARGS3R(ret,func,t1,n1,t2,n2,t3,n3)                         DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3 ) : n1(n1), n2(n2), n3(n3) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; ret result; };
-    #define DECLARE_FUNC_ARGS4R(ret,func,t1,n1,t2,n2,t3,n3,t4,n4)                   DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4 ) : n1(n1), n2(n2), n3(n3), n4(n4) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; ret result; };
-    #define DECLARE_FUNC_ARGS7R(ret,func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5,t6,n6,t7,n7) DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4,t5 n5,t6 n6,t7 n7 ) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5), n6(n6), n7(n7) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; t5 n5; t6 n6; t7 n7; ret result; };
+#define DECLARE_FUNC_ARGS0R(ret, func) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(){SETTYPE(func)} ret result; \
+    };
+#define DECLARE_FUNC_ARGS1R(ret, func, t1, n1) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1) : n1(n1){SETTYPE(func)} t1 n1; \
+        ret result; \
+    };
+#define DECLARE_FUNC_ARGS2R(ret, func, t1, n1, t2, n2) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2) : n1(n1), n2(n2){SETTYPE(func)} t1 n1; \
+        t2  n2; \
+        ret result; \
+    };
+#define DECLARE_FUNC_ARGS3R(ret, func, t1, n1, t2, n2, t3, n3) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2, t3 n3) : n1(n1), n2(n2), n3(n3){SETTYPE(func)} t1 n1; \
+        t2  n2; \
+        t3  n3; \
+        ret result; \
+    };
+#define DECLARE_FUNC_ARGS4R(ret, func, t1, n1, t2, n2, t3, n3, t4, n4) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2, t3 n3, t4 n4) : n1(n1), n2(n2), n3(n3), n4(n4){SETTYPE(func)} t1 n1; \
+        t2  n2; \
+        t3  n3; \
+        t4  n4; \
+        ret result; \
+    };
+#define DECLARE_FUNC_ARGS7R(ret, func, t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6, t7, n7) \
+    DOTYPE(func) struct S##func##Args : SArgs \
+    { \
+        S##func##Args(t1 n1, t2 n2, t3 n3, t4 n4, t5 n5, t6 n6, t7 n7) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5), n6(n6), n7(n7){SETTYPE(func)} t1 n1; \
+        t2  n2; \
+        t3  n3; \
+        t4  n4; \
+        t5  n5; \
+        t6  n6; \
+        t7  n7; \
+        ret result; \
+    };
 
     typedef NetServerPlayerID NetServerPlayerIDRef;
 
@@ -209,7 +293,7 @@ public:
         std::list<CNetJobData*>        m_OutCommandQueue;
         std::list<CNetJobData*>        m_OutResultQueue;
         std::list<SProcessPacketArgs*> m_InResultQueue;
-        std::set<CNetJobData*>         m_FinishedList;            // Result has been used, will be deleted next pulse (shared access with watchdog thread)
+        std::set<CNetJobData*>         m_FinishedList;  // Result has been used, will be deleted next pulse (shared access with watchdog thread)
         CComboMutex                    m_Mutex;
         CNetBufferWatchDog*            m_pWatchDog;
         int                            m_iThreadFrameCount;

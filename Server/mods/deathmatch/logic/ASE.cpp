@@ -18,13 +18,13 @@
 
 extern "C"
 {
-    #include "ASEQuerySDK.h"
+#include "ASEQuerySDK.h"
 }
 
 ASE* ASE::_instance = NULL;
 
 ASE::ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList /*, bool bLan*/)
-    : m_QueryDosProtect(5, 6000, 7000)            // Max of 5 queries per 6 seconds, then 7 second ignore
+    : m_QueryDosProtect(5, 6000, 7000)  // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
     m_tStartTime = time(NULL);
@@ -36,15 +36,15 @@ ASE::ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned shor
 
     m_uiFullLastPlayerCount = 0;
     m_llFullLastTime = 0;
-    m_lFullMinInterval = 10 * 1000;            // Update full query cache after 10 seconds
+    m_lFullMinInterval = 10 * 1000;  // Update full query cache after 10 seconds
 
     m_uiLightLastPlayerCount = 0;
     m_llLightLastTime = 0;
-    m_lLightMinInterval = 10 * 1000;            // Update light query cache after 10 seconds
+    m_lLightMinInterval = 10 * 1000;  // Update light query cache after 10 seconds
 
     m_uiXfireLightLastPlayerCount = 0;
     m_llXfireLightLastTime = 0;
-    m_lXfireLightMinInterval = 10 * 1000;            // Update XFire light query cache after 10 seconds
+    m_lXfireLightMinInterval = 10 * 1000;  // Update XFire light query cache after 10 seconds
 
     m_ulMasterServerQueryCount = 0;
     m_uiNumQueriesTotal = 0;
@@ -123,13 +123,13 @@ bool ASE::SetPortEnabled(bool bInternetEnabled, bool bLanEnabled)
             return false;
         }
 
-        // Set it to non blocking, so we dont have to wait for a packet
-        #ifdef WIN32
+// Set it to non blocking, so we dont have to wait for a packet
+#ifdef WIN32
         unsigned long ulNonBlock = 1;
         ioctlsocket(newSocket, FIONBIO, &ulNonBlock);
-        #else
+#else
         fcntl(newSocket, F_SETFL, fcntl(newSocket, F_GETFL) | O_NONBLOCK);
-        #endif
+#endif
 
         m_SocketList.push_back(newSocket);
     }
@@ -152,7 +152,7 @@ void ASE::DoPulse()
     m_llCurrentTime = GetTickCount64_();
     m_uiCurrentPlayerCount = m_pPlayerManager->Count();
 
-    char szBuffer[100];            // Extra bytes for future use
+    char szBuffer[100];  // Extra bytes for future use
 
     for (uint s = 0; s < m_SocketList.size(); s++)
     {
@@ -176,28 +176,28 @@ void ASE::DoPulse()
             switch (szBuffer[0])
             {
                 case 's':
-                {            // ASE protocol query
+                {  // ASE protocol query
                     m_ulMasterServerQueryCount++;
                     strReply = QueryFullCached();
                     break;
                 }
                 case 'b':
-                {            // Our own lighter query for ingame browser
+                {  // Our own lighter query for ingame browser
                     strReply = QueryLightCached();
                     break;
                 }
                 case 'r':
-                {            // Our own lighter query for ingame browser - Release version only
+                {  // Our own lighter query for ingame browser - Release version only
                     strReply = QueryLightCached();
                     break;
                 }
                 case 'x':
-                {            // Our own lighter query for xfire updates
+                {  // Our own lighter query for xfire updates
                     strReply = QueryXfireLightCached();
                     break;
                 }
                 case 'v':
-                {            // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
+                {  // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
                     strReply = &m_strMtaAseVersion;
                     break;
                 }
@@ -288,12 +288,12 @@ std::string ASE::QueryFull()
 
     // the flags that tell what data we carry per player ( apparently we need all set cause of GM atm )
     unsigned char ucFlags = 0;
-    ucFlags |= 0x01;            // nick
-    ucFlags |= 0x02;            // team
-    ucFlags |= 0x04;            // skin
-    ucFlags |= 0x08;            // score
-    ucFlags |= 0x10;            // ping
-    ucFlags |= 0x20;            // time
+    ucFlags |= 0x01;  // nick
+    ucFlags |= 0x02;  // team
+    ucFlags |= 0x04;  // skin
+    ucFlags |= 0x08;  // score
+    ucFlags |= 0x10;  // ping
+    ucFlags |= 0x20;  // time
 
     char     szTemp[256] = {'\0'};
     CPlayer* pPlayer = NULL;

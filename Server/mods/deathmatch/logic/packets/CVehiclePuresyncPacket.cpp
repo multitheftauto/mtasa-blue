@@ -87,7 +87,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 // Note: here we use a uchar, in the CTT branch this is a uint. Just don't forget that, it might be important
                 uchar trackIndex;
                 BitStream.Read(trackIndex);
-                pTrainTrack = g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(trackIndex);
+                pTrainTrack = g_pGame->GetTrainTrackManager()->GetDefaultTrackByIndex(trackIndex);
 
                 // But we should only actually apply that train-specific data if that vehicle is train on our side
                 if (vehicleType == VEHICLE_TRAIN)

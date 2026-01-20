@@ -20,9 +20,9 @@ class CVehicle;
 #include "CVehicleUpgrades.h"
 #include "CHandlingEntry.h"
 
-#define MAX_VEHICLE_SEATS 9
+#define MAX_VEHICLE_SEATS      9
 #define DEFAULT_VEHICLE_HEALTH 1000
-#define MAX_VEHICLE_HEALTH 10000
+#define MAX_VEHICLE_HEALTH     10000
 
 enum eWheelStatus
 {
@@ -155,9 +155,9 @@ enum class eCarComponentCollisionTypes
 };
 
 #define SIREN_TYPE_FIRST 1
-#define SIREN_TYPE_LAST 6
-#define SIREN_ID_MAX 7
-#define SIREN_COUNT_MAX 8
+#define SIREN_TYPE_LAST  6
+#define SIREN_ID_MAX     7
+#define SIREN_COUNT_MAX  8
 
 struct SSirenBeaconInfo
 {
@@ -509,7 +509,7 @@ private:
     bool       m_bNeedsDimensionResync;
     ushort     m_usLastUnoccupiedSyncDimension;
 
-public:            // 'Safe' variables (that have no need for accessors)
+public:  // 'Safe' variables (that have no need for accessors)
     bool                                   m_bDamageProof;
     uint                                   m_uiDamageInfoSendPhase;
     SFixedArray<unsigned char, MAX_DOORS>  m_ucDoorStates;

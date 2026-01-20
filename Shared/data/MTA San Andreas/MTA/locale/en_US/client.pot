@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-06 11:14+0000\n"
+"POT-Creation-Date: 2026-01-19 01:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,11 +35,11 @@ msgid ""
 "Ensure the game is placed in the 'Program Files (x86)' folder."
 msgstr ""
 
-#: Client/loader/Utils.cpp:606
+#: Client/loader/Utils.cpp:616
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr ""
 
-#: Client/loader/Utils.cpp:974 Client/loader/CInstallManager.cpp:376
+#: Client/loader/Utils.cpp:995 Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid ""
 "MTA:SA needs Administrator access for the following task:\n"
@@ -49,28 +49,28 @@ msgid ""
 "Please confirm in the next window."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1075
+#: Client/loader/Utils.cpp:1096
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr ""
 
-#: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
+#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
+#: Client/loader/Utils.cpp:1481 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1466 Client/loader/Dialogs.cpp:1058
+#: Client/loader/Utils.cpp:1487 Client/loader/Dialogs.cpp:1058
 msgid "Finishing..."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1468 Client/loader/Dialogs.cpp:1062
+#: Client/loader/Utils.cpp:1489 Client/loader/Dialogs.cpp:1062
 msgid "Done!"
 msgstr ""
 
-#: Client/loader/Utils.cpp:1508
+#: Client/loader/Utils.cpp:1529
 #, c-format
 msgid ""
 "New installation of %s detected.\n"
@@ -78,38 +78,38 @@ msgid ""
 "Do you want to copy your settings from %s ?"
 msgstr ""
 
-#: Client/loader/Utils.cpp:1547
+#: Client/loader/Utils.cpp:1568
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr ""
 
-#: Client/loader/Utils.cpp:1569
+#: Client/loader/Utils.cpp:1590
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1594
+#: Client/loader/Utils.cpp:1615
 msgid "GTA:SA had trouble loading a model."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1596
+#: Client/loader/Utils.cpp:1617
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1621
+#: Client/loader/Utils.cpp:1642
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1640
+#: Client/loader/Utils.cpp:1661
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr ""
 
-#: Client/loader/Utils.cpp:1722
+#: Client/loader/Utils.cpp:1743
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr ""
 
-#: Client/loader/Utils.cpp:1787
+#: Client/loader/Utils.cpp:1808
 msgid "Please terminate the following programs before continuing:"
 msgstr ""
 
@@ -214,7 +214,7 @@ msgid ""
 msgstr ""
 
 #: Client/loader/MainFunctions.cpp:996 Client/loader/MainFunctions.cpp:1003
-#: Client/loader/MainFunctions.cpp:1969
+#: Client/loader/MainFunctions.cpp:1973
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 #: Client/game_sa/CGameSA.cpp:270
@@ -342,32 +342,32 @@ msgstr ""
 msgid "Main file has an incorrect name (%s)"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1618
+#: Client/loader/MainFunctions.cpp:1622
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1626
+#: Client/loader/MainFunctions.cpp:1630
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1650
+#: Client/loader/MainFunctions.cpp:1654
 msgid ""
 ".asi files are in the installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1819
+#: Client/loader/MainFunctions.cpp:1823
 msgid "Invalid game paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1827
+#: Client/loader/MainFunctions.cpp:1831
 msgid "Fix configuration issue"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1969
+#: Client/loader/MainFunctions.cpp:1973
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr ""
 
@@ -681,7 +681,7 @@ msgstr ""
 msgid "Don't show again"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:126 Client/game_sa/CSettingsSA.cpp:902
+#: Client/loader/Dialogs.cpp:126 Client/game_sa/CSettingsSA.cpp:910
 msgid "MTA: San Andreas"
 msgstr ""
 
@@ -2000,10 +2000,10 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:5696
 msgid ""
-"It seems that you have the Rich Presence connection option enabled.\n"
-"Do you want to allow servers to share their data?\n"
+"Rich Presence is currently enabled.\n"
+"Do you want to allow data sharing with servers you connect to?\n"
 "\n"
-"This includes yours unique ID identifier."
+"This includes your Discord client ID, and game state info."
 msgstr ""
 
 #: Client/core/CSettings.cpp:5701
@@ -2475,19 +2475,19 @@ msgstr ""
 msgid "Programming"
 msgstr ""
 
-#: Client/core/CCredits.cpp:63
+#: Client/core/CCredits.cpp:67
 msgid "Contributors"
 msgstr ""
 
-#: Client/core/CCredits.cpp:84
+#: Client/core/CCredits.cpp:86
 msgid "Game Design / Scripting"
 msgstr ""
 
-#: Client/core/CCredits.cpp:104
+#: Client/core/CCredits.cpp:105
 msgid "Language Localization"
 msgstr ""
 
-#: Client/core/CCredits.cpp:110
+#: Client/core/CCredits.cpp:111
 msgid "Patch contributors"
 msgstr ""
 
@@ -2828,16 +2828,16 @@ msgid "You have to select a server to connect to."
 msgstr ""
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2009
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2244
 msgid "Problem with graphics driver"
 msgstr ""
 
-#: Client/game_sa/CSettingsSA.cpp:824
+#: Client/game_sa/CSettingsSA.cpp:832
 msgid "Can't find valid screen resolution."
 msgstr ""
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:900
+#: Client/game_sa/CSettingsSA.cpp:908
 msgid "Are you sure you want to use this screen resolution?"
 msgstr ""
 

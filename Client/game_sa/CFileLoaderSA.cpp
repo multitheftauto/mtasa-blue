@@ -66,7 +66,8 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
 {
     const auto nodeNameLen = strlen(nodeName);
 
-    const auto NodeNameEndsWith = [=](const char* with) {
+    const auto NodeNameEndsWith = [=](const char* with)
+    {
         const auto withLen = strlen(with);
         // dassert(withLen <= nodeNameLen);
         return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
@@ -75,7 +76,8 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
 
     // Copy `nodeName` into `outName` with `off` trimmed from the end
     // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
-    const auto TerminatedCopy = [&](size_t off) {
+    const auto TerminatedCopy = [&](size_t off)
+    {
         dassert(nodeNameLen >= off && nodeNameLen - off < OutBuffSize);
         const size_t copyLen = std::min(nodeNameLen - off, OutBuffSize - 1);
         strncpy_s(outName, nodeName, copyLen);
@@ -242,11 +244,12 @@ CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
     SFileObjectInstance inst;
 
     // Use safer scanf with width specifier to prevent buffer overflow
-    int result = sscanf(szLine, "%d %23s %d %f %f %f %f %f %f %f %d", &inst.modelID, szModelName, &inst.interiorID, &inst.position.fX, &inst.position.fY, &inst.position.fZ,
-           &inst.rotation.fX, &inst.rotation.fY, &inst.rotation.fZ, &inst.rotation.fW, &inst.lod);
-    
+    int result = sscanf(szLine, "%d %23s %d %f %f %f %f %f %f %f %d", &inst.modelID, szModelName, &inst.interiorID, &inst.position.fX, &inst.position.fY,
+                        &inst.position.fZ, &inst.rotation.fX, &inst.rotation.fY, &inst.rotation.fZ, &inst.rotation.fW, &inst.lod);
+
     // Check if all expected fields were parsed
-    if (result != 11) {
+    if (result != 11)
+    {
         // Return null or handle error appropriately
         return nullptr;
     }
