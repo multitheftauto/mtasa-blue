@@ -21,19 +21,32 @@
 #include <cef3/cef/include/cef_life_span_handler.h>
 #include <cef3/cef/include/cef_context_menu_handler.h>
 #include <cef3/cef/include/cef_resource_request_handler.h>
+#include <cef3/cef/include/cef_values.h>
 #include <SString.h>
-#include <mmdeviceapi.h>
 #include <audiopolicy.h>
 #include <condition_variable>
-#define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
-#define GetFirstChild(hwnd) GetTopWindow(hwnd)
+#include <functional>
+#include <memory>
+#include <mmdeviceapi.h>
+#include <mutex>
+#include <cstdint>
+#define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT)  // Re-define the conflicting macro
+#define GetFirstChild(hwnd)  GetTopWindow(hwnd)
 
 #define MTA_CEF_USERAGENT "Multi Theft Auto: San Andreas Client " MTA_DM_BUILDTAG_LONG
 
+// Forward declaration for WebViewAuth namespace functions (defined in CWebViewAuth.h)
+class CWebView;
+namespace WebViewAuth
+{
+    bool HandleTriggerLuaEvent(CWebView*, CefRefPtr<CefListValue>, const bool);
+    bool HandleInputFocus(CWebView*, CefRefPtr<CefListValue>, const bool);
+}
+
 enum class ECefThreadState
 {
-    Running = 0,            // CEF thread is currently running
-    Wait                    // CEF thread is waiting for the main thread
+    Running = 0,  // CEF thread is currently running
+    Wait          // CEF thread is waiting for the main thread
 };
 
 class CWebView : public CWebViewInterface,
@@ -48,11 +61,15 @@ class CWebView : public CWebViewInterface,
                  private CefDisplayHandler,
                  private CefContextMenuHandler
 {
+    friend bool WebViewAuth::HandleTriggerLuaEvent(CWebView*, CefRefPtr<CefListValue>, const bool);
+    friend bool WebViewAuth::HandleInputFocus(CWebView*, CefRefPtr<CefListValue>, const bool);
+
 public:
     CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false);
     virtual ~CWebView();
     void                  Initialise();
-    void                  SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface) { m_pEventsInterface = pInterface; };
+    void                  SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface);
+    void                  ClearWebBrowserEvents(CWebBrowserEventsInterface* pInterface);
     void                  CloseBrowser();
     CefRefPtr<CefBrowser> GetCefBrowser() { return m_pWebView; };
 
@@ -72,7 +89,9 @@ public:
 
     void UpdateTexture();
 
-    bool HasInputFocus() { return m_bHasInputFocus; }
+    bool                        HasInputFocus() { return m_bHasInputFocus; }
+    void                        SetInputFocus(bool bFocus) { m_bHasInputFocus = bFocus; }  // Setter for IPC handlers
+    CWebBrowserEventsInterface* GetEventsInterface() { return m_pEventsInterface; }        // Getter for IPC handlers
 
     void ExecuteJavascript(const SString& strJavascriptCode);
 
@@ -109,17 +128,17 @@ public:
     bool CanGoForward();
     bool GoBack();
     bool GoForward();
-    void Refresh(bool ignoreCache);
+    void Refresh(bool bIgnoreCache);
 
     // CefClient methods
-    virtual CefRefPtr<CefRenderHandler>      GetRenderHandler() override { return this; };
-    virtual CefRefPtr<CefLoadHandler>        GetLoadHandler() override { return this; };
-    virtual CefRefPtr<CefRequestHandler>     GetRequestHandler() override { return this; };
-    virtual CefRefPtr<CefLifeSpanHandler>    GetLifeSpanHandler() override { return this; };
-    virtual CefRefPtr<CefJSDialogHandler>    GetJSDialogHandler() override { return this; };
-    virtual CefRefPtr<CefDialogHandler>      GetDialogHandler() override { return this; };
-    virtual CefRefPtr<CefDisplayHandler>     GetDisplayHandler() override { return this; };
-    virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override { return this; };
+    virtual CefRefPtr<CefRenderHandler>      GetRenderHandler() override { return this; }
+    virtual CefRefPtr<CefLoadHandler>        GetLoadHandler() override { return this; }
+    virtual CefRefPtr<CefRequestHandler>     GetRequestHandler() override { return this; }
+    virtual CefRefPtr<CefLifeSpanHandler>    GetLifeSpanHandler() override { return this; }
+    virtual CefRefPtr<CefJSDialogHandler>    GetJSDialogHandler() override { return this; }
+    virtual CefRefPtr<CefDialogHandler>      GetDialogHandler() override { return this; }
+    virtual CefRefPtr<CefDisplayHandler>     GetDisplayHandler() override { return this; }
+    virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override { return this; }
     virtual bool                             OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefProcessId source_process,
                                                                       CefRefPtr<CefProcessMessage> message) override;
 
@@ -152,10 +171,17 @@ public:
 
     // CefLifeSpawnHandler methods
     virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
+#ifdef MTA_MAETRO
+    virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name,
+                               CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures,
+                               CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, CefRefPtr<CefDictionaryValue>& extra_info,
+                               bool* no_javascript_access) override;
+#else
     virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int popup_id, const CefString& target_url,
                                const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture,
                                const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings,
                                CefRefPtr<CefDictionaryValue>& extra_info, bool* no_javascript_access) override;
+#endif
     virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
 
     // CefJSDialogHandler methods
@@ -164,9 +190,14 @@ public:
                             bool& suppress_message) override;
 
     // CefDialogHandler methods
+#ifdef MTA_MAETRO
+    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                              const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback) override;
+#else
     virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, FileDialogMode mode, const CefString& title, const CefString& default_file_path,
-        const std::vector<CefString>& accept_filters, const std::vector<CefString>& accept_extensions, const std::vector<CefString>& accept_descriptions,
-        CefRefPtr<CefFileDialogCallback> callback) override;
+                              const std::vector<CefString>& accept_filters, const std::vector<CefString>& accept_extensions,
+                              const std::vector<CefString>& accept_descriptions, CefRefPtr<CefFileDialogCallback> callback) override;
+#endif
 
     // CefDisplayHandler methods
     virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
@@ -181,21 +212,76 @@ public:
 
 private:
     void ResumeCefThread();
+    void QueueBrowserEvent(const char* name, std::function<void(CWebBrowserEventsInterface*)>&& fn);
+
+    struct FEventTarget
+    {
+        struct DispatchToken
+        {
+            uint64_t generation = 0;
+        };
+
+        DispatchToken CreateDispatchToken() const
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            return DispatchToken{generation};
+        }
+
+        void Assign(CWebBrowserEventsInterface* ptr)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            if (target == ptr)
+                return;
+
+            target = ptr;
+            ++generation;
+        }
+
+        void Clear(CWebBrowserEventsInterface* expected)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            if (target != expected)
+                return;
+
+            target = nullptr;
+            ++generation;
+        }
+
+        template <typename Fn>
+        void Dispatch(const DispatchToken& token, Fn&& fn)
+        {
+            CWebBrowserEventsInterface* current = nullptr;
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                if (generation != token.generation || !target)
+                    return;
+                current = target;
+            }
+
+            fn(current);
+        }
+
+    private:
+        mutable std::mutex          mutex;
+        CWebBrowserEventsInterface* target = nullptr;
+        uint64_t                    generation = 0;
+    };
 
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*      m_pWebBrowserRenderItem;
 
-    std::atomic_bool           m_bBeingDestroyed;
-    bool                       m_bIsLocal;
-    bool                       m_bIsRenderingPaused;
-    bool                       m_bIsTransparent;
-    POINT                      m_vecMousePosition;
-    bool                       m_mouseButtonStates[3];
-    SString                    m_CurrentTitle;
-    float                      m_fVolume;
-    std::map<SString, SString> m_Properties;
-    bool                       m_bHasInputFocus;
-    std::set<std::string>      m_AjaxHandlers;
+    std::atomic_bool              m_bBeingDestroyed;
+    bool                          m_bIsLocal;
+    bool                          m_bIsRenderingPaused;
+    bool                          m_bIsTransparent;
+    POINT                         m_vecMousePosition;
+    bool                          m_mouseButtonStates[3];
+    SString                       m_CurrentTitle;
+    float                         m_fVolume;
+    std::map<SString, SString>    m_Properties;
+    bool                          m_bHasInputFocus;
+    std::set<std::string>         m_AjaxHandlers;
+    std::shared_ptr<FEventTarget> m_pEventTarget;
 
     struct
     {

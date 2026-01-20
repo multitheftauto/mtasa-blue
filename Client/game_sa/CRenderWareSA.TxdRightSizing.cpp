@@ -30,23 +30,45 @@ extern CGameSA*        pGame;
 /////////////////////////////////////////////////////////////////////////////
 bool CRenderWareSA::RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit)
 {
-    //
-    // Read txd from memory
-    //
-    RwStream* pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strInTxdFilename);
-    if (pStream == NULL)
+    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
+    constexpr std::uint32_t RW_CHUNK_TYPE_TXD = 0x16;
+    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
+
+    SString headerData;
+    if (!FileLoad(std::nothrow, strInTxdFilename, headerData, RW_CHUNK_HEADER_SIZE))
         return false;
 
-    // Find our txd chunk
-    if (RwStreamFindChunk(pStream, 0x16, NULL, NULL) == false)
+    if (headerData.size() < RW_CHUNK_HEADER_SIZE)
+        return false;
+
+    std::uint32_t chunkType = 0;
+    std::uint32_t chunkSize = 0;
+    std::memcpy(&chunkType, headerData.data(), sizeof(chunkType));
+    std::memcpy(&chunkSize, headerData.data() + 4, sizeof(chunkSize));
+
+    if (chunkType != RW_CHUNK_TYPE_TXD)
+        return false;
+
+    if (chunkSize > MAX_SANE_CHUNK_SIZE)
+        return false;
+
+    std::uint64_t fileSize = FileSize(strInTxdFilename);
+    if (fileSize < RW_CHUNK_HEADER_SIZE + chunkSize)
+        return false;
+
+    RwStream* pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strInTxdFilename);
+    if (!pStream)
+        return false;
+
+    if (!RwStreamFindChunk(pStream, RW_CHUNK_TYPE_TXD, nullptr, nullptr))
     {
-        RwStreamClose(pStream, NULL);
+        RwStreamClose(pStream, nullptr);
         return false;
     }
 
-    // read the txd
     RwTexDictionary* pTxd = RwTexDictionaryGtaStreamRead(pStream);
-    RwStreamClose(pStream, NULL);
+    RwStreamClose(pStream, nullptr);
+
     if (!pTxd)
         return false;
 
@@ -69,15 +91,35 @@ bool CRenderWareSA::RightSizeTxd(const SString& strInTxdFilename, const SString&
         if (pNewRwTexture && pNewRwTexture != pTexture)
         {
             // Replace texture in txd if changed
-            RwTextureDestroy(pTexture);
-            RwTexDictionaryAddTexture(pTxd, pNewRwTexture);
-            bChanged = true;
+            // Remove old texture from TXD safely before destroying it
+            pGame->GetRenderWareSA()->RwTexDictionaryRemoveTexture(pTxd, pTexture);
+            if (pTexture->txd == nullptr)
+            {
+                RwTextureDestroy(pTexture);
+                // Initialize new texture's TXDList before adding
+                pNewRwTexture->TXDList.next = &pNewRwTexture->TXDList;
+                pNewRwTexture->TXDList.prev = &pNewRwTexture->TXDList;
+                pNewRwTexture->txd = nullptr;
+                RwTexDictionaryAddTexture(pTxd, pNewRwTexture);
+                bChanged = true;
+            }
+            else
+            {
+                // Unlink failed - discard new texture to avoid corruption
+                pNewRwTexture->TXDList.next = &pNewRwTexture->TXDList;
+                pNewRwTexture->TXDList.prev = &pNewRwTexture->TXDList;
+                pNewRwTexture->txd = nullptr;
+                RwTextureDestroy(pNewRwTexture);
+            }
         }
         else
         {
-            // Keep texture (Reinsert to preserve order for easier debugging)
-            RwTexDictionaryRemoveTexture(pTxd, pTexture);
-            RwTexDictionaryAddTexture(pTxd, pTexture);
+            // Reinsert to preserve order (only if texture still linked to this TXD)
+            if (pTexture && pTexture->txd == pTxd)
+            {
+                if (pGame->GetRenderWareSA()->RwTexDictionaryRemoveTexture(pTxd, pTexture))
+                    RwTexDictionaryAddTexture(pTxd, pTexture);
+            }
         }
     }
 
@@ -201,14 +243,13 @@ RwTexture* CRenderWareSA::RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit
     header.TextureFormat.vAddressing = (pTexture->flags & 0xf000) >> 12;
     memcpy(header.TextureFormat.name, pTexture->name, 32);
     memcpy(header.TextureFormat.maskName, pTexture->mask, 32);
-    header.RasterFormat.rasterFormat = (pRaster->format & 0x0f)
-                                       << 8;            // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
+    header.RasterFormat.rasterFormat = (pRaster->format & 0x0f) << 8;  // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
     header.RasterFormat.d3dFormat = pD3DRaster->format;
     header.RasterFormat.width = static_cast<unsigned short>(uiReqWidth);
     header.RasterFormat.height = static_cast<unsigned short>(uiReqHeight);
     header.RasterFormat.depth = static_cast<unsigned char>(pRaster->depth);
     header.RasterFormat.numLevels = 1;
-    header.RasterFormat.rasterType = pRaster->type;            // dxt1 = 4 / dxt3 = 4
+    header.RasterFormat.rasterType = pRaster->type;  // dxt1 = 4 / dxt3 = 4
     header.RasterFormat.alpha = bHasAlpha;
     header.RasterFormat.cubeTexture = bIsCubeTexture;
     header.RasterFormat.autoMipMaps = false;
@@ -218,7 +259,7 @@ RwTexture* CRenderWareSA::RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit
     CBuffer            nativeData;
     CBufferWriteStream stream(nativeData);
     stream.Write(1);
-    stream.Write(0);            // Size ignored
+    stream.Write(0);  // Size ignored
     stream.Write(0x1803FFFF);
     stream.WriteBytes(&header, sizeof(header));
     stream.Write(newPixelBuffer.GetSize());

@@ -248,10 +248,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
     // Make sure our pointers are valid.
     if (pThis != NULL && hwnd == pThis->GetHookedWindowHandle() && g_pCore->AreModulesLoaded())
     {
-        g_pCore->UpdateIsWindowMinimized();            // Force update of stuff
+        g_pCore->UpdateIsWindowMinimized();  // Force update of stuff
 
         if (uMsg == WM_TIMER && wParam == IDT_TIMER1)
-            g_pCore->WindowsTimerHandler();            // Used for 'minimized before first game' pulses
+            g_pCore->WindowsTimerHandler();  // Used for 'minimized before first game' pulses
 
         // Handle IME if input is not for the GUI
         if (!g_pCore->GetLocalGUI()->InputGoesToGUI())
@@ -359,7 +359,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     if ((uMsg == WM_KEYDOWN && wParam == VK_TAB))
                     {
                         SystemState systemState = g_pCore->GetGame()->GetSystemState();
-                        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME || systemState == SystemState::GS_PLAYING_GAME)
+                        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME ||
+                            systemState == SystemState::GS_PLAYING_GAME)
                         {
                             short sCtrlState = GetKeyState(VK_CONTROL);
                             short sShiftState = GetKeyState(VK_SHIFT);
@@ -382,7 +383,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     if ((uMsg == WM_KEYDOWN && (wParam >= VK_1 && wParam <= VK_9)))
                     {
                         SystemState systemState = g_pCore->GetGame()->GetSystemState();
-                        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME || systemState == SystemState::GS_PLAYING_GAME)
+                        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME ||
+                            systemState == SystemState::GS_PLAYING_GAME)
                         {
                             short sCtrlState = GetKeyState(VK_CONTROL);
                             if (sCtrlState & 0x8000)
@@ -406,8 +408,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     if ((uMsg == WM_KEYDOWN && wParam == VK_F8) || (uMsg == WM_CHAR && wParam == '`'))
                     {
                         SystemState systemState = g_pCore->GetGame()->GetSystemState();
-                        if (CLocalGUI::GetSingleton().IsConsoleVisible() || systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME ||
-                            systemState == SystemState::GS_PLAYING_GAME)
+                        if (CLocalGUI::GetSingleton().IsConsoleVisible() || systemState == SystemState::GS_FRONTEND ||
+                            systemState == SystemState::GS_INIT_PLAYING_GAME || systemState == SystemState::GS_PLAYING_GAME)
                         {
                             CLocalGUI::GetSingleton().SetConsoleVisible(!CLocalGUI::GetSingleton().IsConsoleVisible());
                         }
@@ -531,10 +533,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     if (!GetVideoModeManager()->IsWindowed())
                     {
                         if (!CLocalGUI::GetSingleton().GetMainMenu() || !CLocalGUI::GetSingleton().GetMainMenu()->HasStarted())
-                            return true;            // No auto-minimize
+                            return true;  // No auto-minimize
 
                         if (GetVideoModeManager()->IsMultiMonitor() && !GetVideoModeManager()->IsMinimizeEnabled())
-                            return true;            // No auto-minimize
+                            return true;  // No auto-minimize
                     }
                 }
                 /*
@@ -549,7 +551,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                 }
                 */
 
-                if (uMsg == WM_SYSCOMMAND && wParam == 0xF012)            // SC_DRAGMOVE
+                if (uMsg == WM_SYSCOMMAND && wParam == 0xF012)  // SC_DRAGMOVE
                 {
                     CMessageLoopHook::GetSingleton().StartWindowMovement();
                     return true;
