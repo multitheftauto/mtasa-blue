@@ -336,7 +336,14 @@ static bool IsSteamProcess(DWORD pid)
 
     using namespace std::string_view_literals;
 
-    if (processName != L"steam.exe"sv && !processName.ends_with(L"\\steam.exe"sv))
+#if __has_cpp_attribute(__cpp_lib_starts_ends_with)
+    const auto ends_with = [&processName](std::wstring_view with) -> bool { return processName.ends_with(with); };
+#else
+    const auto ends_with = [&processName](std::wstring_view with) -> bool
+    { return processName.size() >= with.size() && processName.compare(processName.size() - with.size(), with.size(), with) == 0; };
+#endif
+
+    if (processName != L"steam.exe"sv && !ends_with(L"\\steam.exe"sv))
         return false;
 
     DWORD exitCode = 0;
