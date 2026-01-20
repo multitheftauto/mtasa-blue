@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "logic/CRegisteredCommands.h"
 #include <game/CWeapon.h>
 #include <game/CTaskManager.h>
 #include <game/Task.h>
@@ -57,10 +58,42 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
         strClumpedCommandUTF = strClumpedCommandUTF.substr(0, MAX_COMMAND_LENGTH);
         strClumpedCommand = UTF16ToMbUTF8(strClumpedCommandUTF);
 
-        g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments);
-
-        // Call the onClientConsole event
         CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
+        
+        // First try to process with registered Lua commands
+        CommandExecutionResult commandResult = g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments, false);
+        
+        // If command was handled by Lua, don't send to server
+        if (commandResult.wasExecuted)
+        {
+            return true; // Command was handled locally, don't send to server
+        }
+        
+        // If no Lua handler was found, trigger onClientCommand event to allow interception
+        CLuaArguments arguments;
+        arguments.PushString(szCommandBufferPointer);
+        arguments.PushBoolean(false); // executedByFunction
+        
+        if (szArguments && *szArguments)
+        {
+            std::istringstream stream{szArguments};
+            for (std::string arg; stream >> arg;)
+            {
+                arguments.PushString(arg.c_str());
+            }
+        }
+        
+        if (localPlayer)
+        {
+            localPlayer->CallEvent("onClientCommand", arguments, false);
+            
+            // If command was handled by onClientCommand event, don't send to server
+            if (g_pClientGame->GetEvents()->WasEventCancelled())
+            {
+                return true; // Command was intercepted and handled
+            }
+        }
+       
 
         if (localPlayer != nullptr)
         {
@@ -108,7 +141,16 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
 
         // Call our comand-handlers for core-executed commands too, if allowed
         if (bAllowScriptedBind)
-            g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments);
+        {
+            CommandExecutionResult coreCommandResult = g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments, false);
+            
+            // If core command failed, don't show unknown message (these are usually keybinds)
+            if (!coreCommandResult.wasExecuted)
+            {
+                // Silently ignore failed keybind commands to prevent spam
+                return true;
+            }
+        }
     }
     return false;
 }
