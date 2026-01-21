@@ -5610,7 +5610,8 @@ struct BrowseFolderThreadData
 {
     WString strTitle;
     wchar_t szResult[MAX_PATH];
-    bool bSuccess;
+    bool    bSuccess;
+    HWND    hParentWindow;
 };
 
 DWORD WINAPI BrowseFolderThread(LPVOID lpParam)
@@ -5624,7 +5625,7 @@ DWORD WINAPI BrowseFolderThread(LPVOID lpParam)
     BROWSEINFOW bi = {0};
     bi.lpszTitle = pData->strTitle;
     bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-    bi.hwndOwner = NULL;
+    bi.hwndOwner = pData->hParentWindow;
 
     LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
 
@@ -5644,18 +5645,35 @@ DWORD WINAPI BrowseFolderThread(LPVOID lpParam)
 bool CSettings::OnCachePathBrowseButtonClick(CGUIElement* pElement)
 {
     SString strCurrentPath = CCore::GetSingleton().GetFileCachePath();
+    HWND    hWnd = CCore::GetSingleton().GetHookedWindow();
 
     BrowseFolderThreadData threadData;
     threadData.strTitle = FromUTF8(_("Select a folder for Client resource files (must be outside MTA folder)"));
     threadData.szResult[0] = 0;
     threadData.bSuccess = false;
+    threadData.hParentWindow = NULL;
+
+    EnableWindow(hWnd, FALSE);
 
     HANDLE hThread = CreateThread(NULL, 0, BrowseFolderThread, &threadData, 0, NULL);
     if (hThread)
     {
-        WaitForSingleObject(hThread, INFINITE);
+        MSG   msg;
+        DWORD dwWaitResult = WaitForSingleObject(hThread, INFINITE);
+        while (dwWaitResult)
+        {
+            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            dwWaitResult = WaitForSingleObject(hThread, 0);
+        }
         CloseHandle(hThread);
     }
+
+    EnableWindow(hWnd, TRUE);
+    SetForegroundWindow(hWnd);
 
     if (threadData.bSuccess)
     {
@@ -5672,22 +5690,16 @@ bool CSettings::OnCachePathBrowseButtonClick(CGUIElement* pElement)
                     m_pCachePathValue->SetText(strDefaultPath);
                     m_pCachePathValue->AutoSize();
 
-                    CCore::GetSingleton().ShowMessageBox(
-                        _("File Cache Path Reset"),
-                        _("File cache path has been reset to default. Changes will take effect after restarting MTA."),
-                        MB_BUTTON_OK | MB_ICON_INFO
-                    );
+                    CCore::GetSingleton().ShowMessageBox(_("File Cache Path Reset"),
+                                                         _("File cache path has been reset to default. Changes will take effect after restarting MTA."),
+                                                         MB_BUTTON_OK | MB_ICON_INFO);
 
                     ShowRestartQuestion();
                 }
             }
             else
             {
-                CCore::GetSingleton().ShowMessageBox(
-                    _("Info"),
-                    _("You are already using the default file cache path."),
-                    MB_BUTTON_OK | MB_ICON_INFO
-                );
+                CCore::GetSingleton().ShowMessageBox(_("Info"), _("You are already using the default file cache path."), MB_BUTTON_OK | MB_ICON_INFO);
             }
         }
         else if (CCore::GetSingleton().ValidateFileCachePath(strSelectedPath, strError))
@@ -5699,39 +5711,26 @@ bool CSettings::OnCachePathBrowseButtonClick(CGUIElement* pElement)
                     m_pCachePathValue->SetText(strSelectedPath);
                     m_pCachePathValue->AutoSize();
 
-                    CCore::GetSingleton().ShowMessageBox(
-                        _("File Cache Path Changed"),
-                        _("The file cache path has been successfully changed. Changes will take effect after restarting MTA."),
-                        MB_BUTTON_OK | MB_ICON_INFO
-                    );
+                    CCore::GetSingleton().ShowMessageBox(_("File Cache Path Changed"),
+                                                         _("The file cache path has been successfully changed. Changes will take effect after restarting MTA."),
+                                                         MB_BUTTON_OK | MB_ICON_INFO);
 
                     ShowRestartQuestion();
                 }
                 else
                 {
-                    CCore::GetSingleton().ShowMessageBox(
-                        _("Error"),
-                        _("Failed to save the file cache path to configuration."),
-                        MB_BUTTON_OK | MB_ICON_ERROR
-                    );
+                    CCore::GetSingleton().ShowMessageBox(_("Error"), _("Failed to save the file cache path to configuration."), MB_BUTTON_OK | MB_ICON_ERROR);
                 }
             }
             else
             {
-                CCore::GetSingleton().ShowMessageBox(
-                    _("Info"),
-                    _("The selected path is the same as the current file cache path."),
-                    MB_BUTTON_OK | MB_ICON_INFO
-                );
+                CCore::GetSingleton().ShowMessageBox(_("Info"), _("The selected path is the same as the current file cache path."),
+                                                     MB_BUTTON_OK | MB_ICON_INFO);
             }
         }
         else
         {
-            CCore::GetSingleton().ShowMessageBox(
-                _("Invalid Path"),
-                strError,
-                MB_BUTTON_OK | MB_ICON_ERROR
-            );
+            CCore::GetSingleton().ShowMessageBox(_("Invalid Path"), strError, MB_BUTTON_OK | MB_ICON_ERROR);
         }
     }
 
@@ -5745,11 +5744,7 @@ bool CSettings::OnCachePathResetButtonClick(CGUIElement* pElement)
 
     if (!strDefaultPath.empty() && PathConform(strCurrentPath) == PathConform(strDefaultPath))
     {
-        CCore::GetSingleton().ShowMessageBox(
-            _("Info"),
-            _("You are already using the default file cache path."),
-            MB_BUTTON_OK | MB_ICON_INFO
-        );
+        CCore::GetSingleton().ShowMessageBox(_("Info"), _("You are already using the default file cache path."), MB_BUTTON_OK | MB_ICON_INFO);
         return true;
     }
 
@@ -5759,21 +5754,15 @@ bool CSettings::OnCachePathResetButtonClick(CGUIElement* pElement)
         m_pCachePathValue->SetText(strDefaultPath);
         m_pCachePathValue->AutoSize();
 
-        CCore::GetSingleton().ShowMessageBox(
-            _("File Cache Path Reset"),
-            _("File cache path has been reset to default. Changes will take effect after restarting MTA."),
-            MB_BUTTON_OK | MB_ICON_INFO
-        );
+        CCore::GetSingleton().ShowMessageBox(_("File Cache Path Reset"),
+                                             _("File cache path has been reset to default. Changes will take effect after restarting MTA."),
+                                             MB_BUTTON_OK | MB_ICON_INFO);
 
         ShowRestartQuestion();
     }
     else
     {
-        CCore::GetSingleton().ShowMessageBox(
-            _("Error"),
-            _("Failed to reset the file cache path."),
-            MB_BUTTON_OK | MB_ICON_ERROR
-        );
+        CCore::GetSingleton().ShowMessageBox(_("Error"), _("Failed to reset the file cache path."), MB_BUTTON_OK | MB_ICON_ERROR);
     }
 
     return true;
