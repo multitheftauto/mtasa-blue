@@ -6766,7 +6766,7 @@ void CClientGame::SetFileCacheRoot()
     else
     {
         // Get shared directory
-        SString strFileCachePath = GetCommonRegistryValue("", "File Cache Path");
+        SString strFileCachePath = g_pCore->GetFileCachePath();
         // Check exists
         if (!strFileCachePath.empty() && DirectoryExists(strFileCachePath))
         {

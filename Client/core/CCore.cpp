@@ -2453,3 +2453,95 @@ std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
 {
     return m_pDiscordRichPresence;
 }
+
+// Get File Cache Path from coreconfig.xml or fallback to registry
+SString CCore::GetFileCachePath()
+{
+    // First check coreconfig.xml
+    CXMLNode* pRoot = GetConfig();
+    if (pRoot)
+    {
+        CXMLNode* pFileCachePath = pRoot->FindSubNode("file_cache_path");
+        if (pFileCachePath)
+        {
+            SString strPath = pFileCachePath->GetTagContent();
+            if (!strPath.empty())
+                return strPath;
+        }
+    }
+
+    // Fallback to registry
+    return GetCommonRegistryValue("", "File Cache Path");
+}
+
+// Set File Cache Path in coreconfig.xml
+bool CCore::SetFileCachePath(const SString& strPath)
+{
+    CXMLNode* pRoot = GetConfig();
+    if (!pRoot)
+        return false;
+
+    CXMLNode* pFileCachePath = pRoot->FindSubNode("file_cache_path");
+    if (!pFileCachePath)
+        pFileCachePath = pRoot->CreateSubNode("file_cache_path");
+
+    pFileCachePath->SetTagContent(strPath);
+    SaveConfig();
+    return true;
+}
+
+// Remove File Cache Path from coreconfig.xml to fallback to registry
+bool CCore::ResetFileCachePath()
+{
+    CXMLNode* pRoot = GetConfig();
+    if (!pRoot)
+        return false;
+
+    CXMLNode* pFileCachePath = pRoot->FindSubNode("file_cache_path");
+    if (pFileCachePath)
+    {
+        pRoot->DeleteSubNode(pFileCachePath);
+        SaveConfig();
+    }
+
+    return true;
+}
+
+// Validate a file cache path
+bool CCore::ValidateFileCachePath(const SString& strPath, SString& strError)
+{
+    if (strPath.empty())
+    {
+        strError = "Path cannot be empty";
+        return false;
+    }
+
+    // Check if directory exists
+    if (!DirectoryExists(strPath))
+    {
+        strError = "Directory does not exist";
+        return false;
+    }
+
+    // Check if path is not inside MTA directory to avoid conflicts
+    SString strMTAPath = GetMTADataPath();
+    SString strNormalizedPath = PathConform(strPath);
+    SString strNormalizedMTAPath = PathConform(strMTAPath);
+
+    if (strNormalizedPath.BeginsWithI(strNormalizedMTAPath))
+    {
+        strError = "Path cannot be inside MTA installation folder to avoid conflicts";
+        return false;
+    }
+
+    // Check if writable
+    SString strTestFile = PathJoin(strPath, "_test_write.tmp");
+    if (!FileSave(strTestFile, "test"))
+    {
+        strError = "Directory is not writable";
+        return false;
+    }
+    FileDelete(strTestFile);
+
+    return true;
+}
