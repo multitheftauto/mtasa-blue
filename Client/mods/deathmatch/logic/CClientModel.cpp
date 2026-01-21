@@ -273,14 +273,15 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             const auto             usParentID = static_cast<unsigned short>(g_pGame->GetModelInfo(m_iModelID)->GetParentID());
 
             // Remove custom upgrade and restore parent
-            unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID, 
-                [=](auto& element) {
-                    element.GetUpgrades()->RemoveUpgrade(m_iModelID);
-                    if (usParentID >= 1000 && usParentID <= 1193)
-                    {
-                        element.GetUpgrades()->AddUpgrade(usParentID, false);
-                    }
-                });
+            unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
+                                      [=](auto& element)
+                                      {
+                                          element.GetUpgrades()->RemoveUpgrade(m_iModelID);
+                                          if (usParentID >= 1000 && usParentID <= 1193)
+                                          {
+                                              element.GetUpgrades()->AddUpgrade(usParentID, false);
+                                          }
+                                      });
             break;
         }
     }

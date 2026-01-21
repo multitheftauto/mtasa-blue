@@ -65,7 +65,7 @@ bool CVehicleUpgrades::IsUpgrade(unsigned short usModel)
 
 bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 {
-    unsigned short us = GetCustomUpgradeParentModelID(usUpgrade);
+    unsigned short     us = GetCustomUpgradeParentModelID(usUpgrade);
     eClientVehicleType vehicleType = m_pVehicle->GetVehicleType();
 
     // No upgrades for trains/boats
@@ -637,7 +637,7 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
                 {
                     pModelInfo->Request(BLOCKING, "CVehicleUpgrades::ForceAddUpgrade");
                 }
-                
+
                 // If this is a custom model with parent ID, swap RwObjects
                 unsigned short parentID = static_cast<unsigned short>(pModelInfo->GetParentID());
                 if (parentID != 0 && IsUpgrade(parentID))
@@ -649,20 +649,20 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
                         {
                             pParentModelInfo->Request(BLOCKING, "CVehicleUpgrades::ForceAddUpgrade (parent)");
                         }
-                        
+
                         // Wait for both to be loaded
                         if (pModelInfo->IsLoaded() && pParentModelInfo->IsLoaded())
                         {
                             RwObject* pCustomRwObject = pModelInfo->GetRwObject();
                             RwObject* pParentRwObject = pParentModelInfo->GetRwObject();
-                            
+
                             if (pCustomRwObject && pParentRwObject)
                             {
                                 // Temporarily swap to custom RwObject ONLY during AddVehicleUpgrade call
                                 pParentModelInfo->SetRwObject(pCustomRwObject);
                                 pVehicle->AddVehicleUpgrade(usUpgrade);
                                 pParentModelInfo->SetRwObject(pParentRwObject);
-                                
+
                                 // Early return since we already added the upgrade
                                 m_SlotStates[ucSlot] = usUpgrade;
                                 if (ucSlot == 12)
