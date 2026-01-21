@@ -5647,6 +5647,16 @@ bool CSettings::OnCachePathBrowseButtonClick(CGUIElement* pElement)
     SString strCurrentPath = CCore::GetSingleton().GetFileCachePath();
     HWND    hWnd = CCore::GetSingleton().GetHookedWindow();
 
+    bool bWasFullscreen = !GetVideoModeManager()->IsWindowed();
+    if (bWasFullscreen)
+    {
+        ShowWindow(hWnd, SW_MINIMIZE);
+    }
+
+    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    bool  wasCursorEnabled = pGUI->IsCursorEnabled();
+    pGUI->SetCursorEnabled(false);
+
     BrowseFolderThreadData threadData;
     threadData.strTitle = FromUTF8(_("Select a folder for Client resource files (must be outside MTA folder)"));
     threadData.szResult[0] = 0;
@@ -5674,6 +5684,14 @@ bool CSettings::OnCachePathBrowseButtonClick(CGUIElement* pElement)
 
     EnableWindow(hWnd, TRUE);
     SetForegroundWindow(hWnd);
+
+    if (wasCursorEnabled)
+        pGUI->SetCursorEnabled(true);
+
+    if (bWasFullscreen)
+    {
+        ShowWindow(hWnd, SW_RESTORE);
+    }
 
     if (threadData.bSuccess)
     {
