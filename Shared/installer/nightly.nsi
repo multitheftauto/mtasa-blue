@@ -225,7 +225,7 @@ LangString  DESC_Section2           ${LANG_ENGLISH} "The MTA:SA modification, al
 ;LangString DESC_Section3           ${LANG_ENGLISH} "The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
 ;LangString DESC_SectionGroupMods   ${LANG_ENGLISH} "Modifications for Multi Theft Auto. Without at least one of these, you cannot play Multi Theft Auto."
 LangString  DESC_SectionGroupServer  ${LANG_ENGLISH}    "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
-LangString  DESC_Section4           ${LANG_ENGLISH} "The Multi Theft Auto server. This is an optional component."
+LangString  DESC_Section4           ${LANG_ENGLISH} "The Multi Theft Auto server. This is a required component."
 LangString  DESC_Section5           ${LANG_ENGLISH} "The MTA:SA modification for the server."
 LangString  DESC_Section6           ${LANG_ENGLISH} "This is a set of required resources for your server."
 LangString  DESC_Section7           ${LANG_ENGLISH} "This is an optional set of gamemodes and maps for your server."
@@ -877,7 +877,7 @@ SectionGroupEnd
 SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
     Section "$(INST_SEC_CORE)" SEC04
         ${LogText} "+Section begin - SERVER CORE"
-        SectionIn 1 2 ; section is now optional
+        SectionIn 1 2 RO ; section is required
 
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
@@ -891,7 +891,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 
     Section "$(INST_SEC_GAME)" SEC05
         ${LogText} "+Section begin - SERVER GAME"
-        SectionIn 1 2 ; section is now optional
+        SectionIn 1 2 RO ; section is required
         SetOutPath "$INSTDIR\server\mods\deathmatch"
 
         SetOverwrite on
