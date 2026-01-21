@@ -2466,7 +2466,19 @@ SString CCore::GetFileCachePath()
         {
             SString strPath = pFileCachePath->GetTagContent();
             if (!strPath.empty())
-                return strPath;
+            {
+                // Check if custom path still exists
+                if (DirectoryExists(strPath))
+                {
+                    return strPath;
+                }
+                else
+                {
+                    // Custom path was deleted, remove from config and fallback to registry
+                    pRoot->DeleteSubNode(pFileCachePath);
+                    SaveConfig();
+                }
+            }
         }
     }
 
