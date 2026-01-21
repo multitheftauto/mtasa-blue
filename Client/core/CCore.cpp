@@ -2458,24 +2458,24 @@ std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
 SString CCore::GetFileCachePath()
 {
     // First check coreconfig.xml
-    CXMLNode* pRoot = GetConfig();
-    if (pRoot)
+    CXMLNode* root = GetConfig();
+    if (root)
     {
-        CXMLNode* pFileCachePath = pRoot->FindSubNode("file_cache_path");
-        if (pFileCachePath)
+        CXMLNode* fileCachePath = root->FindSubNode("file_cache_path");
+        if (fileCachePath)
         {
-            SString strPath = pFileCachePath->GetTagContent();
-            if (!strPath.empty())
+            SString path = fileCachePath->GetTagContent();
+            if (!path.empty())
             {
                 // Check if custom path still exists
-                if (DirectoryExists(strPath))
+                if (DirectoryExists(path))
                 {
-                    return strPath;
+                    return path;
                 }
                 else
                 {
                     // Custom path was deleted, remove from config and fallback to registry
-                    pRoot->DeleteSubNode(pFileCachePath);
+                    root->DeleteSubNode(fileCachePath);
                     SaveConfig();
                 }
             }
@@ -2487,17 +2487,17 @@ SString CCore::GetFileCachePath()
 }
 
 // Set File Cache Path in coreconfig.xml
-bool CCore::SetFileCachePath(const SString& strPath)
+bool CCore::SetFileCachePath(const SString& path)
 {
-    CXMLNode* pRoot = GetConfig();
-    if (!pRoot)
+    CXMLNode* root = GetConfig();
+    if (!root)
         return false;
 
-    CXMLNode* pFileCachePath = pRoot->FindSubNode("file_cache_path");
-    if (!pFileCachePath)
-        pFileCachePath = pRoot->CreateSubNode("file_cache_path");
+    CXMLNode* fileCachePath = root->FindSubNode("file_cache_path");
+    if (!fileCachePath)
+        fileCachePath = root->CreateSubNode("file_cache_path");
 
-    pFileCachePath->SetTagContent(strPath);
+    fileCachePath->SetTagContent(path);
     SaveConfig();
     return true;
 }
@@ -2505,14 +2505,14 @@ bool CCore::SetFileCachePath(const SString& strPath)
 // Remove File Cache Path from coreconfig.xml to fallback to registry
 bool CCore::ResetFileCachePath()
 {
-    CXMLNode* pRoot = GetConfig();
-    if (!pRoot)
+    CXMLNode* root = GetConfig();
+    if (!root)
         return false;
 
-    CXMLNode* pFileCachePath = pRoot->FindSubNode("file_cache_path");
-    if (pFileCachePath)
+    CXMLNode* fileCachePath = root->FindSubNode("file_cache_path");
+    if (fileCachePath)
     {
-        pRoot->DeleteSubNode(pFileCachePath);
+        root->DeleteSubNode(fileCachePath);
         SaveConfig();
     }
 
@@ -2520,40 +2520,40 @@ bool CCore::ResetFileCachePath()
 }
 
 // Validate a file cache path
-bool CCore::ValidateFileCachePath(const SString& strPath, SString& strError)
+bool CCore::ValidateFileCachePath(const SString& path, SString& error)
 {
-    if (strPath.empty())
+    if (path.empty())
     {
-        strError = "Path cannot be empty";
+        error = "Path cannot be empty";
         return false;
     }
 
     // Check if directory exists
-    if (!DirectoryExists(strPath))
+    if (!DirectoryExists(path))
     {
-        strError = "Directory does not exist";
+        error = "Directory does not exist";
         return false;
     }
 
     // Check if path is not inside MTA directory to avoid conflicts
-    SString strMTAPath = GetMTADataPath();
-    SString strNormalizedPath = PathConform(strPath);
-    SString strNormalizedMTAPath = PathConform(strMTAPath);
+    SString mtaPath = GetMTADataPath();
+    SString normalizedPath = PathConform(path);
+    SString normalizedMTAPath = PathConform(mtaPath);
 
-    if (strNormalizedPath.BeginsWithI(strNormalizedMTAPath))
+    if (normalizedPath.BeginsWithI(normalizedMTAPath))
     {
-        strError = "Path cannot be inside MTA installation folder to avoid conflicts";
+        error = "Path cannot be inside MTA installation folder to avoid conflicts";
         return false;
     }
 
     // Check if writable
-    SString strTestFile = PathJoin(strPath, "_test_write.tmp");
-    if (!FileSave(strTestFile, "test"))
+    SString testFile = PathJoin(path, "_test_write.tmp");
+    if (!FileSave(testFile, "test"))
     {
-        strError = "Directory is not writable";
+        error = "Directory is not writable";
         return false;
     }
-    FileDelete(strTestFile);
+    FileDelete(testFile);
 
     return true;
 }

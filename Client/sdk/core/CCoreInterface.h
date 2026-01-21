@@ -136,9 +136,9 @@ public:
     virtual void UpdateRecentlyPlayed() = 0;
 
     virtual SString GetFileCachePath() = 0;
-    virtual bool    SetFileCachePath(const SString& strPath) = 0;
+    virtual bool    SetFileCachePath(const SString& path) = 0;
     virtual bool    ResetFileCachePath() = 0;
-    virtual bool    ValidateFileCachePath(const SString& strPath, SString& strError) = 0;
+    virtual bool    ValidateFileCachePath(const SString& path, SString& error) = 0;
 
     virtual void SwitchRenderWindow(HWND hWnd, HWND hWndInput) = 0;
     virtual void SetCenterCursor(bool bEnabled) = 0;
