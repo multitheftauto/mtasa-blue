@@ -609,10 +609,9 @@ static int RunInstall()
     {
         // Filter out server files
         size_t originalCount = archiveFiles.size();
-        archiveFiles.erase(std::remove_if(archiveFiles.begin(), archiveFiles.end(),
-            [](const ManifestFile& file) {
-                return file.relativePath.compare(0, 7, "server/") == 0 || file.relativePath.compare(0, 7, "server\\") == 0;
-            }), archiveFiles.end());
+        archiveFiles.erase(std::remove_if(archiveFiles.begin(), archiveFiles.end(), [](const ManifestFile& file)
+                                          { return file.relativePath.compare(0, 7, "server/") == 0 || file.relativePath.compare(0, 7, "server\\") == 0; }),
+                           archiveFiles.end());
 
         size_t filteredCount = originalCount - archiveFiles.size();
         if (filteredCount > 0)
