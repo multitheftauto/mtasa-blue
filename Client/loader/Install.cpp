@@ -605,7 +605,7 @@ static int RunInstall()
         return 0;
 
     // Check if server is installed, if not, skip server files during update
-    if (!DirectoryExists(CalcMTASAPath("server")) || !FileExists(CalcMTASAPath("server/MTA Server.exe")))
+    if (!DirectoryExists(CalcMTASAPath("server")))
     {
         // Filter out server files
         size_t originalCount = archiveFiles.size();

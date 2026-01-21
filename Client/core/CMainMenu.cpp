@@ -184,7 +184,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_menuItems.push_back(CreateItem(MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
 
     // Only add Host Game and Map Editor if server folder and MTA Server.exe exist
-    if (DirectoryExists(CalcMTASAPath("server")) && FileExists(CalcMTASAPath("server/MTA Server.exe")))
+    if (DirectoryExists(CalcMTASAPath("server")))
     {
         m_menuItems.push_back(CreateItem(MENU_ITEM_HOST_GAME, "menu_host_game.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
         m_menuItems.push_back(CreateItem(MENU_ITEM_MAP_EDITOR, "menu_map_editor.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
