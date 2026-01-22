@@ -49,6 +49,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehiclePaintjob", GetVehiclePaintjob},
         {"getVehiclePlateText", GetVehiclePlateText},
         {"getVehicleWheelStates", GetVehicleWheelStates},
+        {"getVehicleWheelState", ArgumentParser<GetVehicleWheelState>},
         {"isVehicleWheelOnGround", IsVehicleWheelCollided},
         {"isVehicleDamageProof", IsVehicleDamageProof},
         {"isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable},
@@ -229,6 +230,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getPaintjob", "getVehiclePaintjob");
     lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
+    lua_classfunction(luaVM, "getWheelState", "getVehicleWheelState");
     lua_classfunction(luaVM, "isWheelOnGround", "isVehicleWheelOnGround");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getVariant", "getVehicleVariant");
@@ -986,6 +988,17 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<unsigned char, bool> CLuaVehicleDefs::GetVehicleWheelState(CClientVehicle* vehicle, std::uint8_t wheelIndex)
+{
+    if (!vehicle)
+        return false;
+
+    if (wheelIndex >= MAX_WHEELS)
+        return false;
+    
+    return vehicle->GetWheelStatus(static_cast<eWheelPosition>(wheelIndex));
 }
 
 int CLuaVehicleDefs::IsVehicleWheelCollided(lua_State* luaVM)
