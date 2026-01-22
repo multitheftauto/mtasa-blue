@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 
+#include "Wine.h"
 #include "MainFunctions.h"
 #include "Main.h"
 #include "Utils.h"
@@ -25,6 +26,7 @@
 #include <set>
 #include <string>
 #include <locale.h>
+#include <windows.h>
 #include <DbgHelp.h>
 #pragma comment(lib, "dbghelp.lib")
 
@@ -1215,6 +1217,12 @@ void ValidateGTAPath()
 //////////////////////////////////////////////////////////
 void CheckAntiVirusStatus()
 {
+    if (Wine::IsRunningOnWine())
+    {
+        WriteDebugEvent("Skipping AV check under Wine");
+        return;
+    }
+
     std::vector<SString> enabledList, disabledList;
     GetWMIAntiVirusStatus(enabledList, disabledList);
 
