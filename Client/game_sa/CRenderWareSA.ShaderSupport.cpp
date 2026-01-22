@@ -87,7 +87,7 @@ __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 // called from streaming on TXD create
 static void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 {
-    _asm
+    __asm
     {
         // Hooked from 731D55  6 bytes
 
@@ -120,7 +120,7 @@ __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 // called from streaming on TXD destroy
 static void _declspec(naked) HOOK_CTxdStore_RemoveTxd()
 {
-    _asm
+    __asm
     {
         // Hooked from 731E90  6 bytes
 
@@ -189,17 +189,17 @@ void CRenderWareSA::PulseWorldTextureWatch()
             for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
             {
                 RwTexture*  texture = *iter;
-                
+
                 // Validate texture pointer (TXD could unload mid-iteration)
                 if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
                     continue;
-                
+
                 const char* szTextureName = texture->name;
-                
+
                 // Check raster pointer
                 CD3DDUMMY*  pD3DData = (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster)))
                     ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
-                
+
                 if (!MapContains(m_SpecialTextures, texture))
                     StreamingAddedTexture(action.usTxdId, szTextureName, pD3DData);
             }
@@ -579,7 +579,7 @@ void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntity
     SString strLower = strTextureNameMatch.ToLower();
     bool bHasRemap = strLower.Contains("remap");
     bool bHasWhite = strLower.Contains("white");
-    
+
     // Check for "remap" anywhere in the pattern (case-insensitive)
     if (bHasRemap)
     {
@@ -589,7 +589,7 @@ void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntity
         {
             m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strInternalPattern, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime,
                                                         bShaderUsesVertexShader, bAppendLayers);
-            
+
             // If pattern also contains "white", register the doubly-transformed variant
             // e.g., "white_remap*" -> "@hite_#emap*"
             if (bHasWhite)
@@ -644,14 +644,14 @@ void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEnt
     SString strLower = strTextureNameMatch.ToLower();
     bool bHasRemap = strLower.Contains("remap");
     bool bHasWhite = strLower.Contains("white");
-    
+
     if (bHasRemap)
     {
         SString strInternalPattern = strTextureNameMatch.ReplaceI("remap", "#emap");
         if (strInternalPattern != strTextureNameMatch)
         {
             m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strInternalPattern);
-            
+
             // If pattern also contains "white", register the doubly-transformed variant
             if (bHasWhite)
             {
@@ -686,7 +686,7 @@ void CRenderWareSA::OnTextureStreamIn(STexInfo* pTexInfo)
 {
     if (!pTexInfo)
         return;
-    
+
     // Insert into all channels that match the name
     m_pMatchChannelManager->InsertTexture(pTexInfo);
 }
@@ -702,7 +702,7 @@ void CRenderWareSA::OnTextureStreamOut(STexInfo* pTexInfo)
 {
     if (!pTexInfo)
         return;
-    
+
     m_pMatchChannelManager->RemoveTexture(pTexInfo);
 }
 
@@ -875,7 +875,7 @@ __declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTextur
 DWORD RETURN_RwTextureSetName = 0x7F38A9;
 static void _declspec(naked) HOOK_RwTextureSetName()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -909,7 +909,7 @@ __declspec(noinline) void OnMY_RwTextureDestroy_Mid(RwTexture* pTexture)
 DWORD RETURN_RwTextureDestroy_Mid = 0x07F3839;
 static void _declspec(naked) HOOK_RwTextureDestroy_Mid()
 {
-    _asm
+    __asm
     {
         pushad
         push    esi
@@ -953,7 +953,7 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 DWORD RETURN_RwIm3DRenderIndexedPrimitive = 0x07EF555;
 static void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -1003,7 +1003,7 @@ __declspec(noinline) void OnMY_RwIm3DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 DWORD RETURN_RwIm3DRenderPrimitive = 0x07EF6B6;
 static void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -1053,7 +1053,7 @@ __declspec(noinline) void OnMY_RwIm2DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 DWORD RETURN_RwIm2DRenderIndexedPrimitive = 0x0403927;
 static void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -1104,7 +1104,7 @@ __declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 DWORD RETURN_RwIm2DRenderPrimitive = 0x0734E95;
 static void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*0]

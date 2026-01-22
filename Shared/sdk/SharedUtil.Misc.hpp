@@ -164,7 +164,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                 if (bufferTooSmall)
                 {
                     corePathBuffer.resize(MAX_UNICODE_PATH);
-                    
+
                     lengthCore = GetModuleFileNameW(hCoreModule, &corePathBuffer[0], static_cast<DWORD>(corePathBuffer.size()));
                     if (lengthCore > 0 && static_cast<size_t>(lengthCore) < corePathBuffer.size())
                     {
@@ -177,7 +177,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                 }
 
                 std::vector<wchar_t> fullPath(bufferSize);
-                
+
                 DWORD lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr);
                 if (lengthFull > 0)
                 {
@@ -188,7 +188,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                         if (lastSeparator != std::wstring::npos)
                         {
                             std::wstring currentPath = fullPathStr.substr(0, lastSeparator);
-                            
+
                             // Walk up to find MTA/ folder
                             // Stop at first MTA folder found - it's guaranteed to be the correct one
                             // Check current directory and up to 2 parent levels
@@ -196,13 +196,13 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                             {
                                 // Extract folder name from current path
                                 const size_t lastSep = currentPath.find_last_of(L"\\/");
-                                std::wstring folderName = (lastSep != std::wstring::npos) 
-                                    ? currentPath.substr(lastSep + 1) 
+                                std::wstring folderName = (lastSep != std::wstring::npos)
+                                    ? currentPath.substr(lastSep + 1)
                                     : currentPath;
-                                
+
                                 // Convert to lowercase for case-insensitive comparison
                                 std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
-                                
+
                                 if (folderName == L"mta")
                                 {
                                     // Found MTA folder - base directory is its parent
@@ -217,7 +217,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                                     }
                                     return;  // Always stop at first MTA folder found
                                 }
-                                
+
                                 // Move up one level
                                 if (lastSep != std::wstring::npos)
                                     currentPath = currentPath.substr(0, lastSep);
@@ -232,7 +232,7 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
                     {
                         if (static_cast<size_t>(lengthFull) > MAX_UNICODE_PATH)
                             return;  // Path too long, validation failed
-                        
+
                         std::wstring fullPathBuffer;
                         fullPathBuffer.resize(static_cast<size_t>(lengthFull));
                         lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPathBuffer.size()), &fullPathBuffer[0], nullptr);
@@ -342,7 +342,7 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
                     WCHAR szModuleName[MAX_PATH * 2] = {0};
                     DWORD dwSize = GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName) - 1);
                     CloseHandle(hProcess);
-                    
+
                     if (dwSize > 0)
                     {
                         // Ensure null termination
@@ -739,9 +739,9 @@ SString SharedUtil::GetPostUpdateConnect()
     {
         char* endptr;
         long long result = strtoll(strTimeString.c_str(), &endptr, 10);
-        
+
         // Check for valid conversion
-        if (endptr != strTimeString.c_str() && *endptr == '\0' && 
+        if (endptr != strTimeString.c_str() && *endptr == '\0' &&
             result >= 0 && result <= LLONG_MAX)
         {
             timeThen = static_cast<time_t>(result);
@@ -795,14 +795,14 @@ int SharedUtil::GetApplicationSettingInt(const SString& strPath, const SString& 
 
     char* endptr;
     long result = strtol(strValue.c_str(), &endptr, 10);
-    
+
     // Check for conversion errors
     if (endptr == strValue.c_str() || *endptr != '\0')
         return 0;  // Invalid conversion
 
     if (result > INT_MAX || result < INT_MIN)
         return 0;
-    
+
     return static_cast<int>(result);
 }
 
@@ -1283,10 +1283,10 @@ void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, c
     GetSystemTime(&s);
 
     // Use _snprintf_s to prevent buffer overflow and ensure null termination
-    int result = _snprintf_s(szOutput, TOTAL_BUFFER_SIZE, _TRUNCATE, 
-                            "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", 
-                            uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, 
-                            (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown", 
+    int result = _snprintf_s(szOutput, TOTAL_BUFFER_SIZE, _TRUNCATE,
+                            "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n",
+                            uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond,
+                            (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown",
                             (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
 
     OutputDebugString("[ReportLog] ");
@@ -1701,7 +1701,7 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
 
         if (lookup.module)
             lookup.function = static_cast<FunctionPointer>(static_cast<void*>(GetProcAddress(lookup.module, "NtQueryInformationThread")));
-        else 
+        else
             return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
     }
 
@@ -1999,16 +1999,16 @@ std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
     if (input.empty())
         return L"";
-        
+
     size_t len = mbstowcs(NULL, input.c_str(), input.length());
     if (len == (size_t)-1)
         return L"?";
-    
+
     std::vector<wchar_t> wcsOutput(len + 1);  // Use vector for automatic cleanup
     size_t result = mbstowcs(wcsOutput.data(), input.c_str(), len);
     if (result == (size_t)-1 || result != len)
         return L"?";
-    
+
     wcsOutput[len] = 0;  // Null terminate the string
     return std::wstring(wcsOutput.data());
 }
@@ -2282,7 +2282,7 @@ namespace SharedUtil
     #elif defined(WIN_arm) || defined(WIN_arm64)
         return 0;
     #else
-        _asm
+        __asm
         {
             mov eax, 1
             cpuid
@@ -2315,7 +2315,7 @@ namespace SharedUtil
         };
 
         static ProcessorNumberLookup lookup = {};
-																																		   
+
 
         if (!lookup.once)
         {

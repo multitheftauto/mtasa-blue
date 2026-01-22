@@ -537,7 +537,7 @@ void CHudSA::ResetComponentPlacement(const eHudComponent& component, bool resetS
 }
 
 void CHudSA::SetComponentColor(const eHudComponent& component, std::uint32_t color, bool secondColor) noexcept
-{ 
+{
     SColor newColor = TOCOLOR2SCOLOR(color);
     auto&  compRef = GetHudComponentRef(component);
 
@@ -892,7 +892,7 @@ void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
 static constexpr std::uintptr_t CONTINUE_RenderWanted = 0x58DFD8;
 static void _declspec(naked) HOOK_RenderWanted()
 {
-    _asm
+    __asm
     {
         cmp ebp, edi
         jle empty

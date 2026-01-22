@@ -49,7 +49,7 @@ void OnMY_Rtl_fopen_Post(FILE* fh, DWORD calledFrom, const char* szFilename, con
 DWORD RETURN_Rtl_fopen = 0x8232DE;
 void _declspec(naked) HOOK_Rtl_fopen()
 {
-    _asm
+    __asm
     {
         push    [esp+4*3]
         push    [esp+4*3]
@@ -93,7 +93,7 @@ void OnMY_Rtl_fclose(DWORD calledFrom, FILE* fh)
 DWORD RETURN_Rtl_fclose = 0x823192;
 void _declspec(naked) HOOK_Rtl_fclose()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*1]

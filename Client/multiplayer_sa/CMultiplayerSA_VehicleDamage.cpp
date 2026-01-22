@@ -65,7 +65,7 @@ DWORD RETURN_CAutomobile_BurstTyre_A = 0x06A3321;
 DWORD RETURN_CAutomobile_BurstTyre_B = 0x06A3425;
 void _declspec(naked) HOOK_CAutomobile_BurstTyre()
 {
-    _asm
+    __asm
     {
         pushad
         push    edi
@@ -102,7 +102,7 @@ DWORD RETURN_CBike_BurstTyre_A = 0x06BEB9E;
 DWORD RETURN_CBike_BurstTyre_B = 0x06BECA5;
 void _declspec(naked) HOOK_CBike_BurstTyre()
 {
-    _asm
+    __asm
     {
         pushad
         movzx   eax, bl
@@ -151,7 +151,7 @@ bool OnMY_CVehicle_InflictDamage(CVehicleSAInterface* pVehicle, CEntitySAInterfa
 DWORD RETURN_CVehicle_InflictDamage = 0x0404CDC;
 void _declspec(naked) HOOK_CVehicle_InflictDamage()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -205,7 +205,7 @@ void OnMY_CVehicle_VehicleDamage1(CVehicleSAInterface* pVehicle, float f, ushort
 DWORD RETURN_CAutomobile_VehicleDamage1 = 0x06A7657;
 void _declspec(naked) HOOK_CAutomobile_VehicleDamage1()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -264,7 +264,7 @@ float OnMY_CVehicle_VehicleDamage2(CVehicleSAInterface* pVehicle, float fDamage)
 DWORD RETURN_CAutomobile_VehicleDamage2 = 0x06A832B;
 void _declspec(naked) HOOK_CAutomobile_VehicleDamage2()
 {
-    _asm
+    __asm
     {
         pushad
         fstp    [esp-4] // Pop loss
@@ -295,7 +295,7 @@ void _declspec(naked) HOOK_CAutomobile_VehicleDamage2()
 DWORD RETURN_CPlane_VehicleDamage1 = 0x06CC4B8;
 void _declspec(naked) HOOK_CPlane_VehicleDamage1()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -330,7 +330,7 @@ void _declspec(naked) HOOK_CPlane_VehicleDamage1()
 DWORD RETURN_CPlane_VehicleDamage2 = 0x06CC6CE;
 void _declspec(naked) HOOK_CPlane_VehicleDamage2()
 {
-    _asm
+    __asm
     {
         pushad
         fstp    [esp-4] // Pop loss
@@ -361,7 +361,7 @@ void _declspec(naked) HOOK_CPlane_VehicleDamage2()
 DWORD RETURN_CBike_VehicleDamage1 = 0x06B8EC5;
 void _declspec(naked) HOOK_CBike_VehicleDamage1()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -396,7 +396,7 @@ void _declspec(naked) HOOK_CBike_VehicleDamage1()
 DWORD RETURN_CBike_VehicleDamage2 = 0x06B91C8;
 void _declspec(naked) HOOK_CBike_VehicleDamage2()
 {
-    _asm
+    __asm
     {
         pushad
         fstp    [esp-4] // Pop loss

@@ -36,7 +36,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
 
     DWORD dwPedPointer = 0;
-    _asm
+    __asm
     {
         push    SIZEOF_CPLAYERPED
         call    CPedOperatorNew
@@ -162,7 +162,7 @@ void CPlayerPedSA::SetInitialState()
     DWORD dwUnknown = 1;
     DWORD dwFunction = FUNC_SetInitialState;
     DWORD dwThis = (DWORD)m_pInterface;
-    _asm
+    __asm
     {
         push    dwUnknown
         mov     ecx, dwThis
@@ -293,7 +293,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
 
     DWORD dwThis = (DWORD)pedInterface;
     DWORD dwFunc = FUNC_CPlayerPed_ReApplyMoveAnims;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -445,7 +445,7 @@ __declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAI
 DWORD RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
 void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
-    _asm
+    __asm
     {
         pushad
         push    eax
@@ -497,7 +497,7 @@ __declspec(noinline) int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqM
 DWORD RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
 void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 {
-    _asm
+    __asm
     {
         mov     eax, 0x05A7FB0      // CClothes::GetPlayerMotionGroupToLoad
         call    eax

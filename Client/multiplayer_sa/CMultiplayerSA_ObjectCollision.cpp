@@ -48,7 +48,7 @@ static const DWORD CONTINUE_CObject_Init = 0x59F8DC;
 
 static void _declspec(naked) HOOK_CObject_Init()
 {
-    _asm
+    __asm
     {
         pushad
         push    esi     // CObjectSAInterface*
@@ -87,7 +87,7 @@ static const DWORD CONTINUE_CObject_Destructor = 0x59F709;
 
 static void _declspec(naked) HOOK_CObject_Destructor()
 {
-    _asm
+    __asm
     {
         pushad
         push    esi     // CObjectSAInterface*

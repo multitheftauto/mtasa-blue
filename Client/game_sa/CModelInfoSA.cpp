@@ -227,7 +227,7 @@ bool CModelInfoSA::IsBoat()
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -242,7 +242,7 @@ bool CModelInfoSA::IsCar()
     DWORD dwFunction = FUNC_IsCarModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -257,7 +257,7 @@ bool CModelInfoSA::IsTrain()
     DWORD dwFunction = FUNC_IsTrainModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -272,7 +272,7 @@ bool CModelInfoSA::IsHeli()
     DWORD dwFunction = FUNC_IsHeliModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -287,7 +287,7 @@ bool CModelInfoSA::IsPlane()
     DWORD dwFunction = FUNC_IsPlaneModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -302,7 +302,7 @@ bool CModelInfoSA::IsBike()
     DWORD dwFunction = FUNC_IsBikeModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -317,7 +317,7 @@ bool CModelInfoSA::IsFakePlane()
     DWORD dwFunction = FUNC_IsFakePlaneModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -332,7 +332,7 @@ bool CModelInfoSA::IsMonsterTruck()
     DWORD dwFunction = FUNC_IsMonsterTruckModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -347,7 +347,7 @@ bool CModelInfoSA::IsQuadBike()
     DWORD dwFunction = FUNC_IsQuadBikeModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -362,7 +362,7 @@ bool CModelInfoSA::IsBmx()
     DWORD dwFunction = FUNC_IsBmxModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -377,7 +377,7 @@ bool CModelInfoSA::IsTrailer()
     DWORD dwFunction = FUNC_IsTrailerModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunction
@@ -437,7 +437,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
-        _asm
+        __asm
         {
             push    eax
             push    ebx
@@ -473,7 +473,7 @@ uint CModelInfoSA::GetAnimFileIndex()
 
     DWORD dwThis = (DWORD)m_pInterface;
     uint  uiReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
@@ -894,7 +894,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
     DWORD         dwFunc = FUNC_GetBoundingBox;
     DWORD         ModelID = m_dwModelID;
     CBoundingBox* dwReturn = 0;
-    _asm
+    __asm
     {
         push    ModelID
         call    dwFunc
@@ -1281,7 +1281,7 @@ void CModelInfoSA::RestreamIPL()
 // Helper to call entity's DeleteRwObject virtual method
 static void DeleteEntityRwObject(CEntitySAInterface* pEntity)
 {
-    _asm
+    __asm
     {
         mov ecx, pEntity
         mov eax, [ecx]
@@ -1554,7 +1554,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         if (pInterface && pInterface->usNumberOfRefs > 1)
         {
             DWORD                      dwFunction = FUNC_RemoveRef;
-            _asm
+            __asm
             {
                 mov     ecx, pInterface
                 call    dwFunction
@@ -1625,7 +1625,7 @@ short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
     if (usUpgrade >= 1000 && usUpgrade <= 1193)
     {
         DWORD ModelID = m_dwModelID;
-        _asm
+        __asm
         {
             mov     eax, ModelID
 
@@ -1647,7 +1647,7 @@ bool CModelInfoSA::IsUpgradeAvailable(eVehicleUpgradePosn posn)
 {
     bool  bRet = false;
     DWORD ModelID = m_dwModelID;
-    _asm
+    __asm
     {
         mov     eax, ModelID
         mov ecx, dword ptr[ARRAY_ModelInfo]
@@ -1673,7 +1673,7 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
 {
     char* szStoredText;
     DWORD ModelID = m_dwModelID;
-    _asm
+    __asm
     {
         push    ecx
         mov     ecx, ModelID
@@ -1699,7 +1699,7 @@ unsigned int CModelInfoSA::GetNumRemaps()
     DWORD        dwFunc = FUNC_CVehicleModelInfo__GetNumRemaps;
     DWORD        ModelID = m_dwModelID;
     unsigned int uiReturn = 0;
-    _asm
+    __asm
     {
         mov     ecx, ModelID
 
@@ -2836,7 +2836,7 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 DWORD RETURN_NodeNameStreamRead = 0x072FA77;
 static void _declspec(naked) HOOK_NodeNameStreamRead()
 {
-    _asm
+    __asm
     {
         pushad
         push    edi
@@ -3125,7 +3125,7 @@ bool CModelInfoSA::ForceUnload()
     uint  uiLimit = 100;
     while (pInterface->usNumberOfRefs > 0 && uiLimit--)
     {
-        _asm
+        __asm
         {
             mov     ecx, pInterface
             call    dwFunction

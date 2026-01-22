@@ -252,7 +252,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     if (IsUpgradeModelId(dwModelID))
     {
         DWORD dwFunc = FUNC_RequestVehicleUpgrade;
-        _asm
+        __asm
         {
             push    dwFlags
             push    dwModelID
@@ -284,7 +284,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
         }
 
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
-        _asm
+        __asm
         {
             push    dwFlags
             push    dwModelID
@@ -307,7 +307,7 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
-    _asm
+    __asm
     {
         push    dwOnlyPriorityModels
         call    dwFunction
@@ -328,7 +328,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         bool  bReturn;
         DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
-        _asm
+        __asm
         {
             push    dwModelID
             call    dwFunc
@@ -341,7 +341,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
         bool  bReturn = 0;
-        _asm
+        __asm
         {
             push    dwModelID
             call    dwFunc
@@ -356,7 +356,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
     DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
-    _asm
+    __asm
     {
         push    channel
         push    szTexture
@@ -490,7 +490,7 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
     numBlocks += numBlocks % 2; // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
-    
+
     // Check if the size is the same already
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
         return true;

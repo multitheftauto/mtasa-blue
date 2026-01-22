@@ -1152,7 +1152,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
-        _asm
+        __asm
         {
             mov     ecx, dwThis
             mov     ecx, [ecx]

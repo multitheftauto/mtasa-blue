@@ -50,7 +50,7 @@ DWORD RETURN_CallIdle = 0x53ECC2;
 DWORD DO_CallIdle = 0x53E920;
 void _declspec(naked) HOOK_CallIdle()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMY_CallIdle_Pre
@@ -116,7 +116,7 @@ void OnMY_CEntity_Render_Post()
 DWORD RETURN_CEntity_Render = 0x534317;
 void _declspec(naked) HOOK_CEntity_Render()
 {
-    _asm
+    __asm
     {
         pushad
         push    ecx
@@ -169,7 +169,7 @@ void OnMY_CEntity_RenderOneNonRoad_Post(CEntitySAInterface* pEntity)
 DWORD RETURN_CEntity_RenderOneNonRoad = 0x553265;
 void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*1]
@@ -216,7 +216,7 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(CPedSAInterface* pEntity)
 DWORD RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
 void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
 {
-    _asm
+    __asm
     {
         pushad
         push    ebx
@@ -247,7 +247,7 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 #define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End               5
 void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End
@@ -273,7 +273,7 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 DWORD RETURN_Check_NoOfVisibleLods = 0x5534FF;
 void _declspec(naked) HOOK_Check_NoOfVisibleLods()
 {
-    _asm
+    __asm
     {
         cmp     eax, 999            // Array limit is 1000
         jge     limit
@@ -297,7 +297,7 @@ limit:
 DWORD RETURN_Check_NoOfVisibleEntities = 0x553533;
 void _declspec(naked) HOOK_Check_NoOfVisibleEntities()
 {
-    _asm
+    __asm
     {
         cmp     eax, 999        // Array limit is 1000
         jge     limit
@@ -325,7 +325,7 @@ void OnMY_WinLoop()
 DWORD RETURN_WinLoop = 0x748A98;
 void _declspec(naked) HOOK_WinLoop()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMY_WinLoop
@@ -348,14 +348,14 @@ void _declspec(naked) HOOK_WinLoop()
 static const DWORD CONTINUE_CTimer_Update = 0x561B16;
 static void _declspec(naked) HOOK_CTimer_Update()
 {
-    _asm
+    __asm
     {
         pushad
     }
 
     g_pCore->OnGameTimerUpdate();
 
-    _asm
+    __asm
     {
         popad
         // Original code: mov ecx, ds:_timerFunction
@@ -377,17 +377,17 @@ static void _declspec(naked) HOOK_CTimer_Update()
 static const DWORD CONTINUE_CTimer_Suspend = 0x5619EF;
 static void _declspec(naked) HOOK_CTimer_Suspend()
 {
-    _asm
+    __asm
     {
         // Check if _timerFunction is NULL
         mov     eax, dword ptr ds:[0B7CB28h]
         test    eax, eax
         jz      skip_suspend
-        
+
         // Original code: call [_timerFunction]
         call    eax
         jmp     CONTINUE_CTimer_Suspend
-        
+
     skip_suspend:
         // If NULL, return zero timestamp (EAX:EDX = 0) to avoid corrupting pause time
         xor     eax, eax
@@ -401,17 +401,17 @@ static void _declspec(naked) HOOK_CTimer_Suspend()
 static const DWORD CONTINUE_CTimer_Resume = 0x561A17;
 static void _declspec(naked) HOOK_CTimer_Resume()
 {
-    _asm
+    __asm
     {
         // Check if _timerFunction is NULL
         mov     eax, dword ptr ds:[0B7CB28h]
         test    eax, eax
         jz      skip_resume
-        
+
         // Original code: call [_timerFunction]
         call    eax
         jmp     CONTINUE_CTimer_Resume
-        
+
     skip_resume:
         // If NULL, return zero timestamp (EAX:EDX = 0) to avoid corrupting resume time calculations
         xor     eax, eax
@@ -460,7 +460,7 @@ DWORD RETURN_psGrabScreen_YesChange = 0x745311;
 DWORD RETURN_psGrabScreen_NoChange = 0x745336;
 void _declspec(naked) HOOK_psGrabScreen()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMY_psGrabScreen_ShouldUseRect
@@ -504,7 +504,7 @@ void OnMY_CClouds_RenderSkyPolys()
 DWORD RETURN_CClouds_RenderSkyPolys = 0x714655;
 void _declspec(naked) HOOK_CClouds_RenderSkyPolys()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMY_CClouds_RenderSkyPolys
@@ -559,7 +559,7 @@ float OnMY_RwCameraSetNearClipPlane(DWORD dwCalledFrom, void* pUnknown, float fD
 DWORD RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
 void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -590,7 +590,7 @@ void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
 DWORD RETURN_RenderEffects_HeliLight = 0x53E1BE;
 void _declspec(naked) HOOK_RenderEffects_HeliLight()
 {
-    _asm
+    __asm
     {
         pushad
     }
@@ -598,7 +598,7 @@ void _declspec(naked) HOOK_RenderEffects_HeliLight()
     // Call render handler
     if (pRenderHeliLightHandler) pRenderHeliLightHandler();
 
-    _asm
+    __asm
     {
         popad
         mov     eax, ds:[0xC1C96C]
@@ -749,22 +749,22 @@ bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
 #define HOOKSIZE_CVisibilityPlugins_RenderPedCB                       5
 void _declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 {
-    _asm
+    __asm
     {
         push esi;
         push edi;
         mov edi, [esp + 0Ch]; // RpAtomic
-        
+
         push edi;
         call AreMatricesOfRpAtomicValid;
         add esp, 4;
-        
+
         test al, al;
         jz skipRender;
-        
+
         push 0x7335B6; // Continue rendering
         retn;
-        
+
     skipRender:
         pop edi;
         pop esi;
@@ -779,7 +779,7 @@ DWORD RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
 DWORD DO_CRenderer_EverythingBarRoads = 0x7EE180;
 void _declspec(naked) HOOK_CRenderer_EverythingBarRoads()
 {
-    _asm
+    __asm
     {
         pushad
     }
@@ -787,7 +787,7 @@ void _declspec(naked) HOOK_CRenderer_EverythingBarRoads()
     if (pRenderEverythingBarRoadsHandler)
         pRenderEverythingBarRoadsHandler();
 
-    _asm
+    __asm
     {
         popad
         call DO_CRenderer_EverythingBarRoads

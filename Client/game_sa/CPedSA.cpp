@@ -166,7 +166,7 @@ CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponS
                 modelInfo->Request(BLOCKING, "CPedSA::GiveWeapon");
                 modelInfo->MakeCustomModel();
             }
-            
+
             // If the weapon is satchels, load the detonator too
             if (weaponType == WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
                 GiveWeapon(WEAPONTYPE_DETONATOR, 1, WEAPONSKILL_STD);
@@ -399,7 +399,7 @@ void CPedSA::SetFootBlood(std::uint32_t footBlood)
 std::uint32_t CPedSA::GetFootBlood() const
 {
     CPedSAInterface* pedInterface = GetPedInterface();
-    
+
     // If the foot blood flag is activated, return the amount of foot blood
     return pedInterface->pedFlags.bDoBloodyFootprints ? pedInterface->timeWhenDead : 0;
 }
@@ -590,7 +590,7 @@ static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
 static void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
 {
-    _asm
+    __asm
     {
         // Replaced code
         sub esp,70h
@@ -629,7 +629,7 @@ static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
 static void _declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
 {
-    _asm
+    __asm
     {
         // Check what to do
         movzx eax, byte ptr g_onlyUpdateRotations

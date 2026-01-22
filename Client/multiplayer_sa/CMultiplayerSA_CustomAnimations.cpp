@@ -75,21 +75,21 @@ CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(eAnimGroup animGroup
 
 void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
 {
-    _asm
+    __asm
     {
         pushad
     }
 
     if (bDisableCallsToCAnimBlendNode)
     {
-        _asm
+        __asm
         {
             popad
             retn 4
         }
     }
 
-    _asm
+    __asm
     {
         popad
         mov     eax, [esp+4]
@@ -100,21 +100,21 @@ void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
 
 void _declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
 {
-    _asm
+    __asm
     {
         pushad
     }
 
     if (bDisableCallsToCAnimBlendNode)
     {
-        _asm
+        __asm
         {
             popad
             retn
         }
     }
 
-    _asm
+    __asm
     {
         popad
         sub     esp, 3Ch
@@ -144,7 +144,7 @@ CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpC
 
 void _declspec(naked) HOOK_CAnimManager_AddAnimation()
 {
-    _asm
+    __asm
     {
         lea     edx, [esp + 8]  // animationGroupID address
         lea     eax, [esp + 12] // animationID address
@@ -157,7 +157,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
 
     if (m_pAddAnimationHandler)
     {
-        _asm
+        __asm
         {
             popad
             mov     ecx, [esp + 4]  // animationClump
@@ -175,7 +175,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
         }
     }
 
-    _asm
+    __asm
     {
         popad
         mov     eax, dword ptr[esp + 0Ch]
@@ -186,7 +186,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
 
 void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 {
-     _asm
+     __asm
      {
          lea     edx, [esp + 12] // animationGroup address
          lea     eax, [esp + 16] // animationID address
@@ -199,7 +199,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 
     if (m_pAddAnimationAndSyncHandler)
     {
-         _asm
+         __asm
          {
              popad
              mov     ecx, [esp + 4]  // animationClump
@@ -216,7 +216,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
          }
     }
 
-     _asm
+     __asm
      {
 
          popad
@@ -228,14 +228,14 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
 {
-    _asm
+    __asm
     {
         pushad
     }
 
     if (m_pBlendAnimationHierarchyHandler)
     {
-        _asm
+        __asm
         {
             popad
             push    eax // pAnimAssociation
@@ -279,7 +279,7 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
         }
     }
 
-    _asm
+    __asm
     {
         NORMAL_FLOW_BlendAnimation_Hierarchy:
         popad

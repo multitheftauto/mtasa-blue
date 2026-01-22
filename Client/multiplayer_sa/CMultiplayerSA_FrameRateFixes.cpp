@@ -611,7 +611,7 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
 static constexpr std::uintptr_t RETURN_CWeapon_Update = 0x073DC42;
 static void __declspec(naked) HOOK_CWeapon_Update()
 {
-    _asm
+    __asm
     {
         // Temp fix for camera
         cmp [esi], 0x2B // CWeapon::m_eWeaponType

@@ -139,7 +139,7 @@ CTaskSA* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
     DWORD dwFunc = pVTBL->GetTaskType;
     if (dwFunc && dwFunc != 0x82263A)
     {
-        _asm
+        __asm
         {
             mov     ecx, pTaskInterface
             call    dwFunc
@@ -277,7 +277,7 @@ __declspec(noinline) void OnMY_Task_Operator_Delete(CTaskSAInterface* pTaskInter
 
 void _declspec(naked) HOOK_CTask_Operator_Delete()
 {
-    _asm
+    __asm
         {
         mov     eax, [esp+4]
         mov     pTempTaskInterface, eax
@@ -288,7 +288,7 @@ void _declspec(naked) HOOK_CTask_Operator_Delete()
     OnMY_Task_Operator_Delete(pTempTaskInterface);
 
     // Continue on our merry way....
-    _asm
+    __asm
     {
         popad
 

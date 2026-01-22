@@ -56,7 +56,7 @@ void OnMY_CWeapon_GenerateDamageEvent(DWORD calledFrom, CPedSAInterface* pPed, C
 DWORD RETURN_CWeapon_GenerateDamageEvent = 0x73A537;
 void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*6]
@@ -105,7 +105,7 @@ void ResetShotInfoArray()
 
 void Call_CShotInfo_Update()
 {
-    _asm
+    __asm
     {
         call inner
         jmp  done
@@ -144,7 +144,7 @@ void OnMY_CShotInfo_Update()
 // The hook goes here
 void _declspec(naked) HOOK_CShotInfo_Update()
 {
-    _asm
+    __asm
     {
         pushad
         call    OnMY_CShotInfo_Update
@@ -185,7 +185,7 @@ DWORD RETURN_Fx_AddBulletImpact = 0x049F3ED;
 
 void _declspec(naked) HOOK_Fx_AddBulletImpact()
 {
-    _asm
+    __asm
     {
         pushad
         push    eax
@@ -203,16 +203,16 @@ void _declspec(naked) HOOK_Fx_AddBulletImpact()
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVisibilityPlugins::RenderWeaponPedsForPC
-// 
+//
 // Fix for the bright objects after weapon change sometimes
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC 0x733123
 #define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC 5
 static constexpr DWORD CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC = 0x733128;
 static void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
 {
-    _asm
+    __asm
     {
         mov eax, 5DF4E0h
         call eax // call CPed::ResetGunFlashAlpha

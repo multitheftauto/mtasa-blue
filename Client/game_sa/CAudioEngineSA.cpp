@@ -61,7 +61,7 @@ void CAudioEngineSA::StopRadio()
     // DWORD dwFunc = FUNC_StopRadio;
     DWORD dwFunc = 0x4E9823;            // Some function CAudio::StopRadio jumps to immediately
 
-    _asm
+    __asm
     {
         // This doesn't work anymore because we've
         // returned out the function.
@@ -105,7 +105,7 @@ void CAudioEngineSA::StartRadio(unsigned int station)
 
     DWORD dwFunc = 0x4DBEC3;
     DWORD dwFunc2 = 0x4EB3C3;
-    _asm
+    __asm
     {
         // We can't do this anymore as we've returned out StartRadio
         /*
@@ -163,7 +163,7 @@ void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
         DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
         float fSpeed = 1.0f;
         float fVolumeChange = 0.0f;
-        _asm
+        __asm
         {
             push    fSpeed
             push    fVolumeChange
@@ -178,7 +178,7 @@ void CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
 {
     DWORD dwFunc = FUNC_SetEffectsMasterVolume;
     DWORD dwVolume = bVolume;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    dwVolume
@@ -190,7 +190,7 @@ void CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
 {
     DWORD dwFunc = FUNC_SetMusicMasterVolume;
     DWORD dwVolume = bVolume;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    dwVolume
@@ -228,7 +228,7 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
     {
         DWORD dwFunc = FUNC_PreloadBeatTrack;
         DWORD dwTrack = iTrack;
-        _asm
+        __asm
         {
             mov     ecx, CLASS_CAudioEngine
             push    dwTrack
@@ -236,7 +236,7 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
         }
 
         dwFunc = FUNC_PlayPreloadedBeatTrack;
-        _asm
+        __asm
         {
             mov     ecx, CLASS_CAudioEngine
             push    1
@@ -248,7 +248,7 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
 void CAudioEngineSA::ClearMissionAudio(int slot)
 {
     DWORD dwFunc = 0x5072F0;            // CAudioEngine::ClearMissionAudio(unsigned char)
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    slot // sound bank slot?
@@ -260,7 +260,7 @@ bool CAudioEngineSA::IsMissionAudioSampleFinished(int slot)
 {
     DWORD dwFunc = 0x5072C0;            // CAudioEngine::IsMissionAudioSampleFinished
     bool  cret = 0;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    slot
@@ -274,7 +274,7 @@ void CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
 {
     DWORD dwFunc = 0x507290;            // CAudioEngine__PreloadMissionAudio
     DWORD AudioEvent = usAudioEvent;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    AudioEvent
@@ -287,7 +287,7 @@ unsigned char CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
 {
     DWORD         dwFunc = 0x5072A0;            // get load status
     unsigned char cret = 0;
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    slot
@@ -308,7 +308,7 @@ void CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
     }
 
     DWORD dwFunc = 0x507330;            // AttachMissionAudioToPhysical
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    entity
@@ -320,7 +320,7 @@ void CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
 void CAudioEngineSA::SetMissionAudioPosition(CVector* position, int slot)
 {
     DWORD dwFunc = 0x507300;            // CAudioEngine__SetMissionAudioPosition
-    _asm
+    __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    position
@@ -334,7 +334,7 @@ bool CAudioEngineSA::PlayLoadedMissionAudio(int slot)
     if (GetMissionAudioLoadingStatus(slot) == 1)
     {
         DWORD dwFunc = 0x5072B0;            // CAudioEngine::PlayLoadedMissionAudio(unsigned char)
-        _asm
+        __asm
         {
             mov     ecx, CLASS_CAudioEngine
             push    slot
@@ -350,7 +350,7 @@ void CAudioEngineSA::PauseAllSound(bool bPaused)
     if (bPaused)
     {
         DWORD dwFunc = FUNC_PauseAllSounds;
-        _asm
+        __asm
         {
             mov     ecx, CLASS_CAudioEngine
             call    dwFunc
@@ -359,7 +359,7 @@ void CAudioEngineSA::PauseAllSound(bool bPaused)
     else
     {
         DWORD dwFunc = FUNC_ResumeAllSounds;
-        _asm
+        __asm
         {
             mov     ecx, CLASS_CAudioEngine
             call    dwFunc
@@ -425,7 +425,7 @@ __declspec(noinline) bool _cdecl IsAmbientSoundGeneralEnabled()
 // Hook for manual ambient sound pause
 void _declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
 {
-    _asm
+    __asm
     {
         // Hooked from 004D6E21  6 bytes
         call IsAmbientSoundGeneralEnabled
@@ -513,7 +513,7 @@ __declspec(noinline) bool _cdecl On_CAESoundManager_RequestNewSound(CAESound* pA
 
 void _declspec(naked) HOOK_CAESoundManager_RequestNewSound()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*1]
@@ -543,7 +543,7 @@ void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceTy
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAudioEngine_ReportBulletHit;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    f_2
@@ -561,7 +561,7 @@ void CAudioEngineSA::ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhys
         dwPhysicalInterface = (DWORD)pPhysical->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAudioEngine_ReportWeaponEvent;
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         push    dwPhysicalInterface

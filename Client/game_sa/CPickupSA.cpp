@@ -126,7 +126,7 @@ bool CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
     DWORD GiveUsAPickUpObject = FUNC_GIVEUSAPICKUP;
     DWORD dwObject = (DWORD) & (GetInterface()->pObject);
     DWORD dwThis = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         push    ForcedObjectIndex
         push    dwObject
@@ -158,7 +158,7 @@ void CPickupSA::GetRidOfObjects()
         delete object;
         object = nullptr;
     }
-    
+
     GetInterface()->pObject = nullptr;
 }
 
@@ -166,7 +166,7 @@ void CPickupSA::Remove()
 {
     DWORD dwFunc = FUNC_CPickup_Remove;
     DWORD dwThis = (DWORD)GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc

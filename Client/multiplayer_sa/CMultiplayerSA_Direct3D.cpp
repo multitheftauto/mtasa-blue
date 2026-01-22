@@ -38,8 +38,8 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
                               D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
     // Safely unpatch with validation
-    if (RESTORE_Addr_PreCreateDevice && 
-        RESTORE_Size_PreCreateDevice > 0 && 
+    if (RESTORE_Addr_PreCreateDevice &&
+        RESTORE_Size_PreCreateDevice > 0 &&
         RESTORE_Size_PreCreateDevice <= sizeof(RESTORE_Bytes_PreCreateDevice))
     {
         MemCpy((PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice);
@@ -72,14 +72,14 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 DWORD RETURN_PreCreateDevice = 0x07F6781;
 void _declspec(naked) HOOK_PreCreateDevice()
 {
-    _asm
+    __asm
     {
         // Run replaced code - these pushes create the original function parameters
         mov     ecx,dword ptr ds:[0C97C20h]        // pDirect3D
         push    0C97C28h                           // ppReturnedDeviceInterface
-        push    0C9C040h                           // pPresentationParameters  
+        push    0C9C040h                           // pPresentationParameters
         push    eax                                // BehaviorFlags (original eax)
-        mov     eax,dword ptr ds:[00C97C1Ch]       
+        mov     eax,dword ptr ds:[00C97C1Ch]
         mov     edx,  [ecx]
         push    eax                                // hFocusWindow
         mov     eax,dword ptr ds:[008E2428h]
@@ -93,7 +93,7 @@ void _declspec(naked) HOOK_PreCreateDevice()
         // Stack layout at ESP: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
 
         pushad  // Save all registers (32 bytes), ESP now at ESP-32
-        
+
         // Pass parameters to OnPreCreateDevice
         // After pushad, params start at ESP+32. Each push decreases ESP by 4,
         // so [esp+32+4*6] effectively walks backward through the params:
@@ -170,7 +170,7 @@ DWORD RETURN_PostCreateDevice = 0x07F678A;
 DWORD RETURN_PostCreateDeviceB = 0x07F6799;
 void _declspec(naked) HOOK_PostCreateDevice()
 {
-    _asm
+    __asm
     {
         // Replaced code
         pushad

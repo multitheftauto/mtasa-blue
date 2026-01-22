@@ -142,17 +142,17 @@ public:
         {
             if (!info.pClump || !info.pClump->atomics.root.next) [[unlikely]]
                 continue;
-            
+
             if (info.pClump->atomics.root.next == &info.pClump->atomics.root) [[unlikely]]
                 continue;
-            
+
             // Container_of pattern: RwLLLink at offset 0x8 in RpAtomic
             char* pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
             RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pListNode - 0x8);
-            
+
             if (!SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic))) [[unlikely]]
                 continue;
-            
+
             RpGeometry* pGeometry = pAtomic->geometry;
             if (!pGeometry) [[unlikely]]
                 continue;
@@ -203,7 +203,7 @@ public:
         SSavedClumpInfo info;
         info.pClump = pClumpCopy;
 #ifdef CLOTHES_REF_TEST
-        if (info.pClump && info.pClump->atomics.root.next && 
+        if (info.pClump && info.pClump->atomics.root.next &&
             info.pClump->atomics.root.next != &info.pClump->atomics.root)
         {
             char* pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
@@ -281,7 +281,7 @@ public:
             return false;
 
 #ifdef CLOTHES_REF_TEST
-        if (info.pClump && info.pClump->atomics.root.next && 
+        if (info.pClump && info.pClump->atomics.root.next &&
             info.pClump->atomics.root.next != &info.pClump->atomics.root)
         {
             char* pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
@@ -381,7 +381,7 @@ void _cdecl OnCClothesBuilderCreateSkinnedClumpPost(RpClump* pRpClumpResult, RpC
 DWORD RETURN_CClothesBuilderCreateSkinnedClump = 0x5A69D6;
 void _declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
 {
-    _asm
+    __asm
     {
         pushad
         push    [esp+32+4*5]

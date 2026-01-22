@@ -57,7 +57,7 @@ static void HandleWaterCannonHit(CVehicleSAInterface* pGameVehicle, CColPointSAI
 
 static void _declspec(naked) HOOK_CWaterCannon__Render()
 {
-    _asm
+    __asm
     {
         pushad
         mov     eax, [ebx]                      // CVehicleSAInterface* CWaterCannon::m_pVehicle

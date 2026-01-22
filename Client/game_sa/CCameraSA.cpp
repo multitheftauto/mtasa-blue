@@ -48,7 +48,7 @@ void CCameraSA::Restore()
 {
     DWORD               dwFunc = FUNC_Restore;
     CCameraSAInterface* cameraInterface = GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -59,13 +59,13 @@ void CCameraSA::RestoreWithJumpCut()
 {
     CCameraSAInterface* cameraInterface = GetInterface();
     DWORD               dwFunc = 0x50BD40;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
     }
     dwFunc = 0x50BAB0;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -86,7 +86,7 @@ void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
     // __thiscall
 
     DWORD CCamera__TakeControl = FUNC_TakeControl;
-    _asm
+    __asm
     {
         mov ecx, cameraInterface
         push 1
@@ -106,7 +106,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         vecOffset.fY = 0.5f;
         vecOffset.fX = 0.5f;*/
     /*  DWORD dwFunc = 0x50BEC0;
-        _asm
+        __asm
         {
             mov ecx, cameraInterface
             lea     eax, vecOffset
@@ -116,7 +116,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         }*/
 
     DWORD CCamera__TakeControlNoEntity = FUNC_TakeControlNoEntity;
-    _asm
+    __asm
         {
         mov ecx, cameraInterface
         push 1
@@ -126,7 +126,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         }
 
     DWORD dwFunc = 0x50BEC0;
-    _asm
+    __asm
     {
         mov ecx, cameraInterface
         lea     eax, vecOffset
@@ -227,7 +227,7 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
     float               fOriginZ = vecGunMuzzle->fZ;
     DWORD               dwFunc = FUNC_Find3rdPersonCamTargetVector;
     CCameraSAInterface* cameraInterface = GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         push    vecTarget
@@ -245,7 +245,7 @@ float CCameraSA::Find3rdPersonQuickAimPitch()
     float               fReturn;
     DWORD               dwFunc = FUNC_Find3rdPersonQuickAimPitch;
     CCameraSAInterface* cameraInterface = GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -297,7 +297,7 @@ bool CCameraSA::IsFading()
     DWORD               dwFunc = FUNC_GetFading;
     CCameraSAInterface* cameraInterface = GetInterface();
     bool                bRet = false;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -311,7 +311,7 @@ int CCameraSA::GetFadingDirection()
     DWORD               dwFunc = FUNC_GetFadingDirection;
     CCameraSAInterface* cameraInterface = GetInterface();
     int                 dwRet = false;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         call    dwFunc
@@ -324,7 +324,7 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
 {
     DWORD               dwFunc = FUNC_Fade;
     CCameraSAInterface* cameraInterface = GetInterface();
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         push    iOutOrIn
@@ -340,7 +340,7 @@ void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigne
     DWORD               dwRed = ucRed;
     DWORD               dwGreen = ucGreen;
     DWORD               dwBlue = ucBlue;
-    _asm
+    __asm
     {
         mov     ecx, cameraInterface
         push    dwBlue
@@ -400,7 +400,7 @@ __declspec(noinline) void _cdecl DoCameraCollisionDetectionPokes()
 
 void _declspec(naked) HOOK_Camera_CollisionDetection()
 {
-    _asm
+    __asm
     {
         pushad
         call DoCameraCollisionDetectionPokes
