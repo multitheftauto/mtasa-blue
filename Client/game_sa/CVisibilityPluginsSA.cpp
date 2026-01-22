@@ -18,12 +18,12 @@ void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
     DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
     _asm
-        {
+    {
         push    iAlpha
         push    pClump
         call    dwFunc
         add     esp, 0x8
-        }
+    }
 }
 
 // Some AtomicId bits are:

@@ -44,8 +44,8 @@ extern CClientGame* g_pClientGame;
 
 #define INVALID_VALUE 0xFFFFFFFF
 
-#define PED_INTERPOLATION_WARP_THRESHOLD           5  // Minimal threshold
-#define PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED 5  // Units to increment the threshold per speed unit
+#define PED_INTERPOLATION_WARP_THRESHOLD            5   // Minimal threshold
+#define PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  5   // Units to increment the threshold per speed unit
 
 enum eAnimGroups
 {
@@ -133,7 +133,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_armorLocked = false;
     m_ulLastOnScreenTime = 0;
     m_pLoadedModelInfo = NULL;
-    m_pOutOfVehicleWeaponSlot = WEAPONSLOT_MAX;  // WEAPONSLOT_MAX = invalid
+    m_pOutOfVehicleWeaponSlot = WEAPONSLOT_MAX;            // WEAPONSLOT_MAX = invalid
     m_bRadioOn = false;
     m_ucRadioChannel = 1;
     m_fBeginAimX = 0.0f;
@@ -165,7 +165,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_fMoveSpeed = 0.0f;
     m_bCanBeKnockedOffBike = true;
     m_bBleeding = false;
-    RemoveAllWeapons();  // Set all our weapon values to unarmed
+    RemoveAllWeapons();            // Set all our weapon values to unarmed
     m_bHasJetPack = false;
     m_FightingStyle = STYLE_GRAB_KICK;
     m_MoveAnim = MOVE_DEFAULT;
@@ -176,8 +176,8 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_ulLastTimeBeganAiming = 0;
     m_ulLastTimeEndedAiming = 0;
     m_ulLastTimeBeganCrouch = 0;
-    m_ulLastTimeBeganStand = 0;          // Standing after crouching
-    m_ulLastTimeMovedWhileCrouched = 0;  // Moved while crouching
+    m_ulLastTimeBeganStand = 0;                    // Standing after crouching
+    m_ulLastTimeMovedWhileCrouched = 0;            // Moved while crouching
     m_bRecreatingModel = false;
     m_pCurrentContactEntity = NULL;
     m_bSunbathing = false;
@@ -273,7 +273,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         m_stats = m_remoteDataStorage->Stats();
         // ### remember if you want to set Int flags, subtract STATS_OFFSET from the enum ID ###
 
-        SetStat(MAX_HEALTH, 569.0f);  // Default max_health stat
+        SetStat(MAX_HEALTH, 569.0f);            // Default max_health stat
 
         SetArmor(0.0f);
     }
@@ -667,7 +667,7 @@ void CClientPed::SetRotationDegrees(const CVector& vecRotation)
     // HACK: set again the z rotation to work on ground
     SetCurrentRotation(vecTemp.fZ);
     if (!IS_PLAYER(this))
-        SetCameraRotation(vecTemp.fZ);  // This is incorrect and kept for backward compatibility
+        SetCameraRotation(vecTemp.fZ);            // This is incorrect and kept for backward compatibility
 }
 
 void CClientPed::SetRotationRadians(const CVector& vecRotation)
@@ -676,7 +676,7 @@ void CClientPed::SetRotationRadians(const CVector& vecRotation)
     CMatrix matTemp;
     GetMatrix(matTemp);
     g_pMultiplayer->ConvertEulerAnglesToMatrix(matTemp, vecRotation.fX, vecRotation.fY,
-                                               vecRotation.fZ);  // This is incorrect and kept for backward compatibility
+                                               vecRotation.fZ);            // This is incorrect and kept for backward compatibility
     SetMatrix(matTemp);
 }
 
@@ -3107,7 +3107,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
             {
                 // Disable double crouching (another anim cut)
                 if (g_pClientGame->IsUsingAlternatePulseOrder())
-                    Current.ShockButtonL = 255;  // Do this differently if we have changed the pulse order
+                    Current.ShockButtonL = 255;            // Do this differently if we have changed the pulse order
                 else
                     Current.ShockButtonL = 0;
             }
@@ -3219,7 +3219,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
         CTask* pTask = m_pTaskManager->GetSimplestActiveTask();
         if ((pTask && pTask->GetTaskType() == TASK_SIMPLE_PLAYER_ON_FOOT) && (GetWeapon()->GetSlot() == WEAPONSLOT_TYPE_UNARMED) &&
             (Current.RightShoulder1 != 0) && (Current.ButtonSquare != 0) && (Current.ButtonCross != 0))
-        {  // We are block jogging
+        {            // We are block jogging
             if (Current.LeftStickY > 0)
                 // We're pressing target+jump+sprint+backwards.  Using the backwards key in this situation is prone to bugs, swap it with forwards
                 Current.LeftStickY = -Current.LeftStickY;
@@ -4467,8 +4467,7 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
         pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
     auto usVehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
     if (((pTask && pTask->GetTaskType() == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) &&
-        (usVehicleModel == VehicleType::VT_SKIMMER || usVehicleModel == VehicleType::VT_SEASPAR || usVehicleModel == VehicleType::VT_LEVIATHN ||
-         usVehicleModel == VehicleType::VT_VORTEX))
+        (usVehicleModel == VehicleType::VT_SKIMMER || usVehicleModel == VehicleType::VT_SEASPAR || usVehicleModel == VehicleType::VT_LEVIATHN || usVehicleModel == VehicleType::VT_VORTEX))
     {
         CVector      vecDoorPos;
         unsigned int uiDoor;
@@ -4738,7 +4737,7 @@ bool CClientPed::GetShotData(CVector* pvecOrigin, CVector* pvecTarget, CVector* 
     float fRotation = GetCurrentRotation();
 
     // Grab the target range of the current weapon
-    float        fSkill = 1000.0f;  //  GetStat ( g_pGame->GetStats ( )->GetSkillStatIndex ( pWeapon->GetType ( ) ) );
+    float        fSkill = 1000.0f;            //  GetStat ( g_pGame->GetStats ( )->GetSkillStatIndex ( pWeapon->GetType ( ) ) );
     CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(pWeapon->GetType(), fSkill);
     float        fRange = pCurrentWeaponInfo->GetWeaponRange();
 
@@ -4772,19 +4771,19 @@ bool CClientPed::GetShotData(CVector* pvecOrigin, CVector* pvecTarget, CVector* 
             // Always use the gun muzzle as origin
             vecOrigin = vecGunMuzzle;
 
-            if (false && HasAkimboPointingUpwards())  // Upwards pointing akimbo's
+            if (false && HasAkimboPointingUpwards())            // Upwards pointing akimbo's
             {
                 // Disabled temporarily until we actually get working akimbos
                 vecTarget = vecOrigin;
                 vecTarget.fZ += fRange;
             }
-            else if (Controller.RightShoulder1 == 255)  // First-person weapons, crosshair active: sync the crosshair
+            else if (Controller.RightShoulder1 == 255)            // First-person weapons, crosshair active: sync the crosshair
             {
                 g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecGunMuzzle, &vecOrigin, &vecTarget);
                 // Apply shoot through walls fix
                 vecOrigin = AdjustShotOriginForWalls(vecOrigin, vecTarget, 0.5f);
             }
-            else if (pVehicle)  // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
+            else if (pVehicle)            // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
             {
                 CColPoint* pCollision;
                 CMatrix    mat;
@@ -4819,7 +4818,7 @@ bool CClientPed::GetShotData(CVector* pvecOrigin, CVector* pvecTarget, CVector* 
             }
         }
     }
-    else  // Always use only the last reported shot data for remote players?
+    else            // Always use only the last reported shot data for remote players?
     {
         vecOrigin = m_shotSyncData->m_vecShotOrigin;
         vecTarget = m_shotSyncData->m_vecShotTarget;
@@ -5031,7 +5030,7 @@ bool CClientPed::IsLeavingVehicle()
         {
             switch (pTask->GetTaskType())
             {
-                case TASK_COMPLEX_LEAVE_CAR:  // We only use this task
+                case TASK_COMPLEX_LEAVE_CAR:            // We only use this task
                 case TASK_COMPLEX_LEAVE_CAR_AND_DIE:
                 case TASK_COMPLEX_LEAVE_CAR_AND_FLEE:
                 case TASK_COMPLEX_LEAVE_CAR_AND_WANDER:
@@ -5765,9 +5764,9 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
              Saml1er: Setting flags to 0x10 will tell GTA:SA that animation needs to be decompressed.
                       If not, animation will either crash or do some weird things.
             */
-            int flags = 0x10;  // Stops jaw fucking up, some speaking flag maybe
+            int flags = 0x10;            // Stops jaw fucking up, some speaking flag maybe
             if (bLoop)
-                flags |= 0x2;  // flag that triggers the loop (Maccer)
+                flags |= 0x2;            // flag that triggers the loop (Maccer)
             if (bUpdatePosition)
             {
                 // 0x40 enables position updating on Y-coord, 0x80 on X. (Maccer)
@@ -5784,7 +5783,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             }
 
             if (!bFreezeLastFrame)
-                flags |= 0x08;  // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
+                flags |= 0x08;            // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
             float  fBlendDelta = 1 / std::max((float)iBlend, 1.0f) * 1000;
             CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunNamedAnim(szAnimName, pBlock->GetName(), flags, fBlendDelta, iTime, !bInterruptable,
                                                                              bRunInSequence, bOffsetPed, bHoldLastFrame);
@@ -5866,8 +5865,7 @@ void CClientPed::RunAnimationFromCache()
     std::string animName = m_AnimationCache.strName;
 
     // Run our animation
-    RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
-                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+    RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
 
     auto animAssoc = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(GetClump(), animName.c_str());
     if (!animAssoc)
@@ -5879,7 +5877,7 @@ void CClientPed::RunAnimationFromCache()
     {
         float animLength = animAssoc->GetLength();
 
-        if (m_AnimationCache.bFreezeLastFrame)  // time and loop is ignored if freezeLastFrame is true
+        if (m_AnimationCache.bFreezeLastFrame) // time and loop is ignored if freezeLastFrame is true
             progress = (elapsedTime / animLength) * m_AnimationCache.speed;
         else
         {
@@ -6495,12 +6493,12 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     }
 
     // Are we already sending an in/out request or not allowed to create a new in/out?
-    if (m_bNoNewVehicleTask                        // Are we permitted to even enter a vehicle?
-        || m_VehicleInOutID != INVALID_ELEMENT_ID  // Make sure we're not already processing a vehicle enter (would refer to valid ID if we were)
-        || m_bIsGettingJacked                      // Make sure we're not currently getting carjacked &&
-        || m_bIsGettingIntoVehicle                 // We can't enter a vehicle we're currently entering...
-        || m_bIsGettingOutOfVehicle                // We can't enter a vehicle we're currently leaving...
-        || CClientTime::GetTime() < m_ulLastVehicleInOutTime + VEHICLE_INOUT_DELAY  // We are trying to enter the vehicle to soon
+    if (m_bNoNewVehicleTask                                  // Are we permitted to even enter a vehicle?
+        || m_VehicleInOutID != INVALID_ELEMENT_ID            // Make sure we're not already processing a vehicle enter (would refer to valid ID if we were)
+        || m_bIsGettingJacked                                // Make sure we're not currently getting carjacked &&
+        || m_bIsGettingIntoVehicle                           // We can't enter a vehicle we're currently entering...
+        || m_bIsGettingOutOfVehicle                          // We can't enter a vehicle we're currently leaving...
+        || CClientTime::GetTime() < m_ulLastVehicleInOutTime + VEHICLE_INOUT_DELAY            // We are trying to enter the vehicle to soon
     )
     {
         return false;
@@ -6551,8 +6549,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
     auto vehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
 
-    if (IsInWater() && !(vehicleModel == VehicleType::VT_SKIMMER || vehicleModel == VehicleType::VT_SEASPAR || vehicleModel == VehicleType::VT_LEVIATHN ||
-                         vehicleModel == VehicleType::VT_VORTEX))
+    if (IsInWater() && !(vehicleModel == VehicleType::VT_SKIMMER || vehicleModel == VehicleType::VT_SEASPAR || vehicleModel == VehicleType::VT_LEVIATHN || vehicleModel == VehicleType::VT_VORTEX))
     {
         return false;
     }
@@ -6560,11 +6557,12 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     // If the Jump task is playing and we are in water - I know right
     // Kill the task.
     CTask* pTask = GetCurrentPrimaryTask();
-    if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)  // Kill jump task - breaks warp in entry and doesn't really matter
+    if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)            // Kill jump task - breaks warp in entry and doesn't really matter
     {
-        if (pVehicle->IsInWater() || IsInWater())  // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
+        if (pVehicle->IsInWater() ||
+            IsInWater())            // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
         {
-            KillTask(3, true);  // Kill jump task if we are about to warp in
+            KillTask(3, true);            // Kill jump task if we are about to warp in
         }
     }
 
@@ -6576,10 +6574,10 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    if (IsClimbing()             // Make sure we're not currently climbing
-        || HasJetPack()          // Make sure we don't have a jetpack
-        || IsUsingGun()          // Make sure we're not using a gun (have the gun task active) - we stop it in UpdatePlayerTasks anyway
-        || IsRunningAnimation()  // Make sure we aren't running an animation
+    if (IsClimbing()                       // Make sure we're not currently climbing
+        || HasJetPack()                    // Make sure we don't have a jetpack
+        || IsUsingGun()                    // Make sure we're not using a gun (have the gun task active) - we stop it in UpdatePlayerTasks anyway
+        || IsRunningAnimation()            // Make sure we aren't running an animation
     )
     {
         return false;
@@ -6607,9 +6605,9 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     // Call the onClientVehicleStartEnter event for the ped
     // Check if it is cancelled before sending packet
     CLuaArguments Arguments;
-    Arguments.PushElement(this);   // player / ped
-    Arguments.PushNumber(uiSeat);  // seat
-    Arguments.PushNumber(uiDoor);  // door
+    Arguments.PushElement(this);             // player / ped
+    Arguments.PushNumber(uiSeat);            // seat
+    Arguments.PushNumber(uiDoor);            // door
 
     if (!pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true))
     {
@@ -6724,12 +6722,12 @@ bool CClientPed::ExitVehicle()
     }
 
     // Are we already sending an in/out request or not allowed to create a new in/out?
-    if (m_bNoNewVehicleTask                        // Are we permitted to even enter a vehicle?
-        || m_VehicleInOutID != INVALID_ELEMENT_ID  // Make sure we're not already processing a vehicle enter (would refer to valid ID if we were)
-        || m_bIsGettingJacked                      // Make sure we're not currently getting carjacked &&
-        || m_bIsGettingIntoVehicle                 // We can't enter a vehicle we're currently entering...
-        || m_bIsGettingOutOfVehicle                // We can't enter a vehicle we're currently leaving...
-        || CClientTime::GetTime() < m_ulLastVehicleInOutTime + VEHICLE_INOUT_DELAY  // We are trying to enter the vehicle to soon
+    if (m_bNoNewVehicleTask                                  // Are we permitted to even enter a vehicle?
+        || m_VehicleInOutID != INVALID_ELEMENT_ID            // Make sure we're not already processing a vehicle enter (would refer to valid ID if we were)
+        || m_bIsGettingJacked                                // Make sure we're not currently getting carjacked &&
+        || m_bIsGettingIntoVehicle                           // We can't enter a vehicle we're currently entering...
+        || m_bIsGettingOutOfVehicle                          // We can't enter a vehicle we're currently leaving...
+        || CClientTime::GetTime() < m_ulLastVehicleInOutTime + VEHICLE_INOUT_DELAY            // We are trying to enter the vehicle to soon
     )
     {
         return false;
@@ -6756,11 +6754,11 @@ bool CClientPed::ExitVehicle()
         // Call the onClientVehicleStartExit event for the ped
         // Check if it is cancelled before making the ped exit the vehicle
         CLuaArguments arguments;
-        arguments.PushElement(this);                 // player / ped
-        arguments.PushNumber(m_ucVehicleInOutSeat);  // seat
-        arguments.PushNumber(0);                     // door
+        arguments.PushElement(this);                    // player / ped
+        arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+        arguments.PushNumber(0);                        // door
 
-        if (!pOccupiedVehicle->CallEvent("onClientVehicleStartExit", arguments, true))  // Event has been cancelled
+        if (!pOccupiedVehicle->CallEvent("onClientVehicleStartExit", arguments, true)) // Event has been cancelled
             return false;
 
         // Make ped exit vehicle
@@ -6851,8 +6849,8 @@ void CClientPed::UpdateVehicleInOut()
             // Call the onClientVehicleEnter event for the ped
             // Check if it is cancelled before allowing the ped to enter the vehicle
             CLuaArguments arguments;
-            arguments.PushElement(this);                 // player / ped
-            arguments.PushNumber(m_ucVehicleInOutSeat);  // seat
+            arguments.PushElement(this);                    // player / ped
+            arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
 
             if (!vehicle->CallEvent("onClientVehicleEnter", arguments, true))
             {
@@ -6877,8 +6875,8 @@ void CClientPed::UpdateVehicleInOut()
 
             // Call the onClientVehicleExit event for the ped
             CLuaArguments arguments;
-            arguments.PushElement(this);                 // player / ped
-            arguments.PushNumber(m_ucVehicleInOutSeat);  // seat
+            arguments.PushElement(this);                    // player / ped
+            arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
             networkVehicle->CallEvent("onClientVehicleExit", arguments, true);
 
             m_bIsGettingOutOfVehicle = false;

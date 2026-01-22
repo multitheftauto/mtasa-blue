@@ -372,8 +372,8 @@ void CMapManager::BroadcastResourceElements(CElement* pResourceElement, CElement
     CEntityAddPacket Packet;
     Packet.Add(pResourceElement);
 
-    std::set<CElement*>            doneElements;    // Lookup map of elements already processed
-    std::vector<CPerPlayerEntity*> pPerPlayerList;  // A list of per player elements we will process the last
+    std::set<CElement*>            doneElements;              // Lookup map of elements already processed
+    std::vector<CPerPlayerEntity*> pPerPlayerList;            // A list of per player elements we will process the last
 
     if (pResourceElement->CountChildren() > 0)
         BroadcastElementChildren(pResourceElement, Packet, pPerPlayerList, doneElements);

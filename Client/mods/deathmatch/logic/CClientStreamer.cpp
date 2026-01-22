@@ -539,7 +539,7 @@ void CClientStreamer::Restream(bool bMovedFar)
                 if (bReachedLimit)
                 {
                     // Add to the list that might be streamed in during the final phase
-                    if ((int)ClosestStreamedOutList.size() < iMaxIn)  // (only add if there is a chance it will be used)
+                    if ((int)ClosestStreamedOutList.size() < iMaxIn)            // (only add if there is a chance it will be used)
                         ClosestStreamedOutList.push_back(pElement);
                 }
                 else
@@ -593,7 +593,7 @@ void CClientStreamer::Restream(bool bMovedFar)
                 iMaxOut--;
             }
             m_ToStreamOut.remove(pFurthestStreamedIn);
-            iFurthestStreamedInIndex--;  // Always advance to the next candidate
+            iFurthestStreamedInIndex--;            // Always advance to the next candidate
 
             // Stream in ClosestStreamedOut candidate if possible
             if (!ReachedLimit())

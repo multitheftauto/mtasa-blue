@@ -247,13 +247,13 @@ ADD_ENUM(WeaponProperty::WEAPON_WEAPON_RANGE, "weapon_range")
 ADD_ENUM(WeaponProperty::WEAPON_TARGET_RANGE, "target_range")
 ADD_ENUM(WeaponProperty::WEAPON_ACCURACY, "accuracy")
 ADD_ENUM(WeaponProperty::WEAPON_DAMAGE, "damage")
-ADD_ENUM(WeaponProperty::WEAPON_LIFE_SPAN, "life_span")        // Disabled for release
-ADD_ENUM(WeaponProperty::WEAPON_FIRING_SPEED, "firing_speed")  // Disabled for release
-ADD_ENUM(WeaponProperty::WEAPON_SPREAD, "spread")              // Disabled for release
+ADD_ENUM(WeaponProperty::WEAPON_LIFE_SPAN, "life_span")                  // Disabled for release
+ADD_ENUM(WeaponProperty::WEAPON_FIRING_SPEED, "firing_speed")            // Disabled for release
+ADD_ENUM(WeaponProperty::WEAPON_SPREAD, "spread")                        // Disabled for release
 ADD_ENUM(WeaponProperty::WEAPON_MAX_CLIP_AMMO, "maximum_clip_ammo")
 ADD_ENUM(WeaponProperty::WEAPON_MOVE_SPEED, "move_speed")
 ADD_ENUM(WeaponProperty::WEAPON_FLAGS, "flags")
-ADD_ENUM(WeaponProperty::WEAPON_ANIM_GROUP, "anim_group")  // Disabled for release
+ADD_ENUM(WeaponProperty::WEAPON_ANIM_GROUP, "anim_group")            // Disabled for release
 
 ADD_ENUM(WeaponProperty::WEAPON_ANIM_LOOP_START, "anim_loop_start")
 ADD_ENUM(WeaponProperty::WEAPON_ANIM_LOOP_STOP, "anim_loop_stop")
@@ -317,7 +317,7 @@ IMPLEMENT_ENUM_BEGIN(ERenderFormat)
 ADD_ENUM(RFORMAT_UNKNOWN, "unknown")
 ADD_ENUM(RFORMAT_ARGB, "argb")
 ADD_ENUM(RFORMAT_XRGB, "xrgb")
-ADD_ENUM(RFORMAT_RGB, "rgb")
+ADD_ENUM(RFORMAT_RGB,  "rgb")
 ADD_ENUM(RFORMAT_DXT1, "dxt1")
 ADD_ENUM(RFORMAT_DXT2, "dxt2")
 ADD_ENUM(RFORMAT_DXT3, "dxt3")
@@ -488,11 +488,11 @@ IMPLEMENT_ENUM_BEGIN(eFontQuality)
 ADD_ENUM(FONT_QUALITY_DEFAULT, "default")
 ADD_ENUM(FONT_QUALITY_DRAFT, "draft")
 ADD_ENUM(FONT_QUALITY_PROOF, "proof")
-#if (WINVER >= 0x0400)
+#if( WINVER >= 0x0400 )
 ADD_ENUM(FONT_QUALITY_NONANTIALIASED, "nonantialiased")
 ADD_ENUM(FONT_QUALITY_ANTIALIASED, "antialiased")
 #endif
-#if (_WIN32_WINNT >= _WIN32_WINNT_WINXP)
+#if( _WIN32_WINNT >= _WIN32_WINNT_WINXP )
 ADD_ENUM(FONT_QUALITY_CLEARTYPE, "cleartype")
 ADD_ENUM(FONT_QUALITY_CLEARTYPE_NATURAL, "cleartype_natural")
 #endif
@@ -570,17 +570,17 @@ ADD_ENUM(JSONPRETTY_TABS, "tabs")
 IMPLEMENT_ENUM_END("json-pretty-type")
 
 IMPLEMENT_ENUM_BEGIN(eCursorType)
-ADD_ENUM(CURSORTYPE_NONE, "none")                  // cursor has no image
-ADD_ENUM(CURSORTYPE_DEFAULT, "arrow")              // default cursor
-ADD_ENUM(CURSORTYPE_SIZING_NS, "sizing_ns")        // N-S (up-down) sizing cursor
-ADD_ENUM(CURSORTYPE_SIZING_EW, "sizing_ew")        // E-W (left-right) sizing cursor
-ADD_ENUM(CURSORTYPE_SIZING_NWSE, "sizing_nwse")    // NW-SE diagonal sizing cursor
-ADD_ENUM(CURSORTYPE_SIZING_NESW, "sizing_nesw")    // NE-SW diagonal sizing cursor
-ADD_ENUM(CURSORTYPE_SIZING_ESWE, "sizing_eswe")    // ES-WE horizontal sizing cursor
-ADD_ENUM(CURSORTYPE_MOVE, "move")                  // move cursor
-ADD_ENUM(CURSORTYPE_DRAG, "container_drag")        // drag container cursor (note: not in use)
-ADD_ENUM(CURSORTYPE_SEG_MOVING, "segment_moving")  // segment moving cursor (note: not in use)
-ADD_ENUM(CURSORTYPE_SEG_SIZING, "segment_sizing")  // segment sizing cursor (note: not in use)
+ADD_ENUM(CURSORTYPE_NONE, "none")                            // cursor has no image
+ADD_ENUM(CURSORTYPE_DEFAULT, "arrow")                        // default cursor
+ADD_ENUM(CURSORTYPE_SIZING_NS, "sizing_ns")                  // N-S (up-down) sizing cursor
+ADD_ENUM(CURSORTYPE_SIZING_EW, "sizing_ew")                  // E-W (left-right) sizing cursor
+ADD_ENUM(CURSORTYPE_SIZING_NWSE, "sizing_nwse")              // NW-SE diagonal sizing cursor
+ADD_ENUM(CURSORTYPE_SIZING_NESW, "sizing_nesw")              // NE-SW diagonal sizing cursor
+ADD_ENUM(CURSORTYPE_SIZING_ESWE, "sizing_eswe")              // ES-WE horizontal sizing cursor
+ADD_ENUM(CURSORTYPE_MOVE, "move")                            // move cursor
+ADD_ENUM(CURSORTYPE_DRAG, "container_drag")                  // drag container cursor (note: not in use)
+ADD_ENUM(CURSORTYPE_SEG_MOVING, "segment_moving")            // segment moving cursor (note: not in use)
+ADD_ENUM(CURSORTYPE_SEG_SIZING, "segment_sizing")            // segment sizing cursor (note: not in use)
 IMPLEMENT_ENUM_END("cursor-type")
 
 IMPLEMENT_ENUM_BEGIN(eWheelPosition)
@@ -943,6 +943,7 @@ ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
 ADD_ENUM(PreloadAreaOption::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("preload-area-option")
 
+
 IMPLEMENT_ENUM_CLASS_BEGIN(taskType)
 ADD_ENUM(taskType::PRIMARY_TASK, "primary")
 ADD_ENUM(taskType::SECONDARY_TASK, "secondary")
@@ -957,6 +958,7 @@ ADD_ENUM(ENTITY_TYPE_OBJECT, "object")
 ADD_ENUM(ENTITY_TYPE_DUMMY, "dummy")
 ADD_ENUM(ENTITY_TYPE_NOTINPOOLS, "unknown")
 IMPLEMENT_ENUM_END("entity-type")
+
 
 IMPLEMENT_ENUM_CLASS_BEGIN(VehicleAudioSettingProperty)
 ADD_ENUM(VehicleAudioSettingProperty::DOOR_SOUND, "door-sound")
@@ -974,6 +976,7 @@ ADD_ENUM(VehicleAudioSettingProperty::FIELD_C, "field-c")
 ADD_ENUM(VehicleAudioSettingProperty::ENGINE_UPGRADE, "engine-upgrade")
 ADD_ENUM(VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-audio")
 IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
+
 
 IMPLEMENT_ENUM_CLASS_BEGIN(PostFXType)
 ADD_ENUM(PostFXType::GAMMA, "gamma")
@@ -1085,15 +1088,15 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
             return GetClassTypeName(pClientElement);
     }
 
-    if (auto* pVar = UserDataCast((CResource*)ptr, luaVM))  // Try resource
+    if (auto* pVar = UserDataCast((CResource*)ptr, luaVM))            // Try resource
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))  // Try xml node
+    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))            // Try xml node
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))  // Try timer
+    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))  // Try 2D Vector
+    if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))  // Try 3D Vector
+    if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))            // Try 3D Vector
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
         return GetClassTypeName(pVar);
@@ -1276,10 +1279,10 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         {
             if (pResource->GetMinClientReq() < szVersionReq)
             {
-#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
                 if (szReason)
                     argStream.SetVersionWarning(szVersionReq, "client", szReason);
-#endif
+                #endif
                 return false;
             }
         }
@@ -1300,14 +1303,16 @@ void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* s
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
         return;
-
+    
     if (pResource->GetMinClientReq() < szVersionReq)
     {
-#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-        SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client %s because %s)", szVersionReq, szReason);
+        #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+        SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client %s because %s)",
+                                szVersionReq, szReason);
         throw std::invalid_argument(err);
-#endif
+        #endif
     }
+    
 }
 
 //
@@ -1373,7 +1378,7 @@ uint GetWeaponPropertyFlagBit(WeaponProperty weaponProperty)
         return 0;
 
     // Check 20 bits from first to last
-    // dassert(WEAPON_FLAG_LAST + 1 - WEAPON_FLAG_FIRST == 20);
+    //dassert(WEAPON_FLAG_LAST + 1 - WEAPON_FLAG_FIRST == 20);
 
     uint uiFlagIndex = ((std::size_t)weaponProperty - (std::size_t)WeaponProperty::WEAPON_FLAG_FIRST);
     uint uiFlagBit = 1 << uiFlagIndex;

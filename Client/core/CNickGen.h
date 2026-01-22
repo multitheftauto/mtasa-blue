@@ -12,5 +12,5 @@
 class CNickGen
 {
 public:
-    static SString GetRandomNickname();
+    static SString           GetRandomNickname();
 };

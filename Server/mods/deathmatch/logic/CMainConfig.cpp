@@ -136,12 +136,12 @@ bool CMainConfig::Load()
     }
 
     // Grab rules
-    CXMLNode*   currentNode = nullptr;
+    CXMLNode* currentNode = nullptr;
     std::size_t currentIndex = 0;
     while (currentNode = m_pRootNode->FindSubNode("rule", currentIndex++))
     {
         CXMLAttribute* attribute = currentNode->GetAttributes().Find("name");
-        SString        ruleName = attribute ? attribute->GetValue() : SString{};
+        SString ruleName = attribute ? attribute->GetValue() : SString{};
 
         attribute = currentNode->GetAttributes().Find("value");
         SString ruleValue = attribute ? attribute->GetValue() : SString{};
@@ -149,7 +149,7 @@ bool CMainConfig::Load()
         if (!ruleName.empty() && !ruleValue.empty())
             m_RulesForASEMap[std::move(ruleName)] = std::move(ruleValue);
     }
-
+  
     // Strip spaces from beginning and end of server name
     m_strServerName = SString(m_strServerName).TrimStart(" ").TrimEnd(" ");
 
@@ -258,13 +258,13 @@ bool CMainConfig::Load()
     {
         // Grab its "name" attribute
         CXMLAttribute* attribute = currentNode->GetAttributes().Find("name");
-        SString        name = attribute ? attribute->GetValue() : SString{};
+        SString name = attribute ? attribute->GetValue() : SString{};
         name = name.Replace("\\", "/").ToLower();
 
         // Grab its "verify" attribute
         attribute = currentNode->GetAttributes().Find("verify");
         SString verify = attribute ? attribute->GetValue() : SString{};
-        bool    shouldVerify = verify == "true" || verify == "yes" || verify == "1";
+        bool shouldVerify = verify == "true" || verify == "yes" || verify == "1";
 
         // Find bitnumber
         bool found = false;
@@ -771,8 +771,7 @@ bool CMainConfig::LoadExtended()
     RegisterCommand("start", CConsoleCommands::StartResource, false, "Usage: start <resource1> <resource2> ...\nStart a loaded resource eg: start admin");
     RegisterCommand("stop", CConsoleCommands::StopResource, false, "Usage: stop <resource1> <resource2> ...\nStop a resource eg: stop admin");
     RegisterCommand("stopall", CConsoleCommands::StopAllResources, false, "Stop all running resources");
-    RegisterCommand("restart", CConsoleCommands::RestartResource, false,
-                    "Usage: restart <resource1> <resource2> ...\nRestarts a running resource eg: restart admin");
+    RegisterCommand("restart", CConsoleCommands::RestartResource, false, "Usage: restart <resource1> <resource2> ...\nRestarts a running resource eg: restart admin");
     RegisterCommand("refresh", CConsoleCommands::RefreshResources, false, "Refresh resource list to find new resources");
     RegisterCommand("refreshall", CConsoleCommands::RefreshAllResources, false, "Refresh resources and restart any changed resources");
     RegisterCommand("list", CConsoleCommands::ListResources, false, "Shows a list of resources");
@@ -1530,8 +1529,7 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {false, false, 0, 1, 1, "database_credentials_protection", &m_bDatabaseCredentialsProtectionEnabled, NULL},
         {false, false, 0, 0, 1, "fakelag", &m_bFakeLagCommandEnabled, NULL},
         {true, true, 50, 1000, 5000, "player_triggered_event_interval", &m_iPlayerTriggeredEventIntervalMs, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
-        {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval,
-         &CMainConfig::OnPlayerTriggeredEventIntervalChange},
+        {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
         {true, true, 0, 1, 1, "resource_client_file_checks", &m_checkResourceClientFiles, nullptr},
     };
 

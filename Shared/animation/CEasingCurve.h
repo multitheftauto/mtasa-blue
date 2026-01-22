@@ -75,7 +75,7 @@ public:
     void GetParams(double& a_rfPeriod, double& a_rfAmplitude, double& a_rfOvershoot) const;
 
     float ValueForProgress(float progress) const;
-    bool  IsTargetValueFinalValue() const;  // at t=1 can we use target as the final value (false for sin & cos)
+    bool  IsTargetValueFinalValue() const;            // at t=1 can we use target as the final value (false for sin & cos)
 protected:
     CEasingCurve_Impl* m_pImplementation;
 };

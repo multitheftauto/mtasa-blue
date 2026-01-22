@@ -19,9 +19,9 @@
 #include <CMatrix.h>
 
 #define INVALID_VEHICLE_SEAT 0xFF
-#define NUM_PLAYER_STATS     343
-#define WEAPON_SLOTS         13
-#define STEALTH_KILL_RANGE   2.5f
+#define NUM_PLAYER_STATS 343
+#define WEAPON_SLOTS 13
+#define STEALTH_KILL_RANGE 2.5f
 
 enum ePedMoveAnim
 {

@@ -77,11 +77,12 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
         {colorWhiteTransparent, 0.92f, 1.5f, ""},
         {colorWhite, 0.95f, 1.0f, SString(_("Change mode: %s"), *GetBoundKeyName("radar_attach"))},
 
-        {colorWhite, 0.05f, 1.0f,
-         SString(_("Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"), *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"),
-                 *GetBoundKeyName("radar_move_north"), *GetBoundKeyName("radar_move_east"), *GetBoundKeyName("radar_move_south"),
-                 *GetBoundKeyName("radar_move_west"), *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
-        {colorWhite, 0.07f, 1.0f, SString(_("Toggle map: %s     Toggle help text: %s"), *GetBoundKeyName("radar"), *GetBoundKeyName("radar_help"))},
+        {colorWhite, 0.05f, 1.0f, SString(_("Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"),
+                 *GetBoundKeyName("radar_zoom_in"), *GetBoundKeyName("radar_zoom_out"), *GetBoundKeyName("radar_move_north"),
+                 *GetBoundKeyName("radar_move_east"), *GetBoundKeyName("radar_move_south"), *GetBoundKeyName("radar_move_west"),
+                 *GetBoundKeyName("radar_opacity_down"), *GetBoundKeyName("radar_opacity_up"))},
+        {colorWhite, 0.07f, 1.0f, SString(_("Toggle map: %s     Toggle help text: %s"),
+                 *GetBoundKeyName("radar"), *GetBoundKeyName("radar_help"))},
     };
 
     for (uint i = 0; i < NUMELMS(messageList); i++)
@@ -266,11 +267,11 @@ CTextureItem* CPlayerMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fL
         pMarker->GetPosition(vecMarker);
 
         if (fLocalZ > vecMarker.fZ + 4.0f)
-            uiListIndex = MARKER_DOWN_TRIANGLE_INDEX;  // We're higher than this marker, so draw the arrow pointing down
+            uiListIndex = MARKER_DOWN_TRIANGLE_INDEX;            // We're higher than this marker, so draw the arrow pointing down
         else if (fLocalZ < vecMarker.fZ - 4.0f)
-            uiListIndex = MARKER_UP_TRIANGLE_INDEX;  // We're lower than this entity, so draw the arrow pointing up
+            uiListIndex = MARKER_UP_TRIANGLE_INDEX;            // We're lower than this entity, so draw the arrow pointing up
         else
-            uiListIndex = MARKER_SQUARE_INDEX;  // We're at the same level so draw a square
+            uiListIndex = MARKER_SQUARE_INDEX;            // We're at the same level so draw a square
 
         fScale /= 4;
     }
@@ -717,8 +718,7 @@ void CPlayerMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
 
 bool CPlayerMap::IsPlayerMapShowing()
 {
-    return ((m_bIsPlayerMapEnabled || m_bForcedState) && m_mapImageTexture && m_playerMarkerTexture &&
-            (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
+    return ((m_bIsPlayerMapEnabled || m_bForcedState) && m_mapImageTexture && m_playerMarkerTexture && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
 }
 
 bool CPlayerMap::GetBoundingBox(CVector& vecMin, CVector& vecMax)

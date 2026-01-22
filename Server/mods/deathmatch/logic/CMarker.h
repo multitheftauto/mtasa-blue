@@ -72,7 +72,7 @@ public:
 
     SColor GetTargetArrowColor() const noexcept { return m_TargetArrowColor; };
     float  GetTargetArrowSize() const noexcept { return m_TargetArrowSize; };
-    void   SetTargetArrowProperties(const SColor color, float size) noexcept;
+    void SetTargetArrowProperties(const SColor color, float size) noexcept;
 
 protected:
     bool ReadSpecialData(const int iLine) override;

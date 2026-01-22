@@ -19,9 +19,9 @@ class CGraphics;
 #include "CSingleton.h"
 #include "CRenderItemManager.h"
 
-#define DUMMY_PROGRESS_INITIAL_DELAY      1000  // Game stall time before spinner is displayed
-#define DUMMY_PROGRESS_MIN_DISPLAY_TIME   1000  // Minimum time spinner is drawn (to prevent flicker)
-#define DUMMY_PROGRESS_ANIMATION_INTERVAL 100   // Animation speed
+#define DUMMY_PROGRESS_INITIAL_DELAY        1000    // Game stall time before spinner is displayed
+#define DUMMY_PROGRESS_MIN_DISPLAY_TIME     1000    // Minimum time spinner is drawn (to prevent flicker)
+#define DUMMY_PROGRESS_ANIMATION_INTERVAL   100     // Animation speed
 
 class CTileBatcher;
 class CLine3DBatcher;
@@ -154,8 +154,7 @@ public:
     void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
 
     void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, eRenderStage stage = eRenderStage::PRE_FX);
-    void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
-                                       eRenderStage stage = eRenderStage::PRE_FX);
+    void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, eRenderStage stage = eRenderStage::PRE_FX);
 
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                           short siSegments, float fRatio, bool bPostGUI);
@@ -240,7 +239,7 @@ private:
     CPrimitiveMaterialBatcher*   m_pPrimitiveMaterialBatcher = nullptr;
     CPrimitive3DBatcher*         m_pPrimitive3DBatcherPreGUI = nullptr;
     CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostFX = nullptr;
-    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;    
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostFX = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
@@ -371,8 +370,8 @@ private:
     enum EMTARenderZone
     {
         MTA_RZONE_NONE,
-        MTA_RZONE_MAIN,     // MTA rendering inside known areas.
-        MTA_RZONE_OUTSIDE,  // MTA rendering outside known areas. i.e. During a keypress or GTA callback
+        MTA_RZONE_MAIN,               // MTA rendering inside known areas.
+        MTA_RZONE_OUTSIDE,            // MTA rendering outside known areas. i.e. During a keypress or GTA callback
     };
 
     EMTARenderZone                          m_MTARenderZone;

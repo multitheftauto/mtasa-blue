@@ -51,9 +51,9 @@ void OnMY_CWeapon_GenerateDamageEvent(DWORD calledFrom, CPedSAInterface* pPed, C
 }
 
 // Hook info
-#define HOOKPOS_CWeapon_GenerateDamageEvent  0x73A530
-#define HOOKSIZE_CWeapon_GenerateDamageEvent 7
-DWORD                 RETURN_CWeapon_GenerateDamageEvent = 0x73A537;
+#define HOOKPOS_CWeapon_GenerateDamageEvent                         0x73A530
+#define HOOKSIZE_CWeapon_GenerateDamageEvent                        7
+DWORD RETURN_CWeapon_GenerateDamageEvent = 0x73A537;
 void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 {
     _asm
@@ -85,8 +85,8 @@ void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 //////////////////////////////////////////////////////////////////////////////////////////
 
 // Hook info
-#define HOOKPOS_CShotInfo_Update  0x739E60
-#define HOOKSIZE_CShotInfo_Update 6
+#define HOOKPOS_CShotInfo_Update                         0x739E60
+#define HOOKSIZE_CShotInfo_Update                        6
 DWORD RETURN_CShotInfo_Update = 0x739E66;
 
 // Clear all shotinfos
@@ -100,8 +100,8 @@ void ResetShotInfoArray()
         memcpy(pInfo + i, pInfo, sizeof(CFlameShotInfo));
 }
 
-#pragma warning(push)
-#pragma warning(disable : 4731)  // warning C4731: 'Call_CShotInfo_Update' : frame pointer register 'ebp' modified by inline assembly code
+#pragma warning( push )
+#pragma warning( disable : 4731 )   // warning C4731: 'Call_CShotInfo_Update' : frame pointer register 'ebp' modified by inline assembly code
 
 void Call_CShotInfo_Update()
 {
@@ -118,7 +118,7 @@ void Call_CShotInfo_Update()
     }
 }
 
-#pragma warning(pop)
+#pragma warning( pop )
 
 // Our code for when CShotInfo_Update is called
 void OnMY_CShotInfo_Update()
@@ -171,16 +171,16 @@ int OnMY_Fx_AddBulletImpact(int iType)
     if (iType == 2 || iType == 4)
     {
         if (ms_LastFxTimer.Get() > 500)
-            ms_LastFxTimer.Reset();  // Allow once every 500ms
+            ms_LastFxTimer.Reset();            // Allow once every 500ms
         else
-            iType = 1;  // Otherwise replace with spark
+            iType = 1;            // Otherwise replace with spark
     }
     return iType;
 }
 
 // Hook info
-#define HOOKPOS_Fx_AddBulletImpact  0x049F3E8
-#define HOOKSIZE_Fx_AddBulletImpact 5
+#define HOOKPOS_Fx_AddBulletImpact                         0x049F3E8
+#define HOOKSIZE_Fx_AddBulletImpact                        5
 DWORD RETURN_Fx_AddBulletImpact = 0x049F3ED;
 
 void _declspec(naked) HOOK_Fx_AddBulletImpact()
@@ -190,11 +190,11 @@ void _declspec(naked) HOOK_Fx_AddBulletImpact()
         pushad
         push    eax
         call    OnMY_Fx_AddBulletImpact
-        mov     [esp+0], eax  // Put result temp
+        mov     [esp+0], eax         // Put result temp
         add     esp, 4*1
         popad
 
-        mov     esi, [esp-32-4*1]  // Get result temp
+        mov     esi, [esp-32-4*1]    // Get result temp
         mov     eax, ds:0x0B6F03C
         jmp     RETURN_Fx_AddBulletImpact
     }
@@ -203,25 +203,25 @@ void _declspec(naked) HOOK_Fx_AddBulletImpact()
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVisibilityPlugins::RenderWeaponPedsForPC
-//
+// 
 // Fix for the bright objects after weapon change sometimes
-//
+// 
 //////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC  0x733123
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC 0x733123
 #define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC 5
-static constexpr DWORD       CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC = 0x733128;
+static constexpr DWORD CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC = 0x733128;
 static void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
 {
     _asm
     {
         mov eax, 5DF4E0h
-        call eax  // call CPed::ResetGunFlashAlpha
+        call eax // call CPed::ResetGunFlashAlpha
 
         mov eax, 5533B0h
         mov ecx, ebx
 
         push 0
-        call eax  // call CPed::RemoveLighting
+        call eax // call CPed::RemoveLighting
 
         jmp CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC
     }

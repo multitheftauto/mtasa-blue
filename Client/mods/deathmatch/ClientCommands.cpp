@@ -18,14 +18,14 @@ using std::list;
 using std::vector;
 
 #ifdef MTA_DEBUG
-    #include <Tlhelp32.h>
-    #include <Psapi.h>
-    #include <shlwapi.h>
-    #include <Utils.h>
+#include <Tlhelp32.h>
+#include <Psapi.h>
+#include <shlwapi.h>
+#include <Utils.h>
 #endif
 
 // Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
-#pragma warning(disable : 4312)
+#pragma warning(disable:4312)
 
 extern CClientGame* g_pClientGame;
 
@@ -771,7 +771,7 @@ void COMMAND_ServerInfo(const char* szCmdLine)
     g_pCore->GetConsole()->Print(*strSpacer);
 }
 
-#if defined(MTA_DEBUG) || defined(MTA_BETA)
+#if defined (MTA_DEBUG) || defined (MTA_BETA)
 
 void COMMAND_ShowSyncing(const char* szCmdLine)
 {

@@ -29,6 +29,6 @@ public:
     ~CThreadData();
 
     bool        bAbortThread;
-    ThreadMutex MutexPrimary;  // primary mutex for suspend/resume operations
-    ThreadMutex MutexLogical;  // logical mutex for proper CThreadData sync
+    ThreadMutex MutexPrimary;            // primary mutex for suspend/resume operations
+    ThreadMutex MutexLogical;            // logical mutex for proper CThreadData sync
 };

@@ -25,7 +25,7 @@ namespace MemSA
         return ((gta_malloc)0x824257)(count);
     };
 
-    template <typename T>
+    template<typename T>
     T* malloc_struct(size_t count)
     {
         return static_cast<T*>(MemSA::malloc(sizeof(T) * count));

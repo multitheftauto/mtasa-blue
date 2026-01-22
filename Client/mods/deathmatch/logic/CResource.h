@@ -19,8 +19,8 @@
 #include "CElementGroup.h"
 #include <list>
 
-#define MAX_RESOURCE_NAME_LENGTH 255
-#define MAX_FUNCTION_NAME_LENGTH 50
+#define MAX_RESOURCE_NAME_LENGTH    255
+#define MAX_FUNCTION_NAME_LENGTH    50
 
 struct SNoClientCacheScript
 {
@@ -120,8 +120,8 @@ private:
     bool                 m_bActive;
     bool                 m_bStarting;
     bool                 m_bStopping;
-    class CClientEntity* m_pResourceEntity;         // no idea what this is used for anymore
-    class CClientEntity* m_pResourceDynamicEntity;  // parent of elements created by the resource
+    class CClientEntity* m_pResourceEntity;                   // no idea what this is used for anymore
+    class CClientEntity* m_pResourceDynamicEntity;            // parent of elements created by the resource
     class CClientEntity* m_pResourceCOLRoot;
     class CClientEntity* m_pResourceDFFEntity;
     class CClientEntity* m_pResourceGUIEntity;
@@ -139,14 +139,14 @@ private:
     static int m_iShowingCursor;
     bool       m_bShowingCursor;
 
-    SString m_strResourceDirectoryPath;            // stores the path to /mods/deathmatch/resources/resource_name
-    SString m_strResourcePrivateDirectoryPath;     // stores the path to /mods/deathmatch/priv/server-id/resource_name
-    SString m_strResourcePrivateDirectoryPathOld;  // stores the path to /mods/deathmatch/priv/old-server-id/resource_name
+    SString m_strResourceDirectoryPath;                      // stores the path to /mods/deathmatch/resources/resource_name
+    SString m_strResourcePrivateDirectoryPath;               // stores the path to /mods/deathmatch/priv/server-id/resource_name
+    SString m_strResourcePrivateDirectoryPathOld;            // stores the path to /mods/deathmatch/priv/old-server-id/resource_name
 
     std::list<class CResourceFile*>       m_ResourceFiles;
     std::list<class CResourceConfigItem*> m_ConfigFiles;
     CFastHashSet<SString>                 m_exportedFunctions;
-    CElementGroup*                        m_pDefaultElementGroup;  // stores elements created by scripts in this resource
+    CElementGroup*                        m_pDefaultElementGroup;            // stores elements created by scripts in this resource
     std::list<SNoClientCacheScript>       m_NoClientCacheScriptList;
 
     CResourceModelStreamer m_modelStreamer{};

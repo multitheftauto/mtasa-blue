@@ -16,12 +16,12 @@ struct SPDVertex
     DWORD             color;
 };
 
-#define WRITE_PD_VERTEX(buf, fX, fY, fZ, dwColor) \
-    buf->x = fX; \
-    buf->y = fY; \
-    buf->z = fZ; \
-    buf->color = dwColor; \
-    buf++;
+#define WRITE_PD_VERTEX(buf,fX,fY,fZ,dwColor) \
+        buf->x = fX; \
+        buf->y = fY; \
+        buf->z = fZ; \
+        buf->color = dwColor; \
+        buf++;
 
 struct SLine3DItem
 {

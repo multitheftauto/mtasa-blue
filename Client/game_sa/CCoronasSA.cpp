@@ -86,18 +86,18 @@ RwTexture* CCoronasSA::GetTexture(CoronaType type)
     // Validate enum is within valid range
     if (static_cast<DWORD>(type) >= MAX_CORONA_TEXTURES) [[unlikely]]
         return nullptr;
-
+    
     // Read texture pointer from array with validation
     DWORD* pTextureArray = reinterpret_cast<DWORD*>(ARRAY_CORONA_TEXTURES);
     if (!pTextureArray) [[unlikely]]
         return nullptr;
-
+    
     DWORD textureAddr = pTextureArray[static_cast<DWORD>(type)];
     if (!textureAddr) [[unlikely]]
         return nullptr;
-
+    
     RwTexture* pTexture = reinterpret_cast<RwTexture*>(textureAddr);
-
+    
     return pTexture;
 }
 

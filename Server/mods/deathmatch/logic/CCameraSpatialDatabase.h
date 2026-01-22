@@ -11,7 +11,7 @@
 class CPlayerCamera;
 
 // Bounding sphere z position for 2d objects
-#define SPATIAL_2D_Z 0
+#define SPATIAL_2D_Z    0
 
 // Result of a Query
 class CCameraQueryResult : public std::vector<CPlayerCamera*>

@@ -210,7 +210,7 @@ int CLuaFunctionDefs::UnbindKey(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            if (argStream.NextIsString(1))  // Check if has command
+            if (argStream.NextIsString(1))            // Check if has command
             {
                 // bool unbindKey ( string key, string keyState, string command )
                 SString strResource = pLuaMain->GetResource()->GetName();
@@ -304,7 +304,7 @@ int CLuaFunctionDefs::SetAnalogControlState(lua_State* luaVM)
     //  bool setAnalogControlState ( string controlName [, float state][, bFrameForced] )
     SString          strControlState = "";
     float            fState = 0.0f;
-    bool             bForceOverrideNextFrame = false;  // if user input effect should be forcefully overriden for the next frame
+    bool             bForceOverrideNextFrame = false;            // if user input effect should be forcefully overriden for the next frame
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strControlState);
 

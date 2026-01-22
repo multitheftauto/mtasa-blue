@@ -45,8 +45,8 @@ static void __cdecl UpdateVehicleDummiesPositionArray(CVehicleSAInterface* vehic
 // >>> 0x6DE325 | 89 54 24 70          | mov  [esp+0D4h+var_64.x], edx
 // >>> 0x6DE329 | 89 54 24 48          | mov  [esp+0D4h+var_8C], edx
 //     0x6DE32D | E8 BE D9 EB FF       | call CMatrix::CMatrix(CMatrix const &)
-#define HOOKPOS_CVehicle_AddExhaustParticles_1  0x6DE2F1
-#define HOOKSIZE_CVehicle_AddExhaustParticles_1 59
+#define HOOKPOS_CVehicle_AddExhaustParticles_1               0x6DE2F1
+#define HOOKSIZE_CVehicle_AddExhaustParticles_1              59
 static const DWORD CONTINUE_CVehicle_AddExhaustParticles_1 = 0x6DE32D;
 
 static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleInterface, CVector* mainPosition, CVector* secondaryPosition)
@@ -101,9 +101,9 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
         pushad
         lea     eax, [esp+5Ch]
         lea     ebx, [esp+84h]
-        push    eax  // CVector*
-        push    ebx  // CVector*
-        push    esi  // CVehicleSAInterface*
+        push    eax             // CVector*
+        push    ebx             // CVector*
+        push    esi             // CVehicleSAInterface*
         call    ApplyExhaustParticlesPosition
         add     esp, 12
         popad
@@ -130,8 +130,8 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
 // >>> 0x6DE39E | 8B 57 5C          | mov edx, [edi+5Ch]
 // >>> 0x6DE3A1 | 81 C2 84 00 00 00 | add edx, 84h
 //     0x6DE3A7 | 8B 02             | mov eax, [edx]
-#define HOOKPOS_CVehicle_AddExhaustParticles_2  0x6DE39E
-#define HOOKSIZE_CVehicle_AddExhaustParticles_2 9
+#define HOOKPOS_CVehicle_AddExhaustParticles_2               0x6DE39E
+#define HOOKSIZE_CVehicle_AddExhaustParticles_2              9
 static const DWORD CONTINUE_CVehicle_AddExhaustParticles_2 = 0x6DE3A7;
 
 static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
@@ -167,8 +167,8 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
 // >>> 0x6D2B09 | 8B 49 5C             | mov  ecx, [ecx+5Ch]
 // >>> 0x6D2B0C | 83 C1 54             | add  ecx, 54h
 //     0x6D2B0F | 84 D2                | test dl, dl
-#define HOOKPOS_CVehicle_AddDamagedVehicleParticles  0x6D2B09
-#define HOOKSIZE_CVehicle_AddDamagedVehicleParticles 6
+#define HOOKPOS_CVehicle_AddDamagedVehicleParticles               0x6D2B09
+#define HOOKSIZE_CVehicle_AddDamagedVehicleParticles              6
 static const DWORD CONTINUE_CVehicle_AddDamagedVehicleParticles = 0x6D2B0F;
 
 static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
@@ -176,7 +176,7 @@ static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -208,8 +208,8 @@ static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
 // >>> 0x53A714 | 8B 40 5C             | mov eax, [eax+5Ch]
 // >>> 0x53A717 | 8B 10                | mov edx, [eax]
 //     0x53A719 | 89 54 24 18          | mov [esp+3Ch+var_24.x], edx
-#define HOOKPOS_CFire_ProcessFire  0x53A714
-#define HOOKSIZE_CFire_ProcessFire 5
+#define HOOKPOS_CFire_ProcessFire               0x53A714
+#define HOOKSIZE_CFire_ProcessFire              5
 static const DWORD CONTINUE_CFire_ProcessFire = 0x53A719;
 
 static void _declspec(naked) HOOK_CFire_ProcessFire()
@@ -217,7 +217,7 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
     _asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -249,8 +249,8 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
 // >>> 0x6A3BE2 | 8B 48 5C             | mov ecx, [eax+5Ch]
 // >>> 0x6A3BE5 | 83 C1 48             | add ecx, 48h
 //     0x6A3BE8 | 8B 11                | mov edx, [ecx]
-#define HOOKPOS_CAutomobile_DoNitroEffect_1  0x6A3BE2
-#define HOOKSIZE_CAutomobile_DoNitroEffect_1 6
+#define HOOKPOS_CAutomobile_DoNitroEffect_1               0x6A3BE2
+#define HOOKSIZE_CAutomobile_DoNitroEffect_1              6
 static const DWORD CONTINUE_CAutomobile_DoNitroEffect_1 = 0x6A3BE8;
 
 static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
@@ -258,7 +258,7 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -298,8 +298,8 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
 // >>> 0x6A3C89 | D9 5C 24 20       | fstp [esp+38h+secondaryNitroPos.x]
 // >>> 0x6A3C8D | 89 54 24 24       | mov  [esp+38h+secondaryNitroPos.y], edx
 //     0x6A3C91 | 74 4B             | jz   short loc_6A3CDE
-#define HOOKPOS_CAutomobile_DoNitroEffect_2  0x6A3C68
-#define HOOKSIZE_CAutomobile_DoNitroEffect_2 41
+#define HOOKPOS_CAutomobile_DoNitroEffect_2               0x6A3C68
+#define HOOKSIZE_CAutomobile_DoNitroEffect_2              41
 static const DWORD CONTINUE_CAutomobile_DoNitroEffect_2 = 0x6A3C91;
 
 static void __cdecl ApplySecondaryExhaustNitroPosition(CVehicleSAInterface* vehicleInterface, CVector* secondaryExhaustPosition)
@@ -330,8 +330,8 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
     {
         pushad
         lea     eax, [esp+40h]
-        push    eax  // CVector*
-        push    esi  // CVehicleSAInterface*
+        push    eax             // CVector*
+        push    esi             // CVehicleSAInterface*
         call    ApplySecondaryExhaustNitroPosition
         add     esp, 8
         popad
@@ -355,8 +355,8 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
 // >>> 0x6E1F3C | 8B 40 5C             | mov eax, [eax+5Ch]
 // >>> 0x6E1F3F | 83 C0 18             | add eax, 18h
 //     0x6E1F42 | 8B 08                | mov ecx, [eax]
-#define HOOKPOS_CVehicle_DoVehicleLights_1  0x6E1F3C
-#define HOOKSIZE_CVehicle_DoVehicleLights_1 6
+#define HOOKPOS_CVehicle_DoVehicleLights_1               0x6E1F3C
+#define HOOKSIZE_CVehicle_DoVehicleLights_1              6
 static const DWORD CONTINUE_CVehicle_DoVehicleLights_1 = 0x6E1F42;
 
 static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
@@ -364,7 +364,7 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -389,8 +389,8 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
 // >>> 0x6E22CD | 8B 48 5C             | mov ecx, [eax+5Ch]
 // >>> 0x6E22D0 | 83 C1 18             | add ecx, 18h
 //     0x6E22D3 | 8B 11                | mov edx, [ecx]
-#define HOOKPOS_CVehicle_DoVehicleLights_2  0x6E22CD
-#define HOOKSIZE_CVehicle_DoVehicleLights_2 6
+#define HOOKPOS_CVehicle_DoVehicleLights_2               0x6E22CD
+#define HOOKSIZE_CVehicle_DoVehicleLights_2              6
 static const DWORD CONTINUE_CVehicle_DoVehicleLights_2 = 0x6E22D3;
 
 static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
@@ -398,7 +398,7 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -430,8 +430,8 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
 // >>> 0x6A717F | 8B 40 5C             | mov eax, [eax+5Ch]
 // >>> 0x6A7182 | 83 C0 54             | add eax, 54h
 //     0x6A7185 | 8B 08                | mov ecx, [eax]
-#define HOOKPOS_CAutomobile_ProcessCarOnFireAndExplode  0x6A717F
-#define HOOKSIZE_CAutomobile_ProcessCarOnFireAndExplode 6
+#define HOOKPOS_CAutomobile_ProcessCarOnFireAndExplode               0x6A717F
+#define HOOKSIZE_CAutomobile_ProcessCarOnFireAndExplode              6
 static const DWORD CONTINUE_CAutomobile_ProcessCarOnFireAndExplode = 0x6A7185;
 
 static void _declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
@@ -439,7 +439,7 @@ static void _declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -471,8 +471,8 @@ static void _declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
 // >>> 0x6B8053 | 8B 40 5C             | mov eax, [eax+92]
 // >>> 0x6B8056 | 83 C0 78             | add eax, 78h
 //     0x6B8059 | 8B 10                | mov edx, [eax]
-#define HOOKPOS_CBike_FixHandsToBars  0x6B8053
-#define HOOKSIZE_CBike_FixHandsToBars 6
+#define HOOKPOS_CBike_FixHandsToBars               0x6B8053
+#define HOOKSIZE_CBike_FixHandsToBars              6
 static const DWORD CONTINUE_CBike_FixHandsToBars = 0x6B8059;
 
 static void _declspec(naked) HOOK_CBike_FixHandsToBars()
@@ -480,7 +480,7 @@ static void _declspec(naked) HOOK_CBike_FixHandsToBars()
     _asm
     {
         pushad
-        push    ebx  // CVehicleSAInterface*
+        push    ebx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -512,8 +512,8 @@ static void _declspec(naked) HOOK_CBike_FixHandsToBars()
 // >>> 0x5DF98B | 83 7F 3C 05 | cmp dword ptr [edi+3Ch], 5
 // >>> 0x5DF98F | 8B 7F 5C    | mov edi, [edi+5Ch]
 //     0x5DF992 | 74 03       | jz  short loc_5DF997
-#define HOOKPOS_CPed_SetPedPositionInCar_1  0x5DF98B
-#define HOOKSIZE_CPed_SetPedPositionInCar_1 7
+#define HOOKPOS_CPed_SetPedPositionInCar_1               0x5DF98B
+#define HOOKSIZE_CPed_SetPedPositionInCar_1              7
 static const DWORD CONTINUE_CPed_SetPedPositionInCar_1 = 0x5DF992;
 
 static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
@@ -522,7 +522,7 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
     {
         pushad
         mov     eax, [esi+58Ch]
-        push    eax  // CVehicleSAInterface*
+        push    eax            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -554,8 +554,8 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
 // >>> 0x5DFA56 | 8B 47 5C    | mov eax, [edi+5Ch]
 // >>> 0x5DFA59 | 83 C0 3C    | add eax, 3Ch
 //     0x5DFA5C | 8B 10       | mov edx, [eax]
-#define HOOKPOS_CPed_SetPedPositionInCar_2  0x5DFA56
-#define HOOKSIZE_CPed_SetPedPositionInCar_2 6
+#define HOOKPOS_CPed_SetPedPositionInCar_2               0x5DFA56
+#define HOOKSIZE_CPed_SetPedPositionInCar_2              6
 static const DWORD CONTINUE_CPed_SetPedPositionInCar_2 = 0x5DFA5C;
 
 static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
@@ -564,7 +564,7 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
     {
         pushad
         mov     eax, [esi+58Ch]
-        push    eax  // CVehicleSAInterface*
+        push    eax            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -596,8 +596,8 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
 // >>> 0x5DFA04 | 83 7F 3C 05 | cmp dword ptr [edi+3Ch], 5
 // >>> 0x5DFA08 | 8B 7F 5C    | mov edi, [edi+5Ch]
 //     0x5DFA0B | 74 03       | jz  short loc_5DFA10
-#define HOOKPOS_CPed_SetPedPositionInCar_3  0x5DFA04
-#define HOOKSIZE_CPed_SetPedPositionInCar_3 7
+#define HOOKPOS_CPed_SetPedPositionInCar_3               0x5DFA04
+#define HOOKSIZE_CPed_SetPedPositionInCar_3              7
 static const DWORD CONTINUE_CPed_SetPedPositionInCar_3 = 0x5DFA0B;
 
 static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
@@ -606,7 +606,7 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
     {
         pushad
         mov     eax, [esi+58Ch]
-        push    eax  // CVehicleSAInterface*
+        push    eax            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -638,8 +638,8 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
 // >>> 0x5DFA80 | 8B 57 5C    | mov edx, [edi+5Ch]
 // >>> 0x5DFA83 | 83 C2 3C    | add edx, 3Ch
 //     0x5DFA86 | 8B 02       | mov eax, [edx]
-#define HOOKPOS_CPed_SetPedPositionInCar_4  0x5DFA80
-#define HOOKSIZE_CPed_SetPedPositionInCar_4 6
+#define HOOKPOS_CPed_SetPedPositionInCar_4               0x5DFA80
+#define HOOKSIZE_CPed_SetPedPositionInCar_4              6
 static const DWORD CONTINUE_CPed_SetPedPositionInCar_4 = 0x5DFA86;
 
 static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
@@ -648,7 +648,7 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
     {
         pushad
         mov     eax, [esi+58Ch]
-        push    eax  // CVehicleSAInterface*
+        push    eax            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -680,8 +680,8 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
 // >>> 0x6E0A69 | 8B 50 5C             | mov edx, [eax+5Ch]
 // >>> 0x6E0A6C | 8D 0C 5B             | lea ecx, [ebx+ebx*2]
 //     0x6E0A6F | 8D 04 CA             | lea eax, [edx+ecx*8]
-#define HOOKPOS_CVehicle_DoHeadLightEffect  0x6E0A69
-#define HOOKSIZE_CVehicle_DoHeadLightEffect 6
+#define HOOKPOS_CVehicle_DoHeadLightEffect               0x6E0A69
+#define HOOKSIZE_CVehicle_DoHeadLightEffect              6
 static const DWORD CONTINUE_CVehicle_DoHeadLightEffect = 0x6E0A6F;
 
 static void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
@@ -689,7 +689,7 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
     _asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -722,8 +722,8 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
 // >>> 0x6E17C3 | 53                   | push ebx
 // >>> 0x6E17C4 | 8B 5C 24 34          | mov  ebx, [esp+4+30h]
 //     0x6E17C8 | 83 FB 01             | cmp  ebx, 1
-#define HOOKPOS_CVehicle_DoTailLightEffect  0x6E17C0
-#define HOOKSIZE_CVehicle_DoTailLightEffect 8
+#define HOOKPOS_CVehicle_DoTailLightEffect               0x6E17C0
+#define HOOKSIZE_CVehicle_DoTailLightEffect              8
 static const DWORD CONTINUE_CVehicle_DoTailLightEffect = 0x6E17C8;
 
 static void _declspec(naked) HOOK_CVehicle_DoTailLightEffect()
@@ -731,7 +731,7 @@ static void _declspec(naked) HOOK_CVehicle_DoTailLightEffect()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -765,8 +765,8 @@ static void _declspec(naked) HOOK_CVehicle_DoTailLightEffect()
 // >>> 0x6E1452 | 8B 50 5C             | mov  edx, [eax+5Ch]
 // >>> 0x6E1455 | 8B 02                | mov  eax, [edx]
 //     0x6E1457 | 89 44 24 18          | mov  [esp+24h+var_C], eax
-#define HOOKPOS_CVehicle_DoHeadLightReflectionSingle  0x6E1452
-#define HOOKSIZE_CVehicle_DoHeadLightReflectionSingle 5
+#define HOOKPOS_CVehicle_DoHeadLightReflectionSingle               0x6E1452
+#define HOOKSIZE_CVehicle_DoHeadLightReflectionSingle              5
 static const DWORD CONTINUE_CVehicle_DoHeadLightReflectionSingle = 0x6E1457;
 
 static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
@@ -774,7 +774,7 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
     _asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -806,8 +806,8 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
 // >>> 0x6E160E | 8B 50 5C             | mov edx, [eax+5Ch]
 // >>> 0x6E1611 | 8B 02                | mov eax, [edx]
 //     0x6E1613 | 89 44 24 10          | mov [esp+1Ch+var_C], eax
-#define HOOKPOS_CVehicle_DoHeadLightReflectionTwin  0x6E160E
-#define HOOKSIZE_CVehicle_DoHeadLightReflectionTwin 5
+#define HOOKPOS_CVehicle_DoHeadLightReflectionTwin               0x6E160E
+#define HOOKSIZE_CVehicle_DoHeadLightReflectionTwin              5
 static const DWORD CONTINUE_CVehicle_DoHeadLightReflectionTwin = 0x6E1613;
 
 static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
@@ -815,7 +815,7 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
     _asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -848,8 +848,8 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 // >>> 0x6D429A | 8B 04 8D C8 B0 A9 00 | mov   eax, CModelInfo::ms_modelInfoPtrs
 // >>> 0x6D42A1 | 8B 40 5C             | mov   eax, [eax+5Ch]
 //     0x6D42A4 | 05 9C 00 00 00       | add   eax, 9Ch
-#define HOOKPOS_CVehicle_GetPlaneGunsPosition  0x6D4297
-#define HOOKSIZE_CVehicle_GetPlaneGunsPosition 13
+#define HOOKPOS_CVehicle_GetPlaneGunsPosition               0x6D4297
+#define HOOKSIZE_CVehicle_GetPlaneGunsPosition              13
 static const DWORD CONTINUE_CVehicle_GetPlaneGunsPosition = 0x6D42A4;
 
 static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
@@ -857,7 +857,7 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
     _asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -891,8 +891,8 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 // >>> 0x6D46F0 | 8B 40 5C             | mov eax, [eax+5Ch]
 // >>> 0x6D46F3 | 05 9C 00 00 00       | add eax, 9Ch
 //     0x6D46F8 | 8B 08                | mov ecx, [eax]
-#define HOOKPOS_CVehicle_GetPlaneOrdnancePosition  0x6D46F0
-#define HOOKSIZE_CVehicle_GetPlaneOrdnancePosition 8
+#define HOOKPOS_CVehicle_GetPlaneOrdnancePosition               0x6D46F0
+#define HOOKSIZE_CVehicle_GetPlaneOrdnancePosition              8
 static const DWORD CONTINUE_CVehicle_GetPlaneOrdnancePosition = 0x6D46F8;
 
 static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
@@ -900,7 +900,7 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
     _asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -932,8 +932,8 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
 // >>> 0x6D5438 | 83 78 3C 05          | cmp dword ptr [eax+3Ch], 5
 // >>> 0x6D543C | 8B 40 5C             | mov eax, [eax+5Ch]
 //     0x6D543F | 74 03                | jz  short loc_6D5444
-#define HOOKPOS_CVehicle_CanBeDriven  0x6D5438
-#define HOOKSIZE_CVehicle_CanBeDriven 7
+#define HOOKPOS_CVehicle_CanBeDriven               0x6D5438
+#define HOOKSIZE_CVehicle_CanBeDriven              7
 static const DWORD CONTINUE_CVehicle_CanBeDriven = 0x6D543F;
 
 static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
@@ -941,7 +941,7 @@ static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
     _asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -973,8 +973,8 @@ static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
 // >>> 0x6C971B | 8B 4D 5C          | mov  ecx, [ebp+5Ch]
 // >>> 0x6C971E | 81 C1 84 00 00 00 | add  ecx, 84h
 //     0x6C9724 | 8B 11             | mov  edx, [ecx]
-#define HOOKPOS_CPlane_PreRender_1  0x6C971B
-#define HOOKSIZE_CPlane_PreRender_1 9
+#define HOOKPOS_CPlane_PreRender_1               0x6C971B
+#define HOOKSIZE_CPlane_PreRender_1              9
 static const DWORD CONTINUE_CPlane_PreRender_1 = 0x6C9724;
 
 static void _declspec(naked) HOOK_CPlane_PreRender_1()
@@ -982,7 +982,7 @@ static void _declspec(naked) HOOK_CPlane_PreRender_1()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -1014,8 +1014,8 @@ static void _declspec(naked) HOOK_CPlane_PreRender_1()
 // >>> 0x6C98C9 | 8B 45 5C       | mov  eax, [ebp+5Ch]
 // >>> 0x6C98CC | 83 C0 6C       | add  eax, 6Ch
 //     0x6C98CF | 8B 08          | mov  ecx, [eax]
-#define HOOKPOS_CPlane_PreRender_2  0x6C98C9
-#define HOOKSIZE_CPlane_PreRender_2 6
+#define HOOKPOS_CPlane_PreRender_2               0x6C98C9
+#define HOOKSIZE_CPlane_PreRender_2              6
 static const DWORD CONTINUE_CPlane_PreRender_2 = 0x6C98CF;
 
 static void _declspec(naked) HOOK_CPlane_PreRender_2()
@@ -1023,7 +1023,7 @@ static void _declspec(naked) HOOK_CPlane_PreRender_2()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -1055,8 +1055,8 @@ static void _declspec(naked) HOOK_CPlane_PreRender_2()
 // >>> 0x6C9B56 | 8B 45 5C       | mov  eax, [ebp+5Ch]
 // >>> 0x6C9B59 | 83 C0 78       | add  eax, 78h
 //     0x6C9B5C | 8B 08          | mov  ecx, [eax]
-#define HOOKPOS_CPlane_PreRender_3  0x6C9B56
-#define HOOKSIZE_CPlane_PreRender_3 6
+#define HOOKPOS_CPlane_PreRender_3               0x6C9B56
+#define HOOKSIZE_CPlane_PreRender_3              6
 static const DWORD CONTINUE_CPlane_PreRender_3 = 0x6C9B5C;
 
 static void _declspec(naked) HOOK_CPlane_PreRender_3()
@@ -1064,7 +1064,7 @@ static void _declspec(naked) HOOK_CPlane_PreRender_3()
     _asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -1096,8 +1096,8 @@ static void _declspec(naked) HOOK_CPlane_PreRender_3()
 // >>> 0x6E0E34 | 8B 49 5C             | mov ecx, [ecx+5Ch]
 // >>> 0x6E0E37 | 8B 84 24 9C 00 00 00 | mov eax, [esp+98h+arg_0]
 //     0x6E0E3E | 83 F8 01             | cmp eax, 1
-#define HOOKPOS_CVehicle_DoHeadLightBeam  0x6E0E34
-#define HOOKSIZE_CVehicle_DoHeadLightBeam 10
+#define HOOKPOS_CVehicle_DoHeadLightBeam               0x6E0E34
+#define HOOKSIZE_CVehicle_DoHeadLightBeam              10
 static const DWORD CONTINUE_CVehicle_DoHeadLightBeam = 0x6E0E3E;
 
 static void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
@@ -1105,7 +1105,7 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
     _asm
     {
         pushad
-        push    edi  // CVehicleSAInterface*
+        push    edi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 

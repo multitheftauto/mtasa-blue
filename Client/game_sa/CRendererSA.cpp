@@ -15,8 +15,8 @@
 #include "CMatrix.h"
 #include "gamesa_renderware.h"
 
-#define SetLightColoursForPedsCarsAndObjects(fMult) ((RpLight * (__cdecl*)(float))0x735D90)(fMult)
-#define SetAmbientColours()                         ((RpLight * (__cdecl*)())0x735D30)()
+#define SetLightColoursForPedsCarsAndObjects(fMult) ((RpLight*(__cdecl*)(float))0x735D90)(fMult)
+#define SetAmbientColours() ((RpLight*(__cdecl*)())0x735D30)()
 
 CRendererSA::CRendererSA()
 {
@@ -81,11 +81,11 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
         // Restore ambient light
         SetAmbientColours();
     }
-    catch (...)
-    {
-        // Release reference on rendering exception
-        pModelInfo->RemoveRef();
-        throw;
-    }  // Release reference - allow GC
+        catch (...)
+        {
+            // Release reference on rendering exception
+            pModelInfo->RemoveRef();
+            throw;
+        }    // Release reference - allow GC
     pModelInfo->RemoveRef();
 }

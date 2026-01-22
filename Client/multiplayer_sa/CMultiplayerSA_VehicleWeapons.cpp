@@ -40,8 +40,8 @@ static void TriggerVehicleWeaponHitEvent(EVehicleWeaponType weaponType, CVehicle
 //     0x729324 | 0F 84 1C 02 00 00 | jz    0x729546
 // >>> 0x72932A | 68 CD CC 4C 3E    | push  3E4CCCCDh
 //     0x72932F | 68 00 00 80 3F    | push  3F800000h
-#define HOOKPOS_CWaterCannon__Render  0x72932A
-#define HOOKSIZE_CWaterCannon__Render 5
+#define HOOKPOS_CWaterCannon__Render         0x72932A
+#define HOOKSIZE_CWaterCannon__Render        5
 static DWORD CONTINUE_CWaterCannon__Render = 0x72932F;
 
 static void HandleWaterCannonHit(CVehicleSAInterface* pGameVehicle, CColPointSAInterface* pColPoint, CEntitySAInterface** ppHitGameEntity)
@@ -60,12 +60,12 @@ static void _declspec(naked) HOOK_CWaterCannon__Render()
     _asm
     {
         pushad
-        mov     eax, [ebx]  // CVehicleSAInterface* CWaterCannon::m_pVehicle
-        lea     ebx, [esp + 100h - 54h]  // CColPointSAInterface*
-        lea     ecx, [esp + 100h - 58h]  // CEntitySAInterface**
-        push    ecx  // ppHitGameEntity
-        push    ebx  // pColPoint
-        push    eax  // pGameVehicle
+        mov     eax, [ebx]                      // CVehicleSAInterface* CWaterCannon::m_pVehicle
+        lea     ebx, [esp + 100h - 54h]         // CColPointSAInterface*
+        lea     ecx, [esp + 100h - 58h]         // CEntitySAInterface**
+        push    ecx                             // ppHitGameEntity
+        push    ebx                             // pColPoint
+        push    eax                             // pGameVehicle
         call    HandleWaterCannonHit
         add     esp, 12
         popad

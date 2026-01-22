@@ -76,7 +76,7 @@ void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
-        push    0x3F800000  // 1.0f
+        push    0x3F800000 // 1.0f
         push    dwBass
         call    dwFunc
     }

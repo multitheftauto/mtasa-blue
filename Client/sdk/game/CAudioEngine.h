@@ -54,7 +54,7 @@ class CAudioEngine
 public:
     virtual void          PlayFrontEndSound(DWORD dwSound) = 0;
     virtual void          PlayBeatTrack(short iTrack) = 0;
-    virtual void          SetEffectsMasterVolume(BYTE bVolume) = 0;  // 64 = max volume
+    virtual void          SetEffectsMasterVolume(BYTE bVolume) = 0;            // 64 = max volume
     virtual void          SetMusicMasterVolume(BYTE bVolume) = 0;
     virtual void          ClearMissionAudio(int slot = 1) = 0;
     virtual void          PreloadMissionAudio(unsigned short usAudioEvent, int slot = 1) = 0;

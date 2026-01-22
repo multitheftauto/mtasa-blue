@@ -50,7 +50,7 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
         m_pManager->GetModelRequestManager()->RequestBlocking(usModelId, "CClientDFF::LoadDFF");
 
         // Attempt loading it
-        if (!m_bIsRawData)  // We have file
+        if (!m_bIsRawData)            // We have file
         {
             if (g_pCore->GetNetwork()->CheckFile("dff", m_strDffFilename))
             {
@@ -58,7 +58,7 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
                 info.pClump = g_pGame->GetRenderWare()->ReadDFF(m_strDffFilename, SString(), usModelId, CClientVehicleManager::IsValidModel(usModelId));
             }
         }
-        else  // We have raw data
+        else            // We have raw data
         {
             info.pClump = g_pGame->GetRenderWare()->ReadDFF(NULL, m_RawDataBuffer, usModelId, CClientVehicleManager::IsValidModel(usModelId));
 

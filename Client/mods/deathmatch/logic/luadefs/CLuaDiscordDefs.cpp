@@ -24,7 +24,7 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresenceEndTime", ArgumentParser<SetEndTime>},
         {"setDiscordRichPresencePartySize", ArgumentParser<SetPartySize>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
-        {"isDiscordRichPresenceConnected", ArgumentParser<IsDiscordRPCConnected>},
+        {"isDiscordRichPresenceConnected", ArgumentParser <IsDiscordRPCConnected>},
         {"getDiscordRichPresenceUserID", ArgumentParser<GetDiscordUserID>},
     };
 
@@ -48,8 +48,8 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setPartySize", "setDiscordRichPresencePartySize");
 
     lua_classfunction(luaVM, "isConnected", "isDiscordRichPresenceConnected");
-    // lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
-    // lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
+    //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
+    //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
 
     lua_registerclass(luaVM, "DiscordRPC");
 }
@@ -100,7 +100,7 @@ bool CLuaDiscordDefs::SetAppID(lua_State* luaVM, std::string strAppID)
 
     auto discord = g_pCore->GetDiscord();
 
-    CLuaMain*   pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     const char* resourceName = "";
     if (pLuaMain)
     {

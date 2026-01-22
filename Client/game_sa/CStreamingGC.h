@@ -84,6 +84,6 @@ public:
 
 private:
     static std::unordered_map<std::uint32_t, std::uint32_t> ms_protectedModels;
-    static std::mutex                                       ms_mutex;
-    static bool                                             ms_bInitialized;
+    static std::mutex                                        ms_mutex;
+    static bool                                              ms_bInitialized;
 };

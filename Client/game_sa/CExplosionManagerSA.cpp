@@ -53,14 +53,14 @@ CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity
         push    dwOwnerInterface
         push    dwExplodingEntityInterface
 
-         // OUR CALL
-        push    returnhere  // simulate a call, by pusing our return address
-                         // NOW the code is actually inside CExplosion__AddExplosion, but may be patched by Multiplayer
+        // OUR CALL
+        push    returnhere // simulate a call, by pusing our return address
+        // NOW the code is actually inside CExplosion__AddExplosion, but may be patched by Multiplayer
         sub     esp, 0x1C
         push    ebx
         push    ebp
         push    esi
-        mov     ebx, dwFunc              // Now jump in 6 bytes later (6 bytes might be used for our patch-jump in Multiplayer)
+        mov     ebx, dwFunc // Now jump in 6 bytes later (6 bytes might be used for our patch-jump in Multiplayer)
         add     ebx, 6
         jmp     ebx
 

@@ -31,7 +31,7 @@ CZipMaker::CZipMaker(const SString& strZipPathFilename)
     fill_win32_filefunc(&ffunc);
     m_uzFile = zipOpen2(strZipPathFilename, APPEND_STATUS_CREATE, nullptr, &ffunc);
 #else
-    m_uzFile = zipOpen(strZipPathFilename, APPEND_STATUS_CREATE);  // Use APPEND_STATUS_ADDINZIP to open existing
+    m_uzFile = zipOpen(strZipPathFilename, APPEND_STATUS_CREATE);            // Use APPEND_STATUS_ADDINZIP to open existing
 #endif
 }
 

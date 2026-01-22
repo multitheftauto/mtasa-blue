@@ -67,9 +67,9 @@ void CNewsBrowser::InitNewsItemList()
     {
         SString strItemDir = directoryList[directoryList.size() - 1 - i];
         if (strItemDir < strOldestPost)
-            continue;  // Post too old
+            continue;            // Post too old
         if (m_NewsitemList.size() >= uiMaxHistoryLength)
-            continue;  // Post count too high
+            continue;            // Post count too high
 
         SNewsItem newsItem;
         newsItem.strContentFullDir = PathJoin(strAllNewsDir, strItemDir);

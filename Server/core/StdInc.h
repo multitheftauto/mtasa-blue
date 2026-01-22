@@ -55,6 +55,6 @@
     #endif
 
     #ifndef Sleep
-        #define Sleep(duration) usleep((duration) * 1000)
+        #define Sleep(duration) usleep((duration)*1000)
     #endif
 #endif

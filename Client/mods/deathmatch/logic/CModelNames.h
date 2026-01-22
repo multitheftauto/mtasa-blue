@@ -8,11 +8,11 @@
  *
  *****************************************************************************/
 
-#define CLOTHES_MODEL_ID_FIRST 30000
-#define CLOTHES_MODEL_ID_LAST  30151
-#define CLOTHES_TEX_ID_FIRST   30152
-#define CLOTHES_TEX_ID_LAST    30541
-#define INVALID_MODEL_ID       32000
+#define CLOTHES_MODEL_ID_FIRST  30000
+#define CLOTHES_MODEL_ID_LAST   30151
+#define CLOTHES_TEX_ID_FIRST    30152
+#define CLOTHES_TEX_ID_LAST     30541
+#define INVALID_MODEL_ID        32000
 
 class CModelNames
 {

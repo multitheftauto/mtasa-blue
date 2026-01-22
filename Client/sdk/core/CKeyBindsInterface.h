@@ -64,10 +64,10 @@ struct SBindableGTAControl
 enum class KeyBindType
 {
     UNDEFINED,
-    COMMAND,           // bind key function args
-    GTA_CONTROL,       // bind key gta_control
-    FUNCTION,          // script bind key to function
-    CONTROL_FUNCTION,  // script bind gta_control to function (pressing control, calls function)
+    COMMAND,                     // bind key function args
+    GTA_CONTROL,                 // bind key gta_control
+    FUNCTION,                    // script bind key to function
+    CONTROL_FUNCTION,            // script bind gta_control to function (pressing control, calls function)
 };
 
 class CKeyBind
@@ -91,7 +91,7 @@ public:
 
 public:
     bool state{false};
-    bool triggerState{false};  // true == "down", false == "up"
+    bool triggerState{false};            // true == "down", false == "up"
 };
 
 class CCommandBind : public CKeyBindWithState
@@ -103,9 +103,9 @@ public:
     std::string command;
     std::string arguments;
     std::string resource;
-    std::string originalScriptKey;  // Original key set by script
+    std::string originalScriptKey;            // Original key set by script
     bool        wasCreatedByScript{false};
-    bool        isReplacingScriptKey{false};  // true if script set key is not being used
+    bool        isReplacingScriptKey{false};            // true if script set key is not being used
 };
 
 class CKeyFunctionBind : public CKeyBindWithState

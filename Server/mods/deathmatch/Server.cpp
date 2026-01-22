@@ -42,7 +42,7 @@ MTAEXPORT void ReleaseServer(void)
     }
 }
 
-#ifdef WIN32 /* Win32 DllMain entry */
+#ifdef WIN32    /* Win32 DllMain entry */
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {

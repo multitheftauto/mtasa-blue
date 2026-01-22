@@ -17,7 +17,7 @@
 class CGUIListItem
 {
 public:
-    virtual ~CGUIListItem() {};
+    virtual ~CGUIListItem(){};
 
     virtual std::string GetText() const = 0;
     virtual void        SetText(const char* pszText, const char* pszSortText = NULL) = 0;

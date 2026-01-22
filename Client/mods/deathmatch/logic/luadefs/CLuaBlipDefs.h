@@ -20,15 +20,8 @@ public:
 
 private:
     // Create functions
-    static std::variant<CClientRadarMarker*, bool> CreateBlip(lua_State* luaVM, const CVector vecPosition, std::optional<std::uint8_t> icon,
-                                                              std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
-                                                              std::optional<std::uint8_t> b, std::optional<std::uint8_t> a,
-                                                              std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance);
-    static std::variant<CClientRadarMarker*, bool> CreateBlipAttachedTo(lua_State* luaVM, CClientEntity* entity, std::optional<std::uint8_t> icon,
-                                                                        std::optional<std::uint8_t> size, std::optional<std::uint8_t> r,
-                                                                        std::optional<std::uint8_t> g, std::optional<std::uint8_t> b,
-                                                                        std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering,
-                                                                        std::optional<std::uint16_t> visibleDistance);
+    static std::variant<CClientRadarMarker*, bool> CreateBlip(lua_State* luaVM, const CVector vecPosition, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance);
+    static std::variant<CClientRadarMarker*, bool> CreateBlipAttachedTo(lua_State* luaVM, CClientEntity* entity, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance);
 
     // Get functions
     static auto GetBlipIcon(CClientRadarMarker* radarMarker) noexcept;

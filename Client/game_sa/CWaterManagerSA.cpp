@@ -23,9 +23,9 @@ extern int ms_iNumNonDefaultAndNonZeroVertices;
 
 using namespace std;
 
-#define POLYENTRY_TYPE(entry)    ((entry)->m_wValue >> 14)
-#define POLYENTRY_ID(entry)      ((entry)->m_wValue & 0x3FFF)
-#define MAKE_POLYENTRY(type, id) (WORD)(((type) << 14) | (id))
+#define POLYENTRY_TYPE(entry) ( (entry)->m_wValue >> 14 )
+#define POLYENTRY_ID(entry) ( (entry)->m_wValue & 0x3FFF )
+#define MAKE_POLYENTRY(type, id) (WORD)( ((type) << 14) | (id) )
 
 // These are code references in SA to the various data pools. We relocate these pools
 // to our own buffers to have more space, and thus have to update all references.
@@ -361,21 +361,21 @@ void CWaterManagerSA::RelocatePools()
         }
     }
 
-//
-// Fix outside world water blocks disappearing when using long draw distances
-//
+    //
+    // Fix outside world water blocks disappearing when using long draw distances
+    //
 
-// GTA default is 70 blocks. We increase this to 512 which is 2^9
-#define OUTSIDE_WORLD_BLOCKS_BITS 9
+    // GTA default is 70 blocks. We increase this to 512 which is 2^9
+    #define OUTSIDE_WORLD_BLOCKS_BITS   9
     static short ms_BlocksToBeRenderedOutsideWorldX[1 << OUTSIDE_WORLD_BLOCKS_BITS];
     static short ms_BlocksToBeRenderedOutsideWorldY[1 << OUTSIDE_WORLD_BLOCKS_BITS];
 
-    BYTE part1[] = {0xC1, 0xF8, OUTSIDE_WORLD_BLOCKS_BITS + 1,  // sar eax,13           = 2^(10-1) = 512
-                    0x7A, 0x19};                                // jp part2             Effectively jump always
+    BYTE part1[] = {0xC1, 0xF8, OUTSIDE_WORLD_BLOCKS_BITS + 1,            // sar eax,13           = 2^(10-1) = 512
+                    0x7A, 0x19};                                          // jp part2             Effectively jump always
 
-    BYTE part2[] = {0x72, 0xFB,                    // jc exit              Jump if at limit
-                    0xA1, 0xEC, 0x15, 0xC2, 0x00,  // mov eax,NumBlocks    Restore eax
-                    0x73, 0xDE};                   // jnc dothing          Effectively jump always
+    BYTE part2[] = {0x72, 0xFB,                              // jc exit              Jump if at limit
+                    0xA1, 0xEC, 0x15, 0xC2, 0x00,            // mov eax,NumBlocks    Restore eax
+                    0x73, 0xDE};                             // jnc dothing          Effectively jump always
 
     MemCpy((void*)0x6E6CE9, part1, sizeof(part1));
     MemCpy((void*)0x6E6D07, part2, sizeof(part2));
@@ -396,7 +396,7 @@ void CWaterManagerSA::RelocatePools()
 // pool; however in MTA, we can dynamically delete water polys,
 // creating gaps. These hooks make SA skip empty pool slots.
 
-DWORD                  dwHook6E9E23continue = 0x6E9E29;
+DWORD dwHook6E9E23continue = 0x6E9E29;
 void __declspec(naked) Hook6E9E23()
 {
     _asm
@@ -405,7 +405,7 @@ check:
         mov eax, dword ptr [edi]
         test eax, eax
         jnz cont
-        add edi, 0xA  // sizeof(CWaterQuadSAInterface)
+        add edi, 0xA        // sizeof(CWaterQuadSAInterface)
         jmp check
 cont:
         movsx eax, word ptr [edi]
@@ -414,8 +414,8 @@ cont:
     }
 }
 
-DWORD                  dwHook6EFCD7continue = 0x6EFCDD;
-DWORD                  dwHook6EFCD7skip = 0x6EFE5E;
+DWORD dwHook6EFCD7continue = 0x6EFCDD;
+DWORD dwHook6EFCD7skip = 0x6EFE5E;
 void __declspec(naked) Hook6EFCD7()
 {
     _asm
@@ -425,7 +425,7 @@ void __declspec(naked) Hook6EFCD7()
         jz check
         jmp dwHook6EFCD7skip
 check:
-        add esi, 0xA  // sizeof(CWaterQuadSAInterface)
+        add esi, 0xA        // sizeof(CWaterQuadSAInterface)
         mov eax, dword ptr [esi-4]
         test eax, eax
         jz check
@@ -433,7 +433,7 @@ check:
     }
 }
 
-DWORD                  dwHook6EFBD8continue = 0x6EFBDE;
+DWORD dwHook6EFBD8continue = 0x6EFBDE;
 void __declspec(naked) Hook6EFBD8()
 {
     _asm
@@ -644,7 +644,7 @@ CWaterPoly* CWaterManagerSA::CreateQuad(const CVector& vecBL, const CVector& vec
     pInterface->m_wVertexIDs[0] = pV1->GetID();
     pInterface->m_wVertexIDs[1] = pV2->GetID();
     pInterface->m_wVertexIDs[2] = pV3->GetID();
-    pInterface->m_wVertexIDs[3] = pV4->GetID();  // This is ok
+    pInterface->m_wVertexIDs[3] = pV4->GetID();            // This is ok
     pInterface->m_wFlags = WATER_VISIBLE;
     if (bShallow)
         pInterface->m_wFlags |= WATER_SHALLOW;

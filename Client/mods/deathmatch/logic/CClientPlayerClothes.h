@@ -12,25 +12,25 @@ class CClientPlayerClothes;
 
 #pragma once
 
-#define PLAYER_CLOTHING_SLOTS        18
-#define TORSO_CLOTHING_MAX           68
-#define HAIR_CLOTHING_MAX            33
-#define LEGS_CLOTHING_MAX            45
-#define SHOES_CLOTHING_MAX           38
-#define LEFT_UPPER_ARM_CLOTHING_MAX  3
-#define LEFT_LOWER_ARM_CLOTHING_MAX  4
+#define PLAYER_CLOTHING_SLOTS 18
+#define TORSO_CLOTHING_MAX 68
+#define HAIR_CLOTHING_MAX 33
+#define LEGS_CLOTHING_MAX 45
+#define SHOES_CLOTHING_MAX 38
+#define LEFT_UPPER_ARM_CLOTHING_MAX 3
+#define LEFT_LOWER_ARM_CLOTHING_MAX 4
 #define RIGHT_UPPER_ARM_CLOTHING_MAX 4
 #define RIGHT_LOWER_ARM_CLOTHING_MAX 4
-#define BACK_TOP_CLOTHING_MAX        7
-#define LEFT_CHEST_CLOTHING_MAX      6
-#define RIGHT_CHEST_CLOTHING_MAX     7
-#define STOMACH_CLOTHING_MAX         7
-#define LOWER_BACK_CLOTHING_MAX      6
-#define EXTRA1_CLOTHING_MAX          12
-#define EXTRA2_CLOTHING_MAX          12
-#define EXTRA3_CLOTHING_MAX          17
-#define EXTRA4_CLOTHING_MAX          57
-#define SUIT_CLOTHING_MAX            9
+#define BACK_TOP_CLOTHING_MAX 7
+#define LEFT_CHEST_CLOTHING_MAX 6
+#define RIGHT_CHEST_CLOTHING_MAX 7
+#define STOMACH_CLOTHING_MAX 7
+#define LOWER_BACK_CLOTHING_MAX 6
+#define EXTRA1_CLOTHING_MAX 12
+#define EXTRA2_CLOTHING_MAX 12
+#define EXTRA3_CLOTHING_MAX 17
+#define EXTRA4_CLOTHING_MAX 57
+#define SUIT_CLOTHING_MAX 9
 
 class CClientPed;
 
@@ -67,11 +67,11 @@ public:
     static bool        IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType);
     static const char* GetClothingName(unsigned char ucType);
 
-    static std::vector<const SPlayerClothing*> GetClothingGroup(unsigned char ucType);
-    static bool                                IsValidModel(unsigned short usModel);
-    static bool                                HasClothesChanged();
-    static bool                                AddClothingModel(const char* texture, const char* model, unsigned char clothingType);
-    static bool                                RemoveClothingModel(const char* texture, const char* model, unsigned char clothingType);
+    static std::vector<const SPlayerClothing*>  GetClothingGroup(unsigned char ucType);
+    static bool                                 IsValidModel(unsigned short usModel);
+    static bool                                 HasClothesChanged();
+    static bool                                 AddClothingModel(const char* texture, const char* model, unsigned char clothingType);
+    static bool                                 RemoveClothingModel(const char* texture, const char* model, unsigned char clothingType);
 
 private:
     static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);

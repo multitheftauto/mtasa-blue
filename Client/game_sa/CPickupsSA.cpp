@@ -74,7 +74,7 @@ CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, PickupTyp
         }
 
         if (FreeSlot >= MAX_PICKUPS)
-        {  // In that case use the first PICKUP_ONCE_TIMEOUT
+        {            // In that case use the first PICKUP_ONCE_TIMEOUT
             FreeSlot = 0;
             while (FreeSlot < MAX_PICKUPS && Pickups[FreeSlot]->GetInterface()->Type != (BYTE)PickupType::PICKUP_ONCE_TIMEOUT &&
                    Pickups[FreeSlot]->GetInterface()->Type != (BYTE)PickupType::PICKUP_ONCE_TIMEOUT_SLOW)
@@ -85,8 +85,8 @@ CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, PickupTyp
 
         // We need to tidy up the objects that go with this pickup
         if (FreeSlot >= MAX_PICKUPS)
-        {  // Couldn't find one. Let's just hope we don't break anything in the scripts.
-           // ASSERTMSG(0, "Ran out of pickups");
+        {            // Couldn't find one. Let's just hope we don't break anything in the scripts.
+                     // ASSERTMSG(0, "Ran out of pickups");
             return (CPickup*)NULL;
         }
         else
@@ -118,17 +118,17 @@ CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, PickupTyp
     }
     if (Type == PickupType::PICKUP_MONEY)
     {
-        pickup->SetRegenerationTime(pGame->GetSystemTime() + 30000);  // Money stays for 30 secs
+        pickup->SetRegenerationTime(pGame->GetSystemTime() + 30000);            // Money stays for 30 secs
     }
     if (Type == PickupType::PICKUP_MINE_INACTIVE || Type == PickupType::PICKUP_MINE_ARMED)
     {
         pickup->SetType(PickupType::PICKUP_MINE_INACTIVE);
-        pickup->SetRegenerationTime(pGame->GetSystemTime() + 1500);  // Mines get activated after 2 secs
+        pickup->SetRegenerationTime(pGame->GetSystemTime() + 1500);            // Mines get activated after 2 secs
     }
     if (Type == PickupType::PICKUP_NAUTICAL_MINE_INACTIVE || Type == PickupType::PICKUP_NAUTICAL_MINE_ARMED)
     {
         pickup->SetType(PickupType::PICKUP_NAUTICAL_MINE_INACTIVE);
-        pickup->GetInterface()->RegenerationTime = pGame->GetSystemTime() + 1500;  // Mines get activated after 2 secs
+        pickup->GetInterface()->RegenerationTime = pGame->GetSystemTime() + 1500;            // Mines get activated after 2 secs
     }
     pickup->SetModel((WORD)ModelIndex);
 

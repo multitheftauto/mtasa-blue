@@ -89,7 +89,7 @@ public:
     static bool   EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t newSize);
 
     static std::variant<bool, uint> EngineRequestTXD(lua_State* const luaVM, std::string strTxdName);
-    static bool                     EngineFreeTXD(uint txdID);
+    static bool EngineFreeTXD(uint txdID);
 
     static bool EngineStreamingRequestModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking);
     static bool EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference);

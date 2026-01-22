@@ -104,13 +104,10 @@ namespace SharedUtil
         }
     }
 
-    inline float DegreesToRadians(float fValue)
-    {
-        return fValue * 0.017453292f;
-    }
+    inline float DegreesToRadians(float fValue) { return fValue * 0.017453292f; }
 
     static std::random_device randomDevice;
-    static std::mt19937       randomEngine(randomDevice());
+    static std::mt19937 randomEngine(randomDevice());
 
     inline float GetRandomNumberInRange(float minRange, float maxRange)
     {
@@ -119,6 +116,6 @@ namespace SharedUtil
 
     inline bool IsNearlyEqual(float a, float b, float epsilon = std::numeric_limits<float>().epsilon()) noexcept
     {
-        return std::fabs(a - b) <= epsilon;
+	    return std::fabs(a - b) <= epsilon;
     }
-}  // namespace SharedUtil
+}            // namespace SharedUtil

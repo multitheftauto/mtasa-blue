@@ -42,7 +42,7 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
         g_pCore->GetConsole()->Printf("BASS ERROR %d in PluginLoad WEBM", BASS_ErrorGetCode());
 
     BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0);
-    BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);  // Allow playlists
+    BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);            // Allow playlists
     BASS_SetConfig(BASS_CONFIG_NET_TIMEOUT, 15000);
 
     m_strUserAgent = SString("MTA:SA Server %s - See http://mtasa.com/agent/", g_pNet->GetConnectedServer(true));
@@ -70,15 +70,15 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
 CClientSoundManager::~CClientSoundManager()
 {
     ProcessStopQueues(true);
-
+    
     // Signal stream threads to exit as soon as their blocking call returns
     SignalStreamingThreadsToStop();
-
+    
     // Stopping and freeing BASS should lead any pending BASS_StreamCreateURL to abort/return.
     // This makes threads exit quickly
     BASS_Stop();
     BASS_Free();
-
+    
     // Now wait for threads to finish - they should exit almost immediately since BASS was freed.
     // Use a short timeout since the blocking call should have been interrupted.
     WaitForAllStreamingThreads(3000);
@@ -123,7 +123,7 @@ void CClientSoundManager::DoPulse()
         {
             // call onClientSoundStopped
             CLuaArguments Arguments;
-            Arguments.PushString("finished");  // Reason
+            Arguments.PushString("finished");            // Reason
             pSound->CallEvent("onClientSoundStopped", Arguments, false);
             g_pClientGame->GetElementDeleter()->Delete(pSound);
         }
@@ -444,7 +444,7 @@ void CClientSoundManager::ProcessStopQueues(bool bFlush)
     {
         if (iter->second.Get() > 100 || bFlush)
         {
-            delete iter->first;  // This will cause BASS_ChannelStop
+            delete iter->first;            // This will cause BASS_ChannelStop
             m_AudioStopQueue.erase(iter++);
         }
         else

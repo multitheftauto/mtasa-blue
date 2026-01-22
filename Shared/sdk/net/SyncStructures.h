@@ -57,9 +57,9 @@ struct SFloatSync : public ISyncStructure
 
         double dValue = data.fValue;
 #ifdef WIN32
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
         assert(!std::isnan(dValue));
-    #endif
+#endif
 #endif
         dValue = Clamp<double>(limitsMin, dValue, limitsMax);
 
@@ -1723,49 +1723,49 @@ struct SVehicleHandlingSync : public ISyncStructure
 
     struct
     {
-        float fMass;  // +4
+        float fMass;            // +4
 
-        float         fTurnMass;           // +12
-        float         fDragCoeff;          // +16
-        CVector       vecCenterOfMass;     // +20
-        unsigned char ucPercentSubmerged;  // +32     (unsigned int - sync changes)
+        float         fTurnMass;                     // +12
+        float         fDragCoeff;                    // +16
+        CVector       vecCenterOfMass;               // +20
+        unsigned char ucPercentSubmerged;            // +32     (unsigned int - sync changes)
 
-        float fTractionMultiplier;  // +40
+        float fTractionMultiplier;            // +40
 
-        unsigned char ucDriveType;      // +112
-        unsigned char ucEngineType;     // +113
-        unsigned char ucNumberOfGears;  // +114
+        unsigned char ucDriveType;                // +112
+        unsigned char ucEngineType;               // +113
+        unsigned char ucNumberOfGears;            // +114
 
-        float fEngineAcceleration;  // +120     (value in handling.cfg * 0x86A950)
-        float fEngineInertia;       // +124
-        float fMaxVelocity;         // +128
+        float fEngineAcceleration;            // +120     (value in handling.cfg * 0x86A950)
+        float fEngineInertia;                 // +124
+        float fMaxVelocity;                   // +128
 
-        float fBrakeDeceleration;  // +148
-        float fBrakeBias;          // +152
-        bool  bABS;                // +156
+        float fBrakeDeceleration;            // +148
+        float fBrakeBias;                    // +152
+        bool  bABS;                          // +156
 
-        float fSteeringLock;  // +160
-        float fTractionLoss;  // +164
-        float fTractionBias;  // +168
+        float fSteeringLock;            // +160
+        float fTractionLoss;            // +164
+        float fTractionBias;            // +168
 
-        float fSuspensionForceLevel;          // +172
-        float fSuspensionDamping;             // +176
-        float fSuspensionHighSpdDamping;      // +180
-        float fSuspensionUpperLimit;          // +184
-        float fSuspensionLowerLimit;          // +188
-        float fSuspensionFrontRearBias;       // +192
-        float fSuspensionAntiDiveMultiplier;  // +196
+        float fSuspensionForceLevel;                    // +172
+        float fSuspensionDamping;                       // +176
+        float fSuspensionHighSpdDamping;                // +180
+        float fSuspensionUpperLimit;                    // +184
+        float fSuspensionLowerLimit;                    // +188
+        float fSuspensionFrontRearBias;                 // +192
+        float fSuspensionAntiDiveMultiplier;            // +196
 
-        float fCollisionDamageMultiplier;  // +200
+        float fCollisionDamageMultiplier;            // +200
 
-        unsigned int uiModelFlags;         // +204
-        unsigned int uiHandlingFlags;      // +208
-        float        fSeatOffsetDistance;  // +212
+        unsigned int uiModelFlags;                   // +204
+        unsigned int uiHandlingFlags;                // +208
+        float        fSeatOffsetDistance;            // +212
         // unsigned int    uiMonetary;                     // +216
 
         // unsigned char   ucHeadLight;                    // +220
         // unsigned char   ucTailLight;                    // +221
-        unsigned char ucAnimGroup;  // +222
+        unsigned char ucAnimGroup;            // +222
     } data;
 };
 
@@ -2108,19 +2108,19 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     {
         bool isOK = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
-            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
-        else
-            data2.fireballdestruct = true;
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
+         else
+             data2.fireballdestruct = true;
 
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
-            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data3), BITCOUNT3);
-        else
-            data3.roadsignstext = true;
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data3), BITCOUNT3);
+         else
+             data3.roadsignstext = true;
 
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
-            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
-        else
-            data4.extendedwatercannons = true;
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
+         else
+             data4.extendedwatercannons = true;
 
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
@@ -2146,7 +2146,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
         else
             data9.vehicleEngineAutoStart = true;
-
+            
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
         //     isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
@@ -2228,7 +2228,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     {
         bool ignoreFireState : 1;
     } data6;
-
+    
     struct
     {
         bool flyingcomponents : 1;
@@ -2243,7 +2243,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     {
         bool vehicleEngineAutoStart : 1;
     } data9;
-
+    
     SWorldSpecialPropertiesStateSync()
     {
         // Set default states
@@ -2632,26 +2632,26 @@ struct sWeaponPropertySync : public ISyncStructure
     struct
     {
         int   weaponType;
-        FLOAT fTargetRange;  // max targeting range
-        FLOAT fWeaponRange;  // absolute gun range / default melee attack range
+        FLOAT fTargetRange;            // max targeting range
+        FLOAT fWeaponRange;            // absolute gun range / default melee attack range
 
-        int nFlags;  // flags defining characteristics
+        int nFlags;            // flags defining characteristics
 
-        short nAmmo;    // ammo in one clip
-        short nDamage;  // damage inflicted per hit
+        short nAmmo;              // ammo in one clip
+        short nDamage;            // damage inflicted per hit
 
-        FLOAT fAccuracy;   // modify accuracy of weapon
-        FLOAT fMoveSpeed;  // how fast can move with weapon
+        FLOAT fAccuracy;             // modify accuracy of weapon
+        FLOAT fMoveSpeed;            // how fast can move with weapon
 
-        FLOAT anim_loop_start;        // start of animation loop
-        FLOAT anim_loop_stop;         // end of animation loop
-        FLOAT anim_loop_bullet_fire;  // time in animation when weapon should be fired
+        FLOAT anim_loop_start;                  // start of animation loop
+        FLOAT anim_loop_stop;                   // end of animation loop
+        FLOAT anim_loop_bullet_fire;            // time in animation when weapon should be fired
 
-        FLOAT anim2_loop_start;        // start of animation2 loop
-        FLOAT anim2_loop_stop;         // end of animation2 loop
-        FLOAT anim2_loop_bullet_fire;  // time in animation2 when weapon should be fired
+        FLOAT anim2_loop_start;                  // start of animation2 loop
+        FLOAT anim2_loop_stop;                   // end of animation2 loop
+        FLOAT anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
 
-        FLOAT anim_breakout_time;  // time after which player can break out of attack and run off
+        FLOAT anim_breakout_time;            // time after which player can break out of attack and run off
     } data;
 };
 

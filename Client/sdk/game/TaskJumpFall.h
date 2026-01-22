@@ -16,13 +16,13 @@
 class CTaskSimpleClimb : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleClimb() {};
+    virtual ~CTaskSimpleClimb(){};
 };
 
 class CTaskSimpleJetPack : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleJetPack() {};
+    virtual ~CTaskSimpleJetPack(){};
 
     virtual bool IsFinished() const = 0;
 };

@@ -162,10 +162,10 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post()
 }
 
 // Hook info
-#define HOOKCHECK_FxSystem_c_Update_MidA 0x83
-#define HOOKPOS_FxSystem_c_Update_MidA   0x04AAF70
-#define HOOKSIZE_FxSystem_c_Update_MidA  5
-DWORD                 RETURN_FxSystem_c_Update_MidA = 0x04AAF75;
+#define HOOKCHECK_FxSystem_c_Update_MidA            0x83
+#define HOOKPOS_FxSystem_c_Update_MidA              0x04AAF70
+#define HOOKSIZE_FxSystem_c_Update_MidA             5
+DWORD RETURN_FxSystem_c_Update_MidA = 0x04AAF75;
 void _declspec(naked) HOOK_FxSystem_c_Update_MidA()
 {
     _asm
@@ -230,10 +230,10 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post()
 }
 
 // Hook info
-#define HOOKCHECK_FxSystem_c_Update_MidB 0x83
-#define HOOKPOS_FxSystem_c_Update_MidB   0x04AB21D
-#define HOOKSIZE_FxSystem_c_Update_MidB  7
-DWORD                 RETURN_FxSystem_c_Update_MidB = 0x04AB224;
+#define HOOKCHECK_FxSystem_c_Update_MidB           0x83
+#define HOOKPOS_FxSystem_c_Update_MidB             0x04AB21D
+#define HOOKSIZE_FxSystem_c_Update_MidB            7
+DWORD RETURN_FxSystem_c_Update_MidB = 0x04AB224;
 void _declspec(naked) HOOK_FxSystem_c_Update_MidB()
 {
     _asm
@@ -246,7 +246,7 @@ void _declspec(naked) HOOK_FxSystem_c_Update_MidB()
 
         mov     eax, [ebp+54h]
         push    eax
-        call    dword ptr [edx+8]  // FxEmitter_c::CreateParticles
+        call    dword ptr [edx+8]   // FxEmitter_c::CreateParticles
 
         pushad
         call    OnMY_FxSystem_c_Update_MidB_Post

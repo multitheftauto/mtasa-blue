@@ -17,19 +17,19 @@
 class CColPointSAInterface
 {
 public:
-    CVector      Position;        // 0
-    float        fUnknown1;       // 12
-    CVector      Normal;          // 16
-    float        fUnknown2;       // 28
-    EColSurface  ucSurfaceTypeA;  // 32
-    uint8        ucPieceTypeA;    // 33
-    CColLighting lightingA;       // 34
-    EColSurface  ucSurfaceTypeB;  // 35
-    uint8        ucPieceTypeB;    // 36
-    CColLighting lightingB;       // 37
-    uint8        pad1;            // 38
-    uint8        pad2;            // 39
-    float        fDepth;          // 40
+    CVector      Position;                  // 0
+    float        fUnknown1;                 // 12
+    CVector      Normal;                    // 16
+    float        fUnknown2;                 // 28
+    EColSurface  ucSurfaceTypeA;            // 32
+    uint8        ucPieceTypeA;              // 33
+    CColLighting lightingA;                 // 34
+    EColSurface  ucSurfaceTypeB;            // 35
+    uint8        ucPieceTypeB;              // 36
+    CColLighting lightingB;                 // 37
+    uint8        pad1;                      // 38
+    uint8        pad2;                      // 39
+    float        fDepth;                    // 40
 };
 static_assert(sizeof(CColPointSAInterface) == 0x2C, "Invalid size for CColPointSAInterface");
 

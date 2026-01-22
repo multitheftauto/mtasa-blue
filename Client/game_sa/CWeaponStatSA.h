@@ -15,7 +15,7 @@
 class CWeaponStatSA : public CWeaponStat
 {
 public:
-    CWeaponStatSA() {};
+    CWeaponStatSA(){};
     CWeaponStatSA(eWeaponType weaponType, eWeaponSkill skillLevel);
     CWeaponStatSA(CWeaponInfoSA* pWeaponInfo, eWeaponType weaponType, eWeaponSkill skillLevel);
     ~CWeaponStatSA();

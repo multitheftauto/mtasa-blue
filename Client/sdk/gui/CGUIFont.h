@@ -16,7 +16,7 @@
 class CGUIFont
 {
 public:
-    virtual ~CGUIFont() {};
+    virtual ~CGUIFont(){};
 
     virtual void SetAntiAliasingEnabled(bool bAntialiased) = 0;
     virtual bool IsAntiAliasingEnabled() = 0;

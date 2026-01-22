@@ -16,7 +16,7 @@
 class CPedSAInterface;
 class CTaskManagerSA;
 
-#define FUNC_CPedIntelligence_TestForStealthKill 0x601E00
+#define FUNC_CPedIntelligence_TestForStealthKill    0x601E00
 
 class CFightManagerInterface
 {
@@ -33,11 +33,11 @@ class CPedIntelligenceSAInterface
 public:
     // CEventHandlerHistory @ + 56
     CPedSAInterface*        pPed;
-    DWORD                   taskManager;  // +4 (really CTaskManagerSAInterface)
+    DWORD                   taskManager;            // +4 (really CTaskManagerSAInterface)
     BYTE                    bPad[16];
-    CFightManagerInterface* fightInterface;  // +24
+    CFightManagerInterface* fightInterface;            // +24
     BYTE                    bPad2[184];
-    DWORD                   vehicleScanner;  // +212 (really CVehicleScannerSAInterface)
+    DWORD                   vehicleScanner;            // +212 (really CVehicleScannerSAInterface)
 };
 
 class CPedIntelligenceSA : public CPedIntelligence

@@ -15,8 +15,8 @@
 
 extern CMultiplayerSA* pMultiplayer;
 
-DWORD dwCurrentPlayerPed = 0;  // stores the player ped temporarily during hooks
-DWORD dwCurrentVehicle = 0;    // stores the current vehicle during the hooks
+DWORD dwCurrentPlayerPed = 0;            // stores the player ped temporarily during hooks
+DWORD dwCurrentVehicle = 0;              // stores the current vehicle during the hooks
 
 DWORD dwParameter = 0;
 
@@ -201,7 +201,7 @@ VOID ReturnContextToLocalPlayer()
 
         bNotInLocalContext = false;
 
-        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);  // the player
+        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
         CPedSA* pLocalPlayerPedSA = dynamic_cast<CPedSA*>(pLocalPlayerPed);
         if (pLocalPlayerPedSA)
         {
@@ -222,7 +222,7 @@ VOID ReturnContextToLocalPlayer()
         // Store any changes to the local-players stats?
         if (!bLocalStatsStatic)
         {
-            assert(0);  // bLocalStatsStatic is always true
+            assert(0);            // bLocalStatsStatic is always true
             MemCpyFast(&localStatsData.StatTypesFloat, (void*)0xb79380, sizeof(float) * MAX_FLOAT_STATS);
             MemCpyFast(&localStatsData.StatTypesInt, (void*)0xb79000, sizeof(int) * MAX_INT_STATS);
             MemCpyFast(&localStatsData.StatReactionValue, (void*)0xb78f10, sizeof(float) * MAX_REACTION_STATS);
@@ -245,7 +245,7 @@ void SwitchContext(CPed* thePed)
     if (thePed && !bNotInLocalContext)
     {
         // Grab the local ped and the local pad
-        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);  // the player
+        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
         CPad*            pLocalPad = pGameInterface->GetPad();
         CPadSAInterface* pLocalPadInterface = ((CPadSA*)pLocalPad)->GetInterface();
 
@@ -253,7 +253,7 @@ void SwitchContext(CPed* thePed)
         if (thePed != pLocalPlayerPed)
         {
             // Store the local pad
-            pLocalPad->Store();  // store a copy of the local pad internally
+            pLocalPad->Store();            // store a copy of the local pad internally
 
             // Grab the remote data storage for the player we're context switching to
             CPlayerPed* thePlayerPed = dynamic_cast<CPlayerPed*>(thePed);
@@ -505,10 +505,10 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
     // Assumes no reentrancy
     _asm
-        {
+    {
         mov     dwCurrentPlayerPed, ecx
 
-             // Save incase of abort
+        // Save incase of abort
         mov     PlayerPed__ProcessControl_Saved.eax, eax
         mov     PlayerPed__ProcessControl_Saved.ecx, ecx
         mov     PlayerPed__ProcessControl_Saved.edx, edx
@@ -518,17 +518,17 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
         mov     PlayerPed__ProcessControl_Saved.esi, esi
         mov     PlayerPed__ProcessControl_Saved.edi, edi
         pushad
-        }
+    }
 
     SwitchContext((CPedSAInterface*)dwCurrentPlayerPed);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CPlayerPed__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -542,7 +542,8 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 void _declspec(naked) CPlayerPed__ProcessControl_Abort()
 {
     _asm
-        {// restore stuff
+    {
+        // restore stuff
         mov     eax, PlayerPed__ProcessControl_Saved.eax
         mov     ecx, PlayerPed__ProcessControl_Saved.ecx
         mov     edx, PlayerPed__ProcessControl_Saved.edx
@@ -552,7 +553,7 @@ void _declspec(naked) CPlayerPed__ProcessControl_Abort()
         mov     esi, PlayerPed__ProcessControl_Saved.esi
         mov     edi, PlayerPed__ProcessControl_Saved.edi
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -568,20 +569,20 @@ void _declspec(naked) CPlayerPed__ProcessControl_Abort()
 VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CAutomobile__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -597,20 +598,20 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CMonsterTruck__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -626,20 +627,20 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CTrailer__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -655,20 +656,20 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CQuadBike__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -684,20 +685,20 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CPlane__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -713,20 +714,20 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CBmx__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -742,20 +743,20 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CTrain__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -771,20 +772,20 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CBoat__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -800,20 +801,20 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 VOID _declspec(naked) HOOK_CBike__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CBike__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 
@@ -829,20 +830,20 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
 VOID _declspec(naked) HOOK_CHeli__ProcessControl()
 {
     _asm
-        {
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
-        {
+    {
         popad
         mov     edx, FUNC_CHeli__ProcessControl
         call    edx
         pushad
-        }
+    }
 
     ReturnContextToLocalPlayer();
 

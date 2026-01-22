@@ -120,4 +120,5 @@ public:
     virtual bool IsObjectRemoved(CEntitySAInterface* pInterface) = 0;
     virtual bool IsDataModelRemoved(uint16_t usModelID) = 0;
     virtual bool IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
+
 };

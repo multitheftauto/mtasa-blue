@@ -55,19 +55,19 @@ private:
     char _pad1[2];
 
 public:
-    float m_fTrainSpeed;         // 1.0 - train derails
-    float m_fTrainRailDistance;  // Distance along rail starting from first rail node (determines train position when on rails)
+    float m_fTrainSpeed;                   // 1.0 - train derails
+    float m_fTrainRailDistance;            // Distance along rail starting from first rail node (determines train position when on rails)
     float m_fDistanceToNextCarriage;
-    float m_fTrainGas;    // gas pedal pressed: 255.0, moving forward: 0.0, moving back: -255.0
-    float m_fTrainBrake;  // 255.0 - braking
+    float m_fTrainGas;              // gas pedal pressed: 255.0, moving forward: 0.0, moving back: -255.0
+    float m_fTrainBrake;            // 255.0 - braking
     union
     {
         struct
         {
-            unsigned short b01 : 1;                // initialised with 1
-            unsigned short bStoppedAtStation : 1;  // Only the first created train on the chain gets this set to true, others get it set to false.
+            unsigned short b01 : 1;                          // initialised with 1
+            unsigned short bStoppedAtStation : 1;            // Only the first created train on the chain gets this set to true, others get it set to false.
             unsigned short bPassengersCanEnterAndLeave : 1;
-            unsigned short bIsTheChainEngine : 1;  // front carriage
+            unsigned short bIsTheChainEngine : 1;            // front carriage
             unsigned short bIsLastCarriage : 1;
             unsigned short bMissionTrain : 1;
             unsigned short bClockwiseDirection : 1;
@@ -91,11 +91,11 @@ private:
 
 public:
     int                             m_nTimeWhenCreated;
-    short                           field_5C8;  // initialized with 0, not referenced
+    short                           field_5C8;            // initialized with 0, not referenced
     eTrainPassengersGenerationState m_nPassengersGenerationState;
-    unsigned char                   m_nNumPassengersToLeave : 4;  // 0 to 4
-    unsigned char                   m_nNumPassengersToEnter : 4;  // 0 to 4
-    CPedSAInterface*                m_pTemporaryPassenger;        // we tell peds to enter train and then delete them
+    unsigned char                   m_nNumPassengersToLeave : 4;            // 0 to 4
+    unsigned char                   m_nNumPassengersToEnter : 4;            // 0 to 4
+    CPedSAInterface*                m_pTemporaryPassenger;                  // we tell peds to enter train and then delete them
     CTrainSAInterface*              m_prevCarriage;
     CTrainSAInterface*              m_nextCarriage;
     CDoorSAInterface                m_aDoors[MAX_DOORS];

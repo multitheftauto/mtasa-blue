@@ -680,10 +680,10 @@ CDbJobData::~CDbJobData()
 bool CDbJobData::SetCallback(PFN_DBRESULT pfnDbResult, void* pContext)
 {
     if (callback.bSet)
-        return false;  // One has already been set
+        return false;            // One has already been set
 
     if (this->stage > EJobStage::RESULT)
-        return false;  // Too late to set a callback now
+        return false;            // Too late to set a callback now
 
     // Set new
     callback.pfnDbResult = pfnDbResult;

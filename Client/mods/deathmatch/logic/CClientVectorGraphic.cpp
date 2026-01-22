@@ -59,7 +59,8 @@ namespace
     bool StyleContainsExternalReference(const std::string& styleValue)
     {
         SString styleLower = SString(styleValue).ToLower();
-        return styleLower.find("url(") != std::string::npos || styleLower.find("@import") != std::string::npos;
+        return styleLower.find("url(") != std::string::npos ||
+               styleLower.find("@import") != std::string::npos;
     }
 
     bool AttributeContainsExternalUrl(const std::string& value)
@@ -72,7 +73,8 @@ namespace
 
         size_t start = urlPos + 4;
 
-        while (start < valueLower.length() && (valueLower[start] == ' ' || valueLower[start] == '"' || valueLower[start] == '\''))
+        while (start < valueLower.length() &&
+               (valueLower[start] == ' ' || valueLower[start] == '"' || valueLower[start] == '\''))
             start++;
 
         if (start >= valueLower.length())
@@ -290,7 +292,7 @@ void CClientVectorGraphic::OnUpdate()
     if (std::holds_alternative<CLuaFunctionRef>(m_updateCallbackRef))
     {
         auto& func = std::get<CLuaFunctionRef>(m_updateCallbackRef);
-        auto  state = func.GetLuaVM();
+        auto state = func.GetLuaVM();
 
         if (VERIFY_FUNCTION(func) && state != NULL)
         {

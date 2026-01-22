@@ -25,14 +25,8 @@ public:
     LUA_DECLARE(CreateWeapon);
     LUA_DECLARE(FireWeapon);
     LUA_DECLARE(SetWeaponProperty);
-    static std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> GetWeaponProperty(lua_State*                                     luaVM,
-                                                                                                  std::variant<CClientWeapon*, int, std::string> weapon,
-                                                                                                  std::variant<int, std::string>                 weaponSkill,
-                                                                                                  WeaponProperty                                 property);
-    static std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> GetOriginalWeaponProperty(lua_State*                     luaVM,
-                                                                                                          std::variant<int, std::string> weapon,
-                                                                                                          std::variant<int, std::string> weaponSkill,
-                                                                                                          WeaponProperty                 property);
+    static std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> GetWeaponProperty(lua_State* luaVM, std::variant<CClientWeapon*, int, std::string> weapon, std::variant<int, std::string> weaponSkill, WeaponProperty property);
+    static std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> GetOriginalWeaponProperty(lua_State* luaVM, std::variant<int, std::string> weapon, std::variant<int, std::string> weaponSkill, WeaponProperty property);
     LUA_DECLARE(SetWeaponState);
     LUA_DECLARE(GetWeaponState);
     LUA_DECLARE(SetWeaponTarget);

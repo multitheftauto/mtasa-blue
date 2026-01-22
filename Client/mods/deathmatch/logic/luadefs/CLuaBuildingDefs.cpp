@@ -33,8 +33,7 @@ void CLuaBuildingDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Building", "Element");
 }
 
-CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::uint16_t modelId, CVector pos, std::optional<CVector> rot,
-                                                  std::optional<std::uint8_t> interior)
+CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::uint16_t modelId, CVector pos, std::optional<CVector> rot, std::optional<std::uint8_t> interior)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
@@ -54,7 +53,7 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::u
     else
         rot.emplace(CVector(0, 0, 0));
 
-    CClientBuilding* pBuilding = new CClientBuilding(m_pManager, INVALID_ELEMENT_ID, modelId, pos, rot.value(), interior.value_or(0));
+    CClientBuilding* pBuilding = new CClientBuilding(m_pManager, INVALID_ELEMENT_ID, modelId, pos, rot.value() , interior.value_or(0));
 
     CClientEntity* pRoot = pResource->GetResourceDynamicEntity();
     pBuilding->SetParent(pRoot);

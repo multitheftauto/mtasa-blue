@@ -20,13 +20,13 @@ namespace
         ushort usNext;
         ushort usPrev;
 
-        ushort uiUnknown1;  // Parent ?
-        uchar  uiUnknown2;  // 0x12 when loading, 0x02 when finished loading
+        ushort uiUnknown1;            // Parent ?
+        uchar  uiUnknown2;            // 0x12 when loading, 0x02 when finished loading
         uchar  ucImgId;
 
         int  iBlockOffset;
         int  iBlockCount;
-        uint uiLoadflag;  // 0-not loaded  2-requested  3-loaded  1-processed
+        uint uiLoadflag;            // 0-not loaded  2-requested  3-loaded  1-processed
     };
 
     std::unordered_map<ushort, char*>         ms_ReplacementClothesFileDataMap;
@@ -59,7 +59,7 @@ namespace
         auto blockDiv = std::div(size, 2048);
         return (blockDiv.quot + (blockDiv.rem ? 1 : 0));
     }
-}  // namespace
+}            // namespace
 
 ////////////////////////////////////////////////////////////////
 //
@@ -254,8 +254,8 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
     if (!replacementFileData)
         return false;
 
-    // If bLoadingBigModel is set, try to get it unset
-#define VAR_CStreaming_bLoadingBigModel 0x08E4A58
+        // If bLoadingBigModel is set, try to get it unset
+    #define VAR_CStreaming_bLoadingBigModel     0x08E4A58
     BYTE& bLoadingBigModel = *(BYTE*)VAR_CStreaming_bLoadingBigModel;
     if (bLoadingBigModel)
     {
@@ -279,10 +279,10 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
 }
 
 // Hook info
-#define HOOKPOS_CStreaming_RequestModel_Mid  0x040895A
-#define HOOKSIZE_CStreaming_RequestModel_Mid 5
-DWORD                 RETURN_CStreaming_RequestModel_MidA = 0x0408960;
-DWORD                 RETURN_CStreaming_RequestModel_MidB = 0x0408990;
+#define HOOKPOS_CStreaming_RequestModel_Mid             0x040895A
+#define HOOKSIZE_CStreaming_RequestModel_Mid            5
+DWORD RETURN_CStreaming_RequestModel_MidA = 0x0408960;
+DWORD RETURN_CStreaming_RequestModel_MidB = 0x0408990;
 void _declspec(naked) HOOK_CStreaming_RequestModel_Mid()
 {
     _asm
@@ -295,13 +295,14 @@ void _declspec(naked) HOOK_CStreaming_RequestModel_Mid()
         cmp     al, 0
         jnz     skip
 
-         // Continue with standard code
+        // Continue with standard code
         popad
         mov     eax, ds:0x08E4C58
         push    eax
         jmp     RETURN_CStreaming_RequestModel_MidA
 
-         // Handle load here
+
+        // Handle load here
 skip:
         popad
         pushad

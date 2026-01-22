@@ -41,7 +41,7 @@ public:
     CVaPassNext(va_list& args)
     {
         try
-        {  // to avoid access violation
+        {            // to avoid access violation
             memcpy(&svapassnext, args, sizeof(svapassnext));
         }
         catch (...)
@@ -62,7 +62,7 @@ public:
 
 // Min and max number of characters in chat echos
 #define MIN_CHATECHO_LENGTH 1
-#define MAX_CHATECHO_LENGTH (MAX_CHAT_LENGTH + MAX_PLAYER_NICK_LENGTH + 2)  // +2 is for ": " between player nick and the message
+#define MAX_CHATECHO_LENGTH (MAX_CHAT_LENGTH + MAX_PLAYER_NICK_LENGTH + 2) // +2 is for ": " between player nick and the message
 
 // Min and max number of characters in outputChatBox from the server
 #define MIN_OUTPUTCHATBOX_LENGTH 1
@@ -102,7 +102,7 @@ public:
 #define MAX_MAPNAME_LENGTH 255
 
 // Timeouts
-#define NET_CONNECT_TIMEOUT         30000
+#define NET_CONNECT_TIMEOUT 30000
 #define CLIENT_VERIFICATION_TIMEOUT 10000
 
 // Vehicle in-out delay (to prevent messed up like 1765/1956/1880

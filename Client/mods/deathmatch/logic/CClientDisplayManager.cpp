@@ -17,7 +17,7 @@ std::shared_ptr<CClientDisplay> CClientDisplayManager::Get(unsigned long ulID)
     // Find the display with the given id
     auto iter = m_List.begin();
 
-    for (; iter != m_List.end(); iter++)  // Iterate weak_ptr list
+    for (; iter != m_List.end(); iter++) // Iterate weak_ptr list
     {
         if (const auto& display = (*iter).lock())  // Make sure the shared_ptr still exists
         {
@@ -26,6 +26,7 @@ std::shared_ptr<CClientDisplay> CClientDisplayManager::Get(unsigned long ulID)
                 return display;
             }
         }
+
     }
 
     return NULL;
@@ -55,9 +56,9 @@ void CClientDisplayManager::DoPulse()
     // Clean up expired weak_ptr
     m_List.remove_if([](const std::weak_ptr<CClientDisplay>& wp) { return wp.expired(); });
 
-    for (; iter != m_List.end(); iter++)  // Iterate weak_ptr list
+    for (; iter != m_List.end(); iter++) // Iterate weak_ptr list
     {
-        if (const auto& display = (*iter).lock())  // Make sure the shared_ptr still exists
+        if (const auto& display = (*iter).lock())            // Make sure the shared_ptr still exists
         {
             display->Render();
         }

@@ -204,7 +204,7 @@ void CUnoccupiedVehicleSync::StartSync(CPlayer* pPlayer, CVehicle* pVehicle)
 
     // Call the onElementStartSync event
     CLuaArguments Arguments;
-    Arguments.PushElement(pPlayer);  // New syncer
+    Arguments.PushElement(pPlayer);            // New syncer
     pVehicle->CallEvent("onElementStartSync", Arguments);
 }
 
@@ -221,7 +221,7 @@ void CUnoccupiedVehicleSync::StopSync(CVehicle* pVehicle)
 
     // Call the onElementStopSync event
     CLuaArguments Arguments;
-    Arguments.PushElement(pSyncer);  // Old syncer
+    Arguments.PushElement(pSyncer);            // Old syncer
     pVehicle->CallEvent("onElementStopSync", Arguments);
 }
 
@@ -488,8 +488,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehicle
             // Is the player syncing this vehicle and there is no driver? Also only process
             // this packet if the time context matches.
             if (pVehicle->GetSyncer() != pPlayer && pVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE &&
-                IsPointNearPoint3D(pVehicle->GetPosition(), pPlayer->GetPosition(), g_TickRateSettings.iVehicleContactSyncRadius) &&
-                pVehicle->GetDimension() == pPlayer->GetDimension())
+                IsPointNearPoint3D(pVehicle->GetPosition(), pPlayer->GetPosition(), g_TickRateSettings.iVehicleContactSyncRadius)
+                && pVehicle->GetDimension() == pPlayer->GetDimension())
             {
                 // Is there no player driver?
                 CPed* pOccupant = pVehicle->GetOccupant(0);

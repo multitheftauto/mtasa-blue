@@ -16,8 +16,8 @@ class CRegisteredCorona;
 class CVector;
 
 // these are the IDs that are used internally for coronas
-#define CORONA_SUN  1
-#define CORONA_MOON 2
+#define CORONA_SUN                  1
+#define CORONA_MOON                 2
 
 class CCoronas
 {

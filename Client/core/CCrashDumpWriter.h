@@ -39,26 +39,26 @@ enum EDumpFileNameParts
 class CCrashDumpWriter
 {
 public:
-    static long WINAPI        HandleExceptionGlobal(_EXCEPTION_POINTERS* pException);
-    static void               DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);
-    static void               DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);
+    static long WINAPI HandleExceptionGlobal(_EXCEPTION_POINTERS* pException);
+    static void        DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);
+    static void        DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);
     [[nodiscard]] static bool RunErrorTool(CExceptionInformation* pExceptionInformation);
-    static void               AppendToDumpFile(const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd);
-    static void               GetPoolInfo(CBuffer& buffer);
-    static void               GetD3DInfo(CBuffer& buffer);
-    static void               GetCrashAvertedStats(CBuffer& buffer);
-    static void               GetLogInfo(CBuffer& buffer);
-    static void               GetDxInfo(CBuffer& buffer);
-    static void               GetMemoryInfo(CBuffer& buffer);
-    static void               GetCurrentAnimTaskInfo(CBuffer& buffer);
-    static void               GetMiscInfo(CBuffer& buffer);
-    static void               OnCrashAverted(uint uiId);
-    static void               OnEnterCrashZone(uint uiId);
-    static void               LogEvent(const char* szType, const char* szContext, const char* szBody);
-    static SString            GetCrashAvertedStatsSoFar();
-    static void               ReserveMemoryKBForCrashDumpProcessing(uint uiMemoryKB);
-    static void               FreeMemoryForCrashDumpProcessing();
-    static void               SetHandlers();
-    static void               UpdateCounters();
-    static void HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved);
+    static void        AppendToDumpFile(const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd);
+    static void        GetPoolInfo(CBuffer& buffer);
+    static void        GetD3DInfo(CBuffer& buffer);
+    static void        GetCrashAvertedStats(CBuffer& buffer);
+    static void        GetLogInfo(CBuffer& buffer);
+    static void        GetDxInfo(CBuffer& buffer);
+    static void        GetMemoryInfo(CBuffer& buffer);
+    static void        GetCurrentAnimTaskInfo(CBuffer& buffer);
+    static void        GetMiscInfo(CBuffer& buffer);
+    static void        OnCrashAverted(uint uiId);
+    static void        OnEnterCrashZone(uint uiId);
+    static void        LogEvent(const char* szType, const char* szContext, const char* szBody);
+    static SString     GetCrashAvertedStatsSoFar();
+    static void        ReserveMemoryKBForCrashDumpProcessing(uint uiMemoryKB);
+    static void        FreeMemoryForCrashDumpProcessing();
+    static void        SetHandlers();
+    static void        UpdateCounters();
+    static void        HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved);
 };

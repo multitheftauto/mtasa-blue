@@ -24,7 +24,7 @@ char szZoneName[50] = {'\0'};
 
 static ComponentProperties componentProperties;
 
-RsGlobal*     CHudSA::rsGlobal = reinterpret_cast<RsGlobal*>(VAR_RSGlobal);
+RsGlobal* CHudSA::rsGlobal = reinterpret_cast<RsGlobal*>(VAR_RSGlobal);
 std::int16_t* CHudSA::itemToFlash = reinterpret_cast<std::int16_t*>(VAR_ItemToFlash);
 
 float CHudSA::calcStreetchX = 0.0f;
@@ -43,22 +43,14 @@ std::unordered_map<eHudComponent, SHudComponentData> defaultComponentProperties 
     {HUD_BREATH, {CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE)}},
     {HUD_ARMOUR, {CHudSA::GetHUDColour(eHudColour::LIGHT_GRAY)}},
     {HUD_CLOCK, {CHudSA::GetHUDColour(eHudColour::LIGHT_GRAY), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_PRICEDOWN, 2}},
-    {HUD_MONEY,
-     {CHudSA::GetHUDColour(eHudColour::GREEN), CHudSA::GetHUDColour(eHudColour::RED), false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT,
-      eFontStyle::FONT_PRICEDOWN, 2}},
-    {HUD_AMMO,
-     {CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER, eFontStyle::FONT_SUBTITLES, 1, 0, true}},
-    {HUD_VEHICLE_NAME,
-     {CHudSA::GetHUDColour(eHudColour::GREEN), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER, eFontStyle::FONT_MENU, 2, 0, true}},
-    {HUD_AREA_NAME,
-     {CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER, eFontStyle::FONT_GOTHIC, 2, 0, true}},
-    {HUD_RADIO,
-     {CHudSA::GetHUDColour(eHudColour::GOLD), CHudSA::GetHUDColour(eHudColour::DARK_GRAY), false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER,
-      eFontStyle::FONT_MENU, 1, 0, true}},
+    {HUD_MONEY, {CHudSA::GetHUDColour(eHudColour::GREEN), CHudSA::GetHUDColour(eHudColour::RED), false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_PRICEDOWN, 2}},
+    {HUD_AMMO, {CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER, eFontStyle::FONT_SUBTITLES, 1, 0, true}},
+    {HUD_VEHICLE_NAME, {CHudSA::GetHUDColour(eHudColour::GREEN), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER, eFontStyle::FONT_MENU, 2, 0, true}},
+    {HUD_AREA_NAME, {CHudSA::GetHUDColour(eHudColour::LIGHT_BLUE), {}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER, eFontStyle::FONT_GOTHIC, 2, 0, true}},
+    {HUD_RADIO, {CHudSA::GetHUDColour(eHudColour::GOLD), CHudSA::GetHUDColour(eHudColour::DARK_GRAY), false, false, COLOR_BLACK, eFontAlignment::ALIGN_CENTER, eFontStyle::FONT_MENU, 1, 0, true}},
     {HUD_WEAPON, {RwColor{255, 255, 255, 255}, RwColor{255, 255, 255, 255}}},
-    {HUD_WANTED,
-     {CHudSA::GetHUDColour(eHudColour::GOLD), RwColor{0, 0, 0, 170}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_GOTHIC, 1, 0,
-      true}}};
+    {HUD_WANTED, {CHudSA::GetHUDColour(eHudColour::GOLD), RwColor{0, 0, 0, 170}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_GOTHIC, 1, 0, true}}
+};
 
 CHudSA::CHudSA()
 {
@@ -198,7 +190,7 @@ bool CHudSA::IsComponentVisible(eHudComponent component)
         uchar* pSrc = (uchar*)(&pComponent->disabledData);
         uchar* pDest = (uchar*)(pComponent->uiDataAddr);
         if (memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
-            return false;  // Matches disabled bytes
+            return false;            // Matches disabled bytes
         return true;
     }
     return false;
@@ -307,8 +299,8 @@ bool CHudSA::IsCrosshairVisible()
     eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
 
     // Get player
-    CPed*       playerPed = pGame->GetPedContext();
-    CWeapon*    weapon = nullptr;
+    CPed* playerPed = pGame->GetPedContext();
+    CWeapon* weapon = nullptr;
     eWeaponType weaponType;
 
     // Get player current weapon
@@ -320,29 +312,24 @@ bool CHudSA::IsCrosshairVisible()
     }
 
     // Special aiming
-    if (cameraViewMode == MODE_SNIPER || cameraViewMode == MODE_1STPERSON || cameraViewMode == MODE_ROCKETLAUNCHER ||
-        cameraViewMode == MODE_ROCKETLAUNCHER_HS || cameraViewMode == MODE_M16_1STPERSON || cameraViewMode == MODE_HELICANNON_1STPERSON ||
-        cameraViewMode == MODE_CAMERA)
+    if (cameraViewMode == MODE_SNIPER || cameraViewMode == MODE_1STPERSON || cameraViewMode == MODE_ROCKETLAUNCHER || cameraViewMode == MODE_ROCKETLAUNCHER_HS || cameraViewMode == MODE_M16_1STPERSON || cameraViewMode == MODE_HELICANNON_1STPERSON || cameraViewMode == MODE_CAMERA)
     {
         if (weapon && cameraViewMode != MODE_1STPERSON && pGame->GetWeaponInfo(weaponType, WEAPONSKILL_STD)->GetFireType() != FIRETYPE_MELEE)
             specialAiming = true;
     }
 
     // Simple aiming
-    if (cameraViewMode == MODE_M16_1STPERSON_RUNABOUT || cameraViewMode == MODE_ROCKETLAUNCHER_RUNABOUT || cameraViewMode == MODE_ROCKETLAUNCHER_RUNABOUT_HS ||
-        cameraViewMode == MODE_SNIPER_RUNABOUT)
+    if (cameraViewMode == MODE_M16_1STPERSON_RUNABOUT || cameraViewMode == MODE_ROCKETLAUNCHER_RUNABOUT || cameraViewMode == MODE_ROCKETLAUNCHER_RUNABOUT_HS || cameraViewMode == MODE_SNIPER_RUNABOUT)
         simpleAiming = true;
 
     if ((playerPed && weapon) && !playerPed->GetTargetedObject() && playerPed->GetPedInterface()->pPlayerData->m_bFreeAiming)
     {
         CTaskSimpleUseGun* taskUseGun = playerPed->GetPedIntelligence()->GetTaskUseGun();
-        if ((!taskUseGun || !taskUseGun->GetSkipAim()) &&
-            (cameraViewMode == MODE_AIMWEAPON || cameraViewMode == MODE_AIMWEAPON_FROMCAR || cameraViewMode == MODE_AIMWEAPON_ATTACHED))
+        if ((!taskUseGun || !taskUseGun->GetSkipAim()) && (cameraViewMode == MODE_AIMWEAPON || cameraViewMode == MODE_AIMWEAPON_FROMCAR || cameraViewMode == MODE_AIMWEAPON_ATTACHED))
         {
             if (playerPed->GetPedState() != PedState::PED_ENTER_CAR && playerPed->GetPedState() != PedState::PED_CARJACK)
             {
-                if ((weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_M4) || weaponType == WEAPONTYPE_TEC9 ||
-                    weaponType == WEAPONTYPE_COUNTRYRIFLE || weaponType == WEAPONTYPE_MINIGUN || weaponType == WEAPONTYPE_FLAMETHROWER)
+                if ((weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_M4) || weaponType == WEAPONTYPE_TEC9 || weaponType == WEAPONTYPE_COUNTRYRIFLE || weaponType == WEAPONTYPE_MINIGUN || weaponType == WEAPONTYPE_FLAMETHROWER)
                     simpleAiming = cameraViewMode != MODE_AIMWEAPON || camera->GetTransitionState() == 0;
             }
         }
@@ -550,7 +537,7 @@ void CHudSA::ResetComponentPlacement(const eHudComponent& component, bool resetS
 }
 
 void CHudSA::SetComponentColor(const eHudComponent& component, std::uint32_t color, bool secondColor) noexcept
-{
+{ 
     SColor newColor = TOCOLOR2SCOLOR(color);
     auto&  compRef = GetHudComponentRef(component);
 
@@ -614,7 +601,7 @@ SColor CHudSA::GetComponentSecondaryColor(const eHudComponent& component) const 
 
 SColor CHudSA::GetComponentFontDropColor(const eHudComponent& component) const
 {
-    const auto&    ref = GetHudComponentRef(component);
+    const auto& ref = GetHudComponentRef(component);
     const RwColor& color = CFontSA::GetDropColor();
     return SColorRGBA(color.r, color.g, color.b, color.a);
 }
@@ -623,7 +610,7 @@ void CHudSA::RenderHealthBar(int x, int y)
 {
     // Flash each 8 frames
     bool isValidFrame = (pGame->GetSystemFrameCounter() & 8) == 0;
-    if (*itemToFlash == 4 && isValidFrame)  // 4 = HEALTH_BAR
+    if (*itemToFlash == 4 && isValidFrame) // 4 = HEALTH_BAR
         return;
 
     CPed* playerPed = pGame->GetPedContext();
@@ -651,20 +638,18 @@ void CHudSA::RenderHealthBar(int x, int y)
     double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
     float  totalWidth = (barWidth * maxHealth) / statModifier;
 
-    float         posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + x);
-    float         posY = useCustomPosition ? componentProperties.hpBar.placement.customY : y;
-    std::uint32_t barHeight =
-        static_cast<std::uint32_t>(useCustomSize ? componentProperties.hpBar.placement.customHeight : componentProperties.hpBar.placement.height);
+    float posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + x);
+    float posY = useCustomPosition ? componentProperties.hpBar.placement.customY : y;
+    std::uint32_t barHeight = static_cast<std::uint32_t>(useCustomSize ? componentProperties.hpBar.placement.customHeight : componentProperties.hpBar.placement.height);
 
     // call CSprite2d::DrawBarChart
-    DrawBarChart(posX, posY, static_cast<std::uint16_t>(totalWidth), barHeight, playerPed->GetHealth() * 100.0f / maxHealth, false,
-                 componentProperties.hpBar.drawPercentage, componentProperties.hpBar.drawBlackBorder, componentProperties.hpBar.fillColor, COLOR_BLACK);
+    DrawBarChart(posX, posY, static_cast<std::uint16_t>(totalWidth), barHeight, playerPed->GetHealth() * 100.0f / maxHealth, false, componentProperties.hpBar.drawPercentage, componentProperties.hpBar.drawBlackBorder, componentProperties.hpBar.fillColor, COLOR_BLACK);
 }
 
 void CHudSA::RenderBreathBar(int x, int y)
 {
     // Flash each 8 frames
-    if (*itemToFlash == 10 && (pGame->GetSystemFrameCounter() & 8) == 0)  // 10 = BREATH_BAR
+    if (*itemToFlash == 10 && (pGame->GetSystemFrameCounter() & 8) == 0) // 10 = BREATH_BAR
         return;
 
     CPed* playerPed = pGame->GetPedContext();
@@ -686,22 +671,19 @@ void CHudSA::RenderBreathBar(int x, int y)
     bool useCustomPosition = componentProperties.breathBar.placement.useCustomPosition;
     bool useCustomSize = componentProperties.breathBar.placement.useCustomSize;
 
-    float         posX = useCustomPosition ? componentProperties.breathBar.placement.customX : x;
-    float         posY = useCustomPosition ? componentProperties.breathBar.placement.customY : y;
-    std::uint16_t barWidth =
-        static_cast<std::uint16_t>(useCustomSize ? componentProperties.breathBar.placement.customWidth : componentProperties.breathBar.placement.width);
-    std::uint32_t barHeight =
-        static_cast<std::uint32_t>(useCustomSize ? componentProperties.breathBar.placement.customHeight : componentProperties.breathBar.placement.height);
+    float posX = useCustomPosition ? componentProperties.breathBar.placement.customX : x;
+    float posY = useCustomPosition ? componentProperties.breathBar.placement.customY : y;
+    std::uint16_t barWidth = static_cast<std::uint16_t>(useCustomSize ? componentProperties.breathBar.placement.customWidth : componentProperties.breathBar.placement.width);
+    std::uint32_t barHeight = static_cast<std::uint32_t>(useCustomSize ? componentProperties.breathBar.placement.customHeight : componentProperties.breathBar.placement.height);
 
     // call CSprite2d::DrawBarChart
-    DrawBarChart(posX, posY, barWidth, barHeight, playerPed->GetOxygenLevel() / statModifier * 100.0f, false, componentProperties.breathBar.drawPercentage,
-                 componentProperties.breathBar.drawBlackBorder, componentProperties.breathBar.fillColor, COLOR_BLACK);
+    DrawBarChart(posX, posY, barWidth, barHeight, playerPed->GetOxygenLevel() / statModifier * 100.0f, false, componentProperties.breathBar.drawPercentage, componentProperties.breathBar.drawBlackBorder, componentProperties.breathBar.fillColor, COLOR_BLACK);
 }
 
 void CHudSA::RenderArmorBar(int x, int y)
 {
     // Flash each 8 frames
-    if (*itemToFlash == 3 && (pGame->GetSystemFrameCounter() & 8) == 0)  // 3 = ARMOR_BAR
+    if (*itemToFlash == 3 && (pGame->GetSystemFrameCounter() & 8) == 0) // 3 = ARMOR_BAR
         return;
 
     CPed* playerPed = pGame->GetPedContext();
@@ -720,17 +702,13 @@ void CHudSA::RenderArmorBar(int x, int y)
     bool useCustomPosition = componentProperties.hpBar.placement.useCustomPosition;
     bool useCustomSize = componentProperties.hpBar.placement.useCustomSize;
 
-    float         posX = useCustomPosition ? componentProperties.armorBar.placement.customX : x;
-    float         posY = useCustomPosition ? componentProperties.armorBar.placement.customY : y;
-    std::uint16_t barWidth =
-        static_cast<std::uint16_t>(useCustomSize ? componentProperties.armorBar.placement.customWidth : componentProperties.armorBar.placement.width);
-    std::uint32_t barHeight =
-        static_cast<std::uint32_t>(useCustomSize ? componentProperties.armorBar.placement.customHeight : componentProperties.armorBar.placement.height);
+    float posX = useCustomPosition ? componentProperties.armorBar.placement.customX : x;
+    float posY = useCustomPosition ? componentProperties.armorBar.placement.customY : y;
+    std::uint16_t barWidth = static_cast<std::uint16_t>(useCustomSize ? componentProperties.armorBar.placement.customWidth : componentProperties.armorBar.placement.width);
+    std::uint32_t barHeight = static_cast<std::uint32_t>(useCustomSize ? componentProperties.armorBar.placement.customHeight : componentProperties.armorBar.placement.height);
 
     // call CSprite2d::DrawBarChart
-    DrawBarChart(posX, posY, barWidth, barHeight, playerPed->GetArmor() / static_cast<float>(pGame->GetPlayerInfo()->GetMaxArmor()) * 100.0f, false,
-                 componentProperties.armorBar.drawPercentage, componentProperties.armorBar.drawBlackBorder, componentProperties.armorBar.fillColor,
-                 COLOR_BLACK);
+    DrawBarChart(posX, posY, barWidth, barHeight, playerPed->GetArmor() / static_cast<float>(pGame->GetPlayerInfo()->GetMaxArmor()) * 100.0f, false, componentProperties.armorBar.drawPercentage, componentProperties.armorBar.drawBlackBorder, componentProperties.armorBar.fillColor, COLOR_BLACK);
 }
 
 void CHudSA::RenderText(float x, float y, const char* text, SHudComponentData& properties, bool useSecondColor, bool drawFromBottom, bool scaleForLanguage)
@@ -764,9 +742,7 @@ void CHudSA::RenderText(float x, float y, const char* text, SHudComponentData& p
     if (!properties.useCustomAlpha)
     {
         CFontSA::SetDropColor(RwColor{properties.dropColor.r, properties.dropColor.g, properties.dropColor.b, CFontSA::GetColor().a});
-        CFontSA::SetColor(
-            useSecondColor ? RwColor{properties.fillColorSecondary.r, properties.fillColorSecondary.g, properties.fillColorSecondary.b, CFontSA::GetColor().a}
-                           : RwColor{properties.fillColor.r, properties.fillColor.g, properties.fillColor.b, CFontSA::GetColor().a});
+        CFontSA::SetColor(useSecondColor ? RwColor{properties.fillColorSecondary.r, properties.fillColorSecondary.g, properties.fillColorSecondary.b, CFontSA::GetColor().a} : RwColor{properties.fillColor.r, properties.fillColor.g, properties.fillColor.b, CFontSA::GetColor().a});
     }
     else
     {
@@ -864,8 +840,7 @@ void __fastcall CHudSA::RenderWeaponIcon_Sprite(void* sprite, void*, CRect* rect
     ((void(__thiscall*)(void*, CRect*, RwColor*))FUNC_CSprite2d_Draw)(sprite, rect, color);
 }
 
-void CHudSA::RenderWeaponIcon_XLU(CVector pos, CVector2D halfSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint16_t intensity, float rhw,
-                                  std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir)
+void CHudSA::RenderWeaponIcon_XLU(CVector pos, CVector2D halfSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint16_t intensity, float rhw, std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir)
 {
     // Use custom position/size?
     SHudComponentData& properties = componentProperties.weaponIcon;
@@ -906,8 +881,7 @@ void CHudSA::RenderWeaponIcon_XLU(CVector pos, CVector2D halfSize, std::uint8_t 
     }
 
     // Call CSprite::RenderOneXLUSprite
-    ((void(__cdecl*)(CVector, CVector2D, std::uint8_t, std::uint8_t, std::uint8_t, std::uint16_t, float, std::uint8_t, std::uint8_t,
-                     std::uint8_t))FUNC_CSprite_RenderOneXLUSprite)(pos, halfSize, r, g, b, intensity, rhw, a, uDir, vDir);
+    ((void(__cdecl*)(CVector, CVector2D, std::uint8_t, std::uint8_t, std::uint8_t, std::uint16_t, float, std::uint8_t, std::uint8_t, std::uint8_t))FUNC_CSprite_RenderOneXLUSprite)(pos, halfSize, r, g, b, intensity, rhw, a, uDir, vDir);
 }
 
 void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
@@ -916,7 +890,7 @@ void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
 }
 
 static constexpr std::uintptr_t CONTINUE_RenderWanted = 0x58DFD8;
-static void _declspec(naked)    HOOK_RenderWanted()
+static void _declspec(naked) HOOK_RenderWanted()
 {
     _asm
     {

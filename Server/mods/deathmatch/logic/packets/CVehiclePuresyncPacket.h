@@ -19,7 +19,7 @@ class CVehicle;
 class CVehiclePuresyncPacket final : public CPacket
 {
 public:
-    CVehiclePuresyncPacket() {};
+    CVehiclePuresyncPacket(){};
     explicit CVehiclePuresyncPacket(class CPlayer* pPlayer);
 
     bool          HasSimHandler() const { return true; }

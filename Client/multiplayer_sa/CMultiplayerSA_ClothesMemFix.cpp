@@ -11,10 +11,10 @@
 
 #include "StdInc.h"
 
-#define FUNC_CPedModelInfo_DeleteRwObject 0x04C6C50
-#define FUNC_CPedModelInfo_SetClump       0x04C7340
-#define FUNC_CClumpModelInfo_SetClump     0x04C4F70
-DWORD ADDR_CPedModelInfo_SetClump_AfterHook = 0x04C7349;
+#define     FUNC_CPedModelInfo_DeleteRwObject               0x04C6C50
+#define     FUNC_CPedModelInfo_SetClump                     0x04C7340
+#define     FUNC_CClumpModelInfo_SetClump                   0x04C4F70
+DWORD       ADDR_CPedModelInfo_SetClump_AfterHook           = 0x04C7349;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -61,9 +61,9 @@ void      OnMy_CClothesDeleteRwObject()
 }
 
 // Hook info
-#define HOOKPOS_CClothesDeleteRwObject  0x5A8243
-#define HOOKSIZE_CClothesDeleteRwObject 5
-DWORD                 RETURN_CClothesDeleteRwObject = 0x5A8248;
+#define HOOKPOS_CClothesDeleteRwObject                          0x5A8243
+#define HOOKSIZE_CClothesDeleteRwObject                         5
+DWORD RETURN_CClothesDeleteRwObject = 0x5A8248;
 void _declspec(naked) HOOK_CClothesDeleteRwObject()
 {
     _asm
@@ -72,10 +72,10 @@ void _declspec(naked) HOOK_CClothesDeleteRwObject()
         call    OnMy_CClothesDeleteRwObject
         popad
 
-         // Do original code and continue
+        // Do original code and continue
         mov     ecx, esi
-         // Skip deletion
-         // call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject()
+        // Skip deletion
+        //call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject()
         jmp     RETURN_CClothesDeleteRwObject
     }
 }
@@ -112,9 +112,9 @@ void OnMy_PostCPedDress()
 }
 
 // Hook info
-#define HOOKPOS_PostCPedDress  0x5A835C
-#define HOOKSIZE_PostCPedDress 5
-DWORD                 RETURN_PostCPedDress = 0x5A8361;
+#define HOOKPOS_PostCPedDress                           0x5A835C
+#define HOOKSIZE_PostCPedDress                          5
+DWORD RETURN_PostCPedDress = 0x5A8361;
 void _declspec(naked) HOOK_PostCPedDress()
 {
     _asm
@@ -123,7 +123,7 @@ void _declspec(naked) HOOK_PostCPedDress()
         call    OnMy_PostCPedDress
         popad
 
-         // Do original code and continue
+        // Do original code and continue
         mov     eax, [esi+18h]
         push    edi
         push    eax

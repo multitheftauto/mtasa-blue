@@ -19,8 +19,8 @@ class CTaskSimpleUseGun;
 class CPedIntelligence
 {
 public:
-    virtual CTaskManager*      GetTaskManager() = 0;
-    virtual bool               TestForStealthKill(CPed* pPed, bool bUnk) = 0;
-    virtual CTaskSAInterface*  SetTaskDuckSecondary(unsigned short nLengthOfDuck) = 0;
+    virtual CTaskManager*     GetTaskManager() = 0;
+    virtual bool              TestForStealthKill(CPed* pPed, bool bUnk) = 0;
+    virtual CTaskSAInterface* SetTaskDuckSecondary(unsigned short nLengthOfDuck) = 0;
     virtual CTaskSimpleUseGun* GetTaskUseGun() = 0;
 };

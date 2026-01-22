@@ -15,14 +15,14 @@
 
 extern CGameSA* pGame;
 
-static bool bCameraClipObjects;
-static bool bCameraClipVehicles;
+static bool   bCameraClipObjects;
+static bool   bCameraClipVehicles;
 
-#define VAR_CameraClipVehicles       0x8A5B14
-#define VAR_CameraClipDynamicObjects 0x8A5B15
-#define VAR_CameraClipStaticObjects  0x8A5B16
+#define VAR_CameraClipVehicles              0x8A5B14
+#define VAR_CameraClipDynamicObjects        0x8A5B15
+#define VAR_CameraClipStaticObjects         0x8A5B16
 
-#define HOOKPOS_Camera_CollisionDetection 0x520190
+#define HOOKPOS_Camera_CollisionDetection   0x520190
 DWORD RETURN_Camera_CollisionDetection = 0x520195;
 void  HOOK_Camera_CollisionDetection();
 
@@ -60,10 +60,10 @@ void CCameraSA::RestoreWithJumpCut()
     CCameraSAInterface* cameraInterface = GetInterface();
     DWORD               dwFunc = 0x50BD40;
     _asm
-        {
+    {
         mov     ecx, cameraInterface
         call    dwFunc
-        }
+    }
     dwFunc = 0x50BAB0;
     _asm
     {
@@ -187,7 +187,7 @@ void CCameraSA::RestoreLastGoodState()
 
 CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 {
-    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;  // ->matrix;
+    CMatrix_Padded* pCamMatrix = &GetInterface()->m_cameraMatrix;            // ->matrix;
     if (pCamMatrix)
     {
         matrix->vFront = pCamMatrix->vFront;
@@ -358,7 +358,7 @@ float CCameraSA::GetCameraRotation()
 RwMatrix* CCameraSA::GetLTM()
 {
     // RwFrameGetLTM
-    return ((RwMatrix * (_cdecl*)(void*))0x7F0990)(GetInterface()->m_pRwCamera->object.object.parent);
+    return ((RwMatrix*(_cdecl*)(void*))0x7F0990)(GetInterface()->m_pRwCamera->object.object.parent);
 }
 
 CEntity* CCameraSA::GetTargetEntity()

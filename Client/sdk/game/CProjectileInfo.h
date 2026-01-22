@@ -20,8 +20,8 @@ class CProjectileInfo
 {
 public:
     virtual bool             AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
-    virtual CProjectile*     GetProjectile(void* projectilePointer) = 0;            // hack, don't use please
-    virtual CProjectileInfo* GetProjectileInfo(void* projectileInfoInterface) = 0;  // don't use
+    virtual CProjectile*     GetProjectile(void* projectilePointer) = 0;                      // hack, don't use please
+    virtual CProjectileInfo* GetProjectileInfo(void* projectileInfoInterface) = 0;            // don't use
     virtual void             RemoveProjectile(CProjectileInfo* pProjectileInfo, CProjectile* pProjectile, bool bBlow = true) = 0;
     virtual CProjectileInfo* GetProjectileInfo(DWORD Index) = 0;
     virtual void             RemoveEntityReferences(CEntity* entity) = 0;

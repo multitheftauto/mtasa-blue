@@ -20,7 +20,7 @@ namespace
         CTickCount           endTickCount;
         bool                 bHasEndTime;
     };
-}  // namespace
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -49,7 +49,7 @@ public:
     SString                      m_strCategoryName;
     CElapsedTime                 m_TimeSinceRemoveOld;
     std::map<SString, SLineInfo> m_LineMap;
-    CCriticalSection             m_CS;  // Required as some methods are called from the database thread
+    CCriticalSection             m_CS;            // Required as some methods are called from the database thread
 };
 
 ///////////////////////////////////////////////////////////////

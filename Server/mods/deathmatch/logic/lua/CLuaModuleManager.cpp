@@ -55,7 +55,7 @@ void CLuaModuleManager::DoPulse()
 }
 
 int CLuaModuleManager::LoadModule(const char* szShortFileName, const char* szFileName, bool bLateLoad)
-{  // 0 = Success, 1 = Can't find file, 2 = Can't find initialise function, 3 = can't find dopulse function,
+{            // 0 = Success, 1 = Can't find file, 2 = Can't find initialise function, 3 = can't find dopulse function,
     // 4 = can't find shutdownmodule function, 5 = can't find register function, 6 = can't find resourcestopping function
     // 7 = can't find resourcestopped function, 8 = resource already loaded
 
@@ -112,7 +112,7 @@ int CLuaModuleManager::ReloadModule(const char* szShortFileName, const char* szF
 }
 
 int CLuaModuleManager::UnloadModule(const char* szShortFileName)
-{  // 0 = Success, 9 = Can't find module by name
+{            // 0 = Success, 9 = Can't find module by name
     list<CLuaModule*>::iterator iter = m_Modules.begin();
     for (; iter != m_Modules.end(); ++iter)
     {

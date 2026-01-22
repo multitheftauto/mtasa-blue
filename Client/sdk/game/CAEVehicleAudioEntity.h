@@ -19,10 +19,10 @@ enum eVehicleAudioType
     VEHICLE_AUDIO_BOAT,
     VEHICLE_AUDIO_HELI,
     VEHICLE_AUDIO_PLANE,
-    VEHICLE_AUDIO_SEAPLANE,  // unused?
+    VEHICLE_AUDIO_SEAPLANE,            // unused?
 
     VEHICLE_AUDIO_TRAIN = 8,
-    VEHICLE_AUDIO_SPECIAL,  // RC vehicles, vortex, caddy, few trailers
+    VEHICLE_AUDIO_SPECIAL,            // RC vehicles, vortex, caddy, few trailers
     VEHICLE_AUDIO_SILENT
 };
 

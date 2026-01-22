@@ -29,7 +29,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
 
                                  // TODO: Consider using VK_(L|R)(SHIFT|CONTROL|MENU)
                                  {"lshift", VK_SHIFT, GTA_KEY_LSHIFT, DATA_NOT_EXTENDED, 0},
-                                 {"rshift", VK_SHIFT, GTA_KEY_RSHIFT, DATA_EXTENDED, 0},  // 10
+                                 {"rshift", VK_SHIFT, GTA_KEY_RSHIFT, DATA_EXTENDED, 0},            // 10
                                  {"lctrl", VK_CONTROL, GTA_KEY_LCONTROL, DATA_NOT_EXTENDED, 0},
                                  {"rctrl", VK_CONTROL, GTA_KEY_RCONTROL, DATA_EXTENDED, 0},
                                  {"lalt", VK_MENU, GTA_KEY_LMENU, DATA_NOT_EXTENDED, 0, true},
@@ -40,7 +40,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {"enter", VK_RETURN, GTA_KEY_RETURN, DATA_NOT_EXTENDED, 0},
                                  {"space", VK_SPACE, GTA_KEY_SPACE, DATA_NONE, 0},
                                  {"pgup", VK_PRIOR, GTA_KEY_PGUP, DATA_NUMPAD, 74, true},
-                                 {"pgdn", VK_NEXT, GTA_KEY_PGDN, DATA_NUMPAD, 68, true},  // 20
+                                 {"pgdn", VK_NEXT, GTA_KEY_PGDN, DATA_NUMPAD, 68, true},            // 20
                                  {"end", VK_END, GTA_KEY_END, DATA_NUMPAD, 66},
                                  {"home", VK_HOME, GTA_KEY_HOME, DATA_NUMPAD, 72},
                                  {"arrow_l", VK_LEFT, GTA_KEY_LEFT, DATA_NUMPAD, 69},
@@ -50,7 +50,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {"insert", VK_INSERT, GTA_KEY_INSERT, DATA_NUMPAD, 65, true},
                                  {"delete", VK_DELETE, GTA_KEY_DELETE, DATA_NUMPAD, 79},
                                  {"0", 0x30, GTA_KEY_0, DATA_NONE, 0},
-                                 {"1", 0x31, GTA_KEY_1, DATA_NONE, 0},  // 30
+                                 {"1", 0x31, GTA_KEY_1, DATA_NONE, 0},            // 30
                                  {"2", 0x32, GTA_KEY_2, DATA_NONE, 0},
                                  {"3", 0x33, GTA_KEY_3, DATA_NONE, 0},
                                  {"4", 0x34, GTA_KEY_4, DATA_NONE, 0},
@@ -60,7 +60,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {"8", 0x38, GTA_KEY_8, DATA_NONE, 0},
                                  {"9", 0x39, GTA_KEY_9, DATA_NONE, 0},
                                  {"a", 0x41, GTA_KEY_A, DATA_NONE, 0},
-                                 {"b", 0x42, GTA_KEY_B, DATA_NONE, 0},  // 40
+                                 {"b", 0x42, GTA_KEY_B, DATA_NONE, 0},            // 40
                                  {"c", 0x43, GTA_KEY_C, DATA_NONE, 0},
                                  {"d", 0x44, GTA_KEY_D, DATA_NONE, 0},
                                  {"e", 0x45, GTA_KEY_E, DATA_NONE, 0},
@@ -70,7 +70,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {"i", 0x49, GTA_KEY_I, DATA_NONE, 0},
                                  {"j", 0x4A, GTA_KEY_J, DATA_NONE, 0},
                                  {"k", 0x4B, GTA_KEY_K, DATA_NONE, 0},
-                                 {"l", 0x4C, GTA_KEY_L, DATA_NONE, 0},  // 50
+                                 {"l", 0x4C, GTA_KEY_L, DATA_NONE, 0},            // 50
                                  {"m", 0x4D, GTA_KEY_M, DATA_NONE, 0},
                                  {"n", 0x4E, GTA_KEY_N, DATA_NONE, 0},
                                  {"o", 0x4F, GTA_KEY_O, DATA_NONE, 0},
@@ -80,7 +80,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {"s", 0x53, GTA_KEY_S, DATA_NONE, 0},
                                  {"t", 0x54, GTA_KEY_T, DATA_NONE, 0},
                                  {"u", 0x55, GTA_KEY_U, DATA_NONE, 0},
-                                 {"v", 0x56, GTA_KEY_V, DATA_NONE, 0},  // 60
+                                 {"v", 0x56, GTA_KEY_V, DATA_NONE, 0},            // 60
                                  {"w", 0x57, GTA_KEY_W, DATA_NONE, 0},
                                  {"x", 0x58, GTA_KEY_X, DATA_NONE, 0},
                                  {"y", 0x59, GTA_KEY_Y, DATA_NONE, 0},
@@ -90,7 +90,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {"num_2", VK_NUMPAD2, GTA_KEY_NUMPAD2, DATA_NONE, 0},
                                  {"num_3", VK_NUMPAD3, GTA_KEY_NUMPAD3, DATA_NONE, 0},
                                  {"num_4", VK_NUMPAD4, GTA_KEY_NUMPAD4, DATA_NONE, 0},
-                                 {"num_5", VK_NUMPAD5, GTA_KEY_NUMPAD5, DATA_NONE, 0},  // 70
+                                 {"num_5", VK_NUMPAD5, GTA_KEY_NUMPAD5, DATA_NONE, 0},            // 70
                                  {"num_6", VK_NUMPAD6, GTA_KEY_NUMPAD6, DATA_NONE, 0},
                                  {"num_7", VK_NUMPAD7, GTA_KEY_NUMPAD7, DATA_NONE, 0},
                                  {"num_8", VK_NUMPAD8, GTA_KEY_NUMPAD8, DATA_NONE, 0},
@@ -100,7 +100,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {"num_sep", VK_SEPARATOR, NO_KEY_DEFINED, DATA_NONE, 0},
                                  {"num_sub", VK_SUBTRACT, GTA_KEY_SUBTRACT, DATA_NONE, 0},
                                  {"num_dec", VK_DECIMAL, GTA_KEY_DECIMAL, DATA_NONE, 0},
-                                 {"num_div", VK_DIVIDE, GTA_KEY_DIVIDE, DATA_NONE, 0},  // 80
+                                 {"num_div", VK_DIVIDE, GTA_KEY_DIVIDE, DATA_NONE, 0},            // 80
                                  {"F1", VK_F1, GTA_KEY_F1, DATA_NONE, 0, true},
                                  {"F2", VK_F2, GTA_KEY_F2, DATA_NONE, 0, true},
                                  {"F3", VK_F3, GTA_KEY_F3, DATA_NONE, 0, true},
@@ -111,7 +111,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  //  {"F8", VK_F8, GTA_KEY_F8, DATA_NONE, 0, true}, * Used for console
                                  {"F9", VK_F9, GTA_KEY_F9, DATA_NONE, 0, true},
                                  {"F10", VK_F10, GTA_KEY_F10, DATA_NONE, 0, true},
-                                 {"F11", VK_F11, GTA_KEY_F11, DATA_NONE, 0, true},  // 90
+                                 {"F11", VK_F11, GTA_KEY_F11, DATA_NONE, 0, true},            // 90
                                  {"F12", VK_F12, GTA_KEY_F12, DATA_NONE, 0, true},
                                  {"scroll", VK_SCROLL, GTA_KEY_SCROLL, DATA_NONE, 0, true},
                                  {";", 0xBA, GTA_KEY_SEMICOLON, DATA_NONE, 0},
@@ -121,7 +121,7 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {".", 0xBE, GTA_KEY_PERIOD, DATA_NONE, 0},
                                  {"/", 0xBF, GTA_KEY_SLASH, DATA_NONE, 0},
                                  {"'", 0xC0, GTA_KEY_APOSTROPHE, DATA_NONE, 0},
-                                 {"[", 0xDB, GTA_KEY_LBRACKET, DATA_NONE, 0},  // 100
+                                 {"[", 0xDB, GTA_KEY_LBRACKET, DATA_NONE, 0},            // 100
                                  {"\\", 0xDC, GTA_KEY_BACKSLASH, DATA_NONE, 0},
                                  {"]", 0xDD, GTA_KEY_RBRACKET, DATA_NONE, 0},
                                  {"#", 0xDE, GTA_KEY_HASH, DATA_NONE, 0},
@@ -193,7 +193,7 @@ SBindableGTAControl g_bcControls[] = {{"fire", FIRE, CONTROL_FOOT, false, true, 
                                       {"zoom_in", ZOOM_IN, CONTROL_FOOT, false, true, _td("Zoom in")},
                                       {"zoom_out", ZOOM_OUT, CONTROL_FOOT, false, true, _td("Zoom out")},
                                       {"enter_exit", ENTER_EXIT, CONTROL_BOTH, false, true, _td("Enter/Exit")},
-                                      {"change_camera", CHANGE_CAMERA, CONTROL_BOTH, false, true, _td("Change camera")},  // 10
+                                      {"change_camera", CHANGE_CAMERA, CONTROL_BOTH, false, true, _td("Change camera")},            // 10
                                       {"jump", JUMP, CONTROL_FOOT, false, true, _td("Jump")},
                                       {"sprint", SPRINT, CONTROL_FOOT, false, true, _td("Sprint")},
                                       {"look_behind", LOOK_BEHIND, CONTROL_FOOT, false, true, _td("Look behind")},
@@ -203,7 +203,7 @@ SBindableGTAControl g_bcControls[] = {{"fire", FIRE, CONTROL_FOOT, false, true, 
                                       {"vehicle_fire", VEHICLE_FIRE, CONTROL_VEHICLE, false, true, _td("Vehicle fire")},
                                       {"vehicle_secondary_fire", VEHICLE_SECONDARY_FIRE, CONTROL_VEHICLE, false, true, _td("Vehicle secondary fire")},
                                       {"vehicle_left", VEHICLE_LEFT, CONTROL_VEHICLE, false, true, _td("Vehicle left")},
-                                      {"vehicle_right", VEHICLE_RIGHT, CONTROL_VEHICLE, false, true, _td("Vehicle right")},  // 20
+                                      {"vehicle_right", VEHICLE_RIGHT, CONTROL_VEHICLE, false, true, _td("Vehicle right")},            // 20
                                       {"steer_forward", STEER_FORWARDS_DOWN, CONTROL_VEHICLE, false, true, _td("Steer forwards/down")},
                                       {"steer_back", STEER_BACK_UP, CONTROL_VEHICLE, false, true, _td("Steer backwards/up")},
                                       {"accelerate", ACCELERATE, CONTROL_VEHICLE, false, true, _td("Accelerate")},
@@ -213,7 +213,7 @@ SBindableGTAControl g_bcControls[] = {{"fire", FIRE, CONTROL_FOOT, false, true, 
                                       {"radio_user_track_skip", RADIO_USER_TRACK_SKIP, CONTROL_VEHICLE, false, true, _td("Radio user track skip")},
                                       {"horn", HORN, CONTROL_VEHICLE, false, true, _td("Horn")},
                                       {"sub_mission", SUB_MISSION, CONTROL_VEHICLE, false, true, _td("Sub-mission")},
-                                      {"handbrake", HANDBRAKE, CONTROL_VEHICLE, false, true, _td("Handbrake")},  // 30
+                                      {"handbrake", HANDBRAKE, CONTROL_VEHICLE, false, true, _td("Handbrake")},            // 30
                                       {"vehicle_look_left", VEHICLE_LOOK_LEFT, CONTROL_VEHICLE, false, true, _td("Vehicle look left")},
                                       {"vehicle_look_right", VEHICLE_LOOK_RIGHT, CONTROL_VEHICLE, false, true, _td("Vehicle look right")},
                                       {"vehicle_look_behind", VEHICLE_LOOK_BEHIND, CONTROL_VEHICLE, false, true, _td("Vehicle look behind")},
@@ -223,7 +223,7 @@ SBindableGTAControl g_bcControls[] = {{"fire", FIRE, CONTROL_FOOT, false, true, 
                                       {"special_control_down", SPECIAL_CONTROL_DOWN, CONTROL_VEHICLE, false, true, _td("Special control down")},
                                       {"special_control_up", SPECIAL_CONTROL_UP, CONTROL_VEHICLE, false, true, _td("Special control up")},
                                       {"aim_weapon", AIM_WEAPON, CONTROL_FOOT, false, true, _td("Aim weapon")},
-                                      {"conversation_yes", CONVERSATION_YES, CONTROL_FOOT, false, true, _td("Conversation yes")},  // 40
+                                      {"conversation_yes", CONVERSATION_YES, CONTROL_FOOT, false, true, _td("Conversation yes")},            // 40
                                       {"conversation_no", CONVERSATION_NO, CONTROL_FOOT, false, true, _td("Conversation no")},
                                       {"group_control_forwards", GROUP_CONTROL_FORWARDS, CONTROL_FOOT, false, true, _td("Group control forwards")},
                                       {"group_control_back", GROUP_CONTROL_BACK, CONTROL_FOOT, false, true, _td("Group control backwards")},
@@ -432,19 +432,16 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     bool                     wasBindFound = false;
     std::list<CCommandBind*> processedCommandBinds;
 
-    auto wasCommandBindProcessed = [&processedCommandBinds](CCommandBind* commandBind)
-    {
-        auto iter = std::find_if(processedCommandBinds.begin(), processedCommandBinds.end(),
-                                 [&](CCommandBind* processedCommandBind)
-                                 {
-                                     if (processedCommandBind->triggerState != commandBind->triggerState)
-                                         return false;
+    auto wasCommandBindProcessed = [&processedCommandBinds](CCommandBind* commandBind) {
+        auto iter = std::find_if(processedCommandBinds.begin(), processedCommandBinds.end(), [&](CCommandBind* processedCommandBind) {
+            if (processedCommandBind->triggerState != commandBind->triggerState)
+                return false;
 
-                                     if (processedCommandBind->command != commandBind->command)
-                                         return false;
+            if (processedCommandBind->command != commandBind->command)
+                return false;
 
-                                     return commandBind->arguments.empty() || processedCommandBind->arguments == commandBind->arguments;
-                                 });
+            return commandBind->arguments.empty() || processedCommandBind->arguments == commandBind->arguments;
+        });
         return iter != processedCommandBinds.end();
     };
 
@@ -509,7 +506,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                         processedCommandBinds.push_back(commandBind);
                     }
                 }
-                else  // bindWithState->type == KeyBindType::FUNCTION
+                else            // bindWithState->type == KeyBindType::FUNCTION
                 {
                     if (bAllowed)
                     {
@@ -568,8 +565,9 @@ void CKeyBinds::RemoveDeletedBinds()
 
 void CKeyBinds::ClearCommandsAndControls()
 {
-    const auto predicate = [](const KeyBindPtr& bind)
-    { return !bind->isBeingDeleted && bind->type != KeyBindType::FUNCTION && bind->type != KeyBindType::CONTROL_FUNCTION; };
+    const auto predicate = [](const KeyBindPtr& bind) {
+        return !bind->isBeingDeleted && bind->type != KeyBindType::FUNCTION && bind->type != KeyBindType::CONTROL_FUNCTION;
+    };
     RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
@@ -654,7 +652,7 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
         if (bScriptCreated)
             bind->originalScriptKey = szKey;
         else if (szOriginalScriptKey)
-            bind->originalScriptKey = szOriginalScriptKey;  // Will wait for script to addcommand before doing replace
+            bind->originalScriptKey = szOriginalScriptKey;            // Will wait for script to addcommand before doing replace
     }
 
     m_binds.emplace_back(bind.release());
@@ -687,8 +685,7 @@ bool CKeyBinds::RemoveCommand(const char* szKey, const char* szCommand, bool bCh
 
     std::string_view command{szCommand};
 
-    const auto predicate = [&](const KeyBindPtr& bind)
-    {
+    const auto predicate = [&](const KeyBindPtr& bind) {
         if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             return false;
 
@@ -711,8 +708,7 @@ bool CKeyBinds::RemoveAllCommands(const char* szKey, bool bCheckState, bool bSta
     if (!szKey)
         return false;
 
-    const auto predicate = [&](const KeyBindPtr& bind)
-    {
+    const auto predicate = [&](const KeyBindPtr& bind) {
         if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             return false;
 
@@ -951,8 +947,7 @@ void CKeyBinds::UserChangeCommandBoundKey(CCommandBind* pBind, const SBindableKe
 //
 void CKeyBinds::SortCommandBinds()
 {
-    auto compare = [](const KeyBindPtr& lhs, const KeyBindPtr& rhs)
-    {
+    auto compare = [](const KeyBindPtr& lhs, const KeyBindPtr& rhs) {
         // Group command binds last
         if (lhs->type != KeyBindType::COMMAND && rhs->type == KeyBindType::COMMAND)
             return true;
@@ -1042,8 +1037,7 @@ bool CKeyBinds::RemoveGTAControl(const char* szKey, const char* szControl)
     if (!szKey || !szControl)
         return false;
 
-    const auto predicate = [&](const KeyBindPtr& bind)
-    {
+    const auto predicate = [&](const KeyBindPtr& bind) {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             return false;
 
@@ -1059,8 +1053,7 @@ bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
     if (!szKey)
         return false;
 
-    const auto predicate = [&](const KeyBindPtr& bind)
-    {
+    const auto predicate = [&](const KeyBindPtr& bind) {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             return false;
 
@@ -1355,8 +1348,7 @@ bool CKeyBinds::RemoveFunction(const char* szKey, KeyFunctionBindHandler Handler
 
 bool CKeyBinds::RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    const auto predicate = [&](const KeyBindPtr& bind)
-    {
+    const auto predicate = [&](const KeyBindPtr& bind) {
         if (bind->isBeingDeleted || bind->type != KeyBindType::FUNCTION)
             return false;
 
@@ -1373,8 +1365,7 @@ bool CKeyBinds::RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler 
 
 bool CKeyBinds::RemoveAllFunctions(KeyFunctionBindHandler Handler)
 {
-    const auto predicate = [&](const KeyBindPtr& bind)
-    {
+    const auto predicate = [&](const KeyBindPtr& bind) {
         if (bind->isBeingDeleted || bind->type != KeyBindType::FUNCTION)
             return false;
 
@@ -1461,8 +1452,7 @@ bool CKeyBinds::RemoveControlFunction(const char* szControl, ControlFunctionBind
 
 bool CKeyBinds::RemoveControlFunction(SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    const auto predicate = [&](const KeyBindPtr& bind)
-    {
+    const auto predicate = [&](const KeyBindPtr& bind) {
         if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
             return false;
 
@@ -1479,8 +1469,7 @@ bool CKeyBinds::RemoveControlFunction(SBindableGTAControl* pControl, ControlFunc
 
 bool CKeyBinds::RemoveAllControlFunctions(ControlFunctionBindHandler Handler)
 {
-    const auto predicate = [&](const KeyBindPtr& bind)
-    {
+    const auto predicate = [&](const KeyBindPtr& bind) {
         if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
             return false;
 
@@ -1901,8 +1890,7 @@ void CKeyBinds::DoPostFramePulse()
 {
     SystemState systemState = CCore::GetSingleton().GetGame()->GetSystemState();
 
-    if (m_bWaitingToLoadDefaults &&
-        (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME))  // Are GTA controls actually initialized?
+    if (m_bWaitingToLoadDefaults && (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME))            // Are GTA controls actually initialized?
     {
         LoadDefaultBinds();
         m_bWaitingToLoadDefaults = false;
@@ -1954,16 +1942,16 @@ void CKeyBinds::DoPostFramePulse()
     {
         if (!bInVehicle)
         {
-            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;  // Fire
+            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;            // Fire
             if (bAimingWeapon)
             {
-                cs.RightShoulder2 = g_bcControls[8].bState ? 255 : 0;  // Zoom Out
-                cs.LeftShoulder2 = g_bcControls[7].bState ? 255 : 0;   // Zoom In
+                cs.RightShoulder2 = g_bcControls[8].bState ? 255 : 0;            // Zoom Out
+                cs.LeftShoulder2 = g_bcControls[7].bState ? 255 : 0;             // Zoom In
             }
             else
             {
-                cs.RightShoulder2 = g_bcControls[1].bState ? 255 : 0;  // Next Weapon
-                cs.LeftShoulder2 = g_bcControls[2].bState ? 255 : 0;   // Previous Weapon
+                cs.RightShoulder2 = g_bcControls[1].bState ? 255 : 0;            // Next Weapon
+                cs.LeftShoulder2 = g_bcControls[2].bState ? 255 : 0;             // Previous Weapon
             }
 
             if (!ControlForwardsBackWards(cs))
@@ -1978,39 +1966,39 @@ void CKeyBinds::DoPostFramePulse()
 
             // * Enter Exit
             // * Change View
-            cs.ButtonSquare = (!bEnteringVehicle && g_bcControls[11].bState) ? 255 : 0;  // Jump
-            cs.ButtonCross = (g_bcControls[12].bState) ? 255 : 0;                        // Sprint
-            cs.ShockButtonR = (g_bcControls[13].bState) ? 255 : 0;                       // Look Behind
-            cs.ShockButtonL = (g_bcControls[14].bState) ? 255 : 0;                       // Crouch
-            cs.LeftShoulder1 = (g_bcControls[15].bState) ? 255 : 0;                      // Action
-            cs.m_bPedWalk = (g_bcControls[16].bState) ? 255 : 0;                         // Walk
+            cs.ButtonSquare = (!bEnteringVehicle && g_bcControls[11].bState) ? 255 : 0;            // Jump
+            cs.ButtonCross = (g_bcControls[12].bState) ? 255 : 0;                                  // Sprint
+            cs.ShockButtonR = (g_bcControls[13].bState) ? 255 : 0;                                 // Look Behind
+            cs.ShockButtonL = (g_bcControls[14].bState) ? 255 : 0;                                 // Crouch
+            cs.LeftShoulder1 = (g_bcControls[15].bState) ? 255 : 0;                                // Action
+            cs.m_bPedWalk = (g_bcControls[16].bState) ? 255 : 0;                                   // Walk
             // * Vehicle Keys
-            cs.RightShoulder1 = (g_bcControls[39].bState) ? 255 : 0;  // Aim Weapon
-            cs.DPadRight = (g_bcControls[40].bState) ? 255 : 0;       // Conversation Yes
-            cs.DPadLeft = (g_bcControls[41].bState) ? 255 : 0;        // Conversation No
-            cs.DPadUp = (g_bcControls[42].bState) ? 255 : 0;          // Group Control Forwards
-            cs.DPadDown = (g_bcControls[43].bState) ? 255 : 0;        // Group Control Backwards
+            cs.RightShoulder1 = (g_bcControls[39].bState) ? 255 : 0;            // Aim Weapon
+            cs.DPadRight = (g_bcControls[40].bState) ? 255 : 0;                 // Conversation Yes
+            cs.DPadLeft = (g_bcControls[41].bState) ? 255 : 0;                  // Conversation No
+            cs.DPadUp = (g_bcControls[42].bState) ? 255 : 0;                    // Group Control Forwards
+            cs.DPadDown = (g_bcControls[43].bState) ? 255 : 0;                  // Group Control Backwards
         }
         else
         {
-            cs.ButtonCircle = (g_bcControls[17].bState) ? 255 : 0;   // Fire
-            cs.LeftShoulder1 = (g_bcControls[18].bState) ? 255 : 0;  // Secondary Fire
+            cs.ButtonCircle = (g_bcControls[17].bState) ? 255 : 0;             // Fire
+            cs.LeftShoulder1 = (g_bcControls[18].bState) ? 255 : 0;            // Secondary Fire
             cs.LeftStickX = ((g_bcControls[19].bState && g_bcControls[20].bState) || (!g_bcControls[19].bState && !g_bcControls[20].bState)) ? 0
                             : (g_bcControls[19].bState)                                                                                      ? -128
                                                                                                                                              : 128;
             cs.LeftStickY = ((g_bcControls[21].bState && g_bcControls[22].bState) || (!g_bcControls[21].bState && !g_bcControls[22].bState)) ? 0
                             : (g_bcControls[21].bState)                                                                                      ? -128
                                                                                                                                              : 128;
-            cs.ButtonCross = (g_bcControls[23].bState) ? 255 : 0;                                // Accelerate
-            cs.ButtonSquare = (g_bcControls[24].bState) ? 255 : 0;                               // Reverse
-            cs.DPadUp = (g_bcControls[25].bState) ? 255 : 0;                                     // Radio Next
-            cs.DPadDown = (g_bcControls[26].bState) ? 255 : 0;                                   // Radio Previous
-            cs.m_bRadioTrackSkip = (g_bcControls[27].bState) ? 255 : 0;                          // Radio Skip
-            cs.ShockButtonL = (g_bcControls[28].bState) ? 255 : 0;                               // Horn
-            cs.ShockButtonR = (g_bcControls[29].bState) ? 255 : 0;                               // Sub Mission
-            cs.RightShoulder1 = (g_bcControls[30].bState) ? 255 : 0;                             // Handbrake
-            cs.LeftShoulder2 = (g_bcControls[31].bState || g_bcControls[33].bState) ? 255 : 0;   // Look Left
-            cs.RightShoulder2 = (g_bcControls[32].bState || g_bcControls[33].bState) ? 255 : 0;  // Look Right
+            cs.ButtonCross = (g_bcControls[23].bState) ? 255 : 0;                                          // Accelerate
+            cs.ButtonSquare = (g_bcControls[24].bState) ? 255 : 0;                                         // Reverse
+            cs.DPadUp = (g_bcControls[25].bState) ? 255 : 0;                                               // Radio Next
+            cs.DPadDown = (g_bcControls[26].bState) ? 255 : 0;                                             // Radio Previous
+            cs.m_bRadioTrackSkip = (g_bcControls[27].bState) ? 255 : 0;                                    // Radio Skip
+            cs.ShockButtonL = (g_bcControls[28].bState) ? 255 : 0;                                         // Horn
+            cs.ShockButtonR = (g_bcControls[29].bState) ? 255 : 0;                                         // Sub Mission
+            cs.RightShoulder1 = (g_bcControls[30].bState) ? 255 : 0;                                       // Handbrake
+            cs.LeftShoulder2 = (g_bcControls[31].bState || g_bcControls[33].bState) ? 255 : 0;             // Look Left
+            cs.RightShoulder2 = (g_bcControls[32].bState || g_bcControls[33].bState) ? 255 : 0;            // Look Right
             // * Look Behind - uses both keys above simultaneously
             // Mouse Look
             cs.RightStickX = ((g_bcControls[35].bState && g_bcControls[36].bState) || (!g_bcControls[35].bState && !g_bcControls[36].bState)) ? 0
@@ -2020,8 +2008,8 @@ void CKeyBinds::DoPostFramePulse()
                              : (g_bcControls[37].bState)                                                                                      ? 128
                                                                                                                                               : -128;
         }
-        cs.ButtonTriangle = (g_bcControls[9].bState) ? 255 : 0;  // Enter Exit
-        cs.Select = (g_bcControls[10].bState) ? 255 : 0;         // Change View
+        cs.ButtonTriangle = (g_bcControls[9].bState) ? 255 : 0;            // Enter Exit
+        cs.Select = (g_bcControls[10].bState) ? 255 : 0;                   // Change View
 
         bool disableGameplayControls = m_pCore->IsCursorForcedVisible() && m_pCore->IsCursorControlsToggled();
 
@@ -2187,7 +2175,7 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
     SystemState systemState = CCore::GetSingleton().GetGame()->GetSystemState();
     if (bLoadDefaults)
     {
-        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME)  // Are GTA controls actually initialized?
+        if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME)            // Are GTA controls actually initialized?
             LoadDefaultBinds();
         else
             m_bWaitingToLoadDefaults = true;
@@ -2221,8 +2209,7 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
 
         CXMLAttributes& attributes = bindNode->GetAttributes();
 
-        auto createAttribute = [&attributes](const char* key, const char* value)
-        {
+        auto createAttribute = [&attributes](const char* key, const char* value) {
             if (value && value[0])
             {
                 CXMLAttribute* attribute = attributes.Create(key);
@@ -2252,7 +2239,7 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
                 createAttribute("default", commandBind->originalScriptKey.c_str());
             }
         }
-        else  // bind->type == KeyBindType::GTA_CONTROL
+        else            // bind->type == KeyBindType::GTA_CONTROL
         {
             auto controlBind = static_cast<CGTAControlBind*>(bind.get());
             createAttribute("key", controlBind->boundKey->szKey);
@@ -2501,8 +2488,7 @@ void CKeyBinds::PrintBindsCommand(const char* szCmdLine)
 
     CConsoleInterface* console = m_pCore->GetConsole();
 
-    auto print = [console](const KeyBindPtr& bind)
-    {
+    auto print = [console](const KeyBindPtr& bind) {
         switch (bind->type)
         {
             case KeyBindType::COMMAND:

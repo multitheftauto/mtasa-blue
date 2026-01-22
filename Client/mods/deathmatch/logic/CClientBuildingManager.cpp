@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-constexpr float  WORLD_DISTANCE_FROM_CENTER = 3000.0f;
+constexpr float WORLD_DISTANCE_FROM_CENTER = 3000.0f;
 constexpr size_t PRESERVED_POOL_SIZE = 2000;
 constexpr size_t RESIZE_POOL_STEP = 5000;
 
@@ -62,8 +62,8 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
     if (modelId >= static_cast<uint16_t>(g_pGame->GetBaseIDforTXD()))
         return false;
 
-    // Clothes and hands cause artefacts
-    if (384 <= modelId && modelId <= 397)
+     // Clothes and hands cause artefacts
+     if (384 <= modelId && modelId <= 397)
         return false;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);

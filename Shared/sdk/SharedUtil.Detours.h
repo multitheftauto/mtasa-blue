@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(WIN32)
-    #include <detours.h>
+#include <detours.h>
 
 namespace SharedUtil
 {
@@ -44,6 +44,6 @@ namespace SharedUtil
         DetourDetach(&reinterpret_cast<PVOID&>(target), replacement);
         return DetourTransactionCommit() == NO_ERROR;
     }
-}  // namespace SharedUtil
+}            // namespace SharedUtil
 
 #endif

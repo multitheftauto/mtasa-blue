@@ -211,8 +211,7 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
             std::transform(pages.begin(), pages.end(), pages.begin(), [pWebCore](const auto& url) { return pWebCore->GetDomainFromURL(url); });
         }
 
-        WebRequestCallback callback = [=](bool bAllow, const std::unordered_set<SString>& domains)
-        {
+        WebRequestCallback callback = [=](bool bAllow, const std::unordered_set<SString>& domains) {
             // Test if luaVM is still available
             if (m_pLuaManager->IsLuaVMValid(luaVM) && VERIFY_FUNCTION(callbackFunction))
             {
@@ -575,7 +574,7 @@ int CLuaBrowserDefs::IsBrowserDomainBlocked(lua_State* luaVM)
             lua_pushnil(luaVM);
             return 1;
         }
-
+        
         if (bIsURL)
             strURL = pWebCore->GetDomainFromURL(strURL);
 
@@ -632,7 +631,7 @@ int CLuaBrowserDefs::IsBrowserFocused(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        auto               pWebCore = g_pCore->GetWebCore();
+        auto pWebCore = g_pCore->GetWebCore();
         CWebViewInterface* pWebView = pWebCore ? pWebCore->GetFocusedWebView() : nullptr;
         lua_pushboolean(luaVM, pWebBrowser->GetWebView() == pWebView);
         return 1;
@@ -701,7 +700,7 @@ int CLuaBrowserDefs::GetBrowserSettings(lua_State* luaVM)
 {
     //  table getBrowserSettings ()
     auto pWebCore = g_pCore->GetWebCore();
-
+    
     lua_createtable(luaVM, 0, 3);
 
     lua_pushstring(luaVM, "RemoteEnabled");
@@ -735,23 +734,21 @@ int CLuaBrowserDefs::GetBrowserSource(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain && VERIFY_FUNCTION(callbackFunction))
         {
-            pWebBrowser->GetSourceCode(
-                [callbackFunction, pLuaMain, pWebBrowser](const std::string& code)
+            pWebBrowser->GetSourceCode([callbackFunction, pLuaMain, pWebBrowser](const std::string& code) {
+                /*
+                This function should not be called when the resource is about to stop as
+                stopping the resource destroys the browser element and thus cancels the
+                CefStringVisitor callback class (see CWebView::GetSourceCode::MyStringVisitor)
+                */
+                if (VERIFY_FUNCTION(callbackFunction))
                 {
-                    /*
-                    This function should not be called when the resource is about to stop as
-                    stopping the resource destroys the browser element and thus cancels the
-                    CefStringVisitor callback class (see CWebView::GetSourceCode::MyStringVisitor)
-                    */
-                    if (VERIFY_FUNCTION(callbackFunction))
-                    {
-                        CLuaArguments arguments;
-                        // TODO: Use SCharStringRef/direct string access instead of copying strings around
-                        arguments.PushString(code);
-                        arguments.PushElement(pWebBrowser);
-                        arguments.Call(pLuaMain, callbackFunction);
-                    }
-                });
+                    CLuaArguments arguments;
+                    // TODO: Use SCharStringRef/direct string access instead of copying strings around
+                    arguments.PushString(code);
+                    arguments.PushElement(pWebBrowser);
+                    arguments.Call(pLuaMain, callbackFunction);
+                }
+            });
 
             lua_pushboolean(luaVM, true);
             return 1;
@@ -986,7 +983,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
     return 1;
 }
 
-int CLuaBrowserDefs::GUIGetBrowser(lua_State* luaVM)  // Or rather guiGetBrowserBrowser?
+int CLuaBrowserDefs::GUIGetBrowser(lua_State* luaVM)            // Or rather guiGetBrowserBrowser?
 {
     //  webbrowser guiGetBrowser ( gui-webbrowser browser )
     CClientGUIElement* pGUIElement;
@@ -1044,47 +1041,45 @@ int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
                 CResourceManager* pResourceManager = m_pResourceManager;
                 auto              netId = pResource->GetNetID();
 
-                bool bResult = pWebBrowser->AddAjaxHandler(strURL,
-                                                           [=](std::vector<SString>& vecGet, std::vector<SString>& vecPost) -> const SString
-                                                           {
-                                                               // Make sure the resource is still running
-                                                               if (!pResourceManager->Exists(pResource) || pResource->GetNetID() != netId)
-                                                               {
-                                                                   return "";
-                                                               }
+                bool bResult = pWebBrowser->AddAjaxHandler(strURL, [=](std::vector<SString>& vecGet, std::vector<SString>& vecPost) -> const SString {
+                    // Make sure the resource is still running
+                    if (!pResourceManager->Exists(pResource) || pResource->GetNetID() != netId)
+                    {
+                        return "";
+                    }
 
-                                                               // Make sure the function is valid
-                                                               if (VERIFY_FUNCTION(callbackFunction))
-                                                               {
-                                                                   CLuaArguments arguments;
-                                                                   CLuaArguments getArguments;
-                                                                   CLuaArguments postArguments;
+                    // Make sure the function is valid
+                    if (VERIFY_FUNCTION(callbackFunction))
+                    {
+                        CLuaArguments arguments;
+                        CLuaArguments getArguments;
+                        CLuaArguments postArguments;
 
-                                                                   for (auto&& param : vecGet)
-                                                                       getArguments.PushString(param);
+                        for (auto&& param : vecGet)
+                            getArguments.PushString(param);
 
-                                                                   for (auto&& param : vecPost)
-                                                                       postArguments.PushString(param);
+                        for (auto&& param : vecPost)
+                            postArguments.PushString(param);
 
-                                                                   arguments.PushTable(&getArguments);
-                                                                   arguments.PushTable(&postArguments);
+                        arguments.PushTable(&getArguments);
+                        arguments.PushTable(&postArguments);
 
-                                                                   CLuaArguments result;
+                        CLuaArguments result;
 
-                                                                   arguments.Call(pLuaMain, callbackFunction, &result);
+                        arguments.Call(pLuaMain, callbackFunction, &result);
 
-                                                                   if (result.IsEmpty())
-                                                                       return "";
+                        if (result.IsEmpty())
+                            return "";
 
-                                                                   CLuaArgument* returnedValue = *result.begin();
-                                                                   if (returnedValue->GetType() == LUA_TSTRING)
-                                                                       return returnedValue->GetString();
-                                                                   else
-                                                                       return "";
-                                                               }
-                                                               else
-                                                                   return "";
-                                                           });
+                        CLuaArgument* returnedValue = *result.begin();
+                        if (returnedValue->GetType() == LUA_TSTRING)
+                            return returnedValue->GetString();
+                        else
+                            return "";
+                    }
+                    else
+                        return "";
+                });
 
                 lua_pushboolean(luaVM, bResult);
                 return 1;

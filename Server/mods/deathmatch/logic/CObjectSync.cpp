@@ -14,8 +14,8 @@
 
 #ifdef WITH_OBJECT_SYNC
 
-    #define SYNC_RATE                500
-    #define MAX_PLAYER_SYNC_DISTANCE 100.0f
+#define SYNC_RATE 500
+#define MAX_PLAYER_SYNC_DISTANCE 100.0f
 
 CObjectSync::CObjectSync(CPlayerManager* pPlayerManager, CObjectManager* pObjectManager)
 {
@@ -141,7 +141,7 @@ void CObjectSync::StartSync(CPlayer* pPlayer, CObject* pObject)
 
     // Call the onElementStartSync event
     CLuaArguments Arguments;
-    Arguments.PushElement(pPlayer);  // New syncer
+    Arguments.PushElement(pPlayer);            // New syncer
     pObject->CallEvent("onElementStartSync", Arguments);
 }
 
@@ -158,7 +158,7 @@ void CObjectSync::StopSync(CObject* pObject)
 
     // Call the onElementStopSync event
     CLuaArguments Arguments;
-    Arguments.PushElement(pSyncer);  // Old syncer
+    Arguments.PushElement(pSyncer);            // Old syncer
     pObject->CallEvent("onElementStopSync", Arguments);
 }
 

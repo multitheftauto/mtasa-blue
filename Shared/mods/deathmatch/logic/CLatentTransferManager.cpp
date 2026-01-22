@@ -64,9 +64,9 @@ void CLatentTransferManager::DoPulse()
     // Smooth out time between calls, with more resistance when rising
     int iBetweenCallsChange = iDeltaTimeMs - m_iTimeMsBetweenCalls;
     if (iBetweenCallsChange > 0)
-        m_iTimeMsBetweenCalls += std::min(iBetweenCallsChange, std::max(1, m_iTimeMsBetweenCalls / 10));  // 10% max when rising
+        m_iTimeMsBetweenCalls += std::min(iBetweenCallsChange, std::max(1, m_iTimeMsBetweenCalls / 10));            // 10% max when rising
     else
-        m_iTimeMsBetweenCalls -= std::min(-iBetweenCallsChange, std::max(1, m_iTimeMsBetweenCalls / 5));  // 20% max when falling
+        m_iTimeMsBetweenCalls -= std::min(-iBetweenCallsChange, std::max(1, m_iTimeMsBetweenCalls / 5));            // 20% max when falling
 
     m_iTimeMsBetweenCalls = Clamp(1, m_iTimeMsBetweenCalls, 100);
 
@@ -141,7 +141,7 @@ void CLatentTransferManager::AddSendBatchBegin(unsigned char ucPacketId, NetBitS
 
     // Copy data from bitstream into buffer
     buffer.SetSize(uiHeadSize + uiBitStreamBytesUsed);
-    *(buffer.GetData() + buffer.GetSize() - 1) = 0;  // Zero last byte of destination buffer
+    *(buffer.GetData() + buffer.GetSize() - 1) = 0;            // Zero last byte of destination buffer
     pBitStream->ResetReadPointer();
     pBitStream->ReadBits(buffer.GetData() + uiHeadSize, uiBitStreamBitsUsed);
 
@@ -375,7 +375,7 @@ bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBi
 
 void DoDisconnectRemote(NetPlayerID remoteId, const SString& strReason)
 {
-    g_pCore->ShowMessageBox(_("Error") + _E("CD61"), strReason, MB_BUTTON_OK | MB_ICON_ERROR);  // DoDisconnectRemote
+    g_pCore->ShowMessageBox(_("Error") + _E("CD61"), strReason, MB_BUTTON_OK | MB_ICON_ERROR);            // DoDisconnectRemote
     g_pCore->GetModManager()->RequestUnload();
 }
 

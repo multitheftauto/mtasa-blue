@@ -44,26 +44,26 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, T3DMarkerType dwType, CV
     DWORD dwFunc = FUNC_PlaceMarker;
     DWORD dwReturn = 0;
     _asm
-        {
-        push    bZCheck  // zCheck  ##SA##
-        push    0  // normalZ ##SA##
-        push    0  // normalY ##SA##
-        push    0  // normalX ##SA##
-        push    0  // rotate rate
-        push    fPulseFraction  // pulse
-        push    0  // period
-        push    a  // alpha
-        push    b  // blue
-        push    g  // green
-        push    r  // red
-        push    fSize  // size
-        push    vecPosition  // position
-        push    dwType  // type
+    {
+        push    bZCheck     // zCheck  ##SA##
+        push    0           // normalZ ##SA##
+        push    0           // normalY ##SA##
+        push    0           // normalX ##SA##
+        push    0           // rotate rate
+        push    fPulseFraction      // pulse
+        push    0           // period
+        push    a           // alpha
+        push    b           // blue
+        push    g           // green
+        push    r           // red
+        push    fSize       // size
+        push    vecPosition // position
+        push    dwType      // type
         push    Identifier  // identifier
         call    dwFunc
         mov     dwReturn, eax
         add     esp, 0x3C
-        }
+    }
 
     if (dwReturn)
     {
@@ -102,7 +102,7 @@ C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
 
 void C3DMarkersSA::ReinitMarkers()
 {
-    using Function_ShutdownMarkers = void(__cdecl*)();
+    using Function_ShutdownMarkers = void(__cdecl *)();
     auto shutdownMarkers = reinterpret_cast<Function_ShutdownMarkers>(0x722710);
 
     using Function_InitMarkers = void(__cdecl*)();

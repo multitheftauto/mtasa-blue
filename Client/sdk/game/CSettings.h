@@ -12,10 +12,10 @@
 #pragma once
 
 #if (!defined(RWFORCEENUMSIZEINT))
-    #define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0)) >> 1))
+#define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
 #endif /* (!defined(RWFORCEENUMSIZEINT)) */
 
-enum VideoModeFlag  // RwVideoModeFlag
+enum VideoModeFlag            // RwVideoModeFlag
 {
     rwVIDEOMODEEXCLUSIVE = 0x0001,   /**<Exclusive (i.e. full-screen) */
     rwVIDEOMODEINTERLACE = 0x0002,   /**<Interlaced                   */
@@ -60,7 +60,7 @@ enum VideoModeFlag  // RwVideoModeFlag
     rwVIDEOMODEFLAGFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
 };
 
-struct VideoMode  // RwVideoMode
+struct VideoMode            // RwVideoMode
 {
     int           width;   /**< Width  */
     int           height;  /**< Height */
@@ -141,7 +141,7 @@ public:
     virtual bool IsDynamicPedShadowsEnabled() = 0;
     virtual void SetDynamicPedShadowsEnabled(bool bEnable) = 0;
     virtual bool IsDynamicPedShadowsEnabledByVideoSetting() const noexcept = 0;
-    virtual bool ResetDynamicPedShadows() noexcept = 0;
+    virtual bool ResetDynamicPedShadows()  noexcept = 0;
 
     virtual float        GetAspectRatioValue() = 0;
     virtual eAspectRatio GetAspectRatio() = 0;

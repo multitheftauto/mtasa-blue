@@ -271,10 +271,10 @@ __declspec(noinline) void _cdecl OnCEventHandler_ComputeDamageResponse_Mid(CPedS
 }
 
 // Hook info
-#define HOOKPOS_CEventHandler_ComputeDamageResponse_Mid  0x4C0593
-#define HOOKSIZE_CEventHandler_ComputeDamageResponse_Mid 5
-DWORD                 RETURN_CEventHandler_ComputeDamageResponse_Mid = 0x4C0598;
-DWORD                 CTaskSimpleBeHit_constructor = FUNC_CTaskSimpleBeHit__Constructor;
+#define HOOKPOS_CEventHandler_ComputeDamageResponse_Mid        0x4C0593
+#define HOOKSIZE_CEventHandler_ComputeDamageResponse_Mid       5
+DWORD RETURN_CEventHandler_ComputeDamageResponse_Mid = 0x4C0598;
+DWORD CTaskSimpleBeHit_constructor = FUNC_CTaskSimpleBeHit__Constructor;
 void _declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
 {
     _asm
@@ -289,7 +289,7 @@ void _declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
         add     esp, 4*4+4
         popad
 
-             // Replaced code
+        // Replaced code
         call    CTaskSimpleBeHit_constructor
         jmp     RETURN_CEventHandler_ComputeDamageResponse_Mid
     }

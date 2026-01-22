@@ -22,7 +22,12 @@ class CStringNameData : public CIntrusiveDoubleLinkedListNode
 public:
     CStringNameData() = default;
 
-    CStringNameData(const std::string_view& name, StringNameHash hash, size_t refs = 0) : m_name(name), m_hash(hash), m_refs(refs) {}
+    CStringNameData(const std::string_view& name, StringNameHash hash, size_t refs = 0) :
+        m_name(name),
+        m_hash(hash),
+        m_refs(refs)
+    {
+    }
 
     void AddRef();
 
@@ -39,12 +44,11 @@ class CStringName
 {
     friend class CStringNameStorage;
 
-    enum
-    {
-        STRING_TABLE_BITS = 16,
-        STRING_TABLE_LEN = 1 << STRING_TABLE_BITS,
-        STRING_TABLE_MASK = STRING_TABLE_LEN - 1
-    };
+    enum {
+		STRING_TABLE_BITS = 16,
+		STRING_TABLE_LEN = 1 << STRING_TABLE_BITS,
+		STRING_TABLE_MASK = STRING_TABLE_LEN - 1
+	};
 
 public:
     // Default constructor
@@ -63,32 +67,32 @@ public:
     CStringName(const CStringName& name);
 
     // Copy-assignment from another string name.
-    CStringName& operator=(const CStringName& name);
+    CStringName& operator =(const CStringName& name);
 
     // Copy-assignment from string.
-    CStringName& operator=(const std::string& str);
+    CStringName& operator =(const std::string& str);
 
     // Copy-assignment from string view.
-    CStringName& operator=(const std::string_view& str);
+    CStringName& operator =(const std::string_view& str);
 
     // Destruct
     ~CStringName();
 
     // Test for equality with another string name.
-    bool operator==(const CStringName& rhs) const { return m_data == rhs.m_data; }
+    bool operator ==(const CStringName& rhs) const { return m_data == rhs.m_data; }
 
     // Test for inequality with another string name.
-    bool operator!=(const CStringName& rhs) const { return m_data != rhs.m_data; }
+    bool operator !=(const CStringName& rhs) const { return m_data != rhs.m_data; }
 
     // Test if less than another string name.
-    bool operator<(const CStringName& rhs) const { return m_data->m_hash < rhs.m_data->m_hash; }
+    bool operator <(const CStringName& rhs) const { return m_data->m_hash < rhs.m_data->m_hash; }
 
     // Test if greater than another string name.
-    bool operator>(const CStringName& rhs) const { return m_data->m_hash > rhs.m_data->m_hash; }
+    bool operator >(const CStringName& rhs) const { return m_data->m_hash > rhs.m_data->m_hash; }
 
-    const std::string* operator->() const { return &m_data->m_name; }
+    const std::string* operator ->() const { return &m_data->m_name; }
 
-    const std::string& operator*() const { return m_data->m_name; }
+    const std::string& operator *() const { return m_data->m_name; }
 
     // Return true if nonzero string name value.
     explicit operator bool() const { return m_data != nullptr; }
@@ -118,11 +122,14 @@ private:
 
 private:
     // String name data
-    CStringNameData* m_data{};
+    CStringNameData* m_data{};    
 };
 
 template <>
 struct std::hash<CStringName>
 {
-    std::size_t operator()(const CStringName& k) const { return static_cast<std::size_t>(k.Hash()); }
+    std::size_t operator()(const CStringName& k) const
+    {
+        return static_cast<std::size_t>(k.Hash());
+    }
 };

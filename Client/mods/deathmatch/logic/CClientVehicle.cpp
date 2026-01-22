@@ -28,12 +28,12 @@ extern CClientGame*            g_pClientGame;
 std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
-#pragma warning(disable : 4311)
+#pragma warning(disable:4311)
 
 // Maximum distance between current position and target position (for interpolation)
 // before we disable interpolation and warp to the position instead
-#define VEHICLE_INTERPOLATION_WARP_THRESHOLD           15
-#define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED 10
+#define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
+#define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  10
 
 CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2)
     : ClassInit(this), CClientStreamElement(pManager->GetVehicleStreamer(), ID)
@@ -1476,9 +1476,8 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus);
 
                 // Update the wheel's visibility
-                m_pVehicle->SetWheelVisibility(
-                    (eWheelPosition)ucWheel,
-                    ucStatus != DT_WHEEL_MISSING && (m_ComponentData.empty() || m_ComponentData[GetComponentNameForWheel(ucWheel)].m_bVisible));
+                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, ucStatus != DT_WHEEL_MISSING &&
+                    (m_ComponentData.empty() || m_ComponentData[GetComponentNameForWheel(ucWheel)].m_bVisible));
             }
             else if (m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2)
                 m_pVehicle->SetBikeWheelStatus(ucWheel, ucGTAStatus);
@@ -2311,7 +2310,7 @@ void CClientVehicle::StreamedInPulse()
 
             // Check if we need to update the train position (because of streaming)
             CVector vecPosition;
-            float   fCarriageDistance = 20.0f;  // approximately || Todo: Find proper distance
+            float   fCarriageDistance = 20.0f;            // approximately || Todo: Find proper distance
             if (GetTrainDirection())
                 fCarriageDistance = -fCarriageDistance;
 
@@ -2474,8 +2473,8 @@ bool CClientVehicle::DoCheckHasLandingGear()
 {
     auto model = static_cast<VehicleType>(m_usModel);
 
-    return (model == VehicleType::VT_ANDROM || model == VehicleType::VT_AT400 || model == VehicleType::VT_NEVADA || model == VehicleType::VT_RUSTLER ||
-            model == VehicleType::VT_SHAMAL || model == VehicleType::VT_HYDRA || model == VehicleType::VT_STUNT);
+    return (model == VehicleType::VT_ANDROM || model == VehicleType::VT_AT400 || model == VehicleType::VT_NEVADA || model == VehicleType::VT_RUSTLER || model == VehicleType::VT_SHAMAL || model == VehicleType::VT_HYDRA ||
+            model == VehicleType::VT_STUNT);
 }
 
 void CClientVehicle::Create()
@@ -2483,9 +2482,9 @@ void CClientVehicle::Create()
     // If the vehicle doesn't exist
     if (!m_pVehicle)
     {
-#ifdef MTA_DEBUG
+        #ifdef MTA_DEBUG
         g_pCore->GetConsole()->Printf("CClientVehicle::Create %d", GetModel());
-#endif
+        #endif
 
         // Check again that the limit isn't reached. We are required to do so because
         // we load async. The streamer isn't always aware of our limits.
@@ -2881,7 +2880,7 @@ void CClientVehicle::Create()
             }
             m_ComponentVisibilityBackup.clear();
         }
-
+            
         // Grab our component data
         std::map<SString, SVehicleComponentData>::iterator iter = m_ComponentData.begin();
         // Loop through our component data
@@ -2955,9 +2954,9 @@ void CClientVehicle::Destroy()
     // If the vehicle exists
     if (m_pVehicle)
     {
-#ifdef MTA_DEBUG
+        #ifdef MTA_DEBUG
         g_pCore->GetConsole()->Printf("CClientVehicle::Destroy %d", GetModel());
-#endif
+        #endif
 
         // Invalidate
         m_pManager->InvalidateEntity(this);
@@ -3326,7 +3325,7 @@ bool CClientVehicle::InternalSetTowLink(CClientVehicle* pTrailer)
     // SA can attach the trailer now
     pGameVehicle->SetTowLink(m_pVehicle);
 
-    pTrailer->PlaceProperlyOnGround();  // Probably not needed
+    pTrailer->PlaceProperlyOnGround();            // Probably not needed
 
     return true;
 }
@@ -3338,7 +3337,7 @@ bool CClientVehicle::IsTowableBy(CClientVehicle* towingVehicle)
 
 bool CClientVehicle::SetWinchType(eWinchType winchType)
 {
-    if (static_cast<VehicleType>(GetModel()) == VehicleType::VT_LEVIATHN)  // Leviathan
+    if (static_cast<VehicleType>(GetModel()) == VehicleType::VT_LEVIATHN)            // Leviathan
     {
         if (m_pVehicle)
         {
@@ -3930,17 +3929,18 @@ bool CClientVehicle::IsEnterable(bool localEntity)
 {
     if (!m_pVehicle)
         return false;
-
+        
     // Server vehicle?
     if (IsLocalEntity() != localEntity)
         return false;
-
+        
     if (GetHealth() <= 0.0f)
         return false;
-
-    return !IsInWater() || (GetVehicleType() == CLIENTVEHICLE_BOAT || m_usModel == 447 /* sea sparrow */
-                            || m_usModel == 417                                        /* levithan */
-                            || m_usModel == 460 /* skimmer */);
+        
+    return !IsInWater() || (GetVehicleType() == CLIENTVEHICLE_BOAT
+        || m_usModel == 447 /* sea sparrow */
+        || m_usModel == 417                                        /* levithan */
+        || m_usModel == 460 /* skimmer */);
 }
 
 bool CClientVehicle::HasRadio()
@@ -4017,15 +4017,11 @@ void CClientVehicle::SetHeadLightColor(const SColor color)
 //
 
 #if OCCUPY_DEBUG_INFO
-    #define INFO(x) g_pCore->GetConsole()->Printf x
-    #define WARN(x) g_pCore->GetConsole()->Printf x
+    #define INFO(x)    g_pCore->GetConsole ()->Printf x
+    #define WARN(x)    g_pCore->GetConsole ()->Printf x
 #else
-    #define INFO(x) \
-        { \
-        }
-    #define WARN(x) \
-        { \
-        }
+    #define INFO(x)    {}
+    #define WARN(x)    {}
 #endif
 
 std::string GetPlayerName(CClientPed* pClientPed)
@@ -4395,9 +4391,9 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
     {
         // If not near any MTA objects, then don't bother waiting
         SetFrozenWaitingForGroundToLoad(false, true);
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         OutputDebugLine("[AsyncLoading]   FreezeUntilCollisionLoaded - Early stop");
-#endif
+        #endif
         return;
     }
 
@@ -4421,29 +4417,29 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
     bool                  bASync = g_pGame->IsASyncLoadingEnabled();
     bool                  bMTAObjLimit = pObjectManager->IsObjectLimitReached();
     bool                  bHasModel = GetModelInfo() != NULL;
-#ifndef ASYNC_LOADING_DEBUG_OUTPUTA
+    #ifndef ASYNC_LOADING_DEBUG_OUTPUTA
     bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded(vecPosition, fUseRadius, m_usDimension);
-#else
+    #else
     SString strAround;
     bool    bMTALoaded = pObjectManager->ObjectsAroundPointLoaded(vecPosition, fUseRadius, m_usDimension, &strAround);
-#endif
+    #endif
 
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
     SString status = SString(
         "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f   m_fObjectsAroundTolerance:%2.2f  "
         "fUseRadius:%2.1f",
         vecPosition.fX, vecPosition.fY, vecPosition.fZ, bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance, m_fObjectsAroundTolerance,
         fUseRadius);
-#endif
+    #endif
 
     // See if ground is ready
     if ((!bHasModel || !bMTALoaded) && m_fObjectsAroundTolerance < 1.f)
     {
         m_fGroundCheckTolerance = 0.f;
         m_fObjectsAroundTolerance = std::min(1.f, m_fObjectsAroundTolerance + 0.01f);
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         status += ("  FreezeUntilCollisionLoaded - wait");
-#endif
+        #endif
     }
     else
     {
@@ -4456,16 +4452,16 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
         if (fUseDist > -0.2f && fUseDist < 1.5f)
             SetFrozenWaitingForGroundToLoad(false, true);
 
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         status += (SString("  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist));
-#endif
+        #endif
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here)
         if (m_fGroundCheckTolerance > 0.03f /*&& !bMTAObjLimit*/ && !bASync)
             SetFrozenWaitingForGroundToLoad(false, true);
     }
 
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
     OutputDebugLine(SStringX("[AsyncLoading] ") + status);
     g_pCore->GetGraphics()->DrawString(10, 220, -1, 1, status);
 
@@ -4473,7 +4469,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
     strAround.Split("\n", lineList);
     for (unsigned int i = 0; i < lineList.size(); i++)
         g_pCore->GetGraphics()->DrawString(10, 230 + i * 10, -1, 1, lineList[i]);
-#endif
+    #endif
 }
 
 bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
@@ -4973,6 +4969,7 @@ CVehicleAudioSettingsEntry& CClientVehicle::GetOrCreateAudioSettings()
     return *m_pSoundSettingsEntry.get();
 }
 
+
 bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) const
 {
     if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
@@ -5127,15 +5124,15 @@ bool CClientVehicle::SpawnFlyingComponent(const eCarNodes& nodeID, const eCarCom
 
     return m_pVehicle->SpawnFlyingComponent(nodeID, collisionType, removalTime);
 }
-
+ 
 CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
 {
     static const uint32_t lookup[4] = {10, 8, 11, 9};
     assert(entryPointIndex < 4);
     const std::uint32_t saDoorIndex = lookup[entryPointIndex];
 
-    CVector   entryPoint;
-    CVehicle* gameVehicle = GetGameVehicle();
+    CVector      entryPoint;
+    CVehicle*    gameVehicle = GetGameVehicle();
 
     g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(entryPoint, gameVehicle, saDoorIndex);
 
@@ -5156,3 +5153,4 @@ void CClientVehicle::ResetAudioSettings()
     m_pSoundSettingsEntry = nullptr;
     ApplyAudioSettings();
 }
+

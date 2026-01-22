@@ -18,7 +18,7 @@
 #include "CLuaPedDefs.h"
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
-#define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE   "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 
 void CLuaPedDefs::LoadFunctions()
 {
@@ -75,7 +75,7 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedAnimation", GetPedAnimation},
         {"getPedAnimationProgress", ArgumentParser<GetPedAnimationProgress>},
         {"getPedAnimationSpeed", ArgumentParser<GetPedAnimationSpeed>},
-        {"getPedAnimationLength", ArgumentParser<GetPedAnimationLength>},
+        {"getPedAnimationLength", ArgumentParser<GetPedAnimationLength>},        
         {"getPedWalkingStyle", GetPedMoveAnim},
         {"getPedControlState", ArgumentParserWarn<false, GetPedControlState>},
         {"getPedAnalogControlState", GetPedAnalogControlState},
@@ -141,7 +141,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "canBeKnockedOffBike", "canPedBeKnockedOffBike");
     lua_classfunction(luaVM, "doesHaveJetPack", "doesPedHaveJetPack");
-    lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");  // introduced in 1.5.5-9.13846
+    lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
     lua_classfunction(luaVM, "getAmmoInClip", "getPedAmmoInClip");
     lua_classfunction(luaVM, "getAnalogControlState", "getPedAnalogControlState");
     lua_classfunction(luaVM, "getAnimation", "getPedAnimation");
@@ -218,7 +218,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
     lua_classvariable(luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike");
     lua_classvariable(luaVM, "hasJetPack", NULL, "doesPedHaveJetPack");
-    lua_classvariable(luaVM, "jetpack", NULL, "isPedWearingJetpack");  // introduced in 1.5.5-9.13846
+    lua_classvariable(luaVM, "jetpack", NULL, "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
     lua_classvariable(luaVM, "armor", "setPedArmor", "getPedArmor");
     lua_classvariable(luaVM, "fightingStyle", "setPedFightingStyle", "getPedFightingStyle");
     lua_classvariable(luaVM, "cameraRotation", "setPedCameraRotation", "getPedCameraRotation");
@@ -1001,7 +1001,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
         throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
 
     CEntity* entity = ped->GetGameEntity();
-    CVector  position;
+    CVector position;
 
     if (!entity || !entity->GetBonePosition(static_cast<eBone>(bone), position))
         return false;
@@ -1018,7 +1018,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
     float    yaw = 0.0f;
     float    pitch = 0.0f;
     float    roll = 0.0f;
-
+    
     if (!entity || !entity->GetBoneRotation(static_cast<eBone>(bone), yaw, pitch, roll))
         return false;
 
@@ -1132,7 +1132,7 @@ bool CLuaPedDefs::UpdateElementRpHAnim(CClientPed* ped)
 
     if (clump)
     {
-        ((void(__cdecl*)(RpClump*))0x5DF560)(clump);  // CPed::ShoulderBoneRotation
+        ((void(__cdecl*)(RpClump*))0x5DF560)(clump); // CPed::ShoulderBoneRotation
     }
 
     return true;
@@ -1260,7 +1260,7 @@ bool CLuaPedDefs::IsPedReloadingWeapon(CClientPed* const ped) noexcept
 {
     return ped->IsReloadingWeapon();
 }
-
+  
 int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
 {
     // Verify the argument
@@ -1311,7 +1311,7 @@ bool CLuaPedDefs::GetPedControlState(std::variant<CClientPed*, std::string> firs
     }
 
     bool state;
-
+    
     if (!CStaticFunctionDefinitions::GetPedControlState(*ped, control, state))
         return false;
 
@@ -2233,9 +2233,9 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     if (argStream.NextIsBool())
-        argStream.ReadBool(bDummy);  // Wiki used setPedAnimation(source,false) as an example
+        argStream.ReadBool(bDummy);            // Wiki used setPedAnimation(source,false) as an example
     else if (argStream.NextIsNil())
-        argStream.m_iIndex++;  // Wiki docs said blockName could be nil
+        argStream.m_iIndex++;            // Wiki docs said blockName could be nil
     else
         argStream.ReadString(strBlockName, "");
     argStream.ReadString(strAnimName, "");
@@ -2521,7 +2521,7 @@ bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
     return pPed->ExitVehicle();
 }
 
-bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully)
+bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully) 
 {
     switch (taskType)
     {
@@ -2533,7 +2533,7 @@ bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t t
             if (taskNumber >= TASK_PRIORITY_MAX)
                 throw LuaFunctionError("Invalid task slot number");
 
-            return ped->KillTask(taskNumber, gracefully.value_or(true));
+            return ped->KillTask(taskNumber, gracefully.value_or(true)); 
         }
         case taskType::SECONDARY_TASK:
         {
@@ -2543,7 +2543,7 @@ bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t t
             return ped->KillTaskSecondary(taskNumber, gracefully.value_or(true));
         }
         default:
-            return false;
+            return false; 
     }
 }
 

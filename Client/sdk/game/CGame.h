@@ -161,18 +161,18 @@ public:
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
 
-    virtual DWORD       GetSystemTime() = 0;
-    virtual int         GetSystemFrameCounter() const = 0;
-    virtual bool        IsAtMenu() = 0;
-    virtual void        StartGame() = 0;
-    virtual void        SetSystemState(SystemState State) = 0;
-    virtual SystemState GetSystemState() = 0;
-    virtual void        Pause(bool bPaused) = 0;
-    virtual void        SetTimeScale(float fTimeScale) = 0;
-    virtual float       GetFPS() = 0;
-    virtual float       GetTimeStep() = 0;
-    virtual float       GetOldTimeStep() = 0;
-    virtual float       GetTimeScale() = 0;
+    virtual DWORD        GetSystemTime() = 0;
+    virtual int          GetSystemFrameCounter() const = 0;
+    virtual bool         IsAtMenu() = 0;
+    virtual void         StartGame() = 0;
+    virtual void         SetSystemState(SystemState State) = 0;
+    virtual SystemState  GetSystemState() = 0;
+    virtual void         Pause(bool bPaused) = 0;
+    virtual void         SetTimeScale(float fTimeScale) = 0;
+    virtual float        GetFPS() = 0;
+    virtual float        GetTimeStep() = 0;
+    virtual float        GetOldTimeStep() = 0;
+    virtual float        GetTimeScale() = 0;
 
     virtual void Initialize() = 0;
     virtual void Reset() = 0;
@@ -291,4 +291,5 @@ public:
     virtual void RestoreGameWorld() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
+
 };

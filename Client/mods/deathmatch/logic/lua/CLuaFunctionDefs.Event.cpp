@@ -71,7 +71,7 @@ int CLuaFunctionDefs::AddEventHandler(lua_State* luaVM)
         }
 
         if (!StringToEnum(strPriority, eventPriority))
-            argStream.SetTypeError(GetEnumTypeName(eventPriority), 5);  // priority is argument #5
+            argStream.SetTypeError(GetEnumTypeName(eventPriority), 5);            // priority is argument #5
     }
 
     if (!argStream.HasErrors())

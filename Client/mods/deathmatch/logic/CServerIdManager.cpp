@@ -13,20 +13,20 @@
 #include "StdInc.h"
 #include "CServerIdManager.h"
 
-#define MTA_SERVERID_LOOKUP_DIR "priv"
-#define MTA_SERVERID_LOOKUP_XML "priv/server-ids.xml"
+#define MTA_SERVERID_LOOKUP_DIR       "priv"
+#define MTA_SERVERID_LOOKUP_XML       "priv/server-ids.xml"
 
 namespace
 {
     struct CServerIdKey
     {
-        SString strId;  // Server id
+        SString strId;            // Server id
         bool    operator<(const CServerIdKey& other) const { return strId < other.strId; }
     };
 
     struct CServerIdInfo
     {
-        SString strDir;  // Server private directory
+        SString strDir;            // Server private directory
     };
 
     // Variables used for saving the file on a separate thread
@@ -40,7 +40,7 @@ namespace
         strText.Split("_", &strMain, &strCount);
         return SString("%s_%d", *strMain, atoi(strCount) + 1);
     }
-}  // namespace
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //

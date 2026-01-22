@@ -22,8 +22,8 @@ class CPed;
 class CVector;
 class CVehicle;
 
-#define MARKER_SCALE_SMALL  1
-#define MARKER_SCALE_NORMAL 2
+#define MARKER_SCALE_SMALL          1
+#define MARKER_SCALE_NORMAL         2
 
 class CMarker
 {

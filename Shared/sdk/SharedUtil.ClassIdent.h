@@ -20,80 +20,58 @@ namespace SharedUtil
     typedef uint64 ClassBits;
     typedef uchar  ClassId;
 
-#define DECLARE_BASE_CLASS(cls) \
-public: \
-    static ClassId GetClassId(void) \
-    { \
-        return CLASS_##cls; \
-    } \
-    bool IsA(ClassId classId) const \
-    { \
-        return (ClassHierarchyBits & (1ULL << classId)) ? true : false; \
-    } \
-    const char* GetClassName(void) \
-    { \
-        return ClassName; \
-    } \
-\
-protected: \
-    static const char* StaticGetClassName(void) \
-    { \
-        return #cls; \
-    } \
-    static ClassBits CalcClassHierarchyBits(void) \
-    { \
-        return (1ULL << GetClassId()); \
-    } \
-    const char* ClassName; \
-    ClassBits   ClassHierarchyBits; \
-    friend CAutoClassInit<cls>; \
-    CAutoClassInit<cls> ClassInit; \
-\
-public: \
-    void* operator new(size_t size) \
-    { \
-        void* ptr = ::operator new(size); \
-        memset(ptr, 0, size); \
-        return ptr; \
-    } \
-    void* operator new(size_t size, void* where) \
-    { \
-        memset(where, 0, size); \
-        return where; \
-    }
+    #define DECLARE_BASE_CLASS(cls) \
+        public: \
+            static ClassId GetClassId ( void ) \
+            { \
+                return CLASS_##cls; \
+            } \
+            bool IsA( ClassId classId ) const \
+            { \
+                return ( ClassHierarchyBits & ( 1ULL << classId ) ) ? true : false; \
+            } \
+            const char* GetClassName ( void ) \
+            { \
+                return ClassName; \
+            } \
+        protected: \
+            static const char* StaticGetClassName ( void ) \
+            { \
+                return #cls; \
+            } \
+            static ClassBits CalcClassHierarchyBits ( void ) \
+            { \
+                return ( 1ULL << GetClassId () ); \
+            } \
+            const char* ClassName; \
+            ClassBits ClassHierarchyBits; \
+            friend CAutoClassInit < cls >; \
+            CAutoClassInit < cls > ClassInit; \
+        public: \
+            void* operator new ( size_t size )              { void* ptr = ::operator new(size); memset(ptr,0,size); return ptr; } \
+            void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
 
-#define DECLARE_CLASS(cls, super) \
-public: \
-    static ClassId GetClassId(void) \
-    { \
-        return CLASS_##cls; \
-    } \
-\
-protected: \
-    static const char* StaticGetClassName(void) \
-    { \
-        return #cls; \
-    } \
-    static ClassBits CalcClassHierarchyBits(void) \
-    { \
-        return (1ULL << GetClassId()) | super::CalcClassHierarchyBits(); \
-    } \
-    friend CAutoClassInit<cls>; \
-    CAutoClassInit<cls> ClassInit; \
-\
-public: \
-    typedef super Super; \
-    void*         operator new(size_t size) \
-    { \
-        void* ptr = ::operator new(size); \
-        memset(ptr, 0, size); \
-        return ptr; \
-    } \
-    void* operator new(size_t size, void* where) \
-    { \
-        memset(where, 0, size); \
-        return where; \
-    }
+    #define DECLARE_CLASS(cls,super) \
+        public: \
+            static ClassId GetClassId ( void ) \
+            { \
+                return CLASS_##cls; \
+            } \
+        protected: \
+            static const char* StaticGetClassName ( void ) \
+            { \
+                return #cls; \
+            } \
+            static ClassBits CalcClassHierarchyBits ( void ) \
+            { \
+                return ( 1ULL << GetClassId () ) | super::CalcClassHierarchyBits (); \
+            } \
+            friend CAutoClassInit < cls >; \
+            CAutoClassInit < cls > ClassInit; \
+        public: \
+            typedef super Super; \
+            void* operator new ( size_t size )              { void* ptr = ::operator new(size); memset(ptr,0,size); return ptr; } \
+            void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
 
     //
     // Auto init the class bit flags
@@ -121,7 +99,7 @@ public: \
         return NULL;
     }
 
-#ifdef WIN32
-    #pragma warning(disable : 4355)  // warning C4355: 'this' : used in base member initializer list
-#endif
-}  // namespace SharedUtil
+    #ifdef WIN32
+        #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+    #endif
+}            // namespace SharedUtil

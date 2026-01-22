@@ -113,14 +113,14 @@ int main(int argc, char* argv[])
     FILE* fh = File::Fopen(LIB_CORE, "r");
     if (!fh)
     {
-#ifdef WIN32
+        #ifdef WIN32
         wchar_t szBuffer[64000];
         GetModuleFileNameW(NULL, szBuffer, 64000);
         PathRemoveFileSpecW(szBuffer);
         SetCurrentDirectoryW(szBuffer);
-#else
+        #else
         chdir(strLaunchDirectory);
-#endif
+        #endif
     }
     else
         fclose(fh);

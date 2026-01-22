@@ -96,8 +96,8 @@ float CGUIFont_Impl::GetCharacterWidth(int iChar, float fScale)
 
 float CGUIFont_Impl::GetFontHeight(float fScale)
 {
-    float fHeight = m_pFont->getFontHeight(fScale);  // average height.. not the maximum height for long characters such as 'g' or 'j'
-    fHeight += 2.0f;                                 // so hack it
+    float fHeight = m_pFont->getFontHeight(fScale);            // average height.. not the maximum height for long characters such as 'g' or 'j'
+    fHeight += 2.0f;                                           // so hack it
 
     return fHeight;
 }

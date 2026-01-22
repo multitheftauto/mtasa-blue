@@ -17,8 +17,8 @@ extern CGameSA* pGame;
 
 // Static member initialization
 std::unordered_map<std::uint32_t, std::uint32_t> CStreamingGC::ms_protectedModels;
-std::mutex                                       CStreamingGC::ms_mutex;
-bool                                             CStreamingGC::ms_bInitialized = false;
+std::mutex                                        CStreamingGC::ms_mutex;
+bool                                              CStreamingGC::ms_bInitialized = false;
 
 void CStreamingGC::Initialize()
 {
@@ -28,7 +28,7 @@ void CStreamingGC::Initialize()
 
     // CStreamingGC provides Guard-based protection using model reference counting
     // Protected models have their reference count increased via ModelAddRef
-
+    
     LogEvent(6645, "StreamingGC", "Initialize", "StreamingGC protection system initialized");
     ms_bInitialized = true;
 }
@@ -39,7 +39,7 @@ void CStreamingGC::Shutdown()
         return;
 
     std::lock_guard<std::mutex> lock(ms_mutex);
-
+    
     // Release all references before clearing
     if (!pGame)
     {
@@ -61,7 +61,7 @@ void CStreamingGC::Shutdown()
             // Continue releasing remaining references on exception
         }
     }
-
+    
     ms_protectedModels.clear();
     ms_bInitialized = false;
 }
@@ -76,7 +76,7 @@ bool CStreamingGC::ProtectModel(std::uint32_t modelId)
         return false;
 
     std::lock_guard<std::mutex> lock(ms_mutex);
-
+    
     auto findResult = ms_protectedModels.find(modelId);
     if (findResult != ms_protectedModels.end())
     {
@@ -104,12 +104,12 @@ bool CStreamingGC::ProtectModel(std::uint32_t modelId)
     }
     else
     {
-// Attempted to protect unloaded model
-#if MTA_DEBUG
+        // Attempted to protect unloaded model
+        #if MTA_DEBUG
         OutputDebugString(SString("CStreamingGC::ProtectModel: Ignored attempt to protect unloaded model %d", modelId));
-#endif
+        #endif
     }
-
+    
     return false;
 }
 
@@ -123,7 +123,7 @@ bool CStreamingGC::UnprotectModel(std::uint32_t modelId)
         return false;
 
     std::lock_guard<std::mutex> lock(ms_mutex);
-
+    
     // Only remove ref if currently protected
     auto findResult = ms_protectedModels.find(modelId);
     if (findResult != ms_protectedModels.end()) [[likely]]
@@ -172,7 +172,7 @@ std::size_t CStreamingGC::GetProtectedCount()
 void CStreamingGC::ClearAllProtections()
 {
     std::lock_guard<std::mutex> lock(ms_mutex);
-
+    
     // Release all references before clearing
     if (pGame)
     {
@@ -190,7 +190,7 @@ void CStreamingGC::ClearAllProtections()
             }
         }
     }
-
+    
     ms_protectedModels.clear();
 }
 
@@ -206,7 +206,7 @@ bool CStreamingGC::OnRemoveModel(std::uint32_t modelId)
 {
     // Validate model ID is within valid range
     if (modelId >= MODELINFO_MAX) [[unlikely]]
-        return true;  // Allow removal of invalid model IDs
+        return true; // Allow removal of invalid model IDs
 
     return !IsModelProtected(modelId);
 }

@@ -31,7 +31,7 @@ CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 
     float fRadius = pModelInfo->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
-    pRect->FixIncorrectTopLeft();  // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
 }
 
@@ -83,11 +83,11 @@ CVector* CPhysicalSA::GetMoveSpeedInternal(CVector* vecMoveSpeed)
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
     _asm
-        {
+    {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
-        }
+    }
     MemCpyFast(vecMoveSpeed, (void*)dwReturn, sizeof(CVector));
     return vecMoveSpeed;
 }
@@ -98,11 +98,11 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
     _asm
-        {
+    {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
-        }
+    }
     MemCpyFast(vecTurnSpeed, (void*)dwReturn, sizeof(CVector));
     return vecTurnSpeed;
 }
@@ -114,11 +114,11 @@ void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
     DWORD dwReturn = 0;
 
     __asm
-        {
+    {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
-        }
+    }
     MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
 
     if (GetInterface()->nType == ENTITY_TYPE_OBJECT)

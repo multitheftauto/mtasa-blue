@@ -35,24 +35,24 @@
 #include <lua/CLuaFunctionParser.h>
 
 // Used by script handlers to verify elements
-#define SCRIPT_VERIFY_BLIP(blip)            (m_pBlipManager->Exists(blip) && !blip->IsBeingDeleted())
-#define SCRIPT_VERIFY_ELEMENT(element)      ((element) != NULL && m_pRootElement->IsMyChild((element), true) && !element->IsBeingDeleted())
-#define SCRIPT_VERIFY_ENTITY(entity)        ((entity) != NULL && m_pRootElement->IsMyChild((entity), true) && entity->IsEntity() && !entity->IsBeingDeleted())
-#define SCRIPT_VERIFY_MARKER(marker)        (m_pMarkerManager->Exists(marker) && !marker->IsBeingDeleted())
-#define SCRIPT_VERIFY_OBJECT(object)        (m_pObjectManager->Exists(object) && !object->IsBeingDeleted())
-#define SCRIPT_VERIFY_PICKUP(pickup)        (m_pPickupManager->Exists(pickup) && !pickup->IsBeingDeleted())
-#define SCRIPT_VERIFY_PLAYER(player)        (m_pPlayerManager->Exists(player) && !player->IsBeingDeleted())
-#define SCRIPT_VERIFY_FUNCTION(func)        ((func) != LUA_REFNIL)
-#define SCRIPT_VERIFY_RADAR_AREA(radararea) (m_pRadarAreaManager->Exists(radararea) && !radararea->IsBeingDeleted())
-#define SCRIPT_VERIFY_VEHICLE(vehicle)      (m_pVehicleManager->Exists(vehicle) && !vehicle->IsBeingDeleted())
-#define SCRIPT_VERIFY_TIMER(timer)          (luaMain->GetTimerManager()->Exists(timer))
-#define SCRIPT_VERIFY_PATH(path)            (m_pPathManager->Exists(path) && !path->IsBeingDeleted())
-#define SCRIPT_VERIFY_TEAM(team)            (m_pTeamManager->Exists(team))
-#define SCRIPT_VERIFY_ACCOUNT(account)      (m_pAccountManager->Exists(account))
-#define SCRIPT_VERIFY_COLSHAPE(colshape)    (m_pColManager->Exists(colshape))
-#define SCRIPT_VERIFY_RESOURCE(resource)    (m_pResourceManager->Exists(resource))
-#define LUA_DECLARE(x)                      static int x(lua_State* luaVM);
-#define LUA_DECLARE_OOP(x)                  LUA_DECLARE(x) LUA_DECLARE(OOP_##x)
+#define SCRIPT_VERIFY_BLIP(blip) (m_pBlipManager->Exists(blip)&&!blip->IsBeingDeleted())
+#define SCRIPT_VERIFY_ELEMENT(element) ((element)!=NULL&&m_pRootElement->IsMyChild((element),true)&&!element->IsBeingDeleted())
+#define SCRIPT_VERIFY_ENTITY(entity) ((entity)!=NULL&&m_pRootElement->IsMyChild((entity),true)&&entity->IsEntity()&&!entity->IsBeingDeleted())
+#define SCRIPT_VERIFY_MARKER(marker) (m_pMarkerManager->Exists(marker)&&!marker->IsBeingDeleted())
+#define SCRIPT_VERIFY_OBJECT(object) (m_pObjectManager->Exists(object)&&!object->IsBeingDeleted())
+#define SCRIPT_VERIFY_PICKUP(pickup) (m_pPickupManager->Exists(pickup)&&!pickup->IsBeingDeleted())
+#define SCRIPT_VERIFY_PLAYER(player) (m_pPlayerManager->Exists(player)&&!player->IsBeingDeleted())
+#define SCRIPT_VERIFY_FUNCTION(func) ((func)!=LUA_REFNIL)
+#define SCRIPT_VERIFY_RADAR_AREA(radararea) (m_pRadarAreaManager->Exists(radararea)&&!radararea->IsBeingDeleted())
+#define SCRIPT_VERIFY_VEHICLE(vehicle) (m_pVehicleManager->Exists(vehicle)&&!vehicle->IsBeingDeleted())
+#define SCRIPT_VERIFY_TIMER(timer) (luaMain->GetTimerManager ()->Exists(timer))
+#define SCRIPT_VERIFY_PATH(path) (m_pPathManager->Exists(path)&&!path->IsBeingDeleted())
+#define SCRIPT_VERIFY_TEAM(team) (m_pTeamManager->Exists(team))
+#define SCRIPT_VERIFY_ACCOUNT(account) (m_pAccountManager->Exists(account))
+#define SCRIPT_VERIFY_COLSHAPE(colshape) (m_pColManager->Exists(colshape))
+#define SCRIPT_VERIFY_RESOURCE(resource) (m_pResourceManager->Exists(resource))
+#define LUA_DECLARE(x) static int x ( lua_State * luaVM );
+#define LUA_DECLARE_OOP(x) LUA_DECLARE(x) LUA_DECLARE(OOP_##x)
 
 class CLuaDefs
 {

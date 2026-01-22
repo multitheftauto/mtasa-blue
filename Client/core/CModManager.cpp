@@ -92,9 +92,9 @@ void CModManager::DoPulsePostFrame()
 
     // Make sure frame rate limit gets applied
     if (m_client != nullptr)
-        CCore::GetSingleton().EnsureFrameRateLimitApplied();  // Catch missed frames
+        CCore::GetSingleton().EnsureFrameRateLimitApplied();            // Catch missed frames
     else
-        CCore::GetSingleton().ApplyFrameRateLimit();  // Limit when not connected
+        CCore::GetSingleton().ApplyFrameRateLimit();            // Limit when not connected
 
     if (m_state == State::PendingStart)
     {

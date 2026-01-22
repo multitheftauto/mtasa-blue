@@ -33,13 +33,13 @@ CLanBroadcast::CLanBroadcast(unsigned short usServerPort)
         return;
     }
 
-// Set it to non blocking, so we dont have to wait for a packet
-#ifdef WIN32
+    // Set it to non blocking, so we dont have to wait for a packet
+    #ifdef WIN32
     unsigned long ulNonBlock = 1;
     ioctlsocket(m_Socket, FIONBIO, &ulNonBlock);
-#else
+    #else
     fcntl(m_Socket, F_SETFL, fcntl(m_Socket, F_GETFL) | O_NONBLOCK);
-#endif
+    #endif
 
     // Set up the query messages
     std::stringstream ss;

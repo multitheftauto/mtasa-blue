@@ -105,10 +105,10 @@ inline void _free_(void* Original)
     return myFree(Original);
 }
 
-        #define malloc  _malloc_
-        #define calloc  _calloc_
+        #define malloc _malloc_
+        #define calloc _calloc_
         #define realloc _realloc_
-        #define free    _free_
+        #define free _free_
     #endif
 
     #include <list>
@@ -181,7 +181,7 @@ namespace std
 
         inline bool operator==(Allocator const&) { return true; }
         inline bool operator!=(Allocator const& a) { return !operator==(a); }
-    };  //    end of class Allocator
+    };            //    end of class Allocator
 
     template <class _Ty>
     class CArray : public std::vector<_Ty, Allocator<_Ty> >
@@ -226,22 +226,22 @@ namespace std
     {
     public:
     };
-}  // namespace std
+}            // namespace std
 
     // Replace std classes
     // Not safe - do not enable this in distributed builds
-    #define vector CArray
-    #define list   CList
-    #define map    CMap
-    #define set    CSet
-    #define deque  CDeque
+    #define vector  CArray
+    #define list    CList
+    #define map     CMap
+    #define set     CSet
+    #define deque   CDeque
 
 #else
 
-    #define myMalloc(a, tag)     malloc(a)
-    #define myCalloc(a, tag)     calloc(a)
-    #define myRealloc(a, b, tag) realloc(a, b)
-    #define myFree               free
+    #define myMalloc(a,tag)     malloc(a)
+    #define myCalloc(a,tag)     calloc(a)
+    #define myRealloc(a,b,tag)  realloc(a,b)
+    #define myFree              free
 
 #endif  // WITH_ALLOC_TRACKING
 

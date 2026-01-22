@@ -29,15 +29,15 @@
 #include <mmdeviceapi.h>
 #include <mutex>
 #include <cstdint>
-#define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT)  // Re-define the conflicting macro
-#define GetFirstChild(hwnd)  GetTopWindow(hwnd)
+#define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
+#define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
 #define MTA_CEF_USERAGENT "Multi Theft Auto: San Andreas Client " MTA_DM_BUILDTAG_LONG
 
 enum class ECefThreadState
 {
-    Running = 0,  // CEF thread is currently running
-    Wait          // CEF thread is waiting for the main thread
+    Running = 0,            // CEF thread is currently running
+    Wait                    // CEF thread is waiting for the main thread
 };
 
 class CWebView : public CWebViewInterface,
@@ -181,8 +181,8 @@ public:
                               const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback) override;
 #else
     virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, FileDialogMode mode, const CefString& title, const CefString& default_file_path,
-                              const std::vector<CefString>& accept_filters, const std::vector<CefString>& accept_extensions,
-                              const std::vector<CefString>& accept_descriptions, CefRefPtr<CefFileDialogCallback> callback) override;
+        const std::vector<CefString>& accept_filters, const std::vector<CefString>& accept_extensions, const std::vector<CefString>& accept_descriptions,
+        CefRefPtr<CefFileDialogCallback> callback) override;
 #endif
 
     // CefDisplayHandler methods
@@ -248,25 +248,25 @@ private:
         }
 
     private:
-        mutable std::mutex          mutex;
-        CWebBrowserEventsInterface* target = nullptr;
-        uint64_t                    generation = 0;
+        mutable std::mutex            mutex;
+        CWebBrowserEventsInterface*   target = nullptr;
+        uint64_t                      generation = 0;
     };
 
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*      m_pWebBrowserRenderItem;
 
-    std::atomic_bool              m_bBeingDestroyed;
-    bool                          m_bIsLocal;
-    bool                          m_bIsRenderingPaused;
-    bool                          m_bIsTransparent;
-    POINT                         m_vecMousePosition;
-    bool                          m_mouseButtonStates[3];
-    SString                       m_CurrentTitle;
-    float                         m_fVolume;
-    std::map<SString, SString>    m_Properties;
-    bool                          m_bHasInputFocus;
-    std::set<std::string>         m_AjaxHandlers;
+    std::atomic_bool           m_bBeingDestroyed;
+    bool                       m_bIsLocal;
+    bool                       m_bIsRenderingPaused;
+    bool                       m_bIsTransparent;
+    POINT                      m_vecMousePosition;
+    bool                       m_mouseButtonStates[3];
+    SString                    m_CurrentTitle;
+    float                      m_fVolume;
+    std::map<SString, SString> m_Properties;
+    bool                       m_bHasInputFocus;
+    std::set<std::string>      m_AjaxHandlers;
     std::shared_ptr<FEventTarget> m_pEventTarget;
 
     struct

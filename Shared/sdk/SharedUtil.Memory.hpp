@@ -102,7 +102,7 @@ namespace SharedUtil
 
         if (!success && GetLastError() == ERROR_BAD_LENGTH)
         {
-            workingSetInfo->NumberOfEntries += 64;  // Insurance in case the number of entries changes.
+            workingSetInfo->NumberOfEntries += 64;            // Insurance in case the number of entries changes.
             workingSetBuffer.resize(workingSetInfo->NumberOfEntries * sizeof(PSAPI_WORKING_SET_BLOCK) + sizeof(PSAPI_WORKING_SET_INFORMATION));
             workingSetInfo = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(workingSetBuffer.data());
             success = QueryWorkingSet(process, workingSetBuffer.data(), workingSetBuffer.size());
@@ -192,4 +192,4 @@ namespace SharedUtil
         std::set_new_handler(&HandleMemoryAllocationFailure);
 #endif
     }
-}  // namespace SharedUtil
+}            // namespace SharedUtil

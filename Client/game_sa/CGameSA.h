@@ -24,65 +24,65 @@ class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
 class CTaskManagementSystemSA;
 
-extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
+extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 
-#define CLASS_CPlayerInfo  0xB7CD98
-#define CLASS_CCamera      0xB6F028
-#define CLASS_CPad         0xB73458
-#define CLASS_CFx          0xa9ae00
-#define CLASS_CFxManager   0xA9AE80
-#define CLASS_CMenuManager 0xBA6748
-#define CLASS_RwCamera     0xB6F97C
+#define CLASS_CPlayerInfo               0xB7CD98
+#define CLASS_CCamera                   0xB6F028
+#define CLASS_CPad                      0xB73458
+#define CLASS_CFx                       0xa9ae00
+#define CLASS_CFxManager                0xA9AE80
+#define CLASS_CMenuManager              0xBA6748
+#define CLASS_RwCamera                  0xB6F97C
 
-#define ARRAY_WeaponInfo          0xC8AAB8
-#define CLASSSIZE_WeaponInfo      112
-#define NUM_WeaponInfosStdSkill   WEAPONTYPE_LAST_WEAPONTYPE
-#define NUM_WeaponInfosOtherSkill 11
-#define NUM_WeaponInfosTotal      (NUM_WeaponInfosStdSkill + (3 * NUM_WeaponInfosOtherSkill))  // std, (poor, pro, special)
+#define ARRAY_WeaponInfo                0xC8AAB8
+#define CLASSSIZE_WeaponInfo            112
+#define NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
+#define NUM_WeaponInfosOtherSkill       11
+#define NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-#define MODELINFO_DFF_MAX 20000
-#define MODELINFO_TXD_MAX 25000
-#define MODELINFO_MAX     26000  // Actual max is 25755
+#define MODELINFO_DFF_MAX               20000
+#define MODELINFO_TXD_MAX               25000
+#define MODELINFO_MAX                   26000       // Actual max is 25755
 
-#define VAR_FlyingCarsEnabled    0x969160
-#define VAR_ExtraBunnyhopEnabled 0x969161
-#define VAR_HoveringCarsEnabled  0x969152
-#define VAR_ExtraJumpEnabled     0x96916C
-#define VAR_TankModeEnabled      0x969164
-#define VAR_NoReloadEnabled      0x969178
-#define VAR_PerfectHandling      0x96914C
-#define VAR_AllCarsHaveNitro     0x969165
-#define VAR_BoatsCanFly          0x969153
-#define VAR_InfiniteOxygen       0x96916E
-#define VAR_FasterClock          0x96913B
-#define VAR_FasterGameplay       0x96913C
-#define VAR_SlowerGameplay       0x96913D
-#define VAR_AlwaysMidnight       0x969167
-#define VAR_FullWeaponAiming     0x969179
-#define VAR_InfiniteHealth       0x96916D
-#define VAR_NeverWanted          0x969171
-#define VAR_HealthArmorMoney     0x969133
-#define VAR_WalkUnderwater       0x6C2759
+#define VAR_FlyingCarsEnabled           0x969160
+#define VAR_ExtraBunnyhopEnabled        0x969161
+#define VAR_HoveringCarsEnabled         0x969152
+#define VAR_ExtraJumpEnabled            0x96916C
+#define VAR_TankModeEnabled             0x969164
+#define VAR_NoReloadEnabled             0x969178
+#define VAR_PerfectHandling             0x96914C
+#define VAR_AllCarsHaveNitro            0x969165
+#define VAR_BoatsCanFly                 0x969153
+#define VAR_InfiniteOxygen              0x96916E
+#define VAR_FasterClock                 0x96913B
+#define VAR_FasterGameplay              0x96913C
+#define VAR_SlowerGameplay              0x96913D
+#define VAR_AlwaysMidnight              0x969167
+#define VAR_FullWeaponAiming            0x969179
+#define VAR_InfiniteHealth              0x96916D
+#define VAR_NeverWanted                 0x969171
+#define VAR_HealthArmorMoney            0x969133
+#define VAR_WalkUnderwater              0x6C2759
 
-#define CHEAT_HOVERINGCARS     "hovercars"
-#define CHEAT_FLYINGCARS       "aircars"
-#define CHEAT_EXTRABUNNYHOP    "extrabunny"
-#define CHEAT_EXTRAJUMP        "extrajump"
-#define CHEAT_TANKMODE         "tankmode"
-#define CHEAT_NORELOAD         "noreload"
-#define CHEAT_PERFECTHANDLING  "perfecthandling"
-#define CHEAT_ALLCARSHAVENITRO "allcarshavenitro"
-#define CHEAT_BOATSCANFLY      "airboats"
-#define CHEAT_INFINITEOXYGEN   "infiniteoxygen"
-#define CHEAT_WALKUNDERWATER   "walkunderwater"
-#define CHEAT_FASTERCLOCK      "fasterclock"
-#define CHEAT_FASTERGAMEPLAY   "fastergameplay"
-#define CHEAT_SLOWERGAMEPLAY   "slowergameplay"
-#define CHEAT_ALWAYSMIDNIGHT   "alwaysmidnight"
-#define CHEAT_FULLWEAPONAIMING "fullweaponaiming"
-#define CHEAT_INFINITEHEALTH   "infinitehealth"
-#define CHEAT_NEVERWANTED      "neverwanted"
-#define CHEAT_HEALTARMORMONEY  "healtharmormoney"
+#define CHEAT_HOVERINGCARS          "hovercars"
+#define CHEAT_FLYINGCARS            "aircars"
+#define CHEAT_EXTRABUNNYHOP         "extrabunny"
+#define CHEAT_EXTRAJUMP             "extrajump"
+#define CHEAT_TANKMODE              "tankmode"
+#define CHEAT_NORELOAD              "noreload"
+#define CHEAT_PERFECTHANDLING       "perfecthandling"
+#define CHEAT_ALLCARSHAVENITRO      "allcarshavenitro"
+#define CHEAT_BOATSCANFLY           "airboats"
+#define CHEAT_INFINITEOXYGEN        "infiniteoxygen"
+#define CHEAT_WALKUNDERWATER        "walkunderwater"
+#define CHEAT_FASTERCLOCK           "fasterclock"
+#define CHEAT_FASTERGAMEPLAY        "fastergameplay"
+#define CHEAT_SLOWERGAMEPLAY        "slowergameplay"
+#define CHEAT_ALWAYSMIDNIGHT        "alwaysmidnight"
+#define CHEAT_FULLWEAPONAIMING      "fullweaponaiming"
+#define CHEAT_INFINITEHEALTH        "infinitehealth"
+#define CHEAT_NEVERWANTED           "neverwanted"
+#define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
 #define FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity 0x4EFCD0
 #define STRUCT_CAESoundManager                              0xB62CB0
@@ -96,13 +96,13 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
 #define NUM_CWaterCannon_Audio_Offset                       0x32C
 #define NUM_CWaterCannon_DefaultLimit                       3
 
-constexpr int MAX_WATER_CANNONS = 30;  // extended CWaterCannon limit, it can be increased
+constexpr int MAX_WATER_CANNONS = 30; // extended CWaterCannon limit, it can be increased
 
 struct SCheatSA
 {
-    BYTE* m_byAddress;  // Cheat Address
-    bool  m_bEnabled;   // Cheat State
-    bool  m_bCanBeSet;  // Cheat can be set with setWorldSpecialPropertyEnabled
+    BYTE* m_byAddress;            // Cheat Address
+    bool  m_bEnabled;             // Cheat State
+    bool  m_bCanBeSet;            // Cheat can be set with setWorldSpecialPropertyEnabled
     SCheatSA(BYTE* Address, bool bCanBeSet = true)
     {
         m_byAddress = Address;
@@ -176,7 +176,10 @@ public:
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
 
-    CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept override { return m_pVehicleAudioSettingsManager.get(); }
+    CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() const noexcept override
+    {
+        return m_pVehicleAudioSettingsManager.get();
+    }
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -192,15 +195,15 @@ public:
     int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
     int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
-    DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; }              // CTimer::m_snTimeInMilliseconds
-    int   GetSystemFrameCounter() const { return *(int*)0xB7CB4C; }  // CTimer::m_FrameCounter
+    DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
+    int   GetSystemFrameCounter() const { return *(int*)0xB7CB4C; } // CTimer::m_FrameCounter
 
-    bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; }  // FrontEndMenuManager + 0x33
+    bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
-    void        StartGame();
-    void        SetSystemState(SystemState State);
-    SystemState GetSystemState();
-    void        Pause(bool bPaused);
+    void         StartGame();
+    void         SetSystemState(SystemState State);
+    SystemState  GetSystemState();
+    void         Pause(bool bPaused);
 
     void Initialize();
     void Reset();
@@ -361,7 +364,7 @@ private:
 
     std::unique_ptr<CVehicleAudioSettingsManagerSA> m_pVehicleAudioSettingsManager;
 
-    std::unique_ptr<CRendererSA> m_pRenderer;
+    std::unique_ptr<CRendererSA>    m_pRenderer;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
@@ -370,7 +373,7 @@ private:
     CAESoundManager*          m_pAESoundManager;
     CAudioContainer*          m_pAudioContainer;
     CStats*                   m_pStats;
-    CTaskManagementSystemSA*  m_pTaskManagementSystem;  // not used outside the game_sa
+    CTaskManagementSystemSA*  m_pTaskManagementSystem;            // not used outside the game_sa
     CTasks*                   m_pTasks;
     CGameSettings*            m_pSettings;
     CCarEnterExit*            m_pCarEnterExit;
@@ -384,7 +387,7 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
-    bool         m_isTunnelWeatherBlendEnabled{true};
+    bool         m_isTunnelWeatherBlendEnabled{true}; 
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
@@ -394,7 +397,7 @@ private:
     bool         m_isIgnoreFireStateEnabled{false};
     bool         m_isVehicleBurnExplosionsEnabled{true};
 
-    static unsigned int& ClumpOffset;
+    static unsigned int&  ClumpOffset;
 
     std::map<std::string, SCheatSA*> m_Cheats;
 

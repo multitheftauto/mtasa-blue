@@ -81,7 +81,7 @@ void CPositionRotationAnimation::ToBitStream(NetBitStreamInterface& a_rBitStream
     positionSync.data.vecPosition = m_SourceValue.m_vecPosition;
     a_rBitStream.Write(&positionSync);
 
-    SRotationRadiansSync rotationSync(true);  // RPC function used floats when join time packet didn't, let's go for float
+    SRotationRadiansSync rotationSync(true);            // RPC function used floats when join time packet didn't, let's go for float
     rotationSync.data.vecRotation = m_SourceValue.m_vecRotation;
     a_rBitStream.Write(&rotationSync);
 
@@ -91,7 +91,7 @@ void CPositionRotationAnimation::ToBitStream(NetBitStreamInterface& a_rBitStream
     a_rBitStream.WriteBit(m_bDeltaRotationMode);
     if (m_bDeltaRotationMode)
     {
-        rotationSync.data.vecRotation = m_DeltaValue.m_vecRotation;  // We serialize DELTA
+        rotationSync.data.vecRotation = m_DeltaValue.m_vecRotation;            // We serialize DELTA
     }
     else
     {
@@ -116,7 +116,7 @@ CPositionRotationAnimation* CPositionRotationAnimation::FromBitStream(NetBitStre
         return NULL;
     }
 
-    CPositionRotationAnimation* pAnimation = new CPositionRotationAnimation();  // It's up to the caller do delete it if we return it
+    CPositionRotationAnimation* pAnimation = new CPositionRotationAnimation();            // It's up to the caller do delete it if we return it
 
     if (bResumeMode)
     {

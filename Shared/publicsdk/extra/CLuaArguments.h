@@ -20,7 +20,7 @@
 
 extern "C"
 {
-#include <lua.h>
+    #include <lua.h>
 }
 
 #include "CLuaArgument.h"
@@ -31,7 +31,7 @@ using std::vector;
 class CLuaArguments
 {
 public:
-    CLuaArguments() {};
+    CLuaArguments(){};
     CLuaArguments(const CLuaArguments& Arguments);
     ~CLuaArguments() { DeleteArguments(); };
 

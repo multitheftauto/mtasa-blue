@@ -50,7 +50,7 @@ public:
                     m_uiMatchCurLine = i;
                     m_uiDupCount = 0;
                     if (m_uiMatchCurLine == 0)
-                        m_uiDupCount++;  // Completed matching set (will only occur here for single line match)
+                        m_uiDupCount++;            // Completed matching set (will only occur here for single line match)
                     return;
                 }
             }
@@ -65,7 +65,7 @@ public:
                 // Still matching
                 m_uiMatchCurLine = uiNextLine;
                 if (m_uiMatchCurLine == 0)
-                    m_uiDupCount++;  // Completed matching set
+                    m_uiDupCount++;            // Completed matching set
                 return;
             }
             else
@@ -153,11 +153,11 @@ public:
 protected:
     std::deque<T>          m_History;
     std::list<SOutputLine> m_PendingOutput;
-    bool                   m_bIsMatching = false;  // true if matching a duplicate set
-    uint                   m_uiMatchSize = 0;      // Number of lines in active match
-    uint                   m_uiMatchCurLine = 0;   // Current line in active match
-    uint                   m_uiDupCount = 0;       // Number of duplicates found for active match
+    bool                   m_bIsMatching = false;            // true if matching a duplicate set
+    uint                   m_uiMatchSize = 0;                // Number of lines in active match
+    uint                   m_uiMatchCurLine = 0;             // Current line in active match
+    uint                   m_uiDupCount = 0;                 // Number of duplicates found for active match
     time_t                 m_tLastOutputTime = 0;
-    uint                   m_uiMaxNumOfLinesInMatch;  // Max number lines in a matching set
-    uint                   m_uiMaxDelaySeconds;       // Max seconds to delay outputting duplicated lines
+    uint                   m_uiMaxNumOfLinesInMatch;            // Max number lines in a matching set
+    uint                   m_uiMaxDelaySeconds;                 // Max seconds to delay outputting duplicated lines
 };

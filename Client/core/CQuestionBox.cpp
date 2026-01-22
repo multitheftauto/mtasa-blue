@@ -217,7 +217,7 @@ bool CQuestionBox::OnButtonClick(CGUIElement* pElement)
     if (m_Callback)
         m_Callback(m_CallbackParameter, m_uiLastButton);
 
-    if (m_CallbackEdit && !m_EditList.empty())  // Just grab the first editbox for now
+    if (m_CallbackEdit && !m_EditList.empty())            // Just grab the first editbox for now
         m_CallbackEdit(m_CallbackParameter, m_uiLastButton, m_EditList[0]->GetText());
     return true;
 }

@@ -150,7 +150,7 @@ public:
         char         Name[24];
         std::int32_t TotalObjects;
         std::int32_t FrameSize;
-        std::int32_t isCompressed;  // The value is always 1
+        std::int32_t isCompressed;            // The value is always 1
     };
 
     struct SSequenceHeaderV2
@@ -164,7 +164,7 @@ public:
     enum eBoneType
     {
         UNKNOWN = -1,
-        NORMAL = 0,  // Normal or Root, both are same
+        NORMAL = 0,            // Normal or Root, both are same
         PELVIS = 1,
         SPINE = 2,
         SPINE1 = 3,
@@ -215,7 +215,7 @@ public:
     // Sorta a hack that these are required by CClientEntity...
     void Unlink();
     void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition) {};
+    void SetPosition(const CVector& vecPosition){};
 
 private:
     bool ReadIFPByVersion();

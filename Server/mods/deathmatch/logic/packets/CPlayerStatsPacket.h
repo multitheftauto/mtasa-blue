@@ -31,5 +31,5 @@ public:
     size_t GetSize() const noexcept { return m_map.size(); }
 
 private:
-    std::map<unsigned short, float> m_map;  // id - value pairs
+    std::map<unsigned short, float> m_map;            // id - value pairs
 };

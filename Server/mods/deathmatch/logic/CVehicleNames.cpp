@@ -18,7 +18,7 @@ const char* szVehicleNameEmpty = "";
 struct SVehicleName
 {
     const char* szName;
-    const char* szName_replaced;  // Compatability
+    const char* szName_replaced;            // Compatability
 };
 
 static const SFixedArray<SVehicleName, 212> VehicleNames = {{{"Landstalker"},

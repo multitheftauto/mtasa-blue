@@ -50,7 +50,7 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     _asm
     {
         mov     ecx, dwThisInterface
-        push    0  // pTargetEnt - ignored for simplicity's sake (we really don't need it)
+        push    0               // pTargetEnt - ignored for simplicity's sake (we really don't need it)
         push    nHoverTime
         push    fCruiseHeight
         push    pVecTargetPos

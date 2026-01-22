@@ -32,7 +32,7 @@ public:
     ~CScriptFile();
 
     // Functions required by CElement
-    void Unlink() {};
+    void Unlink(){};
 
     // Load and unload routines
     bool           Load(CResource* pResourceForFilePath, eMode Mode);

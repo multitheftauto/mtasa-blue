@@ -22,5 +22,5 @@ public:
 
     eCGUIType GetType() { return CGUI_BUTTON; };
 
-#include "CGUIElement_Inc.h"
+    #include "CGUIElement_Inc.h"
 };

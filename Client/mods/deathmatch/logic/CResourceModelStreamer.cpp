@@ -87,7 +87,7 @@ bool CResourceModelStreamer::ReleaseModel(std::uint16_t modelId, bool removeRef)
 
 void CResourceModelStreamer::ReleaseAll()
 {
-    for (const auto& modelRefs : m_requestedModels)
+    for (const auto &modelRefs : m_requestedModels)
     {
         if (modelRefs.second > 0)
         {

@@ -17,8 +17,16 @@ template <>
 CDirect3DData* CSingleton<CDirect3DData>::m_pSingleton = NULL;
 
 CDirect3DData::CDirect3DData()
-    : m_mViewMatrix{}, m_mProjMatrix{}, m_mWorldMatrix{}, m_hDeviceWindow(0), m_dwViewportX(0), m_dwViewportY(0), m_dwViewportWidth(0), m_dwViewportHeight(0)
+    : m_mViewMatrix{}
+    , m_mProjMatrix{}
+    , m_mWorldMatrix{}
+    , m_hDeviceWindow(0)
+    , m_dwViewportX(0)
+    , m_dwViewportY(0)
+    , m_dwViewportWidth(0)
+    , m_dwViewportHeight(0)
 {
+
 }
 
 CDirect3DData::~CDirect3DData()

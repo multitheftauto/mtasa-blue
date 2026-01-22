@@ -10,57 +10,72 @@
 
 #include "StdInc.h"
 
-#define HOOKPOS_GrainEffect_NightModifier    0x704EE8
+#define HOOKPOS_GrainEffect_NightModifier 0x704EE8
 #define HOOKPOS_GrainEffect_InfraredModifier 0x704F59
-#define HOOKPOS_GrainEffect_RainModifier     0x705078
-#define HOOKPOS_GrainEffect_OverlayModifier  0x705091
+#define HOOKPOS_GrainEffect_RainModifier 0x705078
+#define HOOKPOS_GrainEffect_OverlayModifier 0x705091
 
 namespace GrainEffect
 {
 
-    static BYTE  ucGrainEnabled = FALSE;
-    static DWORD dwGrainStrength = 1;
+static BYTE ucGrainEnabled = FALSE;
+static DWORD dwGrainStrength = 1;
 
-    struct MasterModifier
+struct MasterModifier
+{
+    static float fMultiplier;
+
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
     {
-        static float fMultiplier;
+        return ((int(__cdecl*)(char, char))0x7037C0)(ucLevel * fMultiplier, ucUpdate);
+    }
+};
 
-        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return ((int(__cdecl*)(char, char))0x7037C0)(ucLevel * fMultiplier, ucUpdate); }
-    };
+struct InfraredModifier
+{
+    static float fMultiplier;
 
-    struct InfraredModifier
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
     {
-        static float fMultiplier;
+        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
+    }
+};
 
-        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate); }
-    };
+struct NightModifier
+{
+    static float fMultiplier;
 
-    struct NightModifier
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
     {
-        static float fMultiplier;
+        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
+    }
+};
 
-        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate); }
-    };
+struct RainModifier
+{
+    static float fMultiplier;
 
-    struct RainModifier
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
     {
-        static float fMultiplier;
+        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
+    }
+};
 
-        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate); }
-    };
+struct OverlayModifier
+{
+    static float fMultiplier;
 
-    struct OverlayModifier
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
     {
-        static float fMultiplier;
+        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
+    }
+};
 
-        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate); }
-    };
-
-    float MasterModifier::fMultiplier = 1.0f;
-    float InfraredModifier::fMultiplier = 1.0f;
-    float NightModifier::fMultiplier = 1.0f;
-    float RainModifier::fMultiplier = 1.0f;
-    float OverlayModifier::fMultiplier = 1.0f;
+float MasterModifier::fMultiplier = 1.0f;
+float InfraredModifier::fMultiplier = 1.0f;
+float NightModifier::fMultiplier = 1.0f;
+float RainModifier::fMultiplier = 1.0f;
+float OverlayModifier::fMultiplier = 1.0f;
 
 }
 
@@ -72,27 +87,26 @@ void CMultiplayerSA::SetGrainMultiplier(eGrainMultiplierType type, float fMultip
 
     switch (type)
     {
-        case eGrainMultiplierType::MASTER:
-            MasterModifier::fMultiplier = fMultiplier;
-            break;
-        case eGrainMultiplierType::INFRARED:
-            InfraredModifier::fMultiplier = fMultiplier;
-            break;
-        case eGrainMultiplierType::NIGHT:
-            NightModifier::fMultiplier = fMultiplier;
-            break;
-        case eGrainMultiplierType::RAIN:
-            RainModifier::fMultiplier = fMultiplier;
-            break;
-        case eGrainMultiplierType::OVERLAY:
-            OverlayModifier::fMultiplier = fMultiplier;
-            break;
-        case eGrainMultiplierType::ALL:
-            MasterModifier::fMultiplier = InfraredModifier::fMultiplier = NightModifier::fMultiplier = RainModifier::fMultiplier =
-                OverlayModifier::fMultiplier = fMultiplier;
-            break;
-        default:
-            break;
+    case eGrainMultiplierType::MASTER:
+        MasterModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::INFRARED:
+        InfraredModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::NIGHT:
+        NightModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::RAIN:
+        RainModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::OVERLAY:
+        OverlayModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::ALL:
+        MasterModifier::fMultiplier = InfraredModifier::fMultiplier = NightModifier::fMultiplier = RainModifier::fMultiplier = OverlayModifier::fMultiplier = fMultiplier;
+        break;
+    default:
+        break;
     }
 }
 
@@ -105,7 +119,7 @@ void CMultiplayerSA::SetGrainLevel(BYTE ucLevel)
     GrainEffect::dwGrainStrength = static_cast<DWORD>(ucLevel);
 
     if (bEnable == bOverridden)
-        return;
+        return;    
 
     if (bEnable)
     {

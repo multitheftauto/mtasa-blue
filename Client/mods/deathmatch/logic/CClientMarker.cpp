@@ -13,7 +13,7 @@
 extern CClientGame* g_pClientGame;
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
 unsigned int CClientMarker::m_uiStreamedInMarkers = 0;
@@ -416,8 +416,8 @@ void CClientMarker::Callback_OnCollision(CClientColShape& Shape, CClientEntity& 
     {
         // Call the marker hit event
         CLuaArguments Arguments;
-        Arguments.PushElement(&Entity);                                    // player that hit it
-        Arguments.PushBoolean((GetDimension() == Entity.GetDimension()));  // matching dimension?
+        Arguments.PushElement(&Entity);                                              // player that hit it
+        Arguments.PushBoolean((GetDimension() == Entity.GetDimension()));            // matching dimension?
         CallEvent("onClientMarkerHit", Arguments, true);
     }
 }
@@ -428,8 +428,8 @@ void CClientMarker::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Enti
     {
         // Call the marker hit event
         CLuaArguments Arguments;
-        Arguments.PushElement(&Entity);                                    // player that hit it
-        Arguments.PushBoolean((GetDimension() == Entity.GetDimension()));  // matching dimension?
+        Arguments.PushElement(&Entity);                                              // player that hit it
+        Arguments.PushBoolean((GetDimension() == Entity.GetDimension()));            // matching dimension?
         CallEvent("onClientMarkerLeave", Arguments, true);
     }
 }

@@ -27,10 +27,10 @@ void CFireSA::Extinguish()
     DWORD dwFunction = FUNC_Extinguish;
     DWORD dwPointer = (DWORD)internalInterface;
     _asm
-        {
+    {
         mov     ecx, dwPointer
         call    dwFunction
-        }
+    }
     internalInterface->bActive = false;
 }
 
@@ -185,12 +185,12 @@ void CFireSA::Ignite()
     DWORD    dwFunc = FUNC_CreateFxSysForStrength;
     DWORD    dwThis = (DWORD)internalInterface;
     _asm
-        {
+    {
         mov     ecx, dwThis
         push    0
         push    vecPosition
         call    dwFunc
-        }
+    }
 
     internalInterface->bBeingExtinguished = 0;
     internalInterface->bFirstGeneration = 1;
@@ -234,10 +234,10 @@ static void AbortFireTask(CEntitySAInterface* entityOnFire, DWORD returnAddress)
     taskManager->RemoveTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM, TASK_SIMPLE_PLAYER_ON_FIRE);
 }
 
-#define HOOKPOS_CFire_Extinguish  0x539429
+#define HOOKPOS_CFire_Extinguish 0x539429
 #define HOOKSIZE_CFire_Extinguish 6
 static constexpr std::uintptr_t CONTINUE_CFire_Extinguish = 0x53942F;
-static void _declspec(naked)    HOOK_CFire_Extinguish()
+static void _declspec(naked) HOOK_CFire_Extinguish()
 {
     _asm
     {
