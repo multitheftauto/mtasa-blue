@@ -429,11 +429,11 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
         if (c.hitGeo->materials.materials && c.hitGeo->materials.materials[c.hitTri->materialId])
         {
             RwTexture* const tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
-            ret.textureName = tex ? tex->name : "unknown";
+            ret.textureName = tex ? tex->name : nullptr;
         }
         else
         {
-            ret.textureName = "unknown";
+            ret.textureName = nullptr;
         }
 
         RwFrame* const hitFrame = RpAtomicGetFrame(c.hitAtomic);
