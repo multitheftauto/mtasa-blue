@@ -1796,10 +1796,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
 
                 auto IsBusyStreaming = [](CStreamingInfo* pInfo) -> bool
-                {
-                    return pInfo && (pInfo->loadState == eModelLoadState::LOADSTATE_READING ||
-                                     pInfo->loadState == eModelLoadState::LOADSTATE_FINISHING);
-                };
+                { return pInfo && (pInfo->loadState == eModelLoadState::LOADSTATE_READING || pInfo->loadState == eModelLoadState::LOADSTATE_FINISHING); };
 
                 if (IsBusyStreaming(pStreamInfo))
                 {
@@ -1935,10 +1932,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
         CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(uiTxdStreamId);
 
         auto IsBusyStreaming = [](CStreamingInfo* pInfo) -> bool
-        {
-            return pInfo && (pInfo->loadState == eModelLoadState::LOADSTATE_READING ||
-                             pInfo->loadState == eModelLoadState::LOADSTATE_FINISHING);
-        };
+        { return pInfo && (pInfo->loadState == eModelLoadState::LOADSTATE_READING || pInfo->loadState == eModelLoadState::LOADSTATE_FINISHING); };
 
         if (IsBusyStreaming(pStreamInfo))
             return nullptr;
@@ -2496,10 +2490,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     perTxdInfo.replacedOriginals.resize(perTxdInfo.usingTextures.size(), nullptr);
 
     const auto& masterTexturesVec = pReplacementTextures->textures;
-    auto IsMasterTexture = [&masterTexturesVec](RwTexture* pTex) -> bool
-    {
-        return std::find(masterTexturesVec.begin(), masterTexturesVec.end(), pTex) != masterTexturesVec.end();
-    };
+    auto        IsMasterTexture = [&masterTexturesVec](RwTexture* pTex) -> bool
+    { return std::find(masterTexturesVec.begin(), masterTexturesVec.end(), pTex) != masterTexturesVec.end(); };
 
     RwTexDictionary* const pTargetTxd = pInfo->pTxd;
     const bool             bTargetTxdOk = pTargetTxd != nullptr;
