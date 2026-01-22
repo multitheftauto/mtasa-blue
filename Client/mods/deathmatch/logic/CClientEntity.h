@@ -23,20 +23,20 @@ class CLuaFunctionRef;
 
 class CClientManager;
 
-#define IS_PED(entity) ((entity)->GetType()==CCLIENTPLAYER||(entity)->GetType()==CCLIENTPED)
-#define IS_PLAYER(entity) ((entity)->GetType()==CCLIENTPLAYER)
-#define IS_REMOTE_PLAYER(player) (IS_PLAYER(player)&&!(player)->IsLocalPlayer())
-#define IS_RADARMARKER(entity) ((entity)->GetType()==CCLIENTRADARMARKER)
-#define IS_VEHICLE(entity) ((entity)->GetType()==CCLIENTVEHICLE)
-#define IS_OBJECT(entity) ((entity)->GetType()==CCLIENTOBJECT)
-#define IS_MARKER(entity) ((entity)->GetType()==CCLIENTMARKER)
-#define IS_PICKUP(entity) ((entity)->GetType()==CCLIENTPICKUP)
-#define IS_RADAR_AREA(entity) ((entity)->GetType()==CCLIENTRADARAREA)
-#define IS_COLSHAPE(entity) ((entity)->GetType()==CCLIENTCOLSHAPE)
-#define IS_PROJECTILE(entity) ((entity)->GetType()==CCLIENTPROJECTILE)
-#define IS_GUI(entity) ((entity)->GetType()==CCLIENTGUI)
-#define IS_IFP(entity) ((entity)->GetType()==CCLIENTIFP)
-#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==(type))
+#define IS_PED(entity)           ((entity)->GetType() == CCLIENTPLAYER || (entity)->GetType() == CCLIENTPED)
+#define IS_PLAYER(entity)        ((entity)->GetType() == CCLIENTPLAYER)
+#define IS_REMOTE_PLAYER(player) (IS_PLAYER(player) && !(player)->IsLocalPlayer())
+#define IS_RADARMARKER(entity)   ((entity)->GetType() == CCLIENTRADARMARKER)
+#define IS_VEHICLE(entity)       ((entity)->GetType() == CCLIENTVEHICLE)
+#define IS_OBJECT(entity)        ((entity)->GetType() == CCLIENTOBJECT)
+#define IS_MARKER(entity)        ((entity)->GetType() == CCLIENTMARKER)
+#define IS_PICKUP(entity)        ((entity)->GetType() == CCLIENTPICKUP)
+#define IS_RADAR_AREA(entity)    ((entity)->GetType() == CCLIENTRADARAREA)
+#define IS_COLSHAPE(entity)      ((entity)->GetType() == CCLIENTCOLSHAPE)
+#define IS_PROJECTILE(entity)    ((entity)->GetType() == CCLIENTPROJECTILE)
+#define IS_GUI(entity)           ((entity)->GetType() == CCLIENTGUI)
+#define IS_IFP(entity)           ((entity)->GetType() == CCLIENTIFP)
+#define CHECK_CGUI(entity, type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType() == (type))
 
 enum eClientEntityType
 {
@@ -57,7 +57,7 @@ enum eClientEntityType
     CCLIENTGUI,
     CCLIENTSPAWNPOINT_DEPRECATED,
     CCLIENTCOLSHAPE,
-    CCLIENTDUMMY,            // anything user-defined
+    CCLIENTDUMMY,  // anything user-defined
     SCRIPTFILE,
     CCLIENTDFF,
     CCLIENTCOL,
@@ -228,7 +228,7 @@ public:
     virtual inline unsigned short GetDimension() { return m_usDimension; }
     virtual void                  SetDimension(unsigned short usDimension);
 
-    virtual void ModelRequestCallback(CModelInfo* pModelInfo){};
+    virtual void ModelRequestCallback(CModelInfo* pModelInfo) {};
 
     virtual bool IsOutOfBounds();
     CModelInfo*  GetModelInfo() { return m_pModelInfo; };
@@ -360,7 +360,7 @@ protected:
     CVector                     m_vecAttachedPosition;
     CVector                     m_vecAttachedRotation;
     std::vector<CClientEntity*> m_AttachedEntities;
-    bool                        m_bDisallowAttaching;            // Protect against attaching in destructor
+    bool                        m_bDisallowAttaching;  // Protect against attaching in destructor
 
     bool                              m_bBeingDeleted;
     bool                              m_bSystemEntity;
@@ -377,8 +377,8 @@ protected:
     bool                              m_bWorldIgnored;
     bool                              m_bCallPropagationEnabled;
     bool                              m_bDisallowCollisions;
-    bool                              m_canBeDestroyedByScript = true;            // If true, destroyElement function will
-                                                                                  // have no effect on this element
+    bool                              m_canBeDestroyedByScript = true;  // If true, destroyElement function will
+                                                                        // have no effect on this element
 public:
     // Optimization for getElementsByType starting at root
     static void StartupEntitiesFromRoot();

@@ -24,7 +24,7 @@
 #endif
 
 #ifdef __cpp_lib_string_view
-#include <string_view>
+    #include <string_view>
 #endif
 
 struct ISyncStructure;
@@ -53,7 +53,7 @@ public:
     virtual void Write(const char* input, int numberOfBytes) = 0;
     virtual void Write(const ISyncStructure* syncStruct) = 0;
 
-public:            // Use char functions only when they will be 0 most times
+public:  // Use char functions only when they will be 0 most times
     virtual void WriteCompressed(const unsigned char& input) = 0;
     virtual void WriteCompressed(const char& input) = 0;
 
@@ -63,7 +63,7 @@ public:
     virtual void WriteCompressed(const unsigned int& input) = 0;
     virtual void WriteCompressed(const int& input) = 0;
 
-private:            // Float functions not used because they only cover -1 to +1 and are lossy
+private:  // Float functions not used because they only cover -1 to +1 and are lossy
     virtual void WriteCompressed(const float& input) = 0;
     virtual void WriteCompressed(const double& input) = 0;
 
@@ -95,7 +95,7 @@ public:
     virtual bool Read(char* output, int numberOfBytes) = 0;
     virtual bool Read(ISyncStructure* syncStruct) = 0;
 
-public:            // Use char functions only when they will be 0 most times
+public:  // Use char functions only when they will be 0 most times
     virtual bool ReadCompressed(unsigned char& output) = 0;
     virtual bool ReadCompressed(char& output) = 0;
 
@@ -105,7 +105,7 @@ public:
     virtual bool ReadCompressed(unsigned int& output) = 0;
     virtual bool ReadCompressed(int& output) = 0;
 
-private:            // Float functions not used because they only cover -1 to +1 and are lossy
+private:  // Float functions not used because they only cover -1 to +1 and are lossy
     virtual bool ReadCompressed(float& output) = 0;
     virtual bool ReadCompressed(double& output) = 0;
 
@@ -302,15 +302,15 @@ public:
     // Write variable size length
     void WriteLength(uint uiLength)
     {
-        if (uiLength <= 0x7F)            // One byte for length up to 127
+        if (uiLength <= 0x7F)  // One byte for length up to 127
             Write((uchar)uiLength);
         else if (uiLength <= 0x7EFF)
-        {            // Two bytes for length from 128 to 32511
+        {  // Two bytes for length from 128 to 32511
             Write((uchar)((uiLength >> 8) + 128));
             Write((uchar)(uiLength & 0xFF));
         }
         else
-        {            // Five bytes for length 32512 and up
+        {  // Five bytes for length 32512 and up
             Write((uchar)255);
             Write(uiLength);
         }
@@ -326,18 +326,18 @@ public:
             return false;
 
         if (ucValue <= 0x7F)
-        {            // One byte for length up to 127
+        {  // One byte for length up to 127
             uiOutLength = ucValue;
         }
         else if (ucValue != 255)
-        {            // Two bytes for length from 128 to 32511
+        {  // Two bytes for length from 128 to 32511
             uchar ucValue2 = 0;
             if (!Read(ucValue2))
                 return false;
             uiOutLength = ((ucValue - 128) << 8) + ucValue2;
         }
         else
-        {            // Five bytes for length 32512 and up
+        {  // Five bytes for length 32512 and up
             if (!Read(uiOutLength))
                 return false;
         }
@@ -354,18 +354,18 @@ public:
         return ReadStringCharacters(result, uiLength);
     }
 
-    #ifdef MTA_CLIENT
-        #define MAX_ELEMENTS    MAX_CLIENT_ELEMENTS
-    #else
-        #define MAX_ELEMENTS    MAX_SERVER_ELEMENTS
-    #endif
+#ifdef MTA_CLIENT
+    #define MAX_ELEMENTS MAX_CLIENT_ELEMENTS
+#else
+    #define MAX_ELEMENTS MAX_SERVER_ELEMENTS
+#endif
 
     // Write an element ID
     void Write(const ElementID& ID)
     {
         static const unsigned int bitcount = NumberOfSignificantBits<(MAX_ELEMENTS - 1)>::COUNT;
         const unsigned int&       IDref = ID.Value();
-        #ifdef MTA_CLIENT
+#ifdef MTA_CLIENT
         if (IDref != INVALID_ELEMENT_ID && IDref >= MAX_SERVER_ELEMENTS)
         {
             dassert("Sending client side element id to server" && 0);
@@ -373,7 +373,7 @@ public:
             WriteBits(reinterpret_cast<const unsigned char*>(&uiInvalidId), bitcount);
             return;
         }
-        #endif
+#endif
         WriteBits(reinterpret_cast<const unsigned char*>(&IDref), bitcount);
     }
 
@@ -550,8 +550,8 @@ enum class eBitStreamVersion : unsigned short
 
     // Add breakObject to serverside as well
     // 2024-05-31
-    BreakObject_Serverside,   
-    
+    BreakObject_Serverside,
+
     // Ped syncronization revision
     // 2024-06-16
     PedSync_Revision,

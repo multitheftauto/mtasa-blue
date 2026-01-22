@@ -143,7 +143,7 @@ inline void SafeDebugPrint(Buffer& buffer, const char* format, ...)
     if (format == nullptr)
         return;
 
-    auto* data = buffer.data();
+    auto*             data = buffer.data();
     const std::size_t size = buffer.size();
 
     if (data == nullptr || size == 0)
@@ -166,7 +166,7 @@ inline void SafeDebugPrintC(char* buffer, std::size_t bufferSize, const char* fo
     va_end(args);
 }
 
-#define SAFE_DEBUG_PRINT(buffer, ...) SafeDebugPrint((buffer), __VA_ARGS__)
+#define SAFE_DEBUG_PRINT(buffer, ...)               SafeDebugPrint((buffer), __VA_ARGS__)
 #define SAFE_DEBUG_PRINT_C(buffer, bufferSize, ...) SafeDebugPrintC((buffer), (bufferSize), __VA_ARGS__)
 
 inline void SafeDebugPrintPrefixed(std::string_view prefix, const char* format, ...)
@@ -210,35 +210,17 @@ struct ENHANCED_EXCEPTION_INFO
 
     [[nodiscard]] bool operator==(const ENHANCED_EXCEPTION_INFO& other) const
     {
-        return exceptionCode == other.exceptionCode &&
-               exceptionAddress == other.exceptionAddress &&
-               moduleName == other.moduleName &&
-               modulePathName == other.modulePathName &&
-               moduleBaseName == other.moduleBaseName &&
-               moduleOffset == other.moduleOffset &&
-               timestamp == other.timestamp &&
-               threadId == other.threadId &&
-               processId == other.processId &&
-               stackTrace == other.stackTrace &&
-               capturedException == other.capturedException &&
-               uncaughtExceptionCount == other.uncaughtExceptionCount &&
-               exceptionDescription == other.exceptionDescription &&
-               hasDetailedStackTrace == other.hasDetailedStackTrace &&
-               eax == other.eax && ebx == other.ebx && ecx == other.ecx &&
-               edx == other.edx && esi == other.esi && edi == other.edi &&
-               ebp == other.ebp && esp == other.esp && eip == other.eip &&
-               eflags == other.eflags &&
-               cs == other.cs && ds == other.ds && ss == other.ss &&
-               es == other.es && fs == other.fs && gs == other.gs &&
-               exceptionType == other.exceptionType &&
-               isFatal == other.isFatal &&
-               additionalInfo == other.additionalInfo;
+        return exceptionCode == other.exceptionCode && exceptionAddress == other.exceptionAddress && moduleName == other.moduleName &&
+               modulePathName == other.modulePathName && moduleBaseName == other.moduleBaseName && moduleOffset == other.moduleOffset &&
+               timestamp == other.timestamp && threadId == other.threadId && processId == other.processId && stackTrace == other.stackTrace &&
+               capturedException == other.capturedException && uncaughtExceptionCount == other.uncaughtExceptionCount &&
+               exceptionDescription == other.exceptionDescription && hasDetailedStackTrace == other.hasDetailedStackTrace && eax == other.eax &&
+               ebx == other.ebx && ecx == other.ecx && edx == other.edx && esi == other.esi && edi == other.edi && ebp == other.ebp && esp == other.esp &&
+               eip == other.eip && eflags == other.eflags && cs == other.cs && ds == other.ds && ss == other.ss && es == other.es && fs == other.fs &&
+               gs == other.gs && exceptionType == other.exceptionType && isFatal == other.isFatal && additionalInfo == other.additionalInfo;
     }
 
-    [[nodiscard]] bool operator!=(const ENHANCED_EXCEPTION_INFO& other) const
-    {
-        return !(*this == other);
-    }
+    [[nodiscard]] bool operator!=(const ENHANCED_EXCEPTION_INFO& other) const { return !(*this == other); }
 };
 using PENHANCED_EXCEPTION_INFO = ENHANCED_EXCEPTION_INFO*;
 
@@ -276,7 +258,7 @@ extern "C"
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames,
-                                                                  std::vector<std::string>* pOutTrace);
+                                                                                std::vector<std::string>* pOutTrace);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableSehExceptionHandler();
 

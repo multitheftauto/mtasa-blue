@@ -20,11 +20,11 @@ template <>
 CLocalGUI* CSingleton<CLocalGUI>::m_pSingleton = NULL;
 
 #ifndef HIWORD
-    #define HIWORD(l)           ((WORD)((DWORD_PTR)(l) >> 16))
+    #define HIWORD(l) ((WORD)((DWORD_PTR)(l) >> 16))
 #endif
-#define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
+#define GET_WHEEL_DELTA_WPARAM(wParam) ((short)HIWORD(wParam))
 
-const char* const DEFAULT_SKIN_NAME = "Default 2023";            // TODO: Change to whatever the default skin is if it changes
+const char* const DEFAULT_SKIN_NAME = "Default 2023";  // TODO: Change to whatever the default skin is if it changes
 
 CLocalGUI::CLocalGUI()
 {
@@ -352,18 +352,20 @@ void CLocalGUI::DoPulse()
 void CLocalGUI::Draw()
 {
     // Get the game interface
-    CGame*       pGame = CCore::GetSingleton().GetGame();
-    SystemState  systemState = pGame->GetSystemState();
-    CGUI*        pGUI = CCore::GetSingleton().GetGUI();
+    CGame*      pGame = CCore::GetSingleton().GetGame();
+    SystemState systemState = pGame->GetSystemState();
+    CGUI*       pGUI = CCore::GetSingleton().GetGUI();
 
     // Update mainmenu stuff
     m_pMainMenu->Update();
 
     // If we're ingame, make sure the chatbox is drawn
-    bool bChatVisible = (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bChatVisible =
+        (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pChat->IsVisible() != bChatVisible)
         m_pChat->SetVisible(bChatVisible, !bChatVisible);
-    bool bDebugVisible = (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bDebugVisible =
+        (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pDebugView->IsVisible() != bDebugVisible)
         m_pDebugView->SetVisible(bDebugVisible, true);
 
@@ -885,13 +887,13 @@ DWORD CLocalGUI::TranslateScanCodeToGUIKey(DWORD dwCharacter)
         case VK_DELETE:
             return DIK_DELETE;
         case 0x56:
-            return DIK_V;            // V
+            return DIK_V;  // V
         case 0x43:
-            return DIK_C;            // C
+            return DIK_C;  // C
         case 0x58:
-            return DIK_X;            // X
+            return DIK_X;  // X
         case 0x41:
-            return DIK_A;            // A
+            return DIK_A;  // A
         default:
             return 0;
     }

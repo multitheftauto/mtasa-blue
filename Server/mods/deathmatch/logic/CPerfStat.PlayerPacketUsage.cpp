@@ -19,7 +19,7 @@ extern CNetServer* g_pRealNetServer;
 
 namespace
 {
-    #define TOP_COUNT (3)
+#define TOP_COUNT (3)
 
     struct CTopValue
     {
@@ -47,8 +47,8 @@ namespace
 
     struct CTimeSpan
     {
-        CTopSet acc;             // Accumulator for current period
-        CTopSet prev;            // Result for previous period
+        CTopSet acc;   // Accumulator for current period
+        CTopSet prev;  // Result for previous period
 
         void Pulse(CTimeSpan* above)
         {
@@ -62,10 +62,10 @@ namespace
     class CTimeSpanBlock
     {
     public:
-        CTimeSpan s5;             // 5 second period
-        CTimeSpan s60;            // 60
-        CTimeSpan m5;             // 300
-        CTimeSpan m60;            // 3600
+        CTimeSpan s5;   // 5 second period
+        CTimeSpan s60;  // 60
+        CTimeSpan m5;   // 300
+        CTimeSpan m60;  // 3600
 
         void Pulse1s(int flags)
         {
@@ -95,7 +95,7 @@ namespace
             }
         }
     };
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -200,13 +200,13 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse()
         int flags = 0;
         m_SecondCounter++;
 
-        if (m_SecondCounter % 5 == 0)            // 5 second
+        if (m_SecondCounter % 5 == 0)  // 5 second
             flags |= 1;
-        if (m_SecondCounter % 60 == 0)            // 60 seconds
+        if (m_SecondCounter % 60 == 0)  // 60 seconds
             flags |= 2;
-        if (m_SecondCounter % (5 * 60) == 0)            // 5 mins
+        if (m_SecondCounter % (5 * 60) == 0)  // 5 mins
             flags |= 4;
-        if (m_SecondCounter % (60 * 60) == 0)            // 60 mins
+        if (m_SecondCounter % (60 * 60) == 0)  // 60 mins
             flags |= 8;
 
         m_AllPlayerPacketUsage.Pulse1s(flags);

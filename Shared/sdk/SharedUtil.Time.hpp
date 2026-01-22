@@ -14,7 +14,7 @@
     #include "sys/time.h"
 #else
     #ifndef NOMINMAX
-    #define NOMINMAX
+        #define NOMINMAX
     #endif
     #include <windows.h>
 #endif
@@ -192,41 +192,41 @@ namespace SharedUtil
     public:
         CPerModuleTickCount()
         {
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
             m_TimeSinceUpdated.SetMaxIncrement(500);
-    #endif
+#endif
             m_ResultValue.Initialize(GetTickCount64_());
         }
 
         long long Get()
         {
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
             if (m_TimeSinceUpdated.Get() > 10000)
             {
                 m_TimeSinceUpdated.Reset();
                 OutputDebugLine("WARNING: UpdateModuleTickCount64 might not be called for the current module");
             }
-    #endif
+#endif
             return m_ResultValue.GetValue();
         }
 
         void Update()
         {
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
             m_TimeSinceUpdated.Reset();
-    #endif
+#endif
             m_ResultValue.SetValue(GetTickCount64_());
         }
 
     protected:
         CThreadResultValue<long long> m_ResultValue;
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
         CElapsedTime m_TimeSinceUpdated;
-    #endif
+#endif
     };
 
     CPerModuleTickCount ms_PerModuleTickCount;
-}            // namespace SharedUtil
+}  // namespace SharedUtil
 
 long long SharedUtil::GetModuleTickCount64()
 {
@@ -248,8 +248,8 @@ void SharedUtil::UpdateModuleTickCount64()
 //
 #if defined(__APPLE__)
 
-// Apple / Darwin platforms with Mach monotonic clock support
-#include <mach/mach_time.h>
+    // Apple / Darwin platforms with Mach monotonic clock support
+    #include <mach/mach_time.h>
 unsigned long GetTickCountInternal()
 {
     mach_timebase_info_data_t info;
@@ -271,7 +271,7 @@ unsigned long GetTickCountInternal()
 unsigned long GetTickCountInternal()
 {
     #if !defined(CLOCK_MONOTONIC)
-    #error "This platform does not have monotonic clock support."
+        #error "This platform does not have monotonic clock support."
     #endif
 
     /*
@@ -306,9 +306,9 @@ unsigned long GetTickCountInternal()
 
 #else
 
-// Win32 platforms
-#include <Mmsystem.h>
-#pragma comment(lib, "Winmm.lib")
+    // Win32 platforms
+    #include <Mmsystem.h>
+    #pragma comment(lib, "Winmm.lib")
 unsigned long GetTickCountInternal()
 {
     // Uses timeGetTime() as Win32 GetTickCount() has a resolution of 16ms.
@@ -340,7 +340,7 @@ TIMEUS SharedUtil::GetTimeUs()
     return llDuration & 0xffffffff;
 }
 #else
-#include <sys/time.h>                // for gettimeofday()
+    #include <sys/time.h>  // for gettimeofday()
 typedef long long LONGLONG;
 
 TIMEUS SharedUtil::GetTimeUs()
@@ -360,8 +360,8 @@ TIMEUS SharedUtil::GetTimeUs()
 
     // compute elapsed time in us
     LONGLONG llDuration;
-    llDuration = (t2.tv_sec - t1.tv_sec) * 1000000LL;            // sec to us
-    llDuration += (t2.tv_usec - t1.tv_usec);                     // us to us
+    llDuration = (t2.tv_sec - t1.tv_sec) * 1000000LL;  // sec to us
+    llDuration += (t2.tv_usec - t1.tv_usec);           // us to us
 
     return llDuration & 0xffffffff;
 }

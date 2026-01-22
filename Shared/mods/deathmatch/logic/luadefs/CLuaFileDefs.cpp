@@ -227,7 +227,7 @@ int CLuaFileDefs::fileOpen(lua_State* luaVM)
                 CheckCanAccessOtherResourceFile(argStream, pThisResource, pResource, strAbsPath, &bReadOnly);
                 if (!argStream.HasErrors())
                 {
-#ifndef MTA_CLIENT // IF SERVER
+#ifndef MTA_CLIENT  // IF SERVER
                     // Create the file to create
                     CScriptFile* pFile = new CScriptFile(pThisResource->GetScriptID(), strMetaPath, DEFAULT_MAX_FILESIZE);
 #else
@@ -313,7 +313,7 @@ int CLuaFileDefs::fileCreate(lua_State* luaVM)
             lua_pushboolean(luaVM, false);
             return 1;
         }
-#endif // MTA_CLIENT
+#endif  // MTA_CLIENT
 
         SString    strAbsPath;
         SString    strMetaPath;
@@ -765,7 +765,7 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        long lBytesWritten = 0;            // Total bytes written
+        long lBytesWritten = 0;  // Total bytes written
 
         // While we're not out of string arguments
         // (we will always have at least one string because we validated it above)
@@ -816,7 +816,7 @@ std::optional<std::string> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFi
     // string fileGetContents ( file target [, bool verifyContents = true ] )
 
     std::string buffer;
-    const long bytesRead = scriptFile->GetContents(buffer);
+    const long  bytesRead = scriptFile->GetContents(buffer);
 
     if (bytesRead == -2)
     {
@@ -951,7 +951,7 @@ std::optional<std::string> CLuaFileDefs::fileGetHash(lua_State* const luaVM, CSc
 
                 if (algorithm.empty() || !StringToEnum(algorithm, hmacAlgorithm))
                     throw std::invalid_argument("Invalid value for field 'algorithm'");
-                
+
                 switch (hmacAlgorithm)
                 {
                     case HmacAlgorithm::MD5:

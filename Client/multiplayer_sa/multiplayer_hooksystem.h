@@ -19,13 +19,12 @@ BOOL  HookInstall(DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize)
 BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
 VOID  HookCheckOriginalByte(DWORD dwInstallAddress, uchar ucExpectedValue);
 
-#define EZHookInstall(type) \
-    HookInstall( HOOKPOS_##type, (DWORD)HOOK_##type, HOOKSIZE_##type );
+#define EZHookInstall(type) HookInstall(HOOKPOS_##type, (DWORD)HOOK_##type, HOOKSIZE_##type);
 
 // Check original byte before hooking
 #define EZHookInstallChecked(type) \
-    HookCheckOriginalByte( HOOKPOS_##type, HOOKCHECK_##type ); \
-    EZHookInstall( type );
+    HookCheckOriginalByte(HOOKPOS_##type, HOOKCHECK_##type); \
+    EZHookInstall(type);
 
 #define EZHookInstallRestore(type) \
     __if_exists(RESTORE_Bytes_##type) \
@@ -35,7 +34,7 @@ VOID  HookCheckOriginalByte(DWORD dwInstallAddress, uchar ucExpectedValue);
         assert(sizeof(RESTORE_Bytes_##type) >= RESTORE_Size_##type); \
         MemCpyFast(RESTORE_Bytes_##type, (PVOID)RESTORE_Addr_##type, RESTORE_Size_##type); \
     } \
-    EZHookInstall( type );
+    EZHookInstall(type);
 
 // Structure for holding hook info
 struct SHookInfo
@@ -49,7 +48,7 @@ struct SHookInfo
     uint  uiSize;
 };
 
-#define MAKE_HOOK_INFO(type)  SHookInfo ( HOOKPOS_##type, HOOK_##type, HOOKSIZE_##type )
+#define MAKE_HOOK_INFO(type) SHookInfo(HOOKPOS_##type, HOOK_##type, HOOKSIZE_##type)
 
 // Structure for holding poke info
 struct SPokeInfo

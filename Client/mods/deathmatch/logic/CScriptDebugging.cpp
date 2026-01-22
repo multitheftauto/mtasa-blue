@@ -36,7 +36,7 @@ CScriptDebugging::~CScriptDebugging()
         if (m_flushTimerHandle != NULL)
         {
             // delete our flush timer
-            DeleteTimerQueueTimer(NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
+            DeleteTimerQueueTimer(NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE);  // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
         fclose(m_pLogFile);
         m_pLogFile = NULL;
@@ -71,7 +71,7 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
         if (m_flushTimerHandle != NULL)
         {
             // delete our flush timer
-            DeleteTimerQueueTimer(NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE);            // INVALID_HANDLE_VALUE = wait for running callbacks to finish
+            DeleteTimerQueueTimer(NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE);  // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
         fclose(m_pLogFile);
         m_pLogFile = NULL;
@@ -129,10 +129,10 @@ void CScriptDebugging::UpdateLogOutput()
         {
             PrintLog(line.strText);
         }
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
         if (!g_pCore->IsDebugVisible())
             return;
-    #endif
+#endif
         g_pCore->DebugEchoColor(line.strText, line.ucRed, line.ucGreen, line.ucBlue);
     }
 }

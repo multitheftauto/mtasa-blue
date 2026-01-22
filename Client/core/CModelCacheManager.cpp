@@ -25,7 +25,7 @@ namespace
         bool       bIsModelCachedHere;
         bool       bIsModelLoadedByGame;
     };
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -61,14 +61,14 @@ public:
     void SubModelRefCount(ushort usModelId);
 
 protected:
-    CGame*                            m_pGame{};
-    int                               m_iFrameCounter{};
-    CTickCount                        m_TickCountNow{};
-    bool                              m_bDonePreLoad{};
-    uint                              m_uiMaxCachedPedModels{};
-    bool                              m_IsUsingCustomPedCacheLimit{}; //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
-    uint                              m_uiMaxCachedVehicleModels{};
-    bool                              m_IsUsingCustomVehicleCacheLimit{}; //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
+    CGame*     m_pGame{};
+    int        m_iFrameCounter{};
+    CTickCount m_TickCountNow{};
+    bool       m_bDonePreLoad{};
+    uint       m_uiMaxCachedPedModels{};
+    bool       m_IsUsingCustomPedCacheLimit{};  //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
+    uint       m_uiMaxCachedVehicleModels{};
+    bool       m_IsUsingCustomVehicleCacheLimit{};  //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
     std::map<ushort, SModelCacheInfo> m_PedModelCacheInfoMap{};
     std::map<ushort, SModelCacheInfo> m_VehicleModelCacheInfoMap{};
 };
@@ -224,13 +224,16 @@ void CModelCacheManagerImpl::GetStats(SModelCacheStats& outStats)
 // Function to set custom limits, instead of calculating them automatically.
 // If the pointer is nullptr, the value is restored to the automatic one
 // otherwise it is set to whatever value the pointer points to
-// 
+//
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::SetCustomLimits(const size_t* numVehicles, const size_t* numPeds) {
-    if (m_IsUsingCustomPedCacheLimit = (numPeds != nullptr)) {
+void CModelCacheManagerImpl::SetCustomLimits(const size_t* numVehicles, const size_t* numPeds)
+{
+    if (m_IsUsingCustomPedCacheLimit = (numPeds != nullptr))
+    {
         m_uiMaxCachedPedModels = *numPeds;
     }
-    if (m_IsUsingCustomVehicleCacheLimit = (numVehicles != nullptr)) {
+    if (m_IsUsingCustomVehicleCacheLimit = (numVehicles != nullptr))
+    {
         m_uiMaxCachedVehicleModels = *numVehicles;
     }
 }
@@ -254,11 +257,13 @@ void CModelCacheManagerImpl::DoPulse()
     //  256MB streaming = 16+8 MB for peds & vehicles       72 peds + 56 veh
     //
     const auto iStreamingMemoryAvailableKB = *(int*)0x08A5A80;
-    if (!m_IsUsingCustomPedCacheLimit) {
-        SSamplePoint<float> pedPoints[] = { {65536, 9}, {98304, 18}, {131072, 36}, {262144, 72} };
+    if (!m_IsUsingCustomPedCacheLimit)
+    {
+        SSamplePoint<float> pedPoints[] = {{65536, 9}, {98304, 18}, {131072, 36}, {262144, 72}};
         m_uiMaxCachedPedModels = (int)EvalSamplePosition<float>(pedPoints, NUMELMS(pedPoints), (float)iStreamingMemoryAvailableKB);
     }
-    if (!m_IsUsingCustomVehicleCacheLimit) {
+    if (!m_IsUsingCustomVehicleCacheLimit)
+    {
         SSamplePoint<float> vehPoints[] = {{65536, 7}, {98304, 28}, {131072, 56}, {262144, 56}};
         m_uiMaxCachedVehicleModels = (int)EvalSamplePosition<float>(vehPoints, NUMELMS(vehPoints), (float)iStreamingMemoryAvailableKB);
     }
@@ -524,5 +529,5 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
                 OutputDebugLine(SString("[Cache] End caching model %d  (OnRestreamModel)", usModelId));
             }
         }
-    }   
+    }
 }

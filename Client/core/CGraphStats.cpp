@@ -20,7 +20,7 @@ namespace
         SColor              color;
         std::string         strName;
     };
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -115,7 +115,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
     std::uint32_t viewportWidth = pGraphics->GetViewportWidth();
-    std::uint32_t sizeX = viewportWidth / 4; // one quarter of screen width
+    std::uint32_t sizeX = viewportWidth / 4;  // one quarter of screen width
 
     // Start of next frame?
     if (szName[0] == 0)

@@ -17,8 +17,8 @@
 class CEntitySAInterface;
 
 // Flame shot array for flamethrower flames and maybe molotovs
-#define ARRAY_CFlameShotInfo                0xC89690
-#define MAX_FLAME_SHOT_INFOS                100
+#define ARRAY_CFlameShotInfo                 0xC89690
+#define MAX_FLAME_SHOT_INFOS                 100
 #define FUNC_CWeaponInfo_GetWeaponReloadTime 0x743D70
 
 class CFlameShotInfo
@@ -36,18 +36,18 @@ public:
 };
 static_assert(sizeof(CFlameShotInfo) == 0x2c, "Invalid size for CFlameShotInfo");
 
-class CWeaponInfoSAInterface            // 112 byte long class
+class CWeaponInfoSAInterface  // 112 byte long class
 {
 public:
-    eFireType m_eFireType;            // type - instant hit (e.g. pistol), projectile (e.g. rocket launcher), area effect (e.g. flame thrower)
+    eFireType m_eFireType;  // type - instant hit (e.g. pistol), projectile (e.g. rocket launcher), area effect (e.g. flame thrower)
 
-    float m_fTargetRange;            // max targeting range
-    float m_fWeaponRange;            // absolute gun range / default melee attack range
-    int   m_modelId;                 // modelinfo id
-    int   m_modelId2;                // second modelinfo id
+    float m_fTargetRange;  // max targeting range
+    float m_fWeaponRange;  // absolute gun range / default melee attack range
+    int   m_modelId;       // modelinfo id
+    int   m_modelId2;      // second modelinfo id
 
     eWeaponSlot m_nWeaponSlot;
-    int         m_nFlags;            // flags defining characteristics
+    int         m_nFlags;  // flags defining characteristics
 
     // instead of storing pointers directly to anims, use anim association groups
     // NOTE: this is used for stealth kill anims for melee weapons
@@ -56,39 +56,39 @@ public:
     //////////////////////////////////
     // Gun Data
     /////////////////////////////////
-    short   m_nAmmo;                    // ammo in one clip
-    short   m_nDamage;                  // damage inflicted per hit
-    CVector m_vecFireOffset;            // offset from weapon origin to projectile starting point
+    short   m_nAmmo;          // ammo in one clip
+    short   m_nDamage;        // damage inflicted per hit
+    CVector m_vecFireOffset;  // offset from weapon origin to projectile starting point
 
     // skill settings
-    eWeaponSkill m_SkillLevel;               // what's the skill level of this weapontype
-    int          m_nReqStatLevel;            // what stat level is required for this skill level
-    float        m_fAccuracy;                // modify accuracy of weapon
-    float        m_fMoveSpeed;               // how fast can move with weapon
+    eWeaponSkill m_SkillLevel;     // what's the skill level of this weapontype
+    int          m_nReqStatLevel;  // what stat level is required for this skill level
+    float        m_fAccuracy;      // modify accuracy of weapon
+    float        m_fMoveSpeed;     // how fast can move with weapon
 
     // anim timings
-    float m_animLoopStart;            // start of animation loop
-    float m_animLoopEnd;              // end of animation loop
-    float m_animFireTime;             // time in animation when weapon should be fired
+    float m_animLoopStart;  // start of animation loop
+    float m_animLoopEnd;    // end of animation loop
+    float m_animFireTime;   // time in animation when weapon should be fired
 
-    float m_anim2LoopStart;            // start of animation2 loop
-    float m_anim2LoopEnd;              // end of animation2 loop
-    float m_anim2FireTime;             // time in animation2 when weapon should be fired
+    float m_anim2LoopStart;  // start of animation2 loop
+    float m_anim2LoopEnd;    // end of animation2 loop
+    float m_anim2FireTime;   // time in animation2 when weapon should be fired
 
-    float m_animBreakoutTime;            // time after which player can break out of attack and run off
+    float m_animBreakoutTime;  // time after which player can break out of attack and run off
 
     // projectile/area effect specific info
-    float m_fSpeed;               // speed of projectile
-    float m_fRadius;              // radius affected
-    float m_fLifeSpan;            // time taken for shot to dissipate
-    float m_fSpread;              // angle inside which shots are created
+    float m_fSpeed;     // speed of projectile
+    float m_fRadius;    // radius affected
+    float m_fLifeSpan;  // time taken for shot to dissipate
+    float m_fSpread;    // angle inside which shots are created
 
-    short m_nAimOffsetIndex;            // index into array of aiming offsets
+    short m_nAimOffsetIndex;  // index into array of aiming offsets
     //////////////////////////////////
     // Melee Data
     /////////////////////////////////
-    BYTE m_defaultCombo;                // base combo for this melee weapon
-    BYTE m_nCombosAvailable;            // how many further combos are available
+    BYTE m_defaultCombo;      // base combo for this melee weapon
+    BYTE m_nCombosAvailable;  // how many further combos are available
 
     int GetWeaponReloadTime() { return ((int(__thiscall*)(CWeaponInfoSAInterface*))FUNC_CWeaponInfo_GetWeaponReloadTime)(this); }
 };

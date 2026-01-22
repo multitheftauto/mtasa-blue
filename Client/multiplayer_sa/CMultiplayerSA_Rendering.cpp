@@ -9,14 +9,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-extern CCoreInterface*   g_pCore;
-GameEntityRenderHandler* pGameEntityRenderHandler = nullptr;
-PreRenderSkyHandler*     pPreRenderSkyHandlerHandler = nullptr;
-RenderHeliLightHandler*  pRenderHeliLightHandler = nullptr;
-RenderEverythingBarRoadsHandler*  pRenderEverythingBarRoadsHandler = nullptr;
+extern CCoreInterface*           g_pCore;
+GameEntityRenderHandler*         pGameEntityRenderHandler = nullptr;
+PreRenderSkyHandler*             pPreRenderSkyHandlerHandler = nullptr;
+RenderHeliLightHandler*          pRenderHeliLightHandler = nullptr;
+RenderEverythingBarRoadsHandler* pRenderEverythingBarRoadsHandler = nullptr;
 
-#define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
-#define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
+#define VAR_CCullZones_NumMirrorAttributeZones 0x0C87AC4  // int
+#define VAR_CMirrors_d3dRestored               0x0C7C729  // uchar
 
 namespace
 {
@@ -24,7 +24,7 @@ namespace
     CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
     bool                ms_bIsMinimizedAndNotConnected = false;
     int                 ms_iSavedNumMirrorZones = 0;
-}            // namespace
+}  // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -44,10 +44,10 @@ void OnMY_CallIdle_Post(RwGeometry* pGeometry, DWORD calledFrom)
 }
 
 // Hook info
-#define HOOKPOS_CallIdle                         0x53ECBD
-#define HOOKSIZE_CallIdle                        5
-DWORD RETURN_CallIdle = 0x53ECC2;
-DWORD DO_CallIdle = 0x53E920;
+#define HOOKPOS_CallIdle  0x53ECBD
+#define HOOKSIZE_CallIdle 5
+DWORD                 RETURN_CallIdle = 0x53ECC2;
+DWORD                 DO_CallIdle = 0x53E920;
 void _declspec(naked) HOOK_CallIdle()
 {
     // clang-format off
@@ -108,14 +108,14 @@ void OnMY_CEntity_Render_Post()
     if (ms_Rendering)
     {
         ms_Rendering = NULL;
-        CallGameEntityRenderHandler(ms_RenderingOneNonRoad);            // restore value set in RenderOneNonRoad
+        CallGameEntityRenderHandler(ms_RenderingOneNonRoad);  // restore value set in RenderOneNonRoad
     }
 }
 
 // Hook info
-#define HOOKPOS_CEntity_Render                         0x534310
-#define HOOKSIZE_CEntity_Render                        6
-DWORD RETURN_CEntity_Render = 0x534317;
+#define HOOKPOS_CEntity_Render  0x534310
+#define HOOKSIZE_CEntity_Render 6
+DWORD                 RETURN_CEntity_Render = 0x534317;
 void _declspec(naked) HOOK_CEntity_Render()
 {
     // clang-format off
@@ -168,9 +168,9 @@ void OnMY_CEntity_RenderOneNonRoad_Post(CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntity_RenderOneNonRoad                         0x553260
-#define HOOKSIZE_CEntity_RenderOneNonRoad                        5
-DWORD RETURN_CEntity_RenderOneNonRoad = 0x553265;
+#define HOOKPOS_CEntity_RenderOneNonRoad  0x553260
+#define HOOKSIZE_CEntity_RenderOneNonRoad 5
+DWORD                 RETURN_CEntity_RenderOneNonRoad = 0x553265;
 void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
 {
     // clang-format off
@@ -217,9 +217,9 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(CPedSAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid                0x733080
-#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid               6
-DWORD RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid  0x733080
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid 6
+DWORD                 RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
 void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
 {
     // clang-format off
@@ -251,8 +251,8 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 }
 
 // Hook info
-#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_End                0x73314D
-#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End               5
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_End  0x73314D
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End 5
 void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 {
     // clang-format off
@@ -278,9 +278,9 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_Check_NoOfVisibleLods                         0x5534F9
-#define HOOKSIZE_Check_NoOfVisibleLods                        6
-DWORD RETURN_Check_NoOfVisibleLods = 0x5534FF;
+#define HOOKPOS_Check_NoOfVisibleLods  0x5534F9
+#define HOOKSIZE_Check_NoOfVisibleLods 6
+DWORD                 RETURN_Check_NoOfVisibleLods = 0x5534FF;
 void _declspec(naked) HOOK_Check_NoOfVisibleLods()
 {
     // clang-format off
@@ -304,9 +304,9 @@ limit:
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_Check_NoOfVisibleEntities                         0x55352D
-#define HOOKSIZE_Check_NoOfVisibleEntities                        6
-DWORD RETURN_Check_NoOfVisibleEntities = 0x553533;
+#define HOOKPOS_Check_NoOfVisibleEntities  0x55352D
+#define HOOKSIZE_Check_NoOfVisibleEntities 6
+DWORD                 RETURN_Check_NoOfVisibleEntities = 0x553533;
 void _declspec(naked) HOOK_Check_NoOfVisibleEntities()
 {
     // clang-format off
@@ -334,9 +334,9 @@ void OnMY_WinLoop()
 }
 
 // Hook info
-#define HOOKPOS_WinLoop                            0x748A93
-#define HOOKSIZE_WinLoop                           5
-DWORD RETURN_WinLoop = 0x748A98;
+#define HOOKPOS_WinLoop  0x748A93
+#define HOOKSIZE_WinLoop 5
+DWORD                 RETURN_WinLoop = 0x748A98;
 void _declspec(naked) HOOK_WinLoop()
 {
     // clang-format off
@@ -359,9 +359,9 @@ void _declspec(naked) HOOK_WinLoop()
 // Just before GTA calculates frame time deltas
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTimer_Update               0x561B10
-#define HOOKSIZE_CTimer_Update              6
-static const DWORD CONTINUE_CTimer_Update = 0x561B16;
+#define HOOKPOS_CTimer_Update  0x561B10
+#define HOOKSIZE_CTimer_Update 6
+static const DWORD           CONTINUE_CTimer_Update = 0x561B16;
 static void _declspec(naked) HOOK_CTimer_Update()
 {
     // clang-format off
@@ -392,9 +392,9 @@ static void _declspec(naked) HOOK_CTimer_Update()
 // Prevent crashes if _timerFunction is NULL during init
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTimer_Suspend              0x5619E9
-#define HOOKSIZE_CTimer_Suspend             6
-static const DWORD CONTINUE_CTimer_Suspend = 0x5619EF;
+#define HOOKPOS_CTimer_Suspend  0x5619E9
+#define HOOKSIZE_CTimer_Suspend 6
+static const DWORD           CONTINUE_CTimer_Suspend = 0x5619EF;
 static void _declspec(naked) HOOK_CTimer_Suspend()
 {
     // clang-format off
@@ -418,9 +418,9 @@ static void _declspec(naked) HOOK_CTimer_Suspend()
     // clang-format on
 }
 
-#define HOOKPOS_CTimer_Resume               0x561A11
-#define HOOKSIZE_CTimer_Resume              6
-static const DWORD CONTINUE_CTimer_Resume = 0x561A17;
+#define HOOKPOS_CTimer_Resume  0x561A11
+#define HOOKSIZE_CTimer_Resume 6
+static const DWORD           CONTINUE_CTimer_Resume = 0x561A17;
 static void _declspec(naked) HOOK_CTimer_Resume()
 {
     // clang-format off
@@ -478,10 +478,10 @@ bool OnMY_psGrabScreen_ShouldUseRect()
 }
 
 // Hook info
-#define HOOKPOS_psGrabScreen                        0x7452FC
-#define HOOKSIZE_psGrabScreen                       5
-DWORD RETURN_psGrabScreen_YesChange = 0x745311;
-DWORD RETURN_psGrabScreen_NoChange = 0x745336;
+#define HOOKPOS_psGrabScreen  0x7452FC
+#define HOOKSIZE_psGrabScreen 5
+DWORD                 RETURN_psGrabScreen_YesChange = 0x745311;
+DWORD                 RETURN_psGrabScreen_NoChange = 0x745336;
 void _declspec(naked) HOOK_psGrabScreen()
 {
     // clang-format off
@@ -524,10 +524,10 @@ void OnMY_CClouds_RenderSkyPolys()
 }
 
 // Hook info
-#define HOOKCHECK_CClouds_RenderSkyPolys            0xA1
-#define HOOKPOS_CClouds_RenderSkyPolys              0x714650
-#define HOOKSIZE_CClouds_RenderSkyPolys             5
-DWORD RETURN_CClouds_RenderSkyPolys = 0x714655;
+#define HOOKCHECK_CClouds_RenderSkyPolys 0xA1
+#define HOOKPOS_CClouds_RenderSkyPolys   0x714650
+#define HOOKSIZE_CClouds_RenderSkyPolys  5
+DWORD                 RETURN_CClouds_RenderSkyPolys = 0x714655;
 void _declspec(naked) HOOK_CClouds_RenderSkyPolys()
 {
     // clang-format off
@@ -581,10 +581,10 @@ float OnMY_RwCameraSetNearClipPlane(DWORD dwCalledFrom, void* pUnknown, float fD
 }
 
 // Hook info
-#define HOOKCHECK_RwCameraSetNearClipPlane          0xD9
-#define HOOKPOS_RwCameraSetNearClipPlane            0x7EE1D0
-#define HOOKSIZE_RwCameraSetNearClipPlane           5
-DWORD RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
+#define HOOKCHECK_RwCameraSetNearClipPlane 0xD9
+#define HOOKPOS_RwCameraSetNearClipPlane   0x7EE1D0
+#define HOOKSIZE_RwCameraSetNearClipPlane  5
+DWORD                 RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
 void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
     // clang-format off
@@ -615,9 +615,9 @@ void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_RenderEffects_HeliLight                           0x53E1B9
-#define HOOKSIZE_RenderEffects_HeliLight                          5
-DWORD RETURN_RenderEffects_HeliLight = 0x53E1BE;
+#define HOOKPOS_RenderEffects_HeliLight  0x53E1B9
+#define HOOKSIZE_RenderEffects_HeliLight 5
+DWORD                 RETURN_RenderEffects_HeliLight = 0x53E1BE;
 void _declspec(naked) HOOK_RenderEffects_HeliLight()
 {
     // clang-format off
@@ -741,34 +741,29 @@ bool IsMatrixValid(RwMatrix* pMatrix)
     constexpr float maxValue = 100000.0;
     constexpr float minValue = -100000.0;
 
-    return
-        pMatrix->at.x >= minValue && pMatrix->at.x <= maxValue
-        && pMatrix->at.y >= minValue && pMatrix->at.y <= maxValue
-        && pMatrix->at.z >= minValue && pMatrix->at.y <= maxValue
+    return pMatrix->at.x >= minValue && pMatrix->at.x <= maxValue && pMatrix->at.y >= minValue && pMatrix->at.y <= maxValue && pMatrix->at.z >= minValue &&
+           pMatrix->at.y <= maxValue
 
-        && pMatrix->right.x >= minValue && pMatrix->right.x <= maxValue
-        && pMatrix->right.y >= minValue && pMatrix->right.y <= maxValue
-        && pMatrix->right.z >= minValue && pMatrix->right.y <= maxValue
+           && pMatrix->right.x >= minValue && pMatrix->right.x <= maxValue && pMatrix->right.y >= minValue && pMatrix->right.y <= maxValue &&
+           pMatrix->right.z >= minValue && pMatrix->right.y <= maxValue
 
-        && pMatrix->up.x >= minValue && pMatrix->up.x <= maxValue
-        && pMatrix->up.y >= minValue && pMatrix->up.y <= maxValue
-        && pMatrix->up.z >= minValue && pMatrix->up.y <= maxValue
+           && pMatrix->up.x >= minValue && pMatrix->up.x <= maxValue && pMatrix->up.y >= minValue && pMatrix->up.y <= maxValue && pMatrix->up.z >= minValue &&
+           pMatrix->up.y <= maxValue
 
-        && pMatrix->pos.x >= minValue && pMatrix->pos.x <= maxValue
-        && pMatrix->pos.y >= minValue && pMatrix->pos.y <= maxValue
-        && pMatrix->pos.z >= minValue && pMatrix->pos.y <= maxValue;
+           && pMatrix->pos.x >= minValue && pMatrix->pos.x <= maxValue && pMatrix->pos.y >= minValue && pMatrix->pos.y <= maxValue &&
+           pMatrix->pos.z >= minValue && pMatrix->pos.y <= maxValue;
 }
 
 bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
 {
-    uint32 atomicSkinOffset = *(uint32*)0xC978A4;
+    uint32            atomicSkinOffset = *(uint32*)0xC978A4;
     RpHAnimHierarchy* pSkinPluginData = *(RpHAnimHierarchy**)((char*)pAtomic + atomicSkinOffset);
 
     if (!pSkinPluginData)
         return true;
 
     unsigned __int32 count = pSkinPluginData->numNodes;
-    RwMatrix* pMatrixArray = pSkinPluginData->pMatrixArray;
+    RwMatrix*        pMatrixArray = pSkinPluginData->pMatrixArray;
 
     for (unsigned int i = 0; i < count; i++)
     {
@@ -779,8 +774,8 @@ bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
     return true;
 }
 
-#define HOOKPOS_CVisibilityPlugins_RenderPedCB                        0x7335B0
-#define HOOKSIZE_CVisibilityPlugins_RenderPedCB                       5
+#define HOOKPOS_CVisibilityPlugins_RenderPedCB  0x7335B0
+#define HOOKSIZE_CVisibilityPlugins_RenderPedCB 5
 void _declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 {
     // clang-format off
@@ -809,10 +804,10 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 }
 
 // Hook info
-#define HOOKPOS_CRenderer_EverythingBarRoads                         0x553C78
-#define HOOKSIZE_CRenderer_EverythingBarRoads                        5
-DWORD RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
-DWORD DO_CRenderer_EverythingBarRoads = 0x7EE180;
+#define HOOKPOS_CRenderer_EverythingBarRoads  0x553C78
+#define HOOKSIZE_CRenderer_EverythingBarRoads 5
+DWORD                 RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
+DWORD                 DO_CRenderer_EverythingBarRoads = 0x7EE180;
 void _declspec(naked) HOOK_CRenderer_EverythingBarRoads()
 {
     // clang-format off
@@ -822,8 +817,7 @@ void _declspec(naked) HOOK_CRenderer_EverythingBarRoads()
     }
     // clang-format on
 
-    if (pRenderEverythingBarRoadsHandler)
-        pRenderEverythingBarRoadsHandler();
+    if (pRenderEverythingBarRoadsHandler) pRenderEverythingBarRoadsHandler();
 
     // clang-format off
     __asm

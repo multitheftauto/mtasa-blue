@@ -28,15 +28,15 @@ extern CGameSA*        pGame;
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
-std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                               CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, unsigned short>                                      CModelInfoSA::ms_ModelDefaultFlagsMap;
+std::map<DWORD, BYTE>                                                CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::map<DWORD, CTimeInfoSAInterface>                                 CModelInfoSA::ms_ModelDefaultModelTimeInfo;
-std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
-std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
-std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::map<DWORD, CTimeInfoSAInterface>                                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
+std::unordered_map<DWORD, unsigned short>                            CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                   CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_DefaultTxdIDMap;
 
 void CModelInfoSA::ClearModelDefaults(DWORD modelId)
 {
@@ -459,7 +459,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
-        // clang-format off
+    // clang-format off
         __asm
         {
             push    eax
@@ -482,7 +482,7 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     ebx
             pop     eax
         }
-        // clang-format on
+    // clang-format on
     return (char*)dwReturn;
 }
 
@@ -694,8 +694,8 @@ void CModelInfoSA::SetFlags(unsigned short usFlags)
         MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
 
     // Don't change bIsColLoaded flag
-    usFlags &= 0xFF7F;                                  // Disable flag in input
-    usFlags |= m_pInterface->usFlags & 0x80;            // Apply current bIsColLoaded flag
+    usFlags &= 0xFF7F;                        // Disable flag in input
+    usFlags |= m_pInterface->usFlags & 0x80;  // Apply current bIsColLoaded flag
 
     m_pInterface->usFlags = usFlags;
 }
@@ -715,7 +715,7 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
 
     // Default value is 0xC0 (bIsColLoaded + bIsBackfaceCulled)
     // But bIsColLoaded should not be changed
-    m_pInterface->usFlags &= 0x80;            // Reset all flags except bIsColLoaded
+    m_pInterface->usFlags &= 0x80;  // Reset all flags except bIsColLoaded
     m_pInterface->bIsBackfaceCulled = true;
 
     // setBaseModelInfoFlags
@@ -1188,7 +1188,7 @@ void CModelInfoSA::StaticResetModelTimes()
 {
     for (auto it = ms_ModelDefaultModelTimeInfo.begin(); it != ms_ModelDefaultModelTimeInfo.end();)
     {
-        const DWORD modelId = it->first;
+        const DWORD                modelId = it->first;
         CBaseModelInfoSAInterface* pInterface = ppModelInfo[modelId];
         if (!IsValidModelInfoPtr(pInterface))
         {
@@ -1202,7 +1202,7 @@ void CModelInfoSA::StaticResetModelTimes()
             it = ms_ModelDefaultModelTimeInfo.erase(it);
             continue;
         }
-        const eModelInfoType modelType = ((eModelInfoType(*)())funcAddr)();
+        const eModelInfoType modelType = ((eModelInfoType (*)())funcAddr)();
         if (modelType != eModelInfoType::TIME)
         {
             it = ms_ModelDefaultModelTimeInfo.erase(it);
@@ -1330,7 +1330,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     // In other words, it does not affect elements created by MTA.
     // It's mostly a reimplementation of SA's DeleteAllRwObjects, except that it filters by model ID.
 
-    reinterpret_cast<void(*)()>(FUNC_FlushRequestList)();
+    reinterpret_cast<void (*)()>(FUNC_FlushRequestList)();
 
     std::unordered_set<unsigned short> processedTxdIDs;
     std::unordered_set<unsigned short> pendingTxdIDs;
@@ -1344,16 +1344,18 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     constexpr int kRepeatSectorStride = 3;  // StreamRepeatSectors uses stride of 3, we access element [2]
 
     // Helper to validate entity vtable - checks if DeleteRwObject points to expected address
-    auto isValidEntity = [](CEntitySAInterface* pEntity) -> bool {
+    auto isValidEntity = [](CEntitySAInterface* pEntity) -> bool
+    {
         constexpr std::size_t kDeleteRwObjectVtblOffset = 8;
         constexpr std::size_t kExpectedDeleteRwObject = 0x00534030;
-        auto* vtbl = static_cast<std::size_t*>(pEntity->GetVTBL());
+        auto*                 vtbl = static_cast<std::size_t*>(pEntity->GetVTBL());
         return vtbl[kDeleteRwObjectVtblOffset] == kExpectedDeleteRwObject;
     };
 
     // Process entities from a sector list
     // Note: validateVtable should be true for StreamSectors but false for StreamRepeatSectors
-    auto processSectorList = [&](DWORD* pSectorEntry, bool validateVtable, int sectorIndex) {
+    auto processSectorList = [&](DWORD* pSectorEntry, bool validateVtable, int sectorIndex)
+    {
         while (pSectorEntry)
         {
             auto* pEntity = reinterpret_cast<CEntitySAInterface*>(pSectorEntry[0]);
@@ -1366,10 +1368,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             // Vtable validation for StreamSectors
             if (validateVtable && !isValidEntity(pEntity))
             {
-                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n",
-                    pEntity, pEntity->m_nModelIndex,
-                    sectorIndex / 2 % NUM_StreamSectorRows, sectorIndex / 2 / NUM_StreamSectorCols));
-                    pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
+                                          sectorIndex / 2 % NUM_StreamSectorRows, sectorIndex / 2 / NUM_StreamSectorCols));
+                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
                 continue;
             }
 
@@ -1434,9 +1435,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     // Increment retry counter ONLY for pending TXD IDs (entities being rendered)
     // Don't increment for: unprocessed (will be erased below)
     // Note: processedTxdIDs that are also in pendingTxdIDs stay in map and need counter incremented
-    constexpr int kMaxRetryFrames = 300;  // ~5 seconds at 60fps
+    constexpr int                      kMaxRetryFrames = 300;  // ~5 seconds at 60fps
     std::unordered_set<unsigned short> timedOutTxdIDs;
-    for (auto it = ms_RestreamTxdIDMap.begin(); it != ms_RestreamTxdIDMap.end(); )
+    for (auto it = ms_RestreamTxdIDMap.begin(); it != ms_RestreamTxdIDMap.end();)
     {
         // Skip if unprocessed - those will be erased below after model unload attempt
         if (unprocessedTxdIDs.count(it->first))
@@ -1490,7 +1491,8 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     {
         const auto maxModelId = static_cast<DWORD>(pGame->GetBaseIDforTXD());
 
-        auto tryQueueModelUnload = [&](DWORD modelId) {
+        auto tryQueueModelUnload = [&](DWORD modelId)
+        {
             auto* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(modelId);
             if (!pStreamingInfo || pStreamingInfo->loadState == eModelLoadState::LOADSTATE_NOT_LOADED)
                 return;
@@ -1585,7 +1587,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         CBaseModelInfoSAInterface* pInterface = GetInterface();
         if (pInterface && pInterface->usNumberOfRefs > 1)
         {
-            DWORD                      dwFunction = FUNC_RemoveRef;
+            DWORD dwFunction = FUNC_RemoveRef;
             // clang-format off
             __asm
             {
@@ -1728,10 +1730,8 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
     }
     // clang-format on
 
-    if (szText)
-        strncpy(szStoredText, szText, 8);
-    else
-        szStoredText[0] = '\0';
+    if (szText) strncpy(szStoredText, szText, 8);
+    else szStoredText[0] = '\0';
 }
 
 unsigned int CModelInfoSA::GetNumRemaps()
@@ -1970,7 +1970,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
-        return;            // Early out in case the model doesn't have any dummies modified
+        return;  // Early out in case the model doesn't have any dummies modified
 
     auto* pVehicleModel = static_cast<CVehicleModelInfoSAInterface*>(GetInterface());
     if (!pVehicleModel || !pVehicleModel->pVisualInfo)
@@ -2739,8 +2739,8 @@ void CModelInfoSA::DeallocateModel()
     // Block deletion while refs > 0 to avoid null pointer crash.
     if (pInterfaceToDelete->usNumberOfRefs > 0)
     {
-        AddReportLog(5550, SString("Blocked DeallocateModel for model %u with %u active refs to prevent crash at 0x4C4BB0",
-                    m_dwModelID, static_cast<unsigned int>(pInterfaceToDelete->usNumberOfRefs)));
+        AddReportLog(5550, SString("Blocked DeallocateModel for model %u with %u active refs to prevent crash at 0x4C4BB0", m_dwModelID,
+                                   static_cast<unsigned int>(pInterfaceToDelete->usNumberOfRefs)));
 
         m_pInterface = pInterfaceToDelete;
 
@@ -2768,12 +2768,12 @@ void CModelInfoSA::DeallocateModel()
 
     // Capture model type and damageability BEFORE nulling the array entry.
     eModelInfoType modelType = eModelInfoType::UNKNOWN;
-    bool isDamageableAtomic = false;
+    bool           isDamageableAtomic = false;
     if (pInterfaceToDelete->VFTBL)
     {
         DWORD typeFunc = pInterfaceToDelete->VFTBL->GetModelType;
         if (IsValidGtaSaCodePtr(typeFunc))
-            modelType = ((eModelInfoType(*)())typeFunc)();
+            modelType = ((eModelInfoType (*)())typeFunc)();
 
         if (modelType == eModelInfoType::ATOMIC || modelType == eModelInfoType::LOD_ATOMIC)
         {
@@ -2840,8 +2840,7 @@ void CModelInfoSA::DeallocateModel()
             delete reinterpret_cast<CTimeModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         default:
-            AddReportLog(5551, SString("Unknown model type %d for model %u - memory leaked to prevent corruption",
-                                       static_cast<int>(modelType), m_dwModelID));
+            AddReportLog(5551, SString("Unknown model type %d for model %u - memory leaked to prevent corruption", static_cast<int>(modelType), m_dwModelID));
             return;
     }
 
@@ -2873,9 +2872,9 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 }
 
 // Hook info
-#define HOOKPOS_NodeNameStreamRead                         0x072FA68
-#define HOOKSIZE_NodeNameStreamRead                        15
-DWORD RETURN_NodeNameStreamRead = 0x072FA77;
+#define HOOKPOS_NodeNameStreamRead  0x072FA68
+#define HOOKSIZE_NodeNameStreamRead 15
+DWORD                        RETURN_NodeNameStreamRead = 0x072FA77;
 static void _declspec(naked) HOOK_NodeNameStreamRead()
 {
     // clang-format off
@@ -3089,7 +3088,7 @@ eModelInfoType CModelInfoSA::GetModelType()
     if (!IsValidGtaSaCodePtr(funcAddr))
         return eModelInfoType::UNKNOWN;
 
-    return ((eModelInfoType(*)())funcAddr)();
+    return ((eModelInfoType (*)())funcAddr)();
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)

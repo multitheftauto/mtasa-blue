@@ -23,9 +23,9 @@
 #include <ehs/ehs.h>
 #include <time.h>
 
-#define MAX_AUTHOR_LENGTH           255
-#define MAX_RESOURCE_NAME_LENGTH    255
-#define MAX_FUNCTION_NAME_LENGTH    50
+#define MAX_AUTHOR_LENGTH        255
+#define MAX_RESOURCE_NAME_LENGTH 255
+#define MAX_FUNCTION_NAME_LENGTH 50
 
 class CDummy;
 class CElement;
@@ -84,8 +84,8 @@ private:
     SVersion          m_MaxVersion;
     bool              m_bExists;
     bool              m_bBadVersion;
-    CResource*        m_pResource;            // the resource this links to
-    CResource*        m_pOwner;               // the resource this is inside
+    CResource*        m_pResource;  // the resource this links to
+    CResource*        m_pOwner;     // the resource this is inside
     CResourceManager* m_pResourceManager;
 
 public:
@@ -125,10 +125,10 @@ public:
 enum class EResourceState : unsigned char
 {
     None,
-    Loaded,              // its been loaded successfully (i.e. meta parsed ok), included resources loaded ok
-    Starting,            // the resource is starting
-    Running,             // resource items are running
-    Stopping,            // the resource is stopping
+    Loaded,    // its been loaded successfully (i.e. meta parsed ok), included resources loaded ok
+    Starting,  // the resource is starting
+    Running,   // resource items are running
+    Stopping,  // the resource is stopping
 };
 
 // A resource is either a directory with files or a ZIP file which contains the content of such directory.
@@ -250,11 +250,11 @@ public:
     bool CheckIfStartable();
     void DisplayInfo();
 
-    bool                        GetFilePath(const char* szFilename, std::string& strPath);
-    std::vector<std::string>    GetFilePaths(const char* szFilename);
+    bool                     GetFilePath(const char* szFilename, std::string& strPath);
+    std::vector<std::string> GetFilePaths(const char* szFilename);
 
-    const std::string&          GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
-    const std::string&          GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
+    const std::string& GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
+    const std::string& GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
 
     std::list<CResourceFile*>& GetFiles() { return m_ResourceFiles; }
     size_t                     GetFileCount() const noexcept { return m_ResourceFiles.size(); }
@@ -347,7 +347,7 @@ protected:
     bool FindAclRequest(SAclRequest& request);
 
 private:
-    bool CheckState();            // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
+    bool CheckState();  // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
     bool ReadIncludedResources(CXMLNode* pRoot);
     bool ReadIncludedMaps(CXMLNode* pRoot);
     bool ReadIncludedScripts(CXMLNode* pRoot);
@@ -374,15 +374,15 @@ private:
     CResourceManager* m_pResourceManager;
 
     SString     m_strResourceName;
-    SString     m_strAbsPath;                          // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
-    std::string m_strResourceZip;                      // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
-    std::string m_strResourceDirectoryPath;            // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
-    std::string m_strResourceCachePath;            // Absolute path to unzipped cache (if a zip)   i.e. /server/mods/deathmatch/resources/cache/resource_name
+    SString     m_strAbsPath;                // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
+    std::string m_strResourceZip;            // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
+    std::string m_strResourceDirectoryPath;  // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
+    std::string m_strResourceCachePath;      // Absolute path to unzipped cache (if a zip)   i.e. /server/mods/deathmatch/resources/cache/resource_name
 
     unsigned int m_uiVersionMajor = 0;
     unsigned int m_uiVersionMinor = 0;
     unsigned int m_uiVersionRevision = 0;
-    unsigned int m_uiVersionState = 2;            // 2 = release
+    unsigned int m_uiVersionState = 2;  // 2 = release
 
     int m_iDownloadPriorityGroup = 0;
 
@@ -392,16 +392,16 @@ private:
     CElement*      m_pRootElement = nullptr;
     CDummy*        m_pResourceElement = nullptr;
     CDummy*        m_pResourceDynamicElementRoot = nullptr;
-    CElementGroup* m_pDefaultElementGroup = nullptr;            // stores elements created by scripts in this resource
+    CElementGroup* m_pDefaultElementGroup = nullptr;  // stores elements created by scripts in this resource
     CLuaMain*      m_pVM = nullptr;
 
     KeyValueMap                    m_Info;
-    std::list<CIncludedResources*> m_IncludedResources;            // we store them here temporarily, then read them once all the resources are loaded
+    std::list<CIncludedResources*> m_IncludedResources;  // we store them here temporarily, then read them once all the resources are loaded
     std::list<CResourceFile*>      m_ResourceFiles;
     std::map<std::string, int>     m_ResourceFilesCountPerDir;
-    std::list<CResource*>          m_Dependents;            // resources that have "included" or loaded this one
+    std::list<CResource*>          m_Dependents;  // resources that have "included" or loaded this one
     std::list<CExportedFunction>   m_ExportedFunctions;
-    std::list<CResource*>          m_TemporaryIncludes;            // started by startResource script command
+    std::list<CResource*>          m_TemporaryIncludes;  // started by startResource script command
 
     int         m_httpRouterCheck{};
     std::string m_httpRouterFunction;
@@ -427,23 +427,23 @@ private:
     bool m_bUsingDbConnectMysql = false;
 
     bool m_bOOPEnabledInMetaXml = false;
-    bool m_bLinked = false;                  // if true, the included resources are already linked to this resource
-    bool m_bIsPersistent = false;            // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
+    bool m_bLinked = false;        // if true, the included resources are already linked to this resource
+    bool m_bIsPersistent = false;  // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
     bool m_bDestroyed = false;
 
-    CXMLNode* m_pNodeSettings = nullptr;            // Settings XML node, read from meta.xml and copied into it's own instance
-    CXMLNode* m_pNodeStorage = nullptr;             // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
+    CXMLNode* m_pNodeSettings = nullptr;  // Settings XML node, read from meta.xml and copied into it's own instance
+    CXMLNode* m_pNodeStorage = nullptr;   // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
 
-    CMtaVersion m_strMinClientRequirement;              // Min MTA client version
-    CMtaVersion m_strMinServerRequirement;              // Min MTA server version
-    CMtaVersion m_strMinClientFromMetaXml;              // Min MTA client version as declared in meta.xml
-    CMtaVersion m_strMinServerFromMetaXml;              // Min MTA server version as declared in meta.xml
-    CMtaVersion m_strMinClientReqFromSource;            // Min MTA client version as calculated by scanning the script source
-    CMtaVersion m_strMinServerReqFromSource;            // Min MTA server version as calculated by scanning the script source
+    CMtaVersion m_strMinClientRequirement;    // Min MTA client version
+    CMtaVersion m_strMinServerRequirement;    // Min MTA server version
+    CMtaVersion m_strMinClientFromMetaXml;    // Min MTA client version as declared in meta.xml
+    CMtaVersion m_strMinServerFromMetaXml;    // Min MTA server version as declared in meta.xml
+    CMtaVersion m_strMinClientReqFromSource;  // Min MTA client version as calculated by scanning the script source
+    CMtaVersion m_strMinServerReqFromSource;  // Min MTA server version as calculated by scanning the script source
     SString     m_strMinClientReason;
     SString     m_strMinServerReason;
 
-    CChecksum m_metaChecksum;            // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
+    CChecksum m_metaChecksum;  // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
 
     uint                              m_uiFunctionRightCacheRevision = 0;
     CFastHashMap<lua_CFunction, bool> m_FunctionRightCacheMap;

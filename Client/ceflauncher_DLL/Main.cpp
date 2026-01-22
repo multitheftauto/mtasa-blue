@@ -26,27 +26,27 @@
 #include "SharedUtil.h"
 
 #ifdef CEF_ENABLE_SANDBOX
-#include <cef3/cef/include/cef_sandbox_win.h>
-#pragma comment(lib, "cef_sandbox.lib")
+    #include <cef3/cef/include/cef_sandbox_win.h>
+    #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
 // Return codes
-inline constexpr int CEF_INIT_SUCCESS                = 0;
-inline constexpr int CEF_INIT_ERROR_NO_BASE_DIR      = -1;
-inline constexpr int CEF_INIT_ERROR_DLL_LOAD_FAILED  = -2;
+inline constexpr int CEF_INIT_SUCCESS = 0;
+inline constexpr int CEF_INIT_ERROR_NO_BASE_DIR = -1;
+inline constexpr int CEF_INIT_ERROR_DLL_LOAD_FAILED = -2;
 
-inline constexpr DWORD       CEF_PARENT_CHECK_INTERVAL       = 1000;
-inline constexpr const char* CEF_DLL_NAME                    = "libcef.dll";
-inline constexpr const char* CEF_MTA_SUBDIR                  = "MTA";
+inline constexpr DWORD       CEF_PARENT_CHECK_INTERVAL = 1000;
+inline constexpr const char* CEF_DLL_NAME = "libcef.dll";
+inline constexpr const char* CEF_MTA_SUBDIR = "MTA";
 
-inline constexpr DWORD PARENT_CHECK_ERROR_NO_QUERY_FUNC    = 1;
-inline constexpr DWORD PARENT_CHECK_ERROR_QUERY_FAILED     = 2;
-inline constexpr DWORD PARENT_CHECK_ERROR_OPEN_FAILED      = 3;
+inline constexpr DWORD PARENT_CHECK_ERROR_NO_QUERY_FUNC = 1;
+inline constexpr DWORD PARENT_CHECK_ERROR_QUERY_FAILED = 2;
+inline constexpr DWORD PARENT_CHECK_ERROR_OPEN_FAILED = 3;
 
 using NtQueryInformationProcessFunc = NTSTATUS(NTAPI*)(HANDLE, PROCESSINFOCLASS, PVOID, ULONG, PULONG);
 
 // Safe parent monitor thread shutdown
-std::atomic<bool> g_bShouldTerminateMonitor{false};
+std::atomic<bool>   g_bShouldTerminateMonitor{false};
 std::atomic<HANDLE> g_hMonitorThread{nullptr};
 
 namespace
@@ -56,19 +56,19 @@ namespace
         const auto ntdll = GetModuleHandleW(L"ntdll.dll");
         if (!ntdll)
             return nullptr;
-            
+
         const auto procAddr = GetProcAddress(ntdll, "NtQueryInformationProcess");
         if (!procAddr)
             return nullptr;
-            
+
         return reinterpret_cast<NtQueryInformationProcessFunc>(procAddr);
     }
 
     [[nodiscard]] auto GetParentProcessId(NtQueryInformationProcessFunc queryFunc) noexcept -> DWORD
     {
         PROCESS_BASIC_INFORMATION info{};
-        ULONG returnLength = 0;
-        
+        ULONG                     returnLength = 0;
+
         if (const auto status = queryFunc(GetCurrentProcess(), ProcessBasicInformation, &info, sizeof(info), &returnLength);
             !NT_SUCCESS(status) || returnLength < sizeof(PROCESS_BASIC_INFORMATION))
         {
@@ -83,7 +83,7 @@ namespace
         while (!g_bShouldTerminateMonitor.load(std::memory_order_acquire))
         {
             const DWORD result = WaitForSingleObject(parentProcess, CEF_PARENT_CHECK_INTERVAL);
-            
+
             if (result == WAIT_OBJECT_0)
             {
                 DWORD exitCode = 0;
@@ -100,7 +100,7 @@ namespace
             }
         }
     }
-}            // namespace
+}  // namespace
 
 DWORD WINAPI CheckParentProcessAliveness(LPVOID) noexcept;
 
@@ -116,7 +116,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, [[maybe_unused]] LPVOID l
     {
         g_bShouldTerminateMonitor.store(true, std::memory_order_release);
     }
-    
+
     return TRUE;
 }
 
@@ -125,14 +125,14 @@ extern "C" [[nodiscard]] __declspec(dllexport) auto InitCEF() noexcept -> int
     const auto baseDir = SharedUtil::GetMTAProcessBaseDir();
     if (baseDir.empty())
         return CEF_INIT_ERROR_NO_BASE_DIR;
-    
+
     const auto mtaDir = SharedUtil::PathJoin(baseDir, CEF_MTA_SUBDIR);
     SetDllDirectoryW(SharedUtil::FromUTF8(mtaDir));
 
     if (FAILED(__HrLoadAllImportsForDll(CEF_DLL_NAME)))
         return CEF_INIT_ERROR_DLL_LOAD_FAILED;
 
-    const CefMainArgs mainArgs(GetModuleHandleW(nullptr));
+    const CefMainArgs        mainArgs(GetModuleHandleW(nullptr));
     const CefRefPtr<CCefApp> app{new CCefApp};
 
     void* sandboxInfo = nullptr;

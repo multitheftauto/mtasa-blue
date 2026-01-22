@@ -443,14 +443,14 @@ void CClientPlayerVoice::SetPaused(bool bPaused)
         {
             // call onClientPlayerVoicePause
             CLuaArguments Arguments;
-            Arguments.PushString("paused");            // Reason
+            Arguments.PushString("paused");  // Reason
             m_pPlayer->CallEvent("onClientPlayerVoicePause", Arguments, false);
         }
         else
         {
             // call onClientPlayerVoiceResumed
             CLuaArguments Arguments;
-            Arguments.PushString("resumed");            // Reason
+            Arguments.PushString("resumed");  // Reason
             m_pPlayer->CallEvent("onClientPlayerVoiceResumed", Arguments, false);
         }
     }

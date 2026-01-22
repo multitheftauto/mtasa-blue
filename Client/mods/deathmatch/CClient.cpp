@@ -31,10 +31,11 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
 
 #if defined(MTA_DM_EXPIRE_DAYS)
     // Make public client test builds expire
-	// Unused relic from 10+ years ago (as of 2025) but could still be used. Defined by net.
+    // Unused relic from 10+ years ago (as of 2025) but could still be used. Defined by net.
     if (GetDaysUntilExpire() < -1)
     {
-        MessageBox(NULL, _("This version has expired."), (SString("MTA: San Andreas %s", MTA_DM_BUILDTAG_LONG) + _E("CD64")).c_str(), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST);
+        MessageBox(NULL, _("This version has expired."), (SString("MTA: San Andreas %s", MTA_DM_BUILDTAG_LONG) + _E("CD64")).c_str(),
+                   MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST);
         TerminateProcess(GetCurrentProcess(), 1);
     }
 #endif

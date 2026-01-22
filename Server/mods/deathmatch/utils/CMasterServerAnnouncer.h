@@ -46,12 +46,12 @@ public:
     {
         m_Stage = ANNOUNCE_STAGE_INITIAL;
         m_uiInitialAnnounceRetryAttempts = 5;
-        m_uiInitialAnnounceRetryInterval = 1000 * 60 * 5;            // 5 mins initial announce retry interval
-        m_uiPushInterval = 1000 * 60 * 10;                           // 10 mins push interval
+        m_uiInitialAnnounceRetryInterval = 1000 * 60 * 5;  // 5 mins initial announce retry interval
+        m_uiPushInterval = 1000 * 60 * 10;                 // 10 mins push interval
     }
 
 protected:
-    ~CMasterServer() {}            // Must use Release()
+    ~CMasterServer() {}  // Must use Release()
 public:
     //
     // Pulse this master server
@@ -81,7 +81,7 @@ public:
                 m_llLastAnnounceTime = llTickCountNow;
 
                 // Send request
-                this->AddRef();            // Keep object alive
+                this->AddRef();  // Keep object alive
                 m_bStatusBusy = true;
                 SHttpRequestOptions options;
                 options.uiConnectionAttempts = 2;
@@ -115,7 +115,7 @@ public:
     {
         CMasterServer* pMasterServer = (CMasterServer*)result.pObj;
         pMasterServer->DownloadFinishedCallback(result);
-        pMasterServer->Release();            // No need to keep object alive now
+        pMasterServer->Release();  // No need to keep object alive now
     }
 
     //
@@ -151,7 +151,7 @@ public:
         }
         else
         {
-            bool bCanRetry = (result.iErrorCode == 28);            // We can retry if 'Timeout was reached'
+            bool bCanRetry = (result.iErrorCode == 28);  // We can retry if 'Timeout was reached'
 
             if (m_Stage == ANNOUNCE_STAGE_INITIAL)
             {

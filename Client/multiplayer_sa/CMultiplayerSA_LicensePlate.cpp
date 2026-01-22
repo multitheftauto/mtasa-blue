@@ -22,7 +22,7 @@ namespace
     std::vector<RwTexture*>                             ms_SavedTextureList;
     CVehicleModelInfoSAInterface*                       ms_pProcessingVehicleModelInfo = NULL;
     RwTexture*                                          ms_pLastGeneratedPlateText = NULL;
-}            // namespace
+}  // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -58,9 +58,9 @@ void OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart(CVehicleSAInterface* p
 }
 
 // Hook info
-#define HOOKPOS_CAutomobile_CustomCarPlate_BeforeRenderingStart                         0x006A2F00
-#define HOOKSIZE_CAutomobile_CustomCarPlate_BeforeRenderingStart                        7
-DWORD RETURN_CAutomobile_CustomCarPlate_BeforeRenderingStart = 0x006A2F07;
+#define HOOKPOS_CAutomobile_CustomCarPlate_BeforeRenderingStart  0x006A2F00
+#define HOOKSIZE_CAutomobile_CustomCarPlate_BeforeRenderingStart 7
+DWORD                 RETURN_CAutomobile_CustomCarPlate_BeforeRenderingStart = 0x006A2F07;
 void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
 {
     // clang-format off
@@ -115,9 +115,9 @@ void OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop(CVehicleModelInfoSAInter
 }
 
 // Hook info
-#define HOOKPOS_CAutomobile_CustomCarPlate_AfterRenderingStop                         0x006A2F30
-#define HOOKSIZE_CAutomobile_CustomCarPlate_AfterRenderingStop                        7
-DWORD RETURN_CAutomobile_CustomCarPlate_AfterRenderingStop = 0x006A2F37;
+#define HOOKPOS_CAutomobile_CustomCarPlate_AfterRenderingStop  0x006A2F30
+#define HOOKSIZE_CAutomobile_CustomCarPlate_AfterRenderingStop 7
+DWORD                 RETURN_CAutomobile_CustomCarPlate_AfterRenderingStop = 0x006A2F37;
 void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
 {
     // clang-format off
@@ -153,9 +153,9 @@ void OnMY_CCustomCarPlateMgr_SetupMaterialPlateTexture(struct RpMaterial* a, cha
 }
 
 // Hook info
-#define HOOKPOS_CCustomCarPlateMgr_SetupMaterialPlateTexture                         0x006FE020
-#define HOOKSIZE_CCustomCarPlateMgr_SetupMaterialPlateTexture                        5
-DWORD RETURN_CCustomCarPlateMgr_SetupMaterialPlateTexture = 0x006FE025;
+#define HOOKPOS_CCustomCarPlateMgr_SetupMaterialPlateTexture  0x006FE020
+#define HOOKSIZE_CCustomCarPlateMgr_SetupMaterialPlateTexture 5
+DWORD                 RETURN_CCustomCarPlateMgr_SetupMaterialPlateTexture = 0x006FE025;
 void _declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
 {
     // clang-format off
@@ -199,9 +199,9 @@ void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post()
 }
 
 // Hook info
-#define HOOKPOS_CVehicleModelInfo_SetCarCustomPlate                         0x004C9450
-#define HOOKSIZE_CVehicleModelInfo_SetCarCustomPlate                        6
-DWORD RETURN_CVehicleModelInfo_SetCarCustomPlate = 0x004C9456;
+#define HOOKPOS_CVehicleModelInfo_SetCarCustomPlate  0x004C9450
+#define HOOKSIZE_CVehicleModelInfo_SetCarCustomPlate 6
+DWORD                 RETURN_CVehicleModelInfo_SetCarCustomPlate = 0x004C9456;
 void _declspec(naked) HOOK_CVehicleModelInfo_SetCarCustomPlate()
 {
     // clang-format off
@@ -237,9 +237,9 @@ inner:
 // Prevent GTA from generating a new texture for each occurrence of 'carplate' in a model
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CCustomCarPlateMgr_CreatePlateTexture                         0x006FDEA0
-#define HOOKSIZE_CCustomCarPlateMgr_CreatePlateTexture                        5
-DWORD RETURN_CCustomCarPlateMgr_CreatePlateTexture = 0x006FDEA5;
+#define HOOKPOS_CCustomCarPlateMgr_CreatePlateTexture  0x006FDEA0
+#define HOOKSIZE_CCustomCarPlateMgr_CreatePlateTexture 5
+DWORD                 RETURN_CCustomCarPlateMgr_CreatePlateTexture = 0x006FDEA5;
 void _declspec(naked) HOOK_CCustomCarPlateMgr_CreatePlateTexture()
 {
     // clang-format off

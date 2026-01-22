@@ -651,7 +651,8 @@ bool CLuaPlayerDefs::IsPlayerCrosshairVisible()
     return g_pGame->GetHud()->IsCrosshairVisible();
 }
 
-bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property, std::variant<CVector2D, float, bool, std::string> value)
+bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property,
+                                                   std::variant<CVector2D, float, bool, std::string> value)
 {
     if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
         return false;
@@ -937,9 +938,10 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
     }
 
     return false;
-} 
+}
 
-std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>> CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property)
+std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>>
+CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property)
 {
     if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
         return false;

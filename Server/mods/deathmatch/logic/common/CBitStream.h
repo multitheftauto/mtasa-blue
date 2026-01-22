@@ -30,7 +30,7 @@ public:
 class CPlayerBitStream
 {
 public:
-    CPlayerBitStream(class CPlayer* pPlayer);            //  { pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() ); };
+    CPlayerBitStream(class CPlayer* pPlayer);  //  { pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() ); };
     ~CPlayerBitStream() { g_pNetServer->DeallocateNetServerBitStream((NetBitStreamInterface*)pBitStream); };
     NetBitStreamInterface* operator->() { return pBitStream; }
 

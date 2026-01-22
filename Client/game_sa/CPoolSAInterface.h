@@ -77,8 +77,8 @@ public:
 
     B* Allocate()
     {
-        m_nFirstFree++;                     // Continue after the last allocated slot
-        const auto sz = m_nSize;            // Storing size to avoid reloads from memory - should help out the optimizer
+        m_nFirstFree++;           // Continue after the last allocated slot
+        const auto sz = m_nSize;  // Storing size to avoid reloads from memory - should help out the optimizer
         for (auto i = 0u; i < sz; i++)
         {
             const auto slot = (m_nFirstFree + i) % sz;
@@ -123,8 +123,8 @@ public:
     void Delete(uint index) { Release(index); }
 
     std::int32_t Size() const noexcept { return m_nSize; };
-    bool IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
-    bool IsContains(uint index) const
+    bool         IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
+    bool         IsContains(uint index) const
     {
         if (m_nSize <= index)
             return false;
@@ -166,8 +166,5 @@ struct SVectorPoolData
     size_t                        count;
 
 public:
-    SVectorPoolData(size_t defaultSize) : count(0)
-    {
-        entities.resize(defaultSize, {nullptr, nullptr});
-    }
+    SVectorPoolData(size_t defaultSize) : count(0) { entities.resize(defaultSize, {nullptr, nullptr}); }
 };

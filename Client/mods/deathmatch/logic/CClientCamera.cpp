@@ -139,7 +139,7 @@ bool CClientCamera::SetMatrix(const CMatrix& Matrix)
     m_matFixedMatrix = Matrix;
     m_matFixedMatrix.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
     m_FixedCameraMode = EFixedCameraMode::MATRIX;
-    SetPosition(m_matFixedMatrix.vPos);            // To update center of world
+    SetPosition(m_matFixedMatrix.vPos);  // To update center of world
     return true;
 }
 
@@ -613,7 +613,7 @@ CMatrix CClientCamera::GetGtaMatrix() const
     matResult.vFront = *pCam->GetFront();
     matResult.vUp = *pCam->GetUp();
     matResult.vPos = *pCam->GetSource();
-    matResult.vRight = -matResult.vRight;            // Camera has this the other way
+    matResult.vRight = -matResult.vRight;  // Camera has this the other way
     matResult.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
     return matResult;
 }
@@ -628,7 +628,7 @@ void CClientCamera::SetGtaMatrix(const CMatrix& matInNew, CCam* pCam) const
 
     CMatrix matNew = matInNew;
     matNew.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
-    matNew.vRight = -matNew.vRight;            // Camera has this the other way
+    matNew.vRight = -matNew.vRight;  // Camera has this the other way
     m_pCamera->SetMatrix(&matNew);
     *pCam->GetUp() = matNew.vUp;
     *pCam->GetFront() = matNew.vFront;

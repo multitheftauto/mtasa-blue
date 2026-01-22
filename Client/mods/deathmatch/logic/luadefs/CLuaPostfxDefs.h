@@ -18,6 +18,6 @@ public:
 
 private:
     static float GetPostFXValue(PostFXType type);
-    static int GetPostFXMode();
-    static bool IsPostFXEnabled(PostFXType type);
+    static int   GetPostFXMode();
+    static bool  IsPostFXEnabled(PostFXType type);
 };

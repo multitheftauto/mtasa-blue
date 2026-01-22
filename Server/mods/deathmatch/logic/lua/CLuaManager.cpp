@@ -166,7 +166,7 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
     {
         if (luaVM == (*iter)->GetVirtualMachine())
         {
-            dassert(0);            // Why not in map?
+            dassert(0);  // Why not in map?
             return *iter;
         }
     }

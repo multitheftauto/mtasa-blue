@@ -96,7 +96,6 @@ bool CDirectorySAInterface::SetModelStreamingSize(std::uint16_t modelId, std::ui
     return true;
 }
 
-
 std::uint16_t CDirectorySAInterface::GetModelStreamingSize(std::uint16_t modelId)
 {
     DirectoryInfoSA* entry = GetModelEntry(modelId);

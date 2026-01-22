@@ -17,9 +17,9 @@
 #include "SharedUtil.IntTypes.h"
 
 #ifdef WIN32
-#ifndef va_copy
-    #define va_copy(dest, orig) (dest) = (orig)
-#endif
+    #ifndef va_copy
+        #define va_copy(dest, orig) (dest) = (orig)
+    #endif
 #endif
 
 class SString : public std::string
@@ -68,7 +68,7 @@ public:
     SString operator+(const SString& other) const { return std::string(*this) + other; }
 
     // Assignment
-                operator const char*() const { return c_str(); }            // Auto assign to const char* without using c_str()
+                operator const char*() const { return c_str(); }  // Auto assign to const char* without using c_str()
     const char* operator*() const { return c_str(); }
 
     // Functions

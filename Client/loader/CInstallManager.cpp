@@ -46,20 +46,32 @@ namespace
     }
 
     // Comms between 'Admin' and 'User' processes
-    void SendStringToUserProcess(const SString& strText) { SetApplicationSetting("admin2user_comms", strText); }
+    void SendStringToUserProcess(const SString& strText)
+    {
+        SetApplicationSetting("admin2user_comms", strText);
+    }
 
-    SString ReceiveStringFromAdminProcess() { return GetApplicationSetting("admin2user_comms"); }
+    SString ReceiveStringFromAdminProcess()
+    {
+        return GetApplicationSetting("admin2user_comms");
+    }
 
-    bool IsBlockingUserProcess() { return GetApplicationSetting("admin2user_comms") == "user_waiting"; }
+    bool IsBlockingUserProcess()
+    {
+        return GetApplicationSetting("admin2user_comms") == "user_waiting";
+    }
 
-    void SetIsBlockingUserProcess() { SetApplicationSetting("admin2user_comms", "user_waiting"); }
+    void SetIsBlockingUserProcess()
+    {
+        SetApplicationSetting("admin2user_comms", "user_waiting");
+    }
 
     void ClearIsBlockingUserProcess()
     {
         if (IsBlockingUserProcess())
             SetApplicationSetting("admin2user_comms", "");
     }
-}            // namespace
+}  // namespace
 
 //////////////////////////////////////////////////////////
 //
@@ -86,124 +98,124 @@ CInstallManager* GetInstallManager()
 //////////////////////////////////////////////////////////
 void CInstallManager::InitSequencer()
 {
-    #define CR "\n"
-    SString strSource = CR "initial: "                                                     // *** Starts here  by default
-        CR "            CALL CheckOnRestartCommand "                                       ////// Start of 'update game' //////
-        CR "            IF LastResult != ok GOTO update_end: "                             //
-        CR " "                                                                             //
-        CR "            CALL MaybeSwitchToTempExe "                                        // If update files comes with an .exe, switch to that for the install
-        CR " "                                                                             //
-        CR "copy_files: "                                                                  //
-        CR "            CALL InstallFiles "                                                // Try to install update files
-        CR "            IF LastResult == ok GOTO update_end: "                             //
-        CR " "                                                                             //
-        CR "            CALL ChangeToAdmin "                                               // If install failed, try as admin
-        CR " "                                                                             //
-        CR "copy_files_admin: "                                                            //
-        CR "            CALL InstallFiles "                                                // Try to install update files
-        CR "            IF LastResult == ok GOTO update_end_admin: "                       //
-        CR " "                                                                             //
-        CR "            CALL ShowCopyFailDialog "                                          // If install failed as admin, show message box
-        CR "            IF LastResult == retry GOTO copy_files_admin: "                    //
-        CR " "                                                                             //
-        CR "update_end_admin: "                                                            //
-        CR "            CALL ChangeFromAdmin "                                             //
-        CR " "                                                                             //
-        CR "update_end: "                                                                  ////// End of 'update game' //////
-        CR "            CALL SwitchBackFromTempExe "                                       //
-        CR " "                                                                             //
-        CR "newlayout_check:"                                                              ////// Start of 'new layout check' //////
-        CR "            CALL ProcessLayoutChecks "                                         //
-        CR "            IF LastResult == ok GOTO newlayout_end: "                          //
-        CR " "                                                                             //
-        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO newlayout_check: "                        //
-        CR "            CALL Quit "                                                        //
-        CR " "                                                                             //
-        CR "newlayout_end: "                                                               ////// End of 'new layout check' //////
-        CR " "                                                                             //
-        CR "langfile_check: "                                                              ////// Start of 'Lang file fix' //////
-        CR "            CALL ProcessLangFileChecks "                                       // Make changes to comply with requirements
-        CR "            IF LastResult == ok GOTO langfile_end: "                           //
-        CR " "                                                                             //
-        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO langfile_check: "                         //
-        CR "            CALL Quit "                                                        //
-        CR " "                                                                             //
-        CR "langfile_end: "                                                                ////// End of 'Lang file fix' //////
-        CR " "                                                                             //
-        CR "prepare_launch_location:"                                                      ////// Start of 'prepare launch location' //////
-        CR "            CALL PrepareLaunchLocation "                                       //
-        CR "            IF LastResult == ok GOTO prepare_launch_location_end: "            //
-        CR " "                                                                             //
-        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO prepare_launch_location: "                //
-        CR "            CALL Quit "                                                        //
-        CR " "                                                                             //
-        CR "prepare_launch_location_end:"                                                  ////// End of 'prepare launch location' //////
-        CR " "                                                                             //
-        CR "gta_patch_check:"                                                              ////// Start of 'gta patch check' //////
-        CR "            CALL ProcessGtaPatchCheck "                                        //
-        CR "            IF LastResult != ok GOTO do_quit: "                                // Switching to admin has zero impact
-        CR " "                                                                             //
-        CR "gta_patch_check_end:"                                                          ////// End of 'gta patch check' //////
-        CR " "                                                                             //
-        CR "gta_dll_check:"                                                                ////// Start of 'gta dll check' //////
-        CR "            CALL ProcessGtaDllCheck "                                          //
-        CR "            IF LastResult == ok GOTO gta_dll_end: "                            //
-        CR "            IF LastResult == quit GOTO do_quit: "                              //
-        CR " "                                                                             //
-        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO gta_dll_check: "                          //
-        CR "            CALL Quit "                                                        //
-        CR " "                                                                             //
-        CR "gta_dll_end: "                                                                 ////// End of 'gta dll check' //////
-        CR " "                                                                             //
-        CR "gta_version_check:"                                                            ////// Start of 'gta version check' //////
-        CR "            CALL ProcessGtaVersionCheck "                                      //
-        CR "            IF LastResult == ok GOTO gta_version_end: "                        //
-        CR "            IF LastResult == quit GOTO do_quit: "                              //
-        CR " "                                                                             //
-        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO gta_version_check: "                      //
-        CR "            CALL Quit "                                                        //
-        CR " "                                                                             //
-        CR "gta_version_end: "                                                             ////// End of 'gta version check' //////
-        CR " "                                                                             //
-        CR "service_check: "                                                               ////// Start of 'Service checks' //////
-        CR "            CALL ProcessServiceChecks "                                        // Make changes to comply with service requirements
-        CR "            IF LastResult == ok GOTO service_end: "                            //
-        CR " "                                                                             //
-        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO service_check: "                          //
-        CR "            CALL Quit "                                                        //
-        CR " "                                                                             //
-        CR "service_end: "                                                                 ////// End of 'Service checks' //////
-        CR " "                                                                             //
-        CR "appcompat_check: "                                                             ////// Start of 'AppCompat checks' //////
-        CR "            CALL ProcessAppCompatChecks "                                      // Make changes to comply with appcompat requirements
-        CR "            IF LastResult == ok GOTO appcompat_end: "                          //
-        CR " "                                                                             //
-        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO appcompat_check: "                        //
-        CR "            CALL Quit "                                                        //
-        CR " "                                                                             //
-        CR "appcompat_end: "                                                               ////// End of 'AppCompat checks' //////
-        CR " "                                                                             //
-        CR "            CALL ChangeFromAdmin "                                             //
-        CR "            CALL InstallNewsItems "                                            // Install pending news
-        CR "            CALL CheckForWerCrash "                                            // Check for fail-fast crashes detected by WER
-        CR "            IF LastResult == crashed GOTO crashed: "                           // WER crash detected -> show dialog
-        CR "            GOTO launch: "                                                     //
-        CR " "                                                                             //
-        CR "do_quit: "                                                                     // Quit ensuring termination of both user & admin instance
-        CR "            CALL ChangeFromAdmin "                                             //
-        CR "            CALL Quit "                                                        //
-        CR " "                                                                             //
-        CR "crashed: "                                                                     // *** Starts here when install_stage=crashed is passed
-        CR "            CALL ShowCrashFailDialog "                                         // Shows immediate crash dialog from fresh launcher process
-        CR "            IF LastResult == ok GOTO initial: "                                // User clicked "Yes" to restart -> go to normal launch
-        CR "            CALL Quit "                                                        // User clicked "No" -> exit launcher
+#define CR "\n"
+    SString strSource = CR "initial: "                                           // *** Starts here  by default
+        CR "            CALL CheckOnRestartCommand "                             ////// Start of 'update game' //////
+        CR "            IF LastResult != ok GOTO update_end: "                   //
+        CR " "                                                                   //
+        CR "            CALL MaybeSwitchToTempExe "                              // If update files comes with an .exe, switch to that for the install
+        CR " "                                                                   //
+        CR "copy_files: "                                                        //
+        CR "            CALL InstallFiles "                                      // Try to install update files
+        CR "            IF LastResult == ok GOTO update_end: "                   //
+        CR " "                                                                   //
+        CR "            CALL ChangeToAdmin "                                     // If install failed, try as admin
+        CR " "                                                                   //
+        CR "copy_files_admin: "                                                  //
+        CR "            CALL InstallFiles "                                      // Try to install update files
+        CR "            IF LastResult == ok GOTO update_end_admin: "             //
+        CR " "                                                                   //
+        CR "            CALL ShowCopyFailDialog "                                // If install failed as admin, show message box
+        CR "            IF LastResult == retry GOTO copy_files_admin: "          //
+        CR " "                                                                   //
+        CR "update_end_admin: "                                                  //
+        CR "            CALL ChangeFromAdmin "                                   //
+        CR " "                                                                   //
+        CR "update_end: "                                                        ////// End of 'update game' //////
+        CR "            CALL SwitchBackFromTempExe "                             //
+        CR " "                                                                   //
+        CR "newlayout_check:"                                                    ////// Start of 'new layout check' //////
+        CR "            CALL ProcessLayoutChecks "                               //
+        CR "            IF LastResult == ok GOTO newlayout_end: "                //
+        CR " "                                                                   //
+        CR "            CALL ChangeToAdmin "                                     // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO newlayout_check: "              //
+        CR "            CALL Quit "                                              //
+        CR " "                                                                   //
+        CR "newlayout_end: "                                                     ////// End of 'new layout check' //////
+        CR " "                                                                   //
+        CR "langfile_check: "                                                    ////// Start of 'Lang file fix' //////
+        CR "            CALL ProcessLangFileChecks "                             // Make changes to comply with requirements
+        CR "            IF LastResult == ok GOTO langfile_end: "                 //
+        CR " "                                                                   //
+        CR "            CALL ChangeToAdmin "                                     // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO langfile_check: "               //
+        CR "            CALL Quit "                                              //
+        CR " "                                                                   //
+        CR "langfile_end: "                                                      ////// End of 'Lang file fix' //////
+        CR " "                                                                   //
+        CR "prepare_launch_location:"                                            ////// Start of 'prepare launch location' //////
+        CR "            CALL PrepareLaunchLocation "                             //
+        CR "            IF LastResult == ok GOTO prepare_launch_location_end: "  //
+        CR " "                                                                   //
+        CR "            CALL ChangeToAdmin "                                     // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO prepare_launch_location: "      //
+        CR "            CALL Quit "                                              //
+        CR " "                                                                   //
+        CR "prepare_launch_location_end:"                                        ////// End of 'prepare launch location' //////
+        CR " "                                                                   //
+        CR "gta_patch_check:"                                                    ////// Start of 'gta patch check' //////
+        CR "            CALL ProcessGtaPatchCheck "                              //
+        CR "            IF LastResult != ok GOTO do_quit: "                      // Switching to admin has zero impact
+        CR " "                                                                   //
+        CR "gta_patch_check_end:"                                                ////// End of 'gta patch check' //////
+        CR " "                                                                   //
+        CR "gta_dll_check:"                                                      ////// Start of 'gta dll check' //////
+        CR "            CALL ProcessGtaDllCheck "                                //
+        CR "            IF LastResult == ok GOTO gta_dll_end: "                  //
+        CR "            IF LastResult == quit GOTO do_quit: "                    //
+        CR " "                                                                   //
+        CR "            CALL ChangeToAdmin "                                     // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO gta_dll_check: "                //
+        CR "            CALL Quit "                                              //
+        CR " "                                                                   //
+        CR "gta_dll_end: "                                                       ////// End of 'gta dll check' //////
+        CR " "                                                                   //
+        CR "gta_version_check:"                                                  ////// Start of 'gta version check' //////
+        CR "            CALL ProcessGtaVersionCheck "                            //
+        CR "            IF LastResult == ok GOTO gta_version_end: "              //
+        CR "            IF LastResult == quit GOTO do_quit: "                    //
+        CR " "                                                                   //
+        CR "            CALL ChangeToAdmin "                                     // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO gta_version_check: "            //
+        CR "            CALL Quit "                                              //
+        CR " "                                                                   //
+        CR "gta_version_end: "                                                   ////// End of 'gta version check' //////
+        CR " "                                                                   //
+        CR "service_check: "                                                     ////// Start of 'Service checks' //////
+        CR "            CALL ProcessServiceChecks "                              // Make changes to comply with service requirements
+        CR "            IF LastResult == ok GOTO service_end: "                  //
+        CR " "                                                                   //
+        CR "            CALL ChangeToAdmin "                                     // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO service_check: "                //
+        CR "            CALL Quit "                                              //
+        CR " "                                                                   //
+        CR "service_end: "                                                       ////// End of 'Service checks' //////
+        CR " "                                                                   //
+        CR "appcompat_check: "                                                   ////// Start of 'AppCompat checks' //////
+        CR "            CALL ProcessAppCompatChecks "                            // Make changes to comply with appcompat requirements
+        CR "            IF LastResult == ok GOTO appcompat_end: "                //
+        CR " "                                                                   //
+        CR "            CALL ChangeToAdmin "                                     // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO appcompat_check: "              //
+        CR "            CALL Quit "                                              //
+        CR " "                                                                   //
+        CR "appcompat_end: "                                                     ////// End of 'AppCompat checks' //////
+        CR " "                                                                   //
+        CR "            CALL ChangeFromAdmin "                                   //
+        CR "            CALL InstallNewsItems "                                  // Install pending news
+        CR "            CALL CheckForWerCrash "                                  // Check for fail-fast crashes detected by WER
+        CR "            IF LastResult == crashed GOTO crashed: "                 // WER crash detected -> show dialog
+        CR "            GOTO launch: "                                           //
+        CR " "                                                                   //
+        CR "do_quit: "                                                           // Quit ensuring termination of both user & admin instance
+        CR "            CALL ChangeFromAdmin "                                   //
+        CR "            CALL Quit "                                              //
+        CR " "                                                                   //
+        CR "crashed: "                                                           // *** Starts here when install_stage=crashed is passed
+        CR "            CALL ShowCrashFailDialog "                               // Shows immediate crash dialog from fresh launcher process
+        CR "            IF LastResult == ok GOTO initial: "                      // User clicked "Yes" to restart -> go to normal launch
+        CR "            CALL Quit "                                              // User clicked "No" -> exit launcher
         //
         // Flow when game crashes:
         // 1. core.dll crash handler saves crash info to settings
@@ -211,7 +223,7 @@ void CInstallManager::InitSequencer()
         // 3. New launcher lands HERE at "crashed:" label
         // 4. Shows dialog with crash info from settings
         // 5. User chooses restart or quit
-        CR " "                                                                             //
+        CR " "  //
         CR "launch: ";
 
     m_pSequencer = new CSequencerType();
@@ -384,7 +396,7 @@ SString CInstallManager::_ChangeToAdmin()
             UpdateSettingsForReportLog();
             RestoreSequencerFromSnapshot(ReceiveStringFromAdminProcess());
             ClearIsBlockingUserProcess();
-            return "ok";            // This will appear as the result for _ChangeFromAdmin
+            return "ok";  // This will appear as the result for _ChangeFromAdmin
         }
         CreateSingleInstanceMutex();
         ClearIsBlockingUserProcess();
@@ -454,7 +466,7 @@ SString CInstallManager::_ShowCrashFailDialog()
     SetApplicationSetting("diagnostics", "last-crash-code", "");
 
     const bool debuggerCapturePending = (GetApplicationSetting("diagnostics", "debugger-crash-capture") == "1");
-    
+
     if (strReason == "direct3ddevice-reset")
     {
         strMessage += _("** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **");
@@ -532,10 +544,9 @@ SString CInstallManager::_CheckForWerCrash()
     }
 
     const SString existingReason = GetApplicationSetting("diagnostics", "last-crash-reason");
-    const DWORD existingCode = static_cast<DWORD>(GetApplicationSettingInt("diagnostics", "last-crash-code"));
+    const DWORD   existingCode = static_cast<DWORD>(GetApplicationSettingInt("diagnostics", "last-crash-code"));
 
-    if ((existingCode == EXCEPTION_STACK_BUFFER_OVERRUN || existingCode == EXCEPTION_HEAP_CORRUPTION)
-        && !existingReason.empty())
+    if ((existingCode == EXCEPTION_STACK_BUFFER_OVERRUN || existingCode == EXCEPTION_HEAP_CORRUPTION) && !existingReason.empty())
     {
         OutputDebugStringA(SString("_CheckForWerCrash: Already have crash info, code=0x%08X\n", existingCode));
         bWerCrashAlreadyHandled = true;
@@ -558,8 +569,7 @@ SString CInstallManager::_CheckForWerCrash()
             break;
 
         const SString fullPath = PathJoin(werDumpPath, dumpFile);
-        HANDLE hFile = CreateFileA(fullPath, GENERIC_READ, FILE_SHARE_READ, nullptr,
-                                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        HANDLE        hFile = CreateFileA(fullPath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
         if (hFile == INVALID_HANDLE_VALUE)
             break;
@@ -569,15 +579,15 @@ SString CInstallManager::_CheckForWerCrash()
 
         if (isRecent)
         {
-            const auto regs = WerCrash::ExtractRegistersFromMinidump(fullPath);
+            const auto  regs = WerCrash::ExtractRegistersFromMinidump(fullPath);
             const DWORD exceptionCode = regs.valid ? regs.exceptionCode : EXCEPTION_STACK_BUFFER_OVERRUN;
             const char* exceptionName = (exceptionCode == EXCEPTION_STACK_BUFFER_OVERRUN) ? "Stack Buffer Overrun"
-                                       : (exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
-                                                                                        : "Security Exception";
+                                        : (exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
+                                                                                          : "Security Exception";
 
             SString moduleName = "unknown";
-            DWORD moduleOffset = 0;
-            DWORD idaAddress = 0;
+            DWORD   moduleOffset = 0;
+            DWORD   idaAddress = 0;
             if (regs.valid)
             {
                 const auto resolved = WerCrash::ResolveAddressFromMinidump(fullPath, regs.eip);
@@ -603,8 +613,7 @@ SString CInstallManager::_CheckForWerCrash()
             SYSTEMTIME st{};
             GetLocalTime(&st);
 
-            const auto strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG,
-                                                   *GetApplicationSetting("mta-version-ext").SplitRight(".", nullptr, -2));
+            const auto strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", nullptr, -2));
 
             const SString crashReason = SString(
                 "Security Exception - %s (0x%08X) detected.\n"
@@ -613,11 +622,7 @@ SString CInstallManager::_CheckForWerCrash()
                 "IDA Address: %s\n"
                 "This crash bypassed normal crash handling.\n"
                 "Crash dump: %s",
-                exceptionName, exceptionCode,
-                moduleName.c_str(),
-                moduleOffset,
-                idaAddressStr.c_str(),
-                ExtractFilename(usedDumpPath).c_str());
+                exceptionName, exceptionCode, moduleName.c_str(), moduleOffset, idaAddressStr.c_str(), ExtractFilename(usedDumpPath).c_str());
 
             SString coreLogEntry;
             coreLogEntry += SString("Version = %s\n", strMTAVersionFull.c_str());
@@ -633,9 +638,8 @@ SString CInstallManager::_CheckForWerCrash()
                     "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n"
                     "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n"
                     "CS=%04X   DS=%04X  SS=%04X  ES=%04X   FS=%04X  GS=%04X\n\n",
-                    regs.eax, regs.ebx, regs.ecx, regs.edx, regs.esi,
-                    regs.edi, regs.ebp, regs.esp, regs.eip, regs.eflags,
-                    regs.cs, regs.ds, regs.ss, regs.es, regs.fs, regs.gs);
+                    regs.eax, regs.ebx, regs.ecx, regs.edx, regs.esi, regs.edi, regs.ebp, regs.esp, regs.eip, regs.eflags, regs.cs, regs.ds, regs.ss, regs.es,
+                    regs.fs, regs.gs);
             }
 
             if (!stackTrace.empty())
@@ -702,8 +706,7 @@ SString CInstallManager::_CheckForWerCrash()
             }
 
             const SString fullPath = PathJoin(werDumpPath, dumpFile);
-            HANDLE hFile = CreateFileA(fullPath, GENERIC_READ, FILE_SHARE_READ, nullptr,
-                                       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            HANDLE        hFile = CreateFileA(fullPath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
             if (hFile == INVALID_HANDLE_VALUE)
             {
@@ -718,15 +721,15 @@ SString CInstallManager::_CheckForWerCrash()
             {
                 OutputDebugStringA(SString("_CheckForWerCrash: Processing WER dump file directly: %s\n", dumpFile.c_str()));
 
-                const auto regs = WerCrash::ExtractRegistersFromMinidump(fullPath);
+                const auto  regs = WerCrash::ExtractRegistersFromMinidump(fullPath);
                 const DWORD exceptionCode = regs.valid ? regs.exceptionCode : EXCEPTION_STACK_BUFFER_OVERRUN;
                 const char* exceptionName = (exceptionCode == EXCEPTION_STACK_BUFFER_OVERRUN) ? "Stack Buffer Overrun"
-                                           : (exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
-                                                                                            : "Security Exception";
+                                            : (exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
+                                                                                              : "Security Exception";
 
                 SString moduleName = "unknown";
-                DWORD moduleOffset = 0;
-                DWORD idaAddress = 0;
+                DWORD   moduleOffset = 0;
+                DWORD   idaAddress = 0;
                 if (regs.valid)
                 {
                     const auto resolved = WerCrash::ResolveAddressFromMinidump(fullPath, regs.eip);
@@ -752,8 +755,7 @@ SString CInstallManager::_CheckForWerCrash()
                 SYSTEMTIME st{};
                 GetLocalTime(&st);
 
-                const auto strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG,
-                                                       *GetApplicationSetting("mta-version-ext").SplitRight(".", nullptr, -2));
+                const auto strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", nullptr, -2));
 
                 const SString crashReason = SString(
                     "Security Exception - %s (0x%08X) detected.\n"
@@ -762,11 +764,7 @@ SString CInstallManager::_CheckForWerCrash()
                     "IDA Address: %s\n"
                     "This crash bypassed normal crash handling.\n"
                     "Crash dump: %s",
-                    exceptionName, exceptionCode,
-                    moduleName.c_str(),
-                    moduleOffset,
-                    idaAddressStr.c_str(),
-                    ExtractFilename(usedDumpPath).c_str());
+                    exceptionName, exceptionCode, moduleName.c_str(), moduleOffset, idaAddressStr.c_str(), ExtractFilename(usedDumpPath).c_str());
 
                 SString coreLogEntry;
                 coreLogEntry += SString("Version = %s\n", strMTAVersionFull.c_str());
@@ -782,9 +780,8 @@ SString CInstallManager::_CheckForWerCrash()
                         "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n"
                         "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n"
                         "CS=%04X   DS=%04X  SS=%04X  ES=%04X   FS=%04X  GS=%04X\n\n",
-                        regs.eax, regs.ebx, regs.ecx, regs.edx, regs.esi,
-                        regs.edi, regs.ebp, regs.esp, regs.eip, regs.eflags,
-                        regs.cs, regs.ds, regs.ss, regs.es, regs.fs, regs.gs);
+                        regs.eax, regs.ebx, regs.ecx, regs.edx, regs.esi, regs.edi, regs.ebp, regs.esp, regs.eip, regs.eflags, regs.cs, regs.ds, regs.ss,
+                        regs.es, regs.fs, regs.gs);
                 }
 
                 if (!stackTrace.empty())
@@ -836,13 +833,13 @@ SString CInstallManager::_CheckForWerCrash()
     }
 
     const char* exceptionName = (werInfo.exceptionCode == EXCEPTION_STACK_BUFFER_OVERRUN) ? "Stack Buffer Overrun"
-                               : (werInfo.exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
-                                                                                           : "Security Exception";
+                                : (werInfo.exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
+                                                                                          : "Security Exception";
 
-    OutputDebugStringA(SString("_CheckForWerCrash: DETECTED! code=0x%08X module=%s offset=%s\n",
-        werInfo.exceptionCode, werInfo.moduleName.c_str(), werInfo.faultOffset.c_str()));
+    OutputDebugStringA(SString("_CheckForWerCrash: DETECTED! code=0x%08X module=%s offset=%s\n", werInfo.exceptionCode, werInfo.moduleName.c_str(),
+                               werInfo.faultOffset.c_str()));
 
-    DWORD offsetValue = 0;
+    DWORD   offsetValue = 0;
     SString offsetStr;
     if (!werInfo.faultOffset.empty())
     {
@@ -855,8 +852,8 @@ SString CInstallManager::_CheckForWerCrash()
     const SString offsetText = offsetStr.empty() ? "unknown" : SString("0x%s", offsetStr.c_str());
 
     constexpr DWORD IDA_DEFAULT_DLL_BASE = 0x10000000;
-    const DWORD idaAddress = IDA_DEFAULT_DLL_BASE + offsetValue;
-    const SString idaAddressStr = (offsetValue == 0) ? "unknown" : SString("0x%08X", idaAddress);
+    const DWORD     idaAddress = IDA_DEFAULT_DLL_BASE + offsetValue;
+    const SString   idaAddressStr = (offsetValue == 0) ? "unknown" : SString("0x%08X", idaAddress);
 
     const auto dumpResult = WerCrash::FindAndRenameWerDump(werDumpPath, werInfo.moduleName, offsetValue, werInfo.exceptionCode, std::nullopt);
     if (!dumpResult.path.empty())
@@ -870,33 +867,27 @@ SString CInstallManager::_CheckForWerCrash()
         SetApplicationSetting("diagnostics", "last-wer-dump-shown", dumpResult.sourceFilename);
 
     const SString crashReason = dumpResult.path.empty()
-                                   ? SString(
-                                         "Security Exception - %s (0x%08X) detected.\n"
-                                         "Module: %s\n"
-                                 "Offset: %s\n"
-                                         "IDA Address: %s (assuming default DLL base 0x10000000)\n"
-                                         "This crash bypassed normal crash handling.",
-                                         exceptionName, werInfo.exceptionCode,
-                                         werInfo.moduleName.empty() ? "unknown" : werInfo.moduleName.c_str(),
-                                 offsetText.c_str(),
-                                         idaAddressStr.c_str())
-                                   : SString(
-                                         "Security Exception - %s (0x%08X) detected.\n"
-                                         "Module: %s\n"
-                                 "Offset: %s\n"
-                                         "IDA Address: %s (assuming default DLL base 0x10000000)\n"
-                                         "Crash dump: %s",
-                                         exceptionName, werInfo.exceptionCode,
-                                         werInfo.moduleName.empty() ? "unknown" : werInfo.moduleName.c_str(),
-                                 offsetText.c_str(),
-                                         idaAddressStr.c_str(),
-                                         ExtractFilename(dumpResult.path).c_str());
+                                    ? SString(
+                                          "Security Exception - %s (0x%08X) detected.\n"
+                                          "Module: %s\n"
+                                          "Offset: %s\n"
+                                          "IDA Address: %s (assuming default DLL base 0x10000000)\n"
+                                          "This crash bypassed normal crash handling.",
+                                          exceptionName, werInfo.exceptionCode, werInfo.moduleName.empty() ? "unknown" : werInfo.moduleName.c_str(),
+                                          offsetText.c_str(), idaAddressStr.c_str())
+                                    : SString(
+                                          "Security Exception - %s (0x%08X) detected.\n"
+                                          "Module: %s\n"
+                                          "Offset: %s\n"
+                                          "IDA Address: %s (assuming default DLL base 0x10000000)\n"
+                                          "Crash dump: %s",
+                                          exceptionName, werInfo.exceptionCode, werInfo.moduleName.empty() ? "unknown" : werInfo.moduleName.c_str(),
+                                          offsetText.c_str(), idaAddressStr.c_str(), ExtractFilename(dumpResult.path).c_str());
 
     SYSTEMTIME st{};
     GetLocalTime(&st);
 
-    const auto strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG,
-                                           *GetApplicationSetting("mta-version-ext").SplitRight(".", nullptr, -2));
+    const auto strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", nullptr, -2));
 
     SString coreLogEntry;
     coreLogEntry += SString("Version = %s\n", strMTAVersionFull.c_str());
@@ -912,9 +903,9 @@ SString CInstallManager::_CheckForWerCrash()
             "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n"
             "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n"
             "CS=%04X   DS=%04X  SS=%04X  ES=%04X   FS=%04X  GS=%04X\n\n",
-            dumpResult.regs.eax, dumpResult.regs.ebx, dumpResult.regs.ecx, dumpResult.regs.edx, dumpResult.regs.esi,
-            dumpResult.regs.edi, dumpResult.regs.ebp, dumpResult.regs.esp, dumpResult.regs.eip, dumpResult.regs.eflags,
-            dumpResult.regs.cs, dumpResult.regs.ds, dumpResult.regs.ss, dumpResult.regs.es, dumpResult.regs.fs, dumpResult.regs.gs);
+            dumpResult.regs.eax, dumpResult.regs.ebx, dumpResult.regs.ecx, dumpResult.regs.edx, dumpResult.regs.esi, dumpResult.regs.edi, dumpResult.regs.ebp,
+            dumpResult.regs.esp, dumpResult.regs.eip, dumpResult.regs.eflags, dumpResult.regs.cs, dumpResult.regs.ds, dumpResult.regs.ss, dumpResult.regs.es,
+            dumpResult.regs.fs, dumpResult.regs.gs);
     }
 
     if (!dumpResult.stackTrace.empty())
@@ -991,7 +982,7 @@ SString CInstallManager::_MaybeSwitchToTempExe()
     {
         ReleaseSingleInstanceMutex();
         if (ShellExecuteNonBlocking("open", GetLauncherPathFilename(), GetSequencerSnapshot()))
-            ExitProcess(0);            // All done here
+            ExitProcess(0);  // All done here
         CreateSingleInstanceMutex();
         return "fail";
     }
@@ -1014,7 +1005,7 @@ SString CInstallManager::_SwitchBackFromTempExe()
 
         ReleaseSingleInstanceMutex();
         if (ShellExecuteNonBlocking("open", GetLauncherPathFilename(), GetSequencerSnapshot()))
-            ExitProcess(0);            // All done here
+            ExitProcess(0);  // All done here
         CreateSingleInstanceMutex();
         return "fail";
     }
@@ -1432,7 +1423,7 @@ SString CInstallManager::_ProcessLayoutChecks()
         SString strMTADataPath = i ? GetMTADataPathCommon() : GetMTADataPath();
 
         if (!DirectoryExists(strMTADataPath))
-            ShowLayoutError("[Data directory not present]");            // Can't find directory
+            ShowLayoutError("[Data directory not present]");  // Can't find directory
 
         SString strTestFilePath = PathJoin(strMTADataPath, "testdir", "testfile.txt");
 
@@ -1441,7 +1432,7 @@ SString CInstallManager::_ProcessLayoutChecks()
 
         SString strContent = "test";
         if (!FileSave(strTestFilePath, strContent))
-            ShowLayoutError("[Data directory not writable]");            // Can't save file
+            ShowLayoutError("[Data directory not writable]");  // Can't save file
 
         FileDelete(strTestFilePath);
         RemoveDirectory(ExtractPath(strTestFilePath));
@@ -1451,7 +1442,7 @@ SString CInstallManager::_ProcessLayoutChecks()
     // Check reg key exists
     {
         if (GetRegistryValue("", "Last Install Location").empty())
-            ShowLayoutError("[Registry key not present]");            // Can't find reg key
+            ShowLayoutError("[Registry key not present]");  // Can't find reg key
     }
 #endif
 
@@ -1463,7 +1454,7 @@ SString CInstallManager::_ProcessLayoutChecks()
         SetRegistryValue("testkeypath", "testname", strValue);
         SString strValueCheck = GetRegistryValue("testkeypath", "testname");
         if (strValueCheck != strValue)
-            ShowLayoutError("[Registry key not writable]");            // Can't write reg key
+            ShowLayoutError("[Registry key not writable]");  // Can't write reg key
 
         RemoveRegistryKey("testkeypath");
     }
@@ -1476,7 +1467,7 @@ SString CInstallManager::_ProcessLayoutChecks()
 
         SString strContent = "test";
         if (!FileSave(strTestFilePath, strContent))
-            ShowLayoutError("[Install directory not writable]");            // Can't save file
+            ShowLayoutError("[Install directory not writable]");  // Can't save file
 
         FileDelete(strTestFilePath);
     }
@@ -1676,7 +1667,7 @@ SString CInstallManager::_ProcessServiceChecks()
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessAppCompatChecks()
 {
-    BOOL bIsWOW64 = false;            // 64bit OS
+    BOOL bIsWOW64 = false;  // 64bit OS
     IsWow64Process(GetCurrentProcess(), &bIsWOW64);
     uint    uiHKLMFlags = bIsWOW64 ? KEY_WOW64_64KEY : 0;
     WString strGTAExePathFilename = GetGameExecutablePath().wstring();
@@ -1789,7 +1780,7 @@ SString CInstallManager::_ProcessAppCompatChecks()
             WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
             if (strUrlValue.ContainsI(L":"))
             {
-                strUrlValue = L"disabled";            // Can be anything not containing `:`
+                strUrlValue = L"disabled";  // Can be anything not containing `:`
                 if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
                     bTryAdmin = true;
             }

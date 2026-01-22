@@ -26,9 +26,9 @@ static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
 static const float MOUSE_SENSITIVITY_MAX = MOUSE_SENSITIVITY_DEFAULT * 2 - MOUSE_SENSITIVITY_MIN;
 
-#define VAR_CurVideoMode (*((uint*)(0x08D6220)))
+#define VAR_CurVideoMode   (*((uint*)(0x08D6220)))
 #define VAR_SavedVideoMode (*((uint*)(0x0BA6820)))
-#define VAR_CurAdapter (*((uint*)(0x0C920F4)))
+#define VAR_CurAdapter     (*((uint*)(0x0C920F4)))
 
 #define HOOKPOS_GetFxQuality 0x49EA50
 void HOOK_GetFxQuality();
@@ -53,7 +53,7 @@ CSettingsSA::CSettingsSA()
     HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
-    MemPut<BYTE>(0x6FF420, 0xC3);            // Truncate CalculateAspectRatio
+    MemPut<BYTE>(0x6FF420, 0xC3);  // Truncate CalculateAspectRatio
 
     MemPut(0x732926, &ms_fVehicleLODDistance);
     MemPut(0x732940, &ms_fTrainPlaneLODDistance);
@@ -82,7 +82,7 @@ unsigned int CSettingsSA::GetNumVideoModes()
 VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex)
 {
     // RwEngineGetVideoModeInfo
-    return ((VideoMode*(__cdecl*)(VideoMode*, unsigned int))0x7F2CF0)(modeInfo, modeIndex);
+    return ((VideoMode * (__cdecl*)(VideoMode*, unsigned int))0x7F2CF0)(modeInfo, modeIndex);
 }
 
 unsigned int CSettingsSA::GetCurrentVideoMode()
@@ -194,7 +194,7 @@ float CSettingsSA::GetDrawDistance()
 
 void CSettingsSA::SetDrawDistance(float fDistance)
 {
-    MemPutFast<float>(0x8CD800, fDistance);            // CRenderer::ms_lodDistScale
+    MemPutFast<float>(0x8CD800, fDistance);  // CRenderer::ms_lodDistScale
     m_pInterface->fDrawDistance = fDistance;
 }
 
@@ -223,7 +223,7 @@ void CSettingsSA::SetFXQuality(unsigned int fxQualityId)
 float CSettingsSA::GetMouseSensitivity()
 {
     float fRawValue = *(float*)VAR_fMouseSensitivity;
-    return UnlerpClamped(MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX);            // Remap to 0-1
+    return UnlerpClamped(MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX);  // Remap to 0-1
 }
 
 void CSettingsSA::SetMouseSensitivity(float fSensitivity)
@@ -293,7 +293,6 @@ void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
     MemPut<BYTE>(0x5E682A + 1, bEnable);
 }
 
-
 bool CSettingsSA::GetVolumetricShadowsEnabledByVideoSetting() const noexcept
 {
     bool volumetricShadow;
@@ -335,7 +334,6 @@ bool CSettingsSA::ResetDynamicPedShadows() noexcept
     return true;
 }
 
-
 //
 // Volumetric shadow hooks
 //
@@ -354,11 +352,11 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
         // These vehicles seem to have problems with volumetric shadows, so force blob shadows
         switch (usCallingForVehicleModel)
         {
-            case 460:            // Skimmer
-            case 511:            // Beagle
-            case 572:            // Mower
-            case 590:            // Box Freight
-            case 592:            // Andromada
+            case 460:  // Skimmer
+            case 511:  // Beagle
+            case 572:  // Mower
+            case 590:  // Box Freight
+            case 592:  // Andromada
                 dwFxQualityValue = 0;
         }
         usCallingForVehicleModel = 0;
@@ -366,9 +364,9 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
     else
         // Handle all calls from CPed::PreRenderAfterTest
         if (dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680)
-    {
-        dwFxQualityValue = pGame->GetSettings()->IsDynamicPedShadowsEnabled() ? 2 : 0;
-    }
+        {
+            dwFxQualityValue = pGame->GetSettings()->IsDynamicPedShadowsEnabled() ? 2 : 0;
+        }
 }
 
 // Hooked from 0x49EA50
@@ -447,7 +445,7 @@ void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabl
     {
         fValue = 16 / 10.f;
     }
-    else            // ASPECT_RATIO_16_9
+    else  // ASPECT_RATIO_16_9
     {
         fValue = 16 / 9.f;
     }
@@ -498,7 +496,7 @@ void CSettingsSA::SetRadarMode(eRadarMode hudMode)
 ////////////////////////////////////////////////
 float ms_fFOV = 70;
 float ms_fFOVCar = 70;
-float ms_fFOVCarMax = 100;            // at high vehicle velocity
+float ms_fFOVCarMax = 100;  // at high vehicle velocity
 bool  ms_bFOVPlayerFromScript = false;
 bool  ms_bFOVVehicleFromScript = false;
 
@@ -972,11 +970,11 @@ __declspec(noinline) int OnMY_SelectDevice()
 }
 
 // Hook info
-#define HOOKPOS_SelectDevice 0x0746219
+#define HOOKPOS_SelectDevice  0x0746219
 #define HOOKSIZE_SelectDevice 6
-DWORD RETURN_SelectDeviceSingle = 0x0746273;
-DWORD RETURN_SelectDeviceMultiHide = 0x074622C;
-DWORD RETURN_SelectDeviceMultiShow = 0x0746227;
+DWORD                 RETURN_SelectDeviceSingle = 0x0746273;
+DWORD                 RETURN_SelectDeviceMultiHide = 0x074622C;
+DWORD                 RETURN_SelectDeviceMultiShow = 0x0746227;
 void _declspec(naked) HOOK_SelectDevice()
 {
     // clang-format off

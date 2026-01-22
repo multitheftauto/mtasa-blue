@@ -34,7 +34,7 @@ enum eVoiceState
     VOICESTATE_TRANSMITTING_IGNORED,
 };
 
-#define MOVEMENT_UPDATE_THRESH (5)
+#define MOVEMENT_UPDATE_THRESH   (5)
 #define DISTANCE_FOR_NEAR_VIEWER (310)
 
 struct SViewerInfo

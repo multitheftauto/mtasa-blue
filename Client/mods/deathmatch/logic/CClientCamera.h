@@ -37,7 +37,7 @@ class CClientCamera final : public CClientEntity
     friend class CClientManager;
 
 public:
-    void Unlink(){};
+    void Unlink() {};
     void DoPulse();
 
     eClientEntityType GetType() const { return CCLIENTCAMERA; };

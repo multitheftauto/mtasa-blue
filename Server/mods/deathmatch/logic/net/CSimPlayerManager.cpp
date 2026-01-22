@@ -41,7 +41,7 @@
 ///////////////////////////////////////////////////////////////////////////
 void CSimPlayerManager::AddSimPlayer(CPlayer* pPlayer)
 {
-    LockSimSystem();            // Prevent any sim activity on the sync thread
+    LockSimSystem();  // Prevent any sim activity on the sync thread
 
     // Create
     CSimPlayer* pSim = new CSimPlayer();
@@ -72,7 +72,7 @@ void CSimPlayerManager::AddSimPlayer(CPlayer* pPlayer)
 ///////////////////////////////////////////////////////////////////////////
 void CSimPlayerManager::RemoveSimPlayer(CPlayer* pPlayer)
 {
-    LockSimSystem();            // Prevent any sim activity on the sync thread
+    LockSimSystem();  // Prevent any sim activity on the sync thread
 
     // Check
     assert(pPlayer->m_pSimPlayer->m_pRealPlayer == pPlayer);
@@ -110,7 +110,7 @@ void CSimPlayerManager::RemoveSimPlayer(CPlayer* pPlayer)
 ///////////////////////////////////////////////////////////////////////////
 void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
 {
-    LockSimSystem();            // TODO - only lock the CSimPlayer
+    LockSimSystem();  // TODO - only lock the CSimPlayer
 
     // Get matching sim player
     CSimPlayer* pSim = pPlayer->m_pSimPlayer;
@@ -162,7 +162,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
             if (pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate)
                 pSim->m_PuresyncSendListFlat.push_back(pSendSimPlayer);
             else
-                pPlayer->m_bPureSyncSimSendListDirty = true;            // Retry next time
+                pPlayer->m_bPureSyncSimSendListDirty = true;  // Retry next time
         }
     }
 
@@ -228,7 +228,7 @@ bool CSimPlayerManager::HandlePlayerPureSync(const NetServerPlayerID& Socket, Ne
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PLAYER_PURESYNC))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();  // Prevent player additions and deletions
 
     // Grab the source player
     CSimPlayer* pSourceSimPlayer = Get(Socket);
@@ -266,7 +266,7 @@ bool CSimPlayerManager::HandleVehiclePureSync(const NetServerPlayerID& Socket, N
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PLAYER_VEHICLE_PURESYNC))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();  // Prevent player additions and deletions
 
     // Grab the source player
     CSimPlayer* pSourceSimPlayer = Get(Socket);
@@ -305,7 +305,7 @@ bool CSimPlayerManager::HandleKeySync(const NetServerPlayerID& Socket, NetBitStr
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PLAYER_KEYSYNC))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();  // Prevent player additions and deletions
 
     // Grab the source player
     CSimPlayer* pSourceSimPlayer = Get(Socket);
@@ -378,7 +378,7 @@ bool CSimPlayerManager::HandlePedTaskPacket(const NetServerPlayerID& Socket, Net
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PED_TASK))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();  // Prevent player additions and deletions
 
     // Grab the source player
     CSimPlayer* pSourceSimPlayer = Get(Socket);

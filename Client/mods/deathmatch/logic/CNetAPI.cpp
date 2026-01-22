@@ -665,7 +665,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
         // Eventually read vehicle specific keysync data
         ReadSmallVehicleSpecific(pVehicle, BitStream, pVehicle->GetModel());
 
-        if (pVehicle->GetUpgrades()->HasUpgrade(1087))            // Hydraulics?
+        if (pVehicle->GetUpgrades()->HasUpgrade(1087))  // Hydraulics?
         {
             short sRightStickX, sRightStickY;
             BitStream.Read(sRightStickX);
@@ -790,7 +790,7 @@ void CNetAPI::WriteKeysync(CClientPed* pPlayerModel, NetBitStreamInterface& BitS
         CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
         if (pUpgrades)
         {
-            if (pUpgrades->HasUpgrade(1087))            // Hydraulics?
+            if (pUpgrades->HasUpgrade(1087))  // Hydraulics?
             {
                 BitStream.Write(ControllerState.RightStickX);
                 BitStream.Write(ControllerState.RightStickY);
@@ -1046,16 +1046,16 @@ void WriteCameraOrientation(const CVector& vecPositionBase, NetBitStreamInterfac
         uint  uiNumBits;
         float fRange;
     } bitCountTable[4] = {
-        {3, 4.0f},                // 3 bits is +-4        12 bits total
-        {5, 16.0f},               // 5 bits is +-16       18 bits total
-        {9, 256.0f},              // 9 bits is +-256      30 bits total
-        {14, 8192.0f},            // 14 bits is +-8192    45 bits total
+        {3, 4.0f},      // 3 bits is +-4        12 bits total
+        {5, 16.0f},     // 5 bits is +-16       18 bits total
+        {9, 256.0f},    // 9 bits is +-256      30 bits total
+        {14, 8192.0f},  // 14 bits is +-8192    45 bits total
     };
     char idx;
     for (idx = 0; idx < 3; idx++)
     {
         if (bitCountTable[idx].fRange > fUseMaxValue)
-            break;            // We have enough bits now
+            break;  // We have enough bits now
     }
     const uint  uiNumBits = bitCountTable[idx].uiNumBits;
     const float fRange = bitCountTable[idx].fRange;
@@ -1786,10 +1786,10 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
     if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
-            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+            sButtonSquare = (short)keys.data.ucButtonSquare;  // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;  // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -1805,16 +1805,16 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
 void CNetAPI::WriteSmallKeysync(const CControllerState& ControllerState, NetBitStreamInterface& BitStream)
 {
     SSmallKeysyncSync keys;
-    keys.data.bLeftShoulder1 = (ControllerState.LeftShoulder1 != 0);                   // Action / Secondary-Fire
-    keys.data.bRightShoulder1 = (ControllerState.RightShoulder1 != 0);                 // Aim-Weapon / Handbrake
-    keys.data.bButtonSquare = (ControllerState.ButtonSquare != 0);                     // Jump / Reverse
-    keys.data.bButtonCross = (ControllerState.ButtonCross != 0);                       // Sprint / Accelerate
-    keys.data.bButtonCircle = (ControllerState.ButtonCircle != 0);                     // Fire // Fire
-    keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);                 // Enter/Exit/Special-Attack / Enter/exit
-    keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);                     // Crouch / Horn
-    keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                            // Walk / -
-    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;            // Jump / Reverse
-    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;              // Sprint / Accelerate
+    keys.data.bLeftShoulder1 = (ControllerState.LeftShoulder1 != 0);         // Action / Secondary-Fire
+    keys.data.bRightShoulder1 = (ControllerState.RightShoulder1 != 0);       // Aim-Weapon / Handbrake
+    keys.data.bButtonSquare = (ControllerState.ButtonSquare != 0);           // Jump / Reverse
+    keys.data.bButtonCross = (ControllerState.ButtonCross != 0);             // Sprint / Accelerate
+    keys.data.bButtonCircle = (ControllerState.ButtonCircle != 0);           // Fire // Fire
+    keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);       // Enter/Exit/Special-Attack / Enter/exit
+    keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);           // Crouch / Horn
+    keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                  // Walk / -
+    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;  // Jump / Reverse
+    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;    // Sprint / Accelerate
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
@@ -1837,10 +1837,10 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
     if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
-            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+            sButtonSquare = (short)keys.data.ucButtonSquare;  // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;  // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -2267,9 +2267,8 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
 
     CVector start;
     CVector end;
-    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) ||
-        !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) ||
-        !start.IsValid() || !end.IsValid())
+    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
+        !end.IsValid())
         return;
 
     std::uint8_t order = 0;

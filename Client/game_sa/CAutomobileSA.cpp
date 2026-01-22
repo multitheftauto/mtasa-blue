@@ -44,7 +44,7 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
     {
         case DT_PANEL_DAMAGED:
         {
-            if ((pHandlingData->uiModelFlags & 0x10000000) != 0) // check bouncePanels flag
+            if ((pHandlingData->uiModelFlags & 0x10000000) != 0)  // check bouncePanels flag
                 return;
 
             if (node != eCarNodes::WINDSCREEN && node != eCarNodes::WING_LF && node != eCarNodes::WING_RF)
@@ -60,7 +60,7 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
                 }
             }
 
-            SetComponentVisibility(frame, 2); // ATOMIC_IS_DAM_STATE
+            SetComponentVisibility(frame, 2);  // ATOMIC_IS_DAM_STATE
             break;
         }
         case DT_PANEL_OPENED:
@@ -68,7 +68,7 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
             if (panelId == WINDSCREEN_PANEL)
                 m_VehicleAudioEntity.AddAudioEvent(91, 0.0f);
 
-            SetComponentVisibility(frame, 2); // ATOMIC_IS_DAM_STATE
+            SetComponentVisibility(frame, 2);  // ATOMIC_IS_DAM_STATE
             break;
         }
         case DT_PANEL_OPENED_DAMAGED:
@@ -76,13 +76,13 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
             if (panelId == WINDSCREEN_PANEL)
             {
                 if (breakGlass)
-                    ((void(__cdecl*)(CAutomobileSAInterface*, bool))0x71C2B0)(this, false); // Call CGlass::CarWindscreenShatters
+                    ((void(__cdecl*)(CAutomobileSAInterface*, bool))0x71C2B0)(this, false);  // Call CGlass::CarWindscreenShatters
             }
 
             if (spawnFlyingComponent && (panelId != WINDSCREEN_PANEL || (panelId == WINDSCREEN_PANEL && !breakGlass)))
                 SpawnFlyingComponent(node, eCarComponentCollisionTypes::COL_NODE_PANEL);
 
-            SetComponentVisibility(frame, 0); // ATOMIC_IS_NOT_PRESENT
+            SetComponentVisibility(frame, 0);  // ATOMIC_IS_NOT_PRESENT
             break;
         }
     }

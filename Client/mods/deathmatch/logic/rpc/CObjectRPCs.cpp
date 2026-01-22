@@ -132,7 +132,7 @@ void CObjectRPCs::SetObjectBreakable(CClientEntity* pSource, NetBitStreamInterfa
 
 void CObjectRPCs::BreakObject(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-   auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
+    auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
 
     if (pObject)
         pObject->Break();

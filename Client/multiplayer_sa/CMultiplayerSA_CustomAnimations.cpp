@@ -204,7 +204,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
 
 void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 {
-     // clang-format off
+    // clang-format off
      __asm
      {
          lea     edx, [esp + 12] // animationGroup address
@@ -215,11 +215,11 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
          add     esp, 8
          pushad
      }
-     // clang-format on
+    // clang-format on
 
     if (m_pAddAnimationAndSyncHandler)
     {
-         // clang-format off
+        // clang-format off
          __asm
          {
              popad
@@ -235,10 +235,10 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
              push    edi
              jmp     RETURN_CAnimManager_AddAnimationAndSync
          }
-         // clang-format on
+        // clang-format on
     }
 
-     // clang-format off
+    // clang-format off
      __asm
      {
 
@@ -247,7 +247,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
              mov     edx, dword ptr ds : [0B4EA34h]
              jmp     RETURN_CAnimManager_AddAnimationAndSync_NORMAL_FLOW
      }
-     // clang-format on
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()

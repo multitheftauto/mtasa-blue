@@ -12,7 +12,7 @@
 
 extern "C"
 {
-    #include "lua.h"
+#include "lua.h"
 }
 #include <net/bitstream.h>
 #include <string>
@@ -21,7 +21,7 @@ extern "C"
 class CClientEntity;
 class CLuaArguments;
 
-#define LUA_TTABLEREF 9
+#define LUA_TTABLEREF    9
 #define LUA_TSTRING_LONG 10
 
 class CLuaArgument
