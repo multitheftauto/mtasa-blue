@@ -1,6 +1,9 @@
 name: Build
 
 on:
+  pull_request:
+    branches:
+      - release/1.6.0
   push:
     branches:
       - release/1.6.0
