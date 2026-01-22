@@ -20,7 +20,7 @@ enum eWeaponSkill : std::uint8_t
     WEAPONSKILL_POOR = 0,
     WEAPONSKILL_STD,
     WEAPONSKILL_PRO,
-    WEAPONSKILL_SPECIAL,            // for cops using pistols differently for example
+    WEAPONSKILL_SPECIAL,  // for cops using pistols differently for example
     WEAPONSKILL_MAX_NUMBER
 };
 
@@ -42,15 +42,15 @@ enum eWeaponSlot
     WEAPONSLOT_TYPE_MELEE,
     WEAPONSLOT_TYPE_HANDGUN,
     WEAPONSLOT_TYPE_SHOTGUN,
-    WEAPONSLOT_TYPE_SMG,            // 4
+    WEAPONSLOT_TYPE_SMG,  // 4
     WEAPONSLOT_TYPE_MG,
     WEAPONSLOT_TYPE_RIFLE,
     WEAPONSLOT_TYPE_HEAVY,
     WEAPONSLOT_TYPE_THROWN,
-    WEAPONSLOT_TYPE_SPECIAL,              // 9
-    WEAPONSLOT_TYPE_GIFT,                 // 10
-    WEAPONSLOT_TYPE_PARACHUTE,            // 11
-    WEAPONSLOT_TYPE_DETONATOR,            // 12
+    WEAPONSLOT_TYPE_SPECIAL,    // 9
+    WEAPONSLOT_TYPE_GIFT,       // 10
+    WEAPONSLOT_TYPE_PARACHUTE,  // 11
+    WEAPONSLOT_TYPE_DETONATOR,  // 12
 
     WEAPONSLOT_MAX
 };
@@ -81,7 +81,7 @@ enum eWeaponType
     WEAPONTYPE_CHAINSAW,
 
     // gifts
-    WEAPONTYPE_DILDO1,            // 10
+    WEAPONTYPE_DILDO1,  // 10
     WEAPONTYPE_DILDO2,
     WEAPONTYPE_VIBE1,
     WEAPONTYPE_VIBE2,
@@ -92,31 +92,31 @@ enum eWeaponType
     WEAPONTYPE_TEARGAS,
     WEAPONTYPE_MOLOTOV,
     WEAPONTYPE_ROCKET,
-    WEAPONTYPE_ROCKET_HS,            // 20
+    WEAPONTYPE_ROCKET_HS,  // 20
     WEAPONTYPE_FREEFALL_BOMB,
 
     // FIRST SKILL WEAPON
-    WEAPONTYPE_PISTOL,            // handguns
+    WEAPONTYPE_PISTOL,  // handguns
     WEAPONTYPE_PISTOL_SILENCED,
     WEAPONTYPE_DESERT_EAGLE,
-    WEAPONTYPE_SHOTGUN,                    // shotguns
-    WEAPONTYPE_SAWNOFF_SHOTGUN,            // one handed
+    WEAPONTYPE_SHOTGUN,          // shotguns
+    WEAPONTYPE_SAWNOFF_SHOTGUN,  // one handed
     WEAPONTYPE_SPAS12_SHOTGUN,
-    WEAPONTYPE_MICRO_UZI,            // submachine guns
+    WEAPONTYPE_MICRO_UZI,  // submachine guns
     WEAPONTYPE_MP5,
-    WEAPONTYPE_AK47,            // 30      // machine guns
+    WEAPONTYPE_AK47,  // 30      // machine guns
     WEAPONTYPE_M4,
-    WEAPONTYPE_TEC9,            // this uses stat from the micro_uzi
+    WEAPONTYPE_TEC9,  // this uses stat from the micro_uzi
     // END SKILL WEAPONS
 
-    WEAPONTYPE_COUNTRYRIFLE,            // rifles
+    WEAPONTYPE_COUNTRYRIFLE,  // rifles
     WEAPONTYPE_SNIPERRIFLE,
-    WEAPONTYPE_ROCKETLAUNCHER,            // specials
+    WEAPONTYPE_ROCKETLAUNCHER,  // specials
     WEAPONTYPE_ROCKETLAUNCHER_HS,
     WEAPONTYPE_FLAMETHROWER,
     WEAPONTYPE_MINIGUN,
     WEAPONTYPE_REMOTE_SATCHEL_CHARGE,
-    WEAPONTYPE_DETONATOR,            // 40 // plastic explosive
+    WEAPONTYPE_DETONATOR,  // 40 // plastic explosive
     WEAPONTYPE_SPRAYCAN,
     WEAPONTYPE_EXTINGUISHER,
     WEAPONTYPE_CAMERA,
@@ -128,12 +128,12 @@ enum eWeaponType
     WEAPONTYPE_ARMOUR,
     // these are possible ways to die
     WEAPONTYPE_RAMMEDBYCAR,
-    WEAPONTYPE_RUNOVERBYCAR,            // 50
+    WEAPONTYPE_RUNOVERBYCAR,  // 50
     WEAPONTYPE_EXPLOSION,
     WEAPONTYPE_UZI_DRIVEBY,
     WEAPONTYPE_DROWNING,
     WEAPONTYPE_FALL,
-    WEAPONTYPE_UNIDENTIFIED,            // Used for damage being done
+    WEAPONTYPE_UNIDENTIFIED,  // Used for damage being done
     WEAPONTYPE_ANYMELEE,
     WEAPONTYPE_ANYWEAPON,
     WEAPONTYPE_FLARE,
