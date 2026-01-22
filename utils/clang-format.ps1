@@ -1,5 +1,19 @@
 #!/usr/bin/env pwsh
 
+# Check PowerShell version
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    $currentVersion = $PSVersionTable.PSVersion
+    Write-Error @"
+This script requires PowerShell 7 or later. 
+Current version: $currentVersion
+
+Install PowerShell 7+: 
+  - Or run: winget install Microsoft.PowerShell (Windows)
+  - Windows/macOS/Linux: https://github.com/PowerShell/PowerShell#get-powershell
+"@
+    exit 1
+}
+
 $ToolConfig = @{
     "clang-format" = @{
         "linux-amd64" = @{
