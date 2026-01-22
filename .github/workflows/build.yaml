@@ -1,6 +1,9 @@
 name: Build
 
 on:
+  pull_request:
+    branches:
+      - release/1.6.0
   push:
     branches:
       - release/1.6.0
@@ -34,9 +37,9 @@ jobs:
 
       - name: Restore vs2022
         run: |
-          git fetch origin c757a89f7c92fa7c814572b28384ca5985fff5bb
-          git checkout c757a89f7c92fa7c814572b28384ca5985fff5bb -- README.md
-          git revert c757a89f7c92fa7c814572b28384ca5985fff5bb --no-commit
+          git fetch origin 6ccea706e4b49f6bdb013b554cd8ac5bf4ed8a6c
+          git checkout 6ccea706e4b49f6bdb013b554cd8ac5bf4ed8a6c -- README.md
+          git revert 6ccea706e4b49f6bdb013b554cd8ac5bf4ed8a6c --no-commit
         shell: bash
 
       - name: Install CEF
