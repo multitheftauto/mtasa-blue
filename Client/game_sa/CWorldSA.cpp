@@ -401,22 +401,39 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
         // Now, calculate texture UV, etc based on the hit [if we've hit anything at all]
         // Since we have the barycentric coords of the hit, calculating it is easy
         ret.uv = {};
-        for (int i = 0; i < 3; i++)
+
+        // Index of the UV set to use
+        const int uvSetIdx = 0;
+
+        // Check if texcoords exist (some models only have colored mesh without textures)
+        if (c.hitGeo->texcoords[uvSetIdx])
         {
-            // UV set index - Usually models only use level 0 indices, so let's stick with that
-            const int uvSetIdx = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                // Vertex's UV position
+                RwTextureCoordinates* const vtxUV = &c.hitGeo->texcoords[uvSetIdx][c.hitTri->verts[i]];
 
-            // Vertex's UV position
-            RwTextureCoordinates* const vtxUV = &c.hitGeo->texcoords[uvSetIdx][c.hitTri->verts[i]];
-
-            // Now, just interpolate
-            ret.uv += CVector2D{vtxUV->u, vtxUV->v} * c.hitBary[i];
+                // Now, just interpolate
+                ret.uv += CVector2D{vtxUV->u, vtxUV->v} * c.hitBary[i];
+            }
+        }
+        else
+        {
+            // No texture coords available, use barycentric coords as UV fallback
+            ret.uv = CVector2D{c.hitBary.fX, c.hitBary.fY};
         }
 
         // Find out material texture name
         // For some reason this is sometimes null
-        RwTexture* const tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
-        ret.textureName = tex ? tex->name : nullptr;
+        if (c.hitGeo->materials.materials && c.hitGeo->materials.materials[c.hitTri->materialId])
+        {
+            RwTexture* const tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
+            ret.textureName = tex ? tex->name : nullptr;
+        }
+        else
+        {
+            ret.textureName = nullptr;
+        }
 
         RwFrame* const hitFrame = RpAtomicGetFrame(c.hitAtomic);
         ret.frameName = hitFrame ? hitFrame->szName : nullptr;
