@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 
+#include "Wine.h"
 #include "MainFunctions.h"
 #include "Main.h"
 #include "Utils.h"
@@ -1209,23 +1210,6 @@ void ValidateGTAPath()
 
 //////////////////////////////////////////////////////////
 //
-// isUsingWine
-//
-// Detect if we are running under Wine
-// 
-//////////////////////////////////////////////////////////
-bool isUsingWine()
-{
-    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
-    if (!ntdll)
-        return false;
-
-    FARPROC wineVersion = GetProcAddress(ntdll, "wine_get_version");
-    return wineVersion != nullptr;
-}
-
-//////////////////////////////////////////////////////////
-//
 // CheckAntiVirusStatus
 //
 // Maybe warn user if no anti-virus running
@@ -1233,7 +1217,7 @@ bool isUsingWine()
 //////////////////////////////////////////////////////////
 void CheckAntiVirusStatus()
 {
-    if (isUsingWine())
+    if (Wine::IsRunningOnWine())
     {
         WriteDebugEvent("Skipping AV check under Wine");
         return;
