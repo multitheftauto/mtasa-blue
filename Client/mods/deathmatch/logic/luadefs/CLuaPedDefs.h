@@ -119,9 +119,9 @@ public:
 
     static bool killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully);
 
-    static void PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probability);
-    static bool IsPedEnteringToVehicle(CClientPed* const ped) noexcept;
-    static bool IsPedExitingFromVehicle(CClientPed* const ped) noexcept;
+    static void            PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probability);
+    static bool            IsPedEnteringToVehicle(CClientPed* const ped) noexcept;
+    static bool            IsPedExitingFromVehicle(CClientPed* const ped) noexcept;
     static CClientVehicle* GetPedVehicleEnteringTo(CClientPed* const ped);
-    static int GetPedVehicleEnteringToSeat(CClientPed* const ped);
+    static int             GetPedVehicleEnteringToSeat(CClientPed* const ped);
 };
