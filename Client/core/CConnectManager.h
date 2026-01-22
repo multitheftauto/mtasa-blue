@@ -33,7 +33,7 @@ public:
     void OnServerExists();
 
     void SetQuickConnect(bool quick) noexcept { m_quickConnect = quick; }
-    
+
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 
     static bool StaticProcessPacket(unsigned char ucPacketID, class NetBitStreamInterface& bitStream);

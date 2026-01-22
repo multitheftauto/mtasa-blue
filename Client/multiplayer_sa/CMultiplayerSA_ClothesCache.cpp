@@ -14,7 +14,7 @@
 #include "..\game_sa\gamesa_renderware.h"
 #include "..\game_sa\gamesa_renderware.hpp"
 
-#define CLOTHES_REF_TEST    1       // Debug clothes geometry refs
+#define CLOTHES_REF_TEST 1  // Debug clothes geometry refs
 
 ////////////////////////////////////////////////
 //
@@ -28,7 +28,7 @@ class CPedClothesDesc
 public:
     union
     {
-        DWORD things1[10];            // models
+        DWORD things1[10];  // models
         struct
         {
             DWORD torso;
@@ -45,7 +45,7 @@ public:
 
     union
     {
-        DWORD things2[18];            // +0x28 textures?
+        DWORD things2[18];  // +0x28 textures?
         struct
         {
             DWORD Torso;
@@ -69,8 +69,8 @@ public:
         };
     };
 
-    float fFatAmount;               // +0x70
-    float fMuscleAmount;            // +0x74
+    float fFatAmount;     // +0x70
+    float fMuscleAmount;  // +0x74
 
     bool operator==(const CPedClothesDesc& other) const
     {
@@ -142,17 +142,17 @@ public:
         {
             if (!info.pClump || !info.pClump->atomics.root.next) [[unlikely]]
                 continue;
-            
+
             if (info.pClump->atomics.root.next == &info.pClump->atomics.root) [[unlikely]]
                 continue;
-            
+
             // Container_of pattern: RwLLLink at offset 0x8 in RpAtomic
-            char* pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
+            char*     pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
             RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pListNode - 0x8);
-            
+
             if (!SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic))) [[unlikely]]
                 continue;
-            
+
             RpGeometry* pGeometry = pAtomic->geometry;
             if (!pGeometry) [[unlikely]]
                 continue;
@@ -203,10 +203,9 @@ public:
         SSavedClumpInfo info;
         info.pClump = pClumpCopy;
 #ifdef CLOTHES_REF_TEST
-        if (info.pClump && info.pClump->atomics.root.next && 
-            info.pClump->atomics.root.next != &info.pClump->atomics.root)
+        if (info.pClump && info.pClump->atomics.root.next && info.pClump->atomics.root.next != &info.pClump->atomics.root)
         {
-            char* pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
+            char*     pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
             RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pListNode - 0x8);
             if (SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
             {
@@ -277,11 +276,13 @@ public:
 
         const SSavedClumpInfo& info = savedClumpList[bestIndex];
 
+        if (!info.bUnused)
+            return false;
+
 #ifdef CLOTHES_REF_TEST
-        if (info.pClump && info.pClump->atomics.root.next && 
-            info.pClump->atomics.root.next != &info.pClump->atomics.root)
+        if (info.pClump && info.pClump->atomics.root.next && info.pClump->atomics.root.next != &info.pClump->atomics.root)
         {
-            char* pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
+            char*     pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
             RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pListNode - 0x8);
             if (SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
             {
@@ -292,7 +293,6 @@ public:
         }
 #endif
         RpClumpDestroy(info.pClump);
-        assert(info.bUnused);
         m_Stats.uiNumTotal--;
         m_Stats.uiNumUnused--;
         m_Stats.uiNumRemoved++;
@@ -311,7 +311,7 @@ public:
         for (SSavedClumpInfo& info : savedClumpList)
         {
             if (info.iCacheRevision != m_iCacheRevision)
-                continue;            // Don't match if it was generated with different custom clothes textures
+                continue;  // Don't match if it was generated with different custom clothes textures
 
             if (info.clothedDesc == *pClothesDesc)
             {
@@ -374,13 +374,14 @@ void _cdecl OnCClothesBuilderCreateSkinnedClumpPost(RpClump* pRpClumpResult, RpC
 }
 
 // Hook info
-#define HOOKPOS_CClothesBuilderCreateSkinnedClump        0x5A69D0
-#define HOOKSIZE_CClothesBuilderCreateSkinnedClump       6
-DWORD RETURN_CClothesBuilderCreateSkinnedClump = 0x5A69D6;
+#define HOOKPOS_CClothesBuilderCreateSkinnedClump  0x5A69D0
+#define HOOKSIZE_CClothesBuilderCreateSkinnedClump 6
+DWORD                         RETURN_CClothesBuilderCreateSkinnedClump = 0x5A69D6;
 static void __declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -424,6 +425,7 @@ inside:
         sub     esp, 0D4h
         jmp     RETURN_CClothesBuilderCreateSkinnedClump
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -78,6 +78,7 @@ void InitRwFunctions()
     RpLightSetColor = (RpLightSetColor_t)0x00751A90;
     RwCameraClone = (RwCameraClone_t)0x007EF3B0;
     RpClumpClone = (RpClumpClone_t)0x00749F70;
+    RwTexDictionaryCreate = (RwTexDictionaryCreate_t)0x007F3600;
     RwTexDictionaryDestroy = (RwTexDictionaryDestroy_t)0x007F36A0;
     RwTextureDestroy = (RwTextureDestroy_t)0x007F3820;
     RwRasterUnlock = (RwRasterUnlock_t)0x007FAEC0;
@@ -90,7 +91,7 @@ void InitRwFunctions()
     RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51A0;
     RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5120;
     RtQuatRotate = (RtQuatRotate_t)0x7EB7C0;
-    
+
     SetTextureDict = (SetTextureDict_t)0x007319C0;
     LoadClumpFile = (LoadClumpFile_t)0x005371F0;
     LoadModel = (LoadModel_t)0x0040C6B0;
@@ -104,5 +105,6 @@ void InitRwFunctions()
     CTxdStore_RemoveRef = (CTxdStore_RemoveRef_t)0x00731A30;
     CTxdStore_AddRef = (CTxdStore_AddRef_t)0x00731A00;
     CTxdStore_GetNumRefs = (CTxdStore_GetNumRefs_t)0x00731AA0;
+    CTxdStore_SetupTxdParent = (CTxdStore_SetupTxdParent_t)0x00731D50;
     CClothesBuilder_CopyTexture = (CClothesBuilder_CopyTexture_t)0x005A5730;
 }

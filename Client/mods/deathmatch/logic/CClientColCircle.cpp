@@ -70,7 +70,7 @@ void CClientColCircle::DebugRender(const CVector& vecPosition, float fDrawRadius
     // Draw Slices
     {
         CVector vecMult(m_fRadius, m_fRadius, fHeight);
-        CVector vecAdd(vecOrigin.fX, vecOrigin.fY, vecBase.fZ + 4);            // Extra bit so a slice is on the same Z coord as the camera
+        CVector vecAdd(vecOrigin.fX, vecOrigin.fY, vecBase.fZ + 4);  // Extra bit so a slice is on the same Z coord as the camera
 
         for (uint s = iSkipEndSlices; s < uiNumSlices - iSkipEndSlices; s++)
         {
