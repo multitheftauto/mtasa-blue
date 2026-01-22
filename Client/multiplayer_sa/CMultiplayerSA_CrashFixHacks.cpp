@@ -192,7 +192,7 @@ static bool IsWritablePtr(void* ptr, std::size_t size) noexcept
 
 ////////////////////////////////////////////////////////////////////////
 // CCustomCarEnvMapPipeline::CustomPipeRenderCB
-// 
+//
 // Null mesh material pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc1                              0x5D9A6E
@@ -220,7 +220,7 @@ void _declspec(naked) HOOK_CrashFix_Misc1()
 
 ////////////////////////////////////////////////////////////////////////
 // CAutomobile::ProcessControl
-// 
+//
 // Null CColModel pointer or corrupted m_pColData
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc2                              0x6B18B0
@@ -279,7 +279,7 @@ void _declspec(naked) HOOK_CrashFix_Misc3()
 
 ////////////////////////////////////////////////////////////////////////
 // CAESoundManager::Service
-// 
+//
 // Division by 0
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc4                              0x4F02D2
@@ -306,7 +306,7 @@ void _declspec(naked) HOOK_CrashFix_Misc4()
 
 ////////////////////////////////////////////////////////////////////////
 // CPed::SetPedPositionInCar
-// 
+//
 // Null pointer m_pVehicleStruct in the CVehicleModelInfo structure
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc5                              0x5DF949
@@ -315,7 +315,8 @@ DWORD RETURN_CrashFix_Misc5 = 0x5DF950;
 DWORD RETURN_CrashFix_Misc5B = 0x5DFCC4;
 void _declspec(naked) HOOK_CrashFix_Misc5()
 {
-    _asm {
+    __asm
+    {
         mov edi, dword ptr[ARRAY_ModelInfo]
         mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
@@ -561,7 +562,7 @@ void _declspec(naked) HOOK_CrashFix_Misc13()
 
 ////////////////////////////////////////////////////////////////////////
 // CAEFrontendAudioEntity::AddAudioEvent
-// 
+//
 // Invalid pointer to the array CAEAudioEntity::m_pAudioEventVolumes
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc14                             0x4DD4B5
@@ -749,7 +750,7 @@ void _declspec(naked) HOOK_CrashFix_Misc19()
 
 ////////////////////////////////////////////////////////////////////////
 // CPlaceable::RemoveMatrix
-// 
+//
 // "this" is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc20                             0x54F3B0
@@ -776,7 +777,7 @@ void _declspec(naked) HOOK_CrashFix_Misc20()
 
 ////////////////////////////////////////////////////////////////////////
 // CTaskSimpleCarFallOut::FinishAnimFallOutCB
-// 
+//
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
 ////////////////////////////////////////////////////////////////////////
 bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAssociation, CTaskSimpleCarFallOutSAInterface* pTask)
@@ -913,7 +914,7 @@ void _declspec(naked) HOOK_CrashFix_Misc23()
 
 ////////////////////////////////////////////////////////////////////////
 // RwFrameForAllChildren
-// 
+//
 // The first argument of type RwFrame received is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc24                             0x7F0DC8
@@ -973,7 +974,7 @@ void _declspec(naked) HOOK_CrashFix_Misc25()
 
 ////////////////////////////////////////////////////////////////////////
 // CShotInfo::Update
-// 
+//
 // _creator->m_pIntelligence is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc26                             0x739FA0
@@ -1006,7 +1007,7 @@ void _declspec(naked) HOOK_CrashFix_Misc26()
 
 ////////////////////////////////////////////////////////////////////////
 // CTaskComplexDieInCar::ControlSubTask
-// 
+//
 // ped or ped->m_pVehicle is null pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc27                             0x6377FB
@@ -1097,7 +1098,7 @@ cont:
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimBlendAssociation::SetFinishCallback
-// 
+//
 // "this" is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc30                             0x4CEBE8
@@ -1128,7 +1129,7 @@ cont:
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimBlendAssociation::SetCurrentTime
-// 
+//
 // "this" is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc32                             0x4CEA80
@@ -1200,7 +1201,7 @@ static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
 
     const auto RwTexDictionaryFindNamedTexture = reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(TrampolineRwTexDictionaryFindNamedTexture);
     const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
-    
+
     RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
     if (vehicleTxd != nullptr)
     {
@@ -1352,7 +1353,7 @@ void _declspec(naked) HOOK_CrashFix_Misc33()
 
 ////////////////////////////////////////////////////////////////////////
 // CCustomCarEnvMapPipeline::CustomPipeRenderCB - EnvWave path
-// 
+//
 // NULL env map plugin data pointer (EBP) causes crash in CalculateEnvMap
 // Crash when rendering a car environment map (Accessing [esi+2]).
 // This occurs when a material has MF_HAS_SHINE_WAVE flag set
@@ -1835,7 +1836,7 @@ inner:
 
 ////////////////////////////////////////////////////////////////////////
 // CObject::~CObject, CObject::ProcessTrainCrossingBehavior
-// 
+//
 // Train crossings: Detach barrier from post (to be able to create objects 1373 and 1374 separately)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CObject_Destructor_TrainCrossing_Check 0x59F7A8
@@ -1870,7 +1871,7 @@ jmp_invalid:
 
 ////////////////////////////////////////////////////////////////////////
 // Interior_c::Init
-// 
+//
 // GTA doesn't reset the furniture object counter, so do it manually everytime before GTA furnishes an interior (Interior_c::Init)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_ResetFurnitureObjectCounter 0x593BF0
@@ -1890,7 +1891,7 @@ void _declspec(naked) HOOK_ResetFurnitureObjectCounter()
 
 ////////////////////////////////////////////////////////////////////////
 // CVolumetricShadowMgr_Render
-// 
+//
 // Custom models can cause problems for volumetric shadows.
 // Record when volumetric shadows are being rendered so we can disable them if a crash occurs.
 ////////////////////////////////////////////////////////////////////////
@@ -1934,7 +1935,7 @@ inner:
 
 ////////////////////////////////////////////////////////////////////////
 // CVolumetricShadowMgr_Update
-// 
+//
 // Custom models can cause problems for volumetric shadows.
 // Record when volumetric shadows are being updated so we can disable them if a crash occurs.
 ////////////////////////////////////////////////////////////////////////
@@ -1979,7 +1980,7 @@ inner:
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::CreateAnimAssocGroups
-// 
+//
 // CModelInfo::ms_modelInfoPtrs at the given index is a null pointer
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
@@ -2057,7 +2058,7 @@ void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 
 ////////////////////////////////////////////////////////////////////////
 // OnMY_printf
-// 
+//
 // GTA outputs stuff via printf which we can use to help diagnose problems
 ////////////////////////////////////////////////////////////////////////
 void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
@@ -2114,7 +2115,7 @@ void _declspec(naked) HOOK_printf()
 
 ////////////////////////////////////////////////////////////////////////
 // RwMatrixMultiply
-// 
+//
 // The third received argument of type RwMatrixTag* is a null pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_RwMatrixMultiply                0x7F18B0
@@ -2141,7 +2142,7 @@ cont:
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimBlendNode::GetCurrentTranslation
-// 
+//
 // Invalid endKeyFrameIndex
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInterface)
@@ -2223,7 +2224,7 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
 
 ////////////////////////////////////////////////////////////////////////
 // CStreaming::AreAnimsUsedByRequestedModels
-// 
+//
 // GTA streamer will use this function to decide if IFP blocks should be unloaded or not.
 // We will return true to disable unloading.
 ////////////////////////////////////////////////////////////////////////
@@ -2260,7 +2261,7 @@ void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 
 ////////////////////////////////////////////////////////////////////////
 // CTrain::ProcessControl
-// 
+//
 // This hook overwrites the logic to wrap the train's rail distance, because in the
 // original game code this could cause an infinite loop
 //
@@ -2327,7 +2328,7 @@ static void _declspec(naked) HOOK_CTrain__ProcessControl()
 
 ////////////////////////////////////////////////////////////////////////
 // CTaskComplexCarSlowBeDraggedOutAndStandUp::CreateFirstSubTask
-// 
+//
 // This hook adds a null-pointer check for eax, which stores the ped's current vehicle.
 // Returning a null-pointer from this function will prevent the animation from being played.
 //
@@ -2365,7 +2366,7 @@ static void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__Cre
 
 ////////////////////////////////////////////////////////////////////////
 // CVehicleModelInfo::LoadVehicleColours
-// 
+//
 // A modified data/carcols.dat can have entries with invalid model names and these cause
 // CModelInfo::GetModelInfo to return a null pointer, but the original code doesn't verify
 // the return value and tries to use the null pointer. This hook adds a null pointer check
@@ -2446,7 +2447,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 
 ////////////////////////////////////////////////////////////////////////
 // CPlaceName::Process
-// 
+//
 // Prevent the original game code from accessing the ped's vehicle, when it's a null pointer
 // and the ped flag bInVehicle is set by setting the ped flag to zero.
 //
@@ -2505,7 +2506,8 @@ static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0
 static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
 static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 {
-    _asm {
+    __asm
+    {
         mov eax, [edx*4+0xA9B0C8]   // CModelInfo::ms_modelInfoPtrs
         test eax, eax
         jz skip
@@ -2529,7 +2531,7 @@ static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 
 ////////////////////////////////////////////////////////////////////////
 // RpClumpForAllAtomics
-// 
+//
 // Adds a nullptr check for the clump object pointer.
 //
 // >>> 0x749B70 | 8B 44 24 04 | mov  eax, [esp+arg_0]
@@ -2559,7 +2561,7 @@ static void _declspec(naked) HOOK_RpClumpForAllAtomics()
 
 ////////////////////////////////////////////////////////////////////////
 // RpAnimBlendClumpGetFirstAssociation
-// 
+//
 // Adds a nullptr check for the clump object pointer.
 //
 // >>> 0x4D6A70 | 8B 0D 78 F8 B5 00 | mov ecx, ds:_ClumpOffset
@@ -2586,7 +2588,7 @@ static void _declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::BlendAnimation
-// 
+//
 // Adds a nullptr check for the clump object pointer.
 //
 // >>> 0x4D4610 | 83 EC 14          | sub esp, 14h
@@ -2708,9 +2710,9 @@ static void _declspec(naked) HOOK_FxPrim_c__Enable()
 
 ////////////////////////////////////////////////////////////////////////
 // CFire::ProcessFire
-// 
+//
 // GitHub #1757 (https://github.com/multitheftauto/mtasa-blue/issues/1757)
-// 
+//
 // Null pointer to the attachedTo field in the CFire structure
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CFire_ProcessFire  0x53A6FC

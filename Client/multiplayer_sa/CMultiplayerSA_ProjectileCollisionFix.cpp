@@ -37,7 +37,8 @@ static void InitializeGrenadeColModel()
 static const unsigned int RETURN_CTempColModels__Initialise = 0x5BB883;
 static void _declspec(naked) HOOK_CTempColModels__Initialise()
 {
-    _asm {
+    __asm
+    {
         mov ds:[0x968FE4], edx
 
         call InitializeGrenadeColModel
@@ -51,7 +52,8 @@ static void _declspec(naked) HOOK_CTempColModels__Initialise()
 static const unsigned int RETURN_CFileLoader__LoadWeaponObject = 0x5B4023;
 static void _declspec(naked) HOOK_CFileLoader__LoadWeaponObject()
 {
-    _asm {
+    __asm
+    {
         mov eax, [esp+0x8]
         cmp eax, 342
         je grenade

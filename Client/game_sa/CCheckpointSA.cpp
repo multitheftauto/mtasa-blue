@@ -158,7 +158,8 @@ static void __cdecl RenderTargetArrow(CCheckpointSAInterface* pCheckpoint)
 
 static void _declspec(naked) HOOK_CCheckpoint__Render()
 {
-    _asm {
+    __asm
+    {
         pushad
         push esi
         call RenderTargetArrow

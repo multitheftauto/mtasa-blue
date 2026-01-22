@@ -93,7 +93,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
         if (!pModelInfo->GetInterface())
             return nullptr;
     }
-    
+
     CBaseModelInfoSAInterface* pModelInterface = pModelInfo->GetInterface();
 
     // Ensure collision model pointer exists
@@ -101,12 +101,12 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     {
         // Collision model pointer is NULL - try loading
         pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
-        
+
         // Re-fetch interface as loading may have invalidated pointer
         pModelInterface = pModelInfo->GetInterface();
         if (!pModelInterface)
             return nullptr;
-        
+
         // Still NULL means model has no collision (or loading failed) - block creation
         if (!pModelInterface->pColModel)
             return nullptr;
@@ -555,7 +555,8 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
-    _asm {
+    __asm
+    {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
         call    dwFunction
@@ -718,7 +719,7 @@ DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
     {
         return MAX_PEDS;
     }
-    return ((pInterface - pTheObjects) / dwAlignedSize); 
+    return ((pInterface - pTheObjects) / dwAlignedSize);
 }
 
 DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)

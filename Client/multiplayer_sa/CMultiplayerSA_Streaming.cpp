@@ -28,7 +28,8 @@ void OnModelLoaded(unsigned int uiModelID)
 
 static void _declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
 {
-    _asm {
+    __asm
+    {
         push    esi
         call    OnModelLoaded
         pop esi

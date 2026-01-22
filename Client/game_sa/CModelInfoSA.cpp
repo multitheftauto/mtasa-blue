@@ -973,7 +973,8 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     float fReturn = 0;
-    _asm {
+    __asm
+    {
         mov     eax, ModelID
 
         push    ecx
@@ -1333,7 +1334,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             // Vtable validation for StreamSectors
             if (validateVtable && !isValidEntity(pEntity))
             {
-                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", 
+                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n",
                     pEntity, pEntity->m_nModelIndex,
                     sectorIndex / 2 % NUM_StreamSectorRows, sectorIndex / 2 / NUM_StreamSectorCols));
                     pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
@@ -1411,7 +1412,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             ++it;
             continue;
         }
-        
+
         it->second++;  // Increment retry counter for pending TXD IDs
         if (it->second > kMaxRetryFrames)
         {
@@ -2320,7 +2321,7 @@ void CModelInfoSA::MakeCustomModel()
         // on the same model (via the streaming hook) if the custom DFF lacks embedded collision.
         RpClump* pClumpToSet = m_pCustomClump;
         m_pCustomClump = nullptr;
-        
+
         if (!SetCustomModel(pClumpToSet))
         {
             // SetCustomModel failed, restore the custom clump for retry on next stream-in
@@ -2497,9 +2498,9 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
 void CModelInfoSA::MakePedModel(char* szTexture)
 {
     CPedModelInfoSAInterface* pInterface = new CPedModelInfoSAInterface();
-    
+
     ppModelInfo[m_dwModelID] = pInterface;
-    
+
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
@@ -2654,7 +2655,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 void CModelInfoSA::DeallocateModel()
 {
     CBaseModelInfoSAInterface* pInterfaceToDelete = ppModelInfo[m_dwModelID];
-    
+
     if (!IsValidModelInfoPtr(pInterfaceToDelete))
     {
         if (pInterfaceToDelete)
@@ -2696,17 +2697,17 @@ void CModelInfoSA::DeallocateModel()
     // Block deletion while refs > 0 to avoid null pointer crash.
     if (pInterfaceToDelete->usNumberOfRefs > 0)
     {
-        AddReportLog(5550, SString("Blocked DeallocateModel for model %u with %u active refs to prevent crash at 0x4C4BB0", 
+        AddReportLog(5550, SString("Blocked DeallocateModel for model %u with %u active refs to prevent crash at 0x4C4BB0",
                     m_dwModelID, static_cast<unsigned int>(pInterfaceToDelete->usNumberOfRefs)));
-        
+
         m_pInterface = pInterfaceToDelete;
-        
+
         // Clear custom model pointers to prevent use-after-free on later RemoveRef calls
         m_pCustomClump = nullptr;
         m_pCustomColModel = nullptr;
         m_pOriginalColModelInterface = nullptr;
         m_originalFlags = 0;
-        
+
         // Keep m_dwReferences and TXD mapping intact - model still in use
         // Tradeoff: interface leaks until refs hit 0, model ID stays occupied
         return;

@@ -38,7 +38,8 @@ extern CGameSA*        pGame;
 static BOOL m_bVehicleSunGlare = false;
 _declspec(naked) void DoVehicleSunGlare(void* this_)
 {
-    _asm {
+    __asm
+    {
         mov eax, FUNC_CVehicle_DoSunGlare
         jmp eax
     }
@@ -46,7 +47,8 @@ _declspec(naked) void DoVehicleSunGlare(void* this_)
 
 void _declspec(naked) HOOK_Vehicle_PreRender(void)
 {
-    _asm {
+    __asm
+    {
         mov    ecx, m_bVehicleSunGlare
         cmp    ecx, 0
         jle    noglare
@@ -613,7 +615,7 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
 }
 
 bool CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
-{ 
+{
     VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleSubClass);
     switch (m_eVehicleType)
     {
@@ -643,7 +645,7 @@ bool CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, flo
     return false;
 }
 
-float CVehicleSA::GetPlaneRotorSpeed() 
+float CVehicleSA::GetPlaneRotorSpeed()
 {
     auto pInterface = static_cast<CPlaneSAInterface*>(GetInterface());
     return pInterface->m_fPropSpeed;

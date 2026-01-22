@@ -42,7 +42,8 @@ constexpr std::size_t        HOOKSIZE_CPtrListSingleLink_Flush = 6;
 constexpr std::uint32_t      CONTINUE_CPtrListSingleLink_Flush = 0x55245B;
 static void _declspec(naked) HOOK_CPtrListSingleLink_Flush()
 {
-    __asm {
+    __asm
+    {
         mov edi, ecx ; save register
 
         ; CPtrNodeSingleLinkPoolSA::m_customPool->RemoveItem(eax)
