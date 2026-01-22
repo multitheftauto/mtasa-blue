@@ -153,6 +153,21 @@ namespace
         }
     }
 
+    // Remove pReplacementTextures from all usedByReplacements vectors in the map.
+    // Always does a full sweep to catch orphaned references not tracked in usedInTxdIds.
+    void RemoveReplacementFromTracking(SReplacementTextures* pReplacementTextures)
+    {
+        if (!pReplacementTextures)
+            return;
+
+        for (auto& entry : ms_ModelTexturesInfoMap)
+        {
+            auto& usedBy = entry.second.usedByReplacements;
+            if (!usedBy.empty())
+                ListRemove(usedBy, pReplacementTextures);
+        }
+    }
+
     std::vector<CD3DDUMMY*>& GetShaderRegList(SReplacementTextures* pReplacement, unsigned short usTxdId)
     {
         return g_ShaderRegs[ReplacementShaderKey{pReplacement, usTxdId}];
@@ -2000,6 +2015,7 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
     // Reset tracking if crossed session boundary
     if (pReplacementTextures->uiSessionId != ms_uiTextureReplacingSession)
     {
+        RemoveReplacementFromTracking(pReplacementTextures);
         pReplacementTextures->uiSessionId = ms_uiTextureReplacingSession;
         pReplacementTextures->perTxdList.clear();
         pReplacementTextures->usedInTxdIds.clear();
@@ -2131,6 +2147,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
     if (pReplacementTextures->uiSessionId != ms_uiTextureReplacingSession)
     {
+        RemoveReplacementFromTracking(pReplacementTextures);
         pReplacementTextures->uiSessionId = ms_uiTextureReplacingSession;
         pReplacementTextures->perTxdList.clear();
         pReplacementTextures->usedInTxdIds.clear();
@@ -3038,6 +3055,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             ClearShaderRegs(pReplacementTextures, txdId);
         }
 
+        RemoveReplacementFromTracking(pReplacementTextures);
+
         pReplacementTextures->perTxdList.clear();
         pReplacementTextures->usedInTxdIds.clear();
         pReplacementTextures->usedInModelIds.clear();
@@ -3787,6 +3806,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             destroyedTextures.insert(pTexture);
         }
     }
+
+    RemoveReplacementFromTracking(pReplacementTextures);
 
     // Reset all states except usedInModelIds which is needed by the caller for restreaming
     pReplacementTextures->textures.clear();
