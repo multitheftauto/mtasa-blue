@@ -28,6 +28,7 @@ static constexpr std::uintptr_t RETURN_CTaskSimplePlayerOnFoot__MakeAbortable = 
 static constexpr std::uintptr_t SKIP_CTaskSimplePlayerOnFoot__MakeAbortable = 0x685855;
 static void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
 {
+    // clang-format off
     __asm
     {
         // return false and keep task alive
@@ -56,6 +57,7 @@ static void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
         skip:
         jmp SKIP_CTaskSimplePlayerOnFoot__MakeAbortable
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -28,6 +28,7 @@ void OnModelLoaded(unsigned int uiModelID)
 
 static void _declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
 {
+    // clang-format off
     __asm
     {
         push    esi
@@ -42,6 +43,7 @@ static void _declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
         add     esp, 20h
         retn
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

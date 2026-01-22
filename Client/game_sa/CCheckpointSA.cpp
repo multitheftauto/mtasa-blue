@@ -158,6 +158,7 @@ static void __cdecl RenderTargetArrow(CCheckpointSAInterface* pCheckpoint)
 
 static void _declspec(naked) HOOK_CCheckpoint__Render()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -167,6 +168,7 @@ static void _declspec(naked) HOOK_CCheckpoint__Render()
         popad
         jmp RETURN_CCheckpoint__Render
     }
+    // clang-format on
 }
 
 void CCheckpointSA::StaticSetHooks()

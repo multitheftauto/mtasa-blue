@@ -42,6 +42,7 @@ constexpr std::size_t        HOOKSIZE_CPtrListSingleLink_Flush = 6;
 constexpr std::uint32_t      CONTINUE_CPtrListSingleLink_Flush = 0x55245B;
 static void _declspec(naked) HOOK_CPtrListSingleLink_Flush()
 {
+    // clang-format off
     __asm
     {
         mov edi, ecx ; save register
@@ -55,6 +56,7 @@ static void _declspec(naked) HOOK_CPtrListSingleLink_Flush()
         mov ecx, edi ; restore
         jmp CONTINUE_CPtrListSingleLink_Flush
     }
+    // clang-format on
 }
 
 void CPtrNodeSingleLinkPoolSA::StaticSetHooks()

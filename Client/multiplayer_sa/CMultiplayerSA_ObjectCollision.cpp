@@ -48,6 +48,7 @@ static const DWORD CONTINUE_CObject_Init = 0x59F8DC;
 
 static void _declspec(naked) HOOK_CObject_Init()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -63,6 +64,7 @@ static void _declspec(naked) HOOK_CObject_Init()
 
         jmp     CONTINUE_CObject_Init
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +89,7 @@ static const DWORD CONTINUE_CObject_Destructor = 0x59F709;
 
 static void _declspec(naked) HOOK_CObject_Destructor()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -96,6 +99,7 @@ static void _declspec(naked) HOOK_CObject_Destructor()
         popad
         jmp     CONTINUE_CObject_Destructor
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

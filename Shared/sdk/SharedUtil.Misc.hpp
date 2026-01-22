@@ -2282,6 +2282,7 @@ namespace SharedUtil
     #elif defined(WIN_arm) || defined(WIN_arm64)
         return 0;
     #else
+        // clang-format off
         __asm
         {
             mov eax, 1
@@ -2289,6 +2290,7 @@ namespace SharedUtil
             shr ebx, 24
             mov eax, ebx
         }
+        // clang-format on
     #endif
     }
 

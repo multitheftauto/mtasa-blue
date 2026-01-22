@@ -381,6 +381,7 @@ void _cdecl OnCClothesBuilderCreateSkinnedClumpPost(RpClump* pRpClumpResult, RpC
 DWORD RETURN_CClothesBuilderCreateSkinnedClump = 0x5A69D6;
 void _declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -424,6 +425,7 @@ inside:
         sub     esp, 0D4h
         jmp     RETURN_CClothesBuilderCreateSkinnedClump
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

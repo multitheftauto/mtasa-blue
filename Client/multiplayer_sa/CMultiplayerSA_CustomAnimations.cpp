@@ -75,20 +75,25 @@ CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(eAnimGroup animGroup
 
 void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
 {
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
     if (bDisableCallsToCAnimBlendNode)
     {
+        // clang-format off
         __asm
         {
             popad
             retn 4
         }
+        // clang-format on
     }
 
+    // clang-format off
     __asm
     {
         popad
@@ -96,24 +101,30 @@ void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
         fld     [esp+4]
         jmp     RETURN_CAnimBlendAssociation_SetCurrentTime_NORMALFLOW
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
 {
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
     if (bDisableCallsToCAnimBlendNode)
     {
+        // clang-format off
         __asm
         {
             popad
             retn
         }
+        // clang-format on
     }
 
+    // clang-format off
     __asm
     {
         popad
@@ -121,6 +132,7 @@ void _declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
         mov     eax, ds:[0B5F878h]
         jmp     RETURN_RpAnimBlendClumpUpdateAnimations_NORMALFLOW
     }
+    // clang-format on
 }
 
 CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, eAnimGroup u32AnimGroupID, eAnimID animID)
@@ -144,6 +156,7 @@ CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpC
 
 void _declspec(naked) HOOK_CAnimManager_AddAnimation()
 {
+    // clang-format off
     __asm
     {
         lea     edx, [esp + 8]  // animationGroupID address
@@ -154,9 +167,11 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
         add     esp, 8
         pushad
     }
+    // clang-format on
 
     if (m_pAddAnimationHandler)
     {
+        // clang-format off
         __asm
         {
             popad
@@ -173,8 +188,10 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
             jmp     RETURN_CAnimManager_AddAnimation
 
         }
+        // clang-format on
     }
 
+    // clang-format off
     __asm
     {
         popad
@@ -182,10 +199,12 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
         mov     edx, dword ptr ds : [0B4EA34h]
         jmp     RETURN_CAnimManager_AddAnimation_NORMAL_FLOW
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 {
+     // clang-format off
      __asm
      {
          lea     edx, [esp + 12] // animationGroup address
@@ -196,9 +215,11 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
          add     esp, 8
          pushad
      }
+     // clang-format on
 
     if (m_pAddAnimationAndSyncHandler)
     {
+         // clang-format off
          __asm
          {
              popad
@@ -214,8 +235,10 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
              push    edi
              jmp     RETURN_CAnimManager_AddAnimationAndSync
          }
+         // clang-format on
     }
 
+     // clang-format off
      __asm
      {
 
@@ -224,17 +247,21 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
              mov     edx, dword ptr ds : [0B4EA34h]
              jmp     RETURN_CAnimManager_AddAnimationAndSync_NORMAL_FLOW
      }
+     // clang-format on
 }
 
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
 {
+    // clang-format off
     __asm
     {
         pushad
     }
+    // clang-format on
 
     if (m_pBlendAnimationHierarchyHandler)
     {
+        // clang-format off
         __asm
         {
             popad
@@ -277,8 +304,10 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
             pushad
             jmp NORMAL_FLOW_BlendAnimation_Hierarchy
         }
+        // clang-format on
     }
 
+    // clang-format off
     __asm
     {
         NORMAL_FLOW_BlendAnimation_Hierarchy:
@@ -300,4 +329,5 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
         call    FUNC_UncompressAnimation
         jmp    RETURN_CAnimManager_BlendAnimation_Hierarchy
     }
+    // clang-format on
 }

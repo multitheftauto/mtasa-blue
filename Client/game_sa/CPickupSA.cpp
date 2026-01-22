@@ -126,6 +126,7 @@ bool CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
     DWORD GiveUsAPickUpObject = FUNC_GIVEUSAPICKUP;
     DWORD dwObject = (DWORD) & (GetInterface()->pObject);
     DWORD dwThis = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         push    ForcedObjectIndex
@@ -133,6 +134,7 @@ bool CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
         mov     ecx, dwThis
         call    GiveUsAPickUpObject
     }
+    // clang-format on
 
     if (GetInterface()->pObject)
     {
@@ -166,11 +168,13 @@ void CPickupSA::Remove()
 {
     DWORD dwFunc = FUNC_CPickup_Remove;
     DWORD dwThis = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     // CPickup::Remove also destroys the owned object, so we need to delete our CObjectSA class
     if (object)

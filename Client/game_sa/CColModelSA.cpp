@@ -20,11 +20,13 @@ CColModelSA::CColModelSA()
 
     try
     {
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
     }
     catch (...)
     {
@@ -56,11 +58,13 @@ CColModelSA::~CColModelSA()
 
         try
         {
+            // clang-format off
             __asm
             {
                 mov     ecx, dwThis
                 call    dwFunc
             }
+            // clang-format on
         }
         catch (...)
         {

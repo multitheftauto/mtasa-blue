@@ -72,6 +72,7 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 DWORD RETURN_PreCreateDevice = 0x07F6781;
 void _declspec(naked) HOOK_PreCreateDevice()
 {
+    // clang-format off
     __asm
     {
         // Run replaced code - these pushes create the original function parameters
@@ -114,6 +115,7 @@ void _declspec(naked) HOOK_PreCreateDevice()
         // Continue
         jmp     RETURN_PreCreateDevice
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -170,6 +172,7 @@ DWORD RETURN_PostCreateDevice = 0x07F678A;
 DWORD RETURN_PostCreateDeviceB = 0x07F6799;
 void _declspec(naked) HOOK_PostCreateDevice()
 {
+    // clang-format off
     __asm
     {
         // Replaced code
@@ -190,6 +193,7 @@ void _declspec(naked) HOOK_PostCreateDevice()
 ok:
         jmp     RETURN_PostCreateDeviceB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

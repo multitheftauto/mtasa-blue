@@ -21,6 +21,7 @@
 static constexpr std::uintptr_t RETURN_CWorld_TriggerExplosion = 0x56B836;
 static void _declspec(naked) HOOK_CWorld_TriggerExplosion()
 {
+    // clang-format off
     __asm
     {
         mov [esp+1Ch-8h], eax
@@ -36,6 +37,7 @@ static void _declspec(naked) HOOK_CWorld_TriggerExplosion()
         cmp esi, eax
         jmp RETURN_CWorld_TriggerExplosion
     }
+    // clang-format on
 }
 
 #define HOOKPOS_CWorld_TriggerExplosionSectorList  0x5677F4
@@ -44,6 +46,7 @@ static constexpr std::uintptr_t RETURN_CWorld_TriggerExplosionSectorList = 0x567
 static constexpr std::uintptr_t SKIP_CWorld_TriggerExplosionSectorList = 0x568473;
 static void _declspec(naked) HOOK_CWorld_TriggerExplosionSectorList()
 {
+    // clang-format off
     __asm
     {
         // check entity->m_nScanCode == CWorld::ms_nCurrentScanCode
@@ -62,6 +65,7 @@ static void _declspec(naked) HOOK_CWorld_TriggerExplosionSectorList()
         skip:
         jmp SKIP_CWorld_TriggerExplosionSectorList
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -32,6 +32,7 @@ void OnRequestDeferredStreamingMemoryRelief();
 
 static void _declspec(naked) CrashAverted()
 {
+    // clang-format off
     __asm
     {
         pushfd
@@ -43,6 +44,7 @@ static void _declspec(naked) CrashAverted()
         popfd
         retn    4
     }
+    // clang-format on
 }
 
 static bool HasReadAccess(DWORD dwProtect) noexcept
@@ -200,6 +202,7 @@ static bool IsWritablePtr(void* ptr, std::size_t size) noexcept
 DWORD RETURN_CrashFix_Misc1 = 0x5D9A74;
 void _declspec(naked) HOOK_CrashFix_Misc1()
 {
+    // clang-format off
     __asm
     {
         mov     eax,dword ptr [esp+18h]
@@ -216,6 +219,7 @@ void _declspec(naked) HOOK_CrashFix_Misc1()
     cont:
         jmp     RETURN_CrashFix_Misc1
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -229,6 +233,7 @@ DWORD RETURN_CrashFix_Misc2 = 0x6B18B9;
 DWORD RETURN_CrashFix_Misc2B = 0x6B3775;
 void _declspec(naked) HOOK_CrashFix_Misc2()
 {
+    // clang-format off
     __asm
     {
         test    eax,eax
@@ -251,6 +256,7 @@ void _declspec(naked) HOOK_CrashFix_Misc2()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc2B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -263,6 +269,7 @@ void _declspec(naked) HOOK_CrashFix_Misc2()
 DWORD RETURN_CrashFix_Misc3 = 0x645FDF;
 void _declspec(naked) HOOK_CrashFix_Misc3()
 {
+    // clang-format off
     __asm
     {
         test    ecx,ecx
@@ -275,6 +282,7 @@ void _declspec(naked) HOOK_CrashFix_Misc3()
         call    CrashAverted
         jmp     CPlayerPed__ProcessControl_Abort
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -288,6 +296,7 @@ DWORD RETURN_CrashFix_Misc4 = 0x4F02D7;
 DWORD RETURN_CrashFix_Misc4B = 0x4F0B07;
 void _declspec(naked) HOOK_CrashFix_Misc4()
 {
+    // clang-format off
     __asm
     {
         test    ecx,ecx
@@ -302,6 +311,7 @@ void _declspec(naked) HOOK_CrashFix_Misc4()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc4B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -315,6 +325,7 @@ DWORD RETURN_CrashFix_Misc5 = 0x5DF950;
 DWORD RETURN_CrashFix_Misc5B = 0x5DFCC4;
 void _declspec(naked) HOOK_CrashFix_Misc5()
 {
+    // clang-format off
     __asm
     {
         mov edi, dword ptr[ARRAY_ModelInfo]
@@ -332,6 +343,7 @@ void _declspec(naked) HOOK_CrashFix_Misc5()
         pop edi
         jmp     RETURN_CrashFix_Misc5B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -347,6 +359,7 @@ DWORD RETURN_CrashFix_Misc6 = 0x4D1755;
 DWORD RETURN_CrashFix_Misc6B = 0x4D1A44;
 void _declspec(naked) HOOK_CrashFix_Misc6()
 {
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -360,6 +373,7 @@ void _declspec(naked) HOOK_CrashFix_Misc6()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc6B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -375,6 +389,7 @@ DWORD RETURN_CrashFix_Misc7 = 0x417BFD;
 DWORD RETURN_CrashFix_Misc7B = 0x417BFF;
 void _declspec(naked) HOOK_CrashFix_Misc7()
 {
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -388,6 +403,7 @@ void _declspec(naked) HOOK_CrashFix_Misc7()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc7B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -403,6 +419,7 @@ DWORD RETURN_CrashFix_Misc8 = 0x734862;
 DWORD RETURN_CrashFix_Misc8B = 0x734871;
 void _declspec(naked) HOOK_CrashFix_Misc8()
 {
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -416,6 +433,7 @@ void _declspec(naked) HOOK_CrashFix_Misc8()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc8B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -431,6 +449,7 @@ DWORD RETURN_CrashFix_Misc9 = 0x738B6A;
 DWORD RETURN_CrashFix_Misc9B = 0x73983A;
 void _declspec(naked) HOOK_CrashFix_Misc9()
 {
+    // clang-format off
     __asm
     {
         test    esi, esi
@@ -444,6 +463,7 @@ void _declspec(naked) HOOK_CrashFix_Misc9()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc9B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -459,6 +479,7 @@ DWORD RETURN_CrashFix_Misc10 = 0x533504;
 DWORD RETURN_CrashFix_Misc10B = 0x533539;
 void _declspec(naked) HOOK_CrashFix_Misc10()
 {
+    // clang-format off
     __asm
     {
         cmp     ecx, 0x80
@@ -476,6 +497,7 @@ void _declspec(naked) HOOK_CrashFix_Misc10()
         mov     dword ptr [ecx+8],0
         jmp     RETURN_CrashFix_Misc10B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -491,6 +513,7 @@ DWORD RETURN_CrashFix_Misc11 = 0x4D2C67;
 DWORD RETURN_CrashFix_Misc11B = 0x4D2E03;
 void _declspec(naked) HOOK_CrashFix_Misc11()
 {
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -504,6 +527,7 @@ void _declspec(naked) HOOK_CrashFix_Misc11()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc11B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -519,6 +543,7 @@ DWORD RETURN_CrashFix_Misc12 = 0x4D41CA;
 DWORD RETURN_CrashFix_Misc12B = 0x4D4222;
 void _declspec(naked) HOOK_CrashFix_Misc12()
 {
+    // clang-format off
     __asm
     {
         test    edi, edi
@@ -532,6 +557,7 @@ void _declspec(naked) HOOK_CrashFix_Misc12()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc12B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -545,6 +571,7 @@ DWORD RETURN_CrashFix_Misc13 = 0x4D4654;
 DWORD RETURN_CrashFix_Misc13B = 0x4D4764;
 void _declspec(naked) HOOK_CrashFix_Misc13()
 {
+    // clang-format off
     __asm
     {
         cmp     eax, 0x2480
@@ -558,6 +585,7 @@ void _declspec(naked) HOOK_CrashFix_Misc13()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc13B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -570,6 +598,7 @@ void _declspec(naked) HOOK_CrashFix_Misc13()
 DWORD RETURN_CrashFix_Misc14 = 0x4DD4BB;
 void _declspec(naked) HOOK_CrashFix_Misc14()
 {
+    // clang-format off
     __asm
     {
         mov     eax, dword ptr ds:[0BD00F8h]
@@ -584,6 +613,7 @@ void _declspec(naked) HOOK_CrashFix_Misc14()
         add     esp, 12
         retn    12
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -615,6 +645,7 @@ void _cdecl DoWait(HANDLE hHandle)
 DWORD RETURN_FreezeFix_Misc15 = 0x156CDB4;
 void _declspec(naked) HOOK_FreezeFix_Misc15()
 {
+    // clang-format off
     __asm
     {
         pop eax
@@ -628,6 +659,7 @@ void _declspec(naked) HOOK_FreezeFix_Misc15()
         popad
         jmp     RETURN_FreezeFix_Misc15
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -640,6 +672,7 @@ void _declspec(naked) HOOK_FreezeFix_Misc15()
 DWORD RETURN_CrashFix_Misc16 = 0x5E581B;
 void _declspec(naked) HOOK_CrashFix_Misc16()
 {
+    // clang-format off
     __asm
     {
         cmp     eax, 0
@@ -656,6 +689,7 @@ void _declspec(naked) HOOK_CrashFix_Misc16()
         add     esp, 96
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -669,6 +703,7 @@ DWORD RETURN_CrashFix_Misc17 = 0x7F1214;
 DWORD RETURN_CrashFix_Misc17B = 0x7F1236;
 void _declspec(naked) HOOK_CrashFix_Misc17()
 {
+    // clang-format off
     __asm
     {
         cmp     eax, 0
@@ -683,6 +718,7 @@ void _declspec(naked) HOOK_CrashFix_Misc17()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc17B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -695,6 +731,7 @@ void _declspec(naked) HOOK_CrashFix_Misc17()
 DWORD RETURN_CrashFix_Misc18 = 0x4C7DB4;
 void _declspec(naked) HOOK_CrashFix_Misc18()
 {
+    // clang-format off
     __asm
     {
         cmp     ebp, 0
@@ -717,6 +754,7 @@ void _declspec(naked) HOOK_CrashFix_Misc18()
         pop         ebp
         ret         0Ch
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -730,6 +768,7 @@ DWORD RETURN_CrashFix_Misc19 = 0x7F0BFD;
 DWORD RETURN_CrashFix_Misc19B = 0x7F0C20;
 void _declspec(naked) HOOK_CrashFix_Misc19()
 {
+    // clang-format off
     __asm
     {
         cmp     esi, 0
@@ -746,6 +785,7 @@ void _declspec(naked) HOOK_CrashFix_Misc19()
         test    edx,edx
         jmp     RETURN_CrashFix_Misc19B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -758,6 +798,7 @@ void _declspec(naked) HOOK_CrashFix_Misc19()
 DWORD RETURN_CrashFix_Misc20 = 0x54F3B6;
 void _declspec(naked) HOOK_CrashFix_Misc20()
 {
+    // clang-format off
     __asm
     {
         cmp     ecx, 0
@@ -773,6 +814,7 @@ void _declspec(naked) HOOK_CrashFix_Misc20()
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -809,6 +851,7 @@ bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAss
 DWORD RETURN_CrashFix_Misc21 = 0x648EE7;
 void _declspec(naked) HOOK_CrashFix_Misc21()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -830,6 +873,7 @@ void _declspec(naked) HOOK_CrashFix_Misc21()
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -842,6 +886,7 @@ void _declspec(naked) HOOK_CrashFix_Misc21()
 DWORD RETURN_CrashFix_Misc22 = 0x4CEF25;
 void _declspec(naked) HOOK_CrashFix_Misc22()
 {
+    // clang-format off
     __asm
     {
         mov         edx,dword ptr [edi+0Ch]
@@ -879,6 +924,7 @@ void _declspec(naked) HOOK_CrashFix_Misc22()
         jl          altcode
         jmp     RETURN_CrashFix_Misc22
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -891,6 +937,7 @@ void _declspec(naked) HOOK_CrashFix_Misc22()
 DWORD RETURN_CrashFix_Misc23 = 0x6E3D17;
 void _declspec(naked) HOOK_CrashFix_Misc23()
 {
+    // clang-format off
     __asm
     {
         // Ensure door index is reasonable
@@ -910,6 +957,7 @@ void _declspec(naked) HOOK_CrashFix_Misc23()
         lea     eax, [edx+edx*2]
         jmp     RETURN_CrashFix_Misc23
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -922,6 +970,7 @@ void _declspec(naked) HOOK_CrashFix_Misc23()
 DWORD RETURN_CrashFix_Misc24 = 0x7F0DCE;
 void _declspec(naked) HOOK_CrashFix_Misc24()
 {
+    // clang-format off
     __asm
     {
         cmp     ebp, 0x480
@@ -938,6 +987,7 @@ void _declspec(naked) HOOK_CrashFix_Misc24()
         mov     eax, 0
         jmp     RETURN_CrashFix_Misc24
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -950,6 +1000,7 @@ void _declspec(naked) HOOK_CrashFix_Misc24()
 DWORD RETURN_CrashFix_Misc25 = 0x64602B;
 void _declspec(naked) HOOK_CrashFix_Misc25()
 {
+    // clang-format off
     __asm
     {
         // Check for zero pointer to vehicle
@@ -970,6 +1021,7 @@ void _declspec(naked) HOOK_CrashFix_Misc25()
         pop     ecx
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -982,6 +1034,7 @@ void _declspec(naked) HOOK_CrashFix_Misc25()
 DWORD RETURN_CrashFix_Misc26 = 0x739FA6;
 void _declspec(naked) HOOK_CrashFix_Misc26()
 {
+    // clang-format off
     __asm
     {
         // Check for incorrect pointer
@@ -1003,6 +1056,7 @@ void _declspec(naked) HOOK_CrashFix_Misc26()
         test    edi,edi
         jmp     RETURN_CrashFix_Misc26
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1015,6 +1069,7 @@ void _declspec(naked) HOOK_CrashFix_Misc26()
 DWORD RETURN_CrashFix_Misc27 = 0x637802;
 void _declspec(naked) HOOK_CrashFix_Misc27()
 {
+    // clang-format off
     __asm
     {
         // Execute replaced code
@@ -1032,6 +1087,7 @@ cont:
         // Continue standard path
         jmp     RETURN_CrashFix_Misc27
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1045,6 +1101,7 @@ DWORD RETURN_CrashFix_Misc28 = 0x44A503;
 DWORD RETURN_CrashFix_Misc28B = 0x44A650;
 void _declspec(naked) HOOK_CrashFix_Misc28()
 {
+    // clang-format off
     __asm
     {
         // Execute replaced code
@@ -1063,6 +1120,7 @@ cont:
         // Continue standard path
         jmp     RETURN_CrashFix_Misc28
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1076,6 +1134,7 @@ DWORD RETURN_CrashFix_Misc29 = 0x4E0231;
 DWORD RETURN_CrashFix_Misc29B = 0x4E0227;
 void _declspec(naked) HOOK_CrashFix_Misc29()
 {
+    // clang-format off
     __asm
     {
         // Execute replaced code
@@ -1094,6 +1153,7 @@ cont:
         // Skip much code
         jmp     RETURN_CrashFix_Misc29B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1108,6 +1168,7 @@ DWORD RETURN_CrashFix_Misc30 = 0x4CEBEF;
 DWORD RETURN_CrashFix_Misc30B = 0x4CEBF5;
 void _declspec(naked) HOOK_CrashFix_Misc30()
 {
+    // clang-format off
     __asm
     {
         // Check for incorrect pointer
@@ -1125,6 +1186,7 @@ cont:
         // Skip much code
         jmp     RETURN_CrashFix_Misc30B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1138,6 +1200,7 @@ DWORD RETURN_CrashFix_Misc32 = 0x4CEA88;
 
 void _declspec(naked) HOOK_CrashFix_Misc32()
 {
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -1159,6 +1222,7 @@ void _declspec(naked) HOOK_CrashFix_Misc32()
         call    CrashAverted
         retn    4
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1182,12 +1246,14 @@ static RwTexDictionaryGetCurrent_t pfnRwTexDictionaryGetCurrentForMisc39 = (RwTe
 static constexpr DWORD AddrFindNamedTexture_Continue = 0x7F39F5;
 static void _declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 {
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]
         push    ebx
         jmp     AddrFindNamedTexture_Continue
     }
+    // clang-format on
 }
 
 static constexpr std::size_t TextureNameSize = 32;
@@ -1249,6 +1315,7 @@ static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
 #define HOOKSIZE_CrashFix_Misc39                            5
 static void _declspec(naked) HOOK_CrashFix_Misc39()
 {
+    // clang-format off
     __asm
     {
         push    [esp+4]
@@ -1256,6 +1323,7 @@ static void _declspec(naked) HOOK_CrashFix_Misc39()
         add     esp, 4
         ret
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1286,6 +1354,7 @@ PFN_RwTexDictionaryGetCurrent pfnRwTexDictionaryGetCurrent = (PFN_RwTexDictionar
 // Used by HOOK_CrashFix_Misc33 when validation passes.
 void _declspec(naked) CallOriginalFindNamedTexture()
 {
+    // clang-format off
     __asm
     {
         // Replicate overwritten bytes at 0x7F39F0
@@ -1293,10 +1362,12 @@ void _declspec(naked) CallOriginalFindNamedTexture()
         push    ebx                  // Original: push ebx
         jmp     RETURN_CrashFix_Misc33  // Continue at 0x7F39F5: add eax, 8
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CrashFix_Misc33()
 {
+    // clang-format off
     __asm
     {
         // Get first argument (dict)
@@ -1349,6 +1420,7 @@ void _declspec(naked) HOOK_CrashFix_Misc33()
         xor     eax, eax            // Return null (texture not found)
         retn                        // cdecl
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1372,6 +1444,7 @@ DWORD RETURN_CrashFix_Misc34 = 0x5D9CB8;
 DWORD RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;  // Skip to end of EnvWave block
 void _declspec(naked) HOOK_CrashFix_Misc34()
 {
+    // clang-format off
     __asm
     {
         // Replicate original flag check: ZF was set by previous "test al, al"
@@ -1399,6 +1472,7 @@ void _declspec(naked) HOOK_CrashFix_Misc34()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc34_Skip
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1416,6 +1490,7 @@ DWORD RETURN_CrashFix_Misc35_Abort = 0x7F3760;
 
 void _declspec(naked) HOOK_CrashFix_Misc35()
 {
+    // clang-format off
     __asm
     {
         cmp     eax, NUM_LOWMEM_THRESHOLD_ASM
@@ -1443,6 +1518,7 @@ void _declspec(naked) HOOK_CrashFix_Misc35()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc35_Abort
     }
+    // clang-format on
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1461,6 +1537,7 @@ DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
 
 void _declspec(naked) HOOK_CrashFix_Misc36()
 {
+    // clang-format off
     __asm
     {
         cmp     ebx, NUM_LOWMEM_THRESHOLD_ASM
@@ -1494,6 +1571,7 @@ void _declspec(naked) HOOK_CrashFix_Misc36()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc36_Abort
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1510,6 +1588,7 @@ DWORD RETURN_CrashFix_Misc37 = 0x7F39B8;
 
 void _declspec(naked) HOOK_CrashFix_Misc37()
 {
+    // clang-format off
     __asm
     {
         cmp     esi, NUM_LOWMEM_THRESHOLD_ASM
@@ -1545,6 +1624,7 @@ void _declspec(naked) HOOK_CrashFix_Misc37()
         mov     [ecx], edx
         jmp     RETURN_CrashFix_Misc37
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1577,6 +1657,7 @@ static void OnVideoMemoryExhausted()
 // No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 void _declspec(naked) HOOK_CrashFix_Misc38()
 {
+    // clang-format off
     __asm
     {
         mov     esi, [eax]
@@ -1600,6 +1681,7 @@ void _declspec(naked) HOOK_CrashFix_Misc38()
         lea     ecx, [esp+ecx*4+18h]
         jmp     RETURN_CrashFix_Misc38
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1649,6 +1731,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
         RwFrame* pNewFrameResult = NULL;
         uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
         DWORD    dwFunc = 0x4C53C0;            // CClumpModelInfo::GetFrameFromId
+        // clang-format off
         __asm
         {
             push    uiNewId
@@ -1657,6 +1740,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
             add     esp, 8
             mov     pNewFrameResult,eax
         }
+        // clang-format on
 
         if (pNewFrameResult)
         {
@@ -1681,6 +1765,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
 DWORD RETURN_CClumpModelInfo_GetFrameFromId = 0x4C53C7;
 void _declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId()
 {
+    // clang-format off
     __asm
     {
         push    [esp+4*2]
@@ -1708,6 +1793,7 @@ inner:
         mov     eax,dword ptr [esp+10h]
         jmp     RETURN_CClumpModelInfo_GetFrameFromId
     }
+    // clang-format on
 }
 
 CStreamingInfo* GetStreamingInfo(uint id)
@@ -1767,6 +1853,7 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 DWORD RETURN_CEntity_GetBoundRect = 0x534136;
 void _declspec(naked) HOOK_CEntity_GetBoundRect()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -1780,6 +1867,7 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
         mov     edx, [eax]
         jmp     RETURN_CEntity_GetBoundRect
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1808,6 +1896,7 @@ void OnMY_CVehicle_AddUpgrade_Post()
 DWORD RETURN_CVehicle_AddUpgrade = 0x6DFA26;
 void _declspec(naked) HOOK_CVehicle_AddUpgrade()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -1832,6 +1921,7 @@ inner:
         mov     ebx, [esp+16]
         jmp     RETURN_CVehicle_AddUpgrade
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1856,6 +1946,7 @@ void _declspec(naked) HOOK_TrainCrossingBarrierCrashFix()
     TrainCrossingFix_ReturnAddress = ReturnAddress;
     TrainCrossingFix_InvalidReturnAddress = InvalidReturnAddress;
 
+    // clang-format off
     __asm
     {
         test eax, eax // Check if pLinkedBarrierPost exists
@@ -1867,6 +1958,7 @@ void _declspec(naked) HOOK_TrainCrossingBarrierCrashFix()
 jmp_invalid:
         jmp TrainCrossingFix_InvalidReturnAddress
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1881,12 +1973,14 @@ void _declspec(naked) HOOK_ResetFurnitureObjectCounter()
 {
     *(int*)0xBB3A18 = 0;            // InteriorManager_c::ms_objectCounter
 
+    // clang-format off
     __asm
     {
         // original instruction
         mov eax, fs:[0]
         jmp RETURN_ResetFurnitureObjectCounter
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1912,6 +2006,7 @@ void OnMY_CVolumetricShadowMgr_Render_Post()
 DWORD RETURN_CVolumetricShadowMgr_Render = 0x7113B8;
 void _declspec(naked) HOOK_CVolumetricShadowMgr_Render()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -1931,6 +2026,7 @@ inner:
         mov     ecx, 0A9AE00h
         jmp     RETURN_CVolumetricShadowMgr_Render
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1956,6 +2052,7 @@ void OnMY_CVolumetricShadowMgr_Update_Post()
 DWORD RETURN_CVolumetricShadowMgr_Update = 0x711D95;
 void _declspec(naked) HOOK_CVolumetricShadowMgr_Update()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -1976,6 +2073,7 @@ inner:
         mov     ecx, 0A9AE00h
         jmp     RETURN_CVolumetricShadowMgr_Update
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2005,6 +2103,7 @@ void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 DWORD RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
 void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -2021,6 +2120,7 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2040,6 +2140,7 @@ void  OnMY_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 
 void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 {
+    // clang-format off
     __asm
     {
         test eax, eax
@@ -2054,6 +2155,7 @@ void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
         popad
         jmp RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask_Invalid
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2097,6 +2199,7 @@ void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
 DWORD RETURN_printf = 0x821989;
 void _declspec(naked) HOOK_printf()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -2111,6 +2214,7 @@ void _declspec(naked) HOOK_printf()
         push    887DC0h
         jmp     RETURN_printf
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2124,6 +2228,7 @@ void _declspec(naked) HOOK_printf()
 DWORD RETURN_RwMatrixMultiply = 0x7F18B6;
 void _declspec(naked) HOOK_RwMatrixMultiply()
 {
+    // clang-format off
     __asm
     {
         mov     eax, [esp+0Ch]
@@ -2138,6 +2243,7 @@ cont:
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2195,6 +2301,7 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
 DWORD RETURN_CAnimBlendNode_GetCurrentTranslation = 0x4CFCBB;
 void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
 {
+    // clang-format off
     __asm
         {
             // if end key frame index is greater than 10,000 then return
@@ -2220,6 +2327,7 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
             // The function expects 8 bytes of parameters
             retn    8
         }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2250,6 +2358,7 @@ bool __cdecl OnMY_CStreaming_AreAnimsUsedByRequestedModels(int modelID)
 #define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels               7
 void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 {
+    // clang-format off
     __asm
     {
         push    [esp + 4]
@@ -2257,6 +2366,7 @@ void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
         add     esp, 0x4
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2315,6 +2425,7 @@ static void _cdecl WrapTrainRailDistance(CTrainSAInterface* train)
 
 static void _declspec(naked) HOOK_CTrain__ProcessControl()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -2324,6 +2435,7 @@ static void _declspec(naked) HOOK_CTrain__ProcessControl()
         popad
         jmp     CONTINUE_CTrain__ProcessControl
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2347,6 +2459,7 @@ static void _cdecl LOG_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSub
 
 static void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask()
 {
+    // clang-format off
     __asm
     {
         test    eax, eax
@@ -2362,6 +2475,7 @@ static void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__Cre
         pop     esi
         retn    4
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2388,6 +2502,7 @@ static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6D04;
 
 static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
 {
+    // clang-format off
     __asm
     {
         test    eax, eax
@@ -2409,6 +2524,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
         lea     eax, [edi - 1]
         jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_1
     }
+    // clang-format on
 }
 
 //     0x5B6CA5 | E8 96 EC F0 FF | call  CModelInfo::GetModelInfo
@@ -2422,6 +2538,7 @@ static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6D04;
 
 static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 {
+    // clang-format off
     __asm
     {
         test    eax, eax
@@ -2443,6 +2560,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
         lea     eax, [edi - 1]
         jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_2
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2461,6 +2579,7 @@ static DWORD CONTINUE_CPlaceName__Process = 0x571F3F;
 
 static void _declspec(naked) HOOK_CPlaceName__Process()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -2478,6 +2597,7 @@ static void _declspec(naked) HOOK_CPlaceName__Process()
         mov     ecx, [eax + 46Ch]
         jmp     CONTINUE_CPlaceName__Process
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2506,6 +2626,7 @@ static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0
 static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
 static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 {
+    // clang-format off
     __asm
     {
         mov eax, [edx*4+0xA9B0C8]   // CModelInfo::ms_modelInfoPtrs
@@ -2527,6 +2648,7 @@ static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 
         jmp RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2545,6 +2667,7 @@ static DWORD CONTINUE_RpClumpForAllAtomics = 0x749B76;
 
 static void _declspec(naked) HOOK_RpClumpForAllAtomics()
 {
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]    // RpClump* clump
@@ -2557,6 +2680,7 @@ static void _declspec(naked) HOOK_RpClumpForAllAtomics()
         push    ebp
         jmp     CONTINUE_RpClumpForAllAtomics
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2573,6 +2697,7 @@ static DWORD CONTINUE_RpAnimBlendClumpGetFirstAssociation = 0x4D6A76;
 
 static void _declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
 {
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
@@ -2584,6 +2709,7 @@ static void _declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
         mov     ecx, ds:[0xB5F878]
         jmp     CONTINUE_RpAnimBlendClumpGetFirstAssociation
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2601,6 +2727,7 @@ static DWORD CONTINUE_CAnimManager__BlendAnimation = 0x4D4617;
 
 static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
 {
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
@@ -2613,6 +2740,7 @@ static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
         mov     ecx, [esp+18h]
         jmp     CONTINUE_CAnimManager__BlendAnimation
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2664,6 +2792,7 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
 
 static void _declspec(naked) HOOK_FxSystemBP_c__Load()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -2679,6 +2808,7 @@ static void _declspec(naked) HOOK_FxSystemBP_c__Load()
         add     esp, 5E8h
         retn    0Ch
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2696,6 +2826,7 @@ static void _declspec(naked) HOOK_FxSystemBP_c__Load()
 
 static void _declspec(naked) HOOK_FxPrim_c__Enable()
 {
+    // clang-format off
     __asm
     {
         test    ecx, ecx
@@ -2706,6 +2837,7 @@ static void _declspec(naked) HOOK_FxPrim_c__Enable()
         returnFromFunction:
         retn    4
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2721,6 +2853,7 @@ static constexpr DWORD CONTINUE_CFire_ProcessFire = 0x53A705;
 static constexpr DWORD SKIP_CFire_ProcessFire = 0x53A69C;
 static void _declspec(naked) HOOK_CFire_ProcessFire()
 {
+    // clang-format off
     __asm
     {
         test byte ptr [esi], 1 // If the "active" flag has been set to 0, we skip processing attached entities
@@ -2734,6 +2867,7 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
         mov ecx, esi
         jmp SKIP_CFire_ProcessFire
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -243,12 +243,14 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
     if (!bOnRestart)
     {
         DWORD dwFunc = FUNC_SetAntiAliasing;
+        // clang-format off
         __asm
         {
             push    uiAntiAliasing
             call    dwFunc
             add     esp, 4
         }
+        // clang-format on
         SetCurrentVideoMode(m_pInterface->dwVideoMode, false);
     }
 
@@ -267,12 +269,14 @@ void CSettingsSA::SetMipMappingEnabled(bool bEnable)
 
 void CSettingsSA::Save()
 {
+    // clang-format off
     __asm
     {
         mov ecx, CLASS_CMenuManager
         mov eax, FUNC_CMenuManager_Save
         call eax
     }
+    // clang-format on
 }
 
 bool CSettingsSA::IsVolumetricShadowsEnabled() const noexcept
@@ -370,6 +374,7 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
 // Hooked from 0x49EA50
 void _declspec(naked) HOOK_GetFxQuality()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -385,11 +390,13 @@ void _declspec(naked) HOOK_GetFxQuality()
         mov     eax, dwFxQualityValue
         retn
     }
+    // clang-format on
 }
 
 // Hook to discover what vehicle will be calling GetFxQuality
 void _declspec(naked) HOOK_StoreShadowForVehicle()
 {
+    // clang-format off
     __asm
     {
         // Hooked from 0x70BDA0  5 bytes
@@ -402,6 +409,7 @@ void _declspec(naked) HOOK_StoreShadowForVehicle()
         call    eax
         jmp     RETURN_StoreShadowForVehicle
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////
@@ -971,6 +979,7 @@ DWORD RETURN_SelectDeviceMultiHide = 0x074622C;
 DWORD RETURN_SelectDeviceMultiShow = 0x0746227;
 void _declspec(naked) HOOK_SelectDevice()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -991,6 +1000,7 @@ multishow:
 single:
         jmp     RETURN_SelectDeviceSingle
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////

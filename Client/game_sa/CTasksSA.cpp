@@ -277,6 +277,7 @@ DWORD RETURN_CEventHandler_ComputeDamageResponse_Mid = 0x4C0598;
 DWORD CTaskSimpleBeHit_constructor = FUNC_CTaskSimpleBeHit__Constructor;
 void _declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -293,6 +294,7 @@ void _declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
         call    CTaskSimpleBeHit_constructor
         jmp     RETURN_CEventHandler_ComputeDamageResponse_Mid
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

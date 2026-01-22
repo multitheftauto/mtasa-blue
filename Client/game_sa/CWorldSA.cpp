@@ -93,6 +93,7 @@ void _declspec(naked) HOOK_FallenPeds()
 {
     if (pGame && pGame->IsUnderWorldWarpEnabled())
     {
+        // clang-format off
         __asm
         {
             sub esp, 2Ch
@@ -100,13 +101,16 @@ void _declspec(naked) HOOK_FallenPeds()
             mov ebx, ds:0B74490h
             jmp CONTINUE_CWorld_FallenPeds
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             ret
         }
+        // clang-format on
     }
 }
 
@@ -114,6 +118,7 @@ void _declspec(naked) HOOK_FallenCars()
 {
     if (pGame && pGame->IsUnderWorldWarpEnabled())
     {
+        // clang-format off
         __asm
         {
             sub esp, 2Ch
@@ -121,13 +126,16 @@ void _declspec(naked) HOOK_FallenCars()
             mov ebx, ds:0B74494h
             jmp CONTINUE_CWorld_FallenCars
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         __asm
         {
             ret
         }
+        // clang-format on
     }
 }
 
@@ -145,12 +153,14 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
         }
         DWORD dwEntity = (DWORD)pEntitySA->GetInterface();
         DWORD dwFunction = FUNC_Add;
+        // clang-format off
         __asm
         {
             push    dwEntity
             call    dwFunction
             add     esp, 4
         }
+        // clang-format on
     }
 }
 
@@ -162,12 +172,14 @@ void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
         SString strMessage("Caller: %i ", CallerId);
         LogEvent(506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage);
     }
+    // clang-format off
     __asm
     {
         push    entityInterface
         call    dwFunction
         add     esp, 4
     }
+    // clang-format on
 }
 
 void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
@@ -184,12 +196,14 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
         }
         DWORD dwEntity = (DWORD)pInterface;
         DWORD dwFunction = FUNC_Remove;
+        // clang-format off
         __asm
         {
             push    dwEntity
             call    dwFunction
             add     esp, 4
         }
+        // clang-format on
     }
 }
 
@@ -201,6 +215,7 @@ void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId
         LogEvent(507, "CWorld::Remove ( CEntitySAInterface * ) Crash", "", strMessage);
     }
     DWORD dwFunction = FUNC_Remove;
+    // clang-format off
     __asm
     {
         push    entityInterface
@@ -212,18 +227,21 @@ void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId
         push    1
         call    dword ptr [esi+8]*/
     }
+    // clang-format on
 }
 
 void CWorldSA::RemoveReferencesToDeletedObject(CEntitySAInterface* entity)
 {
     DWORD dwFunc = FUNC_RemoveReferencesToDeletedObject;
     DWORD dwEntity = (DWORD)entity;
+    // clang-format off
     __asm
     {
         push    dwEntity
         call    dwFunc
         add     esp, 4
     }
+    // clang-format on
 }
 
 void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, float& fY, float& fZ)
@@ -239,6 +257,7 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
     float* pfY = &fY;
     float* pfZ = &fZ;
     int    iUnknown = 21;
+    // clang-format off
     __asm
     {
         push    iUnknown
@@ -248,6 +267,7 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
             mov     ecx, pMatrixPadded
             call    dwFunc
     }
+    // clang-format on
 }
 
 
@@ -427,6 +447,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
     // bool bIgnoreSomeObjectsForCamera = false,    bool bShootThroughStuff = false
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, flags.bCheckCarTires);
 
+    // clang-format off
     __asm
     {
         push    flags.bShootThroughStuff
@@ -446,6 +467,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         mov     bReturn, al
         add     esp, 0x30
     }
+    // clang-format on
 
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, 0);
 
@@ -571,6 +593,7 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
     float fX = vecPosition->fX;
     float fY = vecPosition->fY;
     float fZ = vecPosition->fZ;
+    // clang-format off
     __asm
     {
         push    0
@@ -582,6 +605,7 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
         fstp    fReturn
         add     esp, 0x14
     }
+    // clang-format on
     return fReturn;
 }
 
@@ -599,6 +623,7 @@ bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd
     // bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false,
     // bool bIgnoreSomeObjectsForCamera = false
 
+    // clang-format off
     __asm
     {
         push    flags.bIgnoreSomeObjectsForCamera
@@ -614,6 +639,7 @@ bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd
         mov     bReturn, al
         add     esp, 0x24
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -621,6 +647,7 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
 {
     DWORD dwFunc = FUNC_HasCollisionBeenLoaded;
     bool  bRet = false;
+    // clang-format off
     __asm
     {
         push    0
@@ -629,6 +656,7 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
         mov     bRet, al
         add     esp, 8
     }
+    // clang-format on
     return bRet;
 }
 
@@ -642,12 +670,14 @@ void CWorldSA::SetCurrentArea(DWORD dwArea)
     MemPutFast<DWORD>(VAR_currArea, dwArea);
 
     DWORD dwFunc = FUNC_RemoveBuildingsNotInArea;
+    // clang-format off
     __asm
     {
         push    dwArea
         call    dwFunc
         add     esp, 4
     }
+    // clang-format on
 }
 
 void CWorldSA::SetJetpackMaxHeight(float fHeight)
@@ -706,6 +736,7 @@ void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, i
 {
     DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition;            // __cdecl
 
+    // clang-format off
     __asm
     {
         push pOutVecPosition
@@ -714,6 +745,7 @@ void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, i
         call dwFunc
         add  esp, 3*4
     }
+    // clang-format on
 }
 
 int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance)

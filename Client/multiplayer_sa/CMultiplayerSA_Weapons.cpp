@@ -56,6 +56,7 @@ void OnMY_CWeapon_GenerateDamageEvent(DWORD calledFrom, CPedSAInterface* pPed, C
 DWORD RETURN_CWeapon_GenerateDamageEvent = 0x73A537;
 void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -74,6 +75,7 @@ void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
         push    848E10h
         jmp     RETURN_CWeapon_GenerateDamageEvent
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -105,6 +107,7 @@ void ResetShotInfoArray()
 
 void Call_CShotInfo_Update()
 {
+    // clang-format off
     __asm
     {
         call inner
@@ -116,6 +119,7 @@ void Call_CShotInfo_Update()
         jmp     RETURN_CShotInfo_Update
     done:
     }
+    // clang-format on
 }
 
 #pragma warning( pop )
@@ -144,6 +148,7 @@ void OnMY_CShotInfo_Update()
 // The hook goes here
 void _declspec(naked) HOOK_CShotInfo_Update()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -151,6 +156,7 @@ void _declspec(naked) HOOK_CShotInfo_Update()
         popad
         retn
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -185,6 +191,7 @@ DWORD RETURN_Fx_AddBulletImpact = 0x049F3ED;
 
 void _declspec(naked) HOOK_Fx_AddBulletImpact()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -198,6 +205,7 @@ void _declspec(naked) HOOK_Fx_AddBulletImpact()
         mov     eax, ds:0x0B6F03C
         jmp     RETURN_Fx_AddBulletImpact
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -212,6 +220,7 @@ void _declspec(naked) HOOK_Fx_AddBulletImpact()
 static constexpr DWORD CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC = 0x733128;
 static void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
 {
+    // clang-format off
     __asm
     {
         mov eax, 5DF4E0h
@@ -225,6 +234,7 @@ static void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC()
 
         jmp CONTINUE_CVisibilityPlugins_RenderWeaponPedsForPC
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

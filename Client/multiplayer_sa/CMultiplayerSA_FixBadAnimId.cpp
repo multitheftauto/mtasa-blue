@@ -97,6 +97,7 @@ void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHie
 DWORD RETURN_GetAnimHierarchyFromSkinClump = 0x734A64;
 void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -110,6 +111,7 @@ void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
         add     esp, 10h
         jmp     RETURN_GetAnimHierarchyFromSkinClump
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

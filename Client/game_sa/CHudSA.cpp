@@ -892,6 +892,7 @@ void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
 static constexpr std::uintptr_t CONTINUE_RenderWanted = 0x58DFD8;
 static void _declspec(naked) HOOK_RenderWanted()
 {
+    // clang-format off
     __asm
     {
         cmp ebp, edi
@@ -909,6 +910,7 @@ static void _declspec(naked) HOOK_RenderWanted()
 
         jmp CONTINUE_RenderWanted
     }
+    // clang-format on
 }
 
 static void HOOK_RenderHudBar(int playerId, int x, int y)

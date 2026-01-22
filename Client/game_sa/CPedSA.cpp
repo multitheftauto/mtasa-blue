@@ -590,6 +590,7 @@ static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
 static void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
 {
+    // clang-format off
     __asm
     {
         // Replaced code
@@ -613,6 +614,7 @@ skip_rotation_update:
         // Skip code at start of CPed::PreRenderAfterTest
         jmp RETURN_CPed_PreRenderAfterTestSkip
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -629,6 +631,7 @@ static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
 static void _declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
 {
+    // clang-format off
     __asm
     {
         // Check what to do
@@ -645,6 +648,7 @@ skip_tail:
         // Skip code at mid of CPed::PreRenderAfterTest
         jmp RETURN_CPed_PreRenderAfterTest_MidSkip
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////

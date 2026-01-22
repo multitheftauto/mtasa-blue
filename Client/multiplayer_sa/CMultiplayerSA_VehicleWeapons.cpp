@@ -57,6 +57,7 @@ static void HandleWaterCannonHit(CVehicleSAInterface* pGameVehicle, CColPointSAI
 
 static void _declspec(naked) HOOK_CWaterCannon__Render()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -72,6 +73,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Render()
         push    3E4CCCCDh
         jmp     CONTINUE_CWaterCannon__Render
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

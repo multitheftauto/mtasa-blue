@@ -285,6 +285,7 @@ DWORD RETURN_CStreaming_RequestModel_MidA = 0x0408960;
 DWORD RETURN_CStreaming_RequestModel_MidB = 0x0408990;
 void _declspec(naked) HOOK_CStreaming_RequestModel_Mid()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -319,6 +320,7 @@ skip:
         popad
         jmp     RETURN_CStreaming_RequestModel_MidB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

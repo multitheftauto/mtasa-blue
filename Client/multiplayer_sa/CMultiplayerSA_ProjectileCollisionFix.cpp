@@ -37,6 +37,7 @@ static void InitializeGrenadeColModel()
 static const unsigned int RETURN_CTempColModels__Initialise = 0x5BB883;
 static void _declspec(naked) HOOK_CTempColModels__Initialise()
 {
+    // clang-format off
     __asm
     {
         mov ds:[0x968FE4], edx
@@ -45,6 +46,7 @@ static void _declspec(naked) HOOK_CTempColModels__Initialise()
 
         jmp RETURN_CTempColModels__Initialise
     }
+    // clang-format on
 }
 
 #define HOOKPOS_CFileLoader__LoadWeaponObject 0x5B401E
@@ -52,6 +54,7 @@ static void _declspec(naked) HOOK_CTempColModels__Initialise()
 static const unsigned int RETURN_CFileLoader__LoadWeaponObject = 0x5B4023;
 static void _declspec(naked) HOOK_CFileLoader__LoadWeaponObject()
 {
+    // clang-format off
     __asm
     {
         mov eax, [esp+0x8]
@@ -71,6 +74,7 @@ static void _declspec(naked) HOOK_CFileLoader__LoadWeaponObject()
         push offset colModelGrenade
         jmp RETURN_CFileLoader__LoadWeaponObject
     }
+    // clang-format on
 }
 
 void CMultiplayerSA::InitHooks_ProjectileCollisionFix()

@@ -29,6 +29,7 @@ static void CObject_PreRender(CObjectSAInterface* objectInterface)
 const std::uintptr_t RETURN_CCObject_PreRender = 0x59FD56;
 static void _declspec(naked) HOOK_CCObject_PreRender()
 {
+    // clang-format off
     __asm
     {
         push ecx
@@ -39,6 +40,7 @@ static void _declspec(naked) HOOK_CCObject_PreRender()
         mov  esi, ecx
         jmp  RETURN_CCObject_PreRender
     }
+    // clang-format on
 }
 
 void CObjectSA::StaticSetHooks()
@@ -89,6 +91,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 {
     DWORD CObjectCreate = FUNC_CObject_Create;
     DWORD dwObjectPtr = 0;
+    // clang-format off
     __asm
     {
         push    1
@@ -97,6 +100,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
         add     esp, 8
         mov     dwObjectPtr, eax
     }
+    // clang-format on
 
     if (dwObjectPtr)
     {
@@ -165,11 +169,13 @@ void CObjectSA::Explode()
     DWORD dwFunc = FUNC_CObject_Explode;
     DWORD dwThis = (DWORD)GetInterface();
 
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CObjectSA::Break()
@@ -179,6 +185,7 @@ void CObjectSA::Break()
 
     float fHitVelocity = 1000.0f;            // has no direct influence, but should be high enough to trigger the break (effect)
 
+    // clang-format off
     __asm
     {
         push    32h // most cases: between 30 and 37
@@ -189,6 +196,7 @@ void CObjectSA::Break()
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     if (IsGlass())
     {
@@ -197,6 +205,7 @@ void CObjectSA::Break()
         float fZ = 0.0f;
         dwFunc = FUNC_CGlass_WindowRespondsToCollision;
 
+        // clang-format off
         __asm
         {
             push 0
@@ -211,6 +220,7 @@ void CObjectSA::Break()
             call dwFunc
             add esp, 24h
         }
+        // clang-format on
     }
 }
 
@@ -261,6 +271,7 @@ bool CObjectSA::IsGlass()
     DWORD dwThis = (DWORD)GetInterface();
     bool  bResult;
 
+    // clang-format off
     __asm
     {
         push dwThis
@@ -268,6 +279,7 @@ bool CObjectSA::IsGlass()
         mov bResult, al
         add esp, 4
     }
+    // clang-format on
     return bResult;
 }
 

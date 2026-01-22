@@ -399,6 +399,7 @@ void CWaterManagerSA::RelocatePools()
 DWORD dwHook6E9E23continue = 0x6E9E29;
 void __declspec(naked) Hook6E9E23()
 {
+    // clang-format off
     __asm
     {
 check:
@@ -412,12 +413,14 @@ cont:
         lea ebx, [eax+4*eax]
         jmp dwHook6E9E23continue
     }
+    // clang-format on
 }
 
 DWORD dwHook6EFCD7continue = 0x6EFCDD;
 DWORD dwHook6EFCD7skip = 0x6EFE5E;
 void __declspec(naked) Hook6EFCD7()
 {
+    // clang-format off
     __asm
     {
         mov eax, dword ptr [esi-4]
@@ -431,11 +434,13 @@ check:
         jz check
         jmp dwHook6EFCD7continue
     }
+    // clang-format on
 }
 
 DWORD dwHook6EFBD8continue = 0x6EFBDE;
 void __declspec(naked) Hook6EFBD8()
 {
+    // clang-format off
     __asm
     {
 check:
@@ -449,6 +454,7 @@ check:
 cont:
         jmp dwHook6EFBD8continue
     }
+    // clang-format on
 }
 
 void CWaterManagerSA::InstallHooks()

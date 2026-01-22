@@ -25,23 +25,27 @@ void CPedModelInfo_DeleteRwObject(CBaseModelInfoSAInterface* pModelInfo)
 {
     DWORD                      dwFunction = FUNC_CPedModelInfo_DeleteRwObject;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
+    // clang-format off
     __asm
     {
         mov     ecx, pInterface
         call    dwFunction
     }
+    // clang-format on
 }
 
 void CClumpModelInfo_SetClump(CBaseModelInfoSAInterface* pModelInfo, RwObject* pRwClump)
 {
     DWORD                      dwFunction = FUNC_CClumpModelInfo_SetClump;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
+    // clang-format off
     __asm
     {
         push    pRwClump
         mov     ecx, pInterface
         call    dwFunction
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -66,6 +70,7 @@ void      OnMy_CClothesDeleteRwObject()
 DWORD RETURN_CClothesDeleteRwObject = 0x5A8248;
 void _declspec(naked) HOOK_CClothesDeleteRwObject()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -78,6 +83,7 @@ void _declspec(naked) HOOK_CClothesDeleteRwObject()
         //call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject()
         jmp     RETURN_CClothesDeleteRwObject
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -117,6 +123,7 @@ void OnMy_PostCPedDress()
 DWORD RETURN_PostCPedDress = 0x5A8361;
 void _declspec(naked) HOOK_PostCPedDress()
 {
+    // clang-format off
     __asm
     {
         pushad
@@ -129,6 +136,7 @@ void _declspec(naked) HOOK_PostCPedDress()
         push    eax
         jmp     RETURN_PostCPedDress
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////
