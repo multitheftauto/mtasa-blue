@@ -9,6 +9,7 @@
 *.hh        text diff=cpp
 *.hpp       text diff=cpp
 *.h++       text diff=cpp
+*.json      text eol=lf
 *.rc        text
 *.vcproj    text eol=crlf
 *.sln       text eol=crlf
@@ -23,6 +24,7 @@
 *.nsh       text
 *.xsd       text
 *.po        text
+*.ps1       text eol=lf
 *.ico       binary
 *.png       binary
 *.bmp       binary

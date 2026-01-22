@@ -16,7 +16,7 @@
 #include "CGame.h"
 #include "CMapManager.h"
 
-#define ERROR_BUFFER            32
+#define ERROR_BUFFER 32
 
 CSettings::CSettings(CResourceManager* pResourceManager)
 {
@@ -85,7 +85,7 @@ CXMLNode* CSettings::Get(CXMLNode* pSource, CXMLNode* pStorage, const char* szSo
 
     // Get the resource name from the specified setting
     if (!GetResourceName(szSetting, szQueryResource, MAX_RESOURCE_LENGTH - 1))
-    {            // (something): No resource specified, so use the local resource name
+    {  // (something): No resource specified, so use the local resource name
         strncpy(szQueryResource, szLocalResource, MAX_RESOURCE_LENGTH - 1);
     }
     else
@@ -169,7 +169,7 @@ CXMLNode* CSettings::Get(CXMLNode* pSource, CXMLNode* pStorage, const char* szSo
                 }
             }
             else if (stricmp(szName, szQueryName) == 0 && stricmp(szResource, szQueryResource) == 0)
-            {            // If the query name/resource and found node name/resource combinations are equal
+            {  // If the query name/resource and found node name/resource combinations are equal
                 eStatus = (stricmp(szResource, szLocalResource) == 0 || eAccess != CSettings::Private) ? Found : NoAccess;
                 return pNode;
             }
@@ -239,9 +239,9 @@ CXMLNode* CSettings::Get(const char* szLocalResource, const char* szSetting, boo
 
         // See if we found a matching setting
         if (eStatus == Found)
-            return pNode;            // Found
+            return pNode;  // Found
         else if (eStatus == NotFound)
-        {            // Not found, continue searching
+        {  // Not found, continue searching
             // Try to get the value for the appropriate setting from the resource's meta XML file
             if (pSource)
                 pNode = Get(pSource, pStorage, pResource->GetName().c_str(), szLocalResource, szSetting, bDeleteNode, eStatus);
@@ -257,7 +257,7 @@ CXMLNode* CSettings::Get(const char* szLocalResource, const char* szSetting, boo
             return pNode;
     }
 
-    return NULL;            // No access or no settings found
+    return NULL;  // No access or no settings found
 }
 
 // Creates a new setting and adds it to the destination node
@@ -306,13 +306,13 @@ bool CSettings::Set(const char* szLocalResource, const char* szSetting, const ch
 
         // Check whether the setting exists in the settings registry
         pNode = Get(m_pNodeGlobalSettings, NULL, "", szLocalResource, szSetting, bDeleteNode, eStatus);
-        bExists = true;            // Default value
+        bExists = true;  // Default value
 
         // Try to get the value for the appropriate setting from the resource's meta XML file
         if (eStatus == NotFound && pSource)
         {
             pNode = Get(pSource, NULL, pResource->GetName().c_str(), szLocalResource, szSetting, bDeleteNode, eStatus);
-            bExists = false;            // There's no node in the settings registry, so we create one
+            bExists = false;  // There's no node in the settings registry, so we create one
         }
 
         // See if we have access
@@ -340,11 +340,11 @@ bool CSettings::Set(const char* szLocalResource, const char* szSetting, const ch
             }
 
             if (!bExists || !pNode)
-            {            // No existing settings registry entry, so create a new setting
+            {  // No existing settings registry entry, so create a new setting
                 CreateSetting(m_pNodeGlobalSettings, szBuffer, szContent);
             }
             else
-            {            // Existing settings registry entry
+            {  // Existing settings registry entry
                 // Get the attributes
                 pAttributes = &(pNode->GetAttributes());
 
@@ -392,13 +392,13 @@ bool CSettings::HasPrefix(char cCharacter)
 {
     switch (cCharacter)
     {
-        case SETTINGS_PREFIX_PRIVATE:            // Private variable
+        case SETTINGS_PREFIX_PRIVATE:  // Private variable
             return true;
-        case SETTINGS_PREFIX_PUBLIC:            // Public variable
+        case SETTINGS_PREFIX_PUBLIC:  // Public variable
             return true;
-        case SETTINGS_PREFIX_PROTECTED:            // Protected variable
+        case SETTINGS_PREFIX_PROTECTED:  // Protected variable
             return true;
-        default:            // No variable
+        default:  // No variable
             return false;
     }
 }
@@ -408,13 +408,13 @@ CSettings::AccessType CSettings::GetAccessType(char cCharacter)
 {
     switch (cCharacter)
     {
-        case SETTINGS_PREFIX_PRIVATE:            // Private variable
+        case SETTINGS_PREFIX_PRIVATE:  // Private variable
             return CSettings::Private;
-        case SETTINGS_PREFIX_PUBLIC:            // Public variable
+        case SETTINGS_PREFIX_PUBLIC:  // Public variable
             return CSettings::Public;
-        case SETTINGS_PREFIX_PROTECTED:            // Protected variable
+        case SETTINGS_PREFIX_PROTECTED:  // Protected variable
             return CSettings::Protected;
-        default:            // Default variable (as declared in SETTINGS_NO_PREFIX)
+        default:  // Default variable (as declared in SETTINGS_NO_PREFIX)
             return SETTINGS_NO_PREFIX;
     }
 }
@@ -424,7 +424,7 @@ inline const char* CSettings::GetResourceName(const char* szSetting, char* szBuf
 {
     const char* szChr = strchr(szSetting, SETTINGS_DELIMITER);
     if (szChr == NULL)
-        return NULL;            // Not found? Return NULL, because there's no resource name.
+        return NULL;  // Not found? Return NULL, because there's no resource name.
 
     // Strip off the prefix, if any
     if (HasPrefix(szSetting[0]))

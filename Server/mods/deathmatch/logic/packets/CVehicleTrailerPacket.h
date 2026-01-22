@@ -19,7 +19,7 @@ class CVehicle;
 class CVehicleTrailerPacket final : public CPacket
 {
 public:
-    CVehicleTrailerPacket(){};
+    CVehicleTrailerPacket() {};
     CVehicleTrailerPacket(CVehicle* pVehicle, CVehicle* pTrailer, bool bAttached);
 
     ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_TRAILER; };
