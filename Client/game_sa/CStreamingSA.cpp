@@ -508,8 +508,8 @@ bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
     if (ms_pStreamingBuffer[0] == nullptr || ms_pStreamingBuffer[1] == nullptr)
         return false;
 
-    typedef void*(__cdecl* AllocFunc)(uint32, uint32);
-    typedef void(__cdecl* DeallocFunc)(void*);
+    typedef void*(__cdecl * AllocFunc)(uint32, uint32);
+    typedef void(__cdecl * DeallocFunc)(void*);
 
     // Allocate new buffer first
     void* pNewBuffer = ((AllocFunc)(0x72F4C0))(numBlocks * 2048, 2048);
@@ -524,7 +524,7 @@ bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
     // Suspend streaming thread when idle to safely swap buffers
     // Uses suspend-then-verify to avoid race between checking bInUse and suspending
     constexpr int kMaxRetries = 10000;
-    for (int attempt = 0; ; ++attempt)
+    for (int attempt = 0;; ++attempt)
     {
         if (attempt >= kMaxRetries)
         {
