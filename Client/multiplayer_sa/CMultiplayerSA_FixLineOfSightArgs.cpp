@@ -53,7 +53,8 @@ void _cdecl OnCWorld_ProcessLineOfSight(CVector* pvecStart, CVector* pvecEnd)
 DWORD                 RETURN_CWorld_ProcessLineOfSight = 0x56BA0C;
 void _declspec(naked) HOOK_CWorld_ProcessLineOfSight()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -66,6 +67,7 @@ void _declspec(naked) HOOK_CWorld_ProcessLineOfSight()
         cmp     word ptr ds:[0B7CD78h], 0FFFFh
         jmp     RETURN_CWorld_ProcessLineOfSight
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -86,7 +88,8 @@ void _cdecl OnCWorld_GetIsLineOfSightClear(CVector* pvecStart, CVector* pvecEnd)
 DWORD                 RETURN_CWorld_GetIsLineOfSightClear = 0x56A49C;
 void _declspec(naked) HOOK_CWorld_GetIsLineOfSightClear()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    [esp+32+4*2]
@@ -99,6 +102,7 @@ void _declspec(naked) HOOK_CWorld_GetIsLineOfSightClear()
         cmp     word ptr ds:[0B7CD78h], 0FFFFh
         jmp     RETURN_CWorld_GetIsLineOfSightClear
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -504,11 +504,12 @@ static CSavedRegs PlayerPed__ProcessControl_Saved;
 VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
     // Assumes no reentrancy
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentPlayerPed, ecx
 
-             // Save incase of abort
+        // Save incase of abort
         mov     PlayerPed__ProcessControl_Saved.eax, eax
         mov     PlayerPed__ProcessControl_Saved.ecx, ecx
         mov     PlayerPed__ProcessControl_Saved.edx, edx
@@ -518,31 +519,38 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
         mov     PlayerPed__ProcessControl_Saved.esi, esi
         mov     PlayerPed__ProcessControl_Saved.edi, edi
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CPedSAInterface*)dwCurrentPlayerPed);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CPlayerPed__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 void _declspec(naked) CPlayerPed__ProcessControl_Abort()
 {
-    _asm
-        {// restore stuff
+    // clang-format off
+    __asm
+    {
+        // restore stuff
         mov     eax, PlayerPed__ProcessControl_Saved.eax
         mov     ecx, PlayerPed__ProcessControl_Saved.ecx
         mov     edx, PlayerPed__ProcessControl_Saved.edx
@@ -552,303 +560,366 @@ void _declspec(naked) CPlayerPed__ProcessControl_Abort()
         mov     esi, PlayerPed__ProcessControl_Saved.esi
         mov     edi, PlayerPed__ProcessControl_Saved.edi
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CAutomobile__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CMonsterTruck__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CTrailer__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CQuadBike__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CPlane__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CBmx__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CTrain__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CBoat__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CBike__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CBike__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
 
 VOID _declspec(naked) HOOK_CHeli__ProcessControl()
 {
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     dwCurrentVehicle, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         popad
         mov     edx, FUNC_CHeli__ProcessControl
         call    edx
         pushad
-        }
+    }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
-    _asm
+    // clang-format off
+    __asm
     {
         popad
         retn
     }
+    // clang-format on
 }

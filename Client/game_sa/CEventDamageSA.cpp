@@ -27,7 +27,8 @@ CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType w
     DWORD dwEntityInterface = (DWORD)pEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_Constructor;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         push    b_4
@@ -39,6 +40,7 @@ CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType w
         push    dwEntityInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 CEventDamageSA::CEventDamageSA(CEventDamageSAInterface* pInterface)
@@ -57,11 +59,13 @@ CEventDamageSA::~CEventDamageSA()
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CEventDamage_Destructor;
-        _asm
+        // clang-format off
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
         delete m_pInterface;
     }
 }
@@ -83,12 +87,14 @@ bool CEventDamageSA::HasKilledPed()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_HasKilledPed;
     bool  bReturn = false;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -97,12 +103,14 @@ float CEventDamageSA::GetDamageApplied()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_GetDamageApplied;
     float fReturn = 0.0f;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         fstp    fReturn
     }
+    // clang-format on
     return fReturn;
 }
 
@@ -111,12 +119,14 @@ AssocGroupId CEventDamageSA::GetAnimGroup()
     DWORD        dwThis = (DWORD)m_pInterface;
     DWORD        dwFunc = FUNC_CEventDamage_GetAnimGroup;
     AssocGroupId animGroup = 0;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     animGroup, eax
     }
+    // clang-format on
     return animGroup;
 }
 
@@ -125,12 +135,14 @@ AnimationId CEventDamageSA::GetAnimId()
     DWORD       dwThis = (DWORD)m_pInterface;
     DWORD       dwFunc = FUNC_CEventDamage_GetAnimId;
     AnimationId animID = 0;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     animID, eax
     }
+    // clang-format on
     return animID;
 }
 
@@ -139,12 +151,14 @@ bool CEventDamageSA::GetAnimAdded()
     bool  bReturn;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_GetAnimAdded;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -153,13 +167,15 @@ void CEventDamageSA::ComputeDeathAnim(CPed* pPed, bool bUnk)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDeathAnim;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         push    bUnk
         push    dwPed
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CEventDamageSA::ComputeDamageAnim(CPed* pPed, bool bUnk)
@@ -167,13 +183,15 @@ void CEventDamageSA::ComputeDamageAnim(CPed* pPed, bool bUnk)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDamageAnim;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         push    bUnk
         push    dwPed
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CEventDamageSA::AffectsPed(CPed* pPed)
@@ -182,12 +200,14 @@ bool CEventDamageSA::AffectsPed(CPed* pPed)
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_AffectsPed;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         push    dwPedInterface
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }

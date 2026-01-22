@@ -34,7 +34,8 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
         push    controllerType
@@ -42,13 +43,15 @@ void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControlle
         push    action
         call    dwFunc
     }
+    // clang-format on
 }
 
 int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
         push    controllerType
@@ -56,6 +59,7 @@ int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eController
         call    dwFunc
         mov     iReturn, eax
     }
+    // clang-format on
     return iReturn;
 }
 
@@ -63,26 +67,30 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
 {
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
         push    action
         call    dwFunc
         mov     iReturn, eax
     }
+    // clang-format on
     return iReturn;
 }
 
 void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, CLASS_CControllerConfigManager
         push    controllerType
         push    action
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)

@@ -17,13 +17,15 @@
 void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
     DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    iAlpha
         push    pClump
         call    dwFunc
         add     esp, 0x8
-        }
+    }
+    // clang-format on
 }
 
 // Some AtomicId bits are:
@@ -44,13 +46,15 @@ int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
 {
     DWORD dwFunc = FUNC_CVisibilityPlugins_GetAtomicId;
     int   iResult = 0;
-    _asm
+    // clang-format off
+    __asm
     {
         push    pAtomic
         call    dwFunc
         add     esp, 0x4
         mov     iResult, eax
     }
+    // clang-format on
     return iResult;
 }
 

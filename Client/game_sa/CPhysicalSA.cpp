@@ -82,12 +82,14 @@ CVector* CPhysicalSA::GetMoveSpeedInternal(CVector* vecMoveSpeed)
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
-        }
+    }
+    // clang-format on
     MemCpyFast(vecMoveSpeed, (void*)dwReturn, sizeof(CVector));
     return vecMoveSpeed;
 }
@@ -97,12 +99,14 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     DWORD dwFunc = FUNC_GetTurnSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
-        }
+    }
+    // clang-format on
     MemCpyFast(vecTurnSpeed, (void*)dwReturn, sizeof(CVector));
     return vecTurnSpeed;
 }
@@ -113,12 +117,14 @@ void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
 
+    // clang-format off
     __asm
-        {
+    {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
-        }
+    }
+    // clang-format on
     MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
 
     if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
@@ -204,11 +210,13 @@ void CPhysicalSA::ProcessCollision()
     DWORD dwFunc = FUNC_ProcessCollision;
     DWORD dwThis = (DWORD)GetInterface();
 
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CPhysicalSA::AddToMovingList()
@@ -216,11 +224,13 @@ void CPhysicalSA::AddToMovingList()
     DWORD dwFunc = FUNC_CPhysical_AddToMovingList;
     DWORD dwThis = (DWORD)GetInterface();
 
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 float CPhysicalSA::GetDamageImpulseMagnitude()
@@ -289,7 +299,8 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
     if (((CPhysicalSAInterface*)GetInterface())->m_pAttachedEntity == NULL)
         return;
 
-    _asm
+    // clang-format off
+    __asm
     {
         push    bUnk
         push    fUnkZ
@@ -298,6 +309,7 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector* vecPosition, const CVector* vecRotation)
@@ -305,7 +317,8 @@ bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CV
     DWORD dwFunc = FUNC_AttachEntityToEntity;
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwReturn = 0;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, vecRotation
         push    [ecx+8]
@@ -320,6 +333,7 @@ bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CV
         call    dwFunc
         mov     dwReturn, eax
     }
+    // clang-format on
     return (dwReturn != NULL);
 }
 

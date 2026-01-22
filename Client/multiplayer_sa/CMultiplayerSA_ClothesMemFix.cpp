@@ -25,23 +25,27 @@ void CPedModelInfo_DeleteRwObject(CBaseModelInfoSAInterface* pModelInfo)
 {
     DWORD                      dwFunction = FUNC_CPedModelInfo_DeleteRwObject;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, pInterface
         call    dwFunction
     }
+    // clang-format on
 }
 
 void CClumpModelInfo_SetClump(CBaseModelInfoSAInterface* pModelInfo, RwObject* pRwClump)
 {
     DWORD                      dwFunction = FUNC_CClumpModelInfo_SetClump;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
-    _asm
+    // clang-format off
+    __asm
     {
         push    pRwClump
         mov     ecx, pInterface
         call    dwFunction
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -66,18 +70,20 @@ void      OnMy_CClothesDeleteRwObject()
 DWORD                 RETURN_CClothesDeleteRwObject = 0x5A8248;
 void _declspec(naked) HOOK_CClothesDeleteRwObject()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         call    OnMy_CClothesDeleteRwObject
         popad
 
-         // Do original code and continue
+        // Do original code and continue
         mov     ecx, esi
-         // Skip deletion
-         // call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject()
+        // Skip deletion
+        //call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject()
         jmp     RETURN_CClothesDeleteRwObject
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -117,18 +123,20 @@ void OnMy_PostCPedDress()
 DWORD                 RETURN_PostCPedDress = 0x5A8361;
 void _declspec(naked) HOOK_PostCPedDress()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         call    OnMy_PostCPedDress
         popad
 
-         // Do original code and continue
+        // Do original code and continue
         mov     eax, [esi+18h]
         push    edi
         push    eax
         jmp     RETURN_PostCPedDress
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////

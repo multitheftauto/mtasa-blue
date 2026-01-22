@@ -96,14 +96,15 @@ static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleIn
 
 static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         lea     eax, [esp+5Ch]
         lea     ebx, [esp+84h]
-        push    eax  // CVector*
-        push    ebx  // CVector*
-        push    esi  // CVehicleSAInterface*
+        push    eax             // CVector*
+        push    ebx             // CVector*
+        push    esi             // CVehicleSAInterface*
         call    ApplyExhaustParticlesPosition
         add     esp, 12
         popad
@@ -117,6 +118,7 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
         mov     [esp+0D4h-8Ch], edx
         jmp     CONTINUE_CVehicle_AddExhaustParticles_1
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +138,8 @@ static const DWORD CONTINUE_CVehicle_AddExhaustParticles_2 = 0x6DE3A7;
 
 static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         mov     eax, vehicleDummiesPositionArray
@@ -154,6 +157,7 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
         add     edx, 84h
         jmp     CONTINUE_CVehicle_AddExhaustParticles_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -173,10 +177,11 @@ static const DWORD CONTINUE_CVehicle_AddDamagedVehicleParticles = 0x6D2B0F;
 
 static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -195,6 +200,7 @@ static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
         add     ecx, 54h
         jmp     CONTINUE_CVehicle_AddDamagedVehicleParticles
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -214,10 +220,11 @@ static const DWORD CONTINUE_CFire_ProcessFire = 0x53A719;
 
 static void _declspec(naked) HOOK_CFire_ProcessFire()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -236,6 +243,7 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
         mov     edx, [eax]
         jmp     CONTINUE_CFire_ProcessFire
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -255,10 +263,11 @@ static const DWORD CONTINUE_CAutomobile_DoNitroEffect_1 = 0x6A3BE8;
 
 static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -277,6 +286,7 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
         add     ecx, 48h
         jmp     CONTINUE_CAutomobile_DoNitroEffect_1
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -326,12 +336,13 @@ static void __cdecl ApplySecondaryExhaustNitroPosition(CVehicleSAInterface* vehi
 
 static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         lea     eax, [esp+40h]
-        push    eax  // CVector*
-        push    esi  // CVehicleSAInterface*
+        push    eax             // CVector*
+        push    esi             // CVehicleSAInterface*
         call    ApplySecondaryExhaustNitroPosition
         add     esp, 8
         popad
@@ -339,6 +350,7 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
         test    [esi+40h], edi
         jmp     CONTINUE_CAutomobile_DoNitroEffect_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -361,10 +373,11 @@ static const DWORD CONTINUE_CVehicle_DoVehicleLights_1 = 0x6E1F42;
 
 static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -383,6 +396,7 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
         add     eax, 18h
         jmp     CONTINUE_CVehicle_DoVehicleLights_1
     }
+    // clang-format on
 }
 
 //     0x6E22C6 | 8B 04 85 C8 B0 A9 00 | mov eax, CModelInfo::ms_modelInfoPtrs
@@ -395,10 +409,11 @@ static const DWORD CONTINUE_CVehicle_DoVehicleLights_2 = 0x6E22D3;
 
 static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -417,6 +432,7 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
         add     ecx, 18h
         jmp     CONTINUE_CVehicle_DoVehicleLights_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -436,10 +452,11 @@ static const DWORD CONTINUE_CAutomobile_ProcessCarOnFireAndExplode = 0x6A7185;
 
 static void _declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -458,6 +475,7 @@ static void _declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
         add     eax, 54h
         jmp     CONTINUE_CAutomobile_ProcessCarOnFireAndExplode
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -477,10 +495,11 @@ static const DWORD CONTINUE_CBike_FixHandsToBars = 0x6B8059;
 
 static void _declspec(naked) HOOK_CBike_FixHandsToBars()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    ebx  // CVehicleSAInterface*
+        push    ebx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -499,6 +518,7 @@ static void _declspec(naked) HOOK_CBike_FixHandsToBars()
         add     eax, 78h
         jmp     CONTINUE_CBike_FixHandsToBars
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -518,11 +538,12 @@ static const DWORD CONTINUE_CPed_SetPedPositionInCar_1 = 0x5DF992;
 
 static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         mov     eax, [esi+58Ch]
-        push    eax  // CVehicleSAInterface*
+        push    eax            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -541,6 +562,7 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
         mov     edi, [edi+5Ch]
         jmp     CONTINUE_CPed_SetPedPositionInCar_1
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -560,11 +582,12 @@ static const DWORD CONTINUE_CPed_SetPedPositionInCar_2 = 0x5DFA5C;
 
 static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         mov     eax, [esi+58Ch]
-        push    eax  // CVehicleSAInterface*
+        push    eax            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -583,6 +606,7 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
         add     eax, 3Ch
         jmp     CONTINUE_CPed_SetPedPositionInCar_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -602,11 +626,12 @@ static const DWORD CONTINUE_CPed_SetPedPositionInCar_3 = 0x5DFA0B;
 
 static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         mov     eax, [esi+58Ch]
-        push    eax  // CVehicleSAInterface*
+        push    eax            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -625,6 +650,7 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
         mov     edi, [edi+5Ch]
         jmp     CONTINUE_CPed_SetPedPositionInCar_3
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -644,11 +670,12 @@ static const DWORD CONTINUE_CPed_SetPedPositionInCar_4 = 0x5DFA86;
 
 static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         mov     eax, [esi+58Ch]
-        push    eax  // CVehicleSAInterface*
+        push    eax            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -667,6 +694,7 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
         add     edx, 3Ch
         jmp     CONTINUE_CPed_SetPedPositionInCar_4
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -686,10 +714,11 @@ static const DWORD CONTINUE_CVehicle_DoHeadLightEffect = 0x6E0A6F;
 
 static void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -708,6 +737,7 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
         lea     ecx, [ebx+ebx*2]
         jmp     CONTINUE_CVehicle_DoHeadLightEffect
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -728,10 +758,11 @@ static const DWORD CONTINUE_CVehicle_DoTailLightEffect = 0x6E17C8;
 
 static void _declspec(naked) HOOK_CVehicle_DoTailLightEffect()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -752,6 +783,7 @@ static void _declspec(naked) HOOK_CVehicle_DoTailLightEffect()
         mov     ebx, [esp+4+30h]
         jmp     CONTINUE_CVehicle_DoTailLightEffect
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -771,10 +803,11 @@ static const DWORD CONTINUE_CVehicle_DoHeadLightReflectionSingle = 0x6E1457;
 
 static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -793,6 +826,7 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
         mov     eax, [edx]
         jmp     CONTINUE_CVehicle_DoHeadLightReflectionSingle
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -812,10 +846,11 @@ static const DWORD CONTINUE_CVehicle_DoHeadLightReflectionTwin = 0x6E1613;
 
 static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -834,6 +869,7 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
         mov     eax, [edx]
         jmp     CONTINUE_CVehicle_DoHeadLightReflectionTwin
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -854,10 +890,11 @@ static const DWORD CONTINUE_CVehicle_GetPlaneGunsPosition = 0x6D42A4;
 
 static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -878,6 +915,7 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
         mov     eax, [eax+5Ch]
         jmp     CONTINUE_CVehicle_GetPlaneGunsPosition
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -897,10 +935,11 @@ static const DWORD CONTINUE_CVehicle_GetPlaneOrdnancePosition = 0x6D46F8;
 
 static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -919,6 +958,7 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
         add     eax, 9Ch
         jmp     CONTINUE_CVehicle_GetPlaneOrdnancePosition
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -938,10 +978,11 @@ static const DWORD CONTINUE_CVehicle_CanBeDriven = 0x6D543F;
 
 static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    ecx  // CVehicleSAInterface*
+        push    ecx            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -960,6 +1001,7 @@ static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
         mov     eax, [eax+5Ch]
         jmp     CONTINUE_CVehicle_CanBeDriven
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -979,10 +1021,11 @@ static const DWORD CONTINUE_CPlane_PreRender_1 = 0x6C9724;
 
 static void _declspec(naked) HOOK_CPlane_PreRender_1()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -1001,6 +1044,7 @@ static void _declspec(naked) HOOK_CPlane_PreRender_1()
         add     ecx, 84h
         jmp     CONTINUE_CPlane_PreRender_1
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1020,10 +1064,11 @@ static const DWORD CONTINUE_CPlane_PreRender_2 = 0x6C98CF;
 
 static void _declspec(naked) HOOK_CPlane_PreRender_2()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -1042,6 +1087,7 @@ static void _declspec(naked) HOOK_CPlane_PreRender_2()
         add     eax, 6Ch
         jmp     CONTINUE_CPlane_PreRender_2
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1061,10 +1107,11 @@ static const DWORD CONTINUE_CPlane_PreRender_3 = 0x6C9B5C;
 
 static void _declspec(naked) HOOK_CPlane_PreRender_3()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CVehicleSAInterface*
+        push    esi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -1083,6 +1130,7 @@ static void _declspec(naked) HOOK_CPlane_PreRender_3()
         add     eax, 78h
         jmp     CONTINUE_CPlane_PreRender_3
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1102,10 +1150,11 @@ static const DWORD CONTINUE_CVehicle_DoHeadLightBeam = 0x6E0E3E;
 
 static void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    edi  // CVehicleSAInterface*
+        push    edi            // CVehicleSAInterface*
         call    UpdateVehicleDummiesPositionArray
         add     esp, 4
 
@@ -1124,6 +1173,7 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
         mov     eax, [esp+98h+4h]
         jmp     CONTINUE_CVehicle_DoHeadLightBeam
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

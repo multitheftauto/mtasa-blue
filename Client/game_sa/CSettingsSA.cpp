@@ -243,12 +243,14 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
     if (!bOnRestart)
     {
         DWORD dwFunc = FUNC_SetAntiAliasing;
-        _asm
-            {
+        // clang-format off
+        __asm
+        {
             push    uiAntiAliasing
             call    dwFunc
             add     esp, 4
-            }
+        }
+        // clang-format on
         SetCurrentVideoMode(m_pInterface->dwVideoMode, false);
     }
 
@@ -267,12 +269,14 @@ void CSettingsSA::SetMipMappingEnabled(bool bEnable)
 
 void CSettingsSA::Save()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         mov ecx, CLASS_CMenuManager
         mov eax, FUNC_CMenuManager_Save
         call eax
     }
+    // clang-format on
 }
 
 bool CSettingsSA::IsVolumetricShadowsEnabled() const noexcept
@@ -368,13 +372,14 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
 // Hooked from 0x49EA50
 void _declspec(naked) HOOK_GetFxQuality()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        mov     eax, [ecx+054h]  // Current FxQuality setting
+        mov     eax, [ecx+054h]            // Current FxQuality setting
         mov     dwFxQualityValue, eax
 
-        mov     eax, [esp+32]  // Address GetFxQuality was called from
+        mov     eax, [esp+32]            // Address GetFxQuality was called from
         push    eax
         call    MaybeAlterFxQualityValue
         add     esp, 4
@@ -383,23 +388,26 @@ void _declspec(naked) HOOK_GetFxQuality()
         mov     eax, dwFxQualityValue
         retn
     }
+    // clang-format on
 }
 
 // Hook to discover what vehicle will be calling GetFxQuality
 void _declspec(naked) HOOK_StoreShadowForVehicle()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         // Hooked from 0x70BDA0  5 bytes
-        mov     eax, [esp+4]  // Get vehicle
-        mov     ax, [eax+34]  // pEntity->m_nModelIndex
+        mov     eax, [esp+4]            // Get vehicle
+        mov     ax, [eax+34]            // pEntity->m_nModelIndex
         mov     usCallingForVehicleModel, ax
         sub     esp, 44h
         push    ebx
-        mov     eax, 0x70F9B0  // CVolumetricShadowMgr::IsAvailable
+        mov     eax, 0x70F9B0            // CVolumetricShadowMgr::IsAvailable
         call    eax
         jmp     RETURN_StoreShadowForVehicle
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////
@@ -969,7 +977,8 @@ DWORD                 RETURN_SelectDeviceMultiHide = 0x074622C;
 DWORD                 RETURN_SelectDeviceMultiShow = 0x0746227;
 void _declspec(naked) HOOK_SelectDevice()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         call    OnMY_SelectDevice
@@ -979,7 +988,7 @@ void _declspec(naked) HOOK_SelectDevice()
         jl      single
         jz      multishow
 
-             // multhide
+                // multhide
         mov     eax, 1
         jmp     RETURN_SelectDeviceMultiHide
 
@@ -989,6 +998,7 @@ multishow:
 single:
         jmp     RETURN_SelectDeviceSingle
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////

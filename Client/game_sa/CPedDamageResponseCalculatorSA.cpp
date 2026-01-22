@@ -23,7 +23,8 @@ CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CEntity* pEntity,
     DWORD dwEntityInterface = (DWORD)pEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CPedDamageResponseCalculator_Constructor;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         push    b_1
@@ -33,6 +34,7 @@ CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CEntity* pEntity,
         push    dwEntityInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CPedDamageResponseCalculatorSAInterface* pInterface)
@@ -47,11 +49,13 @@ CPedDamageResponseCalculatorSA::~CPedDamageResponseCalculatorSA()
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CPedDamageResponseCalculator_Destructor;
-        _asm
+        // clang-format off
+        __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
         delete m_pInterface;
     }
 }
@@ -62,7 +66,8 @@ void CPedDamageResponseCalculatorSA::ComputeDamageResponse(CPed* pPed, CPedDamag
     DWORD dwResponseInterface = (DWORD)pDamageResponse->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CPedDamageResponseCalculator_ComputeDamageResponse;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         push    bSpeak
@@ -70,4 +75,5 @@ void CPedDamageResponseCalculatorSA::ComputeDamageResponse(CPed* pPed, CPedDamag
         push    dwPedInterface
         call    dwFunc
     }
+    // clang-format on
 }

@@ -36,8 +36,9 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
 
     DWORD dwPedPointer = 0;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    SIZEOF_CPLAYERPED
         call    CPedOperatorNew
         add     esp, 4
@@ -45,10 +46,11 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
         mov     dwPedPointer, eax
 
         mov     ecx, eax
-        push    0  // set to 0 and they'll behave like AI peds
+        push    0 // set to 0 and they'll behave like AI peds
         push    1
         call    CPlayerPedConstructor
-        }
+    }
+    // clang-format on
 
     SetInterface((CEntitySAInterface*)dwPedPointer);
 
@@ -162,12 +164,14 @@ void CPlayerPedSA::SetInitialState()
     DWORD dwUnknown = 1;
     DWORD dwFunction = FUNC_SetInitialState;
     DWORD dwThis = (DWORD)m_pInterface;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    dwUnknown
         mov     ecx, dwThis
         call    dwFunction
-        }
+    }
+    // clang-format on
 
     // Avoid direction locks for respawning after a jump
     GetPlayerPedInterface()->pedFlags.bIsLanding = false;
@@ -293,11 +297,13 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
 
     DWORD dwThis = (DWORD)pedInterface;
     DWORD dwFunc = FUNC_CPlayerPed_ReApplyMoveAnims;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 CEntity* CPlayerPedSA::GetTargetedEntity() const
@@ -445,21 +451,23 @@ __declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAI
 DWORD                 RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
 void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    eax
         push    esi
         call    OnCPlayerPed_ProcessAnimGroups_Mid
-        mov     [esp+0],eax  // Put temp
+        mov     [esp+0],eax         // Put temp
         add     esp, 4*2
         popad
 
-        mov     eax,[esp-32-4*2]  // Get temp
-        cmp     [esi+4D4h], eax  // pPed->iMoveAnim
+        mov     eax,[esp-32-4*2]    // Get temp
+        cmp     [esi+4D4h], eax     // pPed->iMoveAnim
 
         jmp     RETURN_CPlayerPed_ProcessAnimGroups_Mid
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -497,21 +505,23 @@ __declspec(noinline) int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqM
 DWORD                 RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
 void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 {
-    _asm
+    // clang-format off
+    __asm
     {
-        mov     eax, 0x05A7FB0  // CClothes::GetPlayerMotionGroupToLoad
+        mov     eax, 0x05A7FB0      // CClothes::GetPlayerMotionGroupToLoad
         call    eax
 
         pushad
         push    eax
         call    OnCClothes_GetDefaultPlayerMotionGroup
-        mov     [esp+0],eax  // Put temp
+        mov     [esp+0],eax         // Put temp
         add     esp, 4*1
         popad
 
-        mov     eax,[esp-32-4*1]  // Get temp
+        mov     eax,[esp-32-4*1]    // Get temp
         jmp     RETURN_CClothes_GetDefaultPlayerMotionGroup
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -109,19 +109,23 @@ static __declspec(naked) void Hook_Calculate()
 {
     tHandlingDataSA* pData;
     DWORD            dwHandlingData;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         mov         eax, [esp+4]
         mov         dwHandlingData, eax
-        }
+    }
+    // clang-format on
 
     pData = reinterpret_cast<tHandlingDataSA*>(dwHandlingData);
     DumpHandlingData(pData);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         ret         4
-        }
+    }
+    // clang-format on
 }
 
 CHandlingManagerSA::CHandlingManagerSA()

@@ -2306,13 +2306,15 @@ namespace SharedUtil
     #elif defined(WIN_arm) || defined(WIN_arm64)
         return 0;
     #else
-        _asm
+        // clang-format off
+        __asm
         {
             mov eax, 1
             cpuid
             shr ebx, 24
             mov eax, ebx
         }
+            // clang-format on
     #endif
     }
 

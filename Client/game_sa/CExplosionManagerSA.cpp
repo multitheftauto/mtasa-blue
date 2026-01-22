@@ -40,7 +40,8 @@ CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity
     CExplosion* explosion = CExplosionManagerSA::FindFreeExplosion();
     bool        bReturn;
     DWORD       dwFunc = FUNC_CExplosion_AddExplosion;
-    _asm
+    // clang-format off
+    __asm
     {
         push    bNoDamage
         push    fCamShake
@@ -53,14 +54,14 @@ CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity
         push    dwOwnerInterface
         push    dwExplodingEntityInterface
 
-         // OUR CALL
-        push    returnhere  // simulate a call, by pusing our return address
-                         // NOW the code is actually inside CExplosion__AddExplosion, but may be patched by Multiplayer
+        // OUR CALL
+        push    returnhere // simulate a call, by pusing our return address
+        // NOW the code is actually inside CExplosion__AddExplosion, but may be patched by Multiplayer
         sub     esp, 0x1C
         push    ebx
         push    ebp
         push    esi
-        mov     ebx, dwFunc              // Now jump in 6 bytes later (6 bytes might be used for our patch-jump in Multiplayer)
+        mov     ebx, dwFunc // Now jump in 6 bytes later (6 bytes might be used for our patch-jump in Multiplayer)
         add     ebx, 6
         jmp     ebx
 
@@ -68,6 +69,7 @@ returnhere:
         add     esp, 0x28
         mov     bReturn, al
     }
+    // clang-format on
     if (bReturn) return explosion;
 
     return NULL;

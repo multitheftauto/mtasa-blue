@@ -37,10 +37,11 @@ static DWORD CONTINUE_CDamageManager__ProgressDoorDamage = 0x6C2327;
 
 static void _declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        mov     ecx, [esp + 08h]  // CAutomobileSAInterface*
+        mov     ecx, [esp + 08h]        // CAutomobileSAInterface*
         call    AreVehicleDoorsUndamageable
         test    al, al
         jz      continueGameCodeLocation
@@ -56,6 +57,7 @@ static void _declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
         movzx   esi, [esp + 0Ch]
         jmp     CONTINUE_CDamageManager__ProgressDoorDamage
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

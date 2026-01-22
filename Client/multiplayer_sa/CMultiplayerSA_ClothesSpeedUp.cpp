@@ -130,7 +130,8 @@ DWORD                 RETURN_CallCStreamingInfoAddToListA = 0x408967;
 DWORD                 RETURN_CallCStreamingInfoAddToListB = 0x408990;
 void _declspec(naked) HOOK_CallCStreamingInfoAddToList()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    ecx
@@ -140,12 +141,13 @@ void _declspec(naked) HOOK_CallCStreamingInfoAddToList()
         cmp     al, 0
         jnz     skip
 
-         // Continue with standard code
+        // Continue with standard code
         popad
         call    FUNC_CStreamingInfoAddToList
         jmp     RETURN_CallCStreamingInfoAddToListA
 
-             // Handle load here
+
+        // Handle load here
 skip:
         popad
         pushad
@@ -163,6 +165,7 @@ skip:
         add     esp, 4*1
         jmp     RETURN_CallCStreamingInfoAddToListB
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,7 +192,8 @@ DWORD                 RETURN_CStreamingLoadRequestedModels = 0x15670A5;
 DWORD                 RETURN_CStreamingLoadRequestedModelsB = 0x156711B;
 void _declspec(naked) HOOK_CStreamingLoadRequestedModels()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    [esp+32+4*0]
@@ -198,16 +202,17 @@ void _declspec(naked) HOOK_CStreamingLoadRequestedModels()
         cmp     al, 0
         jnz     skip
 
-         // Continue with standard code
+        // Continue with standard code
         popad
         mov     al,byte ptr ds:[008E4A58h]
         jmp     RETURN_CStreamingLoadRequestedModels
 
-         // Skip LoadRequestedModels
+        // Skip LoadRequestedModels
 skip:
         popad
         jmp     RETURN_CStreamingLoadRequestedModelsB
     }
+    // clang-format on
 }
 
 //
@@ -236,7 +241,8 @@ static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;  // retu
 void _declspec(naked) HOOK_LoadingPlayerImgDir()
 {
     // hook from 005A69E3 5 bytes
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         call    IsPlayerImgDirLoaded
@@ -254,6 +260,7 @@ skip:
         popad
         jmp     RETURN_LoadingPlayerImgDirB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -43,11 +43,13 @@ void CFxSystemSA::PlayAndKill()
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_FxSystem_c__PlayAndKill;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CFxSystemSA::GetMatrix(CMatrix& matrix)
@@ -168,7 +170,8 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post()
 DWORD                 RETURN_FxSystem_c_Update_MidA = 0x04AAF75;
 void _declspec(naked) HOOK_FxSystem_c_Update_MidA()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    ecx
@@ -191,6 +194,7 @@ inner:
         push    ebp
         jmp     RETURN_FxSystem_c_Update_MidA
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -236,7 +240,8 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post()
 DWORD                 RETURN_FxSystem_c_Update_MidB = 0x04AB224;
 void _declspec(naked) HOOK_FxSystem_c_Update_MidB()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    ecx
@@ -246,7 +251,7 @@ void _declspec(naked) HOOK_FxSystem_c_Update_MidB()
 
         mov     eax, [ebp+54h]
         push    eax
-        call    dword ptr [edx+8]  // FxEmitter_c::CreateParticles
+        call    dword ptr [edx+8]   // FxEmitter_c::CreateParticles
 
         pushad
         call    OnMY_FxSystem_c_Update_MidB_Post
@@ -254,6 +259,7 @@ void _declspec(naked) HOOK_FxSystem_c_Update_MidB()
 
         jmp     RETURN_FxSystem_c_Update_MidB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

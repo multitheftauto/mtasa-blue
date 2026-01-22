@@ -30,13 +30,15 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
-        _asm
+        // clang-format off
+        __asm
         {
             mov     ecx, dwThisInterface
             push    pUtility
             push    dwVehiclePtr
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -72,7 +74,8 @@ CTaskSimpleCarSetPedInAsPassengerSA::CTaskSimpleCarSetPedInAsPassengerSA(CVehicl
         DWORD dwFunc = FUNC_CTaskSimpleCarSetPedInAsPassenger__Constructor;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
-        _asm
+        // clang-format off
+        __asm
         {
             mov     ecx, dwThisInterface
             push    pUtility
@@ -80,6 +83,7 @@ CTaskSimpleCarSetPedInAsPassengerSA::CTaskSimpleCarSetPedInAsPassengerSA(CVehicl
             push    dwVehiclePtr
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -115,7 +119,8 @@ CTaskSimpleCarSetPedOutSA::CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, i
         DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__Constructor;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
-        _asm
+        // clang-format off
+        __asm
         {
             mov     ecx, dwThisInterface
             xor     eax, eax
@@ -125,6 +130,7 @@ CTaskSimpleCarSetPedOutSA::CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, i
             push    dwVehiclePtr
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -154,11 +160,13 @@ void CTaskSimpleCarSetPedOutSA::PositionPedOutOfCollision(CPed* ped, CVehicle* v
     DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision;
     DWORD dwVehiclePtr = (DWORD)((CEntitySA*)vehicle)->GetInterface();
     DWORD dwPedPtr = (DWORD)((CEntitySA*)ped)->GetInterface();
-    _asm
+    // clang-format off
+    __asm
     {
         push    nDoor
         push    dwVehiclePtr
         push    dwPedPtr
         call    dwFunc
     }
+    // clang-format on
 }

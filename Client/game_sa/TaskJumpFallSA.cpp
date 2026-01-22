@@ -21,7 +21,8 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTar
     DWORD dwFunc = FUNC_CTaskSimpleClimb__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThisInterface
         push    bForceClimb
@@ -32,6 +33,7 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTar
         push    pClimbEnt
         call    dwFunc
     }
+    // clang-format on
 }
 
 // ##############################################################################
@@ -47,13 +49,15 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     DWORD dwFunc = FUNC_CTaskSimpleJetPack__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThisInterface
-        push    0  // pTargetEnt - ignored for simplicity's sake (we really don't need it)
+        push    0               // pTargetEnt - ignored for simplicity's sake (we really don't need it)
         push    nHoverTime
         push    fCruiseHeight
         push    pVecTargetPos
         call    dwFunc
     }
+    // clang-format on
 }

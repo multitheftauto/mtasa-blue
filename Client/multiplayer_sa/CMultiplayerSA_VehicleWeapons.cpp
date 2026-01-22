@@ -57,21 +57,23 @@ static void HandleWaterCannonHit(CVehicleSAInterface* pGameVehicle, CColPointSAI
 
 static void _declspec(naked) HOOK_CWaterCannon__Render()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        mov     eax, [ebx]  // CVehicleSAInterface* CWaterCannon::m_pVehicle
-        lea     ebx, [esp + 100h - 54h]  // CColPointSAInterface*
-        lea     ecx, [esp + 100h - 58h]  // CEntitySAInterface**
-        push    ecx  // ppHitGameEntity
-        push    ebx  // pColPoint
-        push    eax  // pGameVehicle
+        mov     eax, [ebx]                      // CVehicleSAInterface* CWaterCannon::m_pVehicle
+        lea     ebx, [esp + 100h - 54h]         // CColPointSAInterface*
+        lea     ecx, [esp + 100h - 58h]         // CEntitySAInterface**
+        push    ecx                             // ppHitGameEntity
+        push    ebx                             // pColPoint
+        push    eax                             // pGameVehicle
         call    HandleWaterCannonHit
         add     esp, 12
         popad
         push    3E4CCCCDh
         jmp     CONTINUE_CWaterCannon__Render
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

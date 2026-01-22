@@ -249,13 +249,15 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     if (IsUpgradeModelId(dwModelID))
     {
         DWORD dwFunc = FUNC_RequestVehicleUpgrade;
-        _asm
-            {
+        // clang-format off
+        __asm
+        {
             push    dwFlags
             push    dwModelID
             call    dwFunc
             add     esp, 8
-            }
+        }
+        // clang-format on
     }
     else
     {
@@ -281,13 +283,15 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
         }
 
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
-        _asm
-            {
+        // clang-format off
+        __asm
+        {
             push    dwFlags
             push    dwModelID
             call    dwFunction
             add     esp, 8
-            }
+        }
+        // clang-format on
     }
 }
 
@@ -304,12 +308,14 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    dwOnlyPriorityModels
         call    dwFunction
         add     esp, 4
-        }
+    }
+    // clang-format on
 
     if (IS_TIMING_CHECKPOINTS())
     {
@@ -325,26 +331,30 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         bool  bReturn;
         DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
-        _asm
+        // clang-format off
+        __asm
         {
             push    dwModelID
             call    dwFunc
             add     esp, 0x4
             mov     bReturn, al
         }
+        // clang-format on
         return bReturn;
     }
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
         bool  bReturn = 0;
-        _asm
+        // clang-format off
+        __asm
         {
             push    dwModelID
             call    dwFunc
             mov     bReturn, al
             pop     eax
         }
+        // clang-format on
 
         return bReturn;
     }
@@ -353,14 +363,16 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
     DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    channel
         push    szTexture
         push    model
         call    dwFunc
         add     esp, 0xC
-        }
+    }
+    // clang-format on
 }
 
 void CStreamingSA::ReinitStreaming()

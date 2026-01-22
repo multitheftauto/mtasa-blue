@@ -48,21 +48,23 @@ static const DWORD CONTINUE_CObject_Init = 0x59F8DC;
 
 static void _declspec(naked) HOOK_CObject_Init()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CObjectSAInterface*
+        push    esi     // CObjectSAInterface*
         call    ColStoreAddRef
         add     esp, 4
         popad
 
-         // this->m_objectFlags |= 0x10000u;
+        // this->m_objectFlags |= 0x10000u;
         mov     eax, [esi+140h]
         or      eax, 10000h
         mov     [esi+140h], eax
 
         jmp     CONTINUE_CObject_Init
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -87,15 +89,17 @@ static const DWORD CONTINUE_CObject_Destructor = 0x59F709;
 
 static void _declspec(naked) HOOK_CObject_Destructor()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
-        push    esi  // CObjectSAInterface*
+        push    esi     // CObjectSAInterface*
         call    ColStoreRemoveRef
         add     esp, 4
         popad
         jmp     CONTINUE_CObject_Destructor
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

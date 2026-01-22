@@ -93,20 +93,24 @@ void _declspec(naked) HOOK_FallenPeds()
 {
     if (pGame && pGame->IsUnderWorldWarpEnabled())
     {
-        _asm
+        // clang-format off
+        __asm
         {
             sub esp, 2Ch
             push ebx
             mov ebx, ds:0B74490h
             jmp CONTINUE_CWorld_FallenPeds
         }
+        // clang-format on
     }
     else
     {
-        _asm
+        // clang-format off
+        __asm
         {
             ret
         }
+        // clang-format on
     }
 }
 
@@ -114,20 +118,24 @@ void _declspec(naked) HOOK_FallenCars()
 {
     if (pGame && pGame->IsUnderWorldWarpEnabled())
     {
-        _asm
+        // clang-format off
+        __asm
         {
             sub esp, 2Ch
             push ebx
             mov ebx, ds:0B74494h
             jmp CONTINUE_CWorld_FallenCars
         }
+        // clang-format on
     }
     else
     {
-        _asm
+        // clang-format off
+        __asm
         {
             ret
         }
+        // clang-format on
     }
 }
 
@@ -145,12 +153,14 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
         }
         DWORD dwEntity = (DWORD)pEntitySA->GetInterface();
         DWORD dwFunction = FUNC_Add;
-        _asm
-            {
+        // clang-format off
+        __asm
+        {
             push    dwEntity
             call    dwFunction
             add     esp, 4
-            }
+        }
+        // clang-format on
     }
 }
 
@@ -162,12 +172,14 @@ void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
         SString strMessage("Caller: %i ", CallerId);
         LogEvent(506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage);
     }
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    entityInterface
         call    dwFunction
         add     esp, 4
-        }
+    }
+    // clang-format on
 }
 
 void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
@@ -184,12 +196,14 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
         }
         DWORD dwEntity = (DWORD)pInterface;
         DWORD dwFunction = FUNC_Remove;
-        _asm
-            {
+        // clang-format off
+        __asm
+        {
             push    dwEntity
             call    dwFunction
             add     esp, 4
-            }
+        }
+        // clang-format on
     }
 }
 
@@ -201,29 +215,33 @@ void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId
         LogEvent(507, "CWorld::Remove ( CEntitySAInterface * ) Crash", "", strMessage);
     }
     DWORD dwFunction = FUNC_Remove;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    entityInterface
         call    dwFunction
         add     esp, 4
 
-            /*  mov     ecx, entityInterface
-                mov     esi, [ecx]
-                push    1
-                call    dword ptr [esi+8]*/
-        }
+    /*  mov     ecx, entityInterface
+        mov     esi, [ecx]
+        push    1
+        call    dword ptr [esi+8]*/
+    }
+    // clang-format on
 }
 
 void CWorldSA::RemoveReferencesToDeletedObject(CEntitySAInterface* entity)
 {
     DWORD dwFunc = FUNC_RemoveReferencesToDeletedObject;
     DWORD dwEntity = (DWORD)entity;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    dwEntity
         call    dwFunc
         add     esp, 4
-        }
+    }
+    // clang-format on
 }
 
 void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, float& fY, float& fZ)
@@ -239,7 +257,8 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
     float* pfY = &fY;
     float* pfZ = &fZ;
     int    iUnknown = 21;
-    _asm
+    // clang-format off
+    __asm
     {
         push    iUnknown
             push    pfZ
@@ -248,6 +267,7 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
             mov     ecx, pMatrixPadded
             call    dwFunc
     }
+    // clang-format on
 }
 
 auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector start, CVector end) -> SProcessLineOfSightMaterialInfoResult
@@ -427,8 +447,9 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
     // bool bIgnoreSomeObjectsForCamera = false,    bool bShootThroughStuff = false
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, flags.bCheckCarTires);
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    flags.bShootThroughStuff
         push    flags.bIgnoreSomeObjectsForCamera
         push    flags.bSeeThroughStuff
@@ -445,7 +466,8 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         call    dwFunc
         mov     bReturn, al
         add     esp, 0x30
-        }
+    }
+    // clang-format on
 
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, 0);
 
@@ -574,8 +596,9 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
     float fX = vecPosition->fX;
     float fY = vecPosition->fY;
     float fZ = vecPosition->fZ;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    0
         push    0
         push    fZ
@@ -584,7 +607,8 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
         call    dwFunc
         fstp    fReturn
         add     esp, 0x14
-        }
+    }
+    // clang-format on
     return fReturn;
 }
 
@@ -602,8 +626,9 @@ bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd
     // bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false,
     // bool bIgnoreSomeObjectsForCamera = false
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    flags.bIgnoreSomeObjectsForCamera
         push    flags.bSeeThroughStuff
         push    flags.bCheckDummies
@@ -616,7 +641,8 @@ bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd
         call    dwFunc
         mov     bReturn, al
         add     esp, 0x24
-        }
+    }
+    // clang-format on
     return bReturn;
 }
 
@@ -624,14 +650,16 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
 {
     DWORD dwFunc = FUNC_HasCollisionBeenLoaded;
     bool  bRet = false;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    0
         push    vecPosition
         call    dwFunc
         mov     bRet, al
         add     esp, 8
-        }
+    }
+    // clang-format on
     return bRet;
 }
 
@@ -645,12 +673,14 @@ void CWorldSA::SetCurrentArea(DWORD dwArea)
     MemPutFast<DWORD>(VAR_currArea, dwArea);
 
     DWORD dwFunc = FUNC_RemoveBuildingsNotInArea;
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push    dwArea
         call    dwFunc
         add     esp, 4
-        }
+    }
+    // clang-format on
 }
 
 void CWorldSA::SetJetpackMaxHeight(float fHeight)
@@ -709,14 +739,16 @@ void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, i
 {
     DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition;  // __cdecl
 
-    _asm
-        {
+    // clang-format off
+    __asm
+    {
         push pOutVecPosition
         push iTrackId
         push fRailTrackPosition
         call dwFunc
         add  esp, 3*4
-        }
+    }
+    // clang-format on
 }
 
 int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance)

@@ -40,7 +40,8 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
     DWORD dwThis = (DWORD)internalInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CPedIntelligence_TestForStealthKill;
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, dwThis
         push    bUnk
@@ -48,6 +49,7 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 

@@ -95,9 +95,10 @@ void OnMY_CRenderer_SetupEntityVisibility_Post(int result, CEntitySAInterface* p
 DWORD                 RETURN_CRenderer_SetupEntityVisibility = 0x554238;
 void _declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
 {
-    _asm
+    // clang-format off
+    __asm
     {
-        ////////////////////
+////////////////////
         pushad
         push    [esp+32+4*2]
         push    [esp+32+4*2]
@@ -105,13 +106,13 @@ void _declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
         add     esp, 4*2
         popad
 
-                ////////////////////
+////////////////////
         push    [esp+4*2]
         push    [esp+4*2]
         call    second
         add     esp, 4*2
 
-            ////////////////////
+////////////////////
         pushad
         push    [esp+32+4*2]
         push    [esp+32+4*2]
@@ -126,8 +127,9 @@ second:
         sub     esp,14h
         push    esi
         mov     esi,dword ptr [esp+1Ch]
-        jmp     RETURN_CRenderer_SetupEntityVisibility  // 0x554238
+        jmp     RETURN_CRenderer_SetupEntityVisibility   // 0x554238
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////
@@ -155,10 +157,11 @@ DWORD                 RETURN_CWorldScan_ScanWorlda = 0x555563;
 DWORD                 RETURN_CWorldScan_ScanWorldb = 0x72CAE0;
 void _declspec(naked) HOOK_CWorldScan_ScanWorld()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         call    second
-        jmp     RETURN_CWorldScan_ScanWorlda  // 555563
+        jmp     RETURN_CWorldScan_ScanWorlda   // 555563
 
 second:
         pushad
@@ -169,8 +172,9 @@ second:
         add     esp, 4*3
         popad
 
-        jmp     RETURN_CWorldScan_ScanWorldb  // 72CAE0
+        jmp     RETURN_CWorldScan_ScanWorldb   // 72CAE0
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////
@@ -196,7 +200,8 @@ int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre(CBaseModelInfoSAInter
 DWORD                 RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha = 0x732505;
 void _declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    [esp+32+4*3]
@@ -211,7 +216,7 @@ void _declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha()
         cmp     eax, 0xffffffff
         jne     usecustom
 
-         // Use standard code
+        // Use standard code
         push    [esp+4*3]
         push    [esp+4*3]
         push    [esp+4*3]
@@ -226,6 +231,7 @@ second:
         mov     ecx, [esp+8]
         jmp     RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////

@@ -21,16 +21,19 @@ constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 const unsigned int    RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
 void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 {
-    _asm {
-        fld ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
-        fmul ds:[0x858B1C]  // 0.1f
+    // clang-format off
+    __asm
+    {
+        fld ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fmul ds:[0x858B1C]          // 0.1f
         fxch
         fcom
         fxch
         fstp st(0)
         jmp RETURN_CTaskSimpleUseGun__SetMoveAnim
     }
+    // clang-format on
 }
 
 // Fixes excessively fast camera shaking with setCameraShakeLevel on high FPS.
@@ -39,14 +42,17 @@ void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 static const unsigned int    RETURN_CCamera__Process = 0x52C735;
 static void _declspec(naked) HOOK_CCamera__Process()
 {
-    _asm {
-        fld ds:[0x858C80]  // 5.0f
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+    // clang-format off
+    __asm
+    {
+        fld ds:[0x858C80]           // 5.0f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fadd ds:[0xB6EC30]
         fstp ds:[0xB6EC30]
         jmp RETURN_CCamera__Process
     }
+    // clang-format on
 }
 
 // Fixes helicopters accelerating excessively during takeoff at high FPS.
@@ -55,25 +61,28 @@ static void _declspec(naked) HOOK_CCamera__Process()
 static const unsigned int    RETURN_CHeli__ProcessFlyingCarStuff = 0x6C4F3D;
 static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         mov ax, [esi+0x22]
         cmp ax, 465
         jz is_rc_heli
         cmp ax, 501
         jz is_rc_heli
 
-        fld ds:[0x858CDC]  // 0.001f
+        fld ds:[0x858CDC]           // 0.001f
         jmp end
 
     is_rc_heli:
-        fld ds:[0x859CD8]  // 0.003f
+        fld ds:[0x859CD8]           // 0.003f
 
     end:
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fadd [esi+0x84C]
         jmp RETURN_CHeli__ProcessFlyingCarStuff
     }
+    // clang-format on
 }
 
 // Fixes excessively fast movement of fog on high FPS.
@@ -82,18 +91,21 @@ static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
 static const unsigned int    RETURN_CClouds__MovingFog_Update = 0x716BBC;
 static void _declspec(naked) HOOK_CClouds__MovingFog_Update()
 {
-    _asm {
-        fmul [edi*4+0xC6E394]  // CClouds::ms_mf.fSpeedFactor
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+    // clang-format off
+    __asm
+    {
+        fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fadd [esi]
         fstp [esi]
         fld [esp+0x18]
-        fmul [edi*4+0xC6E394]  // CClouds::ms_mf.fSpeedFactor
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         jmp RETURN_CClouds__MovingFog_Update
     }
+    // clang-format on
 }
 
 // Fixes glass shards spinning and moving at excessive speeds on high FPS.
@@ -102,21 +114,24 @@ static void _declspec(naked) HOOK_CClouds__MovingFog_Update()
 static const unsigned int    RETURN_CFallingGlassPane__Update_A = 0x71AAC5;
 static void _declspec(naked) HOOK_CFallingGlassPane__Update_A()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         fld [esp+0x28]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fstp [esp+0x28]
         fld [esp+0x24]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fstp [esp+0x24]
         fld [esp+0x20]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fadd [esi]
         jmp RETURN_CFallingGlassPane__Update_A
     }
+    // clang-format on
 }
 
 // Fixes glass shards spinning and moving at excessive speeds on high FPS.
@@ -125,23 +140,26 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_A()
 static const unsigned int    RETURN_CFallingGlassPane__Update_B = 0x71AAF0;
 static void _declspec(naked) HOOK_CFallingGlassPane__Update_B()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         fld [eax]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fstp [eax]
         fld [eax+0x4]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fstp [eax+0x4]
         fld [eax+0x8]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fstp [eax+0x8]
         mov ecx, [eax]
         mov [esp+0x2C], ecx
         jmp RETURN_CFallingGlassPane__Update_B
     }
+    // clang-format on
 }
 
 // Fixes glass shards spinning and moving at excessive speeds on high FPS.
@@ -150,23 +168,26 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_B()
 static const unsigned int    RETURN_CFallingGlassPane__Update_C = 0x71AB2F;
 static void _declspec(naked) HOOK_CFallingGlassPane__Update_C()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         fld [eax]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fstp [eax]
         fld [eax+0x4]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fstp [eax+0x4]
         fld [eax+0x8]
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
         fstp [eax+0x8]
         mov edx, [eax]
         mov [esp+0x38], edx
         jmp RETURN_CFallingGlassPane__Update_C
     }
+    // clang-format on
 }
 
 // Ensure that CTimer::CurrentFrame is updated only every 33+ milliseconds.
@@ -174,26 +195,29 @@ static void _declspec(naked) HOOK_CFallingGlassPane__Update_C()
 #define HOOKSIZE_CTimer__Update 0xE
 static void _declspec(naked) HOOK_CTimer__Update()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         add esp, 0x4
 
         mov bWouldBeNewFrame, 0
         mov eax, nLastFrameTime
-        add eax, 33  // 33 = 1000 / 30
-        mov ecx, ds:[0xB7CB84]  // CTimer::m_snTimeInMilliseconds
+        add eax, 33                 // 33 = 1000 / 30
+        mov ecx, ds:[0xB7CB84]      // CTimer::m_snTimeInMilliseconds
         cmp ecx, eax
         jb skip
 
         mov bWouldBeNewFrame, 1
         mov nLastFrameTime, ecx
-        mov eax, ds:[0xB7CB4C]  // CTimer::m_FrameCounter
+        mov eax, ds:[0xB7CB4C]      // CTimer::m_FrameCounter
         inc eax
-        mov ds:[0xB7CB4C], eax  // CTimer::m_FrameCounter
+        mov ds:[0xB7CB4C], eax      // CTimer::m_FrameCounter
 
     skip:
         add esp, 0xC
         ret
     }
+    // clang-format on
 }
 
 // Fixes premature despawning of broken breakable objects on high FPS.
@@ -202,7 +226,9 @@ static void _declspec(naked) HOOK_CTimer__Update()
 static const unsigned int    RETURN_BreakObject_c__Update = 0x59E42B;
 static void _declspec(naked) HOOK_BreakObject_c__Update()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -215,6 +241,7 @@ static void _declspec(naked) HOOK_BreakObject_c__Update()
     skip:
         jmp RETURN_BreakObject_c__Update
     }
+    // clang-format on
 }
 
 // Fixes limited reach of the water cannon on high FPS.
@@ -224,7 +251,9 @@ static const unsigned int    RETURN_CWaterCannon__Update_OncePerFrame = 0x72A2A0
 static const unsigned int    RETURN_CWaterCannon__Update_OncePerFrame_SKIP = 0x72A2BB;
 static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -236,6 +265,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
     skip:
         jmp RETURN_CWaterCannon__Update_OncePerFrame_SKIP
     }
+    // clang-format on
 }
 
 // Fixes money animation issues on high FPS.
@@ -245,7 +275,9 @@ static const unsigned int    RETURN_CPlayerInfo__Process = 0x5700FB;
 static const unsigned int    RETURN_CPlayerInfo__Process_SKIP = 0x57015B;
 static void _declspec(naked) HOOK_CPlayerInfo__Process()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -256,6 +288,7 @@ static void _declspec(naked) HOOK_CPlayerInfo__Process()
     skip:
         jmp RETURN_CPlayerInfo__Process_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive effects spawning from rocket launchers on high FPS.
@@ -265,7 +298,9 @@ static const unsigned int    RETURN_CProjectileInfo__Update = 0x738C68;
 static const unsigned int    RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
 static void _declspec(naked) HOOK_CProjectileInfo__Update()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -277,6 +312,7 @@ static void _declspec(naked) HOOK_CProjectileInfo__Update()
     skip:
         jmp RETURN_CProjectileInfo__Update_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive surface effects spawning from wheels on high FPS.
@@ -285,7 +321,9 @@ static void _declspec(naked) HOOK_CProjectileInfo__Update()
 static const unsigned int    RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
 static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -298,6 +336,7 @@ static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
         xor eax, eax
         retn 0x10
     }
+    // clang-format on
 }
 
 // Fixes excessive smoke trail particle spawning from stuntplanes and cropdusters on high FPS.
@@ -307,7 +346,9 @@ static const unsigned int    RETURN_CPlane__PreRender = 0x6CA93D;
 static const unsigned int    RETURN_CPlane__PreRender_SKIP = 0x6CAA93;
 static void _declspec(naked) HOOK_CPlane__PreRender()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -318,6 +359,7 @@ static void _declspec(naked) HOOK_CPlane__PreRender()
     skip:
         jmp RETURN_CPlane__PreRender_SKIP
     }
+    // clang-format on
 }
 
 // Fixes increased frequency of water cannon pushing peds on high FPS.
@@ -327,7 +369,9 @@ static const unsigned int    RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix
 static const unsigned int    RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP = 0x72A38E;
 static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -338,6 +382,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
     skip:
         jmp RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive particle spawning from water cannons on high FPS.
@@ -347,7 +392,9 @@ static const unsigned int    RETURN_CWaterCannon__Render_FxFix = 0x729440;
 static const unsigned int    RETURN_CWaterCannon__Render_FxFix_SKIP = 0x7294EE;
 static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -356,6 +403,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
     skip:
         jmp RETURN_CWaterCannon__Render_FxFix_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive particle spawning with setPedHeadless on high FPS.
@@ -365,7 +413,9 @@ static const unsigned int    RETURN_CPed__PreRenderAfterTest = 0x5E7187;
 static const unsigned int    RETURN_CPed__PreRenderAfterTest_SKIP = 0x5E722D;
 static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -376,6 +426,7 @@ static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
     skip:
         jmp RETURN_CPed__PreRenderAfterTest_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive particle spawning from boats on high FPS.
@@ -384,7 +435,9 @@ static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
 static const unsigned int    RETURN_cBuoyancy__AddSplashParticles = 0x6C34E6;
 static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -395,6 +448,7 @@ static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
     skip:
         retn 0x2C
     }
+    // clang-format on
 }
 
 // Fixes excessive weather particle spawning on high FPS.
@@ -403,7 +457,9 @@ static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
 static const unsigned int    RETURN_CWeather__AddRain = 0x72AAAE;
 static void _declspec(naked) HOOK_CWeather__AddRain()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -416,6 +472,7 @@ static void _declspec(naked) HOOK_CWeather__AddRain()
         add esp, 0x84
         ret
     }
+    // clang-format on
 }
 
 // Fixes excessive damage particle spawning from airplanes on high FPS.
@@ -425,7 +482,9 @@ static const unsigned int    RETURN_CPlane__ProcessFlyingCarStuff = 0x6CBE51;
 static const unsigned int    RETURN_CPlane__ProcessFlyingCarStuff_SKIP = 0x6CC0D9;
 static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -436,6 +495,7 @@ static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
     skip:
         jmp RETURN_CPlane__ProcessFlyingCarStuff_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive spawning of sand and water particles from vehicles on high FPS.
@@ -445,7 +505,9 @@ static const unsigned int    RETURN_CAutomobile__UpdateWheelMatrix = 0x6AA78F;
 static const unsigned int    RETURN_CAutomobile__UpdateWheelMatrix_SKIP = 0x6AAAD0;
 static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -456,6 +518,7 @@ static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
     skip:
         jmp RETURN_CAutomobile__UpdateWheelMatrix_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive particle spawning from boats on high FPS.
@@ -464,7 +527,9 @@ static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
 static const unsigned int    RETURN_CVehicle__DoBoatSplashes = 0x6DD136;
 static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -475,6 +540,7 @@ static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
     skip:
         retn 4
     }
+    // clang-format on
 }
 
 // Fixes excessive rain particle spawning on vehicles on high FPS.
@@ -483,7 +549,9 @@ static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
 static const unsigned int    RETURN_CVehicle__AddWaterSplashParticles = 0x6DDF66;
 static void _declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -494,6 +562,7 @@ static void _declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
     skip:
         ret
     }
+    // clang-format on
 }
 
 // Fixes excessive particle spawning from airplanes when damaged on high FPS.
@@ -503,7 +572,9 @@ static const unsigned int    RETURN_CPlane__ProcessControl = 0x6C939F;
 static const unsigned int    RETURN_CPlane__ProcessControl_SKIP = 0x6C9463;
 static void _declspec(naked) HOOK_CPlane__ProcessControl()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -515,6 +586,7 @@ static void _declspec(naked) HOOK_CPlane__ProcessControl()
     skip:
         jmp RETURN_CPlane__ProcessControl_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive exhaust particle spawning from vehicles on high FPS.
@@ -523,7 +595,9 @@ static void _declspec(naked) HOOK_CPlane__ProcessControl()
 static const unsigned int    RETURN_CVehicle__AddExhaustParticles = 0x6DE246;
 static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx edx, bWouldBeNewFrame
         test edx, edx
         jz skip
@@ -534,6 +608,7 @@ static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
     skip:
         ret
     }
+    // clang-format on
 }
 
 // Fixes excessive particle spawning while swimming on high FPS.
@@ -543,7 +618,9 @@ static const unsigned int    RETURN_CTaskSimpleSwim__ProcessEffects = 0x68AD41;
 static const unsigned int    RETURN_CTaskSimpleSwim__ProcessEffects_SKIP = 0x68AFDB;
 static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -555,6 +632,7 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
     skip:
         jmp RETURN_CTaskSimpleSwim__ProcessEffects_SKIP
     }
+    // clang-format on
 }
 
 // Fixes excessive particle spawning while swimming on high FPS.
@@ -564,7 +642,9 @@ static const unsigned int    RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix = 0
 static const unsigned int    RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP = 0x68AD36;
 static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
 {
-    _asm {
+    // clang-format off
+    __asm
+    {
         movzx eax, bWouldBeNewFrame
         test eax, eax
         jz skip
@@ -576,6 +656,7 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
     skip:
         jmp RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP
     }
+    // clang-format on
 }
 
 // Fixes invisible weapon particles (extinguisher, spraycan, flamethrower) at high FPS
@@ -584,27 +665,28 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
 static constexpr std::uintptr_t RETURN_CWeapon_Update = 0x073DC42;
 static void __declspec(naked)   HOOK_CWeapon_Update()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         // Temp fix for camera
-        cmp [esi], 0x2B  // CWeapon::m_eWeaponType
+        cmp [esi], 0x2B // CWeapon::m_eWeaponType
         je skip
 
-            // timeStep / kOriginalTimeStep
-        fld ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
+        // timeStep / kOriginalTimeStep
+        fld ds:[0xB7CB5C] // CTimer::ms_fTimeStep
         fdiv kOriginalTimeStep
 
-        mov eax, [esi+10h]  // m_timeToNextShootInMS
-        mov ebx, ds:[0xB7CB84]  // CTimer::m_snTimeInMilliseconds
+        mov eax, [esi+10h] // m_timeToNextShootInMS
+        mov ebx, ds:[0xB7CB84] // CTimer::m_snTimeInMilliseconds
 
-        sub eax, ebx  // m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds
+        sub eax, ebx // m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds
 
         push eax
         fild dword ptr [esp]
         add esp, 4
 
-        fmul st(0), st(1)  // (m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds) * (timeStep / kOriginalTimeStep)
-        fadd st(0), ebx  // + m_snTimeInMilliseconds
+        fmul st(0), st(1) // (m_timeToNextShootInMS - CTimer::m_snTimeInMilliseconds) * (timeStep / kOriginalTimeStep)
+        fadd st(0), ebx // + m_snTimeInMilliseconds
         fistp [esi+10h]
         fstp st(0)
 
@@ -617,6 +699,7 @@ static void __declspec(naked)   HOOK_CWeapon_Update()
         mov eax, ds:[0xB7CB84]
         jmp RETURN_CWeapon_Update
     }
+    // clang-format on
 }
 
 #define HOOKPOS_CPhysical__ApplyAirResistance  0x544D29
@@ -624,11 +707,13 @@ static void __declspec(naked)   HOOK_CWeapon_Update()
 static const unsigned int    RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
 static void _declspec(naked) HOOK_CPhysical__ApplyAirResistance()
 {
-    _asm {
-        fld ds:[0x862CD0]  // 0.99000001f
-        fld ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
-        mov eax, 0x822130  // powf
+    // clang-format off
+    __asm
+    {
+        fld ds:[0x862CD0]            // 0.99000001f
+        fld ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep            // 1.666f
+        mov eax, 0x822130            // powf
         call eax
 
         fld st(0)
@@ -643,18 +728,22 @@ static void _declspec(naked) HOOK_CPhysical__ApplyAirResistance()
         fstp [esi+0x58]
         jmp RETURN_CPhysical__ApplyAirResistance
     }
+    // clang-format on
 }
 
 template <unsigned int returnAddress>
 static void _declspec(naked) HOOK_VehicleRapidStopFix()
 {
     static unsigned int RETURN_VehicleRapidStopFix = returnAddress;
-    _asm {
-        fld ds:[0xC2B9CC]  // mod_HandlingManager.m_fWheelFriction
-        fmul ds:[0xB7CB5C]  // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
+    // clang-format off
+    __asm
+    {
+        fld ds:[0xC2B9CC]            // mod_HandlingManager.m_fWheelFriction
+        fmul ds:[0xB7CB5C]            // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep            // 1.666f
         jmp RETURN_VehicleRapidStopFix
     }
+    // clang-format on
 }
 
 void CMultiplayerSA::SetRapidVehicleStopFixEnabled(bool enabled)

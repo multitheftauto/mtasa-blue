@@ -37,7 +37,8 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
     float fZ = vecPosition.fZ;
     DWORD dwFunction = FUNC_ExtinguishPoint;
 
-    _asm
+    // clang-format off
+    __asm
     {
         mov     ecx, CLASS_CFireManager
         push    fRadius
@@ -46,6 +47,7 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
         push    fX
         call    dwFunction
     }
+    // clang-format on
 }
 
 CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)

@@ -70,48 +70,50 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 DWORD                 RETURN_PreCreateDevice = 0x07F6781;
 void _declspec(naked) HOOK_PreCreateDevice()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         // Run replaced code - these pushes create the original function parameters
-        mov     ecx,dword ptr ds:[0C97C20h]  // pDirect3D
-        push    0C97C28h  // ppReturnedDeviceInterface
-        push    0C9C040h  // pPresentationParameters  
-        push    eax  // BehaviorFlags (original eax)
-        mov     eax,dword ptr ds:[00C97C1Ch]       
+        mov     ecx,dword ptr ds:[0C97C20h]        // pDirect3D
+        push    0C97C28h                           // ppReturnedDeviceInterface
+        push    0C9C040h                           // pPresentationParameters
+        push    eax                                // BehaviorFlags (original eax)
+        mov     eax,dword ptr ds:[00C97C1Ch]
         mov     edx,  [ecx]
-        push    eax  // hFocusWindow
+        push    eax                                // hFocusWindow
         mov     eax,dword ptr ds:[008E2428h]
-        push    eax  // DeviceType
+        push    eax                                // DeviceType
 
-        mov     eax, ds:0x0C97C24  // __RwD3DAdapterIndex
-        push    eax  // Adapter
-        push    ecx  // pDirect3D
+        mov     eax, ds:0x0C97C24                  // __RwD3DAdapterIndex
+        push    eax                                // Adapter
+        push    ecx                                // pDirect3D
 
-                 // Now we have 7 parameters on stack (28 bytes)
-                 // Stack layout at ESP: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
+        // Now we have 7 parameters on stack (28 bytes)
+        // Stack layout at ESP: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
 
         pushad  // Save all registers (32 bytes), ESP now at ESP-32
 
-                     // Pass parameters to OnPreCreateDevice
-                     // After pushad, params start at ESP+32. Each push decreases ESP by 4,
-                     // so [esp+32+4*6] effectively walks backward through the params:
-                     // 1st access: ESP+56 = ppReturnedDeviceInterface, then ESP -= 4
-                     // 2nd access: ESP+56 = pPresentationParameters (was at ESP+52), etc.
-        push    [esp+32+4*6]  // ppReturnedDeviceInterface
-        push    [esp+32+4*6]  // pPresentationParameters
-        lea     eax,[esp+32+4*6]  // BehaviorFlags as pointer
+        // Pass parameters to OnPreCreateDevice
+        // After pushad, params start at ESP+32. Each push decreases ESP by 4,
+        // so [esp+32+4*6] effectively walks backward through the params:
+        // 1st access: ESP+56 = ppReturnedDeviceInterface, then ESP -= 4
+        // 2nd access: ESP+56 = pPresentationParameters (was at ESP+52), etc.
+        push    [esp+32+4*6]                       // ppReturnedDeviceInterface
+        push    [esp+32+4*6]                       // pPresentationParameters
+        lea     eax,[esp+32+4*6]                   // BehaviorFlags as pointer
         push    eax
-        push    [esp+32+4*6]  // hFocusWindow
-        push    [esp+32+4*6]  // DeviceType
-        push    [esp+32+4*6]  // Adapter
-        push    [esp+32+4*6]  // pDirect3D
+        push    [esp+32+4*6]                       // hFocusWindow
+        push    [esp+32+4*6]                       // DeviceType
+        push    [esp+32+4*6]                       // Adapter
+        push    [esp+32+4*6]                       // pDirect3D
         call    OnPreCreateDevice
         add     esp, 4*7
         popad
 
-                 // Continue
+        // Continue
         jmp     RETURN_PreCreateDevice
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -168,7 +170,8 @@ DWORD                 RETURN_PostCreateDevice = 0x07F678A;
 DWORD                 RETURN_PostCreateDeviceB = 0x07F6799;
 void _declspec(naked) HOOK_PostCreateDevice()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         // Replaced code
         pushad
@@ -188,6 +191,7 @@ void _declspec(naked) HOOK_PostCreateDevice()
 ok:
         jmp     RETURN_PostCreateDeviceB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

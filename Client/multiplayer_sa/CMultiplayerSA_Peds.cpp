@@ -35,7 +35,8 @@ static const DWORD CONTINUE_CPed_DoFootLanded = 0x5E5386;
 
 void _declspec(naked) HOOK_CPed_DoFootLanded()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         pushad
         push    [esp + 32 + 4]
@@ -45,12 +46,13 @@ void _declspec(naked) HOOK_CPed_DoFootLanded()
         add     esp, 12
         popad
 
-         // Continue
+        // Continue
         sub     esp, 30h
         push    esi
         mov     esi, ecx
         jmp     CONTINUE_CPed_DoFootLanded
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

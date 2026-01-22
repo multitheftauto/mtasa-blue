@@ -31,7 +31,8 @@ namespace
 DWORD                 RETURN_CVehicle_DoTailLightEffect_Mid = 0x006E18EB;
 void _declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         // Save result of comparing camera and corona direction
         mov     eax, 0
@@ -42,6 +43,7 @@ behind_corona:
         mov     bCameraFacingCorona, eax
         jmp     RETURN_CVehicle_DoTailLightEffect_Mid
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -59,17 +61,18 @@ DWORD                 RETURN_CVehicle_DoTailLightEffect_Mid2 = 0x006E19F0;
 DWORD                 RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona = 0x006E1A32;
 void _declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
 {
-    _asm
+    // clang-format off
+    __asm
     {
         movzx   eax, byte ptr [esp+0Fh]
         test    al, al
-        jz      no_corona  // Tail light off
+        jz      no_corona           // Tail light off
 
         mov     eax, bCameraFacingCorona
         test    al, al
-        jz      no_corona  // Camera looking behind corona
+        jz      no_corona           // Camera looking behind corona
 
-         // Add corona
+        // Add corona
         mov     eax, [esp+38h]
         fld     dword ptr ds:[0xB6F118]
         jmp     RETURN_CVehicle_DoTailLightEffect_Mid2
@@ -78,6 +81,7 @@ no_corona:
         sub     esp, 54h
         jmp     RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
