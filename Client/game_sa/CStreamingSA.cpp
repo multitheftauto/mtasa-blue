@@ -28,6 +28,9 @@ void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void* (*)[2])0x8E4CAC;
 
 namespace
 {
+    // Validates model info pointer by checking VFTBL is in valid GTA:SA code range.
+    // Uses SEH for crash protection when reading the VFTBL field, but avoids
+    // the expensive volatile read of VFTBL->Destructor by using address validation.
     bool IsValidPtr(const void* ptr) noexcept
     {
         if (!ptr)
@@ -36,13 +39,10 @@ namespace
         __try
         {
             const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
-            const auto* v = p->VFTBL;
-            if (!v)
-                return false;
-
-            volatile DWORD test = v->Destructor;
-            static_cast<void>(test);
-            return true;
+            const DWORD vftbl = reinterpret_cast<DWORD>(p->VFTBL);
+            // VFTBL must be in valid GTA:SA code range - this implicitly validates
+            // the pointer since garbage/freed memory won't have valid VFTBL addresses
+            return SharedUtil::IsValidGtaSaPtr(vftbl);
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
