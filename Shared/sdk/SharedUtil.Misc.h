@@ -136,6 +136,19 @@ namespace SharedUtil
     // Returns true if the pointer points to committed, readable memory
     bool IsReadablePointer(const void* ptr, size_t size);
 
+    // GTA:SA executable memory bounds for validating vtable/function pointers.
+    // .text (code):     0x401000 - 0x857000 (VA 0x1000, size 0x456000)
+    // .rdata (vtables): 0x858000 - 0x8A4000 (VA 0x458000, size 0x4C000)
+    constexpr std::uint32_t GTA_SA_VALID_PTR_START = 0x401000;
+    constexpr std::uint32_t GTA_SA_VALID_PTR_END = 0x8A4000;
+
+    // Fast address range check for GTA:SA code/rdata pointers (vtables, functions).
+    // Used to validate pointers before dereferencing, avoiding expensive SEH volatile reads.
+    inline bool IsValidGtaSaPtr(std::uint32_t addr) noexcept
+    {
+        return addr >= GTA_SA_VALID_PTR_START && addr < GTA_SA_VALID_PTR_END;
+    }
+
     [[nodiscard]] const SString& GetMTAProcessBaseDir();
 
     template <typename TFunction>

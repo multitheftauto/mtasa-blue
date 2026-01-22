@@ -3393,8 +3393,10 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
             for (CModelInfoSA* pModelInfo : targetModels)
             {
-                if (pModelInfo->GetRwObject())
-                    ReplaceTextureInModel(pModelInfo, swapMap);
+                // Note: targetModels only contains models that had GetRwObject() != null
+                // when added to the list above. While technically the object could be
+                // unloaded between loops, ReplaceTextureInModel handles null safely.
+                ReplaceTextureInModel(pModelInfo, swapMap);
             }
         }
 
