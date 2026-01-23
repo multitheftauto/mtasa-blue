@@ -20,6 +20,7 @@
 #include "../core/FastFailCrashHandler/WerCrashHandler.h"
 
 #include <optional>
+#include <algorithm>
 #include <version.h>
 
 namespace fs = std::filesystem;
@@ -33,6 +34,51 @@ namespace
     //
     //
     //////////////////////////////////////////////////////////
+
+    // Compares AppCompat entries as case-insensitive multisets (order-independent)
+    bool AreAppCompatEntriesEqual(const std::vector<WString>& a, const std::vector<WString>& b)
+    {
+        if (a.size() != b.size())
+            return false;
+
+        std::vector<WString> sortedA = a;
+        std::vector<WString> sortedB = b;
+
+        auto caseInsensitiveLess = [](const WString& lhs, const WString& rhs) { return _wcsicmp(lhs.c_str(), rhs.c_str()) < 0; };
+        std::sort(sortedA.begin(), sortedA.end(), caseInsensitiveLess);
+        std::sort(sortedB.begin(), sortedB.end(), caseInsensitiveLess);
+
+        for (size_t i = 0; i < sortedA.size(); ++i)
+        {
+            if (_wcsicmp(sortedA[i].c_str(), sortedB[i].c_str()) != 0)
+                return false;
+        }
+        return true;
+    }
+
+    // Case-insensitive remove
+    void AppCompatListRemove(std::vector<WString>& itemList, const WString& item)
+    {
+        auto it = itemList.begin();
+        while (it != itemList.end())
+        {
+            if (_wcsicmp(it->c_str(), item.c_str()) == 0)
+                it = itemList.erase(it);
+            else
+                ++it;
+        }
+    }
+
+    // Case-insensitive add-unique
+    void AppCompatListAddUnique(std::vector<WString>& itemList, const WString& item)
+    {
+        for (const auto& existing : itemList)
+        {
+            if (_wcsicmp(existing.c_str(), item.c_str()) == 0)
+                return;
+        }
+        itemList.push_back(item);
+    }
 
     // Ensure report log stuff has correct tags
     void UpdateSettingsForReportLog()
@@ -1749,13 +1795,15 @@ SString CInstallManager::_ProcessAppCompatChecks()
         strValue.Split(" ", entryList);
         ListRemove(entryList, WString());
 
-        // Apply removals
-        for (uint a = 0; a < removeList.size(); a++)
-            ListRemove(entryList, removeList[a]);
+        std::vector<WString> originalEntries = entryList;
 
-        // Apply adds
+        // Apply removals (case-insensitive)
+        for (uint a = 0; a < removeList.size(); a++)
+            AppCompatListRemove(entryList, removeList[a]);
+
+        // Apply adds (case-insensitive)
         for (uint a = 0; a < addList.size(); a++)
-            ListAddUnique(entryList, addList[a]);
+            AppCompatListAddUnique(entryList, addList[a]);
 
         // Clear list if only flags remain
         if (entryList.size() == 1 && entryList[0].size() < 3)
@@ -1764,8 +1812,8 @@ SString CInstallManager::_ProcessAppCompatChecks()
         // Join to one value
         WString strNewValue = WString::Join(L" ", entryList);
 
-        // Save setting
-        if (strNewValue != strValue)
+        // Write only if entries actually changed
+        if (!AreAppCompatEntriesEqual(entryList, originalEntries))
             if (!WriteCompatibilityEntries(items[i].strProgName, strCompatModeRegKey, items[i].hKeyRoot, items[i].uiFlags, strNewValue))
                 bTryAdmin = true;
     }
