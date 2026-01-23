@@ -166,7 +166,7 @@ namespace SharedUtil
     // Reusable event handle pool for async CreateFile operations
     namespace EventPool
     {
-        constexpr size_t POOL_SIZE = 32;
+        constexpr size_t           POOL_SIZE = 32;
         static std::atomic<HANDLE> ms_Slots[POOL_SIZE] = {};
 
         static HANDLE Acquire()
@@ -213,19 +213,19 @@ namespace SharedUtil
         struct SCreateFileParams
         {
             std::wstring          wstrFileName;
-            DWORD                 dwAccess       = 0;
-            DWORD                 dwShareMode    = 0;
-            LPSECURITY_ATTRIBUTES pSecurity      = nullptr;
-            DWORD                 dwDisposition  = 0;
-            DWORD                 dwFlags        = 0;
-            HANDLE                hTemplateFile  = nullptr;
-            HANDLE                hResult        = INVALID_HANDLE_VALUE;
-            DWORD                 dwError        = ERROR_SUCCESS;
-            HANDLE                hEvent         = nullptr;
+            DWORD                 dwAccess = 0;
+            DWORD                 dwShareMode = 0;
+            LPSECURITY_ATTRIBUTES pSecurity = nullptr;
+            DWORD                 dwDisposition = 0;
+            DWORD                 dwFlags = 0;
+            HANDLE                hTemplateFile = nullptr;
+            HANDLE                hResult = INVALID_HANDLE_VALUE;
+            DWORD                 dwError = ERROR_SUCCESS;
+            HANDLE                hEvent = nullptr;
             std::atomic<int>      state{0};
         };
 
-        constexpr size_t POOL_SIZE = 32;
+        constexpr size_t                       POOL_SIZE = 32;
         static std::atomic<SCreateFileParams*> ms_ParamsPool[POOL_SIZE] = {};
 
         static SCreateFileParams* AcquireParams()
@@ -266,8 +266,8 @@ namespace SharedUtil
         {
             SCreateFileParams* pParams = static_cast<SCreateFileParams*>(pArg);
 
-            pParams->hResult = CreateFileW(pParams->wstrFileName.c_str(), pParams->dwAccess, pParams->dwShareMode,
-                                           pParams->pSecurity, pParams->dwDisposition, pParams->dwFlags, pParams->hTemplateFile);
+            pParams->hResult = CreateFileW(pParams->wstrFileName.c_str(), pParams->dwAccess, pParams->dwShareMode, pParams->pSecurity, pParams->dwDisposition,
+                                           pParams->dwFlags, pParams->hTemplateFile);
             pParams->dwError = GetLastError();
 
             int iExpected = static_cast<int>(EState::Running);
@@ -285,39 +285,30 @@ namespace SharedUtil
             return 0;
         }
 
-        static HANDLE DirectCreateFile(LPCWSTR wszFileName, DWORD dwAccess, DWORD dwShareMode,
-                                       LPSECURITY_ATTRIBUTES pSecurity, DWORD dwDisposition, DWORD dwFlags, HANDLE hTemplate)
+        static HANDLE DirectCreateFile(LPCWSTR wszFileName, DWORD dwAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES pSecurity, DWORD dwDisposition,
+                                       DWORD dwFlags, HANDLE hTemplate)
         {
             return CreateFileW(wszFileName, dwAccess, dwShareMode, pSecurity, dwDisposition, dwFlags, hTemplate);
         }
     }
 
-    static HANDLE CreateFileWithTimeout(
-        LPCWSTR               lpFileName,
-        DWORD                 dwDesiredAccess,
-        DWORD                 dwShareMode,
-        LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-        DWORD                 dwCreationDisposition,
-        DWORD                 dwFlagsAndAttributes,
-        HANDLE                hTemplateFile)
+    static HANDLE CreateFileWithTimeout(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                                        DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
     {
         using namespace AsyncCreateFile;
 
         if (!IsGTAProcess())
-            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode,
-                                    lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
 
         // Skip async if caller provided security attributes or template (lifetime issue)
         if (lpSecurityAttributes || hTemplateFile)
-            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode,
-                                    lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
 
         SCreateFileParams* pParams = AcquireParams();
         if (!pParams)
         {
             AddReportLog(6214, "CreateFile timeout: alloc failed");
-            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode,
-                                    lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
         }
 
         try
@@ -328,8 +319,7 @@ namespace SharedUtil
         {
             AddReportLog(6220, "CreateFile timeout: string copy failed");
             ReleaseParams(pParams);
-            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode,
-                                    lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
         }
 
         HANDLE hEvent = EventPool::Acquire();
@@ -337,32 +327,30 @@ namespace SharedUtil
         {
             AddReportLog(6215, "CreateFile timeout: event failed");
             ReleaseParams(pParams);
-            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode,
-                                    lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
         }
 
-        pParams->dwAccess      = dwDesiredAccess;
-        pParams->dwShareMode   = dwShareMode;
-        pParams->pSecurity     = lpSecurityAttributes;
+        pParams->dwAccess = dwDesiredAccess;
+        pParams->dwShareMode = dwShareMode;
+        pParams->pSecurity = lpSecurityAttributes;
         pParams->dwDisposition = dwCreationDisposition;
-        pParams->dwFlags       = dwFlagsAndAttributes;
+        pParams->dwFlags = dwFlagsAndAttributes;
         pParams->hTemplateFile = hTemplateFile;
-        pParams->hEvent        = hEvent;
+        pParams->hEvent = hEvent;
 
         if (!QueueUserWorkItem(WorkerCallback, pParams, WT_EXECUTELONGFUNCTION))
         {
             AddReportLog(6218, "CreateFile timeout: queue failed");
             EventPool::Release(hEvent);
             ReleaseParams(pParams);
-            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode,
-                                    lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+            return DirectCreateFile(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
         }
 
         if (WaitForSingleObject(hEvent, TIMEOUT_MS) == WAIT_OBJECT_0)
         {
             EventPool::Release(hEvent);
             HANDLE hResult = pParams->hResult;
-            DWORD dwError = pParams->dwError;
+            DWORD  dwError = pParams->dwError;
             ReleaseParams(pParams);
             SetLastError(dwError);
             return hResult;
@@ -397,7 +385,7 @@ namespace SharedUtil
             std::wstring wstrValue;
         };
 
-        constexpr size_t CACHE_SIZE = 64;
+        constexpr size_t                CACHE_SIZE = 64;
         static std::atomic<CacheEntry*> ms_CacheSlots[CACHE_SIZE] = {};
 
         static uint32_t ComputeHash(const char* szPath)
@@ -413,7 +401,7 @@ namespace SharedUtil
 
         static const std::wstring* Lookup(const char* szPath)
         {
-            uint32_t uiIndex = ComputeHash(szPath) % CACHE_SIZE;
+            uint32_t    uiIndex = ComputeHash(szPath) % CACHE_SIZE;
             CacheEntry* pEntry = ms_CacheSlots[uiIndex].load(std::memory_order_acquire);
 
             if (pEntry && pEntry->strKey == szPath)
@@ -472,10 +460,8 @@ namespace SharedUtil
 
             if (wstrPath.size() >= 8)
             {
-                bool bIsUNC = (wstrPath[4] == L'U' || wstrPath[4] == L'u') &&
-                              (wstrPath[5] == L'N' || wstrPath[5] == L'n') &&
-                              (wstrPath[6] == L'C' || wstrPath[6] == L'c') &&
-                              wstrPath[7] == L'\\';
+                bool bIsUNC = (wstrPath[4] == L'U' || wstrPath[4] == L'u') && (wstrPath[5] == L'N' || wstrPath[5] == L'n') &&
+                              (wstrPath[6] == L'C' || wstrPath[6] == L'c') && wstrPath[7] == L'\\';
 
                 if (bIsUNC)
                     return L"\\" + wstrPath.substr(8);
@@ -494,7 +480,7 @@ namespace SharedUtil
                 return wstrPath;
 
             std::wstring wstrResult(dwNeeded, L'\0');
-            DWORD dwWritten = GetFullPathNameW(wstrPath.c_str(), dwNeeded, &wstrResult[0], nullptr);
+            DWORD        dwWritten = GetFullPathNameW(wstrPath.c_str(), dwNeeded, &wstrResult[0], nullptr);
 
             if (dwWritten > 0)
                 wstrResult.resize(dwWritten);
@@ -507,7 +493,7 @@ namespace SharedUtil
         static std::wstring ExtractDirectory(const std::wstring& wstrPath)
         {
             std::wstring wstrStripped = StripExtendedPrefix(wstrPath);
-            size_t uiPos = wstrStripped.find_last_of(L"\\/");
+            size_t       uiPos = wstrStripped.find_last_of(L"\\/");
 
             if (uiPos == std::wstring::npos)
                 return std::wstring();
@@ -549,7 +535,7 @@ namespace SharedUtil
                     }
 
                     std::wstring wstrBuffer(dwNeeded, L'\0');
-                    DWORD dwWritten = GetShortPathNameW(wstrDir.c_str(), &wstrBuffer[0], dwNeeded);
+                    DWORD        dwWritten = GetShortPathNameW(wstrDir.c_str(), &wstrBuffer[0], dwNeeded);
                     if (dwWritten == 0)
                     {
                         wstrValue = GetExeDir();
@@ -582,7 +568,7 @@ namespace SharedUtil
                         return;
 
                     std::wstring wstrBuffer(dwNeeded, L'\0');
-                    DWORD dwWritten = GetShortPathNameW(wstrFullPath.c_str(), &wstrBuffer[0], dwNeeded);
+                    DWORD        dwWritten = GetShortPathNameW(wstrFullPath.c_str(), &wstrBuffer[0], dwNeeded);
                     if (dwWritten == 0)
                         return;
 
@@ -612,7 +598,7 @@ namespace SharedUtil
             if (_wcsicmp(wstrPath.c_str(), wstrExePath.c_str()) == 0)
                 return true;
 
-            size_t uiPos = wstrPath.find_last_of(L"\\/");
+            size_t         uiPos = wstrPath.find_last_of(L"\\/");
             const wchar_t* wszName = (uiPos == std::wstring::npos) ? wstrPath.c_str() : wstrPath.c_str() + uiPos + 1;
 
             size_t uiLen = wcslen(wszName);
@@ -653,23 +639,23 @@ namespace SharedUtil
             if (pCached)
             {
                 if (PathCache::IsExe(*pCached))
-                    return CreateFileWithTimeout(pCached->c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes,
-                                                 dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+                    return CreateFileWithTimeout(pCached->c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+                                                 dwFlagsAndAttributes, hTemplateFile);
 
-                return CreateFileW(pCached->c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes,
-                                   dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+                return CreateFileW(pCached->c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes,
+                                   hTemplateFile);
             }
 
-            SString strFileName = MakeSurePathIsUTF8(lpFileName);
+            SString      strFileName = MakeSurePathIsUTF8(lpFileName);
             std::wstring wstrWidePath = FromUTF8(strFileName);
             PathCache::Store(lpFileName, wstrWidePath);
 
             if (PathCache::IsExe(wstrWidePath))
-                return CreateFileWithTimeout(wstrWidePath.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes,
-                                             dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+                return CreateFileWithTimeout(wstrWidePath.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+                                             dwFlagsAndAttributes, hTemplateFile);
 
-            return CreateFileW(wstrWidePath.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes,
-                               dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+            return CreateFileW(wstrWidePath.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes,
+                               hTemplateFile);
         }
 #endif
         SString strFileName = lpFileName;
@@ -805,12 +791,8 @@ namespace SharedUtil
             SetLastError(ERROR_INVALID_PARAMETER);
             return reinterpret_cast<HINSTANCE>(SE_ERR_FNF);
         }
-        return ShellExecuteW(hwnd,
-                             lpOperation ? FromUTF8(lpOperation).c_str() : NULL,
-                             FromUTF8(lpFile),
-                             lpParameters ? FromUTF8(lpParameters).c_str() : NULL,
-                             lpDirectory ? FromUTF8(lpDirectory).c_str() : NULL,
-                             nShowCmd);
+        return ShellExecuteW(hwnd, lpOperation ? FromUTF8(lpOperation).c_str() : NULL, FromUTF8(lpFile), lpParameters ? FromUTF8(lpParameters).c_str() : NULL,
+                             lpDirectory ? FromUTF8(lpDirectory).c_str() : NULL, nShowCmd);
     }
 
     BOOL WINAPI MyCreateDirectoryA(__in LPCSTR lpPathName, __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes)

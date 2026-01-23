@@ -673,7 +673,7 @@ SString SharedUtil::GetLaunchPathFilename()
         {
             try
             {
-                std::wstring wstrModulePath(512, L'\0');
+                std::wstring     wstrModulePath(512, L'\0');
                 constexpr size_t MAX_PATH_LENGTH = 32768;
 
                 for (;;)
@@ -721,7 +721,7 @@ SString SharedUtil::GetLaunchPathFilename()
                     if (dwNeeded > 0)
                     {
                         std::wstring wstrFullPath(dwNeeded, L'\0');
-                        DWORD dwWritten = GetFullPathNameW(wstrModulePath.c_str(), dwNeeded, &wstrFullPath[0], nullptr);
+                        DWORD        dwWritten = GetFullPathNameW(wstrModulePath.c_str(), dwNeeded, &wstrFullPath[0], nullptr);
 
                         if (dwWritten > 0)
                         {

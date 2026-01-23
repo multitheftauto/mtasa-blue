@@ -53,7 +53,7 @@ namespace
     // Reusable event handle pool for async CreateFile operations
     namespace StreamingEventPool
     {
-        constexpr auto SIZE = 8u;
+        constexpr auto             SIZE = 8u;
         static std::atomic<HANDLE> slots[SIZE] = {};
 
         inline HANDLE Acquire()
@@ -86,23 +86,28 @@ namespace
 
     namespace AsyncStreamingFile
     {
-        enum class State : int { Running = 0, Completed = 1, Abandoned = 2 };
+        enum class State : int
+        {
+            Running = 0,
+            Completed = 1,
+            Abandoned = 2
+        };
         constexpr DWORD TIMEOUT_MS = 5'000;
 
         struct Params
         {
             std::wstring     fileName;
-            DWORD            access      = 0;
-            DWORD            shareMode   = 0;
+            DWORD            access = 0;
+            DWORD            shareMode = 0;
             DWORD            disposition = 0;
-            DWORD            flags       = 0;
-            HANDLE           result      = INVALID_HANDLE_VALUE;
-            DWORD            error       = ERROR_SUCCESS;
-            HANDLE           event       = nullptr;
+            DWORD            flags = 0;
+            HANDLE           result = INVALID_HANDLE_VALUE;
+            DWORD            error = ERROR_SUCCESS;
+            HANDLE           event = nullptr;
             std::atomic<int> state{0};
         };
 
-        constexpr auto POOL_SIZE = 8u;
+        constexpr auto              POOL_SIZE = 8u;
         static std::atomic<Params*> pool[POOL_SIZE] = {};
 
         inline Params* Acquire()
@@ -142,8 +147,7 @@ namespace
         {
             auto* p = static_cast<Params*>(arg);
 
-            p->result = CreateFileW(p->fileName.c_str(), p->access, p->shareMode,
-                                    nullptr, p->disposition, p->flags, nullptr);
+            p->result = CreateFileW(p->fileName.c_str(), p->access, p->shareMode, nullptr, p->disposition, p->flags, nullptr);
             p->error = GetLastError();
 
             auto expected = static_cast<int>(State::Running);
@@ -167,12 +171,8 @@ namespace
         }
     }
 
-    static HANDLE CreateFileWithTimeoutForStreaming(
-        LPCWSTR lpFileName,
-        DWORD   dwDesiredAccess,
-        DWORD   dwShareMode,
-        DWORD   dwCreationDisposition,
-        DWORD   dwFlagsAndAttributes)
+    static HANDLE CreateFileWithTimeoutForStreaming(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, DWORD dwCreationDisposition,
+                                                    DWORD dwFlagsAndAttributes)
     {
         using namespace AsyncStreamingFile;
 
@@ -189,7 +189,10 @@ namespace
             return DirectCall(lpFileName, dwDesiredAccess, dwShareMode, dwCreationDisposition, dwFlagsAndAttributes);
         }
 
-        try { params->fileName = lpFileName; }
+        try
+        {
+            params->fileName = lpFileName;
+        }
         catch (...)
         {
             AddReportLog(6221, "Streaming CreateFile timeout: string copy failed");
@@ -205,11 +208,11 @@ namespace
             return DirectCall(lpFileName, dwDesiredAccess, dwShareMode, dwCreationDisposition, dwFlagsAndAttributes);
         }
 
-        params->access      = dwDesiredAccess;
-        params->shareMode   = dwShareMode;
+        params->access = dwDesiredAccess;
+        params->shareMode = dwShareMode;
         params->disposition = dwCreationDisposition;
-        params->flags       = dwFlagsAndAttributes;
-        params->event       = event;
+        params->flags = dwFlagsAndAttributes;
+        params->event = event;
 
         if (!QueueUserWorkItem(PoolCallback, params, WT_EXECUTELONGFUNCTION))
         {
@@ -229,8 +232,7 @@ namespace
             return hResult;
         }
 
-        AddReportLog(6213, SString("Streaming CreateFile timed out after %ums: %s",
-                                   TIMEOUT_MS, SharedUtil::ToUTF8(lpFileName).c_str()));
+        AddReportLog(6213, SString("Streaming CreateFile timed out after %ums: %s", TIMEOUT_MS, SharedUtil::ToUTF8(lpFileName).c_str()));
 
         auto expected = static_cast<int>(State::Running);
         if (params->state.compare_exchange_strong(expected, static_cast<int>(State::Abandoned)))
@@ -674,7 +676,7 @@ unsigned char CStreamingSA::AddArchive(const wchar_t* szFilePath)
     // Create new stream handler (uses timeout to avoid NtCreateFile hangs)
     const auto streamCreateFlags = *(DWORD*)0x8E3FE0;
     HANDLE     hFile = CreateFileWithTimeoutForStreaming(szFilePath, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING,
-                                   streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS);
+                                                         streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS);
 
     if (hFile == INVALID_HANDLE_VALUE)
         return INVALID_ARCHIVE_ID;
