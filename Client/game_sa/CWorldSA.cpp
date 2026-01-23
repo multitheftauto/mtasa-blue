@@ -401,22 +401,27 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
         // Now, calculate texture UV, etc based on the hit [if we've hit anything at all]
         // Since we have the barycentric coords of the hit, calculating it is easy
         ret.uv = {};
-        for (int i = 0; i < 3; i++)
+
+        // Usually models only use UV set 0, so we stick with that
+        // Some geometries have no texture coordinates
+        RwTextureCoordinates* const texCoords = c.hitGeo->texcoords[0];
+        if (texCoords)
         {
-            // UV set index - Usually models only use level 0 indices, so let's stick with that
-            const int uvSetIdx = 0;
-
-            // Vertex's UV position
-            RwTextureCoordinates* const vtxUV = &c.hitGeo->texcoords[uvSetIdx][c.hitTri->verts[i]];
-
-            // Now, just interpolate
-            ret.uv += CVector2D{vtxUV->u, vtxUV->v} * c.hitBary[i];
+            for (int i = 0; i < 3; i++)
+            {
+                RwTextureCoordinates* const vtxUV = &texCoords[c.hitTri->verts[i]];
+                ret.uv += CVector2D{vtxUV->u, vtxUV->v} * c.hitBary[i];
+            }
         }
 
         // Find out material texture name
-        // For some reason this is sometimes null
-        RwTexture* const tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
-        ret.textureName = tex ? tex->name : nullptr;
+        ret.textureName = nullptr;
+        if (c.hitTri->materialId < c.hitGeo->materials.entries)
+        {
+            RpMaterial* const mat = c.hitGeo->materials.materials[c.hitTri->materialId];
+            if (mat && mat->texture)
+                ret.textureName = mat->texture->name;
+        }
 
         RwFrame* const hitFrame = RpAtomicGetFrame(c.hitAtomic);
         ret.frameName = hitFrame ? hitFrame->szName : nullptr;
