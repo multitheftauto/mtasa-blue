@@ -50,7 +50,7 @@ namespace RegMap
         Matrix2Matrix,
         Texture2Texture,
     };
-}
+}  // namespace RegMap
 
 // Map effect parameter to something
 struct STypeMapping

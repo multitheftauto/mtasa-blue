@@ -106,6 +106,9 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
     function(idx, colModel);
 }
 
+// Validates model info pointer by checking VFTBL is in valid GTA:SA code range.
+// Uses SEH for crash protection when reading the VFTBL field, but avoids
+// the expensive volatile read of VFTBL->Destructor by using address validation.
 static bool IsValidModelInfoPtr(const void* ptr) noexcept
 {
     if (!ptr)
@@ -114,23 +117,15 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
     __try
     {
         const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
-        const auto* v = p->VFTBL;
-        if (!v)
-            return false;
-
-        volatile DWORD test = v->Destructor;
-        static_cast<void>(test);
-        return true;
+        const DWORD vftbl = reinterpret_cast<DWORD>(p->VFTBL);
+        // VFTBL must be in valid GTA:SA code range - this implicitly validates
+        // the pointer since garbage/freed memory won't have valid VFTBL addresses
+        return SharedUtil::IsValidGtaSaPtr(vftbl);
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
         return false;
     }
-}
-
-static bool IsValidGtaSaCodePtr(DWORD addr) noexcept
-{
-    return addr >= 0x401000 && addr < 0x900000;
 }
 
 static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept
@@ -495,7 +490,7 @@ uint CModelInfoSA::GetAnimFileIndex()
         return 0xFFFFFFFF;
 
     DWORD dwFunc = m_pInterface->VFTBL->GetAnimFileIndex;
-    if (!IsValidGtaSaCodePtr(dwFunc))
+    if (!SharedUtil::IsValidGtaSaPtr(dwFunc))
         return 0xFFFFFFFF;
 
     DWORD dwThis = (DWORD)m_pInterface;
@@ -878,7 +873,7 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
         case eModelIdeFlag::IS_DAMAGABLE:
         {
             DWORD funcAddr = m_pInterface->VFTBL->AsDamageAtomicModelInfoPtr;
-            if (!IsValidGtaSaCodePtr(funcAddr))
+            if (!SharedUtil::IsValidGtaSaPtr(funcAddr))
                 return false;
             return ((bool (*)())funcAddr)();
         }
@@ -1197,7 +1192,7 @@ void CModelInfoSA::StaticResetModelTimes()
         }
 
         DWORD funcAddr = pInterface->VFTBL->GetModelType;
-        if (!IsValidGtaSaCodePtr(funcAddr))
+        if (!SharedUtil::IsValidGtaSaPtr(funcAddr))
         {
             it = ms_ModelDefaultModelTimeInfo.erase(it);
             continue;
@@ -2782,13 +2777,13 @@ void CModelInfoSA::DeallocateModel()
     if (pInterfaceToDelete->VFTBL)
     {
         DWORD typeFunc = pInterfaceToDelete->VFTBL->GetModelType;
-        if (IsValidGtaSaCodePtr(typeFunc))
+        if (SharedUtil::IsValidGtaSaPtr(typeFunc))
             modelType = ((eModelInfoType (*)())typeFunc)();
 
         if (modelType == eModelInfoType::ATOMIC || modelType == eModelInfoType::LOD_ATOMIC)
         {
             DWORD damageFunc = pInterfaceToDelete->VFTBL->AsDamageAtomicModelInfoPtr;
-            if (IsValidGtaSaCodePtr(damageFunc))
+            if (SharedUtil::IsValidGtaSaPtr(damageFunc))
             {
                 void* asDamageable = ((void* (*)())damageFunc)();
                 isDamageableAtomic = (asDamageable != nullptr);
@@ -3099,7 +3094,7 @@ eModelInfoType CModelInfoSA::GetModelType()
         return eModelInfoType::UNKNOWN;
 
     DWORD funcAddr = pInterface->VFTBL->GetModelType;
-    if (!IsValidGtaSaCodePtr(funcAddr))
+    if (!SharedUtil::IsValidGtaSaPtr(funcAddr))
         return eModelInfoType::UNKNOWN;
 
     return ((eModelInfoType (*)())funcAddr)();
@@ -3142,7 +3137,7 @@ bool CModelInfoSA::IsDamageableAtomic()
         return false;
 
     DWORD funcAddr = pInterface->VFTBL->AsDamageAtomicModelInfoPtr;
-    if (!IsValidGtaSaCodePtr(funcAddr))
+    if (!SharedUtil::IsValidGtaSaPtr(funcAddr))
         return false;
 
     void* asDamageable = ((void* (*)())funcAddr)();

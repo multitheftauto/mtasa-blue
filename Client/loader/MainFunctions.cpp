@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 
+#include "Wine.h"
 #include "MainFunctions.h"
 #include "Main.h"
 #include "Utils.h"
@@ -25,6 +26,7 @@
 #include <set>
 #include <string>
 #include <locale.h>
+#include <windows.h>
 #include <DbgHelp.h>
 #pragma comment(lib, "dbghelp.lib")
 
@@ -1215,6 +1217,12 @@ void ValidateGTAPath()
 //////////////////////////////////////////////////////////
 void CheckAntiVirusStatus()
 {
+    if (Wine::IsRunningOnWine())
+    {
+        WriteDebugEvent("Skipping AV check under Wine");
+        return;
+    }
+
     std::vector<SString> enabledList, disabledList;
     GetWMIAntiVirusStatus(enabledList, disabledList);
 
@@ -1575,7 +1583,12 @@ void CheckDataFiles()
         {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
         {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"4B3932359373F11CBC542CC96D9A9285", "tags.dll"},
         {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"}, {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
-        {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"}, {"F1CA5A1E77965777AC26A81EAF345A7A", "XInput9_1_0_mta.dll"}};
+#ifdef MTA_MAETRO
+        {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
+#else
+        {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"},
+#endif
+        {"F1CA5A1E77965777AC26A81EAF345A7A", "XInput9_1_0_mta.dll"}};
 
     for (uint i = 0; i < NUMELMS(integrityCheckList); ++i)
     {

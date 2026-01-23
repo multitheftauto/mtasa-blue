@@ -64,4 +64,4 @@ namespace FPSLimiter
         std::uint16_t m_fpsTarget;           // Currently target FPS limit (0 = no limit)
         bool          m_appliedThisFrame;    // Whether the FPS limit was applied in the current frame
     };
-}
+}  // namespace FPSLimiter

@@ -17,7 +17,7 @@ namespace CCreditsGUI
 {
     float fWindowX = 560.0f;
     float fWindowY = 300.0f;
-}
+}  // namespace CCreditsGUI
 using namespace CCreditsGUI;
 
 CCredits::CCredits()
