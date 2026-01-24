@@ -41,6 +41,19 @@ bool IsSecondaryClient()
     }
     return iResult == 1;
 }
+
+// Check if secondary client is running
+bool IsSecondaryClientRunning()
+{
+    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
+    if (hCL2Mutex)
+    {
+        CloseHandle(hCL2Mutex);
+        return true;
+    }
+    return false;
+}
+
 static HMODULE hLibraryModule = NULL;
 HINSTANCE      g_hInstance = NULL;
 
@@ -332,13 +345,9 @@ std::vector<DWORD> GetGTAProcessList()
 ///////////////////////////////////////////////////////////////////////////
 bool IsGTARunning()
 {
-    // Don't report GTA as running if CL2 is active (to allow coexistence)
-    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
-    if (hCL2Mutex)
-    {
-        CloseHandle(hCL2Mutex);
+    // Skip this for secondary clients/instances
+    if (IsSecondaryClientRunning())
         return false;
-    }
     
     return !GetGTAProcessList().empty();
 }
@@ -352,16 +361,9 @@ bool IsGTARunning()
 ///////////////////////////////////////////////////////////////////////////
 void TerminateGTAIfRunning()
 {
-    if (IsSecondaryClient())
+    // Skip this for secondary clients/instances
+    if (IsSecondaryClient() || IsSecondaryClientRunning())
         return;
-    
-    // Don't terminate GTA if CL2 is running
-    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
-    if (hCL2Mutex)
-    {
-        CloseHandle(hCL2Mutex);
-        return;
-    }
 
     std::vector<DWORD> processIdList = GetGTAProcessList();
 
@@ -425,16 +427,9 @@ bool IsOtherMTARunning()
 ///////////////////////////////////////////////////////////////////////////
 void TerminateOtherMTAIfRunning()
 {
-    if (IsSecondaryClient())
+    // Skip this for secondary clients/instances
+    if (IsSecondaryClient() || IsSecondaryClientRunning())
         return;
-    
-    // Don't terminate other MTA if CL2 is running
-    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
-    if (hCL2Mutex)
-    {
-        CloseHandle(hCL2Mutex);
-        return;
-    }
 
     std::vector<DWORD> processIdList = GetOtherMTAProcessList();
 
