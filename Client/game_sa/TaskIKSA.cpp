@@ -31,6 +31,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, 
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     float fEffectorX = effectorVec.fX, fEffectorY = effectorVec.fY, fEffectorZ = effectorVec.fZ;
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -50,6 +51,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, 
         push    idString
         call    dwFunc
     }
+    // clang-format on
 }
 
 CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso,
@@ -65,6 +67,7 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, i
     if (pEntity)
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -81,6 +84,7 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, i
         push    idString
         call    dwFunc
     }
+    // clang-format on
 }
 
 CTaskSimpleIKManagerSA::CTaskSimpleIKManagerSA()
@@ -114,7 +118,7 @@ void CTaskSimpleIKManagerSA::RemoveIKChainTask(int slotID)
     {
         // Grab the task
         CTask* pTask = m_pTaskManagementSystem->GetTask(pInterface->m_pIKChainTasks[slotID]);
-        assert(pTask);            // Leave this here temporarily for debugging (shouldn't ever be null)
+        assert(pTask);  // Leave this here temporarily for debugging (shouldn't ever be null)
         pTask->Destroy();
         pInterface->m_pIKChainTasks[slotID] = NULL;
     }
@@ -138,7 +142,7 @@ CTaskSimpleIKChain* CTaskSimpleIKManagerSA::GetTaskAtSlot(int slotID)
     {
         // Grab the task
         CTask* pTask = m_pTaskManagementSystem->GetTask(pInterface->m_pIKChainTasks[slotID]);
-        assert(pTask);            // Leave this here temporarily for debugging (shouldn't ever be null)
+        assert(pTask);  // Leave this here temporarily for debugging (shouldn't ever be null)
         return dynamic_cast<CTaskSimpleIKChain*>(pTask);
     }
     return NULL;
@@ -157,6 +161,7 @@ CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int tim
     if (pEntity)
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -172,4 +177,5 @@ CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int tim
         push    dwEntityInterface
         call    dwFunc
     }
+    // clang-format on
 }

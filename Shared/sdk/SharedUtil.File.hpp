@@ -8,25 +8,36 @@
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
+
+#ifndef _WIN32
+    #ifndef _LARGEFILE64_SOURCE
+        #define _LARGEFILE64_SOURCE
+    #endif
+#endif
+
 #include "SharedUtil.File.h"
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.IntTypes.h"
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Buffer.h"
 #include <algorithm>
+#include <cctype>
+#include <cstring>
 
-#if __cplusplus >= 201703L // C++17
+#if __cplusplus >= 201703L  // C++17
     #include <filesystem>
 #endif
 
 #ifdef _WIN32
     #ifndef NOMINMAX
-    #define NOMINMAX
+        #define NOMINMAX
     #endif
     #include "Windows.h"
     #include "shellapi.h"
     #include "shlobj.h"
     #include <shlwapi.h>
+    #include <io.h>
+    #include <fcntl.h>
     #pragma comment(lib, "Shlwapi.lib")
 #else
     #include <dirent.h>
@@ -34,6 +45,14 @@
     #include <unistd.h>
     #include <limits.h>
 #endif
+
+namespace SharedUtil
+{
+    namespace File
+    {
+        inline bool IsPathSafe(const char* filename) noexcept;
+    }
+}
 
 //
 // Returns true if the file exists
@@ -49,23 +68,26 @@ bool SharedUtil::FileExists(const std::string& strFilename) noexcept
     if (strFilename.empty())
         return false;
 
-    const WString widePath = FromUTF8(strFilename.c_str());
-    if (!widePath.empty())
+    WString widePath;
+    try
     {
-        DWORD wideAttrs = GetFileAttributesW(widePath.c_str());
-        if (wideAttrs != INVALID_FILE_ATTRIBUTES)
-            return (wideAttrs & FILE_ATTRIBUTE_DIRECTORY) == 0;
+        widePath = FromUTF8(strFilename);
     }
-
-    DWORD ansiAttrs = GetFileAttributesA(strFilename.c_str());
-    if (ansiAttrs == INVALID_FILE_ATTRIBUTES)
+    catch (...)
+    {
         return false;
-    return (ansiAttrs & FILE_ATTRIBUTE_DIRECTORY) == 0;
+    }
+    if (widePath.empty())
+        return false;
+    DWORD attrs = GetFileAttributesW(widePath.c_str());
+    if (attrs == INVALID_FILE_ATTRIBUTES)
+        return false;
+    return (attrs & FILE_ATTRIBUTE_DIRECTORY) == 0;
     #else
     struct stat s;
-    if (!stat(strFilename.c_str(), &s))
+    if (stat(strFilename.c_str(), &s) != 0)
         return false;
-    return s.st_mode & S_IFREG;
+    return (s.st_mode & S_IFREG) != 0;
     #endif
 #endif
 }
@@ -84,23 +106,26 @@ bool SharedUtil::DirectoryExists(const std::string& strPath) noexcept
     if (strPath.empty())
         return false;
 
-    const WString widePath = FromUTF8(strPath.c_str());
-    if (!widePath.empty())
+    WString widePath;
+    try
     {
-        DWORD wideAttrs = GetFileAttributesW(widePath.c_str());
-        if (wideAttrs != INVALID_FILE_ATTRIBUTES)
-            return (wideAttrs & FILE_ATTRIBUTE_DIRECTORY) != 0;
+        widePath = FromUTF8(strPath);
     }
-
-    DWORD ansiAttrs = GetFileAttributesA(strPath.c_str());
-    if (ansiAttrs == INVALID_FILE_ATTRIBUTES)
+    catch (...)
+    {
         return false;
-    return (ansiAttrs & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    }
+    if (widePath.empty())
+        return false;
+    DWORD attrs = GetFileAttributesW(widePath.c_str());
+    if (attrs == INVALID_FILE_ATTRIBUTES)
+        return false;
+    return (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0;
     #else
     struct stat s;
-    if (!stat(strPath.c_str(), &s))
+    if (stat(strPath.c_str(), &s) != 0)
         return false;
-    return s.st_mode & S_IFDIR;
+    return (s.st_mode & S_IFDIR) != 0;
     #endif
 #endif
 }
@@ -121,6 +146,9 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
 {
     outBuffer.clear();
 
+    if (!File::IsPathSafe(filePath.c_str()))
+        return false;
+
     constexpr unsigned int GIBIBYTE = 1 * 1024 * 1024 * 1024;
 
     if (offset > GIBIBYTE)
@@ -133,7 +161,7 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     {
         wideFilePath = FromUTF8(filePath);
     }
-    catch (const std::bad_alloc&)
+    catch (...)
     {
         return false;
     }
@@ -151,23 +179,57 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     if (fileSize == 0 || fileSize <= static_cast<DWORD>(offset))
         return true;
 
-    HANDLE handle = CreateFileW(wideFilePath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    constexpr int MAX_RETRY_ATTEMPTS = 20;
+    constexpr int RETRY_DELAY_MS = 10;
+
+    HANDLE handle = INVALID_HANDLE_VALUE;
+    for (int attempt = 0; attempt < MAX_RETRY_ATTEMPTS; ++attempt)
+    {
+        handle = CreateFileW(wideFilePath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (handle != INVALID_HANDLE_VALUE)
+            break;
+
+        DWORD errorCode = GetLastError();
+        if (errorCode != ERROR_SHARING_VIOLATION && errorCode != ERROR_LOCK_VIOLATION)
+            break;
+
+        if (attempt + 1 < MAX_RETRY_ATTEMPTS)
+            Sleep(RETRY_DELAY_MS);
+    }
 
     if (handle == INVALID_HANDLE_VALUE)
         return false;
+
+    if (offset > 0)
+    {
+        LARGE_INTEGER seek{};
+        seek.QuadPart = static_cast<LONGLONG>(offset);
+        if (!SetFilePointerEx(handle, seek, nullptr, FILE_BEGIN))
+        {
+            CloseHandle(handle);
+            return false;
+        }
+    }
 
     DWORD numBytesToRead = fileSize - static_cast<DWORD>(offset);
 
     if (static_cast<size_t>(numBytesToRead) > maxSize)
         numBytesToRead = static_cast<DWORD>(maxSize);
 
+    if (numBytesToRead == 0)
+    {
+        CloseHandle(handle);
+        return true;
+    }
+
     try
     {
         outBuffer.resize(static_cast<size_t>(numBytesToRead));
     }
-    catch (const std::bad_alloc&)
+    catch (...)
     {
         CloseHandle(handle);
+        outBuffer.clear();
         return false;
     }
 
@@ -176,23 +238,24 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     if (!ReadFile(handle, &outBuffer[0], numBytesToRead, &numBytesFromRead, nullptr) || numBytesFromRead != numBytesToRead)
     {
         CloseHandle(handle);
+        outBuffer.clear();
         return false;
     }
 
     CloseHandle(handle);
     return true;
 #else
-#ifdef __APPLE__
+    #ifdef __APPLE__
     struct stat info;
 
     if (stat(filePath, &info) != 0)
         return false;
-#else
+    #else
     struct stat64 info;
 
     if (stat64(filePath, &info) != 0)
         return false;
-#endif
+    #endif
 
     size_t fileSize = static_cast<size_t>(info.st_size);
 
@@ -207,24 +270,43 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     if (numBytesToRead > maxSize)
         numBytesToRead = maxSize;
 
-    try
-    {
-        outBuffer.resize(numBytesToRead);
-    }
-    catch (const std::bad_alloc&)
-    {
-        return false;
-    }
-
     FILE* handle = fopen(filePath, "rb");
 
     if (!handle)
         return false;
 
-    fseek(handle, static_cast<long>(offset), SEEK_SET);
+    try
+    {
+        outBuffer.resize(numBytesToRead);
+    }
+    catch (...)
+    {
+        fclose(handle);
+        outBuffer.clear();
+        return false;
+    }
+
+    #ifdef __APPLE__
+    if (fseeko(handle, static_cast<off_t>(offset), SEEK_SET) != 0)
+    #else
+    if (fseeko64(handle, static_cast<off64_t>(offset), SEEK_SET) != 0)
+    #endif
+    {
+        fclose(handle);
+        outBuffer.clear();
+        return false;
+    }
+
     size_t numBytesFromRead = fread(&outBuffer[0], 1, numBytesToRead, handle);
     fclose(handle);
-    return numBytesToRead == numBytesFromRead;
+
+    if (numBytesFromRead != numBytesToRead)
+    {
+        outBuffer.clear();
+        return false;
+    }
+
+    return true;
 #endif
 }
 
@@ -255,11 +337,12 @@ bool SharedUtil::FileRename(const SString& strFilenameOld, const SString& strFil
         int errorCode = GetLastError();
         if (errorCode == ERROR_ACCESS_DENIED)
         {
-            // Try alternate rename strategy
             if (!FileExists(strFilenameNew) && FileCopy(strFilenameOld, strFilenameNew))
             {
                 FileDelete(strFilenameOld);
-                return true;
+                if (!FileExists(strFilenameOld))
+                    return true;
+                FileDelete(strFilenameNew);
             }
         }
         if (pOutErrorCode)
@@ -284,29 +367,39 @@ bool SharedUtil::FileRename(const SString& strFilenameOld, const SString& strFil
 bool SharedUtil::FileLoad(const SString& strFilename, std::vector<char>& buffer, int iMaxSize, int iOffset)
 {
     buffer.clear();
-    // Open
     FILE* fh = File::Fopen(strFilename, "rb");
     if (!fh)
         return false;
-    // Get size
-    fseek(fh, 0, SEEK_END);
-    int size = ftell(fh);
 
-    // Set offset
+    fseek(fh, 0, SEEK_END);
+#ifdef _WIN32
+    int64 rawSize = _ftelli64(fh);
+#elif defined(__APPLE__)
+    int64 rawSize = ftello(fh);
+#else
+    int64 rawSize = ftello64(fh);
+#endif
+    int size = static_cast<int>(std::min<int64>(INT_MAX, rawSize));
+
     iOffset = std::min(iOffset, size);
     fseek(fh, iOffset, SEEK_SET);
     size -= iOffset;
 
     int bytesRead = 0;
-    if (size > 0 && size < 1e9)            // 1GB limit
+    if (size > 0 && size < 1e9)
     {
         size = std::min(size, iMaxSize);
-        // Allocate space
-        buffer.assign(size, 0);
-        // Read into buffer
+        try
+        {
+            buffer.assign(size, 0);
+        }
+        catch (...)
+        {
+            fclose(fh);
+            return false;
+        }
         bytesRead = fread(&buffer.at(0), 1, size, fh);
     }
-    // Close
     fclose(fh);
     return bytesRead == size;
 }
@@ -407,7 +500,7 @@ void SharedUtil::MakeSureDirExists(const SString& strPath)
     }
 #else
     std::filesystem::path filePath = static_cast<std::string>(PathConform(strPath));
-    std::error_code ec{};
+    std::error_code       ec{};
     std::filesystem::create_directories(filePath.parent_path(), ec);
 #endif
 }
@@ -423,7 +516,7 @@ SString SharedUtil::PathConform(const SString& strPath)
     // Remove slash duplicates
     size_t iFirstDoubleSlash = strTemp.find(PATH_SEPERATOR PATH_SEPERATOR);
     if (iFirstDoubleSlash == std::string::npos)
-        return strTemp;            // No duplicates present
+        return strTemp;  // No duplicates present
 
     // If first double slash is not at the start, then treat as a normal duplicate if:
     //      1. It is not preceeded by a colon, or
@@ -489,7 +582,7 @@ SString SharedUtil::GetSystemCurrentDirectory()
 }
 
 #ifdef _WIN32
-#ifdef MTA_CLIENT
+    #ifdef MTA_CLIENT
 
 SString SharedUtil::GetSystemDllDirectory()
 {
@@ -572,18 +665,93 @@ SString SharedUtil::GetMTATempPath()
 // C:\Program Files\gta_sa.exe
 SString SharedUtil::GetLaunchPathFilename()
 {
-    static SString strLaunchPathFilename;
-    if (strLaunchPathFilename.empty())
+    struct LaunchPathFilenameHolder
     {
-        wchar_t szBuffer[2048];
-        GetModuleFileNameW(NULL, szBuffer, NUMELMS(szBuffer) - 1);
+        SString strValue;
 
-        wchar_t fullPath[MAX_PATH];
-        GetFullPathNameW(szBuffer, MAX_PATH, fullPath, nullptr);
+        LaunchPathFilenameHolder()
+        {
+            try
+            {
+                std::wstring     wstrModulePath(512, L'\0');
+                constexpr size_t MAX_PATH_LENGTH = 32768;
 
-        strLaunchPathFilename = ToUTF8(fullPath);
-    }
-    return strLaunchPathFilename;
+                for (;;)
+                {
+                    DWORD dwBufferSize = static_cast<DWORD>(wstrModulePath.size());
+                    DWORD dwLength = GetModuleFileNameW(NULL, &wstrModulePath[0], dwBufferSize);
+
+                    if (dwLength == 0)
+                    {
+                        wstrModulePath.clear();
+                        break;
+                    }
+
+                    if (dwLength < dwBufferSize)
+                    {
+                        wstrModulePath.resize(dwLength);
+                        break;
+                    }
+
+                    // dwLength == dwBufferSize means truncation or error
+                    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+                    {
+                        wstrModulePath.resize(dwLength);
+                        break;
+                    }
+
+                    // Buffer too small - grow it
+                    if (wstrModulePath.size() >= MAX_PATH_LENGTH)
+                    {
+                        wstrModulePath.resize(dwLength);
+                        break;
+                    }
+
+                    size_t uiNextSize = wstrModulePath.size() * 2;
+                    if (uiNextSize > MAX_PATH_LENGTH)
+                        uiNextSize = MAX_PATH_LENGTH;
+
+                    wstrModulePath.resize(uiNextSize);
+                }
+
+                // Convert to full path
+                if (!wstrModulePath.empty())
+                {
+                    DWORD dwNeeded = GetFullPathNameW(wstrModulePath.c_str(), 0, nullptr, nullptr);
+                    if (dwNeeded > 0)
+                    {
+                        std::wstring wstrFullPath(dwNeeded, L'\0');
+                        DWORD        dwWritten = GetFullPathNameW(wstrModulePath.c_str(), dwNeeded, &wstrFullPath[0], nullptr);
+
+                        if (dwWritten > 0)
+                        {
+                            wstrFullPath.resize(dwWritten);
+                            strValue = ToUTF8(wstrFullPath);
+                        }
+                        else
+                        {
+                            strValue = ToUTF8(wstrModulePath);
+                        }
+                    }
+                    else
+                    {
+                        strValue = ToUTF8(wstrModulePath);
+                    }
+                }
+                else
+                {
+                    strValue.clear();
+                }
+            }
+            catch (...)
+            {
+                strValue.clear();
+            }
+        }
+    };
+
+    static LaunchPathFilenameHolder holder;
+    return holder.strValue;
 }
 
 // C:\Program Files
@@ -640,12 +808,12 @@ SString SharedUtil::GetDriveNameWithNotEnoughSpace(uint uiResourcesPathMinMB, ui
     return "";
 }
 
-#endif  // #ifdef MTA_CLIENT
-#endif  // #ifdef _WIN32
+    #endif  // #ifdef MTA_CLIENT
+#endif      // #ifdef _WIN32
 
 WString SharedUtil::FromUTF8(const SString& strPath)
 {
-#ifdef WIN32_TESTING   // This might be faster - Needs testing
+#ifdef WIN32_TESTING  // This might be faster - Needs testing
     const char* szSrc = strPath;
     uint        cCharacters = strlen(szSrc) + 1;
     uint        cbUnicode = cCharacters * 4;
@@ -666,7 +834,7 @@ WString SharedUtil::FromUTF8(const SString& strPath)
 
 SString SharedUtil::ToUTF8(const WString& strPath)
 {
-#ifdef WIN32_TESTING   // This might be faster - Needs testing
+#ifdef WIN32_TESTING  // This might be faster - Needs testing
     const wchar_t* pszW = strPath;
     uint           cCharacters = wcslen(pszW) + 1;
     uint           cbAnsi = cCharacters * 6;
@@ -709,7 +877,7 @@ bool SharedUtil::DelTree(const SString& strPath, const SString& strInsideHere)
 
     sfos.hwnd = NULL;
     sfos.wFunc = FO_DELETE;
-    sfos.pFrom = szBuffer;            // Double NULL terminated
+    sfos.pFrom = szBuffer;  // Double NULL terminated
     sfos.pTo = NULL;
     sfos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
 
@@ -764,17 +932,26 @@ bool SharedUtil::FileCopy(const SString& strSrc, const SString& strDest, bool bF
     }
 
     char cBuffer[65536];
+    bool ok = true;
     while (true)
     {
         size_t dataLength = fread(cBuffer, 1, 65536, fhSrc);
         if (dataLength == 0)
+        {
+            if (ferror(fhSrc))
+                ok = false;
             break;
-        fwrite(cBuffer, 1, dataLength, fhDst);
+        }
+        if (fwrite(cBuffer, 1, dataLength, fhDst) != dataLength)
+        {
+            ok = false;
+            break;
+        }
     }
 
     fclose(fhSrc);
     fclose(fhDst);
-    return true;
+    return ok;
 }
 
 #ifdef _WIN32
@@ -796,20 +973,28 @@ std::vector<SString> SharedUtil::FindFiles(const SString& strInMatch, bool bFile
         strMatch += "*";
 
     _WIN32_FIND_DATAW findData;
-    HANDLE           hFind = FindFirstFileW(FromUTF8(strMatch), &findData);
+    HANDLE            hFind = FindFirstFileW(FromUTF8(strMatch), &findData);
     if (hFind != INVALID_HANDLE_VALUE)
     {
-        do
+        try
         {
-            if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? bDirectories : bFiles)
-                if (wcscmp(findData.cFileName, L".") && wcscmp(findData.cFileName, L".."))
-                {
-                    if (bSortByDate)
-                        MapInsert(sortMap, (uint64&)findData.ftLastWriteTime, ToUTF8(findData.cFileName));
-                    else
-                        strResult.push_back(ToUTF8(findData.cFileName));
-                }
-        } while (FindNextFileW(hFind, &findData));
+            do
+            {
+                if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? bDirectories : bFiles)
+                    if (wcscmp(findData.cFileName, L".") && wcscmp(findData.cFileName, L".."))
+                    {
+                        if (bSortByDate)
+                            MapInsert(sortMap, (uint64&)findData.ftLastWriteTime, ToUTF8(findData.cFileName));
+                        else
+                            strResult.push_back(ToUTF8(findData.cFileName));
+                    }
+            } while (FindNextFileW(hFind, &findData));
+        }
+        catch (...)
+        {
+            FindClose(hFind);
+            throw;
+        }
         FindClose(hFind);
     }
 
@@ -1000,12 +1185,14 @@ SString SharedUtil::MakeGenericPath(const SString& uniqueFilePath)
 SString SharedUtil::ConformPathForSorting(const SString& strPathFilename)
 {
     SString strResult = strPathFilename;
-    std::transform(strResult.begin(), strResult.end(), strResult.begin(), [](int c) {
-        // Ignores locale and always does this:
-        if (c >= 'A' && c <= 'Z')
-            c = c - 'A' + 'a';
-        return c;
-    });
+    std::transform(strResult.begin(), strResult.end(), strResult.begin(),
+                   [](int c)
+                   {
+                       // Ignores locale and always does this:
+                       if (c >= 'A' && c <= 'Z')
+                           c = c - 'A' + 'a';
+                       return c;
+                   });
     return strResult;
 }
 
@@ -1051,16 +1238,402 @@ SString SharedUtil::GetSystemLongPathName(const SString& strPath)
         return strPath;
     return ToUTF8(szBuffer);
 }
-#endif // _WIN32
+#endif  // _WIN32
+
+namespace SharedUtil
+{
+    namespace File
+    {
+#ifdef _WIN32
+        inline bool IsReservedName(const char* path) noexcept
+        {
+            const char* name = path;
+            for (const char* p = path; *p; ++p)
+            {
+                if (*p == '\\' || *p == '/')
+                    name = p + 1;
+            }
+
+            std::size_t len = 0;
+            while (name[len] && name[len] != '.' && name[len] != ':')
+                ++len;
+
+            while (len > 0 && (name[len - 1] == ' ' || name[len - 1] == '.'))
+                --len;
+
+            auto up = [](char c) noexcept -> char { return (c >= 'a' && c <= 'z') ? static_cast<char>(c - 'a' + 'A') : c; };
+
+            if (len == 3)
+            {
+                char a = up(name[0]), b = up(name[1]), c = up(name[2]);
+                return (a == 'C' && b == 'O' && c == 'N') || (a == 'P' && b == 'R' && c == 'N') || (a == 'A' && b == 'U' && c == 'X') ||
+                       (a == 'N' && b == 'U' && c == 'L');
+            }
+            if (len == 4 && name[3] >= '1' && name[3] <= '9')
+            {
+                char a = up(name[0]), b = up(name[1]), c = up(name[2]);
+                return (a == 'C' && b == 'O' && c == 'M') || (a == 'L' && b == 'P' && c == 'T');
+            }
+            if (len == 6 && name[5] == '$')
+            {
+                char a = up(name[0]), b = up(name[1]), c = up(name[2]);
+                char d = up(name[3]), e = up(name[4]);
+                return a == 'C' && b == 'O' && c == 'N' && d == 'I' && e == 'N';
+            }
+            if (len == 7 && name[6] == '$')
+            {
+                char a = up(name[0]), b = up(name[1]), c = up(name[2]);
+                char d = up(name[3]), e = up(name[4]), f = up(name[5]);
+                return a == 'C' && b == 'O' && c == 'N' && d == 'O' && e == 'U' && f == 'T';
+            }
+            return false;
+        }
+#endif
+
+        inline bool IsPathSafe(const char* filename) noexcept
+        {
+            if (!filename || !*filename)
+                return false;
+
+            constexpr std::size_t maxPathLen = 4'096;
+            if (std::strlen(filename) > maxPathLen)
+                return false;
+
+            const auto isSeparator = [](char c) noexcept { return c == '\\' || c == '/'; };
+            for (const char* p = filename; *p; ++p)
+            {
+                if (p[0] == '.' && p[1] == '.' && (p == filename || isSeparator(p[-1])) && (p[2] == '\0' || isSeparator(p[2])))
+                    return false;
+            }
+
+#ifdef _WIN32
+            const auto* colonPos = std::strchr(filename, ':');
+            if (colonPos)
+            {
+                const bool isDriveLetter = (colonPos == filename + 1) && std::isalpha(static_cast<unsigned char>(filename[0]));
+                if (!isDriveLetter || std::strchr(colonPos + 1, ':'))
+                    return false;
+            }
+
+            if (isSeparator(filename[0]) && isSeparator(filename[1]) && (filename[2] == '.' || filename[2] == '?') && isSeparator(filename[3]))
+                return false;
+
+            if (filename[0] == '\\' && filename[1] == '?' && filename[2] == '?' && filename[3] == '\\')
+                return false;
+
+            if (IsReservedName(filename))
+                return false;
+#endif
+            return true;
+        }
+    }
+}
+
+#if defined(_WIN32) && defined(MTA_CLIENT)
+FILE* SharedUtil::File::TryFopen(const char* filename, const char* mode)
+{
+    if (!filename || !mode || !*filename || !*mode)
+        return errno = EINVAL, nullptr;
+
+    if (!IsPathSafe(filename))
+        return errno = EINVAL, nullptr;
+
+    constexpr std::size_t maxModeLen = 3;
+    if (std::strlen(mode) > maxModeLen)
+        return errno = EINVAL, nullptr;
+
+    const auto baseMode = mode[0];
+    if (baseMode != 'r' && baseMode != 'w' && baseMode != 'a')
+        return errno = EINVAL, nullptr;
+
+    auto hasPlus = false;
+    auto hasBT = false;
+    auto isBinary = false;
+    for (std::size_t i = 1; mode[i] != '\0'; ++i)
+    {
+        switch (mode[i])
+        {
+            case '+':
+                if (hasPlus)
+                    return errno = EINVAL, nullptr;
+                hasPlus = true;
+                break;
+            case 'b':
+                if (hasBT)
+                    return errno = EINVAL, nullptr;
+                hasBT = true;
+                isBinary = true;
+                break;
+            case 't':
+                if (hasBT)
+                    return errno = EINVAL, nullptr;
+                hasBT = true;
+                break;
+            default:
+                return errno = EINVAL, nullptr;
+        }
+    }
+
+    char        normalizedMode[4];
+    std::size_t modePos = 0;
+    normalizedMode[modePos++] = baseMode;
+    if (hasPlus)
+        normalizedMode[modePos++] = '+';
+    if (isBinary)
+        normalizedMode[modePos++] = 'b';
+    normalizedMode[modePos] = '\0';
+
+    DWORD accessFlags{}, creationMode{};
+    int   osFlags{};
+    switch (baseMode)
+    {
+        case 'r':
+            accessFlags = hasPlus ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_READ;
+            creationMode = OPEN_EXISTING;
+            osFlags = hasPlus ? _O_RDWR : _O_RDONLY;
+            break;
+        case 'w':
+            accessFlags = hasPlus ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_WRITE;
+            creationMode = CREATE_ALWAYS;
+            osFlags = (hasPlus ? _O_RDWR : _O_WRONLY) | _O_CREAT | _O_TRUNC;
+            break;
+        case 'a':
+            accessFlags = hasPlus ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_WRITE;
+            creationMode = OPEN_ALWAYS;
+            osFlags = (hasPlus ? _O_RDWR : _O_WRONLY) | _O_CREAT | _O_APPEND;
+            break;
+    }
+    osFlags |= isBinary ? _O_BINARY : _O_TEXT;
+
+    WString wideFilename;
+    try
+    {
+        wideFilename = FromUTF8(filename);
+    }
+    catch (...)
+    {
+        return errno = EINVAL, nullptr;
+    }
+    if (wideFilename.empty())
+        return errno = EINVAL, nullptr;
+
+    const auto fileHandle = CreateFileW(wideFilename.c_str(), accessFlags, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, creationMode,
+                                        FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (fileHandle == INVALID_HANDLE_VALUE)
+    {
+        const auto errorCode = GetLastError();
+        switch (errorCode)
+        {
+            case ERROR_FILE_NOT_FOUND:
+            case ERROR_PATH_NOT_FOUND:
+                errno = ENOENT;
+                break;
+            case ERROR_ACCESS_DENIED:
+            case ERROR_SHARING_VIOLATION:
+            case ERROR_LOCK_VIOLATION:
+                errno = EACCES;
+                break;
+            case ERROR_INVALID_NAME:
+            case ERROR_BAD_PATHNAME:
+                errno = EINVAL;
+                break;
+            case ERROR_FILE_EXISTS:
+            case ERROR_ALREADY_EXISTS:
+                errno = EEXIST;
+                break;
+            case ERROR_DISK_FULL:
+            case ERROR_HANDLE_DISK_FULL:
+                errno = ENOSPC;
+                break;
+            case ERROR_TOO_MANY_OPEN_FILES:
+                errno = EMFILE;
+                break;
+            case ERROR_WRITE_PROTECT:
+                errno = EROFS;
+                break;
+            case ERROR_NOT_READY:
+                errno = ENXIO;
+                break;
+            case ERROR_INVALID_DRIVE:
+                errno = ENODEV;
+                break;
+            default:
+                errno = EIO;
+                break;
+        }
+        return nullptr;
+    }
+
+    if (GetFileType(fileHandle) != FILE_TYPE_DISK)
+    {
+        CloseHandle(fileHandle);
+        return errno = EACCES, nullptr;
+    }
+
+    {
+        wchar_t finalPath[1024];
+        DWORD   pathLen = GetFinalPathNameByHandleW(fileHandle, finalPath, 1024, FILE_NAME_NORMALIZED);
+        if (pathLen > 0 && pathLen < 1024 && pathLen >= 8 && finalPath[0] == L'\\' && finalPath[1] == L'\\' && finalPath[2] == L'?' && finalPath[3] == L'\\' &&
+            (finalPath[4] == L'U' || finalPath[4] == L'u') && (finalPath[5] == L'N' || finalPath[5] == L'n') &&
+            (finalPath[6] == L'C' || finalPath[6] == L'c') && finalPath[7] == L'\\')
+        {
+            CloseHandle(fileHandle);
+            return errno = EACCES, nullptr;
+        }
+    }
+
+    const auto fileDescriptor = _open_osfhandle(reinterpret_cast<intptr_t>(fileHandle), osFlags);
+    if (fileDescriptor == -1)
+    {
+        const auto savedErrno = errno;
+        CloseHandle(fileHandle);
+        return errno = savedErrno, nullptr;
+    }
+
+    auto* fileStream = _fdopen(fileDescriptor, normalizedMode);
+    if (!fileStream)
+    {
+        const auto savedErrno = errno;
+        _close(fileDescriptor);
+        return errno = savedErrno, nullptr;
+    }
+    return fileStream;
+}
+
+FILE* SharedUtil::File::TryFopenExclusive(const char* filename, const char* mode)
+{
+    if (!filename || !mode || !*filename || !*mode)
+        return errno = EINVAL, nullptr;
+
+    if (!IsPathSafe(filename))
+        return errno = EINVAL, nullptr;
+
+    if (mode[0] != 'r' || (mode[1] != 'b' && mode[1] != '\0') || (mode[1] == 'b' && mode[2] != '\0'))
+        return errno = EINVAL, nullptr;
+
+    WString wideFilename;
+    try
+    {
+        wideFilename = FromUTF8(filename);
+    }
+    catch (...)
+    {
+        return errno = EINVAL, nullptr;
+    }
+    if (wideFilename.empty())
+        return errno = EINVAL, nullptr;
+
+    const auto fileHandle = CreateFileW(wideFilename.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (fileHandle == INVALID_HANDLE_VALUE)
+    {
+        const auto errorCode = GetLastError();
+        switch (errorCode)
+        {
+            case ERROR_FILE_NOT_FOUND:
+            case ERROR_PATH_NOT_FOUND:
+                errno = ENOENT;
+                break;
+            case ERROR_ACCESS_DENIED:
+            case ERROR_SHARING_VIOLATION:
+            case ERROR_LOCK_VIOLATION:
+                errno = EACCES;
+                break;
+            case ERROR_INVALID_NAME:
+            case ERROR_BAD_PATHNAME:
+                errno = EINVAL;
+                break;
+            case ERROR_TOO_MANY_OPEN_FILES:
+                errno = EMFILE;
+                break;
+            default:
+                errno = EIO;
+                break;
+        }
+        return nullptr;
+    }
+
+    if (GetFileType(fileHandle) != FILE_TYPE_DISK)
+    {
+        CloseHandle(fileHandle);
+        return errno = EACCES, nullptr;
+    }
+
+    {
+        wchar_t finalPath[1024];
+        DWORD   pathLen = GetFinalPathNameByHandleW(fileHandle, finalPath, 1024, FILE_NAME_NORMALIZED);
+        if (pathLen > 0 && pathLen < 1024 && pathLen >= 8 && finalPath[0] == L'\\' && finalPath[1] == L'\\' && finalPath[2] == L'?' && finalPath[3] == L'\\' &&
+            (finalPath[4] == L'U' || finalPath[4] == L'u') && (finalPath[5] == L'N' || finalPath[5] == L'n') &&
+            (finalPath[6] == L'C' || finalPath[6] == L'c') && finalPath[7] == L'\\')
+        {
+            CloseHandle(fileHandle);
+            return errno = EACCES, nullptr;
+        }
+    }
+
+    const int  osFlags = (mode[1] == 'b') ? (_O_RDONLY | _O_BINARY) : _O_RDONLY;
+    const auto fileDescriptor = _open_osfhandle(reinterpret_cast<intptr_t>(fileHandle), osFlags);
+    if (fileDescriptor == -1)
+    {
+        const auto savedErrno = errno;
+        CloseHandle(fileHandle);
+        return errno = savedErrno, nullptr;
+    }
+
+    auto* fileStream = _fdopen(fileDescriptor, mode);
+    if (!fileStream)
+    {
+        const auto savedErrno = errno;
+        _close(fileDescriptor);
+        return errno = savedErrno, nullptr;
+    }
+    return fileStream;
+}
 
 FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
 {
-#ifdef _WIN32
-    return _wfsopen(FromUTF8(szFilename), FromUTF8(szMode), _SH_DENYNO);
-#else
-    return fopen(szFilename, szMode);
-#endif
+    return TryFopen(szFilename, szMode);
 }
+
+FILE* SharedUtil::File::FopenExclusive(const char* szFilename, const char* szMode)
+{
+    return TryFopenExclusive(szFilename, szMode);
+}
+
+#else
+FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
+{
+    #ifdef _WIN32
+    try
+    {
+        return _wfsopen(FromUTF8(szFilename), FromUTF8(szMode), _SH_DENYNO);
+    }
+    catch (...)
+    {
+        errno = EINVAL;
+        return nullptr;
+    }
+    #else
+    return fopen(szFilename, szMode);
+    #endif
+}
+
+FILE* SharedUtil::File::FopenExclusive(const char* szFilename, const char* szMode)
+{
+    #ifdef _WIN32
+    try
+    {
+        return _wfsopen(FromUTF8(szFilename), FromUTF8(szMode), _SH_DENYWR);
+    }
+    catch (...)
+    {
+        errno = EINVAL;
+        return nullptr;
+    }
+    #else
+    return fopen(szFilename, szMode);
+    #endif
+}
+#endif
 
 int SharedUtil::File::Mkdir(const char* szPath, int iMode)
 {
@@ -1123,26 +1696,49 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath) noexcept
                 entries.push_back(entry.path().filename().string());
         }
     }
-    catch (...) {} // catch all possible errors and ignore them
+    catch (...)
+    {
+    }  // catch all possible errors and ignore them
 #else
     #ifdef _WIN32
     std::string search_path = szPath;
     if (search_path.empty())
         return {};
 
-    if (search_path.back() != '/')
+    char lastChar = search_path.back();
+    if (lastChar == '/' || lastChar == '\\')
+        search_path += '*';
+    else
         search_path += "/*";
 
-    WIN32_FIND_DATA fd;
-    HANDLE          hFind = ::FindFirstFile(search_path.c_str(), &fd);
-    if (hFind == INVALID_HANDLE_VALUE)
-        return {};
-
-    do
+    try
     {
-        entries.push_back(fd.cFileName);
-    } while (::FindNextFile(hFind, &fd));
-    ::FindClose(hFind);
+        WString          wideSearchPath = FromUTF8(search_path);
+        WIN32_FIND_DATAW fd;
+        HANDLE           hFind = ::FindFirstFileW(wideSearchPath.c_str(), &fd);
+
+        if (hFind != INVALID_HANDLE_VALUE)
+        {
+            try
+            {
+                do
+                {
+                    entries.push_back(ToUTF8(fd.cFileName));
+                } while (::FindNextFileW(hFind, &fd));
+            }
+            catch (...)
+            {
+                ::FindClose(hFind);
+                throw;
+            }
+            ::FindClose(hFind);
+        }
+        return entries;
+    }
+    catch (...)
+    {
+        return {};
+    }
 
     #else
     DIR*           dir;
@@ -1150,9 +1746,17 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath) noexcept
     if (!(dir = opendir(szPath)))
         return {};
 
-    while ((ent = readdir(dir)))
+    try
     {
-        entries.push_back(ent->d_name);
+        while ((ent = readdir(dir)))
+        {
+            entries.push_back(ent->d_name);
+        }
+    }
+    catch (...)
+    {
+        closedir(dir);
+        return {};
     }
     closedir(dir);
     #endif
@@ -1160,3 +1764,77 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath) noexcept
 
     return entries;
 }
+#if defined(_WIN32) && defined(MTA_CLIENT)
+bool SharedUtil::FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs) noexcept
+{
+    outBuffer.clear();
+
+    if (!File::IsPathSafe(filePath.c_str()))
+        return false;
+
+    WString wideFilePath;
+    try
+    {
+        wideFilePath = FromUTF8(filePath);
+    }
+    catch (...)
+    {
+        return false;
+    }
+
+    if (wideFilePath.empty())
+        return false;
+
+    WIN32_FILE_ATTRIBUTE_DATA attr;
+    if (!GetFileAttributesExW(wideFilePath.c_str(), GetFileExInfoStandard, &attr) || attr.nFileSizeHigh > 0)
+        return false;
+
+    DWORD fileSize = attr.nFileSizeLow;
+    if (fileSize == 0)
+        return true;
+
+    HANDLE fh = CreateFileW(wideFilePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
+                            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
+    if (fh == INVALID_HANDLE_VALUE)
+        return false;
+
+    HANDLE ev = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (!ev)
+    {
+        CloseHandle(fh);
+        return false;
+    }
+
+    bool ok = false;
+    try
+    {
+        outBuffer.resize(fileSize);
+    }
+    catch (...)
+    {
+        goto done;
+    }
+
+    {
+        OVERLAPPED ov{};
+        ov.hEvent = ev;
+        DWORD n = 0;
+        if (!ReadFile(fh, &outBuffer[0], fileSize, &n, &ov) && GetLastError() == ERROR_IO_PENDING)
+        {
+            if (WaitForSingleObject(ev, timeoutMs) != WAIT_OBJECT_0)
+            {
+                CancelIo(fh);
+                GetOverlappedResult(fh, &ov, &n, TRUE);
+                goto done;
+            }
+        }
+        ok = GetOverlappedResult(fh, &ov, &n, FALSE) && n == fileSize;
+    }
+done:
+    CloseHandle(ev);
+    CloseHandle(fh);
+    if (!ok)
+        outBuffer.clear();
+    return ok;
+}
+#endif

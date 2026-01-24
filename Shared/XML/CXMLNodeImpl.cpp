@@ -231,7 +231,7 @@ bool CXMLNodeImpl::GetTagContent(bool& bContent)
         return true;
     }
 
-    return false;            // Invalid
+    return false;  // Invalid
 }
 
 bool CXMLNodeImpl::GetTagContent(int& iContent)

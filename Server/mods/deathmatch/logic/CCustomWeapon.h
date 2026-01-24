@@ -39,7 +39,7 @@ struct SLineOfSightFlags
     bool bCheckDummies;
     bool bSeeThroughStuff;
     bool bIgnoreSomeObjectsForCamera;
-    bool bShootThroughStuff;            // not used for IsLineOfSightClear
+    bool bShootThroughStuff;  // not used for IsLineOfSightClear
     bool bCheckCarTires;
 };
 
@@ -120,7 +120,7 @@ private:
     eBone                m_targetBone;
     int                  m_itargetWheel;
     SWeaponConfiguration m_weaponConfig;
-    CPlayer*             m_pOwner;            // For lag compensation
+    CPlayer*             m_pOwner;  // For lag compensation
     int                  m_nAmmoTotal;
     int                  m_nAmmoInClip;
     eWeaponState         m_PreviousState;

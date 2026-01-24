@@ -13,22 +13,22 @@
 #include "StdInc.h"
 #include "CServerIdManager.h"
 
-#define MTA_SERVERID_LOOKUP_DIR       "priv"
-#define MTA_SERVERID_LOOKUP_XML       "priv/server-ids.xml"
-#define MTA_SERVERID_LOOKUP_DIR_CL2   "priv-cl2"
-#define MTA_SERVERID_LOOKUP_XML_CL2   "priv-cl2/server-ids.xml"
+#define MTA_SERVERID_LOOKUP_DIR     "priv"
+#define MTA_SERVERID_LOOKUP_XML     "priv/server-ids.xml"
+#define MTA_SERVERID_LOOKUP_DIR_CL2 "priv-cl2"
+#define MTA_SERVERID_LOOKUP_XML_CL2 "priv-cl2/server-ids.xml"
 
 namespace
 {
     struct CServerIdKey
     {
-        SString strId;            // Server id
+        SString strId;  // Server id
         bool    operator<(const CServerIdKey& other) const { return strId < other.strId; }
     };
 
     struct CServerIdInfo
     {
-        SString strDir;            // Server private directory
+        SString strDir;  // Server private directory
     };
 
     // Variables used for saving the file on a separate thread
@@ -42,7 +42,7 @@ namespace
         strText.Split("_", &strMain, &strCount);
         return SString("%s_%d", *strMain, atoi(strCount) + 1);
     }
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -200,8 +200,7 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
     ms_ServerIdMap = m_ServerIdMap;
 
     // Start save thread
-    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerIdManagerImpl::StaticThreadProc),
-                                  NULL, CREATE_SUSPENDED, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerIdManagerImpl::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         g_pCore->GetConsole()->Printf("Could not create server-ids save thread.");

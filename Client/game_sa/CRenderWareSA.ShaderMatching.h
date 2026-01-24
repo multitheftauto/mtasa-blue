@@ -24,7 +24,9 @@ SString GetDebugTagStr(CClientEntityBase* pClientEntity);
 SString GetDebugTagStr(SShaderInfo* pShaderInfo);
 SString GetDebugTagStr(CMatchChannel* pChannel);
 #else
-    #define OutputDebug(x) {}
+    #define OutputDebug(x) \
+        { \
+        }
 #endif
 
 //
@@ -94,7 +96,7 @@ struct SWildcardMatchChain
         return true;
     }
 
-    std::vector<SMatchType> matchTypeList;            // List of additive and subtractive wildcard match strings
+    std::vector<SMatchType> matchTypeList;  // List of additive and subtractive wildcard match strings
 };
 
 ////////////////////////////////////////////////////////////////
@@ -160,19 +162,19 @@ public:
     //////////////////////////////////////////////
     void AddShaderAndEntity(const CShaderAndEntityPair& key)
     {
-    #ifdef SHADER_DEBUG_OUTPUT
+#ifdef SHADER_DEBUG_OUTPUT
         if (!MapContains(m_ShaderAndEntityList, key))
             OutputDebug(SString("     +Channel:%s adds (ShaderEntity:%s)", GetDebugTag(this), GetDebugTag(key)));
-    #endif
+#endif
         MapInsert(m_ShaderAndEntityList, key);
     }
 
     void RemoveShaderAndEntity(const CShaderAndEntityPair& key)
     {
-    #ifdef SHADER_DEBUG_OUTPUT
+#ifdef SHADER_DEBUG_OUTPUT
         if (MapContains(m_ShaderAndEntityList, key))
             OutputDebug(SString("     -Channel:%s removes (ShaderEntity:%s)", GetDebugTag(this), GetDebugTag(key)));
-    #endif
+#endif
         MapRemove(m_ShaderAndEntityList, key);
     }
 
@@ -211,19 +213,19 @@ public:
     //////////////////////////////////////////////
     void AddTexture(STexNameInfo* pTexNameInfo)
     {
-    #ifdef SHADER_DEBUG_OUTPUT
+#ifdef SHADER_DEBUG_OUTPUT
         if (!MapContains(m_MatchedTextureList, pTexNameInfo))
             OutputDebug(SString("     +Channel:%s adds Tex:%s", GetDebugTag(this), GetDebugTag(pTexNameInfo)));
-    #endif
+#endif
         MapInsert(m_MatchedTextureList, pTexNameInfo);
     }
 
     void RemoveTexture(STexNameInfo* pTexNameInfo)
     {
-    #ifdef SHADER_DEBUG_OUTPUT
+#ifdef SHADER_DEBUG_OUTPUT
         if (MapContains(m_MatchedTextureList, pTexNameInfo))
             OutputDebug(SString("     -Channel:%s removes Tex:%s", GetDebugTag(this), GetDebugTag(pTexNameInfo)));
-    #endif
+#endif
         MapRemove(m_MatchedTextureList, pTexNameInfo);
     }
 
@@ -232,19 +234,19 @@ public:
     //////////////////////////////////////////////
     void SetMatchChain(const SWildcardMatchChain& matchChain)
     {
-    #ifdef SHADER_DEBUG_OUTPUT
+#ifdef SHADER_DEBUG_OUTPUT
         if (!(m_MatchChain == matchChain))
             OutputDebug(SString("     Channel:%s SetMatchChain:%s", GetDebugTag(this), GetDebugTag(matchChain)));
-    #endif
+#endif
         m_MatchChain = matchChain;
     }
 
     const SWildcardMatchChain& GetMatchChain() const { return m_MatchChain; }
 
-    SWildcardMatchChain            m_MatchChain;                    // String matches this channel represents
-    CFastHashSet<STexNameInfo*>    m_MatchedTextureList;            // All textures whose name matches the match chain
+    SWildcardMatchChain            m_MatchChain;          // String matches this channel represents
+    CFastHashSet<STexNameInfo*>    m_MatchedTextureList;  // All textures whose name matches the match chain
     std::set<CShaderAndEntityPair> m_ShaderAndEntityList;
-    bool                           m_bResetReplacements;            // Flag to indicate texture replacements should be reset
+    bool                           m_bResetReplacements;  // Flag to indicate texture replacements should be reset
     uint                           m_uiId;
     static uint                    ms_uiIdCounter;
 };
@@ -266,7 +268,7 @@ public:
     void               RemoveClientEntityRefs(CClientEntityBase* pClientEntity);
     void               RemoveShaderRefs(CSHADERDUMMY* pShaderData);
     void               GetShaderReplacementStats(SShaderReplacementStats& outStats);
-    void               CleanupInvalidatedShaderCache();            // Cleanup deferred invalidated entries
+    void               CleanupInvalidatedShaderCache();  // Cleanup deferred invalidated entries
 
 protected:
     void           CalcShaderForTexAndEntity(SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType,

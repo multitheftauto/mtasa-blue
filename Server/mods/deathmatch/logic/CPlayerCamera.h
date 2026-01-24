@@ -47,15 +47,9 @@ public:
     void      SetTarget(CElement* pElement);
 
     float GetRoll() const { return m_fRoll; }
-    void  SetRoll(float fRoll)
-    {
-        m_fRoll = CameraScriptShared::NormalizeRoll(fRoll);
-    }
+    void  SetRoll(float fRoll) { m_fRoll = CameraScriptShared::NormalizeRoll(fRoll); }
     float GetFOV() const { return m_fFOV; }
-    void  SetFOV(float fFOV)
-    {
-        m_fFOV = CameraScriptShared::SanitizeFOV(fFOV);
-    }
+    void  SetFOV(float fFOV) { m_fFOV = CameraScriptShared::SanitizeFOV(fFOV); }
 
     void SetRotation(CVector& vecRotation);
 

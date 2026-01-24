@@ -39,7 +39,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
     m_pLuaManager = g_pClientGame->GetLuaManager();
     m_pRootEntity = g_pClientGame->GetRootEntity();
-    m_pDefaultElementGroup = new CElementGroup();            // for use by scripts
+    m_pDefaultElementGroup = new CElementGroup();  // for use by scripts
     m_pResourceEntity = pResourceEntity;
     m_pResourceDynamicEntity = pResourceDynamicEntity;
 
@@ -120,11 +120,11 @@ CResource::~CResource()
 
     // Remove all keybinds on this VM
     g_pClientGame->GetScriptKeyBinds()->RemoveAllKeys(m_pLuaVM);
-    
+
     // Remove all resource-specific command bindings while preserving user bindings
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     pKeyBinds->SetAllCommandsActive(m_strResourceName, false);
-    
+
     // Additional cleanup: remove any remaining resource bindings that weren't caught by SetAllCommandsActive
     for (auto& bind : *pKeyBinds)
     {

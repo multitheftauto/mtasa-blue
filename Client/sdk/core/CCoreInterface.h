@@ -42,7 +42,7 @@ enum eCoreVersion
 };
 
 #ifndef WITH_TIMING_CHECKPOINTS
-    #define WITH_TIMING_CHECKPOINTS 1            // Comment this line to remove timing checkpoint code
+    #define WITH_TIMING_CHECKPOINTS 1  // Comment this line to remove timing checkpoint code
 #endif
 
 #if WITH_TIMING_CHECKPOINTS
@@ -80,7 +80,7 @@ public:
     virtual CCVarsInterface*                   GetCVars() = 0;
     virtual CLocalizationInterface*            GetLocalization() = 0;
     virtual CWebCoreInterface*                 GetWebCore() = 0;
-    virtual CWebCoreInterface*                 GetWebCoreUnchecked() = 0;            // For cleanup in destructors only - bypasses initialization check
+    virtual CWebCoreInterface*                 GetWebCoreUnchecked() = 0;  // For cleanup in destructors only - bypasses initialization check
     virtual CTrayIconInterface*                GetTrayIcon() = 0;
     virtual std::shared_ptr<CDiscordInterface> GetDiscord() = 0;
     virtual FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() const noexcept = 0;
@@ -153,6 +153,7 @@ public:
     virtual uint                 GetMaxStreamingMemory() = 0;
     virtual void                 OnCrashAverted(uint uiId) = 0;
     virtual void                 OnEnterCrashZone(uint uiId) = 0;
+    virtual void                 UpdateWerCrashModuleBases() = 0;
     virtual void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0) = 0;
     virtual bool                 GetDebugIdEnabled(uint uiDebugId) = 0;
     virtual EDiagnosticDebugType GetDiagnosticDebug() = 0;
