@@ -247,7 +247,7 @@ bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* 
 {
     SString strHTTPDownloadURLFull("%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile);
     
-    // Use resources-cl2 for secondary client
+    // Use resources-cl2 for secondary client to avoid file protection conflicts
     SString strResourcesDir = "resources";
     if (g_pCore->IsSecondaryClient())
     {

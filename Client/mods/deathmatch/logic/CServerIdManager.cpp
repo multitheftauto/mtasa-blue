@@ -15,8 +15,6 @@
 
 #define MTA_SERVERID_LOOKUP_DIR     "priv"
 #define MTA_SERVERID_LOOKUP_XML     "priv/server-ids.xml"
-#define MTA_SERVERID_LOOKUP_DIR_CL2 "priv-cl2"
-#define MTA_SERVERID_LOOKUP_XML_CL2 "priv-cl2/server-ids.xml"
 
 namespace
 {
@@ -100,13 +98,8 @@ CServerIdManager* CServerIdManager::GetSingleton()
 ///////////////////////////////////////////////////////////////
 CServerIdManagerImpl::CServerIdManagerImpl()
 {
-    // Calc private dir root - use priv-cl2 for secondary client
-    SString strPrivDir = MTA_SERVERID_LOOKUP_DIR;
-    if (g_pCore->IsSecondaryClient())
-    {
-        strPrivDir = MTA_SERVERID_LOOKUP_DIR_CL2;
-    }
-    m_strServerIdLookupBaseDir = PathJoin(g_pClientGame->GetFileCacheRoot(), strPrivDir);
+    // Calc private dir root
+    m_strServerIdLookupBaseDir = PathJoin(g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_DIR);
     MakeSureDirExists(PathJoin(m_strServerIdLookupBaseDir, ""));
 
     // Calc temp dir path incase of server id error
@@ -139,13 +132,8 @@ CServerIdManagerImpl::~CServerIdManagerImpl()
 ///////////////////////////////////////////////////////////////
 bool CServerIdManagerImpl::LoadServerIdMap()
 {
-    // Load config XML file - use priv-cl2 for secondary client
-    SString strServerIdXml = MTA_SERVERID_LOOKUP_XML;
-    if (g_pCore->IsSecondaryClient())
-    {
-        strServerIdXml = MTA_SERVERID_LOOKUP_XML_CL2;
-    }
-    CXMLFile* pConfigFile = g_pCore->GetXML()->CreateXML(PathJoin(g_pClientGame->GetFileCacheRoot(), strServerIdXml));
+    // Load config XML file
+    CXMLFile* pConfigFile = g_pCore->GetXML()->CreateXML(PathJoin(g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_XML));
     if (!pConfigFile)
         return false;
     pConfigFile->Parse();
@@ -246,13 +234,7 @@ DWORD WINAPI CServerIdManagerImpl::StaticThreadProc(LPVOID lpdwThreadParam)
 ///////////////////////////////////////////////////////////////
 void CServerIdManagerImpl::StaticSaveServerIdMap()
 {
-    // Use priv-cl2 for secondary client
-    SString strServerIdXml = MTA_SERVERID_LOOKUP_XML;
-    if (g_pCore->IsSecondaryClient())
-    {
-        strServerIdXml = MTA_SERVERID_LOOKUP_XML_CL2;
-    }
-    CXMLFile* pConfigFile = g_pCore->GetXML()->CreateXML(PathJoin(g_pClientGame->GetFileCacheRoot(), strServerIdXml));
+    CXMLFile* pConfigFile = g_pCore->GetXML()->CreateXML(PathJoin(g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_XML));
     if (!pConfigFile)
         return;
     pConfigFile->Reset();
