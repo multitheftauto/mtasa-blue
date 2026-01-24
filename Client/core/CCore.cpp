@@ -740,13 +740,13 @@ bool CCore::IsSecondaryClient()
 {
     static bool bChecked = false;
     static bool bIsSecondary = false;
-    
+
     if (!bChecked)
     {
         bIsSecondary = (strstr(GetCommandLine(), "-cl2") != NULL);
         bChecked = true;
     }
-    
+
     return bIsSecondary;
 }
 
@@ -1135,12 +1135,12 @@ void CCore::CreateXML()
     {
         // Load config XML file - use -cl2 suffix for secondary client
         SString strConfigPath = MTA_CONFIG_PATH;
-        bool bIsSecondary = IsSecondaryClient();
-        
+        bool    bIsSecondary = IsSecondaryClient();
+
         if (bIsSecondary)
         {
             strConfigPath = strConfigPath.Replace(".xml", "-cl2.xml");
-            
+
             // If CL2 config doesn't exist, copy from the primary config
             SString strFullPath = CalcMTASAPath(strConfigPath);
             if (!FileExists(strFullPath))
@@ -1152,7 +1152,7 @@ void CCore::CreateXML()
                 }
             }
         }
-        
+
         m_pConfigFile = m_pXML->CreateXML(CalcMTASAPath(strConfigPath));
         if (!m_pConfigFile)
         {

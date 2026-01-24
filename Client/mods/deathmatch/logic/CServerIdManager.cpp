@@ -13,8 +13,8 @@
 #include "StdInc.h"
 #include "CServerIdManager.h"
 
-#define MTA_SERVERID_LOOKUP_DIR     "priv"
-#define MTA_SERVERID_LOOKUP_XML     "priv/server-ids.xml"
+#define MTA_SERVERID_LOOKUP_DIR "priv"
+#define MTA_SERVERID_LOOKUP_XML "priv/server-ids.xml"
 
 namespace
 {

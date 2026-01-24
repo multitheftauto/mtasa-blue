@@ -348,7 +348,7 @@ bool IsGTARunning()
     // Skip this for secondary clients/instances
     if (IsSecondaryClientRunning())
         return false;
-    
+
     return !GetGTAProcessList().empty();
 }
 
@@ -1262,7 +1262,7 @@ bool CreateSingleInstanceMutex()
 {
     // Use different GUID for secondary client
     const char* szGuid = IsSecondaryClient() ? MTA_GUID_CL2 : MTA_GUID;
-    
+
     HANDLE hMutex = CreateMutex(NULL, FALSE, TEXT(szGuid));
 
     if (GetLastError() == ERROR_ALREADY_EXISTS)

@@ -131,7 +131,7 @@ bool CServerCache::LoadServerCache()
     if (g_pCore->IsSecondaryClient())
     {
         strCachePath = strCachePath.Replace(".xml", "-cl2.xml");
-        
+
         // If CL2 cache doesn't exist, copy from the primary cache
         SString strFullPath = CalcMTASAPath(strCachePath);
         if (!FileExists(strFullPath))
@@ -143,7 +143,7 @@ bool CServerCache::LoadServerCache()
             }
         }
     }
-    
+
     CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(strCachePath));
     if (!m_pConfigFile)
         return false;
@@ -292,7 +292,7 @@ void CServerCache::StaticSaveServerCache()
     {
         strCachePath = strCachePath.Replace(".xml", "-cl2.xml");
     }
-    
+
     CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(strCachePath));
     if (!m_pConfigFile)
         return;

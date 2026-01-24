@@ -6783,7 +6783,7 @@ void CClientGame::SetFileCacheRoot()
                 strResourcesDir = "resources-cl2";
                 strPrivDir = "priv-cl2";
             }
-            
+
             SString strTestFileName = PathJoin(strFileCachePath, strResourcesDir, "_test.tmp");
             if (FileSave(strTestFileName, "x"))
             {
