@@ -108,6 +108,21 @@ public:
         float       Time;
     };
 
+    struct SKrt0_Memory
+    {
+        SQuaternion Rotation;
+        float       Time;
+        SVector     Translation;
+    };
+
+    struct SKrts_Memory
+    {
+        SQuaternion Rotation;
+        float       Time;
+        SVector     Translation;
+        SVector     Scale;
+    };
+
     struct SCompressedQuaternion
     {
         std::int16_t X, Y, Z, W;

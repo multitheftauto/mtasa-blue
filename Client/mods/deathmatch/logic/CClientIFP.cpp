@@ -387,7 +387,7 @@ void CClientIFP::ReadKrtsFramesUncompressed(std::unique_ptr<CAnimBlendSequence>&
 {
     for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
     {
-        SKrt0* krt0 = static_cast<SKrt0*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKrt0)));
+        SKrts_Memory* krt0 = static_cast<SKrts_Memory*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKrts_Memory)));
         SKrts  Krts;
         ReadBuffer<SKrts>(&Krts);
 
@@ -423,7 +423,7 @@ void CClientIFP::ReadKrt0FramesUncompressed(std::unique_ptr<CAnimBlendSequence>&
 {
     for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
     {
-        SKrt0* frameKrt0 = static_cast<SKrt0*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKrt0)));
+        SKrt0_Memory* frameKrt0 = static_cast<SKrt0_Memory*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKrt0_Memory)));
         SKrt0  Krt0;
         ReadBuffer<SKrt0>(&Krt0);
 
