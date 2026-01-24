@@ -87,12 +87,13 @@ public:
         float X, Y, Z;
     };
 
-    struct SKr00
+    struct SKr00 // CAnimBlendKeyFrameNoTrans
     {
         SQuaternion Rotation;
         float       Time;
     };
 
+    // Structues used for reading IFP files
     struct SKrt0
     {
         SQuaternion Rotation;
@@ -104,11 +105,12 @@ public:
     {
         SQuaternion Rotation;
         SVector     Translation;
-        SVector     Scale;
+        SVector     Scale; // unused
         float       Time;
     };
 
-    struct SKrt0_Memory
+    // Structures used by GTA SA (time is always at 0x10 offset for uncompressed anims)
+    struct SKrt0_Memory // CAnimBlendKeyFrame
     {
         SQuaternion Rotation;
         float       Time;
@@ -120,7 +122,7 @@ public:
         SQuaternion Rotation;
         float       Time;
         SVector     Translation;
-        SVector     Scale;
+        SVector     Scale; // unused
     };
 
     struct SCompressedQuaternion
