@@ -138,12 +138,12 @@ bool CMainConfig::Load()
     }
 
     // Grab rules
-    CXMLNode* currentNode = nullptr;
+    CXMLNode*   currentNode = nullptr;
     std::size_t currentIndex = 0;
     while (currentNode = m_pRootNode->FindSubNode("rule", currentIndex++))
     {
         CXMLAttribute* attribute = currentNode->GetAttributes().Find("name");
-        SString ruleName = attribute ? attribute->GetValue() : SString{};
+        SString        ruleName = attribute ? attribute->GetValue() : SString{};
 
         attribute = currentNode->GetAttributes().Find("value");
         SString ruleValue = attribute ? attribute->GetValue() : SString{};
@@ -151,7 +151,7 @@ bool CMainConfig::Load()
         if (!ruleName.empty() && !ruleValue.empty())
             m_RulesForASEMap[std::move(ruleName)] = std::move(ruleValue);
     }
-  
+
     // Strip spaces from beginning and end of server name
     m_strServerName = SString(m_strServerName).TrimStart(" ").TrimEnd(" ");
 
@@ -260,13 +260,13 @@ bool CMainConfig::Load()
     {
         // Grab its "name" attribute
         CXMLAttribute* attribute = currentNode->GetAttributes().Find("name");
-        SString name = attribute ? attribute->GetValue() : SString{};
+        SString        name = attribute ? attribute->GetValue() : SString{};
         name = name.Replace("\\", "/").ToLower();
 
         // Grab its "verify" attribute
         attribute = currentNode->GetAttributes().Find("verify");
         SString verify = attribute ? attribute->GetValue() : SString{};
-        bool shouldVerify = verify == "true" || verify == "yes" || verify == "1";
+        bool    shouldVerify = verify == "true" || verify == "yes" || verify == "1";
 
         // Find bitnumber
         bool found = false;
@@ -771,7 +771,8 @@ bool CMainConfig::LoadExtended()
     RegisterCommand("start", CConsoleCommands::StartResource, false, "Usage: start <resource1> <resource2> ...\nStart a loaded resource eg: start admin");
     RegisterCommand("stop", CConsoleCommands::StopResource, false, "Usage: stop <resource1> <resource2> ...\nStop a resource eg: stop admin");
     RegisterCommand("stopall", CConsoleCommands::StopAllResources, false, "Stop all running resources");
-    RegisterCommand("restart", CConsoleCommands::RestartResource, false, "Usage: restart <resource1> <resource2> ...\nRestarts a running resource eg: restart admin");
+    RegisterCommand("restart", CConsoleCommands::RestartResource, false,
+                    "Usage: restart <resource1> <resource2> ...\nRestarts a running resource eg: restart admin");
     RegisterCommand("refresh", CConsoleCommands::RefreshResources, false, "Refresh resource list to find new resources");
     RegisterCommand("refreshall", CConsoleCommands::RefreshAllResources, false, "Refresh resources and restart any changed resources");
     RegisterCommand("list", CConsoleCommands::ListResources, false, "Shows a list of resources");
@@ -883,18 +884,18 @@ bool CMainConfig::AddMissingSettings()
     }
 
     // Check that each item in the template also exists in the server config
-    bool configChanged = false;
+    bool      configChanged = false;
     CXMLNode* previousNode = nullptr;
 
     for (auto it = templateRootNode->ChildrenBegin(); it != templateRootNode->ChildrenEnd(); ++it)
     {
-        CXMLNode* templateNode = *it;
+        CXMLNode*          templateNode = *it;
         const std::string& templateNodeName = templateNode->GetTagName();
 
         // Skip certain optional nodes
         if (templateNodeName == "resource" || templateNodeName == "module")
             continue;
-        
+
         // Find node with exact same attributes
         CXMLAttributes& templateAttributes = templateNode->GetAttributes();
         CXMLNode*       foundNode = nullptr;
@@ -903,10 +904,10 @@ bool CMainConfig::AddMissingSettings()
             CXMLNode* tempNode = *it2;
             if (tempNode->GetTagName() != templateNodeName)
                 continue;
-            
+
             CXMLAttributes& attributes = tempNode->GetAttributes();
-            bool attributesMatch = true;
-            
+            bool            attributesMatch = true;
+
             for (auto it3 = templateAttributes.ListBegin(); it3 != templateAttributes.ListEnd(); ++it3)
             {
                 CXMLAttribute* templateAttribute = *it3;
@@ -915,9 +916,9 @@ bool CMainConfig::AddMissingSettings()
                 // Don't check value attribute which is intended to be customized by the server
                 if (attrName == "value")
                     continue;
-                
+
                 const SString& attrValue = templateAttribute->GetValue();
-        
+
                 CXMLAttribute* foundAttribute = attributes.Find(attrName);
                 if (!foundAttribute || foundAttribute->GetValue() != attrValue)
                 {
@@ -925,18 +926,18 @@ bool CMainConfig::AddMissingSettings()
                     break;
                 }
             }
-        
+
             if (attributesMatch)
             {
                 foundNode = tempNode;
                 break;
             }
         }
-        
+
         if (!foundNode)
         {
             const std::string templateNodeValue = templateNode->GetTagContent();
-            const SString templateNodeComment = templateNode->GetCommentText();
+            const SString     templateNodeComment = templateNode->GetCommentText();
 
             foundNode = m_pRootNode->CreateSubNode(templateNodeName.c_str(), previousNode);
             foundNode->SetTagContent(templateNodeValue.c_str());
@@ -1533,7 +1534,8 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {false, false, 0, 1, 1, "database_credentials_protection", &m_bDatabaseCredentialsProtectionEnabled, NULL},
         {false, false, 0, 0, 1, "fakelag", &m_bFakeLagCommandEnabled, NULL},
         {true, true, 50, 1000, 5000, "player_triggered_event_interval", &m_iPlayerTriggeredEventIntervalMs, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
-        {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
+        {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval,
+         &CMainConfig::OnPlayerTriggeredEventIntervalChange},
         {true, true, 0, 1, 1, "resource_client_file_checks", &m_checkResourceClientFiles, nullptr},
         {true, true, 0, 1, 2, "allow_multi_command_handlers", &m_allowMultiCommandHandlers, &CMainConfig::OnAllowMultiCommandHandlersChange},
     };

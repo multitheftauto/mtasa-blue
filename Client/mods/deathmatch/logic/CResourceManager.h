@@ -57,7 +57,8 @@ public:
     void                   ValidateResourceFile(const SString& strFilename, const char* buffer, size_t bufferSize);
     CDownloadableResource* GetDownloadableResourceFile(const SString& strFilename) { return MapFindRef(m_ResourceFileMap, strFilename); }
 
-    static bool ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr, bool bPassSize = false);
+    static bool ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr,
+                                       bool bPassSize = false);
 
 private:
     CMappedList<CResource*>                   m_resources;

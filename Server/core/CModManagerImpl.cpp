@@ -73,8 +73,8 @@ bool CModManagerImpl::Load(const char* szModName, int iArgumentCount, char* szAr
         return false;
     }
 
-    // Grab the initialization procedure
-    #pragma warning(suppress: 4191)
+// Grab the initialization procedure
+#pragma warning(suppress : 4191)
     auto pfnInitServer = reinterpret_cast<InitServer*>(m_Library.GetProcedureAddress("InitServer"));
     if (!pfnInitServer)
     {

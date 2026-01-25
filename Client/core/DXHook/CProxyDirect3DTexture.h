@@ -16,8 +16,8 @@ class CProxyDirect3DTexture : public IDirect3DTexture9
 public:
     /*** IUnknown methods ***/
     HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    ULONG __stdcall AddRef() { return m_pOriginal->AddRef(); }
-    ULONG __stdcall Release();
+    ULONG __stdcall   AddRef() { return m_pOriginal->AddRef(); }
+    ULONG __stdcall   Release();
 
     /*** IDirect3DResource9 methods ***/
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice) { return m_pOriginal->GetDevice(ppDevice); }
@@ -27,18 +27,18 @@ public:
     }
     HRESULT __stdcall GetPrivateData(REFGUID refguid, void* pData, DWORD* pSizeOfData) { return m_pOriginal->GetPrivateData(refguid, pData, pSizeOfData); }
     HRESULT __stdcall FreePrivateData(REFGUID refguid) { return m_pOriginal->FreePrivateData(refguid); }
-    DWORD __stdcall SetPriority(DWORD PriorityNew) { return m_pOriginal->SetPriority(PriorityNew); }
-    DWORD __stdcall GetPriority() { return m_pOriginal->GetPriority(); }
-    void __stdcall PreLoad() { return m_pOriginal->PreLoad(); }
+    DWORD __stdcall   SetPriority(DWORD PriorityNew) { return m_pOriginal->SetPriority(PriorityNew); }
+    DWORD __stdcall   GetPriority() { return m_pOriginal->GetPriority(); }
+    void __stdcall    PreLoad() { return m_pOriginal->PreLoad(); }
     D3DRESOURCETYPE __stdcall GetType() { return m_pOriginal->GetType(); }
 
     /*** IDirect3DBaseTexture9 methods ***/
-    DWORD __stdcall SetLOD(DWORD LODNew) { return m_pOriginal->SetLOD(LODNew); }
-    DWORD __stdcall GetLOD() { return m_pOriginal->GetLOD(); }
-    DWORD __stdcall GetLevelCount() { return m_pOriginal->GetLevelCount(); }
+    DWORD __stdcall   SetLOD(DWORD LODNew) { return m_pOriginal->SetLOD(LODNew); }
+    DWORD __stdcall   GetLOD() { return m_pOriginal->GetLOD(); }
+    DWORD __stdcall   GetLevelCount() { return m_pOriginal->GetLevelCount(); }
     HRESULT __stdcall SetAutoGenFilterType(D3DTEXTUREFILTERTYPE FilterType) { return m_pOriginal->SetAutoGenFilterType(FilterType); }
     D3DTEXTUREFILTERTYPE
-    __stdcall GetAutoGenFilterType() { return m_pOriginal->GetAutoGenFilterType(); }
+    __stdcall      GetAutoGenFilterType() { return m_pOriginal->GetAutoGenFilterType(); }
     void __stdcall GenerateMipSubLevels() { return m_pOriginal->GenerateMipSubLevels(); }
 
     /*** IDirect3DTexture9 methods ***/
@@ -59,5 +59,5 @@ protected:
     IDirect3DTexture9*                      m_pOriginal;
     int                                     m_iMemUsed;
     DWORD                                   m_dwUsage;
-    CProxyDirect3DDevice9::SResourceMemory& m_stats;
+    CProxyDirect3DDevice9::SResourceMemory* m_pStats;
 };
