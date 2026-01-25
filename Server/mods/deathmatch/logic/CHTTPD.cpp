@@ -27,13 +27,14 @@
 extern CGame* g_pGame;
 
 CHTTPD::CHTTPD()
-    : m_BruteForceProtect(4, 30000, 60000 * 5)            // Max of 4 attempts per 30 seconds, then 5 minute ignore
-    , m_HttpDosProtect(0, 0, 0)
+    : m_BruteForceProtect(4, 30000, 60000 * 5)  // Max of 4 attempts per 30 seconds, then 5 minute ignore
+      ,
+      m_HttpDosProtect(0, 0, 0)
 {
     m_pGuestAccount = g_pGame->GetAccountManager()->AddGuestAccount(HTTP_GUEST_ACCOUNT_NAME);
 
     m_HttpDosProtect = CConnectHistory(g_pGame->GetConfig()->GetHTTPDosThreshold(), 10000,
-                                       60000 * 1);            // Max of 'n' connections per 10 seconds, then 1 minute ignore
+                                       60000 * 1);  // Max of 'n' connections per 10 seconds, then 1 minute ignore
 
     std::vector<SString> excludeList;
     g_pGame->GetConfig()->GetHTTPDosExclude().Split(",", excludeList);
@@ -81,7 +82,7 @@ bool CHTTPD::StartHTTPD(const char* szIP, unsigned int port)
             parameters["bindip"] = (long)INADDR_ANY;
         }
 
-        parameters["mode"] = "threadpool";            // or "singlethreaded"/"threadpool"
+        parameters["mode"] = "threadpool";  // or "singlethreaded"/"threadpool"
         parameters["threadcount"] = g_pGame->GetConfig()->GetHTTPThreadCount();
 
         bResult = (StartServer(parameters) == STARTSERVER_SUCCESS);
@@ -302,7 +303,7 @@ void CHTTPD::HttpPulse()
 {
     std::lock_guard<std::mutex> guard(m_mutexLoggedInMap);
 
-    long long llExpireTime = GetTickCount64_() - 1000 * 60 * 5;            // 5 minute timeout
+    long long llExpireTime = GetTickCount64_() - 1000 * 60 * 5;  // 5 minute timeout
 
     map<string, long long>::iterator iter = m_LoggedInMap.begin();
     while (iter != m_LoggedInMap.end())

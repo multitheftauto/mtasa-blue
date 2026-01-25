@@ -12,7 +12,9 @@
 #include "CPickupManager.h"
 #include "CWeaponStatManager.h"
 
-CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID id) : m_id(id) {}
+CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID id) : m_id(id)
+{
+}
 
 bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
 {
