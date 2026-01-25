@@ -10195,6 +10195,7 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
         pLight->SetStartRadius(startRadius);
         pLight->SetEndRadius(endRadius);
         pLight->SetRenderSpot(renderSpot);
+        pLight->SetColor(SColorRGBA(200, 200, 255, 0));
         return pLight;
     }
 

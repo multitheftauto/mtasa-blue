@@ -53,6 +53,9 @@ public:
     bool GetRenderSpot() const { return m_bRenderSpot; }
     void SetRenderSpot(bool renderSpot) { m_bRenderSpot = renderSpot; }
 
+    SColor GetColor() const noexcept { return m_color; }
+    void SetColor(const SColor& color) noexcept { m_color = color; }
+
 protected:
     void Render();
 
@@ -63,4 +66,5 @@ private:
     float   m_StartRadius;
     float   m_EndRadius;
     bool    m_bRenderSpot;
+    SColor  m_color;
 };
