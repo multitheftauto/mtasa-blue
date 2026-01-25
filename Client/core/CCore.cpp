@@ -1135,9 +1135,7 @@ void CCore::CreateXML()
     {
         // Load config XML file - use -cl2 suffix for secondary client
         SString strConfigPath = MTA_CONFIG_PATH;
-        bool    bIsSecondary = IsSecondaryClient();
-
-        if (bIsSecondary)
+        if (IsSecondaryClient())
         {
             strConfigPath = strConfigPath.Replace(".xml", "-cl2.xml");
 
