@@ -28,6 +28,7 @@ void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecD
     float fPosX = vecPosition.fX, fPosY = vecPosition.fY, fPosZ = vecPosition.fZ;
     float fDirX = vecDirection.fX, fDirY = vecDirection.fY, fDirZ = vecDirection.fZ;
     float fRed = (float)color.R / 255, fGreen = (float)color.G / 255, fBlue = (float)color.B / 255;
+    // clang-format off
     __asm
     {
         push    dwEntityInterface
@@ -47,6 +48,7 @@ void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecD
         call    dwFunc
         add     esp, 56
     }
+    // clang-format on
 }
 
 void CPointLightsSA::PreRenderHeliLights()

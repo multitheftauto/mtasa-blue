@@ -24,7 +24,7 @@ public:
     CVehicleAudioSettingsManagerSA();
 
     std::unique_ptr<CVehicleAudioSettingsEntry> CreateVehicleAudioSettingsData(uint32_t modelId) override;
-    CVehicleAudioSettingsEntry& GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept override;
+    CVehicleAudioSettingsEntry&                 GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept override;
 
     void ResetModelSettings(uint32_t modelId) noexcept override;
     void ResetAudioSettingsData() noexcept override;

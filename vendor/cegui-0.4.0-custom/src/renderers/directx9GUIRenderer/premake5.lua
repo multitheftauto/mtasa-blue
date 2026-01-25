@@ -2,20 +2,21 @@ project "DirectX9GUIRenderer"
 	language "C++"
 	kind "StaticLib"
 	targetname "DirectX9GUIRenderer"
+	warnings "Off"
 
 	defines { "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING" }
-	
-	includedirs { 
+
+	includedirs {
 		"../sdk",
 		"../../../include"
-	 }
-	 
-	vpaths { 
+	}
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"d3d9renderer.cpp",
@@ -23,9 +24,9 @@ project "DirectX9GUIRenderer"
 		"../../../include/renderers/d3d9texture.h",
 		"../../../include/renderers/d3d9renderer.h"
 	}
-	
+
 	filter "architecture:not x86"
-		flags { "ExcludeFromBuild" } 
-	
+		flags { "ExcludeFromBuild" }
+
 	filter "system:not windows"
         flags { "ExcludeFromBuild" }

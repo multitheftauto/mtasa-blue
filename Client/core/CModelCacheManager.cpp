@@ -38,12 +38,12 @@ namespace
     constexpr std::uintptr_t FUNC_CGame_CanSeeOutsideFromCurrArea = 0x53C4A0;
 
     constexpr std::size_t PED_STREAMING_SLOT_COUNT = 8u;
-    constexpr int32_t      PED_STREAMING_SLOT_MAX_VALUE = 0xFFFF;
-    constexpr uint32_t PED_STREAMING_FLOOR = 4u;
-    constexpr uint32_t VEHICLE_STREAMING_FLOOR_EXTERIOR = 7u;
-    constexpr uint32_t VEHICLE_STREAMING_FLOOR_INTERIOR = 4u;
+    constexpr int32_t     PED_STREAMING_SLOT_MAX_VALUE = 0xFFFF;
+    constexpr uint32_t    PED_STREAMING_FLOOR = 4u;
+    constexpr uint32_t    VEHICLE_STREAMING_FLOOR_EXTERIOR = 7u;
+    constexpr uint32_t    VEHICLE_STREAMING_FLOOR_INTERIOR = 4u;
     constexpr std::size_t VEHICLE_STREAMING_SLOT_COUNT = 23u;
-    constexpr int16_t VEHICLE_STREAMING_SLOT_UNUSED = -1;
+    constexpr int16_t     VEHICLE_STREAMING_SLOT_UNUSED = -1;
 
     uint32_t GetNativeNumPedsLoaded()
     {
@@ -114,7 +114,7 @@ namespace
         using Fn = bool(__cdecl*)();
         return reinterpret_cast<Fn>(FUNC_CGame_CanSeeOutsideFromCurrArea)();
     }
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -151,14 +151,14 @@ public:
     bool TryReleaseCachedModel(ushort usModelId, SModelCacheInfo& info, const char* contextTag, uint& uiNumModelsCachedHereOnly);
 
 protected:
-    CGame*                            m_pGame{};
-    int                               m_iFrameCounter{};
-    CTickCount                        m_TickCountNow{};
-    bool                              m_bDonePreLoad{};
-    uint                              m_uiMaxCachedPedModels{};
-    bool                              m_IsUsingCustomPedCacheLimit{}; //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
-    uint                              m_uiMaxCachedVehicleModels{};
-    bool                              m_IsUsingCustomVehicleCacheLimit{}; //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
+    CGame*     m_pGame{};
+    int        m_iFrameCounter{};
+    CTickCount m_TickCountNow{};
+    bool       m_bDonePreLoad{};
+    uint       m_uiMaxCachedPedModels{};
+    bool       m_IsUsingCustomPedCacheLimit{};  //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
+    uint       m_uiMaxCachedVehicleModels{};
+    bool       m_IsUsingCustomVehicleCacheLimit{};  //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
     std::map<ushort, SModelCacheInfo> m_PedModelCacheInfoMap{};
     std::map<ushort, SModelCacheInfo> m_VehicleModelCacheInfoMap{};
 };
@@ -267,7 +267,7 @@ void CModelCacheManagerImpl::PreLoad()
         {
             if (bSlowMethod)
                 SetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID, i);
-            
+
             AddModelRefCount(static_cast<ushort>(i));
 
             if (bSlowMethod)
@@ -317,13 +317,16 @@ void CModelCacheManagerImpl::GetStats(SModelCacheStats& outStats)
 // Function to set custom limits, instead of calculating them automatically.
 // If the pointer is nullptr, the value is restored to the automatic one
 // otherwise it is set to whatever value the pointer points to
-// 
+//
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::SetCustomLimits(const size_t* numVehicles, const size_t* numPeds) {
-    if (m_IsUsingCustomPedCacheLimit = (numPeds != nullptr)) {
+void CModelCacheManagerImpl::SetCustomLimits(const size_t* numVehicles, const size_t* numPeds)
+{
+    if (m_IsUsingCustomPedCacheLimit = (numPeds != nullptr))
+    {
         m_uiMaxCachedPedModels = *numPeds;
     }
-    if (m_IsUsingCustomVehicleCacheLimit = (numVehicles != nullptr)) {
+    if (m_IsUsingCustomVehicleCacheLimit = (numVehicles != nullptr))
+    {
         m_uiMaxCachedVehicleModels = *numVehicles;
     }
 }
@@ -347,11 +350,13 @@ void CModelCacheManagerImpl::DoPulse()
     //  256MB streaming = 16+8 MB for peds & vehicles       72 peds + 56 veh
     //
     const auto iStreamingMemoryAvailableKB = *(int*)0x08A5A80;
-    if (!m_IsUsingCustomPedCacheLimit) {
-        SSamplePoint<float> pedPoints[] = { {65536, 9}, {98304, 18}, {131072, 36}, {262144, 72} };
+    if (!m_IsUsingCustomPedCacheLimit)
+    {
+        SSamplePoint<float> pedPoints[] = {{65536, 9}, {98304, 18}, {131072, 36}, {262144, 72}};
         m_uiMaxCachedPedModels = (int)EvalSamplePosition<float>(pedPoints, NUMELMS(pedPoints), (float)iStreamingMemoryAvailableKB);
     }
-    if (!m_IsUsingCustomVehicleCacheLimit) {
+    if (!m_IsUsingCustomVehicleCacheLimit)
+    {
         SSamplePoint<float> vehPoints[] = {{65536, 7}, {98304, 28}, {131072, 56}, {262144, 56}};
         m_uiMaxCachedVehicleModels = (int)EvalSamplePosition<float>(vehPoints, NUMELMS(vehPoints), (float)iStreamingMemoryAvailableKB);
     }
@@ -490,7 +495,8 @@ void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& n
 
     // If at or above cache limit, try to uncache unneeded first
     bool bReleasedModel = false;
-    auto AttemptReleaseFromList = [&](const std::map<uint, ushort>& candidateList, const char* contextTag) -> bool {
+    auto AttemptReleaseFromList = [&](const std::map<uint, ushort>& candidateList, const char* contextTag) -> bool
+    {
         for (auto it = candidateList.rbegin(); it != candidateList.rend(); ++it)
         {
             const ushort modelId = it->second;
@@ -616,7 +622,7 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
                 OutputDebugLine(SString("[Cache] End caching model %d  (OnRestreamModel)", usModelId));
             }
         }
-    }   
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -656,10 +662,10 @@ bool CModelCacheManagerImpl::TryReleaseCachedModel(ushort usModelId, SModelCache
         return false;
     }
 
-    CModelInfo* pModelInfo = m_pGame->GetModelInfo(usModelId, true);
+    CModelInfo*          pModelInfo = m_pGame->GetModelInfo(usModelId, true);
     const eModelInfoType modelType = pModelInfo ? pModelInfo->GetModelType() : eModelInfoType::UNKNOWN;
-    const bool bIsPedModel = modelType == eModelInfoType::PED;
-    const bool bIsVehicleModel = modelType == eModelInfoType::VEHICLE;
+    const bool           bIsPedModel = modelType == eModelInfoType::PED;
+    const bool           bIsVehicleModel = modelType == eModelInfoType::VEHICLE;
 
     const bool bTrackedByNativePedSlots = bIsPedModel && IsModelTrackedByNativePedSlots(usModelId);
     const bool bTrackedByNativeVehicleGroup = bIsVehicleModel && IsModelTrackedByNativeVehicleGroup(usModelId);
@@ -675,8 +681,8 @@ bool CModelCacheManagerImpl::TryReleaseCachedModel(ushort usModelId, SModelCache
     if (bTrackedByNativeVehicleGroup)
     {
         const uint32_t vehicleCount = GetNativeVehicleStreamCount();
-        const bool bIsInterior = m_pGame->GetWorld() && m_pGame->GetWorld()->GetCurrentArea() != 0;
-        const bool bTreatAsInterior = bIsInterior || !NativeCanSeeOutsideFromCurrArea();
+        const bool     bIsInterior = m_pGame->GetWorld() && m_pGame->GetWorld()->GetCurrentArea() != 0;
+        const bool     bTreatAsInterior = bIsInterior || !NativeCanSeeOutsideFromCurrArea();
         const uint32_t minVehicleBudget = bTreatAsInterior ? VEHICLE_STREAMING_FLOOR_INTERIOR : VEHICLE_STREAMING_FLOOR_EXTERIOR;
         if (vehicleCount <= minVehicleBudget)
         {

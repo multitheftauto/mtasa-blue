@@ -52,18 +52,18 @@ namespace WebAppAuth
 
     // Auth code configuration
     inline constexpr std::size_t AUTH_CODE_LENGTH = 30;
-    inline constexpr char AUTH_CODE_MIN_CHAR = 'A';
-    inline constexpr char AUTH_CODE_MAX_CHAR = 'Z';
+    inline constexpr char        AUTH_CODE_MIN_CHAR = 'A';
+    inline constexpr char        AUTH_CODE_MAX_CHAR = 'Z';
 
     // Generates random 30-character auth code (A-Z)
     [[nodiscard]] inline std::string GenerateAuthCode()
     {
         std::array<char, AUTH_CODE_LENGTH> buffer{};
-        
+
         // Use mt19937 with time-based seed (fast, cryptographic strength not needed for DoS prevention)
-        static std::mt19937 rng(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+        static std::mt19937                rng(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
         std::uniform_int_distribution<int> dist(0, AUTH_CODE_MAX_CHAR - AUTH_CODE_MIN_CHAR);
-        
+
         for (auto& ch : buffer)
             ch = static_cast<char>(AUTH_CODE_MIN_CHAR + dist(rng));
 
@@ -77,7 +77,7 @@ namespace WebAppAuth
             return;
 
         const std::lock_guard<std::mutex> lock{GetSharedAuthMutex()};
-        
+
         // Always use webCore->m_AuthCode (already populated in CWebCore constructor)
         // No need for fallback - webCore is guaranteed to exist before this is called
         if (!::g_pCore || !IsReadablePointer(::g_pCore, sizeof(void*))) [[unlikely]]
