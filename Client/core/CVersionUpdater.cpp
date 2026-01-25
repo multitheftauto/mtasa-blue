@@ -568,6 +568,7 @@ void CVersionUpdater::InitiateUpdate(const SString& strType, const SString& strD
     if (CCore::GetSingleton().IsSecondaryClient())
         return;
 
+#ifdef MTA_CL2
     // Don't allow update if CL2 is running
     HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD354}");
     if (hCL2Mutex)
@@ -575,6 +576,7 @@ void CVersionUpdater::InitiateUpdate(const SString& strType, const SString& strD
         CloseHandle(hCL2Mutex);
         return;
     }
+#endif
 
     if (strType == "Mandatory")
     {
@@ -634,6 +636,7 @@ void CVersionUpdater::InitiateManualCheck()
         return;
     }
 
+#ifdef MTA_CL2
     // Don't allow update if CL2 is running
     HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD354}");
     if (hCL2Mutex)
@@ -642,6 +645,7 @@ void CVersionUpdater::InitiateManualCheck()
         CCore::GetSingleton().ShowMessageBox(_("Information"), _("Can't check for updates while secondary client is running"), MB_BUTTON_OK | MB_ICON_INFO);
         return;
     }
+#endif
 
     if (GetQuestionBox().IsVisible())
     {
