@@ -91,7 +91,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     break;
             }
 
-            if (radius > -1 && (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), radius) ||
+            if (radius > -1 && (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), static_cast<float>(radius)) ||
                                 pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
             {
                 pContactElement = nullptr;
@@ -232,7 +232,12 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
             // Set weapon slot
             if (bWeaponCorrect)
-                pSourcePlayer->SetWeaponSlot(uiSlot);
+            {
+                if (uiSlot > 0xFF)
+                    return false;
+
+                pSourcePlayer->SetWeaponSlot(static_cast<unsigned char>(uiSlot));
+            }
             else
             {
                 // remove invalid weapon data to prevent this from being relayed to other players
@@ -302,7 +307,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             if (!BitStream.Read(&bodyPart))
                 return false;
 
-            pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart);
+            pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
         }
 
         // If we know the player's dead, make sure the health we send on is 0
@@ -350,7 +355,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
 
         ElementID               PlayerID = pSourcePlayer->GetID();
-        unsigned short          usLatency = pSourcePlayer->GetPing();
+        unsigned short          usLatency = static_cast<unsigned short>(pSourcePlayer->GetPing());
         const CControllerState& ControllerState = pSourcePlayer->GetPad()->GetCurrentControllerState();
         CElement*               pContactElement = pSourcePlayer->GetContactElement();
 

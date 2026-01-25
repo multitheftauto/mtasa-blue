@@ -99,7 +99,7 @@ bool CPedSA::InternalAttachEntityToEntity(DWORD entityInteface, const CVector* p
 {
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
     CPedSAInterface* pedInterface = GetPedInterface();
-    std::uint8_t     pedType = pedInterface->bPedType;
+    int              pedType = pedInterface->bPedType;
 
     // Hack the CPed type(?) to non-player so the camera doesn't get changed
     pedInterface->bPedType = 2;
@@ -356,7 +356,7 @@ void CPedSA::SetClothesTextureAndModel(const char* texture, const char* model, i
     // int __fastcall CPedClothesDesc::SetTextureAndModel(DWORD* this, int unknown, char* textureName, char* modelName, eClothesTexturePart texturePart)
     // Second argument is unused in CKeyGen::GetUppercaseKey
     ((void(__fastcall*)(CPedClothesDesc*, int, const char*, const char*, std::uint8_t))FUNC_CPedClothesDesc__SetTextureAndModel)(clothes, 0, texture, model,
-                                                                                                                                 textureType);
+                                                                                                                                 static_cast<std::uint8_t>(textureType));
 }
 
 void CPedSA::RebuildPlayer()

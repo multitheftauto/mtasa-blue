@@ -50,10 +50,10 @@ void CClientVectorGraphicDisplay::UnpremultiplyBitmap(Bitmap& bitmap)
     auto stride = bitmap.stride();
     auto rowData = bitmap.data();
 
-    for (std::uint32_t y = 0; y < height; y++)
+    for (decltype(height) y = 0; y < height; y++)
     {
         auto data = rowData;
-        for (std::uint32_t x = 0; x < width; x++)
+        for (decltype(width) x = 0; x < width; x++)
         {
             auto& b = data[0];
             auto& g = data[1];

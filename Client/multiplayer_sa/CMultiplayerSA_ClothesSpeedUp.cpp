@@ -270,18 +270,22 @@ skip:
 //////////////////////////////////////////////////////////////////////////////////////////
 bool SetClothingDirectorySize(int directorySize)
 {
-    DirectoryInfoSA* clothesDirectory = new DirectoryInfoSA[directorySize];
+    if (directorySize <= 0 || directorySize > 0xFFFF)
+        return false;
+
+    const std::uint16_t usDirectorySize = static_cast<std::uint16_t>(directorySize);
+    DirectoryInfoSA*    clothesDirectory = new DirectoryInfoSA[static_cast<std::size_t>(directorySize)];
 
     if (!clothesDirectory)
         return false;
 
     // CClothesBuilder::LoadCdDirectory(void)
     MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));  // push    offset _playerImgEntries; headers
-    MemPut<std::uint16_t>(0x5A4195 + 1, directorySize);                                 // push    550             ; count
-    MemPut<std::uint16_t>(0x5A69E8 + 1, directorySize);                                 // push    550             ; count
+    MemPut<std::uint16_t>(0x5A4195 + 1, usDirectorySize);                               // push    550             ; count
+    MemPut<std::uint16_t>(0x5A69E8 + 1, usDirectorySize);                               // push    550             ; count
 
     g_playerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
-    g_playerImgSize = directorySize;
+    g_playerImgSize = usDirectorySize;
 
     return true;
 }

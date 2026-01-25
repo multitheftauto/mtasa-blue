@@ -37,14 +37,21 @@ bool CDirectorySAInterface::RemoveEntry(const char* fileName)
     if (m_numEntries == 0)
         return false;
 
+    if (m_entries == nullptr)
+        return false;
+
     DirectoryInfoSA* entry = GetModelEntry(fileName);
 
     if (!entry)
         return false;
 
-    std::ptrdiff_t index = entry - m_entries;
+    const std::ptrdiff_t index = entry - m_entries;
+    if (index < 0 || static_cast<std::uint32_t>(index) >= m_numEntries)
+        return false;
 
-    if (index < m_numEntries - 1)
+    const std::uint32_t uiIndex = static_cast<std::uint32_t>(index);
+
+    if (uiIndex < m_numEntries - 1)
     {
         DirectoryInfoSA* lastEntry = m_entries + m_numEntries - 1;
         entry->m_offset = lastEntry->m_offset + lastEntry->m_sizeInArchive;
@@ -52,8 +59,8 @@ bool CDirectorySAInterface::RemoveEntry(const char* fileName)
 
     m_numEntries--;
 
-    if (index < m_numEntries)
-        std::memmove(entry, entry + 1, (m_numEntries - index) * sizeof(DirectoryInfoSA));
+    if (uiIndex < m_numEntries)
+        std::memmove(entry, entry + 1, static_cast<std::size_t>(m_numEntries - uiIndex) * sizeof(DirectoryInfoSA));
 
     return true;
 }
@@ -77,12 +84,13 @@ DirectoryInfoSA* CDirectorySAInterface::GetModelEntry(std::uint16_t modelId)
     if (m_numEntries == 0)
         return nullptr;
 
-    DirectoryInfoSA* entry = m_entries + modelId;
-
-    if (!entry)
+    if (m_entries == nullptr)
         return nullptr;
 
-    return entry;
+    if (modelId >= m_numEntries)
+        return nullptr;
+
+    return m_entries + modelId;
 }
 
 bool CDirectorySAInterface::SetModelStreamingSize(std::uint16_t modelId, std::uint16_t size)

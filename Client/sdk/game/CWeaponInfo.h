@@ -249,7 +249,7 @@ public:
     virtual void  SetFlag(DWORD flag) = 0;
     virtual void  ClearFlag(DWORD flag) = 0;
     virtual bool  IsFlagSet(DWORD flag) = 0;
-    virtual short GetFlags() = 0;
+    virtual int   GetFlags() = 0;
 
     virtual DWORD GetAnimGroup() = 0;
     virtual void  SetAnimGroup(DWORD dwAnimGroup) = 0;

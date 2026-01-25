@@ -1121,7 +1121,10 @@ void CPlayer::SetPlayerStat(unsigned short usStat, float fValue)
 // Calculate weapon range using efficient stuffs
 float CPlayer::GetWeaponRangeFromSlot(uint uiSlot)
 {
-    eWeaponType eWeapon = static_cast<eWeaponType>(GetWeaponType(uiSlot));
+    if (uiSlot > 0xFF)
+        return 0.0f;
+
+    eWeaponType eWeapon = static_cast<eWeaponType>(GetWeaponType(static_cast<unsigned char>(uiSlot)));
     float       fSkill = GetPlayerStat(CWeaponStatManager::GetSkillStatIndex(eWeapon));
 
     if (fSkill != m_fWeaponRangeLastSkill || eWeapon != m_eWeaponRangeLastWeapon ||

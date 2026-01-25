@@ -26,5 +26,5 @@ protected:
     static void    ClearBuffer();
     static SString GetScreenshotPath();
     static bool    IsRateLimited(bool bIsCameraShot);
-    static DWORD   ThreadProc(LPVOID lpdwThreadParam);
+    static DWORD WINAPI ThreadProc(LPVOID lpdwThreadParam);
 };

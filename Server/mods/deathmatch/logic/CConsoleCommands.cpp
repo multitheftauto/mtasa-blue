@@ -1315,7 +1315,7 @@ bool CConsoleCommands::DebugScript(CConsole* console, const char* arguments, CCl
     }
 
     // Set the new level
-    player->SetScriptDebugLevel(debugLevel);
+    player->SetScriptDebugLevel(static_cast<uint8_t>(debugLevel));
     echoClient->SendEcho(("debugscript: Your debug mode was set to " + std::to_string(debugLevel)).c_str());
     CLogger::LogPrintf("SCRIPT: %s set their script debug mode to %d\n", GetAdminNameForLog(client).c_str(), debugLevel);
 

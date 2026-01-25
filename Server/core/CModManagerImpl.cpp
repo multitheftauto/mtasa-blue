@@ -74,7 +74,10 @@ bool CModManagerImpl::Load(const char* szModName, int iArgumentCount, char* szAr
     }
 
     // Grab the initialization procedure
-    InitServer* pfnInitServer = (InitServer*)(m_Library.GetProcedureAddress("InitServer"));
+    InitServer*  pfnInitServer = nullptr;
+    const auto   procAddr = m_Library.GetProcedureAddress("InitServer");
+    static_assert(sizeof(pfnInitServer) == sizeof(procAddr), "Unexpected function pointer size");
+    std::memcpy(&pfnInitServer, &procAddr, sizeof(pfnInitServer));
     if (!pfnInitServer)
     {
         // Unload the library

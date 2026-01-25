@@ -162,8 +162,14 @@ SQueryInfo CQueryReceiver::GetServerResponse()
             SString strJoinedPlayers, strMaxPlayers;
             if (strPlayerCount.Split("/", &strJoinedPlayers, &strMaxPlayers))
             {
-                info.players = atoi(strJoinedPlayers);
-                info.playerSlot = atoi(strMaxPlayers);
+                const int joinedPlayers = atoi(strJoinedPlayers);
+                const int maxPlayers = atoi(strMaxPlayers);
+
+                if (joinedPlayers >= 0 && joinedPlayers <= 0xFFFF)
+                    info.players = static_cast<ushort>(joinedPlayers);
+
+                if (maxPlayers >= 0 && maxPlayers <= 0xFFFF)
+                    info.playerSlot = static_cast<ushort>(maxPlayers);
             }
         }
 
@@ -190,7 +196,11 @@ SQueryInfo CQueryReceiver::GetServerResponse()
         const SString strUpTime = strNetRoute.Right(strNetRoute.length() - strlen(strNetRoute) - 1);
         const SString strHttpPort = strUpTime.Right(strUpTime.length() - strlen(strUpTime) - 1);
         if (!strHttpPort.empty())
-            info.httpPort = atoi(strHttpPort);
+        {
+            const int httpPort = atoi(strHttpPort);
+            if (httpPort >= 0 && httpPort <= 0xFFFF)
+                info.httpPort = static_cast<ushort>(httpPort);
+        }
 
         // Get player nicks
         while (i < len)

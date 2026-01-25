@@ -211,7 +211,7 @@ void CScreenShot::CheckForScreenShot(bool bBeforeGUI)
 }
 
 // Callback for threaded save
-DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
+DWORD WINAPI CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
 {
     uint  uiLinePitch = ms_uiWidth * 4;
     void* pData = ms_ScreenShotBuffer.GetData();
@@ -277,7 +277,7 @@ DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
 
 void CScreenShot::StartSaveThread()
 {
-    HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, NULL, CREATE_SUSPENDED, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, &CScreenShot::ThreadProc, NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot thread.");

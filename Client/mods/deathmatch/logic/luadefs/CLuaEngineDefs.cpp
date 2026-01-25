@@ -627,7 +627,7 @@ int CLuaEngineDefs::EngineRestoreCOL(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModelID = CModelNames::ResolveModelID(strModelName);
+        unsigned short usModelID = static_cast<unsigned short>(CModelNames::ResolveModelID(strModelName));
 
         if (m_pColModelManager->RestoreModel(usModelID))
         {
@@ -655,9 +655,9 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Valid importable model?
-        ushort usModelID = CModelNames::ResolveModelID(strModelName);
+        ushort usModelID = static_cast<ushort>(CModelNames::ResolveModelID(strModelName));
         if (usModelID == INVALID_MODEL_ID)
-            usModelID = CModelNames::ResolveClothesTexID(strModelName);
+            usModelID = static_cast<ushort>(CModelNames::ResolveClothesTexID(strModelName));
         if (CClientTXD::IsImportableModel(usModelID))
         {
             // Try to import
@@ -1396,9 +1396,12 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
 
 uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
+    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     return pModelInfo->GetTextureDictionaryID();
@@ -1406,9 +1409,12 @@ uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 
 bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
+    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     // TXD slots occupy IDs from BaseIDforTXD to BaseIDforCOL-1
@@ -1429,9 +1435,12 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 
 bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
+    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     // Clean up TXD isolation before resetting TXD slot

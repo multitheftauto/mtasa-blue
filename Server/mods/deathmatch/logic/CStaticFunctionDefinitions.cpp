@@ -2419,7 +2419,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(eWeaponProperty eProperty, eW
             case WEAPON_DAMAGE:
             {
                 if (sData >= -10000 && sData <= 10000)
-                    pWeaponInfo->SetDamagePerHit(sData);
+                    pWeaponInfo->SetDamagePerHit(static_cast<short>(sData));
                 else
                     return false;
                 break;
@@ -2427,7 +2427,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(eWeaponProperty eProperty, eW
             case WEAPON_MAX_CLIP_AMMO:
             {
                 if (sData >= 0 && sData <= 1000)
-                    pWeaponInfo->SetMaximumClipAmmo(sData);
+                    pWeaponInfo->SetMaximumClipAmmo(static_cast<short>(sData));
                 else
                     return false;
                 break;
@@ -3313,7 +3313,7 @@ bool CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(CElement* pElement, u
         {
             CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-            if (pPlayer->SetScriptDebugLevel(uiLevel))
+            if (pPlayer->SetScriptDebugLevel(static_cast<std::uint8_t>(uiLevel)))
                 return SetPlayerDebuggerVisible(pElement, uiLevel != 0);
         }
     }
@@ -3828,7 +3828,7 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
                 pPed->CallEvent("onPedWasted", Arguments);
             }
 
-            for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+            for (unsigned char slot = 0; slot < WEAPON_SLOTS; ++slot)
             {
                 pPed->SetWeaponType(0, slot);
                 pPed->SetWeaponAmmoInClip(0, slot);

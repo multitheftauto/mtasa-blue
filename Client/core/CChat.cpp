@@ -737,7 +737,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                         {
                             // Check size if it's ok, then output
                             SString strOutput = strCurrentInput.replace(iFound, std::string::npos, strPlayerName);
-                            if (MbUTF8ToUTF16(strOutput).size() < m_iCharacterLimit)
+                            if (MbUTF8ToUTF16(strOutput).size() < static_cast<std::size_t>(m_iCharacterLimit))
                             {
                                 bSuccess = true;
                                 m_strLastPlayerNamePart = strPlayerNamePart;
@@ -802,7 +802,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             }
 
             // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-            if (MbUTF8ToUTF16(m_strInputText).size() < m_iCharacterLimit)
+            if (MbUTF8ToUTF16(m_strInputText).size() < static_cast<std::size_t>(m_iCharacterLimit))
             {
                 if (KeyboardArgs.codepoint >= 32)
                 {
@@ -1136,7 +1136,12 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
 
 void CChat::SetCharacterLimit(int charLimit)
 {
-    m_iCharacterLimit = charLimit;
+    if (charLimit < 0)
+        m_iCharacterLimit = 0;
+    else if (charLimit > m_iMaxCharacterLimit)
+        m_iCharacterLimit = m_iMaxCharacterLimit;
+    else
+        m_iCharacterLimit = charLimit;
 }
 
 float CChat::GetChatBottomPosition() const noexcept

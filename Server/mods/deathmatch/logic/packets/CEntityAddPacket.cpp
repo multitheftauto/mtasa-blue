@@ -338,7 +338,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 }
                                 else if (IS_VEHICLE(pTarget))
                                 {
-                                    unsigned char ucSubTarget = pWeapon->GetTargetWheel();
+                                    unsigned char ucSubTarget = static_cast<unsigned char>(pWeapon->GetTargetWheel());
                                     BitStream.WriteBits(&ucSubTarget, 4);  // 4 bits = 8 possible values.
                                 }
                                 break;
@@ -380,10 +380,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(weaponConfig.flags.bSeeThroughStuff);
                         BitStream.WriteBit(weaponConfig.flags.bShootThroughStuff);
 
-                        unsigned short usAmmo = pWeapon->GetAmmo();
-                        unsigned short usClipAmmo = pWeapon->GetAmmo();
+                        unsigned short usAmmo = static_cast<unsigned short>(pWeapon->GetAmmo());
+                        unsigned short usClipAmmo = static_cast<unsigned short>(pWeapon->GetAmmo());
                         ElementID      OwnerID = pWeapon->GetOwner() == NULL ? INVALID_ELEMENT_ID : pWeapon->GetOwner()->GetID();
-                        unsigned char  ucWeaponState = pWeapon->GetWeaponState();
+                        unsigned char  ucWeaponState = static_cast<unsigned char>(pWeapon->GetWeaponState());
                         BitStream.WriteBits(&ucWeaponState, 4);  // 4 bits = 8 possible values for weapon state
                         BitStream.Write(usAmmo);
                         BitStream.Write(usClipAmmo);
@@ -629,7 +629,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         handling.data.fTurnMass = pEntry->GetTurnMass();
                         handling.data.fDragCoeff = pEntry->GetDragCoeff();
                         handling.data.vecCenterOfMass = pEntry->GetCenterOfMass();
-                        handling.data.ucPercentSubmerged = pEntry->GetPercentSubmerged();
+                        handling.data.ucPercentSubmerged = static_cast<unsigned char>(pEntry->GetPercentSubmerged());
                         handling.data.fTractionMultiplier = pEntry->GetTractionMultiplier();
                         handling.data.ucDriveType = pEntry->GetCarDriveType();
                         handling.data.ucEngineType = pEntry->GetCarEngineType();
@@ -1006,7 +1006,9 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
 
                             // Write elapsed time & speed
-                            float elapsedTime = GetTickCount64_() - animData.startedTick;
+                            const uint64_t nowTick = GetTickCount64_();
+                            const uint64_t elapsedMs = nowTick >= static_cast<uint64_t>(animData.startedTick) ? (nowTick - static_cast<uint64_t>(animData.startedTick)) : 0;
+                            const float    elapsedTime = static_cast<float>(elapsedMs);
                             BitStream.Write(elapsedTime);
                             BitStream.Write(animData.speed);
                         }

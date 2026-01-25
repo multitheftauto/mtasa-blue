@@ -104,12 +104,14 @@ unsigned char CWeaponNames::GetWeaponID(const char* szName)
     if (szName[0] == 0)
         return 0xFF;
 
+    static_assert(NUMELMS(WeaponNames) <= 0xFF, "WeaponNames table too large for unsigned char IDs");
+
     // Look for it in our table
-    for (unsigned int i = 0; i < NUMELMS(WeaponNames); i++)
+    for (std::size_t i = 0; i < NUMELMS(WeaponNames); i++)
     {
         if (stricmp(szName, WeaponNames[i].szName) == 0)
         {
-            return i;
+            return static_cast<unsigned char>(i);
         }
     }
 

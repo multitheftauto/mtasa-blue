@@ -783,7 +783,17 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
             ulFormat |= DT_WORDBREAK;
 
         // Calculate the size of the text
-        RECT rect = {0, 0, fWidth / fScaleX, 0};
+        const float fRectRight = fWidth / fScaleX;
+        LONG        rectRight = 0;
+        if (fRectRight > 0.0f)
+        {
+            if (fRectRight >= static_cast<float>(LONG_MAX))
+                rectRight = LONG_MAX;
+            else
+                rectRight = static_cast<LONG>(fRectRight);
+        }
+
+        RECT rect = {0, 0, rectRight, 0};
         pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
 
         vecSize.fX = (rect.right - rect.left) * fScaleX;

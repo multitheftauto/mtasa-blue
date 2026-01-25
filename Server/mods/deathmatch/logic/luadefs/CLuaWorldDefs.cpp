@@ -120,11 +120,11 @@ int CLuaWorldDefs::getTime(lua_State* luaVM)
 
 int CLuaWorldDefs::getWeather(lua_State* luaVM)
 {
-    unsigned char ucWeather, ucWeatherBlendingTo;
+    unsigned char ucWeather;
+    unsigned char ucWeatherBlendingTo;
     if (CStaticFunctionDefinitions::GetWeather(ucWeather, ucWeatherBlendingTo))
     {
         lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeather));
-
         if (ucWeatherBlendingTo != 0xFF)
             lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeatherBlendingTo));
         else
@@ -238,7 +238,7 @@ int CLuaWorldDefs::isGarageOpen(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         bool bIsOpen;
-        if (CStaticFunctionDefinitions::IsGarageOpen(iGarageID, bIsOpen))
+        if (CStaticFunctionDefinitions::IsGarageOpen(static_cast<unsigned char>(iGarageID), bIsOpen))
         {
             lua_pushboolean(luaVM, bIsOpen);
             return 1;
@@ -320,7 +320,7 @@ int CLuaWorldDefs::setTrafficLightState(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::SetTrafficLightState(iState))
+            if (CStaticFunctionDefinitions::SetTrafficLightState(static_cast<unsigned char>(iState)))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -431,7 +431,7 @@ int CLuaWorldDefs::setWeather(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetWeather(iWeather))
+        if (CStaticFunctionDefinitions::SetWeather(static_cast<unsigned char>(iWeather)))
         {
             lua_pushboolean(luaVM, true);
             return 1;

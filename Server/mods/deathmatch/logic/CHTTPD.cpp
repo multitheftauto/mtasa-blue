@@ -24,6 +24,10 @@
     #include <arpa/inet.h>
 #endif
 
+#ifdef WIN32
+    #include <ws2tcpip.h>
+#endif
+
 extern CGame* g_pGame;
 
 CHTTPD::CHTTPD()
@@ -72,21 +76,27 @@ bool CHTTPD::StartHTTPD(const char* szIP, unsigned int port)
 
         if (szIP && szIP[0])
         {
-            // Convert the dotted ip to a long
-            long lIP = inet_addr(szIP);
-            parameters["bindip"] = lIP;
+              in_addr addr{};
+    #ifdef WIN32
+              if (InetPtonA(AF_INET, szIP, &addr) != 1)
+                 return false;
+    #else
+              if (inet_pton(AF_INET, szIP, &addr) != 1)
+                 return false;
+    #endif
+              parameters["bindip"] = static_cast<long>(addr.s_addr);
         }
         else
         {
             // Bind to default;
-            parameters["bindip"] = (long)INADDR_ANY;
+              parameters["bindip"] = static_cast<long>(INADDR_ANY);
         }
 
         parameters["mode"] = "threadpool";  // or "singlethreaded"/"threadpool"
         parameters["threadcount"] = g_pGame->GetConfig()->GetHTTPThreadCount();
 
         bResult = (StartServer(parameters) == STARTSERVER_SUCCESS);
-        m_bStartedServer = true;
+        m_bStartedServer = bResult;
     }
 
     return bResult;

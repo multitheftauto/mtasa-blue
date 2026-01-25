@@ -54,7 +54,10 @@ void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlas
                 {
                     if (panel.m_nFrameId == (std::uint16_t)0xFFFF)
                     {
-                        panel.SetPanel(nodeId, 1, GetRandomNumberInRange(-0.2f, -0.5f));
+                        if (nodeId < 0 || nodeId > 0x7FFF)
+                            return;
+
+                        panel.SetPanel(static_cast<std::int16_t>(nodeId), static_cast<std::int16_t>(1), GetRandomNumberInRange(-0.2f, -0.5f));
                         break;
                     }
                 }

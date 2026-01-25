@@ -70,7 +70,8 @@ bool CExplosionSyncPacket::Write(NetBitStreamInterface& BitStream) const
         ElementID ID = m_pSourceElement->GetID();
         BitStream.Write(ID);
 
-        unsigned short usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        const unsigned int   uiPing = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        const unsigned short usLatency = uiPing <= 0xFFFF ? static_cast<unsigned short>(uiPing) : 0xFFFF;
         BitStream.WriteCompressed(usLatency);
     }
     else

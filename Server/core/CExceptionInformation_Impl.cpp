@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include "CExceptionInformation_Impl.h"
 
+#include <cstring>
+
 #define MAX_MODULE_PATH 512
 
 CExceptionInformation_Impl::CExceptionInformation_Impl()
@@ -113,7 +115,13 @@ bool CExceptionInformation_Impl::GetModule(char* szOutputBuffer, int nOutputName
      * See if we're able to use GetModuleHandleExA.  According to Microsoft,
      * this API is only available on Windows XP and Vista.
      */
-    _pfnGetModuleHandleExA pfnGetModuleHandleExA = (_pfnGetModuleHandleExA)GetProcAddress(hKern32, "GetModuleHandleExA");
+    _pfnGetModuleHandleExA pfnGetModuleHandleExA = NULL;
+    {
+        const auto procAddr = GetProcAddress(hKern32, "GetModuleHandleExA");
+        static_assert(sizeof(pfnGetModuleHandleExA) == sizeof(procAddr), "Unexpected function pointer size");
+        if (procAddr)
+            std::memcpy(&pfnGetModuleHandleExA, &procAddr, sizeof(pfnGetModuleHandleExA));
+    }
 
     /*
      * TODO:  Possibly use our own code to do this for other systems.

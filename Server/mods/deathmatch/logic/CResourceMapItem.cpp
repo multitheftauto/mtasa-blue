@@ -217,7 +217,15 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
     pNode->SetTypeName(strTagName);
 
     if (!pNode->GetDimension())
-        pNode->SetDimension(m_iDimension);
+    {
+        int iDimension = m_iDimension;
+        if (iDimension < 0)
+            iDimension = 0;
+        else if (iDimension > 0xFFFF)
+            iDimension = 0xFFFF;
+
+        pNode->SetDimension(static_cast<unsigned short>(iDimension));
+    }
 
     if (m_pElementGroup)
         m_pElementGroup->Add(pNode);

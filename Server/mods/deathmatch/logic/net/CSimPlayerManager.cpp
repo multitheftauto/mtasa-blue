@@ -136,7 +136,10 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_ucWeaponType = pPlayer->GetWeaponType();
     pSim->m_usVehicleModel = pVehicle ? pVehicle->GetModel() : 0;
     pSim->m_ucSyncTimeContext = pPlayer->GetSyncTimeContext();
-    pSim->m_ucOccupiedVehicleSeat = pPlayer->GetOccupiedVehicleSeat();
+    {
+        const uint uiSeat = pPlayer->GetOccupiedVehicleSeat();
+        pSim->m_ucOccupiedVehicleSeat = uiSeat <= 0xFF ? static_cast<unsigned char>(uiSeat) : 0xFF;
+    }
     pSim->m_fWeaponRange = pPlayer->GetWeaponRangeFromSlot();
     pSim->m_bVehicleHasHydraulics = pVehicle ? pVehicle->GetUpgrades()->HasUpgrade(1087) : false;
     pSim->m_bVehicleIsPlaneOrHeli = pVehicle ? pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI : false;

@@ -261,7 +261,7 @@ int CLuaMarkerDefs::GetMarkerIcon(lua_State* luaVM)
         if (pCheckpoint)
         {
             SString strMarkerIcon;
-            CClientCheckpoint::IconToString(pCheckpoint->GetIcon(), strMarkerIcon);
+            CClientCheckpoint::IconToString(static_cast<unsigned char>(pCheckpoint->GetIcon()), strMarkerIcon);
             lua_pushstring(luaVM, strMarkerIcon);
             return 1;
         }

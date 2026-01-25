@@ -165,7 +165,9 @@ bool CConnectManager::Reconnect(const char* szHost, unsigned short usPort, const
     unsigned int uiPort = 0;
     CVARS_GET("host", m_strHost);
     CVARS_GET("port", uiPort);
-    m_usPort = uiPort;
+    if (uiPort == 0 || uiPort > 0xFFFF)
+        uiPort = 22003;
+    m_usPort = static_cast<unsigned short>(uiPort);
 
     // If keeping the same host & port, retrieve the password as well
     if (!szHost || !szHost[0] || m_strHost == szHost)

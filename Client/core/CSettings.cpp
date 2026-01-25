@@ -2217,7 +2217,7 @@ void CSettings::UpdateVideoTab()
     else if (FxQuality == 3)
         m_pComboFxQuality->SetText(_("Very high"));
 
-    char AntiAliasing = gameSettings->GetAntiAliasing();
+    unsigned int AntiAliasing = gameSettings->GetAntiAliasing();
     if (AntiAliasing == 1)
         m_pComboAntiAliasing->SetText(_("Off"));
     else if (AntiAliasing == 2)
@@ -4945,10 +4945,10 @@ void CSettings::LoadChatColorFromString(eChatColorType eType, const string& strC
     try
     {
         ss >> iR >> iG >> iB >> iA;
-        pColor.R = iR;
-        pColor.G = iG;
-        pColor.B = iB;
-        pColor.A = iA;
+        pColor.R = static_cast<unsigned char>(iR);
+        pColor.G = static_cast<unsigned char>(iG);
+        pColor.B = static_cast<unsigned char>(iB);
+        pColor.A = static_cast<unsigned char>(iA);
         SetChatColorValues(eType, pColor);
     }
     catch (...)

@@ -50,15 +50,21 @@ public:
 
     uint GetFreeSlot()
     {
+        if (m_nSize <= 0 || m_byteMap == nullptr)
+            return static_cast<uint>(-1);
+
         bool bLooped = false;
-        uint index = m_nFirstFree + 1;
+        int  index = m_nFirstFree + 1;
+
+        if (index < 0 || index >= m_nSize)
+            index = 0;
 
         while (true)
         {
             if (index >= m_nSize)
             {
                 if (bLooped)
-                    return -1;
+                    return static_cast<uint>(-1);
 
                 index = 0;
                 bLooped = true;
@@ -67,21 +73,30 @@ public:
             if (m_byteMap[index].bEmpty)
             {
                 m_nFirstFree = index;
-                return index;
+                return static_cast<uint>(index);
             }
             index++;
         }
 
-        return -1;
+        return static_cast<uint>(-1);
     };
 
     B* Allocate()
     {
+        if (m_nSize <= 0 || m_pObjects == nullptr || m_byteMap == nullptr)
+            return nullptr;
+
         m_nFirstFree++;           // Continue after the last allocated slot
         const auto sz = m_nSize;  // Storing size to avoid reloads from memory - should help out the optimizer
-        for (auto i = 0u; i < sz; i++)
+
+        if (m_nFirstFree < 0 || m_nFirstFree >= sz)
+            m_nFirstFree = 0;
+
+        for (int i = 0; i < sz; i++)
         {
-            const auto slot = (m_nFirstFree + i) % sz;
+            int slot = m_nFirstFree + i;
+            if (slot >= sz)
+                slot -= sz;
             const auto e = &m_byteMap[slot];
             if (!e->bEmpty)
             {
@@ -126,9 +141,12 @@ public:
     bool         IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
     bool         IsContains(uint index) const
     {
-        if (m_nSize <= index)
+        if (m_nSize <= 0)
             return false;
-        return !IsEmpty(index);
+
+        if (index >= static_cast<uint>(m_nSize))
+            return false;
+        return !IsEmpty(static_cast<std::int32_t>(index));
     }
 
     B* GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
@@ -138,7 +156,10 @@ public:
     uint32_t GetObjectIndexSafe(B* pObject)
     {
         uint32_t index = GetObjectIndex(pObject);
-        return index > m_nSize ? UINT_MAX : index;
+        if (m_nSize <= 0)
+            return UINT_MAX;
+
+        return index >= static_cast<uint32_t>(m_nSize) ? UINT_MAX : index;
     }
 };
 

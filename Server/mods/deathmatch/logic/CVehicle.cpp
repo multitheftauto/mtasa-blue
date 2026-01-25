@@ -132,7 +132,11 @@ CVehicle::~CVehicle()
             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
             {
                 // Does it have an occupant and is the occupant the requesting ped?
-                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                const uint uiOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                if (uiOccupiedSeat > 0xFF)
+                    continue;
+
+                unsigned char ucOccupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                 if (pPed == GetOccupant(ucOccupiedSeat))
                 {
                     // Mark the ped/vehicle as empty
@@ -312,7 +316,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
         uchar ucValues[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         char* sz1 = strtok(szTemp, ", ");
         if (sz1)
-            ucValues[0] = atoi(sz1);
+            ucValues[0] = static_cast<uchar>(atoi(sz1));
 
         int i;
         for (i = 1; i < 12; i++)
@@ -320,7 +324,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
             char* szn = strtok(NULL, ", ");
             if (!szn)
                 break;
-            ucValues[i] = atoi(szn);
+            ucValues[i] = static_cast<uchar>(atoi(szn));
         }
 
         if (i == 3 || i == 6 || i == 9 || i == 12)
@@ -804,7 +808,7 @@ void CVehicle::GenerateRegPlate()
             }
 
             // Put it in the plate
-            m_szRegPlate[i] = iChar;
+            m_szRegPlate[i] = static_cast<char>(iChar);
         }
     }
 

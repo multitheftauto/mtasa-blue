@@ -65,7 +65,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 BitStream.Read(iRemoteModelID);
 
             eVehicleType vehicleType = pVehicle->GetVehicleType();
-            eVehicleType remoteVehicleType = CVehicleManager::GetVehicleType(iRemoteModelID);
+            eVehicleType remoteVehicleType = CVehicleManager::GetVehicleType(static_cast<unsigned short>(iRemoteModelID));
 
             // Read out its position
             SPositionSync position(false);
@@ -295,7 +295,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     if (!BitStream.Read(&bodyPart))
                         return false;
 
-                    pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart);
+                    pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
                 }
             }
 
@@ -484,7 +484,8 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(pSourcePlayer->GetSyncTimeContext());
 
             // Write his ping divided with 2 plus a small number so the client can find out when this packet was sent
-            unsigned short usLatency = pSourcePlayer->GetPing();
+            const unsigned int   uiPing = pSourcePlayer->GetPing();
+            const unsigned short usLatency = uiPing <= 0xFFFF ? static_cast<unsigned short>(uiPing) : 0xFFFF;
             BitStream.WriteCompressed(usLatency);
 
             // Write the keysync data
@@ -717,7 +718,7 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStrea
     }
 
     // Door angles.
-    if (CVehicleManager::HasDoors(iRemoteModel))
+    if (CVehicleManager::HasDoors(static_cast<unsigned short>(iRemoteModel)))
     {
         SDoorOpenRatioSync door;
 

@@ -12,8 +12,15 @@
 
 void OnModelLoaded(unsigned int uiModelID)
 {
-    if (uiModelID < pGameInterface->GetBaseIDforTXD())
-        pGameInterface->GetModelInfo(uiModelID)->MakeCustomModel();
+    const int32_t baseTxdId = pGameInterface->GetBaseIDforTXD();
+    if (baseTxdId <= 0)
+        return;
+
+    if (uiModelID < static_cast<unsigned int>(baseTxdId))
+    {
+        if (auto* pModelInfo = pGameInterface->GetModelInfo(uiModelID))
+            pModelInfo->MakeCustomModel();
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

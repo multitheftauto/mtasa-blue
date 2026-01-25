@@ -49,7 +49,10 @@ bool CPedWastedPacket::Read(NetBitStreamInterface& BitStream)
         BitStream.Read(&bodyPart) && BitStream.Read(&pos) && BitStream.Read(m_PedID))
     {
         m_ucKillerWeapon = weapon.data.ucWeaponType;
-        m_ucBodyPart = bodyPart.data.uiBodypart;
+        if (bodyPart.data.uiBodypart > 0xFF)
+            return false;
+
+        m_ucBodyPart = static_cast<unsigned char>(bodyPart.data.uiBodypart);
         m_vecPosition = pos.data.vecPosition;
 
         SWeaponAmmoSync ammo(m_ucKillerWeapon, true, false);

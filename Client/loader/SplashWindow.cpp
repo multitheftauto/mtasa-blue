@@ -401,9 +401,10 @@ void Splash::UpdateLoadingBar()
     const long long numUpdates = elapsed / UPDATE_RATE_IN_MS;
     m_barLastUpdate += std::chrono::milliseconds(numUpdates * UPDATE_RATE_IN_MS);
 
-    m_barX += PIXELS_PER_UPDATE * numUpdates;
-
-    if (m_barX >= m_width)
+    const long long delta = static_cast<long long>(PIXELS_PER_UPDATE) * numUpdates;
+    if (m_width > 0)
+        m_barX = static_cast<int>((static_cast<long long>(m_barX) + delta) % m_width);
+    else
         m_barX = 0;
 
     // Only invalidate the loading bar region to avoid flickering.

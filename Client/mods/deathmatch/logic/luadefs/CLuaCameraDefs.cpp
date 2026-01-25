@@ -481,7 +481,7 @@ bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)
         throw std::invalid_argument("Invalid range (0-255)");
 
     CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
-    pPlayerInfo->SetCamDrunkLevel(drunkLevel);
+    pPlayerInfo->SetCamDrunkLevel(static_cast<unsigned char>(drunkLevel));
 
     return true;
 }

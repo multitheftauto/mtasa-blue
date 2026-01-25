@@ -146,18 +146,17 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                 }
                 // clang-format on
             }
-            else reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(dwPanel, breakGlass, spawnFlyingComponent);
+            else reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
         }
     }
 }
 
 void CDamageManagerSA::SetPanelStatus(unsigned long ulStatus, bool spawnFlyingComponent, bool breakGlass)
 {
-    unsigned int uiIndex;
-
-    for (uiIndex = 0; uiIndex < MAX_PANELS; uiIndex++)
+    for (unsigned int uiIndex = 0; uiIndex < MAX_PANELS; ++uiIndex)
     {
-        SetPanelStatus(static_cast<eDoors>(uiIndex), static_cast<unsigned char>(ulStatus), spawnFlyingComponent, breakGlass);
+        const BYTE bPanelStatus = static_cast<BYTE>(ulStatus & 0x0F);
+        SetPanelStatus(static_cast<BYTE>(uiIndex), bPanelStatus, spawnFlyingComponent, breakGlass);
         ulStatus >>= 4;
     }
 }

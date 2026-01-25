@@ -103,18 +103,16 @@ bool CClientVariables::Get(const std::string& strVariable, CColor& val)
     strVal = Node(strVariable)->GetTagContent();
     ss.str(strVal);
 
-    try
-    {
-        ss >> iR >> iG >> iB >> iA;
-        val.R = iR;
-        val.G = iG;
-        val.B = iB;
-        val.A = iA;
-    }
-    catch (...)
-    {
+    if (!(ss >> iR >> iG >> iB >> iA))
         return false;
-    }
+
+    if (iR < 0 || iR > 255 || iG < 0 || iG > 255 || iB < 0 || iB > 255 || iA < 0 || iA > 255)
+        return false;
+
+    val.R = static_cast<unsigned char>(iR);
+    val.G = static_cast<unsigned char>(iG);
+    val.B = static_cast<unsigned char>(iB);
+    val.A = static_cast<unsigned char>(iA);
 
     return true;
 }

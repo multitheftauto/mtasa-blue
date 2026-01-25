@@ -173,11 +173,12 @@ void CModelCacheManagerImpl::PreLoad()
     // PreLoad upgrades
     WatchDogBeginSection(WD_SECTION_PRELOAD_UPGRADES);
     {
-        for (int i = 1000; i < iLowestUnsafeUpgrade; i++)
+        const int iEndModelId = std::min(iLowestUnsafeUpgrade, 0x10000);
+        for (int i = 1000; i < iEndModelId; i++)
         {
             if (bSlowMethod)
                 SetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID, i);
-            AddModelRefCount(i);
+            AddModelRefCount(static_cast<ushort>(i));
             if (bSlowMethod)
                 m_pGame->GetStreaming()->LoadAllRequestedModels(false);
         }

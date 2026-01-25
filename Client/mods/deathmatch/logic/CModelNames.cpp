@@ -29364,7 +29364,7 @@ void CModelNames::InitializeMaps()
     // Include vehicle names as well
     for (uint i = 400; i <= 610; i++)
     {
-        ushort      usID = i;
+        ushort      usID = static_cast<ushort>(i);
         const char* szName = CVehicleNames::GetVehicleName(i);
         MapSet(ms_ModelIDNameMap, usID, szName);
         MapSet(ms_NameModelIDMap, SStringX(szName).ToLower(), usID);

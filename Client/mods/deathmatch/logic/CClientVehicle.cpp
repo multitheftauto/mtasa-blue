@@ -59,7 +59,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     // Apply handling
     std::uint16_t usHandlingModelID = m_usModel;
     if (m_usModel < 400 || m_usModel > 611)
-        usHandlingModelID = m_pModelInfo->GetParentID();
+        usHandlingModelID = static_cast<std::uint16_t>(m_pModelInfo->GetParentID());
 
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
     m_HandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
@@ -814,13 +814,13 @@ void CClientVehicle::Fix()
     GetInitialDoorStates(ucDoorStates);
 
     bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
-    for (int i = 0; i < MAX_DOORS; i++)
+    for (unsigned char i = 0; i < MAX_DOORS; i++)
         SetDoorStatus(i, ucDoorStates[i], flyingComponents);
-    for (int i = 0; i < MAX_PANELS; i++)
+    for (unsigned char i = 0; i < MAX_PANELS; i++)
         SetPanelStatus(i, 0, flyingComponents);
-    for (int i = 0; i < MAX_LIGHTS; i++)
+    for (unsigned char i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
-    for (int i = 0; i < MAX_WHEELS; i++)
+    for (unsigned char i = 0; i < MAX_WHEELS; i++)
         SetWheelStatus(i, 0);
 
     // These components get a funny rotation when calling Fix() (unknown reason)
@@ -1059,7 +1059,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         {
             std::uint16_t usHandlingModelID = usModel;
             if (usHandlingModelID < 400 || usHandlingModelID > 611)
-                usHandlingModelID = m_pModelInfo->GetParentID();
+                usHandlingModelID = static_cast<std::uint16_t>(m_pModelInfo->GetParentID());
 
             m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
             m_HandlingEntry->Assign(m_pOriginalHandlingEntry);

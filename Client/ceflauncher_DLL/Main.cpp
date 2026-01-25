@@ -12,6 +12,7 @@
 // #define CEF_ENABLE_SANDBOX
 
 #include <atomic>
+#include <cstring>
 
 #define WIN32_NO_STATUS
 #define WIN32_LEAN_AND_MEAN
@@ -61,7 +62,10 @@ namespace
         if (!procAddr)
             return nullptr;
 
-        return reinterpret_cast<NtQueryInformationProcessFunc>(procAddr);
+        NtQueryInformationProcessFunc queryFunc = nullptr;
+        static_assert(sizeof(queryFunc) == sizeof(procAddr), "Unexpected function pointer size");
+        std::memcpy(&queryFunc, &procAddr, sizeof(queryFunc));
+        return queryFunc;
     }
 
     [[nodiscard]] auto GetParentProcessId(NtQueryInformationProcessFunc queryFunc) noexcept -> DWORD

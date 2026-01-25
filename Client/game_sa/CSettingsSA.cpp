@@ -150,7 +150,10 @@ unsigned int CSettingsSA::GetUsertrackMode()
 
 void CSettingsSA::SetUsertrackMode(unsigned int uiMode)
 {
-    m_pInterface->ucUsertrackMode = uiMode;
+    if (uiMode > 2)
+        uiMode = 0;
+
+    m_pInterface->ucUsertrackMode = static_cast<BYTE>(uiMode);
 }
 
 bool CSettingsSA::IsUsertrackAutoScan()
@@ -217,7 +220,7 @@ unsigned int CSettingsSA::GetFXQuality()
 
 void CSettingsSA::SetFXQuality(unsigned int fxQualityId)
 {
-    MemPutFast<BYTE>(VAR_ucFxQuality, fxQualityId);
+    MemPutFast<BYTE>(VAR_ucFxQuality, static_cast<BYTE>(fxQualityId));
 }
 
 float CSettingsSA::GetMouseSensitivity()

@@ -110,7 +110,7 @@ bool CLuaVectorGraphicDefs::SetSize(CClientVectorGraphic* vectorGraphic, CVector
     int intSizeX = static_cast<int>(size.fX);
     int intSizeY = static_cast<int>(size.fY);
 
-    vectorGraphicItem->Resize(CVector2D(intSizeX, intSizeY));
+    vectorGraphicItem->Resize(CVector2D(static_cast<float>(intSizeX), static_cast<float>(intSizeY)));
 
     vectorGraphic->GetDisplay()->Update();
     return true;

@@ -2239,19 +2239,19 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
     bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
 
     if (damage.data.bSyncDoors)
-        for (unsigned int i = 0; i < MAX_DOORS; ++i)
+        for (unsigned char i = 0; i < MAX_DOORS; ++i)
             pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i], flyingComponents);
 
     if (damage.data.bSyncWheels)
-        for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+        for (unsigned char i = 0; i < MAX_WHEELS; ++i)
             pVehicle->SetWheelStatus(i, damage.data.wheels.data.ucStates[i]);
 
     if (damage.data.bSyncPanels)
-        for (unsigned int i = 0; i < MAX_PANELS; ++i)
+        for (unsigned char i = 0; i < MAX_PANELS; ++i)
             pVehicle->SetPanelStatus(i, damage.data.panels.data.ucStates[i], flyingComponents);
 
     if (damage.data.bSyncLights)
-        for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+        for (unsigned char i = 0; i < MAX_LIGHTS; ++i)
             pVehicle->SetLightStatus(i, damage.data.lights.data.ucStates[i]);
 
     static_cast<CDeathmatchVehicle*>(pVehicle)->ResetDamageModelSync();

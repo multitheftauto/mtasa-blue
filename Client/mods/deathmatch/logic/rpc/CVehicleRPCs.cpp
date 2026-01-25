@@ -456,7 +456,7 @@ void CVehicleRPCs::SetVehicleWheelStates(CClientEntity* pSource, NetBitStreamInt
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
         if (pVehicle)
         {
-            for (int i = 0; i < MAX_WHEELS; i++)
+            for (unsigned char i = 0; i < MAX_WHEELS; i++)
                 pVehicle->SetWheelStatus(i, ucWheelStates[i], false);
         }
     }

@@ -1929,7 +1929,7 @@ bool CLuaPedDefs::SetPedFightingStyle(CClientEntity* const entity, const unsigne
     if (style < 4 || style > 16)
         throw std::invalid_argument("Style can only be between 4 and 16");
 
-    return CStaticFunctionDefinitions::SetPedFightingStyle(*entity, style);
+    return CStaticFunctionDefinitions::SetPedFightingStyle(*entity, static_cast<unsigned char>(style));
 }
 
 int CLuaPedDefs::SetPedLookAt(lua_State* luaVM)

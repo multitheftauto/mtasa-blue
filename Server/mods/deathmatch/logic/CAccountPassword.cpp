@@ -132,7 +132,6 @@ SString CAccountPassword::GenerateSalt()
 {
     char randomData[16];
     g_pNetServer->GenerateRandomData(randomData, sizeof(randomData));
-    randomData[8] = rand();
 
     SString strSalt = ConvertDataToHexString(randomData, sizeof(randomData));
 

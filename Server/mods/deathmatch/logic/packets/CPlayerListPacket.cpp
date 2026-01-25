@@ -191,7 +191,10 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.Write(pVehicle->GetID());
 
                 SOccupiedSeatSync seat;
-                seat.data.ucSeat = pPlayer->GetOccupiedVehicleSeat();
+                {
+                    const uint uiSeat = pPlayer->GetOccupiedVehicleSeat();
+                    seat.data.ucSeat = uiSeat <= 0xFF ? static_cast<unsigned char>(uiSeat) : 0xFF;
+                }
                 BitStream.Write(&seat);
             }
             else
@@ -214,10 +217,10 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
             alpha.data.ucAlpha = pPlayer->GetAlpha();
             BitStream.Write(&alpha);
 
-            BitStream.Write(pPlayer->GetInterior());
+            BitStream.Write(static_cast<unsigned char>(pPlayer->GetInterior()));
 
             // Write the weapons of the player weapon slots
-            for (unsigned int i = 0; i < 16; ++i)
+            for (unsigned char i = 0; i < 16; ++i)
             {
                 CWeapon* pWeapon = pPlayer->GetWeapon(i);
                 if (pWeapon && pWeapon->ucType != 0)

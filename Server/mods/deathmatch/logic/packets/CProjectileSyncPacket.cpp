@@ -101,7 +101,8 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.WriteBit(true);
         BitStream.Write(m_pSourceElement->GetID());
 
-        unsigned short usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        const unsigned int   uiPing = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        const unsigned short usLatency = uiPing <= 0xFFFF ? static_cast<unsigned short>(uiPing) : 0xFFFF;
         BitStream.WriteCompressed(usLatency);
     }
     else

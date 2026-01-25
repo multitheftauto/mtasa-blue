@@ -88,7 +88,7 @@ void CGUIFont_Impl::SetNativeResolution(int iX, int iY)
 float CGUIFont_Impl::GetCharacterWidth(int iChar, float fScale)
 {
     char szBuf[2];
-    szBuf[0] = iChar;
+    szBuf[0] = static_cast<char>(iChar);
     szBuf[1] = 0;
 
     return m_pFont->getTextExtent(szBuf, fScale);

@@ -100,7 +100,7 @@ CGameSA::CGameSA()
         // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
         for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
         {
-            ObjectGroupsInfo[i].SetGroup(i);
+            ObjectGroupsInfo[i].SetGroup(static_cast<unsigned char>(i));
         }
 
         m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
@@ -361,7 +361,11 @@ void CGameSA::Pause(bool bPaused)
 
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
-    if (dwModelID < GetCountOfAllFileIDs())
+    const int32_t count = GetCountOfAllFileIDs();
+    if (count <= 0)
+        return nullptr;
+
+    if (dwModelID < static_cast<DWORD>(count))
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
         {
@@ -853,25 +857,25 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     MemPut((void*)0x856BFD, aCannons);      // 0x856BFC
 
     // CWaterCannons::Init
-    MemPut<BYTE>(0x728C88, newLimit);
+    MemPut<BYTE>(0x728C88, static_cast<BYTE>(newLimit));
 
     // CWaterCannons::Update
-    MemPut<BYTE>(0x72A3F2, newLimit);
+    MemPut<BYTE>(0x72A3F2, static_cast<BYTE>(newLimit));
 
     // CWaterCanons::UpdateOne
-    MemPut<BYTE>(0x728CD4, newLimit);
-    MemPut<BYTE>(0x728CF6, newLimit);
-    MemPut<BYTE>(0x728CFF, newLimit);
-    MemPut<BYTE>(0x728D62, newLimit);
+    MemPut<BYTE>(0x728CD4, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x728CF6, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x728CFF, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x728D62, static_cast<BYTE>(newLimit));
 
     // CWaterCannons::Render
-    MemPutFast<BYTE>(0x729B38, newLimit);
+    MemPutFast<BYTE>(0x729B38, static_cast<BYTE>(newLimit));
 
     // 0x85542A
-    MemPut<BYTE>(0x85542B, newLimit);
+    MemPut<BYTE>(0x85542B, static_cast<BYTE>(newLimit));
 
     // 0x856BF5
-    MemPut<BYTE>(0x856BF6, newLimit);
+    MemPut<BYTE>(0x856BF6, static_cast<BYTE>(newLimit));
 
     // Free previous allocated memory
     if (!isEnabled && currentACannons != nullptr)

@@ -2103,7 +2103,7 @@ int CLuaElementDefs::SetElementInterior(lua_State* luaVM)
             }
 
             // Set the interior
-            if (CStaticFunctionDefinitions::SetElementInterior(*pEntity, uiInterior, bSetPosition, vecPosition))
+            if (CStaticFunctionDefinitions::SetElementInterior(*pEntity, static_cast<unsigned char>(uiInterior), bSetPosition, vecPosition))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;

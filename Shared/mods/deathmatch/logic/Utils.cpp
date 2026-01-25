@@ -186,17 +186,14 @@ void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector&
 
 void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
 {
-    in_addr in{};
-    in.s_addr = ulIP;
-    char* szTemp = inet_ntoa(in);
-    if (szTemp)
-    {
-        strncpy(szDottedIP, szTemp, 22);
-    }
-    else
-    {
-        szDottedIP[0] = 0;
-    }
+    const unsigned char b1 = static_cast<unsigned char>((ulIP >> 24) & 0xFF);
+    const unsigned char b2 = static_cast<unsigned char>((ulIP >> 16) & 0xFF);
+    const unsigned char b3 = static_cast<unsigned char>((ulIP >> 8) & 0xFF);
+    const unsigned char b4 = static_cast<unsigned char>(ulIP & 0xFF);
+
+    const SString str = SString("%u.%u.%u.%u", b1, b2, b3, b4);
+    strncpy(szDottedIP, str, 22);
+    szDottedIP[21] = 0;
 }
 #else
 
@@ -977,9 +974,12 @@ void RotateVector(CVector& vecLine, const CVector& vecRotation)
 
 SString LongToDottedIP(unsigned long ulIP)
 {
-    in_addr in;
-    in.s_addr = ulIP;
-    return inet_ntoa(in);
+    const unsigned char b1 = static_cast<unsigned char>((ulIP >> 24) & 0xFF);
+    const unsigned char b2 = static_cast<unsigned char>((ulIP >> 16) & 0xFF);
+    const unsigned char b3 = static_cast<unsigned char>((ulIP >> 8) & 0xFF);
+    const unsigned char b4 = static_cast<unsigned char>(ulIP & 0xFF);
+
+    return SString("%u.%u.%u.%u", b1, b2, b3, b4);
 }
 #endif
 

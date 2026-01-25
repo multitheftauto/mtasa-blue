@@ -49,9 +49,9 @@ void CTrainTrackManager::Reset()
     m_Tracks.clear();
 
     // Create default tracks
-    for (std::size_t i = 0; i < 4; ++i)
+    for (uchar trackId = 0; trackId < 4; ++trackId)
     {
         // Create train tracks
-        CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, i);
+        CreateTrainTrack(OriginalTrackNodes[trackId], true, nullptr, trackId);
     }
 }

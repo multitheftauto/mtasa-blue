@@ -42,7 +42,7 @@ void CHandlingEntrySA::Assign(const CHandlingEntry* const pEntry) noexcept
         return;
 
     // Copy the data
-    const CHandlingEntrySA* const pEntrySA = static_cast<const CHandlingEntrySA const*>(pEntry);
+    const CHandlingEntrySA* const pEntrySA = static_cast<const CHandlingEntrySA*>(pEntry);
     m_Handling = pEntrySA->m_Handling;
 }
 

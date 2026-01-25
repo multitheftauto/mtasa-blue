@@ -658,7 +658,7 @@ void DumpPlayer(CClientPlayer* pPlayer, FILE* pFile)
 
     for (uiIndex = 0; uiIndex < NUM_PLAYER_STATS; uiIndex++)
     {
-        fprintf(pFile, "Stat [%u] = %f\n", uiIndex, pPlayer->GetStat(uiIndex));
+        fprintf(pFile, "Stat [%u] = %f\n", uiIndex, pPlayer->GetStat(static_cast<unsigned short>(uiIndex)));
     }
 
     fprintf(pFile, "Streamed in: %u\n", pPlayer->IsStreamedIn());

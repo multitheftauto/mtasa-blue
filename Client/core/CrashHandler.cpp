@@ -779,7 +779,14 @@ using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, D
     const HMODULE          psapiModule = GetModuleHandleW(L"Psapi.dll");
     EnumProcessModulesExFn enumModulesEx = nullptr;
     if (psapiModule != nullptr)
-        enumModulesEx = reinterpret_cast<EnumProcessModulesExFn>(GetProcAddress(psapiModule, "EnumProcessModulesEx"));
+    {
+        const auto procAddr = GetProcAddress(psapiModule, "EnumProcessModulesEx");
+        if (procAddr)
+        {
+            static_assert(sizeof(enumModulesEx) == sizeof(procAddr), "Unexpected function pointer size");
+            std::memcpy(&enumModulesEx, &procAddr, sizeof(enumModulesEx));
+        }
+    }
 
     auto enumModules = [&](HMODULE* buffer, DWORD bufferSize, DWORD* bytesNeeded) -> BOOL
     {
@@ -1773,7 +1780,7 @@ static bool ConfigureWerLocalDumps()
     HMODULE hWer = LoadLibraryW(L"wer.dll");
     if (hWer)
     {
-        auto pfnWerRegisterAppLocalDump = reinterpret_cast<WerRegisterAppLocalDumpFn>(GetProcAddress(hWer, "WerRegisterAppLocalDump"));
+        auto pfnWerRegisterAppLocalDump = reinterpret_cast<WerRegisterAppLocalDumpFn>(reinterpret_cast<void*>(GetProcAddress(hWer, "WerRegisterAppLocalDump")));
 
         if (pfnWerRegisterAppLocalDump)
         {

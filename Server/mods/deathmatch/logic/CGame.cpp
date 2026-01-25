@@ -11,6 +11,12 @@
 
 #include "StdInc.h"
 #include "CGame.h"
+
+#ifdef WIN32
+    #include <ws2tcpip.h>
+#else
+    #include <arpa/inet.h>
+#endif
 #include "CAccessControlListManager.h"
 #include "ASE.h"
 #include "CPerfStatManager.h"
@@ -839,13 +845,21 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     if (m_pMainConfig->GetAseInternetListenEnabled())
     {
         // Check if IP is one of the most common private IP addresses
-        in_addr serverIp;
-        serverIp.s_addr = inet_addr(strServerIP);
-        uchar a = ((uchar*)&serverIp.s_addr)[0];
-        uchar b = ((uchar*)&serverIp.s_addr)[1];
-        if (a == 10 || a == 127 || (a == 169 && b == 254) || (a == 192 && b == 168))
+        in_addr serverIp{};
+#ifdef WIN32
+        const bool parsed = InetPtonA(AF_INET, strServerIP, &serverIp) == 1;
+#else
+        const bool parsed = inet_pton(AF_INET, strServerIP, &serverIp) == 1;
+#endif
+        if (parsed)
         {
-            CLogger::LogPrintf("WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP);
+            const uint32_t hostOrder = ntohl(serverIp.s_addr);
+            const uchar    a = (hostOrder >> 24) & 0xFF;
+            const uchar    b = (hostOrder >> 16) & 0xFF;
+            if (a == 10 || a == 127 || (a == 169 && b == 254) || (a == 192 && b == 168))
+            {
+                CLogger::LogPrintf("WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP);
+            }
         }
     }
 
@@ -2133,7 +2147,7 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
         pPed->CallEvent("onPedWasted", Arguments);
 
         // Reset the weapons list, because a ped loses his weapons on death
-        for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+        for (unsigned char slot = 0; slot < WEAPON_SLOTS; ++slot)
         {
             pPed->SetWeaponType(0, slot);
             pPed->SetWeaponAmmoInClip(0, slot);
@@ -2195,7 +2209,7 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         pPlayer->CallEvent("onPlayerWasted", Arguments);
 
         // Reset the weapons list, because a player loses his weapons on death
-        for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+        for (unsigned char slot = 0; slot < WEAPON_SLOTS; ++slot)
         {
             pPlayer->SetWeaponType(0, slot);
             pPlayer->SetWeaponAmmoInClip(0, slot);
@@ -3419,8 +3433,11 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             // Is he entering?
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                             {
-                                // Is he the occupant? (he must unless the client has fucked up)
-                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                const unsigned int uiOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                if (uiOccupiedSeat > 0xFF)
+                                    break;
+
+                                const unsigned char ucOccupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                                 if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
                                     // Mark him as successfully entered
@@ -5034,7 +5051,7 @@ void CGame::ProcessClientTriggeredEventSpam()
         {
             if (GetTickCount64_() - data.m_llTicks >= m_iClientTriggeredEventsIntervalMs)
             {
-                if (data.m_uiCounter > m_iMaxClientTriggeredEventsPerInterval)
+                if (data.m_uiCounter > static_cast<uint32_t>(m_iMaxClientTriggeredEventsPerInterval))
                 {
                     CLuaArguments args;
                     args.PushString(data.m_strLastEventName);

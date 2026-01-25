@@ -180,4 +180,6 @@ eFontStyle CFontSA::GetFontStyle()
         case 2:
             return eFontStyle::FONT_MENU;
     }
+
+    return eFontStyle::FONT_MENU;
 }

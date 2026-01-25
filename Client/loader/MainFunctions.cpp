@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstring>
 #include <cstdint>
 #include <iterator>
 #include <map>
@@ -781,7 +782,11 @@ void ConfigureWerDumpPath()
     HMODULE hWer = LoadLibraryW(L"wer.dll");
     if (hWer)
     {
-        auto pfnWerRegisterAppLocalDump = reinterpret_cast<WerRegisterAppLocalDumpFn>(GetProcAddress(hWer, "WerRegisterAppLocalDump"));
+        WerRegisterAppLocalDumpFn pfnWerRegisterAppLocalDump = nullptr;
+        const auto                procAddr = GetProcAddress(hWer, "WerRegisterAppLocalDump");
+        static_assert(sizeof(pfnWerRegisterAppLocalDump) == sizeof(procAddr), "Unexpected function pointer size");
+        if (procAddr)
+            std::memcpy(&pfnWerRegisterAppLocalDump, &procAddr, sizeof(pfnWerRegisterAppLocalDump));
 
         if (pfnWerRegisterAppLocalDump)
         {
@@ -1229,7 +1234,7 @@ void CheckAntiVirusStatus()
     {
         if (HMODULE wscapi = LoadLibraryW(L"Wscapi.dll"))
         {
-            return reinterpret_cast<decltype(&WscGetSecurityProviderHealth)>(GetProcAddress(wscapi, "WscGetSecurityProviderHealth"));
+            return reinterpret_cast<decltype(&WscGetSecurityProviderHealth)>(reinterpret_cast<void*>(GetProcAddress(wscapi, "WscGetSecurityProviderHealth")));
         }
         return nullptr;
     }();
