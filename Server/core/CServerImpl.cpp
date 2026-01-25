@@ -356,9 +356,9 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
         if (m_XMLLibrary.Load(PathJoin(m_strServerPath, SERVER_BIN_PATH, szXMLLibName)))
         {
-            InitNetServerInterface pfnInitNetServerInterface = nullptr;
+            InitNetServerInterface    pfnInitNetServerInterface = nullptr;
             ReleaseNetServerInterface pfnReleaseNetServerInterface = nullptr;
-            InitXMLInterface pfnInitXMLInterface = nullptr;
+            InitXMLInterface          pfnInitXMLInterface = nullptr;
 
             {
                 const auto procAddr = m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface");

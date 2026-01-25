@@ -355,8 +355,8 @@ void CPedSA::SetClothesTextureAndModel(const char* texture, const char* model, i
 
     // int __fastcall CPedClothesDesc::SetTextureAndModel(DWORD* this, int unknown, char* textureName, char* modelName, eClothesTexturePart texturePart)
     // Second argument is unused in CKeyGen::GetUppercaseKey
-    ((void(__fastcall*)(CPedClothesDesc*, int, const char*, const char*, std::uint8_t))FUNC_CPedClothesDesc__SetTextureAndModel)(clothes, 0, texture, model,
-                                                                                                                                 static_cast<std::uint8_t>(textureType));
+    ((void(__fastcall*)(CPedClothesDesc*, int, const char*, const char*, std::uint8_t))FUNC_CPedClothesDesc__SetTextureAndModel)(
+        clothes, 0, texture, model, static_cast<std::uint8_t>(textureType));
 }
 
 void CPedSA::RebuildPlayer()

@@ -2179,7 +2179,8 @@ bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::op
 {
     if (arg2.has_value() && arg3.has_value())
     {
-        const auto toInt16ColorComponent = [](float value) -> int16 {
+        const auto toInt16ColorComponent = [](float value) -> int16
+        {
             const int iValue = Round(value);
             if (iValue < 0 || iValue > 255)
                 throw std::invalid_argument("Expected a valid colour component (0-255)");
@@ -2198,7 +2199,8 @@ bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::op
             case WorldProperty::LOW_CLOUDS_COLOR:
                 return g_pMultiplayer->SetLowCloudsColor(toInt16ColorComponent(arg1), toInt16ColorComponent(arg2.value()), toInt16ColorComponent(arg3.value()));
             case WorldProperty::BOTTOM_CLOUDS_COLOR:
-                return g_pMultiplayer->SetBottomCloudsColor(toInt16ColorComponent(arg1), toInt16ColorComponent(arg2.value()), toInt16ColorComponent(arg3.value()));
+                return g_pMultiplayer->SetBottomCloudsColor(toInt16ColorComponent(arg1), toInt16ColorComponent(arg2.value()),
+                                                            toInt16ColorComponent(arg3.value()));
         }
         return false;
     }

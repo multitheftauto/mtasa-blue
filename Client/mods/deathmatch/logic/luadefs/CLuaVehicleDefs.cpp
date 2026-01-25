@@ -4434,7 +4434,8 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
     if (!CClientVehicleManager::IsStandardModel(uiModel))
         throw std::invalid_argument("Cannot change audio setting for allocated vechiles");
 
-    const auto toInt = [](float value) -> int {
+    const auto toInt = [](float value) -> int
+    {
         const int iValue = static_cast<int>(value);
         if (static_cast<float>(iValue) != value)
             throw std::invalid_argument("Expected an integer value");
@@ -4442,7 +4443,8 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
         return iValue;
     };
 
-    const auto toChar = [&toInt](float value) -> char {
+    const auto toChar = [&toInt](float value) -> char
+    {
         const int iValue = toInt(value);
         if (iValue < std::numeric_limits<char>::min() || iValue > std::numeric_limits<char>::max())
             throw std::invalid_argument("Value out of range");
@@ -4543,7 +4545,8 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const Veh
 {
     CVehicleAudioSettingsEntry& pModelSettings = pVehicle->GetOrCreateAudioSettings();
 
-    const auto toInt = [](float value) -> int {
+    const auto toInt = [](float value) -> int
+    {
         const int iValue = static_cast<int>(value);
         if (static_cast<float>(iValue) != value)
             throw std::invalid_argument("Expected an integer value");
@@ -4551,7 +4554,8 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const Veh
         return iValue;
     };
 
-    const auto toChar = [&toInt](float value) -> char {
+    const auto toChar = [&toInt](float value) -> char
+    {
         const int iValue = toInt(value);
         if (iValue < std::numeric_limits<char>::min() || iValue > std::numeric_limits<char>::max())
             throw std::invalid_argument("Value out of range");

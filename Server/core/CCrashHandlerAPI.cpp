@@ -105,7 +105,8 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
                 return (FALSE);
 
             const DWORD protect = (mbi.Protect & 0xFF);
-            const bool isExecutable = protect == PAGE_EXECUTE || protect == PAGE_EXECUTE_READ || protect == PAGE_EXECUTE_READWRITE || protect == PAGE_EXECUTE_WRITECOPY;
+            const bool  isExecutable =
+                protect == PAGE_EXECUTE || protect == PAGE_EXECUTE_READ || protect == PAGE_EXECUTE_READWRITE || protect == PAGE_EXECUTE_WRITECOPY;
             if (!isExecutable)
                 return (FALSE);
         }

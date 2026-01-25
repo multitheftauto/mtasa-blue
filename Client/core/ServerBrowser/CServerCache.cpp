@@ -66,9 +66,9 @@ public:
     ~CServerCache();
 
 protected:
-    bool         LoadServerCache();
+    bool                LoadServerCache();
     static DWORD WINAPI StaticThreadProc(LPVOID lpdwThreadParam);
-    static void  StaticSaveServerCache();
+    static void         StaticSaveServerCache();
 
     bool                              m_bListChanged;
     std::map<CCachedKey, CCachedInfo> m_ServerCachedMap;

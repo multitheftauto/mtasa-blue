@@ -2834,9 +2834,8 @@ int CVersionUpdater::_PollDownload()
                     {
                         const unsigned int uiBytesDownloaded = m_JobInfo.uiBytesDownloaded;
                         const int          iFilesize = m_JobInfo.iFilesize;
-                        const bool bIsDownloadedSizeRight =
-                            uiBytesDownloaded > 0 && iFilesize > 0 && static_cast<unsigned int>(iFilesize) >= uiBytesDownloaded;
-                        const int fDownloadedPercent =
+                        const bool bIsDownloadedSizeRight = uiBytesDownloaded > 0 && iFilesize > 0 && static_cast<unsigned int>(iFilesize) >= uiBytesDownloaded;
+                        const int  fDownloadedPercent =
                             bIsDownloadedSizeRight ? Round(static_cast<float>(uiBytesDownloaded) / static_cast<float>(iFilesize) * 100.f) : 0;
                         GetQuestionBox().SetMessage(SString(_("%3d %% completed"), fDownloadedPercent));
                     }

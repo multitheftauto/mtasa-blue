@@ -81,13 +81,13 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
                 unsigned int uiSlot = slot.data.uiSlot;
 
                 if (bWeaponCorrect)
-                        if (uiSlot != static_cast<unsigned int>(pSourcePlayer->GetWeaponSlot()))
-                        {
-                            if (uiSlot > 0xFF)
-                                return false;
+                    if (uiSlot != static_cast<unsigned int>(pSourcePlayer->GetWeaponSlot()))
+                    {
+                        if (uiSlot > 0xFF)
+                            return false;
 
-                            pSourcePlayer->SetWeaponSlot(static_cast<unsigned char>(uiSlot));
-                        }
+                        pSourcePlayer->SetWeaponSlot(static_cast<unsigned char>(uiSlot));
+                    }
 
                 // Did he have a weapon?
                 if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))

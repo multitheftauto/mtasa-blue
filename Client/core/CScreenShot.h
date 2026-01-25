@@ -22,9 +22,9 @@ public:
     static void SetPhotoSavingInsideDocuments(bool bSavePhoto) noexcept;
 
 protected:
-    static void    StartSaveThread();
-    static void    ClearBuffer();
-    static SString GetScreenshotPath();
-    static bool    IsRateLimited(bool bIsCameraShot);
+    static void         StartSaveThread();
+    static void         ClearBuffer();
+    static SString      GetScreenshotPath();
+    static bool         IsRateLimited(bool bIsCameraShot);
     static DWORD WINAPI ThreadProc(LPVOID lpdwThreadParam);
 };

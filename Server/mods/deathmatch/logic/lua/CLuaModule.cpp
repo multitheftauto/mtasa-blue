@@ -19,7 +19,7 @@ template <typename T>
 static T GetProcAddressAs(HMODULE module, const char* procName)
 {
     FARPROC proc = module ? GetProcAddress(module, procName) : nullptr;
-    T fn = nullptr;
+    T       fn = nullptr;
     static_assert(sizeof(fn) == sizeof(proc), "Unexpected function pointer size");
     if (proc)
         std::memcpy(&fn, &proc, sizeof(fn));
