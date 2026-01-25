@@ -1269,6 +1269,7 @@ bool CreateSingleInstanceMutex()
     // Use different GUID for secondary client
     const char* szGuid = IsSecondaryClient() ? MTA_GUID_CL2 : MTA_GUID;
 
+    // BUG: we don't check whether creating the hMutex succeeded
     HANDLE hMutex = CreateMutex(NULL, FALSE, TEXT(szGuid));
 
     if (GetLastError() == ERROR_ALREADY_EXISTS)
