@@ -696,7 +696,7 @@ void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBit
 
 void CVehicleRPCs::SetVehicleSmokeTrailEnabled(CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream)
 {
-    bool state = bitStream.ReadBit();
+    bool            state = bitStream.ReadBit();
     CClientVehicle* vehicle = m_pVehicleManager->Get(pSourceEntity->GetID());
     if (!vehicle)
         return;

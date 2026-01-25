@@ -295,5 +295,5 @@ enum eElementRPCFunctions
 
     SET_VEHICLE_SMOKE_TRAIL_ENABLED,
 
-    NUM_RPC_FUNCS            // Add above this line
+    NUM_RPC_FUNCS  // Add above this line
 };
