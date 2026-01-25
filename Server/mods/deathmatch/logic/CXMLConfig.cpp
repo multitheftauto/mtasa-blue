@@ -112,7 +112,7 @@ int CXMLConfig::GetRGBA(CXMLNode* pParent, const char* szKey, unsigned char& R, 
             if (!*p)
                 return INVALID_VALUE;
 
-            char* end = nullptr;
+            char*      end = nullptr;
             const long v = std::strtol(p, &end, 10);
             if (end == p)
                 return INVALID_VALUE;

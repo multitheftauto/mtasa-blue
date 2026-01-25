@@ -384,7 +384,7 @@ void CResource::Stop()
         {
             discord->ResetDiscordData();
             discord->SetPresenceState(_("In-game"), false);
-            const time_t now = time(nullptr);
+            const time_t  now = time(nullptr);
             unsigned long startTimestamp = 0;
             if (now > 0)
             {

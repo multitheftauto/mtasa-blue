@@ -701,8 +701,8 @@ bool CPixelsManager::IsPixels(const CPixels& pixels)
 ////////////////////////////////////////////////////////////////
 bool CPixelsManager::SetPlainDimensions(CPixels& pixels, uint uiWidth, uint uiHeight)
 {
-    uint        uiDataSize = pixels.GetSize();
-    char*       pData = pixels.GetData();
+    uint  uiDataSize = pixels.GetSize();
+    char* pData = pixels.GetData();
 
     if (uiWidth > 0xFFFF || uiHeight > 0xFFFF)
         return false;

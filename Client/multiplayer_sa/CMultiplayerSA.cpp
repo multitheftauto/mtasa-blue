@@ -8058,7 +8058,8 @@ static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, C
         pVehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
 
         const float fLighting = pVehicleInterface->m_fLighting;
-        const auto  ClampFloatToByte = [](float value) -> unsigned char {
+        const auto  ClampFloatToByte = [](float value) -> unsigned char
+        {
             if (value <= 0.0f)
                 return 0;
             if (value >= 255.0f)

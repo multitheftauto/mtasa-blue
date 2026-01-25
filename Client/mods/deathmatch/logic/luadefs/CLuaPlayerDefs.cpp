@@ -492,7 +492,8 @@ int CLuaPlayerDefs::SetPlayerNametagColor(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::SetPlayerNametagColor(*pPlayer, false, static_cast<unsigned char>(iR), static_cast<unsigned char>(iG), static_cast<unsigned char>(iB)))
+            if (CStaticFunctionDefinitions::SetPlayerNametagColor(*pPlayer, false, static_cast<unsigned char>(iR), static_cast<unsigned char>(iG),
+                                                                  static_cast<unsigned char>(iB)))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;

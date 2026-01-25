@@ -173,8 +173,8 @@ void CGraphStats::AddTimingPoint(const char* szName)
         uchar* p = md5.data;
         while (p[0] + p[1] + p[2] < 128)
         {
-            int f = rand() % NUMELMS(md5.data);
-            int t = rand() % 3;
+            int       f = rand() % NUMELMS(md5.data);
+            int       t = rand() % 3;
             const int newValue = std::min(255, static_cast<int>(p[t]) + static_cast<int>(p[f]) + 1);
             p[t] = static_cast<uchar>(newValue);
         }

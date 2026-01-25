@@ -970,8 +970,9 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                         // Write elapsed time & speed
                         const uint64_t nowTick = GetTickCount64_();
-                        const uint64_t elapsedMs = nowTick >= static_cast<uint64_t>(animData.startTime) ? (nowTick - static_cast<uint64_t>(animData.startTime)) : 0;
-                        const float    elapsedTime = static_cast<float>(elapsedMs);
+                        const uint64_t elapsedMs =
+                            nowTick >= static_cast<uint64_t>(animData.startTime) ? (nowTick - static_cast<uint64_t>(animData.startTime)) : 0;
+                        const float elapsedTime = static_cast<float>(elapsedMs);
                         BitStream.Write(elapsedTime);
                         BitStream.Write(animData.speed);
                     }

@@ -149,7 +149,7 @@ bool CRenderWareSA::ClothesAddFile(const char* fileData, std::size_t fileSize, c
         return false;
 
     DirectoryInfoSA entry{};
-    const size_t streamingSizeBlocks = GetSizeInBlocks(fileSize);
+    const size_t    streamingSizeBlocks = GetSizeInBlocks(fileSize);
     if (streamingSizeBlocks > 0xFFFF)
         return false;
     entry.m_streamingSize = static_cast<std::uint16_t>(streamingSizeBlocks);

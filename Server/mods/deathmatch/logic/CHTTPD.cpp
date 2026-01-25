@@ -76,20 +76,20 @@ bool CHTTPD::StartHTTPD(const char* szIP, unsigned int port)
 
         if (szIP && szIP[0])
         {
-              in_addr addr{};
-    #ifdef WIN32
-              if (InetPtonA(AF_INET, szIP, &addr) != 1)
-                 return false;
-    #else
-              if (inet_pton(AF_INET, szIP, &addr) != 1)
-                 return false;
-    #endif
-              parameters["bindip"] = static_cast<long>(addr.s_addr);
+            in_addr addr{};
+#ifdef WIN32
+            if (InetPtonA(AF_INET, szIP, &addr) != 1)
+                return false;
+#else
+            if (inet_pton(AF_INET, szIP, &addr) != 1)
+                return false;
+#endif
+            parameters["bindip"] = static_cast<long>(addr.s_addr);
         }
         else
         {
             // Bind to default;
-              parameters["bindip"] = static_cast<long>(INADDR_ANY);
+            parameters["bindip"] = static_cast<long>(INADDR_ANY);
         }
 
         parameters["mode"] = "threadpool";  // or "singlethreaded"/"threadpool"

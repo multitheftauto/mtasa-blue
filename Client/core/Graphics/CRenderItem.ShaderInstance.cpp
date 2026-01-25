@@ -222,7 +222,7 @@ bool CShaderInstance::CmpBoolValue(D3DXHANDLE hHandle, bool bValue)
 bool CShaderInstance::CmpFloatsValue(D3DXHANDLE hHandle, const float* pfValues, uint uiCount)
 {
     SShaderValue* pParam = GetParam(hHandle);
-    const uint storedCount = static_cast<unsigned char>(pParam->cCount);
+    const uint    storedCount = static_cast<unsigned char>(pParam->cCount);
     return pParam->cType == 'f' && storedCount == uiCount && memcmp(pParam->floatList, pfValues, sizeof(float) * uiCount) == 0;
 }
 
