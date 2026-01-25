@@ -526,13 +526,15 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
 {
     SString input;
     SString blockName;
-    std::vector<SString> uncompressedAnims;
+    std::vector<SString> uncompressedAnims{};
 
     CScriptArgReader argStream(luaVM);
     // Grab the IFP filename or data
     argStream.ReadString(input);
     argStream.ReadString(blockName);
-    argStream.ReadStringTable(uncompressedAnims);
+
+    if (argStream.NextIsTable())
+        argStream.ReadStringTable(uncompressedAnims);
 
     if (!argStream.HasErrors())
     {
