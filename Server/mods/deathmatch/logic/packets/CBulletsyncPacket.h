@@ -15,18 +15,11 @@
 #pragma once
 
 #include "CPacket.h"
-#include "CCommon.h"
+#include "BulletSyncData.h"
 
 class CBulletsyncPacket final : public CPacket
 {
 public:
-    static constexpr float         MIN_DISTANCE_SQ = 0.0001f;
-    static constexpr float         MAX_DISTANCE_SQ = 160000.0f;
-    static constexpr float         EPSILON = 0.0001f;
-    static constexpr float         EPSILON_SQ = EPSILON * EPSILON;
-    static constexpr unsigned char MAX_BODY_ZONE = 9;
-    static constexpr float         MAX_DAMAGE = 200.0f;
-
     CBulletsyncPacket() = default;
     explicit CBulletsyncPacket(class CPlayer* player);
 
@@ -37,24 +30,7 @@ public:
     bool Read(NetBitStreamInterface& stream) override;
     bool Write(NetBitStreamInterface& stream) const override;
 
-private:
-    bool ReadWeaponAndPositions(NetBitStreamInterface& stream);
-    bool ReadOptionalDamage(NetBitStreamInterface& stream);
-    bool ValidateTrajectory() const noexcept;
-    void ResetDamageData() noexcept;
-
-    static constexpr bool IsNaN(float value) noexcept { return value != value; }
-    static bool           IsValidVector(const CVector& vec) noexcept;
-    static bool           IsValidWeaponId(unsigned char weaponId) noexcept;
-
-public:
-    eWeaponType  m_weapon{};
-    CVector      m_start{};
-    CVector      m_end{};
-    std::uint8_t m_order{};
-    float        m_damage{};
-    std::uint8_t m_zone{};
-    ElementID    m_damaged{INVALID_ELEMENT_ID};
+    BulletSyncData m_data;
 };
 
 #endif  // __CBULLETSYNCPACKET_H

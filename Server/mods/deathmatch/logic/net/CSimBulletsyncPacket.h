@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "packets/BulletSyncData.h"
+
 class CSimBulletsyncPacket : public CSimPacket
 {
 public:
@@ -22,15 +24,5 @@ public:
     bool Write(NetBitStreamInterface& stream) const;
 
     const ElementID m_id{};
-
-    struct
-    {
-        eWeaponType  weapon = eWeaponType::WEAPONTYPE_UNARMED;
-        CVector      start{};
-        CVector      end{};
-        std::uint8_t order{};
-        float        damage{};
-        uchar        zone{};
-        ElementID    damaged = INVALID_ELEMENT_ID;
-    } m_cache;
+    BulletSyncData  m_cache;
 };

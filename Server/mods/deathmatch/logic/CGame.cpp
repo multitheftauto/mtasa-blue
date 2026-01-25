@@ -2517,7 +2517,9 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (!player || !player->IsJoined())
         return;
 
-    const auto type = static_cast<std::uint8_t>(packet.m_weapon);
+    const auto& data = packet.m_data;
+
+    const auto type = static_cast<std::uint8_t>(data.weapon);
     if (!player->HasWeaponType(type))
         return;
 
@@ -2528,11 +2530,11 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     // Note: Don't check ammo in clip here - it can be out of sync due to network timing
     // The total ammo check above is sufficient
 
-    const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
+    const auto stat = CWeaponStatManager::GetSkillStatIndex(data.weapon);
     const auto level = player->GetPlayerStat(stat);
-    auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
+    auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(data.weapon, level);
 
-    const float distanceSq = (packet.m_start - packet.m_end).LengthSquared();
+    const float distanceSq = (data.start - data.end).LengthSquared();
     const float range = stats->GetWeaponRange();
     const float rangeSq = range * range;
 
@@ -2544,19 +2546,19 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     RelayNearbyPacket(packet);
 
     CLuaArguments args;
-    args.PushNumber(packet.m_weapon);
-    args.PushNumber(packet.m_end.fX);
-    args.PushNumber(packet.m_end.fY);
-    args.PushNumber(packet.m_end.fZ);
+    args.PushNumber(data.weapon);
+    args.PushNumber(data.end.fX);
+    args.PushNumber(data.end.fY);
+    args.PushNumber(data.end.fZ);
 
-    if (packet.m_damaged == INVALID_ELEMENT_ID)
+    if (data.damaged == INVALID_ELEMENT_ID)
         args.PushNil();
     else
-        args.PushElement(CElementIDs::GetElement(packet.m_damaged));
+        args.PushElement(CElementIDs::GetElement(data.damaged));
 
-    args.PushNumber(packet.m_start.fX);
-    args.PushNumber(packet.m_start.fY);
-    args.PushNumber(packet.m_start.fZ);
+    args.PushNumber(data.start.fX);
+    args.PushNumber(data.start.fY);
+    args.PushNumber(data.start.fZ);
 
     player->CallEvent("onPlayerWeaponFire", args);
 }
