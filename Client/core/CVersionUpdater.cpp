@@ -565,7 +565,8 @@ void CVersionUpdater::DoPulse()
 void CVersionUpdater::InitiateUpdate(const SString& strType, const SString& strData, const SString& strHost)
 {
     // Disable server-initiated updates for secondary client
-    if (CCore::GetSingleton().IsSecondaryClient())
+    // TODO: or when secondary client is running
+    if (g_pCore->IsSecondaryClient())
         return;
 
 #ifdef MTA_CL2
