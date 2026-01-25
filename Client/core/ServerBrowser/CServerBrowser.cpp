@@ -1159,6 +1159,20 @@ void CServerBrowser::SetVisible(bool bVisible)
             EnsureRefreshFor(type, bAutoRefresh, bForceInitialRefresh);
         }
 
+        // Start refresh for current tab immediately to avoid first-display timing issues
+        if (m_bPendingRefresh[currentType])
+            StartRefresh(currentType);
+
+        // Populate GUI immediately from available data (cache or fresh)
+        if (CServerList* pCurrentList = GetServerList(currentType))
+        {
+            if (pCurrentList->GetServerCount() > 0 || pCurrentList->IsUpdated())
+            {
+                UpdateServerList(currentType, currentType == ServerBrowserTypes::RECENTLY_PLAYED);
+                m_ulLastUpdateTime = CClientTime::GetTime();
+            }
+        }
+
         if (m_bHistoryListDirty)
             CreateHistoryList();
 
