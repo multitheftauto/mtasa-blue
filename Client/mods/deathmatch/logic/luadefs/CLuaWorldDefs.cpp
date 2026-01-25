@@ -178,6 +178,11 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
                                                                              {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
 
+        // Grass draw distance functions
+        {"getGrassDrawDistance", ArgumentParser<GetGrassDrawDistance>},
+        {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
+        {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
+
     // Add functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
