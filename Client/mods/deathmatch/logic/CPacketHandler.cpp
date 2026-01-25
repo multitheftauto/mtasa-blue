@@ -2673,7 +2673,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pGame->GetWorld()->SetOcclusionsEnabled(bOcclusionsEnabled);
 
     // Grass draw distance
-    bool overrideGrassDrawDistance = false;
+    bool  overrideGrassDrawDistance = false;
     float grassCloseDistance, grassFarDistance;
     if (!bitStream.ReadBit(overrideGrassDrawDistance))
         return;

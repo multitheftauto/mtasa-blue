@@ -92,8 +92,8 @@ public:
     LUA_DECLARE(SetFogDistance);
     LUA_DECLARE(ResetFogDistance);
     static CLuaMultiReturn<float, float> GetGrassDrawDistance();
-    static void SetGrassDrawDistance(float closeDistance, float farDistance);
-    static void ResetGrassDrawDistance();
+    static void                          SetGrassDrawDistance(float closeDistance, float farDistance);
+    static void                          ResetGrassDrawDistance();
     LUA_DECLARE(GetSunColor);
     LUA_DECLARE(SetSunColor);
     LUA_DECLARE(ResetSunColor);

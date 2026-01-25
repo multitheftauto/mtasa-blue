@@ -27,9 +27,9 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
                                bool bOverrideRainLevel, float fRainLevel, bool bOverrideSunSize, float fSunSize, bool bOverrideSunColor,
                                unsigned char ucSunCoreR, unsigned char ucSunCoreG, unsigned char ucSunCoreB, unsigned char ucSunCoronaR,
                                unsigned char ucSunCoronaG, unsigned char ucSunCoronaB, bool bOverrideWindVelocity, float fWindVelX, float fWindVelY,
-                               float fWindVelZ, bool bOverrideFarClipDistance, float fFarClip, bool bOverrideFogDistance, float fFogDistance, float fAircraftMaxHeight,
-                               float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize, bool overrideGrassDrawDistance, float grassCloseDistance,
-                               float grassFarDistance)
+                               float fWindVelZ, bool bOverrideFarClipDistance, float fFarClip, bool bOverrideFogDistance, float fFogDistance,
+                               float fAircraftMaxHeight, float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize, bool overrideGrassDrawDistance,
+                               float grassCloseDistance, float grassFarDistance)
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;

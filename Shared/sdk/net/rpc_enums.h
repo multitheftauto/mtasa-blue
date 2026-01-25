@@ -290,11 +290,11 @@ enum eElementRPCFunctions
     SPAWN_VEHICLE_FLYING_COMPONENT,
 
     SET_VEHICLE_NITRO_ACTIVATED,
-  
+
     SET_ELEMENT_ON_FIRE,
 
     SET_GRASS_DRAW_DISTANCE,
     RESET_GRASS_DRAW_DISTANCE,
 
-    NUM_RPC_FUNCS            // Add above this line
+    NUM_RPC_FUNCS  // Add above this line
 };

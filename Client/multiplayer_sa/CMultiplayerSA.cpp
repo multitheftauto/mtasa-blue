@@ -2075,14 +2075,14 @@ void CMultiplayerSA::SetGrassDrawDistance(float closeDistance, float farDistance
     // Store unscaled values
     m_grassCloseDistance = closeDistance;
     m_grassFarDistance = farDistance;
-    
+
     // Apply FX quality scaling
-    CGameSettings* pSettings = pGameInterface ? pGameInterface->GetSettings() : nullptr;
+    CGameSettings*     pSettings = pGameInterface ? pGameInterface->GetSettings() : nullptr;
     const unsigned int fxQuality = pSettings ? pSettings->GetFXQuality() : 2;
 
     if (fxQuality)
         farDistance /= 2.0f;
-    
+
     MemPutFast<float>(VAR_CGrassCloseDist, closeDistance);
     MemPutFast<float>(VAR_CGrassFarDist, farDistance);
 }
@@ -2100,7 +2100,7 @@ void CMultiplayerSA::ResetGrassDrawDistance()
     m_grassFarDistance = DEFAULT_GRASS_FAR_DISTANCE;
 
     // Apply FX quality scaling
-    CGameSettings* pSettings = pGameInterface ? pGameInterface->GetSettings() : nullptr;
+    CGameSettings*     pSettings = pGameInterface ? pGameInterface->GetSettings() : nullptr;
     const unsigned int fxQuality = pSettings ? pSettings->GetFXQuality() : 2;
 
     float farDistance = DEFAULT_GRASS_FAR_DISTANCE;
