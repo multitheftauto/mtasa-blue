@@ -1291,9 +1291,6 @@ bool CreateSingleInstanceMutex()
 ///////////////////////////////////////////////////////////////////////////
 void ReleaseSingleInstanceMutex()
 {
-    if (IsSecondaryClient())
-        return;
-
     // assert(g_hMutex);
     CloseHandle(g_hMutex);
     g_hMutex = NULL;
