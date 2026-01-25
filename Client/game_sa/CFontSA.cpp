@@ -183,5 +183,5 @@ eFontStyle CFontSA::GetFontStyle()
             break;
     }
 
-    return eFontStyle::FONT_PRICEDOWN;
+    return eFontStyle::FONT_MENU;
 }

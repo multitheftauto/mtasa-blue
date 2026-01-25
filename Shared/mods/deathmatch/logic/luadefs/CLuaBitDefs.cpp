@@ -68,7 +68,8 @@ int CLuaBitDefs::bitNot(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushnumber(luaVM, ~uiVar);
+        const uint uiResult = ~uiVar;
+        lua_pushnumber(luaVM, static_cast<lua_Number>(uiResult));
         return 1;
     }
     else

@@ -7241,7 +7241,7 @@ void CClientPed::RunClimbingTask()
     if (!climbEntity)
         return;
 
-    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, surfaceType, eClimbHeights::CLIMB_GRAB, false);
+    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, static_cast<unsigned char>(surfaceType), eClimbHeights::CLIMB_GRAB, false);
     if (!climbTask)
         return;
 

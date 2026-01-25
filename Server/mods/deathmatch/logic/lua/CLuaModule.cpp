@@ -11,6 +11,21 @@
 
 #include "StdInc.h"
 #include "CLuaModule.h"
+
+#include <cstring>
+
+#ifdef WIN32
+template <typename T>
+static T GetProcAddressAs(HMODULE module, const char* procName)
+{
+    FARPROC proc = module ? GetProcAddress(module, procName) : nullptr;
+    T fn = nullptr;
+    static_assert(sizeof(fn) == sizeof(proc), "Unexpected function pointer size");
+    if (proc)
+        std::memcpy(&fn, &proc, sizeof(fn));
+    return fn;
+}
+#endif
 #include "CLuaModuleManager.h"
 #include "CScriptDebugging.h"
 #include "CStaticFunctionDefinitions.h"
@@ -117,7 +132,7 @@ int CLuaModule::_LoadModule()
 
     // Find the initialisation function
 #ifdef WIN32
-    pfnInitFunc = reinterpret_cast<InitModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "InitModule")));
+    pfnInitFunc = GetProcAddressAs<InitModuleFunc>(m_hModule, "InitModule");
     if (pfnInitFunc == NULL)
     {
         CLogger::LogPrintf("MODULE: Unable to initialize %s!\n", *PathJoin(SERVER_BIN_PATH_MOD, "modules", m_szShortFileName));
@@ -135,20 +150,20 @@ int CLuaModule::_LoadModule()
     // Initialise
     m_FunctionInfo.szFileName = m_szShortFileName;
 #ifdef WIN32
-    m_FunctionInfo.DoPulse = reinterpret_cast<DefaultModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "DoPulse")));
+    m_FunctionInfo.DoPulse = GetProcAddressAs<DefaultModuleFunc>(m_hModule, "DoPulse");
     if (m_FunctionInfo.DoPulse == NULL)
         return 3;
-    m_FunctionInfo.ShutdownModule = reinterpret_cast<DefaultModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "ShutdownModule")));
+    m_FunctionInfo.ShutdownModule = GetProcAddressAs<DefaultModuleFunc>(m_hModule, "ShutdownModule");
     if (m_FunctionInfo.ShutdownModule == NULL)
         return 4;
-    m_FunctionInfo.RegisterFunctions = reinterpret_cast<RegisterModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "RegisterFunctions")));
+    m_FunctionInfo.RegisterFunctions = GetProcAddressAs<RegisterModuleFunc>(m_hModule, "RegisterFunctions");
     if (m_FunctionInfo.RegisterFunctions == NULL)
         return 5;
 
-    m_FunctionInfo.ResourceStopping = reinterpret_cast<RegisterModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "ResourceStopping")));
+    m_FunctionInfo.ResourceStopping = GetProcAddressAs<RegisterModuleFunc>(m_hModule, "ResourceStopping");
     // No error for backward compatibility
     // if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
-    m_FunctionInfo.ResourceStopped = reinterpret_cast<RegisterModuleFunc>(static_cast<void*>(GetProcAddress(m_hModule, "ResourceStopped")));
+    m_FunctionInfo.ResourceStopped = GetProcAddressAs<RegisterModuleFunc>(m_hModule, "ResourceStopped");
     // if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
 #else
     m_FunctionInfo.DoPulse = reinterpret_cast<DefaultModuleFunc>(dlsym(m_hModule, "DoPulse"));

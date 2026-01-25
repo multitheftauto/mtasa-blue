@@ -14,6 +14,8 @@
 #include "profiler/SharedUtil.Profiler.h"
 #include "CServerIdManager.h"
 
+#include <limits>
+
 using namespace std;
 
 extern CClientGame* g_pClientGame;
@@ -382,7 +384,16 @@ void CResource::Stop()
         {
             discord->ResetDiscordData();
             discord->SetPresenceState(_("In-game"), false);
-            discord->SetPresenceStartTimestamp(static_cast<unsigned long>(time(nullptr)));
+            const time_t now = time(nullptr);
+            unsigned long startTimestamp = 0;
+            if (now > 0)
+            {
+                const auto maxValue = std::numeric_limits<unsigned long>::max();
+                const auto nowUnsigned = static_cast<unsigned long long>(now);
+                startTimestamp = (nowUnsigned > maxValue) ? maxValue : static_cast<unsigned long>(now);
+            }
+
+            discord->SetPresenceStartTimestamp(startTimestamp);
             discord->UpdatePresence();
         }
     }

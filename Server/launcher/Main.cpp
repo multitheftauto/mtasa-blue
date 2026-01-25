@@ -131,7 +131,10 @@ int main(int argc, char* argv[])
     {
         // Grab the entrypoint
         typedef int(Main_t)(int, char*[]);
-        Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>(Core.GetProcedureAddress("Run"));
+        Main_t*   pfnEntryPoint = nullptr;
+        const auto procAddr = Core.GetProcedureAddress("Run");
+        static_assert(sizeof(pfnEntryPoint) == sizeof(procAddr), "Unexpected function pointer size");
+        std::memcpy(&pfnEntryPoint, &procAddr, sizeof(pfnEntryPoint));
         if (pfnEntryPoint)
         {
             // Call it and return what it returns

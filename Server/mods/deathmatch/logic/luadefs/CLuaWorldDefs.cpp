@@ -120,11 +120,11 @@ int CLuaWorldDefs::getTime(lua_State* luaVM)
 
 int CLuaWorldDefs::getWeather(lua_State* luaVM)
 {
-    unsigned char ucWeather, ucWeatherBlendingTo;
+    unsigned char ucWeather;
+    unsigned char ucWeatherBlendingTo;
     if (CStaticFunctionDefinitions::GetWeather(ucWeather, ucWeatherBlendingTo))
     {
         lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeather));
-
         if (ucWeatherBlendingTo != 0xFF)
             lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeatherBlendingTo));
         else

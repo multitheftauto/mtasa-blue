@@ -25,6 +25,8 @@ CONDITIONAL COMPILATION :
 
 #include "StdInc.h"
 #include "CCrashHandlerAPI.h"
+
+#include <cstring>
 #ifdef WIN32
 
     #ifdef _M_IX86
@@ -89,9 +91,23 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
     }
     else
     {
-        if (TRUE == IsBadCodePtr(reinterpret_cast<FARPROC>(static_cast<void*>(pFn))))
         {
-            return (FALSE);
+            const void* address = nullptr;
+            static_assert(sizeof(address) == sizeof(pFn), "Unexpected function pointer size");
+            std::memcpy(&address, &pFn, sizeof(address));
+
+            MEMORY_BASIC_INFORMATION mbi{};
+            if (VirtualQuery(address, &mbi, sizeof(mbi)) != sizeof(mbi))
+                return (FALSE);
+            if (mbi.State != MEM_COMMIT)
+                return (FALSE);
+            if ((mbi.Protect & PAGE_GUARD) || (mbi.Protect & PAGE_NOACCESS))
+                return (FALSE);
+
+            const DWORD protect = (mbi.Protect & 0xFF);
+            const bool isExecutable = protect == PAGE_EXECUTE || protect == PAGE_EXECUTE_READ || protect == PAGE_EXECUTE_READWRITE || protect == PAGE_EXECUTE_WRITECOPY;
+            if (!isExecutable)
+                return (FALSE);
         }
         g_pfnCallBack = pFn;
 
@@ -163,7 +179,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
             // it got unloaded. If some other function loaded
             // back into the same address, however, there isn't much
             // I can do.
-            if (FALSE == IsBadCodePtr(reinterpret_cast<FARPROC>(static_cast<void*>(g_pfnCallBack))))
+            if (FALSE == IsBadCodePtr(reinterpret_cast<FARPROC>(reinterpret_cast<void*>(g_pfnCallBack))))
             {
                 lRet = g_pfnCallBack(pExPtrs);
             }

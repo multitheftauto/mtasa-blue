@@ -1273,8 +1273,8 @@ static RwTexDictionaryGetCurrent_t pfnRwTexDictionaryGetCurrentForMisc39 = (RwTe
 // Trampoline to call the ORIGINAL RwTexDictionaryFindNamedTexture at 0x7F39F0,
 // thereby working around HOOK_CrashFix_Misc33.
 // Replicates the 5 overwritten bytes (mov eax,[esp+4]; push ebx) then jumps to 0x7F39F5.
-static constexpr DWORD        AddrFindNamedTexture_Continue = 0x7F39F5;
-static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
+static constexpr DWORD AddrFindNamedTexture_Continue = 0x7F39F5;
+static void _declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
@@ -1295,7 +1295,8 @@ static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
     if (name == nullptr)
         return nullptr;
 
-    const auto RwTexDictionaryFindNamedTexture = reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(TrampolineRwTexDictionaryFindNamedTexture);
+    const auto RwTexDictionaryFindNamedTexture = reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(
+        reinterpret_cast<void*>(TrampolineRwTexDictionaryFindNamedTexture));
     const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
 
     RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
@@ -1530,7 +1531,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc35()
     __asm
     {
         cmp     eax, NUM_LOWMEM_THRESHOLD_ASM
-        jb      abort
+        jb      abort_35
 
         push    eax
         push    ecx
@@ -1543,13 +1544,13 @@ static void __declspec(naked) HOOK_CrashFix_Misc35()
         pop     edx
         pop     ecx
         pop     eax
-        jz      abort
+        jz      abort_35
 
         mov     esi, [eax]
         add     eax, 0FFFFFFF8h
         jmp     RETURN_CrashFix_Misc35
 
-    abort:
+    abort_35:
         push    35
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc35_Abort
@@ -1579,14 +1580,14 @@ static void __declspec(naked) HOOK_CrashFix_Misc36()
     __asm
     {
         cmp     ebx, NUM_LOWMEM_THRESHOLD_ASM
-        jb      abort
+        jb      abort_36
 
         // Replicate original code
         lea     eax, [ebx-8]
         lea     ecx, [eax+10h]
 
         cmp     ecx, NUM_LOWMEM_THRESHOLD_ASM
-        jb      abort
+        jb      abort_36
 
         push    eax
         push    ecx
@@ -1599,12 +1600,12 @@ static void __declspec(naked) HOOK_CrashFix_Misc36()
         pop     edx
         pop     ecx
         pop     eax
-        jz      abort
+        jz      abort_36
 
         // Continue to original code at test ecx, ecx
         jmp     RETURN_CrashFix_Misc36
 
-    abort:
+    abort_36:
         push    36
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc36_Abort

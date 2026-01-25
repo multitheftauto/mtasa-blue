@@ -331,8 +331,12 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     {
         // Network module compatibility check
         typedef unsigned long (*PFNCHECKCOMPATIBILITY)(unsigned long, unsigned long*);
-#pragma warning(suppress : 4191)
-        auto pfnCheckCompatibility = reinterpret_cast<PFNCHECKCOMPATIBILITY>(m_NetworkLibrary.GetProcedureAddress("CheckCompatibility"));
+        PFNCHECKCOMPATIBILITY pfnCheckCompatibility = nullptr;
+        {
+            const auto procAddr = m_NetworkLibrary.GetProcedureAddress("CheckCompatibility");
+            static_assert(sizeof(pfnCheckCompatibility) == sizeof(procAddr), "Unexpected function pointer size");
+            std::memcpy(&pfnCheckCompatibility, &procAddr, sizeof(pfnCheckCompatibility));
+        }
         if (!pfnCheckCompatibility || !pfnCheckCompatibility(MTA_DM_SERVER_NET_MODULE_VERSION, (unsigned long*)MTASA_VERSION_TYPE))
         {
             // net.dll doesn't like our version number
@@ -352,12 +356,25 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
         if (m_XMLLibrary.Load(PathJoin(m_strServerPath, SERVER_BIN_PATH, szXMLLibName)))
         {
-#pragma warning(push)
-#pragma warning(disable : 4191)
-            auto pfnInitNetServerInterface = (InitNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface"));
-            auto pfnReleaseNetServerInterface = (ReleaseNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("ReleaseNetServerInterface"));
-            auto pfnInitXMLInterface = (InitXMLInterface)(m_XMLLibrary.GetProcedureAddress("InitXMLInterface"));
-#pragma warning(pop)
+            InitNetServerInterface pfnInitNetServerInterface = nullptr;
+            ReleaseNetServerInterface pfnReleaseNetServerInterface = nullptr;
+            InitXMLInterface pfnInitXMLInterface = nullptr;
+
+            {
+                const auto procAddr = m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface");
+                static_assert(sizeof(pfnInitNetServerInterface) == sizeof(procAddr), "Unexpected function pointer size");
+                std::memcpy(&pfnInitNetServerInterface, &procAddr, sizeof(pfnInitNetServerInterface));
+            }
+            {
+                const auto procAddr = m_NetworkLibrary.GetProcedureAddress("ReleaseNetServerInterface");
+                static_assert(sizeof(pfnReleaseNetServerInterface) == sizeof(procAddr), "Unexpected function pointer size");
+                std::memcpy(&pfnReleaseNetServerInterface, &procAddr, sizeof(pfnReleaseNetServerInterface));
+            }
+            {
+                const auto procAddr = m_XMLLibrary.GetProcedureAddress("InitXMLInterface");
+                static_assert(sizeof(pfnInitXMLInterface) == sizeof(procAddr), "Unexpected function pointer size");
+                std::memcpy(&pfnInitXMLInterface, &procAddr, sizeof(pfnInitXMLInterface));
+            }
 
             if (pfnInitNetServerInterface && pfnInitXMLInterface)
             {

@@ -323,7 +323,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 }
                                 else if (IS_VEHICLE(pTarget))
                                 {
-                                    auto ucSubTarget = static_cast<unsigned char>(pWeapon->GetTargetWheel());
+                                    unsigned char ucSubTarget = static_cast<unsigned char>(pWeapon->GetTargetWheel());
                                     BitStream.WriteBits(&ucSubTarget, 4);  // 4 bits = 8 possible values.
                                 }
                                 break;
@@ -365,10 +365,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(weaponConfig.flags.bSeeThroughStuff);
                         BitStream.WriteBit(weaponConfig.flags.bShootThroughStuff);
 
-                        auto          usAmmo = static_cast<unsigned short>(pWeapon->GetAmmo());
-                        auto          usClipAmmo = static_cast<unsigned short>(pWeapon->GetAmmo());
-                        ElementID     OwnerID = pWeapon->GetOwner() == NULL ? INVALID_ELEMENT_ID : pWeapon->GetOwner()->GetID();
-                        unsigned char ucWeaponState = pWeapon->GetWeaponState();
+                        unsigned short usAmmo = static_cast<unsigned short>(pWeapon->GetAmmo());
+                        unsigned short usClipAmmo = static_cast<unsigned short>(pWeapon->GetAmmo());
+                        ElementID      OwnerID = pWeapon->GetOwner() == NULL ? INVALID_ELEMENT_ID : pWeapon->GetOwner()->GetID();
+                        unsigned char  ucWeaponState = static_cast<unsigned char>(pWeapon->GetWeaponState());
                         BitStream.WriteBits(&ucWeaponState, 4);  // 4 bits = 8 possible values for weapon state
                         BitStream.Write(usAmmo);
                         BitStream.Write(usClipAmmo);
@@ -968,8 +968,11 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.Write(animData.blendTime);
                         BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
 
-                        // Write start time & speed
-                        BitStream.Write(static_cast<double>(animData.startTime));
+                        // Write elapsed time & speed
+                        const uint64_t nowTick = GetTickCount64_();
+                        const uint64_t elapsedMs = nowTick >= static_cast<uint64_t>(animData.startTime) ? (nowTick - static_cast<uint64_t>(animData.startTime)) : 0;
+                        const float    elapsedTime = static_cast<float>(elapsedMs);
+                        BitStream.Write(elapsedTime);
                         BitStream.Write(animData.speed);
                     }
 
