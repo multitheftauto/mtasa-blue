@@ -2540,6 +2540,9 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (distanceSq > maxRangeSq)
         return;
 
+    // Relay to nearby players
+    RelayNearbyPacket(packet);
+
     CLuaArguments args;
     args.PushNumber(packet.m_weapon);
     args.PushNumber(packet.m_end.fX);
