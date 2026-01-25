@@ -351,7 +351,7 @@ std::vector<DWORD> GetGTAProcessList()
 ///////////////////////////////////////////////////////////////////////////
 bool IsGTARunning()
 {
-    // Skip this for secondary clients/instances
+    // Skip this for secondary clients
     if (IsSecondaryClientRunning())
         return false;
 
@@ -367,7 +367,7 @@ bool IsGTARunning()
 ///////////////////////////////////////////////////////////////////////////
 void TerminateGTAIfRunning()
 {
-    // Skip this for secondary clients/instances
+    // Skip this for secondary clients
     if (IsSecondaryClient() || IsSecondaryClientRunning())
         return;
 
