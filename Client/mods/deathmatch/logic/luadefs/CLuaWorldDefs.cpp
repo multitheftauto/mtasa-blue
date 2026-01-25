@@ -140,43 +140,43 @@ void CLuaWorldDefs::LoadFunctions()
         {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
         {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},
 
-        // World reset funcs
-        {"resetColorFilter", ArgumentParser<ResetColorFilter>},
-        {"resetCoronaReflectionsEnabled", ArgumentParser<ResetCoronaReflectionsEnabled>},
-        {"resetSkyGradient", ResetSkyGradient},
-        {"resetHeatHaze", ResetHeatHaze},
-        {"resetWindVelocity", ResetWindVelocity},
-        {"resetRainLevel", ResetRainLevel},
-        {"resetFarClipDistance", ResetFarClipDistance},
-        {"resetNearClipDistance", ResetNearClipDistance},
-        {"resetVehiclesLODDistance", ResetVehiclesLODDistance},
-        {"resetPedsLODDistance", ResetPedsLODDistance},
-        {"resetFogDistance", ResetFogDistance},
-        {"resetSunColor", ResetSunColor},
-        {"resetSunSize", ResetSunSize},
-        {"resetMoonSize", ResetMoonSize},
-        {"resetBlurLevel", ResetBlurLevel},
-        {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
-        {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
-        {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
-        {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
-        {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},
+                                                                             // World reset funcs
+                                                                             {"resetColorFilter", ArgumentParser<ResetColorFilter>},
+                                                                             {"resetCoronaReflectionsEnabled", ArgumentParser<ResetCoronaReflectionsEnabled>},
+                                                                             {"resetSkyGradient", ResetSkyGradient},
+                                                                             {"resetHeatHaze", ResetHeatHaze},
+                                                                             {"resetWindVelocity", ResetWindVelocity},
+                                                                             {"resetRainLevel", ResetRainLevel},
+                                                                             {"resetFarClipDistance", ResetFarClipDistance},
+                                                                             {"resetNearClipDistance", ResetNearClipDistance},
+                                                                             {"resetVehiclesLODDistance", ResetVehiclesLODDistance},
+                                                                             {"resetPedsLODDistance", ResetPedsLODDistance},
+                                                                             {"resetFogDistance", ResetFogDistance},
+                                                                             {"resetSunColor", ResetSunColor},
+                                                                             {"resetSunSize", ResetSunSize},
+                                                                             {"resetMoonSize", ResetMoonSize},
+                                                                             {"resetBlurLevel", ResetBlurLevel},
+                                                                             {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
+                                                                             {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
+                                                                             {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
+                                                                             {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
+                                                                             {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},    
+      
+                                                                             // World check funcs
+                                                                             {"areTrafficLightsLocked", AreTrafficLightsLocked},
+                                                                             {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
+                                                                             {"isLineOfSightClear", IsLineOfSightClear},
+                                                                             {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
+                                                                             {"isGarageOpen", IsGarageOpen},
+                                                                             {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
+                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
+                                                                             {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>},
+                                                                             {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>},
 
-        // World check funcs
-        {"areTrafficLightsLocked", AreTrafficLightsLocked},
-        {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
-        {"isLineOfSightClear", IsLineOfSightClear},
-        {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
-        {"isGarageOpen", IsGarageOpen},
-        {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
-        {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
-        {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>},
-        {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>},
-
-        // Grass draw distance functions
-        {"getGrassDrawDistance", ArgumentParser<GetGrassDrawDistance>},
-        {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
-        {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
+                                                                             // Grass draw distance functions
+                                                                             {"getGrassDrawDistance", ArgumentParser<GetGrassDrawDistance>},
+                                                                             {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
+                                                                             {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
