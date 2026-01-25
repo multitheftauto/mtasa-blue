@@ -954,8 +954,8 @@ void CGameSA::SetVehicleBurnBlowUpEnabled(bool isEnabled)
 
     if (isEnabled)
     {
-        MemCpy((void*)0x6A72B5, "\x0F\x84\x7F\x01\x00\x00", 6);        // if ( this->m_nBurnTimer > 5000.0 )
-        MemCpy((void*)0x6A7166, "\x0F\x84\x87\x00\x00\x00", 6);        // if ( v6 <= 5000.0 )
+        MemCpy((void*)0x6A72B5, "\x0F\x84\x7F\x01\x00\x00", 6);  // if ( this->m_nBurnTimer > 5000.0 )
+        MemCpy((void*)0x6A7166, "\x0F\x84\x87\x00\x00\x00", 6);  // if ( v6 <= 5000.0 )
     }
     else
     {
