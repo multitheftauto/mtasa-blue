@@ -894,7 +894,7 @@ void CCore::ApplyHooks()
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
     DetourLibraryFunction("kernel32.dll", "LoadLibraryA", Win32LoadLibraryA, SkipDirectPlay_LoadLibraryA);
 
-    // Special thanks for botder too [https://github.com/multitheftauto/mtasa-blue/commit/b08948fcf46746c9d74503a0889996575f93cde5]
+#ifdef MTA_CL2
     // Disable code that disallows multiple instances of GTA:SA
     // Disable `if (IsAppAlreadyRunning())` in WinMain
     {
@@ -910,6 +910,7 @@ void CCore::ApplyHooks()
         memcpy(reinterpret_cast<void*>(0x406945), "\x6A\x00\x90\x90\x90", 5);
         VirtualProtect(reinterpret_cast<void*>(0x406945), 5, oldProtect, &oldProtect);
     }
+#endif
 }
 
 bool UsingAltD3DSetup()
