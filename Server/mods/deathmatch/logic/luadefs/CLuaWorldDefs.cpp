@@ -100,11 +100,6 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
                                                                              {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
 
-        // Grass draw distance functions
-        {"getGrassDrawDistance", ArgumentParser<GetGrassDrawDistance>},
-        {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
-        {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
-
     // Add functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
@@ -215,7 +210,7 @@ int CLuaWorldDefs::getFPSLimit(lua_State* luaVM)
     // int getFPSLimit ()
     std::uint16_t fpsLimit;
     CStaticFunctionDefinitions::GetFPSLimit(fpsLimit);
-
+    
     lua_pushnumber(luaVM, fpsLimit);
     return 1;
 }
@@ -1480,11 +1475,7 @@ int CLuaWorldDefs::getOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties,
-                                         std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds,
-                                         std::optional<bool> resetGlitches, std::optional<bool> resetJetpackWeapons) noexcept
+void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds, std::optional<bool> resetGlitches, std::optional<bool> resetJetpackWeapons) noexcept
 {
-    g_pGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true),
-                                                      resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true),
-                                                      resetGlitches.value_or(true), resetJetpackWeapons.value_or(true)});
+    g_pGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true), resetGlitches.value_or(true), resetJetpackWeapons.value_or(true)});
 }
