@@ -45,7 +45,7 @@ namespace
         // Set up memory allocation failure handler for CEF processes
         SharedUtil::SetMemoryAllocationFailureHandler();
     }
-}            // namespace
+}  // namespace
 
 //
 // DLL export: Initialize the web browser subsystem

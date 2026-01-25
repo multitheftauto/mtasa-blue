@@ -70,12 +70,12 @@ enum eFontQuality
     FONT_QUALITY_DRAFT = DRAFT_QUALITY,
     FONT_QUALITY_PROOF = PROOF_QUALITY,
 
-#if( WINVER >= 0x0400 )
+#if (WINVER >= 0x0400)
     FONT_QUALITY_NONANTIALIASED = NONANTIALIASED_QUALITY,
     FONT_QUALITY_ANTIALIASED = ANTIALIASED_QUALITY,
 #endif
 
-#if( _WIN32_WINNT >= _WIN32_WINNT_WINXP )
+#if (_WIN32_WINNT >= _WIN32_WINNT_WINXP)
     FONT_QUALITY_CLEARTYPE = CLEARTYPE_QUALITY,
     FONT_QUALITY_CLEARTYPE_NATURAL = CLEARTYPE_NATURAL_QUALITY,
 #endif
@@ -88,10 +88,10 @@ namespace EBlendMode
     enum EBlendModeType
     {
         NONE,
-        BLEND,                   // Alpha blend
-        ADD,                     // Color add                          (used for making composite textures with a premultiplied source)
-        MODULATE_ADD,            // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
-        OVERWRITE,               // Blat everything
+        BLEND,         // Alpha blend
+        ADD,           // Color add                          (used for making composite textures with a premultiplied source)
+        MODULATE_ADD,  // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
+        OVERWRITE,     // Blat everything
     };
 }
 using EBlendMode::EBlendModeType;
@@ -152,11 +152,13 @@ public:
     // Queued up drawing
     virtual void DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, unsigned long ulColor, bool bPostGUI) = 0;
 
-    virtual void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, eRenderStage stage = eRenderStage::PRE_FX) = 0;
+    virtual void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor,
+                                  eRenderStage stage = eRenderStage::PRE_FX) = 0;
 
     virtual void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
                                           float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bFlipUV = false,
-                                          bool bUseFaceToward = false, const CVector& vecFaceToward = CVector(), eRenderStage renderStage = eRenderStage::POST_FX) = 0;
+                                          bool bUseFaceToward = false, const CVector& vecFaceToward = CVector(),
+                                          eRenderStage renderStage = eRenderStage::POST_FX) = 0;
 
     virtual void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false) = 0;
 

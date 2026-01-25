@@ -244,7 +244,7 @@ namespace
         static SMemStatsInfo* pZeroed = new SMemStatsInfo();
         memStats = *pZeroed;
     }
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -407,7 +407,7 @@ void CMemStats::Draw()
 ///////////////////////////////////////////////////////////////
 void CMemStats::UpdateFrameStats()
 {
-    m_MemStatsNow.d3dMemory = g_pDeviceState->MemoryState;
+    m_MemStatsNow.d3dMemory = g_StaticMemoryState;
 
     static CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {&m_MemStatsNow.d3dMemory.StaticVertexBuffer,
                                                                       &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
@@ -454,8 +454,8 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
     //
     // Update 'now' state
     //
-    memStatsInfo.d3dMemory = g_pDeviceState->MemoryState;
-    memStatsInfo.frameStats = g_pDeviceState->FrameStats;
+    memStatsInfo.d3dMemory = g_StaticMemoryState;
+    memStatsInfo.frameStats = g_pDeviceState ? g_pDeviceState->FrameStats : CProxyDirect3DDevice9::SFrameStats{};
 
     g_pGraphics->GetRenderItemManager()->GetDxStatus(memStatsInfo.dxStatus);
 
@@ -482,7 +482,7 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
     for (uint i = 0; i < RRR_BASE_ID; i++)
     {
         char* pModelInfo = pFileInfoArray + 20 /* sizeof(CStreamingInfo) */ * i;
-        char  uiLoadedFlag = pModelInfo[0x10];            // CStreamingInfo.uiLoadFlag
+        char  uiLoadedFlag = pModelInfo[0x10];  // CStreamingInfo.uiLoadFlag
         if (uiLoadedFlag)
         {
             memStatsInfo.modelInfo.uiTotal++;
@@ -598,7 +598,7 @@ void CMemStats::UpdateIntervalStats()
         deltaList[i]->iCreatedBytes = nowList[i]->iCreatedBytes - prevList[i]->iCreatedBytes;
         deltaList[i]->iDestroyedCount = nowList[i]->iDestroyedCount - prevList[i]->iDestroyedCount;
         deltaList[i]->iDestroyedBytes = nowList[i]->iDestroyedBytes - prevList[i]->iDestroyedBytes;
-        deltaList[i]->iLockedCount = maxList[i]->iLockedCount;            // Use per-frame max for lock stats
+        deltaList[i]->iLockedCount = maxList[i]->iLockedCount;  // Use per-frame max for lock stats
     }
 
     m_MemStatsDelta.rwResourceStats.uiTextures = m_MemStatsNow.rwResourceStats.uiTextures - m_MemStatsPrev.rwResourceStats.uiTextures;
@@ -664,27 +664,27 @@ void CMemStats::CreateTables()
     CGame* pGame = g_pCore->GetGame();
     m_TableList.clear();
 
-//
-// Color setups
-//
-    #define YELLOW "#FFFF00"
-    #define RED "#FF0000"
-    #define BLUE "#0000FF"
-    #define WHITE "#FFFFFF"
+    //
+    // Color setups
+    //
+#define YELLOW "#FFFF00"
+#define RED    "#FF0000"
+#define BLUE   "#0000FF"
+#define WHITE  "#FFFFFF"
 
-    #define LT_RED "#FF5050"
-    #define DK_RED "#CF0000"
-    #define GREY "#808080"
-    #define LT_GREY "#C0C0C0"
-    #define INVIS "#000000"
-    #define DK_GREEN "#00CF00"
-    #define LT_GREEN "#30FF30"
-    #define PURPLE "#FF00FF"
-    #define CYAN "#00FFFF"
-    #define LT_CYAN "#00C0F0"
+#define LT_RED   "#FF5050"
+#define DK_RED   "#CF0000"
+#define GREY     "#808080"
+#define LT_GREY  "#C0C0C0"
+#define INVIS    "#000000"
+#define DK_GREEN "#00CF00"
+#define LT_GREEN "#30FF30"
+#define PURPLE   "#FF00FF"
+#define CYAN     "#00FFFF"
+#define LT_CYAN  "#00C0F0"
 
-    // Table header
-    #define HEADER1(text) LT_CYAN text WHITE
+// Table header
+#define HEADER1(text) LT_CYAN text WHITE
 
     // Cell colour depending upon the value
     SString strNumberColorsCreat = GREY "0," CYAN "999999,";

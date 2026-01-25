@@ -30,14 +30,14 @@ public:
     void OnPulse();
 
 #else
-    CSyncDebug(CClientManager* pManager){};
+    CSyncDebug(CClientManager* pManager) {};
 
-    void Unreference(CClientPlayer& Player){};
+    void Unreference(CClientPlayer& Player) {};
 
-    void Attach(CClientPlayer& Player){};
-    void Detach(){};
+    void Attach(CClientPlayer& Player) {};
+    void Detach() {};
 
-    void OnPulse(){};
+    void OnPulse() {};
 
 #endif
 

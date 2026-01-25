@@ -10,7 +10,7 @@
 #include <CMatrix_Pad.h>
 #include <CVector.h>
 
-class CSimpleTransformSAInterface            // 16 bytes
+class CSimpleTransformSAInterface  // 16 bytes
 {
 public:
     CVector m_translate;
@@ -33,6 +33,6 @@ public:
 
 public:
     CSimpleTransformSAInterface m_transform;
-    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later
+    CMatrix_Padded*             matrix;  // This is actually XYZ*, change later
 };
 static_assert(sizeof(CPlaceableSAInterface) == 0x18, "Invalid size for CPlaceableSAInterface");

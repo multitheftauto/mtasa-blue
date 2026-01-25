@@ -34,7 +34,7 @@ public:
         m_eObjectType = eObjectType;
     }
 
-    virtual ~CAccessControlListGroupObject(){};
+    virtual ~CAccessControlListGroupObject() {};
 
     static SString GenerateKey(const char* szName, EObjectType eObjectType) { return SString("%s_%d", szName, (unsigned int)eObjectType); }
 
