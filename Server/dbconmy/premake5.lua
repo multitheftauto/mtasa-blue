@@ -3,6 +3,7 @@ project "Dbconmy"
 	kind "SharedLib"
 	targetname "dbconmy"
 	targetdir(buildpath("server/mods/deathmatch"))
+	clangtidy "On"
 
 	filter "system:windows"
 		includedirs {

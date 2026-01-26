@@ -158,7 +158,7 @@ public:
 class CGame
 {
 public:
-    ZERO_ON_NEW            // To be sure everything is cleared
+    ZERO_ON_NEW  // To be sure everything is cleared
         enum {
             VEHICLE_REQUEST_IN,
             VEHICLE_NOTIFY_IN,
@@ -218,19 +218,19 @@ public:
     void SetIsFinished(bool bFinished) { m_bIsFinished = bFinished; };
     bool IsFinished() { return m_bIsFinished; };
 
-    CMainConfig*                        GetConfig() { return m_pMainConfig; }
-    CHandlingManager*                   GetHandlingManager() const noexcept { return m_HandlingManager.get(); }
-    CMapManager*                        GetMapManager() { return m_pMapManager; }
-    CPlayerManager*                     GetPlayerManager() { return m_pPlayerManager; }
-    CObjectManager*                     GetObjectManager() { return m_pObjectManager; }
-    CBuildingManager*                   GetBuildingManager() const noexcept { return m_pBuildingManager; }
-    CVehicleManager*                    GetVehicleManager() { return m_pVehicleManager; }
-    CTeamManager*                       GetTeamManager() { return m_pTeamManager; }
-    CUnoccupiedVehicleSync*             GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
-    CPedSync*                           GetPedSync() { return m_pPedSync; }
-    CRegisteredCommands*                GetRegisteredCommands() { return m_pRegisteredCommands; }
+    CMainConfig*            GetConfig() { return m_pMainConfig; }
+    CHandlingManager*       GetHandlingManager() const noexcept { return m_HandlingManager.get(); }
+    CMapManager*            GetMapManager() { return m_pMapManager; }
+    CPlayerManager*         GetPlayerManager() { return m_pPlayerManager; }
+    CObjectManager*         GetObjectManager() { return m_pObjectManager; }
+    CBuildingManager*       GetBuildingManager() const noexcept { return m_pBuildingManager; }
+    CVehicleManager*        GetVehicleManager() { return m_pVehicleManager; }
+    CTeamManager*           GetTeamManager() { return m_pTeamManager; }
+    CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
+    CPedSync*               GetPedSync() { return m_pPedSync; }
+    CRegisteredCommands*    GetRegisteredCommands() { return m_pRegisteredCommands; }
 #ifdef WITH_OBJECT_SYNC
-    CObjectSync*                        GetObjectSync() { return m_pObjectSync; }
+    CObjectSync* GetObjectSync() { return m_pObjectSync; }
 #endif
     CConsole*                           GetConsole() { return m_pConsole; }
     CDatabaseManager*                   GetDatabaseManager() { return m_pDatabaseManager; }
@@ -533,30 +533,30 @@ private:
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
 
-    CEvents                           m_Events;
-    CRemoteCalls*                     m_pRemoteCalls;
-    CHTTPD*                           m_pHTTPD;
-    CMainConfig*                      m_pMainConfig;
-    CBlipManager*                     m_pBlipManager;
-    CGroups*                          m_pGroups;
-    CColManager*                      m_pColManager;
-    CObjectManager*                   m_pObjectManager;
-    CBuildingManager*                 m_pBuildingManager;
-    CPickupManager*                   m_pPickupManager;
-    CPlayerManager*                   m_pPlayerManager;
-    CRadarAreaManager*                m_pRadarAreaManager;
-    CVehicleManager*                  m_pVehicleManager;
-    CPacketTranslator*                m_pPacketTranslator;
-    CMapManager*                      m_pMapManager;
-    CElementDeleter                   m_ElementDeleter;
-    CConnectHistory                   m_FloodProtect;
-    CLuaManager*                      m_pLuaManager;
-    CScriptDebugging*                 m_pScriptDebugging;
-    CConsole*                         m_pConsole;
-    CUnoccupiedVehicleSync*           m_pUnoccupiedVehicleSync;
-    CPedSync*                         m_pPedSync;
+    CEvents                 m_Events;
+    CRemoteCalls*           m_pRemoteCalls;
+    CHTTPD*                 m_pHTTPD;
+    CMainConfig*            m_pMainConfig;
+    CBlipManager*           m_pBlipManager;
+    CGroups*                m_pGroups;
+    CColManager*            m_pColManager;
+    CObjectManager*         m_pObjectManager;
+    CBuildingManager*       m_pBuildingManager;
+    CPickupManager*         m_pPickupManager;
+    CPlayerManager*         m_pPlayerManager;
+    CRadarAreaManager*      m_pRadarAreaManager;
+    CVehicleManager*        m_pVehicleManager;
+    CPacketTranslator*      m_pPacketTranslator;
+    CMapManager*            m_pMapManager;
+    CElementDeleter         m_ElementDeleter;
+    CConnectHistory         m_FloodProtect;
+    CLuaManager*            m_pLuaManager;
+    CScriptDebugging*       m_pScriptDebugging;
+    CConsole*               m_pConsole;
+    CUnoccupiedVehicleSync* m_pUnoccupiedVehicleSync;
+    CPedSync*               m_pPedSync;
 #ifdef WITH_OBJECT_SYNC
-    CObjectSync*                      m_pObjectSync;
+    CObjectSync* m_pObjectSync;
 #endif
     CMarkerManager*                   m_pMarkerManager;
     CClock*                           m_pClock;
@@ -666,7 +666,7 @@ private:
 
     CLightsyncManager m_lightsyncManager;
 
-    bool m_bServerFullyUp;            // No http operations should be allowed unless this is true
+    bool m_bServerFullyUp;  // No http operations should be allowed unless this is true
 
     bool      m_bLatentSendsEnabled;
     int       m_iLatentSendsBandwidth;
@@ -688,8 +688,8 @@ private:
 
     struct ClientTriggeredEventsInfo
     {
-        long long m_llTicks = 0;
-        uint32_t  m_uiCounter = 0;
+        long long   m_llTicks = 0;
+        uint32_t    m_uiCounter = 0;
         std::string m_strLastEventName;
     };
 

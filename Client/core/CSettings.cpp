@@ -20,11 +20,11 @@
 
 using namespace std;
 
-#define CORE_MTA_FILLER "cgui\\images\\mta_filler.png"
-#define CORE_SETTINGS_UPDATE_INTERVAL 30            // Settings update interval in frames
-#define CORE_SETTINGS_HEADERS 3
-#define CORE_SETTINGS_HEADER_SPACER " "
-#define CORE_SETTINGS_NO_KEY " "
+#define CORE_MTA_FILLER               "cgui\\images\\mta_filler.png"
+#define CORE_SETTINGS_UPDATE_INTERVAL 30  // Settings update interval in frames
+#define CORE_SETTINGS_HEADERS         3
+#define CORE_SETTINGS_HEADER_SPACER   " "
+#define CORE_SETTINGS_NO_KEY          " "
 
 extern CCore*              g_pCore;
 extern SBindableGTAControl g_bcControls[];
@@ -32,150 +32,147 @@ extern SBindableKey        g_bkKeys[];
 
 namespace
 {
-constexpr float kBorderlessGammaMin = 0.5f;
-constexpr float kBorderlessGammaMax = 2.0f;
-constexpr float kBorderlessGammaDefault = 0.95f;
-constexpr float kBorderlessBrightnessMin = 0.5f;
-constexpr float kBorderlessBrightnessMax = 2.0f;
-constexpr float kBorderlessBrightnessDefault = 1.03f;
-constexpr float kBorderlessContrastMin = 0.5f;
-constexpr float kBorderlessContrastMax = 2.0f;
-constexpr float kBorderlessContrastDefault = 1.0f;
-constexpr float kBorderlessSaturationMin = 0.5f;
-constexpr float kBorderlessSaturationMax = 2.0f;
-constexpr float kBorderlessSaturationDefault = 1.0f;
+    constexpr float kBorderlessGammaMin = 0.5f;
+    constexpr float kBorderlessGammaMax = 2.0f;
+    constexpr float kBorderlessGammaDefault = 0.95f;
+    constexpr float kBorderlessBrightnessMin = 0.5f;
+    constexpr float kBorderlessBrightnessMax = 2.0f;
+    constexpr float kBorderlessBrightnessDefault = 1.03f;
+    constexpr float kBorderlessContrastMin = 0.5f;
+    constexpr float kBorderlessContrastMax = 2.0f;
+    constexpr float kBorderlessContrastDefault = 1.0f;
+    constexpr float kBorderlessSaturationMin = 0.5f;
+    constexpr float kBorderlessSaturationMax = 2.0f;
+    constexpr float kBorderlessSaturationDefault = 1.0f;
 
-constexpr float kSettingsContentWidth = 680.0f;
-constexpr float kSettingsBaseContentHeight = 480.0f;
-constexpr float kSettingsWindowFrameHorizontal = 18.0f;            // 9px left + 9px right
-constexpr float kSettingsWindowFrameVertical = 22.0f;              // 20px top + 2px bottom
-constexpr float kSettingsBottomButtonAreaHeight = 38.0f;
-constexpr float kPostFxCheckboxOffset = 24.0f;
-constexpr float kSettingsTabHorizontalPadding = 20.0f;
-constexpr float kSliderValueReserve = 80.0f;
-constexpr float kSettingsSliderExtraAllowance = 0.0f;
-constexpr float kSettingsSliderMinWidth = 32.0f;
-constexpr float kSliderLabelSpacing = 6.0f;
-constexpr float kSliderLeftSpacing = 6.0f;
-constexpr float kBrowserColumnSpacing = 18.0f;
-constexpr float kBrowserColumnMinWidth = 240.0f;
+    constexpr float kSettingsContentWidth = 680.0f;
+    constexpr float kSettingsBaseContentHeight = 480.0f;
+    constexpr float kSettingsWindowFrameHorizontal = 18.0f;  // 9px left + 9px right
+    constexpr float kSettingsWindowFrameVertical = 22.0f;    // 20px top + 2px bottom
+    constexpr float kSettingsBottomButtonAreaHeight = 38.0f;
+    constexpr float kPostFxCheckboxOffset = 24.0f;
+    constexpr float kSettingsTabHorizontalPadding = 20.0f;
+    constexpr float kSliderValueReserve = 80.0f;
+    constexpr float kSettingsSliderExtraAllowance = 0.0f;
+    constexpr float kSettingsSliderMinWidth = 32.0f;
+    constexpr float kSliderLabelSpacing = 6.0f;
+    constexpr float kSliderLeftSpacing = 6.0f;
+    constexpr float kBrowserColumnSpacing = 18.0f;
+    constexpr float kBrowserColumnMinWidth = 240.0f;
 
-float NormalizeSliderValue(float value, float minValue, float maxValue)
-{
-    if (maxValue <= minValue)
-        return 0.0f;
-    return std::clamp((value - minValue) / (maxValue - minValue), 0.0f, 1.0f);
-}
+    float NormalizeSliderValue(float value, float minValue, float maxValue)
+    {
+        if (maxValue <= minValue)
+            return 0.0f;
+        return std::clamp((value - minValue) / (maxValue - minValue), 0.0f, 1.0f);
+    }
 
-float DenormalizeSliderValue(float position, float minValue, float maxValue)
-{
-    position = std::clamp(position, 0.0f, 1.0f);
-    return minValue + position * (maxValue - minValue);
-}
+    float DenormalizeSliderValue(float position, float minValue, float maxValue)
+    {
+        position = std::clamp(position, 0.0f, 1.0f);
+        return minValue + position * (maxValue - minValue);
+    }
 
-float ComputeSliderWidth(float tabWidth, float sliderX, float preferredWidth, float reservedWidth = kSliderValueReserve)
-{
-    const float totalAvailable = std::max(0.0f, tabWidth - sliderX);
-        if (totalAvailable <= 0.0f) {
+    float ComputeSliderWidth(float tabWidth, float sliderX, float preferredWidth, float reservedWidth = kSliderValueReserve)
+    {
+        const float totalAvailable = std::max(0.0f, tabWidth - sliderX);
+        if (totalAvailable <= 0.0f)
+        {
             return 0.0f;
         }
 
-    const float clampedReserve = std::clamp(reservedWidth, 0.0f, totalAvailable);
-    const float spaceForSlider = totalAvailable - clampedReserve;
+        const float clampedReserve = std::clamp(reservedWidth, 0.0f, totalAvailable);
+        const float spaceForSlider = totalAvailable - clampedReserve;
 
-    float width = 0.0f;
-    if (spaceForSlider >= preferredWidth)
-    {
-        width = std::min(spaceForSlider, preferredWidth + kSettingsSliderExtraAllowance);
-    }
-    else if (spaceForSlider > 0.0f)
-    {
-        width = spaceForSlider;
-    }
-    else
-    {
-        width = std::min(preferredWidth, totalAvailable);
-    }
-
-    if (width > 0.0f && width < kSettingsSliderMinWidth)
-        width = std::min(std::max(width, kSettingsSliderMinWidth), totalAvailable);
-
-    return width;
-}
-
-void FinalizeSliderRow(float tabWidth,
-                       CGUIScrollBar* slider,
-                       CGUILabel* valueLabel,
-                       float preferredWidth,
-                       float labelSpacing = kSliderLabelSpacing,
-                       CGUILabel* textLabel = nullptr)
-{
-    if (!slider)
-        return;
-
-    CVector2D sliderPos;
-    slider->GetPosition(sliderPos);
-
-    if (textLabel)
-    {
-        CVector2D textPos;
-        textLabel->GetPosition(textPos);
-        CVector2D textSize;
-        textLabel->GetSize(textSize);
-        const float minSliderX = textPos.fX + textSize.fX + kSliderLeftSpacing;
-        if (sliderPos.fX < minSliderX)
+        float width = 0.0f;
+        if (spaceForSlider >= preferredWidth)
         {
-            sliderPos.fX = minSliderX;
+            width = std::min(spaceForSlider, preferredWidth + kSettingsSliderExtraAllowance);
+        }
+        else if (spaceForSlider > 0.0f)
+        {
+            width = spaceForSlider;
+        }
+        else
+        {
+            width = std::min(preferredWidth, totalAvailable);
+        }
+
+        if (width > 0.0f && width < kSettingsSliderMinWidth)
+            width = std::min(std::max(width, kSettingsSliderMinWidth), totalAvailable);
+
+        return width;
+    }
+
+    void FinalizeSliderRow(float tabWidth, CGUIScrollBar* slider, CGUILabel* valueLabel, float preferredWidth, float labelSpacing = kSliderLabelSpacing,
+                           CGUILabel* textLabel = nullptr)
+    {
+        if (!slider)
+            return;
+
+        CVector2D sliderPos;
+        slider->GetPosition(sliderPos);
+
+        if (textLabel)
+        {
+            CVector2D textPos;
+            textLabel->GetPosition(textPos);
+            CVector2D textSize;
+            textLabel->GetSize(textSize);
+            const float minSliderX = textPos.fX + textSize.fX + kSliderLeftSpacing;
+            if (sliderPos.fX < minSliderX)
+            {
+                sliderPos.fX = minSliderX;
+                slider->SetPosition(CVector2D(sliderPos.fX, sliderPos.fY));
+            }
+        }
+
+        float     reservedWidth = 0.0f;
+        CVector2D labelSize;
+        if (valueLabel)
+        {
+            valueLabel->GetSize(labelSize);
+            reservedWidth = std::max(0.0f, labelSize.fX + labelSpacing);
+        }
+        else
+        {
+            reservedWidth = std::max(0.0f, labelSpacing);
+        }
+
+        const float maxSliderStart = std::max(0.0f, tabWidth - reservedWidth - kSettingsSliderMinWidth);
+        if (sliderPos.fX > maxSliderStart)
+        {
+            sliderPos.fX = maxSliderStart;
             slider->SetPosition(CVector2D(sliderPos.fX, sliderPos.fY));
         }
+
+        float targetWidth = ComputeSliderWidth(tabWidth, sliderPos.fX, preferredWidth, reservedWidth);
+        if (targetWidth <= 0.0f)
+            targetWidth = std::max(0.0f, tabWidth - sliderPos.fX - reservedWidth);
+
+        CVector2D sliderSize;
+        slider->GetSize(sliderSize);
+        if (sliderSize.fY <= 0.0f)
+            sliderSize.fY = 20.0f;
+        sliderSize.fX = targetWidth;
+        slider->SetSize(sliderSize);
+
+        if (!valueLabel)
+            return;
+
+        if (labelSize.fX <= 0.0f)
+            valueLabel->GetSize(labelSize);
+
+        CVector2D labelPos;
+        valueLabel->GetPosition(labelPos);
+        labelPos.fX = sliderPos.fX + targetWidth + labelSpacing;
+
+        const float maxLabelX = std::max(0.0f, tabWidth - labelSize.fX);
+        if (labelPos.fX > maxLabelX)
+            labelPos.fX = maxLabelX;
+
+        valueLabel->SetPosition(labelPos);
     }
-
-    float reservedWidth = 0.0f;
-    CVector2D labelSize;
-    if (valueLabel)
-    {
-        valueLabel->GetSize(labelSize);
-        reservedWidth = std::max(0.0f, labelSize.fX + labelSpacing);
-    }
-    else
-    {
-        reservedWidth = std::max(0.0f, labelSpacing);
-    }
-
-    const float maxSliderStart = std::max(0.0f, tabWidth - reservedWidth - kSettingsSliderMinWidth);
-    if (sliderPos.fX > maxSliderStart)
-    {
-        sliderPos.fX = maxSliderStart;
-        slider->SetPosition(CVector2D(sliderPos.fX, sliderPos.fY));
-    }
-
-    float targetWidth = ComputeSliderWidth(tabWidth, sliderPos.fX, preferredWidth, reservedWidth);
-    if (targetWidth <= 0.0f)
-        targetWidth = std::max(0.0f, tabWidth - sliderPos.fX - reservedWidth);
-
-    CVector2D sliderSize;
-    slider->GetSize(sliderSize);
-    if (sliderSize.fY <= 0.0f)
-        sliderSize.fY = 20.0f;
-    sliderSize.fX = targetWidth;
-    slider->SetSize(sliderSize);
-
-    if (!valueLabel)
-        return;
-
-    if (labelSize.fX <= 0.0f)
-        valueLabel->GetSize(labelSize);
-
-    CVector2D labelPos;
-    valueLabel->GetPosition(labelPos);
-    labelPos.fX = sliderPos.fX + targetWidth + labelSpacing;
-
-    const float maxLabelX = std::max(0.0f, tabWidth - labelSize.fX);
-    if (labelPos.fX > maxLabelX)
-        labelPos.fX = maxLabelX;
-
-    valueLabel->SetPosition(labelPos);
-}
 }
 
 void CSettings::ResetGuiPointers()
@@ -484,7 +481,7 @@ void CSettings::CreateGUI()
     const float availableContentHeight = resolution.fY - kSettingsWindowFrameVertical;
     if (availableContentHeight > 0.0f)
     {
-           const float minContentHeight = fBottomButtonAreaHeight + 1.0f; // Adjusted for clarity
+        const float minContentHeight = fBottomButtonAreaHeight + 1.0f;  // Adjusted for clarity
         const float maxContentHeight = std::max(availableContentHeight, minContentHeight);
         contentSize.fY = std::clamp(kSettingsBaseContentHeight, minContentHeight, maxContentHeight);
     }
@@ -536,7 +533,8 @@ void CSettings::CreateGUI()
     m_pTabs->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnTabChanged, this));
 
     const float tabHorizontalPadding = kSettingsTabHorizontalPadding;
-    const auto placeBottomRightButton = [&](CGUIButton* button) {
+    const auto  placeBottomRightButton = [&](CGUIButton* button)
+    {
         if (!button)
             return;
         CVector2D buttonSize;
@@ -628,7 +626,7 @@ void CSettings::CreateGUI()
     m_pMouseSensitivity->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pMouseSensitivity->GetPosition(vecTemp);
     const CVector2D mouseSliderPos = vecTemp;
-    const float mouseSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mouseSliderPos.fX, 160.0f);
+    const float     mouseSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mouseSliderPos.fX, 160.0f);
     m_pMouseSensitivity->SetSize(CVector2D(mouseSliderWidth, 20.0f));
     m_pMouseSensitivity->GetSize(vecSize);
     m_pMouseSensitivity->SetProperty("StepSize", "0.01");
@@ -649,7 +647,7 @@ void CSettings::CreateGUI()
     m_pVerticalAimSensitivity->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pVerticalAimSensitivity->GetPosition(vecTemp);
     const CVector2D verticalSliderPos = vecTemp;
-    const float verticalSliderWidth = ComputeSliderWidth(tabPanelSize.fX, verticalSliderPos.fX, 160.0f);
+    const float     verticalSliderWidth = ComputeSliderWidth(tabPanelSize.fX, verticalSliderPos.fX, 160.0f);
     m_pVerticalAimSensitivity->SetSize(CVector2D(verticalSliderWidth, 20.0f));
     m_pVerticalAimSensitivity->GetSize(vecSize);
     m_pVerticalAimSensitivity->SetProperty("StepSize", "0.01");
@@ -657,7 +655,8 @@ void CSettings::CreateGUI()
     m_pLabelVerticalAimSensitivityValue = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, "0%"));
     m_pLabelVerticalAimSensitivityValue->SetPosition(CVector2D(verticalSliderPos.fX + vecSize.fX + kSliderLabelSpacing, verticalSliderPos.fY));
     m_pLabelVerticalAimSensitivityValue->AutoSize("100%");
-    FinalizeSliderRow(tabPanelSize.fX, m_pVerticalAimSensitivity, m_pLabelVerticalAimSensitivityValue, 160.0f, kSliderLabelSpacing, m_pLabelVerticalAimSensitivity);
+    FinalizeSliderRow(tabPanelSize.fX, m_pVerticalAimSensitivity, m_pLabelVerticalAimSensitivityValue, 160.0f, kSliderLabelSpacing,
+                      m_pLabelVerticalAimSensitivity);
     vecTemp.fY += 30.f;
 
     m_pCheckboxVerticalAimSensitivity = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabControls, _("Use mouse sensitivity for aiming"), false));
@@ -740,13 +739,13 @@ void CSettings::CreateGUI()
         vecTemp.fY += -91;
 
         // Layout the mapping buttons like a dual axis joypad
-        CVector2D vecPosList[] = {CVector2D(162, 202),            // Left Stick
+        CVector2D vecPosList[] = {CVector2D(162, 202),  // Left Stick
                                   CVector2D(280, 202), CVector2D(221, 182), CVector2D(221, 220),
 
-                                  CVector2D(351, 202),            // Right Stick
+                                  CVector2D(351, 202),  // Right Stick
                                   CVector2D(469, 202), CVector2D(410, 182), CVector2D(410, 220),
 
-                                  CVector2D(410, 276),            // Acceleration/Brake
+                                  CVector2D(410, 276),  // Acceleration/Brake
                                   CVector2D(221, 276)};
 
         for (int i = 0; i < JoyMan->GetOutputCount() && i < 10; i++)
@@ -766,7 +765,7 @@ void CSettings::CreateGUI()
             pLabel->SetPosition(CVector2D((vecPos.fX + 10) + vecSize.fX * 0.5f - 80.0f, vecPos.fY - 26));
             pLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
             pLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-            pLabel->SetVisible(i >= 8);            // Hide all labels except 'Acceleration' and 'Brake'
+            pLabel->SetVisible(i >= 8);  // Hide all labels except 'Acceleration' and 'Brake'
 
             m_pJoypadLabels.push_back(pLabel);
             m_pJoypadButtons.push_back(pButton);
@@ -852,7 +851,8 @@ void CSettings::CreateGUI()
     m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
     m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
 
-    m_pCheckBoxAllowDiscordRPC = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), false));
+    m_pCheckBoxAllowDiscordRPC =
+        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), false));
     m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
@@ -863,12 +863,14 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowSteamClient->AutoSize(NULL, 20.0f);
 
     // Enable camera photos getting saved to documents folder
-    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
+    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(
+        pManager->CreateCheckBox(pTabMultiplayer, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
     m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pPhotoSavingCheckbox->GetPosition(vecTemp, false);
     m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxAskBeforeDisconnect = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Ask before disconnecting from server using main menu"), true));
+    m_pCheckBoxAskBeforeDisconnect =
+        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Ask before disconnecting from server using main menu"), true));
     m_pCheckBoxAskBeforeDisconnect->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAskBeforeDisconnect->GetPosition(vecTemp, false);
     m_pCheckBoxAskBeforeDisconnect->AutoSize(NULL, 20.0f);
@@ -895,7 +897,7 @@ void CSettings::CreateGUI()
     m_pMapAlpha->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pMapAlpha->GetPosition(vecTemp, false);
     const CVector2D mapAlphaSliderPos = vecTemp;
-    const float mapAlphaSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mapAlphaSliderPos.fX, 160.0f);
+    const float     mapAlphaSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mapAlphaSliderPos.fX, 160.0f);
     m_pMapAlpha->SetSize(CVector2D(mapAlphaSliderWidth, 20.0f));
     m_pMapAlpha->GetSize(vecSize);
     m_pMapAlpha->SetProperty("StepSize", "0.01");
@@ -916,8 +918,8 @@ void CSettings::CreateGUI()
     m_pPlayerMapImageCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabMultiplayer, ""));
     m_pPlayerMapImageCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f));
     m_pPlayerMapImageCombo->SetSize(CVector2D(170.f, 95.0f));
-    m_pPlayerMapImageCombo->AddItem(_("1024 x 1024 (Default)"));            // index 0
-    m_pPlayerMapImageCombo->AddItem(_("2048 x 2048"));                      // index 1
+    m_pPlayerMapImageCombo->AddItem(_("1024 x 1024 (Default)"));  // index 0
+    m_pPlayerMapImageCombo->AddItem(_("2048 x 2048"));            // index 1
     m_pPlayerMapImageCombo->SetReadOnly(true);
 
     /**
@@ -941,7 +943,7 @@ void CSettings::CreateGUI()
     m_pAudioMasterVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioMasterVolume->GetPosition(vecTemp, false);
     const CVector2D masterSliderPos = vecTemp;
-    const float masterSliderWidth = ComputeSliderWidth(tabPanelSize.fX, masterSliderPos.fX, 160.0f);
+    const float     masterSliderWidth = ComputeSliderWidth(tabPanelSize.fX, masterSliderPos.fX, 160.0f);
     m_pAudioMasterVolume->SetSize(CVector2D(masterSliderWidth, 20.0f));
     m_pAudioMasterVolume->GetSize(vecSize, false);
     m_pAudioMasterVolume->SetProperty("StepSize", "0.01");
@@ -963,7 +965,7 @@ void CSettings::CreateGUI()
     m_pAudioRadioVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioRadioVolume->GetPosition(vecTemp, false);
     const CVector2D radioSliderPos = vecTemp;
-    const float radioSliderWidth = ComputeSliderWidth(tabPanelSize.fX, radioSliderPos.fX, 160.0f);
+    const float     radioSliderWidth = ComputeSliderWidth(tabPanelSize.fX, radioSliderPos.fX, 160.0f);
     m_pAudioRadioVolume->SetSize(CVector2D(radioSliderWidth, 20.0f));
     m_pAudioRadioVolume->GetSize(vecSize, false);
     m_pAudioRadioVolume->SetProperty("StepSize", "0.01");
@@ -985,7 +987,7 @@ void CSettings::CreateGUI()
     m_pAudioSFXVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioSFXVolume->GetPosition(vecTemp, false);
     const CVector2D sfxSliderPos = vecTemp;
-    const float sfxSliderWidth = ComputeSliderWidth(tabPanelSize.fX, sfxSliderPos.fX, 160.0f);
+    const float     sfxSliderWidth = ComputeSliderWidth(tabPanelSize.fX, sfxSliderPos.fX, 160.0f);
     m_pAudioSFXVolume->SetSize(CVector2D(sfxSliderWidth, 20.0f));
     m_pAudioSFXVolume->GetSize(vecSize, false);
     m_pAudioSFXVolume->SetProperty("StepSize", "0.01");
@@ -1007,7 +1009,7 @@ void CSettings::CreateGUI()
     m_pAudioMTAVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioMTAVolume->GetPosition(vecTemp, false);
     const CVector2D mtaSliderPos = vecTemp;
-    const float mtaSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mtaSliderPos.fX, 160.0f);
+    const float     mtaSliderWidth = ComputeSliderWidth(tabPanelSize.fX, mtaSliderPos.fX, 160.0f);
     m_pAudioMTAVolume->SetSize(CVector2D(mtaSliderWidth, 20.0f));
     m_pAudioMTAVolume->GetSize(vecSize, false);
     m_pAudioMTAVolume->SetProperty("StepSize", "0.01");
@@ -1029,7 +1031,7 @@ void CSettings::CreateGUI()
     m_pAudioVoiceVolume->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAudioVoiceVolume->GetPosition(vecTemp, false);
     const CVector2D voiceSliderPos = vecTemp;
-    const float voiceSliderWidth = ComputeSliderWidth(tabPanelSize.fX, voiceSliderPos.fX, 160.0f);
+    const float     voiceSliderWidth = ComputeSliderWidth(tabPanelSize.fX, voiceSliderPos.fX, 160.0f);
     m_pAudioVoiceVolume->SetSize(CVector2D(voiceSliderWidth, 20.0f));
     m_pAudioVoiceVolume->GetSize(vecSize, false);
     m_pAudioVoiceVolume->SetProperty("StepSize", "0.01");
@@ -1154,7 +1156,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxDPIAware->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY));
     m_pCheckBoxDPIAware->AutoSize(NULL, 20.0f);
 
-    m_pVideoResolutionLabel->GetPosition(vecTemp, false);            // Restore our label position
+    m_pVideoResolutionLabel->GetPosition(vecTemp, false);  // Restore our label position
 
     // Fullscreen mode
     vecTemp.fY += 26;
@@ -1196,7 +1198,7 @@ void CSettings::CreateGUI()
     m_pFieldOfView->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pFieldOfView->GetPosition(vecTemp, false);
     const CVector2D fovSliderPos = vecTemp;
-    const float fovSliderWidth = ComputeSliderWidth(tabPanelSize.fX, fovSliderPos.fX, 160.0f);
+    const float     fovSliderWidth = ComputeSliderWidth(tabPanelSize.fX, fovSliderPos.fX, 160.0f);
     m_pFieldOfView->SetSize(CVector2D(fovSliderWidth, 20.0f));
     m_pFieldOfView->GetSize(vecSize);
 
@@ -1215,7 +1217,7 @@ void CSettings::CreateGUI()
     m_pDrawDistance->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pDrawDistance->GetPosition(vecTemp, false);
     const CVector2D drawDistanceSliderPos = vecTemp;
-    const float drawDistanceSliderWidth = ComputeSliderWidth(tabPanelSize.fX, drawDistanceSliderPos.fX, 160.0f);
+    const float     drawDistanceSliderWidth = ComputeSliderWidth(tabPanelSize.fX, drawDistanceSliderPos.fX, 160.0f);
     m_pDrawDistance->SetSize(CVector2D(drawDistanceSliderWidth, 20.0f));
     m_pDrawDistance->GetSize(vecSize);
     m_pDrawDistance->SetProperty("StepSize", "0.01");
@@ -1236,7 +1238,7 @@ void CSettings::CreateGUI()
     m_pBrightness->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pBrightness->GetPosition(vecTemp, false);
     const CVector2D brightnessSliderPos = vecTemp;
-    const float brightnessSliderWidth = ComputeSliderWidth(tabPanelSize.fX, brightnessSliderPos.fX, 160.0f);
+    const float     brightnessSliderWidth = ComputeSliderWidth(tabPanelSize.fX, brightnessSliderPos.fX, 160.0f);
     m_pBrightness->SetSize(CVector2D(brightnessSliderWidth, 20.0f));
     m_pBrightness->GetSize(vecSize);
     m_pBrightness->SetProperty("StepSize", "0.01");
@@ -1271,7 +1273,7 @@ void CSettings::CreateGUI()
     m_pAnisotropic->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
     m_pAnisotropic->GetPosition(vecTemp, false);
     const CVector2D anisotropicSliderPos = vecTemp;
-    const float anisotropicSliderWidth = ComputeSliderWidth(tabPanelSize.fX, anisotropicSliderPos.fX, 160.0f);
+    const float     anisotropicSliderWidth = ComputeSliderWidth(tabPanelSize.fX, anisotropicSliderPos.fX, 160.0f);
     m_pAnisotropic->SetSize(CVector2D(anisotropicSliderWidth, 20.0f));
     m_pAnisotropic->GetSize(vecSize);
     m_pAnisotropic->SetProperty("StepSize", SString("%1.2f", 1 / (float)m_iMaxAnisotropic));
@@ -1281,8 +1283,8 @@ void CSettings::CreateGUI()
 
     const SString anisotropicOffText = _("Off");
     const SString anisotropicMaxText = (m_iMaxAnisotropic > 0) ? SString("%ix", 1 << m_iMaxAnisotropic) : anisotropicOffText;
-    const float anisotropicOffExtent = pManager->GetTextExtent(anisotropicOffText);
-    const float anisotropicMaxExtent = pManager->GetTextExtent(anisotropicMaxText);
+    const float   anisotropicOffExtent = pManager->GetTextExtent(anisotropicOffText);
+    const float   anisotropicMaxExtent = pManager->GetTextExtent(anisotropicMaxText);
     const SString anisotropicSizeHint = (anisotropicMaxExtent > anisotropicOffExtent) ? anisotropicMaxText : anisotropicOffText;
     const SString anisotropicSizePadding("%s ", anisotropicSizeHint.c_str());
     m_pAnisotropicValueLabel->AutoSize(anisotropicSizePadding);
@@ -1422,13 +1424,12 @@ void CSettings::CreateGUI()
     /**
      *  PostFX tab
      **/
-    CVector2D postFxPos(12.0f, 12.0f);
+    CVector2D   postFxPos(12.0f, 12.0f);
     const float postFxRowHeight = 28.0f;
     const float postFxValueColumnPadding = 10.0f;
     const float postFxCheckboxColumnX = postFxPos.fX;
     const float postFxLabelColumnX = postFxCheckboxColumnX + kPostFxCheckboxOffset;
-    const float postFxLabelIndent =
-        pManager->CGUI_GetMaxTextExtent("default-normal", _("Gamma:"), _("Brightness:"), _("Contrast:"), _("Saturation:")) + 5.0f;
+    const float postFxLabelIndent = pManager->CGUI_GetMaxTextExtent("default-normal", _("Gamma:"), _("Brightness:"), _("Contrast:"), _("Saturation:")) + 5.0f;
     const float postFxSliderColumnX = postFxLabelColumnX + postFxLabelIndent;
     const float postFxValueColumnReserve = postFxValueColumnPadding + 60.0f;
     const float postFxSliderWidth = ComputeSliderWidth(tabPanelSize.fX, postFxSliderColumnX, 220.0f, postFxValueColumnReserve);
@@ -1592,18 +1593,26 @@ void CSettings::CreateGUI()
     m_pGridBrowserBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserBlacklist->GetPosition(vecTemp);
     const CVector2D blacklistGridPos = vecTemp;
-    const float browserBottomPadding = 32.0f;
-    const float browserButtonSpacing = 5.0f;
-    const CVector2D blacklistRemoveSize(140.0f, 22.0f);
-    const float blacklistHeightAvailable = tabPanelSize.fY - blacklistGridPos.fY - blacklistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
+    const float     browserBottomPadding = 32.0f;
+    const float     browserButtonSpacing = 5.0f;
+    const CVector2D blacklistRemoveSize(155.0f, 22.0f);
+    const CVector2D blacklistRemoveAllSize(155.0f, 22.0f);
+    const float     blacklistRemoveAllSpacing = 165.0f;
+    const float     blacklistHeightAvailable = tabPanelSize.fY - blacklistGridPos.fY - blacklistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
     m_pGridBrowserBlacklist->SetSize(CVector2D(browserColumnWidth, std::max(80.0f, blacklistHeightAvailable)));
     m_pGridBrowserBlacklist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserBlacklistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
     m_pButtonBrowserBlacklistRemove->SetSize(blacklistRemoveSize);
-    m_pButtonBrowserBlacklistRemove->SetPosition(CVector2D(blacklistGridPos.fX, blacklistGridPos.fY + m_pGridBrowserBlacklist->GetSize().fY + browserButtonSpacing));
+    m_pButtonBrowserBlacklistRemove->SetPosition(
+        CVector2D(blacklistGridPos.fX, blacklistGridPos.fY + m_pGridBrowserBlacklist->GetSize().fY + browserButtonSpacing));
 
-    m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);            // Reset vecTemp
+    m_pButtonBrowserBlacklistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
+    m_pButtonBrowserBlacklistRemoveAll->SetSize(blacklistRemoveAllSize);
+    m_pButtonBrowserBlacklistRemoveAll->SetPosition(
+        CVector2D(vecTemp.fX + blacklistRemoveAllSpacing, vecTemp.fY + m_pGridBrowserBlacklist->GetSize().fY + browserButtonSpacing));
+
+    m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);  // Reset vecTemp
 
     m_pLabelBrowserCustomWhitelist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom whitelist")));
     m_pLabelBrowserCustomWhitelist->SetPosition(CVector2D(browserRightColumnX, vecTemp.fY));
@@ -1632,14 +1641,22 @@ void CSettings::CreateGUI()
     m_pGridBrowserWhitelist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserWhitelist->GetPosition(vecTemp);
     const CVector2D whitelistGridPos = vecTemp;
-    const CVector2D whitelistRemoveSize(140.0f, 22.0f);
-    const float whitelistHeightAvailable = tabPanelSize.fY - whitelistGridPos.fY - whitelistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
+    const CVector2D whitelistRemoveSize(155.0f, 22.0f);
+    const CVector2D whitelistRemoveAllSize(155.0f, 22.0f);
+    const float     whitelistRemoveAllSpacing = 165.0f;
+    const float     whitelistHeightAvailable = tabPanelSize.fY - whitelistGridPos.fY - whitelistRemoveSize.fY - browserButtonSpacing - browserBottomPadding;
     m_pGridBrowserWhitelist->SetSize(CVector2D(browserColumnWidth, std::max(80.0f, whitelistHeightAvailable)));
     m_pGridBrowserWhitelist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserWhitelistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
     m_pButtonBrowserWhitelistRemove->SetSize(whitelistRemoveSize);
-    m_pButtonBrowserWhitelistRemove->SetPosition(CVector2D(whitelistGridPos.fX, whitelistGridPos.fY + m_pGridBrowserWhitelist->GetSize().fY + browserButtonSpacing));
+    m_pButtonBrowserWhitelistRemove->SetPosition(
+        CVector2D(whitelistGridPos.fX, whitelistGridPos.fY + m_pGridBrowserWhitelist->GetSize().fY + browserButtonSpacing));
+
+    m_pButtonBrowserWhitelistRemoveAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove all")));
+    m_pButtonBrowserWhitelistRemoveAll->SetSize(whitelistRemoveAllSize);
+    m_pButtonBrowserWhitelistRemoveAll->SetPosition(
+        CVector2D(vecTemp.fX + whitelistRemoveAllSpacing, vecTemp.fY + m_pGridBrowserWhitelist->GetSize().fY + browserButtonSpacing));
 
     /**
      *  Advanced tab
@@ -1826,7 +1843,7 @@ void CSettings::CreateGUI()
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
     {
-#ifndef MTA_DEBUG            // Don't hide when debugging
+#ifndef MTA_DEBUG  // Don't hide when debugging
         m_pWin8Label->SetVisible(false);
         m_pWin8ColorCheckBox->SetVisible(false);
         m_pWin8MouseCheckBox->SetVisible(false);
@@ -1854,7 +1871,8 @@ void CSettings::CreateGUI()
     vecTemp.fY += fLineHeight;
 
     // Process affinity
-    m_pProcessAffinityCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Set CPU 0 affinity to improve game performance"), true));
+    m_pProcessAffinityCheckbox =
+        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Set CPU 0 affinity to improve game performance"), true));
     m_pProcessAffinityCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pProcessAffinityCheckbox->AutoSize(nullptr, 20.0f);
     vecTemp.fY += fLineHeight;
@@ -1963,10 +1981,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
+    m_pButtonBrowserBlacklistRemoveAll->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemoveAll, this));
     m_pEditBrowserBlacklistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddFocused, this));
     m_pEditBrowserBlacklistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddDefocused, this));
     m_pButtonBrowserWhitelistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistAdd, this));
     m_pButtonBrowserWhitelistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemove, this));
+    m_pButtonBrowserWhitelistRemoveAll->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemoveAll, this));
     m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
     m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
     m_pProcessAffinityCheckbox->SetClickHandler(GUI_CALLBACK(&CSettings::OnAffinityClick, this));
@@ -2230,7 +2250,7 @@ void CSettings::UpdateVideoTab()
     else if (FxQuality == 3)
         m_pComboFxQuality->SetText(_("Very high"));
 
-    auto antiAliasing = static_cast<char>(gameSettings->GetAntiAliasing());
+    unsigned int antiAliasing = gameSettings->GetAntiAliasing();
     if (antiAliasing == 1)
         m_pComboAntiAliasing->SetText(_("Off"));
     else if (antiAliasing == 2)
@@ -2348,10 +2368,10 @@ void CSettings::UpdateVideoTab()
 
 struct ResolutionData
 {
-    int width;
-    int height;
-    int depth;
-    int vidMode;
+    int  width;
+    int  height;
+    int  depth;
+    int  vidMode;
     bool isWidescreen;
 };
 
@@ -2371,13 +2391,13 @@ void CSettings::PopulateResolutionComboBox()
     if (!gameSettings)
         return;
 
-    VideoMode vidModemInfo;
-    int       vidMode, numVidModes;
+    VideoMode                   vidModemInfo;
+    int                         vidMode, numVidModes;
     std::vector<ResolutionData> resolutions;
 
     if (!m_pComboResolution)
         return;
-        
+
     m_pComboResolution->Clear();
     numVidModes = gameSettings->GetNumVideoModes();
 
@@ -2414,7 +2434,7 @@ void CSettings::PopulateResolutionComboBox()
                 break;
             }
         }
-        
+
         if (!bDuplicate)
             resolutions.push_back(resData);
     }
@@ -2423,21 +2443,23 @@ void CSettings::PopulateResolutionComboBox()
         return;
 
     // Sort resolutions by width (descending), then by height, then by depth
-    std::sort(resolutions.begin(), resolutions.end(), [](const ResolutionData& a, const ResolutionData& b) {
-        if (a.width != b.width)
-            return a.width > b.width;
-        if (a.height != b.height)
-            return a.height > b.height;
-        return a.depth > b.depth;
-    });
+    std::sort(resolutions.begin(), resolutions.end(),
+              [](const ResolutionData& a, const ResolutionData& b)
+              {
+                  if (a.width != b.width)
+                      return a.width > b.width;
+                  if (a.height != b.height)
+                      return a.height > b.height;
+                  return a.depth > b.depth;
+              });
 
-    SString selectedText;
+    SString   selectedText;
     VideoMode currentInfo;
     if (gameSettings->GetVideoModeInfo(&currentInfo, iNextVidMode))
     {
         for (const auto& res : resolutions)
         {
-            SString strMode("%d x %d x %d", res.width, res.height, res.depth);
+            SString       strMode("%d x %d x %d", res.width, res.height, res.depth);
             CGUIListItem* pItem = m_pComboResolution->AddItem(strMode);
             if (pItem)
                 pItem->SetData((void*)res.vidMode);
@@ -2483,12 +2505,12 @@ void CSettings::ProcessJoypad()
 
 void CSettings::UpdatePostFxTab()
 {
-    bool applyWindowed = false;
-    bool applyFullscreen = false;
-    bool gammaEnabled = false;
-    bool brightnessEnabled = false;
-    bool contrastEnabled = false;
-    bool saturationEnabled = false;
+    bool  applyWindowed = false;
+    bool  applyFullscreen = false;
+    bool  gammaEnabled = false;
+    bool  brightnessEnabled = false;
+    bool  contrastEnabled = false;
+    bool  saturationEnabled = false;
     float gammaValue = kBorderlessGammaDefault;
     float brightnessValue = kBorderlessBrightnessDefault;
     float contrastValue = kBorderlessContrastDefault;
@@ -2586,8 +2608,8 @@ void CSettings::UpdateJoypadTab()
     // Update axes labels and buttons
     for (int i = 0; i < JoyMan->GetOutputCount() && i < (int)m_pJoypadButtons.size(); i++)
     {
-        string outputName = JoyMan->GetOutputName(i);                // LeftStickPosX etc
-        string inputName = JoyMan->GetOutputInputName(i);            // X+ or RZ- etc
+        string outputName = JoyMan->GetOutputName(i);      // LeftStickPosX etc
+        string inputName = JoyMan->GetOutputInputName(i);  // X+ or RZ- etc
 
         CGUILabel* pLabel = m_pJoypadLabels[i];
         pLabel->SetText(outputName.c_str());
@@ -2665,7 +2687,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("borderless_apply_windowed", false);
     CVARS_SET("borderless_apply_fullscreen", false);
     gameSettings->UpdateFieldOfViewFromSettings();
-    gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
+    gameSettings->SetDrawDistance(1.19625f);  // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
     gameSettings->SetFXQuality(2);
     gameSettings->SetAntiAliasing(1, true);
@@ -2705,8 +2727,8 @@ void CSettings::RefreshBorderlessDisplayCalibration()
 
 void CSettings::UpdateBorderlessAdjustmentControls()
 {
-    const bool applyAdjustments = (m_pCheckBoxApplyBorderless && m_pCheckBoxApplyBorderless->GetSelected()) ||
-                                  (m_pCheckBoxApplyFullscreen && m_pCheckBoxApplyFullscreen->GetSelected());
+    const bool applyAdjustments =
+        (m_pCheckBoxApplyBorderless && m_pCheckBoxApplyBorderless->GetSelected()) || (m_pCheckBoxApplyFullscreen && m_pCheckBoxApplyFullscreen->GetSelected());
 
     const bool gammaEnabled = applyAdjustments && (!m_pBorderlessGammaToggle || m_pBorderlessGammaToggle->GetSelected());
     const bool brightnessEnabled = applyAdjustments && (!m_pBorderlessBrightnessToggle || m_pBorderlessBrightnessToggle->GetSelected());
@@ -3508,10 +3530,10 @@ bool CSettings::OnBindsListClick(CGUIElement* pElement)
 }
 
 #ifndef WM_XBUTTONDOWN
-#define WM_XBUTTONDOWN 0x020B
+    #define WM_XBUTTONDOWN 0x020B
 #endif
 #ifndef WM_XBUTTONUP
-#define WM_XBUTTONUP 0x020C
+    #define WM_XBUTTONUP 0x020C
 #endif
 
 bool CSettings::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -3615,7 +3637,7 @@ void CSettings::Initialize()
             if (controlBind->control != pControl)
                 continue;
 
-            if (!numMatches)            // Primary key
+            if (!numMatches)  // Primary key
             {
                 // Add bind to the list
                 iBind = m_pBindsList->InsertRowAfter(iRowGame);
@@ -3627,7 +3649,7 @@ void CSettings::Initialize()
                 m_pBindsList->SetItemData(iBind, m_hPriKey, controlBind);
                 iGameRowCount++;
             }
-            else            // Secondary key
+            else  // Secondary key
             {
                 for (size_t k = 0; k < SecKeyNum; k++)
                 {
@@ -3785,7 +3807,7 @@ void CSettings::SetVisible(bool bVisible)
     {
 #ifdef MTA_DEBUG
         if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0)
-            CreateGUI();            // Recreate GUI (for adjusting layout with edit and continue)
+            CreateGUI();  // Recreate GUI (for adjusting layout with edit and continue)
 #endif
         m_pWindow->BringToFront();
         m_pWindow->Activate();
@@ -3798,7 +3820,7 @@ void CSettings::SetVisible(bool bVisible)
         Initialize();
     }
 
-    m_pWindow->SetZOrderingEnabled(!bVisible);            // Message boxes dont appear on top otherwise
+    m_pWindow->SetZOrderingEnabled(!bVisible);  // Message boxes dont appear on top otherwise
 }
 
 bool CSettings::IsVisible()
@@ -4105,7 +4127,7 @@ void CSettings::LoadData()
     DWORD_PTR sys;
 
     HANDLE process = GetCurrentProcess();
-    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+    BOOL   result = GetProcessAffinityMask(process, &mask, &sys);
 
     if (bVar && result)
         SetProcessAffinityMask(process, mask & ~1);
@@ -4221,7 +4243,7 @@ void CSettings::ReloadBrowserLists()
     m_bBrowserListsChanged = false;
     if (m_bBrowserListsLoadEnabled)
     {
-        auto                                  pWebCore = g_pCore->GetWebCore();
+        auto pWebCore = g_pCore->GetWebCore();
         if (!pWebCore)
             return;
         std::vector<std::pair<SString, bool>> customBlacklist;
@@ -4552,7 +4574,7 @@ void CSettings::SaveData()
     DWORD_PTR sys;
 
     HANDLE process = GetCurrentProcess();
-    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+    BOOL   result = GetProcessAffinityMask(process, &mask, &sys);
 
     if (affinity && result)
         SetProcessAffinityMask(process, mask & ~1);
@@ -4587,7 +4609,7 @@ void CSettings::SaveData()
 
     // Player map alpha
     SString sText = m_pMapAlphaValueLabel->GetText();
-    float fMapAlpha = ((atof(sText.substr(0, sText.length() - 1).c_str())) / 100) * 255;
+    float   fMapAlpha = ((atof(sText.substr(0, sText.length() - 1).c_str())) / 100) * 255;
     CVARS_SET("mapalpha", fMapAlpha);
 
     // Player map image
@@ -4686,7 +4708,7 @@ void CSettings::SaveData()
 
     if (m_bBrowserListsLoadEnabled)
     {
-        auto                 pWebCore = g_pCore->GetWebCore();
+        auto pWebCore = g_pCore->GetWebCore();
         if (pWebCore)
         {
             std::vector<SString> customBlacklist;
@@ -4879,11 +4901,11 @@ void CSettings::CreateChatColorTab(eChatColorType eType, const char* szName, CGU
         m_pChatAlphaValue[eType]->AutoSize("255 ");
         FinalizeSliderRow(tabPanelSize.fX, m_pChatAlpha[eType], m_pChatAlphaValue[eType], chatSliderPreferredWidth, kSliderLabelSpacing, pLabelAlpha);
 
-    CVector2D alphaValuePos;
-    m_pChatAlphaValue[eType]->GetPosition(alphaValuePos);
-    CVector2D alphaValueSize;
-    m_pChatAlphaValue[eType]->GetSize(alphaValueSize);
-    fMarginX = alphaValuePos.fX + alphaValueSize.fX + 30.0f;
+        CVector2D alphaValuePos;
+        m_pChatAlphaValue[eType]->GetPosition(alphaValuePos);
+        CVector2D alphaValueSize;
+        m_pChatAlphaValue[eType]->GetSize(alphaValueSize);
+        fMarginX = alphaValuePos.fX + alphaValueSize.fX + 30.0f;
     }
 
     //
@@ -5664,7 +5686,7 @@ bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
     g_pCore->GetDiscord()->SetDiscordRPCEnabled(isEnabled);
 
     if (isEnabled)
-        ShowRichPresenceShareDataQuestionBox(); // show question box
+        ShowRichPresenceShareDataQuestionBox();  // show question box
 
     return true;
 }
@@ -5679,9 +5701,9 @@ static void ShowRichPresenceShareDataCallback(void* ptr, unsigned int uiButton)
 void CSettings::ShowRichPresenceShareDataQuestionBox() const
 {
     SStringX strMessage(
-        _("It seems that you have the Rich Presence connection option enabled."
-          "\nDo you want to allow servers to share their data?"
-          "\n\nThis includes yours unique ID identifier."));
+        _("Rich Presence is currently enabled."
+          "\nDo you want to allow data sharing with servers you connect to?"
+          "\n\nThis includes your Discord client ID, and game state info."));
     CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pQuestionBox->Reset();
     pQuestionBox->SetTitle(_("CONSENT TO ALLOW DATA SHARING"));
@@ -5877,6 +5899,16 @@ bool CSettings::OnBrowserBlacklistRemove(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnBrowserBlacklistRemoveAll(CGUIElement* pElement)
+{
+    if (m_pGridBrowserBlacklist->GetRowCount() > 0)
+    {
+        m_pGridBrowserBlacklist->Clear();
+        m_bBrowserListsChanged = true;
+    }
+    return true;
+}
+
 bool CSettings::OnBrowserBlacklistDomainAddFocused(CGUIElement* pElement)
 {
     m_pLabelBrowserBlacklistAdd->SetVisible(false);
@@ -5926,6 +5958,17 @@ bool CSettings::OnBrowserWhitelistRemove(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnBrowserWhitelistRemoveAll(CGUIElement* pElement)
+{
+    if (m_pGridBrowserWhitelist->GetRowCount() > 0)
+    {
+        m_pGridBrowserWhitelist->Clear();
+        m_bBrowserListsChanged = true;
+    }
+
+    return true;
+}
+
 bool CSettings::OnBrowserWhitelistDomainAddFocused(CGUIElement* pElement)
 {
     m_pLabelBrowserWhitelistAdd->SetVisible(false);
@@ -5941,7 +5984,7 @@ bool CSettings::OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement)
 
 void NewNicknameCallback(void* ptr, unsigned int uiButton, std::string strNick)
 {
-    if (uiButton == 1)            // We hit OK
+    if (uiButton == 1)  // We hit OK
     {
         if (!CCore::GetSingleton().IsValidNick(strNick.c_str()))
             CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC81"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO);
