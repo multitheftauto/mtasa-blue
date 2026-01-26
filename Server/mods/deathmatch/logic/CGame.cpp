@@ -4713,7 +4713,8 @@ bool CGame::SendPacket(unsigned char ucPacketID, const NetServerPlayerID& player
     }
     else
     {
-        SSendHandle handle = GetLatentTransferManager()->AddSend(playerID, pBitStream->Version(), m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId);
+        SSendHandle handle =
+            GetLatentTransferManager()->AddSend(playerID, pBitStream->Version(), m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId);
         m_LastSentHandle = handle;
     }
     return true;

@@ -229,8 +229,7 @@ bool CStaticFunctionDefinitions::TriggerClientEvent(const std::vector<CPlayer*>&
     return true;
 }
 
-uint CStaticFunctionDefinitions::TriggerLatentClientEvent(const std::vector<CPlayer*>& sendList, const char* szName,
-                                                                              CElement* pCallWithElement,
+uint CStaticFunctionDefinitions::TriggerLatentClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement,
                                                           CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId)
 {
     assert(szName);

@@ -34,8 +34,8 @@ public:
     static bool RemoveEventHandler(CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction);
     static bool TriggerEvent(const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool& bWasCancelled);
     static bool TriggerClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments);
-    static uint TriggerLatentClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement,
-                                                             CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId);
+    static uint TriggerLatentClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments,
+                                         int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId);
 
     static bool        CancelEvent(bool bCancel, const char* szReason);
     static const char* GetCancelReason();

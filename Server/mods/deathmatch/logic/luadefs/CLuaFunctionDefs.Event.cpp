@@ -310,7 +310,8 @@ int CLuaFunctionDefs::TriggerLatentClientEvent(lua_State* luaVM)
         markerLatentEvent.SetAndStoreString(SString("Get args (%d,%s)", sendList.size(), *strName));
 
         // Trigger it
-        uint handle = CStaticFunctionDefinitions::TriggerLatentClientEvent(sendList, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId);
+        uint handle =
+            CStaticFunctionDefinitions::TriggerLatentClientEvent(sendList, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId);
         if (handle >= 0)
         {
             markerLatentEvent.Set("End");
