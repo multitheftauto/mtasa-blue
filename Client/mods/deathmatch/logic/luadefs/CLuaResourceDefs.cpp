@@ -26,7 +26,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceGUIElement", GetResourceGUIElement},
         {"getResourceDynamicElementRoot", GetResourceDynamicElementRoot},
         {"getResourceExportedFunctions", GetResourceExportedFunctions},
-        {"getResources", GetResources},
+        {"getResources", ArgumentParser<GetResources>},
         {"getResourceState", GetResourceState},
         {"loadstring", LoadString},
         {"load", Load},
@@ -392,18 +392,14 @@ int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::GetResources(lua_State* luaVM)
+std::vector<CResource*> CLuaResourceDefs::GetResources(lua_State* luaVM)
 {
-    unsigned int uiIndex = 0;
-    lua_newtable(luaVM);
-    list<CResource*>::const_iterator iter = m_pResourceManager->IterBegin();
-    for (; iter != m_pResourceManager->IterEnd(); ++iter)
+    std::vector<CResource*> resources;
+    for (auto iter = m_pResourceManager->IterBegin(); iter != m_pResourceManager->IterEnd(); ++iter)
     {
-        lua_pushnumber(luaVM, ++uiIndex);
-        lua_pushresource(luaVM, *iter);
-        lua_settable(luaVM, -3);
+        resources.push_back(*iter);
     }
-    return 1;
+    return resources;
 }
 
 int CLuaResourceDefs::GetResourceState(lua_State* luaVM)
