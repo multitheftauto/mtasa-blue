@@ -66,5 +66,5 @@ private:
     float   m_StartRadius;
     float   m_EndRadius;
     bool    m_bRenderSpot;
-    SColor  m_color;
+    SColor  m_color{SColorRGBA(200, 200, 255, 0)};
 };

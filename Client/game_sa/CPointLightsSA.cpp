@@ -84,8 +84,8 @@ struct RxObjSpace3DVertex
     CVector pos;
     CVector normal;
     int     color;
-    int     u;
-    int     v;
+    float   u;
+    float   v;
 };
 
 static void __cdecl PreRenderSearchLight3DVertexBuffer(RxObjSpace3DVertex* buffer, int numVerts, RwMatrix* ltm, int flags)
