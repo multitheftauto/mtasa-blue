@@ -2487,6 +2487,18 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         if (std::isnan(vecCollision.fZ))
                             vecCollision.fZ = 0;
 
+                        if (pCollisionEntity)
+                        {
+                            // Call the onClientElementClicked event
+                            CLuaArguments Arguments;
+                            Arguments.PushString(szButton);
+                            Arguments.PushString(szState);
+                            Arguments.PushNumber(vecCollision.fX);
+                            Arguments.PushNumber(vecCollision.fY);
+                            Arguments.PushNumber(vecCollision.fZ);
+                            pCollisionEntity->CallEvent("onClientElementClicked", Arguments, true);
+                        }
+
                         // Call the event for the client
                         CLuaArguments Arguments;
                         Arguments.PushString(szButton);
@@ -2497,18 +2509,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         Arguments.PushNumber(vecCollision.fY);
                         Arguments.PushNumber(vecCollision.fZ);
                         if (pCollisionEntity)
-                        {
                             Arguments.PushElement(pCollisionEntity);
-
-                            // Call the onClientElementClicked event
-                            CLuaArguments Arguments;
-                            Arguments.PushString(szButton);
-                            Arguments.PushString(szState);
-                            Arguments.PushNumber(vecCollision.fX);
-                            Arguments.PushNumber(vecCollision.fY);
-                            Arguments.PushNumber(vecCollision.fZ);
-                            pCollisionEntity->CallEvent("onClientElementClicked", Arguments, true);
-                        }
                         else
                             Arguments.PushBoolean(false);
                         m_pRootEntity->CallEvent("onClientClick", Arguments, false);
