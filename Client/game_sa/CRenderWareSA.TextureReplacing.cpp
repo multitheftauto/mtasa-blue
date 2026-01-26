@@ -544,10 +544,10 @@ namespace
             return true;
 
         // Also check parent model for engineRequestModel clones
-        const unsigned short usParentModelId = pModelInfo->GetParentID();
-        if (usParentModelId != 0)
+        const unsigned int uiParentModelId = pModelInfo->GetParentID();
+        if (uiParentModelId != 0)
         {
-            if (auto* pParentModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usParentModelId)))
+            if (auto* pParentModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiParentModelId)))
             {
                 if (pParentModelInfo->IsVehicle() || pParentModelInfo->IsUpgrade())
                     return true;
@@ -791,11 +791,11 @@ namespace
         if (!pModelInfo)
             return false;
 
-        const unsigned short usParentModelId = pModelInfo->GetParentID();
-        if (usParentModelId == 0)
+        const unsigned int uiParentModelId = pModelInfo->GetParentID();
+        if (uiParentModelId == 0)
             return false;
 
-        auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usParentModelId));
+        auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiParentModelId));
         if (!pParentInfo)
             return false;
 
@@ -1232,8 +1232,8 @@ namespace
             g_SharedIsolatedTxdByParentTxd.erase(itShared);
         }
 
-        const std::uint16_t usNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlot();
-        if (usNewTxdId == static_cast<std::uint16_t>(-1))
+        const std::uint32_t uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlot();
+        if (uiNewTxdId == static_cast<std::uint32_t>(-1))
         {
             AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot for model %u parentTxd %u", usModelId, usParentTxdId));
             return false;
@@ -1245,10 +1245,10 @@ namespace
         if (txdName.size() > 24)
             txdName.resize(24);
 
-        if (pTxdPoolSA->AllocateTextureDictonarySlot(usNewTxdId, txdName) == static_cast<std::uint32_t>(-1))
+        if (pTxdPoolSA->AllocateTextureDictonarySlot(uiNewTxdId, txdName) == static_cast<std::uint32_t>(-1))
         {
             AddReportLog(
-                9401, SString("EnsureIsolatedTxdForRequestedModel: AllocateTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, usNewTxdId));
+                9401, SString("EnsureIsolatedTxdForRequestedModel: AllocateTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, uiNewTxdId));
             return false;
         }
 
@@ -1257,31 +1257,36 @@ namespace
         if (!pChildTxd)
         {
             AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: RwTexDictionaryCreate failed for parentTxd %u", usParentTxdId));
-            pTxdPoolSA->RemoveTextureDictonarySlot(usNewTxdId);
+            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
             return false;
         }
 
         // Associate the TXD with the slot and set parent linkage
-        if (!pTxdPoolSA->SetTextureDictonarySlot(usNewTxdId, pChildTxd, usParentTxdId))
+        if (!pTxdPoolSA->SetTextureDictonarySlot(uiNewTxdId, pChildTxd, usParentTxdId))
         {
             AddReportLog(9401,
-                         SString("EnsureIsolatedTxdForRequestedModel: SetTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, usNewTxdId));
+                         SString("EnsureIsolatedTxdForRequestedModel: SetTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, uiNewTxdId));
             RwTexDictionaryDestroy(pChildTxd);
-            pTxdPoolSA->RemoveTextureDictonarySlot(usNewTxdId);
+            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
             return false;
         }
 
         // If parent is already loaded, establish parent-child linkage now
         // Otherwise, it will be deferred to ProcessPendingIsolatedTxdParents
         if (bParentTxdLoaded)
-            CTxdStore_SetupTxdParent(usNewTxdId);
+            CTxdStore_SetupTxdParent(uiNewTxdId);
 
         // Initialize streaming info to mark this virtual TXD as loaded
-        const std::uint32_t usTxdStreamId = usNewTxdId + pGame->GetBaseIDforTXD();
-        if (usTxdStreamId >= pGame->GetCountOfAllFileIDs())
+        const int32_t baseTxdId = pGame->GetBaseIDforTXD();
+        const int32_t countOfAllFileIds = pGame->GetCountOfAllFileIDs();
+        if (baseTxdId <= 0 || countOfAllFileIds <= 0)
+            return false;
+
+        const std::uint32_t usTxdStreamId = static_cast<std::uint32_t>(uiNewTxdId) + static_cast<std::uint32_t>(baseTxdId);
+        if (usTxdStreamId >= static_cast<std::uint32_t>(countOfAllFileIds))
         {
             AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Stream ID %u out of range for parentTxd %u", usTxdStreamId, usParentTxdId));
-            pTxdPoolSA->RemoveTextureDictonarySlot(usNewTxdId);
+            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
             return false;
         }
         CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(usTxdStreamId);
@@ -1289,7 +1294,7 @@ namespace
         {
             AddReportLog(9401,
                          SString("EnsureIsolatedTxdForRequestedModel: GetStreamingInfo failed for parentTxd %u streamId=%u", usParentTxdId, usTxdStreamId));
-            pTxdPoolSA->RemoveTextureDictonarySlot(usNewTxdId);
+            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
             return false;
         }
         pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
@@ -1303,12 +1308,12 @@ namespace
 
         // Create and register the new shared TXD tracking entry
         SSharedIsolatedTxd sharedSlot;
-        sharedSlot.usTxdId = usNewTxdId;
+        sharedSlot.usTxdId = static_cast<unsigned short>(uiNewTxdId);
         sharedSlot.usParentTxdId = usParentTxdId;
         sharedSlot.modelIds.insert(usModelId);
 
         // Point the model's TXD reference to our new isolated TXD
-        pModelInfo->SetTextureDictionaryID(usNewTxdId);
+        pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
 
         // Register in tracking maps for cleanup and lookup
         g_SharedIsolatedTxdByParentTxd.emplace(usParentTxdId, std::move(sharedSlot));
@@ -1390,10 +1395,10 @@ void CRenderWareSA::ProcessPendingIsolatedTxdParents()
                     break;
                 }
 
-                unsigned short usParentId = pModelInfo->GetParentID();
-                if (usParentId != 0)
+                unsigned int uiParentId = pModelInfo->GetParentID();
+                if (uiParentId != 0)
                 {
-                    if (auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usParentId)))
+                    if (auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiParentId)))
                     {
                         if (pParentInfo->IsVehicle() || pParentInfo->IsUpgrade())
                         {
@@ -2131,16 +2136,16 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
         auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
         if (pModelInfo)
         {
-            const unsigned short usParentModelId = pModelInfo->GetParentID();
-            if (usParentModelId != 0)
+            const unsigned int uiParentModelId = pModelInfo->GetParentID();
+            if (uiParentModelId != 0)
             {
-                auto*                pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usParentModelId));
-                const unsigned short usParentTxdId = pParentInfo ? pParentInfo->GetTextureDictionaryID() : 0;
+                auto*              pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiParentModelId));
+                const unsigned int uiParentTxdId = pParentInfo ? pParentInfo->GetTextureDictionaryID() : 0;
 
                 const bool bIsolatedOk = EnsureIsolatedTxdForRequestedModel(usModelId);
                 if (!bIsolatedOk)
                     AddReportLog(9401, SString("ModelInfoTXDAddTextures: EnsureIsolatedTxdForRequestedModel failed for model %u (parent=%u parentTxd=%u)",
-                                               usModelId, usParentModelId, usParentTxdId));
+                                               usModelId, uiParentModelId, uiParentTxdId));
             }
         }
     }
@@ -4182,7 +4187,7 @@ void CRenderWareSA::StaticResetShaderSupport()
     if (!pGame)
         return;
 
-    const unsigned short usBaseTxdId = pGame->GetBaseIDforTXD();
+    const std::uint32_t uiBaseTxdId = pGame->GetBaseIDforTXD();
 
     // Safety limit to prevent freeze on corrupted/huge maps
     constexpr size_t MAX_CLEANUP_ITERATIONS = 50000;
@@ -4213,7 +4218,7 @@ void CRenderWareSA::StaticResetShaderSupport()
 
         // Remove: custom TXD entries (ID >= base) and script-loaded textures
         // Keep: GTA base textures and FAKE_NO_TEXTURE singleton
-        const bool bIsCustomTxdEntry = pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_usTxdId >= usBaseTxdId;
+        const bool bIsCustomTxdEntry = pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_usTxdId >= uiBaseTxdId;
         const bool bIsScriptTexture = !pTexInfo->texTag.m_bUsingTxdId && (pTexInfo->texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE);
         const bool bShouldRemove = bIsCustomTxdEntry || bIsScriptTexture;
 

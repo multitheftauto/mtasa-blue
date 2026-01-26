@@ -275,8 +275,7 @@ namespace WerCrash
                                 if (lastSlash != std::wstring::npos)
                                     wname = wname.substr(lastSlash + 1);
 
-                                std::string name(wname.begin(), wname.end());
-                                info.name = name.c_str();
+                                info.name = UTF16ToMbUTF8(wname);
                             }
                         }
                     }

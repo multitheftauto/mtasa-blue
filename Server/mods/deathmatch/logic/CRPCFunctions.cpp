@@ -165,7 +165,11 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
 
         SWeaponSlotSync slot;
         bitStream.Read(&slot);
-        auto ucSlot = static_cast<unsigned char>(slot.data.uiSlot);
+
+        if (slot.data.uiSlot > 0xFF)
+            return;
+
+        const unsigned char ucSlot = static_cast<unsigned char>(slot.data.uiSlot);
 
         if (ucSlot != ucPrevSlot)
         {

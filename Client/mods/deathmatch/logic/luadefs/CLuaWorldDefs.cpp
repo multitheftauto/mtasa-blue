@@ -2175,6 +2175,15 @@ bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::op
 {
     if (arg2.has_value() && arg3.has_value())
     {
+        const auto toInt16ColorComponent = [](float value) -> int16
+        {
+            const int iValue = Round(value);
+            if (iValue < 0 || iValue > 255)
+                throw std::invalid_argument("Expected a valid colour component (0-255)");
+
+            return static_cast<int16>(iValue);
+        };
+
         switch (property)
         {
             case WorldProperty::AMBIENT_COLOR:
@@ -2184,9 +2193,10 @@ bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::op
             case WorldProperty::DIRECTIONAL_COLOR:
                 return g_pMultiplayer->SetDirectionalColor(arg1 / 255, arg2.value() / 255, arg3.value() / 255);
             case WorldProperty::LOW_CLOUDS_COLOR:
-                return g_pMultiplayer->SetLowCloudsColor((int16)arg1, (int16)arg2.value(), (int16)arg3.value());
+                return g_pMultiplayer->SetLowCloudsColor(toInt16ColorComponent(arg1), toInt16ColorComponent(arg2.value()), toInt16ColorComponent(arg3.value()));
             case WorldProperty::BOTTOM_CLOUDS_COLOR:
-                return g_pMultiplayer->SetBottomCloudsColor((int16)arg1, (int16)arg2.value(), (int16)arg3.value());
+                return g_pMultiplayer->SetBottomCloudsColor(toInt16ColorComponent(arg1), toInt16ColorComponent(arg2.value()),
+                                                            toInt16ColorComponent(arg3.value()));
         }
         return false;
     }
@@ -2197,9 +2207,9 @@ bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::op
         case WorldProperty::SPRITE_BRIGHTNESS:
             return g_pMultiplayer->SetSpriteBrightness(arg1);
         case WorldProperty::POLE_SHADOW_STRENGTH:
-            return g_pMultiplayer->SetPoleShadowStrength(static_cast<int16_t>(arg1));
+            return g_pMultiplayer->SetPoleShadowStrength(static_cast<int16>(arg1));
         case WorldProperty::SHADOW_STRENGTH:
-            return g_pMultiplayer->SetShadowStrength(static_cast<int16_t>(arg1));
+            return g_pMultiplayer->SetShadowStrength(static_cast<int16>(arg1));
         case WorldProperty::SHADOWS_OFFSET:
             return g_pMultiplayer->SetShadowsOffset(arg1);
         case WorldProperty::LIGHTS_ON_GROUND:
