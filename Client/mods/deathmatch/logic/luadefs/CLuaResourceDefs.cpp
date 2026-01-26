@@ -392,7 +392,7 @@ int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
     return 1;
 }
 
-std::vector<CResource*> CLuaResourceDefs::GetResources(lua_State* luaVM)
+std::vector<CResource*> CLuaResourceDefs::GetResources()
 {
     std::vector<CResource*> resources;
     for (auto iter = m_pResourceManager->IterBegin(); iter != m_pResourceManager->IterEnd(); ++iter)
