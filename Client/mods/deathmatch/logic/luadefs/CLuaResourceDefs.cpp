@@ -392,16 +392,6 @@ int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
     return 1;
 }
 
-std::vector<CResource*> CLuaResourceDefs::GetResources()
-{
-    std::vector<CResource*> resources;
-    for (auto iter = m_pResourceManager->IterBegin(); iter != m_pResourceManager->IterEnd(); ++iter)
-    {
-        resources.push_back(*iter);
-    }
-    return resources;
-}
-
 int CLuaResourceDefs::GetResourceState(lua_State* luaVM)
 {
     //  string getResourceState ( resource theResource )
@@ -420,6 +410,16 @@ int CLuaResourceDefs::GetResourceState(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::vector<CResource*> CLuaResourceDefs::GetResources()
+{
+    std::vector<CResource*> resources;
+    for (auto iter = m_pResourceManager->IterBegin(); iter != m_pResourceManager->IterEnd(); ++iter)
+    {
+        resources.push_back(*iter);
+    }
+    return resources;
 }
 
 int CLuaResourceDefs::LoadString(lua_State* luaVM)
