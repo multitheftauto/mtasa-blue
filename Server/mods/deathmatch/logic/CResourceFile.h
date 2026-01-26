@@ -69,5 +69,6 @@ public:
 
     uint64  GetSizeHint() { return m_uiFileSizeHint; }  // Only used by download counters
     string  GetMetaFileAttribute(const string& key) { return m_attributeMap[key]; }
+    const map<string, string>& GetAttributeMap() const { return m_attributeMap; }
     SString GetCachedPathFilename(bool bForceClientCachePath = false);
 };
