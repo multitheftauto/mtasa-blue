@@ -289,8 +289,7 @@ namespace
             if (!tex || tex->raster != raster)
                 continue;
 
-            if (IsReadableTexture(tex))
-                return tex;
+            return tex;
         }
 
         return nullptr;
@@ -2022,6 +2021,7 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
     {
         RemoveReplacementFromTracking(pReplacementTextures);
         pReplacementTextures->uiSessionId = ms_uiTextureReplacingSession;
+        pReplacementTextures->textures.clear();
         pReplacementTextures->perTxdList.clear();
         pReplacementTextures->usedInTxdIds.clear();
         pReplacementTextures->usedInModelIds.clear();
@@ -2154,6 +2154,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     {
         RemoveReplacementFromTracking(pReplacementTextures);
         pReplacementTextures->uiSessionId = ms_uiTextureReplacingSession;
+        pReplacementTextures->textures.clear();
         pReplacementTextures->perTxdList.clear();
         pReplacementTextures->usedInTxdIds.clear();
         pReplacementTextures->usedInModelIds.clear();
@@ -3062,6 +3063,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
         RemoveReplacementFromTracking(pReplacementTextures);
 
+        pReplacementTextures->textures.clear();
         pReplacementTextures->perTxdList.clear();
         pReplacementTextures->usedInTxdIds.clear();
         pReplacementTextures->usedInModelIds.clear();
