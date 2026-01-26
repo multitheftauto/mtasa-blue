@@ -414,12 +414,7 @@ int CLuaResourceDefs::GetResourceState(lua_State* luaVM)
 
 std::vector<CResource*> CLuaResourceDefs::GetResources()
 {
-    std::vector<CResource*> resources;
-    for (auto iter = m_pResourceManager->IterBegin(); iter != m_pResourceManager->IterEnd(); ++iter)
-    {
-        resources.push_back(*iter);
-    }
-    return resources;
+    return {m_pResourceManager->IterBegin(), m_pResourceManager->IterEnd()};
 }
 
 int CLuaResourceDefs::LoadString(lua_State* luaVM)
