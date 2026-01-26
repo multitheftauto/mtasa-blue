@@ -791,11 +791,11 @@ namespace
         if (!pModelInfo)
             return false;
 
-        const unsigned short usParentModelId = static_cast<unsigned short>(pModelInfo->GetParentID());
-        if (usParentModelId == 0)
+        const unsigned int uiParentModelId = pModelInfo->GetParentID();
+        if (uiParentModelId == 0)
             return false;
 
-        auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usParentModelId));
+        auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiParentModelId));
         if (!pParentInfo)
             return false;
 
@@ -1395,10 +1395,10 @@ void CRenderWareSA::ProcessPendingIsolatedTxdParents()
                     break;
                 }
 
-                unsigned short usParentId = pModelInfo->GetParentID();
-                if (usParentId != 0)
+                unsigned int uiParentId = pModelInfo->GetParentID();
+                if (uiParentId != 0)
                 {
-                    if (auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usParentId)))
+                    if (auto* pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiParentId)))
                     {
                         if (pParentInfo->IsVehicle() || pParentInfo->IsUpgrade())
                         {
@@ -2136,16 +2136,16 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
         auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
         if (pModelInfo)
         {
-            const unsigned short usParentModelId = pModelInfo->GetParentID();
-            if (usParentModelId != 0)
+            const unsigned int uiParentModelId = pModelInfo->GetParentID();
+            if (uiParentModelId != 0)
             {
-                auto*                pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usParentModelId));
-                const unsigned short usParentTxdId = pParentInfo ? pParentInfo->GetTextureDictionaryID() : 0;
+                auto*              pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiParentModelId));
+                const unsigned int uiParentTxdId = pParentInfo ? pParentInfo->GetTextureDictionaryID() : 0;
 
                 const bool bIsolatedOk = EnsureIsolatedTxdForRequestedModel(usModelId);
                 if (!bIsolatedOk)
                     AddReportLog(9401, SString("ModelInfoTXDAddTextures: EnsureIsolatedTxdForRequestedModel failed for model %u (parent=%u parentTxd=%u)",
-                                               usModelId, usParentModelId, usParentTxdId));
+                                               usModelId, uiParentModelId, uiParentTxdId));
             }
         }
     }
@@ -4187,7 +4187,7 @@ void CRenderWareSA::StaticResetShaderSupport()
     if (!pGame)
         return;
 
-    const unsigned short usBaseTxdId = pGame->GetBaseIDforTXD();
+    const std::uint32_t uiBaseTxdId = pGame->GetBaseIDforTXD();
 
     // Safety limit to prevent freeze on corrupted/huge maps
     constexpr size_t MAX_CLEANUP_ITERATIONS = 50000;
@@ -4218,7 +4218,7 @@ void CRenderWareSA::StaticResetShaderSupport()
 
         // Remove: custom TXD entries (ID >= base) and script-loaded textures
         // Keep: GTA base textures and FAKE_NO_TEXTURE singleton
-        const bool bIsCustomTxdEntry = pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_usTxdId >= usBaseTxdId;
+        const bool bIsCustomTxdEntry = pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_usTxdId >= uiBaseTxdId;
         const bool bIsScriptTexture = !pTexInfo->texTag.m_bUsingTxdId && (pTexInfo->texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE);
         const bool bShouldRemove = bIsCustomTxdEntry || bIsScriptTexture;
 
