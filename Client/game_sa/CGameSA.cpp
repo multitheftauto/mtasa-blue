@@ -100,7 +100,7 @@ CGameSA::CGameSA()
         // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
         for (unsigned char i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
         {
-            ObjectGroupsInfo[i].SetGroup(i);
+            ObjectGroupsInfo[i].SetGroup(static_cast<unsigned char>(i));
         }
 
         m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
@@ -361,7 +361,11 @@ void CGameSA::Pause(bool bPaused)
 
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
-    if (dwModelID < GetCountOfAllFileIDs())
+    const int32_t count = GetCountOfAllFileIDs();
+    if (count <= 0)
+        return nullptr;
+
+    if (dwModelID < static_cast<DWORD>(count))
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
         {
@@ -855,25 +859,25 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     const auto ucNewLimit = static_cast<BYTE>(newLimit);
 
     // CWaterCannons::Init
-    MemPut(0x728C88, ucNewLimit);
+    MemPut<BYTE>(0x728C88, static_cast<BYTE>(newLimit));
 
     // CWaterCannons::Update
-    MemPut(0x72A3F2, ucNewLimit);
+    MemPut<BYTE>(0x72A3F2, static_cast<BYTE>(newLimit));
 
     // CWaterCanons::UpdateOne
-    MemPut(0x728CD4, ucNewLimit);
-    MemPut(0x728CF6, ucNewLimit);
-    MemPut(0x728CFF, ucNewLimit);
-    MemPut(0x728D62, ucNewLimit);
+    MemPut<BYTE>(0x728CD4, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x728CF6, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x728CFF, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x728D62, static_cast<BYTE>(newLimit));
 
     // CWaterCannons::Render
-    MemPutFast(0x729B38, ucNewLimit);
+    MemPutFast<BYTE>(0x729B38, static_cast<BYTE>(newLimit));
 
     // 0x85542A
-    MemPut(0x85542B, ucNewLimit);
+    MemPut<BYTE>(0x85542B, static_cast<BYTE>(newLimit));
 
     // 0x856BF5
-    MemPut(0x856BF6, ucNewLimit);
+    MemPut<BYTE>(0x856BF6, static_cast<BYTE>(newLimit));
 
     // Free previous allocated memory
     if (!isEnabled && currentACannons != nullptr)

@@ -19,7 +19,7 @@
 #include <thread>
 #include <game/CSettings.h>
 
-class CProxyDirect3DDevice9;
+struct CProxyDirect3DDevice9;
 extern std::atomic<bool> g_bInMTAScene;
 
 void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters);
