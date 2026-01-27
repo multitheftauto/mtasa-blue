@@ -17,7 +17,7 @@
 class CGUIEdit : public CGUIElement
 {
 public:
-    virtual ~CGUIEdit(){};
+    virtual ~CGUIEdit() {};
 
     virtual void SetReadOnly(bool bReadOnly) = 0;
     virtual bool IsReadOnly() = 0;

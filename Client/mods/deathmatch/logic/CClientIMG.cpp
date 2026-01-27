@@ -205,9 +205,11 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
         return false;
 
     CStreamingInfo* pCurrInfo = g_pGame->GetStreaming()->GetStreamingInfo(uiModelID);
+    if (!pCurrInfo)
+        return false;
 
     if (pCurrInfo->archiveId == m_ucArchiveID)
-        return true;            // Already linked
+        return true;  // Already linked
 
     m_restoreInfo.emplace_back(uiModelID, pCurrInfo->offsetInBlocks, pCurrInfo->sizeInBlocks, pCurrInfo->archiveId);
 

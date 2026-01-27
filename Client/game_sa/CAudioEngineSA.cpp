@@ -18,11 +18,11 @@
 
 extern CGameSA* pGame;
 
-#define HOOKPOS_CAEAmbienceTrackManager_CheckForPause       0x4D6E21
+#define HOOKPOS_CAEAmbienceTrackManager_CheckForPause 0x4D6E21
 DWORD RETURN_CAEAmbienceTrackManager_CheckForPause = 0x4D6E27;
 void  HOOK_CAEAmbienceTrackManager_CheckForPause();
 
-#define HOOKPOS_CAESoundManager_RequestNewSound     0x4EFB10
+#define HOOKPOS_CAESoundManager_RequestNewSound 0x4EFB10
 DWORD RETURN_CAESoundManager_RequestNewSound = 0x4EFB15;
 void  HOOK_CAESoundManager_RequestNewSound();
 
@@ -44,13 +44,13 @@ CAudioEngineSA::CAudioEngineSA(CAudioEngineSAInterface* pInterface)
     HookInstall(HOOKPOS_CAEAmbienceTrackManager_CheckForPause, (DWORD)HOOK_CAEAmbienceTrackManager_CheckForPause, 6);
 
     // Make room for hook
-    MemPut<BYTE>(0x4EFB15 + 0, 0x0F);            // movsx   eax, si
+    MemPut<BYTE>(0x4EFB15 + 0, 0x0F);  // movsx   eax, si
     MemPut<BYTE>(0x4EFB15 + 1, 0xBF);
     MemPut<BYTE>(0x4EFB15 + 2, 0xC6);
-    MemPut<BYTE>(0x4EFB15 + 3, 0x6B);            // imul    eax, 74h
+    MemPut<BYTE>(0x4EFB15 + 3, 0x6B);  // imul    eax, 74h
     MemPut<BYTE>(0x4EFB15 + 4, 0xC0);
     MemPut<BYTE>(0x4EFB15 + 5, 0x74);
-    MemPut<BYTE>(0x4EFB29, 0xEB);            // Move jump forward one byte
+    MemPut<BYTE>(0x4EFB29, 0xEB);  // Move jump forward one byte
     HookInstall(HOOKPOS_CAESoundManager_RequestNewSound, (DWORD)HOOK_CAESoundManager_RequestNewSound, 5);
 }
 
@@ -59,8 +59,9 @@ void CAudioEngineSA::StopRadio()
     m_bRadioOn = false;
 
     // DWORD dwFunc = FUNC_StopRadio;
-    DWORD dwFunc = 0x4E9823;            // Some function CAudio::StopRadio jumps to immediately
+    DWORD dwFunc = 0x4E9823;  // Some function CAudio::StopRadio jumps to immediately
 
+    // clang-format off
     __asm
     {
         // This doesn't work anymore because we've
@@ -91,6 +92,7 @@ void CAudioEngineSA::StopRadio()
 
         retpoint:
     }
+    // clang-format on
 }
 
 void CAudioEngineSA::StartRadio(unsigned int station)
@@ -105,6 +107,7 @@ void CAudioEngineSA::StartRadio(unsigned int station)
 
     DWORD dwFunc = 0x4DBEC3;
     DWORD dwFunc2 = 0x4EB3C3;
+    // clang-format off
     __asm
     {
         // We can't do this anymore as we've returned out StartRadio
@@ -151,6 +154,7 @@ void CAudioEngineSA::StartRadio(unsigned int station)
 
         skip:
     }
+    // clang-format on
 }
 
 // 43 = race one
@@ -158,11 +162,12 @@ void CAudioEngineSA::StartRadio(unsigned int station)
 // 13 = camera take picture
 void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
 {
-    if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwEventID <= 101)            // may prevent a crash
+    if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwEventID <= 101)  // may prevent a crash
     {
         DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
         float fSpeed = 1.0f;
         float fVolumeChange = 0.0f;
+        // clang-format off
         __asm
         {
             push    fSpeed
@@ -171,6 +176,7 @@ void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
             mov     ecx, CLASS_CAudioEngine
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -178,24 +184,28 @@ void CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
 {
     DWORD dwFunc = FUNC_SetEffectsMasterVolume;
     DWORD dwVolume = bVolume;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    dwVolume
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
 {
     DWORD dwFunc = FUNC_SetMusicMasterVolume;
     DWORD dwVolume = bVolume;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    dwVolume
         call    dwFunc
     }
+    // clang-format on
 
     //
     // See if radio stream should be stopped/started
@@ -217,49 +227,56 @@ void CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
         {
             // unmute -> mute
             StopRadio();
-            m_bRadioOn = true;            // StopRadio was only called to stop the radio stream. Radio is logically still on
+            m_bRadioOn = true;  // StopRadio was only called to stop the radio stream. Radio is logically still on
         }
     }
 }
 
 void CAudioEngineSA::PlayBeatTrack(short iTrack)
 {
-    if (*(DWORD*)VAR_AudioEventVolumes != 0)            // may prevent a crash
+    if (*(DWORD*)VAR_AudioEventVolumes != 0)  // may prevent a crash
     {
         DWORD dwFunc = FUNC_PreloadBeatTrack;
         DWORD dwTrack = iTrack;
+        // clang-format off
         __asm
         {
             mov     ecx, CLASS_CAudioEngine
             push    dwTrack
             call    dwFunc
         }
+        // clang-format on
 
         dwFunc = FUNC_PlayPreloadedBeatTrack;
+        // clang-format off
         __asm
         {
             mov     ecx, CLASS_CAudioEngine
             push    1
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
 void CAudioEngineSA::ClearMissionAudio(int slot)
 {
-    DWORD dwFunc = 0x5072F0;            // CAudioEngine::ClearMissionAudio(unsigned char)
+    DWORD dwFunc = 0x5072F0;  // CAudioEngine::ClearMissionAudio(unsigned char)
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAudioEngine
         push    slot // sound bank slot?
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CAudioEngineSA::IsMissionAudioSampleFinished(int slot)
 {
-    DWORD dwFunc = 0x5072C0;            // CAudioEngine::IsMissionAudioSampleFinished
+    DWORD dwFunc = 0x5072C0;  // CAudioEngine::IsMissionAudioSampleFinished
     bool  cret = 0;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAudioEngine
@@ -267,13 +284,15 @@ bool CAudioEngineSA::IsMissionAudioSampleFinished(int slot)
         call    dwFunc
         mov     cret, al
     }
+    // clang-format on
     return cret;
 }
 
 void CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
 {
-    DWORD dwFunc = 0x507290;            // CAudioEngine__PreloadMissionAudio
+    DWORD dwFunc = 0x507290;  // CAudioEngine__PreloadMissionAudio
     DWORD AudioEvent = usAudioEvent;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAudioEngine
@@ -281,12 +300,14 @@ void CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
         push    slot
         call    dwFunc
     }
+    // clang-format on
 }
 
 unsigned char CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
 {
-    DWORD         dwFunc = 0x5072A0;            // get load status
+    DWORD         dwFunc = 0x5072A0;  // get load status
     unsigned char cret = 0;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAudioEngine
@@ -294,6 +315,7 @@ unsigned char CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
         call    dwFunc
         mov     cret, al
     }
+    // clang-format on
     return cret;
 }
 
@@ -307,7 +329,8 @@ void CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
             entity = pPhysical->GetInterface();
     }
 
-    DWORD dwFunc = 0x507330;            // AttachMissionAudioToPhysical
+    DWORD dwFunc = 0x507330;  // AttachMissionAudioToPhysical
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAudioEngine
@@ -315,11 +338,13 @@ void CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
         push    slot
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAudioEngineSA::SetMissionAudioPosition(CVector* position, int slot)
 {
-    DWORD dwFunc = 0x507300;            // CAudioEngine__SetMissionAudioPosition
+    DWORD dwFunc = 0x507300;  // CAudioEngine__SetMissionAudioPosition
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAudioEngine
@@ -327,19 +352,22 @@ void CAudioEngineSA::SetMissionAudioPosition(CVector* position, int slot)
         push    slot
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CAudioEngineSA::PlayLoadedMissionAudio(int slot)
 {
     if (GetMissionAudioLoadingStatus(slot) == 1)
     {
-        DWORD dwFunc = 0x5072B0;            // CAudioEngine::PlayLoadedMissionAudio(unsigned char)
+        DWORD dwFunc = 0x5072B0;  // CAudioEngine::PlayLoadedMissionAudio(unsigned char)
+        // clang-format off
         __asm
         {
             mov     ecx, CLASS_CAudioEngine
             push    slot
             call    dwFunc
         }
+        // clang-format on
         return true;
     }
     return false;
@@ -350,20 +378,24 @@ void CAudioEngineSA::PauseAllSound(bool bPaused)
     if (bPaused)
     {
         DWORD dwFunc = FUNC_PauseAllSounds;
+        // clang-format off
         __asm
         {
             mov     ecx, CLASS_CAudioEngine
             call    dwFunc
         }
+        // clang-format on
     }
     else
     {
         DWORD dwFunc = FUNC_ResumeAllSounds;
+        // clang-format off
         __asm
         {
             mov     ecx, CLASS_CAudioEngine
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -408,9 +440,9 @@ void CAudioEngineSA::UpdateAmbientSoundSettings()
 {
     // Update gunfire setting
     if (IsAmbientSoundEnabled(AMBIENT_SOUND_GUNFIRE))
-        MemPut<BYTE>(0x507814, 0x85);            // Enable gunfire (default)
+        MemPut<BYTE>(0x507814, 0x85);  // Enable gunfire (default)
     else
-        MemPut<BYTE>(0x507814, 0x33);            // No gunfire
+        MemPut<BYTE>(0x507814, 0x33);  // No gunfire
 }
 
 static bool IsAmbientSoundGeneralEnabled()
@@ -423,6 +455,7 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -437,6 +470,7 @@ static void __declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause()
         xor     ecx, ecx
         jmp     RETURN_CAEAmbienceTrackManager_CheckForPause
     }
+    // clang-format on
 }
 
 //
@@ -513,6 +547,7 @@ static void __declspec(naked) HOOK_CAESoundManager_RequestNewSound()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -533,6 +568,7 @@ static void __declspec(naked) HOOK_CAESoundManager_RequestNewSound()
         xor     esi, esi
         jmp     RETURN_CAESoundManager_RequestNewSound
     }
+    // clang-format on
 }
 
 void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2)
@@ -542,6 +578,7 @@ void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceTy
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAudioEngine_ReportBulletHit;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
@@ -551,6 +588,7 @@ void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceTy
         push    dwEntityInterface
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAudioEngineSA::ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical)
@@ -560,6 +598,7 @@ void CAudioEngineSA::ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhys
         dwPhysicalInterface = (DWORD)pPhysical->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAudioEngine_ReportWeaponEvent;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
@@ -568,4 +607,5 @@ void CAudioEngineSA::ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhys
         push    iEvent
         call    dwFunc
     }
+    // clang-format on
 }
