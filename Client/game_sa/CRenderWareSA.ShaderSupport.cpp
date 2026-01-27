@@ -220,7 +220,7 @@ void CRenderWareSA::PulseWorldTextureWatch()
 
     ms_txdStreamEventList.clear();
 
-    ProcessPendingIsolatedTxdParents();
+    ProcessPendingIsolatedModels();
     TIMING_CHECKPOINT("-TextureWatch");
 }
 
