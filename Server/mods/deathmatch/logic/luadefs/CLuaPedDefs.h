@@ -73,7 +73,10 @@ public:
     LUA_DECLARE_OOP(WarpPedIntoVehicle);
     LUA_DECLARE(RemovePedFromVehicle);
     LUA_DECLARE(SetPedDoingGangDriveby);
-    static bool SetPedAnimation(CElement* pPed, std::optional<std::variant<std::string, std::monostate, bool>> blockName, std::optional<std::variant<std::string, std::monostate, bool>> animName, std::optional<int> time, std::optional<bool> loop, std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame, std::optional<int> blendTime, std::optional<bool> restoreTask);
+    static bool SetPedAnimation(CElement* pPed, std::optional<std::variant<std::string, std::monostate, bool>> blockName,
+                                std::optional<std::variant<std::string, std::monostate, bool>> animName, std::optional<int> time, std::optional<bool> loop,
+                                std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame,
+                                std::optional<int> blendTime, std::optional<bool> restoreTask);
     static std::variant<bool, CLuaMultiReturn<std::string, std::string, int, bool, bool, bool, bool, int, bool>> GetPedAnimation(CPed* pPed);
     LUA_DECLARE(SetPedAnimationProgress);
     LUA_DECLARE(SetPedAnimationSpeed);

@@ -431,21 +431,13 @@ bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std
 std::variant<bool, CLuaMultiReturn<std::string, std::string, int, bool, bool, bool, bool, int, bool>> CLuaPedDefs::GetPedAnimation(CPed* pPed)
 {
     const SPlayerAnimData& animData = pPed->GetAnimationData();
-    
+
     if (!animData.IsAnimating())
         return false;
-    
+
     return CLuaMultiReturn<std::string, std::string, int, bool, bool, bool, bool, int, bool>(
-        animData.blockName,
-        animData.animName,
-        animData.time,
-        animData.loop,
-        animData.updatePosition,
-        animData.interruptable,
-        animData.freezeLastFrame,
-        animData.blendTime,
-        animData.taskToBeRestoredOnAnimEnd
-    );
+        animData.blockName, animData.animName, animData.time, animData.loop, animData.updatePosition, animData.interruptable, animData.freezeLastFrame,
+        animData.blendTime, animData.taskToBeRestoredOnAnimEnd);
 }
 
 int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
