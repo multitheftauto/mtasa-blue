@@ -6112,6 +6112,9 @@ bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, c
         case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
             g_pGame->SetVehicleBurnExplosionsEnabled(enabled);
             break;
+        case WorldSpecialProperty::VEHICLEBURNBLOWUP:
+            g_pGame->SetVehicleBurnBlowUpEnabled(enabled);
+            break;
         case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
             SetVehicleEngineAutoStartEnabled(enabled);
             break;
@@ -6161,6 +6164,8 @@ bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
             return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
         case WorldSpecialProperty::VEHICLEBURNEXPLOSIONS:
             return g_pGame->IsVehicleBurnExplosionsEnabled();
+        case WorldSpecialProperty::VEHICLEBURNBLOWUP:
+            return g_pGame->IsVehicleBurnBlowUpEnabled();
         case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
             return IsVehicleEngineAutoStartEnabled();
     }
@@ -6967,6 +6972,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         g_pGame->SetIgnoreFireStateEnabled(false);
         m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
         g_pGame->SetVehicleBurnExplosionsEnabled(true);
+        g_pGame->SetVehicleBurnBlowUpEnabled(true);
         SetVehicleEngineAutoStartEnabled(true);
     }
 
