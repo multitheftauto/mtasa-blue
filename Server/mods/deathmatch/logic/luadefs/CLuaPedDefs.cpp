@@ -67,7 +67,7 @@ void CLuaPedDefs::LoadFunctions()
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
         {"setPedAnimation", ArgumentParserWarn<false, SetPedAnimation>},
-        {"getPedAnimation", ArgumentParserWarn<false, GetPedAnimation>},
+        {"getPedAnimation", ArgumentParser<GetPedAnimation>},
         {"setPedAnimationProgress", SetPedAnimationProgress},
         {"setPedAnimationSpeed", SetPedAnimationSpeed},
         {"setPedOnFire", SetPedOnFire},
