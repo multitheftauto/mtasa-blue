@@ -13,9 +13,9 @@
 
 #include <game/CClock.h>
 
-#define VAR_TimeMinutes                 0xB70152
-#define VAR_TimeHours                   0xB70153
-#define VAR_TimeOfLastMinuteChange      0xB70158
+#define VAR_TimeMinutes            0xB70152
+#define VAR_TimeHours              0xB70153
+#define VAR_TimeOfLastMinuteChange 0xB70158
 
 class CClockSA : public CClock
 {

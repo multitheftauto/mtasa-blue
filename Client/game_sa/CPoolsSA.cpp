@@ -81,23 +81,28 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     if (m_vehiclePool.ulCount >= MAX_VEHICLES)
         return nullptr;
 
-    // Ensure collision model is fully loaded to prevent crash at 0x002a65ef in SetupSuspensionLines
     CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(model));
-    if (!pModelInfo || !pModelInfo->GetInterface())
+    if (!pModelInfo)
         return nullptr;
-    
+
+    if (!pModelInfo->GetInterface())
+    {
+        pGame->GetStreaming()->RequestModel(model, 0x16);
+        pGame->GetStreaming()->LoadAllRequestedModels(true, "CPoolsSA::AddVehicle");
+        if (!pModelInfo->GetInterface())
+            return nullptr;
+    }
+
     CBaseModelInfoSAInterface* pModelInterface = pModelInfo->GetInterface();
 
-    // Ensure collision model pointer exists
     if (!pModelInterface->pColModel)
     {
-        // Collision model pointer is NULL - try loading
         pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
-        
-        // Re-fetch interface as loading may have invalidated pointer
+
         pModelInterface = pModelInfo->GetInterface();
-        
-        // Still NULL means model has no collision (or loading failed) - block creation
+        if (!pModelInterface)
+            return nullptr;
+
         if (!pModelInterface->pColModel)
             return nullptr;
     }
@@ -269,6 +274,21 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
+        CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(dwModelID));
+        if (!pModelInfo)
+            return nullptr;
+
+        if (!pModelInfo->GetInterface())
+        {
+            pGame->GetStreaming()->RequestModel(dwModelID, 0x16);
+            pGame->GetStreaming()->LoadAllRequestedModels(true, "CPoolsSA::AddObject");
+            if (!pModelInfo->GetInterface())
+            {
+                AddReportLog(5552, SString("Failed to create object with model %d - model invalid or deallocated", dwModelID));
+                return nullptr;
+            }
+        }
+
         pObject = new (std::nothrow) CObjectSA(dwModelID, bBreakingDisabled);
 
         if (pObject && AddObjectToPool(pClientObject, pObject))
@@ -447,7 +467,7 @@ CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
 
 void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
 {
-    static bool bIsDeletingPedAlready = false;            // to prevent delete being called twice
+    static bool bIsDeletingPedAlready = false;  // to prevent delete being called twice
 
     if (!bIsDeletingPedAlready)
     {
@@ -608,8 +628,8 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
 static void CreateMissionTrain(const CVector& vecPos, bool bDirection, std::uint32_t uiTrainType, CTrainSAInterface** ppTrainBeginning,
                                CTrainSAInterface** ppTrainEnd, int iNodeIndex, int iTrackId, bool bMissionTrain) noexcept
 {
-    auto createMissionTrain = reinterpret_cast<void(__cdecl*)(CVector, bool, std::uint32_t, CTrainSAInterface**, CTrainSAInterface**,
-                                                              int, int, bool)>(FUNC_CTrain_CreateMissionTrain);
+    auto createMissionTrain = reinterpret_cast<void(__cdecl*)(CVector, bool, std::uint32_t, CTrainSAInterface**, CTrainSAInterface**, int, int, bool)>(
+        FUNC_CTrain_CreateMissionTrain);
 
     createMissionTrain(vecPos, bDirection, uiTrainType, ppTrainBeginning, ppTrainEnd, iNodeIndex, iTrackId, bMissionTrain);
 }
@@ -693,7 +713,7 @@ DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
     {
         return MAX_PEDS;
     }
-    return ((pInterface - pTheObjects) / dwAlignedSize); 
+    return ((pInterface - pTheObjects) / dwAlignedSize);
 }
 
 DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
@@ -764,10 +784,38 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 
     unsigned int NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
 
+    auto isValidPtr = [](const void* ptr) noexcept -> bool
+    {
+        if (!ptr)
+            return false;
+
+        __try
+        {
+            const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
+            const auto* v = p->VFTBL;
+            if (!v)
+                return false;
+
+            volatile DWORD test = v->Destructor;
+            static_cast<void>(test);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    };
+
     for (uint i = 1; i < NUMBER_OF_MODELS; i++)
     {
-        CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[i];
-        if (m_pInterface && m_pInterface->pRwObject == (RwObject*)pRpClump)
+        CBaseModelInfoSAInterface* pInterface = ppModelInfo[i];
+        if (!pInterface)
+            continue;
+
+        if (!isValidPtr(pInterface))
+            continue;
+
+        if (pInterface->pRwObject == (RwObject*)pRpClump)
         {
             return i;
         }
@@ -784,17 +832,17 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
         case PED_POOL:
             return 140;
         case OBJECT_POOL:
-            return 350;            // Modded to 700   @ CGameSA.cpp
+            return 350;  // Modded to 700   @ CGameSA.cpp
         case DUMMY_POOL:
             return 2500;
         case VEHICLE_POOL:
             return 110;
         case COL_MODEL_POOL:
-            return 10150;            // Modded to 12000  @ CGameSA.cpp
+            return 10150;  // Modded to 12000  @ CGameSA.cpp
         case TASK_POOL:
-            return 500;            // Modded to 5000   @ CGameSA.cpp
+            return 500;  // Modded to 5000   @ CGameSA.cpp
         case EVENT_POOL:
-            return 200;            // Modded to 5000   @ CGameSA.cpp
+            return 200;  // Modded to 5000   @ CGameSA.cpp
         case TASK_ALLOCATOR_POOL:
             return 16;
         case PED_INTELLIGENCE_POOL:
@@ -802,7 +850,7 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
         case PED_ATTRACTOR_POOL:
             return 64;
         case ENTRY_INFO_NODE_POOL:
-            return 500;            // Modded to 4096   @ CGameSA.cpp
+            return 500;  // Modded to 4096   @ CGameSA.cpp
         case NODE_ROUTE_POOL:
             return 64;
         case PATROL_ROUTE_POOL:
@@ -810,15 +858,15 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
         case POINT_ROUTE_POOL:
             return 64;
         case POINTER_DOUBLE_LINK_POOL:
-            return 3200;            // Modded to 8000   @ CGameSA.cpp
+            return 3200;  // Modded to 8000   @ CGameSA.cpp
         case POINTER_SINGLE_LINK_POOL:
             return 70000;
         case ENV_MAP_MATERIAL_POOL:
-            return 4096;            // Modded to 16000   @ CGameSA.cpp
+            return 4096;  // Modded to 16000   @ CGameSA.cpp
         case ENV_MAP_ATOMIC_POOL:
-            return 1024;            // Modded to 8000    @ CGameSA.cpp
+            return 1024;  // Modded to 8000    @ CGameSA.cpp
         case SPEC_MAP_MATERIAL_POOL:
-            return 4096;            // Modded to 16000   @ CGameSA.cpp
+            return 4096;  // Modded to 16000   @ CGameSA.cpp
     }
     return 0;
 }
@@ -978,25 +1026,25 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
             break;
         case TASK_ALLOCATOR_POOL:
             cPtr = 0x55124E;
-            break;            // 0 - 127
+            break;  // 0 - 127
         case PED_INTELLIGENCE_POOL:
             iPtr = 0x551283;
             break;
         case PED_ATTRACTOR_POOL:
             cPtr = 0x5512BB;
-            break;            // 0 - 127
+            break;  // 0 - 127
         case ENTRY_INFO_NODE_POOL:
             iPtr = 0x550FBA;
             break;
         case NODE_ROUTE_POOL:
             cPtr = 0x551218;
-            break;            // 0 - 127
+            break;  // 0 - 127
         case PATROL_ROUTE_POOL:
             cPtr = 0x5511E4;
-            break;            // 0 - 127
+            break;  // 0 - 127
         case POINT_ROUTE_POOL:
             cPtr = 0x5511AF;
-            break;            // 0 - 127
+            break;  // 0 - 127
         case POINTER_DOUBLE_LINK_POOL:
             iPtr = 0x550F82;
             break;
@@ -1017,7 +1065,7 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
         MemPut(iPtr, iValue);
 
     if (cPtr)
-        MemPut(cPtr, static_cast<char>(iValue));
+        MemPut<char>(cPtr, static_cast<char>(iValue));
 }
 
 int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
@@ -1099,6 +1147,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
@@ -1107,6 +1156,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
             mov     iOut, eax
 
         }
+        // clang-format on
     }
 
     return iOut;

@@ -56,9 +56,9 @@ void CPedSA::Init()
     for (std::size_t i = 0; i < WEAPONSLOT_MAX; i++)
         m_weapons[i] = std::make_unique<CWeaponSA>(&(pedInterface->Weapons[i]), this, static_cast<eWeaponSlot>(i));
 
-    #ifdef PedIK_SA
-        this->m_pPedIK = new Cm_pPedIKSA(&(pedInterface->m_pPedIK));
-    #endif
+#ifdef PedIK_SA
+    this->m_pPedIK = new Cm_pPedIKSA(&(pedInterface->m_pPedIK));
+#endif
 }
 
 void CPedSA::SetModelIndex(std::uint32_t modelIndex)
@@ -85,7 +85,8 @@ bool CPedSA::AddProjectile(eWeaponType weaponType, CVector origin, float force, 
     if (!projectileInfo)
         return false;
 
-    return projectileInfo->AddProjectile(static_cast<CEntitySA*>(this), weaponType, origin, force, const_cast<CVector*>(target), const_cast<CEntity*>(targetEntity));
+    return projectileInfo->AddProjectile(static_cast<CEntitySA*>(this), weaponType, origin, force, const_cast<CVector*>(target),
+                                         const_cast<CEntity*>(targetEntity));
 }
 
 void CPedSA::DetachPedFromEntity()
@@ -98,13 +99,15 @@ bool CPedSA::InternalAttachEntityToEntity(DWORD entityInteface, const CVector* p
 {
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
     CPedSAInterface* pedInterface = GetPedInterface();
-    auto pedType = static_cast<std::uint8_t>(pedInterface->bPedType);
+    int              pedType = pedInterface->bPedType;
 
     // Hack the CPed type(?) to non-player so the camera doesn't get changed
     pedInterface->bPedType = 2;
 
     // CEntity *__thiscall CPed::AttachPedToEntity(CPed *this, CEntity *a2, float arg4, float a4, float a5, __int16 a6, int a7, eWeaponType a3)
-    ((CEntitySAInterface*(__thiscall*)(CEntitySAInterface*, CEntitySAInterface*, float, float, float, std::uint16_t, int, eWeaponType))FUNC_AttachPedToEntity)(m_pInterface, reinterpret_cast<CEntitySAInterface*>(entityInteface), position->fX, position->fY, position->fZ, 0, 0, WEAPONTYPE_UNARMED);
+    ((CEntitySAInterface * (__thiscall*)(CEntitySAInterface*, CEntitySAInterface*, float, float, float, std::uint16_t, int, eWeaponType))
+         FUNC_AttachPedToEntity)(m_pInterface, reinterpret_cast<CEntitySAInterface*>(entityInteface), position->fX, position->fY, position->fZ, 0, 0,
+                                 WEAPONTYPE_UNARMED);
 
     // Hack the CPed type(?) to whatever it was set to
     pedInterface->bPedType = pedType;
@@ -134,14 +137,15 @@ void CPedSA::Respawn(CVector* position, bool cameraCut)
         MemSet((void*)0x4422EA, 0x90, 20);
 
     // void __cdecl CGameLogic::RestorePlayerStuffDuringResurrection(CPlayerPed *player, __int128 a2)
-    ((void(__cdecl*)(CEntitySAInterface*, float, float, float, float))FUNC_RestorePlayerStuffDuringResurrection)(m_pInterface, position->fX, position->fY, position->fZ, 1.0f);
+    ((void(__cdecl*)(CEntitySAInterface*, float, float, float, float))FUNC_RestorePlayerStuffDuringResurrection)(m_pInterface, position->fX, position->fY,
+                                                                                                                 position->fZ, 1.0f);
 
-    #ifdef SortOutStreamingAndMemory // Disabled to see if it reduces crashes
-        float angle = 10.0f; // angle for CRenderer::RequestObjectsInDirection
+#ifdef SortOutStreamingAndMemory  // Disabled to see if it reduces crashes
+    float angle = 10.0f;          // angle for CRenderer::RequestObjectsInDirection
 
-        // void __cdecl CGameLogic::SortOutStreamingAndMemory(CVector *translation, float angle)
-        ((void(__cdecl*)(CVector*, float))FUNC_SortOutStreamingAndMemory)(position, angle);
-    #endif
+    // void __cdecl CGameLogic::SortOutStreamingAndMemory(CVector *translation, float angle)
+    ((void(__cdecl*)(CVector*, float))FUNC_SortOutStreamingAndMemory)(position, angle);
+#endif
 
     // BYTE *__thiscall CPed::RemoveGogglesModel(CPed *this)
     ((std::uint8_t*(__thiscall*)(CEntitySAInterface*))FUNC_RemoveGogglesModel)(m_pInterface);
@@ -166,7 +170,7 @@ CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponS
                 modelInfo->Request(BLOCKING, "CPedSA::GiveWeapon");
                 modelInfo->MakeCustomModel();
             }
-            
+
             // If the weapon is satchels, load the detonator too
             if (weaponType == WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
                 GiveWeapon(WEAPONTYPE_DETONATOR, 1, WEAPONSKILL_STD);
@@ -175,7 +179,8 @@ CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponS
 
     // eWeaponType __thiscall CPed::GiveWeapon(CPed *this, eWeaponType weaponID, signed int ammo, int a4)
     // Last argument is unused
-    eWeaponSlot weaponSlot = ((eWeaponSlot(__thiscall*)(CEntitySAInterface*, eWeaponType, std::uint32_t, int))FUNC_GiveWeapon)(m_pInterface, weaponType, ammo, 1);
+    eWeaponSlot weaponSlot =
+        ((eWeaponSlot(__thiscall*)(CEntitySAInterface*, eWeaponType, std::uint32_t, int))FUNC_GiveWeapon)(m_pInterface, weaponType, ammo, 1);
 
     return GetWeapon(weaponSlot);
 }
@@ -214,7 +219,7 @@ void CPedSA::RemoveWeaponModel(std::uint32_t model)
 void CPedSA::ClearWeapon(eWeaponType weaponType)
 {
     // BYTE *__thiscall CPed::ClearWeapon(CPed *this, eWeaponType a2)
-    ((std::uint8_t * (__thiscall*)(CEntitySAInterface*, eWeaponType)) FUNC_ClearWeapon)(m_pInterface, weaponType);
+    ((std::uint8_t*(__thiscall*)(CEntitySAInterface*, eWeaponType))FUNC_ClearWeapon)(m_pInterface, weaponType);
 }
 
 void CPedSA::SetIsStanding(bool standing)
@@ -302,7 +307,7 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* position)
     // for a broken model.
     if (entity->m_pRwObject)
         // RwV3D *__thiscall CPed::GetTransformedBonePosition(CPed *this, RwV3D *pointsIn, int boneId, char bUpdateBones)
-        ((RwV3d*(__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool))FUNC_GetTransformedBonePosition)(entity, position, bone, true);
+        ((RwV3d * (__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool)) FUNC_GetTransformedBonePosition)(entity, position, bone, true);
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
@@ -350,9 +355,8 @@ void CPedSA::SetClothesTextureAndModel(const char* texture, const char* model, i
 
     // int __fastcall CPedClothesDesc::SetTextureAndModel(DWORD* this, int unknown, char* textureName, char* modelName, eClothesTexturePart texturePart)
     // Second argument is unused in CKeyGen::GetUppercaseKey
-    void(__fastcall* CPedClothesDesc__SetTextureAndModel)(CPedClothesDesc*, int, const char*, const char*, int) = nullptr;
-    CPedClothesDesc__SetTextureAndModel = reinterpret_cast<decltype(CPedClothesDesc__SetTextureAndModel)>(FUNC_CPedClothesDesc__SetTextureAndModel);
-    CPedClothesDesc__SetTextureAndModel(clothes, 0, texture, model, textureType);
+    ((void(__fastcall*)(CPedClothesDesc*, int, const char*, const char*, std::uint8_t))FUNC_CPedClothesDesc__SetTextureAndModel)(
+        clothes, 0, texture, model, static_cast<std::uint8_t>(textureType));
 }
 
 void CPedSA::RebuildPlayer()
@@ -401,7 +405,7 @@ void CPedSA::SetFootBlood(std::uint32_t footBlood)
 std::uint32_t CPedSA::GetFootBlood() const
 {
     CPedSAInterface* pedInterface = GetPedInterface();
-    
+
     // If the foot blood flag is activated, return the amount of foot blood
     return pedInterface->pedFlags.bDoBloodyFootprints ? pedInterface->timeWhenDead : 0;
 }
@@ -517,7 +521,8 @@ float CPedSA::GetCurrentWeaponRange() const
 void CPedSA::AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType)
 {
     // void __thiscall CAEPedWeaponAudioEntity::AddAudioEvent(CAEPedWeaponAudioEntity *this, int audioEventId)
-    ((void(__thiscall*)(CPedWeaponAudioEntitySAInterface*, std::uint16_t))FUNC_CAEPedWeaponAudioEntity__AddAudioEvent)(&GetPedInterface()->weaponAudioEntity, static_cast<std::uint16_t>(audioEventType));
+    ((void(__thiscall*)(CPedWeaponAudioEntitySAInterface*, std::uint16_t))FUNC_CAEPedWeaponAudioEntity__AddAudioEvent)(
+        &GetPedInterface()->weaponAudioEntity, static_cast<std::uint16_t>(audioEventType));
 }
 
 bool CPedSA::IsDoingGangDriveby() const
@@ -542,17 +547,18 @@ void CPedSA::SetOxygenLevel(float oxygen)
 void CPedSA::Say(const ePedSpeechContext& speechId, float probability)
 {
     // Call CPed::Say
-    ((void(__thiscall*)(CPedSAInterface*, ePedSpeechContext, int, float, bool, bool, bool))FUNC_CPed_Say)(GetPedInterface(), speechId, 0, probability, false, false, false);
+    ((void(__thiscall*)(CPedSAInterface*, ePedSpeechContext, int, float, bool, bool, bool))FUNC_CPed_Say)(GetPedInterface(), speechId, 0, probability, false,
+                                                                                                          false, false);
 }
 
 void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
 {
     // Array of projectiles objects
-    auto** projectilesArray = reinterpret_cast<CProjectileSAInterface**>(ARRAY_CProjectile);
-    CProjectileSAInterface*  projectileInterface = nullptr;
+    auto**                  projectilesArray = reinterpret_cast<CProjectileSAInterface**>(ARRAY_CProjectile);
+    CProjectileSAInterface* projectileInterface = nullptr;
 
     // Array of projectiles infos
-    auto* projectilesInfoArray = reinterpret_cast<CProjectileInfoSAInterface*>(ARRAY_CProjectileInfo);
+    auto*                       projectilesInfoArray = reinterpret_cast<CProjectileInfoSAInterface*>(ARRAY_CProjectileInfo);
     CProjectileInfoSAInterface* projectileInfoInterface = nullptr;
 
     satchelsList.reserve(PROJECTILE_COUNT);
@@ -596,14 +602,15 @@ void CPedSA::SetInWaterFlags(bool inWater)
 // Check if they have already been applied.
 //
 ////////////////////////////////////////////////////////////////
-#define HOOKPOS_CPed_PreRenderAfterTest 0x5E65A0
+#define HOOKPOS_CPed_PreRenderAfterTest  0x5E65A0
 #define HOOKSIZE_CPed_PreRenderAfterTest 15
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
-static void __declspec(naked) HOOK_CPed_PreRenderAfterTest()
+static void __declspec(naked)   HOOK_CPed_PreRenderAfterTest()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Replaced code
@@ -627,6 +634,7 @@ static void __declspec(naked) HOOK_CPed_PreRenderAfterTest()
         // Skip code at start of CPed::PreRenderAfterTest
         jmp     RETURN_CPed_PreRenderAfterTestSkip
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -637,14 +645,15 @@ static void __declspec(naked) HOOK_CPed_PreRenderAfterTest()
 // Check if it should not be called because we only wanted to do the extra rotations
 //
 ////////////////////////////////////////////////////////////////
-#define HOOKPOS_CPed_PreRenderAfterTest_Mid 0x5E6669
+#define HOOKPOS_CPed_PreRenderAfterTest_Mid  0x5E6669
 #define HOOKSIZE_CPed_PreRenderAfterTest_Mid 5
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
 static constexpr std::uintptr_t RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
-static void __declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
+static void __declspec(naked)   HOOK_CPed_PreRenderAfterTest_Mid()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Check what to do
@@ -661,6 +670,7 @@ static void __declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
         // Skip code at mid of CPed::PreRenderAfterTest
         jmp     RETURN_CPed_PreRenderAfterTest_MidSkip
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////

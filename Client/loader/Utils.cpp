@@ -14,6 +14,8 @@
 #include "Dialogs.h"
 #include <array>
 #include <random>
+#include <cstring>
+#include <winternl.h>
 #include <cryptopp/crc.h>
 #include <cryptopp/files.h>
 #include <tchar.h>
@@ -23,7 +25,7 @@
 #include <wintrust.h>
 #include <version.h>
 #include <windows.h>
-#pragma comment (lib, "wintrust")
+#pragma comment(lib, "wintrust")
 
 namespace fs = std::filesystem;
 
@@ -86,7 +88,7 @@ WString devicePathToWin32Path(const WString& strDevicePath)
             while (*p++)
                 ;
 
-        } while (!bFound && *p);            // end of string
+        } while (!bFound && *p);  // end of string
     }
     return pszFilename;
 }
@@ -532,7 +534,8 @@ static const SString DoUserAssistedSearch() noexcept
 {
     SString result;
 
-    MessageBox(nullptr, _("Start Grand Theft Auto: San Andreas.\nEnsure the game is placed in the 'Program Files (x86)' folder."), _("Searching for GTA: San Andreas"), MB_OK | MB_ICONINFORMATION);
+    MessageBox(nullptr, _("Start Grand Theft Auto: San Andreas.\nEnsure the game is placed in the 'Program Files (x86)' folder."),
+               _("Searching for GTA: San Andreas"), MB_OK | MB_ICONINFORMATION);
 
     while (true)
     {
@@ -545,7 +548,10 @@ static const SString DoUserAssistedSearch() noexcept
             return result;
         }
 
-        if (MessageBox(nullptr, _("Sorry, game not found.\nStart Grand Theft Auto: San Andreas and click retry.\nEnsure the game is placed in the 'Program Files (x86)' folder."), _("Searching for GTA: San Andreas"), MB_RETRYCANCEL | MB_ICONWARNING) == IDCANCEL)
+        if (MessageBox(nullptr,
+                       _("Sorry, game not found.\nStart Grand Theft Auto: San Andreas and click retry.\nEnsure the game is placed in the 'Program Files (x86)' "
+                         "folder."),
+                       _("Searching for GTA: San Andreas"), MB_RETRYCANCEL | MB_ICONWARNING) == IDCANCEL)
             return result;
     }
 }
@@ -564,7 +570,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
 
     // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
     pathList.push_back(GetCommonRegistryValue("", "GTA:SA Path"));
-    
+
     WriteDebugEvent(SString("GetGamePath: Registry returned '%s'", pathList[0].c_str()));
 
     // Unicode character check on first one
@@ -581,11 +587,13 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
         if (pathList[i].empty())
         {
             WriteDebugEvent(SString("GetGamePath: pathList[%d] is empty", i));
+            AddReportLog(3201, SString("GetGamePath: Registry GTA:SA Path is empty (index %d)", i));
             continue;
         }
 
         WriteDebugEvent(SString("GetGamePath: Checking '%s' for '%s'", pathList[i].c_str(), MTA_GTA_KNOWN_FILE_NAME));
-        if (FileExists(PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME)))
+        SString strCheckPath = PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME);
+        if (FileExists(strCheckPath))
         {
             strOutResult = pathList[i];
             // Update registry.
@@ -593,15 +601,23 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
             WriteDebugEvent(SString("GetGamePath: Found GTA at '%s'", strOutResult.c_str()));
             return GAME_PATH_OK;
         }
+        else
+        {
+            AddReportLog(3202, SString("GetGamePath: File check failed - '%s' not found", strCheckPath.c_str()));
+        }
     }
 
     WriteDebugEvent("GetGamePath: No valid GTA path found in registry");
 
     // Try to find?
     if (!bFindIfMissing)
+    {
+        AddReportLog(3203, "GetGamePath: No valid GTA path and bFindIfMissing=false");
         return GAME_PATH_MISSING;
+    }
 
     // Ask user to browse for GTA
+    AddReportLog(3204, "GetGamePath: Prompting user to browse for GTA folder");
     BROWSEINFOW bi = {0};
     WString     strMessage(_("Select your Grand Theft Auto: San Andreas Installation Directory"));
     bi.lpszTitle = strMessage;
@@ -614,6 +630,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
         if (SHGetPathFromIDListW(pidl, szBuffer))
         {
             strOutResult = ToUTF8(szBuffer);
+            AddReportLog(3205, SString("GetGamePath: User browsed to '%s'", strOutResult.c_str()));
         }
 
         // free memory used
@@ -624,21 +641,31 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
             imalloc->Release();
         }
     }
+    else
+    {
+        AddReportLog(3206, "GetGamePath: User cancelled browse dialog");
+    }
 
     // Check browse result
-    if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
+    SString strBrowseCheckPath = PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME);
+    if (!FileExists(strBrowseCheckPath))
     {
+        AddReportLog(3207, SString("GetGamePath: Browse result invalid - '%s' not found, trying DoUserAssistedSearch", strBrowseCheckPath.c_str()));
         // If browse didn't help, try another method
         strOutResult = DoUserAssistedSearch();
 
-        if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
+        SString strSearchCheckPath = PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME);
+        if (!FileExists(strSearchCheckPath))
         {
+            AddReportLog(3208, SString("GetGamePath: DoUserAssistedSearch failed - '%s' not found, giving up", strSearchCheckPath.c_str()));
             // If still not found, give up
             return GAME_PATH_MISSING;
         }
+        AddReportLog(3209, SString("GetGamePath: DoUserAssistedSearch succeeded - found '%s'", strOutResult.c_str()));
     }
 
     // File found. Update registry.
+    AddReportLog(3210, SString("GetGamePath: Success - GTA found at '%s'", strOutResult.c_str()));
     SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
     return GAME_PATH_OK;
 }
@@ -854,16 +881,40 @@ void MakeRandomIndexList(int Size, std::vector<int>& outList)
 //
 // GetOSVersion
 //
-// Affected by compatibility mode
+// Returns OS version info
 //
 ///////////////////////////////////////////////////////////////
+static bool QueryRtlGetVersion(SOSVersionInfo& versionInfo)
+{
+    HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
+    if (!hNtdll)
+        return false;
+
+    FARPROC pProc = GetProcAddress(hNtdll, "RtlGetVersion");
+    if (!pProc)
+        return false;
+
+    using RtlGetVersionFn = LONG(WINAPI*)(PRTL_OSVERSIONINFOW);
+    RtlGetVersionFn pRtlGetVersion = nullptr;
+    static_assert(sizeof(pRtlGetVersion) == sizeof(pProc), "Unexpected function pointer size");
+    std::memcpy(&pRtlGetVersion, &pProc, sizeof(pRtlGetVersion));
+
+    RTL_OSVERSIONINFOW osvi = {};
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    if (pRtlGetVersion(&osvi) != 0)
+        return false;
+
+    versionInfo.dwMajor = osvi.dwMajorVersion;
+    versionInfo.dwMinor = osvi.dwMinorVersion;
+    versionInfo.dwBuild = osvi.dwBuildNumber;
+    return true;
+}
+
 SOSVersionInfo GetOSVersion()
 {
-    OSVERSIONINFO versionInfo;
-    memset(&versionInfo, 0, sizeof(versionInfo));
-    versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
-    GetVersionEx(&versionInfo);
-    return {versionInfo.dwMajorVersion, versionInfo.dwMinorVersion, versionInfo.dwBuildNumber};
+    SOSVersionInfo versionInfo = {0};
+    QueryRtlGetVersion(versionInfo);
+    return versionInfo;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -1145,13 +1196,13 @@ bool Is32bitProcess(DWORD processID)
             if (bOk)
             {
                 if (bIsWow64 == FALSE)
-                    return false;            // 64 bit O/S and process not running under WOW64, so it must be a 64 bit process
+                    return false;  // 64 bit O/S and process not running under WOW64, so it must be a 64 bit process
                 return true;
             }
         }
     }
 
-    return false;            // Can't determine. Guess it's 64 bit
+    return false;  // Can't determine. Guess it's 64 bit
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1311,8 +1362,8 @@ int GetFileAge(const SString& strPathFilename)
 ///////////////////////////////////////////////////////////////////////////
 void CleanDownloadCache()
 {
-    const uint uiMaxCleanTime = 5;                           // Limit clean time (seconds)
-    const uint uiCleanFileAge = 60 * 60 * 24 * 7;            // Delete files older than this
+    const uint uiMaxCleanTime = 5;                 // Limit clean time (seconds)
+    const uint uiCleanFileAge = 60 * 60 * 24 * 7;  // Delete files older than this
 
     const time_t tMaxEndTime = time(NULL) + uiMaxCleanTime;
 
@@ -1394,7 +1445,7 @@ void DirectoryCopy(SString strSrcBase, SString strDestBase, bool bShowProgressDi
     bool      bCheckFreeSpace = false;
     long long llFreeBytesAvailable = GetDiskFreeSpace(strDestBase);
     if (llFreeBytesAvailable != 0)
-        bCheckFreeSpace = (llFreeBytesAvailable < (iMinFreeSpaceMB + 10000) * 0x100000LL);            // Only check if initial freespace is less than 10GB
+        bCheckFreeSpace = (llFreeBytesAvailable < (iMinFreeSpaceMB + 10000) * 0x100000LL);  // Only check if initial freespace is less than 10GB
 
     if (bShowProgressDialog)
         ShowProgressDialog(g_hInstance, _("Copying files..."), true);
@@ -1501,7 +1552,7 @@ void MaybeShowCopySettingsDialog()
     if (!FileExists(strPreviousConfig))
         return;
 
-    HideSplash();            // Hide standard MTA splash
+    HideSplash();  // Hide standard MTA splash
 
     // Show dialog
     SString strMessage;
@@ -2164,7 +2215,7 @@ bool IsNativeArm64Host()
         if (kernel32)
         {
             BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
-            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(static_cast<void*>(GetProcAddress(kernel32, "IsWow64Process2")));
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(reinterpret_cast<void*>(GetProcAddress(kernel32, "IsWow64Process2")));
 
             if (IsWow64Process2_)
             {
@@ -2249,4 +2300,392 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
     g_hInstance = hModule;
     return TRUE;
+}
+
+//////////////////////////////////////////////////////////
+//
+// QueryWerCrashInfo
+//
+// Query Windows Error Reporting and Event Log for crash details.
+// If targetExceptionCode is 0, any fail-fast exception is matched.
+//
+//////////////////////////////////////////////////////////
+WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode)
+{
+    constexpr DWORD     EXCEPTION_STACK_BUFFER_OVERRUN = 0xC0000409;
+    constexpr DWORD     EXCEPTION_HEAP_CORRUPTION = 0xC0000374;
+    constexpr ULONGLONG FILETIME_UNITS_PER_SECOND = 10000000ULL;
+    constexpr ULONGLONG MAX_CRASH_AGE_MINUTES = 15;
+
+    WerCrashInfo result;
+
+    // WER stores reports in two locations:
+    // 1. User profile: %LOCALAPPDATA%\Microsoft\Windows\WER\ReportArchive (no admin needed)
+    // 2. System-wide: C:\ProgramData\Microsoft\Windows\WER\ReportArchive (needs admin)
+    // Check user profile first as it's more likely to have reports without admin privileges
+    std::vector<SString> werArchivePaths;
+
+    char localAppData[MAX_PATH];
+    if (GetEnvironmentVariableA("LOCALAPPDATA", localAppData, MAX_PATH) > 0)
+    {
+        werArchivePaths.push_back(PathJoin(localAppData, "Microsoft\\Windows\\WER\\ReportArchive"));
+    }
+    werArchivePaths.push_back("C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive");
+
+    // Collect all report directories from both paths
+    std::vector<std::pair<SString, SString>> allReportDirs;  // <archivePath, reportDir>
+    for (const SString& werArchivePath : werArchivePaths)
+    {
+        SString searchPattern = PathJoin(werArchivePath, "AppCrash_gta_sa.exe_*");
+        auto    reportDirs = FindFiles(searchPattern, false, true, true);
+        for (const SString& dir : reportDirs)
+        {
+            allReportDirs.push_back({werArchivePath, dir});
+        }
+    }
+
+    if (allReportDirs.empty())
+        return result;
+
+    FILETIME ftNow;
+    GetSystemTimeAsFileTime(&ftNow);
+    ULARGE_INTEGER uliNow;
+    uliNow.LowPart = ftNow.dwLowDateTime;
+    uliNow.HighPart = ftNow.dwHighDateTime;
+
+    for (auto it = allReportDirs.rbegin(); it != allReportDirs.rend(); ++it)
+    {
+        const SString& werArchivePath = it->first;
+        const SString& reportDir = it->second;
+        SString        reportPath = PathJoin(werArchivePath, reportDir, "Report.wer");
+
+        HANDLE hFile = CreateFileA(reportPath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (hFile == INVALID_HANDLE_VALUE)
+            continue;
+
+        FILETIME ftCreate, ftAccess, ftWrite;
+        if (!GetFileTime(hFile, &ftCreate, &ftAccess, &ftWrite))
+        {
+            CloseHandle(hFile);
+            continue;
+        }
+
+        ULARGE_INTEGER uliWrite;
+        uliWrite.LowPart = ftWrite.dwLowDateTime;
+        uliWrite.HighPart = ftWrite.dwHighDateTime;
+
+        const ULONGLONG maxAge = MAX_CRASH_AGE_MINUTES * 60 * FILETIME_UNITS_PER_SECOND;
+        if (uliNow.QuadPart < uliWrite.QuadPart || uliNow.QuadPart - uliWrite.QuadPart > maxAge)
+        {
+            CloseHandle(hFile);
+            continue;  // Skip stale reports but check others from different paths
+        }
+
+        wchar_t wbuffer[8192]{};
+        DWORD   bytesRead = 0;
+        SetFilePointer(hFile, 0, nullptr, FILE_BEGIN);
+        ReadFile(hFile, wbuffer, sizeof(wbuffer) - sizeof(wchar_t), &bytesRead, nullptr);
+        CloseHandle(hFile);
+
+        std::wstring content(wbuffer, bytesRead / sizeof(wchar_t));
+
+        bool hasStackOverrun = content.find(L"c0000409") != std::wstring::npos || content.find(L"C0000409") != std::wstring::npos;
+        bool hasHeapCorruption = content.find(L"c0000374") != std::wstring::npos || content.find(L"C0000374") != std::wstring::npos;
+
+        if (!hasStackOverrun && !hasHeapCorruption)
+            continue;
+
+        DWORD foundCode = hasStackOverrun ? EXCEPTION_STACK_BUFFER_OVERRUN : EXCEPTION_HEAP_CORRUPTION;
+
+        if (targetExceptionCode != 0 && foundCode != targetExceptionCode)
+            continue;
+
+        auto parseField = [&content](const wchar_t* fieldName) -> SString
+        {
+            std::wstring searchKey = std::wstring(fieldName) + L".Value=";
+            size_t       pos = content.find(searchKey);
+            if (pos == std::wstring::npos)
+                return "";
+            pos += searchKey.length();
+            size_t endPos = content.find_first_of(L"\r\n", pos);
+            if (endPos == std::wstring::npos)
+                return "";
+            std::wstring value = content.substr(pos, endPos - pos);
+            return SString("%ls", value.c_str());
+        };
+
+        SString appName = parseField(L"Sig[0]");
+        SString werModule = parseField(L"Sig[3]");
+        SString werOffset = parseField(L"Sig[6]");
+
+        SString evtModule, evtOffset;
+        HANDLE  hEventLog = OpenEventLogW(nullptr, L"Application");
+        if (hEventLog)
+        {
+            std::vector<BYTE> buffer(65536);
+            DWORD             evtBytesRead = 0, minBytes = 0;
+
+            if (ReadEventLogW(hEventLog, EVENTLOG_BACKWARDS_READ | EVENTLOG_SEQUENTIAL_READ, 0, buffer.data(), static_cast<DWORD>(buffer.size()), &evtBytesRead,
+                              &minBytes))
+            {
+                auto* record = reinterpret_cast<EVENTLOGRECORD*>(buffer.data());
+                DWORD totalRead = 0;
+
+                for (int i = 0; i < 10 && totalRead < evtBytesRead; ++i)
+                {
+                    if (record->EventID == 1000)
+                    {
+                        auto* source = reinterpret_cast<const wchar_t*>(reinterpret_cast<const BYTE*>(record) + sizeof(EVENTLOGRECORD));
+
+                        if (wcscmp(source, L"Application Error") == 0)
+                        {
+                            constexpr LONGLONG UNIX_EPOCH_DIFF = 11644473600LL;
+                            ULARGE_INTEGER     eventTime;
+                            eventTime.QuadPart = (static_cast<LONGLONG>(record->TimeGenerated) + UNIX_EPOCH_DIFF) * FILETIME_UNITS_PER_SECOND;
+
+                            ULONGLONG timeDiff =
+                                (uliWrite.QuadPart > eventTime.QuadPart) ? (uliWrite.QuadPart - eventTime.QuadPart) : (eventTime.QuadPart - uliWrite.QuadPart);
+
+                            if (timeDiff < 2ULL * 60 * FILETIME_UNITS_PER_SECOND)
+                            {
+                                auto* strPtr = reinterpret_cast<const wchar_t*>(reinterpret_cast<const BYTE*>(record) + record->StringOffset);
+
+                                std::vector<SString> eventStrings;
+                                for (WORD s = 0; s < record->NumStrings && s < 10; ++s)
+                                {
+                                    eventStrings.emplace_back(SString("%ls", strPtr));
+                                    while (*strPtr)
+                                        ++strPtr;
+                                    ++strPtr;
+                                }
+
+                                if (eventStrings.size() >= 8)
+                                {
+                                    const SString& exCode = eventStrings[6];
+                                    if (exCode.ContainsI("c0000409") || exCode.ContainsI("c0000374"))
+                                    {
+                                        evtModule = eventStrings[3];
+                                        evtOffset = eventStrings[7];
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    totalRead += record->Length;
+                    record = reinterpret_cast<EVENTLOGRECORD*>(reinterpret_cast<BYTE*>(record) + record->Length);
+                }
+            }
+            CloseEventLog(hEventLog);
+        }
+
+        result.moduleName = !evtModule.empty() ? evtModule : (!werModule.empty() ? werModule : appName);
+        result.faultOffset = !evtOffset.empty() ? evtOffset : werOffset;
+        result.reportId = reportDir;
+        result.exceptionCode = foundCode;
+        result.found = true;
+        return result;
+    }
+
+    return result;
+}
+
+//////////////////////////////////////////////////////////
+//
+// ResolveModuleCrashAddress
+//
+// Resolves a crash address to a known MTA module using stored module bases.
+// Returns module name, RVA, and IDA-friendly address for debugging.
+//
+// The IDA address uses 0x10000000 as base (standard for DLLs in IDA).
+//
+//////////////////////////////////////////////////////////
+ModuleCrashInfo ResolveModuleCrashAddress(DWORD crashAddress)
+{
+    ModuleCrashInfo result;
+    result.crashAddress = crashAddress;
+
+    // Read stored module bases from registry (set by core.dll/Client.dll at startup)
+    int chunkCount = GetApplicationSettingInt("diagnostics", "module-bases-chunks");
+    if (chunkCount <= 0)
+        chunkCount = 6;
+    if (chunkCount > 256)
+        chunkCount = 256;
+
+    SString strModuleBases;
+    for (int i = 0; i < chunkCount; ++i)
+    {
+        SString key;
+        if (i == 0)
+            key = "module-bases";
+        else
+            key.Format("module-bases-%d", i);
+        SString chunk = GetApplicationSetting("diagnostics", key);
+        if (chunk.empty())
+            continue;
+        if (!strModuleBases.empty())
+            strModuleBases += ";";
+        strModuleBases += chunk;
+    }
+
+    if (strModuleBases.empty())
+        return result;
+
+    // Parse format: "module1=base1,size1;module2=base2,size2;..."
+    // Each entry is "modulename=BASEADDR,SIZE" (hex without 0x prefix)
+    struct ModuleEntry
+    {
+        SString name;
+        DWORD   base;
+        DWORD   size;
+    };
+
+    std::vector<ModuleEntry> modules;
+    std::vector<SString>     entries;
+    strModuleBases.Split(";", entries, true);
+
+    for (const SString& entry : entries)
+    {
+        std::vector<SString> parts;
+        entry.Split("=", parts);
+        if (parts.size() != 2)
+            continue;
+
+        ModuleEntry mod;
+        mod.name = parts[0];
+
+        // Parse "base,size" or just "base" (legacy format with %p)
+        std::vector<SString> addrParts;
+        parts[1].Split(",", addrParts);
+
+        if (addrParts.empty())
+            continue;
+
+        // Parse base address (handles both "0x..." from %p and raw hex)
+        SString addrStr = addrParts[0];
+        addrStr.Replace("0x", "");
+        addrStr.Replace("0X", "");
+        mod.base = static_cast<DWORD>(strtoull(addrStr.c_str(), nullptr, 16));
+
+        // Parse size if available, otherwise estimate
+        if (addrParts.size() >= 2)
+        {
+            SString sizeStr = addrParts[1];
+            sizeStr.Replace("0x", "");
+            sizeStr.Replace("0X", "");
+            mod.size = static_cast<DWORD>(strtoull(sizeStr.c_str(), nullptr, 16));
+        }
+        else
+        {
+            mod.size = 0x400000;  // Legacy fallback: 4MB estimate
+        }
+
+        if (!mod.name.empty() && mod.base != 0 && mod.size != 0)
+            modules.push_back(mod);
+    }
+
+    if (modules.empty())
+        return result;
+
+    // Find which module contains the crash address using actual sizes
+    for (const ModuleEntry& mod : modules)
+    {
+        // Check for overflow before computing end address
+        if (mod.size > 0xFFFFFFFF - mod.base)
+            continue;  // Skip this module if end address would overflow
+
+        DWORD moduleEnd = mod.base + mod.size;
+
+        if (crashAddress >= mod.base && crashAddress < moduleEnd)
+        {
+            result.moduleName = mod.name;
+            result.moduleBase = mod.base;
+            result.rva = crashAddress - mod.base;
+
+            // IDA default base varies: DLLs at 0x10000000, EXEs at 0x00400000
+            const bool  isExe = result.moduleName.EndsWithI(".exe");
+            const DWORD idaBase = isExe ? 0x00400000 : 0x10000000;
+            result.idaAddress = idaBase + result.rva;
+            result.resolved = true;
+            return result;
+        }
+    }
+
+    return result;
+}
+
+//////////////////////////////////////////////////////////
+//
+// ResolveModuleCrashAddress (with process handle fallback)
+//
+// Tries registry-based resolution first. If that fails and a valid
+// process handle is provided, enumerates modules from the target process
+// directly. This handles early crashes before module bases are stored.
+//
+//////////////////////////////////////////////////////////
+ModuleCrashInfo ResolveModuleCrashAddress(DWORD crashAddress, HANDLE hProcess)
+{
+    // First try registry-based resolution
+    ModuleCrashInfo result = ResolveModuleCrashAddress(crashAddress);
+    if (result.resolved)
+        return result;
+
+    // Fallback: enumerate modules from the target process if handle is valid
+    if (!hProcess || hProcess == INVALID_HANDLE_VALUE)
+        return result;
+
+    HMODULE hMods[512];
+    DWORD   cbNeeded = 0;
+
+    if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
+        return result;
+
+    DWORD moduleCount = cbNeeded / sizeof(HMODULE);
+    if (moduleCount > NUMELMS(hMods))
+        moduleCount = NUMELMS(hMods);
+
+    result.crashAddress = crashAddress;
+
+    for (DWORD i = 0; i < moduleCount; ++i)
+    {
+        if (!hMods[i])
+            continue;
+
+        MODULEINFO modInfo = {};
+        if (!GetModuleInformation(hProcess, hMods[i], &modInfo, sizeof(modInfo)))
+            continue;
+
+        DWORD modBase = static_cast<DWORD>(reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll));
+
+        // Check for overflow before computing end address
+        if (modInfo.SizeOfImage > 0xFFFFFFFF - modBase)
+            continue;  // Skip this module if end address would overflow
+
+        DWORD modEnd = modBase + modInfo.SizeOfImage;
+
+        if (crashAddress >= modBase && crashAddress < modEnd)
+        {
+            char szModName[MAX_PATH];
+            if (GetModuleFileNameExA(hProcess, hMods[i], szModName, sizeof(szModName)))
+            {
+                const char* filename = strrchr(szModName, '\\');
+                result.moduleName = filename ? filename + 1 : szModName;
+            }
+            else
+            {
+                result.moduleName = SString("module_%08X", modBase);
+            }
+
+            result.moduleBase = modBase;
+            result.rva = crashAddress - modBase;
+
+            const bool  isExe = result.moduleName.EndsWithI(".exe");
+            const DWORD idaBase = isExe ? 0x00400000 : 0x10000000;
+            result.idaAddress = idaBase + result.rva;
+            result.resolved = true;
+            return result;
+        }
+    }
+
+    return result;
 }

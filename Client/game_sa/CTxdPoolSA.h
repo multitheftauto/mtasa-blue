@@ -26,6 +26,13 @@ public:
 
     std::uint32_t GetFreeTextureDictonarySlot() override;
 
+    int GetPoolSize() const noexcept;
+    int GetUsedSlotCount() const noexcept;
+
+    // Access/modification helpers for slots we create
+    CTextureDictonarySAInterface* GetTextureDictonarySlot(std::uint32_t uiTxdId) noexcept;
+    bool                          SetTextureDictonarySlot(std::uint32_t uiTxdId, RwTexDictionary* pTxd, std::uint16_t usParentIndex) noexcept;
+
 private:
     CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;
 };

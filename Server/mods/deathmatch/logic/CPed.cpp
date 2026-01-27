@@ -41,7 +41,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_armor = 0.0f;
 
     memset(&m_fStats[0], 0, sizeof(m_fStats));
-    m_fStats[24] = 569.0f;            // default max_health
+    m_fStats[24] = 569.0f;  // default max_health
 
     m_pClothes = new CPlayerClothes;
     m_pClothes->DefaultClothes();
@@ -63,7 +63,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_bSpawned = false;
     m_fRotation = 0.0f;
     m_pTargetedEntity = NULL;
-    m_ucFightingStyle = 15;            // STYLE_GRAB_KICK
+    m_ucFightingStyle = 15;  // STYLE_GRAB_KICK
     m_iMoveAnim = MOVE_DEFAULT;
     m_fGravity = 0.008f;
     m_bDoingGangDriveby = false;
@@ -477,9 +477,12 @@ void CPed::SetSyncer(CPlayer* pPlayer)
         {
             case VEHICLEACTION_ENTERING:
             {
-                CVehicle*    pVehicle = GetOccupiedVehicle();
-                unsigned int occupiedSeat = GetOccupiedVehicleSeat();
-                // Does it have an occupant and is the occupant us?
+                CVehicle*          pVehicle = GetOccupiedVehicle();
+                const unsigned int uiOccupiedSeat = GetOccupiedVehicleSeat();
+                if (uiOccupiedSeat > 0xFF)
+                    break;
+
+                const unsigned char occupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                 if (pVehicle && (this == pVehicle->GetOccupant(occupiedSeat)))
                 {
                     // Warp us into vehicle
@@ -489,9 +492,12 @@ void CPed::SetSyncer(CPlayer* pPlayer)
 
             case VEHICLEACTION_EXITING:
             {
-                CVehicle*    pVehicle = GetOccupiedVehicle();
-                unsigned int occupiedSeat = GetOccupiedVehicleSeat();
-                // Does it have an occupant and is the occupant us?
+                CVehicle*          pVehicle = GetOccupiedVehicle();
+                const unsigned int uiOccupiedSeat = GetOccupiedVehicleSeat();
+                if (uiOccupiedSeat > 0xFF)
+                    break;
+
+                const unsigned char occupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                 if (pVehicle && (this == pVehicle->GetOccupant(occupiedSeat)))
                 {
                     // Warp us out of vehicle
