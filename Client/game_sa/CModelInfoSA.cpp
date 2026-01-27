@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <chrono>
+#include <cstdint>
 #include <vector>
 #include <core/CCoreInterface.h>
 #include "CColModelSA.h"
@@ -631,7 +632,8 @@ bool CModelInfoSA::DoIsLoaded()
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     bool bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
 
-    if (m_dwModelID < pGame->GetBaseIDforTXD())
+    const int32_t baseTxdId = pGame->GetBaseIDforTXD();
+    if (baseTxdId > 0 && m_dwModelID < static_cast<DWORD>(baseTxdId))
     {
         m_pInterface = GetInterface();
 
@@ -975,8 +977,15 @@ bool CModelInfoSA::IsValid()
     if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
         return !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
 
-    if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
-        return true;
+    const int32_t baseTxdId = pGame->GetBaseIDforTXD();
+    const int32_t countOfAllFileIds = pGame->GetCountOfAllFileIDs();
+    if (baseTxdId > 0 && countOfAllFileIds > baseTxdId)
+    {
+        const DWORD baseTxdIdDw = static_cast<DWORD>(baseTxdId);
+        const DWORD countDw = static_cast<DWORD>(countOfAllFileIds);
+        if (m_dwModelID >= baseTxdIdDw && m_dwModelID < countDw)
+            return true;
+    }
 
     if (m_dwModelID >= MODELINFO_DFF_MAX)
         return false;
@@ -2253,8 +2262,11 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
             }
         }
 
-        // Apply some low-level hacks
-        pColModelInterface->m_sphere.m_collisionSlot = 0xA9;
+        // Set collision slot to 0 (the "generic" slot) for custom collision models.
+        // Slot 0 is always allocated in CColStore::Initialise(). Using an unallocated
+        // slot ID (like the previous 0xA9) causes CColStore::AddRef to access garbage
+        // memory since native GTA doesn't validate slot existence before pool indexing.
+        pColModelInterface->m_sphere.m_collisionSlot = 0;
 
         CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, true);
         CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
@@ -2394,13 +2406,23 @@ void CModelInfoSA::AddColRef()
         }
     }
 
-    if (slot != 0xFFFF && pGame)
+    if (slot == 0xFFFF || slot > 0xFF)
+        return;
+
+    if (pGame)
     {
         auto* pColStore = pGame->GetCollisionStore();
         if (pColStore)
         {
-            pColStore->AddRef(slot);
-            ++m_colRefCount;
+            // Validate slot exists in pool before calling native AddRef.
+            // GTA SA's CColStore::AddRef (0x4107A0) doesn't validate slot existence,
+            // it directly indexes the pool causing crashes on unallocated slots.
+            const CollisionSlot colSlot = static_cast<CollisionSlot>(slot);
+            if (pColStore->IsValidSlot(colSlot))
+            {
+                pColStore->AddRef(colSlot);
+                ++m_colRefCount;
+            }
         }
     }
 }
@@ -2435,7 +2457,7 @@ void CModelInfoSA::RemoveColRef()
         slot = m_usColSlot;
     }
 
-    if (slot == 0xFFFF)
+    if (slot == 0xFFFF || slot > 0xFF)
         return;
 
     if (!pGame)
@@ -2445,9 +2467,15 @@ void CModelInfoSA::RemoveColRef()
     if (!pColStore)
         return;
 
-    pColStore->RemoveRef(slot);
-    if (m_colRefCount > 0)
-        --m_colRefCount;
+    // Validate slot exists in pool before calling native RemoveRef.
+    // GTA SA's CColStore::RemoveRef (0x4107D0) doesn't validate slot existence.
+    const CollisionSlot colSlot = static_cast<CollisionSlot>(slot);
+    if (pColStore->IsValidSlot(colSlot))
+    {
+        pColStore->RemoveRef(colSlot);
+        if (m_colRefCount > 0)
+            --m_colRefCount;
+    }
     if (m_colRefCount == 0)
         m_usColSlot = 0xFFFF;
 }
@@ -2699,13 +2727,17 @@ void CModelInfoSA::DeallocateModel()
         m_pCustomClump = nullptr;
         m_pCustomColModel = nullptr;
         m_pOriginalColModelInterface = nullptr;
-        if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && pGame)
+        if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && m_usColSlot <= 0xFF && pGame)
         {
             auto* pColStore = pGame->GetCollisionStore();
             if (pColStore)
             {
-                for (std::uint32_t i = 0; i < m_colRefCount; ++i)
-                    pColStore->RemoveRef(m_usColSlot);
+                const CollisionSlot colSlot = static_cast<CollisionSlot>(m_usColSlot);
+                if (pColStore->IsValidSlot(colSlot))
+                {
+                    for (std::uint32_t i = 0; i < m_colRefCount; ++i)
+                        pColStore->RemoveRef(colSlot);
+                }
             }
         }
         m_colRefCount = 0;
@@ -2779,13 +2811,17 @@ void CModelInfoSA::DeallocateModel()
     m_pCustomClump = nullptr;
     m_pCustomColModel = nullptr;
     m_pOriginalColModelInterface = nullptr;
-    if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && pGame)
+    if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && m_usColSlot <= 0xFF && pGame)
     {
         auto* pColStore = pGame->GetCollisionStore();
         if (pColStore)
         {
-            for (std::uint32_t i = 0; i < m_colRefCount; ++i)
-                pColStore->RemoveRef(m_usColSlot);
+            const CollisionSlot colSlot = static_cast<CollisionSlot>(m_usColSlot);
+            if (pColStore->IsValidSlot(colSlot))
+            {
+                for (std::uint32_t i = 0; i < m_colRefCount; ++i)
+                    pColStore->RemoveRef(colSlot);
+            }
         }
     }
     m_colRefCount = 0;

@@ -14,6 +14,8 @@
 #include "Dialogs.h"
 #include <array>
 #include <random>
+#include <cstring>
+#include <winternl.h>
 #include <cryptopp/crc.h>
 #include <cryptopp/files.h>
 #include <tchar.h>
@@ -921,16 +923,40 @@ void MakeRandomIndexList(int Size, std::vector<int>& outList)
 //
 // GetOSVersion
 //
-// Affected by compatibility mode
+// Returns OS version info
 //
 ///////////////////////////////////////////////////////////////
+static bool QueryRtlGetVersion(SOSVersionInfo& versionInfo)
+{
+    HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
+    if (!hNtdll)
+        return false;
+
+    FARPROC pProc = GetProcAddress(hNtdll, "RtlGetVersion");
+    if (!pProc)
+        return false;
+
+    using RtlGetVersionFn = LONG(WINAPI*)(PRTL_OSVERSIONINFOW);
+    RtlGetVersionFn pRtlGetVersion = nullptr;
+    static_assert(sizeof(pRtlGetVersion) == sizeof(pProc), "Unexpected function pointer size");
+    std::memcpy(&pRtlGetVersion, &pProc, sizeof(pRtlGetVersion));
+
+    RTL_OSVERSIONINFOW osvi = {};
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    if (pRtlGetVersion(&osvi) != 0)
+        return false;
+
+    versionInfo.dwMajor = osvi.dwMajorVersion;
+    versionInfo.dwMinor = osvi.dwMinorVersion;
+    versionInfo.dwBuild = osvi.dwBuildNumber;
+    return true;
+}
+
 SOSVersionInfo GetOSVersion()
 {
-    OSVERSIONINFO versionInfo;
-    memset(&versionInfo, 0, sizeof(versionInfo));
-    versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
-    GetVersionEx(&versionInfo);
-    return {versionInfo.dwMajorVersion, versionInfo.dwMinorVersion, versionInfo.dwBuildNumber};
+    SOSVersionInfo versionInfo = {0};
+    QueryRtlGetVersion(versionInfo);
+    return versionInfo;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2236,7 +2262,7 @@ bool IsNativeArm64Host()
         if (kernel32)
         {
             BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
-            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(static_cast<void*>(GetProcAddress(kernel32, "IsWow64Process2")));
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(reinterpret_cast<void*>(GetProcAddress(kernel32, "IsWow64Process2")));
 
             if (IsWow64Process2_)
             {

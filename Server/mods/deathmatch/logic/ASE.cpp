@@ -16,6 +16,11 @@
 #include "CPlayerManager.h"
 #include "CMainConfig.h"
 
+#ifdef WIN32
+    #include <ws2tcpip.h>
+#else
+    #include <arpa/inet.h>
+#endif
 extern "C"
 {
 #include "ASEQuerySDK.h"
@@ -101,7 +106,15 @@ bool ASE::SetPortEnabled(bool bInternetEnabled, bool bLanEnabled)
         sockAddr.sin_family = AF_INET;
         sockAddr.sin_port = htons(m_usPort);
         if (!strIP.empty())
-            sockAddr.sin_addr.s_addr = inet_addr(strIP);
+        {
+#ifdef WIN32
+            if (InetPtonA(AF_INET, strIP.c_str(), &sockAddr.sin_addr) != 1)
+                return false;
+#else
+            if (inet_pton(AF_INET, strIP.c_str(), &sockAddr.sin_addr) != 1)
+                return false;
+#endif
+        }
         else
             sockAddr.sin_addr.s_addr = INADDR_ANY;
 
@@ -168,8 +181,19 @@ void ASE::DoPulse()
             m_uiNumQueriesTotal++;
 
             if (m_QueryDosProtect.GetTotalFloodingCount() < 100)
-                if (m_QueryDosProtect.AddConnect(inet_ntoa(SockAddr.sin_addr)))
+            {
+                char szAddr[INET_ADDRSTRLEN] = {};
+#ifdef WIN32
+                if (!InetNtopA(AF_INET, &SockAddr.sin_addr, szAddr, sizeof(szAddr)))
                     continue;
+#else
+                if (!inet_ntop(AF_INET, &SockAddr.sin_addr, szAddr, sizeof(szAddr)))
+                    continue;
+#endif
+
+                if (m_QueryDosProtect.AddConnect(szAddr))
+                    continue;
+            }
 
             const std::string* strReply = NULL;
 

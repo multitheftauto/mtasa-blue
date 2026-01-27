@@ -102,7 +102,7 @@ unsigned char CWeaponNames::GetWeaponID(const char* szName)
     {
         if (stricmp(szName, WeaponNames[i].szName) == 0)
         {
-            return i;
+            return static_cast<unsigned char>(i);
         }
     }
 

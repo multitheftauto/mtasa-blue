@@ -121,6 +121,7 @@ void CScriptDebugging::UpdateLogOutput()
     SLogLine line;
     while (m_DuplicateLineFilter.PopOutputLine(line))
     {
+        // Log it to the file if enough level
         bool sufficientDebugLevel =
             CheckForSufficientDebugLevel(static_cast<std::uint8_t>(m_uiLogFileLevel), static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
 

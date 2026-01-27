@@ -1903,18 +1903,23 @@ void CCore::UpdateRecentlyPlayed()
     std::string  strHost;
     CVARS_GET("host", strHost);
     CVARS_GET("port", uiPort);
+
+    if (uiPort == 0 || uiPort > 0xFFFF)
+        return;
+
+    const ushort usPort = static_cast<ushort>(uiPort);
     // Save the connection details into the recently played servers list
     in_addr Address;
     if (CServerListItem::Parse(strHost.c_str(), Address))
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
-        pRecentList->Remove(Address, static_cast<ushort>(uiPort));
-        pRecentList->AddUnique(Address, static_cast<ushort>(uiPort), true);
+        pRecentList->Remove(Address, usPort);
+        pRecentList->AddUnique(Address, usPort, true);
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())
-            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", uiPort), m_pConnectManager->m_strLastPassword);
+            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", usPort), m_pConnectManager->m_strLastPassword);
     }
     // Save our configuration file
     CCore::GetSingleton().SaveConfig();
