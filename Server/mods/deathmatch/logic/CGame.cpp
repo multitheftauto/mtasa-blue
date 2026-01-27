@@ -11,6 +11,12 @@
 
 #include "StdInc.h"
 #include "CGame.h"
+
+#ifdef WIN32
+    #include <ws2tcpip.h>
+#else
+    #include <arpa/inet.h>
+#endif
 #include "CAccessControlListManager.h"
 #include "ASE.h"
 #include "CPerfStatManager.h"
@@ -839,13 +845,21 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     if (m_pMainConfig->GetAseInternetListenEnabled())
     {
         // Check if IP is one of the most common private IP addresses
-        in_addr serverIp;
-        serverIp.s_addr = inet_addr(strServerIP);
-        uchar a = ((uchar*)&serverIp.s_addr)[0];
-        uchar b = ((uchar*)&serverIp.s_addr)[1];
-        if (a == 10 || a == 127 || (a == 169 && b == 254) || (a == 192 && b == 168))
+        in_addr serverIp{};
+#ifdef WIN32
+        const bool parsed = InetPtonA(AF_INET, strServerIP, &serverIp) == 1;
+#else
+        const bool parsed = inet_pton(AF_INET, strServerIP, &serverIp) == 1;
+#endif
+        if (parsed)
         {
-            CLogger::LogPrintf("WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP);
+            const uint32_t hostOrder = ntohl(serverIp.s_addr);
+            const uchar    a = (hostOrder >> 24) & 0xFF;
+            const uchar    b = (hostOrder >> 16) & 0xFF;
+            if (a == 10 || a == 127 || (a == 169 && b == 254) || (a == 192 && b == 168))
+            {
+                CLogger::LogPrintf("WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP);
+            }
         }
     }
 
@@ -3357,8 +3371,11 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             // Is he entering?
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                             {
-                                // Is he the occupant? (he must unless the client has fucked up)
-                                unsigned int occupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                const unsigned int uiOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                if (uiOccupiedSeat > 0xFF)
+                                    break;
+
+                                const unsigned char occupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                                 if (pPed == pVehicle->GetOccupant(occupiedSeat))
                                 {
                                     // Mark him as successfully entered

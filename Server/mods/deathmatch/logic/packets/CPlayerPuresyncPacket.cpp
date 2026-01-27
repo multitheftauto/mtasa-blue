@@ -234,7 +234,13 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
             // Set weapon slot
             if (bWeaponCorrect)
-                pSourcePlayer->SetWeaponSlot(ucSlot);
+            {
+                const unsigned int uiCurrSlot = slot.data.uiSlot;
+                if (uiCurrSlot > 0xFF)
+                    return false;
+
+                pSourcePlayer->SetWeaponSlot(static_cast<unsigned char>(uiCurrSlot));
+            }
             else
             {
                 // remove invalid weapon data to prevent this from being relayed to other players
@@ -352,7 +358,7 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
 
         ElementID               PlayerID = pSourcePlayer->GetID();
-        auto                    usLatency = static_cast<unsigned short>(pSourcePlayer->GetPing());
+        unsigned short          usLatency = static_cast<unsigned short>(pSourcePlayer->GetPing());
         const CControllerState& ControllerState = pSourcePlayer->GetPad()->GetCurrentControllerState();
         CElement*               pContactElement = pSourcePlayer->GetContactElement();
 

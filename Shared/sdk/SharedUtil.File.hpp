@@ -665,18 +665,93 @@ SString SharedUtil::GetMTATempPath()
 // C:\Program Files\gta_sa.exe
 SString SharedUtil::GetLaunchPathFilename()
 {
-    static SString strLaunchPathFilename;
-    if (strLaunchPathFilename.empty())
+    struct LaunchPathFilenameHolder
     {
-        wchar_t szBuffer[2048];
-        GetModuleFileNameW(NULL, szBuffer, NUMELMS(szBuffer) - 1);
+        SString strValue;
 
-        wchar_t fullPath[MAX_PATH];
-        GetFullPathNameW(szBuffer, MAX_PATH, fullPath, nullptr);
+        LaunchPathFilenameHolder()
+        {
+            try
+            {
+                std::wstring     wstrModulePath(512, L'\0');
+                constexpr size_t MAX_PATH_LENGTH = 32768;
 
-        strLaunchPathFilename = ToUTF8(fullPath);
-    }
-    return strLaunchPathFilename;
+                for (;;)
+                {
+                    DWORD dwBufferSize = static_cast<DWORD>(wstrModulePath.size());
+                    DWORD dwLength = GetModuleFileNameW(NULL, &wstrModulePath[0], dwBufferSize);
+
+                    if (dwLength == 0)
+                    {
+                        wstrModulePath.clear();
+                        break;
+                    }
+
+                    if (dwLength < dwBufferSize)
+                    {
+                        wstrModulePath.resize(dwLength);
+                        break;
+                    }
+
+                    // dwLength == dwBufferSize means truncation or error
+                    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+                    {
+                        wstrModulePath.resize(dwLength);
+                        break;
+                    }
+
+                    // Buffer too small - grow it
+                    if (wstrModulePath.size() >= MAX_PATH_LENGTH)
+                    {
+                        wstrModulePath.resize(dwLength);
+                        break;
+                    }
+
+                    size_t uiNextSize = wstrModulePath.size() * 2;
+                    if (uiNextSize > MAX_PATH_LENGTH)
+                        uiNextSize = MAX_PATH_LENGTH;
+
+                    wstrModulePath.resize(uiNextSize);
+                }
+
+                // Convert to full path
+                if (!wstrModulePath.empty())
+                {
+                    DWORD dwNeeded = GetFullPathNameW(wstrModulePath.c_str(), 0, nullptr, nullptr);
+                    if (dwNeeded > 0)
+                    {
+                        std::wstring wstrFullPath(dwNeeded, L'\0');
+                        DWORD        dwWritten = GetFullPathNameW(wstrModulePath.c_str(), dwNeeded, &wstrFullPath[0], nullptr);
+
+                        if (dwWritten > 0)
+                        {
+                            wstrFullPath.resize(dwWritten);
+                            strValue = ToUTF8(wstrFullPath);
+                        }
+                        else
+                        {
+                            strValue = ToUTF8(wstrModulePath);
+                        }
+                    }
+                    else
+                    {
+                        strValue = ToUTF8(wstrModulePath);
+                    }
+                }
+                else
+                {
+                    strValue.clear();
+                }
+            }
+            catch (...)
+            {
+                strValue.clear();
+            }
+        }
+    };
+
+    static LaunchPathFilenameHolder holder;
+    return holder.strValue;
 }
 
 // C:\Program Files
