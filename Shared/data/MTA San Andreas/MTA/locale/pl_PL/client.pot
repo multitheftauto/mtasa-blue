@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-08 15:06+0000\n"
-"PO-Revision-Date: 2026-01-08 17:19\n"
+"POT-Creation-Date: 2026-01-19 01:07+0000\n"
+"PO-Revision-Date: 2026-01-25 00:30\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -35,11 +35,11 @@ msgstr "Przepraszamy, nie udało nam się znaleźć gry.\n"
 "Uruchom Grand Theft Auto: San Andreas i naciśnij 'retry' lub 'ponów'.\n"
 "Gra powinna znajdować się w katalogu 'Program Files (x86)'."
 
-#: Client/loader/Utils.cpp:606
+#: Client/loader/Utils.cpp:616
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Wybierz folder z zainstalowaną grą Grand Theft Auto: San Andreas"
 
-#: Client/loader/Utils.cpp:974 Client/loader/CInstallManager.cpp:376
+#: Client/loader/Utils.cpp:995 Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -48,66 +48,66 @@ msgstr "MTA:SA potrzebuje praw administratora dla następującej czynności:\n\n
 "  '%s'\n\n"
 "Proszę je potwierdzić w następnym oknie."
 
-#: Client/loader/Utils.cpp:1075
+#: Client/loader/Utils.cpp:1096
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Błąd przy ładowaniu modułu %s! (%s)"
 
-#: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
+#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
 msgstr "Kopiuję pliki..."
 
-#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
+#: Client/loader/Utils.cpp:1481 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
 msgstr "Kopiowanie zakończone przed czasem. Wszystko w porządku."
 
-#: Client/loader/Utils.cpp:1466 Client/loader/Dialogs.cpp:1058
+#: Client/loader/Utils.cpp:1487 Client/loader/Dialogs.cpp:1058
 msgid "Finishing..."
 msgstr "Kończenie..."
 
-#: Client/loader/Utils.cpp:1468 Client/loader/Dialogs.cpp:1062
+#: Client/loader/Utils.cpp:1489 Client/loader/Dialogs.cpp:1062
 msgid "Done!"
 msgstr "Gotowe!"
 
-#: Client/loader/Utils.cpp:1508
+#: Client/loader/Utils.cpp:1529
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Wykryto nową instalację %s.\n\n"
 "Czy chcesz skopiować swoje ustawienia z %s ?"
 
-#: Client/loader/Utils.cpp:1547
+#: Client/loader/Utils.cpp:1568
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA miało problem z otwarciem pliku '%s'"
 
-#: Client/loader/Utils.cpp:1569
+#: Client/loader/Utils.cpp:1590
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA nie może otworzyć brakującego pliku '%s'."
 
-#: Client/loader/Utils.cpp:1594
+#: Client/loader/Utils.cpp:1615
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA miało problem z załadowaniem modelu."
 
-#: Client/loader/Utils.cpp:1596
+#: Client/loader/Utils.cpp:1617
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Jeśli niedawno zmodyfikowałeś plik 'gta3.img', spróbuj przeinstalować GTA:SA."
 
-#: Client/loader/Utils.cpp:1621
+#: Client/loader/Utils.cpp:1642
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA miało problem z dodaniem ulepszenia do pojazdu."
 
-#: Client/loader/Utils.cpp:1640
+#: Client/loader/Utils.cpp:1661
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA znalazło błędy w pliku '%s'"
 
-#: Client/loader/Utils.cpp:1722
+#: Client/loader/Utils.cpp:1743
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Czy Twój komputer zrestartował się podczas gry w MTA:SA?"
 
-#: Client/loader/Utils.cpp:1787
+#: Client/loader/Utils.cpp:1808
 msgid "Please terminate the following programs before continuing:"
 msgstr "Proszę zakończyć pracę następujących programów przed kontynuowaniem:"
 
@@ -202,7 +202,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Proces gry GTA: San Andreas jest już uruchomiony. Przed włączeniem MTA:SA proces ten musi być zatrzymany. Czy chcesz go teraz zatrzymać?"
 
 #: Client/loader/MainFunctions.cpp:996 Client/loader/MainFunctions.cpp:1003
-#: Client/loader/MainFunctions.cpp:1969
+#: Client/loader/MainFunctions.cpp:1973
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 #: Client/game_sa/CGameSA.cpp:270
@@ -316,31 +316,31 @@ msgstr "Uruchomienie moda nie powiodło się. %s istnieje w katalogu z GTA:SA. U
 msgid "Main file has an incorrect name (%s)"
 msgstr "Plik główny ma nieprawidłową nazwę (%s)"
 
-#: Client/loader/MainFunctions.cpp:1618
+#: Client/loader/MainFunctions.cpp:1622
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr "Brak pliku danych %s. Możliwa aktywność wirusa."
 
-#: Client/loader/MainFunctions.cpp:1626
+#: Client/loader/MainFunctions.cpp:1630
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr "Plik danych %s jest zmodyfikowany. Możliwa aktywność wirusa."
 
-#: Client/loader/MainFunctions.cpp:1650
+#: Client/loader/MainFunctions.cpp:1654
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
 msgstr "Wykryto pliki .asi w katalogu GTA San Andreas lub Multi Theft Auto.\n\n"
 "Jeśli doświadczasz problemów z uruchomieniem lub stabilnością gry, zalecamy usunięcie tych plików."
 
-#: Client/loader/MainFunctions.cpp:1819
+#: Client/loader/MainFunctions.cpp:1823
 msgid "Invalid game paths detected."
 msgstr "Ścieżka do GTA San Andreas lub Multi Theft Auto jest nieprawidłowa."
 
-#: Client/loader/MainFunctions.cpp:1827
+#: Client/loader/MainFunctions.cpp:1831
 msgid "Fix configuration issue"
 msgstr "Napraw problem z konfiguracją"
 
-#: Client/loader/MainFunctions.cpp:1969
+#: Client/loader/MainFunctions.cpp:1973
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
 msgstr "Prawdopodobnie GTA San Andreas uruchomiło się nieprawidłowo i nie odpowiada. Czy chcesz przerwać uruchamianie?"
 
@@ -1489,7 +1489,7 @@ msgstr "Usuń domenę"
 
 #: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
 msgid "Remove all"
-msgstr ""
+msgstr "Usuń wszystko"
 
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:1614
@@ -1942,7 +1942,9 @@ msgstr "ZEWNĘTRZNE DŹWIĘKI"
 msgid "Rich Presence is currently enabled.\n"
 "Do you want to allow data sharing with servers you connect to?\n\n"
 "This includes your Discord client ID, and game state info."
-msgstr ""
+msgstr "Status aktywności jest aktualnie włączony.\n"
+"Czy chcesz zezwolić na udostępnianie danych serwerom, z którymi się łączysz?\n\n"
+"Dane zawierają twoje ID konta Discord oraz informacje o stanie gry."
 
 #: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
@@ -2406,11 +2408,11 @@ msgstr "KONSOLA"
 msgid "Programming"
 msgstr "Programiści"
 
-#: Client/core/CCredits.cpp:65
+#: Client/core/CCredits.cpp:67
 msgid "Contributors"
 msgstr "Współpracownicy"
 
-#: Client/core/CCredits.cpp:85
+#: Client/core/CCredits.cpp:86
 msgid "Game Design / Scripting"
 msgstr "Twórcy poziomów i skryptów"
 
@@ -2763,7 +2765,7 @@ msgid "You have to select a server to connect to."
 msgstr "Musisz wybrać serwer, z którym chcesz się połączyć."
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2225
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2244
 msgid "Problem with graphics driver"
 msgstr "Problem ze sterownikiem karty graficznej"
 
