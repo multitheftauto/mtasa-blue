@@ -113,6 +113,12 @@ public:
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
+    // File Cache Path management
+    SString GetFileCachePath();
+    bool    SetFileCachePath(const SString& path);
+    bool    ResetFileCachePath();
+    bool    ValidateFileCachePath(const SString& path, SString& error);
+
     // Debug
     void DebugEcho(const char* szText);
     void DebugPrintf(const char* szFormat, ...);
