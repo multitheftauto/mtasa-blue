@@ -23,7 +23,7 @@ public:
         ALL
     };
 
-    static std::shared_ptr<CClientIFP> LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input);
+    static std::shared_ptr<CClientIFP> LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input, std::vector<SString>&& uncompressedAnims);
     static bool                        EngineReplaceAnimation(CClientEntity* pEntity, const SString& strInternalBlockName, const SString& strInternalAnimName,
                                                               const SString& strCustomBlockName, const SString& strCustomAnimName);
     static bool                        EngineRestoreAnimation(CClientEntity* pEntity, const SString& strInternalBlockName, const SString& strInternalAnimName,

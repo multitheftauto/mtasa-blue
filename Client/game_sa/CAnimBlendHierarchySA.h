@@ -32,7 +32,7 @@ public:
     CAnimBlendSequenceSAInterface* pSequences;
     unsigned short                 usNumSequences;
     bool                           bRunningCompressed;
-    BYTE                           pad;
+    bool                           keepCompressed;
     int                            iAnimBlockID;
     float                          fTotalTime;
     DWORD*                         pLinkPtr;
@@ -47,7 +47,7 @@ public:
     void                            SetName(const char* szName);
     void                            SetSequences(CAnimBlendSequenceSAInterface* pSequences) { m_pInterface->pSequences = pSequences; }
     void                            SetNumSequences(unsigned short uNumSequences) { m_pInterface->usNumSequences = uNumSequences; }
-    void                            SetRunningCompressed(bool bCompressed) { m_pInterface->bRunningCompressed = bCompressed; }
+    void                            SetRunningCompressed(bool bCompressed, bool isANPK) { m_pInterface->bRunningCompressed = bCompressed; if (isANPK && !bCompressed) m_pInterface->keepCompressed = false; }
     void                            SetAnimationBlockID(int iBlockID) { m_pInterface->iAnimBlockID = iBlockID; }
     void                            RemoveAnimSequences();
     void                            RemoveFromUncompressedCache();

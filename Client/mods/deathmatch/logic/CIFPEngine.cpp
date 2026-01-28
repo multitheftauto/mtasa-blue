@@ -12,7 +12,7 @@
 #include <game/CAnimBlendAssocGroup.h>
 #include <game/CAnimManager.h>
 
-std::shared_ptr<CClientIFP> CIFPEngine::LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input)
+std::shared_ptr<CClientIFP> CIFPEngine::LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input, std::vector<SString>&& uncompressedAnims)
 {
     // Grab the resource root entity
     const unsigned int u32BlockNameHash = HashString(blockName.ToLower());
@@ -24,7 +24,7 @@ std::shared_ptr<CClientIFP> CIFPEngine::LoadIFP(CResource* resource, CClientMana
         std::shared_ptr<CClientIFP> pIFP(new CClientIFP(clientManager, INVALID_ELEMENT_ID));
 
         // Try to load the IFP file
-        if (pIFP->Load(blockName, isRawInput, std::move(input)))
+        if (pIFP->Load(blockName, isRawInput, std::move(input), std::move(uncompressedAnims)))
         {
             // We can use the map to retrieve correct IFP by block name later
             g_pClientGame->InsertIFPPointerToMap(u32BlockNameHash, pIFP);
