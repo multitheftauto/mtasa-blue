@@ -335,6 +335,81 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
     return pTxd;
 }
 
+bool CRenderWareSA::DoContainHAnimPLG(const SString& filename, const SString& buffer)
+{
+    // Open the stream
+    RwStream* streamModel;
+    RwBuffer  streamBuffer;
+    if (!buffer.empty())
+    {
+        streamBuffer.ptr = (void*)buffer.data();
+        streamBuffer.size = buffer.size();
+        streamModel = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
+    }
+    else
+        streamModel = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *filename);
+
+    std::size_t sizeToSkip = 0;
+    // Skip Clump header
+    sizeToSkip += 0xC;
+    // Skip first struct (header + data, it's always 0x18 bytes)
+    sizeToSkip += 0x18;
+    // Skip frame list header
+    sizeToSkip += 0xC;
+    // Skip frame list struct header
+    sizeToSkip += 0xC;
+
+    RwStreamSkip(streamModel, sizeToSkip);
+    sizeToSkip = 0;
+
+    // Read number of frames (4 bytes)
+    int frames = 0;
+    RwStreamRead(streamModel, &frames, 4);
+    // Skip all frames data (56 bytes each)
+    sizeToSkip += (56 * frames);
+    // Skip extension header
+    sizeToSkip += 0xC;
+
+    RwStreamSkip(streamModel, sizeToSkip);
+
+    int animChunks = 0;
+    int chunkType = 0;
+    int chunkLength = 0;
+
+    // Read extension chunks
+    while (RwStreamReadChunkHeader(streamModel, &chunkType, &chunkLength, nullptr, nullptr))
+    {
+        // If this is an extension chunk
+        if (chunkType == 0x3)
+        {
+            // Read chunks inside extension chunk
+            int extensionChunkSize = chunkLength;
+            while (extensionChunkSize > 0)
+            {
+                int subChunkType = 0;
+                int subChunkLength = 0;
+                RwStreamReadChunkHeader(streamModel, &subChunkType, &subChunkLength, nullptr, nullptr);
+
+                // Is this a HAnimPLG chunk?
+                if (subChunkType == 0x11E)
+                    animChunks++;
+
+                RwStreamSkip(streamModel, subChunkLength);
+                extensionChunkSize -= (subChunkLength + 12); // 12 bytes for chunk header
+            }
+        }
+
+        // Break if we reached the end of extensions
+        if (chunkType == 0x1A)
+            break;
+    }
+
+    // Close the stream
+    RwStreamClose(streamModel, nullptr);
+    return animChunks > 0;
+} 
+
+
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
@@ -427,11 +502,12 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         return nullptr;
     }
 
+    CModelInfo* modelInfo = pGame->GetModelInfo(usModelID);
+
     if (bLoadEmbeddedCollisions)
     {
         // Vehicles have their collision loaded through the CollisionModel plugin, so we need to remove the current collision to prevent a memory leak.
         // This needs to be done here before reading the stream data, because plugins are read in RpClumpStreamRead.
-        CModelInfo* modelInfo = pGame->GetModelInfo(usModelID);
         if (modelInfo)
         {
             if (auto* modelInfoInterface = modelInfo->GetInterface())
@@ -460,6 +536,25 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
     }
 
     RwStreamClose(pStream, nullptr);
+
+    // Set animation flags if needed
+    // Functions SetAnimFile and ConvertAnimFileIndex are useless for us as we have our custom implementation of objects animation loading
+    if (modelInfo)
+    {
+        auto* modelInfoInterface = modelInfo->GetInterface();
+        if (!modelInfoInterface)
+            return pClump;
+
+        // We need to parse the file again to check for HAnimPLG presence
+        bool hasAnim = DoContainHAnimPLG(strFilename, buffer);
+        bool defaultAnimFlag = modelInfoInterface->bHasAnimBlend;
+
+        modelInfoInterface->bHasAnimBlend = hasAnim;
+        modelInfoInterface->bAnimSomething = hasAnim;
+
+        if (hasAnim != defaultAnimFlag)
+            CModelInfoSA::InsertModelIntoModifiedAnimList(usModelID);
+    }
 
     return pClump;
 }

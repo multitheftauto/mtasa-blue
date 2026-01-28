@@ -36,6 +36,22 @@ CClientBuilding::~CClientBuilding()
     m_pBuildingManager->RemoveFromList(this);
 }
 
+void CClientBuilding::DoPulse()
+{
+    if (m_animation && !m_animationPlaying)
+        RunAnimation();
+
+    // Custom anim speed?
+    if (!m_animationSpeedUpdated)
+    {
+        if (m_pBuilding && m_pBuilding->GetRpClump())
+        {
+            m_pBuilding->SetAnimationSpeed(m_animationSpeed);
+            m_animationSpeedUpdated = true;
+        }
+    }
+}
+
 void CClientBuilding::Unlink()
 {
     if (m_pHighBuilding)
@@ -47,6 +63,14 @@ void CClientBuilding::Unlink()
         SetLowLodBuilding();
     }
     Destroy();
+
+    // Remove from ifp list if needed
+    if (m_animationBlockNameHash > 0)
+    {
+        auto ifp = g_pClientGame->GetIFPPointerFromMap(m_animationBlockNameHash);
+        if (ifp)
+            ifp->RemoveEntityUsingThisIFP(this);
+    }
 }
 
 void CClientBuilding::SetPosition(const CVector& vecPosition)
@@ -134,7 +158,7 @@ void CClientBuilding::Create()
     if (m_bBeingDeleted)
         return;
 
-    m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &m_vRot, m_interior);
+    m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &m_vRot, m_interior, m_animation != nullptr);
 
     if (!m_pBuilding)
         return;
@@ -150,6 +174,9 @@ void CClientBuilding::Create()
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(m_pBuilding);
     }
+
+    m_animationSpeedUpdated = false;
+    m_animationPlaying = false;
 }
 
 void CClientBuilding::Destroy()
@@ -201,4 +228,38 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
 float CClientBuilding::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     return m_pBuilding ? m_pBuilding->GetDistanceFromCentreOfMassToBaseOfModel() : 0.0f;
+}
+
+void CClientBuilding::SetAnimation(CAnimBlendHierarchySAInterface* animation, unsigned int blockNameHash, std::uint16_t flags)
+{
+    m_animation = animation;
+    m_animationBlockNameHash = blockNameHash;
+    m_animationFlags = static_cast<eAnimationFlags>(flags);
+
+    Recreate();
+    RunAnimation();
+}
+
+bool CClientBuilding::SetAnimationSpeed(float speed)
+{
+    m_animationSpeed = speed;
+    m_animationSpeedUpdated = false;
+
+    if (m_pBuilding && m_pBuilding->GetRpClump())
+    {
+        m_animationSpeedUpdated = true;
+        return m_pBuilding->SetAnimationSpeed(speed);
+    }
+
+    return true;
+}
+
+void CClientBuilding::RunAnimation()
+{
+    if (!m_pBuilding)
+        return;
+
+    m_pBuilding->SetAnimation(m_animation, m_animationFlags);
+    m_pBuilding->SetAnimationSpeed(m_animationSpeed);
+    m_animationPlaying = m_animation != nullptr && m_pBuilding->GetRpClump();
 }
