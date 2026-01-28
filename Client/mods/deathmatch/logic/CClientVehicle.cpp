@@ -135,7 +135,8 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     memset(&m_ucLightStates[0], 0, sizeof(m_ucLightStates));
     m_bCanBeDamaged = true;
     m_bSyncUnoccupiedDamage = false;
-    m_bScriptCanBeDamaged = true;
+    // Local vehicles are damage proof by default due to backwards compatibility. Before 1.7 it wasn't possible for client side vehicles to be damaged.
+    m_bScriptCanBeDamaged = !IsLocalEntity();
     m_bTyresCanBurst = true;
     m_ucOverrideLights = 0;
     m_pTowedVehicle = NULL;
@@ -1176,6 +1177,9 @@ void CClientVehicle::CalcAndUpdateCanBeDamagedFlag()
     if (m_bSyncUnoccupiedDamage)
         bCanBeDamaged = true;
 
+    if (IsLocalEntity())
+        bCanBeDamaged = true;
+
     // Script override
     if (!m_bScriptCanBeDamaged)
         bCanBeDamaged = false;
@@ -1216,6 +1220,9 @@ void CClientVehicle::CalcAndUpdateTyresCanBurstFlag()
         bTyresCanBurst = true;
 
     if (m_bSyncUnoccupiedDamage)
+        bTyresCanBurst = true;
+
+    if (IsLocalEntity())
         bTyresCanBurst = true;
 
     // Script override
