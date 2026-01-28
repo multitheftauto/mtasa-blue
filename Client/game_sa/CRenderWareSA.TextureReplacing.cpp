@@ -2318,18 +2318,9 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 return nullptr;
 
             std::unordered_map<unsigned short, CModelInfoSA*> modelInfoCache;
-            for (SReplacementTextures* pReplacement : info.usedByReplacements)
-            {
-                for (unsigned short modelId : pReplacement->usedInModelIds)
-                {
-                    auto result = modelInfoCache.emplace(modelId, nullptr);
-                    if (result.second)
-                        result.first->second = static_cast<CModelInfoSA*>(pGame->GetModelInfo(modelId));
-                }
-            }
-
             std::vector<std::pair<SReplacementTextures*, std::vector<unsigned short>>> replacementsToReapply;
             std::vector<SReplacementTextures*>                                         originalUsed;
+
             for (SReplacementTextures* pReplacement : info.usedByReplacements)
             {
                 if (pReplacement)
@@ -2337,21 +2328,16 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 std::vector<unsigned short> modelIds;
                 for (unsigned short modelId : pReplacement->usedInModelIds)
                 {
-                    auto itCache = modelInfoCache.find(modelId);
-                    if (itCache == modelInfoCache.end() || !itCache->second)
+                    auto& pCachedModInfo = modelInfoCache[modelId];
+                    if (!pCachedModInfo)
+                        pCachedModInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(modelId));
+                    if (!pCachedModInfo || !pCachedModInfo->GetRwObject())
                         continue;
-
-                    CModelInfoSA* pModInfo = itCache->second;
-                    if (!pModInfo->GetRwObject())
-                        continue;
-
-                    if (pModInfo->GetTextureDictionaryID() == usTxdId)
+                    if (pCachedModInfo->GetTextureDictionaryID() == usTxdId)
                         modelIds.push_back(modelId);
                 }
                 if (!pReplacement->textures.empty() && !modelIds.empty())
-                {
                     replacementsToReapply.emplace_back(pReplacement, std::move(modelIds));
-                }
             }
 
             for (auto& entry : replacementsToReapply)
