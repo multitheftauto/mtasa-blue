@@ -29,4 +29,7 @@ public:
     LUA_DECLARE(SetSearchLightEndPosition);
     LUA_DECLARE(SetSearchLightStartRadius);
     LUA_DECLARE(SetSearchLightEndRadius);
+
+    static CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t> GetSearchLightColor(CClientSearchLight* searchLight);
+    static void SetSearchLightColor(CClientSearchLight* searchLight, SColor color);
 };
