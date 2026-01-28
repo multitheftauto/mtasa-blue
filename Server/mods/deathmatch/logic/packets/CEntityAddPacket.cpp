@@ -578,6 +578,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.WriteBit(pVehicle->GetTrainDirection());
                     BitStream.WriteBit(pVehicle->IsTaxiLightOn());
 
+                    // Write rotor state for helicopters and planes
+                    if (pVehicle->GetVehicleType() == VEHICLE_HELI || pVehicle->GetVehicleType() == VEHICLE_PLANE)
+                        BitStream.WriteBit(pVehicle->GetRotorState());
+
                     // Write alpha
                     SEntityAlphaSync alpha;
                     alpha.data.ucAlpha = pVehicle->GetAlpha();
