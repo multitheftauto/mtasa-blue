@@ -961,6 +961,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         constexpr int defaultClumpParentId = 3425;
                         constexpr int defaultObjectParentId = 1337;
                         constexpr int defaultDamageableObjectParentId = 994;
+                        constexpr int defaultVehicleUpgradeId = 1025;
 
                         switch (eModelType)
                         {
@@ -981,6 +982,9 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                                 break;
                             case eClientModelType::VEHICLE:
                                 iParentID = static_cast<int>(VehicleType::VT_LANDSTAL);
+                                break;
+                            case eClientModelType::VEHICLE_UPGRADE:
+                                iParentID = defaultVehicleUpgradeId;
                                 break;
                             default:
                                 break;
