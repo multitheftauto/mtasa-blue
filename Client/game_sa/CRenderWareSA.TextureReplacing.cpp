@@ -201,6 +201,63 @@ namespace
     constexpr uint32_t      PENDING_ISOLATION_TIMEOUT_MS = 15000;
     constexpr std::size_t   MAX_PENDING_ISOLATED_PER_TICK = 64;
 
+    // Per-TXD texture map cache to avoid repeated linked list iter
+    // Cache is keyed by TXD slot ID and validated by TXD pointer comparison
+    struct SCachedTxdTextureMap
+    {
+        RwTexDictionary* pTxd = nullptr;      // TXD pointer at cache time (detects reload/slot reuse)
+        TxdTextureMap    textureMap;          // Cached texture name > texture map
+
+        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
+        {
+            return pTxd != nullptr && pTxd == pCurrentTxd;
+        }
+    };
+    std::unordered_map<unsigned short, SCachedTxdTextureMap> g_TxdTextureMapCache;
+
+    // Invalidate cache for specific TXD slot (call after texture add/remove)
+    static void InvalidateTxdTextureMapCache(unsigned short usTxdId)
+    {
+        g_TxdTextureMapCache.erase(usTxdId);
+    }
+
+    // Clear all TXD texture map caches (call at session reset or bulk operations)
+    static void ClearTxdTextureMapCache()
+    {
+        g_TxdTextureMapCache.clear();
+    }
+
+    // Get or build texture map for a TXD slot with caching
+    // Returns pointer to cached map (valid until cache invalidation) or nullptr if pTxd is null
+    static const TxdTextureMap* GetCachedTxdTextureMap(unsigned short usTxdId, RwTexDictionary* pTxd)
+    {
+        if (!pTxd)
+            return nullptr;
+
+        SCachedTxdTextureMap& entry = g_TxdTextureMapCache[usTxdId];
+
+        if (!entry.IsValid(pTxd))
+        {
+            entry.pTxd = pTxd;
+            entry.textureMap.clear();
+            BuildTxdTextureMapFast(pTxd, entry.textureMap);
+        }
+
+        return &entry.textureMap;
+    }
+
+    // Build or retrieve cached texture map and merge into output map
+    // Use when building combined maps (parent + child + vehicle fallback)
+    static void MergeCachedTxdTextureMap(unsigned short usTxdId, RwTexDictionary* pTxd, TxdTextureMap& outMap)
+    {
+        const TxdTextureMap* pCached = GetCachedTxdTextureMap(usTxdId, pTxd);
+        if (!pCached)
+            return;
+
+        for (const auto& kv : *pCached)
+            outMap[kv.first] = kv.second;
+    }
+
     void PurgeModelIdFromReplacementTracking(unsigned short usModelId)
     {
         for (auto& entry : ms_ModelTexturesInfoMap)
@@ -334,7 +391,7 @@ namespace
         TxdTextureMap    parentTxdMap;
         if (pParentTxd)
         {
-            BuildTxdTextureMapFast(pParentTxd, parentTxdMap);
+            MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdMap);
             if (ShouldUseVehicleTxdFallback(usModelId))
                 AddVehicleTxdFallback(parentTxdMap);
         }
@@ -931,6 +988,7 @@ namespace
             if (pRenderWareSA)
                 pRenderWareSA->StreamingRemovedTxd(usTxdId);
 
+            InvalidateTxdTextureMapCache(usTxdId);
             pTxdPoolSA->RemoveTextureDictonarySlot(usTxdId);
             g_IsolatedModelByTxd.erase(usTxdId);
             for (auto itModel = g_IsolatedTxdByModel.begin(); itModel != g_IsolatedTxdByModel.end();)
@@ -1121,6 +1179,9 @@ namespace
         if (pCurrentTxd)
         {
             CRenderWareSA::RwTexDictionaryRemoveTexture(pCurrentTxd, pTexture);
+
+            // Invalidate texture map cache since TXD contents changed
+            ClearTxdTextureMapCache();
 
             pTexture->TXDList.next = &pTexture->TXDList;
             pTexture->TXDList.prev = &pTexture->TXDList;
@@ -1655,6 +1716,7 @@ namespace
                                 pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
                             }
                         }
+                        InvalidateTxdTextureMapCache(oldTxdId);
                         pTxdPoolSA->RemoveTextureDictonarySlot(oldTxdId);
                         MarkTxdPoolCountDirty();
                         g_OrphanedIsolatedTxdSlots.erase(oldTxdId);
@@ -2132,9 +2194,9 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         RwTexDictionary* pChildTxd = CTxdStore_GetTxd(childTxdId);
         TxdTextureMap    txdTextureMap;
         if (pParentTxd)
-            BuildTxdTextureMapFast(pParentTxd, txdTextureMap);
+            MergeCachedTxdTextureMap(parentTxdId, pParentTxd, txdTextureMap);
         if (pChildTxd)
-            BuildTxdTextureMapFast(pChildTxd, txdTextureMap);
+            MergeCachedTxdTextureMap(childTxdId, pChildTxd, txdTextureMap);
 
         bool bNeedVehicleFallback = TxdChainContainsVehicleTxd(parentTxdId);
         if (!bNeedVehicleFallback && pModelInfo)
@@ -2363,7 +2425,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
             TxdTextureMap freshTxdMap;
             if (pCurrentTxd)
-                BuildTxdTextureMapFast(pCurrentTxd, freshTxdMap);
+                MergeCachedTxdTextureMap(usTxdId, pCurrentTxd, freshTxdMap);
 
             TxdTextureMap parentTxdMap;
             auto&         txdPool = pGame->GetPools()->GetTxdPool();
@@ -2376,7 +2438,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     {
                         RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
                         if (pParentTxd)
-                            BuildTxdTextureMapFast(pParentTxd, parentTxdMap);
+                            MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdMap);
                     }
                 }
             }
@@ -3593,6 +3655,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     if (g_IsolatedTxdByModel.count(usModelId) > 0)
         UpdateIsolatedTxdLastUse(usModelId);
 
+    // Invalidate cache for modified TXD
+    InvalidateTxdTextureMapCache(pInfo->usTxdId);
+
     return true;
 }
 
@@ -3619,7 +3684,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
     RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
     TxdTextureMap    parentTxdTextureMap;
     if (pParentTxd)
-        BuildTxdTextureMapFast(pParentTxd, parentTxdTextureMap);
+        MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdTextureMap);
 
     if (ShouldUseVehicleTxdFallback(usModelId))
         AddVehicleTxdFallback(parentTxdTextureMap);
@@ -3776,6 +3841,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
                 pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
             }
 
+            InvalidateTxdTextureMapCache(usIsolatedTxdId);
             pTxdPoolSA->RemoveTextureDictonarySlot(usIsolatedTxdId);
             MarkTxdPoolCountDirty();
             g_OrphanedIsolatedTxdSlots.erase(usIsolatedTxdId);
@@ -4579,6 +4645,10 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         }
     }
 
+    // Invalidate caches for all TXDs that were modified
+    for (unsigned short usTxdId : processedTxdIds)
+        InvalidateTxdTextureMapCache(usTxdId);
+
     RemoveReplacementFromTracking(pReplacementTextures);
 
     // Reset all states except usedInModelIds which is needed by the caller for restreaming
@@ -4606,6 +4676,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_pCachedVehicleTxd = nullptr;
     g_CachedVehicleTxdMap = TxdTextureMap{};
     g_usVehicleTxdSlotId = 0xFFFF;
+    ClearTxdTextureMapCache();
     g_uiLastPendingTxdProcessTime = 0;
     g_uiLastTxdPoolWarnTime = 0;
     g_uiLastPoolCountTime = 0;
