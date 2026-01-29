@@ -1,8 +1,22 @@
 DLL files can be found in `Shared/data/MTA San Andreas/server`.
 That directory gets copied to the "Bin" directory when you run "win-install-data.bat".
 
+## MySQL 9.6.0 Upgrade Notes
+
+This module has been upgraded to support MySQL 9.6.0 (Innovation track), bringing:
+- **Enhanced Security**: Removed `mysql_native_password` authentication (deprecated in 8.4, removed in 9.0)
+- **Default Authentication**: Now uses `caching_sha2_password` with SHA-256 encryption
+- **Improved Performance**: Better query optimization and execution
+- **New Features**: Enhanced JSON support, EXPLAIN ANALYZE, and VECTOR data type support
+
+### Authentication Compatibility
+MySQL 9+ no longer supports `mysql_native_password`. The client library automatically uses `caching_sha2_password` by default. Server administrators must ensure user accounts use compatible authentication methods:
+```sql
+ALTER USER 'username'@'host' IDENTIFIED WITH caching_sha2_password BY 'password';
+```
+
 The source code for MySQL and OpenSSL used to produce the binaries can be found here:  
-https://github.com/mysql/mysql-server/releases/tag/mysql-8.4.6  
+https://github.com/mysql/mysql-server/releases/tag/mysql-9.6.0  
 https://github.com/openssl/openssl/releases/tag/openssl-3.4.2  
 
 ## How to compile OpenSSL
@@ -60,7 +74,7 @@ https://github.com/openssl/openssl/releases/tag/openssl-3.4.2
     ```
 4. Switch to the release tag:  
     ```bat
-    git switch --detach --force --recurse-submodules mysql-8.4.6
+    git switch --detach --force --recurse-submodules mysql-9.6.0
     ```
 5. Apply the patch file:  
     ```bat
