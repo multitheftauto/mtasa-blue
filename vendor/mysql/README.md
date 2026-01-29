@@ -80,6 +80,15 @@ https://github.com/openssl/openssl/releases/tag/openssl-3.4.2
     ```bat
     git apply path\to\vendor\mysql\mysql-server.diff
     ```
+    > [!NOTE]  
+    > The patch file was originally created for MySQL 8.4.6. When compiling MySQL 9.6.0, 
+    > you may need to adjust line numbers or update the patch if the source files have changed.
+    > The patch includes fixes for:
+    > - Static runtime linking configuration
+    > - 32-bit x86 build support
+    > - OpenSSL detection skipping
+    > - ARM64 cross-compilation support
+    > - MYSQL_OPT_RECONNECT deprecation warning suppression
 6. Run `VsDevCmd.cmd` to open three Developer Command Prompts.  
 > [!IMPORTANT]  
 > The next steps assume the OpenSSL checkout directory is `C:\GitHub\openssl`  
@@ -118,3 +127,29 @@ https://github.com/openssl/openssl/releases/tag/openssl-3.4.2
     5. Copy signed `*.dll` files to their designed subfolder in `Shared\data\MTA San Andreas\server`.
     6. Copy `lib\libmysql.lib` to `vendor\mysql\lib\{arch}\`.
 6. Commit the update.
+
+## Server Administrator Migration Guide
+
+When upgrading an MTA server to use MySQL 9.6+, server administrators need to ensure their MySQL server configuration is compatible:
+
+### Authentication Method Update
+MySQL 9.0+ has removed `mysql_native_password` authentication. All database users must use `caching_sha2_password`:
+
+```sql
+-- Check current authentication plugins
+SELECT user, host, plugin FROM mysql.user;
+
+-- Update users to use caching_sha2_password
+ALTER USER 'mtauser'@'%' IDENTIFIED WITH caching_sha2_password BY 'password';
+FLUSH PRIVILEGES;
+```
+
+### Connection Requirements
+- Ensure MySQL server is version 8.0+ (MySQL 9.x is backwards compatible with MySQL 8.x clients)
+- If using SSL/TLS, ensure OpenSSL 3.4.2+ is installed
+- The `get_server_public_key=1` option (enabled by default) allows secure password exchange
+
+### Compatibility Notes
+- MTA server with MySQL 9.6+ client library **can connect to** MySQL 8.x servers (using `caching_sha2_password`)
+- MTA server with MySQL 9.6+ client library **cannot connect to** MySQL servers using `mysql_native_password` only
+- For optimal security, upgrade both the MTA server's client library and the MySQL server to version 9.x
