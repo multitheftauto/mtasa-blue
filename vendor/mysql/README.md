@@ -7,7 +7,7 @@ This module has been upgraded to support MySQL 9.6.0 (Innovation track), bringin
 - **Enhanced Security**: Removed `mysql_native_password` authentication (deprecated in 8.4, removed in 9.0)
 - **Default Authentication**: Now uses `caching_sha2_password` with SHA-256 encryption
 - **Improved Performance**: Better query optimization and execution
-- **New Features**: Enhanced JSON support, EXPLAIN ANALYZE, and VECTOR data type support
+- **New Features**: Enhanced JSON support and EXPLAIN ANALYZE capabilities
 
 ### Authentication Compatibility
 MySQL 9+ no longer supports `mysql_native_password`. The client library automatically uses `caching_sha2_password` by default. Server administrators must ensure user accounts use compatible authentication methods:
@@ -80,9 +80,11 @@ https://github.com/openssl/openssl/releases/tag/openssl-3.4.2
     ```bat
     git apply path\to\vendor\mysql\mysql-server.diff
     ```
-    > [!NOTE]  
+    > [!WARNING]  
     > The patch file was originally created for MySQL 8.4.6. When compiling MySQL 9.6.0, 
-    > you may need to adjust line numbers or update the patch if the source files have changed.
+    > the patch has **not yet been tested** and may need adjustments if MySQL 9.6.0 source 
+    > files have changed. If `git apply` fails, you will need to manually update the patch.
+    > 
     > The patch includes fixes for:
     > - Static runtime linking configuration
     > - 32-bit x86 build support
@@ -145,11 +147,12 @@ FLUSH PRIVILEGES;
 ```
 
 ### Connection Requirements
-- Ensure MySQL server is version 8.0+ (MySQL 9.x is backwards compatible with MySQL 8.x clients)
+- Ensure MySQL server is version 8.0+ (MySQL 9.x servers support the MySQL client protocol used by 8.x clients)
+- Note: While protocol-compatible, authentication must use `caching_sha2_password` (not `mysql_native_password`)
 - If using SSL/TLS, ensure OpenSSL 3.4.2+ is installed
 - The `get_server_public_key=1` option (enabled by default) allows secure password exchange
 
 ### Compatibility Notes
-- MTA server with MySQL 9.6+ client library **can connect to** MySQL 8.x servers (using `caching_sha2_password`)
-- MTA server with MySQL 9.6+ client library **cannot connect to** MySQL servers using `mysql_native_password` only
+- MTA server with MySQL 9.6+ client library **can connect to** MySQL 8.0+ servers (using `caching_sha2_password`)
+- MTA server with MySQL 9.6+ client library **cannot connect to** servers using `mysql_native_password` only
 - For optimal security, upgrade both the MTA server's client library and the MySQL server to version 9.x

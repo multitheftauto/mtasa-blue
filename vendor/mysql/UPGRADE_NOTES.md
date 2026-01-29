@@ -11,9 +11,8 @@ This document describes the upgrade from MySQL 8.4.6 to MySQL 9.6.0 for the MTA:
 - Updated main `README.md` to indicate MySQL 9.6+ support
 
 ### 2. Documentation Added
-- Added MySQL 9.6.0 upgrade notes to `vendor/mysql/README.md`
-- Added authentication compatibility information
-- Added server administrator migration guide
+- Added MySQL 9.6.0 upgrade notes to `vendor/mysql/README.md` including authentication compatibility and migration guide
+- Added comprehensive upgrade documentation in `vendor/mysql/UPGRADE_NOTES.md`
 - Added patch file compatibility notes
 
 ### 3. Code Compatibility
@@ -77,7 +76,7 @@ FLUSH PRIVILEGES;
 | MySQL 9.6.0 | MySQL 9.x | ✅ Yes | Optimal configuration |
 | MySQL 9.6.0 | MySQL 8.4+ | ✅ Yes | Using `caching_sha2_password` |
 | MySQL 9.6.0 | MySQL 8.0+ | ✅ Yes | Using `caching_sha2_password` |
-| MySQL 9.6.0 | MySQL 5.x/8.x | ❌ No | If using `mysql_native_password` only |
+| MySQL 9.6.0 | MySQL 5.7 or earlier 8.0 | ❌ No | If using `mysql_native_password` only |
 
 ## Benefits of MySQL 9.6.0
 
@@ -94,7 +93,6 @@ FLUSH PRIVILEGES;
 ### New Features
 - Enhanced JSON support and functions
 - EXPLAIN ANALYZE for query performance analysis
-- New VECTOR data type for AI/ML workloads
 - Improved stored procedures and triggers
 
 ## References
