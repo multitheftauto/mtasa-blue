@@ -988,7 +988,7 @@ void CMemStats::CreateTables()
             int     iDefCapacity = g_pCore->GetGame()->GetPools()->GetPoolDefaultCapacity((ePools)i);
             int     iCapacity = g_pCore->GetGame()->GetPools()->GetPoolCapacity((ePools)i);
             int     iUsedSpaces = g_pCore->GetGame()->GetPools()->GetNumberOfUsedSpaces((ePools)i);
-            int     iUsedPercent = iUsedSpaces * 100 / iCapacity;
+            int     iUsedPercent = iCapacity > 0 ? iUsedSpaces * 100 / iCapacity : 0;
             table.AddRow(SString("%s|%d|%d|%d%%", *strName, iCapacity, iUsedSpaces, iUsedPercent));
         }
     }
