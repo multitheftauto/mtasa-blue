@@ -9,7 +9,7 @@
  *****************************************************************************/
 
 #define XRGB_BYTES_PER_PIXEL (4)
-#define SIZEOF_PLAIN_TAIL (4)
+#define SIZEOF_PLAIN_TAIL    (4)
 
 //
 // Scope release and zeroing of pointer

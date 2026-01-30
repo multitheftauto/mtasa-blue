@@ -2,6 +2,7 @@ project "tinyxml"
 	language "C++"
 	kind "StaticLib"
 	targetname "tinyxml"
+	warnings "Off"
 
 	includedirs {
 		"../../Shared/sdk",

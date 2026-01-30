@@ -10,12 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGUI_Impl.h"
 
 // Define no-drawing zones, a.k.a. the inside borders in the FrameWindow of BlueLook in pixels
 // If something is drawn inside of these areas, the theme border is drawn on top of it
-#define CGUI_NODRAW_LEFT 9.0f
-#define CGUI_NODRAW_RIGHT 9.0f
-#define CGUI_NODRAW_TOP 9.0f
+#define CGUI_NODRAW_LEFT   9.0f
+#define CGUI_NODRAW_RIGHT  9.0f
+#define CGUI_NODRAW_TOP    9.0f
 #define CGUI_NODRAW_BOTTOM 9.0f
 
 CGUIElement_Impl::CGUIElement_Impl()
@@ -24,20 +25,65 @@ CGUIElement_Impl::CGUIElement_Impl()
     m_pWindow = NULL;
     m_pParent = NULL;
     m_pManager = NULL;
+    m_redrawHandle = CGUI_Impl::kInvalidRedrawHandle;
+}
+
+void CGUIElement_Impl::SetManager(CGUI_Impl* pManager)
+{
+    if (m_pManager == pManager)
+        return;
+
+    if (m_pManager && m_redrawHandle != CGUI_Impl::kInvalidRedrawHandle)
+    {
+        m_pManager->ReleaseRedrawHandle(m_redrawHandle);
+        m_redrawHandle = CGUI_Impl::kInvalidRedrawHandle;
+    }
+
+    m_pManager = pManager;
+
+    if (m_pManager)
+    {
+        m_redrawHandle = m_pManager->RegisterRedrawHandle(this);
+    }
+}
+
+void CGUIElement_Impl::UnregisterFromRedrawQueue()
+{
+    if (m_pManager && m_redrawHandle != CGUI_Impl::kInvalidRedrawHandle)
+    {
+        m_pManager->RemoveFromRedrawQueue(this);
+    }
 }
 
 void CGUIElement_Impl::DestroyElement()
 {
-    m_pManager->RemoveFromRedrawQueue(reinterpret_cast<CGUIElement*>((m_pWindow)->getUserData()));
+    UnregisterFromRedrawQueue();
 
-    // Clear pointer back to this
-    m_pWindow->setUserData(NULL);
+    if (m_pWindow)
+    {
+        // Clear pointer back to this
+        m_pWindow->setUserData(NULL);
 
-    // Destroy the control
-    m_pManager->GetWindowManager()->destroyWindow(m_pWindow);
+        if (m_pManager)
+        {
+            // Destroy the control
+            m_pManager->GetWindowManager()->destroyWindow(m_pWindow);
+        }
+        m_pWindow = NULL;
+    }
 
     // Destroy the properties list
     EmptyProperties();
+
+    if (m_pManager && m_redrawHandle != CGUI_Impl::kInvalidRedrawHandle)
+    {
+        m_pManager->ReleaseRedrawHandle(m_redrawHandle);
+    }
+
+    m_redrawHandle = CGUI_Impl::kInvalidRedrawHandle;
+    m_pParent = NULL;
+    m_pData = NULL;
+    m_pManager = NULL;
 }
 
 void CGUIElement_Impl::SetVisible(bool bVisible)
@@ -174,7 +220,7 @@ void CGUIElement_Impl::AutoSize(const char* Text, float fPaddingX, float fPaddin
     const CEGUI::Font* pFont = m_pWindow->getFont();
     m_pWindow->setSize(CEGUI::Absolute,
                        CEGUI::Size(pFont->getTextExtent(CGUI_Impl::GetUTFString(Text ? Text : GetText())) + fPaddingX,
-                                   pFont->getFontHeight() + fPaddingY));            // Add hack factor to height to allow for long characters such as 'g' or 'j'
+                                   pFont->getFontHeight() + fPaddingY));  // Add hack factor to height to allow for long characters such as 'g' or 'j'
 }
 
 void CGUIElement_Impl::SetMinimumSize(const CVector2D& vecSize)
@@ -324,11 +370,6 @@ CGUIElement* CGUIElement_Impl::GetParent()
         return NULL;
 
     return m_pParent;
-}
-
-CEGUI::Window* CGUIElement_Impl::GetWindow()
-{
-    return m_pWindow;
 }
 
 void CGUIElement_Impl::CorrectEdges()

@@ -113,14 +113,14 @@ int main(int argc, char* argv[])
     FILE* fh = File::Fopen(LIB_CORE, "r");
     if (!fh)
     {
-        #ifdef WIN32
+#ifdef WIN32
         wchar_t szBuffer[64000];
         GetModuleFileNameW(NULL, szBuffer, 64000);
         PathRemoveFileSpecW(szBuffer);
         SetCurrentDirectoryW(szBuffer);
-        #else
+#else
         chdir(strLaunchDirectory);
-        #endif
+#endif
     }
     else
         fclose(fh);
@@ -131,7 +131,10 @@ int main(int argc, char* argv[])
     {
         // Grab the entrypoint
         typedef int(Main_t)(int, char*[]);
-        Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>(Core.GetProcedureAddress("Run"));
+        Main_t*    pfnEntryPoint = nullptr;
+        const auto procAddr = Core.GetProcedureAddress("Run");
+        static_assert(sizeof(pfnEntryPoint) == sizeof(procAddr), "Unexpected function pointer size");
+        std::memcpy(&pfnEntryPoint, &procAddr, sizeof(pfnEntryPoint));
         if (pfnEntryPoint)
         {
             // Call it and return what it returns

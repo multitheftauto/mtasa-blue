@@ -2,6 +2,7 @@ project "tinygettext"
 	language "C++"
 	kind "StaticLib"
 	targetname "tinygettext"
+	warnings "Off"
 
 	includedirs {
 		"../../Shared/sdk",

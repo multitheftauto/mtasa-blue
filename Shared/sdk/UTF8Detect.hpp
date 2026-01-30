@@ -60,7 +60,7 @@ int icu_getUTF8Confidence(const unsigned char* input, int len)
 
         if ((b & 0x80) == 0)
         {
-            continue;            // ASCII
+            continue;  // ASCII
         }
 
         // Hi bit on char found.  Figure out how long the sequence should be

@@ -122,7 +122,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         // Flags
         bool bInVehicle = (pPlayer->GetOccupiedVehicle() != NULL);
         BitStream.WriteBit(pPlayer->IsDead());
-        BitStream.WriteBit(true);            // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
+        BitStream.WriteBit(true);  // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
         BitStream.WriteBit(bInVehicle);
         BitStream.WriteBit(pPlayer->HasJetPack());
         BitStream.WriteBit(pPlayer->IsNametagShowing());
@@ -179,7 +179,10 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.Write(pVehicle->GetID());
 
                 SOccupiedSeatSync seat;
-                seat.data.ucSeat = pPlayer->GetOccupiedVehicleSeat();
+                {
+                    const uint uiSeat = pPlayer->GetOccupiedVehicleSeat();
+                    seat.data.ucSeat = uiSeat <= 0xFF ? static_cast<unsigned char>(uiSeat) : 0xFF;
+                }
                 BitStream.Write(&seat);
             }
             else
@@ -202,7 +205,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
             alpha.data.ucAlpha = pPlayer->GetAlpha();
             BitStream.Write(&alpha);
 
-            BitStream.Write(pPlayer->GetInterior());
+            BitStream.Write(static_cast<unsigned char>(pPlayer->GetInterior()));
 
             // Write the weapons of the player weapon slots
             for (unsigned char i = 0; i < 16; ++i)

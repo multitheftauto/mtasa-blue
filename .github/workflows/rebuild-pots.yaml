@@ -1,6 +1,9 @@
 name: "Rebuild en_US pot files"
 
-on: [push, workflow_dispatch]
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Every Monday at 00:00 UTC
+  workflow_dispatch:
 
 jobs:
   test:

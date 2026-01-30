@@ -12,6 +12,8 @@
 #include "CFileFormat.h"
 #include "CPixelsManager.h"
 
+extern CCore* g_pCore;
+
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
@@ -629,7 +631,13 @@ bool CPixelsManager::GetPixelsSize(const CPixels& pixels, uint& uiOutWidth, uint
     }
     else if (format == EPixelsFormat::JPEG)
     {
-        return JpegGetDimensions(pixels.GetData(), pixels.GetSize(), uiOutWidth, uiOutHeight);
+        std::string strError;
+        if (JpegGetDimensions(pixels.GetData(), pixels.GetSize(), uiOutWidth, uiOutHeight, &strError))
+            return true;
+
+        if (!strError.empty() && g_pCore)
+            g_pCore->DebugEchoColor(("JPEG error: " + strError).c_str(), 255, 0, 0);
+        return false;
     }
 
     return false;
@@ -693,21 +701,21 @@ bool CPixelsManager::IsPixels(const CPixels& pixels)
 ////////////////////////////////////////////////////////////////
 bool CPixelsManager::SetPlainDimensions(CPixels& pixels, uint uiWidth, uint uiHeight)
 {
-    uint        uiDataSize = pixels.GetSize();
-    const char* pData = pixels.GetData();
+    uint  uiDataSize = pixels.GetSize();
+    char* pData = pixels.GetData();
 
-    uint ReqSize = uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL;
+    if (uiWidth > 0xFFFF || uiHeight > 0xFFFF)
+        return false;
 
-    if (ReqSize == uiDataSize)
-    {
-        // Fixup plain format tail
-        WORD* pPlainTail = (WORD*)(pData + uiDataSize - SIZEOF_PLAIN_TAIL);
-        pPlainTail[0] = static_cast<WORD>(uiWidth);
-        pPlainTail[1] = static_cast<WORD>(uiHeight);
-        return true;
-    }
+    const uint64_t reqSize64 = static_cast<uint64_t>(uiWidth) * static_cast<uint64_t>(uiHeight) * 4ULL + SIZEOF_PLAIN_TAIL;
+    if (reqSize64 != uiDataSize)
+        return false;
 
-    return false;
+    // Fixup plain format tail
+    auto* pPlainTail = reinterpret_cast<WORD*>(pData + uiDataSize - SIZEOF_PLAIN_TAIL);
+    pPlainTail[0] = static_cast<WORD>(uiWidth);
+    pPlainTail[1] = static_cast<WORD>(uiHeight);
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -765,7 +773,15 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
             return false;
 
         if (newFormat == EPixelsFormat::JPEG)
-            return JpegEncode(uiWidth, uiHeight, uiQuality, oldPixels.GetData(), oldPixels.GetSize() - 4, newPixels.buffer);
+        {
+            std::string strError;
+            if (JpegEncode(uiWidth, uiHeight, uiQuality, oldPixels.GetData(), oldPixels.GetSize() - 4, newPixels.buffer, &strError))
+                return true;
+
+            if (!strError.empty() && g_pCore)
+                g_pCore->DebugEchoColor(("JPEG encode error: " + strError).c_str(), 255, 0, 0);
+            return false;
+        }
         else if (newFormat == EPixelsFormat::PNG)
             return PngEncode(uiWidth, uiHeight, oldPixels.GetData(), oldPixels.GetSize() - 4, newPixels.buffer);
     }
@@ -774,12 +790,17 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
         // Decode
         if (oldFormat == EPixelsFormat::JPEG)
         {
-            uint uiWidth, uiHeight;
-            if (JpegDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight))
+            uint        uiWidth, uiHeight;
+            std::string strError;
+            if (JpegDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight, &strError))
             {
                 newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL);
                 return SetPlainDimensions(newPixels, uiWidth, uiHeight);
             }
+
+            if (!strError.empty() && g_pCore)
+                g_pCore->DebugEchoColor(("JPEG decode error: " + strError).c_str(), 255, 0, 0);
+            return false;
         }
         else if (oldFormat == EPixelsFormat::PNG)
         {

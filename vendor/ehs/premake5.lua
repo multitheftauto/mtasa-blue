@@ -2,6 +2,7 @@ project "ehs"
 	language "C++"
 	kind "StaticLib"
 	targetname "ehs"
+	warnings "Off"
 
 	includedirs {
 		"../../Shared/sdk",

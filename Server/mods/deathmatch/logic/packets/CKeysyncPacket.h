@@ -17,7 +17,7 @@
 class CKeysyncPacket final : public CPacket
 {
 public:
-    CKeysyncPacket(){};
+    CKeysyncPacket() {};
     CKeysyncPacket(class CPlayer* pPlayer);
 
     bool          HasSimHandler() const { return true; }

@@ -50,8 +50,20 @@
 _START_GOOGLE_NAMESPACE_
 
 template <bool> struct SparsehashCompileAssert { };
-#define SPARSEHASH_COMPILE_ASSERT(expr, msg) \
-  [[maybe_unused]] typedef SparsehashCompileAssert<(bool(expr))> msg[bool(expr) ? 1 : -1]
+
+// Cross-platform compatibility for unused attribute
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+  #define SPARSEHASH_COMPILE_ASSERT(expr, msg) \
+    [[maybe_unused]] typedef SparsehashCompileAssert<(bool(expr))> msg[bool(expr) ? 1 : -1]
+#elif defined(__GNUC__) || defined(__clang__)
+  // GCC or Clang: use GNU attribute
+  #define SPARSEHASH_COMPILE_ASSERT(expr, msg) \
+__attribute__((unused)) typedef SparsehashCompileAssert<(bool(expr))> msg[bool(expr) ? 1 : -1]
+#else
+  // Other compilers: No attribute
+  #define SPARSEHASH_COMPILE_ASSERT(expr, msg) \
+    typedef SparsehashCompileAssert<(bool(expr))> msg[bool(expr) ? 1 : -1]
+#endif
 
 namespace sparsehash_internal {
 

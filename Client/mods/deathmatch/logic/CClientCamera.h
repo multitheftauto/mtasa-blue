@@ -12,6 +12,7 @@
 
 #include <CMatrix.h>
 #include <game/CCamera.h>
+#include <cmath>
 #include "CClientCommon.h"
 #include "CClientEntity.h"
 
@@ -37,7 +38,7 @@ class CClientCamera final : public CClientEntity
     friend class CClientManager;
 
 public:
-    void Unlink(){};
+    void Unlink() {};
     void DoPulse();
 
     eClientEntityType GetType() const { return CCLIENTCAMERA; };
@@ -51,9 +52,17 @@ public:
     void  GetFixedTarget(CVector& vecTarget, float* pfRoll = NULL) const;
     void  SetFixedTarget(const CVector& vecPosition, float fRoll = 0);
     float GetFOV() { return m_fFOV; }
-    void  SetFOV(float fFOV) { m_fFOV = fFOV; }
-    void  SetOrbitTarget(const CVector& vecPosition);
-    void  AttachTo(CClientEntity* pElement);
+    void  SetFOV(float fFOV)
+    {
+        if (!std::isfinite(fFOV) || fFOV <= 0.0f)
+            fFOV = DEFAULT_FOV;
+        else if (fFOV >= 180.0f)
+            fFOV = 179.0f;
+
+        m_fFOV = fFOV;
+    }
+    void SetOrbitTarget(const CVector& vecPosition);
+    void AttachTo(CClientEntity* pElement);
 
     void FadeIn(float fTime);
     void FadeOut(float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
@@ -96,7 +105,12 @@ private:
     CMatrix     GetGtaMatrix() const;
     void        SetGtaMatrix(const CMatrix& matInNew, CCam* pCam = NULL) const;
 
-    void SetFocusToLocalPlayerImpl();
+    void           SetFocusToLocalPlayerImpl();
+    void           InvalidateCachedTransforms() const;
+    void           SetCenterOfWorldCached(const CVector* pPosition, float fRotationRadians);
+    void           UpdateCenterOfWorldFromFixedMatrix();
+    const CMatrix& AcquirePulseMatrix() const;
+    const CVector& AcquirePulseEuler(const CMatrix& matrix) const;
 
     void UnreferenceEntity(CClientEntity* pEntity);
     void InvalidateEntity(CClientEntity* pEntity);
@@ -115,6 +129,14 @@ private:
     float                m_fRoll;
     float                m_fFOV;
     CMatrix              m_matFixedMatrix;
+
+    mutable CMatrix m_cachedPulseMatrix;
+    mutable CVector m_cachedPulseEuler;
+    mutable bool    m_hasCachedPulseMatrix;
+    mutable bool    m_hasCachedPulseEuler;
+    CVector         m_lastCenterOfWorldPos;
+    float           m_lastCenterOfWorldRot;
+    bool            m_hasCenterOfWorld;
 
     CCamera* m_pCamera;
 };

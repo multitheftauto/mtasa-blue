@@ -247,3 +247,45 @@ b42518e64803762d27fe6277b36044d1a71fc2c4
 # Date:   Mon Jun 12 19:01:59 2023 +0300
 #
 # Apply win-apply-clang-format.bat
+
+466c162fbd1af45b290849cc0771fab66f55ba34
+# Author: Dutchman101 <mcak105@outlook.com>
+# Date:   Wed April 9 19:01:39 2025 +0300
+#
+# Eliminate the use of http:// across whole project
+
+e7c3619a5d5e0b6bf352befde6ff33c5921032b2
+# Author: qaisjp
+# Date:   Wed Jan 7 16:42:45 2026 -0500
+#
+# codemod: disable clang-format for `__asm` directives (#4611)
+
+c2a0ba939f0fabba96450d02ec56a111658230d6
+# Author: qaisjp <qaisjp@gmail.com>
+# Date:   Sat Jan 17 10:20:18 2026 -0500
+#
+# Run ./utils/clang-format.ps1
+
+6be278d2d37f5f9686984856b72573290852ed74
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Sat Jan 17 17:14:10 2026 -0500
+#
+# Remove more FixNamespaceComments changes (#4638)
+
+a665e0144e7f71a4c7898f024262393f019f6b7b
+# Author: qaisjp <qaisjp@gmail.com>
+# Date:   Sat Jan 17 17:30:03 2026 -0500
+#
+# Revert back to pre-enforcement
+
+7cd17bc67c5c2d631b6aaac1ac48521b6922045e
+# Author: qaisjp <qaisjp@gmail.com>
+# Date:   Mon Jan 19 01:50:18 2026 -0500
+#
+# fastmod '}  // namespace [a-zA-Z0-9]+$' '}' Client/ Server/ Shared/
+
+e75ba93362c6ae99d30a95d3f20a1e04ba46a22e
+# Author: qaisjp <qaisjp@gmail.com>
+# Date:   Mon Jan 19 02:08:21 2026 -0500
+#
+# Run utils/clang-format.ps1

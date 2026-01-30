@@ -23,6 +23,7 @@ public:
     virtual void Refresh();
     virtual bool HasData();
     virtual bool ParseList(CServerListItemList& itemList);
+    virtual void Cancel();
 
     // CRemoteMasterServer
     void Init(const SString& strURL);
@@ -42,6 +43,7 @@ protected:
     SString   m_strStage;
     SString   m_strURL;
     CBuffer   m_Data;
+    bool      m_bPendingDownload = false;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -90,7 +92,9 @@ CRemoteMasterServer::~CRemoteMasterServer()
 void CRemoteMasterServer::Init(const SString& strURL)
 {
     m_strURL = strURL;
-    GetHTTP()->SetMaxConnections(5);
+    CNetHTTPDownloadManagerInterface* pHTTP = GetHTTP();
+    if (pHTTP)
+        pHTTP->SetMaxConnections(5);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -118,13 +122,55 @@ void CRemoteMasterServer::Refresh()
     if (GetTickCount64_() - m_llLastRefreshTime < 60000 && m_strStage == "hasdata")
         return;
 
+    CNetHTTPDownloadManagerInterface* pHTTP = GetHTTP();
+    if (!pHTTP)
+    {
+        m_strStage = "nogood";
+        return;
+    }
+
     // Send new request
     m_strStage = "waitingreply";
     m_llLastRefreshTime = GetTickCount64_();
-    AddRef();            // Keep alive
     SHttpRequestOptions options;
     options.uiConnectionAttempts = 1;
-    GetHTTP()->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options);
+    if (pHTTP->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options))
+    {
+        m_bPendingDownload = true;
+        AddRef();  // Keep alive
+    }
+    else
+    {
+        m_strStage = "nogood";
+    }
+}
+
+void CRemoteMasterServer::Cancel()
+{
+    if (!m_bPendingDownload)
+        return;
+
+    CNetHTTPDownloadManagerInterface* pHTTP = GetHTTP();
+    if (!pHTTP)
+    {
+        // HTTP manager destroyed - callback won't be called, so Release() here
+        m_bPendingDownload = false;
+        m_strStage.clear();
+        Release();
+        return;
+    }
+
+    if (pHTTP->CancelDownload(this, &CRemoteMasterServer::StaticDownloadFinished))
+    {
+        m_bPendingDownload = false;
+        m_strStage.clear();
+        Release();
+    }
+    else
+    {
+        m_bPendingDownload = false;
+        m_strStage.clear();
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -138,7 +184,7 @@ void CRemoteMasterServer::StaticDownloadFinished(const SHttpDownloadResult& resu
 {
     CRemoteMasterServer* pRemoteMasterServer = (CRemoteMasterServer*)result.pObj;
     pRemoteMasterServer->DownloadFinished(result);
-    pRemoteMasterServer->Release();            // Unkeep alive
+    pRemoteMasterServer->Release();  // Unkeep alive
 }
 
 ///////////////////////////////////////////////////////////////
@@ -150,6 +196,8 @@ void CRemoteMasterServer::StaticDownloadFinished(const SHttpDownloadResult& resu
 ///////////////////////////////////////////////////////////////
 void CRemoteMasterServer::DownloadFinished(const SHttpDownloadResult& result)
 {
+    m_bPendingDownload = false;
+
     if (result.bSuccess)
     {
         if (m_strStage == "waitingreply")
@@ -171,7 +219,9 @@ void CRemoteMasterServer::DownloadFinished(const SHttpDownloadResult& result)
 ///////////////////////////////////////////////////////////////
 bool CRemoteMasterServer::HasData()
 {
-    GetHTTP()->ProcessQueuedFiles();
+    CNetHTTPDownloadManagerInterface* pHTTP = GetHTTP();
+    if (pHTTP)
+        pHTTP->ProcessQueuedFiles();
     return m_strStage == "hasdata";
 }
 
@@ -301,8 +351,8 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
 
     while (!stream.AtEnd(6) && usCount--)
     {
-        in_addr        Address;                // IP-address
-        unsigned short usQueryPort;            // Query port
+        in_addr        Address;      // IP-address
+        unsigned short usQueryPort;  // Query port
 
         stream.Read(Address.S_un.S_un_b.s_b1);
         stream.Read(Address.S_un.S_un_b.s_b2);
@@ -398,12 +448,12 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
     // Add all servers until we hit the count or run out of data
     while (!stream.AtEnd(6) && uiCount--)
     {
-        ushort usLength = 0;            // Length of data for this server
+        ushort usLength = 0;  // Length of data for this server
         stream.Read(usLength);
         uint uiSkipPos = stream.Tell() + usLength - 2;
 
-        in_addr        Address;               // IP-address
-        unsigned short usGamePort;            // Game port
+        in_addr        Address;     // IP-address
+        unsigned short usGamePort;  // Game port
 
         stream.Read(Address.S_un.S_addr);
         stream.Read(usGamePort);
@@ -414,6 +464,9 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
         if (pItem->ShouldAllowDataQuality(uiDataQuality))
         {
             pItem->SetDataQuality(uiDataQuality);
+
+            // Remember previous no-response
+            bool bWasPreviouslyMarkedNoResponse = pItem->bMasterServerSaysNoResponse;
 
             if (bHasPlayerCount)
                 stream.Read(pItem->nPlayers);
@@ -452,6 +505,11 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
             if (bHasRespondingFlag)
             {
                 stream.Read(pItem->bMasterServerSaysNoResponse);
+            }
+            else if (bWasPreviouslyMarkedNoResponse)
+            {
+                // Reset no-response flag when server reappears in master list without responding flag
+                pItem->bMasterServerSaysNoResponse = false;
             }
 
             if (bHasRestrictionFlags)

@@ -54,9 +54,9 @@ enum eDoorLock : int32_t
 };
 
 #define SIREN_TYPE_FIRST 1
-#define SIREN_TYPE_LAST 6
-#define SIREN_ID_MAX 7
-#define SIREN_COUNT_MAX 8
+#define SIREN_TYPE_LAST  6
+#define SIREN_ID_MAX     7
+#define SIREN_COUNT_MAX  8
 
 struct SSirenBeaconInfo
 {
@@ -88,13 +88,13 @@ struct SVehicleFrame
 
     RwFrame*              pFrame;
     bool                  bReadOnly;
-    std::vector<RwFrame*> frameList;            // Frames from root to parent
+    std::vector<RwFrame*> frameList;  // Frames from root to parent
 };
 
 class CVehicle : public virtual CPhysical
 {
 public:
-    virtual ~CVehicle(){};
+    virtual ~CVehicle() {};
 
     virtual bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
 
@@ -269,9 +269,9 @@ public:
     virtual SColor GetHeadLightColor() = 0;
     virtual void   SetHeadLightColor(const SColor color) = 0;
 
-    virtual bool     SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1) = 0;
-    virtual void     SetWheelVisibility(eWheelPosition wheel, bool bVisible) = 0;
-    virtual CVector  GetWheelPosition(eWheelPosition wheel) = 0;
+    virtual bool    SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1) = 0;
+    virtual void    SetWheelVisibility(eWheelPosition wheel, bool bVisible) = 0;
+    virtual CVector GetWheelPosition(eWheelPosition wheel) = 0;
 
     virtual bool IsHeliSearchLightVisible() = 0;
     virtual void SetHeliSearchLightVisible(bool bVisible) = 0;

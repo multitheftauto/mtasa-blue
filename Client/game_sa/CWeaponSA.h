@@ -23,9 +23,9 @@ public:
     std::uint32_t m_ammoInClip{0};
     std::uint32_t m_ammoTotal{0};
     std::uint32_t m_timeToNextShootInMS{0};
-    bool          m_firstPersonEnabled{false};            // Unused
-    bool          m_dontPlaceInHand{false};               // Used in case of goggles
-    FxSystem_c*   m_fxSystem{nullptr};                    // Fx system (flamethrower, spraycan, extinguisher)
+    bool          m_firstPersonEnabled{false};  // Unused
+    bool          m_dontPlaceInHand{false};     // Used in case of goggles
+    FxSystem_c*   m_fxSystem{nullptr};          // Fx system (flamethrower, spraycan, extinguisher)
 
     void Shutdown() { ((void(__thiscall*)(CWeaponSAInterface*))0x73A380)(this); }
     void Initialize(eWeaponType weaponType, std::uint32_t ammo, CPedSAInterface* ped)

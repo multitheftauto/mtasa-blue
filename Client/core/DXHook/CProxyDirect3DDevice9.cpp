@@ -10,127 +10,258 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProxyComHelpers.h"
+#include "ComPtrValidation.h"
 #include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <mutex>
+#include <thread>
 #include <game/CSettings.h>
 
-class CProxyDirect3DDevice9;
+struct CProxyDirect3DDevice9;
 extern std::atomic<bool> g_bInMTAScene;
+
+void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3DPRESENT_PARAMETERS& presentationParameters);
 
 namespace
 {
-template <typename T>
-bool IsValidComInterfacePointer(T* pointer)
+
+}  // unnamed namespace
+
+namespace BorderlessGamma
 {
-    if (!pointer)
-        return true;
+    const float kGammaMin = 0.5f;
+    const float kGammaMax = 2.0f;
+    const float kBrightnessMin = 0.5f;
+    const float kBrightnessMax = 2.0f;
+    const float kContrastMin = 0.5f;
+    const float kContrastMax = 2.0f;
+    const float kSaturationMin = 0.5f;
+    const float kSaturationMax = 2.0f;
 
-    if (!SharedUtil::IsReadablePointer(pointer, sizeof(void*)))
-        return false;
-
-    void* const* vtablePtr = reinterpret_cast<void* const*>(pointer);
-    void* const  vtable = *vtablePtr;
-    if (!vtable)
-        return false;
-
-    constexpr size_t requiredBytes = sizeof(void*) * 3;  // QueryInterface, AddRef, Release
-    return SharedUtil::IsReadablePointer(vtable, requiredBytes);
-}
-
-template <typename T>
-void ReleaseInterface(T*& pointer, const char* context = nullptr)
-{
-    if (pointer)
+    // Cache CVAR-derived values to avoid repeated string lookups on every frame.
+    struct CachedSettings
     {
-        if (IsValidComInterfacePointer(pointer))
-        {
-            pointer->Release();
-        }
-        else
-        {
-        SString label;
-        label = context ? context : "ReleaseInterface";
-            SString message;
-            message.Format("%s: skipping Release on invalid COM pointer %p", label.c_str(), pointer);
-            AddReportLog(8750, message, 5);
-        }
-        pointer = nullptr;
-    }
-}
+        std::mutex                           updateMutex;
+        std::atomic<int>                     revision;
+        std::atomic<const CClientVariables*> source;
+        std::atomic<float>                   gammaPower;
+        std::atomic<float>                   brightnessScale;
+        std::atomic<float>                   contrastScale;
+        std::atomic<float>                   saturationScale;
+        std::atomic<bool>                    gammaEnabled;
+        std::atomic<bool>                    brightnessEnabled;
+        std::atomic<bool>                    contrastEnabled;
+        std::atomic<bool>                    saturationEnabled;
+        std::atomic<bool>                    applyWindowed;
+        std::atomic<bool>                    applyFullscreen;
 
-template <typename T>
-void ReplaceInterface(T*& destination, T* source, const char* context = nullptr)
-{
-    if (destination == source)
-        return;
+        CachedSettings()
+            : revision(-1),
+              source(nullptr),
+              gammaPower(1.0f),
+              brightnessScale(1.0f),
+              contrastScale(1.0f),
+              saturationScale(1.0f),
+              gammaEnabled(false),
+              brightnessEnabled(false),
+              contrastEnabled(false),
+              saturationEnabled(false),
+              applyWindowed(false),
+              applyFullscreen(false)
+        {
+        }
+    };
 
-    if (source && !IsValidComInterfacePointer(source))
+    static CachedSettings g_cachedSettings;
+
+    void RefreshCacheIfNeeded()
     {
-    SString label;
-    label = context ? context : "ReplaceInterface";
-        SString message;
-        message.Format("%s: rejected invalid COM pointer %p", label.c_str(), source);
-        AddReportLog(8751, message, 5);
-        return;
+        CClientVariables*       cvars = CClientVariables::GetSingletonPtr();
+        const CClientVariables* currentSource = cvars;
+        const int               currentRevision = cvars ? cvars->GetRevision() : -1;
+
+        const CClientVariables* cachedSource = g_cachedSettings.source.load(std::memory_order_relaxed);
+        const int               cachedRevision = g_cachedSettings.revision.load(std::memory_order_relaxed);
+
+        if (cachedSource == currentSource && cachedRevision == currentRevision)
+            return;
+
+        std::lock_guard<std::mutex> guard(g_cachedSettings.updateMutex);
+
+        const CClientVariables* doubleCheckSource = g_cachedSettings.source.load(std::memory_order_relaxed);
+        const int               doubleCheckRevision = g_cachedSettings.revision.load(std::memory_order_relaxed);
+        if (doubleCheckSource == currentSource && doubleCheckRevision == currentRevision)
+            return;
+
+        float gammaPower = 1.0f;
+        float brightnessScale = 1.0f;
+        float contrastScale = 1.0f;
+        float saturationScale = 1.0f;
+        bool  gammaEnabled = false;
+        bool  brightnessEnabled = false;
+        bool  contrastEnabled = false;
+        bool  saturationEnabled = false;
+        bool  applyWindowed = false;
+        bool  applyFullscreen = false;
+
+        if (cvars)
+        {
+            cvars->Get("borderless_gamma_power", gammaPower);
+            cvars->Get("borderless_brightness_scale", brightnessScale);
+            cvars->Get("borderless_contrast_scale", contrastScale);
+            cvars->Get("borderless_saturation_scale", saturationScale);
+            cvars->Get("borderless_gamma_enabled", gammaEnabled);
+            cvars->Get("borderless_brightness_enabled", brightnessEnabled);
+            cvars->Get("borderless_contrast_enabled", contrastEnabled);
+            cvars->Get("borderless_saturation_enabled", saturationEnabled);
+            cvars->Get("borderless_apply_windowed", applyWindowed);
+            cvars->Get("borderless_apply_fullscreen", applyFullscreen);
+
+            if (!cvars->Exists("borderless_apply_windowed"))
+            {
+                bool legacyEnable = false;
+                cvars->Get("borderless_enable_srgb", legacyEnable);
+                applyWindowed = legacyEnable;
+            }
+
+            if (!std::isfinite(gammaPower))
+                gammaPower = 1.0f;
+            if (!std::isfinite(brightnessScale))
+                brightnessScale = 1.0f;
+            if (!std::isfinite(contrastScale))
+                contrastScale = 1.0f;
+            if (!std::isfinite(saturationScale))
+                saturationScale = 1.0f;
+
+            gammaPower = std::clamp(gammaPower, kGammaMin, kGammaMax);
+            brightnessScale = std::clamp(brightnessScale, kBrightnessMin, kBrightnessMax);
+            contrastScale = std::clamp(contrastScale, kContrastMin, kContrastMax);
+            saturationScale = std::clamp(saturationScale, kSaturationMin, kSaturationMax);
+        }
+
+        g_cachedSettings.gammaPower.store(gammaPower, std::memory_order_relaxed);
+        g_cachedSettings.brightnessScale.store(brightnessScale, std::memory_order_relaxed);
+        g_cachedSettings.contrastScale.store(contrastScale, std::memory_order_relaxed);
+        g_cachedSettings.saturationScale.store(saturationScale, std::memory_order_relaxed);
+        g_cachedSettings.gammaEnabled.store(gammaEnabled, std::memory_order_relaxed);
+        g_cachedSettings.brightnessEnabled.store(brightnessEnabled, std::memory_order_relaxed);
+        g_cachedSettings.contrastEnabled.store(contrastEnabled, std::memory_order_relaxed);
+        g_cachedSettings.saturationEnabled.store(saturationEnabled, std::memory_order_relaxed);
+        g_cachedSettings.applyWindowed.store(applyWindowed, std::memory_order_relaxed);
+        g_cachedSettings.applyFullscreen.store(applyFullscreen, std::memory_order_relaxed);
+        g_cachedSettings.source.store(currentSource, std::memory_order_relaxed);
+        g_cachedSettings.revision.store(currentRevision, std::memory_order_release);
     }
 
-    ReleaseInterface(destination, context);
-    destination = source;
-    if (destination)
-        destination->AddRef();
-}
-std::mutex               g_proxyDeviceMutex;
-std::mutex               g_gammaStateMutex;
-std::mutex               g_deviceStateMutex;
-std::atomic<uint64_t>    g_proxyRegistrationCounter{0};
-std::mutex               g_sceneStateMutex;
-uint32_t                 g_gtaSceneActiveCount = 0;
-uint64_t                 g_activeProxyRegistrationId = 0;
+    void FetchSettings(float& gammaPower, float& brightnessScale, float& contrastScale, float& saturationScale, bool& applyWindowed, bool& applyFullscreen)
+    {
+        RefreshCacheIfNeeded();
 
-uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance);
-bool      UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registrationId);
-}
+        const float cachedGammaPower = g_cachedSettings.gammaPower.load(std::memory_order_acquire);
+        const float cachedBrightness = g_cachedSettings.brightnessScale.load(std::memory_order_acquire);
+        const float cachedContrast = g_cachedSettings.contrastScale.load(std::memory_order_acquire);
+        const float cachedSaturation = g_cachedSettings.saturationScale.load(std::memory_order_acquire);
+        const bool  gammaEnabled = g_cachedSettings.gammaEnabled.load(std::memory_order_acquire);
+        const bool  brightnessEnabled = g_cachedSettings.brightnessEnabled.load(std::memory_order_acquire);
+        const bool  contrastEnabled = g_cachedSettings.contrastEnabled.load(std::memory_order_acquire);
+        const bool  saturationEnabled = g_cachedSettings.saturationEnabled.load(std::memory_order_acquire);
+
+        gammaPower = gammaEnabled ? cachedGammaPower : 1.0f;
+        brightnessScale = brightnessEnabled ? cachedBrightness : 1.0f;
+        contrastScale = contrastEnabled ? cachedContrast : 1.0f;
+        saturationScale = saturationEnabled ? cachedSaturation : 1.0f;
+
+        applyWindowed = g_cachedSettings.applyWindowed.load(std::memory_order_acquire);
+        applyFullscreen = g_cachedSettings.applyFullscreen.load(std::memory_order_acquire);
+    }
+
+    bool ShouldApplyAdjustments(float gammaPower, float brightnessScale, float contrastScale, float saturationScale)
+    {
+        constexpr float epsilon = 0.001f;
+        return std::fabs(gammaPower - 1.0f) > epsilon || std::fabs(brightnessScale - 1.0f) > epsilon || std::fabs(contrastScale - 1.0f) > epsilon ||
+               std::fabs(saturationScale - 1.0f) > epsilon;
+    }
+
+}  // namespace BorderlessGamma
+
+using namespace BorderlessGamma;
+std::mutex            g_proxyDeviceMutex;
+std::mutex            g_gammaStateMutex;
+std::mutex            g_deviceStateMutex;
+std::atomic<uint64_t> g_proxyRegistrationCounter{0};
+std::atomic<uint>     g_gtaSceneActiveCount{0};
+uint64_t              g_activeProxyRegistrationId = 0;
 
 std::atomic<bool>                       g_bInGTAScene{false};
 CProxyDirect3DDevice9*                  g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 SGammaState                             g_GammaState;
 
+CProxyDirect3DDevice9::SMemoryState g_StaticMemoryState;
+
+namespace
+{
+    uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance)
+    {
+        std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
+        const uint64_t              registrationId = g_proxyRegistrationCounter.fetch_add(1, std::memory_order_relaxed) + 1;
+        g_pProxyDevice = instance;
+        g_activeProxyRegistrationId = registrationId;
+        {
+            std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+            g_pDeviceState = instance ? &instance->DeviceState : nullptr;
+        }
+        return registrationId;
+    }
+
+    bool UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registrationId)
+    {
+        std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
+        if (g_pProxyDevice != instance)
+            return false;
+
+        if (g_activeProxyRegistrationId != registrationId)
+            return false;
+
+        g_pProxyDevice = nullptr;
+        g_activeProxyRegistrationId = 0;
+        {
+            std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
+            g_pDeviceState = nullptr;
+        }
+        return true;
+    }
+}  // namespace
+
 void IncrementGTASceneState()
 {
-    std::lock_guard<std::mutex> lock(g_sceneStateMutex);
-    ++g_gtaSceneActiveCount;
+    // Lockless atomic increment (called on every BeginScene)
+    g_gtaSceneActiveCount.fetch_add(1, std::memory_order_relaxed);
     g_bInGTAScene.store(true, std::memory_order_release);
 }
 
 void DecrementGTASceneState()
 {
-    std::lock_guard<std::mutex> lock(g_sceneStateMutex);
-    if (g_gtaSceneActiveCount > 0)
-        --g_gtaSceneActiveCount;
-    g_bInGTAScene.store(g_gtaSceneActiveCount > 0, std::memory_order_release);
+    // Lockless atomic decrement (called on every EndScene)
+    uint prevCount = g_gtaSceneActiveCount.fetch_sub(1, std::memory_order_acq_rel);
+    // fetch_sub returns value BEFORE subtraction, so check if it was 1 (now 0)
+    g_bInGTAScene.store(prevCount > 1, std::memory_order_release);
 }
 
 void ResetGTASceneState()
 {
-    std::lock_guard<std::mutex> lock(g_sceneStateMutex);
-    g_gtaSceneActiveCount = 0;
+    // Lockless atomic reset
+    g_gtaSceneActiveCount.store(0, std::memory_order_relaxed);
     g_bInGTAScene.store(false, std::memory_order_release);
 }
 
 // Proxy constructor and destructor.
 // Constructor performs heavy initialization; defer global registration until the end to avoid exposing a partially built object.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
-    : m_pDevice(pDevice)
-    , m_pData(nullptr)
-    , m_ulRefCount(1)
-    , m_registrationToken(0)
-    , m_lastTestCooperativeLevelResult(D3D_OK)
+    : m_pDevice(pDevice), m_pData(nullptr), m_lRefCount(1), m_registrationToken(0), m_lastTestCooperativeLevelResult(D3D_OK)
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x (device: %08x)", this, pDevice));
-
     struct DeviceRefGuard
     {
         IDirect3DDevice9* device;
@@ -164,39 +295,47 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
         if (!pD3D9)
         {
             m_pDevice->GetDirect3D(&pD3D9);
-            bNeedRelease = true;        // GetDirect3D increments reference count
+            bNeedRelease = true;  // GetDirect3D increments reference count
         }
 
         if (pD3D9)
         {
             D3DADAPTER_IDENTIFIER9 adaptIdent;
-            ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
-            pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
+            HRESULT                hr = pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
 
-            int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
+            if (SUCCEEDED(hr))
+            {
+                // GetAdapterIdentifier succeeded - use adapter info
+                int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
 
-            // Just incase, fallback to using texture memory stats
-            if (iVideoCardMemoryKBTotal < 16)
-                iVideoCardMemoryKBTotal = m_pDevice->GetAvailableTextureMem() / 1024;
+                // Just incase, fallback to using texture memory stats
+                if (iVideoCardMemoryKBTotal < 16)
+                    iVideoCardMemoryKBTotal = m_pDevice->GetAvailableTextureMem() / 1024;
 
-            DeviceState.AdapterState.InstalledMemoryKB = iVideoCardMemoryKBTotal;
+                DeviceState.AdapterState.InstalledMemoryKB = iVideoCardMemoryKBTotal;
 
-            // Get video card name
-            DeviceState.AdapterState.Name = adaptIdent.Description;
+                // Get video card name
+                DeviceState.AdapterState.Name = adaptIdent.Description;
 
-            // Clipping is required for some graphic configurations
-            DeviceState.AdapterState.bRequiresClipping = SStringX(adaptIdent.Description).Contains("Intel");
+                // Clipping is required for some graphic configurations - use direct C-string search to avoid heap allocation
+                DeviceState.AdapterState.bRequiresClipping = (strstr(adaptIdent.Description, "Intel") != nullptr);
+            }
+            else
+            {
+                // GetAdapterIdentifier failed - use defaults
+                DeviceState.AdapterState.InstalledMemoryKB = m_pDevice->GetAvailableTextureMem() / 1024;
+                DeviceState.AdapterState.Name = "Unknown";
+                DeviceState.AdapterState.bRequiresClipping = false;
+            }
 
             // Release D3D9 interface if we obtained it via GetDirect3D
             if (bNeedRelease)
             {
-                SAFE_RELEASE(pD3D9);
+                ReleaseInterface(pD3D9, 8799, "CProxyDirect3DDevice9 ctor GetDirect3D");
             }
         }
         else
         {
-            WriteDebugEvent("Warning: Could not obtain IDirect3D9 interface for adapter info");
-
             // Set default values
             DeviceState.AdapterState.InstalledMemoryKB = m_pDevice->GetAvailableTextureMem() / 1024;
             DeviceState.AdapterState.Name = "Unknown";
@@ -216,8 +355,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
                 DeviceState.AdapterState.MaxAnisotropicSetting++;
         }
 
-        WriteDebugEvent(SString("*** Using adapter: %s (Mem:%d KB, MaxAnisotropy:%d)", (const char*)DeviceState.AdapterState.Name,
-                                DeviceState.AdapterState.InstalledMemoryKB, DeviceState.AdapterState.MaxAnisotropicSetting));
+        // Adapter info collected in DeviceState
     }
 
     const uint64_t registrationToken = RegisterProxyDevice(this);
@@ -237,9 +375,15 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 
     m_registrationToken = registrationToken;
 
-    // Give a default value for the streaming memory setting
-    if (g_pCore->GetCVars()->Exists("streaming_memory") == false)
-        g_pCore->GetCVars()->Set("streaming_memory", g_pCore->GetMaxStreamingMemory());
+    // Give a default value for the streaming memory setting without assuming core lifetime
+    if (CClientVariables* cvars = CClientVariables::GetSingletonPtr())
+    {
+        if (!cvars->Exists("streaming_memory"))
+        {
+            if (CCore* core = CCore::GetSingletonPtr())
+                cvars->Set("streaming_memory", core->GetMaxStreamingMemory());
+        }
+    }
 
     CDirect3DEvents9::OnDirect3DDeviceCreate(m_pDevice);
 
@@ -249,12 +393,11 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::~CProxyDirect3DDevice9 %08x", this));
     const bool bWasRegistered = UnregisterProxyDevice(this, m_registrationToken);
 
-    bool          bRestoreGamma = false;
-    UINT          lastSwapChain = 0;
-    D3DGAMMARAMP  originalGammaRamp{};
+    bool         bRestoreGamma = false;
+    UINT         lastSwapChain = 0;
+    D3DGAMMARAMP originalGammaRamp{};
 
     if (bWasRegistered)
     {
@@ -269,7 +412,7 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 
             g_GammaState.bOriginalGammaStored = false;
             g_GammaState.bLastWasBorderless = false;
-            ZeroMemory(&g_GammaState.originalGammaRamp, sizeof(g_GammaState.originalGammaRamp));
+            g_GammaState.originalGammaRamp = {};
         }
     }
 
@@ -279,7 +422,6 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
         pDevice->AddRef();
         pDevice->SetGammaRamp(lastSwapChain, 0, &originalGammaRamp);
         pDevice->Release();
-        WriteDebugEvent("Restored original gamma ramp on device destruction");
     }
 
     // Release any cached COM references we held onto for diagnostics
@@ -287,13 +429,11 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9()
 
     // Release our reference to the wrapped device
     // Note: We don't check m_ulRefCount here because destructor is only called
-    // when Release() determined the count reached 0
-    if (m_pDevice)
+    // when Release() determined the count reached 0    if (m_pDevice)
     {
         m_pDevice->Release();
         m_pDevice = nullptr;
     }
-    
 }
 
 /*** IUnknown methods ***/
@@ -301,9 +441,9 @@ HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
 {
     if (!ppvObj)
         return E_POINTER;
-        
+
     *ppvObj = nullptr;
-    
+
     // Check if its for IUnknown or IDirect3DDevice9
     if (riid == IID_IUnknown || riid == IID_IDirect3DDevice9)
     {
@@ -311,7 +451,7 @@ HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
         AddRef();
         return S_OK;
     }
-    
+
     // For any other interface, forward to underlying device
     // But this means the caller gets the underlying device, not our proxy
     return m_pDevice->QueryInterface(riid, ppvObj);
@@ -321,37 +461,35 @@ ULONG CProxyDirect3DDevice9::AddRef()
 {
     // Only increment proxy reference count
     // We keep a single reference to the underlying device throughout the lifetime
-    return InterlockedIncrement(&m_ulRefCount);
+    LONG lNewRefCount = m_lRefCount.fetch_add(1, std::memory_order_relaxed) + 1;
+    return static_cast<ULONG>(lNewRefCount);
 }
 
 ULONG CProxyDirect3DDevice9::Release()
 {
-    // Only decrement proxy reference count  
-    ULONG ulNewRefCount = InterlockedDecrement(&m_ulRefCount);
-    
-    if (ulNewRefCount == 0)
+    // Only decrement proxy reference count
+    LONG lNewRefCount = m_lRefCount.fetch_sub(1, std::memory_order_acq_rel) - 1;
+
+    if (lNewRefCount == 0)
     {
-        WriteDebugEvent("Releasing IDirect3DDevice9 Proxy...");
         // Call event handler
         CDirect3DEvents9::OnDirect3DDeviceDestroy(m_pDevice);
         delete this;
         return 0;
     }
 
-    return ulNewRefCount;
+    return static_cast<ULONG>(lNewRefCount);
 }
 
 /*** IDirect3DDevice9 methods ***/
 HRESULT CProxyDirect3DDevice9::TestCooperativeLevel()
 {
     HRESULT hResult = m_pDevice->TestCooperativeLevel();
-    
-    // Log device state transitions for debugging GPU driver issues
+
     if (hResult != m_lastTestCooperativeLevelResult)
     {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::TestCooperativeLevel - Device state changed: %08x -> %08x", m_lastTestCooperativeLevelResult, hResult));
         m_lastTestCooperativeLevelResult = hResult;
-        
+
         // Additional safety for when transitioning to/from lost states
         if (hResult == D3DERR_DEVICELOST || hResult == D3DERR_DEVICENOTRESET)
         {
@@ -359,7 +497,7 @@ HRESULT CProxyDirect3DDevice9::TestCooperativeLevel()
             Sleep(1);
         }
     }
-    
+
     return hResult;
 }
 
@@ -463,14 +601,12 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
 
     if (SUCCEEDED(hResult))
     {
-        // Log success
-        WriteDebugEvent("Reset success");
+        return hResult;
     }
     else if (FAILED(hResult))
     {
         // Handle failure of initial reset device call
         g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail0:%08x", hResult));
-        WriteDebugEvent(SString("Reset failed #0: %08x", hResult));
 
         // Try reset device again
         hResult = ResetDeviceInsist(5, 1000, pDevice, pPresentationParameters);
@@ -480,7 +616,6 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
         {
             // Record problem
             g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail1:%08x", hResult));
-            WriteDebugEvent(SString("Direct3DDevice9::Reset  Fail1:%08x", hResult));
 
             // Try with original presentation parameters
             *pPresentationParameters = presentationParametersOrig;
@@ -490,7 +625,6 @@ HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresent
             {
                 // Record problem
                 g_pCore->LogEvent(7124, "Direct3D", "Direct3DDevice9::Reset", SString("Fail2:%08x", hResult));
-                WriteDebugEvent(SString("Direct3DDevice9::Reset  Fail2:%08x", hResult));
 
                 // Prevent statup warning in loader
                 WatchDogCompletedSection("L3");
@@ -546,7 +680,7 @@ static bool WaitForGpuIdle(IDirect3DDevice9* pDevice)
                 break;
             }
 
-            Sleep(0);
+            std::this_thread::yield();
         }
     }
 
@@ -556,34 +690,30 @@ static bool WaitForGpuIdle(IDirect3DDevice9* pDevice)
 
 HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
-    WriteDebugEvent("CProxyDirect3DDevice9::Reset");
-
     // Validate input parameters
     if (!pPresentationParameters)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Invalid presentation parameters");
         return D3DERR_INVALIDCALL;
     }
-    
-    // Reset gamma state since display mode might change
+
+    // Preserve existing gamma snapshot so we can restore it if the reset fails.
+    SGammaState previousGammaState;
+    bool        gammaStateCleared = false;
     {
         std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
-        g_GammaState.bOriginalGammaStored = false;
-        g_GammaState.bLastWasBorderless = false;
-        ZeroMemory(&g_GammaState.originalGammaRamp, sizeof(g_GammaState.originalGammaRamp));
+        previousGammaState = g_GammaState;
+        g_GammaState = SGammaState();
+        gammaStateCleared = true;
     }
-    WriteDebugEvent("Reset gamma state due to device reset");
-    
+
     // Check cooperative level before attempting reset
     HRESULT hCoopLevel = m_pDevice->TestCooperativeLevel();
     if (hCoopLevel == D3DERR_DEVICELOST)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Device still lost, cannot reset yet");
         return hCoopLevel;
     }
     else if (hCoopLevel != D3DERR_DEVICENOTRESET && hCoopLevel != D3D_OK)
     {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset - Device in unexpected state: %08x", hCoopLevel));
         return hCoopLevel;
     }
 
@@ -594,10 +724,6 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     if (pVideoModeManager)
     {
         pVideoModeManager->PreReset(pPresentationParameters);
-    }
-    else
-    {
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - Video mode manager unavailable during PreReset");
     }
 
     HRESULT hResult;
@@ -611,11 +737,10 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Give GPU driver time to complete any pending operations. We keep the light Sleep as a
     // conservative fallback but first rely on an event query, as recommended in Microsoft's GPU
     // synchronization guidance, to ensure outstanding commands finish.
-    if (!WaitForGpuIdle(m_pDevice))
-        WriteDebugEvent("CProxyDirect3DDevice9::Reset - WaitForGpuIdle timed out or failed");
+    WaitForGpuIdle(m_pDevice);
 
     Sleep(1);
-    
+
     // Call the real reset routine.
     hResult = DoResetDevice(m_pDevice, pPresentationParameters, presentationParametersOrig);
 
@@ -626,11 +751,9 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         HRESULT              hrSwapChain = m_pDevice->GetSwapChain(0, &pSwapChain);
         if (FAILED(hrSwapChain))
         {
-            WriteDebugEvent(SString("Warning: Failed to get swap chain for parameter storage: %08x", hrSwapChain));
         }
         else if (!pSwapChain)
         {
-            WriteDebugEvent("Warning: GetSwapChain succeeded but returned null swap chain");
         }
 
         // Store device creation parameters as well, keeping both updates atomic relative to device state changes
@@ -652,11 +775,10 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         }
 
         // Always release the swap chain if it was obtained, regardless of success/failure
-        ReleaseInterface(pSwapChain);
+        ReleaseInterface(pSwapChain, 8799, "CProxyDirect3DDevice9::Reset GetSwapChain");
 
         if (FAILED(hrCreationParams))
         {
-            WriteDebugEvent(SString("Warning: Failed to get creation parameters: %08x", hrCreationParams));
         }
 
         // Only perform post-reset operations on successful reset
@@ -665,84 +787,54 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         {
             pVideoModeManager->PostReset(pPresentationParameters);
         }
-        else
-        {
-            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Skipping PostReset because video mode manager is unavailable");
-        }
 
-    // Update our data.
-    m_pData->StoreViewport(0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
+        ApplyBorderlessColorCorrection(this, *pPresentationParameters);
+
+        // Update our data.
+        m_pData->StoreViewport(0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
 
         // Ensure scene state is properly restored
         // Call our event handler.
         CDirect3DEvents9::OnRestore(m_pDevice);
-        
+
         // Additional sync point for GPU driver
-        if (!BeginSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
+        if (BeginSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
         {
-            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to begin scene for driver sync");
+            EndSceneWithoutProxy(m_pDevice, ESceneOwner::MTA);
         }
-        else if (!EndSceneWithoutProxy(m_pDevice, ESceneOwner::MTA))
-        {
-            WriteDebugEvent("CProxyDirect3DDevice9::Reset - Failed to end scene for driver sync");
-        }
-
-    WriteDebugEvent(SString("    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d", pPresentationParameters->BackBufferWidth,
-                            pPresentationParameters->BackBufferHeight, pPresentationParameters->BackBufferFormat, pPresentationParameters->BackBufferCount));
-
-    WriteDebugEvent(SString("    MultiSampleType:%d  Quality:%d", pPresentationParameters->MultiSampleType, pPresentationParameters->MultiSampleQuality));
-
-    WriteDebugEvent(SString("    SwapEffect:%d  Windowed:%d  EnableAutoDepthStencil:%d  AutoDepthStencilFormat:%d  Flags:0x%x",
-                            pPresentationParameters->SwapEffect, pPresentationParameters->Windowed, pPresentationParameters->EnableAutoDepthStencil,
-                            pPresentationParameters->AutoDepthStencilFormat, pPresentationParameters->Flags));
-
-    WriteDebugEvent(SString("    FullScreen_RefreshRateInHz:%d  PresentationInterval:0x%08x", pPresentationParameters->FullScreen_RefreshRateInHz,
-                            pPresentationParameters->PresentationInterval));
-
-    {
-        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
-        if (g_pDeviceState)
-        {
-            const D3DDEVICE_CREATION_PARAMETERS& parameters = g_pDeviceState->CreationState.CreationParameters;
-            WriteDebugEvent(SString("    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x", parameters.AdapterOrdinal, parameters.DeviceType,
-                                    parameters.BehaviorFlags));
-        }
-    }
     }
     else
     {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::Reset failed with HRESULT: %08x", hResult));
+        if (gammaStateCleared)
+        {
+            std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
+            g_GammaState = previousGammaState;
+        }
     }
 
     return hResult;
 }
 
-
 HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion)
 {
-    // Reset frame stat counters
+    // Reset frame stat counters - using memset for efficiency
     memset(&DeviceState.FrameStats, 0, sizeof(DeviceState.FrameStats));
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCoopLevel = D3DERR_INVALIDCALL;
     if (!CDirect3DEvents9::IsDeviceOperational(m_pDevice, &bDeviceTemporarilyLost, &hrCoopLevel))
     {
-        if (bDeviceTemporarilyLost)
-            WriteDebugEvent(SString("CProxyDirect3DDevice9::Present skipped due to device state: %08x", hrCoopLevel));
-        else if (hrCoopLevel != D3D_OK)
-            WriteDebugEvent(SString("CProxyDirect3DDevice9::Present unexpected cooperative level: %08x", hrCoopLevel));
-        else
-            WriteDebugEvent("CProxyDirect3DDevice9::Present invalid device state");
-
         return (hrCoopLevel != D3D_OK) ? hrCoopLevel : D3DERR_INVALIDCALL;
     }
 
     CDirect3DEvents9::OnPresent(m_pDevice);
 
     // A fog flicker fix for some ATI cards
-    D3DMATRIX projMatrix;
-    m_pData->GetTransform(D3DTS_PROJECTION, &projMatrix);
-    m_pDevice->SetTransform(D3DTS_PROJECTION, &projMatrix);
+    const D3DMATRIX* pCachedProjection = m_pData->GetTransformPtr(D3DTS_PROJECTION);
+    if (pCachedProjection)
+    {
+        m_pDevice->SetTransform(D3DTS_PROJECTION, pCachedProjection);
+    }
 
     TIMING_GRAPH("Present");
     HRESULT hr = CDirect3DEvents9::PresentGuarded(m_pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
@@ -770,14 +862,12 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
     // Validate inputs first
     if (!pRamp)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::SetGammaRamp - Invalid gamma ramp pointer");
         return;
     }
 
     // Validate swap chain index
     if (iSwapChain >= GetNumberOfSwapChains())
     {
-        WriteDebugEvent(SString("CProxyDirect3DDevice9::SetGammaRamp - Invalid swap chain index: %d", iSwapChain));
         return;
     }
 
@@ -791,6 +881,27 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
     }
 
     bool bIsBorderlessMode = pVideoModeManager->IsDisplayModeWindowed() || pVideoModeManager->IsDisplayModeFullScreenWindow();
+
+    // Fast-path: check cached state before expensive settings fetch
+    {
+        std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
+        if (g_GammaState.bOriginalGammaStored && g_GammaState.bLastWasBorderless == bIsBorderlessMode && g_GammaState.lastSwapChain == iSwapChain)
+        {
+            // State hasn't changed, apply ramp directly
+            m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
+            return;
+        }
+    }
+
+    float gammaPower = 1.0f;
+    float brightnessScale = 1.0f;
+    float contrastScale = 1.0f;
+    float saturationScale = 1.0f;
+    bool  applyWindowed = true;
+    bool  applyFullscreen = false;
+    FetchSettings(gammaPower, brightnessScale, contrastScale, saturationScale, applyWindowed, applyFullscreen);
+
+    const bool adjustmentsRequested = bIsBorderlessMode ? applyWindowed : applyFullscreen;
 
     // Store original gamma ramp on first call or mode change
     {
@@ -808,60 +919,89 @@ VOID CProxyDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3D
         }
     }
 
+    if (adjustmentsRequested)
+    {
+        // Let the tone-mapping pass handle all presentation adjustments for this mode.
+        m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
+        return;
+    }
+
     if (bIsBorderlessMode)
     {
-        // Apply brightness and contrast adjustment to match fullscreen mode
-        D3DGAMMARAMP adjustedRamp = *pRamp;
-
-        // Use lighter gamma correction to prevent darkening effect
-        // and optimize brightness boost for better visibility
-        const float fGammaCorrection = 1.0f / 1.3f;
-        const float fBrightnessBoost = 1.4f;
-
-        const auto convertNormalizedToGammaWord = [](float normalized) -> WORD {
-            const float scaled = std::clamp(normalized * 65535.0f, 0.0f, 65535.0f);
-            const float rounded = std::floor(scaled + 0.5f);
-            return static_cast<WORD>(rounded);
-        };
-
-        for (int i = 0; i < 256; i++)
-        {
-            // Convert to normalized float (0.0 - 1.0)
-            float fRed = static_cast<float>(pRamp->red[i]) / 65535.0f;
-            float fGreen = static_cast<float>(pRamp->green[i]) / 65535.0f;
-            float fBlue = static_cast<float>(pRamp->blue[i]) / 65535.0f;
-
-            // Clamp input values to valid range
-            fRed = std::max(0.0f, std::min(1.0f, fRed));
-            fGreen = std::max(0.0f, std::min(1.0f, fGreen));
-            fBlue = std::max(0.0f, std::min(1.0f, fBlue));
-
-            // Apply gentler gamma correction first
-            fRed = powf(fRed, fGammaCorrection);
-            fGreen = powf(fGreen, fGammaCorrection);
-            fBlue = powf(fBlue, fGammaCorrection);
-
-            // Then apply balanced brightness boost
-            fRed = std::min(1.0f, fRed * fBrightnessBoost);
-            fGreen = std::min(1.0f, fGreen * fBrightnessBoost);
-            fBlue = std::min(1.0f, fBlue * fBrightnessBoost);
-
-            // Convert back to WORD values with proper rounding
-            adjustedRamp.red[i] = convertNormalizedToGammaWord(fRed);
-            adjustedRamp.green[i] = convertNormalizedToGammaWord(fGreen);
-            adjustedRamp.blue[i] = convertNormalizedToGammaWord(fBlue);
-        }
-
-        // Set the adjusted gamma ramp
-        m_pDevice->SetGammaRamp(iSwapChain, Flags, &adjustedRamp);
-    }
-    else
-    {
-        // In exclusive fullscreen mode, use the original gamma ramp
+        // Windowed/borderless always rely on the tone-mapping pass.
         m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
-        
-        WriteDebugEvent("Applied original gamma ramp for fullscreen mode");
+        return;
     }
+
+    // In exclusive fullscreen mode with no adjustments requested, fall back to the original gamma ramp
+    m_pDevice->SetGammaRamp(iSwapChain, Flags, pRamp);
+}
+
+void CProxyDirect3DDevice9::ApplyBorderlessPresentationTuning()
+{
+    if (!m_pDevice)
+        return;
+
+    D3DPRESENT_PARAMETERS presentationParameters{};
+    bool                  havePresentationParameters = false;
+    {
+        std::lock_guard<std::mutex> stateLock(g_deviceStateMutex);
+        if (g_pDeviceState)
+        {
+            presentationParameters = g_pDeviceState->CreationState.PresentationParameters;
+            havePresentationParameters = true;
+        }
+    }
+
+    bool bIsBorderlessMode = false;
+    if (havePresentationParameters)
+    {
+        bIsBorderlessMode = (presentationParameters.Windowed != 0);
+    }
+
+    if (!havePresentationParameters)
+    {
+        if (CVideoModeManagerInterface* pVideoModeManager = GetVideoModeManager())
+            bIsBorderlessMode = pVideoModeManager->IsDisplayModeWindowed() || pVideoModeManager->IsDisplayModeFullScreenWindow();
+
+        // Provide a best-effort set of presentation parameters so sRGB state refreshes consistently.
+        presentationParameters.Windowed = bIsBorderlessMode ? TRUE : FALSE;
+    }
+
+    ApplyBorderlessColorCorrection(this, presentationParameters);
+
+    if (bIsBorderlessMode)
+    {
+        // Borderless tone mapping handles gamma/brightness adjustments when enabled.
+        return;
+    }
+
+    UINT         targetSwapChain = 0;
+    D3DGAMMARAMP baseRamp{};
+    bool         haveBaseRamp = false;
+
+    {
+        std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
+        if (g_GammaState.bOriginalGammaStored)
+        {
+            baseRamp = g_GammaState.originalGammaRamp;
+            targetSwapChain = g_GammaState.lastSwapChain;
+            haveBaseRamp = true;
+        }
+    }
+
+    if (!haveBaseRamp)
+    {
+        m_pDevice->GetGammaRamp(targetSwapChain, &baseRamp);
+
+        std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
+        g_GammaState.originalGammaRamp = baseRamp;
+        g_GammaState.lastSwapChain = targetSwapChain;
+        g_GammaState.bOriginalGammaStored = true;
+    }
+
+    D3DGAMMARAMP rampCopy = baseRamp;
+    SetGammaRamp(targetSwapChain, 0, &rampCopy);
 }
 
 VOID CProxyDirect3DDevice9::GetGammaRamp(UINT iSwapChain, D3DGAMMARAMP* pRamp)
@@ -908,7 +1048,8 @@ HRESULT CProxyDirect3DDevice9::CreateRenderTarget(UINT Width, UINT Height, D3DFO
 HRESULT CProxyDirect3DDevice9::CreateDepthStencilSurface(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality,
                                                          BOOL Discard, IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
 {
-    return CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(m_pDevice, Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
+    return CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(m_pDevice, Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface,
+                                                              pSharedHandle);
 }
 
 HRESULT CProxyDirect3DDevice9::UpdateSurface(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestinationSurface,
@@ -988,7 +1129,6 @@ HRESULT CProxyDirect3DDevice9::BeginScene()
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
@@ -1025,7 +1165,6 @@ HRESULT CProxyDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State, CONST D
 {
     if (!pMatrix)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::SetTransform - Null matrix pointer");
         return D3DERR_INVALIDCALL;
     }
 
@@ -1040,6 +1179,17 @@ HRESULT CProxyDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State, CONST D
 
 HRESULT CProxyDirect3DDevice9::GetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix)
 {
+    // Use cached data if available to avoid expensive device query
+    if (pMatrix)
+    {
+        const D3DMATRIX* pCached = m_pData->GetTransformPtr(State);
+        if (pCached)
+        {
+            *pMatrix = *pCached;
+            return D3D_OK;
+        }
+    }
+    // Fallback to device query for unsupported transform types
     return m_pDevice->GetTransform(State, pMatrix);
 }
 
@@ -1066,11 +1216,12 @@ HRESULT CProxyDirect3DDevice9::SetMaterial(CONST D3DMATERIAL9* pMaterial)
 {
     if (!pMaterial)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::SetMaterial - Null material pointer");
         return D3DERR_INVALIDCALL;
     }
 
-    DeviceState.Material = *pMaterial;
+    // Update cache if material has changed (avoid 68-byte copy)
+    if (memcmp(&DeviceState.Material, pMaterial, sizeof(D3DMATERIAL9)) != 0)
+        DeviceState.Material = *pMaterial;
     return m_pDevice->SetMaterial(pMaterial);
 }
 
@@ -1083,11 +1234,11 @@ HRESULT CProxyDirect3DDevice9::SetLight(DWORD Index, CONST D3DLIGHT9* pLight)
 {
     if (!pLight)
     {
-        WriteDebugEvent("CProxyDirect3DDevice9::SetLight - Null light pointer");
         return D3DERR_INVALIDCALL;
     }
 
-    if (Index < NUMELMS(DeviceState.Lights))
+    // Update cache if light has changed (avoid 104-byte copy)
+    if (Index < NUMELMS(DeviceState.Lights) && memcmp(&DeviceState.Lights[Index], pLight, sizeof(D3DLIGHT9)) != 0)
         DeviceState.Lights[Index] = *pLight;
     return m_pDevice->SetLight(Index, pLight);
 }
@@ -1121,8 +1272,10 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane(DWORD Index, float* pPlane)
 
 HRESULT CProxyDirect3DDevice9::SetRenderState(D3DRENDERSTATETYPE State, DWORD Value)
 {
+    // Update cache for state tracking
     if (State < NUMELMS(DeviceState.RenderState.Raw))
         DeviceState.RenderState.Raw[State] = Value;
+
     return m_pDevice->SetRenderState(State, Value);
 }
 
@@ -1166,9 +1319,12 @@ HRESULT CProxyDirect3DDevice9::SetTexture(DWORD Stage, IDirect3DBaseTexture9* pT
     CDirect3DEvents9::CloseActiveShader();
     if (Stage < NUMELMS(DeviceState.TextureState))
     {
-        SString context;
-        context.Format("SetTexture stage %u", Stage);
-        ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture, context.c_str());
+        // Fast-path: avoid AddRef/Release if texture hasn't changed
+        if (DeviceState.TextureState[Stage].Texture != pTexture)
+        {
+            // Hot path: use non-validating ReplaceInterface since textures come from D3D9 driver
+            ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture);
+        }
     }
     return m_pDevice->SetTexture(Stage, CDirect3DEvents9::GetRealTexture(pTexture));
 }
@@ -1180,9 +1336,11 @@ HRESULT CProxyDirect3DDevice9::GetTextureStageState(DWORD Stage, D3DTEXTURESTAGE
 
 HRESULT CProxyDirect3DDevice9::SetTextureStageState(DWORD Stage, D3DTEXTURESTAGESTATETYPE Type, DWORD Value)
 {
+    // Update cache for state tracking
     if (Stage < NUMELMS(DeviceState.StageState))
         if (Type < NUMELMS(DeviceState.StageState[Stage].Raw))
             DeviceState.StageState[Stage].Raw[Type] = Value;
+
     return m_pDevice->SetTextureStageState(Stage, Type, Value);
 }
 
@@ -1193,9 +1351,11 @@ HRESULT CProxyDirect3DDevice9::GetSamplerState(DWORD Sampler, D3DSAMPLERSTATETYP
 
 HRESULT CProxyDirect3DDevice9::SetSamplerState(DWORD Sampler, D3DSAMPLERSTATETYPE Type, DWORD Value)
 {
+    // Update cache for state tracking
     if (Sampler < NUMELMS(DeviceState.SamplerState))
         if (Type < NUMELMS(DeviceState.SamplerState[Sampler].Raw))
             DeviceState.SamplerState[Sampler].Raw[Type] = Value;
+
     return m_pDevice->SetSamplerState(Sampler, Type, Value);
 }
 
@@ -1265,9 +1425,8 @@ HRESULT CProxyDirect3DDevice9::DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, UIN
 HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitive(D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex,
                                                     UINT primCount)
 {
-    SetCallType(SCallState::DRAW_INDEXED_PRIMITIVE,
-                {PrimitiveType, BaseVertexIndex, static_cast<int>(MinVertexIndex), static_cast<int>(NumVertices), static_cast<int>(startIndex),
-                 static_cast<int>(primCount)});
+    SetCallType(SCallState::DRAW_INDEXED_PRIMITIVE, {PrimitiveType, BaseVertexIndex, static_cast<int>(MinVertexIndex), static_cast<int>(NumVertices),
+                                                     static_cast<int>(startIndex), static_cast<int>(primCount)});
     HRESULT hr = CDirect3DEvents9::OnDrawIndexedPrimitive(m_pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
     SetCallType(SCallState::NONE);
     return hr;
@@ -1283,8 +1442,8 @@ HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE Primitive
                                                       CONST void* pIndexData, D3DFORMAT IndexDataFormat, CONST void* pVertexStreamZeroData,
                                                       UINT VertexStreamZeroStride)
 {
-    return CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(m_pDevice, PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData,
-                                                          IndexDataFormat, pVertexStreamZeroData, VertexStreamZeroStride);
+    return CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(m_pDevice, PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat,
+                                                           pVertexStreamZeroData, VertexStreamZeroStride);
 }
 
 HRESULT CProxyDirect3DDevice9::ProcessVertices(UINT SrcStartIndex, UINT DestIndex, UINT VertexCount, IDirect3DVertexBuffer9* pDestBuffer,
@@ -1300,7 +1459,9 @@ HRESULT CProxyDirect3DDevice9::CreateVertexDeclaration(CONST D3DVERTEXELEMENT9* 
 
 HRESULT CProxyDirect3DDevice9::SetVertexDeclaration(IDirect3DVertexDeclaration9* pDecl)
 {
-    ReplaceInterface(DeviceState.VertexDeclaration, pDecl);
+    // Avoid validation overhead since declarations come from D3D9 driver
+    if (DeviceState.VertexDeclaration != pDecl)
+        ReplaceInterface(DeviceState.VertexDeclaration, pDecl);
     return CDirect3DEvents9::SetVertexDeclaration(m_pDevice, pDecl);
 }
 
@@ -1326,7 +1487,9 @@ HRESULT CProxyDirect3DDevice9::CreateVertexShader(CONST DWORD* pFunction, IDirec
 
 HRESULT CProxyDirect3DDevice9::SetVertexShader(IDirect3DVertexShader9* pShader)
 {
-    ReplaceInterface(DeviceState.VertexShader, pShader);
+    // Avoid validation overhead since shaders come from D3D9 driver
+    if (DeviceState.VertexShader != pShader)
+        ReplaceInterface(DeviceState.VertexShader, pShader);
     return m_pDevice->SetVertexShader(pShader);
 }
 
@@ -1369,7 +1532,9 @@ HRESULT CProxyDirect3DDevice9::SetStreamSource(UINT StreamNumber, IDirect3DVerte
 {
     if (StreamNumber < NUMELMS(DeviceState.VertexStreams))
     {
-        ReplaceInterface(DeviceState.VertexStreams[StreamNumber].StreamData, pStreamData);
+        // Avoid validation overhead since vertex buffers come from D3D9 driver
+        if (DeviceState.VertexStreams[StreamNumber].StreamData != pStreamData)
+            ReplaceInterface(DeviceState.VertexStreams[StreamNumber].StreamData, pStreamData);
         DeviceState.VertexStreams[StreamNumber].StreamOffset = OffsetInBytes;
         DeviceState.VertexStreams[StreamNumber].StreamStride = Stride;
     }
@@ -1393,7 +1558,9 @@ HRESULT CProxyDirect3DDevice9::GetStreamSourceFreq(UINT StreamNumber, UINT* pSet
 
 HRESULT CProxyDirect3DDevice9::SetIndices(IDirect3DIndexBuffer9* pIndexData)
 {
-    ReplaceInterface(DeviceState.IndexBufferData, pIndexData);
+    // Avoid validation overhead since index buffers come from D3D9 driver
+    if (DeviceState.IndexBufferData != pIndexData)
+        ReplaceInterface(DeviceState.IndexBufferData, pIndexData);
     return m_pDevice->SetIndices(CDirect3DEvents9::GetRealIndexBuffer(pIndexData));
 }
 
@@ -1409,7 +1576,9 @@ HRESULT CProxyDirect3DDevice9::CreatePixelShader(CONST DWORD* pFunction, IDirect
 
 HRESULT CProxyDirect3DDevice9::SetPixelShader(IDirect3DPixelShader9* pShader)
 {
-    ReplaceInterface(DeviceState.PixelShader, pShader);
+    // Avoid validation overhead since shaders come from D3D9 driver
+    if (DeviceState.PixelShader != pShader)
+        ReplaceInterface(DeviceState.PixelShader, pShader);
     return m_pDevice->SetPixelShader(pShader);
 }
 
@@ -1472,21 +1641,21 @@ void CProxyDirect3DDevice9::ReleaseCachedResources()
 {
     for (uint i = 0; i < NUMELMS(DeviceState.TextureState); ++i)
     {
-        ReleaseInterface(DeviceState.TextureState[i].Texture);
+        ReleaseInterface(DeviceState.TextureState[i].Texture, 8799, "ReleaseCachedResources Texture");
     }
 
     for (uint i = 0; i < NUMELMS(DeviceState.VertexStreams); ++i)
     {
-        ReleaseInterface(DeviceState.VertexStreams[i].StreamData);
+        ReleaseInterface(DeviceState.VertexStreams[i].StreamData, 8799, "ReleaseCachedResources VertexStream");
         DeviceState.VertexStreams[i].StreamOffset = 0;
         DeviceState.VertexStreams[i].StreamStride = 0;
     }
 
-    ReleaseInterface(DeviceState.VertexDeclaration);
-    ReleaseInterface(DeviceState.VertexShader);
-    ReleaseInterface(DeviceState.PixelShader);
-    ReleaseInterface(DeviceState.IndexBufferData);
-    ReleaseInterface(DeviceState.MainSceneState.DepthBuffer);
+    ReleaseInterface(DeviceState.VertexDeclaration, 8799, "ReleaseCachedResources VertexDecl");
+    ReleaseInterface(DeviceState.VertexShader, 8799, "ReleaseCachedResources VertexShader");
+    ReleaseInterface(DeviceState.PixelShader, 8799, "ReleaseCachedResources PixelShader");
+    ReleaseInterface(DeviceState.IndexBufferData, 8799, "ReleaseCachedResources IndexBuffer");
+    ReleaseInterface(DeviceState.MainSceneState.DepthBuffer, 8799, "ReleaseCachedResources DepthBuffer");
 }
 
 // For debugging
@@ -1512,40 +1681,6 @@ void CProxyDirect3DDevice9::SetCallType(SCallState::eD3DCallType callType, std::
     }
 }
 
-namespace
-{
-uint64_t RegisterProxyDevice(CProxyDirect3DDevice9* instance)
-{
-    std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
-    const uint64_t registrationId = g_proxyRegistrationCounter.fetch_add(1, std::memory_order_relaxed) + 1;
-    g_pProxyDevice = instance;
-    g_activeProxyRegistrationId = registrationId;
-    {
-        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
-        g_pDeviceState = instance ? &instance->DeviceState : nullptr;
-    }
-    return registrationId;
-}
-
-bool UnregisterProxyDevice(CProxyDirect3DDevice9* instance, uint64_t registrationId)
-{
-    std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
-    if (g_pProxyDevice != instance)
-        return false;
-
-    if (g_activeProxyRegistrationId != registrationId)
-        return false;
-
-    g_pProxyDevice = nullptr;
-    g_activeProxyRegistrationId = 0;
-    {
-        std::lock_guard<std::mutex> stateGuard(g_deviceStateMutex);
-        g_pDeviceState = nullptr;
-    }
-    return true;
-}
-}        // namespace
-
 CProxyDirect3DDevice9* AcquireActiveProxyDevice()
 {
     std::lock_guard<std::mutex> guard(g_proxyDeviceMutex);
@@ -1568,7 +1703,6 @@ bool BeginSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner)
     const HRESULT hr = pDevice->BeginScene();
     if (FAILED(hr))
     {
-        WriteDebugEvent(SString("BeginSceneWithoutProxy failed: %08x", hr));
         return false;
     }
 
@@ -1593,6 +1727,14 @@ bool EndSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner)
     if (FAILED(hr))
     {
         WriteDebugEvent(SString("EndSceneWithoutProxy failed: %08x", hr));
+        if (owner == ESceneOwner::GTA)
+        {
+            ResetGTASceneState();
+        }
+        else if (owner == ESceneOwner::MTA)
+        {
+            g_bInMTAScene.store(false, std::memory_order_release);
+        }
         return false;
     }
 
@@ -1608,8 +1750,7 @@ bool EndSceneWithoutProxy(IDirect3DDevice9* pDevice, ESceneOwner owner)
     return true;
 }
 
-CScopedActiveProxyDevice::CScopedActiveProxyDevice()
-    : m_pProxy(AcquireActiveProxyDevice())
+CScopedActiveProxyDevice::CScopedActiveProxyDevice() : m_pProxy(AcquireActiveProxyDevice())
 {
 }
 

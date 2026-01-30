@@ -3,6 +3,7 @@ project "Client Core"
 	kind "SharedLib"
 	targetname "core"
 	targetdir(buildpath("mta"))
+	clangtidy "On"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
@@ -13,6 +14,7 @@ project "Client Core"
 			"../../Shared/sdk",
 			".",
 			"../sdk",
+			"../../vendor/cegui-0.4.0-custom/include",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
 			"../../vendor/jpeg-9f",
@@ -24,6 +26,11 @@ project "Client Core"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
+
+	filter { "files:FastFailCrashHandler/WerCrashHandler.cpp" }
+		flags { "NoPCH" }
+
+	filter {}
 
 	vpaths {
 		["Headers/*"] = {"**.h", "**.hpp"},
@@ -51,7 +58,7 @@ project "Client Core"
 
 	defines {
 		"INITGUID",
-		"PNG_SETJMP_NOT_SUPPORTED"
+		"PNG_SETJMP_NOT_SUPPORTED",
 	}
 
 	prebuildcommands {

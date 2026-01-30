@@ -15,8 +15,8 @@
 
 extern CMultiplayerSA* pMultiplayer;
 
-DWORD dwCurrentPlayerPed = 0;            // stores the player ped temporarily during hooks
-DWORD dwCurrentVehicle = 0;              // stores the current vehicle during the hooks
+DWORD dwCurrentPlayerPed = 0;  // stores the player ped temporarily during hooks
+DWORD dwCurrentVehicle = 0;    // stores the current vehicle during the hooks
 
 DWORD dwParameter = 0;
 
@@ -201,7 +201,7 @@ VOID ReturnContextToLocalPlayer()
 
         bNotInLocalContext = false;
 
-        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
+        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);  // the player
         CPedSA* pLocalPlayerPedSA = dynamic_cast<CPedSA*>(pLocalPlayerPed);
         if (pLocalPlayerPedSA)
         {
@@ -222,7 +222,7 @@ VOID ReturnContextToLocalPlayer()
         // Store any changes to the local-players stats?
         if (!bLocalStatsStatic)
         {
-            assert(0);            // bLocalStatsStatic is always true
+            assert(0);  // bLocalStatsStatic is always true
             MemCpyFast(&localStatsData.StatTypesFloat, (void*)0xb79380, sizeof(float) * MAX_FLOAT_STATS);
             MemCpyFast(&localStatsData.StatTypesInt, (void*)0xb79000, sizeof(int) * MAX_INT_STATS);
             MemCpyFast(&localStatsData.StatReactionValue, (void*)0xb78f10, sizeof(float) * MAX_REACTION_STATS);
@@ -245,7 +245,7 @@ void SwitchContext(CPed* thePed)
     if (thePed && !bNotInLocalContext)
     {
         // Grab the local ped and the local pad
-        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
+        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);  // the player
         CPad*            pLocalPad = pGameInterface->GetPad();
         CPadSAInterface* pLocalPadInterface = ((CPadSA*)pLocalPad)->GetInterface();
 
@@ -253,7 +253,7 @@ void SwitchContext(CPed* thePed)
         if (thePed != pLocalPlayerPed)
         {
             // Store the local pad
-            pLocalPad->Store();            // store a copy of the local pad internally
+            pLocalPad->Store();  // store a copy of the local pad internally
 
             // Grab the remote data storage for the player we're context switching to
             CPlayerPed* thePlayerPed = dynamic_cast<CPlayerPed*>(thePed);
@@ -301,8 +301,7 @@ void SwitchContext(CPed* thePed)
                     pGameInterface->SetGravity(data->m_fGravity);
 
                     // Disable mouselook for remote players (so the mouse doesn't affect them)
-                    // Only disable mouselook if they're not holding a 1st-person weapon
-                    // And if they're not under-water
+                    // Disable mouselook if they're not holding a 1st-person weapon
                     bool bDisableMouseLook = true;
                     if (pWeapon)
                     {
@@ -312,6 +311,16 @@ void SwitchContext(CPed* thePed)
                             bDisableMouseLook = false;
                         }
                     }
+
+                    // Disable mouse look if they're not in a fight task and not aiming (strafing)
+                    // Fix GitHub Issue #395
+                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && data->m_pad.NewState.RightShoulder1 != 0 &&
+                        thePed->GetPedIntelligence()->GetFightTask())
+                        bDisableMouseLook = false;
+
+                    // Disable mouse look if they're not underwater (Ped vertical rotation when diving)
+                    // TODO - After merge PR #4401
+
                     bMouseLookEnabled = *(bool*)0xB6EC2E;
                     if (bDisableMouseLook)
                         *(bool*)0xB6EC2E = false;
@@ -506,6 +515,7 @@ static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // Assumes no reentrancy
+    // clang-format off
     __asm
     {
         mov     dwCurrentPlayerPed, ecx
@@ -521,9 +531,11 @@ static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
         mov     PlayerPed__ProcessControl_Saved.edi, edi
         pushad
     }
+    // clang-format on
 
     SwitchContext((CPedSAInterface*)dwCurrentPlayerPed);
 
+    // clang-format off
     __asm
     {
         popad
@@ -531,20 +543,24 @@ static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 static void __declspec(naked) CPlayerPed__ProcessControl_Abort()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // restore stuff
@@ -558,14 +574,17 @@ static void __declspec(naked) CPlayerPed__ProcessControl_Abort()
         mov     edi, PlayerPed__ProcessControl_Saved.edi
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -574,14 +593,17 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -589,14 +611,17 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -605,14 +630,17 @@ static void __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -620,14 +648,17 @@ static void __declspec(naked) HOOK_CMonsterTruck__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -636,14 +667,17 @@ static void __declspec(naked) HOOK_CTrailer__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -651,14 +685,17 @@ static void __declspec(naked) HOOK_CTrailer__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -667,14 +704,17 @@ static void __declspec(naked) HOOK_CQuadBike__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -682,14 +722,17 @@ static void __declspec(naked) HOOK_CQuadBike__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -698,14 +741,17 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -713,14 +759,17 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -729,14 +778,17 @@ static void __declspec(naked) HOOK_CBmx__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -744,14 +796,17 @@ static void __declspec(naked) HOOK_CBmx__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -760,14 +815,17 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -775,14 +833,17 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -791,14 +852,17 @@ static void __declspec(naked) HOOK_CBoat__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -806,14 +870,17 @@ static void __declspec(naked) HOOK_CBoat__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -822,14 +889,17 @@ static void __declspec(naked) HOOK_CBike__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -837,14 +907,17 @@ static void __declspec(naked) HOOK_CBike__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 //--------------------------------------------------------------------------------------------
@@ -853,14 +926,17 @@ static void __declspec(naked) HOOK_CHeli__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     dwCurrentVehicle, ecx
         pushad
     }
+    // clang-format on
 
     SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
+    // clang-format off
     __asm
     {
         popad
@@ -868,12 +944,15 @@ static void __declspec(naked) HOOK_CHeli__ProcessControl()
         call    edx
         pushad
     }
+    // clang-format on
 
     ReturnContextToLocalPlayer();
 
+    // clang-format off
     __asm
     {
         popad
         retn
     }
+    // clang-format on
 }

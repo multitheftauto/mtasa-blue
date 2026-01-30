@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CSettings.h>
+#include <memory>
 #include "DXHook/CProxyDirect3DDevice9.h"
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
@@ -20,9 +21,9 @@
 #include "CPrimitive3DBatcher.h"
 #include "CMaterialPrimitive3DBatcher.h"
 #include "CAspectRatioConverter.h"
-extern CCore* g_pCore;
-extern std::atomic<bool>   g_bInGTAScene;
-extern std::atomic<bool>   g_bInMTAScene;
+extern CCore*            g_pCore;
+extern std::atomic<bool> g_bInGTAScene;
+extern std::atomic<bool> g_bInMTAScene;
 
 using namespace std;
 
@@ -30,15 +31,15 @@ template <>
 CGraphics* CSingleton<CGraphics>::m_pSingleton = NULL;
 
 const SColor g_rectEdgePixelsData[] = {
-    0x00FFFF00, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,            //
-    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
-    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
-    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
-    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
-    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
-    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
-    0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,            //
-    0x00080008                                                                                                 // Plain pixels size info
+    0x00FFFF00, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,  //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,  //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,  //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,  //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,  //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,  //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,  //
+    0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,  //
+    0x00080008                                                                                       // Plain pixels size info
 };
 
 CGraphics::CGraphics(CLocalGUI* pGUI)
@@ -52,36 +53,82 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_ActiveBlendMode = EBlendMode::BLEND;
     m_CurDrawMode = EDrawMode::NONE;
     m_CurBlendMode = EBlendMode::BLEND;
+    auto renderItemManager = std::make_unique<CRenderItemManager>();
+    auto tileBatcher = std::make_unique<CTileBatcher>();
+    auto line3DPreGUI = std::make_unique<CLine3DBatcher>(true);
+    auto line3DPostFX = std::make_unique<CLine3DBatcher>(true);
+    auto line3DPostGUI = std::make_unique<CLine3DBatcher>(false);
+    auto materialLinePreGUI = std::make_unique<CMaterialLine3DBatcher>(true);
+    auto materialLinePostFX = std::make_unique<CMaterialLine3DBatcher>(true);
+    auto materialLinePostGUI = std::make_unique<CMaterialLine3DBatcher>(false);
+    auto primitive3DPreGUI = std::make_unique<CPrimitive3DBatcher>(true);
+    auto primitive3DPostFX = std::make_unique<CPrimitive3DBatcher>(true);
+    auto primitive3DPostGUI = std::make_unique<CPrimitive3DBatcher>(false);
+    auto materialPrimitivePreGUI = std::make_unique<CMaterialPrimitive3DBatcher>(true, this);
+    auto materialPrimitivePostFX = std::make_unique<CMaterialPrimitive3DBatcher>(true, this);
+    auto materialPrimitivePostGUI = std::make_unique<CMaterialPrimitive3DBatcher>(false, this);
+    auto primitiveBatcher = std::make_unique<CPrimitiveBatcher>();
+    auto primitiveMaterialBatcher = std::make_unique<CPrimitiveMaterialBatcher>(this);
+    auto screenGrabber = std::unique_ptr<CScreenGrabberInterface>(NewScreenGrabber());
+    auto pixelsManager = std::unique_ptr<CPixelsManagerInterface>(NewPixelsManager());
+    auto aspectRatioConverter = std::make_unique<CAspectRatioConverter>();
 
-    m_pRenderItemManager = new CRenderItemManager();
-    m_pTileBatcher = new CTileBatcher();
-    m_pLine3DBatcherPreGUI = new CLine3DBatcher(true);
-    m_pLine3DBatcherPostFX = new CLine3DBatcher(true);
-    m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
-    m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
-    m_pMaterialLine3DBatcherPostFX = new CMaterialLine3DBatcher(true);
-    m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
-    m_pPrimitive3DBatcherPreGUI = new CPrimitive3DBatcher(true);
-    m_pPrimitive3DBatcherPostFX = new CPrimitive3DBatcher(true);
-    m_pPrimitive3DBatcherPostGUI = new CPrimitive3DBatcher(false);
-    m_pMaterialPrimitive3DBatcherPreGUI = new CMaterialPrimitive3DBatcher(true, this);
-    m_pMaterialPrimitive3DBatcherPostFX = new CMaterialPrimitive3DBatcher(true, this);
-    m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
-    m_pPrimitiveBatcher = new CPrimitiveBatcher();
-    m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
-
-    m_pScreenGrabber = NewScreenGrabber();
-    m_pPixelsManager = NewPixelsManager();
-    m_LastLostDeviceTimer.SetMaxIncrement(250);
-    m_pAspectRatioConverter = new CAspectRatioConverter();
+    m_pRenderItemManager = renderItemManager.release();
+    m_pTileBatcher = tileBatcher.release();
+    m_pLine3DBatcherPreGUI = line3DPreGUI.release();
+    m_pLine3DBatcherPostFX = line3DPostFX.release();
+    m_pLine3DBatcherPostGUI = line3DPostGUI.release();
+    m_pMaterialLine3DBatcherPreGUI = materialLinePreGUI.release();
+    m_pMaterialLine3DBatcherPostFX = materialLinePostFX.release();
+    m_pMaterialLine3DBatcherPostGUI = materialLinePostGUI.release();
+    m_pPrimitive3DBatcherPreGUI = primitive3DPreGUI.release();
+    m_pPrimitive3DBatcherPostFX = primitive3DPostFX.release();
+    m_pPrimitive3DBatcherPostGUI = primitive3DPostGUI.release();
+    m_pMaterialPrimitive3DBatcherPreGUI = materialPrimitivePreGUI.release();
+    m_pMaterialPrimitive3DBatcherPostFX = materialPrimitivePostFX.release();
+    m_pMaterialPrimitive3DBatcherPostGUI = materialPrimitivePostGUI.release();
+    m_pPrimitiveBatcher = primitiveBatcher.release();
+    m_pPrimitiveMaterialBatcher = primitiveMaterialBatcher.release();
+    m_pScreenGrabber = screenGrabber.release();
+    m_pPixelsManager = pixelsManager.release();
+    m_pAspectRatioConverter = aspectRatioConverter.release();
 }
 
 CGraphics::~CGraphics()
 {
     if (m_pLineInterface)
+    {
         m_pLineInterface->Release();
+        m_pLineInterface = nullptr;
+    }
+
+    // Ensure queued draw items release their allocations before we tear down batchers
+    ClearDrawQueue(m_PreGUIQueue);
+    ClearDrawQueue(m_PostGUIQueue);
+
+    if (m_pPrimitiveBatcher)
+        m_pPrimitiveBatcher->ClearQueue();
+    if (m_pPrimitiveMaterialBatcher)
+        m_pPrimitiveMaterialBatcher->ClearQueue();
+    if (m_pPrimitive3DBatcherPreGUI)
+        m_pPrimitive3DBatcherPreGUI->ClearQueue();
+    if (m_pPrimitive3DBatcherPostFX)
+        m_pPrimitive3DBatcherPostFX->ClearQueue();
+    if (m_pPrimitive3DBatcherPostGUI)
+        m_pPrimitive3DBatcherPostGUI->ClearQueue();
+    if (m_pMaterialPrimitive3DBatcherPreGUI)
+        m_pMaterialPrimitive3DBatcherPreGUI->ClearQueue();
+    if (m_pMaterialPrimitive3DBatcherPostFX)
+        m_pMaterialPrimitive3DBatcherPostFX->ClearQueue();
+    if (m_pMaterialPrimitive3DBatcherPostGUI)
+        m_pMaterialPrimitive3DBatcherPostGUI->ClearQueue();
 
     DestroyStandardDXFonts();
+
+    SAFE_RELEASE(m_pDXSprite);
+    SAFE_RELEASE(m_pSavedStateBlock);
+    SAFE_RELEASE(m_pSavedFrontBufferData);
+    SAFE_RELEASE(m_pTempBackBufferData);
 
     SAFE_RELEASE(m_ProgressSpinnerTexture);
     SAFE_RELEASE(m_RectangleEdgeTexture);
@@ -242,15 +289,15 @@ void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fH
         int  overrideWidth;
         int  overrideHeight;
     } static sectionList[] = {
-        {{3, 3, 5, 5}, 0, 0, 0, 0},              // Center
-        {{3, 0, 5, 2}, 0, -2, 0, 2},             // Top
-        {{0, 0, 2, 2}, -2, -2, 2, 2},            // Top left
-        {{0, 3, 2, 5}, -2, 0, 2, 0},             // Left
-        {{0, 6, 2, 8}, -2, 2, 2, 2},             // Bottom left
-        {{3, 6, 5, 8}, 0, 2, 0, 2},              // Bottom
-        {{6, 6, 8, 8}, 2, 2, 2, 2},              // Bottom right
-        {{6, 3, 8, 5}, 2, 0, 2, 0},              // Right
-        {{6, 0, 8, 2}, 2, -2, 2, 2},             // Top right
+        {{3, 3, 5, 5}, 0, 0, 0, 0},    // Center
+        {{3, 0, 5, 2}, 0, -2, 0, 2},   // Top
+        {{0, 0, 2, 2}, -2, -2, 2, 2},  // Top left
+        {{0, 3, 2, 5}, -2, 0, 2, 0},   // Left
+        {{0, 6, 2, 8}, -2, 2, 2, 2},   // Bottom left
+        {{3, 6, 5, 8}, 0, 2, 0, 2},    // Bottom
+        {{6, 6, 8, 8}, 2, 2, 2, 2},    // Bottom right
+        {{6, 3, 8, 5}, 2, 0, 2, 0},    // Right
+        {{6, 0, 8, 2}, 2, -2, 2, 2},   // Top right
     };
 
     D3DXMATRIX        matrix;
@@ -736,7 +783,17 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
             ulFormat |= DT_WORDBREAK;
 
         // Calculate the size of the text
-        RECT rect = {0, 0, static_cast<LONG>(fWidth / fScaleX), 0};
+        const float fRectRight = fWidth / fScaleX;
+        LONG        rectRight = 0;
+        if (fRectRight > 0.0f)
+        {
+            if (fRectRight >= static_cast<float>(LONG_MAX))
+                rectRight = LONG_MAX;
+            else
+                rectRight = static_cast<LONG>(fRectRight);
+        }
+
+        RECT rect = {0, 0, rectRight, 0};
         pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
 
         vecSize.fX = (rect.right - rect.left) * fScaleX;
@@ -1209,7 +1266,7 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
         else if (ulFormat & DT_VCENTER)
             fY = (fBottom + fTop - fTotalHeight) * 0.5f;
         else
-            fY = fTop;            // DT_TOP
+            fY = fTop;  // DT_TOP
 
         // Process each line
         SColor currentColor = dwColor;
@@ -1243,7 +1300,7 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
         unsigned int   uiSeekPos = 0;
         const wchar_t* wszSectionStart = wszSectionPos;
         SColor         nextColor = currentColor;
-        while (*wszSectionPos != '\0')            // find end of this section
+        while (*wszSectionPos != '\0')  // find end of this section
         {
             if (IsColorCodeW(wszSectionPos))
             {
@@ -1297,7 +1354,7 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
     else if (ulFormat & DT_CENTER)
         fX = (fRight + fLeft - fTotalWidth) * 0.5f;
     else
-        fX = fLeft;            // DT_LEFT
+        fX = fLeft;  // DT_LEFT
 
     // Draw all the color sections
     for (std::list<STextSection>::const_iterator iter = sectionList.begin(); iter != sectionList.end(); ++iter)
@@ -1435,13 +1492,13 @@ bool CGraphics::CreateStandardDXFontWithCustomScale(eFontType fontType, float fS
 bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality,
                                      ID3DXFont** ppD3DXFont)
 {
-    int iLoaded = AddFontResourceEx(strFontPath.c_str(), FR_PRIVATE, 0);
+    int  iLoaded = AddFontResourceEx(strFontPath.c_str(), FR_PRIVATE, 0);
+    bool bFontResourceAdded = (iLoaded > 0);
 
     int iWeight = bBold ? FW_BOLD : FW_NORMAL;
     *ppD3DXFont = NULL;
 
     bool bSuccess = true;
-    // Normal size
     if (!SUCCEEDED(D3DXCreateFont(m_pDevice, uiHeight, 0, iWeight, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ulQuality, DEFAULT_PITCH | FF_DONTCARE,
                                   strFontName.c_str(), ppD3DXFont)))
     {
@@ -1449,7 +1506,18 @@ bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFon
         bSuccess = false;
     }
 
-    return bSuccess && (iLoaded == 1);
+    if (!bSuccess && bFontResourceAdded)
+    {
+        RemoveFontResourceEx(strFontPath.c_str(), FR_PRIVATE, 0);
+    }
+
+    if (!bFontResourceAdded)
+    {
+        SAFE_RELEASE(*ppD3DXFont);
+        return false;
+    }
+
+    return bSuccess;
 }
 
 bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont)
@@ -1525,6 +1593,18 @@ void CGraphics::DrawTexture(CTextureItem* pTexture, float fX, float fY, float fS
 void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
 {
     m_pDevice = pDevice;
+
+    if (GetInitializationPhase() != INIT_PHASE_POST_D3D)
+    {
+        if (!EnableAllHandlersAfterInitialization())
+        {
+            SafeDebugOutput("CGraphics::OnDeviceCreate - Failed to enable crash handlers after device creation\n");
+        }
+        else
+        {
+            SafeDebugOutput("CGraphics::OnDeviceCreate - Crash handlers enabled after device creation\n");
+        }
+    }
 
     LoadStandardDXFonts();
 
@@ -1695,7 +1775,7 @@ void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
 void CGraphics::AddQueueItem(const sDrawQueueItem& Item, bool bPostGUI)
 {
     // Add it to the correct queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())            // Don't draw over the main menu.  Ever.
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())  // Don't draw over the main menu.  Ever.
         m_PostGUIQueue.push_back(Item);
     else
         m_PreGUIQueue.push_back(Item);
@@ -1761,7 +1841,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             const float  fPosFracY = Item.Text.fTop - rect.top;
             D3DXMATRIX   matrix;
             D3DXVECTOR2  scaling(Item.Text.fScaleX, Item.Text.fScaleY);
-            D3DXVECTOR2  translation(fPosFracX * Item.Text.fScaleX, fPosFracY * Item.Text.fScaleY);            // Sub-pixel positioning
+            D3DXVECTOR2  translation(fPosFracX * Item.Text.fScaleX, fPosFracY * Item.Text.fScaleY);  // Sub-pixel positioning
             D3DXVECTOR2  rotcenter(Item.Text.fRotationCenterX, Item.Text.fRotationCenterY);
             D3DXVECTOR2* pRotcenter = Item.Text.fRotation ? &rotcenter : NULL;
             D3DXMatrixTransformation2D(&matrix, NULL, 0.0f, &scaling, pRotcenter, DegreesToRadians(Item.Text.fRotation), &translation);
@@ -1837,6 +1917,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             const sDrawQueuePrimitiveMaterial primitive = Item.PrimitiveMaterial;
             CheckModes(EDrawMode::PRIMITIVE_MATERIAL, Item.blendMode);
             m_pPrimitiveMaterialBatcher->AddPrimitive(primitive.eType, primitive.pMaterial, primitive.pVecVertices);
+            RemoveQueueRef(primitive.pMaterial);
             break;
         }
     }
@@ -1855,7 +1936,7 @@ ID3DXFont* CGraphics::MaybeGetBigFont(ID3DXFont* pDXFont, float& fScaleX, float&
             {
                 // Adjust scale to compensate for higher res font
                 fScaleX *= 0.25f;
-                if (&fScaleX != &fScaleY)            // Check fScaleY is not the same variable
+                if (&fScaleX != &fScaleY)  // Check fScaleY is not the same variable
                     fScaleY *= 0.25f;
                 return m_pBigDXFonts[i];
             }
@@ -1873,9 +1954,25 @@ void CGraphics::ClearDrawQueue(std::vector<sDrawQueueItem>& Queue)
     {
         const sDrawQueueItem& item = *iter;
         if (item.eType == QUEUE_TEXTURE || item.eType == QUEUE_SHADER)
+        {
             RemoveQueueRef(item.Texture.pMaterial);
+        }
+        else if (item.eType == QUEUE_PRIMITIVEMATERIAL)
+        {
+            if (item.PrimitiveMaterial.pMaterial)
+                RemoveQueueRef(item.PrimitiveMaterial.pMaterial);
+            // Flush any queued geometry that never reached the batcher
+            delete item.PrimitiveMaterial.pVecVertices;
+        }
+        else if (item.eType == QUEUE_PRIMITIVE)
+        {
+            // Prevent per-primitive allocations from leaking when we clear the queue early
+            delete item.Primitive.pVecVertices;
+        }
         else if (item.eType == QUEUE_TEXT)
+        {
             RemoveQueueRef(item.Text.pDXFont);
+        }
     }
     Queue.clear();
 }
@@ -1886,25 +1983,25 @@ void CGraphics::ClearDrawQueue(std::vector<sDrawQueueItem>& Queue)
 void CGraphics::AddQueueRef(CRenderItem* pRenderItem)
 {
     pRenderItem->AddRef();
-    m_iDebugQueueRefs++;            // For debugging
+    m_iDebugQueueRefs++;  // For debugging
 }
 
 void CGraphics::RemoveQueueRef(CRenderItem* pRenderItem)
 {
     pRenderItem->Release();
-    m_iDebugQueueRefs--;            // For debugging
+    m_iDebugQueueRefs--;  // For debugging
 }
 
 void CGraphics::AddQueueRef(IUnknown* pUnknown)
 {
     pUnknown->AddRef();
-    m_iDebugQueueRefs++;            // For debugging
+    m_iDebugQueueRefs++;  // For debugging
 }
 
 void CGraphics::RemoveQueueRef(IUnknown* pUnknown)
 {
     pUnknown->Release();
-    m_iDebugQueueRefs--;            // For debugging
+    m_iDebugQueueRefs--;  // For debugging
 }
 
 // Notification that the render target will be changing
@@ -2144,12 +2241,52 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     if (m_LastLostDeviceTimer.Get() < 1000)
         return;
 
-    const bool bWasInScene = g_bInGTAScene.load(std::memory_order_acquire) ||
-                             g_bInMTAScene.load(std::memory_order_acquire);
-    bool       bInScene = bWasInScene;
+    const auto determineOwner = []() -> ESceneOwner
+    {
+        if (g_bInMTAScene.load(std::memory_order_acquire))
+            return ESceneOwner::MTA;
+        if (g_bInGTAScene.load(std::memory_order_acquire))
+            return ESceneOwner::GTA;
+        return ESceneOwner::None;
+    };
 
-    // Skip of not in a scene and not forced with always flag
-    if (!bInScene && !g_pCore->GetDummyProgressUpdateAlways())
+    const ESceneOwner originalOwner = determineOwner();
+    ESceneOwner       currentOwner = originalOwner;
+
+    auto inScene = [&]() { return currentOwner != ESceneOwner::None; };
+
+    auto endCurrentScene = [&](const char* context) -> bool
+    {
+        if (!inScene())
+            return true;
+        if (!EndSceneWithoutProxy(m_pDevice, currentOwner))
+        {
+            SString msg;
+            msg.Format("%s: EndSceneWithoutProxy failed for owner %d", context, static_cast<int>(currentOwner));
+            WriteDebugEvent(msg);
+            return false;
+        }
+        currentOwner = ESceneOwner::None;
+        return true;
+    };
+
+    auto beginSceneAs = [&](ESceneOwner owner, const char* context) -> bool
+    {
+        if (owner == ESceneOwner::None)
+            return true;
+        if (!BeginSceneWithoutProxy(m_pDevice, owner))
+        {
+            SString msg;
+            msg.Format("%s: BeginSceneWithoutProxy failed for owner %d", context, static_cast<int>(owner));
+            WriteDebugEvent(msg);
+            return false;
+        }
+        currentOwner = owner;
+        return true;
+    };
+
+    // Skip if not in a scene and not forced with always flag
+    if (!inScene() && !g_pCore->GetDummyProgressUpdateAlways())
         return;
 
     // Check if disabled
@@ -2177,10 +2314,10 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     {
         if (bPreserveBackbuffer)
         {
-            if (bInScene)
+            if (inScene())
             {
-                m_pDevice->EndScene();
-                bInScene = false;
+                if (!endCurrentScene("CGraphics::DrawProgressMessage (preserve setup)"))
+                    break;
             }
 
             // Get backbuffer surface
@@ -2237,10 +2374,10 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
                 break;
         }
 
-        if (!bInScene)
+        if (!inScene())
         {
-            m_pDevice->BeginScene();
-            bInScene = true;
+            if (!beginSceneAs(ESceneOwner::MTA, "CGraphics::DrawProgressMessage (draw setup)"))
+                break;
         }
 
         // Draw progress graphics on backbuffer surface
@@ -2281,8 +2418,11 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
 
         if (bPreserveBackbuffer)
         {
-            m_pDevice->EndScene();
-            bInScene = false;
+            if (inScene())
+            {
+                if (!endCurrentScene("CGraphics::DrawProgressMessage (pre-present)"))
+                    break;
+            }
 
             // Flip backbuffer onto front buffer
             SAFE_RELEASE(pD3DBackBufferSurface);
@@ -2295,9 +2435,14 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
             if (FAILED(hr))
                 break;
             hr = m_pDevice->StretchRect(m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, pD3DBackBufferSurface, NULL, D3DTEXF_POINT);
+            if (FAILED(hr))
+            {
+                WriteDebugEvent("CGraphics::DrawProgressMessage: StretchRect restore failed");
+                break;
+            }
 
-            m_pDevice->BeginScene();
-            bInScene = true;
+            if (!beginSceneAs(ESceneOwner::MTA, "CGraphics::DrawProgressMessage (post-present)"))
+                break;
         }
     } while (false);
 
@@ -2305,14 +2450,27 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     SAFE_RELEASE(pTempFrontBufferData);
     SAFE_RELEASE(pD3DBackBufferSurface);
 
-    // Ensure scene status is restored
-    if (bInScene != bWasInScene)
+    // Ensure scene status is restored to its original owner
+    if (currentOwner != originalOwner)
     {
-        if (bWasInScene)
-            m_pDevice->BeginScene();
-        else
-            m_pDevice->EndScene();
-        bInScene = bWasInScene;
+        bool restorePossible = true;
+        if (currentOwner != ESceneOwner::None)
+            restorePossible = endCurrentScene("CGraphics::DrawProgressMessage (restore current)");
+
+        if (restorePossible && originalOwner != ESceneOwner::None && currentOwner != originalOwner)
+        {
+            if (!beginSceneAs(originalOwner, "CGraphics::DrawProgressMessage (restore original)"))
+            {
+                if (originalOwner == ESceneOwner::GTA)
+                {
+                    ResetGTASceneState();
+                }
+                else if (originalOwner == ESceneOwner::MTA)
+                {
+                    g_bInMTAScene.store(false, std::memory_order_release);
+                }
+            }
+        }
     }
 
     //
@@ -2546,7 +2704,7 @@ namespace
             for (int i = 0; i < (int)vertexList.size() - 1; i += 2)
                 if ((from - vertexList[i]).LengthSquared() < 0.00001f)
                     if ((to - vertexList[i + 1]).LengthSquared() < 0.00001f)
-                        return;            // Duplicated
+                        return;  // Duplicated
 
             // Add new line
             vertexList.push_back(from);
@@ -2579,7 +2737,7 @@ namespace
         }
         return wireModel;
     }
-}            // namespace
+}  // namespace
 
 void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColor color, float fLineWidth, int iterations)
 {

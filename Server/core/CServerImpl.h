@@ -37,11 +37,11 @@ constexpr SHORT SCREEN_BUFFER_SIZE = 256;
 class CServerImpl : public CServerInterface
 {
 public:
-    #ifdef WIN32
+#ifdef WIN32
     CServerImpl(CThreadCommandQueue* pThreadCommandQueue);
-    #else
+#else
     CServerImpl();
-    #endif
+#endif
 
     ~CServerImpl();
 

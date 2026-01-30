@@ -21,10 +21,10 @@
 #define FUNC_GetAeroplaneCompStatus 0x6C2300
 #define FUNC_FuckCarCompletely      0x6c25d0
 
-#define MAX_DOORS                   6   // also in CAutomobile
-#define MAX_WHEELS                  4
+#define MAX_DOORS  6  // also in CAutomobile
+#define MAX_WHEELS 4
 
-class CDamageManagerSAInterface            // 28 bytes due to the way its packed (24 containing actual data)
+class CDamageManagerSAInterface  // 28 bytes due to the way its packed (24 containing actual data)
 {
 public:
     std::uint8_t GetPanelStatus(std::uint8_t panelId)
@@ -36,11 +36,11 @@ public:
     }
 
     float fWheelDamageEffect;
-    BYTE  bEngineStatus;            // old - wont be used
+    BYTE  bEngineStatus;  // old - wont be used
     BYTE  Wheel[MAX_WHEELS];
     BYTE  Door[MAX_DOORS];
-    DWORD Lights;            // 2 bits per light
-    DWORD Panels;            // 4 bits per panel
+    DWORD Lights;  // 2 bits per light
+    DWORD Panels;  // 4 bits per panel
 };
 static_assert(sizeof(CDamageManagerSAInterface) == 0x18, "Invalid size for CDamageManagerSAInterface");
 

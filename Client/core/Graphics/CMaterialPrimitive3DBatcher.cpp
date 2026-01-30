@@ -21,6 +21,11 @@
 CMaterialPrimitive3DBatcher::CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* pGraphics) : m_bPreGUI(bPreGUI), m_pGraphics(pGraphics)
 {
 }
+
+CMaterialPrimitive3DBatcher::~CMaterialPrimitive3DBatcher()
+{
+    ClearQueue();
+}
 ////////////////////////////////////////////////////////////////
 //
 // CMaterialPrimitive3DBatcher::OnDeviceCreate
@@ -158,6 +163,7 @@ void CMaterialPrimitive3DBatcher::Flush()
         }
         pLastMaterial = pMaterial;
         pMaterial->Release();
+        primitive.pMaterial = nullptr;
     }
 
     // Clean up
@@ -175,7 +181,9 @@ void CMaterialPrimitive3DBatcher::ClearQueue()
     // Clean up
     for (auto& primitive : m_primitiveList)
     {
+        SAFE_RELEASE(primitive.pMaterial);
         delete primitive.pVecVertices;
+        primitive.pVecVertices = nullptr;
     }
 
     m_primitiveList.clear();

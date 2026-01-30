@@ -15,6 +15,7 @@
 #include <WinTrust.h>
 #include <SoftPub.h>
 #include <Psapi.h>
+#include <SharedUtil.Misc.h>
 
 #define STEAM_GTASA_APP_ID "12120"
 
@@ -323,12 +324,19 @@ static bool IsSteamProcess(DWORD pid)
 
     HandleScope closeProcess{process};
 
-    wchar_t processName[MAX_PATH];
+    wchar_t     processNameBuf[MAX_PATH];
+    const DWORD processNameLen = GetProcessImageFileNameW(process, processNameBuf, MAX_PATH);
 
-    if (!GetModuleBaseNameW(process, nullptr, processName, sizeof(processName) / sizeof(wchar_t)))
+    if (!processNameLen)
         return false;
 
-    if (wcsicmp(processName, L"steam.exe") != 0)
+    CharLowerW(processNameBuf);
+
+    std::wstring_view processName(processNameBuf, processNameLen);
+
+    using namespace std::string_view_literals;
+
+    if (processName != L"steam.exe"sv && !processName.ends_with(L"\\steam.exe"sv))
         return false;
 
     DWORD exitCode = 0;
@@ -380,7 +388,10 @@ bool CSteamClient::Load()
     static auto pAddDllDirectory = ([]() -> decltype(&AddDllDirectory) {
         if (const HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll"); kernel32 != nullptr)
         {
-            return reinterpret_cast<decltype(&AddDllDirectory)>(static_cast<void*>(GetProcAddress(kernel32, "AddDllDirectory")));
+            decltype(&AddDllDirectory) addDllDirectory = nullptr;
+            if (!SharedUtil::TryGetProcAddress(kernel32, "AddDllDirectory", addDllDirectory))
+                return nullptr;
+            return addDllDirectory;
         }
 
         return nullptr;
@@ -439,10 +450,8 @@ bool CSteamClient::Load()
     }
 
     releaseLibraryLock.reset();
-    
-    Native::CreateInterface = reinterpret_cast<decltype(Native::CreateInterface)>(static_cast<void*>(GetProcAddress(dll, "CreateInterface")));
 
-    if (!Native::CreateInterface)
+    if (!SharedUtil::TryGetProcAddress(dll, "CreateInterface", Native::CreateInterface))
     {
         FreeLibrary(dll);
         return false;

@@ -20,7 +20,7 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl(CGUI_Impl* pGUI, CGUIElement* pParent
     m_pImageset = NULL;
     m_pImage = NULL;
     m_pGUI = pGUI;
-    m_pManager = pGUI;
+    SetManager(pGUI);
     m_pTexture = NULL;
     m_bCreatedTexture = false;
 

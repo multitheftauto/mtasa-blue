@@ -11,8 +11,10 @@
 
 #include "StdInc.h"
 
-#define     FUNC_CPedModelInfo_DeleteRwObject               0x04C6C50
-#define     FUNC_CPedModelInfo_SetClump                     0x04C7340
+#define FUNC_CPedModelInfo_DeleteRwObject 0x04C6C50
+#define FUNC_CPedModelInfo_SetClump       0x04C7340
+#define FUNC_CClumpModelInfo_SetClump     0x04C4F70
+DWORD ADDR_CPedModelInfo_SetClump_AfterHook = 0x04C7349;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -23,23 +25,27 @@ void CPedModelInfo_DeleteRwObject(CBaseModelInfoSAInterface* pModelInfo)
 {
     DWORD                      dwFunction = FUNC_CPedModelInfo_DeleteRwObject;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
+    // clang-format off
     __asm
     {
         mov     ecx, pInterface
         call    dwFunction
     }
+    // clang-format on
 }
 
-void CPedModelInfo_SetClump(CBaseModelInfoSAInterface* pModelInfo, RwObject* pSavedRwObject)
+void CClumpModelInfo_SetClump(CBaseModelInfoSAInterface* pModelInfo, RwObject* pRwClump)
 {
-    DWORD                      dwFunction = FUNC_CPedModelInfo_SetClump;
+    DWORD                      dwFunction = FUNC_CClumpModelInfo_SetClump;
     CBaseModelInfoSAInterface* pInterface = pModelInfo;
+    // clang-format off
     __asm
     {
-        push    pSavedRwObject
+        push    pRwClump
         mov     ecx, pInterface
         call    dwFunction
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -50,21 +56,23 @@ void CPedModelInfo_SetClump(CBaseModelInfoSAInterface* pModelInfo, RwObject* pSa
 RwObject* pSavedModel0RwObject = NULL;
 void      OnMy_CClothesDeleteRwObject()
 {
-    assert(!pSavedModel0RwObject);
+    if (pSavedModel0RwObject)
+        return;
+
     ushort                     usModelID = 0;
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
-    // Save RwObject of model 0
     pSavedModel0RwObject = pModelInfo->pRwObject;
 }
 
 // Hook info
-#define HOOKPOS_CClothesDeleteRwObject                          0x5A8243
-#define HOOKSIZE_CClothesDeleteRwObject                         5
-DWORD RETURN_CClothesDeleteRwObject = 0x5A8248;
+#define HOOKPOS_CClothesDeleteRwObject  0x5A8243
+#define HOOKSIZE_CClothesDeleteRwObject 5
+DWORD                         RETURN_CClothesDeleteRwObject = 0x5A8248;
 static void __declspec(naked) HOOK_CClothesDeleteRwObject()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -77,6 +85,7 @@ static void __declspec(naked) HOOK_CClothesDeleteRwObject()
         //call    dword ptr [edx+20h] //; 004C6C50 ; void CPedModelInfo::DeleteRwObject()
         jmp     RETURN_CClothesDeleteRwObject
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -86,24 +95,39 @@ static void __declspec(naked) HOOK_CClothesDeleteRwObject()
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMy_PostCPedDress()
 {
+    if (!pSavedModel0RwObject)
+        return;
+
     ushort                     usModelID = 0;
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
-    if (pSavedModel0RwObject)
+    if (!pModelInfo)
     {
-        CPedModelInfo_DeleteRwObject(pModelInfo);
-        CPedModelInfo_SetClump(pModelInfo, pSavedModel0RwObject);
-        pSavedModel0RwObject = NULL;
+        pSavedModel0RwObject = nullptr;
+        return;
     }
+
+    RwObject* pCurrentRwObject = pModelInfo->pRwObject;
+    RwObject* pObjectToRestore = pSavedModel0RwObject;
+    pSavedModel0RwObject = nullptr;
+
+    if (pCurrentRwObject == pObjectToRestore)
+        return;
+
+    if (pCurrentRwObject)
+        CPedModelInfo_DeleteRwObject(pModelInfo);
+
+    pModelInfo->pRwObject = pObjectToRestore;
 }
 
 // Hook info
-#define HOOKPOS_PostCPedDress                           0x5A835C
-#define HOOKSIZE_PostCPedDress                          5
-DWORD RETURN_PostCPedDress = 0x5A8361;
+#define HOOKPOS_PostCPedDress  0x5A835C
+#define HOOKSIZE_PostCPedDress 5
+DWORD                         RETURN_PostCPedDress = 0x5A8361;
 static void __declspec(naked) HOOK_PostCPedDress()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -116,6 +140,7 @@ static void __declspec(naked) HOOK_PostCPedDress()
         push    eax
         jmp     RETURN_PostCPedDress
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////
@@ -172,7 +197,6 @@ void CMultiplayerSA::EnableHooks_ClothesMemFix(bool bEnable)
         {
             const SHookInfo& hookInfo = hookInfoList[i];
             BYTE             temp[10];
-            assert(sizeof(temp) >= hookInfo.uiSize);
             stream.ReadBytes(temp, hookInfo.uiSize);
             MemCpy((void*)hookInfo.dwAddress, temp, hookInfo.uiSize);
         }

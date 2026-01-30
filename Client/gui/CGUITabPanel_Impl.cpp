@@ -15,7 +15,7 @@
 
 CGUITabPanel_Impl::CGUITabPanel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Initialize
     m_pGUI = pGUI;

@@ -12,8 +12,18 @@
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Time.h"
 #include <cstdint>
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <string>
 #include <limits>
 #include <map>
+#include <vector>
+#include <memory>
+#include <type_traits>
+#include <exception>
+#include <mutex>
+#include <utility>
 
 #if defined(_WIN32) || defined(WIN32)
     #define SHAREDUTIL_PLATFORM_WINDOWS 1
@@ -37,27 +47,230 @@
 #include "CDuplicateLineFilter.h"
 #include "version.h"
 
+namespace SharedUtil::Details
+{
+    constexpr size_t kMaxClipboardBytes = 100u * 1024u * 1024u;
+    constexpr size_t kMaxClipboardChars = kMaxClipboardBytes / sizeof(wchar_t);
+
+    inline std::mutex& ClipboardMutex() noexcept
+    {
+        static std::mutex mutex;
+        return mutex;
+    }
+}
+
 #if defined(SHAREDUTIL_PLATFORM_WINDOWS)
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
     #include <windows.h>
     #include <ctime>
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
     #include <Psapi.h>
+    #ifdef GetModuleBaseName
+        #undef GetModuleBaseName
+    #endif
+    #ifdef GetModuleBaseNameA
+        #undef GetModuleBaseNameA
+    #endif
+    #ifdef GetModuleBaseNameW
+        #undef GetModuleBaseNameW
+    #endif
+
+    #if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
+        #include <filesystem>
+    #endif
+
+struct HKeyDeleter
+{
+    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
+};
+using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
+
+namespace SharedUtil::Details
+{
+    class UniqueHGlobal
+    {
+    public:
+        UniqueHGlobal() noexcept = default;
+        explicit UniqueHGlobal(HGLOBAL value) noexcept : m_handle(value) {}
+        ~UniqueHGlobal() { reset(); }
+
+        UniqueHGlobal(const UniqueHGlobal&) = delete;
+        UniqueHGlobal& operator=(const UniqueHGlobal&) = delete;
+
+        UniqueHGlobal(UniqueHGlobal&& other) noexcept : m_handle(other.release()) {}
+
+        UniqueHGlobal& operator=(UniqueHGlobal&& other) noexcept
+        {
+            if (this != &other)
+                reset(other.release());
+            return *this;
+        }
+
+        void reset(HGLOBAL value = nullptr) noexcept
+        {
+            if (m_handle)
+                GlobalFree(m_handle);
+            m_handle = value;
+        }
+
+        [[nodiscard]] HGLOBAL get() const noexcept { return m_handle; }
+
+        [[nodiscard]] HGLOBAL release() noexcept { return std::exchange(m_handle, nullptr); }
+
+        [[nodiscard]] explicit operator bool() const noexcept { return m_handle != nullptr; }
+
+    private:
+        HGLOBAL m_handle = nullptr;
+    };
+}  // namespace SharedUtil::Details
+
+static void InitializeProcessBaseDir(SString& strProcessBaseDir)
+{
+    try
+    {
+        constexpr auto bufferSize = MAX_PATH * 2;
+        constexpr auto MAX_UNICODE_PATH = 32767;
+        auto           coreFileName = std::array<wchar_t, bufferSize>{};
+
+        // Get core.dll module handle to determine base directory
+        // Try debug build first (core_d.dll), then release build (core.dll)
+        constexpr auto coreDllDebug = std::wstring_view{L"core_d.dll"};
+        constexpr auto coreDllRelease = std::wstring_view{L"core.dll"};
+
+        auto hCoreModule = HMODULE{};
+        auto bCoreModuleFound = bool{false};
+    #ifdef MTA_DEBUG
+        if (bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllDebug.data(), &hCoreModule); !bCoreModuleFound)
+    #endif
+            bCoreModuleFound = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, coreDllRelease.data(), &hCoreModule);
+
+        // Fallback: Use current module if core.dll isn't loaded yet
+        if (!hCoreModule)
+        {
+            GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               reinterpret_cast<LPCWSTR>(&InitializeProcessBaseDir), &hCoreModule);
+        }
+
+        if (hCoreModule)
+        {
+            if (DWORD lengthCore = GetModuleFileNameW(hCoreModule, coreFileName.data(), static_cast<DWORD>(coreFileName.size())); lengthCore > 0)
+            {
+                // Use std::wstring for flexible buffer management
+                auto corePathBuffer = std::wstring{coreFileName.data(), static_cast<size_t>(lengthCore)};
+
+                // If buffer too small, resize for long path support
+                if (const auto bufferTooSmall = (static_cast<size_t>(lengthCore) == coreFileName.size()); bufferTooSmall)
+                {
+                    corePathBuffer.resize(MAX_UNICODE_PATH);
+
+                    if (lengthCore = GetModuleFileNameW(hCoreModule, corePathBuffer.data(), static_cast<DWORD>(corePathBuffer.size()));
+                        lengthCore > 0 && static_cast<size_t>(lengthCore) < corePathBuffer.size())
+                    {
+                        corePathBuffer.resize(lengthCore);
+                    }
+                    else
+                    {
+                        return;  // Long path retrieval failed
+                    }
+                }
+
+                auto fullPath = std::array<wchar_t, bufferSize>{};
+
+                if (DWORD lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPath.size()), fullPath.data(), nullptr); lengthFull > 0)
+                {
+                    // Process path and extract base directory
+                    // The directory above /MTA/ is always the base directory
+                    const auto processPath = [&strProcessBaseDir](const std::wstring_view fullPathStr)
+                    {
+                        if (const auto lastSeparator = fullPathStr.find_last_of(L"\\/"); lastSeparator != std::wstring_view::npos)
+                        {
+                            const auto moduleDir = fullPathStr.substr(0, lastSeparator);
+                            auto       currentPath = std::filesystem::path(moduleDir);
+
+                            // Walk up to find MTA/ folder
+                            // Stop at first MTA folder found - it's guaranteed to be the correct one
+                            // Check current directory and up to 2 parent levels
+                            for (auto level = 0; level < 3; ++level)
+                            {
+                                auto folderName = currentPath.filename().wstring();
+
+                                // Convert to lowercase for case-insensitive comparison
+                                std::transform(folderName.begin(), folderName.end(), folderName.begin(), ::towlower);
+
+                                if (folderName == L"mta")
+                                {
+                                    // Found MTA folder - base directory is its parent
+                                    // Stop searching immediately to avoid finding outer "MTA" folders (e.g user with custom intall dir)
+                                    if (currentPath.has_parent_path())
+                                    {
+                                        strProcessBaseDir = ToUTF8(currentPath.parent_path().wstring());
+                                    }
+                                    return;  // Always stop at first MTA folder found
+                                }
+
+                                // Move up one level
+                                if (currentPath.has_parent_path())
+                                    currentPath = currentPath.parent_path();
+                                else
+                                    break;  // Reached root, can't go further
+                            }
+                        }
+                    };
+
+                    // If buffer too small, resize for long path support
+                    if (auto fullPathBuffer = std::wstring{}; static_cast<size_t>(lengthFull) > fullPath.size())
+                    {
+                        if (static_cast<size_t>(lengthFull) > MAX_UNICODE_PATH)
+                            return;  // Path too long, validation failed
+
+                        fullPathBuffer.resize(static_cast<size_t>(lengthFull));
+                        if (lengthFull = GetFullPathNameW(corePathBuffer.c_str(), static_cast<DWORD>(fullPathBuffer.size()), fullPathBuffer.data(), nullptr);
+                            lengthFull > 0 && static_cast<size_t>(lengthFull) < fullPathBuffer.size())
+                        {
+                            processPath(std::wstring_view(fullPathBuffer.data(), static_cast<size_t>(lengthFull)));
+                        }
+                    }
+                    else
+                    {
+                        processPath(std::wstring_view(fullPath.data(), static_cast<size_t>(lengthFull)));
+                    }
+                }
+            }
+        }
+    }
+    catch (...)
+    {
+    }
+}
+
+[[nodiscard]] const SString& SharedUtil::GetMTAProcessBaseDir()
+{
+    static auto strProcessBaseDir = SString{};
+    static auto initFlag = std::once_flag{};
+
+    std::call_once(initFlag, InitializeProcessBaseDir, std::ref(strProcessBaseDir));
+
+    return strProcessBaseDir;
+}
+
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
-    # define _GNU_SOURCE    /* See feature_test_macros(7) */
+        #define _GNU_SOURCE /* See feature_test_macros(7) */
     #endif
     #include <sched.h>
     #include <sys/time.h>
     #include <sys/resource.h>
     #ifndef RUSAGE_THREAD
-        #define    RUSAGE_THREAD    1        /* only the calling thread */
+        #define RUSAGE_THREAD 1 /* only the calling thread */
     #endif
 #endif
 
-#if __cplusplus >= 201703L // C++17
+#if __cplusplus >= 201703L  // C++17
     #include <filesystem>
 #endif
 
@@ -82,15 +295,15 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 
 #ifdef MTA_CLIENT
 
-#define PRODUCT_REGISTRY_PATH       "Software\\Multi Theft Auto: San Andreas All"       // HKLM
-#define PRODUCT_COMMON_DATA_DIR     "MTA San Andreas All"                               // C:\ProgramData
-#define TROUBLE_URL1 "https://help.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
+    #define PRODUCT_REGISTRY_PATH   "Software\\Multi Theft Auto: San Andreas All"  // HKLM
+    #define PRODUCT_COMMON_DATA_DIR "MTA San Andreas All"                          // C:\ProgramData
+    #define TROUBLE_URL1            "https://help.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
-//
-// Output a UTF8 encoded messagebox
-// Used in the Win32 Client only
-//
-#ifdef _WINDOWS_ //Only for modules that use windows.h
+    //
+    // Output a UTF8 encoded messagebox
+    // Used in the Win32 Client only
+    //
+    #ifdef _WINDOWS_  // Only for modules that use windows.h
 int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType)
 {
     // Default to warning icon
@@ -103,7 +316,7 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
     WString strCaption = MbUTF8ToUTF16(lpCaption);
     return MessageBoxW(hWnd, strText.c_str(), strCaption.c_str(), uType);
 }
-#endif
+    #endif
 
 //
 // Return full path and filename of parent exe
@@ -124,7 +337,7 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
                     WCHAR szModuleName[MAX_PATH * 2] = {0};
                     DWORD dwSize = GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName) - 1);
                     CloseHandle(hProcess);
-                    
+
                     if (dwSize > 0)
                     {
                         // Ensure null termination
@@ -195,25 +408,28 @@ bool SharedUtil::IsGTAProcess()
 bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
 {
     // Guard against null or overflow before touching platform APIs
-    if (!ptr || size == 0) return false;
+    if (!ptr || size == 0)
+        return false;
 
-    const uintptr_t start = reinterpret_cast<uintptr_t>(ptr);
+    const uintptr_t     start = reinterpret_cast<uintptr_t>(ptr);
     constexpr uintptr_t maxAddress = std::numeric_limits<uintptr_t>::max();
-    if (size > maxAddress - start) return false;
+    if (size > maxAddress - start)
+        return false;
 
     const uintptr_t end = start + size;
 
-#ifdef SHAREDUTIL_PLATFORM_WINDOWS
+    #ifdef SHAREDUTIL_PLATFORM_WINDOWS
     constexpr DWORD readableMask = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
     for (uintptr_t current = start; current < end;)
     {
         MEMORY_BASIC_INFORMATION mbi{};
-        if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0) return false;
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0)
+            return false;
 
         const uintptr_t regionStart = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
         const uintptr_t regionSize = static_cast<uintptr_t>(mbi.RegionSize);
         const uintptr_t regionEnd = regionStart + regionSize;
-        const DWORD protection = mbi.Protect;
+        const DWORD     protection = mbi.Protect;
         if (regionSize == 0 || current < regionStart || regionStart > maxAddress - regionSize || regionEnd <= current || mbi.State != MEM_COMMIT ||
             (protection & PAGE_GUARD) || (protection & readableMask) == 0)
             return false;
@@ -222,16 +438,17 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     }
 
     return true;
-#elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    #elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
     static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long), "Unexpected uintptr_t size");
 
     std::ifstream maps("/proc/self/maps");
     if (!maps.is_open())
         return false;
 
-    const auto parseAddress = [maxAddress](const std::string& token, uintptr_t& out) -> bool {
+    const auto parseAddress = [maxAddress](const std::string& token, uintptr_t& out) -> bool
+    {
         errno = 0;
-        char* endPtr = nullptr;
+        char*              endPtr = nullptr;
         unsigned long long value = std::strtoull(token.c_str(), &endPtr, 16);
         if (errno != 0 || endPtr == token.c_str() || *endPtr != '\0' || value > maxAddress)
             return false;
@@ -240,50 +457,59 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     };
 
     uintptr_t coverage = start;
-    bool coveringRange = false;
+    bool      coveringRange = false;
     for (std::string line; std::getline(maps, line);)
     {
-        if (line.empty()) continue;
+        if (line.empty())
+            continue;
         std::istringstream iss(line);
-        std::string range, perms;
-        if (!(iss >> range >> perms)) continue;
+        std::string        range, perms;
+        if (!(iss >> range >> perms))
+            continue;
         const size_t dashPos = range.find('-');
-        if (dashPos == std::string::npos) continue;
-    uintptr_t regionStart = 0;
-    uintptr_t regionEnd = 0;
-    if (!parseAddress(range.substr(0, dashPos), regionStart) || !parseAddress(range.substr(dashPos + 1), regionEnd)) continue;
-        if (regionEnd <= regionStart || regionEnd <= coverage) continue;
+        if (dashPos == std::string::npos)
+            continue;
+        uintptr_t regionStart = 0;
+        uintptr_t regionEnd = 0;
+        if (!parseAddress(range.substr(0, dashPos), regionStart) || !parseAddress(range.substr(dashPos + 1), regionEnd))
+            continue;
+        if (regionEnd <= regionStart || regionEnd <= coverage)
+            continue;
         if (coveringRange)
         {
-            if (regionStart > coverage) return false;
+            if (regionStart > coverage)
+                return false;
         }
         else if (regionStart > coverage || coverage >= regionEnd)
         {
             continue;
         }
-        else coveringRange = true;
+        else
+            coveringRange = true;
 
-        if (perms.empty() || perms[0] != 'r') return false;
+        if (perms.empty() || perms[0] != 'r')
+            return false;
         coverage = regionEnd;
-        if (coverage >= end) return true;
+        if (coverage >= end)
+            return true;
     }
 
     return false;
-#elif defined(APPLE_x64) || defined(APPLE_arm64)
-    mach_vm_address_t queryAddress = static_cast<mach_vm_address_t>(start);
-    const mach_vm_address_t targetEnd = static_cast<mach_vm_address_t>(end);
-    constexpr mach_vm_address_t maxAddressMac = std::numeric_limits<mach_vm_address_t>::max();
+    #elif defined(APPLE_x64) || defined(APPLE_arm64)
+    mach_vm_address_t              queryAddress = static_cast<mach_vm_address_t>(start);
+    const mach_vm_address_t        targetEnd = static_cast<mach_vm_address_t>(end);
+    constexpr mach_vm_address_t    maxAddressMac = std::numeric_limits<mach_vm_address_t>::max();
     vm_region_basic_info_data_64_t info;
-    mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
-    mach_port_t objectName = MACH_PORT_NULL;
+    mach_msg_type_number_t         infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+    mach_port_t                    objectName = MACH_PORT_NULL;
 
     while (queryAddress < targetEnd)
     {
         mach_vm_size_t regionSize = 0;
         infoCount = VM_REGION_BASIC_INFO_COUNT_64;
         mach_vm_address_t regionAddress = queryAddress;
-        kern_return_t kr = mach_vm_region(mach_task_self(), &regionAddress, &regionSize, VM_REGION_BASIC_INFO_64,
-                                          reinterpret_cast<vm_region_info_t>(&info), &infoCount, &objectName);
+        kern_return_t     kr = mach_vm_region(mach_task_self(), &regionAddress, &regionSize, VM_REGION_BASIC_INFO_64, reinterpret_cast<vm_region_info_t>(&info),
+                                              &infoCount, &objectName);
         if (objectName != MACH_PORT_NULL)
         {
             mach_port_deallocate(mach_task_self(), objectName);
@@ -302,9 +528,9 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     }
 
     return true;
-#else
+    #else
     return false;
-#endif
+    #endif
 }
 
 //
@@ -332,35 +558,326 @@ static void WriteRegistryStringValue(HKEY hkRoot, const char* szSubKey, const ch
 //
 // Read a registry string value
 //
-static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
+namespace
 {
-    // Clear output
-    SString strOutResult = "";
+    constexpr DWORD kMaxRegistryValueBytes = 1024 * 1024;  // Cap to avoid runaway allocations
+    constexpr DWORD kMinStringAlloc = sizeof(wchar_t);
+    constexpr DWORD kMinBinaryAlloc = static_cast<DWORD>(sizeof(unsigned long long));
 
-    bool    bResult = false;
-    HKEY    hkTemp = NULL;
-    WString wstrSubKey = FromUTF8(szSubKey);
-    WString wstrValue = FromUTF8(szValue);
-    if (RegOpenKeyExW(hkRoot, wstrSubKey, 0, KEY_READ, &hkTemp) == ERROR_SUCCESS)
+    bool ComputeNextAllocation(DWORD current, DWORD requested, DWORD minimum, DWORD& outNext)
     {
-        DWORD dwBufferSize;
-        if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS)
-        {
+        const ULONGLONG requestedSize = requested != 0 ? static_cast<ULONGLONG>(requested) : static_cast<ULONGLONG>(current) * 2ULL;
+        const ULONGLONG adjusted = std::max<ULONGLONG>(requestedSize, static_cast<ULONGLONG>(minimum));
+        if (adjusted > kMaxRegistryValueBytes)
+            return false;
+        outNext = static_cast<DWORD>(adjusted);
+        return true;
+    }
 
-            CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
-            if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
+    size_t ComputeWideBufferCapacity(DWORD bytes)
+    {
+        const size_t rounded = static_cast<size_t>(bytes) + (sizeof(wchar_t) - 1u);
+        return (rounded / sizeof(wchar_t)) + 1u;  // +1 for null terminator
+    }
+
+    WString CollapseMultiSz(const wchar_t* data, size_t wcharCount)
+    {
+        const wchar_t* current = data;
+        const wchar_t* end = current + wcharCount;
+        WString        combined;
+        while (current < end && *current != L'\0')
+        {
+            if (!combined.empty())
+                combined.push_back(L'\n');
+            const wchar_t* segmentEnd = current;
+            while (segmentEnd < end && *segmentEnd != L'\0')
+                ++segmentEnd;
+            combined.append(current, static_cast<size_t>(segmentEnd - current));
+            current = segmentEnd;
+            if (current >= end)
+                break;
+            ++current;
+        }
+        return combined;
+    }
+
+    SString ExpandEnvironmentToUtf8(const wchar_t* raw)
+    {
+        const DWORD expandedChars = ExpandEnvironmentStringsW(raw, NULL, 0);
+        const DWORD maxExpandChars = kMaxRegistryValueBytes / sizeof(wchar_t);
+        if (expandedChars > 0 && expandedChars <= maxExpandChars)
+        {
+            std::vector<wchar_t> expanded(expandedChars, L'\0');
+            if (ExpandEnvironmentStringsW(raw, expanded.data(), expandedChars))
             {
-                // Ensure null termination - dwBufferSize is in bytes, convert to wchar_t units
-                size_t wcharCount = dwBufferSize / sizeof(wchar_t);
-                szBuffer[wcharCount] = 0;
-                strOutResult = ToUTF8((wchar_t*)szBuffer);
-                bResult = true;
+                WString expandedString;
+                expandedString.assign(expanded.data());
+                return ToUTF8(expandedString);
             }
         }
-        RegCloseKey(hkTemp);
+        WString fallback;
+        fallback.assign(raw);
+        return ToUTF8(fallback);
     }
+
+    SString BinaryBufferToHex(const unsigned char* data, DWORD size)
+    {
+        if (size == 0)
+            return SString();
+
+        static const char hexDigits[] = "0123456789ABCDEF";
+        std::string       hex;
+        hex.reserve(static_cast<size_t>(size) * 2u);
+        for (DWORD i = 0; i < size; ++i)
+        {
+            const unsigned char byte = data[i];
+            hex.push_back(hexDigits[(byte >> 4) & 0x0F]);
+            hex.push_back(hexDigits[byte & 0x0F]);
+        }
+        SString result;
+        result = hex.c_str();
+        return result;
+    }
+
+    bool TryReadStringValue(HKEY key, const wchar_t* valueName, DWORD& dwType, DWORD initialSize, SString& outValue, int& status)
+    {
+        DWORD                allocSize = std::max<DWORD>(initialSize, kMinStringAlloc);
+        std::vector<wchar_t> buffer(ComputeWideBufferCapacity(allocSize), L'\0');
+
+        while (true)
+        {
+            DWORD dwTempSize = allocSize;
+            LONG  readResult = RegQueryValueExW(key, valueName, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwTempSize);
+
+            if (readResult == ERROR_MORE_DATA)
+            {
+                if (dwTempSize > kMaxRegistryValueBytes)
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                DWORD newSize = 0;
+                if (!ComputeNextAllocation(allocSize, dwTempSize, kMinStringAlloc, newSize))
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                allocSize = newSize;
+                buffer.assign(ComputeWideBufferCapacity(allocSize), L'\0');
+                continue;
+            }
+
+            if (readResult != ERROR_SUCCESS)
+            {
+                status = -static_cast<int>(readResult);
+                return false;
+            }
+
+            size_t wcharCount = static_cast<size_t>(dwTempSize) / sizeof(wchar_t);
+            if (wcharCount >= buffer.size())
+                wcharCount = buffer.size() - 1u;
+            buffer[wcharCount] = L'\0';
+
+            if (dwType == REG_MULTI_SZ)
+            {
+                outValue = ToUTF8(CollapseMultiSz(buffer.data(), wcharCount));
+            }
+            else if (dwType == REG_EXPAND_SZ)
+            {
+                outValue = ExpandEnvironmentToUtf8(buffer.data());
+            }
+            else
+            {
+                WString direct;
+                direct.assign(buffer.data());
+                outValue = ToUTF8(direct);
+            }
+
+            status = 1;
+            return true;
+        }
+    }
+
+    bool TryReadBinaryValue(HKEY key, const wchar_t* valueName, DWORD& dwType, DWORD initialSize, SString& outValue, int& status)
+    {
+        DWORD                      allocSize = std::max<DWORD>(initialSize, kMinBinaryAlloc);
+        std::vector<unsigned char> buffer(static_cast<size_t>(allocSize), 0u);
+
+        while (true)
+        {
+            DWORD dwTempSize = allocSize;
+            LONG  readResult = RegQueryValueExW(key, valueName, NULL, &dwType, buffer.data(), &dwTempSize);
+
+            if (readResult == ERROR_MORE_DATA)
+            {
+                if (dwTempSize > kMaxRegistryValueBytes)
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                DWORD newSize = 0;
+                if (!ComputeNextAllocation(allocSize, dwTempSize, kMinBinaryAlloc, newSize))
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                allocSize = newSize;
+                buffer.assign(static_cast<size_t>(allocSize), 0u);
+                continue;
+            }
+
+            if (readResult != ERROR_SUCCESS)
+            {
+                status = -static_cast<int>(readResult);
+                return false;
+            }
+
+            switch (dwType)
+            {
+                case REG_DWORD:
+                {
+                    DWORD       value = 0;
+                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, sizeof(DWORD));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                        value |= static_cast<DWORD>(buffer[i]) << (8u * i);
+                    outValue.Format("%lu", static_cast<unsigned long>(value));
+                    break;
+                }
+                case REG_DWORD_BIG_ENDIAN:
+                {
+                    DWORD       value = 0;
+                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, sizeof(DWORD));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                    {
+                        value <<= 8;
+                        value |= buffer[i];
+                    }
+                    outValue.Format("%lu", static_cast<unsigned long>(value));
+                    break;
+                }
+                case REG_QWORD:
+                {
+                    unsigned long long value = 0ull;
+                    const DWORD        copyBytes = std::min<DWORD>(dwTempSize, static_cast<DWORD>(sizeof(value)));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                        value |= static_cast<unsigned long long>(buffer[i]) << (8ull * i);
+                    outValue.Format("%llu", static_cast<unsigned long long>(value));
+                    break;
+                }
+                case REG_BINARY:
+                case REG_LINK:
+                case REG_RESOURCE_LIST:
+                case REG_FULL_RESOURCE_DESCRIPTOR:
+                case REG_RESOURCE_REQUIREMENTS_LIST:
+                case REG_NONE:
+                default:
+                {
+                    outValue = BinaryBufferToHex(buffer.data(), dwTempSize);
+                    break;
+                }
+            }
+
+            status = 1;
+            return true;
+        }
+    }
+
+    bool PopulateValueFromKey(HKEY key, const wchar_t* valueName, int& status, SString& outValue)
+    {
+        DWORD dwType = REG_NONE;
+        DWORD dwBufferSize = 0;
+        LONG  queryResult = RegQueryValueExW(key, valueName, NULL, &dwType, NULL, &dwBufferSize);
+
+        if (queryResult != ERROR_SUCCESS && queryResult != ERROR_MORE_DATA)
+        {
+            status = -static_cast<int>(queryResult);
+            return false;
+        }
+
+        if (dwBufferSize > kMaxRegistryValueBytes)
+        {
+            status = -static_cast<int>(ERROR_MORE_DATA);
+            return false;
+        }
+
+        int        localStatus = 0;
+        const bool isStringType = (dwType == REG_SZ || dwType == REG_EXPAND_SZ || dwType == REG_MULTI_SZ);
+        const bool success = isStringType ? TryReadStringValue(key, valueName, dwType, dwBufferSize, outValue, localStatus)
+                                          : TryReadBinaryValue(key, valueName, dwType, dwBufferSize, outValue, localStatus);
+
+        if (localStatus != 0)
+            status = localStatus;
+
+        return success;
+    }
+}
+
+static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
+{
+    SString strOutResult;
+    int     status = 0;
+    bool    success = false;
+
+    const char* szSafeSubKey = szSubKey ? szSubKey : "";
+    const char* szSafeValue = szValue ? szValue : "";
+
+    WString        wstrSubKey;
+    const wchar_t* pSubKey = L"";
+    if (szSafeSubKey[0] != '\0')
+    {
+        wstrSubKey = FromUTF8(szSafeSubKey);
+        pSubKey = wstrSubKey.c_str();
+    }
+
+    static constexpr wchar_t kDefaultValueName[] = L"";
+    WString                  wstrValue;
+    const wchar_t*           pValueName = kDefaultValueName;
+    if (szSafeValue[0] != '\0')
+    {
+        wstrValue = FromUTF8(szSafeValue);
+        pValueName = wstrValue.c_str();
+    }
+
+    constexpr size_t                     kAccessMaskSlots = 3u;
+    std::array<REGSAM, kAccessMaskSlots> accessMasks{};
+    size_t                               maskCount = 0;
+    #ifdef KEY_WOW64_64KEY
+    accessMasks[maskCount++] = KEY_READ | KEY_WOW64_64KEY;
+    #endif
+    #ifdef KEY_WOW64_32KEY
+    accessMasks[maskCount++] = KEY_READ | KEY_WOW64_32KEY;
+    #endif
+    accessMasks[maskCount++] = KEY_READ;
+
+    for (size_t maskIndex = 0; maskIndex < maskCount && !success; ++maskIndex)
+    {
+        HKEY       hkTemp = nullptr;
+        const LONG openResult = RegOpenKeyExW(hkRoot, pSubKey, 0, accessMasks[maskIndex], &hkTemp);
+        if (openResult != ERROR_SUCCESS)
+        {
+            status = -static_cast<int>(openResult);
+            continue;
+        }
+
+        UniqueHKey keyGuard(hkTemp);
+
+        if (PopulateValueFromKey(hkTemp, pValueName, status, strOutResult))
+        {
+            success = true;
+            break;
+        }
+    }
+
     if (iResult)
-        *iResult = bResult;
+        *iResult = status;
+
+    if (!success)
+        strOutResult.clear();
+
     return strOutResult;
 }
 
@@ -383,9 +900,9 @@ SString SharedUtil::GetMajorVersionString()
 //
 // GetSystemRegistryValue
 //
-SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName)
+SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, NULL);
+    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, iResult);
 }
 
 //
@@ -409,9 +926,9 @@ void SharedUtil::SetRegistryValue(const SString& strPath, const SString& strName
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, strValue, bFlush);
 }
 
-SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName)
+SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, iResult);
 }
 
 bool SharedUtil::RemoveRegistryKey(const SString& strPath)
@@ -425,9 +942,9 @@ void SharedUtil::SetVersionRegistryValue(const SString& strVersion, const SStrin
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, strValue);
 }
 
-SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName)
+SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, iResult);
 }
 
 // Get/set registry values for all versions (common)
@@ -436,9 +953,9 @@ void SharedUtil::SetCommonRegistryValue(const SString& strPath, const SString& s
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, strValue);
 }
 
-SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName)
+SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, iResult);
 }
 
 //
@@ -519,12 +1036,11 @@ SString SharedUtil::GetPostUpdateConnect()
     time_t timeThen = 0;
     if (!strTimeString.empty())
     {
-        char* endptr;
+        char*     endptr;
         long long result = strtoll(strTimeString.c_str(), &endptr, 10);
-        
+
         // Check for valid conversion
-        if (endptr != strTimeString.c_str() && *endptr == '\0' && 
-            result >= 0 && result <= LLONG_MAX)
+        if (endptr != strTimeString.c_str() && *endptr == '\0' && result >= 0 && result <= LLONG_MAX)
         {
             timeThen = static_cast<time_t>(result);
         }
@@ -576,15 +1092,15 @@ int SharedUtil::GetApplicationSettingInt(const SString& strPath, const SString& 
         return 0;
 
     char* endptr;
-    long result = strtol(strValue.c_str(), &endptr, 10);
-    
+    long  result = strtol(strValue.c_str(), &endptr, 10);
+
     // Check for conversion errors
     if (endptr == strValue.c_str() || *endptr != '\0')
         return 0;  // Invalid conversion
 
     if (result > INT_MAX || result < INT_MIN)
         return 0;
-    
+
     return static_cast<int>(result);
 }
 
@@ -763,51 +1279,138 @@ const SString& SharedUtil::GetProductVersion()
 
 void SharedUtil::SetClipboardText(const SString& strText)
 {
-    // If we got something to copy
-    if (!strText.empty())
+    if (strText.empty())
+        return;
+
+    std::lock_guard<std::mutex> clipboardGuard(Details::ClipboardMutex());
+
+    WString wideText;
+    try
     {
-        // Convert it to Unicode
-        WString strUTF = MbUTF8ToUTF16(strText);
+        wideText = MbUTF8ToUTF16(strText);
+    }
+    catch (const std::exception&)
+    {
+        return;
+    }
+    catch (...)
+    {
+        return;
+    }
 
-        // Open and empty the clipboard
-        OpenClipboard(NULL);
-        EmptyClipboard();
+    if (!OpenClipboard(nullptr))
+        return;
 
-        // Allocate the clipboard buffer and copy the data
-        HGLOBAL  hBuf = GlobalAlloc(GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t));
-        wchar_t* buf = reinterpret_cast<wchar_t*>(GlobalLock(hBuf));
-        wcscpy(buf, strUTF);
-        GlobalUnlock(hBuf);
+    struct ClipboardCloser
+    {
+        ~ClipboardCloser() { CloseClipboard(); }
+    } clipboardCloser;
 
-        // Copy the data into the clipboard
-        SetClipboardData(CF_UNICODETEXT, hBuf);
+    if (!EmptyClipboard())
+        return;
 
-        // Close the clipboard
-        CloseClipboard();
+    const size_t length = wideText.length();
+    if (length > (std::numeric_limits<size_t>::max() / sizeof(wchar_t)) - 1)
+        return;
+
+    const size_t charCount = length + 1u;
+    if (charCount > Details::kMaxClipboardChars)
+        return;
+
+    const size_t totalBytes = charCount * sizeof(wchar_t);
+
+    Details::UniqueHGlobal clipboardMemory(GlobalAlloc(GMEM_MOVEABLE, totalBytes));
+    if (!clipboardMemory)
+        return;
+
+    void* rawBuffer = GlobalLock(clipboardMemory.get());
+    if (!rawBuffer)
+        return;
+
+    auto lockGuard = SharedUtil::MakeGlobalUnlockGuard(static_cast<WinHGlobalHandle>(clipboardMemory.get()));
+
+    auto* buffer = static_cast<wchar_t*>(rawBuffer);
+    std::copy_n(wideText.c_str(), charCount, buffer);
+
+    if (!lockGuard.UnlockChecked())
+        return;
+
+    if (const HANDLE placedHandle = SetClipboardData(CF_UNICODETEXT, clipboardMemory.get()))
+    {
+        static_cast<void>(clipboardMemory.release());
     }
 }
 
 SString SharedUtil::GetClipboardText()
 {
-    SString data;
+    SString result;
 
-    if (OpenClipboard(NULL))
+    std::lock_guard<std::mutex> clipboardGuard(Details::ClipboardMutex());
+
+    if (!OpenClipboard(nullptr))
+        return result;
+
+    struct ClipboardCloser
     {
-        // Get the clipboard's data
-        HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
-        if (clipboardData)  // Check if handle is valid
+        ~ClipboardCloser() { CloseClipboard(); }
+    } clipboardCloser;
+
+    if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
+        return result;
+
+    if (const HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT); clipboardData)
+    {
+        void* rawData = GlobalLock(clipboardData);
+        if (!rawData)
+            return result;
+
+        auto lockGuard = SharedUtil::MakeGlobalUnlockGuard(static_cast<WinHGlobalHandle>(clipboardData));
+
+        const SIZE_T rawSizeBytes = GlobalSize(static_cast<HGLOBAL>(clipboardData));
+        if (rawSizeBytes == 0)
+            return result;
+
+        if (rawSizeBytes > Details::kMaxClipboardBytes)
         {
-            void* lockedData = GlobalLock(clipboardData);
-            if (lockedData)
-            {
-                data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
-                GlobalUnlock(clipboardData);
-            }
+            return result;
         }
-        CloseClipboard();
+
+        if ((rawSizeBytes % sizeof(wchar_t)) != 0)
+        {
+            return result;
+        }
+
+        const size_t wcharCount = static_cast<size_t>(rawSizeBytes / sizeof(wchar_t));
+        if (wcharCount == 0)
+            return result;
+
+        const auto* lockedData = static_cast<const wchar_t*>(rawData);
+        const auto* terminator = std::find(lockedData, lockedData + wcharCount, L'\0');
+        if (terminator == lockedData + wcharCount)
+        {
+            return result;
+        }
+
+        try
+        {
+            result = UTF16ToMbUTF8(lockedData);
+        }
+        catch (const std::exception&)
+        {
+            result.clear();
+        }
+        catch (...)
+        {
+            result.clear();
+        }
+
+        if (!lockGuard.UnlockChecked())
+        {
+            // Unlock failure is non-fatal; retain gathered data
+        }
     }
 
-    return data;
+    return result;
 }
 
 //
@@ -952,8 +1555,7 @@ void SharedUtil::AddReportLog(uint uiId, const SString& strText, uint uiAmountLi
         MakeSureDirExists(strPathFilename);
 
         SString strMessage;
-        strMessage.Format("%u: %s %s [%s] - ", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(),
-                          GetReportLogProcessTag().c_str());
+        strMessage.Format("%u: %s %s [%s] - ", uiId, GetTimeString(true, false).c_str(), GetReportLogHeaderText().c_str(), GetReportLogProcessTag().c_str());
         strMessage += strText;
         strMessage += "\n";
         FileAppend(strPathFilename, &strMessage.at(0), strMessage.length());
@@ -977,11 +1579,9 @@ void SharedUtil::AddExceptionReportLog(uint uiId, const char* szExceptionName, c
     GetSystemTime(&s);
 
     // Use _snprintf_s to prevent buffer overflow and ensure null termination
-    int result = _snprintf_s(szOutput, TOTAL_BUFFER_SIZE, _TRUNCATE, 
-                            "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", 
-                            uiId, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, 
-                            (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown", 
-                            (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
+    int result = _snprintf_s(szOutput, TOTAL_BUFFER_SIZE, _TRUNCATE, "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n", uiId, s.wYear,
+                             s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, (int)MAX_EXCEPTION_NAME_SIZE, szExceptionName ? szExceptionName : "Unknown",
+                             (int)MAX_EXCEPTION_TEXT_SIZE, szExceptionText ? szExceptionText : "");
 
     OutputDebugString("[ReportLog] ");
     OutputDebugString(&szOutput[0]);
@@ -1068,9 +1668,9 @@ void WriteEvent(const char* szType, const SString& strText)
     SString strPathFilename = CalcMTASAPath(PathJoin("mta", "logs", "logfile.txt"));
     SString strMessage("%s - %s %s", *GetLocalTimeString(), szType, *strText);
     FileAppend(strPathFilename, strMessage + "\n");
-#ifdef MTA_DEBUG
+    #ifdef MTA_DEBUG
     OutputDebugLine(strMessage);
-#endif
+    #endif
 }
 
 void SharedUtil::WriteDebugEvent(const SString& strText)
@@ -1175,8 +1775,8 @@ static bool MyShellExecute(bool bBlocking, const SString& strAction, const SStri
     }
     else
     {
-        int iResult = (int)ShellExecute(NULL, strAction, strFile, strParameters, strDirectory, nShowCmd);
-        return iResult > 32;
+        const auto result = reinterpret_cast<INT_PTR>(ShellExecute(NULL, strAction, strFile, strParameters, strDirectory, nShowCmd));
+        return result > 32;
     }
 }
 
@@ -1208,7 +1808,7 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 #endif  // MTA_CLIENT
 
 #ifdef SHAREDUTIL_PLATFORM_WINDOWS
-#define _WIN32_WINNT_WIN8                   0x0602
+    #define _WIN32_WINNT_WIN8 0x0602
 ///////////////////////////////////////////////////////////////////////////
 //
 // SharedUtil::IsWindowsVersionOrGreater
@@ -1395,14 +1995,14 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
 
         if (lookup.module)
             lookup.function = static_cast<FunctionPointer>(static_cast<void*>(GetProcAddress(lookup.module, "NtQueryInformationThread")));
-        else 
-            return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
+        else
+            return 0xC0000135L;  // STATUS_DLL_NOT_FOUND
     }
 
     if (lookup.function)
         return lookup.function(ThreadHandle, ThreadInformationClass, ThreadInformation, ThreadInformationLength, ReturnLength);
     else
-        return 0xC00000BBL;            // STATUS_NOT_SUPPORTED
+        return 0xC00000BBL;  // STATUS_NOT_SUPPORTED
 }
 
 bool SharedUtil::QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress)
@@ -1422,7 +2022,7 @@ DWORD SharedUtil::GetMainThreadId()
 
         if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)) != 0)
         {
-            processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
+            processEntryPointAddress = static_cast<DWORD>(reinterpret_cast<uintptr_t>(moduleInfo.EntryPoint));
         }
 
         // Find oldest thread in the current process ( https://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
@@ -1524,7 +2124,7 @@ int SharedUtil::GetBuildAge()
     return (int)(time(NULL) - mktime(&when)) / (60 * 60 * 24);
 }
 
-#if defined(MTA_DM_EXPIRE_DAYS)
+    #if defined(MTA_DM_EXPIRE_DAYS)
 int SharedUtil::GetDaysUntilExpire()
 {
     tm when;
@@ -1535,7 +2135,7 @@ int SharedUtil::GetDaysUntilExpire()
     return (int)(mktime(&when) - time(NULL)) / (60 * 60 * 24);
 }
 
-#endif
+    #endif
 #endif
 
 //
@@ -1657,15 +2257,15 @@ char* SharedUtil::Trim(char* szText)
     return static_cast<char*>(memmove(szOriginal, szText, uiLen + 1));
 }
 
-#if __cplusplus >= 201703L // C++17
+#if __cplusplus >= 201703L  // C++17
 std::string SharedUtil::UTF8FilePath(const std::filesystem::path& input)
 {
-#ifdef __cpp_lib_char8_t
+    #ifdef __cpp_lib_char8_t
     std::u8string raw = input.u8string();
-    return std::string{ std::begin(raw), std::end(raw) };
-#else
+    return std::string{std::begin(raw), std::end(raw)};
+    #else
     return input.u8string();
-#endif
+    #endif
 }
 #endif
 
@@ -1704,16 +2304,16 @@ std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
     if (input.empty())
         return L"";
-        
+
     size_t len = mbstowcs(NULL, input.c_str(), input.length());
     if (len == (size_t)-1)
         return L"?";
-    
+
     std::vector<wchar_t> wcsOutput(len + 1);  // Use vector for automatic cleanup
-    size_t result = mbstowcs(wcsOutput.data(), input.c_str(), len);
+    size_t               result = mbstowcs(wcsOutput.data(), input.c_str(), len);
     if (result == (size_t)-1 || result != len)
         return L"?";
-    
+
     wcsOutput[len] = 0;  // Null terminate the string
     return std::wstring(wcsOutput.data());
 }
@@ -1734,14 +2334,14 @@ bool SharedUtil::IsLuaCompiledScript(const void* pData, uint uiLength)
         pCharData += 3;
         uiLength -= 3;
     }
-    return (uiLength > 0 && pCharData[0] == 0x1B);            // Do the same check as what the Lua parser does
+    return (uiLength > 0 && pCharData[0] == 0x1B);  // Do the same check as what the Lua parser does
 }
 
 // Check for obfuscated script
 bool SharedUtil::IsLuaObfuscatedScript(const void* pData, uint uiLength)
 {
     const uchar* pCharData = (const uchar*)pData;
-    return (uiLength > 0 && pCharData[0] == 0x1C);            // Look for our special marker
+    return (uiLength > 0 && pCharData[0] == 0x1C);  // Look for our special marker
 }
 
 //
@@ -1834,9 +2434,15 @@ namespace SharedUtil
         m_cEscapeCharacter = '#';
     }
 
-    void CArgMap::SetEscapeCharacter(char cEscapeCharacter) { m_cEscapeCharacter = cEscapeCharacter; }
+    void CArgMap::SetEscapeCharacter(char cEscapeCharacter)
+    {
+        m_cEscapeCharacter = cEscapeCharacter;
+    }
 
-    void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues) { MergeFromString(other.ToString(), bAllowMultiValues); }
+    void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues)
+    {
+        MergeFromString(other.ToString(), bAllowMultiValues);
+    }
 
     void CArgMap::SetFromString(const SString& strLine, bool bAllowMultiValues)
     {
@@ -1854,7 +2460,7 @@ namespace SharedUtil
             parts[i].Split(m_strArgSep, &strCmd, &strArg);
             if (!bAllowMultiValues)
                 m_Map.erase(strCmd);
-            if (strCmd.length())            // Key can not be empty
+            if (strCmd.length())  // Key can not be empty
                 MapInsert(m_Map, strCmd, strArg);
         }
     }
@@ -1889,9 +2495,15 @@ namespace SharedUtil
             SetFromString(ToString(), false);
     }
 
-    SString CArgMap::Escape(const SString& strIn) const { return EscapeString(strIn, m_strDisallowedChars, m_cEscapeCharacter); }
+    SString CArgMap::Escape(const SString& strIn) const
+    {
+        return EscapeString(strIn, m_strDisallowedChars, m_cEscapeCharacter);
+    }
 
-    SString CArgMap::Unescape(const SString& strIn) const { return UnescapeString(strIn, m_cEscapeCharacter); }
+    SString CArgMap::Unescape(const SString& strIn) const
+    {
+        return UnescapeString(strIn, m_cEscapeCharacter);
+    }
 
     // Set a unique key string value
     void CArgMap::Set(const SString& strCmd, const SString& strValue)
@@ -1908,17 +2520,23 @@ namespace SharedUtil
     }
 
     // Insert a key int value
-    void CArgMap::Insert(const SString& strCmd, int iValue) { Insert(strCmd, SString("%d", iValue)); }
+    void CArgMap::Insert(const SString& strCmd, int iValue)
+    {
+        Insert(strCmd, SString("%d", iValue));
+    }
 
     // Insert a key string value
     void CArgMap::Insert(const SString& strCmd, const SString& strValue)
     {
-        if (strCmd.length())            // Key can not be empty
+        if (strCmd.length())  // Key can not be empty
             MapInsert(m_Map, Escape(strCmd), Escape(strValue));
     }
 
     // Test if key exists
-    bool CArgMap::Contains(const SString& strCmd) const { return MapFind(m_Map, Escape(strCmd)) != NULL; }
+    bool CArgMap::Contains(const SString& strCmd) const
+    {
+        return MapFind(m_Map, Escape(strCmd)) != NULL;
+    }
 
     // First result as string
     bool CArgMap::Get(const SString& strCmd, SString& strOut, const char* szDefault) const
@@ -2020,7 +2638,6 @@ namespace SharedUtil
         };
 
         static ProcessorNumberLookup lookup = {};
-																																		   
 
         if (!lookup.once)
         {
@@ -2319,7 +2936,7 @@ namespace SharedUtil
         return false;
     }
 
-}            // namespace SharedUtil
+}  // namespace SharedUtil
 
 //
 // For checking MTA library module versions

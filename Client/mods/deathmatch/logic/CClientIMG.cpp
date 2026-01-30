@@ -205,11 +205,18 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
         return false;
 
     CStreamingInfo* pCurrInfo = g_pGame->GetStreaming()->GetStreamingInfo(uiModelID);
+    if (!pCurrInfo)
+        return false;
 
     if (pCurrInfo->archiveId == m_ucArchiveID)
-        return true;            // Already linked
+        return true;  // Already linked
 
     m_restoreInfo.emplace_back(uiModelID, pCurrInfo->offsetInBlocks, pCurrInfo->sizeInBlocks, pCurrInfo->archiveId);
+
+    // Internally stream out the vehicle before calling CStreamingSA::RemoveModel
+    // otherwise a crash will occur if the player is inside a vehicle that gets unloaded by the streamer
+    if (CClientVehicleManager::IsValidModel(uiModelID))
+        g_pClientGame->GetVehicleManager()->RestreamVehicles(static_cast<unsigned short>(uiModelID));
 
     g_pGame->GetStreaming()->SetStreamingInfo(uiModelID, m_ucArchiveID, pFileInfo->uiOffset, pFileInfo->usSize);
 

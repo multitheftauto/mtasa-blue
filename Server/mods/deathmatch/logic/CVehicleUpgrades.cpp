@@ -87,7 +87,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 
     if (us == 1000 || us == 1001 || us == 1002 || us == 1003 || us == 1014 || /* spoiler */
         us == 1015 || us == 1016 || us == 1023 || us == 1049 || us == 1050 || us == 1058 || us == 1060 || us == 1138 || us == 1139 || us == 1146 ||
-        us == 1147 || us == 1158 || us == 1162 || us == 1163 || us == 116)
+        us == 1147 || us == 1158 || us == 1162 || us == 1163 || us == 1164)
     {
         return true;
     }
@@ -97,7 +97,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
         case 400:
             return (us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010);
         case 401:
-            return (us == 1005 || us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 114 || us == 1020 || us == 1019 || us == 1013 || us == 1008 ||
+            return (us == 1005 || us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 1145 || us == 1020 || us == 1019 || us == 1013 || us == 1008 ||
                     us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 || us == 1017 || us == 1007);
         case 402:
             return (us == 1009 || us == 1010);
@@ -320,17 +320,17 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
         ucSlot = 3;
         return true;
     }
-    if (us == 1115 || us == 1116)            // front bullbars
+    if (us == 1115 || us == 1116)  // front bullbars
     {
         ucSlot = 4;
         return true;
     }
-    if (us == 1109 || us == 1110)            // rear bullbars
+    if (us == 1109 || us == 1110)  // rear bullbars
     {
         ucSlot = 5;
         return true;
     }
-    if (us == 1013 || us == 1024)            // lamps
+    if (us == 1013 || us == 1024)  // lamps
     {
         ucSlot = 6;
         return true;
@@ -342,17 +342,17 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
         ucSlot = 7;
         return true;
     }
-    if (us == 1008 || us == 1009 || us == 1010)            // nitro
+    if (us == 1008 || us == 1009 || us == 1010)  // nitro
     {
         ucSlot = 8;
         return true;
     }
-    if (us == 1087)            // hydraulics
+    if (us == 1087)  // hydraulics
     {
         ucSlot = 9;
         return true;
     }
-    if (us == 1086)            // stereo
+    if (us == 1086)  // stereo
     {
         ucSlot = 10;
         return true;

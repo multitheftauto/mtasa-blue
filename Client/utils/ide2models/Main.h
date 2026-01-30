@@ -12,7 +12,6 @@
 #pragma once
 
 #include <cstdio>
-using namespace std;
 
 int  main(int iArgumentCount, char* szArgs[]);
 int  Convert(FILE* pInput, FILE* pOutput);

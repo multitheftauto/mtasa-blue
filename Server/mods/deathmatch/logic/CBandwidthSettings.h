@@ -12,10 +12,10 @@
 
 enum
 {
-    ZONE0,            // Near sync
-    ZONE1,            // Mid sync + out of fov
-    ZONE2,            // Mid sync + way out of fov
-    ZONE3,            // Far sync
+    ZONE0,  // Near sync
+    ZONE1,  // Mid sync + out of fov
+    ZONE2,  // Mid sync + way out of fov
+    ZONE3,  // Far sync
     ZONE_MAX
 };
 
@@ -95,17 +95,17 @@ public:
     float                      fZone1Dot;
     float                      fZone2Dot;
     float                      fZone0RadiusSq;
-    SFixedArray<int, ZONE_MAX> ZoneUpdateIntervals;            // First is always 0, next is Zone1 interval then Zone2 and Zone3
+    SFixedArray<int, ZONE_MAX> ZoneUpdateIntervals;  // First is always 0, next is Zone1 interval then Zone2 and Zone3
     int                        iMaxZoneIfOtherCanSee;
     bool                       bLightSyncEnabled;
 
 protected:
-    float fZone0Radius;                               // 10 - 200     Use zone1&2 only if other player is at least this distance away
-    float fZone1Angle;                                // 90 - 350     Use zone1 if angle to other player is greater than this
-    float fZone2Angle;                                // 100 - 360    Use zone2 if angle to other player is greater than this
-    int   iMaxZoneIfOtherCanSeeNormal;                // Zone limit if other player can see us
-    int   iMaxZoneIfOtherCanSeeBulletSync;            // Zone limit if other player can see us when bullet sync is enabled
-    bool  bBulletSyncEnabled;                         // Cache flag set by game
+    float fZone0Radius;                     // 10 - 200     Use zone1&2 only if other player is at least this distance away
+    float fZone1Angle;                      // 90 - 350     Use zone1 if angle to other player is greater than this
+    float fZone2Angle;                      // 100 - 360    Use zone2 if angle to other player is greater than this
+    int   iMaxZoneIfOtherCanSeeNormal;      // Zone limit if other player can see us
+    int   iMaxZoneIfOtherCanSeeBulletSync;  // Zone limit if other player can see us when bullet sync is enabled
+    bool  bBulletSyncEnabled;               // Cache flag set by game
 };
 
 extern CBandwidthSettings* g_pBandwidthSettings;

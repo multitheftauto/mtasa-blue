@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 struct SModelCacheStats
 {
     uint uiMaxNumPedModels;

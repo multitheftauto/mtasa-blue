@@ -146,6 +146,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
 
     // Copy the results into a array in case m_EventsMap is modified during the call
     std::vector<CMapEvent*> matchingEvents;
+    matchingEvents.reserve(8);
     for (EventsIter iter = itPair.first; iter != itPair.second; ++iter)
         matchingEvents.push_back(iter->second);
 
@@ -165,11 +166,11 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     // Grab the current VM
                     lua_State* pState = pMapEvent->GetVM()->GetVM();
 
-                    LUA_CHECKSTACK(pState, 1);            // Ensure some room
+                    LUA_CHECKSTACK(pState, 1);  // Ensure some room
 
-                    #if MTA_DEBUG
+#if MTA_DEBUG
                     int luaStackPointer = lua_gettop(pState);
-                    #endif
+#endif
 
                     TIMEUS startTime = GetTimeUs();
 
@@ -266,9 +267,9 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     OldClient.Push(pState);
                     lua_setglobal(pState, "client");
 
-                    #if MTA_DEBUG
+#if MTA_DEBUG
                     assert(lua_gettop(pState) == luaStackPointer);
-                    #endif
+#endif
 
                     CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, GetTimeUs() - startTime);
                 }

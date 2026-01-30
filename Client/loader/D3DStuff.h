@@ -10,5 +10,8 @@
 
 #pragma once
 
+#include <windows.h>
+
 void BeginD3DStuff();
 void EndD3DStuff();
+void LoaderResolveCrashHandlerExports(HMODULE coreModule) noexcept;

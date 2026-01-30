@@ -179,7 +179,8 @@ void CShaderInstance::SetFloatsValue(D3DXHANDLE hHandle, const float* pfValues, 
 {
     SShaderValue* pParam = GetParam(hHandle);
     // Set as float
-    uiCount = std::min(uiCount, NUMELMS(pParam->floatList));
+    const uint uiMaxCount = static_cast<uint>(NUMELMS(pParam->floatList));
+    uiCount = std::min(uiCount, uiMaxCount);
     pParam->cType = 'f';
     memcpy(pParam->floatList, pfValues, sizeof(float) * uiCount);
     pParam->cCount = static_cast<char>(uiCount);
@@ -221,7 +222,8 @@ bool CShaderInstance::CmpBoolValue(D3DXHANDLE hHandle, bool bValue)
 bool CShaderInstance::CmpFloatsValue(D3DXHANDLE hHandle, const float* pfValues, uint uiCount)
 {
     SShaderValue* pParam = GetParam(hHandle);
-    return pParam->cType == 'f' && pParam->cCount == uiCount && memcmp(pParam->floatList, pfValues, sizeof(float) * uiCount) == 0;
+    const uint    storedCount = static_cast<unsigned char>(pParam->cCount);
+    return pParam->cType == 'f' && storedCount == uiCount && memcmp(pParam->floatList, pfValues, sizeof(float) * uiCount) == 0;
 }
 
 ////////////////////////////////////////////////////////////////

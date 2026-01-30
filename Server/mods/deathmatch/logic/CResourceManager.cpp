@@ -23,8 +23,8 @@
 #include "CDatabaseManager.h"
 #include "CRegistry.h"
 
-#define BLOCKED_DB_FILE_NAME    "fileblock.db"
-#define BLOCKED_DB_TABLE_NAME   "`block_reasons`"
+#define BLOCKED_DB_FILE_NAME  "fileblock.db"
+#define BLOCKED_DB_TABLE_NAME "`block_reasons`"
 
 // SResInfo - Item in list of potential resources - Used in Refresh()
 struct SResInfo
@@ -172,27 +172,42 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
         if (!strJustThisResource.empty() && strJustThisResource != info.strName)
             continue;
 
-        if (!info.bPathIssue)
+        if (info.bPathIssue)
+            continue;
+
+        auto* pResource = GetResource(info.strName);
+
+        if (bRefreshAll || !pResource || !pResource->CheckIfStartable())
         {
-            CResource* pResource = GetResource(info.strName);
+            if (g_pServerInterface->IsRequestingExit())
+                return false;
 
-            if (bRefreshAll || !pResource || !pResource->CheckIfStartable())
-            {
-                if (g_pServerInterface->IsRequestingExit())
-                    return false;
-
-                // Add the resource
-                Load(!info.bIsDir, info.strAbsPath, info.strName);
-            }
-            else if (bRefreshAll && pResource && pResource->HasResourceChanged())
-            {
-                if (g_pServerInterface->IsRequestingExit())
-                    return false;
-                    
-                // Resource exists but has changed, reload it
-                Load(!info.bIsDir, info.strAbsPath, info.strName);
-            }
+            // Add the resource
+            Load(!info.bIsDir, info.strAbsPath, info.strName);
+            continue;
         }
+
+        if (!pResource)
+            continue;
+
+        // For existing resources, refresh ACL permissions without full reload
+        std::string strPath;
+        if (!pResource->GetFilePath("meta.xml", strPath))
+            continue;
+
+        std::unique_ptr<CXMLFile> pMetaFile(g_pServerInterface->GetXML()->CreateXML(strPath.c_str()));
+        if (!pMetaFile || !pMetaFile->Parse())
+            continue;
+
+        CXMLNode* pRoot = pMetaFile->GetRootNode();
+        if (!pRoot)
+            continue;
+
+        CXMLNode* pNodeAclRequest = pRoot->FindSubNode("aclrequest", 0);
+        if (pNodeAclRequest)
+            pResource->RefreshAutoPermissions(pNodeAclRequest);
+        else
+            pResource->RemoveAutoPermissions();
     }
 
     marker.Set("AddNew");
@@ -534,7 +549,7 @@ CResource* CResourceManager::GetResourceFromNetID(unsigned short usNetID)
     {
         if ((*iter)->GetNetID() == usNetID)
         {
-            assert(0);            // Should be in map
+            assert(0);  // Should be in map
             return (*iter);
         }
     }
@@ -1344,11 +1359,11 @@ void CResourceManager::ReevaluateSyncMapElementDataOption()
     {
         if (iter->second)
         {
-            bSyncMapElementData = true;            // Any 'true' will stop the set
+            bSyncMapElementData = true;  // Any 'true' will stop the set
             break;
         }
         else
-            bSyncMapElementData = false;            // Need at least one 'false' to set
+            bSyncMapElementData = false;  // Need at least one 'false' to set
     }
 
     // Apply

@@ -53,7 +53,7 @@ static CLuaManager* m_pLuaManager;
 SString             CLuaMain::ms_strExpectedUndumpHash;
 
 #define HOOK_INSTRUCTION_COUNT 1000000
-#define HOOK_MAXIMUM_TIME 5000
+#define HOOK_MAXIMUM_TIME      5000
 
 extern CGame*      g_pGame;
 extern CNetServer* g_pRealNetServer;
@@ -172,7 +172,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     if (!m_bEnableOOP)
         return;
 
-    CLuaElementDefs ::AddClass(luaVM);            // keep this at the top because inheritance
+    CLuaElementDefs ::AddClass(luaVM);  // keep this at the top because inheritance
     CLuaAccountDefs ::AddClass(luaVM);
     CLuaACLDefs ::AddClass(luaVM);
     CLuaBanDefs ::AddClass(luaVM);
@@ -307,7 +307,7 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
         {
             std::string strBuffer = std::string(cpBuffer, uiSize);
 #ifdef WIN32
-            std::setlocale(LC_CTYPE, "");            // Temporarilly use locales to read the script
+            std::setlocale(LC_CTYPE, "");  // Temporarilly use locales to read the script
             strUTFScript = UTF16ToMbUTF8(ANSIToUTF16(strBuffer));
             std::setlocale(LC_CTYPE, "C");
 #else
@@ -604,14 +604,14 @@ const SString& CLuaMain::GetFunctionTag(int iLuaFunction)
             strText = SString("@func_%d NULL", iLuaFunction);
         }
 
-    #ifdef CHECK_FUNCTION_TAG
+#ifdef CHECK_FUNCTION_TAG
         if (pTag)
         {
             // Check tag remains unchanged
             assert(strText == *pTag);
             return *pTag;
         }
-    #endif
+#endif
 
         MapSet(m_FunctionTagMap, iLuaFunction, strText);
         pTag = MapFind(m_FunctionTagMap, iLuaFunction);
@@ -629,7 +629,7 @@ const SString& CLuaMain::GetFunctionTag(int iLuaFunction)
 int CLuaMain::PCall(lua_State* L, int nargs, int nresults, int errfunc)
 {
     if (m_uiPCallDepth++ == 0)
-        m_WarningTimer.Reset();            // Only restart timer if initial call
+        m_WarningTimer.Reset();  // Only restart timer if initial call
 
     g_pGame->GetScriptDebugging()->PushLuaMain(this);
     int iret = lua_pcall(L, nargs, nresults, errfunc);

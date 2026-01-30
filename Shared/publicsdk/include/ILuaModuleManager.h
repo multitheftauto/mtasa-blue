@@ -17,14 +17,14 @@
 
 extern "C"
 {
-    #include <lua.h>
-    #include <lualib.h>
-    #include <lauxlib.h>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 }
 #include <string>
 
 #ifndef __CChecksum_H
-#define __CChecksum_H
+    #define __CChecksum_H
 class CChecksum
 {
 public:
@@ -41,9 +41,9 @@ public:
     virtual void DebugPrintf(lua_State* luaVM, const char* szFormat, ...) = 0;
     virtual void Printf(const char* szFormat, ...) = 0;
 
-    virtual bool RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func) = 0;
-    virtual bool GetResourceName(
-        lua_State* luaVM, std::string& strName) = 0;            // This function might not work if module and MTA were compiled with different compiler versions
+    virtual bool      RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func) = 0;
+    virtual bool      GetResourceName(lua_State*   luaVM,
+                                      std::string& strName) = 0;  // This function might not work if module and MTA were compiled with different compiler versions
     virtual CChecksum GetResourceMetaChecksum(lua_State* luaVM) = 0;
     virtual CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile) = 0;
 };

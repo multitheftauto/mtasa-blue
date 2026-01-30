@@ -14,10 +14,10 @@ class CLocalGUI;
 #pragma once
 
 #ifndef WM_MOUSEWHEEL
-#define WM_MOUSEWHEEL 0x20A // Defined only when including Windows.h -> Not getting defined? (<=XP only?)
+    #define WM_MOUSEWHEEL 0x20A  // Defined only when including Windows.h -> Not getting defined? (<=XP only?)
 #endif
 
-#define DIRECT3D_VERSION         0x0900
+#define DIRECT3D_VERSION 0x0900
 #include "d3d9.h"
 #include "d3dx9.h"
 
@@ -92,8 +92,11 @@ public:
     bool IsOptionalUpdateInfoRequired(const char* szHost) { return m_pVersionUpdater->IsOptionalUpdateInfoRequired(szHost); }
     void InitiateDataFilesFix() { m_pVersionUpdater->InitiateDataFilesFix(); }
 
+    void RequestLocaleChange(const SString& strLocale);
+
 private:
     void UpdateCursor();
+    void ApplyQueuedLocale();
 
     DWORD TranslateScanCodeToGUIKey(DWORD dwCharacter);
 
@@ -114,8 +117,10 @@ private:
     int   m_uiActiveCompositionSize;
     POINT m_StoredMousePosition;
 
-    int     m_LastSettingsRevision;            // the revision number the last time we saw the skin change
+    int     m_LastSettingsRevision;  // the revision number the last time we saw the skin change
     SString m_LastSkinName;
     SString m_LastLocaleName;
     uint    m_LocaleChangeCounter;
+    SString m_QueuedLocaleChange;
+    bool    m_bHasQueuedLocaleChange;
 };

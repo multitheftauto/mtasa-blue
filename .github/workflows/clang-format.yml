@@ -1,0 +1,15 @@
+name: clang-format
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  clang-format:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run clang-format
+        shell: pwsh
+        run: ./utils/clang-format.ps1 -Verbose

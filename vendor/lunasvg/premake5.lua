@@ -5,6 +5,7 @@ project "lunasvg"
 	targetdir(buildpath("mta"))
 	floatingpoint "Fast"
 	rtti "Off"
+	warnings "Off"
 
 	defines {
 		"PLUTOVG_BUILD",
@@ -15,11 +16,11 @@ project "lunasvg"
 	vpaths {
 		["Headers"] = "source/**.h",
 		["Headers/*"] = "include/**.h",
-		["Headers/3rdparty/*"] = "3rdparty/**.h",
+		["Headers/plutovg/*"] = "plutovg/**.h",
 		["Sources"] = "source/**.cpp",
         ["Sources/*"] = "source/**.c",
-		["Sources/3rdparty"] = "3rdparty/**.cpp",
-		["Sources/3rdparty/*"] = "3rdparty/**.c",
+		["Sources/plutovg"] = "plutovg/**.cpp",
+		["Sources/plutovg/*"] = "plutovg/**.c",
 		["*"] = "premake5.lua"
 	}
 
@@ -31,9 +32,9 @@ project "lunasvg"
 	}
 
 	includedirs {
-		"3rdparty/plutovg",
-		"source",
-		"include"
+		"plutovg/include",
+		"include",
+		"source"
 	}
 
 	filter "system:windows"
@@ -44,6 +45,6 @@ project "lunasvg"
 
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
-	
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }

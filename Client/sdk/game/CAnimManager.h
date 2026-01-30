@@ -15,7 +15,7 @@
 
 // Get correct values
 #define MAX_ANIM_GROUPS 200
-#define MAX_ANIMATIONS 500
+#define MAX_ANIMATIONS  500
 #define MAX_ANIM_BLOCKS 200
 
 typedef unsigned long AssocGroupId;
@@ -128,7 +128,7 @@ public:
     virtual void                                 DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface) = 0;
     virtual void                                 DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface) = 0;
 
-    virtual bool              isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
+    virtual bool        isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
     virtual const char* GetGateWayBlockName() const = 0;
     virtual const char* GetGateWayAnimationName() const = 0;
 

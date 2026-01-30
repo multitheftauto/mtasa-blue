@@ -30,6 +30,7 @@ CPrimitiveBatcher::CPrimitiveBatcher()
 ////////////////////////////////////////////////////////////////
 CPrimitiveBatcher::~CPrimitiveBatcher()
 {
+    ClearQueue();
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -195,6 +196,7 @@ void CPrimitiveBatcher::ClearQueue()
     for (auto& primitive : m_primitiveList)
     {
         delete primitive.pVecVertices;
+        primitive.pVecVertices = nullptr;
     }
     size_t prevSize = m_primitiveList.size();
     m_primitiveList.clear();

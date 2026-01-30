@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 #include <string>
+#include <sstream>
+#include <map>
 #include <cef3/cef/include/cef_app.h>
 typedef void (*JavascriptCallback)(CefRefPtr<CefFrame> frame, const CefV8ValueList& arguments);
 
@@ -92,4 +94,4 @@ namespace V8Helpers
         CefRefPtr<CefV8Value> func = CefV8Value::CreateFunction(name, handler);
         object->SetValue(name, func, V8_PROPERTY_ATTRIBUTE_NONE);
     }
-}            // namespace V8Helpers
+}  // namespace V8Helpers

@@ -10,12 +10,12 @@
 #include "StdInc.h"
 #include "CEasingCurve.h"
 #include "lua/CLuaFunctionParseHelpers.h"
-#include "EasingEquations.hpp" //Included from cpp to separate just visually maths equations from framework
+#include "EasingEquations.hpp"  //Included from cpp to separate just visually maths equations from framework
 
 // For easing functions that require more parameters than time (like amplitude, period, overshot)
 class CComplexEasingFunction
 {
-public:            // All public since it's only an internal class
+public:  // All public since it's only an internal class
     enum eType
     {
         In = 0,
@@ -113,7 +113,7 @@ public:
 
 class CEasingCurve_Impl
 {
-public:            // All public since it's only an internal class
+public:  // All public since it's only an internal class
     explicit CEasingCurve_Impl(CEasingCurve::eType a_eType);
     ~CEasingCurve_Impl();
 
@@ -124,7 +124,7 @@ public:            // All public since it's only an internal class
     CEasingCurve::eType                m_eType;
     CEasingCurve::SimpleEasingFunction m_pSimpleFunction;
     CComplexEasingFunction*            m_pComplexFunction;
-    bool                               m_bFinishesAtOne;            // f(1) = 1?
+    bool                               m_bFinishesAtOne;  // f(1) = 1?
 };
 
 CEasingCurve_Impl::CEasingCurve_Impl(CEasingCurve::eType a_eType) : m_eType(CEasingCurve::EASING_INVALID), m_pSimpleFunction(NULL), m_pComplexFunction(NULL)

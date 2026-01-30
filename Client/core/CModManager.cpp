@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <SharedUtil.Misc.h>
 #include "CModManager.h"
 #define DECLARE_PROFILER_SECTION_CModManager
 #include "profiler/SharedUtil.Profiler.h"
@@ -56,7 +57,7 @@ bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLeng
 void CModManager::DoPulsePreFrame()
 {
     TIMING_GRAPH("+DoPulsePreFrame");
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameStart();            // Prepare FPS limiting for this frame
+    CCore::GetSingleton().GetFPSLimiter()->OnFrameStart();  // Prepare FPS limiting for this frame
 
     if (m_client)
     {
@@ -87,7 +88,7 @@ void CModManager::DoPulsePostFrame()
 
     TIMING_GRAPH("+DoPulsePostFrame");
 
-    handleStateChange();            // Handle state changes before pulse
+    handleStateChange();  // Handle state changes before pulse
 
     if (m_client)
     {
@@ -98,12 +99,12 @@ void CModManager::DoPulsePostFrame()
         CCore::GetSingleton().GetNetwork()->DoPulse();
     }
 
-    CCore::GetSingleton().DoReliablePulse();            // Do reliable pulse
+    CCore::GetSingleton().DoReliablePulse();  // Do reliable pulse
 
-    handleStateChange();            // Handle state changes after pulse
+    handleStateChange();  // Handle state changes after pulse
 
     // TODO: ENSURE "CModManager::DoPulsePostFrame" IS THE LAST THING BEFORE THE FRAME ENDS
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();            // Apply FPS limiting
+    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();  // Apply FPS limiting
 
     TIMING_GRAPH("-DoPulsePostFrame");
     TIMING_GRAPH("");
@@ -186,17 +187,16 @@ bool CModManager::TryStart()
         return false;
     }
 
-    CClientBase* (__cdecl * InitClient)() = nullptr;
-    InitClient = reinterpret_cast<decltype(InitClient)>(static_cast<void*>(GetProcAddress(library, "InitClient")));
-
-    if (InitClient == nullptr)
+    using InitClientFn = CClientBase*(__cdecl*)();
+    InitClientFn initClient = nullptr;
+    if (!SharedUtil::TryGetProcAddress(library, "InitClient", initClient))
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to initialize deathmatch's DLL (missing init)");
         FreeLibrary(library);
         return false;
     }
 
-    CClientBase* client = InitClient();
+    CClientBase* client = initClient();
 
     if (client == nullptr || client->ClientInitialize(m_arguments.c_str(), CCore::GetSingletonPtr()) != 0)
     {

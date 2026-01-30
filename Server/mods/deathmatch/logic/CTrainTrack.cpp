@@ -19,8 +19,8 @@ CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackN
     m_iType = CElement::TRAIN_TRACK;
     SetTypeName("train-track");
 
-    m_LinkLastNodes = linkLastNodes;
     m_Nodes = nodes;
+    m_LinkLastNodes = linkLastNodes;
     m_DefaultTrackId = defaultTrackId;
 }
 

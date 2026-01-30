@@ -2,6 +2,7 @@ project "glob"
 	language "C++"
 	kind "StaticLib"
 	targetname "glob"
+	warnings "Off"
 
 	vpaths {
 		["Headers/*"] = "include/**.h",

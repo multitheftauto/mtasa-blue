@@ -45,7 +45,7 @@ public:
 
     eCGUIType GetType() { return CGUI_MEMO; };
 
-    #include "CGUIElement_Inc.h"
+#include "CGUIElement_Inc.h"
 
 private:
     bool Event_TextChanged(const CEGUI::EventArgs& e);

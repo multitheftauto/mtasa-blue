@@ -8,23 +8,52 @@
  *
  *****************************************************************************/
 
+#include "StdInc.h"
 #include "Dialogs.h"
 #include "resource.h"
 #include "Utils.h"
 #include "CInstallManager.h"
 #include "Main.h"
 #include <sstream>
+#include <optional>
+#include <string_view>
+#include <atomic>
+#include <array>
 
-static bool          bCancelPressed = false;
-static bool          bOkPressed = false;
-static bool          bOtherPressed = false;
-static int           iOtherCode = 0;
-static HWND          hwndProgressDialog = NULL;
-static unsigned long ulProgressStartTime = 0;
-static HWND          hwndCrashedDialog = NULL;
-static HWND          hwndGraphicsDllDialog = NULL;
-static HWND          hwndOptimusDialog = NULL;
-static HWND          hwndNoAvDialog = NULL;
+// Define STN_CLICKED if not already defined
+#ifndef STN_CLICKED
+    #define STN_CLICKED 0
+#endif
+
+// Define IDC_SEND_DUMP_LABEL if not in resource.h yet
+#ifndef IDC_SEND_DUMP_LABEL
+    #define IDC_SEND_DUMP_LABEL 1040
+#endif
+
+static std::atomic<bool> bCancelPressed{false};
+static std::atomic<bool> bOkPressed{false};
+static std::atomic<bool> bOtherPressed{false};
+static int               iOtherCode = 0;
+static HWND              hwndProgressDialog = nullptr;
+static unsigned long     ulProgressStartTime = 0;
+static HWND              hwndCrashedDialog = nullptr;
+static HWND              hwndGraphicsDllDialog = nullptr;
+static HWND              hwndOptimusDialog = nullptr;
+static HWND              hwndNoAvDialog = nullptr;
+
+// Constants for crash dialog timeout
+namespace
+{
+    inline constexpr DWORD MAX_WAIT_TIME = 30000;
+    static_assert(MAX_WAIT_TIME > 0 && MAX_WAIT_TIME <= 60000, "Timeout must be between 0 and 60 seconds");
+
+    inline constexpr std::string_view  ERROR_MSG_PREFIX = "ShowCrashedDialog: CreateDialogW failed with error ";
+    inline constexpr std::string_view  CRASH_MSG_DIALOG_FAIL = "MTA has crashed. (Failed to create crash dialog)";
+    inline constexpr std::string_view  CRASH_TITLE_FATAL = "MTA: San Andreas - Fatal Error";
+    inline constexpr std::wstring_view DEFAULT_ERROR_MSG = L"An error occurred. No details available.";
+    inline constexpr size_t            MAX_CRASH_MESSAGE_LENGTH = 65536;
+    static_assert(ERROR_MSG_PREFIX.size() <= INT_MAX, "ERROR_MSG_PREFIX too long for int cast");
+}
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -161,13 +190,67 @@ int CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
+        case WM_CLOSE:
+            // Prevent dialog from closing via WM_CLOSE (Alt+F4, X button, parent termination, etc.)
+            // User must explicitly click a button. This prevents premature closure of crash dialog.
+            if (hwnd == hwndCrashedDialog)
+            {
+                // Block WM_CLOSE for crash dialog - require explicit user button press
+                return TRUE;
+            }
+            // Allow other dialogs to close normally
+            break;
+
+        case WM_SYSCOMMAND:
+            // Block system menu commands that could hide or close the crash dialog
+            if (hwnd == hwndCrashedDialog)
+            {
+                if (wParam == SC_CLOSE || wParam == SC_MINIMIZE || wParam == SC_MAXIMIZE)
+                    return TRUE;
+            }
+            break;
+
         case WM_COMMAND:
+            // Validate message source
+            if (lParam != 0 && !IsWindow(reinterpret_cast<HWND>(lParam)))
+                break;
+
             switch (LOWORD(wParam))
             {
                 case IDCANCEL:
+                    // For crash dialog, save checkbox state before exiting
+                    if (hwnd == hwndCrashedDialog)
+                    {
+                        if (HWND hwndCheck = GetDlgItem(hwnd, IDC_SEND_DUMP_CHECK))
+                        {
+                            LRESULT res = SendMessageA(hwndCheck, BM_GETCHECK, 0, 0);
+                            try
+                            {
+                                SetApplicationSetting("diagnostics", "send-dumps", (res == BST_CHECKED) ? "yes" : "no");
+                            }
+                            catch (...)
+                            {
+                            }
+                        }
+                    }
                     bCancelPressed = true;
                     return TRUE;
                 case IDOK:
+                    // For crash dialog, save checkbox state before exiting
+                    if (hwnd == hwndCrashedDialog)
+                    {
+                        if (HWND hwndCheck = GetDlgItem(hwnd, IDC_SEND_DUMP_CHECK))
+                        {
+                            LRESULT res = SendMessageA(hwndCheck, BM_GETCHECK, 0, 0);
+                            try
+                            {
+                                SetApplicationSetting("diagnostics", "send-dumps", (res == BST_CHECKED) ? "yes" : "no");
+                            }
+                            catch (...)
+                            {
+                            }
+                        }
+                    }
                     bOkPressed = true;
                     return TRUE;
                 default:
@@ -195,7 +278,7 @@ void ShowProgressDialog(HINSTANCE hInstance, const SString& strTitle, bool bAllo
         HideSplash();
         bCancelPressed = false;
         hwndProgressDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_PROGRESS_DIALOG), 0, DialogProc);
-        dassert((GetWindowLong(hwndProgressDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        dassert((GetWindowLong(hwndProgressDialog, GWL_STYLE) & WS_VISIBLE) == 0);  // Should be Visible: False
         InitDialogStrings(hwndProgressDialog, g_ProgressDialogItems);
         SetWindowTextW(hwndProgressDialog, FromUTF8(strTitle));
         ShowWindow(GetDlgItem(hwndProgressDialog, IDCANCEL), bAllowCancel ? SW_SHOW : SW_HIDE);
@@ -275,65 +358,370 @@ void StopPseudoProgress()
     }
 }
 
-///////////////////////////////////////////////////////////////
-//
-// Crashed dialog
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage)
+// This function isn't overengineered, it needs to be extremely secure to avoid maliciously triggered crashes from escaping and doing bad things.
+[[nodiscard]] SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage)
 {
-    if (!hwndCrashedDialog)
-    {
-        SuspendSplash();
-        bCancelPressed = false;
-        bOkPressed = false;
-        bOtherPressed = false;
-        iOtherCode = 0;
-        hwndCrashedDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_CRASHED_DIALOG), 0, DialogProc);
-        dassert((GetWindowLong(hwndCrashedDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
-        InitDialogStrings(hwndCrashedDialog, g_CrashedDialogItems);
-        SetWindowTextW(GetDlgItem(hwndCrashedDialog, IDC_CRASH_INFO_EDIT), FromUTF8(strMessage));
-        SendDlgItemMessage(hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK,
-                           GetApplicationSetting("diagnostics", "send-dumps") != "no" ? BST_CHECKED : BST_UNCHECKED, 0);
-    }
-    SetForegroundWindow(hwndCrashedDialog);
-    SetWindowPos(hwndCrashedDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+    using namespace std::string_view_literals;
 
-    while (!bCancelPressed && !bOkPressed)
+    if (auto validHandle = std::optional{hInstance ? hInstance : GetModuleHandle(nullptr)}; !validHandle || !*validHandle) [[unlikely]]
     {
-        MSG msg;
-        while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+        try
         {
-            if (GetMessage(&msg, NULL, 0, 0))
+            MessageBoxA(nullptr, "MTA has crashed."sv.data(), "MTA: San Andreas"sv.data(), MB_OK | MB_ICONERROR | MB_TOPMOST);
+        }
+        catch (...)
+        {
+        }
+        return "quit";
+    }
+    else
+    {
+        hInstance = *validHandle;
+    }
+
+    const auto strSanitizedMessage = [&message = std::as_const(strMessage)]() noexcept -> SString
+    {
+        try
+        {
+            if constexpr (MAX_CRASH_MESSAGE_LENGTH > 0)
             {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
+                const auto messageLength = std::clamp(std::size(message), size_t{0}, MAX_CRASH_MESSAGE_LENGTH);
+                if (std::size(message) > MAX_CRASH_MESSAGE_LENGTH)
+                    return message.substr(0, messageLength);
+                else
+                    return message;
+            }
+            else
+            {
+                return message;
             }
         }
-        Sleep(10);
+        catch (...)
+        {
+            return SString{};
+        }
+    }();
+
+    struct ReentranceGuard final
+    {
+        std::atomic<bool>& flag;
+        bool               isValid{true};
+
+        explicit ReentranceGuard(std::atomic<bool>& f) noexcept : flag(f), isValid(!flag.exchange(true, std::memory_order_acquire)) {}
+
+        ~ReentranceGuard() noexcept
+        {
+            if (isValid) [[likely]]
+                flag.store(false, std::memory_order_release);
+        }
+
+        [[nodiscard]] explicit operator bool() const noexcept { return isValid; }
+
+        ReentranceGuard(const ReentranceGuard&) = delete;
+        ReentranceGuard& operator=(const ReentranceGuard&) = delete;
+        ReentranceGuard(ReentranceGuard&&) = delete;
+        ReentranceGuard& operator=(ReentranceGuard&&) = delete;
+    };
+
+    static std::atomic<bool> bInShowCrashedDialog{false};
+
+    try
+    {
+        ReentranceGuard guard{bInShowCrashedDialog};
+
+        if (!guard) [[unlikely]]
+        {
+            try
+            {
+                MessageBoxA(nullptr, "MTA has crashed."sv.data(), "MTA: San Andreas"sv.data(), MB_OK | MB_ICONERROR | MB_TOPMOST | MB_SETFOREGROUND);
+            }
+            catch (...)
+            {
+            }
+            return "quit";
+        }
+
+        if ([[maybe_unused]] const auto displayResult = ChangeDisplaySettings(nullptr, 0); true)
+        {
+            constexpr auto displaySettingsDelay = 300;
+            Sleep(displaySettingsDelay);
+        }
+
+        if (!hwndCrashedDialog)
+        {
+            try
+            {
+                SuspendSplash();
+            }
+            catch (...)
+            {
+            }
+
+            // Reset button states
+            bCancelPressed.store(false, std::memory_order_release);
+            bOkPressed.store(false, std::memory_order_release);
+
+            hwndCrashedDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_CRASHED_DIALOG), nullptr, DialogProc);
+
+            if (!hwndCrashedDialog) [[unlikely]]
+            {
+                [[nodiscard]] const auto logError = [lastError = static_cast<DWORD>(GetLastError())]() noexcept
+                {
+                    try
+                    {
+                        constexpr auto errorCode = 9001;
+                        AddReportLog(errorCode, SString("ShowCrashedDialog: CreateDialogW failed with error %u", lastError));
+                    }
+                    catch (...)
+                    {
+                    }
+                };
+
+                [[nodiscard]] constexpr auto setDumpSetting = []() noexcept -> void
+                {
+                    try
+                    {
+                        SetApplicationSetting("diagnostics"sv.data(), "send-dumps"sv.data(), "yes"sv.data());
+                    }
+                    catch (...)
+                    {
+                    }
+                };
+
+                [[nodiscard]] constexpr auto cleanup = []() noexcept -> void
+                {
+                    try
+                    {
+                        ResumeSplash();
+                    }
+                    catch (...)
+                    {
+                    }
+                    try
+                    {
+                        MessageBoxA(nullptr, CRASH_MSG_DIALOG_FAIL.data(), CRASH_TITLE_FATAL.data(), MB_OK | MB_ICONERROR | MB_TOPMOST);
+                    }
+                    catch (...)
+                    {
+                    }
+                };
+
+                std::invoke(logError);
+                std::invoke(setDumpSetting);
+                std::invoke(cleanup);
+                return "quit";
+            }
+            try
+            {
+                InitDialogStrings(hwndCrashedDialog, g_CrashedDialogItems);
+            }
+            catch (...)
+            {
+            }
+            if (auto hwndCrashInfo = GetDlgItem(hwndCrashedDialog, IDC_CRASH_INFO_EDIT); hwndCrashInfo)
+            {
+                try
+                {
+                    if (const bool isEmpty = std::empty(strSanitizedMessage); isEmpty) [[unlikely]]
+                    {
+                        SetWindowTextW(hwndCrashInfo, DEFAULT_ERROR_MSG.data());
+                    }
+                    else
+                    {
+                        if (const auto wszMessage = FromUTF8(strSanitizedMessage); wszMessage && (wszMessage[0] != L'\0')) [[likely]]
+                        {
+                            SetWindowTextW(hwndCrashInfo, wszMessage);
+                        }
+                        else [[unlikely]]
+                        {
+                            SetWindowTextW(hwndCrashInfo, DEFAULT_ERROR_MSG.data());
+                        }
+                    }
+                }
+                catch (...)
+                {
+                }
+            }
+            if (const auto hwndCheckbox = GetDlgItem(hwndCrashedDialog, IDC_SEND_DUMP_CHECK); hwndCheckbox)
+            {
+                try
+                {
+                    const auto settingValue = std::invoke(
+                        []() noexcept -> SString
+                        {
+                            try
+                            {
+                                return GetApplicationSetting("diagnostics"sv.data(), "send-dumps"sv.data());
+                            }
+                            catch (...)
+                            {
+                                return "yes";
+                            }
+                        });
+
+                    const std::array<UINT, 2> checkStates = {BST_UNCHECKED, BST_CHECKED};
+                    const auto                shouldCheck = !std::empty(settingValue) && settingValue != "no"sv.data();
+                    SendDlgItemMessage(hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, checkStates[shouldCheck], 0);
+                }
+                catch (...)
+                {
+                }
+            }
+        }
+        if (!hwndCrashedDialog) [[unlikely]]
+        {
+            try
+            {
+                SetApplicationSetting("diagnostics"sv.data(), "send-dumps"sv.data(), "yes"sv.data());
+            }
+            catch (...)
+            {
+            }
+            return "quit";
+        }
+        try
+        {
+            SetForegroundWindow(hwndCrashedDialog);
+            SetWindowPos(hwndCrashedDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        }
+        catch (...)
+        {
+        }
+
+        const auto dwStartTime = static_cast<DWORD>(GetTickCount32());
+
+        [[nodiscard]] constexpr auto handleTimeout = []() noexcept -> void
+        {
+            try
+            {
+                SetApplicationSetting("diagnostics"sv.data(), "send-dumps"sv.data(), "yes"sv.data());
+            }
+            catch (...)
+            {
+            }
+        };
+
+        [[nodiscard]] constexpr auto calculateElapsed = [](const DWORD current, const DWORD start) noexcept -> DWORD
+        {
+            if constexpr (sizeof(DWORD) == 4)
+            {
+                return (current >= start) ? (current - start) : (std::numeric_limits<DWORD>::max() - start + current + 1);
+            }
+            else
+            {
+                return current - start;
+            }
+        };
+
+        for (;;)
+        {
+            const auto [cancelPressed, okPressed] = std::pair{bCancelPressed.load(std::memory_order_acquire), bOkPressed.load(std::memory_order_acquire)};
+            if (cancelPressed || okPressed)
+                break;
+
+            if (const auto dwCurrentTime = static_cast<DWORD>(GetTickCount32()); calculateElapsed(dwCurrentTime, dwStartTime) > MAX_WAIT_TIME) [[unlikely]]
+            {
+                std::invoke(handleTimeout);
+                (void)bCancelPressed.exchange(true, std::memory_order_release);
+                break;
+            }
+            constexpr auto maxMessagesPerIteration = 100;
+            auto           msg = MSG{};
+            auto           messageCount = decltype(maxMessagesPerIteration){0};
+
+            while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+            {
+                if (std::exchange(messageCount, messageCount + 1) >= maxMessagesPerIteration) [[unlikely]]
+                    break;
+
+                // Block WM_QUIT and other termination messages during crash dialog.
+                // The crash dialog MUST only close via explicit user button press (IDOK/IDCANCEL).
+                // External quit requests (from CallFunction:Quit, PostQuitMessage, etc.) are suppressed
+                // to prevent premature dialog closure before user can make a choice.
+                if (msg.message == WM_QUIT || msg.message == WM_CLOSE || msg.message == WM_DESTROY) [[unlikely]]
+                {
+                    // Silently discard termination messages - do NOT set bCancelPressed
+                    // This prevents external quit requests from closing the crash dialog
+                    continue;
+                }
+
+                if (msg.hwnd && !IsWindow(msg.hwnd)) [[unlikely]]
+                    continue;
+
+                try
+                {
+                    TranslateMessage(&msg);
+                    DispatchMessage(&msg);
+                }
+                catch (...)
+                {
+                }
+            }
+            if (!hwndCrashedDialog || !IsWindow(hwndCrashedDialog)) [[unlikely]]
+            {
+                (void)bCancelPressed.exchange(true, std::memory_order_release);
+                break;
+            }
+
+            {
+                constexpr auto sleepDuration = 10;
+                try
+                {
+                    Sleep(sleepDuration);
+                }
+                catch (...)
+                {
+                    (void)bCancelPressed.exchange(true, std::memory_order_release);
+                    break;
+                }
+            }
+        }
+
+        const auto okWasPressed = bOkPressed.load(std::memory_order_acquire);
+        return okWasPressed ? "ok" : "quit";
     }
-
-    LRESULT res = SendMessageA(GetDlgItem(hwndCrashedDialog, IDC_SEND_DUMP_CHECK), BM_GETCHECK, 0, 0);
-    SetApplicationSetting("diagnostics", "send-dumps", res ? "yes" : "no");
-
-    if (bCancelPressed)
+    catch (...)
+    {
+        try
+        {
+            SetApplicationSetting("diagnostics"sv.data(), "send-dumps"sv.data(), "yes"sv.data());
+        }
+        catch (...)
+        {
+        }
         return "quit";
-
-    ResumeSplash();
-
-    // if ( bOkPressed )
-    return "ok";
+    }
 }
 
 void HideCrashedDialog()
 {
     if (hwndCrashedDialog)
     {
-        DestroyWindow(hwndCrashedDialog);
-        hwndCrashedDialog = NULL;
+        const HWND crashedDialog = hwndCrashedDialog;
+        hwndCrashedDialog = nullptr;
+
+        if (crashedDialog && IsWindow(crashedDialog))
+            DestroyWindow(crashedDialog);
     }
+
+    ResumeSplash();
+}
+
+void ShowOOMMessageBox([[maybe_unused]] HINSTANCE hInstance)
+{
+    static constexpr const char* fallbackMessage = "The crash you experienced is due to memory abuse by servers. Contact server owner or MTA support.";
+    static constexpr const char* fallbackTitle = "MTA: San Andreas - Out of Memory Crash";
+
+    const char* message =
+        _("The crash you experienced is due to memory abuse by servers.\n\n"
+          "Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB "
+          "and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) "
+          "can make this happen, as well as lag your game.\n\n"
+          "Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information.");
+
+    const char* title = _("MTA: San Andreas - Out of Memory Information");
+
+    MessageBoxA(NULL, message ? message : fallbackMessage, title ? title : fallbackTitle, MB_OK | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -367,7 +755,7 @@ void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrar
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_SHOW_DIR;
         hwndGraphicsDllDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_D3DDLL_DIALOG), 0, DialogProc);
-        dassert((GetWindowLong(hwndGraphicsDllDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        dassert((GetWindowLong(hwndGraphicsDllDialog, GWL_STYLE) & WS_VISIBLE) == 0);  // Should be Visible: False
         InitDialogStrings(hwndGraphicsDllDialog, g_GraphicsDllDialogItems);
         SetWindowTextW(GetDlgItem(hwndGraphicsDllDialog, IDC_EDIT_GRAPHICS_DLL_PATH), libraryPaths.str().c_str());
         SendMessage(GetDlgItem(hwndGraphicsDllDialog, IDC_NO_ACTION), BM_SETCHECK, BST_CHECKED, 1);
@@ -504,7 +892,7 @@ void ShowOptimusDialog(HINSTANCE hInstance)
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_HELP;
         hwndOptimusDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_OPTIMUS_DIALOG), 0, DialogProc);
-        dassert((GetWindowLong(hwndOptimusDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        dassert((GetWindowLong(hwndOptimusDialog, GWL_STYLE) & WS_VISIBLE) == 0);  // Should be Visible: False
         InitDialogStrings(hwndOptimusDialog, g_OptimusDialogItems);
         uint uiStartupOption = GetApplicationSettingInt("nvhacks", "optimus-startup-option") % NUMELMS(RadioButtons);
         uint uiForceWindowed = GetApplicationSettingInt("nvhacks", "optimus-force-windowed");
@@ -593,13 +981,13 @@ void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
     // Time to ask again?
     uint uiAskHoursInterval;
     if (!bUserSaysNo)
-        uiAskHoursInterval = 1;            // Once an hour if box not ticked
+        uiAskHoursInterval = 1;  // Once an hour if box not ticked
     else
     {
         if (bEnableScaremongering)
-            uiAskHoursInterval = 24 * 7;            // Once a week if ticked
+            uiAskHoursInterval = 24 * 7;  // Once a week if ticked
         else
-            uiAskHoursInterval = 24 * 365 * 1000;            // Once every 1000 years if ticked and WSC not monitoring
+            uiAskHoursInterval = 24 * 365 * 1000;  // Once every 1000 years if ticked and WSC not monitoring
     }
 
     uint uiTimeNow = static_cast<uint>(time(NULL) / 3600LL);
@@ -616,7 +1004,7 @@ void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_HELP;
         hwndNoAvDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_NOAV_DIALOG), 0, DialogProc);
-        dassert((GetWindowLongW(hwndNoAvDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        dassert((GetWindowLongW(hwndNoAvDialog, GWL_STYLE) & WS_VISIBLE) == 0);  // Should be Visible: False
         InitDialogStrings(hwndNoAvDialog, g_NoAvDialogItems);
         const int textSourceItemId = bEnableScaremongering ? IDC_NOAV_OPT_BOTNET : IDC_NOAV_OPT_SKIP;
         {
@@ -625,7 +1013,7 @@ void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
             SetWindowTextW(GetDlgItem(hwndNoAvDialog, IDC_CHECK_NOT_AGAIN), text);
         }
     }
-    ShowWindow(hwndNoAvDialog, SW_SHOW);            // Show after all changes are complete
+    ShowWindow(hwndNoAvDialog, SW_SHOW);  // Show after all changes are complete
     SetForegroundWindow(hwndNoAvDialog);
     SetWindowPos(hwndNoAvDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
@@ -677,8 +1065,8 @@ void HideNoAvDialog()
 ///////////////////////////////////////////////////////////////
 void TestDialogs()
 {
-#if 0
-#if 1
+    #if 0
+        #if 1
     ShowProgressDialog( g_hInstance, _("Searching for Grand Theft Auto San Andreas"), true );
     for ( uint i = 0 ; i < 100 ; i++ )
     {
@@ -722,40 +1110,40 @@ void TestDialogs()
         Sleep( 10 );
     }
     HideProgressDialog();
-#endif
+        #endif
 
-#if 1
+        #if 1
     ShowCrashedDialog( g_hInstance, "test2" );
     HideCrashedDialog();
-#endif
+        #endif
 
-#if 1
+        #if 1
     SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", "123");
     std::vector<GraphicsLibrary> offenders{GraphicsLibrary{"dummy"}};
     ShowGraphicsDllDialog(g_hInstance, offenders);
     HideGraphicsDllDialog();
-#endif
+        #endif
 
-#if 1
+        #if 1
     ShowOptimusDialog( g_hInstance );
     HideOptimusDialog();
-#endif
+        #endif
 
-#if 1
+        #if 1
     // Friendly option
     SetApplicationSettingInt( "noav-last-asked-time", 1 );
     SetApplicationSettingInt( "noav-user-says-skip", 0 );
     ShowNoAvDialog( g_hInstance, true );
     HideNoAvDialog();
-#endif
+        #endif
 
-#if 1
+        #if 1
     // Scaremongering option option
     SetApplicationSettingInt( "noav-last-asked-time", 1 );
     SetApplicationSettingInt( "noav-user-says-skip", 0 );
     ShowNoAvDialog( g_hInstance, false );
     HideNoAvDialog();
-#endif
-#endif
+        #endif
+    #endif
 }
 #endif

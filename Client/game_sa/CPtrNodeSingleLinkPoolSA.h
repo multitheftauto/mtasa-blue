@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #pragma once
- 
+
 #include "CPoolSAInterface.h"
 #include "CDynamicPool.h"
 #include "CPtrNodeSingleListSA.h"
@@ -30,8 +30,9 @@ public:
     bool Resize(std::size_t newSize) override { return m_customPool->SetCapacity(newSize); };
     void ResetCapacity() override { m_customPool->SetCapacity(MAX_POINTER_SINGLE_LINKS); };
 
-    static auto* GetPoolInstance() { return m_customPool; } 
-    static void StaticSetHooks();
+    static auto* GetPoolInstance() { return m_customPool; }
+    static void  StaticSetHooks();
+
 private:
     static pool_t* m_customPool;
 };

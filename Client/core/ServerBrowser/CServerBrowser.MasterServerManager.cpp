@@ -24,6 +24,7 @@ public:
     virtual void Refresh();
     virtual bool HasData();
     virtual bool ParseList(CServerListItemList& itemList);
+    virtual void CancelRefresh();
 
     // CMasterServerManager
 protected:
@@ -65,6 +66,7 @@ CMasterServerManager::CMasterServerManager()
 ///////////////////////////////////////////////////////////////
 CMasterServerManager::~CMasterServerManager()
 {
+    CancelRefresh();
     for (uint i = 0; i < m_MasterServerList.size(); i++)
         SAFE_RELEASE(m_MasterServerList[i]);
 
@@ -151,4 +153,16 @@ bool CMasterServerManager::ParseList(CServerListItemList& itemList)
                 uiParsedCount++;
 
     return uiParsedCount > 0;
+}
+
+void CMasterServerManager::CancelRefresh()
+{
+    for (uint i = 0; i < m_MasterServerList.size(); ++i)
+    {
+        if (m_MasterServerList[i])
+            m_MasterServerList[i]->Cancel();
+    }
+
+    m_iActiveAmount = 0;
+    m_ElapsedTime.Reset();
 }

@@ -1,6 +1,7 @@
 project "pcre"
 	language "C++"
 	targetname "pcre3"
+	warnings "Off"
 
 	defines { "HAVE_CONFIG_H" }
 	includedirs { "." }

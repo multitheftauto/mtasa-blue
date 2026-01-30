@@ -2,7 +2,7 @@
 	filename: 	CEGUIString.cpp
 	created:	26/2/2004
 	author:		Paul D Turner
-	
+
 	purpose:	Implements string class
 *************************************************************************/
 /*************************************************************************
@@ -68,12 +68,12 @@ bool String::grow(size_type new_size)
 
         if (d_reserve > STR_QUICKBUFF_SIZE)
         {
-            memcpy(temp, d_buffer, (d_cplength + 1) * sizeof(utf32));
+            temp = static_cast<utf32*>(memcpy(temp, d_buffer, (d_cplength + 1) * sizeof(utf32)));
             delete[] d_buffer;
         }
         else
         {
-            memcpy(temp, d_quickbuff, (d_cplength + 1) * sizeof(utf32));
+            temp = static_cast<utf32*>(memcpy(temp, d_quickbuff, (d_cplength + 1) * sizeof(utf32)));
         }
 
         d_buffer = temp;
@@ -96,15 +96,16 @@ void String::trim(void)
             // see if we can trim to quick-buffer
         if (min_size <= STR_QUICKBUFF_SIZE)
         {
-            memcpy(d_quickbuff, d_buffer, min_size * sizeof(utf32));
-            delete[] d_buffer;
+            utf32* const pOldBuffer = d_buffer;
+            d_buffer = static_cast<utf32*>(memcpy(d_quickbuff, pOldBuffer, min_size * sizeof(utf32)));
+            delete[] pOldBuffer;
             d_reserve = STR_QUICKBUFF_SIZE;
         }
         // re-allocate buffer
         else
         {
             utf32* temp = new utf32[min_size];
-            memcpy(temp, d_buffer, min_size * sizeof(utf32));
+            temp = static_cast<utf32*>(memcpy(temp, d_buffer, min_size * sizeof(utf32)));
             delete[] d_buffer;
             d_buffer = temp;
             d_reserve = min_size;

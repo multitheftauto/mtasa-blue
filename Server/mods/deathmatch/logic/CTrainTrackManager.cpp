@@ -15,7 +15,11 @@
 
 CTrainTrackManager::CTrainTrackManager()
 {
-    Reset();
+    // Create default tracks
+    for (uchar i = 0; i < 4; ++i)
+    {
+        m_DefaultTracks[i] = CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, i);
+    }
 }
 
 CTrainTrack* CTrainTrackManager::CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId)
@@ -33,25 +37,16 @@ CTrainTrack* CTrainTrackManager::CreateTrainTrack(const std::vector<STrackNode>&
 void CTrainTrackManager::DestroyTrainTrack(CTrainTrack* pTrainTrack)
 {
     m_Tracks.erase(std::remove(m_Tracks.begin(), m_Tracks.end(), pTrainTrack));
-}
-
-CTrainTrack* CTrainTrackManager::GetTrainTrackByIndex(unsigned int index)
-{
-    if (index >= m_Tracks.size())
-        return nullptr;
-
-    return m_Tracks[index];
-}
-
-void CTrainTrackManager::Reset()
-{
-    // Clear tracks
-    m_Tracks.clear();
-
-    // Create default tracks
-    for (uchar i = 0; i < 4; ++i)
+    if (pTrainTrack->IsDefault())
     {
-        // Create train tracks
-        CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, i);
+        uchar defaultId = pTrainTrack->GetDefaultTrackId();
+        m_DefaultTracks[defaultId] = nullptr;
     }
+}
+
+CTrainTrack* CTrainTrackManager::GetDefaultTrackByIndex(uchar index)
+{
+    if (index >= MaxDefaultTracks)
+        return nullptr;
+    return m_DefaultTracks[index];
 }

@@ -12,15 +12,15 @@
 #include "StdInc.h"
 #include "../core/CFilePathTranslator.h"
 
-#define MESSAGEBOX_WIDTH        400.0f
-#define MESSAGEBOX_HEIGHT       150.0f
-#define MESSAGEBOX_SPACER       20
-#define MESSAGEBOX_ICON_SIZE    42
+#define MESSAGEBOX_WIDTH     400.0f
+#define MESSAGEBOX_HEIGHT    150.0f
+#define MESSAGEBOX_SPACER    20
+#define MESSAGEBOX_ICON_SIZE 42
 
 CGUIMessageBox_Impl::CGUIMessageBox_Impl(CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, unsigned int uiFlags)
 {
     // Initialize
-    m_bAutoDestroy = true;            // TODO: If any buttons..
+    m_bAutoDestroy = true;  // TODO: If any buttons..
     m_pIcon = NULL;
     m_pButton = NULL;
     m_pLabelCaption = NULL;
@@ -32,7 +32,7 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl(CGUI_Impl* pGUI, const char* szTitle, c
     m_pWindow->SetCloseButtonEnabled(false);
     m_pWindow->SetSizingEnabled(false);
     m_pWindow->SetPosition(CVector2D(ScreenSize.fX * 0.5f - MESSAGEBOX_WIDTH * 0.5f, ScreenSize.fY * 0.5f - MESSAGEBOX_HEIGHT * 0.5f));
-    m_pWindow->SetSize(CVector2D(MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT));            // relative 0.35, 0.225
+    m_pWindow->SetSize(CVector2D(MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT));  // relative 0.35, 0.225
 
     // Create the icon
     m_pIcon = pGUI->CreateStaticImage(m_pWindow);

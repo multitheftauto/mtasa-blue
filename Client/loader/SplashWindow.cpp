@@ -24,7 +24,7 @@ using hrc = std::chrono::high_resolution_clock;
 ///////////////////////////////////////////////////////////////////////////
 //
 // Splash window logic.
-// 
+//
 ///////////////////////////////////////////////////////////////////////////
 
 class Splash final
@@ -111,7 +111,7 @@ bool Splash::CreateSplashWindow(HINSTANCE instance)
     windowClass.style = 0;
     windowClass.hInstance = instance;
     windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    windowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110));            // IDI_ICON1 from Launcher
+    windowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110));  // IDI_ICON1 from Launcher
     windowClass.lpszClassName = TEXT("SplashWindow");
 
     if (!RegisterClass(&windowClass))
@@ -144,7 +144,7 @@ bool Splash::CreateSplashWindow(HINSTANCE instance)
     m_barX = {};
     m_barY = ScaleToDpi(197, dpi);
     m_barWidth = m_width;
-    m_barHeight = ScaleToDpi(5, dpi) + 1;            // We add 1 pixel because scaling can cause the bar to be too small.
+    m_barHeight = ScaleToDpi(5, dpi) + 1;  // We add 1 pixel because scaling can cause the bar to be too small.
 
     m_windowClass = windowClass;
     m_window = window;
@@ -179,55 +179,117 @@ bool Splash::CreateDeviceResources()
     if (!m_window)
         return false;
 
-    HBITMAP backgroundResource = LoadBitmap(m_windowClass.hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
-    HBITMAP barResource = LoadBitmap(m_windowClass.hInstance, MAKEINTRESOURCE(IDB_BITMAP2));
+    ReleaseDeviceResources();
 
-    if (backgroundResource == nullptr || barResource == nullptr)
+    HBITMAP backgroundResource = LoadBitmap(m_windowClass.hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
+    if (backgroundResource == nullptr)
         return false;
 
+    HBITMAP barResource = LoadBitmap(m_windowClass.hInstance, MAKEINTRESOURCE(IDB_BITMAP2));
+    if (barResource == nullptr)
+    {
+        DeleteObject(backgroundResource);
+        return false;
+    }
+
     HDC windowContext = GetDC(m_window);
+    if (windowContext == nullptr)
+    {
+        DeleteObject(barResource);
+        DeleteObject(backgroundResource);
+        return false;
+    }
 
-    // Background
     HDC sourceContext = CreateCompatibleDC(windowContext);
-    SelectObject(sourceContext, backgroundResource);
+    if (sourceContext == nullptr)
     {
-        HBITMAP backgroundBitmap = CreateCompatibleBitmap(windowContext, m_width, m_height);
-        HDC     renderContext = CreateCompatibleDC(windowContext);
-        SelectObject(renderContext, backgroundBitmap);
-
-        BITMAP source{};
-        GetObject(backgroundResource, sizeof(source), &source);
-
-        SetStretchBltMode(renderContext, HALFTONE);
-        StretchBlt(renderContext, 0, 0, m_width, m_height, sourceContext, 0, 0, source.bmWidth, source.bmHeight, SRCCOPY);
-
-        m_bgBitmap = backgroundBitmap;
-        m_bgContext = renderContext;
+        ReleaseDC(m_window, windowContext);
+        DeleteObject(barResource);
+        DeleteObject(backgroundResource);
+        return false;
     }
 
-    // Loading bar
-    SelectObject(sourceContext, barResource);
+    HBITMAP bgBitmap{};
+    HDC     bgContext{};
+    HBITMAP barBitmap{};
+    HDC     barContext{};
+    HRGN    barRegion{};
+    bool    success = false;
+
+    BITMAP source{};
+
+    do
     {
-        HBITMAP barBitmap = CreateCompatibleBitmap(windowContext, m_barWidth, m_barHeight);
-        HDC     renderContext = CreateCompatibleDC(windowContext);
-        SelectObject(renderContext, barBitmap);
+        SelectObject(sourceContext, backgroundResource);
 
-        BITMAP source{};
-        GetObject(barResource, sizeof(source), &source);
+        bgBitmap = CreateCompatibleBitmap(windowContext, m_width, m_height);
+        if (bgBitmap == nullptr)
+            break;
 
-        SetStretchBltMode(renderContext, HALFTONE);
-        StretchBlt(renderContext, 0, 0, m_barWidth, m_barHeight, sourceContext, 0, 0, source.bmWidth, source.bmHeight, SRCCOPY);
+        bgContext = CreateCompatibleDC(windowContext);
+        if (bgContext == nullptr)
+            break;
 
-        m_barBitmap = barBitmap;
-        m_barContext = renderContext;
-        m_barRegion = CreateRectRgn(0, m_barY, m_width, m_barY + m_barHeight);
-    }
+        SelectObject(bgContext, bgBitmap);
+
+        if (!GetObject(backgroundResource, sizeof(source), &source))
+            break;
+
+        SetStretchBltMode(bgContext, HALFTONE);
+        if (!StretchBlt(bgContext, 0, 0, m_width, m_height, sourceContext, 0, 0, source.bmWidth, source.bmHeight, SRCCOPY))
+            break;
+
+        SelectObject(sourceContext, barResource);
+
+        barBitmap = CreateCompatibleBitmap(windowContext, m_barWidth, m_barHeight);
+        if (barBitmap == nullptr)
+            break;
+
+        barContext = CreateCompatibleDC(windowContext);
+        if (barContext == nullptr)
+            break;
+
+        SelectObject(barContext, barBitmap);
+
+        if (!GetObject(barResource, sizeof(source), &source))
+            break;
+
+        SetStretchBltMode(barContext, HALFTONE);
+        if (!StretchBlt(barContext, 0, 0, m_barWidth, m_barHeight, sourceContext, 0, 0, source.bmWidth, source.bmHeight, SRCCOPY))
+            break;
+
+        barRegion = CreateRectRgn(0, m_barY, m_width, m_barY + m_barHeight);
+        if (barRegion == nullptr)
+            break;
+
+        success = true;
+    } while (false);
 
     DeleteDC(sourceContext);
+    ReleaseDC(m_window, windowContext);
     DeleteObject(barResource);
     DeleteObject(backgroundResource);
 
-    ReleaseDC(m_window, windowContext);
+    if (!success)
+    {
+        if (barRegion)
+            DeleteObject(barRegion);
+        if (barContext)
+            DeleteDC(barContext);
+        if (barBitmap)
+            DeleteObject(barBitmap);
+        if (bgContext)
+            DeleteDC(bgContext);
+        if (bgBitmap)
+            DeleteObject(bgBitmap);
+        return false;
+    }
+
+    m_bgBitmap = bgBitmap;
+    m_bgContext = bgContext;
+    m_barBitmap = barBitmap;
+    m_barContext = barContext;
+    m_barRegion = barRegion;
     return true;
 }
 
@@ -339,9 +401,10 @@ void Splash::UpdateLoadingBar()
     const long long numUpdates = elapsed / UPDATE_RATE_IN_MS;
     m_barLastUpdate += std::chrono::milliseconds(numUpdates * UPDATE_RATE_IN_MS);
 
-    m_barX += PIXELS_PER_UPDATE * static_cast<int>(numUpdates);
-
-    if (m_barX >= m_width)
+    const long long delta = static_cast<long long>(PIXELS_PER_UPDATE) * numUpdates;
+    if (m_width > 0)
+        m_barX = static_cast<int>((static_cast<long long>(m_barX) + delta) % m_width);
+    else
         m_barX = 0;
 
     // Only invalidate the loading bar region to avoid flickering.
@@ -521,26 +584,6 @@ void SplashThread::PostRun()
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifdef MTA_DEBUG
-
-void ShowSplash(HINSTANCE instance)
-{
-}
-
-void HideSplash()
-{
-}
-
-void SuspendSplash()
-{
-}
-
-void ResumeSplash()
-{
-}
-
-#else
-
 void ShowSplash(HINSTANCE instance)
 {
     if (g_splashThread.Exists())
@@ -568,8 +611,6 @@ void ResumeSplash()
 {
     g_splash.Show();
 }
-
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //

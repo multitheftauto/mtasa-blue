@@ -203,7 +203,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 
 ;@INSERT_TRANSLATIONS@
 
-LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
+LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "Multi Theft Auto does not support Windows XP or Vista.  Please upgrade your computer."
 LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
 LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
@@ -256,15 +256,26 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
 
+    # MTA isn't supported on XP/Vista
     ${If} ${AtMostWinVista}
         MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
         ExecShell "open" "https://multitheftauto.com"
         Quit
-    ${ElseIf} ${AtMostWin8.1}
-        MessageBox MB_OK "$(GET_WIN81_PLEASE)"
-        ExecShell "open" "https://multitheftauto.com"
-        Quit
     ${EndIf}
+
+    !ifdef MTA_MAETRO
+        ${If} ${AtLeastWin10}
+            MessageBox MB_OK "$(GET_MASTER_PLEASE)"
+            ExecShell "open" "https://multitheftauto.com"
+            Quit
+        ${EndIf}
+    !else
+        ${If} ${AtMostWin8.1}
+            MessageBox MB_OK "$(GET_WIN81_PLEASE)"
+            ExecShell "open" "https://multitheftauto.com"
+            Quit
+        ${EndIf}
+    !endif
 
     File /oname=$TEMP\image.bmp "connect.bmp"
 
@@ -373,7 +384,24 @@ Function .onInstSuccess
 
     # Add 'MaxLoaderThreads' DWORD value for gta_sa.exe to disable multi-threaded loading of DLLs.
     WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads" 1
-	
+
+    # Configure Windows Error Reporting to save crash dumps to MTA's folder
+    # This enables capture of fail-fast crashes (0xC0000409, 0xC0000374) that bypass normal exception handling
+    # WER is a 64-bit system service that reads from the native 64-bit registry,
+    # so we must use SetRegView 64 to write to the correct location (not WOW6432Node)
+    SetRegView 64
+    # Configure for gta_sa.exe (game process)
+    ; DumpType: 0=Custom, 1=MiniDump, 2=FullDump - use 1 for smaller dumps
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\gta_sa.exe" "DumpType" 1
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\gta_sa.exe" "DumpCount" 10
+    WriteRegExpandStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\gta_sa.exe" "DumpFolder" "$INSTDIR\MTA\dumps\private"
+    # Configure for Multi Theft Auto.exe (loader process)
+    ; DumpType: 0=Custom, 1=MiniDump, 2=FullDump - use 1 for smaller dumps
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Multi Theft Auto.exe" "DumpType" 1
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Multi Theft Auto.exe" "DumpCount" 10
+    WriteRegExpandStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Multi Theft Auto.exe" "DumpFolder" "$INSTDIR\MTA\dumps\private"
+    SetRegView 32
+
 	# Initilize variables holding paths and names
 	Call MTAInitFileNamesAndPaths
     ; Start menu items
@@ -546,6 +574,10 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SetOutPath "$INSTDIR\MTA"
         SetOverwrite on
 
+        # Create dumps directory for WER crash dumps
+        CreateDirectory "$INSTDIR\MTA\dumps"
+        CreateDirectory "$INSTDIR\MTA\dumps\private"
+
         #############################################################
         # Make the directory "$INSTDIR" read write accessible by all users
         # Make the directory "$APPDATA\MTA San Andreas All" read write accessible by all users
@@ -686,7 +718,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
         File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
         File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
-        File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+        !ifdef MTA_MAETRO
+            File /oname=d3dcompiler_47.dll "${FILES_ROOT}\mta\d3dcompiler_47.maetro.dll"
+        !else
+            File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+        !endif
 
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
@@ -706,7 +742,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         #File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
         #File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
         #File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
-		
+
 	# Below file was included in the deprecation referenced above, but already disabled in MTA beforehand
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
 
@@ -729,7 +765,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
 
             File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
-            File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+            !ifdef MTA_MAETRO
+                File /oname=d3dcompiler_47.dll "${FILES_ROOT}\mta\d3dcompiler_47.maetro.dll"
+            !else
+                File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+            !endif
 
             SetOutPath "$INSTDIR\MTA\data"
             File "${FILES_ROOT}\mta\data\gta_sa_diff.dat"
@@ -1158,6 +1198,13 @@ Section Uninstall
         # Remove 'MaxLoaderThreads' DWORD value for gta_sa.exe.
         DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads"
         DeleteRegKey /ifempty HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe"
+
+        # Remove WER LocalDumps configuration for gta_sa.exe and Multi Theft Auto.exe
+        # WER config is in 64-bit registry (not WOW6432Node), so use SetRegView 64
+        SetRegView 64
+        DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\gta_sa.exe"
+        DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Multi Theft Auto.exe"
+        SetRegView 32
 
         ${GameExplorer_RemoveGame} ${GUID}
 

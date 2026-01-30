@@ -29,10 +29,10 @@ IMPLEMENT_ENUM_END("state-group")
 
 const STypeMapping TypeMappingList[] = {
     {TYPE_INT, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},
-    {TYPE_D3DCOLOR, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},            // Can be read as float4 or DWORD color
+    {TYPE_D3DCOLOR, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},  // Can be read as float4 or DWORD color
     {TYPE_D3DCOLOR, D3DXPC_VECTOR, D3DXPT_FLOAT, RegMap::Int2Color, 4},
-    {TYPE_IFLOAT, D3DXPC_SCALAR, D3DXPT_FLOAT, RegMap::Int2Float, 1},            // Can be read as float or as int on float memory
-    {TYPE_IFLOAT, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},                // Can be read as float or as int on float memory
+    {TYPE_IFLOAT, D3DXPC_SCALAR, D3DXPT_FLOAT, RegMap::Int2Float, 1},  // Can be read as float or as int on float memory
+    {TYPE_IFLOAT, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},      // Can be read as float or as int on float memory
     {TYPE_FLOAT, D3DXPC_SCALAR, D3DXPT_FLOAT, RegMap::Float2Float, 1},
     {TYPE_D3DCOLORVALUE, D3DXPC_VECTOR, D3DXPT_FLOAT, RegMap::Color2Color, 4},
     {TYPE_VECTOR3, D3DXPC_VECTOR, D3DXPT_FLOAT, RegMap::Vector2Vector, 3},
@@ -48,191 +48,190 @@ const STypeMapping TypeMappingList[] = {
 // Big list of D3D registers
 //
 
-#define ADD_REGISTER(type,name) \
-    {offsetof(USING_STRUCT, name), USING_LIST, #name, type}
+#define ADD_REGISTER(type, name) {offsetof(USING_STRUCT, name), USING_LIST, #name, type}
 
 const SRegisterInfo BigRegisterInfoList[] = {
 
 #define USING_STRUCT CProxyDirect3DDevice9::SD3DRenderState
-#define USING_LIST "RenderState"
-    ADD_REGISTER(TYPE_INT, ZENABLE),                             //  = 7,    /* D3DZBUFFERTYPE (or TRUE/FALSE for legacy) */
-    ADD_REGISTER(TYPE_INT, FILLMODE),                            //  = 8,    /* D3DFILLMODE */
-    ADD_REGISTER(TYPE_INT, SHADEMODE),                           //  = 9,    /* D3DSHADEMODE */
-    ADD_REGISTER(TYPE_INT, ZWRITEENABLE),                        //  = 14,   /* TRUE to enable z writes */
-    ADD_REGISTER(TYPE_INT, ALPHATESTENABLE),                     //  = 15,   /* TRUE to enable alpha tests */
-    ADD_REGISTER(TYPE_INT, LASTPIXEL),                           //  = 16,   /* TRUE for last-pixel on lines */
-    ADD_REGISTER(TYPE_INT, SRCBLEND),                            //  = 19,   /* D3DBLEND */
-    ADD_REGISTER(TYPE_INT, DESTBLEND),                           //  = 20,   /* D3DBLEND */
-    ADD_REGISTER(TYPE_INT, CULLMODE),                            //  = 22,   /* D3DCULL */
-    ADD_REGISTER(TYPE_INT, ZFUNC),                               //  = 23,   /* D3DCMPFUNC */
-    ADD_REGISTER(TYPE_INT, ALPHAREF),                            //  = 24,   /* D3DFIXED */
-    ADD_REGISTER(TYPE_INT, ALPHAFUNC),                           //  = 25,   /* D3DCMPFUNC */
-    ADD_REGISTER(TYPE_INT, DITHERENABLE),                        //  = 26,   /* TRUE to enable dithering */
-    ADD_REGISTER(TYPE_INT, ALPHABLENDENABLE),                    //  = 27,   /* TRUE to enable alpha blending */
-    ADD_REGISTER(TYPE_INT, FOGENABLE),                           //  = 28,   /* TRUE to enable fog blending */
-    ADD_REGISTER(TYPE_INT, SPECULARENABLE),                      //  = 29,   /* TRUE to enable specular */
-    ADD_REGISTER(TYPE_D3DCOLOR, FOGCOLOR),                       //  = 34,   /* D3DCOLOR */
-    ADD_REGISTER(TYPE_INT, FOGTABLEMODE),                        //  = 35,   /* D3DFOGMODE */
-    ADD_REGISTER(TYPE_IFLOAT, FOGSTART),                         //  = 36,   /* Fog start (for both vertex and pixel fog) */
-    ADD_REGISTER(TYPE_IFLOAT, FOGEND),                           //  = 37,   /* Fog end      */
-    ADD_REGISTER(TYPE_IFLOAT, FOGDENSITY),                       //  = 38,   /* Fog density  */
-    ADD_REGISTER(TYPE_INT, RANGEFOGENABLE),                      //  = 48,   /* Enables range-based fog */
-    ADD_REGISTER(TYPE_INT, STENCILENABLE),                       //  = 52,   /* BOOL enable/disable stenciling */
-    ADD_REGISTER(TYPE_INT, STENCILFAIL),                         //  = 53,   /* D3DSTENCILOP to do if stencil test fails */
-    ADD_REGISTER(TYPE_INT, STENCILZFAIL),                        //  = 54,   /* D3DSTENCILOP to do if stencil test passes and Z test fails */
-    ADD_REGISTER(TYPE_INT, STENCILPASS),                         //  = 55,   /* D3DSTENCILOP to do if both stencil and Z tests pass */
-    ADD_REGISTER(TYPE_INT, STENCILFUNC),                         //  = 56,   /* D3DCMPFUNC fn.   */
-    ADD_REGISTER(TYPE_INT, STENCILREF),                          //  = 57,   /* Reference value used in stencil test */
-    ADD_REGISTER(TYPE_INT, STENCILMASK),                         //  = 58,   /* Mask value used in stencil test */
-    ADD_REGISTER(TYPE_INT, STENCILWRITEMASK),                    //  = 59,   /* Write mask applied to values written to stencil buffer */
-    ADD_REGISTER(TYPE_D3DCOLOR, TEXTUREFACTOR),                  //  = 60,   /* D3DCOLOR used for multi-texture blend */
-    ADD_REGISTER(TYPE_INT, WRAP0),                               //  = 128,  /* wrap for 1st texture coord. set */
-    ADD_REGISTER(TYPE_INT, WRAP1),                               //  = 129,  /* wrap for 2nd texture coord. set */
-    ADD_REGISTER(TYPE_INT, WRAP2),                               //  = 130,  /* wrap for 3rd texture coord. set */
-    ADD_REGISTER(TYPE_INT, WRAP3),                               //  = 131,  /* wrap for 4th texture coord. set */
-    ADD_REGISTER(TYPE_INT, WRAP4),                               //  = 132,  /* wrap for 5th texture coord. set */
-    ADD_REGISTER(TYPE_INT, WRAP5),                               //  = 133,  /* wrap for 6th texture coord. set */
-    ADD_REGISTER(TYPE_INT, WRAP6),                               //  = 134,  /* wrap for 7th texture coord. set */
-    ADD_REGISTER(TYPE_INT, WRAP7),                               //  = 135,  /* wrap for 8th texture coord. set */
-    ADD_REGISTER(TYPE_INT, CLIPPING),                            //  = 136,
-    ADD_REGISTER(TYPE_INT, LIGHTING),                            //  = 137,
-    ADD_REGISTER(TYPE_D3DCOLOR, AMBIENT),                        //  = 139,
-    ADD_REGISTER(TYPE_INT, FOGVERTEXMODE),                       //  = 140,
-    ADD_REGISTER(TYPE_INT, COLORVERTEX),                         //  = 141,
-    ADD_REGISTER(TYPE_INT, LOCALVIEWER),                         //  = 142,
-    ADD_REGISTER(TYPE_INT, NORMALIZENORMALS),                    //  = 143,
-    ADD_REGISTER(TYPE_INT, DIFFUSEMATERIALSOURCE),               //  = 145,
-    ADD_REGISTER(TYPE_INT, SPECULARMATERIALSOURCE),              //  = 146,
-    ADD_REGISTER(TYPE_INT, AMBIENTMATERIALSOURCE),               //  = 147,
-    ADD_REGISTER(TYPE_INT, EMISSIVEMATERIALSOURCE),              //  = 148,
-    ADD_REGISTER(TYPE_INT, VERTEXBLEND),                         //  = 151,
-    ADD_REGISTER(TYPE_INT, CLIPPLANEENABLE),                     //  = 152,
-    ADD_REGISTER(TYPE_IFLOAT, POINTSIZE),                        //  = 154,   /* float point size */
-    ADD_REGISTER(TYPE_IFLOAT, POINTSIZE_MIN),                    //  = 155,   /* float point size min threshold */
-    ADD_REGISTER(TYPE_INT, POINTSPRITEENABLE),                   //  = 156,   /* BOOL point texture coord control */
-    ADD_REGISTER(TYPE_INT, POINTSCALEENABLE),                    //  = 157,   /* BOOL point size scale enable */
-    ADD_REGISTER(TYPE_IFLOAT, POINTSCALE_A),                     //  = 158,   /* float point attenuation A value */
-    ADD_REGISTER(TYPE_IFLOAT, POINTSCALE_B),                     //  = 159,   /* float point attenuation B value */
-    ADD_REGISTER(TYPE_IFLOAT, POINTSCALE_C),                     //  = 160,   /* float point attenuation C value */
-    ADD_REGISTER(TYPE_INT, MULTISAMPLEANTIALIAS),                //  = 161,  // BOOL - set to do FSAA with multisample buffer
-    ADD_REGISTER(TYPE_INT, MULTISAMPLEMASK),                     //  = 162,  // DWORD - )        //per-sample enable/disable
-    ADD_REGISTER(TYPE_INT, PATCHEDGESTYLE),                      //  = 163,  // Sets whether patch edges will use float style tessellation
-    ADD_REGISTER(TYPE_INT, DEBUGMONITORTOKEN),                   //  = 165,  // DEBUG ONLY - token to debug monitor
-    ADD_REGISTER(TYPE_IFLOAT, POINTSIZE_MAX),                    //  = 166,   /* float point size max threshold */
-    ADD_REGISTER(TYPE_INT, INDEXEDVERTEXBLENDENABLE),            //  = 167,
-    ADD_REGISTER(TYPE_INT, COLORWRITEENABLE),                    //  = 168,  // per-channel write enable
-    ADD_REGISTER(TYPE_IFLOAT, TWEENFACTOR),                      //  = 170,   // float tween factor
-    ADD_REGISTER(TYPE_INT, BLENDOP),                             //  = 171,   // D3DBLENDOP setting
-    ADD_REGISTER(TYPE_INT, POSITIONDEGREE),               //  = 172,   // NPatch position interpolation degree. D3DDEGREE_LINEAR or D3DDEGREE_CUBIC (default)
-    ADD_REGISTER(TYPE_INT, NORMALDEGREE),                 //  = 173,   aa NPatch normal interpolation degree. D3DDEGREE_LINEAR (default) or D3DDEGREE_QUADRATIC
-    ADD_REGISTER(TYPE_INT, SCISSORTESTENABLE),            //  = 174
-    ADD_REGISTER(TYPE_INT, SLOPESCALEDEPTHBIAS),                   //  = 175,
-    ADD_REGISTER(TYPE_INT, ANTIALIASEDLINEENABLE),                 //  = 176,
-    ADD_REGISTER(TYPE_INT, MINTESSELLATIONLEVEL),                  //  = 178,
-    ADD_REGISTER(TYPE_INT, MAXTESSELLATIONLEVEL),                  //  = 179,
-    ADD_REGISTER(TYPE_INT, ADAPTIVETESS_X),                        //  = 180,
-    ADD_REGISTER(TYPE_INT, ADAPTIVETESS_Y),                        //  = 181,
-    ADD_REGISTER(TYPE_INT, ADAPTIVETESS_Z),                        //  = 182,
-    ADD_REGISTER(TYPE_INT, ADAPTIVETESS_W),                        //  = 183,
-    ADD_REGISTER(TYPE_INT, ENABLEADAPTIVETESSELLATION),            //  = 184,
-    ADD_REGISTER(TYPE_INT, TWOSIDEDSTENCILMODE),                   //  = 185,   /* BOOL enable/disable 2 sided stenciling */
-    ADD_REGISTER(TYPE_INT, CCW_STENCILFAIL),                       //  = 186,   /* D3DSTENCILOP to do if ccw stencil test fails */
-    ADD_REGISTER(TYPE_INT, CCW_STENCILZFAIL),                      //  = 187,   /* D3DSTENCILOP to do if ccw stencil test passes and Z test fails */
-    ADD_REGISTER(TYPE_INT, CCW_STENCILPASS),                       //  = 188,   /* D3DSTENCILOP to do if both ccw stencil and Z tests pass */
-    ADD_REGISTER(TYPE_INT, CCW_STENCILFUNC),                       //  = 189,   /* D3DCMPFUNC fn.  */
-    ADD_REGISTER(TYPE_INT, COLORWRITEENABLE1),                     //  = 190,   /* Additional ColorWriteEnables */
-    ADD_REGISTER(TYPE_INT, COLORWRITEENABLE2),                     //  = 191,   /* Additional ColorWriteEnables */
-    ADD_REGISTER(TYPE_INT, COLORWRITEENABLE3),                     //  = 192,   /* Additional ColorWriteEnables */
-    ADD_REGISTER(TYPE_D3DCOLOR, BLENDFACTOR),                      //  = 193,   /* D3DCOLOR used for a constant blend factor during alpha blending*/
-    ADD_REGISTER(TYPE_INT, SRGBWRITEENABLE),                       //  = 194,   /* Enable rendertarget writes to be DE-linearized to SRGB */
-    ADD_REGISTER(TYPE_INT, DEPTHBIAS),                             //  = 195,
-    ADD_REGISTER(TYPE_INT, WRAP8),                                 //  = 198,   /* Additional wrap states for vs_3_0+ attributes with D3DDECLUSAGE_TEXCOORD */
-    ADD_REGISTER(TYPE_INT, WRAP9),                                 //  = 199,
-    ADD_REGISTER(TYPE_INT, WRAP10),                                //  = 200,
-    ADD_REGISTER(TYPE_INT, WRAP11),                                //  = 201,
-    ADD_REGISTER(TYPE_INT, WRAP12),                                //  = 202,
-    ADD_REGISTER(TYPE_INT, WRAP13),                                //  = 203,
-    ADD_REGISTER(TYPE_INT, WRAP14),                                //  = 204,
-    ADD_REGISTER(TYPE_INT, WRAP15),                                //  = 205,
-    ADD_REGISTER(TYPE_INT, SEPARATEALPHABLENDENABLE),              //  = 206,  /* TRUE to enable a separate blending function for the alpha channel */
-    ADD_REGISTER(TYPE_INT, SRCBLENDALPHA),             //  = 207,  /* SRC blend factor for the alpha channel when DWORD SEPARATEDESTALPHAENABLE )  */
-    ADD_REGISTER(TYPE_INT, DESTBLENDALPHA),            //  = 208,  /* DST blend factor for the alpha channel when DWORD SEPARATEDESTALPHAENABLE ) */
-    ADD_REGISTER(TYPE_INT, BLENDOPALPHA),              //  = 209,  /* Blending operation for the alpha channel when DWORD SEPARATEDESTALPHAENABLE ) */
-#undef  USING_STRUCT
-#undef  USING_LIST
+#define USING_LIST   "RenderState"
+    ADD_REGISTER(TYPE_INT, ZENABLE),                     //  = 7,    /* D3DZBUFFERTYPE (or TRUE/FALSE for legacy) */
+    ADD_REGISTER(TYPE_INT, FILLMODE),                    //  = 8,    /* D3DFILLMODE */
+    ADD_REGISTER(TYPE_INT, SHADEMODE),                   //  = 9,    /* D3DSHADEMODE */
+    ADD_REGISTER(TYPE_INT, ZWRITEENABLE),                //  = 14,   /* TRUE to enable z writes */
+    ADD_REGISTER(TYPE_INT, ALPHATESTENABLE),             //  = 15,   /* TRUE to enable alpha tests */
+    ADD_REGISTER(TYPE_INT, LASTPIXEL),                   //  = 16,   /* TRUE for last-pixel on lines */
+    ADD_REGISTER(TYPE_INT, SRCBLEND),                    //  = 19,   /* D3DBLEND */
+    ADD_REGISTER(TYPE_INT, DESTBLEND),                   //  = 20,   /* D3DBLEND */
+    ADD_REGISTER(TYPE_INT, CULLMODE),                    //  = 22,   /* D3DCULL */
+    ADD_REGISTER(TYPE_INT, ZFUNC),                       //  = 23,   /* D3DCMPFUNC */
+    ADD_REGISTER(TYPE_INT, ALPHAREF),                    //  = 24,   /* D3DFIXED */
+    ADD_REGISTER(TYPE_INT, ALPHAFUNC),                   //  = 25,   /* D3DCMPFUNC */
+    ADD_REGISTER(TYPE_INT, DITHERENABLE),                //  = 26,   /* TRUE to enable dithering */
+    ADD_REGISTER(TYPE_INT, ALPHABLENDENABLE),            //  = 27,   /* TRUE to enable alpha blending */
+    ADD_REGISTER(TYPE_INT, FOGENABLE),                   //  = 28,   /* TRUE to enable fog blending */
+    ADD_REGISTER(TYPE_INT, SPECULARENABLE),              //  = 29,   /* TRUE to enable specular */
+    ADD_REGISTER(TYPE_D3DCOLOR, FOGCOLOR),               //  = 34,   /* D3DCOLOR */
+    ADD_REGISTER(TYPE_INT, FOGTABLEMODE),                //  = 35,   /* D3DFOGMODE */
+    ADD_REGISTER(TYPE_IFLOAT, FOGSTART),                 //  = 36,   /* Fog start (for both vertex and pixel fog) */
+    ADD_REGISTER(TYPE_IFLOAT, FOGEND),                   //  = 37,   /* Fog end      */
+    ADD_REGISTER(TYPE_IFLOAT, FOGDENSITY),               //  = 38,   /* Fog density  */
+    ADD_REGISTER(TYPE_INT, RANGEFOGENABLE),              //  = 48,   /* Enables range-based fog */
+    ADD_REGISTER(TYPE_INT, STENCILENABLE),               //  = 52,   /* BOOL enable/disable stenciling */
+    ADD_REGISTER(TYPE_INT, STENCILFAIL),                 //  = 53,   /* D3DSTENCILOP to do if stencil test fails */
+    ADD_REGISTER(TYPE_INT, STENCILZFAIL),                //  = 54,   /* D3DSTENCILOP to do if stencil test passes and Z test fails */
+    ADD_REGISTER(TYPE_INT, STENCILPASS),                 //  = 55,   /* D3DSTENCILOP to do if both stencil and Z tests pass */
+    ADD_REGISTER(TYPE_INT, STENCILFUNC),                 //  = 56,   /* D3DCMPFUNC fn.   */
+    ADD_REGISTER(TYPE_INT, STENCILREF),                  //  = 57,   /* Reference value used in stencil test */
+    ADD_REGISTER(TYPE_INT, STENCILMASK),                 //  = 58,   /* Mask value used in stencil test */
+    ADD_REGISTER(TYPE_INT, STENCILWRITEMASK),            //  = 59,   /* Write mask applied to values written to stencil buffer */
+    ADD_REGISTER(TYPE_D3DCOLOR, TEXTUREFACTOR),          //  = 60,   /* D3DCOLOR used for multi-texture blend */
+    ADD_REGISTER(TYPE_INT, WRAP0),                       //  = 128,  /* wrap for 1st texture coord. set */
+    ADD_REGISTER(TYPE_INT, WRAP1),                       //  = 129,  /* wrap for 2nd texture coord. set */
+    ADD_REGISTER(TYPE_INT, WRAP2),                       //  = 130,  /* wrap for 3rd texture coord. set */
+    ADD_REGISTER(TYPE_INT, WRAP3),                       //  = 131,  /* wrap for 4th texture coord. set */
+    ADD_REGISTER(TYPE_INT, WRAP4),                       //  = 132,  /* wrap for 5th texture coord. set */
+    ADD_REGISTER(TYPE_INT, WRAP5),                       //  = 133,  /* wrap for 6th texture coord. set */
+    ADD_REGISTER(TYPE_INT, WRAP6),                       //  = 134,  /* wrap for 7th texture coord. set */
+    ADD_REGISTER(TYPE_INT, WRAP7),                       //  = 135,  /* wrap for 8th texture coord. set */
+    ADD_REGISTER(TYPE_INT, CLIPPING),                    //  = 136,
+    ADD_REGISTER(TYPE_INT, LIGHTING),                    //  = 137,
+    ADD_REGISTER(TYPE_D3DCOLOR, AMBIENT),                //  = 139,
+    ADD_REGISTER(TYPE_INT, FOGVERTEXMODE),               //  = 140,
+    ADD_REGISTER(TYPE_INT, COLORVERTEX),                 //  = 141,
+    ADD_REGISTER(TYPE_INT, LOCALVIEWER),                 //  = 142,
+    ADD_REGISTER(TYPE_INT, NORMALIZENORMALS),            //  = 143,
+    ADD_REGISTER(TYPE_INT, DIFFUSEMATERIALSOURCE),       //  = 145,
+    ADD_REGISTER(TYPE_INT, SPECULARMATERIALSOURCE),      //  = 146,
+    ADD_REGISTER(TYPE_INT, AMBIENTMATERIALSOURCE),       //  = 147,
+    ADD_REGISTER(TYPE_INT, EMISSIVEMATERIALSOURCE),      //  = 148,
+    ADD_REGISTER(TYPE_INT, VERTEXBLEND),                 //  = 151,
+    ADD_REGISTER(TYPE_INT, CLIPPLANEENABLE),             //  = 152,
+    ADD_REGISTER(TYPE_IFLOAT, POINTSIZE),                //  = 154,   /* float point size */
+    ADD_REGISTER(TYPE_IFLOAT, POINTSIZE_MIN),            //  = 155,   /* float point size min threshold */
+    ADD_REGISTER(TYPE_INT, POINTSPRITEENABLE),           //  = 156,   /* BOOL point texture coord control */
+    ADD_REGISTER(TYPE_INT, POINTSCALEENABLE),            //  = 157,   /* BOOL point size scale enable */
+    ADD_REGISTER(TYPE_IFLOAT, POINTSCALE_A),             //  = 158,   /* float point attenuation A value */
+    ADD_REGISTER(TYPE_IFLOAT, POINTSCALE_B),             //  = 159,   /* float point attenuation B value */
+    ADD_REGISTER(TYPE_IFLOAT, POINTSCALE_C),             //  = 160,   /* float point attenuation C value */
+    ADD_REGISTER(TYPE_INT, MULTISAMPLEANTIALIAS),        //  = 161,  // BOOL - set to do FSAA with multisample buffer
+    ADD_REGISTER(TYPE_INT, MULTISAMPLEMASK),             //  = 162,  // DWORD - )        //per-sample enable/disable
+    ADD_REGISTER(TYPE_INT, PATCHEDGESTYLE),              //  = 163,  // Sets whether patch edges will use float style tessellation
+    ADD_REGISTER(TYPE_INT, DEBUGMONITORTOKEN),           //  = 165,  // DEBUG ONLY - token to debug monitor
+    ADD_REGISTER(TYPE_IFLOAT, POINTSIZE_MAX),            //  = 166,   /* float point size max threshold */
+    ADD_REGISTER(TYPE_INT, INDEXEDVERTEXBLENDENABLE),    //  = 167,
+    ADD_REGISTER(TYPE_INT, COLORWRITEENABLE),            //  = 168,  // per-channel write enable
+    ADD_REGISTER(TYPE_IFLOAT, TWEENFACTOR),              //  = 170,   // float tween factor
+    ADD_REGISTER(TYPE_INT, BLENDOP),                     //  = 171,   // D3DBLENDOP setting
+    ADD_REGISTER(TYPE_INT, POSITIONDEGREE),              //  = 172,   // NPatch position interpolation degree. D3DDEGREE_LINEAR or D3DDEGREE_CUBIC (default)
+    ADD_REGISTER(TYPE_INT, NORMALDEGREE),                //  = 173,   aa NPatch normal interpolation degree. D3DDEGREE_LINEAR (default) or D3DDEGREE_QUADRATIC
+    ADD_REGISTER(TYPE_INT, SCISSORTESTENABLE),           //  = 174
+    ADD_REGISTER(TYPE_INT, SLOPESCALEDEPTHBIAS),         //  = 175,
+    ADD_REGISTER(TYPE_INT, ANTIALIASEDLINEENABLE),       //  = 176,
+    ADD_REGISTER(TYPE_INT, MINTESSELLATIONLEVEL),        //  = 178,
+    ADD_REGISTER(TYPE_INT, MAXTESSELLATIONLEVEL),        //  = 179,
+    ADD_REGISTER(TYPE_INT, ADAPTIVETESS_X),              //  = 180,
+    ADD_REGISTER(TYPE_INT, ADAPTIVETESS_Y),              //  = 181,
+    ADD_REGISTER(TYPE_INT, ADAPTIVETESS_Z),              //  = 182,
+    ADD_REGISTER(TYPE_INT, ADAPTIVETESS_W),              //  = 183,
+    ADD_REGISTER(TYPE_INT, ENABLEADAPTIVETESSELLATION),  //  = 184,
+    ADD_REGISTER(TYPE_INT, TWOSIDEDSTENCILMODE),         //  = 185,   /* BOOL enable/disable 2 sided stenciling */
+    ADD_REGISTER(TYPE_INT, CCW_STENCILFAIL),             //  = 186,   /* D3DSTENCILOP to do if ccw stencil test fails */
+    ADD_REGISTER(TYPE_INT, CCW_STENCILZFAIL),            //  = 187,   /* D3DSTENCILOP to do if ccw stencil test passes and Z test fails */
+    ADD_REGISTER(TYPE_INT, CCW_STENCILPASS),             //  = 188,   /* D3DSTENCILOP to do if both ccw stencil and Z tests pass */
+    ADD_REGISTER(TYPE_INT, CCW_STENCILFUNC),             //  = 189,   /* D3DCMPFUNC fn.  */
+    ADD_REGISTER(TYPE_INT, COLORWRITEENABLE1),           //  = 190,   /* Additional ColorWriteEnables */
+    ADD_REGISTER(TYPE_INT, COLORWRITEENABLE2),           //  = 191,   /* Additional ColorWriteEnables */
+    ADD_REGISTER(TYPE_INT, COLORWRITEENABLE3),           //  = 192,   /* Additional ColorWriteEnables */
+    ADD_REGISTER(TYPE_D3DCOLOR, BLENDFACTOR),            //  = 193,   /* D3DCOLOR used for a constant blend factor during alpha blending*/
+    ADD_REGISTER(TYPE_INT, SRGBWRITEENABLE),             //  = 194,   /* Enable rendertarget writes to be DE-linearized to SRGB */
+    ADD_REGISTER(TYPE_INT, DEPTHBIAS),                   //  = 195,
+    ADD_REGISTER(TYPE_INT, WRAP8),                       //  = 198,   /* Additional wrap states for vs_3_0+ attributes with D3DDECLUSAGE_TEXCOORD */
+    ADD_REGISTER(TYPE_INT, WRAP9),                       //  = 199,
+    ADD_REGISTER(TYPE_INT, WRAP10),                      //  = 200,
+    ADD_REGISTER(TYPE_INT, WRAP11),                      //  = 201,
+    ADD_REGISTER(TYPE_INT, WRAP12),                      //  = 202,
+    ADD_REGISTER(TYPE_INT, WRAP13),                      //  = 203,
+    ADD_REGISTER(TYPE_INT, WRAP14),                      //  = 204,
+    ADD_REGISTER(TYPE_INT, WRAP15),                      //  = 205,
+    ADD_REGISTER(TYPE_INT, SEPARATEALPHABLENDENABLE),    //  = 206,  /* TRUE to enable a separate blending function for the alpha channel */
+    ADD_REGISTER(TYPE_INT, SRCBLENDALPHA),               //  = 207,  /* SRC blend factor for the alpha channel when DWORD SEPARATEDESTALPHAENABLE )  */
+    ADD_REGISTER(TYPE_INT, DESTBLENDALPHA),              //  = 208,  /* DST blend factor for the alpha channel when DWORD SEPARATEDESTALPHAENABLE ) */
+    ADD_REGISTER(TYPE_INT, BLENDOPALPHA),                //  = 209,  /* Blending operation for the alpha channel when DWORD SEPARATEDESTALPHAENABLE ) */
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT CProxyDirect3DDevice9::SD3DStageState
-#define USING_LIST "StageState"
-    ADD_REGISTER(TYPE_INT, COLOROP),                          //  =  1, /* D3DTEXTUREOP - per-stage blending controls for color channels */
-    ADD_REGISTER(TYPE_INT, COLORARG1),                        //  =  2, /* D3DTA_* (texture arg) */
-    ADD_REGISTER(TYPE_INT, COLORARG2),                        //  =  3, /* D3DTA_* (texture arg) */
-    ADD_REGISTER(TYPE_INT, ALPHAOP),                          //  =  4, /* D3DTEXTUREOP - per-stage blending controls for alpha channel */
-    ADD_REGISTER(TYPE_INT, ALPHAARG1),                        //  =  5, /* D3DTA_* (texture arg) */
-    ADD_REGISTER(TYPE_INT, ALPHAARG2),                        //  =  6, /* D3DTA_* (texture arg) */
-    ADD_REGISTER(TYPE_INT, BUMPENVMAT00),                     //  =  7, /* float (bump mapping matrix) */
-    ADD_REGISTER(TYPE_INT, BUMPENVMAT01),                     //  =  8, /* float (bump mapping matrix) */
-    ADD_REGISTER(TYPE_INT, BUMPENVMAT10),                     //  =  9, /* float (bump mapping matrix) */
-    ADD_REGISTER(TYPE_INT, BUMPENVMAT11),                     //  = 10, /* float (bump mapping matrix) */
-    ADD_REGISTER(TYPE_INT, TEXCOORDINDEX),                    //  = 11, /* identifies which set of texture coordinates index this texture */
-    ADD_REGISTER(TYPE_INT, BUMPENVLSCALE),                    //  = 22, /* float scale for bump map luminance */
-    ADD_REGISTER(TYPE_INT, BUMPENVLOFFSET),                   //  = 23, /* float offset for bump map luminance */
-    ADD_REGISTER(TYPE_INT, TEXTURETRANSFORMFLAGS),            // = 24, /* D3DTEXTURETRANSFORMFLAGS controls texture transform */
-    ADD_REGISTER(TYPE_INT, COLORARG0),                        //  = 26, /* D3DTA_* third arg for triadic ops */
-    ADD_REGISTER(TYPE_INT, ALPHAARG0),                        //  = 27, /* D3DTA_* third arg for triadic ops */
-    ADD_REGISTER(TYPE_INT, RESULTARG),                        //  = 28, /* D3DTA_* arg for result (CURRENT or TEMP) */
-    ADD_REGISTER(TYPE_INT, CONSTANT),                         //  = 32, /* Per-stage constant D3DTA_CONSTANT */
-#undef  USING_STRUCT
-#undef  USING_LIST
+#define USING_LIST   "StageState"
+    ADD_REGISTER(TYPE_INT, COLOROP),                //  =  1, /* D3DTEXTUREOP - per-stage blending controls for color channels */
+    ADD_REGISTER(TYPE_INT, COLORARG1),              //  =  2, /* D3DTA_* (texture arg) */
+    ADD_REGISTER(TYPE_INT, COLORARG2),              //  =  3, /* D3DTA_* (texture arg) */
+    ADD_REGISTER(TYPE_INT, ALPHAOP),                //  =  4, /* D3DTEXTUREOP - per-stage blending controls for alpha channel */
+    ADD_REGISTER(TYPE_INT, ALPHAARG1),              //  =  5, /* D3DTA_* (texture arg) */
+    ADD_REGISTER(TYPE_INT, ALPHAARG2),              //  =  6, /* D3DTA_* (texture arg) */
+    ADD_REGISTER(TYPE_INT, BUMPENVMAT00),           //  =  7, /* float (bump mapping matrix) */
+    ADD_REGISTER(TYPE_INT, BUMPENVMAT01),           //  =  8, /* float (bump mapping matrix) */
+    ADD_REGISTER(TYPE_INT, BUMPENVMAT10),           //  =  9, /* float (bump mapping matrix) */
+    ADD_REGISTER(TYPE_INT, BUMPENVMAT11),           //  = 10, /* float (bump mapping matrix) */
+    ADD_REGISTER(TYPE_INT, TEXCOORDINDEX),          //  = 11, /* identifies which set of texture coordinates index this texture */
+    ADD_REGISTER(TYPE_INT, BUMPENVLSCALE),          //  = 22, /* float scale for bump map luminance */
+    ADD_REGISTER(TYPE_INT, BUMPENVLOFFSET),         //  = 23, /* float offset for bump map luminance */
+    ADD_REGISTER(TYPE_INT, TEXTURETRANSFORMFLAGS),  // = 24, /* D3DTEXTURETRANSFORMFLAGS controls texture transform */
+    ADD_REGISTER(TYPE_INT, COLORARG0),              //  = 26, /* D3DTA_* third arg for triadic ops */
+    ADD_REGISTER(TYPE_INT, ALPHAARG0),              //  = 27, /* D3DTA_* third arg for triadic ops */
+    ADD_REGISTER(TYPE_INT, RESULTARG),              //  = 28, /* D3DTA_* arg for result (CURRENT or TEMP) */
+    ADD_REGISTER(TYPE_INT, CONSTANT),               //  = 32, /* Per-stage constant D3DTA_CONSTANT */
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT CProxyDirect3DDevice9::SD3DSamplerState
-#define USING_LIST "SamplerState"
-    ADD_REGISTER(TYPE_INT, ADDRESSU),                    //  = 1,  /* D3DTEXTUREADDRESS for U coordinate */
-    ADD_REGISTER(TYPE_INT, ADDRESSV),                    //  = 2,  /* D3DTEXTUREADDRESS for V coordinate */
-    ADD_REGISTER(TYPE_INT, ADDRESSW),                    //  = 3,  /* D3DTEXTUREADDRESS for W coordinate */
-    ADD_REGISTER(TYPE_D3DCOLOR, BORDERCOLOR),            //  = 4,  /* D3DCOLOR */
-    ADD_REGISTER(TYPE_INT, MAGFILTER),                   //  = 5,  /* D3DTEXTUREFILTER filter to use for magnification */
-    ADD_REGISTER(TYPE_INT, MINFILTER),                   //  = 6,  /* D3DTEXTUREFILTER filter to use for minification */
-    ADD_REGISTER(TYPE_INT, MIPFILTER),                   //  = 7,  /* D3DTEXTUREFILTER filter to use between mipmaps during minification */
-    ADD_REGISTER(TYPE_INT, MIPMAPLODBIAS),               //  = 8,  /* float Mipmap LOD bias */
-    ADD_REGISTER(TYPE_INT, MAXMIPLEVEL),                 //  = 9,  /* DWORD 0..(n-1) LOD index of largest map to use (0 == largest) */
-    ADD_REGISTER(TYPE_INT, MAXANISOTROPY),               //  = 10, /* DWORD maximum anisotropy */
-    ADD_REGISTER(TYPE_INT, SRGBTEXTURE),             //  = 11, /* Default = 0 (which means Gamma 1.0, no correction required.) else correct for Gamma = 2.2 */
-    ADD_REGISTER(TYPE_INT, ELEMENTINDEX),            //  = 12, When multi-element texture is assigned to sampler, this indicates which element index to use.
-    ADD_REGISTER(TYPE_INT, DMAPOFFSET),              //  = 13, /* Offset in vertices in the pre-sampled displacement map. */
-#undef  USING_STRUCT
-#undef  USING_LIST
+#define USING_LIST   "SamplerState"
+    ADD_REGISTER(TYPE_INT, ADDRESSU),          //  = 1,  /* D3DTEXTUREADDRESS for U coordinate */
+    ADD_REGISTER(TYPE_INT, ADDRESSV),          //  = 2,  /* D3DTEXTUREADDRESS for V coordinate */
+    ADD_REGISTER(TYPE_INT, ADDRESSW),          //  = 3,  /* D3DTEXTUREADDRESS for W coordinate */
+    ADD_REGISTER(TYPE_D3DCOLOR, BORDERCOLOR),  //  = 4,  /* D3DCOLOR */
+    ADD_REGISTER(TYPE_INT, MAGFILTER),         //  = 5,  /* D3DTEXTUREFILTER filter to use for magnification */
+    ADD_REGISTER(TYPE_INT, MINFILTER),         //  = 6,  /* D3DTEXTUREFILTER filter to use for minification */
+    ADD_REGISTER(TYPE_INT, MIPFILTER),         //  = 7,  /* D3DTEXTUREFILTER filter to use between mipmaps during minification */
+    ADD_REGISTER(TYPE_INT, MIPMAPLODBIAS),     //  = 8,  /* float Mipmap LOD bias */
+    ADD_REGISTER(TYPE_INT, MAXMIPLEVEL),       //  = 9,  /* DWORD 0..(n-1) LOD index of largest map to use (0 == largest) */
+    ADD_REGISTER(TYPE_INT, MAXANISOTROPY),     //  = 10, /* DWORD maximum anisotropy */
+    ADD_REGISTER(TYPE_INT, SRGBTEXTURE),       //  = 11, /* Default = 0 (which means Gamma 1.0, no correction required.) else correct for Gamma = 2.2 */
+    ADD_REGISTER(TYPE_INT, ELEMENTINDEX),      //  = 12, When multi-element texture is assigned to sampler, this indicates which element index to use.
+    ADD_REGISTER(TYPE_INT, DMAPOFFSET),        //  = 13, /* Offset in vertices in the pre-sampled displacement map. */
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT D3DMATERIAL9
-#define USING_LIST "MaterialState"
+#define USING_LIST   "MaterialState"
     ADD_REGISTER(TYPE_D3DCOLORVALUE, Diffuse),  /* Diffuse color RGBA */
     ADD_REGISTER(TYPE_D3DCOLORVALUE, Ambient),  /* Ambient color RGB */
     ADD_REGISTER(TYPE_D3DCOLORVALUE, Specular), /* Specular 'shininess' */
     ADD_REGISTER(TYPE_D3DCOLORVALUE, Emissive), /* Emissive color RGB */
     ADD_REGISTER(TYPE_FLOAT, Power),            /* Sharpness if specular highlight */
-#undef  USING_STRUCT
-#undef  USING_LIST
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT CProxyDirect3DDevice9::SD3DTransformState
-#define USING_LIST "TransformState"
-    ADD_REGISTER(TYPE_MATRIX, VIEW),                  //  = 2,
-    ADD_REGISTER(TYPE_MATRIX, PROJECTION),            //  = 3,
-    ADD_REGISTER(TYPE_MATRIX, TEXTURE0),              //  = 16,
-    ADD_REGISTER(TYPE_MATRIX, TEXTURE1),              //  = 17,
-    ADD_REGISTER(TYPE_MATRIX, TEXTURE2),              //  = 18,
-    ADD_REGISTER(TYPE_MATRIX, TEXTURE3),              //  = 19,
-    ADD_REGISTER(TYPE_MATRIX, TEXTURE4),              //  = 20,
-    ADD_REGISTER(TYPE_MATRIX, TEXTURE5),              //  = 21,
-    ADD_REGISTER(TYPE_MATRIX, TEXTURE6),              //  = 22,
-    ADD_REGISTER(TYPE_MATRIX, TEXTURE7),              //  = 23,
-    ADD_REGISTER(TYPE_MATRIX, WORLD),                 //  = 256,
-    ADD_REGISTER(TYPE_MATRIX, WORLD1),                //  = 257,
-    ADD_REGISTER(TYPE_MATRIX, WORLD2),                //  = 258,
-    ADD_REGISTER(TYPE_MATRIX, WORLD3),                //  = 259,
-#undef  USING_STRUCT
-#undef  USING_LIST
+#define USING_LIST   "TransformState"
+    ADD_REGISTER(TYPE_MATRIX, VIEW),        //  = 2,
+    ADD_REGISTER(TYPE_MATRIX, PROJECTION),  //  = 3,
+    ADD_REGISTER(TYPE_MATRIX, TEXTURE0),    //  = 16,
+    ADD_REGISTER(TYPE_MATRIX, TEXTURE1),    //  = 17,
+    ADD_REGISTER(TYPE_MATRIX, TEXTURE2),    //  = 18,
+    ADD_REGISTER(TYPE_MATRIX, TEXTURE3),    //  = 19,
+    ADD_REGISTER(TYPE_MATRIX, TEXTURE4),    //  = 20,
+    ADD_REGISTER(TYPE_MATRIX, TEXTURE5),    //  = 21,
+    ADD_REGISTER(TYPE_MATRIX, TEXTURE6),    //  = 22,
+    ADD_REGISTER(TYPE_MATRIX, TEXTURE7),    //  = 23,
+    ADD_REGISTER(TYPE_MATRIX, WORLD),       //  = 256,
+    ADD_REGISTER(TYPE_MATRIX, WORLD1),      //  = 257,
+    ADD_REGISTER(TYPE_MATRIX, WORLD2),      //  = 258,
+    ADD_REGISTER(TYPE_MATRIX, WORLD3),      //  = 259,
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT D3DLIGHT9
-#define USING_LIST "LightState"
+#define USING_LIST   "LightState"
     ADD_REGISTER(TYPE_INT, Type),               /* Type of light source */
     ADD_REGISTER(TYPE_D3DCOLORVALUE, Diffuse),  /* Diffuse color of light */
     ADD_REGISTER(TYPE_D3DCOLORVALUE, Specular), /* Specular color of light */
@@ -246,23 +245,23 @@ const SRegisterInfo BigRegisterInfoList[] = {
     ADD_REGISTER(TYPE_FLOAT, Attenuation2),     /* Quadratic attenuation */
     ADD_REGISTER(TYPE_FLOAT, Theta),            /* Inner angle of spotlight cone */
     ADD_REGISTER(TYPE_FLOAT, Phi),              /* Outer angle of spotlight cone */
-#undef  USING_STRUCT
-#undef  USING_LIST
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT CProxyDirect3DDevice9::SD3DLightEnableState
-#define USING_LIST "LightEnableState"
+#define USING_LIST   "LightEnableState"
     ADD_REGISTER(TYPE_INT, Enable),
-#undef  USING_STRUCT
-#undef  USING_LIST
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT CProxyDirect3DDevice9::SD3DTextureState
-#define USING_LIST "TextureState"
+#define USING_LIST   "TextureState"
     ADD_REGISTER(TYPE_TEXTURE, Texture),
-#undef  USING_STRUCT
-#undef  USING_LIST
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT D3DCAPS9
-#define USING_LIST "DeviceCaps"
+#define USING_LIST   "DeviceCaps"
     ADD_REGISTER(TYPE_INT, DeviceType),
     ADD_REGISTER(TYPE_INT, AdapterOrdinal),
     ADD_REGISTER(TYPE_INT, Caps), /* Caps from DX7 Draw */
@@ -279,12 +278,12 @@ const SRegisterInfo BigRegisterInfoList[] = {
     ADD_REGISTER(TYPE_INT, AlphaCmpCaps),
     ADD_REGISTER(TYPE_INT, ShadeCaps),
     ADD_REGISTER(TYPE_INT, TextureCaps),
-    ADD_REGISTER(TYPE_INT, TextureFilterCaps),                   // D3DPTFILTERCAPS for IDirect3DTexture9's
-    ADD_REGISTER(TYPE_INT, CubeTextureFilterCaps),               // D3DPTFILTERCAPS for IDirect3DCubeTexture9's
-    ADD_REGISTER(TYPE_INT, VolumeTextureFilterCaps),             // D3DPTFILTERCAPS for IDirect3DVolumeTexture9's
-    ADD_REGISTER(TYPE_INT, TextureAddressCaps),                  // D3DPTADDRESSCAPS for IDirect3DTexture9's
-    ADD_REGISTER(TYPE_INT, VolumeTextureAddressCaps),            // D3DPTADDRESSCAPS for IDirect3DVolumeTexture9's
-    ADD_REGISTER(TYPE_INT, LineCaps),                            // D3DLINECAPS
+    ADD_REGISTER(TYPE_INT, TextureFilterCaps),         // D3DPTFILTERCAPS for IDirect3DTexture9's
+    ADD_REGISTER(TYPE_INT, CubeTextureFilterCaps),     // D3DPTFILTERCAPS for IDirect3DCubeTexture9's
+    ADD_REGISTER(TYPE_INT, VolumeTextureFilterCaps),   // D3DPTFILTERCAPS for IDirect3DVolumeTexture9's
+    ADD_REGISTER(TYPE_INT, TextureAddressCaps),        // D3DPTADDRESSCAPS for IDirect3DTexture9's
+    ADD_REGISTER(TYPE_INT, VolumeTextureAddressCaps),  // D3DPTADDRESSCAPS for IDirect3DVolumeTexture9's
+    ADD_REGISTER(TYPE_INT, LineCaps),                  // D3DLINECAPS
     ADD_REGISTER(TYPE_INT, MaxTextureWidth),
     ADD_REGISTER(TYPE_INT, MaxTextureHeight),
     ADD_REGISTER(TYPE_INT, MaxVolumeExtent),
@@ -308,23 +307,23 @@ const SRegisterInfo BigRegisterInfoList[] = {
     ADD_REGISTER(TYPE_INT, MaxVertexBlendMatrices),
     ADD_REGISTER(TYPE_INT, MaxVertexBlendMatrixIndex),
     ADD_REGISTER(TYPE_FLOAT, MaxPointSize),
-    ADD_REGISTER(TYPE_INT, MaxPrimitiveCount),            // max number of primitives per DrawPrimitive call
+    ADD_REGISTER(TYPE_INT, MaxPrimitiveCount),  // max number of primitives per DrawPrimitive call
     ADD_REGISTER(TYPE_INT, MaxVertexIndex),
     ADD_REGISTER(TYPE_INT, MaxStreams),
-    ADD_REGISTER(TYPE_INT, MaxStreamStride),            // max stride for SetStreamSource
+    ADD_REGISTER(TYPE_INT, MaxStreamStride),  // max stride for SetStreamSource
     ADD_REGISTER(TYPE_INT, VertexShaderVersion),
-    ADD_REGISTER(TYPE_INT, MaxVertexShaderConst),            // number of vertex shader constant registers
+    ADD_REGISTER(TYPE_INT, MaxVertexShaderConst),  // number of vertex shader constant registers
     ADD_REGISTER(TYPE_INT, PixelShaderVersion),
-    ADD_REGISTER(TYPE_FLOAT, PixelShader1xMaxValue),            // max value storable in registers of ps.1.x shaders
-    ADD_REGISTER(TYPE_INT, DevCaps2),                           // Here are the DX9 specific ones
+    ADD_REGISTER(TYPE_FLOAT, PixelShader1xMaxValue),  // max value storable in registers of ps.1.x shaders
+    ADD_REGISTER(TYPE_INT, DevCaps2),                 // Here are the DX9 specific ones
     ADD_REGISTER(TYPE_FLOAT, MaxNpatchTessellationLevel),
     ADD_REGISTER(TYPE_INT, Reserved5),
-    ADD_REGISTER(TYPE_INT, MasterAdapterOrdinal),               // ordinal of master adaptor for adapter group
-    ADD_REGISTER(TYPE_INT, AdapterOrdinalInGroup),              // ordinal inside the adapter group
-    ADD_REGISTER(TYPE_INT, NumberOfAdaptersInGroup),            // number of adapters in this adapter group (only if master)
-    ADD_REGISTER(TYPE_INT, DeclTypes),                          // Data types, supported in vertex declarations
-    ADD_REGISTER(TYPE_INT, NumSimultaneousRTs),                 // Will be at least 1
-    ADD_REGISTER(TYPE_INT, StretchRectFilterCaps),              // Filter caps supported by StretchRect
+    ADD_REGISTER(TYPE_INT, MasterAdapterOrdinal),     // ordinal of master adaptor for adapter group
+    ADD_REGISTER(TYPE_INT, AdapterOrdinalInGroup),    // ordinal inside the adapter group
+    ADD_REGISTER(TYPE_INT, NumberOfAdaptersInGroup),  // number of adapters in this adapter group (only if master)
+    ADD_REGISTER(TYPE_INT, DeclTypes),                // Data types, supported in vertex declarations
+    ADD_REGISTER(TYPE_INT, NumSimultaneousRTs),       // Will be at least 1
+    ADD_REGISTER(TYPE_INT, StretchRectFilterCaps),    // Filter caps supported by StretchRect
     ADD_REGISTER(TYPE_INT, VS20Caps.Caps),
     ADD_REGISTER(TYPE_INT, VS20Caps.DynamicFlowControlDepth),
     ADD_REGISTER(TYPE_INT, VS20Caps.NumTemps),
@@ -334,25 +333,25 @@ const SRegisterInfo BigRegisterInfoList[] = {
     ADD_REGISTER(TYPE_INT, PS20Caps.NumTemps),
     ADD_REGISTER(TYPE_INT, PS20Caps.StaticFlowControlDepth),
     ADD_REGISTER(TYPE_INT, PS20Caps.NumInstructionSlots),
-    ADD_REGISTER(TYPE_INT, VertexTextureFilterCaps),                   // D3DPTFILTERCAPS for IDirect3DTexture9's for texture, used in vertex shaders
-    ADD_REGISTER(TYPE_INT, MaxVShaderInstructionsExecuted),            // maximum number of vertex shader instructions that can be executed
-    ADD_REGISTER(TYPE_INT, MaxPShaderInstructionsExecuted),            // maximum number of pixel shader instructions that can be executed
+    ADD_REGISTER(TYPE_INT, VertexTextureFilterCaps),         // D3DPTFILTERCAPS for IDirect3DTexture9's for texture, used in vertex shaders
+    ADD_REGISTER(TYPE_INT, MaxVShaderInstructionsExecuted),  // maximum number of vertex shader instructions that can be executed
+    ADD_REGISTER(TYPE_INT, MaxPShaderInstructionsExecuted),  // maximum number of pixel shader instructions that can be executed
     ADD_REGISTER(TYPE_INT, MaxVertexShader30InstructionSlots),
     ADD_REGISTER(TYPE_INT, MaxPixelShader30InstructionSlots),
-#undef  USING_STRUCT
-#undef  USING_LIST
+#undef USING_STRUCT
+#undef USING_LIST
 
 #define USING_STRUCT CProxyDirect3DDevice9::SD3DVertexDeclState
-#define USING_LIST "VertexDeclState"
-    ADD_REGISTER(TYPE_INT, Position),            // Does each vertex have these components ?
+#define USING_LIST   "VertexDeclState"
+    ADD_REGISTER(TYPE_INT, Position),  // Does each vertex have these components ?
     ADD_REGISTER(TYPE_INT, PositionT),
     ADD_REGISTER(TYPE_INT, Normal),
     ADD_REGISTER(TYPE_INT, Color0),
     ADD_REGISTER(TYPE_INT, Color1),
     ADD_REGISTER(TYPE_INT, TexCoord0),
     ADD_REGISTER(TYPE_INT, TexCoord1),
-#undef  USING_STRUCT
-#undef  USING_LIST
+#undef USING_STRUCT
+#undef USING_LIST
 };
 
 ////////////////////////////////////////////////////////////////
@@ -1017,7 +1016,7 @@ SString CEffectParameters::GetAnnotationNameAndValue(D3DXHANDLE hParameter, uint
     if (!m_pD3DEffect)
         return "";
 
-    D3DXHANDLE         hAnnotation = m_pD3DEffect->GetAnnotation(hParameter, uiIndex);
+    D3DXHANDLE hAnnotation = m_pD3DEffect->GetAnnotation(hParameter, uiIndex);
     if (!hAnnotation)
         return "";
 
@@ -1156,8 +1155,8 @@ bool CEffectParameters::TryMappingParameterToRegister(D3DXHANDLE hParameter, con
         }
 
         // Extract prepended stage number, if any
-        SString strStagePart;
-        SString strName;
+        SString    strStagePart;
+        SString    strName;
         const bool bHasStagePart = strAnnotValue.Split(",", &strStagePart, &strName, -1);
         if (!bHasStagePart)
             strName = strAnnotValue;
@@ -1168,7 +1167,7 @@ bool CEffectParameters::TryMappingParameterToRegister(D3DXHANDLE hParameter, con
         if (strName.empty())
             continue;
 
-        int iStage = 0;
+        int        iStage = 0;
         const bool bGroupUsesStage = DoesStateGroupUseStageIndex(stateGroup);
         if (bHasStagePart)
         {
@@ -1181,7 +1180,7 @@ bool CEffectParameters::TryMappingParameterToRegister(D3DXHANDLE hParameter, con
             if (strStagePart.empty())
                 continue;
 
-            char* pParseEnd = nullptr;
+            char*      pParseEnd = nullptr;
             const long parsedStage = strtol(strStagePart.c_str(), &pParseEnd, 10);
             if (!pParseEnd || *pParseEnd != '\0')
                 continue;
@@ -1231,7 +1230,7 @@ bool CEffectParameters::TryMappingParameterToRegister(D3DXHANDLE hParameter, con
         var.iSize = pTypeMapping->OutSize;
         AddStateMappedParameter(stateGroup, var);
         m_bUsesMappedHandles = true;
-        return true;            // We have a weiner
+        return true;  // We have a weiner
     }
 
     return false;

@@ -63,12 +63,12 @@ private:
     CGameSettings* m_pGameSettings;
     ULONG          m_ulMonitorCount;
 
-    int      m_iCurrentVideoMode;            // VideoMode this run
+    int      m_iCurrentVideoMode;  // VideoMode this run
     int      m_iCurrentAdapter;
     bool     m_bCurrentWindowed;
     bool     m_bCurrentFullScreenMinimize;
     int      m_iCurrentFullscreenStyle;
-    int      m_iNextVideoMode;            // VideoMode next run
+    int      m_iNextVideoMode;  // VideoMode next run
     int      m_iNextAdapter;
     bool     m_bNextWindowed;
     int      m_iNextFullscreenStyle;
@@ -254,7 +254,7 @@ void CVideoModeManager::PostReset(D3DPRESENT_PARAMETERS* pp)
 
         SetWindowLong(m_hDeviceWindow, GWL_STYLE, Style);
 
-        LONG ExStyle = 0;            // WS_EX_WINDOWEDGE;
+        LONG ExStyle = 0;  // WS_EX_WINDOWEDGE;
         SetWindowLong(m_hDeviceWindow, GWL_EXSTYLE, ExStyle);
 
         // Ensure client area of window is correct size
@@ -628,7 +628,7 @@ bool CVideoModeManager::GameResMatchesCurrentAdapter()
 
     // Here we hope that the color depth is the same across all monitors
     HDC hdcPrimaryMonitor = GetDC(nullptr);
-    int iDesktopColorDepth = 32;            // Default fallback
+    int iDesktopColorDepth = 32;  // Default fallback
 
     if (hdcPrimaryMonitor)
     {

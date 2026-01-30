@@ -18,28 +18,29 @@
 
 extern "C"
 {
-    #include <lua.h>
-    #include <lualib.h>
-    #include <lauxlib.h>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 }
 
 #ifdef WIN32
     #define MTAEXPORT extern "C" __declspec(dllexport)
 #else
-    #define MTAEXPORT extern "C" __attribute__ ((visibility ("default")))
+    #define MTAEXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
 #include <list>
 #include <vector>
 // Obviously i can't get us this so other includes will most likely be needed later on
 
-using namespace std;
+using std::list;
+using std::vector;
 
 #ifndef __COMMON_H
-#define __COMMON_H
+    #define __COMMON_H
 
-// used in the function argument vector
-#define MAX_ARGUMENTS 10
+    // used in the function argument vector
+    #define MAX_ARGUMENTS 10
 struct FunctionArguments
 {
     lua_State*    luaVM;

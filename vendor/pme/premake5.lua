@@ -2,6 +2,7 @@ project "pme"
 	language "C++"
 	kind "StaticLib"
 	targetname "pme"
+	warnings "Off"
 
 	includedirs { "../pcre" }
 

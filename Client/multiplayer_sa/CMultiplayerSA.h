@@ -19,8 +19,8 @@
 #include "CRemoteDataSA.h"
 
 class CRemoteDataSA;
-#define DEFAULT_NEAR_CLIP_DISTANCE  ( 0.3f )
-#define DEFAULT_SHADOWS_OFFSET      ( 0.013f ) // GTA default = 0.06f
+#define DEFAULT_NEAR_CLIP_DISTANCE (0.3f)
+#define DEFAULT_SHADOWS_OFFSET     (0.013f)  // GTA default = 0.06f
 
 enum eRadioStationID
 {
@@ -51,6 +51,7 @@ public:
     ZERO_ON_NEW
 
     CMultiplayerSA();
+    ~CMultiplayerSA();
     void                InitHooks();
     void                InitHooks_CrashFixHacks();
     void                Init_13();
@@ -60,6 +61,7 @@ public:
     void                InitHooks_ClothesSpeedUp();
     void                InitHooks_FixBadAnimId();
     void                InitHooks_HookDestructors();
+    void                CleanupHooks_HookDestructors();
     void                InitHooks_RwResources();
     void                InitHooks_ClothesCache();
     void                InitHooks_Files();
@@ -202,17 +204,17 @@ public:
     int   GetMoonSize();
     void  ResetMoonSize();
 
-    void  GetAmbientColor(float& red, float& green, float& blue) const;
-    bool  SetAmbientColor(float red, float green, float blue);
-    bool  ResetAmbientColor();
+    void GetAmbientColor(float& red, float& green, float& blue) const;
+    bool SetAmbientColor(float red, float green, float blue);
+    bool ResetAmbientColor();
 
-    void  GetAmbientObjectColor(float& red, float& green, float& blue) const;
-    bool  SetAmbientObjectColor(float red, float green, float blue);
-    bool  ResetAmbientObjectColor();
+    void GetAmbientObjectColor(float& red, float& green, float& blue) const;
+    bool SetAmbientObjectColor(float red, float green, float blue);
+    bool ResetAmbientObjectColor();
 
-    void  GetDirectionalColor(float& red, float& green, float& blue) const;
-    bool  SetDirectionalColor(float red, float green, float blue);
-    bool  ResetDirectionalColor();
+    void GetDirectionalColor(float& red, float& green, float& blue) const;
+    bool SetDirectionalColor(float red, float green, float blue);
+    bool ResetDirectionalColor();
 
     float GetSpriteSize() const;
     bool  SetSpriteSize(float size);
@@ -238,13 +240,13 @@ public:
     bool  SetLightsOnGroundBrightness(float brightness);
     bool  ResetLightsOnGroundBrightness();
 
-    void  GetLowCloudsColor(int16& red, int16& green, int16& blue) const;
-    bool  SetLowCloudsColor(int16 red, int16 green, int16 blue);
-    bool  ResetLowCloudsColor();
+    void GetLowCloudsColor(int16& red, int16& green, int16& blue) const;
+    bool SetLowCloudsColor(int16 red, int16 green, int16 blue);
+    bool ResetLowCloudsColor();
 
-    void  GetBottomCloudsColor(int16& red, int16& green, int16& blue) const;
-    bool  SetBottomCloudsColor(int16 red, int16 green, int16 blue);
-    bool  ResetBottomCloudsColor();
+    void GetBottomCloudsColor(int16& red, int16& green, int16& blue) const;
+    bool SetBottomCloudsColor(int16 red, int16 green, int16 blue);
+    bool ResetBottomCloudsColor();
 
     float GetCloudsAlpha1() const;
     bool  SetCloudsAlpha1(float alpha);

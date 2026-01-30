@@ -272,8 +272,7 @@ bool CClientObjectManager::IsHardObjectLimitReached()
                 "CClientObjectManager reached limit -"
                 " ENTRY_INFO_NODES:%d/%d"
                 " POINTER_DOUBLE_LINKS:%d/%d",
-                m_iEntryInfoNodeEntries, MAX_ENTRY_INFO_NODES_MTA,
-                m_iPointerNodeDoubleLinkEntries, MAX_POINTER_DOUBLE_LINKS_MTA);
+                m_iEntryInfoNodeEntries, MAX_ENTRY_INFO_NODES_MTA, m_iPointerNodeDoubleLinkEntries, MAX_POINTER_DOUBLE_LINKS_MTA);
             g_pCore->GetConsole()->Echo(strMessage);
             AddReportLog(7430, strMessage);
         }

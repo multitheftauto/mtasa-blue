@@ -50,15 +50,21 @@ public:
 
     uint GetFreeSlot()
     {
-        bool         bLooped = false;
-        std::int32_t index = m_nFirstFree + 1;
+        if (m_nSize <= 0 || m_byteMap == nullptr)
+            return static_cast<uint>(-1);
+
+        bool bLooped = false;
+        int  index = m_nFirstFree + 1;
+
+        if (index < 0 || index >= m_nSize)
+            index = 0;
 
         while (true)
         {
             if (index >= m_nSize)
             {
                 if (bLooped)
-                    return -1;
+                    return static_cast<uint>(-1);
 
                 index = 0;
                 bLooped = true;
@@ -67,21 +73,30 @@ public:
             if (m_byteMap[index].bEmpty)
             {
                 m_nFirstFree = index;
-                return index;
+                return static_cast<uint>(index);
             }
             index++;
         }
 
-        return -1;
+        return static_cast<uint>(-1);
     };
 
     B* Allocate()
     {
-        m_nFirstFree++;                     // Continue after the last allocated slot
-        const auto sz = m_nSize;            // Storing size to avoid reloads from memory - should help out the optimizer
-        for (auto i = 0u; i < sz; i++)
+        if (m_nSize <= 0 || m_pObjects == nullptr || m_byteMap == nullptr)
+            return nullptr;
+
+        m_nFirstFree++;           // Continue after the last allocated slot
+        const auto sz = m_nSize;  // Storing size to avoid reloads from memory - should help out the optimizer
+
+        if (m_nFirstFree < 0 || m_nFirstFree >= sz)
+            m_nFirstFree = 0;
+
+        for (int i = 0; i < sz; i++)
         {
-            const auto slot = (m_nFirstFree + i) % sz;
+            int slot = m_nFirstFree + i;
+            if (slot >= sz)
+                slot -= sz;
             const auto e = &m_byteMap[slot];
             if (!e->bEmpty)
             {
@@ -123,10 +138,13 @@ public:
     void Delete(uint index) { Release(index); }
 
     std::int32_t Size() const noexcept { return m_nSize; };
-    bool IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
-    bool IsContains(std::int32_t index) const
+    bool         IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
+    bool         IsContains(std::int32_t index) const
     {
-        if (m_nSize <= index)
+        if (m_nSize <= 0)
+            return false;
+
+        if (index < 0 || index >= m_nSize)
             return false;
         return !IsEmpty(index);
     }
@@ -137,8 +155,11 @@ public:
 
     std::int32_t GetObjectIndexSafe(B* pObject)
     {
-        std::int32_t index = GetObjectIndex(pObject);
-        return index > m_nSize ? UINT_MAX : index;
+        uint32_t index = GetObjectIndex(pObject);
+        if (m_nSize <= 0)
+            return UINT_MAX;
+
+        return index >= static_cast<uint32_t>(m_nSize) ? UINT_MAX : index;
     }
 };
 
@@ -166,8 +187,5 @@ struct SVectorPoolData
     size_t                        count;
 
 public:
-    SVectorPoolData(size_t defaultSize) : count(0)
-    {
-        entities.resize(defaultSize, {nullptr, nullptr});
-    }
+    SVectorPoolData(size_t defaultSize) : count(0) { entities.resize(defaultSize, {nullptr, nullptr}); }
 };

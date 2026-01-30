@@ -16,7 +16,7 @@
 class CPlayerPuresyncPacket final : public CPacket
 {
 public:
-    CPlayerPuresyncPacket(){};
+    CPlayerPuresyncPacket() {};
     explicit CPlayerPuresyncPacket(CPlayer* pPlayer);
 
     bool          HasSimHandler() const { return true; }

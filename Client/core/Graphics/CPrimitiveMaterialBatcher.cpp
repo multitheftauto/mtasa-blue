@@ -30,6 +30,7 @@ CPrimitiveMaterialBatcher::CPrimitiveMaterialBatcher(CGraphics* graphics)
 ////////////////////////////////////////////////////////////////
 CPrimitiveMaterialBatcher::~CPrimitiveMaterialBatcher()
 {
+    ClearQueue();
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -203,6 +204,7 @@ void CPrimitiveMaterialBatcher::Flush()
         }
         pLastMaterial = pMaterial;
         m_pGraphics->RemoveQueueRef(pMaterial);
+        primitive.pMaterial = nullptr;
     }
 
     // Clean up
@@ -257,7 +259,13 @@ void CPrimitiveMaterialBatcher::ClearQueue()
     // Clean up
     for (auto& primitive : m_primitiveList)
     {
+        if (primitive.pMaterial)
+        {
+            m_pGraphics->RemoveQueueRef(primitive.pMaterial);
+            primitive.pMaterial = nullptr;
+        }
         delete primitive.pVecVertices;
+        primitive.pVecVertices = nullptr;
     }
 
     size_t prevSize = m_primitiveList.size();
@@ -273,5 +281,7 @@ void CPrimitiveMaterialBatcher::ClearQueue()
 ////////////////////////////////////////////////////////////////
 void CPrimitiveMaterialBatcher::AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices)
 {
+    if (pMaterial)
+        m_pGraphics->AddQueueRef(pMaterial);
     m_primitiveList.push_back({eType, pMaterial, pVecVertices});
 }

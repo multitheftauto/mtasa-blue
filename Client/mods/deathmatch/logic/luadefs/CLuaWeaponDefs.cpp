@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "game/CWeaponStatManager.h"
 
-#define MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG     "1.3.5-9.06139"
+#define MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG "1.3.5-9.06139"
 
 void CLuaWeaponDefs::LoadFunctions()
 {
@@ -41,8 +41,7 @@ void CLuaWeaponDefs::LoadFunctions()
         {"setWeaponAmmo", SetWeaponAmmo},
         {"setWeaponClipAmmo", SetWeaponClipAmmo},
         {"setWeaponRenderEnabled", ArgumentParser<SetWeaponRenderEnabled>},
-        {"isWeaponRenderEnabled", ArgumentParser<IsWeaponRenderEnabled>}
-    };
+        {"isWeaponRenderEnabled", ArgumentParser<IsWeaponRenderEnabled>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -209,7 +208,7 @@ int CLuaWeaponDefs::FireWeapon(lua_State* luaVM)
 int CLuaWeaponDefs::SetWeaponProperty(lua_State* luaVM)
 {
     CClientWeapon*   pWeapon;
-    WeaponProperty  weaponProperty;
+    WeaponProperty   weaponProperty;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pWeapon);
     argStream.ReadEnumString(weaponProperty);
@@ -694,7 +693,10 @@ int CLuaWeaponDefs::SetWeaponClipAmmo(lua_State* luaVM)
     return 1;
 }
 
-std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDefs::GetWeaponProperty(lua_State* luaVM, std::variant<CClientWeapon*, int, std::string> weapon, std::variant<int, std::string> weaponSkill, WeaponProperty property)
+std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetWeaponProperty(lua_State*                                     luaVM,
+                                                                                                       std::variant<CClientWeapon*, int, std::string> weapon,
+                                                                                                       std::variant<int, std::string> weaponSkill,
+                                                                                                       WeaponProperty                 property)
 {
     eWeaponSkill skill = WEAPONSKILL_POOR;
     if (std::holds_alternative<int>(weaponSkill))
@@ -708,7 +710,7 @@ std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDef
     // custom weapon
     if (std::holds_alternative<CClientWeapon*>(weapon))
     {
-        auto* weaponPtr = std::get<CClientWeapon*>(weapon);
+        auto*        weaponPtr = std::get<CClientWeapon*>(weapon);
         CWeaponStat* weaponStats = weaponPtr->GetWeaponStat();
         if (!weaponPtr || !weaponStats)
             return false;
@@ -840,7 +842,10 @@ std::variant<float, int, bool, CLuaMultiReturn<float,float,float>> CLuaWeaponDef
     return false;
 }
 
-std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State* luaVM, std::variant<int, std::string> weapon, std::variant<int, std::string> weaponSkill, WeaponProperty property)
+std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State*                     luaVM,
+                                                                                                               std::variant<int, std::string> weapon,
+                                                                                                               std::variant<int, std::string> weaponSkill,
+                                                                                                               WeaponProperty                 property)
 {
     eWeaponType weaponType = eWeaponType::WEAPONTYPE_INVALID;
     if (std::holds_alternative<int>(weapon))

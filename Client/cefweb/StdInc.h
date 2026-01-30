@@ -1,5 +1,9 @@
 
 #include <winsock.h>
+#include <array>
+#include <filesystem>
+#include <string>
+#include <memory>
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"

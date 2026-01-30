@@ -66,7 +66,7 @@ CClientPlayer::CClientPlayer(CClientManager* pManager, ElementID ID, bool bIsLoc
         m_remoteDataStorage->SetProcessPlayerWeapon(true);
 
         // Enable voice playback for remote players
-        if (g_pClientGame->GetVoiceRecorder()->IsEnabled())            // If voice is enabled
+        if (g_pClientGame->GetVoiceRecorder()->IsEnabled())  // If voice is enabled
             m_voice = new CClientPlayerVoice(this, g_pClientGame->GetVoiceRecorder());
     }
 

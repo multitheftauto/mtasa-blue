@@ -11,6 +11,12 @@
 
 #include "StdInc.h"
 #include "CGame.h"
+
+#ifdef WIN32
+    #include <ws2tcpip.h>
+#else
+    #include <arpa/inet.h>
+#endif
 #include "CAccessControlListManager.h"
 #include "ASE.h"
 #include "CPerfStatManager.h"
@@ -154,7 +160,7 @@ void sighandler(int sig)
 }
 #endif
 
-CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connections per 30 seconds, then 30 second ignore
+CGame::CGame() : m_FloodProtect(4, 30000, 30000)  // Max of 4 connections per 30 seconds, then 30 second ignore
 {
     // Set our global pointer
     g_pGame = this;
@@ -839,13 +845,21 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     if (m_pMainConfig->GetAseInternetListenEnabled())
     {
         // Check if IP is one of the most common private IP addresses
-        in_addr serverIp;
-        serverIp.s_addr = inet_addr(strServerIP);
-        uchar a = ((uchar*)&serverIp.s_addr)[0];
-        uchar b = ((uchar*)&serverIp.s_addr)[1];
-        if (a == 10 || a == 127 || (a == 169 && b == 254) || (a == 192 && b == 168))
+        in_addr serverIp{};
+#ifdef WIN32
+        const bool parsed = InetPtonA(AF_INET, strServerIP, &serverIp) == 1;
+#else
+        const bool parsed = inet_pton(AF_INET, strServerIP, &serverIp) == 1;
+#endif
+        if (parsed)
         {
-            CLogger::LogPrintf("WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP);
+            const uint32_t hostOrder = ntohl(serverIp.s_addr);
+            const uchar    a = (hostOrder >> 24) & 0xFF;
+            const uchar    b = (hostOrder >> 16) & 0xFF;
+            if (a == 10 || a == 127 || (a == 169 && b == 254) || (a == 192 && b == 168))
+            {
+                CLogger::LogPrintf("WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP);
+            }
         }
     }
 
@@ -903,7 +917,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pResourceManager = new CResourceManager;
     m_pSettings = new CSettings(m_pResourceManager);
     if (!m_pResourceManager->Refresh())
-        return false;            // Load cancelled
+        return false;  // Load cancelled
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync(m_pPlayerManager, m_pVehicleManager);
     m_pPedSync = new CPedSync(m_pPlayerManager, m_pPedManager);
 #ifdef WITH_OBJECT_SYNC
@@ -1004,7 +1018,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     // Now load the rest of the config
     if (!m_pMainConfig->LoadExtended())
-        return false;            // Fail or cancelled
+        return false;  // Fail or cancelled
 
     // Is the script debug log enabled?
     if (m_pMainConfig->GetScriptDebugLogEnabled())
@@ -1359,12 +1373,11 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("Start");
 
     // Let him join
-    Player.Send(CPlayerJoinCompletePacket(Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(),
-                                          m_pMainConfig->GetHTTPPort(), m_pMainConfig->GetHTTPDownloadURL().c_str(),
-                                          m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
-                                          m_pMainConfig->IsVoiceEnabled(), static_cast<unsigned char>(m_pMainConfig->GetVoiceSampleRate()),
-                                          static_cast<unsigned char>(m_pMainConfig->GetVoiceQuality()), m_pMainConfig->GetVoiceBitrate(),
-                                          m_pMainConfig->GetServerName().c_str()));
+    Player.Send(CPlayerJoinCompletePacket(
+        Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(), m_pMainConfig->GetHTTPPort(),
+        m_pMainConfig->GetHTTPDownloadURL().c_str(), m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
+        m_pMainConfig->IsVoiceEnabled(), static_cast<unsigned char>(m_pMainConfig->GetVoiceSampleRate()),
+        static_cast<unsigned char>(m_pMainConfig->GetVoiceQuality()), m_pMainConfig->GetVoiceBitrate(), m_pMainConfig->GetServerName().c_str()));
 
     marker.Set("CPlayerJoinCompletePacket");
 
@@ -1414,7 +1427,7 @@ void CGame::InitialDataStream(CPlayer& Player)
     marker.Set("PlayerNotice");
 
     // Tell the map manager
-    m_pMapManager->OnPlayerJoin(Player);            // This sends the elements that are needed before the resources start
+    m_pMapManager->OnPlayerJoin(Player);  // This sends the elements that are needed before the resources start
 
     marker.Set("SendMapElements");
 
@@ -1675,7 +1688,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
     m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
     m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
-    m_Events.AddEvent("onElementAttach", "attachSource, attachOffsetX, attachOffsetY, attachOffsetZ, attachOffsetRX, attachOffsetRY, attachOffsetRZ", nullptr, false);
+    m_Events.AddEvent("onElementAttach", "attachSource, attachOffsetX, attachOffsetY, attachOffsetZ, attachOffsetRX, attachOffsetRY, attachOffsetRZ", nullptr,
+                      false);
     m_Events.AddEvent("onElementDetach", "detachSource, detachWorldX, detachWorldY, detachWorldZ, detachWorldRX, detachWorldRY, detachWorldRZ", nullptr, false);
 
     // Radar area events
@@ -1728,15 +1742,15 @@ void CGame::ProcessTrafficLights(long long llCurrentTime)
 
     if (ulDiff >= 1000)
     {
-        if ((m_ucTrafficLightState == 0 || m_ucTrafficLightState == 3) && ulDiff >= 8000)            // green
+        if ((m_ucTrafficLightState == 0 || m_ucTrafficLightState == 3) && ulDiff >= 8000)  // green
         {
             ucNewState = m_ucTrafficLightState + 1;
         }
-        else if ((m_ucTrafficLightState == 1 || m_ucTrafficLightState == 4) && ulDiff >= 3000)            // orange
+        else if ((m_ucTrafficLightState == 1 || m_ucTrafficLightState == 4) && ulDiff >= 3000)  // orange
         {
             ucNewState = (m_ucTrafficLightState == 4) ? 0 : 2;
         }
-        else if (m_ucTrafficLightState == 2 && ulDiff >= 2000)            // red
+        else if (m_ucTrafficLightState == 2 && ulDiff >= 2000)  // red
         {
             ucNewState = 3;
         }
@@ -1958,7 +1972,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             if (CBan* pBan = m_pBanManager->GetBanFromIP(strIP))
                             {
                                 time_t  Duration = pBan->GetBanTimeRemaining();
-                                SString strBanMessage;            // = "Serial is banned";
+                                SString strBanMessage;  // = "Serial is banned";
                                 SString strDurationDesc = pBan->GetDurationDesc();
                                 if (strDurationDesc.length())
                                     strBanMessage += " (" + strDurationDesc + ")";
@@ -2255,7 +2269,7 @@ void CGame::RelayPlayerPuresync(CPacket& Packet)
         SViewerMapType& nearList = pPlayer->GetNearPlayerList();
 
         // Array for holding players that need moving to the puresync far list
-        static std::vector<CPlayer*> moveToFarListList;            // static to help reduce memory allocations
+        static std::vector<CPlayer*> moveToFarListList;  // static to help reduce memory allocations
         moveToFarListList.clear();
 
         // For each puresync near player
@@ -2269,7 +2283,7 @@ void CGame::RelayPlayerPuresync(CPacket& Packet)
             {
                 // Remove player from puresync near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far
                 // away))
-                if (!pPlayer->ShouldPlayerBeInNearList(pSendPlayer))            // Double check remove is required.
+                if (!pPlayer->ShouldPlayerBeInNearList(pSendPlayer))  // Double check remove is required.
                 {
                     moveToFarListList.push_back(pSendPlayer);
                     continue;
@@ -2525,20 +2539,19 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (player->GetWeaponTotalAmmo(slot) <= 0)
         return;
 
-    if (player->GetWeaponAmmoInClip(slot) <= 0)
-        return;
+    // Note: Don't check ammo in clip here - it can be out of sync due to network timing
+    // The total ammo check above is sufficient
 
     const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
     const auto level = player->GetPlayerStat(stat);
     auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
 
-    const float distance = (packet.m_start - packet.m_end).LengthSquared();
+    const float distanceSq = (packet.m_start - packet.m_end).LengthSquared();
     const float range = stats->GetWeaponRange();
-    const float rangesq = range * range;
+    const float rangeSq = range * range;
 
-    const float delta = std::fabs(distance - rangesq);
-    const float max = std::max(distance, rangesq);
-    if (delta > max * FLOAT_EPSILON)
+    const float maxRangeSq = rangeSq * 1.1f;  // 10% tolerance for floating point
+    if (distanceSq > maxRangeSq)
         return;
 
     CLuaArguments args;
@@ -2672,13 +2685,12 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
                 m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not marked as remotely triggerable",
                                              pCaller->GetNick(), szName);
             }
-
         }
         else
         {
             // Limit this error to prevent debug / log files being flooded.
             static std::uint64_t s_lastClientEventErrorLog = 0;
-            auto now = GetTickCount64_();
+            auto                 now = GetTickCount64_();
             if (now - s_lastClientEventErrorLog > NUM_CLIENT_EVENT_ERROR_GAP)
             {
                 CLuaArguments arguments;
@@ -2718,7 +2730,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                 return;
             }
 
-            ESyncType lastSyncType = ESyncType::BROADCAST;
+            ESyncType              lastSyncType = ESyncType::BROADCAST;
             eCustomDataClientTrust clientChangesMode{};
 
             pElement->GetCustomData(szName, false, &lastSyncType, &clientChangesMode);
@@ -2727,8 +2739,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                                                                                            : clientChangesMode == eCustomDataClientTrust::ALLOW;
             if (!changesAllowed)
             {
-                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", Packet.GetSourcePlayer()->GetNick(),
-                                     szName);
+                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", Packet.GetSourcePlayer()->GetNick(), szName);
 
                 CLuaArguments arguments;
                 arguments.PushElement(pElement);
@@ -2738,25 +2749,45 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                 return;
             }
 
-            if (lastSyncType != ESyncType::LOCAL)
+            if (pElement->SetCustomData(szName, Value, lastSyncType, pSourcePlayer))
             {
-                // Tell our clients to update their data. Send to everyone but the one we got this packet from.
+                if (lastSyncType != ESyncType::LOCAL)
+                {
+                    // Tell our clients to update their data. Send to everyone but the one we got this packet from.
+                    unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+                    CBitStream     BitStream;
+                    BitStream.pBitStream->WriteCompressed(usNameLength);
+                    BitStream.pBitStream->Write(szName, usNameLength);
+                    Value.WriteToBitStream(*BitStream.pBitStream);
+                    if (lastSyncType == ESyncType::BROADCAST)
+                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
+                    else
+                        m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName,
+                                                                  pSourcePlayer);
+
+                    CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(szName, m_pPlayerManager->Count(),
+                                                                                             BitStream.pBitStream->GetNumberOfBytesUsed());
+                }
+            }
+            else
+            {
+                // Event was cancelled; sync the authoritative value back to the source player
                 unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
                 CBitStream     BitStream;
                 BitStream.pBitStream->WriteCompressed(usNameLength);
                 BitStream.pBitStream->Write(szName, usNameLength);
-                Value.WriteToBitStream(*BitStream.pBitStream);
-                if (lastSyncType == ESyncType::BROADCAST)
-                    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
+
+                if (CLuaArgument* pServerValue = pElement->GetCustomData(szName, false))
+                {
+                    pServerValue->WriteToBitStream(*BitStream.pBitStream);
+                    pSourcePlayer->Send(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+                }
                 else
-                    m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName,
-                                                              pSourcePlayer);
-
-                CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(szName, m_pPlayerManager->Count(),
-                                                                                         BitStream.pBitStream->GetNumberOfBytesUsed());
+                {
+                    BitStream.pBitStream->WriteBit(false);
+                    pSourcePlayer->Send(CElementRPCPacket(pElement, REMOVE_ELEMENT_DATA, *BitStream.pBitStream));
+                }
             }
-
-            pElement->SetCustomData(szName, Value, lastSyncType, pSourcePlayer);
         }
     }
 }
@@ -2929,23 +2960,23 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
         }
 
         CLuaArguments arguments;
-        arguments.PushNumber(Packet.m_ucWeaponType);            // "weaponType"
-        arguments.PushNumber(vecPosition.fX);                   // "posX"
-        arguments.PushNumber(vecPosition.fY);                   // "posY"
-        arguments.PushNumber(vecPosition.fZ);                   // "posZ"
-        arguments.PushNumber(Packet.m_fForce);                  // "force"
+        arguments.PushNumber(Packet.m_ucWeaponType);  // "weaponType"
+        arguments.PushNumber(vecPosition.fX);         // "posX"
+        arguments.PushNumber(vecPosition.fY);         // "posY"
+        arguments.PushNumber(vecPosition.fZ);         // "posZ"
+        arguments.PushNumber(Packet.m_fForce);        // "force"
 
         CElement* pTarget = nullptr;
         if (Packet.m_bHasTarget && Packet.m_TargetID != INVALID_ELEMENT_ID)
             pTarget = CElementIDs::GetElement(Packet.m_TargetID);
 
-        arguments.PushElement(pTarget);                            // "target"
-        arguments.PushNumber(Packet.m_vecRotation.fX);             // "rotX"
-        arguments.PushNumber(Packet.m_vecRotation.fY);             // "rotY"
-        arguments.PushNumber(Packet.m_vecRotation.fZ);             // "rotZ"
-        arguments.PushNumber(Packet.m_vecMoveSpeed.fX);            // "velX"
-        arguments.PushNumber(Packet.m_vecMoveSpeed.fY);            // "velY"
-        arguments.PushNumber(Packet.m_vecMoveSpeed.fZ);            // "velZ"
+        arguments.PushElement(pTarget);                  // "target"
+        arguments.PushNumber(Packet.m_vecRotation.fX);   // "rotX"
+        arguments.PushNumber(Packet.m_vecRotation.fY);   // "rotY"
+        arguments.PushNumber(Packet.m_vecRotation.fZ);   // "rotZ"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fX);  // "velX"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fY);  // "velY"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fZ);  // "velZ"
 
         // Trigger Lua event and see if we are allowed to continue
         if (!pPlayer->CallEvent("onPlayerProjectileCreation", arguments))
@@ -3085,7 +3116,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                             bWarpIn = true;
                                         }
                                         if (usVehicleModel == VT_RCBARON)
-                                        {            // warp in for rc baron.
+                                        {  // warp in for rc baron.
                                             fCutoffDistance = 10.0f;
                                             bWarpIn = true;
                                         }
@@ -3119,10 +3150,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
-                                                    Arguments.PushElement(pPed);             // player / ped
-                                                    Arguments.PushNumber(0);                 // seat
-                                                    Arguments.PushBoolean(false);            // jacked
-                                                    Arguments.PushNumber(ucDoor);            // Door
+                                                    Arguments.PushElement(pPed);   // player / ped
+                                                    Arguments.PushNumber(0);       // seat
+                                                    Arguments.PushBoolean(false);  // jacked
+                                                    Arguments.PushNumber(ucDoor);  // Door
                                                     if (pVehicle->CallEvent("onVehicleStartEnter", Arguments))
                                                     {
                                                         // HACK?: check the ped's vehicle-action is still the same (not warped in?)
@@ -3189,10 +3220,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                                         // Call the entering vehicle event
                                                         CLuaArguments EnterArguments;
-                                                        EnterArguments.PushElement(pPed);                 // player / ped
-                                                        EnterArguments.PushNumber(0);                     // seat
-                                                        EnterArguments.PushElement(pOccupant);            // jacked
-                                                        EnterArguments.PushNumber(ucDoor);                // Door
+                                                        EnterArguments.PushElement(pPed);       // player / ped
+                                                        EnterArguments.PushNumber(0);           // seat
+                                                        EnterArguments.PushElement(pOccupant);  // jacked
+                                                        EnterArguments.PushNumber(ucDoor);      // Door
                                                         if (pVehicle->CallEvent("onVehicleStartEnter", EnterArguments))
                                                         {
                                                             // HACK?: check the peds vehicle-action is still the same (not warped in?)
@@ -3200,9 +3231,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                             {
                                                                 // Call the exiting vehicle event
                                                                 CLuaArguments ExitArguments;
-                                                                ExitArguments.PushElement(pOccupant);            // player / ped
-                                                                ExitArguments.PushNumber(ucSeat);                // seat
-                                                                ExitArguments.PushElement(pPed);                 // jacker
+                                                                ExitArguments.PushElement(pOccupant);  // player / ped
+                                                                ExitArguments.PushNumber(ucSeat);      // seat
+                                                                ExitArguments.PushElement(pPed);       // jacker
                                                                 if (pVehicle->CallEvent("onVehicleStartExit", ExitArguments))
                                                                 {
                                                                     // HACK?: check the player's vehicle-action is still the same (not warped out?)
@@ -3251,10 +3282,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
-                                                    Arguments.PushElement(pPed);             // player / ped
-                                                    Arguments.PushNumber(ucSeat);            // seat
-                                                    Arguments.PushBoolean(false);            // jacked
-                                                    Arguments.PushNumber(ucDoor);            // Door
+                                                    Arguments.PushElement(pPed);   // player / ped
+                                                    Arguments.PushNumber(ucSeat);  // seat
+                                                    Arguments.PushBoolean(false);  // jacked
+                                                    Arguments.PushNumber(ucDoor);  // Door
                                                     if (pVehicle->CallEvent("onVehicleStartEnter", Arguments))
                                                     {
                                                         // HACK?: check the player's vehicle-action is still the same (not warped in?)
@@ -3339,8 +3370,11 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             // Is he entering?
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                             {
-                                // Is he the occupant? (he must unless the client has fucked up)
-                                unsigned int occupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                const unsigned int uiOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                if (uiOccupiedSeat > 0xFF)
+                                    break;
+
+                                const unsigned char occupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                                 if (pPed == pVehicle->GetOccupant(occupiedSeat))
                                 {
                                     // Mark him as successfully entered
@@ -3356,9 +3390,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Call the player->vehicle event
                                     CLuaArguments Arguments;
-                                    Arguments.PushElement(pVehicle);                 // vehicle
-                                    Arguments.PushNumber(occupiedSeat);              // seat
-                                    Arguments.PushBoolean(false);                    // jacked
+                                    Arguments.PushElement(pVehicle);     // vehicle
+                                    Arguments.PushNumber(occupiedSeat);  // seat
+                                    Arguments.PushBoolean(false);        // jacked
                                     if (pPed->IsPlayer())
                                         pPed->CallEvent("onPlayerVehicleEnter", Arguments);
                                     else
@@ -3366,9 +3400,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Call the vehicle->player event
                                     CLuaArguments Arguments2;
-                                    Arguments2.PushElement(pPed);                     // player / ped
-                                    Arguments2.PushNumber(occupiedSeat);              // seat
-                                    Arguments2.PushBoolean(false);                    // jacked
+                                    Arguments2.PushElement(pPed);         // player / ped
+                                    Arguments2.PushNumber(occupiedSeat);  // seat
+                                    Arguments2.PushBoolean(false);        // jacked
                                     pVehicle->CallEvent("onVehicleEnter", Arguments2);
                                 }
                             }
@@ -3398,7 +3432,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     pVehicle->SetDoorOpenRatio(ucDoor + 2, fDoorAngle);
 
                                     // Tell everyone he's out (they should warp him out)
-                                    CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor);
+                                    CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_NOTIFY_IN_ABORT_RETURN,
+                                                              ucDoor);
                                     Reply.SetDoorAngle(fDoorAngle);
                                     m_pPlayerManager->BroadcastOnlyJoined(Reply);
                                 }
@@ -3419,13 +3454,13 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 {
                                     // Reset the occupant changed flag before calling the event
                                     pVehicle->m_bOccupantChanged = false;
-                                    
+
                                     // Call the exiting vehicle event
                                     CLuaArguments Arguments;
-                                    Arguments.PushElement(pPed);                       // player / ped
-                                    Arguments.PushNumber(occupiedSeat);                // seat
-                                    Arguments.PushBoolean(false);                      // jacked
-                                    Arguments.PushNumber(Packet.GetDoor());            // door being used
+                                    Arguments.PushElement(pPed);             // player / ped
+                                    Arguments.PushNumber(occupiedSeat);      // seat
+                                    Arguments.PushBoolean(false);            // jacked
+                                    Arguments.PushNumber(Packet.GetDoor());  // door being used
                                     if (pVehicle->CallEvent("onVehicleStartExit", Arguments) && pPed->GetOccupiedVehicle() == pVehicle)
                                     {
                                         // Check if the occupant was changed during the event (e.g., by warpPedIntoVehicle)
@@ -3435,7 +3470,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                             pPed->SetVehicleAction(CPed::VEHICLEACTION_EXITING);
 
                                             // Tell everyone he can start exiting the vehicle
-                                            CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_REQUEST_OUT_CONFIRMED, Packet.GetDoor());
+                                            CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_REQUEST_OUT_CONFIRMED,
+                                                                      Packet.GetDoor());
                                             m_pPlayerManager->BroadcastOnlyJoined(Reply);
                                         }
                                         else
@@ -3498,10 +3534,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Call the ped->vehicle event
                                     CLuaArguments Arguments;
-                                    Arguments.PushElement(pVehicle);                 // vehicle
-                                    Arguments.PushNumber(occupiedSeat);              // seat
-                                    Arguments.PushBoolean(false);                    // jacker
-                                    Arguments.PushBoolean(false);                    // forcedByScript
+                                    Arguments.PushElement(pVehicle);     // vehicle
+                                    Arguments.PushNumber(occupiedSeat);  // seat
+                                    Arguments.PushBoolean(false);        // jacker
+                                    Arguments.PushBoolean(false);        // forcedByScript
                                     if (pPed->IsPlayer())
                                         pPed->CallEvent("onPlayerVehicleExit", Arguments);
                                     else
@@ -3509,10 +3545,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Call the vehicle->player event
                                     CLuaArguments Arguments2;
-                                    Arguments2.PushElement(pPed);                     // player / ped
-                                    Arguments2.PushNumber(occupiedSeat);              // seat
-                                    Arguments2.PushBoolean(false);                    // jacker
-                                    Arguments2.PushBoolean(false);                    // forcedByScript
+                                    Arguments2.PushElement(pPed);         // player / ped
+                                    Arguments2.PushNumber(occupiedSeat);  // seat
+                                    Arguments2.PushBoolean(false);        // jacker
+                                    Arguments2.PushBoolean(false);        // forcedByScript
                                     pVehicle->CallEvent("onVehicleExit", Arguments2);
                                 }
                             }
@@ -3565,10 +3601,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                 // Call the ped->vehicle event
                                 CLuaArguments Arguments;
-                                Arguments.PushElement(pVehicle);                 // vehicle
-                                Arguments.PushNumber(occupiedSeat);              // seat
-                                Arguments.PushBoolean(false);                    // jacker
-                                Arguments.PushBoolean(false);                    // forcedByScript
+                                Arguments.PushElement(pVehicle);     // vehicle
+                                Arguments.PushNumber(occupiedSeat);  // seat
+                                Arguments.PushBoolean(false);        // jacker
+                                Arguments.PushBoolean(false);        // forcedByScript
                                 if (pPed->IsPlayer())
                                 {
                                     pPed->CallEvent("onPlayerVehicleExit", Arguments);
@@ -3580,17 +3616,17 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                 // Call the vehicle->player event
                                 CLuaArguments Arguments2;
-                                Arguments2.PushElement(pPed);                     // player / ped
-                                Arguments2.PushNumber(occupiedSeat);              // seat
-                                Arguments2.PushBoolean(false);                    // jacker
-                                Arguments2.PushBoolean(false);                    // forcedByScript
+                                Arguments2.PushElement(pPed);         // player / ped
+                                Arguments2.PushNumber(occupiedSeat);  // seat
+                                Arguments2.PushBoolean(false);        // jacker
+                                Arguments2.PushBoolean(false);        // forcedByScript
                                 pVehicle->CallEvent("onVehicleExit", Arguments2);
                             }
 
                             break;
                         }
 
-                        case VEHICLE_NOTIFY_JACK:            // Finished jacking him
+                        case VEHICLE_NOTIFY_JACK:  // Finished jacking him
                         {
                             // Is the ped jacking?
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_JACKING)
@@ -3617,10 +3653,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Execute the ped->vehicle script function for the jacked ped
                                     CLuaArguments ArgumentsExit;
-                                    ArgumentsExit.PushElement(pVehicle);            // vehicle
-                                    ArgumentsExit.PushNumber(0);                    // seat
-                                    ArgumentsExit.PushElement(pPed);                // jacker
-                                    ArgumentsExit.PushBoolean(false);               // forcedByScript
+                                    ArgumentsExit.PushElement(pVehicle);  // vehicle
+                                    ArgumentsExit.PushNumber(0);          // seat
+                                    ArgumentsExit.PushElement(pPed);      // jacker
+                                    ArgumentsExit.PushBoolean(false);     // forcedByScript
                                     if (pJacked->IsPlayer())
                                         pJacked->CallEvent("onPlayerVehicleExit", ArgumentsExit);
                                     else
@@ -3628,17 +3664,17 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Execute the vehicle->ped script function for the jacked ped
                                     CLuaArguments ArgumentsExit2;
-                                    ArgumentsExit2.PushElement(pJacked);            // player / ped
-                                    ArgumentsExit2.PushNumber(0);                   // seat
-                                    ArgumentsExit2.PushElement(pPed);               // jacker
-                                    ArgumentsExit2.PushBoolean(false);              // forcedByScript
+                                    ArgumentsExit2.PushElement(pJacked);  // player / ped
+                                    ArgumentsExit2.PushNumber(0);         // seat
+                                    ArgumentsExit2.PushElement(pPed);     // jacker
+                                    ArgumentsExit2.PushBoolean(false);    // forcedByScript
                                     pVehicle->CallEvent("onVehicleExit", ArgumentsExit2);
 
                                     // Execute the ped->vehicle script function
                                     CLuaArguments ArgumentsEnter;
-                                    ArgumentsEnter.PushElement(pVehicle);            // vehicle
-                                    ArgumentsEnter.PushNumber(0);                    // seat
-                                    ArgumentsEnter.PushElement(pJacked);             // jacked
+                                    ArgumentsEnter.PushElement(pVehicle);  // vehicle
+                                    ArgumentsEnter.PushNumber(0);          // seat
+                                    ArgumentsEnter.PushElement(pJacked);   // jacked
                                     if (pPed->IsPlayer())
                                         pPed->CallEvent("onPlayerVehicleEnter", ArgumentsEnter);
                                     else
@@ -3646,9 +3682,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Execute the vehicle->ped script function
                                     CLuaArguments ArgumentsEnter2;
-                                    ArgumentsEnter2.PushElement(pPed);               // player / ped
-                                    ArgumentsEnter2.PushNumber(0);                   // seat
-                                    ArgumentsEnter2.PushElement(pJacked);            // jacked
+                                    ArgumentsEnter2.PushElement(pPed);     // player / ped
+                                    ArgumentsEnter2.PushNumber(0);         // seat
+                                    ArgumentsEnter2.PushElement(pJacked);  // jacked
                                     pVehicle->CallEvent("onVehicleEnter", ArgumentsEnter2);
                                 }
                                 else
@@ -3665,9 +3701,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Execute the player->vehicle script function
                                     CLuaArguments Arguments;
-                                    Arguments.PushElement(pVehicle);            // vehicle
-                                    Arguments.PushNumber(0);                    // seat
-                                    Arguments.PushBoolean(false);               // jacked
+                                    Arguments.PushElement(pVehicle);  // vehicle
+                                    Arguments.PushNumber(0);          // seat
+                                    Arguments.PushBoolean(false);     // jacked
                                     if (pPed->IsPlayer())
                                         pPed->CallEvent("onPlayerVehicleEnter", Arguments);
                                     else
@@ -3675,9 +3711,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                     // Execute the vehicle->player script function
                                     CLuaArguments Arguments2;
-                                    Arguments2.PushElement(pPed);             // player / ped
-                                    Arguments2.PushNumber(0);                 // seat
-                                    Arguments2.PushBoolean(false);            // jacked
+                                    Arguments2.PushElement(pPed);   // player / ped
+                                    Arguments2.PushNumber(0);       // seat
+                                    Arguments2.PushBoolean(false);  // jacked
                                     pVehicle->CallEvent("onVehicleEnter", Arguments2);
                                 }
                             }
@@ -3726,10 +3762,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         m_pPlayerManager->BroadcastOnlyJoined(JackedReply);
 
                                         CLuaArguments Arguments;
-                                        Arguments.PushElement(pVehicle);                 // vehicle
-                                        Arguments.PushNumber(occupiedSeat);              // seat
-                                        Arguments.PushElement(pPed);                     // jacker
-                                        Arguments.PushBoolean(false);                    // forcedByScript
+                                        Arguments.PushElement(pVehicle);     // vehicle
+                                        Arguments.PushNumber(occupiedSeat);  // seat
+                                        Arguments.PushElement(pPed);         // jacker
+                                        Arguments.PushBoolean(false);        // forcedByScript
 
                                         if (pJacked->IsPlayer())
                                         {
@@ -3741,10 +3777,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         }
 
                                         CLuaArguments Arguments2;
-                                        Arguments2.PushElement(pJacked);                  // jacked
-                                        Arguments2.PushNumber(occupiedSeat);              // seat
-                                        Arguments2.PushElement(pPed);                     // jacker
-                                        Arguments2.PushBoolean(false);                    // forcedByScript
+                                        Arguments2.PushElement(pJacked);      // jacked
+                                        Arguments2.PushNumber(occupiedSeat);  // seat
+                                        Arguments2.PushElement(pPed);         // jacker
+                                        Arguments2.PushBoolean(false);        // forcedByScript
                                         pVehicle->CallEvent("onVehicleExit", Arguments2);
                                     }
                                     pJacked->SetVehicleAction(CPed::VEHICLEACTION_NONE);
@@ -3854,7 +3890,7 @@ void CGame::Packet_VehicleTrailer(CVehicleTrailerPacket& Packet)
                             m_pPlayerManager->BroadcastOnlyJoined(DetachPacket);
                         }
                     }
-                    else            // If we're detaching
+                    else  // If we're detaching
                     {
                         // Make sure they're attached
                         if (pVehicle->GetTowedVehicle() == pTrailer && pTrailer->GetTowedByVehicle() == pVehicle)
@@ -3882,7 +3918,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
 {
     unsigned short usDataLength = 0;
 
-    if (m_pMainConfig->IsVoiceEnabled())            // Shouldn't really be receiving voice packets at all if voice is disabled
+    if (m_pMainConfig->IsVoiceEnabled())  // Shouldn't really be receiving voice packets at all if voice is disabled
     {
         if (!Packet.IsEmpty())
         {
@@ -3890,7 +3926,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
 
             if (pPlayer)
             {
-                if (pPlayer->IsVoiceMuted())            // Shouldn't be receiving voice packets, player should be muted client side
+                if (pPlayer->IsVoiceMuted())  // Shouldn't be receiving voice packets, player should be muted client side
                     return;
 
                 // Is it the start of the voice stream?
@@ -3900,7 +3936,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                     CLuaArguments Arguments;
                     bool          bEventTriggered = pPlayer->CallEvent("onPlayerVoiceStart", Arguments, pPlayer);
 
-                    if (!bEventTriggered)            // Was the event cancelled?
+                    if (!bEventTriggered)  // Was the event cancelled?
                     {
                         pPlayer->SetVoiceState(VOICESTATE_TRANSMITTING_IGNORED);
                         return;
@@ -3910,8 +3946,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                     pPlayer->SetVoiceState(VOICESTATE_TRANSMITTING);
                 }
 
-                if (pPlayer->GetVoiceState() ==
-                    VOICESTATE_TRANSMITTING)            // If we reach here, and we're still in idle state, then the event was cancelled
+                if (pPlayer->GetVoiceState() == VOICESTATE_TRANSMITTING)  // If we reach here, and we're still in idle state, then the event was cancelled
                 {
                     // Make list of players to send the voice packet to
                     std::set<CPlayer*> playerSendMap;
@@ -3964,7 +3999,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
 
 void CGame::Packet_Voice_End(CVoiceEndPacket& Packet)
 {
-    if (m_pMainConfig->IsVoiceEnabled())            // Shouldn't really be receiving voice packets at all if voice is disabled
+    if (m_pMainConfig->IsVoiceEnabled())  // Shouldn't really be receiving voice packets at all if voice is disabled
     {
         CPlayer* pPlayer = Packet.GetSourcePlayer();
 
@@ -4189,8 +4224,8 @@ void CGame::Packet_PlayerNetworkStatus(CPlayerNetworkStatusPacket& Packet)
     if (pPlayer)
     {
         CLuaArguments Arguments;
-        Arguments.PushNumber(Packet.m_ucType);             // 0-interruption began  1-interruption end
-        Arguments.PushNumber(Packet.m_uiTicks);            // Ticks since interruption start
+        Arguments.PushNumber(Packet.m_ucType);   // 0-interruption began  1-interruption end
+        Arguments.PushNumber(Packet.m_uiTicks);  // Ticks since interruption start
         pPlayer->CallEvent("onPlayerNetworkStatus", Arguments, NULL);
     }
 }
@@ -4579,7 +4614,7 @@ void CGame::HandleBackup()
 
         time_t timeSinceBackup = secondsNow - mktime(&timeinfo);
         if (timeSinceBackup < iBackupInterval * 86400L)
-            return;            // No backup required
+            return;  // No backup required
     }
 
     m_pMainConfig->NotifyDidBackup();
@@ -4593,7 +4628,7 @@ void CGame::HandleBackup()
     SString strTempZip = PathJoin(strBackupPath, strDateNow + "_temp.zip");
 
     if (FileExists(strBackupZip))
-        return;            // Can't do backup as target file already exists
+        return;  // Can't do backup as target file already exists
 
     MkDir(strBackupPath);
 
@@ -4602,7 +4637,7 @@ void CGame::HandleBackup()
 
     CZipMaker zipMaker(strTempZip);
     if (!zipMaker.IsValid())
-        return;            // Can't do backup as can't create target zip
+        return;  // Can't do backup as can't create target zip
 
     CLogger::LogPrintfNoStamp("Please wait...\n");
 
@@ -4700,7 +4735,7 @@ void CGame::SendPacketBatchEnd()
 bool CGame::IsBulletSyncActive()
 {
     bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled();
-#if 0            // No auto bullet sync as there are some problems with it
+#if 0  // No auto bullet sync as there are some problems with it
     bool bGlitchesSayEnable = ( m_Glitches [ GLITCH_FASTFIRE ] || m_Glitches [ GLITCH_CROUCHBUG ] );
 #else
     bool bGlitchesSayEnable = false;
@@ -4732,14 +4767,14 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
             MapInsert(weaponTypesUsingBulletSync, weaponList[i]);
     }
 
-    short sVehExtrapolateBaseMs = 5;
-    auto  sVehExtrapolatePercent = static_cast<short>(m_pMainConfig->GetVehExtrapolatePercent());
-    auto  sVehExtrapolateMaxMs = static_cast<short>(m_pMainConfig->GetVehExtrapolatePingLimit());
-    uchar ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
-    uchar ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder() != 0;
-    uchar ucAllowFastSprintFix = true;
-    uchar ucAllowDrivebyAnimFix = true;
-    uchar ucAllowShotgunDamageFix = true;
+    short        sVehExtrapolateBaseMs = 5;
+    auto         sVehExtrapolatePercent = static_cast<short>(m_pMainConfig->GetVehExtrapolatePercent());
+    auto         sVehExtrapolateMaxMs = static_cast<short>(m_pMainConfig->GetVehExtrapolatePingLimit());
+    uchar        ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
+    uchar        ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder() != 0;
+    uchar        ucAllowFastSprintFix = true;
+    uchar        ucAllowDrivebyAnimFix = true;
+    uchar        ucAllowShotgunDamageFix = true;
     std::uint8_t multiCommandHandlerPolicy = static_cast<std::uint8_t>(m_pMainConfig->GetAllowMultiCommandHandlers());
 
     CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs,

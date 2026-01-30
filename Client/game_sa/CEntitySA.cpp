@@ -62,7 +62,7 @@ CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
     TransformFromObjectSpace(point, vecMax);
     rect.StretchToPoint(point.fX, point.fY);
     *pRect = rect;
-    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    pRect->FixIncorrectTopLeft();  // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
 }
 
@@ -100,6 +100,9 @@ bool CEntitySA::SetScaleInternal(const CVector& scale)
 void CEntitySA::SetPosition(float fX, float fY, float fZ)
 {
     // Remove & add to world?
+    if (std::isnan(fX) || std::isnan(fY) || std::isnan(fZ) || std::isinf(fX) || std::isinf(fY) || std::isinf(fZ))
+        return;
+
     CVector* vecPos;
     if (m_pInterface->matrix)
     {
@@ -125,11 +128,13 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
         // If it's a train, recalculate its rail position parameter (does not affect derailed state)
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
     }
     if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
     {
@@ -139,6 +144,9 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
 
 void CEntitySA::Teleport(float fX, float fY, float fZ)
 {
+    if (std::isnan(fX) || std::isnan(fY) || std::isnan(fZ) || std::isinf(fX) || std::isinf(fY) || std::isinf(fZ))
+        return;
+
     if (m_pInterface->matrix)
     {
         SetPosition(fX, fY, fZ);
@@ -164,13 +172,15 @@ void CEntitySA::SetupLighting()
 void CEntitySA::Render()
 {
     // This function may use m_pInterface->Render()
-    DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;
+    DWORD dwFunc = 0x59F180;  // m_pInterface->vtbl->Render;
     DWORD dwThis = (DWORD)m_pInterface;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CEntitySA::SetOrientation(float fX, float fY, float fZ)
@@ -181,18 +191,22 @@ void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x446F90;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     dwFunc = 0x532B00;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
     {
@@ -207,18 +221,22 @@ void CEntitySA::FixBoatOrientation()
     pGame->GetWorld()->Remove(this, CEntity_FixBoatOrientation);
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x446F90;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     dwFunc = 0x532B00;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 
     pGame->GetWorld()->Add(this, CEntity_FixBoatOrientation);
 }
@@ -300,7 +318,7 @@ CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
 
 void CEntitySA::SetMatrix(CMatrix* matrix)
 {
-    if (m_pInterface->matrix && matrix)
+    if (m_pInterface->matrix && matrix && IsValidMatrix(*matrix))
     {
         OnChangingPosition(matrix->vPos);
 
@@ -318,11 +336,13 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
         {
             DWORD dwThis = (DWORD) m_pInterface;
             DWORD dwFunc = 0x6F6CC0;
+            // clang-format off
             __asm
             {
                 mov     ecx, dwThis
                 call    dwFunc
             }
+            // clang-format on
 
             //OutputDebugString ( "Set train position on tracks (matrix)!\n" );
         }
@@ -330,19 +350,23 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
 
         pGame->GetWorld()->Remove(this, CEntity_SetMatrix);
         DWORD dwThis = (DWORD)m_pInterface;
-        DWORD dwFunc = 0x446F90;            // CEntity::UpdateRwMatrix
+        DWORD dwFunc = 0x446F90;  // CEntity::UpdateRwMatrix
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
 
-        dwFunc = 0x532B00;            // CEntity::UpdateRwFrame
+        dwFunc = 0x532B00;  // CEntity::UpdateRwFrame
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
 
         if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
         {
@@ -368,12 +392,14 @@ float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwFunc = FUNC_GetDistanceFromCentreOfMassToBaseOfModel;
     DWORD dwThis = (DWORD)m_pInterface;
     float fReturn;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         fstp    fReturn
     }
+    // clang-format on
     return fReturn;
 }
 
@@ -390,7 +416,7 @@ eEntityStatus CEntitySA::GetEntityStatus()
 RwFrame* CEntitySA::GetFrameFromId(int id)
 {
     // CClumpModelInfo::GetFrameFromId
-    return ((RwFrame*(_cdecl*)(RpClump*, int))0x4C53C0)(m_pInterface->m_pRwObject, id);
+    return ((RwFrame * (_cdecl*)(RpClump*, int))0x4C53C0)(m_pInterface->m_pRwObject, id);
 }
 
 RpClump* CEntitySA::GetRpClump()
@@ -401,19 +427,21 @@ RpClump* CEntitySA::GetRpClump()
 RwMatrix* CEntitySA::GetLTMFromId(int id)
 {
     // RwFrameGetLTM
-    return ((RwMatrix*(_cdecl*)(RwFrame*))0x7F0990)(GetFrameFromId(id));
+    return ((RwMatrix * (_cdecl*)(RwFrame*))0x7F0990)(GetFrameFromId(id));
 }
 
 void CEntitySA::SetAlpha(DWORD dwAlpha)
 {
     DWORD dwFunc = FUNC_SetRwObjectAlpha;
     DWORD dwThis = (DWORD)m_pInterface;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         push    dwAlpha
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CEntitySA::IsOnScreen()
@@ -421,12 +449,14 @@ bool CEntitySA::IsOnScreen()
     DWORD dwFunc = FUNC_IsVisible;
     DWORD dwThis = (DWORD)m_pInterface;
     bool  bReturn = false;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -457,6 +487,7 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
+        // clang-format off
         __asm
         {
             push    iUnknown
@@ -466,6 +497,7 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
             mov     ecx, matrixPadded
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -475,6 +507,7 @@ void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int 
     if (matrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
+        // clang-format off
         __asm
         {
             push    iUnknown
@@ -484,6 +517,7 @@ void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int 
             mov     ecx, matrixPadded
             call    dwFunc
         }
+        // clang-format on
     }
 }
 
@@ -493,6 +527,7 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     DWORD dwFunc = FUNC_RpAnimBlendClumpGetAssociation;
     DWORD dwThis = (DWORD)m_pInterface->m_pRwObject;
 
+    // clang-format off
     __asm
     {
         push    szAnimName
@@ -501,6 +536,7 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
         add     esp, 8
         mov     dwReturn, eax
     }
+    // clang-format on
     if (dwReturn) return true;
     else return false;
 }
@@ -561,7 +597,7 @@ bool CEntitySA::GetBoneRotationQuat(eBone boneId, float& x, float& y, float& z, 
     RpClump* clump = GetRpClump();
     if (!clump)
         return false;
-        
+
     // updating the bone frame orientation will also update its children
     // This rotation is only applied when UpdateElementRpHAnim is called
     auto* clumpDataInterface = *pGame->GetClumpData(clump);
@@ -582,21 +618,21 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
     RpClump* clump = GetRpClump();
     if (!clump)
         return false;
-        
+
     // updating the bone frame orientation will also update its children
     // This rotation is only applied when UpdateElementRpHAnim is called
     auto* clumpDataInterface = *pGame->GetClumpData(clump);
     auto* frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
     if (!frameData)
         return false;
-        
+
     RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
-    RwV3d angles = { yaw, roll, pitch };
+    RwV3d   angles = {yaw, roll, pitch};
     BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
     CEntitySAInterface* theInterface = GetInterface();
     if (theInterface)
         theInterface->bDontUpdateHierarchy = false;
-        
+
     return true;
 }
 
@@ -605,7 +641,7 @@ bool CEntitySA::SetBoneRotationQuat(eBone boneId, float x, float y, float z, flo
     RpClump* clump = GetRpClump();
     if (!clump)
         return false;
-        
+
     // updating the bone frame orientation will also update its children
     // This rotation is only applied when UpdateElementRpHAnim is called
     auto* clumpDataInterface = *pGame->GetClumpData(clump);
@@ -621,7 +657,7 @@ bool CEntitySA::SetBoneRotationQuat(eBone boneId, float x, float y, float z, flo
     CEntitySAInterface* theInterface = GetInterface();
     if (theInterface)
         theInterface->bDontUpdateHierarchy = false;
-        
+
     return true;
 }
 
@@ -642,7 +678,7 @@ bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
     RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (!rwBoneMatrix)
         return false;
-        
+
     CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
     boneMatrix.SetTranslateOnly(position);
     boneMatrix.UpdateRW();

@@ -69,18 +69,18 @@ namespace
         ushort usNext;
         ushort usPrev;
 
-        ushort uiUnknown1;            // Parent ?
-        uchar  uiUnknown2;            // 0x12 when loading, 0x02 when finished loading
+        ushort uiUnknown1;  // Parent ?
+        uchar  uiUnknown2;  // 0x12 when loading, 0x02 when finished loading
         uchar  ucImgId;
 
         int  iBlockOffset;
         int  iBlockCount;
-        uint uiLoadflag;            // 0-not loaded  2-requested  3-loaded  1-processed
+        uint uiLoadflag;  // 0-not loaded  2-requested  3-loaded  1-processed
     };
 
     int   iReturnFileId;
     char* pReturnBuffer;
-}            // namespace
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -94,15 +94,16 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
 
     if (pImgGTAInfo->ucImgId == 5)
     {
-        // If bLoadingBigModel is set, try to get it unset
-        #define VAR_CStreaming_bLoadingBigModel     0x08E4A58
+// If bLoadingBigModel is set, try to get it unset
+#define VAR_CStreaming_bLoadingBigModel 0x08E4A58
         BYTE& bLoadingBigModel = *(BYTE*)VAR_CStreaming_bLoadingBigModel;
         if (bLoadingBigModel)
         {
             pGameInterface->GetStreaming()->LoadAllRequestedModels(true);
             if (bLoadingBigModel)
                 pGameInterface->GetStreaming()->LoadAllRequestedModels(false);
-            assert(!bLoadingBigModel);
+            if (bLoadingBigModel)
+                return false;
         }
 
         int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
@@ -123,14 +124,15 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
 }
 
 // Hook info
-#define HOOKPOS_CallCStreamingInfoAddToList             0x408962
-#define HOOKSIZE_CallCStreamingInfoAddToList            5
-DWORD RETURN_CallCStreamingInfoAddToListA = 0x408967;
-DWORD RETURN_CallCStreamingInfoAddToListB = 0x408990;
+#define HOOKPOS_CallCStreamingInfoAddToList  0x408962
+#define HOOKSIZE_CallCStreamingInfoAddToList 5
+DWORD                         RETURN_CallCStreamingInfoAddToListA = 0x408967;
+DWORD                         RETURN_CallCStreamingInfoAddToListB = 0x408990;
 static void __declspec(naked) HOOK_CallCStreamingInfoAddToList()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -165,6 +167,7 @@ skip:
         add     esp, 4*1
         jmp     RETURN_CallCStreamingInfoAddToListB
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,14 +188,15 @@ bool _cdecl ShouldSkipLoadRequestedModels(DWORD calledFrom)
 }
 
 // Hook info
-#define HOOKPOS_CStreamingLoadRequestedModels        0x15670A0
-#define HOOKSIZE_CStreamingLoadRequestedModels       5
-DWORD RETURN_CStreamingLoadRequestedModels = 0x15670A5;
-DWORD RETURN_CStreamingLoadRequestedModelsB = 0x156711B;
+#define HOOKPOS_CStreamingLoadRequestedModels  0x15670A0
+#define HOOKSIZE_CStreamingLoadRequestedModels 5
+DWORD                         RETURN_CStreamingLoadRequestedModels = 0x15670A5;
+DWORD                         RETURN_CStreamingLoadRequestedModelsB = 0x156711B;
 static void __declspec(naked) HOOK_CStreamingLoadRequestedModels()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -212,6 +216,7 @@ skip:
         popad
         jmp     RETURN_CStreamingLoadRequestedModelsB
     }
+    // clang-format on
 }
 
 //
@@ -233,15 +238,16 @@ bool IsPlayerImgDirLoaded()
 
 // Hook info
 #define HOOKSIZE_LoadingPlayerImgDir 5
-#define HOOKPOS_LoadingPlayerImgDir  0x5A69E3                               // 005A69D6 -> CClothesBuilder::CreateSkinnedClump -> playerImgEntries
-static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirA = 0x5A69E8;     // push 00000226 { 550 }
-static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;     // return of CreateSkinnedClump function
+#define HOOKPOS_LoadingPlayerImgDir  0x5A69E3                            // 005A69D6 -> CClothesBuilder::CreateSkinnedClump -> playerImgEntries
+static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirA = 0x5A69E8;  // push 00000226 { 550 }
+static constexpr std::uintptr_t RETURN_LoadingPlayerImgDirB = 0x5A6A06;  // return of CreateSkinnedClump function
 
 static void __declspec(naked) HOOK_LoadingPlayerImgDir()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // hook from 005A69E3 5 bytes
+    // clang-format off
     __asm
     {
         pushad
@@ -260,6 +266,7 @@ skip:
         popad
         jmp     RETURN_LoadingPlayerImgDirB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -269,18 +276,22 @@ skip:
 //////////////////////////////////////////////////////////////////////////////////////////
 bool SetClothingDirectorySize(int directorySize)
 {
-    DirectoryInfoSA* clothesDirectory = new DirectoryInfoSA[directorySize];
+    if (directorySize <= 0 || directorySize > 0xFFFF)
+        return false;
+
+    const std::uint16_t usDirectorySize = static_cast<std::uint16_t>(directorySize);
+    DirectoryInfoSA*    clothesDirectory = new DirectoryInfoSA[static_cast<std::size_t>(directorySize)];
 
     if (!clothesDirectory)
         return false;
 
     // CClothesBuilder::LoadCdDirectory(void)
-    MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));      // push    offset _playerImgEntries; headers
-    MemPut<std::uint16_t>(0x5A4195 + 1, static_cast<std::uint16_t>(directorySize));         // push    550             ; count
-    MemPut<std::uint16_t>(0x5A69E8 + 1, static_cast<std::uint16_t>(directorySize));         // push    550             ; count
+    MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));  // push    offset _playerImgEntries; headers
+    MemPut<std::uint16_t>(0x5A4195 + 1, usDirectorySize);                               // push    550             ; count
+    MemPut<std::uint16_t>(0x5A69E8 + 1, usDirectorySize);                               // push    550             ; count
 
     g_playerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
-    g_playerImgSize = static_cast<std::uint16_t>(directorySize);
+    g_playerImgSize = usDirectorySize;
 
     return true;
 }

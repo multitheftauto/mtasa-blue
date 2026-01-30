@@ -36,6 +36,12 @@ CMaterialLine3DBatcher::CMaterialLine3DBatcher(bool bPreGUI)
 ////////////////////////////////////////////////////////////////
 CMaterialLine3DBatcher::~CMaterialLine3DBatcher()
 {
+    for (SMaterialLine3DItem& item : m_LineList)
+    {
+        if (item.pMaterial)
+            item.pMaterial->Release();
+    }
+    m_LineList.clear();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -287,7 +293,7 @@ void CMaterialLine3DBatcher::DrawBatch(const CVector& vecCameraPos, uint* pBatch
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
 
         // Do shader passes
-        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;  // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint  uiNumPasses = 0;
         pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
 
