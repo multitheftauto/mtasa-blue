@@ -1256,14 +1256,12 @@ void CElement::GetAttachedPosition(CVector& vecPosition)
 {
     if (m_pAttachedTo)
     {
-        CVector vecRotation;
-        vecPosition = m_pAttachedTo->GetPosition();
-        m_pAttachedTo->GetRotation(vecRotation);
+        // Get the parent's matrix
+        CMatrix parentMatrix;
+        m_pAttachedTo->GetMatrix(parentMatrix);
 
-        CVector vecPositionOffset = m_vecAttachedPosition;
-        // This works when rotating around z axis. Other axes need testing.
-        RotateVector(vecPositionOffset, CVector(vecRotation.fX, vecRotation.fY, -vecRotation.fZ));
-        vecPosition += vecPositionOffset;
+        // Transform the attached position by the parent's matrix
+        vecPosition = m_pAttachedTo->GetPosition() + parentMatrix.TransformVector(m_vecAttachedPosition);
     }
 }
 
