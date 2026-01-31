@@ -18,6 +18,8 @@
 
 #include "enums/HandlingProperty.h"
 
+#include <limits>
+
 void CLuaVehicleDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -407,7 +409,7 @@ int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushstring(luaVM, CVehicleNames::GetVehicleTypeName(ucModel));            // Range check will be done by GetVehicleTypeName
+        lua_pushstring(luaVM, CVehicleNames::GetVehicleTypeName(ucModel));  // Range check will be done by GetVehicleTypeName
         return 1;
     }
     else
@@ -2577,8 +2579,8 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                             }
                             break;
                         }
-                        case HandlingProperty::HANDLING_PERCENTSUBMERGED:            // unsigned int
-                                                           // case HANDLING_MONETARY:
+                        case HandlingProperty::HANDLING_PERCENTSUBMERGED:  // unsigned int
+                                                                           // case HANDLING_MONETARY:
                         case HandlingProperty::HANDLING_HANDLINGFLAGS:
                         case HandlingProperty::HANDLING_MODELFLAGS:
                         {
@@ -2699,7 +2701,7 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
             SString strProperty;
             argStream.ReadString(strProperty);
 
-            bool              bResult = true;
+            bool             bResult = true;
             HandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
             if (eProperty != HandlingProperty::HANDLING_MAX)
             {
@@ -2795,7 +2797,7 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
             lua_pushstring(luaVM, "rwd");
         else if (eDriveType == CHandlingEntry::FOURWHEEL)
             lua_pushstring(luaVM, "awd");
-        else            // What the ... (yeah, security)
+        else  // What the ... (yeah, security)
             lua_pushnil(luaVM);
         lua_setfield(luaVM, -2, "driveType");
         CHandlingEntry::eEngineType eEngineType = entry->GetCarEngineType();
@@ -2951,7 +2953,7 @@ int CLuaVehicleDefs::GetOriginalHandling(lua_State* luaVM)
                     lua_pushstring(luaVM, "rwd");
                 else if (eDriveType == CHandlingEntry::FOURWHEEL)
                     lua_pushstring(luaVM, "awd");
-                else            // What the ... (yeah, security)
+                else  // What the ... (yeah, security)
                     lua_pushnil(luaVM);
                 lua_setfield(luaVM, -2, "driveType");
                 CHandlingEntry::eEngineType eEngineType = entry->GetCarEngineType();
@@ -3083,37 +3085,37 @@ int CLuaVehicleDefs::GetVehicleSirenParams(lua_State* luaVM)
     argStream.ReadUserData(pVehicle);
     if (!argStream.HasErrors())
     {
-        tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Grab the siren structure data
+        tSirenInfo = pVehicle->m_tSirenBeaconInfo;  // Grab the siren structure data
         lua_newtable(luaVM);
 
         lua_pushstring(luaVM, "SirenCount");
         lua_pushnumber(luaVM, tSirenInfo.m_ucSirenCount);
-        lua_settable(luaVM, -3);            // End of SirenCount Property
+        lua_settable(luaVM, -3);  // End of SirenCount Property
 
         lua_pushstring(luaVM, "SirenType");
         lua_pushnumber(luaVM, tSirenInfo.m_ucSirenType);
-        lua_settable(luaVM, -3);            // End of SirenType Property
+        lua_settable(luaVM, -3);  // End of SirenType Property
 
         lua_pushstring(luaVM, "Flags");
         lua_newtable(luaVM);
 
         lua_pushstring(luaVM, "360");
         lua_pushboolean(luaVM, tSirenInfo.m_b360Flag);
-        lua_settable(luaVM, -3);            // End of 360 Property
+        lua_settable(luaVM, -3);  // End of 360 Property
 
         lua_pushstring(luaVM, "DoLOSCheck");
         lua_pushboolean(luaVM, tSirenInfo.m_bDoLOSCheck);
-        lua_settable(luaVM, -3);            // End of DoLOSCheck Property
+        lua_settable(luaVM, -3);  // End of DoLOSCheck Property
 
         lua_pushstring(luaVM, "UseRandomiser");
         lua_pushboolean(luaVM, tSirenInfo.m_bUseRandomiser);
-        lua_settable(luaVM, -3);            // End of UseRandomiser Property
+        lua_settable(luaVM, -3);  // End of UseRandomiser Property
 
         lua_pushstring(luaVM, "Silent");
         lua_pushboolean(luaVM, tSirenInfo.m_bSirenSilent);
-        lua_settable(luaVM, -3);            // End of Silent Property
+        lua_settable(luaVM, -3);  // End of Silent Property
 
-        lua_settable(luaVM, -3);            // End of table
+        lua_settable(luaVM, -3);  // End of table
 
         return 1;
     }
@@ -3134,7 +3136,7 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
     argStream.ReadUserData(pVehicle);
     if (!argStream.HasErrors())
     {
-        tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Grab the siren structure data
+        tSirenInfo = pVehicle->m_tSirenBeaconInfo;  // Grab the siren structure data
         lua_newtable(luaVM);
 
         for (int i = 0; i < tSirenInfo.m_ucSirenCount; i++)
@@ -3144,37 +3146,37 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
 
             lua_pushstring(luaVM, "Min_Alpha");
             lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha);
-            lua_settable(luaVM, -3);            // End of Min_Alpha property
+            lua_settable(luaVM, -3);  // End of Min_Alpha property
 
             lua_pushstring(luaVM, "Red");
             lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R);
-            lua_settable(luaVM, -3);            // End of Red property
+            lua_settable(luaVM, -3);  // End of Red property
 
             lua_pushstring(luaVM, "Green");
             lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G);
-            lua_settable(luaVM, -3);            // End of Green property
+            lua_settable(luaVM, -3);  // End of Green property
 
             lua_pushstring(luaVM, "Blue");
             lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B);
-            lua_settable(luaVM, -3);            // End of Blue property
+            lua_settable(luaVM, -3);  // End of Blue property
 
             lua_pushstring(luaVM, "Alpha");
             lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A);
-            lua_settable(luaVM, -3);            // End of Alpha property
+            lua_settable(luaVM, -3);  // End of Alpha property
 
             lua_pushstring(luaVM, "x");
             lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX);
-            lua_settable(luaVM, -3);            // End of X property
+            lua_settable(luaVM, -3);  // End of X property
 
             lua_pushstring(luaVM, "y");
             lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY);
-            lua_settable(luaVM, -3);            // End of Y property
+            lua_settable(luaVM, -3);  // End of Y property
 
             lua_pushstring(luaVM, "z");
             lua_pushnumber(luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ);
-            lua_settable(luaVM, -3);            // End of Z property
+            lua_settable(luaVM, -3);  // End of Z property
 
-            lua_settable(luaVM, -3);            // End of Table
+            lua_settable(luaVM, -3);  // End of Table
         }
 
         return 1;
@@ -3671,7 +3673,7 @@ int CLuaVehicleDefs::GetVehicleComponents(lua_State* luaVM)
         {
             lua_pushstring(luaVM, (*iter).first);
             lua_pushboolean(luaVM, (*iter).second.m_bVisible);
-            lua_settable(luaVM, -3);            // End of Table
+            lua_settable(luaVM, -3);  // End of Table
         }
         return 1;
     }
@@ -3985,9 +3987,9 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // bool setVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy, float x, float y, float z )
-    unsigned short  usModel;
+    unsigned short usModel;
     VehicleDummies eDummy;
-    CVector         vecPosition;
+    CVector        vecPosition;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4012,7 +4014,7 @@ int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
-    unsigned short  usModel;
+    unsigned short usModel;
     VehicleDummies eDummy;
 
     CScriptArgReader argStream(luaVM);
@@ -4041,7 +4043,7 @@ int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
-    unsigned short  usModel;
+    unsigned short usModel;
     VehicleDummies eDummy;
 
     CScriptArgReader argStream(luaVM);
@@ -4222,8 +4224,7 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
     return pVehicle->GetWheelFrictionState(wheel);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short  vehicleModel,
-                                                                                                              VehicleDummies dummy)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, VehicleDummies dummy)
 {
     CVector position;
 
@@ -4440,32 +4441,52 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
 {
     if (!CClientVehicleManager::IsStandardModel(uiModel))
         throw std::invalid_argument("Cannot change audio setting for allocated vechiles");
-    
+
+    const auto toInt = [](float value) -> int
+    {
+        const int iValue = static_cast<int>(value);
+        if (static_cast<float>(iValue) != value)
+            throw std::invalid_argument("Expected an integer value");
+
+        return iValue;
+    };
+
+    const auto toChar = [&toInt](float value) -> char
+    {
+        const int iValue = toInt(value);
+        if (iValue < std::numeric_limits<char>::min() || iValue > std::numeric_limits<char>::max())
+            throw std::invalid_argument("Value out of range");
+
+        return static_cast<char>(iValue);
+    };
+
     CVehicleAudioSettingsEntry& pModelSettings = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData(uiModel);
 
     switch (eProperty)
     {
         case VehicleAudioSettingProperty::DOOR_SOUND:
         {
-            pModelSettings.SetDoorSound(static_cast<char>(varValue));
+            pModelSettings.SetDoorSound(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
         {
             // Using SPC_ sound banks other than SPC_EA causes a crash
-            if (varValue > 410)
+            const int iValue = toInt(varValue);
+            if (iValue < 0 || iValue > 410)
                 throw std::invalid_argument("Invalid engine-off-sound-bank-id value");
 
-            pModelSettings.SetEngineOffSoundBankID(static_cast<short>(varValue));
+            pModelSettings.SetEngineOffSoundBankID(static_cast<short>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
         {
             // Using SPC_ sound banks other than SPC_EA causes a crash
-            if (varValue > 410)
+            const int iValue = toInt(varValue);
+            if (iValue < 0 || iValue > 410)
                 throw std::invalid_argument("Invalid engine-on-sound-bank-id value");
 
-            pModelSettings.SetEngineOnSoundBankID(static_cast<short>(varValue));
+            pModelSettings.SetEngineOnSoundBankID(static_cast<short>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::HORN_HIGH:
@@ -4475,7 +4496,7 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
         }
         case VehicleAudioSettingProperty::HORN_TON:
         {
-            pModelSettings.SetHornTon(static_cast<char>(varValue));
+            pModelSettings.SetHornTon(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::HORN_VOLUME_DELTA:
@@ -4485,22 +4506,30 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
         }
         case VehicleAudioSettingProperty::RADIO_NUM:
         {
-            pModelSettings.SetRadioNum(static_cast<char>(varValue));
+            pModelSettings.SetRadioNum(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::RADIO_TYPE:
         {
-            pModelSettings.SetRadioType(static_cast<char>(varValue));
+            pModelSettings.SetRadioType(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::SOUND_TYPE:
         {
-            pModelSettings.SetSoundType((VehicleSoundType)(int)(varValue));
+            const int iValue = toInt(varValue);
+            if (!((iValue >= 0 && iValue <= 5) || (iValue >= 8 && iValue <= 10)))
+                throw std::invalid_argument("Invalid sound-type value");
+
+            pModelSettings.SetSoundType(static_cast<VehicleSoundType>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::BASS_SETTING:
         {
-            pModelSettings.SetBassSetting(static_cast<char>(varValue));
+            const int iValue = toInt(varValue);
+            if (iValue < 0 || iValue > 2)
+                throw std::invalid_argument("Invalid bass-setting value");
+
+            pModelSettings.SetBassSetting(static_cast<char>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::BASS_EQ:
@@ -4515,12 +4544,12 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
         }
         case VehicleAudioSettingProperty::ENGINE_UPGRADE:
         {
-            pModelSettings.SetEngineUpgrade(static_cast<char>(varValue));
+            pModelSettings.SetEngineUpgrade(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
         {
-            pModelSettings.SetVehicleTypeForAudio(static_cast<char>(varValue));
+            pModelSettings.SetVehicleTypeForAudio(toChar(varValue));
             break;
         }
         default:
@@ -4546,37 +4575,58 @@ bool CLuaVehicleDefs::ResetVehicleModelAudioSettings(const uint32_t uiModel)
     if (!CClientVehicleManager::IsStandardModel(uiModel))
         throw std::invalid_argument("Cannot change audio setting for allocated vechiles");
 
-     g_pGame->GetVehicleAudioSettingsManager()->ResetModelSettings(uiModel);
-     return true;
+    g_pGame->GetVehicleAudioSettingsManager()->ResetModelSettings(uiModel);
+
+    return true;
 }
 
 bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const VehicleAudioSettingProperty eProperty, float varValue)
 {
     CVehicleAudioSettingsEntry& pModelSettings = pVehicle->GetOrCreateAudioSettings();
 
+    const auto toInt = [](float value) -> int
+    {
+        const int iValue = static_cast<int>(value);
+        if (static_cast<float>(iValue) != value)
+            throw std::invalid_argument("Expected an integer value");
+
+        return iValue;
+    };
+
+    const auto toChar = [&toInt](float value) -> char
+    {
+        const int iValue = toInt(value);
+        if (iValue < std::numeric_limits<char>::min() || iValue > std::numeric_limits<char>::max())
+            throw std::invalid_argument("Value out of range");
+
+        return static_cast<char>(iValue);
+    };
+
     switch (eProperty)
     {
         case VehicleAudioSettingProperty::DOOR_SOUND:
         {
-            pModelSettings.SetDoorSound(static_cast<char>(varValue));
+            pModelSettings.SetDoorSound(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
         {
             // Using SPC_ sound banks other than SPC_EA causes a crash
-            if (varValue > 410)
+            const int iValue = toInt(varValue);
+            if (iValue < 0 || iValue > 410)
                 throw std::invalid_argument("Invalid engine-off-sound-bank-id value");
 
-            pModelSettings.SetEngineOffSoundBankID(static_cast<short>(varValue));
+            pModelSettings.SetEngineOffSoundBankID(static_cast<short>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
         {
             // Using SPC_ sound banks other than SPC_EA causes a crash
-            if (varValue > 410)
+            const int iValue = toInt(varValue);
+            if (iValue < 0 || iValue > 410)
                 throw std::invalid_argument("Invalid engine-on-sound-bank-id value");
 
-            pModelSettings.SetEngineOnSoundBankID(static_cast<short>(varValue));
+            pModelSettings.SetEngineOnSoundBankID(static_cast<short>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::HORN_HIGH:
@@ -4586,7 +4636,7 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const Veh
         }
         case VehicleAudioSettingProperty::HORN_TON:
         {
-            pModelSettings.SetHornTon(static_cast<char>(varValue));
+            pModelSettings.SetHornTon(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::HORN_VOLUME_DELTA:
@@ -4596,22 +4646,30 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const Veh
         }
         case VehicleAudioSettingProperty::RADIO_NUM:
         {
-            pModelSettings.SetRadioNum(static_cast<char>(varValue));
+            pModelSettings.SetRadioNum(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::RADIO_TYPE:
         {
-            pModelSettings.SetRadioType(static_cast<char>(varValue));
+            pModelSettings.SetRadioType(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::SOUND_TYPE:
         {
-            pModelSettings.SetSoundType((VehicleSoundType)(int)(varValue));
+            const int iValue = toInt(varValue);
+            if (!((iValue >= 0 && iValue <= 5) || (iValue >= 8 && iValue <= 10)))
+                throw std::invalid_argument("Invalid sound-type value");
+
+            pModelSettings.SetSoundType(static_cast<VehicleSoundType>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::BASS_SETTING:
         {
-            pModelSettings.SetBassSetting(static_cast<char>(varValue));
+            const int iValue = toInt(varValue);
+            if (iValue < 0 || iValue > 2)
+                throw std::invalid_argument("Invalid bass-setting value");
+
+            pModelSettings.SetBassSetting(static_cast<char>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::BASS_EQ:
@@ -4626,12 +4684,12 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const Veh
         }
         case VehicleAudioSettingProperty::ENGINE_UPGRADE:
         {
-            pModelSettings.SetEngineUpgrade(static_cast<char>(varValue));
+            pModelSettings.SetEngineUpgrade(toChar(varValue));
             break;
         }
         case VehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
         {
-            pModelSettings.SetVehicleTypeForAudio(static_cast<char>(varValue));
+            pModelSettings.SetVehicleTypeForAudio(toChar(varValue));
             break;
         }
         default:
@@ -4668,19 +4726,19 @@ std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleModelAudioSett
 
     std::unordered_map<std::string, float> output;
 
-    output["sound-type"] = static_cast<float>(pEntry.GetSoundType());
-    output["engine-on-soundbank-id"] = pEntry.GetEngineOnSoundBankID();
-    output["engine-off-soundbank-id"] = pEntry.GetEngineOffSoundBankID();
-    output["bass-setting"] = pEntry.GetBassSetting();
+    output["sound-type"] = static_cast<float>(static_cast<int>(pEntry.GetSoundType()));
+    output["engine-on-soundbank-id"] = static_cast<float>(pEntry.GetEngineOnSoundBankID());
+    output["engine-off-soundbank-id"] = static_cast<float>(pEntry.GetEngineOffSoundBankID());
+    output["bass-setting"] = static_cast<float>(pEntry.GetBassSetting());
     output["bass-eq"] = pEntry.GetBassEq();
     output["field-c"] = pEntry.GetFieldC();
-    output["horn-ton"] = pEntry.GetHornTon();
+    output["horn-ton"] = static_cast<float>(pEntry.GetHornTon());
     output["horn-high"] = pEntry.GetHornHign();
-    output["engine-upgrade"] = pEntry.GetEngineUpgrade();
-    output["door-sound"] = pEntry.GetDoorSound();
-    output["radio-num"] = pEntry.GetRadioNum();
-    output["radio-type"] = pEntry.GetRadioType();
-    output["vehicle-type-for-audio"] = pEntry.GetVehicleTypeForAudio();
+    output["engine-upgrade"] = static_cast<float>(pEntry.GetEngineUpgrade());
+    output["door-sound"] = static_cast<float>(pEntry.GetDoorSound());
+    output["radio-num"] = static_cast<float>(pEntry.GetRadioNum());
+    output["radio-type"] = static_cast<float>(pEntry.GetRadioType());
+    output["vehicle-type-for-audio"] = static_cast<float>(pEntry.GetVehicleTypeForAudio());
     output["horn-volume-delta"] = pEntry.GetHornVolumeDelta();
 
     return output;
@@ -4692,21 +4750,20 @@ std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleAudioSettings(
 
     std::unordered_map<std::string, float> output;
 
-    output["sound-type"] = fabs(static_cast<float>(pEntry.GetSoundType()));
-    output["engine-on-soundbank-id"] = pEntry.GetEngineOnSoundBankID();
-    output["engine-off-soundbank-id"] = pEntry.GetEngineOffSoundBankID();
-    output["bass-setting"] = pEntry.GetBassSetting();
+    output["sound-type"] = static_cast<float>(static_cast<int>(pEntry.GetSoundType()));
+    output["engine-on-soundbank-id"] = static_cast<float>(pEntry.GetEngineOnSoundBankID());
+    output["engine-off-soundbank-id"] = static_cast<float>(pEntry.GetEngineOffSoundBankID());
+    output["bass-setting"] = static_cast<float>(pEntry.GetBassSetting());
     output["bass-eq"] = pEntry.GetBassEq();
     output["field-c"] = pEntry.GetFieldC();
-    output["horn-ton"] = pEntry.GetHornTon();
+    output["horn-ton"] = static_cast<float>(pEntry.GetHornTon());
     output["horn-high"] = pEntry.GetHornHign();
-    output["engine-upgrade"] = pEntry.GetEngineUpgrade();
-    output["door-sound"] = pEntry.GetDoorSound();
-    output["radio-num"] = pEntry.GetRadioNum();
-    output["radio-type"] = pEntry.GetRadioType();
-    output["vehicle-type-for-audio"] = pEntry.GetVehicleTypeForAudio();
+    output["engine-upgrade"] = static_cast<float>(pEntry.GetEngineUpgrade());
+    output["door-sound"] = static_cast<float>(pEntry.GetDoorSound());
+    output["radio-num"] = static_cast<float>(pEntry.GetRadioNum());
+    output["radio-type"] = static_cast<float>(pEntry.GetRadioType());
+    output["vehicle-type-for-audio"] = static_cast<float>(pEntry.GetVehicleTypeForAudio());
     output["horn-volume-delta"] = pEntry.GetHornVolumeDelta();
 
     return output;
 }
-

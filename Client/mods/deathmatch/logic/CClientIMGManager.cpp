@@ -22,7 +22,7 @@ CClientIMGManager::CClientIMGManager(CClientManager* pManager)
     // TODO: In the default gta3.img the biggest file is 1260 sectors, so to be fail safe, we double it
     // ideally, we'd just take this value from the game, but there's no clean/easy way to do that [without loading the img archives]
     // so, for now, this is good enough
-    m_LargestFileSizeBlocks = m_GTALargestFileSizeBlocks = 1260 * 2; 
+    m_LargestFileSizeBlocks = m_GTALargestFileSizeBlocks = 1260 * 2;
 }
 
 CClientIMGManager::~CClientIMGManager()
@@ -87,7 +87,11 @@ CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
 
 bool CClientIMGManager::IsLinkableModel(unsigned int uiModel)
 {
-    return uiModel < g_pGame->GetCountOfAllFileIDs();
+    const int32_t count = g_pGame->GetCountOfAllFileIDs();
+    if (count <= 0)
+        return false;
+
+    return uiModel < static_cast<unsigned int>(count);
 }
 
 bool CClientIMGManager::RestoreModel(unsigned int uiModel)

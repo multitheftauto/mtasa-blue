@@ -176,7 +176,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                 {
                     int fpsVal = 0;
                     CVARS_GET("fps_limit", fpsVal);
-                    CCore::GetSingleton().GetFPSLimiter()->SetUserDefinedFPS(fpsVal);
+                    CCore::GetSingleton().GetFPSLimiter()->SetUserDefinedFPS(static_cast<std::uint16_t>(fpsVal));
                 }
 
                 // HACK: Foul dirty hack to force vsync (Rework on #4427)

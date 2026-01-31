@@ -50,6 +50,7 @@ public:
     static bool HasDamageModel(unsigned long ulModel);
     static bool HasDamageModel(enum eClientVehicleType Type);
     static bool HasDoors(unsigned long ulModel);
+    static bool IsValidSeat(unsigned long ulModel, unsigned char ucSeat);
 
     bool Exists(CClientVehicle* pVehicle);
 

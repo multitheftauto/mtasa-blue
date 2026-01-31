@@ -24,7 +24,7 @@ using hrc = std::chrono::high_resolution_clock;
 ///////////////////////////////////////////////////////////////////////////
 //
 // Splash window logic.
-// 
+//
 ///////////////////////////////////////////////////////////////////////////
 
 class Splash final
@@ -111,7 +111,7 @@ bool Splash::CreateSplashWindow(HINSTANCE instance)
     windowClass.style = 0;
     windowClass.hInstance = instance;
     windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    windowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110));            // IDI_ICON1 from Launcher
+    windowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110));  // IDI_ICON1 from Launcher
     windowClass.lpszClassName = TEXT("SplashWindow");
 
     if (!RegisterClass(&windowClass))
@@ -144,7 +144,7 @@ bool Splash::CreateSplashWindow(HINSTANCE instance)
     m_barX = {};
     m_barY = ScaleToDpi(197, dpi);
     m_barWidth = m_width;
-    m_barHeight = ScaleToDpi(5, dpi) + 1;            // We add 1 pixel because scaling can cause the bar to be too small.
+    m_barHeight = ScaleToDpi(5, dpi) + 1;  // We add 1 pixel because scaling can cause the bar to be too small.
 
     m_windowClass = windowClass;
     m_window = window;
@@ -401,9 +401,10 @@ void Splash::UpdateLoadingBar()
     const long long numUpdates = elapsed / UPDATE_RATE_IN_MS;
     m_barLastUpdate += std::chrono::milliseconds(numUpdates * UPDATE_RATE_IN_MS);
 
-    m_barX += PIXELS_PER_UPDATE * static_cast<int>(numUpdates);
-
-    if (m_barX >= m_width)
+    const long long delta = static_cast<long long>(PIXELS_PER_UPDATE) * numUpdates;
+    if (m_width > 0)
+        m_barX = static_cast<int>((static_cast<long long>(m_barX) + delta) % m_width);
+    else
         m_barX = 0;
 
     // Only invalidate the loading bar region to avoid flickering.

@@ -16,58 +16,58 @@ class CHandlingEntry;
 class CTransmissionSAInterface
 {
 public:
-    unsigned char ucDriveType : 8;                // +112
-    unsigned char ucEngineType : 8;               // +113
-    unsigned char ucNumberOfGears : 8;            // +114
-    unsigned char ucUnknown : 8;                  // +115
+    unsigned char ucDriveType : 8;      // +112
+    unsigned char ucEngineType : 8;     // +113
+    unsigned char ucNumberOfGears : 8;  // +114
+    unsigned char ucUnknown : 8;        // +115
 
-    unsigned int uiHandlingFlags;            // +116
+    unsigned int uiHandlingFlags;  // +116
 
-    float fEngineAcceleration;            // +120     (value in handling.cfg * 0x86A950)
-    float fEngineInertia;                 // +124
-    float fMaxVelocity;                   // +128
+    float fEngineAcceleration;  // +120     (value in handling.cfg * 0x86A950)
+    float fEngineInertia;       // +124
+    float fMaxVelocity;         // +128
 };
 
 struct tHandlingData
 {
-    int iVehicleID;            // +0
+    int iVehicleID;  // +0
 
-    float fMass;            // +4
+    float fMass;  // +4
 
-    float        fTurnMass;                     // +12
-    float        fDragCoeff;                    // +16
-    CVector      vecCenterOfMass;               // +20
-    unsigned int uiPercentSubmerged;            // +32
+    float        fTurnMass;           // +12
+    float        fDragCoeff;          // +16
+    CVector      vecCenterOfMass;     // +20
+    unsigned int uiPercentSubmerged;  // +32
 
-    float fTractionMultiplier;            // +40
+    float fTractionMultiplier;  // +40
 
-    CTransmissionSAInterface Transmission;                  // +44
-    float                    fBrakeDeceleration;            // +148
-    float                    fBrakeBias;                    // +152
-    bool                     bABS;                          // +156
+    CTransmissionSAInterface Transmission;        // +44
+    float                    fBrakeDeceleration;  // +148
+    float                    fBrakeBias;          // +152
+    bool                     bABS;                // +156
 
-    float fSteeringLock;            // +160
-    float fTractionLoss;            // +164
-    float fTractionBias;            // +168
+    float fSteeringLock;  // +160
+    float fTractionLoss;  // +164
+    float fTractionBias;  // +168
 
-    float fSuspensionForceLevel;                    // +172
-    float fSuspensionDamping;                       // +176
-    float fSuspensionHighSpdDamping;                // +180
-    float fSuspensionUpperLimit;                    // +184
-    float fSuspensionLowerLimit;                    // +188
-    float fSuspensionFrontRearBias;                 // +192
-    float fSuspensionAntiDiveMultiplier;            // +196
+    float fSuspensionForceLevel;          // +172
+    float fSuspensionDamping;             // +176
+    float fSuspensionHighSpdDamping;      // +180
+    float fSuspensionUpperLimit;          // +184
+    float fSuspensionLowerLimit;          // +188
+    float fSuspensionFrontRearBias;       // +192
+    float fSuspensionAntiDiveMultiplier;  // +196
 
-    float fCollisionDamageMultiplier;            // +200
+    float fCollisionDamageMultiplier;  // +200
 
-    unsigned int uiModelFlags;                   // +204
-    unsigned int uiHandlingFlags;                // +208
-    float        fSeatOffsetDistance;            // +212
-    unsigned int uiMonetary;                     // +216
+    unsigned int uiModelFlags;         // +204
+    unsigned int uiHandlingFlags;      // +208
+    float        fSeatOffsetDistance;  // +212
+    unsigned int uiMonetary;           // +216
 
-    unsigned char ucHeadLight : 8;            // +220
-    unsigned char ucTailLight : 8;            // +221
-    unsigned char ucAnimGroup : 8;            // +222
+    unsigned char ucHeadLight : 8;  // +220
+    unsigned char ucTailLight : 8;  // +221
+    unsigned char ucAnimGroup : 8;  // +222
 };
 
 class CHandlingEntry
@@ -96,12 +96,12 @@ public:
     };
 
     // Constructor for creatable dummy entries
-    CHandlingEntry(){};
+    CHandlingEntry() {};
 
     // Constructor for original entries
     CHandlingEntry(tHandlingData* pOriginal);
 
-    ~CHandlingEntry(){};
+    ~CHandlingEntry() {};
 
     // Use this to copy data from an another handling class to this
     void ApplyHandlingData(const CHandlingEntry* const pData) noexcept;

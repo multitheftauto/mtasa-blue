@@ -87,7 +87,7 @@ bool CResourceModelStreamer::ReleaseModel(std::uint16_t modelId, bool removeRef)
 
 void CResourceModelStreamer::ReleaseAll()
 {
-    for (const auto &modelRefs : m_requestedModels)
+    for (const auto& modelRefs : m_requestedModels)
     {
         if (modelRefs.second > 0)
         {
@@ -116,6 +116,9 @@ void CResourceModelStreamer::FullyReleaseModel(std::uint16_t modelId)
         if (!model)
             return;
 
-        model->RemoveRef();
+        // Pass true to also decrement GTA's usNumberOfRefs which was incremented
+        // by ModelAddRef() when the model was first requested. Without this,
+        // DeallocateModel() will be blocked due to orphaned GTA-side refs.
+        model->RemoveRef(true);
     }
 }

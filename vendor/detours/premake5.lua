@@ -1,7 +1,8 @@
 project "detours"
     language "C++"
     kind "StaticLib"
-    
+	warnings "Off"
+
     defines {
         "WIN32_LEAN_AND_MEAN",
         -- "_WIN32_WINNT=0x501", Not necessary, predefined in root premake5.lua
