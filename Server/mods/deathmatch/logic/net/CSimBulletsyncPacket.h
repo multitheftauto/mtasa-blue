@@ -28,7 +28,7 @@ public:
         eWeaponType         weapon = eWeaponType::WEAPONTYPE_UNARMED;
         SPositionSync       start{};
         SPositionSync       end{};
-        SFloatAsBitsSync<8> damage{0.0f, 255.0f, true, false};
+        SFloatAsBitsSync<8> damage{0.0f, 200.0f, true, false};
         std::uint8_t        zone{};
         ElementID           damaged = INVALID_ELEMENT_ID;
     } m_cache;

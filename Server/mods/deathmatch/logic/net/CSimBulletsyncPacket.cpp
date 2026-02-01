@@ -14,6 +14,7 @@
 
 CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID id) : m_id(id)
 {
+    m_cache.damage.data.fValue = 0.0f;
 }
 
 bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
@@ -44,7 +45,7 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
         if (!std::isfinite(m_cache.damage.data.fValue))
             return false;
 
-        if (m_cache.damage.data.fValue < 0 || m_cache.damage.data.fValue > CBulletsyncPacket::MAX_DAMAGE)
+        if (m_cache.damage.data.fValue < 0.0f || m_cache.damage.data.fValue > CBulletsyncPacket::MAX_DAMAGE)
             return false;
 
         stream.Read(m_cache.zone);
@@ -64,7 +65,7 @@ bool CSimBulletsyncPacket::Write(NetBitStreamInterface& stream) const
     stream.Write(&m_cache.start);
     stream.Write(&m_cache.end);
 
-    bool hasDamaged = m_cache.damage.data.fValue > 0 && m_cache.damaged != INVALID_ELEMENT_ID;
+    bool hasDamaged = m_cache.damage.data.fValue > 0.0f && m_cache.damaged != INVALID_ELEMENT_ID;
 
     stream.WriteBit(hasDamaged);
     if (hasDamaged)

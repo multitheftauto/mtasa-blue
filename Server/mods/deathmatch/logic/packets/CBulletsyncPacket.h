@@ -49,7 +49,7 @@ public:
     eWeaponType  m_weapon{};
     SPositionSync m_start{};
     SPositionSync m_end{};
-    SFloatAsBitsSync<8> m_damage{0.0f, 255.0f, true, false};
+    SFloatAsBitsSync<8> m_damage{0.0f, 200.0f, true, false};
     std::uint8_t m_zone{};
     ElementID    m_damaged{INVALID_ELEMENT_ID};
 };
