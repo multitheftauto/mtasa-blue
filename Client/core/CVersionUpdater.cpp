@@ -571,7 +571,7 @@ void CVersionUpdater::InitiateUpdate(const SString& strType, const SString& strD
 
 #ifdef MTA_CL2
     // Don't allow update if CL2 is running
-    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD354}");
+    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD352}");
     if (hCL2Mutex)
     {
         CloseHandle(hCL2Mutex);
@@ -639,7 +639,7 @@ void CVersionUpdater::InitiateManualCheck()
 
 #ifdef MTA_CL2
     // Don't allow update if CL2 is running
-    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD354}");
+    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD352}");
     if (hCL2Mutex)
     {
         CloseHandle(hCL2Mutex);
