@@ -145,6 +145,18 @@ CInstallManager* GetInstallManager()
 void CInstallManager::InitSequencer()
 {
 #define CR "\n"
+    SString strVersionCheckPart = IsSecondaryClient()
+        ? CR "            GOTO launch: "                                         // Skip version check for secondary client
+        : CR "            CALL ProcessGtaVersionCheck "                          //
+          CR "            IF LastResult == ok GOTO gta_version_end: "            //
+          CR "            IF LastResult == quit GOTO do_quit: "                  //
+          CR " "                                                                 //
+          CR "            CALL ChangeToAdmin "                                   // If changes failed, try as admin
+          CR "            IF LastResult == ok GOTO gta_version_check: "          //
+          CR "            CALL Quit "                                            //
+          CR " "                                                                 //
+          CR "gta_version_end: ";                                                ////// End of 'gta version check' //////
+
     SString strSource = CR "initial: "                                           // *** Starts here  by default
         CR "            CALL CheckOnRestartCommand "                             ////// Start of 'update game' //////
         CR "            IF LastResult != ok GOTO update_end: "                   //
@@ -218,16 +230,7 @@ void CInstallManager::InitSequencer()
         CR "gta_dll_end: "                                                       ////// End of 'gta dll check' //////
         CR " "                                                                   //
         CR "gta_version_check:"                                                  ////// Start of 'gta version check' //////
-        CR "            GOTO launch: "
-        CR "            CALL ProcessGtaVersionCheck "                            //
-        CR "            IF LastResult == ok GOTO gta_version_end: "              //
-        CR "            IF LastResult == quit GOTO do_quit: "                    //
-        CR " "                                                                   //
-        CR "            CALL ChangeToAdmin "                                     // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO gta_version_check: "            //
-        CR "            CALL Quit "                                              //
-        CR " "                                                                   //
-        CR "gta_version_end: "                                                   ////// End of 'gta version check' //////
+        + strVersionCheckPart +
         CR " "                                                                   //
         CR "service_check: "                                                     ////// Start of 'Service checks' //////
         CR "            CALL ProcessServiceChecks "                              // Make changes to comply with service requirements
