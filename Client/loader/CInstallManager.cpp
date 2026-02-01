@@ -218,6 +218,7 @@ void CInstallManager::InitSequencer()
         CR "gta_dll_end: "                                                       ////// End of 'gta dll check' //////
         CR " "                                                                   //
         CR "gta_version_check:"                                                  ////// Start of 'gta version check' //////
+        CR "            GOTO launch: "
         CR "            CALL ProcessGtaVersionCheck "                            //
         CR "            IF LastResult == ok GOTO gta_version_end: "              //
         CR "            IF LastResult == quit GOTO do_quit: "                    //
