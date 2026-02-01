@@ -30,7 +30,8 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
     if (!m_cache.start.data.vecPosition.IsValid() || !m_cache.end.data.vecPosition.IsValid())
         return false;
 
-    // Huge coordinates can crash other players
+    // Cheaters sends packet with huge coordinates (INFINITE/INFINITY)
+    // to intentionally crash other players
     if (!m_cache.start.data.vecPosition.IsInWorldBounds(true) || !m_cache.end.data.vecPosition.IsInWorldBounds(true))
         return false;
 
