@@ -16,7 +16,6 @@
 
 #include "CPacket.h"
 #include "CCommon.h"
-#include "net/SyncStructures.h"
 
 class CBulletsyncPacket final : public CPacket
 {
@@ -38,18 +37,22 @@ public:
     bool Read(NetBitStreamInterface& stream) override;
     bool Write(NetBitStreamInterface& stream) const override;
 
-    static bool ValidateTrajectory(const CVector& start, const CVector& end) noexcept;
-
 private:
     bool ReadWeaponAndPositions(NetBitStreamInterface& stream);
     bool ReadOptionalDamage(NetBitStreamInterface& stream);
+    bool ValidateTrajectory() const noexcept;
     void ResetDamageData() noexcept;
+
+    static constexpr bool IsNaN(float value) noexcept { return value != value; }
+    static bool           IsValidVector(const CVector& vec) noexcept;
+    static bool           IsValidWeaponId(unsigned char weaponId) noexcept;
 
 public:
     eWeaponType  m_weapon{};
-    SPositionSync m_start{};
-    SPositionSync m_end{};
-    SFloatAsBitsSync<8> m_damage{0.0f, 255.0f, true, false};
+    CVector      m_start{};
+    CVector      m_end{};
+    std::uint8_t m_order{};
+    float        m_damage{};
     std::uint8_t m_zone{};
     ElementID    m_damaged{INVALID_ELEMENT_ID};
 };

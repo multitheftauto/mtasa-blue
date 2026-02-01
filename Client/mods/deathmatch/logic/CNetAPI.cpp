@@ -132,7 +132,7 @@ bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& B
             if (!BitStream.Read(id))
                 return true;
 
-            CClientPlayer* player = m_pPlayerManager->Get(id);
+            auto* player = m_pPlayerManager->Get(id);
             if (!player)
                 return true;
 
@@ -2236,36 +2236,48 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
     if (!stream.Read(weapon) || !CClientWeaponManager::HasWeaponBulletSync(weapon))
         return;
 
-    auto type = static_cast<eWeaponType>(weapon);
+    const auto type = static_cast<eWeaponType>(weapon);
 
-    SPositionSync startPosition;
-    SPositionSync endPosition;
-    if (!stream.Read(&startPosition) || !stream.Read(&endPosition))
+    CVector start;
+    CVector end;
+    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
+        !end.IsValid())
         return;
 
-    if (!startPosition.data.vecPosition.IsValid() || endPosition.data.vecPosition.IsValid())
+    std::uint8_t order = 0;
+    if (!stream.Read(order))
         return;
 
-    // Cheaters sends packet with huge coordinates (INFINITE/INFINITY)
-    // to intentionally crash other players
-    if (!startPosition.data.vecPosition.IsInWorldBounds(true) || !endPosition.data.vecPosition.IsInWorldBounds(true))
-        return;
-
-    // 200 is MAX weapon damage
-    SFloatAsBitsSync<8> damage(0, 200.0f, false);
+    float          damage = 0.0f;
     std::uint8_t   zone = 0;
     CClientPlayer* damaged = nullptr;
 
     if (stream.ReadBit())
     {
         ElementID id = INVALID_ELEMENT_ID;
-        if (!stream.Read(&damage) || !stream.Read(zone) || !stream.Read(id))
+        if (!stream.Read(damage) || !stream.Read(zone) || !stream.Read(id))
             return;
 
         damaged = DynamicCast<CClientPlayer>(CElementIDs::GetElement(id));
     }
 
-    player->DischargeWeapon(type, startPosition.data.vecPosition, endPosition.data.vecPosition, damage.data.fValue, zone, damaged);
+    bool duplicate = false;
+
+    if (start == player->m_vecPrevBulletSyncStart && end == player->m_vecPrevBulletSyncEnd)
+        duplicate = true;
+
+    player->m_vecPrevBulletSyncStart = start;
+    player->m_vecPrevBulletSyncEnd = end;
+
+    if (static_cast<char>(order - player->m_ucPrevBulletSyncOrderCounter) > 0)
+        duplicate = false;
+
+    player->m_ucPrevBulletSyncOrderCounter = order;
+
+    if (duplicate)
+        return;
+
+    player->DischargeWeapon(type, start, end, damage, zone, damaged);
 }
 
 void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface& stream)
@@ -2278,47 +2290,38 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface&
     if (!weapon || !CClientWeaponManager::HasWeaponBulletSync(weapon->GetWeaponType()))
         return;
 
-    SPositionSync startPosition;
-    SPositionSync endPosition;
-    if (!stream.Read(&startPosition) || !stream.Read(&endPosition))
+    CVector start;
+    CVector end;
+    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
+        !end.IsValid())
         return;
 
-    if (!startPosition.data.vecPosition.IsValid() || endPosition.data.vecPosition.IsValid())
+    uint8_t order = 0;
+    if (!stream.Read(order))
         return;
 
-    // Cheaters sends packet with huge coordinates (INFINITE/INFINITY)
-    // to intentionally crash other players
-    if (!startPosition.data.vecPosition.IsInWorldBounds(true) || !endPosition.data.vecPosition.IsInWorldBounds(true))
-        return;
-
-    weapon->FireInstantHit(startPosition.data.vecPosition, endPosition.data.vecPosition, false, true);
+    weapon->FireInstantHit(start, end, false, true);
 }
 
 void CNetAPI::SendBulletSyncFire(eWeaponType weapon, const CVector& start, const CVector& end, float damage, std::uint8_t zone, CClientPlayer* damaged)
 {
-    NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
-    SPositionSync startPosition;
-    startPosition.data.vecPosition = start;
+    auto* stream = g_pNet->AllocateNetBitStream();
 
-    SPositionSync endPosition;
-    endPosition.data.vecPosition = end;
+    stream->Write(static_cast<char>(weapon));
+    stream->Write(reinterpret_cast<const char*>(&start), sizeof(CVector));
+    stream->Write(reinterpret_cast<const char*>(&end), sizeof(CVector));
+    stream->Write(m_ucBulletSyncOrderCounter++);
 
-    stream->Write(static_cast<std::uint8_t>(weapon));
-
-    stream->Write(&startPosition);
-    stream->Write(&endPosition);
-
-    bool hasDamaged = damaged && damage > 0.0f;
-    stream->WriteBit(hasDamaged);
-
-    if (hasDamaged)
+    if (damage > 0.0f && damaged)
     {
-        SFloatAsBitsSync<8> damageF(0, 200.0f, false);
-        damageF.data.fValue = damage;
-
-        stream->Write(&damageF);
+        stream->WriteBit(true);
+        stream->Write(damage);
         stream->Write(zone);
         stream->Write(damaged->GetID());
+    }
+    else
+    {
+        stream->WriteBit(false);
     }
 
     g_pNet->SendPacket(PACKET_ID_PLAYER_BULLETSYNC, stream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE);
@@ -2330,17 +2333,12 @@ void CNetAPI::SendBulletSyncCustomWeaponFire(CClientWeapon* weapon, const CVecto
     if (weapon->IsLocalEntity())
         return;
 
-    NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
-
-    SPositionSync          startPosition;
-    startPosition.data.vecPosition = start;
-
-    SPositionSync endPosition;
-    endPosition.data.vecPosition = end;
+    auto* stream = g_pNet->AllocateNetBitStream();
 
     stream->Write(weapon->GetID());
-    stream->Write(&startPosition);
-    stream->Write(&endPosition);
+    stream->Write(reinterpret_cast<const char*>(&start), sizeof(CVector));
+    stream->Write(reinterpret_cast<const char*>(&end), sizeof(CVector));
+    stream->Write(m_ucCustomWeaponBulletSyncOrderCounter++);
 
     g_pNet->SendPacket(PACKET_ID_WEAPON_BULLETSYNC, stream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE);
     g_pNet->DeallocateNetBitStream(stream);

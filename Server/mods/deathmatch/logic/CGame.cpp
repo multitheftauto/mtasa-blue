@@ -2527,11 +2527,10 @@ void CGame::Packet_Keysync(CKeysyncPacket& Packet)
 
 void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
 {
-    CPlayer* player = packet.GetSourcePlayer();
+    auto* player = packet.GetSourcePlayer();
     if (!player || !player->IsJoined())
         return;
 
-    // Early return when the player attempts to fire a weapon they do not have
     const auto type = static_cast<std::uint8_t>(packet.m_weapon);
     if (!player->HasWeaponType(type))
         return;
@@ -2547,7 +2546,7 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     const auto level = player->GetPlayerStat(stat);
     auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
 
-    const float distanceSq = (packet.m_start.data.vecPosition - packet.m_end.data.vecPosition).LengthSquared();
+    const float distanceSq = (packet.m_start - packet.m_end).LengthSquared();
     const float range = stats->GetWeaponRange();
     const float rangeSq = range * range;
 
@@ -2555,37 +2554,38 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (distanceSq > maxRangeSq)
         return;
 
-    RelayNearbyPacket(packet);
-
     CLuaArguments args;
     args.PushNumber(packet.m_weapon);
-    args.PushNumber(packet.m_end.data.vecPosition.fX);
-    args.PushNumber(packet.m_end.data.vecPosition.fY);
-    args.PushNumber(packet.m_end.data.vecPosition.fZ);
+    args.PushNumber(packet.m_end.fX);
+    args.PushNumber(packet.m_end.fY);
+    args.PushNumber(packet.m_end.fZ);
 
     if (packet.m_damaged == INVALID_ELEMENT_ID)
         args.PushNil();
     else
         args.PushElement(CElementIDs::GetElement(packet.m_damaged));
 
-    args.PushNumber(packet.m_start.data.vecPosition.fX);
-    args.PushNumber(packet.m_start.data.vecPosition.fY);
-    args.PushNumber(packet.m_start.data.vecPosition.fZ);
+    args.PushNumber(packet.m_start.fX);
+    args.PushNumber(packet.m_start.fY);
+    args.PushNumber(packet.m_start.fZ);
 
     player->CallEvent("onPlayerWeaponFire", args);
 }
 
 void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& packet)
 {
-    CPlayer* player = packet.GetSourcePlayer();
+    auto* player = packet.GetSourcePlayer();
     if (!player || !player->IsJoined())
         return;
 
     if (player != packet.GetWeaponOwner())
         return;
 
-    CCustomWeapon* weapon = packet.GetWeapon();
+    auto* weapon = packet.GetWeapon();
     if (weapon->GetAmmo() <= 0)
+        return;
+
+    if (weapon->GetClipAmmo() <= 0)
         return;
 
     CLuaArguments args;
