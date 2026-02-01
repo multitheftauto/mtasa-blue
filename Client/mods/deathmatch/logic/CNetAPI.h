@@ -122,6 +122,4 @@ private:
     CControllerState m_LastSentControllerState;
     float            m_fLastSentCameraRotation;
     float            m_fLastSentAimY;
-    uchar            m_ucBulletSyncOrderCounter;
-    uchar            m_ucCustomWeaponBulletSyncOrderCounter;
 };
