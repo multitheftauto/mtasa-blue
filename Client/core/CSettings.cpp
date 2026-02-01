@@ -2250,7 +2250,7 @@ void CSettings::UpdateVideoTab()
     else if (FxQuality == 3)
         m_pComboFxQuality->SetText(_("Very high"));
 
-    auto antiAliasing = static_cast<char>(gameSettings->GetAntiAliasing());
+    unsigned int antiAliasing = gameSettings->GetAntiAliasing();
     if (antiAliasing == 1)
         m_pComboAntiAliasing->SetText(_("Off"));
     else if (antiAliasing == 2)

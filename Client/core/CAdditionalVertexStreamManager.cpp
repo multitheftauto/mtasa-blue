@@ -200,8 +200,6 @@ bool CAdditionalVertexStreamManager::MaybeSetAdditionalVertexStream(D3DPRIMITIVE
 ///////////////////////////////////////////////////////////////
 bool CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo& state)
 {
-    HRESULT hr;
-
     // Get matching custom N vbuffer for std PT vbuffer
     SAdditionalStreamInfo* pAdditionalInfo = GetAdditionalStreamInfo(state.stream1.pStreamData);
     if (!pAdditionalInfo)

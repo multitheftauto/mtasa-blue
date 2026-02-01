@@ -231,7 +231,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         case eClientModelType::TIMED_OBJECT:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
-            unsigned short usParentID = pModelInfo->GetParentID();
+            unsigned short usParentID = static_cast<unsigned short>(pModelInfo->GetParentID());
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [usParentID](auto& element) { element.SetModel(usParentID); });
 
@@ -245,13 +245,13 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID,
                                                  [usParentID](auto& element) { element.SetModel(usParentID); });
 
-            g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(modelId);
+            g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(static_cast<unsigned short>(modelId));
             break;
         }
         case eClientModelType::VEHICLE:
         {
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
-            unsigned short         usParentID = pModelInfo->GetParentID();
+            unsigned short         usParentID = static_cast<unsigned short>(pModelInfo->GetParentID());
 
             unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
                                       [usParentID](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });
@@ -259,7 +259,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         }
     }
 
-    g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(modelId);
+    g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(static_cast<unsigned short>(modelId));
 }
 
 bool CClientModel::AllocateTXD(std::string& strTxdName)

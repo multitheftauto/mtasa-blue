@@ -1065,7 +1065,7 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
         MemPut(iPtr, iValue);
 
     if (cPtr)
-        MemPut(cPtr, static_cast<char>(iValue));
+        MemPut<char>(cPtr, static_cast<char>(iValue));
 }
 
 int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)

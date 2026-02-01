@@ -15,7 +15,11 @@
     #include <windows.h>
 #endif
 
+#ifdef WIN32
+using FuncPtr_t = FARPROC;
+#else
 typedef void (*FuncPtr_t)();
+#endif
 
 class CDynamicLibrary
 {

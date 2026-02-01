@@ -81,7 +81,16 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
                 auto ucSlot = static_cast<unsigned char>(slot.data.uiSlot);
 
                 if (bWeaponCorrect)
-                    pSourcePlayer->SetWeaponSlot(ucSlot);
+                {
+                    const unsigned int uiCurrSlot = slot.data.uiSlot;
+                    if (uiCurrSlot != static_cast<unsigned int>(pSourcePlayer->GetWeaponSlot()))
+                    {
+                        if (uiCurrSlot > 0xFF)
+                            return false;
+
+                        pSourcePlayer->SetWeaponSlot(static_cast<unsigned char>(uiCurrSlot));
+                    }
+                }
 
                 // Did he have a weapon?
                 if (CWeaponNames::DoesSlotHaveAmmo(ucSlot))
