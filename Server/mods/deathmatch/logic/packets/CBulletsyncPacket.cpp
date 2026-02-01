@@ -198,7 +198,7 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
     stream.Write(&m_start);
     stream.Write(&m_end);
 
-    const bool hasDamage = (m_damage.data.fValue > 0.0f) && (m_damaged != INVALID_ELEMENT_ID);
+    const bool hasDamage = (m_damage.data.fValue > 0) && (m_damaged != INVALID_ELEMENT_ID);
     stream.WriteBit(hasDamage);
 
     if (hasDamage)
