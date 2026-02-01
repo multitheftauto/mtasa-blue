@@ -2243,11 +2243,10 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
     if (!stream.Read(&startPosition) || !stream.Read(&endPosition))
         return;
 
-    if (!startPosition.data.vecPosition.IsValid() || endPosition.data.vecPosition.IsValid())
+    if (!startPosition.data.vecPosition.IsValid() || !endPosition.data.vecPosition.IsValid())
         return;
 
-    // Cheaters sends packet with huge coordinates (INFINITE/INFINITY)
-    // to intentionally crash other players
+    // Huge coordinates can crash other players
     if (!startPosition.data.vecPosition.IsInWorldBounds(true) || !endPosition.data.vecPosition.IsInWorldBounds(true))
         return;
 
@@ -2283,11 +2282,10 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface&
     if (!stream.Read(&startPosition) || !stream.Read(&endPosition))
         return;
 
-    if (!startPosition.data.vecPosition.IsValid() || endPosition.data.vecPosition.IsValid())
+    if (!startPosition.data.vecPosition.IsValid() || !endPosition.data.vecPosition.IsValid())
         return;
 
-    // Cheaters sends packet with huge coordinates (INFINITE/INFINITY)
-    // to intentionally crash other players
+    // Huge coordinates can crash other players
     if (!startPosition.data.vecPosition.IsInWorldBounds(true) || !endPosition.data.vecPosition.IsInWorldBounds(true))
         return;
 

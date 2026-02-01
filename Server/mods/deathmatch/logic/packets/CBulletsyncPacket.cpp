@@ -64,8 +64,7 @@ bool CBulletsyncPacket::ReadWeaponAndPositions(NetBitStreamInterface& stream)
     if (!m_start.data.vecPosition.IsValid() || !m_end.data.vecPosition.IsValid())
         return false;
 
-    // Cheaters sends packet with huge coordinates (INFINITE/INFINITY)
-    // to intentionally crash other players
+    // Huge coordinates can crash other players
     if (!m_start.data.vecPosition.IsInWorldBounds(true) || !m_end.data.vecPosition.IsInWorldBounds(true))
         return false;
 
@@ -183,8 +182,7 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
     if (!m_start.data.vecPosition.IsValid() || !m_end.data.vecPosition.IsValid())
         return false;
 
-    // Cheaters sends packet with huge coordinates (INFINITE/INFINITY)
-    // to intentionally crash other players
+    // Huge coordinates can crash other players
     if (!m_start.data.vecPosition.IsInWorldBounds(true) || !m_end.data.vecPosition.IsInWorldBounds(true))
         return false;
 
