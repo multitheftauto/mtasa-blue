@@ -204,7 +204,7 @@ public:
 
     // Checks if the vector is within the world bounds.
     // If maxLimit = false (default), it checks coordinates in the range -3000 to 3000.
-    // If maxLimit = true, it checks the full map range from -8192 to 8192.
+    // If maxLimit = true, it checks the full map range from -8192 to 8192. Currently, the effective map size is limited to 16384x16384 due to synchronization constraints.
     // Currently, the effective map size is limited to 16384x16384 due to synchronization constraints.
     [[nodiscard]] bool IsInWorldBounds(bool maxLimit = false) const noexcept
     {
