@@ -2251,7 +2251,9 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
         return;
 
     // 200 is MAX weapon damage
-    SFloatAsBitsSync<8> damage(0, 200.0f, false);
+    SFloatAsBitsSync<8> damage(0, 200.0f, true, false);
+    damage.data.fValue = 0.0f;
+
     std::uint8_t   zone = 0;
     CClientPlayer* damaged = nullptr;
 
