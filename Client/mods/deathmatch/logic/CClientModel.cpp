@@ -46,7 +46,8 @@ bool CClientModel::Allocate(ushort usParentID)
     {
         case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
-            pModelInfo->SetParentID(usParentID);
+            // Parent ID 0 (CJ) bypasses TXD isolation in downstream logic
+            pModelInfo->SetParentID(usParentID ? usParentID : 7);
             allocated = true;
             break;
         case eClientModelType::OBJECT:
