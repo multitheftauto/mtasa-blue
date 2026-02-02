@@ -258,6 +258,7 @@ public:
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 
     virtual unsigned int GetParentID() = 0;
+    virtual void         SetParentID(unsigned int id) = 0;
     virtual bool         IsDynamic() = 0;
     virtual bool         IsDamageableAtomic() = 0;
 };
