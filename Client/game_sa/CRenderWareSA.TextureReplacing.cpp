@@ -140,7 +140,7 @@ namespace
 
     // Last-use timestamps for isolated TXDs; enables stale slot reclamation
     std::unordered_map<unsigned short, uint32_t> g_IsolatedTxdLastUseTime;
-    uint32_t g_uiLastStaleCleanupTime = 0;
+    uint32_t                                     g_uiLastStaleCleanupTime = 0;
 
     bool g_bInTxdReapply = false;
 
@@ -175,14 +175,14 @@ namespace
     static bool            WasIsolationDenied(uint32_t uiStartSerial);
     static CStreamingInfo* GetStreamingInfoSafe(unsigned int uiStreamId);
 
-    constexpr std::size_t   MAX_ORPHAN_TEXTURES = 8192;
-    constexpr std::size_t   MAX_TEX_DICTIONARY_NAME_LENGTH = 24;
-    constexpr int           TXD_POOL_USAGE_WARN_PERCENT = 80;
-    constexpr uint32_t      TXD_POOL_USAGE_WARN_INTERVAL_MS = 5000;
-    constexpr uint32_t      TXD_POOL_COUNT_INTERVAL_MS = 500;
-    constexpr uint32_t      ORPHAN_CLEANUP_INTERVAL_MS = 250;
-    constexpr uint32_t      LOG_THROTTLE_INTERVAL_MS = 2000;
-    constexpr int           TXD_POOL_HARD_LIMIT_PERCENT = 95;
+    constexpr std::size_t MAX_ORPHAN_TEXTURES = 8192;
+    constexpr std::size_t MAX_TEX_DICTIONARY_NAME_LENGTH = 24;
+    constexpr int         TXD_POOL_USAGE_WARN_PERCENT = 80;
+    constexpr uint32_t    TXD_POOL_USAGE_WARN_INTERVAL_MS = 5000;
+    constexpr uint32_t    TXD_POOL_COUNT_INTERVAL_MS = 500;
+    constexpr uint32_t    ORPHAN_CLEANUP_INTERVAL_MS = 250;
+    constexpr uint32_t    LOG_THROTTLE_INTERVAL_MS = 2000;
+    constexpr int         TXD_POOL_HARD_LIMIT_PERCENT = 95;
 
     // Pool pressure thresholds for stale slot reclamation
     constexpr int           TXD_POOL_PROACTIVE_CLEANUP_PERCENT = 80;
@@ -205,13 +205,10 @@ namespace
     // Cache is keyed by TXD slot ID and validated by TXD pointer comparison
     struct SCachedTxdTextureMap
     {
-        RwTexDictionary* pTxd = nullptr;      // TXD pointer at cache time (detects reload/slot reuse)
-        TxdTextureMap    textureMap;          // Cached texture name > texture map
+        RwTexDictionary* pTxd = nullptr;  // TXD pointer at cache time (detects reload/slot reuse)
+        TxdTextureMap    textureMap;      // Cached texture name > texture map
 
-        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
-        {
-            return pTxd != nullptr && pTxd == pCurrentTxd;
-        }
+        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept { return pTxd != nullptr && pTxd == pCurrentTxd; }
     };
     std::unordered_map<unsigned short, SCachedTxdTextureMap> g_TxdTextureMapCache;
 
@@ -911,8 +908,8 @@ namespace
 
             if (ShouldLog(g_uiLastOrphanLogTime))
             {
-                AddReportLog(9402, SString("TryReclaimStaleIsolatedSlots: Reclaimed stale isolation for model %u (TXD %u -> parent %u, pool %d%%)",
-                                           usModelId, usTxdId, usParentTxdId, iUsagePercent));
+                AddReportLog(9402, SString("TryReclaimStaleIsolatedSlots: Reclaimed stale isolation for model %u (TXD %u -> parent %u, pool %d%%)", usModelId,
+                                           usTxdId, usParentTxdId, iUsagePercent));
             }
         }
     }
@@ -2379,7 +2376,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             if (bBusy && !pCurrentTxd)
                 return nullptr;
 
-            std::unordered_map<unsigned short, CModelInfoSA*> modelInfoCache;
+            std::unordered_map<unsigned short, CModelInfoSA*>                          modelInfoCache;
             std::vector<std::pair<SReplacementTextures*, std::vector<unsigned short>>> replacementsToReapply;
             std::vector<SReplacementTextures*>                                         originalUsed;
 
