@@ -46,6 +46,7 @@ bool CClientModel::Allocate(ushort usParentID)
     {
         case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
+            pModelInfo->SetParentID(usParentID);
             allocated = true;
             break;
         case eClientModelType::OBJECT:
