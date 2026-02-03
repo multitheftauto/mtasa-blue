@@ -3091,6 +3091,12 @@ void CClientVehicle::Destroy()
         g_pGame->GetPools()->RemoveVehicle(m_pVehicle);
         m_pVehicle = NULL;
 
+        // Clear our component data, but backup the visibility states so we can restore them on next create
+        m_ComponentVisibilityBackup.clear();
+        for (const auto& pair : m_ComponentData)
+            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
+        m_ComponentData.clear();
+
         // Remove reference to its model
         m_pModelInfo->RemoveRef();
 
