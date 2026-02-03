@@ -2312,14 +2312,12 @@ bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequ
             bool isComponentFallenOff = false;
             int  componentID = GetComponentIDFromName(vehicleComponent);
             auto damageManager = GetDamageManager();
-            auto type = static_cast<VehicleComponentType>(GetComponentTypeFromName(vehicleComponent));
 
-            switch (type)
+            switch (GetComponentTypeFromName(vehicleComponent))
             {
                 case VehicleComponentType::DOOR:
                 {
-                    auto doorEnum = static_cast<eDoors>(componentID);
-                    int  doorStatus = damageManager->GetDoorStatus(doorEnum);
+                    std::uint8_t doorStatus = damageManager->GetDoorStatus(static_cast<eDoors>(componentID));
 
                     isComponentDamaged = (doorStatus > 1);
                     isComponentFallenOff = (doorStatus == 4);
@@ -2327,8 +2325,7 @@ bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequ
                 }
                 case VehicleComponentType::PANEL:
                 {
-                    auto panelId = static_cast<std::uint8_t>(componentID);
-                    int  panelStatus = damageManager->GetPanelStatus(panelId);
+                    std::uint8_t panelStatus = damageManager->GetPanelStatus(static_cast<std::uint8_t>(componentID));
 
                     isComponentDamaged = (panelStatus > 0);
                     isComponentFallenOff = (panelStatus == 3);
