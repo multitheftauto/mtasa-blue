@@ -147,6 +147,42 @@ static void __declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
     // clang-format on
 }
 
+static void __fastcall SetComponentVisibility(CVehicleSAInterface* vehicleInterface, RwFrame* frame, int state)
+{
+    if (!frame)
+        return;
+
+    SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)vehicleInterface);
+    if (!vehicle || !vehicle->pEntity)
+        return;
+
+    // > ATOMIC_NONE
+    // If a component was hidden by a script, don't show it
+    if (state > 0 && !vehicle->pEntity->IsComponentVisibleInCache(frame->szName))
+        return;
+
+    RwFrameForAllObjects(frame, (void*)0x6D2690, (void*)state); // SetVehicleAtomicVisibilityCB(RpAtomic*)
+    RwFrameForAllChildren(frame, (void*)0x6D26D0, (void*)state); // SetVehicleAtomicVisibilityCB(RwFrame*)
+}
+
+static constexpr std::uintptr_t RETURN_CVehicle_SetComponentVisibility = 0x6D2735;
+static void __declspec(naked)   HOOK_CVehicle_SetComponentVisibility()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov edx, esi
+
+        push edi
+        call SetComponentVisibility
+
+        jmp RETURN_CVehicle_SetComponentVisibility
+    }
+    // clang-format on
+}
+
 namespace
 {
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
@@ -2008,6 +2044,9 @@ void CVehicleSA::StaticSetHooks()
     // Setup hooks to handle setVehicleRotorState function
     HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
     HookInstall(FUNC_CPlane_ProcessFlyingCarStuff, (DWORD)HOOK_CPlane_ProcessFlyingCarStuff, 5);
+
+    // Setup hook to handle vehicle component visibility changes
+    HookInstall(0x6D271A, (DWORD)HOOK_CVehicle_SetComponentVisibility);
 }
 
 void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)
@@ -2295,6 +2334,22 @@ bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequ
         return true;
     }
     return false;
+}
+
+bool CVehicleSA::IsComponentVisibleInCache(const SString& vehicleComponent)
+{
+    SVehicleFrame* component = GetVehicleComponent(vehicleComponent);
+    if (!component)
+        return false;
+
+    if (!m_componentCacheData)
+        return false;
+
+    auto it = m_componentCacheData->find(vehicleComponent);
+    if (it == m_componentCacheData->end())
+        return false;
+
+    return it->second.m_bVisible;
 }
 
 bool CVehicleSA::GetComponentVisible(const SString& vehicleComponent, bool& bOutVisible)

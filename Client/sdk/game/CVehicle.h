@@ -91,6 +91,28 @@ struct SVehicleFrame
     std::vector<RwFrame*> frameList;  // Frames from root to parent
 };
 
+struct SVehicleComponentData
+{
+    SVehicleComponentData()
+    {
+        m_bPositionChanged = false;
+        m_bRotationChanged = false;
+        m_bScaleChanged = false;
+        m_bVisible = true;
+    }
+    SString m_strParentName;
+    CVector m_vecComponentPosition;          // Parent relative
+    CVector m_vecComponentRotation;          // Parent relative radians
+    CVector m_vecComponentScale;             // Parent relative
+    CVector m_vecOriginalComponentPosition;  // Parent relative
+    CVector m_vecOriginalComponentRotation;  // Parent relative radians
+    CVector m_vecOriginalComponentScale;     // Parent relative
+    bool    m_bPositionChanged;
+    bool    m_bRotationChanged;
+    bool    m_bScaleChanged;
+    bool    m_bVisible;
+};
+
 class CVehicle : public virtual CPhysical
 {
 public:
@@ -331,4 +353,6 @@ public:
 
     virtual const CVector* GetDummyPositions() const = 0;
     virtual void           ReinitAudio() = 0;
+
+    virtual void SetCacheDataMap(std::map<SString, SVehicleComponentData>* pCacheData) = 0;
 };
