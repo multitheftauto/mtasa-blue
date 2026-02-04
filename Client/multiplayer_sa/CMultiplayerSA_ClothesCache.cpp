@@ -156,8 +156,8 @@ public:
     //////////////////////////////////////////////////////////////
     uint GetNumCached()
     {
-        uint                      uiNumCached = 0;
-        std::vector<std::size_t>  orphanedIndices;
+        uint                     uiNumCached = 0;
+        std::vector<std::size_t> orphanedIndices;
 
         for (std::size_t i = 0; i < savedClumpList.size(); ++i)
         {
