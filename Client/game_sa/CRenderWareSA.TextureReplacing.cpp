@@ -2136,6 +2136,14 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         std::unordered_map<unsigned short, uint32_t>::iterator itPendingTime = g_PendingIsolatedModelTimes.find(usModelId);
         if (itPendingTime != g_PendingIsolatedModelTimes.end() && uiNow - itPendingTime->second > PENDING_ISOLATION_TIMEOUT_MS)
         {
+            // Try to revert model TXD if parent is valid
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
+                pModelInfo->SetTextureDictionaryID(parentTxdId);
+
+            // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
+                continue;
+
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
             g_IsolatedTxdByModel.erase(itInfo);
@@ -2151,6 +2159,14 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         const unsigned int uiCurrentParentId = pModelInfo->GetParentID();
         if (uiCurrentParentId == 0)
         {
+            // Try to revert model TXD if parent is valid
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
+                pModelInfo->SetTextureDictionaryID(parentTxdId);
+
+            // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
+                continue;
+
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
             g_IsolatedTxdByModel.erase(itInfo);
@@ -2203,6 +2219,14 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         CTextureDictonarySAInterface* pSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
         if (!pSlot || !pSlot->rwTexDictonary || pSlot->usParentIndex != parentTxdId)
         {
+            // Try to revert model TXD if parent is valid
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
+                pModelInfo->SetTextureDictionaryID(parentTxdId);
+
+            // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
+                continue;
+
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
             g_IsolatedTxdByModel.erase(itInfo);
@@ -3779,7 +3803,10 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
     // Hold a safety ref to prevent TXD destruction while we clean up.
     // External refs could drop to 0 during cleanup; orphan textures first
     // to avoid destroying them with bad raster pointers.
-    CTxdStore_AddRef(usIsolatedTxdId);
+    // Validate slot before AddRef to avoid crash on already-destroyed slots
+    const bool bIsolatedSlotValid = CTxdStore_GetTxd(usIsolatedTxdId) != nullptr;
+    if (bIsolatedSlotValid)
+        CTxdStore_AddRef(usIsolatedTxdId);
 
     // Clear shader system entries for this TXD id
     StreamingRemovedTxd(usIsolatedTxdId);
@@ -3847,7 +3874,9 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
     }
 
     // Release safety ref; may now allow TXD destruction
-    CTxdStore_RemoveRef(usIsolatedTxdId);
+    // Only release if we successfully added the ref earlier
+    if (bIsolatedSlotValid)
+        CTxdStore_RemoveRef(usIsolatedTxdId);
 
     auto& txdPool = pGame->GetPools()->GetTxdPool();
     auto* pTxdPoolSA = static_cast<CTxdPoolSA*>(&txdPool);
