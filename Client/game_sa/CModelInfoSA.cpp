@@ -1040,6 +1040,10 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (usOldTxdId == usID)
         return;
 
+    // Validate new TXD slot before proceeding to avoid CTxdStore_AddRef crash
+    if (CTxdStore_GetTxd(usID) == nullptr)
+        return;
+
     size_t referencesCount = m_pInterface->usNumberOfRefs;
     if (m_pInterface->pRwObject)
         referencesCount++;
@@ -1094,8 +1098,12 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     }
 
     // Release old TXD refs after rebinding completes
-    for (size_t i = 0; i < referencesCount; i++)
-        CTxdStore_RemoveRef(usOldTxdId);
+    // Only release if old slot is still valid to avoid crash on stale/orphaned TXD slots
+    if (CTxdStore_GetTxd(usOldTxdId) != nullptr)
+    {
+        for (size_t i = 0; i < referencesCount; i++)
+            CTxdStore_RemoveRef(usOldTxdId);
+    }
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()
@@ -1112,6 +1120,14 @@ void CModelInfoSA::ResetTextureDictionaryID()
     }
 
     const auto targetId = static_cast<unsigned short>(it->second);
+
+    // If target TXD no longer exists, clean up stale entry and return
+    if (CTxdStore_GetTxd(targetId) == nullptr)
+    {
+        ms_DefaultTxdIDMap.erase(it);
+        return;
+    }
+
     SetTextureDictionaryID(targetId);
     if (GetTextureDictionaryID() == targetId)
         ms_DefaultTxdIDMap.erase(it);
@@ -2153,6 +2169,15 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::LOD_ATOMIC:
         case eModelInfoType::TIME:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::UNKNOWN:
+            // Weapon models (321-372) may return UNKNOWN type during streaming. Using ReplaceAllAtomicsInModel
+            // for weapons would skip CWeaponModelInfo::SetClump, leaving the frame plugin's m_modelInfo NULL,
+            // which crashes in CVisibilityPlugins::RenderWeaponCB due to nullptr deref.
+            if (m_dwModelID >= 321 && m_dwModelID <= 372)
+                success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            else
+                success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         default:
             break;

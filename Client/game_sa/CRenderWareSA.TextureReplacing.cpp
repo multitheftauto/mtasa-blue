@@ -115,6 +115,7 @@ namespace
     {
         unsigned short usTxdId = 0;
         unsigned short usParentTxdId = 0;
+        bool           bNeedsVehicleFallback = false;
     };
 
     struct SPendingReplacement
@@ -140,7 +141,7 @@ namespace
 
     // Last-use timestamps for isolated TXDs; enables stale slot reclamation
     std::unordered_map<unsigned short, uint32_t> g_IsolatedTxdLastUseTime;
-    uint32_t g_uiLastStaleCleanupTime = 0;
+    uint32_t                                     g_uiLastStaleCleanupTime = 0;
 
     bool g_bInTxdReapply = false;
 
@@ -175,14 +176,14 @@ namespace
     static bool            WasIsolationDenied(uint32_t uiStartSerial);
     static CStreamingInfo* GetStreamingInfoSafe(unsigned int uiStreamId);
 
-    constexpr std::size_t   MAX_ORPHAN_TEXTURES = 8192;
-    constexpr std::size_t   MAX_TEX_DICTIONARY_NAME_LENGTH = 24;
-    constexpr int           TXD_POOL_USAGE_WARN_PERCENT = 80;
-    constexpr uint32_t      TXD_POOL_USAGE_WARN_INTERVAL_MS = 5000;
-    constexpr uint32_t      TXD_POOL_COUNT_INTERVAL_MS = 500;
-    constexpr uint32_t      ORPHAN_CLEANUP_INTERVAL_MS = 250;
-    constexpr uint32_t      LOG_THROTTLE_INTERVAL_MS = 2000;
-    constexpr int           TXD_POOL_HARD_LIMIT_PERCENT = 95;
+    constexpr std::size_t MAX_ORPHAN_TEXTURES = 8192;
+    constexpr std::size_t MAX_TEX_DICTIONARY_NAME_LENGTH = 24;
+    constexpr int         TXD_POOL_USAGE_WARN_PERCENT = 80;
+    constexpr uint32_t    TXD_POOL_USAGE_WARN_INTERVAL_MS = 5000;
+    constexpr uint32_t    TXD_POOL_COUNT_INTERVAL_MS = 500;
+    constexpr uint32_t    ORPHAN_CLEANUP_INTERVAL_MS = 250;
+    constexpr uint32_t    LOG_THROTTLE_INTERVAL_MS = 2000;
+    constexpr int         TXD_POOL_HARD_LIMIT_PERCENT = 95;
 
     // Pool pressure thresholds for stale slot reclamation
     constexpr int           TXD_POOL_PROACTIVE_CLEANUP_PERCENT = 80;
@@ -205,13 +206,10 @@ namespace
     // Cache is keyed by TXD slot ID and validated by TXD pointer comparison
     struct SCachedTxdTextureMap
     {
-        RwTexDictionary* pTxd = nullptr;      // TXD pointer at cache time (detects reload/slot reuse)
-        TxdTextureMap    textureMap;          // Cached texture name > texture map
+        RwTexDictionary* pTxd = nullptr;  // TXD pointer at cache time (detects reload/slot reuse)
+        TxdTextureMap    textureMap;      // Cached texture name > texture map
 
-        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
-        {
-            return pTxd != nullptr && pTxd == pCurrentTxd;
-        }
+        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept { return pTxd != nullptr && pTxd == pCurrentTxd; }
     };
     std::unordered_map<unsigned short, SCachedTxdTextureMap> g_TxdTextureMapCache;
 
@@ -371,6 +369,10 @@ namespace
         info.usedByReplacements.clear();
         info.originalTextures.clear();
         info.originalTexturesByName.clear();
+
+        // Balance the ref added by GetModelTexturesInfo
+        if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
+            CRenderWareSA::DebugTxdRemoveRef(usTxdId, "RemoveTxdFromReplacementTracking");
 
         ms_ModelTexturesInfoMap.erase(itInfo);
     }
@@ -911,8 +913,8 @@ namespace
 
             if (ShouldLog(g_uiLastOrphanLogTime))
             {
-                AddReportLog(9402, SString("TryReclaimStaleIsolatedSlots: Reclaimed stale isolation for model %u (TXD %u -> parent %u, pool %d%%)",
-                                           usModelId, usTxdId, usParentTxdId, iUsagePercent));
+                AddReportLog(9402, SString("TryReclaimStaleIsolatedSlots: Reclaimed stale isolation for model %u (TXD %u -> parent %u, pool %d%%)", usModelId,
+                                           usTxdId, usParentTxdId, iUsagePercent));
             }
         }
     }
@@ -1749,13 +1751,51 @@ namespace
             if (pCurrentSlot && pCurrentSlot->rwTexDictonary && pCurrentSlot->usParentIndex == usParentTxdId)
             {
                 std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(usCurrentTxdId);
-                const bool bTxdInUse = (itOwner != g_IsolatedModelByTxd.end() && itOwner->second != usModelId);
 
-                if (!bTxdInUse)
+                // TXD ownership cases:
+                // 1. This model's slot > re-adopt
+                // 2. Another model's slot > restore to parent
+                // 3. Orphaned MTA slot > reclaim
+                // 4. Untracked game TXD > create new slot
+
+                if (itOwner != g_IsolatedModelByTxd.end())
                 {
+                    if (itOwner->second == usModelId)
+                    {
+                        // Case 1: This model's slot - re-adopt
+                        SIsolatedTxdInfo info;
+                        info.usTxdId = usCurrentTxdId;
+                        info.usParentTxdId = usParentTxdId;
+                        info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
+
+                        g_IsolatedTxdByModel[usModelId] = info;
+                        g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
+
+                        UpdateIsolatedTxdLastUse(usModelId);
+                        return true;
+                    }
+
+                    // Case 2: Another model's slot - restore to parent
+                    if (ShouldLog(g_uiLastAdoptLogTime))
+                    {
+                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Current TXD %u tracked by model %u, restoring to parent (model=%u)",
+                                                   usCurrentTxdId, itOwner->second, usModelId));
+                    }
+
+                    RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
+
+                    if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
+                        pModelInfo->SetTextureDictionaryID(usParentTxdId);
+                }
+                else if (g_OrphanedIsolatedTxdSlots.count(usCurrentTxdId) > 0)
+                {
+                    // Case 3: Orphaned MTA isolated slot - safe to reclaim
+                    g_OrphanedIsolatedTxdSlots.erase(usCurrentTxdId);
+
                     SIsolatedTxdInfo info;
                     info.usTxdId = usCurrentTxdId;
                     info.usParentTxdId = usParentTxdId;
+                    info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
 
                     g_IsolatedTxdByModel[usModelId] = info;
                     g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
@@ -1763,17 +1803,7 @@ namespace
                     UpdateIsolatedTxdLastUse(usModelId);
                     return true;
                 }
-
-                if (ShouldLog(g_uiLastAdoptLogTime))
-                {
-                    AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Current TXD %u already tracked by another model, skipping adopt (model=%u)",
-                                               usCurrentTxdId, usModelId));
-                }
-
-                RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
-
-                if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
-                    pModelInfo->SetTextureDictionaryID(usParentTxdId);
+                // Case 4: Untracked game TXD - create new slot without touching current assignment
             }
         }
 
@@ -2012,6 +2042,7 @@ namespace
         SIsolatedTxdInfo info;
         info.usTxdId = static_cast<unsigned short>(uiNewTxdId);
         info.usParentTxdId = usParentTxdId;
+        info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
 
         pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
 
@@ -2105,6 +2136,14 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         std::unordered_map<unsigned short, uint32_t>::iterator itPendingTime = g_PendingIsolatedModelTimes.find(usModelId);
         if (itPendingTime != g_PendingIsolatedModelTimes.end() && uiNow - itPendingTime->second > PENDING_ISOLATION_TIMEOUT_MS)
         {
+            // Try to revert model TXD if parent is valid
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
+                pModelInfo->SetTextureDictionaryID(parentTxdId);
+
+            // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
+                continue;
+
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
             g_IsolatedTxdByModel.erase(itInfo);
@@ -2120,6 +2159,14 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         const unsigned int uiCurrentParentId = pModelInfo->GetParentID();
         if (uiCurrentParentId == 0)
         {
+            // Try to revert model TXD if parent is valid
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
+                pModelInfo->SetTextureDictionaryID(parentTxdId);
+
+            // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
+                continue;
+
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
             g_IsolatedTxdByModel.erase(itInfo);
@@ -2172,6 +2219,14 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         CTextureDictonarySAInterface* pSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
         if (!pSlot || !pSlot->rwTexDictonary || pSlot->usParentIndex != parentTxdId)
         {
+            // Try to revert model TXD if parent is valid
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
+                pModelInfo->SetTextureDictionaryID(parentTxdId);
+
+            // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
+            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
+                continue;
+
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
             g_IsolatedTxdByModel.erase(itInfo);
@@ -2379,7 +2434,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             if (bBusy && !pCurrentTxd)
                 return nullptr;
 
-            std::unordered_map<unsigned short, CModelInfoSA*> modelInfoCache;
+            std::unordered_map<unsigned short, CModelInfoSA*>                          modelInfoCache;
             std::vector<std::pair<SReplacementTextures*, std::vector<unsigned short>>> replacementsToReapply;
             std::vector<SReplacementTextures*>                                         originalUsed;
 
@@ -3680,13 +3735,14 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
 
     const unsigned short usParentTxdId = itModelInfo->second.usParentTxdId;
     const unsigned short usIsolatedTxdId = itModelInfo->second.usTxdId;
+    const bool           bNeedsVehicleFallback = itModelInfo->second.bNeedsVehicleFallback;
 
     RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
     TxdTextureMap    parentTxdTextureMap;
     if (pParentTxd)
         MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdTextureMap);
 
-    if (ShouldUseVehicleTxdFallback(usModelId))
+    if (bNeedsVehicleFallback)
         AddVehicleTxdFallback(parentTxdTextureMap);
 
     // Restore original textures in model geometry BEFORE removing from shared TXD.
@@ -3747,7 +3803,10 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
     // Hold a safety ref to prevent TXD destruction while we clean up.
     // External refs could drop to 0 during cleanup; orphan textures first
     // to avoid destroying them with bad raster pointers.
-    CTxdStore_AddRef(usIsolatedTxdId);
+    // Validate slot before AddRef to avoid crash on already-destroyed slots
+    const bool bIsolatedSlotValid = CTxdStore_GetTxd(usIsolatedTxdId) != nullptr;
+    if (bIsolatedSlotValid)
+        CTxdStore_AddRef(usIsolatedTxdId);
 
     // Clear shader system entries for this TXD id
     StreamingRemovedTxd(usIsolatedTxdId);
@@ -3815,7 +3874,9 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
     }
 
     // Release safety ref; may now allow TXD destruction
-    CTxdStore_RemoveRef(usIsolatedTxdId);
+    // Only release if we successfully added the ref earlier
+    if (bIsolatedSlotValid)
+        CTxdStore_RemoveRef(usIsolatedTxdId);
 
     auto& txdPool = pGame->GetPools()->GetTxdPool();
     auto* pTxdPoolSA = static_cast<CTxdPoolSA*>(&txdPool);
