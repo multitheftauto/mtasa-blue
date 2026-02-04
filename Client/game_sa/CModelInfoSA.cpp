@@ -2170,6 +2170,15 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::TIME:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
+        case eModelInfoType::UNKNOWN:
+            // Weapon models (321-372) may return UNKNOWN type during streaming. Using ReplaceAllAtomicsInModel
+            // for weapons would skip CWeaponModelInfo::SetClump, leaving the frame plugin's m_modelInfo NULL,
+            // which crashes in CVisibilityPlugins::RenderWeaponCB due to nullptr deref.
+            if (m_dwModelID >= 321 && m_dwModelID <= 372)
+                success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            else
+                success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
         default:
             break;
     }
