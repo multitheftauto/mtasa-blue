@@ -107,21 +107,26 @@ bool CClientModel::Deallocate()
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
     if (!pModelInfo || !pModelInfo->IsValid())
     {
+        // Model already gone - cleanup any orphaned TXD slot
         if (m_eModelType != eClientModelType::TXD)
         {
             if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
                 pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(m_iModelID));
         }
         m_bAllocatedByUs = false;
-        return false;
+        return true;
     }
 
     if (m_eModelType != eClientModelType::TXD)
     {
+        pModelInfo->DeallocateModel();
+
+        // Log if model still has refs - TXD cleanup proceeds anyway (handles orphaning)
+        if (pModelInfo->IsValid())
+            AddReportLog(9406, SString("Deallocate: Model %d still valid after DeallocateModel (refs=%d)", m_iModelID, pModelInfo->GetRefCount()), 10);
+
         if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
             pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(m_iModelID));
-
-        pModelInfo->DeallocateModel();
     }
 
     m_bAllocatedByUs = false;

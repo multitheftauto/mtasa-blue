@@ -369,6 +369,10 @@ namespace
         info.originalTextures.clear();
         info.originalTexturesByName.clear();
 
+        // Balance the ref added by GetModelTexturesInfo
+        if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
+            CRenderWareSA::DebugTxdRemoveRef(usTxdId, "RemoveTxdFromReplacementTracking");
+
         ms_ModelTexturesInfoMap.erase(itInfo);
     }
 
@@ -1746,10 +1750,46 @@ namespace
             if (pCurrentSlot && pCurrentSlot->rwTexDictonary && pCurrentSlot->usParentIndex == usParentTxdId)
             {
                 std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(usCurrentTxdId);
-                const bool bTxdInUse = (itOwner != g_IsolatedModelByTxd.end() && itOwner->second != usModelId);
 
-                if (!bTxdInUse)
+                // TXD ownership cases:
+                // 1. This model's slot > re-adopt
+                // 2. Another model's slot > restore to parent
+                // 3. Orphaned MTA slot > reclaim
+                // 4. Untracked game TXD > create new slot
+
+                if (itOwner != g_IsolatedModelByTxd.end())
                 {
+                    if (itOwner->second == usModelId)
+                    {
+                        // Case 1: This model's slot - re-adopt
+                        SIsolatedTxdInfo info;
+                        info.usTxdId = usCurrentTxdId;
+                        info.usParentTxdId = usParentTxdId;
+
+                        g_IsolatedTxdByModel[usModelId] = info;
+                        g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
+
+                        UpdateIsolatedTxdLastUse(usModelId);
+                        return true;
+                    }
+
+                    // Case 2: Another model's slot - restore to parent
+                    if (ShouldLog(g_uiLastAdoptLogTime))
+                    {
+                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Current TXD %u tracked by model %u, restoring to parent (model=%u)",
+                                                   usCurrentTxdId, itOwner->second, usModelId));
+                    }
+
+                    RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
+
+                    if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
+                        pModelInfo->SetTextureDictionaryID(usParentTxdId);
+                }
+                else if (g_OrphanedIsolatedTxdSlots.count(usCurrentTxdId) > 0)
+                {
+                    // Case 3: Orphaned MTA isolated slot - safe to reclaim
+                    g_OrphanedIsolatedTxdSlots.erase(usCurrentTxdId);
+
                     SIsolatedTxdInfo info;
                     info.usTxdId = usCurrentTxdId;
                     info.usParentTxdId = usParentTxdId;
@@ -1760,17 +1800,7 @@ namespace
                     UpdateIsolatedTxdLastUse(usModelId);
                     return true;
                 }
-
-                if (ShouldLog(g_uiLastAdoptLogTime))
-                {
-                    AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Current TXD %u already tracked by another model, skipping adopt (model=%u)",
-                                               usCurrentTxdId, usModelId));
-                }
-
-                RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
-
-                if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
-                    pModelInfo->SetTextureDictionaryID(usParentTxdId);
+                // Case 4: Untracked game TXD - create new slot without touching current assignment
             }
         }
 
