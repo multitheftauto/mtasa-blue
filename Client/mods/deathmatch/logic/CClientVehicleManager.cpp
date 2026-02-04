@@ -425,7 +425,14 @@ bool CClientVehicleManager::IsTrainModel(unsigned long ulModel)
 bool CClientVehicleManager::IsValidModel(unsigned long ulModel)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
-    return pModelInfo && pModelInfo->IsVehicle();
+    if (!pModelInfo || !pModelInfo->GetInterface())
+        return false;
+
+    // Custom models allocated via engineRequestModel have a parent ID
+    if (pModelInfo->GetParentID() != 0)
+        return pModelInfo->GetModelType() == eModelInfoType::VEHICLE;
+
+    return pModelInfo->IsVehicle();
 }
 
 bool CClientVehicleManager::IsStandardModel(unsigned long ulModel)
