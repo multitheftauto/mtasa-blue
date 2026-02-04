@@ -139,9 +139,9 @@ namespace
     // TXD slots at safety-cap during cleanup; tracked for diagnostics
     std::unordered_set<unsigned short> g_PermanentlyLeakedTxdSlots;
     // Master textures that couldn't be destroyed due to leaked copies; destroyed at StaticReset
-    std::unordered_set<RwTexture*>     g_LeakedMasterTextures;
+    std::unordered_set<RwTexture*> g_LeakedMasterTextures;
     // D3D textures already released during StaticReset; prevents double-release on shared rasters
-    std::unordered_set<void*>          g_ReleasedD3DTextures;
+    std::unordered_set<void*> g_ReleasedD3DTextures;
 
     // Last-use timestamps for isolated TXDs; enables stale slot reclamation
     std::unordered_map<unsigned short, uint32_t> g_IsolatedTxdLastUseTime;
@@ -1225,7 +1225,7 @@ namespace
         RwTextureDestroy(pTexture);
     }
 
-// Destroy texture AND its raster safely. Releases D3D texture first, then frees structs.
+    // Destroy texture AND its raster safely. Releases D3D texture first, then frees structs.
     void SafeDestroyTextureWithRaster(RwTexture* pTexture)
     {
         if (!pTexture)
@@ -5031,7 +5031,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_PendingLeakedTxdRefs.clear();
 
     std::unordered_set<RwTexture*> mopupDestroyedTextures;  // Avoid double-free with g_LeakedMasterTextures
-    std::unordered_set<RwRaster*> mopupFreedRasters;         // Detect dangling raster pointers from shared rasters
+    std::unordered_set<RwRaster*>  mopupFreedRasters;       // Detect dangling raster pointers from shared rasters
 
     auto noteUncleaned = [&](unsigned short txdId) { g_PendingLeakedTxdRefs.insert(txdId); };
 
@@ -5187,7 +5187,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                 if (pTex && CanDestroyOrphanedTexture(pTex))
                 {
                     mopupDestroyedTextures.insert(pTex);
-                    RwRaster* pRaster = pTex->raster;
+                    RwRaster*  pRaster = pTex->raster;
                     const bool bRasterAlreadyFreed = pRaster && (mopupFreedRasters.find(pRaster) != mopupFreedRasters.end());
 
                     if (bRasterAlreadyFreed)
@@ -5298,7 +5298,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
             if (CanDestroyOrphanedTexture(pMaster))
             {
-                RwRaster* pRaster = pMaster->raster;
+                RwRaster*  pRaster = pMaster->raster;
                 const bool bRasterAlreadyFreed = pRaster && (mopupFreedRasters.find(pRaster) != mopupFreedRasters.end());
 
                 if (bRasterAlreadyFreed)
@@ -5309,7 +5309,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                 {
                     if (pRaster)
                         mopupFreedRasters.insert(pRaster);  // Track for shared raster detection
-                    RwTextureDestroy(pMaster);  // D3D prepped earlier, safe to free
+                    RwTextureDestroy(pMaster);              // D3D prepped earlier, safe to free
                 }
             }
         }
