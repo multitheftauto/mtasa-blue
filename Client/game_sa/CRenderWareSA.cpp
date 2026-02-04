@@ -37,12 +37,18 @@ void CRenderWareSA::DebugTxdAddRef(unsigned short usTxdId, const char* /*tag*/, 
 {
     if (!pGame || !pGame->GetRenderWareSA())
         return;
+    // Validate slot before AddRef to avoid crash on invalid/destroyed slots
+    if (CTxdStore_GetTxd(usTxdId) == nullptr)
+        return;
     CTxdStore_AddRef(usTxdId);
 }
 
 void CRenderWareSA::DebugTxdRemoveRef(unsigned short usTxdId, const char* /*tag*/)
 {
     if (!pGame || !pGame->GetRenderWareSA())
+        return;
+    // Validate slot before RemoveRef to avoid crash on invalid/destroyed slots
+    if (CTxdStore_GetTxd(usTxdId) == nullptr)
         return;
     CTxdStore_RemoveRef(usTxdId);
 }

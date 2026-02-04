@@ -1043,6 +1043,10 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (usOldTxdId == usID)
         return;
 
+    // Validate new TXD slot before proceeding to avoid CTxdStore_AddRef crash
+    if (CTxdStore_GetTxd(usID) == nullptr)
+        return;
+
     size_t referencesCount = m_pInterface->usNumberOfRefs;
     if (m_pInterface->pRwObject)
         referencesCount++;
@@ -1097,8 +1101,12 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     }
 
     // Release old TXD refs after rebinding completes
-    for (size_t i = 0; i < referencesCount; i++)
-        CTxdStore_RemoveRef(usOldTxdId);
+    // Only release if old slot is still valid to avoid crash on stale/orphaned TXD slots
+    if (CTxdStore_GetTxd(usOldTxdId) != nullptr)
+    {
+        for (size_t i = 0; i < referencesCount; i++)
+            CTxdStore_RemoveRef(usOldTxdId);
+    }
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()
@@ -1115,6 +1123,14 @@ void CModelInfoSA::ResetTextureDictionaryID()
     }
 
     const auto targetId = static_cast<unsigned short>(it->second);
+
+    // If target TXD no longer exists, clean up stale entry and return
+    if (CTxdStore_GetTxd(targetId) == nullptr)
+    {
+        ms_DefaultTxdIDMap.erase(it);
+        return;
+    }
+
     SetTextureDictionaryID(targetId);
     if (GetTextureDictionaryID() == targetId)
         ms_DefaultTxdIDMap.erase(it);
