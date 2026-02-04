@@ -474,6 +474,9 @@ CClientGame::~CClientGame()
     // Singular file download manager
     SAFE_DELETE(m_pSingularFileDownloadManager);
 
+    // Clear cached clothes from this session
+    g_pMultiplayer->FlushClothesCache();
+
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler(NULL);
     g_pMultiplayer->SetPostContextSwitchHandler(NULL);

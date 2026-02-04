@@ -197,7 +197,10 @@ public:
 
         // Remove orphaned entries (null pClump) in reverse order
         for (auto it = orphanedIndices.rbegin(); it != orphanedIndices.rend(); ++it)
+        {
             savedClumpList.erase(savedClumpList.begin() + static_cast<std::ptrdiff_t>(*it));
+            m_Stats.uiNumRemoved++;
+        }
 
         m_Stats.uiNumTotal = savedClumpList.size();
         m_Stats.uiNumUnused = uiNumCached;
@@ -340,6 +343,34 @@ public:
         m_Stats.uiCacheMiss++;
         return NULL;
     }
+
+    void ClearOldRevisions()
+    {
+        m_iCacheRevision++;
+
+        for (auto& info : savedClumpList)
+        {
+            if (info.iCacheRevision == m_iCacheRevision)
+                continue;
+
+#ifdef CLOTHES_REF_TEST
+            if (auto pGeometry = GetClumpGeometry(info.pClump))
+                if (pGeometry->refs >= 20)
+                    pGeometry->refs -= 20;
+#endif
+            if (info.pClump)
+                RpClumpDestroy(info.pClump);
+
+            m_Stats.uiNumTotal--;
+            if (info.bUnused)
+                m_Stats.uiNumUnused--;
+            m_Stats.uiNumRemoved++;
+        }
+
+        savedClumpList.erase(std::remove_if(savedClumpList.begin(), savedClumpList.end(),
+                                            [this](const SSavedClumpInfo& info) { return info.iCacheRevision != m_iCacheRevision; }),
+                             savedClumpList.end());
+    }
 };
 
 CClumpStore ms_clumpStore;
@@ -353,7 +384,7 @@ CClumpStore ms_clumpStore;
 ////////////////////////////////////////////////
 void CMultiplayerSA::FlushClothesCache()
 {
-    ms_clumpStore.m_iCacheRevision++;
+    ms_clumpStore.ClearOldRevisions();
 }
 
 ////////////////////////////////////////////////
