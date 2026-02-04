@@ -115,6 +115,7 @@ namespace
     {
         unsigned short usTxdId = 0;
         unsigned short usParentTxdId = 0;
+        bool           bNeedsVehicleFallback = false;
     };
 
     struct SPendingReplacement
@@ -1765,6 +1766,7 @@ namespace
                         SIsolatedTxdInfo info;
                         info.usTxdId = usCurrentTxdId;
                         info.usParentTxdId = usParentTxdId;
+                        info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
 
                         g_IsolatedTxdByModel[usModelId] = info;
                         g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
@@ -1793,6 +1795,7 @@ namespace
                     SIsolatedTxdInfo info;
                     info.usTxdId = usCurrentTxdId;
                     info.usParentTxdId = usParentTxdId;
+                    info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
 
                     g_IsolatedTxdByModel[usModelId] = info;
                     g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
@@ -2039,6 +2042,7 @@ namespace
         SIsolatedTxdInfo info;
         info.usTxdId = static_cast<unsigned short>(uiNewTxdId);
         info.usParentTxdId = usParentTxdId;
+        info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
 
         pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
 
@@ -3707,13 +3711,14 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
 
     const unsigned short usParentTxdId = itModelInfo->second.usParentTxdId;
     const unsigned short usIsolatedTxdId = itModelInfo->second.usTxdId;
+    const bool           bNeedsVehicleFallback = itModelInfo->second.bNeedsVehicleFallback;
 
     RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
     TxdTextureMap    parentTxdTextureMap;
     if (pParentTxd)
         MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdTextureMap);
 
-    if (ShouldUseVehicleTxdFallback(usModelId))
+    if (bNeedsVehicleFallback)
         AddVehicleTxdFallback(parentTxdTextureMap);
 
     // Restore original textures in model geometry BEFORE removing from shared TXD.
