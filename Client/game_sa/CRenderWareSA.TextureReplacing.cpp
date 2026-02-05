@@ -5140,6 +5140,10 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             {
                 if (pTex && pTex->txd == nullptr)
                 {
+                    // Nullify raster if already freed by previous mopup (shared raster scenario)
+                    if (pTex->raster && mopupFreedRasters.find(pTex->raster) != mopupFreedRasters.end())
+                        reinterpret_cast<RwRaster* volatile&>(pTex->raster) = nullptr;
+
                     if (RwTexDictionaryAddTexture(pTxd, pTex))
                         ++relinkedCount;
                 }
@@ -5157,6 +5161,10 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             {
                 if (pTex && pTex->txd == nullptr)
                 {
+                    // Nullify raster if already freed by previous mopup (shared raster scenario)
+                    if (pTex->raster && mopupFreedRasters.find(pTex->raster) != mopupFreedRasters.end())
+                        reinterpret_cast<RwRaster* volatile&>(pTex->raster) = nullptr;
+
                     if (RwTexDictionaryAddTexture(pTxd, pTex))
                         ++relinkedCount;
                 }
@@ -5215,6 +5223,10 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             {
                 if (pTex && pTex->txd == nullptr)
                 {
+                    // Nullify raster if already freed by previous mopup (shared raster scenario)
+                    if (pTex->raster && mopupFreedRasters.find(pTex->raster) != mopupFreedRasters.end())
+                        reinterpret_cast<RwRaster* volatile&>(pTex->raster) = nullptr;
+
                     if (RwTexDictionaryAddTexture(pTxd, pTex))
                         ++relinkedCount;
                 }
