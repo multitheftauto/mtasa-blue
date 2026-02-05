@@ -87,7 +87,7 @@ public:
         float X, Y, Z;
     };
 
-    struct SKr00 // CAnimBlendKeyFrameNoTrans
+    struct SKr00  // CAnimBlendKeyFrameNoTrans
     {
         SQuaternion Rotation;
         float       Time;
@@ -105,12 +105,12 @@ public:
     {
         SQuaternion Rotation;
         SVector     Translation;
-        SVector     Scale; // unused
+        SVector     Scale;  // unused
         float       Time;
     };
 
     // Structures used by GTA SA (time is always at 0x10 offset for uncompressed anims)
-    struct SKrt0_Memory // CAnimBlendKeyFrame
+    struct SKrt0_Memory  // CAnimBlendKeyFrame
     {
         SQuaternion Rotation;
         float       Time;
@@ -122,7 +122,7 @@ public:
         SQuaternion Rotation;
         float       Time;
         SVector     Translation;
-        SVector     Scale; // unused
+        SVector     Scale;  // unused
     };
 
     struct SCompressedQuaternion
@@ -253,8 +253,10 @@ private:
     CClientIFP::eFrameType ReadKfrm();
     void                   ReadAnimationHeaderVersion2(SAnimationHeaderV2& AnimationNode, bool bAnp3);
 
-    bool ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames, bool isUncompressed = false);
-    void ReadKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames, bool isUncompressed = false);
+    bool ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames,
+                               bool isUncompressed = false);
+    void ReadKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames,
+                       bool isUncompressed = false);
 
     void ReadKrtsFramesUncompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
     void ReadKrt0FramesUncompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
@@ -280,7 +282,8 @@ private:
                                    std::map<DWORD, std::unique_ptr<CAnimBlendSequence>>& mapOfSequences, bool isUncompressed = false);
     BYTE* AllocateSequencesMemory(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
 
-    void    InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID, bool isUncompressed = false);
+    void    InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID,
+                                         bool isUncompressed = false);
     void    CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID);
     SString ConvertStringToKey(const SString& strBoneName);
 

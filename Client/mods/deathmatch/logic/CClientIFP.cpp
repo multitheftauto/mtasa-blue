@@ -277,7 +277,8 @@ void CClientIFP::ReadSequenceVersion2(SSequenceHeaderV2& ObjectNode)
     strncpy(ObjectNode.Name, strCorrectBoneName, strCorrectBoneName.size() + 1);
 }
 
-bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames, bool isUncompressed)
+bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames,
+                                       bool isUncompressed)
 {
     size_t iCompressedFrameSize = GetSizeOfCompressedFrame(iFrameType, isUncompressed);
     if (iCompressedFrameSize)
@@ -388,7 +389,7 @@ void CClientIFP::ReadKrtsFramesUncompressed(std::unique_ptr<CAnimBlendSequence>&
     for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
     {
         SKrts_Memory* krt0 = static_cast<SKrts_Memory*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKrts_Memory)));
-        SKrts  Krts;
+        SKrts         Krts;
         ReadBuffer<SKrts>(&Krts);
 
         krt0->Rotation.X = -Krts.Rotation.X;
@@ -424,7 +425,7 @@ void CClientIFP::ReadKrt0FramesUncompressed(std::unique_ptr<CAnimBlendSequence>&
     for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
     {
         SKrt0_Memory* frameKrt0 = static_cast<SKrt0_Memory*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKrt0_Memory)));
-        SKrt0  Krt0;
+        SKrt0         Krt0;
         ReadBuffer<SKrt0>(&Krt0);
 
         frameKrt0->Rotation.X = -Krt0.Rotation.X;
@@ -589,7 +590,8 @@ CClientIFP::eFrameType CClientIFP::GetFrameTypeFromFourCC(const char* szFourCC)
     return eFrameType::UNKNOWN_FRAME;
 }
 
-void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID, bool isUncompressed)
+void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID,
+                                              bool isUncompressed)
 {
     InitializeAnimationSequence(pAnimationSequence, BoneName, dwBoneID);
 
