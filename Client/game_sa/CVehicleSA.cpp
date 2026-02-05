@@ -2345,7 +2345,8 @@ bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequ
                 RwObject* pAtomic = atomicList[i];
                 int       AtomicId = pGame->GetVisibilityPlugins()->GetAtomicId(pAtomic);
 
-                if ((isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED)) || (!isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED)))
+                if ((isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED)) ||
+                    (!isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED)))
                     pAtomic->flags |= 0x04;
             }
         }
