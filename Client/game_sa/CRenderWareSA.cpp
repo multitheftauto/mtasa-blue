@@ -903,6 +903,31 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
             return nullptr;
     }
 
+    // Ensure shadow data consistency to prevent crash in GTA's stencil shadow rendering
+    // GTA accesses shadow vertices without NULL checks, causing crash if pointer is NULL but count is non-zero
+    auto* pInterface = pColModel->GetInterface();
+    if (pInterface && pInterface->m_data)
+    {
+        auto* pData = pInterface->m_data;
+
+        // shadow counts indicate data exists but pointers are NULL
+        const bool shadowVertsCorrupt = pData->m_numShadowVertices > 0 && pData->m_shadowVertices == nullptr;
+        const bool shadowTrisCorrupt = pData->m_numShadowTriangles > 0 && pData->m_shadowTriangles == nullptr;
+
+        if (shadowVertsCorrupt || shadowTrisCorrupt)
+        {
+            // Clear all shadow state to prevent GTA from attempting shadow rendering
+            pData->m_numShadowVertices = 0;
+            pData->m_numShadowTriangles = 0;
+            pData->m_shadowVertices = nullptr;
+            pData->m_shadowTriangles = nullptr;
+            pData->m_hasShadowInfo = 0;
+            pData->m_hasShadow = 0;
+
+            AddReportLog(8624, SString("ReadCOL: Invalid shadow data in '%s' - shadow rendering disabled", header.name));
+        }
+    }
+
     return pColModel;
 }
 
@@ -957,7 +982,7 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
             RpClump* pCopy = RpClumpClone(pNew);
             if (!pCopy) [[unlikely]]
             {
-                AddReportLog(8624, SString("ReplaceAllAtomicsInModel: RpClumpClone failed for model %d", usModelID));
+                AddReportLog(8628, SString("ReplaceAllAtomicsInModel: RpClumpClone failed for model %d", usModelID));
                 return false;
             }
 
