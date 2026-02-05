@@ -140,8 +140,27 @@ namespace
     std::unordered_set<unsigned short> g_PermanentlyLeakedTxdSlots;
     // Master textures that couldn't be destroyed due to leaked copies; destroyed at StaticReset
     std::unordered_set<RwTexture*> g_LeakedMasterTextures;
-    // D3D textures already released during StaticReset; prevents double-release on shared rasters
+    // D3D textures already released during StaticReset; used by SafeDestroyTextureWithRaster
+    // to detect shared rasters and prevent double-release across different texture structs.
     std::unordered_set<void*> g_ReleasedD3DTextures;
+
+    static void* TryReleaseTextureD3D(RwTexture* pTex)
+    {
+        __try
+        {
+            RwRaster* pRaster = pTex ? pTex->raster : nullptr;
+            if (!pRaster)
+                return nullptr;
+            void* pD3D = pRaster->renderResource;
+            if (pD3D)
+            {
+                reinterpret_cast<IDirect3DTexture9*>(pD3D)->Release();
+                reinterpret_cast<void* volatile&>(pRaster->renderResource) = nullptr;
+            }
+            return pD3D;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) { return nullptr; }
+    }
 
     // Last-use timestamps for isolated TXDs; enables stale slot reclamation
     std::unordered_map<unsigned short, uint32_t> g_IsolatedTxdLastUseTime;
@@ -5010,20 +5029,25 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
     // Pre-release D3D textures from leaked masters while raster pointers are still valid.
     // Must happen before mopup because mopup may free shared raster structs.
+    // Validate texture struct to avoid crash on corrupted/freed memory.
     g_ReleasedD3DTextures.clear();
     for (RwTexture* pMaster : g_LeakedMasterTextures)
     {
-        if (pMaster && pMaster->raster)
-        {
-            void* pD3DRaw = pMaster->raster->renderResource;
-            // Multiple masters can share the same raster
-            if (pD3DRaw && g_ReleasedD3DTextures.find(pD3DRaw) == g_ReleasedD3DTextures.end())
-            {
-                reinterpret_cast<IDirect3DTexture9*>(pD3DRaw)->Release();
-                g_ReleasedD3DTextures.insert(pD3DRaw);
-            }
-            reinterpret_cast<void* volatile&>(pMaster->raster->renderResource) = nullptr;
-        }
+        if (!pMaster)
+            continue;
+
+        // Validate texture struct is readable and sane before accessing raster
+        if (pMaster->txd != nullptr)
+            continue;  // Not orphaned - skip to avoid corruption
+        if (pMaster->TXDList.next != &pMaster->TXDList || pMaster->TXDList.prev != &pMaster->TXDList)
+            continue;  // Still linked - skip
+        if (pMaster->refs < 0 || pMaster->refs > 10000)
+            continue;  // Corrupted refs field - skip
+
+        // TryReleaseTextureD3D is idempotent (nulls renderResource after release), so no need
+        // to check g_ReleasedD3DTextures here. We populate the set for SafeDestroyTextureWithRaster.
+        if (void* pD3D = TryReleaseTextureD3D(pMaster))
+            g_ReleasedD3DTextures.insert(pD3D);
     }
 
     // Mop-up: orphan leaked TXDs to avoid stale refs
