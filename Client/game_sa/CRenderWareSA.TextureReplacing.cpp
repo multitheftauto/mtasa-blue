@@ -159,7 +159,10 @@ namespace
             }
             return pD3D;
         }
-        __except (EXCEPTION_EXECUTE_HANDLER) { return nullptr; }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return nullptr;
+        }
     }
 
     // Last-use timestamps for isolated TXDs; enables stale slot reclamation
