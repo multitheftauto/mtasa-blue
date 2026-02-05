@@ -490,7 +490,8 @@ public:
     void         MakeTimedObjectModel(ushort usBaseModelID);
     void         MakeClumpModel(ushort usBaseModelID);
     void         DeallocateModel();
-    unsigned int GetParentID() { return m_dwParentID; };
+    unsigned int GetParentID() override { return m_dwParentID; }
+    void         SetParentID(unsigned int id) override { m_dwParentID = id; }
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 
