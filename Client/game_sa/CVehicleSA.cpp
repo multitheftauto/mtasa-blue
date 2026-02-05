@@ -161,8 +161,8 @@ static void __fastcall SetComponentVisibility(CVehicleSAInterface* vehicleInterf
     if (state > 0 && !vehicle->pEntity->IsComponentVisibleInCache(frame->szName))
         return;
 
-    RwFrameForAllObjects(frame, (void*)0x6D2690, (void*)state); // SetVehicleAtomicVisibilityCB(RpAtomic*)
-    RwFrameForAllChildren(frame, (void*)0x6D26D0, (void*)state); // SetVehicleAtomicVisibilityCB(RwFrame*)
+    RwFrameForAllObjects(frame, (void*)0x6D2690, (void*)state);   // SetVehicleAtomicVisibilityCB(RpAtomic*)
+    RwFrameForAllChildren(frame, (void*)0x6D26D0, (void*)state);  // SetVehicleAtomicVisibilityCB(RwFrame*)
 }
 
 static constexpr std::uintptr_t RETURN_CVehicle_SetComponentVisibility = 0x6D2735;
