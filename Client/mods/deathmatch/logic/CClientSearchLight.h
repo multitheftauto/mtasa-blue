@@ -54,7 +54,7 @@ public:
     void SetRenderSpot(bool renderSpot) { m_bRenderSpot = renderSpot; }
 
     SColor GetColor() const noexcept { return m_color; }
-    void SetColor(const SColor& color) noexcept { m_color = color; }
+    void   SetColor(const SColor& color) noexcept { m_color = color; }
 
 protected:
     void Render();

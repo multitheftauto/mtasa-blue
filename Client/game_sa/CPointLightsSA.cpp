@@ -65,7 +65,8 @@ void CPointLightsSA::PostRenderHeliLights()
     CHeli_PostSearchLightCone();
 }
 
-void CPointLightsSA::RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot, const SharedUtil::SColor& color)
+void CPointLightsSA::RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot,
+                                     const SharedUtil::SColor& color)
 {
     auto CHeli_SearchLightCone = (CHeli_SearchLightCone_t)FUNC_CHeli_SearchLightCone;
 
@@ -99,16 +100,17 @@ static void __cdecl PreRenderSearchLight3DVertexBuffer(RxObjSpace3DVertex* buffe
             std::uint8_t g = (buffer[i].color >> 8) & 0xFF;
             std::uint8_t b = (buffer[i].color >> 0) & 0xFF;
 
-            float intensity = (buffer[i].color & 0xFF) / 255.0f; // Get original intensity
+            float intensity = (buffer[i].color & 0xFF) / 255.0f;  // Get original intensity
 
-            buffer[i].color = COLOR_RGBA(static_cast<std::uint8_t>(searchLightColor.R * intensity), static_cast<std::uint8_t>(searchLightColor.G * intensity), static_cast<std::uint8_t>(searchLightColor.B * intensity), 0);
+            buffer[i].color = COLOR_RGBA(static_cast<std::uint8_t>(searchLightColor.R * intensity), static_cast<std::uint8_t>(searchLightColor.G * intensity),
+                                         static_cast<std::uint8_t>(searchLightColor.B * intensity), 0);
         }
     }
 }
 
 static constexpr std::uintptr_t HOOK_CSearchLight_PreRender3DVertexBuffer = 0x6C6293;
 static constexpr std::uintptr_t TansformFunc = 0x7EF450;
-static void __declspec(naked) CSearchLight_PreRender3DVertexBuffer()
+static void __declspec(naked)   CSearchLight_PreRender3DVertexBuffer()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -123,19 +125,22 @@ static void __declspec(naked) CSearchLight_PreRender3DVertexBuffer()
     // clang-format on
 }
 
-static void __cdecl RenderSearchLightShadow(char type, void* texture, CVector* pos, float x1, float y1, float x2, float y2, std::int16_t intensity, char r, char g, char b, float zDistance, bool drawOnWater, float scale, void* shadowData, bool drawOnBuildings)
+static void __cdecl RenderSearchLightShadow(char type, void* texture, CVector* pos, float x1, float y1, float x2, float y2, std::int16_t intensity, char r,
+                                            char g, char b, float zDistance, bool drawOnWater, float scale, void* shadowData, bool drawOnBuildings)
 {
     // Get original color intensity multiplier
     float colorIntensity = static_cast<float>(intensity) / 128.0f;
 
     // CShadows::StoreShadowToBeRendered
-    ((void(__cdecl*)(char, void*, CVector*, float, float, float, float, std::int16_t, unsigned char, unsigned char, unsigned char, float, bool, float, void*, bool))0x707390)(
-        type, texture, pos, x1, y1, x2, y2, intensity, static_cast<unsigned char>(searchLightColor.R * colorIntensity), static_cast<unsigned char>(searchLightColor.G * colorIntensity),
-        static_cast<unsigned char>(searchLightColor.B * colorIntensity), zDistance, drawOnWater, scale, shadowData, drawOnBuildings);
+    ((void(__cdecl*)(char, void*, CVector*, float, float, float, float, std::int16_t, unsigned char, unsigned char, unsigned char, float, bool, float, void*,
+                     bool))0x707390)(type, texture, pos, x1, y1, x2, y2, intensity, static_cast<unsigned char>(searchLightColor.R * colorIntensity),
+                                     static_cast<unsigned char>(searchLightColor.G * colorIntensity),
+                                     static_cast<unsigned char>(searchLightColor.B * colorIntensity), zDistance, drawOnWater, scale, shadowData,
+                                     drawOnBuildings);
 }
 
 static constexpr std::uintptr_t RETURN_CSearchLight_RenderShadow = 0x6C64FC;
-static void __declspec(naked) CSearchLight_RenderShadow()
+static void __declspec(naked)   CSearchLight_RenderShadow()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -148,7 +153,10 @@ static void __declspec(naked) CSearchLight_RenderShadow()
     // clang-format on
 }
 
-static void __cdecl RenderSearchLightCorona(int ID, void* entity, unsigned char r, unsigned char g, unsigned char b, unsigned char a, CVector* pos, float radius, float farClip, int type, char flareType, bool enableReflection, bool checkObstacles, int unknownUnused, float angle, bool longDistance, float nearClip, bool fadeState, float fadeSpeed, bool onlyFromBelow, bool reflectionDelay)
+static void __cdecl RenderSearchLightCorona(int ID, void* entity, unsigned char r, unsigned char g, unsigned char b, unsigned char a, CVector* pos,
+                                            float radius, float farClip, int type, char flareType, bool enableReflection, bool checkObstacles,
+                                            int unknownUnused, float angle, bool longDistance, float nearClip, bool fadeState, float fadeSpeed,
+                                            bool onlyFromBelow, bool reflectionDelay)
 {
     // CCoronas::RegisterCorona
     ((void(__cdecl*)(int, void*, unsigned char, unsigned char, unsigned char, unsigned char, CVector*, float, float, int, char, bool, bool, int, float, bool,
