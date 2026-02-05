@@ -2297,7 +2297,7 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface&
 void CNetAPI::SendBulletSyncFire(eWeaponType weapon, const CVector& start, const CVector& end, float damage, std::uint8_t zone, CClientPlayer* damaged)
 {
     NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
-    SPositionSync startPosition;
+    SPositionSync          startPosition;
     startPosition.data.vecPosition = start;
 
     SPositionSync endPosition;
@@ -2332,7 +2332,7 @@ void CNetAPI::SendBulletSyncCustomWeaponFire(CClientWeapon* weapon, const CVecto
 
     NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
 
-    SPositionSync          startPosition;
+    SPositionSync startPosition;
     startPosition.data.vecPosition = start;
 
     SPositionSync endPosition;

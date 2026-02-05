@@ -197,10 +197,7 @@ public:
         return false;
     }
 
-    [[nodiscard]] bool IsValid() const noexcept
-    {
-        return std::isfinite(fX) && std::isfinite(fY) && std::isfinite(fZ);
-    }
+    [[nodiscard]] bool IsValid() const noexcept { return std::isfinite(fX) && std::isfinite(fY) && std::isfinite(fZ); }
 
     // Checks if the vector is within the world bounds.
     // If maxLimit = false (default), it checks coordinates in the range -3000 to 3000.

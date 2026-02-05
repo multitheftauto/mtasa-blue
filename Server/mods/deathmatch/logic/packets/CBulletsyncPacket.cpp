@@ -17,8 +17,7 @@
 #include "CElement.h"
 #include "CWeaponNames.h"
 
-CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
-    : m_weapon(WEAPONTYPE_UNARMED), m_start(), m_end(), m_zone(0), m_damaged(INVALID_ELEMENT_ID)
+CBulletsyncPacket::CBulletsyncPacket(CPlayer* player) : m_weapon(WEAPONTYPE_UNARMED), m_start(), m_end(), m_zone(0), m_damaged(INVALID_ELEMENT_ID)
 {
     m_pSourceElement = player;
 }
@@ -128,9 +127,9 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
     CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
     if (pPlayer)
 
-    // Check if player is spawned and alive
-    if (!pPlayer || !pPlayer->IsSpawned() || pPlayer->IsDead())
-        return false;
+        // Check if player is spawned and alive
+        if (!pPlayer || !pPlayer->IsSpawned() || pPlayer->IsDead())
+            return false;
 
     // Check player position is reasonable relative to bullet start
     if (!ReadWeaponAndPositions(stream))
