@@ -232,11 +232,12 @@ bool CClientDFF::HasReplaced(unsigned short usModel)
     return false;
 }
 
-void CClientDFF::RestoreModel(unsigned short usModel)
+bool CClientDFF::RestoreModel(unsigned short usModel)
 {
     // Restore the model and remove it from the list
-    InternalRestoreModel(usModel);
+    bool bRestored = InternalRestoreModel(usModel);
     m_Replaced.remove(usModel);
+    return bRestored;
 }
 
 void CClientDFF::RestoreModels()
@@ -245,7 +246,7 @@ void CClientDFF::RestoreModels()
     std::list<unsigned short>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
-        // Restore this model
+        // Restore this model (ignore return - bulk cleanup)
         InternalRestoreModel(*iter);
     }
 
@@ -256,7 +257,7 @@ void CClientDFF::RestoreModels()
     m_Replaced.clear();
 }
 
-void CClientDFF::InternalRestoreModel(unsigned short usModel)
+bool CClientDFF::InternalRestoreModel(unsigned short usModel)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -266,7 +267,7 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
         // eventually stream them back in with async loading.
         m_pManager->GetVehicleManager()->RestreamVehicles(usModel);
     }
-    // Is this an ped ID?
+    // Is this a ped ID?
     else if (CClientPlayerManager::IsValidModel(usModel))
     {
         // Stream the ped of that model out so we have no
@@ -295,17 +296,36 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     else if (CClientPlayerClothes::IsValidModel(usModel))
     {
         g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_RawDataBuffer.data());
-        return;
+        return true;
     }
     else
-        return;
+    {
+        AddReportLog(9403, SString("InternalRestoreModel: Model %u not recognized as vehicle/ped/object/clothes", usModel), 10);
+        return false;
+    }
 
-    // Restore all the models we replaced.
+    // Restore model first - this releases texture replacement tracking refs
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (!pModelInfo)
+    {
+        AddReportLog(9405, SString("InternalRestoreModel: GetModelInfo returned null for model %u", usModel), 10);
+        return false;
+    }
     pModelInfo->ResetVehicleDummies(true);
     pModelInfo->ResetVehicleWheelSizes();
     pModelInfo->RestoreOriginalModel();
     pModelInfo->ResetAlphaTransparency();
+
+    // Check if model was actually unloaded (immediate restore)
+    bool bModelUnloaded = !pModelInfo->IsLoaded();
+
+    // Only clean up isolated TXD if model has no refs (no entities using it)
+    // If refs remain, TXD cleanup is deferred to CClientModel::Deallocate
+    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
+    {
+        if (bModelUnloaded)
+            pRenderWare->CleanupIsolatedTxdForModel(usModel);
+    }
 
     // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
     if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
@@ -323,6 +343,9 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
             g_pGame->GetRenderWare()->DestroyDFF(pInfo->pClump);
         MapRemove(m_LoadedClumpInfoMap, usModel);
     }
+
+    // Return true only if model was immediately restored (not deferred due to entities using it)
+    return bModelUnloaded;
 }
 
 bool CClientDFF::ReplaceClothes(ushort usModel)
