@@ -956,7 +956,7 @@ static void CppNewHandlerBridge()
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
 [[noreturn]] void __cdecl CppTerminateHandler();
-void __cdecl AbortSignalHandler(int signal);
+void __cdecl              AbortSignalHandler(int signal);
 [[noreturn]] void __cdecl PureCallHandler();
 
 static void InstallCppHandlers();
