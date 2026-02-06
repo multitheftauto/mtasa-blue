@@ -34,6 +34,11 @@ CClientTXD::~CClientTXD()
     if (bInDeleteAll)
     {
         g_pGame->GetRenderWare()->ModelInfoTXDDeferCleanup(&m_ReplacementTextures);
+
+        // Remove clothes buffer references so OnCStreaming_RequestModel_Mid
+        // won't serve up our soon-to-be-freed m_FileData pointer
+        g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_FileData.data());
+        g_pGame->GetRenderWare()->ClothesRemoveFile(m_FileData.data());
         return;
     }
 
