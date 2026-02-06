@@ -44,6 +44,11 @@ CClientDFF::~CClientDFF()
             }
         }
         m_Replaced.clear();
+
+        // Remove clothes buffer references so OnCStreaming_RequestModel_Mid
+        // won't serve up our soon-to-be-freed m_RawDataBuffer pointer
+        g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_RawDataBuffer.data());
+        g_pGame->GetRenderWare()->ClothesRemoveFile(m_RawDataBuffer.data());
         return;
     }
 
