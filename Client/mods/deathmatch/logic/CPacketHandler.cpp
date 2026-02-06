@@ -2599,6 +2599,8 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
             pWeaponInfo->SetWeaponAnim2LoopFireTime(weaponProperty.data.anim2_loop_bullet_fire);
 
             pWeaponInfo->SetAnimBreakoutTime(weaponProperty.data.anim_breakout_time);
+
+            pWeaponInfo->SetAnimGroup(weaponProperty.data.anim_group);
         }
 
         bool bEnabled;
@@ -2613,7 +2615,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         bitStream.ReadBit(bReadWeaponInfo);
         if (bReadWeaponInfo)
         {
-            for (int j = 0; j <= 2; j++)
+            for (int j = 0; j <= 3; j++)
             {
                 bitStream.Read(&weaponProperty);
                 CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)weaponProperty.data.weaponType, (eWeaponSkill)j);
@@ -2634,6 +2636,23 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
                 pWeaponInfo->SetWeaponAnim2LoopFireTime(weaponProperty.data.anim2_loop_bullet_fire);
 
                 pWeaponInfo->SetAnimBreakoutTime(weaponProperty.data.anim_breakout_time);
+
+                pWeaponInfo->SetAnimGroup(weaponProperty.data.anim_group);
+                pWeaponInfo->SetAnimGroup(weaponProperty.data.anim_group);
+                pWeaponInfo->SetFireType((eFireType)weaponProperty.data.fire_type);
+                pWeaponInfo->SetModel(weaponProperty.data.model);
+                pWeaponInfo->SetModel2( weaponProperty.data.model2);
+                pWeaponInfo->SetSlot((eWeaponSlot)weaponProperty.data.weapon_slot);
+                pWeaponInfo->SetFireOffset(&weaponProperty.data.fire_offset);
+                pWeaponInfo->SetSkill((eWeaponSkill)weaponProperty.data.skill_level);
+                pWeaponInfo->SetRequiredStatLevel(weaponProperty.data.required_skill_level);
+                pWeaponInfo->SetFiringSpeed(weaponProperty.data.firing_speed);
+                pWeaponInfo->SetRadius(weaponProperty.data.radius);
+                pWeaponInfo->SetLifeSpan(weaponProperty.data.life_span);
+                pWeaponInfo->SetSpread(weaponProperty.data.spread);
+                pWeaponInfo->SetAimOffsetIndex(weaponProperty.data.aim_offset);
+                pWeaponInfo->SetDefaultCombo(weaponProperty.data.default_combo);
+                pWeaponInfo->SetCombosAvailable(weaponProperty.data.combos_available);
             }
         }
 

@@ -6105,40 +6105,54 @@ eWeaponType      weaponSkillWeapon;
 BYTE             weaponSkill;
 bool             CPed_GetWeaponSkill()
 {
+    if (weaponSkillWeapon < WEAPONTYPE_PISTOL || weaponSkillWeapon > WEAPONTYPE_TEC9)
+    {
+        return false;
+    }
+
     SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed);
     CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
-    if (pPed)
+    if (!pPed)
     {
-        CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);
-        if (pPed != pLocalPlayerPed)
-        {
-            if (weaponSkillWeapon >= WEAPONTYPE_PISTOL && weaponSkillWeapon <= WEAPONTYPE_TEC9)
-            {
-                CPlayerPed* playerPed = dynamic_cast<CPlayerPed*>(pPed);
-                if (playerPed)
-                {
-                    CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
-                    if (data)
-                    {
-                        float stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
-
-                        CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
-                        CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
-                        CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
-
-                        if (stat >= pPro->GetRequiredStatLevel())
-                            weaponSkill = WEAPONSKILL_PRO;
-                        else if (stat >= pStd->GetRequiredStatLevel())
-                            weaponSkill = WEAPONSKILL_STD;
-                        else
-                            weaponSkill = WEAPONSKILL_POOR;
-                        return true;
-                    }
-                }
-            }
-        }
+        return false;
     }
-    return false;
+
+    CPlayerPed* playerPed = dynamic_cast<CPlayerPed*>(pPed);
+    if (!playerPed)
+    {
+        return false;
+    }
+
+    unsigned short skillStatIdx = pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon);
+    float stat;
+    CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);
+    if (pPed == pLocalPlayerPed)
+    {
+        stat = pGameInterface->GetStats()->GetStatValue(skillStatIdx);
+    }
+    else
+    {
+        CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
+        if (!data)
+        {
+            return false;
+        }
+        stat = data->m_stats.StatTypesFloat[skillStatIdx];
+    }
+        
+    CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
+    CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
+    CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
+    CWeaponInfo* pSpec = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_SPECIAL);
+    if (stat >= pSpec->GetRequiredStatLevel())
+        weaponSkill = WEAPONSKILL_SPECIAL;
+    else if (stat >= pPro->GetRequiredStatLevel())
+        weaponSkill = WEAPONSKILL_PRO;
+    else if (stat >= pStd->GetRequiredStatLevel())
+        weaponSkill = WEAPONSKILL_STD;
+    else
+        weaponSkill = WEAPONSKILL_POOR;
+    return true;
 }
 
 static void __declspec(naked) HOOK_CPed_GetWeaponSkill()

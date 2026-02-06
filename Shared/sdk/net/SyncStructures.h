@@ -2378,7 +2378,23 @@ struct sWeaponPropertySync : public ISyncStructure
             bitStream.Read(data.nAmmo) && bitStream.Read(data.nDamage) && bitStream.Read(data.fAccuracy) && bitStream.Read(data.fMoveSpeed) &&
             bitStream.Read(data.anim_loop_start) && bitStream.Read(data.anim_loop_stop) && bitStream.Read(data.anim_loop_bullet_fire) &&
             bitStream.Read(data.anim2_loop_start) && bitStream.Read(data.anim2_loop_stop) && bitStream.Read(data.anim2_loop_bullet_fire) &&
-            bitStream.Read(data.anim_breakout_time))
+            bitStream.Read(data.anim_breakout_time) &&
+
+            bitStream.Read(data.anim_group) &&
+            bitStream.Read(data.fire_type) &&
+            bitStream.Read(data.model) &&
+            bitStream.Read(data.model2) &&
+            bitStream.Read(data.weapon_slot) &&
+            bitStream.Read(data.fire_offset.fX) && bitStream.Read(data.fire_offset.fY) && bitStream.Read(data.fire_offset.fZ) &&
+            bitStream.Read(data.skill_level) &&
+            bitStream.Read(data.required_skill_level) &&
+            bitStream.Read(data.firing_speed) &&
+            bitStream.Read(data.radius) &&
+            bitStream.Read(data.life_span) &&
+            bitStream.Read(data.spread) &&
+            bitStream.Read(data.aim_offset) &&
+            bitStream.Read(data.default_combo) &&
+            bitStream.Read(data.combos_available))
             return true;
 
         return false;
@@ -2402,6 +2418,22 @@ struct sWeaponPropertySync : public ISyncStructure
         bitStream.Write(data.anim2_loop_stop);
         bitStream.Write(data.anim2_loop_bullet_fire);
         bitStream.Write(data.anim_breakout_time);
+
+        bitStream.Write(data.anim_group);
+        bitStream.Write(data.fire_type);
+        bitStream.Write(data.model);
+        bitStream.Write(data.model2);
+        bitStream.Write(data.weapon_slot);
+        bitStream.Write(data.fire_offset.fX); bitStream.Write(data.fire_offset.fY); bitStream.Write(data.fire_offset.fZ);
+        bitStream.Write(data.skill_level);
+        bitStream.Write(data.required_skill_level);
+        bitStream.Write(data.firing_speed);
+        bitStream.Write(data.radius);
+        bitStream.Write(data.life_span);
+        bitStream.Write(data.spread);
+        bitStream.Write(data.aim_offset);
+        bitStream.Write(data.default_combo);
+        bitStream.Write(data.combos_available);
     }
 
     struct
@@ -2427,6 +2459,23 @@ struct sWeaponPropertySync : public ISyncStructure
         FLOAT anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
 
         FLOAT anim_breakout_time;            // time after which player can break out of attack and run off
+
+        DWORD anim_group;
+
+        DWORD   fire_type;
+        int     model;
+        int     model2;
+        DWORD   weapon_slot;
+        CVector fire_offset;
+        BYTE    skill_level;
+        int     required_skill_level;
+        float   firing_speed;
+        float   radius;
+        float   life_span;
+        float   spread;
+        short   aim_offset;
+        BYTE    default_combo;
+        BYTE    combos_available;
     } data;
 };
 
