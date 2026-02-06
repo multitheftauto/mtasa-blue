@@ -4759,7 +4759,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             std::vector<RwTexture*> currentTextures;
             GetTxdTextures(currentTextures, pInfo->pTxd);
 
-            if (!pInfo->originalTextures.empty() && currentTextures.empty())
+            if (currentTextures.empty())
                 return false;
 
             if (currentTextures.size() != pInfo->originalTextures.size())
@@ -4770,6 +4770,33 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 if (pInfo->originalTextures.find(pTex) == pInfo->originalTextures.end())
                     return false;
             }
+
+            // Prevent PopulateOriginalTextures contamination:
+            // If originalTextures was snapshotted while MTA textures were still linked in the
+            // TXD, the pointer comparison above gives a false positive. Cross-check against
+            // g_LeakedMasterTextures to detect masters or copies (via shared raster) that
+            // should not be in a clean TXD.
+            if (!g_LeakedMasterTextures.empty())
+            {
+                for (RwTexture* pTex : currentTextures)
+                {
+                    if (!pTex)
+                        continue;
+
+                    if (g_LeakedMasterTextures.count(pTex) != 0)
+                        return false;
+
+                    if (pTex->raster)
+                    {
+                        for (RwTexture* pMaster : g_LeakedMasterTextures)
+                        {
+                            if (pMaster && pMaster->raster == pTex->raster)
+                                return false;
+                        }
+                    }
+                }
+            }
+
             return true;
         };
 
