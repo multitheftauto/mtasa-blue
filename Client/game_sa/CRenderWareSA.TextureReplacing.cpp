@@ -1162,7 +1162,9 @@ namespace
         return nullptr;
     }
 
-    // Capture all TXD textures for restoration
+    // Capture all TXD textures for restoration, filtering out MTA-injected textures.
+    // Without filtering, MTA masters/copies still linked in the TXD get recorded as
+    // "originals," contaminating the baseline used by canProveNoLeaks comparisons.
     void PopulateOriginalTextures(CModelTexturesInfo& info, RwTexDictionary* pTxd)
     {
         info.originalTextures.clear();
@@ -1174,10 +1176,39 @@ namespace
         std::vector<RwTexture*> allTextures;
         CRenderWareSA::GetTxdTextures(allTextures, pTxd);
 
+        // Build a set of rasters owned by known MTA textures for fast filtering.
+        // Both masters and copies share the same raster, so a raster-level check
+        // catches both without needing separate copy tracking.
+        std::unordered_set<RwRaster*> mtaRasters;
+
+        for (RwTexture* pMaster : g_LeakedMasterTextures)
+        {
+            if (pMaster && pMaster->raster)
+                mtaRasters.insert(pMaster->raster);
+        }
+
+        for (const SReplacementTextures* pReplacement : info.usedByReplacements)
+        {
+            if (!pReplacement || !IsReplacementActive(pReplacement))
+                continue;
+
+            for (RwTexture* pMasterTex : pReplacement->textures)
+            {
+                if (pMasterTex && pMasterTex->raster)
+                    mtaRasters.insert(pMasterTex->raster);
+            }
+        }
+
         for (RwTexture* pTex : allTextures)
         {
-            if (pTex)
-                info.originalTextures.insert(pTex);
+            if (!pTex)
+                continue;
+
+            // Reject textures whose raster belongs to an MTA master or copy
+            if (!mtaRasters.empty() && pTex->raster && mtaRasters.count(pTex->raster) != 0)
+                continue;
+
+            info.originalTextures.insert(pTex);
         }
 
         // Build name map for lookup after replacements
