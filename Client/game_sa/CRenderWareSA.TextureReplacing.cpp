@@ -304,7 +304,9 @@ namespace
     void RemoveReplacementFromTracking(SReplacementTextures* pReplacementTextures)
     {
         if (!pReplacementTextures)
+        {
             return;
+        }
 
         for (auto& entry : ms_ModelTexturesInfoMap)
         {
@@ -4068,6 +4070,29 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::ModelInfoTXDDeferCleanup
+//
+// Remove tracking state without destroying textures. Used during shutdown
+// when model data may be corrupted and full cleanup via
+// ModelInfoTXDRemoveTextures would be unsafe. Textures are intentionally
+// leaked - destroying them risks double-freeing rasters shared between
+// copy and master textures, or freeing rasters still referenced by
+// in-flight clumps. StaticResetModelTextureReplacing handles bulk TXD
+// ref release and orphaned texture cleanup after all elements are gone.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures)
+{
+    if (!pReplacementTextures)
+    {
+        return;
+    }
+
+    RemoveReplacementFromTracking(pReplacementTextures);
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::ModelInfoTXDRemoveTextures
 //
 // Remove the textures from the txds that are using them.
@@ -4076,7 +4101,9 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
 void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures)
 {
     if (!pGame || !pReplacementTextures)
+    {
         return;
+    }
 
     // Early exit if session changed - stale data is invalid
     if (pReplacementTextures->uiSessionId != ms_uiTextureReplacingSession)
@@ -4558,6 +4585,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 destroyedTextures.insert(pReplacedTexture);
                 // Skip originalTextures.erase() to avoid heap corruption risk
                 RwTextureDestroy(pReplacedTexture);
+                g_LeakedMasterTextures.erase(pReplacedTexture);
             }
         }
 
@@ -4863,6 +4891,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
             RwTextureDestroy(pTexture);
             destroyedTextures.insert(pTexture);
+            g_LeakedMasterTextures.erase(pTexture);
         }
     }
     else
@@ -4871,7 +4900,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         for (RwTexture* pTexture : pReplacementTextures->textures)
         {
             if (pTexture && destroyedTextures.find(pTexture) == destroyedTextures.end())
+            {
                 g_LeakedMasterTextures.insert(pTexture);
+            }
         }
     }
 
@@ -5353,21 +5384,26 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         tryMopUpTxd(txdId, nullptr, true);
     }
 
-    // Release refs for clean TXDs; preserve leaked entries for reuse to prevent ref accumulation
+    // Final cleanup pass - skip all GTA TXD pool operations for both branches.
+    // Earlier operations in this function (mopup, orphan cleanup, texture
+    // destruction) may corrupt the GTA heap without immediate detection.
+    // Any subsequent pool access - even on valid slots via CTxdStore_GetTxd -
+    // can trigger deferred heap corruption (0xC0000374).
+    // Clean entries leak one ref per TXD per reconnect (uint16 refcount);
+    // acceptable since base TXDs are reloaded by streaming on the next session.
+
     for (auto iter = ms_ModelTexturesInfoMap.begin(); iter != ms_ModelTexturesInfoMap.end();)
     {
         CModelTexturesInfo& info = iter->second;
 
         if (!info.bHasLeakedTextures)
         {
-            if (CTxdStore_GetNumRefs(info.usTxdId) > 0)
-                CRenderWareSA::DebugTxdRemoveRef(info.usTxdId, "StaticResetModelTextureReplacing-final-clean");
+            // Erase without releasing ref - pool access unsafe at this point
             iter = ms_ModelTexturesInfoMap.erase(iter);
         }
         else
         {
-            // Keep leaked entry but clear replacement linkage (script objects destroyed).
-            // pTxd kept to detect slot reallocation at repopulate.
+            // Keep leaked entry but clear replacement linkage (script objects destroyed)
             info.usedByReplacements.clear();
             info.originalTextures.clear();
             info.originalTexturesByName.clear();
@@ -5385,7 +5421,14 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         for (RwTexture* pMaster : g_LeakedMasterTextures)
         {
             if (!pMaster)
+            {
                 continue;
+            }
+
+            if (!IsReadableTexture(pMaster))
+            {
+                continue;
+            }
 
             // Ensure texture is orphaned (not linked in any TXD)
             if (pMaster->txd != nullptr)

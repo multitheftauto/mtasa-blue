@@ -150,4 +150,7 @@ public:
 
     // Rebind single atomic's material textures to current TXD textures
     virtual void RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId) = 0;
+
+    // Remove tracking state without destroying textures; used during shutdown.
+    virtual void ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures) = 0;
 };

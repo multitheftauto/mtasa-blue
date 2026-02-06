@@ -163,6 +163,11 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
     if (!g_pClientGame || !g_pClientGame->GetManager())
         return;
 
+    // DFFManager is destroyed before ModelManager during CClientManager cleanup.
+    // If null, sub-managers are already torn down - skip restoration.
+    if (!g_pClientGame->GetManager()->GetDFFManager())
+        return;
+
     const int  modelId = m_iModelID;
     const auto modelType = m_eModelType;
 

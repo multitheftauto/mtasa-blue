@@ -27,6 +27,26 @@ CClientDFF::~CClientDFF()
     // Remove us from DFF manager list
     m_pDFFManager->RemoveFromList(this);
 
+    bool bInDeleteAll = g_pClientGame && g_pClientGame->GetElementDeleter()->IsBeingDeleted(this);
+
+    // During DoDeleteAll (arbitrary element destruction order), clear custom model
+    // pointers to prevent stale clump references. Skip restreaming and UnloadDFF
+    // which would corrupt RW data or double-free textures. Normal resource cleanup
+    // (engineRestoreModel, resource stop) uses the full restoration path below.
+    if (bInDeleteAll)
+    {
+        for (auto usModel : m_Replaced)
+        {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+            if (pModelInfo)
+            {
+                pModelInfo->ClearCustomModel();
+            }
+        }
+        m_Replaced.clear();
+        return;
+    }
+
     // Restore all our models
     RestoreModels();
 
@@ -93,7 +113,9 @@ void CClientDFF::UnloadDFF()
     {
         SLoadedClumpInfo& info = iter->second;
         if (info.pClump)
+        {
             g_pGame->GetRenderWare()->DestroyDFF(info.pClump);
+        }
     }
 
     m_LoadedClumpInfoMap.clear();
