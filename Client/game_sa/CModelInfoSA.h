@@ -212,19 +212,6 @@ public:
                     unsigned char bTagDisabled : 1;
                 };
             };
-            unsigned char     bHasBeenPreRendered : 1;  // we use this because we need to apply changes only once
-            unsigned char     bAlphaTransparency : 1;   // bDrawLast
-            unsigned char     bAdditiveRender : 1;
-            unsigned char     bDontWriteZBuffer : 1;
-            unsigned char     bDontCastShadowsOn : 1;
-            unsigned char     bDoWeOwnTheColModel : 1;
-            unsigned char     bIsBackfaceCulled : 1;
-            unsigned char     bIsColLoaded : 1;
-            unsigned char     bIsRoad : 1;
-            unsigned char     bHasComplexHierarchy : 1;
-            unsigned char     bDontCollideWithFlyer : 1;
-            eModelSpecialType eSpecialModelType : 4;
-            unsigned char     bWetRoadReflection : 1;  // Used for tags
         };
 
         unsigned short usFlags;

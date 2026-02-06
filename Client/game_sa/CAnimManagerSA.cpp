@@ -470,7 +470,6 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* p
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_BlendAnimation_hier;
-    CAnimBlendHierarchySAInterface*   pHierarchyInterface = pHierarchy->GetInterface();
     // clang-format off
     __asm
     {
