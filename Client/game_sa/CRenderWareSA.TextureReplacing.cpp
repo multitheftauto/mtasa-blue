@@ -3931,20 +3931,20 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
         }
     }
 
+    // Hold a safety ref to prevent TXD destruction during SetTextureDictionaryID.
+    // SetTextureDictionaryID releases refs to the old TXD which may drop it to 0.
+    // Without this, the TXD gets destroyed before we can orphan its textures,
+    // causing shared rasters to be freed and leaving dangling pointers, > heap corruption.
+    const bool bIsolatedSlotValid = CTxdStore_GetTxd(usIsolatedTxdId) != nullptr;
+    if (bIsolatedSlotValid)
+        CTxdStore_AddRef(usIsolatedTxdId);
+
     // Revert model TXD back to parent
     if (auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId)))
     {
         if (pModelInfo->GetTextureDictionaryID() == usIsolatedTxdId)
             pModelInfo->SetTextureDictionaryID(usParentTxdId);
     }
-
-    // Hold a safety ref to prevent TXD destruction while we clean up.
-    // External refs could drop to 0 during cleanup; orphan textures first
-    // to avoid destroying them with bad raster pointers.
-    // Validate slot before AddRef to avoid crash on already-destroyed slots
-    const bool bIsolatedSlotValid = CTxdStore_GetTxd(usIsolatedTxdId) != nullptr;
-    if (bIsolatedSlotValid)
-        CTxdStore_AddRef(usIsolatedTxdId);
 
     // Clear shader system entries for this TXD id
     StreamingRemovedTxd(usIsolatedTxdId);
