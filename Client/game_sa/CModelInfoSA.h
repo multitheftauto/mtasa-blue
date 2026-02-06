@@ -546,7 +546,8 @@ public:
     void         MakeTimedObjectModel(ushort usBaseModelID);
     void         MakeClumpModel(ushort usBaseModelID);
     void         DeallocateModel();
-    unsigned int GetParentID() { return m_dwParentID; };
+    unsigned int GetParentID() override { return m_dwParentID; }
+    void         SetParentID(unsigned int id) override { m_dwParentID = id; }
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 
@@ -569,8 +570,9 @@ public:
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;
 
-    bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
+    bool IsDynamic() override { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
     bool IsDamageableAtomic() override;
+    void ClearCustomModel() override;
 
     static bool IsVehicleModel(std::uint32_t model) noexcept;
 

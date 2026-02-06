@@ -138,6 +138,10 @@ workspace "MTASA"
 		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
 
+	-- Disable Edit and Continue on x86 Debug to avoid conflict with /SAFESEH
+	filter {"system:windows", "configurations:Debug", "platforms:x86"}
+		editandcontinue "Off"
+
 	filter { "system:linux or macosx", "configurations:not Debug" }
 		buildoptions { "-fvisibility=hidden" }
 

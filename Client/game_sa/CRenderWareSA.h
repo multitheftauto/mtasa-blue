@@ -34,6 +34,7 @@ public:
                                   SString* pOutError = nullptr) override;
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
+    void ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures) override;
     void CleanupIsolatedTxdForModel(unsigned short usModelId) override;
     void StaticResetModelTextureReplacing();
     void StaticResetShaderSupport();
@@ -102,8 +103,10 @@ public:
 
     unsigned short GetTXDIDForModelID(unsigned short usModelID);
     void           PulseWorldTextureWatch();
-    void           ProcessPendingIsolatedTxdParents();
-    void           GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID);
+    // Compatibility wrapper; uses per-model pending processing.
+    void        ProcessPendingIsolatedTxdParents();
+    void        ProcessPendingIsolatedModels();
+    void        GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID);
     bool        GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames);
     void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, unsigned short usTxdId);
     static void GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);

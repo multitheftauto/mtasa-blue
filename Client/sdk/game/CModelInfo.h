@@ -267,6 +267,11 @@ public:
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 
     virtual unsigned int GetParentID() = 0;
+    virtual void         SetParentID(unsigned int id) = 0;
     virtual bool         IsDynamic() = 0;
     virtual bool         IsDamageableAtomic() = 0;
+
+    // Clear m_pCustomClump without touching GTA streaming or RW objects.
+    // Used during shutdown when RW operations are unsafe.
+    virtual void ClearCustomModel() = 0;
 };

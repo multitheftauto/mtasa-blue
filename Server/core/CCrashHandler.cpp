@@ -215,7 +215,11 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
     if (hDll)
     {
         // Grab the MiniDumpWriteDump proc address
-        auto pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(static_cast<void*>(GetProcAddress(hDll, "MiniDumpWriteDump")));
+        MINIDUMPWRITEDUMP pDump = nullptr;
+        const auto        procAddr = GetProcAddress(hDll, "MiniDumpWriteDump");
+        static_assert(sizeof(pDump) == sizeof(procAddr), "Unexpected function pointer size");
+        if (procAddr)
+            std::memcpy(&pDump, &procAddr, sizeof(pDump));
         if (pDump)
         {
             // Grab the current time

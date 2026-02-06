@@ -329,7 +329,7 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
 void CBuildingsPoolSA::UpdateBackupLodPointers(uint32_t offset)
 {
     backup_array_t* arr = m_pOriginalBuildingsBackup.get();
-    for (auto i = 0; i < MAX_BUILDINGS; i++)
+    for (size_t i = 0; i < MAX_BUILDINGS; ++i)
     {
         std::pair<bool, building_buffer_t>* data = &(*arr)[i];
         if (data->first)

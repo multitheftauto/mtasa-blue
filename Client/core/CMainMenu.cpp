@@ -172,7 +172,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     float fBase = 0.613f;
     float fGap = 0.043f;
-    // Our disconnect item is shown/hidden dynamically, so we store it seperately
+    // Our disconnect item is shown/hidden dynamically, so we store it separately
     m_pDisconnect = CreateItem(MENU_ITEM_DISCONNECT, "menu_disconnect.png", CVector2D(0.168f, fBase + fGap * 0));
     m_pDisconnect->image->SetVisible(false);
 
@@ -575,7 +575,7 @@ void CMainMenu::Update()
         while (it != m_unhoveredItems.end())
         {
             // Let's work out what the target progress should be by working out the time passed
-            // Min of 0.5 progress fixes occasional graphical glitchekal
+            // Min of 0.5 progress fixes occasional graphical glitches
             float newProgress =
                 (*it)->animProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME_OUT) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
             if (SetItemHoverProgress((*it), newProgress, false))
