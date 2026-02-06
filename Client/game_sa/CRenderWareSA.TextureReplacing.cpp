@@ -248,37 +248,37 @@ namespace
     // Clear all TXD texture map caches (call at session reset or bulk operations)
     static void ClearTxdTextureMapCache()
     {
-        g_TxdTextureMapCache.clear();
-    }
-
-    // Get or build texture map for a TXD slot with caching
-    // Returns pointer to cached map (valid until cache invalidation) or nullptr if pTxd is null
-    static const TxdTextureMap* GetCachedTxdTextureMap(unsigned short usTxdId, RwTexDictionary* pTxd)
-    {
-        if (!pTxd)
-            return nullptr;
-
-        SCachedTxdTextureMap& entry = g_TxdTextureMapCache[usTxdId];
-
-        if (!entry.IsValid(pTxd))
-        {
-            entry.pTxd = pTxd;
-            entry.textureMap.clear();
-            BuildTxdTextureMapFast(pTxd, entry.textureMap);
-        }
-
-        return &entry.textureMap;
+        // Use swap idiom to ensure complete memory release on reconnect
+        // This forces deallocation of unordered_map buckets; .clear() might retain capacity.
+        // Safe: no TXD pool access, called early in StaticReset before heap-corrupting operations
+        decltype(g_TxdTextureMapCache) temp;
+        g_TxdTextureMapCache.swap(temp);
     }
 
     // Build or retrieve cached texture map and merge into output map
     // Use when building combined maps (parent + child + vehicle fallback)
     static void MergeCachedTxdTextureMap(unsigned short usTxdId, RwTexDictionary* pTxd, TxdTextureMap& outMap)
     {
-        const TxdTextureMap* pCached = GetCachedTxdTextureMap(usTxdId, pTxd);
-        if (!pCached)
+        if (!pTxd)
             return;
 
-        for (const auto& kv : *pCached)
+        SCachedTxdTextureMap& entry = g_TxdTextureMapCache[usTxdId];
+
+        if (entry.IsValid(pTxd))
+        {
+            for (const auto& kv : entry.textureMap)
+                outMap[kv.first] = kv.second;
+            return;
+        }
+
+        entry.pTxd = pTxd;
+        // Use swap idiom to ensure complete memory release
+        // (avoids reconnect leaks; safer than .clear() on potentially corrupted maps)
+        TxdTextureMap temp;
+        entry.textureMap.swap(temp);
+        BuildTxdTextureMapFast(pTxd, entry.textureMap);
+
+        for (const auto& kv : entry.textureMap)
             outMap[kv.first] = kv.second;
     }
 
