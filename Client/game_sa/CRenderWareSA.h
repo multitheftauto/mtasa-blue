@@ -34,6 +34,7 @@ public:
                                   SString* pOutError = nullptr) override;
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
+    void ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures) override;
     void CleanupIsolatedTxdForModel(unsigned short usModelId) override;
     void StaticResetModelTextureReplacing();
     void StaticResetShaderSupport();

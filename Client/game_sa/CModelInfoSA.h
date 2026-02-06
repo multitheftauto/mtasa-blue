@@ -504,8 +504,9 @@ public:
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;
 
-    bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
+    bool IsDynamic() override { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
     bool IsDamageableAtomic() override;
+    void ClearCustomModel() override;
 
     static bool IsVehicleModel(std::uint32_t model) noexcept;
 

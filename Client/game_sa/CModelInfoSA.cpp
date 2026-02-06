@@ -2255,6 +2255,11 @@ void CModelInfoSA::RestoreOriginalModel()
     m_pCustomClump = nullptr;
 }
 
+void CModelInfoSA::ClearCustomModel()
+{
+    m_pCustomClump = nullptr;
+}
+
 void CModelInfoSA::SetColModel(CColModel* pColModel)
 {
     if (!pColModel)

@@ -25,6 +25,18 @@ CClientTXD::~CClientTXD()
         return;
     }
 
+    bool bInDeleteAll = g_pClientGame && g_pClientGame->GetElementDeleter()->IsBeingDeleted(this);
+
+    // During DoDeleteAll (arbitrary element destruction order), remove tracking state
+    // to prevent dangling pointer access. Skip full cleanup which would access RW data
+    // that may already be corrupted by other elements' destructors. Normal resource
+    // cleanup (engineRestoreTXD, resource stop) uses the full path below.
+    if (bInDeleteAll)
+    {
+        g_pGame->GetRenderWare()->ModelInfoTXDDeferCleanup(&m_ReplacementTextures);
+        return;
+    }
+
     const auto usedTxdIdsSnapshot = m_ReplacementTextures.usedInTxdIds;
 
     g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);
