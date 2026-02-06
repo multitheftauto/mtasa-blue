@@ -89,9 +89,9 @@ inline constexpr std::string_view DEBUG_PREFIX_EXCEPTION_INFO = "ExceptionInfo: 
 inline constexpr std::string_view DEBUG_PREFIX_WATCHDOG = "WATCHDOG: ";
 inline constexpr std::string_view DEBUG_SEPARATOR = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 // Helpers implemented in CrashHandler.cpp to avoid __try in inline functions
-void OutputDebugStringSafeImpl(const char* message);
-void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
-void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
+void                     OutputDebugStringSafeImpl(const char* message);
+void                     SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
+void                     SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
 extern thread_local bool g_bCrashHandlerStackOverflow;
 
 // Helper to safely call OutputDebugStringA with SEH guards
