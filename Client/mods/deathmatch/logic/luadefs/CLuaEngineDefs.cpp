@@ -170,7 +170,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestream", ArgumentParser<EngineRestream>},
         {"engineSetModelAnimation", ArgumentParser<EngineSetModelAnimation>},
         {"engineRestoreModelAnimation", ArgumentParser<EngineRestoreModelAnimation>},
-        
+
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
         // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
@@ -2744,7 +2744,8 @@ void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
     g_pClientGame->Restream(option);
 }
 
-bool CLuaEngineDefs::EngineSetModelAnimation(std::uint16_t modelId, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName, std::optional<std::uint16_t> flags)
+bool CLuaEngineDefs::EngineSetModelAnimation(std::uint16_t modelId, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil,
+                                             std::optional<std::string> animationName, std::optional<std::uint16_t> flags)
 {
     if (!CClientObjectManager::IsValidModel(modelId) && !CClientBuildingManager::IsValidModel(modelId))
         throw std::invalid_argument("Invalid model ID");
@@ -2801,7 +2802,7 @@ void CLuaEngineDefs::EngineRestoreModelAnimation(std::uint16_t modelId)
     }
 
     modelInfo->SetObjectAnimation(nullptr, 0, 0);
-    
+
     m_pManager->GetObjectManager()->RestreamObjects(modelId);
     m_pManager->GetBuildingManager()->RestreamBuildings(modelId);
 }

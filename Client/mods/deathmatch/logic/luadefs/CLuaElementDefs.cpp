@@ -2527,7 +2527,8 @@ bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexc
     return entity->SetOnFire(onFire);
 }
 
-bool CLuaElementDefs::SetElementAnimation(CClientEntity* entity, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName, std::optional<std::uint16_t> flags)
+bool CLuaElementDefs::SetElementAnimation(CClientEntity* entity, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil,
+                                          std::optional<std::string> animationName, std::optional<std::uint16_t> flags)
 {
     if (!IS_OBJECT(entity) && !IS_BUILDING(entity))
         return false;

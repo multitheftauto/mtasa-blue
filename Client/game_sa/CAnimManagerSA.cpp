@@ -462,7 +462,8 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* p
     return BlendAnimation(pClump, pHierarchy->GetInterface(), ID, fBlendDelta);
 }
 
-std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pHierarchyInterface, int ID, float fBlendDelta)
+std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pHierarchyInterface, int ID,
+                                                                      float fBlendDelta)
 {
     if (!pClump)
         return nullptr;
@@ -483,8 +484,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* p
     }
 
     // clang-format on
-    if (pInterface)
-        return std::make_unique<CAnimBlendAssociationSA>(pInterface);
+    if (pInterface) return std::make_unique<CAnimBlendAssociationSA>(pInterface);
 
     return nullptr;
 }

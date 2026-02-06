@@ -171,14 +171,14 @@ public:
     {
         struct
         {
-            unsigned char bHasBeenPreRendered : 1;            // we use this because we need to apply changes only once
-            unsigned char bAlphaTransparency : 1;             // bDrawLast
+            unsigned char bHasBeenPreRendered : 1;  // we use this because we need to apply changes only once
+            unsigned char bAlphaTransparency : 1;   // bDrawLast
             unsigned char bAdditiveRender : 1;
             unsigned char bDontWriteZBuffer : 1;
             unsigned char bDontCastShadowsOn : 1;
             unsigned char bDoWeOwnTheColModel : 1;
             unsigned char bIsBackfaceCulled : 1;
-            unsigned char bIsColLoaded : 1;            // isLod
+            unsigned char bIsColLoaded : 1;  // isLod
 
             union
             {
@@ -189,7 +189,7 @@ public:
                     unsigned char     bAtomicFlag0x200 : 1;
                     unsigned char     bDontCollideWithFlyer : 1;
                     eModelSpecialType eSpecialModelType : 4;
-                    unsigned char     bWetRoadReflection : 1;            // Used for tags
+                    unsigned char     bWetRoadReflection : 1;  // Used for tags
                 };
 
                 // Vehicle flags
@@ -559,12 +559,22 @@ public:
     void           RestoreObjectPropertiesGroup();
     static void    RestoreAllObjectsPropertiesGroups();
 
-    void SetObjectAnimation(CAnimBlendHierarchySAInterface* anim, unsigned int blockNameHash, std::uint16_t flags) noexcept override { m_objectAimation = anim; InsertModelIntoModifiedAnimList(m_dwModelID); m_objectAnimationBlockNameHash = blockNameHash; m_animationFlags = static_cast<eAnimationFlags>(flags); }
+    void SetObjectAnimation(CAnimBlendHierarchySAInterface* anim, unsigned int blockNameHash, std::uint16_t flags) noexcept override
+    {
+        m_objectAimation = anim;
+        InsertModelIntoModifiedAnimList(m_dwModelID);
+        m_objectAnimationBlockNameHash = blockNameHash;
+        m_animationFlags = static_cast<eAnimationFlags>(flags);
+    }
     CAnimBlendHierarchySAInterface* GetObjectAnimation() const noexcept override { return m_objectAimation; }
     unsigned int                    GetObjectAnimationBlockNameHash() const noexcept override { return m_objectAnimationBlockNameHash; }
     eAnimationFlags                 GetObjectAnimationFlags() const noexcept override { return m_animationFlags; }
 
-    void DisableObjectAnimation(bool disable) noexcept override { m_objectAnimationDisabled = disable; InsertModelIntoModifiedAnimList(m_dwModelID); }
+    void DisableObjectAnimation(bool disable) noexcept override
+    {
+        m_objectAnimationDisabled = disable;
+        InsertModelIntoModifiedAnimList(m_dwModelID);
+    }
     bool IsObjectAnimationDisabled() const noexcept override { return m_objectAnimationDisabled; }
 
     // Vehicle towing functions

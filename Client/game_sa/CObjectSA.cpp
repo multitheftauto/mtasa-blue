@@ -351,7 +351,8 @@ void CObjectSA::SetAnimation(CAnimBlendHierarchySAInterface* animation, eAnimati
         pGame->GetAnimManager()->BlendAnimation(clump, animation, flags, 1.0f);
     else
     {
-        for (auto assoc = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(clump); assoc; assoc = pGame->GetAnimManager()->RpAnimBlendGetNextAssociation(assoc))
+        for (auto assoc = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(clump); assoc;
+             assoc = pGame->GetAnimManager()->RpAnimBlendGetNextAssociation(assoc))
         {
             // Disable playing flag
             short flags = assoc->GetFlags();

@@ -3288,7 +3288,7 @@ RpClump* __fastcall CClumpModelInfoSAInterface::CreateInstance(CClumpModelInfoSA
     if (clumpModelInfo->bHasAnimBlend)
     {
         CAnimBlendHierarchySAInterface* anim = nullptr;
-        auto* modelInfo = pGame->GetModelInfo(static_cast<CBaseModelInfoSAInterface*>(clumpModelInfo));
+        auto*                           modelInfo = pGame->GetModelInfo(static_cast<CBaseModelInfoSAInterface*>(clumpModelInfo));
         eAnimationFlags                 flags = ANIMATION_IS_LOOPED;
 
         if (clumpModelInfo->m_nAnimFileIndex != -1)

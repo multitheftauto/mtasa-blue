@@ -401,7 +401,7 @@ bool CRenderWareSA::DoContainHAnimPLG(const SString& filename, const SString& bu
                     animChunks++;
 
                 RwStreamSkip(streamModel, subChunkLength);
-                extensionChunkSize -= (subChunkLength + 12); // 12 bytes for chunk header
+                extensionChunkSize -= (subChunkLength + 12);  // 12 bytes for chunk header
             }
         }
 
@@ -413,8 +413,7 @@ bool CRenderWareSA::DoContainHAnimPLG(const SString& filename, const SString& bu
     // Close the stream
     RwStreamClose(streamModel, nullptr);
     return animChunks > 0;
-} 
-
+}
 
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles

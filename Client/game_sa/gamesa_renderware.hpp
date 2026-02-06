@@ -97,7 +97,6 @@ void InitRwFunctions()
     RtAnimInterpolatorSetCurrentAnim = reinterpret_cast<RtAnimInterpolatorSetCurrentAnim_t>(0x7CD5A0);
     RpAnimBlendClumpInit = reinterpret_cast<RpAnimBlendClumpInit_t>(0x4D6720);
     RpAnimBlendClumpIsInitialized = reinterpret_cast<RpAnimBlendClumpIsInitialized_t>(0x4D6760);
-    
 
     SetTextureDict = (SetTextureDict_t)0x007319C0;
     LoadClumpFile = (LoadClumpFile_t)0x005371F0;

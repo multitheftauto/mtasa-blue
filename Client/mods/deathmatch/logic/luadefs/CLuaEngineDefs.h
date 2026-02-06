@@ -99,7 +99,8 @@ public:
     static bool EngineRestreamModel(std::uint16_t modelId);
     static void EngineRestream(std::optional<RestreamOption> option);
 
-    static bool EngineSetModelAnimation(std::uint16_t modelId, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil, std::optional<std::string> animationName, std::optional<std::uint16_t> flags);
+    static bool EngineSetModelAnimation(std::uint16_t modelId, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil,
+                                        std::optional<std::string> animationName, std::optional<std::uint16_t> flags);
     static void EngineRestoreModelAnimation(std::uint16_t modelId);
 
 private:
