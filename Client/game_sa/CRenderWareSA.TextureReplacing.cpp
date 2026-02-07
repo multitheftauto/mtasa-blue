@@ -418,7 +418,23 @@ namespace
             return;
 
         RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
-        TxdTextureMap    parentTxdMap;
+
+        // Request parent TXD to load if not already loaded - required for texture restoration.
+        // Without this, restoration fails when parent TXD is unloaded, leaving us with
+        // dangling texture pointers that later get their rasters nullified, causing "white textures" bug.
+        if (!pParentTxd && pGame && pGame->GetStreaming())
+        {
+            const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+            if (iBaseIDforTXD > 0)
+            {
+                const unsigned int uiTxdStreamId = usParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                pGame->GetStreaming()->LoadAllRequestedModels(true, "RestoreModelTexturesToParent-parentTxd");
+                pParentTxd = CTxdStore_GetTxd(usParentTxdId);
+            }
+        }
+
+        TxdTextureMap parentTxdMap;
         if (pParentTxd)
         {
             MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdMap);
@@ -3858,7 +3874,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 }
 
 // Clean up isolated TXD slot for model (destroy copy textures, clear bookkeeping)
-void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
+// bSkipStreamingLoads: When true, skip blocking streaming loads (use during session reset when streaming system may be unsafe)
+void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bSkipStreamingLoads)
 {
     if (!pGame)
         return;
@@ -3878,8 +3895,32 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId)
     const unsigned short usIsolatedTxdId = itModelInfo->second.usTxdId;
     const bool           bNeedsVehicleFallback = itModelInfo->second.bNeedsVehicleFallback;
 
+    // Check if model has loaded geometry that needs texture restoration.
+    // If not loaded, there's no geometry to restore textures for, so we can skip
+    // the parent TXD load and texture swap.. then, only bookkeeping cleanup is needed.
+    auto*      pModelInfoForRestore = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
+    const bool bModelHasGeometry = pModelInfoForRestore && pModelInfoForRestore->GetRwObject();
+
     RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
-    TxdTextureMap    parentTxdTextureMap;
+
+    // Request parent TXD to load if not already loaded - required for texture restoration.
+    // Without this, restoration fails when parent TXD is unloaded, leaving model geometry
+    // with dangling texture pointers that later get their rasters nullified, causing white textures.
+    // Only needed when model has loaded geometry whose textures need restoring.
+    // Skip during session reset (bSkipStreamingLoads) when streaming system may be in shutdown state.
+    if (!pParentTxd && bModelHasGeometry && !bSkipStreamingLoads && pGame->GetStreaming())
+    {
+        const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+        if (iBaseIDforTXD > 0)
+        {
+            const unsigned int uiTxdStreamId = usParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+            pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+            pGame->GetStreaming()->LoadAllRequestedModels(true, "CleanupIsolatedTxdForModel-parentTxd");
+            pParentTxd = CTxdStore_GetTxd(usParentTxdId);
+        }
+    }
+
+    TxdTextureMap parentTxdTextureMap;
     if (pParentTxd)
         MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdTextureMap);
 
@@ -4986,7 +5027,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             modelIds.push_back(pair.first);
 
         for (unsigned short modelId : modelIds)
-            CleanupIsolatedTxdForModel(modelId);
+            CleanupIsolatedTxdForModel(modelId, true);  // Skip streaming loads during session reset
     }
 
     // Retry orphaned isolated TXD slots (should be empty after per-model cleanup).
