@@ -182,6 +182,7 @@ namespace
     uint32_t g_uiLastOrphanLogTime = 0;
     uint32_t g_uiLastAdoptLogTime = 0;
     uint32_t g_uiLastPoolDenyLogTime = 0;
+    uint32_t g_uiLastLeakCapacityLogTime = 0;
     uint32_t g_uiLastIsolationFailLogTime = 0;
     int      g_iCachedPoolSize = 0;
     int      g_iCachedUsedSlots = 0;
@@ -360,7 +361,7 @@ namespace
     }
 
     void RemoveShaderEntryByD3DData(unsigned short usTxdId, CD3DDUMMY* pD3DData);
-    void SafeOrphanTexture(RwTexture* pTexture);
+    void SafeOrphanTexture(RwTexture* pTexture, unsigned short usTxdIdHint = 0xFFFF);
 
     static void RemoveTxdFromReplacementTracking(unsigned short usTxdId)
     {
@@ -933,6 +934,10 @@ namespace
                     continue;
             }
 
+            // Don't reclaim if replacements are queued but not yet applied
+            if (g_PendingReplacementByModel.count(usModelId) > 0)
+                continue;
+
             const unsigned short usParentTxdId = itIsolated->second.usParentTxdId;
 
             // Skip if parent TXD not loaded - can't safely revert
@@ -1247,7 +1252,7 @@ namespace
     constexpr uint32_t MAX_TEXTURE_DIMENSION = 0x80000000;
 
     // Properly unlink texture from TXD to prevent list corruption
-    void SafeOrphanTexture(RwTexture* pTexture)
+    void SafeOrphanTexture(RwTexture* pTexture, unsigned short usTxdIdHint)
     {
         if (!pTexture)
             return;
@@ -1258,7 +1263,10 @@ namespace
             CRenderWareSA::RwTexDictionaryRemoveTexture(pCurrentTxd, pTexture);
 
             // Invalidate texture map cache since TXD contents changed
-            ClearTxdTextureMapCache();
+            if (usTxdIdHint != 0xFFFF)
+                InvalidateTxdTextureMapCache(usTxdIdHint);
+            else
+                ClearTxdTextureMapCache();
 
             pTexture->TXDList.next = &pTexture->TXDList;
             pTexture->TXDList.prev = &pTexture->TXDList;
@@ -2845,8 +2853,12 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
                         CRenderWareSA::DebugTxdRemoveRef(usTxdId, "GetModelTexturesInfo-stale-id-changed");
                     else if (info.bHasLeakedTextures)
+                    {
                         if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
                             g_PendingLeakedTxdRefs.insert(usTxdId);
+                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                            AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", usTxdId));
+                    }
                     MapRemove(ms_ModelTexturesInfoMap, usTxdId);
                     return nullptr;
                 }
@@ -2880,8 +2892,12 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
                         CRenderWareSA::DebugTxdRemoveRef(usTxdId, "GetModelTexturesInfo-blocking-fail");
                     else if (info.bHasLeakedTextures)
+                    {
                         if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
                             g_PendingLeakedTxdRefs.insert(usTxdId);
+                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                            AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", usTxdId));
+                    }
                     MapRemove(ms_ModelTexturesInfoMap, usTxdId);
                     return nullptr;
                 }
@@ -3274,7 +3290,6 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     CModelTexturesInfo* pInfo = GetModelTexturesInfo(usModelId, "ModelInfoTXDAddTextures-first");
     if (!pInfo)
     {
-        auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
         if (!pModelInfo)
         {
             AddReportLog(9401, SString("ModelInfoTXDAddTextures: No model info for model %u", usModelId));
@@ -4091,10 +4106,12 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                     if (!IsReadableTexture(pTex))
                         continue;
 
-                    if (bTxdOk && pTex->txd == pTxd)
-                        SafeOrphanTexture(pTex);
+                    bool bWasInIsolatedTxd = (bTxdOk && pTex->txd == pTxd);
+                    if (bWasInIsolatedTxd)
+                        SafeOrphanTexture(pTex, usIsolatedTxdId);
 
-                    if (pTex->txd == nullptr)
+                    // Only null raster for textures we just orphaned from this TXD
+                    if (bWasInIsolatedTxd && pTex->txd == nullptr)
                         pTex->raster = nullptr;
                 }
 
@@ -5100,6 +5117,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_uiLastOrphanLogTime = uiNow;
     g_uiLastAdoptLogTime = uiNow;
     g_uiLastPoolDenyLogTime = uiNow;
+    g_uiLastLeakCapacityLogTime = uiNow;
     g_uiLastIsolationFailLogTime = uiNow;
 
     g_IsolatedTxdLastUseTime.clear();
@@ -5220,6 +5238,8 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                         }
                         if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
                             g_PendingLeakedTxdRefs.insert(txdId);
+                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                            AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", txdId));
                         g_PermanentlyLeakedTxdSlots.insert(txdId);
                         it = g_OrphanedIsolatedTxdSlots.erase(it);
                         continue;
@@ -5389,7 +5409,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         bool allOrphaned = true;
         for (RwTexture* pTex : currentTextures)
         {
-            SafeOrphanTexture(pTex);
+            SafeOrphanTexture(pTex, txdId);
 
             if (pTex && pTex->txd != nullptr)
             {
