@@ -17,17 +17,11 @@
 #include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
 #include "CAjaxResourceHandler.h"
 #include "CWebAppAuth.h"  // IPC code generation
+#include "Wine.h"
 #include <cstdlib>
 
 namespace
 {
-    // Helper to detect Wine/Proton environment
-    bool IsRunningOnWine()
-    {
-        HMODULE hNtdll = GetModuleHandle("ntdll.dll");
-        return hNtdll && GetProcAddress(hNtdll, "wine_get_version");
-    }
-
     // Centralises command-line switch setup so both pre-launch callbacks stay in sync
     void ConfigureCommandLineSwitches(const CefRefPtr<CefCommandLine>& commandLine, const CefString& processType)
     {
@@ -89,7 +83,7 @@ namespace
         }
 
         // Wine/Proton compatibility: Allow GPU unless explicitly disabled or forced software
-        if (IsRunningOnWine())
+        if (Wine::IsRunningOnWine())
         {
             if (std::getenv("MTA_FORCE_SOFTWARE_RENDERING"))
             {

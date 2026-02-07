@@ -25,6 +25,23 @@ CClientTXD::~CClientTXD()
         return;
     }
 
+    bool bInDeleteAll = g_pClientGame && g_pClientGame->GetElementDeleter()->IsBeingDeleted(this);
+
+    // During DoDeleteAll (arbitrary element destruction order), remove tracking state
+    // to prevent dangling pointer access. Skip full cleanup which would access RW data
+    // that may already be corrupted by other elements' destructors. Normal resource
+    // cleanup (engineRestoreTXD, resource stop) uses the full path below.
+    if (bInDeleteAll)
+    {
+        g_pGame->GetRenderWare()->ModelInfoTXDDeferCleanup(&m_ReplacementTextures);
+
+        // Remove clothes buffer references so OnCStreaming_RequestModel_Mid
+        // won't serve up our soon-to-be-freed m_FileData pointer
+        g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_FileData.data());
+        g_pGame->GetRenderWare()->ClothesRemoveFile(m_FileData.data());
+        return;
+    }
+
     const auto usedTxdIdsSnapshot = m_ReplacementTextures.usedInTxdIds;
 
     g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);

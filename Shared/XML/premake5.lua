@@ -3,6 +3,7 @@ project "XML"
 	kind "SharedLib"
 	targetname "xmll"
 	targetdir(buildpath("server"))
+	clangtidy "On"
 
 	includedirs {
 		"../sdk",

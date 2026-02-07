@@ -89,11 +89,9 @@ bool CClientDFFManager::RestoreModel(unsigned short usModel)
     CClientDFF* pDFF = GetElementThatReplaced(usModel);
     if (pDFF)
     {
-        // Restore it
-        pDFF->RestoreModel(usModel);
-
-        // Success
-        return true;
+        // Restore it and return whether it was immediately restored
+        // Returns false if model is still loaded (entities using it)
+        return pDFF->RestoreModel(usModel);
     }
 
     // Nothing to restore

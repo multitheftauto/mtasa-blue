@@ -89,5 +89,10 @@ public:
     // Exported methods
     void SetWantedLevel(DWORD dwWantedLevel);
     void SetWantedLevelNoFlash(DWORD dwWantedLevel);
-    char GetWantedLevel() { return static_cast<char>(internalInterface->m_WantedLevel); };
+    char GetWantedLevel()
+    {
+        const std::uint32_t wantedLevel = (internalInterface != nullptr) ? internalInterface->m_WantedLevel : 0u;
+        const std::uint32_t clampedLevel = (wantedLevel > 6u) ? 6u : wantedLevel;
+        return static_cast<char>(clampedLevel);
+    };
 };
