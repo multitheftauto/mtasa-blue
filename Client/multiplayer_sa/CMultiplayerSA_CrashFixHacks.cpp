@@ -1698,9 +1698,9 @@ void _declspec(naked) HOOK_CrashFix_Misc38()
 // __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=numVerts, [esp+14]=stride
 // Returns D3D9VertexTypeSize[type] in EAX on all paths.
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_VBInstV3dNull    0x752AD0
-#define HOOKSIZE_CrashFix_VBInstV3dNull   7
-#define HOOKCHECK_CrashFix_VBInstV3dNull  0x51
+#define HOOKPOS_CrashFix_VBInstV3dNull   0x752AD0
+#define HOOKSIZE_CrashFix_VBInstV3dNull  7
+#define HOOKCHECK_CrashFix_VBInstV3dNull 0x51
 DWORD RETURN_CrashFix_VBInstV3dNull = 0x752AD7;
 DWORD ARRAY_D3D9VertexTypeSize = 0x874EF8;
 
@@ -1753,9 +1753,9 @@ void _declspec(naked) HOOK_CrashFix_VBInstV3dNull()
 //          [esp+14]=scale(float), [esp+18]=numVerts, [esp+1C]=stride
 // Returns D3D9VertexTypeSize[type] in EAX.
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_VBInstV3dMorphNull    0x753B60
-#define HOOKSIZE_CrashFix_VBInstV3dMorphNull   5
-#define HOOKCHECK_CrashFix_VBInstV3dMorphNull  0x51
+#define HOOKPOS_CrashFix_VBInstV3dMorphNull   0x753B60
+#define HOOKSIZE_CrashFix_VBInstV3dMorphNull  5
+#define HOOKCHECK_CrashFix_VBInstV3dMorphNull 0x51
 DWORD RETURN_CrashFix_VBInstV3dMorphNull = 0x753B65;
 
 void _declspec(naked) HOOK_CrashFix_VBInstV3dMorphNull()
