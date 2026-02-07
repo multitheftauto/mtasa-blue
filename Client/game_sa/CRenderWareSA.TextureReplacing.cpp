@@ -2601,6 +2601,33 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     if (usParentTxdId != static_cast<unsigned short>(-1))
                     {
                         RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
+
+                        // Load parent TXD if models with geometry need texture restoration
+                        if (!pParentTxd && pGame->GetStreaming())
+                        {
+                            bool bAnyModelHasGeometry = false;
+                            for (const auto& cacheEntry : modelInfoCache)
+                            {
+                                if (cacheEntry.second && cacheEntry.second->GetRwObject())
+                                {
+                                    bAnyModelHasGeometry = true;
+                                    break;
+                                }
+                            }
+
+                            if (bAnyModelHasGeometry)
+                            {
+                                const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+                                if (iBaseIDforTXD > 0)
+                                {
+                                    const unsigned int uiTxdStreamId = usParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                                    pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                                    pGame->GetStreaming()->LoadAllRequestedModels(true, "GetModelTexturesInfo-parentTxd");
+                                    pParentTxd = CTxdStore_GetTxd(usParentTxdId);
+                                }
+                            }
+                        }
+
                         if (pParentTxd)
                             MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdMap);
                     }
@@ -3384,6 +3411,36 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                         if (usParent != static_cast<unsigned short>(-1))
                         {
                             RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParent);
+
+                            // Load parent TXD if models with geometry need texture restoration
+                            if (!pParentTxd && pGame->GetStreaming())
+                            {
+                                bool bNeedRestore = false;
+                                for (unsigned short modelId : pReplacementTextures->usedInModelIds)
+                                {
+                                    if (auto* pMi = static_cast<CModelInfoSA*>(pGame->GetModelInfo(modelId)))
+                                    {
+                                        if (pMi->GetRwObject())
+                                        {
+                                            bNeedRestore = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (bNeedRestore)
+                                {
+                                    const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+                                    if (iBaseIDforTXD > 0)
+                                    {
+                                        const unsigned int uiTxdStreamId = usParent + static_cast<unsigned int>(iBaseIDforTXD);
+                                        pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                                        pGame->GetStreaming()->LoadAllRequestedModels(true, "ModelInfoTXDAddTextures-parentTxd");
+                                        pParentTxd = CTxdStore_GetTxd(usParent);
+                                    }
+                                }
+                            }
+
                             if (pParentTxd)
                                 BuildTxdTextureMapFast(pParentTxd, parentTxdTextureMap);
                         }
@@ -4432,6 +4489,39 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 if (usParent != static_cast<unsigned short>(-1))
                 {
                     RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParent);
+
+                    // Request parent TXD to load if not already loaded - required for texture restoration.
+                    // Without this, restoration fails when parent TXD is unloaded, leaving model geometry
+                    // with dangling texture pointers that cause white textures.
+                    // Only load if at least one model using this replacement has geometry to restore.
+                    if (!pParentTxd && pGame->GetStreaming())
+                    {
+                        bool bNeedRestore = false;
+                        for (unsigned short modelId : pReplacementTextures->usedInModelIds)
+                        {
+                            if (auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(modelId)))
+                            {
+                                if (pModelInfo->GetRwObject())
+                                {
+                                    bNeedRestore = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (bNeedRestore)
+                        {
+                            const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+                            if (iBaseIDforTXD > 0)
+                            {
+                                const unsigned int uiTxdStreamId = usParent + static_cast<unsigned int>(iBaseIDforTXD);
+                                pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                                pGame->GetStreaming()->LoadAllRequestedModels(true, "ModelInfoTXDRemoveTextures-parentTxd");
+                                pParentTxd = CTxdStore_GetTxd(usParent);
+                            }
+                        }
+                    }
+
                     if (pParentTxd)
                         BuildTxdTextureMapFast(pParentTxd, parentTxdTextureMap);
                 }
