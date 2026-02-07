@@ -2158,6 +2158,66 @@ namespace
             AddPendingIsolatedModel(usModelId);
         return true;
     }
+
+    // Rebind all materials of a single atomic to textures from the given combined texture map.
+    // Looks up each material's texture name (with internal name fallback) in the map and
+    // replaces the material's texture pointer if a match is found.
+    void RebindAtomicMaterialsFromMap(RpAtomic* pAtomic, const TxdTextureMap& txdTextureMap)
+    {
+        if (!pAtomic)
+            return;
+
+        RpGeometry* pGeometry = pAtomic->geometry;
+        if (!pGeometry)
+            return;
+
+        RpMaterials& materials = pGeometry->materials;
+        if (!materials.materials || materials.entries <= 0)
+            return;
+
+        constexpr int kMaxMaterials = 10000;
+        const int     materialCount = materials.entries;
+        if (materialCount > kMaxMaterials)
+            return;
+
+        for (int idx = 0; idx < materialCount; ++idx)
+        {
+            RpMaterial* pMaterial = materials.materials[idx];
+            if (!pMaterial)
+                continue;
+
+            RwTexture* pOldTexture = pMaterial->texture;
+            if (!pOldTexture)
+                continue;
+
+            const char* szTextureName = pOldTexture->name;
+            if (!szTextureName[0])
+                continue;
+
+            RwTexture* pCurrentTexture = nullptr;
+            if (strnlen(szTextureName, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
+            {
+                auto itFound = txdTextureMap.find(szTextureName);
+                if (itFound != txdTextureMap.end())
+                    pCurrentTexture = itFound->second;
+
+                if (!pCurrentTexture)
+                {
+                    const char* szInternalName = CRenderWareSA::GetInternalTextureName(szTextureName);
+                    if (szInternalName && szInternalName != szTextureName &&
+                        strnlen(szInternalName, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
+                    {
+                        auto itInternal = txdTextureMap.find(szInternalName);
+                        if (itInternal != txdTextureMap.end())
+                            pCurrentTexture = itInternal->second;
+                    }
+                }
+            }
+
+            if (pCurrentTexture && pCurrentTexture != pOldTexture)
+                RpMaterialSetTexture(pMaterial, pCurrentTexture);
+        }
+    }
 }
 
 // Process deferred parent TXD setup for per-model isolated TXDs
@@ -2401,67 +2461,17 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
                     case eModelInfoType::VEHICLE:
                     case eModelInfoType::CLUMP:
                     {
-                        RebindClumpTexturesToTxd(reinterpret_cast<RpClump*>(pRwObject), childTxdId);
+                        std::vector<RpAtomic*> atomicList;
+                        CRenderWareSA::GetClumpAtomicList(reinterpret_cast<RpClump*>(pRwObject), atomicList);
+                        for (RpAtomic* pAtomic : atomicList)
+                            RebindAtomicMaterialsFromMap(pAtomic, txdTextureMap);
                         break;
                     }
                     case eModelInfoType::ATOMIC:
                     case eModelInfoType::LOD_ATOMIC:
                     case eModelInfoType::TIME:
                     {
-                        auto* pAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
-                        if (pAtomic)
-                        {
-                            RpGeometry* pGeometry = pAtomic->geometry;
-                            if (pGeometry)
-                            {
-                                RpMaterials& materials = pGeometry->materials;
-                                if (materials.materials && materials.entries > 0)
-                                {
-                                    constexpr int kMaxMaterials = 10000;
-                                    const int     materialCount = materials.entries;
-                                    if (materialCount <= kMaxMaterials)
-                                    {
-                                        for (int idx = 0; idx < materialCount; ++idx)
-                                        {
-                                            RpMaterial* pMaterial = materials.materials[idx];
-                                            if (!pMaterial)
-                                                continue;
-
-                                            RwTexture* pOldTexture = pMaterial->texture;
-                                            if (!pOldTexture)
-                                                continue;
-
-                                            const char* szTextureName = pOldTexture->name;
-                                            if (!szTextureName[0])
-                                                continue;
-
-                                            RwTexture* pCurrentTexture = nullptr;
-                                            if (strnlen(szTextureName, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
-                                            {
-                                                auto itFound = txdTextureMap.find(szTextureName);
-                                                if (itFound != txdTextureMap.end())
-                                                    pCurrentTexture = itFound->second;
-
-                                                if (!pCurrentTexture)
-                                                {
-                                                    const char* szInternalName = CRenderWareSA::GetInternalTextureName(szTextureName);
-                                                    if (szInternalName && szInternalName != szTextureName &&
-                                                        strnlen(szInternalName, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
-                                                    {
-                                                        auto itInternal = txdTextureMap.find(szInternalName);
-                                                        if (itInternal != txdTextureMap.end())
-                                                            pCurrentTexture = itInternal->second;
-                                                    }
-                                                }
-                                            }
-
-                                            if (pCurrentTexture && pCurrentTexture != pOldTexture)
-                                                RpMaterialSetTexture(pMaterial, pCurrentTexture);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        RebindAtomicMaterialsFromMap(reinterpret_cast<RpAtomic*>(pRwObject), txdTextureMap);
                         break;
                     }
                     default:
