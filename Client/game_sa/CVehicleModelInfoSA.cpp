@@ -15,10 +15,10 @@
 #include "enums/VehicleClass.h"
 
 #define NUM_DIRT_TEXTURES 16
-#define NUM_MAX_DESCS 12
+#define NUM_MAX_DESCS     12
 
-static RwTexture** ms_aDirtTextures = *(RwTexture*(*)[NUM_DIRT_TEXTURES])0xC02BD0;
-static RwObjectNameIdAssocation** ms_vehicleDescs = *(RwObjectNameIdAssocation*(*)[NUM_MAX_DESCS])0x8A7740;
+static RwTexture**                ms_aDirtTextures = *(RwTexture * (*)[NUM_DIRT_TEXTURES])0xC02BD0;
+static RwObjectNameIdAssocation** ms_vehicleDescs = *(RwObjectNameIdAssocation * (*)[NUM_MAX_DESCS])0x8A7740;
 
 static bool fixVehicleDirtLevel = false;
 
@@ -88,17 +88,18 @@ void CVehicleModelInfoSAInterface::SetDirtTextures(CVehicleModelInfoSAInterface*
 
 bool CVehicleModelInfoSAInterface::GetEditableMaterialListCB(RpAtomic* atomic, void* data)
 {
-    RpGeometryForAllMaterials(atomic->geometry,
+    RpGeometryForAllMaterials(
+        atomic->geometry,
         +[](RpMaterial* material, void* cbData) -> RpMaterial*
         {
-            auto* materialData = static_cast<VehicleMaterialCBData*>(cbData);
-            RwTexture*           tex = material->texture;
+            auto*      materialData = static_cast<VehicleMaterialCBData*>(cbData);
+            RwTexture* tex = material->texture;
             if (tex && std::strcmp(tex->name, "vehiclegrunge256") == 0)
                 materialData->modelInfo->m_dirtMaterials[materialData->numDirt++] = material;
 
             return material;
         },
-    data);
+        data);
 
     return true;
 }
@@ -132,13 +133,13 @@ void CVehicleModelInfoSAInterface::SetVehicleDirtLevelFixEnabled(bool enabled) n
 static void CVehicleModelInfo__SetClump()
 {
     _asm
-    {
+        {
         mov eax, [esp+8]
         push eax
         call CVehicleModelInfoSAInterface::SetClump
         add esp, 4
         retn 4
-    }
+        }
 }
 
 void CVehicleModelInfoSAInterface::StaticSetHooks()

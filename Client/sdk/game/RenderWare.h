@@ -41,7 +41,7 @@ typedef void                        RpWorld;
 typedef struct RpClump              RpClump;
 typedef struct RwRaster             RwRaster;
 typedef struct RpMaterialLighting   RpMaterialLighting;
-typedef struct RpMaterialList       RpMaterialList; // RpMaterials
+typedef struct RpMaterialList       RpMaterialList;  // RpMaterials
 typedef struct RpMaterial           RpMaterial;
 typedef struct RpTriangle           RpTriangle;
 typedef struct RwTextureCoordinates RwTextureCoordinates;
@@ -396,8 +396,8 @@ struct RpMaterial
 struct RpMaterials
 {
     RpMaterial** materials;
-    int          entries; // numMaterials
-    int          space; // space
+    int          entries;  // numMaterials
+    int          space;    // space
 };
 struct RpTriangle
 {
@@ -463,12 +463,12 @@ struct vehicleComponentFlags
 
 struct RwObjectNameIdAssocation
 {
-    char* name;
+    char*         name;
     std::uint32_t hierarchyId;
 
     union
     {
-        std::uint32_t flags;
+        std::uint32_t         flags;
         vehicleComponentFlags compFlags;
     };
 };
