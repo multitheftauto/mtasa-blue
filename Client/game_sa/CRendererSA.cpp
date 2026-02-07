@@ -73,7 +73,7 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
             RwRenderStateGet(rwRENDERSTATECULLMODE, &currentCullMode);
             RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(rwCULLMODECULLNONE));
         }
-      
+
         if (pRwObject->type == RP_TYPE_ATOMIC)
         {
             RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);

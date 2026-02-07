@@ -2148,7 +2148,8 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
     return true;
 }
 
-bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale, const std::optional<float> lighting, std::optional<bool> doubleSided)
+bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale,
+                                    const std::optional<float> lighting, std::optional<bool> doubleSided)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelID);
     if (!pModelInfo)
@@ -2162,5 +2163,6 @@ bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVe
 
     ConvertDegreesToRadians(rotation);
 
-    return g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo, CMatrix{position, rotation, scale.value_or(CVector{1.0f, 1.0f, 1.0f})}, lighting.value_or(0.0f), doubleSided.value_or(false));
+    return g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo, CMatrix{position, rotation, scale.value_or(CVector{1.0f, 1.0f, 1.0f})},
+                                                           lighting.value_or(0.0f), doubleSided.value_or(false));
 }

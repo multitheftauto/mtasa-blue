@@ -21,7 +21,7 @@
 #if (!defined(RWFORCEENUMSIZEINT))
     #define RWFORCEENUMSIZEINT ((std::int32_t)((~((std::uint32_t)0)) >> 1))
 #endif
-#define RWSRCGLOBAL(variable)                 ((*(RwGlobals**)0xC97B24)->variable) // 0xC97B24 = RwEngineInstance pointer
+#define RWSRCGLOBAL(variable)                 ((*(RwGlobals**)0xC97B24)->variable)  // 0xC97B24 = RwEngineInstance pointer
 #define RWRSTATE(a)                           (reinterpret_cast<void*>(a))
 #define RWPLUGINOFFSET(_type, _base, _offset) ((_type*)((std::uint8_t*)(_base) + (_offset)))
 #define RW_STRUCT_ALIGN                       ((int)((~((unsigned int)0)) >> 1))
@@ -714,17 +714,17 @@ struct RwError
 /*****************************************************************************/
 
 typedef bool (*RwSystemFunc)(std::int32_t, void*, void*, std::int32_t);
-using RwRenderStateSetFunction = bool(*)(RwRenderState, void*);
-using RwRenderStateGetFunction = bool(*)(RwRenderState, void*);
+using RwRenderStateSetFunction = bool (*)(RwRenderState, void*);
+using RwRenderStateGetFunction = bool (*)(RwRenderState, void*);
 
 struct RwDevice
 {
-    float        gammaCorrection;
-    RwSystemFunc fpSystem;
-    float        zBufferNear;
-    float        zBufferFar;
-    RwRenderStateSetFunction             fpRenderStateSet;
-    RwRenderStateGetFunction             fpRenderStateGet;
+    float                    gammaCorrection;
+    RwSystemFunc             fpSystem;
+    float                    zBufferNear;
+    float                    zBufferFar;
+    RwRenderStateSetFunction fpRenderStateSet;
+    RwRenderStateGetFunction fpRenderStateGet;
     // RwIm2DRenderLineFunction             fpIm2DRenderLine;
     // RwIm2DRenderTriangleFunction         fpIm2DRenderTriangle;
     // RwIm2DRenderPrimitiveFunction        fpIm2DRenderPrimitive;

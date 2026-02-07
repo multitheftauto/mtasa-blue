@@ -21,7 +21,10 @@ public:
         float       lighting;
         bool        doubleSided;
 
-        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f, bool doubleSided = false) : pModelInfo(pModelInfo), matrix(matrix), lighting(lighting), doubleSided(doubleSided) {}
+        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f, bool doubleSided = false)
+            : pModelInfo(pModelInfo), matrix(matrix), lighting(lighting), doubleSided(doubleSided)
+        {
+        }
     };
 
     bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting, bool doubleSided);
