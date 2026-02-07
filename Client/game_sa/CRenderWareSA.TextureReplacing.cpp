@@ -1294,12 +1294,15 @@ namespace
         {
             // Release D3D texture before destroying to prevent double-free on shared rasters
             void* pD3DRaw = pRaster->renderResource;
-            if (pD3DRaw && g_ReleasedD3DTextures.find(pD3DRaw) == g_ReleasedD3DTextures.end())
+            if (pD3DRaw)
             {
-                reinterpret_cast<IDirect3DTexture9*>(pD3DRaw)->Release();
-                g_ReleasedD3DTextures.insert(pD3DRaw);
+                if (g_ReleasedD3DTextures.find(pD3DRaw) == g_ReleasedD3DTextures.end())
+                {
+                    if (void* pReleased = TryReleaseTextureD3D(pTexture))
+                        g_ReleasedD3DTextures.insert(pReleased);
+                }
+                reinterpret_cast<void* volatile&>(pRaster->renderResource) = nullptr;
             }
-            reinterpret_cast<void* volatile&>(pRaster->renderResource) = nullptr;
         }
 
         RwTextureDestroy(pTexture);

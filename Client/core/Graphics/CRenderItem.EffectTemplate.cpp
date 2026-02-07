@@ -9,6 +9,7 @@
 
 #include "StdInc.h"
 #include "CRenderItem.EffectTemplate.h"
+#include <DXHook/CProxyDirect3DDevice9.h>
 #include <DXHook/CProxyDirect3DEffect.h>
 
 ///////////////////////////////////////////////////////////////
@@ -300,14 +301,22 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
         }
 
         // Try resetting samplers if 1st attempt failed
-        LPDIRECT3DDEVICE9 pDevice;
-        m_pD3DEffect->GetDevice(&pDevice);
-        for (uint i = 0; i < 16; i++)
+        CScopedActiveProxyDevice proxyDevice;
+        IDirect3DDevice9*        pSamplerDevice = proxyDevice ? static_cast<IDirect3DDevice9*>(proxyDevice.Get()) : nullptr;
+        LPDIRECT3DDEVICE9        pDevice = nullptr;
+        if (!pSamplerDevice && SUCCEEDED(m_pD3DEffect->GetDevice(&pDevice)) && pDevice)
+            pSamplerDevice = pDevice;
+
+        if (pSamplerDevice)
         {
-            pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-            pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-            pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            for (uint i = 0; i < 16; i++)
+            {
+                pSamplerDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                pSamplerDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+                pSamplerDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            }
         }
+        SAFE_RELEASE(pDevice);
     }
 
     // Set technique

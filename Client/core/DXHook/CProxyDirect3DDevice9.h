@@ -25,6 +25,7 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
     virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
     virtual ULONG __stdcall   AddRef();
     virtual ULONG __stdcall   Release();
+    HRESULT                   PresentWithoutProxy(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion);
 
     /*** IDirect3DDevice9 methods ***/
     virtual HRESULT __stdcall TestCooperativeLevel();
@@ -166,6 +167,8 @@ private:
     IDirect3DDevice9* m_pDevice;
     CDirect3DData*    m_pData;
     std::atomic<LONG> m_lRefCount;
+    std::atomic<LONG> m_deviceRefCount;
+    std::atomic<bool> m_bBeginSceneSuccess;
     uint64_t          m_registrationToken;
     HRESULT           m_lastTestCooperativeLevelResult;
 
@@ -566,6 +569,7 @@ extern CProxyDirect3DDevice9::SMemoryState     g_StaticMemoryState;
 
 // GTA scene tracking helpers
 void ResetGTASceneState();
+void SetSuspendDeviceStateCache(bool bSuspend);
 
 enum class ESceneOwner
 {

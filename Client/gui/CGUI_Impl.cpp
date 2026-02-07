@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "GuiCleanup.h"
 #include "CEGUIExceptions.h"
+#include <core/D3DProxyDeviceGuids.h>
 #include <SharedUtil.Misc.h>
 
 using std::list;
@@ -75,6 +76,20 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
       m_eInputMode(INPUTMODE_NO_BINDS_ON_EDIT),
       m_Channel(INPUT_CORE)
 {
+#ifdef MTA_DEBUG
+    {
+        IUnknown* pProxyMarker = nullptr;
+        const HRESULT hr =
+            pDevice ? pDevice->QueryInterface(CProxyDirect3DDevice9_GUID, reinterpret_cast<void**>(&pProxyMarker)) : E_POINTER;
+        if (SUCCEEDED(hr) && pProxyMarker)
+        {
+            pProxyMarker->Release();
+        }
+        else
+        {
+        }
+    }
+#endif
     m_RenderOkTimer.SetMaxIncrement(100);
 
     // Callback arrays are default-initialized to empty state by their constructors

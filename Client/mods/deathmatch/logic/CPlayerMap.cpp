@@ -172,6 +172,17 @@ void CPlayerMap::CreateAllTextures()
 
 void CPlayerMap::DoPulse()
 {
+    const uint uiViewportWidth = g_pCore->GetGraphics()->GetViewportWidth();
+    const uint uiViewportHeight = g_pCore->GetGraphics()->GetViewportHeight();
+    if (uiViewportWidth > 0 && uiViewportHeight > 0 &&
+        (m_bPendingViewportRefresh || m_uiWidth != uiViewportWidth || m_uiHeight != uiViewportHeight))
+    {
+        m_uiWidth = uiViewportWidth;
+        m_uiHeight = uiViewportHeight;
+        SetupMapVariables();
+        m_bPendingViewportRefresh = false;
+    }
+
     // If our map image exists
     if (IsPlayerMapShowing())
     {
@@ -207,6 +218,19 @@ void CPlayerMap::DoPulse()
             }
         }
     }
+}
+
+void CPlayerMap::MarkViewportRefreshPending()
+{
+    m_bPendingViewportRefresh = true;
+}
+
+void CPlayerMap::ClearMovementFlags()
+{
+    m_bIsMovingNorth = false;
+    m_bIsMovingSouth = false;
+    m_bIsMovingEast = false;
+    m_bIsMovingWest = false;
 }
 
 //
@@ -287,10 +311,58 @@ CTextureItem* CPlayerMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fL
 void CPlayerMap::DoRender()
 {
     bool isMapShowing = IsPlayerMapShowing();
+    if (isMapShowing)
+    {
+        g_pCore->GetGraphics()->RefreshViewportIfNeeded();
+        if (!g_pCore->GetGraphics()->GetRenderItemManager()->IsUsingDefaultRenderTarget())
+        {
+            g_pCore->GetGraphics()->GetRenderItemManager()->RestoreDefaultRenderTarget();
+        }
+        g_pCore->GetGraphics()->ApplyMTARenderViewportIfNeeded();
+        const uint uiViewportWidth = g_pCore->GetGraphics()->GetViewportWidth();
+        const uint uiViewportHeight = g_pCore->GetGraphics()->GetViewportHeight();
+        if (uiViewportWidth > 0 && uiViewportHeight > 0 &&
+            (m_bPendingViewportRefresh || m_uiWidth != uiViewportWidth || m_uiHeight != uiViewportHeight))
+        {
+            m_uiWidth = uiViewportWidth;
+            m_uiHeight = uiViewportHeight;
+            SetupMapVariables();
+            m_bPendingViewportRefresh = false;
+        }
+    }
 
     // Render if showing and textures are all loaded
     if (isMapShowing && !m_failedToLoadTextures)
     {
+        IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
+        D3DVIEWPORT9      prevViewport = {};
+        RECT              prevScissor = {};
+        DWORD             prevScissorEnable = FALSE;
+        bool              restoreViewport = false;
+        bool              restoreScissor = false;
+
+        if (pDevice && m_uiWidth > 0 && m_uiHeight > 0)
+        {
+            if (SUCCEEDED(pDevice->GetViewport(&prevViewport)))
+                restoreViewport = true;
+            if (SUCCEEDED(pDevice->GetScissorRect(&prevScissor)))
+                restoreScissor = true;
+            pDevice->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorEnable);
+
+            D3DVIEWPORT9 viewport = {};
+            viewport.X = 0;
+            viewport.Y = 0;
+            viewport.Width = m_uiWidth;
+            viewport.Height = m_uiHeight;
+            viewport.MinZ = 0.0f;
+            viewport.MaxZ = 1.0f;
+            pDevice->SetViewport(&viewport);
+
+            RECT fullRect = {0, 0, static_cast<LONG>(m_uiWidth), static_cast<LONG>(m_uiHeight)};
+            pDevice->SetScissorRect(&fullRect);
+            pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+        }
+
         // Get the alpha value from the settings
         int mapAlpha;
         g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
@@ -382,6 +454,15 @@ void CPlayerMap::DoRender()
         }
 
         g_pCore->GetGraphics()->DrawTexture(m_playerMarkerTexture, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f);
+
+        if (pDevice)
+        {
+            if (restoreViewport)
+                pDevice->SetViewport(&prevViewport);
+            if (restoreScissor)
+                pDevice->SetScissorRect(&prevScissor);
+            pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, prevScissorEnable);
+        }
     }
 
     // Update visibility of help text

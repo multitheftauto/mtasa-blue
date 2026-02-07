@@ -10,6 +10,8 @@
 #include "StdInc.h"
 #include "CRenderItem.EffectParameters.h"
 
+#include <DXHook/CProxyDirect3DDevice9.h>
+
 #include <cctype>
 #include <cstdlib>
 #include <limits>
@@ -377,6 +379,8 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
     m_pD3DEffect->GetDevice(&pDevice);
 
     bool bCanBindRenderTargets = (pDevice != nullptr);
+    CScopedActiveProxyDevice proxyDevice;
+    IDirect3DDevice9*        pStateDevice = proxyDevice ? static_cast<IDirect3DDevice9*>(proxyDevice.Get()) : pDevice;
     if (pDevice)
     {
         const HRESULT hrCooperativeLevel = pDevice->TestCooperativeLevel();
@@ -403,7 +407,8 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
                     HRESULT            hrSurface = ((IDirect3DTexture9*)pD3DTexture)->GetSurfaceLevel(0, &pD3DSurface);
                     if (hrSurface == D3D_OK && pD3DSurface)
                     {
-                        pDevice->SetRenderTarget(i + 1, pD3DSurface);
+                        if (pStateDevice)
+                            pStateDevice->SetRenderTarget(i + 1, pD3DSurface);
                         SAFE_RELEASE(pD3DSurface);
                     }
                 }
@@ -435,6 +440,8 @@ HRESULT CEffectParameters::End(bool bDeviceOperational)
     {
         LPDIRECT3DDEVICE9 pDevice = nullptr;
         m_pD3DEffect->GetDevice(&pDevice);
+        CScopedActiveProxyDevice proxyDevice;
+        IDirect3DDevice9*        pStateDevice = proxyDevice ? static_cast<IDirect3DDevice9*>(proxyDevice.Get()) : pDevice;
 
         if (pDevice)
         {
@@ -448,7 +455,8 @@ HRESULT CEffectParameters::End(bool bDeviceOperational)
             if (bCanTouchDevice)
             {
                 for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
-                    pDevice->SetRenderTarget(i + 1, nullptr);
+                    if (pStateDevice)
+                        pStateDevice->SetRenderTarget(i + 1, nullptr);
             }
 
             SAFE_RELEASE(pDevice);

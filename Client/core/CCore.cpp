@@ -128,6 +128,7 @@ CCore::CCore()
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
+    m_uiNextRenderTargetRetryTime = 0;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Create our Direct3DData handler.
@@ -2081,6 +2082,7 @@ void CCore::OnDeviceRestore()
 {
     m_iUnminimizeFrameCounter = 4;  // Tell script we have restored after 4 frames to avoid double sends
     m_bDidRecreateRenderTargets = true;
+    m_uiNextRenderTargetRetryTime = 0;
 }
 
 //
@@ -2104,6 +2106,13 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
+    const uint uiNow = GetTickCount32();
+    if (uiNow >= m_uiNextRenderTargetRetryTime)
+    {
+        CGraphics::GetSingleton().RetryInvalidRenderTargets();
+        m_uiNextRenderTargetRetryTime = uiNow + 250;
+    }
+
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff

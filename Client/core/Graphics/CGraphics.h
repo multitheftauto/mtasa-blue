@@ -170,6 +170,11 @@ public:
     CRenderItemManagerInterface* GetRenderItemManager() { return m_pRenderItemManager; }
     CScreenGrabberInterface*     GetScreenGrabber() { return m_pScreenGrabber; }
     CPixelsManagerInterface*     GetPixelsManager() { return m_pPixelsManager; }
+    void                         RetryInvalidRenderTargets()
+    {
+        if (m_pRenderItemManager)
+            m_pRenderItemManager->RetryInvalidRenderTargets();
+    }
 
     // Transition between GTA and MTA controlled rendering
     virtual void EnteringMTARenderZone();
@@ -201,6 +206,11 @@ public:
     void SetProgressMessage(const SString& strMessage);
     void DrawProgressMessage(bool bPreserveBackbuffer = true);
     void DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning);
+    void MarkViewportRefreshPending();
+    void RefreshViewportIfNeeded();
+    void ApplyMTARenderViewportIfNeeded();
+    void SetSkipMTARenderThisFrame(bool bSkip) { m_bSkipMTARenderThisFrame = bSkip; }
+    bool ShouldSkipMTARenderThisFrame() const { return m_bSkipMTARenderThisFrame; }
 
 private:
     void       OnDeviceCreate(IDirect3DDevice9* pDevice);
@@ -245,6 +255,12 @@ private:
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostFX = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
     CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
+    bool m_bSkipMTARenderThisFrame = false;
+    D3DVIEWPORT9 m_prevViewportForMTA = {};
+    RECT         m_prevScissorForMTA = {};
+    DWORD        m_prevScissorEnableForMTA = FALSE;
+    bool         m_bRestoreViewportAfterMTA = false;
+    bool         m_bRestoreScissorAfterMTA = false;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];
@@ -364,6 +380,7 @@ private:
     void RemoveQueueRef(CRenderItem* pRenderItem);
     void AddQueueRef(IUnknown* pUnknown);
     void RemoveQueueRef(IUnknown* pUnknown);
+    void UpdateRenderTargetMatrices(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
     // Drawing types
     struct ID3DXLine* m_pLineInterface = nullptr;
@@ -391,4 +408,13 @@ private:
     CElapsedTime                            m_ProgressAnimTimer;
     uint                                    m_uiProgressAnimFrame;
     std::map<SString, SCustomScaleFontInfo> m_CustomScaleFontMap;
+    bool                                    m_bPendingViewportRefresh = false;
+    uint                                    m_uiPendingViewportRefreshTries = 0;
+    uint                                    m_uiViewportRefreshSerial = 0;
+    uint                                    m_uiViewportLastAppliedSerial = 0;
+    bool                                    m_bPendingBackbufferOverrideAttempted = false;
+    bool                                    m_bForceFullViewportInMTA = false;
+    uint                                    m_uiForceViewportWidth = 0;
+    uint                                    m_uiForceViewportHeight = 0;
+    bool                                    m_bForceFullScissorInMTA = false;
 };
