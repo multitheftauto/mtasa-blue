@@ -378,7 +378,7 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
     LPDIRECT3DDEVICE9 pDevice = nullptr;
     m_pD3DEffect->GetDevice(&pDevice);
 
-    bool bCanBindRenderTargets = (pDevice != nullptr);
+    bool                     bCanBindRenderTargets = (pDevice != nullptr);
     CScopedActiveProxyDevice proxyDevice;
     IDirect3DDevice9*        pStateDevice = proxyDevice ? static_cast<IDirect3DDevice9*>(proxyDevice.Get()) : pDevice;
     if (pDevice)

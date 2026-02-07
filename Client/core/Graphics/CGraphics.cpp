@@ -1602,7 +1602,6 @@ void CGraphics::DrawTexture(CTextureItem* pTexture, float fX, float fY, float fS
     EndDrawBatch();
 }
 
-
 void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
 {
     m_pDevice = pDevice;
@@ -2123,7 +2122,7 @@ void CGraphics::RefreshViewportIfNeeded()
     uint targetHeight = viewport.Height;
     if (m_bPendingViewportRefresh && (viewport.Width <= kMinValidViewportSize || viewport.Height <= kMinValidViewportSize))
     {
-        D3DSURFACE_DESC   backBufferDesc = {};
+        D3DSURFACE_DESC    backBufferDesc = {};
         IDirect3DSurface9* pBackBuffer = nullptr;
         if (SUCCEEDED(m_pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer)) && pBackBuffer)
         {
@@ -2135,11 +2134,10 @@ void CGraphics::RefreshViewportIfNeeded()
             pBackBuffer->Release();
         }
     }
-    else if (m_bPendingViewportRefresh && !m_bPendingBackbufferOverrideAttempted &&
-             m_uiViewportLastAppliedSerial < m_uiViewportRefreshSerial &&
+    else if (m_bPendingViewportRefresh && !m_bPendingBackbufferOverrideAttempted && m_uiViewportLastAppliedSerial < m_uiViewportRefreshSerial &&
              viewport.Width == uiCachedWidth && viewport.Height == uiCachedHeight)
     {
-        D3DSURFACE_DESC   backBufferDesc = {};
+        D3DSURFACE_DESC    backBufferDesc = {};
         IDirect3DSurface9* pBackBuffer = nullptr;
         if (SUCCEEDED(m_pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer)) && pBackBuffer)
         {
@@ -2658,7 +2656,7 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
 
             // Flip backbuffer onto front buffer
             SAFE_RELEASE(pD3DBackBufferSurface);
-            IDirect3DDevice9* pPresentDevice = m_pDevice;
+            IDirect3DDevice9*        pPresentDevice = m_pDevice;
             CScopedActiveProxyDevice proxyDevice;
             if (proxyDevice && pPresentDevice == static_cast<IDirect3DDevice9*>(proxyDevice.Get()))
             {

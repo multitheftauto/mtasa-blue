@@ -160,9 +160,9 @@ void CClientTXD::RemovePendingImports()
     if (s_PendingTxdImports.empty())
         return;
 
-    s_PendingTxdImports.erase(std::remove_if(s_PendingTxdImports.begin(), s_PendingTxdImports.end(),
-                                            [this](const SPendingTxdImport& entry) { return entry.pTXD == this; }),
-                              s_PendingTxdImports.end());
+    s_PendingTxdImports.erase(
+        std::remove_if(s_PendingTxdImports.begin(), s_PendingTxdImports.end(), [this](const SPendingTxdImport& entry) { return entry.pTXD == this; }),
+        s_PendingTxdImports.end());
 }
 
 bool CClientTXD::ImportInternal(unsigned short usModelID, bool bAllowQueue)
@@ -256,7 +256,7 @@ bool CClientTXD::ImportInternal(unsigned short usModelID, bool bAllowQueue)
         if (bAllowQueue && IsDeviceLost())
         {
             const std::size_t kMaxPendingImports = 2048;
-            const uint32_t uiNow = GetTickCount32();
+            const uint32_t    uiNow = GetTickCount32();
 
             if (s_PendingTxdImports.size() >= kMaxPendingImports)
             {

@@ -78,9 +78,8 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
 {
 #ifdef MTA_DEBUG
     {
-        IUnknown* pProxyMarker = nullptr;
-        const HRESULT hr =
-            pDevice ? pDevice->QueryInterface(CProxyDirect3DDevice9_GUID, reinterpret_cast<void**>(&pProxyMarker)) : E_POINTER;
+        IUnknown*     pProxyMarker = nullptr;
+        const HRESULT hr = pDevice ? pDevice->QueryInterface(CProxyDirect3DDevice9_GUID, reinterpret_cast<void**>(&pProxyMarker)) : E_POINTER;
         if (SUCCEEDED(hr) && pProxyMarker)
         {
             pProxyMarker->Release();

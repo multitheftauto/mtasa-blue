@@ -212,8 +212,8 @@ void CVideoModeManager::PostCreateDevice(IDirect3DDevice9* pD3DDevice, D3DPRESEN
     {
         // `PostCreateDevice` intentionally operates on the real device (it may call Reset immediately).
         // Log if we ever see the proxy here, as that can introduce recursion/state tracking side-effects.
-        IUnknown*      pProxyMarker = nullptr;
-        const HRESULT  hr = pD3DDevice->QueryInterface(CProxyDirect3DDevice9_GUID, reinterpret_cast<void**>(&pProxyMarker));
+        IUnknown*     pProxyMarker = nullptr;
+        const HRESULT hr = pD3DDevice->QueryInterface(CProxyDirect3DDevice9_GUID, reinterpret_cast<void**>(&pProxyMarker));
         if (SUCCEEDED(hr) && pProxyMarker)
         {
             pProxyMarker->Release();

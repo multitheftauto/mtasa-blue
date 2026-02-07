@@ -25,7 +25,7 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
     virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
     virtual ULONG __stdcall   AddRef();
     virtual ULONG __stdcall   Release();
-    HRESULT                   PresentWithoutProxy(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion);
+    HRESULT                   PresentWithoutProxy(CONST RECT * pSourceRect, CONST RECT * pDestRect, HWND hDestWindowOverride, CONST RGNDATA * pDirtyRegion);
 
     /*** IDirect3DDevice9 methods ***/
     virtual HRESULT __stdcall TestCooperativeLevel();

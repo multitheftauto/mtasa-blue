@@ -174,8 +174,7 @@ void CPlayerMap::DoPulse()
 {
     const uint uiViewportWidth = g_pCore->GetGraphics()->GetViewportWidth();
     const uint uiViewportHeight = g_pCore->GetGraphics()->GetViewportHeight();
-    if (uiViewportWidth > 0 && uiViewportHeight > 0 &&
-        (m_bPendingViewportRefresh || m_uiWidth != uiViewportWidth || m_uiHeight != uiViewportHeight))
+    if (uiViewportWidth > 0 && uiViewportHeight > 0 && (m_bPendingViewportRefresh || m_uiWidth != uiViewportWidth || m_uiHeight != uiViewportHeight))
     {
         m_uiWidth = uiViewportWidth;
         m_uiHeight = uiViewportHeight;
@@ -321,8 +320,7 @@ void CPlayerMap::DoRender()
         g_pCore->GetGraphics()->ApplyMTARenderViewportIfNeeded();
         const uint uiViewportWidth = g_pCore->GetGraphics()->GetViewportWidth();
         const uint uiViewportHeight = g_pCore->GetGraphics()->GetViewportHeight();
-        if (uiViewportWidth > 0 && uiViewportHeight > 0 &&
-            (m_bPendingViewportRefresh || m_uiWidth != uiViewportWidth || m_uiHeight != uiViewportHeight))
+        if (uiViewportWidth > 0 && uiViewportHeight > 0 && (m_bPendingViewportRefresh || m_uiWidth != uiViewportWidth || m_uiHeight != uiViewportHeight))
         {
             m_uiWidth = uiViewportWidth;
             m_uiHeight = uiViewportHeight;

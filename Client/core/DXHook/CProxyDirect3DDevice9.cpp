@@ -295,7 +295,12 @@ void ResetGTASceneState()
 // Proxy constructor and destructor.
 // Constructor performs heavy initialization; defer global registration until the end to avoid exposing a partially built object.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
-    : m_pDevice(pDevice), m_pData(nullptr), m_lRefCount(1), m_deviceRefCount(0), m_bBeginSceneSuccess(false), m_registrationToken(0),
+    : m_pDevice(pDevice),
+      m_pData(nullptr),
+      m_lRefCount(1),
+      m_deviceRefCount(0),
+      m_bBeginSceneSuccess(false),
+      m_registrationToken(0),
       m_lastTestCooperativeLevelResult(D3D_OK)
 {
     struct DeviceRefGuard
@@ -879,8 +884,8 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
         ApplyBorderlessColorCorrection(this, *pPresentationParameters);
 
         // Update our data. Some windowed resets use 0x0 backbuffer sizes, so query the device.
-        const DWORD prevViewportWidth = m_pData->GetViewportWidth();
-        const DWORD prevViewportHeight = m_pData->GetViewportHeight();
+        const DWORD  prevViewportWidth = m_pData->GetViewportWidth();
+        const DWORD  prevViewportHeight = m_pData->GetViewportHeight();
         D3DVIEWPORT9 viewport = {};
         bool         haveViewport = false;
         if (SUCCEEDED(m_pDevice->GetViewport(&viewport)) && viewport.Width > 0 && viewport.Height > 0)

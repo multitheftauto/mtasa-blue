@@ -27,11 +27,11 @@ public:
                                    UINT PrimitiveCount);
     static HRESULT DrawPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex,
                                        UINT PrimitiveCount, CShaderItem* pShaderItem, bool bIsLayer);
-    static HRESULT OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType,
-                                          INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount);
-    static HRESULT DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType,
-                                              INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount,
-                                              CShaderItem* pShaderItem, bool bIsLayer, bool bCanBecomeActiveShader);
+    static HRESULT OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex,
+                                          UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount);
+    static HRESULT DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex,
+                                              UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount, CShaderItem* pShaderItem, bool bIsLayer,
+                                              bool bCanBecomeActiveShader);
     static HRESULT DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount);
     static HRESULT DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex,
                                                UINT NumVertices, UINT startIndex, UINT primCount);

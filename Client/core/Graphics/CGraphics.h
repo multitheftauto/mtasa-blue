@@ -255,12 +255,12 @@ private:
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostFX = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
     CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
-    bool m_bSkipMTARenderThisFrame = false;
-    D3DVIEWPORT9 m_prevViewportForMTA = {};
-    RECT         m_prevScissorForMTA = {};
-    DWORD        m_prevScissorEnableForMTA = FALSE;
-    bool         m_bRestoreViewportAfterMTA = false;
-    bool         m_bRestoreScissorAfterMTA = false;
+    bool                         m_bSkipMTARenderThisFrame = false;
+    D3DVIEWPORT9                 m_prevViewportForMTA = {};
+    RECT                         m_prevScissorForMTA = {};
+    DWORD                        m_prevScissorEnableForMTA = FALSE;
+    bool                         m_bRestoreViewportAfterMTA = false;
+    bool                         m_bRestoreScissorAfterMTA = false;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];

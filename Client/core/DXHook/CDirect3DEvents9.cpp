@@ -24,10 +24,10 @@
 #include "Graphics/CVideoModeManager.h"
 #include "Graphics/CRenderItem.EffectTemplate.h"
 
-std::atomic<bool>        g_bInMTAScene{false};
-extern std::atomic<bool> g_bInGTAScene;
+std::atomic<bool>             g_bInMTAScene{false};
+extern std::atomic<bool>      g_bInGTAScene;
 extern CProxyDirect3DDevice9* g_pProxyDevice;
-void                     ResetGTASceneState();
+void                          ResetGTASceneState();
 
 // Other variables
 static uint                 ms_RequiredAnisotropicLevel = 1;
@@ -784,8 +784,8 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, IDirect3DDe
 //
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType,
-                                              UINT StartVertex, UINT PrimitiveCount, CShaderItem* pShaderItem, bool bIsLayer)
+HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex,
+                                              UINT PrimitiveCount, CShaderItem* pShaderItem, bool bIsLayer)
 {
     if (!pShaderItem)
     {
@@ -917,8 +917,8 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, IDirect
 // May change render states for custom renderings
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType,
-                                                 INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount)
+HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex,
+                                                 UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734)
         return pDevice->DrawIndexedPrimitive(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
@@ -958,8 +958,8 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDir
     else
     {
         // Draw base shader
-        DrawIndexedPrimitiveShader(pDevice, pStateDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount,
-                                   pLayers->pBase, false, pLayers->layerList.empty());
+        DrawIndexedPrimitiveShader(pDevice, pStateDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->pBase,
+                                   false, pLayers->layerList.empty());
 
         // Draw each layer
         if (!pLayers->layerList.empty())
