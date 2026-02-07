@@ -3191,6 +3191,15 @@ namespace
 
             if (elapsed.count() >= static_cast<std::chrono::seconds::rep>(timeoutSecs))
             {
+#ifdef MTA_DEBUG
+                if (IsDebuggerPresent() == TRUE)
+                {
+                    g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
+                    std::this_thread::sleep_for(kCheckInterval);
+                    continue;
+                }
+#endif
+
                 AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)", static_cast<long long>(elapsed.count()), timeoutSecs));
 
                 const bool triggered = TriggerWatchdogException(targetThread.get(), targetThreadId);
