@@ -27,6 +27,7 @@
 #include "CGameSA.h"
 #include "CRenderWareSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
+#include "CTxdPoolSA.h"
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 
@@ -602,7 +603,10 @@ namespace
 
     using TxdTextureMap = std::unordered_map<const char*, RwTexture*, TxdTextureNameHash, TxdTextureNameEq>;
 
-    // Build name->texture map for a TXD slot. Keys point directly into RwTexture::name buffers.
+    // Build name->texture map for a TXD slot, including textures from parent TXDs.
+    // Walks the parent chain via the pool-level usParentIndex (the TXD parent linkage in SA).
+    // Keys point directly into RwTexture::name buffers.
+    // Iterates from outermost parent to child, so child textures overwrite parent on name conflict.
     TxdTextureMap BuildTxdTextureMap(unsigned short usTxdId)
     {
         TxdTextureMap result;
@@ -611,21 +615,63 @@ namespace
         if (!pTxd)
             return result;
 
-        std::vector<RwTexture*> txdTextures;
-        CRenderWareSA::GetTxdTextures(txdTextures, pTxd);
+        // Get the TXD pool for parent index lookups.
+        // TXD parents are tracked via CTextureDictonarySAInterface::usParentIndex
+        // (not via RwObject::parent. which is unused for TXDs).
+        CTxdPoolSA* pTxdPoolSA = pGame ? static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool()) : nullptr;
 
-        if (txdTextures.empty())
-            return result;
+        // Collect the TXD chain (child > parent > grandparent > ...) as pool IDs.
+        constexpr std::size_t kMaxChainDepth = 16;
+        unsigned short        chain[kMaxChainDepth];
+        std::size_t           chainLen = 0;
 
-        result.reserve(txdTextures.size());
-        for (RwTexture* pTexture : txdTextures)
+        for (unsigned short id = usTxdId; chainLen < kMaxChainDepth;)
         {
-            if (!pTexture)
+            // Cyclic? stop if we revisit a TXD ID
+            bool bCycle = false;
+            for (std::size_t j = 0; j < chainLen; ++j)
+            {
+                if (chain[j] == id)
+                {
+                    bCycle = true;
+                    break;
+                }
+            }
+            if (bCycle)
+                break;
+
+            chain[chainLen++] = id;
+
+            // Walk to parent via pool-level usParentIndex
+            if (!pTxdPoolSA)
+                break;
+
+            CTextureDictonarySAInterface* pSlot = pTxdPoolSA->GetTextureDictonarySlot(id);
+            if (!pSlot || pSlot->usParentIndex == static_cast<unsigned short>(-1))
+                break;
+
+            id = pSlot->usParentIndex;
+        }
+
+        // Iter from root (outermost parent) to child so child textures win on name conflict.
+        for (std::size_t i = chainLen; i > 0; --i)
+        {
+            RwTexDictionary* pChainTxd = CTxdStore_GetTxd(chain[i - 1]);
+            if (!pChainTxd)
                 continue;
 
-            const char* name = pTexture->name;
-            if (strnlen(name, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
-                result[name] = pTexture;
+            std::vector<RwTexture*> txdTextures;
+            CRenderWareSA::GetTxdTextures(txdTextures, pChainTxd);
+
+            for (RwTexture* pTexture : txdTextures)
+            {
+                if (!pTexture)
+                    continue;
+
+                const char* name = pTexture->name;
+                if (strnlen(name, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
+                    result[name] = pTexture;
+            }
         }
 
         return result;

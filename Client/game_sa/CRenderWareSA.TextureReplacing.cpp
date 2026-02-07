@@ -2049,8 +2049,14 @@ namespace
             g_uiLastTxdPoolWarnTime = uiNow;
         }
 
-        if (!bParentTxdLoaded)
-            pParentInfo->Request(NON_BLOCKING, "EnsureIsolatedTxdForRequestedModel-ParentTXD");
+        // Use blocking request to ensure parent TXD is loaded before child TXD allocation.
+        // Without this, ReadDFF may run with a NULL parent chain, causing white textures
+        bool bParentAvailable = bParentTxdLoaded;
+        if (!bParentAvailable)
+        {
+            pParentInfo->Request(BLOCKING, "EnsureIsolatedTxdForRequestedModel-ParentTXD");
+            bParentAvailable = (CTxdStore_GetTxd(usParentTxdId) != nullptr);
+        }
 
         const unsigned short usModelTxdId = pModelInfo->GetTextureDictionaryID();
         if (usModelTxdId != usParentTxdId)
@@ -2099,9 +2105,8 @@ namespace
 
         MarkTxdPoolCountDirty();
 
-        // If parent is already loaded, establish parent-child linkage now
-        // Otherwise, it will be deferred to ProcessPendingIsolatedModels
-        if (bParentTxdLoaded)
+        // Establish parent-child RW linkage if parent TXD is available
+        if (bParentAvailable)
             CTxdStore_SetupTxdParent(uiNewTxdId);
 
         // Initialize streaming info to mark this virtual TXD as loaded
@@ -2154,7 +2159,7 @@ namespace
 
         UpdateIsolatedTxdLastUse(usModelId);
 
-        if (!bParentTxdLoaded)
+        if (!bParentAvailable)
             AddPendingIsolatedModel(usModelId);
         return true;
     }
@@ -2204,8 +2209,7 @@ namespace
                 if (!pCurrentTexture)
                 {
                     const char* szInternalName = CRenderWareSA::GetInternalTextureName(szTextureName);
-                    if (szInternalName && szInternalName != szTextureName &&
-                        strnlen(szInternalName, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
+                    if (szInternalName && szInternalName != szTextureName && strnlen(szInternalName, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
                     {
                         auto itInternal = txdTextureMap.find(szInternalName);
                         if (itInternal != txdTextureMap.end())
