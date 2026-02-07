@@ -146,7 +146,8 @@ public:
     virtual void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) = 0;
 
     // Cleanup TXD slots created to isolate engineRequestModel clones.
-    virtual void CleanupIsolatedTxdForModel(unsigned short usModelId) = 0;
+    // bSkipStreamingLoads: When true, skip blocking streaming loads (use during session reset when streaming system may be unsafe)
+    virtual void CleanupIsolatedTxdForModel(unsigned short usModelId, bool bSkipStreamingLoads = false) = 0;
 
     // Rebind single atomic's material textures to current TXD textures
     virtual void RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId) = 0;
