@@ -125,7 +125,7 @@ namespace FPSLimiter
         if (pD3D9 && pD3D9->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &DisplayMode) == D3D_OK)
         {
             std::uint16_t validFps;
-            if (FPSLimits::IsValidAndSetValid(DisplayMode.RefreshRate, validFps))
+            if (FPSLimits::IsValidAndSetValid(static_cast<std::uint16_t>(DisplayMode.RefreshRate), validFps))
             {
                 return validFps;
             }

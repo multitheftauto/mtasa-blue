@@ -73,11 +73,15 @@ void CRenderWareSA::ClothesAddReplacement(char* pFileData, size_t fileSize, usho
     if (!pFileData)
         return;
 
+    const size_t streamingSizeBlocks = GetSizeInBlocks(fileSize);
+    if (streamingSizeBlocks > 0xFFFF)
+        return;
+
     if (pFileData != MapFindRef(ms_ReplacementClothesFileDataMap, usFileId))
     {
         MapSet(ms_ReplacementClothesFileDataMap, usFileId, pFileData);
         MapSet(ms_OriginalStreamingSizesMap, usFileId, g_clothesDirectory->GetModelStreamingSize(usFileId));
-        g_clothesDirectory->SetModelStreamingSize(usFileId, static_cast<std::uint16_t>(GetSizeInBlocks(fileSize)));
+        g_clothesDirectory->SetModelStreamingSize(usFileId, static_cast<std::uint16_t>(streamingSizeBlocks));
 
         clothesReplacementChanged = true;
     }
@@ -145,7 +149,10 @@ bool CRenderWareSA::ClothesAddFile(const char* fileData, std::size_t fileSize, c
         return false;
 
     DirectoryInfoSA entry{};
-    entry.m_streamingSize = static_cast<std::uint16_t>(GetSizeInBlocks(fileSize));
+    const size_t    streamingSizeBlocks = GetSizeInBlocks(fileSize);
+    if (streamingSizeBlocks > 0xFFFF)
+        return false;
+    entry.m_streamingSize = static_cast<std::uint16_t>(streamingSizeBlocks);
 
     std::size_t nameSize = sizeof(entry.m_name) - 1;
     std::strncpy(entry.m_name, fileName, nameSize);
@@ -172,6 +179,8 @@ bool CRenderWareSA::ClothesRemoveFile(char* fileData)
     if (!fileData)
         return false;
 
+    bool removed = false;
+
     for (auto iter = ms_ClothesFileDataMap.begin(); iter != ms_ClothesFileDataMap.end();)
     {
         if (iter->second == fileData)
@@ -181,12 +190,13 @@ bool CRenderWareSA::ClothesRemoveFile(char* fileData)
 
             iter = ms_ClothesFileDataMap.erase(iter);
             clothesReplacementChanged = true;
+            removed = true;
         }
         else
             ++iter;
     }
 
-    return clothesReplacementChanged;
+    return removed;
 }
 
 ////////////////////////////////////////////////////////////////

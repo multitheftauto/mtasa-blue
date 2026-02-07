@@ -1407,9 +1407,12 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
 
 uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
+    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     return pModelInfo->GetTextureDictionaryID();
@@ -1417,9 +1420,12 @@ uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 
 bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
+    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     // TXD slots occupy IDs from BaseIDforTXD to BaseIDforCOL-1
@@ -1440,9 +1446,12 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 
 bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
+    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+    if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     // Clean up TXD isolation before resetting TXD slot

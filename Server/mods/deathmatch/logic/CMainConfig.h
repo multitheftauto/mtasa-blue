@@ -63,10 +63,10 @@ public:
     const std::string& GetPassword() { return m_strPassword; };
     bool               SetPassword(const char* szPassword, bool bSave);
 
-    bool         IsVoiceEnabled();
-    unsigned int GetVoiceSampleRate() { return m_uiVoiceSampleRate; };
-    unsigned int GetVoiceQuality() { return m_ucVoiceQuality; };
-    unsigned int GetVoiceBitrate() { return m_uiVoiceBitrate; };
+    bool          IsVoiceEnabled();
+    unsigned char GetVoiceSampleRate() { return static_cast<unsigned char>(m_uiVoiceSampleRate); };
+    unsigned char GetVoiceQuality() { return m_ucVoiceQuality; };
+    unsigned int  GetVoiceBitrate() { return m_uiVoiceBitrate; };
 
     bool                              GetAseInternetPushEnabled() { return m_iAseMode == 2 && !IsFakeLagCommandEnabled(); }
     bool                              GetAseInternetListenEnabled() { return m_iAseMode == 1 && !IsFakeLagCommandEnabled(); }

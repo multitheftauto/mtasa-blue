@@ -58,7 +58,7 @@ namespace CEGUI
     class EventArgs;
     class GUISheet;
     typedef GUISheet DefaultWindow;
-}
+}  // namespace CEGUI
 
 class CGUI_Impl : public CGUI, public CGUITabList
 {

@@ -67,7 +67,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     auto*          modelInfo = g_pGame->GetModelInfo(usModel);
 
     if (modelInfo && modelInfo->GetParentID() != 0)
-        usModel = modelInfo->GetParentID();
+        usModel = static_cast<unsigned short>(modelInfo->GetParentID());
 
     // Wheels should be compatible with any vehicle which have wheels, except
     // bike/bmx (they're buggy). Vortex is technically a car, but it has no

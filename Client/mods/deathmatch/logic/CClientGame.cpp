@@ -474,6 +474,9 @@ CClientGame::~CClientGame()
     // Singular file download manager
     SAFE_DELETE(m_pSingularFileDownloadManager);
 
+    // Clear cached clothes from this session
+    g_pMultiplayer->FlushClothesCache();
+
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler(NULL);
     g_pMultiplayer->SetPostContextSwitchHandler(NULL);
@@ -1094,7 +1097,9 @@ void CClientGame::DoPulsePostFrame()
                         const int stateCount = taskStates.size();
                         if (stateCount > 0)
                         {
-                            std::srand(static_cast<unsigned int>(GetTickCount64_()));
+                            const std::uint64_t tickCount = static_cast<std::uint64_t>(GetTickCount64_());
+                            const unsigned int  seed = static_cast<unsigned int>(tickCount ^ (tickCount >> 32));
+                            std::srand(seed);
                             const int   index = (std::rand() % stateCount);
                             const auto& taskState = taskStates[index];
 
@@ -4964,20 +4969,36 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
     return false;
 }
 
-// Validate known objects
+// Called when GTA:SA destroys an entity (e.g., during map streaming).
+// Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
+// Note: This may leak the CObjectSA/CVehicleSA/CPedSA wrapper if MTA created it, but we cannot
+// safely delete it here since the game entity is mid-destruction. The leak is acceptable
+// as this is an abnormal code path (GTA destroying MTA-managed entities).
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
-    // m_pGameEntityXRefManager->OnGameEntityDestruct(pObject);
+    if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))
+    {
+        pSlot->pEntity = nullptr;
+        pSlot->pClientEntity = nullptr;
+    }
 }
 
 void CClientGame::GameVehicleDestructHandler(CEntitySAInterface* pVehicle)
 {
-    // m_pGameEntityXRefManager->OnGameEntityDestruct(pVehicle);
+    if (auto* pSlot = g_pGame->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(pVehicle)))
+    {
+        pSlot->pEntity = nullptr;
+        pSlot->pClientEntity = nullptr;
+    }
 }
 
 void CClientGame::GamePlayerDestructHandler(CEntitySAInterface* pPlayer)
 {
-    // m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
+    if (auto* pSlot = g_pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(pPlayer)))
+    {
+        pSlot->pEntity = nullptr;
+        pSlot->pClientEntity = nullptr;
+    }
 }
 
 void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
@@ -6405,8 +6426,8 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
 
-        auto usPartNumber = static_cast<ushort>(i);
-        auto usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
+        ushort usPartNumber = static_cast<ushort>(i);
+        ushort usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
         assert(usBytesThisPart != 0);
 
         pBitStream->Write((uchar)EPlayerScreenShotResult::SUCCESS);
@@ -6619,7 +6640,7 @@ void CClientGame::OutputServerInfo()
 
         for (unsigned char i = 0; i < NUM_GLITCHES; i++)
         {
-            if (IsGlitchEnabled(i))
+            if (IsGlitchEnabled(static_cast<unsigned char>(i)))
             {
                 if (!strEnabledGlitches.empty())
                     strEnabledGlitches += ", ";
@@ -6903,7 +6924,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::VEHICLE))
         {
-            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
         }
 
         m_pManager->GetVehicleManager()->RestreamAllVehicles();
@@ -6913,7 +6934,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED))
         {
-            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
         }
 
         m_pManager->GetPedManager()->RestreamAllPeds();
@@ -6928,7 +6949,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
         {
             for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(type))
             {
-                g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+                g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
             }
         }
 

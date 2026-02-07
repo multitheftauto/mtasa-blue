@@ -59,7 +59,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     // Apply handling
     std::uint32_t usHandlingModelID = m_usModel;
     if (m_usModel < 400 || m_usModel > 611)
-        usHandlingModelID = m_pModelInfo->GetParentID();
+        usHandlingModelID = static_cast<std::uint16_t>(m_pModelInfo->GetParentID());
 
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
     m_HandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
@@ -1059,7 +1059,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         {
             std::uint32_t usHandlingModelID = usModel;
             if (usHandlingModelID < 400 || usHandlingModelID > 611)
-                usHandlingModelID = m_pModelInfo->GetParentID();
+                usHandlingModelID = static_cast<std::uint16_t>(m_pModelInfo->GetParentID());
 
             m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
             m_HandlingEntry->Assign(m_pOriginalHandlingEntry);
