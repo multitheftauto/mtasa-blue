@@ -51,7 +51,9 @@ static const DWORD CONTINUE_CVehicle_AddExhaustParticles_1 = 0x6DE32D;
 
 static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleInterface, CVector* mainPosition, CVector* secondaryPosition)
 {
-    UpdateVehicleDummiesPositionArray(vehicleInterface);
+    // NOTE: Caller (HOOK_CVehicle_AddExhaustParticles_1) already called UpdateVehicleDummiesPositionArray
+    // and verified vehicleDummiesPositionArray is non-null before calling us. Don't call it again
+    // as the pool state could change between calls, causing nullptr deref or wrong positions.
 
     if (vehicleDummiesPositionArray != nullptr)
     {
@@ -100,22 +102,60 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_1()
     __asm
     {
         pushad
-        lea     eax, [esp+5Ch]
-        lea     ebx, [esp+84h]
-        push    eax             // CVector*
-        push    ebx             // CVector*
         push    esi             // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      useOriginalCode
+
+        // Check if exhaust dummy position is uninitialized (all zeros)
+        // EXHAUST is at index 6, offset = 6 * sizeof(CVector) = 6 * 12 = 0x48
+        mov     ecx, [eax+48h]      // EXHAUST.X
+        or      ecx, [eax+4Ch]      // EXHAUST.Y
+        or      ecx, [eax+50h]      // EXHAUST.Z
+        jz      useOriginalCode     // If all zero, use model defaults
+
+        // vehicle with custom dummies - apply custom positions to stack
+        // ApplyExhaustParticlesPosition writes all position components correctly
+        // Parameters: (vehicleInterface, mainPosition, secondaryPosition)
+        // cdecl: push right-to-left, so eax=secondary (3rd), ebx=main (2nd), esi=vehicle (1st)
+        lea     eax, [esp+5Ch]      // secondaryPosition at original_esp+0x3C
+        lea     ebx, [esp+84h]      // mainPosition at original_esp+0x64
+        push    eax
+        push    ebx
+        push    esi
         call    ApplyExhaustParticlesPosition
         add     esp, 12
         popad
 
-        mov     edx, vehicleDummiesPositionArray
-        add     edx, 48h
-        mov     edx, [edx+8]
+        // ApplyExhaustParticlesPosition already wrote all X,Y,Z to mainPos and secondaryPos.
+        // Now replicate remaining original instructions that don't involve position data:
+        // push ebx, lea ecx for matrix constructor arg, then jump to continuation
         push    ebx
-        lea     ecx, [esp+0D4h-54h]
-        mov     [esp+0D4h-64h], edx
-        mov     [esp+0D4h-8Ch], edx
+        lea     ecx, [esp+80h]
+        jmp     CONTINUE_CVehicle_AddExhaustParticles_1
+
+    useOriginalCode:
+        // Vehicle not in MTA pool or has uninitialized dummies - run SA code
+        popad
+        mov     edx, [edi+5Ch]
+        add     edx, 48h
+        mov     eax, [edx]
+        mov     [esp+64h], eax
+        mov     ecx, [edx+4]
+        fld     dword ptr [esp+64h]
+        mov     [esp+68h], ecx
+        mov     edx, [edx+8]
+        fmul    dword ptr ds:[0858C1Ch]
+        mov     [esp+40h], ecx
+        mov     [esp+3Ch], eax
+        push    ebx
+        lea     ecx, [esp+80h]
+        fstp    dword ptr [esp+40h]
+        mov     [esp+70h], edx
+        mov     [esp+48h], edx
         jmp     CONTINUE_CVehicle_AddExhaustParticles_1
     }
     // clang-format on
@@ -144,6 +184,13 @@ static void _declspec(naked) HOOK_CVehicle_AddExhaustParticles_2()
         pushad
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if exhaust secondary dummy position is uninitialized (all zeros)
+        // EXHAUST_SECONDARY is at offset 0x84
+        mov     ecx, [eax+84h]      // EXHAUST_SECONDARY.X
+        or      ecx, [eax+88h]      // EXHAUST_SECONDARY.Y
+        or      ecx, [eax+8Ch]      // EXHAUST_SECONDARY.Z
         jz      continueWithOriginalCode
 
         popad
@@ -189,6 +236,12 @@ static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if ENGINE dummy (offset 0x54) is uninitialized (all zeros)
+        mov     edx, [eax+54h]      // ENGINE.X
+        or      edx, [eax+58h]      // ENGINE.Y
+        or      edx, [eax+5Ch]      // ENGINE.Z
+        jz      continueWithOriginalCode
+
         popad
         mov     ecx, vehicleDummiesPositionArray
         add     ecx, 54h
@@ -196,7 +249,7 @@ static void _declspec(naked) HOOK_CVehicle_AddDamagedVehicleParticles()
 
         continueWithOriginalCode:
         popad
-        mov     ecx, [edi+5Ch]
+        mov     ecx, [ecx+5Ch]
         add     ecx, 54h
         jmp     CONTINUE_CVehicle_AddDamagedVehicleParticles
     }
@@ -230,6 +283,12 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if dummy at offset 0 is uninitialized (all zeros)
+        mov     edx, [eax]          // Dummy.X
+        or      edx, [eax+4]        // Dummy.Y
+        or      edx, [eax+8]        // Dummy.Z
         jz      continueWithOriginalCode
 
         popad
@@ -275,6 +334,12 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_1()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if EXHAUST dummy (offset 0x48) is uninitialized (all zeros)
+        mov     edx, [eax+48h]      // EXHAUST.X
+        or      edx, [eax+4Ch]      // EXHAUST.Y
+        or      edx, [eax+50h]      // EXHAUST.Z
+        jz      continueWithOriginalCode
+
         popad
         mov     ecx, vehicleDummiesPositionArray
         add     ecx, 48h
@@ -318,20 +383,26 @@ static void __cdecl ApplySecondaryExhaustNitroPosition(CVehicleSAInterface* vehi
 
     if (vehicleDummiesPositionArray != nullptr)
     {
-        *secondaryExhaustPosition = vehicleDummiesPositionArray[(std::size_t)VehicleDummies::EXHAUST_SECONDARY];
-
-        if (secondaryExhaustPosition->fX == 0.0 && secondaryExhaustPosition->fY == 0.0 && secondaryExhaustPosition->fZ == 0.0)
+        // Check if EXHAUST_SECONDARY is initialized (non-zero)
+        CVector& exhaustSecondary = vehicleDummiesPositionArray[(std::size_t)VehicleDummies::EXHAUST_SECONDARY];
+        if (exhaustSecondary.fX != 0.0f || exhaustSecondary.fY != 0.0f || exhaustSecondary.fZ != 0.0f)
         {
-            *secondaryExhaustPosition = vehicleDummiesPositionArray[(std::size_t)VehicleDummies::EXHAUST];
-            secondaryExhaustPosition->fX *= -1.0f;
+            *secondaryExhaustPosition = exhaustSecondary;
+        }
+        else
+        {
+            // EXHAUST_SECONDARY is uninitialized, try EXHAUST with negated X
+            CVector& exhaust = vehicleDummiesPositionArray[(std::size_t)VehicleDummies::EXHAUST];
+            if (exhaust.fX != 0.0f || exhaust.fY != 0.0f || exhaust.fZ != 0.0f)
+            {
+                *secondaryExhaustPosition = exhaust;
+                secondaryExhaustPosition->fX *= -1.0f;
+            }
+            // If both are zero, leave secondaryExhaustPosition unchanged (use original GTA value on stack)
         }
     }
-    else
-    {
-        secondaryExhaustPosition->fX = 0.0f;
-        secondaryExhaustPosition->fY = 0.0f;
-        secondaryExhaustPosition->fZ = 0.0f;
-    }
+    // If vehicleDummiesPositionArray is nullptr, leave secondaryExhaustPosition unchanged
+    // (use original GTA value that's already on the stack)
 }
 
 static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
@@ -385,6 +456,12 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if LIGHT_FRONT_SECONDARY (offset 0x18) is uninitialized
+        mov     edx, [eax+18h]
+        or      edx, [eax+1Ch]
+        or      edx, [eax+20h]
+        jz      continueWithOriginalCode
+
         popad
         mov     eax, vehicleDummiesPositionArray
         add     eax, 18h
@@ -419,6 +496,12 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if LIGHT_FRONT_SECONDARY (offset 0x18) is uninitialized
+        mov     edx, [eax+18h]
+        or      edx, [eax+1Ch]
+        or      edx, [eax+20h]
         jz      continueWithOriginalCode
 
         popad
@@ -464,6 +547,12 @@ static void _declspec(naked) HOOK_CAutomobile_ProcessCarOnFireAndExplode()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if ENGINE dummy (offset 0x54) is uninitialized
+        mov     edx, [eax+54h]
+        or      edx, [eax+58h]
+        or      edx, [eax+5Ch]
+        jz      continueWithOriginalCode
+
         popad
         mov     eax, vehicleDummiesPositionArray
         add     eax, 54h
@@ -505,6 +594,12 @@ static void _declspec(naked) HOOK_CBike_FixHandsToBars()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if HAND_REST dummy (offset 0x78) is uninitialized
+        mov     edx, [eax+78h]
+        or      edx, [eax+7Ch]
+        or      edx, [eax+80h]
         jz      continueWithOriginalCode
 
         popad
@@ -551,6 +646,12 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_1()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if SEAT_FRONT dummy (offset 0x30) is uninitialized
+        mov     edx, [eax+30h]
+        or      edx, [eax+34h]
+        or      edx, [eax+38h]
+        jz      continueWithOriginalCode
+
         popad
         cmp     dword ptr [edi+3Ch], 5
         mov     edi, vehicleDummiesPositionArray
@@ -593,6 +694,12 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_2()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if SEAT_REAR dummy (offset 0x3C) is uninitialized
+        mov     edx, [eax+3Ch]
+        or      edx, [eax+40h]
+        or      edx, [eax+44h]
         jz      continueWithOriginalCode
 
         popad
@@ -639,6 +746,12 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_3()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if SEAT_FRONT dummy (offset 0x30) is uninitialized
+        mov     edx, [eax+30h]
+        or      edx, [eax+34h]
+        or      edx, [eax+38h]
+        jz      continueWithOriginalCode
+
         popad
         cmp     dword ptr [edi+3Ch], 5
         mov     edi, vehicleDummiesPositionArray
@@ -681,6 +794,12 @@ static void _declspec(naked) HOOK_CPed_SetPedPositionInCar_4()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if SEAT_REAR dummy (offset 0x3C) is uninitialized
+        mov     edx, [eax+3Ch]
+        or      edx, [eax+40h]
+        or      edx, [eax+44h]
         jz      continueWithOriginalCode
 
         popad
@@ -726,6 +845,12 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if LIGHT_FRONT_MAIN dummy (offset 0x00) is uninitialized
+        mov     edx, [eax]
+        or      edx, [eax+4]
+        or      edx, [eax+8]
+        jz      continueWithOriginalCode
+
         popad
         mov     edx, vehicleDummiesPositionArray
         lea     ecx, [ebx+ebx*2]
@@ -768,6 +893,12 @@ static void _declspec(naked) HOOK_CVehicle_DoTailLightEffect()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if LIGHT_REAR_MAIN dummy (offset 0x0C) is uninitialized
+        mov     edx, [eax+0Ch]
+        or      edx, [eax+10h]
+        or      edx, [eax+14h]
         jz      continueWithOriginalCode
 
         popad
@@ -815,6 +946,12 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if LIGHT_FRONT_MAIN dummy (offset 0x00) is uninitialized
+        mov     edx, [eax]
+        or      edx, [eax+4]
+        or      edx, [eax+8]
+        jz      continueWithOriginalCode
+
         popad
         mov     edx, vehicleDummiesPositionArray
         mov     eax, [edx]
@@ -856,6 +993,12 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if LIGHT_FRONT_MAIN dummy (offset 0x00) is uninitialized
+        mov     edx, [eax]
+        or      edx, [eax+4]
+        or      edx, [eax+8]
         jz      continueWithOriginalCode
 
         popad
@@ -900,6 +1043,12 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if VEH_GUN dummy (offset 0x9C) is uninitialized
+        mov     edx, [eax+9Ch]
+        or      edx, [eax+0A0h]
+        or      edx, [eax+0A4h]
         jz      continueWithOriginalCode
 
         popad
@@ -947,6 +1096,12 @@ static void _declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if VEH_GUN dummy (offset 0x9C) is uninitialized
+        mov     edx, [eax+9Ch]
+        or      edx, [eax+0A0h]
+        or      edx, [eax+0A4h]
+        jz      continueWithOriginalCode
+
         popad
         mov     eax, vehicleDummiesPositionArray
         add     eax, 9Ch
@@ -988,6 +1143,12 @@ static void _declspec(naked) HOOK_CVehicle_CanBeDriven()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if SEAT_FRONT dummy (offset 0x30) is uninitialized
+        mov     edx, [eax+30h]
+        or      edx, [eax+34h]
+        or      edx, [eax+38h]
         jz      continueWithOriginalCode
 
         popad
@@ -1033,6 +1194,12 @@ static void _declspec(naked) HOOK_CPlane_PreRender_1()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if dummy at offset 0x84 (EXHAUST_SECONDARY) is uninitialized
+        mov     edx, [eax+84h]
+        or      edx, [eax+88h]
+        or      edx, [eax+8Ch]
+        jz      continueWithOriginalCode
+
         popad
         mov     ecx, vehicleDummiesPositionArray
         add     ecx, 84h
@@ -1074,6 +1241,12 @@ static void _declspec(naked) HOOK_CPlane_PreRender_2()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if dummy at offset 0x6C (TRAILER_ATTACH) is uninitialized
+        mov     edx, [eax+6Ch]
+        or      edx, [eax+70h]
+        or      edx, [eax+74h]
         jz      continueWithOriginalCode
 
         popad
@@ -1119,6 +1292,12 @@ static void _declspec(naked) HOOK_CPlane_PreRender_3()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if dummy at offset 0x78 (HAND_REST) is uninitialized
+        mov     edx, [eax+78h]
+        or      edx, [eax+7Ch]
+        or      edx, [eax+80h]
+        jz      continueWithOriginalCode
+
         popad
         mov     eax, vehicleDummiesPositionArray
         add     eax, 78h
@@ -1160,6 +1339,12 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if LIGHT_FRONT_MAIN dummy (offset 0x00) is uninitialized
+        mov     edx, [eax]
+        or      edx, [eax+4]
+        or      edx, [eax+8]
         jz      continueWithOriginalCode
 
         popad
