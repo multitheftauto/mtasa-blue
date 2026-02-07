@@ -113,13 +113,13 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
     MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
 
+    // Valid model?
+    if (!CModelInfoSA::IsVehicleModel(model))
+        return nullptr;
+
     // CCarCtrl::CreateCarForScript
     auto* pInterface = ((CVehicleSAInterface * (__cdecl*)(int, CVector, std::uint8_t)) FUNC_CCarCtrlCreateCarForScript)(model, CVector(), 0);
     if (!pInterface)
-        return nullptr;
-
-    // Valid model?
-    if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
     auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
@@ -222,6 +222,11 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 
             if (dwElementIndexInPool < MAX_VEHICLES)
             {
+                auto* pPool = m_ppVehiclePoolInterface ? *m_ppVehiclePoolInterface : nullptr;
+                if (!pPool || pPool->IsEmpty(static_cast<std::int32_t>(dwElementIndexInPool)))
+                    return nullptr;
+                if (pPool->GetObject(static_cast<std::int32_t>(dwElementIndexInPool)) != pInterface)
+                    return nullptr;
                 return &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
             }
         }
@@ -354,6 +359,11 @@ SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_OBJECTS)
         {
+            auto* pPool = m_ppObjectPoolInterface ? *m_ppObjectPoolInterface : nullptr;
+            if (!pPool || pPool->IsEmpty(static_cast<std::int32_t>(dwElementIndexInPool)))
+                return nullptr;
+            if (pPool->GetObject(static_cast<std::int32_t>(dwElementIndexInPool)) != pInterface)
+                return nullptr;
             return &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
         }
     }
@@ -523,6 +533,11 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_PEDS)
         {
+            auto* pPool = m_ppPedPoolInterface ? *m_ppPedPoolInterface : nullptr;
+            if (!pPool || pPool->IsEmpty(static_cast<std::int32_t>(dwElementIndexInPool)))
+                return nullptr;
+            if (pPool->GetObject(static_cast<std::int32_t>(dwElementIndexInPool)) != pInterface)
+                return nullptr;
             return &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
         }
     }
@@ -650,6 +665,8 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
 
         if (model == 449 || model == 537 || model == 538 || model == 569 || model == 590 || model == 570)
         {
+            if (count >= 32)
+                return nullptr;
             MemPutFast<DWORD>(VAR_TrainModelArray + count * 4, model);
             count += 1;
         }

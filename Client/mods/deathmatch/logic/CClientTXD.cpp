@@ -10,6 +10,18 @@
 
 #include <StdInc.h>
 
+struct SPendingTxdImport
+{
+    CClientTXD*    pTXD = nullptr;
+    unsigned short usModelId = 0;
+    uint32_t       uiQueuedTick = 0;
+    uint8_t        ucRetryCount = 0;
+};
+
+static std::vector<SPendingTxdImport> s_PendingTxdImports;
+static uint32_t                       s_uiLastPendingImportProcessTime = 0;
+static uint32_t                       s_uiLastPendingImportDropLogTime = 0;
+
 CClientTXD::CClientTXD(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     // Init
@@ -19,6 +31,8 @@ CClientTXD::CClientTXD(class CClientManager* pManager, ElementID ID) : ClassInit
 
 CClientTXD::~CClientTXD()
 {
+    RemovePendingImports();
+
     if (!g_pGame || !g_pGame->GetRenderWare())
     {
         // RenderWare already destroyed (SA is unpredictable)
@@ -128,6 +142,31 @@ bool CClientTXD::AddClothingTexture(const std::string& modelName)
 
 bool CClientTXD::Import(unsigned short usModelID)
 {
+    return ImportInternal(usModelID, true);
+}
+
+bool CClientTXD::IsDeviceLost() const
+{
+    IDirect3DDevice9* pDevice = g_pCore ? g_pCore->GetGraphics()->GetDevice() : nullptr;
+    if (!pDevice)
+        return true;
+
+    const HRESULT hr = pDevice->TestCooperativeLevel();
+    return hr != D3D_OK;
+}
+
+void CClientTXD::RemovePendingImports()
+{
+    if (s_PendingTxdImports.empty())
+        return;
+
+    s_PendingTxdImports.erase(
+        std::remove_if(s_PendingTxdImports.begin(), s_PendingTxdImports.end(), [this](const SPendingTxdImport& entry) { return entry.pTXD == this; }),
+        s_PendingTxdImports.end());
+}
+
+bool CClientTXD::ImportInternal(unsigned short usModelID, bool bAllowQueue)
+{
     m_strLastError.clear();
 
     if (usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST)
@@ -214,11 +253,95 @@ bool CClientTXD::Import(unsigned short usModelID)
             return true;
         }
 
+        if (bAllowQueue && IsDeviceLost())
+        {
+            const std::size_t kMaxPendingImports = 2048;
+            const uint32_t    uiNow = GetTickCount32();
+
+            if (s_PendingTxdImports.size() >= kMaxPendingImports)
+            {
+                s_PendingTxdImports.erase(s_PendingTxdImports.begin());
+                if (uiNow - s_uiLastPendingImportDropLogTime >= 1000)
+                    s_uiLastPendingImportDropLogTime = uiNow;
+            }
+
+            for (const SPendingTxdImport& entry : s_PendingTxdImports)
+            {
+                if (entry.pTXD == this && entry.usModelId == usModelID)
+                    return true;
+            }
+
+            SPendingTxdImport entry;
+            entry.pTXD = this;
+            entry.usModelId = usModelID;
+            entry.uiQueuedTick = uiNow;
+            entry.ucRetryCount = 0;
+            s_PendingTxdImports.push_back(entry);
+            return true;
+        }
+
         if (m_strLastError.empty())
             m_strLastError = SString("Cannot apply textures to model %d (already applied or invalid model)", usModelID);
     }
 
     return false;
+}
+
+void CClientTXD::ProcessPendingImports()
+{
+    if (s_PendingTxdImports.empty())
+        return;
+
+    const uint32_t uiNow = GetTickCount32();
+    if (uiNow - s_uiLastPendingImportProcessTime < 250)
+        return;
+
+    s_uiLastPendingImportProcessTime = uiNow;
+
+    IDirect3DDevice9* pDevice = g_pCore ? g_pCore->GetGraphics()->GetDevice() : nullptr;
+    if (!pDevice)
+        return;
+
+    const HRESULT hr = pDevice->TestCooperativeLevel();
+    if (hr != D3D_OK)
+        return;
+
+    const uint32_t kTimeoutMs = 30000;
+    const uint8_t  kMaxRetries = 10;
+
+    for (auto it = s_PendingTxdImports.begin(); it != s_PendingTxdImports.end();)
+    {
+        SPendingTxdImport& entry = *it;
+        if (!entry.pTXD || entry.pTXD->IsBeingDeleted())
+        {
+            it = s_PendingTxdImports.erase(it);
+            continue;
+        }
+
+        if (uiNow - entry.uiQueuedTick > kTimeoutMs || entry.ucRetryCount >= kMaxRetries)
+        {
+            if (uiNow - s_uiLastPendingImportDropLogTime >= 1000)
+                s_uiLastPendingImportDropLogTime = uiNow;
+            it = s_PendingTxdImports.erase(it);
+            continue;
+        }
+
+        if (entry.pTXD->ImportInternal(entry.usModelId, false))
+        {
+            it = s_PendingTxdImports.erase(it);
+            continue;
+        }
+
+        ++entry.ucRetryCount;
+        ++it;
+    }
+}
+
+void CClientTXD::ClearPendingImports()
+{
+    s_PendingTxdImports.clear();
+    s_uiLastPendingImportProcessTime = 0;
+    s_uiLastPendingImportDropLogTime = 0;
 }
 
 bool CClientTXD::IsImportableModel(unsigned short usModelID)

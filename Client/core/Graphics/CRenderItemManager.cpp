@@ -33,6 +33,7 @@ struct SRTVertex
 //
 ////////////////////////////////////////////////////////////////
 CRenderItemManager::CRenderItemManager()
+    : m_uiLastRenderTargetRetryTime(0), m_uiRenderTargetRetryDelayMs(0), m_uiRenderTargetRetryAttempts(0), m_uiRenderTargetRetryCooldownUntil(0)
 {
     m_pEffectCloner = new CEffectCloner(this);
 }
@@ -129,6 +130,11 @@ void CRenderItemManager::OnLostDevice()
         (*current)->OnLostDevice();
     }
 
+    m_uiLastRenderTargetRetryTime = 0;
+    m_uiRenderTargetRetryDelayMs = 0;
+    m_uiRenderTargetRetryAttempts = 0;
+    m_uiRenderTargetRetryCooldownUntil = 0;
+
     SAFE_RELEASE(m_pSavedSceneDepthSurface);
     SAFE_RELEASE(m_pSavedSceneRenderTargetAA);
     SAFE_RELEASE(g_pDeviceState->MainSceneState.DepthBuffer);
@@ -151,7 +157,22 @@ void CRenderItemManager::OnResetDevice()
     for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
         (*iter)->OnResetDevice();
 
+    m_uiLastRenderTargetRetryTime = 0;
+    m_uiRenderTargetRetryDelayMs = 0;
+    m_uiRenderTargetRetryAttempts = 0;
+    m_uiRenderTargetRetryCooldownUntil = 0;
+
     UpdateMemoryUsage();
+}
+
+void CRenderItemManager::OnViewportSizeChanged(uint uiNewViewportSizeX, uint uiNewViewportSizeY)
+{
+    if (m_uiDefaultViewportSizeX == uiNewViewportSizeX && m_uiDefaultViewportSizeY == uiNewViewportSizeY)
+        return;
+
+    m_uiDefaultViewportSizeX = uiNewViewportSizeX;
+    m_uiDefaultViewportSizeY = uiNewViewportSizeY;
+    m_bBackBufferCopyMaybeNeedsResize = true;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -225,8 +246,12 @@ CRenderTargetItem* CRenderItemManager::CreateRenderTarget(uint uiSizeX, uint uiS
 
     if (!pRenderTargetItem->IsValid())
     {
-        SAFE_RELEASE(pRenderTargetItem);
-        return nullptr;
+        const bool bAllowDeferredCreate = !bForce;
+        if (!bAllowDeferredCreate || GetDeviceCooperativeLevel("CreateRenderTarget", false) == D3D_OK)
+        {
+            SAFE_RELEASE(pRenderTargetItem);
+            return nullptr;
+        }
     }
 
     UpdateMemoryUsage();
@@ -426,6 +451,88 @@ void CRenderItemManager::DoPulse()
     UpdateBackBufferCopy();
 }
 
+void CRenderItemManager::RetryInvalidRenderTargets()
+{
+    TryRecreateInvalidRenderTargets();
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::TryRecreateInvalidRenderTargets
+//
+// Retry render target creation when the device is ready
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::TryRecreateInvalidRenderTargets()
+{
+    if (GetDeviceCooperativeLevel("TryRecreateInvalidRenderTargets", false) != D3D_OK)
+        return;
+
+    const uint kRetryIntervalMinMs = 250;
+    const uint kRetryIntervalMaxMs = 2000;
+    const uint kRetryAttemptCap = 20;
+    const uint kRetryCooldownMs = 15000;
+
+    const uint uiNow = GetTickCount32();
+    if (m_uiRenderTargetRetryAttempts >= kRetryAttemptCap)
+    {
+        if (m_uiRenderTargetRetryCooldownUntil == 0)
+            m_uiRenderTargetRetryCooldownUntil = uiNow + kRetryCooldownMs;
+
+        if (uiNow < m_uiRenderTargetRetryCooldownUntil)
+            return;
+
+        m_uiRenderTargetRetryAttempts = 0;
+        m_uiRenderTargetRetryDelayMs = kRetryIntervalMinMs;
+        m_uiRenderTargetRetryCooldownUntil = 0;
+    }
+
+    if (m_uiRenderTargetRetryDelayMs == 0)
+        m_uiRenderTargetRetryDelayMs = kRetryIntervalMinMs;
+
+    if (uiNow - m_uiLastRenderTargetRetryTime < m_uiRenderTargetRetryDelayMs)
+        return;
+
+    m_uiLastRenderTargetRetryTime = uiNow;
+
+    bool anyInvalid = false;
+    bool anyRecreated = false;
+    for (CRenderItem* pItem : m_CreatedItemList)
+    {
+        if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pItem))
+        {
+            if (pRenderTarget->IsValid())
+                continue;
+
+            anyInvalid = true;
+            if (pRenderTarget->TryEnsureValid())
+                anyRecreated = true;
+        }
+        else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pItem))
+        {
+            if (pScreenSource->IsValid())
+                continue;
+
+            anyInvalid = true;
+            if (pScreenSource->TryEnsureValid())
+                anyRecreated = true;
+        }
+    }
+
+    if (!anyInvalid)
+        return;
+
+    if (anyRecreated)
+    {
+        m_uiRenderTargetRetryAttempts = 0;
+        m_uiRenderTargetRetryDelayMs = kRetryIntervalMinMs;
+        return;
+    }
+
+    ++m_uiRenderTargetRetryAttempts;
+    m_uiRenderTargetRetryDelayMs = std::min(m_uiRenderTargetRetryDelayMs * 2, kRetryIntervalMaxMs);
+}
+
 ////////////////////////////////////////////////////////////////
 //
 // CRenderItemManager::UpdateBackBufferCopy
@@ -474,6 +581,14 @@ void CRenderItemManager::UpdateBackBufferCopy()
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::UpdateScreenSource(CScreenSourceItem* pScreenSourceItem, bool bResampleNow)
 {
+    if (!pScreenSourceItem)
+        return;
+
+    if (!pScreenSourceItem->IsValid() && !pScreenSourceItem->TryEnsureValid())
+    {
+        return;
+    }
+
     if (bResampleNow)
     {
         // Tell graphics things are about to change
@@ -553,6 +668,17 @@ bool CRenderItemManager::SetRenderTarget(CRenderTargetItem* pItem, bool bClear)
 {
     if (GetDeviceCooperativeLevel("SetRenderTarget") != D3D_OK)
         return false;
+
+    if (pItem && !pItem->IsValid())
+        pItem->TryEnsureValid();
+
+    if (!pItem || !pItem->IsValid())
+    {
+        if (!m_pDefaultD3DRenderTarget)
+            SaveDefaultRenderTarget();
+        RestoreDefaultRenderTarget();
+        return false;
+    }
 
     if (!m_pDefaultD3DRenderTarget)
         SaveDefaultRenderTarget();

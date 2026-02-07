@@ -560,6 +560,7 @@ CClientGame::~CClientGame()
     // StaticReset calls. TXD destructors need intact bookkeeping to clean up propery.
 
     // Destroy our stuff
+    CClientTXD::ClearPendingImports();
     SAFE_DELETE(m_pManager);  // Will trigger onClientResourceStop
 
     SAFE_DELETE(m_pNametags);
@@ -836,6 +837,8 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 {
     // Allow scripted dxSetRenderTarget for old scripts
     g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(true);
+
+    CClientTXD::ProcessPendingImports();
 
     // If appropriate, call onClientRestore
     if (bDidUnminimize)
@@ -3761,6 +3764,11 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         CClientEntity* pClientEntity = pPools->GetClientEntity((DWORD*)pGameEntity);
         if (pClientEntity)
         {
+            if (pClientEntity->IsBeingDeleted())
+            {
+                g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+                return;
+            }
             int    iTypeMask;
             ushort usModelId = 0xFFFF;
             switch (pClientEntity->GetType())
@@ -3788,7 +3796,7 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         }
     }
 
-    g_pGame->GetRenderWare()->SetRenderingClientEntity(NULL, 0xFFFF, TYPE_MASK_WORLD);
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
 }
 
 void CClientGame::StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -7116,6 +7124,18 @@ void CClientGame::OnWindowFocusChange(bool state)
         return;
 
     m_bFocused = state;
+    if (m_pPlayerMap)
+    {
+        if (state)
+        {
+            g_pCore->GetGraphics()->MarkViewportRefreshPending();
+            m_pPlayerMap->MarkViewportRefreshPending();
+        }
+        else
+        {
+            m_pPlayerMap->ClearMovementFlags();
+        }
+    }
 
     CLuaArguments Arguments;
     Arguments.PushBoolean(state);
