@@ -1727,6 +1727,119 @@ static void __declspec(naked) HOOK_CrashFix_Misc38()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstV3d
+//
+// Same class of issue as CrashFix_Misc38 (skin geometry path), usually due to out of video mem.
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// NULL locked vertex buffer crash (VB Lock failure unchecked by RW).
+// RW's D3D9AtomicDefaultInstanceCallback passes a NULL lockedVertexBuffer
+// to this function when IDirect3DVertexBuffer9::Lock() fails and the
+// HRESULT is discarded. The function writes vertex data to the NULL
+// pointer, causing an crash at 0x00352BA7 (0x752BA7) (case 2, first store).
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=numVerts, [esp+14]=stride
+// Returns D3D9VertexTypeSize[type] in EAX on all paths.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstV3dNull   0x752AD0
+#define HOOKSIZE_CrashFix_VBInstV3dNull  7
+#define HOOKCHECK_CrashFix_VBInstV3dNull 0x51
+DWORD RETURN_CrashFix_VBInstV3dNull = 0x752AD7;
+DWORD ARRAY_D3D9VertexTypeSize = 0x874EF8;
+
+void _declspec(naked) HOOK_CrashFix_VBInstV3dNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+8]                         // eax = mem (locked VB pointer)
+        test    eax, eax
+        jz      bail_out
+
+        // Replicate overwritten prologue (7 bytes: push ecx; push ebx; push ebp; mov ebp,[esp+0Ch])
+        push    ecx
+        push    ebx
+        push    ebp
+        mov     ebp, [esp+10h]                       // type (was [esp+0C] before 3 pushes, +4 each = +0Ch+4 = 10h)
+        jmp     RETURN_CrashFix_VBInstV3dNull
+
+    bail_out:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    40
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type] to satisfy caller's contract
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstV3dMorph
+//
+// Same NULL locked VB crash as above __rpD3D9VertexDeclarationInstV3d, but in the morph interpolation path.
+// Called from D3D9AtomicDefaultInstanceCallback when geometry has morph
+// targets. mem (2nd arg) receives lockedVertexBuffer[] which can be NULL.
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src1, [esp+10]=src2,
+//          [esp+14]=scale(float), [esp+18]=numVerts, [esp+1C]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstV3dMorphNull   0x753B60
+#define HOOKSIZE_CrashFix_VBInstV3dMorphNull  5
+#define HOOKCHECK_CrashFix_VBInstV3dMorphNull 0x51
+DWORD RETURN_CrashFix_VBInstV3dMorphNull = 0x753B65;
+
+void _declspec(naked) HOOK_CrashFix_VBInstV3dMorphNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+8]                         // eax = mem (locked VB pointer)
+        test    eax, eax
+        jz      bail_out_morph
+
+        // Replicate overwritten prologue (5 bytes: push ecx; mov eax,[esp+4+arg_0])
+        push    ecx
+        mov     eax, [esp+8]                         // type (was [esp+4+4] = [esp+8] after push ecx)
+        jmp     RETURN_CrashFix_VBInstV3dMorphNull
+
+    bail_out_morph:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    41
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CClumpModelInfo::GetFrameFromId
 //
 // Invalid frame
@@ -3003,6 +3116,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_Misc36);
     EZHookInstallChecked(CrashFix_Misc37);
     EZHookInstallChecked(CrashFix_Misc38);
+    EZHookInstallChecked(CrashFix_VBInstV3dNull);
+    EZHookInstallChecked(CrashFix_VBInstV3dMorphNull);
     EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
