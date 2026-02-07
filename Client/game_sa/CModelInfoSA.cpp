@@ -1045,7 +1045,19 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 
     // Validate new TXD slot before proceeding to avoid CTxdStore_AddRef crash
     if (CTxdStore_GetTxd(usID) == nullptr)
+    {
+        // Slot is allocated (e.g. via engineRequestTXD) but TXD data isn't loaded yet.
+        // For unloaded models, just set the TXD ID.. SA streaming handles refs and
+        // texture resolution when it loads both the model and its TXD dependency.
+        if (!pGame || pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usID) || m_pInterface->pRwObject)
+            return;
+
+        if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
+            ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
+
+        m_pInterface->usTextureDictionary = usID;
         return;
+    }
 
     size_t referencesCount = m_pInterface->usNumberOfRefs;
     if (m_pInterface->pRwObject)
