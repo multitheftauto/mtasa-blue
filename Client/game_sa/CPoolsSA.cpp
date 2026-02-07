@@ -222,12 +222,14 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 
             if (dwElementIndexInPool < MAX_VEHICLES)
             {
-                auto* pPool = m_ppVehiclePoolInterface ? *m_ppVehiclePoolInterface : nullptr;
-                if (!pPool || pPool->IsEmpty(static_cast<std::int32_t>(dwElementIndexInPool)))
+                // Return only if MTA has an entity for this slot
+                // This filters out non-MTA managed vehicles (where pEntity is null) without
+                // being overly strict about GTA pool state during timing edge cases or internal transitions from GTA-side to MTA vehicles
+                SClientEntity<CVehicleSA>* pSlot = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+                if (!pSlot->pEntity)
                     return nullptr;
-                if (pPool->GetObject(static_cast<std::int32_t>(dwElementIndexInPool)) != pInterface)
-                    return nullptr;
-                return &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+
+                return pSlot;
             }
         }
     }
@@ -359,12 +361,12 @@ SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_OBJECTS)
         {
-            auto* pPool = m_ppObjectPoolInterface ? *m_ppObjectPoolInterface : nullptr;
-            if (!pPool || pPool->IsEmpty(static_cast<std::int32_t>(dwElementIndexInPool)))
+            // Return only if MTA has an entity for this slot
+            SClientEntity<CObjectSA>* pSlot = &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+            if (!pSlot->pEntity)
                 return nullptr;
-            if (pPool->GetObject(static_cast<std::int32_t>(dwElementIndexInPool)) != pInterface)
-                return nullptr;
-            return &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+
+            return pSlot;
         }
     }
     return nullptr;
@@ -533,12 +535,12 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_PEDS)
         {
-            auto* pPool = m_ppPedPoolInterface ? *m_ppPedPoolInterface : nullptr;
-            if (!pPool || pPool->IsEmpty(static_cast<std::int32_t>(dwElementIndexInPool)))
+            // Return only if MTA has an entity for this slot
+            SClientEntity<CPedSA>* pSlot = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+            if (!pSlot->pEntity)
                 return nullptr;
-            if (pPool->GetObject(static_cast<std::int32_t>(dwElementIndexInPool)) != pInterface)
-                return nullptr;
-            return &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+
+            return pSlot;
         }
     }
     return nullptr;
