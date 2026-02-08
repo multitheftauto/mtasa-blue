@@ -3239,7 +3239,17 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
             auto*                pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiParentModelId));
             const unsigned short usParentTxdId = pParentInfo ? pParentInfo->GetTextureDictionaryID() : 0;
 
-            if (!g_bInTxdReapply)
+            // If the model uses a TXD assigned by script (engineSetModelTXDID / engineRequestTXD)
+            // that isn't tracked by isolation, import directly without allocating a pool slot
+            const unsigned short usModelCurrentTxdId = pModelInfo->GetTextureDictionaryID();
+            const bool           bScriptManagedTxd = usModelCurrentTxdId != 0 && usModelCurrentTxdId != usParentTxdId &&
+                                                     g_IsolatedTxdByModel.count(usModelId) == 0;
+
+            if (bScriptManagedTxd)
+            {
+                // Textures go directly into the script-assigned TXD
+            }
+            else if (!g_bInTxdReapply)
             {
                 // Normal path: try to create isolation
                 const uint32_t uiStartSerial = g_uiIsolationDeniedSerial;
@@ -4073,7 +4083,43 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
     if (auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId)))
     {
         if (pModelInfo->GetTextureDictionaryID() == usIsolatedTxdId)
+        {
             pModelInfo->SetTextureDictionaryID(usParentTxdId);
+
+            // SetTextureDictionaryID silently skips ref management when the target
+            // TXD data isn't loaded (CTxdStore_GetTxd returns nullptr). During session
+            // reset the parent TXD is often already unloaded, hitting this path.
+            // So we detect the skip and transfer refs manually so the isolated slot can be freed.
+            if (CTxdStore_GetTxd(usParentTxdId) == nullptr && !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usParentTxdId))
+            {
+                CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
+                if (pInterface)
+                {
+                    // Force the field if SetTextureDictionaryID bailed completely
+                    // (model has loaded geometry — the bail returns without setting it)
+                    if (pInterface->usTextureDictionary != usParentTxdId)
+                        pInterface->usTextureDictionary = usParentTxdId;
+
+                    size_t referencesCount = pInterface->usNumberOfRefs;
+                    if (pInterface->pRwObject)
+                        referencesCount++;
+
+                    // AddRef parent to match what SetTextureDictionaryID would have done.
+                    // Safe even with null RW dict - operates on the pool entry's ref count.
+                    for (size_t i = 0; i < referencesCount; i++)
+                        CTxdStore_AddRef(usParentTxdId);
+
+                    // RemoveRef isolated to release the model's contribution.
+                    // Guarded by bIsolatedSlotValid to match the safety ref pattern..
+                    // the safety ref keeps refs above 0 during this loop.
+                    if (bIsolatedSlotValid)
+                    {
+                        for (size_t i = 0; i < referencesCount; i++)
+                            CTxdStore_RemoveRef(usIsolatedTxdId);
+                    }
+                }
+            }
+        }
     }
 
     // Clear shader system entries for this TXD id
