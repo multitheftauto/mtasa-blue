@@ -3242,8 +3242,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
             // If the model uses a TXD assigned by script (engineSetModelTXDID / engineRequestTXD)
             // that isn't tracked by isolation, import directly without allocating a pool slot
             const unsigned short usModelCurrentTxdId = pModelInfo->GetTextureDictionaryID();
-            const bool           bScriptManagedTxd = usModelCurrentTxdId != 0 && usModelCurrentTxdId != usParentTxdId &&
-                                                     g_IsolatedTxdByModel.count(usModelId) == 0;
+            const bool bScriptManagedTxd = usModelCurrentTxdId != 0 && usModelCurrentTxdId != usParentTxdId && g_IsolatedTxdByModel.count(usModelId) == 0;
 
             if (bScriptManagedTxd)
             {
