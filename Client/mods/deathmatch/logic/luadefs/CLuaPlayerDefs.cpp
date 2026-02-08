@@ -1071,16 +1071,16 @@ bool CLuaPlayerDefs::SetPlayerMapImage(lua_State* luaVM, std::variant<std::strin
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
         return false;
-        
+
     CResource* pResource = pLuaMain->GetResource();
-    
+
     if (!size.has_value())
         return false;
 
     auto resolution = UIntToMapResolution(size.value());
     if (!resolution.has_value())
         throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
-    
+
     if (std::holds_alternative<CClientTexture*>(texturePathOrElement))
     {
         CClientTexture* pTexture = std::get<CClientTexture*>(texturePathOrElement);
@@ -1100,7 +1100,7 @@ bool CLuaPlayerDefs::ResetPlayerMapImage(std::optional<uint> size)
         auto resolution = UIntToMapResolution(*size);
         if (!resolution.has_value())
             throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
-        
+
         return CStaticFunctionDefinitions::ResetPlayerMapImage(resolution.value());
     }
     else
@@ -1114,7 +1114,7 @@ bool CLuaPlayerDefs::SetPlayerMapOpacity(lua_State* luaVM, uchar opacity)
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
         return false;
-        
+
     CResource* pResource = pLuaMain->GetResource();
     return CStaticFunctionDefinitions::SetPlayerMapOpacity(opacity, pResource);
 }

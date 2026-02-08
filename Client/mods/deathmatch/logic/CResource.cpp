@@ -372,14 +372,14 @@ void CResource::Stop()
 {
     m_bStarting = false;
     m_bStopping = true;
-    
+
     if (g_pClientGame)
     {
         CPlayerMap* pPlayerMap = g_pClientGame->GetPlayerMap();
         if (pPlayerMap)
             pPlayerMap->OnResourceStopping(this);
     }
-    
+
     CLuaArguments Arguments;
     Arguments.PushResource(this);
     m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);

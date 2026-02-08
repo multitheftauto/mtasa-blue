@@ -71,16 +71,14 @@ public:
     void MarkViewportRefreshPending();
     void ClearMovementFlags();
 
-    bool SetCustomMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource = nullptr);
-    bool SetCustomMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource = nullptr);
-    void ResetCustomMapImage(std::optional<ECustomMapResolution> resolution = std::nullopt);
-    bool SetMapOpacity(uchar ucOpacity, CResource* pResource = nullptr);
-    void ResetMapOpacity();
+    bool  SetCustomMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource = nullptr);
+    bool  SetCustomMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource = nullptr);
+    void  ResetCustomMapImage(std::optional<ECustomMapResolution> resolution = std::nullopt);
+    bool  SetMapOpacity(uchar ucOpacity, CResource* pResource = nullptr);
+    void  ResetMapOpacity();
     uchar GetMapOpacity() const;
-    bool HasCustomMapImage(ECustomMapResolution resolution) const { 
-        return m_customMapData[MapResolutionToIndex(resolution)].bHasCustomMap; 
-    }
-    void OnResourceStopping(CResource* pResource);
+    bool  HasCustomMapImage(ECustomMapResolution resolution) const { return m_customMapData[MapResolutionToIndex(resolution)].bHasCustomMap; }
+    void  OnResourceStopping(CResource* pResource);
 
 protected:
     void InternalSetPlayerMapEnabled(bool bEnabled);
@@ -174,16 +172,16 @@ private:
     bool m_bPendingViewportRefresh = false;
     struct CustomMapData
     {
-        bool           bHasCustomMap = false;
-        CTextureItem*  pTexture = nullptr;
-        std::string    strPath = "";
+        bool            bHasCustomMap = false;
+        CTextureItem*   pTexture = nullptr;
+        std::string     strPath = "";
         CClientTexture* pTextureElement = nullptr;
-        CResource*     pResource = nullptr;
+        CResource*      pResource = nullptr;
     };
-    CustomMapData  m_customMapData[2];  // [0] = 1024, [1] = 2048
-    std::size_t    m_defaultMapImageIndex;
-    uchar          m_ucCustomMapOpacity;
-    bool           m_bHasCustomMapOpacity;
-    CResource*     m_pCustomOpacityResource;
-    CResource*     m_pRadarMapDisabledResource;
+    CustomMapData m_customMapData[2];  // [0] = 1024, [1] = 2048
+    std::size_t   m_defaultMapImageIndex;
+    uchar         m_ucCustomMapOpacity;
+    bool          m_bHasCustomMapOpacity;
+    CResource*    m_pCustomOpacityResource;
+    CResource*    m_pRadarMapDisabledResource;
 };

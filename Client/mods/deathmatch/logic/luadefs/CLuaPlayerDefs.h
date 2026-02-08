@@ -56,8 +56,8 @@ public:
     LUA_DECLARE(IsPlayerMapVisible);
     LUA_DECLARE(GetPlayerMapBoundingBox);
     static unsigned char GetPlayerMapOpacity();
-    static bool SetPlayerMapImage(lua_State* luaVM, std::variant<std::string, CClientTexture*> texturePathOrElement, std::optional<uint> size);
-    static bool ResetPlayerMapImage(std::optional<uint> size);
-    static bool SetPlayerMapOpacity(lua_State* luaVM, uchar opacity);
-    static bool ResetPlayerMapOpacity();
+    static bool          SetPlayerMapImage(lua_State* luaVM, std::variant<std::string, CClientTexture*> texturePathOrElement, std::optional<uint> size);
+    static bool          ResetPlayerMapImage(std::optional<uint> size);
+    static bool          SetPlayerMapOpacity(lua_State* luaVM, uchar opacity);
+    static bool          ResetPlayerMapOpacity();
 };
