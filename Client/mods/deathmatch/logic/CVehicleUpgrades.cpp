@@ -67,7 +67,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     auto*          modelInfo = g_pGame->GetModelInfo(usModel);
 
     if (modelInfo && modelInfo->GetParentID() != 0)
-        usModel = modelInfo->GetParentID();
+        usModel = static_cast<unsigned short>(modelInfo->GetParentID());
 
     // Wheels should be compatible with any vehicle which have wheels, except
     // bike/bmx (they're buggy). Vortex is technically a car, but it has no
@@ -373,7 +373,6 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     // Allow slot 2 to be upgraded regardless of ID and then check it has the required part
     if (GetSlotFromUpgrade(us, ucSlot) && (bReturn || ucSlot == 2))
     {
-        
         // Get our model supported upgrades
         auto* info = g_pGame->GetModelInfo(usModel);
         modelInfo = info ? info : m_pVehicle->GetModelInfo();
@@ -479,17 +478,17 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
         ucSlot = 3;
         return true;
     }
-    if (us == 1115 || us == 1116)            // front bullbars
+    if (us == 1115 || us == 1116)  // front bullbars
     {
         ucSlot = 4;
         return true;
     }
-    if (us == 1109 || us == 1110)            // rear bullbars
+    if (us == 1109 || us == 1110)  // rear bullbars
     {
         ucSlot = 5;
         return true;
     }
-    if (us == 1013 || us == 1024)            // lamps
+    if (us == 1013 || us == 1024)  // lamps
     {
         ucSlot = 6;
         return true;
@@ -501,17 +500,17 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
         ucSlot = 7;
         return true;
     }
-    if (us == 1008 || us == 1009 || us == 1010)            // nitro
+    if (us == 1008 || us == 1009 || us == 1010)  // nitro
     {
         ucSlot = 8;
         return true;
     }
-    if (us == 1087)            // hydraulics
+    if (us == 1087)  // hydraulics
     {
         ucSlot = 9;
         return true;
     }
-    if (us == 1086)            // stereo
+    if (us == 1086)  // stereo
     {
         ucSlot = 10;
         return true;

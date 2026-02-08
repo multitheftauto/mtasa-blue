@@ -42,15 +42,15 @@ public:
 
     bool HasReplaced(unsigned short usModel);
 
-    void RestoreModel(unsigned short usModel);
+    bool RestoreModel(unsigned short usModel);
     void RestoreModels();
 
     static bool IsDFFData(const SString& strData);
 
     // Sorta a hack that these are required by CClientEntity...
-    void Unlink(){};
+    void Unlink() {};
     void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition){};
+    void SetPosition(const CVector& vecPosition) {};
 
 private:
     bool LoadFromFile(SString filePath);
@@ -58,7 +58,8 @@ private:
 
     bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
     void UnloadDFF();
-    void InternalRestoreModel(unsigned short usModel);
+
+    bool InternalRestoreModel(unsigned short usModel);
 
     bool ReplaceClothes(ushort usModel);
     bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);

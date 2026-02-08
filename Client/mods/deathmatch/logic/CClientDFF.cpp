@@ -27,6 +27,31 @@ CClientDFF::~CClientDFF()
     // Remove us from DFF manager list
     m_pDFFManager->RemoveFromList(this);
 
+    bool bInDeleteAll = g_pClientGame && g_pClientGame->GetElementDeleter()->IsBeingDeleted(this);
+
+    // During DoDeleteAll (arbitrary element destruction order), clear custom model
+    // pointers to prevent stale clump references. Skip restreaming and UnloadDFF
+    // which would corrupt RW data or double-free textures. Normal resource cleanup
+    // (engineRestoreModel, resource stop) uses the full restoration path below.
+    if (bInDeleteAll)
+    {
+        for (auto usModel : m_Replaced)
+        {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+            if (pModelInfo)
+            {
+                pModelInfo->ClearCustomModel();
+            }
+        }
+        m_Replaced.clear();
+
+        // Remove clothes buffer references so OnCStreaming_RequestModel_Mid
+        // won't serve up our soon-to-be-freed m_RawDataBuffer pointer
+        g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_RawDataBuffer.data());
+        g_pGame->GetRenderWare()->ClothesRemoveFile(m_RawDataBuffer.data());
+        return;
+    }
+
     // Restore all our models
     RestoreModels();
 
@@ -50,7 +75,7 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
         m_pManager->GetModelRequestManager()->RequestBlocking(usModelId, "CClientDFF::LoadDFF");
 
         // Attempt loading it
-        if (!m_bIsRawData)            // We have file
+        if (!m_bIsRawData)  // We have file
         {
             if (g_pCore->GetNetwork()->CheckFile("dff", m_strDffFilename))
             {
@@ -58,7 +83,7 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
                 info.pClump = g_pGame->GetRenderWare()->ReadDFF(m_strDffFilename, SString(), usModelId, CClientVehicleManager::IsValidModel(usModelId));
             }
         }
-        else            // We have raw data
+        else  // We have raw data
         {
             info.pClump = g_pGame->GetRenderWare()->ReadDFF(NULL, m_RawDataBuffer, usModelId, CClientVehicleManager::IsValidModel(usModelId));
 
@@ -93,7 +118,9 @@ void CClientDFF::UnloadDFF()
     {
         SLoadedClumpInfo& info = iter->second;
         if (info.pClump)
+        {
             g_pGame->GetRenderWare()->DestroyDFF(info.pClump);
+        }
     }
 
     m_LoadedClumpInfoMap.clear();
@@ -232,11 +259,12 @@ bool CClientDFF::HasReplaced(unsigned short usModel)
     return false;
 }
 
-void CClientDFF::RestoreModel(unsigned short usModel)
+bool CClientDFF::RestoreModel(unsigned short usModel)
 {
     // Restore the model and remove it from the list
-    InternalRestoreModel(usModel);
+    bool bRestored = InternalRestoreModel(usModel);
     m_Replaced.remove(usModel);
+    return bRestored;
 }
 
 void CClientDFF::RestoreModels()
@@ -245,7 +273,7 @@ void CClientDFF::RestoreModels()
     std::list<unsigned short>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
-        // Restore this model
+        // Restore this model (ignore return - bulk cleanup)
         InternalRestoreModel(*iter);
     }
 
@@ -256,7 +284,7 @@ void CClientDFF::RestoreModels()
     m_Replaced.clear();
 }
 
-void CClientDFF::InternalRestoreModel(unsigned short usModel)
+bool CClientDFF::InternalRestoreModel(unsigned short usModel)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -266,7 +294,7 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
         // eventually stream them back in with async loading.
         m_pManager->GetVehicleManager()->RestreamVehicles(usModel);
     }
-    // Is this an ped ID?
+    // Is this a ped ID?
     else if (CClientPlayerManager::IsValidModel(usModel))
     {
         // Stream the ped of that model out so we have no
@@ -295,17 +323,36 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     else if (CClientPlayerClothes::IsValidModel(usModel))
     {
         g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_RawDataBuffer.data());
-        return;
+        return true;
     }
     else
-        return;
+    {
+        AddReportLog(9403, SString("InternalRestoreModel: Model %u not recognized as vehicle/ped/object/clothes", usModel), 10);
+        return false;
+    }
 
-    // Restore all the models we replaced.
+    // Restore model first - this releases texture replacement tracking refs
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (!pModelInfo)
+    {
+        AddReportLog(9405, SString("InternalRestoreModel: GetModelInfo returned null for model %u", usModel), 10);
+        return false;
+    }
     pModelInfo->ResetVehicleDummies(true);
     pModelInfo->ResetVehicleWheelSizes();
     pModelInfo->RestoreOriginalModel();
     pModelInfo->ResetAlphaTransparency();
+
+    // Check if model was actually unloaded (immediate restore)
+    bool bModelUnloaded = !pModelInfo->IsLoaded();
+
+    // Only clean up isolated TXD if model has no refs (no entities using it)
+    // If refs remain, TXD cleanup is deferred to CClientModel::Deallocate
+    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
+    {
+        if (bModelUnloaded)
+            pRenderWare->CleanupIsolatedTxdForModel(usModel);
+    }
 
     // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
     if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
@@ -323,6 +370,9 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
             g_pGame->GetRenderWare()->DestroyDFF(pInfo->pClump);
         MapRemove(m_LoadedClumpInfoMap, usModel);
     }
+
+    // Return true only if model was immediately restored (not deferred due to entities using it)
+    return bModelUnloaded;
 }
 
 bool CClientDFF::ReplaceClothes(ushort usModel)

@@ -43,7 +43,7 @@ public:
 
     eCGUIType GetType() { return CGUI_LABEL; };
 
-    #define EXCLUDE_SET_TEXT
-    #include "CGUIElement_Inc.h"
-    #undef EXCLUDE_SET_TEXT
+#define EXCLUDE_SET_TEXT
+#include "CGUIElement_Inc.h"
+#undef EXCLUDE_SET_TEXT
 };

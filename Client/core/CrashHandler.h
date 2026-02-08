@@ -43,6 +43,7 @@ static_assert(DEBUG_BUFFER_SIZE > 1, "DEBUG_BUFFER_SIZE must allow for null term
 constexpr DWORD CPP_EXCEPTION_CODE = 0xE06D7363;
 constexpr DWORD STATUS_INVALID_CRUNTIME_PARAMETER_CODE = 0xC0000417;
 constexpr DWORD STATUS_STACK_BUFFER_OVERRUN_CODE = 0xC0000409;
+constexpr DWORD STATUS_HEAP_CORRUPTION_CODE = 0xC0000374;
 // STATUS_FATAL_USER_CALLBACK_EXCEPTION (0xC000041D):
 // This exception type occurs when an exception happens inside a Windows system callback
 // (e.g., window procedures, DLL callbacks, kernel-to-user transitions) and cannot be
@@ -88,17 +89,22 @@ inline constexpr std::string_view DEBUG_PREFIX_EXCEPTION_INFO = "ExceptionInfo: 
 inline constexpr std::string_view DEBUG_PREFIX_WATCHDOG = "WATCHDOG: ";
 inline constexpr std::string_view DEBUG_SEPARATOR = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 // Helpers implemented in CrashHandler.cpp to avoid __try in inline functions
-void OutputDebugStringSafeImpl(const char* message);
-void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
-void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
+void                     OutputDebugStringSafeImpl(const char* message);
+void                     SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
+void                     SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
+extern thread_local bool g_bCrashHandlerStackOverflow;
 
 // Helper to safely call OutputDebugStringA with SEH guards
 inline void OutputDebugStringSafe(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     OutputDebugStringSafeImpl(message);
 }
 inline void SafeDebugOutput(std::string_view message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     const char* data = message.data();
     std::size_t remaining = message.size();
 
@@ -124,12 +130,16 @@ inline void SafeDebugOutput(std::string_view message)
 // Overload for C-string literals (backward compatibility)
 inline void SafeDebugOutput(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     OutputDebugStringSafeImpl(message);
 }
 
 // Overload for std::string (for string_view concatenation)
 inline void SafeDebugOutput(const std::string& message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (!message.empty())
     {
         OutputDebugStringSafeImpl(message.c_str());
@@ -142,7 +152,7 @@ inline void SafeDebugPrint(Buffer& buffer, const char* format, ...)
     if (format == nullptr)
         return;
 
-    auto* data = buffer.data();
+    auto*             data = buffer.data();
     const std::size_t size = buffer.size();
 
     if (data == nullptr || size == 0)
@@ -165,7 +175,7 @@ inline void SafeDebugPrintC(char* buffer, std::size_t bufferSize, const char* fo
     va_end(args);
 }
 
-#define SAFE_DEBUG_PRINT(buffer, ...) SafeDebugPrint((buffer), __VA_ARGS__)
+#define SAFE_DEBUG_PRINT(buffer, ...)               SafeDebugPrint((buffer), __VA_ARGS__)
 #define SAFE_DEBUG_PRINT_C(buffer, bufferSize, ...) SafeDebugPrintC((buffer), (bufferSize), __VA_ARGS__)
 
 inline void SafeDebugPrintPrefixed(std::string_view prefix, const char* format, ...)
@@ -219,6 +229,8 @@ extern "C"
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableStackCookieFailureCapture(BOOL bEnable);
 
+    [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall ConfigureWerForFailFast();
+
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall GetEnhancedExceptionInfo(PENHANCED_EXCEPTION_INFO pExceptionInfo);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureCurrentException();
@@ -243,7 +255,7 @@ extern "C"
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall GetCrashHandlerConfiguration(PCRASH_HANDLER_CONFIG pConfig);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall CaptureUnifiedStackTrace(_EXCEPTION_POINTERS* pException, DWORD maxFrames,
-                                                                  std::vector<std::string>* pOutTrace);
+                                                                                std::vector<std::string>* pOutTrace);
 
     [[nodiscard]] BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableSehExceptionHandler();
 

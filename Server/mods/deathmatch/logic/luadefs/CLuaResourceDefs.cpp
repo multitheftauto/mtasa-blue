@@ -97,7 +97,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getFromName", "getResourceFromName");
     lua_classfunction(luaVM, "getAll", "getResources");
     lua_classfunction(luaVM, "getThis", "getThisResource");
-    lua_classfunction(luaVM, "refresh", "refreshResources");            // Can't use "all" here because that's an argument
+    lua_classfunction(luaVM, "refresh", "refreshResources");  // Can't use "all" here because that's an argument
 
     lua_classfunction(luaVM, "create", "createResource");
     lua_classfunction(luaVM, "start", "startResource");
@@ -595,7 +595,7 @@ int CLuaResourceDefs::stopResource(lua_State* luaVM)
 int CLuaResourceDefs::restartResource(lua_State* luaVM)
 {
     CResource*            pResource = nullptr;
-    bool                  bPersistent = false;            // unused
+    bool                  bPersistent = false;  // unused
     SResourceStartOptions StartOptions;
 
     CScriptArgReader argStream(luaVM);
@@ -1140,7 +1140,7 @@ int CLuaResourceDefs::call(lua_State* luaVM)
                 args.ReadArguments(luaVM, 3);
                 CLuaArguments returns;
 
-                LUA_CHECKSTACK(targetLuaVM, 1);            // Ensure some room
+                LUA_CHECKSTACK(targetLuaVM, 1);  // Ensure some room
 
                 // Lets grab the original hidden variables so we can restore them later
                 lua_getglobal(targetLuaVM, "sourceResource");
@@ -1237,10 +1237,10 @@ int CLuaResourceDefs::getResourceACLRequests(lua_State* luaVM)
         lua_newtable(luaVM);
         for (uint i = 0; i < Result.size(); i++)
         {
-            lua_newtable(luaVM);                     // new table
-            lua_pushnumber(luaVM, i + 1);            // row index number (starting at 1, not 0)
-            lua_pushvalue(luaVM, -2);                // value
-            lua_settable(luaVM, -4);                 // refer to the top level table
+            lua_newtable(luaVM);           // new table
+            lua_pushnumber(luaVM, i + 1);  // row index number (starting at 1, not 0)
+            lua_pushvalue(luaVM, -2);      // value
+            lua_settable(luaVM, -4);       // refer to the top level table
 
             const SAclRequest& request = Result[i];
             lua_pushstring(luaVM, "name");
@@ -1263,7 +1263,7 @@ int CLuaResourceDefs::getResourceACLRequests(lua_State* luaVM)
             lua_pushstring(luaVM, request.strDate);
             lua_settable(luaVM, -3);
 
-            lua_pop(luaVM, 1);            // pop the inner table
+            lua_pop(luaVM, 1);  // pop the inner table
         }
         return 1;
     }

@@ -15,6 +15,7 @@ else
 	CI_BUILD = false
 end
 GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
+MTA_MAETRO = os.getenv("MTA_MAETRO") == "true"
 
 newoption {
 	trigger     = "gccprefix",
@@ -61,6 +62,10 @@ workspace "MTASA"
 		"_TIMESPEC_DEFINED"
 	}
 
+	if MTA_MAETRO then
+		defines { "MTA_MAETRO" }
+	end
+
 	-- Helper function for output path
 	buildpath = function(p) return "%{wks.location}/../Bin/"..p.."/" end
 	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} \"%{wks.location}../Bin/"..p.."/\"" end
@@ -88,6 +93,12 @@ workspace "MTASA"
 	filter "configurations:Debug"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
+
+	filter "configurations:Release"
+		defines { "MTA_RELEASE" }
+
+	filter "configurations:Nightly"
+		defines { "MTA_NIGHTLY" }
 
 	filter "configurations:Release or configurations:Nightly"
 		optimize "Speed"	-- "On"=MS:/Ox GCC:/O2  "Speed"=MS:/O2 GCC:/O3  "Full"=MS:/Ox GCC:/O3
@@ -126,6 +137,10 @@ workspace "MTASA"
 	filter {"system:windows", "configurations:Debug"}
 		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
+
+	-- Disable Edit and Continue on x86 Debug to avoid conflict with /SAFESEH
+	filter {"system:windows", "configurations:Debug", "platforms:x86"}
+		editandcontinue "Off"
 
 	filter { "system:linux or macosx", "configurations:not Debug" }
 		buildoptions { "-fvisibility=hidden" }

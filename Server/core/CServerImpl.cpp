@@ -48,7 +48,7 @@ bool    IsCursesActive()
     return m_wndInput != NULL;
 }
 #else
-bool g_isChildProcess = false;
+bool   g_isChildProcess = false;
 HANDLE g_readyEvent = nullptr;
 #endif
 
@@ -58,13 +58,13 @@ CServerImpl::CServerImpl(CThreadCommandQueue* pThreadCommandQueue)
 CServerImpl::CServerImpl()
 #endif
 {
-    #ifdef WIN32
+#ifdef WIN32
     m_pThreadCommandQueue = pThreadCommandQueue;
     m_hConsole = NULL;
-    #else
+#else
     m_wndMenu = NULL;
     m_wndInput = NULL;
-    #endif
+#endif
 
     // Init
     m_pNetwork = NULL;
@@ -331,8 +331,12 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     {
         // Network module compatibility check
         typedef unsigned long (*PFNCHECKCOMPATIBILITY)(unsigned long, unsigned long*);
-        #pragma warning(suppress: 4191)
-        auto pfnCheckCompatibility = reinterpret_cast<PFNCHECKCOMPATIBILITY>(m_NetworkLibrary.GetProcedureAddress("CheckCompatibility"));
+        PFNCHECKCOMPATIBILITY pfnCheckCompatibility = nullptr;
+        {
+            const auto procAddr = m_NetworkLibrary.GetProcedureAddress("CheckCompatibility");
+            static_assert(sizeof(pfnCheckCompatibility) == sizeof(procAddr), "Unexpected function pointer size");
+            std::memcpy(&pfnCheckCompatibility, &procAddr, sizeof(pfnCheckCompatibility));
+        }
         if (!pfnCheckCompatibility || !pfnCheckCompatibility(MTA_DM_SERVER_NET_MODULE_VERSION, (unsigned long*)MTASA_VERSION_TYPE))
         {
             // net.dll doesn't like our version number
@@ -352,12 +356,25 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
         if (m_XMLLibrary.Load(PathJoin(m_strServerPath, SERVER_BIN_PATH, szXMLLibName)))
         {
-            #pragma warning(push)
-            #pragma warning(disable: 4191)
-            auto pfnInitNetServerInterface = (InitNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface"));
-            auto pfnReleaseNetServerInterface = (ReleaseNetServerInterface)(m_NetworkLibrary.GetProcedureAddress("ReleaseNetServerInterface"));
-            auto pfnInitXMLInterface = (InitXMLInterface)(m_XMLLibrary.GetProcedureAddress("InitXMLInterface"));
-            #pragma warning(pop)
+            InitNetServerInterface    pfnInitNetServerInterface = nullptr;
+            ReleaseNetServerInterface pfnReleaseNetServerInterface = nullptr;
+            InitXMLInterface          pfnInitXMLInterface = nullptr;
+
+            {
+                const auto procAddr = m_NetworkLibrary.GetProcedureAddress("InitNetServerInterface");
+                static_assert(sizeof(pfnInitNetServerInterface) == sizeof(procAddr), "Unexpected function pointer size");
+                std::memcpy(&pfnInitNetServerInterface, &procAddr, sizeof(pfnInitNetServerInterface));
+            }
+            {
+                const auto procAddr = m_NetworkLibrary.GetProcedureAddress("ReleaseNetServerInterface");
+                static_assert(sizeof(pfnReleaseNetServerInterface) == sizeof(procAddr), "Unexpected function pointer size");
+                std::memcpy(&pfnReleaseNetServerInterface, &procAddr, sizeof(pfnReleaseNetServerInterface));
+            }
+            {
+                const auto procAddr = m_XMLLibrary.GetProcedureAddress("InitXMLInterface");
+                static_assert(sizeof(pfnInitXMLInterface) == sizeof(procAddr), "Unexpected function pointer size");
+                std::memcpy(&pfnInitXMLInterface, &procAddr, sizeof(pfnInitXMLInterface));
+            }
 
             if (pfnInitNetServerInterface && pfnInitXMLInterface)
             {
@@ -368,7 +385,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
                 if (m_pNetwork && m_pXML)
                 {
                     // Make the modmanager load our mod
-                    if (m_pModManager->Load("deathmatch", iArgumentCount, szArguments))            // Hardcoded for now
+                    if (m_pModManager->Load("deathmatch", iArgumentCount, szArguments))  // Hardcoded for now
                     {
                         // Enter our mainloop
                         MainLoop();
@@ -450,7 +467,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 void CServerImpl::MainLoop()
 {
 #ifdef WIN32
-    timeBeginPeriod(1);            // Change sleep resolution to 1ms
+    timeBeginPeriod(1);  // Change sleep resolution to 1ms
 #endif
 
     // Loop until a termination is requested
@@ -478,10 +495,10 @@ void CServerImpl::MainLoop()
         // Handle the interpreter input
         HandleInput();
 
-        // Handle input from the secondary thread
-        #ifdef WIN32
+// Handle input from the secondary thread
+#ifdef WIN32
         m_pThreadCommandQueue->Process(m_bRequestedQuit, m_pModManager);
-        #endif
+#endif
 
         // Pulse the modmanager
         m_pModManager->DoPulse();
@@ -502,7 +519,7 @@ void CServerImpl::MainLoop()
     }
 
 #ifdef WIN32
-    timeEndPeriod(1);            // Restore previous sleep resolution
+    timeEndPeriod(1);  // Restore previous sleep resolution
 #endif
 
     // Unload the current mod
@@ -557,7 +574,7 @@ void CServerImpl::ApplyFrameRateLimit(uint uiUseRate)
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
 
     // Time now
-    double dTimeMs = CTickCount::Now().ToDouble();            // GetTickCount32 ();
+    double dTimeMs = CTickCount::Now().ToDouble();  // GetTickCount32 ();
 
     // Get delta time in ms since last frame
     double dTimeUsed = dTimeMs - m_dLastTimeMs;
@@ -771,7 +788,7 @@ void CServerImpl::HandleInput()
 
     switch (iStdIn)
     {
-        case '\n':            // Newlines and carriage returns
+        case '\n':  // Newlines and carriage returns
         case '\r':
 #ifdef WIN32
             // Echo a newline
@@ -832,12 +849,12 @@ void CServerImpl::HandleInput()
             m_uiSelectedCommandHistoryEntry = 0;
             break;
 
-        case KEY_BACKSPACE:            // Backspace
+        case KEY_BACKSPACE:  // Backspace
         case 0x7F:
             if (m_uiInputCount == 0)
                 break;
 
-                // Insert a blank space + backspace
+            // Insert a blank space + backspace
 #ifdef WIN32
             Printf("%c %c", 0x08, 0x08);
 #else
@@ -848,7 +865,7 @@ void CServerImpl::HandleInput()
             m_szInputBuffer[m_uiInputCount] = 0;
             break;
 
-#ifdef WIN32    // WIN32: we have to use a prefix code, this routine opens an extra switch
+#ifdef WIN32  // WIN32: we have to use a prefix code, this routine opens an extra switch
         case KEY_EXTENDED:
             // Color the text
             if (!g_bSilent && HasConsole())
@@ -901,7 +918,7 @@ void CServerImpl::HandleInput()
                     break;
                 }
 
-                case KEY_UP:            // Up-arrow cursor
+                case KEY_UP:  // Up-arrow cursor
                 {
                     // If there's nothing to select, break here
                     if (m_vecCommandHistory.size() <= 1 || m_uiSelectedCommandHistoryEntry == 1)
@@ -919,7 +936,7 @@ void CServerImpl::HandleInput()
 
                     break;
                 }
-                case KEY_DOWN:            // Down-arrow cursor
+                case KEY_DOWN:  // Down-arrow cursor
                 {
                     // If there's nothing to select, break here
                     if (m_vecCommandHistory.size() <= 1 || m_uiSelectedCommandHistoryEntry == 0)
@@ -930,13 +947,13 @@ void CServerImpl::HandleInput()
 
                     break;
                 }
-#ifdef WIN32    // WIN32: Close the switch again
+#ifdef WIN32  // WIN32: Close the switch again
             }
             // Restore the color
             if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 
-            break;            // KEY_EXTENDED
+            break;  // KEY_EXTENDED
 #endif
 
         default:

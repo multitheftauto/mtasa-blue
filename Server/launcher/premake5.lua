@@ -3,6 +3,7 @@ project "Launcher"
 	kind "ConsoleApp"
 	targetdir(buildpath("server"))
 	targetname "mta-server"
+	clangtidy "On"
 
 	includedirs {
 		"../../Shared/sdk",

@@ -3,6 +3,7 @@ project "Client Core"
 	kind "SharedLib"
 	targetname "core"
 	targetdir(buildpath("mta"))
+	clangtidy "On"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
@@ -25,6 +26,11 @@ project "Client Core"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
+
+	filter { "files:FastFailCrashHandler/WerCrashHandler.cpp" }
+		flags { "NoPCH" }
+
+	filter {}
 
 	vpaths {
 		["Headers/*"] = {"**.h", "**.hpp"},

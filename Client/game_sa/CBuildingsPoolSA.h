@@ -26,10 +26,10 @@ public:
     void       RemoveBuilding(CBuilding* pBuilding);
     bool       HasFreeBuildingSlot();
 
-    void RemoveAllWithBackup() override;
-    void RestoreBackup() override;
-    bool Resize(int size) override;
-    int  GetSize() const override { return (*m_ppBuildingPoolInterface)->m_nSize; };
+    void           RemoveAllWithBackup() override;
+    void           RestoreBackup() override;
+    bool           Resize(int size) override;
+    int            GetSize() const override { return (m_ppBuildingPoolInterface && *m_ppBuildingPoolInterface) ? (*m_ppBuildingPoolInterface)->m_nSize : 0; };
     CClientEntity* GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept;
 
 private:

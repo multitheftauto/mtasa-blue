@@ -32,7 +32,6 @@
 #include <exception>
 #include <errno.h>
 #include <filesystem>
-#include <format>
 #include <intrin.h>
 #include <malloc.h>
 #include <mutex>
@@ -44,7 +43,6 @@
 #if defined(_MSC_VER)
     #pragma comment(lib, "Psapi.lib")
 #endif
-#include <ranges>
 #include <set>
 #include <signal.h>
 #include <stdio.h>
@@ -59,6 +57,12 @@
 #if defined(_MSC_VER)
     #include <corecrt.h>
 #endif
+
+#include <werapi.h>
+
+using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
+static std::atomic<bool> g_bWerLocalDumpConfigured{false};
+thread_local bool        g_bCrashHandlerStackOverflow{false};
 
 [[nodiscard]] constexpr bool IsMemoryException(DWORD code)
 {
@@ -81,8 +85,8 @@
         return false;
 
     HMODULE hModule{nullptr};
-    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                          static_cast<LPCSTR>(exceptionAddress), &hModule) == 0) [[unlikely]]
+    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, static_cast<LPCSTR>(exceptionAddress),
+                           &hModule) == 0) [[unlikely]]
         return false;
 
     char modulePath[256]{};
@@ -90,13 +94,14 @@
         return false;
 
     // Libraries with a lot of bogus breakpoints
-    return strstr(modulePath, "libcef.dll") != nullptr || 
-           strstr(modulePath, "chrome_elf.dll") != nullptr;
+    return strstr(modulePath, "libcef.dll") != nullptr || strstr(modulePath, "chrome_elf.dll") != nullptr;
 }
 
 // Helpers to isolate __try usage and prevent crashes in debug output itself
 void OutputDebugStringSafeImpl(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (message == nullptr)
         return;
 
@@ -111,6 +116,8 @@ void OutputDebugStringSafeImpl(const char* message)
 
 void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (buffer == nullptr || bufferSize == 0 || format == nullptr)
         return;
 
@@ -132,6 +139,8 @@ void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format
 
 void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     char buffer[DEBUG_BUFFER_SIZE] = {};
 
     std::size_t offset = 0;
@@ -207,6 +216,7 @@ static void CppNewHandlerBridge();
         case EXCEPTION_STACK_OVERFLOW:
         case EXCEPTION_NONCONTINUABLE_EXCEPTION:
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
+        case STATUS_HEAP_CORRUPTION_CODE:
         case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
         case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
         case CPP_EXCEPTION_CODE:
@@ -227,8 +237,8 @@ static void CppNewHandlerBridge();
     if (IsMemoryException(exceptionCode)) [[unlikely]]
     {
         std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "IsFatalException: Access violation/page fault 0x%08X - treating as fatal for dump generation\n",
-                           exceptionCode);
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                           "IsFatalException: Access violation/page fault 0x%08X - treating as fatal for dump generation\n", exceptionCode);
         return TRUE;
     }
 
@@ -242,10 +252,8 @@ static void LogBasicExceptionInfo(_EXCEPTION_POINTERS* exception)
     if (exception == nullptr || exception->ExceptionRecord == nullptr)
         return;
 
-    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "Exception 0x%08X at 0x%p (TID: %lu)\n",
-                           exception->ExceptionRecord->ExceptionCode,
-                           exception->ExceptionRecord->ExceptionAddress,
-                           GetCurrentThreadId());
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "Exception 0x%08X at 0x%p (TID: %lu)\n", exception->ExceptionRecord->ExceptionCode,
+                           exception->ExceptionRecord->ExceptionAddress, GetCurrentThreadId());
 }
 
 static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException)
@@ -262,13 +270,11 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException)
             return;
         }
 
-        ENHANCED_EXCEPTION_INFO info{
-            .exceptionCode = pException->ExceptionRecord->ExceptionCode,
-            .exceptionAddress = pException->ExceptionRecord->ExceptionAddress,
-            .timestamp = std::chrono::system_clock::now(),
-            .threadId = GetCurrentThreadId(),
-            .processId = GetCurrentProcessId()
-        };
+        ENHANCED_EXCEPTION_INFO info{.exceptionCode = pException->ExceptionRecord->ExceptionCode,
+                                     .exceptionAddress = pException->ExceptionRecord->ExceptionAddress,
+                                     .timestamp = std::chrono::system_clock::now(),
+                                     .threadId = GetCurrentThreadId(),
+                                     .processId = GetCurrentProcessId()};
 
         const auto telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote();
         if (!telemetryNote.empty())
@@ -344,7 +350,7 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException)
             return "Out of Memory - Allocation Failure";
         case CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT:
             return "Watchdog Timeout - Application Freeze Detected";
-        case 0xC0000374:
+        case STATUS_HEAP_CORRUPTION_CODE:
             return "Heap Corruption Detected";
         case 0xC0000420:
             return "Assertion Failure";
@@ -411,22 +417,21 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
         info.eflags = pException->ContextRecord->EFlags;
 
         CExceptionInformation_Impl moduleHelper;
-        std::array<char, 512> moduleBuffer{};
-        void* moduleBase{nullptr};
+        std::array<char, 512>      moduleBuffer{};
+        void*                      moduleBase{nullptr};
 
         // For EIP=0 crashes, resolve module from return address at [ESP] instead of EIP
-        void* addressToResolve{info.exceptionAddress};
+        void*          addressToResolve{info.exceptionAddress};
         constexpr auto kNullAddress{uintptr_t{0}};
-        
+
         const auto exceptionAddressValue{reinterpret_cast<uintptr_t>(info.exceptionAddress)};
-        
+
         if (exceptionAddressValue == kNullAddress && info.eip == kNullAddress)
         {
             const auto espAddr{static_cast<uintptr_t>(info.esp)};
             const auto pReturnAddress{reinterpret_cast<void* const*>(espAddr)};
 
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                                   "LogEnhancedExceptionInfo - EIP=0 detected (ESP=0x%08X), reading return address...\n",
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - EIP=0 detected (ESP=0x%08X), reading return address...\n",
                                    static_cast<unsigned int>(espAddr));
 
             if (SharedUtil::IsReadablePointer(pReturnAddress, sizeof(void*)))
@@ -434,14 +439,12 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
                 addressToResolve = *pReturnAddress;
 
                 const auto returnAddressValue{reinterpret_cast<uintptr_t>(addressToResolve)};
-                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                                       "LogEnhancedExceptionInfo - Return address: 0x%08X (resolving module from this)\n",
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Return address: 0x%08X (resolving module from this)\n",
                                        static_cast<unsigned int>(returnAddressValue));
             }
             else
             {
-                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                                       "LogEnhancedExceptionInfo - ESP not readable (0x%08X), cannot read return address\n",
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - ESP not readable (0x%08X), cannot read return address\n",
                                        static_cast<unsigned int>(espAddr));
             }
         }
@@ -556,6 +559,9 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
                 break;
             case STATUS_STACK_BUFFER_OVERRUN_CODE:
                 info.exceptionType = "SEH:BufferOverrun";
+                break;
+            case STATUS_HEAP_CORRUPTION_CODE:
+                info.exceptionType = "SEH:HeapCorruption";
                 break;
             case STATUS_INVALID_CRUNTIME_PARAMETER_CODE:
                 info.exceptionType = "SEH:InvalidCRTParameter";
@@ -733,29 +739,29 @@ static std::variant<DWORD, std::string> HandleExceptionModern(_EXCEPTION_POINTER
         case STATUS_STACK_BUFFER_OVERRUN_CODE:
             exceptionType = "Stack Buffer Overrun";
             break;
+        case STATUS_HEAP_CORRUPTION_CODE:
+            exceptionType = "Heap Corruption";
+            break;
         case STATUS_FATAL_USER_CALLBACK_EXCEPTION:
             exceptionType = "Fatal User Callback Exception";
             break;
     }
 
-    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "%.*s (0x%08X) at 0x%p\n",
-                           static_cast<int>(exceptionType.size()),
-                           exceptionType.data(),
-                           exceptionCode,
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "%.*s (0x%08X) at 0x%p\n", static_cast<int>(exceptionType.size()), exceptionType.data(), exceptionCode,
                            pRecord->ExceptionAddress);
 
     return exceptionCode;
 }
 
-static std::mutex                                          g_handlerStateMutex;
-static std::atomic<PFNCHFILTFN>                            g_pfnCrashCallback{nullptr};
-static std::atomic<LPTOP_LEVEL_EXCEPTION_FILTER>           g_pfnOrigFilt{nullptr};
-static std::atomic<std::terminate_handler>                 g_pfnOrigTerminate{nullptr};
+static std::mutex                                g_handlerStateMutex;
+static std::atomic<PFNCHFILTFN>                  g_pfnCrashCallback{nullptr};
+static std::atomic<LPTOP_LEVEL_EXCEPTION_FILTER> g_pfnOrigFilt{nullptr};
+static std::atomic<std::terminate_handler>       g_pfnOrigTerminate{nullptr};
 #if defined(_MSC_VER)
 using CrtNewHandler = int(__cdecl*)(size_t);
-static std::atomic<CrtNewHandler>                          g_pfnOrigNewHandler{nullptr};
+static std::atomic<CrtNewHandler> g_pfnOrigNewHandler{nullptr};
 #else
-static std::atomic<std::new_handler>                       g_pfnOrigNewHandler{nullptr};
+static std::atomic<std::new_handler> g_pfnOrigNewHandler{nullptr};
 #endif
 static std::atomic<decltype(&SetUnhandledExceptionFilter)> g_pfnKernelSetUnhandledExceptionFilter{nullptr};
 static decltype(&SetUnhandledExceptionFilter)              g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
@@ -768,20 +774,28 @@ static std::atomic<bool>                g_bInPureCallHandler{false};
 static std::atomic<bool>                g_bInTerminateHandler{false};
 static std::atomic<bool>                g_bInNewHandler{false};
 
-static std::atomic<bool>                g_symbolsInitialized{false};
-static std::atomic<HANDLE>              g_symbolProcess{nullptr};
-static std::mutex                       g_symbolMutex;
+static std::atomic<bool>   g_symbolsInitialized{false};
+static std::atomic<HANDLE> g_symbolProcess{nullptr};
+static std::mutex          g_symbolMutex;
 
 using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, DWORD);
 
 [[nodiscard]] static bool CollectProcessModules(HANDLE process, std::vector<HMODULE>& modules)
 {
-    const HMODULE psapiModule = GetModuleHandleW(L"Psapi.dll");
+    const HMODULE          psapiModule = GetModuleHandleW(L"Psapi.dll");
     EnumProcessModulesExFn enumModulesEx = nullptr;
     if (psapiModule != nullptr)
-        enumModulesEx = reinterpret_cast<EnumProcessModulesExFn>(GetProcAddress(psapiModule, "EnumProcessModulesEx"));
+    {
+        const auto procAddr = GetProcAddress(psapiModule, "EnumProcessModulesEx");
+        if (procAddr)
+        {
+            static_assert(sizeof(enumModulesEx) == sizeof(procAddr), "Unexpected function pointer size");
+            std::memcpy(&enumModulesEx, &procAddr, sizeof(enumModulesEx));
+        }
+    }
 
-    auto enumModules = [&](HMODULE* buffer, DWORD bufferSize, DWORD* bytesNeeded) -> BOOL {
+    auto enumModules = [&](HMODULE* buffer, DWORD bufferSize, DWORD* bytesNeeded) -> BOOL
+    {
         if (enumModulesEx)
             return enumModulesEx(process, buffer, bufferSize, bytesNeeded, LIST_MODULES_ALL);
         return EnumProcessModules(process, buffer, bufferSize, bytesNeeded);
@@ -836,20 +850,19 @@ using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, D
         }
         else if (failuresLogged < 5)
         {
-            const auto error = GetLastError();
+            const auto                          error = GetLastError();
             std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
             SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                              "CrashHandler: InitializeSymbolHandler - SymLoadModuleEx failed via EnumProcessModules for %s (error 0x%08X)\n",
-                              modulePath.data(), error);
+                               "CrashHandler: InitializeSymbolHandler - SymLoadModuleEx failed via EnumProcessModules for %s (error 0x%08X)\n",
+                               modulePath.data(), error);
             ++failuresLogged;
         }
     }
 
     std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
     SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                      "CrashHandler: InitializeSymbolHandler - Registered %lu modules via EnumProcessModules (failures=%lu)\n",
-                      modulesRegistered,
-                      failuresLogged);
+                       "CrashHandler: InitializeSymbolHandler - Registered %lu modules via EnumProcessModules (failures=%lu)\n", modulesRegistered,
+                       failuresLogged);
 
     return modulesRegistered != 0;
 }
@@ -859,16 +872,12 @@ using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, D
     const auto addressPtr = reinterpret_cast<LPCSTR>(static_cast<std::uintptr_t>(address));
 
     HMODULE moduleHandle{nullptr};
-    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                           addressPtr,
-                           &moduleHandle) == 0)
+    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, addressPtr, &moduleHandle) == 0)
     {
-        const auto error = GetLastError();
+        const auto                          error = GetLastError();
         std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                           "CaptureUnifiedStackTrace - Unable to resolve module for address 0x%llX (error 0x%08X)\n",
-                           address,
-                           error);
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CaptureUnifiedStackTrace - Unable to resolve module for address 0x%llX (error 0x%08X)\n",
+                           address, error);
         return false;
     }
 
@@ -879,48 +888,38 @@ using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, D
     MODULEINFO moduleInfo{};
     if (GetModuleInformation(process, moduleHandle, &moduleInfo, sizeof(moduleInfo)) == FALSE)
     {
-        const auto error = GetLastError();
+        const auto                          error = GetLastError();
         std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                           "CaptureUnifiedStackTrace - GetModuleInformation failed for address 0x%llX (error 0x%08X)\n",
-                           address,
-                           error);
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CaptureUnifiedStackTrace - GetModuleInformation failed for address 0x%llX (error 0x%08X)\n",
+                           address, error);
         return false;
     }
 
     std::array<char, MAX_PATH> modulePath{};
     if (GetModuleFileNameExA(process, moduleHandle, modulePath.data(), static_cast<DWORD>(modulePath.size())) == 0)
     {
-        const auto error = GetLastError();
+        const auto                          error = GetLastError();
         std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                           "CaptureUnifiedStackTrace - GetModuleFileNameEx failed for address 0x%llX (error 0x%08X)\n",
-                           address,
-                           error);
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CaptureUnifiedStackTrace - GetModuleFileNameEx failed for address 0x%llX (error 0x%08X)\n",
+                           address, error);
         return false;
     }
 
-    const DWORD   imageSize = moduleInfo.SizeOfImage;
+    const DWORD imageSize = moduleInfo.SizeOfImage;
 
     SetLastError(ERROR_SUCCESS);
     if (SymLoadModuleEx(process, nullptr, modulePath.data(), nullptr, moduleBase, imageSize, nullptr, 0) == 0)
     {
-        const auto error = GetLastError();
+        const auto                          error = GetLastError();
         std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                           "CaptureUnifiedStackTrace - SymLoadModuleEx failed for %s (address 0x%llX, error 0x%08X)\n",
-                           modulePath.data(),
-                           address,
-                           error);
+        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CaptureUnifiedStackTrace - SymLoadModuleEx failed for %s (address 0x%llX, error 0x%08X)\n",
+                           modulePath.data(), address, error);
         return false;
     }
 
     std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                       "CaptureUnifiedStackTrace - Registered module %s (base=0x%llX) for address 0x%llX\n",
-                       modulePath.data(),
-                       moduleBase,
-                       address);
+    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CaptureUnifiedStackTrace - Registered module %s (base=0x%llX) for address 0x%llX\n",
+                       modulePath.data(), moduleBase, address);
 
     return true;
 }
@@ -970,11 +969,11 @@ void __cdecl              AbortSignalHandler(int signal);
 static void InstallCppHandlers();
 static bool InstallSehHandler();
 static void InstallAbortHandlers();
+static bool ConfigureWerLocalDumps();
 static void UninstallCrashHandlers();
 static void ReportCurrentCppException();
 
-[[nodiscard]] static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECORD*& outExRecord, CONTEXT*& outCtx,
-                                                DWORD dwExceptionCode);
+[[nodiscard]] static bool BuildExceptionContext(EXCEPTION_POINTERS& outExPtrs, EXCEPTION_RECORD*& outExRecord, CONTEXT*& outCtx, DWORD dwExceptionCode);
 
 inline void InitializeExceptionRecord(EXCEPTION_RECORD* const pRecord, const DWORD code, const void* const address);
 
@@ -1038,8 +1037,8 @@ inline void InitializeExceptionRecord(EXCEPTION_RECORD* const pRecord, const DWO
 static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI RedirectedSetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter)
 {
     std::array szLog{std::array<char, DEBUG_BUFFER_SIZE>{}};
-    SAFE_DEBUG_PRINT(szLog, "%.*sIntercepted SetUnhandledExceptionFilter call with arg 0x%p\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
-                     static_cast<const void*>(lpTopLevelExceptionFilter));
+    SAFE_DEBUG_PRINT(szLog, "%.*sIntercepted SetUnhandledExceptionFilter call with arg 0x%p\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()),
+                     DEBUG_PREFIX_CRASH.data(), static_cast<const void*>(lpTopLevelExceptionFilter));
 
     if (lpTopLevelExceptionFilter == nullptr)
     {
@@ -1177,7 +1176,7 @@ public:
 
         g_bStackCookieCaptureEnabled.store(false, std::memory_order_release);
         g_pfnCrashCallback.store(nullptr, std::memory_order_release);
-        
+
         if (g_symbolsInitialized.exchange(false, std::memory_order_acq_rel))
         {
             if (HANDLE hProcess = g_symbolProcess.exchange(nullptr, std::memory_order_acq_rel); hProcess != nullptr)
@@ -1194,11 +1193,11 @@ public:
 
         if (auto newHandler = g_pfnOrigNewHandler.exchange(nullptr, std::memory_order_acq_rel); newHandler != nullptr)
         {
-    #if defined(_MSC_VER)
+#if defined(_MSC_VER)
             _set_new_handler(newHandler);
-    #else
+#else
             std::set_new_handler(newHandler);
-    #endif
+#endif
         }
 
         if (auto abortHandler = g_pfnOrigAbortHandler.exchange(nullptr, std::memory_order_acq_rel); abortHandler != nullptr)
@@ -1233,341 +1232,333 @@ static CleanUpCrashHandler g_cBeforeAndAfter;
 namespace CrashHandler
 {
 
-[[nodiscard]] const std::vector<std::string>& GetPdbDirectories()
-{
-    static std::once_flag             onceFlag;
-    static std::vector<std::string>   pdbDirs;
-    
-    std::call_once(onceFlag, [] {
-        try
+    [[nodiscard]] const std::vector<std::string>& GetPdbDirectories()
+    {
+        static std::once_flag           onceFlag;
+        static std::vector<std::string> pdbDirs;
+
+        std::call_once(onceFlag,
+                       []
+                       {
+                           try
+                           {
+                               const SString& processDir = SharedUtil::GetMTAProcessBaseDir();
+
+                               if (processDir.empty()) [[unlikely]]
+                                   return;
+
+                               const std::filesystem::path rootPath{FromUTF8(processDir)};
+                               std::error_code             ec{};
+
+                               if (!std::filesystem::exists(rootPath, ec) || !std::filesystem::is_directory(rootPath, ec))
+                                   return;
+
+                               std::set<std::string> uniqueDirs;
+
+                               constexpr auto                                options = std::filesystem::directory_options::skip_permission_denied;
+                               std::filesystem::recursive_directory_iterator iter{rootPath, options, ec};
+
+                               if (ec) [[unlikely]]
+                                   return;
+
+                               constexpr auto maxDepth = 256u;
+
+                               for (const auto end = std::filesystem::recursive_directory_iterator{}; iter != end;)
+                               {
+                                   if (iter.depth() > maxDepth) [[unlikely]]
+                                       iter.disable_recursion_pending();
+
+                                   std::error_code entryEc{};
+                                   const bool      isSymlink = iter->is_symlink(entryEc);
+
+                                   if (entryEc || isSymlink) [[unlikely]]
+                                   {
+                                       iter.increment(ec), ec ? ec.clear() : void();
+                                       continue;
+                                   }
+
+                                   const bool isRegularFile = iter->is_regular_file(entryEc);
+
+                                   if (entryEc) [[unlikely]]
+                                   {
+                                       iter.increment(ec), ec ? ec.clear() : void();
+                                       continue;
+                                   }
+
+                                   if (isRegularFile) [[likely]]
+                                   {
+                                       const auto extension = iter->path().extension().wstring();
+
+                                       if (extension.size() == 4 && (extension[0] == L'.') && (extension[1] == L'p' || extension[1] == L'P') &&
+                                           (extension[2] == L'd' || extension[2] == L'D') && (extension[3] == L'b' || extension[3] == L'B')) [[unlikely]]
+                                       {
+                                           const auto parentPath = iter->path().parent_path();
+                                           if (!parentPath.empty())
+                                           {
+                                               const auto parentStr = ToUTF8(parentPath.wstring());
+                                               uniqueDirs.insert(std::string{parentStr.c_str()});
+                                           }
+                                       }
+                                   }
+
+                                   iter.increment(ec), ec ? ec.clear() : void();
+                               }
+
+                               pdbDirs.assign(uniqueDirs.begin(), uniqueDirs.end());
+                           }
+                           catch (...)
+                           {
+                           }
+                       });
+
+        return pdbDirs;
+    }
+
+    [[nodiscard]] bool ProcessHasLocalDebugSymbols()
+    {
+        return !GetPdbDirectories().empty();
+    }
+
+    [[nodiscard]] static bool InitializeSymbolHandler()
+    {
+        std::scoped_lock lock{g_symbolMutex};
+
+        if (g_symbolsInitialized.load(std::memory_order_acquire))
+            return true;
+
+        const HANDLE hProcess = GetCurrentProcess();
+
+        DWORD symOptions = SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_NO_PROMPTS | SYMOPT_LOAD_ANYTHING;
+
+#ifdef _DEBUG
+        symOptions |= SYMOPT_DEBUG;
+        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - SYMOPT_DEBUG enabled for diagnostics\n");
+#endif
+
+        SymSetOptions(symOptions);
+
+        std::string symbolPath;
+        const auto& pdbDirs = GetPdbDirectories();
+
+        if (!pdbDirs.empty()) [[likely]]
         {
-            const SString& processDir = SharedUtil::GetMTAProcessBaseDir();
-            
-            if (processDir.empty()) [[unlikely]]
-                return;
-            
-            const std::filesystem::path rootPath{FromUTF8(processDir)};
-            std::error_code             ec{};
-            
-            if (!std::filesystem::exists(rootPath, ec) || !std::filesystem::is_directory(rootPath, ec))
-                return;
-            
-            std::set<std::string> uniqueDirs;
-            
-            constexpr auto options = std::filesystem::directory_options::skip_permission_denied;
-            std::filesystem::recursive_directory_iterator iter{rootPath, options, ec};
-            
-            if (ec) [[unlikely]]
-                return;
-            
-            constexpr auto maxDepth = 256u;
-            
-            for (const auto end = std::filesystem::recursive_directory_iterator{}; iter != end;)
+            auto first{true};
+            for (const auto& dir : pdbDirs)
             {
-                if (iter.depth() > maxDepth) [[unlikely]]
-                    iter.disable_recursion_pending();
-                
-                std::error_code entryEc{};
-                const bool      isSymlink = iter->is_symlink(entryEc);
-                
-                if (entryEc || isSymlink) [[unlikely]]
-                {
-                    iter.increment(ec), ec ? ec.clear() : void();
-                    continue;
-                }
-                
-                const bool isRegularFile = iter->is_regular_file(entryEc);
-                
-                if (entryEc) [[unlikely]]
-                {
-                    iter.increment(ec), ec ? ec.clear() : void();
-                    continue;
-                }
-                
-                if (isRegularFile) [[likely]]
-                {
-                    const auto extension = iter->path().extension().wstring();
-                    
-                    if (extension.size() == 4 && (extension[0] == L'.') && 
-                        (extension[1] == L'p' || extension[1] == L'P') &&
-                        (extension[2] == L'd' || extension[2] == L'D') && 
-                        (extension[3] == L'b' || extension[3] == L'B')) [[unlikely]]
-                    {
-                        const auto parentPath = iter->path().parent_path();
-                        if (!parentPath.empty())
-                        {
-                            const auto parentStr = ToUTF8(parentPath.wstring());
-                            uniqueDirs.insert(std::string{parentStr.c_str()});
-                        }
-                    }
-                }
-                
-                iter.increment(ec), ec ? ec.clear() : void();
+                if (!std::exchange(first, false))
+                    symbolPath += ";";
+                symbolPath += dir;
             }
-            
-            pdbDirs.assign(uniqueDirs.begin(), uniqueDirs.end());
         }
-        catch (...)
+        else [[unlikely]]
         {
+            const auto& processDir = SharedUtil::GetMTAProcessBaseDir();
+            if (!processDir.empty())
+                symbolPath = processDir.c_str();
         }
-    });
-    
-    return pdbDirs;
-}
 
-[[nodiscard]] bool ProcessHasLocalDebugSymbols()
-{
-    return !GetPdbDirectories().empty();
-}
-
-[[nodiscard]] static bool InitializeSymbolHandler()
-{
-    std::scoped_lock lock{g_symbolMutex};
-    
-    if (g_symbolsInitialized.load(std::memory_order_acquire))
-        return true;
-    
-    const HANDLE hProcess = GetCurrentProcess();
-    
-    DWORD symOptions = SYMOPT_UNDNAME | 
-                       SYMOPT_DEFERRED_LOADS | 
-                       SYMOPT_LOAD_LINES | 
-                       SYMOPT_FAIL_CRITICAL_ERRORS |
-                       SYMOPT_NO_PROMPTS |
-                       SYMOPT_LOAD_ANYTHING;
-    
-#ifdef _DEBUG
-    symOptions |= SYMOPT_DEBUG;
-    SafeDebugOutput("CrashHandler: InitializeSymbolHandler - SYMOPT_DEBUG enabled for diagnostics\n");
-#endif
-    
-    SymSetOptions(symOptions);
-    
-    std::string symbolPath;
-    const auto& pdbDirs = GetPdbDirectories();
-    
-    if (!pdbDirs.empty()) [[likely]]
-    {
-        auto first{true};
-        for (const auto& dir : pdbDirs)
+        std::array<char, 32768> envBuffer{};
+        if (const auto len = GetEnvironmentVariableA("_NT_SYMBOL_PATH", envBuffer.data(), static_cast<DWORD>(envBuffer.size()));
+            len > 0 && len < envBuffer.size())
         {
-            if (!std::exchange(first, false))
-                symbolPath += ";";
-            symbolPath += dir;
-        }
-    }
-    else [[unlikely]]
-    {
-        const auto& processDir = SharedUtil::GetMTAProcessBaseDir();
-        if (!processDir.empty())
-            symbolPath = processDir.c_str();
-    }
-    
-    std::array<char, 32768> envBuffer{};
-    if (const auto len = GetEnvironmentVariableA("_NT_SYMBOL_PATH", envBuffer.data(), static_cast<DWORD>(envBuffer.size()));
-        len > 0 && len < envBuffer.size())
-    {
-        const std::string_view envPath{envBuffer.data(), len};
-        if (envPath.find("http") == std::string_view::npos && envPath.find("SRV") == std::string_view::npos) [[likely]]
-        {
-            if (!symbolPath.empty())
-                symbolPath += ";";
-            symbolPath += envBuffer.data();
-        }
-    }
-    
-    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-    
-    if (symbolPath.empty())
-    {
-        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - WARNING: Empty symbol search path, symbols may not load\n");
-    }
-    else
-    {
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                          "CrashHandler: InitializeSymbolHandler - Symbol search path (%zu chars): %s\n", 
-                          symbolPath.size(), symbolPath.c_str());
-    }
-    
-    const char* pSymbolPath = symbolPath.empty() ? nullptr : symbolPath.c_str();
-    
-    if (SymInitialize(hProcess, pSymbolPath, TRUE) == FALSE) [[unlikely]]
-    {
-        const auto error = GetLastError();
-        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                  "CrashHandler: InitializeSymbolHandler - SymInitialize FAILED with error 0x%08X (path: %s)\n", 
-                          error, pSymbolPath ? pSymbolPath : "<null>");
-        
-        constexpr auto kErrorAlreadyExists = 0x000000B7;
-        constexpr auto kErrorFileNotFound = 0x00000002;
-        constexpr auto kErrorAccessDenied  = 0x00000005;
-        
-        if (error == kErrorAlreadyExists) [[unlikely]]
-        {
-            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR_ALREADY_EXISTS despite lock, forcing cleanup\n");
-            SymCleanup(hProcess);
-        }
-        
-        return false;
-    }
-    
-    if (SymRefreshModuleList(hProcess) == FALSE)
-    {
-        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                  "CrashHandler: InitializeSymbolHandler - WARNING: SymRefreshModuleList failed\n");
-    }
-
-    [[maybe_unused]] const bool modulesRegistered = RegisterProcessModulesWithDbgHelp(hProcess);
-    
-    auto moduleCount = DWORD{0};
-    auto symbolsLoadedCount = DWORD{0};
-    auto modulesNeedingLoad = DWORD{0};
-
-    auto enumerateModules = [&]() -> bool {
-        moduleCount = 0;
-        symbolsLoadedCount = 0;
-        modulesNeedingLoad = 0;
-
-        struct EnumContext
-        {
-            DWORD* pModuleCount;
-            DWORD* pSymbolsCount;
-            DWORD* pNeedingLoad;
-            HANDLE hProcess;
-        };
-
-        EnumContext enumCtx{&moduleCount, &symbolsLoadedCount, &modulesNeedingLoad, hProcess};
-
-        if (SymEnumerateModules64(hProcess, [](PCSTR ModuleName, DWORD64 BaseOfDll, PVOID UserContext) -> BOOL {
-            auto* pCtx = static_cast<EnumContext*>(UserContext);
-            (*pCtx->pModuleCount)++;
-
-            IMAGEHLP_MODULE64 moduleInfo{};
-            moduleInfo.SizeOfStruct = sizeof(moduleInfo);
-
-            if (SymGetModuleInfo64(pCtx->hProcess, BaseOfDll, &moduleInfo) != FALSE)
+            const std::string_view envPath{envBuffer.data(), len};
+            if (envPath.find("http") == std::string_view::npos && envPath.find("SRV") == std::string_view::npos) [[likely]]
             {
-                const bool hasSymbols = (moduleInfo.SymType != SymNone && 
-                                         moduleInfo.SymType != SymDeferred &&
-                                         moduleInfo.LoadedPdbName[0] != '\0');
+                if (!symbolPath.empty())
+                    symbolPath += ";";
+                symbolPath += envBuffer.data();
+            }
+        }
 
-                if (hasSymbols)
-                {
-                    (*pCtx->pSymbolsCount)++;
-#ifdef _DEBUG
-                    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-                    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                        "  Module: %s [Base: 0x%llX, SymType: %d, PDB: %s]\n", 
-                        ModuleName ? ModuleName : "<unknown>", BaseOfDll, moduleInfo.SymType,
-                        moduleInfo.LoadedPdbName);
-#endif
-                }
-                else
-                {
-                    (*pCtx->pNeedingLoad)++;
-                    if (ModuleName && ModuleName[0] != '\0')
+        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+
+        if (symbolPath.empty())
+        {
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - WARNING: Empty symbol search path, symbols may not load\n");
+        }
+        else
+        {
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: InitializeSymbolHandler - Symbol search path (%zu chars): %s\n",
+                               symbolPath.size(), symbolPath.c_str());
+        }
+
+        const char* pSymbolPath = symbolPath.empty() ? nullptr : symbolPath.c_str();
+
+        if (SymInitialize(hProcess, pSymbolPath, TRUE) == FALSE) [[unlikely]]
+        {
+            const auto                          error = GetLastError();
+            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                               "CrashHandler: InitializeSymbolHandler - SymInitialize FAILED with error 0x%08X (path: %s)\n", error,
+                               pSymbolPath ? pSymbolPath : "<null>");
+
+            constexpr auto kErrorAlreadyExists = 0x000000B7;
+            constexpr auto kErrorFileNotFound = 0x00000002;
+            constexpr auto kErrorAccessDenied = 0x00000005;
+
+            if (error == kErrorAlreadyExists) [[unlikely]]
+            {
+                SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR_ALREADY_EXISTS despite lock, forcing cleanup\n");
+                SymCleanup(hProcess);
+            }
+
+            return false;
+        }
+
+        if (SymRefreshModuleList(hProcess) == FALSE)
+        {
+            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: InitializeSymbolHandler - WARNING: SymRefreshModuleList failed\n");
+        }
+
+        [[maybe_unused]] const bool modulesRegistered = RegisterProcessModulesWithDbgHelp(hProcess);
+
+        auto moduleCount = DWORD{0};
+        auto symbolsLoadedCount = DWORD{0};
+        auto modulesNeedingLoad = DWORD{0};
+
+        auto enumerateModules = [&]() -> bool
+        {
+            moduleCount = 0;
+            symbolsLoadedCount = 0;
+            modulesNeedingLoad = 0;
+
+            struct EnumContext
+            {
+                DWORD* pModuleCount;
+                DWORD* pSymbolsCount;
+                DWORD* pNeedingLoad;
+                HANDLE hProcess;
+            };
+
+            EnumContext enumCtx{&moduleCount, &symbolsLoadedCount, &modulesNeedingLoad, hProcess};
+
+            if (SymEnumerateModules64(
+                    hProcess,
+                    [](PCSTR ModuleName, DWORD64 BaseOfDll, PVOID UserContext) -> BOOL
                     {
-                        const DWORD64 loadedBase = SymLoadModuleEx(pCtx->hProcess, nullptr, ModuleName, nullptr, BaseOfDll, 0, nullptr, 0);
-                        if (loadedBase != 0)
+                        auto* pCtx = static_cast<EnumContext*>(UserContext);
+                        (*pCtx->pModuleCount)++;
+
+                        IMAGEHLP_MODULE64 moduleInfo{};
+                        moduleInfo.SizeOfStruct = sizeof(moduleInfo);
+
+                        if (SymGetModuleInfo64(pCtx->hProcess, BaseOfDll, &moduleInfo) != FALSE)
                         {
-                            (*pCtx->pSymbolsCount)++;
+                            const bool hasSymbols = (moduleInfo.SymType != SymNone && moduleInfo.SymType != SymDeferred && moduleInfo.LoadedPdbName[0] != '\0');
+
+                            if (hasSymbols)
+                            {
+                                (*pCtx->pSymbolsCount)++;
 #ifdef _DEBUG
-                            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-                            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                                "  Module: %s [Base: 0x%llX] - Symbols loaded via SymLoadModuleEx\n", 
-                                ModuleName, BaseOfDll);
+                                std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+                                SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "  Module: %s [Base: 0x%llX, SymType: %d, PDB: %s]\n",
+                                                   ModuleName ? ModuleName : "<unknown>", BaseOfDll, moduleInfo.SymType, moduleInfo.LoadedPdbName);
 #endif
+                            }
+                            else
+                            {
+                                (*pCtx->pNeedingLoad)++;
+                                if (ModuleName && ModuleName[0] != '\0')
+                                {
+                                    const DWORD64 loadedBase = SymLoadModuleEx(pCtx->hProcess, nullptr, ModuleName, nullptr, BaseOfDll, 0, nullptr, 0);
+                                    if (loadedBase != 0)
+                                    {
+                                        (*pCtx->pSymbolsCount)++;
+#ifdef _DEBUG
+                                        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+                                        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                                                           "  Module: %s [Base: 0x%llX] - Symbols loaded via SymLoadModuleEx\n", ModuleName, BaseOfDll);
+#endif
+                                    }
+#ifdef _DEBUG
+                                    else
+                                    {
+                                        const DWORD                         loadError = GetLastError();
+                                        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+                                        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                                                           "  Module: %s [Base: 0x%llX] - SymLoadModuleEx FAILED (error 0x%08X)\n", ModuleName, BaseOfDll,
+                                                           loadError);
+                                    }
+#endif
+                                }
+                            }
                         }
 #ifdef _DEBUG
                         else
                         {
-                            const DWORD loadError = GetLastError();
+                            const DWORD                         moduleInfoError = GetLastError();
                             std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
                             SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                                "  Module: %s [Base: 0x%llX] - SymLoadModuleEx FAILED (error 0x%08X)\n", 
-                                ModuleName, BaseOfDll, loadError);
+                                               "  Module: %s [Base: 0x%llX] - SymGetModuleInfo64 FAILED (error 0x%08X)\n",
+                                               ModuleName ? ModuleName : "<unknown>", BaseOfDll, moduleInfoError);
                         }
 #endif
-                    }
-                }
-            }
-#ifdef _DEBUG
-            else
+                        return TRUE;
+                    },
+                    &enumCtx) == FALSE)
             {
-                const DWORD moduleInfoError = GetLastError();
+                const DWORD                         enumError = GetLastError();
                 std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
                 SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                    "  Module: %s [Base: 0x%llX] - SymGetModuleInfo64 FAILED (error 0x%08X)\n", 
-                    ModuleName ? ModuleName : "<unknown>", BaseOfDll, moduleInfoError);
+                                   "CrashHandler: InitializeSymbolHandler - WARNING: SymEnumerateModules64 failed with error 0x%08X\n", enumError);
+                return false;
             }
-#endif
-            return TRUE;
-        }, &enumCtx) == FALSE)
-        {
-            const DWORD enumError = GetLastError();
+
             std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
             SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                              "CrashHandler: InitializeSymbolHandler - WARNING: SymEnumerateModules64 failed with error 0x%08X\n",
-                              enumError);
+                               "CrashHandler: InitializeSymbolHandler - Enumerated %lu modules, %lu with symbols (%lu needed explicit load)\n", moduleCount,
+                               symbolsLoadedCount, modulesNeedingLoad);
+
+            if (symbolsLoadedCount == 0 && moduleCount > 0)
+            {
+                SafeDebugOutput("CrashHandler: InitializeSymbolHandler - CRITICAL: Zero symbols loaded despite modules present!\n");
+                SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Possible causes: PDB mismatch, wrong paths, or corrupted symbols\n");
+            }
+
+            return true;
+        };
+
+        bool enumerationOk = enumerateModules();
+
+        if ((!enumerationOk || moduleCount == 0) && RegisterProcessModulesWithDbgHelp(hProcess))
+        {
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Module table rebuilt after EnumProcessModules registration\n");
+            enumerationOk = enumerateModules();
+        }
+
+        if (!enumerationOk)
+        {
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR: Unable to enumerate modules, cleaning up symbol handler\n");
+            SymCleanup(hProcess);
             return false;
         }
 
-        std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-        SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
-                          "CrashHandler: InitializeSymbolHandler - Enumerated %lu modules, %lu with symbols (%lu needed explicit load)\n", 
-                          moduleCount, symbolsLoadedCount, modulesNeedingLoad);
-
-        if (symbolsLoadedCount == 0 && moduleCount > 0)
+        if (moduleCount == 0)
         {
-            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - CRITICAL: Zero symbols loaded despite modules present!\n");
-            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Possible causes: PDB mismatch, wrong paths, or corrupted symbols\n");
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR: Symbol handler initialized but module list is empty\n");
+            SymCleanup(hProcess);
+            return false;
+        }
+
+        g_symbolProcess.store(hProcess, std::memory_order_release);
+        g_symbolsInitialized.store(true, std::memory_order_release);
+
+        const auto validationOk = (symbolsLoadedCount > 0 || moduleCount == 0);
+
+        if (validationOk) [[likely]]
+        {
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Symbol handler initialized successfully\n");
+        }
+        else [[unlikely]]
+        {
+            SafeDebugOutput("CrashHandler: InitializeSymbolHandler - WARNING: Initialized but no symbols loaded!\n");
         }
 
         return true;
-    };
-
-    bool enumerationOk = enumerateModules();
-
-    if ((!enumerationOk || moduleCount == 0) && RegisterProcessModulesWithDbgHelp(hProcess))
-    {
-        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Module table rebuilt after EnumProcessModules registration\n");
-        enumerationOk = enumerateModules();
     }
 
-    if (!enumerationOk)
-    {
-        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR: Unable to enumerate modules, cleaning up symbol handler\n");
-        SymCleanup(hProcess);
-        return false;
-    }
-
-    if (moduleCount == 0)
-    {
-        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - ERROR: Symbol handler initialized but module list is empty\n");
-        SymCleanup(hProcess);
-        return false;
-    }
-    
-    g_symbolProcess.store(hProcess, std::memory_order_release);
-    g_symbolsInitialized.store(true, std::memory_order_release);
-    
-    const auto validationOk = (symbolsLoadedCount > 0 || moduleCount == 0);
-    
-    if (validationOk) [[likely]]
-    {
-        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - Symbol handler initialized successfully\n");
-    }
-    else [[unlikely]]
-    {
-        SafeDebugOutput("CrashHandler: InitializeSymbolHandler - WARNING: Initialized but no symbols loaded!\n");
-    }
-    
-    return true;
 }
-
-}  // namespace CrashHandler
 
 [[nodiscard]] BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
 {
@@ -1580,19 +1571,21 @@ namespace CrashHandler
     g_pfnCrashCallback.store(pFn, std::memory_order_seq_cst);
 
     std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-    SAFE_DEBUG_PRINT(debugBuffer, "%.*sInstalling handlers with callback at 0x%p\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(), reinterpret_cast<const void*>(pFn));
+    SAFE_DEBUG_PRINT(debugBuffer, "%.*sInstalling handlers with callback at 0x%p\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
+                     reinterpret_cast<const void*>(pFn));
 
     SafeDebugOutput("========================================\n");
     SafeDebugOutput("CrashHandler: Starting PDB detection and symbol initialization\n");
     SafeDebugOutput("========================================\n");
-    
+
     // Warm up PDB detection early to avoid filesystem scan during crash handling
     // This performs the recursive directory search now rather than during exception processing
     const bool hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
-    
+
     SafeDebugOutput("========================================\n");
-    SAFE_DEBUG_PRINT(debugBuffer, "%.*sDebug symbols %s\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(), hasSymbols ? "DETECTED" : "not found");
-    
+    SAFE_DEBUG_PRINT(debugBuffer, "%.*sDebug symbols %s\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
+                     hasSymbols ? "DETECTED" : "not found");
+
     if (hasSymbols)
     {
         if (CrashHandler::InitializeSymbolHandler())
@@ -1634,11 +1627,15 @@ namespace CrashHandler
     g_bStackCookieCaptureEnabled.store(bEnableBool, std::memory_order_release);
 
     std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
-    SAFE_DEBUG_PRINT(szDebug, "%.*sStack cookie failure capture %s\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(), bEnableBool ? "ENABLED" : "DISABLED");
+    SAFE_DEBUG_PRINT(szDebug, "%.*sStack cookie failure capture %s\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
+                     bEnableBool ? "ENABLED" : "DISABLED");
 
     if (bEnableBool)
     {
         SafeDebugOutput("CrashHandler: Stack cookie capture enabled - call SetCrashHandlerFilter to activate\n");
+
+        ConfigureWerLocalDumps();
+
         if (g_pfnCrashCallback.load(std::memory_order_acquire) != nullptr)
         {
             InstallAbortHandlers();
@@ -1655,8 +1652,7 @@ namespace CrashHandler
                 const int                    errnoValue = errno;
                 constexpr auto               bufferSize = DEBUG_BUFFER_SIZE;
                 std::array<char, bufferSize> szDebug{};
-                SAFE_DEBUG_PRINT_C(szDebug.data(), bufferSize,
-                                   "CrashHandler: WARNING - Failed to restore SIGABRT handler, errno: %d\n", errnoValue);
+                SAFE_DEBUG_PRINT_C(szDebug.data(), bufferSize, "CrashHandler: WARNING - Failed to restore SIGABRT handler, errno: %d\n", errnoValue);
             }
             else
             {
@@ -1680,6 +1676,11 @@ namespace CrashHandler
     }
 
     return TRUE;
+}
+
+[[nodiscard]] BOOL __stdcall ConfigureWerForFailFast()
+{
+    return ConfigureWerLocalDumps() ? TRUE : FALSE;
 }
 
 static void InstallCppHandlers()
@@ -1745,6 +1746,155 @@ static void InstallAbortHandlers()
     }
 }
 
+static bool ConfigureWerLocalDumps()
+{
+    if (g_bWerLocalDumpConfigured.exchange(true, std::memory_order_acq_rel))
+    {
+        return true;
+    }
+
+    wchar_t modulePath[MAX_PATH]{};
+    if (GetModuleFileNameW(nullptr, modulePath, MAX_PATH) == 0)
+    {
+        SafeDebugOutput("CrashHandler: WARNING - Failed to get module path for WER config\n");
+        return false;
+    }
+
+    const SString& baseDir = SharedUtil::GetMTAProcessBaseDir();
+    SString        mtaDumpPath = PathJoin(baseDir, "mta\\dumps\\private");
+
+    if (!CreateDirectoryA(PathJoin(baseDir, "mta\\dumps"), nullptr))
+    {
+        if (GetLastError() != ERROR_ALREADY_EXISTS)
+        {
+            SafeDebugOutput("CrashHandler: WARNING - Failed to create mta\\dumps directory\n");
+        }
+    }
+
+    if (!CreateDirectoryA(mtaDumpPath, nullptr))
+    {
+        if (GetLastError() != ERROR_ALREADY_EXISTS)
+        {
+            SafeDebugOutput("CrashHandler: WARNING - Failed to create mta\\dumps\\private directory\n");
+        }
+    }
+
+    std::wstring dumpPathW = MbUTF8ToUTF16(mtaDumpPath);
+
+    // Dynamically load WerRegisterAppLocalDump to support older Windows versions
+    // The function is only available on Windows 10 1709 (build 16299) and later
+    HMODULE hWer = LoadLibraryW(L"wer.dll");
+    if (hWer)
+    {
+        auto pfnWerRegisterAppLocalDump = reinterpret_cast<WerRegisterAppLocalDumpFn>(reinterpret_cast<void*>(GetProcAddress(hWer, "WerRegisterAppLocalDump")));
+
+        if (pfnWerRegisterAppLocalDump)
+        {
+            HRESULT hr = pfnWerRegisterAppLocalDump(dumpPathW.c_str());
+            if (SUCCEEDED(hr))
+            {
+                SafeDebugOutput("CrashHandler: WER app-local dump registered to MTA dumps folder\n");
+                SafeDebugOutput("CrashHandler: Fail-fast exceptions (0xC0000409, 0xC0000374) will now generate dumps in mta\\dumps\\private\n");
+                return true;
+            }
+
+            if (hr == HRESULT_FROM_WIN32(ERROR_ALREADY_REGISTERED))
+            {
+                SafeDebugOutput("CrashHandler: WER app-local dump already registered\n");
+                return true;
+            }
+
+            std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: WerRegisterAppLocalDump failed with 0x%08X, trying registry fallback\n",
+                               static_cast<unsigned int>(hr));
+        }
+        else
+        {
+            SafeDebugOutput("CrashHandler: WerRegisterAppLocalDump not available (Windows 10 1709+ required), trying registry fallback\n");
+        }
+    }
+    else
+    {
+        SafeDebugOutput("CrashHandler: Could not load wer.dll, trying registry fallback\n");
+    }
+
+    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
+
+    HKEY           hKey = nullptr;
+    const wchar_t* exeName = wcsrchr(modulePath, L'\\');
+    exeName = exeName ? exeName + 1 : modulePath;
+
+    wchar_t regPath[512]{};
+    _snwprintf_s(regPath, _countof(regPath), _TRUNCATE, L"SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\\%s", exeName);
+
+    // LocalDumps registry settings are only supported in HKEY_LOCAL_MACHINE (requires admin to write)
+    // First try to create/open with write access - succeeds if running as admin
+    // Use KEY_WOW64_64KEY to write to the 64-bit registry view.
+    // WER is a 64-bit system service that reads from the native 64-bit registry,
+    // not the WOW6432Node that 32-bit apps normally access.
+    LONG result = RegCreateKeyExW(HKEY_LOCAL_MACHINE, regPath, 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_SET_VALUE | KEY_WOW64_64KEY, nullptr, &hKey, nullptr);
+    if (result == ERROR_SUCCESS)
+    {
+        // We have write access (running as admin) - update values to ensure correct path
+        // DumpType: 0=Custom, 1=MiniDump, 2=FullDump - use 1 for smaller dumps
+        DWORD dumpType = 1;
+        RegSetValueExW(hKey, L"DumpType", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dumpType), sizeof(dumpType));
+
+        DWORD dumpCount = 10;
+        RegSetValueExW(hKey, L"DumpCount", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dumpCount), sizeof(dumpCount));
+
+        RegSetValueExW(hKey, L"DumpFolder", 0, REG_EXPAND_SZ, reinterpret_cast<const BYTE*>(dumpPathW.c_str()),
+                       static_cast<DWORD>((dumpPathW.length() + 1) * sizeof(wchar_t)));
+
+        RegCloseKey(hKey);
+
+        SafeDebugOutput("CrashHandler: WER LocalDumps configured via registry (admin access)\n");
+        SafeDebugOutput("CrashHandler: Fail-fast exceptions should now generate dumps in mta\\dumps\\private\n");
+        return true;
+    }
+
+    // Can't write - check if key already exists and has correct values
+    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, regPath, 0, KEY_READ | KEY_WOW64_64KEY, &hKey);
+    if (result == ERROR_SUCCESS)
+    {
+        wchar_t existingPath[MAX_PATH]{};
+        DWORD   pathSize = sizeof(existingPath);
+        DWORD   pathType = 0;
+
+        bool pathCorrect = false;
+        if (RegQueryValueExW(hKey, L"DumpFolder", nullptr, &pathType, reinterpret_cast<BYTE*>(existingPath), &pathSize) == ERROR_SUCCESS)
+        {
+            if (pathType == REG_SZ || pathType == REG_EXPAND_SZ)
+            {
+                std::wstring existingPathStr(existingPath);
+                pathCorrect = (existingPathStr == dumpPathW);
+            }
+        }
+
+        RegCloseKey(hKey);
+
+        if (pathCorrect)
+        {
+            SafeDebugOutput("CrashHandler: WER LocalDumps registry key exists with correct path\n");
+            SafeDebugOutput("CrashHandler: Fail-fast exceptions should generate dumps in mta\\dumps\\private\n");
+            return true;
+        }
+        else
+        {
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: WARNING - WER LocalDumps exists but points to wrong path!\n");
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: Expected: %s\n", ToUTF8(dumpPathW).c_str());
+            SafeDebugOutput("CrashHandler: Run MTA as admin once OR reinstall to fix WER dump path\n");
+            return false;
+        }
+    }
+
+    // Neither write nor read succeeded - WER dumps won't work
+    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: Failed to access WER registry key in HKLM (error %ld)\n", result);
+    SafeDebugOutput("CrashHandler: WER LocalDumps requires either admin privileges or installer setup\n");
+    SafeDebugOutput("CrashHandler: NOTE: Reinstall MTA or run as admin once to enable WER crash dumps\n");
+    return false;
+}
+
 [[nodiscard]] static bool TryReadEnvBool(const char* name, bool& outValue)
 {
     std::array<char, 8> buffer{};
@@ -1754,7 +1904,7 @@ static void InstallAbortHandlers()
         return false;
 
     const std::uint8_t rawChar{static_cast<std::uint8_t>(buffer[0])};
-    const char indicator{static_cast<char>(std::tolower(rawChar))};
+    const char         indicator{static_cast<char>(std::tolower(rawChar))};
     outValue = !(indicator == '0' || indicator == 'f' || indicator == 'n');
     return true;
 }
@@ -1766,8 +1916,8 @@ static void InstallAbortHandlers()
 
     memset(pConfig, 0, sizeof(CRASH_HANDLER_CONFIG));
 
-    auto disableSehDetourBool{false};
-    auto forceSehDetourBool{false};
+    auto                        disableSehDetourBool{false};
+    auto                        forceSehDetourBool{false};
     [[maybe_unused]] const auto r1 = TryReadEnvBool("MTA_DISABLE_SEH_DETOUR", disableSehDetourBool);
     [[maybe_unused]] const auto r2 = TryReadEnvBool("MTA_FORCE_SEH_DETOUR", forceSehDetourBool);
 
@@ -1792,12 +1942,11 @@ static void InstallAbortHandlers()
 
 // Helper to perform protected stack walk for callback exceptions
 static BOOL ProtectedStackWalk64(DWORD machineType, HANDLE hProcess, HANDLE hThread, STACKFRAME64* frame, CONTEXT* context,
-                                  const StackTraceHelpers::StackWalkRoutines& routines)
+                                 const StackTraceHelpers::StackWalkRoutines& routines)
 {
     __try
     {
-        return StackWalk64(machineType, hProcess, hThread, frame, context, 
-                          routines.readMemory, routines.functionTableAccess, routines.moduleBase, nullptr);
+        return StackWalk64(machineType, hProcess, hThread, frame, context, routines.readMemory, routines.functionTableAccess, routines.moduleBase, nullptr);
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
@@ -1854,33 +2003,28 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
 
     const auto hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
     const auto initializedAtEntry = g_symbolsInitialized.load(std::memory_order_acquire);
-    
-    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-        "CaptureUnifiedStackTrace - Entry: hasSymbols=%s, initialized=%s\n",
-        hasSymbols ? "true" : "false",
-        initializedAtEntry ? "true" : "false");
-    
+
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Entry: hasSymbols=%s, initialized=%s\n", hasSymbols ? "true" : "false",
+                           initializedAtEntry ? "true" : "false");
+
     if (!hasSymbols)
     {
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-            "CaptureUnifiedStackTrace - PDB detection returned FALSE - checking GetPdbDirectories()...\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - PDB detection returned FALSE - checking GetPdbDirectories()...\n");
         const auto& pdbDirs = CrashHandler::GetPdbDirectories();
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-            "CaptureUnifiedStackTrace - GetPdbDirectories() returned %zu directories\n", pdbDirs.size());
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - GetPdbDirectories() returned %zu directories\n", pdbDirs.size());
     }
-    
+
     if (!hasSymbols)
     {
         static std::once_flag logOnce;
-        std::call_once(logOnce, [] {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - capturing without symbols (raw addresses only)\n");
-        });
+        std::call_once(logOnce,
+                       [] { SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - capturing without symbols (raw addresses only)\n"); });
     }
 
     // Check if this is a callback exception - these have special handling requirements
-    const bool isCallbackException = (pException->ExceptionRecord != nullptr && 
-                                      pException->ExceptionRecord->ExceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION);
-    
+    const bool isCallbackException =
+        (pException->ExceptionRecord != nullptr && pException->ExceptionRecord->ExceptionCode == STATUS_FATAL_USER_CALLBACK_EXCEPTION);
+
     // Handle null ContextRecord - can occur with callbacks and other severe exceptions
     if (pException->ContextRecord == nullptr)
     {
@@ -1894,7 +2038,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
         }
         return FALSE;
     }
-    
+
     if (isCallbackException)
     {
         SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Callback exception: using defensive stack capture\n");
@@ -1931,19 +2075,17 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
     const bool hasControlContext = (context.ContextFlags & CONTEXT_CONTROL) != 0;
     if (!hasControlContext)
     {
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-            "CaptureUnifiedStackTrace - Incomplete context (flags=0x%08X), cannot walk stack%s\n",
-            context.ContextFlags,
-            isCallbackException ? " (callback exception)" : "");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Incomplete context (flags=0x%08X), cannot walk stack%s\n", context.ContextFlags,
+                               isCallbackException ? " (callback exception)" : "");
         return FALSE;
     }
 
     // For EIP=0 crashes, start stack walk from return address at [ESP]
     constexpr auto kNullAddress = uintptr_t{0};
     static_assert(kNullAddress == 0, "Null address constant must be zero");
-    
+
     const auto isNullJump = (context.Eip == kNullAddress);
-    
+
     if (isNullJump)
     {
         // Try to read return address from [ESP]
@@ -1954,8 +2096,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
         {
             const auto returnAddr{reinterpret_cast<uintptr_t>(*pReturnAddress)};
 
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                                   "CaptureUnifiedStackTrace - EIP=0, starting stack walk from return address: 0x%08X\n",
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - EIP=0, starting stack walk from return address: 0x%08X\n",
                                    static_cast<unsigned int>(returnAddr));
 
             // Start stack walk from return address instead of null EIP
@@ -1965,8 +2106,7 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
         }
         else
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                                   "CaptureUnifiedStackTrace - EIP=0, ESP not readable (0x%08X), cannot capture stack\n",
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - EIP=0, ESP not readable (0x%08X), cannot capture stack\n",
                                    static_cast<unsigned int>(espAddr));
             return FALSE;
         }
@@ -1983,35 +2123,29 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
     frame.AddrStack.Mode = AddrModeFlat;
 
     auto symbolsAvailable = hasSymbols && initializedAtEntry;
-    
+
     if (hasSymbols && !symbolsAvailable) [[unlikely]]
     {
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-            "CaptureUnifiedStackTrace - Symbols detected but handler not initialized, attempting late init\n");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Symbols detected but handler not initialized, attempting late init\n");
         symbolsAvailable = CrashHandler::InitializeSymbolHandler();
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-            "CaptureUnifiedStackTrace - Late init result: %s\n", symbolsAvailable ? "SUCCESS" : "FAILED");
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Late init result: %s\n", symbolsAvailable ? "SUCCESS" : "FAILED");
     }
 
-    const auto useDbgHelp = symbolsAvailable;
+    const auto   useDbgHelp = symbolsAvailable;
     const HANDLE symHandle = g_symbolProcess.load(std::memory_order_acquire);
 
-    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-        "CaptureUnifiedStackTrace - Using DbgHelp: %s (symbolsAvailable=%s)\n",
-        useDbgHelp ? "YES" : "NO",
-        symbolsAvailable ? "true" : "false");
+    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Using DbgHelp: %s (symbolsAvailable=%s)\n", useDbgHelp ? "YES" : "NO",
+                           symbolsAvailable ? "true" : "false");
 
     if (useDbgHelp && symHandle != nullptr)
     {
         if (SymRefreshModuleList(symHandle) == FALSE)
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                "CaptureUnifiedStackTrace - SymRefreshModuleList failed before stack walk\n");
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - SymRefreshModuleList failed before stack walk\n");
         }
         else
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                "CaptureUnifiedStackTrace - SymRefreshModuleList succeeded before stack walk\n");
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - SymRefreshModuleList succeeded before stack walk\n");
         }
 
         [[maybe_unused]] const bool modulesRegistered = RegisterProcessModulesWithDbgHelp(symHandle);
@@ -2021,20 +2155,20 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
 
     constexpr auto kMaxSymbolNameLength = std::size_t{2048};
     constexpr auto symbolBufferSize = sizeof(SYMBOL_INFO) + kMaxSymbolNameLength;
-    
+
     alignas(SYMBOL_INFO) auto symbolBuffer = std::array<std::uint8_t, symbolBufferSize>{};
-    auto* const pSymbol = reinterpret_cast<PSYMBOL_INFO>(symbolBuffer.data());
+    auto* const               pSymbol = reinterpret_cast<PSYMBOL_INFO>(symbolBuffer.data());
     pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
     pSymbol->MaxNameLen = kMaxSymbolNameLength;
 
     constexpr auto machineType = IMAGE_FILE_MACHINE_I386;
-    
+
     for (auto frameIndex : std::views::iota(DWORD{0}, actualMaxFrames))
     {
         // Always use protected stack walking as the stack might be corrupted
         // (e.g. stack overflow, buffer overrun, or just garbage pointers)
         BOOL bWalked = ProtectedStackWalk64(machineType, hProcess, hThread, &frame, &context, routines);
-        
+
         if (bWalked == FALSE)
         {
             if (isCallbackException)
@@ -2048,37 +2182,32 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
             break;
 
         const auto address = frame.AddrPC.Offset;
-        
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-            "CaptureUnifiedStackTrace - Frame %lu: address=0x%llX, useDbgHelp=%s\n",
-            frameIndex, address, useDbgHelp ? "true" : "false");
-        
+
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: address=0x%llX, useDbgHelp=%s\n", frameIndex, address,
+                               useDbgHelp ? "true" : "false");
+
         if (!useDbgHelp) [[unlikely]]
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-                "CaptureUnifiedStackTrace - Frame %lu: Using fallback formatting (no DbgHelp)\n", frameIndex);
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: Using fallback formatting (no DbgHelp)\n", frameIndex);
             pOutTrace->emplace_back(StackTraceHelpers::FormatAddressWithModuleAndAbsolute(address));
             continue;
         }
-        
+
         if (symHandle == nullptr) [[unlikely]]
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-                "CaptureUnifiedStackTrace - Frame %lu: symHandle is NULL\n", frameIndex);
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: symHandle is NULL\n", frameIndex);
             pOutTrace->emplace_back(StackTraceHelpers::FormatAddressWithModuleAndAbsolute(address));
             continue;
         }
-        
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-            "CaptureUnifiedStackTrace - Frame %lu: symHandle=0x%p\n", frameIndex, symHandle);
-        
+
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: symHandle=0x%p\n", frameIndex, symHandle);
+
         auto moduleBase = SymGetModuleBase64(symHandle, address);
 
         if (moduleBase == 0) [[unlikely]]
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                "CaptureUnifiedStackTrace - Frame %lu: Address not in any loaded module, attempting registration\n",
-                frameIndex);
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: Address not in any loaded module, attempting registration\n",
+                                   frameIndex);
 
             if (RegisterModuleForAddress(symHandle, address))
             {
@@ -2089,54 +2218,46 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
         if (moduleBase == 0) [[unlikely]]
         {
             SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH,
-                "CaptureUnifiedStackTrace - Frame %lu: Address still not associated with a module after registration attempt\n",
-                frameIndex);
+                                   "CaptureUnifiedStackTrace - Frame %lu: Address still not associated with a module after registration attempt\n", frameIndex);
             pOutTrace->emplace_back(StackTraceHelpers::FormatAddressWithModuleAndAbsolute(address));
             continue;
         }
-        
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-            "CaptureUnifiedStackTrace - Frame %lu: moduleBase=0x%llX\n", frameIndex, moduleBase);
-        
+
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: moduleBase=0x%llX\n", frameIndex, moduleBase);
+
         std::string symbolName;
         symbolName.resize(64);
         _snprintf_s(symbolName.data(), symbolName.size(), _TRUNCATE, "0x%llX", address);
         symbolName.resize(std::strlen(symbolName.c_str()));
-        
+
         if (!SafeSymFromAddr(symHandle, address, pSymbol, isCallbackException)) [[unlikely]]
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-                "CaptureUnifiedStackTrace - Frame %lu: SymFromAddr failed\n", frameIndex);
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: SymFromAddr failed\n", frameIndex);
             symbolName.resize(64);
             _snprintf_s(symbolName.data(), symbolName.size(), _TRUNCATE, "0x%llX [lookup failed]", address);
             symbolName.resize(std::strlen(symbolName.c_str()));
         }
         else if (const auto nameView = std::string_view{pSymbol->Name ? pSymbol->Name : ""}; nameView.empty()) [[unlikely]]
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-                "CaptureUnifiedStackTrace - Frame %lu: Symbol lookup succeeded but name is empty\n", frameIndex);
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: Symbol lookup succeeded but name is empty\n", frameIndex);
             symbolName.resize(64);
             _snprintf_s(symbolName.data(), symbolName.size(), _TRUNCATE, "0x%llX [no symbol]", address);
             symbolName.resize(std::strlen(symbolName.c_str()));
         }
         else [[likely]]
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-                "CaptureUnifiedStackTrace - Frame %lu: Resolved symbol '%s'\n", frameIndex, pSymbol->Name);
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: Resolved symbol '%s'\n", frameIndex, pSymbol->Name);
             symbolName.assign(nameView.begin(), nameView.end());
         }
-        
-        IMAGEHLP_LINE64 lineInfo{
-            .SizeOfStruct = sizeof(IMAGEHLP_LINE64)
-        };
-        auto lineDisplacement = DWORD{0};
-        
+
+        IMAGEHLP_LINE64 lineInfo{.SizeOfStruct = sizeof(IMAGEHLP_LINE64)};
+        auto            lineDisplacement = DWORD{0};
+
         std::string frameInfo;
-        
+
         if (!SafeSymGetLineFromAddr64(symHandle, address, &lineDisplacement, &lineInfo, isCallbackException)) [[unlikely]]
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-                "CaptureUnifiedStackTrace - Frame %lu: No line info available\n", frameIndex);
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: No line info available\n", frameIndex);
             frameInfo.resize(256);
             _snprintf_s(frameInfo.data(), frameInfo.size(), _TRUNCATE, "%s [0x%llX]", symbolName.c_str(), address);
             frameInfo.resize(std::strlen(frameInfo.c_str()));
@@ -2149,18 +2270,16 @@ static bool SafeSymGetLineFromAddr64(HANDLE hProcess, DWORD64 address, DWORD* pD
         }
         else [[likely]]
         {
-            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-                "CaptureUnifiedStackTrace - Frame %lu: Line info: %s:%lu\n", 
-                frameIndex, lineInfo.FileName, lineInfo.LineNumber);
+            SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: Line info: %s:%lu\n", frameIndex, lineInfo.FileName,
+                                   lineInfo.LineNumber);
             frameInfo.resize(512);
-            _snprintf_s(frameInfo.data(), frameInfo.size(), _TRUNCATE, "%s (%.*s:%lu) [0x%llX]", 
-                symbolName.c_str(), static_cast<int>(fileName.size()), fileName.data(), lineInfo.LineNumber, address);
+            _snprintf_s(frameInfo.data(), frameInfo.size(), _TRUNCATE, "%s (%.*s:%lu) [0x%llX]", symbolName.c_str(), static_cast<int>(fileName.size()),
+                        fileName.data(), lineInfo.LineNumber, address);
             frameInfo.resize(std::strlen(frameInfo.c_str()));
         }
-        
-        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, 
-            "CaptureUnifiedStackTrace - Frame %lu: Final: %s\n", frameIndex, frameInfo.c_str());
-        
+
+        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "CaptureUnifiedStackTrace - Frame %lu: Final: %s\n", frameIndex, frameInfo.c_str());
+
         pOutTrace->emplace_back(std::move(frameInfo));
     }
 
@@ -2185,7 +2304,8 @@ static bool InstallSehHandler()
     std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
     if (previousFilter != nullptr)
     {
-        SAFE_DEBUG_PRINT(szDebug, "%.*sSEH installed, previous filter at 0x%p\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(), static_cast<const void*>(previousFilter));
+        SAFE_DEBUG_PRINT(szDebug, "%.*sSEH installed, previous filter at 0x%p\n", static_cast<int>(DEBUG_PREFIX_CRASH.size()), DEBUG_PREFIX_CRASH.data(),
+                         static_cast<const void*>(previousFilter));
     }
     else
     {
@@ -2550,7 +2670,7 @@ static BOOL TryLogEnhancedExceptionInfo(EXCEPTION_POINTERS* pException)
     catch (...)
     {
         SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - Exception caught in LogEnhancedExceptionInfo\n");
-        return TRUE; // Return TRUE to indicate we handled the attempt, even if it failed
+        return TRUE;  // Return TRUE to indicate we handled the attempt, even if it failed
     }
 }
 
@@ -2567,12 +2687,12 @@ static BOOL TryLogEnhancedExceptionInfo(EXCEPTION_POINTERS* pException)
     }
 
     SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - pException OK\n");
-    
+
     if (pException->ExceptionRecord != nullptr)
         SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ExceptionRecord OK\n");
     else
         SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ExceptionRecord is NULL\n");
-    
+
     if (pException->ContextRecord != nullptr)
         SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogExceptionDetails - ContextRecord OK\n");
     else
@@ -2635,6 +2755,21 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     }
 
     const DWORD dwExceptionCode{pExPtrs->ExceptionRecord->ExceptionCode};
+    const bool  isStackOverflow = (dwExceptionCode == EXCEPTION_STACK_OVERFLOW);
+    struct StackOverflowScope
+    {
+        bool active;
+        explicit StackOverflowScope(bool enable) : active(enable)
+        {
+            if (active)
+                g_bCrashHandlerStackOverflow = true;
+        }
+        ~StackOverflowScope()
+        {
+            if (active)
+                g_bCrashHandlerStackOverflow = false;
+        }
+    } stackOverflowScope(isStackOverflow);
 
     // Special handling for release build-affecting assertions from 3rd-party libs (e.g CEF) that overuse them
     if (IsDebuggerPresent() == FALSE && pExPtrs->ContextRecord != nullptr)
@@ -2663,7 +2798,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     LONG lRet{EXCEPTION_CONTINUE_SEARCH};
 
     static std::atomic<bool> bHandlerActive{false};
-    bool expected{false};
+    bool                     expected{false};
 
     if (!bHandlerActive.compare_exchange_strong(expected, true, std::memory_order_acq_rel, std::memory_order_relaxed))
     {
@@ -2712,6 +2847,10 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     if (STATUS_INVALID_CRUNTIME_PARAMETER_CODE == dwExceptionCode || STATUS_STACK_BUFFER_OVERRUN_CODE == dwExceptionCode)
     {
         SafeDebugOutput("SEH: FATAL - STACK BUFFER OVERRUN (STATUS_STACK_BUFFER_OVERRUN)\n");
+    }
+    else if (STATUS_HEAP_CORRUPTION_CODE == dwExceptionCode)
+    {
+        SafeDebugOutput("SEH: FATAL - HEAP CORRUPTION (STATUS_HEAP_CORRUPTION)\n");
     }
     else if (STATUS_FATAL_USER_CALLBACK_EXCEPTION == dwExceptionCode)
     {
@@ -2812,7 +2951,6 @@ namespace
 
     class HandleGuard
     {
-   
     public:
         HandleGuard() = default;
         explicit HandleGuard(HANDLE handle) : m_handle(handle) {}
@@ -2860,10 +2998,10 @@ namespace
         alignas(hardware_destructive_interference_size) std::atomic<std::chrono::steady_clock::time_point> lastHeartbeat{std::chrono::steady_clock::now()};
         alignas(hardware_destructive_interference_size) std::atomic<DWORD> targetThreadId{0};
         alignas(hardware_destructive_interference_size) std::atomic<DWORD> timeoutSeconds{20};
-        
+
         // Non-atomic handle doesn't need cache-line alignment
         HANDLE watchdogThreadHandle{nullptr};
-        
+
         ~WatchdogState()
         {
             // Note: watchdogThreadHandle should be closed by StopWatchdogThread,
@@ -2876,46 +3014,39 @@ namespace
         }
     };
 
-    static_assert(std::is_trivially_copyable_v<std::chrono::steady_clock::time_point>,
-                  "time_point must be trivially copyable for use with std::atomic");
+    static_assert(std::is_trivially_copyable_v<std::chrono::steady_clock::time_point>, "time_point must be trivially copyable for use with std::atomic");
     static_assert(std::has_unique_object_representations_v<std::chrono::steady_clock::time_point>,
                   "time_point must have unique object representations for atomic operations");
 
-    static_assert(std::atomic<bool>::is_always_lock_free,
-                  "bool atomics must be lock-free on this platform");
-    static_assert(std::atomic<DWORD>::is_always_lock_free,
-                  "DWORD atomics must be lock-free on this platform");
-    
+    static_assert(std::atomic<bool>::is_always_lock_free, "bool atomics must be lock-free on this platform");
+    static_assert(std::atomic<DWORD>::is_always_lock_free, "DWORD atomics must be lock-free on this platform");
+
     // Validate timeout constraints at compile-time using std::conjunction
-    template<auto Min, auto Max>
-    using valid_range = std::conjunction<
-        std::bool_constant<(Min > 0)>,
-        std::bool_constant<(Max >= Min)>
-    >;
-    
+    template <auto Min, auto Max>
+    using valid_range = std::conjunction<std::bool_constant<(Min > 0)>, std::bool_constant<(Max >= Min)> >;
+
     inline WatchdogState g_watchdogState{};
-    
+
     [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId)
     {
-        AddReportLog(9300, SString("Watchdog freeze detected after %u seconds (thread %u)",
-                                   g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed),
+        AddReportLog(9300, SString("Watchdog freeze detected after %u seconds (thread %u)", g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed),
                                    targetThreadId));
-        
+
         // Suspend the thread once and capture everything while suspended
         if (SuspendThread(targetThread) == static_cast<DWORD>(-1))
         {
             AddReportLog(9301, SString("Watchdog failed to suspend thread %u", targetThreadId));
             return false;
         }
-        
+
         // Thread is now suspended - capture context
         CONTEXT context{};
         context.ContextFlags = CONTEXT_FULL;
-        
+
         if (GetThreadContext(targetThread, &context) == FALSE)
         {
             AddReportLog(9302, SString("Watchdog failed to capture thread context for %u", targetThreadId));
-            
+
             // Must resume thread before returning!
             if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
             {
@@ -2923,7 +3054,7 @@ namespace
             }
             return false;
         }
-        
+
         // Create exception record and pointers for stack walking (thread still suspended)
         EXCEPTION_RECORD exceptionRecord{};
         exceptionRecord.ExceptionCode = CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT;
@@ -2932,19 +3063,19 @@ namespace
         exceptionRecord.NumberParameters = 2;
         exceptionRecord.ExceptionInformation[0] = targetThreadId;
         exceptionRecord.ExceptionInformation[1] = g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed);
-        
+
         // Use static storage to keep exception pointers alive
         static thread_local CONTEXT s_capturedContext{};
         s_capturedContext = context;
-        
+
         EXCEPTION_POINTERS exceptionPointers{};
         exceptionPointers.ExceptionRecord = &exceptionRecord;
         exceptionPointers.ContextRecord = &s_capturedContext;
-        
+
         // Capture stack trace NOW while thread is still suspended - prevents race conditions
         std::vector<std::string> stackTraceVec{};
-        const auto stackCaptured = CaptureUnifiedStackTrace(&exceptionPointers, 32, &stackTraceVec);
-        
+        const auto               stackCaptured = CaptureUnifiedStackTrace(&exceptionPointers, 32, &stackTraceVec);
+
         // Now we can safely resume the thread - we have everything we need
         if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
         {
@@ -2953,7 +3084,7 @@ namespace
         }
 
         AddReportLog(9305, SString("Watchdog captured context for thread %u", targetThreadId));
-        
+
         // Store enhanced exception info
         try
         {
@@ -2961,7 +3092,8 @@ namespace
             if (std::unique_lock<std::mutex> lock{g_exceptionInfoMutex, std::try_to_lock}; lock.owns_lock())
             {
                 // For cleaner initialization
-                g_lastExceptionInfo = [&]() {
+                g_lastExceptionInfo = [&]()
+                {
                     ENHANCED_EXCEPTION_INFO info{};
                     info.exceptionCode = CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT;
                     info.exceptionAddress = exceptionRecord.ExceptionAddress;
@@ -2970,10 +3102,10 @@ namespace
                     info.processId = GetCurrentProcessId();
                     info.exceptionType = "Watchdog Timeout (Application Freeze)";
                     info.isFatal = true;
-                    
+
                     const auto timeoutSecs = g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed);
                     info.additionalInfo = "Application became unresponsive for " + std::to_string(timeoutSecs) + " seconds";
-                    
+
                     info.eax = s_capturedContext.Eax;
                     info.ebx = s_capturedContext.Ebx;
                     info.ecx = s_capturedContext.Ecx;
@@ -2990,14 +3122,14 @@ namespace
                     info.fs = s_capturedContext.SegFs;
                     info.gs = s_capturedContext.SegGs;
                     info.eflags = s_capturedContext.EFlags;
-                    
+
                     // Use the stack trace we captured while thread was suspended
                     if (stackCaptured != FALSE && !stackTraceVec.empty())
                     {
                         info.stackTrace = std::move(stackTraceVec);
                         info.hasDetailedStackTrace = true;
                     }
-                    
+
                     return info;  // Guaranteed copy - no move, no copy
                 }();
             }
@@ -3018,25 +3150,25 @@ namespace
                 AddReportLog(9308, "Watchdog exception while storing enhanced info");
             }
         }
-        
+
         // Trigger the global exception handler
         CCrashDumpWriter::HandleExceptionGlobal(&exceptionPointers);
-        
+
         return true;
     }
-    
+
     [[nodiscard]] static unsigned int __stdcall WatchdogThreadProc(void* /*pParameter*/)
     {
         AddReportLog(9309, "Watchdog thread started");
-        
+
         constexpr auto kCheckInterval = std::chrono::milliseconds{500};
         static_assert(kCheckInterval.count() > 0, "Check interval must be positive");
-        
+
         const auto targetThreadId = g_watchdogState.targetThreadId.load(std::memory_order_acquire);
-        
+
         // Open handle to target thread
         constexpr DWORD kThreadAccess = THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION;
-        HandleGuard targetThread{OpenThread(kThreadAccess, FALSE, targetThreadId)};
+        HandleGuard     targetThread{OpenThread(kThreadAccess, FALSE, targetThreadId)};
 
         if (!targetThread)
         {
@@ -3057,9 +3189,16 @@ namespace
 
             if (elapsed.count() >= static_cast<std::chrono::seconds::rep>(timeoutSecs))
             {
-                AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)",
-                                           static_cast<long long>(elapsed.count()),
-                                           timeoutSecs));
+#ifdef MTA_DEBUG
+                if (IsDebuggerPresent() == TRUE)
+                {
+                    g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
+                    std::this_thread::sleep_for(kCheckInterval);
+                    continue;
+                }
+#endif
+
+                AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)", static_cast<long long>(elapsed.count()), timeoutSecs));
 
                 const bool triggered = TriggerWatchdogException(targetThread.get(), targetThreadId);
                 if (!triggered)
@@ -3091,12 +3230,12 @@ namespace
         AddReportLog(9314, "Watchdog thread already running");
         return FALSE;
     }
-    
+
     constexpr auto kMinTimeout = DWORD{5};
     constexpr auto kMaxTimeout = DWORD{300};
     static_assert(kMinTimeout > 0, "Minimum timeout must be positive");
     static_assert(kMaxTimeout >= kMinTimeout, "Maximum timeout must be >= minimum");
-    
+
     if (timeoutSeconds < kMinTimeout || timeoutSeconds > kMaxTimeout)
     {
         AddReportLog(9315, SString("Watchdog invalid timeout %u (allowed %u-%u)", timeoutSeconds, kMinTimeout, kMaxTimeout));
@@ -3104,22 +3243,15 @@ namespace
         g_watchdogState.running.store(false, std::memory_order_release);
         return FALSE;
     }
-    
+
     g_watchdogState.targetThreadId.store(mainThreadId, std::memory_order_release);
     g_watchdogState.timeoutSeconds.store(timeoutSeconds, std::memory_order_release);
     g_watchdogState.shouldStop.store(false, std::memory_order_release);
     g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
-    
+
     constexpr unsigned int kStackSize = 0;
-    const auto threadHandle{reinterpret_cast<HANDLE>(_beginthreadex(
-        nullptr,
-        kStackSize,
-        WatchdogThreadProc,
-        nullptr,
-        0,
-        nullptr
-    ))};
-    
+    const auto             threadHandle{reinterpret_cast<HANDLE>(_beginthreadex(nullptr, kStackSize, WatchdogThreadProc, nullptr, 0, nullptr))};
+
     HandleGuard watchdogHandle{threadHandle};
 
     if (!watchdogHandle)
@@ -3133,7 +3265,7 @@ namespace
     g_watchdogState.watchdogThreadHandle = watchdogHandle.release();
 
     AddReportLog(9317, SString("Watchdog monitoring thread %u with %u second timeout", mainThreadId, timeoutSeconds));
-    
+
     return TRUE;
 }
 
@@ -3146,19 +3278,17 @@ void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread()
 
     AddReportLog(9318, "Stopping watchdog thread");
     g_watchdogState.shouldStop.store(true, std::memory_order_release);
-    
-    if (g_watchdogState.watchdogThreadHandle != nullptr && 
-        g_watchdogState.watchdogThreadHandle != INVALID_HANDLE_VALUE)
+
+    if (g_watchdogState.watchdogThreadHandle != nullptr && g_watchdogState.watchdogThreadHandle != INVALID_HANDLE_VALUE)
     {
         constexpr DWORD kWaitTimeout = 5000;
-        if (const auto waitResult = WaitForSingleObject(g_watchdogState.watchdogThreadHandle, kWaitTimeout);
-            waitResult != WAIT_OBJECT_0)
+        if (const auto waitResult = WaitForSingleObject(g_watchdogState.watchdogThreadHandle, kWaitTimeout); waitResult != WAIT_OBJECT_0)
         {
             AddReportLog(9319, "Watchdog thread forced termination");
             TerminateThread(g_watchdogState.watchdogThreadHandle, 1);
             WaitForSingleObject(g_watchdogState.watchdogThreadHandle, INFINITE);
         }
-        
+
         CloseHandle(g_watchdogState.watchdogThreadHandle);
         g_watchdogState.watchdogThreadHandle = nullptr;
     }
@@ -3173,4 +3303,3 @@ void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat()
         g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
     }
 }
-
