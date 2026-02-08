@@ -281,7 +281,7 @@ bool CClientTXD::ImportInternal(unsigned short usModelID, bool bAllowQueue)
         }
 
         if (m_strLastError.empty())
-            m_strLastError = SString("Cannot apply textures to model %d (already applied or invalid model)", usModelID);
+            m_strLastError = SString("Failed to apply textures to model %d (texture import failed or was deferred)", usModelID);
     }
 
     return false;
