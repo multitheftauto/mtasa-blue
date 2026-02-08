@@ -317,7 +317,7 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
         rwBuffer.ptr = const_cast<char*>(buffer.data());
 
         // Limit to actual chunk boundaries
-		// This buffer trim ensures RW's stream reader only sees actual TXD/DFF data, not trailing garbage
+        // This buffer trim ensures RW's stream reader only sees actual TXD/DFF data, not trailing garbage
         // from IMG sector alignment. Avoids some spurious "TXD parsed successfully but contains no valid textures" errors
         rwBuffer.size = static_cast<unsigned int>(RW_CHUNK_HEADER_SIZE + chunkSize);
         pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
@@ -421,7 +421,7 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         rwBuffer.ptr = const_cast<char*>(buffer.data());
 
         // Limit to actual chunk boundaries
-		// This buffer trim ensures RW's stream reader only sees actual TXD/DFF data, not trailing garbage
+        // This buffer trim ensures RW's stream reader only sees actual TXD/DFF data, not trailing garbage
         // from IMG sector alignment. Avoids some spurious "TXD parsed successfully but contains no valid textures" errors
         rwBuffer.size = static_cast<unsigned int>(RW_CHUNK_HEADER_SIZE + chunkSize);
         pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
