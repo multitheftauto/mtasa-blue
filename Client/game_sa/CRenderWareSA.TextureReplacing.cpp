@@ -2003,23 +2003,18 @@ namespace
                 const bool bPoolStillUnderPressure = (iPoolSize != 0 && (iUsagePercent >= TXD_POOL_HARD_LIMIT_PERCENT || iFreeSlots <= iReservedSlots));
                 if (bPoolStillUnderPressure)
                 {
-                    if (!bParentTxdLoaded && pModelInfo->IsLoaded())
-                        pParentInfo->Request(NON_BLOCKING, "EnsureIsolatedTxdForRequestedModel-ParentTXD");
-
-                    if (usCurrentTxdId != 0 && usCurrentTxdId != usParentTxdId)
-                        RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
-
-                    if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
-                        pModelInfo->SetTextureDictionaryID(usParentTxdId);
-
-                    MarkIsolationDenied();
-
+                    // Pool is under pressure but free slots may still exist.
+                    // Log warning and continue to allocation attempt.. later, any real, persistent exhaustion
+                    // is caught by GetFreeTextureDictonarySlot() returning -1 below.
+                    // Previously this was a hard denial, which led to "white textures bug" on
+                    // total-conversion maps with many engineRequestModel objects (each
+                    // needing an isolated TXD slot).
                     if (ShouldLog(g_uiLastIsolationFailLogTime))
                     {
-                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: TXD pool near exhaustion (%d/%d, %d%%), denying isolation for model %u",
-                                                   iUsedSlots, iPoolSize, iUsagePercent, usModelId));
+                        AddReportLog(9401,
+                                     SString("EnsureIsolatedTxdForRequestedModel: TXD pool under pressure (%d/%d, %d%%), attempting allocation for model %u",
+                                             iUsedSlots, iPoolSize, iUsagePercent, usModelId));
                     }
-                    return false;
                 }
             }
         }
@@ -2074,6 +2069,7 @@ namespace
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
         {
             AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot for model %u parentTxd %u", usModelId, usParentTxdId));
+            MarkIsolationDenied();
             return false;
         }
 
