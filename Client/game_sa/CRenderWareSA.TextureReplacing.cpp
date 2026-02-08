@@ -5571,6 +5571,19 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         noteCleaned(txdId);
     };
 
+    // Release the GetModelTexturesInfo ref for clean game-TXD entries.
+    // These refs were added by DebugTxdAddRef in GetModelTexturesInfo but never
+    // released by ModelInfoTXDDeferCleanup (which only removes replacement tracking)
+    // Must happen before the mopup loop below, as mopup may corrupt the heap,
+    // making later pool access unsafe (0xC0000374).
+    // Guard with GetNumRefs > 1 to avoid triggering CStreaming::RemoveModel
+    // (which is a heap operation) when earlier cleanup could have corrupted the heap.
+    for (auto& entry : ms_ModelTexturesInfoMap)
+    {
+        if (!entry.second.bHasLeakedTextures && CTxdStore_GetNumRefs(entry.first) > 1)
+            DebugTxdRemoveRef(entry.first, "StaticResetModelTextureReplacing-clean");
+    }
+
     for (auto iter = ms_ModelTexturesInfoMap.begin(); iter != ms_ModelTexturesInfoMap.end();)
     {
         auto& info = iter->second;
@@ -5603,8 +5616,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     // destruction) may corrupt the GTA heap without immediate detection.
     // Any subsequent pool access - even on valid slots via CTxdStore_GetTxd -
     // can trigger deferred heap corruption (0xC0000374).
-    // Clean entries leak one ref per TXD per reconnect (uint16 refcount);
-    // acceptable since base TXDs are reloaded by streaming on the next session.
+    // Clean entry refs were already released before the mopup loop above.
 
     for (auto iter = ms_ModelTexturesInfoMap.begin(); iter != ms_ModelTexturesInfoMap.end();)
     {
@@ -5612,7 +5624,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
         if (!info.bHasLeakedTextures)
         {
-            // Erase without releasing ref - pool access unsafe at this point
+            // Erase entry - ref already released before mopup
             iter = ms_ModelTexturesInfoMap.erase(iter);
         }
         else
