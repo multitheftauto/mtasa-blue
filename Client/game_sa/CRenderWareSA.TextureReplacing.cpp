@@ -2518,6 +2518,13 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
     const unsigned short usTxdId = pModelInfo->GetTextureDictionaryID();
 
+    // A freed pool slot means the model has a stale usTextureDictionary left over from a
+    // cleaned-up isolated TXD. Streaming requests on freed slots insert them into GTA's
+    // streaming linked list, and when RemoveLeastUsedModel walks that list it calls
+    // GetNumRefs on the freed slot > null-deref crash.
+    if (pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usTxdId))
+        return nullptr;
+
     auto it = ms_ModelTexturesInfoMap.find(usTxdId);
     if (it != ms_ModelTexturesInfoMap.end())
     {
@@ -4117,6 +4124,15 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                             CTxdStore_RemoveRef(usIsolatedTxdId);
                     }
                 }
+            }
+
+            // If neither SetTextureDictionaryID nor the fallback above managed to restore
+            // the field (e.g. parent slot is freed), force-set it now so the model doesn't
+            // keep a stale reference to the about-to-be-freed isolated slot.
+            {
+                CBaseModelInfoSAInterface* pFinalCheck = pModelInfo->GetInterface();
+                if (pFinalCheck && pFinalCheck->usTextureDictionary == usIsolatedTxdId)
+                    pFinalCheck->usTextureDictionary = usParentTxdId;
             }
         }
     }
