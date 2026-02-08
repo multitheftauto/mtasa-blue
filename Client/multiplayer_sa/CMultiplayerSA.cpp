@@ -853,6 +853,12 @@ void CMultiplayerSA::InitHooks()
 
     // MemSet ( (void*)0x408A1B, 0x90, 5 );
 
+    // CTxdStore::GetNumRefs freed-slot error path does xor eax,eax then movsx eax,[eax+4]
+    // which is a null-deref (reads address 0x4). In SA its dead code, but MTA can reach it
+    // when a stale streaming entry references a freed TXD pool slot. NOP the movsx so
+    // freed slots return 0 refs instead of crashing.
+    MemSet((void*)0x731AB5, 0x90, 4);
+
     // Hack to make the choke task use 0 time left remaining when he starts t
     // just stand there looking. So he won't do that.
     MemPut<unsigned char>(0x620607, 0x33);
