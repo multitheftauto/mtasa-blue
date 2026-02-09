@@ -190,7 +190,7 @@ namespace
     uint32_t g_uiLastLeakCapacityLogTime = 0;
     uint32_t g_uiLastIsolationFailLogTime = 0;
     int      g_iCachedPoolSize = 0;
-    int      g_iCachedUsedSlots = 0;            // Used slots in standard range [0, SA_TXD_POOL_CAPACITY)
+    int      g_iCachedUsedSlots = 0;  // Used slots in standard range [0, SA_TXD_POOL_CAPACITY)
     bool     g_bPoolCountDirty = true;
     uint32_t g_uiIsolationDeniedSerial = 0;
     bool     g_bProcessingPendingReplacements = false;
@@ -630,8 +630,8 @@ namespace
             const unsigned int   uiParentStreamId = static_cast<unsigned int>(usCurrentParentTxdId) + uiBaseTxdId;
             // Parent TXDs are always vanilla SA slots (< 5000), so streaming info is valid.
             // Guard with SA_TXD_POOL_CAPACITY in case that invariant ever breaks.
-            CStreamingInfo*      pParentStreamInfo = usCurrentParentTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY ? GetStreamingInfoSafe(uiParentStreamId) : nullptr;
-            const bool           bParentStreamingBusy =
+            CStreamingInfo* pParentStreamInfo = usCurrentParentTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY ? GetStreamingInfoSafe(uiParentStreamId) : nullptr;
+            const bool      bParentStreamingBusy =
                 usCurrentParentTxdId != 0 && pParentStreamInfo &&
                 (pParentStreamInfo->loadState == eModelLoadState::LOADSTATE_READING || pParentStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING);
 
@@ -1999,11 +1999,11 @@ namespace
         // Pressure metrics are based on the standard range (0 to SA_TXD_POOL_CAPACITY-1)
         // because isolation slots must stay in that range. Overflow slots used by
         // script TXDs (engineRequestTXD) don't affect isolation availability.
-        constexpr int  iIsolationPoolSize = CTxdPoolSA::SA_TXD_POOL_CAPACITY;
-        int            iUsedSlots = 0;
-        int            iFreeSlots = 0;
-        int            iUsagePercent = 0;
-        int            iReservedSlots = 0;
+        constexpr int iIsolationPoolSize = CTxdPoolSA::SA_TXD_POOL_CAPACITY;
+        int           iUsedSlots = 0;
+        int           iFreeSlots = 0;
+        int           iUsagePercent = 0;
+        int           iReservedSlots = 0;
         if (iPoolSize > 0)
         {
             iReservedSlots = TXD_POOL_RESERVED_SLOTS;
@@ -2034,8 +2034,7 @@ namespace
             if (bNeedRefresh)
             {
                 g_iCachedPoolSize = iPoolSize;
-                g_iCachedUsedSlots = pTxdPoolSA->GetUsedSlotCountInRange(
-                    static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
+                g_iCachedUsedSlots = pTxdPoolSA->GetUsedSlotCountInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
                 g_uiLastPoolCountTime = uiNow;
                 g_bPoolCountDirty = false;
             }
@@ -2061,8 +2060,7 @@ namespace
                 if (!g_OrphanedIsolatedTxdSlots.empty())
                 {
                     TryCleanupOrphanedIsolatedSlots(true);
-                    g_iCachedUsedSlots = pTxdPoolSA->GetUsedSlotCountInRange(
-                        static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
+                    g_iCachedUsedSlots = pTxdPoolSA->GetUsedSlotCountInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
                     g_uiLastPoolCountTime = uiNow;
                     g_bPoolCountDirty = false;
                     if (g_iCachedUsedSlots >= 0)
@@ -2093,10 +2091,9 @@ namespace
                     // needing an isolated TXD slot).
                     if (ShouldLog(g_uiLastIsolationFailLogTime))
                     {
-                        AddReportLog(9401,
-                                     SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool under pressure (%d/%d, %d%%), "
-                                             "attempting allocation for model %u",
-                                             iUsedSlots, iIsolationPoolSize, iUsagePercent, usModelId));
+                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool under pressure (%d/%d, %d%%), "
+                                                   "attempting allocation for model %u",
+                                                   iUsedSlots, iIsolationPoolSize, iUsagePercent, usModelId));
                     }
                 }
             }
@@ -2128,8 +2125,8 @@ namespace
         {
             if (iPoolSize > 0 && iUsagePercent >= TXD_POOL_USAGE_WARN_PERCENT)
             {
-                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool usage high (%d/%d, %d%%) for model %u",
-                                           iUsedSlots, iIsolationPoolSize, iUsagePercent, usModelId));
+                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool usage high (%d/%d, %d%%) for model %u", iUsedSlots,
+                                           iIsolationPoolSize, iUsagePercent, usModelId));
             }
 
             g_uiLastTxdPoolWarnTime = uiNow;
@@ -2152,15 +2149,13 @@ namespace
         // dedicated TXD streaming entries.  Fall back to overflow range [5000, 6316)
         // which has no dedicated entries; the GetNextFileOnCd hook handles
         // DFF dependency checks for overflow by reading the pool directly.
-        std::uint32_t uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(
-            static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
+        std::uint32_t uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
 
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
         {
             // Standard range exhausted. Fall back to overflow range [5000, 6316).
             // Pool was pre-allocated to TXD_POOL_MAX_CAPACITY at startup.
-            uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(
-                static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT));
+            uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT));
         }
 
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
@@ -2168,7 +2163,8 @@ namespace
             if (ShouldLog(g_uiLastPoolDenyLogTime))
             {
                 AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot in range [0, %d) "
-                                           "for model %u parentTxd %u", CTxdPoolSA::MAX_STREAMING_TXD_SLOT, usModelId, usParentTxdId));
+                                           "for model %u parentTxd %u",
+                                           CTxdPoolSA::MAX_STREAMING_TXD_SLOT, usModelId, usParentTxdId));
             }
             MarkIsolationDenied();
             return false;
@@ -5387,8 +5383,6 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             g_OrphanedIsolatedTxdSlots.clear();
         }
     }
-
-
 
     // Pre-release D3D textures from leaked masters while raster pointers are still valid.
     // Must happen before mopup because mopup may free shared raster structs.

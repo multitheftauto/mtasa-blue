@@ -17,10 +17,10 @@
 #include <cstring>
 #include <limits>
 
-#define VAR_CTxdStore_ms_pTxdPool      0xC8800C
-#define FUNC_CTxdStore__RemoveRef      0x731A30
-#define FUNC_CStreaming__requestTxd    0x407100
-#define FUNC_CTxdStore__RemoveSlot     0x731E90
+#define VAR_CTxdStore_ms_pTxdPool   0xC8800C
+#define FUNC_CTxdStore__RemoveRef   0x731A30
+#define FUNC_CStreaming__requestTxd 0x407100
+#define FUNC_CTxdStore__RemoveSlot  0x731E90
 
 // GetNextFileOnCd TXD dependency check hook:
 // At 0x408ECE, SA reads the TXD streaming entry loadState for DFF dependency:
@@ -346,7 +346,7 @@ int CTxdPoolSA::GetUsedSlotCountInRange(std::uint32_t maxExclusive) const
         return -1;
 
     const std::uint32_t limit = std::min(maxExclusive, static_cast<std::uint32_t>(pool->m_nSize));
-    int count = 0;
+    int                 count = 0;
     for (std::uint32_t i = 0; i < limit; ++i)
     {
         if (!pool->m_byteMap[i].bEmpty)
@@ -418,7 +418,7 @@ bool CTxdPoolSA::Resize(int newCapacity)
     if (!m_ppTxdPoolInterface || !(*m_ppTxdPoolInterface))
         return false;
 
-    auto* pool = *m_ppTxdPoolInterface;
+    auto*     pool = *m_ppTxdPoolInterface;
     const int oldCapacity = pool->m_nSize;
 
     if (newCapacity <= oldCapacity)
