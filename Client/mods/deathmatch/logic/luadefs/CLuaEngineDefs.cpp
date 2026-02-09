@@ -1428,8 +1428,9 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
     if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    // TXD slots occupy IDs from BaseIDforTXD to BaseIDforCOL-1
-    const unsigned short usMaxTxdSlots = static_cast<unsigned short>(g_pGame->GetBaseIDforCOL() - g_pGame->GetBaseIDforTXD());
+    // TXD pool indices range from 0 to (MAX_MODEL_TXD_ID - MAX_MODEL_DFF_ID - 1),
+    // covering both standard SA slots and overflow slots.
+    const unsigned short usMaxTxdSlots = static_cast<unsigned short>(MAX_MODEL_TXD_ID - MAX_MODEL_DFF_ID);
     if (usTxdId >= usMaxTxdSlots)
         throw std::invalid_argument("Expected a valid TXD ID at argument 2");
 
