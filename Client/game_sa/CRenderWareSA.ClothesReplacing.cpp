@@ -229,8 +229,8 @@ __declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGT
     if (ms_ReplacementClothesFileDataMap.empty() && ms_ClothesFileDataMap.empty())
         return false;
 
-    static std::map<std::uint32_t, int>     blockOffsetToFileIdMap;
-    std::map<std::uint32_t, std::string>    blockOffsetToFileNameMap;
+    static std::map<std::uint32_t, int>  blockOffsetToFileIdMap;
+    std::map<std::uint32_t, std::string> blockOffsetToFileNameMap;
 
     if (blockOffsetToFileIdMap.empty() || ms_ClothesFileDataMap.size() > 0)
     {
