@@ -1996,9 +1996,10 @@ namespace
         const uint32_t uiNow = GetTickCount32();
         int            iPoolSize = pTxdPoolSA->GetPoolSize();
 
-        // Pressure metrics are based on the standard range (0 to SA_TXD_POOL_CAPACITY-1)
-        // because isolation slots must stay in that range. Overflow slots used by
-        // script TXDs (engineRequestTXD) don't affect isolation availability.
+        // Pressure metrics measure the standard range [0, SA_TXD_POOL_CAPACITY)
+        // where isolation prefers to allocate. Isolation can spill into the
+        // expanded range when this fills up, but pressure here still drives
+        // stale-slot reclamation to keep standard-range slots available.
         constexpr int iIsolationPoolSize = CTxdPoolSA::SA_TXD_POOL_CAPACITY;
         int           iUsedSlots = 0;
         int           iFreeSlots = 0;
@@ -2146,25 +2147,31 @@ namespace
             pModelInfo->SetTextureDictionaryID(usParentTxdId);
 
         // Prefer standard-range [0, 5000) for isolation slots - these have
-        // dedicated TXD streaming entries.  Fall back to overflow range [5000, 6316)
-        // which has no dedicated entries; the GetNextFileOnCd hook handles
-        // DFF dependency checks for overflow by reading the pool directly.
+        // dedicated TXD streaming entries.  Fall back to [5000, 6316) which
+        // has no dedicated entries, then to the expanded range [6316, 32768).
+        // For slots >= 5000 the ASM hooks check the pool bytemap directly
+        // instead of reading streaming entries.
         std::uint32_t uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
 
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
         {
-            // Standard range exhausted. Fall back to overflow range [5000, 6316).
-            // Pool was pre-allocated to TXD_POOL_MAX_CAPACITY at startup.
+            // Standard range exhausted. Try overflow range [5000, 6316).
             uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT));
+        }
+
+        if (uiNewTxdId == static_cast<std::uint32_t>(-1))
+        {
+            // Both streaming-range tiers exhausted. Use expanded pool [6316+).
+            uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotAbove(static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT));
         }
 
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
         {
             if (ShouldLog(g_uiLastPoolDenyLogTime))
             {
-                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot in range [0, %d) "
-                                           "for model %u parentTxd %u",
-                                           CTxdPoolSA::MAX_STREAMING_TXD_SLOT, usModelId, usParentTxdId));
+                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot in pool "
+                                           "for model %u parentTxd %u (poolSize=%d)",
+                                           usModelId, usParentTxdId, pTxdPoolSA->GetPoolSize()));
             }
             MarkIsolationDenied();
             return false;

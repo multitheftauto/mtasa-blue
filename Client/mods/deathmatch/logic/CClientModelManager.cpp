@@ -156,10 +156,8 @@ void CClientModelManager::ReleaseModelID(int iModelID)
 int CClientModelManager::GetFreeTxdModelID()
 {
     // Allocate above MAX_STREAMING_TXD_SLOT so script TXDs don't consume
-    // the range [0, 6316) needed by EnsureIsolatedTxd for isolation.
-    // No fallback to lower ranges - those are reserved for SA streaming
-    // and isolation. With 26,452 slots available in [6316, 32767], this
-    // covers all practical use cases.
+    // the range [0, 6316) that isolation prefers. Both isolation overflow
+    // and script TXDs share [6316+) safely via the pool bytemap.
     std::uint32_t uiTxdId = g_pGame->GetPools()->GetTxdPool().GetFreeTextureDictonarySlotAbove(CTxdPool::MAX_STREAMING_TXD_SLOT);
     if (uiTxdId == static_cast<std::uint32_t>(-1))
         return INVALID_MODEL_ID;
