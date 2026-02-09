@@ -179,7 +179,7 @@ bool CClientPickup::Create()
 
             // Store our pickup's object
             m_pObject = m_pPickup->GetObject();
-            
+
             // Validate the object was stored correctly
             if (!m_pObject)
             {
@@ -245,17 +245,17 @@ void CClientPickup::Callback_OnCollision(CClientColShape& Shape, CClientEntity& 
 {
     if (IS_PLAYER(&Entity))
     {
-        bool bMatchingDimensions = (GetDimension() == Entity.GetDimension());            // Matching dimensions?
+        bool bMatchingDimensions = (GetDimension() == Entity.GetDimension());  // Matching dimensions?
 
         // Call the pickup hit event (source = pickup that was hit)
         CLuaArguments Arguments;
-        Arguments.PushElement(&Entity);            // The element that hit the pickup
+        Arguments.PushElement(&Entity);  // The element that hit the pickup
         Arguments.PushBoolean(bMatchingDimensions);
         CallEvent("onClientPickupHit", Arguments, true);
 
         // Call the player pickup hit (source = player that hit the pickup)
         CLuaArguments Arguments2;
-        Arguments2.PushElement(this);            // The pickup that was hit
+        Arguments2.PushElement(this);  // The pickup that was hit
         Arguments2.PushBoolean(bMatchingDimensions);
         Entity.CallEvent("onClientPlayerPickupHit", Arguments2, true);
     }
@@ -265,17 +265,17 @@ void CClientPickup::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Enti
 {
     if (IS_PLAYER(&Entity))
     {
-        bool bMatchingDimensions = (GetDimension() == Entity.GetDimension());            // Matching dimensions?
+        bool bMatchingDimensions = (GetDimension() == Entity.GetDimension());  // Matching dimensions?
 
         // Call the pickup leave event (source = the pickup that was left)
         CLuaArguments Arguments;
-        Arguments.PushElement(&Entity);            // The element that left the pickup
+        Arguments.PushElement(&Entity);  // The element that left the pickup
         Arguments.PushBoolean(bMatchingDimensions);
         CallEvent("onClientPickupLeave", Arguments, true);
 
         // Call the player pickup leave event (source = the player that left the pickup)
         CLuaArguments Arguments2;
-        Arguments2.PushElement(this);            // The pickup that was left (this)
+        Arguments2.PushElement(this);  // The pickup that was left (this)
         Arguments2.PushBoolean(bMatchingDimensions);
         Entity.CallEvent("onClientPlayerPickupLeave", Arguments2, true);
     }

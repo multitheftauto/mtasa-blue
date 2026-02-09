@@ -92,10 +92,10 @@ bool CClientModelManager::TryAdd(const std::shared_ptr<CClientModel>& pModel)
 bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 {
     int modelId = pModel->GetModelID();
-    
+
     if (modelId < 0 || modelId >= static_cast<int>(g_pGame->GetBaseIDforCOL()))
         return false;
-    
+
     std::shared_ptr<CClientModel> model;
     {
         std::lock_guard<std::mutex> lock(m_idMutex);
@@ -114,7 +114,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
     if (parentResource)
     {
         if (auto* streamer = parentResource->GetResourceModelStreamer())
-            streamer->FullyReleaseModel(modelId);
+            streamer->FullyReleaseModel(static_cast<std::uint16_t>(modelId));
     }
     if (model)
     {
@@ -156,8 +156,8 @@ void CClientModelManager::ReleaseModelID(int iModelID)
 
 int CClientModelManager::GetFreeTxdModelID()
 {
-    std::uint16_t usTxdId = g_pGame->GetPools()->GetTxdPool().GetFreeTextureDictonarySlot();
-    if (usTxdId == static_cast<std::uint16_t>(-1))
+    std::uint32_t uiTxdId = g_pGame->GetPools()->GetTxdPool().GetFreeTextureDictonarySlot();
+    if (uiTxdId == static_cast<std::uint32_t>(-1))
         return INVALID_MODEL_ID;
 
     const uint maxStreamingID = g_pGame->GetCountOfAllFileIDs();
@@ -166,13 +166,13 @@ int CClientModelManager::GetFreeTxdModelID()
         return INVALID_MODEL_ID;
 
     const uint maxTxdSlots = maxModelId - MAX_MODEL_DFF_ID;
-    if (usTxdId >= maxTxdSlots)
+    if (uiTxdId >= maxTxdSlots)
         return INVALID_MODEL_ID;
 
-    return static_cast<int>(MAX_MODEL_DFF_ID + usTxdId);
+    return static_cast<int>(MAX_MODEL_DFF_ID + uiTxdId);
 }
 
-std::shared_ptr<CClientModel>  CClientModelManager::FindModelByID(int iModelID)
+std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
 {
     int32_t iMaxModelId = g_pGame->GetBaseIDforCOL();
 

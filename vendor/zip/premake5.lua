@@ -6,6 +6,10 @@ project "zip"
 
 	includedirs  { "../zlib" }
 
+	if MTA_MAETRO then
+		defines { "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP" }
+	end
+
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources"] = "*.c",

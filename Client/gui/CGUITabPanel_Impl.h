@@ -42,7 +42,7 @@ public:
 
     void SetSelectionHandler(GUI_CALLBACK Callback);
 
-    #include "CGUIElement_Inc.h"
+#include "CGUIElement_Inc.h"
 
 private:
     class CGUI_Impl* m_pGUI;

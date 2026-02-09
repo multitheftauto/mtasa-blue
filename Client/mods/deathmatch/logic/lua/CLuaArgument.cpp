@@ -11,15 +11,15 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-#define ARGUMENT_TYPE_INT       9
-#define ARGUMENT_TYPE_FLOAT     10
+#define ARGUMENT_TYPE_INT   9
+#define ARGUMENT_TYPE_FLOAT 10
 
 #ifndef VERIFY_ENTITY
-#define VERIFY_ENTITY(entity) (CStaticFunctionDefinitions::GetRootElement()->IsMyChild(entity,true)&&!entity->IsBeingDeleted())
+    #define VERIFY_ENTITY(entity) (CStaticFunctionDefinitions::GetRootElement()->IsMyChild(entity, true) && !entity->IsBeingDeleted())
 #endif
 
 #ifndef VERIFY_RESOURCE
-#define VERIFY_RESOURCE(resource) (g_pClientGame->GetResourceManager()->Exists(resource))
+    #define VERIFY_RESOURCE(resource) (g_pClientGame->GetResourceManager()->Exists(resource))
 #endif
 
 extern CClientGame* g_pClientGame;
@@ -27,7 +27,7 @@ extern CClientGame* g_pClientGame;
 using namespace std;
 
 // Prevent the warning issued when doing unsigned short -> void*
-#pragma warning(disable:4312)
+#pragma warning(disable : 4312)
 
 CLuaArgument::CLuaArgument()
 {
@@ -887,9 +887,9 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
             }
             else
             {
-                if (pElement)            // eg toJSON() with valid element
+                if (pElement)  // eg toJSON() with valid element
                     g_pClientGame->GetScriptDebugging()->LogError(NULL, "Couldn't convert userdata argument to JSON, elements not allowed for this function.");
-                else if (!bSerialize)            // eg toJSON() with invalid element
+                else if (!bSerialize)  // eg toJSON() with invalid element
                     g_pClientGame->GetScriptDebugging()->LogError(
                         NULL, "Couldn't convert userdata argument to JSON, only valid resources can be included for this function.");
                 else
@@ -1038,7 +1038,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                 {
                     switch (strString[1])
                     {
-                        case 'E':            // element
+                        case 'E':  // element
                         {
                             int            id = atoi(strString.c_str() + 3);
                             CClientEntity* element = NULL;
@@ -1056,7 +1056,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                             }
                             break;
                         }
-                        case 'R':            // resource
+                        case 'R':  // resource
                         {
                             CResource* resource = g_pClientGame->GetResourceManager()->GetResource(strString.c_str() + 3);
                             if (resource)
@@ -1070,7 +1070,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                             }
                             break;
                         }
-                        case 'T':            // Table reference
+                        case 'T':  // Table reference
                         {
                             unsigned long ulTableID = static_cast<unsigned long>(atol(strString.c_str() + 3));
                             if (pKnownTables && ulTableID < pKnownTables->size())

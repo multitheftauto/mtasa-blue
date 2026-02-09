@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <chrono>
+#include <cstdint>
 #include <vector>
 #include <core/CCoreInterface.h>
 #include "CColModelSA.h"
@@ -28,15 +29,15 @@ extern CGameSA*        pGame;
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
-std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                               CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, unsigned short>                                      CModelInfoSA::ms_ModelDefaultFlagsMap;
+std::map<DWORD, BYTE>                                                CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::map<DWORD, CTimeInfoSAInterface>                                 CModelInfoSA::ms_ModelDefaultModelTimeInfo;
-std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
-std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
-std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::map<DWORD, CTimeInfoSAInterface>                                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
+std::unordered_map<DWORD, unsigned short>                            CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                   CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_DefaultTxdIDMap;
 
 void CModelInfoSA::ClearModelDefaults(DWORD modelId)
 {
@@ -103,6 +104,9 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
     function(idx, colModel);
 }
 
+// Validates model info pointer by checking VFTBL is in valid GTA:SA code range.
+// Uses SEH for crash protection when reading the VFTBL field, but avoids
+// the expensive volatile read of VFTBL->Destructor by using address validation.
 static bool IsValidModelInfoPtr(const void* ptr) noexcept
 {
     if (!ptr)
@@ -111,23 +115,15 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
     __try
     {
         const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
-        const auto* v = p->VFTBL;
-        if (!v)
-            return false;
-
-        volatile DWORD test = v->Destructor;
-        static_cast<void>(test);
-        return true;
+        const DWORD vftbl = reinterpret_cast<DWORD>(p->VFTBL);
+        // VFTBL must be in valid GTA:SA code range - this implicitly validates
+        // the pointer since garbage/freed memory won't have valid VFTBL addresses
+        return SharedUtil::IsValidGtaSaPtr(vftbl);
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
         return false;
     }
-}
-
-static bool IsValidGtaSaCodePtr(DWORD addr) noexcept
-{
-    return addr >= 0x401000 && addr < 0x900000;
 }
 
 static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept
@@ -459,7 +455,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
-        // clang-format off
+    // clang-format off
         __asm
         {
             push    eax
@@ -482,7 +478,7 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     ebx
             pop     eax
         }
-        // clang-format on
+    // clang-format on
     return (char*)dwReturn;
 }
 
@@ -492,7 +488,7 @@ uint CModelInfoSA::GetAnimFileIndex()
         return 0xFFFFFFFF;
 
     DWORD dwFunc = m_pInterface->VFTBL->GetAnimFileIndex;
-    if (!IsValidGtaSaCodePtr(dwFunc))
+    if (!SharedUtil::IsValidGtaSaPtr(dwFunc))
         return 0xFFFFFFFF;
 
     DWORD dwThis = (DWORD)m_pInterface;
@@ -636,7 +632,8 @@ bool CModelInfoSA::DoIsLoaded()
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     bool bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
 
-    if (m_dwModelID < pGame->GetBaseIDforTXD())
+    const int32_t baseTxdId = pGame->GetBaseIDforTXD();
+    if (baseTxdId > 0 && m_dwModelID < static_cast<DWORD>(baseTxdId))
     {
         m_pInterface = GetInterface();
 
@@ -694,8 +691,8 @@ void CModelInfoSA::SetFlags(unsigned short usFlags)
         MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
 
     // Don't change bIsColLoaded flag
-    usFlags &= 0xFF7F;                                  // Disable flag in input
-    usFlags |= m_pInterface->usFlags & 0x80;            // Apply current bIsColLoaded flag
+    usFlags &= 0xFF7F;                        // Disable flag in input
+    usFlags |= m_pInterface->usFlags & 0x80;  // Apply current bIsColLoaded flag
 
     m_pInterface->usFlags = usFlags;
 }
@@ -715,7 +712,7 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
 
     // Default value is 0xC0 (bIsColLoaded + bIsBackfaceCulled)
     // But bIsColLoaded should not be changed
-    m_pInterface->usFlags &= 0x80;            // Reset all flags except bIsColLoaded
+    m_pInterface->usFlags &= 0x80;  // Reset all flags except bIsColLoaded
     m_pInterface->bIsBackfaceCulled = true;
 
     // setBaseModelInfoFlags
@@ -875,7 +872,7 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
         case eModelIdeFlag::IS_DAMAGABLE:
         {
             DWORD funcAddr = m_pInterface->VFTBL->AsDamageAtomicModelInfoPtr;
-            if (!IsValidGtaSaCodePtr(funcAddr))
+            if (!SharedUtil::IsValidGtaSaPtr(funcAddr))
                 return false;
             return ((bool (*)())funcAddr)();
         }
@@ -980,8 +977,15 @@ bool CModelInfoSA::IsValid()
     if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
         return !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
 
-    if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
-        return true;
+    const int32_t baseTxdId = pGame->GetBaseIDforTXD();
+    const int32_t countOfAllFileIds = pGame->GetCountOfAllFileIDs();
+    if (baseTxdId > 0 && countOfAllFileIds > baseTxdId)
+    {
+        const DWORD baseTxdIdDw = static_cast<DWORD>(baseTxdId);
+        const DWORD countDw = static_cast<DWORD>(countOfAllFileIds);
+        if (m_dwModelID >= baseTxdIdDw && m_dwModelID < countDw)
+            return true;
+    }
 
     if (m_dwModelID >= MODELINFO_DFF_MAX)
         return false;
@@ -1035,6 +1039,22 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     unsigned short usOldTxdId = m_pInterface->usTextureDictionary;
     if (usOldTxdId == usID)
         return;
+
+    // Validate new TXD slot before proceeding to avoid CTxdStore_AddRef crash
+    if (CTxdStore_GetTxd(usID) == nullptr)
+    {
+        // Slot is allocated (e.g. via engineRequestTXD) but TXD data isn't loaded yet.
+        // For unloaded models, just set the TXD ID.. SA streaming handles refs and
+        // texture resolution when it loads both the model and its TXD dependency.
+        if (!pGame || pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usID) || m_pInterface->pRwObject)
+            return;
+
+        if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
+            ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
+
+        m_pInterface->usTextureDictionary = usID;
+        return;
+    }
 
     size_t referencesCount = m_pInterface->usNumberOfRefs;
     if (m_pInterface->pRwObject)
@@ -1090,8 +1110,12 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     }
 
     // Release old TXD refs after rebinding completes
-    for (size_t i = 0; i < referencesCount; i++)
-        CTxdStore_RemoveRef(usOldTxdId);
+    // Only release if old slot is still valid to avoid crash on stale/orphaned TXD slots
+    if (CTxdStore_GetTxd(usOldTxdId) != nullptr)
+    {
+        for (size_t i = 0; i < referencesCount; i++)
+            CTxdStore_RemoveRef(usOldTxdId);
+    }
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()
@@ -1108,6 +1132,14 @@ void CModelInfoSA::ResetTextureDictionaryID()
     }
 
     const auto targetId = static_cast<unsigned short>(it->second);
+
+    // If target TXD no longer exists, clean up stale entry and return
+    if (CTxdStore_GetTxd(targetId) == nullptr)
+    {
+        ms_DefaultTxdIDMap.erase(it);
+        return;
+    }
+
     SetTextureDictionaryID(targetId);
     if (GetTextureDictionaryID() == targetId)
         ms_DefaultTxdIDMap.erase(it);
@@ -1185,7 +1217,7 @@ void CModelInfoSA::StaticResetModelTimes()
 {
     for (auto it = ms_ModelDefaultModelTimeInfo.begin(); it != ms_ModelDefaultModelTimeInfo.end();)
     {
-        const DWORD modelId = it->first;
+        const DWORD                modelId = it->first;
         CBaseModelInfoSAInterface* pInterface = ppModelInfo[modelId];
         if (!IsValidModelInfoPtr(pInterface))
         {
@@ -1194,12 +1226,12 @@ void CModelInfoSA::StaticResetModelTimes()
         }
 
         DWORD funcAddr = pInterface->VFTBL->GetModelType;
-        if (!IsValidGtaSaCodePtr(funcAddr))
+        if (!SharedUtil::IsValidGtaSaPtr(funcAddr))
         {
             it = ms_ModelDefaultModelTimeInfo.erase(it);
             continue;
         }
-        const eModelInfoType modelType = ((eModelInfoType(*)())funcAddr)();
+        const eModelInfoType modelType = ((eModelInfoType (*)())funcAddr)();
         if (modelType != eModelInfoType::TIME)
         {
             it = ms_ModelDefaultModelTimeInfo.erase(it);
@@ -1325,7 +1357,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     // In other words, it does not affect elements created by MTA.
     // It's mostly a reimplementation of SA's DeleteAllRwObjects, except that it filters by model ID.
 
-    reinterpret_cast<void(*)()>(FUNC_FlushRequestList)();
+    reinterpret_cast<void (*)()>(FUNC_FlushRequestList)();
 
     std::unordered_set<unsigned short> processedTxdIDs;
     std::unordered_set<unsigned short> pendingTxdIDs;
@@ -1339,16 +1371,18 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     constexpr int kRepeatSectorStride = 3;  // StreamRepeatSectors uses stride of 3, we access element [2]
 
     // Helper to validate entity vtable - checks if DeleteRwObject points to expected address
-    auto isValidEntity = [](CEntitySAInterface* pEntity) -> bool {
+    auto isValidEntity = [](CEntitySAInterface* pEntity) -> bool
+    {
         constexpr std::size_t kDeleteRwObjectVtblOffset = 8;
         constexpr std::size_t kExpectedDeleteRwObject = 0x00534030;
-        auto* vtbl = static_cast<std::size_t*>(pEntity->GetVTBL());
+        auto*                 vtbl = static_cast<std::size_t*>(pEntity->GetVTBL());
         return vtbl[kDeleteRwObjectVtblOffset] == kExpectedDeleteRwObject;
     };
 
     // Process entities from a sector list
     // Note: validateVtable should be true for StreamSectors but false for StreamRepeatSectors
-    auto processSectorList = [&](DWORD* pSectorEntry, bool validateVtable, int sectorIndex) {
+    auto processSectorList = [&](DWORD* pSectorEntry, bool validateVtable, int sectorIndex)
+    {
         while (pSectorEntry)
         {
             auto* pEntity = reinterpret_cast<CEntitySAInterface*>(pSectorEntry[0]);
@@ -1361,10 +1395,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             // Vtable validation for StreamSectors
             if (validateVtable && !isValidEntity(pEntity))
             {
-                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n",
-                    pEntity, pEntity->m_nModelIndex,
-                    sectorIndex / 2 % NUM_StreamSectorRows, sectorIndex / 2 / NUM_StreamSectorCols));
-                    pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
+                                          sectorIndex / 2 % NUM_StreamSectorRows, sectorIndex / 2 / NUM_StreamSectorCols));
+                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
                 continue;
             }
 
@@ -1429,9 +1462,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     // Increment retry counter ONLY for pending TXD IDs (entities being rendered)
     // Don't increment for: unprocessed (will be erased below)
     // Note: processedTxdIDs that are also in pendingTxdIDs stay in map and need counter incremented
-    constexpr int kMaxRetryFrames = 300;  // ~5 seconds at 60fps
+    constexpr int                      kMaxRetryFrames = 300;  // ~5 seconds at 60fps
     std::unordered_set<unsigned short> timedOutTxdIDs;
-    for (auto it = ms_RestreamTxdIDMap.begin(); it != ms_RestreamTxdIDMap.end(); )
+    for (auto it = ms_RestreamTxdIDMap.begin(); it != ms_RestreamTxdIDMap.end();)
     {
         // Skip if unprocessed - those will be erased below after model unload attempt
         if (unprocessedTxdIDs.count(it->first))
@@ -1485,7 +1518,8 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     {
         const auto maxModelId = static_cast<DWORD>(pGame->GetBaseIDforTXD());
 
-        auto tryQueueModelUnload = [&](DWORD modelId) {
+        auto tryQueueModelUnload = [&](DWORD modelId)
+        {
             auto* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(modelId);
             if (!pStreamingInfo || pStreamingInfo->loadState == eModelLoadState::LOADSTATE_NOT_LOADED)
                 return;
@@ -1580,7 +1614,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         CBaseModelInfoSAInterface* pInterface = GetInterface();
         if (pInterface && pInterface->usNumberOfRefs > 1)
         {
-            DWORD                      dwFunction = FUNC_RemoveRef;
+            DWORD dwFunction = FUNC_RemoveRef;
             _asm
             {
                 mov     ecx, pInterface
@@ -1721,10 +1755,8 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
     }
     // clang-format on
 
-    if (szText)
-        strncpy(szStoredText, szText, 8);
-    else
-        szStoredText[0] = '\0';
+    if (szText) strncpy(szStoredText, szText, 8);
+    else szStoredText[0] = '\0';
 }
 
 unsigned int CModelInfoSA::GetNumRemaps()
@@ -1963,7 +1995,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
-        return;            // Early out in case the model doesn't have any dummies modified
+        return;  // Early out in case the model doesn't have any dummies modified
 
     auto* pVehicleModel = static_cast<CVehicleModelInfoSAInterface*>(GetInterface());
     if (!pVehicleModel || !pVehicleModel->pVisualInfo)
@@ -2150,6 +2182,15 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::TIME:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
+        case eModelInfoType::UNKNOWN:
+            // Weapon models (321-372) may return UNKNOWN type during streaming. Using ReplaceAllAtomicsInModel
+            // for weapons would skip CWeaponModelInfo::SetClump, leaving the frame plugin's m_modelInfo NULL,
+            // which crashes in CVisibilityPlugins::RenderWeaponCB due to nullptr deref.
+            if (m_dwModelID >= 321 && m_dwModelID <= 372)
+                success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            else
+                success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
         default:
             break;
     }
@@ -2217,6 +2258,11 @@ void CModelInfoSA::RestoreOriginalModel()
     m_pCustomClump = nullptr;
 }
 
+void CModelInfoSA::ClearCustomModel()
+{
+    m_pCustomClump = nullptr;
+}
+
 void CModelInfoSA::SetColModel(CColModel* pColModel)
 {
     if (!pColModel)
@@ -2258,8 +2304,11 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
             }
         }
 
-        // Apply some low-level hacks
-        pColModelInterface->m_sphere.m_collisionSlot = 0xA9;
+        // Set collision slot to 0 (the "generic" slot) for custom collision models.
+        // Slot 0 is always allocated in CColStore::Initialise(). Using an unallocated
+        // slot ID (like the previous 0xA9) causes CColStore::AddRef to access garbage
+        // memory since native GTA doesn't validate slot existence before pool indexing.
+        pColModelInterface->m_sphere.m_collisionSlot = 0;
 
         CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, true);
         CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
@@ -2399,13 +2448,23 @@ void CModelInfoSA::AddColRef()
         }
     }
 
-    if (slot != 0xFFFF && pGame)
+    if (slot == 0xFFFF || slot > 0xFF)
+        return;
+
+    if (pGame)
     {
         auto* pColStore = pGame->GetCollisionStore();
         if (pColStore)
         {
-            pColStore->AddRef(slot);
-            ++m_colRefCount;
+            // Validate slot exists in pool before calling native AddRef.
+            // GTA SA's CColStore::AddRef (0x4107A0) doesn't validate slot existence,
+            // it directly indexes the pool causing crashes on unallocated slots.
+            const CollisionSlot colSlot = static_cast<CollisionSlot>(slot);
+            if (pColStore->IsValidSlot(colSlot))
+            {
+                pColStore->AddRef(colSlot);
+                ++m_colRefCount;
+            }
         }
     }
 }
@@ -2440,7 +2499,7 @@ void CModelInfoSA::RemoveColRef()
         slot = m_usColSlot;
     }
 
-    if (slot == 0xFFFF)
+    if (slot == 0xFFFF || slot > 0xFF)
         return;
 
     if (!pGame)
@@ -2450,9 +2509,15 @@ void CModelInfoSA::RemoveColRef()
     if (!pColStore)
         return;
 
-    pColStore->RemoveRef(slot);
-    if (m_colRefCount > 0)
-        --m_colRefCount;
+    // Validate slot exists in pool before calling native RemoveRef.
+    // GTA SA's CColStore::RemoveRef (0x4107D0) doesn't validate slot existence.
+    const CollisionSlot colSlot = static_cast<CollisionSlot>(slot);
+    if (pColStore->IsValidSlot(colSlot))
+    {
+        pColStore->RemoveRef(colSlot);
+        if (m_colRefCount > 0)
+            --m_colRefCount;
+    }
     if (m_colRefCount == 0)
         m_usColSlot = 0xFFFF;
 }
@@ -2704,13 +2769,17 @@ void CModelInfoSA::DeallocateModel()
         m_pCustomClump = nullptr;
         m_pCustomColModel = nullptr;
         m_pOriginalColModelInterface = nullptr;
-        if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && pGame)
+        if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && m_usColSlot <= 0xFF && pGame)
         {
             auto* pColStore = pGame->GetCollisionStore();
             if (pColStore)
             {
-                for (std::uint32_t i = 0; i < m_colRefCount; ++i)
-                    pColStore->RemoveRef(m_usColSlot);
+                const CollisionSlot colSlot = static_cast<CollisionSlot>(m_usColSlot);
+                if (pColStore->IsValidSlot(colSlot))
+                {
+                    for (std::uint32_t i = 0; i < m_colRefCount; ++i)
+                        pColStore->RemoveRef(colSlot);
+                }
             }
         }
         m_colRefCount = 0;
@@ -2724,8 +2793,8 @@ void CModelInfoSA::DeallocateModel()
     // Block deletion while refs > 0 to avoid null pointer crash.
     if (pInterfaceToDelete->usNumberOfRefs > 0)
     {
-        AddReportLog(5550, SString("Blocked DeallocateModel for model %u with %u active refs to prevent crash at 0x4C4BB0",
-                    m_dwModelID, static_cast<unsigned int>(pInterfaceToDelete->usNumberOfRefs)));
+        AddReportLog(5550, SString("Blocked DeallocateModel for model %u with %u active refs to prevent crash at 0x4C4BB0", m_dwModelID,
+                                   static_cast<unsigned int>(pInterfaceToDelete->usNumberOfRefs)));
 
         m_pInterface = pInterfaceToDelete;
 
@@ -2753,17 +2822,17 @@ void CModelInfoSA::DeallocateModel()
 
     // Capture model type and damageability BEFORE nulling the array entry.
     eModelInfoType modelType = eModelInfoType::UNKNOWN;
-    bool isDamageableAtomic = false;
+    bool           isDamageableAtomic = false;
     if (pInterfaceToDelete->VFTBL)
     {
         DWORD typeFunc = pInterfaceToDelete->VFTBL->GetModelType;
-        if (IsValidGtaSaCodePtr(typeFunc))
-            modelType = ((eModelInfoType(*)())typeFunc)();
+        if (SharedUtil::IsValidGtaSaPtr(typeFunc))
+            modelType = ((eModelInfoType (*)())typeFunc)();
 
         if (modelType == eModelInfoType::ATOMIC || modelType == eModelInfoType::LOD_ATOMIC)
         {
             DWORD damageFunc = pInterfaceToDelete->VFTBL->AsDamageAtomicModelInfoPtr;
-            if (IsValidGtaSaCodePtr(damageFunc))
+            if (SharedUtil::IsValidGtaSaPtr(damageFunc))
             {
                 void* asDamageable = ((void* (*)())damageFunc)();
                 isDamageableAtomic = (asDamageable != nullptr);
@@ -2784,13 +2853,17 @@ void CModelInfoSA::DeallocateModel()
     m_pCustomClump = nullptr;
     m_pCustomColModel = nullptr;
     m_pOriginalColModelInterface = nullptr;
-    if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && pGame)
+    if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && m_usColSlot <= 0xFF && pGame)
     {
         auto* pColStore = pGame->GetCollisionStore();
         if (pColStore)
         {
-            for (std::uint32_t i = 0; i < m_colRefCount; ++i)
-                pColStore->RemoveRef(m_usColSlot);
+            const CollisionSlot colSlot = static_cast<CollisionSlot>(m_usColSlot);
+            if (pColStore->IsValidSlot(colSlot))
+            {
+                for (std::uint32_t i = 0; i < m_colRefCount; ++i)
+                    pColStore->RemoveRef(colSlot);
+            }
         }
     }
     m_colRefCount = 0;
@@ -2825,8 +2898,7 @@ void CModelInfoSA::DeallocateModel()
             delete reinterpret_cast<CTimeModelInfoSAInterface*>(pInterfaceToDelete);
             break;
         default:
-            AddReportLog(5551, SString("Unknown model type %d for model %u - memory leaked to prevent corruption",
-                                       static_cast<int>(modelType), m_dwModelID));
+            AddReportLog(5551, SString("Unknown model type %d for model %u - memory leaked to prevent corruption", static_cast<int>(modelType), m_dwModelID));
             return;
     }
 
@@ -2858,9 +2930,9 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 }
 
 // Hook info
-#define HOOKPOS_NodeNameStreamRead                         0x072FA68
-#define HOOKSIZE_NodeNameStreamRead                        15
-DWORD RETURN_NodeNameStreamRead = 0x072FA77;
+#define HOOKPOS_NodeNameStreamRead  0x072FA68
+#define HOOKSIZE_NodeNameStreamRead 15
+DWORD                         RETURN_NodeNameStreamRead = 0x072FA77;
 static void __declspec(naked) HOOK_NodeNameStreamRead()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -3073,10 +3145,10 @@ eModelInfoType CModelInfoSA::GetModelType()
         return eModelInfoType::UNKNOWN;
 
     DWORD funcAddr = pInterface->VFTBL->GetModelType;
-    if (!IsValidGtaSaCodePtr(funcAddr))
+    if (!SharedUtil::IsValidGtaSaPtr(funcAddr))
         return eModelInfoType::UNKNOWN;
 
-    return ((eModelInfoType(*)())funcAddr)();
+    return ((eModelInfoType (*)())funcAddr)();
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
@@ -3116,7 +3188,7 @@ bool CModelInfoSA::IsDamageableAtomic()
         return false;
 
     DWORD funcAddr = pInterface->VFTBL->AsDamageAtomicModelInfoPtr;
-    if (!IsValidGtaSaCodePtr(funcAddr))
+    if (!SharedUtil::IsValidGtaSaPtr(funcAddr))
         return false;
 
     void* asDamageable = ((void* (*)())funcAddr)();

@@ -13,8 +13,7 @@
 
 using namespace lunasvg;
 
-CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID)
-    : CClientDisplay(ID)
+CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID) : CClientDisplay(ID)
 {
     m_pVectorGraphic = pVectorGraphic;
     m_bVisible = true;
@@ -51,10 +50,10 @@ void CClientVectorGraphicDisplay::UnpremultiplyBitmap(Bitmap& bitmap)
     auto stride = bitmap.stride();
     auto rowData = bitmap.data();
 
-    for (int y = 0; y < height; y++)
+    for (decltype(height) y = 0; y < height; y++)
     {
         auto data = rowData;
-        for (int x = 0; x < width; x++)
+        for (decltype(width) x = 0; x < width; x++)
         {
             auto& b = data[0];
             auto& g = data[1];

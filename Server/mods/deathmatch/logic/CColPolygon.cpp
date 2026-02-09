@@ -161,8 +161,8 @@ void CColPolygon::CalculateRadius(const CVector2D& vecPoint)
 bool CColPolygon::IsInBounds(CVector vecPoint)
 {
     const CVector& vecPosition = GetPosition();
-    float fDistanceX = vecPoint.fX - vecPosition.fX;
-    float fDistanceY = vecPoint.fY - vecPosition.fY;
+    float          fDistanceX = vecPoint.fX - vecPosition.fX;
+    float          fDistanceY = vecPoint.fY - vecPosition.fY;
 
     float fDist = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
 

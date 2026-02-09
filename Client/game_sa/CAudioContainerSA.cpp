@@ -54,20 +54,20 @@ bool CAudioContainerSA::GetAudioData(eAudioLookupIndex lookupIndex, int bankInde
 
     // Add the RIFF Wave header since BASS does not support raw data
     SRiffWavePCMHeader waveHeader;
-    waveHeader.chunkId = EndianSwap32(0x52494646);            // "RIFF" in ASCII, big-Endian
+    waveHeader.chunkId = EndianSwap32(0x52494646);  // "RIFF" in ASCII, big-Endian
     waveHeader.chunkSize = 36 + rawAudioLength;
-    waveHeader.format = EndianSwap32(0x57415645);            // "WAVE" in ASCII, big-Endian
+    waveHeader.format = EndianSwap32(0x57415645);  // "WAVE" in ASCII, big-Endian
 
-    waveHeader.subchunk1Id = EndianSwap32(0x666d7420);            // "fmt " in ASCII, big-Endian
-    waveHeader.subchunk1Size = 16;                                // 16 for PCM
-    waveHeader.audioFormat = 0x1;                                 // PCM
-    waveHeader.numChannels = 1;                                   // Mono
+    waveHeader.subchunk1Id = EndianSwap32(0x666d7420);  // "fmt " in ASCII, big-Endian
+    waveHeader.subchunk1Size = 16;                      // 16 for PCM
+    waveHeader.audioFormat = 0x1;                       // PCM
+    waveHeader.numChannels = 1;                         // Mono
     waveHeader.sampleRate = iSampleRate;
-    waveHeader.bitsPerSample = 16;            // 16-Bit PCM
+    waveHeader.bitsPerSample = 16;  // 16-Bit PCM
     waveHeader.byteRate = waveHeader.sampleRate * waveHeader.numChannels * waveHeader.bitsPerSample / 8;
     waveHeader.blockAlign = waveHeader.numChannels * waveHeader.bitsPerSample / 8;
 
-    waveHeader.subchunk2Id = EndianSwap32(0x64617461);            // "data" in ASCII, big-endian
+    waveHeader.subchunk2Id = EndianSwap32(0x64617461);  // "data" in ASCII, big-endian
     waveHeader.subchunk2Size = rawAudioLength;
 
     // Allocate a second buffer as we've to insert the wave pcm header at the beginning
@@ -94,10 +94,13 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
     if (numBanks == 0)
         return false;
 
+    if (bankIndex < 0 || bankIndex >= numBanks || bankIndex > 0xFF)
+        return false;
+
     // Get archive file size
     std::ifstream archive(FromUTF8(GetAudioArchiveName(lookupIndex)), std::ios::binary);
 
-    SAudioLookupEntrySA* lookupEntry = m_pLookupTable->GetEntry(lookupIndex, static_cast<uint8_t>(bankIndex));
+    SAudioLookupEntrySA* lookupEntry = m_pLookupTable->GetEntry(lookupIndex, static_cast<uint8>(bankIndex));
     if (!lookupEntry)
         return false;
 
@@ -115,7 +118,7 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
         return false;
 
     unsigned int rawLength;
-    if (audioIndex + 1 < bankHeader.numSounds)            // hacky fix: audioIndex starts at 0
+    if (audioIndex + 1 < bankHeader.numSounds)  // hacky fix: audioIndex starts at 0
     {
         SAudioEntrySA* nextAudioEntry = &bankHeader.sounds[audioIndex + 1];
         if (!nextAudioEntry)
@@ -142,8 +145,7 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
     iSampleRateOut = audioEntry->sampleRate;
 
     // Seek to the correct offset and read
-    archive.seekg(lookupEntry->offset + sizeof(SAudioBankHeaderSA) +
-                  audioEntry->offset);            // Or just archive.seekg ( archive.tellg() + audioEntry->offset )
+    archive.seekg(lookupEntry->offset + sizeof(SAudioBankHeaderSA) + audioEntry->offset);  // Or just archive.seekg ( archive.tellg() + audioEntry->offset )
     archive.read(reinterpret_cast<char*>(buffer), rawLength);
 
     return !archive.fail();

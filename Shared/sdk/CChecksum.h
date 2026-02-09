@@ -21,8 +21,8 @@
 #include <bochs_internal/bochs_crc32.h>
 
 #if defined(_WIN32) && defined(MTA_CLIENT)
-#include <unordered_map>
-#include <mutex>
+    #include <unordered_map>
+    #include <mutex>
 #endif
 
 // Depends on CMD5Hasher and CRCGenerator
@@ -38,65 +38,144 @@ public:
 
 #if defined(_WIN32) && defined(MTA_CLIENT)
 private:
-    struct CacheEntry { std::uint64_t size, mtime; unsigned long crc; MD5 md5; };
-    static std::unordered_map<std::string, CacheEntry>& Cache() { static std::unordered_map<std::string, CacheEntry> c; return c; }
-    static std::mutex& CacheMtx() { static std::mutex m; return m; }
+    struct CacheEntry
+    {
+        std::uint64_t size, mtime;
+        unsigned long crc;
+        MD5           md5;
+    };
+    static std::unordered_map<std::string, CacheEntry>& Cache()
+    {
+        static std::unordered_map<std::string, CacheEntry> c;
+        return c;
+    }
+    static std::mutex& CacheMtx()
+    {
+        static std::mutex m;
+        return m;
+    }
+
+    struct GetAttributesParams
+    {
+        wchar_t*                  pathCopy;
+        WIN32_FILE_ATTRIBUTE_DATA attrLocal;
+        BOOL                      result;
+    };
+
+    static DWORD WINAPI GetAttributesThread(LPVOID param)
+    {
+        auto* p = static_cast<GetAttributesParams*>(param);
+        p->result = GetFileAttributesExW(p->pathCopy, GetFileExInfoStandard, &p->attrLocal);
+        return 0;
+    }
+
+    static bool GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_ATTRIBUTE_DATA& attr, DWORD timeoutMs) noexcept
+    {
+        size_t   pathLen = wcslen(path) + 1;
+        wchar_t* pathCopy = new (std::nothrow) wchar_t[pathLen];
+        if (!pathCopy)
+            return false;
+
+    #ifdef _MSC_VER
+        wcscpy_s(pathCopy, pathLen, path);
+    #else
+        wcscpy(pathCopy, path);
+    #endif
+
+        auto* params = new (std::nothrow) GetAttributesParams{pathCopy, {}, FALSE};
+        if (!params)
+        {
+            delete[] pathCopy;
+            return false;
+        }
+
+        DWORD  threadId;
+        HANDLE thread = CreateThread(nullptr, 0, GetAttributesThread, params, 0, &threadId);
+        if (!thread)
+        {
+            delete[] params->pathCopy;
+            delete params;
+            return false;
+        }
+
+        DWORD waitResult = WaitForSingleObject(thread, timeoutMs);
+
+        if (waitResult == WAIT_OBJECT_0)
+        {
+            CloseHandle(thread);
+            attr = params->attrLocal;
+            bool success = params->result != FALSE;
+            delete[] params->pathCopy;
+            delete params;
+            return success;
+        }
+
+        // Timeout - abandon thread and leak params (acceptable: small leak vs game freeze)
+        CloseHandle(thread);
+        return false;
+    }
 
 public:
-    static void ClearChecksumCache() { std::lock_guard<std::mutex> l(CacheMtx()); Cache().clear(); }
+    static void ClearChecksumCache()
+    {
+        std::lock_guard<std::mutex> l(CacheMtx());
+        Cache().clear();
+    }
 
     static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
         std::string key = strFilename;
-        for (char& c : key) {
-            if (c >= 'A' && c <= 'Z') c += 32;
-            if (c == '\\') c = '/';
+        for (char& c : key)
+        {
+            if (c >= 'A' && c <= 'Z')
+                c += 32;
+            if (c == '\\')
+                c = '/';
         }
 
         WIN32_FILE_ATTRIBUTE_DATA attr;
-        WString wide;
-        try { wide = SharedUtil::FromUTF8(strFilename); } catch (...) {}
-        bool hasMeta = !wide.empty() && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr);
+        WString                   wide;
+        try
+        {
+            wide = SharedUtil::FromUTF8(strFilename);
+        }
+        catch (...)
+        {
+        }
+        bool          hasMeta = !wide.empty() && GetFileAttributesExWithTimeout(wide.c_str(), attr, 500);
         std::uint64_t sz = 0, mt = 0;
-        if (hasMeta) {
+        if (hasMeta)
+        {
             sz = (std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
             mt = (std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime;
             std::lock_guard<std::mutex> l(CacheMtx());
-            auto it = Cache().find(key);
-            if (it != Cache().end() && it->second.size == sz && it->second.mtime == mt) {
-                CChecksum cached; cached.ulCRC = it->second.crc; cached.md5 = it->second.md5;
+            auto                        it = Cache().find(key);
+            if (it != Cache().end() && it->second.size == sz && it->second.mtime == mt)
+            {
+                CChecksum cached;
+                cached.ulCRC = it->second.crc;
+                cached.md5 = it->second.md5;
                 return cached;
             }
         }
 
         SString buf;
-        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 10000))
+        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 2000))
         {
-            if (!SharedUtil::FileExists(strFilename))
-                return SString("File not found: %s", strFilename.c_str());
-
-            CChecksum r;
-            errno = 0;
-            r.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
-            if (errno || !CMD5Hasher().Calculate(strFilename, r.md5))
-                return SString("Could not read: %s", strFilename.c_str());
-
-            if (hasMeta && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr) &&
-                sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
-                mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime)) {
-                std::lock_guard<std::mutex> l(CacheMtx()); Cache()[key] = {sz, mt, r.ulCRC, r.md5};
-            }
-            return r;
+            if (!hasMeta)
+                return SString("File not found or inaccessible: %s", strFilename.c_str());
+            return SString("Could not read: %s", strFilename.c_str());
         }
 
         CChecksum r;
         r.ulCRC = CRCGenerator::GetCRCFromBuffer(buf.data(), buf.size());
         CMD5Hasher().Calculate(buf.data(), buf.size(), r.md5);
 
-        if (hasMeta && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr) &&
-            sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
-            mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime)) {
-            std::lock_guard<std::mutex> l(CacheMtx()); Cache()[key] = {sz, mt, r.ulCRC, r.md5};
+        if (hasMeta && GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) && sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
+            mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime))
+        {
+            std::lock_guard<std::mutex> l(CacheMtx());
+            Cache()[key] = {sz, mt, r.ulCRC, r.md5};
         }
         return r;
     }
@@ -108,8 +187,8 @@ public:
     {
         constexpr int maxRetries = 3;
         constexpr int retryDelayMs = 50;
-        int lastErrno = 0;
-        int attemptsMade = 0;
+        int           lastErrno = 0;
+        int           attemptsMade = 0;
 
         for (int attempt = 0; attempt < maxRetries; ++attempt)
         {
@@ -148,14 +227,10 @@ public:
         if (lastErrno == ENOENT)
             return SString("File not found: %s", strFilename.c_str());
 
-        return SString("Could not checksum '%s' after %d attempt%s: %s", 
-                       strFilename.c_str(),
-                       attemptsMade, 
-                       attemptsMade == 1 ? "" : "s",
+        return SString("Could not checksum '%s' after %d attempt%s: %s", strFilename.c_str(), attemptsMade, attemptsMade == 1 ? "" : "s",
                        lastErrno ? std::strerror(lastErrno) : "Unknown error");
     }
 #endif
-
 
     // GenerateChecksumFromFileUnsafe should never ever be used unless you are a bad person. Or unless you really know what you're doing.
     // If it's the latter, please leave a code comment somewhere explaining why. Otherwise we'll think it's just code that hasn't been migrated yet.

@@ -480,8 +480,8 @@ void CWeaponStatManager::Init()
     OriginalNormalWeaponData[33].default_combo = 4;
     OriginalNormalWeaponData[33].combos_available = 1;
     // 34 - Sniper
-    OriginalNormalWeaponData[34].weapon_range = 300.0f;            // Default is actually 100;
-    OriginalNormalWeaponData[34].target_range = 250.0f;            // Default is actually 50;
+    OriginalNormalWeaponData[34].weapon_range = 300.0f;  // Default is actually 100;
+    OriginalNormalWeaponData[34].target_range = 250.0f;  // Default is actually 50;
     OriginalNormalWeaponData[34].accuracy = 1.0f;
     OriginalNormalWeaponData[34].damage = 125;
     OriginalNormalWeaponData[34].life_span = 0.0f;
@@ -1697,20 +1697,34 @@ eStats CWeaponStatManager::GetSkillStatIndex(eWeaponType weapon)
 {
     switch (weapon)
     {
-        case WEAPONTYPE_PISTOL:          return STAT_PISTOL_SKILL;
-        case WEAPONTYPE_PISTOL_SILENCED: return STAT_SILENCED_PISTOL_SKILL;
-        case WEAPONTYPE_DESERT_EAGLE:    return STAT_DESERT_EAGLE_SKILL;
-        case WEAPONTYPE_SHOTGUN:         return STAT_SHOTGUN_SKILL;
-        case WEAPONTYPE_SAWNOFF_SHOTGUN: return STAT_SAWN_OFF_SHOTGUN_SKILL;
-        case WEAPONTYPE_SPAS12_SHOTGUN:  return STAT_COMBAT_SHOTGUN_SKILL;
-        case WEAPONTYPE_MICRO_UZI:       return STAT_MACHINE_PISTOL_SKILL;
-        case WEAPONTYPE_MP5:             return STAT_SMG_SKILL;
-        case WEAPONTYPE_AK47:            return STAT_AK_47_SKILL;
-        case WEAPONTYPE_M4:              return STAT_M4_SKILL;
-        case WEAPONTYPE_TEC9:            return STAT_MACHINE_PISTOL_SKILL;
-        case WEAPONTYPE_COUNTRYRIFLE:    return STAT_RIFLE_SKILL;
-        case WEAPONTYPE_SNIPERRIFLE:     return STAT_RIFLE_SKILL;
-        default:                         return static_cast<eStats>(0);
+        case WEAPONTYPE_PISTOL:
+            return STAT_PISTOL_SKILL;
+        case WEAPONTYPE_PISTOL_SILENCED:
+            return STAT_SILENCED_PISTOL_SKILL;
+        case WEAPONTYPE_DESERT_EAGLE:
+            return STAT_DESERT_EAGLE_SKILL;
+        case WEAPONTYPE_SHOTGUN:
+            return STAT_SHOTGUN_SKILL;
+        case WEAPONTYPE_SAWNOFF_SHOTGUN:
+            return STAT_SAWN_OFF_SHOTGUN_SKILL;
+        case WEAPONTYPE_SPAS12_SHOTGUN:
+            return STAT_COMBAT_SHOTGUN_SKILL;
+        case WEAPONTYPE_MICRO_UZI:
+            return STAT_MACHINE_PISTOL_SKILL;
+        case WEAPONTYPE_MP5:
+            return STAT_SMG_SKILL;
+        case WEAPONTYPE_AK47:
+            return STAT_AK_47_SKILL;
+        case WEAPONTYPE_M4:
+            return STAT_M4_SKILL;
+        case WEAPONTYPE_TEC9:
+            return STAT_MACHINE_PISTOL_SKILL;
+        case WEAPONTYPE_COUNTRYRIFLE:
+            return STAT_RIFLE_SKILL;
+        case WEAPONTYPE_SNIPERRIFLE:
+            return STAT_RIFLE_SKILL;
+        default:
+            return static_cast<eStats>(0);
     }
 }
 

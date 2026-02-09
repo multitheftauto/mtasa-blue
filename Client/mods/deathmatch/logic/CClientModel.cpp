@@ -46,6 +46,8 @@ bool CClientModel::Allocate(ushort usParentID)
     {
         case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
+            // Parent ID 0 (CJ) bypasses TXD isolation in downstream logic
+            pModelInfo->SetParentID(usParentID ? usParentID : 7);
             allocated = true;
             break;
         case eClientModelType::OBJECT:
@@ -105,21 +107,27 @@ bool CClientModel::Deallocate()
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
     if (!pModelInfo || !pModelInfo->IsValid())
     {
+        // Model already gone - cleanup any orphaned TXD slot
         if (m_eModelType != eClientModelType::TXD)
         {
             if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
                 pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(m_iModelID));
         }
         m_bAllocatedByUs = false;
-        return false;
+        return true;
     }
 
     if (m_eModelType != eClientModelType::TXD)
     {
+        // Clean up TXD isolation BEFORE deallocating - cleanup needs valid model info
         if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
             pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(m_iModelID));
 
         pModelInfo->DeallocateModel();
+
+        // Log if model still has refs
+        if (pModelInfo->IsValid())
+            AddReportLog(9406, SString("Deallocate: Model %d still valid after DeallocateModel (refs=%d)", m_iModelID, pModelInfo->GetRefCount()), 10);
     }
 
     m_bAllocatedByUs = false;
@@ -155,17 +163,24 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
     if (!g_pClientGame || !g_pClientGame->GetManager())
         return;
 
-    const int modelId = m_iModelID;
+    // DFFManager is destroyed before ModelManager during CClientManager cleanup.
+    // If null, sub-managers are already torn down - skip restoration.
+    if (!g_pClientGame->GetManager()->GetDFFManager())
+        return;
+
+    const int  modelId = m_iModelID;
     const auto modelType = m_eModelType;
 
-    auto callElementChangeEvent = [](auto &element, unsigned short usParentID, auto modelId) {
+    auto callElementChangeEvent = [](auto& element, unsigned short usParentID, auto modelId)
+    {
         CLuaArguments Arguments;
         Arguments.PushNumber(modelId);
         Arguments.PushNumber(usParentID);
         element.CallEvent("onClientElementModelChange", Arguments, true);
     };
 
-    auto copyPtrs = [](auto begin, auto end) {
+    auto copyPtrs = [](auto begin, auto end)
+    {
         using T = typename std::iterator_traits<decltype(begin)>::value_type;
         std::vector<T> out;
         for (auto it = begin; it != end; ++it)
@@ -173,7 +188,9 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         return out;
     };
 
-    auto unloadModelsAndCallEvents = [modelId, callElementChangeEvent, copyPtrs](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
+    auto unloadModelsAndCallEvents =
+        [modelId, callElementChangeEvent, copyPtrs](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    {
         auto items = copyPtrs(iterBegin, iterEnd);
         for (auto ptr : items)
         {
@@ -193,7 +210,8 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         }
     };
 
-    auto unloadModelsAndCallEventsNonStreamed = [modelId, callElementChangeEvent, copyPtrs](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    auto unloadModelsAndCallEventsNonStreamed =
+        [modelId, callElementChangeEvent, copyPtrs](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
     {
         auto items = copyPtrs(iterBegin, iterEnd);
         for (auto ptr : items)
@@ -226,26 +244,27 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         case eClientModelType::TIMED_OBJECT:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
-            unsigned short usParentID = pModelInfo->GetParentID();
+            unsigned short usParentID = static_cast<unsigned short>(pModelInfo->GetParentID());
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [usParentID](auto& element) { element.SetModel(usParentID); });
 
             CClientPickupManager* pPickupManager = g_pClientGame->GetManager()->GetPickupManager();
 
-            unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID, [usParentID](auto& element) { element.SetModel(usParentID); });
+            unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID,
+                                      [usParentID](auto& element) { element.SetModel(usParentID); });
 
             CClientBuildingManager* pBuildingsManager = g_pClientGame->GetManager()->GetBuildingManager();
             auto&                   buildingsList = pBuildingsManager->GetBuildings();
             unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID,
-                                      [usParentID](auto& element) { element.SetModel(usParentID); });
+                                                 [usParentID](auto& element) { element.SetModel(usParentID); });
 
-            g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(modelId);
+            g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(static_cast<unsigned short>(modelId));
             break;
         }
         case eClientModelType::VEHICLE:
         {
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
-            unsigned short         usParentID = pModelInfo->GetParentID();
+            unsigned short         usParentID = static_cast<unsigned short>(pModelInfo->GetParentID());
 
             unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
                                       [usParentID](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });
@@ -253,10 +272,10 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         }
     }
 
-    g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(modelId);
+    g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(static_cast<unsigned short>(modelId));
 }
 
-bool CClientModel::AllocateTXD(std::string &strTxdName)
+bool CClientModel::AllocateTXD(std::string& strTxdName)
 {
     if (m_iModelID < MAX_MODEL_DFF_ID)
         return false;

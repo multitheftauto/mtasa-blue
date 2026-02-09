@@ -244,7 +244,7 @@ namespace
         static SMemStatsInfo* pZeroed = new SMemStatsInfo();
         memStats = *pZeroed;
     }
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -475,42 +475,47 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
     memStatsInfo.iStreamingMemoryUsed = *(size_t*)0x08E4CB4;
     memStatsInfo.iStreamingMemoryAvailable = *(size_t*)0x08A5A80;
 
-    char*        pFileInfoArray = *(char**)(0x5B8B08 + 6);
-    CGame*       pGame = g_pCore->GetGame();
-    unsigned int RRR_BASE_ID = pGame->GetBaseIDforRRR();
+    char*      pFileInfoArray = *(char**)(0x5B8B08 + 6);
+    CGame*     pGame = g_pCore->GetGame();
+    const uint baseTxdId = static_cast<uint>(pGame->GetBaseIDforTXD());
+    const uint baseColId = static_cast<uint>(pGame->GetBaseIDforCOL());
+    const uint baseIplId = static_cast<uint>(pGame->GetBaseIDforIPL());
+    const uint baseDatId = static_cast<uint>(pGame->GetBaseIDforDAT());
+    const uint baseIfpId = static_cast<uint>(pGame->GetBaseIDforIFP());
+    const uint baseRrrId = static_cast<uint>(pGame->GetBaseIDforRRR());
 
-    for (uint i = 0; i < RRR_BASE_ID; i++)
+    for (uint i = 0; i < baseRrrId; i++)
     {
         char* pModelInfo = pFileInfoArray + 20 /* sizeof(CStreamingInfo) */ * i;
-        char  uiLoadedFlag = pModelInfo[0x10];            // CStreamingInfo.uiLoadFlag
+        char  uiLoadedFlag = pModelInfo[0x10];  // CStreamingInfo.uiLoadFlag
         if (uiLoadedFlag)
         {
             memStatsInfo.modelInfo.uiTotal++;
-            if (i < 313)
+            if (i < 313u)
                 memStatsInfo.modelInfo.uiPlayerModels_0_312++;
-            else if (i < 318)
+            else if (i < 318u)
                 memStatsInfo.modelInfo.uiUnknown_313_317++;
-            else if (i < 373)
+            else if (i < 373u)
                 memStatsInfo.modelInfo.uiWeaponModels_318_372++;
-            else if (i < 400)
+            else if (i < 400u)
                 memStatsInfo.modelInfo.uiUnknown_373_399++;
-            else if (i < 612)
+            else if (i < 612u)
                 memStatsInfo.modelInfo.uiVehicles_400_611++;
-            else if (i < 1000)
+            else if (i < 1000u)
                 memStatsInfo.modelInfo.uiUnknown_612_999++;
-            else if (i < 1194)
+            else if (i < 1194u)
                 memStatsInfo.modelInfo.uiUpgrades_1000_1193++;
-            else if (i < pGame->GetBaseIDforTXD())
+            else if (i < baseTxdId)
                 memStatsInfo.modelInfo.uiUnknown_1194_19999++;
-            else if (i < pGame->GetBaseIDforCOL())
+            else if (i < baseColId)
                 memStatsInfo.modelInfo.uiTextures_20000_24999++;
-            else if (i < pGame->GetBaseIDforIPL())
+            else if (i < baseIplId)
                 memStatsInfo.modelInfo.uiCollisions_25000_25254++;
-            else if (i < pGame->GetBaseIDforDAT())
+            else if (i < baseDatId)
                 memStatsInfo.modelInfo.uiIpls_25255_25510++;
-            else if (i < pGame->GetBaseIDforIFP())
+            else if (i < baseIfpId)
                 memStatsInfo.modelInfo.uiPaths_25511_25574++;
-            else if (i < pGame->GetBaseIDforRRR())
+            else if (i < baseRrrId)
                 memStatsInfo.modelInfo.uiAnims_25575_25754++;
         }
     }
@@ -598,7 +603,7 @@ void CMemStats::UpdateIntervalStats()
         deltaList[i]->iCreatedBytes = nowList[i]->iCreatedBytes - prevList[i]->iCreatedBytes;
         deltaList[i]->iDestroyedCount = nowList[i]->iDestroyedCount - prevList[i]->iDestroyedCount;
         deltaList[i]->iDestroyedBytes = nowList[i]->iDestroyedBytes - prevList[i]->iDestroyedBytes;
-        deltaList[i]->iLockedCount = maxList[i]->iLockedCount;            // Use per-frame max for lock stats
+        deltaList[i]->iLockedCount = maxList[i]->iLockedCount;  // Use per-frame max for lock stats
     }
 
     m_MemStatsDelta.rwResourceStats.uiTextures = m_MemStatsNow.rwResourceStats.uiTextures - m_MemStatsPrev.rwResourceStats.uiTextures;
@@ -664,27 +669,27 @@ void CMemStats::CreateTables()
     CGame* pGame = g_pCore->GetGame();
     m_TableList.clear();
 
-//
-// Color setups
-//
-    #define YELLOW "#FFFF00"
-    #define RED "#FF0000"
-    #define BLUE "#0000FF"
-    #define WHITE "#FFFFFF"
+    //
+    // Color setups
+    //
+#define YELLOW "#FFFF00"
+#define RED    "#FF0000"
+#define BLUE   "#0000FF"
+#define WHITE  "#FFFFFF"
 
-    #define LT_RED "#FF5050"
-    #define DK_RED "#CF0000"
-    #define GREY "#808080"
-    #define LT_GREY "#C0C0C0"
-    #define INVIS "#000000"
-    #define DK_GREEN "#00CF00"
-    #define LT_GREEN "#30FF30"
-    #define PURPLE "#FF00FF"
-    #define CYAN "#00FFFF"
-    #define LT_CYAN "#00C0F0"
+#define LT_RED   "#FF5050"
+#define DK_RED   "#CF0000"
+#define GREY     "#808080"
+#define LT_GREY  "#C0C0C0"
+#define INVIS    "#000000"
+#define DK_GREEN "#00CF00"
+#define LT_GREEN "#30FF30"
+#define PURPLE   "#FF00FF"
+#define CYAN     "#00FFFF"
+#define LT_CYAN  "#00C0F0"
 
-    // Table header
-    #define HEADER1(text) LT_CYAN text WHITE
+// Table header
+#define HEADER1(text) LT_CYAN text WHITE
 
     // Cell colour depending upon the value
     SString strNumberColorsCreat = GREY "0," CYAN "999999,";
@@ -983,7 +988,7 @@ void CMemStats::CreateTables()
             int     iDefCapacity = g_pCore->GetGame()->GetPools()->GetPoolDefaultCapacity((ePools)i);
             int     iCapacity = g_pCore->GetGame()->GetPools()->GetPoolCapacity((ePools)i);
             int     iUsedSpaces = g_pCore->GetGame()->GetPools()->GetNumberOfUsedSpaces((ePools)i);
-            int     iUsedPercent = iUsedSpaces * 100 / iCapacity;
+            int     iUsedPercent = iCapacity > 0 ? (iUsedSpaces * 100 / iCapacity) : 0;
             table.AddRow(SString("%s|%d|%d|%d%%", *strName, iCapacity, iUsedSpaces, iUsedPercent));
         }
     }

@@ -153,12 +153,14 @@ static void __cdecl RenderTargetArrow(CCheckpointSAInterface* pCheckpoint)
     CVector* direction = checkpoint->GetPointDirection();
     SColor   color = checkpoint->GetTargetArrowColor();
 
-    ((void(__cdecl*)(float, float, float, float, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float, float, float))C3dMarkers_DirectionArrowSet)(position->fX, position->fY, position->fZ, checkpoint->GetTargetArrowSize(), color.R, color.G, color.B, color.A, -direction->fX, -direction->fY, -direction->fZ);
+    ((void(__cdecl*)(float, float, float, float, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float, float, float))C3dMarkers_DirectionArrowSet)(
+        position->fX, position->fY, position->fZ, checkpoint->GetTargetArrowSize(), color.R, color.G, color.B, color.A, -direction->fX, -direction->fY,
+        -direction->fZ);
 }
 
 #define HOOKPOS_CCheckpoint__Render  0x725E56
 #define HOOKSIZE_CCheckpoint__Render 5
-static constexpr intptr_t RETURN_CCheckpoint__Render = 0x725E5B;
+static constexpr intptr_t     RETURN_CCheckpoint__Render = 0x725E5B;
 static void __declspec(naked) HOOK_CCheckpoint__Render()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
