@@ -15,8 +15,8 @@ class CTxdPool
 {
 public:
     // Maximum TXD slot index whose streaming ID (index + 20000) fits within
-    // SA's ms_aInfoForModel[26316].  Isolation TXDs prefer [0, 6316).
-    // Script TXDs should prefer slots above this to avoid contention.
+    // SA's ms_aInfoForModel[26316].  Isolation TXDs prefer [0, 6316) but
+    // spill above when that fills up.  Script TXDs start above this.
     static constexpr int MAX_STREAMING_TXD_SLOT = 6316;
 
     virtual std::uint32_t AllocateTextureDictonarySlot(std::uint32_t uiSlotID, std::string& strTxdName) = 0;
