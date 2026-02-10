@@ -251,11 +251,27 @@ CTxdPoolSA::CTxdPoolSA()
 
 void CTxdPoolSA::InitialisePool()
 {
-    if (m_ppTxdPoolInterface && *m_ppTxdPoolInterface)
+    if (!m_ppTxdPoolInterface || !*m_ppTxdPoolInterface)
     {
-        const int currentSize = (*m_ppTxdPoolInterface)->m_nSize;
-        if (currentSize < TXD_POOL_MAX_CAPACITY)
-            Resize(TXD_POOL_MAX_CAPACITY);
+        AddReportLog(9401, "CTxdPoolSA::InitialisePool: Pool pointer is NULL");
+        return;
+    }
+
+    const int currentSize = (*m_ppTxdPoolInterface)->m_nSize;
+    if (currentSize >= TXD_POOL_MAX_CAPACITY)
+    {
+        AddReportLog(9402, SString("CTxdPoolSA::InitialisePool: Already at capacity (%d)", currentSize));
+        return;
+    }
+
+    AddReportLog(9402, SString("CTxdPoolSA::InitialisePool: Expanding from %d to %d", currentSize, TXD_POOL_MAX_CAPACITY));
+    if (!Resize(TXD_POOL_MAX_CAPACITY))
+    {
+        AddReportLog(9401, SString("CTxdPoolSA::InitialisePool: Resize failed (currentSize=%d targetSize=%d)", currentSize, TXD_POOL_MAX_CAPACITY));
+    }
+    else
+    {
+        AddReportLog(9402, SString("CTxdPoolSA::InitialisePool: Success, new size=%d", (*m_ppTxdPoolInterface)->m_nSize));
     }
 }
 
@@ -453,13 +469,19 @@ bool CTxdPoolSA::SetTextureDictonarySlot(std::uint32_t uiTxdId, RwTexDictionary*
 bool CTxdPoolSA::Resize(int newCapacity)
 {
     if (!m_ppTxdPoolInterface || !(*m_ppTxdPoolInterface))
+    {
+        AddReportLog(9401, "CTxdPoolSA::Resize: Pool pointer is NULL");
         return false;
+    }
 
     auto*     pool = *m_ppTxdPoolInterface;
     const int oldCapacity = pool->m_nSize;
 
     if (newCapacity <= oldCapacity)
+    {
+        AddReportLog(9401, SString("CTxdPoolSA::Resize: newCapacity(%d) <= oldCapacity(%d)", newCapacity, oldCapacity));
         return false;
+    }
 
     // SA reads CBaseModelInfo::usTextureDictionary with movsx (signed extend);
     // indices >= 32768 become negative, crashing SA pool accesses.
@@ -467,7 +489,10 @@ bool CTxdPoolSA::Resize(int newCapacity)
     if (newCapacity > maxPoolIndex + 1)
         newCapacity = maxPoolIndex + 1;
     if (newCapacity <= oldCapacity)
+    {
+        AddReportLog(9401, SString("CTxdPoolSA::Resize: clamped newCapacity(%d) <= oldCapacity(%d)", newCapacity, oldCapacity));
         return false;
+    }
 
     // Allocate replacement arrays via CMemoryMgr::MallocAlign (hooked to
     // SafeMallocAlign). SA's original CPool arrays were allocated with
@@ -477,11 +502,15 @@ bool CTxdPoolSA::Resize(int newCapacity)
     // them (~65 KB one-time leak, negligible for a 32 KB-slot pool resize).
     auto* newObjects = static_cast<CTextureDictonarySAInterface*>(CMemoryMgr::MallocAlign(newCapacity * sizeof(CTextureDictonarySAInterface)));
     if (!newObjects)
+    {
+        AddReportLog(9401, SString("CTxdPoolSA::Resize: MallocAlign failed for objects (size=%d)", newCapacity * sizeof(CTextureDictonarySAInterface)));
         return false;
+    }
 
     auto* newByteMap = static_cast<tPoolObjectFlags*>(CMemoryMgr::MallocAlign(newCapacity * sizeof(tPoolObjectFlags)));
     if (!newByteMap)
     {
+        AddReportLog(9401, SString("CTxdPoolSA::Resize: MallocAlign failed for bytemap (size=%d)", newCapacity * sizeof(tPoolObjectFlags)));
         CMemoryMgr::FreeAlign(newObjects);
         return false;
     }
