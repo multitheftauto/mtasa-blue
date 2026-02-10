@@ -1194,7 +1194,7 @@ namespace
             pStreamInfo->loadState = eModelLoadState::LOADSTATE_LOADED;
         }
         // Overflow slots [5000, 6316): do NOT touch - streaming entry belongs to COL/IPL.
-        // The GetNextFileOnCd hook in CTxdPoolSA handles DFF dependency checks directly.
+        // The CTxdPoolSA ASM hooks always report LOADED for overflow slots.
     }
 
     // Resets a TXD streaming entry when isolation is cleaned up.
@@ -2200,8 +2200,7 @@ namespace
         // Prefer standard-range [0, 5000) for isolation slots - these have
         // dedicated TXD streaming entries.  Fall back to [5000, 6316) which
         // has no dedicated entries, then to the expanded range [6316, 32768).
-        // For slots >= 5000 the ASM hooks check the pool bytemap directly
-        // instead of reading streaming entries.
+        // For slots >= 5000 the ASM hooks always report LOADED to SA.
         std::uint32_t uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
 
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
@@ -2276,8 +2275,7 @@ namespace
 
         // Mark the streaming entry LOADSTATE_LOADED so SA's DFF dependency check
         // in GetNextFileOnCd treats the TXD as loaded.  Overflow slots have no
-        // dedicated streaming entry; the GetNextFileOnCd hook reads the pool
-        // bytemap directly for those.
+        // dedicated streaming entry; the ASM hooks always report LOADED for those.
         if (IsStreamingInfoSlot(static_cast<unsigned short>(uiNewTxdId)))
         {
             SetStreamingInfoLoaded(static_cast<unsigned short>(uiNewTxdId));
