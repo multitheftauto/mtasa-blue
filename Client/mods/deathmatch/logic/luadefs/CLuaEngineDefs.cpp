@@ -814,8 +814,10 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
 
 bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
 {
-    if (uiTxdID >= 5000)
-        throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
+    // Only TXD slots [0, SA_TXD_POOL_CAPACITY) have dedicated TXD streaming
+    // entries (model IDs 20000-24999). Slots >= 5000 map to COL/IPL/DAT/IFP.
+    if (uiTxdID >= static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
+        throw std::invalid_argument(SString("Expected txdid in range 0 - %d, got %d", CTxdPool::SA_TXD_POOL_CAPACITY - 1, uiTxdID));
 
     size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
@@ -841,8 +843,8 @@ bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
 
 bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
 {
-    if (uiModelID >= 5000)
-        throw std::invalid_argument("Expected TXD ID in range [0-4999] at argument 1");
+    if (uiModelID >= static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
+        throw std::invalid_argument(SString("Expected TXD ID in range [0-%d] at argument 1", CTxdPool::SA_TXD_POOL_CAPACITY - 1));
 
     if (CClientIMGManager::IsLinkableModel(uiModelID))
         return m_pImgManager->RestoreModel(20000 + uiModelID);
@@ -1428,8 +1430,9 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
     if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    // TXD slots occupy IDs from BaseIDforTXD to BaseIDforCOL-1
-    const unsigned short usMaxTxdSlots = static_cast<unsigned short>(g_pGame->GetBaseIDforCOL() - g_pGame->GetBaseIDforTXD());
+    // TXD pool indices range from 0 to (MAX_MODEL_TXD_ID - MAX_MODEL_DFF_ID - 1),
+    // covering both standard SA slots and overflow slots.
+    const unsigned short usMaxTxdSlots = static_cast<unsigned short>(MAX_MODEL_TXD_ID - MAX_MODEL_DFF_ID);
     if (usTxdId >= usMaxTxdSlots)
         throw std::invalid_argument("Expected a valid TXD ID at argument 2");
 

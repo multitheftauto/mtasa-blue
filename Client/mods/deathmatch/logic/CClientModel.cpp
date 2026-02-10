@@ -136,6 +136,15 @@ bool CClientModel::Deallocate()
 
 void CClientModel::RestoreEntitiesUsingThisModel()
 {
+    // TXD cleanup does not depend on GetModelInfo. Overflow TXDs (pool index >= 5000)
+    // map to model IDs in the COL/IPL range or beyond the ModelInfo array, so
+    // GetModelInfo would return wrong or null entries for them.
+    if (m_eModelType == eClientModelType::TXD)
+    {
+        RestoreTXD();
+        return;
+    }
+
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
     if (!pModelInfo || !pModelInfo->IsValid())
         return;
@@ -149,9 +158,6 @@ void CClientModel::RestoreEntitiesUsingThisModel()
         case eClientModelType::TIMED_OBJECT:
         case eClientModelType::VEHICLE:
             RestoreDFF(pModelInfo);
-            return;
-        case eClientModelType::TXD:
-            RestoreTXD(pModelInfo);
             return;
         default:
             return;
@@ -289,13 +295,18 @@ bool CClientModel::AllocateTXD(std::string& strTxdName)
     return false;
 }
 
-void CClientModel::RestoreTXD(CModelInfo* pModelInfo)
+void CClientModel::RestoreTXD()
 {
-    const uint txdModelId = pModelInfo->GetModel();
-    if (txdModelId < MAX_MODEL_DFF_ID)
+    if (m_iModelID < MAX_MODEL_DFF_ID)
         return;
-    const uint txdSlotId = txdModelId - MAX_MODEL_DFF_ID;
 
+    const uint txdSlotId = static_cast<uint>(m_iModelID - MAX_MODEL_DFF_ID);
+
+    // Slot may already have been freed (e.g. resource stopped then model destroyed)
+    if (g_pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(txdSlotId))
+        return;
+
+    // Reset any DFF models that reference this TXD slot back to the default
     const uint limit = static_cast<uint>(g_pGame->GetBaseIDforCOL());
     for (uint modelId = 0; modelId < limit; modelId++)
     {
@@ -304,9 +315,15 @@ void CClientModel::RestoreTXD(CModelInfo* pModelInfo)
             continue;
 
         if (pIter->GetTextureDictionaryID() == txdSlotId)
-            pIter->SetTextureDictionaryID(0);
+            pIter->ResetTextureDictionaryID();
     }
 
     g_pGame->GetPools()->GetTxdPool().RemoveTextureDictonarySlot(txdSlotId);
-    g_pGame->GetStreaming()->SetStreamingInfo(txdModelId, 0, 0, 0, -1);
+
+    // Only clear streaming info for TXDs within SA's streaming range.
+    // Overflow TXDs (pool index >= 5000) map to model IDs in the COL/IPL
+    // range or beyond the ModelInfo array and have no streaming entry.
+    const uint txdModelId = static_cast<uint>(m_iModelID);
+    if (txdModelId < static_cast<uint>(g_pGame->GetBaseIDforCOL()))
+        g_pGame->GetStreaming()->SetStreamingInfo(txdModelId, 0, 0, 0, -1);
 }

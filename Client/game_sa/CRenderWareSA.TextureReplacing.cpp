@@ -128,7 +128,13 @@ namespace
         uint32_t              uiSessionId = 0;
     };
 
+    // NOTE: Overflow TXD slots [5000, 6316) share streaming IDs with COL/IPL/etc.
+    // We do NOT modify their streaming entries at all. The GetNextFileOnCd hook in
+    // CTxdPoolSA.cpp checks the TXD pool bytemap directly to satisfy DFF dependency
+    // checks, so no loadState manipulation is needed for overflow slots.
+
     // Per-model isolated TXD slots (higher pool usage than shared mode).
+    // Each entry holds an AddRef on its parent TXD to prevent streaming eviction.
     std::unordered_map<unsigned short, SIsolatedTxdInfo>                 g_IsolatedTxdByModel;
     std::unordered_map<unsigned short, unsigned short>                   g_IsolatedModelByTxd;
     std::unordered_set<unsigned short>                                   g_OrphanedIsolatedTxdSlots;
@@ -185,7 +191,7 @@ namespace
     uint32_t g_uiLastLeakCapacityLogTime = 0;
     uint32_t g_uiLastIsolationFailLogTime = 0;
     int      g_iCachedPoolSize = 0;
-    int      g_iCachedUsedSlots = 0;
+    int      g_iCachedUsedSlots = 0;  // Used slots in standard range [0, SA_TXD_POOL_CAPACITY)
     bool     g_bPoolCountDirty = true;
     uint32_t g_uiIsolationDeniedSerial = 0;
     bool     g_bProcessingPendingReplacements = false;
@@ -202,6 +208,10 @@ namespace
     static void            TryApplyPendingReplacements();
     static bool            WasIsolationDenied(uint32_t uiStartSerial);
     static CStreamingInfo* GetStreamingInfoSafe(unsigned int uiStreamId);
+    static void            SetStreamingInfoLoaded(unsigned short usTxdSlotId);
+    static void            ResetStreamingInfo(unsigned short usTxdSlotId);
+    static void            SetStreamingInfoLeaked(unsigned short usTxdSlotId);
+    static bool            IsStreamingInfoSlot(unsigned short usTxdSlotId);
 
     constexpr std::size_t MAX_ORPHAN_TEXTURES = 8192;
     constexpr std::size_t MAX_TEX_DICTIONARY_NAME_LENGTH = 24;
@@ -619,8 +629,10 @@ namespace
             const bool           bModelLoaded = pModelInfo->IsLoaded();
             const unsigned int   uiBaseTxdId = pGame->GetBaseIDforTXD();
             const unsigned int   uiParentStreamId = static_cast<unsigned int>(usCurrentParentTxdId) + uiBaseTxdId;
-            CStreamingInfo*      pParentStreamInfo = GetStreamingInfoSafe(uiParentStreamId);
-            const bool           bParentStreamingBusy =
+            // Parent TXDs are always vanilla SA slots (< 5000), so streaming info is valid.
+            // Guard with SA_TXD_POOL_CAPACITY in case that invariant ever breaks.
+            CStreamingInfo* pParentStreamInfo = usCurrentParentTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY ? GetStreamingInfoSafe(uiParentStreamId) : nullptr;
+            const bool      bParentStreamingBusy =
                 usCurrentParentTxdId != 0 && pParentStreamInfo &&
                 (pParentStreamInfo->loadState == eModelLoadState::LOADSTATE_READING || pParentStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING);
 
@@ -820,22 +832,14 @@ namespace
         return false;
     }
 
+    // Returns usage percentage of the standard-range slots (0 to SA_TXD_POOL_CAPACITY-1)
+    // that isolation can actually use.
     static int GetTxdPoolUsagePercent()
     {
-        if (!pGame)
+        if (g_iCachedUsedSlots < 0)
             return 0;
 
-        CTxdPoolSA* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
-        if (!pTxdPoolSA)
-            return 0;
-
-        const int iPoolSize = g_iCachedPoolSize > 0 ? g_iCachedPoolSize : pTxdPoolSA->GetPoolSize();
-        const int iUsedSlots = g_iCachedUsedSlots >= 0 ? g_iCachedUsedSlots : pTxdPoolSA->GetUsedSlotCount();
-
-        if (iPoolSize <= 0 || iUsedSlots < 0)
-            return 0;
-
-        return (iUsedSlots * 100) / iPoolSize;
+        return (g_iCachedUsedSlots * 100) / CTxdPoolSA::SA_TXD_POOL_CAPACITY;
     }
 
     static void UpdateIsolatedTxdLastUse(unsigned short usModelId)
@@ -897,6 +901,7 @@ namespace
         else if (iUsagePercent >= TXD_POOL_MEDIUM_PRESSURE_PERCENT)
             uiMaxToProcess = 8;
 
+        auto*       pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
         std::size_t uiProcessed = 0;
         for (unsigned short usModelId : vecStaleModels)
         {
@@ -923,9 +928,14 @@ namespace
                     continue;
             }
 
-            // Only mark for orphan cleanup if no refs and no active replacements
-            if (CTxdStore_GetNumRefs(usTxdId) != 0)
-                continue;
+            // Only mark for orphan cleanup if no external refs remain.
+            // With the MTA ownership pin the minimum expected ref count is 1.
+            {
+                const bool bPinned = pTxdPoolSA && pTxdPoolSA->IsSlotProtectedFromStreaming(usTxdId);
+                const int  nPinRefs = bPinned ? 1 : 0;
+                if (CTxdStore_GetNumRefs(usTxdId) > nPinRefs)
+                    continue;
+            }
 
             auto itInfo = ms_ModelTexturesInfoMap.find(usTxdId);
             if (itInfo != ms_ModelTexturesInfoMap.end())
@@ -940,11 +950,23 @@ namespace
 
             const unsigned short usParentTxdId = itIsolated->second.usParentTxdId;
 
-            // Skip if parent TXD not loaded - can't safely revert
-            if (!CTxdStore_GetTxd(usParentTxdId))
-                continue;
-
             auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
+
+            // Parent TXD data may not be in memory (SA streamed it out).
+            // If the model has loaded geometry, we can't rebind textures
+            // without the parent data. But unloaded models hold zero TXD
+            // refs, so reassigning usTextureDictionary is a safe field-only
+            // change - SA will resolve textures when both are streamed in.
+            if (!CTxdStore_GetTxd(usParentTxdId))
+            {
+                if (pTxdPoolSA->IsFreeTextureDictonarySlot(usParentTxdId))
+                    continue;  // Parent slot freed entirely, can't reassign
+
+                CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+                if (pInterface && pInterface->pRwObject)
+                    continue;  // Model has geometry, rebind needs parent data
+            }
+
             if (pModelInfo && pModelInfo->GetTextureDictionaryID() == usTxdId)
                 pModelInfo->SetTextureDictionaryID(usParentTxdId);
 
@@ -952,6 +974,7 @@ namespace
             ms_ModelTexturesInfoMap.erase(usTxdId);
 
             g_IsolatedModelByTxd.erase(usTxdId);
+            CTxdStore_RemoveRef(usParentTxdId);  // Release parent pin
             g_IsolatedTxdByModel.erase(itIsolated);
             ClearPendingIsolatedModel(usModelId);
             g_PendingReplacementByModel.erase(usModelId);
@@ -997,7 +1020,12 @@ namespace
 
         for (unsigned short usTxdId : g_OrphanedIsolatedTxdSlots)
         {
-            if (CTxdStore_GetNumRefs(usTxdId) != 0)
+            // If the slot has an MTA ownership pin (from ProtectSlotFromStreaming /
+            // AddRef at creation), the minimum expected ref count is 1 - just the
+            // pin. For un-pinned legacy slots the threshold is 0.
+            const bool  bPinned = pTxdPoolSA->IsSlotProtectedFromStreaming(usTxdId);
+            const short nPinRefs = bPinned ? 1 : 0;
+            if (CTxdStore_GetNumRefs(usTxdId) > nPinRefs)
                 continue;
 
             std::map<unsigned short, CModelTexturesInfo>::iterator itInfo = ms_ModelTexturesInfoMap.find(usTxdId);
@@ -1021,25 +1049,24 @@ namespace
 
             RemoveTxdFromReplacementTracking(usTxdId);
 
-            const std::uint32_t usTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
-            CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(usTxdStreamId);
-            if (pStreamInfo)
-            {
-                pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
-                pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
-                pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
-                pStreamInfo->flg = 0;
-                pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
-                pStreamInfo->offsetInBlocks = 0;
-                pStreamInfo->sizeInBlocks = 0;
-                pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
-            }
+            if (IsStreamingInfoSlot(usTxdId))
+                ResetStreamingInfo(usTxdId);
 
             CRenderWareSA* pRenderWareSA = pGame->GetRenderWareSA();
             if (pRenderWareSA)
                 pRenderWareSA->StreamingRemovedTxd(usTxdId);
 
             InvalidateTxdTextureMapCache(usTxdId);
+
+            // Release the MTA ownership pin that kept SA's streaming from
+            // evicting this slot while textures were still tracked.  The
+            // hook guard (g_StreamingProtectedTxdSlots) prevents the
+            // resulting ref-count-0 from triggering CStreaming::RemoveModel
+            // — only the explicit RemoveTextureDictonarySlot below will
+            // call SA's RemoveTxd.
+            if (bPinned)
+                CTxdStore_RemoveRef(usTxdId);
+
             pTxdPoolSA->RemoveTextureDictonarySlot(usTxdId);
             g_IsolatedModelByTxd.erase(usTxdId);
             for (auto itModel = g_IsolatedTxdByModel.begin(); itModel != g_IsolatedTxdByModel.end();)
@@ -1049,6 +1076,7 @@ namespace
                     ClearPendingIsolatedModel(itModel->first);
                     ClearIsolatedTxdLastUse(itModel->first);
                     g_PendingReplacementByModel.erase(itModel->first);
+                    CTxdStore_RemoveRef(itModel->second.usParentTxdId);  // Release parent pin
                     itModel = g_IsolatedTxdByModel.erase(itModel);
                 }
                 else
@@ -1136,6 +1164,102 @@ namespace
             return nullptr;
 
         return pStreaming->GetStreamingInfo(uiStreamId);
+    }
+
+    // Marks a TXD streaming entry as LOADED, zeroing disc-ref fields.
+    // Only applies to standard-range slots [0, 5000). Overflow slots [5000, 6316)
+    // have no dedicated streaming entry (they overlap COL/IPL), so we skip them.
+    // The GetNextFileOnCd hook in CTxdPoolSA handles DFF dependency checks for
+    // overflow TXDs by reading the pool directly.
+    static void SetStreamingInfoLoaded(unsigned short usTxdSlotId)
+    {
+        if (!pGame)
+            return;
+
+        const int32_t       baseTxdId = pGame->GetBaseIDforTXD();
+        const std::uint32_t streamId = static_cast<std::uint32_t>(usTxdSlotId) + static_cast<std::uint32_t>(baseTxdId);
+        CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(streamId);
+        if (!pStreamInfo)
+            return;
+
+        if (usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
+        {
+            pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
+            pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
+            pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
+            pStreamInfo->flg = 0;
+            pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
+            pStreamInfo->offsetInBlocks = 0;
+            pStreamInfo->sizeInBlocks = 0;
+            pStreamInfo->loadState = eModelLoadState::LOADSTATE_LOADED;
+        }
+        // Overflow slots [5000, 6316): do NOT touch - streaming entry belongs to COL/IPL.
+        // The GetNextFileOnCd hook in CTxdPoolSA handles DFF dependency checks directly.
+    }
+
+    // Resets a TXD streaming entry when isolation is cleaned up.
+    // Standard-range slots: zeroes disc refs and sets NOT_LOADED.
+    // Overflow slots: no-op - we never modified their streaming entries.
+    static void ResetStreamingInfo(unsigned short usTxdSlotId)
+    {
+        if (!pGame)
+            return;
+
+        const int32_t       baseTxdId = pGame->GetBaseIDforTXD();
+        const std::uint32_t streamId = static_cast<std::uint32_t>(usTxdSlotId) + static_cast<std::uint32_t>(baseTxdId);
+        CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(streamId);
+        if (!pStreamInfo)
+            return;
+
+        if (usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
+        {
+            pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
+            pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
+            pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
+            pStreamInfo->flg = 0;
+            pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
+            pStreamInfo->offsetInBlocks = 0;
+            pStreamInfo->sizeInBlocks = 0;
+            pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+        }
+        // Overflow slots: nothing to restore - we never modified their streaming entries.
+    }
+
+    // Marks a leaked TXD slot's streaming entry as LOADED so SA doesn't try to re-stream.
+    // Standard-range: zeroes disc refs and sets LOADED.
+    // Overflow: no-op - the GetNextFileOnCd hook handles dependency checks directly.
+    static void SetStreamingInfoLeaked(unsigned short usTxdSlotId)
+    {
+        if (!pGame)
+            return;
+
+        const int32_t       baseTxdId = pGame->GetBaseIDforTXD();
+        const std::uint32_t streamId = static_cast<std::uint32_t>(usTxdSlotId) + static_cast<std::uint32_t>(baseTxdId);
+        CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(streamId);
+        if (!pStreamInfo)
+            return;
+
+        if (usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
+        {
+            pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
+            pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
+            pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
+            pStreamInfo->flg = 0;
+            pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
+            pStreamInfo->offsetInBlocks = 0;
+            pStreamInfo->sizeInBlocks = 0;
+            pStreamInfo->loadState = eModelLoadState::LOADSTATE_LOADED;
+        }
+        // Overflow slots: do NOT touch - streaming entry belongs to COL/IPL.
+    }
+
+    // Returns true if this TXD slot has a dedicated streaming entry in ms_aInfoForModel
+    // that MTA can safely read/write. Standard-range [0, 5000) have their own entries.
+    // Overflow [5000, 6316) overlap COL/IPL/etc - we must NOT treat them as ours.
+    // Slots >= 6316 have no entry at all.
+    static bool IsStreamingInfoSlot(unsigned short usTxdSlotId)
+    {
+        return usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY;
     }
 
     std::unordered_set<RwTexture*> MakeTextureSet(const std::vector<RwTexture*>& textures)
@@ -1435,7 +1559,7 @@ namespace
         // Find vehicle TXD slot by scanning the pool (only if not cached)
         if (g_usVehicleTxdSlotId == 0xFFFF)
         {
-            constexpr unsigned short kMaxTxdSlots = 5000;
+            constexpr unsigned short kMaxTxdSlots = CTxdPoolSA::SA_TXD_POOL_CAPACITY;
             for (unsigned short i = 0; i < kMaxTxdSlots; ++i)
             {
                 if (CTxdStore_GetTxd(i) == pVehicleTxd)
@@ -1763,6 +1887,11 @@ namespace
         if (!pTxdPoolSA)
             return false;
 
+        // Expand pool on first use if CGameSA::Initialize() hasn't run yet.
+        // Scripts may request model textures before game init completes.
+        AddReportLog(9402, SString("EnsureIsolatedTxdForRequestedModel: Triggering pool expansion check for model %u", usModelId));
+        pTxdPoolSA->InitialisePool();
+
         auto itExisting = g_IsolatedTxdByModel.find(usModelId);
         if (itExisting != g_IsolatedTxdByModel.end())
         {
@@ -1799,7 +1928,12 @@ namespace
                 if (pRenderWareSA)
                     pRenderWareSA->StreamingRemovedTxd(oldTxdId);
 
-                if (CTxdStore_GetNumRefs(oldTxdId) == 0)
+                // With the MTA ownership pin the minimum ref count is 1 (just
+                // the pin) instead of 0.  Account for old un-pinned slots.
+                const bool  bOldPinned = pTxdPoolSA->IsSlotProtectedFromStreaming(oldTxdId);
+                const short nPinRefs = bOldPinned ? 1 : 0;
+
+                if (CTxdStore_GetNumRefs(oldTxdId) <= nPinRefs)
                 {
                     RwTexDictionary* pTxd = oldSlot->rwTexDictonary;
                     const bool       bOrphanedAll = OrphanTxdTexturesBounded(pTxd, true);
@@ -1814,22 +1948,11 @@ namespace
 
                     if (bOrphanedAll)
                     {
-                        if (auto* pStreaming = pGame->GetStreaming())
-                        {
-                            const std::uint32_t streamId = oldTxdId + pGame->GetBaseIDforTXD();
-                            if (CStreamingInfo* pStreamInfo = GetStreamingInfoSafe(streamId))
-                            {
-                                pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
-                                pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
-                                pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
-                                pStreamInfo->flg = 0;
-                                pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
-                                pStreamInfo->offsetInBlocks = 0;
-                                pStreamInfo->sizeInBlocks = 0;
-                                pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
-                            }
-                        }
+                        if (IsStreamingInfoSlot(oldTxdId))
+                            ResetStreamingInfo(oldTxdId);
                         InvalidateTxdTextureMapCache(oldTxdId);
+                        if (bOldPinned)
+                            CTxdStore_RemoveRef(oldTxdId);
                         pTxdPoolSA->RemoveTextureDictonarySlot(oldTxdId);
                         MarkTxdPoolCountDirty();
                         g_OrphanedIsolatedTxdSlots.erase(oldTxdId);
@@ -1849,6 +1972,7 @@ namespace
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(oldParentTxdId);  // Release parent pin for old isolatin entry
             g_IsolatedTxdByModel.erase(itExisting);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(oldTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -1881,6 +2005,7 @@ namespace
 
                         g_IsolatedTxdByModel[usModelId] = info;
                         g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
+                        CTxdStore_AddRef(usParentTxdId);  // Pin parent while child exists
 
                         UpdateIsolatedTxdLastUse(usModelId);
                         return true;
@@ -1910,6 +2035,7 @@ namespace
 
                     g_IsolatedTxdByModel[usModelId] = info;
                     g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
+                    CTxdStore_AddRef(usParentTxdId);  // Pin parent while child exists
 
                     UpdateIsolatedTxdLastUse(usModelId);
                     return true;
@@ -1920,22 +2046,28 @@ namespace
 
         const uint32_t uiNow = GetTickCount32();
         int            iPoolSize = pTxdPoolSA->GetPoolSize();
-        int            iUsedSlots = 0;
-        int            iFreeSlots = 0;
-        int            iUsagePercent = 0;
-        int            iReservedSlots = 0;
+
+        // Pressure metrics measure the standard range [0, SA_TXD_POOL_CAPACITY)
+        // where isolation prefers to allocate. Isolation can spill into the
+        // expanded range when this fills up, but pressure here still drives
+        // stale-slot reclamation to keep standard-range slots available.
+        constexpr int iIsolationPoolSize = CTxdPoolSA::SA_TXD_POOL_CAPACITY;
+        int           iUsedSlots = 0;
+        int           iFreeSlots = 0;
+        int           iUsagePercent = 0;
+        int           iReservedSlots = 0;
         if (iPoolSize > 0)
         {
             iReservedSlots = TXD_POOL_RESERVED_SLOTS;
-            const int iPercentReserve = (iPoolSize * TXD_POOL_RESERVED_PERCENT) / 100;
-            if (iPoolSize < TXD_POOL_RESERVED_SLOTS)
+            const int iPercentReserve = (iIsolationPoolSize * TXD_POOL_RESERVED_PERCENT) / 100;
+            if (iIsolationPoolSize < TXD_POOL_RESERVED_SLOTS)
                 iReservedSlots = iPercentReserve;
             else if (iPercentReserve > iReservedSlots)
                 iReservedSlots = iPercentReserve;
             if (iReservedSlots < 0)
                 iReservedSlots = 0;
-            if (iReservedSlots > iPoolSize - 1)
-                iReservedSlots = iPoolSize - 1;
+            if (iReservedSlots > iIsolationPoolSize - 1)
+                iReservedSlots = iIsolationPoolSize - 1;
 
             bool bNeedRefresh = g_bPoolCountDirty || g_iCachedPoolSize != iPoolSize || (uiNow - g_uiLastPoolCountTime >= TXD_POOL_COUNT_INTERVAL_MS);
             if (!bNeedRefresh)
@@ -1943,10 +2075,10 @@ namespace
                 int iCachedUsed = g_iCachedUsedSlots;
                 if (iCachedUsed < 0)
                     iCachedUsed = 0;
-                if (iCachedUsed > iPoolSize)
-                    iCachedUsed = iPoolSize;
-                const int iCachedFree = iPoolSize - iCachedUsed;
-                const int iCachedUsagePercent = (iCachedUsed * 100) / iPoolSize;
+                if (iCachedUsed > iIsolationPoolSize)
+                    iCachedUsed = iIsolationPoolSize;
+                const int iCachedFree = iIsolationPoolSize - iCachedUsed;
+                const int iCachedUsagePercent = (iCachedUsed * 100) / iIsolationPoolSize;
                 if (iCachedUsagePercent >= TXD_POOL_HARD_LIMIT_PERCENT || iCachedFree <= iReservedSlots + 4)
                     bNeedRefresh = true;
             }
@@ -1954,7 +2086,7 @@ namespace
             if (bNeedRefresh)
             {
                 g_iCachedPoolSize = iPoolSize;
-                g_iCachedUsedSlots = pTxdPoolSA->GetUsedSlotCount();
+                g_iCachedUsedSlots = pTxdPoolSA->GetUsedSlotCountInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
                 g_uiLastPoolCountTime = uiNow;
                 g_bPoolCountDirty = false;
             }
@@ -1966,10 +2098,10 @@ namespace
             }
             else
             {
-                if (iUsedSlots > iPoolSize)
-                    iUsedSlots = iPoolSize;
-                iFreeSlots = iPoolSize - iUsedSlots;
-                iUsagePercent = (iUsedSlots * 100) / iPoolSize;
+                if (iUsedSlots > iIsolationPoolSize)
+                    iUsedSlots = iIsolationPoolSize;
+                iFreeSlots = iIsolationPoolSize - iUsedSlots;
+                iUsagePercent = (iUsedSlots * 100) / iIsolationPoolSize;
             }
 
             const bool bPoolPressure = (iPoolSize != 0 && (iUsagePercent >= TXD_POOL_HARD_LIMIT_PERCENT || iFreeSlots <= iReservedSlots));
@@ -1980,16 +2112,16 @@ namespace
                 if (!g_OrphanedIsolatedTxdSlots.empty())
                 {
                     TryCleanupOrphanedIsolatedSlots(true);
-                    g_iCachedUsedSlots = pTxdPoolSA->GetUsedSlotCount();
+                    g_iCachedUsedSlots = pTxdPoolSA->GetUsedSlotCountInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
                     g_uiLastPoolCountTime = uiNow;
                     g_bPoolCountDirty = false;
                     if (g_iCachedUsedSlots >= 0)
                     {
                         iUsedSlots = g_iCachedUsedSlots;
-                        if (iUsedSlots > iPoolSize)
-                            iUsedSlots = iPoolSize;
-                        iFreeSlots = iPoolSize - iUsedSlots;
-                        iUsagePercent = (iUsedSlots * 100) / iPoolSize;
+                        if (iUsedSlots > iIsolationPoolSize)
+                            iUsedSlots = iIsolationPoolSize;
+                        iFreeSlots = iIsolationPoolSize - iUsedSlots;
+                        iUsagePercent = (iUsedSlots * 100) / iIsolationPoolSize;
                     }
                     else
                     {
@@ -2004,16 +2136,16 @@ namespace
                 if (bPoolStillUnderPressure)
                 {
                     // Pool is under pressure but free slots may still exist.
-                    // Log warning and continue to allocation attempt.. later, any real, persistent exhaustion
-                    // is caught by GetFreeTextureDictonarySlot() returning -1 below.
+                    // Log warning and continue to allocation attempt; real exhaustion
+                    // is caught by GetFreeTextureDictonarySlotInRange() returning -1 below.
                     // Previously this was a hard denial, which led to "white textures bug" on
                     // total-conversion maps with many engineRequestModel objects (each
                     // needing an isolated TXD slot).
                     if (ShouldLog(g_uiLastIsolationFailLogTime))
                     {
-                        AddReportLog(9401,
-                                     SString("EnsureIsolatedTxdForRequestedModel: TXD pool under pressure (%d/%d, %d%%), attempting allocation for model %u",
-                                             iUsedSlots, iPoolSize, iUsagePercent, usModelId));
+                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool under pressure (%d/%d, %d%%), "
+                                                   "attempting allocation for model %u",
+                                                   iUsedSlots, iIsolationPoolSize, iUsagePercent, usModelId));
                     }
                 }
             }
@@ -2045,8 +2177,8 @@ namespace
         {
             if (iPoolSize > 0 && iUsagePercent >= TXD_POOL_USAGE_WARN_PERCENT)
             {
-                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: TXD pool usage high (%d/%d, %d%%) for model %u", iUsedSlots, iPoolSize,
-                                           iUsagePercent, usModelId));
+                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool usage high (%d/%d, %d%%) for model %u", iUsedSlots,
+                                           iIsolationPoolSize, iUsagePercent, usModelId));
             }
 
             g_uiLastTxdPoolWarnTime = uiNow;
@@ -2065,10 +2197,33 @@ namespace
         if (usModelTxdId != usParentTxdId)
             pModelInfo->SetTextureDictionaryID(usParentTxdId);
 
-        const std::uint32_t uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlot();
+        // Prefer standard-range [0, 5000) for isolation slots - these have
+        // dedicated TXD streaming entries.  Fall back to [5000, 6316) which
+        // has no dedicated entries, then to the expanded range [6316, 32768).
+        // For slots >= 5000 the ASM hooks check the pool bytemap directly
+        // instead of reading streaming entries.
+        std::uint32_t uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
+
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
         {
-            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot for model %u parentTxd %u", usModelId, usParentTxdId));
+            // Standard range exhausted. Try overflow range [5000, 6316).
+            uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT));
+        }
+
+        if (uiNewTxdId == static_cast<std::uint32_t>(-1))
+        {
+            // Both streaming-range tiers exhausted. Use expanded pool [6316+).
+            uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotAbove(static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT));
+        }
+
+        if (uiNewTxdId == static_cast<std::uint32_t>(-1))
+        {
+            if (ShouldLog(g_uiLastPoolDenyLogTime))
+            {
+                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot in pool "
+                                           "for model %u parentTxd %u (poolSize=%d)",
+                                           usModelId, usParentTxdId, pTxdPoolSA->GetPoolSize()));
+            }
             MarkIsolationDenied();
             return false;
         }
@@ -2096,8 +2251,14 @@ namespace
             return false;
         }
 
-        // Associate the TXD with the slot and set parent linkage
-        if (!pTxdPoolSA->SetTextureDictonarySlot(uiNewTxdId, pChildTxd, usParentTxdId))
+        // Associate the TXD with the slot.Set usParentIndex only when the
+        // parent is available and SetupTxdParent will be called immediately,
+        // because SA's RemoveTxd internally decrements the parent's
+        // usUsagesCount via usParentIndex.  When the parent is unavailable
+        // we defer setting usParentIndex until ProcessPendingIsolatedModels
+        // establishes the linkage, keeping the ref-count balanced.
+        const unsigned short usSlotParentIndex = bParentAvailable ? usParentTxdId : static_cast<unsigned short>(-1);
+        if (!pTxdPoolSA->SetTextureDictonarySlot(uiNewTxdId, pChildTxd, usSlotParentIndex))
         {
             AddReportLog(9401,
                          SString("EnsureIsolatedTxdForRequestedModel: SetTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, uiNewTxdId));
@@ -2113,43 +2274,14 @@ namespace
         if (bParentAvailable)
             CTxdStore_SetupTxdParent(uiNewTxdId);
 
-        // Initialize streaming info to mark this virtual TXD as loaded
-        const int32_t baseTxdId = pGame->GetBaseIDforTXD();
-        const int32_t countOfAllFileIds = pGame->GetCountOfAllFileIDs();
-        if (baseTxdId <= 0 || countOfAllFileIds <= 0)
+        // Mark the streaming entry LOADSTATE_LOADED so SA's DFF dependency check
+        // in GetNextFileOnCd treats the TXD as loaded.  Overflow slots have no
+        // dedicated streaming entry; the GetNextFileOnCd hook reads the pool
+        // bytemap directly for those.
+        if (IsStreamingInfoSlot(static_cast<unsigned short>(uiNewTxdId)))
         {
-            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Invalid TXD stream base/count (base=%d count=%d) for model %u parentTxd %u",
-                                       baseTxdId, countOfAllFileIds, usModelId, usParentTxdId));
-            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
-            MarkTxdPoolCountDirty();
-            return false;
+            SetStreamingInfoLoaded(static_cast<unsigned short>(uiNewTxdId));
         }
-
-        const std::uint32_t usTxdStreamId = static_cast<std::uint32_t>(uiNewTxdId) + static_cast<std::uint32_t>(baseTxdId);
-        if (usTxdStreamId >= static_cast<std::uint32_t>(countOfAllFileIds))
-        {
-            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Stream ID %u out of range for parentTxd %u", usTxdStreamId, usParentTxdId));
-            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
-            MarkTxdPoolCountDirty();
-            return false;
-        }
-        CStreamingInfo* pStreamInfo = GetStreamingInfoSafe(usTxdStreamId);
-        if (!pStreamInfo)
-        {
-            AddReportLog(9401,
-                         SString("EnsureIsolatedTxdForRequestedModel: GetStreamingInfo failed for parentTxd %u streamId=%u", usParentTxdId, usTxdStreamId));
-            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
-            MarkTxdPoolCountDirty();
-            return false;
-        }
-        pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
-        pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
-        pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
-        pStreamInfo->flg = 0;
-        pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
-        pStreamInfo->offsetInBlocks = 0;
-        pStreamInfo->sizeInBlocks = 0;
-        pStreamInfo->loadState = eModelLoadState::LOADSTATE_LOADED;
 
         SIsolatedTxdInfo info;
         info.usTxdId = static_cast<unsigned short>(uiNewTxdId);
@@ -2160,6 +2292,16 @@ namespace
 
         g_IsolatedTxdByModel[usModelId] = info;
         g_IsolatedModelByTxd[info.usTxdId] = usModelId;
+        CTxdStore_AddRef(usParentTxdId);  // Pin parent while child exists
+
+        // Pin the child TXD itself so SA's streaming never reaches ref-count 0
+        // while MTA still tracks its textures.  Without this, model unloading
+        // via CBaseModelInfo::RemoveRef can drop the child TXD ref to 0 and
+        // CStreaming::RemoveModel → CTxdStore::RemoveTxd destroys the RW dict
+        // and its textures before MTA's cleanup can orphan them — causing
+        // use-after-free / heap corruption.
+        CTxdStore_AddRef(uiNewTxdId);
+        pTxdPoolSA->ProtectSlotFromStreaming(static_cast<unsigned short>(uiNewTxdId));
 
         UpdateIsolatedTxdLastUse(usModelId);
 
@@ -2256,7 +2398,11 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
     }
 
     uint32_t uiNow = GetTickCount32();
-    if (uiNow - g_uiLastPendingTxdProcessTime < 50)
+
+    // Throttle cleanup-only work to 50ms intervals, but always process
+    // immediately when pending models exist - their parent linkage
+    // (usParentIndex) must be resolved before SA streams in the DFF.
+    if (g_PendingIsolatedModels.empty() && uiNow - g_uiLastPendingTxdProcessTime < 50)
         return;
     g_uiLastPendingTxdProcessTime = uiNow;
 
@@ -2292,6 +2438,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         {
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);  // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2317,6 +2464,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);  // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2340,6 +2488,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);  // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2361,6 +2510,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);  // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2388,7 +2538,10 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         g_IsolatedModelByTxd[childTxdId] = usModelId;
 
         CTextureDictonarySAInterface* pSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
-        if (!pSlot || !pSlot->rwTexDictonary || pSlot->usParentIndex != parentTxdId)
+        // Accept usParentIndex == 0xFFFF for pending slots where the parent
+        // was unavailable at creation time; we set it below before
+        // CTxdStore_SetupTxdParent establishes the RW linkage.
+        if (!pSlot || !pSlot->rwTexDictonary || (pSlot->usParentIndex != parentTxdId && pSlot->usParentIndex != static_cast<unsigned short>(-1)))
         {
             // Try to revert model TXD if parent is valid
             if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
@@ -2400,6 +2553,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);  // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2412,6 +2566,10 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             continue;
         }
 
+        // Set usParentIndex now so txdInitParent can read it to establish
+        // RW parent dict linkage and increment the parent's usUsagesCount.
+        // This was deferred at creation when the parent was not yet loaded.
+        pSlot->usParentIndex = parentTxdId;
         CTxdStore_SetupTxdParent(childTxdId);
 
         if (pModelInfo->GetTextureDictionaryID() != childTxdId)
@@ -2562,9 +2720,10 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             }
 
             unsigned int    uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
-            CStreamingInfo* pStreamInfoBusyCheck = GetStreamingInfoSafe(uiTxdStreamId);
-            bool            bBusy = pStreamInfoBusyCheck && (pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_READING ||
-                                                  pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_FINISHING);
+            CStreamingInfo* pStreamInfoBusyCheck = IsStreamingInfoSlot(usTxdId) ? GetStreamingInfoSafe(uiTxdStreamId) : nullptr;
+            bool            bBusy = IsStreamingInfoSlot(usTxdId) && pStreamInfoBusyCheck &&
+                         (pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_READING ||
+                          pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_FINISHING);
             if (bBusy && !pCurrentTxd)
                 return nullptr;
 
@@ -2828,8 +2987,9 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 PopulateOriginalTextures(info, pCurrentTxd);
                 restoreState();
             }
-            else
+            else if (usTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
             {
+                // Standard-range TXD: use SA streaming to load from disc.
                 unsigned int    uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
                 CStreamingInfo* pStreamInfo = GetStreamingInfoSafe(uiTxdStreamId);
 
@@ -2901,6 +3061,23 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                         else if (ShouldLog(g_uiLastLeakCapacityLogTime))
                             AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", usTxdId));
                     }
+                    MapRemove(ms_ModelTexturesInfoMap, usTxdId);
+                    return nullptr;
+                }
+            }
+            else
+            {
+                // Overflow TXDs have no streaming entry; refetch from pool
+                pCurrentTxd = CTxdStore_GetTxd(usTxdId);
+                if (pCurrentTxd)
+                {
+                    info.pTxd = pCurrentTxd;
+                    PopulateOriginalTextures(info, pCurrentTxd);
+                    restoreState();
+                }
+                else
+                {
+                    restoreState();
                     MapRemove(ms_ModelTexturesInfoMap, usTxdId);
                     return nullptr;
                 }
@@ -3044,7 +3221,10 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
     // For total conversion maps: custom models via engineRequestModel inherit
     // their parent's TXD ID but bypass normal streaming dependencies. If the parent model never
     // spawns, its TXD won't be loaded via normal streaming. Load it on-demand here.
-    if (!pTxd)
+    // Overflow TXDs (>= MAX_STREAMING_TXD_SLOT) have no streaming entry and
+    // cannot be loaded via RequestModel. Overflow isolation slots [5000, 6316)
+    // have entries but are MTA-created; if pTxd is null, streaming won't help.
+    if (!pTxd && usTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
     {
         unsigned int    uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
         CStreamingInfo* pStreamInfo = GetStreamingInfoSafe(uiTxdStreamId);
@@ -3078,7 +3258,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
         if (pTxd)
             CRenderWareSA::DebugTxdAddRef(usTxdId, "GetModelTexturesInfo-cache-miss");
     }
-    else
+    else if (pTxd)
     {
         CRenderWareSA::DebugTxdAddRef(usTxdId, "GetModelTexturesInfo-cache-hit");
     }
@@ -4018,6 +4198,13 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
         }
     }
 
+    // When parent TXD is unavailable and model has loaded geometry, material
+    // restoration can't run (swap map will be empty). Keep replacement texture
+    // rasters alive in that case so the model doesn't go white; the orphaned
+    // textures leak (refCount=1, unreachable) until process exit, matching the
+    // normal cleanup path where copies also leak with refCount=1.
+    const bool bSkipRasterNull = !pParentTxd && bModelHasGeometry;
+
     TxdTextureMap parentTxdTextureMap;
     if (pParentTxd)
         MergeCachedTxdTextureMap(usParentTxdId, pParentTxd, parentTxdTextureMap);
@@ -4167,8 +4354,10 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                     if (bWasInIsolatedTxd)
                         SafeOrphanTexture(pTex, usIsolatedTxdId);
 
-                    // Only null raster for textures we just orphaned from this TXD
-                    if (bWasInIsolatedTxd && pTex->txd == nullptr)
+                    // Null raster for textures orphaned from this TXD, unless
+                    // parent was unavailable and model has geometry (keep rasters
+                    // to prevent white tex; follows the deferred-cleanup leak pattern).
+                    if (bWasInIsolatedTxd && pTex->txd == nullptr && !bSkipRasterNull)
                         pTex->raster = nullptr;
                 }
 
@@ -4209,25 +4398,23 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
     auto* pTxdPoolSA = static_cast<CTxdPoolSA*>(&txdPool);
     if (pTxdPoolSA)
     {
-        // Only remove the slot if there are no remaining CTxdStore refs
-        if (CTxdStore_GetNumRefs(usIsolatedTxdId) == 0 && bOrphanedAll)
+        const bool bPinned = pTxdPoolSA->IsSlotProtectedFromStreaming(usIsolatedTxdId);
+        const int  nPinRefs = bPinned ? 1 : 0;
+
+        // Only remove the slot if the only remaining ref is the MTA pin (or none).
+        if (CTxdStore_GetNumRefs(usIsolatedTxdId) <= nPinRefs && bOrphanedAll)
         {
-            // Reset the streaming info for the isolated TXD back to unloaded state before removing the slot.
-            // Only do this when actually removing - if orphaned, keep it marked as loaded so SA
-            // doesn't try to stream it from disk.
-            const std::uint32_t usTxdStreamId = usIsolatedTxdId + pGame->GetBaseIDforTXD();
-            CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(usTxdStreamId);
-            if (pStreamInfo)
-            {
-                pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
-                pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
-                pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
-                pStreamInfo->flg = 0;
-                pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
-                pStreamInfo->offsetInBlocks = 0;
-                pStreamInfo->sizeInBlocks = 0;
-                pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
-            }
+            // Release the MTA ownership pin right before slot removal.
+            // The hook guard (g_StreamingProtectedTxdSlots) prevents the
+            // resulting ref-count 0 from triggering CStreaming::RemoveModel;
+            // RemoveTextureDictonarySlot clears the guard afterwards.
+            if (bPinned)
+                CTxdStore_RemoveRef(usIsolatedTxdId);
+
+            // Reset the streaming info for the isolated TXD back to unloaded state
+            // (or restore the original COL/IPL entry for overflow slots).
+            if (IsStreamingInfoSlot(usIsolatedTxdId))
+                ResetStreamingInfo(usIsolatedTxdId);
 
             InvalidateTxdTextureMapCache(usIsolatedTxdId);
             pTxdPoolSA->RemoveTextureDictonarySlot(usIsolatedTxdId);
@@ -4236,6 +4423,9 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
         }
         else
         {
+            // External refs remain or not all textures could be orphaned.
+            // Keep the MTA pin active so the hook won't trigger
+            // CStreaming::RemoveModel while the slot is alive.
             const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(usIsolatedTxdId).second;
             if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
             {
@@ -4250,6 +4440,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
     }
 
     ClearPendingIsolatedModel(usModelId);
+    CTxdStore_RemoveRef(usParentTxdId);  // Release parent pin
     g_IsolatedTxdByModel.erase(itModelInfo);
     std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(usIsolatedTxdId);
     if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -5178,6 +5369,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_uiLastIsolationFailLogTime = uiNow;
 
     g_IsolatedTxdLastUseTime.clear();
+
     g_uiLastStaleCleanupTime = uiNow;
 
     if (!g_PendingReplacementByModel.empty())
@@ -5239,19 +5431,8 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                     }
                     if (!bOrphanedAll)
                     {
-                        const std::uint32_t usTxdStreamId = txdId + pGame->GetBaseIDforTXD();
-                        CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(usTxdStreamId);
-                        if (pStreamInfo)
-                        {
-                            pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
-                            pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
-                            pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
-                            pStreamInfo->flg = 0;
-                            pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
-                            pStreamInfo->offsetInBlocks = 0;
-                            pStreamInfo->sizeInBlocks = 0;
-                            pStreamInfo->loadState = eModelLoadState::LOADSTATE_LOADED;
-                        }
+                        if (IsStreamingInfoSlot(txdId))
+                            SetStreamingInfoLeaked(txdId);
                         g_PermanentlyLeakedTxdSlots.insert(txdId);
                         it = g_OrphanedIsolatedTxdSlots.erase(it);
                         continue;
@@ -5274,25 +5455,9 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                     if (iCurrentRefCount > 0)
                     {
                         // Refs held by external systems - don't force-remove.
-                        // Reset streaming info to prevent GTA from trying to stream this TXD,
-                        // but keep loadState as LOADED since refs are still held.
-                        // Move to permanent leak set for diagnostics.
-                        const std::uint32_t usTxdStreamId = txdId + pGame->GetBaseIDforTXD();
-                        CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(usTxdStreamId);
-                        if (pStreamInfo)
-                        {
-                            // Clear archive/offset/size to prevent any streaming attempts,
-                            // but keep LOADED state since something still refs this TXD.
-                            pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
-                            pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
-                            pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
-                            pStreamInfo->flg = 0;
-                            pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
-                            pStreamInfo->offsetInBlocks = 0;
-                            pStreamInfo->sizeInBlocks = 0;
-                            // Keep LOADED - slot has refs, changing to NOT_LOADED could cause re-stream attempts
-                            pStreamInfo->loadState = eModelLoadState::LOADSTATE_LOADED;
-                        }
+                        // Keep streaming entry LOADED so SA doesn't try to re-stream.
+                        if (IsStreamingInfoSlot(txdId))
+                            SetStreamingInfoLeaked(txdId);
                         if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
                             g_PendingLeakedTxdRefs.insert(txdId);
                         else if (ShouldLog(g_uiLastLeakCapacityLogTime))
@@ -5303,20 +5468,8 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                     }
 
                     // Reset streaming info before removing the slot
-                    const std::uint32_t usTxdStreamId = txdId + pGame->GetBaseIDforTXD();
-                    CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(usTxdStreamId);
-                    if (pStreamInfo)
-                    {
-                        // Reset all streaming fields to clean defaults
-                        pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
-                        pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
-                        pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
-                        pStreamInfo->flg = 0;
-                        pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
-                        pStreamInfo->offsetInBlocks = 0;
-                        pStreamInfo->sizeInBlocks = 0;
-                        pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
-                    }
+                    if (IsStreamingInfoSlot(txdId))
+                        ResetStreamingInfo(txdId);
 
                     // Orphan cleanup is removing the slot without going through per-model cleanup.
                     // Ensure shader support releases any texinfos tagged with this TXD id.
@@ -5417,6 +5570,11 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
     auto tryMopUpTxd = [&](unsigned short txdId, CModelTexturesInfo* pInfo, bool isDeferred)
     {
+        // Check if this slot has an MTA ownership pin.
+        CTxdPoolSA* pMopTxdPool = pGame ? static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool()) : nullptr;
+        const bool  bPinned = pMopTxdPool && pMopTxdPool->IsSlotProtectedFromStreaming(txdId);
+        const int   nPinRefs = bPinned ? 1 : 0;
+
         if (isDeferred)
         {
             if (ms_ModelTexturesInfoMap.find(txdId) != ms_ModelTexturesInfoMap.end())
@@ -5424,7 +5582,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                 return;
             }
 
-            if (CTxdStore_GetNumRefs(txdId) > 1)
+            if (CTxdStore_GetNumRefs(txdId) > 1 + nPinRefs)
             {
                 noteUncleaned(txdId);
                 return;
@@ -5440,9 +5598,9 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             return;
         }
 
-        // Only orphan if refs will hit 0
+        // Only orphan if refs will hit 0 (accounting for MTA pin)
         int currentRefs = CTxdStore_GetNumRefs(txdId);
-        if (currentRefs > 1)
+        if (currentRefs > 1 + nPinRefs)
         {
             noteUncleaned(txdId);
             return;
@@ -5495,7 +5653,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         }
 
         int refsAfterOrphan = CTxdStore_GetNumRefs(txdId);
-        if (refsAfterOrphan > 2)
+        if (refsAfterOrphan > 2 + nPinRefs)
         {
             int relinkedCount = 0;
             for (RwTexture* pTex : currentTextures)
@@ -5526,6 +5684,16 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         // Release our original ref
         const char* tag = isDeferred ? "StaticResetModelTextureReplacing-mopup-deferred" : "StaticResetModelTextureReplacing-mopup";
         CRenderWareSA::DebugTxdRemoveRef(txdId, tag);
+
+        // Release the MTA ownership pin. The hook guard still prevents
+        // CStreaming::RemoveModel while the slot is protected; we clear
+        // the protection flag immediately after the ref drop.
+        if (bPinned)
+        {
+            CTxdStore_RemoveRef(txdId);
+            if (pMopTxdPool)
+                pMopTxdPool->UnprotectSlotFromStreaming(txdId);
+        }
 
         int refsAfterDrop = CTxdStore_GetNumRefs(txdId);
         if (refsAfterDrop == 0)
