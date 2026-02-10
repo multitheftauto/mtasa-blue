@@ -901,6 +901,7 @@ namespace
         else if (iUsagePercent >= TXD_POOL_MEDIUM_PRESSURE_PERCENT)
             uiMaxToProcess = 8;
 
+        auto*       pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
         std::size_t uiProcessed = 0;
         for (unsigned short usModelId : vecStaleModels)
         {
@@ -927,9 +928,14 @@ namespace
                     continue;
             }
 
-            // Only mark for orphan cleanup if no refs and no active replacements
-            if (CTxdStore_GetNumRefs(usTxdId) != 0)
-                continue;
+            // Only mark for orphan cleanup if no external refs remain.
+            // With the MTA ownership pin the minimum expected ref count is 1.
+            {
+                const bool bPinned = pTxdPoolSA && pTxdPoolSA->IsSlotProtectedFromStreaming(usTxdId);
+                const int  nPinRefs = bPinned ? 1 : 0;
+                if (CTxdStore_GetNumRefs(usTxdId) > nPinRefs)
+                    continue;
+            }
 
             auto itInfo = ms_ModelTexturesInfoMap.find(usTxdId);
             if (itInfo != ms_ModelTexturesInfoMap.end())
@@ -1002,7 +1008,12 @@ namespace
 
         for (unsigned short usTxdId : g_OrphanedIsolatedTxdSlots)
         {
-            if (CTxdStore_GetNumRefs(usTxdId) != 0)
+            // If the slot has an MTA ownership pin (from ProtectSlotFromStreaming /
+            // AddRef at creation), the minimum expected ref count is 1 - just the
+            // pin. For un-pinned legacy slots the threshold is 0.
+            const bool  bPinned = pTxdPoolSA->IsSlotProtectedFromStreaming(usTxdId);
+            const short nPinRefs = bPinned ? 1 : 0;
+            if (CTxdStore_GetNumRefs(usTxdId) > nPinRefs)
                 continue;
 
             std::map<unsigned short, CModelTexturesInfo>::iterator itInfo = ms_ModelTexturesInfoMap.find(usTxdId);
@@ -1034,6 +1045,16 @@ namespace
                 pRenderWareSA->StreamingRemovedTxd(usTxdId);
 
             InvalidateTxdTextureMapCache(usTxdId);
+
+            // Release the MTA ownership pin that kept SA's streaming from
+            // evicting this slot while textures were still tracked.  The
+            // hook guard (g_StreamingProtectedTxdSlots) prevents the
+            // resulting ref-count-0 from triggering CStreaming::RemoveModel
+            // — only the explicit RemoveTextureDictonarySlot below will
+            // call SA's RemoveTxd.
+            if (bPinned)
+                CTxdStore_RemoveRef(usTxdId);
+
             pTxdPoolSA->RemoveTextureDictonarySlot(usTxdId);
             g_IsolatedModelByTxd.erase(usTxdId);
             for (auto itModel = g_IsolatedTxdByModel.begin(); itModel != g_IsolatedTxdByModel.end();)
@@ -1890,7 +1911,12 @@ namespace
                 if (pRenderWareSA)
                     pRenderWareSA->StreamingRemovedTxd(oldTxdId);
 
-                if (CTxdStore_GetNumRefs(oldTxdId) == 0)
+                // With the MTA ownership pin the minimum ref count is 1 (just
+                // the pin) instead of 0.  Account for old un-pinned slots.
+                const bool  bOldPinned = pTxdPoolSA->IsSlotProtectedFromStreaming(oldTxdId);
+                const short nPinRefs = bOldPinned ? 1 : 0;
+
+                if (CTxdStore_GetNumRefs(oldTxdId) <= nPinRefs)
                 {
                     RwTexDictionary* pTxd = oldSlot->rwTexDictonary;
                     const bool       bOrphanedAll = OrphanTxdTexturesBounded(pTxd, true);
@@ -1908,6 +1934,8 @@ namespace
                         if (IsStreamingInfoSlot(oldTxdId))
                             ResetStreamingInfo(oldTxdId);
                         InvalidateTxdTextureMapCache(oldTxdId);
+                        if (bOldPinned)
+                            CTxdStore_RemoveRef(oldTxdId);
                         pTxdPoolSA->RemoveTextureDictonarySlot(oldTxdId);
                         MarkTxdPoolCountDirty();
                         g_OrphanedIsolatedTxdSlots.erase(oldTxdId);
@@ -2248,6 +2276,15 @@ namespace
         g_IsolatedTxdByModel[usModelId] = info;
         g_IsolatedModelByTxd[info.usTxdId] = usModelId;
         CTxdStore_AddRef(usParentTxdId);  // Pin parent while child exists
+
+        // Pin the child TXD itself so SA's streaming never reaches ref-count 0
+        // while MTA still tracks its textures.  Without this, model unloading
+        // via CBaseModelInfo::RemoveRef can drop the child TXD ref to 0 and
+        // CStreaming::RemoveModel → CTxdStore::RemoveTxd destroys the RW dict
+        // and its textures before MTA's cleanup can orphan them — causing
+        // use-after-free / heap corruption.
+        CTxdStore_AddRef(uiNewTxdId);
+        pTxdPoolSA->ProtectSlotFromStreaming(static_cast<unsigned short>(uiNewTxdId));
 
         UpdateIsolatedTxdLastUse(usModelId);
 
@@ -4340,9 +4377,19 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
     auto* pTxdPoolSA = static_cast<CTxdPoolSA*>(&txdPool);
     if (pTxdPoolSA)
     {
-        // Only remove the slot if there are no remaining CTxdStore refs
-        if (CTxdStore_GetNumRefs(usIsolatedTxdId) == 0 && bOrphanedAll)
+        const bool bPinned = pTxdPoolSA->IsSlotProtectedFromStreaming(usIsolatedTxdId);
+        const int  nPinRefs = bPinned ? 1 : 0;
+
+        // Only remove the slot if the only remaining ref is the MTA pin (or none).
+        if (CTxdStore_GetNumRefs(usIsolatedTxdId) <= nPinRefs && bOrphanedAll)
         {
+            // Release the MTA ownership pin right before slot removal.
+            // The hook guard (g_StreamingProtectedTxdSlots) prevents the
+            // resulting ref-count 0 from triggering CStreaming::RemoveModel;
+            // RemoveTextureDictonarySlot clears the guard afterwards.
+            if (bPinned)
+                CTxdStore_RemoveRef(usIsolatedTxdId);
+
             // Reset the streaming info for the isolated TXD back to unloaded state
             // (or restore the original COL/IPL entry for overflow slots).
             if (IsStreamingInfoSlot(usIsolatedTxdId))
@@ -4355,6 +4402,9 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
         }
         else
         {
+            // External refs remain or not all textures could be orphaned.
+            // Keep the MTA pin active so the hook won't trigger
+            // CStreaming::RemoveModel while the slot is alive.
             const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(usIsolatedTxdId).second;
             if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
             {
@@ -5499,6 +5549,11 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
     auto tryMopUpTxd = [&](unsigned short txdId, CModelTexturesInfo* pInfo, bool isDeferred)
     {
+        // Check if this slot has an MTA ownership pin.
+        CTxdPoolSA* pMopTxdPool = pGame ? static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool()) : nullptr;
+        const bool  bPinned = pMopTxdPool && pMopTxdPool->IsSlotProtectedFromStreaming(txdId);
+        const int   nPinRefs = bPinned ? 1 : 0;
+
         if (isDeferred)
         {
             if (ms_ModelTexturesInfoMap.find(txdId) != ms_ModelTexturesInfoMap.end())
@@ -5506,7 +5561,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                 return;
             }
 
-            if (CTxdStore_GetNumRefs(txdId) > 1)
+            if (CTxdStore_GetNumRefs(txdId) > 1 + nPinRefs)
             {
                 noteUncleaned(txdId);
                 return;
@@ -5522,9 +5577,9 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             return;
         }
 
-        // Only orphan if refs will hit 0
+        // Only orphan if refs will hit 0 (accounting for MTA pin)
         int currentRefs = CTxdStore_GetNumRefs(txdId);
-        if (currentRefs > 1)
+        if (currentRefs > 1 + nPinRefs)
         {
             noteUncleaned(txdId);
             return;
@@ -5577,7 +5632,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         }
 
         int refsAfterOrphan = CTxdStore_GetNumRefs(txdId);
-        if (refsAfterOrphan > 2)
+        if (refsAfterOrphan > 2 + nPinRefs)
         {
             int relinkedCount = 0;
             for (RwTexture* pTex : currentTextures)
@@ -5608,6 +5663,16 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         // Release our original ref
         const char* tag = isDeferred ? "StaticResetModelTextureReplacing-mopup-deferred" : "StaticResetModelTextureReplacing-mopup";
         CRenderWareSA::DebugTxdRemoveRef(txdId, tag);
+
+        // Release the MTA ownership pin. The hook guard still prevents
+        // CStreaming::RemoveModel while the slot is protected; we clear
+        // the protection flag immediately after the ref drop.
+        if (bPinned)
+        {
+            CTxdStore_RemoveRef(txdId);
+            if (pMopTxdPool)
+                pMopTxdPool->UnprotectSlotFromStreaming(txdId);
+        }
 
         int refsAfterDrop = CTxdStore_GetNumRefs(txdId);
         if (refsAfterDrop == 0)
