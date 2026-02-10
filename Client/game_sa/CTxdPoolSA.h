@@ -45,6 +45,14 @@ public:
     CTextureDictonarySAInterface* GetTextureDictonarySlot(std::uint32_t uiTxdId) noexcept;
     bool                          SetTextureDictonarySlot(std::uint32_t uiTxdId, RwTexDictionary* pTxd, std::uint16_t usParentIndex) noexcept;
 
+    // Streaming protection: prevents Hook_CTxdStore_RemoveRef from calling
+    // CStreaming::RemoveModel when the ref count of a protected slot drops
+    // to zero. This keeps SA from destroying the RwTexDictionary of MTA-
+    // managed isolated TXD slots before MTA has orphaned their textures.
+    void ProtectSlotFromStreaming(unsigned short usSlotId);
+    void UnprotectSlotFromStreaming(unsigned short usSlotId);
+    bool IsSlotProtectedFromStreaming(unsigned short usSlotId) const;
+
 private:
     void InstallPoolHooks();
 

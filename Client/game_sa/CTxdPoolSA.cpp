@@ -16,6 +16,13 @@
 #include "MemSA.h"
 #include <cstring>
 #include <limits>
+#include <unordered_set>
+
+// Slots in this set are shielded from SA's streaming eviction.
+// Hook_CTxdStore_RemoveRef will NOT call CStreaming::RemoveModel when a
+// protected slot's ref count drops to zero, allowing MTA to orphan textures
+// from the RwTexDictionary before it is destroyed.
+static std::unordered_set<unsigned short> g_StreamingProtectedTxdSlots;
 
 #define VAR_CTxdStore_ms_pTxdPool   0xC8800C
 #define FUNC_CTxdStore__RemoveRef   0x731A30
@@ -181,7 +188,8 @@ static void __cdecl Hook_CTxdStore_RemoveRef(int index)
     // Signed comparison matches the original jg (jump if greater) at 0x731A4C
     if (static_cast<short>(entry->usUsagesCount) <= 0)
     {
-        if (index < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
+        if (index < CTxdPoolSA::SA_TXD_POOL_CAPACITY
+            && g_StreamingProtectedTxdSlots.count(static_cast<unsigned short>(index)) == 0)
         {
             using RemoveModel_t = void(__cdecl*)(int);
             reinterpret_cast<RemoveModel_t>(FUNC_RemoveModel)(index + pGame->GetBaseIDforTXD());
@@ -261,6 +269,11 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
 {
     if (!(*m_ppTxdPoolInterface)->IsContains(uiTxdId))
         return;
+
+    // Clear streaming protection so any future re-use of this pool index
+    // starts unprotected. Must happen before RemoveTxd in case RemoveTxd's
+    // parent cascade triggers Hook_CTxdStore_RemoveRef on related slots.
+    g_StreamingProtectedTxdSlots.erase(static_cast<unsigned short>(uiTxdId));
 
     // ShaderSupport hooks 0x731E90 and reads ESI as the streaming ID
     // (pool index + 20000) for texture/shader tracking. A plain cdecl
@@ -470,4 +483,19 @@ bool CTxdPoolSA::Resize(int newCapacity)
     MemSA::free(oldByteMap);
 
     return true;
+}
+
+void CTxdPoolSA::ProtectSlotFromStreaming(unsigned short usSlotId)
+{
+    g_StreamingProtectedTxdSlots.insert(usSlotId);
+}
+
+void CTxdPoolSA::UnprotectSlotFromStreaming(unsigned short usSlotId)
+{
+    g_StreamingProtectedTxdSlots.erase(usSlotId);
+}
+
+bool CTxdPoolSA::IsSlotProtectedFromStreaming(unsigned short usSlotId) const
+{
+    return g_StreamingProtectedTxdSlots.count(usSlotId) > 0;
 }
