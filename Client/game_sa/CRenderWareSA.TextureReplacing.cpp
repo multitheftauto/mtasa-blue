@@ -950,11 +950,23 @@ namespace
 
             const unsigned short usParentTxdId = itIsolated->second.usParentTxdId;
 
-            // Skip if parent TXD not loaded - can't safely revert
-            if (!CTxdStore_GetTxd(usParentTxdId))
-                continue;
-
             auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
+
+            // Parent TXD data may not be in memory (SA streamed it out).
+            // If the model has loaded geometry, we can't rebind textures
+            // without the parent data. But unloaded models hold zero TXD
+            // refs, so reassigning usTextureDictionary is a safe field-only
+            // change - SA will resolve textures when both are streamed in.
+            if (!CTxdStore_GetTxd(usParentTxdId))
+            {
+                if (pTxdPoolSA->IsFreeTextureDictonarySlot(usParentTxdId))
+                    continue;  // Parent slot freed entirely, can't reassign
+
+                CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+                if (pInterface && pInterface->pRwObject)
+                    continue;  // Model has geometry, rebind needs parent data
+            }
+
             if (pModelInfo && pModelInfo->GetTextureDictionaryID() == usTxdId)
                 pModelInfo->SetTextureDictionaryID(usParentTxdId);
 
@@ -2381,7 +2393,11 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
     }
 
     uint32_t uiNow = GetTickCount32();
-    if (uiNow - g_uiLastPendingTxdProcessTime < 50)
+
+    // Throttle cleanup-only work to 50ms intervals, but always process
+    // immediately when pending models exist - their parent linkage
+    // (usParentIndex) must be resolved before SA streams in the DFF.
+    if (g_PendingIsolatedModels.empty() && uiNow - g_uiLastPendingTxdProcessTime < 50)
         return;
     g_uiLastPendingTxdProcessTime = uiNow;
 

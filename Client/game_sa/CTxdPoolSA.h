@@ -37,6 +37,11 @@ public:
     int GetPoolSize() const noexcept;
     int GetUsedSlotCount() const noexcept;
 
+    // Expands pool to TXD_POOL_MAX_CAPACITY after SA's CTxdStore::Initialise
+    // has created the pool. The pool pointer at 0xC8800C is still NULL during
+    // CTxdPoolSA construction, so expansion is deferred to this call.
+    void InitialisePool();
+
     // Grows pool to newCapacity, preserving existing slots.
     // Returns false if newCapacity <= current or allocation fails.
     bool Resize(int newCapacity);
