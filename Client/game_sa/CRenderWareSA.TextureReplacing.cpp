@@ -1887,6 +1887,11 @@ namespace
         if (!pTxdPoolSA)
             return false;
 
+        // Expand pool on first use if CGameSA::Initialize() hasn't run yet.
+        // Scripts may request model textures before game init completes.
+        AddReportLog(9402, SString("EnsureIsolatedTxdForRequestedModel: Triggering pool expansion check for model %u", usModelId));
+        pTxdPoolSA->InitialisePool();
+
         auto itExisting = g_IsolatedTxdByModel.find(usModelId);
         if (itExisting != g_IsolatedTxdByModel.end())
         {
