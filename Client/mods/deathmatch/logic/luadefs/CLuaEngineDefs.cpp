@@ -814,8 +814,10 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
 
 bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
 {
-    if (uiTxdID >= 5000)
-        throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
+    // Only TXD slots [0, SA_TXD_POOL_CAPACITY) have dedicated TXD streaming
+    // entries (model IDs 20000-24999). Slots >= 5000 map to COL/IPL/DAT/IFP.
+    if (uiTxdID >= static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
+        throw std::invalid_argument(SString("Expected txdid in range 0 - %d, got %d", CTxdPool::SA_TXD_POOL_CAPACITY - 1, uiTxdID));
 
     size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
@@ -841,8 +843,8 @@ bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
 
 bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
 {
-    if (uiModelID >= 5000)
-        throw std::invalid_argument("Expected TXD ID in range [0-4999] at argument 1");
+    if (uiModelID >= static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
+        throw std::invalid_argument(SString("Expected TXD ID in range [0-%d] at argument 1", CTxdPool::SA_TXD_POOL_CAPACITY - 1));
 
     if (CClientIMGManager::IsLinkableModel(uiModelID))
         return m_pImgManager->RestoreModel(20000 + uiModelID);

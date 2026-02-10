@@ -17,9 +17,6 @@
 class CTxdPoolSA final : public CTxdPool
 {
 public:
-    // SA's original pool size. Slots [0, 5000) have streaming entries.
-    static constexpr int SA_TXD_POOL_CAPACITY = 5000;
-
     // Pool expansion limit: 5000 > 10000 > 20000 > 32768.
     // Capped at 32768: SA reads CBaseModelInfo::usTextureDictionary with
     // movsx, so indices >= 32768 become negative and crash SA functions.

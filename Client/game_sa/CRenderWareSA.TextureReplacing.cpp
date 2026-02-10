@@ -134,6 +134,7 @@ namespace
     // checks, so no loadState manipulation is needed for overflow slots.
 
     // Per-model isolated TXD slots (higher pool usage than shared mode).
+    // Each entry holds an AddRef on its parent TXD to prevent streaming eviction.
     std::unordered_map<unsigned short, SIsolatedTxdInfo>                 g_IsolatedTxdByModel;
     std::unordered_map<unsigned short, unsigned short>                   g_IsolatedModelByTxd;
     std::unordered_set<unsigned short>                                   g_OrphanedIsolatedTxdSlots;
@@ -955,6 +956,7 @@ namespace
             ms_ModelTexturesInfoMap.erase(usTxdId);
 
             g_IsolatedModelByTxd.erase(usTxdId);
+            CTxdStore_RemoveRef(usParentTxdId);            // Release parent pin
             g_IsolatedTxdByModel.erase(itIsolated);
             ClearPendingIsolatedModel(usModelId);
             g_PendingReplacementByModel.erase(usModelId);
@@ -1041,6 +1043,7 @@ namespace
                     ClearPendingIsolatedModel(itModel->first);
                     ClearIsolatedTxdLastUse(itModel->first);
                     g_PendingReplacementByModel.erase(itModel->first);
+                    CTxdStore_RemoveRef(itModel->second.usParentTxdId);            // Release parent pin
                     itModel = g_IsolatedTxdByModel.erase(itModel);
                 }
                 else
@@ -1924,6 +1927,7 @@ namespace
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(oldParentTxdId);            // Release parent pin for old isolatin entry
             g_IsolatedTxdByModel.erase(itExisting);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(oldTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -1956,6 +1960,7 @@ namespace
 
                         g_IsolatedTxdByModel[usModelId] = info;
                         g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
+                        CTxdStore_AddRef(usParentTxdId);            // Pin parent while child exists
 
                         UpdateIsolatedTxdLastUse(usModelId);
                         return true;
@@ -1985,6 +1990,7 @@ namespace
 
                     g_IsolatedTxdByModel[usModelId] = info;
                     g_IsolatedModelByTxd[usCurrentTxdId] = usModelId;
+                    CTxdStore_AddRef(usParentTxdId);            // Pin parent while child exists
 
                     UpdateIsolatedTxdLastUse(usModelId);
                     return true;
@@ -2235,6 +2241,7 @@ namespace
 
         g_IsolatedTxdByModel[usModelId] = info;
         g_IsolatedModelByTxd[info.usTxdId] = usModelId;
+        CTxdStore_AddRef(usParentTxdId);            // Pin parent while child exists
 
         UpdateIsolatedTxdLastUse(usModelId);
 
@@ -2367,6 +2374,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         {
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);            // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2392,6 +2400,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);            // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2415,6 +2424,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);            // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2436,6 +2446,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);            // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -2475,6 +2486,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(parentTxdId);            // Release parent pin
             g_IsolatedTxdByModel.erase(itInfo);
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
@@ -4335,6 +4347,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
     }
 
     ClearPendingIsolatedModel(usModelId);
+    CTxdStore_RemoveRef(usParentTxdId);            // Release parent pin
     g_IsolatedTxdByModel.erase(itModelInfo);
     std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(usIsolatedTxdId);
     if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)

@@ -14,9 +14,14 @@
 class CTxdPool
 {
 public:
+    // SA's original TXD pool size (not the expanded capacity - see TXD_POOL_MAX_CAPACITY).
+    // Only slots [0, 5000) have dedicated TXD streaming entries (model IDs 20000-24999).
+    // Slots >= 5000 map to COL/IPL/DAT/IFP streaming ID's and cannot be used for IMG linking.
+    static constexpr int SA_TXD_POOL_CAPACITY = 5000;
+
     // Maximum TXD slot index whose streaming ID (index + 20000) fits within
     // SA's ms_aInfoForModel[26316].  Isolation TXDs prefer [0, 6316) but
-    // spill above when that fills up.  Script TXDs start above this.
+    // spill above when that fills up.
     static constexpr int MAX_STREAMING_TXD_SLOT = 6316;
 
     virtual std::uint32_t AllocateTextureDictonarySlot(std::uint32_t uiSlotID, std::string& strTxdName) = 0;
