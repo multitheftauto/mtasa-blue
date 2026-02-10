@@ -29,6 +29,30 @@ static std::unordered_set<unsigned short> g_StreamingProtectedTxdSlots;
 #define FUNC_CStreaming__requestTxd 0x407100
 #define FUNC_CTxdStore__RemoveSlot  0x731E90
 
+// CMemoryMgr::MallocAlign / FreeAlign wrappers (hooked by MTA in
+// CMultiplayerSA_FixMallocAlign.cpp > SafeMallocAlign / SafeFreeAlign).
+// SafeMallocAlign uses MTA's CRT malloc with alignment metadata at ptr-4/ptr-8.
+// SafeFreeAlign validates the metadata magic before freeing; if the magic is
+// absent (e.g. memory from SA's CRT), it silently returns without freeing.
+//
+// We use these for Resize()'s replacement pool arrays. SA's original CPool
+// constructor allocates via operator new (SA's static CRT), but MTA's hooked
+// allocator provides controlled lifetime and avoids cross-CRT issues.
+namespace CMemoryMgr
+{
+    inline void* MallocAlign(int size, int alignment = 4, int hint = 0)
+    {
+        using fn_t = void*(__cdecl*)(int, int, int);
+        return reinterpret_cast<fn_t>(0x72F4C0)(size, alignment, hint);
+    }
+
+    inline void FreeAlign(void* ptr)
+    {
+        using fn_t = void(__cdecl*)(void*);
+        reinterpret_cast<fn_t>(0x72F4F0)(ptr);
+    }
+}
+
 // GetNextFileOnCd TXD dependency check hook:
 // At 0x408ECE, SA reads the TXD streaming entry loadState for DFF dependency:
 //   movzx edx, byte ptr [edx*4+0x946750]   ; 8 bytes: 0F B6 14 95 50 67 94 00
@@ -190,8 +214,7 @@ static void __cdecl Hook_CTxdStore_RemoveRef(int index)
     // Signed comparison matches the original jg (jump if greater) at 0x731A4C
     if (static_cast<short>(entry->usUsagesCount) <= 0)
     {
-        if (index < CTxdPoolSA::SA_TXD_POOL_CAPACITY
-            && g_StreamingProtectedTxdSlots.count(static_cast<unsigned short>(index)) == 0)
+        if (index < CTxdPoolSA::SA_TXD_POOL_CAPACITY && g_StreamingProtectedTxdSlots.count(static_cast<unsigned short>(index)) == 0)
         {
             using RemoveModel_t = void(__cdecl*)(int);
             reinterpret_cast<RemoveModel_t>(FUNC_RemoveModel)(index + pGame->GetBaseIDforTXD());
@@ -223,10 +246,13 @@ CTxdPoolSA::CTxdPoolSA()
     m_ppTxdPoolInterface = (CPoolSAInterface<CTextureDictonarySAInterface>**)VAR_CTxdStore_ms_pTxdPool;
     InstallPoolHooks();
 
-    // Pre-allocate pool to maximum capacity at startup, before any game
-    // code caches pointers to pool elements. Runtime Resize() after slots
-    // are in use is unsafe: SA may hold CTextureDictonarySAInterface*
-    // pointers that become dangling when the backing arrays are freed.
+    // Pool expansion deferred to InitialisePool() - called from
+    // CGameSA::Initialize() after SA's CTxdStore::Initialise has
+    // created the pool at 0xC8800C.
+}
+
+void CTxdPoolSA::InitialisePool()
+{
     if (m_ppTxdPoolInterface && *m_ppTxdPoolInterface)
     {
         const int currentSize = (*m_ppTxdPoolInterface)->m_nSize;
@@ -422,10 +448,10 @@ bool CTxdPoolSA::SetTextureDictonarySlot(std::uint32_t uiTxdId, RwTexDictionary*
 }
 
 // Resizes the TXD pool, preserving existing slot data.
-// ONLY SAFE TO CALL AT STARTUP before any game code caches pointers
-// to pool elements (CTextureDictonarySAInterface*). Calling this at
-// runtime causes use-after-free crashes because SA holds raw pointers
-// into the old m_pObjects/m_byteMap arrays which are freed here.
+// Safe to call after SA creates the pool: SA stores TXD references
+// as 16-bit indices and re-reads pool->m_pObjects on every access,
+// so swapping the backing arrays doesn't invalidate anything as
+// long as no pool-accessing code is on the call stack.
 bool CTxdPoolSA::Resize(int newCapacity)
 {
     if (!m_ppTxdPoolInterface || !(*m_ppTxdPoolInterface))
@@ -445,14 +471,20 @@ bool CTxdPoolSA::Resize(int newCapacity)
     if (newCapacity <= oldCapacity)
         return false;
 
-    auto* newObjects = MemSA::malloc_struct<CTextureDictonarySAInterface>(newCapacity);
+    // Allocate replacement arrays via CMemoryMgr::MallocAlign (hooked to
+    // SafeMallocAlign). SA's original CPool arrays were allocated with
+    // operator new (SA's static CRT), but we intentionally use MTA's hooked
+    // allocator for the replacement arrays. SafeFreeAlign below will detect
+    // the old SA-CRT arrays lack the metadata magic and silently skip freeing
+    // them (~65 KB one-time leak, negligible for a 32 KB-slot pool resize).
+    auto* newObjects = static_cast<CTextureDictonarySAInterface*>(CMemoryMgr::MallocAlign(newCapacity * sizeof(CTextureDictonarySAInterface)));
     if (!newObjects)
         return false;
 
-    auto* newByteMap = MemSA::malloc_struct<tPoolObjectFlags>(newCapacity);
+    auto* newByteMap = static_cast<tPoolObjectFlags*>(CMemoryMgr::MallocAlign(newCapacity * sizeof(tPoolObjectFlags)));
     if (!newByteMap)
     {
-        MemSA::free(newObjects);
+        CMemoryMgr::FreeAlign(newObjects);
         return false;
     }
 
@@ -478,11 +510,19 @@ bool CTxdPoolSA::Resize(int newCapacity)
     pool->m_byteMap = newByteMap;
     pool->m_nSize = newCapacity;
 
-    // Start next search at the first new slot to avoid scanning occupied old range
-    pool->m_nFirstFree = oldCapacity - 1;
+    // Prevent SA's CPool destructor from calling operator delete on our
+    // SafeMallocAlign'd arrays. MTA exits via TerminateProcess() so the
+    // destructor normally never runs, but this is a zero-cost safeguard.
+    pool->m_bOwnsAllocations = false;
 
-    MemSA::free(oldObjects);
-    MemSA::free(oldByteMap);
+    // Don't override m_nFirstFree - SA's value points within [0, 5000)
+    // where its standard TXD allocations belong. Overriding it to
+    // oldCapacity-1 would make SA's Allocate()/GetFreeSlot() skip the
+    // standard range and hand out slots in the overflow zone (>= 5000)
+    // where no streaming entries exist.
+
+    CMemoryMgr::FreeAlign(oldObjects);
+    CMemoryMgr::FreeAlign(oldByteMap);
 
     return true;
 }

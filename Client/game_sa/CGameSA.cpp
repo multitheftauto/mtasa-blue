@@ -495,6 +495,12 @@ void CGameSA::Terminate()
 
 void CGameSA::Initialize()
 {
+    // Expand TXD pool from SA's default 5000 to our maximum capacity.
+    // Can't run in CTxdPoolSA's constructor (pool at 0xC8800C doesn't
+    // exist yet). Safe here: pool access is main-thread only and SA
+    // derefs m_pObjects on every access (no cached pointers).
+    static_cast<CTxdPoolSA&>(m_Pools->GetTxdPool()).InitialisePool();
+
     // Initialize garages
     m_pGarages->Initialize();
     SetupSpecialCharacters();
