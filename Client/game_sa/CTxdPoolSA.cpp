@@ -57,7 +57,8 @@ namespace CMemoryMgr
 // At 0x408ECE, SA reads the TXD streaming entry loadState for DFF dependency:
 //   movzx edx, byte ptr [edx*4+0x946750]   ; 8 bytes: 0F B6 14 95 50 67 94 00
 // For overflow TXD slots (txdIndex >= 5000), this reads COL/IPL streaming
-// entries instead. Check the TXD pool bytemap directly for overflow slots.
+// entries instead. For overflow slots, always report LOADED so SA never
+// calls CStreaming::RequestModel with an out-of-range streaming ID.
 #define HOOKPOS_GetNextFileOnCd_TxdCheck  0x408ECE
 #define HOOKSIZE_GetNextFileOnCd_TxdCheck 8
 static const DWORD RETURN_GetNextFileOnCd_TxdCheck = 0x408ED6;
@@ -66,8 +67,8 @@ static const DWORD RETURN_GetNextFileOnCd_TxdCheck = 0x408ED6;
 // At 0x40CD9F, SA reads the TXD streaming entry loadState before packing a
 // DFF into a streaming request:
 //   mov al, byte ptr [ecx*4+0x8E4CD0]   ; 7 bytes: 8A 04 8D D0 4C 8E 00
-// Same overflow problem as GetNextFileOnCd. For overflow TXD slots, we check
-// the pool bytemap directly.
+// Same overflow problem as GetNextFileOnCd. For overflow TXD slots, always
+// report LOADED so the DFF is not indefinitely deferred.
 #define HOOKPOS_RequestModelStream_TxdCheck  0x40CD9F
 #define HOOKSIZE_RequestModelStream_TxdCheck 7
 static const DWORD RETURN_RequestModelStream_TxdCheck = 0x40CDA6;
@@ -80,11 +81,18 @@ extern CGameSA* pGame;
 //           edx = txdIndex*5 (from lea edx, [eax+eax*4])
 // At exit:  edx = loadState byte, execution continues at 0x408ED6 (cmp edx, 1)
 //
+// Post-hook, SA checks: cmp edx, 1 (LOADED) > jz loc_408F01 (IFP dep check);
+//                        cmp edx, 3 (READING) > jz loc_408F01 (same);
+//                        otherwise > fallthrough to RequestModel(txdIndex+20000).
 // For standard TXDs (txdIndex < 5000): executes the original loadState read.
-// For overflow TXDs (>= 5000): checks the TXD pool bytemap directly.
-// If the pool slot is occupied, MTA has loaded the TXD data into memory,
-// so we report LOADED (edx=1).  This avoids modifying the shared COL/IPL
-// streaming entry, which would break collision loading.
+// For overflow TXDs (>= 5000 or negative from movsx): always reports LOADED (1).
+// This prevents SA from falling through to its direct
+//   push edx; add eax, 4E20h; push eax; call CStreaming::RequestModel (0x4087E0)
+// call, which is NOT guarded by Hook_CStreaming_requestTxd and would use
+// an out-of-range streaming ID (>= 25000), corrupting COL/IPL streaming
+// entries or writing out of bounds of ms_aInfoForModel[26316].
+// Only EDX is live after return; eax and ecx are preserved (never touched
+// in the overflow path).
 static void __declspec(naked) HOOK_GetNextFileOnCd_TxdCheck()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -93,49 +101,22 @@ static void __declspec(naked) HOOK_GetNextFileOnCd_TxdCheck()
     {
         // eax = txdIndex, edx = txdIndex*5
         test    eax, eax
-        js      overflow_not_loaded     // Negative txdIndex (movsx of >= 32768), treat as not loaded
+        js      overflow_loaded         // Negative txdIndex from movsx of >= 32768
         cmp     eax, 5000               // SA_TXD_POOL_CAPACITY
-        jge     overflow_check
+        jge     overflow_loaded
 
         // Standard path: execute original instruction
         movzx   edx, byte ptr [edx*4+0x946750]
         jmp     RETURN_GetNextFileOnCd_TxdCheck
 
-    overflow_check:
-        // Overflow TXD slot: check if pool slot is occupied
-        push    ecx
-        push    eax
-        mov     ecx, dword ptr [0xC8800C]  // VAR_CTxdStore_ms_pTxdPool -> pool*
-        test    ecx, ecx
-        jz      overflow_not_loaded
-
-        // Check pool size
-        cmp     eax, [ecx+8]              // pool->m_nSize (offset 8 in CPoolSAInterface)
-        jge     overflow_not_loaded
-
-        // Check bytemap: pool->m_byteMap[txdIndex].bEmpty  (bit 7 of byte)
-        mov     ecx, [ecx+4]              // pool->m_byteMap (offset 4)
-        test    ecx, ecx
-        jz      overflow_not_loaded
-
-        movzx   edx, byte ptr [ecx+eax]   // m_byteMap[txdIndex]
-        test    dl, 0x80                   // bEmpty is the sign bit (bit 7)
-        jnz     overflow_not_loaded        // bEmpty=1 means slot is free
-
-        // Slot occupied = TXD loaded by MTA
-        pop     eax
-        pop     ecx
-        mov     edx, 1                    // LOADSTATE_LOADED
-        jmp     RETURN_GetNextFileOnCd_TxdCheck
-
-    overflow_not_loaded:
-        pop     eax
-        pop     ecx
-        // TXD not loaded by MTA: report NOT_LOADED so SA defers the DFF.
-        // Do NOT fall back to the real streaming entry - it belongs to
-        // COL/IPL and would give a semantically wrong (and possibly
-        // corrupted, since edx may no longer hold txdIndex*5) result.
-        xor     edx, edx                  // LOADSTATE_NOT_LOADED = 0
+    overflow_loaded:
+        // MTA manages overflow TXDs outside SA's streaming system.
+        // Reporting LOADED is always safe:
+        //  - Slot occupied: TXD data is present, DFF renders correctly.
+        //  - Slot empty:    DFF may get white textures (recoverable),
+        //                   vs. NOT_LOADED which triggers the unguarded
+        //                   RequestModel call above (freeze/corruption).
+        mov     edx, 1                  // LOADSTATE_LOADED
         jmp     RETURN_GetNextFileOnCd_TxdCheck
     }
     // clang-format on
@@ -145,6 +126,14 @@ static void __declspec(naked) HOOK_GetNextFileOnCd_TxdCheck()
 // Replaces:  mov al, byte ptr [ecx*4+0x8E4CD0]  (7 bytes)
 // At entry: eax = txdIndex+20000 (from movsx + add), ecx = (txdIndex+20000)*5
 // At exit:  al = loadState byte, execution continues at 0x40CDA6 (cmp al, 1)
+//
+// Post-hook, SA checks: cmp al, 1 (LOADED) > jz proceed;
+//                        cmp al, 3 (READING) > jz proceed;
+//                        otherwise > jnz loc_40CEF8 (defer DFF).
+// For standard TXDs (streaming ID < 25000): executes the original loadState read.
+// For overflow TXDs (streaming ID >= 25000): always reports LOADED (1).
+// Returning NOT_LOADED would prevent the DFF from ever being packed into
+// a streaming request when its overflow TXD is managed by MTA.
 // Only AL is live after return; ecx, edx, and eax upper bytes are dead.
 static void __declspec(naked) HOOK_RequestModelStream_TxdCheck()
 {
@@ -154,39 +143,14 @@ static void __declspec(naked) HOOK_RequestModelStream_TxdCheck()
     {
         // eax = txdIndex+20000, ecx = (txdIndex+20000)*5
         cmp     eax, 25000                 // 20000 + SA_TXD_POOL_CAPACITY
-        jge     overflow_check
+        jge     overflow_loaded
 
         // Standard path: execute original instruction
         mov     al, byte ptr [ecx*4+0x8E4CD0]
         jmp     RETURN_RequestModelStream_TxdCheck
 
-    overflow_check:
-        // Convert streaming ID back to raw pool index
-        sub     eax, 0x4E20                // eax = txdIndex (raw pool index)
-        test    eax, eax
-        js      overflow_not_loaded        // Negative index, not loaded
-
-        // Check pool bytemap
-        mov     ecx, dword ptr [0xC8800C]  // VAR_CTxdStore_ms_pTxdPool -> pool*
-        test    ecx, ecx
-        jz      overflow_not_loaded
-
-        cmp     eax, [ecx+8]              // pool->m_nSize
-        jge     overflow_not_loaded
-
-        mov     ecx, [ecx+4]              // pool->m_byteMap
-        test    ecx, ecx
-        jz      overflow_not_loaded
-
-        test    byte ptr [ecx+eax], 0x80  // bEmpty? (bit 7)
-        jnz     overflow_not_loaded
-
-        // Slot occupied = TXD loaded by MTA
+    overflow_loaded:
         mov     al, 1                      // LOADSTATE_LOADED
-        jmp     RETURN_RequestModelStream_TxdCheck
-
-    overflow_not_loaded:
-        xor     eax, eax                   // al = LOADSTATE_NOT_LOADED = 0
         jmp     RETURN_RequestModelStream_TxdCheck
     }
     // clang-format on
@@ -226,8 +190,8 @@ static void __cdecl Hook_CTxdStore_RemoveRef(int index)
 // The original converts a TXD pool index to a stream ID (index + 20000) and
 // calls CStreaming::RequestModel. For standard-range slots (< 5000) forward
 // to RequestModel. For overflow slots (>= 5000) the stream ID falls in
-// COL/IPL/DAT/IFP territory, so skip - GetNextFileOnCd handles the DFF
-// dependency check via the TXD pool bytemap.
+// COL/IPL/DAT/IFP territory, so skip - the GetNextFileOnCd and
+// RequestModelStream hooks always report LOADED for overflow TXDs.
 static void __cdecl Hook_CStreaming_requestTxd(int txdIndex, int flags)
 {
     if (txdIndex >= 0 && txdIndex < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
@@ -238,7 +202,8 @@ static void __cdecl Hook_CStreaming_requestTxd(int txdIndex, int flags)
     }
 
     // Overflow slots (>= 5000): skip. GetNextFileOnCd and RequestModelStream
-    // hooks handle the DFF dependency check via the TXD pool bytemap.
+    // hooks always report LOADED for overflow TXDs, so SA never tries to
+    // stream them.
 }
 
 CTxdPoolSA::CTxdPoolSA()
@@ -285,8 +250,8 @@ void CTxdPoolSA::InstallPoolHooks()
     // Small 2-instruction wrapper, 5-byte overwrite
     HookInstall(FUNC_CStreaming__requestTxd, reinterpret_cast<DWORD>(Hook_CStreaming_requestTxd), 5);
 
-    // GetNextFileOnCd TXD loadState hook: overflow slots check pool bytemap
-    // instead of reading the COL/IPL streaming entry.
+    // GetNextFileOnCd TXD loadState hook: overflow slots always report
+    // LOADED to prevent SA from issuing RequestModel with invalid IDs.
     HookInstall(HOOKPOS_GetNextFileOnCd_TxdCheck, reinterpret_cast<DWORD>(HOOK_GetNextFileOnCd_TxdCheck), HOOKSIZE_GetNextFileOnCd_TxdCheck);
 
     // RequestModelStream TXD dependency check when packing streaming requests.
