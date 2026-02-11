@@ -317,7 +317,7 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
         rwBuffer.ptr = const_cast<char*>(buffer.data());
 
         // Limit to actual chunk boundaries
-        // This buffer trim ensures RW's stream reader only sees actual TXD/DFF data, not trailing garbage
+        // This buffer trim ensures RW's stream reader only sees actual TXD data, not trailing garbage
         // from IMG sector alignment. Avoids some spurious "TXD parsed successfully but contains no valid textures" errors
         rwBuffer.size = static_cast<unsigned int>(RW_CHUNK_HEADER_SIZE + chunkSize);
         pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
@@ -420,10 +420,14 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
     {
         rwBuffer.ptr = const_cast<char*>(buffer.data());
 
-        // Limit to actual chunk boundaries
-        // This buffer trim ensures RW's stream reader only sees actual TXD/DFF data, not trailing garbage
-        // from IMG sector alignment. Avoids some spurious "TXD parsed successfully but contains no valid textures" errors
-        rwBuffer.size = static_cast<unsigned int>(RW_CHUNK_HEADER_SIZE + chunkSize);
+        // Use the full buffer size - do NOT trim to (RW_CHUNK_HEADER_SIZE + chunkSize).
+        // RpClumpStreamRead uses count-based loop termination (numAtomics/numLights/numCameras from the
+        // struct header), not byte-based tracking against the outer chunk's declared size. Any trailing
+        // IMG sector padding is therefore harmless - RW stops reading once all declared sub-chunks are
+        // consumed. Trimming to chunkSize causes E_RW_ENDOFSTREAM (error 5) when inner sub-chunk totals
+        // slightly exceed the outer header's declared chunkSize, which happens with valid SA DFF files.
+        // SA's native CFileLoader_LoadAtomicFile also does not trim.
+        rwBuffer.size = static_cast<unsigned int>(buffer.size());
         pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
     }
     else
@@ -462,8 +466,45 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         ((void(__cdecl*)())0x4C75A0)();
     }
 
+    // Clear any stale RW error before reading, so post-failure RwErrorGet captures only fresh errors
+    {
+        RwError staleErr{};
+        RwErrorGet(&staleErr);
+    }
+
     // read the clump with all its extensions
     RpClump* pClump = RpClumpStreamRead(pStream);
+
+    if (!pClump)
+    {
+        int txdId = -1;
+        if (usModelID != 0)
+        {
+            auto* pInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
+            if (pInfo)
+                txdId = pInfo->usTextureDictionary;
+        }
+
+        RwError rwError{};
+        RwErrorGet(&rwError);
+
+        std::uint32_t versionStamp = 0;
+        if (bUsingBuffer && buffer.size() >= RW_CHUNK_HEADER_SIZE)
+            std::memcpy(&versionStamp, buffer.data() + 8, sizeof(versionStamp));
+
+        // Also capture the stream position after the failed read
+        unsigned int streamPos = 0;
+        unsigned int streamSz = 0;
+        if (bUsingBuffer && pStream)
+        {
+            streamPos = pStream->data.position;
+            streamSz = pStream->data.size;
+        }
+
+        AddReportLog(8630, SString("ReadDFF: RpClumpStreamRead null model=%d txd=%d buf=%d bufSz=%u chunkSz=%u ver=0x%X rwErr=%d/%d sPos=%u sSz=%u", usModelID,
+                                   txdId, bUsingBuffer ? 1 : 0, bUsingBuffer ? static_cast<unsigned int>(buffer.size()) : 0u, chunkSize, versionStamp,
+                                   rwError.err1, rwError.err2, streamPos, streamSz));
+    }
 
     if (bLoadEmbeddedCollisions)
     {
@@ -874,6 +915,12 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
 bool CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID)
 {
     return ReplaceModel(pNew, usModelID, FUNC_LoadVehicleModel);
+}
+
+// Replaces a generic CClumpModelInfo model (multi-part objects like cranes, signs, etc.)
+bool CRenderWareSA::ReplaceClumpModel(RpClump* pNew, unsigned short usModelID)
+{
+    return ReplaceModel(pNew, usModelID, FUNC_LoadClumpModel);
 }
 
 // Replaces a weapon model

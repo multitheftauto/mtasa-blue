@@ -112,6 +112,7 @@ public:
     virtual void             RepositionAtomic(RpClump* pDst, RpClump* pSrc, const char* szName) = 0;
     virtual void             AddAllAtomics(RpClump* pDst, RpClump* pSrc) = 0;
     virtual bool             ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) = 0;
+    virtual bool             ReplaceClumpModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplacePedModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;

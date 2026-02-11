@@ -87,7 +87,10 @@ public:
     // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
     bool ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) override;
 
-    // Replaces a CClumpModelInfo clump with a new clump
+    // Replaces a generic CClumpModelInfo clump with a new clump
+    bool ReplaceClumpModel(RpClump* pNew, unsigned short usModelID) override;
+
+    // Replaces a CWeaponModelInfo clump with a new clump
     bool ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) override;
 
     bool ReplacePedModel(RpClump* pNew, unsigned short usModelID) override;
