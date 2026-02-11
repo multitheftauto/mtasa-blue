@@ -33,6 +33,7 @@ static void* ARRAY_ModelLoaded = (char*)CStreaming__ms_aInfoForModel + 0x10;
 
 // CModelInfo/ARRAY_ModelInfo __thiscall to load/replace vehicle models
 #define FUNC_LoadVehicleModel 0x4C95C0
+#define FUNC_LoadClumpModel   0x4C4F70
 #define FUNC_LoadWeaponModel  0x4C9910
 #define FUNC_LoadPedModel     0x4C7340
 

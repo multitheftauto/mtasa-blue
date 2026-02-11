@@ -2182,6 +2182,9 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::TIME:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
+        case eModelInfoType::CLUMP:
+            success = pGame->GetRenderWare()->ReplaceClumpModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
         case eModelInfoType::UNKNOWN:
             // Weapon models (321-372) may return UNKNOWN type during streaming. Using ReplaceAllAtomicsInModel
             // for weapons would skip CWeaponModelInfo::SetClump, leaving the frame plugin's m_modelInfo NULL,
@@ -2192,6 +2195,8 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
                 success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         default:
+            AddReportLog(8634, SString("SetCustomModel: Unhandled model type %d for model %u", static_cast<int>(GetModelType()),
+                                       static_cast<unsigned int>(m_dwModelID)));
             break;
     }
 

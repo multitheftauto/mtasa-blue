@@ -72,7 +72,8 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
         info.bTriedLoad = true;
 
         // Make sure previous model+collision is loaded
-        m_pManager->GetModelRequestManager()->RequestBlocking(usModelId, "CClientDFF::LoadDFF");
+        if (!m_pManager->GetModelRequestManager()->RequestBlocking(usModelId, "CClientDFF::LoadDFF"))
+            AddReportLog(8631, SString("GetLoadedClump: RequestBlocking failed for model %d", usModelId));
 
         // Attempt loading it
         if (!m_bIsRawData)  // We have file
@@ -239,6 +240,11 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
     }
 
     // No supported type or no loaded clump
+    if (!pClump)
+        AddReportLog(8632, SString("DoReplaceModel: GetLoadedClump returned null for model %d", usModel));
+    else
+        AddReportLog(8633, SString("DoReplaceModel: No type match for model %d (loaded clump exists)", usModel));
+
     return false;
 }
 
@@ -403,7 +409,11 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
 
     if (!pModelInfo->SetCustomModel(pClump))
+    {
+        AddReportLog(8635, SString("ReplaceObjectModel: SetCustomModel failed for model %d (loaded=%d, type=%d)", usModel, pModelInfo->IsLoaded() ? 1 : 0,
+                                   static_cast<int>(pModelInfo->GetModelType())));
         return false;
+    }
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
