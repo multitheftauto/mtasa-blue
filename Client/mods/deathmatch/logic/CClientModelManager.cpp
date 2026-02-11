@@ -155,23 +155,20 @@ void CClientModelManager::ReleaseModelID(int iModelID)
 
 int CClientModelManager::GetFreeTxdModelID()
 {
-    // Categorized allocations:
-    // 1. [MAX_STREAMING_TXD_SLOT+) - no streaming entries.
-    //      Works with engineLoadTXD/engineImportTXD but not IMG linking.
-    //      Preferred to avoid competition with the isolation system.
-    // 2. [0, SA_TXD_POOL_CAPACITY) - dedicated TXD streaming entries
-    //    (model IDs 20000-24999). Required for engineImageLinkTXD.
-    //    Only used as fallback to avoid starving isolation-preferred TXD pool slots.
-    // Skip [5000, 6316) because those streaming IDs belong to COL/IPL/DAT/IFP.
-    // That range is reserved for isolation TXDs.
+    // [0, 5000) have streaming entries (model IDs 20000-24999), so they
+    // support both engineLoadTXD/engineImportTXD and engineImageLinkTXD.
+    // [5000, 6316) maps to COL/IPL/DAT/IFP streaming IDs - not usable here.
+    // [6316+) are overflow slots with no streaming entries, so they only
+    // work with engineLoadTXD/engineImportTXD (not IMG linking).
     auto& txdPool = g_pGame->GetPools()->GetTxdPool();
 
-    // Prefer expanded range first (avoids competition with isolation system)
-    std::uint32_t uiTxdId = txdPool.GetFreeTextureDictonarySlotAbove(CTxdPool::MAX_STREAMING_TXD_SLOT);
+    // Prefer the IMG-linkable range so all engineRequestTXD callers can
+    // freely use engineImageLinkTXD on the returned ID
+    std::uint32_t uiTxdId = txdPool.GetFreeTextureDictonarySlotInRange(CTxdPool::SA_TXD_POOL_CAPACITY);
 
-    // Fall back to IMG-linkable range if expanded range is full
+    // Fall back to overflow range (engineLoadTXD/engineImportTXD only)
     if (uiTxdId == static_cast<std::uint32_t>(-1))
-        uiTxdId = txdPool.GetFreeTextureDictonarySlotInRange(CTxdPool::SA_TXD_POOL_CAPACITY);
+        uiTxdId = txdPool.GetFreeTextureDictonarySlotAbove(CTxdPool::MAX_STREAMING_TXD_SLOT);
 
     if (uiTxdId == static_cast<std::uint32_t>(-1))
         return INVALID_MODEL_ID;
