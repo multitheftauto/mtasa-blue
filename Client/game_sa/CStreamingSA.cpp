@@ -462,6 +462,12 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
     else
     {
+        // Overflow TXD slots (pool index >= 6316) produce streaming IDs >= 26316,
+        // which exceed ms_aInfoForModel[26316]. These slots are managed by MTA
+        // independently of SA's streaming system, so skip the request.
+        if (dwModelID >= static_cast<DWORD>(pGame->GetCountOfAllFileIDs()))
+            return;
+
         CBaseModelInfoSAInterface** ppModelInfo = reinterpret_cast<CBaseModelInfoSAInterface**>(ARRAY_ModelInfo);
         if (dwModelID < MODELINFO_DFF_MAX)
         {
@@ -498,6 +504,12 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
 
 void CStreamingSA::RemoveModel(std::uint32_t model)
 {
+    // Overflow TXD slots (pool index >= 6316) produce streaming IDs >= 26316,
+    // which exceed ms_aInfoForModel[26316]. These slots are managed by MTA
+    // independently of SA's streaming system, so skip the removal.
+    if (model >= static_cast<std::uint32_t>(pGame->GetCountOfAllFileIDs()))
+        return;
+
     using Signature = void(__cdecl*)(std::uint32_t);
     const auto function = reinterpret_cast<Signature>(0x4089A0);
     function(model);
