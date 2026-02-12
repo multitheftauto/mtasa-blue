@@ -29,6 +29,10 @@ public:
 
     void Render();
 
+    // Must be called after GTA's RenderFadingInEntities completes to release
+    // the queue memory that the alpha entity list's callbacks reference.
+    void NotifyFrameEnd();
+
     static void RenderEntity(SModelToRender* entity, float distance);
 
 private:

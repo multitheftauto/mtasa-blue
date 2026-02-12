@@ -57,6 +57,13 @@ void CModelRenderer::Render()
             pRenderer->RenderModel(modelDesc.pModelInfo, modelDesc.matrix, modelDesc.lighting);
     }
 
+    // m_Queue must NOT be cleared here: GTA's RenderFadingInEntities runs later
+    // in the same frame and calls RenderEntity with pointers into m_Queue elements
+    // that were inserted by Update() into the alpha entity list.
+}
+
+void CModelRenderer::NotifyFrameEnd()
+{
     m_Queue.clear();
 }
 
