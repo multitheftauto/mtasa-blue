@@ -42,7 +42,7 @@ namespace
     constexpr std::uint32_t RW_CHUNK_TYPE_DFF = 0x10;
     constexpr std::uint32_t RW_CHUNK_TYPE_TXD = 0x16;
     constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
-}    // namespace
+}  // namespace
 
 void CRenderWareSA::DebugTxdAddRef(unsigned short usTxdId, const char* /*tag*/, bool /*enableSafetyPin*/)
 {
@@ -1225,8 +1225,7 @@ bool CRenderWareSA::LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::str
 
     // Slots [SA_TXD_POOL_CAPACITY, MAX_STREAMING_TXD_SLOT) overlap with
     // non-TXD streaming resources (COL/IPL/DAT/IFP); reject them here.
-    if (uiSlotId >= static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY)
-        && uiSlotId < static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT))
+    if (uiSlotId >= static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY) && uiSlotId < static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT))
         return false;
 
     CTextureDictonarySAInterface* pSlot = pTxdPool->GetTextureDictonarySlot(uiSlotId);
