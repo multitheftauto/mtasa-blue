@@ -4310,19 +4310,18 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
         {
             pModelInfo->SetTextureDictionaryID(usParentTxdId);
 
-            // SetTextureDictionaryID silently skips ref management when the target
-            // TXD data isn't loaded (CTxdStore_GetTxd returns nullptr). During session
-            // reset the parent TXD is often already unloaded, hitting this path.
-            // So we detect the skip and transfer refs manually so the isolated slot can be freed.
+            // SetTextureDictionaryID handles ref transfer even when the target
+            // TXD data isn't loaded (null rwTexDictonary). But if it bailed
+            // (e.g. parent slot is freed and re-allocated as free), detect the
+            // skip and transfer refs manually so the isolated slot can be freed.
             if (CTxdStore_GetTxd(usParentTxdId) == nullptr && !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usParentTxdId))
             {
                 CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                if (pInterface)
+                if (pInterface && pInterface->usTextureDictionary != usParentTxdId)
                 {
-                    // Force the field if SetTextureDictionaryID bailed completely
-                    // (model has loaded geometry — the bail returns without setting it)
-                    if (pInterface->usTextureDictionary != usParentTxdId)
-                        pInterface->usTextureDictionary = usParentTxdId;
+                    // SetTextureDictionaryID bailed without changing the field.
+                    // Force the field and transfer refs manually.
+                    pInterface->usTextureDictionary = usParentTxdId;
 
                     size_t referencesCount = pInterface->usNumberOfRefs;
                     if (pInterface->pRwObject)

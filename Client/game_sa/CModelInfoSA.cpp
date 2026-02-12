@@ -1048,20 +1048,28 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (usOldTxdId == usID)
         return;
 
-    // Validate new TXD slot before proceeding to avoid CTxdStore_AddRef crash
+    // Slot allocated (e.g. via engineRequestTXD) but TXD data isn't loaded yet.
+    // For unloaded models, just record the new TXD ID; SA streaming handles refs
+    // and texture resolution when it loads both the model and its TXD dependency.
+    // Loaded models fall through to the ref-transfer path below. CTxdStore_AddRef
+    // only touches usUsagesCount (never dereferences rwTexDictonary), and
+    // BuildTxdTextureMap returns an empty map for null TXDs, making the rebind a
+    // no-op. The real texture data arrives later via engineImageLinkTXD + restream.
     if (CTxdStore_GetTxd(usID) == nullptr)
     {
-        // Slot is allocated (e.g. via engineRequestTXD) but TXD data isn't loaded yet.
-        // For unloaded models, just set the TXD ID.. SA streaming handles refs and
-        // texture resolution when it loads both the model and its TXD dependency.
-        if (!pGame || pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usID) || m_pInterface->pRwObject)
+        if (!pGame || pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usID))
             return;
 
-        if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
-            ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
+        if (!m_pInterface->pRwObject)
+        {
+            if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
+                ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
 
-        m_pInterface->usTextureDictionary = usID;
-        return;
+            m_pInterface->usTextureDictionary = usID;
+            return;
+        }
+
+        // Loaded model: fall through to ref-transfer path
     }
 
     size_t referencesCount = m_pInterface->usNumberOfRefs;
