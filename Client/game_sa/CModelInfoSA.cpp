@@ -584,7 +584,11 @@ void CModelInfoSA::Remove()
 
     // Remove our reference
     if (m_pInterface->usNumberOfRefs > 0)
+    {
+        if (CTxdStore_GetTxd(m_pInterface->usTextureDictionary) != nullptr)
+            CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
         m_pInterface->usNumberOfRefs--;
+    }
 
     // No references left?
     if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
@@ -619,6 +623,7 @@ bool CModelInfoSA::IsLoaded()
             if (pInterface)
             {
                 pInterface->usNumberOfRefs++;
+                CTxdStore_AddRef(pInterface->usTextureDictionary);
                 m_dwPendingInterfaceRef = 0;
             }
         }
@@ -1579,7 +1584,10 @@ void CModelInfoSA::ModelAddRef(EModelRequestType requestType, const char* szTag)
         {
             m_pInterface = ppModelInfo[m_dwModelID];
             if (IsValidModelInfoPtr(m_pInterface))
+            {
                 m_pInterface->usNumberOfRefs++;
+                CTxdStore_AddRef(m_pInterface->usTextureDictionary);
+            }
             else
                 m_pInterface = nullptr;
         }
@@ -1977,6 +1985,7 @@ void CModelInfoSA::SetVehicleDummyPosition(VehicleDummies eDummy, const CVector&
         ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<VehicleDummies, CVector>()});
         // Increment this model references count, so we don't unload it before we have a chance to reset the positions
         pVehicleModel->usNumberOfRefs++;
+        CTxdStore_AddRef(pVehicleModel->usTextureDictionary);
     }
 
     if (ms_ModelDefaultDummiesPosition[m_dwModelID].find(eDummy) == ms_ModelDefaultDummiesPosition[m_dwModelID].end())
@@ -2016,7 +2025,11 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
     }
 
     if (pVehicleModel->usNumberOfRefs > 0)
+    {
+        if (CTxdStore_GetTxd(pVehicleModel->usTextureDictionary) != nullptr)
+            CTxdStore_RemoveRef(pVehicleModel->usTextureDictionary);
         pVehicleModel->usNumberOfRefs--;
+    }
 
     if (bRemoveFromDummiesMap)
         ms_ModelDefaultDummiesPosition.erase(iter);
@@ -2051,7 +2064,11 @@ void CModelInfoSA::ResetAllVehicleDummies()
             pVehicleModel->pVisualInfo->vecDummies[static_cast<std::size_t>(dummy.first)] = dummy.second;
 
         if (pVehicleModel->usNumberOfRefs > 0)
+        {
+            if (CTxdStore_GetTxd(pVehicleModel->usTextureDictionary) != nullptr)
+                CTxdStore_RemoveRef(pVehicleModel->usTextureDictionary);
             pVehicleModel->usNumberOfRefs--;
+        }
 
         it = ms_ModelDefaultDummiesPosition.erase(it);
     }

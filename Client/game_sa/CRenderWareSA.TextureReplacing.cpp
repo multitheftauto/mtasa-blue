@@ -1213,14 +1213,29 @@ namespace
 
         if (usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
         {
-            pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
-            pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
+            // Use CStreaming::RemoveModel to properly unlink from SA's
+            // streaming loaded doubly-linked list. Manually zeroing
+            // prevId/nextId corrupts the list because neighbours still
+            // point to this entry, causing crashes when SA walks it.
+            if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED && pGame->GetStreaming())
+            {
+                pGame->GetStreaming()->RemoveModel(streamId);
+
+                // RemoveTxd (called internally by RemoveModel) doesn't
+                // reset parentIndex. Clear it so RemoveTextureDictonarySlot
+                // (which also calls RemoveTxd) won't double-decrement
+                // the parent's usUsagesCount.
+                auto* pTxdPool = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+                if (auto* pEntry = pTxdPool->GetTextureDictonarySlot(usTxdSlotId))
+                    pEntry->usParentIndex = static_cast<unsigned short>(-1);
+            }
+
+            // Clear remaining informational fields not handled by RemoveModel
             pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
             pStreamInfo->flg = 0;
             pStreamInfo->archiveId = INVALID_ARCHIVE_ID;
             pStreamInfo->offsetInBlocks = 0;
             pStreamInfo->sizeInBlocks = 0;
-            pStreamInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
         }
         // Overflow slots: nothing to restore - we never modified their streaming entries.
     }
@@ -1241,6 +1256,13 @@ namespace
 
         if (usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
         {
+            // Isolated TXDs are never added to SA's streaming loaded list
+            // (SetStreamingInfoLoaded sets prevId/nextId to -1 at creation,
+            // and SA's streaming never touches this entry). The zeroing here
+            // is defensive cleanup of already-detached fields.
+            // Must NOT call RemoveModel: that triggers RemoveTxd which
+            // destroys the RW dictionary — but leaked slots still have
+            // live textures or external refs that must stay alive.
             pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
@@ -1643,7 +1665,7 @@ namespace
 
     void CleanupStalePerTxd(SReplacementTextures::SPerTxd& perTxdInfo, RwTexDictionary* pDeadTxd, SReplacementTextures* pReplacementTextures,
                             const std::unordered_set<RwTexture*>* pMasterTextures, std::unordered_set<RwTexture*>& outCopiesToDestroy,
-                            std::unordered_set<RwTexture*>& outOriginalsToDestroy)
+                            std::unordered_set<RwTexture*>& outOriginalsToDestroy, bool bSkipRasterNull = false)
     {
         const bool bDeadTxdValid = pDeadTxd != nullptr;
 
@@ -1671,7 +1693,7 @@ namespace
                 bNeedsDestruction = true;
             }
 
-            if (bNeedsDestruction)
+            if (bNeedsDestruction && !bSkipRasterNull)
                 pTexture->raster = nullptr;
 
             if (bNeedsDestruction && CanDestroyOrphanedTexture(pTexture))
@@ -1703,7 +1725,7 @@ namespace
                 bNeedsDestruction = true;
             }
 
-            if (bNeedsDestruction)
+            if (bNeedsDestruction && !bSkipRasterNull)
                 pReplaced->raster = nullptr;
 
             if (bNeedsDestruction && CanDestroyOrphanedTexture(pReplaced))
@@ -1919,7 +1941,22 @@ namespace
             RestoreModelTexturesToParent(pModelInfo, usModelId, oldTxdId, oldParentTxdId);
 
             if (pModelInfo->GetTextureDictionaryID() == oldTxdId)
+            {
+                // Ensure parent TXD is loaded so SetTextureDictionaryID takes
+                // the full ref transfer path instead of a field-only change that
+                // would orphan any active entity refs on the old child TXD.
+                if (CTxdStore_GetTxd(oldParentTxdId) == nullptr && pGame && pGame->GetStreaming())
+                {
+                    const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+                    if (iBaseIDforTXD > 0)
+                    {
+                        const unsigned int uiTxdStreamId = oldParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                        pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                        pGame->GetStreaming()->LoadAllRequestedModels(true, "EnsureIsolatedTxd-reiso");
+                    }
+                }
                 pModelInfo->SetTextureDictionaryID(oldParentTxdId);
+            }
 
             auto* oldSlot = pTxdPoolSA->GetTextureDictonarySlot(oldTxdId);
             if (oldSlot && oldSlot->rwTexDictonary && oldSlot->usParentIndex == oldParentTxdId)
@@ -4619,7 +4656,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             std::unordered_set<RwTexture*> copiesToDestroy;
             std::unordered_set<RwTexture*> originalsToDestroy;
 
-            CleanupStalePerTxd(perTxdInfo, pInfo->pTxd, pReplacementTextures, &masterTextures, copiesToDestroy, originalsToDestroy);
+            CleanupStalePerTxd(perTxdInfo, pInfo->pTxd, pReplacementTextures, &masterTextures, copiesToDestroy, originalsToDestroy,
+                               true /* bSkipRasterNull: textures are leaked, not destroyed — keep rasters for active materials */);
 
             for (RwTexture* pCopy : copiesToDestroy)  // Leak to prevent crashes
             {

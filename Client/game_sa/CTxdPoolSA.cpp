@@ -284,10 +284,36 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
     // parent cascade triggers Hook_CTxdStore_RemoveRef on related slots.
     g_StreamingProtectedTxdSlots.erase(static_cast<unsigned short>(uiTxdId));
 
-    // ShaderSupport hooks 0x731E90 and reads ESI as the streaming ID
-    // (pool index + 20000) for texture/shader tracking. A plain cdecl
-    // call leaves ESI undefined, so set it to match what the hook expects.
     const DWORD dwStreamingId = uiTxdId + pGame->GetBaseIDforTXD();
+
+    // Standard-range TXD slots tracked by SA's streaming system must be
+    // removed via CStreaming::RemoveModel before the pool slot is freed.
+    // RemoveModel properly unlinks from the loaded doubly-linked list,
+    // sets loadState to NOT_LOADED, and calls RemoveTxd internally.
+    // Without this, the stale entry stays in the loaded list and causes
+    // a crash when RemoveLeastUsedModel later tries to access the freed slot.
+    if (uiTxdId < SA_TXD_POOL_CAPACITY && pGame->GetStreaming())
+    {
+        CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(dwStreamingId);
+        if (pStreamInfo && pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+        {
+            pGame->GetStreaming()->RemoveModel(dwStreamingId);
+
+            // RemoveTxd (called by RemoveModel) doesn't clear parentIndex.
+            // The direct RemoveTxd call below would re-process the parent
+            // chain, double-decrementing the parent's usUsagesCount.
+            CTextureDictonarySAInterface* pEntry = (*m_ppTxdPoolInterface)->GetObject(uiTxdId);
+            if (pEntry)
+                pEntry->usParentIndex = static_cast<unsigned short>(-1);
+        }
+    }
+
+    // Call RemoveTxd for dictionary cleanup. When RemoveModel already ran
+    // above, dictionary is NULL and parentIndex is -1, making this a no-op.
+    // For overflow slots or non-loaded standard slots, this performs the
+    // actual dictionary destruction and parent ref cascade.
+    // ShaderSupport hooks 0x731E90 and reads ESI as the streaming ID
+    // (pool index + 20000) for texture/shader tracking.
     const DWORD dwFuncAddr = FUNC_CTxdStore__RemoveSlot;
     // clang-format off
     __asm

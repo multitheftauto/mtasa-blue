@@ -1746,7 +1746,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc38()
 DWORD RETURN_CrashFix_VBInstV3dNull = 0x752AD7;
 DWORD ARRAY_D3D9VertexTypeSize = 0x874EF8;
 
-void _declspec(naked) HOOK_CrashFix_VBInstV3dNull()
+static void _declspec(naked) HOOK_CrashFix_VBInstV3dNull()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -1802,7 +1802,7 @@ void _declspec(naked) HOOK_CrashFix_VBInstV3dNull()
 #define HOOKCHECK_CrashFix_VBInstV3dMorphNull 0x51
 DWORD RETURN_CrashFix_VBInstV3dMorphNull = 0x753B65;
 
-void _declspec(naked) HOOK_CrashFix_VBInstV3dMorphNull()
+static void _declspec(naked) HOOK_CrashFix_VBInstV3dMorphNull()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
