@@ -655,7 +655,7 @@ void _cdecl DoWait(HANDLE hHandle)
         {
             dwResult = WaitForSingleObject(hHandle, 1000);
             if (dwResult != WAIT_TIMEOUT)
-                s_consecutiveTimeouts = 0;            // Completed during retry, not persistent
+                s_consecutiveTimeouts = 0;  // Completed during retry, not persistent
         }
     }
     else
