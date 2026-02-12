@@ -155,4 +155,7 @@ public:
 
     // Remove tracking state without destroying textures; used during shutdown.
     virtual void ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures) = 0;
+
+    // Parses TXD buffer data and injects it directly into an allocated pool slot
+    virtual bool LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer) = 0;
 };

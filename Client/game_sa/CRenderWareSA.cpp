@@ -34,6 +34,16 @@
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
+// RenderWare binary chunk format constants (shared by ReadTXD, ReadDFF,
+// LoadTxdSlotFromBuffer, etc.)
+namespace
+{
+    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
+    constexpr std::uint32_t RW_CHUNK_TYPE_DFF = 0x10;
+    constexpr std::uint32_t RW_CHUNK_TYPE_TXD = 0x16;
+    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
+}    // namespace
+
 void CRenderWareSA::DebugTxdAddRef(unsigned short usTxdId, const char* /*tag*/, bool /*enableSafetyPin*/)
 {
     if (!pGame || !pGame->GetRenderWareSA())
@@ -257,10 +267,6 @@ CRenderWareSA::~CRenderWareSA()
 // Reads and parses a TXD file specified by a path (szTXD)
 RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SString& buffer)
 {
-    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
-    constexpr std::uint32_t RW_CHUNK_TYPE_TXD = 0x16;
-    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
-
     if (buffer.empty() && strFilename.empty())
         return nullptr;
 
@@ -360,10 +366,6 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
             SetTextureDict(usTxdId);
         }
     }
-
-    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
-    constexpr std::uint32_t RW_CHUNK_TYPE_DFF = 0x10;
-    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
 
     const bool bUsingBuffer = !buffer.empty();
 
@@ -1196,6 +1198,84 @@ void CRenderWareSA::DestroyDFF(RpClump* pClump)
 {
     if (pClump)
         RpClumpDestroy(pClump);
+}
+
+// Parses TXD buffer data and injects the resulting RwTexDictionary directly
+// into an allocated pool slot, bypassing the streaming system.
+// Used for overflow TXD slots that have no corresponding streaming entry.
+//
+// Deliberately avoids ReadTXD() because it calls ScriptAddedTxd(), which
+// creates shader TexInfo entries keyed by RwTexture* under txdId 0.
+// Those entries would never be cleaned up when the slot is freed via
+// RemoveTextureDictonarySlot (which cleans up by pool-slot key), causing
+// TexInfo leaks and dangling D3D data pointers.
+bool CRenderWareSA::LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer)
+{
+    CTxdPoolSA* pTxdPool = pGame ? static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool()) : nullptr;
+    if (!pTxdPool)
+        return false;
+
+    const int poolSize = pTxdPool->GetPoolSize();
+    if (poolSize <= 0 || uiSlotId >= static_cast<std::uint32_t>(poolSize))
+        return false;
+
+    // True means unallocated (slot not reserved via AllocateTextureDictonarySlot)
+    if (pTxdPool->IsFreeTextureDictonarySlot(uiSlotId))
+        return false;
+
+    // Slots [SA_TXD_POOL_CAPACITY, MAX_STREAMING_TXD_SLOT) overlap with
+    // non-TXD streaming resources (COL/IPL/DAT/IFP); reject them here.
+    if (uiSlotId >= static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY)
+        && uiSlotId < static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT))
+        return false;
+
+    CTextureDictonarySAInterface* pSlot = pTxdPool->GetTextureDictonarySlot(uiSlotId);
+    if (!pSlot)
+        return false;
+
+    // Pre-validate the buffer before handing it to RenderWare
+
+    if (buffer.size() < RW_CHUNK_HEADER_SIZE)
+        return false;
+
+    std::uint32_t chunkType = 0;
+    std::uint32_t chunkSize = 0;
+    std::memcpy(&chunkType, buffer.data(), sizeof(chunkType));
+    std::memcpy(&chunkSize, buffer.data() + 4, sizeof(chunkSize));
+
+    if (chunkType != RW_CHUNK_TYPE_TXD || chunkSize > MAX_SANE_CHUNK_SIZE)
+        return false;
+
+    if (buffer.size() < RW_CHUNK_HEADER_SIZE + chunkSize)
+        return false;
+
+    // Parse the TXD from buffer directly, bypassing ReadTXD/ScriptAddedTxd
+    RwBuffer rwBuffer{};
+    // const_cast safe: STREAM_MODE_READ only reads from the buffer
+    rwBuffer.ptr = const_cast<char*>(buffer.data());
+    rwBuffer.size = static_cast<unsigned int>(RW_CHUNK_HEADER_SIZE + chunkSize);
+
+    RwStream* pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
+    if (!pStream)
+        return false;
+
+    if (!RwStreamFindChunk(pStream, RW_CHUNK_TYPE_TXD, nullptr, nullptr))
+    {
+        RwStreamClose(pStream, nullptr);
+        return false;
+    }
+
+    RwTexDictionary* pTxd = RwTexDictionaryGtaStreamRead(pStream);
+    RwStreamClose(pStream, nullptr);
+
+    if (!pTxd)
+        return false;
+
+    if (pSlot->rwTexDictonary && pSlot->rwTexDictonary != pTxd)
+        RwTexDictionaryDestroy(pSlot->rwTexDictonary);
+
+    pSlot->rwTexDictonary = pTxd;
+    return true;
 }
 
 // Destroys a TXD instance

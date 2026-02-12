@@ -60,6 +60,9 @@ public:
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
 
+    // Parses TXD buffer data and injects it directly into an allocated pool slot
+    bool LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer) override;
+
     // Reads and parses a COL file (versions 1-4: COLL, COL2, COL3, COL4)
     CColModel* ReadCOL(const SString& buffer);
 
