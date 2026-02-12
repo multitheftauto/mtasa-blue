@@ -1665,7 +1665,7 @@ namespace
 
     void CleanupStalePerTxd(SReplacementTextures::SPerTxd& perTxdInfo, RwTexDictionary* pDeadTxd, SReplacementTextures* pReplacementTextures,
                             const std::unordered_set<RwTexture*>* pMasterTextures, std::unordered_set<RwTexture*>& outCopiesToDestroy,
-                            std::unordered_set<RwTexture*>& outOriginalsToDestroy)
+                            std::unordered_set<RwTexture*>& outOriginalsToDestroy, bool bSkipRasterNull = false)
     {
         const bool bDeadTxdValid = pDeadTxd != nullptr;
 
@@ -1693,7 +1693,7 @@ namespace
                 bNeedsDestruction = true;
             }
 
-            if (bNeedsDestruction)
+            if (bNeedsDestruction && !bSkipRasterNull)
                 pTexture->raster = nullptr;
 
             if (bNeedsDestruction && CanDestroyOrphanedTexture(pTexture))
@@ -1725,7 +1725,7 @@ namespace
                 bNeedsDestruction = true;
             }
 
-            if (bNeedsDestruction)
+            if (bNeedsDestruction && !bSkipRasterNull)
                 pReplaced->raster = nullptr;
 
             if (bNeedsDestruction && CanDestroyOrphanedTexture(pReplaced))
@@ -4656,7 +4656,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             std::unordered_set<RwTexture*> copiesToDestroy;
             std::unordered_set<RwTexture*> originalsToDestroy;
 
-            CleanupStalePerTxd(perTxdInfo, pInfo->pTxd, pReplacementTextures, &masterTextures, copiesToDestroy, originalsToDestroy);
+            CleanupStalePerTxd(perTxdInfo, pInfo->pTxd, pReplacementTextures, &masterTextures, copiesToDestroy, originalsToDestroy,
+                               true /* bSkipRasterNull: textures are leaked, not destroyed — keep rasters for active materials */);
 
             for (RwTexture* pCopy : copiesToDestroy)  // Leak to prevent crashes
             {
