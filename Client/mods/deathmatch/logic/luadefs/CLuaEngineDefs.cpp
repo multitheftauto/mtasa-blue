@@ -803,7 +803,7 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
 
     size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
-    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
+    if (!pIMG->GetFile(fileID, buffer))
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     if (!g_pCore->GetNetwork()->CheckFile("dff", "", buffer.data(), buffer.size()))
@@ -814,20 +814,32 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
 
 bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
 {
-    // Only TXD slots [0, SA_TXD_POOL_CAPACITY) have dedicated TXD streaming
-    // entries (model IDs 20000-24999). Slots >= 5000 map to COL/IPL/DAT/IFP.
-    if (uiTxdID >= static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
-        throw std::invalid_argument(SString("Expected txdid in range 0 - %d, got %d", CTxdPool::SA_TXD_POOL_CAPACITY - 1, uiTxdID));
-
     size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
-    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
+    if (!pIMG->GetFile(fileID, buffer))
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     if (!g_pCore->GetNetwork()->CheckFile("txd", "", buffer.data(), buffer.size()))
         throw std::invalid_argument("Failed to link file. Make sure the archieve isn't corrupted.");
 
-    return pIMG->LinkModel(20000 + uiTxdID, fileID);
+    // Standard TXD slots [0, SA_TXD_POOL_CAPACITY) have dedicated streaming
+    // entries (model IDs 20000-24999) and can use deferred IMG streaming
+    if (uiTxdID < static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
+        return pIMG->LinkModel(20000 + uiTxdID, fileID);
+
+    // Slots [SA_TXD_POOL_CAPACITY, MAX_STREAMING_TXD_SLOT) have streaming IDs
+    // that overlap with non-TXD resources (COL/IPL/DAT/IFP). engineRequestTXD
+    // never allocates from this range.
+    if (uiTxdID < static_cast<uint>(CTxdPool::MAX_STREAMING_TXD_SLOT))
+        throw std::invalid_argument(SString("Invalid TXD slot ID %u (reserved range)", uiTxdID));
+
+    // Overflow TXD slots (>= MAX_STREAMING_TXD_SLOT, from engineRequestTXD
+    // fallback) have no streaming entry, so we parse and load the TXD data
+    // directly into the pool slot.
+    if (!g_pGame->GetRenderWare()->LoadTxdSlotFromBuffer(uiTxdID, buffer))
+        throw std::invalid_argument(SString("Failed to load TXD data into slot %u", uiTxdID));
+
+    return true;
 }
 
 bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
@@ -843,8 +855,10 @@ bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
 
 bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
 {
+    // Only standard TXD slots [0, SA_TXD_POOL_CAPACITY) can have streaming
+    // IMG links to restore. Higher slots don't have TXD streaming entries.
     if (uiModelID >= static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
-        throw std::invalid_argument(SString("Expected TXD ID in range [0-%d] at argument 1", CTxdPool::SA_TXD_POOL_CAPACITY - 1));
+        return false;
 
     if (CClientIMGManager::IsLinkableModel(uiModelID))
         return m_pImgManager->RestoreModel(20000 + uiModelID);
