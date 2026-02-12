@@ -158,15 +158,15 @@ int CClientModelManager::GetFreeTxdModelID()
     // [0, 5000) have streaming entries (model IDs 20000-24999), so they
     // support both engineLoadTXD/engineImportTXD and engineImageLinkTXD.
     // [5000, 6316) maps to COL/IPL/DAT/IFP streaming IDs - not usable here.
-    // [6316+) are overflow slots with no streaming entries, so they only
-    // work with engineLoadTXD/engineImportTXD (not IMG linking).
+    // [6316+) are overflow slots with no streaming entries. They work with
+    // engineLoadTXD/engineImportTXD and engineImageLinkTXD (direct load).
     auto& txdPool = g_pGame->GetPools()->GetTxdPool();
 
     // Prefer the IMG-linkable range so all engineRequestTXD callers can
     // freely use engineImageLinkTXD on the returned ID
     std::uint32_t uiTxdId = txdPool.GetFreeTextureDictonarySlotInRange(CTxdPool::SA_TXD_POOL_CAPACITY);
 
-    // Fall back to overflow range (engineLoadTXD/engineImportTXD only)
+    // Fall back to overflow range (no deferred streaming, but direct load works)
     if (uiTxdId == static_cast<std::uint32_t>(-1))
         uiTxdId = txdPool.GetFreeTextureDictonarySlotAbove(CTxdPool::MAX_STREAMING_TXD_SLOT);
 
