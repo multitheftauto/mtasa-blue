@@ -37,4 +37,5 @@ public:
 
 private:
     std::vector<SModelToRender> m_Queue;
+    bool                        m_bAlphaRefsActive = false;
 };

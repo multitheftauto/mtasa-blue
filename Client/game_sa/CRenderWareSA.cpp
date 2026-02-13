@@ -1008,14 +1008,20 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 
     // Ensure shadow data consistency to prevent crash in GTA's stencil shadow rendering
     // GTA accesses shadow vertices without NULL checks, causing crash if pointer is NULL but count is non-zero
+    // Also cap counts to catch corrupt data before CCollisionData::Copy amplifies it into an out-of-bounds read
     auto* pInterface = pColModel->GetInterface();
     if (pInterface && pInterface->m_data)
     {
         auto* pData = pInterface->m_data;
 
-        // shadow counts indicate data exists but pointers are NULL
-        const bool shadowVertsCorrupt = pData->m_numShadowVertices > 0 && pData->m_shadowVertices == nullptr;
-        const bool shadowTrisCorrupt = pData->m_numShadowTriangles > 0 && pData->m_shadowTriangles == nullptr;
+        constexpr std::uint32_t MAX_SHADOW_VERTICES = 10000;
+        constexpr std::uint32_t MAX_SHADOW_TRIANGLES = 5000;
+
+        // shadow counts indicate data exists but pointers are NULL, or counts are beyond any legitimate model
+        const bool shadowVertsCorrupt =
+            (pData->m_numShadowVertices > 0 && pData->m_shadowVertices == nullptr) || pData->m_numShadowVertices > MAX_SHADOW_VERTICES;
+        const bool shadowTrisCorrupt =
+            (pData->m_numShadowTriangles > 0 && pData->m_shadowTriangles == nullptr) || pData->m_numShadowTriangles > MAX_SHADOW_TRIANGLES;
 
         if (shadowVertsCorrupt || shadowTrisCorrupt)
         {
@@ -1204,11 +1210,9 @@ void CRenderWareSA::DestroyDFF(RpClump* pClump)
 // into an allocated pool slot, bypassing the streaming system.
 // Used for overflow TXD slots that have no corresponding streaming entry.
 //
-// Deliberately avoids ReadTXD() because it calls ScriptAddedTxd(), which
-// creates shader TexInfo entries keyed by RwTexture* under txdId 0.
-// Those entries would never be cleaned up when the slot is freed via
-// RemoveTextureDictonarySlot (which cleans up by pool-slot key), causing
-// TexInfo leaks and dangling D3D data pointers.
+// Registers textures via StreamingAddedTexture (keyed by pool slot ID) so
+// shader matching works. Cleanup is handled by RemoveTextureDictonarySlot
+// which triggers StreamingRemovedTxd via the CTxdStore hook.
 bool CRenderWareSA::LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer)
 {
     CTxdPoolSA* pTxdPool = pGame ? static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool()) : nullptr;
@@ -1223,9 +1227,10 @@ bool CRenderWareSA::LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::str
     if (pTxdPool->IsFreeTextureDictonarySlot(uiSlotId))
         return false;
 
-    // Slots [SA_TXD_POOL_CAPACITY, MAX_STREAMING_TXD_SLOT) overlap with
-    // non-TXD streaming resources (COL/IPL/DAT/IFP); reject them here.
-    if (uiSlotId >= static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY) && uiSlotId < static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT))
+    // Only overflow slots (>= MAX_STREAMING_TXD_SLOT) are valid here.
+    // Standard slots [0, 5000) use SA's streaming system, and [5000, 6316)
+    // overlap with non-TXD streaming resources (COL/IPL/DAT/IFP).
+    if (uiSlotId < static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT))
         return false;
 
     CTextureDictonarySAInterface* pSlot = pTxdPool->GetTextureDictonarySlot(uiSlotId);
@@ -1271,9 +1276,38 @@ bool CRenderWareSA::LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::str
         return false;
 
     if (pSlot->rwTexDictonary && pSlot->rwTexDictonary != pTxd)
+    {
+        // Refuse replacement if the old TXD still has active references
+        if (static_cast<short>(pSlot->usUsagesCount) > 0)
+        {
+            RwTexDictionaryDestroy(pTxd);
+            return false;
+        }
+
+        // Remove old shader TexInfo entries before destroying the TXD
+        StreamingRemovedTxd(static_cast<ushort>(uiSlotId));
+
         RwTexDictionaryDestroy(pSlot->rwTexDictonary);
+    }
 
     pSlot->rwTexDictonary = pTxd;
+
+    // Register each texture for shader matching, keyed by pool slot ID
+    std::vector<RwTexture*> textureList;
+    GetTxdTextures(textureList, pTxd);
+    for (RwTexture* pTexture : textureList)
+    {
+        if (!pTexture || !SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+            continue;
+
+        CD3DDUMMY* pD3DData = (pTexture->raster && SharedUtil::IsReadablePointer(pTexture->raster, sizeof(RwRaster)))
+                                  ? reinterpret_cast<CD3DDUMMY*>(pTexture->raster->renderResource)
+                                  : nullptr;
+
+        if (pD3DData && pTexture->name[0] && !IsTexInfoRegistered(pD3DData))
+            StreamingAddedTexture(static_cast<ushort>(uiSlotId), pTexture->name, pD3DData);
+    }
+
     return true;
 }
 

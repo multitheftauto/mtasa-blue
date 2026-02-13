@@ -17,6 +17,7 @@
 #include "../game_sa/TaskBasicSA.h"
 #include "../game_sa/CFxSystemBPSA.h"
 #include "../game_sa/CFxSystemSA.h"
+#include "../game_sa/CColModelSA.h"
 
 extern CCoreInterface* g_pCore;
 
@@ -616,11 +617,27 @@ static void __declspec(naked) HOOK_CrashFix_Misc14()
 ////////////////////////////////////////////////////////////////////////
 void _cdecl DoWait(HANDLE hHandle)
 {
-    DWORD dwWait = 4000;
+    static DWORD s_consecutiveTimeouts = 0;
+    static DWORD s_lastCallTick = 0;
+
+    DWORD now = SharedUtil::GetTickCount32();
+
+    // Reset counter after a quiet period - a 10+ second gap means
+    // we moved on to a different streaming operation
+    if (s_lastCallTick != 0 && (now - s_lastCallTick) > 10000)
+        s_consecutiveTimeouts = 0;
+    s_lastCallTick = now;
+
+    // After a consecutive timeout, use a short wait so
+    // LoadAllRequestedModels doesn't accumulate multi-second freezes
+    // when the same I/O issue keeps re-ocurring
+    DWORD dwWait = (s_consecutiveTimeouts >= 1) ? 100 : 4000;
+
     DWORD dwResult = WaitForSingleObject(hHandle, dwWait);
     if (dwResult == WAIT_TIMEOUT)
     {
-        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait));
+        s_consecutiveTimeouts++;
+        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms (consecutive: %u)", hHandle, dwWait, s_consecutiveTimeouts));
         // This thread lock bug in GTA will have to be fixed one day.
         // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
 #if 0
@@ -632,7 +649,16 @@ void _cdecl DoWait(HANDLE hHandle)
             ")
          , _CRT_WIDE(__FILE__), __LINE__);
 #endif
-        dwResult = WaitForSingleObject(hHandle, 1000);
+        if (dwWait >= 4000)
+        {
+            dwResult = WaitForSingleObject(hHandle, 1000);
+            if (dwResult != WAIT_TIMEOUT)
+                s_consecutiveTimeouts = 0;  // Completed during retry, not persistent
+        }
+    }
+    else
+    {
+        s_consecutiveTimeouts = 0;
     }
 }
 
@@ -3075,6 +3101,46 @@ static void __declspec(naked) HOOK_CFire_ProcessFire()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CColModel::MakeMultipleAlloc - Validate collision data before converting
+// single-allocation to multi-allocation format via CCollisionData::Copy.
+//
+// Corrupt collision data (e.g. from PC_Scratch buffer overflow) can produce
+// bogus shadow vertex/triangle counts, causing Copy to read past allocations.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CColModel_MakeMultipleAlloc  0x40F740
+#define HOOKSIZE_CColModel_MakeMultipleAlloc 5
+static void __fastcall HOOK_CColModel_MakeMultipleAlloc(CColModelSAInterface* pColModel, void*)
+{
+    if (CColDataSA* pData = pColModel->m_data)
+    {
+        constexpr std::uint32_t MAX_SHADOW_TRIANGLES = 5000;
+        constexpr std::uint32_t MAX_SHADOW_VERTICES = 10000;
+
+        const bool shadowCorrupt = pData->m_numShadowTriangles > MAX_SHADOW_TRIANGLES || pData->m_numShadowVertices > MAX_SHADOW_VERTICES ||
+                                   (pData->m_numShadowVertices > 0 && !pData->m_shadowVertices) ||
+                                   (pData->m_numShadowTriangles > 0 && !pData->m_shadowTriangles);
+
+        if (shadowCorrupt)
+        {
+            pData->m_numShadowTriangles = 0;
+            pData->m_numShadowVertices = 0;
+            pData->m_shadowVertices = nullptr;
+            pData->m_shadowTriangles = nullptr;
+            pData->m_hasShadowInfo = 0;
+            pData->m_hasShadow = 0;
+
+            OnCrashAverted(9801);
+        }
+    }
+
+    // Call the original MakeMultipleAlloc
+    using MakeMultipleAlloc_t = void(__thiscall*)(CColModelSAInterface*);
+    reinterpret_cast<MakeMultipleAlloc_t>(0x1564A10)(pColModel);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 ////////////////////////////////////////////////////////////////////////
@@ -3143,6 +3209,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(FxSystemBP_c__Load);
     EZHookInstall(FxPrim_c__Enable);
     EZHookInstall(CFire_ProcessFire);
+
+    EZHookInstall(CColModel_MakeMultipleAlloc);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

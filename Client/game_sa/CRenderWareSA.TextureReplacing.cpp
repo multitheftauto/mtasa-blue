@@ -149,6 +149,9 @@ namespace
     // D3D textures already released during StaticReset; used by SafeDestroyTextureWithRaster
     // to detect shared rasters and prevent double-release across different texture structs.
     std::unordered_set<void*> g_ReleasedD3DTextures;
+    // Rasters kept alive by orphaned copy textures during isolated TXD cleanup.
+    // Prevents master destruction from freeing rasters that orphaned copies still reference.
+    std::unordered_set<RwRaster*> g_OrphanedCopyRasters;
 
     static void* TryReleaseTextureD3D(RwTexture* pTex)
     {
@@ -160,8 +163,10 @@ namespace
             void* pD3D = pRaster->renderResource;
             if (pD3D)
             {
-                reinterpret_cast<IDirect3DTexture9*>(pD3D)->Release();
+                // Null the pointer first so a fault during Release() won't leave
+                // a stale D3D pointer that triggers a double-release later.
                 reinterpret_cast<void* volatile&>(pRaster->renderResource) = nullptr;
+                reinterpret_cast<IDirect3DTexture9*>(pD3D)->Release();
             }
             return pD3D;
         }
@@ -562,10 +567,15 @@ namespace
         if (vecPending.size() >= MAX_PENDING_REPLACEMENTS_PER_MODEL)
             return;
 
-        for (const SPendingReplacement& existingEntry : vecPending)
+        for (SPendingReplacement& existingEntry : vecPending)
         {
             if (existingEntry.pReplacement == pendingEntryCopy.pReplacement)
+            {
+                // Keep the higher retry count so escalation is never lost
+                if (pendingEntryCopy.ucRetryCount > existingEntry.ucRetryCount)
+                    existingEntry.ucRetryCount = pendingEntryCopy.ucRetryCount;
                 return;
+            }
         }
 
         vecPending.push_back(pendingEntryCopy);
@@ -613,7 +623,7 @@ namespace
             }
 
             CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame ? pGame->GetModelInfo(usModelId) : nullptr);
-            if (!pModelInfo || pModelInfo->GetParentID() == 0)
+            if (!pModelInfo)
             {
                 for (const SPendingReplacement& entry : vecPending)
                 {
@@ -624,16 +634,18 @@ namespace
             }
 
             const unsigned int   uiCurrentParentModelId = pModelInfo->GetParentID();
-            CModelInfoSA*        pParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiCurrentParentModelId));
+            const bool           bIsVanilla = (uiCurrentParentModelId == 0);
+            CModelInfoSA*        pParentInfo = bIsVanilla ? nullptr : static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiCurrentParentModelId));
             const unsigned short usCurrentParentTxdId = pParentInfo ? pParentInfo->GetTextureDictionaryID() : 0;
             const bool           bModelLoaded = pModelInfo->IsLoaded();
             const unsigned int   uiBaseTxdId = pGame->GetBaseIDforTXD();
             const unsigned int   uiParentStreamId = static_cast<unsigned int>(usCurrentParentTxdId) + uiBaseTxdId;
             // Parent TXDs are always vanilla SA slots (< 5000), so streaming info is valid.
             // Guard with SA_TXD_POOL_CAPACITY in case that invariant ever breaks.
-            CStreamingInfo* pParentStreamInfo = usCurrentParentTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY ? GetStreamingInfoSafe(uiParentStreamId) : nullptr;
-            const bool      bParentStreamingBusy =
-                usCurrentParentTxdId != 0 && pParentStreamInfo &&
+            CStreamingInfo* pParentStreamInfo =
+                (!bIsVanilla && usCurrentParentTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY) ? GetStreamingInfoSafe(uiParentStreamId) : nullptr;
+            const bool bParentStreamingBusy =
+                !bIsVanilla && usCurrentParentTxdId != 0 && pParentStreamInfo &&
                 (pParentStreamInfo->loadState == eModelLoadState::LOADSTATE_READING || pParentStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING);
 
             for (const SPendingReplacement& entry : vecPending)
@@ -1368,6 +1380,24 @@ namespace
             }
         }
 
+        // Also filter against all active replacements globally. Covers cases where
+        // this entry's usedByReplacements was cleared during stale recovery but
+        // copies from active replacements remain linked in the TXD.
+        for (const SReplacementTextures* pReplacement : g_ActiveReplacements)
+        {
+            if (!pReplacement)
+                continue;
+            for (RwTexture* pMasterTex : pReplacement->textures)
+            {
+                if (pMasterTex && pMasterTex->raster)
+                    mtaRasters.insert(pMasterTex->raster);
+            }
+        }
+
+        // Filter rasters from orphaned copies kept alive during isolated TXD cleanup
+        for (RwRaster* pKeptRaster : g_OrphanedCopyRasters)
+            mtaRasters.insert(pKeptRaster);
+
         for (RwTexture* pTex : allTextures)
         {
             if (!pTex)
@@ -1911,7 +1941,6 @@ namespace
 
         // Expand pool on first use if CGameSA::Initialize() hasn't run yet.
         // Scripts may request model textures before game init completes.
-        AddReportLog(9402, SString("EnsureIsolatedTxdForRequestedModel: Triggering pool expansion check for model %u", usModelId));
         pTxdPoolSA->InitialisePool();
 
         auto itExisting = g_IsolatedTxdByModel.find(usModelId);
@@ -1927,11 +1956,6 @@ namespace
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
                     return true;
-                }
-                if (ShouldLog(g_uiLastAdoptLogTime))
-                {
-                    AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Existing isolated slot invalid for model %u (txd=%u parent=%u)", usModelId,
-                                               existingTxdId, usParentTxdId));
                 }
             }
 
@@ -1976,11 +2000,7 @@ namespace
                     const bool       bOrphanedAll = OrphanTxdTexturesBounded(pTxd, true);
                     if (!bOrphanedAll)
                     {
-                        const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(oldTxdId).second;
-                        if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
-                        {
-                            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Orphan list exceeded limit for txdId %u", oldTxdId));
-                        }
+                        g_OrphanedIsolatedTxdSlots.insert(oldTxdId);
                     }
 
                     if (bOrphanedAll)
@@ -1997,23 +2017,24 @@ namespace
                 }
                 else
                 {
-                    const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(oldTxdId).second;
-                    if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
-                    {
-                        AddReportLog(
-                            9401, SString("EnsureIsolatedTxdForRequestedModel: Orphaned isolated TXD %u (refs=%d)", oldTxdId, CTxdStore_GetNumRefs(oldTxdId)));
-                    }
+                    g_OrphanedIsolatedTxdSlots.insert(oldTxdId);
                 }
             }
-            RemoveTxdFromReplacementTracking(oldTxdId);
+            std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(oldTxdId);
+            const bool                                                   bStillOwned = (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId);
+
+            // Only clean up tracking/orphan state if the slot hasn't been
+            // reused by another model since we last owned it.
+            if (bStillOwned)
+            {
+                RemoveTxdFromReplacementTracking(oldTxdId);
+                g_IsolatedModelByTxd.erase(itOwner);
+            }
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
-            CTxdStore_RemoveRef(oldParentTxdId);  // Release parent pin for old isolatin entry
+            CTxdStore_RemoveRef(oldParentTxdId);  // Release parent pin for old isolation entry
             g_IsolatedTxdByModel.erase(itExisting);
-            std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(oldTxdId);
-            if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
-                g_IsolatedModelByTxd.erase(itOwner);
         }
 
         const unsigned short usCurrentTxdId = pModelInfo->GetTextureDictionaryID();
@@ -2049,12 +2070,6 @@ namespace
                     }
 
                     // Case 2: Another model's slot - restore to parent
-                    if (ShouldLog(g_uiLastAdoptLogTime))
-                    {
-                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Current TXD %u tracked by model %u, restoring to parent (model=%u)",
-                                                   usCurrentTxdId, itOwner->second, usModelId));
-                    }
-
                     RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
 
                     if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
@@ -2178,12 +2193,6 @@ namespace
                     // Previously this was a hard denial, which led to "white textures bug" on
                     // total-conversion maps with many engineRequestModel objects (each
                     // needing an isolated TXD slot).
-                    if (ShouldLog(g_uiLastIsolationFailLogTime))
-                    {
-                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool under pressure (%d/%d, %d%%), "
-                                                   "attempting allocation for model %u",
-                                                   iUsedSlots, iIsolationPoolSize, iUsagePercent, usModelId));
-                    }
                 }
             }
         }
@@ -2202,22 +2211,12 @@ namespace
                     pModelInfo->SetTextureDictionaryID(usParentTxdId);
 
                 MarkIsolationDenied();
-                if (ShouldLog(g_uiLastPoolDenyLogTime))
-                {
-                    AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slots, denying isolation for model %u", usModelId));
-                }
                 return false;
             }
         }
 
         if (uiNow - g_uiLastTxdPoolWarnTime >= TXD_POOL_USAGE_WARN_INTERVAL_MS)
         {
-            if (iPoolSize > 0 && iUsagePercent >= TXD_POOL_USAGE_WARN_PERCENT)
-            {
-                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool usage high (%d/%d, %d%%) for model %u", iUsedSlots,
-                                           iIsolationPoolSize, iUsagePercent, usModelId));
-            }
-
             g_uiLastTxdPoolWarnTime = uiNow;
         }
 
@@ -2254,12 +2253,6 @@ namespace
 
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
         {
-            if (ShouldLog(g_uiLastPoolDenyLogTime))
-            {
-                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot in pool "
-                                           "for model %u parentTxd %u (poolSize=%d)",
-                                           usModelId, usParentTxdId, pTxdPoolSA->GetPoolSize()));
-            }
             MarkIsolationDenied();
             return false;
         }
@@ -2270,8 +2263,6 @@ namespace
 
         if (pTxdPoolSA->AllocateTextureDictonarySlot(uiNewTxdId, txdName) == static_cast<std::uint32_t>(-1))
         {
-            AddReportLog(
-                9401, SString("EnsureIsolatedTxdForRequestedModel: AllocateTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, uiNewTxdId));
             MarkIsolationDenied();
             MarkTxdPoolCountDirty();
             return false;
@@ -2281,7 +2272,6 @@ namespace
         RwTexDictionary* pChildTxd = RwTexDictionaryCreate();
         if (!pChildTxd)
         {
-            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: RwTexDictionaryCreate failed for parentTxd %u", usParentTxdId));
             pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
             MarkTxdPoolCountDirty();
             return false;
@@ -2296,8 +2286,6 @@ namespace
         const unsigned short usSlotParentIndex = bParentAvailable ? usParentTxdId : static_cast<unsigned short>(-1);
         if (!pTxdPoolSA->SetTextureDictonarySlot(uiNewTxdId, pChildTxd, usSlotParentIndex))
         {
-            AddReportLog(9401,
-                         SString("EnsureIsolatedTxdForRequestedModel: SetTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, uiNewTxdId));
             RwTexDictionaryDestroy(pChildTxd);
             pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
             MarkTxdPoolCountDirty();
@@ -2342,6 +2330,185 @@ namespace
 
         if (!bParentAvailable)
             AddPendingIsolatedModel(usModelId);
+        return true;
+    }
+
+    // Allocate a private TXD slot for a vanilla model whose shared TXD already
+    // holds replacement textures from a different model.  Unlike the clone path
+    // (EnsureIsolatedTxdForRequestedModel), vanilla models have no parent model,
+    // so the model's current TXD slot is treated as the parent.
+    bool AllocateIsolatedTxdForVanillaModel(unsigned short usModelId, unsigned short usParentTxdId)
+    {
+        if (!pGame)
+            return false;
+
+        auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
+        if (!pModelInfo)
+            return false;
+
+        CTxdPoolSA* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+        if (!pTxdPoolSA)
+            return false;
+
+        pTxdPoolSA->InitialisePool();
+
+        // Already isolated - reuse if parent matches, otherwise clean up old entry
+        auto itExisting = g_IsolatedTxdByModel.find(usModelId);
+        if (itExisting != g_IsolatedTxdByModel.end())
+        {
+            if (itExisting->second.usParentTxdId == usParentTxdId)
+            {
+                const unsigned short existingTxdId = itExisting->second.usTxdId;
+                auto*                slot = pTxdPoolSA->GetTextureDictonarySlot(existingTxdId);
+                if (slot && slot->rwTexDictonary && slot->usParentIndex == usParentTxdId)
+                {
+                    g_IsolatedModelByTxd[existingTxdId] = usModelId;
+                    if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
+                        pModelInfo->SetTextureDictionaryID(existingTxdId);
+                    UpdateIsolatedTxdLastUse(usModelId);
+                    return true;
+                }
+            }
+
+            // Parent changed or slot invalid - clean up old isolation before re-allocating
+            const unsigned short oldTxdId = itExisting->second.usTxdId;
+            const unsigned short oldParentTxdId = itExisting->second.usParentTxdId;
+
+            RestoreModelTexturesToParent(pModelInfo, usModelId, oldTxdId, oldParentTxdId);
+            if (pModelInfo->GetTextureDictionaryID() == oldTxdId)
+            {
+                // Ensure parent TXD is loaded so SetTextureDictionaryID takes
+                // the full ref transfer path instead of a field-only change that
+                // would orphan any active entity refs on the old child TXD.
+                if (CTxdStore_GetTxd(oldParentTxdId) == nullptr && pGame && pGame->GetStreaming())
+                {
+                    const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+                    if (iBaseIDforTXD > 0)
+                    {
+                        const unsigned int uiTxdStreamId = oldParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                        pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                        pGame->GetStreaming()->LoadAllRequestedModels(true, "AllocateIsolatedTxdForVanillaModel-reiso");
+                    }
+                }
+                pModelInfo->SetTextureDictionaryID(oldParentTxdId);
+            }
+
+            auto       itOwner = g_IsolatedModelByTxd.find(oldTxdId);
+            const bool bStillOwned = (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId);
+
+            // Only clean up tracking/orphan state if the slot hasn't been
+            // reused by another model since we last owned it.
+            if (bStillOwned)
+            {
+                RemoveTxdFromReplacementTracking(oldTxdId);
+                g_IsolatedModelByTxd.erase(itOwner);
+                g_OrphanedIsolatedTxdSlots.insert(oldTxdId);
+            }
+
+            ClearIsolatedTxdLastUse(usModelId);
+            ClearPendingIsolatedModel(usModelId);
+            CTxdStore_RemoveRef(oldParentTxdId);
+            g_IsolatedTxdByModel.erase(itExisting);
+        }
+
+        // Pool pressure: try to reclaim stale slots before allocating
+        const int iPoolSize = pTxdPoolSA->GetPoolSize();
+        if (iPoolSize > 0)
+        {
+            constexpr int iIsolationPoolSize = CTxdPoolSA::SA_TXD_POOL_CAPACITY;
+            const int     iUsedSlots = pTxdPoolSA->GetUsedSlotCountInRange(static_cast<std::uint32_t>(iIsolationPoolSize));
+            if (iUsedSlots >= 0)
+            {
+                const int iUsagePercent = (iUsedSlots * 100) / iIsolationPoolSize;
+                if (iUsagePercent >= TXD_POOL_HARD_LIMIT_PERCENT)
+                {
+                    TryReclaimStaleIsolatedSlots();
+                    if (!g_OrphanedIsolatedTxdSlots.empty())
+                        TryCleanupOrphanedIsolatedSlots(true);
+                    MarkTxdPoolCountDirty();
+                }
+            }
+        }
+
+        // Ensure parent TXD is loaded so child inherits its textures via the parent chain.
+        // Unlike clone isolation, vanilla models cannot be deferred to ProcessPendingIsolatedModels
+        // because that function treats GetParentID()==0 as "clone lost its parent" and tears down
+        // the isolation.  A blocking request should always succeed for vanilla shared TXDs.
+        if (CTxdStore_GetTxd(usParentTxdId) == nullptr)
+        {
+            pModelInfo->Request(BLOCKING, "AllocateIsolatedTxdForVanillaModel-ParentTXD");
+            if (CTxdStore_GetTxd(usParentTxdId) == nullptr)
+                return false;
+        }
+
+        // Find a free TXD slot (same tier priority as clone isolation)
+        std::uint32_t uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::SA_TXD_POOL_CAPACITY));
+
+        if (uiNewTxdId == static_cast<std::uint32_t>(-1))
+            uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotInRange(static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT));
+
+        if (uiNewTxdId == static_cast<std::uint32_t>(-1))
+            uiNewTxdId = pTxdPoolSA->GetFreeTextureDictonarySlotAbove(static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT));
+
+        if (uiNewTxdId == static_cast<std::uint32_t>(-1))
+        {
+            if (ShouldLog(g_uiLastPoolDenyLogTime))
+                AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel: No free TXD slot for model %u (parentTxd=%u)", usModelId, usParentTxdId));
+            MarkIsolationDenied();
+            return false;
+        }
+
+        std::string txdName = SString("mta_iso_%u", usModelId);
+        if (txdName.size() > MAX_TEX_DICTIONARY_NAME_LENGTH)
+            txdName.resize(MAX_TEX_DICTIONARY_NAME_LENGTH);
+
+        if (pTxdPoolSA->AllocateTextureDictonarySlot(uiNewTxdId, txdName) == static_cast<std::uint32_t>(-1))
+        {
+            MarkIsolationDenied();
+            MarkTxdPoolCountDirty();
+            return false;
+        }
+
+        RwTexDictionary* pChildTxd = RwTexDictionaryCreate();
+        if (!pChildTxd)
+        {
+            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
+            MarkTxdPoolCountDirty();
+            return false;
+        }
+
+        if (!pTxdPoolSA->SetTextureDictonarySlot(uiNewTxdId, pChildTxd, usParentTxdId))
+        {
+            RwTexDictionaryDestroy(pChildTxd);
+            pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
+            MarkTxdPoolCountDirty();
+            return false;
+        }
+
+        MarkTxdPoolCountDirty();
+
+        CTxdStore_SetupTxdParent(uiNewTxdId);
+
+        if (IsStreamingInfoSlot(static_cast<unsigned short>(uiNewTxdId)))
+            SetStreamingInfoLoaded(static_cast<unsigned short>(uiNewTxdId));
+
+        SIsolatedTxdInfo info;
+        info.usTxdId = static_cast<unsigned short>(uiNewTxdId);
+        info.usParentTxdId = usParentTxdId;
+        info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
+
+        pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
+
+        g_IsolatedTxdByModel[usModelId] = info;
+        g_IsolatedModelByTxd[info.usTxdId] = usModelId;
+        CTxdStore_AddRef(usParentTxdId);
+
+        // Pin child TXD so streaming cannot destroy it while MTA tracks its textures
+        CTxdStore_AddRef(uiNewTxdId);
+        pTxdPoolSA->ProtectSlotFromStreaming(static_cast<unsigned short>(uiNewTxdId));
+
+        UpdateIsolatedTxdLastUse(usModelId);
+
         return true;
     }
 
@@ -3140,15 +3307,13 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     g_bInTxdReapply = true;
 
                     RwTexDictionary* txdAtStart = pCurrentTxd;
-                    bool             bTxdAlreadyPopulated = false;
 
                     for (auto& reapplyEntry : replacementsToReapply)
                     {
                         SReplacementTextures*              pReplacement = reapplyEntry.first;
                         const std::vector<unsigned short>& modelIds = reapplyEntry.second;
 
-                        if (bTxdAlreadyPopulated)
-                            continue;
+                        bool bAppliedToFirstModel = false;
 
                         if (!modelIds.empty())
                         {
@@ -3167,7 +3332,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                 if (bApplied)
                                 {
                                     uiAppliedIndex = i;
-                                    bTxdAlreadyPopulated = true;
+                                    bAppliedToFirstModel = true;
                                     break;
                                 }
 
@@ -3175,7 +3340,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                     break;
                             }
 
-                            if (bTxdAlreadyPopulated)
+                            if (bAppliedToFirstModel)
                             {
                                 if (CTxdStore_GetTxd(usTxdId) != txdAtStart)
                                     break;
@@ -3447,7 +3612,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
     RegisterReplacement(pReplacementTextures);
 
-    // Check if modwl is a clone that needs TXD isolation to prevent texture mixing
+    // Check if model needs TXD isolation to prevent texture mixing
     auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
     if (pModelInfo)
     {
@@ -3473,11 +3638,6 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 const bool     bIsolatedOk = EnsureIsolatedTxdForRequestedModel(usModelId);
                 if (!bIsolatedOk)
                 {
-                    if (ShouldLog(g_uiLastIsolationFailLogTime))
-                    {
-                        AddReportLog(9401, SString("ModelInfoTXDAddTextures: EnsureIsolatedTxdForRequestedModel failed for model %u (parent=%u parentTxd=%u)",
-                                                   usModelId, uiParentModelId, usParentTxdId));
-                    }
                     QueuePendingReplacement(usModelId, pReplacementTextures, uiParentModelId, usParentTxdId);
                     return false;
                 }
@@ -3500,6 +3660,146 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     return false;
                 }
             }
+        }
+        else if (!g_bInTxdReapply)
+        {
+            // Vanilla models sharing a TXD can corrupt each other when multiple
+            // CClientTXDs are imported to different models on the same TXD slot.
+            // Isolate this model if the shared TXD already has replacement textures
+            // belonging to a different model.
+            const unsigned short usCurrentTxdId = pModelInfo->GetTextureDictionaryID();
+
+            // Check for an existing isolation entry for this model.
+            auto itPrevIsolated = g_IsolatedTxdByModel.find(usModelId);
+            if (itPrevIsolated != g_IsolatedTxdByModel.end() && usCurrentTxdId == itPrevIsolated->second.usTxdId)
+            {
+                // Model is already on its isolated TXD (e.g after resource restart
+                // where removal + restream ran but CleanupIsolatedTxdForModel did not).
+                // Validate the slot is still live and owned by this model; a recycled
+                // or disowned slot would cause textures to target the wrong TXD.
+                auto itOwner = g_IsolatedModelByTxd.find(usCurrentTxdId);
+                if (CTxdStore_GetTxd(usCurrentTxdId) != nullptr && itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
+                {
+                    UpdateIsolatedTxdLastUse(usModelId);
+                }
+                else
+                {
+                    // Stale entry: slot was recycled or ownership changed.
+                    // Clean up tracking, restore model to parent TXD so the
+                    // pending retry's conflict detection runs on the shared slot.
+                    const unsigned short usParentTxdId = itPrevIsolated->second.usParentTxdId;
+
+                    if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
+                    {
+                        RemoveTxdFromReplacementTracking(usCurrentTxdId);
+                        g_IsolatedModelByTxd.erase(itOwner);
+                    }
+
+                    // Restore model to its parent TXD before releasing the pin,
+                    // so the model doesn't remain pointed at a dead/disowned slot.
+                    if (pModelInfo->GetTextureDictionaryID() == usCurrentTxdId)
+                        pModelInfo->SetTextureDictionaryID(usParentTxdId);
+
+                    CTxdStore_RemoveRef(usParentTxdId);
+                    ClearIsolatedTxdLastUse(usModelId);
+                    ClearPendingIsolatedModel(usModelId);
+                    g_IsolatedTxdByModel.erase(itPrevIsolated);
+                    if (!g_bProcessingPendingReplacements)
+                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
+                }
+            }
+            else if (itPrevIsolated != g_IsolatedTxdByModel.end() && itPrevIsolated->second.usParentTxdId == usCurrentTxdId)
+            {
+                // Model was restored to its parent TXD but the isolation entry persists.
+                // During fast resource restarts, the other model's replacement may not
+                // have been re-added yet, so conflict detection alone would miss it.
+                // The existing isolation entry proves a conflict was detected before.
+                if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
+                {
+                    if (!g_bProcessingPendingReplacements)
+                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
+                }
+            }
+            else if (itPrevIsolated == g_IsolatedTxdByModel.end())
+            {
+                auto itExisting = ms_ModelTexturesInfoMap.find(usCurrentTxdId);
+                if (itExisting != ms_ModelTexturesInfoMap.end())
+                {
+                    bool bHasOtherModelReplacements = false;
+                    for (const SReplacementTextures* pExisting : itExisting->second.usedByReplacements)
+                    {
+                        // Conflict: another CClientTXD already injected textures into this TXD for other models
+                        if (pExisting != pReplacementTextures && pExisting->usedInTxdIds.count(usCurrentTxdId) > 0 &&
+                            pExisting->usedInModelIds.count(usModelId) == 0)
+                        {
+                            bHasOtherModelReplacements = true;
+                            break;
+                        }
+                    }
+
+                    if (bHasOtherModelReplacements)
+                    {
+                        if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
+                        {
+                            // Only queue on the initial call; during retry processing the
+                            // loop in TryApplyPendingReplacements handles requeue itself.
+                            if (!g_bProcessingPendingReplacements)
+                                QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                            return false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Parent TXD changed since last isolation - re-isolate with new parent
+                if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
+                {
+                    if (!g_bProcessingPendingReplacements)
+                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            // Reapply path for vanilla-isolated models: verify isolation still exists
+            auto itIsolated = g_IsolatedTxdByModel.find(usModelId);
+            if (itIsolated != g_IsolatedTxdByModel.end())
+            {
+                const unsigned short usModelTxdId = pModelInfo->GetTextureDictionaryID();
+                if (usModelTxdId != itIsolated->second.usTxdId)
+                {
+                    // Streaming may have reassigned the model back to the shared TXD.
+                    // If the isolated slot is still valid, rebind the model to it.
+                    if (CTxdStore_GetTxd(itIsolated->second.usTxdId) != nullptr)
+                    {
+                        pModelInfo->SetTextureDictionaryID(itIsolated->second.usTxdId);
+                        UpdateIsolatedTxdLastUse(usModelId);
+                    }
+                    else
+                    {
+                        // Isolated slot was destroyed - release parent pin and remove stale entries.
+                        // Do NOT fall through to shared-TXD import; that would re-create the
+                        // texture mixup this isolation was meant to prevent.
+                        const unsigned short usDestroyedTxdId = itIsolated->second.usTxdId;
+                        CTxdStore_RemoveRef(itIsolated->second.usParentTxdId);
+                        auto itOwner = g_IsolatedModelByTxd.find(usDestroyedTxdId);
+                        if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
+                        {
+                            RemoveTxdFromReplacementTracking(usDestroyedTxdId);
+                            g_IsolatedModelByTxd.erase(itOwner);
+                        }
+                        ClearIsolatedTxdLastUse(usModelId);
+                        ClearPendingIsolatedModel(usModelId);
+                        g_IsolatedTxdByModel.erase(itIsolated);
+                        return false;
+                    }
+                }
+            }
+            // Non-isolated vanilla models during reapply: fall through normally
         }
     }
 
@@ -4310,19 +4610,18 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
         {
             pModelInfo->SetTextureDictionaryID(usParentTxdId);
 
-            // SetTextureDictionaryID silently skips ref management when the target
-            // TXD data isn't loaded (CTxdStore_GetTxd returns nullptr). During session
-            // reset the parent TXD is often already unloaded, hitting this path.
-            // So we detect the skip and transfer refs manually so the isolated slot can be freed.
+            // SetTextureDictionaryID handles ref transfer even when the target
+            // TXD data isn't loaded (null rwTexDictonary). But if it bailed
+            // (e.g. parent slot is freed and re-allocated as free), detect the
+            // skip and transfer refs manually so the isolated slot can be freed.
             if (CTxdStore_GetTxd(usParentTxdId) == nullptr && !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usParentTxdId))
             {
                 CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                if (pInterface)
+                if (pInterface && pInterface->usTextureDictionary != usParentTxdId)
                 {
-                    // Force the field if SetTextureDictionaryID bailed completely
-                    // (model has loaded geometry — the bail returns without setting it)
-                    if (pInterface->usTextureDictionary != usParentTxdId)
-                        pInterface->usTextureDictionary = usParentTxdId;
+                    // SetTextureDictionaryID bailed without changing the field.
+                    // Force the field and transfer refs manually.
+                    pInterface->usTextureDictionary = usParentTxdId;
 
                     size_t referencesCount = pInterface->usNumberOfRefs;
                     if (pInterface->pRwObject)
@@ -4392,8 +4691,19 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                     // Null raster for textures orphaned from this TXD, unless
                     // parent was unavailable and model has geometry (keep rasters
                     // to prevent white tex; follows the deferred-cleanup leak pattern).
-                    if (bWasInIsolatedTxd && pTex->txd == nullptr && !bSkipRasterNull)
-                        pTex->raster = nullptr;
+                    if (bWasInIsolatedTxd && pTex->txd == nullptr)
+                    {
+                        if (!bSkipRasterNull)
+                            pTex->raster = nullptr;
+                        else if (pTex->raster)
+                        {
+                            // Only the first texture per raster keeps it alive;
+                            // duplicates are nulled to prevent multiple frees
+                            // when materials are destroyed by the engine.
+                            if (!g_OrphanedCopyRasters.insert(pTex->raster).second)
+                                pTex->raster = nullptr;
+                        }
+                    }
                 }
 
                 itPerTxd->usingTextures.clear();
@@ -5032,8 +5342,17 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 pInfo->originalTextures.find(pReplacedTexture) == pInfo->originalTextures.end() && CanDestroyOrphanedTexture(pReplacedTexture))
             {
                 destroyedTextures.insert(pReplacedTexture);
-                // Skip originalTextures.erase() to avoid heap corruption risk
-                RwTextureDestroy(pReplacedTexture);
+
+                // If this entry shares a raster with a master texture, it's a copy that
+                // was incorrectly captured as a displaced original. Use SafeDestroyTexture
+                // to null the raster and prevent double-free when the master is destroyed.
+                bool bSharesRasterWithMaster = pReplacedTexture->raster &&
+                    masterRasterMap.find(pReplacedTexture->raster) != masterRasterMap.end();
+
+                if (bSharesRasterWithMaster)
+                    SafeDestroyTexture(pReplacedTexture);
+                else
+                    RwTextureDestroy(pReplacedTexture);
                 g_LeakedMasterTextures.erase(pReplacedTexture);
             }
         }
@@ -5338,7 +5657,13 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             if (!CanDestroyOrphanedTexture(pTexture))
                 continue;
 
-            RwTextureDestroy(pTexture);
+            // If an orphaned copy keeps this raster alive (bSkipRasterNull path),
+            // null the raster instead of freeing it. The copy's material destruction
+            // by the engine will free the raster when the model unloads.
+            if (pTexture->raster && g_OrphanedCopyRasters.count(pTexture->raster))
+                SafeDestroyTexture(pTexture);
+            else
+                RwTextureDestroy(pTexture);
             destroyedTextures.insert(pTexture);
             g_LeakedMasterTextures.erase(pTexture);
         }
@@ -5853,6 +6178,14 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         }
     }
 
+    // Rasters kept alive by orphaned copies (bSkipRasterNull path) must not be freed
+    // when their master is destroyed. Treating them as "already freed" makes the loop
+    // below use SafeDestroyTexture (which only nulls the raster pointer) rather than
+    // RwTextureDestroy (which would free the raster the orphaned copy still references).
+    for (RwRaster* pKeptRaster : g_OrphanedCopyRasters)
+        mopupFreedRasters.insert(pKeptRaster);
+    g_OrphanedCopyRasters.clear();
+
     // Destroy leaked master textures. Rasters may be dangling if mopup freed shared rasters.
     if (!g_LeakedMasterTextures.empty())
     {
@@ -5904,15 +6237,11 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 ////////////////////////////////////////////////////////////////
 //
 // CRenderWareSA::StaticResetShaderSupport
-// Cleans shader entries for custom TXDs (ID >= base), preserves GTA base textures.
+// Cleans shader entries for MTA-managed TXD slots (>= SA pool capacity),
+// preserves GTA base textures (slots 0 to SA_TXD_POOL_CAPACITY-1).
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StaticResetShaderSupport()
 {
-    if (!pGame)
-        return;
-
-    const std::uint32_t uiBaseTxdId = pGame->GetBaseIDforTXD();
-
     // Safety limit to prevent freeze on corrupted/huge maps
     constexpr size_t MAX_CLEANUP_ITERATIONS = 50000;
     if (m_TexInfoMap.size() > MAX_CLEANUP_ITERATIONS)
@@ -5943,9 +6272,9 @@ void CRenderWareSA::StaticResetShaderSupport()
             continue;
         }
 
-        // Remove: custom TXD entries (ID >= base) and script-loaded textures
-        // Keep: GTA base textures and FAKE_NO_TEXTURE singleton
-        const bool bIsCustomTxdEntry = pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_usTxdId >= uiBaseTxdId;
+        // Remove: custom TXD entries (overflow/MTA-managed slots) and script-loaded textures
+        // Keep: GTA base textures (slot < SA pool capacity) and FAKE_NO_TEXTURE singleton
+        const bool bIsCustomTxdEntry = pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_usTxdId >= CTxdPoolSA::SA_TXD_POOL_CAPACITY;
         const bool bIsScriptTexture = !pTexInfo->texTag.m_bUsingTxdId && (pTexInfo->texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE);
         const bool bShouldRemove = bIsCustomTxdEntry || bIsScriptTexture;
 

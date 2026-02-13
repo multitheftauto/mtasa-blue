@@ -792,6 +792,10 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     HRESULT hCoopLevel = m_pDevice->TestCooperativeLevel();
     if (hCoopLevel == D3DERR_DEVICELOST)
     {
+        // The caller (e.g. RW's _rwD3D9TestState) may have already released GPU
+        // resources before calling Reset. Run MTA invalidation so we don't hold
+        // stale pointers to surfaces/textures that were freed on the RW side.
+        CDirect3DEvents9::OnInvalidate(m_pDevice);
         return hCoopLevel;
     }
     else if (hCoopLevel != D3DERR_DEVICENOTRESET && hCoopLevel != D3D_OK)
