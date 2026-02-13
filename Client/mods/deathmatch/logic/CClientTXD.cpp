@@ -39,13 +39,11 @@ CClientTXD::~CClientTXD()
         return;
     }
 
-    bool bInDeleteAll = g_pClientGame && g_pClientGame->GetElementDeleter()->IsBeingDeleted(this);
-
-    // During DoDeleteAll (arbitrary element destruction order), remove tracking state
-    // to prevent dangling pointer access. Skip full cleanup which would access RW data
-    // that may already be corrupted by other elements' destructors. Normal resource
-    // cleanup (engineRestoreTXD, resource stop) uses the full path below.
-    if (bInDeleteAll)
+    // During session shutdown (CClientManager being destroyed), element destruction
+    // order is arbitrary. Skip full cleanup which would access RW data that other
+    // elements' destructors may have already freed. Resource stop uses the full path
+    // below - CClientManager is still alive so full cleanup is safe.
+    if (m_pManager && m_pManager->IsBeingDeleted())
     {
         g_pGame->GetRenderWare()->ModelInfoTXDDeferCleanup(&m_ReplacementTextures);
 
@@ -56,24 +54,15 @@ CClientTXD::~CClientTXD()
         return;
     }
 
-    const auto usedTxdIdsSnapshot = m_ReplacementTextures.usedInTxdIds;
-
     g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);
 
-    // Restream affected models
-    std::vector<unsigned short> restreamModelIds;
-    restreamModelIds.reserve(m_ReplacementTextures.usedInModelIds.size());
+    // Restream all models that used our replacement textures. Don't filter by current
+    // TXD ID - if CClientDFF was destroyed before us, CleanupIsolatedTxdForModel may
+    // have moved the model back to its parent TXD, making the old TXD ID stale.
     for (unsigned short modelId : m_ReplacementTextures.usedInModelIds)
-        restreamModelIds.push_back(modelId);
-
-    for (unsigned short modelId : restreamModelIds)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId, true);
         if (!pModelInfo || !pModelInfo->IsValid())
-            continue;
-
-        // Only restream if model uses a TXD that was affected
-        if (!usedTxdIdsSnapshot.empty() && usedTxdIdsSnapshot.count(pModelInfo->GetTextureDictionaryID()) == 0)
             continue;
         Restream(modelId);
     }
