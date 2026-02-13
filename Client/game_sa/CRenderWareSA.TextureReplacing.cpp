@@ -149,6 +149,9 @@ namespace
     // D3D textures already released during StaticReset; used by SafeDestroyTextureWithRaster
     // to detect shared rasters and prevent double-release across different texture structs.
     std::unordered_set<void*> g_ReleasedD3DTextures;
+    // Rasters kept alive by orphaned copy textures during isolated TXD cleanup.
+    // Prevents master destruction from freeing rasters that orphaned copies still reference.
+    std::unordered_set<RwRaster*> g_OrphanedCopyRasters;
 
     static void* TryReleaseTextureD3D(RwTexture* pTex)
     {
@@ -160,8 +163,10 @@ namespace
             void* pD3D = pRaster->renderResource;
             if (pD3D)
             {
-                reinterpret_cast<IDirect3DTexture9*>(pD3D)->Release();
+                // Null the pointer first so a fault during Release() won't leave
+                // a stale D3D pointer that triggers a double-release later.
                 reinterpret_cast<void* volatile&>(pRaster->renderResource) = nullptr;
+                reinterpret_cast<IDirect3DTexture9*>(pD3D)->Release();
             }
             return pD3D;
         }
@@ -1374,6 +1379,24 @@ namespace
                     mtaRasters.insert(pMasterTex->raster);
             }
         }
+
+        // Also filter against all active replacements globally. Covers cases where
+        // this entry's usedByReplacements was cleared during stale recovery but
+        // copies from active replacements remain linked in the TXD.
+        for (const SReplacementTextures* pReplacement : g_ActiveReplacements)
+        {
+            if (!pReplacement)
+                continue;
+            for (RwTexture* pMasterTex : pReplacement->textures)
+            {
+                if (pMasterTex && pMasterTex->raster)
+                    mtaRasters.insert(pMasterTex->raster);
+            }
+        }
+
+        // Filter rasters from orphaned copies kept alive during isolated TXD cleanup
+        for (RwRaster* pKeptRaster : g_OrphanedCopyRasters)
+            mtaRasters.insert(pKeptRaster);
 
         for (RwTexture* pTex : allTextures)
         {
@@ -4668,8 +4691,19 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                     // Null raster for textures orphaned from this TXD, unless
                     // parent was unavailable and model has geometry (keep rasters
                     // to prevent white tex; follows the deferred-cleanup leak pattern).
-                    if (bWasInIsolatedTxd && pTex->txd == nullptr && !bSkipRasterNull)
-                        pTex->raster = nullptr;
+                    if (bWasInIsolatedTxd && pTex->txd == nullptr)
+                    {
+                        if (!bSkipRasterNull)
+                            pTex->raster = nullptr;
+                        else if (pTex->raster)
+                        {
+                            // Only the first texture per raster keeps it alive;
+                            // duplicates are nulled to prevent multiple frees
+                            // when materials are destroyed by the engine.
+                            if (!g_OrphanedCopyRasters.insert(pTex->raster).second)
+                                pTex->raster = nullptr;
+                        }
+                    }
                 }
 
                 itPerTxd->usingTextures.clear();
@@ -5308,8 +5342,17 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 pInfo->originalTextures.find(pReplacedTexture) == pInfo->originalTextures.end() && CanDestroyOrphanedTexture(pReplacedTexture))
             {
                 destroyedTextures.insert(pReplacedTexture);
-                // Skip originalTextures.erase() to avoid heap corruption risk
-                RwTextureDestroy(pReplacedTexture);
+
+                // If this entry shares a raster with a master texture, it's a copy that
+                // was incorrectly captured as a displaced original. Use SafeDestroyTexture
+                // to null the raster and prevent double-free when the master is destroyed.
+                bool bSharesRasterWithMaster = pReplacedTexture->raster &&
+                    masterRasterMap.find(pReplacedTexture->raster) != masterRasterMap.end();
+
+                if (bSharesRasterWithMaster)
+                    SafeDestroyTexture(pReplacedTexture);
+                else
+                    RwTextureDestroy(pReplacedTexture);
                 g_LeakedMasterTextures.erase(pReplacedTexture);
             }
         }
@@ -5614,7 +5657,13 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             if (!CanDestroyOrphanedTexture(pTexture))
                 continue;
 
-            RwTextureDestroy(pTexture);
+            // If an orphaned copy keeps this raster alive (bSkipRasterNull path),
+            // null the raster instead of freeing it. The copy's material destruction
+            // by the engine will free the raster when the model unloads.
+            if (pTexture->raster && g_OrphanedCopyRasters.count(pTexture->raster))
+                SafeDestroyTexture(pTexture);
+            else
+                RwTextureDestroy(pTexture);
             destroyedTextures.insert(pTexture);
             g_LeakedMasterTextures.erase(pTexture);
         }
@@ -6128,6 +6177,14 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             ++iter;
         }
     }
+
+    // Rasters kept alive by orphaned copies (bSkipRasterNull path) must not be freed
+    // when their master is destroyed. Treating them as "already freed" makes the loop
+    // below use SafeDestroyTexture (which only nulls the raster pointer) rather than
+    // RwTextureDestroy (which would free the raster the orphaned copy still references).
+    for (RwRaster* pKeptRaster : g_OrphanedCopyRasters)
+        mopupFreedRasters.insert(pKeptRaster);
+    g_OrphanedCopyRasters.clear();
 
     // Destroy leaked master textures. Rasters may be dangling if mopup freed shared rasters.
     if (!g_LeakedMasterTextures.empty())
