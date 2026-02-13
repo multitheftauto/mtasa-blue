@@ -219,27 +219,13 @@ CTxdPoolSA::CTxdPoolSA()
 void CTxdPoolSA::InitialisePool()
 {
     if (!m_ppTxdPoolInterface || !*m_ppTxdPoolInterface)
-    {
-        AddReportLog(9401, "CTxdPoolSA::InitialisePool: Pool pointer is NULL");
         return;
-    }
 
     const int currentSize = (*m_ppTxdPoolInterface)->m_nSize;
     if (currentSize >= TXD_POOL_MAX_CAPACITY)
-    {
-        AddReportLog(9402, SString("CTxdPoolSA::InitialisePool: Already at capacity (%d)", currentSize));
         return;
-    }
 
-    AddReportLog(9402, SString("CTxdPoolSA::InitialisePool: Expanding from %d to %d", currentSize, TXD_POOL_MAX_CAPACITY));
-    if (!Resize(TXD_POOL_MAX_CAPACITY))
-    {
-        AddReportLog(9401, SString("CTxdPoolSA::InitialisePool: Resize failed (currentSize=%d targetSize=%d)", currentSize, TXD_POOL_MAX_CAPACITY));
-    }
-    else
-    {
-        AddReportLog(9402, SString("CTxdPoolSA::InitialisePool: Success, new size=%d", (*m_ppTxdPoolInterface)->m_nSize));
-    }
+    Resize(TXD_POOL_MAX_CAPACITY);
 }
 
 void CTxdPoolSA::InstallPoolHooks()
