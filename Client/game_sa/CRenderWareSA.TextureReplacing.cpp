@@ -5903,15 +5903,11 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 ////////////////////////////////////////////////////////////////
 //
 // CRenderWareSA::StaticResetShaderSupport
-// Cleans shader entries for custom TXDs (ID >= base), preserves GTA base textures.
+// Cleans shader entries for MTA-managed TXD slots (>= SA pool capacity),
+// preserves GTA base textures (slots 0 to SA_TXD_POOL_CAPACITY-1).
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StaticResetShaderSupport()
 {
-    if (!pGame)
-        return;
-
-    const std::uint32_t uiBaseTxdId = pGame->GetBaseIDforTXD();
-
     // Safety limit to prevent freeze on corrupted/huge maps
     constexpr size_t MAX_CLEANUP_ITERATIONS = 50000;
     if (m_TexInfoMap.size() > MAX_CLEANUP_ITERATIONS)
@@ -5942,9 +5938,9 @@ void CRenderWareSA::StaticResetShaderSupport()
             continue;
         }
 
-        // Remove: custom TXD entries (ID >= base) and script-loaded textures
-        // Keep: GTA base textures and FAKE_NO_TEXTURE singleton
-        const bool bIsCustomTxdEntry = pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_usTxdId >= uiBaseTxdId;
+        // Remove: custom TXD entries (overflow/MTA-managed slots) and script-loaded textures
+        // Keep: GTA base textures (slot < SA pool capacity) and FAKE_NO_TEXTURE singleton
+        const bool bIsCustomTxdEntry = pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_usTxdId >= CTxdPoolSA::SA_TXD_POOL_CAPACITY;
         const bool bIsScriptTexture = !pTexInfo->texTag.m_bUsingTxdId && (pTexInfo->texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE);
         const bool bShouldRemove = bIsCustomTxdEntry || bIsScriptTexture;
 
