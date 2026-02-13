@@ -1008,14 +1008,20 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 
     // Ensure shadow data consistency to prevent crash in GTA's stencil shadow rendering
     // GTA accesses shadow vertices without NULL checks, causing crash if pointer is NULL but count is non-zero
+    // Also cap counts to catch corrupt data before CCollisionData::Copy amplifies it into an out-of-bounds read
     auto* pInterface = pColModel->GetInterface();
     if (pInterface && pInterface->m_data)
     {
         auto* pData = pInterface->m_data;
 
-        // shadow counts indicate data exists but pointers are NULL
-        const bool shadowVertsCorrupt = pData->m_numShadowVertices > 0 && pData->m_shadowVertices == nullptr;
-        const bool shadowTrisCorrupt = pData->m_numShadowTriangles > 0 && pData->m_shadowTriangles == nullptr;
+        constexpr std::uint32_t MAX_SHADOW_VERTICES = 10000;
+        constexpr std::uint32_t MAX_SHADOW_TRIANGLES = 5000;
+
+        // shadow counts indicate data exists but pointers are NULL, or counts are beyond any legitimate model
+        const bool shadowVertsCorrupt =
+            (pData->m_numShadowVertices > 0 && pData->m_shadowVertices == nullptr) || pData->m_numShadowVertices > MAX_SHADOW_VERTICES;
+        const bool shadowTrisCorrupt =
+            (pData->m_numShadowTriangles > 0 && pData->m_shadowTriangles == nullptr) || pData->m_numShadowTriangles > MAX_SHADOW_TRIANGLES;
 
         if (shadowVertsCorrupt || shadowTrisCorrupt)
         {
