@@ -146,8 +146,7 @@ CClientEntity::~CClientEntity()
     }
 
     // Remove from spatial database
-    if (!g_pClientGame->IsBeingDeleted())
-        GetClientSpatialDatabase()->RemoveEntity(this);
+    GetClientSpatialDatabase()->RemoveEntity(this);
 
     // Ensure not referenced in the disabled collisions list
     assert(!MapContains(g_pClientGame->m_AllDisabledCollisions, this));
