@@ -1300,9 +1300,9 @@ bool CRenderWareSA::LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::str
         if (!pTexture || !SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
             continue;
 
-        CD3DDUMMY* pD3DData =
-            (pTexture->raster && SharedUtil::IsReadablePointer(pTexture->raster, sizeof(RwRaster)))
-                ? reinterpret_cast<CD3DDUMMY*>(pTexture->raster->renderResource) : nullptr;
+        CD3DDUMMY* pD3DData = (pTexture->raster && SharedUtil::IsReadablePointer(pTexture->raster, sizeof(RwRaster)))
+                                  ? reinterpret_cast<CD3DDUMMY*>(pTexture->raster->renderResource)
+                                  : nullptr;
 
         if (pD3DData && pTexture->name[0] && !IsTexInfoRegistered(pD3DData))
             StreamingAddedTexture(static_cast<ushort>(uiSlotId), pTexture->name, pD3DData);
