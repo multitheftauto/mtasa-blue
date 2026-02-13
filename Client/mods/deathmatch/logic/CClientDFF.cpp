@@ -30,13 +30,12 @@ CClientDFF::~CClientDFF()
     // Remove us from DFF manager list
     m_pDFFManager->RemoveFromList(this);
 
-    bool bInDeleteAll = g_pClientGame && g_pClientGame->GetElementDeleter()->IsBeingDeleted(this);
+    // During session shutdown (CClientManager being destroyed), element destruction
+    // order is arbitrary. Clear custom model pointers without restreaming or UnloadDFF
+    // to prevent RW data corruption or double-free. Resource stop uses the full
+    // restoration path below - CClientManager is still alive so cleanup is safe.
 
-    // During DoDeleteAll (arbitrary element destruction order), clear custom model
-    // pointers to prevent stale clump references. Skip restreaming and UnloadDFF
-    // which would corrupt RW data or double-free textures. Normal resource cleanup
-    // (engineRestoreModel, resource stop) uses the full restoration path below.
-    if (bInDeleteAll)
+    if (m_pManager && m_pManager->IsBeingDeleted())
     {
         for (auto usModel : m_Replaced)
         {
