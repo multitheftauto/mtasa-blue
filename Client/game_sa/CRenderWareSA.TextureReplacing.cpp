@@ -1918,7 +1918,6 @@ namespace
 
         // Expand pool on first use if CGameSA::Initialize() hasn't run yet.
         // Scripts may request model textures before game init completes.
-        AddReportLog(9402, SString("EnsureIsolatedTxdForRequestedModel: Triggering pool expansion check for model %u", usModelId));
         pTxdPoolSA->InitialisePool();
 
         auto itExisting = g_IsolatedTxdByModel.find(usModelId);
@@ -1934,11 +1933,6 @@ namespace
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
                     return true;
-                }
-                if (ShouldLog(g_uiLastAdoptLogTime))
-                {
-                    AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Existing isolated slot invalid for model %u (txd=%u parent=%u)", usModelId,
-                                               existingTxdId, usParentTxdId));
                 }
             }
 
@@ -1983,11 +1977,7 @@ namespace
                     const bool       bOrphanedAll = OrphanTxdTexturesBounded(pTxd, true);
                     if (!bOrphanedAll)
                     {
-                        const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(oldTxdId).second;
-                        if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
-                        {
-                            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Orphan list exceeded limit for txdId %u", oldTxdId));
-                        }
+                        g_OrphanedIsolatedTxdSlots.insert(oldTxdId);
                     }
 
                     if (bOrphanedAll)
@@ -2004,12 +1994,7 @@ namespace
                 }
                 else
                 {
-                    const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(oldTxdId).second;
-                    if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
-                    {
-                        AddReportLog(
-                            9401, SString("EnsureIsolatedTxdForRequestedModel: Orphaned isolated TXD %u (refs=%d)", oldTxdId, CTxdStore_GetNumRefs(oldTxdId)));
-                    }
+                    g_OrphanedIsolatedTxdSlots.insert(oldTxdId);
                 }
             }
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(oldTxdId);
@@ -2062,12 +2047,6 @@ namespace
                     }
 
                     // Case 2: Another model's slot - restore to parent
-                    if (ShouldLog(g_uiLastAdoptLogTime))
-                    {
-                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Current TXD %u tracked by model %u, restoring to parent (model=%u)",
-                                                   usCurrentTxdId, itOwner->second, usModelId));
-                    }
-
                     RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
 
                     if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
@@ -2191,12 +2170,6 @@ namespace
                     // Previously this was a hard denial, which led to "white textures bug" on
                     // total-conversion maps with many engineRequestModel objects (each
                     // needing an isolated TXD slot).
-                    if (ShouldLog(g_uiLastIsolationFailLogTime))
-                    {
-                        AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool under pressure (%d/%d, %d%%), "
-                                                   "attempting allocation for model %u",
-                                                   iUsedSlots, iIsolationPoolSize, iUsagePercent, usModelId));
-                    }
                 }
             }
         }
@@ -2215,22 +2188,12 @@ namespace
                     pModelInfo->SetTextureDictionaryID(usParentTxdId);
 
                 MarkIsolationDenied();
-                if (ShouldLog(g_uiLastPoolDenyLogTime))
-                {
-                    AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slots, denying isolation for model %u", usModelId));
-                }
                 return false;
             }
         }
 
         if (uiNow - g_uiLastTxdPoolWarnTime >= TXD_POOL_USAGE_WARN_INTERVAL_MS)
         {
-            if (iPoolSize > 0 && iUsagePercent >= TXD_POOL_USAGE_WARN_PERCENT)
-            {
-                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: Standard-range TXD pool usage high (%d/%d, %d%%) for model %u", iUsedSlots,
-                                           iIsolationPoolSize, iUsagePercent, usModelId));
-            }
-
             g_uiLastTxdPoolWarnTime = uiNow;
         }
 
@@ -2267,12 +2230,6 @@ namespace
 
         if (uiNewTxdId == static_cast<std::uint32_t>(-1))
         {
-            if (ShouldLog(g_uiLastPoolDenyLogTime))
-            {
-                AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: No free TXD slot in pool "
-                                           "for model %u parentTxd %u (poolSize=%d)",
-                                           usModelId, usParentTxdId, pTxdPoolSA->GetPoolSize()));
-            }
             MarkIsolationDenied();
             return false;
         }
@@ -2283,8 +2240,6 @@ namespace
 
         if (pTxdPoolSA->AllocateTextureDictonarySlot(uiNewTxdId, txdName) == static_cast<std::uint32_t>(-1))
         {
-            AddReportLog(
-                9401, SString("EnsureIsolatedTxdForRequestedModel: AllocateTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, uiNewTxdId));
             MarkIsolationDenied();
             MarkTxdPoolCountDirty();
             return false;
@@ -2294,7 +2249,6 @@ namespace
         RwTexDictionary* pChildTxd = RwTexDictionaryCreate();
         if (!pChildTxd)
         {
-            AddReportLog(9401, SString("EnsureIsolatedTxdForRequestedModel: RwTexDictionaryCreate failed for parentTxd %u", usParentTxdId));
             pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
             MarkTxdPoolCountDirty();
             return false;
@@ -2309,8 +2263,6 @@ namespace
         const unsigned short usSlotParentIndex = bParentAvailable ? usParentTxdId : static_cast<unsigned short>(-1);
         if (!pTxdPoolSA->SetTextureDictonarySlot(uiNewTxdId, pChildTxd, usSlotParentIndex))
         {
-            AddReportLog(9401,
-                         SString("EnsureIsolatedTxdForRequestedModel: SetTextureDictonarySlot failed for parentTxd %u txdId=%u", usParentTxdId, uiNewTxdId));
             RwTexDictionaryDestroy(pChildTxd);
             pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
             MarkTxdPoolCountDirty();
@@ -3663,11 +3615,6 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 const bool     bIsolatedOk = EnsureIsolatedTxdForRequestedModel(usModelId);
                 if (!bIsolatedOk)
                 {
-                    if (ShouldLog(g_uiLastIsolationFailLogTime))
-                    {
-                        AddReportLog(9401, SString("ModelInfoTXDAddTextures: EnsureIsolatedTxdForRequestedModel failed for model %u (parent=%u parentTxd=%u)",
-                                                   usModelId, uiParentModelId, usParentTxdId));
-                    }
                     QueuePendingReplacement(usModelId, pReplacementTextures, uiParentModelId, usParentTxdId);
                     return false;
                 }

@@ -100,7 +100,7 @@ CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFile, const SStrin
         {
             strReport += SString("[effects cur:%d created:%d dest:%d]", g_StaticMemoryState.Effect.iCurrentCount, g_StaticMemoryState.Effect.iCreatedCount,
                                  g_StaticMemoryState.Effect.iDestroyedCount);
-            AddReportLog(7544, SString("NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFile));
+            //AddReportLog(7544, SString("NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFile));
         }
         if (!pEffectTemplate)
             return NULL;

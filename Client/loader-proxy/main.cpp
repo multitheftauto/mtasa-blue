@@ -149,14 +149,6 @@ VOID OnGameLaunch()
     // Log current working directory
     wchar_t inheritedCwd[32768]{};
     DWORD   inheritedCwdLen = GetCurrentDirectoryW(32768, inheritedCwd);
-    if (inheritedCwdLen > 0)
-    {
-        AddLaunchLog("loader-proxy OnGameLaunch - Inherited CWD: %S", inheritedCwd);
-    }
-    else
-    {
-        AddLaunchLog("loader-proxy OnGameLaunch - GetCurrentDirectoryW failed: %u", GetLastError());
-    }
 
     // CEF subprocess may have different working directory than parent process
     // Try multiple methods to find the GTA directory:
@@ -174,8 +166,6 @@ VOID OnGameLaunch()
         const LPWSTR cmdLine = GetCommandLineW();
         if (cmdLine)
         {
-            AddLaunchLog("loader-proxy OnGameLaunch - Full command line: %S", cmdLine);
-
             // Parse for --mta-gta-path=<path>
             // CEF command-line format: --switch=value or --switch=\"value with spaces\"
             constexpr std::wstring_view switchPrefix = L"--mta-gta-path=";
@@ -210,16 +200,7 @@ VOID OnGameLaunch()
                 {
                     wcsncpy_s(gtaPathFromCmdLine.data(), gtaPathFromCmdLine.size(), pathStart, pathLen);
                     cmdLinePathLen = static_cast<DWORD>(pathLen);
-                    AddLaunchLog("loader-proxy OnGameLaunch - Parsed CEF switch --mta-gta-path: '%S' (len=%u)", gtaPathFromCmdLine.data(), cmdLinePathLen);
                 }
-                else
-                {
-                    AddLaunchLog("loader-proxy OnGameLaunch - CEF switch found but path length invalid: %zu", pathLen);
-                }
-            }
-            else
-            {
-                AddLaunchLog("loader-proxy OnGameLaunch - CEF command-line switch --mta-gta-path NOT found in command line");
             }
 
             // Parse for --mta-base-path=<path>
@@ -255,7 +236,6 @@ VOID OnGameLaunch()
                 {
                     wcsncpy_s(mtaBasePathFromCmdLine.data(), mtaBasePathFromCmdLine.size(), mtaPathStart, mtaPathLength);
                     mtaBasePathLen = static_cast<DWORD>(mtaPathLength);
-                    AddLaunchLog("loader-proxy OnGameLaunch - Parsed CEF switch --mta-base-path: '%S' (len=%u)", mtaBasePathFromCmdLine.data(), mtaBasePathLen);
                 }
             }
         }
@@ -290,19 +270,16 @@ VOID OnGameLaunch()
         // CEF command-line switch
         if (cmdLinePathLen > 0 && cmdLinePathLen < gtaPathFromCmdLine.size())
         {
-            AddLaunchLog("loader-proxy OnGameLaunch - Using GTA path from CEF command-line switch: %S", gtaPathFromCmdLine.data());
             return fs::path{gtaPathFromCmdLine.data()};
         }
         // File-based communication
         else if (filePathLen > 0 && filePathLen < gtaPathFromFile.size())
         {
-            AddLaunchLog("loader-proxy OnGameLaunch - Using GTA path from file: %S", gtaPathFromFile.data());
             return fs::path{gtaPathFromFile.data()};
         }
         // Environment variable
         else if (envLen > 0 && envLen < gtaPathFromEnv.size())
         {
-            AddLaunchLog("loader-proxy OnGameLaunch - Using GTA path from MTA_GTA_PATH env var: %S", gtaPathFromEnv.data());
             return fs::path{gtaPathFromEnv.data()};
         }
         // Current working directory
@@ -417,7 +394,6 @@ VOID OnGameLaunch()
         }
         else if (!bIsCefSubprocess && !launcherPath.empty())
         {
-            AddLaunchLog("Using MTA base path from parent process path");
             return launcherPath.parent_path();
         }
         else

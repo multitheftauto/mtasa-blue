@@ -5310,8 +5310,6 @@ void __cdecl HandleIdle()
     {
         bAnimGroupArrayAddressLogged = true;
         DWORD dwAnimGroupArrayAddress = 0xb4ea34;
-        LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
-                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
     }
 
     ProcessDeferredStreamingMemoryRelief();

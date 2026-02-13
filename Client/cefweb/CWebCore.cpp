@@ -131,8 +131,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
 
     // Read GTA path from registry to pass to CEF subprocess
     const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path");
-    g_pCore->GetConsole()->Printf("DEBUG: Registry path='%s'", strGTAPath.c_str());
-    AddReportLog(8017, SString("DEBUG: Registry path='%s'", strGTAPath.c_str()));
 
     // Check if process is running with elevated privileges
     // CEF subprocesses may have communication issues when running elevated
@@ -163,9 +161,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
 
     if (bIsElevated && !std::getenv("WINE"))
     {
-        AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
-        AddReportLog(8022, "CEF browser features may not work correctly when running as Administrator");
-        AddReportLog(8023, "Consider running MTA without Administrator privileges for full browser functionality");
         g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
 

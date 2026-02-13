@@ -2362,7 +2362,6 @@ HRESULT CDirect3DEvents9::CreateTexture(IDirect3DDevice9* pDevice, UINT Width, U
         {
             SString strMessage("CreateTexture fail: hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool);
             WriteDebugEvent(strMessage);
-            AddReportLog(8612, strMessage);
             CCore::GetSingleton().LogEvent(612, "CreateTexture", "", strMessage);
             return hr;
         }
