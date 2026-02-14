@@ -2285,10 +2285,14 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
 
 void CModelInfoSA::RestoreOriginalModel()
 {
-    // Are we loaded?
     if (IsLoaded())
     {
-        pGame->GetStreaming()->RemoveModel(m_dwModelID);
+        CBaseModelInfoSAInterface* pInterface = GetInterface();
+        // SA's streaming GC (DeleteLeastUsedEntityRwObject, 0x409640) never removes
+        // models with active refs. Removing with refs > 0 causes TXD ref mismatches
+        // when entities eventually detach, because m_wTxdIndex may have changed.
+        if (pInterface && pInterface->usNumberOfRefs == 0)
+            pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
     // Reset the stored custom vehicle clump
     m_pCustomClump = nullptr;

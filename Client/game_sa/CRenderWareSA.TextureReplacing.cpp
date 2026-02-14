@@ -144,7 +144,7 @@ namespace
     std::unordered_set<const SReplacementTextures*>                      g_ActiveReplacements;
     // TXD slots at safety-cap during cleanup; tracked for diagnostics
     std::unordered_set<unsigned short> g_PermanentlyLeakedTxdSlots;
-    // Master textures that couldn't be destroyed due to leaked copies; destroyed at StaticReset
+    // Textures (masters and leftover copies) that couldn't be destroyed inline; destroyed at StaticReset
     std::unordered_set<RwTexture*> g_LeakedMasterTextures;
     // D3D textures already released during StaticReset; used by SafeDestroyTextureWithRaster
     // to detect shared rasters and prevent double-release across different texture structs.
@@ -4771,12 +4771,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
             // External refs remain or not all textures could be orphaned.
             // Keep the MTA pin active so the hook won't trigger
             // CStreaming::RemoveModel while the slot is alive.
-            const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(usIsolatedTxdId).second;
-            if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
-            {
-                AddReportLog(9401,
-                             SString("CleanupIsolatedTxdForModel: Orphaned isolated TXD %u (refs=%d)", usIsolatedTxdId, CTxdStore_GetNumRefs(usIsolatedTxdId)));
-            }
+            g_OrphanedIsolatedTxdSlots.insert(usIsolatedTxdId);
         }
     }
     else
@@ -4795,15 +4790,149 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::CleanupReplacementsInTxdSlot
+//
+// Detach all replacement texture tracking from a TXD slot that is about
+// to be destroyed (e.g. by RestoreTXD when engineRequestTXD is freed).
+// Without this, CClientTXD destructors that run later would access the
+// freed TXD via stale perTxdList entries, causing use-after-free.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId)
+{
+    auto itInfo = ms_ModelTexturesInfoMap.find(usTxdSlotId);
+    if (itInfo == ms_ModelTexturesInfoMap.end())
+        return;
+
+    CModelTexturesInfo& info = itInfo->second;
+    RwTexDictionary*    pTxd = CTxdStore_GetTxd(usTxdSlotId);
+    const bool          bTxdOk = pTxd != nullptr;
+
+    const std::vector<SReplacementTextures*> usedBy = info.usedByReplacements;
+    for (SReplacementTextures* pReplacement : usedBy)
+    {
+        if (!pReplacement)
+            continue;
+
+        ForEachShaderReg(pReplacement, usTxdSlotId, [usTxdSlotId](CD3DDUMMY* pD3D) { RemoveShaderEntryByD3DData(usTxdSlotId, pD3D); });
+        ClearShaderRegs(pReplacement, usTxdSlotId);
+
+        auto itPerTxd = std::find_if(pReplacement->perTxdList.begin(), pReplacement->perTxdList.end(),
+                                     [usTxdSlotId](const SReplacementTextures::SPerTxd& entry) { return entry.usTxdId == usTxdSlotId; });
+
+        if (itPerTxd != pReplacement->perTxdList.end())
+        {
+            // Build master set to distinguish masters from copies.
+            // When bTexturesAreCopies is false, usingTextures contains the
+            // actual master textures (placed directly into the TXD). Their
+            // rasters must be preserved for ModelInfoTXDRemoveTextures to
+            // properly free later. Only copy rasters are nulled since the
+            // master keeps the shared raster alive.
+            const std::unordered_set<RwTexture*> masterSet(pReplacement->textures.begin(), pReplacement->textures.end());
+
+            for (RwTexture* pTex : itPerTxd->usingTextures)
+            {
+                if (!IsReadableTexture(pTex))
+                    continue;
+
+                // Remove texture from TXD linked list before slot destruction
+                if (bTxdOk && pTex->txd == pTxd)
+                    SafeOrphanTexture(pTex, usTxdSlotId);
+
+                // Null rasters only for copies. Copies share their raster with
+                // a master in pReplacement->textures; the master keeps it alive
+                // and ModelInfoTXDRemoveTextures will free it properly later.
+                // Nulling a master's raster would permanently leak the VRAM.
+                const bool bIsCopy = itPerTxd->bTexturesAreCopies || masterSet.find(pTex) == masterSet.end();
+                if (bIsCopy && pTex->txd == nullptr)
+                {
+                    pTex->raster = nullptr;
+
+                    // Destroy the copy struct now - the perTxdList entry is
+                    // about to be erased, so ModelInfoTXDRemoveTextures will
+                    // never see this copy. Without this the RwTexture struct
+                    // leaks (raster was already nulled, no VRAM impact).
+                    RwTextureDestroy(pTex);
+                }
+            }
+
+            itPerTxd->usingTextures.clear();
+            itPerTxd->replacedOriginals.clear();
+            pReplacement->perTxdList.erase(itPerTxd);
+        }
+
+        pReplacement->usedInTxdIds.erase(usTxdSlotId);
+        ListRemove(info.usedByReplacements, pReplacement);
+    }
+
+    info.usedByReplacements.clear();
+
+    // Restore displaced originals back into the TXD so RwTexDictionaryDestroy
+    // frees them along with the dictionary. During ModelInfoTXDAddTextures,
+    // originals were removed from the TXD linked list and stored in
+    // replacedOriginals / info.originalTextures. Without restoring them,
+    // they'd leak (both struct and raster) since they're no longer in the
+    // TXD and nobody else tracks them.
+    if (bTxdOk)
+    {
+        TxdTextureMap txdTextureMap;
+        BuildTxdTextureMapFast(pTxd, txdTextureMap);
+
+        for (RwTexture* pOriginal : info.originalTextures)
+        {
+            if (!IsReadableTexture(pOriginal))
+                continue;
+
+            // Already in the TXD - will be freed by RwTexDictionaryDestroy
+            if (pOriginal->txd == pTxd)
+                continue;
+
+            if (strnlen(pOriginal->name, RW_TEXTURE_NAME_LENGTH) >= RW_TEXTURE_NAME_LENGTH)
+                continue;
+
+            // Skip if a texture with this name is already in the TXD
+            if (txdTextureMap.find(pOriginal->name) != txdTextureMap.end())
+                continue;
+
+            // Ensure proper unlinking from any stale TXD list state
+            SafeOrphanTexture(pOriginal);
+            if (pOriginal->txd != nullptr)
+                continue;
+
+            if (RwTexDictionaryAddTexture(pTxd, pOriginal))
+                txdTextureMap[pOriginal->name] = pOriginal;
+        }
+    }
+
+    info.originalTextures.clear();
+    info.originalTexturesByName.clear();
+
+    ms_ModelTexturesInfoMap.erase(itInfo);
+
+    // After restoring displaced originals above, the TXD now contains both
+    // non-displaced originals (never removed) and restored displaced originals.
+    // RwTexDictionaryDestroy in RemoveTextureDictonarySlot will free all of
+    // them properly. Do NOT call OrphanTxdTexturesBounded - orphaning them
+    // would leak their raster memory since nobody tracks them anymore.
+
+    if (CTxdStore_GetNumRefs(usTxdSlotId) > 0)
+        CRenderWareSA::DebugTxdRemoveRef(usTxdSlotId, "CleanupReplacementsInTxdSlot");
+
+    InvalidateTxdTextureMapCache(usTxdSlotId);
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::ModelInfoTXDDeferCleanup
 //
 // Remove tracking state without destroying textures. Used during shutdown
 // when model data may be corrupted and full cleanup via
-// ModelInfoTXDRemoveTextures would be unsafe. Textures are intentionally
-// leaked - destroying them risks double-freeing rasters shared between
-// copy and master textures, or freeing rasters still referenced by
-// in-flight clumps. StaticResetModelTextureReplacing handles bulk TXD
-// ref release and orphaned texture cleanup after all elements are gone.
+// ModelInfoTXDRemoveTextures would be unsafe. Immediate destruction risks
+// double-freeing rasters shared between copy and master textures, or
+// freeing rasters still referenced by in-flight clumps.
+// Master textures are saved in g_LeakedMasterTextures so
+// StaticResetModelTextureReplacing can destroy them safely after all
+// elements are gone and shared-raster tracking is available.
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures)
@@ -4811,6 +4940,19 @@ void CRenderWareSA::ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementT
     if (!pReplacementTextures)
     {
         return;
+    }
+
+    // Save master textures for deferred destruction in StaticResetModelTextureReplacing.
+    // After this function returns, CClientTXD's destructor destroys pReplacementTextures
+    // and its textures vector drops the raw RwTexture* pointers. Without this, the
+    // master RwTexture structs and their rasters leak permanently.
+    // Masters are always orphaned (txd=nullptr, self-circular TXDList) - they were
+    // never added to any game TXD; only copies were. Their rasters are shared with
+    // copies still in TXDs; the destruction loop's mopupFreedRasters handles that.
+    for (RwTexture* pMaster : pReplacementTextures->textures)
+    {
+        if (pMaster)
+            g_LeakedMasterTextures.insert(pMaster);
     }
 
     RemoveReplacementFromTracking(pReplacementTextures);
@@ -5346,8 +5488,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 // If this entry shares a raster with a master texture, it's a copy that
                 // was incorrectly captured as a displaced original. Use SafeDestroyTexture
                 // to null the raster and prevent double-free when the master is destroyed.
-                bool bSharesRasterWithMaster = pReplacedTexture->raster &&
-                    masterRasterMap.find(pReplacedTexture->raster) != masterRasterMap.end();
+                bool bSharesRasterWithMaster = pReplacedTexture->raster && masterRasterMap.find(pReplacedTexture->raster) != masterRasterMap.end();
 
                 if (bSharesRasterWithMaster)
                     SafeDestroyTexture(pReplacedTexture);
@@ -5748,6 +5889,19 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             AddReportLog(
                 9401, SString("StaticResetModelTextureReplacing: %u TXD slots remain leaked", static_cast<unsigned int>(g_PermanentlyLeakedTxdSlots.size())));
         }
+
+        // Queue previously-leaked slots for mop-up retry later in this function.
+        // External refs may have been released since the last session, allowing
+        // tryMopUpTxd to free them now. Without this, leaked slots accumulate
+        // permanently in the TXD pool, shrinking available capacity each session.
+        for (unsigned short txdId : g_PermanentlyLeakedTxdSlots)
+        {
+            if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
+                g_PendingLeakedTxdRefs.insert(txdId);
+            else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", txdId));
+        }
+
         g_PermanentlyLeakedTxdSlots.clear();
     }
 
@@ -5794,6 +5948,10 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                     {
                         if (IsStreamingInfoSlot(txdId))
                             SetStreamingInfoLeaked(txdId);
+                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
+                            g_PendingLeakedTxdRefs.insert(txdId);
+                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                            AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", txdId));
                         g_PermanentlyLeakedTxdSlots.insert(txdId);
                         it = g_OrphanedIsolatedTxdSlots.erase(it);
                         continue;
@@ -6111,6 +6269,130 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         noteCleaned(txdId);
     };
 
+    // Restore original textures in shared (non-isolated) GTA TXDs.
+    // ModelInfoTXDDeferCleanup (used during delete-all) only removes tracking pointers
+    // but leaves replacement textures inside the TXD dictionaries and discards the originals.
+    // Without this restoration, replacement textures persist across server sessions:
+    // when the player reconnects, models restream from TXDs that still contain
+    // the previous server's replacement textures instead of the GTA originals.
+    //
+    // No rendering occurs between DeferCleanup and this point - both run within
+    // ~CClientGame's call stack on the main thread, so polluted TXDs are never
+    // sampled by the renderer.
+    std::size_t restoredTxdCount = 0;
+    std::size_t removedReplacementCount = 0;
+    std::size_t restoredOriginalCount = 0;
+    std::size_t skippedLeaked = 0;
+    std::size_t skippedActive = 0;
+    std::size_t skippedNoOriginals = 0;
+    std::size_t skippedNoTxd = 0;
+    std::size_t skippedMismatch = 0;
+
+    for (auto& entry : ms_ModelTexturesInfoMap)
+    {
+        CModelTexturesInfo& info = entry.second;
+        if (info.bHasLeakedTextures)
+        {
+            ++skippedLeaked;
+            continue;
+        }
+
+        // Only restore if usedByReplacements is empty (DeferCleanup path) but originals exist.
+        // When usedByReplacements is non-empty, the normal removal path already handled it.
+        if (!info.usedByReplacements.empty())
+        {
+            ++skippedActive;
+            continue;
+        }
+        if (info.originalTextures.empty())
+        {
+            ++skippedNoOriginals;
+            continue;
+        }
+
+        RwTexDictionary* pTxd = CTxdStore_GetTxd(info.usTxdId);
+        if (!pTxd)
+        {
+            // TXD was unloaded (e.g. streaming freed it during element cleanup).
+            // Safe to skip: when the TXD is reloaded from disk, it gets fresh
+            // original textures. GTA streaming doesn't run mid-destructor, so
+            // this path is a defensive guard rather than a common case.
+            ++skippedNoTxd;
+            continue;
+        }
+
+        // Verify TXD pointer matches what we tracked - if GTA reloaded this TXD,
+        // originalTextures holds stale pointers and restoration would corrupt it
+        if (info.pTxd && info.pTxd != pTxd)
+        {
+            ++skippedMismatch;
+            continue;
+        }
+
+        const std::size_t prevRemovedCount = removedReplacementCount;
+        const std::size_t prevRestoredCount = restoredOriginalCount;
+
+        // Remove non-original (replacement) textures from the TXD
+        std::vector<RwTexture*> currentTextures;
+        GetTxdTextures(currentTextures, pTxd);
+
+        for (RwTexture* pCurrent : currentTextures)
+        {
+            if (!IsReadableTexture(pCurrent))
+                continue;
+
+            if (info.originalTextures.find(pCurrent) != info.originalTextures.end())
+                continue;  // This is an original, keep it
+
+            // This is a replacement texture left behind by DeferCleanup - remove it
+            // and make it a proper orphan (self-circular TXDList) so
+            // CanDestroyOrphanedTexture succeeds in the cleanup loop below.
+            SafeOrphanTexture(pCurrent, info.usTxdId);
+            ++removedReplacementCount;
+
+            // Track for destruction at the end of StaticReset (g_LeakedMasterTextures loop).
+            // Without this, the orphaned RwTexture + raster + D3D texture leak permanently.
+            g_LeakedMasterTextures.insert(pCurrent);
+        }
+
+        // Re-add originals that were orphaned during ModelInfoTXDAddTextures
+        TxdTextureMap currentTxdMap;
+        BuildTxdTextureMapFast(pTxd, currentTxdMap);
+
+        for (RwTexture* pOriginal : info.originalTextures)
+        {
+            if (!IsReadableTexture(pOriginal))
+                continue;
+
+            if (pOriginal->txd == pTxd)
+                continue;  // Already in the TXD
+
+            if (strnlen(pOriginal->name, RW_TEXTURE_NAME_LENGTH) >= RW_TEXTURE_NAME_LENGTH)
+                continue;
+
+            // Skip if a texture with this name is already present
+            if (currentTxdMap.find(pOriginal->name) != currentTxdMap.end())
+                continue;
+
+            SafeOrphanTexture(pOriginal, info.usTxdId);
+            if (pOriginal->txd != nullptr)  // Defensive: RwTexDictionaryRemoveTexture may fail on corrupt data
+                continue;
+
+            if (RwTexDictionaryAddTexture(pTxd, pOriginal))
+            {
+                currentTxdMap[pOriginal->name] = pOriginal;
+                ++restoredOriginalCount;
+            }
+        }
+
+        // Only count and invalidate cache if we actually changed this TXD's contents
+        if (removedReplacementCount > prevRemovedCount || restoredOriginalCount > prevRestoredCount)
+        {
+            InvalidateTxdTextureMapCache(info.usTxdId);
+            ++restoredTxdCount;
+        }
+    }
+
     // Release the GetModelTexturesInfo ref for clean game-TXD entries.
     // These refs were added by DebugTxdAddRef in GetModelTexturesInfo but never
     // released by ModelInfoTXDDeferCleanup (which only removes replacement tracking)
@@ -6215,9 +6497,13 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                 RwRaster*  pRaster = pMaster->raster;
                 const bool bRasterAlreadyFreed = pRaster && (mopupFreedRasters.find(pRaster) != mopupFreedRasters.end());
 
-                if (bRasterAlreadyFreed)
+                if (bRasterAlreadyFreed || pMaster->refs > 1)
                 {
-                    SafeDestroyTexture(pMaster);  // Raster struct dangling
+                    // Raster already freed by another texture, or texture has external refs
+                    // (e.g. materials still reference this copy). Null the raster to prevent
+                    // dangling pointers. If both a master and its copy take this path,
+                    // the raster leaks - better than crashing.
+                    SafeDestroyTexture(pMaster);
                 }
                 else
                 {
