@@ -4795,6 +4795,139 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::CleanupReplacementsInTxdSlot
+//
+// Detach all replacement texture tracking from a TXD slot that is about
+// to be destroyed (e.g. by RestoreTXD when engineRequestTXD is freed).
+// Without this, CClientTXD destructors that run later would access the
+// freed TXD via stale perTxdList entries, causing use-after-free.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId)
+{
+    auto itInfo = ms_ModelTexturesInfoMap.find(usTxdSlotId);
+    if (itInfo == ms_ModelTexturesInfoMap.end())
+        return;
+
+    CModelTexturesInfo& info = itInfo->second;
+    RwTexDictionary*    pTxd = CTxdStore_GetTxd(usTxdSlotId);
+    const bool          bTxdOk = pTxd != nullptr;
+
+    const std::vector<SReplacementTextures*> usedBy = info.usedByReplacements;
+    for (SReplacementTextures* pReplacement : usedBy)
+    {
+        if (!pReplacement)
+            continue;
+
+        ForEachShaderReg(pReplacement, usTxdSlotId, [usTxdSlotId](CD3DDUMMY* pD3D) { RemoveShaderEntryByD3DData(usTxdSlotId, pD3D); });
+        ClearShaderRegs(pReplacement, usTxdSlotId);
+
+        auto itPerTxd = std::find_if(pReplacement->perTxdList.begin(), pReplacement->perTxdList.end(),
+                                     [usTxdSlotId](const SReplacementTextures::SPerTxd& entry) { return entry.usTxdId == usTxdSlotId; });
+
+        if (itPerTxd != pReplacement->perTxdList.end())
+        {
+            // Build master set to distinguish masters from copies.
+            // When bTexturesAreCopies is false, usingTextures contains the
+            // actual master textures (placed directly into the TXD). Their
+            // rasters must be preserved for ModelInfoTXDRemoveTextures to
+            // properly free later. Only copy rasters are nulled since the
+            // master keeps the shared raster alive.
+            const std::unordered_set<RwTexture*> masterSet(pReplacement->textures.begin(), pReplacement->textures.end());
+
+            for (RwTexture* pTex : itPerTxd->usingTextures)
+            {
+                if (!IsReadableTexture(pTex))
+                    continue;
+
+                // Remove texture from TXD linked list before slot destruction
+                if (bTxdOk && pTex->txd == pTxd)
+                    SafeOrphanTexture(pTex, usTxdSlotId);
+
+                // Null rasters only for copies. Copies share their raster with
+                // a master in pReplacement->textures; the master keeps it alive
+                // and ModelInfoTXDRemoveTextures will free it properly later.
+                // Nulling a master's raster would permanently leak the VRAM.
+                const bool bIsCopy = itPerTxd->bTexturesAreCopies || masterSet.find(pTex) == masterSet.end();
+                if (bIsCopy && pTex->txd == nullptr)
+                {
+                    pTex->raster = nullptr;
+
+                    // Destroy the copy struct now - the perTxdList entry is
+                    // about to be erased, so ModelInfoTXDRemoveTextures will
+                    // never see this copy. Without this the RwTexture struct
+                    // leaks (raster was already nulled, no VRAM impact).
+                    RwTextureDestroy(pTex);
+                }
+            }
+
+            itPerTxd->usingTextures.clear();
+            itPerTxd->replacedOriginals.clear();
+            pReplacement->perTxdList.erase(itPerTxd);
+        }
+
+        pReplacement->usedInTxdIds.erase(usTxdSlotId);
+        ListRemove(info.usedByReplacements, pReplacement);
+    }
+
+    info.usedByReplacements.clear();
+
+    // Restore displaced originals back into the TXD so RwTexDictionaryDestroy
+    // frees them along with the dictionary. During ModelInfoTXDAddTextures,
+    // originals were removed from the TXD linked list and stored in
+    // replacedOriginals / info.originalTextures. Without restoring them,
+    // they'd leak (both struct and raster) since they're no longer in the
+    // TXD and nobody else tracks them.
+    if (bTxdOk)
+    {
+        TxdTextureMap txdTextureMap;
+        BuildTxdTextureMapFast(pTxd, txdTextureMap);
+
+        for (RwTexture* pOriginal : info.originalTextures)
+        {
+            if (!IsReadableTexture(pOriginal))
+                continue;
+
+            // Already in the TXD - will be freed by RwTexDictionaryDestroy
+            if (pOriginal->txd == pTxd)
+                continue;
+
+            if (strnlen(pOriginal->name, RW_TEXTURE_NAME_LENGTH) >= RW_TEXTURE_NAME_LENGTH)
+                continue;
+
+            // Skip if a texture with this name is already in the TXD
+            if (txdTextureMap.find(pOriginal->name) != txdTextureMap.end())
+                continue;
+
+            // Ensure proper unlinking from any stale TXD list state
+            SafeOrphanTexture(pOriginal);
+            if (pOriginal->txd != nullptr)
+                continue;
+
+            if (RwTexDictionaryAddTexture(pTxd, pOriginal))
+                txdTextureMap[pOriginal->name] = pOriginal;
+        }
+    }
+
+    info.originalTextures.clear();
+    info.originalTexturesByName.clear();
+
+    ms_ModelTexturesInfoMap.erase(itInfo);
+
+    // After restoring displaced originals above, the TXD now contains both
+    // non-displaced originals (never removed) and restored displaced originals.
+    // RwTexDictionaryDestroy in RemoveTextureDictonarySlot will free all of
+    // them properly. Do NOT call OrphanTxdTexturesBounded - orphaning them
+    // would leak their raster memory since nobody tracks them anymore.
+
+    if (CTxdStore_GetNumRefs(usTxdSlotId) > 0)
+        CRenderWareSA::DebugTxdRemoveRef(usTxdSlotId, "CleanupReplacementsInTxdSlot");
+
+    InvalidateTxdTextureMapCache(usTxdSlotId);
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::ModelInfoTXDDeferCleanup
 //
 // Remove tracking state without destroying textures. Used during shutdown
