@@ -36,6 +36,7 @@ public:
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
     void ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures) override;
     void CleanupIsolatedTxdForModel(unsigned short usModelId, bool bSkipStreamingLoads = false) override;
+    void CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId) override;
     void StaticResetModelTextureReplacing();
     void StaticResetShaderSupport();
     void ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId);

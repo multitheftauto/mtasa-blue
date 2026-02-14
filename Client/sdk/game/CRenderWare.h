@@ -158,4 +158,9 @@ public:
 
     // Parses TXD buffer data and injects it directly into an allocated pool slot
     virtual bool LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer) = 0;
+
+    // Clean up replacement texture tracking for a TXD slot that is about to be destroyed.
+    // Detaches all SReplacementTextures from this slot, orphans copy textures, and removes
+    // the ms_ModelTexturesInfoMap entry so later CClientTXD cleanup won't access freed data.
+    virtual void CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId) = 0;
 };

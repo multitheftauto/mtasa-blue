@@ -318,6 +318,12 @@ void CClientModel::RestoreTXD()
             pIter->ResetTextureDictionaryID();
     }
 
+    // Detach any replacement texture tracking from this TXD slot before the slot
+    // is destroyed. Without this, CClientTXD destructors that run later (queued
+    // by DeleteRecursive) would access freed TXD data via stale perTxdList entries.
+    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
+        pRenderWare->CleanupReplacementsInTxdSlot(static_cast<unsigned short>(txdSlotId));
+
     g_pGame->GetPools()->GetTxdPool().RemoveTextureDictonarySlot(txdSlotId);
 
     // Only clear streaming info for TXDs within SA's streaming range.
