@@ -6295,10 +6295,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             // restore now - removing stale copies before masters' D3D is released.
             RwTexDictionary* pLeakedTxd = CTxdStore_GetTxd(info.usTxdId);
 
-            bool bCanRestore = pLeakedTxd
-                            && (!info.pTxd || info.pTxd == pLeakedTxd)
-                            && !info.originalTextures.empty()
-                            && info.usedByReplacements.empty();
+            bool bCanRestore = pLeakedTxd && (!info.pTxd || info.pTxd == pLeakedTxd) && !info.originalTextures.empty() && info.usedByReplacements.empty();
 
             if (bCanRestore)
             {
