@@ -3717,9 +3717,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 // The existing isolation entry proves a conflict was detected before.
                 if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
                 {
-                    if (!g_bProcessingPendingReplacements)
-                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
-                    return false;
+                    // Isolation failed - fall through to shared TXD injection instead.
+                    // May cause texture mixing, but avoids permanent white textures.
+                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (re-isolation), using shared TXD", usModelId));
                 }
             }
             else if (itPrevIsolated == g_IsolatedTxdByModel.end())
@@ -3743,11 +3743,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     {
                         if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
                         {
-                            // Only queue on the initial call; during retry processing the
-                            // loop in TryApplyPendingReplacements handles requeue itself.
-                            if (!g_bProcessingPendingReplacements)
-                                QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
-                            return false;
+                            // Isolation failed - fall through to shared TXD injection instead.
+                            // May cause texture mixing, but avoids permanent white textures.
+                            AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (conflict), using shared TXD", usModelId));
                         }
                     }
                 }
@@ -3757,9 +3755,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 // Parent TXD changed since last isolation - re-isolate with new parent
                 if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
                 {
-                    if (!g_bProcessingPendingReplacements)
-                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
-                    return false;
+                    // Isolation failed - fall through to shared TXD injection instead.
+                    // May cause texture mixing, but avoids permanent white textures.
+                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (parent changed), using shared TXD", usModelId));
                 }
             }
         }
@@ -6293,8 +6291,34 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         CModelTexturesInfo& info = entry.second;
         if (info.bHasLeakedTextures)
         {
-            ++skippedLeaked;
-            continue;
+            // If the TXD is unchanged and originalTextures are intact, try to
+            // restore now - removing stale copies before masters' D3D is released.
+            RwTexDictionary* pLeakedTxd = CTxdStore_GetTxd(info.usTxdId);
+
+            bool bCanRestore = pLeakedTxd
+                            && (!info.pTxd || info.pTxd == pLeakedTxd)
+                            && !info.originalTextures.empty()
+                            && info.usedByReplacements.empty();
+
+            if (bCanRestore)
+            {
+                // TXD unchanged - clear leaked flag and fall through to normal
+                // restoration, which removes stale copies and re-adds originals.
+                info.bHasLeakedTextures = false;
+            }
+            else if (!pLeakedTxd || (info.pTxd && info.pTxd != pLeakedTxd))
+            {
+                // TXD unloaded or reloaded from disk - fresh data, no stale copies.
+                info.bHasLeakedTextures = false;
+                ++skippedNoTxd;
+                continue;
+            }
+            else
+            {
+                // Can't safely restore - leave for the mopup path below.
+                ++skippedLeaked;
+                continue;
+            }
         }
 
         // Only restore if usedByReplacements is empty (DeferCleanup path) but originals exist.
