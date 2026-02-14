@@ -80,6 +80,7 @@ namespace
 
     int   iReturnFileId;
     char* pReturnBuffer;
+    bool  bCacheLoadIncomplete = false;
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +104,10 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
             if (bLoadingBigModel)
                 pGameInterface->GetStreaming()->LoadAllRequestedModels(false);
             if (bLoadingBigModel)
+            {
+                bCacheLoadIncomplete = true;
                 return false;
+            }
         }
 
         int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
@@ -161,6 +165,15 @@ skip:
         call    FUNC_CStreamingConvertBufferToObject
         add     esp, 4*3
 
+        test    al, al
+        jnz     convert_ok
+        mov     bCacheLoadIncomplete, 1
+        // Undo premature loadflag=3 set by OnCallCStreamingInfoAddToList
+        mov     ecx, iReturnFileId
+        imul    ecx, 14h
+        mov     byte ptr [ecx + 008E4CD0h], 0
+convert_ok:
+
         popad
         add     esp, 4*1
         jmp     RETURN_CallCStreamingInfoAddToListB
@@ -180,7 +193,14 @@ bool _cdecl ShouldSkipLoadRequestedModels(DWORD calledFrom)
     //      CClothesBuilder::LoadAndPutOnClothes         5A5F70 - 5A6039
     //      CClothesBuilder::ConstructTextures           5A6040 - 5A6520
     if (calledFrom > 0x5A55A0 && calledFrom < 0x5A6520)
+    {
+        if (bCacheLoadIncomplete)
+        {
+            bCacheLoadIncomplete = false;
+            return false;
+        }
         return true;
+    }
 
     return false;
 }
