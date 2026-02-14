@@ -61,6 +61,7 @@
 #include "CBuildingRemovalSA.h"
 #include "CCheckpointSA.h"
 #include "CPtrNodeSingleLinkPoolSA.h"
+#include "CCreepingFireSA.h"
 
 extern CGameSA* pGame;
 
@@ -251,6 +252,8 @@ CGameSA::CGameSA()
         CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
         CVehicleAudioSettingsManagerSA::StaticSetHooks();
+        CFireManagerSA::StaticSetHooks();
+        CCreepingFireSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {
@@ -451,7 +454,7 @@ void CGameSA::Reset()
     if (GetSystemState() == SystemState::GS_PLAYING_GAME)
     {
         // Extinguish all fires
-        m_pFireManager->ExtinguishAllFires();
+        //m_pFireManager->ExtinguishAllFires();
 
         // Restore camera stuff
         m_pCamera->Restore();
@@ -560,6 +563,16 @@ float CGameSA::GetFPS()
 float CGameSA::GetTimeStep()
 {
     return *(float*)0xB7CB5C;  // CTimer::ms_fTimeStep
+}
+
+float CGameSA::GetTimeStepInSeconds()
+{
+    return GetTimeStep() / 50.0f;
+}
+
+float CGameSA::GetTimeStepInMS()
+{
+    return GetTimeStepInSeconds() * 1000.0f;
 }
 
 float CGameSA::GetOldTimeStep()

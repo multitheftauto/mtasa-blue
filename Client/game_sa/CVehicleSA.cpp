@@ -1977,14 +1977,14 @@ bool CVehicleSA::SetOnFire(bool onFire)
 
     if (onFire)
     {
-        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        CFire* fire = fireManager->StartFire(this, nullptr, pGame->GetSystemTime() + 5000, 0);
         if (!fire)
             return false;
 
-        fire->SetTarget(this);
-        fire->SetStrength(1.0f);
-        fire->Ignite();
-        fire->SetNumGenerationsAllowed(0);
+        //fire->SetTarget(this);
+        //fire->SetStrength(1.0f);
+        //fire->Ignite();
+        //fire->SetNumGenerationsAllowed(0);
 
         vehicleInterface->m_pFire = fire->GetInterface();
     }

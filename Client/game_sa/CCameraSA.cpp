@@ -317,6 +317,7 @@ CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
     else
     {
         *matrix = CMatrix();
+        matrix->vPos = cameraInterface->m_transform.m_translate;
     }
     return matrix;
 }

@@ -668,9 +668,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_ApplyCarBlowHop, (DWORD)HOOK_ApplyCarBlowHop, 6);
     HookInstall(HOOKPOS_CWorld_SetWorldOnFire, (DWORD)HOOK_CWorld_SetWorldOnFire, 5);
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFire_ProcessPed, (DWORD)HOOK_CTaskSimplePlayerOnFire_ProcessPed, 5);
-    HookInstall(HOOKPOS_CFire_ProcessFire, (DWORD)HOOK_CFire_ProcessFire, 5);
-    HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
-    HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
+    //HookInstall(HOOKPOS_CFire_ProcessFire, (DWORD)HOOK_CFire_ProcessFire, 5);
+    //HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
+    //HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);

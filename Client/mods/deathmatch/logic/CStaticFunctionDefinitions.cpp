@@ -4630,7 +4630,8 @@ bool CStaticFunctionDefinitions::DetonateSatchels()
 
 bool CStaticFunctionDefinitions::CreateFire(CVector& vecPosition, float fSize)
 {
-    return g_pGame->GetFireManager()->StartFire(vecPosition, fSize) != NULL;
+    //return g_pGame->GetFireManager()->StartFire(vecPosition, fSize) != NULL;
+    return false;
 }
 
 bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, float fRadius)
@@ -4641,7 +4642,7 @@ bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, fl
 
 bool CStaticFunctionDefinitions::ExtinguishAllFires()
 {
-    g_pGame->GetFireManager()->ExtinguishAllFires();
+    //g_pGame->GetFireManager()->ExtinguishAllFires();
     return true;
 }
 
