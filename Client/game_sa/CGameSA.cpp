@@ -479,6 +479,10 @@ void CGameSA::Reset()
 
         // Restore default world state
         RestoreGameWorld();
+
+        // Reset building pool to default capacity if a server enlarged it
+        if (m_Pools->GetBuildingsPool().GetSize() != MAX_BUILDINGS)
+            SetBuildingPoolSize(MAX_BUILDINGS);
     }
 }
 
