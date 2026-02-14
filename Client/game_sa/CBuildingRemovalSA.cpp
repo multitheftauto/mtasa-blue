@@ -503,6 +503,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                 }
             }
             m_pBuildingRemovals->erase(iter++);
+            delete pFind;
         }
         else
             iter++;
@@ -536,6 +537,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
     // Create new
     m_pBuildingRemovals = new std::multimap<uint16_t, SBuildingRemoval*>;
     m_pRemovedEntities.clear();
+    m_pAddedEntities.clear();
 
     if (pOutAmount)
         *pOutAmount = uiAmount;
@@ -725,8 +727,8 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
                 iteratorBinary++;
         }
     }
-    m_pRemovedEntities[(DWORD)pInterface] = false;
-    m_pAddedEntities[(DWORD)pInterface] = false;
+    m_pRemovedEntities.erase((DWORD)pInterface);
+    m_pAddedEntities.erase((DWORD)pInterface);
 }
 
 void CBuildingRemovalSA::DropCaches()
