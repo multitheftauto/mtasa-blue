@@ -39,10 +39,11 @@ void CClientIFP::Unlink()
     }
 }
 
-bool CClientIFP::Load(SString blockName, bool isRawData, SString input)
+bool CClientIFP::Load(SString blockName, bool isRawData, SString input, std::vector<SString>&& uncompressedAnims)
 {
     m_strBlockName = std::move(blockName);
     m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
+    m_uncompressedAnimations = std::move(uncompressedAnims);
 
     if (isRawData)
     {
@@ -110,11 +111,14 @@ void CClientIFP::ReadIFPVersion1()
         ReadDgan(Dgan);
 
         Animation.pHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy();
-        InitializeAnimationHierarchy(Animation.pHierarchy, Animation.Name, Dgan.Info.Entries);
+
+        bool isUncompressed = std::find(m_uncompressedAnimations.begin(), m_uncompressedAnimations.end(), Animation.Name) != m_uncompressedAnimations.end();
+        InitializeAnimationHierarchy(Animation.pHierarchy, Animation.Name, Dgan.Info.Entries, isUncompressed);
+
         Animation.pSequencesMemory = AllocateSequencesMemory(Animation.pHierarchy);
         Animation.pHierarchy->SetSequences(reinterpret_cast<CAnimBlendSequenceSAInterface*>(Animation.pSequencesMemory + 4));
 
-        *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy);
+        *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy, isUncompressed);
         PreProcessAnimationHierarchy(Animation.pHierarchy);
     }
 }
@@ -143,12 +147,12 @@ void CClientIFP::ReadIFPVersion2(bool bAnp3)
     }
 }
 
-WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy)
+WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, bool isUncompressed)
 {
     SequenceMapType MapOfSequences;
-    WORD            wUnknownSequences = ReadSequences(pAnimationHierarchy, MapOfSequences);
+    WORD            wUnknownSequences = ReadSequences(pAnimationHierarchy, MapOfSequences, isUncompressed);
 
-    MoveSequencesWithDummies(pAnimationHierarchy, MapOfSequences);
+    MoveSequencesWithDummies(pAnimationHierarchy, MapOfSequences, isUncompressed);
     WORD cSequences = m_kcIFPSequences + wUnknownSequences;
 
     // As we need support for all 32 bones, we must change the total sequences count
@@ -156,16 +160,16 @@ WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
     return cSequences;
 }
 
-WORD CClientIFP::ReadSequences(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences)
+WORD CClientIFP::ReadSequences(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences, bool isUncompressed)
 {
     if (m_bVersion1)
     {
-        return ReadSequencesVersion1(pAnimationHierarchy, MapOfSequences);
+        return ReadSequencesVersion1(pAnimationHierarchy, MapOfSequences, isUncompressed);
     }
     return ReadSequencesVersion2(pAnimationHierarchy, MapOfSequences);
 }
 
-WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences)
+WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences, bool isUncompressed)
 {
     WORD wUnknownSequences = 0;
     for (size_t SequenceIndex = 0; SequenceIndex < pAnimationHierarchy->GetNumSequences(); SequenceIndex++)
@@ -193,7 +197,7 @@ WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAn
         InitializeAnimationSequence(pAnimationSequence, Anim.Name, iBoneID);
 
         eFrameType iFrameType = ReadKfrm();
-        if ((ReadSequenceKeyFrames(pAnimationSequence, iFrameType, Anim.Frames)) && (!bUnknownSequence))
+        if ((ReadSequenceKeyFrames(pAnimationSequence, iFrameType, Anim.Frames, isUncompressed)) && (!bUnknownSequence))
         {
             MapOfSequences[iBoneID] = std::move(pAnimationSequence);
         }
@@ -273,14 +277,16 @@ void CClientIFP::ReadSequenceVersion2(SSequenceHeaderV2& ObjectNode)
     strncpy(ObjectNode.Name, strCorrectBoneName, strCorrectBoneName.size() + 1);
 }
 
-bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames)
+bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames,
+                                       bool isUncompressed)
 {
-    size_t iCompressedFrameSize = GetSizeOfCompressedFrame(iFrameType);
+    size_t iCompressedFrameSize = GetSizeOfCompressedFrame(iFrameType, isUncompressed);
     if (iCompressedFrameSize)
     {
         BYTE* pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(iCompressedFrameSize * cFrames);
-        pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed, pKeyFrames);
-        ReadKeyFramesAsCompressed(pAnimationSequence, iFrameType, cFrames);
+        pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed && !isUncompressed, pKeyFrames);
+        ReadKeyFrames(pAnimationSequence, iFrameType, cFrames, isUncompressed);
+
         return true;
     }
     return false;
@@ -334,23 +340,35 @@ void CClientIFP::ReadAnimationHeaderVersion2(SAnimationHeaderV2& AnimationNode, 
     }
 }
 
-void CClientIFP::ReadKeyFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames)
+void CClientIFP::ReadKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames, bool isUncompressed)
 {
     switch (iFrameType)
     {
         case eFrameType::KRTS:
         {
-            ReadKrtsFramesAsCompressed(pAnimationSequence, cFrames);
+            if (isUncompressed)
+                ReadKrtsFramesUncompressed(pAnimationSequence, cFrames);
+            else
+                ReadKrtsFramesAsCompressed(pAnimationSequence, cFrames);
+
             break;
         }
         case eFrameType::KRT0:
         {
-            ReadKrt0FramesAsCompressed(pAnimationSequence, cFrames);
+            if (isUncompressed)
+                ReadKrt0FramesUncompressed(pAnimationSequence, cFrames);
+            else
+                ReadKrt0FramesAsCompressed(pAnimationSequence, cFrames);
+
             break;
         }
         case eFrameType::KR00:
         {
-            ReadKr00FramesAsCompressed(pAnimationSequence, cFrames);
+            if (isUncompressed)
+                ReadKr00FramesUncompressed(pAnimationSequence, cFrames);
+            else
+                ReadKr00FramesAsCompressed(pAnimationSequence, cFrames);
+
             break;
         }
         case eFrameType::KR00_COMPRESSED:
@@ -363,6 +381,23 @@ void CClientIFP::ReadKeyFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& 
             ReadCompressedFrames<SCompressed_KRT0>(pAnimationSequence, cFrames);
             break;
         }
+    }
+}
+
+void CClientIFP::ReadKrtsFramesUncompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames)
+{
+    for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
+    {
+        SKrts_Memory* krt0 = static_cast<SKrts_Memory*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKrts_Memory)));
+        SKrts         Krts;
+        ReadBuffer<SKrts>(&Krts);
+
+        krt0->Rotation.X = -Krts.Rotation.X;
+        krt0->Rotation.Y = -Krts.Rotation.Y;
+        krt0->Rotation.Z = -Krts.Rotation.Z;
+        krt0->Rotation.W = Krts.Rotation.W;
+        krt0->Time = Krts.Time;
+        krt0->Translation = Krts.Translation;
     }
 }
 
@@ -385,6 +420,23 @@ void CClientIFP::ReadKrtsFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>&
     }
 }
 
+void CClientIFP::ReadKrt0FramesUncompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames)
+{
+    for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
+    {
+        SKrt0_Memory* frameKrt0 = static_cast<SKrt0_Memory*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKrt0_Memory)));
+        SKrt0         Krt0;
+        ReadBuffer<SKrt0>(&Krt0);
+
+        frameKrt0->Rotation.X = -Krt0.Rotation.X;
+        frameKrt0->Rotation.Y = -Krt0.Rotation.Y;
+        frameKrt0->Rotation.Z = -Krt0.Rotation.Z;
+        frameKrt0->Rotation.W = Krt0.Rotation.W;
+        frameKrt0->Time = Krt0.Time;
+        frameKrt0->Translation = Krt0.Translation;
+    }
+}
+
 void CClientIFP::ReadKrt0FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames)
 {
     for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
@@ -404,6 +456,22 @@ void CClientIFP::ReadKrt0FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>&
     }
 }
 
+void CClientIFP::ReadKr00FramesUncompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames)
+{
+    for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
+    {
+        SKr00* frameKr00 = static_cast<SKr00*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SKr00)));
+        SKr00  Kr00;
+        ReadBuffer<SKr00>(&Kr00);
+
+        frameKr00->Rotation.X = -Kr00.Rotation.X;
+        frameKr00->Rotation.Y = -Kr00.Rotation.Y;
+        frameKr00->Rotation.Z = -Kr00.Rotation.Z;
+        frameKr00->Rotation.W = Kr00.Rotation.W;
+        frameKr00->Time = Kr00.Time;
+    }
+}
+
 void CClientIFP::ReadKr00FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames)
 {
     for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
@@ -420,21 +488,21 @@ void CClientIFP::ReadKr00FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>&
     }
 }
 
-size_t CClientIFP::GetSizeOfCompressedFrame(eFrameType iFrameType)
+size_t CClientIFP::GetSizeOfCompressedFrame(eFrameType iFrameType, bool isUncompressed)
 {
     switch (iFrameType)
     {
         case eFrameType::KRTS:
         {
-            return sizeof(SCompressed_KRT0);
+            return isUncompressed ? sizeof(SKrts) : sizeof(SCompressed_KRT0);
         }
         case eFrameType::KRT0:
         {
-            return sizeof(SCompressed_KRT0);
+            return isUncompressed ? sizeof(SKrt0) : sizeof(SCompressed_KRT0);
         }
         case eFrameType::KR00:
         {
-            return sizeof(SCompressed_KR00);
+            return isUncompressed ? sizeof(SKr00) : sizeof(SCompressed_KR00);
         }
         case eFrameType::KR00_COMPRESSED:
         {
@@ -449,13 +517,13 @@ size_t CClientIFP::GetSizeOfCompressedFrame(eFrameType iFrameType)
 }
 
 void CClientIFP::InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, const SString& strAnimationName,
-                                              const std::int32_t& iSequences)
+                                              const std::int32_t& iSequences, bool isUncompressed)
 {
     pAnimationHierarchy->Initialize();
     pAnimationHierarchy->SetName(strAnimationName);
     pAnimationHierarchy->SetNumSequences(static_cast<unsigned short>(iSequences));
     pAnimationHierarchy->SetAnimationBlockID(-1);
-    pAnimationHierarchy->SetRunningCompressed(m_kbAllKeyFramesCompressed);
+    pAnimationHierarchy->SetRunningCompressed(m_kbAllKeyFramesCompressed && !isUncompressed, isUncompressed);
 }
 
 void CClientIFP::InitializeAnimationSequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& strName, const std::int32_t& iBoneID)
@@ -474,7 +542,7 @@ void CClientIFP::PreProcessAnimationHierarchy(std::unique_ptr<CAnimBlendHierarch
     }
 }
 
-void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& mapOfSequences)
+void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& mapOfSequences, bool isUncompressed)
 {
     for (size_t SequenceIndex = 0; SequenceIndex < m_kcIFPSequences; SequenceIndex++)
     {
@@ -493,7 +561,7 @@ void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
         }
         else
         {
-            InsertAnimationDummySequence(pAnimationSequence, BoneName, BoneID);
+            InsertAnimationDummySequence(pAnimationSequence, BoneName, BoneID, isUncompressed);
         }
     }
 }
@@ -522,7 +590,8 @@ CClientIFP::eFrameType CClientIFP::GetFrameTypeFromFourCC(const char* szFourCC)
     return eFrameType::UNKNOWN_FRAME;
 }
 
-void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID)
+void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID,
+                                              bool isUncompressed)
 {
     InitializeAnimationSequence(pAnimationSequence, BoneName, dwBoneID);
 
@@ -532,18 +601,18 @@ void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence
     // We only need 1 dummy key frame to make the animation work
     const size_t cKeyFrames = 1;
     // KR00 is child key frame and KRT0 is Root key frame
-    size_t FrameSize = sizeof(SCompressed_KR00);
+    size_t FrameSize = isUncompressed ? sizeof(SKr00) : sizeof(SCompressed_KR00);
 
     if (bRootBone)
     {
         // This key frame will have translation values.
-        FrameSize = sizeof(SCompressed_KRT0);
+        FrameSize = isUncompressed ? sizeof(SKrt0) : sizeof(SCompressed_KRT0);
         bHasTranslationValues = true;
     }
 
     const size_t FramesDataSizeInBytes = FrameSize * cKeyFrames;
     BYTE*        pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(FramesDataSizeInBytes);
-    pAnimationSequence->SetKeyFrames(cKeyFrames, bHasTranslationValues, m_kbAllKeyFramesCompressed, pKeyFrames);
+    pAnimationSequence->SetKeyFrames(cKeyFrames, bHasTranslationValues, m_kbAllKeyFramesCompressed && !isUncompressed, pKeyFrames);
     CopyDummyKeyFrameByBoneID(pKeyFrames, dwBoneID);
 }
 

@@ -87,12 +87,13 @@ public:
         float X, Y, Z;
     };
 
-    struct SKr00
+    struct SKr00  // CAnimBlendKeyFrameNoTrans
     {
         SQuaternion Rotation;
         float       Time;
     };
 
+    // Structues used for reading IFP files
     struct SKrt0
     {
         SQuaternion Rotation;
@@ -104,8 +105,24 @@ public:
     {
         SQuaternion Rotation;
         SVector     Translation;
-        SVector     Scale;
+        SVector     Scale;  // unused
         float       Time;
+    };
+
+    // Structures used by GTA SA (time is always at 0x10 offset for uncompressed anims)
+    struct SKrt0_Memory  // CAnimBlendKeyFrame
+    {
+        SQuaternion Rotation;
+        float       Time;
+        SVector     Translation;
+    };
+
+    struct SKrts_Memory
+    {
+        SQuaternion Rotation;
+        float       Time;
+        SVector     Translation;
+        SVector     Scale;  // unused
     };
 
     struct SCompressedQuaternion
@@ -205,7 +222,7 @@ public:
     void MarkAsUnloading() { m_bUnloading = true; }
     bool IsUnloading() { return m_bUnloading; }
 
-    bool Load(SString blockName, bool isRawData, SString input);
+    bool Load(SString blockName, bool isRawData, SString input, std::vector<SString>&& uncompressedAnims);
 
     const SString&      GetBlockName() { return m_strBlockName; }
     const unsigned int& GetBlockNameHash() { return m_u32Hashkey; }
@@ -223,9 +240,9 @@ private:
     void ReadIFPVersion1();
     void ReadIFPVersion2(bool bAnp3);
 
-    WORD         ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
-    WORD         ReadSequences(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
-    WORD         ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
+    WORD         ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, bool isUncompressed = false);
+    WORD         ReadSequences(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences, bool isUncompressed = false);
+    WORD         ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences, bool isUncompressed = false);
     WORD         ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
     std::int32_t ReadSequenceVersion1(SAnim& Anim);
     void         ReadSequenceVersion2(SSequenceHeaderV2& ObjectNode);
@@ -236,8 +253,15 @@ private:
     CClientIFP::eFrameType ReadKfrm();
     void                   ReadAnimationHeaderVersion2(SAnimationHeaderV2& AnimationNode, bool bAnp3);
 
-    bool ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames);
-    void ReadKeyFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames);
+    bool ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames,
+                               bool isUncompressed = false);
+    void ReadKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames,
+                       bool isUncompressed = false);
+
+    void ReadKrtsFramesUncompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
+    void ReadKrt0FramesUncompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
+    void ReadKr00FramesUncompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
+
     void ReadKrtsFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
     void ReadKrt0FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
     void ReadKr00FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
@@ -251,14 +275,15 @@ private:
     }
 
     void  InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, const SString& strAnimationName,
-                                       const std::int32_t& iSequences);
+                                       const std::int32_t& iSequences, bool isUncompressed = false);
     void  InitializeAnimationSequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& strName, const std::int32_t& iBoneID);
     void  PreProcessAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
     void  MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>&                 pAnimationHierarchy,
-                                   std::map<DWORD, std::unique_ptr<CAnimBlendSequence>>& mapOfSequences);
+                                   std::map<DWORD, std::unique_ptr<CAnimBlendSequence>>& mapOfSequences, bool isUncompressed = false);
     BYTE* AllocateSequencesMemory(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
 
-    void    InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID);
+    void    InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID,
+                                         bool isUncompressed = false);
     void    CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID);
     SString ConvertStringToKey(const SString& strBoneName);
 
@@ -266,7 +291,7 @@ private:
     constexpr bool IsKeyFramesTypeRoot(eFrameType iFrameType);
 
     eFrameType   GetFrameTypeFromFourCC(const char* szFourCC);
-    size_t       GetSizeOfCompressedFrame(eFrameType FrameType);
+    size_t       GetSizeOfCompressedFrame(eFrameType FrameType, bool isUncompressed = false);
     std::int32_t GetBoneIDFromName(const SString& strBoneName);
     SString      GetCorrectBoneNameFromName(const SString& strBoneName);
     SString      GetCorrectBoneNameFromID(const std::int32_t& iBoneID);
@@ -278,6 +303,7 @@ private:
     bool                            m_bVersion1;
     bool                            m_bUnloading;
     CAnimManager*                   m_pAnimManager;
+    std::vector<SString>            m_uncompressedAnimations;
 
     // 32 because there are 32 bones in a ped model
     const unsigned short m_kcIFPSequences = 32;
