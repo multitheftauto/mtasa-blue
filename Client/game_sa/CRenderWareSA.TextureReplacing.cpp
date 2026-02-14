@@ -4771,12 +4771,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
             // External refs remain or not all textures could be orphaned.
             // Keep the MTA pin active so the hook won't trigger
             // CStreaming::RemoveModel while the slot is alive.
-            const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(usIsolatedTxdId).second;
-            if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
-            {
-                AddReportLog(9401,
-                             SString("CleanupIsolatedTxdForModel: Orphaned isolated TXD %u (refs=%d)", usIsolatedTxdId, CTxdStore_GetNumRefs(usIsolatedTxdId)));
-            }
+            g_OrphanedIsolatedTxdSlots.insert(usIsolatedTxdId);
         }
     }
     else
@@ -6276,8 +6271,6 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     std::size_t skippedNoTxd = 0;
     std::size_t skippedMismatch = 0;
 
-    AddReportLog(9401, SString("TXD restore: ms_ModelTexturesInfoMap has %u entries", static_cast<unsigned int>(ms_ModelTexturesInfoMap.size())));
-
     for (auto& entry : ms_ModelTexturesInfoMap)
     {
         CModelTexturesInfo& info = entry.second;
@@ -6382,12 +6375,6 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             ++restoredTxdCount;
         }
     }
-
-    AddReportLog(9401,
-                 SString("TXD restore: %u restored, %u removed, %u re-added | skip: %u leaked, %u active, %u noOrig, %u noTxd, %u mismatch",
-                         static_cast<unsigned int>(restoredTxdCount), static_cast<unsigned int>(removedReplacementCount),
-                         static_cast<unsigned int>(restoredOriginalCount), static_cast<unsigned int>(skippedLeaked), static_cast<unsigned int>(skippedActive),
-                         static_cast<unsigned int>(skippedNoOriginals), static_cast<unsigned int>(skippedNoTxd), static_cast<unsigned int>(skippedMismatch)));
 
     // Release the GetModelTexturesInfo ref for clean game-TXD entries.
     // These refs were added by DebugTxdAddRef in GetModelTexturesInfo but never
@@ -6499,8 +6486,6 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                     // (e.g. materials still reference this copy). Null the raster to prevent
                     // dangling pointers. If both a master and its copy take this path,
                     // the raster leaks - better than crashing.
-                    if (!bRasterAlreadyFreed && pMaster->refs > 1)
-                        AddReportLog(9401, SString("StaticReset: texture %p has refs=%d, using SafeDestroy", pMaster, pMaster->refs));
                     SafeDestroyTexture(pMaster);
                 }
                 else
