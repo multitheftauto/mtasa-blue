@@ -5889,6 +5889,19 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
             AddReportLog(
                 9401, SString("StaticResetModelTextureReplacing: %u TXD slots remain leaked", static_cast<unsigned int>(g_PermanentlyLeakedTxdSlots.size())));
         }
+
+        // Queue previously-leaked slots for mop-up retry later in this function.
+        // External refs may have been released since the last session, allowing
+        // tryMopUpTxd to free them now. Without this, leaked slots accumulate
+        // permanently in the TXD pool, shrinking available capacity each session.
+        for (unsigned short txdId : g_PermanentlyLeakedTxdSlots)
+        {
+            if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
+                g_PendingLeakedTxdRefs.insert(txdId);
+            else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", txdId));
+        }
+
         g_PermanentlyLeakedTxdSlots.clear();
     }
 
@@ -5935,6 +5948,10 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                     {
                         if (IsStreamingInfoSlot(txdId))
                             SetStreamingInfoLeaked(txdId);
+                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
+                            g_PendingLeakedTxdRefs.insert(txdId);
+                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                            AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", txdId));
                         g_PermanentlyLeakedTxdSlots.insert(txdId);
                         it = g_OrphanedIsolatedTxdSlots.erase(it);
                         continue;
