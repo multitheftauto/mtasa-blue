@@ -24,6 +24,7 @@ public:
 
     virtual void ExtinguishPoint(const CVector& position, float radius) = 0;
     virtual bool ExtinguishPointWithWater(const CVector& position, float radius, float waterStrength) = 0;
+    virtual void ExtinguishAllFires() = 0;
 
     virtual std::uint32_t GetNumFiresInRange(const CVector& position, float radius) const = 0;
     virtual bool PlentyFiresAvailable() = 0;

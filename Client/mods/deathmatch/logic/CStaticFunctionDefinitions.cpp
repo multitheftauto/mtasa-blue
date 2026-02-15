@@ -4642,7 +4642,7 @@ bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, fl
 
 bool CStaticFunctionDefinitions::ExtinguishAllFires()
 {
-    //g_pGame->GetFireManager()->ExtinguishAllFires();
+    g_pGame->GetFireManager()->ExtinguishAllFires();
     return true;
 }
 

@@ -41,7 +41,6 @@ CFire* CFireManagerSA::StartFire(const CVector& position, float size, CEntity* c
     if (waterLevel > position.fZ)
         return nullptr;
 
-    // Wywolac handler z klienta, aby utworzyc CClientFire i dopiero tam CFireSA
     m_Fires.push_back(std::make_unique<CFireSA>(this, creator, position, lifetime, numGenerationsAllowed));
     return m_Fires.back().get();
 }
@@ -72,8 +71,6 @@ CFire* CFireManagerSA::StartFire(CEntity* target, CEntity* creator, std::uint32_
         default:
             break;
     }
-
-    // Wywolac handler z klienta, aby utworzyc CClientFire i dopiero tam CFireSA
 
     m_Fires.push_back(std::make_unique<CFireSA>(this, creator, target, lifetime, numGenerationsAllowed));
     return m_Fires.back().get();
@@ -162,6 +159,12 @@ bool CFireManagerSA::ExtinguishPointWithWater(const CVector& position, float rad
     }
 
     return anyFireExtinguished;
+}
+
+void CFireManagerSA::ExtinguishAllFires()
+{
+    for (auto& fire : m_Fires)
+        fire->Extinguish();
 }
 
 bool CFireManagerSA::PlentyFiresAvailable()

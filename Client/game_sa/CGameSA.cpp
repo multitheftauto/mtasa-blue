@@ -454,7 +454,7 @@ void CGameSA::Reset()
     if (GetSystemState() == SystemState::GS_PLAYING_GAME)
     {
         // Extinguish all fires
-        //m_pFireManager->ExtinguishAllFires();
+        m_pFireManager->ExtinguishAllFires();
 
         // Restore camera stuff
         m_pCamera->Restore();

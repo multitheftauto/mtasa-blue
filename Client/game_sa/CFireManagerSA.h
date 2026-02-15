@@ -37,6 +37,7 @@ public:
 
     void ExtinguishPoint(const CVector& position, float radius) override;
     bool ExtinguishPointWithWater(const CVector& position, float radius, float waterStrength) override;
+    void ExtinguishAllFires() override;
 
     bool          PlentyFiresAvailable() override;
     std::uint32_t GetNumFiresInRange(const CVector& position, float radius) const override;
