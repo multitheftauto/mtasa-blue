@@ -33,7 +33,7 @@ CFireManagerSA::~CFireManagerSA()
     m_Fires.clear();
 }
 
-CFire* CFireManagerSA::StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed)
+CFire* CFireManagerSA::StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed, bool makeNoise)
 {
     // Call CWaterLevel::GetWaterLevelNoWaves
     float waterLevel = 0.0f;
@@ -41,11 +41,11 @@ CFire* CFireManagerSA::StartFire(const CVector& position, float size, CEntity* c
     if (waterLevel > position.fZ)
         return nullptr;
 
-    m_Fires.push_back(std::make_unique<CFireSA>(this, creator, position, lifetime, numGenerationsAllowed));
+    m_Fires.push_back(std::make_unique<CFireSA>(this, creator, position, lifetime, numGenerationsAllowed, makeNoise));
     return m_Fires.back().get();
 }
 
-CFire* CFireManagerSA::StartFire(CEntity* target, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed)
+CFire* CFireManagerSA::StartFire(CEntity* target, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed, bool makeNoise)
 {
     if (target->IsOnFire() || target->IsFireProof())
         return nullptr;
@@ -72,7 +72,7 @@ CFire* CFireManagerSA::StartFire(CEntity* target, CEntity* creator, std::uint32_
             break;
     }
 
-    m_Fires.push_back(std::make_unique<CFireSA>(this, creator, target, lifetime, numGenerationsAllowed));
+    m_Fires.push_back(std::make_unique<CFireSA>(this, creator, target, lifetime, numGenerationsAllowed, makeNoise));
     return m_Fires.back().get();
 }
 

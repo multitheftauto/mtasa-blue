@@ -77,10 +77,10 @@ static void __declspec(naked) HOOK_CFire_Extinguish()
     // clang-format on
 }
 
-CFireSA::CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed)
+CFireSA::CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed, bool makeNoise)
     : m_fireManager{fireMgr}, m_creator{creator}
 {
-    SetSilent(false);
+    SetSilent(!makeNoise);
     SetActive(true);
     SetLifetime(pGame->GetSystemTime() + static_cast<std::uint32_t>(GetRandomNumberInRange(1.0f, 1.3f) * static_cast<float>(lifetime)));
     SetNumGenerationsAllowed(numGenerationsAllowed);
@@ -89,10 +89,10 @@ CFireSA::CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, st
     SetStrength(1.0f);
 }
 
-CFireSA::CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CEntity* target, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed)
+CFireSA::CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CEntity* target, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed, bool makeNoise)
     : m_fireManager{fireMgr}, m_creator{creator}, m_entityOnFire{target}
 {
-    SetSilent(false);
+    SetSilent(!makeNoise);
     SetActive(true);
     SetNumGenerationsAllowed(numGenerationsAllowed);
     SetCreator(creator);
@@ -135,6 +135,13 @@ void CFireSA::Extinguish()
 {
     if (!IsActive())
         return;
+
+    // If the fire was created by a script, we need to remove CClientFire object
+    if (IsCreatedByScript())
+    {
+        if (m_fireManager->m_destructionHandler)
+            m_fireManager->m_destructionHandler(this);
+    }
 
     SetLifetime(0);
 
@@ -339,7 +346,7 @@ void CFireSA::ProcessFire()
             {
                 // CPlayerPed::DoStuffToGoOnFire
                 ((void(__thiscall*)(CPedSAInterface*))0x60A020)(player->GetPedInterface());
-                m_fireManager->StartFire(player, m_creator, 7000u, 100);
+                m_fireManager->StartFire(player, m_creator, 7000u, 100, !IsSilent());
             }
         }
     }
@@ -366,14 +373,14 @@ void CFireSA::ProcessFire()
                 CPed* player = pGame->GetPedContext();
                 // CPlayerPed::DoStuffToGoOnFire
                 ((void(__thiscall*)(CPedSAInterface*))0x60A020)(player->GetPedInterface());
-                m_fireManager->StartFire(player, m_creator, 7000u, 100);
+                m_fireManager->StartFire(player, m_creator, 7000u, 100, !IsSilent());
 
                 int tyre = ((int(__thiscall*)(CVehicleSAInterface*, CVector2D))0x6D7BC0)(vehicleInterface,
                                                                                          CVector2D(firePosition.fX, firePosition.fY));
                 vehicleInterface->BurstTyre(tyre + 13, false);
             }
             else
-                m_fireManager->StartFire(pEntitySA, m_creator, 7000, 100);
+                m_fireManager->StartFire(pEntitySA, m_creator, 7000, 100, !IsSilent());
         }
     }
 

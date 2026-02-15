@@ -330,11 +330,6 @@ public:
     static bool CreateExplosion(CVector& vecPosition, unsigned char ucType, bool bMakeSound, float fCamShake, bool bDamaging);
     static bool DetonateSatchels();
 
-    // Fire funcs
-    static bool CreateFire(CVector& vecPosition, float fSize);
-    static bool ExtinguishFireInRadius(CVector& vecPosition, float fRadius);
-    static bool ExtinguishAllFires();
-
     // Light funcs
     static CClientPointLights* CreateLight(CResource& Resource, int iMode, const CVector& vecPosition, float fRadius, SColor color, CVector& vecDirection);
     static bool                GetLightType(CClientPointLights* pLight, int& iMode);

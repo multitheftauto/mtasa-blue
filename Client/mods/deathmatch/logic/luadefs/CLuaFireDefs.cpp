@@ -9,12 +9,13 @@
  *****************************************************************************/
 #include "StdInc.h"
 #include "CLuaFireDefs.h"
+#include "game/CFireManager.h"
 
 void CLuaFireDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createFire", CreateFire},
-        {"extinguishFire", ExtinguishFire},
+        {"createFire", ArgumentParserWarn<false, CreateFire>},
+        {"extinguishFire", ArgumentParserWarn<false, ExtinguishFire>},
     };
 
     // Add functions
@@ -22,59 +23,20 @@ void CLuaFireDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
-int CLuaFireDefs::CreateFire(lua_State* luaVM)
+CClientFire* CLuaFireDefs::CreateFire(CVector position, float size, std::optional<std::uint32_t> lifetime, std::optional<bool> makeNoise)
 {
-    // bool createFire ( float x, float y, float z [, float size = 1.8 ] )
-    CVector vecPosition;
-    float   fSize;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fSize, 1.8f);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::CreateFire(vecPosition, fSize))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CClientFire* fire = new CClientFire(m_pManager->GetFireManager(), position, size, lifetime.value_or(0), makeNoise.value_or(true));
+    return fire;
 }
 
-int CLuaFireDefs::ExtinguishFire(lua_State* luaVM)
+bool CLuaFireDefs::ExtinguishFire(std::optional<CVector> position, std::optional<float> radius)
 {
-    // bool extinguishFire ( [ float x, float y, float z [, float radius = 1.0 ] ] )
-    CScriptArgReader argStream(luaVM);
-
-    if (argStream.NextIsNone())
+    if (!position.has_value())
     {
-        lua_pushboolean(luaVM, CStaticFunctionDefinitions::ExtinguishAllFires());
-        return 1;
+        g_pGame->GetFireManager()->ExtinguishAllFires();
+        return true; // backwards compatibilty
     }
 
-    CVector vecPosition;
-    float   fRadius;
-
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fRadius, 1.0f);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::ExtinguishFireInRadius(vecPosition, fRadius))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    g_pGame->GetFireManager()->ExtinguishPoint(position.value(), radius.value_or(1.0f));
+    return true; // backwards compatibilty
 }

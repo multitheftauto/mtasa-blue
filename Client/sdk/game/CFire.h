@@ -27,4 +27,11 @@ public:
 
     virtual void  SetStrength(float strength, bool updateFX = true) = 0;
     virtual float GetStrength() const noexcept = 0;
+
+    virtual void SetLifetime(std::uint32_t lifetime) noexcept = 0;
+    virtual std::uint32_t GetLifetime() const noexcept = 0;
+
+    // Created by lua script - createFire
+    virtual void SetCreatedByScript(bool createdByScript) noexcept = 0;
+    virtual bool IsCreatedByScript() const noexcept = 0;
 };

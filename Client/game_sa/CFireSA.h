@@ -52,8 +52,8 @@ class CFireSA : public CFire
     friend class CFireManagerSA;
 
 public:
-    CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100);
-    CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CEntity* target, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100);
+    CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true);
+    CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CEntity* target, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true);
 
     CFireSAInterface* GetInterface() noexcept { return &m_interface; }
 
@@ -72,14 +72,17 @@ public:
     std::uint8_t GetNumGenerationsAllowed() const noexcept { return m_interface.m_numGenerationsAllowed; }
     void         SetNumGenerationsAllowed(std::uint8_t numGenerationsAllowed) noexcept { m_interface.m_numGenerationsAllowed = numGenerationsAllowed; }
 
-    std::uint32_t GetLifetime() const noexcept { return m_interface.m_lifetime; }
-    void SetLifetime(std::uint32_t lifetime) noexcept { m_interface.m_lifetime = lifetime; }
+    std::uint32_t GetLifetime() const noexcept override { return m_interface.m_lifetime; }
+    void SetLifetime(std::uint32_t lifetime) noexcept override { m_interface.m_lifetime = lifetime; }
 
     void     SetPosition(const CVector& position, bool updateParticle = false) override;
     CVector& GetPosition() noexcept override { return m_interface.m_position; }
 
     float GetStrength() const noexcept override { return m_interface.m_strength; }
     void  SetStrength(float strength, bool updateFX = true) override;
+
+    void SetCreatedByScript(bool createdByScript) noexcept override { m_interface.m_flags.createdByScript = createdByScript; }
+    bool IsCreatedByScript() const noexcept override { return m_interface.m_flags.createdByScript; }
 
     void ProcessFire();
 
@@ -89,6 +92,7 @@ private:
     CFireSAInterface m_interface{};
     CEntity*         m_entityOnFire{nullptr};
     CEntity*         m_creator{nullptr};
+    bool             m_createdByScript{false}; // created by createFire function
 
     CFireManagerSA* m_fireManager{nullptr};
 

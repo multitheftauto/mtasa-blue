@@ -20,16 +20,20 @@ class CFireSAInterface;
 
 class CFireManagerSA : public CFireManager
 {
+    friend class CFireSA;
+
 private:
     std::vector<std::unique_ptr<CFireSA>> m_Fires;
     std::vector<bool>                     m_Visited;
+
+    FireDestructionHandler m_destructionHandler{nullptr};
 
 public:
     CFireManagerSA();
     ~CFireManagerSA();
 
-    CFire* StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100) override;
-    CFire* StartFire(CEntity* target, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100) override;
+    CFire* StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true) override;
+    CFire* StartFire(CEntity* target, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true) override;
     CFire* FindNearestFire(CVector* position, bool checkExtinguished, bool checkScript) override;
     CFireSA* GetRandomFire() const noexcept;
 
@@ -45,13 +49,7 @@ public:
 
     void Update();
 
-    //CFire* StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize);
-    //CFire* StartFire(CVector& vecPosition, float fSize);
-    //void   ExtinguishAllFires();
-    //CFire* GetFire(DWORD ID);
-    //DWORD  GetFireCount();
-    //CFire* FindFreeFire();
-    //CFire* GetFire(CFireSAInterface* fire);
+    void        SetFireDestructionHandler(FireDestructionHandler destructionHandler) noexcept override { m_destructionHandler = destructionHandler; }
 
     static void StaticSetHooks();
 

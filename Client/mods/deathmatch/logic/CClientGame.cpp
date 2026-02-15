@@ -37,6 +37,7 @@
 #include "game/CClock.h"
 #include <game/CProjectileInfo.h>
 #include <game/CVehicleAudioSettingsManager.h>
+#include <game/CFireManager.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 #include "CClientPed.h"
@@ -343,6 +344,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Disable GTA's pickup processing as we want to confirm the hits with the server
     m_pPickupManager->SetPickupProcessingDisabled(true);
 
+    g_pGame->GetFireManager()->SetFireDestructionHandler(CClientFire::OnGameFireDestroyed);
+
     // Key-bind for fire-key (for handling satchels and stealth-kills)
     g_pCore->GetKeyBinds()->AddControlFunction("fire", CClientGame::StaticUpdateFireKey, true);
 
@@ -527,6 +530,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
     g_pMultiplayer->SetAudioZoneRadioSwitchHandler(nullptr);
+    g_pGame->GetFireManager()->SetFireDestructionHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
