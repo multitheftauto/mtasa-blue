@@ -1155,8 +1155,10 @@ void CModelInfoSA::ResetTextureDictionaryID()
 
     const auto targetId = static_cast<unsigned short>(it->second);
 
-    // If target TXD no longer exists, clean up stale entry and return
-    if (CTxdStore_GetTxd(targetId) == nullptr)
+    // If the target TXD pool slot was freed, we can't restore to it.
+    // When the slot is allocated but its data is unloaded (rwTexDictionary
+    // null), let SetTextureDictionaryID handle it -- it supports that case.
+    if (pGame && pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(targetId))
     {
         ms_DefaultTxdIDMap.erase(it);
         return;
