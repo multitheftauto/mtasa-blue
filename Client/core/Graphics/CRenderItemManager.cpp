@@ -556,6 +556,12 @@ void CRenderItemManager::UpdateBackBufferCopy()
         return;
 
     // Copy back buffer into our private render target
+    if (!m_pBackBufferCopy->m_pD3DRenderTargetSurface)
+    {
+        SAFE_RELEASE(pD3DBackBufferSurface);
+        return;
+    }
+
     D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
     const HRESULT        hr = m_pDevice->StretchRect(pD3DBackBufferSurface, nullptr, m_pBackBufferCopy->m_pD3DRenderTargetSurface, nullptr, FilterType);
     if (SUCCEEDED(hr))
@@ -601,8 +607,11 @@ void CRenderItemManager::UpdateScreenSource(CScreenSourceItem* pScreenSourceItem
             return;
 
         // Copy back buffer into our private render target
-        D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
-        HRESULT              hr = m_pDevice->StretchRect(pD3DBackBufferSurface, nullptr, pScreenSourceItem->m_pD3DRenderTargetSurface, nullptr, FilterType);
+        if (pScreenSourceItem->m_pD3DRenderTargetSurface)
+        {
+            D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
+            m_pDevice->StretchRect(pD3DBackBufferSurface, nullptr, pScreenSourceItem->m_pD3DRenderTargetSurface, nullptr, FilterType);
+        }
 
         // Clean up
         SAFE_RELEASE(pD3DBackBufferSurface);
@@ -615,7 +624,7 @@ void CRenderItemManager::UpdateScreenSource(CScreenSourceItem* pScreenSourceItem
 
     pScreenSourceItem->m_uiRevision = m_uiBackBufferCopyRevision;
 
-    if (m_pBackBufferCopy)
+    if (m_pBackBufferCopy && m_pBackBufferCopy->m_pD3DRenderTargetSurface && pScreenSourceItem->m_pD3DRenderTargetSurface)
     {
         D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
         m_pDevice->StretchRect(m_pBackBufferCopy->m_pD3DRenderTargetSurface, nullptr, pScreenSourceItem->m_pD3DRenderTargetSurface, nullptr, FilterType);
@@ -1604,6 +1613,9 @@ void CRenderItemManager::FlushNonAARenderTarget()
 HRESULT CRenderItemManager::HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface,
                                               CONST RECT* pDestRect, int Filter)
 {
+    if (!pSourceSurface || !pDestSurface)
+        return D3DERR_INVALIDCALL;
+
     const HRESULT hrDeviceState = GetDeviceCooperativeLevel("HandleStretchRect");
     if (hrDeviceState != D3D_OK)
         return hrDeviceState;
@@ -1613,14 +1625,15 @@ HRESULT CRenderItemManager::HandleStretchRect(IDirect3DSurface9* pSourceSurface,
         // If trying to copy from the saved render target, use the active render target instead
         IDirect3DSurface9* pActiveRenderTarget = nullptr;
         const HRESULT      hrGetRenderTarget = m_pDevice->GetRenderTarget(0, &pActiveRenderTarget);
-        if (SUCCEEDED(hrGetRenderTarget))
+        if (SUCCEEDED(hrGetRenderTarget) && pActiveRenderTarget)
         {
             const HRESULT hrStretch = m_pDevice->StretchRect(pActiveRenderTarget, pSourceRect, pDestSurface, pDestRect, (D3DTEXTUREFILTERTYPE)Filter);
             SAFE_RELEASE(pActiveRenderTarget);
             return hrStretch;
         }
 
-        return hrGetRenderTarget;
+        SAFE_RELEASE(pActiveRenderTarget);
+        return SUCCEEDED(hrGetRenderTarget) ? D3DERR_INVALIDCALL : hrGetRenderTarget;
     }
 
     return m_pDevice->StretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, (D3DTEXTUREFILTERTYPE)Filter);
