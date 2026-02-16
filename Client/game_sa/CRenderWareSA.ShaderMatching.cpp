@@ -190,6 +190,10 @@ STexShaderReplacement* CMatchChannelManager::UpdateTexShaderReplacement(STexName
         // If not done yet for this entity, needs to be done
         MapSet(pTexNameInfo->texEntityShaderMap, pClientEntity, STexShaderReplacement());
         pTexShaderReplacement = MapFind(pTexNameInfo->texEntityShaderMap, pClientEntity);
+
+        // Track which STexNameInfo entries reference this entity for fast cleanup
+        if (pClientEntity)
+            MapInsert(m_EntityToTexNameInfos[pClientEntity], pTexNameInfo);
     }
 
     if (!pTexShaderReplacement->bSet || !pTexShaderReplacement->bValid)
@@ -444,10 +448,15 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
         // This could be optimized
     }
 
-    // Need to remove client entity entries that were used even though they had no matches
-    for (const auto& pair : m_AllTextureList)
+    // Remove cached entity shader entries using reverse index instead of scanning all textures
+    auto itTexNames = m_EntityToTexNameInfos.find(pClientEntity);
+    if (itTexNames != m_EntityToTexNameInfos.end())
     {
-        MapRemove(pair.second->texEntityShaderMap, pClientEntity);
+        for (STexNameInfo* pTexNameInfo : itTexNames->second)
+        {
+            MapRemove(pTexNameInfo->texEntityShaderMap, pClientEntity);
+        }
+        m_EntityToTexNameInfos.erase(itTexNames);
     }
 
 #ifdef SHADER_DEBUG_CHECKS
@@ -1037,8 +1046,30 @@ void CMatchChannelManager::CleanupInvalidatedShaderCache()
     for (CFastHashMap<SString, STexNameInfo*>::iterator iter = m_AllTextureList.begin(); iter != m_AllTextureList.end(); ++iter)
     {
         STexNameInfo* pTexNameInfo = iter->second;
-        if (pTexNameInfo)
-            pTexNameInfo->CleanupInvalidatedEntries();
+        if (!pTexNameInfo)
+            continue;
+
+        // Collect entities being removed before cleanup
+        std::vector<CClientEntityBase*> removedEntities;
+        for (auto itMap = pTexNameInfo->texEntityShaderMap.begin(); itMap != pTexNameInfo->texEntityShaderMap.end(); ++itMap)
+        {
+            if (!itMap->second.bValid)
+                removedEntities.push_back(itMap->first);
+        }
+
+        pTexNameInfo->CleanupInvalidatedEntries();
+
+        // Update reverse index for removed entities
+        for (CClientEntityBase* pEntity : removedEntities)
+        {
+            auto itRev = m_EntityToTexNameInfos.find(pEntity);
+            if (itRev != m_EntityToTexNameInfos.end())
+            {
+                MapRemove(itRev->second, pTexNameInfo);
+                if (itRev->second.empty())
+                    m_EntityToTexNameInfos.erase(itRev);
+            }
+        }
     }
 }
 

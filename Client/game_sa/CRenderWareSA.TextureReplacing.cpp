@@ -6578,6 +6578,7 @@ void CRenderWareSA::StaticResetShaderSupport()
         }
         m_TexInfoMap.clear();
         m_D3DDataTexInfoMap.clear();
+        m_ScriptTexInfoMap.clear();
         return;
     }
 
