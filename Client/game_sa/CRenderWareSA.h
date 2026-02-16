@@ -184,6 +184,8 @@ public:
     // Watched world textures
     std::multimap<unsigned short, STexInfo*> m_TexInfoMap;
     CFastHashMap<CD3DDUMMY*, STexInfo*>      m_D3DDataTexInfoMap;
+    // Reverse lookup for script/special textures (keyed by RwTexture* tag)
+    std::unordered_map<const RwTexture*, STexInfo*> m_ScriptTexInfoMap;
     CClientEntityBase*                       m_pRenderingClientEntity;
     unsigned short                           m_usRenderingEntityModelId;
     int                                      m_iRenderingEntityType;

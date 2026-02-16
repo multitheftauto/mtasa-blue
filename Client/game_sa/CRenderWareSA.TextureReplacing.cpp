@@ -183,6 +183,7 @@ namespace
     bool g_bInTxdReapply = false;
 
     RwTexDictionary* g_pCachedVehicleTxd = nullptr;
+    RwListEntry*     g_pCachedVehicleTxdListHead = nullptr;  // textures.root.next at cache time; detects texture rebuild at same TXD address
     TxdTextureMap    g_CachedVehicleTxdMap;
     unsigned short   g_usVehicleTxdSlotId = 0xFFFF;
 
@@ -244,14 +245,19 @@ namespace
     constexpr uint32_t      PENDING_ISOLATION_TIMEOUT_MS = 15000;
     constexpr std::size_t   MAX_PENDING_ISOLATED_PER_TICK = 64;
 
-    // Per-TXD texture map cache to avoid repeated linked list iter
-    // Cache is keyed by TXD slot ID and validated by TXD pointer comparison
+    // Per-TXD texture map cache to avoid repeated linked list iteration.
+    // Keyed by TXD slot ID; validated by TXD pointer and texture list head
+    // (the list head catches TXD rebuilds at the same pool address).
     struct SCachedTxdTextureMap
     {
-        RwTexDictionary* pTxd = nullptr;  // TXD pointer at cache time (detects reload/slot reuse)
-        TxdTextureMap    textureMap;      // Cached texture name > texture map
+        RwTexDictionary* pTxd = nullptr;       // TXD pointer at cache time (detects reload/slot reuse)
+        RwListEntry*     pListHead = nullptr;  // textures.root.next at cache time (detects texture rebuild at same TXD address)
+        TxdTextureMap    textureMap;            // Cached texture name > texture map
 
-        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept { return pTxd != nullptr && pTxd == pCurrentTxd; }
+        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
+        {
+            return pTxd != nullptr && pTxd == pCurrentTxd && pListHead == pCurrentTxd->textures.root.next;
+        }
     };
     std::unordered_map<unsigned short, SCachedTxdTextureMap> g_TxdTextureMapCache;
 
@@ -288,6 +294,7 @@ namespace
         }
 
         entry.pTxd = pTxd;
+        entry.pListHead = pTxd->textures.root.next;
         // Use swap idiom to ensure complete memory release
         // (avoids reconnect leaks; safer than .clear() on potentially corrupted maps)
         TxdTextureMap temp;
@@ -328,7 +335,7 @@ namespace
         {
             auto& usedBy = entry.second.usedByReplacements;
             if (!usedBy.empty())
-                ListRemove(usedBy, pReplacementTextures);
+                ListRemoveUnordered(usedBy, pReplacementTextures);
         }
 
         if (!g_PendingReplacementByModel.empty())
@@ -407,7 +414,7 @@ namespace
             }
 
             pReplacement->usedInTxdIds.erase(usTxdId);
-            ListRemove(info.usedByReplacements, pReplacement);
+            ListRemoveUnordered(info.usedByReplacements, pReplacement);
         }
 
         info.usedByReplacements.clear();
@@ -1577,10 +1584,15 @@ namespace
         if (!pVehicleTxd)
             return;
 
-        if (pVehicleTxd != g_pCachedVehicleTxd)
+        // Check both TXD pointer and its texture list head.
+        // Streaming can destroy and reload a TXD at the same address (pool/allocator reuse),
+        // which leaves the cache with dangling texture name pointers.
+        RwListEntry* pListHead = pVehicleTxd->textures.root.next;
+        if (pVehicleTxd != g_pCachedVehicleTxd || pListHead != g_pCachedVehicleTxdListHead)
         {
             g_CachedVehicleTxdMap.clear();
             g_pCachedVehicleTxd = pVehicleTxd;
+            g_pCachedVehicleTxdListHead = pListHead;
             g_usVehicleTxdSlotId = 0xFFFF;
             BuildTxdTextureMapFast(pVehicleTxd, g_CachedVehicleTxdMap);
         }
@@ -4710,7 +4722,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
             }
 
             pReplacement->usedInTxdIds.erase(usIsolatedTxdId);
-            ListRemove(info.usedByReplacements, pReplacement);
+            ListRemoveUnordered(info.usedByReplacements, pReplacement);
         }
 
         info.usedByReplacements.clear();
@@ -4860,7 +4872,7 @@ void CRenderWareSA::CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId)
         }
 
         pReplacement->usedInTxdIds.erase(usTxdSlotId);
-        ListRemove(info.usedByReplacements, pReplacement);
+        ListRemoveUnordered(info.usedByReplacements, pReplacement);
     }
 
     info.usedByReplacements.clear();
@@ -4981,7 +4993,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             auto itInfo = ms_ModelTexturesInfoMap.find(txdId);
             if (itInfo != ms_ModelTexturesInfoMap.end())
             {
-                ListRemove(itInfo->second.usedByReplacements, pReplacementTextures);
+                ListRemoveUnordered(itInfo->second.usedByReplacements, pReplacementTextures);
             }
 
             // Drop any shader registrations we tracked for this replacement/txd pairing.
@@ -5149,7 +5161,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
             (void)originalsToDestroy;
 
-            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
 
             if (pInfo->usedByReplacements.empty())
@@ -5218,7 +5230,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             perTxdInfo.usingTextures.clear();
             perTxdInfo.replacedOriginals.clear();
 
-            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
 
             if (pInfo->usedByReplacements.empty())
@@ -5515,7 +5527,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                     leakedTextures.insert(pOrig);
                 }
             }
-            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
             if (pInfo->usedByReplacements.empty())
             {
@@ -5574,7 +5586,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             }
         }
 
-        ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+        ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
 
         if (pInfo->usedByReplacements.empty())
         {
@@ -5848,6 +5860,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_PendingIsolatedModelTimes.clear();
 
     g_pCachedVehicleTxd = nullptr;
+    g_pCachedVehicleTxdListHead = nullptr;
     g_CachedVehicleTxdMap = TxdTextureMap{};
     g_usVehicleTxdSlotId = 0xFFFF;
     ClearTxdTextureMapCache();
@@ -6565,6 +6578,7 @@ void CRenderWareSA::StaticResetShaderSupport()
         }
         m_TexInfoMap.clear();
         m_D3DDataTexInfoMap.clear();
+        m_ScriptTexInfoMap.clear();
         return;
     }
 

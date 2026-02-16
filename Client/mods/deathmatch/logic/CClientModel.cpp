@@ -20,6 +20,7 @@ CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelT
 
 CClientModel::~CClientModel(void)
 {
+    RestoreEntitiesUsingThisModel();
     Deallocate();
 }
 
@@ -315,7 +316,15 @@ void CClientModel::RestoreTXD()
             continue;
 
         if (pIter->GetTextureDictionaryID() == txdSlotId)
+        {
             pIter->ResetTextureDictionaryID();
+
+            // If still referencing this slot (no stored default, or the
+            // default's pool slot was freed), redirect to TXD 0 so
+            // streaming won't hit the freed slot later.
+            if (pIter->GetTextureDictionaryID() == txdSlotId)
+                pIter->SetTextureDictionaryID(0);
+        }
     }
 
     // Detach any replacement texture tracking from this TXD slot before the slot

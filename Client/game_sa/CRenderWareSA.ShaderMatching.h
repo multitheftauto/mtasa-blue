@@ -51,8 +51,21 @@ struct SWildcardMatchChain
     {
         bool bIsMatch = false;
         for (std::vector<SMatchType>::const_iterator iter = matchTypeList.begin(); iter != matchTypeList.end(); ++iter)
-            if (WildcardMatch(iter->strMatch, strTextureName))
+        {
+            const SString& strMatch = iter->strMatch;
+            bool            bMatches;
+
+            // Fast paths for common patterns (equivalent to WildcardMatch but avoids per-char loop)
+            if (strMatch.length() == 1 && strMatch[0] == '*')
+                bMatches = true;
+            else if (strMatch.find_first_of("*?") == SString::npos)
+                bMatches = (strMatch == strTextureName);
+            else
+                bMatches = WildcardMatch(strMatch, strTextureName);
+
+            if (bMatches)
                 bIsMatch = iter->bAdditive;
+        }
 
         return bIsMatch;
     }
@@ -296,7 +309,14 @@ protected:
     void                   FinalizeLayers(SShaderInfoLayers& shaderLayers);
 
     bool                                           m_bChangesPending;
+    CFastHashSet<STexNameInfo*>                     m_InvalidatedTexNameInfos;    // Textures with bValid=false entries needing deferred cleanup
     std::map<CShaderAndEntityPair, CMatchChannel*> m_ChannelUsageMap;
+    // Secondary index: entity > keys in m_ChannelUsageMap, for fast RemoveClientEntityRefs
+    std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>> m_EntityToChannelKeys;
+    // Secondary index: shader > keys in m_ChannelUsageMap, for fast RemoveShaderRefs
+    std::unordered_map<SShaderInfo*, std::vector<CShaderAndEntityPair>> m_ShaderToChannelKeys;
+    // Secondary index: entity > STexNameInfo entries in texEntityShaderMap, for fast cleanup
+    std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>> m_EntityToTexNameInfos;
     CFastHashSet<CMatchChannel*>                   m_CreatedChannelList;
     CFastHashSet<CMatchChannel*>                   m_OptimizeQueue;
     CFastHashSet<CMatchChannel*>                   m_RematchQueue;
