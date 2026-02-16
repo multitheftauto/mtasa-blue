@@ -686,7 +686,7 @@ UINT CProxyDirect3DDevice9::GetNumberOfSwapChains()
     return m_pDevice->GetNumberOfSwapChains();
 }
 
-static HRESULT TryResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, int crashAvertedBase, bool& bHardwareFaultOut)
+static HRESULT TryResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, uint crashAvertedBase, bool& bHardwareFaultOut)
 {
     HRESULT hResult = D3DERR_DEVICELOST;
     bHardwareFaultOut = false;
