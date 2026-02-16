@@ -59,17 +59,11 @@ struct STxdStreamEvent
 {
     STxdStreamEvent(bool bAdded, ushort usTxdId) : bAdded(bAdded), usTxdId(usTxdId) {}
 
-    bool operator<(const STxdStreamEvent& other) const
-    {
-        return usTxdId < other.usTxdId || (usTxdId == other.usTxdId && bAdded == false && other.bAdded == true);
-    }
-    bool operator==(const STxdStreamEvent& other) const { return usTxdId == other.usTxdId && bAdded == other.bAdded; }
-
     bool   bAdded;
     ushort usTxdId;
 };
 
-static CMappedArray<STxdStreamEvent> ms_txdStreamEventList;
+static std::vector<STxdStreamEvent> ms_txdStreamEventList;
 
 ////////////////////////////////////////////////////////////////
 // Txd created
@@ -77,11 +71,13 @@ static CMappedArray<STxdStreamEvent> ms_txdStreamEventList;
 __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 {
     ushort usTxdId = (ushort)dwTxdId;
-    // Ensure there are no previous events for this txd
-    ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));
-    ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
+    // Remove any previous events for this txd (erase-remove idiom)
+    ms_txdStreamEventList.erase(
+        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(),
+                       [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
+        ms_txdStreamEventList.end());
     // Append 'added'
-    ms_txdStreamEventList.push_back(STxdStreamEvent(true, usTxdId));
+    ms_txdStreamEventList.emplace_back(true, usTxdId);
 }
 
 // called from streaming on TXD create
@@ -112,11 +108,13 @@ static void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
     ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
-    // Ensure there are no previous events for this txd
-    ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
-    ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));
+    // Remove any previous events for this txd (erase-remove idiom)
+    ms_txdStreamEventList.erase(
+        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(),
+                       [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
+        ms_txdStreamEventList.end());
     // Append 'removed'
-    ms_txdStreamEventList.push_back(STxdStreamEvent(false, usTxdId));
+    ms_txdStreamEventList.emplace_back(false, usTxdId);
 }
 
 // called from streaming on TXD destroy
@@ -168,6 +166,25 @@ void CRenderWareSA::InitTextureWatchHooks()
 // Process ms_txdStreamEventList
 //
 ////////////////////////////////////////////////////////////////
+
+// SEH-protected texture field access; returns false on access violation
+static __declspec(noinline) bool TryReadTextureFields(RwTexture* texture, const char** ppName, CD3DDUMMY** ppD3DData)
+{
+    __try
+    {
+        *ppName = texture->name;
+        RwRaster* pRaster = texture->raster;
+        *ppD3DData = (pRaster != nullptr) ? static_cast<CD3DDUMMY*>(pRaster->renderResource) : nullptr;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        *ppName = nullptr;
+        *ppD3DData = nullptr;
+        return false;
+    }
+}
+
 void CRenderWareSA::PulseWorldTextureWatch()
 {
     UpdateModuleTickCount64();
@@ -193,16 +210,15 @@ void CRenderWareSA::PulseWorldTextureWatch()
             for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
             {
                 RwTexture* texture = *iter;
-
-                // Validate texture pointer (TXD could unload mid-iteration)
-                if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
+                if (!texture)
                     continue;
 
-                const char* szTextureName = texture->name;
-
-                // Check raster pointer
-                CD3DDUMMY* pD3DData =
-                    (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster))) ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+                // Read texture fields with SEH protection instead of per-field IsReadablePointer syscalls.
+                // The TXD was just streamed in so its textures are normally valid; SEH catches rare corruption.
+                const char* szTextureName = nullptr;
+                CD3DDUMMY*  pD3DData = nullptr;
+                if (!TryReadTextureFields(texture, &szTextureName, &pD3DData))
+                    continue;
 
                 if (!MapContains(m_SpecialTextures, texture))
                     StreamingAddedTexture(action.usTxdId, szTextureName, pD3DData);
@@ -371,19 +387,30 @@ void CRenderWareSA::ScriptAddedTxd(RwTexDictionary* pTxd)
 void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
 {
     TIMING_CHECKPOINT("+ScriptRemovedTexture");
-    // Find TexInfo for this script added texture
-    for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
+
+    // Use reverse lookup instead of full m_TexInfoMap scan
+    auto it = m_ScriptTexInfoMap.find(pTex);
+    if (it != m_ScriptTexInfoMap.end())
     {
-        STexInfo* pTexInfo = iter->second;
-        if (pTexInfo && pTexInfo->texTag == pTex)
+        STexInfo* pTexInfo = it->second;
+        if (pTexInfo)
         {
             OnTextureStreamOut(pTexInfo);
+            // Erase from m_TexInfoMap by scanning the TXD ID bucket
+            typedef std::multimap<ushort, STexInfo*>::iterator IterType;
+            std::pair<IterType, IterType> range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
+            for (IterType iter = range.first; iter != range.second; ++iter)
+            {
+                if (iter->second == pTexInfo)
+                {
+                    m_TexInfoMap.erase(iter);
+                    break;
+                }
+            }
             DestroyTexInfo(pTexInfo);
-            m_TexInfoMap.erase(iter++);
         }
-        else
-            ++iter;
     }
+
     TIMING_CHECKPOINT("-ScriptRemovedTexture");
 }
 
@@ -435,19 +462,28 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
 
     MapRemove(m_SpecialTextures, pTex);
 
-    // Find TexInfo for this special texture
-    for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
+    // Use reverse lookup instead of full m_TexInfoMap scan
+    auto it = m_ScriptTexInfoMap.find(pTex);
+    if (it != m_ScriptTexInfoMap.end())
     {
-        STexInfo* pTexInfo = iter->second;
-        if (pTexInfo && pTexInfo->texTag == pTex)
+        STexInfo* pTexInfo = it->second;
+        if (pTexInfo)
         {
             OutputDebug(SString("     %s", *pTexInfo->strTextureName));
             OnTextureStreamOut(pTexInfo);
+            // Erase from m_TexInfoMap by scanning the TXD ID bucket
+            typedef std::multimap<ushort, STexInfo*>::iterator IterType;
+            std::pair<IterType, IterType> range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
+            for (IterType iter = range.first; iter != range.second; ++iter)
+            {
+                if (iter->second == pTexInfo)
+                {
+                    m_TexInfoMap.erase(iter);
+                    break;
+                }
+            }
             DestroyTexInfo(pTexInfo);
-            m_TexInfoMap.erase(iter++);
         }
-        else
-            ++iter;
     }
 }
 
@@ -476,6 +512,11 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
 
     // Add to D3DData lookup map
     MapSet(m_D3DDataTexInfoMap, pTexInfo->pD3DData, pTexInfo);
+
+    // Add to script texture reverse lookup if tagged by a real RwTexture*
+    if (!texTag.m_bUsingTxdId && texTag.m_pTex && texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE)
+        m_ScriptTexInfoMap[texTag.m_pTex] = pTexInfo;
+
     return pTexInfo;
 }
 
@@ -496,6 +537,14 @@ void CRenderWareSA::DestroyTexInfo(STexInfo* pTexInfo)
     if (pCurrentEntry == pTexInfo)
     {
         MapRemove(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
+    }
+
+    // Remove from script texture reverse lookup
+    if (!pTexInfo->texTag.m_bUsingTxdId && pTexInfo->texTag.m_pTex && pTexInfo->texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE)
+    {
+        auto it = m_ScriptTexInfoMap.find(pTexInfo->texTag.m_pTex);
+        if (it != m_ScriptTexInfoMap.end() && it->second == pTexInfo)
+            m_ScriptTexInfoMap.erase(it);
     }
 
     delete pTexInfo;

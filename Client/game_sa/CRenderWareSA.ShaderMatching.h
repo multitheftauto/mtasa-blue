@@ -312,6 +312,8 @@ protected:
     std::map<CShaderAndEntityPair, CMatchChannel*> m_ChannelUsageMap;
     // Secondary index: entity > keys in m_ChannelUsageMap, for fast RemoveClientEntityRefs
     std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>> m_EntityToChannelKeys;
+    // Secondary index: entity > STexNameInfo entries in texEntityShaderMap, for fast cleanup
+    std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>> m_EntityToTexNameInfos;
     CFastHashSet<CMatchChannel*>                   m_CreatedChannelList;
     CFastHashSet<CMatchChannel*>                   m_OptimizeQueue;
     CFastHashSet<CMatchChannel*>                   m_RematchQueue;
