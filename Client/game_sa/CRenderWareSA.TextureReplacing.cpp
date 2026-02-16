@@ -335,7 +335,7 @@ namespace
         {
             auto& usedBy = entry.second.usedByReplacements;
             if (!usedBy.empty())
-                ListRemove(usedBy, pReplacementTextures);
+                ListRemoveUnordered(usedBy, pReplacementTextures);
         }
 
         if (!g_PendingReplacementByModel.empty())
@@ -414,7 +414,7 @@ namespace
             }
 
             pReplacement->usedInTxdIds.erase(usTxdId);
-            ListRemove(info.usedByReplacements, pReplacement);
+            ListRemoveUnordered(info.usedByReplacements, pReplacement);
         }
 
         info.usedByReplacements.clear();
@@ -4722,7 +4722,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
             }
 
             pReplacement->usedInTxdIds.erase(usIsolatedTxdId);
-            ListRemove(info.usedByReplacements, pReplacement);
+            ListRemoveUnordered(info.usedByReplacements, pReplacement);
         }
 
         info.usedByReplacements.clear();
@@ -4872,7 +4872,7 @@ void CRenderWareSA::CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId)
         }
 
         pReplacement->usedInTxdIds.erase(usTxdSlotId);
-        ListRemove(info.usedByReplacements, pReplacement);
+        ListRemoveUnordered(info.usedByReplacements, pReplacement);
     }
 
     info.usedByReplacements.clear();
@@ -4993,7 +4993,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             auto itInfo = ms_ModelTexturesInfoMap.find(txdId);
             if (itInfo != ms_ModelTexturesInfoMap.end())
             {
-                ListRemove(itInfo->second.usedByReplacements, pReplacementTextures);
+                ListRemoveUnordered(itInfo->second.usedByReplacements, pReplacementTextures);
             }
 
             // Drop any shader registrations we tracked for this replacement/txd pairing.
@@ -5161,7 +5161,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
             (void)originalsToDestroy;
 
-            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
 
             if (pInfo->usedByReplacements.empty())
@@ -5230,7 +5230,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             perTxdInfo.usingTextures.clear();
             perTxdInfo.replacedOriginals.clear();
 
-            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
 
             if (pInfo->usedByReplacements.empty())
@@ -5527,7 +5527,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                     leakedTextures.insert(pOrig);
                 }
             }
-            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
             if (pInfo->usedByReplacements.empty())
             {
@@ -5586,7 +5586,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             }
         }
 
-        ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+        ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
 
         if (pInfo->usedByReplacements.empty())
         {

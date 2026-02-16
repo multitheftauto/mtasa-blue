@@ -404,20 +404,26 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
     OutputDebug(SString("RemoveClientEntityRefs - Entity:%s", GetDebugTag(pClientEntity)));
 
     CFastHashSet<CMatchChannel*> affectedChannels;
-    for (std::map<CShaderAndEntityPair, CMatchChannel*>::iterator iter = m_ChannelUsageMap.begin(); iter != m_ChannelUsageMap.end();)
+
+    // Use secondary index (entries-per-entity) instead of scanning all m_ChannelUsageMap entries
+    auto itEntity = m_EntityToChannelKeys.find(pClientEntity);
+    if (itEntity != m_EntityToChannelKeys.end())
     {
-        if (pClientEntity == iter->first.pClientEntity)
+        for (const CShaderAndEntityPair& key : itEntity->second)
         {
-            CMatchChannel* pChannel = iter->second;
-            if (pChannel)
+            auto itUsage = m_ChannelUsageMap.find(key);
+            if (itUsage != m_ChannelUsageMap.end())
             {
-                pChannel->RemoveShaderAndEntity(iter->first);
-                MapInsert(affectedChannels, pChannel);
+                CMatchChannel* pChannel = itUsage->second;
+                if (pChannel)
+                {
+                    pChannel->RemoveShaderAndEntity(key);
+                    MapInsert(affectedChannels, pChannel);
+                }
+                m_ChannelUsageMap.erase(itUsage);
             }
-            m_ChannelUsageMap.erase(iter++);
         }
-        else
-            ++iter;
+        m_EntityToChannelKeys.erase(itEntity);
     }
 
     // Flag affected textures to re-calc shader results
@@ -477,11 +483,32 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
     {
         if (pShaderInfo == iter->first.pShaderInfo)
         {
+            const CShaderAndEntityPair& key = iter->first;
             CMatchChannel* pChannel = iter->second;
             if (pChannel)
             {
-                pChannel->RemoveShaderAndEntity(iter->first);
+                pChannel->RemoveShaderAndEntity(key);
                 MapInsert(affectedChannels, pChannel);
+            }
+            // Maintain entity secondary index
+            if (key.pClientEntity)
+            {
+                auto itEnt = m_EntityToChannelKeys.find(key.pClientEntity);
+                if (itEnt != m_EntityToChannelKeys.end())
+                {
+                    auto& vec = itEnt->second;
+                    for (std::size_t i = 0; i < vec.size(); ++i)
+                    {
+                        if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                        {
+                            vec[i] = vec.back();
+                            vec.pop_back();
+                            break;
+                        }
+                    }
+                    if (vec.empty())
+                        m_EntityToChannelKeys.erase(itEnt);
+                }
             }
             m_ChannelUsageMap.erase(iter++);
         }
@@ -814,6 +841,8 @@ void CMatchChannelManager::AddUsage(const CShaderAndEntityPair& key, CMatchChann
     dassert(!MapContains(m_ChannelUsageMap, key));
     pChannel->AddShaderAndEntity(key);
     MapSet(m_ChannelUsageMap, key, pChannel);
+    if (key.pClientEntity)
+        m_EntityToChannelKeys[key.pClientEntity].push_back(key);
     pChannel->m_bResetReplacements = true;
 }
 
@@ -830,6 +859,25 @@ void CMatchChannelManager::RemoveUsage(const CShaderAndEntityPair& key, CMatchCh
     dassert(MapContains(m_ChannelUsageMap, key));
     pChannel->RemoveShaderAndEntity(key);
     MapRemove(m_ChannelUsageMap, key);
+    if (key.pClientEntity)
+    {
+        auto it = m_EntityToChannelKeys.find(key.pClientEntity);
+        if (it != m_EntityToChannelKeys.end())
+        {
+            auto& vec = it->second;
+            for (std::size_t i = 0; i < vec.size(); ++i)
+            {
+                if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                {
+                    vec[i] = vec.back();
+                    vec.pop_back();
+                    break;
+                }
+            }
+            if (vec.empty())
+                m_EntityToChannelKeys.erase(it);
+        }
+    }
     pChannel->m_bResetReplacements = true;
 }
 
