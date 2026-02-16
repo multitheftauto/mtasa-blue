@@ -309,9 +309,12 @@ protected:
     void                   FinalizeLayers(SShaderInfoLayers& shaderLayers);
 
     bool                                           m_bChangesPending;
+    CFastHashSet<STexNameInfo*>                     m_InvalidatedTexNameInfos;    // Textures with bValid=false entries needing deferred cleanup
     std::map<CShaderAndEntityPair, CMatchChannel*> m_ChannelUsageMap;
     // Secondary index: entity > keys in m_ChannelUsageMap, for fast RemoveClientEntityRefs
     std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>> m_EntityToChannelKeys;
+    // Secondary index: shader > keys in m_ChannelUsageMap, for fast RemoveShaderRefs
+    std::unordered_map<SShaderInfo*, std::vector<CShaderAndEntityPair>> m_ShaderToChannelKeys;
     // Secondary index: entity > STexNameInfo entries in texEntityShaderMap, for fast cleanup
     std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>> m_EntityToTexNameInfos;
     CFastHashSet<CMatchChannel*>                   m_CreatedChannelList;
