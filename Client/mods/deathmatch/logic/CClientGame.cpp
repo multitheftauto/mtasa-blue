@@ -6149,6 +6149,12 @@ bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, c
         case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
             SetVehicleEngineAutoStartEnabled(enabled);
             break;
+        case WorldSpecialProperty::VEHICLES_VANILLA_DIRT:
+        {
+            g_pGame->SetVehiclesVannilaDirtEnabled(enabled);
+            m_pManager->GetVehicleManager()->RecreateStreamedVehiclesRwObject();
+            break;
+        }
         default:
             return false;
     }
@@ -6197,6 +6203,8 @@ bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
             return g_pGame->IsVehicleBurnExplosionsEnabled();
         case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
             return IsVehicleEngineAutoStartEnabled();
+        case WorldSpecialProperty::VEHICLES_VANILLA_DIRT:
+            return g_pGame->IsVehiclesVannilaDirtEnabled();
     }
 
     return false;
@@ -7002,6 +7010,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
         g_pGame->SetVehicleBurnExplosionsEnabled(true);
         SetVehicleEngineAutoStartEnabled(true);
+        g_pGame->SetVehiclesVannilaDirtEnabled(false);
     }
 
     // Reset all setWorldProperty to default

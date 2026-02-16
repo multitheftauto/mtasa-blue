@@ -108,6 +108,8 @@ typedef RpHAnimHierarchy*(__cdecl* GetAnimHierarchyFromSkinClump_t)(RpClump*);
 typedef int(__cdecl* RpHAnimIDGetIndex_t)(RpHAnimHierarchy*, int);
 typedef RwMatrix*(__cdecl* RpHAnimHierarchyGetMatrixArray_t)(RpHAnimHierarchy*);
 typedef RtQuat*(__cdecl* RtQuatRotate_t)(RtQuat* quat, const RwV3d* axis, float angle, RwOpCombineType combineOp);
+typedef RpMaterials*(__cdecl* RpMaterialListDeinitialize_t)(RpMaterials* matList);
+typedef RpGeometry*(__cdecl* RpGeometryForAllMaterials_t)(RpGeometry* geom, void* callback, void* data);
 
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
@@ -200,6 +202,8 @@ RWFUNC(GetAnimHierarchyFromSkinClump_t GetAnimHierarchyFromSkinClump, (GetAnimHi
 RWFUNC(RpHAnimIDGetIndex_t RpHAnimIDGetIndex, (RpHAnimIDGetIndex_t)0xDEAD)
 RWFUNC(RpHAnimHierarchyGetMatrixArray_t RpHAnimHierarchyGetMatrixArray, (RpHAnimHierarchyGetMatrixArray_t)0xDEAD)
 RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
+RWFUNC(RpMaterialListDeinitialize_t RpMaterialListDeinitialize, (RpMaterialListDeinitialize_t)0xDEAD)
+RWFUNC(RpGeometryForAllMaterials_t RpGeometryForAllMaterials, (RpGeometryForAllMaterials_t)0xDEAD)
 
 /*****************************************************************************/
 /** GTA function definitions and mappings                                   **/

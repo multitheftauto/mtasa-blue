@@ -41,7 +41,7 @@ typedef void                        RpWorld;
 typedef struct RpClump              RpClump;
 typedef struct RwRaster             RwRaster;
 typedef struct RpMaterialLighting   RpMaterialLighting;
-typedef struct RpMaterialList       RpMaterialList;
+typedef struct RpMaterialList       RpMaterialList;  // RpMaterials
 typedef struct RpMaterial           RpMaterial;
 typedef struct RpTriangle           RpTriangle;
 typedef struct RwTextureCoordinates RwTextureCoordinates;
@@ -396,8 +396,8 @@ struct RpMaterial
 struct RpMaterials
 {
     RpMaterial** materials;
-    int          entries;
-    int          unknown;
+    int          entries;  // numMaterials
+    int          space;    // space
 };
 struct RpTriangle
 {
@@ -430,6 +430,47 @@ struct RpGeometry
     void*                 unknown2;
     void*                 info;
     RpMorphTarget*        morph_target;
+};
+
+struct vehicleComponentFlags
+{
+    std::uint8_t isVehStructPart : 1;
+    std::uint8_t isDamageable : 1;
+    std::uint8_t isWheel : 1;
+    std::uint8_t isDummy : 1;
+    std::uint8_t isDoor : 1;
+    std::uint8_t compIsLeft : 1;
+    std::uint8_t compIsRight : 1;
+    std::uint8_t compIsFront : 1;
+
+    std::uint8_t compIsRear : 1;
+    std::uint8_t isExtra : 1;
+    std::uint8_t compHasAlpha : 1;
+    std::uint8_t compIsGlass : 1;
+    std::uint8_t compCull : 1;
+    std::uint8_t compIsRearDoor : 1;
+    std::uint8_t compIsFrontDoor : 1;
+    std::uint8_t compSwinging : 1;
+
+    std::uint8_t isMainWheel : 1;
+    std::uint8_t isUpgrade : 1;
+    std::uint8_t compDisableReflections : 1;
+    std::uint8_t trainFrontBogie : 1;
+    std::uint8_t trainRearBogie : 1;
+    std::uint8_t compRenderAlways : 1;
+    std::uint8_t unk : 6;
+};
+
+struct RwObjectNameIdAssocation
+{
+    char*         name;
+    std::uint32_t hierarchyId;
+
+    union
+    {
+        std::uint32_t         flags;
+        vehicleComponentFlags compFlags;
+    };
 };
 
 inline auto rwObjectGetParent(RwObject* o)
