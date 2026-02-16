@@ -31,6 +31,7 @@ CLuaArgument::CLuaArgument()
     m_iType = LUA_TNIL;
     m_pTableData = NULL;
     m_pUserData = NULL;
+    m_bWeakTableRef = false;
 }
 
 CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)

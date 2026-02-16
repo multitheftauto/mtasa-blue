@@ -463,10 +463,26 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     unsigned int uiNumArgs;
     if (bitStream.ReadCompressed(uiNumArgs))
     {
+        // Each argument needs at least 4 bits (SLuaTypeSync), reject obviously corrupt counts
+        int unreadBits = bitStream.GetNumberOfUnreadBits();
+        if (unreadBits < 0 || uiNumArgs > static_cast<unsigned int>(unreadBits) / 4)
+        {
+            if (bKnownTablesCreated)
+                delete pKnownTables;
+            return false;
+        }
+
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
-            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables);
+            CLuaArgument* pArgument = new CLuaArgument();
+            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
+            {
+                delete pArgument;
+                if (bKnownTablesCreated)
+                    delete pKnownTables;
+                return false;
+            }
             m_Arguments.push_back(pArgument);
         }
     }
