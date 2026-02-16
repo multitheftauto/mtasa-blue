@@ -1030,6 +1030,8 @@ static void __cdecl OnIplRemovePre(int iplSlotIndex)
 
 static void __declspec(naked) HOOK_CIplStore_RemoveIpl()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
     // clang-format off
     __asm
     {
