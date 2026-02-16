@@ -240,6 +240,11 @@ void CRenderWareSA::PulseWorldTextureWatch()
 
     ms_txdStreamEventList.clear();
 
+    // Prune texEntityShaderMap entries that were marked invalid (bValid=false) by ResetReplacementResults.
+    // Called here (once per frame) so only truly stale entries are removed - freshly invalidated ones
+    // survive to be rebuilt in-place on next GetShaderForTexAndEntity access.
+    m_pMatchChannelManager->CleanupInvalidatedShaderCache();
+
     ProcessPendingIsolatedModels();
     TIMING_CHECKPOINT("-TextureWatch");
 }
