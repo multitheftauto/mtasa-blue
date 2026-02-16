@@ -59,6 +59,12 @@ void OnMY_CRenderer_SetupEntityVisibility_Pre(CEntitySAInterface* pEntity, float
     {
         SetGlobalDrawDistanceScale(LOW_LOD_DRAW_DISTANCE_SCALE * 2);
         saved.pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[pEntity->m_nModelIndex];
+        if (!saved.pModelInfo)
+        {
+            SetGlobalDrawDistanceScale(1);
+            saved.bValid = false;
+            return;
+        }
         saved.fLodDistanceUnscaled = saved.pModelInfo->fLodDistanceUnscaled;
         saved.pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE / GetDrawDistanceSetting();
         saved.bValid = true;

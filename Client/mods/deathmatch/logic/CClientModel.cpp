@@ -20,6 +20,7 @@ CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelT
 
 CClientModel::~CClientModel(void)
 {
+    RestoreEntitiesUsingThisModel();
     Deallocate();
 }
 
