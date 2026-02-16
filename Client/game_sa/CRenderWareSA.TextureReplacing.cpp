@@ -183,6 +183,7 @@ namespace
     bool g_bInTxdReapply = false;
 
     RwTexDictionary* g_pCachedVehicleTxd = nullptr;
+    RwListEntry*     g_pCachedVehicleTxdListHead = nullptr;  // textures.root.next at cache time; detects texture rebuild at same TXD address
     TxdTextureMap    g_CachedVehicleTxdMap;
     unsigned short   g_usVehicleTxdSlotId = 0xFFFF;
 
@@ -244,14 +245,19 @@ namespace
     constexpr uint32_t      PENDING_ISOLATION_TIMEOUT_MS = 15000;
     constexpr std::size_t   MAX_PENDING_ISOLATED_PER_TICK = 64;
 
-    // Per-TXD texture map cache to avoid repeated linked list iter
-    // Cache is keyed by TXD slot ID and validated by TXD pointer comparison
+    // Per-TXD texture map cache to avoid repeated linked list iteration.
+    // Keyed by TXD slot ID; validated by TXD pointer and texture list head
+    // (the list head catches TXD rebuilds at the same pool address).
     struct SCachedTxdTextureMap
     {
-        RwTexDictionary* pTxd = nullptr;  // TXD pointer at cache time (detects reload/slot reuse)
-        TxdTextureMap    textureMap;      // Cached texture name > texture map
+        RwTexDictionary* pTxd = nullptr;       // TXD pointer at cache time (detects reload/slot reuse)
+        RwListEntry*     pListHead = nullptr;  // textures.root.next at cache time (detects texture rebuild at same TXD address)
+        TxdTextureMap    textureMap;            // Cached texture name > texture map
 
-        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept { return pTxd != nullptr && pTxd == pCurrentTxd; }
+        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
+        {
+            return pTxd != nullptr && pTxd == pCurrentTxd && pListHead == pCurrentTxd->textures.root.next;
+        }
     };
     std::unordered_map<unsigned short, SCachedTxdTextureMap> g_TxdTextureMapCache;
 
@@ -288,6 +294,7 @@ namespace
         }
 
         entry.pTxd = pTxd;
+        entry.pListHead = pTxd->textures.root.next;
         // Use swap idiom to ensure complete memory release
         // (avoids reconnect leaks; safer than .clear() on potentially corrupted maps)
         TxdTextureMap temp;
@@ -1577,10 +1584,15 @@ namespace
         if (!pVehicleTxd)
             return;
 
-        if (pVehicleTxd != g_pCachedVehicleTxd)
+        // Check both TXD pointer and its texture list head.
+        // Streaming can destroy and reload a TXD at the same address (pool/allocator reuse),
+        // which leaves the cache with dangling texture name pointers.
+        RwListEntry* pListHead = pVehicleTxd->textures.root.next;
+        if (pVehicleTxd != g_pCachedVehicleTxd || pListHead != g_pCachedVehicleTxdListHead)
         {
             g_CachedVehicleTxdMap.clear();
             g_pCachedVehicleTxd = pVehicleTxd;
+            g_pCachedVehicleTxdListHead = pListHead;
             g_usVehicleTxdSlotId = 0xFFFF;
             BuildTxdTextureMapFast(pVehicleTxd, g_CachedVehicleTxdMap);
         }
@@ -5848,6 +5860,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_PendingIsolatedModelTimes.clear();
 
     g_pCachedVehicleTxd = nullptr;
+    g_pCachedVehicleTxdListHead = nullptr;
     g_CachedVehicleTxdMap = TxdTextureMap{};
     g_usVehicleTxdSlotId = 0xFFFF;
     ClearTxdTextureMapCache();
