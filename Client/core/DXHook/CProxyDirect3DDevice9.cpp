@@ -686,6 +686,23 @@ UINT CProxyDirect3DDevice9::GetNumberOfSwapChains()
     return m_pDevice->GetNumberOfSwapChains();
 }
 
+static HRESULT TryResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, int crashAvertedBase, bool& bHardwareFaultOut)
+{
+    HRESULT hResult = D3DERR_DEVICELOST;
+    bHardwareFaultOut = false;
+    __try
+    {
+        hResult = pDevice->Reset(pPresentationParameters);
+    }
+    __except (FilterResetException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastResetExceptionCode & 0xFFFF) + crashAvertedBase);
+        hResult = D3DERR_DEVICELOST;
+        bHardwareFaultOut = bResetHardwareFault;
+    }
+    return hResult;
+}
+
 ////////////////////////////////////////////////
 //
 // ResetDeviceInsist
@@ -700,19 +717,11 @@ HRESULT ResetDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3DDevice9* pDe
     uint         uiRetryCount = 0;
     do
     {
-        hResult = D3DERR_DEVICELOST;
-        __try
-        {
-            hResult = pDevice->Reset(pPresentationParameters);
-        }
-        __except (FilterResetException(GetExceptionCode()))
-        {
-            CCore::GetSingleton().OnCrashAverted((uiLastResetExceptionCode & 0xFFFF) + 24 * 1000000);
-            hResult = D3DERR_DEVICELOST;
-            // Instruction faults and paging errors won't clear on retry.
-            if (bResetHardwareFault)
-                break;
-        }
+        bool bHardwareFault = false;
+        hResult = TryResetDevice(pDevice, pPresentationParameters, 24 * 1000000, bHardwareFault);
+        // Instruction faults and paging errors won't clear on retry.
+        if (bHardwareFault)
+            break;
         if (hResult == D3D_OK)
         {
             WriteDebugEvent(SString("   -- ResetDeviceInsist succeeded on try #%d", uiRetryCount + 1));
@@ -733,16 +742,8 @@ HRESULT ResetDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3DDevice9* pDe
 ////////////////////////////////////////////////
 HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, D3DPRESENT_PARAMETERS& presentationParametersOrig)
 {
-    HRESULT hResult = D3DERR_DEVICELOST;
-    __try
-    {
-        hResult = pDevice->Reset(pPresentationParameters);
-    }
-    __except (FilterResetException(GetExceptionCode()))
-    {
-        CCore::GetSingleton().OnCrashAverted((uiLastResetExceptionCode & 0xFFFF) + 23 * 1000000);
-        hResult = D3DERR_DEVICELOST;
-    }
+    bool    bHardwareFault = false;
+    HRESULT hResult = TryResetDevice(pDevice, pPresentationParameters, 23 * 1000000, bHardwareFault);
 
     if (SUCCEEDED(hResult))
     {
