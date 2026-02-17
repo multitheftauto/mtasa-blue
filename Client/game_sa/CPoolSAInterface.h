@@ -172,14 +172,14 @@ public:
 
     std::int32_t Size() const noexcept { return m_nSize; };
     bool         IsEmpty(std::int32_t objectIndex) const { return m_byteMap[objectIndex].bEmpty; }
-    bool         IsContains(uint index) const
+    bool         IsContains(std::int32_t index) const
     {
         if (m_nSize <= 0)
             return false;
 
-        if (index >= static_cast<uint>(m_nSize))
+        if (index < 0 || index >= m_nSize)
             return false;
-        return !IsEmpty(static_cast<std::int32_t>(index));
+        return !IsEmpty(index);
     }
 
     B* GetObject(std::int32_t objectIndex)
@@ -193,13 +193,13 @@ public:
             (reinterpret_cast<std::uint8_t*>(pObject) - reinterpret_cast<std::uint8_t*>(m_pObjects)) / PoolAllocStride<B>::value);
     }
 
-    uint32_t GetObjectIndexSafe(B* pObject)
+    std::int32_t GetObjectIndexSafe(B* pObject)
     {
         uint32_t index = GetObjectIndex(pObject);
         if (m_nSize <= 0)
-            return UINT_MAX;
+            return -1;
 
-        return index >= static_cast<uint32_t>(m_nSize) ? UINT_MAX : index;
+        return index >= static_cast<uint32_t>(m_nSize) ? -1 : static_cast<std::int32_t>(index);
     }
 };
 

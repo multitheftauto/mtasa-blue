@@ -25,25 +25,25 @@ static bool IsEntityPoolSlotOccupied(CEntitySAInterface* pEntity)
     CPoolSAInterface<CBuildingSAInterface>* pBuildingPool = *reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
     if (pBuildingPool)
     {
-        uint32_t uiIndex = pBuildingPool->GetObjectIndexSafe(reinterpret_cast<CBuildingSAInterface*>(pEntity));
-        if (uiIndex != UINT_MAX)
-            return pBuildingPool->IsContains(uiIndex);
+        std::int32_t iIndex = pBuildingPool->GetObjectIndexSafe(reinterpret_cast<CBuildingSAInterface*>(pEntity));
+        if (iIndex != -1)
+            return pBuildingPool->IsContains(iIndex);
     }
 
     CPoolSAInterface<CEntitySAInterface>* pDummyPool = *reinterpret_cast<CPoolSAInterface<CEntitySAInterface>**>(CLASS_CDummyPool);
     if (pDummyPool)
     {
-        uint32_t uiIndex = pDummyPool->GetObjectIndexSafe(pEntity);
-        if (uiIndex != UINT_MAX)
-            return pDummyPool->IsContains(uiIndex);
+        std::int32_t iIndex = pDummyPool->GetObjectIndexSafe(pEntity);
+        if (iIndex != -1)
+            return pDummyPool->IsContains(iIndex);
     }
 
     CPoolSAInterface<CObjectSAInterface>* pObjectPool = *reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
     if (pObjectPool)
     {
-        uint32_t uiIndex = pObjectPool->GetObjectIndexSafe(reinterpret_cast<CObjectSAInterface*>(pEntity));
-        if (uiIndex != UINT_MAX)
-            return pObjectPool->IsContains(uiIndex);
+        std::int32_t iIndex = pObjectPool->GetObjectIndexSafe(reinterpret_cast<CObjectSAInterface*>(pEntity));
+        if (iIndex != -1)
+            return pObjectPool->IsContains(iIndex);
     }
 
     return false;
@@ -445,6 +445,7 @@ bool CBuildingRemovalSA::IsRemovedModelInRadius(SIPLInst* pInst)
     std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
         m_pBuildingRemovals->equal_range(usModelIndex);
     std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
+
     // Loop through the buildings list
     for (; iter != iterators.second; ++iter)
     {
@@ -701,7 +702,7 @@ SBuildingRemoval* CBuildingRemovalSA::GetBuildingRemoval(CEntitySAInterface* pIn
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
@@ -1029,6 +1030,7 @@ static void __cdecl OnIplRemovePre(int iplSlotIndex)
 
 static void __declspec(naked) HOOK_CIplStore_RemoveIpl()
 {
+
     // clang-format off
     __asm
     {
