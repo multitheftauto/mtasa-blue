@@ -189,8 +189,7 @@ public:
 
     uint GetObjectIndex(B* pObject)
     {
-        return static_cast<uint>(
-            (reinterpret_cast<std::uint8_t*>(pObject) - reinterpret_cast<std::uint8_t*>(m_pObjects)) / PoolAllocStride<B>::value);
+        return static_cast<uint>((reinterpret_cast<std::uint8_t*>(pObject) - reinterpret_cast<std::uint8_t*>(m_pObjects)) / PoolAllocStride<B>::value);
     }
 
     std::int32_t GetObjectIndexSafe(B* pObject)

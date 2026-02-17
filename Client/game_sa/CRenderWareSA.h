@@ -186,16 +186,16 @@ public:
     CFastHashMap<CD3DDUMMY*, STexInfo*>      m_D3DDataTexInfoMap;
     // Reverse lookup for script/special textures (keyed by RwTexture* tag)
     std::unordered_map<const RwTexture*, STexInfo*> m_ScriptTexInfoMap;
-    CClientEntityBase*                       m_pRenderingClientEntity;
-    unsigned short                           m_usRenderingEntityModelId;
-    int                                      m_iRenderingEntityType;
-    CMatchChannelManager*                    m_pMatchChannelManager;
-    int                                      m_uiReplacementRequestCounter;
-    int                                      m_uiReplacementMatchCounter;
-    int                                      m_uiNumReplacementRequests;
-    int                                      m_uiNumReplacementMatches;
-    CElapsedTime                             m_GTAVertexShadersDisabledTimer;
-    bool                                     m_bGTAVertexShadersEnabled;
-    std::set<RwTexture*>                     m_SpecialTextures;
-    static int                               ms_iRenderingType;
+    CClientEntityBase*                              m_pRenderingClientEntity;
+    unsigned short                                  m_usRenderingEntityModelId;
+    int                                             m_iRenderingEntityType;
+    CMatchChannelManager*                           m_pMatchChannelManager;
+    int                                             m_uiReplacementRequestCounter;
+    int                                             m_uiReplacementMatchCounter;
+    int                                             m_uiNumReplacementRequests;
+    int                                             m_uiNumReplacementMatches;
+    CElapsedTime                                    m_GTAVertexShadersDisabledTimer;
+    bool                                            m_bGTAVertexShadersEnabled;
+    std::set<RwTexture*>                            m_SpecialTextures;
+    static int                                      ms_iRenderingType;
 };

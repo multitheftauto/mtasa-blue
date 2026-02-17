@@ -199,8 +199,7 @@ bool _cdecl ShouldSkipLoadRequestedModels(DWORD calledFrom)
         // the standard LoadRequestedModels run as fallback.
         if (iLastCacheFileId >= 0)
         {
-            auto* pInfo = reinterpret_cast<SImgGTAItemInfo*>(
-                reinterpret_cast<char*>(CStreaming__ms_aInfoForModel) + iLastCacheFileId * 20);
+            auto* pInfo = reinterpret_cast<SImgGTAItemInfo*>(reinterpret_cast<char*>(CStreaming__ms_aInfoForModel) + iLastCacheFileId * 20);
             if (pInfo->uiLoadflag != 1)
                 return false;
         }

@@ -35,10 +35,10 @@ SString GetDebugTagStr(CMatchChannel* pChannel);
 struct SMatchType
 {
     SMatchType(const SString& strMatch, bool bAdditive)
-        : strMatch(strMatch)
-        , bAdditive(bAdditive)
-        , bIsMatchAll(strMatch.length() == 1 && strMatch[0] == '*')
-        , bHasWildcards(strMatch.find_first_of("*?") != SString::npos)
+        : strMatch(strMatch),
+          bAdditive(bAdditive),
+          bIsMatchAll(strMatch.length() == 1 && strMatch[0] == '*'),
+          bHasWildcards(strMatch.find_first_of("*?") != SString::npos)
     {
     }
     SString strMatch;
@@ -323,12 +323,12 @@ protected:
     std::unordered_map<SShaderInfo*, std::vector<CShaderAndEntityPair>> m_ShaderToChannelKeys;
     // Secondary index: entity > STexNameInfo entries in texEntityShaderMap, for fast cleanup
     std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>> m_EntityToTexNameInfos;
-    CFastHashSet<CMatchChannel*>                   m_CreatedChannelList;
-    CFastHashSet<CMatchChannel*>                   m_OptimizeQueue;
-    CFastHashSet<CMatchChannel*>                   m_RematchQueue;
-    CFastHashMap<SString, STexNameInfo*>           m_AllTextureList;
-    CFastHashMap<CSHADERDUMMY*, SShaderInfo*>      m_ShaderInfoMap;
-    CFastHashSet<CClientEntityBase*>               m_KnownClientEntities;
-    long long                                      m_llNextStaleEntityCleanupTime = 0;
-    std::size_t                                    m_uiStaleEntityCleanupCursorBucket = 0;
+    CFastHashSet<CMatchChannel*>                                        m_CreatedChannelList;
+    CFastHashSet<CMatchChannel*>                                        m_OptimizeQueue;
+    CFastHashSet<CMatchChannel*>                                        m_RematchQueue;
+    CFastHashMap<SString, STexNameInfo*>                                m_AllTextureList;
+    CFastHashMap<CSHADERDUMMY*, SShaderInfo*>                           m_ShaderInfoMap;
+    CFastHashSet<CClientEntityBase*>                                    m_KnownClientEntities;
+    long long                                                           m_llNextStaleEntityCleanupTime = 0;
+    std::size_t                                                         m_uiStaleEntityCleanupCursorBucket = 0;
 };

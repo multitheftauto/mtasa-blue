@@ -5026,8 +5026,8 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
                         }
                     }
                     else
-                        g_pClientGame->m_pScriptDebugging->LogError(nullptr, "Server triggered clientside event %s, but event is not marked as remotely triggerable",
-                                                                    szName);
+                        g_pClientGame->m_pScriptDebugging->LogError(
+                            nullptr, "Server triggered clientside event %s, but event is not marked as remotely triggerable", szName);
                 }
                 else
                     g_pClientGame->m_pScriptDebugging->LogError(nullptr, "Server triggered clientside event %s, but event is not added clientside", szName);
