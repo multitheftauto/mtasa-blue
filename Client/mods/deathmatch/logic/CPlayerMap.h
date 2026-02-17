@@ -36,6 +36,8 @@ public:
     bool GetBoundingBox(CVector& vecMin, CVector& vecMax);
 
     void ToggleHelpText();
+    void MarkViewportRefreshPending();
+    void ClearMovementFlags();
 
 protected:
     void InternalSetPlayerMapEnabled(bool bEnabled);
@@ -125,4 +127,5 @@ private:
     bool m_bRadarVisible;
     bool m_bDebugVisible;
     bool m_bTextVisible;
+    bool m_bPendingViewportRefresh = false;
 };

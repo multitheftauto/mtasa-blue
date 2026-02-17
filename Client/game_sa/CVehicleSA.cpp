@@ -183,7 +183,7 @@ namespace
                 RwFrameDump(ret, pVehicleSA);
             }
             // don't re-add, check ret for validity, if it has an empty string at this point it isn't a variant or it's already added
-            if (pVehicleSA->IsComponentPresent(ret->szName) == false && ret->szName != "")
+            if (pVehicleSA->IsComponentPresent(ret->szName) == false && ret->szName[0] != '\0')
             {
                 pVehicleSA->AddComponent(ret, true);
             }
@@ -2212,7 +2212,7 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
         return;
 
     // if the frame already exists ignore it
-    if (IsComponentPresent(pFrame->szName) || pFrame->szName == "")
+    if (IsComponentPresent(pFrame->szName) || pFrame->szName[0] == '\0')
         return;
 
     SString strName = pFrame->szName;

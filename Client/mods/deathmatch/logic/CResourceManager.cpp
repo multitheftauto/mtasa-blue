@@ -244,8 +244,6 @@ void CResourceManager::OnFileModifedByScript(const SString& strInFilename, const
     if (pResourceFile && !pResourceFile->IsModifedByScript())
     {
         pResourceFile->SetModifedByScript(true);
-        SString strMessage("Resource file modifed by script (%s): %s ", *strReason, *ConformResourcePath(strInFilename));
-        AddReportLog(7059, strMessage + g_pNet->GetConnectedServer(true), 10);
     }
 }
 

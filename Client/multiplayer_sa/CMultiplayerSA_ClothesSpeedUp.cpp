@@ -80,6 +80,7 @@ namespace
 
     int   iReturnFileId;
     char* pReturnBuffer;
+    bool  bCacheLoadIncomplete = false;
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +104,10 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
             if (bLoadingBigModel)
                 pGameInterface->GetStreaming()->LoadAllRequestedModels(false);
             if (bLoadingBigModel)
+            {
+                bCacheLoadIncomplete = true;
                 return false;
+            }
         }
 
         int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
@@ -163,6 +167,15 @@ skip:
         call    FUNC_CStreamingConvertBufferToObject
         add     esp, 4*3
 
+        test    al, al
+        jnz     convert_ok
+        mov     bCacheLoadIncomplete, 1
+        // Undo premature loadflag=3 set by OnCallCStreamingInfoAddToList
+        mov     ecx, iReturnFileId
+        imul    ecx, 14h
+        mov     byte ptr [ecx + 008E4CD0h], 0
+convert_ok:
+
         popad
         add     esp, 4*1
         jmp     RETURN_CallCStreamingInfoAddToListB
@@ -182,7 +195,14 @@ bool _cdecl ShouldSkipLoadRequestedModels(DWORD calledFrom)
     //      CClothesBuilder::LoadAndPutOnClothes         5A5F70 - 5A6039
     //      CClothesBuilder::ConstructTextures           5A6040 - 5A6520
     if (calledFrom > 0x5A55A0 && calledFrom < 0x5A6520)
+    {
+        if (bCacheLoadIncomplete)
+        {
+            bCacheLoadIncomplete = false;
+            return false;
+        }
         return true;
+    }
 
     return false;
 }
@@ -276,18 +296,22 @@ skip:
 //////////////////////////////////////////////////////////////////////////////////////////
 bool SetClothingDirectorySize(int directorySize)
 {
-    DirectoryInfoSA* clothesDirectory = new DirectoryInfoSA[directorySize];
+    if (directorySize <= 0 || directorySize > 0xFFFF)
+        return false;
+
+    const std::uint16_t usDirectorySize = static_cast<std::uint16_t>(directorySize);
+    DirectoryInfoSA*    clothesDirectory = new DirectoryInfoSA[static_cast<std::size_t>(directorySize)];
 
     if (!clothesDirectory)
         return false;
 
     // CClothesBuilder::LoadCdDirectory(void)
     MemPut<std::uint32_t>(0x5A4190 + 1, reinterpret_cast<uint32_t>(clothesDirectory));  // push    offset _playerImgEntries; headers
-    MemPut<std::uint16_t>(0x5A4195 + 1, static_cast<std::uint16_t>(directorySize));     // push    550             ; count
-    MemPut<std::uint16_t>(0x5A69E8 + 1, static_cast<std::uint16_t>(directorySize));     // push    550             ; count
+    MemPut<std::uint16_t>(0x5A4195 + 1, usDirectorySize);                               // push    550             ; count
+    MemPut<std::uint16_t>(0x5A69E8 + 1, usDirectorySize);                               // push    550             ; count
 
     g_playerImgEntries = reinterpret_cast<uint32_t>(clothesDirectory);
-    g_playerImgSize = static_cast<std::uint16_t>(directorySize);
+    g_playerImgSize = usDirectorySize;
 
     return true;
 }

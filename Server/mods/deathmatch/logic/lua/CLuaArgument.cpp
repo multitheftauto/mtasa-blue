@@ -31,6 +31,7 @@ CLuaArgument::CLuaArgument()
     m_iType = LUA_TNIL;
     m_pTableData = NULL;
     m_pUserData = NULL;
+    m_bWeakTableRef = false;
 }
 
 CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
@@ -276,6 +277,12 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
 
             case LUA_TTABLE:
             {
+                if (!m_pTableData)
+                {
+                    lua_pushnil(luaVM);
+                    break;
+                }
+
                 int* pThingy;
                 if (pKnownTables && (pThingy = MapFind(*pKnownTables, m_pTableData)))
                 {
@@ -428,6 +435,7 @@ bool CLuaArgument::GetAsString(SString& strBuffer)
 bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
 {
     DeleteTableData();
+    m_iType = LUA_TNIL;
     SLuaTypeSync type;
 
     // Read out the type

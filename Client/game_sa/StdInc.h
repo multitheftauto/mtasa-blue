@@ -12,6 +12,7 @@
 #include <windows.h>
 
 #include <algorithm>
+#include <atomic>
 #include <list>
 #include <map>
 #include <set>
@@ -24,6 +25,7 @@
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_HASH_MAP
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
+#define MTASA_EXPORT_SHARED_UTIL
 #include "SharedUtil.h"
 #include "SharedUtil.MemAccess.h"
 

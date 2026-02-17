@@ -28,6 +28,9 @@ void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void* (*)[2])0x8E4CAC;
 
 namespace
 {
+    // Validates model info pointer by checking VFTBL is in valid GTA:SA code range.
+    // Uses SEH for crash protection when reading the VFTBL field, but avoids
+    // the expensive volatile read of VFTBL->Destructor by using address validation.
     bool IsValidPtr(const void* ptr) noexcept
     {
         if (!ptr)
@@ -36,18 +39,216 @@ namespace
         __try
         {
             const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
-            const auto* v = p->VFTBL;
-            if (!v)
-                return false;
-
-            volatile DWORD test = v->Destructor;
-            static_cast<void>(test);
-            return true;
+            const DWORD vftbl = reinterpret_cast<DWORD>(p->VFTBL);
+            // VFTBL must be in valid GTA:SA code range - this implicitly validates
+            // the pointer since garbage/freed memory won't have valid VFTBL addresses
+            return SharedUtil::IsValidGtaSaPtr(vftbl);
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
             return false;
         }
+    }
+
+    // Reusable event handle pool for async CreateFile operations
+    namespace StreamingEventPool
+    {
+        constexpr auto             SIZE = 8u;
+        static std::atomic<HANDLE> slots[SIZE] = {};
+
+        inline HANDLE Acquire()
+        {
+            for (auto& slot : slots)
+            {
+                if (auto h = slot.exchange(nullptr))
+                {
+                    ResetEvent(h);
+                    return h;
+                }
+            }
+            return CreateEventW(nullptr, TRUE, FALSE, nullptr);
+        }
+
+        inline void Release(HANDLE h)
+        {
+            if (!h)
+                return;
+
+            for (auto& slot : slots)
+            {
+                HANDLE expected = nullptr;
+                if (slot.compare_exchange_strong(expected, h))
+                    return;
+            }
+            CloseHandle(h);
+        }
+    }
+
+    namespace AsyncStreamingFile
+    {
+        enum class State : int
+        {
+            Running = 0,
+            Completed = 1,
+            Abandoned = 2
+        };
+        constexpr DWORD TIMEOUT_MS = 5'000;
+
+        struct Params
+        {
+            std::wstring     fileName;
+            DWORD            access = 0;
+            DWORD            shareMode = 0;
+            DWORD            disposition = 0;
+            DWORD            flags = 0;
+            HANDLE           result = INVALID_HANDLE_VALUE;
+            DWORD            error = ERROR_SUCCESS;
+            HANDLE           event = nullptr;
+            std::atomic<int> state{0};
+        };
+
+        constexpr auto              POOL_SIZE = 8u;
+        static std::atomic<Params*> pool[POOL_SIZE] = {};
+
+        inline Params* Acquire()
+        {
+            for (auto& slot : pool)
+            {
+                if (auto* p = slot.exchange(nullptr))
+                {
+                    p->state = 0;
+                    p->result = INVALID_HANDLE_VALUE;
+                    p->error = ERROR_SUCCESS;
+                    p->event = nullptr;
+                    p->fileName.clear();
+                    return p;
+                }
+            }
+            return new (std::nothrow) Params();
+        }
+
+        inline void Release(Params* p)
+        {
+            if (!p)
+                return;
+
+            p->fileName.clear();
+
+            for (auto& slot : pool)
+            {
+                Params* expected = nullptr;
+                if (slot.compare_exchange_strong(expected, p))
+                    return;
+            }
+            delete p;
+        }
+
+        static DWORD WINAPI PoolCallback(LPVOID arg)
+        {
+            auto* p = static_cast<Params*>(arg);
+
+            p->result = CreateFileW(p->fileName.c_str(), p->access, p->shareMode, nullptr, p->disposition, p->flags, nullptr);
+            p->error = GetLastError();
+
+            auto expected = static_cast<int>(State::Running);
+            if (p->state.compare_exchange_strong(expected, static_cast<int>(State::Completed)))
+            {
+                SetEvent(p->event);
+            }
+            else
+            {
+                StreamingEventPool::Release(p->event);
+                if (p->result != INVALID_HANDLE_VALUE)
+                    CloseHandle(p->result);
+                Release(p);
+            }
+            return 0;
+        }
+
+        inline HANDLE DirectCall(LPCWSTR name, DWORD access, DWORD share, DWORD disp, DWORD flags)
+        {
+            return CreateFileW(name, access, share, nullptr, disp, flags, nullptr);
+        }
+    }
+
+    static HANDLE CreateFileWithTimeoutForStreaming(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, DWORD dwCreationDisposition,
+                                                    DWORD dwFlagsAndAttributes)
+    {
+        using namespace AsyncStreamingFile;
+
+        if (!lpFileName)
+        {
+            SetLastError(ERROR_INVALID_PARAMETER);
+            return INVALID_HANDLE_VALUE;
+        }
+
+        auto* params = Acquire();
+        if (!params)
+        {
+            AddReportLog(6216, "Streaming CreateFile timeout: alloc failed");
+            return DirectCall(lpFileName, dwDesiredAccess, dwShareMode, dwCreationDisposition, dwFlagsAndAttributes);
+        }
+
+        try
+        {
+            params->fileName = lpFileName;
+        }
+        catch (...)
+        {
+            AddReportLog(6221, "Streaming CreateFile timeout: string copy failed");
+            Release(params);
+            return DirectCall(lpFileName, dwDesiredAccess, dwShareMode, dwCreationDisposition, dwFlagsAndAttributes);
+        }
+
+        auto event = StreamingEventPool::Acquire();
+        if (!event)
+        {
+            AddReportLog(6217, "Streaming CreateFile timeout: event failed");
+            Release(params);
+            return DirectCall(lpFileName, dwDesiredAccess, dwShareMode, dwCreationDisposition, dwFlagsAndAttributes);
+        }
+
+        params->access = dwDesiredAccess;
+        params->shareMode = dwShareMode;
+        params->disposition = dwCreationDisposition;
+        params->flags = dwFlagsAndAttributes;
+        params->event = event;
+
+        if (!QueueUserWorkItem(PoolCallback, params, WT_EXECUTELONGFUNCTION))
+        {
+            AddReportLog(6219, "Streaming CreateFile timeout: queue failed");
+            StreamingEventPool::Release(event);
+            Release(params);
+            return DirectCall(lpFileName, dwDesiredAccess, dwShareMode, dwCreationDisposition, dwFlagsAndAttributes);
+        }
+
+        if (WaitForSingleObject(event, TIMEOUT_MS) == WAIT_OBJECT_0)
+        {
+            StreamingEventPool::Release(event);
+            auto hResult = params->result;
+            auto dwError = params->error;
+            Release(params);
+            SetLastError(dwError);
+            return hResult;
+        }
+
+        AddReportLog(6213, SString("Streaming CreateFile timed out after %ums: %s", TIMEOUT_MS, SharedUtil::ToUTF8(lpFileName).c_str()));
+
+        auto expected = static_cast<int>(State::Running);
+        if (params->state.compare_exchange_strong(expected, static_cast<int>(State::Abandoned)))
+        {
+            SetLastError(ERROR_TIMEOUT);
+        }
+        else
+        {
+            StreamingEventPool::Release(event);
+            auto actualError = (params->result == INVALID_HANDLE_VALUE) ? params->error : ERROR_TIMEOUT;
+            if (params->result != INVALID_HANDLE_VALUE)
+                CloseHandle(params->result);
+            Release(params);
+            SetLastError(actualError);
+        }
+        return INVALID_HANDLE_VALUE;
     }
 
     //
@@ -261,6 +462,12 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
     else
     {
+        // Overflow TXD slots (pool index >= 6316) produce streaming IDs >= 26316,
+        // which exceed ms_aInfoForModel[26316]. These slots are managed by MTA
+        // independently of SA's streaming system, so skip the request.
+        if (dwModelID >= static_cast<DWORD>(pGame->GetCountOfAllFileIDs()))
+            return;
+
         CBaseModelInfoSAInterface** ppModelInfo = reinterpret_cast<CBaseModelInfoSAInterface**>(ARRAY_ModelInfo);
         if (dwModelID < MODELINFO_DFF_MAX)
         {
@@ -297,6 +504,12 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
 
 void CStreamingSA::RemoveModel(std::uint32_t model)
 {
+    // Overflow TXD slots (pool index >= 6316) produce streaming IDs >= 26316,
+    // which exceed ms_aInfoForModel[26316]. These slots are managed by MTA
+    // independently of SA's streaming system, so skip the removal.
+    if (model >= static_cast<std::uint32_t>(pGame->GetCountOfAllFileIDs()))
+        return;
+
     using Signature = void(__cdecl*)(std::uint32_t);
     const auto function = reinterpret_cast<Signature>(0x4089A0);
     function(model);
@@ -472,10 +685,10 @@ unsigned char CStreamingSA::AddArchive(const wchar_t* szFilePath)
     if (ucStreamID == INVALID_STREAM_ID)
         return INVALID_ARCHIVE_ID;
 
-    // Create new stream handler
+    // Create new stream handler (uses timeout to avoid NtCreateFile hangs)
     const auto streamCreateFlags = *(DWORD*)0x8E3FE0;
-    HANDLE     hFile = CreateFileW(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-                                   streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS, NULL);
+    HANDLE     hFile = CreateFileWithTimeoutForStreaming(szFilePath, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING,
+                                                         streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS);
 
     if (hFile == INVALID_HANDLE_VALUE)
         return INVALID_ARCHIVE_ID;
@@ -503,54 +716,73 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 
 bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
-    numBlocks += numBlocks % 2;  // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
+    // Round up to even number so it can be split in half properly
+    numBlocks += numBlocks % 2;
 
-    // Check if the size is the same already
+    // Already the requested size
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
         return true;
 
     if (ms_pStreamingBuffer[0] == nullptr || ms_pStreamingBuffer[1] == nullptr)
         return false;
 
-    // First of all, allocate the new buffer
-    // NOTE: Due to a bug in the `MallocAlign` code the function will just *crash* instead of returning nullptr on alloc. failure :D
-    typedef void*(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
-    void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(numBlocks * 2048, 2048);
-    if (!pNewBuffer)  // ...so this code is useless for now
+    typedef void*(__cdecl * AllocFunc)(uint32, uint32);
+    typedef void(__cdecl * DeallocFunc)(void*);
+
+    // Allocate new buffer first
+    void* pNewBuffer = ((AllocFunc)(0x72F4C0))(numBlocks * 2048, 2048);
+    if (!pNewBuffer)
         return false;
 
     int pointer = *(int*)0x8E3FFC;
     SGtaStream(&streaming)[5] = *(SGtaStream(*)[5])(pointer);
 
-    // Wait while streaming thread ends tasks
-    while (streaming[0].bInUse || streaming[1].bInUse)
-        ;
+    void* const pOldBuffer = ms_pStreamingBuffer[0];
 
-    // Suspend streaming thread [otherwise data might become corrupted]
-    SuspendThread(*phStreamingThread);
+    // Suspend streaming thread when idle to safely swap buffers
+    // Uses suspend-then-verify to avoid race between checking bInUse and suspending
+    constexpr int kMaxRetries = 10000;
+    for (int attempt = 0;; ++attempt)
+    {
+        if (attempt >= kMaxRetries)
+        {
+            ((DeallocFunc)(0x72F4F0))(pNewBuffer);
+            return false;
+        }
+
+        if (SuspendThread(*phStreamingThread) == (DWORD)-1)
+        {
+            Sleep(1);
+            continue;
+        }
+
+        if (!streaming[0].bInUse && !streaming[1].bInUse)
+            break;
+
+        ResumeThread(*phStreamingThread);
+        Sleep(0);
+    }
 
     // Calculate new buffer pointers
     void* const pNewBuff0 = pNewBuffer;
     void* const pNewBuff1 = (void*)(reinterpret_cast<uintptr_t>(pNewBuffer) + 2048u * (numBlocks / 2));
 
-    // Copy data from old buffer to new buffer
+    // Copy existing data to new buffer
     const auto copySizeBytes = std::min(ms_streamingHalfOfBufferSizeBlocks, numBlocks / 2) * 2048;
     MemCpyFast(pNewBuff0, ms_pStreamingBuffer[0], copySizeBytes);
     MemCpyFast(pNewBuff1, ms_pStreamingBuffer[1], copySizeBytes);
 
-    // Now, we can deallocate the old buffer safely
-    typedef void(__cdecl * Function_CMemoryMgr_FreeAlign)(void* pos);
-    ((Function_CMemoryMgr_FreeAlign)(0x72F4F0))(ms_pStreamingBuffer[0]);
-
-    // Update the buffer size now
+    // Update buffer size and pointers
     ms_streamingHalfOfBufferSizeBlocks = numBlocks / 2;
 
-    // Update internal pointers too
     streaming[0].pBuffer = ms_pStreamingBuffer[0] = pNewBuff0;
     streaming[1].pBuffer = ms_pStreamingBuffer[1] = pNewBuff1;
 
-    // Now we can resume streaming
+    // Resume streaming thread before freeing old buffer
     ResumeThread(*phStreamingThread);
+
+    // Free old buffer after resume to avoid blocking GTA memory manager
+    ((DeallocFunc)(0x72F4F0))(pOldBuffer);
 
     return true;
 }

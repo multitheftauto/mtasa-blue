@@ -168,10 +168,11 @@ struct STexNameInfo
 #endif
     }
 
-    void ResetReplacementResults()
+    bool ResetReplacementResults()
     {
         // Mark invalid without clearing bSet - preserves data for safe renderer access
         // Data will be rebuilt on next access when bValid=false is detected
+        bool bHadEntityEntries = !texEntityShaderMap.empty();
         for (auto& shader : texNoEntityShaders)
         {
             shader.bValid = false;
@@ -180,6 +181,7 @@ struct STexNameInfo
         {
             pair.second.bValid = false;
         }
+        return bHadEntityEntries;
     }
 
     // Remove entries that have been marked invalid (deferred cleanup)

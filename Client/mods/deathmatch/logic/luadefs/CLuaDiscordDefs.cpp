@@ -10,6 +10,8 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 
+#include <limits>
+
 void CLuaDiscordDefs::LoadFunctions()
 {
     // Backwards compatibility functions
@@ -138,10 +140,24 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 
 bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 {
-    auto ulSecondsSinceEpoch = static_cast<unsigned long>(time(nullptr)) + ulTime;
+    unsigned long ulSecondsSinceEpoch = 0;
+    if (ulTime != 0)
+    {
+        const time_t now = time(nullptr);
+        if (now <= 0)
+            return false;
 
-    if (ulTime == 0)
-        ulSecondsSinceEpoch = 0;
+        const auto maxValue = std::numeric_limits<unsigned long>::max();
+        const auto nowUnsigned = static_cast<unsigned long long>(now);
+        if (nowUnsigned > maxValue)
+            return false;
+
+        const unsigned long nowUl = static_cast<unsigned long>(nowUnsigned);
+        if (maxValue - nowUl < ulTime)
+            return false;
+
+        ulSecondsSinceEpoch = nowUl + ulTime;
+    }
 
     auto discord = g_pCore->GetDiscord();
 
@@ -157,10 +173,24 @@ bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 
 bool CLuaDiscordDefs::SetEndTime(unsigned long ulTime)
 {
-    auto ulSecondsSinceEpoch = static_cast<unsigned long>(time(nullptr)) + ulTime;
+    unsigned long ulSecondsSinceEpoch = 0;
+    if (ulTime != 0)
+    {
+        const time_t now = time(nullptr);
+        if (now <= 0)
+            return false;
 
-    if (ulTime == 0)
-        ulSecondsSinceEpoch = 0;
+        const auto maxValue = std::numeric_limits<unsigned long>::max();
+        const auto nowUnsigned = static_cast<unsigned long long>(now);
+        if (nowUnsigned > maxValue)
+            return false;
+
+        const unsigned long nowUl = static_cast<unsigned long>(nowUnsigned);
+        if (maxValue - nowUl < ulTime)
+            return false;
+
+        ulSecondsSinceEpoch = nowUl + ulTime;
+    }
 
     auto discord = g_pCore->GetDiscord();
 

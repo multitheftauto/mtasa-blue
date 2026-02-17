@@ -2417,8 +2417,13 @@ eMovementState CClientPed::GetMovementState()
         GetControllerState(cs);
 
         // Get his current task(s)
-        const char* szComplexTaskName = GetTaskManager()->GetActiveTask()->GetTaskName();
-        const char* szSimpleTaskName = GetTaskManager()->GetSimplestActiveTask()->GetTaskName();
+        CTask* pActiveTask = GetTaskManager()->GetActiveTask();
+        CTask* pSimplestTask = GetTaskManager()->GetSimplestActiveTask();
+        if (!pActiveTask || !pSimplestTask)
+            return MOVEMENTSTATE_UNKNOWN;
+
+        const char* szComplexTaskName = pActiveTask->GetTaskName();
+        const char* szSimpleTaskName = pSimplestTask->GetTaskName();
 
         // Check tasks
         if (strcmp(szSimpleTaskName, "TASK_SIMPLE_CLIMB") == 0)  // Is he climbing?
@@ -7241,7 +7246,8 @@ void CClientPed::RunClimbingTask()
     if (!climbEntity)
         return;
 
-    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, surfaceType, eClimbHeights::CLIMB_GRAB, false);
+    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, static_cast<unsigned char>(surfaceType),
+                                                                             eClimbHeights::CLIMB_GRAB, false);
     if (!climbTask)
         return;
 

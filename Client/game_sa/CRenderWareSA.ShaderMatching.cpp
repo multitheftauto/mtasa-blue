@@ -190,6 +190,10 @@ STexShaderReplacement* CMatchChannelManager::UpdateTexShaderReplacement(STexName
         // If not done yet for this entity, needs to be done
         MapSet(pTexNameInfo->texEntityShaderMap, pClientEntity, STexShaderReplacement());
         pTexShaderReplacement = MapFind(pTexNameInfo->texEntityShaderMap, pClientEntity);
+
+        // Track which STexNameInfo entries reference this entity for fast cleanup
+        if (pClientEntity)
+            MapInsert(m_EntityToTexNameInfos[pClientEntity], pTexNameInfo);
     }
 
     if (!pTexShaderReplacement->bSet || !pTexShaderReplacement->bValid)
@@ -404,20 +408,43 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
     OutputDebug(SString("RemoveClientEntityRefs - Entity:%s", GetDebugTag(pClientEntity)));
 
     CFastHashSet<CMatchChannel*> affectedChannels;
-    for (std::map<CShaderAndEntityPair, CMatchChannel*>::iterator iter = m_ChannelUsageMap.begin(); iter != m_ChannelUsageMap.end();)
+
+    // Use secondary index (entries-per-entity) instead of scanning all m_ChannelUsageMap entries
+    auto itEntity = m_EntityToChannelKeys.find(pClientEntity);
+    if (itEntity != m_EntityToChannelKeys.end())
     {
-        if (pClientEntity == iter->first.pClientEntity)
+        for (const CShaderAndEntityPair& key : itEntity->second)
         {
-            CMatchChannel* pChannel = iter->second;
-            if (pChannel)
+            auto itUsage = m_ChannelUsageMap.find(key);
+            if (itUsage != m_ChannelUsageMap.end())
             {
-                pChannel->RemoveShaderAndEntity(iter->first);
-                MapInsert(affectedChannels, pChannel);
+                CMatchChannel* pChannel = itUsage->second;
+                if (pChannel)
+                {
+                    pChannel->RemoveShaderAndEntity(key);
+                    MapInsert(affectedChannels, pChannel);
+                }
+                // Maintain shader secondary index
+                auto itShdr = m_ShaderToChannelKeys.find(key.pShaderInfo);
+                if (itShdr != m_ShaderToChannelKeys.end())
+                {
+                    auto& vec = itShdr->second;
+                    for (std::size_t i = 0; i < vec.size(); ++i)
+                    {
+                        if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                        {
+                            vec[i] = vec.back();
+                            vec.pop_back();
+                            break;
+                        }
+                    }
+                    if (vec.empty())
+                        m_ShaderToChannelKeys.erase(itShdr);
+                }
+                m_ChannelUsageMap.erase(itUsage);
             }
-            m_ChannelUsageMap.erase(iter++);
         }
-        else
-            ++iter;
+        m_EntityToChannelKeys.erase(itEntity);
     }
 
     // Flag affected textures to re-calc shader results
@@ -429,7 +456,10 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
         for (STexNameInfo* pTexNameInfo : pChannel->m_MatchedTextureList)
         {
             if (pTexNameInfo)
-                pTexNameInfo->ResetReplacementResults();
+            {
+                if (pTexNameInfo->ResetReplacementResults())
+                    MapInsert(m_InvalidatedTexNameInfos, pTexNameInfo);
+            }
         }
 
         // Also delete channel if is not refed anymore
@@ -438,10 +468,15 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
         // This could be optimized
     }
 
-    // Need to remove client entity entries that were used even though they had no matches
-    for (const auto& pair : m_AllTextureList)
+    // Remove cached entity shader entries using reverse index instead of scanning all textures
+    auto itTexNames = m_EntityToTexNameInfos.find(pClientEntity);
+    if (itTexNames != m_EntityToTexNameInfos.end())
     {
-        MapRemove(pair.second->texEntityShaderMap, pClientEntity);
+        for (STexNameInfo* pTexNameInfo : itTexNames->second)
+        {
+            MapRemove(pTexNameInfo->texEntityShaderMap, pClientEntity);
+        }
+        m_EntityToTexNameInfos.erase(itTexNames);
     }
 
 #ifdef SHADER_DEBUG_CHECKS
@@ -473,20 +508,46 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
     OutputDebug(SString("RemoveShaderRefs - Shader:%s", GetDebugTag(pShaderInfo)));
 
     CFastHashSet<CMatchChannel*> affectedChannels;
-    for (std::map<CShaderAndEntityPair, CMatchChannel*>::iterator iter = m_ChannelUsageMap.begin(); iter != m_ChannelUsageMap.end();)
+
+    // Use shader secondary index for lookup instead of full m_ChannelUsageMap scan
+    auto itShader = m_ShaderToChannelKeys.find(pShaderInfo);
+    if (itShader != m_ShaderToChannelKeys.end())
     {
-        if (pShaderInfo == iter->first.pShaderInfo)
+        for (const CShaderAndEntityPair& key : itShader->second)
         {
-            CMatchChannel* pChannel = iter->second;
-            if (pChannel)
+            auto itUsage = m_ChannelUsageMap.find(key);
+            if (itUsage != m_ChannelUsageMap.end())
             {
-                pChannel->RemoveShaderAndEntity(iter->first);
-                MapInsert(affectedChannels, pChannel);
+                CMatchChannel* pChannel = itUsage->second;
+                if (pChannel)
+                {
+                    pChannel->RemoveShaderAndEntity(key);
+                    MapInsert(affectedChannels, pChannel);
+                }
+                // Maintain entity secondary index
+                if (key.pClientEntity)
+                {
+                    auto itEnt = m_EntityToChannelKeys.find(key.pClientEntity);
+                    if (itEnt != m_EntityToChannelKeys.end())
+                    {
+                        auto& vec = itEnt->second;
+                        for (std::size_t i = 0; i < vec.size(); ++i)
+                        {
+                            if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                            {
+                                vec[i] = vec.back();
+                                vec.pop_back();
+                                break;
+                            }
+                        }
+                        if (vec.empty())
+                            m_EntityToChannelKeys.erase(itEnt);
+                    }
+                }
+                m_ChannelUsageMap.erase(itUsage);
             }
-            m_ChannelUsageMap.erase(iter++);
         }
-        else
-            ++iter;
+        m_ShaderToChannelKeys.erase(itShader);
     }
 
     // Flag affected textures to re-calc shader matches
@@ -499,7 +560,10 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
         for (CFastHashSet<STexNameInfo*>::iterator iter = pChannel->m_MatchedTextureList.begin(); iter != pChannel->m_MatchedTextureList.end(); ++iter)
         {
             if (*iter)
-                (*iter)->ResetReplacementResults();
+            {
+                if ((*iter)->ResetReplacementResults())
+                    MapInsert(m_InvalidatedTexNameInfos, *iter);
+            }
         }
 
         // Also delete channel if is not refed anymore
@@ -630,22 +694,24 @@ void CMatchChannelManager::RecalcEverything()
                 // Force textures to find rematches
                 pChannel->m_bResetReplacements = false;
                 for (CFastHashSet<STexNameInfo*>::iterator iter = pChannel->m_MatchedTextureList.begin(); iter != pChannel->m_MatchedTextureList.end(); ++iter)
-                    (*iter)->ResetReplacementResults();
+                {
+                    if ((*iter)->ResetReplacementResults())
+                        MapInsert(m_InvalidatedTexNameInfos, *iter);
+                }
             }
         }
     }
 
-    // Remove ClientEntitys with no matches
-    CFastHashSet<CClientEntityBase*> removeList = m_KnownClientEntities;
-    for (std::map<CShaderAndEntityPair, CMatchChannel*>::iterator iter = m_ChannelUsageMap.begin(); iter != m_ChannelUsageMap.end(); ++iter)
+    // Remove ClientEntitys with no matches - use entity secondary index instead of scanning m_ChannelUsageMap
+    CFastHashSet<CClientEntityBase*> removeList;
+    for (CClientEntityBase* pEntity : m_KnownClientEntities)
     {
-        if (iter->first.pClientEntity)
-            MapRemove(removeList, iter->first.pClientEntity);
+        if (m_EntityToChannelKeys.find(pEntity) == m_EntityToChannelKeys.end())
+            MapInsert(removeList, pEntity);
     }
 
     for (CFastHashSet<CClientEntityBase*>::iterator iter = removeList.begin(); iter != removeList.end(); ++iter)
     {
-        // This call could be optimized as the entity won't be present in some maps
         RemoveClientEntityRefs(*iter);
     }
 }
@@ -677,7 +743,8 @@ void CMatchChannelManager::ProcessRematchTexturesQueue()
         {
             pChannel->RemoveTexture(pTexNameInfo);
             MapRemove(pTexNameInfo->matchChannelList, pChannel);
-            pTexNameInfo->ResetReplacementResults();  // Do this here as it won't get picked up in RecalcEverything now
+            if (pTexNameInfo->ResetReplacementResults())  // Do this here as it won't get picked up in RecalcEverything now
+                MapInsert(m_InvalidatedTexNameInfos, pTexNameInfo);
         }
 
         // Rematch against texture list
@@ -814,6 +881,9 @@ void CMatchChannelManager::AddUsage(const CShaderAndEntityPair& key, CMatchChann
     dassert(!MapContains(m_ChannelUsageMap, key));
     pChannel->AddShaderAndEntity(key);
     MapSet(m_ChannelUsageMap, key, pChannel);
+    if (key.pClientEntity)
+        m_EntityToChannelKeys[key.pClientEntity].push_back(key);
+    m_ShaderToChannelKeys[key.pShaderInfo].push_back(key);
     pChannel->m_bResetReplacements = true;
 }
 
@@ -830,6 +900,43 @@ void CMatchChannelManager::RemoveUsage(const CShaderAndEntityPair& key, CMatchCh
     dassert(MapContains(m_ChannelUsageMap, key));
     pChannel->RemoveShaderAndEntity(key);
     MapRemove(m_ChannelUsageMap, key);
+    if (key.pClientEntity)
+    {
+        auto it = m_EntityToChannelKeys.find(key.pClientEntity);
+        if (it != m_EntityToChannelKeys.end())
+        {
+            auto& vec = it->second;
+            for (std::size_t i = 0; i < vec.size(); ++i)
+            {
+                if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                {
+                    vec[i] = vec.back();
+                    vec.pop_back();
+                    break;
+                }
+            }
+            if (vec.empty())
+                m_EntityToChannelKeys.erase(it);
+        }
+    }
+    {
+        auto it = m_ShaderToChannelKeys.find(key.pShaderInfo);
+        if (it != m_ShaderToChannelKeys.end())
+        {
+            auto& vec = it->second;
+            for (std::size_t i = 0; i < vec.size(); ++i)
+            {
+                if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                {
+                    vec[i] = vec.back();
+                    vec.pop_back();
+                    break;
+                }
+            }
+            if (vec.empty())
+                m_ShaderToChannelKeys.erase(it);
+        }
+    }
     pChannel->m_bResetReplacements = true;
 }
 
@@ -885,7 +992,8 @@ void CMatchChannelManager::DeleteChannel(CMatchChannel* pChannel)
         MapRemove(pTexNameInfo->matchChannelList, pChannel);
 
         // Reset shader matches now as this channel is going
-        pTexNameInfo->ResetReplacementResults();
+        if (pTexNameInfo->ResetReplacementResults())
+            MapInsert(m_InvalidatedTexNameInfos, pTexNameInfo);
     }
 
 #ifdef SHADER_DEBUG_CHECKS
@@ -986,11 +1094,39 @@ void CMatchChannelManager::GetShaderReplacementStats(SShaderReplacementStats& ou
 ////////////////////////////////////////////////////////////////
 void CMatchChannelManager::CleanupInvalidatedShaderCache()
 {
-    for (CFastHashMap<SString, STexNameInfo*>::iterator iter = m_AllTextureList.begin(); iter != m_AllTextureList.end(); ++iter)
+    if (m_InvalidatedTexNameInfos.empty())
+        return;
+
+    // Swap out the dirty set so any re-invalidation during cleanup is captured for next run
+    CFastHashSet<STexNameInfo*> dirtySet;
+    std::swap(dirtySet, m_InvalidatedTexNameInfos);
+
+    for (STexNameInfo* pTexNameInfo : dirtySet)
     {
-        STexNameInfo* pTexNameInfo = iter->second;
-        if (pTexNameInfo)
-            pTexNameInfo->CleanupInvalidatedEntries();
+        if (!pTexNameInfo)
+            continue;
+
+        // Collect entities being removed before cleanup
+        std::vector<CClientEntityBase*> removedEntities;
+        for (auto itMap = pTexNameInfo->texEntityShaderMap.begin(); itMap != pTexNameInfo->texEntityShaderMap.end(); ++itMap)
+        {
+            if (!itMap->second.bValid)
+                removedEntities.push_back(itMap->first);
+        }
+
+        pTexNameInfo->CleanupInvalidatedEntries();
+
+        // Update reverse index for removed entities
+        for (CClientEntityBase* pEntity : removedEntities)
+        {
+            auto itRev = m_EntityToTexNameInfos.find(pEntity);
+            if (itRev != m_EntityToTexNameInfos.end())
+            {
+                MapRemove(itRev->second, pTexNameInfo);
+                if (itRev->second.empty())
+                    m_EntityToTexNameInfos.erase(itRev);
+            }
+        }
     }
 }
 
