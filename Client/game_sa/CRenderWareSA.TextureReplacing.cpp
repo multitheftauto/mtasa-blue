@@ -335,7 +335,7 @@ namespace
         {
             auto& usedBy = entry.second.usedByReplacements;
             if (!usedBy.empty())
-                ListRemoveUnordered(usedBy, pReplacementTextures);
+                ListRemove(usedBy, pReplacementTextures);
         }
 
         if (!g_PendingReplacementByModel.empty())
@@ -414,7 +414,7 @@ namespace
             }
 
             pReplacement->usedInTxdIds.erase(usTxdId);
-            ListRemoveUnordered(info.usedByReplacements, pReplacement);
+            ListRemove(info.usedByReplacements, pReplacement);
         }
 
         info.usedByReplacements.clear();
@@ -1110,18 +1110,6 @@ namespace
         for (unsigned short usTxdId : vecSlotsToRemove)
         {
             g_OrphanedIsolatedTxdSlots.erase(usTxdId);
-        }
-    }
-
-    template <typename T>
-    void SwapPopRemove(std::vector<T>& vec, const T& value)
-    {
-        auto it = std::find(vec.begin(), vec.end(), value);
-        if (it != vec.end())
-        {
-            if (it != vec.end() - 1)
-                *it = std::move(vec.back());
-            vec.pop_back();
         }
     }
 
@@ -3946,12 +3934,12 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 AddReportLog(9401, SString("ModelInfoTXDAddTextures: Stale replacement cleanup return false for model %u txdId=%u", usModelId, pInfo->usTxdId));
                 pReplacementTextures->perTxdList.erase(itPerTxd);
                 pReplacementTextures->usedInTxdIds.erase(pInfo->usTxdId);
-                SwapPopRemove(pInfo->usedByReplacements, pReplacementTextures);
+                ListRemove(pInfo->usedByReplacements, pReplacementTextures);
                 return false;
             }
 
             pReplacementTextures->usedInTxdIds.erase(pInfo->usTxdId);
-            SwapPopRemove(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
 
             TextureSwapMap swapMap;
             swapMap.reserve(itPerTxd->usingTextures.size());
@@ -4722,7 +4710,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
             }
 
             pReplacement->usedInTxdIds.erase(usIsolatedTxdId);
-            ListRemoveUnordered(info.usedByReplacements, pReplacement);
+            ListRemove(info.usedByReplacements, pReplacement);
         }
 
         info.usedByReplacements.clear();
@@ -4872,7 +4860,7 @@ void CRenderWareSA::CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId)
         }
 
         pReplacement->usedInTxdIds.erase(usTxdSlotId);
-        ListRemoveUnordered(info.usedByReplacements, pReplacement);
+        ListRemove(info.usedByReplacements, pReplacement);
     }
 
     info.usedByReplacements.clear();
@@ -4993,7 +4981,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             auto itInfo = ms_ModelTexturesInfoMap.find(txdId);
             if (itInfo != ms_ModelTexturesInfoMap.end())
             {
-                ListRemoveUnordered(itInfo->second.usedByReplacements, pReplacementTextures);
+                ListRemove(itInfo->second.usedByReplacements, pReplacementTextures);
             }
 
             // Drop any shader registrations we tracked for this replacement/txd pairing.
@@ -5161,7 +5149,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
             (void)originalsToDestroy;
 
-            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
 
             if (pInfo->usedByReplacements.empty())
@@ -5230,7 +5218,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             perTxdInfo.usingTextures.clear();
             perTxdInfo.replacedOriginals.clear();
 
-            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
 
             if (pInfo->usedByReplacements.empty())
@@ -5527,7 +5515,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                     leakedTextures.insert(pOrig);
                 }
             }
-            ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
             pReplacementTextures->usedInTxdIds.erase(usTxdId);
             if (pInfo->usedByReplacements.empty())
             {
@@ -5586,7 +5574,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             }
         }
 
-        ListRemoveUnordered(pInfo->usedByReplacements, pReplacementTextures);
+        ListRemove(pInfo->usedByReplacements, pReplacementTextures);
 
         if (pInfo->usedByReplacements.empty())
         {
