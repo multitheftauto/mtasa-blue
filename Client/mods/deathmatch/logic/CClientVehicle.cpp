@@ -2983,12 +2983,22 @@ void CClientVehicle::Destroy()
         {
             case CLIENTVEHICLE_BOAT:
                 if (auto* pBoat = dynamic_cast<CBoat*>(m_pVehicle))
+                {
+                    if (!m_BoatHandlingEntry)
+                        m_BoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
+
                     m_BoatHandlingEntry->Assign(pBoat->GetBoatHandlingData());
+                }
                 break;
             case CLIENTVEHICLE_BIKE:
             case CLIENTVEHICLE_BMX:
                 if (auto* pBike = dynamic_cast<CBike*>(m_pVehicle))
+                {
+                    if (!m_BikeHandlingEntry)
+                        m_BikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
+
                     m_BikeHandlingEntry->Assign(pBike->GetBikeHandlingData());
+                }
                 break;
             default:
                 break;
