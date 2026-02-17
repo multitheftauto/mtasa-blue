@@ -176,7 +176,7 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
     if (m_pOriginalBuildingsBackup)
         return;
 
-    auto pBuildsingsPool = (*m_ppBuildingPoolInterface);
+    auto         pBuildsingsPool = (*m_ppBuildingPoolInterface);
     const size_t poolSize = static_cast<size_t>(pBuildsingsPool->m_nSize);
 
     m_pOriginalBuildingsBackup = std::make_unique<backup_container_t>(poolSize);
@@ -220,8 +220,8 @@ void CBuildingsPoolSA::RestoreBackup()
     auto* worldSA = pGame->GetWorld();
     auto* buildingRemovealSA = static_cast<CBuildingRemovalSA*>(pGame->GetBuildingRemoval());
 
-    auto& originalData = *m_pOriginalBuildingsBackup;
-    auto  pBuildsingsPool = (*m_ppBuildingPoolInterface);
+    auto&        originalData = *m_pOriginalBuildingsBackup;
+    auto         pBuildsingsPool = (*m_ppBuildingPoolInterface);
     const size_t restoreCount = std::min(originalData.size(), static_cast<size_t>(pBuildsingsPool->m_nSize));
     for (size_t i = 0; i < restoreCount; i++)
     {
@@ -256,7 +256,7 @@ void CBuildingsPoolSA::PurgeStaleSectorEntries(void* oldPool, int poolSize)
     // ARRAY_StreamSectors is a flat array of CSector[120][120].
     // Each CSector is { CPtrListSingleLink m_buildings; CPtrListDoubleLink m_dummies } = 2 DWORDs.
     // We only scan m_buildings (even-indexed DWORDs).
-    auto* sectorDwords = reinterpret_cast<DWORD*>(ARRAY_StreamSectors);
+    auto*         sectorDwords = reinterpret_cast<DWORD*>(ARRAY_StreamSectors);
     constexpr int kSectorCount = NUM_StreamSectorRows * NUM_StreamSectorCols;
 
     for (int i = 0; i < kSectorCount; ++i)
@@ -403,7 +403,7 @@ void CBuildingsPoolSA::RemoveVehicleDamageLinks()
     // GTA SA vehicle pool slot stride (2584) differs from sizeof(CVehicleSAInterface) (1440)
     // because the pool accommodates CAutomobile and other derived vehicle types.
     constexpr std::uint32_t vehicleStride = 2584;
-    auto* pPoolBase = reinterpret_cast<std::uint8_t*>(pVehiclePool->m_pObjects);
+    auto*                   pPoolBase = reinterpret_cast<std::uint8_t*>(pVehiclePool->m_pObjects);
 
     for (int i = 0; i < pVehiclePool->m_nSize; i++)
     {
@@ -429,7 +429,7 @@ void CBuildingsPoolSA::RemovePedsContactEnityLinks()
     // GTA SA ped pool slot stride (1988) differs from sizeof(CPedSAInterface) (1948)
     // because the pool accommodates CPlayerPed and related derived types.
     constexpr std::uint32_t pedStride = 1988;
-    auto* pPoolBase = reinterpret_cast<std::uint8_t*>(pPedPool->m_pObjects);
+    auto*                   pPoolBase = reinterpret_cast<std::uint8_t*>(pPedPool->m_pObjects);
 
     for (int i = 0; i < pPedPool->m_nSize; i++)
     {
@@ -461,7 +461,7 @@ void CBuildingsPoolSA::RemoveObjectEntityLinks()
     // GTA SA object pool slot stride (412) differs from sizeof(CObjectSAInterface) (380)
     // because pool slots include alignment padding beyond the struct size.
     constexpr std::uint32_t objectStride = 412;
-    auto* pPoolBase = reinterpret_cast<std::uint8_t*>(pObjectPool->m_pObjects);
+    auto*                   pPoolBase = reinterpret_cast<std::uint8_t*>(pObjectPool->m_pObjects);
 
     for (int i = 0; i < pObjectPool->m_nSize; i++)
     {

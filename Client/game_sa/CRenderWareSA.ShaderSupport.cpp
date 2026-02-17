@@ -73,8 +73,7 @@ __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
     ushort usTxdId = (ushort)dwTxdId;
     // Remove any previous events for this txd (erase-remove idiom)
     ms_txdStreamEventList.erase(
-        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(),
-                       [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
+        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(), [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
         ms_txdStreamEventList.end());
     // Append 'added'
     ms_txdStreamEventList.emplace_back(true, usTxdId);
@@ -110,8 +109,7 @@ __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
     ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
     // Remove any previous events for this txd (erase-remove idiom)
     ms_txdStreamEventList.erase(
-        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(),
-                       [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
+        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(), [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
         ms_txdStreamEventList.end());
     // Append 'removed'
     ms_txdStreamEventList.emplace_back(false, usTxdId);
@@ -400,7 +398,7 @@ void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
             OnTextureStreamOut(pTexInfo);
             // Erase from m_TexInfoMap by scanning the TXD ID bucket
             typedef std::multimap<ushort, STexInfo*>::iterator IterType;
-            std::pair<IterType, IterType> range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
+            std::pair<IterType, IterType>                      range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
             for (IterType iter = range.first; iter != range.second; ++iter)
             {
                 if (iter->second == pTexInfo)
@@ -475,7 +473,7 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
             OnTextureStreamOut(pTexInfo);
             // Erase from m_TexInfoMap by scanning the TXD ID bucket
             typedef std::multimap<ushort, STexInfo*>::iterator IterType;
-            std::pair<IterType, IterType> range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
+            std::pair<IterType, IterType>                      range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
             for (IterType iter = range.first; iter != range.second; ++iter)
             {
                 if (iter->second == pTexInfo)

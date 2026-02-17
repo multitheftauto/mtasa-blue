@@ -64,7 +64,7 @@ int OnMY_CRenderer_SetupEntityVisibility_Pre(CEntitySAInterface* pEntity, float&
     if (!pModelInfo)
     {
         saved.bValid = false;
-        return 0xFF;            // Skip: caller's switch-default ignores the entity
+        return 0xFF;  // Skip: caller's switch-default ignores the entity
     }
 
     if (pEntity->IsLowLodEntity())
@@ -78,7 +78,7 @@ int OnMY_CRenderer_SetupEntityVisibility_Pre(CEntitySAInterface* pEntity, float&
     else
         saved.bValid = false;
 
-    return -1;                  // Proceed with the original function
+    return -1;  // Proceed with the original function
 }
 
 void OnMY_CRenderer_SetupEntityVisibility_Post(int result, CEntitySAInterface* pEntity, float& fDist)
@@ -333,8 +333,7 @@ void CMultiplayerSA::SetLODSystemEnabled(bool bEnable)
     // Memory saved here
     static CBuffer savedMem;
     SHookInfo      hookInfoList[] = {MAKE_HOOK_INFO(CRenderer_SetupEntityVisibility), MAKE_HOOK_INFO(CWorldScan_ScanWorld),
-                                     MAKE_HOOK_INFO(CRenderer_ScanSectorList_EntityCheck),
-                                     MAKE_HOOK_INFO(CVisibilityPlugins_CalculateFadingAtomicAlpha)};
+                                     MAKE_HOOK_INFO(CRenderer_ScanSectorList_EntityCheck), MAKE_HOOK_INFO(CVisibilityPlugins_CalculateFadingAtomicAlpha)};
 
     // Enable or not?
     if (bEnable)

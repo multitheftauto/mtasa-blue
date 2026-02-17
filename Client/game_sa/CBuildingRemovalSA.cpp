@@ -61,8 +61,7 @@ static bool IsExpectedRemovalModel(CEntitySAInterface* pEntity, uint16_t usExpec
     return static_cast<uint16_t>(iModelIndex) == usExpectedModel;
 }
 
-static void LogStaleTrackedEntity(const char* szContext, CEntitySAInterface* pEntity, const char* szReason,
-                                  int& iLogCount, bool& bSuppressed)
+static void LogStaleTrackedEntity(const char* szContext, CEntitySAInterface* pEntity, const char* szReason, int& iLogCount, bool& bSuppressed)
 {
     constexpr int kMaxStaleLogsPerCall = 32;
     if (iLogCount < kMaxStaleLogsPerCall)
@@ -291,7 +290,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                             }
                             // if the building type is dummy or building and it's not already being removed
                             else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                                pEntity->bRemoveFromWorld != 1)
+                                     pEntity->bRemoveFromWorld != 1)
                             {
                                 // Don't call this on entities being removed.
                                 if (!pEntity->IsPlaceableVTBL())
@@ -336,7 +335,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                             }
                             // if the building type is dummy or building and it's not already being removed
                             else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                                pEntity->bRemoveFromWorld != 1)
+                                     pEntity->bRemoveFromWorld != 1)
                             {
                                 if (!pEntity->IsPlaceableVTBL())
                                 {
@@ -573,7 +572,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                         }
                         // if the building type is dummy or building and it's not already being removed
                         else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                            pEntity->bRemoveFromWorld != 1)
+                                 pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
                             if (!pEntity->IsPlaceableVTBL())
@@ -610,7 +609,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                         }
                         // if the building type is dummy or building and it's not already being removed
                         else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                            pEntity->bRemoveFromWorld != 1)
+                                 pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
                             if (!pEntity->IsPlaceableVTBL())
@@ -949,7 +948,7 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
     for (auto it = m_pDataBuildings->begin(); it != m_pDataBuildings->end();)
     {
         sDataBuildingRemovalItem* pItem = it->second;
-        CEntitySAInterface* pEntity = pItem ? pItem->m_pInterface : nullptr;
+        CEntitySAInterface*       pEntity = pItem ? pItem->m_pInterface : nullptr;
         if (!pEntity)
         {
             ++it;
@@ -980,7 +979,7 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
     for (auto it = m_pBinaryBuildings->begin(); it != m_pBinaryBuildings->end();)
     {
         sBuildingRemovalItem* pItem = it->second;
-        CEntitySAInterface* pEntity = pItem ? pItem->m_pInterface : nullptr;
+        CEntitySAInterface*   pEntity = pItem ? pItem->m_pInterface : nullptr;
         if (!pEntity)
         {
             ++it;
@@ -1016,7 +1015,7 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
 #define HOOKSIZE_CIplStore_RemoveIpl 5
 static DWORD RETURN_CIplStore_RemoveIpl = 0x404B25;
 
-#define VAR_CIplStore_msPool  0x8E3FB0
+#define VAR_CIplStore_msPool 0x8E3FB0
 
 static void __cdecl OnIplRemovePre(int iplSlotIndex)
 {
@@ -1030,7 +1029,6 @@ static void __cdecl OnIplRemovePre(int iplSlotIndex)
 
 static void __declspec(naked) HOOK_CIplStore_RemoveIpl()
 {
-
     // clang-format off
     __asm
     {

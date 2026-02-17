@@ -16,33 +16,33 @@ uint CMatchChannel::ms_uiIdCounter = 1;
 
 namespace
 {
-//////////////////////////////////////////////////////////////////
-//
-constexpr bool ENABLE_STALE_ENTITY_CLEANUP = true;
-constexpr std::size_t NUM_STALE_ENTITY_CLEANUP_MAX_BATCH = 128;
+    //////////////////////////////////////////////////////////////////
+    //
+    constexpr bool        ENABLE_STALE_ENTITY_CLEANUP = true;
+    constexpr std::size_t NUM_STALE_ENTITY_CLEANUP_MAX_BATCH = 128;
 
-struct SStaleEntityCleanupBudget
-{
-    long long   llIntervalMs;
-    std::size_t uiBatchSize;
-    std::size_t uiProbeBudget;
-    long long   llTimeBudgetUs;
-};
+    struct SStaleEntityCleanupBudget
+    {
+        long long   llIntervalMs;
+        std::size_t uiBatchSize;
+        std::size_t uiProbeBudget;
+        long long   llTimeBudgetUs;
+    };
 
-static SStaleEntityCleanupBudget GetStaleEntityCleanupBudget(std::size_t uiTrackedEntities)
-{
-    if (uiTrackedEntities >= 4096)
-        return {300, 96, 1024, 800};
+    static SStaleEntityCleanupBudget GetStaleEntityCleanupBudget(std::size_t uiTrackedEntities)
+    {
+        if (uiTrackedEntities >= 4096)
+            return {300, 96, 1024, 800};
 
-    if (uiTrackedEntities >= 1024)
-        return {700, 48, 512, 450};
+        if (uiTrackedEntities >= 1024)
+            return {700, 48, 512, 450};
 
-    if (uiTrackedEntities >= 256)
-        return {1400, 24, 192, 250};
+        if (uiTrackedEntities >= 256)
+            return {1400, 24, 192, 250};
 
-    return {2400, 12, 96, 120};
-}
-}            // namespace
+        return {2400, 12, 96, 120};
+    }
+}  // namespace
 
 //////////////////////////////////////////////////////////////////
 //
@@ -451,19 +451,19 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
         return;
 
     std::array<CClientEntityBase*, NUM_STALE_ENTITY_CLEANUP_MAX_BATCH> staleEntityList{};
-    std::size_t uiStaleCount = 0;
+    std::size_t                                                        uiStaleCount = 0;
 
     const std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
-    std::size_t uiProbes = 0;
-    std::size_t uiStartBucket = m_uiStaleEntityCleanupCursorBucket % uiBucketCount;
-    std::size_t uiCurrentBucket = uiStartBucket;
-    bool        bStopScan = false;
+    std::size_t                                 uiProbes = 0;
+    std::size_t                                 uiStartBucket = m_uiStaleEntityCleanupCursorBucket % uiBucketCount;
+    std::size_t                                 uiCurrentBucket = uiStartBucket;
+    bool                                        bStopScan = false;
 
     for (std::size_t uiBucketsVisited = 0; uiBucketsVisited < uiBucketCount && !bStopScan; ++uiBucketsVisited)
     {
         uiCurrentBucket = (uiStartBucket + uiBucketsVisited) % uiBucketCount;
         for (std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>>::local_iterator iterEntity = m_EntityToTexNameInfos.begin(uiCurrentBucket);
-               iterEntity != m_EntityToTexNameInfos.end(uiCurrentBucket); ++iterEntity)
+             iterEntity != m_EntityToTexNameInfos.end(uiCurrentBucket); ++iterEntity)
         {
             if (uiStaleCount >= uiTargetBatch)
             {
@@ -480,8 +480,7 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
 
             if ((uiProbes & 0xF) == 0)
             {
-                const long long llElapsedUs =
-                    std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
+                const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
                 if (llElapsedUs > cleanupBudget.llTimeBudgetUs)
                 {
                     bStopScan = true;
@@ -505,7 +504,7 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
 
     for (std::size_t i = 0; i < uiStaleCount; ++i)
     {
-        CClientEntityBase* pClientEntity = staleEntityList[i];
+        CClientEntityBase*                                                            pClientEntity = staleEntityList[i];
         std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>>::iterator iterTexNames = m_EntityToTexNameInfos.find(pClientEntity);
         if (iterTexNames == m_EntityToTexNameInfos.end())
             continue;
