@@ -22,7 +22,8 @@ extern CClientGame* g_pClientGame;
 
 CLuaArguments::CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
 {
-    ReadFromBitStream(bitStream, pKnownTables);
+    if (!ReadFromBitStream(bitStream, pKnownTables))
+        DeleteArguments();
 }
 
 CLuaArguments::CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
