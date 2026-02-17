@@ -4200,8 +4200,9 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     perTxdInfo.replacedOriginals.resize(perTxdInfo.usingTextures.size(), nullptr);
 
     const auto& masterTexturesVec = pReplacementTextures->textures;
-    auto        IsMasterTexture = [&masterTexturesVec](RwTexture* pTex) -> bool
-    { return std::find(masterTexturesVec.begin(), masterTexturesVec.end(), pTex) != masterTexturesVec.end(); };
+    const auto  masterTexturesSet = MakeTextureSet(masterTexturesVec);
+    auto        IsMasterTexture = [&masterTexturesSet](RwTexture* pTex) -> bool
+    { return masterTexturesSet.count(pTex) != 0; };
 
     RwTexDictionary* const pTargetTxd = pInfo->pTxd;
     const bool             bTargetTxdOk = pTargetTxd != nullptr;
