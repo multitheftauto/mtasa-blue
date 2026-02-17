@@ -424,8 +424,10 @@ void CMatchChannelManager::CalcShaderForTexAndEntity(SShaderInfoLayers& outShade
 //
 // CMatchChannelManager::PulseStaleEntityCacheCleanup
 //
-// Low-frequency cleanup to remove cache entries for entities that are no
-// longer in the known-entity set.
+// Rate-controlled periodic cleanup:
+// 1. Remove all cache/index entries for entities no longer in m_KnownClientEntities
+// 2. Prune invalidated (bValid=false) shader cache entries from active entities
+//    that haven't been rebuilt since the last cleanup interval
 //
 //////////////////////////////////////////////////////////////////
 void CMatchChannelManager::PulseStaleEntityCacheCleanup()
@@ -452,6 +454,8 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
 
     std::array<CClientEntityBase*, NUM_STALE_ENTITY_CLEANUP_MAX_BATCH> staleEntityList{};
     std::size_t                                                        uiStaleCount = 0;
+    std::array<CClientEntityBase*, NUM_STALE_ENTITY_CLEANUP_MAX_BATCH> activeCacheCleanupList{};
+    std::size_t                                                        uiActiveCount = 0;
 
     const std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     std::size_t                                 uiProbes = 0;
@@ -497,6 +501,8 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
 
             if (!MapContains(m_KnownClientEntities, pClientEntity))
                 staleEntityList[uiStaleCount++] = pClientEntity;
+            else if (uiActiveCount < uiTargetBatch)
+                activeCacheCleanupList[uiActiveCount++] = pClientEntity;
         }
     }
 
@@ -516,6 +522,116 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
         }
 
         m_EntityToTexNameInfos.erase(iterTexNames);
+
+        // Also clean channel secondary indces for this entity.
+        // RemoveClientEntityRefs should already handle this path, but this keeps cleanup resilient
+        // when entity lifecycle callbacks are skipped.
+        // Follows the same complete pattern as RemoveClientEntityRefs: remove from channels,
+        // reset replacement results on affected textures, and delete empty channels.
+        std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator itEntity = m_EntityToChannelKeys.find(pClientEntity);
+        if (itEntity != m_EntityToChannelKeys.end())
+        {
+            CFastHashSet<CMatchChannel*> affectedChannels;
+
+            for (const CShaderAndEntityPair& key : itEntity->second)
+            {
+                std::map<CShaderAndEntityPair, CMatchChannel*>::iterator itUsage = m_ChannelUsageMap.find(key);
+                if (itUsage != m_ChannelUsageMap.end())
+                {
+                    CMatchChannel* pChannel = itUsage->second;
+                    if (pChannel)
+                    {
+                        pChannel->RemoveShaderAndEntity(key);
+                        MapInsert(affectedChannels, pChannel);
+                    }
+
+                    // Maintain shader secondary index (swap-and-pop, same pattern as RemoveClientEntityRefs)
+                    std::unordered_map<SShaderInfo*, std::vector<CShaderAndEntityPair>>::iterator itShdr = m_ShaderToChannelKeys.find(key.pShaderInfo);
+                    if (itShdr != m_ShaderToChannelKeys.end())
+                    {
+                        std::vector<CShaderAndEntityPair>& vec = itShdr->second;
+                        for (std::size_t j = 0; j < vec.size(); ++j)
+                        {
+                            if (vec[j].pShaderInfo == key.pShaderInfo && vec[j].pClientEntity == key.pClientEntity)
+                            {
+                                vec[j] = vec.back();
+                                vec.pop_back();
+                                break;
+                            }
+                        }
+                        if (vec.empty())
+                            m_ShaderToChannelKeys.erase(itShdr);
+                    }
+                    m_ChannelUsageMap.erase(itUsage);
+                }
+            }
+            m_EntityToChannelKeys.erase(itEntity);
+
+            // Flag affected textures to re-calc shader results and delete empty channels
+            for (CMatchChannel* pChannel : affectedChannels)
+            {
+                if (!pChannel)
+                    continue;
+
+                for (STexNameInfo* pTexNameInfo : pChannel->m_MatchedTextureList)
+                {
+                    if (pTexNameInfo)
+                        pTexNameInfo->ResetReplacementResults();
+                }
+
+                if (pChannel->GetShaderAndEntityCount() == 0)
+                    DeleteChannel(pChannel);
+            }
+        }
+    }
+
+    // Prune invalidated (bValid=false) cache entries from active entities.
+    // By the time this runs (300ms+ after invalidation), entries still bValid=false
+    // are likely for entity+texture combos no longer being rendered.
+    constexpr std::size_t ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY = 32;
+    for (std::size_t i = 0; i < uiActiveCount; ++i)
+    {
+        // Respect the same time rate as the scan phase
+        if ((i & 0x3) == 0 && i > 0)
+        {
+            const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
+            if (llElapsedUs > cleanupBudget.llTimeBudgetUs)
+                break;
+        }
+
+        CClientEntityBase*                                                            pClientEntity = activeCacheCleanupList[i];
+        std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>>::iterator iterTexNames = m_EntityToTexNameInfos.find(pClientEntity);
+        if (iterTexNames == m_EntityToTexNameInfos.end())
+            continue;
+
+        CFastHashSet<STexNameInfo*>&                                      texNameInfoSet = iterTexNames->second;
+        std::array<STexNameInfo*, ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY> toRemove{};
+        std::size_t                                                       uiRemoveCount = 0;
+
+        for (STexNameInfo* pTexNameInfo : texNameInfoSet)
+        {
+            if (uiRemoveCount >= ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY)
+                break;
+
+            if (!pTexNameInfo)
+            {
+                toRemove[uiRemoveCount++] = pTexNameInfo;
+                continue;
+            }
+
+            STexShaderReplacement* pReplacement = MapFind(pTexNameInfo->texEntityShaderMap, pClientEntity);
+            if (pReplacement && !pReplacement->bValid)
+            {
+                MapRemove(pTexNameInfo->texEntityShaderMap, pClientEntity);
+                toRemove[uiRemoveCount++] = pTexNameInfo;
+            }
+        }
+
+        for (std::size_t j = 0; j < uiRemoveCount; ++j)
+            MapRemove(texNameInfoSet, toRemove[j]);
+
+        if (texNameInfoSet.empty())
+            m_EntityToTexNameInfos.erase(iterTexNames);
     }
 }
 
