@@ -18,8 +18,10 @@
 #include "CPtrNodeSingleListSA.h"
 #include "MemSA.h"
 #include "CVehicleSA.h"
+#include "CObjectSA.h"
 #include "CBuildingRemovalSA.h"
 #include "CPlayerPedSA.h"
+#include "CPoolsSA.h"
 #include "CWorldSA.h"
 
 extern CGameSA* pGame;
@@ -185,6 +187,7 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
     // (e.g. CEventScanner::ScanForEvents). Mirrors the cleanup already done in Resize().
     RemoveVehicleDamageLinks();
     RemovePedsContactEnityLinks();
+    RemoveObjectEntityLinks();
 
     for (size_t i = 0; i < poolSize; i++)
     {
@@ -343,6 +346,7 @@ bool CBuildingsPoolSA::Resize(int size)
 
     RemoveVehicleDamageLinks();
     RemovePedsContactEnityLinks();
+    RemoveObjectEntityLinks();
 
     return true;
 }
@@ -392,44 +396,85 @@ void CBuildingsPoolSA::UpdateBackupLodPointers(uint32_t offset)
 
 void CBuildingsPoolSA::RemoveVehicleDamageLinks()
 {
-    const int count = pGame->GetPools()->GetVehicleCount();
-    for (int i = 0; i < count; i++)
+    auto* pVehiclePool = *reinterpret_cast<CPoolSAInterface<CVehicleSAInterface>**>(CLASS_CVehiclePool);
+    if (!pVehiclePool)
+        return;
+
+    // GTA SA vehicle pool slot stride (2584) differs from sizeof(CVehicleSAInterface) (1440)
+    // because the pool accommodates CAutomobile and other derived vehicle types.
+    constexpr std::uint32_t vehicleStride = 2584;
+    auto* pPoolBase = reinterpret_cast<std::uint8_t*>(pVehiclePool->m_pObjects);
+
+    for (int i = 0; i < pVehiclePool->m_nSize; i++)
     {
-        auto* vehLinks = pGame->GetPools()->GetVehicle(i);
-        if (vehLinks->pEntity)
-        {
-            CVehicleSAInterface* vehicle = vehLinks->pEntity->GetVehicleInterface();
-            vehicle->m_pCollidedEntity = nullptr;
-            vehicle->pLastContactedEntity[0] = nullptr;
-            vehicle->pLastContactedEntity[1] = nullptr;
-            vehicle->pLastContactedEntity[2] = nullptr;
-            vehicle->pLastContactedEntity[3] = nullptr;
-            vehicle->m_ucCollisionState = 0;
-        }
+        if (pVehiclePool->IsEmpty(i))
+            continue;
+
+        auto* vehicle = reinterpret_cast<CVehicleSAInterface*>(pPoolBase + i * vehicleStride);
+        vehicle->m_pCollidedEntity = nullptr;
+        vehicle->pLastContactedEntity[0] = nullptr;
+        vehicle->pLastContactedEntity[1] = nullptr;
+        vehicle->pLastContactedEntity[2] = nullptr;
+        vehicle->pLastContactedEntity[3] = nullptr;
+        vehicle->m_ucCollisionState = 0;
     }
 }
 
 void CBuildingsPoolSA::RemovePedsContactEnityLinks()
 {
-    const int count = pGame->GetPools()->GetPedCount();
-    for (int i = 0; i < count; i++)
-    {
-        auto* pedLinks = pGame->GetPools()->GetPed(i);
-        if (pedLinks->pEntity)
-        {
-            CPedSAInterface* ped = pedLinks->pEntity->GetPedInterface();
-            ped->m_pCollidedEntity = nullptr;
-            ped->pContactEntity = nullptr;
-            ped->pLastContactEntity = nullptr;
-            ped->pLastContactedEntity[0] = nullptr;
-            ped->pLastContactedEntity[1] = nullptr;
-            ped->pLastContactedEntity[2] = nullptr;
-            ped->pLastContactedEntity[3] = nullptr;
-            ped->m_ucCollisionState = 0;
+    auto* pPedPool = *reinterpret_cast<CPoolSAInterface<CPedSAInterface>**>(CLASS_CPedPool);
+    if (!pPedPool)
+        return;
 
-            if (auto* playerPed = dynamic_cast<CPlayerPedSA*>(pedLinks->pEntity))
-                playerPed->SetTargetedEntity(nullptr);
-        }
+    // GTA SA ped pool slot stride (1988) differs from sizeof(CPedSAInterface) (1948)
+    // because the pool accommodates CPlayerPed and related derived types.
+    constexpr std::uint32_t pedStride = 1988;
+    auto* pPoolBase = reinterpret_cast<std::uint8_t*>(pPedPool->m_pObjects);
+
+    for (int i = 0; i < pPedPool->m_nSize; i++)
+    {
+        if (pPedPool->IsEmpty(i))
+            continue;
+
+        auto* ped = reinterpret_cast<CPedSAInterface*>(pPoolBase + i * pedStride);
+        ped->m_pCollidedEntity = nullptr;
+        ped->pContactEntity = nullptr;
+        ped->pLastContactEntity = nullptr;
+        ped->pLastContactedEntity[0] = nullptr;
+        ped->pLastContactedEntity[1] = nullptr;
+        ped->pLastContactedEntity[2] = nullptr;
+        ped->pLastContactedEntity[3] = nullptr;
+        ped->m_ucCollisionState = 0;
+    }
+
+    // Clear local player's targeted entity (player ped is always at pool index 0)
+    if (pPedPool->IsContains(0))
+        reinterpret_cast<CPlayerPedSAInterface*>(pPoolBase)->mouseTargetEntity = nullptr;
+}
+
+void CBuildingsPoolSA::RemoveObjectEntityLinks()
+{
+    auto* pObjectPool = *reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
+    if (!pObjectPool)
+        return;
+
+    // GTA SA object pool slot stride (412) differs from sizeof(CObjectSAInterface) (380)
+    // because pool slots include alignment padding beyond the struct size.
+    constexpr std::uint32_t objectStride = 412;
+    auto* pPoolBase = reinterpret_cast<std::uint8_t*>(pObjectPool->m_pObjects);
+
+    for (int i = 0; i < pObjectPool->m_nSize; i++)
+    {
+        if (pObjectPool->IsEmpty(i))
+            continue;
+
+        auto* object = reinterpret_cast<CObjectSAInterface*>(pPoolBase + i * objectStride);
+        object->m_pCollidedEntity = nullptr;
+        object->pLastContactedEntity[0] = nullptr;
+        object->pLastContactedEntity[1] = nullptr;
+        object->pLastContactedEntity[2] = nullptr;
+        object->pLastContactedEntity[3] = nullptr;
+        object->m_ucCollisionState = 0;
     }
 }
 

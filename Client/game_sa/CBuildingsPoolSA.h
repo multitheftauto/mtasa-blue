@@ -39,6 +39,7 @@ private:
     void UpdateBackupLodPointers(uint32_t offset);
     void RemoveVehicleDamageLinks();
     void RemovePedsContactEnityLinks();
+    void RemoveObjectEntityLinks();
     void PurgeStaleSectorEntries(void* oldPool, int poolSize);
 
 private:
