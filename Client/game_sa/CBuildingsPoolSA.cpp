@@ -20,6 +20,7 @@
 #include "CVehicleSA.h"
 #include "CBuildingRemovalSA.h"
 #include "CPlayerPedSA.h"
+#include "CWorldSA.h"
 
 extern CGameSA* pGame;
 
@@ -173,10 +174,19 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
     if (m_pOriginalBuildingsBackup)
         return;
 
-    m_pOriginalBuildingsBackup = std::make_unique<backup_array_t>();
-
     auto pBuildsingsPool = (*m_ppBuildingPoolInterface);
-    for (size_t i = 0; i < MAX_BUILDINGS; i++)
+    const size_t poolSize = static_cast<size_t>(pBuildsingsPool->m_nSize);
+
+    m_pOriginalBuildingsBackup = std::make_unique<backup_container_t>(poolSize);
+
+    // Clear ped/vehicle entity pointers that may reference buildings about to be freed.
+    // Without this, fields like CPed::pContactEntity can become dangling after pool slots
+    // are released, causing crashes in SA code that reads m_nModelIndex from them
+    // (e.g. CEventScanner::ScanForEvents). Mirrors the cleanup already done in Resize().
+    RemoveVehicleDamageLinks();
+    RemovePedsContactEnityLinks();
+
+    for (size_t i = 0; i < poolSize; i++)
     {
         if (pBuildsingsPool->IsContains(i))
         {
@@ -209,7 +219,8 @@ void CBuildingsPoolSA::RestoreBackup()
 
     auto& originalData = *m_pOriginalBuildingsBackup;
     auto  pBuildsingsPool = (*m_ppBuildingPoolInterface);
-    for (size_t i = 0; i < MAX_BUILDINGS; i++)
+    const size_t restoreCount = std::min(originalData.size(), static_cast<size_t>(pBuildsingsPool->m_nSize));
+    for (size_t i = 0; i < restoreCount; i++)
     {
         if (originalData[i].first)
         {
@@ -231,6 +242,39 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
     pBuilding->RemoveRWObjectWithReferencesCleanup();
 }
 
+void CBuildingsPoolSA::PurgeStaleSectorEntries(void* oldPool, int poolSize)
+{
+    if (!oldPool || poolSize <= 0)
+        return;
+
+    const auto poolStart = reinterpret_cast<std::uintptr_t>(oldPool);
+    const auto poolEnd = poolStart + static_cast<std::uintptr_t>(poolSize) * sizeof(CBuildingSAInterface);
+
+    // ARRAY_StreamSectors is a flat array of CSector[120][120].
+    // Each CSector is { CPtrListSingleLink m_buildings; CPtrListDoubleLink m_dummies } = 2 DWORDs.
+    // We only scan m_buildings (even-indexed DWORDs).
+    auto* sectorDwords = reinterpret_cast<DWORD*>(ARRAY_StreamSectors);
+    constexpr int kSectorCount = NUM_StreamSectorRows * NUM_StreamSectorCols;
+
+    for (int i = 0; i < kSectorCount; ++i)
+    {
+        auto* pList = reinterpret_cast<CPtrNodeSingleListSAInterface<CEntitySAInterface>*>(&sectorDwords[i * 2]);
+        auto* pNode = reinterpret_cast<CPtrNodeSingleLink<CEntitySAInterface>*>(sectorDwords[i * 2]);
+
+        while (pNode)
+        {
+            // Pre-cache next before RemoveItem, which frees the current node.
+            auto* pNext = pNode->pNext;
+            auto  entityAddr = reinterpret_cast<std::uintptr_t>(pNode->pItem);
+
+            if (entityAddr >= poolStart && entityAddr < poolEnd)
+                pList->RemoveItem(pNode->pItem);
+
+            pNode = pNext;
+        }
+    }
+}
+
 bool CBuildingsPoolSA::Resize(int size)
 {
     auto*     pool = (*m_ppBuildingPoolInterface);
@@ -239,6 +283,13 @@ bool CBuildingsPoolSA::Resize(int size)
     m_buildingPool.entities.resize(size);
 
     void* oldPool = pool->m_pObjects;
+
+    // Safety scan: remove any sector building list nodes still referencing the
+    // old pool.. RemoveAllWithBackup should have removed them all via CWorld::Remove,
+    // but that call relies on GetBoundRect that can miss entities whose collision
+    // model is unloaded. Leaving stale nodes causes a crash in DeleteAllRwObjects.
+    if (oldPool != nullptr)
+        PurgeStaleSectorEntries(oldPool, currentSize);
 
     if (oldPool != nullptr)
     {
@@ -314,6 +365,8 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
         for (size_t j = 0; j < arraySize; j++)
         {
             CBuildingSAInterface* object = (*ppArray)[j];
+            if (object == nullptr)
+                continue;
 
             (*ppArray)[j] = (CBuildingSAInterface*)((uint32_t)object + offset);
         }
@@ -322,13 +375,13 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
 
 void CBuildingsPoolSA::UpdateBackupLodPointers(uint32_t offset)
 {
-    backup_array_t* arr = m_pOriginalBuildingsBackup.get();
-    for (size_t i = 0; i < MAX_BUILDINGS; ++i)
+    auto& arr = *m_pOriginalBuildingsBackup;
+    for (size_t i = 0; i < arr.size(); ++i)
     {
-        std::pair<bool, building_buffer_t>* data = &(*arr)[i];
-        if (data->first)
+        auto& data = arr[i];
+        if (data.first)
         {
-            CBuildingSAInterface* building = reinterpret_cast<CBuildingSAInterface*>(&data->second);
+            CBuildingSAInterface* building = reinterpret_cast<CBuildingSAInterface*>(&data.second);
             if (building->m_pLod != nullptr)
             {
                 building->m_pLod = (CBuildingSAInterface*)((uint32_t)building->m_pLod + offset);

@@ -34,9 +34,17 @@ SString GetDebugTagStr(CMatchChannel* pChannel);
 //
 struct SMatchType
 {
-    SMatchType(const SString& strMatch, bool bAdditive) : strMatch(strMatch), bAdditive(bAdditive) {}
+    SMatchType(const SString& strMatch, bool bAdditive)
+        : strMatch(strMatch)
+        , bAdditive(bAdditive)
+        , bIsMatchAll(strMatch.length() == 1 && strMatch[0] == '*')
+        , bHasWildcards(strMatch.find_first_of("*?") != SString::npos)
+    {
+    }
     SString strMatch;
     bool    bAdditive;
+    bool    bIsMatchAll;
+    bool    bHasWildcards;
 };
 
 //
@@ -52,16 +60,15 @@ struct SWildcardMatchChain
         bool bIsMatch = false;
         for (std::vector<SMatchType>::const_iterator iter = matchTypeList.begin(); iter != matchTypeList.end(); ++iter)
         {
-            const SString& strMatch = iter->strMatch;
-            bool            bMatches;
+            bool bMatches;
 
             // Fast paths for common patterns (equivalent to WildcardMatch but avoids per-char loop)
-            if (strMatch.length() == 1 && strMatch[0] == '*')
+            if (iter->bIsMatchAll)
                 bMatches = true;
-            else if (strMatch.find_first_of("*?") == SString::npos)
-                bMatches = (strMatch == strTextureName);
+            else if (!iter->bHasWildcards)
+                bMatches = (iter->strMatch == strTextureName);
             else
-                bMatches = WildcardMatch(strMatch, strTextureName);
+                bMatches = WildcardMatch(iter->strMatch, strTextureName);
 
             if (bMatches)
                 bIsMatch = iter->bAdditive;
@@ -278,10 +285,10 @@ public:
     void InsertTexture(STexInfo* pTexInfo);
     void RemoveTexture(STexInfo* pTexInfo);
     SShaderInfoLayers* GetShaderForTexAndEntity(STexInfo* pTexInfo, CClientEntityBase* pClientEntity, int iEntityType);
+    void               PulseStaleEntityCacheCleanup();
     void               RemoveClientEntityRefs(CClientEntityBase* pClientEntity);
     void               RemoveShaderRefs(CSHADERDUMMY* pShaderData);
     void               GetShaderReplacementStats(SShaderReplacementStats& outStats);
-    void               CleanupInvalidatedShaderCache();  // Cleanup deferred invalidated entries
 
 protected:
     void           CalcShaderForTexAndEntity(SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType,
@@ -309,7 +316,6 @@ protected:
     void                   FinalizeLayers(SShaderInfoLayers& shaderLayers);
 
     bool                                           m_bChangesPending;
-    CFastHashSet<STexNameInfo*>                     m_InvalidatedTexNameInfos;    // Textures with bValid=false entries needing deferred cleanup
     std::map<CShaderAndEntityPair, CMatchChannel*> m_ChannelUsageMap;
     // Secondary index: entity > keys in m_ChannelUsageMap, for fast RemoveClientEntityRefs
     std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>> m_EntityToChannelKeys;
@@ -323,4 +329,6 @@ protected:
     CFastHashMap<SString, STexNameInfo*>           m_AllTextureList;
     CFastHashMap<CSHADERDUMMY*, SShaderInfo*>      m_ShaderInfoMap;
     CFastHashSet<CClientEntityBase*>               m_KnownClientEntities;
+    long long                                      m_llNextStaleEntityCleanupTime = 0;
+    std::size_t                                    m_uiStaleEntityCleanupCursorBucket = 0;
 };

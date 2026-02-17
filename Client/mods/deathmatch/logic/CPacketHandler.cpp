@@ -5024,27 +5024,33 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
             szName[usNameLength] = 0;
 
             // Read out the arguments aswell
-            CLuaArguments Arguments(bitStream);
-
-            // Grab the event. Does it exist and is it remotely triggerable?
-            SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
-            if (pEvent)
+            CLuaArguments Arguments;
+            if (!Arguments.ReadFromBitStream(bitStream))
             {
-                if (pEvent->bAllowRemoteTrigger)
-                {
-                    // Grab the element we trigger it on
-                    CClientEntity* pEntity = CElementIDs::GetElement(EntityID);
-                    if (pEntity)
-                    {
-                        pEntity->CallEvent(szName, Arguments, true);
-                    }
-                }
-                else
-                    g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not marked as remotely triggerable",
-                                                                szName);
+                g_pClientGame->m_pScriptDebugging->LogError(nullptr, "Server triggered clientside event %s with invalid argument data", szName);
             }
             else
-                g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not added clientside", szName);
+            {
+                // Grab the event. Does it exist and is it remotely triggerable?
+                SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
+                if (pEvent)
+                {
+                    if (pEvent->bAllowRemoteTrigger)
+                    {
+                        // Grab the element we trigger it on
+                        CClientEntity* pEntity = CElementIDs::GetElement(EntityID);
+                        if (pEntity)
+                        {
+                            pEntity->CallEvent(szName, Arguments, true);
+                        }
+                    }
+                    else
+                        g_pClientGame->m_pScriptDebugging->LogError(nullptr, "Server triggered clientside event %s, but event is not marked as remotely triggerable",
+                                                                    szName);
+                }
+                else
+                    g_pClientGame->m_pScriptDebugging->LogError(nullptr, "Server triggered clientside event %s, but event is not added clientside", szName);
+            }
         }
 
         // Delete event name again

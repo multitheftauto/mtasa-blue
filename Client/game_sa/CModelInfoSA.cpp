@@ -126,6 +126,26 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
     }
 }
 
+// IsValidModelInfoPtr only validates via reads, so stale pointers in readable
+// but non-writable memory pass. So this checks writability
+// by reading a field and writing the same value back under SEH.
+static bool IsWritableModelInfoPtr(CBaseModelInfoSAInterface* ptr) noexcept
+{
+    if (!ptr)
+        return false;
+
+    __try
+    {
+        volatile auto val = ptr->usTextureDictionary;
+        ptr->usTextureDictionary = val;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
 static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept
 {
     __try
@@ -1046,6 +1066,14 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     m_pInterface = GetInterface();
     if (!m_pInterface)
         return;
+
+    // GetInterface() validates via reads only; stale pointers in read-only
+    // pages pass that check but crash on write
+    if (!IsWritableModelInfoPtr(m_pInterface))
+    {
+        m_pInterface = nullptr;
+        return;
+    }
 
     unsigned short usOldTxdId = m_pInterface->usTextureDictionary;
     if (usOldTxdId == usID)
