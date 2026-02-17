@@ -1820,6 +1820,59 @@ void _declspec(naked) HOOK_CrashFix_VBInstV3dMorphNull()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstWeights
+//
+// Same NULL locked VB crash as InstV3d/InstV3dMorph, but in the skin
+// weights instancing path. Called only from __rpD3D9SkinGeometryReinstance
+// when rendering skinned meshes (peds, deformable vehicles).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// The caller adds a vertex byte offset to the locked pointer, so mem
+// is typically a small non-zero value (e.g 0x20) rather than exact NULL.
+// Any address below 0x10000 (Windows null guard page) is invalid.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=numVerts, [esp+14]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstWeightsNull   0x752320
+#define HOOKSIZE_CrashFix_VBInstWeightsNull  7
+#define HOOKCHECK_CrashFix_VBInstWeightsNull 0x8B
+DWORD RETURN_CrashFix_VBInstWeightsNull = 0x752327;
+
+void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
+{
+    // clang-format off
+    __asm
+    {
+        cmp     dword ptr [esp+8], 10000h            // mem below 64KB null guard page?
+        jb      bail_out_weights
+
+        // Replicate overwritten prologue (7 bytes: mov eax,[esp+4]; sub esp,10h)
+        mov     eax, [esp+4]                         // type
+        sub     esp, 10h
+        jmp     RETURN_CrashFix_VBInstWeightsNull
+
+    bail_out_weights:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    42
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CClumpModelInfo::GetFrameFromId
 //
 // Invalid frame
@@ -3092,6 +3145,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_Misc38);
     EZHookInstallChecked(CrashFix_VBInstV3dNull);
     EZHookInstallChecked(CrashFix_VBInstV3dMorphNull);
+    EZHookInstallChecked(CrashFix_VBInstWeightsNull);
     EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
