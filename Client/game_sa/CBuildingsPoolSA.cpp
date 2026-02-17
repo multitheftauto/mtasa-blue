@@ -20,6 +20,7 @@
 #include "CVehicleSA.h"
 #include "CBuildingRemovalSA.h"
 #include "CPlayerPedSA.h"
+#include "CWorldSA.h"
 
 extern CGameSA* pGame;
 
@@ -178,6 +179,13 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
 
     m_pOriginalBuildingsBackup = std::make_unique<backup_container_t>(poolSize);
 
+    // Clear ped/vehicle entity pointers that may reference buildings about to be freed.
+    // Without this, fields like CPed::pContactEntity can become dangling after pool slots
+    // are released, causing crashes in SA code that reads m_nModelIndex from them
+    // (e.g. CEventScanner::ScanForEvents). Mirrors the cleanup already done in Resize().
+    RemoveVehicleDamageLinks();
+    RemovePedsContactEnityLinks();
+
     for (size_t i = 0; i < poolSize; i++)
     {
         if (pBuildsingsPool->IsContains(i))
@@ -234,6 +242,39 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
     pBuilding->RemoveRWObjectWithReferencesCleanup();
 }
 
+void CBuildingsPoolSA::PurgeStaleSectorEntries(void* oldPool, int poolSize)
+{
+    if (!oldPool || poolSize <= 0)
+        return;
+
+    const auto poolStart = reinterpret_cast<std::uintptr_t>(oldPool);
+    const auto poolEnd = poolStart + static_cast<std::uintptr_t>(poolSize) * sizeof(CBuildingSAInterface);
+
+    // ARRAY_StreamSectors is a flat array of CSector[120][120].
+    // Each CSector is { CPtrListSingleLink m_buildings; CPtrListDoubleLink m_dummies } = 2 DWORDs.
+    // We only scan m_buildings (even-indexed DWORDs).
+    auto* sectorDwords = reinterpret_cast<DWORD*>(ARRAY_StreamSectors);
+    constexpr int kSectorCount = NUM_StreamSectorRows * NUM_StreamSectorCols;
+
+    for (int i = 0; i < kSectorCount; ++i)
+    {
+        auto* pList = reinterpret_cast<CPtrNodeSingleListSAInterface<CEntitySAInterface>*>(&sectorDwords[i * 2]);
+        auto* pNode = reinterpret_cast<CPtrNodeSingleLink<CEntitySAInterface>*>(sectorDwords[i * 2]);
+
+        while (pNode)
+        {
+            // Pre-cache next before RemoveItem, which frees the current node.
+            auto* pNext = pNode->pNext;
+            auto  entityAddr = reinterpret_cast<std::uintptr_t>(pNode->pItem);
+
+            if (entityAddr >= poolStart && entityAddr < poolEnd)
+                pList->RemoveItem(pNode->pItem);
+
+            pNode = pNext;
+        }
+    }
+}
+
 bool CBuildingsPoolSA::Resize(int size)
 {
     auto*     pool = (*m_ppBuildingPoolInterface);
@@ -242,6 +283,13 @@ bool CBuildingsPoolSA::Resize(int size)
     m_buildingPool.entities.resize(size);
 
     void* oldPool = pool->m_pObjects;
+
+    // Safety scan: remove any sector building list nodes still referencing the
+    // old pool.. RemoveAllWithBackup should have removed them all via CWorld::Remove,
+    // but that call relies on GetBoundRect that can miss entities whose collision
+    // model is unloaded. Leaving stale nodes causes a crash in DeleteAllRwObjects.
+    if (oldPool != nullptr)
+        PurgeStaleSectorEntries(oldPool, currentSize);
 
     if (oldPool != nullptr)
     {
