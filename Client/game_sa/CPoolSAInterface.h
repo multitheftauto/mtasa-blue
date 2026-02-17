@@ -197,9 +197,9 @@ public:
     {
         uint32_t index = GetObjectIndex(pObject);
         if (m_nSize <= 0)
-            return UINT_MAX;
+            return -1;
 
-        return index >= static_cast<uint32_t>(m_nSize) ? UINT_MAX : index;
+        return index >= static_cast<uint32_t>(m_nSize) ? -1 : static_cast<std::int32_t>(index);
     }
 };
 

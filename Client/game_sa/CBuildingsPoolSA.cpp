@@ -41,11 +41,11 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
     if (!pInterface)
         return false;
 
-    uint32_t dwElementIndexInPool = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pInterface);
-    if (dwElementIndexInPool == UINT_MAX)
+    std::int32_t iElementIndexInPool = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pInterface);
+    if (iElementIndexInPool == -1)
         return false;
 
-    m_buildingPool.entities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
+    m_buildingPool.entities[static_cast<size_t>(iElementIndexInPool)] = {pBuilding, (CClientEntity*)pClientBuilding};
 
     // Increase the count of objects
     ++m_buildingPool.count;
@@ -55,12 +55,12 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
 
 CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept
 {
-    std::uint32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pGameInterface);
+    std::int32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pGameInterface);
 
-    if (poolIndex == static_cast<std::uint32_t>(-1))
+    if (poolIndex == -1)
         return nullptr;
 
-    return m_buildingPool.entities[poolIndex].pClientEntity;
+    return m_buildingPool.entities[static_cast<size_t>(poolIndex)].pClientEntity;
 }
 
 CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior)
@@ -129,12 +129,12 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
 
     CBuildingSAInterface* pInterface = pBuilding->GetBuildingInterface();
 
-    uint32_t dwElementIndexInPool = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pInterface);
-    if (dwElementIndexInPool == UINT_MAX)
+    std::int32_t iElementIndexInPool = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pInterface);
+    if (iElementIndexInPool == -1)
         return;
 
     // Remove references to allocated matrix
-    auto* pBuildingSA = m_buildingPool.entities[dwElementIndexInPool].pEntity;
+    auto* pBuildingSA = m_buildingPool.entities[static_cast<size_t>(iElementIndexInPool)].pEntity;
     pBuildingSA->RemoveAllocatedMatrix();
 
     // Remove building from cover list
@@ -159,10 +159,10 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     modelInfo->RemoveColRef();
 
     // Remove building from SA pool
-    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
+    (*m_ppBuildingPoolInterface)->Release(static_cast<uint>(iElementIndexInPool));
 
     // Remove from BuildingSA pool
-    m_buildingPool.entities[dwElementIndexInPool] = {nullptr, nullptr};
+    m_buildingPool.entities[static_cast<size_t>(iElementIndexInPool)] = {nullptr, nullptr};
 
     // Delete it from memory
     delete pBuildingSA;

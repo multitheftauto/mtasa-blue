@@ -25,25 +25,25 @@ static bool IsEntityPoolSlotOccupied(CEntitySAInterface* pEntity)
     CPoolSAInterface<CBuildingSAInterface>* pBuildingPool = *reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
     if (pBuildingPool)
     {
-        uint32_t uiIndex = pBuildingPool->GetObjectIndexSafe(reinterpret_cast<CBuildingSAInterface*>(pEntity));
-        if (uiIndex != UINT_MAX)
-            return pBuildingPool->IsContains(uiIndex);
+        std::int32_t iIndex = pBuildingPool->GetObjectIndexSafe(reinterpret_cast<CBuildingSAInterface*>(pEntity));
+        if (iIndex != -1)
+            return pBuildingPool->IsContains(iIndex);
     }
 
     CPoolSAInterface<CEntitySAInterface>* pDummyPool = *reinterpret_cast<CPoolSAInterface<CEntitySAInterface>**>(CLASS_CDummyPool);
     if (pDummyPool)
     {
-        uint32_t uiIndex = pDummyPool->GetObjectIndexSafe(pEntity);
-        if (uiIndex != UINT_MAX)
-            return pDummyPool->IsContains(uiIndex);
+        std::int32_t iIndex = pDummyPool->GetObjectIndexSafe(pEntity);
+        if (iIndex != -1)
+            return pDummyPool->IsContains(iIndex);
     }
 
     CPoolSAInterface<CObjectSAInterface>* pObjectPool = *reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
     if (pObjectPool)
     {
-        uint32_t uiIndex = pObjectPool->GetObjectIndexSafe(reinterpret_cast<CObjectSAInterface*>(pEntity));
-        if (uiIndex != UINT_MAX)
-            return pObjectPool->IsContains(uiIndex);
+        std::int32_t iIndex = pObjectPool->GetObjectIndexSafe(reinterpret_cast<CObjectSAInterface*>(pEntity));
+        if (iIndex != -1)
+            return pObjectPool->IsContains(iIndex);
     }
 
     return false;
