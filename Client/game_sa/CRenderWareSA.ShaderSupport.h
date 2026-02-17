@@ -168,34 +168,17 @@ struct STexNameInfo
 #endif
     }
 
-    bool ResetReplacementResults()
+    void ResetReplacementResults()
     {
         // Mark invalid without clearing bSet - preserves data for safe renderer access
         // Data will be rebuilt on next access when bValid=false is detected
-        bool bHadEntityEntries = !texEntityShaderMap.empty();
-        for (auto& shader : texNoEntityShaders)
+        for (STexShaderReplacement& shader : texNoEntityShaders)
         {
             shader.bValid = false;
         }
-        for (auto& pair : texEntityShaderMap)
+        for (CFastHashMap<CClientEntityBase*, STexShaderReplacement>::value_type& pair : texEntityShaderMap)
         {
             pair.second.bValid = false;
-        }
-        return bHadEntityEntries;
-    }
-
-    // Remove entries that have been marked invalid (deferred cleanup)
-    void CleanupInvalidatedEntries()
-    {
-        // Remove invalidated entity shader mappings
-        for (auto iter = texEntityShaderMap.begin(); iter != texEntityShaderMap.end();)
-        {
-            if (!iter->second.bValid)
-            {
-                texEntityShaderMap.erase(iter++);
-            }
-            else
-                ++iter;
         }
     }
 
