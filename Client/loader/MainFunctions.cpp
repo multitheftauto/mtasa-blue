@@ -157,12 +157,64 @@ static DWORD RunDebuggerLoop(HANDLE hProcess, DWORD processId, DebuggerCrashCapt
     DWORD       exitCode = 0;
     bool        processExited = false;
 
+    // Stuck detection
+    constexpr uint STARTUP_GRACE_TIMEOUTS = 20;
+    uint           timeoutCount = 0;
+    bool           startupStuckHandled = false;
+    bool           quitStuckHandled = false;
+
+    std::optional<CStuckProcessDetector> startupStuckDetector;
+    std::optional<CStuckProcessDetector> quitStuckDetector;
+
     while (!processExited)
     {
         if (!WaitForDebugEvent(&debugEvent, 1000))
         {
             if (GetLastError() == ERROR_SEM_TIMEOUT)
+            {
+                ++timeoutCount;
+
+                // Don't count timeouts while the device selection dialog is open
+                if (!startupStuckHandled && timeoutCount <= STARTUP_GRACE_TIMEOUTS && timeoutCount > 1
+                    && IsDeviceSelectionDialogOpen(processId))
+                    --timeoutCount;
+
+                // Startup stuck: check after grace period, once only
+                if (!startupStuckHandled && timeoutCount > STARTUP_GRACE_TIMEOUTS && WatchDogIsSectionOpen("L3"))
+                {
+                    if (!startupStuckDetector)
+                        startupStuckDetector.emplace(hProcess, 5000);
+
+                    if (startupStuckDetector->UpdateIsStuck())
+                    {
+                        WriteDebugEvent("Detected stuck process at startup (one-shot debugger mode)");
+                        startupStuckHandled = true;
+                        if (MessageBoxUTF8(0, _("GTA: San Andreas may not have launched correctly. Terminate it?"), _("Information") + _E("CL25"),
+                                           MB_YESNO | MB_ICONQUESTION | MB_TOPMOST) == IDYES)
+                        {
+                            TerminateProcess(hProcess, 1);
+                        }
+                    }
+                }
+
+                // Quit stuck: Q0 is open (core shutting down)
+                if (!WatchDogIsSectionOpen("L3") && WatchDogIsSectionOpen("Q0"))
+                {
+                    if (!quitStuckDetector)
+                        quitStuckDetector.emplace(hProcess, 5000);
+
+                    if (!quitStuckHandled && quitStuckDetector->UpdateIsStuck())
+                    {
+                        WriteDebugEvent("Detected stuck process at quit (one-shot debugger mode)");
+                        quitStuckHandled = true;
+#ifndef MTA_DEBUG
+                        TerminateProcess(hProcess, 1);
+#endif
+                    }
+                }
+
                 continue;
+            }
             break;
         }
 
@@ -1851,13 +1903,15 @@ int LaunchGame(SString strCmdLine)
 
     if (bUseDebuggerMode)
     {
+        // Clear the one-shot flag before attempting launch, so a loader crash can't leave it stuck
+        SetApplicationSetting("diagnostics", "debugger-crash-capture", "");
+
         WriteDebugEvent("Loader - Debugger crash capture was requested (one-shot)");
         AddReportLog(7201, "Loader - Attempting debugger launch for fail-fast capture");
 
         if (StartGtaProcess(strGTAEXEPath, sanitizedCmdLine, strGTAPath, &piLoadee, dwError, strErrorContext, true))
         {
             bLaunchedAsDebugger = true;
-            SetApplicationSetting("diagnostics", "debugger-crash-capture", "");
             WriteDebugEvent("Loader - Launched as debugger for fail-fast crash detection (diagnostic mode)");
             AddReportLog(7202, "Loader - Debugger launch successful");
         }
@@ -1865,7 +1919,6 @@ int LaunchGame(SString strCmdLine)
         {
             WriteDebugEvent(SString("Loader - Debugger launch FAILED: %s error %d", strErrorContext.c_str(), dwError));
             AddReportLog(7203, SString("Loader - Debugger launch failed: %s error %d, falling back to normal launch", strErrorContext.c_str(), dwError));
-            SetApplicationSetting("diagnostics", "debugger-crash-capture", "");
         }
     }
 
