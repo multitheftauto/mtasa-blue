@@ -241,68 +241,71 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
 
 void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
 {
-    // Got any type?
-    if (m_iType != LUA_TNONE)
-    {
-        // Make sure the stack has enough room
-        LUA_CHECKSTACK(luaVM, 1);
+    // Make sure the stack has enough room
+    LUA_CHECKSTACK(luaVM, 1);
 
-        // Push it depending on the type
-        switch (m_iType)
+    // Push it depending on the type
+    switch (m_iType)
+    {
+        case LUA_TNIL:
         {
-            case LUA_TNIL:
+            lua_pushnil(luaVM);
+            break;
+        }
+
+        case LUA_TBOOLEAN:
+        {
+            lua_pushboolean(luaVM, m_bBoolean);
+            break;
+        }
+
+        case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
+        {
+            lua_pushuserdata(luaVM, m_pUserData);
+            break;
+        }
+
+        case LUA_TNUMBER:
+        {
+            lua_pushnumber(luaVM, m_Number);
+            break;
+        }
+
+        case LUA_TTABLE:
+        {
+            if (!m_pTableData)
             {
                 lua_pushnil(luaVM);
                 break;
             }
 
-            case LUA_TBOOLEAN:
+            int* pTableId;
+            if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
             {
-                lua_pushboolean(luaVM, m_bBoolean);
-                break;
+                lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
+                lua_pushnumber(luaVM, *pTableId);
+                lua_gettable(luaVM, -2);
+                lua_remove(luaVM, -2);
             }
-
-            case LUA_TLIGHTUSERDATA:
-            case LUA_TUSERDATA:
+            else
             {
-                lua_pushuserdata(luaVM, m_pUserData);
-                break;
+                m_pTableData->PushAsTable(luaVM, pKnownTables);
             }
+            break;
+        }
 
-            case LUA_TNUMBER:
-            {
-                lua_pushnumber(luaVM, m_Number);
-                break;
-            }
+        case LUA_TSTRING:
+        {
+            lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
+            break;
+        }
 
-            case LUA_TTABLE:
-            {
-                if (!m_pTableData)
-                {
-                    lua_pushnil(luaVM);
-                    break;
-                }
-
-                int* pThingy;
-                if (pKnownTables && (pThingy = MapFind(*pKnownTables, m_pTableData)))
-                {
-                    lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
-                    lua_pushnumber(luaVM, *pThingy);
-                    lua_gettable(luaVM, -2);
-                    lua_remove(luaVM, -2);
-                }
-                else
-                {
-                    m_pTableData->PushAsTable(luaVM, pKnownTables);
-                }
-                break;
-            }
-
-            case LUA_TSTRING:
-            {
-                lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
-                break;
-            }
+        default:
+        {
+            // Unexpected type, keep the stack balanced for callers
+            lua_pushnil(luaVM);
+            break;
         }
     }
 }
@@ -485,7 +488,10 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             {
                 m_pTableData = new CLuaArguments();
                 if (!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
+                {
+                    DeleteTableData();
                     return false;
+                }
                 m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
                 m_pTableData->ValidateTableKeys();

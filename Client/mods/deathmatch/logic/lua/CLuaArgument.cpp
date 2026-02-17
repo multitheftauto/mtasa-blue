@@ -391,71 +391,71 @@ CClientEntity* CLuaArgument::GetElement() const
 
 void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
 {
-    // WARNING:
-    // Stuff using this function is kinda unsafe, we expect
-    // it to successfully push something, when it actually may not,
-    // corrupting the Lua stack
-    if (m_iType != LUA_TNONE)
-    {
-        // Make sure the stack has enough room
-        LUA_CHECKSTACK(luaVM, 1);
+    // Make sure the stack has enough room
+    LUA_CHECKSTACK(luaVM, 1);
 
-        // Push it depending on the type
-        switch (m_iType)
+    // Push it depending on the type
+    switch (m_iType)
+    {
+        case LUA_TNIL:
         {
-            case LUA_TNIL:
+            lua_pushnil(luaVM);
+            break;
+        }
+
+        case LUA_TBOOLEAN:
+        {
+            lua_pushboolean(luaVM, m_bBoolean);
+            break;
+        }
+
+        case LUA_TUSERDATA:
+        case LUA_TLIGHTUSERDATA:
+        {
+            lua_pushuserdata(luaVM, m_pUserData);
+            break;
+        }
+
+        case LUA_TNUMBER:
+        {
+            lua_pushnumber(luaVM, m_Number);
+            break;
+        }
+
+        case LUA_TTABLE:
+        {
+            if (!m_pTableData)
             {
                 lua_pushnil(luaVM);
                 break;
             }
 
-            case LUA_TBOOLEAN:
+            int* pTableId;
+            if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
             {
-                lua_pushboolean(luaVM, m_bBoolean);
-                break;
+                lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
+                lua_pushnumber(luaVM, *pTableId);
+                lua_gettable(luaVM, -2);
+                lua_remove(luaVM, -2);
             }
-
-            case LUA_TUSERDATA:
-            case LUA_TLIGHTUSERDATA:
+            else
             {
-                lua_pushuserdata(luaVM, m_pUserData);
-                break;
+                m_pTableData->PushAsTable(luaVM, pKnownTables);
             }
+            break;
+        }
 
-            case LUA_TNUMBER:
-            {
-                lua_pushnumber(luaVM, m_Number);
-                break;
-            }
+        case LUA_TSTRING:
+        {
+            lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
+            break;
+        }
 
-            case LUA_TTABLE:
-            {
-                if (!m_pTableData)
-                {
-                    lua_pushnil(luaVM);
-                    break;
-                }
-
-                int* pTableId;
-                if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
-                {
-                    lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
-                    lua_pushnumber(luaVM, *pTableId);
-                    lua_gettable(luaVM, -2);
-                    lua_remove(luaVM, -2);
-                }
-                else
-                {
-                    m_pTableData->PushAsTable(luaVM, pKnownTables);
-                }
-                break;
-            }
-
-            case LUA_TSTRING:
-            {
-                lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
-                break;
-            }
+        default:
+        {
+            // Unexpected type, keep the stack balanced for callers
+            lua_pushnil(luaVM);
+            break;
         }
     }
 }
