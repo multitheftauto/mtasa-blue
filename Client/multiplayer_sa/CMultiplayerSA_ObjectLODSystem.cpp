@@ -46,6 +46,8 @@ namespace
         float                      fLodDistanceUnscaled;
         CBaseModelInfoSAInterface* pModelInfo;
     } saved = {false, 0.f, NULL};
+
+    DWORD preResult = 0;
 }  // namespace
 
 ////////////////////////////////////////////////
@@ -53,24 +55,29 @@ namespace
 // CRenderer_SetupEntityVisibility
 //
 ////////////////////////////////////////////////
-void OnMY_CRenderer_SetupEntityVisibility_Pre(CEntitySAInterface* pEntity, float& fValue)
+// Returns -1 to proceed with the original function, or >= 0 to skip it (value used as result)
+int OnMY_CRenderer_SetupEntityVisibility_Pre(CEntitySAInterface* pEntity, float& fValue)
 {
+    // Guard against entities whose model info has been deallocated
+    auto* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[pEntity->m_nModelIndex];
+    if (!pModelInfo)
+    {
+        saved.bValid = false;
+        return 0xFF;            // Skip: caller's switch-default ignores the entity
+    }
+
     if (pEntity->IsLowLodEntity())
     {
         SetGlobalDrawDistanceScale(LOW_LOD_DRAW_DISTANCE_SCALE * 2);
-        saved.pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[pEntity->m_nModelIndex];
-        if (!saved.pModelInfo)
-        {
-            SetGlobalDrawDistanceScale(1);
-            saved.bValid = false;
-            return;
-        }
-        saved.fLodDistanceUnscaled = saved.pModelInfo->fLodDistanceUnscaled;
-        saved.pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE / GetDrawDistanceSetting();
+        saved.pModelInfo = pModelInfo;
+        saved.fLodDistanceUnscaled = pModelInfo->fLodDistanceUnscaled;
+        pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE / GetDrawDistanceSetting();
         saved.bValid = true;
     }
     else
         saved.bValid = false;
+
+    return -1;                  // Proceed with the original function
 }
 
 void OnMY_CRenderer_SetupEntityVisibility_Post(int result, CEntitySAInterface* pEntity, float& fDist)
@@ -112,7 +119,11 @@ static void __declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
         push    [esp+32+4*2]
         call    OnMY_CRenderer_SetupEntityVisibility_Pre
         add     esp, 4*2
+        mov     preResult, eax
         popad
+        mov     eax, preResult
+        cmp     eax, 0FFFFFFFFh
+        jne     skip_original       // Pre signaled skip - eax already holds the result
 
 ////////////////////
         push    [esp+4*2]
@@ -121,6 +132,7 @@ static void __declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
         add     esp, 4*2
 
 ////////////////////
+skip_original:
         pushad
         push    [esp+32+4*2]
         push    [esp+32+4*2]
