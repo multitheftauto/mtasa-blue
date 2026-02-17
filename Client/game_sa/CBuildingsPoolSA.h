@@ -45,7 +45,8 @@ private:
     CPoolSAInterface<CBuildingSAInterface>** m_ppBuildingPoolInterface;
 
     using building_buffer_t = std::uint8_t[sizeof(CBuildingSAInterface)];
-    using backup_array_t = std::array<std::pair<bool, building_buffer_t>, MAX_BUILDINGS>;
+    using backup_entry_t = std::pair<bool, building_buffer_t>;
+    using backup_container_t = std::vector<backup_entry_t>;
 
-    std::unique_ptr<backup_array_t> m_pOriginalBuildingsBackup;
+    std::unique_ptr<backup_container_t> m_pOriginalBuildingsBackup;
 };

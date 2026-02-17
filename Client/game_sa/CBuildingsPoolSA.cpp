@@ -173,10 +173,12 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
     if (m_pOriginalBuildingsBackup)
         return;
 
-    m_pOriginalBuildingsBackup = std::make_unique<backup_array_t>();
-
     auto pBuildsingsPool = (*m_ppBuildingPoolInterface);
-    for (size_t i = 0; i < MAX_BUILDINGS; i++)
+    const size_t poolSize = static_cast<size_t>(pBuildsingsPool->m_nSize);
+
+    m_pOriginalBuildingsBackup = std::make_unique<backup_container_t>(poolSize);
+
+    for (size_t i = 0; i < poolSize; i++)
     {
         if (pBuildsingsPool->IsContains(i))
         {
@@ -209,7 +211,8 @@ void CBuildingsPoolSA::RestoreBackup()
 
     auto& originalData = *m_pOriginalBuildingsBackup;
     auto  pBuildsingsPool = (*m_ppBuildingPoolInterface);
-    for (size_t i = 0; i < MAX_BUILDINGS; i++)
+    const size_t restoreCount = std::min(originalData.size(), static_cast<size_t>(pBuildsingsPool->m_nSize));
+    for (size_t i = 0; i < restoreCount; i++)
     {
         if (originalData[i].first)
         {
@@ -314,6 +317,8 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
         for (size_t j = 0; j < arraySize; j++)
         {
             CBuildingSAInterface* object = (*ppArray)[j];
+            if (object == nullptr)
+                continue;
 
             (*ppArray)[j] = (CBuildingSAInterface*)((uint32_t)object + offset);
         }
@@ -322,13 +327,13 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
 
 void CBuildingsPoolSA::UpdateBackupLodPointers(uint32_t offset)
 {
-    backup_array_t* arr = m_pOriginalBuildingsBackup.get();
-    for (size_t i = 0; i < MAX_BUILDINGS; ++i)
+    auto& arr = *m_pOriginalBuildingsBackup;
+    for (size_t i = 0; i < arr.size(); ++i)
     {
-        std::pair<bool, building_buffer_t>* data = &(*arr)[i];
-        if (data->first)
+        auto& data = arr[i];
+        if (data.first)
         {
-            CBuildingSAInterface* building = reinterpret_cast<CBuildingSAInterface*>(&data->second);
+            CBuildingSAInterface* building = reinterpret_cast<CBuildingSAInterface*>(&data.second);
             if (building->m_pLod != nullptr)
             {
                 building->m_pLod = (CBuildingSAInterface*)((uint32_t)building->m_pLod + offset);
