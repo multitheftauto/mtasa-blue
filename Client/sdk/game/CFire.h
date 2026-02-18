@@ -20,7 +20,9 @@ class CFire
 public:
     virtual CFireSAInterface* GetInterface() noexcept = 0;
 
-    virtual void Extinguish() = 0;
+    // Always pass ProcessPedCall = false, unless you know what you're doing. This is only used when extinguishing fire on a ped, and it will prevent the
+    // PLAYER_ON_FIRE task from being aborted, which can cause crashes if the task is removed while it's being processed.
+    virtual void Extinguish(bool ProcessPedCall = false) = 0;
 
     virtual void     SetPosition(const CVector& position, bool updateParticle = false) = 0;
     virtual CVector& GetPosition() noexcept = 0;

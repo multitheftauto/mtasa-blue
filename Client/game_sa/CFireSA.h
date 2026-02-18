@@ -57,7 +57,9 @@ public:
 
     CFireSAInterface* GetInterface() noexcept { return &m_interface; }
 
-    void Extinguish() override;
+    // Always pass ProcessPedCall = false, unless you know what you're doing. This is only used when extinguishing fire on a ped, and it will prevent the
+    // PLAYER_ON_FIRE task from being aborted, which can cause crashes if the task is removed while it's being processed.
+    void Extinguish(bool ProcessPedCall = false) override;
     void ExtinguishWithWater(float waterStrength);
 
     bool IsActive() const noexcept { return m_interface.m_flags.isActive; }

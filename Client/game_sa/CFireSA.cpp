@@ -25,58 +25,6 @@
 
 extern CGameSA* pGame;
 
-////////////////////////////////////////////////////////////////////////
-// CFire::Extinguish
-//
-// Fix GH #3249 (PLAYER_ON_FIRE task is not aborted after the fire is extinguished)
-////////////////////////////////////////////////////////////////////////
-static void AbortFireTask(CEntitySAInterface* entityOnFire, DWORD returnAddress)
-{
-    // We can't and shouldn't remove the task if we're in CTaskSimplePlayerOnFire::ProcessPed. Otherwise we will crash.
-    if (returnAddress == 0x633783)
-        return;
-
-    auto* ped = pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(entityOnFire));
-    if (!ped || !ped->pEntity)
-        return;
-
-    CTaskManager* taskManager = ped->pEntity->GetPedIntelligence()->GetTaskManager();
-    if (!taskManager)
-        return;
-
-    taskManager->RemoveTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM, TASK_SIMPLE_PLAYER_ON_FIRE);
-}
-
-#define HOOKPOS_CFire_Extinguish  0x539429
-#define HOOKSIZE_CFire_Extinguish 6
-static constexpr intptr_t     CONTINUE_CFire_Extinguish = 0x53942F;
-static void __declspec(naked) HOOK_CFire_Extinguish()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        mov     [eax+730h], edi
-
-        push    ebx
-        mov     ebx, [esp+12]
-        push    edi
-        push    esi
-
-        push    ebx     // returnAddress
-        push    eax     // entityOnFire
-        call    AbortFireTask
-        add     esp, 8
-
-        pop     esi
-        pop     edi
-        pop     ebx
-        jmp     CONTINUE_CFire_Extinguish
-    }
-    // clang-format on
-}
-
 CFireSA::CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed, bool makeNoise)
     : m_fireManager{fireMgr}, m_creator{creator}
 {
@@ -131,7 +79,7 @@ CFireSA::CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CEntity* target, std
     SetStrength(1.0f);
 }
 
-void CFireSA::Extinguish()
+void CFireSA::Extinguish(bool ProcessPedCall)
 {
     if (!IsActive())
         return;
@@ -158,7 +106,19 @@ void CFireSA::Extinguish()
             {
                 reinterpret_cast<CPedSAInterface*>(entityOnFire)->pFireOnPed = nullptr;
 
-                // task fix above TODO
+                // Fix Github #3249 (PLAYER_ON_FIRE task is not aborted after the fire is extinguished)
+                if (!ProcessPedCall)
+                {
+                    auto* ped = pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(entityOnFire));
+                    if (!ped || !ped->pEntity)
+                        return;
+
+                    CTaskManager* taskManager = ped->pEntity->GetPedIntelligence()->GetTaskManager();
+                    if (!taskManager)
+                        return;
+
+                    taskManager->RemoveTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM, TASK_SIMPLE_PLAYER_ON_FIRE);
+                }
                 break;
             }
             case eEntityType::ENTITY_TYPE_VEHICLE:
@@ -166,7 +126,7 @@ void CFireSA::Extinguish()
                 reinterpret_cast<CVehicleSAInterface*>(entityOnFire)->m_pFire = nullptr;
                 break;
             }
-            case eEntityType::ENTITY_TYPE_OBJECT: // bugfix
+            case eEntityType::ENTITY_TYPE_OBJECT: // R* forgot to set this to nullptr here
             {
                 reinterpret_cast<CObjectSAInterface*>(entityOnFire)->pFire = nullptr;
                 break;
@@ -509,7 +469,8 @@ static void __fastcall StaticExtinguish(CFireSAInterface* fireInterface)
     if (!fire)
         return;
 
-    fire->Extinguish();
+    // We can't and shouldn't remove the task if we're in CTaskSimplePlayerOnFire::ProcessPed. Otherwise we will crash.
+    fire->Extinguish(_ReturnAddress() == reinterpret_cast<void*>(0x633783));
 }
 
 void CFireSA::StaticSetHooks()
@@ -524,6 +485,4 @@ void CFireSA::StaticSetHooks()
     HookInstallCall(0x698261, (DWORD)StaticExtinguish);  // CTaskComplexExtinguishFires::CreateNextSubTask
     HookInstallCall(0x6D24A6, (DWORD)StaticExtinguish);  // CVehicle::ExtinguishCarFire
     HookInstallCall(0x6E2C0B, (DWORD)StaticExtinguish);  // CVehicle::~CVehicle
-
-    // EZHookInstall(CFire_Extinguish);
 }
