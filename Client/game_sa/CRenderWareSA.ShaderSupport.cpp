@@ -57,26 +57,24 @@ DWORD RETURN_CTxdStore_RemoveTxd = 0x731E96;
 //
 struct STxdStreamEvent
 {
+    STxdStreamEvent() : bAdded(false), usTxdId(0) {}
     STxdStreamEvent(bool bAdded, ushort usTxdId) : bAdded(bAdded), usTxdId(usTxdId) {}
 
     bool   bAdded;
     ushort usTxdId;
 };
 
-static std::vector<STxdStreamEvent> ms_txdStreamEventList;
+// Keyed by usTxdId; only the last event per TXD per pulse is kept.
+// This means an add followed by a remove in the same frame resolves to removed (and vice versa).
+static std::unordered_map<ushort, STxdStreamEvent> ms_txdStreamEventList;
 
 ////////////////////////////////////////////////////////////////
 // Txd created
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId;
-    // Remove any previous events for this txd (erase-remove idiom)
-    ms_txdStreamEventList.erase(
-        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(), [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
-        ms_txdStreamEventList.end());
-    // Append 'added'
-    ms_txdStreamEventList.emplace_back(true, usTxdId);
+    const ushort usTxdId = (ushort)dwTxdId;
+    ms_txdStreamEventList[usTxdId] = STxdStreamEvent(true, usTxdId);
 }
 
 // called from streaming on TXD create
@@ -108,13 +106,8 @@ static void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
-    // Remove any previous events for this txd (erase-remove idiom)
-    ms_txdStreamEventList.erase(
-        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(), [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
-        ms_txdStreamEventList.end());
-    // Append 'removed'
-    ms_txdStreamEventList.emplace_back(false, usTxdId);
+    const ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
+    ms_txdStreamEventList[usTxdId] = STxdStreamEvent(false, usTxdId);
 }
 
 // called from streaming on TXD destroy
@@ -195,9 +188,9 @@ void CRenderWareSA::PulseWorldTextureWatch()
     TIMING_CHECKPOINT("+TextureWatch");
 
     // Go through ms_txdStreamEventList
-    for (std::vector<STxdStreamEvent>::const_iterator iter = ms_txdStreamEventList.begin(); iter != ms_txdStreamEventList.end(); ++iter)
+    for (const auto& entry : ms_txdStreamEventList)
     {
-        const STxdStreamEvent& action = *iter;
+        const STxdStreamEvent& action = entry.second;
         if (action.bAdded)
         {
             //
