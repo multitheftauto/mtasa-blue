@@ -24,10 +24,7 @@ project "maetro32"
         flags { "ExcludeFromBuild" }
 
 	filter {"platforms:x86"}
-		postbuildcommands {
-			copy ".",
-			copy "mta",
-		}
+		postbuildcommands { copy "server", copy "mta", copy "mta/cef" }
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
