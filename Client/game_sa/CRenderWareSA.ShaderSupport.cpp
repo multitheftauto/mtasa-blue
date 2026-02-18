@@ -508,6 +508,33 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
 ////////////////////////////////////////////////////////////////
 STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData)
 {
+    // If this is a script/special texture, clean up any existing entry for the same RwTexture*
+    // to prevent orphaned STexInfo leaks (the old entry would be unreachable via m_ScriptTexInfoMap)
+    if (!texTag.m_bUsingTxdId && texTag.m_pTex && texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE)
+    {
+        auto itExisting = m_ScriptTexInfoMap.find(texTag.m_pTex);
+        if (itExisting != m_ScriptTexInfoMap.end())
+        {
+            STexInfo* pOldTexInfo = itExisting->second;
+            if (pOldTexInfo)
+            {
+                OnTextureStreamOut(pOldTexInfo);
+                // Erase from m_TexInfoMap by scanning the TXD ID bucket
+                typedef std::multimap<ushort, STexInfo*>::iterator IterType;
+                std::pair<IterType, IterType>                      range = m_TexInfoMap.equal_range(pOldTexInfo->texTag.m_usTxdId);
+                for (IterType iter = range.first; iter != range.second; ++iter)
+                {
+                    if (iter->second == pOldTexInfo)
+                    {
+                        m_TexInfoMap.erase(iter);
+                        break;
+                    }
+                }
+                DestroyTexInfo(pOldTexInfo);
+            }
+        }
+    }
+
     // Create texinfo
     STexInfo* pTexInfo = new STexInfo(texTag, strTextureName, pD3DData);
 
