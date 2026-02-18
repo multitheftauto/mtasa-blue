@@ -81,7 +81,9 @@ void ReplaceInterface(T*& destination, T* source)
 
     if (destination)
     {
-        if (!ComPtrValidation::ValidateSlow(destination))
+        // Cached validation. All tracked objects are held via AddRef,
+        // so an external release cannot free them while our ref is live.
+        if (!ComPtrValidation::Validate(destination))
         {
             AddReportLog(8799, SString("ReplaceInterface: skipping Release on stale COM pointer %p", destination), 5);
             ComPtrValidation::Invalidate(destination);
