@@ -1152,7 +1152,8 @@ SString CInstallManager::_PrepareLaunchLocation()
     TerminateGTAIfRunning();
 
     const fs::path gtaDir = GetGameBaseDirectory();
-    const fs::path mtaDir = GetMTARootDirectory() / "MTA";
+    const fs::path mtaRootDir = GetMTARootDirectory();
+    const fs::path mtaDir = mtaRootDir / "MTA";
     const fs::path launchDir = GetGameLaunchDirectory();
 
 #if 0
@@ -1200,13 +1201,13 @@ SString CInstallManager::_PrepareLaunchLocation()
 
     // Copy MTA dependencies to our launch directory.
 #ifdef MTA_MAETRO
-    for (const char* fileName : {LOADER_PROXY_DLL_NAME, MAETRO32_DLL_NAME})
+    for (const fs::path& sourcePath : {mtaDir / LOADER_PROXY_DLL_NAME, mtaRootDir / MAETRO32_DLL_NAME})
 #else
-    for (const char* fileName : {LOADER_PROXY_DLL_NAME})
+    for (const fs::path& sourcePath : {mtaDir / LOADER_PROXY_DLL_NAME})
 #endif
     {
-        const fs::path sourcePath = mtaDir / fileName;
-        const fs::path targetPath = launchDir / fileName;
+        const std::string fileName = sourcePath.filename().string();
+        const fs::path    targetPath = launchDir / fileName;
 
         if (std::error_code ec; !SafeCopyFile(sourcePath, targetPath, ec))
         {
@@ -1214,7 +1215,7 @@ SString CInstallManager::_PrepareLaunchLocation()
             {
                 const uintmax_t sourceSize = GetFileSize(sourcePath);
                 const uintmax_t targetSize = GetFileSize(targetPath);
-                AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
+                AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName.c_str(), ec.value(),
                                            sourceSize, targetSize, isAdmin));
             }
 

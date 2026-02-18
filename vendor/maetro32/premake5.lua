@@ -2,7 +2,7 @@ project "maetro32"
 	language "C++"
 	kind "SharedLib"
 	targetname "maetro32"
-	targetdir(buildpath("server"))
+	targetdir(buildpath("."))
 	clangtidy "On"
 	staticruntime "Off"
 	linkoptions { "/NODEFAULTLIB" }
@@ -24,10 +24,7 @@ project "maetro32"
         flags { "ExcludeFromBuild" }
 
 	filter {"platforms:x86"}
-		postbuildcommands {
-			copy ".",
-			copy "mta",
-		}
+		postbuildcommands { copy "server" }
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
