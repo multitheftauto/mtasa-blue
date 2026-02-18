@@ -285,8 +285,11 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
         if (pTexInfo && pTexInfo->texTag == usTxdId)
         {
             OnTextureStreamOut(pTexInfo);
+            ConstIterType iterNext = iter;
+            ++iterNext;
+            m_TexInfoMap.erase(iter);
             DestroyTexInfo(pTexInfo);
-            m_TexInfoMap.erase(iter++);
+            iter = iterNext;
         }
         else
             ++iter;
@@ -316,8 +319,8 @@ void CRenderWareSA::RemoveStreamingTexture(unsigned short usTxdId, CD3DDUMMY* pD
         if (pTexInfo && pTexInfo->pD3DData == pD3DData)
         {
             OnTextureStreamOut(pTexInfo);
+            m_TexInfoMap.erase(iter);
             DestroyTexInfo(pTexInfo);
-            m_TexInfoMap.erase(iter++);
             return;  // Only one entry per D3D data
         }
         else
@@ -508,6 +511,8 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
 ////////////////////////////////////////////////////////////////
 STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData)
 {
+    const SString strTextureNameLower = strTextureName.ToLower();
+
     // If this is a script/special texture, clean up any existing entry for the same RwTexture*
     // to prevent orphaned STexInfo leaks (the old entry would be unreachable via m_ScriptTexInfoMap)
     if (!texTag.m_bUsingTxdId && texTag.m_pTex && texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE)
@@ -518,6 +523,25 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
             STexInfo* pOldTexInfo = itExisting->second;
             if (pOldTexInfo)
             {
+                const bool bSameTagType = (pOldTexInfo->texTag.m_bUsingTxdId == texTag.m_bUsingTxdId);
+                bool       bSameTagValue = false;
+                if (bSameTagType)
+                {
+                    if (texTag.m_bUsingTxdId)
+                        bSameTagValue = (pOldTexInfo->texTag.m_usTxdId == texTag.m_usTxdId);
+                    else
+                        bSameTagValue = (pOldTexInfo->texTag.m_pTex == texTag.m_pTex);
+                }
+
+                if (bSameTagType && bSameTagValue && pOldTexInfo->pD3DData == pD3DData && pOldTexInfo->strTextureName == strTextureNameLower)
+                {
+                    // Fast-return only if reverse lookup still points to this entry.
+                    // Otherwise continue into recreate path to repair mapping.
+                    STexInfo* pMappedTexInfo = MapFindRef(m_D3DDataTexInfoMap, pOldTexInfo->pD3DData);
+                    if (pMappedTexInfo == pOldTexInfo && pOldTexInfo->bInTexInfoMap)
+                        return pOldTexInfo;
+                }
+
                 OnTextureStreamOut(pOldTexInfo);
                 // Erase from m_TexInfoMap by scanning the TXD ID bucket
                 typedef std::multimap<ushort, STexInfo*>::iterator IterType;
@@ -526,6 +550,7 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
                 {
                     if (iter->second == pOldTexInfo)
                     {
+                        pOldTexInfo->bInTexInfoMap = false;
                         m_TexInfoMap.erase(iter);
                         break;
                     }
@@ -540,6 +565,7 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
 
     // Add to map
     MapInsert(m_TexInfoMap, pTexInfo->texTag.m_usTxdId, pTexInfo);
+    pTexInfo->bInTexInfoMap = true;
 
     // Add to D3DData lookup map
     MapSet(m_D3DDataTexInfoMap, pTexInfo->pD3DData, pTexInfo);
@@ -562,6 +588,8 @@ void CRenderWareSA::DestroyTexInfo(STexInfo* pTexInfo)
 {
     if (!pTexInfo)
         return;
+
+    pTexInfo->bInTexInfoMap = false;
 
     // Only remove if this specific STexInfo is the registered one
     STexInfo* pCurrentEntry = MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
