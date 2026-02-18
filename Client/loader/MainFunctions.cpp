@@ -172,8 +172,7 @@ static DWORD RunDebuggerLoop(HANDLE hProcess, DWORD processId, DebuggerCrashCapt
                 ++timeoutCount;
 
                 // Don't count timeouts while the device selection dialog is open
-                if (!startupStuckHandled && timeoutCount <= STARTUP_GRACE_TIMEOUTS && timeoutCount > 1
-                    && IsDeviceSelectionDialogOpen(processId))
+                if (!startupStuckHandled && timeoutCount <= STARTUP_GRACE_TIMEOUTS && timeoutCount > 1 && IsDeviceSelectionDialogOpen(processId))
                     --timeoutCount;
 
                 // Startup stuck: check after grace period, once only
