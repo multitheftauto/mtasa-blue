@@ -127,23 +127,19 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
 }
 
 // IsValidModelInfoPtr only validates via reads, so stale pointers in readable
-// but non-writable memory pass. So this checks writability
-// by reading a field and writing the same value back under SEH.
+// but non-writable memory pass. VirtualQuery checks the actual page protection
+// to confirm the pointer is in committed writable memory.
 static bool IsWritableModelInfoPtr(CBaseModelInfoSAInterface* ptr) noexcept
 {
     if (!ptr)
         return false;
 
-    __try
-    {
-        volatile auto val = ptr->usTextureDictionary;
-        ptr->usTextureDictionary = val;
-        return true;
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
+    MEMORY_BASIC_INFORMATION mbi{};
+    if (VirtualQuery(ptr, &mbi, sizeof(mbi)) == 0 || mbi.State != MEM_COMMIT)
         return false;
-    }
+
+    constexpr DWORD writableMask = PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+    return (mbi.Protect & writableMask) != 0 && (mbi.Protect & PAGE_GUARD) == 0;
 }
 
 static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept

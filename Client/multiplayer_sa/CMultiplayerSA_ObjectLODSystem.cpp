@@ -207,16 +207,61 @@ second:
 ////////////////////////////////////////////////
 bool IsEntityAccessible(CEntitySAInterface* pEntity)
 {
-    __try
-    {
-        volatile WORD scanCode = *(volatile WORD*)((BYTE*)pEntity + 0x2C);
-        (void)scanCode;
-        return true;
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
+    if (!pEntity)
         return false;
+
+    // GTA SA pool header layout: [B* m_pObjects][BYTE* m_byteMap][int m_nSize]
+    // tPoolObjectFlags: bEmpty is bit 7 (MSB) of each byte. Zero MSB = occupied.
+    struct RawPool
+    {
+        BYTE* m_pObjects;
+        BYTE* m_byteMap;
+        int   m_nSize;
+    };
+
+    // CRenderer_ScanSectorList visits sector lists that can contain entities from
+    // all five gameplay pools: buildings, dummies, objects, peds, and vehicles.
+    // Strides: sizeof(CBuildingSAInterface)=56, sizeof(CEntitySAInterface)=56,
+    //          PoolAllocStride<CObjectSAInterface>::value=412,
+    //          PoolAllocStride<CPedSAInterface>::value=1988,
+    //          PoolAllocStride<CVehicleSAInterface>::value=2584.
+    static const struct
+    {
+        DWORD ppPool;
+        DWORD stride;
+    } pools[] = {
+        {0xb74498, 56},    // *CLASS_CBuildingPool
+        {0xb744a0, 56},    // *CLASS_CDummyPool
+        {0xb7449c, 412},   // *CLASS_CObjectPool
+        {0xb74490, 1988},  // *CLASS_CPedPool
+        {0xb74494, 2584},  // *CLASS_CVehiclePool
+    };
+
+    const BYTE* ent = reinterpret_cast<const BYTE*>(pEntity);
+
+    for (int i = 0; i < 5; ++i)
+    {
+        const RawPool* pPool = *reinterpret_cast<RawPool* const*>(pools[i].ppPool);
+        if (!pPool || !pPool->m_pObjects || pPool->m_nSize <= 0)
+            continue;
+
+        if (ent < pPool->m_pObjects)
+            continue;
+
+        const DWORD stride = pools[i].stride;
+        const DWORD diff = static_cast<DWORD>(ent - pPool->m_pObjects);
+        if (diff % stride != 0)
+            continue;
+
+        const DWORD index = diff / stride;
+        if (index >= static_cast<DWORD>(pPool->m_nSize))
+            continue;
+
+        if ((pPool->m_byteMap[index] & 0x80) == 0)  // bEmpty clear (bit 7 = 0) = slot occupied
+            return true;
     }
+
+    return false;
 }
 
 // Hook info
