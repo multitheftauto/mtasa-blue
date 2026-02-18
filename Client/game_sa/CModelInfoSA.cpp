@@ -126,6 +126,26 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
     }
 }
 
+// IsValidModelInfoPtr only validates via reads, so stale pointers in readable
+// but non-writable memory pass. So this checks writability
+// by reading a field and writing the same value back under SEH.
+static bool IsWritableModelInfoPtr(CBaseModelInfoSAInterface* ptr) noexcept
+{
+    if (!ptr)
+        return false;
+
+    __try
+    {
+        volatile auto val = ptr->usTextureDictionary;
+        ptr->usTextureDictionary = val;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
 static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept
 {
     __try
@@ -1047,6 +1067,14 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
+    // GetInterface() validates via reads only; stale pointers in read-only
+    // pages pass that check but crash on write
+    if (!IsWritableModelInfoPtr(m_pInterface))
+    {
+        m_pInterface = nullptr;
+        return;
+    }
+
     unsigned short usOldTxdId = m_pInterface->usTextureDictionary;
     if (usOldTxdId == usID)
         return;
@@ -1152,8 +1180,10 @@ void CModelInfoSA::ResetTextureDictionaryID()
 
     const auto targetId = static_cast<unsigned short>(it->second);
 
-    // If target TXD no longer exists, clean up stale entry and return
-    if (CTxdStore_GetTxd(targetId) == nullptr)
+    // If the target TXD pool slot was freed, we can't restore to it.
+    // When the slot is allocated but its data is unloaded (rwTexDictionary
+    // null), let SetTextureDictionaryID handle it -- it supports that case.
+    if (pGame && pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(targetId))
     {
         ms_DefaultTxdIDMap.erase(it);
         return;
@@ -1367,6 +1397,129 @@ static void DeleteEntityRwObject(CEntitySAInterface* pEntity)
     }
 }
 
+#define FUNC_CEntity_DeleteRwObject 0x534030
+#define NUM_MinValidEntityAddr      0x10000
+
+// Validates entity vtable pointer with SEH protection.
+// If bCheckDeleteRwObject is true, also verifies DeleteRwObject is the CEntity
+// base implementation - only valid for CBuilding/CDummy sector entities.
+static bool HasValidEntityVtablePtr(CEntitySAInterface* pEntity, bool bCheckDeleteRwObject)
+{
+    DWORD dwEntityAddr = reinterpret_cast<DWORD>(pEntity);
+    if (dwEntityAddr < NUM_MinValidEntityAddr || (dwEntityAddr & 3) != 0)
+        return false;
+
+    __try
+    {
+        DWORD* pdwVtbl = reinterpret_cast<DWORD*>(pEntity->GetVTBL());
+        if (!SharedUtil::IsValidGtaSaPtr(reinterpret_cast<DWORD>(pdwVtbl)))
+            return false;
+
+        if (bCheckDeleteRwObject && pdwVtbl[8] != FUNC_CEntity_DeleteRwObject)
+            return false;
+
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+// Tracks log-throttle counters for invalid entity reports during restream
+struct SRestreamLogState
+{
+    static constexpr int MAX_LOGS_PER_CALL = 32;
+
+    int  iStreamCount = 0;
+    int  iRepeatCount = 0;
+    bool bStreamSuppressed = false;
+    bool bRepeatSuppressed = false;
+
+    void LogInvalidEntity(bool bIsStreamSector, int iSectorIndex, CEntitySAInterface* pEntity)
+    {
+        if (bIsStreamSector)
+        {
+            if (iStreamCount < MAX_LOGS_PER_CALL)
+            {
+                AddReportLog(5560,
+                             SString("Entity 0x%08x at ARRAY_StreamSectors[%d,%d] has invalid vtable", pEntity, iSectorIndex / 2 % NUM_StreamSectorRows,
+                                     iSectorIndex / 2 / NUM_StreamSectorCols),
+                             10);
+                ++iStreamCount;
+            }
+            else if (!bStreamSuppressed)
+            {
+                AddReportLog(5560, "Additional invalid StreamSectors entities suppressed this call", 10);
+                bStreamSuppressed = true;
+            }
+        }
+        else
+        {
+            if (iRepeatCount < MAX_LOGS_PER_CALL)
+            {
+                AddReportLog(5561, SString("Entity 0x%08x at ARRAY_StreamRepeatSectors[%d] has invalid vtable", pEntity, iSectorIndex), 10);
+                ++iRepeatCount;
+            }
+            else if (!bRepeatSuppressed)
+            {
+                AddReportLog(5561, "Additional invalid StreamRepeatSectors entities suppressed this call", 10);
+                bRepeatSuppressed = true;
+            }
+        }
+    }
+};
+
+// Process entities from a sector list, skipping any with corrupted/invalid vtables.
+// StreamSectors (buildings/dummies): full vtable check including DeleteRwObject validation.
+// StreamRepeatSectors (vehicles/peds/objects): vtable pointer range check only, because
+// these entity types override DeleteRwObject and can't be validated by vtable content.
+static void ProcessRestreamSectorList(DWORD* pSectorEntry, bool bIsStreamSector, int iSectorIndex, SRestreamLogState& logState,
+                                      std::unordered_set<unsigned short>& processedTxdIDs, std::unordered_set<unsigned short>& pendingTxdIDs,
+                                      std::unordered_set<unsigned short>& modelsToUnload, const std::map<unsigned short, int>& mapRestreamTxdIDs)
+{
+    while (pSectorEntry)
+    {
+        auto* pEntity = reinterpret_cast<CEntitySAInterface*>(pSectorEntry[0]);
+        if (!pEntity)
+        {
+            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+            continue;
+        }
+
+        if (!HasValidEntityVtablePtr(pEntity, bIsStreamSector))
+        {
+            logState.LogInvalidEntity(bIsStreamSector, iSectorIndex, pEntity);
+            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+            continue;
+        }
+
+        auto* pModelInfo = pGame->GetModelInfo(pEntity->m_nModelIndex);
+        if (!pModelInfo)
+        {
+            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+            continue;
+        }
+
+        unsigned short usTxdID = pModelInfo->GetTextureDictionaryID();
+        if (MapContains(mapRestreamTxdIDs, usTxdID))
+        {
+            if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
+            {
+                DeleteEntityRwObject(pEntity);
+                processedTxdIDs.insert(usTxdID);
+                modelsToUnload.insert(pEntity->m_nModelIndex);
+            }
+            else
+            {
+                pendingTxdIDs.insert(usTxdID);
+            }
+        }
+
+        pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+    }
+}
+
 void CModelInfoSA::StaticFlushPendingRestreamIPL()
 {
     if (ms_RestreamTxdIDMap.empty())
@@ -1389,69 +1542,14 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     constexpr int kRepeatSectorCount = NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols;
     constexpr int kRepeatSectorStride = 3;  // StreamRepeatSectors uses stride of 3, we access element [2]
 
-    // Helper to validate entity vtable - checks if DeleteRwObject points to expected address
-    auto isValidEntity = [](CEntitySAInterface* pEntity) -> bool
-    {
-        constexpr std::size_t kDeleteRwObjectVtblOffset = 8;
-        constexpr std::size_t kExpectedDeleteRwObject = 0x00534030;
-        auto*                 vtbl = static_cast<std::size_t*>(pEntity->GetVTBL());
-        return vtbl[kDeleteRwObjectVtblOffset] == kExpectedDeleteRwObject;
-    };
-
-    // Process entities from a sector list
-    // Note: validateVtable should be true for StreamSectors but false for StreamRepeatSectors
-    auto processSectorList = [&](DWORD* pSectorEntry, bool validateVtable, int sectorIndex)
-    {
-        while (pSectorEntry)
-        {
-            auto* pEntity = reinterpret_cast<CEntitySAInterface*>(pSectorEntry[0]);
-            if (!pEntity)
-            {
-                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-                continue;
-            }
-
-            // Vtable validation for StreamSectors
-            if (validateVtable && !isValidEntity(pEntity))
-            {
-                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
-                                          sectorIndex / 2 % NUM_StreamSectorRows, sectorIndex / 2 / NUM_StreamSectorCols));
-                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-                continue;
-            }
-
-            auto* pModelInfo = pGame->GetModelInfo(pEntity->m_nModelIndex);
-            if (!pModelInfo)
-            {
-                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-                continue;
-            }
-
-            auto txdID = pModelInfo->GetTextureDictionaryID();
-            if (MapContains(ms_RestreamTxdIDMap, txdID))
-            {
-                if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
-                {
-                    DeleteEntityRwObject(pEntity);
-                    processedTxdIDs.insert(txdID);
-                    modelsToUnload.insert(pEntity->m_nModelIndex);
-                }
-                else
-                {
-                    pendingTxdIDs.insert(txdID);
-                }
-            }
-
-            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-        }
-    };
+    SRestreamLogState logState;
 
     // Process StreamSectors (skip null entries for efficiency)
     for (int i = 0; i < kStreamSectorCount; i++)
     {
         auto* pSectorEntry = reinterpret_cast<DWORD*>(reinterpret_cast<DWORD**>(ARRAY_StreamSectors)[i]);
         if (pSectorEntry)
-            processSectorList(pSectorEntry, true, i);
+            ProcessRestreamSectorList(pSectorEntry, true, i, logState, processedTxdIDs, pendingTxdIDs, modelsToUnload, ms_RestreamTxdIDMap);
     }
 
     // Process StreamRepeatSectors (skip null entries for efficiency)
@@ -1459,7 +1557,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     {
         auto* pSectorEntry = reinterpret_cast<DWORD*>(reinterpret_cast<DWORD**>(ARRAY_StreamRepeatSectors)[kRepeatSectorStride * i + 2]);
         if (pSectorEntry)
-            processSectorList(pSectorEntry, false, i);
+            ProcessRestreamSectorList(pSectorEntry, false, i, logState, processedTxdIDs, pendingTxdIDs, modelsToUnload, ms_RestreamTxdIDMap);
     }
 
     // Determine which TXD IDs had no entities found at all (buildings not yet streamed in)

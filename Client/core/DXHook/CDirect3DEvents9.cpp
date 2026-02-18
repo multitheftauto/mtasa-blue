@@ -33,6 +33,13 @@ void                          ResetGTASceneState();
 static uint                 ms_RequiredAnisotropicLevel = 1;
 static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 
+// Tracks frames since the last hardware fault caught by FilterException.
+// Draw calls are skipped for a short cooldown to avoid repeated exceptions,
+// then re-enabled as PresentGuarded increments this counter each frame.
+//   UINT_MAX  = normal (no active fault)
+//   0..N      = frames elapsed since fault
+static uint ms_uiFramesSinceDeviceFault = UINT_MAX;
+
 // To reuse shader setups between calls to DrawIndexedPrimitive
 CShaderItem* g_pActiveShader = NULL;
 
@@ -453,6 +460,9 @@ bool CDirect3DEvents9::IsDeviceOperational(IDirect3DDevice9* pDevice, bool* pbTe
 void CDirect3DEvents9::OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice)
 {
     WriteDebugEvent("CDirect3DEvents9::OnDirect3DDeviceCreate");
+
+    // Reset fault cooldown for the new device.
+    ms_uiFramesSinceDeviceFault = UINT_MAX;
 
     // Create the GUI manager
     CCore::GetSingleton().InitGUI(pDevice);
@@ -1349,6 +1359,23 @@ int               FilterException(uint exceptionCode)
     uiLastExceptionCode = exceptionCode;
     if (exceptionCode == EXCEPTION_ACCESS_VIOLATION)
         return EXCEPTION_EXECUTE_HANDLER;
+    if (exceptionCode == EXCEPTION_ILLEGAL_INSTRUCTION || exceptionCode == EXCEPTION_PRIV_INSTRUCTION)
+    {
+        // Corrupted vtable, overlay hooks, or driver code-page corruption can
+        // produce these inside D3D9 calls. Handle like access violations.
+        ms_uiFramesSinceDeviceFault = 0;
+        char buf[80];
+        _snprintf_s(buf, _countof(buf), _TRUNCATE, "FilterException: caught instruction fault %08x", exceptionCode);
+        WriteDebugEvent(buf);
+        return EXCEPTION_EXECUTE_HANDLER;
+    }
+    if (exceptionCode == EXCEPTION_IN_PAGE_ERROR)
+    {
+        // Paging failure reading d3d9.dll from disk.
+        ms_uiFramesSinceDeviceFault = 0;
+        WriteDebugEvent("FilterException: caught in-page error");
+        return EXCEPTION_EXECUTE_HANDLER;
+    }
     if (exceptionCode == 0xE06D7363)
     {
         WriteDebugEvent("FilterException: caught Microsoft C++ exception");
@@ -1376,6 +1403,7 @@ namespace
         __except (FilterException(GetExceptionCode()))
         {
             CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 15 * 1000000);
+            hr = D3DERR_INVALIDCALL;
         }
         return hr;
     }
@@ -1390,6 +1418,7 @@ namespace
         __except (FilterException(GetExceptionCode()))
         {
             CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 16 * 1000000);
+            hr = D3DERR_INVALIDCALL;
         }
         return hr;
     }
@@ -1404,6 +1433,7 @@ namespace
         __except (FilterException(GetExceptionCode()))
         {
             CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 17 * 1000000);
+            hr = D3DERR_INVALIDCALL;
         }
         return hr;
     }
@@ -1419,6 +1449,10 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
+
+    // Skip draws briefly after a hardware fault; PresentGuarded ticks the counter.
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1456,6 +1490,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 1 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
     return hr;
 }
@@ -1472,6 +1507,9 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawIndexedPrimitive(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1502,6 +1540,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 2 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
     return hr;
 }
@@ -1518,6 +1557,9 @@ HRESULT CDirect3DEvents9::DrawPrimitiveUPGuarded(IDirect3DDevice9* pDevice, D3DP
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1541,6 +1583,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveUPGuarded(IDirect3DDevice9* pDevice, D3DP
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 3 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1560,6 +1603,9 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(IDirect3DDevice9* pDevic
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData,
                                                VertexStreamZeroStride);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1584,6 +1630,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(IDirect3DDevice9* pDevic
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 4 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1600,6 +1647,9 @@ HRESULT CDirect3DEvents9::DrawRectPatchGuarded(IDirect3DDevice9* pDevice, UINT H
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawRectPatch(Handle, pNumSegs, pRectPatchInfo);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1623,6 +1673,7 @@ HRESULT CDirect3DEvents9::DrawRectPatchGuarded(IDirect3DDevice9* pDevice, UINT H
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 6 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1639,6 +1690,9 @@ HRESULT CDirect3DEvents9::DrawTriPatchGuarded(IDirect3DDevice9* pDevice, UINT Ha
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawTriPatch(Handle, pNumSegs, pTriPatchInfo);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1662,6 +1716,7 @@ HRESULT CDirect3DEvents9::DrawTriPatchGuarded(IDirect3DDevice9* pDevice, UINT Ha
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 7 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1702,6 +1757,7 @@ HRESULT CDirect3DEvents9::ProcessVerticesGuarded(IDirect3DDevice9* pDevice, UINT
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 8 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1741,6 +1797,7 @@ HRESULT CDirect3DEvents9::ClearGuarded(IDirect3DDevice9* pDevice, DWORD Count, C
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 9 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1780,6 +1837,7 @@ HRESULT CDirect3DEvents9::ColorFillGuarded(IDirect3DDevice9* pDevice, IDirect3DS
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 10 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1820,6 +1878,7 @@ HRESULT CDirect3DEvents9::UpdateSurfaceGuarded(IDirect3DDevice9* pDevice, IDirec
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 11 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1859,6 +1918,7 @@ HRESULT CDirect3DEvents9::UpdateTextureGuarded(IDirect3DDevice9* pDevice, IDirec
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 12 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1898,6 +1958,7 @@ HRESULT CDirect3DEvents9::GetRenderTargetDataGuarded(IDirect3DDevice9* pDevice, 
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 13 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1937,6 +1998,7 @@ HRESULT CDirect3DEvents9::GetFrontBufferDataGuarded(IDirect3DDevice9* pDevice, U
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 14 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2065,6 +2127,7 @@ HRESULT CDirect3DEvents9::CreateVolumeTextureGuarded(IDirect3DDevice9* pDevice, 
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 18 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2105,6 +2168,7 @@ HRESULT CDirect3DEvents9::CreateCubeTextureGuarded(IDirect3DDevice9* pDevice, UI
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 19 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2145,6 +2209,7 @@ HRESULT CDirect3DEvents9::CreateRenderTargetGuarded(IDirect3DDevice9* pDevice, U
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 20 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2186,6 +2251,7 @@ HRESULT CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(IDirect3DDevice9* pDe
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 21 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2226,6 +2292,7 @@ HRESULT CDirect3DEvents9::CreateOffscreenPlainSurfaceGuarded(IDirect3DDevice9* p
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 22 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2241,6 +2308,10 @@ HRESULT CDirect3DEvents9::CreateOffscreenPlainSurfaceGuarded(IDirect3DDevice9* p
 HRESULT CDirect3DEvents9::PresentGuarded(IDirect3DDevice9* pDevice, CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride,
                                          CONST RGNDATA* pDirtyRegion)
 {
+    // Tick the fault cooldown so draw calls resume after a short skip.
+    if (ms_uiFramesSinceDeviceFault < UINT_MAX)
+        ++ms_uiFramesSinceDeviceFault;
+
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
     if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
@@ -2263,6 +2334,7 @@ HRESULT CDirect3DEvents9::PresentGuarded(IDirect3DDevice9* pDevice, CONST RECT* 
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 5 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;

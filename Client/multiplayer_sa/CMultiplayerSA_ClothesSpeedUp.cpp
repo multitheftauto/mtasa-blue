@@ -80,8 +80,10 @@ namespace
 
     int   iReturnFileId;
     char* pReturnBuffer;
-    bool  bCacheLoadIncomplete = false;
+    int   iLastCacheFileId = -1;
 }  // namespace
+
+void OnCrashAverted(uint uiId);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -95,6 +97,12 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
 
     if (pImgGTAInfo->ucImgId == 5)
     {
+        int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
+
+        // Track which file we're attempting to cache-load, so ShouldSkipLoadRequestedModels
+        // can verify its loadState before deciding to skip
+        iLastCacheFileId = iFileId;
+
 // If bLoadingBigModel is set, try to get it unset
 #define VAR_CStreaming_bLoadingBigModel 0x08E4A58
         BYTE& bLoadingBigModel = *(BYTE*)VAR_CStreaming_bLoadingBigModel;
@@ -104,13 +112,8 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
             if (bLoadingBigModel)
                 pGameInterface->GetStreaming()->LoadAllRequestedModels(false);
             if (bLoadingBigModel)
-            {
-                bCacheLoadIncomplete = true;
                 return false;
-            }
         }
-
-        int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
 
         iReturnFileId = iFileId;
         pReturnBuffer = CMultiplayerSA::ms_PlayerImgCachePtr + pImgGTAInfo->iBlockOffset * 2048;
@@ -167,14 +170,9 @@ skip:
         call    FUNC_CStreamingConvertBufferToObject
         add     esp, 4*3
 
-        test    al, al
-        jnz     convert_ok
-        mov     bCacheLoadIncomplete, 1
-        // Undo premature loadflag=3 set by OnCallCStreamingInfoAddToList
-        mov     ecx, iReturnFileId
-        imul    ecx, 14h
-        mov     byte ptr [ecx + 008E4CD0h], 0
-convert_ok:
+        // On failure, ConvertBufferToObject internally calls RemoveModel + RequestModel
+        // to re-queue. Don't touch loadState here -- let its internal cleanup handle state
+        // correctly. ShouldSkipLoadRequestedModels verifies loadState before skipping.
 
         popad
         add     esp, 4*1
@@ -196,10 +194,14 @@ bool _cdecl ShouldSkipLoadRequestedModels(DWORD calledFrom)
     //      CClothesBuilder::ConstructTextures           5A6040 - 5A6520
     if (calledFrom > 0x5A55A0 && calledFrom < 0x5A6520)
     {
-        if (bCacheLoadIncomplete)
+        // Only skip if the last cache-loaded model is actually in processed state (loadState 1).
+        // If the cache load failed for any reason, loadState won't be 1 and we let
+        // the standard LoadRequestedModels run as fallback.
+        if (iLastCacheFileId >= 0)
         {
-            bCacheLoadIncomplete = false;
-            return false;
+            auto* pInfo = reinterpret_cast<SImgGTAItemInfo*>(reinterpret_cast<char*>(CStreaming__ms_aInfoForModel) + iLastCacheFileId * 20);
+            if (pInfo->uiLoadflag != 1)
+                return false;
         }
         return true;
     }
@@ -316,6 +318,54 @@ bool SetClothingDirectorySize(int directorySize)
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// CClothesBuilder::CopyTexture null-check hook
+// SA CopyTexture at 0x5A5730 derefs the texture parameter without a null
+// check. With MTA's fast clothes caching, a cache load failure can leave a TXD dictionary
+// invalid. Misc33's hook on RwTexDictionaryFindNamedTexture converts the resulting invalid-
+// dictionary crash into a NULL return, which then reaches CopyTexture as a NULL parameter.
+// This hook catches that NULL, reports CrashAverted(43), and returns NULL.
+// Note: callers of CopyTexture do not null-check the return value, so a crash may still
+// occur at a different address. The primary prevention is the loadState verification in
+// ShouldSkipLoadRequestedModels; this hook is a last-resort diagnostic.
+//
+// Original bytes at 0x5A5730 (5 bytes):
+//   8B 44 24 04    mov eax, [esp+4]    ; get texture param
+//   53             push ebx            ; save ebx
+//   (then 8B 18    mov ebx, [eax]      ; CRASH when eax=NULL)
+//
+#define HOOKPOS_CClothesBuilder_CopyTexture  0x5A5730
+#define HOOKSIZE_CClothesBuilder_CopyTexture 5
+static constexpr DWORD RETURN_CClothesBuilder_CopyTexture = 0x5A5735;
+
+void _declspec(naked) HOOK_CClothesBuilder_CopyTexture()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+4]            // texture parameter
+        test    eax, eax
+        jz      copytex_null
+
+        // Replicate overwritten instructions and continue
+        push    ebx
+        jmp     RETURN_CClothesBuilder_CopyTexture
+
+    copytex_null:
+        pushad
+        push    43
+        call    OnCrashAverted
+        add     esp, 4
+        popad
+        xor     eax, eax                // return NULL
+        ret
+    }
+    // clang-format on
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for ClothesSpeedUp
@@ -328,4 +378,5 @@ void CMultiplayerSA::InitHooks_ClothesSpeedUp()
     EZHookInstall(CStreamingLoadRequestedModels);
     EZHookInstall(LoadingPlayerImgDir);
     EZHookInstall(CallCStreamingInfoAddToList);
+    EZHookInstall(CClothesBuilder_CopyTexture);
 }

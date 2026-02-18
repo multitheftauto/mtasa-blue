@@ -27,7 +27,40 @@ void ApplyBorderlessColorCorrection(CProxyDirect3DDevice9* proxyDevice, const D3
 
 namespace
 {
+    // SEH filter for pDevice->Reset(). Mirrors FilterException in CDirect3DEvents9.cpp.
+    // Stores the exception code for OnCrashAverted ID encoding and flags hardware
+    // faults so callers can break out of retry loops that won't recover.
+    uint uiLastResetExceptionCode = 0;
+    bool bResetHardwareFault = false;
 
+    int FilterResetException(uint exceptionCode)
+    {
+        uiLastResetExceptionCode = exceptionCode;
+        bResetHardwareFault = false;
+
+        if (exceptionCode == EXCEPTION_ACCESS_VIOLATION)
+            return EXCEPTION_EXECUTE_HANDLER;
+        if (exceptionCode == EXCEPTION_ILLEGAL_INSTRUCTION || exceptionCode == EXCEPTION_PRIV_INSTRUCTION)
+        {
+            bResetHardwareFault = true;
+            char buf[80];
+            _snprintf_s(buf, _countof(buf), _TRUNCATE, "FilterResetException: caught instruction fault %08x", exceptionCode);
+            WriteDebugEvent(buf);
+            return EXCEPTION_EXECUTE_HANDLER;
+        }
+        if (exceptionCode == EXCEPTION_IN_PAGE_ERROR)
+        {
+            bResetHardwareFault = true;
+            WriteDebugEvent("FilterResetException: caught in-page error");
+            return EXCEPTION_EXECUTE_HANDLER;
+        }
+        if (exceptionCode == 0xE06D7363)  // Microsoft C++ exception
+        {
+            WriteDebugEvent("FilterResetException: caught Microsoft C++ exception");
+            return EXCEPTION_EXECUTE_HANDLER;
+        }
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
 }  // unnamed namespace
 
 namespace BorderlessGamma
@@ -653,6 +686,23 @@ UINT CProxyDirect3DDevice9::GetNumberOfSwapChains()
     return m_pDevice->GetNumberOfSwapChains();
 }
 
+static HRESULT TryResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, uint crashAvertedBase, bool& bHardwareFaultOut)
+{
+    HRESULT hResult = D3DERR_DEVICELOST;
+    bHardwareFaultOut = false;
+    __try
+    {
+        hResult = pDevice->Reset(pPresentationParameters);
+    }
+    __except (FilterResetException(GetExceptionCode()))
+    {
+        CCore::GetSingleton().OnCrashAverted((uiLastResetExceptionCode & 0xFFFF) + crashAvertedBase);
+        hResult = D3DERR_DEVICELOST;
+        bHardwareFaultOut = bResetHardwareFault;
+    }
+    return hResult;
+}
+
 ////////////////////////////////////////////////
 //
 // ResetDeviceInsist
@@ -667,7 +717,11 @@ HRESULT ResetDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3DDevice9* pDe
     uint         uiRetryCount = 0;
     do
     {
-        hResult = pDevice->Reset(pPresentationParameters);
+        bool bHardwareFault = false;
+        hResult = TryResetDevice(pDevice, pPresentationParameters, 24 * 1000000, bHardwareFault);
+        // Instruction faults and paging errors won't clear on retry.
+        if (bHardwareFault)
+            break;
         if (hResult == D3D_OK)
         {
             WriteDebugEvent(SString("   -- ResetDeviceInsist succeeded on try #%d", uiRetryCount + 1));
@@ -688,8 +742,8 @@ HRESULT ResetDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3DDevice9* pDe
 ////////////////////////////////////////////////
 HRESULT DoResetDevice(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, D3DPRESENT_PARAMETERS& presentationParametersOrig)
 {
-    HRESULT hResult;
-    hResult = pDevice->Reset(pPresentationParameters);
+    bool    bHardwareFault = false;
+    HRESULT hResult = TryResetDevice(pDevice, pPresentationParameters, 23 * 1000000, bHardwareFault);
 
     if (SUCCEEDED(hResult))
     {
@@ -828,6 +882,28 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     // Call our event handler.
     CDirect3DEvents9::OnInvalidate(m_pDevice);
 
+    // Unbind all device state before releasing cached resources.
+    // D3D9 keeps internal refs to bound textures, streams, shaders, etc. If GTA SA
+    // freed any of them before Reset, drivers may crash iterating stale entries.
+    {
+        IDirect3DDevice9* const pDevice = m_pDevice;
+
+        for (DWORD i = 0; i < NUMELMS(DeviceState.TextureState); ++i)
+            pDevice->SetTexture(i, nullptr);
+
+        for (DWORD i = 0; i < NUMELMS(DeviceState.VertexStreams); ++i)
+            pDevice->SetStreamSource(i, nullptr, 0, 0);
+
+        for (DWORD i = 1; i < 4; ++i)
+            pDevice->SetRenderTarget(i, nullptr);
+
+        pDevice->SetIndices(nullptr);
+        pDevice->SetVertexShader(nullptr);
+        pDevice->SetPixelShader(nullptr);
+        pDevice->SetVertexDeclaration(nullptr);
+        pDevice->SetDepthStencilSurface(nullptr);
+    }
+
     // Release cached state so lingering references can't block Reset on default-pool resources
     ReleaseCachedResources();
 
@@ -837,6 +913,18 @@ HRESULT CProxyDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParamet
     WaitForGpuIdle(m_pDevice);
 
     Sleep(1);
+
+    // The device may have gone from DEVICENOTRESET to DEVICELOST during cleanup.
+    // Some drivers crash if Reset is called on a fully lost device.
+    if (const HRESULT hRecheck = m_pDevice->TestCooperativeLevel(); hRecheck == D3DERR_DEVICELOST)
+    {
+        if (gammaStateCleared)
+        {
+            std::lock_guard<std::mutex> gammaLock(g_gammaStateMutex);
+            g_GammaState = previousGammaState;
+        }
+        return D3DERR_DEVICELOST;
+    }
 
     // Call the real reset routine.
     hResult = DoResetDevice(m_pDevice, pPresentationParameters, presentationParametersOrig);
@@ -1227,6 +1315,9 @@ HRESULT CProxyDirect3DDevice9::GetFrontBufferData(UINT iSwapChain, IDirect3DSurf
 HRESULT CProxyDirect3DDevice9::StretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                            D3DTEXTUREFILTERTYPE Filter)
 {
+    if (!pSourceSurface || !pDestSurface)
+        return D3DERR_INVALIDCALL;
+
     static thread_local bool s_inStretchRect = false;
     if (s_inStretchRect)
     {
@@ -1508,7 +1599,6 @@ HRESULT CProxyDirect3DDevice9::SetTexture(DWORD Stage, IDirect3DBaseTexture9* pT
             // Fast-path: avoid AddRef/Release if texture hasn't changed
             if (DeviceState.TextureState[Stage].Texture != pTexture)
             {
-                // Hot path: use non-validating ReplaceInterface since textures come from D3D9 driver
                 ReplaceInterface(DeviceState.TextureState[Stage].Texture, pTexture);
             }
         }

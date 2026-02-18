@@ -61,11 +61,13 @@ struct sDataBuildingRemovalItem
     {
         m_pInterface = pInterface;
         m_iCount = 0;
+        m_iplIndex = 0;   // set in AddDataBuilding(); CEntitySAInterface is forward-decl here
     }
     void                AddCount() { m_iCount++; }
     void                RemoveCount() { m_iCount--; }
     CEntitySAInterface* m_pInterface;
     int                 m_iCount;
+    BYTE                m_iplIndex;   // cached at tracking time; used by OnRemoveIpl to skip entries from other IPLs
 };
 
 struct sBuildingRemovalItem
@@ -74,11 +76,13 @@ struct sBuildingRemovalItem
     {
         m_pInterface = pInterface;
         m_iCount = 0;
+        m_iplIndex = 0;   // set in AddBinaryBuilding(); CEntitySAInterface is forward-decl here
     }
     void                AddCount() { m_iCount++; }
     void                RemoveCount() { m_iCount--; }
     CEntitySAInterface* m_pInterface;
     int                 m_iCount;
+    BYTE                m_iplIndex;   // cached at tracking time; used by OnRemoveIpl to skip entries from other IPLs
 };
 
 struct SIPLInst

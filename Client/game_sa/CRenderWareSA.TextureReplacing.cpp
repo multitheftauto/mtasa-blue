@@ -153,6 +153,19 @@ namespace
     // Prevents master destruction from freeing rasters that orphaned copies still reference.
     std::unordered_set<RwRaster*> g_OrphanedCopyRasters;
 
+    // Cached global MTA raster set for PopulateOriginalTextures.
+    // Contains rasters from g_ActiveReplacements, g_LeakedMasterTextures, and g_OrphanedCopyRasters.
+    // Rebuilt when g_uiGlobalMtaRasterGeneration changes (incremented on any mutaton of those globals
+    // or when tracked textures have their raster pointers nulled during cleanup).
+    std::unordered_set<RwRaster*> g_GlobalMtaRasterCache;
+    uint32_t                      g_uiGlobalMtaRasterGeneration = 0;
+    uint32_t                      g_uiGlobalMtaRasterCacheGeneration = 0;  // Generation at last cache rebuild
+
+    static void InvalidateGlobalMtaRasterCache()
+    {
+        ++g_uiGlobalMtaRasterGeneration;
+    }
+
     static void* TryReleaseTextureD3D(RwTexture* pTex)
     {
         __try
@@ -183,6 +196,7 @@ namespace
     bool g_bInTxdReapply = false;
 
     RwTexDictionary* g_pCachedVehicleTxd = nullptr;
+    RwListEntry*     g_pCachedVehicleTxdListHead = nullptr;  // textures.root.next at cache time; detects texture rebuild at same TXD address
     TxdTextureMap    g_CachedVehicleTxdMap;
     unsigned short   g_usVehicleTxdSlotId = 0xFFFF;
 
@@ -244,14 +258,19 @@ namespace
     constexpr uint32_t      PENDING_ISOLATION_TIMEOUT_MS = 15000;
     constexpr std::size_t   MAX_PENDING_ISOLATED_PER_TICK = 64;
 
-    // Per-TXD texture map cache to avoid repeated linked list iter
-    // Cache is keyed by TXD slot ID and validated by TXD pointer comparison
+    // Per-TXD texture map cache to avoid repeated linked list iteration.
+    // Keyed by TXD slot ID; validated by TXD pointer and texture list head
+    // (the list head catches TXD rebuilds at the same pool address).
     struct SCachedTxdTextureMap
     {
-        RwTexDictionary* pTxd = nullptr;  // TXD pointer at cache time (detects reload/slot reuse)
-        TxdTextureMap    textureMap;      // Cached texture name > texture map
+        RwTexDictionary* pTxd = nullptr;       // TXD pointer at cache time (detects reload/slot reuse)
+        RwListEntry*     pListHead = nullptr;  // textures.root.next at cache time (detects texture rebuild at same TXD address)
+        TxdTextureMap    textureMap;           // Cached texture name > texture map
 
-        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept { return pTxd != nullptr && pTxd == pCurrentTxd; }
+        bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
+        {
+            return pTxd != nullptr && pTxd == pCurrentTxd && pListHead == pCurrentTxd->textures.root.next;
+        }
     };
     std::unordered_map<unsigned short, SCachedTxdTextureMap> g_TxdTextureMapCache;
 
@@ -288,6 +307,7 @@ namespace
         }
 
         entry.pTxd = pTxd;
+        entry.pListHead = pTxd->textures.root.next;
         // Use swap idiom to ensure complete memory release
         // (avoids reconnect leaks; safer than .clear() on potentially corrupted maps)
         TxdTextureMap temp;
@@ -316,7 +336,7 @@ namespace
     }
 
     // Remove pReplacementTextures from all usedByReplacements vectors in the map.
-    // Always does a full sweep to catch orphaned references not tracked in usedInTxdIds.
+    // Uses usedInTxdIds as fast path, then does a safety scan for orphaned references.
     void RemoveReplacementFromTracking(SReplacementTextures* pReplacementTextures)
     {
         if (!pReplacementTextures)
@@ -324,8 +344,23 @@ namespace
             return;
         }
 
+        // Fast path: remove from entries tracked in usedInTxdIds (O(K) lookups where K = tracked TXDs)
+        for (unsigned short usTxdId : pReplacementTextures->usedInTxdIds)
+        {
+            auto it = ms_ModelTexturesInfoMap.find(usTxdId);
+            if (it != ms_ModelTexturesInfoMap.end())
+            {
+                auto& usedBy = it->second.usedByReplacements;
+                if (!usedBy.empty())
+                    ListRemove(usedBy, pReplacementTextures);
+            }
+        }
+
+        // Safety scan: catch orphaned references not tracked in usedInTxdIds.
         for (auto& entry : ms_ModelTexturesInfoMap)
         {
+            if (pReplacementTextures->usedInTxdIds.count(entry.first) != 0)
+                continue;  // Already handled by fast path
             auto& usedBy = entry.second.usedByReplacements;
             if (!usedBy.empty())
                 ListRemove(usedBy, pReplacementTextures);
@@ -781,13 +816,19 @@ namespace
     static void RegisterReplacement(SReplacementTextures* pReplacement)
     {
         if (pReplacement)
-            g_ActiveReplacements.insert(pReplacement);
+        {
+            if (g_ActiveReplacements.insert(pReplacement).second)
+                InvalidateGlobalMtaRasterCache();
+        }
     }
 
     static void UnregisterReplacement(SReplacementTextures* pReplacement)
     {
         if (pReplacement)
-            g_ActiveReplacements.erase(pReplacement);
+        {
+            if (g_ActiveReplacements.erase(pReplacement) != 0)
+                InvalidateGlobalMtaRasterCache();
+        }
     }
 
     static bool IsReplacementActive(const SReplacementTextures* pReplacement)
@@ -1106,18 +1147,6 @@ namespace
         }
     }
 
-    template <typename T>
-    void SwapPopRemove(std::vector<T>& vec, const T& value)
-    {
-        auto it = std::find(vec.begin(), vec.end(), value);
-        if (it != vec.end())
-        {
-            if (it != vec.end() - 1)
-                *it = std::move(vec.back());
-            vec.pop_back();
-        }
-    }
-
     template <typename Fn>
     void ClearAllShaderRegs(Fn&& fn)
     {
@@ -1360,13 +1389,39 @@ namespace
         // Build a set of rasters owned by known MTA textures for fast filtering.
         // Both masters and copies share the same raster, so a raster-level check
         // catches both without needing separate copy tracking.
-        std::unordered_set<RwRaster*> mtaRasters;
-
-        for (RwTexture* pMaster : g_LeakedMasterTextures)
+        //
+        // The global portion (g_ActiveReplacements, g_LeakedMasterTextures, g_OrphanedCopyRasters)
+        // is cached and only rebuilt when those globals change. The entry-local portion
+        // (info.usedByReplacements) is always added fresh per call.
+        if (g_uiGlobalMtaRasterCacheGeneration != g_uiGlobalMtaRasterGeneration)
         {
-            if (pMaster && pMaster->raster)
-                mtaRasters.insert(pMaster->raster);
+            g_GlobalMtaRasterCache.clear();
+
+            for (RwTexture* pMaster : g_LeakedMasterTextures)
+            {
+                if (pMaster && pMaster->raster)
+                    g_GlobalMtaRasterCache.insert(pMaster->raster);
+            }
+
+            for (const SReplacementTextures* pReplacement : g_ActiveReplacements)
+            {
+                if (!pReplacement)
+                    continue;
+                for (RwTexture* pMasterTex : pReplacement->textures)
+                {
+                    if (pMasterTex && pMasterTex->raster)
+                        g_GlobalMtaRasterCache.insert(pMasterTex->raster);
+                }
+            }
+
+            for (RwRaster* pKeptRaster : g_OrphanedCopyRasters)
+                g_GlobalMtaRasterCache.insert(pKeptRaster);
+
+            g_uiGlobalMtaRasterCacheGeneration = g_uiGlobalMtaRasterGeneration;
         }
+
+        // Start with cached global rasters, then add entry-local rasters
+        std::unordered_set<RwRaster*> mtaRasters = g_GlobalMtaRasterCache;
 
         for (const SReplacementTextures* pReplacement : info.usedByReplacements)
         {
@@ -1379,24 +1434,6 @@ namespace
                     mtaRasters.insert(pMasterTex->raster);
             }
         }
-
-        // Also filter against all active replacements globally. Covers cases where
-        // this entry's usedByReplacements was cleared during stale recovery but
-        // copies from active replacements remain linked in the TXD.
-        for (const SReplacementTextures* pReplacement : g_ActiveReplacements)
-        {
-            if (!pReplacement)
-                continue;
-            for (RwTexture* pMasterTex : pReplacement->textures)
-            {
-                if (pMasterTex && pMasterTex->raster)
-                    mtaRasters.insert(pMasterTex->raster);
-            }
-        }
-
-        // Filter rasters from orphaned copies kept alive during isolated TXD cleanup
-        for (RwRaster* pKeptRaster : g_OrphanedCopyRasters)
-            mtaRasters.insert(pKeptRaster);
 
         for (RwTexture* pTex : allTextures)
         {
@@ -1577,10 +1614,15 @@ namespace
         if (!pVehicleTxd)
             return;
 
-        if (pVehicleTxd != g_pCachedVehicleTxd)
+        // Check both TXD pointer and its texture list head.
+        // Streaming can destroy and reload a TXD at the same address (pool/allocator reuse),
+        // which leaves the cache with dangling texture name pointers.
+        RwListEntry* pListHead = pVehicleTxd->textures.root.next;
+        if (pVehicleTxd != g_pCachedVehicleTxd || pListHead != g_pCachedVehicleTxdListHead)
         {
             g_CachedVehicleTxdMap.clear();
             g_pCachedVehicleTxd = pVehicleTxd;
+            g_pCachedVehicleTxdListHead = pListHead;
             g_usVehicleTxdSlotId = 0xFFFF;
             BuildTxdTextureMapFast(pVehicleTxd, g_CachedVehicleTxdMap);
         }
@@ -1706,6 +1748,7 @@ namespace
             pMasterTextures = &localMasterTextures;
         }
 
+        bool bAnyRasterNulled = false;
         for (RwTexture* pTexture : perTxdInfo.usingTextures)
         {
             if (!pTexture)
@@ -1724,7 +1767,11 @@ namespace
             }
 
             if (bNeedsDestruction && !bSkipRasterNull)
+            {
+                if (pTexture->raster)
+                    bAnyRasterNulled = true;
                 pTexture->raster = nullptr;
+            }
 
             if (bNeedsDestruction && CanDestroyOrphanedTexture(pTexture))
             {
@@ -1736,6 +1783,8 @@ namespace
                     outCopiesToDestroy.insert(pTexture);
             }
         }
+        if (bAnyRasterNulled)
+            InvalidateGlobalMtaRasterCache();
         perTxdInfo.usingTextures.clear();
 
         for (RwTexture* pReplaced : perTxdInfo.replacedOriginals)
@@ -3934,12 +3983,12 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 AddReportLog(9401, SString("ModelInfoTXDAddTextures: Stale replacement cleanup return false for model %u txdId=%u", usModelId, pInfo->usTxdId));
                 pReplacementTextures->perTxdList.erase(itPerTxd);
                 pReplacementTextures->usedInTxdIds.erase(pInfo->usTxdId);
-                SwapPopRemove(pInfo->usedByReplacements, pReplacementTextures);
+                ListRemove(pInfo->usedByReplacements, pReplacementTextures);
                 return false;
             }
 
             pReplacementTextures->usedInTxdIds.erase(pInfo->usTxdId);
-            SwapPopRemove(pInfo->usedByReplacements, pReplacementTextures);
+            ListRemove(pInfo->usedByReplacements, pReplacementTextures);
 
             TextureSwapMap swapMap;
             swapMap.reserve(itPerTxd->usingTextures.size());
@@ -4200,8 +4249,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     perTxdInfo.replacedOriginals.resize(perTxdInfo.usingTextures.size(), nullptr);
 
     const auto& masterTexturesVec = pReplacementTextures->textures;
-    auto        IsMasterTexture = [&masterTexturesVec](RwTexture* pTex) -> bool
-    { return std::find(masterTexturesVec.begin(), masterTexturesVec.end(), pTex) != masterTexturesVec.end(); };
+    const auto  masterTexturesSet = MakeTextureSet(masterTexturesVec);
+    auto        IsMasterTexture = [&masterTexturesSet](RwTexture* pTex) -> bool { return masterTexturesSet.count(pTex) != 0; };
 
     RwTexDictionary* const pTargetTxd = pInfo->pTxd;
     const bool             bTargetTxdOk = pTargetTxd != nullptr;
@@ -4677,6 +4726,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
 
             if (itPerTxd != pReplacement->perTxdList.end())
             {
+                bool bAnyRasterNulled = false;
                 for (RwTexture* pTex : itPerTxd->usingTextures)
                 {
                     if (!IsReadableTexture(pTex))
@@ -4692,7 +4742,11 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                     if (bWasInIsolatedTxd && pTex->txd == nullptr)
                     {
                         if (!bSkipRasterNull)
+                        {
+                            if (pTex->raster)
+                                bAnyRasterNulled = true;
                             pTex->raster = nullptr;
+                        }
                         else if (pTex->raster)
                         {
                             // Only the first texture per raster keeps it alive;
@@ -4700,9 +4754,13 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                             // when materials are destroyed by the engine.
                             if (!g_OrphanedCopyRasters.insert(pTex->raster).second)
                                 pTex->raster = nullptr;
+                            else
+                                InvalidateGlobalMtaRasterCache();
                         }
                     }
                 }
+                if (bAnyRasterNulled)
+                    InvalidateGlobalMtaRasterCache();
 
                 itPerTxd->usingTextures.clear();
                 itPerTxd->replacedOriginals.clear();
@@ -4947,11 +5005,14 @@ void CRenderWareSA::ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementT
     // Masters are always orphaned (txd=nullptr, self-circular TXDList) - they were
     // never added to any game TXD; only copies were. Their rasters are shared with
     // copies still in TXDs; the destruction loop's mopupFreedRasters handles that.
+    bool bLeakedMastersMutated = false;
     for (RwTexture* pMaster : pReplacementTextures->textures)
     {
         if (pMaster)
-            g_LeakedMasterTextures.insert(pMaster);
+            bLeakedMastersMutated |= g_LeakedMasterTextures.insert(pMaster).second;
     }
+    if (bLeakedMastersMutated)
+        InvalidateGlobalMtaRasterCache();
 
     RemoveReplacementFromTracking(pReplacementTextures);
 }
@@ -5492,7 +5553,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                     SafeDestroyTexture(pReplacedTexture);
                 else
                     RwTextureDestroy(pReplacedTexture);
-                g_LeakedMasterTextures.erase(pReplacedTexture);
+                if (g_LeakedMasterTextures.erase(pReplacedTexture) != 0)
+                    InvalidateGlobalMtaRasterCache();
             }
         }
 
@@ -5781,6 +5843,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
     // Also skip if perTxdList entries remain - copies may still reference masters' rasters
     if (!bLeakedTextureStillLinked && pReplacementTextures->perTxdList.empty())
     {
+        bool bLeakedMastersMutated = false;
         for (RwTexture* pTexture : pReplacementTextures->textures)
         {
             if (!pTexture)
@@ -5804,19 +5867,24 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             else
                 RwTextureDestroy(pTexture);
             destroyedTextures.insert(pTexture);
-            g_LeakedMasterTextures.erase(pTexture);
+            bLeakedMastersMutated |= (g_LeakedMasterTextures.erase(pTexture) != 0);
         }
+        if (bLeakedMastersMutated)
+            InvalidateGlobalMtaRasterCache();
     }
     else
     {
         // Track masters that weren't destroyed for cleanup at StaticReset
+        bool bLeakedMastersInserted = false;
         for (RwTexture* pTexture : pReplacementTextures->textures)
         {
             if (pTexture && destroyedTextures.find(pTexture) == destroyedTextures.end())
             {
-                g_LeakedMasterTextures.insert(pTexture);
+                bLeakedMastersInserted |= g_LeakedMasterTextures.insert(pTexture).second;
             }
         }
+        if (bLeakedMastersInserted)
+            InvalidateGlobalMtaRasterCache();
     }
 
     // Invalidate caches for all TXDs that were modified
@@ -5848,6 +5916,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_PendingIsolatedModelTimes.clear();
 
     g_pCachedVehicleTxd = nullptr;
+    g_pCachedVehicleTxdListHead = nullptr;
     g_CachedVehicleTxdMap = TxdTextureMap{};
     g_usVehicleTxdSlotId = 0xFFFF;
     ClearTxdTextureMapCache();
@@ -6373,7 +6442,8 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
             // Track for destruction at the end of StaticReset (g_LeakedMasterTextures loop).
             // Without this, the orphaned RwTexture + raster + D3D texture leak permanently.
-            g_LeakedMasterTextures.insert(pCurrent);
+            if (g_LeakedMasterTextures.insert(pCurrent).second)
+                InvalidateGlobalMtaRasterCache();
         }
 
         // Re-add originals that were orphaned during ModelInfoTXDAddTextures
@@ -6538,6 +6608,9 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
         g_LeakedMasterTextures.clear();
     }
 
+    g_GlobalMtaRasterCache.clear();
+    InvalidateGlobalMtaRasterCache();
+
     g_ReleasedD3DTextures.clear();
 }
 
@@ -6565,6 +6638,7 @@ void CRenderWareSA::StaticResetShaderSupport()
         }
         m_TexInfoMap.clear();
         m_D3DDataTexInfoMap.clear();
+        m_ScriptTexInfoMap.clear();
         return;
     }
 

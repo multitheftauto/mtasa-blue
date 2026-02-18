@@ -46,6 +46,9 @@ namespace
         float                      fLodDistanceUnscaled;
         CBaseModelInfoSAInterface* pModelInfo;
     } saved = {false, 0.f, NULL};
+
+    DWORD preResult = 0;
+    DWORD entityCheckValid = 0;
 }  // namespace
 
 ////////////////////////////////////////////////
@@ -53,18 +56,29 @@ namespace
 // CRenderer_SetupEntityVisibility
 //
 ////////////////////////////////////////////////
-void OnMY_CRenderer_SetupEntityVisibility_Pre(CEntitySAInterface* pEntity, float& fValue)
+// Returns -1 to proceed with the original function, or >= 0 to skip it (value used as result)
+int OnMY_CRenderer_SetupEntityVisibility_Pre(CEntitySAInterface* pEntity, float& fValue)
 {
+    // Guard against entities whose model info has been deallocated
+    auto* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[pEntity->m_nModelIndex];
+    if (!pModelInfo)
+    {
+        saved.bValid = false;
+        return 0xFF;  // Skip: caller's switch-default ignores the entity
+    }
+
     if (pEntity->IsLowLodEntity())
     {
         SetGlobalDrawDistanceScale(LOW_LOD_DRAW_DISTANCE_SCALE * 2);
-        saved.pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[pEntity->m_nModelIndex];
-        saved.fLodDistanceUnscaled = saved.pModelInfo->fLodDistanceUnscaled;
-        saved.pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE / GetDrawDistanceSetting();
+        saved.pModelInfo = pModelInfo;
+        saved.fLodDistanceUnscaled = pModelInfo->fLodDistanceUnscaled;
+        pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE / GetDrawDistanceSetting();
         saved.bValid = true;
     }
     else
         saved.bValid = false;
+
+    return -1;  // Proceed with the original function
 }
 
 void OnMY_CRenderer_SetupEntityVisibility_Post(int result, CEntitySAInterface* pEntity, float& fDist)
@@ -106,7 +120,11 @@ static void __declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
         push    [esp+32+4*2]
         call    OnMY_CRenderer_SetupEntityVisibility_Pre
         add     esp, 4*2
+        mov     preResult, eax
         popad
+        mov     eax, preResult
+        cmp     eax, 0FFFFFFFFh
+        jne     skip_original       // Pre signaled skip - eax already holds the result
 
 ////////////////////
         push    [esp+4*2]
@@ -115,6 +133,7 @@ static void __declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
         add     esp, 4*2
 
 ////////////////////
+skip_original:
         pushad
         push    [esp+32+4*2]
         push    [esp+32+4*2]
@@ -177,6 +196,71 @@ second:
         popad
 
         jmp     RETURN_CWorldScan_ScanWorldb   // 72CAE0
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////
+//
+// CRenderer_ScanSectorList_EntityCheck
+//
+// Validates entity pointer before accessing its scan code field.
+// The LOD system's 10x expanded scan area can visit sectors containing
+// dangling entity pointers (freed but not unlinked from sector lists).
+//
+////////////////////////////////////////////////
+bool IsEntityAccessible(CEntitySAInterface* pEntity)
+{
+    __try
+    {
+        volatile WORD scanCode = *(volatile WORD*)((BYTE*)pEntity + 0x2C);
+        (void)scanCode;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+// Hook info
+#define HOOKPOS_CRenderer_ScanSectorList_EntityCheck  0x554910
+#define HOOKSIZE_CRenderer_ScanSectorList_EntityCheck 8
+DWORD                 RETURN_CRenderer_ScanSectorList_EntityCheck = 0x554918;
+DWORD                 LOOPBOTTOM_CRenderer_ScanSectorList_EntityCheck = 0x554AD5;
+void _declspec(naked) HOOK_CRenderer_ScanSectorList_EntityCheck()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+    check_entity:
+        test    edi, edi
+        jz      list_done
+
+        mov     esi, [edi]              // entity = node->data
+
+        pushad
+        push    esi
+        call    IsEntityAccessible
+        add     esp, 4
+        mov     entityCheckValid, eax
+        popad
+
+        cmp     entityCheckValid, 0
+        je      skip_entity
+
+        // Valid entity: replicate original 'mov ax, word ptr [CWorld::ms_nCurrentScanCode]'
+        mov     ax, word ptr ds:[0xB7CD78]
+        jmp     RETURN_CRenderer_ScanSectorList_EntityCheck     // -> 0x554918
+
+    skip_entity:
+        mov     edi, [edi+4]            // advance to next node
+        jmp     check_entity            // retry with next entity
+
+    list_done:
+        jmp     LOOPBOTTOM_CRenderer_ScanSectorList_EntityCheck // -> 0x554AD5 (def_554948: test edi,edi; jnz)
     }
     // clang-format on
 }
@@ -257,7 +341,7 @@ void CMultiplayerSA::SetLODSystemEnabled(bool bEnable)
     // Memory saved here
     static CBuffer savedMem;
     SHookInfo      hookInfoList[] = {MAKE_HOOK_INFO(CRenderer_SetupEntityVisibility), MAKE_HOOK_INFO(CWorldScan_ScanWorld),
-                                     MAKE_HOOK_INFO(CVisibilityPlugins_CalculateFadingAtomicAlpha)};
+                                     MAKE_HOOK_INFO(CRenderer_ScanSectorList_EntityCheck), MAKE_HOOK_INFO(CVisibilityPlugins_CalculateFadingAtomicAlpha)};
 
     // Enable or not?
     if (bEnable)
