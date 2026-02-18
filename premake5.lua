@@ -14,8 +14,13 @@ if ci and ci:lower() == "true" then
 else
 	CI_BUILD = false
 end
+
 GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 MTA_MAETRO = os.getenv("MTA_MAETRO") == "true"
+
+if MTA_MAETRO then
+	require "maetro"
+end
 
 newoption {
 	trigger     = "gccprefix",
@@ -134,6 +139,10 @@ workspace "MTASA"
 			path.join(dxdir, "Lib/x86")
 		}
 
+		if MTA_MAETRO then
+			flags { "NoImplicitLink" }
+		end
+
 	filter {"system:windows", "configurations:Debug"}
 		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
@@ -181,6 +190,10 @@ workspace "MTASA"
 		include "vendor/libspeex"
 		include "vendor/detours"
 		include "vendor/lunasvg"
+
+		if MTA_MAETRO then
+			include "vendor/maetro32"
+		end
 	end
 
 	filter {}
