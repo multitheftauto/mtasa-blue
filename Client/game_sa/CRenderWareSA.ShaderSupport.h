@@ -101,13 +101,14 @@ struct SShaderInfo
 struct STexInfo
 {
     STexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData)
-        : texTag(texTag), strTextureName(strTextureName.ToLower()), pD3DData(pD3DData), pAssociatedTexNameInfo(nullptr)
+        : texTag(texTag), strTextureName(strTextureName.ToLower()), pD3DData(pD3DData), pAssociatedTexNameInfo(nullptr), bInTexInfoMap(false)
     {
     }
     STexTag          texTag;
     const SString    strTextureName;  // Always lower case
     CD3DDUMMY* const pD3DData;
     STexNameInfo*    pAssociatedTexNameInfo;
+    bool             bInTexInfoMap;
 };
 
 struct SShaderInfoInstance

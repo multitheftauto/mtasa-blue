@@ -54,7 +54,7 @@ namespace
             WriteDebugEvent("FilterResetException: caught in-page error");
             return EXCEPTION_EXECUTE_HANDLER;
         }
-        if (exceptionCode == 0xE06D7363)            // Microsoft C++ exception
+        if (exceptionCode == 0xE06D7363)  // Microsoft C++ exception
         {
             WriteDebugEvent("FilterResetException: caught Microsoft C++ exception");
             return EXCEPTION_EXECUTE_HANDLER;

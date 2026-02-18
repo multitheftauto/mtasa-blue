@@ -1143,6 +1143,21 @@ void CGameSA::RestoreGameWorld()
 bool CGameSA::SetBuildingPoolSize(size_t size)
 {
     const bool shouldRemoveWorld = !m_isGameWorldRemoved;
+
+    const int iCurrentBuildingPoolSize = m_Pools->GetBuildingsPool().GetSize();
+    if (iCurrentBuildingPoolSize >= 0 && static_cast<size_t>(iCurrentBuildingPoolSize) == size)
+    {
+        // Keep same-size behavior unchanged while world is active.
+        // If world is already removed, skip no-op resize and only drop caches.
+        if (!shouldRemoveWorld)
+        {
+            static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
+            return true;
+        }
+
+        // World is active here, so continue with remove and restore flow.
+    }
+
     if (shouldRemoveWorld)
         RemoveGameWorld();
     else

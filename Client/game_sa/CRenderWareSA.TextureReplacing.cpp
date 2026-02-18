@@ -161,7 +161,10 @@ namespace
     uint32_t                      g_uiGlobalMtaRasterGeneration = 0;
     uint32_t                      g_uiGlobalMtaRasterCacheGeneration = 0;  // Generation at last cache rebuild
 
-    static void InvalidateGlobalMtaRasterCache() { ++g_uiGlobalMtaRasterGeneration; }
+    static void InvalidateGlobalMtaRasterCache()
+    {
+        ++g_uiGlobalMtaRasterGeneration;
+    }
 
     static void* TryReleaseTextureD3D(RwTexture* pTex)
     {
@@ -262,7 +265,7 @@ namespace
     {
         RwTexDictionary* pTxd = nullptr;       // TXD pointer at cache time (detects reload/slot reuse)
         RwListEntry*     pListHead = nullptr;  // textures.root.next at cache time (detects texture rebuild at same TXD address)
-        TxdTextureMap    textureMap;            // Cached texture name > texture map
+        TxdTextureMap    textureMap;           // Cached texture name > texture map
 
         bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
         {
@@ -4247,8 +4250,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
     const auto& masterTexturesVec = pReplacementTextures->textures;
     const auto  masterTexturesSet = MakeTextureSet(masterTexturesVec);
-    auto        IsMasterTexture = [&masterTexturesSet](RwTexture* pTex) -> bool
-    { return masterTexturesSet.count(pTex) != 0; };
+    auto        IsMasterTexture = [&masterTexturesSet](RwTexture* pTex) -> bool { return masterTexturesSet.count(pTex) != 0; };
 
     RwTexDictionary* const pTargetTxd = pInfo->pTxd;
     const bool             bTargetTxdOk = pTargetTxd != nullptr;

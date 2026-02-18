@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <deque>
 #include "CRenderWareSA.ShaderSupport.h"
 
 #ifdef SHADER_DEBUG_OUTPUT
@@ -35,10 +36,10 @@ SString GetDebugTagStr(CMatchChannel* pChannel);
 struct SMatchType
 {
     SMatchType(const SString& strMatch, bool bAdditive)
-        : strMatch(strMatch)
-        , bAdditive(bAdditive)
-        , bIsMatchAll(strMatch.length() == 1 && strMatch[0] == '*')
-        , bHasWildcards(strMatch.find_first_of("*?") != SString::npos)
+        : strMatch(strMatch),
+          bAdditive(bAdditive),
+          bIsMatchAll(strMatch.length() == 1 && strMatch[0] == '*'),
+          bHasWildcards(strMatch.find_first_of("*?") != SString::npos)
     {
     }
     SString strMatch;
@@ -136,10 +137,19 @@ public:
 
     bool operator<(const CShaderAndEntityPair& other) const
     {
-        return pShaderInfo < other.pShaderInfo || (pShaderInfo == other.pShaderInfo && pClientEntity < other.pClientEntity);
+        if (pShaderInfo != other.pShaderInfo)
+            return pShaderInfo < other.pShaderInfo;
+
+        if (pClientEntity != other.pClientEntity)
+            return pClientEntity < other.pClientEntity;
+
+        return bAppendLayers < other.bAppendLayers;
     }
 
-    bool operator==(const CShaderAndEntityPair& other) const { return pShaderInfo == other.pShaderInfo && pClientEntity == other.pClientEntity; }
+    bool operator==(const CShaderAndEntityPair& other) const
+    {
+        return pShaderInfo == other.pShaderInfo && pClientEntity == other.pClientEntity && bAppendLayers == other.bAppendLayers;
+    }
 
     SShaderInfo*       pShaderInfo;
     CClientEntityBase* pClientEntity;
@@ -158,6 +168,12 @@ class CMatchChannel
 public:
     CMatchChannel()
     {
+        if (ms_uiIdCounter == 0)
+        {
+            dassert(0);
+            ms_uiIdCounter = 1;
+        }
+
         m_bResetReplacements = false;
         m_uiId = ms_uiIdCounter++;
     }
@@ -291,8 +307,21 @@ public:
     void               GetShaderReplacementStats(SShaderReplacementStats& outStats);
 
 protected:
+    struct SDeferredChannelKey
+    {
+        SDeferredChannelKey(const CShaderAndEntityPair& key, CMatchChannel* pExpectedChannel)
+            : key(key), pExpectedChannel(pExpectedChannel), uiExpectedChannelId(pExpectedChannel ? pExpectedChannel->m_uiId : 0)
+        {
+        }
+
+        CShaderAndEntityPair key;
+        CMatchChannel*       pExpectedChannel;  // Pointer identity check only. Never deref.
+        uint                 uiExpectedChannelId;
+    };
+
     void           CalcShaderForTexAndEntity(SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType,
                                              bool bSilent);
+    void               CleanupStaleEntityChannelRefs(const std::vector<SDeferredChannelKey>& deferredChannelKeys);
     void           AddToOptimizeQueue(CMatchChannel* pChannel);
     void           AddToRematchQueue(CMatchChannel* pChannel);
     void           FlushChanges();
@@ -323,12 +352,15 @@ protected:
     std::unordered_map<SShaderInfo*, std::vector<CShaderAndEntityPair>> m_ShaderToChannelKeys;
     // Secondary index: entity > STexNameInfo entries in texEntityShaderMap, for fast cleanup
     std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>> m_EntityToTexNameInfos;
-    CFastHashSet<CMatchChannel*>                   m_CreatedChannelList;
-    CFastHashSet<CMatchChannel*>                   m_OptimizeQueue;
-    CFastHashSet<CMatchChannel*>                   m_RematchQueue;
-    CFastHashMap<SString, STexNameInfo*>           m_AllTextureList;
-    CFastHashMap<CSHADERDUMMY*, SShaderInfo*>      m_ShaderInfoMap;
-    CFastHashSet<CClientEntityBase*>               m_KnownClientEntities;
-    long long                                      m_llNextStaleEntityCleanupTime = 0;
-    std::size_t                                    m_uiStaleEntityCleanupCursorBucket = 0;
+    // Retry keys that didnt fit in the deferred queue.
+    std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>> m_StaleEntityDeferredRetryKeys;
+    CFastHashSet<CMatchChannel*>                                        m_CreatedChannelList;
+    CFastHashSet<CMatchChannel*>                                        m_OptimizeQueue;
+    CFastHashSet<CMatchChannel*>                                        m_RematchQueue;
+    CFastHashMap<SString, STexNameInfo*>                                m_AllTextureList;
+    CFastHashMap<CSHADERDUMMY*, SShaderInfo*>                           m_ShaderInfoMap;
+    CFastHashSet<CClientEntityBase*>                                    m_KnownClientEntities;
+    std::deque<std::vector<SDeferredChannelKey>>                        m_StaleEntityChannelCleanupQueue;
+    long long                                                           m_llNextStaleEntityCleanupTime = 0;
+    std::size_t                                                         m_uiStaleEntityCleanupCursorBucket = 0;
 };

@@ -57,27 +57,24 @@ DWORD RETURN_CTxdStore_RemoveTxd = 0x731E96;
 //
 struct STxdStreamEvent
 {
+    STxdStreamEvent() : bAdded(false), usTxdId(0) {}
     STxdStreamEvent(bool bAdded, ushort usTxdId) : bAdded(bAdded), usTxdId(usTxdId) {}
 
     bool   bAdded;
     ushort usTxdId;
 };
 
-static std::vector<STxdStreamEvent> ms_txdStreamEventList;
+// Keyed by usTxdId; only the last event per TXD per pulse is kept.
+// This means an add followed by a remove in the same frame resolves to removed (and vice versa).
+static std::unordered_map<ushort, STxdStreamEvent> ms_txdStreamEventList;
 
 ////////////////////////////////////////////////////////////////
 // Txd created
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId;
-    // Remove any previous events for this txd (erase-remove idiom)
-    ms_txdStreamEventList.erase(
-        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(),
-                       [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
-        ms_txdStreamEventList.end());
-    // Append 'added'
-    ms_txdStreamEventList.emplace_back(true, usTxdId);
+    const ushort usTxdId = (ushort)dwTxdId;
+    ms_txdStreamEventList[usTxdId] = STxdStreamEvent(true, usTxdId);
 }
 
 // called from streaming on TXD create
@@ -109,14 +106,8 @@ static void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
-    // Remove any previous events for this txd (erase-remove idiom)
-    ms_txdStreamEventList.erase(
-        std::remove_if(ms_txdStreamEventList.begin(), ms_txdStreamEventList.end(),
-                       [usTxdId](const STxdStreamEvent& e) { return e.usTxdId == usTxdId; }),
-        ms_txdStreamEventList.end());
-    // Append 'removed'
-    ms_txdStreamEventList.emplace_back(false, usTxdId);
+    const ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
+    ms_txdStreamEventList[usTxdId] = STxdStreamEvent(false, usTxdId);
 }
 
 // called from streaming on TXD destroy
@@ -197,9 +188,9 @@ void CRenderWareSA::PulseWorldTextureWatch()
     TIMING_CHECKPOINT("+TextureWatch");
 
     // Go through ms_txdStreamEventList
-    for (std::vector<STxdStreamEvent>::const_iterator iter = ms_txdStreamEventList.begin(); iter != ms_txdStreamEventList.end(); ++iter)
+    for (const auto& entry : ms_txdStreamEventList)
     {
-        const STxdStreamEvent& action = *iter;
+        const STxdStreamEvent& action = entry.second;
         if (action.bAdded)
         {
             //
@@ -287,8 +278,11 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
         if (pTexInfo && pTexInfo->texTag == usTxdId)
         {
             OnTextureStreamOut(pTexInfo);
+            ConstIterType iterNext = iter;
+            ++iterNext;
+            m_TexInfoMap.erase(iter);
             DestroyTexInfo(pTexInfo);
-            m_TexInfoMap.erase(iter++);
+            iter = iterNext;
         }
         else
             ++iter;
@@ -318,8 +312,8 @@ void CRenderWareSA::RemoveStreamingTexture(unsigned short usTxdId, CD3DDUMMY* pD
         if (pTexInfo && pTexInfo->pD3DData == pD3DData)
         {
             OnTextureStreamOut(pTexInfo);
+            m_TexInfoMap.erase(iter);
             DestroyTexInfo(pTexInfo);
-            m_TexInfoMap.erase(iter++);
             return;  // Only one entry per D3D data
         }
         else
@@ -404,7 +398,7 @@ void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
             OnTextureStreamOut(pTexInfo);
             // Erase from m_TexInfoMap by scanning the TXD ID bucket
             typedef std::multimap<ushort, STexInfo*>::iterator IterType;
-            std::pair<IterType, IterType> range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
+            std::pair<IterType, IterType>                      range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
             for (IterType iter = range.first; iter != range.second; ++iter)
             {
                 if (iter->second == pTexInfo)
@@ -479,7 +473,7 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
             OnTextureStreamOut(pTexInfo);
             // Erase from m_TexInfoMap by scanning the TXD ID bucket
             typedef std::multimap<ushort, STexInfo*>::iterator IterType;
-            std::pair<IterType, IterType> range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
+            std::pair<IterType, IterType>                      range = m_TexInfoMap.equal_range(pTexInfo->texTag.m_usTxdId);
             for (IterType iter = range.first; iter != range.second; ++iter)
             {
                 if (iter->second == pTexInfo)
@@ -510,11 +504,61 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
 ////////////////////////////////////////////////////////////////
 STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData)
 {
+    const SString strTextureNameLower = strTextureName.ToLower();
+
+    // If this is a script/special texture, clean up any existing entry for the same RwTexture*
+    // to prevent orphaned STexInfo leaks (the old entry would be unreachable via m_ScriptTexInfoMap)
+    if (!texTag.m_bUsingTxdId && texTag.m_pTex && texTag.m_pTex != FAKE_RWTEXTURE_NO_TEXTURE)
+    {
+        auto itExisting = m_ScriptTexInfoMap.find(texTag.m_pTex);
+        if (itExisting != m_ScriptTexInfoMap.end())
+        {
+            STexInfo* pOldTexInfo = itExisting->second;
+            if (pOldTexInfo)
+            {
+                const bool bSameTagType = (pOldTexInfo->texTag.m_bUsingTxdId == texTag.m_bUsingTxdId);
+                bool       bSameTagValue = false;
+                if (bSameTagType)
+                {
+                    if (texTag.m_bUsingTxdId)
+                        bSameTagValue = (pOldTexInfo->texTag.m_usTxdId == texTag.m_usTxdId);
+                    else
+                        bSameTagValue = (pOldTexInfo->texTag.m_pTex == texTag.m_pTex);
+                }
+
+                if (bSameTagType && bSameTagValue && pOldTexInfo->pD3DData == pD3DData && pOldTexInfo->strTextureName == strTextureNameLower)
+                {
+                    // Fast-return only if reverse lookup still points to this entry.
+                    // Otherwise continue into recreate path to repair mapping.
+                    STexInfo* pMappedTexInfo = MapFindRef(m_D3DDataTexInfoMap, pOldTexInfo->pD3DData);
+                    if (pMappedTexInfo == pOldTexInfo && pOldTexInfo->bInTexInfoMap)
+                        return pOldTexInfo;
+                }
+
+                OnTextureStreamOut(pOldTexInfo);
+                // Erase from m_TexInfoMap by scanning the TXD ID bucket
+                typedef std::multimap<ushort, STexInfo*>::iterator IterType;
+                std::pair<IterType, IterType>                      range = m_TexInfoMap.equal_range(pOldTexInfo->texTag.m_usTxdId);
+                for (IterType iter = range.first; iter != range.second; ++iter)
+                {
+                    if (iter->second == pOldTexInfo)
+                    {
+                        pOldTexInfo->bInTexInfoMap = false;
+                        m_TexInfoMap.erase(iter);
+                        break;
+                    }
+                }
+                DestroyTexInfo(pOldTexInfo);
+            }
+        }
+    }
+
     // Create texinfo
     STexInfo* pTexInfo = new STexInfo(texTag, strTextureName, pD3DData);
 
     // Add to map
     MapInsert(m_TexInfoMap, pTexInfo->texTag.m_usTxdId, pTexInfo);
+    pTexInfo->bInTexInfoMap = true;
 
     // Add to D3DData lookup map
     MapSet(m_D3DDataTexInfoMap, pTexInfo->pD3DData, pTexInfo);
@@ -537,6 +581,8 @@ void CRenderWareSA::DestroyTexInfo(STexInfo* pTexInfo)
 {
     if (!pTexInfo)
         return;
+
+    pTexInfo->bInTexInfoMap = false;
 
     // Only remove if this specific STexInfo is the registered one
     STexInfo* pCurrentEntry = MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData);

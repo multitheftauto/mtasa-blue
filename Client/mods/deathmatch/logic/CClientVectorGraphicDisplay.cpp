@@ -117,8 +117,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     // Reject documents whose content bounding box is degenerate.
     // Catches fully-empty or NaN-dimension documents before they reach the renderer.
     Box bbox = svgDocument->boundingBox();
-    if (bbox.w <= 0 || bbox.h <= 0 || !std::isfinite(bbox.w) || !std::isfinite(bbox.h)
-        || !std::isfinite(bbox.x) || !std::isfinite(bbox.y))
+    if (bbox.w <= 0 || bbox.h <= 0 || !std::isfinite(bbox.w) || !std::isfinite(bbox.h) || !std::isfinite(bbox.x) || !std::isfinite(bbox.y))
         return;
 
     // SVG has a predefined width and height. We need to transform it to the requested size

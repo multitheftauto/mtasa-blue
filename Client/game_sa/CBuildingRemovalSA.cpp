@@ -25,25 +25,25 @@ static bool IsEntityPoolSlotOccupied(CEntitySAInterface* pEntity)
     CPoolSAInterface<CBuildingSAInterface>* pBuildingPool = *reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
     if (pBuildingPool)
     {
-        uint32_t uiIndex = pBuildingPool->GetObjectIndexSafe(reinterpret_cast<CBuildingSAInterface*>(pEntity));
-        if (uiIndex != UINT_MAX)
-            return pBuildingPool->IsContains(uiIndex);
+        std::int32_t iIndex = pBuildingPool->GetObjectIndexSafe(reinterpret_cast<CBuildingSAInterface*>(pEntity));
+        if (iIndex != -1)
+            return pBuildingPool->IsContains(iIndex);
     }
 
     CPoolSAInterface<CEntitySAInterface>* pDummyPool = *reinterpret_cast<CPoolSAInterface<CEntitySAInterface>**>(CLASS_CDummyPool);
     if (pDummyPool)
     {
-        uint32_t uiIndex = pDummyPool->GetObjectIndexSafe(pEntity);
-        if (uiIndex != UINT_MAX)
-            return pDummyPool->IsContains(uiIndex);
+        std::int32_t iIndex = pDummyPool->GetObjectIndexSafe(pEntity);
+        if (iIndex != -1)
+            return pDummyPool->IsContains(iIndex);
     }
 
     CPoolSAInterface<CObjectSAInterface>* pObjectPool = *reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
     if (pObjectPool)
     {
-        uint32_t uiIndex = pObjectPool->GetObjectIndexSafe(reinterpret_cast<CObjectSAInterface*>(pEntity));
-        if (uiIndex != UINT_MAX)
-            return pObjectPool->IsContains(uiIndex);
+        std::int32_t iIndex = pObjectPool->GetObjectIndexSafe(reinterpret_cast<CObjectSAInterface*>(pEntity));
+        if (iIndex != -1)
+            return pObjectPool->IsContains(iIndex);
     }
 
     return false;
@@ -61,8 +61,7 @@ static bool IsExpectedRemovalModel(CEntitySAInterface* pEntity, uint16_t usExpec
     return static_cast<uint16_t>(iModelIndex) == usExpectedModel;
 }
 
-static void LogStaleTrackedEntity(const char* szContext, CEntitySAInterface* pEntity, const char* szReason,
-                                  int& iLogCount, bool& bSuppressed)
+static void LogStaleTrackedEntity(const char* szContext, CEntitySAInterface* pEntity, const char* szReason, int& iLogCount, bool& bSuppressed)
 {
     constexpr int kMaxStaleLogsPerCall = 32;
     if (iLogCount < kMaxStaleLogsPerCall)
@@ -291,7 +290,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                             }
                             // if the building type is dummy or building and it's not already being removed
                             else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                                pEntity->bRemoveFromWorld != 1)
+                                     pEntity->bRemoveFromWorld != 1)
                             {
                                 // Don't call this on entities being removed.
                                 if (!pEntity->IsPlaceableVTBL())
@@ -336,7 +335,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                             }
                             // if the building type is dummy or building and it's not already being removed
                             else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                                pEntity->bRemoveFromWorld != 1)
+                                     pEntity->bRemoveFromWorld != 1)
                             {
                                 if (!pEntity->IsPlaceableVTBL())
                                 {
@@ -573,7 +572,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                         }
                         // if the building type is dummy or building and it's not already being removed
                         else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                            pEntity->bRemoveFromWorld != 1)
+                                 pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
                             if (!pEntity->IsPlaceableVTBL())
@@ -610,7 +609,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                         }
                         // if the building type is dummy or building and it's not already being removed
                         else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                            pEntity->bRemoveFromWorld != 1)
+                                 pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
                             if (!pEntity->IsPlaceableVTBL())
@@ -716,6 +715,7 @@ void CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
     {
         // Create a new building removal
         sDataBuildingRemovalItem* pBuildingRemoval = new sDataBuildingRemovalItem(pInterface, true);
+        pBuildingRemoval->m_iplIndex = pInterface->m_iplIndex;   // CEntitySAInterface is forward-decl in the SDK header; m_iplIndex only accessible here
         // Insert it with the model index so we can fast lookup
         m_pDataBuildings->insert(std::pair<uint16_t, sDataBuildingRemovalItem*>(usModelIndex, pBuildingRemoval));
         m_pAddedEntities[(DWORD)pInterface] = true;
@@ -734,6 +734,7 @@ void CBuildingRemovalSA::AddBinaryBuilding(CEntitySAInterface* pInterface)
     {
         // Create a new building removal
         sBuildingRemovalItem* pBuildingRemoval = new sBuildingRemovalItem(pInterface, false);
+        pBuildingRemoval->m_iplIndex = pInterface->m_iplIndex;   // CEntitySAInterface is forward-decl in the SDK header; m_iplIndex only accessible here
         // Insert it with the model index so we can fast lookup
         m_pBinaryBuildings->insert(std::pair<uint16_t, sBuildingRemovalItem*>(usModelIndex, pBuildingRemoval));
         m_pAddedEntities[(DWORD)pInterface] = true;
@@ -949,8 +950,17 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
     for (auto it = m_pDataBuildings->begin(); it != m_pDataBuildings->end();)
     {
         sDataBuildingRemovalItem* pItem = it->second;
-        CEntitySAInterface* pEntity = pItem ? pItem->m_pInterface : nullptr;
+        CEntitySAInterface*       pEntity = pItem ? pItem->m_pInterface : nullptr;
         if (!pEntity)
+        {
+            ++it;
+            continue;
+        }
+
+        // m_iplIndex was cached when the entity was first tracked (entity was live at that
+        // point). Skip pool-slot and model checks for entries from a different IPL; those
+        // entities remain in the world and are visited when their own IPL unloads.
+        if (canMatchByIpl && pItem->m_iplIndex != iplIndex)
         {
             ++it;
             continue;
@@ -980,8 +990,15 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
     for (auto it = m_pBinaryBuildings->begin(); it != m_pBinaryBuildings->end();)
     {
         sBuildingRemovalItem* pItem = it->second;
-        CEntitySAInterface* pEntity = pItem ? pItem->m_pInterface : nullptr;
+        CEntitySAInterface*   pEntity = pItem ? pItem->m_pInterface : nullptr;
         if (!pEntity)
+        {
+            ++it;
+            continue;
+        }
+
+        // Same m_iplIndex early-out as the data buildings loop above.
+        if (canMatchByIpl && pItem->m_iplIndex != iplIndex)
         {
             ++it;
             continue;
@@ -1016,7 +1033,7 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
 #define HOOKSIZE_CIplStore_RemoveIpl 5
 static DWORD RETURN_CIplStore_RemoveIpl = 0x404B25;
 
-#define VAR_CIplStore_msPool  0x8E3FB0
+#define VAR_CIplStore_msPool 0x8E3FB0
 
 static void __cdecl OnIplRemovePre(int iplSlotIndex)
 {

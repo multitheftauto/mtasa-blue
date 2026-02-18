@@ -39,6 +39,7 @@ private:
     void UpdateBackupLodPointers(uint32_t offset);
     void RemoveVehicleDamageLinks();
     void RemovePedsContactEnityLinks();
+    void RemoveObjectEntityLinks();
     void PurgeStaleSectorEntries(void* oldPool, int poolSize);
 
 private:
@@ -50,4 +51,9 @@ private:
     using backup_container_t = std::vector<backup_entry_t>;
 
     std::unique_ptr<backup_container_t> m_pOriginalBuildingsBackup;
+
+    // Set by RemoveAllWithBackup after sweeping stale entity links (vehicle damage,
+    // ped contact, object entity refs). Cleared by Resize to skip a redundant pass
+    // when SetBuildingPoolSize calls both in the same remove/resize cycle.
+    bool m_bLinkSweepsDone{false};
 };

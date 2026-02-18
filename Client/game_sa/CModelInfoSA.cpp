@@ -1397,8 +1397,8 @@ static void DeleteEntityRwObject(CEntitySAInterface* pEntity)
     }
 }
 
-#define FUNC_CEntity_DeleteRwObject  0x534030
-#define NUM_MinValidEntityAddr     0x10000
+#define FUNC_CEntity_DeleteRwObject 0x534030
+#define NUM_MinValidEntityAddr      0x10000
 
 // Validates entity vtable pointer with SEH protection.
 // If bCheckDeleteRwObject is true, also verifies DeleteRwObject is the CEntity
@@ -1442,8 +1442,10 @@ struct SRestreamLogState
         {
             if (iStreamCount < MAX_LOGS_PER_CALL)
             {
-                AddReportLog(5560, SString("Entity 0x%08x at ARRAY_StreamSectors[%d,%d] has invalid vtable", pEntity,
-                                           iSectorIndex / 2 % NUM_StreamSectorRows, iSectorIndex / 2 / NUM_StreamSectorCols), 10);
+                AddReportLog(5560,
+                             SString("Entity 0x%08x at ARRAY_StreamSectors[%d,%d] has invalid vtable", pEntity, iSectorIndex / 2 % NUM_StreamSectorRows,
+                                     iSectorIndex / 2 / NUM_StreamSectorCols),
+                             10);
                 ++iStreamCount;
             }
             else if (!bStreamSuppressed)
