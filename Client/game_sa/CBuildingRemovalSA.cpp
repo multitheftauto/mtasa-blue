@@ -715,6 +715,7 @@ void CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
     {
         // Create a new building removal
         sDataBuildingRemovalItem* pBuildingRemoval = new sDataBuildingRemovalItem(pInterface, true);
+        pBuildingRemoval->m_iplIndex = pInterface->m_iplIndex;   // CEntitySAInterface is forward-decl in the SDK header; m_iplIndex only accessible here
         // Insert it with the model index so we can fast lookup
         m_pDataBuildings->insert(std::pair<uint16_t, sDataBuildingRemovalItem*>(usModelIndex, pBuildingRemoval));
         m_pAddedEntities[(DWORD)pInterface] = true;
@@ -733,6 +734,7 @@ void CBuildingRemovalSA::AddBinaryBuilding(CEntitySAInterface* pInterface)
     {
         // Create a new building removal
         sBuildingRemovalItem* pBuildingRemoval = new sBuildingRemovalItem(pInterface, false);
+        pBuildingRemoval->m_iplIndex = pInterface->m_iplIndex;   // CEntitySAInterface is forward-decl in the SDK header; m_iplIndex only accessible here
         // Insert it with the model index so we can fast lookup
         m_pBinaryBuildings->insert(std::pair<uint16_t, sBuildingRemovalItem*>(usModelIndex, pBuildingRemoval));
         m_pAddedEntities[(DWORD)pInterface] = true;
@@ -955,6 +957,15 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
             continue;
         }
 
+        // m_iplIndex was cached when the entity was first tracked (entity was live at that
+        // point). Skip pool-slot and model checks for entries from a different IPL; those
+        // entities remain in the world and are visited when their own IPL unloads.
+        if (canMatchByIpl && pItem->m_iplIndex != iplIndex)
+        {
+            ++it;
+            continue;
+        }
+
         bool bPoolSlotOccupied = IsEntityPoolSlotOccupied(pEntity);
         bool bMatchesIpl = false;
         if (bPoolSlotOccupied)
@@ -981,6 +992,13 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
         sBuildingRemovalItem* pItem = it->second;
         CEntitySAInterface*   pEntity = pItem ? pItem->m_pInterface : nullptr;
         if (!pEntity)
+        {
+            ++it;
+            continue;
+        }
+
+        // Same m_iplIndex early-out as the data buildings loop above.
+        if (canMatchByIpl && pItem->m_iplIndex != iplIndex)
         {
             ++it;
             continue;

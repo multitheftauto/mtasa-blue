@@ -188,6 +188,7 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
     RemoveVehicleDamageLinks();
     RemovePedsContactEnityLinks();
     RemoveObjectEntityLinks();
+    m_bLinkSweepsDone = true;
 
     for (size_t i = 0; i < poolSize; i++)
     {
@@ -283,6 +284,12 @@ bool CBuildingsPoolSA::Resize(int size)
     auto*     pool = (*m_ppBuildingPoolInterface);
     const int currentSize = pool->m_nSize;
 
+    // Clear before the malloc calls so the rollback Resize(currentSize), called on
+    // allocation failure below, always runs the link sweeps regardless of whether
+    // RemoveAllWithBackup had set this flag before the outer call.
+    const bool skipLinkSweeps = m_bLinkSweepsDone;
+    m_bLinkSweepsDone = false;
+
     m_buildingPool.entities.resize(size);
 
     void* oldPool = pool->m_pObjects;
@@ -344,9 +351,14 @@ bool CBuildingsPoolSA::Resize(int size)
 
     pGame->GetPools()->GetDummyPool().UpdateBuildingLods(offset);
 
-    RemoveVehicleDamageLinks();
-    RemovePedsContactEnityLinks();
-    RemoveObjectEntityLinks();
+    // RemoveAllWithBackup already ran these in the same remove/resize cycle; skip them.
+    // Run when Resize is called directly without a prior backup (e.g. pool size change).
+    if (!skipLinkSweeps)
+    {
+        RemoveVehicleDamageLinks();
+        RemovePedsContactEnityLinks();
+        RemoveObjectEntityLinks();
+    }
 
     return true;
 }
