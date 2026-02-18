@@ -616,9 +616,12 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
         std::size_t uiRetryEntitiesProcessed = 0;
         while (uiRetryEntitiesProcessed < uiDeferredChannelCleanupMaxPerPulse && !m_StaleEntityDeferredRetryKeys.empty())
         {
-            const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
-            if (llElapsedUs > llRetryTimeBudgetUs)
-                break;
+            if ((uiRetryEntitiesProcessed & 0x3) == 0)
+            {
+                const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
+                if (llElapsedUs > llRetryTimeBudgetUs)
+                    break;
+            }
 
             std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator iterRetry = m_StaleEntityDeferredRetryKeys.begin();
             if (iterRetry == m_StaleEntityDeferredRetryKeys.end())
@@ -727,9 +730,12 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
     std::size_t uiDeferredCleaned = 0;
     while (!m_StaleEntityChannelCleanupQueue.empty() && uiDeferredCleaned < uiDeferredChannelCleanupMaxPerPulse)
     {
-        const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
-        if (llElapsedUs > cleanupBudget.llTimeBudgetUs)
-            break;
+        if ((uiDeferredCleaned & 0x3) == 0)
+        {
+            const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
+            if (llElapsedUs > cleanupBudget.llTimeBudgetUs)
+                break;
+        }
 
         std::vector<SDeferredChannelKey> deferredChannelKeys = std::move(m_StaleEntityChannelCleanupQueue.front());
         m_StaleEntityChannelCleanupQueue.pop_front();
