@@ -25,7 +25,7 @@ void CLuaFireDefs::LoadFunctions()
 
 CClientFire* CLuaFireDefs::CreateFire(CVector position, float size, std::optional<std::uint32_t> lifetime, std::optional<bool> makeNoise)
 {
-    CClientFire* fire = new CClientFire(m_pManager->GetFireManager(), position, size, lifetime.value_or(0), makeNoise.value_or(true));
+    CClientFire* fire = new CClientFire(m_pManager->GetFireManager(), position, size, lifetime.value_or(5000), makeNoise.value_or(true));
     return fire;
 }
 

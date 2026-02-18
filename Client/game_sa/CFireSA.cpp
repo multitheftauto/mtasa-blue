@@ -346,7 +346,7 @@ void CFireSA::ProcessFire()
             {
                 // CPlayerPed::DoStuffToGoOnFire
                 ((void(__thiscall*)(CPedSAInterface*))0x60A020)(player->GetPedInterface());
-                m_fireManager->StartFire(player, m_creator, 7000u, 100, !IsSilent());
+                m_fireManager->StartFire(player, m_creator, 7000, 100, !IsSilent());
             }
         }
     }
@@ -373,8 +373,9 @@ void CFireSA::ProcessFire()
                 CPed* player = pGame->GetPedContext();
                 // CPlayerPed::DoStuffToGoOnFire
                 ((void(__thiscall*)(CPedSAInterface*))0x60A020)(player->GetPedInterface());
-                m_fireManager->StartFire(player, m_creator, 7000u, 100, !IsSilent());
+                m_fireManager->StartFire(player, m_creator, 7000, 100, !IsSilent());
 
+                // CVehicle::FindTyreNearestPoint
                 int tyre = ((int(__thiscall*)(CVehicleSAInterface*, CVector2D))0x6D7BC0)(vehicleInterface,
                                                                                          CVector2D(firePosition.fX, firePosition.fY));
                 vehicleInterface->BurstTyre(tyre + 13, false);
@@ -458,7 +459,7 @@ void CFireSA::ProcessFire()
         // CPointLights::AddLight
         float color = (float)(rand() % 128) / 512.0f;
         ((void(__cdecl*)(char, const CVector&, const CVector&, float, float, float, float, char, bool, CEntitySAInterface*))0x7000E0)(
-            0, firePosition, CVector(), 8.0f, color, color, 0.0f, 0, false, pGame->GetPedContext()->GetInterface());
+            0, firePosition, CVector(), 8.0f, color, color, 0.0f, 0, false, nullptr);
     }
     else
     {

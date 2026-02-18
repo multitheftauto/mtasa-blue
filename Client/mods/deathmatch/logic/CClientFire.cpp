@@ -17,7 +17,8 @@ CClientFire::CClientFire(CClientFireManager* fireManager, const CVector& positio
 {
     SetTypeName("fire");
 
-    m_fire = g_pGame->GetFireManager()->StartFire(position, strength, g_pGame->GetPedContext(), lifetime, 0, makeNoise);
+    CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
+    m_fire = g_pGame->GetFireManager()->StartFire(position, strength, localPlayer ? localPlayer->GetGameEntity() : nullptr, lifetime, 0, makeNoise);
 
     if (m_fire)
         m_fire->SetCreatedByScript(true);

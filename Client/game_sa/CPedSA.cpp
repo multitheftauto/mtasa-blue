@@ -426,22 +426,15 @@ bool CPedSA::SetOnFire(bool onFire)
 
     if (onFire)
     {
-        CFire* fire = fireManager->StartFire(this, nullptr, pGame->GetSystemTime() + 5000, 0);
+        CFire* fire = fireManager->StartFire(this, nullptr, 5000, 0);
         if (!fire)
             return false;
 
-        // Start the fire
-        //fire->SetTarget(this);
-        //fire->Ignite();
-        //fire->SetStrength(1.0f);
-        // Attach the fire only to the player, do not let it
-        // create child fires when moving.
-        //fire->SetNumGenerationsAllowed(0);
         pInterface->pFireOnPed = fire->GetInterface();
     }
     else
     {
-        CFire* fire = fireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
+        CFire* fire = fireManager->GetFire(pInterface->pFireOnPed);
         if (!fire)
             return false;
 

@@ -41,7 +41,7 @@ CFire* CFireManagerSA::StartFire(const CVector& position, float size, CEntity* c
     if (waterLevel > position.fZ)
         return nullptr;
 
-    m_Fires.push_back(std::make_unique<CFireSA>(this, creator, position, lifetime, numGenerationsAllowed, makeNoise));
+    m_Fires.push_back(std::make_unique<CFireSA>(this, creator, position, pGame->GetSystemTime() + lifetime, numGenerationsAllowed, makeNoise));
     return m_Fires.back().get();
 }
 
@@ -72,7 +72,7 @@ CFire* CFireManagerSA::StartFire(CEntity* target, CEntity* creator, std::uint32_
             break;
     }
 
-    m_Fires.push_back(std::make_unique<CFireSA>(this, creator, target, lifetime, numGenerationsAllowed, makeNoise));
+    m_Fires.push_back(std::make_unique<CFireSA>(this, creator, target, pGame->GetSystemTime() + lifetime, numGenerationsAllowed, makeNoise));
     return m_Fires.back().get();
 }
 
@@ -249,7 +249,7 @@ void CFireManagerSA::Update()
             // The shadow is buggy, which is why R* set its intensity to 0 here
 
             // This corona also seems to not achieve what R* intended
-            // It is barely visible, positioned above the particle, and practically produces no visible effect
+            // It is barely visible, positioned above the particle
             if (totalStrength > 6.0f)
             {
                 int strongestId = reinterpret_cast<int>(strongestFire);
@@ -301,7 +301,7 @@ static void __fastcall StaticStartFireAtCoors(void* gFireManagerSA, void* edx, C
 
 static void __fastcall StaticStartFireAtEntity(void* gFireManagerSA, void* edx, CEntitySAInterface* target, CEntitySAInterface* creator, float size_unused, int unused_1, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed)
 {
-    auto pools = pGame->GetPools();
+    CPools* pools = pGame->GetPools();
 
     CEntity* targetEntity = target ? pools->GetEntity((DWORD*)target) : nullptr;
     CEntity* creatorEntity = creator ? pools->GetEntity((DWORD*)creator) : nullptr;
@@ -311,7 +311,7 @@ static void __fastcall StaticStartFireAtEntity(void* gFireManagerSA, void* edx, 
 static CFireSAInterface* __fastcall StaticFindNearestFire(void* gFireManagerSA, void* edx, CVector* position, bool checkExtinguished, bool checkScript)
 {
     CFire* fire = pGame->GetFireManager()->FindNearestFire(position, checkExtinguished, checkScript);
-    return fire != nullptr ? fire->GetInterface() : nullptr;
+    return fire ? fire->GetInterface() : nullptr;
 }
 
 static void __fastcall StaticExtinguishPoint(void* gFireManagerSA, void* edx, CVector position, float radius)

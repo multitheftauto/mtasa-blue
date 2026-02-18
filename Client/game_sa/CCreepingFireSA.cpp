@@ -29,24 +29,22 @@ bool CCreepingFireSA::TryToStartFireAtCoors(CVector position, std::uint8_t numGe
         return false;
 
     // Call CWorld::ProcessVerticalLine
-    CEntitySAInterface* hitEntity;
+    CEntitySAInterface* hitEntity = nullptr;
     CColPointSAInterface cp;
-    if (!((bool(__cdecl*)(CVector*, float, CColPointSAInterface*, CEntitySAInterface*, bool, bool, bool, bool, bool, bool, void*))0x5674E0)(
-            &position, position.fZ - zDistance, &cp, hitEntity, true, false, false, false, false, false, nullptr))
+    if (!((bool(__cdecl*)(CVector*, float, CColPointSAInterface*, CEntitySAInterface**, bool, bool, bool, bool, bool, bool, void*))0x5674E0)(
+            &position, position.fZ - zDistance, &cp, &hitEntity, true, false, false, false, false, false, nullptr))
         return false;
     
     position.fZ = cp.Position.fZ;
     status = 6;
 
-    if (!pGame->GetFireManager()->StartFire(position, 0.8f, nullptr, 20000u, numGenerationsAllowed))
-        return false;
-
-    return true;
+    return pGame->GetFireManager()->StartFire(position, 0.8f, nullptr, 20000, numGenerationsAllowed);
 }
 
 void CCreepingFireSA::Update()
 {
-    std::uint8_t status = m_fireStatus[pGame->GetSystemFrameCounter() % 32][(pGame->GetSystemFrameCounter() / 32) % 32];
+    int          frame = pGame->GetSystemFrameCounter();
+    std::uint8_t status = m_fireStatus[frame % 32][(frame / 32) % 32];
 
     if (status == 4)
         status = 0;
