@@ -20,6 +20,8 @@ namespace
     //
     constexpr bool        ENABLE_STALE_ENTITY_CLEANUP = true;
     constexpr std::size_t NUM_STALE_ENTITY_CLEANUP_MAX_BATCH = 128;
+    constexpr std::size_t NUM_STALE_ENTITY_CLEANUP_MAX_QUEUE = 2048;
+    constexpr std::size_t NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH = 128;
 
     struct SStaleEntityCleanupBudget
     {
@@ -77,22 +79,28 @@ void CMatchChannelManager::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClien
 //////////////////////////////////////////////////////////////////
 void CMatchChannelManager::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch)
 {
-    bool bAppendLayers = false;
-
     // Don't bother if shader hasn't been seen before
     SShaderInfo* pShaderInfo = GetShaderInfo(pShaderData, false, 0, false, TYPE_MASK_NONE, 0, false);
     if (!pShaderInfo)
         return;
 
-    // Don't bother if there are no existing additive matches for this pair
-    if (!MapContains(m_ChannelUsageMap, CShaderAndEntityPair(pShaderInfo, pClientEntity, bAppendLayers)))
-        return;
+    const bool bAppendLayersVariants[2] = {false, true};
+    for (uint uiVariant = 0; uiVariant < 2; ++uiVariant)
+    {
+        const bool bAppendLayers = bAppendLayersVariants[uiVariant];
 
-    // Make channel unique before modifying match chain
-    CMatchChannel* pChannel = GetChannelOnlyUsedBy(pShaderInfo, pClientEntity, bAppendLayers);
-    pChannel->AppendSubtractiveMatch(strTextureNameMatch.ToLower());
-    AddToOptimizeQueue(pChannel);
-    AddToRematchQueue(pChannel);
+        // Handle both append-layer variants so subtractive updates apply
+        // to whichever variant currently owns this pair.
+        // Skip variants that are not currently used by this pair
+        if (!MapContains(m_ChannelUsageMap, CShaderAndEntityPair(pShaderInfo, pClientEntity, bAppendLayers)))
+            continue;
+
+        // Make channel unique before modifying match chain
+        CMatchChannel* pChannel = GetChannelOnlyUsedBy(pShaderInfo, pClientEntity, bAppendLayers);
+        pChannel->AppendSubtractiveMatch(strTextureNameMatch.ToLower());
+        AddToOptimizeQueue(pChannel);
+        AddToRematchQueue(pChannel);
+    }
 }
 
 //////////////////////////////////////////////////////////////////
@@ -436,34 +444,44 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
         return;
 
     const std::size_t uiTrackedEntities = m_EntityToTexNameInfos.size();
-    if (uiTrackedEntities == 0)
+    if (uiTrackedEntities == 0 && m_StaleEntityChannelCleanupQueue.empty() && m_StaleEntityDeferredRetryKeys.empty())
         return;
 
-    const SStaleEntityCleanupBudget cleanupBudget = GetStaleEntityCleanupBudget(uiTrackedEntities);
+    const std::size_t               uiPendingDeferredWork =
+        m_StaleEntityChannelCleanupQueue.size() * NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH + m_StaleEntityDeferredRetryKeys.size();
+    const std::size_t               uiCleanupBudgetLoad = std::max(uiTrackedEntities, uiPendingDeferredWork);
+    const SStaleEntityCleanupBudget cleanupBudget = GetStaleEntityCleanupBudget(uiCleanupBudgetLoad);
     const std::size_t               uiTargetBatch = std::min(cleanupBudget.uiBatchSize, NUM_STALE_ENTITY_CLEANUP_MAX_BATCH);
 
     const long long llNow = GetTickCount64_();
-    if (llNow < m_llNextStaleEntityCleanupTime)
+    const bool      bRunScan = (llNow >= m_llNextStaleEntityCleanupTime);
+    if (!bRunScan && m_StaleEntityChannelCleanupQueue.empty() && m_StaleEntityDeferredRetryKeys.empty())
         return;
 
-    m_llNextStaleEntityCleanupTime = llNow + cleanupBudget.llIntervalMs;
+    if (bRunScan)
+        m_llNextStaleEntityCleanupTime = llNow + cleanupBudget.llIntervalMs;
 
     const std::size_t uiBucketCount = m_EntityToTexNameInfos.bucket_count();
-    if (uiBucketCount == 0)
-        return;
 
     std::array<CClientEntityBase*, NUM_STALE_ENTITY_CLEANUP_MAX_BATCH> staleEntityList{};
     std::size_t                                                        uiStaleCount = 0;
     std::array<CClientEntityBase*, NUM_STALE_ENTITY_CLEANUP_MAX_BATCH> activeCacheCleanupList{};
     std::size_t                                                        uiActiveCount = 0;
+    const std::size_t                                                  uiDeferredChannelCleanupMaxPerPulse = (uiTargetBatch > 8) ? (uiTargetBatch / 2) : 4;
+    const long long                                                    llRetryTimeBudgetUs = std::max<long long>(40, cleanupBudget.llTimeBudgetUs / 2);
 
     const std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     std::size_t                                 uiProbes = 0;
-    std::size_t                                 uiStartBucket = m_uiStaleEntityCleanupCursorBucket % uiBucketCount;
-    std::size_t                                 uiCurrentBucket = uiStartBucket;
+    std::size_t                                 uiStartBucket = 0;
+    std::size_t                                 uiCurrentBucket = 0;
     bool                                        bStopScan = false;
 
-    for (std::size_t uiBucketsVisited = 0; uiBucketsVisited < uiBucketCount && !bStopScan; ++uiBucketsVisited)
+    if (uiBucketCount > 0)
+        uiStartBucket = m_uiStaleEntityCleanupCursorBucket % uiBucketCount;
+
+    uiCurrentBucket = uiStartBucket;
+
+    for (std::size_t uiBucketsVisited = 0; bRunScan && uiBucketsVisited < uiBucketCount && !bStopScan; ++uiBucketsVisited)
     {
         uiCurrentBucket = (uiStartBucket + uiBucketsVisited) % uiBucketCount;
         for (std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>>::local_iterator iterEntity = m_EntityToTexNameInfos.begin(uiCurrentBucket);
@@ -506,7 +524,8 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
         }
     }
 
-    m_uiStaleEntityCleanupCursorBucket = (uiCurrentBucket + 1) % uiBucketCount;
+    if (bRunScan && uiBucketCount > 0)
+        m_uiStaleEntityCleanupCursorBucket = (uiCurrentBucket + 1) % uiBucketCount;
 
     for (std::size_t i = 0; i < uiStaleCount; ++i)
     {
@@ -523,115 +542,352 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
 
         m_EntityToTexNameInfos.erase(iterTexNames);
 
-        // Also clean channel secondary indces for this entity.
-        // RemoveClientEntityRefs should already handle this path, but this keeps cleanup resilient
-        // when entity lifecycle callbacks are skipped.
-        // Follows the same complete pattern as RemoveClientEntityRefs: remove from channels,
-        // reset replacement results on affected textures, and delete empty channels.
-        std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator itEntity = m_EntityToChannelKeys.find(pClientEntity);
-        if (itEntity != m_EntityToChannelKeys.end())
+        // Queue channel and index cleanup to keep per-pulse work bounded.
+        std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator iterEntityKeys = m_EntityToChannelKeys.find(pClientEntity);
+        if (iterEntityKeys != m_EntityToChannelKeys.end())
         {
-            CFastHashSet<CMatchChannel*> affectedChannels;
-
-            for (const CShaderAndEntityPair& key : itEntity->second)
+            std::vector<SDeferredChannelKey> deferredChannelKeys;
+            deferredChannelKeys.reserve(iterEntityKeys->second.size());
+            for (const CShaderAndEntityPair& key : iterEntityKeys->second)
             {
-                std::map<CShaderAndEntityPair, CMatchChannel*>::iterator itUsage = m_ChannelUsageMap.find(key);
-                if (itUsage != m_ChannelUsageMap.end())
+                CMatchChannel* pExpectedChannel = MapFindRef(m_ChannelUsageMap, key);
+                if (pExpectedChannel)
+                    deferredChannelKeys.emplace_back(key, pExpectedChannel);
+            }
+
+            if (!deferredChannelKeys.empty())
+            {
+                std::size_t uiOffset = 0;
+                bool        bQueueSaturated = false;
+                while (uiOffset < deferredChannelKeys.size())
                 {
-                    CMatchChannel* pChannel = itUsage->second;
-                    if (pChannel)
+                    const std::size_t uiRemaining = deferredChannelKeys.size() - uiOffset;
+                    std::size_t       uiChunkSize = std::min(NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH, uiRemaining);
+
+                    if (m_StaleEntityChannelCleanupQueue.size() < NUM_STALE_ENTITY_CLEANUP_MAX_QUEUE)
                     {
-                        pChannel->RemoveShaderAndEntity(key);
-                        MapInsert(affectedChannels, pChannel);
+                        std::vector<SDeferredChannelKey> chunk;
+                        chunk.reserve(uiChunkSize);
+                        for (std::size_t i = 0; i < uiChunkSize; ++i)
+                            chunk.push_back(std::move(deferredChannelKeys[uiOffset + i]));
+
+                        m_StaleEntityChannelCleanupQueue.push_back(std::move(chunk));
+                        uiOffset += uiChunkSize;
+                        continue;
                     }
 
-                    // Maintain shader secondary index (swap-and-pop, same pattern as RemoveClientEntityRefs)
-                    std::unordered_map<SShaderInfo*, std::vector<CShaderAndEntityPair>>::iterator itShdr = m_ShaderToChannelKeys.find(key.pShaderInfo);
-                    if (itShdr != m_ShaderToChannelKeys.end())
+                    std::vector<SDeferredChannelKey>& tailBatch = m_StaleEntityChannelCleanupQueue.back();
+                    if (tailBatch.size() < NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH)
                     {
-                        std::vector<CShaderAndEntityPair>& vec = itShdr->second;
-                        for (std::size_t j = 0; j < vec.size(); ++j)
+                        const std::size_t uiTailFree = NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH - tailBatch.size();
+                        uiChunkSize = std::min(uiChunkSize, uiTailFree);
+                        for (std::size_t i = 0; i < uiChunkSize; ++i)
+                            tailBatch.push_back(std::move(deferredChannelKeys[uiOffset + i]));
+
+                        uiOffset += uiChunkSize;
+                        continue;
+                    }
+
+                    // Queue is full. Keep remaining keys in retry map for later pulses.
+                    bQueueSaturated = true;
+                    break;
+                }
+
+                if (bQueueSaturated)
+                {
+                    std::vector<CShaderAndEntityPair>& vecRetryKeys = m_StaleEntityDeferredRetryKeys[pClientEntity];
+                    vecRetryKeys.clear();
+                    vecRetryKeys.reserve(deferredChannelKeys.size() - uiOffset);
+                    for (std::size_t i = uiOffset; i < deferredChannelKeys.size(); ++i)
+                        vecRetryKeys.push_back(deferredChannelKeys[i].key);
+                }
+
+                m_EntityToChannelKeys.erase(iterEntityKeys);
+            }
+            else
+            {
+                m_EntityToChannelKeys.erase(iterEntityKeys);
+            }
+        }
+    }
+
+    if (!m_StaleEntityDeferredRetryKeys.empty())
+    {
+        std::size_t uiRetryEntitiesProcessed = 0;
+        while (uiRetryEntitiesProcessed < uiDeferredChannelCleanupMaxPerPulse && !m_StaleEntityDeferredRetryKeys.empty())
+        {
+            const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
+            if (llElapsedUs > llRetryTimeBudgetUs)
+                break;
+
+            std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator iterRetry = m_StaleEntityDeferredRetryKeys.begin();
+            if (iterRetry == m_StaleEntityDeferredRetryKeys.end())
+                break;
+
+            CClientEntityBase*                pClientEntity = iterRetry->first;
+            std::vector<CShaderAndEntityPair> retryKeys = std::move(iterRetry->second);
+            m_StaleEntityDeferredRetryKeys.erase(iterRetry);
+
+            if (retryKeys.empty())
+                continue;
+
+            if (retryKeys.size() > 1)
+            {
+                std::sort(retryKeys.begin(), retryKeys.end());
+                retryKeys.erase(std::unique(retryKeys.begin(), retryKeys.end()), retryKeys.end());
+            }
+
+            std::vector<SDeferredChannelKey> deferredChannelKeys;
+            deferredChannelKeys.reserve(retryKeys.size());
+            for (const CShaderAndEntityPair& key : retryKeys)
+            {
+                if (key.pClientEntity && MapContains(m_KnownClientEntities, key.pClientEntity))
+                {
+                    std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator itEnt = m_EntityToChannelKeys.find(key.pClientEntity);
+                    if (itEnt != m_EntityToChannelKeys.end())
+                    {
+                        bool bKeyStillIndexed = false;
+                        for (const CShaderAndEntityPair& indexedKey : itEnt->second)
                         {
-                            if (vec[j].pShaderInfo == key.pShaderInfo && vec[j].pClientEntity == key.pClientEntity)
+                            if (indexedKey.pShaderInfo == key.pShaderInfo && indexedKey.pClientEntity == key.pClientEntity &&
+                                indexedKey.bAppendLayers == key.bAppendLayers)
                             {
-                                vec[j] = vec.back();
-                                vec.pop_back();
+                                bKeyStillIndexed = true;
                                 break;
                             }
                         }
-                        if (vec.empty())
-                            m_ShaderToChannelKeys.erase(itShdr);
+
+                        if (bKeyStillIndexed)
+                            continue;
                     }
-                    m_ChannelUsageMap.erase(itUsage);
                 }
-            }
-            m_EntityToChannelKeys.erase(itEntity);
 
-            // Flag affected textures to re-calc shader results and delete empty channels
-            for (CMatchChannel* pChannel : affectedChannels)
+                CMatchChannel* pExpectedChannel = MapFindRef(m_ChannelUsageMap, key);
+                if (pExpectedChannel)
+                    deferredChannelKeys.emplace_back(key, pExpectedChannel);
+            }
+
+            if (deferredChannelKeys.empty())
             {
-                if (!pChannel)
-                    continue;
+                ++uiRetryEntitiesProcessed;
+                continue;
+            }
 
-                for (STexNameInfo* pTexNameInfo : pChannel->m_MatchedTextureList)
+            std::size_t uiOffset = 0;
+            bool        bQueueSaturated = false;
+            while (uiOffset < deferredChannelKeys.size())
+            {
+                const std::size_t uiRemaining = deferredChannelKeys.size() - uiOffset;
+                std::size_t       uiChunkSize = std::min(NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH, uiRemaining);
+
+                if (m_StaleEntityChannelCleanupQueue.size() < NUM_STALE_ENTITY_CLEANUP_MAX_QUEUE)
                 {
-                    if (pTexNameInfo)
-                        pTexNameInfo->ResetReplacementResults();
+                    std::vector<SDeferredChannelKey> chunk;
+                    chunk.reserve(uiChunkSize);
+                    for (std::size_t i = 0; i < uiChunkSize; ++i)
+                        chunk.push_back(std::move(deferredChannelKeys[uiOffset + i]));
+
+                    m_StaleEntityChannelCleanupQueue.push_back(std::move(chunk));
+                    uiOffset += uiChunkSize;
+                    continue;
                 }
 
-                if (pChannel->GetShaderAndEntityCount() == 0)
-                    DeleteChannel(pChannel);
+                std::vector<SDeferredChannelKey>& tailBatch = m_StaleEntityChannelCleanupQueue.back();
+                if (tailBatch.size() < NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH)
+                {
+                    const std::size_t uiTailFree = NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH - tailBatch.size();
+                    uiChunkSize = std::min(uiChunkSize, uiTailFree);
+                    for (std::size_t i = 0; i < uiChunkSize; ++i)
+                        tailBatch.push_back(std::move(deferredChannelKeys[uiOffset + i]));
+
+                    uiOffset += uiChunkSize;
+                    continue;
+                }
+
+                bQueueSaturated = true;
+                break;
             }
+
+            if (bQueueSaturated)
+            {
+                std::vector<CShaderAndEntityPair>& vecRetryKeys = m_StaleEntityDeferredRetryKeys[pClientEntity];
+                vecRetryKeys.clear();
+                vecRetryKeys.reserve(deferredChannelKeys.size() - uiOffset);
+                for (std::size_t i = uiOffset; i < deferredChannelKeys.size(); ++i)
+                    vecRetryKeys.push_back(deferredChannelKeys[i].key);
+
+                break;
+            }
+
+            ++uiRetryEntitiesProcessed;
         }
+    }
+
+    // Drain deferred channel cleanup with a per-pulse cap.
+    std::size_t uiDeferredCleaned = 0;
+    while (!m_StaleEntityChannelCleanupQueue.empty() && uiDeferredCleaned < uiDeferredChannelCleanupMaxPerPulse)
+    {
+        const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
+        if (llElapsedUs > cleanupBudget.llTimeBudgetUs)
+            break;
+
+        std::vector<SDeferredChannelKey> deferredChannelKeys = std::move(m_StaleEntityChannelCleanupQueue.front());
+        m_StaleEntityChannelCleanupQueue.pop_front();
+
+        if (deferredChannelKeys.empty())
+            continue;
+
+        dassert(deferredChannelKeys.size() <= NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH);
+
+        CleanupStaleEntityChannelRefs(deferredChannelKeys);
+        ++uiDeferredCleaned;
     }
 
     // Prune invalidated (bValid=false) cache entries from active entities.
     // By the time this runs (300ms+ after invalidation), entries still bValid=false
     // are likely for entity+texture combos no longer being rendered.
-    constexpr std::size_t ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY = 32;
-    for (std::size_t i = 0; i < uiActiveCount; ++i)
+    if (bRunScan)
     {
-        // Respect the same time rate as the scan phase
-        if ((i & 0x3) == 0 && i > 0)
+        constexpr std::size_t ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY = 32;
+        constexpr std::size_t ACTIVE_CLEANUP_MAX_TOTAL_REMOVALS = 256;
+        std::size_t           uiTotalActiveRemovals = 0;
+        for (std::size_t i = 0; i < uiActiveCount; ++i)
         {
-            const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
-            if (llElapsedUs > cleanupBudget.llTimeBudgetUs)
+            // Apply the same time cap used by scan work.
+            if ((i & 0x3) == 0 && i > 0)
+            {
+                const long long llElapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();
+                if (llElapsedUs > cleanupBudget.llTimeBudgetUs)
+                    break;
+            }
+
+            CClientEntityBase*                                                            pClientEntity = activeCacheCleanupList[i];
+            std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>>::iterator iterTexNames = m_EntityToTexNameInfos.find(pClientEntity);
+            if (iterTexNames == m_EntityToTexNameInfos.end())
+                continue;
+
+            CFastHashSet<STexNameInfo*>&                                      texNameInfoSet = iterTexNames->second;
+            std::array<STexNameInfo*, ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY> toRemove{};
+            std::size_t                                                       uiRemoveCount = 0;
+
+            for (STexNameInfo* pTexNameInfo : texNameInfoSet)
+            {
+                if (uiTotalActiveRemovals + uiRemoveCount >= ACTIVE_CLEANUP_MAX_TOTAL_REMOVALS)
+                    break;
+
+                if (uiRemoveCount >= ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY)
+                    break;
+
+                if (!pTexNameInfo)
+                {
+                    toRemove[uiRemoveCount++] = pTexNameInfo;
+                    continue;
+                }
+
+                STexShaderReplacement* pReplacement = MapFind(pTexNameInfo->texEntityShaderMap, pClientEntity);
+                if (pReplacement && !pReplacement->bValid)
+                {
+                    MapRemove(pTexNameInfo->texEntityShaderMap, pClientEntity);
+                    toRemove[uiRemoveCount++] = pTexNameInfo;
+                }
+            }
+
+            for (std::size_t j = 0; j < uiRemoveCount; ++j)
+                MapRemove(texNameInfoSet, toRemove[j]);
+
+            uiTotalActiveRemovals += uiRemoveCount;
+
+            if (texNameInfoSet.empty())
+                m_EntityToTexNameInfos.erase(iterTexNames);
+
+            if (uiTotalActiveRemovals >= ACTIVE_CLEANUP_MAX_TOTAL_REMOVALS)
                 break;
         }
+    }
+}
 
-        CClientEntityBase*                                                            pClientEntity = activeCacheCleanupList[i];
-        std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>>::iterator iterTexNames = m_EntityToTexNameInfos.find(pClientEntity);
-        if (iterTexNames == m_EntityToTexNameInfos.end())
+void CMatchChannelManager::CleanupStaleEntityChannelRefs(const std::vector<SDeferredChannelKey>& deferredChannelKeys)
+{
+    if (deferredChannelKeys.empty())
+        return;
+
+    CFastHashSet<CMatchChannel*> affectedChannels;
+
+    for (const SDeferredChannelKey& deferredChannelKey : deferredChannelKeys)
+    {
+        const CShaderAndEntityPair& key = deferredChannelKey.key;
+
+        if (key.pClientEntity && MapContains(m_KnownClientEntities, key.pClientEntity))
+        {
+            std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator itEnt = m_EntityToChannelKeys.find(key.pClientEntity);
+            if (itEnt != m_EntityToChannelKeys.end())
+            {
+                bool bKeyStillIndexed = false;
+                for (const CShaderAndEntityPair& indexedKey : itEnt->second)
+                {
+                    if (indexedKey.pShaderInfo == key.pShaderInfo && indexedKey.pClientEntity == key.pClientEntity &&
+                        indexedKey.bAppendLayers == key.bAppendLayers)
+                    {
+                        bKeyStillIndexed = true;
+                        break;
+                    }
+                }
+
+                if (bKeyStillIndexed)
+                    continue;
+            }
+        }
+
+        std::map<CShaderAndEntityPair, CMatchChannel*>::iterator itUsage = m_ChannelUsageMap.find(key);
+        if (itUsage == m_ChannelUsageMap.end())
             continue;
 
-        CFastHashSet<STexNameInfo*>&                                      texNameInfoSet = iterTexNames->second;
-        std::array<STexNameInfo*, ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY> toRemove{};
-        std::size_t                                                       uiRemoveCount = 0;
+        CMatchChannel* pChannel = itUsage->second;
+        if (!pChannel)
+            continue;
 
-        for (STexNameInfo* pTexNameInfo : texNameInfoSet)
+        if (pChannel != deferredChannelKey.pExpectedChannel)
+            continue;
+
+        if (pChannel->m_uiId != deferredChannelKey.uiExpectedChannelId)
+            continue;
+
+        pChannel->RemoveShaderAndEntity(key);
+        MapInsert(affectedChannels, pChannel);
+
+        std::unordered_map<SShaderInfo*, std::vector<CShaderAndEntityPair>>::iterator itShdr = m_ShaderToChannelKeys.find(key.pShaderInfo);
+        if (itShdr != m_ShaderToChannelKeys.end())
         {
-            if (uiRemoveCount >= ACTIVE_CLEANUP_MAX_REMOVALS_PER_ENTITY)
-                break;
-
-            if (!pTexNameInfo)
+            std::vector<CShaderAndEntityPair>& vec = itShdr->second;
+            for (std::size_t i = 0; i < vec.size(); ++i)
             {
-                toRemove[uiRemoveCount++] = pTexNameInfo;
-                continue;
+                if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity && vec[i].bAppendLayers == key.bAppendLayers)
+                {
+                    vec[i] = vec.back();
+                    vec.pop_back();
+                    break;
+                }
             }
-
-            STexShaderReplacement* pReplacement = MapFind(pTexNameInfo->texEntityShaderMap, pClientEntity);
-            if (pReplacement && !pReplacement->bValid)
-            {
-                MapRemove(pTexNameInfo->texEntityShaderMap, pClientEntity);
-                toRemove[uiRemoveCount++] = pTexNameInfo;
-            }
+            if (vec.empty())
+                m_ShaderToChannelKeys.erase(itShdr);
         }
 
-        for (std::size_t j = 0; j < uiRemoveCount; ++j)
-            MapRemove(texNameInfoSet, toRemove[j]);
+        m_ChannelUsageMap.erase(itUsage);
+    }
 
-        if (texNameInfoSet.empty())
-            m_EntityToTexNameInfos.erase(iterTexNames);
+    for (CMatchChannel* pChannel : affectedChannels)
+    {
+        if (!pChannel)
+            continue;
+
+        for (STexNameInfo* pTexNameInfo : pChannel->m_MatchedTextureList)
+        {
+            if (pTexNameInfo)
+                pTexNameInfo->ResetReplacementResults();
+        }
+
+        if (pChannel->GetShaderAndEntityCount() == 0)
+            DeleteChannel(pChannel);
     }
 }
 
@@ -650,7 +906,31 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
     // Ignore unknown client entities
     if (!MapContains(m_KnownClientEntities, pClientEntity))
         return;
+
     MapRemove(m_KnownClientEntities, pClientEntity);
+    m_StaleEntityDeferredRetryKeys.erase(pClientEntity);
+
+    for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin(); itBatch != m_StaleEntityChannelCleanupQueue.end();)
+    {
+        std::vector<SDeferredChannelKey>& batch = *itBatch;
+        for (std::size_t i = 0; i < batch.size();)
+        {
+            if (batch[i].key.pClientEntity == pClientEntity)
+            {
+                batch[i] = std::move(batch.back());
+                batch.pop_back();
+            }
+            else
+            {
+                ++i;
+            }
+        }
+
+        if (batch.empty())
+            itBatch = m_StaleEntityChannelCleanupQueue.erase(itBatch);
+        else
+            ++itBatch;
+    }
 
     OutputDebug(SString("RemoveClientEntityRefs - Entity:%s", GetDebugTag(pClientEntity)));
 
@@ -678,7 +958,7 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
                     std::vector<CShaderAndEntityPair>& vec = itShdr->second;
                     for (std::size_t i = 0; i < vec.size(); ++i)
                     {
-                        if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                        if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity && vec[i].bAppendLayers == key.bAppendLayers)
                         {
                             vec[i] = vec.back();
                             vec.pop_back();
@@ -723,7 +1003,7 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
         m_EntityToTexNameInfos.erase(itTexNames);
     }
 
-#ifdef SHADER_DEBUG_CHECKS
+#ifdef _CHECKS
     for (CFastHashSet<CMatchChannel*>::const_iterator iter = m_CreatedChannelList.begin(); iter != m_CreatedChannelList.end(); ++iter)
     {
         CMatchChannel* pChannel = *iter;
@@ -751,6 +1031,52 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
 
     OutputDebug(SString("RemoveShaderRefs - Shader:%s", GetDebugTag(pShaderInfo)));
 
+    // Drop deferred and retry keys for this shader before removing live refs.
+    for (std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator itRetry = m_StaleEntityDeferredRetryKeys.begin();
+         itRetry != m_StaleEntityDeferredRetryKeys.end();)
+    {
+        std::vector<CShaderAndEntityPair>& retryKeys = itRetry->second;
+        for (std::size_t i = 0; i < retryKeys.size();)
+        {
+            if (retryKeys[i].pShaderInfo == pShaderInfo)
+            {
+                retryKeys[i] = std::move(retryKeys.back());
+                retryKeys.pop_back();
+            }
+            else
+            {
+                ++i;
+            }
+        }
+
+        if (retryKeys.empty())
+            itRetry = m_StaleEntityDeferredRetryKeys.erase(itRetry);
+        else
+            ++itRetry;
+    }
+
+    for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin(); itBatch != m_StaleEntityChannelCleanupQueue.end();)
+    {
+        std::vector<SDeferredChannelKey>& batch = *itBatch;
+        for (std::size_t i = 0; i < batch.size();)
+        {
+            if (batch[i].key.pShaderInfo == pShaderInfo)
+            {
+                batch[i] = std::move(batch.back());
+                batch.pop_back();
+            }
+            else
+            {
+                ++i;
+            }
+        }
+
+        if (batch.empty())
+            itBatch = m_StaleEntityChannelCleanupQueue.erase(itBatch);
+        else
+            ++itBatch;
+    }
+
     CFastHashSet<CMatchChannel*> affectedChannels;
 
     // Use shader secondary index for lookup instead of full m_ChannelUsageMap scan
@@ -777,7 +1103,7 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
                         std::vector<CShaderAndEntityPair>& vec = itEnt->second;
                         for (std::size_t i = 0; i < vec.size(); ++i)
                         {
-                            if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                            if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity && vec[i].bAppendLayers == key.bAppendLayers)
                             {
                                 vec[i] = vec.back();
                                 vec.pop_back();
@@ -813,7 +1139,7 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
         // This could be optimized
     }
 
-#ifdef SHADER_DEBUG_CHECKS
+#ifdef _CHECKS
     // Check has been remove from textures
     for (CFastHashMap<SString, STexNameInfo*>::const_iterator iter = m_AllTextureList.begin(); iter != m_AllTextureList.end(); ++iter)
     {
@@ -1045,6 +1371,10 @@ void CMatchChannelManager::MergeChannelTo(CMatchChannel* pSource, CMatchChannel*
     {
         const CShaderAndEntityPair& key = *iter;
         RemoveUsage(key, pSource);
+
+        if (key.pClientEntity && !MapContains(m_KnownClientEntities, key.pClientEntity))
+            continue;
+
         AddUsage(key, pTarget);
     }
 }
@@ -1115,7 +1445,53 @@ CMatchChannel* CMatchChannelManager::GetChannelOnlyUsedBy(SShaderInfo* pShaderIn
 void CMatchChannelManager::AddUsage(const CShaderAndEntityPair& key, CMatchChannel* pChannel)
 {
     OutputDebug(SString("    AddUsage - Channel:%s  key:%s", GetDebugTag(pChannel), GetDebugTag(key)));
-    dassert(!MapContains(m_ChannelUsageMap, key));
+
+    CMatchChannel* pExistingChannel = MapFindRef(m_ChannelUsageMap, key);
+    if (pExistingChannel)
+    {
+        if (pExistingChannel == pChannel)
+        {
+            if (key.pClientEntity)
+            {
+                std::vector<CShaderAndEntityPair>& vecEntityKeys = m_EntityToChannelKeys[key.pClientEntity];
+                bool                               bHasEntityKey = false;
+                for (const CShaderAndEntityPair& existingKey : vecEntityKeys)
+                {
+                    if (existingKey.pShaderInfo == key.pShaderInfo && existingKey.pClientEntity == key.pClientEntity &&
+                        existingKey.bAppendLayers == key.bAppendLayers)
+                    {
+                        bHasEntityKey = true;
+                        break;
+                    }
+                }
+                if (!bHasEntityKey)
+                    vecEntityKeys.push_back(key);
+            }
+
+            std::vector<CShaderAndEntityPair>& vecShaderKeys = m_ShaderToChannelKeys[key.pShaderInfo];
+            bool                               bHasShaderKey = false;
+            for (const CShaderAndEntityPair& existingKey : vecShaderKeys)
+            {
+                if (existingKey.pShaderInfo == key.pShaderInfo && existingKey.pClientEntity == key.pClientEntity &&
+                    existingKey.bAppendLayers == key.bAppendLayers)
+                {
+                    bHasShaderKey = true;
+                    break;
+                }
+            }
+            if (!bHasShaderKey)
+                vecShaderKeys.push_back(key);
+
+            return;
+        }
+
+        // Deferred cleanup can leave stale key ownership briefly.
+        // Reconcile here so each key stays bound to one channel.
+        RemoveUsage(key, pExistingChannel);
+        if (pExistingChannel->GetShaderAndEntityCount() == 0)
+            DeleteChannel(pExistingChannel);
+    }
+
     pChannel->AddShaderAndEntity(key);
     MapSet(m_ChannelUsageMap, key, pChannel);
     if (key.pClientEntity)
@@ -1145,7 +1521,7 @@ void CMatchChannelManager::RemoveUsage(const CShaderAndEntityPair& key, CMatchCh
             std::vector<CShaderAndEntityPair>& vec = it->second;
             for (std::size_t i = 0; i < vec.size(); ++i)
             {
-                if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity && vec[i].bAppendLayers == key.bAppendLayers)
                 {
                     vec[i] = vec.back();
                     vec.pop_back();
@@ -1163,7 +1539,7 @@ void CMatchChannelManager::RemoveUsage(const CShaderAndEntityPair& key, CMatchCh
             std::vector<CShaderAndEntityPair>& vec = it->second;
             for (std::size_t i = 0; i < vec.size(); ++i)
             {
-                if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity)
+                if (vec[i].pShaderInfo == key.pShaderInfo && vec[i].pClientEntity == key.pClientEntity && vec[i].bAppendLayers == key.bAppendLayers)
                 {
                     vec[i] = vec.back();
                     vec.pop_back();
@@ -1187,7 +1563,11 @@ void CMatchChannelManager::RemoveUsage(const CShaderAndEntityPair& key, CMatchCh
 CMatchChannel* CMatchChannelManager::GetChannel(const CShaderAndEntityPair& key)
 {
     CMatchChannel* pChannel = MapFindRef(m_ChannelUsageMap, key);
-    if (!pChannel)
+    if (pChannel)
+    {
+        AddUsage(key, pChannel);
+    }
+    else
     {
         pChannel = NewChannel();
         AddUsage(key, pChannel);
