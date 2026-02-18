@@ -569,7 +569,13 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
                         std::vector<SDeferredChannelKey> chunk;
                         chunk.reserve(uiChunkSize);
                         for (std::size_t i = 0; i < uiChunkSize; ++i)
+                        {
+                            const SDeferredChannelKey& dk = deferredChannelKeys[uiOffset + i];
+                            if (dk.key.pClientEntity)
+                                m_DeferredQueueEntityPresence.insert(dk.key.pClientEntity);
+                            m_DeferredQueueShaderPresence.insert(dk.key.pShaderInfo);
                             chunk.push_back(std::move(deferredChannelKeys[uiOffset + i]));
+                        }
 
                         m_StaleEntityChannelCleanupQueue.push_back(std::move(chunk));
                         uiOffset += uiChunkSize;
@@ -582,7 +588,13 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
                         const std::size_t uiTailFree = NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH - tailBatch.size();
                         uiChunkSize = std::min(uiChunkSize, uiTailFree);
                         for (std::size_t i = 0; i < uiChunkSize; ++i)
+                        {
+                            const SDeferredChannelKey& dk = deferredChannelKeys[uiOffset + i];
+                            if (dk.key.pClientEntity)
+                                m_DeferredQueueEntityPresence.insert(dk.key.pClientEntity);
+                            m_DeferredQueueShaderPresence.insert(dk.key.pShaderInfo);
                             tailBatch.push_back(std::move(deferredChannelKeys[uiOffset + i]));
+                        }
 
                         uiOffset += uiChunkSize;
                         continue;
@@ -599,7 +611,13 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
                     vecRetryKeys.clear();
                     vecRetryKeys.reserve(deferredChannelKeys.size() - uiOffset);
                     for (std::size_t i = uiOffset; i < deferredChannelKeys.size(); ++i)
-                        vecRetryKeys.push_back(deferredChannelKeys[i].key);
+                    {
+                        const CShaderAndEntityPair& k = deferredChannelKeys[i].key;
+                        if (k.pClientEntity)
+                            m_DeferredQueueEntityPresence.insert(k.pClientEntity);
+                        m_DeferredQueueShaderPresence.insert(k.pShaderInfo);
+                        vecRetryKeys.push_back(k);
+                    }
                 }
 
                 m_EntityToChannelKeys.erase(iterEntityKeys);
@@ -688,7 +706,13 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
                     std::vector<SDeferredChannelKey> chunk;
                     chunk.reserve(uiChunkSize);
                     for (std::size_t i = 0; i < uiChunkSize; ++i)
+                    {
+                        const SDeferredChannelKey& dk = deferredChannelKeys[uiOffset + i];
+                        if (dk.key.pClientEntity)
+                            m_DeferredQueueEntityPresence.insert(dk.key.pClientEntity);
+                        m_DeferredQueueShaderPresence.insert(dk.key.pShaderInfo);
                         chunk.push_back(std::move(deferredChannelKeys[uiOffset + i]));
+                    }
 
                     m_StaleEntityChannelCleanupQueue.push_back(std::move(chunk));
                     uiOffset += uiChunkSize;
@@ -701,7 +725,13 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
                     const std::size_t uiTailFree = NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH - tailBatch.size();
                     uiChunkSize = std::min(uiChunkSize, uiTailFree);
                     for (std::size_t i = 0; i < uiChunkSize; ++i)
+                    {
+                        const SDeferredChannelKey& dk = deferredChannelKeys[uiOffset + i];
+                        if (dk.key.pClientEntity)
+                            m_DeferredQueueEntityPresence.insert(dk.key.pClientEntity);
+                        m_DeferredQueueShaderPresence.insert(dk.key.pShaderInfo);
                         tailBatch.push_back(std::move(deferredChannelKeys[uiOffset + i]));
+                    }
 
                     uiOffset += uiChunkSize;
                     continue;
@@ -717,7 +747,13 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
                 vecRetryKeys.clear();
                 vecRetryKeys.reserve(deferredChannelKeys.size() - uiOffset);
                 for (std::size_t i = uiOffset; i < deferredChannelKeys.size(); ++i)
-                    vecRetryKeys.push_back(deferredChannelKeys[i].key);
+                {
+                    const CShaderAndEntityPair& k = deferredChannelKeys[i].key;
+                    if (k.pClientEntity)
+                        m_DeferredQueueEntityPresence.insert(k.pClientEntity);
+                    m_DeferredQueueShaderPresence.insert(k.pShaderInfo);
+                    vecRetryKeys.push_back(k);
+                }
 
                 break;
             }
@@ -747,6 +783,13 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
 
         CleanupStaleEntityChannelRefs(deferredChannelKeys);
         ++uiDeferredCleaned;
+    }
+
+    // Reset presence sets after full drain; stale entries would cause unnecessary queue scans in Remove*.
+    if (m_StaleEntityChannelCleanupQueue.empty() && m_StaleEntityDeferredRetryKeys.empty())
+    {
+        m_DeferredQueueEntityPresence.clear();
+        m_DeferredQueueShaderPresence.clear();
     }
 
     // Prune invalidated (bValid=false) cache entries from active entities.
@@ -914,29 +957,35 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
         return;
 
     MapRemove(m_KnownClientEntities, pClientEntity);
+
     m_StaleEntityDeferredRetryKeys.erase(pClientEntity);
 
-    for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin();
-         itBatch != m_StaleEntityChannelCleanupQueue.end();)
+    // Presence set is insert-only - absence guarantees no queue entries for this entity.
+    if (MapContains(m_DeferredQueueEntityPresence, pClientEntity))
     {
-        std::vector<SDeferredChannelKey>& batch = *itBatch;
-        for (std::size_t i = 0; i < batch.size();)
+        for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin();
+             itBatch != m_StaleEntityChannelCleanupQueue.end();)
         {
-            if (batch[i].key.pClientEntity == pClientEntity)
+            std::vector<SDeferredChannelKey>& batch = *itBatch;
+            for (std::size_t i = 0; i < batch.size();)
             {
-                batch[i] = std::move(batch.back());
-                batch.pop_back();
+                if (batch[i].key.pClientEntity == pClientEntity)
+                {
+                    batch[i] = std::move(batch.back());
+                    batch.pop_back();
+                }
+                else
+                {
+                    ++i;
+                }
             }
-            else
-            {
-                ++i;
-            }
-        }
 
-        if (batch.empty())
-            itBatch = m_StaleEntityChannelCleanupQueue.erase(itBatch);
-        else
-            ++itBatch;
+            if (batch.empty())
+                itBatch = m_StaleEntityChannelCleanupQueue.erase(itBatch);
+            else
+                ++itBatch;
+        }
+        m_DeferredQueueEntityPresence.erase(pClientEntity);
     }
 
     OutputDebug(SString("RemoveClientEntityRefs - Entity:%s", GetDebugTag(pClientEntity)));
@@ -1039,50 +1088,56 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
     OutputDebug(SString("RemoveShaderRefs - Shader:%s", GetDebugTag(pShaderInfo)));
 
     // Drop deferred and retry keys for this shader before removing live refs.
-    for (std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator itRetry = m_StaleEntityDeferredRetryKeys.begin();
-         itRetry != m_StaleEntityDeferredRetryKeys.end();)
+    // Presence set is insert-only - absence guarantees no deferred entries for this shader.
+    if (MapContains(m_DeferredQueueShaderPresence, pShaderInfo))
     {
-        std::vector<CShaderAndEntityPair>& retryKeys = itRetry->second;
-        for (std::size_t i = 0; i < retryKeys.size();)
+        for (std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>>::iterator itRetry = m_StaleEntityDeferredRetryKeys.begin();
+             itRetry != m_StaleEntityDeferredRetryKeys.end();)
         {
-            if (retryKeys[i].pShaderInfo == pShaderInfo)
+            std::vector<CShaderAndEntityPair>& retryKeys = itRetry->second;
+            for (std::size_t i = 0; i < retryKeys.size();)
             {
-                retryKeys[i] = std::move(retryKeys.back());
-                retryKeys.pop_back();
+                if (retryKeys[i].pShaderInfo == pShaderInfo)
+                {
+                    retryKeys[i] = std::move(retryKeys.back());
+                    retryKeys.pop_back();
+                }
+                else
+                {
+                    ++i;
+                }
             }
+
+            if (retryKeys.empty())
+                itRetry = m_StaleEntityDeferredRetryKeys.erase(itRetry);
             else
-            {
-                ++i;
-            }
+                ++itRetry;
         }
 
-        if (retryKeys.empty())
-            itRetry = m_StaleEntityDeferredRetryKeys.erase(itRetry);
-        else
-            ++itRetry;
-    }
-
-    for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin();
-         itBatch != m_StaleEntityChannelCleanupQueue.end();)
-    {
-        std::vector<SDeferredChannelKey>& batch = *itBatch;
-        for (std::size_t i = 0; i < batch.size();)
+        for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin();
+             itBatch != m_StaleEntityChannelCleanupQueue.end();)
         {
-            if (batch[i].key.pShaderInfo == pShaderInfo)
+            std::vector<SDeferredChannelKey>& batch = *itBatch;
+            for (std::size_t i = 0; i < batch.size();)
             {
-                batch[i] = std::move(batch.back());
-                batch.pop_back();
+                if (batch[i].key.pShaderInfo == pShaderInfo)
+                {
+                    batch[i] = std::move(batch.back());
+                    batch.pop_back();
+                }
+                else
+                {
+                    ++i;
+                }
             }
+
+            if (batch.empty())
+                itBatch = m_StaleEntityChannelCleanupQueue.erase(itBatch);
             else
-            {
-                ++i;
-            }
+                ++itBatch;
         }
 
-        if (batch.empty())
-            itBatch = m_StaleEntityChannelCleanupQueue.erase(itBatch);
-        else
-            ++itBatch;
+        m_DeferredQueueShaderPresence.erase(pShaderInfo);
     }
 
     CFastHashSet<CMatchChannel*> affectedChannels;
