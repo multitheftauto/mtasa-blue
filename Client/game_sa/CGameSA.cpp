@@ -254,6 +254,7 @@ CGameSA::CGameSA()
         CVehicleAudioSettingsManagerSA::StaticSetHooks();
         CFireManagerSA::StaticSetHooks();
         CCreepingFireSA::StaticSetHooks();
+        CBuildingRemovalSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {
