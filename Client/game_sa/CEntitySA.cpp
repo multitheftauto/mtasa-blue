@@ -48,7 +48,16 @@ void CEntitySAInterface::UpdateRpHAnim()
 // leaving pColModel as a dangling pointer.
 static bool IsColModelAccessible(CColModelSAInterface* pColModel)
 {
-    return SharedUtil::IsReadablePointer(pColModel, sizeof(CColModelSAInterface));
+    __try
+    {
+        volatile float probe = pColModel->m_bounds.m_vecMin.fX;
+        (void)probe;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
 }
 
 CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)

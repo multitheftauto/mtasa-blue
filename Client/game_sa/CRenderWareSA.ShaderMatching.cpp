@@ -447,7 +447,7 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
     if (uiTrackedEntities == 0 && m_StaleEntityChannelCleanupQueue.empty() && m_StaleEntityDeferredRetryKeys.empty())
         return;
 
-    const std::size_t uiPendingDeferredWork =
+    const std::size_t               uiPendingDeferredWork =
         m_StaleEntityChannelCleanupQueue.size() * NUM_STALE_ENTITY_CLEANUP_MAX_KEYS_PER_BATCH + m_StaleEntityDeferredRetryKeys.size();
     const std::size_t               uiCleanupBudgetLoad = std::max(uiTrackedEntities, uiPendingDeferredWork);
     const SStaleEntityCleanupBudget cleanupBudget = GetStaleEntityCleanupBudget(uiCleanupBudgetLoad);
@@ -916,8 +916,7 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
     MapRemove(m_KnownClientEntities, pClientEntity);
     m_StaleEntityDeferredRetryKeys.erase(pClientEntity);
 
-    for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin();
-         itBatch != m_StaleEntityChannelCleanupQueue.end();)
+    for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin(); itBatch != m_StaleEntityChannelCleanupQueue.end();)
     {
         std::vector<SDeferredChannelKey>& batch = *itBatch;
         for (std::size_t i = 0; i < batch.size();)
@@ -1062,8 +1061,7 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
             ++itRetry;
     }
 
-    for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin();
-         itBatch != m_StaleEntityChannelCleanupQueue.end();)
+    for (std::deque<std::vector<SDeferredChannelKey>>::iterator itBatch = m_StaleEntityChannelCleanupQueue.begin(); itBatch != m_StaleEntityChannelCleanupQueue.end();)
     {
         std::vector<SDeferredChannelKey>& batch = *itBatch;
         for (std::size_t i = 0; i < batch.size();)

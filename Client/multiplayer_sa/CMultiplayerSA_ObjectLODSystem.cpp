@@ -207,56 +207,16 @@ second:
 ////////////////////////////////////////////////
 bool IsEntityAccessible(CEntitySAInterface* pEntity)
 {
-    if (!pEntity)
-        return false;
-
-    // GTA SA pool header layout: [B* m_pObjects][BYTE* m_byteMap][int m_nSize]
-    // tPoolObjectFlags: bEmpty is bit 7 (MSB) of each byte. Zero MSB = occupied.
-    struct RawPool
+    __try
     {
-        BYTE* m_pObjects;
-        BYTE* m_byteMap;
-        int   m_nSize;
-    };
-
-    // CRenderer_ScanSectorList visits building, dummy, and object sector lists.
-    // Strides: sizeof(CBuildingSAInterface) = 56, sizeof(CEntitySAInterface) = 56,
-    //          PoolAllocStride<CObjectSAInterface>::value = 412.
-    static const struct
-    {
-        DWORD ppPool;
-        DWORD stride;
-    } pools[] = {
-        {0xb74498, 56},   // *CLASS_CBuildingPool
-        {0xb744a0, 56},   // *CLASS_CDummyPool
-        {0xb7449c, 412},  // *CLASS_CObjectPool
-    };
-
-    const BYTE* ent = reinterpret_cast<const BYTE*>(pEntity);
-
-    for (int i = 0; i < 3; ++i)
-    {
-        const RawPool* pPool = *reinterpret_cast<RawPool* const*>(pools[i].ppPool);
-        if (!pPool || !pPool->m_pObjects || pPool->m_nSize <= 0)
-            continue;
-
-        if (ent < pPool->m_pObjects)
-            continue;
-
-        const DWORD stride = pools[i].stride;
-        const DWORD diff = static_cast<DWORD>(ent - pPool->m_pObjects);
-        if (diff % stride != 0)
-            continue;
-
-        const DWORD index = diff / stride;
-        if (index >= static_cast<DWORD>(pPool->m_nSize))
-            continue;
-
-        if ((pPool->m_byteMap[index] & 0x80) == 0)  // bEmpty bit zero = slot occupied
-            return true;
+        volatile WORD scanCode = *(volatile WORD*)((BYTE*)pEntity + 0x2C);
+        (void)scanCode;
+        return true;
     }
-
-    return false;
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
 }
 
 // Hook info
