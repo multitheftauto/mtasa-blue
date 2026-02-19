@@ -2431,9 +2431,17 @@ namespace
                 auto*                slot = pTxdPoolSA->GetTextureDictonarySlot(existingTxdId);
                 // Also accept usParentIndex==0xFFFF: the slot was created with the same parent
                 // but the parent TXD wasn't loaded yet, so parent-chain setup is still pending.
-                if (slot && slot->rwTexDictonary &&
-                    (slot->usParentIndex == usParentTxdId || slot->usParentIndex == static_cast<unsigned short>(-1)))
+                if (slot && slot->rwTexDictonary && (slot->usParentIndex == usParentTxdId || slot->usParentIndex == static_cast<unsigned short>(-1)))
                 {
+                    // If parent chain was deferred (0xFFFF) but the parent TXD is now available,
+                    // complete the linkage so SA's texture walk resolves non-replaced textures.
+                    if (slot->usParentIndex == static_cast<unsigned short>(-1) && CTxdStore_GetTxd(usParentTxdId) != nullptr)
+                    {
+                        slot->usParentIndex = usParentTxdId;
+                        CTxdStore_SetupTxdParent(existingTxdId);
+                        ClearPendingIsolatedModel(usModelId);
+                    }
+
                     g_IsolatedModelByTxd[existingTxdId] = usModelId;
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
@@ -2746,8 +2754,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             // functioning parent chain; clear them regardless of whether the child TXD is live.
             const auto* pTimeoutChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
             const bool  bIsIncompleteVanillaSlot =
-                pModelInfo->GetParentID() == 0 && pTimeoutChildSlot &&
-                pTimeoutChildSlot->usParentIndex == static_cast<unsigned short>(-1);
+                pModelInfo->GetParentID() == 0 && pTimeoutChildSlot && pTimeoutChildSlot->usParentIndex == static_cast<unsigned short>(-1);
             if (!bIsIncompleteVanillaSlot && pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
                 continue;
 
@@ -2770,11 +2777,9 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             // GetParentID()==0: vanilla model owns its TXD directly (no clone parent).
             // AllocateIsolatedTxdForVanillaModel stores usParentIndex=0xFFFF when the parent
             // TXD is not yet loaded; detect that state and complete setup here once it arrives.
-            auto* pChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
-            const bool bIsDeferredVanillaSetup =
-                pChildSlot && pChildSlot->rwTexDictonary &&
-                pChildSlot->usParentIndex == static_cast<unsigned short>(-1) &&
-                pModelInfo->GetTextureDictionaryID() == childTxdId;
+            auto*      pChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
+            const bool bIsDeferredVanillaSetup = pChildSlot && pChildSlot->rwTexDictonary && pChildSlot->usParentIndex == static_cast<unsigned short>(-1) &&
+                                                 pModelInfo->GetTextureDictionaryID() == childTxdId;
 
             if (bIsDeferredVanillaSetup)
             {
@@ -3880,23 +3885,63 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
             }
             else if (itPrevIsolated == g_IsolatedTxdByModel.end())
             {
-                // Always isolate on first injection. Injecting into the shared TXD means any
-                // model later isolated into a child TXD inherits our textures via the RW parent
-                // chain, causing texture mixing. Pre-emptive isolation keeps the shared TXD clean.
-                if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
+                // Isolate on first injection so the shared TXD stays clean - otherwise child
+                // TXDs inherit our textures via the RW parent chain (texture mixing).
+                // Only isolate when the parent TXD is loaded; a child with usParentIndex=0xFFFF
+                // has a broken texture chain walk (white textures on non-replaced slots).
+                // If unloaded, request the TXD and defer injection until a retry succeeds.
+                if (CTxdStore_GetTxd(usCurrentTxdId) != nullptr)
                 {
-                    // Pool exhausted; fall through to shared TXD injection as a last resort.
-                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u, using shared TXD", usModelId));
+                    if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
+                    {
+                        // Pool exhausted; fall through to shared TXD injection as a last resort.
+                        AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u, using shared TXD", usModelId));
+                    }
+                }
+                else
+                {
+                    // Parent TXD not loaded yet - request it and defer.
+                    if (pGame->GetStreaming())
+                    {
+                        const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+                        if (iBaseIDforTXD > 0)
+                        {
+                            const unsigned int uiTxdStreamId = usCurrentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                            pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                        }
+                    }
+                    if (!g_bProcessingPendingReplacements)
+                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
                 }
             }
             else
             {
-                // Parent TXD changed since last isolation - re-isolate with new parent
-                if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
+                // Parent TXD changed since last isolation - re-isolate with new parent.
+                // Only when the parent TXD is loaded (same reason as first-load above).
+                if (CTxdStore_GetTxd(usCurrentTxdId) != nullptr)
                 {
-                    // Isolation failed - fall through to shared TXD injection instead.
-                    // May cause texture mixing, but avoids permanent white textures.
-                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (parent changed), using shared TXD", usModelId));
+                    if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
+                    {
+                        // Isolation failed - fall through to shared TXD load instead.
+                        // May cause texture mixing, but avoids permanent white textures.
+                        AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (parent changed), using shared TXD", usModelId));
+                    }
+                }
+                else
+                {
+                    if (pGame->GetStreaming())
+                    {
+                        const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+                        if (iBaseIDforTXD > 0)
+                        {
+                            const unsigned int uiTxdStreamId = usCurrentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                            pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                        }
+                    }
+                    if (!g_bProcessingPendingReplacements)
+                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
                 }
             }
         }
