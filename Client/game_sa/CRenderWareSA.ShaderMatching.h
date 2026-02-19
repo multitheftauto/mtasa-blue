@@ -323,6 +323,7 @@ protected:
     void           CalcShaderForTexAndEntity(SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType,
                                              bool bSilent);
     void           CleanupStaleEntityChannelRefs(const std::vector<SDeferredChannelKey>& deferredChannelKeys);
+    bool           TryPushDeferredKey(const CShaderAndEntityPair& key, CMatchChannel* pExpectedChannel);
     void           AddToOptimizeQueue(CMatchChannel* pChannel);
     void           AddToRematchQueue(CMatchChannel* pChannel);
     void           FlushChanges();
@@ -368,4 +369,5 @@ protected:
     std::deque<std::vector<SDeferredChannelKey>> m_StaleEntityChannelCleanupQueue;
     long long                                    m_llNextStaleEntityCleanupTime = 0;
     std::size_t                                  m_uiStaleEntityCleanupCursorBucket = 0;
+    std::size_t                                  m_uiStaleEntityScanCycleCount = 0;
 };
