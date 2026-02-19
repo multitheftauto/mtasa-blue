@@ -479,6 +479,23 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
                 CStreamingInfo* pStreamInfo = GetStreamingInfo(dwModelID);
                 if (pStreamInfo)
                 {
+                    // Unlink from SA's loaded-entry list before zeroing the link fields to avoid linked list corruptin
+                    if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+                    {
+                        constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
+                        const unsigned short     prev = pStreamInfo->prevId;
+                        const unsigned short     next = pStreamInfo->nextId;
+                        if (prev != kInvalid && next != kInvalid)
+                        {
+                            CStreamingInfo* pPrev = GetStreamingInfo(prev);
+                            CStreamingInfo* pNext = GetStreamingInfo(next);
+                            if (pPrev && pNext)
+                            {
+                                pPrev->nextId = next;
+                                pNext->prevId = prev;
+                            }
+                        }
+                    }
                     pStreamInfo->prevId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
