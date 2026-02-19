@@ -721,6 +721,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         !ifdef MTA_MAETRO
             File /oname=d3dcompiler_47.dll "${FILES_ROOT}\mta\d3dcompiler_47.maetro.dll"
             File "${FILES_ROOT}\maetro32.dll"
+            File "${FILES_ROOT}\mta\maetro64.dll"
         !else
             File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
         !endif
