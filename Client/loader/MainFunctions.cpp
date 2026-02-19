@@ -66,6 +66,11 @@ namespace
     return exceptionCode == 0xC0000409 || exceptionCode == 0xC0000374;
 }
 
+[[nodiscard]] static bool IsNetcModule(const SString& moduleName) noexcept
+{
+    return _stricmp(PathFindFileNameA(moduleName.c_str()), "netc.dll") == 0;
+}
+
 struct DebuggerCrashCapture
 {
     DWORD           exceptionCode = 0;
@@ -241,8 +246,17 @@ static DWORD RunDebuggerLoop(HANDLE hProcess, DWORD processId, DebuggerCrashCapt
                                 // This provides fallback if registry-based resolution fails
                                 capture.moduleInfo = ResolveModuleCrashAddress(capture.threadContext.Eip, hProcess);
 
-                                WriteFailFastDump(hProcess, processId, debugEvent.dwThreadId, &debugEvent.u.Exception.ExceptionRecord, &capture.threadContext,
-                                                  capture);
+                                // Do not collect a dump or store registers for netc.dll crashes.
+                                // These are deliberate security fastfails.
+                                if (!IsNetcModule(capture.moduleInfo.moduleName))
+                                {
+                                    WriteFailFastDump(hProcess, processId, debugEvent.dwThreadId, &debugEvent.u.Exception.ExceptionRecord, &capture.threadContext,
+                                                      capture);
+                                }
+                                else
+                                {
+                                    capture.threadContext = {};
+                                }
 
                                 WriteDebugEvent(
                                     SString("Captured fail-fast 0x%08X: EIP=0x%08X ESP=0x%08X", exCode, capture.threadContext.Eip, capture.threadContext.Esp));
@@ -2064,29 +2078,70 @@ int LaunchGame(SString strCmdLine)
             !allArtifactsFresh)
         {
             const auto [coreLogLabel, coreLogFlagLabel, coreDumpLabel] = artifactLabels;
+            bool isAcDefense = false;
 
             if (debugCapture.captured)
             {
-                AddReportLog(3147,
-                             SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s "
-                                     "EIP=0x%08X ESP=0x%08X EBP=0x%08X EAX=0x%08X dump=%s)",
-                                     static_cast<unsigned int>(rawExitCode), coreLogLabel, coreLogFlagLabel, coreDumpLabel, debugCapture.threadContext.Eip,
-                                     debugCapture.threadContext.Esp, debugCapture.threadContext.Ebp, debugCapture.threadContext.Eax,
-                                     debugCapture.dumpPath.empty() ? "none" : ExtractFilename(debugCapture.dumpPath).c_str()));
-
-                // Use the pre-resolved module info from capture time (when process was alive)
-                // This ensures we have module info even for early crashes before registry storage
-                if (debugCapture.moduleInfo.resolved)
+                if (IsFailFastException(debugCapture.exceptionCode) && IsNetcModule(debugCapture.moduleInfo.moduleName))
                 {
-                    AddReportLog(3148, SString("Crash in %s: RVA=0x%08X IDA=0x%08X (base=0x%08X)", debugCapture.moduleInfo.moduleName.c_str(),
-                                               debugCapture.moduleInfo.rva, debugCapture.moduleInfo.idaAddress, debugCapture.moduleInfo.moduleBase));
+                    isAcDefense = true;
+                    AddReportLog(7210, SString("Loader - AC integrity exit detected in debugger capture (module=%s code=0x%08X)",
+                                               debugCapture.moduleInfo.moduleName.c_str(), static_cast<unsigned int>(debugCapture.exceptionCode)));
+                    // Mark the failfast dump as handled so _CheckForWerCrash PATH 1 does not reprocess it on next launch
+                    if (!debugCapture.dumpPath.empty())
+                        SetApplicationSetting("diagnostics", "last-wer-dump-shown", ExtractFilename(debugCapture.dumpPath));
+                    // Mark the WER archive report as handled so _CheckForWerCrash PATH 2 does not reprocess it.
+                    // WER may still create an archive entry for a fail-fast even when our debugger is attached.
+                    {
+                        WerCrashInfo acWerInfo = QueryWerCrashInfo(debugCapture.exceptionCode);
+                        if (acWerInfo.found && !acWerInfo.reportId.empty())
+                            SetApplicationSetting("diagnostics", "last-wer-report-shown", acWerInfo.reportId);
+                    }
+                    MessageBoxUTF8(nullptr,
+                                   "MTA: San Andreas has been terminated due to an integrity violation.\n\n"
+                                   "Make sure that no external program is modifying the game. Note that some unreliable "
+                                   "AV's (such as Bitdefender) are known to interfere in a way that can lead to this problem.",
+                                   "MTA: San Andreas",
+                                   MB_OK | MB_ICONWARNING | MB_TOPMOST);
+                }
+                else
+                {
+                    AddReportLog(3147,
+                                 SString("Loader observed crash exit 0x%08X (core.log=%s core.log.flag=%s core.dmp=%s "
+                                         "EIP=0x%08X ESP=0x%08X EBP=0x%08X EAX=0x%08X dump=%s)",
+                                         static_cast<unsigned int>(rawExitCode), coreLogLabel, coreLogFlagLabel, coreDumpLabel, debugCapture.threadContext.Eip,
+                                         debugCapture.threadContext.Esp, debugCapture.threadContext.Ebp, debugCapture.threadContext.Eax,
+                                         debugCapture.dumpPath.empty() ? "none" : ExtractFilename(debugCapture.dumpPath).c_str()));
+
+                    // Use the pre-resolved module info from capture time (when process was alive)
+                    // This ensures we have module info even for early crashes before registry storage
+                    if (debugCapture.moduleInfo.resolved)
+                    {
+                        AddReportLog(3148, SString("Crash in %s: RVA=0x%08X IDA=0x%08X (base=0x%08X)", debugCapture.moduleInfo.moduleName.c_str(),
+                                                   debugCapture.moduleInfo.rva, debugCapture.moduleInfo.idaAddress, debugCapture.moduleInfo.moduleBase));
+                    }
                 }
             }
             else
             {
                 WerCrashInfo werInfo = QueryWerCrashInfo(rawExitCode);
 
-                if (werInfo.found)
+                if (werInfo.found && IsFailFastException(werInfo.exceptionCode) && IsNetcModule(werInfo.moduleName))
+                {
+                    isAcDefense = true;
+                    AddReportLog(7210, SString("Loader - AC integrity exit detected via WER (module=%s code=0x%08X)",
+                                               werInfo.moduleName.c_str(), static_cast<unsigned int>(werInfo.exceptionCode)));
+                    // Mark WER report as handled so _CheckForWerCrash does not reprocess it on next launch
+                    if (!werInfo.reportId.empty())
+                        SetApplicationSetting("diagnostics", "last-wer-report-shown", werInfo.reportId);
+                    MessageBoxUTF8(nullptr,
+                                   "MTA: San Andreas has been terminated due to an AC integrity violation.\n\n"
+                                   "Make sure that no external program is modifying the game. Note that some unreliable "
+                                   "AV's (such as Bitdefender) are known to interfere in a way that can lead to this problem.",
+                                   "MTA: San Andreas",
+                                   MB_OK | MB_ICONWARNING | MB_TOPMOST);
+                }
+                else if (werInfo.found)
                 {
                     // WER faultOffset is already the RVA (offset within the module)
                     // We can directly compute IDA address: IDA_BASE + RVA
@@ -2215,7 +2270,7 @@ int LaunchGame(SString strCmdLine)
                                                static_cast<unsigned int>(rawExitCode), coreLogLabel, coreLogFlagLabel, coreDumpLabel));
                 }
 
-                if (IsFailFastException(rawExitCode))
+                if (!isAcDefense && IsFailFastException(rawExitCode))
                 {
                     SetApplicationSetting("diagnostics", "debugger-crash-capture", "1");
                     WriteDebugEvent(SString("Loader - Enabled one-shot debugger capture for next run (exit code 0x%08X)", rawExitCode));
