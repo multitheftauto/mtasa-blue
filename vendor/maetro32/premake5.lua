@@ -8,29 +8,50 @@ project "maetro32"
 	linkoptions { "/NODEFAULTLIB" }
 	flags { "NoRuntimeChecks", "NoBufferSecurityCheck" }
 
-    vpaths {
+	vpaths {
 		["Headers/**"] = "**.h",
 		["Sources/**"] = "*.cpp",
 		["*"] = "premake5.lua"
 	}
 
-    files {
+	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
 
-    filter "system:not windows"
-        flags { "ExcludeFromBuild" }
+	postbuildcommands { copy "server", copy "mta", copy "mta/cef" }
 
-	filter {"platforms:x86"}
-		postbuildcommands { copy "server", copy "mta", copy "mta/cef" }
+	filter "system:not windows or platforms:not x86"
+		flags { "ExcludeFromBuild" }
 
-	filter "platforms:x64"
-		targetdir(buildpath("server/x64"))
+project "maetro64"
+	language "C++"
+	kind "SharedLib"
+	targetname "maetro64"
+	targetdir(buildpath("mta"))
+	clangtidy "On"
+	staticruntime "Off"
+	linkoptions { "/NODEFAULTLIB" }
+	flags { "NoRuntimeChecks", "NoBufferSecurityCheck" }
+	architecture "x86_64"
 
-	filter "platforms:arm"
-		targetdir(buildpath("server/arm"))
+	vpaths {
+		["Headers/**"] = "**.h",
+		["Sources/**"] = "*.cpp",
+		["*"] = "premake5.lua"
+	}
 
-	filter "platforms:arm64"
-		targetdir(buildpath("server/arm64"))
+	files {
+		"premake5.lua",
+		"*.h",
+		"*.cpp"
+	}
+
+	postbuildcommands { copy "server/x64" }
+
+	filter "system:not windows"
+		flags { "ExcludeFromBuild" }
+
+	filter { "platforms:not x86", "platforms:not x64" }
+		flags { "ExcludeFromBuild" }
