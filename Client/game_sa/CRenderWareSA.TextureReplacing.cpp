@@ -2429,7 +2429,10 @@ namespace
             {
                 const unsigned short existingTxdId = itExisting->second.usTxdId;
                 auto*                slot = pTxdPoolSA->GetTextureDictonarySlot(existingTxdId);
-                if (slot && slot->rwTexDictonary && slot->usParentIndex == usParentTxdId)
+                // Also accept usParentIndex==0xFFFF: the slot was created with the same parent
+                // but the parent TXD wasn't loaded yet, so parent-chain setup is still pending.
+                if (slot && slot->rwTexDictonary &&
+                    (slot->usParentIndex == usParentTxdId || slot->usParentIndex == static_cast<unsigned short>(-1)))
                 {
                     g_IsolatedModelByTxd[existingTxdId] = usModelId;
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
@@ -2499,15 +2502,20 @@ namespace
             }
         }
 
-        // Ensure parent TXD is loaded so child inherits its textures via the parent chain.
-        // Unlike clone isolation, vanilla models cannot be deferred to ProcessPendingIsolatedModels
-        // because that function treats GetParentID()==0 as "clone lost its parent" and tears down
-        // the isolation.  A blocking request should always succeed for vanilla shared TXDs.
-        if (CTxdStore_GetTxd(usParentTxdId) == nullptr)
+        // Store usParentIndex=0xFFFF when the parent TXD is not yet loaded; ProcessPendingIsolatedModels
+        // completes the RW parent linkage once it arrives, mirroring EnsureIsolatedTxdForRequestedModel.
+        const bool bParentAvailable = (CTxdStore_GetTxd(usParentTxdId) != nullptr);
+        if (!bParentAvailable && pGame->GetStreaming())
         {
-            pModelInfo->Request(BLOCKING, "AllocateIsolatedTxdForVanillaModel-ParentTXD");
-            if (CTxdStore_GetTxd(usParentTxdId) == nullptr)
-                return false;
+            // Changing the model's TXD to childTxdId removes SA's own reference count on
+            // parentTxdId, so it will never load naturally; nudge the streaming system here
+            // and again each tick in ProcessPendingIsolatedModels until the TXD arrives.
+            const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+            if (iBaseIDforTXD > 0)
+            {
+                const unsigned int uiTxdStreamId = usParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+            }
         }
 
         // Find a free TXD slot (same tier priority as clone isolation)
@@ -2546,7 +2554,8 @@ namespace
             return false;
         }
 
-        if (!pTxdPoolSA->SetTextureDictonarySlot(uiNewTxdId, pChildTxd, usParentTxdId))
+        const unsigned short usSlotParentIndex = bParentAvailable ? usParentTxdId : static_cast<unsigned short>(-1);
+        if (!pTxdPoolSA->SetTextureDictonarySlot(uiNewTxdId, pChildTxd, usSlotParentIndex))
         {
             RwTexDictionaryDestroy(pChildTxd);
             pTxdPoolSA->RemoveTextureDictonarySlot(uiNewTxdId);
@@ -2556,7 +2565,8 @@ namespace
 
         MarkTxdPoolCountDirty();
 
-        CTxdStore_SetupTxdParent(uiNewTxdId);
+        if (bParentAvailable)
+            CTxdStore_SetupTxdParent(uiNewTxdId);
 
         if (IsStreamingInfoSlot(static_cast<unsigned short>(uiNewTxdId)))
             SetStreamingInfoLoaded(static_cast<unsigned short>(uiNewTxdId));
@@ -2578,6 +2588,8 @@ namespace
 
         UpdateIsolatedTxdLastUse(usModelId);
 
+        if (!bParentAvailable)
+            AddPendingIsolatedModel(usModelId);
         return true;
     }
 
@@ -2729,8 +2741,14 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
                 pModelInfo->SetTextureDictionaryID(parentTxdId);
 
-            // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
-            if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
+            // If model still using a fully set-up isolated TXD, don't orphan it yet.
+            // Deferred vanilla slots (GetParentID()==0 with usParentIndex==0xFFFF) never had a
+            // functioning parent chain; clear them regardless of whether the child TXD is live.
+            const auto* pTimeoutChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
+            const bool  bIsIncompleteVanillaSlot =
+                pModelInfo->GetParentID() == 0 && pTimeoutChildSlot &&
+                pTimeoutChildSlot->usParentIndex == static_cast<unsigned short>(-1);
+            if (!bIsIncompleteVanillaSlot && pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
                 continue;
 
             ClearIsolatedTxdLastUse(usModelId);
@@ -2749,6 +2767,108 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
         const unsigned int uiCurrentParentId = pModelInfo->GetParentID();
         if (uiCurrentParentId == 0)
         {
+            // GetParentID()==0: vanilla model owns its TXD directly (no clone parent).
+            // AllocateIsolatedTxdForVanillaModel stores usParentIndex=0xFFFF when the parent
+            // TXD is not yet loaded; detect that state and complete setup here once it arrives.
+            auto* pChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
+            const bool bIsDeferredVanillaSetup =
+                pChildSlot && pChildSlot->rwTexDictonary &&
+                pChildSlot->usParentIndex == static_cast<unsigned short>(-1) &&
+                pModelInfo->GetTextureDictionaryID() == childTxdId;
+
+            if (bIsDeferredVanillaSetup)
+            {
+                // Unlike clone models there is no pCurrentParentInfo to nudge through;
+                // request the TXD streaming entry directly each tick so the streaming
+                // system doesn't de-prioritise it before it arrives.
+                RwTexDictionary* pParentTxd = CTxdStore_GetTxd(parentTxdId);
+                if (pParentTxd == nullptr)
+                {
+                    if (pGame->GetStreaming())
+                    {
+                        const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
+                        if (iBaseIDforTXD > 0)
+                        {
+                            const unsigned int uiTxdStreamId = parentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                            pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                        }
+                    }
+                    continue;
+                }
+
+                // Complete parent-chain setup matching the clone-model deferred path:
+                // wire usParentIndex, merge textures, rebind materials, apply vehicle fallback.
+                g_IsolatedModelByTxd[childTxdId] = usModelId;
+
+                pChildSlot->usParentIndex = parentTxdId;
+                CTxdStore_SetupTxdParent(childTxdId);
+
+                if (pModelInfo->GetTextureDictionaryID() != childTxdId)
+                    pModelInfo->SetTextureDictionaryID(childTxdId);
+
+                RwTexDictionary* pChildTxd = CTxdStore_GetTxd(childTxdId);
+                TxdTextureMap    txdTextureMap;
+                if (pParentTxd)
+                    MergeCachedTxdTextureMap(parentTxdId, pParentTxd, txdTextureMap);
+                if (pChildTxd)
+                    MergeCachedTxdTextureMap(childTxdId, pChildTxd, txdTextureMap);
+
+                bool bNeedVehicleFallback = TxdChainContainsVehicleTxd(parentTxdId);
+                if (!bNeedVehicleFallback && pModelInfo)
+                {
+                    if (pModelInfo->IsVehicle() || pModelInfo->IsUpgrade())
+                        bNeedVehicleFallback = true;
+                }
+
+                if (bNeedVehicleFallback)
+                    AddVehicleTxdFallback(txdTextureMap);
+
+                if (pModelInfo->IsAllocatedInArchive())
+                {
+                    RwObject* pRwObject = pModelInfo->GetRwObject();
+                    if (pRwObject)
+                    {
+                        eModelInfoType modelType = pModelInfo->GetModelType();
+                        if (modelType == eModelInfoType::UNKNOWN)
+                        {
+                            if (pRwObject->type == RP_TYPE_ATOMIC)
+                                modelType = eModelInfoType::ATOMIC;
+                            else if (pRwObject->type == RP_TYPE_CLUMP)
+                                modelType = eModelInfoType::CLUMP;
+                        }
+
+                        switch (modelType)
+                        {
+                            case eModelInfoType::PED:
+                            case eModelInfoType::WEAPON:
+                            case eModelInfoType::VEHICLE:
+                            case eModelInfoType::CLUMP:
+                            {
+                                std::vector<RpAtomic*> atomicList;
+                                CRenderWareSA::GetClumpAtomicList(reinterpret_cast<RpClump*>(pRwObject), atomicList);
+                                for (RpAtomic* pAtomic : atomicList)
+                                    RebindAtomicMaterialsFromMap(pAtomic, txdTextureMap);
+                                break;
+                            }
+                            case eModelInfoType::ATOMIC:
+                            case eModelInfoType::LOD_ATOMIC:
+                            case eModelInfoType::TIME:
+                            {
+                                RebindAtomicMaterialsFromMap(reinterpret_cast<RpAtomic*>(pRwObject), txdTextureMap);
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                UpdateIsolatedTxdLastUse(usModelId);
+                ClearPendingIsolatedModel(usModelId);
+                continue;
+            }
+
+            // Not a deferred vanilla setup; stale entry, clear it.
             // Try to revert model TXD if parent is valid
             if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
                 pModelInfo->SetTextureDictionaryID(parentTxdId);
