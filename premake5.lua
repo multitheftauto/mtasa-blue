@@ -122,7 +122,7 @@ workspace "MTASA"
 		symbolspath "$(SolutionDir)Symbols\\$(Configuration)_$(Platform)\\$(ProjectName).pdb"
 
 	filter "system:windows"
-		toolset "v145"
+		toolset "v143"
 		preferredtoolarchitecture "x86_64"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
