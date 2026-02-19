@@ -1063,9 +1063,8 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
-    // GetInterface() validates via reads only; stale pointers in read-only
-    // pages pass that check but crash on write
-    if (!IsWritableModelInfoPtr(m_pInterface))
+    // This check should be sufficient - dont consider using IsWritableModelInfoPtr here in the future without good reason
+    if (m_pInterface != ppModelInfo[m_dwModelID])
     {
         m_pInterface = nullptr;
         return;
