@@ -6640,7 +6640,7 @@ void HideEntitySomehow()
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
         {
             // Add the LOD to the list
-            pBuildingRemoval->AddBinaryBuilding(pInterface);
+            pBuildingRemoval->AddBinaryBuilding(pInterface, pInterface->m_iplIndex);
             // Remove the model from the world
             pGameInterface->GetWorld()->Remove(pInterface, BuildingRemoval);
             // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
@@ -6759,13 +6759,13 @@ void RemoveObjectIfNeeded()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
         if (!pLODInterface->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pLODInterface);
+            pBuildingRemoval->AddDataBuilding(pLODInterface, pLODInterface->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
         }
     }
@@ -6852,7 +6852,7 @@ void RemoveDummyIfReplaced()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);
         }
     }

@@ -151,7 +151,7 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
                             if (!pInterface->IsPlaceableVTBL())
                             {
                                 // Add the Data Building to the list
-                                pRemoval->AddDataBuilding(pInterface);
+                                pRemoval->AddDataBuilding(pInterface, pInterface->m_iplIndex);
                                 // Remove the model from the world
                                 pGame->GetWorld()->Remove(pInterface, BuildingRemoval2);
                                 m_pRemovedEntities[(DWORD)pInterface] = true;
@@ -210,7 +210,7 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
                             if (!pInterface->IsPlaceableVTBL())
                             {
                                 // Add the Data Building to the list
-                                pRemoval->AddBinaryBuilding(pInterface);
+                                pRemoval->AddBinaryBuilding(pInterface, pInterface->m_iplIndex);
                                 // Remove the model from the world
                                 pGame->GetWorld()->Remove(pInterface, BuildingRemoval2);
                                 m_pRemovedEntities[(DWORD)pInterface] = true;
@@ -262,15 +262,15 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
             if (fDistance <= pFind->m_fRadius && (cInterior == -1 || pFind->m_cInterior == cInterior))
             {
                 // Init some variables
-                CEntitySAInterface*                            pEntity = NULL;
-                std::list<CEntitySAInterface*>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
+                CEntitySAInterface*                       pEntity = NULL;
+                std::list<SRemovedEntity>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
                 if (pFind->m_pBinaryRemoveList->empty() == false)
                 {
                     // Loop through the Binary object list
                     for (; entityIter != pFind->m_pBinaryRemoveList->end();)
                     {
                         // Grab the pEntity
-                        pEntity = (*entityIter);
+                        pEntity = entityIter->m_pInterface;
                         // if it's valid re-add it to the world.
                         if (pEntity != NULL)
                         {
@@ -316,7 +316,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                     for (; entityIter != pFind->m_pDataRemoveList->end();)
                     {
                         // Grab the pEntity
-                        pEntity = (*entityIter);
+                        pEntity = entityIter->m_pInterface;
                         // if it's valid re-add it to the world.
                         if (pEntity != NULL)
                         {
@@ -547,15 +547,15 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
         if (pFind)
         {
             // Init some variables
-            CEntitySAInterface*                            pEntity = NULL;
-            std::list<CEntitySAInterface*>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
+            CEntitySAInterface*                       pEntity = NULL;
+            std::list<SRemovedEntity>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
             if (pFind->m_pBinaryRemoveList->empty() == false)
             {
                 // Loop through the Binary remove list
                 for (; entityIter != pFind->m_pBinaryRemoveList->end(); ++entityIter)
                 {
                     // Grab the pEntity
-                    pEntity = (*entityIter);
+                    pEntity = entityIter->m_pInterface;
                     // if it's valid re-add it to the world.
                     if (pEntity && pEntity != NULL)
                     {
@@ -592,7 +592,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                 for (; entityIter != pFind->m_pDataRemoveList->end(); ++entityIter)
                 {
                     // Grab the pEntity
-                    pEntity = (*entityIter);
+                    pEntity = entityIter->m_pInterface;
                     // if it's valid re-add it to the world.
                     if (pEntity && pEntity != NULL)
                     {
@@ -765,11 +765,11 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
             if (pFind->m_pBinaryRemoveList->empty() == false)
             {
                 // grab the beginning
-                std::list<CEntitySAInterface*>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
+                std::list<SRemovedEntity>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
                 // Loop through the binary remove list
                 for (; entityIter != pFind->m_pBinaryRemoveList->end();)
                 {
-                    pEntity = (*entityIter);
+                    pEntity = entityIter->m_pInterface;
                     // is the pointer the same as the one being deleted
                     if ((DWORD)pEntity == (DWORD)pInterface)
                     {
@@ -782,12 +782,12 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
             }
             if (pFind->m_pDataRemoveList->empty() == false)
             {
-                std::list<CEntitySAInterface*>::const_iterator entityIter = pFind->m_pDataRemoveList->begin();
+                std::list<SRemovedEntity>::const_iterator entityIter = pFind->m_pDataRemoveList->begin();
                 // Loop through the Data list
                 for (; entityIter != pFind->m_pDataRemoveList->end();)
                 {
                     // Grab the pEntity
-                    pEntity = (*entityIter);
+                    pEntity = entityIter->m_pInterface;
                     // is the pointer the same as the one being deleted
                     if ((DWORD)pEntity == (DWORD)pInterface)
                     {
@@ -891,8 +891,16 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
 
         for (auto it = pRemoval->m_pBinaryRemoveList->begin(); it != pRemoval->m_pBinaryRemoveList->end();)
         {
-            CEntitySAInterface* pEntity = *it;
+            CEntitySAInterface* pEntity = it->m_pInterface;
             if (!pEntity)
+            {
+                ++it;
+                continue;
+            }
+
+            // m_iplIndex was cached when the entity was first tracked.
+            // Skip pool-slot and model checks for entries from a different IPL.
+            if (canMatchByIpl && it->m_iplIndex != iplIndex)
             {
                 ++it;
                 continue;
@@ -919,8 +927,15 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
 
         for (auto it = pRemoval->m_pDataRemoveList->begin(); it != pRemoval->m_pDataRemoveList->end();)
         {
-            CEntitySAInterface* pEntity = *it;
+            CEntitySAInterface* pEntity = it->m_pInterface;
             if (!pEntity)
+            {
+                ++it;
+                continue;
+            }
+
+            // Same m_iplIndex early-out as the binary list loop above.
+            if (canMatchByIpl && it->m_iplIndex != iplIndex)
             {
                 ++it;
                 continue;
