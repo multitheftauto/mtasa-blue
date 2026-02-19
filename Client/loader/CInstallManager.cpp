@@ -1183,11 +1183,7 @@ SString CInstallManager::_PrepareLaunchLocation()
     }
 
     // Copy MTA dependencies to our launch directory.
-#ifdef MTA_MAETRO
-    for (const char* fileName : {LOADER_PROXY_DLL_NAME, MAETRO32_DLL_NAME})
-#else
     for (const char* fileName : {LOADER_PROXY_DLL_NAME})
-#endif
     {
         const fs::path sourcePath = mtaDir / fileName;
         const fs::path targetPath = launchDir / fileName;

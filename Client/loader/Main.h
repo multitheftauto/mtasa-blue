@@ -25,17 +25,10 @@
     #define CHECK_DM_LUA_NAME     "mods\\deathmatch\\lua5.1c_d.dll"
     #define CHECK_DM_CLIENT_NAME  "mods\\deathmatch\\Client_d.dll"
     #define LOADER_PROXY_DLL_NAME "mtasa_d.dll"
-    #define MAETRO32_DLL_NAME     "maetro32_d.dll"
 #else
     #define MTA_EXE_NAME          "Multi Theft Auto.exe"
     #define MTA_DLL_NAME          "core.dll"
     #define CHECK_DM_LUA_NAME     "mods\\deathmatch\\lua5.1c.dll"
     #define CHECK_DM_CLIENT_NAME  "mods\\deathmatch\\Client.dll"
     #define LOADER_PROXY_DLL_NAME "mtasa.dll"
-    #define MAETRO32_DLL_NAME     "maetro32.dll"
-#endif
-
-#ifndef MTA_MAETRO
-    #undef MAETRO32_DLL_NAME
-    #define MAETRO32_DLL_NAME __COMPILE_ERROR_YOU_ARE_NOT_SUPPOSED_TO_USE_THIS__
 #endif
