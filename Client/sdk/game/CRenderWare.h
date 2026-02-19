@@ -97,7 +97,7 @@ public:
     virtual bool HasClothesReplacementChanged() = 0;
     virtual bool ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) = 0;
     virtual bool ClothesRemoveFile(char* fileData) = 0;
-    virtual bool HasClothesFile(const char* fileName) const noexcept = 0;
+    virtual bool HasClothesFile(const char* fileName) const = 0;
     virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
     virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
     virtual CColModel*       ReadCOL(const SString& buffer) = 0;
