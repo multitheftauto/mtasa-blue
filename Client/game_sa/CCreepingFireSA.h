@@ -17,7 +17,7 @@
 class CCreepingFireSA
 {
 public:
-    static bool TryToStartFireAtCoors(CVector position, std::uint8_t numGenerationsAllowed, float zDistance);
+    static bool TryToStartFireAtCoors(CVector position, std::uint8_t numGenerationsAllowed, int unused_1, bool unused_2, float zDistance);
     static void Update();
 
     static void StaticSetHooks();
