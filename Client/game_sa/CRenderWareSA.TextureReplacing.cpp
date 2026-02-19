@@ -1225,6 +1225,26 @@ namespace
 
         if (usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
         {
+            // Unlink from SA's loaded-entry list before zeroing the link fields.
+            // Neighbors still reference this slot
+            if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+            {
+                const std::uint16_t     prev = pStreamInfo->prevId;
+                const std::uint16_t     next = pStreamInfo->nextId;
+                constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
+
+                if (prev != kInvalidLink && next != kInvalidLink && pGame->GetStreaming())
+                {
+                    CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
+                    CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+                    if (pPrev && pNext)
+                    {
+                        pPrev->nextId = next;
+                        pNext->prevId = prev;
+                    }
+                }
+            }
+
             pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
@@ -2982,6 +3002,9 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             std::vector<std::pair<SReplacementTextures*, std::vector<unsigned short>>> replacementsToReapply;
             std::vector<SReplacementTextures*>                                         originalUsed;
 
+            // Computed before the collection loop; that loop erases from usedInModelIds,
+            // so checking afterward would give false even when a fallback is needed.
+            bool bNeedVehicleFallback = false;
             for (SReplacementTextures* pReplacement : info.usedByReplacements)
             {
                 if (pReplacement)
@@ -2995,7 +3018,11 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     if (!pCachedModInfo || !pCachedModInfo->GetRwObject())
                         continue;
                     if (pCachedModInfo->GetTextureDictionaryID() == usTxdId)
+                    {
                         modelIds.push_back(modelId);
+                        if (!bNeedVehicleFallback && ShouldUseVehicleTxdFallback(modelId))
+                            bNeedVehicleFallback = true;
+                    }
                 }
                 if (!pReplacement->textures.empty() && !modelIds.empty())
                     replacementsToReapply.emplace_back(pReplacement, std::move(modelIds));
@@ -3069,46 +3096,6 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 }
             }
 
-            bool bNeedVehicleFallback = false;
-            if (!info.usedByReplacements.empty())
-            {
-                if (info.usedByReplacements.size() == 1)
-                {
-                    SReplacementTextures* pRepl = info.usedByReplacements.front();
-                    if (pRepl)
-                    {
-                        for (unsigned short modelIdForCheck : pRepl->usedInModelIds)
-                        {
-                            if (ShouldUseVehicleTxdFallback(modelIdForCheck))
-                            {
-                                bNeedVehicleFallback = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    std::unordered_set<unsigned short> checkedVehicleFallback;
-                    for (SReplacementTextures* pRepl : info.usedByReplacements)
-                    {
-                        if (!pRepl)
-                            continue;
-                        for (unsigned short modelIdForCheck : pRepl->usedInModelIds)
-                        {
-                            if (!checkedVehicleFallback.insert(modelIdForCheck).second)
-                                continue;
-                            if (ShouldUseVehicleTxdFallback(modelIdForCheck))
-                            {
-                                bNeedVehicleFallback = true;
-                                break;
-                            }
-                        }
-                        if (bNeedVehicleFallback)
-                            break;
-                    }
-                }
-            }
             if (bNeedVehicleFallback)
                 AddVehicleTxdFallback(parentTxdMap);
 
@@ -3773,30 +3760,13 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
             }
             else if (itPrevIsolated == g_IsolatedTxdByModel.end())
             {
-                auto itExisting = ms_ModelTexturesInfoMap.find(usCurrentTxdId);
-                if (itExisting != ms_ModelTexturesInfoMap.end())
+                // Always isolate on first injection. Injecting into the shared TXD means any
+                // model later isolated into a child TXD inherits our textures via the RW parent
+                // chain, causing texture mixing. Pre-emptive isolation keeps the shared TXD clean.
+                if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
                 {
-                    bool bHasOtherModelReplacements = false;
-                    for (const SReplacementTextures* pExisting : itExisting->second.usedByReplacements)
-                    {
-                        // Conflict: another CClientTXD already injected textures into this TXD for other models
-                        if (pExisting != pReplacementTextures && pExisting->usedInTxdIds.count(usCurrentTxdId) > 0 &&
-                            pExisting->usedInModelIds.count(usModelId) == 0)
-                        {
-                            bHasOtherModelReplacements = true;
-                            break;
-                        }
-                    }
-
-                    if (bHasOtherModelReplacements)
-                    {
-                        if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
-                        {
-                            // Isolation failed - fall through to shared TXD injection instead.
-                            // May cause texture mixing, but avoids permanent white textures.
-                            AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (conflict), using shared TXD", usModelId));
-                        }
-                    }
+                    // Pool exhausted; fall through to shared TXD injection as a last resort.
+                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u, using shared TXD", usModelId));
                 }
             }
             else
@@ -5885,6 +5855,16 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         }
         if (bLeakedMastersInserted)
             InvalidateGlobalMtaRasterCache();
+    }
+
+    // TXD-only removals skip CleanupIsolatedTxdForModel since it only runs from
+    // CClientDFF::UnreplaceModel. Without this, usTextureDictionary stays pointing at
+    // the now-empty isolated slot and the pool entry is never released.
+    for (unsigned short usTxdId : cleanedTxdIds)
+    {
+        auto itOwner = g_IsolatedModelByTxd.find(usTxdId);
+        if (itOwner != g_IsolatedModelByTxd.end())
+            CleanupIsolatedTxdForModel(itOwner->second);
     }
 
     // Invalidate caches for all TXDs that were modified
