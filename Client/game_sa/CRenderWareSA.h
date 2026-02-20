@@ -44,7 +44,7 @@ public:
     bool HasClothesReplacementChanged();
     bool ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) override;
     bool ClothesRemoveFile(char* fileData) override;
-    bool HasClothesFile(const char* fileName) const noexcept override;
+    bool HasClothesFile(const char* fileName) const override;
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);

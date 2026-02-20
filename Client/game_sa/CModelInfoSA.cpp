@@ -671,6 +671,23 @@ bool CModelInfoSA::DoIsLoaded()
                 CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
                 if (pStreamInfo)
                 {
+                    // Unlink from SA's loaded-entry list before zeroing the link fields to avoid linked list corruptin
+                    if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+                    {
+                        constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
+                        const unsigned short     prev = pStreamInfo->prevId;
+                        const unsigned short     next = pStreamInfo->nextId;
+                        if (prev != kInvalid && next != kInvalid)
+                        {
+                            CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
+                            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+                            if (pPrev && pNext)
+                            {
+                                pPrev->nextId = next;
+                                pNext->prevId = prev;
+                            }
+                        }
+                    }
                     pStreamInfo->prevId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
@@ -1063,9 +1080,8 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
-    // GetInterface() validates via reads only; stale pointers in read-only
-    // pages pass that check but crash on write
-    if (!IsWritableModelInfoPtr(m_pInterface))
+    // This check should be sufficient - dont consider using IsWritableModelInfoPtr here in the future without good reason
+    if (m_pInterface != ppModelInfo[m_dwModelID])
     {
         m_pInterface = nullptr;
         return;
