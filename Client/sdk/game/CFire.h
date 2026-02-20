@@ -36,4 +36,6 @@ public:
     // Created by lua script - createFire
     virtual void SetCreatedByScript(bool createdByScript) noexcept = 0;
     virtual bool IsCreatedByScript() const noexcept = 0;
+
+    virtual void SetCreator(CEntity* creator) = 0;
 };

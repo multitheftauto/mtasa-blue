@@ -50,6 +50,7 @@ public:
 class CFireSA : public CFire
 {
     friend class CFireManagerSA;
+    friend class CCreepingFireSA;
 
 public:
     CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true);
@@ -100,7 +101,7 @@ private:
 
 private:
     CEntitySAInterface* GetCreator() const noexcept { return m_interface.m_creator; }
-    void                SetCreator(CEntity* entity);
+    void                SetCreator(CEntity* entity) override;
 
     CEntitySAInterface* GetEntityOnFire() const noexcept { return m_interface.m_entityOnFire; }
     void                SetEntityOnFire(CEntity* entity);

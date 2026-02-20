@@ -375,7 +375,7 @@ void CFireSA::ProcessFire()
         CVector newPos = firePosition + direction * GetRandomNumberInRange(2.0f, 2.1f); // default: 2-2.003
         newPos.fZ = firePosition.fZ + 2.0f;
 
-        CCreepingFireSA::TryToStartFireAtCoors(newPos, numGens - 1, 10.0f);
+        CCreepingFireSA::TryToStartFireAtCoors(newPos, numGens - 1, m_creator ? m_creator->GetInterface() : nullptr, false, 10.0f);
     }
 
     if (GetStrength() <= 2.0f && numGens > 0 && rand() % 16 == 0)
