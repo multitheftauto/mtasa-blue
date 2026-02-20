@@ -250,8 +250,8 @@ static DWORD RunDebuggerLoop(HANDLE hProcess, DWORD processId, DebuggerCrashCapt
                                 // These are deliberate security fastfails.
                                 if (!IsNetcModule(capture.moduleInfo.moduleName))
                                 {
-                                    WriteFailFastDump(hProcess, processId, debugEvent.dwThreadId, &debugEvent.u.Exception.ExceptionRecord, &capture.threadContext,
-                                                      capture);
+                                    WriteFailFastDump(hProcess, processId, debugEvent.dwThreadId, &debugEvent.u.Exception.ExceptionRecord,
+                                                      &capture.threadContext, capture);
                                 }
                                 else
                                 {
@@ -2101,8 +2101,7 @@ int LaunchGame(SString strCmdLine)
                                    "MTA: San Andreas has been terminated due to an integrity violation.\n\n"
                                    "Make sure that no external program is modifying the game. Note that some unreliable "
                                    "AV's (such as Bitdefender) are known to interfere in a way that can lead to this problem.",
-                                   "MTA: San Andreas",
-                                   MB_OK | MB_ICONWARNING | MB_TOPMOST);
+                                   "MTA: San Andreas", MB_OK | MB_ICONWARNING | MB_TOPMOST);
                 }
                 else
                 {
@@ -2129,8 +2128,8 @@ int LaunchGame(SString strCmdLine)
                 if (werInfo.found && IsFailFastException(werInfo.exceptionCode) && IsNetcModule(werInfo.moduleName))
                 {
                     isAcDefense = true;
-                    AddReportLog(7210, SString("Loader - AC integrity exit detected via WER (module=%s code=0x%08X)",
-                                               werInfo.moduleName.c_str(), static_cast<unsigned int>(werInfo.exceptionCode)));
+                    AddReportLog(7210, SString("Loader - AC integrity exit detected via WER (module=%s code=0x%08X)", werInfo.moduleName.c_str(),
+                                               static_cast<unsigned int>(werInfo.exceptionCode)));
                     // Mark WER report as handled so _CheckForWerCrash does not reprocess it on next launch
                     if (!werInfo.reportId.empty())
                         SetApplicationSetting("diagnostics", "last-wer-report-shown", werInfo.reportId);
@@ -2138,8 +2137,7 @@ int LaunchGame(SString strCmdLine)
                                    "MTA: San Andreas has been terminated due to an AC integrity violation.\n\n"
                                    "Make sure that no external program is modifying the game. Note that some unreliable "
                                    "AV's (such as Bitdefender) are known to interfere in a way that can lead to this problem.",
-                                   "MTA: San Andreas",
-                                   MB_OK | MB_ICONWARNING | MB_TOPMOST);
+                                   "MTA: San Andreas", MB_OK | MB_ICONWARNING | MB_TOPMOST);
                 }
                 else if (werInfo.found)
                 {
