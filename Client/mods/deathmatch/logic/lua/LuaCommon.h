@@ -28,6 +28,7 @@ class CClientColShape;
 class CScriptFile;
 class CClientDFF;
 class CClientEntity;
+class CClientFire;
 class CClientGUIElement;
 class CClientMarker;
 class CClientObject;

@@ -100,6 +100,9 @@ public:
     CTxdPool&               GetTxdPool() noexcept { return m_TxdPool; };
     CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept override { return m_PtrNodeSingleLinkPool; };
 
+    void GetVehiclesPool(void* pool) noexcept override { *reinterpret_cast<SPoolData<CVehicleSA, CVehicleSAInterface, MAX_VEHICLES>*>(pool) = m_vehiclePool; }
+    void GetObjectsPool(void* pool) noexcept override { *reinterpret_cast<SPoolData<CObjectSA, CObjectSAInterface, MAX_OBJECTS>*>(pool) = m_objectPool; }
+
 private:
     // Pools
     SPoolData<CVehicleSA, CVehicleSAInterface, MAX_VEHICLES> m_vehiclePool;

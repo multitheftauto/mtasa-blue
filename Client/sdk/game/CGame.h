@@ -172,6 +172,8 @@ public:
     virtual float       GetFPS() = 0;
     virtual float       GetTimeStep() = 0;
     virtual float       GetOldTimeStep() = 0;
+    virtual float       GetTimeStepInSeconds() = 0;
+    virtual float       GetTimeStepInMS() = 0;
     virtual float       GetTimeScale() = 0;
 
     virtual void Initialize() = 0;

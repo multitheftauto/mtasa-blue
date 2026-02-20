@@ -16,6 +16,6 @@ class CLuaFireDefs : public CLuaDefs
 public:
     static void LoadFunctions();
 
-    LUA_DECLARE(CreateFire);
-    LUA_DECLARE(ExtinguishFire);
+    static CClientFire* CreateFire(CVector position, float size, std::optional<std::uint32_t> lifetime, std::optional<bool> makeNoise);
+    static bool ExtinguishFire(std::optional<CVector> position, std::optional<float> radius);
 };

@@ -133,7 +133,8 @@ public:
     CObjectSA(DWORD dwModel, bool bBreakingDisabled);
     ~CObjectSA();
 
-    CObjectSAInterface* GetObjectInterface() { return (CObjectSAInterface*)GetInterface(); }
+    CObjectSAInterface* GetObjectInterface() { return static_cast<CObjectSAInterface*>(GetInterface()); }
+    CObjectSAInterface* GetObjectInterface() const { return reinterpret_cast<CObjectSAInterface*>(GetInterface()); }
 
     void  Explode();
     void  Break();
@@ -153,7 +154,7 @@ public:
     CVector* GetScale();
     void     ResetScale();
 
-    bool IsOnFire() override { return GetObjectInterface()->pFire != nullptr; }
+    bool IsOnFire() const override { return GetObjectInterface()->pFire != nullptr; }
     bool SetOnFire(bool onFire) override;
 
 private:

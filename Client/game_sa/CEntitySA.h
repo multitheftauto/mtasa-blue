@@ -212,6 +212,18 @@ public:
         ((CEntity_ResolveReferences)0x571A40)(this);
     };
 
+    void CleanUpOldReference(CEntitySAInterface** entity)
+    {
+        if (entity)
+            ((void(__thiscall*)(CEntitySAInterface*, CEntitySAInterface**))0x571A00)(this, entity);
+    }
+
+    void RegisterReference(CEntitySAInterface** entity)
+    {
+        if (entity)
+            ((void(__thiscall*)(CEntitySAInterface*, CEntitySAInterface**))0x571B70)(this, entity);
+    }
+
     void RemoveShadows()
     {
         using CStencilShadow_dtorByOwner = void*(__cdecl*)(CEntitySAInterface * pEntity);
@@ -314,8 +326,10 @@ public:
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
 
-    bool IsOnFire() override { return false; }
+    bool IsOnFire() const override { return false; }
     bool SetOnFire(bool onFire) override { return false; }
+
+    bool IsFireProof() const override;
 
     // CEntitySA interface
     virtual void OnChangingPosition(const CVector& vecNewPosition) {}

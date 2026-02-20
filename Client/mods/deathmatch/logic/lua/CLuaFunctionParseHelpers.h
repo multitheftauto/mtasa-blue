@@ -350,6 +350,10 @@ inline SString GetClassTypeName(CClientPointLights*)
 {
     return "light";
 }
+inline SString GetClassTypeName(CClientFire*)
+{
+    return "fire";
+}
 
 inline SString GetClassTypeName(CGUIButton*)
 {
