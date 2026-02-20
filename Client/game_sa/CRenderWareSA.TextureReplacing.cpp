@@ -2431,8 +2431,7 @@ namespace
                 auto*                slot = pTxdPoolSA->GetTextureDictonarySlot(existingTxdId);
                 // Also accept usParentIndex==0xFFFF: the slot was created with the same parent
                 // but the parent TXD wasn't loaded yet, so parent-chain setup is still pending.
-                if (slot && slot->rwTexDictonary &&
-                    (slot->usParentIndex == usParentTxdId || slot->usParentIndex == static_cast<unsigned short>(-1)))
+                if (slot && slot->rwTexDictonary && (slot->usParentIndex == usParentTxdId || slot->usParentIndex == static_cast<unsigned short>(-1)))
                 {
                     g_IsolatedModelByTxd[existingTxdId] = usModelId;
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
@@ -2746,8 +2745,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             // functioning parent chain; clear them regardless of whether the child TXD is live.
             const auto* pTimeoutChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
             const bool  bIsIncompleteVanillaSlot =
-                pModelInfo->GetParentID() == 0 && pTimeoutChildSlot &&
-                pTimeoutChildSlot->usParentIndex == static_cast<unsigned short>(-1);
+                pModelInfo->GetParentID() == 0 && pTimeoutChildSlot && pTimeoutChildSlot->usParentIndex == static_cast<unsigned short>(-1);
             if (!bIsIncompleteVanillaSlot && pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(childTxdId) != nullptr)
                 continue;
 
@@ -2770,11 +2768,9 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             // GetParentID()==0: vanilla model owns its TXD directly (no clone parent).
             // AllocateIsolatedTxdForVanillaModel stores usParentIndex=0xFFFF when the parent
             // TXD is not yet loaded; detect that state and complete setup here once it arrives.
-            auto* pChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
-            const bool bIsDeferredVanillaSetup =
-                pChildSlot && pChildSlot->rwTexDictonary &&
-                pChildSlot->usParentIndex == static_cast<unsigned short>(-1) &&
-                pModelInfo->GetTextureDictionaryID() == childTxdId;
+            auto*      pChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
+            const bool bIsDeferredVanillaSetup = pChildSlot && pChildSlot->rwTexDictonary && pChildSlot->usParentIndex == static_cast<unsigned short>(-1) &&
+                                                 pModelInfo->GetTextureDictionaryID() == childTxdId;
 
             if (bIsDeferredVanillaSetup)
             {
