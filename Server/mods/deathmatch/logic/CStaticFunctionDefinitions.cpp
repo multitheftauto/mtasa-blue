@@ -4320,6 +4320,10 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                     pPed->SetOccupiedVehicle(pVehicle, uiSeat);
                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
+                    // Remove jetpack if he has one
+                    if (pPed->IsPlayer() && pPed->HasJetPack())
+                        pPed->SetHasJetPack(false);
+
                     // If he's the driver, switch on the engine
                     if (uiSeat == 0 && g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART))
                         pVehicle->SetEngineOn(true);
