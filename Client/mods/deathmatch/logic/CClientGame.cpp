@@ -7115,6 +7115,10 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
     GetManager()->GetWaterManager()->SetWaveLevel(0.0f);
 
+    // Underwater effects
+    g_pMultiplayer->ResetUnderwaterDarkness();
+    g_pMultiplayer->ResetUnderwaterEffect();
+
     // Reset volumetric shadows
     g_pGame->GetSettings()->ResetVolumetricShadows();
 
