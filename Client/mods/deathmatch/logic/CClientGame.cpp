@@ -2761,7 +2761,7 @@ void CClientGame::AddBuiltInEvents()
 
     // Console events
     m_Events.AddEvent("onClientConsole", "text", NULL, false);
-    m_Events.AddEvent("onClientCoreCommand", "command", NULL, false);
+    m_Events.AddEvent("onClientCoreCommand", "command, arguments", NULL, false);
 
     // Chat events
     m_Events.AddEvent("onClientChatMessage", "text, r, g, b, messageType", NULL, false);
