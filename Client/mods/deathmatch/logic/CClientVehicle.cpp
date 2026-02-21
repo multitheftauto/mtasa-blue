@@ -4157,8 +4157,7 @@ void CClientVehicle::SetPedOccupyingVehicle(CClientPed* pClientPed, CClientVehic
 
     // Ped vars
     pClientPed->m_pOccupyingVehicle = pVehicle;
-    //  if ( uiSeat >= 0 && uiSeat < 8 )
-    //      pClientPed->m_uiOccupyingSeat = uiSeat;
+    pClientPed->m_uiOccupyingSeat = uiSeat;
 
     if (ucDoor != 0xFF)
         pVehicle->AllowDoorRatioSetting(ucDoor, false);
@@ -4284,7 +4283,7 @@ void CClientVehicle::UnpairPedAndVehicle(CClientPed* pClientPed, CClientVehicle*
     {
         INFO(("UnpairPedAndVehicle: pClientPed:%s from m_pOccupyingVehicle:0x%08x", GetPlayerName(pClientPed).c_str(), pVehicle));
         pClientPed->m_pOccupyingVehicle = NULL;
-        // pClientPed->m_uiOccupyingSeat = 0xFF;
+        pClientPed->m_uiOccupyingSeat = NULL;
     }
 }
 

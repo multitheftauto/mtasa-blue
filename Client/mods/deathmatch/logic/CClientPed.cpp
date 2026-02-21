@@ -127,7 +127,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_pTaskManager = NULL;
     m_pOccupiedVehicle = NULL;
     m_pOccupyingVehicle = NULL;
-    // m_uiOccupyingSeat = 0;
+    m_uiOccupyingSeat = 0;
     m_uiOccupiedVehicleSeat = 0xFF;
     m_bHealthLocked = false;
     m_bDontChangeRadio = false;
@@ -1464,7 +1464,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     CClientVehicle* pPrevVehicle = GetRealOccupiedVehicle();
     // Eventually remove us from a previous vehicle
     RemoveFromVehicle();
-    // m_uiOccupyingSeat = uiSeat;
+    m_uiOccupyingSeat = uiSeat;
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
     m_ucLeavingDoor = 0xFF;
@@ -7280,4 +7280,16 @@ void CClientPed::RunSwimTask() const
     m_pPlayerPed->SetInWaterFlags(true);
 
     inWaterTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP, true);
+}
+
+bool CClientPed::IsEnteringToVehicle()
+{
+    int inOutState = GetVehicleInOutState();
+    return inOutState == VEHICLE_INOUT_GETTING_IN || inOutState == VEHICLE_INOUT_JACKING;
+}
+
+bool CClientPed::IsExitingFromVehicle()
+{
+    int inOutState = GetVehicleInOutState();
+    return inOutState == VEHICLE_INOUT_GETTING_OUT || inOutState == VEHICLE_INOUT_GETTING_JACKED;
 }

@@ -254,6 +254,8 @@ public:
     CClientVehicle*       GetOccupyingVehicle() noexcept { return m_pOccupyingVehicle; };
     const CClientVehicle* GetOccupyingVehicle() const noexcept { return m_pOccupyingVehicle; };
 
+    unsigned int GetOccupyingVehicleSeat() const noexcept { return m_uiOccupyingSeat; };
+
     CClientVehicle* GetRealOccupiedVehicle();
     CClientVehicle* GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL,
@@ -266,6 +268,9 @@ public:
 
     void            WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0);
     CClientVehicle* RemoveFromVehicle(bool bIgnoreIfGettingOut = false);
+
+    bool IsEnteringToVehicle();
+    bool IsExitingFromVehicle();
 
     bool IsVisible();
     void SetVisible(bool bVisible);
@@ -640,16 +645,16 @@ public:
     unsigned long               m_ulLastOnScreenTime;
     CClientVehiclePtr           m_pOccupiedVehicle;
     CClientVehiclePtr           m_pOccupyingVehicle;
-    // unsigned int                m_uiOccupyingSeat;
-    unsigned int      m_uiOccupiedVehicleSeat;
-    bool              m_bForceGettingIn;
-    bool              m_bForceGettingOut;
-    CShotSyncData*    m_shotSyncData;
-    CStatsData*       m_stats;
-    CControllerState* m_currentControllerState;
-    CControllerState* m_lastControllerState;
-    CControllerState  m_rawControllerState;  // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to
-                                             // prevent stuff like rapid input glitch)
+    unsigned int                m_uiOccupyingSeat;
+    unsigned int                m_uiOccupiedVehicleSeat;
+    bool                        m_bForceGettingIn;
+    bool                        m_bForceGettingOut;
+    CShotSyncData*              m_shotSyncData;
+    CStatsData*                 m_stats;
+    CControllerState*           m_currentControllerState;
+    CControllerState*           m_lastControllerState;
+    CControllerState m_rawControllerState;  // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to
+                                            // prevent stuff like rapid input glitch)
     CRemoteDataStorage*                      m_remoteDataStorage;
     unsigned long                            m_ulLastTimeFired;
     unsigned long                            m_ulLastTimeBeganAiming;
