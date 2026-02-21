@@ -556,6 +556,13 @@ CClientGame::~CClientGame()
         discord->UpdatePresence();
     }
 
+    // Reset map related stuff
+    if (m_pPlayerMap)
+    {
+        m_pPlayerMap->ResetCustomMapImage();
+        m_pPlayerMap->ResetMapOpacity();
+    }
+
     // Destruction order matters: destroy CClientTXD entities (via m_pManager) BEFORE
     // StaticReset calls. TXD destructors need intact bookkeeping to clean up propery.
 
