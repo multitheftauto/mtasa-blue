@@ -2499,6 +2499,18 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         if (std::isnan(vecCollision.fZ))
                             vecCollision.fZ = 0;
 
+                        if (pCollisionEntity)
+                        {
+                            // Call the onClientElementClicked event
+                            CLuaArguments Arguments;
+                            Arguments.PushString(szButton);
+                            Arguments.PushString(szState);
+                            Arguments.PushNumber(vecCollision.fX);
+                            Arguments.PushNumber(vecCollision.fY);
+                            Arguments.PushNumber(vecCollision.fZ);
+                            pCollisionEntity->CallEvent("onClientElementClicked", Arguments, true);
+                        }
+
                         // Call the event for the client
                         CLuaArguments Arguments;
                         Arguments.PushString(szButton);
@@ -2781,6 +2793,7 @@ void CClientGame::AddBuiltInEvents()
     // Cursor events
     m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
     m_Events.AddEvent("onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", NULL, false);
+    m_Events.AddEvent("onClientElementClicked", "button, state, posX, posY, posZ", NULL, false);
 
     // Marker events
     m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", nullptr, false);
