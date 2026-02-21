@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <cstdint>
 #include <game/CClock.h>
 #include <game/CFireManager.h>
 #include <game/CGarage.h>
@@ -133,6 +134,11 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
         // Deletes vehicles
         case PACKET_ID_ENTITY_REMOVE:
             Packet_EntityRemove(bitStream);
+            return true;
+
+        // Bulk delete element trees
+        case PACKET_ID_ENTITY_REMOVE_TREE:
+            Packet_EntityRemoveTree(bitStream);
             return true;
 
         // Respawns/hides pickups
@@ -4360,6 +4366,112 @@ void CPacketHandler::Packet_EntityRemove(NetBitStreamInterface& bitStream)
                 g_pClientGame->m_ElementDeleter.Delete(pEntity);
             }
         }
+    }
+}
+
+void CPacketHandler::Packet_EntityRemoveTree(NetBitStreamInterface& bitStream)
+{
+    // std::uint16_t   (2)     - number of root elements  
+    // ElementID       (2)     - root element ids (repeating)
+
+    std::uint16_t rootElementCount;
+    if (!bitStream.ReadCompressed(rootElementCount))
+        return;
+
+    std::vector<CClientEntity*> rootElements;
+    rootElements.reserve(rootElementCount);
+
+    // Read all root element IDs first
+    for (std::uint16_t i = 0; i < rootElementCount; ++i)
+    {
+        ElementID rootID;
+        if (!bitStream.Read(rootID))
+            return;
+
+        CClientEntity* rootEntity = CElementIDs::GetElement(rootID);
+        if (rootEntity)
+        {
+            if (rootEntity->GetType() == CCLIENTPLAYER)
+            {
+                RaiseProtocolError(45); // Same as individual entity removal - cannot remove players
+                return;
+            }
+            rootElements.push_back(rootEntity);
+        }
+    }
+
+    // Delete each tree hierarchically
+    for (auto* rootEntity : rootElements)
+    {
+        RemoveEntityTree(rootEntity);
+    }
+}
+
+void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
+{
+    if (!rootEntity || rootEntity->IsSystemEntity())
+        return;
+
+    // Collect all entities in this tree
+    std::vector<CClientEntity*> entitiesToDelete;
+    CollectEntityTree(rootEntity, entitiesToDelete);
+
+    // Handle vehicle/ped specific cleanup for each entity
+    CMappedList<CClientPed*> listOfPeds(g_pClientGame->GetPedSync()->GetList());
+    listOfPeds.push_front(g_pClientGame->GetLocalPlayer());
+
+    for (auto* entity : entitiesToDelete)
+    {
+        if (entity->GetType() == CCLIENTVEHICLE || entity->GetType() == CCLIENTPED)
+        {
+            ElementID entityID = entity->GetID();
+
+            if (entity->GetType() == CCLIENTVEHICLE)
+            {
+                for (auto* ped : listOfPeds)
+                {
+                    if (ped->m_VehicleInOutID == entityID)
+                        ped->ResetVehicleInOut();
+
+                    if (ped->m_bNoNewVehicleTask && ped->m_NoNewVehicleTaskReasonID == entityID)
+                    {
+                        ped->m_bNoNewVehicleTask = false;
+                        ped->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
+                    }
+                }
+            }
+            else
+            {
+                auto* removedPed = static_cast<CClientPed*>(entity);
+                for (auto* ped : listOfPeds)
+                {
+                    if (ped->m_bIsGettingJacked && ped->m_pGettingJackedBy == removedPed)
+                    {
+                        ped->ResetVehicleInOut();
+                        ped->RemoveFromVehicle(false);
+                        ped->SetVehicleInOutState(VEHICLE_INOUT_NONE);
+                    }
+                }
+            }
+        }
+
+        // Delete clientside children and the entity
+        entity->DeleteClientChildren();
+        g_pClientGame->m_ElementDeleter.Delete(entity);
+    }
+}
+
+void CPacketHandler::CollectEntityTree(CClientEntity* entity, std::vector<CClientEntity*>& entities)
+{
+    if (!entity)
+        return;
+
+    entities.push_back(entity);
+
+    // Recursively collect all children
+    for (auto iter = entity->IterBegin(); iter != entity->IterEnd(); ++iter)
+    {
+        CollectEntityTree(*iter, entities);
     }
 }
 
