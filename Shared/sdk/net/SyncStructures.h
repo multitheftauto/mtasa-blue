@@ -2008,6 +2008,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool ignoreFireState : 1;
         bool flyingcomponents : 1;
         bool vehicleburnexplosions : 1;
+        bool vehicleburnblowup : 1;
         bool vehicleEngineAutoStart : 1;
     } data;
 
@@ -2035,6 +2036,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.ignoreFireState = false;
         data.flyingcomponents = true;
         data.vehicleburnexplosions = true;
+        data.vehicleburnblowup = true;
         data.vehicleEngineAutoStart = true;
     }
 };
