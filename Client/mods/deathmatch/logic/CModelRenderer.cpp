@@ -13,7 +13,7 @@
 #include "game\CRenderer.h"
 #include "game\CVisibilityPlugins.h"
 
-bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting)
+bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting, bool doubleSided)
 {
     if (g_pCore->IsWindowMinimized())
         return false;
@@ -25,7 +25,7 @@ bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix,
 
     if (pModelInfo && pModelInfo->IsLoaded())
     {
-        m_Queue.emplace_back(pModelInfo, matrix, lighting);
+        m_Queue.emplace_back(pModelInfo, matrix, lighting, doubleSided);
         return true;
     }
 
@@ -61,7 +61,7 @@ void CModelRenderer::Render()
     for (auto& modelDesc : m_Queue)
     {
         if (modelDesc.pModelInfo->IsLoaded() && !modelDesc.pModelInfo->GetIdeFlag(eModelIdeFlag::DRAW_LAST))
-            pRenderer->RenderModel(modelDesc.pModelInfo, modelDesc.matrix, modelDesc.lighting);
+            pRenderer->RenderModel(modelDesc.pModelInfo, modelDesc.matrix, modelDesc.lighting, modelDesc.doubleSided);
     }
 
     // m_Queue must NOT be cleared here: GTA's RenderFadingInEntities runs later
@@ -94,5 +94,5 @@ void CModelRenderer::RenderEntity(SModelToRender* modelDesc, float distance)
     CRenderer* pRenderer = g_pGame->GetRenderer();
     assert(pRenderer);
 
-    pRenderer->RenderModel(modelDesc->pModelInfo, modelDesc->matrix, modelDesc->lighting);
+    pRenderer->RenderModel(modelDesc->pModelInfo, modelDesc->matrix, modelDesc->lighting, modelDesc->doubleSided);
 }
