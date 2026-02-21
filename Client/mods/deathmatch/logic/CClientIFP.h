@@ -196,7 +196,44 @@ public:
         R_THIGH = 51,
         R_CALF = 52,
         R_FOOT = 53,
-        R_TOE_0 = 54
+        R_TOE_0 = 54,
+
+        // Cutscene bones
+        R_Thumb1 = 28,
+        R_Thumb2 = 29,
+        LLIP11 = 30,
+        L_Thumb1 = 38,
+        L_Thumb2 = 39,
+
+        JAW22 = 40,
+
+        HEADNUB = 303,
+        L_Finger0Nub = 304,
+        R_Finger0Nub = 305,
+        L_Toe0Nub = 306,
+        R_Toe0Nub = 307,
+
+        R_BROW1 = 5001,
+        R_BROW2 = 5002,
+        L_BROW2 = 5003,
+        L_BROW1 = 5004,
+        R_LID = 5005,
+        L_LID = 5006,
+        R_TLIP3 = 5007,
+        L_TLIP3 = 5008,
+        R_TLIP1 = 5009,
+        R_TLIP2 = 5010,
+        L_TLIP1 = 5011,
+        L_TLIP2 = 5012,
+        R_CORNER = 5013,
+        L_CORNER = 5014,
+        JAW1 = 5015,
+        JAW2 = 5016,
+        LLIP1 = 5017,
+        R_EYE = 5018,
+        L_EYE = 5019,
+        R_CHEEK = 5020,
+        L_CHEEK = 5021,
     };
 
     CClientIFP(class CClientManager* pManager, ElementID ID);
@@ -265,7 +302,7 @@ private:
 
     void    InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID);
     void    CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID);
-    SString ConvertStringToKey(const SString& strBoneName);
+    SString ConvertStringToKey(const SString& strBoneName, bool isANPK = false);
 
     constexpr void RoundSize(std::uint32_t& u32Size);
     constexpr bool IsKeyFramesTypeRoot(eFrameType iFrameType);
@@ -285,16 +322,46 @@ private:
     bool                            m_bUnloading;
     CAnimManager*                   m_pAnimManager;
 
-    // 32 because there are 32 bones in a ped model
-    const unsigned short m_kcIFPSequences = 32;
+    // 64 because there are 32 bones in a ped model + 32 possibly cutscene bones
+    const unsigned short m_kcIFPSequences = 64;
     // We'll keep all key frames compressed by default. GTA:SA will decompress
     // them, when it's going to play the animation. We don't need to worry about it.
     const bool m_kbAllKeyFramesCompressed = true;
 
-    const DWORD m_karruBoneIds[32] = {0, 1, 2, 3, 4, 5, 8, 6, 7, 31, 32, 33, 34, 35, 36, 21, 22, 23, 24, 25, 26, 302, 301, 201, 41, 42, 43, 44, 51, 52, 53, 54};
-    const char  m_karrstrBoneNames[32][24] = {
-        "Normal",     "Pelvis",           "Spine",      "Spine1",    "Neck",       "Head",     "Jaw",        "L Brow",
-        "R Brow",     "Bip01 L Clavicle", "L UpperArm", "L ForeArm", "L Hand",     "L Finger", "L Finger01", "Bip01 R Clavicle",
-        "R UpperArm", "R ForeArm",        "R Hand",     "R Finger",  "R Finger01", "L breast", "R breast",   "Belly",
-        "L Thigh",    "L Calf",           "L Foot",     "L Toe0",    "R Thigh",    "R Calf",   "R Foot",     "R Toe0"};
+    const DWORD m_karruBoneIds[64] = {0,    1,    2,    3,    4,    5,    8,    6,    7,    31,   32,   33,   34,   35,   36,   21,
+                                      22,   23,   24,   25,   26,   302,  301,  201,  41,   42,   43,   44,   51,   52,   53,   54,
+                                      28,   29,   30,   38,   39,   40,   303,  304,  305,  306,  307,  5001, 5002, 5003, 5004, 5005,
+                                      5006, 5007, 5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018, 5019, 5020, 5021};
+    const char  m_karrstrBoneNames[64][24] = {"Normal",       "Pelvis",
+                                              "Spine",        "Spine1",
+                                              "Neck",         "Head",
+                                              "Jaw",          "L Brow",
+                                              "R Brow",       "Bip01 L Clavicle",
+                                              "L UpperArm",   "L ForeArm",
+                                              "L Hand",       "L Finger",
+                                              "L Finger01",   "Bip01 R Clavicle",
+                                              "R UpperArm",   "R ForeArm",
+                                              "R Hand",       "R Finger",
+                                              "R Finger01",   "L breast",
+                                              "R breast",     "Belly",
+                                              "L Thigh",      "L Calf",
+                                              "L Foot",       "L Toe0",
+                                              "R Thigh",      "R Calf",
+                                              "R Foot",       "R Toe0",
+                                              "RThumb1",      "RThumb2",
+                                              "llip11",       "LThumb1",
+                                              "LThumb2",      "jaw22",
+                                              "HeadNub",      "L Finger0Nub",
+                                              "R Finger0Nub", "L Toe0Nub",
+                                              "R Toe0Nub",    "rbrow1",
+                                              "rbrow2",       "lbrow2",
+                                              "lbrow1",       "rlid",
+                                              "llid",         "rtlip3",
+                                              "ltlip3",       "rtlip1",
+                                              "rtlip2",       "ltlip1",
+                                              "ltlip2",       "rcorner",
+                                              "lcorner",      "jaw1",
+                                              "jaw2",         "llip1",
+                                              "reye",         "leye",
+                                              "rcheek",       "lcheek"};
 };
