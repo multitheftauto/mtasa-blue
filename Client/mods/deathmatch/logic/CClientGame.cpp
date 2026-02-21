@@ -6802,21 +6802,21 @@ void CClientGame::SetFileCacheRoot()
     else
     {
         // Get shared directory
-        SString strFileCachePath = GetCommonRegistryValue("", "File Cache Path");
+        SString fileCachePath = g_pCore->GetFileCachePath();
         // Check exists
-        if (!strFileCachePath.empty() && DirectoryExists(strFileCachePath))
+        if (!fileCachePath.empty() && DirectoryExists(fileCachePath))
         {
             // Check writable
-            SString strTestFileName = PathJoin(strFileCachePath, "resources", "_test.tmp");
-            if (FileSave(strTestFileName, "x"))
+            SString testFileName = PathJoin(fileCachePath, "resources", "_test.tmp");
+            if (FileSave(testFileName, "x"))
             {
-                FileDelete(strTestFileName);
-                strTestFileName = PathJoin(strFileCachePath, "priv", "_test.tmp");
-                if (FileSave(strTestFileName, "x"))
+                FileDelete(testFileName);
+                testFileName = PathJoin(fileCachePath, "priv", "_test.tmp");
+                if (FileSave(testFileName, "x"))
                 {
-                    FileDelete(strTestFileName);
+                    FileDelete(testFileName);
                     // Use shared directory
-                    m_strFileCacheRoot = strFileCachePath;
+                    m_strFileCacheRoot = fileCachePath;
                     AddReportLog(7411, SString("CClientGame::SetFileCacheRoot - Is shared '%s'", *m_strFileCacheRoot));
                     return;
                 }
@@ -6827,10 +6827,10 @@ void CClientGame::SetFileCacheRoot()
         m_strFileCacheRoot = GetModRoot();
         SetCommonRegistryValue("", "File Cache Path", m_strFileCacheRoot);
 
-        if (strFileCachePath.empty())
+        if (fileCachePath.empty())
             AddReportLog(7412, SString("CClientGame::SetFileCacheRoot - Initial setting '%s'", *m_strFileCacheRoot));
         else
-            AddReportLog(7413, SString("CClientGame::SetFileCacheRoot - Change shared from '%s' to '%s'", *strFileCachePath, *m_strFileCacheRoot));
+            AddReportLog(7413, SString("CClientGame::SetFileCacheRoot - Change shared from '%s' to '%s'", *fileCachePath, *m_strFileCacheRoot));
     }
 }
 
