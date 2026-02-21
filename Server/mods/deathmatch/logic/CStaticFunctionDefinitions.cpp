@@ -229,7 +229,7 @@ bool CStaticFunctionDefinitions::TriggerClientEvent(const std::vector<CPlayer*>&
     return true;
 }
 
-bool CStaticFunctionDefinitions::TriggerLatentClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement,
+uint CStaticFunctionDefinitions::TriggerLatentClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement,
                                                           CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId)
 {
     assert(szName);
@@ -246,7 +246,7 @@ bool CStaticFunctionDefinitions::TriggerLatentClientEvent(const std::vector<CPla
     g_pGame->EnableLatentSends(false);
 
     CPerfStatEventPacketUsage::GetSingleton()->UpdateEventUsageOut(szName, sendList.size());
-    return true;
+    return g_pGame->GetLastSentHandle();
 }
 
 bool CStaticFunctionDefinitions::CancelEvent(bool bCancel, const char* szReason)
