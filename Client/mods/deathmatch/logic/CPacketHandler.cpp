@@ -3451,6 +3451,13 @@ retry:
                     bool bIsDerailable = bitStream.ReadBit();
                     bool bTrainDirection = bitStream.ReadBit();
                     bool bTaxiLightState = bitStream.ReadBit();
+                    bool bSmokeTrailEnabled = bitStream.ReadBit();
+
+                    // Set smoke trail for appropriate vehicles
+                    if (usModel == 512 || usModel == 513)
+                    {
+                        pVehicle->SetSmokeTrailEnabled(bSmokeTrailEnabled);
+                    }
 
                     // If the vehicle has a landing gear, set landing gear state
                     if (CClientVehicleManager::HasLandingGears(usModel))
