@@ -299,6 +299,10 @@ public:
     virtual void  SetFogDistance(float fDistance) = 0;
     virtual float GetFogDistance() = 0;
     virtual void  RestoreFogDistance() = 0;
+    virtual void  SetGrassDrawDistance(float closeDistance, float farDistance) = 0;
+    virtual void  GetGrassDrawDistance(float& closeDistance, float& farDistance) const = 0;
+    virtual void  ResetGrassDrawDistance() = 0;
+    virtual void  RefreshGrassDrawDistance() = 0;
     virtual void  GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed,
                               unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue) = 0;
     virtual void  SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed,
