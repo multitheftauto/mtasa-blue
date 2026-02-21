@@ -695,7 +695,15 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
 
     std::size_t vehicleIndex = 0;
 
-    std::unique_ptr<CVehicleSA> train = std::make_unique<CTrainSA>(pTrainBeginning);
+    std::unique_ptr<CVehicleSA> train;
+    try
+    {
+        train = std::make_unique<CTrainSA>(pTrainBeginning);
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
     if (!train || !AddVehicleToPool(pClientVehicle, train.get()))
         return nullptr;
 
@@ -708,7 +716,15 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
         if (!pVehCarriage)
             break;
 
-        auto newCarriage = std::make_unique<CTrainSA>(pVehCarriage);
+        std::unique_ptr<CTrainSA> newCarriage;
+        try
+        {
+            newCarriage = std::make_unique<CTrainSA>(pVehCarriage);
+        }
+        catch (...)
+        {
+            break;
+        }
         if (!newCarriage || !AddVehicleToPool(pClientVehicle, newCarriage.get()))
         {
             newCarriage.reset();

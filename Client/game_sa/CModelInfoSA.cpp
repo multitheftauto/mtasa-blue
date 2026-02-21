@@ -127,23 +127,19 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
 }
 
 // IsValidModelInfoPtr only validates via reads, so stale pointers in readable
-// but non-writable memory pass. So this checks writability
-// by reading a field and writing the same value back under SEH.
+// but non-writable memory pass. VirtualQuery checks the actual page protection
+// to confirm the pointer is in committed writable memory.
 static bool IsWritableModelInfoPtr(CBaseModelInfoSAInterface* ptr) noexcept
 {
     if (!ptr)
         return false;
 
-    __try
-    {
-        volatile auto val = ptr->usTextureDictionary;
-        ptr->usTextureDictionary = val;
-        return true;
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
+    MEMORY_BASIC_INFORMATION mbi{};
+    if (VirtualQuery(ptr, &mbi, sizeof(mbi)) == 0 || mbi.State != MEM_COMMIT)
         return false;
-    }
+
+    constexpr DWORD writableMask = PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+    return (mbi.Protect & writableMask) != 0 && (mbi.Protect & PAGE_GUARD) == 0;
 }
 
 static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept
@@ -675,6 +671,23 @@ bool CModelInfoSA::DoIsLoaded()
                 CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
                 if (pStreamInfo)
                 {
+                    // Unlink from SA's loaded-entry list before zeroing the link fields to avoid linked list corruptin
+                    if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+                    {
+                        constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
+                        const unsigned short     prev = pStreamInfo->prevId;
+                        const unsigned short     next = pStreamInfo->nextId;
+                        if (prev != kInvalid && next != kInvalid)
+                        {
+                            CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
+                            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+                            if (pPrev && pNext)
+                            {
+                                pPrev->nextId = next;
+                                pNext->prevId = prev;
+                            }
+                        }
+                    }
                     pStreamInfo->prevId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
@@ -1067,9 +1080,8 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
-    // GetInterface() validates via reads only; stale pointers in read-only
-    // pages pass that check but crash on write
-    if (!IsWritableModelInfoPtr(m_pInterface))
+    // This check should be sufficient - dont consider using IsWritableModelInfoPtr here in the future without good reason
+    if (m_pInterface != ppModelInfo[m_dwModelID])
     {
         m_pInterface = nullptr;
         return;

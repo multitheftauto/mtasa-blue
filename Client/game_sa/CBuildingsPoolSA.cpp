@@ -262,6 +262,10 @@ void CBuildingsPoolSA::PurgeStaleSectorEntries(void* oldPool, int poolSize)
 
     for (int i = 0; i < kSectorCount; ++i)
     {
+        // A stale entry can only exist in a sector that has nodes; null head means empty list.
+        if (sectorDwords[i * 2] == 0)
+            continue;
+
         auto* pList = reinterpret_cast<CPtrNodeSingleListSAInterface<CEntitySAInterface>*>(&sectorDwords[i * 2]);
         auto* pNode = reinterpret_cast<CPtrNodeSingleLink<CEntitySAInterface>*>(sectorDwords[i * 2]);
 

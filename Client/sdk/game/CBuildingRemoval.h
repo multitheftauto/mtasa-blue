@@ -18,12 +18,18 @@ class CEntitySAInterface;
 class CVector;
 class CVector4D;
 
+struct SRemovedEntity
+{
+    CEntitySAInterface* m_pInterface;
+    BYTE                m_iplIndex;  // cached at tracking time; used by OnRemoveIpl to skip entries from other IPLs
+};
+
 struct SBuildingRemoval
 {
     SBuildingRemoval()
     {
-        m_pBinaryRemoveList = new std::list<CEntitySAInterface*>;
-        m_pDataRemoveList = new std::list<CEntitySAInterface*>;
+        m_pBinaryRemoveList = new std::list<SRemovedEntity>;
+        m_pDataRemoveList = new std::list<SRemovedEntity>;
         m_usModel = 0;
         m_vecPos = CVector(0, 0, 0);
         m_fRadius = 0.0f;
@@ -36,23 +42,15 @@ struct SBuildingRemoval
         delete m_pDataRemoveList;
     }
 
-    void AddBinaryBuilding(CEntitySAInterface* pInterface)
-    {
-        // Add to list of binary buildings for this removal
-        m_pBinaryRemoveList->push_back(pInterface);
-    }
-    void AddDataBuilding(CEntitySAInterface* pInterface)
-    {
-        // Add to list of data buildings for this removal
-        m_pDataRemoveList->push_back(pInterface);
-    }
+    void AddBinaryBuilding(CEntitySAInterface* pInterface, BYTE iplIndex) { m_pBinaryRemoveList->push_back({pInterface, iplIndex}); }
+    void AddDataBuilding(CEntitySAInterface* pInterface, BYTE iplIndex) { m_pDataRemoveList->push_back({pInterface, iplIndex}); }
 
-    unsigned short                  m_usModel;
-    CVector                         m_vecPos;
-    float                           m_fRadius;
-    char                            m_cInterior;
-    std::list<CEntitySAInterface*>* m_pBinaryRemoveList;
-    std::list<CEntitySAInterface*>* m_pDataRemoveList;
+    unsigned short             m_usModel;
+    CVector                    m_vecPos;
+    float                      m_fRadius;
+    char                       m_cInterior;
+    std::list<SRemovedEntity>* m_pBinaryRemoveList;
+    std::list<SRemovedEntity>* m_pDataRemoveList;
 };
 
 struct sDataBuildingRemovalItem
@@ -61,13 +59,13 @@ struct sDataBuildingRemovalItem
     {
         m_pInterface = pInterface;
         m_iCount = 0;
-        m_iplIndex = 0;   // set in AddDataBuilding(); CEntitySAInterface is forward-decl here
+        m_iplIndex = 0;  // set in AddDataBuilding(); CEntitySAInterface is forward-decl here
     }
     void                AddCount() { m_iCount++; }
     void                RemoveCount() { m_iCount--; }
     CEntitySAInterface* m_pInterface;
     int                 m_iCount;
-    BYTE                m_iplIndex;   // cached at tracking time; used by OnRemoveIpl to skip entries from other IPLs
+    BYTE                m_iplIndex;  // cached at tracking time; used by OnRemoveIpl to skip entries from other IPLs
 };
 
 struct sBuildingRemovalItem
@@ -76,13 +74,13 @@ struct sBuildingRemovalItem
     {
         m_pInterface = pInterface;
         m_iCount = 0;
-        m_iplIndex = 0;   // set in AddBinaryBuilding(); CEntitySAInterface is forward-decl here
+        m_iplIndex = 0;  // set in AddBinaryBuilding(); CEntitySAInterface is forward-decl here
     }
     void                AddCount() { m_iCount++; }
     void                RemoveCount() { m_iCount--; }
     CEntitySAInterface* m_pInterface;
     int                 m_iCount;
-    BYTE                m_iplIndex;   // cached at tracking time; used by OnRemoveIpl to skip entries from other IPLs
+    BYTE                m_iplIndex;  // cached at tracking time; used by OnRemoveIpl to skip entries from other IPLs
 };
 
 struct SIPLInst

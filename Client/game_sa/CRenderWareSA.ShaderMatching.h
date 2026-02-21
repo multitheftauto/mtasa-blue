@@ -9,6 +9,7 @@
 #pragma once
 
 #include <deque>
+#include <unordered_set>
 #include "CRenderWareSA.ShaderSupport.h"
 
 #ifdef SHADER_DEBUG_OUTPUT
@@ -321,7 +322,8 @@ protected:
 
     void           CalcShaderForTexAndEntity(SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType,
                                              bool bSilent);
-    void               CleanupStaleEntityChannelRefs(const std::vector<SDeferredChannelKey>& deferredChannelKeys);
+    void           CleanupStaleEntityChannelRefs(const std::vector<SDeferredChannelKey>& deferredChannelKeys);
+    bool           TryPushDeferredKey(const CShaderAndEntityPair& key, CMatchChannel* pExpectedChannel);
     void           AddToOptimizeQueue(CMatchChannel* pChannel);
     void           AddToRematchQueue(CMatchChannel* pChannel);
     void           FlushChanges();
@@ -354,13 +356,18 @@ protected:
     std::unordered_map<CClientEntityBase*, CFastHashSet<STexNameInfo*>> m_EntityToTexNameInfos;
     // Retry keys that didnt fit in the deferred queue.
     std::unordered_map<CClientEntityBase*, std::vector<CShaderAndEntityPair>> m_StaleEntityDeferredRetryKeys;
-    CFastHashSet<CMatchChannel*>                                        m_CreatedChannelList;
-    CFastHashSet<CMatchChannel*>                                        m_OptimizeQueue;
-    CFastHashSet<CMatchChannel*>                                        m_RematchQueue;
-    CFastHashMap<SString, STexNameInfo*>                                m_AllTextureList;
-    CFastHashMap<CSHADERDUMMY*, SShaderInfo*>                           m_ShaderInfoMap;
-    CFastHashSet<CClientEntityBase*>                                    m_KnownClientEntities;
-    std::deque<std::vector<SDeferredChannelKey>>                        m_StaleEntityChannelCleanupQueue;
-    long long                                                           m_llNextStaleEntityCleanupTime = 0;
-    std::size_t                                                         m_uiStaleEntityCleanupCursorBucket = 0;
+    // Which entities/shaders have any key currently in the deferred queue or retry map.
+    // Insert-only on push; bulk-cleared on full drain. Absent entry means no keys exist - Remove* skips the scan.
+    std::unordered_set<CClientEntityBase*>       m_DeferredQueueEntityPresence;
+    std::unordered_set<SShaderInfo*>             m_DeferredQueueShaderPresence;
+    CFastHashSet<CMatchChannel*>                 m_CreatedChannelList;
+    CFastHashSet<CMatchChannel*>                 m_OptimizeQueue;
+    CFastHashSet<CMatchChannel*>                 m_RematchQueue;
+    CFastHashMap<SString, STexNameInfo*>         m_AllTextureList;
+    CFastHashMap<CSHADERDUMMY*, SShaderInfo*>    m_ShaderInfoMap;
+    CFastHashSet<CClientEntityBase*>             m_KnownClientEntities;
+    std::deque<std::vector<SDeferredChannelKey>> m_StaleEntityChannelCleanupQueue;
+    long long                                    m_llNextStaleEntityCleanupTime = 0;
+    std::size_t                                  m_uiStaleEntityCleanupCursorBucket = 0;
+    std::size_t                                  m_uiStaleEntityScanCycleCount = 0;
 };
