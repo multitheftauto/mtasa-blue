@@ -12,6 +12,8 @@
 
 #include "CClientCommon.h"
 #include <list>
+#include <unordered_map>
+#include <unordered_set>
 class CClientStreamSector;
 class CClientStreamSectorRow;
 class CClientStreamElement;
@@ -66,14 +68,15 @@ private:
     float                              m_fMaxDistanceExp;
     float                              m_fMaxDistanceThreshold;
     StreamerLimitReachedFunction*      m_pLimitReachedFunc;
-    std::list<CClientStreamSectorRow*> m_WorldRows;
-    std::list<CClientStreamSectorRow*> m_ExtraRows;
-    CClientStreamSectorRow*            m_pRow;
-    CClientStreamSector*               m_pSector;
-    CVector                            m_vecPosition;
-    unsigned short                     m_usDimension;
-    std::list<CClientStreamElement*>   m_ActiveElements;
-    std::list<CClientStreamElement*>   m_ToStreamOut;
+    std::list<CClientStreamSectorRow*>                    m_WorldRows;
+    std::unordered_map<int, CClientStreamSectorRow*>       m_ExtraRows;
+    CClientStreamSectorRow*                                m_pRow;
+    CClientStreamSector*                                   m_pSector;
+    CVector                                                m_vecPosition;
+    unsigned short                                         m_usDimension;
+    std::list<CClientStreamElement*>                        m_ActiveElements;
+    std::unordered_set<CClientStreamElement*>               m_ActiveElementSet;
+    std::list<CClientStreamElement*>                        m_ToStreamOut;
 
     static void* pAddingElement;
 };
