@@ -26,6 +26,7 @@ private:
     std::vector<std::unique_ptr<CFireSA>> m_Fires;
     std::vector<bool>                     m_Visited;
 
+    FireCreationHandler    m_creationHandler{nullptr};
     FireDestructionHandler m_destructionHandler{nullptr};
 
 public:
@@ -49,6 +50,7 @@ public:
 
     void Update();
 
+    void        SetFireCreationHandler(FireCreationHandler creationHandler) noexcept override { m_creationHandler = creationHandler; }
     void        SetFireDestructionHandler(FireDestructionHandler destructionHandler) noexcept override { m_destructionHandler = destructionHandler; }
 
     static void StaticSetHooks();

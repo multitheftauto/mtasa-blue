@@ -50,6 +50,9 @@ CFire* CFireManagerSA::StartFire(CEntity* target, CEntity* creator, std::uint32_
     if (target->IsOnFire() || target->IsFireProof())
         return nullptr;
 
+    if (m_creationHandler && !m_creationHandler(target, creator))
+        return nullptr;
+
     switch (target->GetEntityType())
     {
         case eEntityType::ENTITY_TYPE_PED:

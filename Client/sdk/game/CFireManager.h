@@ -15,6 +15,7 @@ class CFire;
 class CVector;
 class CEntity;
 
+using FireCreationHandler = bool(*)(CEntity* target, CEntity* creator);
 using FireDestructionHandler = void(*)(CFire* fire);
 
 class CFireManager
@@ -33,5 +34,6 @@ public:
 
     virtual void Update() = 0;
 
+    virtual void SetFireCreationHandler(FireCreationHandler creationHandler) noexcept = 0;
     virtual void SetFireDestructionHandler(FireDestructionHandler destructionHandler) noexcept = 0;
 };

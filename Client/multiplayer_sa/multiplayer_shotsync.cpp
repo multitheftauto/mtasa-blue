@@ -68,7 +68,6 @@ extern BulletImpactHandler*   m_pBulletImpactHandler;
 extern BulletFireHandler*     m_pBulletFireHandler;
 extern DamageHandler*         m_pDamageHandler;
 extern DeathHandler*          m_pDeathHandler;
-extern FireHandler*           m_pFireHandler;
 extern ProjectileHandler*     m_pProjectileHandler;
 extern ProjectileStopHandler* m_pProjectileStopHandler;
 
@@ -94,7 +93,6 @@ VOID InitShotsyncHooks()
     HookInstall(HOOKPOS_CWeapon__Fire_Sniper, (DWORD)HOOK_CWeapon__Fire_Sniper, 6);
     HookInstall(HOOKPOS_CEventDamage__AffectsPed, (DWORD)HOOK_CEventDamage__AffectsPed, 6);
     HookInstall(HOOKPOS_CEventVehicleExplosion__AffectsPed, (DWORD)HOOK_CEventVehicleExplosion__AffectsPed, 5);
-    HookInstall(HOOKPOS_CFireManager__StartFire, (DWORD)HOOK_CFireManager__StartFire, 6);
     HookInstall(HOOKPOS_CProjectileInfo__AddProjectile, (DWORD)HOOK_CProjectileInfo__AddProjectile, 7);
     HookInstall(HOOKPOS_CProjectile__CProjectile, (DWORD)HOOK_CProjectile__CProjectile, 7);
     HookInstall(HOOKPOS_IKChainManager_PointArm, (DWORD)HOOK_IKChainManager_PointArm, 7);
@@ -914,47 +912,6 @@ static void __declspec(naked) HOOK_CEventDamage__AffectsPed()
         }
         // clang-format on
     }
-}
-
-//  CFire*  StartFire(CEntity *pBurningEntity, CEntity *pStartedFireEntity, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, bool8 bExtinguishEnabled=TRUE, UInt32
-//  ArgBurnTime = FIRE_AVERAGE_BURNTIME, Int8 NumGenerationsAllowed = 100);
-static constexpr std::uintptr_t SKIP_CFireManager_StartFire = 0x53A0C5;
-static constexpr std::uintptr_t RETURN_CFireManager_StartFire = 0x53A056;
-
-static void __declspec(naked) HOOK_CFireManager__StartFire()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        push esi
-        push edi
-        mov edi, [esp+0Ch]
-
-        mov eax, m_pFireHandler
-        test eax, eax
-        jz startFire
-
-        push ecx
-
-        push [esp+14h]
-        push edi
-        call m_pFireHandler
-        add esp, 8
-
-        pop ecx
-
-        test al, al
-        jz abortCreatingFire
-
-        startFire:
-        jmp RETURN_CFireManager_StartFire
-
-        abortCreatingFire:
-        jmp SKIP_CFireManager_StartFire
-    }
-    // clang-format on
 }
 
 static CEntity* GetProjectileOwner(CPools* pPools)
