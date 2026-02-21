@@ -1079,6 +1079,13 @@ bool CStaticFunctionDefinitions::SetElementPosition(CClientEntity& Entity, const
 {
     RUN_CHILDREN(SetElementPosition(**iter, vecPosition))
 
+    if (Entity.GetType() == CCLIENTVEHICLE)
+    {
+        CClientPed* driver = static_cast<CClientVehicle&>(Entity).GetOccupant(0);
+        if (!Entity.IsLocalEntity() && !static_cast<CDeathmatchVehicle&>(Entity).IsSyncing() && (!driver || !driver->IsLocalPlayer()))
+            return false;
+    }
+
     if (bWarp)
         Entity.Teleport(vecPosition);
     else
@@ -1490,9 +1497,9 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CClientEntity& Entity, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float fHealth)
+bool CStaticFunctionDefinitions::SetElementHealth(lua_State* luaState, CClientEntity& Entity, float fHealth)
 {
-    RUN_CHILDREN(SetElementHealth(**iter, fHealth))
+    RUN_CHILDREN(SetElementHealth(luaState, **iter, fHealth))
 
     switch (Entity.GetType())
     {
@@ -1501,6 +1508,11 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            if (Ped.IsLocalPlayer())
+            {
+                g_pClientGame->GetScriptDebugging()->LogWarning(luaState, "The client-side setElementHealth function for localPlayer is deprecated. Use the corresponding server-side function instead");
+                return false;
+            }
 
             // If setting health to 0 for local player, clear stale damage data
             // and set proper scripted death parameters for DoWastedCheck
@@ -2922,7 +2934,6 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optiona
 
     CClientVehicle&  vehicle = static_cast<CClientVehicle&>(Entity);
     VehicleBlowFlags blow;
-
     blow.withExplosion = withExplosion.value_or(true);
 
     if (vehicle.IsLocalEntity())
@@ -2931,6 +2942,10 @@ bool CStaticFunctionDefinitions::BlowVehicle(CClientEntity& Entity, std::optiona
     }
     else
     {
+        CClientPed* driver = vehicle.GetOccupant(0);
+        if (!static_cast<CDeathmatchVehicle&>(vehicle).IsSyncing() && (!driver || !driver->IsLocalPlayer()))
+            return false;
+
         CVector position;
         vehicle.GetPosition(position);
 
