@@ -34,9 +34,9 @@ bool CLuaFireDefs::ExtinguishFire(std::optional<CVector> position, std::optional
     if (!position.has_value())
     {
         g_pGame->GetFireManager()->ExtinguishAllFires();
-        return true; // backwards compatibilty
+        return true;  // backwards compatibilty
     }
 
     g_pGame->GetFireManager()->ExtinguishPoint(position.value(), radius.value_or(1.0f));
-    return true; // backwards compatibilty
+    return true;  // backwards compatibilty
 }

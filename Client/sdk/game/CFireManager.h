@@ -15,13 +15,14 @@ class CFire;
 class CVector;
 class CEntity;
 
-using FireCreationHandler = bool(*)(CEntity* target, CEntity* creator);
-using FireDestructionHandler = void(*)(CFire* fire);
+using FireCreationHandler = bool (*)(CEntity* target, CEntity* creator);
+using FireDestructionHandler = void (*)(CFire* fire);
 
 class CFireManager
 {
 public:
-    virtual CFire* StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true) = 0;
+    virtual CFire* StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100,
+                             bool makeNoise = true) = 0;
     virtual CFire* StartFire(CEntity* target, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true) = 0;
     virtual CFire* FindNearestFire(CVector* position, bool checkExtinguished, bool checkScript) = 0;
 
@@ -30,7 +31,7 @@ public:
     virtual void ExtinguishAllFires() = 0;
 
     virtual std::uint32_t GetNumFiresInRange(const CVector& position, float radius) const = 0;
-    virtual bool PlentyFiresAvailable() = 0;
+    virtual bool          PlentyFiresAvailable() = 0;
 
     virtual void Update() = 0;
 

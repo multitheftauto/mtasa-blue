@@ -33,9 +33,10 @@ public:
     CFireManagerSA();
     ~CFireManagerSA();
 
-    CFire* StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true) override;
-    CFire* StartFire(CEntity* target, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true) override;
-    CFire* FindNearestFire(CVector* position, bool checkExtinguished, bool checkScript) override;
+    CFire*   StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100,
+                       bool makeNoise = true) override;
+    CFire*   StartFire(CEntity* target, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true) override;
+    CFire*   FindNearestFire(CVector* position, bool checkExtinguished, bool checkScript) override;
     CFireSA* GetRandomFire() const noexcept;
 
     static CFireSA* GetFire(CFireSAInterface* iface) noexcept;
@@ -50,12 +51,12 @@ public:
 
     void Update();
 
-    void        SetFireCreationHandler(FireCreationHandler creationHandler) noexcept override { m_creationHandler = creationHandler; }
-    void        SetFireDestructionHandler(FireDestructionHandler destructionHandler) noexcept override { m_destructionHandler = destructionHandler; }
+    void SetFireCreationHandler(FireCreationHandler creationHandler) noexcept override { m_creationHandler = creationHandler; }
+    void SetFireDestructionHandler(FireDestructionHandler destructionHandler) noexcept override { m_destructionHandler = destructionHandler; }
 
     static void StaticSetHooks();
 
 private:
-    void ClearExtinguishedFires();
+    void   ClearExtinguishedFires();
     CFire* GetStrongestFire() const;
 };

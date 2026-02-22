@@ -59,7 +59,7 @@ public:
     FxSystem_c* m_fxSysSand;
     FxSystem_c* m_fxSysSand2;
     FxSystem_c* m_fxSysSmokeHuge;
-    FxSystem_c* m_fxSysSmoke2; // prt_smokeII_3_expand
+    FxSystem_c* m_fxSysSmoke2;  // prt_smokeII_3_expand
     FxSystem_c* m_fxSysSpark;
     FxSystem_c* m_fxSysSpark2;
     FxSystem_c* m_fxSysSplash;

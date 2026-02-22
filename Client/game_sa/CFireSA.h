@@ -33,18 +33,18 @@ public:
         std::uint8_t createdByScript : 1;  // unused in MTA
         std::uint8_t makeNoise : 1;
         std::uint8_t isBeingExtinguished : 1;
-        std::uint8_t isFirstGeneration : 1; // unused in MTA
+        std::uint8_t isFirstGeneration : 1;  // unused in MTA
     } m_flags{};
 
-    std::int16_t  scriptRefIndex{0};  // unused in MTA
-    CVector       m_position;
-    CEntitySAInterface*    m_entityOnFire{nullptr};
-    CEntitySAInterface*    m_creator{nullptr};
-    std::uint32_t m_lifetime{0};
-    float         m_strength{1.0f};
-    std::uint8_t  m_numGenerationsAllowed{100};
-    std::uint8_t  m_removalDistance{60};
-    CFxSystemSAInterface*  m_fxSystem{nullptr};
+    std::int16_t          scriptRefIndex{0};  // unused in MTA
+    CVector               m_position;
+    CEntitySAInterface*   m_entityOnFire{nullptr};
+    CEntitySAInterface*   m_creator{nullptr};
+    std::uint32_t         m_lifetime{0};
+    float                 m_strength{1.0f};
+    std::uint8_t          m_numGenerationsAllowed{100};
+    std::uint8_t          m_removalDistance{60};
+    CFxSystemSAInterface* m_fxSystem{nullptr};
 };
 
 class CFireSA : public CFire
@@ -53,8 +53,10 @@ class CFireSA : public CFire
     friend class CCreepingFireSA;
 
 public:
-    CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true);
-    CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CEntity* target, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100, bool makeNoise = true);
+    CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CVector position, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100,
+            bool makeNoise = true);
+    CFireSA(CFireManagerSA* fireMgr, CEntity* creator, CEntity* target, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed = 100,
+            bool makeNoise = true);
 
     CFireSAInterface* GetInterface() noexcept { return &m_interface; }
 
@@ -76,7 +78,7 @@ public:
     void         SetNumGenerationsAllowed(std::uint8_t numGenerationsAllowed) noexcept { m_interface.m_numGenerationsAllowed = numGenerationsAllowed; }
 
     std::uint32_t GetLifetime() const noexcept override { return m_interface.m_lifetime; }
-    void SetLifetime(std::uint32_t lifetime) noexcept override { m_interface.m_lifetime = lifetime; }
+    void          SetLifetime(std::uint32_t lifetime) noexcept override { m_interface.m_lifetime = lifetime; }
 
     void     SetPosition(const CVector& position, bool updateParticle = false) override;
     CVector& GetPosition() noexcept override { return m_interface.m_position; }
@@ -95,7 +97,7 @@ private:
     CFireSAInterface m_interface{};
     CEntity*         m_entityOnFire{nullptr};
     CEntity*         m_creator{nullptr};
-    bool             m_createdByScript{false}; // created by createFire function
+    bool             m_createdByScript{false};  // created by createFire function
 
     CFireManagerSA* m_fireManager{nullptr};
 

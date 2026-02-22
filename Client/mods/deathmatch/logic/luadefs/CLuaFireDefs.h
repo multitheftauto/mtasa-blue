@@ -17,5 +17,5 @@ public:
     static void LoadFunctions();
 
     static CClientFire* CreateFire(CVector position, float size, std::optional<std::uint32_t> lifetime, std::optional<bool> makeNoise);
-    static bool ExtinguishFire(std::optional<CVector> position, std::optional<float> radius);
+    static bool         ExtinguishFire(std::optional<CVector> position, std::optional<float> radius);
 };

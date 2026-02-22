@@ -126,7 +126,7 @@ void CFireSA::Extinguish(bool ProcessPedCall)
                 reinterpret_cast<CVehicleSAInterface*>(entityOnFire)->m_pFire = nullptr;
                 break;
             }
-            case eEntityType::ENTITY_TYPE_OBJECT: // R* forgot to set this to nullptr here
+            case eEntityType::ENTITY_TYPE_OBJECT:  // R* forgot to set this to nullptr here
             {
                 reinterpret_cast<CObjectSAInterface*>(entityOnFire)->pFire = nullptr;
                 break;
@@ -153,7 +153,8 @@ void CFireSA::ExtinguishWithWater(float waterStrength)
     SetStrength(newStrength, false);
 
     const CVector& firePos = GetPosition();
-    CVector particlePos = firePos + CVector(GetRandomNumberInRange(-1.28f, 1.28f), GetRandomNumberInRange(-1.28f, 1.28f), GetRandomNumberInRange(-0.64f, 0.64f));
+    CVector        particlePos =
+        firePos + CVector(GetRandomNumberInRange(-1.28f, 1.28f), GetRandomNumberInRange(-1.28f, 1.28f), GetRandomNumberInRange(-0.64f, 0.64f));
     FxPrtMult_c fxPrt{{1.0f, 1.0f, 1.0f, 0.6f}, 0.75f, 0.0f, 0.4f};
 
     static FxSystem_c* smokeII3expand = pGame->GetFx()->GetInterface()->m_fxSysSmoke2;
@@ -273,9 +274,9 @@ void CFireSA::ProcessFire()
 
                 if (vehicleInterface->m_vehicleClass == VehicleClass::AUTOMOBILE)
                 {
-                    CVector fireOnVehPos = 
-                        reinterpret_cast<CVehicleModelInfoSAInterface*>(pGame->GetModelInfo(vehicleInterface->m_nModelIndex)->GetInterface())
-                            ->pVisualInfo->vecDummies[0] + CVector(0, 0, 0.15f);
+                    CVector fireOnVehPos = reinterpret_cast<CVehicleModelInfoSAInterface*>(pGame->GetModelInfo(vehicleInterface->m_nModelIndex)->GetInterface())
+                                               ->pVisualInfo->vecDummies[0] +
+                                           CVector(0, 0, 0.15f);
 
                     CMatrix vehMatrix;
                     dynamic_cast<CVehicle*>(m_entityOnFire)->GetMatrix(&vehMatrix);
@@ -325,7 +326,7 @@ void CFireSA::ProcessFire()
             if ((*pEntitySA->GetPosition() - firePosition).LengthSquared() >= 4.0f)
                 continue;
 
-            CVehicleSA* vehicle = dynamic_cast<CVehicleSA*>(pEntitySA);
+            CVehicleSA*          vehicle = dynamic_cast<CVehicleSA*>(pEntitySA);
             CVehicleSAInterface* vehicleInterface = vehicle->GetVehicleInterface();
 
             if (static_cast<VehicleClass>(vehicleInterface->m_vehicleSubClass) == VehicleClass::BMX)
@@ -336,8 +337,7 @@ void CFireSA::ProcessFire()
                 m_fireManager->StartFire(player, m_creator, 7000, 100, !IsSilent());
 
                 // CVehicle::FindTyreNearestPoint
-                int tyre = ((int(__thiscall*)(CVehicleSAInterface*, CVector2D))0x6D7BC0)(vehicleInterface,
-                                                                                         CVector2D(firePosition.fX, firePosition.fY));
+                int tyre = ((int(__thiscall*)(CVehicleSAInterface*, CVector2D))0x6D7BC0)(vehicleInterface, CVector2D(firePosition.fX, firePosition.fY));
                 vehicleInterface->BurstTyre(tyre + 13, false);
             }
             else
@@ -372,7 +372,7 @@ void CFireSA::ProcessFire()
         CVector direction(GetRandomNumberInRange(-1.0f, 1.0f), GetRandomNumberInRange(-1.0f, 1.0f), 0.0f);
         direction.Normalize();
 
-        CVector newPos = firePosition + direction * GetRandomNumberInRange(2.0f, 2.1f); // default: 2-2.003
+        CVector newPos = firePosition + direction * GetRandomNumberInRange(2.0f, 2.1f);  // default: 2-2.003
         newPos.fZ = firePosition.fZ + 2.0f;
 
         CCreepingFireSA::TryToStartFireAtCoors(newPos, numGens - 1, m_creator ? m_creator->GetInterface() : nullptr, false, 10.0f);
@@ -408,7 +408,8 @@ void CFireSA::ProcessFire()
     {
         float unused_field;
         float fractionalPart = std::modf(GetStrength(), &unused_field);
-        m_interface.m_fxSystem->SetConstTime(true, std::min(std::max(0.0f, (GetLifetime() - static_cast<float>(pGame->GetSystemTime())) / 3500.0f), fractionalPart));
+        m_interface.m_fxSystem->SetConstTime(true,
+                                             std::min(std::max(0.0f, (GetLifetime() - static_cast<float>(pGame->GetSystemTime())) / 3500.0f), fractionalPart));
     }
 
     CMatrix camMatrix;
@@ -476,8 +477,8 @@ static void __fastcall StaticExtinguish(CFireSAInterface* fireInterface)
 void CFireSA::StaticSetHooks()
 {
     // Patch calls to CFire::Extinguish
-    HookInstallCall(0x442157, (DWORD)StaticExtinguish); // CGameLogic::RestorePlayerStuffDuringResurrection
-    HookInstallCall(0x59F81B, (DWORD)StaticExtinguish); // CObject::~CObject
+    HookInstallCall(0x442157, (DWORD)StaticExtinguish);  // CGameLogic::RestorePlayerStuffDuringResurrection
+    HookInstallCall(0x59F81B, (DWORD)StaticExtinguish);  // CObject::~CObject
     HookInstallCall(0x5E8714, (DWORD)StaticExtinguish);  // CPed::~CPed
     HookInstallCall(0x60CD7F, (DWORD)StaticExtinguish);  // CPlayerPed::SetInitialState
     HookInstallCall(0x63377E, (DWORD)StaticExtinguish);  // CTaskSimplePlayerOnFire::ProcessPed

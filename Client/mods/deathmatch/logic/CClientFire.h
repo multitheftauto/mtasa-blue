@@ -31,13 +31,13 @@ public:
 
     void Extinguish();
 
-    void     GetPosition(CVector& position) const override;
-    void     SetPosition(const CVector& position);
+    void GetPosition(CVector& position) const override;
+    void SetPosition(const CVector& position);
 
-    void SetStrength(float strength);
+    void  SetStrength(float strength);
     float GetStrength() const noexcept;
 
-    void SetLifetime(std::uint32_t lifetime);
+    void          SetLifetime(std::uint32_t lifetime);
     std::uint32_t GetLifetime() const noexcept;
 
     static void OnGameFireDestroyed(CFire* fire);

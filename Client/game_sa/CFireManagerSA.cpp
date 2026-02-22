@@ -33,7 +33,8 @@ CFireManagerSA::~CFireManagerSA()
     m_Fires.clear();
 }
 
-CFire* CFireManagerSA::StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed, bool makeNoise)
+CFire* CFireManagerSA::StartFire(const CVector& position, float size, CEntity* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed,
+                                 bool makeNoise)
 {
     // Call CWaterLevel::GetWaterLevelNoWaves
     float waterLevel = 0.0f;
@@ -81,7 +82,7 @@ CFire* CFireManagerSA::StartFire(CEntity* target, CEntity* creator, std::uint32_
 
 CFire* CFireManagerSA::FindNearestFire(CVector* position, bool checkExtinguished, bool checkScript)
 {
-    float nearestDistance2DSquared = std::numeric_limits<float>::infinity();
+    float    nearestDistance2DSquared = std::numeric_limits<float>::infinity();
     CFireSA* nearestFire = nullptr;
 
     for (const auto& fire : m_Fires)
@@ -296,13 +297,15 @@ void CFireManagerSA::Update()
         ClearExtinguishedFires();
 }
 
-static void __fastcall StaticStartFireAtCoors(void* gFireManagerSA, void* edx, CVector position, float size, int unused_1, CEntitySAInterface* creator, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed, int unused_2)
+static void __fastcall StaticStartFireAtCoors(void* gFireManagerSA, void* edx, CVector position, float size, int unused_1, CEntitySAInterface* creator,
+                                              std::uint32_t lifetime, std::uint8_t numGenerationsAllowed, int unused_2)
 {
     CEntity* creatorEntity = creator ? pGame->GetPools()->GetEntity((DWORD*)creator) : nullptr;
     pGame->GetFireManager()->StartFire(position, size, creatorEntity, lifetime, numGenerationsAllowed);
 }
 
-static void __fastcall StaticStartFireAtEntity(void* gFireManagerSA, void* edx, CEntitySAInterface* target, CEntitySAInterface* creator, float size_unused, int unused_1, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed)
+static void __fastcall StaticStartFireAtEntity(void* gFireManagerSA, void* edx, CEntitySAInterface* target, CEntitySAInterface* creator, float size_unused,
+                                               int unused_1, std::uint32_t lifetime, std::uint8_t numGenerationsAllowed)
 {
     CPools* pools = pGame->GetPools();
 
@@ -348,11 +351,11 @@ void CFireManagerSA::StaticSetHooks()
     HookInstallCall(0x7373DA, (DWORD)StaticStartFireAtCoors);  // CExplosion::AddExplosion
 
     // Patch calls to CFireManager::StartFire (entity)
-    HookInstallCall(0x4621D3, (DWORD)StaticStartFireAtEntity); // CRoadBlocks::CreateRoadBlockBetween2Points
-    HookInstallCall(0x4624A9, (DWORD)StaticStartFireAtEntity); // CRoadBlocks::CreateRoadBlockBetween2Points
+    HookInstallCall(0x4621D3, (DWORD)StaticStartFireAtEntity);  // CRoadBlocks::CreateRoadBlockBetween2Points
+    HookInstallCall(0x4624A9, (DWORD)StaticStartFireAtEntity);  // CRoadBlocks::CreateRoadBlockBetween2Points
     HookInstallCall(0x5657DE, (DWORD)StaticStartFireAtEntity);  // CWorld::SetPedsOnFire
-    HookInstallCall(0x565B5A, (DWORD)StaticStartFireAtEntity); // CWorld::SetCarsOnFire
-    HookInstallCall(0x6B39DF, (DWORD)StaticStartFireAtEntity); // CAutomobile::BlowUpCar
+    HookInstallCall(0x565B5A, (DWORD)StaticStartFireAtEntity);  // CWorld::SetCarsOnFire
+    HookInstallCall(0x6B39DF, (DWORD)StaticStartFireAtEntity);  // CAutomobile::BlowUpCar
     HookInstallCall(0x6B3E08, (DWORD)StaticStartFireAtEntity);  // CAutomobile::BlowUpCarCutSceneNoExtras
     HookInstallCall(0x6C6FCC, (DWORD)StaticStartFireAtEntity);  // CHeli::BlowUpCar
     HookInstallCall(0x6CD011, (DWORD)StaticStartFireAtEntity);  // CPlane::BlowUpCar
@@ -360,7 +363,7 @@ void CFireManagerSA::StaticSetHooks()
     HookInstallCall(0x73A063, (DWORD)StaticStartFireAtEntity);  // CShotInfo::Update
 
     // Patch calls to CFireManager::FindNearestFire
-    HookInstallCall(0x603F49, (DWORD)StaticFindNearestFire); // CNearbyFireScanner::ScanForNearbyFires
+    HookInstallCall(0x603F49, (DWORD)StaticFindNearestFire);  // CNearbyFireScanner::ScanForNearbyFires
     HookInstallCall(0x6599AE, (DWORD)StaticFindNearestFire);  // sub_659990 called by CTaskComplexExtinguishFireOnFoot::CreateFirstSubTask
     HookInstallCall(0x65B180, (DWORD)StaticFindNearestFire);  // CTaskComplexDriveFireTruck::CreateFirstSubTask
     HookInstallCall(0x65B24A, (DWORD)StaticFindNearestFire);  // CTaskComplexDriveFireTruck::ControlSubTask
@@ -368,18 +371,18 @@ void CFireManagerSA::StaticSetHooks()
     HookInstallCall(0x69761E, (DWORD)StaticFindNearestFire);  // sub_697600 called by CTaskComplexExtinguishFires::CreateNextSubTask
 
     // Patch calls to CFireManager::ExtinguishPoint
-    HookInstallCall(0x56A421, (DWORD)StaticExtinguishPoint); // CWorld::ClearExcitingStuffFromArea
+    HookInstallCall(0x56A421, (DWORD)StaticExtinguishPoint);  // CWorld::ClearExcitingStuffFromArea
     HookInstallCall(0x56E945, (DWORD)StaticExtinguishPoint);  // CPlayerInfo::MakePlayerSafe
 
     // Patch calls to CFireManager::ExtinguishPointWithWater
-    HookInstallCall(0x72A36B, (DWORD)StaticExtinguishPointWithWater); // CWaterCannon::Update_OncePerFrame
+    HookInstallCall(0x72A36B, (DWORD)StaticExtinguishPointWithWater);  // CWaterCannon::Update_OncePerFrame
     HookInstallCall(0x73A1E1, (DWORD)StaticExtinguishPointWithWater);  // CShotInfo::Update
 
     // Patch call to CFireManager::GetNumFiresInRange
-    HookInstallCall(0x56B972, (DWORD)StaticGetNumFiresInRange); // CWorld::SetWorldOnFire
+    HookInstallCall(0x56B972, (DWORD)StaticGetNumFiresInRange);  // CWorld::SetWorldOnFire
 
     // Patch call to CFireManager::Update
-    HookInstallCall(0x53C00A, (DWORD)StaticUpdate); // CGame::Process
+    HookInstallCall(0x53C00A, (DWORD)StaticUpdate);  // CGame::Process
 
     // Ignoring 0x539340 (CFireManager::PlentyFiresAvailable) because it’s inlined and has no xrefs
     // Ignoring all functions/calls related to scripts & replay stuff

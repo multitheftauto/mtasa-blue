@@ -31,12 +31,12 @@ bool CCreepingFireSA::TryToStartFireAtCoors(CVector position, std::uint8_t numGe
         return false;
 
     // Call CWorld::ProcessVerticalLine
-    CEntitySAInterface* hitEntity = nullptr;
+    CEntitySAInterface*  hitEntity = nullptr;
     CColPointSAInterface cp;
     if (!((bool(__cdecl*)(CVector*, float, CColPointSAInterface*, CEntitySAInterface**, bool, bool, bool, bool, bool, bool, void*))0x5674E0)(
             &position, position.fZ - zDistance, &cp, &hitEntity, true, false, false, false, false, false, nullptr))
         return false;
-    
+
     position.fZ = cp.Position.fZ;
     status = 6;
 
@@ -48,12 +48,12 @@ bool CCreepingFireSA::TryToStartFireAtCoors(CVector position, std::uint8_t numGe
     if (registerWithCreator)
     {
         void* returnAddress = _ReturnAddress();
-        if (returnAddress == (void*)0x7377D8)  // CExplosion::Update
+        if (returnAddress == (void*)0x7377D8)                                               // CExplosion::Update
             creatorInterface = *(CEntitySAInterface**)((char*)registerWithCreator - 0x18);  // [esi-0x18]
-        else if (returnAddress == (void*)0x73EC03)  // CWeapon::FireAreaEffect
+        else if (returnAddress == (void*)0x73EC03)                                          // CWeapon::FireAreaEffect
             // esp + 0x6C+0x4 + 0xC (CVector) + 0x4 (push) = esp + 0x80
             creatorInterface = *(CEntitySAInterface**)((char*)registerWithCreator + 0x80);  // [esp+0x80]
-        else  // our CFireSA::ProcessFire
+        else                                                                                // our CFireSA::ProcessFire
             creatorInterface = static_cast<CEntitySAInterface*>(registerWithCreator);
     }
 
