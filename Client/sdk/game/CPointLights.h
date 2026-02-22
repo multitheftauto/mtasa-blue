@@ -29,5 +29,6 @@ public:
 
     virtual void PreRenderHeliLights() = 0;
     virtual void PostRenderHeliLights() = 0;
-    virtual void RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot) = 0;
+    virtual void RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot,
+                                 const SharedUtil::SColor& color) = 0;
 };
