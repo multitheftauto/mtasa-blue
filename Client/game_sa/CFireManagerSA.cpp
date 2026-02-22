@@ -42,6 +42,9 @@ CFire* CFireManagerSA::StartFire(const CVector& position, float size, CEntity* c
     if (waterLevel > position.fZ)
         return nullptr;
 
+    // Disable spreading fires (world property todo)
+    numGenerationsAllowed = 0;
+
     m_Fires.push_back(std::make_unique<CFireSA>(this, creator, position, pGame->GetSystemTime() + lifetime, numGenerationsAllowed, makeNoise));
     return m_Fires.back().get();
 }
@@ -53,6 +56,9 @@ CFire* CFireManagerSA::StartFire(CEntity* target, CEntity* creator, std::uint32_
 
     if (m_creationHandler && !m_creationHandler(target, creator))
         return nullptr;
+
+    // Disable spreading fires (world property todo)
+    numGenerationsAllowed = 0;
 
     switch (target->GetEntityType())
     {
