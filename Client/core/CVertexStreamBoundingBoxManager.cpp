@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CVertexStreamBoundingBoxManager.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 
 CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::ms_Singleton = NULL;
 

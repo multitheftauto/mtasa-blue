@@ -36,7 +36,15 @@ public:
     bool IsEntityRemoved(CEntitySAInterface* pInterface) override;
     void DropCaches();
 
+    // Called from the CIplStore::RemoveIpl hook before GTA frees the entities.
+    // Purges tracked pointers belonging to the given IPL slot.
+    void OnRemoveIpl(int iplSlotIndex);
+
+    static void StaticSetHooks();
+
 private:
+    void ClearEntityTracking(CEntitySAInterface* pInterface);
+
     std::multimap<uint16_t, SBuildingRemoval*>*         m_pBuildingRemovals;
     std::multimap<uint16_t, sDataBuildingRemovalItem*>* m_pDataBuildings;
     std::multimap<uint16_t, sBuildingRemovalItem*>*     m_pBinaryBuildings;

@@ -720,6 +720,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
         !ifdef MTA_MAETRO
             File /oname=d3dcompiler_47.dll "${FILES_ROOT}\mta\d3dcompiler_47.maetro.dll"
+            File "${FILES_ROOT}\maetro32.dll"
+            File "${FILES_ROOT}\mta\maetro64.dll"
         !else
             File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
         !endif
@@ -727,6 +729,10 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
+
+        !ifdef MTA_MAETRO
+            File "${FILES_ROOT}\maetro32.dll"
+        !endif
 
 
 	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
@@ -847,6 +853,10 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SetOutPath "$INSTDIR"
         File "${FILES_ROOT}\Multi Theft Auto.exe"
 
+        !ifdef MTA_MAETRO
+            File "${FILES_ROOT}\maetro32.dll"
+        !endif
+
         # Ensure exe file can be updated without admin
         AccessControl::GrantOnFile "$INSTDIR\Multi Theft Auto.exe" "($PermissionsGroup)" "FullAccess"
 
@@ -886,6 +896,9 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
+        !ifdef MTA_MAETRO
+            File "${FILES_ROOT}\maetro32.dll"
+        !endif
         ${LogText} "-Section end - SERVER CORE"
     SectionEnd
 
@@ -1127,45 +1140,25 @@ Section Uninstall
 
     preservemapsfolder:
         Call un.DoServiceUninstall
-        ; server CORE FILES
-        Delete "$INSTDIR\server\core.dll"
-        Delete "$INSTDIR\server\MTA Server.exe"
-        Delete "$INSTDIR\server\net.dll"
-        Delete "$INSTDIR\server\pthread.dll"
-        Delete "$INSTDIR\server\xmll.dll"
-
         ; server files
-        Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\libcrypto-3.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\libssl-3.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
-
-        ; server x64 CORE FILES
-        Delete "$INSTDIR\server\MTA Server64.exe"
-        Delete "$INSTDIR\server\x64\core.dll"
-        Delete "$INSTDIR\server\x64\net.dll"
-        Delete "$INSTDIR\server\x64\pthread.dll"
-        Delete "$INSTDIR\server\x64\xmll.dll"
+        Delete "$INSTDIR\server\MTA Server.exe"
+        Delete "$INSTDIR\server\*.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\*.dll"
 
         ; server x64 files
-        Delete "$INSTDIR\server\x64\dbconmy.dll"
-        Delete "$INSTDIR\server\x64\deathmatch.dll"
-        Delete "$INSTDIR\server\x64\libmysql.dll"
-        Delete "$INSTDIR\server\x64\libcrypto-3-x64.dll"
-        Delete "$INSTDIR\server\x64\libssl-3-x64.dll"
-        Delete "$INSTDIR\server\x64\lua5.1.dll"
-        Delete "$INSTDIR\server\x64\pcre3.dll"
+        Delete "$INSTDIR\server\MTA Server64.exe"
+        Delete "$INSTDIR\server\x64\*.dll"
         RmDir "$INSTDIR\server\x64"
 
         Delete "$INSTDIR\Multi Theft Auto.exe"
         Delete "$INSTDIR\Multi Theft Auto.exe.dat"
         Delete "$INSTDIR\Uninstall.exe"
 
-        Delete "$INSTDIR\mods\deathmatch\client.dll"
-        Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
+        !ifdef MTA_MAETRO
+            Delete "$INSTDIR\maetro32.dll"
+        !endif
+
+        Delete "$INSTDIR\mods\deathmatch\*.dll"
 
         RmDir /r "$INSTDIR\MTA\cgui"
         RmDir /r "$INSTDIR\MTA\data"

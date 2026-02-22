@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include "CFileFormat.h"
 #include "CPixelsManager.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 
 extern CCore* g_pCore;
 
