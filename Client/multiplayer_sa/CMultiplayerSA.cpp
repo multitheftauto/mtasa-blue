@@ -1571,8 +1571,8 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x6C4453, 0x90, 0x68);
 
     // Allow model ID 432 (Rhino) to render headlight cones and coronas
-    MemSet((void*)0x6A2EAF, 0x90, 2);
-    MemSet((void*)0x6ABC85, 0x90, 2);
+    MemSet((void*)0x6A2EAB, 0x90, 6);
+    MemSet((void*)0x6ABC81, 0x90, 6);
 
     // Disable Z position changes in the matrix in the C3dMarkers::PlaceMarker (#4000, #536)
     // To prevent arrow-type markers from snapping to the ground
