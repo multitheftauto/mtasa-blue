@@ -29,11 +29,17 @@ public:
     bool              Load(bool isRaw, SString input, bool enableFiltering);
     bool              AddClothingTexture(const std::string& modelName);
     bool              Import(unsigned short usModelID);
+    static void       ProcessPendingImports();
+    static void       ClearPendingImports();
     static bool       IsImportableModel(unsigned short usModelID);
     static bool       IsTXDData(const SString& strData);
     const SString&    GetLastError() const { return m_strLastError; }
 
 private:
+    bool ImportInternal(unsigned short usModelID, bool bAllowQueue);
+    bool IsDeviceLost() const;
+    void RemovePendingImports();
+
     bool LoadFromFile(SString filePath);
     bool LoadFromBuffer(SString buffer);
 

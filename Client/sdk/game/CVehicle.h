@@ -113,6 +113,15 @@ struct SVehicleComponentData
     bool    m_bVisible;
 };
 
+enum class VehicleComponentType
+{
+    NONE = -1,
+
+    DOOR,
+    PANEL,
+    WHEEL,
+};
+
 class CVehicle : public virtual CPhysical
 {
 public:

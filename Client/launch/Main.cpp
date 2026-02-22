@@ -285,7 +285,7 @@ namespace mta::launcher
     {
         if (!ValidatePathSafety(launch_path)) [[unlikely]]
         {
-            AddReportLog(5731, std::format("Launcher Main: Invalid launch path: '{}'", launch_path));
+            AddReportLog(5731, std::format("Launcher Main: Invalid launch path: '{}'", std::string_view{launch_path}));
             return std::unexpected(LoadResult::PathError);
         }
 
@@ -305,7 +305,7 @@ namespace mta::launcher
         if (ValidatePathSafety(alt) && DirectoryExists(alt))
             return alt;
 
-        AddReportLog(5730, std::format("Launcher Main: MTA directory not found from: '{}'", launch_path));
+        AddReportLog(5730, std::format("Launcher Main: MTA directory not found from: '{}'", std::string_view{launch_path}));
         return std::unexpected(LoadResult::PathError);
     }
 }  // namespace mta::launcher
@@ -342,7 +342,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     SString mta_path = mta_path_result.value();
     SString dll_path = PathJoin(mta_path, SString{LOADER_DLL.data(), LOADER_DLL.size()});
 
-    AddReportLog(5725, std::format("Launcher Main: Launch: '{}', MTA: '{}'", launch_path, mta_path));
+    AddReportLog(5725, SString("Launcher Main: Launch: '%s', MTA: '%s'", launch_path.c_str(), mta_path.c_str()));
 
     // DLL loading
     auto module_result = LoadLibrarySafe(dll_path, LOADER_DLL, mta_path);
