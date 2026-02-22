@@ -150,7 +150,8 @@ void CShaderInstance::SetTextureValue(D3DXHANDLE hHandle, CTextureItem* pTexture
     // Set as texture
     pParam->cType = 't';
     pParam->pTextureItem = pTextureItem;
-    pParam->pTextureItem->AddRef();
+    if (pParam->pTextureItem)
+        pParam->pTextureItem->AddRef();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -285,8 +286,40 @@ void CShaderInstance::ApplyShaderParameters()
         switch (iter->second.cType)
         {
             case 't':
-                pD3DEffect->SetTexture(iter->first, iter->second.pTextureItem->m_pD3DTexture);
+            {
+                CTextureItem* pTextureItem = iter->second.pTextureItem;
+                if (!pTextureItem)
+                {
+                    pD3DEffect->SetTexture(iter->first, nullptr);
+                    break;
+                }
+
+                if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTextureItem))
+                {
+                    if (!pRenderTarget->TryEnsureValid())
+                    {
+                        pD3DEffect->SetTexture(iter->first, nullptr);
+                        break;
+                    }
+                }
+                else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTextureItem))
+                {
+                    if (!pScreenSource->TryEnsureValid())
+                    {
+                        pD3DEffect->SetTexture(iter->first, nullptr);
+                        break;
+                    }
+                }
+
+                if (!pTextureItem->m_pD3DTexture)
+                {
+                    pD3DEffect->SetTexture(iter->first, nullptr);
+                    break;
+                }
+
+                pD3DEffect->SetTexture(iter->first, pTextureItem->m_pD3DTexture);
                 break;
+            }
 
             case 'b':
                 pD3DEffect->SetBool(iter->first, iter->second.bValue);

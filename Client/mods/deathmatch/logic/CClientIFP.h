@@ -247,6 +247,11 @@ private:
     {
         BYTE*  pKeyFrames = pAnimationSequence->GetKeyFrames();
         size_t iSizeInBytes = sizeof(T) * iFrames;
+        if (!pKeyFrames)
+        {
+            SkipBytes(static_cast<std::uint32_t>(iSizeInBytes));
+            return;
+        }
         ReadBytes(pKeyFrames, iSizeInBytes);
     }
 
@@ -267,6 +272,7 @@ private:
 
     eFrameType   GetFrameTypeFromFourCC(const char* szFourCC);
     size_t       GetSizeOfCompressedFrame(eFrameType FrameType);
+    size_t       GetSourceFrameDataSize(eFrameType iFrameType);
     std::int32_t GetBoneIDFromName(const SString& strBoneName);
     SString      GetCorrectBoneNameFromName(const SString& strBoneName);
     SString      GetCorrectBoneNameFromID(const std::int32_t& iBoneID);

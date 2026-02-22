@@ -10,6 +10,7 @@
  *****************************************************************************/
 #include <StdInc.h>
 #include "CPrimitiveBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 ////////////////////////////////////////////////////////////////
 //
 // CPrimitiveBatcher::CPrimitiveBatcher
@@ -42,6 +43,7 @@ CPrimitiveBatcher::~CPrimitiveBatcher()
 void CPrimitiveBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY)
 {
     m_pDevice = pDevice;
+
     // Cache matrices
     UpdateMatrices(fViewportSizeX, fViewportSizeY);
 }

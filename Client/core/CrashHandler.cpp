@@ -62,6 +62,7 @@
 
 using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
 static std::atomic<bool> g_bWerLocalDumpConfigured{false};
+thread_local bool        g_bCrashHandlerStackOverflow{false};
 
 [[nodiscard]] constexpr bool IsMemoryException(DWORD code)
 {
@@ -99,6 +100,8 @@ static std::atomic<bool> g_bWerLocalDumpConfigured{false};
 // Helpers to isolate __try usage and prevent crashes in debug output itself
 void OutputDebugStringSafeImpl(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (message == nullptr)
         return;
 
@@ -113,6 +116,8 @@ void OutputDebugStringSafeImpl(const char* message)
 
 void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (buffer == nullptr || bufferSize == 0 || format == nullptr)
         return;
 
@@ -134,6 +139,8 @@ void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format
 
 void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     char buffer[DEBUG_BUFFER_SIZE] = {};
 
     std::size_t offset = 0;
@@ -2748,6 +2755,21 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     }
 
     const DWORD dwExceptionCode{pExPtrs->ExceptionRecord->ExceptionCode};
+    const bool  isStackOverflow = (dwExceptionCode == EXCEPTION_STACK_OVERFLOW);
+    struct StackOverflowScope
+    {
+        bool active;
+        explicit StackOverflowScope(bool enable) : active(enable)
+        {
+            if (active)
+                g_bCrashHandlerStackOverflow = true;
+        }
+        ~StackOverflowScope()
+        {
+            if (active)
+                g_bCrashHandlerStackOverflow = false;
+        }
+    } stackOverflowScope(isStackOverflow);
 
     // Special handling for release build-affecting assertions from 3rd-party libs (e.g CEF) that overuse them
     if (IsDebuggerPresent() == FALSE && pExPtrs->ContextRecord != nullptr)
@@ -3167,6 +3189,15 @@ namespace
 
             if (elapsed.count() >= static_cast<std::chrono::seconds::rep>(timeoutSecs))
             {
+#ifdef MTA_DEBUG
+                if (IsDebuggerPresent() == TRUE)
+                {
+                    g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
+                    std::this_thread::sleep_for(kCheckInterval);
+                    continue;
+                }
+#endif
+
                 AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)", static_cast<long long>(elapsed.count()), timeoutSecs));
 
                 const bool triggered = TriggerWatchdogException(targetThread.get(), targetThreadId);

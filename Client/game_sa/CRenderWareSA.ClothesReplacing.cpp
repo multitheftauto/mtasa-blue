@@ -206,7 +206,7 @@ bool CRenderWareSA::ClothesRemoveFile(char* fileData)
 // Check if clothe file exits
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::HasClothesFile(const char* fileName) const noexcept
+bool CRenderWareSA::HasClothesFile(const char* fileName) const
 {
     return fileName && MapFind(ms_ClothesFileDataMap, fileName);
 }
