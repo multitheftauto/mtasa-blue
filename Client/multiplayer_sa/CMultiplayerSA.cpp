@@ -839,6 +839,12 @@ void CMultiplayerSA::InitHooks()
 
     // MemSet ( (void*)0x408A1B, 0x90, 5 );
 
+    // CTxdStore::GetNumRefs freed-slot error path does xor eax,eax then movsx eax,[eax+4]
+    // which is a null-deref (reads address 0x4). In SA its dead code, but MTA can reach it
+    // when a stale streaming entry references a freed TXD pool slot. NOP the movsx so
+    // freed slots return 0 refs instead of crashing.
+    MemSet((void*)0x731AB5, 0x90, 4);
+
     // Hack to make the choke task use 0 time left remaining when he starts t
     // just stand there looking. So he won't do that.
     MemPut<unsigned char>(0x620607, 0x33);
@@ -1029,8 +1035,8 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x44C39A + 4, 0x00);
     MemPut<BYTE>(0x44C39A + 5, 0x00);
 
-    // Avoid garage doors closing when you change your model
-    MemSet((LPVOID)0x4486F7, 0x90, 4);
+    // Disable CGarages::PlayerArrestedOrDied to stop the game from automatically closing/opening garages
+    MemSet((void*)0x442303, 0x90, 5);
 
     // Disable CStats::IncrementStat (returns at start of function)
     MemPut<BYTE>(0x55C180, 0xC3);
@@ -1693,25 +1699,15 @@ void CMultiplayerSA::DisablePadHandler(bool bDisabled)
 
 void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
 {
-    int*  CPostEffects__m_HeatHazeFXIntensity = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXIntensity)>(0x8D50E8);
-    int*  CPostEffects__m_HeatHazeFXRandomShift = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRandomShift)>(0xC402C0);
-    int*  CPostEffects__m_HeatHazeFXSpeedMin = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMin)>(0xC402C0);
-    int*  CPostEffects__m_HeatHazeFXSpeedMax = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMax)>(0x8D50F0);
-    int*  CPostEffects__m_HeatHazeFXScanSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeX)>(0xC40304);
-    int*  CPostEffects__m_HeatHazeFXScanSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeY)>(0xC40308);
-    int*  CPostEffects__m_HeatHazeFXRenderSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRenderSizeX)>(0xC4030C);
-    int*  CPostEffects__m_HeatHazeFXRenderSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRenderSizeY)>(0xC40310);
-    bool* CPostEffects__m_bHeatHazeFX = reinterpret_cast<decltype(CPostEffects__m_bHeatHazeFX)>(0xC402BA);
-
-    settings.ucIntensity = static_cast<uchar>(*CPostEffects__m_HeatHazeFXIntensity);
-    settings.ucRandomShift = static_cast<uchar>(*CPostEffects__m_HeatHazeFXRandomShift);
-    settings.usSpeedMin = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMin);
-    settings.usSpeedMax = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMax);
-    settings.sScanSizeX = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeY);
-    settings.sScanSizeY = static_cast<short>(*CPostEffects__m_HeatHazeFXSpeedMax);
-    settings.usRenderSizeX = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeX);
-    settings.usRenderSizeY = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeY);
-    settings.bInsideBuilding = *CPostEffects__m_bHeatHazeFX;
+    settings.ucIntensity = *(uchar*)0x8D50E8;
+    settings.ucRandomShift = *(uchar*)0xC402C0;
+    settings.usSpeedMin = *(ushort*)0x8D50EC;
+    settings.usSpeedMax = *(ushort*)0x8D50F0;
+    settings.sScanSizeX = *(short*)0xC40304;
+    settings.sScanSizeY = *(short*)0xC40308;
+    settings.usRenderSizeX = *(ushort*)0xC4030C;
+    settings.usRenderSizeY = *(ushort*)0xC40310;
+    settings.bInsideBuilding = *(bool*)0xC402BA;
 }
 
 void CMultiplayerSA::ResetColorFilter()
@@ -2229,7 +2225,7 @@ void CMultiplayerSA::ResetSky()
 
 void CMultiplayerSA::SetMoonSize(int iSize)
 {
-    MemPutFast(0x8D4B60, static_cast<BYTE>(iSize));
+    MemPutFast<BYTE>(0x8D4B60, static_cast<BYTE>(iSize));
 }
 
 int CMultiplayerSA::GetMoonSize()
@@ -4162,7 +4158,7 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         // Get weapon type before pushad to avoid stack offset corruption
         mov     al, [esp+0x8]
         mov     ucChokingWeaponType, al
-        
+
         pushad
 
         mov     ebx, [m_pChokingHandler]
@@ -4179,7 +4175,7 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         jnz     continueWithOriginalCode
         popad
         jmp     dwChokingDontchoke
-    
+
         continueWithOriginalCode:
         popad
         mov     ecx, [edi]
@@ -5361,8 +5357,6 @@ void __cdecl HandleIdle()
     {
         bAnimGroupArrayAddressLogged = true;
         DWORD dwAnimGroupArrayAddress = 0xb4ea34;
-        LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
-                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
     }
 
     ProcessDeferredStreamingMemoryRelief();
@@ -5559,6 +5553,20 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights()
     // clang-format on
 }
 
+static unsigned long ClampFloatToByteULong(float value)
+{
+    if (!(value > 0.0f))
+        return 0;
+    if (value >= 255.0f)
+        return 255;
+    return static_cast<unsigned long>(value + 0.5f);
+}
+
+static unsigned char ULongToByte(unsigned long value)
+{
+    return static_cast<unsigned char>(value & 0xFFu);
+}
+
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
 {
@@ -5571,9 +5579,9 @@ void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float 
     }
 
     // Scale our color values to the defaults ..looks dodgy but its needed!
-    ulHeadLightR = (unsigned char)std::min(255.f, color.R * (1 / 255.0f) * fR);
-    ulHeadLightG = (unsigned char)std::min(255.f, color.G * (1 / 255.0f) * fG);
-    ulHeadLightB = (unsigned char)std::min(255.f, color.B * (1 / 255.0f) * fB);
+    ulHeadLightR = ClampFloatToByteULong(color.R * (1.0f / 255.0f) * fR);
+    ulHeadLightG = ClampFloatToByteULong(color.G * (1.0f / 255.0f) * fG);
+    ulHeadLightB = ClampFloatToByteULong(color.B * (1.0f / 255.0f) * fB);
 }
 
 CVehicleSAInterface*          pHeadLightBeamVehicleInterface = NULL;
@@ -5601,7 +5609,7 @@ void         CVehicle_DoHeadLightBeam()
     for (unsigned int i = 0; i < uiHeadLightNumVerts; i++)
     {
         unsigned char alpha = COLOR_ARGB_A(pHeadLightVerts[i].color);
-        pHeadLightVerts[i].color = COLOR_ARGB(alpha, (unsigned char)ulHeadLightR, (unsigned char)ulHeadLightG, (unsigned char)ulHeadLightB);
+        pHeadLightVerts[i].color = COLOR_ARGB(alpha, ULongToByte(ulHeadLightR), ULongToByte(ulHeadLightG), ULongToByte(ulHeadLightB));
     }
 }
 
@@ -6711,7 +6719,7 @@ bool CheckRemovedModelNoSet()
     if (pBuildingRemoval)
     {
         // Is the model in question even removed?
-        if (pBuildingRemoval->IsModelRemoved(static_cast<uint16_t>(pEntityWorldAdd->m_nModelIndex)))
+        if (pBuildingRemoval->IsModelRemoved(static_cast<std::uint16_t>(pEntityWorldAdd->m_nModelIndex)))
         {
             // is the replaced model in the spherical radius of any building removal
             if (pGameInterface->GetBuildingRemoval()->IsRemovedModelInRadius(pEntityWorldAdd))
@@ -6777,7 +6785,7 @@ void HideEntitySomehow()
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
         {
             // Add the LOD to the list
-            pBuildingRemoval->AddBinaryBuilding(pInterface);
+            pBuildingRemoval->AddBinaryBuilding(pInterface, pInterface->m_iplIndex);
             // Remove the model from the world
             pGameInterface->GetWorld()->Remove(pInterface, BuildingRemoval);
             // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
@@ -6902,13 +6910,13 @@ void RemoveObjectIfNeeded()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
         if (!pLODInterface->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pLODInterface);
+            pBuildingRemoval->AddDataBuilding(pLODInterface, pLODInterface->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
         }
     }
@@ -7001,7 +7009,7 @@ void RemoveDummyIfReplaced()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);
         }
     }
@@ -8053,9 +8061,21 @@ static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, C
         SColor colors[4];
         pVehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
 
-        RwColor color = {static_cast<unsigned char>(colors[0].R * pVehicleInterface->m_fLighting),
-                         static_cast<unsigned char>(colors[0].G * pVehicleInterface->m_fLighting),
-                         static_cast<unsigned char>(colors[0].B * pVehicleInterface->m_fLighting), 0xFF};
+        const float fLighting = pVehicleInterface->m_fLighting;
+        const auto  ClampFloatToByte = [](float value) -> unsigned char
+        {
+            if (value <= 0.0f)
+                return 0;
+            if (value >= 255.0f)
+                return 255;
+            return static_cast<unsigned char>(value);
+        };
+
+        RwColor color;
+        color.r = ClampFloatToByte(static_cast<float>(colors[0].R) * fLighting);
+        color.g = ClampFloatToByte(static_cast<float>(colors[0].G) * fLighting);
+        color.b = ClampFloatToByte(static_cast<float>(colors[0].B) * fLighting);
+        color.a = 0xFF;
 
         // Fx_c::AddDebris
         ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(CLASS_CFx, vecPosition, color, 0.06f, count / 100 + 1);

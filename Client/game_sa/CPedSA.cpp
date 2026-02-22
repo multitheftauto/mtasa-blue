@@ -20,6 +20,7 @@
 #include "CProjectileInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 #include "CFireManagerSA.h"
+#include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
 
@@ -99,7 +100,7 @@ bool CPedSA::InternalAttachEntityToEntity(DWORD entityInteface, const CVector* p
 {
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
     CPedSAInterface* pedInterface = GetPedInterface();
-    auto             pedType = static_cast<std::uint8_t>(pedInterface->bPedType);
+    int              pedType = pedInterface->bPedType;
 
     // Hack the CPed type(?) to non-player so the camera doesn't get changed
     pedInterface->bPedType = 2;
@@ -305,7 +306,10 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* position)
 
     // NOTE(botder): A crash used to occur at 0x7C51A8 in RpHAnimIDGetIndex, because the clump pointer might have been null
     // for a broken model.
-    if (entity->m_pRwObject)
+    // NOTE: A further crash occurs at 0x7C51B9 in RpHAnimIDGetIndex when the clump exists but lacks animation hierarchy data,
+    // because GTA:SA's GetTransformedBonePosition doesn't check if GetAnimHierarchyFromSkinClump returns NULL.
+    RpClump* clump = reinterpret_cast<RpClump*>(entity->m_pRwObject);
+    if (clump && GetAnimHierarchyFromSkinClump(clump))
         // RwV3D *__thiscall CPed::GetTransformedBonePosition(CPed *this, RwV3D *pointsIn, int boneId, char bUpdateBones)
         ((RwV3d * (__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool)) FUNC_GetTransformedBonePosition)(entity, position, bone, true);
 
@@ -355,9 +359,8 @@ void CPedSA::SetClothesTextureAndModel(const char* texture, const char* model, i
 
     // int __fastcall CPedClothesDesc::SetTextureAndModel(DWORD* this, int unknown, char* textureName, char* modelName, eClothesTexturePart texturePart)
     // Second argument is unused in CKeyGen::GetUppercaseKey
-    void(__fastcall * CPedClothesDesc__SetTextureAndModel)(CPedClothesDesc*, int, const char*, const char*, int) = nullptr;
-    CPedClothesDesc__SetTextureAndModel = reinterpret_cast<decltype(CPedClothesDesc__SetTextureAndModel)>(FUNC_CPedClothesDesc__SetTextureAndModel);
-    CPedClothesDesc__SetTextureAndModel(clothes, 0, texture, model, textureType);
+    ((void(__fastcall*)(CPedClothesDesc*, int, const char*, const char*, std::uint8_t))FUNC_CPedClothesDesc__SetTextureAndModel)(
+        clothes, 0, texture, model, static_cast<std::uint8_t>(textureType));
 }
 
 void CPedSA::RebuildPlayer()

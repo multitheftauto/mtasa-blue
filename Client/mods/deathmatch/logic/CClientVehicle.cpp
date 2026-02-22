@@ -59,7 +59,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     // Apply handling
     std::uint32_t usHandlingModelID = m_usModel;
     if (m_usModel < 400 || m_usModel > 611)
-        usHandlingModelID = m_pModelInfo->GetParentID();
+        usHandlingModelID = static_cast<std::uint16_t>(m_pModelInfo->GetParentID());
 
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
     m_HandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
@@ -1059,7 +1059,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         {
             std::uint32_t usHandlingModelID = usModel;
             if (usHandlingModelID < 400 || usHandlingModelID > 611)
-                usHandlingModelID = m_pModelInfo->GetParentID();
+                usHandlingModelID = static_cast<std::uint16_t>(m_pModelInfo->GetParentID());
 
             m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(usHandlingModelID);
             m_HandlingEntry->Assign(m_pOriginalHandlingEntry);
@@ -2789,11 +2789,13 @@ void CClientVehicle::Create()
             switch (m_eVehicleType)
             {
                 case CLIENTVEHICLE_BOAT:
-                    dynamic_cast<CBoat*>(m_pVehicle)->SetBoatHandlingData(m_BoatHandlingEntry.get());
+                    if (auto* pBoat = dynamic_cast<CBoat*>(m_pVehicle))
+                        pBoat->SetBoatHandlingData(m_BoatHandlingEntry.get());
                     break;
                 case CLIENTVEHICLE_BIKE:
                 case CLIENTVEHICLE_BMX:
-                    dynamic_cast<CBike*>(m_pVehicle)->SetBikeHandlingData(m_BikeHandlingEntry.get());
+                    if (auto* pBike = dynamic_cast<CBike*>(m_pVehicle))
+                        pBike->SetBikeHandlingData(m_BikeHandlingEntry.get());
                     break;
             }
 
@@ -2980,11 +2982,23 @@ void CClientVehicle::Destroy()
         switch (m_eVehicleType)
         {
             case CLIENTVEHICLE_BOAT:
-                m_BoatHandlingEntry->Assign(dynamic_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData());
+                if (auto* pBoat = dynamic_cast<CBoat*>(m_pVehicle))
+                {
+                    if (!m_BoatHandlingEntry)
+                        m_BoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
+
+                    m_BoatHandlingEntry->Assign(pBoat->GetBoatHandlingData());
+                }
                 break;
             case CLIENTVEHICLE_BIKE:
             case CLIENTVEHICLE_BMX:
-                m_BikeHandlingEntry->Assign(dynamic_cast<CBike*>(m_pVehicle)->GetBikeHandlingData());
+                if (auto* pBike = dynamic_cast<CBike*>(m_pVehicle))
+                {
+                    if (!m_BikeHandlingEntry)
+                        m_BikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
+
+                    m_BikeHandlingEntry->Assign(pBike->GetBikeHandlingData());
+                }
                 break;
             default:
                 break;
@@ -4307,7 +4321,8 @@ void CClientVehicle::ApplyHandling()
     m_pVehicle->RecalculateHandling();
 
     if (m_eVehicleType == CLIENTVEHICLE_BMX || m_eVehicleType == CLIENTVEHICLE_BIKE)
-        dynamic_cast<CBike*>(m_pVehicle)->RecalculateBikeHandling();
+        if (auto* pBike = dynamic_cast<CBike*>(m_pVehicle))
+            pBike->RecalculateBikeHandling();
 }
 
 CHandlingEntry* CClientVehicle::GetHandlingData()

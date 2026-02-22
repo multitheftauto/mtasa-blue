@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <chrono>
+#include <cstdint>
 #include <vector>
 #include <core/CCoreInterface.h>
 #include "CColModelSA.h"
@@ -123,6 +124,22 @@ static bool IsValidModelInfoPtr(const void* ptr) noexcept
     {
         return false;
     }
+}
+
+// IsValidModelInfoPtr only validates via reads, so stale pointers in readable
+// but non-writable memory pass. VirtualQuery checks the actual page protection
+// to confirm the pointer is in committed writable memory.
+static bool IsWritableModelInfoPtr(CBaseModelInfoSAInterface* ptr) noexcept
+{
+    if (!ptr)
+        return false;
+
+    MEMORY_BASIC_INFORMATION mbi{};
+    if (VirtualQuery(ptr, &mbi, sizeof(mbi)) == 0 || mbi.State != MEM_COMMIT)
+        return false;
+
+    constexpr DWORD writableMask = PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+    return (mbi.Protect & writableMask) != 0 && (mbi.Protect & PAGE_GUARD) == 0;
 }
 
 static bool SafeReadColSlot(CColModelSAInterface* pColModel, unsigned short* pOut) noexcept
@@ -543,6 +560,7 @@ void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
     if (requestType == BLOCKING)
     {
         pGame->GetStreaming()->RequestModel(m_dwModelID, 0x16);
+        uint32_t blockingStartTick = GetTickCount32();
         pGame->GetStreaming()->LoadAllRequestedModels(true, szTag);
         if (!IsLoaded())
         {
@@ -550,6 +568,11 @@ void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
             int iCount = 0;
             while (iCount++ < 10 && !IsLoaded())
             {
+                // Cap total blocking time (including the first load attempt above)
+                // to prevent extended freezes from persistent streaming I/O issues
+                if ((GetTickCount32() - blockingStartTick) > 10000)
+                    break;
+
                 bool bOnlyPriorityModels = (iCount < 3 || iCount & 1);
                 pGame->GetStreaming()->LoadAllRequestedModels(bOnlyPriorityModels, szTag);
             }
@@ -583,7 +606,11 @@ void CModelInfoSA::Remove()
 
     // Remove our reference
     if (m_pInterface->usNumberOfRefs > 0)
+    {
+        if (CTxdStore_GetTxd(m_pInterface->usTextureDictionary) != nullptr)
+            CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
         m_pInterface->usNumberOfRefs--;
+    }
 
     // No references left?
     if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
@@ -618,6 +645,7 @@ bool CModelInfoSA::IsLoaded()
             if (pInterface)
             {
                 pInterface->usNumberOfRefs++;
+                CTxdStore_AddRef(pInterface->usTextureDictionary);
                 m_dwPendingInterfaceRef = 0;
             }
         }
@@ -631,7 +659,8 @@ bool CModelInfoSA::DoIsLoaded()
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     bool bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
 
-    if (m_dwModelID < pGame->GetBaseIDforTXD())
+    const int32_t baseTxdId = pGame->GetBaseIDforTXD();
+    if (baseTxdId > 0 && m_dwModelID < static_cast<DWORD>(baseTxdId))
     {
         m_pInterface = GetInterface();
 
@@ -642,6 +671,23 @@ bool CModelInfoSA::DoIsLoaded()
                 CStreamingInfo* pStreamInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
                 if (pStreamInfo)
                 {
+                    // Unlink from SA's loaded-entry list before zeroing the link fields to avoid linked list corruptin
+                    if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+                    {
+                        constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
+                        const unsigned short     prev = pStreamInfo->prevId;
+                        const unsigned short     next = pStreamInfo->nextId;
+                        if (prev != kInvalid && next != kInvalid)
+                        {
+                            CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
+                            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+                            if (pPrev && pNext)
+                            {
+                                pPrev->nextId = next;
+                                pNext->prevId = prev;
+                            }
+                        }
+                    }
                     pStreamInfo->prevId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
@@ -975,8 +1021,15 @@ bool CModelInfoSA::IsValid()
     if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
         return !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
 
-    if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
-        return true;
+    const int32_t baseTxdId = pGame->GetBaseIDforTXD();
+    const int32_t countOfAllFileIds = pGame->GetCountOfAllFileIDs();
+    if (baseTxdId > 0 && countOfAllFileIds > baseTxdId)
+    {
+        const DWORD baseTxdIdDw = static_cast<DWORD>(baseTxdId);
+        const DWORD countDw = static_cast<DWORD>(countOfAllFileIds);
+        if (m_dwModelID >= baseTxdIdDw && m_dwModelID < countDw)
+            return true;
+    }
 
     if (m_dwModelID >= MODELINFO_DFF_MAX)
         return false;
@@ -1027,9 +1080,40 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
+    // This check should be sufficient - dont consider using IsWritableModelInfoPtr here in the future without good reason
+    if (m_pInterface != ppModelInfo[m_dwModelID])
+    {
+        m_pInterface = nullptr;
+        return;
+    }
+
     unsigned short usOldTxdId = m_pInterface->usTextureDictionary;
     if (usOldTxdId == usID)
         return;
+
+    // Slot allocated (e.g. via engineRequestTXD) but TXD data isn't loaded yet.
+    // For unloaded models, just record the new TXD ID; SA streaming handles refs
+    // and texture resolution when it loads both the model and its TXD dependency.
+    // Loaded models fall through to the ref-transfer path below. CTxdStore_AddRef
+    // only touches usUsagesCount (never dereferences rwTexDictonary), and
+    // BuildTxdTextureMap returns an empty map for null TXDs, making the rebind a
+    // no-op. The real texture data arrives later via engineImageLinkTXD + restream.
+    if (CTxdStore_GetTxd(usID) == nullptr)
+    {
+        if (!pGame || pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usID))
+            return;
+
+        if (!m_pInterface->pRwObject)
+        {
+            if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
+                ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
+
+            m_pInterface->usTextureDictionary = usID;
+            return;
+        }
+
+        // Loaded model: fall through to ref-transfer path
+    }
 
     size_t referencesCount = m_pInterface->usNumberOfRefs;
     if (m_pInterface->pRwObject)
@@ -1085,8 +1169,12 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     }
 
     // Release old TXD refs after rebinding completes
-    for (size_t i = 0; i < referencesCount; i++)
-        CTxdStore_RemoveRef(usOldTxdId);
+    // Only release if old slot is still valid to avoid crash on stale/orphaned TXD slots
+    if (CTxdStore_GetTxd(usOldTxdId) != nullptr)
+    {
+        for (size_t i = 0; i < referencesCount; i++)
+            CTxdStore_RemoveRef(usOldTxdId);
+    }
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()
@@ -1103,6 +1191,16 @@ void CModelInfoSA::ResetTextureDictionaryID()
     }
 
     const auto targetId = static_cast<unsigned short>(it->second);
+
+    // If the target TXD pool slot was freed, we can't restore to it.
+    // When the slot is allocated but its data is unloaded (rwTexDictionary
+    // null), let SetTextureDictionaryID handle it -- it supports that case.
+    if (pGame && pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(targetId))
+    {
+        ms_DefaultTxdIDMap.erase(it);
+        return;
+    }
+
     SetTextureDictionaryID(targetId);
     if (GetTextureDictionaryID() == targetId)
         ms_DefaultTxdIDMap.erase(it);
@@ -1311,6 +1409,129 @@ static void DeleteEntityRwObject(CEntitySAInterface* pEntity)
     }
 }
 
+#define FUNC_CEntity_DeleteRwObject 0x534030
+#define NUM_MinValidEntityAddr      0x10000
+
+// Validates entity vtable pointer with SEH protection.
+// If bCheckDeleteRwObject is true, also verifies DeleteRwObject is the CEntity
+// base implementation - only valid for CBuilding/CDummy sector entities.
+static bool HasValidEntityVtablePtr(CEntitySAInterface* pEntity, bool bCheckDeleteRwObject)
+{
+    DWORD dwEntityAddr = reinterpret_cast<DWORD>(pEntity);
+    if (dwEntityAddr < NUM_MinValidEntityAddr || (dwEntityAddr & 3) != 0)
+        return false;
+
+    __try
+    {
+        DWORD* pdwVtbl = reinterpret_cast<DWORD*>(pEntity->GetVTBL());
+        if (!SharedUtil::IsValidGtaSaPtr(reinterpret_cast<DWORD>(pdwVtbl)))
+            return false;
+
+        if (bCheckDeleteRwObject && pdwVtbl[8] != FUNC_CEntity_DeleteRwObject)
+            return false;
+
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+// Tracks log-throttle counters for invalid entity reports during restream
+struct SRestreamLogState
+{
+    static constexpr int MAX_LOGS_PER_CALL = 32;
+
+    int  iStreamCount = 0;
+    int  iRepeatCount = 0;
+    bool bStreamSuppressed = false;
+    bool bRepeatSuppressed = false;
+
+    void LogInvalidEntity(bool bIsStreamSector, int iSectorIndex, CEntitySAInterface* pEntity)
+    {
+        if (bIsStreamSector)
+        {
+            if (iStreamCount < MAX_LOGS_PER_CALL)
+            {
+                AddReportLog(5560,
+                             SString("Entity 0x%08x at ARRAY_StreamSectors[%d,%d] has invalid vtable", pEntity, iSectorIndex / 2 % NUM_StreamSectorRows,
+                                     iSectorIndex / 2 / NUM_StreamSectorCols),
+                             10);
+                ++iStreamCount;
+            }
+            else if (!bStreamSuppressed)
+            {
+                AddReportLog(5560, "Additional invalid StreamSectors entities suppressed this call", 10);
+                bStreamSuppressed = true;
+            }
+        }
+        else
+        {
+            if (iRepeatCount < MAX_LOGS_PER_CALL)
+            {
+                AddReportLog(5561, SString("Entity 0x%08x at ARRAY_StreamRepeatSectors[%d] has invalid vtable", pEntity, iSectorIndex), 10);
+                ++iRepeatCount;
+            }
+            else if (!bRepeatSuppressed)
+            {
+                AddReportLog(5561, "Additional invalid StreamRepeatSectors entities suppressed this call", 10);
+                bRepeatSuppressed = true;
+            }
+        }
+    }
+};
+
+// Process entities from a sector list, skipping any with corrupted/invalid vtables.
+// StreamSectors (buildings/dummies): full vtable check including DeleteRwObject validation.
+// StreamRepeatSectors (vehicles/peds/objects): vtable pointer range check only, because
+// these entity types override DeleteRwObject and can't be validated by vtable content.
+static void ProcessRestreamSectorList(DWORD* pSectorEntry, bool bIsStreamSector, int iSectorIndex, SRestreamLogState& logState,
+                                      std::unordered_set<unsigned short>& processedTxdIDs, std::unordered_set<unsigned short>& pendingTxdIDs,
+                                      std::unordered_set<unsigned short>& modelsToUnload, const std::map<unsigned short, int>& mapRestreamTxdIDs)
+{
+    while (pSectorEntry)
+    {
+        auto* pEntity = reinterpret_cast<CEntitySAInterface*>(pSectorEntry[0]);
+        if (!pEntity)
+        {
+            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+            continue;
+        }
+
+        if (!HasValidEntityVtablePtr(pEntity, bIsStreamSector))
+        {
+            logState.LogInvalidEntity(bIsStreamSector, iSectorIndex, pEntity);
+            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+            continue;
+        }
+
+        auto* pModelInfo = pGame->GetModelInfo(pEntity->m_nModelIndex);
+        if (!pModelInfo)
+        {
+            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+            continue;
+        }
+
+        unsigned short usTxdID = pModelInfo->GetTextureDictionaryID();
+        if (MapContains(mapRestreamTxdIDs, usTxdID))
+        {
+            if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
+            {
+                DeleteEntityRwObject(pEntity);
+                processedTxdIDs.insert(usTxdID);
+                modelsToUnload.insert(pEntity->m_nModelIndex);
+            }
+            else
+            {
+                pendingTxdIDs.insert(usTxdID);
+            }
+        }
+
+        pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+    }
+}
+
 void CModelInfoSA::StaticFlushPendingRestreamIPL()
 {
     if (ms_RestreamTxdIDMap.empty())
@@ -1333,69 +1554,14 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     constexpr int kRepeatSectorCount = NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols;
     constexpr int kRepeatSectorStride = 3;  // StreamRepeatSectors uses stride of 3, we access element [2]
 
-    // Helper to validate entity vtable - checks if DeleteRwObject points to expected address
-    auto isValidEntity = [](CEntitySAInterface* pEntity) -> bool
-    {
-        constexpr std::size_t kDeleteRwObjectVtblOffset = 8;
-        constexpr std::size_t kExpectedDeleteRwObject = 0x00534030;
-        auto*                 vtbl = static_cast<std::size_t*>(pEntity->GetVTBL());
-        return vtbl[kDeleteRwObjectVtblOffset] == kExpectedDeleteRwObject;
-    };
-
-    // Process entities from a sector list
-    // Note: validateVtable should be true for StreamSectors but false for StreamRepeatSectors
-    auto processSectorList = [&](DWORD* pSectorEntry, bool validateVtable, int sectorIndex)
-    {
-        while (pSectorEntry)
-        {
-            auto* pEntity = reinterpret_cast<CEntitySAInterface*>(pSectorEntry[0]);
-            if (!pEntity)
-            {
-                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-                continue;
-            }
-
-            // Vtable validation for StreamSectors
-            if (validateVtable && !isValidEntity(pEntity))
-            {
-                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
-                                          sectorIndex / 2 % NUM_StreamSectorRows, sectorIndex / 2 / NUM_StreamSectorCols));
-                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-                continue;
-            }
-
-            auto* pModelInfo = pGame->GetModelInfo(pEntity->m_nModelIndex);
-            if (!pModelInfo)
-            {
-                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-                continue;
-            }
-
-            auto txdID = pModelInfo->GetTextureDictionaryID();
-            if (MapContains(ms_RestreamTxdIDMap, txdID))
-            {
-                if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
-                {
-                    DeleteEntityRwObject(pEntity);
-                    processedTxdIDs.insert(txdID);
-                    modelsToUnload.insert(pEntity->m_nModelIndex);
-                }
-                else
-                {
-                    pendingTxdIDs.insert(txdID);
-                }
-            }
-
-            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-        }
-    };
+    SRestreamLogState logState;
 
     // Process StreamSectors (skip null entries for efficiency)
     for (int i = 0; i < kStreamSectorCount; i++)
     {
         auto* pSectorEntry = reinterpret_cast<DWORD*>(reinterpret_cast<DWORD**>(ARRAY_StreamSectors)[i]);
         if (pSectorEntry)
-            processSectorList(pSectorEntry, true, i);
+            ProcessRestreamSectorList(pSectorEntry, true, i, logState, processedTxdIDs, pendingTxdIDs, modelsToUnload, ms_RestreamTxdIDMap);
     }
 
     // Process StreamRepeatSectors (skip null entries for efficiency)
@@ -1403,7 +1569,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     {
         auto* pSectorEntry = reinterpret_cast<DWORD*>(reinterpret_cast<DWORD**>(ARRAY_StreamRepeatSectors)[kRepeatSectorStride * i + 2]);
         if (pSectorEntry)
-            processSectorList(pSectorEntry, false, i);
+            ProcessRestreamSectorList(pSectorEntry, false, i, logState, processedTxdIDs, pendingTxdIDs, modelsToUnload, ms_RestreamTxdIDMap);
     }
 
     // Determine which TXD IDs had no entities found at all (buildings not yet streamed in)
@@ -1542,7 +1708,10 @@ void CModelInfoSA::ModelAddRef(EModelRequestType requestType, const char* szTag)
         {
             m_pInterface = ppModelInfo[m_dwModelID];
             if (IsValidModelInfoPtr(m_pInterface))
+            {
                 m_pInterface->usNumberOfRefs++;
+                CTxdStore_AddRef(m_pInterface->usTextureDictionary);
+            }
             else
                 m_pInterface = nullptr;
         }
@@ -1940,6 +2109,7 @@ void CModelInfoSA::SetVehicleDummyPosition(VehicleDummies eDummy, const CVector&
         ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<VehicleDummies, CVector>()});
         // Increment this model references count, so we don't unload it before we have a chance to reset the positions
         pVehicleModel->usNumberOfRefs++;
+        CTxdStore_AddRef(pVehicleModel->usTextureDictionary);
     }
 
     if (ms_ModelDefaultDummiesPosition[m_dwModelID].find(eDummy) == ms_ModelDefaultDummiesPosition[m_dwModelID].end())
@@ -1979,7 +2149,11 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
     }
 
     if (pVehicleModel->usNumberOfRefs > 0)
+    {
+        if (CTxdStore_GetTxd(pVehicleModel->usTextureDictionary) != nullptr)
+            CTxdStore_RemoveRef(pVehicleModel->usTextureDictionary);
         pVehicleModel->usNumberOfRefs--;
+    }
 
     if (bRemoveFromDummiesMap)
         ms_ModelDefaultDummiesPosition.erase(iter);
@@ -2014,7 +2188,11 @@ void CModelInfoSA::ResetAllVehicleDummies()
             pVehicleModel->pVisualInfo->vecDummies[static_cast<std::size_t>(dummy.first)] = dummy.second;
 
         if (pVehicleModel->usNumberOfRefs > 0)
+        {
+            if (CTxdStore_GetTxd(pVehicleModel->usTextureDictionary) != nullptr)
+                CTxdStore_RemoveRef(pVehicleModel->usTextureDictionary);
             pVehicleModel->usNumberOfRefs--;
+        }
 
         it = ms_ModelDefaultDummiesPosition.erase(it);
     }
@@ -2145,7 +2323,21 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::TIME:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
+        case eModelInfoType::CLUMP:
+            success = pGame->GetRenderWare()->ReplaceClumpModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::UNKNOWN:
+            // Weapon models (321-372) may return UNKNOWN type during streaming. Using ReplaceAllAtomicsInModel
+            // for weapons would skip CWeaponModelInfo::SetClump, leaving the frame plugin's m_modelInfo NULL,
+            // which crashes in CVisibilityPlugins::RenderWeaponCB due to nullptr deref.
+            if (m_dwModelID >= 321 && m_dwModelID <= 372)
+                success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            else
+                success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
         default:
+            AddReportLog(8634, SString("SetCustomModel: Unhandled model type %d for model %u", static_cast<int>(GetModelType()),
+                                       static_cast<unsigned int>(m_dwModelID)));
             break;
     }
 
@@ -2203,12 +2395,21 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
 
 void CModelInfoSA::RestoreOriginalModel()
 {
-    // Are we loaded?
     if (IsLoaded())
     {
-        pGame->GetStreaming()->RemoveModel(m_dwModelID);
+        CBaseModelInfoSAInterface* pInterface = GetInterface();
+        // SA's streaming GC (DeleteLeastUsedEntityRwObject, 0x409640) never removes
+        // models with active refs. Removing with refs > 0 causes TXD ref mismatches
+        // when entities eventually detach, because m_wTxdIndex may have changed.
+        if (pInterface && pInterface->usNumberOfRefs == 0)
+            pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
     // Reset the stored custom vehicle clump
+    m_pCustomClump = nullptr;
+}
+
+void CModelInfoSA::ClearCustomModel()
+{
     m_pCustomClump = nullptr;
 }
 
@@ -2253,8 +2454,11 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
             }
         }
 
-        // Apply some low-level hacks
-        pColModelInterface->m_sphere.m_collisionSlot = 0xA9;
+        // Set collision slot to 0 (the "generic" slot) for custom collision models.
+        // Slot 0 is always allocated in CColStore::Initialise(). Using an unallocated
+        // slot ID (like the previous 0xA9) causes CColStore::AddRef to access garbage
+        // memory since native GTA doesn't validate slot existence before pool indexing.
+        pColModelInterface->m_sphere.m_collisionSlot = 0;
 
         CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, true);
         CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
@@ -2394,13 +2598,23 @@ void CModelInfoSA::AddColRef()
         }
     }
 
-    if (slot != 0xFFFF && pGame)
+    if (slot == 0xFFFF || slot > 0xFF)
+        return;
+
+    if (pGame)
     {
         auto* pColStore = pGame->GetCollisionStore();
         if (pColStore)
         {
-            pColStore->AddRef(slot);
-            ++m_colRefCount;
+            // Validate slot exists in pool before calling native AddRef.
+            // GTA SA's CColStore::AddRef (0x4107A0) doesn't validate slot existence,
+            // it directly indexes the pool causing crashes on unallocated slots.
+            const CollisionSlot colSlot = static_cast<CollisionSlot>(slot);
+            if (pColStore->IsValidSlot(colSlot))
+            {
+                pColStore->AddRef(colSlot);
+                ++m_colRefCount;
+            }
         }
     }
 }
@@ -2435,7 +2649,7 @@ void CModelInfoSA::RemoveColRef()
         slot = m_usColSlot;
     }
 
-    if (slot == 0xFFFF)
+    if (slot == 0xFFFF || slot > 0xFF)
         return;
 
     if (!pGame)
@@ -2445,9 +2659,15 @@ void CModelInfoSA::RemoveColRef()
     if (!pColStore)
         return;
 
-    pColStore->RemoveRef(slot);
-    if (m_colRefCount > 0)
-        --m_colRefCount;
+    // Validate slot exists in pool before calling native RemoveRef.
+    // GTA SA's CColStore::RemoveRef (0x4107D0) doesn't validate slot existence.
+    const CollisionSlot colSlot = static_cast<CollisionSlot>(slot);
+    if (pColStore->IsValidSlot(colSlot))
+    {
+        pColStore->RemoveRef(colSlot);
+        if (m_colRefCount > 0)
+            --m_colRefCount;
+    }
     if (m_colRefCount == 0)
         m_usColSlot = 0xFFFF;
 }
@@ -2699,13 +2919,17 @@ void CModelInfoSA::DeallocateModel()
         m_pCustomClump = nullptr;
         m_pCustomColModel = nullptr;
         m_pOriginalColModelInterface = nullptr;
-        if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && pGame)
+        if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && m_usColSlot <= 0xFF && pGame)
         {
             auto* pColStore = pGame->GetCollisionStore();
             if (pColStore)
             {
-                for (std::uint32_t i = 0; i < m_colRefCount; ++i)
-                    pColStore->RemoveRef(m_usColSlot);
+                const CollisionSlot colSlot = static_cast<CollisionSlot>(m_usColSlot);
+                if (pColStore->IsValidSlot(colSlot))
+                {
+                    for (std::uint32_t i = 0; i < m_colRefCount; ++i)
+                        pColStore->RemoveRef(colSlot);
+                }
             }
         }
         m_colRefCount = 0;
@@ -2779,13 +3003,17 @@ void CModelInfoSA::DeallocateModel()
     m_pCustomClump = nullptr;
     m_pCustomColModel = nullptr;
     m_pOriginalColModelInterface = nullptr;
-    if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && pGame)
+    if (m_colRefCount > 0 && m_usColSlot != 0xFFFF && m_usColSlot <= 0xFF && pGame)
     {
         auto* pColStore = pGame->GetCollisionStore();
         if (pColStore)
         {
-            for (std::uint32_t i = 0; i < m_colRefCount; ++i)
-                pColStore->RemoveRef(m_usColSlot);
+            const CollisionSlot colSlot = static_cast<CollisionSlot>(m_usColSlot);
+            if (pColStore->IsValidSlot(colSlot))
+            {
+                for (std::uint32_t i = 0; i < m_colRefCount; ++i)
+                    pColStore->RemoveRef(colSlot);
+            }
         }
     }
     m_colRefCount = 0;
