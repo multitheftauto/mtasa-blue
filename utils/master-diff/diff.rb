@@ -136,10 +136,8 @@ def main
   end
 
   # Write summary.txt
-  now = Time.now.strftime('%Y-%m-%d %H:%M:%S')
   sep = '=' * 72
   lines = [
-    "Generated:    #{now}",
     "Master:       #{MASTER}",
     "Fork:         #{FORK}",
     '',
