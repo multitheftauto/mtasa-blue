@@ -1,0 +1,6 @@
+# Commits deliberately excluded from release/1.6.0 (fork).
+# Each entry is either a full commit SHA or an exact commit title (first line).
+#
+# Examples:
+#   - commit: aabbccddeeff00112233445566778899aabbccdd
+#   - title: Fix something not relevant to 1.6.0
