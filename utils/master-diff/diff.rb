@@ -3,6 +3,7 @@ require 'open3'
 require 'fileutils'
 require 'set'
 require 'time'
+require 'yaml'
 
 MASTER = 'master'
 FORK   = 'release/1.6.0'
@@ -10,7 +11,7 @@ FORK   = 'release/1.6.0'
 SCRIPT_DIR    = File.expand_path(__dir__)
 REPO_ROOT     = File.expand_path('../..', SCRIPT_DIR)
 OUTPUT_DIR    = File.join(SCRIPT_DIR, 'output')
-EXCLUDED_FILE = File.join(SCRIPT_DIR, 'excluded-from-fork.yaml')
+EXCLUDED_FILE = File.join(SCRIPT_DIR, 'master-only.yaml')
 
 
 def run_git(args)
@@ -67,15 +68,13 @@ def load_exclusions(path)
   excluded_titles = Set.new
   return [excluded_shas, excluded_titles] unless File.exist?(path)
 
-  File.readlines(path).each do |line|
-    line = line.strip
-    if line.start_with?('- commit:')
-      sha = line[9..].strip
-      excluded_shas << sha unless sha.empty?
-    elsif line.start_with?('- title:')
-      title = line[8..].strip
-      excluded_titles << title unless title.empty?
-    end
+  entries = YAML.safe_load(File.read(path))
+  return [excluded_shas, excluded_titles] unless entries.is_a?(Array)
+
+  entries.each do |entry|
+    next unless entry.is_a?(Hash)
+    excluded_shas   << entry['commit'].to_s if entry.key?('commit')
+    excluded_titles << entry['title'].to_s  if entry.key?('title')
   end
   [excluded_shas, excluded_titles]
 end
@@ -99,14 +98,16 @@ def main
   fork_cherry = parse_cherry(run_git(['cherry', '-v', MASTER, FORK]))
   fork_all    = fork_cherry.select { |s, _, _| s == '+' }.map { |_, sha, subj| [sha, subj] }
 
+  fork_only = fork_all
+
   excluded_shas, excluded_titles = load_exclusions(EXCLUDED_FILE)
-  fork_only     = []
-  fork_excluded = []
-  fork_all.each do |sha, subj|
+  master_only_pending  = []
+  master_only_excluded = []
+  master_only.each do |sha, subj|
     if excluded_shas.include?(sha) || excluded_titles.include?(subj)
-      fork_excluded << [sha, subj]
+      master_only_excluded << [sha, subj]
     else
-      fork_only << [sha, subj]
+      master_only_pending << [sha, subj]
     end
   end
 
@@ -143,16 +144,21 @@ def main
     "Fork:         #{FORK}",
     '',
     'Counts:',
-    "  Master-only (not cherry-picked to fork):  #{master_only.length}",
+    "  Master-only, pending (not cherry-picked):  #{master_only_pending.length}",
+    "  Master-only, excluded (won't backport):    #{master_only_excluded.length}",
     "  Cherry-picked to both:                    #{both_entries.length}",
     "  Unmatched picked (no patch-id match):     #{unmatched.length}",
     "  Fork-only:                                #{fork_only.length}",
-    "  Fork-only (excluded):                     #{fork_excluded.length}",
     '',
     sep,
-    "MASTER-ONLY — not yet cherry-picked to fork (#{master_only.length} commits)",
+    "MASTER-ONLY PENDING — not yet cherry-picked to fork (#{master_only_pending.length} commits)",
     sep,
-  ] + master_only.map { |sha, subj| "  + #{sha}  #{subj}" } + [
+  ] + master_only_pending.map { |sha, subj| "  + #{sha}  #{subj}" } + [
+    '',
+    sep,
+    "MASTER-ONLY EXCLUDED — deliberately not backported (#{master_only_excluded.length} commits)",
+    sep,
+  ] + master_only_excluded.map { |sha, subj| "  + #{sha}  #{subj}" } + [
     '',
     sep,
     "CHERRY-PICKED TO BOTH (#{both_entries.length} commits)",
@@ -175,21 +181,12 @@ def main
     sep,
   ] + fork_only.map { |sha, subj| "  + #{sha}  #{subj}" }
 
-  unless fork_excluded.empty?
-    lines += [
-      '',
-      sep,
-      "FORK-ONLY EXCLUDED (#{fork_excluded.length} commits)",
-      sep,
-    ] + fork_excluded.map { |sha, subj| "  + #{sha}  #{subj}" }
-  end
-
   write_file(File.join(OUTPUT_DIR, 'summary.txt'), lines.join("\n") + "\n")
 
   # Write changes-master.yaml
   write_file(
     File.join(OUTPUT_DIR, 'changes-master.yaml'),
-    master_only.map { |sha, subj| "- #{sha}  # #{subj}" }.join("\n") + "\n"
+    master_only_pending.map { |sha, subj| "- #{sha}  # #{subj}" }.join("\n") + "\n"
   )
 
   # Write changes-fork.yaml
@@ -201,7 +198,7 @@ def main
   # Write changes-fork-excluded.yaml
   write_file(
     File.join(OUTPUT_DIR, 'changes-fork-excluded.yaml'),
-    fork_excluded.map { |sha, subj| "- #{sha}  # #{subj}" }.join("\n") + "\n"
+    master_only_excluded.map { |sha, subj| "- #{sha}  # #{subj}" }.join("\n") + "\n"
   )
 
   # Write changes-both.yaml
