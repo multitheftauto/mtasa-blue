@@ -1,16 +1,16 @@
-Generated:    2026-02-23 01:26:29
+Generated:    2026-02-23 01:28:01
 Master:       master
 Fork:         release/1.6.0
 
 Counts:
-  Master-only, pending (not cherry-picked):  421
-  Master-only, excluded (won't backport):    103
+  Master-only, pending (not cherry-picked):  418
+  Master-only, excluded (won't backport):    106
   Cherry-picked to both:                    402
   Unmatched picked (no patch-id match):     47
   Fork-only:                                188
 
 ========================================================================
-MASTER-ONLY PENDING — not yet cherry-picked to fork (421 commits)
+MASTER-ONLY PENDING — not yet cherry-picked to fork (418 commits)
 ========================================================================
   + 764f5ab0100c212b565c4ae597aa893a0e2716fb  Set version to 1.6.1
   + 25e07c46840360caf58f4241e17ecb7288468e04  Remove remaining minimum client checks
@@ -404,7 +404,6 @@ MASTER-ONLY PENDING — not yet cherry-picked to fork (421 commits)
   + 7a7d1ae1f8d2b53cfe5406ce2ec0a163e6050555  Correct asm of vehicle dummy hooks in multiplayer_sa (straight up mistakes) Avoid crashing on some 'bad' models or dummy initialization race conditions (GTA/MTA) Prepare for further manipulation of 'GTA-side vehicles' (not managed by MTA or its pools) for MTA feature development - run into less immediate obstacles that would lead to crashes and various odd bugs
   + 42a6a437604e7e62f1109f69d2e617db9e25c095  Fix `CElement::GetAttachedPosition` to return correct positions for rotated parents (#4680)
   + afe8ad533248a4523afe08e627aeeb0879389480  Expand TXD pool from 5,000 to 32,768 slots Set the TXD pool at startup to 32,768 (max safe value before movsx sign issues) so total-conversion maps can use far more custom models.
-  + f21f51f545d714eecceff78e0d97a7e5c7acfb6b  clang fix
   + 0a661ef16151fdd6c0f6eeb09ad87b57a70ba39a  Fix 3 streaming freezes in TXD pool expansion ASM hooks
   + a276a18cf53ef2b1d600e5b2ce4f8107b66ad62d  Fix freeze
   + 2381b120c43ee8e473d5022cec8a492e8a051226  Addendum to 6a3b3af
@@ -417,9 +416,7 @@ MASTER-ONLY PENDING — not yet cherry-picked to fork (421 commits)
   + f97247901ecf49ce06b815de849b93f2e08d27fc  Addendum to 663c61a ("Fix old, popular SA crash @ 0x001A5735") as it didn't fix all cases
   + 5aa6455703067a7512d5d42a17e8268be395f891  Fix entity cleanup bugs in building pool and pool stride mismatch Rewrite vehicle/ped entity pointer cleanup to iterate GTA pools directly instead of MTA wrappers, fixing missed GTA-native entities and wrong loop bounds. Add missing object pool cleanup. Replace dynamic_cast with direct pool index 0 access for player ped.
   + 4912d2b55218406b5c40fd39617596b29b4d0935  Fix pool index type safety
-  + 80e6f29ac16437e589ccf685dbb01274fa94f3d7  clang fix
   + f212c93bb41ea20a2d37a5ceadaefbf24dd4c89c  Build maetro32 to the output root directory
-  + f46ef80c6e14bf672f02e7add81f2604abab78e6  clang fix
   + 50911988d520c66a26d5e79743637314303a618e  Various performance tweaks
   + cee3f88980524f8ca90c07aa9bb2f080f4c18300  Adapt installer logic for maetro32
   + 5f27442f24fa21bf194b0d2c37876c6e3b8c6430  Update launchers for maetro
@@ -435,7 +432,7 @@ MASTER-ONLY PENDING — not yet cherry-picked to fork (421 commits)
   + 1468c16637eca4b403c6844adf10774b7533f50e  Update installer en_US pot
 
 ========================================================================
-MASTER-ONLY EXCLUDED — deliberately not backported (103 commits)
+MASTER-ONLY EXCLUDED — deliberately not backported (106 commits)
 ========================================================================
   + dda35b9aab2eae676c5f035524b047d6f7290624  Update client en_US pot
   + 9a12faf8a62529ee5bfd2816a458e318702fed0b  Update client en_US pot
@@ -538,7 +535,10 @@ MASTER-ONLY EXCLUDED — deliberately not backported (103 commits)
   + 4ab100b0be318f6d6e11487a2c6683e613dfe6a6  Update client en_US pot
   + b3166139ac3a7df195d5e0487ed42e4b9505062f  Update client en_US pot
   + 27eb6be2d628816a3555398df853afa538d3913a  Update client en_US pot
+  + f21f51f545d714eecceff78e0d97a7e5c7acfb6b  clang fix
   + 9d15f90ff94a216513708741c1d78e1b59aaf12c  Update client en_US pot
+  + 80e6f29ac16437e589ccf685dbb01274fa94f3d7  clang fix
+  + f46ef80c6e14bf672f02e7add81f2604abab78e6  clang fix
   + 4fa2cbb5c316e37d545197f0fab364f43836d412  Update client en_US pot
 
 ========================================================================

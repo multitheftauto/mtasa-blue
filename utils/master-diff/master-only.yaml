@@ -4,6 +4,7 @@
 # Examples:
 #   - commit: aabbccddeeff00112233445566778899aabbccdd
 #   - title: Fix something not relevant to 1.6.0
-- title: "Update client en_US pot"
+- title: Update client en_US pot
 - title: Update launchers
 - title: Update launchers x64
+- title: clang fix
