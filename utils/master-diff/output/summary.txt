@@ -1,28 +1,20 @@
-Generated:    2026-02-23 01:33:18
+Generated:    2026-02-23 01:38:53
 Master:       master
 Fork:         release/1.6.0
 
 Counts:
-  Master-only, pending (not cherry-picked):  418
-  Master-only, excluded (won't backport):    106
+  Master-only, pending (not cherry-picked):  410
+  Master-only, excluded (won't backport):    114
   Cherry-picked to both:                    402
   Unmatched picked (no patch-id match):     47
   Fork-only:                                188
 
 ========================================================================
-MASTER-ONLY PENDING — not yet cherry-picked to fork (418 commits)
+MASTER-ONLY PENDING — not yet cherry-picked to fork (410 commits)
 ========================================================================
-  + 764f5ab0100c212b565c4ae597aa893a0e2716fb  Set version to 1.6.1
-  + 25e07c46840360caf58f4241e17ecb7288468e04  Remove remaining minimum client checks
   + 859e6cec95130df1f7b03b7114734869841249e2  Remove outdated bitstream checks
-  + 3707b53acd09c1b2dd59bdf544e5c74865091bb6  Disable empty CResourceChecker data arrays
   + fe761e52e4f187df465e1e8079adefa299c1ab55  Remove unused jump section in HOOK_CPlantMgr_Render
-  + d302d3c56d0fba41b7f71bcb78c60e4aab097a8e  Remove outdated community account handling
-  + 47bc53fe4540244d7c0571521f9ae659896ca6da  Remove outdated bitstream checks
-  + 92763f84aacd54b6263e72699a936489e7072a15  Remove outdated bitstream checks
-  + 4be957b8af46d073cd1da35d285a25664abe7f94  Remove outdated bitstream checks
   + bbf74ba0d31e0934e84b2001291b6277fe9dad48  Include or exclude VERSION_TYPE_UNTESTED in some places
-  + 60094d17432eb1395335bb10025dd928a0ab2dff  Set version to 1.7
   + 7108a8d261b937ceda528c96bd52caf68e3903ab  Improve client-side markers & Fix logic (PR #3324, Fixes #3310)
   + b97ce4fbbedffad2074e0c6457d70448f6367a09  Fix arrow type marker snapping to the ground (PR #4027, Fixes #536, Fixes #4000)
   + 45bb3d5b234b91e62488c78117d487671d5cbd60  Swapped the order of Hotring Racer 2 and Hotring Racer 3 (PR #3797)
@@ -432,10 +424,18 @@ MASTER-ONLY PENDING — not yet cherry-picked to fork (418 commits)
   + 1468c16637eca4b403c6844adf10774b7533f50e  Update installer en_US pot
 
 ========================================================================
-MASTER-ONLY EXCLUDED — deliberately not backported (106 commits)
+MASTER-ONLY EXCLUDED — deliberately not backported (114 commits)
 ========================================================================
+  + 764f5ab0100c212b565c4ae597aa893a0e2716fb  Set version to 1.6.1
+  + 25e07c46840360caf58f4241e17ecb7288468e04  Remove remaining minimum client checks
+  + 3707b53acd09c1b2dd59bdf544e5c74865091bb6  Disable empty CResourceChecker data arrays
+  + d302d3c56d0fba41b7f71bcb78c60e4aab097a8e  Remove outdated community account handling
+  + 47bc53fe4540244d7c0571521f9ae659896ca6da  Remove outdated bitstream checks
   + dda35b9aab2eae676c5f035524b047d6f7290624  Update client en_US pot
+  + 92763f84aacd54b6263e72699a936489e7072a15  Remove outdated bitstream checks
   + 9a12faf8a62529ee5bfd2816a458e318702fed0b  Update client en_US pot
+  + 4be957b8af46d073cd1da35d285a25664abe7f94  Remove outdated bitstream checks
+  + 60094d17432eb1395335bb10025dd928a0ab2dff  Set version to 1.7
   + c738f9b9463901bea0bd3572db879e26d24daa98  Update client en_US pot
   + 6139d1b451d166a7a9cf2c293fadddb8f0ab2d27  Update client en_US pot
   + a9bfeef1e719c7c1ddcce79c4f094123847b1679  Update client en_US pot
