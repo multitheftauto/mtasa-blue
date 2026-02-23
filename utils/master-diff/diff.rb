@@ -186,19 +186,19 @@ def main
   # Write changes-master.yaml
   write_file(
     File.join(OUTPUT_DIR, 'changes-master.yaml'),
-    master_only_pending.map { |sha, subj| "- #{sha}  # #{subj}" }.join("\n") + "\n"
+    master_only_pending.map { |sha, subj| "- commit: #{sha}  # #{subj}" }.join("\n") + "\n"
   )
 
   # Write changes-fork.yaml
   write_file(
     File.join(OUTPUT_DIR, 'changes-fork.yaml'),
-    fork_only.map { |sha, subj| "- #{sha}  # #{subj}" }.join("\n") + "\n"
+    fork_only.map { |sha, subj| "- commit: #{sha}  # #{subj}" }.join("\n") + "\n"
   )
 
   # Write changes-fork-excluded.yaml
   write_file(
     File.join(OUTPUT_DIR, 'changes-fork-excluded.yaml'),
-    master_only_excluded.map { |sha, subj| "- #{sha}  # #{subj}" }.join("\n") + "\n"
+    master_only_excluded.map { |sha, subj| "- commit: #{sha}  # #{subj}" }.join("\n") + "\n"
   )
 
   # Write changes-both.yaml
