@@ -131,7 +131,6 @@
 - 8c9f53d7c0d2f8806def5e2712e8a4a85052b9f8  # Update installer en_US pot
 - ea3362ae1cc34d2c3a6560122898ee0a13bb1c59  # Improve exception handling in hookcheck program
 - d5f4af11f65edf476c253ef39814f8cc471e1251  # Fixes #3655 - prevent duplicate command registration (#4313)
-- 7789d6ade2beb7eed8848942612ed87fcc04000f  # Update launchers
 - 0d930ac5ecb4a6365b8f84dc0c643199a2fcec7e  # Fix dependency issue with define for MessageBoxUTF8
 - 24d6d697f93fe3a4490fa8c0bc4206a6624b3a3b  # Fix macOS paths in dbconmy
 - e4906166065530083c07a032b4f938545c8c70c0  # Fix `onClientWorldSound` event cancellation for non-entity sounds (#3269) (#4416)
@@ -151,7 +150,6 @@
 - 5211e3b1f55279a6e37e4d136c51b88d07462e51  # Launcher: Revert all recent changes
 - 71e3f3314f031770b5a196caa9188838c077dbd3  # Fix marker cylinder events not trigger (#4449)
 - 1d7962b9cc7ff2ebf412b3ef39890ea41e80b6ce  # Refactor Launcher with C++ 23
-- 72a60598a162cbee019d4577e32893bb0957971e  # Update launchers
 - 67add5bbbaa089162fb5aa24cdaf5d85e435e90f  # Addendum to 72a6059
 - 27338cc1c78cb5c39bce741a1138e3b46f1a0cab  # Loader update
 - f4155960c286d3b6a19aeea6886db876c86fece9  # Update Freetype to 2.14.1

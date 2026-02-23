@@ -1,16 +1,16 @@
-Generated:    2026-02-23 01:12:21
+Generated:    2026-02-23 01:26:29
 Master:       master
 Fork:         release/1.6.0
 
 Counts:
-  Master-only, pending (not cherry-picked):  423
-  Master-only, excluded (won't backport):    101
+  Master-only, pending (not cherry-picked):  421
+  Master-only, excluded (won't backport):    103
   Cherry-picked to both:                    402
   Unmatched picked (no patch-id match):     47
   Fork-only:                                188
 
 ========================================================================
-MASTER-ONLY PENDING — not yet cherry-picked to fork (423 commits)
+MASTER-ONLY PENDING — not yet cherry-picked to fork (421 commits)
 ========================================================================
   + 764f5ab0100c212b565c4ae597aa893a0e2716fb  Set version to 1.6.1
   + 25e07c46840360caf58f4241e17ecb7288468e04  Remove remaining minimum client checks
@@ -145,7 +145,6 @@ MASTER-ONLY PENDING — not yet cherry-picked to fork (423 commits)
   + 8c9f53d7c0d2f8806def5e2712e8a4a85052b9f8  Update installer en_US pot
   + ea3362ae1cc34d2c3a6560122898ee0a13bb1c59  Improve exception handling in hookcheck program
   + d5f4af11f65edf476c253ef39814f8cc471e1251  Fixes #3655 - prevent duplicate command registration (#4313)
-  + 7789d6ade2beb7eed8848942612ed87fcc04000f  Update launchers
   + 0d930ac5ecb4a6365b8f84dc0c643199a2fcec7e  Fix dependency issue with define for MessageBoxUTF8
   + 24d6d697f93fe3a4490fa8c0bc4206a6624b3a3b  Fix macOS paths in dbconmy
   + e4906166065530083c07a032b4f938545c8c70c0  Fix `onClientWorldSound` event cancellation for non-entity sounds (#3269) (#4416)
@@ -165,7 +164,6 @@ MASTER-ONLY PENDING — not yet cherry-picked to fork (423 commits)
   + 5211e3b1f55279a6e37e4d136c51b88d07462e51  Launcher: Revert all recent changes
   + 71e3f3314f031770b5a196caa9188838c077dbd3  Fix marker cylinder events not trigger (#4449)
   + 1d7962b9cc7ff2ebf412b3ef39890ea41e80b6ce  Refactor Launcher with C++ 23
-  + 72a60598a162cbee019d4577e32893bb0957971e  Update launchers
   + 67add5bbbaa089162fb5aa24cdaf5d85e435e90f  Addendum to 72a6059
   + 27338cc1c78cb5c39bce741a1138e3b46f1a0cab  Loader update
   + f4155960c286d3b6a19aeea6886db876c86fece9  Update Freetype to 2.14.1
@@ -437,7 +435,7 @@ MASTER-ONLY PENDING — not yet cherry-picked to fork (423 commits)
   + 1468c16637eca4b403c6844adf10774b7533f50e  Update installer en_US pot
 
 ========================================================================
-MASTER-ONLY EXCLUDED — deliberately not backported (101 commits)
+MASTER-ONLY EXCLUDED — deliberately not backported (103 commits)
 ========================================================================
   + dda35b9aab2eae676c5f035524b047d6f7290624  Update client en_US pot
   + 9a12faf8a62529ee5bfd2816a458e318702fed0b  Update client en_US pot
@@ -460,7 +458,9 @@ MASTER-ONLY EXCLUDED — deliberately not backported (101 commits)
   + 186ffa8b5c1a19066c25773b7438b6c7b0886de7  Update client en_US pot
   + 46ff069fea325547df8fc7fa81df334a079826a1  Update client en_US pot
   + 2994b287bce182daf34c0e3b3de86e121628912e  Update client en_US pot
+  + 7789d6ade2beb7eed8848942612ed87fcc04000f  Update launchers
   + bee47833b8207b69b2df64c4738fc016b2d8e35f  Update client en_US pot
+  + 72a60598a162cbee019d4577e32893bb0957971e  Update launchers
   + fe5e3a4e33c874dd36c877ef1cb9115a5b538d7b  Update client en_US pot
   + c79fce58c586d55e73c293312a4a7d26e2df5bc7  Update client en_US pot
   + f864cf7001584afe36d619b7a37a476318eef8ba  Update client en_US pot
