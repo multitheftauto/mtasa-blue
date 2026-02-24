@@ -1,5 +1,6 @@
 project "Lua"
 	language "C++"
+	kind "StaticLib"
 	targetname "lua5.1"
 	warnings "Off"
 
@@ -14,5 +15,3 @@ project "Lua"
 		"src/**.c",
 		"src/**.h",
 	}
-
-	kind "StaticLib"
