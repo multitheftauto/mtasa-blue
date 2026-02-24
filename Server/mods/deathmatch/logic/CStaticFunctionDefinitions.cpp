@@ -724,6 +724,7 @@ bool CStaticFunctionDefinitions::GetElementModel(CElement* pElement, unsigned sh
 bool CStaticFunctionDefinitions::GetElementAttachedOffsets(CElement* pElement, CVector& vecPosition, CVector& vecRotation)
 {
     pElement->GetAttachedOffsets(vecPosition, vecRotation);
+    ConvertRadiansToDegrees(vecRotation);
     return true;
 }
 
