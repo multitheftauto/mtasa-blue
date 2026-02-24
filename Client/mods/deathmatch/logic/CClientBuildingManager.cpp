@@ -26,6 +26,12 @@ CClientBuildingManager::~CClientBuildingManager()
     RemoveAll();
 }
 
+void CClientBuildingManager::DoPulse()
+{
+    for (CClientBuilding* building : m_List)
+        building->DoPulse();
+}
+
 void CClientBuildingManager::RemoveAll()
 {
     // Make sure they don't remove themselves from our list
@@ -88,6 +94,15 @@ void CClientBuildingManager::DestroyAllForABit()
     for (CClientBuilding* building : GetBuildings())
     {
         building->Destroy();
+    }
+}
+
+void CClientBuildingManager::RestreamBuildings(std::uint32_t modelId)
+{
+    for (CClientBuilding* building : m_List)
+    {
+        if (building->GetModel() == modelId)
+            building->Recreate();
     }
 }
 

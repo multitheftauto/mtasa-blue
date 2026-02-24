@@ -16,6 +16,8 @@
 #include "CRopesSA.h"
 #include "CWorldSA.h"
 #include "CFireManagerSA.h"
+#include "CAnimManagerSA.h"
+#include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
 
@@ -332,5 +334,44 @@ bool CObjectSA::SetOnFire(bool onFire)
         fire->Extinguish();
     }
 
+    return true;
+}
+
+void CObjectSA::SetAnimation(CAnimBlendHierarchySAInterface* animation, eAnimationFlags flags)
+{
+    if (!m_pInterface || !m_pInterface->m_pRwObject)
+        return;
+
+    RpClump* clump = GetRpClump();
+
+    if (!RpAnimBlendClumpIsInitialized(clump) && animation)
+        RpAnimBlendClumpInit(clump);
+
+    if (animation)
+        pGame->GetAnimManager()->BlendAnimation(clump, animation, flags, 1.0f);
+    else
+    {
+        for (auto assoc = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(clump); assoc;
+             assoc = pGame->GetAnimManager()->RpAnimBlendGetNextAssociation(assoc))
+        {
+            // Disable playing flag
+            short flags = assoc->GetFlags();
+            flags &= ~ANIMATION_IS_PLAYING;
+
+            assoc->SetFlags(flags);
+        }
+    }
+}
+
+bool CObjectSA::SetAnimationSpeed(float speed)
+{
+    if (!m_pInterface || !m_pInterface->m_pRwObject)
+        return false;
+
+    auto assoc = pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(GetRpClump());
+    if (!assoc)
+        return false;
+
+    assoc->SetCurrentSpeed(speed);
     return true;
 }

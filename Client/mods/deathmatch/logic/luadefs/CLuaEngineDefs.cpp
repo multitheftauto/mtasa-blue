@@ -17,6 +17,7 @@
 #include <lua/CLuaFunctionParser.h>
 #include "CLuaEngineDefs.h"
 #include <enums/VehicleType.h>
+#include "game/CAnimManager.h"
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
@@ -167,6 +168,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
+        {"engineSetModelAnimation", ArgumentParser<EngineSetModelAnimation>},
+        {"engineRestoreModelAnimation", ArgumentParser<EngineRestoreModelAnimation>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -215,6 +218,9 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
     lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
     lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
+
+    lua_classfunction(luaVM, "setModelAnimation", "engineSetModelAnimation");
+    lua_classfunction(luaVM, "resetModelAnimation", "engineRestoreModelAnimation");
 
     lua_registerstaticclass(luaVM, "Engine");
 
@@ -2753,4 +2759,67 @@ bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
 void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
 {
     g_pClientGame->Restream(option);
+}
+
+bool CLuaEngineDefs::EngineSetModelAnimation(std::uint16_t modelId, std::optional<std::variant<CClientIFP*, bool>> ifpOrNil,
+                                             std::optional<std::string> animationName, std::optional<std::uint16_t> flags)
+{
+    if (!CClientObjectManager::IsValidModel(modelId) && !CClientBuildingManager::IsValidModel(modelId))
+        throw std::invalid_argument("Invalid model ID");
+
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
+    if (!modelInfo)
+        return false;
+
+    // Clean up old IFP association before applying a new animation
+    if (auto anim = modelInfo->GetObjectAnimation())
+    {
+        auto ifp = g_pClientGame->GetIFPPointerFromMap(modelInfo->GetObjectAnimationBlockNameHash());
+        if (ifp)
+            ifp->RemoveModelUsingThisIFP(modelId);
+    }
+
+    if (!ifpOrNil.has_value() || std::holds_alternative<bool>(ifpOrNil.value()))
+    {
+        modelInfo->DisableObjectAnimation(true);
+        modelInfo->SetObjectAnimation(nullptr, 0, 0);
+    }
+    else if (std::holds_alternative<CClientIFP*>(ifpOrNil.value()))
+    {
+        CClientIFP* ifp = std::get<CClientIFP*>(ifpOrNil.value());
+        auto        animHierarchy = ifp->GetAnimationHierarchy(animationName.value_or(""));
+        if (!animHierarchy)
+            throw std::invalid_argument("Invalid animation name");
+
+        ifp->InsertModelUsingThisIFP(modelId);
+        modelInfo->SetObjectAnimation(animHierarchy, ifp->GetBlockNameHash(), flags.value_or(eAnimationFlags::ANIMATION_IS_LOOPED));
+    }
+
+    m_pManager->GetObjectManager()->RestreamObjects(modelId);
+    m_pManager->GetBuildingManager()->RestreamBuildings(modelId);
+    return true;
+}
+
+void CLuaEngineDefs::EngineRestoreModelAnimation(std::uint16_t modelId)
+{
+    if (!CClientObjectManager::IsValidModel(modelId) && !CClientBuildingManager::IsValidModel(modelId))
+        throw LuaFunctionError("Invalid model");
+
+    CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
+    if (!modelInfo)
+        return;
+
+    modelInfo->DisableObjectAnimation(false);
+
+    if (auto anim = modelInfo->GetObjectAnimation())
+    {
+        auto ifp = g_pClientGame->GetIFPPointerFromMap(modelInfo->GetObjectAnimationBlockNameHash());
+        if (ifp)
+            ifp->RemoveModelUsingThisIFP(modelId);
+    }
+
+    modelInfo->SetObjectAnimation(nullptr, 0, 0);
+
+    m_pManager->GetObjectManager()->RestreamObjects(modelId);
+    m_pManager->GetBuildingManager()->RestreamBuildings(modelId);
 }
