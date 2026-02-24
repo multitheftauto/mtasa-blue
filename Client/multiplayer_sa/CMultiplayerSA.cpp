@@ -839,6 +839,12 @@ void CMultiplayerSA::InitHooks()
 
     // MemSet ( (void*)0x408A1B, 0x90, 5 );
 
+    // CTxdStore::GetNumRefs freed-slot error path does xor eax,eax then movsx eax,[eax+4]
+    // which is a null-deref (reads address 0x4). In SA its dead code, but MTA can reach it
+    // when a stale streaming entry references a freed TXD pool slot. NOP the movsx so
+    // freed slots return 0 refs instead of crashing.
+    MemSet((void*)0x731AB5, 0x90, 4);
+
     // Hack to make the choke task use 0 time left remaining when he starts t
     // just stand there looking. So he won't do that.
     MemPut<unsigned char>(0x620607, 0x33);
@@ -1029,8 +1035,8 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x44C39A + 4, 0x00);
     MemPut<BYTE>(0x44C39A + 5, 0x00);
 
-    // Avoid garage doors closing when you change your model
-    MemSet((LPVOID)0x4486F7, 0x90, 4);
+    // Disable CGarages::PlayerArrestedOrDied to stop the game from automatically closing/opening garages
+    MemSet((void*)0x442303, 0x90, 5);
 
     // Disable CStats::IncrementStat (returns at start of function)
     MemPut<BYTE>(0x55C180, 0xC3);
@@ -5351,8 +5357,6 @@ void __cdecl HandleIdle()
     {
         bAnimGroupArrayAddressLogged = true;
         DWORD dwAnimGroupArrayAddress = 0xb4ea34;
-        LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
-                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
     }
 
     ProcessDeferredStreamingMemoryRelief();
@@ -6781,7 +6785,7 @@ void HideEntitySomehow()
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
         {
             // Add the LOD to the list
-            pBuildingRemoval->AddBinaryBuilding(pInterface);
+            pBuildingRemoval->AddBinaryBuilding(pInterface, pInterface->m_iplIndex);
             // Remove the model from the world
             pGameInterface->GetWorld()->Remove(pInterface, BuildingRemoval);
             // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
@@ -6906,13 +6910,13 @@ void RemoveObjectIfNeeded()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
         if (!pLODInterface->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pLODInterface);
+            pBuildingRemoval->AddDataBuilding(pLODInterface, pLODInterface->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
         }
     }
@@ -7005,7 +7009,7 @@ void RemoveDummyIfReplaced()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);
         }
     }

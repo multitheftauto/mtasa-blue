@@ -12,6 +12,7 @@
 #include <StdInc.h>
 #include "CTileBatcher.h"
 #include "CMaterialLine3DBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 
 SMaterialLine3DItem* CMaterialLine3DBatcher::ms_pLines = NULL;
 
@@ -277,8 +278,22 @@ void CMaterialLine3DBatcher::DrawBatch(const CVector& vecCameraPos, uint* pBatch
     if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
     {
         // Draw using texture
-        m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
-        m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+        bool bDrawTexture = true;
+        if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTextureItem))
+        {
+            if (!pRenderTarget->TryEnsureValid())
+                bDrawTexture = false;
+        }
+        else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTextureItem))
+        {
+            if (!pScreenSource->TryEnsureValid())
+                bDrawTexture = false;
+        }
+        if (bDrawTexture && pTextureItem->m_pD3DTexture)
+        {
+            m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
+            m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+        }
     }
     else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
     {

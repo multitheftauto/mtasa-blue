@@ -113,13 +113,13 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
     MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
 
+    // Valid model?
+    if (!CModelInfoSA::IsVehicleModel(model))
+        return nullptr;
+
     // CCarCtrl::CreateCarForScript
     auto* pInterface = ((CVehicleSAInterface * (__cdecl*)(int, CVector, std::uint8_t)) FUNC_CCarCtrlCreateCarForScript)(model, CVector(), 0);
     if (!pInterface)
-        return nullptr;
-
-    // Valid model?
-    if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
     auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
@@ -222,7 +222,14 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 
             if (dwElementIndexInPool < MAX_VEHICLES)
             {
-                return &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+                // Return only if MTA has an entity for this slot
+                // This filters out non-MTA managed vehicles (where pEntity is null) without
+                // being overly strict about GTA pool state during timing edge cases or internal transitions from GTA-side to MTA vehicles
+                SClientEntity<CVehicleSA>* pSlot = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+                if (!pSlot->pEntity)
+                    return nullptr;
+
+                return pSlot;
             }
         }
     }
@@ -354,7 +361,12 @@ SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_OBJECTS)
         {
-            return &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+            // Return only if MTA has an entity for this slot
+            SClientEntity<CObjectSA>* pSlot = &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+            if (!pSlot->pEntity)
+                return nullptr;
+
+            return pSlot;
         }
     }
     return nullptr;
@@ -523,7 +535,12 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_PEDS)
         {
-            return &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+            // Return only if MTA has an entity for this slot
+            SClientEntity<CPedSA>* pSlot = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+            if (!pSlot->pEntity)
+                return nullptr;
+
+            return pSlot;
         }
     }
     return nullptr;
@@ -650,6 +667,8 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
 
         if (model == 449 || model == 537 || model == 538 || model == 569 || model == 590 || model == 570)
         {
+            if (count >= 32)
+                return nullptr;
             MemPutFast<DWORD>(VAR_TrainModelArray + count * 4, model);
             count += 1;
         }
@@ -676,7 +695,15 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
 
     std::size_t vehicleIndex = 0;
 
-    std::unique_ptr<CVehicleSA> train = std::make_unique<CTrainSA>(pTrainBeginning);
+    std::unique_ptr<CVehicleSA> train;
+    try
+    {
+        train = std::make_unique<CTrainSA>(pTrainBeginning);
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
     if (!train || !AddVehicleToPool(pClientVehicle, train.get()))
         return nullptr;
 
@@ -689,7 +716,15 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
         if (!pVehCarriage)
             break;
 
-        auto newCarriage = std::make_unique<CTrainSA>(pVehCarriage);
+        std::unique_ptr<CTrainSA> newCarriage;
+        try
+        {
+            newCarriage = std::make_unique<CTrainSA>(pVehCarriage);
+        }
+        catch (...)
+        {
+            break;
+        }
         if (!newCarriage || !AddVehicleToPool(pClientVehicle, newCarriage.get()))
         {
             newCarriage.reset();
