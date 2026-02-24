@@ -101,7 +101,7 @@ public:
     static bool          DetachElements(CClientEntity& Entity, CClientEntity* pAttachedToEntity = NULL);
     static bool          SetElementAttachedOffsets(CClientEntity& Entity, CVector& vecPosition, CVector& vecRotation);
     static bool          SetElementAlpha(CClientEntity& Entity, unsigned char ucAlpha);
-    static bool          SetElementHealth(CClientEntity& Entity, float fHealth);
+    static bool          SetElementHealth(lua_State* luaState, CClientEntity& Entity, float fHealth);
     static bool          SetElementModel(CClientEntity& Entity, unsigned short usModel);
     static bool          SetElementCollisionsEnabled(CClientEntity& Entity, bool bEnabled);
     static bool          SetElementCollidableWith(CClientEntity& Entity, CClientEntity& ThisEntity, bool bCanCollide);

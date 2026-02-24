@@ -2405,7 +2405,7 @@ int CLuaElementDefs::SetElementHealth(lua_State* luaVM)
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetElementHealth(*pEntity, fHealth))
+        if (CStaticFunctionDefinitions::SetElementHealth(luaVM, *pEntity, fHealth))
         {
             lua_pushboolean(luaVM, true);
             return 1;
