@@ -583,6 +583,10 @@ CClientGame::~CClientGame()
 
     SAFE_DELETE(m_pRootEntity);
 
+    // Unload models that had custom DFF geometry cleared during DoDeleteAll.
+    // Must run after m_pRootEntity is gone and before StaticResetModelTextureReplacing.
+    CClientDFF::FlushDeferredModelRestores();
+
     // Clear any remaining texture replacement/shader state after destroying entities.
     // This ordering prevents global reset from running before late element destructors
     // (e.g. CClientTXD) have a chance to clean up using RenderWare bookkeeping.
@@ -3668,6 +3672,9 @@ void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
 
 void CClientGame::StaticPreFxRenderHandler()
 {
+    // RenderFadingInEntities is done at this point, so alpha entity list callbacks
+    // no longer reference CModelRenderer's queue elements.
+    g_pClientGame->GetModelRenderer()->NotifyFrameEnd();
     g_pCore->OnPreFxRender();
 }
 

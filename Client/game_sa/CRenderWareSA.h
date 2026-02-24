@@ -36,6 +36,7 @@ public:
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
     void ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures) override;
     void CleanupIsolatedTxdForModel(unsigned short usModelId, bool bSkipStreamingLoads = false) override;
+    void CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId) override;
     void StaticResetModelTextureReplacing();
     void StaticResetShaderSupport();
     void ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId);
@@ -43,7 +44,7 @@ public:
     bool HasClothesReplacementChanged();
     bool ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) override;
     bool ClothesRemoveFile(char* fileData) override;
-    bool HasClothesFile(const char* fileName) const noexcept override;
+    bool HasClothesFile(const char* fileName) const override;
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);
@@ -59,6 +60,9 @@ public:
 
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
+
+    // Parses TXD buffer data and injects it directly into an allocated pool slot
+    bool LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer) override;
 
     // Reads and parses a COL file (versions 1-4: COLL, COL2, COL3, COL4)
     CColModel* ReadCOL(const SString& buffer);
@@ -87,7 +91,10 @@ public:
     // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
     bool ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) override;
 
-    // Replaces a CClumpModelInfo clump with a new clump
+    // Replaces a generic CClumpModelInfo clump with a new clump
+    bool ReplaceClumpModel(RpClump* pNew, unsigned short usModelID) override;
+
+    // Replaces a CWeaponModelInfo clump with a new clump
     bool ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) override;
 
     bool ReplacePedModel(RpClump* pNew, unsigned short usModelID) override;
@@ -177,16 +184,18 @@ public:
     // Watched world textures
     std::multimap<unsigned short, STexInfo*> m_TexInfoMap;
     CFastHashMap<CD3DDUMMY*, STexInfo*>      m_D3DDataTexInfoMap;
-    CClientEntityBase*                       m_pRenderingClientEntity;
-    unsigned short                           m_usRenderingEntityModelId;
-    int                                      m_iRenderingEntityType;
-    CMatchChannelManager*                    m_pMatchChannelManager;
-    int                                      m_uiReplacementRequestCounter;
-    int                                      m_uiReplacementMatchCounter;
-    int                                      m_uiNumReplacementRequests;
-    int                                      m_uiNumReplacementMatches;
-    CElapsedTime                             m_GTAVertexShadersDisabledTimer;
-    bool                                     m_bGTAVertexShadersEnabled;
-    std::set<RwTexture*>                     m_SpecialTextures;
-    static int                               ms_iRenderingType;
+    // Reverse lookup for script/special textures (keyed by RwTexture* tag)
+    std::unordered_map<const RwTexture*, STexInfo*> m_ScriptTexInfoMap;
+    CClientEntityBase*                              m_pRenderingClientEntity;
+    unsigned short                                  m_usRenderingEntityModelId;
+    int                                             m_iRenderingEntityType;
+    CMatchChannelManager*                           m_pMatchChannelManager;
+    int                                             m_uiReplacementRequestCounter;
+    int                                             m_uiReplacementMatchCounter;
+    int                                             m_uiNumReplacementRequests;
+    int                                             m_uiNumReplacementMatches;
+    CElapsedTime                                    m_GTAVertexShadersDisabledTimer;
+    bool                                            m_bGTAVertexShadersEnabled;
+    std::set<RwTexture*>                            m_SpecialTextures;
+    static int                                      ms_iRenderingType;
 };

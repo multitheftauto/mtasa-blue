@@ -38,6 +38,9 @@ using namespace std;
 
 namespace fs = std::filesystem;
 
+// Set to true to enable the freeze watchdog (monitors main thread responsiveness)
+constexpr bool bFreezeWatchdogEnabled = false;
+
 static float fTest = 1;
 
 extern CCore* g_pCore;
@@ -183,7 +186,8 @@ CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
-    StopWatchdogThread();
+    if constexpr (bFreezeWatchdogEnabled)
+        StopWatchdogThread();
 
     // Reset Discord rich presence
     if (m_pDiscordRichPresence)
@@ -1286,7 +1290,8 @@ void CCore::DoPreFramePulse()
 {
     TIMING_CHECKPOINT("+CorePreFrame");
 
-    UpdateWatchdogHeartbeat();
+    if constexpr (bFreezeWatchdogEnabled)
+        UpdateWatchdogHeartbeat();
 
     m_pKeyBinds->DoPreFramePulse();
 
@@ -1346,9 +1351,12 @@ void CCore::DoPostFramePulse()
 
             // Start watchdog thread now that initial loading is complete
             // Use 120 second timeout to allow for large mod asset loading
-            if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+            if constexpr (bFreezeWatchdogEnabled)
             {
-                WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+                {
+                    WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                }
             }
 
             // Disable vsync while it's all dark

@@ -34,6 +34,16 @@
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
+// RenderWare binary chunk format constants (shared by ReadTXD, ReadDFF,
+// LoadTxdSlotFromBuffer, etc.)
+namespace
+{
+    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
+    constexpr std::uint32_t RW_CHUNK_TYPE_DFF = 0x10;
+    constexpr std::uint32_t RW_CHUNK_TYPE_TXD = 0x16;
+    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
+}  // namespace
+
 void CRenderWareSA::DebugTxdAddRef(unsigned short usTxdId, const char* /*tag*/, bool /*enableSafetyPin*/)
 {
     if (!pGame || !pGame->GetRenderWareSA())
@@ -257,10 +267,6 @@ CRenderWareSA::~CRenderWareSA()
 // Reads and parses a TXD file specified by a path (szTXD)
 RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SString& buffer)
 {
-    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
-    constexpr std::uint32_t RW_CHUNK_TYPE_TXD = 0x16;
-    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
-
     if (buffer.empty() && strFilename.empty())
         return nullptr;
 
@@ -317,7 +323,7 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
         rwBuffer.ptr = const_cast<char*>(buffer.data());
 
         // Limit to actual chunk boundaries
-        // This buffer trim ensures RW's stream reader only sees actual TXD/DFF data, not trailing garbage
+        // This buffer trim ensures RW's stream reader only sees actual TXD data, not trailing garbage
         // from IMG sector alignment. Avoids some spurious "TXD parsed successfully but contains no valid textures" errors
         rwBuffer.size = static_cast<unsigned int>(RW_CHUNK_HEADER_SIZE + chunkSize);
         pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
@@ -360,10 +366,6 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
             SetTextureDict(usTxdId);
         }
     }
-
-    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;
-    constexpr std::uint32_t RW_CHUNK_TYPE_DFF = 0x10;
-    constexpr std::uint32_t MAX_SANE_CHUNK_SIZE = 512 * 1024 * 1024;
 
     const bool bUsingBuffer = !buffer.empty();
 
@@ -420,10 +422,14 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
     {
         rwBuffer.ptr = const_cast<char*>(buffer.data());
 
-        // Limit to actual chunk boundaries
-        // This buffer trim ensures RW's stream reader only sees actual TXD/DFF data, not trailing garbage
-        // from IMG sector alignment. Avoids some spurious "TXD parsed successfully but contains no valid textures" errors
-        rwBuffer.size = static_cast<unsigned int>(RW_CHUNK_HEADER_SIZE + chunkSize);
+        // Use the full buffer size - do NOT trim to (RW_CHUNK_HEADER_SIZE + chunkSize).
+        // RpClumpStreamRead uses count-based loop termination (numAtomics/numLights/numCameras from the
+        // struct header), not byte-based tracking against the outer chunk's declared size. Any trailing
+        // IMG sector padding is therefore harmless - RW stops reading once all declared sub-chunks are
+        // consumed. Trimming to chunkSize causes E_RW_ENDOFSTREAM (error 5) when inner sub-chunk totals
+        // slightly exceed the outer header's declared chunkSize, which happens with valid SA DFF files.
+        // SA's native CFileLoader_LoadAtomicFile also does not trim.
+        rwBuffer.size = static_cast<unsigned int>(buffer.size());
         pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
     }
     else
@@ -462,8 +468,45 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         ((void(__cdecl*)())0x4C75A0)();
     }
 
+    // Clear any stale RW error before reading, so post-failure RwErrorGet captures only fresh errors
+    {
+        RwError staleErr{};
+        RwErrorGet(&staleErr);
+    }
+
     // read the clump with all its extensions
     RpClump* pClump = RpClumpStreamRead(pStream);
+
+    if (!pClump)
+    {
+        int txdId = -1;
+        if (usModelID != 0)
+        {
+            auto* pInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
+            if (pInfo)
+                txdId = pInfo->usTextureDictionary;
+        }
+
+        RwError rwError{};
+        RwErrorGet(&rwError);
+
+        std::uint32_t versionStamp = 0;
+        if (bUsingBuffer && buffer.size() >= RW_CHUNK_HEADER_SIZE)
+            std::memcpy(&versionStamp, buffer.data() + 8, sizeof(versionStamp));
+
+        // Also capture the stream position after the failed read
+        unsigned int streamPos = 0;
+        unsigned int streamSz = 0;
+        if (bUsingBuffer && pStream)
+        {
+            streamPos = pStream->data.position;
+            streamSz = pStream->data.size;
+        }
+
+        AddReportLog(8630, SString("ReadDFF: RpClumpStreamRead null model=%d txd=%d buf=%d bufSz=%u chunkSz=%u ver=0x%X rwErr=%d/%d sPos=%u sSz=%u", usModelID,
+                                   txdId, bUsingBuffer ? 1 : 0, bUsingBuffer ? static_cast<unsigned int>(buffer.size()) : 0u, chunkSize, versionStamp,
+                                   rwError.err1, rwError.err2, streamPos, streamSz));
+    }
 
     if (bLoadEmbeddedCollisions)
     {
@@ -876,6 +919,12 @@ bool CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID)
     return ReplaceModel(pNew, usModelID, FUNC_LoadVehicleModel);
 }
 
+// Replaces a generic CClumpModelInfo model (multi-part objects like cranes, signs, etc.)
+bool CRenderWareSA::ReplaceClumpModel(RpClump* pNew, unsigned short usModelID)
+{
+    return ReplaceModel(pNew, usModelID, FUNC_LoadClumpModel);
+}
+
 // Replaces a weapon model
 bool CRenderWareSA::ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID)
 {
@@ -959,14 +1008,20 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 
     // Ensure shadow data consistency to prevent crash in GTA's stencil shadow rendering
     // GTA accesses shadow vertices without NULL checks, causing crash if pointer is NULL but count is non-zero
+    // Also cap counts to catch corrupt data before CCollisionData::Copy amplifies it into an out-of-bounds read
     auto* pInterface = pColModel->GetInterface();
     if (pInterface && pInterface->m_data)
     {
         auto* pData = pInterface->m_data;
 
-        // shadow counts indicate data exists but pointers are NULL
-        const bool shadowVertsCorrupt = pData->m_numShadowVertices > 0 && pData->m_shadowVertices == nullptr;
-        const bool shadowTrisCorrupt = pData->m_numShadowTriangles > 0 && pData->m_shadowTriangles == nullptr;
+        constexpr std::uint32_t MAX_SHADOW_VERTICES = 10000;
+        constexpr std::uint32_t MAX_SHADOW_TRIANGLES = 5000;
+
+        // shadow counts indicate data exists but pointers are NULL, or counts are beyond any legitimate model
+        const bool shadowVertsCorrupt =
+            (pData->m_numShadowVertices > 0 && pData->m_shadowVertices == nullptr) || pData->m_numShadowVertices > MAX_SHADOW_VERTICES;
+        const bool shadowTrisCorrupt =
+            (pData->m_numShadowTriangles > 0 && pData->m_shadowTriangles == nullptr) || pData->m_numShadowTriangles > MAX_SHADOW_TRIANGLES;
 
         if (shadowVertsCorrupt || shadowTrisCorrupt)
         {
@@ -1149,6 +1204,111 @@ void CRenderWareSA::DestroyDFF(RpClump* pClump)
 {
     if (pClump)
         RpClumpDestroy(pClump);
+}
+
+// Parses TXD buffer data and injects the resulting RwTexDictionary directly
+// into an allocated pool slot, bypassing the streaming system.
+// Used for overflow TXD slots that have no corresponding streaming entry.
+//
+// Registers textures via StreamingAddedTexture (keyed by pool slot ID) so
+// shader matching works. Cleanup is handled by RemoveTextureDictonarySlot
+// which triggers StreamingRemovedTxd via the CTxdStore hook.
+bool CRenderWareSA::LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer)
+{
+    CTxdPoolSA* pTxdPool = pGame ? static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool()) : nullptr;
+    if (!pTxdPool)
+        return false;
+
+    const int poolSize = pTxdPool->GetPoolSize();
+    if (poolSize <= 0 || uiSlotId >= static_cast<std::uint32_t>(poolSize))
+        return false;
+
+    // True means unallocated (slot not reserved via AllocateTextureDictonarySlot)
+    if (pTxdPool->IsFreeTextureDictonarySlot(uiSlotId))
+        return false;
+
+    // Only overflow slots (>= MAX_STREAMING_TXD_SLOT) are valid here.
+    // Standard slots [0, 5000) use SA's streaming system, and [5000, 6316)
+    // overlap with non-TXD streaming resources (COL/IPL/DAT/IFP).
+    if (uiSlotId < static_cast<std::uint32_t>(CTxdPoolSA::MAX_STREAMING_TXD_SLOT))
+        return false;
+
+    CTextureDictonarySAInterface* pSlot = pTxdPool->GetTextureDictonarySlot(uiSlotId);
+    if (!pSlot)
+        return false;
+
+    // Pre-validate the buffer before handing it to RenderWare
+
+    if (buffer.size() < RW_CHUNK_HEADER_SIZE)
+        return false;
+
+    std::uint32_t chunkType = 0;
+    std::uint32_t chunkSize = 0;
+    std::memcpy(&chunkType, buffer.data(), sizeof(chunkType));
+    std::memcpy(&chunkSize, buffer.data() + 4, sizeof(chunkSize));
+
+    if (chunkType != RW_CHUNK_TYPE_TXD || chunkSize > MAX_SANE_CHUNK_SIZE)
+        return false;
+
+    if (buffer.size() < RW_CHUNK_HEADER_SIZE + chunkSize)
+        return false;
+
+    // Parse the TXD from buffer directly, bypassing ReadTXD/ScriptAddedTxd
+    RwBuffer rwBuffer{};
+    // const_cast safe: STREAM_MODE_READ only reads from the buffer
+    rwBuffer.ptr = const_cast<char*>(buffer.data());
+    rwBuffer.size = static_cast<unsigned int>(RW_CHUNK_HEADER_SIZE + chunkSize);
+
+    RwStream* pStream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &rwBuffer);
+    if (!pStream)
+        return false;
+
+    if (!RwStreamFindChunk(pStream, RW_CHUNK_TYPE_TXD, nullptr, nullptr))
+    {
+        RwStreamClose(pStream, nullptr);
+        return false;
+    }
+
+    RwTexDictionary* pTxd = RwTexDictionaryGtaStreamRead(pStream);
+    RwStreamClose(pStream, nullptr);
+
+    if (!pTxd)
+        return false;
+
+    if (pSlot->rwTexDictonary && pSlot->rwTexDictonary != pTxd)
+    {
+        // Refuse replacement if the old TXD still has active references
+        if (static_cast<short>(pSlot->usUsagesCount) > 0)
+        {
+            RwTexDictionaryDestroy(pTxd);
+            return false;
+        }
+
+        // Remove old shader TexInfo entries before destroying the TXD
+        StreamingRemovedTxd(static_cast<ushort>(uiSlotId));
+
+        RwTexDictionaryDestroy(pSlot->rwTexDictonary);
+    }
+
+    pSlot->rwTexDictonary = pTxd;
+
+    // Register each texture for shader matching, keyed by pool slot ID
+    std::vector<RwTexture*> textureList;
+    GetTxdTextures(textureList, pTxd);
+    for (RwTexture* pTexture : textureList)
+    {
+        if (!pTexture || !SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
+            continue;
+
+        CD3DDUMMY* pD3DData = (pTexture->raster && SharedUtil::IsReadablePointer(pTexture->raster, sizeof(RwRaster)))
+                                  ? reinterpret_cast<CD3DDUMMY*>(pTexture->raster->renderResource)
+                                  : nullptr;
+
+        if (pD3DData && pTexture->name[0] && !IsTexInfoRegistered(pD3DData))
+            StreamingAddedTexture(static_cast<ushort>(uiSlotId), pTexture->name, pD3DData);
+    }
+
+    return true;
 }
 
 // Destroys a TXD instance

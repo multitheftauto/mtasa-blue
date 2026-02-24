@@ -658,6 +658,24 @@ namespace SharedUtil
         }
     }
 
+    // Remove all occurrences of item from unordered itemList (swap-and-pop)
+    // Only use when element order within the vector does not matter.
+    template <class T>
+    void ListRemoveUnordered(std::vector<T>& itemList, const T& item)
+    {
+        for (std::size_t i = 0; i < itemList.size();)
+        {
+            if (item == itemList[i])
+            {
+                if (i != itemList.size() - 1)
+                    itemList[i] = std::move(itemList.back());
+                itemList.pop_back();
+            }
+            else
+                ++i;
+        }
+    }
+
     // Remove item at index from itemList
     template <class T>
     void ListRemoveIndex(std::vector<T>& itemList, uint index)
