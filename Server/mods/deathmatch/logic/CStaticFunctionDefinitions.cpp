@@ -5374,6 +5374,17 @@ bool CStaticFunctionDefinitions::GetVehicleWheelStates(CVehicle* pVehicle, unsig
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleWheelState(CVehicle* vehicle, std::uint8_t wheelIndex, std::uint8_t& wheelState)
+{
+    assert(vehicle);
+
+    if (wheelIndex >= MAX_WHEELS)
+        return false;
+    
+    wheelState = vehicle->m_ucWheelStates[static_cast<eWheelPosition>(wheelIndex)];
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetVehicleLightState(CVehicle* pVehicle, unsigned char ucLight, unsigned char& ucState)
 {
     assert(pVehicle);
