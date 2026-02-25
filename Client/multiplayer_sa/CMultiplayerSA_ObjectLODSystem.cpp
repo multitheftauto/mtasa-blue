@@ -269,7 +269,7 @@ bool IsEntityAccessible(CEntitySAInterface* pEntity)
 #define HOOKSIZE_CRenderer_ScanSectorList_EntityCheck 8
 DWORD                 RETURN_CRenderer_ScanSectorList_EntityCheck = 0x554918;
 DWORD                 LOOPBOTTOM_CRenderer_ScanSectorList_EntityCheck = 0x554AD5;
-void _declspec(naked) HOOK_CRenderer_ScanSectorList_EntityCheck()
+static void _declspec(naked) HOOK_CRenderer_ScanSectorList_EntityCheck()
 {
     // clang-format off
     __asm

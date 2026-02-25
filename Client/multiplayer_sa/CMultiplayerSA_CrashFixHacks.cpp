@@ -1838,7 +1838,7 @@ void _declspec(naked) HOOK_CrashFix_VBInstV3dMorphNull()
 #define HOOKCHECK_CrashFix_VBInstWeightsNull 0x8B
 DWORD RETURN_CrashFix_VBInstWeightsNull = 0x752327;
 
-void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
+static void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
 {
     // clang-format off
     __asm
