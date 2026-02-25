@@ -1901,8 +1901,10 @@ int LaunchGame(SString strCmdLine)
     bool                 bLaunchedAsDebugger = false;
     DebuggerCrashCapture debugCapture{};
 
+#ifndef MTA_DEBUG
     const SString debuggerFlagValue = GetApplicationSetting("diagnostics", "debugger-crash-capture");
     const bool    bUseDebuggerMode = (debuggerFlagValue == "1");
+
     WriteDebugEvent(SString("[7200] Loader - Debugger flag check: value='%s' useDebugger=%d", debuggerFlagValue.c_str(), bUseDebuggerMode ? 1 : 0));
 
     if (bUseDebuggerMode)
@@ -1925,6 +1927,7 @@ int LaunchGame(SString strCmdLine)
             AddReportLog(7203, SString("Loader - Debugger launch failed: %s error %d, falling back to normal launch", strErrorContext.c_str(), dwError));
         }
     }
+#endif
 
     if (!bLaunchedAsDebugger && !StartGtaProcess(strGTAEXEPath, sanitizedCmdLine, strGTAPath, &piLoadee, dwError, strErrorContext, false))
     {
