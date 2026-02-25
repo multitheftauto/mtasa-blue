@@ -1139,31 +1139,6 @@ SString CInstallManager::_PrepareLaunchLocation()
     const fs::path mtaDir = GetMTARootDirectory() / "MTA";
     const fs::path launchDir = GetGameLaunchDirectory();
 
-#if 0
-    // NOTE(botder): We are not using this solution because creating directory junctions requires administrator privileges.
-    // Create GTA subdirectory junctions to our launch directory.
-    for (const char* directoryName : {"anim", "audio", "data", "models", "text"})
-    {
-        // Delete shortcuts that may be confusing to the eye.
-        const fs::path shortcutPath = (launchDir / directoryName).replace_extension(".lnk");
-
-        if (std::error_code ec; fs::exists(shortcutPath, ec))
-        {
-            if (!fs::remove(shortcutPath, ec))
-            {
-                OutputDebugLine(*SString("Failed to remove shortcut for %s (%d, %s)", directoryName, ec.value(), ec.message().c_str()));
-            }
-        }
-
-        if (std::error_code ec; !SetDirectoryJunction(gtaDir / directoryName, launchDir / directoryName, ec))
-        {
-            OutputDebugLine(*SString("Failed to create junction for %s (%d, %s)", directoryName, ec.value(), ec.message().c_str()));
-            m_strAdminReason = _("Create GTA:SA junctions");
-            return "fail";
-        }
-    }
-#endif
-
     // Copy GTA dependencies to our launch directory.
     for (const char* fileName : {"eax.dll", "ogg.dll", "vorbis.dll", "vorbisFile.dll"})
     {
