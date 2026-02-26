@@ -316,12 +316,6 @@ bool AreFilesEqual(const fs::path& base, const fs::path& other, std::error_code&
 {
     ec.clear();
 
-    if (fs::equivalent(base, other, ec))
-        return true;
-
-    if (ec)
-        return false;
-
     HandleScope baseHandle{CreateFileW(
         /* FileName            */ base.wstring().c_str(),
         /* DesiredAccess       */ GENERIC_READ,
@@ -354,23 +348,31 @@ bool AreFilesEqual(const fs::path& base, const fs::path& other, std::error_code&
         return false;
     }
 
-    LARGE_INTEGER baseSize{};
-    LARGE_INTEGER otherSize{};
+    BY_HANDLE_FILE_INFORMATION baseInfo{};
+    BY_HANDLE_FILE_INFORMATION otherInfo{};
 
-    if (!GetFileSizeEx(baseHandle.get(), &baseSize) || !GetFileSizeEx(otherHandle.get(), &otherSize))
+    if (!GetFileInformationByHandle(baseHandle.get(), &baseInfo) || !GetFileInformationByHandle(otherHandle.get(), &otherInfo))
     {
         ApplyLastSystemError(ec);
         return false;
     }
 
-    if (baseSize.QuadPart != otherSize.QuadPart)
+    // Check if the handles represent the same file in the file system.
+    if (baseInfo.dwVolumeSerialNumber == otherInfo.dwVolumeSerialNumber && baseInfo.nFileIndexHigh == otherInfo.nFileIndexHigh &&
+        baseInfo.nFileIndexLow == otherInfo.nFileIndexLow)
+    {
+        return true;
+    }
+
+    // Check if the file sizes differ.
+    if (!(baseInfo.nFileSizeHigh == otherInfo.nFileSizeHigh && baseInfo.nFileSizeLow == otherInfo.nFileSizeLow))
         return false;
 
     std::array<unsigned char, 4096> baseBuffer{};
     std::array<unsigned char, 4096> otherBuffer{};
 
     const auto bytesToRead = static_cast<DWORD>(baseBuffer.size());
-    LONGLONG   remainingSize = baseSize.QuadPart;
+    LONGLONG   remainingSize = (static_cast<LONGLONG>(baseInfo.nFileSizeHigh) << 32) | baseInfo.nFileSizeLow;
 
     while (remainingSize)
     {
@@ -478,53 +480,4 @@ auto GetFileBufferHash(const std::vector<unsigned char>& buffer) -> FileHash
     FileHash hash{};
     sha256_final(&ctx, hash.data());
     return hash;
-}
-
-bool SetDirectoryJunction(const fs::path& from, const fs::path& to, std::error_code& ec)
-{
-    ec.clear();
-
-    // The source directory must exist.
-    if (!fs::is_directory(from, ec))
-        return false;
-
-    // Check if the target directory is already pointing to the source directory.
-    if (fs::is_symlink(to, ec))
-    {
-        if (fs::equivalent(from, to, ec))
-            return true;
-
-        if (ec)
-            return false;
-    }
-
-    // Remove the target file to replace it.
-    if (fs::exists(to, ec))
-    {
-        fs::remove_all(to, ec);
-    }
-
-    if (ec)
-        return false;
-
-    // Create the parent directory for the symlink.
-    const fs::path toParentDirectory = to.parent_path();
-
-    if (!fs::exists(toParentDirectory, ec))
-    {
-        if (ec || !fs::create_directories(toParentDirectory, ec))
-            return false;
-
-        if (!fs::is_directory(toParentDirectory, ec))
-            return false;
-    }
-
-    // Use the native function to create the symlink due to flag usage.
-    if (!CreateSymbolicLinkW(to.wstring().c_str(), from.wstring().c_str(), SYMBOLIC_LINK_FLAG_DIRECTORY | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE))
-    {
-        ApplyLastSystemError(ec);
-        return false;
-    }
-
-    return true;
 }
