@@ -24,6 +24,9 @@ bool CVoiceDataPacket::Read(NetBitStreamInterface& BitStream)
 
     if (BitStream.Read(voiceBufferLength) && voiceBufferLength <= m_voiceBuffer.capacity())
     {
+        if (!BitStream.CanReadNumberOfBytes(voiceBufferLength))
+            return false;
+
         m_voiceBuffer.resize(voiceBufferLength);
         return BitStream.Read(reinterpret_cast<char*>(m_voiceBuffer.data()), m_voiceBuffer.size());
     }
