@@ -63,20 +63,20 @@ private:
     void OnElementForceStreamOut(CClientStreamElement* pElement);
     void OnElementDimension(CClientStreamElement* pElement);
 
-    const float                        m_fSectorSize;
-    const float                        m_fRowSize;
-    float                              m_fMaxDistanceExp;
-    float                              m_fMaxDistanceThreshold;
-    StreamerLimitReachedFunction*      m_pLimitReachedFunc;
-    std::list<CClientStreamSectorRow*>                    m_WorldRows;
-    std::unordered_map<int, CClientStreamSectorRow*>       m_ExtraRows;
-    CClientStreamSectorRow*                                m_pRow;
-    CClientStreamSector*                                   m_pSector;
-    CVector                                                m_vecPosition;
-    unsigned short                                         m_usDimension;
-    std::list<CClientStreamElement*>                        m_ActiveElements;
-    std::unordered_set<CClientStreamElement*>               m_ActiveElementSet;
-    std::list<CClientStreamElement*>                        m_ToStreamOut;
+    const float                                      m_fSectorSize;
+    const float                                      m_fRowSize;
+    float                                            m_fMaxDistanceExp;
+    float                                            m_fMaxDistanceThreshold;
+    StreamerLimitReachedFunction*                    m_pLimitReachedFunc;
+    std::list<CClientStreamSectorRow*>               m_WorldRows;
+    std::unordered_map<int, CClientStreamSectorRow*> m_ExtraRows;
+    CClientStreamSectorRow*                          m_pRow;
+    CClientStreamSector*                             m_pSector;
+    CVector                                          m_vecPosition;
+    unsigned short                                   m_usDimension;
+    std::list<CClientStreamElement*>                 m_ActiveElements;
+    std::unordered_set<CClientStreamElement*>        m_ActiveElementSet;
+    std::list<CClientStreamElement*>                 m_ToStreamOut;
 
     static void* pAddingElement;
 };
