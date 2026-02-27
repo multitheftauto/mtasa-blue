@@ -449,6 +449,8 @@ private:
 
     std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
 
+    std::map<SString, SVehicleComponentData>* m_componentCacheData{nullptr};
+
 public:
     CVehicleSA() = default;
     ~CVehicleSA();
@@ -698,6 +700,7 @@ public:
     bool                              GetComponentMatrix(const SString& vehicleComponent, CMatrix& matOutOrientation);
     bool                              GetComponentParentToRootMatrix(const SString& vehicleComponent, CMatrix& matOutParentToRoot);
     bool                              SetComponentVisible(const SString& vehicleComponent, bool bVisible);
+    bool                              IsComponentVisibleInCache(const SString& vehicleComponent);
     void                              AddComponent(RwFrame* pFrame, bool bReadOnly);
     bool                              GetComponentVisible(const SString& vehicleComponent, bool& bVisible);
     std::map<SString, SVehicleFrame>& GetComponentMap() { return m_ExtraFrames; }
@@ -719,6 +722,8 @@ public:
 
     bool IsOnFire() override { return GetVehicleInterface()->m_pFire != nullptr; }
     bool SetOnFire(bool onFire) override;
+
+    void SetCacheDataMap(std::map<SString, SVehicleComponentData>* pCacheData) noexcept override { m_componentCacheData = pCacheData; }
 
     static void StaticSetHooks();
     static void SetVehiclesSunGlareEnabled(bool bEnabled);
