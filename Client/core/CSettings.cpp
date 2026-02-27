@@ -4986,7 +4986,26 @@ void CSettings::SetChatColorValues(eChatColorType eType, CColor pColor)
 
 void CSettings::LoadChatPresets()
 {
-    CXMLFile* pPresetsFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(CHAT_PRESETS_PATH));
+    SString strPresetsPath = CHAT_PRESETS_PATH;
+    bool    bIsSecondary = g_pCore->IsSecondaryClient();
+
+    if (bIsSecondary)
+    {
+        strPresetsPath = strPresetsPath.Replace(".xml", "-cl2.xml");
+
+        // If CL2 presets file doesn't exist, copy from the primary
+        SString strFullPath = CalcMTASAPath(strPresetsPath);
+        if (!FileExists(strFullPath))
+        {
+            SString strPrimaryPresets = CalcMTASAPath(CHAT_PRESETS_PATH);
+            if (FileExists(strPrimaryPresets))
+            {
+                FileCopy(strPrimaryPresets, strFullPath);
+            }
+        }
+    }
+
+    CXMLFile* pPresetsFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(strPresetsPath));
     if (pPresetsFile && pPresetsFile->Parse())
     {
         CXMLNode* pPresetsRoot = pPresetsFile->GetRootNode();

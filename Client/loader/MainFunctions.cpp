@@ -674,7 +674,8 @@ void HandleNotUsedMainMenu()
 
     // Check current display mode in coreconfig.xml
     {
-        SString strCoreConfigFilename = CalcMTASAPath(PathJoin("mta", "config", "coreconfig.xml"));
+        SString strCoreConfigName = IsSecondaryClient() ? "coreconfig-cl2.xml" : "coreconfig.xml";
+        SString strCoreConfigFilename = CalcMTASAPath(PathJoin("mta", "config", strCoreConfigName));
         SString strCoreConfig;
         FileLoad(strCoreConfigFilename, strCoreConfig);
         SString strWindowed = strCoreConfig.SplitRight("<display_windowed>").Left(1);
@@ -1041,6 +1042,10 @@ void PostRunWatchDogs(int iReturnCode)
 //////////////////////////////////////////////////////////
 void HandleIfGTAIsAlreadyRunning()
 {
+    // Skip GTA check for secondary client to allow multiple GTA instances
+    if (IsSecondaryClient())
+        return;
+
     if (IsGTARunning())
     {
         if (MessageBoxUTF8(

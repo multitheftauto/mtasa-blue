@@ -75,7 +75,13 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_pResourceIMGRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "imgroot");
     m_pResourceIMGRoot->MakeSystemEntity();
 
-    m_strResourceDirectoryPath = SString("%s/resources/%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName);
+    // Use resources-cl2 for secondary client
+    SString strResourcesDir = "resources";
+    if (g_pCore->IsSecondaryClient())
+    {
+        strResourcesDir = "resources-cl2";
+    }
+    m_strResourceDirectoryPath = SString("%s/%s/%s", g_pClientGame->GetFileCacheRoot(), *strResourcesDir, *m_strResourceName);
     m_strResourcePrivateDirectoryPath = PathJoin(CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(), m_strResourceName);
 
     m_strResourcePrivateDirectoryPathOld = CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(true);
@@ -191,8 +197,13 @@ CResource::~CResource()
 CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResourceType resourceType, const char* szFileName, uint uiDownloadSize,
                                                   CChecksum serverChecksum, bool bAutoDownload)
 {
-    // Create the resource file and add it to the list
-    SString strBuffer("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
+    // Create the resource file and add it to the list - use resources-cl2 for secondary client
+    SString strResourcesDir = "resources";
+    if (g_pCore->IsSecondaryClient())
+    {
+        strResourcesDir = "resources-cl2";
+    }
+    SString strBuffer("%s\\%s\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *strResourcesDir, *m_strResourceName, szFileName);
 
     // Reject duplicates
     if (g_pClientGame->GetResourceManager()->IsResourceFile(strBuffer))
@@ -212,8 +223,13 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
 
 CDownloadableResource* CResource::AddConfigFile(const char* szFileName, uint uiDownloadSize, CChecksum serverChecksum)
 {
-    // Create the config file and add it to the list
-    SString strBuffer("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName, szFileName);
+    // Create the config file and add it to the list - use resources-cl2 for secondary client
+    SString strResourcesDir = "resources";
+    if (g_pCore->IsSecondaryClient())
+    {
+        strResourcesDir = "resources-cl2";
+    }
+    SString strBuffer("%s\\%s\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *strResourcesDir, *m_strResourceName, szFileName);
 
     // Reject duplicates
     if (g_pClientGame->GetResourceManager()->IsResourceFile(strBuffer))
