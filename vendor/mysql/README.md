@@ -1,8 +1,22 @@
 DLL files can be found in `Shared/data/MTA San Andreas/server`.
 That directory gets copied to the "Bin" directory when you run "win-install-data.bat".
 
+## MySQL 9.6.0 Upgrade Notes
+
+This module has been upgraded to support MySQL 9.6.0 (Innovation track), bringing:
+- **Enhanced Security**: Removed `mysql_native_password` authentication (deprecated in 8.4, removed in 9.0)
+- **Default Authentication**: Now uses `caching_sha2_password` with SHA-256 encryption
+- **Improved Performance**: Better query optimization and execution
+- **New Features**: Enhanced JSON support and EXPLAIN ANALYZE capabilities
+
+### Authentication Compatibility
+MySQL 9+ no longer supports `mysql_native_password`. The client library automatically uses `caching_sha2_password` by default. Server administrators must ensure user accounts use compatible authentication methods:
+```sql
+ALTER USER 'username'@'host' IDENTIFIED WITH caching_sha2_password BY 'password';
+```
+
 The source code for MySQL and OpenSSL used to produce the binaries can be found here:  
-https://github.com/mysql/mysql-server/releases/tag/mysql-8.4.6  
+https://github.com/mysql/mysql-server/releases/tag/mysql-9.6.0  
 https://github.com/openssl/openssl/releases/tag/openssl-3.4.2  
 
 ## How to compile OpenSSL
@@ -60,12 +74,23 @@ https://github.com/openssl/openssl/releases/tag/openssl-3.4.2
     ```
 4. Switch to the release tag:  
     ```bat
-    git switch --detach --force --recurse-submodules mysql-8.4.6
+    git switch --detach --force --recurse-submodules mysql-9.6.0
     ```
 5. Apply the patch file:  
     ```bat
     git apply path\to\vendor\mysql\mysql-server.diff
     ```
+    > [!WARNING]  
+    > The patch file was originally created for MySQL 8.4.6. When compiling MySQL 9.6.0, 
+    > the patch has **not yet been tested** and may need adjustments if MySQL 9.6.0 source 
+    > files have changed. If `git apply` fails, you will need to manually update the patch.
+    > 
+    > The patch includes fixes for:
+    > - Static runtime linking configuration
+    > - 32-bit x86 build support
+    > - OpenSSL detection skipping
+    > - ARM64 cross-compilation support
+    > - MYSQL_OPT_RECONNECT deprecation warning suppression
 6. Run `VsDevCmd.cmd` to open three Developer Command Prompts.  
 > [!IMPORTANT]  
 > The next steps assume the OpenSSL checkout directory is `C:\GitHub\openssl`  
@@ -104,3 +129,30 @@ https://github.com/openssl/openssl/releases/tag/openssl-3.4.2
     5. Copy signed `*.dll` files to their designed subfolder in `Shared\data\MTA San Andreas\server`.
     6. Copy `lib\libmysql.lib` to `vendor\mysql\lib\{arch}\`.
 6. Commit the update.
+
+## Server Administrator Migration Guide
+
+When upgrading an MTA server to use MySQL 9.6+, server administrators need to ensure their MySQL server configuration is compatible:
+
+### Authentication Method Update
+MySQL 9.0+ has removed `mysql_native_password` authentication. All database users must use `caching_sha2_password`:
+
+```sql
+-- Check current authentication plugins
+SELECT user, host, plugin FROM mysql.user;
+
+-- Update users to use caching_sha2_password
+ALTER USER 'mtauser'@'%' IDENTIFIED WITH caching_sha2_password BY 'password';
+FLUSH PRIVILEGES;
+```
+
+### Connection Requirements
+- Ensure MySQL server is version 8.0+ (MySQL 9.x servers support the MySQL client protocol used by 8.x clients)
+- Note: While protocol-compatible, authentication must use `caching_sha2_password` (not `mysql_native_password`)
+- If using SSL/TLS, ensure OpenSSL 3.4.2+ is installed
+- The `get_server_public_key=1` option (enabled by default) allows secure password exchange
+
+### Compatibility Notes
+- MTA server with MySQL 9.6+ client library **can connect to** MySQL 8.0+ servers (using `caching_sha2_password`)
+- MTA server with MySQL 9.6+ client library **cannot connect to** servers using `mysql_native_password` only
+- For optimal security, upgrade both the MTA server's client library and the MySQL server to version 9.x
