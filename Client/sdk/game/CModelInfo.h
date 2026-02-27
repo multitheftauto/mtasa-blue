@@ -240,6 +240,7 @@ public:
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
+    virtual void      SetRwObject(RwObject* pRwObject) = 0;
     virtual void      MakePedModel(const char* szTexture) = 0;
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeObjectDamageableModel(std::uint16_t baseID) = 0;

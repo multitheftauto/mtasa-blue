@@ -483,6 +483,12 @@ public:
         return pInterface ? pInterface->pRwObject : NULL;
     }
 
+    void SetRwObject(RwObject* pRwObject)
+    {
+        if (m_pInterface)
+            m_pInterface->pRwObject = pRwObject;
+    }
+
     // CModelInfoSA methods
     void         MakePedModel(const char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
