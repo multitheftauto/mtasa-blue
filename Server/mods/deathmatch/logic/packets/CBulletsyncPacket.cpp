@@ -18,7 +18,6 @@
 #include "CWeaponNames.h"
 
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
-    : m_weapon(WEAPONTYPE_UNARMED), m_start(), m_end(), m_order(0), m_damage(0.0f), m_zone(0), m_damaged(INVALID_ELEMENT_ID)
 {
     m_pSourceElement = player;
 }
@@ -101,41 +100,28 @@ bool CBulletsyncPacket::ReadWeaponAndPositions(NetBitStreamInterface& stream)
     return true;
 }
 
+// Returns false when there's a validation error.
+// Make sure to reset damage data to defaults when that happens.
 bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
 {
     if (!stream.ReadBit())
-    {
-        ResetDamageData();
         return true;
-    }
 
     stream.Read(m_damage);
     stream.Read(m_zone);
     stream.Read(m_damaged);
 
     if (IsNaN(m_damage))
-    {
-        ResetDamageData();
         return false;
-    }
 
     if (m_damage < 0.0f || m_damage > MAX_DAMAGE)
-    {
-        ResetDamageData();
         return false;
-    }
 
     if (m_zone > MAX_BODY_ZONE)
-    {
-        ResetDamageData();
         return false;
-    }
 
     if (m_damaged == 0)
-    {
-        ResetDamageData();
         return false;
-    }
 
     // Check that target element exists (if specified)
     // Note: m_damaged can be INVALID_ELEMENT_ID when shooting at ground/world
@@ -143,10 +129,7 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
     {
         CElement* pElement = CElementIDs::GetElement(m_damaged);
         if (!pElement)
-        {
-            ResetDamageData();
             return false;
-        }
         // Element exists
     }
 
@@ -158,19 +141,10 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
     if (!m_pSourceElement)
         return false;
 
-    CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
-    if (pPlayer)
-    {
-        // Check if player is spawned and alive
-        if (!pPlayer->IsSpawned() || pPlayer->IsDead())
-            return false;
-
-        // Check player position is reasonable relative to bullet start
-        const CVector& playerPos = pPlayer->GetPosition();
-        const float    maxShootDistance = 50.0f;  // Max distance from player to bullet start
-
-        // This check will be done after we read positions
-    }
+    // Check if player is spawned and alive
+    CPlayer* pPlayer = GetSourcePlayer();
+    if (!pPlayer->IsSpawned() || pPlayer->IsDead())
+        return false;
 
     if (!ReadWeaponAndPositions(stream))
         return false;
@@ -205,7 +179,13 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         return false;
 
     if (!ReadOptionalDamage(stream))
+    {
+        // todo: do we really need to reset damage data when we're returning
+        // false? returning false deletes the packet, and other packets don't
+        // reset internal data based on validation failures.
+        ResetDamageData();
         return false;
+    }
 
     return true;
 }
@@ -224,6 +204,7 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
     if (id == INVALID_ELEMENT_ID)
         return false;
 
+    // why?
     if (id == 0)
         return false;
 
