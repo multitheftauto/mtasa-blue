@@ -45,8 +45,8 @@ bool CLightsyncPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(pPlayer->GetID());
         BitStream.Write((unsigned char)pPlayer->GetSyncTimeContext());
 
-        unsigned int uiLatency = pPlayer->GetPing();
-        auto         usLatency = static_cast<unsigned short>(uiLatency);
+        const unsigned int   uiPing = pPlayer->GetPing();
+        const unsigned short usLatency = uiPing <= 0xFFFF ? static_cast<unsigned short>(uiPing) : 0xFFFF;
         BitStream.WriteCompressed(usLatency);
 
         BitStream.WriteBit(data.health.bSync);

@@ -14,7 +14,7 @@ namespace
 {
     // Used to save state between CVehicle_DoTailLightEffect_Mid and CVehicle_DoTailLightEffect_Mid2
     uint bCameraFacingCorona = false;
-}            // namespace
+}  // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -25,10 +25,10 @@ namespace
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_CVehicle_DoTailLightEffect_Mid          0x006E18E5
-#define HOOKSIZE_CVehicle_DoTailLightEffect_Mid         6
-#define HOOKCHECK_CVehicle_DoTailLightEffect_Mid        0x0F
-DWORD RETURN_CVehicle_DoTailLightEffect_Mid = 0x006E18EB;
+#define HOOKPOS_CVehicle_DoTailLightEffect_Mid   0x006E18E5
+#define HOOKSIZE_CVehicle_DoTailLightEffect_Mid  6
+#define HOOKCHECK_CVehicle_DoTailLightEffect_Mid 0x0F
+DWORD                         RETURN_CVehicle_DoTailLightEffect_Mid = 0x006E18EB;
 static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -56,11 +56,11 @@ behind_corona:
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_CVehicle_DoTailLightEffect_Mid2         0x006E19E6
-#define HOOKSIZE_CVehicle_DoTailLightEffect_Mid2        10
-#define HOOKCHECK_CVehicle_DoTailLightEffect_Mid2       0x8B
-DWORD RETURN_CVehicle_DoTailLightEffect_Mid2 = 0x006E19F0;
-DWORD RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona = 0x006E1A32;
+#define HOOKPOS_CVehicle_DoTailLightEffect_Mid2   0x006E19E6
+#define HOOKSIZE_CVehicle_DoTailLightEffect_Mid2  10
+#define HOOKCHECK_CVehicle_DoTailLightEffect_Mid2 0x8B
+DWORD                         RETURN_CVehicle_DoTailLightEffect_Mid2 = 0x006E19F0;
+DWORD                         RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona = 0x006E1A32;
 static void __declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

@@ -15,11 +15,11 @@
 
 class CPickupSA;
 
-#define MAX_PICKUPS                 620
-#define MAX_PICKUPS_ALWAYS_UPDATED  16
+#define MAX_PICKUPS                620
+#define MAX_PICKUPS_ALWAYS_UPDATED 16
 
-#define ARRAY_PICKUPS               0x9788C0
-#define FUNC_CPickups__Update       0x458DE0
+#define ARRAY_PICKUPS         0x9788C0
+#define FUNC_CPickups__Update 0x458DE0
 
 class CPickupsSA : public CPickups
 {

@@ -26,10 +26,10 @@ public:
     void       RemoveBuilding(CBuilding* pBuilding);
     bool       HasFreeBuildingSlot();
 
-    void RemoveAllWithBackup() override;
-    void RestoreBackup() override;
-    bool Resize(int size) override;
-    int  GetSize() const override { return (*m_ppBuildingPoolInterface)->m_nSize; };
+    void           RemoveAllWithBackup() override;
+    void           RestoreBackup() override;
+    bool           Resize(int size) override;
+    int            GetSize() const override { return (m_ppBuildingPoolInterface && *m_ppBuildingPoolInterface) ? (*m_ppBuildingPoolInterface)->m_nSize : 0; };
     CClientEntity* GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept;
 
 private:
@@ -39,13 +39,21 @@ private:
     void UpdateBackupLodPointers(uint32_t offset);
     void RemoveVehicleDamageLinks();
     void RemovePedsContactEnityLinks();
+    void RemoveObjectEntityLinks();
+    void PurgeStaleSectorEntries(void* oldPool, int poolSize);
 
 private:
     SVectorPoolData<CBuildingSA>             m_buildingPool{MAX_BUILDINGS};
     CPoolSAInterface<CBuildingSAInterface>** m_ppBuildingPoolInterface;
 
     using building_buffer_t = std::uint8_t[sizeof(CBuildingSAInterface)];
-    using backup_array_t = std::array<std::pair<bool, building_buffer_t>, MAX_BUILDINGS>;
+    using backup_entry_t = std::pair<bool, building_buffer_t>;
+    using backup_container_t = std::vector<backup_entry_t>;
 
-    std::unique_ptr<backup_array_t> m_pOriginalBuildingsBackup;
+    std::unique_ptr<backup_container_t> m_pOriginalBuildingsBackup;
+
+    // Set by RemoveAllWithBackup after sweeping stale entity links (vehicle damage,
+    // ped contact, object entity refs). Cleared by Resize to skip a redundant pass
+    // when SetBuildingPoolSize calls both in the same remove/resize cycle.
+    bool m_bLinkSweepsDone{false};
 };

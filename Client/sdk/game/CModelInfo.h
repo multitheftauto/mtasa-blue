@@ -40,7 +40,7 @@ enum class eModelIdeFlag
     IS_ROAD,
     DRAW_LAST,
     ADDITIVE,
-    IGNORE_LIGHTING,            // Used with animated objects
+    IGNORE_LIGHTING,  // Used with animated objects
     NO_ZBUFFER_WRITE,
     DONT_RECEIVE_SHADOWS,
     IS_GLASS_TYPE_1,
@@ -258,6 +258,11 @@ public:
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 
     virtual unsigned int GetParentID() = 0;
+    virtual void         SetParentID(unsigned int id) = 0;
     virtual bool         IsDynamic() = 0;
     virtual bool         IsDamageableAtomic() = 0;
+
+    // Clear m_pCustomClump without touching GTA streaming or RW objects.
+    // Used during shutdown when RW operations are unsafe.
+    virtual void ClearCustomModel() = 0;
 };

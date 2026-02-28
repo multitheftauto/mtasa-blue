@@ -10,6 +10,8 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 
+#include <limits>
+
 void CLuaDiscordDefs::LoadFunctions()
 {
     // Backwards compatibility functions
@@ -24,7 +26,7 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresenceEndTime", ArgumentParser<SetEndTime>},
         {"setDiscordRichPresencePartySize", ArgumentParser<SetPartySize>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
-        {"isDiscordRichPresenceConnected", ArgumentParser <IsDiscordRPCConnected>},
+        {"isDiscordRichPresenceConnected", ArgumentParser<IsDiscordRPCConnected>},
         {"getDiscordRichPresenceUserID", ArgumentParser<GetDiscordUserID>},
     };
 
@@ -48,8 +50,8 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setPartySize", "setDiscordRichPresencePartySize");
 
     lua_classfunction(luaVM, "isConnected", "isDiscordRichPresenceConnected");
-    //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
-    //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
+    // lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
+    // lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
 
     lua_registerclass(luaVM, "DiscordRPC");
 }
@@ -100,7 +102,7 @@ bool CLuaDiscordDefs::SetAppID(lua_State* luaVM, std::string strAppID)
 
     auto discord = g_pCore->GetDiscord();
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CLuaMain*   pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     const char* resourceName = "";
     if (pLuaMain)
     {
@@ -138,10 +140,24 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 
 bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 {
-    auto ulSecondsSinceEpoch = static_cast<unsigned long>(time(nullptr)) + ulTime;
+    unsigned long ulSecondsSinceEpoch = 0;
+    if (ulTime != 0)
+    {
+        const time_t now = time(nullptr);
+        if (now <= 0)
+            return false;
 
-    if (ulTime == 0)
-        ulSecondsSinceEpoch = 0;
+        const auto maxValue = std::numeric_limits<unsigned long>::max();
+        const auto nowUnsigned = static_cast<unsigned long long>(now);
+        if (nowUnsigned > maxValue)
+            return false;
+
+        const unsigned long nowUl = static_cast<unsigned long>(nowUnsigned);
+        if (maxValue - nowUl < ulTime)
+            return false;
+
+        ulSecondsSinceEpoch = nowUl + ulTime;
+    }
 
     auto discord = g_pCore->GetDiscord();
 
@@ -157,10 +173,24 @@ bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 
 bool CLuaDiscordDefs::SetEndTime(unsigned long ulTime)
 {
-    auto ulSecondsSinceEpoch = static_cast<unsigned long>(time(nullptr)) + ulTime;
+    unsigned long ulSecondsSinceEpoch = 0;
+    if (ulTime != 0)
+    {
+        const time_t now = time(nullptr);
+        if (now <= 0)
+            return false;
 
-    if (ulTime == 0)
-        ulSecondsSinceEpoch = 0;
+        const auto maxValue = std::numeric_limits<unsigned long>::max();
+        const auto nowUnsigned = static_cast<unsigned long long>(now);
+        if (nowUnsigned > maxValue)
+            return false;
+
+        const unsigned long nowUl = static_cast<unsigned long>(nowUnsigned);
+        if (maxValue - nowUl < ulTime)
+            return false;
+
+        ulSecondsSinceEpoch = nowUl + ulTime;
+    }
 
     auto discord = g_pCore->GetDiscord();
 

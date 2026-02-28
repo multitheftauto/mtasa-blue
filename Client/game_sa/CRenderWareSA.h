@@ -30,10 +30,13 @@ public:
     CRenderWareSA();
     ~CRenderWareSA();
     void Initialize();
-    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled, SString* pOutError = nullptr) override;
+    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled,
+                                  SString* pOutError = nullptr) override;
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, unsigned short usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
-    void CleanupIsolatedTxdForModel(unsigned short usModelId) override;
+    void ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures) override;
+    void CleanupIsolatedTxdForModel(unsigned short usModelId, bool bSkipStreamingLoads = false) override;
+    void CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId) override;
     void StaticResetModelTextureReplacing();
     void StaticResetShaderSupport();
     void ClothesAddReplacement(char* pFileData, size_t fileSize, unsigned short usFileId);
@@ -41,7 +44,7 @@ public:
     bool HasClothesReplacementChanged();
     bool ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) override;
     bool ClothesRemoveFile(char* fileData) override;
-    bool HasClothesFile(const char* fileName) const noexcept override;
+    bool HasClothesFile(const char* fileName) const override;
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);
@@ -57,6 +60,9 @@ public:
 
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
+
+    // Parses TXD buffer data and injects it directly into an allocated pool slot
+    bool LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer) override;
 
     // Reads and parses a COL file (versions 1-4: COLL, COL2, COL3, COL4)
     CColModel* ReadCOL(const SString& buffer);
@@ -85,7 +91,10 @@ public:
     // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
     bool ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) override;
 
-    // Replaces a CClumpModelInfo clump with a new clump
+    // Replaces a generic CClumpModelInfo clump with a new clump
+    bool ReplaceClumpModel(RpClump* pNew, unsigned short usModelID) override;
+
+    // Replaces a CWeaponModelInfo clump with a new clump
     bool ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) override;
 
     bool ReplacePedModel(RpClump* pNew, unsigned short usModelID) override;
@@ -96,16 +105,18 @@ public:
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
     bool ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName);
 
-    unsigned short     GetTXDIDForModelID(unsigned short usModelID);
-    void               PulseWorldTextureWatch();
-    void               ProcessPendingIsolatedTxdParents();
-    void               GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID);
-    bool               GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames);
-    void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, unsigned short usTxdId);
-    static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
-    static void        GetTxdTextures(std::unordered_set<RwTexture*>& outTextureSet, RwTexDictionary* pTXD);
-    const char*        GetTextureName(CD3DDUMMY* pD3DData);
-    void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, unsigned short usModelId, int iTypeMask);
+    unsigned short GetTXDIDForModelID(unsigned short usModelID);
+    void           PulseWorldTextureWatch();
+    // Compatibility wrapper; uses per-model pending processing.
+    void        ProcessPendingIsolatedTxdParents();
+    void        ProcessPendingIsolatedModels();
+    void        GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID);
+    bool        GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames);
+    void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, unsigned short usTxdId);
+    static void GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
+    static void GetTxdTextures(std::unordered_set<RwTexture*>& outTextureSet, RwTexDictionary* pTXD);
+    const char* GetTextureName(CD3DDUMMY* pD3DData);
+    void        SetRenderingClientEntity(CClientEntityBase* pClientEntity, unsigned short usModelId, int iTypeMask);
     SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData);
     void               AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority,
                                            bool bShaderLayered, int iTypeMask, unsigned int uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers);
@@ -155,8 +166,11 @@ public:
     static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
 
-    // Rebind clump material textures to current TXD textures (fixes stale texture pointers after TXD reload
+    // Rebind clump material textures to current TXD textures (fixes stale texture pointers after TXD reload)
     void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) override;
+
+    // Rebind single atomic's material textures to current TXD textures
+    void RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId) override;
 
     static const char* GetInternalTextureName(const char* szExternalName);
     static const char* GetExternalTextureName(const char* szInternalName);
@@ -168,18 +182,20 @@ public:
     void SetGTAVertexShadersEnabled(bool bEnable);
 
     // Watched world textures
-    std::multimap<unsigned short, STexInfo*>    m_TexInfoMap;
-    CFastHashMap<CD3DDUMMY*, STexInfo*> m_D3DDataTexInfoMap;
-    CClientEntityBase*                  m_pRenderingClientEntity;
-    unsigned short                              m_usRenderingEntityModelId;
-    int                                 m_iRenderingEntityType;
-    CMatchChannelManager*               m_pMatchChannelManager;
-    int                                 m_uiReplacementRequestCounter;
-    int                                 m_uiReplacementMatchCounter;
-    int                                 m_uiNumReplacementRequests;
-    int                                 m_uiNumReplacementMatches;
-    CElapsedTime                        m_GTAVertexShadersDisabledTimer;
-    bool                                m_bGTAVertexShadersEnabled;
-    std::set<RwTexture*>                m_SpecialTextures;
-    static int                          ms_iRenderingType;
+    std::multimap<unsigned short, STexInfo*> m_TexInfoMap;
+    CFastHashMap<CD3DDUMMY*, STexInfo*>      m_D3DDataTexInfoMap;
+    // Reverse lookup for script/special textures (keyed by RwTexture* tag)
+    std::unordered_map<const RwTexture*, STexInfo*> m_ScriptTexInfoMap;
+    CClientEntityBase*                              m_pRenderingClientEntity;
+    unsigned short                                  m_usRenderingEntityModelId;
+    int                                             m_iRenderingEntityType;
+    CMatchChannelManager*                           m_pMatchChannelManager;
+    int                                             m_uiReplacementRequestCounter;
+    int                                             m_uiReplacementMatchCounter;
+    int                                             m_uiNumReplacementRequests;
+    int                                             m_uiNumReplacementMatches;
+    CElapsedTime                                    m_GTAVertexShadersDisabledTimer;
+    bool                                            m_bGTAVertexShadersEnabled;
+    std::set<RwTexture*>                            m_SpecialTextures;
+    static int                                      ms_iRenderingType;
 };

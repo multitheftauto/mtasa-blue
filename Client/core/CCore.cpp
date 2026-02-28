@@ -18,7 +18,7 @@
 #include <fstream>
 #include <array>
 #include <algorithm>
-#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
+#include "Userenv.h"  // This will enable SharedUtil::ExpandEnvString
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
@@ -38,6 +38,9 @@ using namespace std;
 
 namespace fs = std::filesystem;
 
+// Set to true to enable the freeze watchdog (monitors main thread responsiveness)
+constexpr bool bFreezeWatchdogEnabled = false;
+
 static float fTest = 1;
 
 extern CCore* g_pCore;
@@ -49,7 +52,7 @@ extern fs::path g_gtaDirectory;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-static auto Win32LoadLibraryA = LoadLibraryA;
+static auto                Win32LoadLibraryA = LoadLibraryA;
 static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
@@ -128,6 +131,7 @@ CCore::CCore()
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
+    m_uiNextRenderTargetRetryTime = 0;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Create our Direct3DData handler.
@@ -182,7 +186,8 @@ CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
-    StopWatchdogThread();
+    if constexpr (bFreezeWatchdogEnabled)
+        StopWatchdogThread();
 
     // Reset Discord rich presence
     if (m_pDiscordRichPresence)
@@ -698,7 +703,7 @@ void CCore::ApplyGameSettings()
 void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
-    UpdateIsWindowMinimized();            // Force update of stuff
+    UpdateIsWindowMinimized();  // Force update of stuff
 
     if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
     {
@@ -812,7 +817,7 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
             strTroubleLink += SString("&neterrorcode=%08X", uiErrorCode);
     }
     else if (bLinkRequiresErrorCode)
-        strTroubleLink = "";            // No link if no error code
+        strTroubleLink = "";  // No link if no error code
 
     AddReportLog(7100, SString("Core - NetError (%s) (%s)", *strTitle, *strMessage));
     ShowErrorMessageBox(strTitle, strMessage, strTroubleLink);
@@ -1213,12 +1218,12 @@ CWebCoreInterface* CCore::GetWebCore()
 
         // Log current working directory
         wchar_t cwdBeforeWebInit[32768]{};
-        DWORD cwdBeforeWebInitLen = GetCurrentDirectoryW(32768, cwdBeforeWebInit);
+        DWORD   cwdBeforeWebInitLen = GetCurrentDirectoryW(32768, cwdBeforeWebInit);
         if (cwdBeforeWebInitLen > 0)
         {
             WriteDebugEvent(SString("CCore::GetWebCore - CWD before Initialise: %S", cwdBeforeWebInit));
         }
-        
+
         // Keep m_pWebCore alive even if Initialise() fails
         // CefInitialize() can only be called once per process
         // Deleting and recreating m_pWebCore causes repeated initialization attempts
@@ -1233,7 +1238,7 @@ CWebCoreInterface* CCore::GetWebCore()
             WriteDebugEvent("CCore::GetWebCore - Initialise threw exception");
             bInitSuccess = false;
         }
-        
+
         if (!bInitSuccess)
         {
             WriteDebugEvent("CCore::GetWebCore - Initialise failed");
@@ -1246,7 +1251,7 @@ CWebCoreInterface* CCore::GetWebCore()
         if (!m_pWebCore->IsInitialised())
             return nullptr;
     }
-    
+
     return m_pWebCore;
 }
 
@@ -1285,7 +1290,8 @@ void CCore::DoPreFramePulse()
 {
     TIMING_CHECKPOINT("+CorePreFrame");
 
-    UpdateWatchdogHeartbeat();
+    if constexpr (bFreezeWatchdogEnabled)
+        UpdateWatchdogHeartbeat();
 
     m_pKeyBinds->DoPreFramePulse();
 
@@ -1340,14 +1346,17 @@ void CCore::DoPostFramePulse()
 
         if (m_menuFrame == 1)
         {
-            WatchDogCompletedSection("L2");            // gta_sa.set seems ok
-            WatchDogCompletedSection("L3");            // No hang on startup
+            WatchDogCompletedSection("L2");  // gta_sa.set seems ok
+            WatchDogCompletedSection("L3");  // No hang on startup
 
             // Start watchdog thread now that initial loading is complete
             // Use 120 second timeout to allow for large mod asset loading
-            if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+            if constexpr (bFreezeWatchdogEnabled)
             {
-                WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+                {
+                    WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                }
             }
 
             // Disable vsync while it's all dark
@@ -1406,7 +1415,7 @@ void CCore::DoPostFramePulse()
         m_bLastFocused = true;
     }
 
-    GetJoystickManager()->DoPulse();            // Note: This may indirectly call CMessageLoopHook::ProcessMessage
+    GetJoystickManager()->DoPulse();  // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse();
 
     if (m_pWebCore)
@@ -1564,7 +1573,7 @@ void CCore::Quit(bool bInstantly)
         // Show that we are quiting (for the crash dump filename)
         SetApplicationSettingInt("last-server-ip", 1);
 
-        WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
+        WatchDogBeginSection("Q0");  // Allow loader to detect freeze on exit
 
         // Hide game window to make quit look instant
         PostQuitMessage(0);
@@ -1580,7 +1589,6 @@ void CCore::Quit(bool bInstantly)
 
         // Destroy ourself (unreachable but kept for completeness)
         delete CCore::GetSingletonPtr();
-
     }
     else
     {
@@ -1855,18 +1863,23 @@ void CCore::UpdateRecentlyPlayed()
     std::string  strHost;
     CVARS_GET("host", strHost);
     CVARS_GET("port", uiPort);
+
+    if (uiPort == 0 || uiPort > 0xFFFF)
+        return;
+
+    const ushort usPort = static_cast<ushort>(uiPort);
     // Save the connection details into the recently played servers list
     in_addr Address;
     if (CServerListItem::Parse(strHost.c_str(), Address))
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
-        pRecentList->Remove(Address, static_cast<ushort>(uiPort));
-        pRecentList->AddUnique(Address, static_cast<ushort>(uiPort), true);
+        pRecentList->Remove(Address, usPort);
+        pRecentList->AddUnique(Address, usPort, true);
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())
-            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", uiPort), m_pConnectManager->m_strLastPassword);
+            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", usPort), m_pConnectManager->m_strLastPassword);
     }
     // Save our configuration file
     CCore::GetSingleton().SaveConfig();
@@ -1911,9 +1924,9 @@ void CCore::ApplyCoreInitSettings()
         SetApplicationSettingInt("reset-settings-revision", 21486);
     }
 
-    HANDLE process = GetCurrentProcess();
+    HANDLE    process = GetCurrentProcess();
     const int priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
-    int priority = CVARS_GET_VALUE<int>("process_priority") % 3;
+    int       priority = CVARS_GET_VALUE<int>("process_priority") % 3;
 
     SetPriorityClass(process, priorities[priority]);
 
@@ -1924,7 +1937,7 @@ void CCore::ApplyCoreInitSettings()
 
     DWORD_PTR mask;
     DWORD_PTR sys;
-    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
+    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
 
     if (result)
         SetProcessAffinityMask(process, mask & ~1);
@@ -1941,7 +1954,7 @@ void CCore::OnGameTimerUpdate()
 
 void CCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    if (m_pNet != nullptr && IsWebCoreLoaded())            // We have to wait for the network module to be loaded
+    if (m_pNet != nullptr && IsWebCoreLoaded())  // We have to wait for the network module to be loaded
         GetWebCore()->OnFPSLimitChange(fps);
 }
 
@@ -1959,7 +1972,7 @@ void CCore::DoReliablePulse()
 
     // Non frame rate limit stuff
     if (IsWindowMinimized())
-        m_iUnminimizeFrameCounter = 4;            // Tell script we have unminimized after a short delay
+        m_iUnminimizeFrameCounter = 4;  // Tell script we have unminimized after a short delay
 
     UpdateModuleTickCount64();
 }
@@ -1987,8 +2000,9 @@ void CCore::OnTimingDetail(const char* szTag)
 //
 void CCore::OnDeviceRestore()
 {
-    m_iUnminimizeFrameCounter = 4;            // Tell script we have restored after 4 frames to avoid double sends
+    m_iUnminimizeFrameCounter = 4;  // Tell script we have restored after 4 frames to avoid double sends
     m_bDidRecreateRenderTargets = true;
+    m_uiNextRenderTargetRetryTime = 0;
 }
 
 //
@@ -2012,6 +2026,13 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
+    const uint uiNow = GetTickCount32();
+    if (uiNow >= m_uiNextRenderTargetRetryTime)
+    {
+        CGraphics::GetSingleton().RetryInvalidRenderTargets();
+        m_uiNextRenderTargetRetryTime = uiNow + 250;
+    }
+
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
@@ -2445,9 +2466,8 @@ bool CCore::IsUsingCustomStreamingMemorySize()
 // Streaming memory size used [In Bytes]
 size_t CCore::GetStreamingMemory()
 {
-    return IsUsingCustomStreamingMemorySize()
-        ? m_CustomStreamingMemoryLimitBytes
-        : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+    return IsUsingCustomStreamingMemorySize() ? m_CustomStreamingMemoryLimitBytes
+                                              : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024;  // MB to B conversion
 }
 
 // Discord rich presence

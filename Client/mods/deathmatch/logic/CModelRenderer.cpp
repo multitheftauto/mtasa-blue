@@ -18,6 +18,11 @@ bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix,
     if (g_pCore->IsWindowMinimized())
         return false;
 
+    // Reject enqueues while the alpha entity list holds pointers into m_Queue.
+    // An emplace_back could reallocate the vector, dangling those pointers.
+    if (m_bAlphaRefsActive)
+        return false;
+
     if (pModelInfo && pModelInfo->IsLoaded())
     {
         m_Queue.emplace_back(pModelInfo, matrix, lighting);
@@ -37,18 +42,20 @@ void CModelRenderer::Update()
         // Insert transparent entities into a sorted list
         if (modelDesc.pModelInfo->GetIdeFlag(eModelIdeFlag::DRAW_LAST))
         {
-            const CVector& vecCameraPosition = *(CVector*)0xB76870; // CRenderer::ms_vecCameraPosition
-            const float fDistance = (modelDesc.matrix.GetPosition() - vecCameraPosition).Length();
+            const CVector& vecCameraPosition = *(CVector*)0xB76870;  // CRenderer::ms_vecCameraPosition
+            const float    fDistance = (modelDesc.matrix.GetPosition() - vecCameraPosition).Length();
 
             pVisibilityPlugins->InsertEntityIntoEntityList(&modelDesc, fDistance, RenderEntity);
         }
     }
+
+    m_bAlphaRefsActive = true;
 }
 
 void CModelRenderer::Render()
 {
     CRenderer* pRenderer = g_pGame->GetRenderer();
-    assert(pRenderer);    
+    assert(pRenderer);
 
     // Draw opaque entities
     for (auto& modelDesc : m_Queue)
@@ -57,11 +64,30 @@ void CModelRenderer::Render()
             pRenderer->RenderModel(modelDesc.pModelInfo, modelDesc.matrix, modelDesc.lighting);
     }
 
+    // m_Queue must NOT be cleared here: GTA's RenderFadingInEntities runs later
+    // in the same frame and calls RenderEntity with pointers into m_Queue elements
+    // that were inserted by Update() into the alpha entity list.
+}
+
+void CModelRenderer::NotifyFrameEnd()
+{
     m_Queue.clear();
+    m_bAlphaRefsActive = false;
 }
 
 void CModelRenderer::RenderEntity(SModelToRender* modelDesc, float distance)
 {
+    // GTA's alpha entity list stores raw pointers from InsertEntityIntoEntityList.
+    // Verify modelDesc actually points into our queue before dereferencing it,
+    // in case heap corruption overwrote the entity field in a list node.
+    CModelRenderer* pModelRenderer = g_pClientGame->GetModelRenderer();
+    if (!pModelRenderer || pModelRenderer->m_Queue.empty())
+        return;
+
+    const SModelToRender* pQueueData = pModelRenderer->m_Queue.data();
+    if (modelDesc < pQueueData || modelDesc >= pQueueData + pModelRenderer->m_Queue.size())
+        return;
+
     if (!modelDesc->pModelInfo->IsLoaded())
         return;
 

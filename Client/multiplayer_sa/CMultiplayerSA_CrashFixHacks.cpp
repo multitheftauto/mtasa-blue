@@ -17,6 +17,7 @@
 #include "../game_sa/TaskBasicSA.h"
 #include "../game_sa/CFxSystemBPSA.h"
 #include "../game_sa/CFxSystemSA.h"
+#include "../game_sa/CColModelSA.h"
 
 extern CCoreInterface* g_pCore;
 
@@ -47,7 +48,7 @@ static void __declspec(naked) CrashAverted()
     // clang-format on
 }
 
-static bool HasReadAccess(DWORD dwProtect)
+static bool HasReadAccess(DWORD dwProtect) noexcept
 {
     if (dwProtect & PAGE_GUARD)
         return false;
@@ -61,7 +62,7 @@ static bool HasReadAccess(DWORD dwProtect)
            dwProtect == PAGE_EXECUTE_READ || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
 }
 
-static bool HasWriteAccess(DWORD dwProtect)
+static bool HasWriteAccess(DWORD dwProtect) noexcept
 {
     if (dwProtect & PAGE_GUARD)
         return false;
@@ -71,116 +72,124 @@ static bool HasWriteAccess(DWORD dwProtect)
     return dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
 }
 
-static bool QueryRegionCached(uintptr_t uiAddress, MEMORY_BASIC_INFORMATION& outMbi, uintptr_t& outStart, uintptr_t& outEnd)
-{
-    static thread_local MEMORY_BASIC_INFORMATION s_mbi;
-    static thread_local uintptr_t                s_start = 0;
-    static thread_local uintptr_t                s_end = 0;
+static constexpr std::size_t    REGION_CACHE_SIZE = 8;
+static constexpr std::uintptr_t NUM_LOWMEM_THRESHOLD = 0x10000;
 
-    if (s_start != 0 && uiAddress >= s_start && uiAddress <= s_end)
+#define NUM_LOWMEM_THRESHOLD_ASM 0x10000
+
+struct CachedRegion
+{
+    std::uintptr_t start{};
+    std::uintptr_t end{};
+    DWORD          state{};
+    DWORD          protect{};
+};
+
+static bool QueryRegionCached(std::uintptr_t address, DWORD& outState, DWORD& outProtect, std::uintptr_t& outEnd) noexcept
+{
+    static thread_local CachedRegion s_cache[REGION_CACHE_SIZE]{};
+    static thread_local std::size_t  s_nextSlot{};
+
+    for (const auto& entry : s_cache)
     {
-        outMbi = s_mbi;
-        outStart = s_start;
-        outEnd = s_end;
-        return true;
+        if (entry.start != 0 && address >= entry.start && address <= entry.end)
+        {
+            outState = entry.state;
+            outProtect = entry.protect;
+            outEnd = entry.end;
+            return true;
+        }
     }
 
-    MEMORY_BASIC_INFORMATION mbi;
-    SIZE_T                   mbiResult = VirtualQuery(reinterpret_cast<LPCVOID>(uiAddress), &mbi, sizeof(mbi));
-    if (mbiResult != sizeof(mbi))
+    MEMORY_BASIC_INFORMATION mbi{};
+    if (VirtualQuery(reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi)) != sizeof(mbi))
         return false;
 
-    s_mbi = mbi;
-    s_start = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+    const auto regionSize = static_cast<std::uintptr_t>(mbi.RegionSize);
+    if (regionSize == 0)
+        return false;
 
-    const uintptr_t uiSize = static_cast<uintptr_t>(mbi.RegionSize);
-    if (uiSize == 0)
-        s_end = s_start;
-    else
-    {
-        const uintptr_t uiEndPlusOne = s_start + uiSize;
-        s_end = (uiEndPlusOne <= s_start) ? static_cast<uintptr_t>(-1) : (uiEndPlusOne - 1);
-    }
+    auto& slot = s_cache[s_nextSlot];
+    s_nextSlot = (s_nextSlot + 1) % REGION_CACHE_SIZE;
 
-    outMbi = s_mbi;
-    outStart = s_start;
-    outEnd = s_end;
+    slot.start = reinterpret_cast<std::uintptr_t>(mbi.BaseAddress);
+    slot.state = mbi.State;
+    slot.protect = mbi.Protect;
+
+    const auto endPlusOne = slot.start + regionSize;
+    slot.end = (endPlusOne <= slot.start) ? static_cast<std::uintptr_t>(-1) : (endPlusOne - 1);
+
+    outState = slot.state;
+    outProtect = slot.protect;
+    outEnd = slot.end;
     return true;
 }
 
-static bool IsReadablePtr(const void* pPtr, size_t uiSize)
+static bool IsReadablePtr(const void* ptr, std::size_t size) noexcept
 {
-    if (pPtr == nullptr || uiSize == 0)
+    if (ptr == nullptr || size == 0)
         return false;
 
-    const uintptr_t uiStart = reinterpret_cast<uintptr_t>(pPtr);
-    if (uiStart < 0x10000)
+    const auto start = reinterpret_cast<std::uintptr_t>(ptr);
+    if (start < NUM_LOWMEM_THRESHOLD)
         return false;
 
-    const uintptr_t uiEnd = uiStart + uiSize - 1;
-    if (uiEnd < uiStart)
+    const auto end = start + size - 1;
+    if (end < start)
         return false;
 
-    uintptr_t uiCur = uiStart;
-    while (true)
+    auto cur = start;
+    for (;;)
     {
-        MEMORY_BASIC_INFORMATION mbi;
-        uintptr_t                uiRegionStart = 0;
-        uintptr_t                uiRegionEnd = 0;
-        if (!QueryRegionCached(uiCur, mbi, uiRegionStart, uiRegionEnd))
+        DWORD          state{}, protect{};
+        std::uintptr_t regionEnd{};
+        if (!QueryRegionCached(cur, state, protect, regionEnd))
             return false;
 
-        if (mbi.State != MEM_COMMIT)
+        if (state != MEM_COMMIT || !HasReadAccess(protect))
             return false;
 
-        if (!HasReadAccess(mbi.Protect))
-            return false;
-
-        if (uiRegionEnd >= uiEnd)
+        if (regionEnd >= end)
             return true;
 
-        if (uiRegionEnd < uiCur || uiRegionEnd == static_cast<uintptr_t>(-1))
+        if (regionEnd < cur || regionEnd == static_cast<std::uintptr_t>(-1))
             return false;
 
-        uiCur = uiRegionEnd + 1;
+        cur = regionEnd + 1;
     }
 }
 
-static bool IsWritablePtr(void* pPtr, size_t uiSize)
+static bool IsWritablePtr(void* ptr, std::size_t size) noexcept
 {
-    if (pPtr == nullptr || uiSize == 0)
+    if (ptr == nullptr || size == 0)
         return false;
 
-    const uintptr_t uiStart = reinterpret_cast<uintptr_t>(pPtr);
-    if (uiStart < 0x10000)
+    const auto start = reinterpret_cast<std::uintptr_t>(ptr);
+    if (start < NUM_LOWMEM_THRESHOLD)
         return false;
 
-    const uintptr_t uiEnd = uiStart + uiSize - 1;
-    if (uiEnd < uiStart)
+    const auto end = start + size - 1;
+    if (end < start)
         return false;
 
-    uintptr_t uiCur = uiStart;
-    while (true)
+    auto cur = start;
+    for (;;)
     {
-        MEMORY_BASIC_INFORMATION mbi;
-        uintptr_t                uiRegionStart = 0;
-        uintptr_t                uiRegionEnd = 0;
-        if (!QueryRegionCached(uiCur, mbi, uiRegionStart, uiRegionEnd))
+        DWORD          state{}, protect{};
+        std::uintptr_t regionEnd{};
+        if (!QueryRegionCached(cur, state, protect, regionEnd))
             return false;
 
-        if (mbi.State != MEM_COMMIT)
+        if (state != MEM_COMMIT || !HasWriteAccess(protect))
             return false;
 
-        if (!HasWriteAccess(mbi.Protect))
-            return false;
-
-        if (uiRegionEnd >= uiEnd)
+        if (regionEnd >= end)
             return true;
 
-        if (uiRegionEnd < uiCur || uiRegionEnd == static_cast<uintptr_t>(-1))
+        if (regionEnd < cur || regionEnd == static_cast<std::uintptr_t>(-1))
             return false;
 
-        uiCur = uiRegionEnd + 1;
+        cur = regionEnd + 1;
     }
 }
 
@@ -304,7 +313,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc5()
         mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
         test    edi, edi
-        je      cont            // Skip much code if edi is zero
+        je      cont  // Skip much code if edi is zero
 
         mov edi, dword ptr[ARRAY_ModelInfo]
         mov     edi, dword ptr [ecx*4+edi]
@@ -608,11 +617,27 @@ static void __declspec(naked) HOOK_CrashFix_Misc14()
 ////////////////////////////////////////////////////////////////////////
 void _cdecl DoWait(HANDLE hHandle)
 {
-    DWORD dwWait = 4000;
+    static DWORD s_consecutiveTimeouts = 0;
+    static DWORD s_lastCallTick = 0;
+
+    DWORD now = SharedUtil::GetTickCount32();
+
+    // Reset counter after a quiet period - a 10+ second gap means
+    // we moved on to a different streaming operation
+    if (s_lastCallTick != 0 && (now - s_lastCallTick) > 10000)
+        s_consecutiveTimeouts = 0;
+    s_lastCallTick = now;
+
+    // After a consecutive timeout, use a short wait so
+    // LoadAllRequestedModels doesn't accumulate multi-second freezes
+    // when the same I/O issue keeps re-ocurring
+    DWORD dwWait = (s_consecutiveTimeouts >= 1) ? 100 : 4000;
+
     DWORD dwResult = WaitForSingleObject(hHandle, dwWait);
     if (dwResult == WAIT_TIMEOUT)
     {
-        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait));
+        s_consecutiveTimeouts++;
+        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms (consecutive: %u)", hHandle, dwWait, s_consecutiveTimeouts));
         // This thread lock bug in GTA will have to be fixed one day.
         // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
 #if 0
@@ -624,7 +649,16 @@ void _cdecl DoWait(HANDLE hHandle)
             ")
          , _CRT_WIDE(__FILE__), __LINE__);
 #endif
-        dwResult = WaitForSingleObject(hHandle, 1000);
+        if (dwWait >= 4000)
+        {
+            dwResult = WaitForSingleObject(hHandle, 1000);
+            if (dwResult != WAIT_TIMEOUT)
+                s_consecutiveTimeouts = 0;  // Completed during retry, not persistent
+        }
+    }
+    else
+    {
+        s_consecutiveTimeouts = 0;
     }
 }
 
@@ -1257,16 +1291,16 @@ static void __declspec(naked) HOOK_CrashFix_Misc32()
 // Solution: CallOriginalRwTexDictionaryFindNamedTexture replicates Misc33's overwritten
 // bytes (mov eax,[esp+4]; push ebx) and jumps to 0x7F39F5 to work around the hook.
 ////////////////////////////////////////////////////////////////////////
-typedef RwTexture* (__cdecl *RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
-typedef RwTexDictionary* (__cdecl *RwTexDictionaryGetCurrent_t)();
+typedef RwTexture*(__cdecl* RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
+typedef RwTexDictionary*(__cdecl* RwTexDictionaryGetCurrent_t)();
 
 static RwTexDictionaryGetCurrent_t pfnRwTexDictionaryGetCurrentForMisc39 = (RwTexDictionaryGetCurrent_t)0x7F3A90;
 
 // Trampoline to call the ORIGINAL RwTexDictionaryFindNamedTexture at 0x7F39F0,
 // thereby working around HOOK_CrashFix_Misc33.
 // Replicates the 5 overwritten bytes (mov eax,[esp+4]; push ebx) then jumps to 0x7F39F5.
-static constexpr DWORD AddrFindNamedTexture_Continue = 0x7F39F5;
-static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
+static constexpr DWORD       AddrFindNamedTexture_Continue = 0x7F39F5;
+static void _declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
@@ -1280,17 +1314,17 @@ static void __declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 }
 
 static constexpr std::size_t TextureNameSize = 32;
-static constexpr char RemapPrefix[] = "remap";
+static constexpr char        RemapPrefix[] = "remap";
 
 static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
 {
-
     if (name == nullptr)
         return nullptr;
 
-    const auto RwTexDictionaryFindNamedTexture = reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(TrampolineRwTexDictionaryFindNamedTexture);
+    const auto RwTexDictionaryFindNamedTexture =
+        reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(reinterpret_cast<void*>(TrampolineRwTexDictionaryFindNamedTexture));
     const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
-    
+
     RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
     if (vehicleTxd != nullptr)
     {
@@ -1334,8 +1368,8 @@ static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
     return tex;
 }
 
-#define HOOKPOS_CrashFix_Misc39                             0x4C7510
-#define HOOKSIZE_CrashFix_Misc39                            5
+#define HOOKPOS_CrashFix_Misc39  0x4C7510
+#define HOOKSIZE_CrashFix_Misc39 5
 static void __declspec(naked) HOOK_CrashFix_Misc39()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1468,7 +1502,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc33()
 #define HOOKPOS_CrashFix_Misc34  0x5D9CB2
 #define HOOKSIZE_CrashFix_Misc34 6
 DWORD                         RETURN_CrashFix_Misc34 = 0x5D9CB8;
-DWORD                         RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;            // Skip to end of EnvWave block
+DWORD                         RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;  // Skip to end of EnvWave block
 static void __declspec(naked) HOOK_CrashFix_Misc34()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -1508,35 +1542,44 @@ static void __declspec(naked) HOOK_CrashFix_Misc34()
 //
 // Invalid list entry pointer (crash at 0x7F374A: mov esi, [eax])
 // (https://pastebin.com/hFduf1JB)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc35   0x7F374A
 #define HOOKSIZE_CrashFix_Misc35  5
 #define HOOKCHECK_CrashFix_Misc35 0x8B
-DWORD                 RETURN_CrashFix_Misc35 = 0x7F374F;
-DWORD                 RETURN_CrashFix_Misc35_Abort = 0x7F3760;
-static void _declspec(naked) HOOK_CrashFix_Misc35()
+DWORD RETURN_CrashFix_Misc35 = 0x7F374F;
+DWORD RETURN_CrashFix_Misc35_Abort = 0x7F3760;
+
+static void __declspec(naked) HOOK_CrashFix_Misc35()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
-        pushad
+        cmp     eax, NUM_LOWMEM_THRESHOLD_ASM
+        jb      abort_35
+
+        push    eax
+        push    ecx
+        push    edx
         push    4
         push    eax
         call    IsReadablePtr
         add     esp, 8
-        test    eax, eax
-        popad
-        jnz     ok
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      abort_35
 
-        push    35
-        call    CrashAverted
-        jmp     RETURN_CrashFix_Misc35_Abort
-
-    ok:
         mov     esi, [eax]
         add     eax, 0FFFFFFF8h
         jmp     RETURN_CrashFix_Misc35
+
+    abort_35:
+        push    35
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc35_Abort
     }
     // clang-format on
 }
@@ -1549,61 +1592,46 @@ static void _declspec(naked) HOOK_CrashFix_Misc35()
 // WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 //          Use push eax/ecx/edx + pushfd instead (16 bytes vs 32)
 ///////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc36                              0x7F3A09
-#define HOOKSIZE_CrashFix_Misc36                             6
-#define HOOKCHECK_CrashFix_Misc36                            0x8D
+#define HOOKPOS_CrashFix_Misc36   0x7F3A09
+#define HOOKSIZE_CrashFix_Misc36  6
+#define HOOKCHECK_CrashFix_Misc36 0x8D
 DWORD RETURN_CrashFix_Misc36 = 0x7F3A0F;
 DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
 
-static bool CheckTextureName(DWORD ecxValue)
-{
-    return IsReadablePtr((const void*)ecxValue, 1);
-}
-
-static void _declspec(naked) HOOK_CrashFix_Misc36()
+static void __declspec(naked) HOOK_CrashFix_Misc36()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     // clang-format off
     __asm
     {
-        cmp     ebx, 0x10000
-        jb      abort
-        cmp     ebx, 0x80000000
-        jae     abort
+        cmp     ebx, NUM_LOWMEM_THRESHOLD_ASM
+        jb      abort_36
 
         // Replicate original code
         lea     eax, [ebx-8]
         lea     ecx, [eax+10h]
 
-        // Quick check: ecx (texture name ptr) must make sense
-        cmp     ecx, 0x10000
-        jb      abort
-        cmp     ecx, 0x80000000
-        jae     abort
+        cmp     ecx, NUM_LOWMEM_THRESHOLD_ASM
+        jb      abort_36
 
-        // ecx must point readable memory
-        // save all state before call
         push    eax
         push    ecx
         push    edx
-        pushfd
-        
+        push    1
         push    ecx
-        call    CheckTextureName
-        add     esp, 4
+        call    IsReadablePtr
+        add     esp, 8
         test    al, al
-        
-        popfd
         pop     edx
         pop     ecx
         pop     eax
-        jz      abort
+        jz      abort_36
 
         // Continue to original code at test ecx, ecx
         jmp     RETURN_CrashFix_Misc36
 
-    abort:
+    abort_36:
         push    36
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc36_Abort
@@ -1616,24 +1644,33 @@ static void _declspec(naked) HOOK_CrashFix_Misc36()
 //
 // Invalid list head pointer (crash at 0x7F39B3: mov [esi+4], edx)
 // (https://pastebin.com/pkWwsSih)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc37                              0x7F39B3
-#define HOOKSIZE_CrashFix_Misc37                             5
-#define HOOKCHECK_CrashFix_Misc37                            0x89
+#define HOOKPOS_CrashFix_Misc37   0x7F39B3
+#define HOOKSIZE_CrashFix_Misc37  5
+#define HOOKCHECK_CrashFix_Misc37 0x89
 DWORD RETURN_CrashFix_Misc37 = 0x7F39B8;
-static void _declspec(naked) HOOK_CrashFix_Misc37()
+
+static void __declspec(naked) HOOK_CrashFix_Misc37()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
-        pushad
+        cmp     esi, NUM_LOWMEM_THRESHOLD_ASM
+        jb      bad
+
+        push    eax
+        push    ecx
+        push    edx
         push    8
         push    esi
         call    IsWritablePtr
         add     esp, 8
-        test    eax, eax
-        popad
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
         jz      bad
 
         cmp     esi, ecx
@@ -1663,18 +1700,18 @@ static void _declspec(naked) HOOK_CrashFix_Misc37()
 // Hook at loc_7C91C0 validates [eax]
 // On NULL, skip to loc_7C91DA (after the call block) to continue the loop.
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc38                              0x7C91C0
-#define HOOKSIZE_CrashFix_Misc38                             6
-#define HOOKCHECK_CrashFix_Misc38                            0x8B
+#define HOOKPOS_CrashFix_Misc38   0x7C91C0
+#define HOOKSIZE_CrashFix_Misc38  6
+#define HOOKCHECK_CrashFix_Misc38 0x8B
 DWORD RETURN_CrashFix_Misc38 = 0x7C91C6;
-DWORD RETURN_CrashFix_Misc38_Skip = 0x7C91DA;            // loc_7C91DA: after call block, safe loop continuation
+DWORD RETURN_CrashFix_Misc38_Skip = 0x7C91DA;  // loc_7C91DA: after call block, safe loop continuation
 
 constexpr std::uint32_t NUM_VRAM_RELIEF_THROTTLE_MS = 500;
 
 static void OnVideoMemoryExhausted()
 {
     static DWORD s_dwLastReliefTick = 0;
-    const DWORD dwNow = GetTickCount32();
+    const DWORD  dwNow = GetTickCount32();
 
     if (dwNow - s_dwLastReliefTick < NUM_VRAM_RELIEF_THROTTLE_MS)
         return;
@@ -1683,7 +1720,8 @@ static void OnVideoMemoryExhausted()
     OnRequestDeferredStreamingMemoryRelief();
 }
 
-static void _declspec(naked) HOOK_CrashFix_Misc38()
+// No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+static void __declspec(naked) HOOK_CrashFix_Misc38()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -1694,9 +1732,15 @@ static void _declspec(naked) HOOK_CrashFix_Misc38()
         test    esi, esi
         jnz     ok
 
-        pushad
+        // Save only volatile registers before call
+        push    eax
+        push    ecx
+        push    edx
         call    OnVideoMemoryExhausted
-        popad
+        pop     edx
+        pop     ecx
+        pop     eax
+
         push    38
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc38_Skip
@@ -1704,6 +1748,174 @@ static void _declspec(naked) HOOK_CrashFix_Misc38()
     ok:
         lea     ecx, [esp+ecx*4+18h]
         jmp     RETURN_CrashFix_Misc38
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstV3d
+//
+// Same class of issue as CrashFix_Misc38 (skin geometry path), usually due to out of video mem.
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// NULL locked vertex buffer crash (VB Lock failure unchecked by RW).
+// RW's D3D9AtomicDefaultInstanceCallback passes a NULL lockedVertexBuffer
+// to this function when IDirect3DVertexBuffer9::Lock() fails and the
+// HRESULT is discarded. The function writes vertex data to the NULL
+// pointer, causing an crash at 0x00352BA7 (0x752BA7) (case 2, first store).
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=numVerts, [esp+14]=stride
+// Returns D3D9VertexTypeSize[type] in EAX on all paths.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstV3dNull   0x752AD0
+#define HOOKSIZE_CrashFix_VBInstV3dNull  7
+#define HOOKCHECK_CrashFix_VBInstV3dNull 0x51
+DWORD RETURN_CrashFix_VBInstV3dNull = 0x752AD7;
+DWORD ARRAY_D3D9VertexTypeSize = 0x874EF8;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstV3dNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+8]                         // eax = mem (locked VB pointer)
+        test    eax, eax
+        jz      bail_out
+
+        // Replicate overwritten prologue (7 bytes: push ecx; push ebx; push ebp; mov ebp,[esp+0Ch])
+        push    ecx
+        push    ebx
+        push    ebp
+        mov     ebp, [esp+10h]                       // type (was [esp+0C] before 3 pushes, +4 each = +0Ch+4 = 10h)
+        jmp     RETURN_CrashFix_VBInstV3dNull
+
+    bail_out:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    40
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type] to satisfy caller's contract
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstV3dMorph
+//
+// Same NULL locked VB crash as above __rpD3D9VertexDeclarationInstV3d, but in the morph interpolation path.
+// Called from D3D9AtomicDefaultInstanceCallback when geometry has morph
+// targets. mem (2nd arg) receives lockedVertexBuffer[] which can be NULL.
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src1, [esp+10]=src2,
+//          [esp+14]=scale(float), [esp+18]=numVerts, [esp+1C]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstV3dMorphNull   0x753B60
+#define HOOKSIZE_CrashFix_VBInstV3dMorphNull  5
+#define HOOKCHECK_CrashFix_VBInstV3dMorphNull 0x51
+DWORD RETURN_CrashFix_VBInstV3dMorphNull = 0x753B65;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstV3dMorphNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+8]                         // eax = mem (locked VB pointer)
+        test    eax, eax
+        jz      bail_out_morph
+
+        // Replicate overwritten prologue (5 bytes: push ecx; mov eax,[esp+4+arg_0])
+        push    ecx
+        mov     eax, [esp+8]                         // type (was [esp+4+4] = [esp+8] after push ecx)
+        jmp     RETURN_CrashFix_VBInstV3dMorphNull
+
+    bail_out_morph:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    41
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstWeights
+//
+// Same NULL locked VB crash as InstV3d/InstV3dMorph, but in the skin
+// weights instancing path. Called only from __rpD3D9SkinGeometryReinstance
+// when rendering skinned meshes (peds, deformable vehicles).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// The caller adds a vertex byte offset to the locked pointer, so mem
+// is typically a small non-zero value (e.g 0x20) rather than exact NULL.
+// Any address below 0x10000 (Windows null guard page) is invalid.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=numVerts, [esp+14]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstWeightsNull   0x752320
+#define HOOKSIZE_CrashFix_VBInstWeightsNull  7
+#define HOOKCHECK_CrashFix_VBInstWeightsNull 0x8B
+DWORD RETURN_CrashFix_VBInstWeightsNull = 0x752327;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        cmp     dword ptr [esp+8], 10000h            // mem below 64KB null guard page?
+        jb      bail_out_weights
+
+        // Replicate overwritten prologue (7 bytes: mov eax,[esp+4]; sub esp,10h)
+        mov     eax, [esp+4]                         // type
+        sub     esp, 10h
+        jmp     RETURN_CrashFix_VBInstWeightsNull
+
+    bail_out_weights:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    42
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
     }
     // clang-format on
 }
@@ -1719,10 +1931,10 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
         return pFrameResult;
 
     // Don't check frame if call can legitimately return NULL
-    if (calledFrom == 0x6D308F                // CVehicle::SetWindowOpenFlag
-        || calledFrom == 0x6D30BF             // CVehicle::ClearWindowOpenFlag
-        || calledFrom == 0x4C7DDE             // CVehicleModelInfo::GetOriginalCompPosition
-        || calledFrom == 0x4C96BD)            // CVehicleModelInfo::CreateInstance
+    if (calledFrom == 0x6D308F      // CVehicle::SetWindowOpenFlag
+        || calledFrom == 0x6D30BF   // CVehicle::ClearWindowOpenFlag
+        || calledFrom == 0x4C7DDE   // CVehicleModelInfo::GetOriginalCompPosition
+        || calledFrom == 0x4C96BD)  // CVehicleModelInfo::CreateInstance
         return NULL;
 
     // Ignore external calls
@@ -1736,14 +1948,14 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
     int   iModelId = 0;
     DWORD pVehicle = NULL;
 
-    if (calledFrom == 0x6D3847)            // CVehicle::AddReplacementUpgrade
+    if (calledFrom == 0x6D3847)  // CVehicle::AddReplacementUpgrade
         pVehicle = _ebx;
-    else if (calledFrom == 0x6DFA61                // CVehicle::AddUpgrade
-             || calledFrom == 0x6D3A62)            // CVehicle::GetReplacementUpgrade
+    else if (calledFrom == 0x6DFA61      // CVehicle::AddUpgrade
+             || calledFrom == 0x6D3A62)  // CVehicle::GetReplacementUpgrade
         pVehicle = _edi;
-    else if (calledFrom == 0x06AC740               // CAutomobile::PreRender (Forklift)
-             || calledFrom == 0x6D39F3             // CVehicle::RemoveReplacementUpgrade
-             || calledFrom == 0x6D3A32)            // CVehicle::RemoveReplacementUpgrade2
+    else if (calledFrom == 0x06AC740     // CAutomobile::PreRender (Forklift)
+             || calledFrom == 0x6D39F3   // CVehicle::RemoveReplacementUpgrade
+             || calledFrom == 0x6D3A32)  // CVehicle::RemoveReplacementUpgrade2
         pVehicle = _esi;
 
     if (pVehicle > 0x1000)
@@ -1754,7 +1966,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
     {
         RwFrame* pNewFrameResult = NULL;
         uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
-        DWORD    dwFunc = 0x4C53C0;            // CClumpModelInfo::GetFrameFromId
+        DWORD    dwFunc = 0x4C53C0;  // CClumpModelInfo::GetFrameFromId
         // clang-format off
         __asm
         {
@@ -2006,7 +2218,7 @@ static void __declspec(naked) HOOK_ResetFurnitureObjectCounter()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-    *(int*)0xBB3A18 = 0;            // InteriorManager_c::ms_objectCounter
+    *(int*)0xBB3A18 = 0;  // InteriorManager_c::ms_objectCounter
 
     // clang-format off
     __asm
@@ -2122,8 +2334,9 @@ inner:
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(uiModelId);
-    if (pModelInfo->GetInterface()->pRwObject == NULL)
+    CModelInfo*                pModelInfo = pGameInterface->GetModelInfo(uiModelId);
+    CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+    if (!pInterface || pInterface->pRwObject == nullptr)
     {
         // Crash will occur at offset 00349b7b
         LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
@@ -2364,7 +2577,7 @@ static void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
         altcode:
          // Save registers before logging
         pushad
-        push    ebp            // Pass 'this' pointer
+        push    ebp  // Pass 'this' pointer
         call    OnMY_CAnimBlendNode_GetCurrentTranslation
         add     esp, 4
         popad
@@ -2943,6 +3156,46 @@ static void __declspec(naked) HOOK_CFire_ProcessFire()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CColModel::MakeMultipleAlloc - Validate collision data before converting
+// single-allocation to multi-allocation format via CCollisionData::Copy.
+//
+// Corrupt collision data (e.g. from PC_Scratch buffer overflow) can produce
+// bogus shadow vertex/triangle counts, causing Copy to read past allocations.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CColModel_MakeMultipleAlloc  0x40F740
+#define HOOKSIZE_CColModel_MakeMultipleAlloc 5
+static void __fastcall HOOK_CColModel_MakeMultipleAlloc(CColModelSAInterface* pColModel, void*)
+{
+    if (CColDataSA* pData = pColModel->m_data)
+    {
+        constexpr std::uint32_t MAX_SHADOW_TRIANGLES = 5000;
+        constexpr std::uint32_t MAX_SHADOW_VERTICES = 10000;
+
+        const bool shadowCorrupt = pData->m_numShadowTriangles > MAX_SHADOW_TRIANGLES || pData->m_numShadowVertices > MAX_SHADOW_VERTICES ||
+                                   (pData->m_numShadowVertices > 0 && !pData->m_shadowVertices) ||
+                                   (pData->m_numShadowTriangles > 0 && !pData->m_shadowTriangles);
+
+        if (shadowCorrupt)
+        {
+            pData->m_numShadowTriangles = 0;
+            pData->m_numShadowVertices = 0;
+            pData->m_shadowVertices = nullptr;
+            pData->m_shadowTriangles = nullptr;
+            pData->m_hasShadowInfo = 0;
+            pData->m_hasShadow = 0;
+
+            OnCrashAverted(9801);
+        }
+    }
+
+    // Call the original MakeMultipleAlloc
+    using MakeMultipleAlloc_t = void(__thiscall*)(CColModelSAInterface*);
+    reinterpret_cast<MakeMultipleAlloc_t>(0x1564A10)(pColModel);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 ////////////////////////////////////////////////////////////////////////
@@ -2984,6 +3237,9 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_Misc36);
     EZHookInstallChecked(CrashFix_Misc37);
     EZHookInstallChecked(CrashFix_Misc38);
+    EZHookInstallChecked(CrashFix_VBInstV3dNull);
+    EZHookInstallChecked(CrashFix_VBInstV3dMorphNull);
+    EZHookInstallChecked(CrashFix_VBInstWeightsNull);
     EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
@@ -3009,6 +3265,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(FxSystemBP_c__Load);
     EZHookInstall(FxPrim_c__Enable);
     EZHookInstall(CFire_ProcessFire);
+
+    EZHookInstall(CColModel_MakeMultipleAlloc);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

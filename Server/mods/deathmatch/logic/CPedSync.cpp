@@ -91,7 +91,8 @@ void CPedSync::UpdateAllSyncer()
         const SPlayerAnimData& animData = (*iter)->GetAnimationData();
         if (animData.IsAnimating())
         {
-            float deltaTime = static_cast<float>(currentTimestamp - animData.startTime);
+            const std::int64_t elapsedMs = currentTimestamp >= animData.startTime ? (currentTimestamp - animData.startTime) : 0;
+            const float        deltaTime = static_cast<float>(elapsedMs);
             if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
                 (*iter)->SetAnimationData({});
         }
@@ -163,7 +164,7 @@ void CPedSync::StartSync(CPlayer* pPlayer, CPed* pPed)
 
     // Call the onElementStartSync event
     CLuaArguments Arguments;
-    Arguments.PushElement(pPlayer);            // New syncer
+    Arguments.PushElement(pPlayer);  // New syncer
     pPed->CallEvent("onElementStartSync", Arguments);
 }
 
@@ -180,7 +181,7 @@ void CPedSync::StopSync(CPed* pPed)
 
     // Call the onElementStopSync event
     CLuaArguments Arguments;
-    Arguments.PushElement(pSyncer);            // Old syncer
+    Arguments.PushElement(pSyncer);  // Old syncer
     pPed->CallEvent("onElementStopSync", Arguments);
 }
 

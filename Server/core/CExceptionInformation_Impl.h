@@ -18,7 +18,7 @@ class CExceptionInformation_Impl : public CExceptionInformation
 {
 public:
     CExceptionInformation_Impl();
-    ~CExceptionInformation_Impl();            //            {};
+    ~CExceptionInformation_Impl();  //            {};
 
     unsigned int        GetCode() { return m_uiCode; };
     void*               GetAddress() { return m_pAddress; };

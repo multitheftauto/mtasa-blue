@@ -40,20 +40,20 @@ namespace
     // Track failed audio file loads to prevent spam and performance hit
     std::mutex                         ms_FailedFilesMutex;
     std::unordered_map<SString, DWORD> ms_FailedAudioFiles;
-    constexpr DWORD FAILED_LOAD_RETRY_DELAY = 10000;            // 10 seconds before retrying a failed file
-    constexpr size_t MAX_FAILED_FILES_CACHE_SIZE = 1000;
+    constexpr DWORD                    FAILED_LOAD_RETRY_DELAY = 10000;  // 10 seconds before retrying a failed file
+    constexpr size_t                   MAX_FAILED_FILES_CACHE_SIZE = 1000;
 
     // Track active streaming threads to ensure they complete before DLL unload
-    std::atomic<int> ms_iActiveStreamingThreads{0};
-    std::atomic<bool> ms_bShuttingDown{false};
-    std::mutex ms_StreamingThreadMutex;
+    std::atomic<int>        ms_iActiveStreamingThreads{0};
+    std::atomic<bool>       ms_bShuttingDown{false};
+    std::mutex              ms_StreamingThreadMutex;
     std::condition_variable ms_StreamingThreadCV;
 
     // Get callback id for this CBassAudio
     void* AddCallbackId(CBassAudio* pBassAudio)
     {
         std::lock_guard<std::mutex> lock(ms_CallbackMutex);
-        void* uiId = (void*)(++ms_uiNextCallbackId ? ms_uiNextCallbackId : ++ms_uiNextCallbackId);
+        void*                       uiId = (void*)(++ms_uiNextCallbackId ? ms_uiNextCallbackId : ++ms_uiNextCallbackId);
         MapSet(ms_CallbackIdMap, uiId, pBassAudio);
         return uiId;
     }
@@ -73,8 +73,11 @@ namespace
     }
 
     // Finish with pointer
-    void UnlockCallbackId() { ms_CallbackMutex.unlock(); }
-}            // namespace
+    void UnlockCallbackId()
+    {
+        ms_CallbackMutex.unlock();
+    }
+}  // namespace
 
 // Signal streaming threads that we're shutting down - they should exit ASAP after their blocking call returns
 void SignalStreamingThreadsToStop()
@@ -160,7 +163,7 @@ bool CBassAudio::BeginLoadingMedia()
 
     // Calc the flags
     long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_SOFTWARE;
-#if 0   // Everything sounds better in ste-reo
+#if 0  // Everything sounds better in ste-reo
     if ( m_b3D )
         lFlags |= BASS_SAMPLE_MONO;
 #endif
@@ -202,7 +205,7 @@ bool CBassAudio::BeginLoadingMedia()
         if (!m_pBuffer)
         {
             std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
-            const auto it = ms_FailedAudioFiles.find(m_strPath);
+            const auto                  it = ms_FailedAudioFiles.find(m_strPath);
             if (it != ms_FailedAudioFiles.end())
             {
                 const DWORD dwTimeSinceFailure = dwCurrentTime - it->second;
@@ -230,14 +233,14 @@ bool CBassAudio::BeginLoadingMedia()
             m_pSound = BASS_StreamCreateFile(false, FromUTF8(m_strPath), 0, 0, lCreateFlags | BASS_UNICODE);
             if (!m_pSound)
                 m_pSound = BASS_MusicLoad(false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_RAMP | BASS_MUSIC_PRESCAN | BASS_STREAM_DECODE | BASS_UNICODE,
-                                          0);            // Try again
+                                          0);  // Try again
             if (!m_pSound && m_b3D)
             {
                 // Last try if 3D - check cache first to avoid spammed mono conversion attempts
                 bool bShouldTry = false;
                 {
                     std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
-                    const auto it = ms_FailedAudioFiles.find(m_strPath);
+                    const auto                  it = ms_FailedAudioFiles.find(m_strPath);
                     if (it == ms_FailedAudioFiles.end() || (dwCurrentTime - it->second) >= FAILED_LOAD_RETRY_DELAY)
                     {
                         bShouldTry = true;
@@ -246,7 +249,7 @@ bool CBassAudio::BeginLoadingMedia()
                         ms_FailedAudioFiles[m_strPath] = dwCurrentTime;
                     }
                 }
-                
+
                 if (bShouldTry)
                 {
                     m_pSound = ConvertFileToMono(m_strPath);
@@ -272,7 +275,7 @@ bool CBassAudio::BeginLoadingMedia()
                 {
                     // Remove oldest entry
                     DWORD maxAge = 0;
-                    auto itOldest = ms_FailedAudioFiles.begin();
+                    auto  itOldest = ms_FailedAudioFiles.begin();
                     for (auto it = ms_FailedAudioFiles.begin(); it != ms_FailedAudioFiles.end(); ++it)
                     {
                         // Find oldest entry
@@ -452,84 +455,83 @@ int CBassAudio::ErrorGetCode()
 //
 HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
 {
-    HSTREAM decoder =
-        BASS_StreamCreateFile(false, FromUTF8(strPath), 0, 0, BASS_STREAM_DECODE | BASS_SAMPLE_MONO | BASS_UNICODE);            // open file for decoding
+    HSTREAM decoder = BASS_StreamCreateFile(false, FromUTF8(strPath), 0, 0, BASS_STREAM_DECODE | BASS_SAMPLE_MONO | BASS_UNICODE);  // open file for decoding
     if (!decoder)
-        return 0;                                                                                           // failed
-    
+        return 0;  // failed
+
     QWORD lengthQW = BASS_ChannelGetLength(decoder, BASS_POS_BYTE);
     if (lengthQW == static_cast<QWORD>(-1) || lengthQW == 0)
     {
         BASS_StreamFree(decoder);
-        return 0;                                                                                           // invalid length
+        return 0;  // invalid length
     }
-    
+
     if (lengthQW > 0xFFFFFFFF)
     {
         BASS_StreamFree(decoder);
-        return 0;                                                                                           // file too large for mono conversion
+        return 0;  // file too large for mono conversion
     }
-    
-    DWORD length = static_cast<DWORD>(lengthQW);            // Safe cast after validation
-    void* data = malloc(length);                            // allocate buffer for decoded data
+
+    DWORD length = static_cast<DWORD>(lengthQW);  // Safe cast after validation
+    void* data = malloc(length);                  // allocate buffer for decoded data
     if (!data)
     {
         BASS_StreamFree(decoder);
-        return 0;                                                                                           // allocation failed
+        return 0;  // allocation failed
     }
-    
+
     BASS_CHANNELINFO ci;
-    if (!BASS_ChannelGetInfo(decoder, &ci))            // get sample format
+    if (!BASS_ChannelGetInfo(decoder, &ci))  // get sample format
     {
         free(data);
         BASS_StreamFree(decoder);
-        return 0;                                                                                           // failed to get channel info
+        return 0;  // failed to get channel info
     }
-    
-    if (ci.chans > 1)                             // not mono, downmix...
+
+    if (ci.chans > 1)  // not mono, downmix...
     {
-        HSTREAM mixer = BASS_Mixer_StreamCreate(ci.freq, 1, BASS_STREAM_DECODE | BASS_MIXER_END);            // create mono mixer
+        HSTREAM mixer = BASS_Mixer_StreamCreate(ci.freq, 1, BASS_STREAM_DECODE | BASS_MIXER_END);  // create mono mixer
         if (!mixer)
         {
             free(data);
             BASS_StreamFree(decoder);
-            return 0;                                                                                       // mixer creation failed
+            return 0;  // mixer creation failed
         }
-        if (!BASS_Mixer_StreamAddChannel(
-            mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE))            // plug-in the decoder (auto-free with the mixer)
+        if (!BASS_Mixer_StreamAddChannel(mixer, decoder,
+                                         BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE))  // plug-in the decoder (auto-free with the mixer)
         {
             free(data);
             BASS_StreamFree(mixer);
             BASS_StreamFree(decoder);
-            return 0;                                                                                       // failed to add channel
+            return 0;  // failed to add channel
         }
-        decoder = mixer;                                                                                 // decode from the mixer
+        decoder = mixer;  // decode from the mixer
     }
-    
-    DWORD decodedLength = BASS_ChannelGetData(decoder, data, length);                                    // decode data
-    BASS_StreamFree(decoder);                                                                               // free the decoder/mixer
-    
+
+    DWORD decodedLength = BASS_ChannelGetData(decoder, data, length);  // decode data
+    BASS_StreamFree(decoder);                                          // free the decoder/mixer
+
     if (decodedLength == static_cast<DWORD>(-1))
     {
         free(data);
-        return 0;                                                                                           // decode failed
+        return 0;  // decode failed
     }
-    
-    HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);            // create stream
+
+    HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);  // create stream
     if (!stream)
     {
         free(data);
-        return 0;                                                                                           // stream creation failed
+        return 0;  // stream creation failed
     }
-    
-    if (!BASS_StreamPutData(stream, data, decodedLength))                                                   // set the stream data
+
+    if (!BASS_StreamPutData(stream, data, decodedLength))  // set the stream data
     {
         free(data);
         BASS_StreamFree(stream);
-        return 0;                                                                                           // failed to put data
+        return 0;  // failed to put data
     }
-    
-    free(data);                                                                                             // free the buffer
+
+    free(data);  // free the buffer
     return stream;
 }
 
@@ -710,12 +712,12 @@ void CBassAudio::CompleteStreamConnect(HSTREAM pSound)
             {
                 for (; *szIcy; szIcy += strlen(szIcy) + 1)
                 {
-                    if (!strnicmp(szIcy, "icy-name:", 9))            // ICY / HTTP
+                    if (!strnicmp(szIcy, "icy-name:", 9))  // ICY / HTTP
                     {
                         m_strStreamName = szIcy + 9;
                         break;
                     }
-                    else if (!strnicmp(szIcy, "title=", 6))            // WMA
+                    else if (!strnicmp(szIcy, "title=", 6))  // WMA
                     {
                         m_strStreamName = szIcy + 6;
                         break;
@@ -738,7 +740,7 @@ void CBassAudio::CompleteStreamConnect(HSTREAM pSound)
         }
 
         // set sync for stream titles
-        m_hSyncMeta = BASS_ChannelSetSync(pSound, BASS_SYNC_META, 0, &MetaSync, m_uiCallbackId);            // Shoutcast
+        m_hSyncMeta = BASS_ChannelSetSync(pSound, BASS_SYNC_META, 0, &MetaSync, m_uiCallbackId);  // Shoutcast
         // g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_META", BASS_ErrorGetCode() );
         // BASS_ChannelSetSync(pSound,BASS_SYNC_OGG_CHANGE,0,&MetaSync,this); // Icecast/OGG
         // g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_OGG_CHANGE", BASS_ErrorGetCode() );
@@ -829,7 +831,7 @@ bool CBassAudio::SetPlayPosition(double dPosition)
         QWORD byteLength = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
         if (byteLength == static_cast<QWORD>(-1) || byteLength == 0)
             return false;
-        
+
         // Make sure position is in range
         QWORD bytePosition = BASS_ChannelSeconds2Bytes(m_pSound, dPosition);
         return BASS_ChannelSetPosition(m_pSound, Clamp<QWORD>(0, bytePosition, byteLength - 1), BASS_POS_BYTE);
@@ -1081,17 +1083,17 @@ float CBassAudio::GetSoundBPM()
         const DWORD dwCurrentTime = GetTickCount32();
         {
             std::lock_guard<std::mutex> lock(ms_FailedFilesMutex);
-            const auto it = ms_FailedAudioFiles.find(m_strPath);
+            const auto                  it = ms_FailedAudioFiles.find(m_strPath);
             if (it != ms_FailedAudioFiles.end())
             {
                 const DWORD dwTimeSinceFailure = dwCurrentTime - it->second;
                 if (dwTimeSinceFailure < FAILED_LOAD_RETRY_DELAY)
                 {
-                    return 0.0f;            // File failed recently, don't retry
+                    return 0.0f;  // File failed recently, don't retry
                 }
             }
         }
-        
+
         float fData = 0.0f;
 
         // open the same file as played but for bpm decoding detection

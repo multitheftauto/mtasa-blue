@@ -50,8 +50,15 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
         std::shared_ptr<CClientIFP> pCustomIFP = g_pClientGame->GetIFPPointerFromMap(u32BlockNameHash);
         if (pInternalBlock && pCustomIFP)
         {
-            // Try to load the block, if it's not loaded already
-            pInternalBlock->Request(BLOCKING, true);
+            if (!pInternalBlock->IsLoaded())
+            {
+                // Request non-blocking load to avoid freezes from synchronous I/O (e.g. during resource cleanup).
+                // Only request if no existing refs, to avoid inflating ref count on repeated calls.
+                if (pInternalBlock->GetRefs() == 0)
+                    pInternalBlock->Request(NON_BLOCKING);
+
+                return false;
+            }
 
             auto                            pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
             CAnimBlendHierarchySAInterface* pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy(strCustomAnimName);

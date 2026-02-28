@@ -978,7 +978,11 @@ CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float r
     if (interior || dimension || typeHash)
     {
         result.erase(std::remove_if(result.begin(), result.end(),
-                                    [&, radiusSq = radius * radius](CElement* pElement) {
+                                    [&, radiusSq = radius * radius](CElement* pElement)
+                                    {
+                                        if (pElement->IsBeingDeleted())
+                                            return true;
+
                                         if (typeHash && typeHash != pElement->GetTypeHash())
                                             return true;
 
@@ -994,7 +998,7 @@ CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float r
                                         if ((elementPos - pos).LengthSquared() > radiusSq)
                                             return true;
 
-                                        return pElement->IsBeingDeleted();
+                                        return false;
                                     }),
                      result.end());
     }
