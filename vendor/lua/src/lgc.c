@@ -21,6 +21,7 @@
 #include "lstring.h"
 #include "ltable.h"
 #include "ltm.h"
+#include "lvector.h" /*LUA-VEC*/
 
 
 #define GCSTEPSIZE	1024u
@@ -105,6 +106,10 @@ static void reallymarkobject (global_State *g, GCObject *o) {
     case LUA_TPROTO: {
       gco2p(o)->gclist = g->gray;
       g->gray = o;
+      break;
+    }
+    case LUA_TVEC: {  /* LUA-VEC */
+      gray2black(o);
       break;
     }
     default: lua_assert(0);
@@ -393,6 +398,10 @@ static void freeobj (lua_State *L, GCObject *o) {
     }
     case LUA_TUSERDATA: {
       luaM_freemem(L, o, sizeudata(gco2u(o)));
+      break;
+    }
+    case LUA_TVEC: {  /* LUA-VEC */
+      luaVec_free(L, o);
       break;
     }
     default: lua_assert(0);
