@@ -56,7 +56,7 @@ CSphere CClientColCuboid::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition = m_vecPosition + m_vecSize * 0.5f;
-    sphere.fRadius = std::max(std::max(m_vecSize.fX, m_vecSize.fY), m_vecSize.fZ) * 0.5f;
+    sphere.fRadius = m_vecSize.Length() * 0.5f;
     return sphere;
 }
 
