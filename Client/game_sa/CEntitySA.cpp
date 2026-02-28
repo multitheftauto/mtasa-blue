@@ -20,6 +20,7 @@
 #include "CVehicleSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include "CPhysicalSA.h"
 
 extern CGameSA* pGame;
 
@@ -707,6 +708,11 @@ bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
     boneMatrix.SetTranslateOnly(position);
     boneMatrix.UpdateRW();
     return true;
+}
+
+bool CEntitySA::IsFireProof() const
+{
+    return static_cast<CPhysicalSAInterface*>(GetInterface())->bFireProof;
 }
 
 BYTE CEntitySA::GetAreaCode()

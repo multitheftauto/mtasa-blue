@@ -62,6 +62,14 @@ public:
     void*                         pSphere;             // 0x74
     void**                        ppParticleEmitters;  // 0x78 (Array of particle emitters, amount is defined by the blueprint)
     CAEFireAudioEntitySAInterface audioEntity;         // 0x7C
+
+    void Kill() { ((void(__thiscall*)(CFxSystemSAInterface*))0x4AA3F0)(this); }
+
+    void Play() { ((void(__thiscall*)(CFxSystemSAInterface*))0x4AA2F0)(this); }
+
+    void SetOffsetPos(const CVector& offset) { ((void(__thiscall*)(CFxSystemSAInterface*, const CVector&))0x4AA660)(this, offset); }
+
+    void SetConstTime(bool enableConstTime, float time) { ((void(__thiscall*)(CFxSystemSAInterface*, bool, float))0x4AA6C0)(this, enableConstTime, time); }
 };
 static_assert(sizeof(CFxSystemSAInterface) == 0x104, "Invalid size for CFxSystemSAInterface");
 

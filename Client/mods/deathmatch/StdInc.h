@@ -72,6 +72,7 @@
 #include <CClientEntity.h>
 #include <CClientSpatialDatabase.h>
 #include <CClientExplosionManager.h>
+#include <CClientFire.h>
 #include <CClientPed.h>
 #include <CClientPlayerClothes.h>
 #include <CClientPlayerVoice.h>

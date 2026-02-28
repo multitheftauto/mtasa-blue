@@ -278,9 +278,6 @@ public:
     virtual bool IsBleeding() const = 0;
     virtual void SetBleeding(bool bleeding) = 0;
 
-    virtual bool IsOnFire() const = 0;
-    virtual bool SetOnFire(bool onFire) = 0;
-
     virtual bool GetStayInSamePlace() const = 0;
     virtual void SetStayInSamePlace(bool stay) = 0;
 
@@ -312,4 +309,6 @@ public:
     virtual void Say(const ePedSpeechContext& speechId, float probability) = 0;
 
     virtual void SetInWaterFlags(bool inWater) = 0;
+
+    virtual bool IsPedInControl() const = 0;
 };

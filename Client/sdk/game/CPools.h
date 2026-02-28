@@ -113,4 +113,7 @@ public:
     virtual CDummyPool&             GetDummyPool() noexcept = 0;
     virtual CTxdPool&               GetTxdPool() noexcept = 0;
     virtual CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept = 0;
+
+    virtual void GetVehiclesPool(void* pool) = 0;
+    virtual void GetObjectsPool(void* pool) = 0;
 };

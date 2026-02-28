@@ -568,7 +568,6 @@ private:
 
     static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     static void                              StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-    static bool                              StaticFireHandler(CEntitySAInterface* target, CEntitySAInterface* creator);
     static bool                              StaticBreakTowLinkHandler(CVehicle* pTowedVehicle);
     static void                              StaticDrawRadarAreasHandler();
     static void                              StaticRender3DStuffHandler();
@@ -617,9 +616,10 @@ private:
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     static void        StaticAudioZoneRadioSwitchHandler(DWORD dwStationID);
 
+    static bool StaticFireHandler(CEntity* target, CEntity* creator);
+
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-    bool                              FireHandler(CEntitySAInterface* target, CEntitySAInterface* creator);
     bool                              BreakTowLinkHandler(CVehicle* pTowedVehicle);
     void                              DrawRadarAreasHandler();
     void                              Render3DStuffHandler();

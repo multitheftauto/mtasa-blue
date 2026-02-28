@@ -37,6 +37,7 @@
 #include "game/CClock.h"
 #include <game/CProjectileInfo.h>
 #include <game/CVehicleAudioSettingsManager.h>
+#include <game/CFireManager.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 #include "CClientPed.h"
@@ -277,7 +278,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetDrawRadarAreasHandler(CClientGame::StaticDrawRadarAreasHandler);
     g_pMultiplayer->SetDamageHandler(CClientGame::StaticDamageHandler);
     g_pMultiplayer->SetDeathHandler(CClientGame::StaticDeathHandler);
-    g_pMultiplayer->SetFireHandler(CClientGame::StaticFireHandler);
     g_pMultiplayer->SetProjectileStopHandler(CClientProjectileManager::Hook_StaticProjectileAllow);
     g_pMultiplayer->SetProjectileHandler(CClientProjectileManager::Hook_StaticProjectileCreation);
     g_pMultiplayer->SetRender3DStuffHandler(CClientGame::StaticRender3DStuffHandler);
@@ -342,6 +342,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Disable GTA's pickup processing as we want to confirm the hits with the server
     m_pPickupManager->SetPickupProcessingDisabled(true);
+
+    g_pGame->GetFireManager()->SetFireCreationHandler(CClientGame::StaticFireHandler);
+    g_pGame->GetFireManager()->SetFireDestructionHandler(CClientFire::OnGameFireDestroyed);
 
     // Key-bind for fire-key (for handling satchels and stealth-kills)
     g_pCore->GetKeyBinds()->AddControlFunction("fire", CClientGame::StaticUpdateFireKey, true);
@@ -488,7 +491,6 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetBreakTowLinkHandler(NULL);
     g_pMultiplayer->SetDrawRadarAreasHandler(NULL);
     g_pMultiplayer->SetDamageHandler(NULL);
-    g_pMultiplayer->SetFireHandler(NULL);
     g_pMultiplayer->SetProjectileStopHandler(NULL);
     g_pMultiplayer->SetProjectileHandler(NULL);
     g_pMultiplayer->SetProcessCamHandler(nullptr);
@@ -527,6 +529,8 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
     g_pMultiplayer->SetAudioZoneRadioSwitchHandler(nullptr);
+    g_pGame->GetFireManager()->SetFireCreationHandler(nullptr);
+    g_pGame->GetFireManager()->SetFireDestructionHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -3597,11 +3601,6 @@ void CClientGame::StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReas
     g_pClientGame->DeathHandler(pKilledPed, ucDeathReason, ucBodyPart);
 }
 
-bool CClientGame::StaticFireHandler(CEntitySAInterface* target, CEntitySAInterface* creator)
-{
-    return g_pClientGame->FireHandler(target, creator);
-}
-
 void CClientGame::StaticRender3DStuffHandler()
 {
     g_pClientGame->Render3DStuffHandler();
@@ -3867,10 +3866,10 @@ bool CClientGame::BreakTowLinkHandler(CVehicle* pTowedVehicle)
     return true;
 }
 
-bool CClientGame::FireHandler(CEntitySAInterface* target, CEntitySAInterface* creator)
+bool CClientGame::StaticFireHandler(CEntity* target, CEntity* creator)
 {
-    CClientEntity* creatorClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)creator);
-    CClientEntity* targetClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)target);
+    CClientEntity* creatorClientEntity = g_pGame->GetPools()->GetClientEntity(creator ? (DWORD*)creator->GetInterface() : nullptr);
+    CClientEntity* targetClientEntity = g_pGame->GetPools()->GetClientEntity(target ? (DWORD*)target->GetInterface() : nullptr);
 
     if (creatorClientEntity && targetClientEntity && IS_PLAYER(targetClientEntity) && IS_PLAYER(creatorClientEntity))
     {
@@ -5405,7 +5404,7 @@ void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType T
 void CClientGame::SendFireSync(CFire* pFire)
 {
 #ifdef MTA_DEBUG
-    CVector* vecPos = pFire->GetPosition();
+    CVector* vecPos = &pFire->GetPosition();
     if (vecPos)
         g_pCore->GetConsole()->Printf("we're sending fire: %f %f %f %f", pFire->GetStrength(), vecPos->fX, vecPos->fY, vecPos->fZ);
     else

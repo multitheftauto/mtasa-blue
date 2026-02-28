@@ -61,6 +61,7 @@
 #include "CBuildingRemovalSA.h"
 #include "CCheckpointSA.h"
 #include "CPtrNodeSingleLinkPoolSA.h"
+#include "CCreepingFireSA.h"
 
 extern CGameSA* pGame;
 
@@ -251,6 +252,8 @@ CGameSA::CGameSA()
         CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
         CVehicleAudioSettingsManagerSA::StaticSetHooks();
+        CFireManagerSA::StaticSetHooks();
+        CCreepingFireSA::StaticSetHooks();
         CPointLightsSA::StaticSetHooks();
         CBuildingRemovalSA::StaticSetHooks();
     }
@@ -562,6 +565,16 @@ float CGameSA::GetFPS()
 float CGameSA::GetTimeStep()
 {
     return *(float*)0xB7CB5C;  // CTimer::ms_fTimeStep
+}
+
+float CGameSA::GetTimeStepInSeconds()
+{
+    return GetTimeStep() / 50.0f;
+}
+
+float CGameSA::GetTimeStepInMS()
+{
+    return GetTimeStepInSeconds() * 1000.0f;
 }
 
 float CGameSA::GetOldTimeStep()

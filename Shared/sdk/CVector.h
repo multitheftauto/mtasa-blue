@@ -68,10 +68,12 @@ public:
     }
 
     float Length() const { return sqrt((fX * fX) + (fY * fY) + (fZ * fZ)); }
+    float Length2D() const { return sqrt(fX * fX + fY * fY); }
 
     // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y + z*z).
     // This can be useful if you only want to compare lengths.
     float LengthSquared() const { return (fX * fX) + (fY * fY) + (fZ * fZ); }
+    float Length2DSquared() const { return fX * fX + fY * fY; }
 
     float DotProduct(const CVector* param) const { return fX * param->fX + fY * param->fY + fZ * param->fZ; }
 

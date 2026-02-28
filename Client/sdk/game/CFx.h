@@ -16,10 +16,13 @@ class CEntity;
 class CVector;
 class CVehicle;
 struct RwColor;
+class CFxSAInterface;
 
 class CFx
 {
 public:
+    virtual CFxSAInterface* GetInterface() = 0;
+
     virtual void AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness) = 0;
     virtual void AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness) = 0;
     virtual void AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, unsigned char ucBlurIf0, float fSpread,
