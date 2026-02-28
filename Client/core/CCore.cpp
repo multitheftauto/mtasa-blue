@@ -1056,6 +1056,19 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+
+    // Apply CPU affinity here (GTA allocates threads on startup, so we have to do it here instead of earlier)
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+    if (!affinity)
+        return;
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+    HANDLE    process = GetCurrentProcess();
+    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 void CCore::CreateGUI()
@@ -1929,18 +1942,6 @@ void CCore::ApplyCoreInitSettings()
     int       priority = CVARS_GET_VALUE<int>("process_priority") % 3;
 
     SetPriorityClass(process, priorities[priority]);
-
-    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
-
-    if (!affinity)
-        return;
-
-    DWORD_PTR mask;
-    DWORD_PTR sys;
-    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
-
-    if (result)
-        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //
