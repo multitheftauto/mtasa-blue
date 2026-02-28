@@ -2498,6 +2498,11 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(eWeaponProperty eProperty, eW
                 pWeaponInfo->ToggleFlagBits(sData);
                 break;
             }
+            case WEAPON_ANIM_GROUP:
+            {
+                pWeaponInfo->SetAnimGroup(sData);
+                break;
+            }
             default:
                 return false;
         }
@@ -3949,47 +3954,61 @@ bool CStaticFunctionDefinitions::SetPedStat(CElement* pElement, unsigned short u
     assert(pElement);
 
     // Check the stat
-    if (usStat < NUM_PLAYER_STATS && fValue >= 0.0f && fValue <= 1000.0f)
+    if (usStat > NUM_PLAYER_STATS - 1)
     {
-        RUN_CHILDREN(SetPedStat(*iter, usStat, fValue))
+        return false;
+    }
+    if (fValue < 0.0f)
+    {
+        return false;
+    }
+    if ((usStat >= 69 /* WEAPONTYPE_PISTOL_SKILL */ && usStat <= 79 /* WEAPONTYPE_SNIPERRIFLE_SKILL */) && fValue > 5000.0f)
+    {
+        return false;
+    }
+    if ((usStat < 69 /* WEAPONTYPE_PISTOL_SKILL */ || usStat > 79 /* WEAPONTYPE_SNIPERRIFLE_SKILL */) && fValue > 1000.0f)
+    {
+        return false;
+    }
 
-        if (IS_PLAYER(pElement))
+    RUN_CHILDREN(SetPedStat(*iter, usStat, fValue))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+        // Dont let them set visual stats if they dont have the CJ model
+        if ((usStat != 21 /* FAT */ && usStat != 23 /* BODY_MUSCLE */) || pPlayer->GetModel() == 0)
         {
-            CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+            // Save the stat
+            pPlayer->SetPlayerStat(usStat, fValue);
 
-            // Dont let them set visual stats if they dont have the CJ model
-            if ((usStat != 21 /* FAT */ && usStat != 23 /* BODY_MUSCLE */) || pPlayer->GetModel() == 0)
-            {
-                // Save the stat
-                pPlayer->SetPlayerStat(usStat, fValue);
+            // Notify everyone
+            CPlayerStatsPacket Packet;
+            Packet.SetSourceElement(pPlayer);
+            Packet.Add(usStat, fValue);
+            m_pPlayerManager->BroadcastOnlyJoined(Packet);
 
-                // Notify everyone
-                CPlayerStatsPacket Packet;
-                Packet.SetSourceElement(pPlayer);
-                Packet.Add(usStat, fValue);
-                m_pPlayerManager->BroadcastOnlyJoined(Packet);
-
-                return true;
-            }
+            return true;
         }
-        else if (IS_PED(pElement))
+    }
+    else if (IS_PED(pElement))
+    {
+        CPed* pPed = static_cast<CPed*>(pElement);
+
+        // Dont let them set visual stats if they dont have the CJ model
+        if ((usStat != 21 /* FAT */ && usStat != 23 /* BODY_MUSCLE */) || pPed->GetModel() == 0)
         {
-            CPed* pPed = static_cast<CPed*>(pElement);
+            // Save the stat
+            pPed->SetPlayerStat(usStat, fValue);
 
-            // Dont let them set visual stats if they dont have the CJ model
-            if ((usStat != 21 /* FAT */ && usStat != 23 /* BODY_MUSCLE */) || pPed->GetModel() == 0)
-            {
-                // Save the stat
-                pPed->SetPlayerStat(usStat, fValue);
+            // Notify everyone
+            CPlayerStatsPacket Packet;
+            Packet.SetSourceElement(pPed);
+            Packet.Add(usStat, fValue);
+            m_pPlayerManager->BroadcastOnlyJoined(Packet);
 
-                // Notify everyone
-                CPlayerStatsPacket Packet;
-                Packet.SetSourceElement(pPed);
-                Packet.Add(usStat, fValue);
-                m_pPlayerManager->BroadcastOnlyJoined(Packet);
-
-                return true;
-            }
+            return true;
         }
     }
 
