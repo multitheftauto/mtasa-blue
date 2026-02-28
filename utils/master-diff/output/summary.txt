@@ -1,0 +1,1190 @@
+Master:       master
+Fork:         release/1.6.0
+
+Counts:
+  Master-only, pending (not cherry-picked):  410
+  Master-only, excluded (won't backport):    114
+  Cherry-picked to both:                    402
+  Unmatched picked (no patch-id match):     47
+  Fork-only:                                188
+
+========================================================================
+MASTER-ONLY PENDING — not yet cherry-picked to fork (410 commits)
+========================================================================
+  + 859e6cec95130df1f7b03b7114734869841249e2  Remove outdated bitstream checks
+  + fe761e52e4f187df465e1e8079adefa299c1ab55  Remove unused jump section in HOOK_CPlantMgr_Render
+  + bbf74ba0d31e0934e84b2001291b6277fe9dad48  Include or exclude VERSION_TYPE_UNTESTED in some places
+  + 7108a8d261b937ceda528c96bd52caf68e3903ab  Improve client-side markers & Fix logic (PR #3324, Fixes #3310)
+  + b97ce4fbbedffad2074e0c6457d70448f6367a09  Fix arrow type marker snapping to the ground (PR #4027, Fixes #536, Fixes #4000)
+  + 45bb3d5b234b91e62488c78117d487671d5cbd60  Swapped the order of Hotring Racer 2 and Hotring Racer 3 (PR #3797)
+  + 4653b7e2b7d74f756a1a5a1db83daa0d73b2bbf9  Fix max health formula (PR #3934, Fixes #3807)
+  + 886194e076c34035f4f0e6bd518130f6ba1b41ff  Fix Purple Dildo and Silver Vibrator weapon names (PR #3801, Fixes #514)
+  + 1b815b5ee9e9fe23d812b83c91151e1efa89ac0d  Fix setVehicleVariant turns on the engine (PR #3486, Fixes #542)
+  + df28972b757a59601ed5c4095d43c58ebcd6756f  Fix the reversed zoom in/out control states in getControlState (PR #3467, Fixes #2570)
+  + 820c22ea7a7e58f7650eb15dc24c2c4e9e207306  Fix Lua array detection and order preservation when using toJSON (PR #3369)
+  + 17c2b28d9cb76512978be3ae013214a2a31d4f6d  Attach events & rotation fix (PR #3353, Fixes #3273)
+  + 841bf30b9594d677888538c98e0bcd8d0ccbab77  Fix cylinder marker colshape and collision radius not matching visual (PR #3436)
+  + a5d97d61f57b6ebc5c2e7c86e4b098a9e1f85688  Use BASE_URL in install_data.lua build action
+  + 1e24eac340bede901a452d17030a3bb10790b1d6  Restore "Fix anim progress & speed (PR #4245)"
+  + 602d160388fe649aa46ac88269f15af2dd08d803  Fix version type checks
+  + 7856d8bc19646c902002036de8a9cb3b43aebeae  New Crowdin updates (PR #4315)
+  + bb5666741878130a4010c8cc52abb2b5cdf529cb  Increase vehicle model id range in packet (PR #4324)
+  + 7b75f69df4ec238e089b5be1e8e83129e7a8d769  Improve players animation sync (PR #4326)
+  + 602b26e8f8116379ce73d2886fd186aa1107cdd9  Refresh sound settings after setVehicleModelAudioSetting (PR #4321, Fixes #4314)
+  + 9c4397707dd2a94d8a6124d6b502d39793f0d2ba  Fix friendly fire does not prevent the player from burning (PR #4320, Fixes #399)
+  + f5e8e69ce3db8a3cea389df67f04a609a07fa6be  Add collision type check to getColPolygonHeight and setColPolygonHeight (PR #4318, Fixes #4305)
+  + 078d46b13164c940f3a713039e1a1be6d52c6c76  Add event onAccountNameChange (PR #4270, Fixes #4246)
+  + c43c1b98b8ec0b7253d98c65b405ead482a765d8  Improve function getPedMoveState (PR #4316)
+  + 66cf087137e9a3edb11b1df0ebb948761dc71e7a  Bump NETCODE_VERSION
+  + 8b199c40c70296d848de33bd223592a3f3af3551  Follow-up to pull request #4326 (PR #4328)
+  + a9bd854a842455a8af6b115ab3339bdef3592470  Make cross compiling the project using msvc-wine on Linux possible (PR #4332)
+  + 7fa778bb22313ac16263421f588ef2ecb9781602  Update CEF to 138.0.36+g52669d7+chromium-138.0.7204.184
+  + 1113a8083e828f29a4955741fa5d466a4faf7acf  New Crowdin updates (PR #4335)
+  + 4cf1a65a91bdcc9f4dff360d8f4672eb550f3e83  Update crowdin-translators.json
+  + d59555ed3b4999d5af8f108d44c9fd227d1416b3  Update CEF to 139.0.17+g6c347eb+chromium-139.0.7258.31
+  + 797331fadbca4367f6cfd43633e48af44a99a115  Add "hanging" movement state to getPedMoveState (PR #4350)
+  + 1dbbfd025c5ff791f31e1ef4f255514198f88d0c  Fix engineReplaceModel memory leak & crash for vehicles (PR #4349, Fixes #4348)
+  + 4ef760c3315ac5a4dbc01356a6ad512077a0878d  Update dependencies in /utils/localization/generate-images (PR #4343)
+  + c51e87d63a5ff54ed22b848cff8289cbae13bb43  New Crowdin updates (PR #4345)
+  + 36f905439a8b062e93b0f216d874ed407fc775de  Test for codeql.yml
+  + c7d718b8bc9a1bc757d5de6fca6d1c0efb43e41c  Update freetype to adc7b85 (PR #4355)
+  + 0adb35578ce4922c6ab477e0a3585e825e5e2427  Delete .github/workflows/codeql.yml
+  + b3240ff1aa1eaa6898c23e6b4cf23a8a703c0db6  Addendum (codeql), to force-config workflow it had to first be deleted
+  + c684463fb68395e3fdd91bd4f07da8b19475ac66  Possible fix for codeql
+  + 4cefa4d060e4543b2be3ffbd14eb465edc01e6d7  Fix client-side `createExplosion` not triggering `onClientExplosion` event (#4341)
+  + be395665c0f5094793b923e9f4fb94056ccff961  Show disconnect warning when using Quick Connect while connected (#4344)
+  + b98c091713ad133f9f472d36995795c7622cdb71  Add ability to show/hide radar components (#4331)
+  + 257f4cd12a8d6e8141eb50574c7b0f1402b5d086  Fix isPedOnGround (#4317)
+  + 0c2433cdfc9f241a74f3ca32ea4c7cff5a0f2f07  Use actual type names in recent changes
+  + 4a8b307905a7b630c3f6dbd1417dd40d58f96641  update SQLite to 3.50.4
+  + 80a5d8969e978ce34da3370267f54de5f99fbd4b  Update nvapi from R575 to R580
+  + 2359d7f2846da19f703e5876d7dafd6e98f1c94c  Fix client side debugscript level filtering (#3498) (#4323)
+  + 22c54a15603e865adf851e94d3f346f1c7d61783  Revert "Update cURL to 8.15.0 (#4358)" for now, due to incompatibilities
+  + d9477bd0b5199137aa22c062bf0ca0129e2f9d53  New Crowdin updates (PR #4351)
+  + 274d865f505c2d73045d752a434d175536816428  Fixes #2680 - GetGarageSize returns wrong values (#4360)
+  + 7b236543b74fe77666321b060bc03b2bc2e7a50b  Add textures created by svgCreate to showmemstat (#4365)
+  + 899c84cde6657a81b877f5a47e5a1fa3045e92c8  Reintroduce 2f4a0a4: "Fix sourceResourceRoot for client-sided events" for release 1.7
+  + bc431d85746d4abde150129a761783d064744a30  Refactor mtaserver.conf.template (#3857)
+  + 49fb0a8f2f78f6577208388fcd8ca69898121ae6  Update installer en_US pot
+  + 4764404ede4bccd3430a4c0350879c3e60cfc1ef  Update CEF to 139.0.23+g34a5b51+chromium-139.0.7258.128
+  + 9a0b1d59233f7001e991262b4df9d1c17850dc08  Fix chat message length calculation with colorCoded enabled (#4370)
+  + fef07beaaa7ca29cc203435f444111e78da87c23  Tell IntelliSense to chill and stop freaking out about fake template errors (#4372)
+  + 38e550f295d40751f001d58ccb1d278bad5fb993  Add `onClientPlayerWeaponReload` and `onClientPedWeaponReload` events (#4373)
+  + 5c3b98886bd533cb530695739de752998fba8ba1  Revert "Refactor mtaserver.conf.template (#3857)" This reverts commit bc431d85746d4abde150129a761783d064744a30.
+  + 09d87e42fa46b9eef5350b2a237ab531e3c6a737  Update installer en_US pot
+  + 434f285e5c4b061a548174173011e4918a300827  Update CEF to 139.0.26+g9d80e0d+chromium-139.0.7258.139
+  + c44b19ac1fe952582d63abd8738446e7c044f9ce  update CryptoPP to 3ee8003 @ https://github.com/Dutchman101/cryptopp-updated
+  + 11b9762fdf64e3db9ff9d8c1f79ee1274b8d25d3  Fix build error
+  + d3bf6f759f750fa493ef82156df821759166ce30  Re-do "Fix build error"
+  + 4b203770c133d34ce63ef9347373255519eac3e3  Better tolerance for isPedOnGround (#4379)
+  + 9ff02d55884e760ac17c7e2850be7ed4356f3dcb  CCamSA, CCameraSA, CCameraRPC fixes
+  + ffff9d150a89bd5d5182228a6fb8e7dabaaade2e  New Crowdin updates (PR #4368)
+  + 1a105c3c6d7e90564b95f6078546e57cbf2648df  Addendum to 9ff02d5
+  + 2d42a4249a9294eea07ed4a2f22b8787085dec21  Set hasObjectPermissionTo defaultPermission to false (#4388)
+  + afce8bf17b65c8b3c5dba7a4705a6779990e2f6b  Addendum to 2d42a42 (MainFunctions.cpp improvements)
+  + 798a480c37f0129163a9505907f4aa00d53230ad  Update Docker build image to Ubuntu Noble with GCC 15
+  + f5e59ac6534452eeaf4c6453cd5329bcd7cb46bc  Fix compilation issues after update to GCC 15 (pt. 1)
+  + 362e171e47440f34cbd107c024fce037b5e97c05  Fix compilation issues after update to GCC 15 (pt. 2)
+  + 2bb356cf205e79ccb049c209fb4ca860b803220b  Use docker-entrypoint.sh in Linux build jobs
+  + ea47d21651c425b0b3d86ef054a540a93504ab6b  Update CEF to 139.0.28+g55ab8a8+chromium-139.0.7258.139
+  + 1762b18b5f3f6a7cc5b977f297a650ac86e4f497  Add MSVC build option /permissive-
+  + 4dcf1402fe5fd43897d6746c750ddae49dbc1209  Resolve errors and warnings in vendor
+  + 17f73866e79d659888a1931c2e81353a9bb0dd5d  Resolve errors and warnings in Shared
+  + e2e7e98633929a016ebd7e1f8372bb8ed8a81fe6  Resolve errors and warnings in Server
+  + 73489af19e459384835954a955b663a268d89867  Resolve errors and warnings in Client
+  + 7b9842440fcd5530ff15e23185cde4c436a46430  Resolve errors and warnings in Client Deathmatch
+  + 52308a3d70eb1c95ca170a5a47ecb3a397815e51  Resolve errors and warnings in remainder
+  + a57ae58bb93e1ce6d10e822500673196af95253c  Remove /SAFESEH:NO
+  + ba48e3456a000d9ee88bf22d2c6b40542e792b4f  Switch to C++23
+  + 3d01dbb2473870321ed95192f3b6dbd17f5f09bb  Default to GCC-15 for macOS
+  + aa7653e081a763b9dc40ccfaface040fa36649dd  Update Premake from 5.0.0-b5 to Update Premake from 5.0.0-b7
+  + ea834e26ac0a4ea65bf24dca1b95fbf83356c14f  Fix for commit 3d01dbb2473870321ed95192f3b6dbd17f5f09bb
+  + 224172fbd28c64b4d4cc437eb7c91c5599791ff8  Fix warning in json-c
+  + 6fabe57e540d9fb76ae35cb9434810f819dee027  Fix Linux compiler error
+  + 539bd29671000277f2669c70cb8da890a2c82f40  Switch to macOS-15 runner image
+  + 3300770b966c103ae02c4e151dbfd44bdf6e3ce3  Fix Linux compile error and some warnings
+  + 328ea8f1999c6fb2a78c6996d63f844ba61ffd8c  Remove x64 for macOS
+  + 2ecdac74eb270f85b60fcbac34fa158e06ff8a3e  Change linux-build defaults for macOS
+  + 2b80fbf8310855be7624c90947068adc9a9036ed  Remove env step for macOS build
+  + 39a9ff5bd1dcaddd9b0974b97cf02d665f64daaa  Move destructor of dwarf2reader::CompilationUnit to cc file
+  + f855b36457fdf159ac84017127e6b3c58257a9d1  Limit some disablewarnings to system:windows
+  + dede110c6441ea6e60e7a33081e5d3992369f3c4  Remove NetBitStreamInterfaceNoVersion
+  + 4138edb454653e638d6ebc2c299bb08be3f65a3f  Remove objcopy for libmysqlclient.a
+  + e33bf1cddda9ed836204f71f6635b5ed352ca908  Bump net module version after dede110c6441ea6e60e7a33081e5d3992369f3c4
+  + 428a2d517f879c81cca1ac7a1e4af43b6ba2eea5  New Crowdin updates (PR #4382)
+  + 2e12e98b4ac3a23fe6b4b601413e350e62f2ad46  Use double underscore for __declspec(naked)
+  + 49ec768b374b8576ad47d8ab99fe9cd64e0f3c21  Use double underscore for __asm
+  + f535ff12c0965f5bd10e56d03caf056328cca145  Replace byte with uint8_t in CTransmission
+  + 6f4bc9c56d97b272d5096e8d25f019e3dbe1e673  Add hookcheck utility program
+  + 6c3bd6989c162e3f0fbbcd2eb4c42d6101f821a1  Switch to C++23 in game_sa
+  + 1af8a67362ed0ad731a9794497bbb96d3a2da2a2  Switch to C++23 in multiplayer_sa (part 1)
+  + 3ce2cc1a303749cbf8b0bfbf01881d52a81c9c8d  Switch to C++23 in multiplayer_sa (part 2)
+  + c81113a2053b71430a62dabe020677cf92bcf4a1  Switch to registration-free COM for hookcheck
+  + 82dc4b00ccb409022a80fc63e914977eec7977a6  Use MSBuild property TargetPath in postbuildcommands
+  + 92c1947fb7c797c19112c195a664fdc7585f937f  Fix typo in gen_language_list build-solution.bat
+  + e4bea3bac45237a6940625ab4488660e4d61e066  Remove cppdialect for glob and lunasvg
+  + 75bfec8905342be7f9c037c44416e28ab3e712df  Update hookcheck
+  + 8d150a2b143fa7926f5e42024f54711b47eb60f1  Addendum for commit 75bfec8905342be7f9c037c44416e28ab3e712df
+  + 8dcc2073c6be510c36147303c1c65d2b0ae7ec5f  Fix client-side peds not being able to enter/exit local vehicles (#4396)
+  + ac7351fb751dc56f5a1f6af66612e939e87fdabe  Fix camera behavior and `getCameraMatrix` return values (#1282 & #1284) (#4393)
+  + 2df92c64160f5c983e749eb2fae3c90fffbb5192  Set Application ID on client shortcut
+  + 6fd08251070239f2cf48c1bb4e17569232f8be5d  Update installer en_US pot
+  + bd7f4c31c1eafaeda7e99bdc1b77ccdaf1c63fb9  Clamp values in CWaterLevel::TestLineAgainstWater
+  + 63b91ff36ed0c00fed721fd4b417e7fb1d4b8b9b  Improve internal buffer management for voice packets
+  + cce4967c6d88d593fc5ec469c8112f3b824a6dd2  Add onPlayerResourceStart trigger check
+  + 7bd161de840b9b76f0d08ef4411cccb2d0f9fb88  Refactor mtaserver.conf.template (#3857)
+  + 8c9f53d7c0d2f8806def5e2712e8a4a85052b9f8  Update installer en_US pot
+  + ea3362ae1cc34d2c3a6560122898ee0a13bb1c59  Improve exception handling in hookcheck program
+  + d5f4af11f65edf476c253ef39814f8cc471e1251  Fixes #3655 - prevent duplicate command registration (#4313)
+  + 0d930ac5ecb4a6365b8f84dc0c643199a2fcec7e  Fix dependency issue with define for MessageBoxUTF8
+  + 24d6d697f93fe3a4490fa8c0bc4206a6624b3a3b  Fix macOS paths in dbconmy
+  + e4906166065530083c07a032b4f938545c8c70c0  Fix `onClientWorldSound` event cancellation for non-entity sounds (#3269) (#4416)
+  + 460ad51ed9e9a631ae728ec955ba0fa7dab2b133  Fix `getTrainSpeed` returning 0 for negative speeds (#2732) (#4415)
+  + 76b02d25b5011be07a4320d6fb82fbe418c150ec  New Crowdin updates (PR #4406)
+  + bd9652209dfdb0fc0899648edbe5988d0addd755  Fix argument parser not handling noexcept functions (PR #4404)
+  + 8d5224e678bc04f1b3129e488b1fce3c0f85f0dc  Revert "Fix compilation issues after update to GCC 15 (pt. 2)"
+  + 0f01e5d407ab4be2e1319c6b90be86f2307f1e24  Death Event Parameters Synchronization Fix (#4418)
+  + 8b29ce81f5cd3c188e3b0290d578a5a811b2ebd7  Fix missing climbing animation (PR #4387, Fixes #1016)
+  + a7903751119afbebbf4ca0eb55bdc1397f157ac3  Bump _NETCODE_VERSION
+  + d0e210a4c5f08fe8164653581134462c39e0d65b  Fix ACL request detection when using refresh (#1824) (#4409)
+  + 62486c0803ddacaf550c0a452d59fd97f88bda2e  #4393 Follow-Up (Roll value) (#4424)
+  + c3a1ddfc9523bdecc7648b2b56cfcf842d286b0a  Fix cross-resource timer access (#827) (#4422)
+  + fc1bd622e99dbc5b539235b81b7508a826d328f9  Fixes #4347 - Colshape desync on parent move (#4429)
+  + 7c2004b2ebe420126b3eecc177822db6ba117a87  Fix client-side ped exit logic (#4432)
+  + 4e9dfc9777892721aadfc19ce5fa85d761004217  Fix missing new line in log (#4441)
+  + 5211e3b1f55279a6e37e4d136c51b88d07462e51  Launcher: Revert all recent changes
+  + 71e3f3314f031770b5a196caa9188838c077dbd3  Fix marker cylinder events not trigger (#4449)
+  + 1d7962b9cc7ff2ebf412b3ef39890ea41e80b6ce  Refactor Launcher with C++ 23
+  + 67add5bbbaa089162fb5aa24cdaf5d85e435e90f  Addendum to 72a6059
+  + 27338cc1c78cb5c39bce741a1138e3b46f1a0cab  Loader update
+  + f4155960c286d3b6a19aeea6886db876c86fece9  Update Freetype to 2.14.1
+  + bba0f0c458722e8e3b73dcab61d9f1f726e57a1d  Fix teargas crash (introduced by 3ce2cc1)
+  + ca66c9bc10bcf2a467c61b40813fba163e63674c  Fix shitty CheckMatrix function (anim validation)
+  + 3304f263792084e419db7ebfe6a88f7f67dbdb42  Try to fix non-functional crashfix (0x000CFCD6)
+  + aa645925f288cec725e25f952eb06953594ee7b3  Improve and document CMultiplayerSA_Direct3D.cpp
+  + 6862921d1de55d407a2eada23ee2b1a267318a43  Fix crash in CAEAmbienceTrackManager::CheckForPause hook
+  + 5b4abf6748b49c84f2f4d831e3f33cdbee39373b  Fix the colors of Borderless Windowed/Keep Res mode to match Fullscreen (Standard) This (lower brightness) has been the major downside of using Borderless for years, so this is a fix of great value to MTA.
+  + 4b4c4c1c1a8c2b898fa05f0f0f95547187f54883  Fix frozen state rotation return value (#1291) (#4436)
+  + 74483dcf1dd722922ea0fccc03d6167a5dd15b4b  Fix `guiSetInputMode` cursor bug (#4015) (#4439)
+  + 48921f869c12ad2110819afe4a94ed5d2ff7292c  Fix object rotation desync after moveObject animation completes (#549) (#4445)
+  + 5e8fb14f4b0c9719ace101509ffc4f14379163de  Fix missing mtaserver.conf setting added from template not receiving attributes (#4452)
+  + d344f85809b7a12d8eae5030b7a77f7865b26067  Bump the npm_and_yarn group across 2 directories with 1 update (#4461)
+  + 02bc65460f3b59d5c0efa3c224f1c9b39774d714  Document SStringX (differences with SString)
+  + f38bdd50b72db10f8edcc3ed9fe182c61af76ef3  Update launcher
+  + 853a7d54a25bc09ee421ac837f22201882ece1b7  Add missing trashcan in help (#4471)
+  + 1c7c72184ade9c6562a21772ec5fdf40c91970e6  Fix refresh restarting resources (#4469)
+  + 21b379e3124e4affc5c2e0fd724f2df4b534a99f  Fix vehiclesunglare crash (Fixes #4474)
+  + b83fa91daf71d289a1ef92a244ac867ec3443d86  Update launcher (344922c)
+  + 095a124ab288fa1744f5d876b62ce68f97d6d349  Safer memory access
+  + dde9a7fd7e2f0027508a340e88a73958d04c7c9b  Refactor framerate limiter to reduce CPU consumption (#4385)
+  + 775d6dd3e088108f377682bfde4b4674848a0ef3  Limit non-added event logging (#4466) (#4467)
+  + b5df742316ee9194c00ad44d9370928a18252c10  Sort the screen resolutions in the in-game video settings (#4456)
+  + 0a36c6309f0e0f679c15b533fb723c9fe66ca029  Use non-system include for FPSLimiter in Core
+  + 2e7ef2631e1e667a1cfdc29539bad94f82c06d5a  New Crowdin updates (PR #4472)
+  + 068e26bcc433fb1cad05db6660c75d871e45d2ce  Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)
+  + a1940e930d92136a1ce95893545cb71397660d7f  Revert "Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)"
+  + 378beda9c1526f10e00bb8ae7f64c9ad2084ae25  Revert "Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)"
+  + 4a85f2cfde4f4d5afee576113158347b541b2caa  Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)
+  + 7e92595a904326234b1c5114c90f1f7b9ec26270  Revert "Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)" for now (Clean-up is underway)
+  + e75b43cba191ceaedca9e02647982aacd76145e9  Restore known-good version of MainFunctions.cpp (as of cd46ab2)
+  + 6f58ebf1e28f8f213d91ee016a6869f4f60ce6a8  Update launcher
+  + 72c5a9290a6bcb30baeeed10209c635274744d64  Fix #4482 (onPlayerWasted not trigerring with setElementHealth to 0) (#4486)
+  + c71577b577e6d796205839bedd936041639191f8  Fix double sided not syncing false (#4481)
+  + 117f804cb2aa844608f939ab749bf280929a003a  Fix `showCursor` not updating controls state when cursor already visible (#1034) (#4448)
+  + eb76ac61b9383ff947138c363f2eed3a3d48af40  Add functionality to re-stream models separately (#4357)
+  + da8e50058293a4b587b5bc172877f1f1a0a6cf32  processLineAgainstMesh crash fix (#4491)
+  + ad2efc3322ba9cb1d73e0c50c1882d60e04c2ec7  Final version of 5dc09d9 (Allocator)
+  + 02997bd4748e40c491390099be36f6b98c091af5  The second iteration of element data optimization (#4492)
+  + bf11c4ceb7d32c5a3a7420d52faaf3a622f3e7fd  Fixed a bunch of vertex-related memory leaks
+  + 3ec9b5c5a4e6f2a3783a3ae2c1c9eb9802678f31  Fix network desync when `removePedFromVehicle` called during vehicle enter (#1519) (#4450)
+  + 679199e16daef3fcbe8734b882c6de6cd56e08e0  Fix vehicle state desync when `warpPedIntoVehicle` is called during `onVehicleStartExit` (#4458)
+  + eb36bb70ab9211ae32b6a8a3caa01af30f461e76  Improve heap safety in allocator
+  + 37d8d4e4c03bf55602328ba4d8d583373d9ff945  Fixed memory and thread safety issues in CProxyDirect3D
+  + 65de0f2af8b4392193f908d343b25d2cb83ed3b3  Add SharedUtil::IsReadablePointer and touch up headers
+  + 8779c72924e2a1466acf1505587aea8940bb0dbc  Addendum to c029a6f
+  + 9ed5455aeef84e0deee71b9d0ca29be72a7d529d  Fix CCore memory leaks
+  + b7ce215530465bec10e6f3dc25781f812b561bea  Addendum to f2e93f2 (CSettings leak): Use new cleanup helper
+  + fe5140b80bd0c2e388f3244dd9cc1602842b4a5e  New Crowdin updates (PR #4493)
+  + f7b912430439e694f5b4837ee83fac01b74e887b  Various fixes for camera-related code: Performance, Memory safety, and alignment (interplay of functions with eachother and RPC's). Fixes identified performance regression and improves smoothness of looking around/aiming with mouse on low spec machines, due to less overhead each tick.
+  + 6e19a734879d0d088d3121b39a238d6275395af7  Replace ReadRegistryStringValue
+  + ca5ca197b63926c220dd3cdb451674e99021a304  Rewrite Crash handler (to more reliably catch, dialog, dump and process all types of exceptions, even stack buffer overruns) Aims to reduce "MTA closed without anything", the handler was on ancient code and badly needed modernization away from deprecated API's as well.
+  + 8a09b5bb59cf9f8d496dbf4f0812a478ab109524  Add SharedUtil::TryGetProcAddress, use it in various places, and address misc issues exposed during implementation
+  + cf3c60284e625d18732f3fe309b6d9c84cb390b6  Improve server list (+list interface) performance, and reduce background overhead
+  + 22c62f761a3d343a7402aa8c17503bec58d84a7e  Addendum #2 to 6e19a73
+  + 29a10a4d4d88fe2652e29c55365fc4a410a82e08  Rework clipboard handling and add SharedUtil::MakeGlobalUnlockGuard
+  + 49e52651bfb38246006d6e589dc0d13a7665f1b9  Rewrite CRenderWareSA.TextureReplacing.cpp for performance, memory, and stability
+  + b1673e74ebfa9c00a12811371ad0137b85805648  New Crowdin updates (#4509)
+  + 20d36cd3ef687108acf99f97b02965fa5dd6003b  `getElementDistanceFromCentreOfMassToBaseOfModel` add 'building' (#4504)
+  + 3ab39b825cb47bc9aba14263157ff665ba1a576f  Cancel data change (#4503)
+  + 24bd2187c099a60881cabb001fbb6bb326044c81  Fix getElementsWithinRange not working in client-side with building (#4502)
+  + f2701527f6f45cf40e65bf6f89ff255631940a89  Update crowdin-translators.json
+  + 6a17b64a9373ac9f4e609b325fcc00127c0769a5  Fix for missing vehicle paintjobs after model replacement (#4402)
+  + 8f8592449b513221a66d9cc86305c962d0de6bcf  Fix jump control triggering weapon zoom while aiming (#2798) (#4454)
+  + 24de73286629421b228d8e160f62c8763b234443  Fix remote player fist/melee strafing sync (#4431)
+  + f333bab62301b27bf74c40a4c7bdd55ae83d701c  Fix chat message word wrapping after scale change (#4425) (#4437)
+  + 809c296850758ffbfb68055276b0603f19f5b0f2  Fixes (#4036) - Preserve user key bindings when unbinding resource keys (#4440)
+  + e02a473f0f1a0f3327a41fa84269c5d982edd102  Fix vehicle upgrades (engineRequestModel) (#4398)
+  + b8b63de8bb365b87169e93e7806cb1e3f8e0cd5b  Fix "Climbing over certain objects kills you" (#4395)
+  + 61c9305d5ea5504fc0cef68fdfcfd55d42696117  Fix missing swimming animation (#4401)
+  + 6d4fab9c5644fc9f95c1289fe3d2d194ccf78b4d  Addendum to 1ba43ce: Actually fix performance hit
+  + 0f1cac6ad8c5d4e433fde7dea4156cd411fcfee8  make performance fix from 1ba43ce actually work, and a few minor tweaks
+  + 7e4bd58ce6113446520cd440a9b4512990d85feb  fix Linux compile error
+  + 13e9c0c562bc5c75832d4d8f6d44680855ed6cd7  New Crowdin updates (PR #4510)
+  + 7a89e595a7b8cd35f257d2c362fdc56dddec1210  Update crowdin-translators.json
+  + 651cea5728d3232ea3d6eaf691f7fe2927fb7f3d  Part 2 of "Rewrite crash handler" (after ca5ca19)
+  + a146677e461be8fda4b163338b609e13a5d779ae  New Crowdin updates (PR #4511)
+  + c787113dfa1dd37a62b88ab8f1ad6de837c2fd67  Addendum to 49e5265: Fix crashes introduced, and other pre-existing issues that surfaced, including mem leaks. Memory fragmentation-related crashes due to texture replacing/allocation spam in loop are also reduced or gone (This wasn't out of mem.. it could happen even with 800MB usage), which is huge for MTA.
+  + 20a14e8a02da42f76d609fad3fd1f619080004e3  Addendum #2 to 49e5265 (after c787113), to include fixes for MTA's top 5 crashes that include SA offsets 0x003F3A17 & 0x003F374A, as well as other bugs and memory leaks.
+  + 8d6eb30df140dd95f550824685cef5720b8dcbfb  Improve crash fix from 20a14e8
+  + 07808b8a87f25e9e305df7c16d1398bc9fcd87fe  Fix destructor leaks and bad asm
+  + 21c8ac9b5a93af28a519f54c7b41dd67fd0b51a5  Addendum to 07808b8
+  + cf668bfb15795d4c7b1f95eb89a78793ec71c335  New Crowdin updates (PR #4514)
+  + 895be40b5348ebb110a2c05876c528d0f7b51b3c  Revert "Rewrite CRenderWareSA.TextureReplacing.cpp for performance, memory, and stability" and related recent changes. To be reintroduced later when more stable.
+  + c0440e86e5a22f8092417838b8e95a07fb477f7f  Fix recently introduced suspension bug
+  + 8a09cdf1a9b327f33386fb47b5cbaac69ffacaa5  New Crowdin updates (PR #4517)
+  + 6e5ba55319d85ebe343484f26acea6351f4948a7  Revert suspension related changes for now, as we need stable master. It will be re-introduced later (revised).
+  + baad050253fbc25c57e63242d7ccc5ceb83eb7aa  Improvements for 07808b8 ("Fix destructor leaks and bad asm")
+  + 1281716e5a6ccf79a23730c1c9bdd723d3d3b16a  Fix 3 issues: MTA freeze on quit, CEF crash on quit (non-user facing), and 'Quit' closing the game being slow to clear the last frame due to redundant blocking operation.
+  + a32fc5f0351bab64563ae5247cde6aab34ae97ac  update CEFLauncher
+  + 251f9d0cfa4827a4d7a9cba237c8f7f71edbc6ba  Addendum to 1281716 - Makes "Quit" close the game instantly without last frame-hang, and avoids risk of ungraceful exit code
+  + 5c9f4b82d2379c285dc602d7e3549ae529d385bd  Crash handler improvements (Includes: don't try to symbolize stack traces on non-dev builds)
+  + f234efd0d4901b031cec7c84a4d66b9cb1370a19  Addendum to a32fc5f
+  + 116b86c925d07944ea5ea4a6df155ca0eccbbcb9  Add forgotten stack trace helpers file from 5c9f4b8
+  + bb0b32cb90f3379853fb9eab0a651caabd837d6f  Fix build error risks with sparsehash
+  + 74326a34f747fd74e2590744ab3f5698c4a7cc43  Addendum #2 to a32fc5f
+  + 35129ebc3527a7719b3a571d36fdcd9754fd58d3  Improve streamer performance.
+  + ec248d49697d23f621f9e4fe76007f3f6166a04a  CEF reworks #2: Miscelanneous
+  + 0772fcc4b644da6f4f5d1b43176c8fdcc0065217  Minor things missed
+  + b66d52cafa91782bc32e2c800e46435a2922c1e8  Addendum to 2e56bd0 & ec248d4: Further improve CEF implementation, and fix any bugs encountered along the way.
+  + 6d22c22a86715802df5dd1d50f322b338f11bbb3  Update CEFLauncher binary after b66d52c
+  + e75755f37f4881438be8294c000466b2c1eb7693  Addendum to b66d52c: Forgot to make base dir check release-build ready
+  + 0f4976860b6705379c8a0bd2b85af29bb139b7fe  Addendum to b66d52c (Fixes crash)
+  + 6d29fb5436502d4b0d0a8d2ff4a479b5831af2fb  GTA streamer bug-fix round #1. This heavily reduces bug load, which is very limiting/blocking. "Bug load" indicates that MTA uses hacks nad workarounds until now to avoid mostly race conditions from SA.
+  + c4fe546afbe0466dff78af2f63053b4088f8e7f8  Fix shutdown crash in CRenderWareSA.TextureReplacing.cpp (+ some other safe tweaks/modernisations)
+  + 045bde9b6ca205ecaa3dce0849d3d6f28844a692  CEF reworks #3: Miscellaneous and refactors
+  + 9a5c9165d8c1a17f36e1e52c368560a17f22fb15  Update CEFLauncher
+  + 1dc93689b37b9109507db51db4cd167d50d1ff42  Fix some threadpool flaws, including: - Memory leaks - Infinite loop - Race condition - Server/resource shutdown
+  + 3c268657d6477334b308be26b31282833e63da82  Fix crashes introduced by PR #3845 Like a common one at gta_sa 0x0116112B
+  + 1f2dc7a19257a1a0b893837e986355a4b2733325  Addendum to d2ef262 (Also fix some issues with other CTimer hooks)
+  + 288bc65757a17075f008e1701f0dcee5a2cd021e  Addendum to 1f2dc7a
+  + ceaadd4617eb344a15f9cdc28462ec09bb05b81b  Texture replacing stability/debugging tweaks
+  + d3a311cf8416980fe98ed9431be7ce06b5323d0a  Fix crash introduced by PR #4544
+  + 81c457ca0583ddeaf94c469d9959e30721e611f8  Update crash handler capabilities and, making use of that, add temp alloc instrumentation to OOM crash hotspots (To help identify leaks/suboptimal procedures)
+  + 36c50b860cfe89c691f78c0bd3e63ad083396793  Crash handler: Fix stack symbolization issues
+  + 3da39e686a7e701654882454a1edf6f0d63df014  Update .git-blame-ignore-revs
+  + 2646504c522b38717f5d4dc466bb4269459db21f  Fix CEF AJAX after 4761859 (and migrate from SString to std::string)
+  + 4bf580179911f49825fbdfac33932b57ba215a38  Performance tweaks for CEF AJAX
+  + e1220e946e97c8255d1ea73f47867d046285c5d8  Fix browser list buttons still misaligned in settings (#4557)
+  + 259959e503d34bd80a4813fb943c9ca5c131ee49  Fix a bunch of server list issues, including with sort and server-info button
+  + 90967efbbac1cb77bb1fee10073dd6e517a13703  Fix build
+  + ed025e582ae17f203b37a5a2e5d3dbe44683d935  Fix some CEF issues, and add Wine/PlayOnLinux compatibility improvements
+  + c757a89f7c92fa7c814572b28384ca5985fff5bb  Switch to VS2026 - Build server has also been updated to Visual Studio 2026 18.0.1 (11217.181) with v145, so nightly builds from now on will use the new toolchain. This means we will have to watch for UB and compiler optimization bugs for a while, as with every major upgrade.
+  + 5c84cf879f03c0c06310e01e2cbbc9a51ec40db4  New Crowdin updates (PR #4558)
+  + 0d4944982d28d530d70e59993c58b4facd8d6c9d  Revert recent changes to CRenderWareSA.TextureReplacing.cpp (and related) once again after following 895be40 i tried to made less intrusive 'safe' changes again, but touching this stuff in any way just causes too many issues. Crash fixes also only cause the crash to relocate. It all started with a desire to avert an old crash reported by Xenius (who was using txd's with invalid/null textures), but it only relocated it and caused new ones.
+  + 58877e66f9bf35ebe9dec2215d19a10ecfd54956  Remove telemetry instrumentation from places
+  + 106b725ba63d411c58a8dd1264196023614ca022  Early initialize CStaticFunctionDefinitions to avoid crashes when something calls into it early. This fixes a popular crash where LunaSVG called into OutputChatBox before core and other pointers were valid
+  + 1eaaec410e4c086ff5b7604a4e931c6a82a3b7b5  Don't use noexcept in crash handler
+  + 46cdd9d419828281469db690215c7d90e995a9e5  Fix warnings in crash handler
+  + 0483b29518b8f4c10e2f54afe6eeb21be04eafef  Fix area name showing for a second when joining to server for first time (#4549)
+  + 62d4a53bd32b4acae27837c7592931758307b762  CEF reworks #5: Better safety and less memory waste/fix edge-case mem leaks
+  + 744b0cb7cb8b41a30946af78084ef6927cf34052  Fix ped rotation sync is broken when using setElementFrozen instantly (#4566)
+  + 8d41e19b1765dee0c1da5e821a477078f6c2dc6b  Resolve Event Context Loss in Nested Event Cacnellation (#4529)
+  + 7ebcf5905ad9f3df39c1b8d9960e0afd1fb3f67d  Simplify ACL request refresh detection (improves #4409) (#4483)
+  + f43cb3b53a43f3860e81fdfaa176454905d00ffe  Fix position desync with dead players (#928) (#4453)
+  + 3466e0fac9e6ae9b147b0c3d036fc3be6869d228  Revert "Revert recent changes to CRenderWareSA.TextureReplacing.cpp (and related) once again after following 895be40 i tried to made less intrusive 'safe' changes again, but touching this stuff in any way just causes too many issues."
+  + b870f4c224062c977479579ebff2c67584d7c3cb  Fix `getVehicleCompatibleUpgrades` returns different value on client/server (#4569)
+  + c41b49fdd89846685ddb0056f6448a0beae15b98  Addendum to e8b6966
+  + 6fa8a13f3063ae8facc82f50c6a23c3546eef67e  Addendum to e8b6966
+  + c02b23c9cce0f3a047fa7401c9885f575169a9b1  Addendum to e8b6966
+  + 32f79302a2e7f75863c740b8a0ff09cdaee87937  Add the ability to set the aiming sensitivity the same as the mouse sensitivity (#4570)
+  + 4ca27f56725e36570e470248ee8900cc6bb3149d  Fix img crash when game shutting down (#4551)
+  + 15bdd6d6ac16825c91905712b47d34a3d637a9a5  Fixes #551 - `onMarkerHit` on attached elements  (#4571)
+  + 09c94aee490fe91816413582a95dcb1821cb97ea  Improve IplStoreSA validation to avoid crashes (#4572)
+  + 93bea6c571198f08945aaa4c47ed1bceab1490c4  CEF safety fixes (fix UAF/UB/race)
+  + 937bc63d37db6b0ce65063beee28035c31641b2b  Crash handler improvements against some cases it can't handle (game just terminates)
+  + 03e66524c27001da17351c6413d489bc38fda6de  Improve texture loading system with fixes that include addendums for 53945f2, c637d39, and individually fix texture loss, memory leaks in stale states, and stacked replacement corruption (Accidentally destroying textures still used by another replacement)
+  + f6a729419285ef0a031919cc9d033944074e774e  Further improvements for texture loading system after a235955 (including performance)
+  + c2c62e14fbe1fbd7a139515d1ab4cfcea13194d9  Fix `isPedDead` didn't check network dead state for players (#4576)
+  + 243ef2423288f662a65d99f055efd56a406c41a8  New Crowdin updates (PR #4564)
+  + 345583706669caf525d29e22d153a7fd85d62bb6  Fix `Camper`'s third seat not working (#4578)
+  + 93d5f91c79b1acaf74f6f5c8fd04671e855fe095  Convert SString to std:: for JPEG handling code in 1.7
+  + c6820b08c64a78e5f5f690aae089c180c68fe63c  Fix 1.7 streaming sectors crash when moving around a total replacement map (like VC) that presents itself as if in CShadows::CastShadowSectorList but it wasn't that straightforward..
+  + fd34d6a0d39f4b23c070f8984b4678c3167bd030  Fix `getVehiclePaintjob` returning -1 when the game engine hasn't applied a paintjob yet during stream-in (#4585)
+  + 3f8067827dc729b95deea302a0f384402d386012  1.7: Better texture-related error handling and debugscript return values
+  + c1b3052516def629aa2367907d8ac6c5744cca84  Fix old, top 5 SA crash @ 0x001D85AA (0x5D85AA)
+  + 06aad7e540c306d2c069ca428a229b00c5297778  Crash handler: Always log registers (creating a full .dmp can fail)
+  + 280b6cd9917eb8e624fa037f3783eb958123a7a2  Add ability to remove all domains (#4465)
+  + 9425de076b257c09f2def1ec48c1f2003575a7d1  Fix build error in certain configurations (custom builds)
+  + 61c5d9e83d580943eb9438c8c0f82ea5cdf95036  Fix build error in certain configurations (custom builds) #2
+  + c2f884d1e07af948a2f69a5146bd42982a4af445  Addendum #2 to 61c5d9e
+  + 917878c7d519a7a1f1ce7ab5c24e09669d07cb22  New Crowdin updates (PR #4581)
+  + be2b2be4fe055634b0a7354f6421a9a07430f0e8  Improve texture/shader loading system
+  + 09d8852ca0777c4789659fc96bc476313ccdde26  Fix streaming bugs and txd leak
+  + 3ec89878945c5e86d64e560c7b1fe6e02665d5db  Fix texture mem leaks and performance issues
+  + 23f7911287b3db31eec3aad5eb75e2d5a8ddfb91  Fix texture freezes/linked list corruption
+  + 6cf8cc6c18b035eea37054057931be89e00c88e0  [1.7] Push ALL changes from our temporary mtasa-blue repo to GitHub's mtasa-blue
+  + 4c474025fc83ab757a84092a45de1bda42a96128  Fix SBO in CKeyBinds
+  + 010645ff5c6d8cdfb0a97c0253487a6bb132504b  1.7: Update crash handler to handle & dump 0xC0000374 and 0xC0000409 crash exits This is a fully functional handler for these types of crashes, despite Windows API having it severely limited to bricked/blocked, my implementation found workarounds to achieve the following:
+  + 8348e98106d926d26900a5808cc88c7e5df05e0f  Update installer en_US pot
+  + 1c590fbc46884bb25809d85d1017c08f779c6a28  Update copyright year (#4605)
+  + 81677d9e1a3632bd5e03b660c0bb37fe4234c7f8  Remove unused `SCRIPT_VERIFY_*` macros (#4606)
+  + c78be3a36b5ec6f3358e4729e8faa8f6b3af8924  train-tracks: enable for custom builds only (#4610)
+  + e7c3619a5d5e0b6bf352befde6ff33c5921032b2  codemod: disable clang-format for `__asm` directives (#4611)
+  + b1d33b48d2ccc681a4880a4f66ed2f33ff72ff79  train-tracks: fix track IDs shifting when you delete a default track (#4609)
+  + 0530c83c7a762abb4e60f3c5fe895f4b32378c00  Memory safety, crash, and SBO fixes
+  + 1d63b0c56913ca990e462f9137b241ca2ab4cf72  Add .github/CODEOWNERS
+  + fb7ee23e761d51ba4c76ae2af4bf69297bb0c92b  credits: correct patrik's location
+  + d68922739eb715090a7f5ad9a40c6f98aba749c8  credits: move Megadreams to programming section (#4617)
+  + c6a7122ef2195b6a365f9fd1338a956f0aaefbe3  Simplify CODEOWNERS to only include blue-collaborators (#4618)
+  + 4963645560effb026a92816f096d73b2f137a2dd  Update .git-blame-ignore-revs with #4611 (#4619)
+  + 9490ddb7fa626438c16ce484c51a5b000f4a7bc1  Update "first time" rich presence dialog wording (#4622)
+  + c54faebeba6c305d38fdf6821588c140b581faa3  Improve pull request template with test plan + motivation (#4621)
+  + bae6ff8f37af2a719e180e09ed9eee50d60e1661  Update Crowdin configuration file
+  + 965f8226953b449bf13b437cb6239ebe807fdcf9  Bump qs from 6.14.0 to 6.14.1 in /utils/localization/generate-images in the npm_and_yarn group across 1 directory (#4608)
+  + 2ac449ea90168cc9b3b260338b657b4b630b0243  New Crowdin updates (PR #4624)
+  + e0bbc889c322eca45cbacb93bd0752047c6d428c  Addendum to 0530c83: Fix last cases of SBO crash exit (which was only deferred on last patch)
+  + 7be6d053605b91a15509246eb966961e5d1a7af7  Add seat parameter to `setPedEnterVehicle` (#4573)
+  + ea9b3df1ba2af82080e0ea5044fa4ca354fa46ee  Enforce clang-format in CI (#4626)
+  + 7c27c416263017edec87fb8e6a0fdd4f90443cec  Rebuild pots every week instead of every push (#4628)
+  + 66eba7a3936a54fae97b46e6152c92fb7b618d69  Improve pickup handling safety, also fixes SA crash @ 0x00154244 (0x554244 - where caller is 0x45593B inside CPickups::DoPickUpEffects)
+  + 40dcf45aeb2940e01f4e38eba9bcf746f24f8a29  Fix build error
+  + 748adfafd074464620ad6438eff87cea22d5cf23  Disable warnings in vendor projects (#4629)
+  + 6de438d9d070c341eba459c359d81c96abf19c92  Move Dutchman101 to programming section (#4631)
+  + b4d0e27a005bebc5e43b8efe6f5fe0f356fef227  Move Lpsd to programming section (#4633)
+  + 8fc6d49c79b50451880766e4da15c0fbb4846dbb  Refactors for safety, common crash, and UB/visual bug paths.
+  + 31cda26a0f94c760a59481eb2eaefefcd7858add  Addendum to 1dc9368 ("Fix some threadpool flaws") to fix new crash
+  + a8957f9c31aa09a35312f03b2967c96e90131a0e  Various improvements for path, file and CRC operations. Replaces 00668ef as well. This also targets the "CRC could not open file: Permission denied" issue (Although we still need to find and fix the leaked handle from where it originates)
+  + 5b1c7d15ac9fe32d4370e445bc7060fa07578393  Bump LunaSVG to 0dd60d1 (#4615)
+  + 209d70e6f83150c14a557469042402b89408f0dd  Addendum to 8fc6d49 (forwardport from 1.6 needs 100% parity)
+  + 5907fb017173dc9c5c23138d6df81127bc86e525  Addendum to 3db6667: Handle and log invalid states that can lead to crashes. All callers properly handle failure return values.
+  + 0f43464425ca0fff9e456d44355fa2dd61fcb1b4  Undo accidental commit inclusion (For proper tracking)
+  + bfaed0ac437f79012d936f5163116dd104bd292b  Fix shutdown crash
+  + c82169cb128658bb6214f7f0cb64373fdc33cac8  Change clang-format rules
+  + c2a0ba939f0fabba96450d02ec56a111658230d6  Run ./utils/clang-format.ps1
+  + ab74393e45abb3fc8dbcb84d7039f75851bf9b23  fastmod '}  // namespace [a-zA-Z0-9]+$' '}' Client/ Server/ Shared/
+  + 6be278d2d37f5f9686984856b72573290852ed74  Remove more FixNamespaceComments changes (#4638)
+  + a665e0144e7f71a4c7898f024262393f019f6b7b  Revert back to pre-enforcement
+  + 682f972b36053bc854076a19e3621c03e950140a  Stop discarding `Client/loader/MainFunctions.cpp` in maetro sync (#4639)
+  + effc779c9e2b4ead6ec8560cbdaeae1d7ca2a1ed  Move maetro patches to master behind MTA_MAETRO env var (#4641)
+  + 53d04bb968e2a7c52c6a6ab11bab611f1a954635  maetro: stop discarding locale (#4643)
+  + 0968ccd4030975fbfdc1e60fe36862f932ab390c  Store maetro d3dcompiler_47.dll in master branch too (#4644)
+  + c0a32672a4380c1c544b065be0b6e286e9d8077d  Update installer en_US pot
+  + 5e391352c2d4ba5c37dd5f58b594803785fb2892  Delete .github/workflows/sync-master-to-maetro.yaml (#4646)
+  + e75ba93362c6ae99d30a95d3f20a1e04ba46a22e  Run utils/clang-format.ps1
+  + 954f7416d83f25683e3db9d18c687e9d7d4f243a  update .git-blame-ignore-revs (#4650)
+  + 83321683df0d24ae481e68679654e9918a52f128  clang-format.ps1: store tools in a config, for future clang-tidy support (#4653)
+  + 9d738a466a64882a1f46e69ce8d0a9214325d363  Update .git-blame-ignore-revs with new entries
+  + 654b7fcd8d752f633935cf1a0b752db9ca97a512  Add another entry
+  + f00772702e8032fb59392720532df28a9d8d8f65  Make server components optional (#4657)
+  + 1b4e5a2c093a102b94b5d554f126efa47fc93fc1  Create MAETRO.md for maetro release documentation (#4654)
+  + 8fa9c976e4740da63b3d62735ef65229d5507010  clang-format.ps1: check powershell version (#4661)
+  + fc574ffc4a585aea60a17125b148489892663a31  Skip antivirus warning when running under Wine (#4536)
+  + 07dc7ade56b4fa3a2ee8aea4c41088df74f2be42  New Crowdin updates (PR #4649)
+  + 7bc2315081840572be19adcc5936abf99870f94a  Fix additional game freezes where something that internally called NtCreateFile / CreateFileInternal hung forever. Many other recent "freeze fixes" targeted potential causes of this type of freeze, such as: .. 8432922 (Later reworked in 51d01e1), 17650bb, e3a7998, f7a8130
+  + 8a6e73afc5283b4167f4bac5965745cbbdfa3eb6  Fix compiler warnings and (type) safety issues across codebase. Modernized & improved a lot of code. - Add explicit static_cast for narrowing conversions - Replace reinterpret_cast on function pointers with memcpy (fixes UB) - Modernize deprecated APIs (inet_addr > InetPtonA, GetVersionEx > RtlGetVersion - old one lies about Windows version) - Add range validation for colors, ports, model IDs, array indices - Fix signed/unsigned comparison warnings - Add overflow checks before narrowing 64-bit to 32-bit values - Fix regex escaping in URL validation - Add missing return statements and WINAPI calling conventions
+  + c2c51a8ec886289632cd4fce1ff3e6dbbc42d1af  Addendum to 8a6e73a (clang format)
+  + 12add3bcd3bf041ae018af217828ecf1f079fe28  Run clang-format on every push (#4668)
+  + 104c58e9d216b48836b1e95d7c3981b799ba922b  add `.clang-tidy` for in-editor feedback (#4667)
+  + 5ab1e03469536f250992fc44dde84f203b882867  Implement `getResources` on client side (#4542)
+  + 8eb71357f9b74517b87282b841b63b98a7216a1c  Fix server build on RHEL/Fedora with `mysql-devel` package (PR #4672)
+  + f6c2b2dda3cf8b797eb45bf0933dbe3f440f917d  New Crowdin updates (PR #4665)
+  + ac0fc467d00d127c584c2b926baa142060727f32  Fix SA crash at 0x003336AE
+  + 9b74e061762ec6cfe6e53749c9127b00183e9d5d  fix(typo): correct spelling in CMainMenu.cpp comments (#4677)
+  + 44ae6e7bbe67463f2c414ebad78a3074c261502d  D3D-proxy system improvements: fix state cache corruption, vtable crashes, and device-loss recovery Fix graphics corruption and crashes in the D3D9 proxy layer.
+  + 6a3b3af02f3e812f092a60f8dced8e630824e017  Fix SA crash @ 0x00352BA7 (Out of video mem) similarly to how i fixed 0x003C91CC, MTA's #1 crash, earlier. For details of "earlier", see the comment https://github.com/multitheftauto/mtasa-blue/issues/3840#issuecomment-3736738172 or CrashFix_Misc38
+  + 7a7d1ae1f8d2b53cfe5406ce2ec0a163e6050555  Correct asm of vehicle dummy hooks in multiplayer_sa (straight up mistakes) Avoid crashing on some 'bad' models or dummy initialization race conditions (GTA/MTA) Prepare for further manipulation of 'GTA-side vehicles' (not managed by MTA or its pools) for MTA feature development - run into less immediate obstacles that would lead to crashes and various odd bugs
+  + 42a6a437604e7e62f1109f69d2e617db9e25c095  Fix `CElement::GetAttachedPosition` to return correct positions for rotated parents (#4680)
+  + afe8ad533248a4523afe08e627aeeb0879389480  Expand TXD pool from 5,000 to 32,768 slots Set the TXD pool at startup to 32,768 (max safe value before movsx sign issues) so total-conversion maps can use far more custom models.
+  + 0a661ef16151fdd6c0f6eeb09ad87b57a70ba39a  Fix 3 streaming freezes in TXD pool expansion ASM hooks
+  + a276a18cf53ef2b1d600e5b2ce4f8107b66ad62d  Fix freeze
+  + 2381b120c43ee8e473d5022cec8a492e8a051226  Addendum to 6a3b3af
+  + 4f227fc5802b4db5f9928faeba39393f72ad5629  Clean up some old, redundant logging
+  + f6f5326a72e58d8b5bcf029d64dcceeb37645600  - Fix crash in building removal after IPL streaming (streaming out an IPL sector) - Attach pointer lifetime to actual entity lifetime, preventing leaked tracking refs from building up across IPL stream cycles.
+  + 5ece86b8acdd8ae3ad0ceb1f0627452341af56a9  Fix crash in CClientPed::GetMovementState
+  + 85829da9e3c1e1266ad54f0c1a9e0d613df631a1  Addendum to f6f5326 (Fix build)
+  + 0d8ff91d044e0b97f439b3cd4a562211e6c74690  Fix SA crash @ 0x00352905 (Out of video mem) similarly to how i fixed 0x003C91CC, MTA's #1 crash, earlier. For details of "earlier", see the closing comment at https://github.com/multitheftauto/mtasa-blue/issues/3840#issuecomment-3736738172 or CrashFix_Misc38
+  + b46f5feb901d2070f06d78af2138c8cfe26a64f1  Fix SA crash at 0x00154918 (Similar/related to the fixes of crash offset 0x00154244 from 4eb4a7c, 00e6631, 66eba7a)
+  + f97247901ecf49ce06b815de849b93f2e08d27fc  Addendum to 663c61a ("Fix old, popular SA crash @ 0x001A5735") as it didn't fix all cases
+  + 5aa6455703067a7512d5d42a17e8268be395f891  Fix entity cleanup bugs in building pool and pool stride mismatch Rewrite vehicle/ped entity pointer cleanup to iterate GTA pools directly instead of MTA wrappers, fixing missed GTA-native entities and wrong loop bounds. Add missing object pool cleanup. Replace dynamic_cast with direct pool index 0 access for player ped.
+  + 4912d2b55218406b5c40fd39617596b29b4d0935  Fix pool index type safety
+  + f212c93bb41ea20a2d37a5ceadaefbf24dd4c89c  Build maetro32 to the output root directory
+  + 50911988d520c66a26d5e79743637314303a618e  Various performance tweaks
+  + cee3f88980524f8ca90c07aa9bb2f080f4c18300  Adapt installer logic for maetro32
+  + 5f27442f24fa21bf194b0d2c37876c6e3b8c6430  Update launchers for maetro
+  + c2935aef6f42d15a062fffc04ea58f8e8aea4efe  Update maetro launchers
+  + d52b161029214d878a696f2214ae676a8222ed91  New Crowdin updates (PR #4708)
+  + f600a76c9f57900a7f8e17e053f013a824b7a648  Switch to 'windows-2025-vs2026' in Windows build workflow
+  + 62028cfecfd34b44aee4a9f493614eac8b0327f0  Fix setVehicleComponentVisible always showing the _ok state component (#4688)
+  + 3e879e6b2f9281c65a43615e40962fab20289b1d  Fix garages automatically closing/opening (#4684)
+  + 889b4c2d2a6c225004d7416b33e0ed3f7d7a1b90  Fix physical objects rotation after restream (#4718)
+  + d39819be601a298b39b814952a17cd11e87fd93d  delete codeql (#4719)
+  + e5b7f24eef93384178cfdaa4b9f4b78c7ba6b8d0  Support for getVehicleWheelFrictionState on Bikes, Quads, and Monster Truck (#4537)
+  + c40bae13feea134b77a2350e7b36254058a46321  Add function setSearchLightColor & getSearchLightColor (#4666)
+  + 1468c16637eca4b403c6844adf10774b7533f50e  Update installer en_US pot
+
+========================================================================
+MASTER-ONLY EXCLUDED — deliberately not backported (114 commits)
+========================================================================
+  + 764f5ab0100c212b565c4ae597aa893a0e2716fb  Set version to 1.6.1
+  + 25e07c46840360caf58f4241e17ecb7288468e04  Remove remaining minimum client checks
+  + 3707b53acd09c1b2dd59bdf544e5c74865091bb6  Disable empty CResourceChecker data arrays
+  + d302d3c56d0fba41b7f71bcb78c60e4aab097a8e  Remove outdated community account handling
+  + 47bc53fe4540244d7c0571521f9ae659896ca6da  Remove outdated bitstream checks
+  + dda35b9aab2eae676c5f035524b047d6f7290624  Update client en_US pot
+  + 92763f84aacd54b6263e72699a936489e7072a15  Remove outdated bitstream checks
+  + 9a12faf8a62529ee5bfd2816a458e318702fed0b  Update client en_US pot
+  + 4be957b8af46d073cd1da35d285a25664abe7f94  Remove outdated bitstream checks
+  + 60094d17432eb1395335bb10025dd928a0ab2dff  Set version to 1.7
+  + c738f9b9463901bea0bd3572db879e26d24daa98  Update client en_US pot
+  + 6139d1b451d166a7a9cf2c293fadddb8f0ab2d27  Update client en_US pot
+  + a9bfeef1e719c7c1ddcce79c4f094123847b1679  Update client en_US pot
+  + 449cf0f071e42d3bad2b8ff31af0bcbf6356b271  Update client en_US pot
+  + 3e6c1a5d4f55f02e5c0adcd5e6727262a935f95a  Update client en_US pot
+  + f6a37acd17808937c7dc4770dd12582422abbcf1  Update client en_US pot
+  + 88ca35e9f541c8813852e770befb51ab5c00f357  Update client en_US pot
+  + 1307ddd4cd18ea6c9a9d725433ed8f77dd08215c  Update client en_US pot
+  + 09c3abdd9d436289e82ffe9bfcd92580dbfd4d2b  Update client en_US pot
+  + ffcde8e4f0a8841c72ddea25f9e094231cfe458a  Update client en_US pot
+  + ba746c34f991b3850431c7d118a47b1f4831d56e  Update client en_US pot
+  + 198d6da771b71b27fbe42a0c3db949e18be5b201  Update client en_US pot
+  + 82e5e55a7a8eda5d68c7020d70be571f33fcee37  Update client en_US pot
+  + 6060905bf153a6de498a056a9e7c32efe547ccc0  Update client en_US pot
+  + adbe2cf277f0aaf9d0ca8796b321594f2587644b  Update client en_US pot
+  + 559081db75ce0d288132611f6a5282f218c8c749  Update client en_US pot
+  + 186ffa8b5c1a19066c25773b7438b6c7b0886de7  Update client en_US pot
+  + 46ff069fea325547df8fc7fa81df334a079826a1  Update client en_US pot
+  + 2994b287bce182daf34c0e3b3de86e121628912e  Update client en_US pot
+  + 7789d6ade2beb7eed8848942612ed87fcc04000f  Update launchers
+  + bee47833b8207b69b2df64c4738fc016b2d8e35f  Update client en_US pot
+  + 72a60598a162cbee019d4577e32893bb0957971e  Update launchers
+  + fe5e3a4e33c874dd36c877ef1cb9115a5b538d7b  Update client en_US pot
+  + c79fce58c586d55e73c293312a4a7d26e2df5bc7  Update client en_US pot
+  + f864cf7001584afe36d619b7a37a476318eef8ba  Update client en_US pot
+  + ef0185d18e0f2af87f117ef2a59f5e279fb5854c  Update client en_US pot
+  + 452486218113f253b1da1e6278c5e8c7b4595676  Update client en_US pot
+  + 50be993670cf5f1ffdd0835e58ab41d0c58dfc97  Update client en_US pot
+  + 359ba7a8ca754cd1af5fe6b5eb8a83b3289b0b8b  Update client en_US pot
+  + 0ab5c0adeeb78825484888548f7ee7bbeec3e3a4  Update client en_US pot
+  + 6c9dde669c776beed417bde6cbd4743dcd396b3d  Update client en_US pot
+  + 659c26d24dc668c073e2e1aca13c2a6fa0c48184  Update client en_US pot
+  + 8c8c5e95dde479b60d826d6b09b7bb9a71a2d80d  Update client en_US pot
+  + 73fc0e76d7b126cac17c78b4b8b0404eab89c370  Update client en_US pot
+  + 96b42ed285c64650c93b42970ddc8a26559124d5  Update client en_US pot
+  + 5189e74ef166747735fe8bb541a8163119d8e7d0  Update client en_US pot
+  + 140b49cfd07dc06b9882bc4445a6598568a908e9  Update client en_US pot
+  + b3c3eafd27bf1d43220383d06cea8f4475b37214  Update client en_US pot
+  + fbead17e92d851a3e705115d6b7718e1112bc231  Update client en_US pot
+  + c1f24ba346fb8417038bdd57ed23314e45a7a2b2  Update client en_US pot
+  + ed7ca40e96b64d39678ec12883d90937333e51bb  Update client en_US pot
+  + 5837aaf22499ff2511bcb8c480db4782e3f910b0  Update client en_US pot
+  + f70e09dbb11f947893288cf7701a9fc782719c3b  Update client en_US pot
+  + 555c27a87070504ae289abc5c340ed8d5020d2e6  Update client en_US pot
+  + bc6af7568ce9f4ad2e483b85bf7bf931e15f75ce  Update client en_US pot
+  + a794d631f5f9401cc152dd3e8bb787dce4f46f21  Update client en_US pot
+  + 354d61feb380001cd018944cb0b3d56a1b05f008  Update client en_US pot
+  + 9d98bf867f32d489bb032562bb16d4ead113b9cf  Update client en_US pot
+  + 6718bf32c220f9da7c5760fd02926ee6fabae3e9  Update client en_US pot
+  + debf04caab99300a3daf17de7604317ed3a239d1  Update client en_US pot
+  + 44d0fad9084571255aecb7334c97fc3dd2a99b15  Update client en_US pot
+  + e8b48ca3557325ef18f777dd1a90c7f2cb9a4f38  Update client en_US pot
+  + 0c072e5aed5458740e3137251dcf21929cf20f7f  Update client en_US pot
+  + 70a07d83260d51e9a60bbec6e75b841119bd6f52  Update client en_US pot
+  + e9b092c16dd278925491dd53631cfc29aee208dc  Update client en_US pot
+  + 13b8473ba77435475d57c80f56f1d669478210e0  Update client en_US pot
+  + 0640276c97c618ee6d7579841fb1cea8f8d45453  Update client en_US pot
+  + 03811e105c67a3c22bac5cd38d91ddd8c8fcdd4a  Update client en_US pot
+  + 1ebb7749a019e7c4808a4e552fe07e3a726ba7f2  Update client en_US pot
+  + 1c36428b71853fd3e5158c50ee1f2ba6584e20be  Update client en_US pot
+  + b18a78484666016fc3e6296319a4b0b0f64a3822  Update client en_US pot
+  + 04f0d4c24c943a5a93a5f2ff51e6f460caf6d0c5  Update client en_US pot
+  + c9c4bd49fff09a9f1f613c4ef5183adf0320abf6  Update client en_US pot
+  + 81d146bbc2db5b135e1cf1b0c639b0d5f16cf3da  Update client en_US pot
+  + a56dd304f944c642426022cec02fa0ff560a7b9e  Update client en_US pot
+  + 812b7da70cb999375417b64524377244696cb50f  Update client en_US pot
+  + 13977ce7b91a37f360c2dddfe539b5c85e75bff5  Update client en_US pot
+  + 5c870f903d1ee36e7851e280a3ca2c38d32a140b  Update client en_US pot
+  + 37bc86b14b4cb6f49f835caa98b5b04a9cb3b011  Update client en_US pot
+  + 8f52043825ec7bcc50ae86e63048d6e5588bc5bd  Update client en_US pot
+  + c1ea23d54a95d6941a354d57b4b1514f9bdf4491  Update client en_US pot
+  + 1909eaa0179c9d05f15823d2e92c7b9c6d63dfa1  Update client en_US pot
+  + 5d6df3f37687946d41d8257e012aa12b2b154596  Update client en_US pot
+  + 4ef8aac33bf4cb81da597853deaca5ebaf2a030f  Update client en_US pot
+  + 632283a045257ef2a6fbd6a4f2d362094bbc109f  Update client en_US pot
+  + 7ff126e1a4a0bb58f256f6fcfe94b4e7a64553c3  Update client en_US pot
+  + c10940ea0372e55522bbe6089508f38b622923cd  Update client en_US pot
+  + e362d3fddcaa6d27f5d6f32eb7a4174ee1c0cc88  Update client en_US pot
+  + bd30f862c9872c2b8677a138d470f801cc1cb73b  Update client en_US pot
+  + a1d1a1d51653bc8cf4710798205cf899617890e3  Update client en_US pot
+  + 6855e41307f94c9307327162fb7415eff487ee0b  Update client en_US pot
+  + 999787625f60ebd7334ac64ef985682692207deb  Update client en_US pot
+  + cfa858f2959f07eb86aef8f32e4e841aa2361b1b  Update client en_US pot
+  + a94ded37432c1aba1f1d28a8a58629f7b4feead7  Update client en_US pot
+  + a5a118d5fc6d09b70ad32873bfdabba18afd3845  Update client en_US pot
+  + 5d15e63bcb682cb060de5cf045d2c64688a48a56  Update client en_US pot
+  + 267e3284c871f217604190c88fb20bd5edc63aa1  Update client en_US pot
+  + ed4639376f07c43b982f679e15bbf719ec49fc15  Update client en_US pot
+  + 80c4dcf874539e93abeae8497df61757f8e65fc8  Update client en_US pot
+  + fe1a9fbe403835d169fd04ee117459589d60e9b7  Update client en_US pot
+  + 9d48126e0da342c7116e0d2bbaef615f21bbf837  Update client en_US pot
+  + c91dba9ad7f8b6e069caf7f34c900da1e6fd609b  Update client en_US pot
+  + 36f5a1fe24349f6b169da42bd54d6582da288b9e  Update client en_US pot
+  + a36330343402f4c01130f3dfb947d3a70cb70801  Update client en_US pot
+  + c9df772f8d167eb0a69a67748307c01d17a189d5  Update client en_US pot
+  + f65294582dfb93ebe1f714b2f8344ffca30182e1  Update client en_US pot
+  + 4ab100b0be318f6d6e11487a2c6683e613dfe6a6  Update client en_US pot
+  + b3166139ac3a7df195d5e0487ed42e4b9505062f  Update client en_US pot
+  + 27eb6be2d628816a3555398df853afa538d3913a  Update client en_US pot
+  + f21f51f545d714eecceff78e0d97a7e5c7acfb6b  clang fix
+  + 9d15f90ff94a216513708741c1d78e1b59aaf12c  Update client en_US pot
+  + 80e6f29ac16437e589ccf685dbb01274fa94f3d7  clang fix
+  + f46ef80c6e14bf672f02e7add81f2604abab78e6  clang fix
+  + 4fa2cbb5c316e37d545197f0fab364f43836d412  Update client en_US pot
+
+========================================================================
+CHERRY-PICKED TO BOTH (402 commits)
+========================================================================
+  master: 3cdf20da0c634330f223d70dd4bfda4d3c797f21  fork: b5badb3f40cccf5f25d88fee0c3f8533bd189abb  Show the out of memory message for any module
+  master: f75e75beeda23f7f5502ee453981ad8aed488407  fork: f69c73daced4cd13f62834d8e870800615403e80  Add missing newline characters to log lines
+  master: c7b54b6667826e3dff1dd46094060d7a4eda84ee  fork: bfddf04bb529fa2a631a4c31744eaad302278586  Load AddDllDirectory on demand
+  master: 7bf6af158a9b0715bb17ec232553562cda3d576b  fork: edfdecb4021cf716d658e1f91b747d6e94a357fe  Revert "Fix missing onExplosion trigger for satchel charges (#4267)"
+  master: efb2edfa853aa9a95f39ed9a843c3230b2e627cf  fork: 463d0906bff951b3a13a8092f814dd262fe20d49  Fix Persian text shaping in CEGUI (PR #4338, Fixes #4302)
+  master: 1fb80dcf4adbed488a015cce1af7865f983b4e99  fork: 833f155922e1f766723d846a59edc7e16718abf0  Fix server shutdown on Windows 7 and 8
+  master: 3affdc45c37e09c91d6e7a2365371bf7c0bf2e4a  fork: bc3121ec981d3a8aa47d48f4444b3c1dff2e2050  Disable _set_new_mode
+  master: c86f493a6ce2f5128f373534687d6eea0f482bee  fork: 3160b4aedd68349fdacace3b087e3337dcc906d8  ehs: Fix datum buffer size
+  master: 53524d94aade1e6552cae2f41bd04e6cc033bbb5  fork: 83e0e0da2fd0b4e9a7ee61c70562787670b02eaa  Tiny fix for tinyxml
+  master: 5754c02fbb5d41d9822e2a9a5e03c9c1124a6a87  fork: 8b6849187d2fa1f146632435f56c5032ad016609  CXMLNodeImpl: minor buffer fix
+  master: 31e051b594aa345d80ac14b9e0ce8cc0b1b6bd84  fork: 0dae3f77d4e74a0da02c6c93c8949b647f7ca68d  Fix dialog text disappearing for No-AV dialog
+  master: a49ce037dab3714d58ebcdfd07a4aa4a50e58090  fork: c4485b2fadfa5c5d93e78e935cd3304c88503622  CPoolsSA: properly handle allocation failure
+  master: 5d690de228fe5e89d103e268fdcece19cad52e81  fork: 7531192d9867f9a5e7c43d7c3d9b021566ed03e4  Addendum to 53524d9
+  master: 1ab5a34c0fda679edd6b6bf91ed61a49e08d0bf1  fork: f42e28384e41012bb9d64621417af95435386ed5  Additional fixes for tinyxml
+  master: faf6824fe6cd0d6abbcbccd7ec4c67563238f666  fork: fbe92d3f8b06b9a457fcf70e97aba28b675d5f21  Copy 1ab5a34 to our tinyxml copy at /vendor/
+  master: 0e965b493cbf9aa6390c176290fef9d306ef21cd  fork: d163da4d728aee687736c8fb4235f22774b16b42  Minor buffer fix for cegui
+  master: b129888ba71205063d7c9892a825563495c2340a  fork: 3bf3bf28d0d9ab8662ccc7f0934f82fcfc677e24  Fix potential bug in CProxyDirect3DDevice9::Release
+  master: f0afa3c99c41d3cabf5625a299608893292b3e69  fork: 622a698c1f90340c3150415c7f3fc026315bde07  Fix undefined behavior in CClientEntity::CallEventNoParent
+  master: d14f4906993dc280229def399cec2ed15ec19653  fork: 6060869b44974ede34830f23b4d491bc2834047c  Fix undefined behavior in server CElement::CallEventNoParent
+  master: 0c1e286938af2174ddf6cacb03f6af36c5cb215b  fork: 8ef5c969f1e18de4bea9c665a25ed2ee0e7a3ca1  Fix bug in arguments of CResource::DisplayInfo call
+  master: 4e612df6d3fd360c26dcb6579946537a71ad3bc1  fork: 06e36daa9ac9e600da65b93d2d09e420187b3e1e  libpng: Cherry-pick https://github.com/pnggroup/libpng/commit/7cecdcae0715bbf7a4b643071e0d39f05d5e7f52
+  master: 4b2fcf4d372338ea9e12e616e493e594f279b18a  fork: 34ec18acffcd1df546337700d5d8e67f0fce1397  Update cURL to 8.15.0 (#4358)
+  master: 2c522d965a53880bc9b486dc5eaf95da1bc064df  fork: f147dea2d1b84d6a2f85e3094658c5d8882147cc  Addendum #2 to 53524d9
+  master: 242aeead0eaab3d4e55df364f4f42ecd52536b31  fork: fb22b7c3553b811a05bf6a3faf4cfdd0cf38b646  Fix default skin error on launching MTA
+  master: 4d4d6c95addb0b6fcf002c9333178477f968dfaf  fork: 2ee5c1a211af9b4c08e4ac19cb73f4ea4147791e  Freetype: avoid dangling pointer
+  master: 04b8ee693ad26bed5b57247d8d94ee918fde4caa  fork: 64358f9e661c832510d736814196426ad418587a  Small tweak for CLuaUtilDefs::Split
+  master: e869dbf90dc77e288f0fc587bdaa4ad40b52a41c  fork: e662f53ced3a408c796d3142c64cdd8506e589bd  Fixes for CVideoModeManager::GetCurrentAdapterDeviceName
+  master: 9e62309ab1626641b19b5096304c270688f4fafa  fork: 25796818d999a25c4fcaf41160b0105581dacd25  Addendum to e869dbf
+  master: d70219c1f2894f35d89c7787559bc3718fa00076  fork: dd2799c42963f89fd5e56d95a487b2b709be1e4d  Improve CVideoModeManager::GetCurrentAdapterRect
+  master: 582b0c154c82973c2c5f89ff4e2d7463800482dd  fork: bcfbb04ae2a47695b4e4243fcf8cb531baa7b71f  CVideoModeManager.cpp: Bunch of improvements
+  master: 57978aac28880ff70b39be13399f883d83dd08b7  fork: 08722cb9ebbd3d12b68128c2941464c6254fdd45  SharedUtil.Misc.hpp: Various issues
+  master: 810b33e55acbe015effb348d0bc314a11f6f80cb  fork: e7245c9c1af7251f509639879e094c0e1e8a5187  SharedUtil.Misc.hpp: Various issues #2 (Memory leak fixes too)
+  master: 41b65762e266350b79081e7528fcb542f6c51ec9  fork: 46ced0f7d354ced81b67bd477d69b32de07872b4  CFileLoaderSA fixes to reduce crashes even further
+  master: 45d6996c965c72d2fb6c967b57d9b9b1351bd5d4  fork: eab7ec8e6be63e71ffde704e51adca37e1383bb5  Refactor bulletsync and add checks (#4381)
+  master: be10139c26cb03c314ba93a74f13446bb42a304a  fork: 1c996433719a14bc4a6797cdaee9d4b30475c550  Refactor Main.cpp (loader) with improved reliability and code quality
+  master: 3f306df6b26deeddf12d27e07683050081c4c6f6  fork: ae739d83cefcfd12e6ffca51be5c7258378d60cc  Addendum to be10139: "Refactor Main.cpp (loader) with improved reliability and code quality"
+  master: 5843fe94e6cb70c16b9b2ab341f8a9ec36159acc  fork: 27264f20fdadecd0cdb9abc08e627709253e3d59  Refactor MainFunctions.cpp (loader) with improved reliability and code quality
+  master: 7004014c3f4d09b02602a8b7522bfc0f591e4a48  fork: b9d5249563fab573af550beea6bf475f38d75344  More checks for bulletsync
+  master: d2ec4441868b267eb03c5224eb46370e2b24be37  fork: 802508b024bed9479e00dc045d7944fede5a1cd8  Update launcher
+  master: aa405a900545eb7ef614b0329ed18b523aa535bb  fork: 8d3d8c1567e7884fb188617307da6e14a7c71aa9  Test fix for build error
+  master: 3b2b5be4146e09039eb9e9e6ac134550e297bad1  fork: 8a0b5e4ac8cab4da1e38703c7556f96ecc05457b  Disable launcher security features for non-release builds
+  master: 45739a063504708b40c51cd5e657522c6c0cc51c  fork: f0032ea81a5bde1078800366302ba2395d003fe4  launcher: Remove noexcept for throwing functions
+  master: cd46ab2316a96dff609e265cb118621ccc3bd3a6  fork: b81419d53ab8b38525990b3cc750e38a2d16adaa  Restore old behavior to wait for game to exit
+  master: 0592e1c7c4a74457cc676bbd0701042e5bd8281d  fork: f7ecfdbc807d7fc20696e062b4274e1f2db687f6  Add missing include
+  master: a6f391ac05cd07e3676690bf6178913fd8bc10d2  fork: f4d5c1bd819e1d26eae21af6fde34a0e76a67cd2  Use correct type for PEB.BeingDebugged flag
+  master: e6a85b92d4b7b5521dc62a4657ac5ea268f1b442  fork: 4268ff82b60291b6293c5b3a609834e723faccc3  Fix crash when requesting CJ clothing model (PR #4419)
+  master: ca06762413833e1c7f8d17970334607763414a45  fork: ef963645c4767f80c88587ef4423a6fb9b7f3a3d  Fix bullet synchronization by using total ammo instead of ammo in clip (#4430)
+  master: f3122d9fd4afeee9278cbb28c14fce0fdba31f80  fork: ebbaf3b590ac1af0772bfaaf10e93837e28ed15d  Addendum for commit ca06762413833e1c7f8d17970334607763414a45 (PR #4434)
+  master: 5a622158455574251582f7a95c3b287e4994e9c0  fork: 616b2ef7d71749f119671ef12a679999bb2dd6cc  Improve CProxyDirect3DDevice9::Reset
+  master: 7eb87007298382ef01eb190f6e7b60ceeccebaec  fork: d850aa7d2b3d879f946281a8d477fdeab1b4a018  Fix counter logic, mem leaks and bugs in CProxyDirect3DDevice9.cpp
+  master: b162464834c7f7d5e48bd0757d01e479e3043867  fork: 93cdc5b0dbe8221c243c7b91ffd83e28b55045bd  GPU driver handling tweaks that will improve stability for users affected by a range of graphics device-related issues
+  master: c7652c42883948fdd1999e4e4eda766463cb60e8  fork: 36b85b2f69c1462f9ed26a2e4e676561f609d109  Fix typo in b162464
+  master: 8b533400069d30ca48a1dac5f9fe0fe6279adbe0  fork: c540c652ac9ef0a39424b9b0d5f1ccbd7120f3fa  Fix #4442: Revert unintended change from b162464
+  master: e0b50f90cf3aa092095ffb51e13a252010b24dac  fork: bfd1306c59f494512c0eef7f283929e8665371ba  Fix memory leak in main menu (News browser)
+  master: 10c5bb7e7b497f42e4d5e86b16011f4ba9a31eb1  fork: 19095965c81de617ac0b65746f705f8572c97999  Update CEF to 139.0.40+g465474a+chromium-139.0.7258.139
+  master: 265db7d78d0a06382fa56681d1cb00b1dddc7214  fork: 6f96178acb185b44b1240dbee531df7ce4bd71f9  gxvmort2.c: Fix C4018: '>': signed/unsigned mismatch
+  master: 65263615f00815c70b9efc39f99f45cc5b1212f5  fork: ac689ce103652e463d25f4270ef84818826a9afe  Minor fixes for CProxyDirect3DVertexBuffer
+  master: 344922ccd7a8ac3e0de2fa74e7ec6d822ad2a15f  fork: 33378b34aa79d94f5e619237f4368fff84f29e32  Launcher: Rewrite it again (much better practice and robustness)
+  master: 7e4346cc91ea112a45f741f1ca2692d5a372e8b0  fork: e8fa102251bfac59ad56fa50817c9bb7ca49ff72  Addendum to 344922c
+  master: 1d4082594786c8c67fef8255550e0855dba64bc5  fork: 32929c1361bf8f86f77888b215590490449da997  Fix major memory leaks in CGUI impl
+  master: eddb378913f9c1db80b1db5d1575c359f9f82568  fork: d23ff86f9af1cd9badd1699d89f6b4110d74eab7  Small fixes for CRanges
+  master: b8b11a2b148bf222220c9c2a36b2d73fd3cef2fb  fork: 28cd1e11fb974c53eb9314df93fbe374ed5f031f  Update CEF to 140.1.13+g5eb3258+chromium-140.0.7339.41
+  master: 5dc09d9151ee625d49e22b381108c0f7cf47fd92  fork: 806da3756916d093aacd1882a85be4c24a56ab00  - Fix GTA memory allocator issues like the notorious 0x0032F4DE crash that just wouldn't die - Massively improve streaming performance and constraints (CMemoryMgr::MallogAlign is a big part of it)
+  master: c9aa55c1cb3ef58ba8118824f2f041fca2919efd  fork: c4f01fc913858ff933ef90ac3009959349e08f4f  Update CEF to 140.1.14+geb1c06e+chromium-140.0.7339.185
+  master: 8e4f2453ca65f8c44672d29b2288b14a77fff9e4  fork: 2bedbb1a7904914c04f70c7db21673e728e4e77c  Fix buffer lock failures (and the #4 most common SA crash @ 0x00354B1C)
+  master: 0a0a6851477b73869ba7263c9ea307f8591a47e0  fork: 363e2b52414e15a88cd58931fe66942f6a9f313b  Different approach for 8e4f245 (Fix vertex buffer lock failures)
+  master: db63a1dd4633fb7f1f4d60b26793a30188bf8e49  fork: 86e63cbd1037e8104e45f196f35a04ecacd638b1  Avoid d3d9.dll crash @ 0x0002A733 (Top 5 most popular MTA crash) and add known incompatible d3d9.dll interface.
+  master: d084246b552044a76158529f67396e864e805c05  fork: d585ea6dd9bd07572e6128e090abf67b03f5d8c2  Addendum to db63a1d: Correct documentation (that, and commit desc, was wrong: 0x0002A733 = 0x0001F4B3)
+  master: f923b9452899ee60923c0b64e41387e4c4fc3e36  fork: 4dd465329b7f8e90dac886c2654eba9eedd4239d  Addendum #2 to db63a1: Fix comment style and add another entry
+  master: 32d4acbe109b0067c7324cbc23e2f764789ba16f  fork: 9eb15a7b2847000b76344cf371fd0b3b4b8d798d  Addendum #3 to db63a1: Fix offset notes (1 regressed, 1 missing)
+  master: 1f6835716e607c9eb11fcea206e5b29b1cb76dfd  fork: e527386a89790f8670491d06400be0a5e73970c5  Fix build error from invisible characters
+  master: 96e88e84739a891c0eedf597ea3b0c6f69cdd3f1  fork: 6765ec06db4be38e25ee430650955fb3a35b62ef  - Fix leaked vertex-shader references in the shader helpers - Fix Begin/EndScene mismatch in OnPresent (potentially calling EndScene() with no active scene > D3DERR_INVALIDCALL > messed up render queue) - Fix OnInvalidate()’s EndScene() call to be effective (Before, it just returned D3DERR_INVALIDCALL and didn't properly flush)
+  master: b59fdbdc4e5e59327f5d0126018209e3fd159f44  fork: c69bfa00b4d5afb176037ace1797a3df0fcf693c  CRenderItemManager::PreDrawWorld: Fix D3D COM object reference leaks (COM objects with dangling references), GPU resource leaks, and avoid device state corruption
+  master: 0787b5983c6837351828b1377c82a0620dee9570  fork: 5ac6e3b071bceca859c81f5fe0c2c3c984276209  Small fix for CRenderItemManager::SaveReadableDepthBuffer
+  master: f1c2a225f5c853c484201abd6d44f417b5f3e3dd  fork: 0da17db516f5ee3fa1734355f9744ce4852a29fa  Misc coding guidelines conformance fixes (from my recent commits + extended)
+  master: 0b530dd0e4f5b9ae0936aedbc132e5d8d71b8656  fork: c62fc88957dcd41682ec909cf41903578103b839  Addendum to last
+  master: 24e9e4f89c5b6d3b41db71db217c2d7c0207ca6d  fork: ee2f3f3132c7624d86463107da794e38212fb796  Fix various unsafe vertex operations
+  master: e556d42df90151d1fde018f2780191be24be325a  fork: 7a3a604221a6d072fb2c487cd09c03a1e1fdec4c  Further reduce the likelihood of alt-tab freezes (Not fully eliminated yet)
+  master: 7a0b8f015062c953324e9d949cc08db8635337b8  fork: 3390d220263ff85fcc8f87e443d9ab957c392ef9  Addendum to e556d42
+  master: e58cd393d46017cc148433884b45c40e1a94dcb4  fork: 9a6bac72b185812c373d18f96977aaf68d20e642  Fix recently introduced log spam
+  master: 309bfab6910d592936f9244b7dd04271da702e22  fork: abafccd74111b564399339ce2244ee59c11788fb  Addendum #2 to e556d42
+  master: 4716e6a94eeaf9560cf42a83690bab0aa84307ea  fork: 4d1e41d32378ee3c3fcfe51bea1d3e214b9ec6d2  Addendum #3 to e556d42 - FINAL, CONCLUSIVE FIX for Nvidia ALT-TAB freezes
+  master: f498844031a427e76a0c7e7f265211aa7cda4408  fork: 8d54de85c1ec488cd31b48f8c2b1650578b1c3db  Revert "Update CEF to 140.1.14+geb1c06e+chromium-140.0.7339.185"
+  master: 74d27cc59b12d40a767514cd5341d1e7ec4e13b8  fork: 910515b8c74b855e63b94e5a8a949029c4889afd  Revert "Update CEF to 140.1.13+g5eb3258+chromium-140.0.7339.41"
+  master: 5a5fbc5684b957aa62ea8fb5bd9ecf8e267c9f65  fork: 6f3369b88f624ddd4d91b4cd94e53528f9177643  Addendum to vertex buffer lock fixes (Return S_OK as GTA expects for return values)
+  master: 5b6530e32285a6a96f07d39f8ccccb13378f3ea0  fork: 3640a2e1879deb16154b5cd1ff13ea887cffde41  Addendum #2 to vertex buffer lock fixes;
+  master: d0dd8002e8a4b14e4ed0117b616f222007babf9a  fork: 2a6c90a132288714dba9bf4ce636289ed0224496  Addendum #3 to vertex buffer lock fixes (after 5b6530e)
+  master: 53097a65801147814cd4d98c4e01277400d6bb5e  fork: 9ed74239c3b20db7c4abc0b3adbe89a2f1be210a  Addendum to e58cd39
+  master: 3779c5ad9f697b6951d396c574feab922aa6efd2  fork: 171c976de8f08f46679835d566709d7f8df4dc03  Improve heap safety in CProxyDirect3DVertexBuffer::Lock
+  master: 97afe85129c114f20bef20c0a3144ef8970400a3  fork: 73fb4d47d2556520606b76d72775921975aa16c3  (Heap) safety fixes for CRenderItem.EffectParameters.cpp
+  master: 9f2a17076b4a9fdd3c7637c0f5a343708cb30512  fork: 2566ac6be8c0f4d44e3c388e7365530dc0b83263  (Heap) safety fixes in CRenderItemManager::OnLostDevice, CRenderItemManager::SaveDefaultRenderTarget and CRenderItemManager::ChangeRenderTarget
+  master: 4505174868f125e7961cfc3caa54a757096e920d  fork: 94caf7367a3137fe0750cf12b55e815f33325dae  Heap safety and memory leak fixes for CDirect3DEvents9
+  master: dceb776287db8d880524b6d9c16d980518c68222  fork: 5710bd2dcccf69bfbf78468b708aa75bbd47f807  Addendum to 37d8d4e
+  master: 1b37d37c8d37880ec1711ef29b422a4005a82178  fork: 1d9cd490edd87700e004074ef66fd73d4b068f78  Addendum #2 to 37d8d4e
+  master: d3a059bef4b31a5e65c2ffb86eef831269febee3  fork: d8db960ce52be478a4d0c2cd5e5e0d5b9f389f40  Fix potential regressions from recent refactors
+  master: eb276d14b2b29f87e95d8b8e09eb07e17de117e5  fork: fa742c12f522eaf1e8ed645f82e86182e2fe8352  Fix memory leak in case screenshot fails
+  master: e885340847b8c01ce28ad98cec1a6483f248c38a  fork: e366e9cc36985432001b31ca69ceb474036e8233  Fix crash on fresh installations
+  master: 20a3a1f90687cacf46cf0a95c875899e3368160b  fork: daba7aefb2494696b016567dc5138497765c231a  Log and advert crash in CCore::OnPostCreateDevice
+  master: 5ad35b46004f4e758348a1a0c0b1024d4becb3c4  fork: ad044dbcf331a018267f44eaf6c65e2bb054d9c9  Fix typo on building creator (#4501)
+  master: db8a1741272295b4c261c929a77abdd21b35c266  fork: 32b50b090e53608dd6646caefcd1a3e2b9c8adc8  Addendum to 20a3a1f (Fixes some other issues as well)
+  master: 8df5101f54b39be387a4ed4649bc89008dcfaeb5  fork: 5a3494c9d7234822f7c6aea9a827ce1fd5de99c5  Fix UB in CProxyDirect3D9
+  master: b970eef1f76d58e765c899ac81dccdfb54769f23  fork: d756eea0b8db8e9e46519dece8e5b563cf44e0da  Fix borderless mode colors & brightness (for real this time) as well as a regression
+  master: aff62e38804d5fd179adb98546a0c988b07df11e  fork: 133d9437230f962deee00cc70a676676152f2849  Fix build error
+  master: 08279e7844ede5195131d0b96fa07e0a2aa8e3c0  fork: 4343e491cd0f0d1d2b32903c8b13e0a1d8c1265e  D3D fix-ups after refactors #1
+  master: 55847ebfcfd5dc392c48ab3c68e74237399173da  fork: c13aeeea500b8c53649e3d8a380b6a32abe8f995  D3D fix-ups after refactors #2
+  master: c029a6f2ac6cdf54ae5e452c118abf4b11eff1ab  fork: 57a2ed9b30b4d53c61776d4a06ba46ca3ef5d707  Round #1: Fix 10 memory leaks in Client\core\Graphics
+  master: 1f46cd7d1ba2c5f095842ce5556529172a574314  fork: e02691119cddc5c99d31662934090f4bccf0cacc  CGraphics: Fix additional memory leak
+  master: 4159496cc0b751fb63420722487b8601e70af3bf  fork: 6a718c74b15bd143093eeccbc4c306e0729271fa  "Borderless colors fix" concept > new "PostFX" settings tab (Supports also fullscreen) to let the user decide and customize. Disabled by default. Also switch up technique for the boosts to tonemap, DWM kept ignoring our values and just applied max all the time, which is a limitation.
+  master: 7363d853e32ac9ce63f4f3c1ec264c2eb1a95563  fork: 621771563f569a803c7c56a13f01cc880e1c8155  Improved settings window with adaptive horizontal size (vertical impl was already in 4159496 by accident), leaving more space for entries in most locales. It will now also not cut off the left side of window, as it did on the smallest resolutions, and the vertical impl exposes previously unseen entries in locale like Arabic, for which a more extensive fix is still needed though.
+  master: f2e93f2a5ab785bf8890c1c16c379753e804d021  fork: d1f8162b0675ec2f8d66dff9df70fb627b98b676  Fix mem leaks in CSettings
+  master: d04a8ec77e27647b372226d2f84682bb9f003f16  fork: 8052d646fce35a06ef7dd1933b2ed11350932d64  Addendum #2 to f2e93f2
+  master: 293100c0880353d5083b8e6ad76c6c1ceb38253b  fork: 737d587131cc4fef5f2197fb89acab2c8d33361d  Fix main menu memory leaks
+  master: dc0fb96085ba476bfd8dcd354e96e8ffbca5f484  fork: ea949b23da947093bd14744d0ac27cc97db61a9e  Further improve settings window scaling on low res
+  master: 86ad47c36eb235422734c4515f005eb5f2135fa0  fork: a2d20baaee82ffd0d83de985dd8e11f3cb917956  GUI related safety tweaks
+  master: ff334d50f2e945deb6dd3584d6ebb179eee9a504  fork: b1623684a94944f2c91834dd9120edd0821f945d  Addendum to 86ad47c & dc0fb96
+  master: cd7483388afa3a2cc1ef1e532126e8bf55d9a4e4  fork: 2425c4c7d74815832ebe6e88fdcf3c27c6b4a312  Addendum to last
+  master: 49ba65887f11ed5bc75b0ecee53155c805c6ab8c  fork: 251b8ac8f0b2e4a416073a700139f9925248c107  Addendum #2 to 86ad47c & dc0fb96
+  master: 96cf6e36f36d33daca69201af8a2129524e41195  fork: b596e877474d8e85d537f6f01f6f2082b70d90b6  Crashfix (uninitialized ptr) (#4508)
+  master: a17747858c1fdddea7a25cd826fcaacd1bd3f61a  fork: bc6e7c0b3ba3e5444d9fb8326061dc1abd169f81  Fix GUI related crashes and regressions/bad code
+  master: 0766e59b53d088f5c39d46d02bf6fab7fab088dd  fork: 8058af5f8c8286f1861c1eba2842452296d43f7a  Addendum #1 to ca5ca19
+  master: a68eda21128fcf7591ee7c6cdb240a160cc7258e  fork: 2daba7b00a48371a7ebd0c66b1ef51dfd434bb7d  Update DX SDK requirement
+  master: bd4d0f7f773937e3eb3ea805398188acf632fb1e  fork: d0d38bdcd640c9364d897ceffed6c20c8a0249a4  Addendum to 6e19a73
+  master: f960ec0bfd06e8554b046f8a70469d02f05b0012  fork: 3e43e7ec5462f46e916f7f778b0962e801c1dbc6  Fix some memory leaks
+  master: f7057c89b42522e54496e17aca82504d89ade5a5  fork: be7cbacf3716a47c1e7ae96ce14d45d621ece35a  Update CEF to 140.1.14+geb1c06e+chromium-140.0.7339.185
+  master: c99f84df33eab8e1f26e40212bee38e4504c9c10  fork: 5b8f720cd924de5564bdf99ed98658111d2ce902  Fix crash in RpMaterialDestroy
+  master: 6d92b58fe02c26efbebf67fe28c398bd2e3c1dfa  fork: 5429339481281d528fcbdc8fbbab9bec1799ab7f  Fix crash introduced by cf3c602
+  master: 50c744e2de59ceada311e91c53246a6e79966292  fork: 1ba43ce07656a0fbf328757afd355b76c73036b5  Fix performance hit introduced by db8a174
+  master: f1ed5e323d8f18c02694f2d3708be4963b4d5141  fork: 56327f32d87e99deae808e8147c6dc34fe05c751  D3D fix-up #1
+  master: d064fcf22351fb9843d167a90de79fbdf613db7b  fork: 699dad68b87b20f0ddf5ff7da2ed1148ba96dcd2  D3D fix-ups #2 (Performance)
+  master: 333fe9805aab94a0b0b7d8a74cdc54add6dfaf0e  fork: 5229ad437aca3f36d983ef2f18ee0aae54c97a41  D3D fix-ups #3 (Performance)
+  master: dfbb6220005e93af3d37bb037d2265e1fe2fe358  fork: 4914b3ca8c47cb6850408ac21539a2dc5ad34e04  D3D fix-ups #4 (Performance)
+  master: aca7cc0f759e06ca2608797016c506836b399059  fork: b2379644b89705b857b92c52dbf2d1658d96bc70  D3D fix-ups #5 (Performance)
+  master: be0307fa5bbaf27242fbe438ef6c0c93528230be  fork: aff7041242bf79bcff406f0f3dd64c23838798d9  D3D fix-ups #6 (Performance)
+  master: 75a40f13c1e93dc193e4cfe744917614293b2bfa  fork: dc8ff6272c3239a87ab0dadf5aa95bfb0a1506d6  Undo accidental merge
+  master: f1571e00709a5b54d0b62250f4a42af468185d5f  fork: e75b07387020251130cc0e29a5862d68a182590a  Fix audio crash
+  master: 71ab849d912870904211ff199119642f9a4b730e  fork: 5c0c283e0d158267693d2b273fc8a0e3e13fc7f3  Addendum to 651cea5
+  master: 778207b5c59a197a32957e47e38f870ebca803c7  fork: d68171c0d93e4e611ec048fdcf5b19eb79943a96  Fix heap corruption crash (No dialog) @ GTA SA 0x4fc66f: Engine sound type 4: Accelerate or type 5/Gear change
+  master: 16de0e1377d4a6052309918f2280bc672485c905  fork: feae02eec36c9cc1f72145d0897b9b5efbbe76c6  Minor audio related changes
+  master: 0981fae57d9d622115143b96a0616fa9aa52a412  fork: 78ae2396285d9f4edcd7acc993cca7fc89009a7a  Addendum to 5429339 (Server list crash fixes)
+  master: f5aa603cf595a302a6fc94f5cc656b4cc00fd7b1  fork: 420a6ec78b38fa439e1216f453618264c5f52fc3  Addendum #2 to 5429339 (Server list crash fixes)
+  master: 466aff51c5293272c46a76ab843ace8a1c3a84c9  fork: 0902200bdf828fd81c98091345249cd74b5c315a  Fix old server info bug (Displaying stale entry)
+  master: da3fabd0626ca23b2b87d3748b066d0a88e617d1  fork: 79331c369784282ffa33c383a6bc0e9f5e578817  Part 3 of "Rewrite crash handler" (after ca5ca19 and 47bb4bc)
+  master: 47e049223aa032b3650132798485467b658c53f0  fork: bc81c454804b1c62eb64f10395b1499e9ed0da2e  Part 4 of "Rewrite crash handler"
+  master: ce11d5f96f90892dc72f2c28417e547f20178199  fork: c5fd124aece4fa11002ea81005c469e2f2f12185  Addendum to 47e0492
+  master: 9705d5e3f3cabcefb0029b7d356143f200746d8b  fork: cc9587772a6845fa21dfd717f3bc84a24ba3ef76  Improve serverinfo (This still doesn't fix stale (i) button data)
+  master: f20610e0344aa5401ba8a427558020e964f37dfd  fork: 33625c2f5516150fe9a125fd162a95abcd5df10d  Update CEF to 141.0.6+g5bb5565+chromium-141.0.7390.108
+  master: ddd816a51be1036de8f910147d0696a2f9e29e84  fork: bd7a2af310adbf41a00980db6fec209a2bc43afd  CEF memory leaks #1
+  master: a9be1ec237524484da2c10d350b97d4a750c7be5  fork: c27d6b3eacefa566854c9d721455b53825fecff9  Fix SA crash at 0x002a65ef
+  master: 2580ae364b23650e9f5c045b5b4ac15e11676ec5  fork: f17490e3bf6c82e8b3ff49dc98038d438fe4fa02  CEF memory leaks #2
+  master: adc738f00698d718bf3d5706a461b643ad83ade6  fork: 2df1c14277ba40cecca9f72328df31b9f39040d8  Addendum to a9be1ec - it's more complex than it seemed, .. (read below)
+  master: 042301a26a023c0b3a544ed2cd5f9893a2f2da18  fork: b2dcbf70a594b461309ad875d86165ce815e87f9  Fix build
+  master: b926956e745efd44eda59d9c0d352a70c1c22969  fork: f09ede6ca50e49738e8c99952d696017e5697d88  Better crash handling of disastrous exception types, including STATUS_FATAL_USER_CALLBACK_EXCEPTION (0xC000041D)
+  master: 7f7bf76c250877f5af92bb420d57ec059307a690  fork: 297fea1bf5d3bfd051f905989053d97fea1a40bf  Addendum to last
+  master: 9fc3d98040c8bbd9a0fc14ab934a8e44b68a1c5d  fork: 6f7a60995399314eaa6e625bdcfe2593bdaab66a  Update CEF to 141.0.11+g7e73ac4+chromium-141.0.7390.123
+  master: 76950251d8a8a692f806b946e68de87b6aa04665  fork: 11bce2bcabc5060d6ff019aab2f84a99d32e1cff  win-build.bat: Default configuration should be 'Debug'
+  master: 84af0028f79b0168a74258fbfe70a3486f6913a6  fork: cede6da54eeb1cfcfaeadd2525479d055903a738  Revert "win-build.bat: Default configuration should be 'Debug'"
+  master: 34ec550c9f623a36af7365f52dae91e832013687  fork: b5cbcf2950b0d457afb4748a016ce22ee52df3c6  Addendum to last
+  master: 6173c2f5e40fc9316001ca9b403cadca6e996f43  fork: ea333358ad1b2d0b59ce0e0fee01bd41e3fa68a2  Crash handler: Minor improvements
+  master: 5832ab0c3c8eb1a1a7e98ad04b8ea9053d21e066  fork: 04b7b94d5dc5e82180eec2a23fe2abfdf725b203  Addendum #3 to a32fc5f
+  master: 2e56bd096e474c1538a84504a747bbc3b3b3c51d  fork: 6887db811442f0604841d2ab3a16074d6ba50d05  CEF reworks #1: CWebApp.cpp
+  master: 03e039a40cdce1437896c28ecde414c535f2cad6  fork: 0fbaef3329a0cd061d77ccc275517ed01b748aca  Resolve CLocalization / CGUI memory leaks (#4527)
+  master: 0807dfb234cb62d77a0a65a76bb2b3fac0070aa0  fork: 6a7a5623c2ac9a931edc0117fcaf9425503aeb59  Fix CEF rendering
+  master: 0c91451ed0950c442588efcb628fd9b4eeb1170b  fork: 26d8388af6fd730b487c21c03e696f1d2da7fe95  Fix another CEF bug
+  master: 6df0ec47cfba3fa51215cc93803b3c41c1ade765  fork: 50b3a37184ae9f30b7a1e93dedfebba00a31fd0a  Update CEF to 142.0.8+gaa285ed+chromium-142.0.7444.135
+  master: 7afa0cf5d7b49d34071c6d262ab49c5e24ec31d5  fork: 3af81823701362e3ff96ee29db3cbb7b8868346d  Fix SA crash @ 0x002A65EF (0x006A65EF) CAutomobile::SetupSuspensionLines()
+  master: 0f4915e2886d11884775d88a29beb35a9c64c86d  fork: 2fd62d07e2bbc8fe34aac10862d03d52f116bf21  Addendum to 6d29fb5
+  master: 3413ebf2cf679d13d0ccc35836a60dbc91b57c7f  fork: b85bc8f609a0f065fe62556d38c5cb6511f886ee  Fix youtube embed not working on latest cef versions (#4532)
+  master: 701b0dd29ec72f2b8fa93e9dfa5bb84f9f904bde  fork: cc4bcc68d2bd428fc521846e5f1e5c0e908d1e4b  Improve collision impl
+  master: d91aeb8b8a5da2e4cf9814e3010a925b41fee71a  fork: 04b59ffb2842772fa60880922df79ad4ba11b684  Fix GUI slider, caret, and selectors bug
+  master: d0fa43101c1fedbedfa4b7aee9957029b9914bc6  fork: 3684ce2256f9b63bb4f22a03683ef777ad81e4d2  Addendum to d91aeb8 (Fix  final GUI bug)
+  master: 4761859f559359a9a0db949cb2aa1e8d129ce348  fork: e4867f9facc36335a257bd44f20c786d88fad987  CEF reworks #4: Smaller part
+  master: 2e2b4a323472f21025b7ff087c7425c7538df3f1  fork: e91077ee65f8ef5f4115521f16eeda260d6385b3  Test fix for bsync issues (#4497)
+  master: 3308359b37cc74291a5487f93604745650ab97c8  fork: 9273b0d153fba9100e27de182744cab4b0760aac  Fix memory leak in engineImageLinkDFF (#4544)
+  master: d2ef26216a21eb2fa9588f07be604e3e2f516c7b  fork: d1e8ebec2a16f32f7f5423923c0818b46cfeacfd  Fix SA crash @ 0x001619EF
+  master: 8a648543e1dddadea48bc193cc31d7a789408771  fork: 9f79d78866396b6189ec6a64c86d20adfd32e851  Fix button misalignments in the settings menu (#4534)
+  master: 95aa1e550ff415a4cf325ad221052ba8a81ddd65  fork: 6ffa19f6249263a7e28db3e410cb8c7916751623  Addendum to 1dc9368 (Reverts only a part of itself)
+  master: b34f3eb18c2a29dc6a87fc594277db6885f0e277  fork: 03755c019956ab09db6fda9810dfe9d3516fce11  Update CEF to 142.0.10+g29548e2+chromium-142.0.7444.135
+  master: 3df252e7f5da6e77b139478ce6452c25a78037c7  fork: ff5d105fd952bd9b46eb2de6ca1e9fe27ada135d  Addendum to 81c457c
+  master: da79688a98e2872499979010c7719d098d8003cf  fork: b6934b033dd79d14e5de54c7f9d003b550100be2  Fix include issue
+  master: 1660597143212c83fe8a74eb9719464f7a3c92fd  fork: 58d15262ce02c1278471e5be27e6b12b300fa6c0  Addendum to last. Downgrading seems counter-intuitive but it's to solve a netcode issue (temp solution)
+  master: fe53eef94d23876837229912e0a1effd181b309d  fork: f6cefffe78ff224db1676683745ef32d02976ee0  Update CEF to 142.0.14+gceaf578+chromium-142.0.7444.163
+  master: 7ad38bb24e9dcb6313136d38e905aaa683257653  fork: 93622c6214ffc9a2848fca5c98189ccafd920c59  Fix SA crash @ 0x003F3825
+  master: c5c0b3f8b99256b6649b2382b43dceb9e560482c  fork: 6112ac6409214012a95ea56ff1739940ee524798  Improve buffer management
+  master: 2a7e01042b9960edbfb331a83e91f0526cc547cd  fork: ae48bef66c09431f8270ecbfcd9bd0cc3176a857  Update CEF to 142.0.15+g6dfdb28+chromium-142.0.7444.176 (#4561)
+  master: 483b0ced73849bc386575addca9556f4411e0b19  fork: 0745deaa960502fcd3668c0cbd60395cf0047440  Addendum to last
+  master: e56a6f88bbbdbfdb9ff0a1827244a63e68ab624c  fork: 5235d33f96d6821c5d6d6ddb3f58272ef3fedb5f  Revert "Improve buffer management"
+  master: 9f95020fc5a0c4662faf62fd83595cc014f0bbc9  fork: 0f62917fcfe404fafa650afd83f7fcb62acb6d37  Reduce a specific, high-hitting crash caused by mem abuse
+  master: b59f4149770d6008540662586f4e2814aa8f490b  fork: 4499e582d5b2a48456bede6b5c328d7aac208b62  Small improvement for CGUI_Impl::DestroyElementRecursive
+  master: 35303176a24789b5c0dd54828cea1beb851e8d6f  fork: ee1a2aab0a6c2ceee6bc00e40b8326506ccf35a8  Addendum to 36ec08c (CEF rework #5) for some more potential mem leaks
+  master: e8b696626e72b8a8bdc66b33d4a76be08f90ecfa  fork: 24c77814bb10b16e870e3d6de2e91e47e3e1b912  Fix SA crash at 0x000CEA92 (0x4CEA92, CAnimBlendAssociation::SetCurrentTime)
+  master: 586b91015b2e71ac52402c218da8387f9d785827  fork: c637d39dbe5c6a676b7c4f80178a5c714e8cf4a3  More rigorous approach to fix texture crashes in gta_sa, related to the revert & reintroduction of "changes to CRenderWareSA.TextureReplacing.cpp (and related)" earlier. Neither the old version or those changes which intend to fix the root causes, have the desired results, so we'll be averting it now.
+  master: 22b6a7507e1fbd43f64524f49088f66c3c72ca5c  fork: b2b800168a1cef2026cb2f0640912528fe8bacfc  Fix texture shader "wrap" replacement (as well as a similar case per GTA's logic)
+  master: 94c1d8b6855a0c7764e0dc814b49e83cd55a106a  fork: 53945f21ee5125d58f8fc80bbe0a0150298c9bc7  Memory management optimization for streamer/texture loading
+  master: 5195145337728a5061f595fb451a231e85ea2d75  fork: df7f304757d00dbd6b20b0bc2cbd74309b4e2a90  Performance tweak for BASS calls when audio file errors out
+  master: 885a7555a69611c1a4cccaaac4323d346f444074  fork: 43b37646166bf1455ac7f7e0762bae684207298f  Addendum to 53945f2
+  master: d6e73b4dcee692c0a8dd2b84cb5b4b3f5ed5d370  fork: 9352557d09304d3cd43530e6188302669cd7e111  Addendum to b2b8001 ("Fix texture shader wrap replacement")
+  master: 708afab43a82a65c4da4df749d3a35ae24dceac9  fork: fd97ad6e23d65f3f5dfe9bd0df60532d375c76eb  Addendum to e5e308d
+  master: 8a16c7028e680baaa8c64e70a5d517699fa0bbe3  fork: bc9fe33bca881ae8b599242fc732ed5321ad5663  Fix sporadic build failure in install_discord due to bad script logic Observed on build server today (one-off)
+  master: dfcfbe1f7c4c6804bc62f51b1405ba580cc3d5d7  fork: ce73b738b073e4d9b39db23a85ee17ff643fa398  Fix `JpegDecode` crash (#4589)
+  master: 25ec9fb6c8a25e01a90866f77485e5d4a274f624  fork: 2969f70ac5a055b14b1bf609405087b27d597ace  Further improve JPEG implementation and error handling. Also addendum to 0f62917 & ce73b73
+  master: a5dca20e28344f58d3357d24a229bfcade038a01  fork: c19c949bca77bf14dbb50518fdf0c2ef7135073b  Try to avert #1 crash from model encryption system-memory abuse by (mostly pt-BR) servers, assuming it's only allocation peaks and that it can be retried later when allocation/mem pressure is lower.
+  master: d6f308d2abe753eb4ec54852680b5601ffcac06c  fork: bb2d6a52abf6646382e5b6d80cb0ddb6041e7776  Addendum to c19c949
+  master: 6360f4d85d363e054a2016fffba4189d772d5691  fork: 5d37348141234704b374883c99050154f8a29fae  Also cover teaEncode case (besides c19c949 that covers encodeString), as both represent the same crash trend and observations.
+  master: ca4393cbb9638e8244726e3212f0cc129ca16e69  fork: 1b4000204d8828c4ed989cee7a129e62df514c45  Addendum to a235955 (Actual crash fixes)
+  master: 42cf239433ec3ce4e7127d1ab479aae23dc7d68f  fork: 0c536804fbd37273d69f8bc1855b89e0bbae6c17  Addendum #2 to a235955 (and 1b40002)
+  master: 4d2b8e25ebfaa069629b298a9acd8122df2cf193  fork: 8d427f54fbba7eb225bcd9ddf296b9968cf5beb5  Addendum to last
+  master: 3537c02c6db17c2cf7aafaf260a6af6ed502a44b  fork: 9d4fedd2977a0d4a44dd2c810fc2c81a7983a37c  Fix issues with texture shader loading (.fx) through addressing a couple of underlying bugs. Has more benefits.
+  master: 70618f620b303d73406c6c89227d311200eb837d  fork: 99fc2fc9b099005675f992c1cd145a6ea068130a  Prevent a class of cross-reconnect texture leaks
+  master: 25c941a41d93b7e1da44d30ff7858edb37bb9424  fork: ae0f0757b32a40b73fb1354845aece1c35ec2af1  Addendum to 5d37348 ("Also cover teaEncode case (besides c19c949 that covers encodeString), as both represent the same crash trend and observations") to make it work as expected/at all
+  master: a95a68ad6c26663c0ef15c0d520817c173a5aa11  fork: ba6efb54f8d624a6dd4546b8422a2a0ffdfe63a9  Addendum to c19c949 to cover decodeString in the fix reliability revisions as well (similarly to ae0f075 that covered teaDecode better)
+  master: 71b6eba36ea222e9f7b108881eb547fc0b019373  fork: b84843c67b39d1eca8191a040c9c075b3e0faad3  Fix server list related crash
+  master: f6f966215f75212a1dabb088f072557a64bc8e89  fork: 99713b3e09c3528a217c723458cd96483718c948  Add PostFX Lua functions (#4587)
+  master: d278dfaac62232411f66d37b2234cd233869df15  fork: a2fb151181184b30de1c5a6d6024a0437527f111  Addendum to ae0f075 & ba6efb5
+  master: 5e2e2c5dc3c1e0a457ebd70ac17280bb5390fe12  fork: a088c9af7cca4d48c61e0c6489d8840895d6dac8  Fix memory waste in CProxyDirect3DVertexBuffer fallback
+  master: afb2ae0e8f7cc2faa2757ae8124fc4a959ea1335  fork: 65f5afc816551310aa00c289c46635a700982058  Fix SA crash at 0x00897C28 (dump name wrongly identifies it as 0x003F0090), likely 'caused' by VS2026 but a latent stack offsets bug since its introduction (736660bf2). Theory: VS2026 changed changed how inline assembly works. Probably something with different stack alignment, optimization choices, register allocation, calling convention optimizations, or code generation. (This can all be relevant to spot similar bugs manifesting now across hooks).
+  master: 29c4ca6de5e18ed318ca723d66ae67cabcbee729  fork: 5e68e2d53d1c10353bbc391d0fa0b2601af2aa88  Update CEF to 142.0.17+g60aac24+chromium-142.0.7444.176 This brings some stability fixes in CEF itself.
+  master: d1e67663d72bfc21493bc94682ac76111bda699d  fork: 7593f519261285b4afda1f29bf7f96e51b0afe07  Addendum to 61c5d9e
+  master: 24c9c67693c2cf4419f6ca17bfc5d58c6892d4fd  fork: e1751e77de166b513e3be62f69146e1c64ece662  Fix serveer crash
+  master: 615495439d0dc4ca14ea501dc21354492d18d12a  fork: 6aa2f81d2169189c4aa9fb7b7549ecfdd59974e2  Fix textures crash when restarting resource
+  master: 876f2ecf5ccd9fc8b8308f10b121d74200df1def  fork: debd133f4536175200febf9480f95a51814111b8  Fix shaders crash
+  master: f492e4d68e5223c78bc33712b8d0cc0450e1598c  fork: e5a5148501bb86d61fbea0ea90bebb4b9aae98b0  Fix texture-mixing bug introduced by e317cc0
+  master: 3d02b86df9f26934c81a96f1feacdc3e112bffc0  fork: f377adc2ac349ed7659ea4f0e6a49ff4b3f8e45f  Fix main menu refresh rate
+  master: 2502205dc76636471a59fd9de7fb6ea359fa7b2a  fork: 4171b3d117f7f5c1a63adb37fde622b1724f44f1  Fix broken CI by patching GitHub Actions back to vs2022 (#4607)
+  master: 6ede47a7cbb99bab29766fbc9631daf1dee57601  fork: f7a7c99931cd779e5a9002a6eea6d30c1d10b50b  Various texture system improvements, including fix for cases of "invisible world textures"
+  master: 4828e9cd5d00ce1c0314cf9c0abf591ec6e690f4  fork: c4af2ffdef1c3fabf101d4065c7d4e546e37d788  Texture system: Crash site test and various performance fixes.
+  master: f9c46930439cb4580dfeebc849f0b1c91b12e170  fork: 81763f7fac7279b9f42f36c7e00f400f6032b4c9  Fix GUI freeze and performance issues with gridlist
+  master: 4b661ed2fd1ce01cfb61b4428a1a86c9447b4150  fork: b9ad33ddef5e9a803e6a1d1bb2aa174dfed916c5  Texture system optimizations
+  master: 8e5747f45d11d084e119c82ce7fdc74d4eb5190d  fork: b88246a44f1a0431fae96c9d5ecb6b531d41f9ce  Fix freeze in CRenderWareSA::TxdForceUnload
+  master: b74698eb8a45225da71f29d378658e8ac5fda75f  fork: ddadc31b5f6d225e7b719ffb6147dafce6754d9b  Addendum to 8e5747f
+  master: baeb3d16753e20a22323d334fe9ff548acb4a40f  fork: e427aa083929e9ae08fe366d830bc8ebf3a2c949  Add more logging to GetGamePath
+  master: 359f557cf61c94320f4a55953bc4bda181869601  fork: 7d239c16be741e494a98f0c62af935f9b6cbc50e  Fix SA crash @ 0x000C4BB0 (or at the very least recently introduced causes, making it happen more frequently)
+  master: 2c450fcd1425bfd7736b427d0454431eba17309c  fork: 7782bd63cc4b6f4793a68ce017c75a4c19ad28c1  Avoid game freeze @ SA 0x7507E0 (WorldAtomicSync) at the lowest level of its callchain per the investigated case.
+  master: f5409cb0f631bddc852c9dcb936dbc14495f9119  fork: 5db37aa5f32c77aa44b455886b704927a51c5cfa  Fix crashes when freeing models that are still in use. Addendum to 359f557
+  master: e8fb20b885031777ad0ec701265de52e96360616  fork: b427dfd049ac21d4285f41373eebedf24471d1d9  Fix crash from stale texture pointers when changing model TXD ID
+  master: b9fd12c5895dcf2ad6275a7637df4a3c25ff0739  fork: 5e14365f3ee4fdd96fe4e09d66eb0bab9201513d  Fix MTA freeze in fopen hook from recursive file I/O
+  master: 7c91b20986ddce31e8d626c99ce0ecef9d9c486c  fork: 60fcb1806e44077228330f2192a0c0449e0b2102  Fix heap corruption crash (0xC0000374) in D3D proxy texture/buffer destructors. This crash: https://pastebin.com/myH65HQW As one of the long-standing causes of "poof, client gone" (No crash info) it was now identifiable due to 010645f, the crash handler update to handle such exceptions.
+  master: 23a3df6fe655813d13f10cff0303208527c827e9  fork: 8432922902353d29818b926fc6f10c73a827847f  Fix game freeze caught by watchdog, but which fails stack symbolization. Reconstructed (from raw trace @ https://pastebin.com/eY7bkuFW):
+  master: 395bf414ff3defdb5fc6100c3ac4e6f477aa1ce8  fork: 3d02681069e24bbf3e0c5ddf4899f6962e7aa2ee  Add some logging to help pinpoint "World textures missing" bug
+  master: 43d10644a3306e017e8e3797de1e71107a3023ad  fork: 0159fa592055d32aace4e0a2d8f9c44d5975df17  Addendum to 5b1c7d1 (parsing tweaks)
+  master: b8d48133711c5ab03ca20f7ff0902029902d2017  fork: 7a5eb7f07228bead4829eacb8f84e0deb78eae40  Update CEF to 143.0.14+gdd46a37+chromium-143.0.7499.193
+  master: 717ace56e037c9f425e38dd77a07203efc3ba9bb  fork: 41e422cb15da4ef0e3a639744039ca5bf07d2f57  Texture system improvements. Fixes "Missing world textures" bug and improves support for large custom maps.
+  master: 4c53a765f6d9ad3f92ade134fb14895752b941b5  fork: e3a79985d068a65740519152c34c5bc2603b71c8  Addendum to 51d01e1, as it didn't prevent all cases.
+  master: 4ce785b3d5803b9f1b2092b41bed649f659cb1bb  fork: 32c658b19b67b212d85facb58577202da8022c14  Addendum to 41e422c
+  master: eac2346ab5bbef7cc3a4c17ca3a2da6f18c351e0  fork: f7a8130627b0842bc34ef2d456294ae50a82547e  Addendum to e3a7998 (and with that, to 51d01e1)
+  master: db985bd93b7536cb2816a22d8ccd7c7a467e6945  fork: 607038b140fb31a547ceae93cd68227378752534  Support building maetro installer from master branch (#4642)
+  master: e87a8864d100db2ff0bc42770ad0efb834ae7af4  fork: f7a37005b9f427586d8d389be1d49882f4abf582  Fix std::format usage with .data() for error messages (#4647)
+  master: 7cd17bc67c5c2d631b6aaac1ac48521b6922045e  fork: 9c4fb6abc82543a0fc56e11d21903c31bd1abdc0  fastmod '}  // namespace [a-zA-Z0-9]+$' '}' Client/ Server/ Shared/
+  master: 79117137ae266045f903607d29f854d293cfe8a2  fork: 486ee1c6042a706930bcebce4b31827a75238d33  Fix Steam GTA:SA ingame presence (Fixes #4623)
+  master: 8b8874020234be68cd0bbb44ea642d6acc9bf2b0  fork: d8c394022b33d2281e2cf8025ccff03cf4a68a7a  Fix performance issues after recent texture system updates
+  master: 0a4cb095146eafb273ed0c2e21063d3c52959fdb  fork: 99340cc6b15f7c1a4062655b8a8eb6a0963a1f70  Fix performance issues after recent texture system updates #2
+  master: 2eaafc1bfa27d0c187bf3c23f38fd3f9142559ea  fork: f3b6b5985e1ad42e7e8736cb51702e20e3ffc700  Addendum to last (clang-format)
+  master: 9d0932dda0b1d72a0eca385139cb8ef63e674654  fork: f400fe39753a5a07edc828c1ad54e5d786a9317d  Perf tweaks for 8fc6d49
+  master: 7296eab8e781056fa620c97c28415a67c238976a  fork: 17650bbd5055137594e56f814f8d89b541219e3c  Fix freeze in IFP loading
+  master: e7ff920e64f3b9b03c4e644dba6196f955c88ee7  fork: 4af707d85fc565572c135308911ed728ab999812  Fix textures dangling pointer crash in PurgeModelIdFromReplacementTracking
+  master: 16cab21fb689d2e4a6da0f9f571778c70a524f26  fork: 9715a47d760b81b71eeddab929da4d75579af1e1  Fix `processLineAgainstMesh` crashes when checking for colored meshes (#4662)
+  master: 5f2e79a10b0897db21d916de723490cc57b6004f  fork: 36fb336e10bf078e21fa5abb2fe96f1eeaab4c6b  Fix freeze in SetStreamingBufferSize caused by race condition
+  master: 0813e831b6af0bef058cb1f914f9ae6a79a18f99  fork: 52646bb7dd6ed4d1d5074b3c17146839e693c201  Addendum to last (clang-format)
+  master: 94232ed53dec6ae84b0122aca4d06e97a8b631a3  fork: 95be41351b3e591ba205b6289f8b0c673d0e6df6  Addendum to last (clang-format)
+  master: 957fcd3e201fb1a358c6a2a918c05847cb2e59b7  fork: 95cd98fec352d1bc9eb3391e5f543ebf2bbf57ab  Fix server list 'internet' tab not populating by itself
+  master: f79e33bd78305fe30099cae78fa88573df8e2102  fork: 31e387fa541621b747980293eed828fcf0315e03  Fix disconnect/quit crash
+  master: 0da7a827b5483848d961f4f4a7ee0290379eef42  fork: 3e8446a213178ae367369bdf1f3242924cfda757  Fix model ref counting imbalance causing bugged deallocation
+  master: 188ce44afc6b82fbe99d907ce3072509595be0df  fork: ba335bbc4df53f657f15b0f477f92cf5324e5058  Fix texture mixing between engineRequestModel clones
+  master: 4864b0d27083b72a23822dfbb21d076b02878742  fork: cac03ed4bdc6bfb1010f56caafbdfd7a6ca99c87  Addendum to 188ce44:
+  master: 8c75a8ff1e1f76103b21f8f3180c216c0d78d526  fork: 9449332fee0eceeceb23ff80b9a08d95d28a6254  Optimize model info lookup in texture reapply path. Reduce overhead when models are filtered out early by the TXD ID check
+  master: 378d64d6c7c4801b6cd92eabe6c56555eba4f961  fork: e6970ee8c1303d1038edb9401a6595c0963013e2  Add TXD texture map caching with invalidation (Performance optimization):
+  master: 01d47ee51c0678be29ef9b6b018205e9a93bc962  fork: 25c78d30135f12cb7db9b0bd65a9f3935cb72b80  clang fix for 4864b0d
+  master: 0622886c03a768b62fc8f09d18ca761897c02277  fork: d87b4d88098e15dbe94dba44953f02daa5a47c3d  Fix ped skin texture mixing by storing parent ID for cloned ped models
+  master: 10af65809cf9e8d900204ffcd27ff25c14702c12  fork: ac7a94babd0b2a03fce8714bf37d0396b7ebb993  Addendum to 0622886
+  master: 381fabaf39ee034aad0d47f5872e596a37db03b0  fork: 7af29e73c7447f1dcc71edcd0efcf41109e193c7  Addendum #2 to 0622886 (And fix other engineRequest* related issues)
+  master: 19c0a73045257b5a45e348aa82350f4ebf015b1e  fork: 3df0e905b00d406b73a5bab60555ae0c6d583e53  Fix SA crash at 0x0116C9C5
+  master: 1030c7ac08904e279056bfea5dfd90bf2f11ddf4  fork: 0055486c9ba76ffb7ee945729380bce50fd45dce  Fix SA crash at 0x00331A4E
+  master: 290e55448e1b53840911fbff8ea0a20fe8ebeebd  fork: 6899730cc63443a46e7b89867657a7c23d61ca83  Fix D3D texture VRAM leak
+  master: 4e0a744082748d2e208b44c704e3ebe11db814a8  fork: bc914b49d57e54975b6877ed10f34fc045f58c15  Fix clothes cache mem leaks
+  master: 46a5f9011a5fedf5d2cefb656b808bd34be9f222  fork: f95377a08be0ac7f073df5e28dafacb67d923721  Addendum to last (clang-format)
+  master: aea5880563d253e2807394ceac9e0c1c9b9475f8  fork: d54aaa730e3624335162df05359c478c0122dab9  Fix clothes cache memory leak on reconnect/disconnect (This never worked before)
+  master: 48c243c0b457135dacfff10cbaea4e278033e55f  fork: 4a35c400d8c3d972a6ea68beded978d144c9da59  Fix `showmemstat` crash when using in main menu (#4678)
+  master: 777bd2ea92798436c5ad69fb2c443208f93e8262  fork: a9080049f9904e78a790b6f5cd451870ca29a835  Fix crash from dangling pool pointers when GTA streams out entities. Most relevant for big/total conversion maps. When GTA:SA's streaming system destroys entities (like: during TP), the pool slots were left with stale pEntity and pClientEntity pointers, causing crashes in code paths like GetEntityClass() that deref pEntity->GetType().
+  master: 63d2379b1a99c9dc8d189134113ceaa4347a3345  fork: 0b418af8166098c91ac1d61184d583f1e2ac0463  Fix textures shutdown crash (0x000C9A95)
+  master: 504c140488dab12bb4812a992603ca61b63d7b43  fork: e4ed99bcf1ed64e1f2b57e01384934bdf28f0b74  Addendum to 290e554: Fix crash "at" 0x00000000 (No module info in dialog)
+  master: 0f651ca2a0d1cb9c29481a8d090ee049f0da7708  fork: f5148515cc1f9d27335aa2ca363b31ee0a4fedfb  Fix old SA crash at 0x0000F64C (0x40F64C) with .col files that have corrupted, or missing, shadow vertex mesh data (which is optional in COL format)
+  master: a87d5d9e379c8f373dadd20ac2b56ecbbcb213a8  fork: ceb06d72520cdb068e6c3a55ac10aad7744b74d6  Fix more ways for freezes to occur on file access (Recent fixes didnt cover all of it)
+  master: efa0b55b286b3478f74e6c22cd703d80e73aea21  fork: 900f83bdbfca515961f4ddf92e16e7726a4c0223  clang fix
+  master: c6ffee0196925f8528c16e5e492e435ee2aec754  fork: c189d1793e52d47b3f5b882c81c48443ee6bb0d7  Addendum to 290e554
+  master: 6a012d2d27f25d18dde3036533bd0ccbbe3bd2d8  fork: 32a9d1b719cfbb30a9a7f47519bff0f9f2f0c57b  Addendum #2 to 290e554
+  master: f5c4ec83028dfd8b9c593a08b5210a2aebe819f3  fork: f0356664b22a7f28d8a77a43a2a391f25415221f  Crash handler: Disable debug output during stack overflow handling (avoid recursion from Crash handler itself in stacktrace)
+  master: 5a73b8df9c5f7104f811a2cce4879c4e9fc0dfcb  fork: 624620b605136dc2e83818bc0ba48486e03e55dc  clang fix
+  master: 7b135274ed8781a7527fea36fae41915fad2b097  fork: 2c759fd4673731d4db88314859f86525b7e18941  Fix heap corruption (0xC0000374) crash during shutdown in texture replacement cleanup
+  master: 80411f8831e5f3863478b67239cd06e848247bdc  fork: 48a56172793f3addc17fedc24deba532634b36b5  Fix crash in TXD texture map cache rebuild with corrupted bucket list
+  master: 115dc2b8ca1c2062819a3bc70648aa387110cacd  fork: d186bc749fdc81e0b6f17326bbf3923702d3b4e7  Fix heap corruption crash from too early TXD destruction
+  master: cf3fee2047b80b5d0ddd94a4bd391ef60acff986  fork: 5663ae4f389d68f0a30129313b690214e02b3d33  Fix rise in SA crash 0x003ECABB (introduced by 7b13527)
+  master: eeec3d8de387609429b4a7d2fbb79886307ba047  fork: fbdfacad944b5ac86bba28fc189e2c0e7b1a93c7  Addendum to a87d5d9 to make it actually work
+  master: 446ec92b59b1a3cddf0199a45286144937ab65a5  fork: d2bc81e4b67e7078ef3e570f7e9b5e1d5e95eb93  Fix crash at 0x003C51B9 in RpHAnimIDGetIndex for peds with missing animation hierarchy
+  master: 9acfad8d72686ce57667c7eb8c44f8d450d1e86d  fork: d4980345c071469dcaa6d6ec001c35a151b23872  Fix fake freeze crash when debugging (#4685)
+  master: 77ddf9ebf6f2288b7feb5fec799fb81bbb094051  fork: 82caa1aab7d691d89e17c7a3bf80351c61d37e67  Add missing file from 44ae6e7
+  master: 38b8d87886f0dcd7aa8e9e2e383d9099b7741e38  fork: 8d34f5f69bd711bcad6eeff1ddc17418038ec4df  clang fix
+  master: 1b21194be4075f93264d4f42cb5052137f36d361  fork: 0f46fd7b7ef910e5759c2a61ebb6d39875c0ee23  Fix CProxyDirect3DEffect crash when underlying D3D9 effect becomes invalid
+  master: ce261e3d3680f9d5ef4af7bf6b8181a8392146d9  fork: dd3d53654016d1dd2b858bcc9755bd6adf697aae  Fix a cause of "white textures" bug
+  master: e9ab581095162e8a3ddd2e781d008d0ac373ed27  fork: 875761904980c4a280d016ac2587d5ede2f9800a  Fix pool entity bugs introduced in 44ae6e7
+  master: f686c32c9ffc94ea358247cbf5a3e213f6a0fbd8  fork: 4a5b9e897dd1263d27577ef60c8ea96823698f7e  Addendum to ce261e3 (White textures bug fix)
+  master: f554e42440b69f43d3f9e59dd27e9e58003c5faf  fork: f55d26df55e16eb732afe49d76af259412f195d5  Update CEF to 144.0.13+g9f739aa+chromium-144.0.7559.133
+  master: 91a7feeb25db131153ec3726f48ba578adb79b02  fork: c5dd7c57ace8fee4285b95341df8c663ecb45523  Addendum #2 to ce261e3 (White textures bug fix)
+  master: 06393e4920399b343ee02fe4ad0e30a018ee420c  fork: 12e221bfe1e2b45d4751eb1b5ba52d765a31e4a0  Addendum #3 to ce261e3 (White textures bug fix)
+  master: d4a17ae30f02df559069e9dfdd9c2b4c0f7bb2b2  fork: 3e7b809e39cb434d74d884ae8e8c253b836a0b44  Addendum #4 to ce261e3 (White textures bug fix). This finally fixes the problem. It was specifically engineRequest* using maps not loading textures.
+  master: d8e7a2f6b659baba7a412d8f7de932c00dc776bd  fork: 0fdefb284a87c8d3896579126206cb5a8068970e  Fix minor texture system issues #1
+  master: 61bc06cb604c96d489cdb7fd5f6c5985cc7fc828  fork: 982b07a6454160a824ea4d93c746a777a8c2d6fa  Fix TXD pool exhaustion from leaked isolated slots on reconnect
+  master: 863241bad42eb840580b326b8bc811a8c0a6c668  fork: e8ef554e727eaf27e55fa6fd0f635c98749b8d5f  - Fix TXD refcount leak
+  master: 2bc2c9791b7514355f358d47d1c96e24248c3c28  fork: 15b9e767dd9b0c20c542f50702438b681263ba7b  clang fix
+  master: 475b9720053fc39a3d0f99ee2c9771002f76851a  fork: 4b58d4cd34439f14370e8e50619828777711b788  Fix SA crash @ 0x00331AB5: GetNumRefs on freed TXD pool slot
+  master: c88f34d621671f96f6e623917e9a4ef6a6629755  fork: c73c1ace947ef2cebc0b71e5bed283de7545f78c  Changed texture pool pressure handling from hard denial to warning-and-continue. Real, persistent pool exhaustion is then still caught by GetFreeTextureDictonarySlot() returning -1.
+  master: e05bea6d9ff89d3eca4dc2fdf30b8dd532081567  fork: 98702739c701cf29b382bb8f1f7f2b43c599cff2  Addendum to afe8ad5
+  master: ee1ac1cd02e3f89aab8c182ef9e326f08dc11736  fork: 3573f2b57d4f58c1c804be18b79428738cc70399  Addendum #2 to afe8ad5
+  master: f109f0d557e608952307f21731e9b6bada1d552e  fork: 8796dc9743029db75678c51fc03afc4ea914cecd  Addendum #3 to afe8ad5
+  master: b1b97e7ca926284559554863bc0cc107592daaf3  fork: 20d0812177532a4a3776349c6c415e78c3bd9834  Addendum #4 to afe8ad5 - Dutchman101
+  master: 474a07cbc98b1e1e053b9f602ea8fea619a6cb98  fork: 04f1a2ccddc694183786c522fcac96e9c6b469ab  Addendum #5 to afe8ad5
+  master: 246d212460037c335b7a5b6d45abd1808c976697  fork: 6fb8c06abd4faccc8dbc581922ae28495cb85339  Addendum #6 to afe8ad5
+  master: 8724eff9a47c2d384bc43bf676543632d83606ce  fork: cd2b23aecddc78f9a99d834569b2eecb7eb50872  Addendum #7 to afe8ad5
+  master: c05dca949830e31cd51281bd7d41d3e402496a7a  fork: 16bf5077cd947396ac36f9783b56974e38d38486  Fix wheel txd loading bug (introduced by 863241b)
+  master: 95311f5d0b3b643cfa35462090137de1640fa714  fork: 0951dd056436b008f8e9862096e77e8d130f427d  Addendum #8 to afe8ad5: Fix IMG linking bug introduced by 8724eff
+  master: 65fe20db80c2dadc200a6f756c67f931dad8568e  fork: da85094cf4991be5eb8d99b2026f19c6660901f5  Fix engineImageLinkTXD rejecting overflow TXD slot IDs Addendum #9 to afe8ad5
+  master: 39051842ff1d8844a81cac152391282d7f890a98  fork: 71483df2aa2158ff5c07e7a2958b5d0a13153db1  clang fix
+  master: 66323852c046d7bca33573fe4199d54c8198eca2  fork: 822f8de7f6f5af093de781b7581f6d1d0cb98390  Fix TXD ref pairing
+  master: 85fbbe99503dfb59ab5bb766905f0eb4be6650f6  fork: 15c32670f903b0613548ca8c7361d65901e0479a  Preserve rasters on leaked textures in CleanupStalePerTxd so there won't be problems in FindReadableMasterForRaster. Could have caused white textures.
+  master: 37fc4959d2ded990ef8da09c292097d67c86ba1c  fork: 0c9bfa92815f9ada36a7f495587a7b14c6cfe5e0  Fix UAF in dxDrawModel3D (alpha entity rendering) Render() cleared m_Queue while RenderFadingInEntities still held pointers into it, causing crashes (NX fault) when there's memory pressure. Move the clear to after RenderFadingInEntities completes.
+  master: 9034bfbe8b848644f32ca4969651188c218dca2c  fork: a79b5ebe02fbdaaca7f7b9ec968c80b57ba7c555  Fix SetTextureDictionaryID skipping ref transfer for loaded models with null TXD
+  master: 2f51ce8316613804b0c5afcf5a943357ecf77fff  fork: 1e4e2f8fabf0e7d0b95c98f6ad91cc4877fc9821  Fix freeze from RetryLoadFile re-entry and CdStreamSync accumulation This is an addendum to a276a18 (Freeze fix that didn't cover all freeze paths)
+  master: bc9d7aa22196c73244e731172b6409dbbfbdc6a2  fork: ba2be498297905c7551e1a06b10eb104ca6d35f6  clang fix
+  master: 1192325237276eb350d9b45c47feca860a1ae511  fork: a50182c0ad51417da3fdae7987531c12aa269eb3  Fix corrupted pointer crashes related to D3D/the fix in 37fc495
+  master: 3b8f42a940bdc545985ac7e053d9922e96b95b58  fork: 7b350f77340b54b9bad8e371b75cf1f7119f5918  Fix shader matching and cleanup for overflow TXD slots
+  master: f129051bd659cc4d925f84f39e79f5aa6e815e37  fork: 2e0671c02c12338bf53c2b6a521fd916f3028425  Remove the IsBeingDeleted guard that skipped spatial database cleanup in ~CClientEntity, leaving dangling pointers in the R-tree when entities were freed between resource stop iterations. Also reorder the IsBeingDeleted check in the GetElementsWithinRange lambda to filter zombie entities before accessing their members.
+  master: e6d967013a0e86d27d44c14ea4a48c74ff1b51c3  fork: 3e4d09e8005df7d1d0dc87688095f2ec1ad3a791  Test crash fix (avert) for old, Top 10 crash: SA @ 0x011630F8
+  master: a0f60a7e6a6324f78128c2cc80c9051f7287df69  fork: d45d25e5252cae266014da3387395382acddfd7b  Fix final texture mixing cases
+  master: a0deb075dcea258f3504551642940c3a8d7636ef  fork: 2b709fabcbf0d4a207cee0b6566efc1f5dbe5788  clang fix
+  master: d566de594629db5e4c96757c5e1fd4cf4386dd70  fork: 3e54dcb2742bccf0319b9552b2ed5a2c0a012425  Disable freeze watchdog for now (Will change it to opt-in later.. or it will be toggled for nightly-QA every now and then)
+  master: 827df68ac22e2f59c20e0ed41dd81bca840b8044  fork: 352ed5838351d39534d15fbee00c2305b0ec5439  Fix double-free crashes in texture system
+  master: e6c5153e30225217610b14a85ff0eb4a1d1fe429  fork: 43df7d8bcb81fae06d409d2736b6ca1dcf64ae90  Fix #4704 (Seasparrow / hunter guns are broken). The bug was introduced by 7a7d1ae.
+  master: 985a8159c98bd352c6d1715fe365f9b06a38e867  fork: 93605f155fe6aa2fc9c9dc7aed94c9484b9e2899  Fix cross-session TXD/DFF leaks and bleeds (textures sometimes carrying over)
+  master: f44f6ea9a0ac0972c67fa040228bdcdd68f146dc  fork: c780fb82c36625f08ee9c229620a94a2d21af297  Addendum to 985a815: Fix similar issues, but then for resource stop
+  master: 6aff5a007399f11473f7df409709932d59331b6e  fork: 39c50f590a7c6eae12939b6f0319007114c7d641  Addendum to 985a815 & f44f6ea, to further improve the situation for engineRequest* textures: Proper and safe clearing across sessions.
+  master: cabf7d5dee1e730dbd35438e933b2a38d6006375  fork: e704bfcf887288e6672d1c1f8da0bbc1d2a5edb6  Clean up some textures logging
+  master: f41ccda9f4a3c6cc1272592abbce40e513de843a  fork: 9366e8d90f5033f8189cb23dcfbb9f4d361e7f9d  Clear expanded building pool upon disconneect/reconnect. This was a missed cleanup when EngineSetPoolCapacity got added.
+  master: 75ef6105c0f3c04d112dffe9df68b30ec3c7186b  fork: 5a507fe333a442d2ae8f8366bb84ff66be5401ed  Retry leaked TXD slots on session reset instead of losing them
+  master: 86572273dd7f36a70a09cb1f4c0372052c2febb9  fork: 8192057d35319c4f21a8cd57cd3c569e3be674e0  Guard RestoreOriginalModel against removing models with active refs
+  master: 1782e6cac1beba08465523a85faaf7d0c741a906  fork: 1c1ca0b3538fffb224a2dd3f39a62b76691c9e93  Fix memory leak and stale entries in building removal tracking
+  master: 66c23297ab10cf0c2a84fb4985bb2d91b50974b4  fork: 1f07efd56c50abd7de3cf5532e47b66c646691dd  Addendum to a0f60a7
+  master: 663c61acbad4821b7dc37f9c050c7c5100497256  fork: a5d76c07948a903502c41339e8ee4c86d6648dd3  Fix old, popular SA crash @ 0x001A5735
+  master: 7175220951d0ac03b138f10f53eb234f1f5edcc7  fork: 8ff212ad8567668d0580d1c394105807d79250b5  clang fix
+  master: b159cceab87e3838f90d6cdb14ffbc220819607a  fork: 71a038fe12919f4fa6c13317ed10287184b6dee1  Fix crash in AddVehicleTxdFallback
+  master: 85218940a747c3bb23eab5df3dc457668a3687b3  fork: 5bf4614a22b1c30309b1b901af052769443056cf  Fix crash in CEntitySAInterface::GetBoundRect_
+  master: 1f85862bba17cc175e8aecd5df93658ef19f0b96  fork: 6a01f65361cedc2dd9b89d044efe96bbc83a59f2  Fix SVG crashes (client.dll)
+  master: 0ec0b60f6fc693cce2afff079ed82f37592e42de  fork: 0e8ab739b3ac8c915bb3e75ab1f1ffe94ba1eb01  Fix common ped related crash
+  master: c68e6187573a8850332bcce65613b9cd7f117701  fork: 2f9831fb1f92fae3c8c199faf2dcf146ade3e1f5  Fix client.dll crash (Lua table bug exposed by sending large events to client; crash when the bitstream runs out of data mid-deserialization and a failed read leaves m_iType as uninitialized stack garbage)
+  master: 7c349cfe4210b30551ac34700f61de5f074a2b54  fork: c8e8c6e1029aa8b8cfc123705b15b863cad8d072  Addendum to c68e618: Fix similar bugs
+  master: aaac36a5abaf514ef1b490d3acc6eb7899a60562  fork: a92f5cc39265918c3b111af8c377c061bdab5424  Fix handling related crash
+  master: c063c481b1769143c4a85df79791a8b7d673827d  fork: 7c6876010458107b8983dd53101454754c641ee5  Fix IFP related crashes
+  master: eadbc9fef64484251d07ba8f7b4fdb09d36527f6  fork: 67035df79bac99defbf113ff2f0a1e95737f0d17  Fix most d3d9.dll crashes in MTA, and improve the handling of interference from recording overlays and such (Avoids crash where possible)
+  master: 8a63b6ad5493d0e309f74395350862ddf14262d0  fork: ee53c4e61934b527dc9c1047ea555b0ab3365323  Addendum to eadbc9f
+  master: 93a5e3a9e16d8da6d8efe66128d1dd06a108d808  fork: 2be1603df3380dd8469e719128571c6ae8bbb6ce  (t)
+  master: 2adbf28ba90d0229b856a06c0748a3064c6b43e3  fork: 0eb098025d2646ee8e9ec96bf0aa076569ab6f57  Fix textures crash #1
+  master: 3f64392d3b851d22b4a1a5f7bf29990505b2f6e9  fork: b7a3e4ca3faaf6affb644ade2a7a96bf57b5f251  Fix textures crash #2
+  master: 4eb4a7ccbb84c902b6d67e0c7333e8bf85c0c4ee  fork: 81d4c12c32da2abc1c8cf8c88aafb7f97de43351  Fix variant of SA crash @ 0x00154244
+  master: 3aac2b93d130794bffd85aac0a1df684af56afbb  fork: d9974eec03e880d7d53434bc35aa2aa1ea30a9c5  Performance optimization round #1 (texture/shader system)
+  master: 15bfa9a88049894be7ef965b0846f8e804c5b27c  fork: 45543a222c827169ee33fe93b592f5fcc559e021  Performance optimization round #2 (texture/shader system)
+  master: a02805efb77ec952b4341a8b7c2f9adef6ca2bb4  fork: f649c963be6a7b64af7170fb04b50697c55b81ad  Performance optimization round #3 (texture/shader system)
+  master: 2e9d445fe456c925881df090e48c82e12006cd14  fork: 240efa5f771fda6ad416389c234f7ee2d1a60d72  Addendum to c68e618 & 7c349cf (Lua table crashes)
+  master: 1cef6ef26f7f149628dcfbf9066f6f4f5c1ff58d  fork: 661299937b0cafe853ddfd1e4e864d5ed53ac0c8  Fix performance degradation from "Performance optimizations" yesterday
+  master: 57e9d6bc2280aca00f325f774e6f15cb3d4fe3ac  fork: 6a3476ecf7e1bd783aa64d683c9d2f822e8bcfaf  Addendum to aaac36a ("Fix handling related crash") to fix left-over crashes. Scenario appears to be related to engineRequestModel vehicles.
+  master: 00e6631f959861555f0fa73c90055e0680709d69  fork: 638fcc91a999e4d66a110a7975cb15397f611091  Addendum to 81d4c12 ("Fix variant of SA crash @ 0x00154244")
+  master: 4fb1c33410ace19330e9a430507436c9798b0f12  fork: 2973947ded516dafa6006543d41b01bdd591c2df  Fix new texture mixing cases (introduced by 3aac2b9)
+  master: 68435334d8f776f7a46fa11e39ef76e6797e10e2  fork: c8abe63e651e5e5104ca26a9f08aaee3333e5a8f  Addendum to 8521894 ("Fix crash in CEntitySAInterface::GetBoundRect_") to fix remaining cases
+  master: c295ae4deaf41cc1a261fcbdc4697752b5277822  fork: c48808e93296d05b91ba358635021a3cd6048540  Fix crash in CModelInfoSA::SetTextureDictionaryID
+  master: 9b62794d5abe5fcd055a9ca7ff387f0baf0ffc33  fork: 05d5d3489a81fb42f969a85bb7f7de0b5d28d985  Fix UpdateIplEntrysPointers corrupting NULL entries and RemoveAllWithBackup missing expanded pool slots
+  master: 14f283b4c2437031640ec114eeb102b3c91a0b88  fork: 1761ddc3ea0ac692097e0c3d831ddfed08fb6a1f  Minor optimization for texture system
+  master: 1605c502d828ee79f416b1edb317883bb195509a  fork: 4e4a0d13b8d10733a89be97e65f31eeefef40dac  Fix node pool leaks and crashes from dangling building pointers. Purge stale sector entries before pool free and clear ped/vehicle entity links in RemoveAllWithBackup
+  master: 74d79b1ee064634691a6412456ccdf7f4d160e55  fork: d05ef4f968f5ff80eda5d57117697f2e2b1685b3  Performance optimization round #4 (texture system)
+  master: 108c4786da4b663bf3d524f0690e7a2b85ced646  fork: e17ec21b3aaa096e502b2a66b691588267b7b072  Addendum to 7296eab Avoid failure to apply early on some anim groups, like: "WARNING: engineReplaceAnimation: Animation block 'tec' not loaded"
+  master: e4cf251034999ecec3945ec6f5f83fe27911d078  fork: 218096f34acb75381979ebb1e287be01aea83749  Add stuck detection to debugger loop and improve one-shot flag clearing
+  master: 19e53a58af8eba4c4c5478598bb4654fe71ba268  fork: 50cb01a2e709ac12ba85855266e73ee58c2f593b  Fix white textures and texture mixing from stale shader cache and orphaned texture entries
+  master: 4bbeffb73804ee1767adb36438fe4af6c85800f0  fork: 297baebb295c87e0f42fc322ae0b9c540fbceab1  clang fix
+  master: f1acc133e667c49d8c5c3c20d0b05cd1caae35d0  fork: 396648c9d582a8e765f314093c48d21cfe727362  Small tweak for CGameSA::SetBuildingPoolSize
+  master: 5751124764f741f7ca29be5f6813c22212e90b0b  fork: 1aa0bbc0502f7c6f5804ef784bf2660c98b297ab  Performance optimization round #5 (texture/shader system)
+  master: 929f4ef6da8dc552dd7080804f811dbf649a7872  fork: 8196c6704bb9f09f6acf300c8726db8e1b334312  Perf tweaks after recent building pool/removal changes
+  master: 05081d4a119bc30128487129c457f24ab363f5c2  fork: e0f6f93990d98618d8386d68d299a957d6f3ea7a  Perf tweak for D3D ReplaceInterface
+  master: 6221b92ca6d77713b5c128203e09ed8b673c80b7  fork: d93c85dea04e911bf081c40f275f79ffe2547b77  Addendum to 5751124
+  master: c597ccf0c667fed824ce36eef332d91d7d922e9b  fork: eb8566b1c90bee67c6ef251d352540e068d24005  Merge changes from branch feature/maetro32
+  master: f6f7b6b84e2ee66ecc55aafe5b4e4bf247301ecb  fork: 9fdfe71556a38d1e7e5748c56a4a64c560c98318  Copy maetro32.dll to launch directory
+  master: 945a745419836e14f1dd4c2f7575dcd8d09585cb  fork: eac48e4a853c82a6db86a0daf0131ea29ebd4ec6  Final perf optimizations in ShaderMatching
+  master: 4b55a22408453f43bc6fc1992d178e57576b1e6a  fork: ba159e2fef10d9e087476fa43af4fc52d291e0a0  Building pool perf tweak
+  master: 5cb98a1a32b6b756e5d9be5fdb0b599f70d31150  fork: ed148a8bdde6615da6adf51e84217b829c75e0f9  Add 64-bit version of maetro32
+  master: cca48dc6e266a264fc8fe30c183a75265f482ee5  fork: c7d4519c2b207d345f8859a51de19b9eb4b5201e  Additional perf optimization for ShaderMatching
+  master: d8eb296a36314d07aac77d298e3aa1447718d41f  fork: cb21b89cff21683aa269af80bce95ba862dab181  Addendum to 5091198
+  master: 1727173d762c13d18c45828d64472994b7f6151b  fork: 5d9993f43f81e0770c6ef7c4a1cd49815d6bcc2b  Addendum to 929f4ef ("Perf tweaks after recent building pool/removal changes")
+  master: c55fdc062857b78d201a88762f5d07e179320f41  fork: c5ac5af9d858bafc5844d4d81256c7e74ef9305e  Fix some noexcept-related cases of std::terminate
+  master: 18a5fb90e45fc34156b7d900982aa4172e56c56d  fork: d70ea8a1479165cd9260734c271c072a86f16e36  More user-friendly handling of netc "crashes"
+  master: 6115d034107622e961f3656914c1c4ee94453e3f  fork: 1e87bf13742543b8c11056240eb30bf1b85ed40c  FIx cases of texture mixing & white textures
+  master: 53de411566b8f3705c89fe68e8bb377fa90e6c1c  fork: 74822ece04c11180aa8a853d863a441995664491  Fix potential linked-list corruptions
+  master: 2dabc30f1e974f933e0dba9843a6dce77d7ad603  fork: dd12a814f79c1164fde92e0992c2d9c5d6fc1ce4  Reduce txd loading times (spinner/blocking load) on server join
+  master: 71363b9b54645586ab593f1609f7568d48c0f4fb  fork: a886ee26b1ad62456a06c3ba776d8731bff7d337  Addendum to 6115d03
+  master: 461160308abf6df71b441d8e06441e3468741ccb  fork: d8da24e1ec38d287d47e64910a9939d025cd2de6  Revert 6115d03 & 71363b9 for now (Not stable yet)
+  master: bae55d1823810bf9ea9fcc65bb880d76736d3cc6  fork: 8fbe5b7a0bff4a773ae57df374ac3bdce945425e  clang fix
+  master: 1d0f4b9a77137028a768f9e159a3604cf686bf9f  fork: 4787e78b0a7267b16fc3e40b15f14593b1707afe  Fix rhino slope bug
+  master: dfdf44f55d805bd3ed0d3d5d0af79c72935accfb  fork: 1de13d0ab981a99ec09600e1c6f373f68fb602fb  Allow overwriting premake5.lua path using PREMAKE_FILE
+  master: f44bf01ea22843588462988f6e48b2381ee19328  fork: 4b7bcb8eab707566412b5fdb2574d1a38aadf79b  Fix LibraryRedirectionPatch::Restore for mtasa_d.dll
+
+========================================================================
+UNMATCHED PICKED — no patch-id match found (47 commits)
+========================================================================
+  - 5f7cb8e21450a48d883fc12ff5fd62dc4c3f33ea  Visual Studio Update
+  - 9f1b791a9d646abcecf70aae41bb850d46d38420  Visual Studio Update
+  - 3adf32287a9c310d86d368048355e305d9d1ce83  Visual Studio Update
+  - b4bfd3e73025f3cd7fa70cf2528d49c497c9ba65  Visual Studio Update
+  - 34e29f1852432248953631b3256f2b5431d49468  Visual Studio Update
+  - b3a6af9c63d93310d9976b75576c6925147db736  Visual Studio Update
+  - 4ce24be21be1a4d3d4e4b0e33e16e0a00aea433e  Visual Studio Update
+  - 2584597eb30f5fb2ff80fffab03a00b2a548d300  Visual Studio Update
+  - 65ede776c32e58c70a5316abf1cea6445eb06080  Visual Studio Update
+  - a7af48c3d7d360ed36cfac01dd72f79d5360b6da  Visual Studio Update
+  - 8d8bbffdaae45a1b06f3cd029913836cc2067510  Visual Studio Update
+  - 1ea65c131ee4b9de0372b5d3be878c9b4484007d  Visual Studio Update
+  - f2d2cc3a3cff1de822aac373811518afdc9730be  Visual Studio Update
+  - fdf57dbb95cb073fef38f12f986cf0ebd24249b0  Visual Studio Update
+  - 98a66a5702340e899e0ffa5e19a16113ddb7b921  Force rebuild
+  - 3167e430804781cd165a757b4773fd229156021b  Force rebuild
+  - a2c3274aad6cfbad90fe45c7ff41f6ba98d16430  Visual Studio Update
+  - 1ef5229fa61e5b575d9b038c6ba66a8b736b7dc1  Visual Studio Update
+  - 45150fdd0214342c68215dd8b645a30911e2b21c  Visual Studio Update
+  - a585fd620877d1625b246f1231743bfa94cd4c6b  Visual Studio Update
+  - 5c60c44874a4a6ee4eda2d17747052c1d41995a8  Force rebuild
+  - 123fda7f3054076d76f313d0ab2120e64738f81b  Visual Studio Update
+  - 9c2a6924077b9db6b813d49144888615dec5e285  Visual Studio Update
+  - a689799173973cdaf83af6595d7657d7083dcd70  Visual Studio Update
+  - 7df59ec3d12dede31a6f3e8e539c76558bd86aa6  Visual Studio Update
+  - d061e111752e9272106335efa35de15a414577b4  Visual Studio Update
+  - d70d0e4f96839adcf146f2d3d64c0f782174b076  Visual Studio Update
+  - 5540963510cb232b6f52125772d758d2f0107c1a  Visual Studio Update
+  - bf7b808ccd910d9736741f1f2c6b8fd2f8642dc0  Visual Studio Update
+  - 13e50df9b0e45c71eb9271b8c08ffe69006febcc  Visual Studio Update
+  - 16517b3080e868b0665c25aa68fbad5ce16c4218  Visual Studio Update
+  - 7f1572b493cdcf67af629311c0ea576dec981048  Visual Studio Update
+  - 2c86cb4a8cd8ed09882f77f5e24f3408154da194  Visual Studio Update
+  - c620a43a53662736336a5043d734967d878a6c07  Visual Studio Update
+  - c5b149b85b3e76a55a335f597b0128bb58175b72  Visual Studio Update
+  - ffd10da635441bb0c8c2e3f95248c1d94f3fe0a9  Visual Studio Update
+  - a065540b8639b178c857a836d66e46d3e49350aa  Visual Studio Update
+  - 4672fb1cc2f81d7b974cdda5147d6686ac2b4abb  Visual Studio Update
+  - 6172bd71f8e59f5b5468604e9e28311a9d1ab2c0  Visual Studio Update
+  - aba3aaabc7928bb2b7f6c71bae9532d2175690ca  Visual Studio Update
+  - 793252b3038bed2b67dc08f5f5cbbbdec573abd8  Visual Studio Update
+  - d9e10506aa827a6ab16a5ed3607b8419a81701ab  Visual Studio Update
+  - 5b6e2f7a18a4eb27785ca4e3e4a256dfd6e606ba  Visual Studio Update
+  - 105d2cb5a0d5bb2d3679a503dfc9a4c784b36b12  Visual Studio Update
+  - f915a9d6d711510133c8cfad70dc25a677c86889  Visual Studio Update
+  - 1cc22f8d81197f9aea400fd10f87562bd9858fd4  Visual Studio Update
+  - 4b4514ef554e11ad11c7166361aac88cba28d492  Visual Studio Update
+
+========================================================================
+FORK-ONLY (188 commits)
+========================================================================
+  + 1bd0ff63d13be93f7ae5af43306b13b603521fdc  Update workflow files
+  + 53b9f6b10860af643140e0493cb96e12172aee93  Use 1.6 subfolder in install_data.lua build action
+  + 9c24f683eca98e771104ba0839cdadb9bcd18aa1  Update CEF to 139.0.17+g6c347eb+chromium-139.0.7258.31
+  + 3940e188582c3004c5af511318af07a9a00cc7ee  Backport relevant changes from 'master' to release/1.6.0
+  + 96764bfc865ae5f28c667edeb183d812c414aa36  Fix-up after 3940e18 (patches got mixed up)
+  + 253048027da18402b18b8e022bdaa6600b41822e  1.6: Reverted all backport related commits to diagnose something
+  + 68a8db670fec9b5966bc1fe8cbb676b07fe3062d  CCamSA, CCameraSA, CCameraRPC fixes
+  + 171bbb928d25e5bbba3a0794b256b1337923398b  Addendum to 9ff02d5
+  + 4f5cdd97adfa1ae6247339142881896111a63774  .
+  + 5c17a8043cb86c6b2bdb19d2cdb7af923e6d85a9  Addendum to 2d42a42 (MainFunctions.cpp improvements)
+  + f59be68bcde7bc6f9c9966c93e822d4528847cf9  Update CEF to 139.0.28+g55ab8a8+chromium-139.0.7258.139
+  + 8838a9864d760cece2321058612b23ffbb1ea759  Fix regression in 1.6 branch
+  + 328c81ce9635ac98a1b89e20420cfde210d17bf4  Addendum to 8838a98
+  + 20cfc3a362aee7bd30af0bda650872820756d940  Update launchers
+  + b7a02aaa59219402c8ef014fa0d0b04d7e2b2065  Fix minor logic error in ResetPlayerHudComponentProperty
+  + a57ab4e730322c54834baa0e332423a7031f64fc  Update launchers
+  + 9814b0ed44091bb190bf1cf4e5ef8161e3c0d87b  Launcher: Revert all recent changes
+  + b197ec1da2338509e7dc5cb0dd19d03c52af7f1d  Refactor Launcher with C++ 23
+  + a35290e628c940b021e071fa3f3100bd34270a61  Update launchers
+  + 68ae075a72e4de621a2f1fcf7eba20de750a9324  Improve CProxyDirect3DDevice9::Reset
+  + 4afecf05bda17a96486fdc43bddee58c21a0c169  Fix counter logic, mem leaks and bugs in CProxyDirect3DDevice9.cpp
+  + 604a6776528380aa17804efe954f0c57c32f9fd5  Fix dependency issue with define for MessageBoxUTF8
+  + 9de80bbb6d01448e6e61c295c2b56d2dda2ad1e0  Loader update
+  + 28e71ed9c62b51e848fafe69144dab4c4dab50e2  Addendum to a35290e
+  + 8da928b0bb4c39b42a28024b2dc754a3ed01aab5  Fix 1.6 build error
+  + d1bef5dd1e808cef58e0d7270b283794f3eccbe3  Update Freetype to 2.14.1
+  + 736660bf23ec556a8b6ae4dc3ae732b79964ccdf  Improve and document CMultiplayerSA_Direct3D.cpp
+  + 5947173c21bd9af99a09db14ce960d5ab2648271  Fix the colors of Borderless Windowed/Keep Res mode to match Fullscreen (Standard) This (lower brightness) has been the major downside of using Borderless for years, so this is a fix of great value to MTA.
+  + c403dc0f9f4dfa9b60263a2e3e1a73430c3d5b08  Update launcher
+  + 5dcef6e521075410fc7b9f480ad04e7cd4ac49e8  Addendum to 33378b3
+  + b6d89e95bb82881de879ab93d8b7d80ea74e7cc4  Re-do 5dcef6e
+  + 79fbf4179284768be50271cb8c31490e4a44fdce  1.6: Fix build after launcher changes
+  + 524d701af85dda793bcb0393c2dabc903fda194e  Update launcher (344922c)
+  + 369e1590a6a1a8088c174b20e6bdb7185cba1e9c  1.6: Addendum to 806da37 (Use at most c++14)
+  + b6ed20f4c8f3e47f143667c685b1f03594cc8a79  1.6: Addendum to 369e159
+  + f1fdb4bb14b371a892552501fbd84c2c9133e06a  1.6: Restore known-good version of MainFunctions.cpp (as of b81419d)
+  + b591bb63b4a1c8fdd838893a01e62761518f75ec  1.6: Update launcher
+  + 891ac4ece7d1a751a4efcc55186844a2cb4f222d  1.6: Addendum to b591bb6
+  + 49dd5ef08822c9551e077b7c12443e38faa61588  1.6: Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)
+  + 33f96d28525a62fb45020daf2e61c69f04a1f6c3  Revert "Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)" for now (Clean-up is underway)
+  + ec7870cb86aa490c8beafa6b5462063d3a0a05e1  1.6: Final version of 5dc09d9 (Allocator)
+  + b6e3f457d86cb4a3f1c59219a483ee8af3e6b47f  1.6: Fixed a bunch of vertex-related memory leaks
+  + 8cbbd4c7d380787f151ada89efbf1a875dc47205  1.6: Improve heap safety in allocator
+  + 00a04a05d7877b255dadc2ff3d2fe18fbd1121be  Fixed memory and thread safety issues in CProxyDirect3D
+  + ebfed7f4ea958367ba86b531d810003244a354bd  Add SharedUtil::IsReadablePointer and touch up headers
+  + 6fd9d8b47b94fa2bc8734fae85e5166d69175531  Addendum to f2e93f2 (CSettings leak): Use new cleanup helper
+  + e17a7a1c342bbe282a8cd642018c5521af6fcc7b  Revert "Addendum to 9ff02d5"
+  + f522314097b4993d527023f985b88b9073c3366d  Revert 68a8db6 to curb unknown camera performance regression in 1.6 (Revised changes are planned for 1.7 only)
+  + e1c459ec39ff04bbcaf3ad5c605d4f378c6ea4fc  Regression fix
+  + 37784c8f914045ff522925e748d4425658171665  Replace ReadRegistryStringValue
+  + e0933adc750cc68ac47a6967ffb1681fdf2ad56c  Rewrite Crash handler (to more reliably catch, dialog, dump and process all types of exceptions, even stack buffer overruns) Aims to reduce "MTA closed without anything", the handler was on ancient code and badly needed modernization away from deprecated API's as well.
+  + 43630d3420bb8bf84c07e25b59d3cad3a1e0e42c  Add SharedUtil::TryGetProcAddress, use it in various places, and address misc issues exposed during implementation
+  + 5f82d6bf0183f13f94c8c6b9072dc65bffbb8afd  Improve server list (+list interface) performance, and reduce background overhead
+  + 27ebfbc30c07f8a6862ac87c98cb969113719552  Revert reg function changes (only for 1.7)
+  + 4efcc4d52febab11421bcac1602bc0bd61adc581  Addendum to 43630d3 (Merge mishap)
+  + cef44d6a0776d54317ac6607ceff1ea778a0840a  Rewrite CRenderWareSA.TextureReplacing.cpp for performance, memory, and stability
+  + b17e00a0bbead8a3ea2d7f5312609543fba540e6  Rework clipboard handling and add SharedUtil::MakeGlobalUnlockGuard
+  + c92a4add79acb76b16d5fa7345cb321fcc9d4bd3  1.6: FIx build errors (convert back to C++ 14 where applicable, due to recent backports)
+  + 1755fd9e7544ff208659f63395d030d7295a7c23  make performance fix from 1ba43ce actually work, and a few minor tweaks
+  + a4287a79926517b4ff7d21260f9b4eb5491f4816  Addendum to 1755fd9
+  + 47bb4bca17d02e552380cdab288bc3e95c8ccb32  Part 2 of "Rewrite crash handler" (after ca5ca19)
+  + 4efb26e2d7ec010d80dc43bfd7750bb0905527bd  1.6 (C++ 14 alternative code).. Addendum to 49e5265: Fix crashes introduced, and other pre-existing issues that surfaced, including mem leaks. Memory fragmentation-related crashes due to texture replacing/allocation spam in loop are also reduced or gone (This wasn't out of mem.. it could happen even with 800MB usage), which is huge for MTA.
+  + 65bd0a4db69e86dc67d7a7f0c4933ef19775c917  1.6 (C++ 14 alternative code).. Addendum to 4efb26e: to include fixes for MTA's top 5 crashes that include SA offsets 0x003F3A17 & 0x003F374A, as well as other bugs and memory leaks.
+  + b7362a0688154297bff660c20785c97b13471c2d  1.6: Improve crash fix from 65bd0a4
+  + 97c8f434bd117bbd1efaaef0cd561200320aa907  Revert "Rewrite CRenderWareSA.TextureReplacing.cpp for performance, memory, and stability" and related recent changes. To be reintroduced later when more stable.
+  + de12081c410308bdc9ab1c768fd54551839363a5  Revert suspension related changes for now, as we need stable master. It will be re-introduced later (revised).
+  + cbe79d3fd31ad8ed4cf1d42f968222e9c822d5e5  1.6: update CEFLauncher
+  + 5359aebf5785e827b83eb319270f7f94cb08c769  Fix 3 issues: MTA freeze on quit, CEF crash on quit (non-user facing), and 'Quit' closing the game being slow to clear the last frame due to redundant blocking operation.
+  + 25169ea54d9ec240a84fa21cf4986ba8afca3c3f  Addendum to 1281716 - Makes "Quit" close the game instantly without last frame-hang, and avoids risk of ungraceful exit code
+  + 6863fc63cd3b9523d25a5938f07ecd8f065272c4  1.6: Addendum to cbe79d3
+  + 4969b947701431150530257b1749babe076eccd7  Addendum to cbe79d3
+  + f4d5b98a555ec62c0f1006fc24693aca48c179c0  Fix build error risks with sparsehash
+  + 46bb595a985fb752a71e17f4e6b6da2185866c43  1.6: Addendum #2 to cbe79d3
+  + 8f7c4d6f8ebeebdee935fe130ae9f3fab5e24e06  update CEFLauncher binary
+  + 4bc0334f7b0a4941427bbdc6b733bfe549617540  1.6: CEF reworks #2: Miscelanneous + compile fix
+  + bb98fb6abdfbe5ae6df5ccfb311747e1416471c8  1.6: Addendum to ea33335 (C++ 17 constraints)
+  + e866d70c6c727ebc519e24c22ee755205eb463a2  1.6: Remove wrong noexcept
+  + 05ae2ac89e8603beea1b4e25d36bc02bffaee2b0  1.6: Addendum to 2e56bd0 & ec248d4: Further improve CEF implementation, and fix any bugs encountered along the way. -- NOTE: Different code in SharedUtil.Misc.hpp due to 1.6 backport (C++ 14 constraint)
+  + 803cdd1f4eb60f10869201024f96f560da4f0296  1.6: Addendum to 05ae2ac: Forgot to make base dir check release-build ready
+  + db68577643aa8924bfccb8667cf78c83e8d8d07f  1.6: Update CEFLauncher binary after 05ae2ac
+  + 1e35a6a740403db84f08a4ce8c7976cad92ec164  1.6: Addendum to 05ae2ac (Fixes crash)
+  + 373bb6995e4f9a525daabd68d07ea2ef9f1ba688  1.6: Addendum to last
+  + 5e2efe32ea228c1e16dd1427ccbb750cdbc2f972  Fix mistake from 373bb69
+  + e5e308de1e7b488177a735887e1c32d8c367da00  1.6: GTA streamer bug-fix round #1. This heavily reduces bug load, which is very limiting/blocking. "Bug load" indicates that MTA uses hacks nad workarounds until now to avoid mostly race conditions from SA.
+  + 4e37df8df757fe6b79325fab47fe935d4d44f832  Fix shutdown crash in CRenderWareSA.TextureReplacing.cpp (+ some other safe tweaks/modernisations)
+  + 1cbeec0a44c75eed25155d173e1c3ba410628728  1.6: CEF reworks #3: Miscellaneous and refactors
+  + 27a37afe6571763cad76df5e1b068cc48bc2d061  1.6: Fix build after 4e37df8
+  + ac295b0db0f12c9152f6afd0d3ec96ec5436c2e5  Update CEFLauncher
+  + 2143c996a27ce0b39c807efa54e5982ec89dfd36  1.6: Fix some threadpool flaws, including: - Memory leaks - Infinite loop - Race condition - Server/resource shutdown
+  + af3251f5577c758600299f27bf98b82556fcae2b  1.6: Fix build after 9273b0d (C++ 14)
+  + 2c28340056ae192de7725f2cefe6fcef0631e673  Addendum to d2ef262 (Also fix some issues with other CTimer hooks)
+  + feb7e6567944c21ff1d3a739f84bd2d326d0c804  Fix crashes introduced by PR #3845 Like a common one at gta_sa 0x0116112B
+  + ecb27fc275e1b620435a5d498174b158ff1b3dd7  Texture replacing stability/debugging tweaks
+  + 6fec5d56c55b8a649b2b4921d4d469b889007079  Fix crash introduced by PR #4544
+  + d0c9b93babba5c66fa6f1b675540a2f3d2c8c06d  Update crash handler capabilities and, making use of that, add temp alloc instrumentation to OOM crash hotspots (To help identify leaks/suboptimal procedures)
+  + 3f04e4e78cda844fe4dff0fb5fd6a96f85923d3c  Addendum to d0c9b93
+  + a8e1d84b2e47b6f904f4f978a78b407e8da53c13  Update .git-blame-ignore-revs
+  + ed1955d762d2c15a5f3268063dbc89ad5db03c77  1.6: Fix CEF AJAX
+  + 375a667c7f931c36b51f7a8702d640afb9075458  1.6: Performance tweaks for CEF AJAX
+  + 04538e5778e0aefc645c9dbed4417c11b80beda8  Fix a bunch of server list issues, including with sort and server-info button
+  + be02addb0a103ef45cc69af490689fb0065b4373  Fix some CEF issues, and add Wine/PlayOnLinux compatibility improvements
+  + ccc8485ae92442650cbf872b898e08e416fc3f29  Fix build
+  + 6ccea706e4b49f6bdb013b554cd8ac5bf4ed8a6c  Switch to VS2026 - Build server has also been updated to Visual Studio 2026 18.0.1 (11217.181) with v145, so nightly builds from now on will use the new toolchain. This means we will have to watch for UB and compiler optimization bugs for a while, as with every major upgrade.
+  + 85f753feb2a120a678f718588fa3a54a5017ef27  1.6: Update launchers
+  + e4e493d7ffc5bb0085154fb76547ee04176962b7  Revert recent changes to CRenderWareSA.TextureReplacing.cpp (and related) once again after following 97c8f43 i tried to made less intrusive 'safe' changes again, but touching this stuff in any way just causes too many issues. Crash fixes also only cause the crash to relocate. It all started with a desire to avert an old crash reported by Xenius (who was using txd's with invalid/null textures), but it only relocated it and caused new ones.
+  + 89c11a2494f3f01bd0e7d6a7bd88bd2024c4a1dc  Remove telemetry instrumentation from places
+  + 2d940e6f27d90440a82f40ede09b3a97c3f1999a  1.6: Backport "Try to fix non-functional crashfix (0x000CFCD6)" due to number of users affected
+  + 98343bbc4bca998154ac7ed69ae121b5187eb904  Early initialize CStaticFunctionDefinitions to avoid crashes when something calls into it early. This fixes a popular crash where LunaSVG called into OutputChatBox before core and other pointers were valid
+  + 9a1a6bd116074c33b159530f5e588df7c3ae5ce7  1.6: Don't use noexcept in crash handler
+  + f151581a73f8197467fe18f6a0b20cc62cc76b14  1.6: Fix warnings in crash handler
+  + 36ec08c46dc558a46575bd8f9f2df7cf68d6b14f  CEF reworks #5: Better safety and less memory waste/fix edge-case mem leaks
+  + 07e96514eb7f2fb971513be3836df34e629ce088  Revert "Revert recent changes to CRenderWareSA.TextureReplacing.cpp (and related) once again after following 97c8f43 i tried to made less intrusive 'safe' changes again, but touching this stuff in any way just causes too many issues."
+  + e2e3390228078196e31d4b7a763b543d34b62433  1.6: Crash handler improvements against some cases it can't handle (game just terminates)
+  + 5fb2cc534a2f872137abe8e82388c0619a6db4f3  CEF safety fixes (fix UAF/UB/race)
+  + a2359558bee6cdad8f11f1e906495fbfd931073f  Improve texture loading system with fixes that include addendums for 53945f2, c637d39, and individually fix texture loss, memory leaks in stale states, and stacked replacement corruption (Accidentally destroying textures still used by another replacement)
+  + a3621bbff5dd977aba3ae20a745aa16e1bf43a1e  Further improvements for texture loading system after a235955 (including performance)
+  + 580fdebf6d16e3377aaee61e9b20b6225a305927  Better texture-related error handling and debugscript return values
+  + afe334670e337872a370a503243fc9c04c90c4b1  Fix old, top 5 SA crash @ 0x001D85AA (0x5D85AA)
+  + ce75b6eb53cf50a5cb48dd746d47e5bcf93f8e73  Crash handler: Always log registers (creating a full .dmp can fail)
+  + 4834ddce47f929b812e161c329f2078f56687716  Fix build error in certain configurations (custom builds)
+  + 28ade161a464c6bf134f5c7ac994699f15ed684a  Fix build error in certain configurations (custom builds) #2
+  + 39817c6a51a00988cc3a4e6b73a4ed54a2f6bd3e  Addendum #2 to 28ade16
+  + e317cc06e3e5e43ac27580cbd0bcad597d992577  Improve texture/shader loading system
+  + 2cef746dd5e8946df41a181a725a8d852e625d1b  Fix streaming bugs and txd leak
+  + 69f04093da0c1312e3e7b47176ba192aa6ede4a5  Fix texture mem leaks and performance issues
+  + 261091e463e68440a518ed0b39805514f83903d2  Fix texture freezes/linked list corruption
+  + 312985d4dcf73a810b450d0caf0cfe7cdb2f7fbc  [1.6] Push ALL changes from our temporary mtasa-blue repo to GitHub's mtasa-blue
+  + 2257156a77da161c7f55f661cc446cd9697a8ded  Fix SBO in CKeyBinds
+  + 0cc91a58ea4c26ff6ca90133b355bf6e7b3e4da9  Update crash handler to handle & dump 0xC0000374 and 0xC0000409 crash exits
+  + e22163f4aeaf728aa811f9b3c17ac7be8df02a36  Memory safety, crash, and SBO fixes
+  + 17a731ae5a3adeac11d7e11a1a3559601d8a642e  Addendum to e22163f: Fix last cases of SBO crash exit (which was only deferred on last patch)
+  + 7f0e60304ca2c126215e3e3a2925dcfaa6b87b64  Improve pickup handling safety, also fixes SA crash @ 0x00154244 (0x554244 - where caller is 0x45593B inside CPickups::DoPickUpEffects)
+  + c5d42327dab2dceee45ae44904f7636dc141102b  Fix build error
+  + 3db6667e6b01dbb087fbb9acbd065cfda2463f4e  Refactors for safety, common crash, and UB/visual bug paths. Validate modelinfo pointers, harden streaming/model handling, more reliable texture swaps for late models, and guard flows prone to GTA streaming system race conditions.
+  + d8713ee920a9f9be9a0856d45de5ad0937207ea8  Addendum to 3db6667
+  + f53c3c74c6da494f00238876c8545d39d8a47d5e  Addendum #2 to 3db6667
+  + 00668ef3fec34da23dfb8b9b6283cf525cb2af09  Addendum to 2143c99 ("Fix some threadpool flaws") to fix new crash
+  + 51d01e10b42a03313dd58acab81ab9b66d42de6e  Various improvements for path, file and CRC operations. Replaces 00668ef as well. This also targets the "CRC could not open file: Permission denied" issue (Although we still need to find and fix the leaked handle from where it originates)
+  + d70f8c8bd4a43699210123755087e39df47f21a5  1.6: Bump LunaSVG from 3.2.0 to [0dd60d1](sammycage/lunasvg@0dd60d1) - PR #4615
+  + ba7c9b8ea998f128cc7317a14b2d5eeb30433b37  Addendum to 3db6667: Handle and log invalid states that can lead to crashes. All callers properly handle failure return values.
+  + e5601837e2c3929e4e87c18af222248f65d2633a  Fix shutdown crash
+  + 7799d9b2ec9b430e707db2a72ec519fb1bc5d888  Move maetro patches to master behind MTA_MAETRO env var (#4641)
+  + e0fd724960cd487f817cf36d33523ea25fdd5251  Store maetro d3dcompiler_47.dll in master branch too (#4644)
+  + 598b3700197294bdb514da17770ac71e9fa84553  Delete sync-master-to-maetro.yaml
+  + 6884eb04d5851538598bc01facc0479b0e3eb254  Pull in clang-format changes from master
+  + 256bca24d0eabc0e0a33253d08d99056d420883e  Run utils/clang-format.ps1
+  + df2ceedefd6db12e6ca939ed29cc53756501ce37  Addendum for commit 486ee1c6042a706930bcebce4b31827a75238d33
+  + 609f50ee1ed5571fcb849f5f21d06d960cf8f965  Maybe fix CI for release/1.6.0
+  + 00c283c98b1e1fadc2e731a99e34a56abe00d29e  Run CI for branches against release/1.6.0 too
+  + 39d3c91158d5cb28f42d2cf2024aebc2d5ca26ff  v1.6.0: fix code after clang-format changes (#4660)
+  + 7c142fc912cb4f77197108067f0af834f38cd82c  Fix additional game freezes where something that internally called NtCreateFile / CreateFileInternal hung forever. Many other recent "freeze fixes" targeted potential causes of this type of freeze, such as: .. 8432922 (Later reworked in 51d01e1), 17650bb, e3a7998, f7a8130
+  + 3058082d61bdd98bf29c54cd2237e2b3c76d184e  Fix crash in CWorldSA::ProcessLineAgainstMesh
+  + 22d646bcb61d11fd0aa939512a593d9d3c8408c0  Revert "Fix crash in CWorldSA::ProcessLineAgainstMesh" This reverts commit 3058082d61bdd98bf29c54cd2237e2b3c76d184e.
+  + 174f3a3713a4ec0dff7e33207456f978d65fe058  Update launchers
+  + 573a3645742eb7d8644ba996f72714fa2b85ed1a  Fix compiler warnings and (type) safety issues across codebase. Modernized & improved a lot of code.
+  + ae1fcb429f8b7eae63125b51c57cc516b2bcbb87  Addendum to 573a364 (clang format)
+  + 3f5f357c2bb2ab256739839d0e47b54af54d8db1  Align TextureReplacing between 1.6/1.7
+  + 14c41dd86421efadace710ed82da06295211e3f5  Fix SA crash at 0x003336AE
+  + 3fb509250c5324770f7ef43a6c1caf14c5e3a2d4  Addendum to last (clang fix)
+  + 9c28883bd6281400459b7ebad86d61f2d70c36cc  D3D-proxy system improvements: fix state cache corruption, vtable crashes, and device-loss recovery
+  + a36865f610e445bfa3b0e3b4b6c5443e32b0e589  clang fix (Addendum to 9c28883)
+  + d84d1b2f2b60f72954ccdb2670e82ce1c9304d9a  Fix SA crash @ 0x00352BA7 (Out of video mem) similarly to how i fixed 0x003C91CC, MTA's #1 crash, earlier. For details of "earlier", see the comment https://github.com/multitheftauto/mtasa-blue/issues/3840#issuecomment-3736738172 or CrashFix_Misc38
+  + 156466a7d80c4ab1ac375f5e300ccd4f78bc0ff4  clang fix
+  + 4b677064a62dee7de55834d6d00e7069895bc1bb  Correct asm of vehicle dummy hooks in multiplayer_sa (straight up mistakes) Avoid crashing on some 'bad' models or dummy initialization race conditions (GTA/MTA) Prepare for further manipulation of 'GTA-side vehicles' (not managed by MTA or its pools) for MTA feature development - run into less immediate obstacles that would lead to crashes and various odd bugs
+  + 77f9952f1ecbffd654dcf23466f020290ddbe28d  Expand TXD pool from 5,000 to 32,768 slots
+  + cc3ea2b727bf319a9ca55170ea88d01f5def14f9  clang fix
+  + b5f02c82e5193e3b7eecf45f3e4e059237f23f54  Fix 3 streaming freezes in TXD pool expansion ASM hooks
+  + 55a36e4a294f2051670757f519832bd45933f240  Fix freeze
+  + c8e9dfe1986fd1acdc8bd4a995d36f24e0c9ef14  Clean up some old, redundant logging
+  + 3e00de408dde39417af07cec1d1ead83080b2fa7  Addendum to c8e9dfe: Update launcher (affected by logs cleanup)
+  + c28fe75acd13ff28d2459f0858b562da768a9dc2  - Fix crash in building removal after IPL streaming (streaming out an IPL sector) - Attach pointer lifetime to actual entity lifetime, preventing leaked tracking refs from building up across IPL stream cycles.
+  + 154f8d0d97b0e261255ef22ea6871473db66a253  Fix crash in CClientPed::GetMovementState
+  + 9bdec589ee6571c91a1b7c2c58764435784aec7e  Fix SA crash @ 0x00352905 (Out of video mem) similarly to how i fixed 0x003C91CC, MTA's #1 crash, earlier. For details of "earlier", see the closing comment at https://github.com/multitheftauto/mtasa-blue/issues/3840#issuecomment-3736738172 or CrashFix_Misc38
+  + 066798a681210e1092eeee57e28e04b58cc06e28  Fix SA crash at 0x00154918 (Similar/related to the fixes of crash offset 0x00154244 from 81d4c12, 638fcc9, 66eba7a)
+  + 71c81db00d8fc91b2ea3354b2e1e5322e4cd1070  Addendum to a5d76c0 ("Fix old, popular SA crash @ 0x001A5735") as it didn't fix all cases
+  + 1486019bab9cc784c3b1c273c967b28cdad8fb7b  Fix entity cleanup bugs in building pool and pool stride mismatch
+  + 449435fa39b433a6cd4a1aad80f9765c0190f08e  Fix pool index type safety
+  + f8e0d188610f907fec276c8a860e0a27dc8b2c7c  clang fix
+  + fe32870a93dfbc4f59bf346788e7d8b69dd854e7  clang fix
+  + 0880b6119d379fb3ce0e62bbfc8a88e40d6e114d  Revert "clang fix" for commits mix-up
+  + 48981996642140a1de5bb1d5aa519b898d0a3724  clang fix
+  + f630c059dc4a5f501d2bfe07dc5903c57dcacac3  Various performance tweaks
+  + 8efff7dd25a627b969bdd195f1dd7d6b049f0e1f  Adapt installer logic for maetro32
+  + c82434e926a2a81d0740adba78808ec0cd81171a  Restore launchers after cherry-picking the commit from master
+  + fd993363901179998bfa425de8602feb5201336d  Revert maetro32.dll commits
+  + c18d6d8e0b483bc1663755880086ce64995edaf8  Revert MSVC toolset to v143 (VS2022)
+  + 7356fe78babe129971c3ed028253457e8a84f19a  Update launchers
+  + 5fa5d1743def072ff196f5f1a26ea0e727884569  Update launchers x64
