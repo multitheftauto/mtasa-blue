@@ -2475,3 +2475,107 @@ std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
 {
     return m_pDiscordRichPresence;
 }
+
+// Get File Cache Path from coreconfig.xml or fallback to registry
+SString CCore::GetFileCachePath()
+{
+    // First check coreconfig.xml
+    CXMLNode* root = GetConfig();
+    if (root)
+    {
+        CXMLNode* fileCachePath = root->FindSubNode("file_cache_path");
+        if (fileCachePath)
+        {
+            SString path = fileCachePath->GetTagContent();
+            if (!path.empty())
+            {
+                // Check if custom path still exists
+                if (DirectoryExists(path))
+                {
+                    return path;
+                }
+                else
+                {
+                    // Custom path was deleted, remove from config and fallback to registry
+                    root->DeleteSubNode(fileCachePath);
+                    SaveConfig();
+                }
+            }
+        }
+    }
+
+    // Fallback to registry
+    return GetCommonRegistryValue("", "File Cache Path");
+}
+
+// Set File Cache Path in coreconfig.xml
+bool CCore::SetFileCachePath(const SString& path)
+{
+    CXMLNode* root = GetConfig();
+    if (!root)
+        return false;
+
+    CXMLNode* fileCachePath = root->FindSubNode("file_cache_path");
+    if (!fileCachePath)
+        fileCachePath = root->CreateSubNode("file_cache_path");
+
+    fileCachePath->SetTagContent(path);
+    SaveConfig();
+    return true;
+}
+
+// Remove File Cache Path from coreconfig.xml to fallback to registry
+bool CCore::ResetFileCachePath()
+{
+    CXMLNode* root = GetConfig();
+    if (!root)
+        return false;
+
+    CXMLNode* fileCachePath = root->FindSubNode("file_cache_path");
+    if (fileCachePath)
+    {
+        root->DeleteSubNode(fileCachePath);
+        SaveConfig();
+    }
+
+    return true;
+}
+
+// Validate a file cache path
+bool CCore::ValidateFileCachePath(const SString& path, SString& error)
+{
+    if (path.empty())
+    {
+        error = "Path cannot be empty";
+        return false;
+    }
+
+    // Check if directory exists
+    if (!DirectoryExists(path))
+    {
+        error = "Directory does not exist";
+        return false;
+    }
+
+    // Check if path is not inside MTA directory to avoid conflicts
+    SString mtaPath = GetMTADataPath();
+    SString normalizedPath = PathConform(path);
+    SString normalizedMTAPath = PathConform(mtaPath);
+
+    if (normalizedPath.BeginsWithI(normalizedMTAPath))
+    {
+        error = "Path cannot be inside MTA installation folder to avoid conflicts";
+        return false;
+    }
+
+    // Check if writable
+    SString testFile = PathJoin(path, "_test_write.tmp");
+    if (!FileSave(testFile, "test"))
+    {
+        error = "Directory is not writable";
+        return false;
+    }
+    FileDelete(testFile);
+
+    return true;
+}
