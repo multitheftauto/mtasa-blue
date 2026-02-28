@@ -56,6 +56,11 @@ function Invoke-ClangFormat {
     [CmdletBinding()]
     param()
 
+    $arguments = @('-i')
+    if ($VerbosePreference -eq 'Continue') {
+        $arguments += '--verbose'
+    }
+
     $repoRoot = Split-Path -Parent $PSScriptRoot
     Push-Location $repoRoot
     Write-Verbose "Changed directory to repository root: $repoRoot"
@@ -64,13 +69,13 @@ function Invoke-ClangFormat {
         Write-Verbose "Searching for source files to format..."
         $clangFormatPath = Get-ClangFormat -RepoRoot $repoRoot
         $searchFolders = "Client", "Server", "Shared"
-        $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+        $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse -ErrorAction SilentlyContinue
 
         $tmp = [System.IO.Path]::GetTempFileName()
-        $files | Out-File $tmp -Encoding utf8
+        $files.FullName | ForEach-Object { '"{0}"' -f $_ } | Set-Content $tmp -Encoding utf8
         Write-Verbose "List of files to format written to temporary file: $tmp"
 
-        & "$clangFormatPath" -i --files=$tmp
+        & "$clangFormatPath" @arguments "@$tmp"
 
         Remove-Item $tmp
         Write-Verbose "Successfully formatted $($files.Count) files."
