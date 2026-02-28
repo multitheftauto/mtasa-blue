@@ -2147,6 +2147,7 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         pPlayer->SetHealth(0.0f);
         pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
+        pPlayer->SetHasJetPack(false);
 
         // Reset his vehicle action, but only if not jacking
         // If jacking we wait for him to reply with VEHICLE_NOTIFY_JACK_ABORT
@@ -3379,6 +3380,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 {
                                     // Mark him as successfully entered
                                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
+
+                                    // Remove jetpack from him
+                                    if (pPed->IsPlayer() && pPed->HasJetPack())
+                                        pPed->SetHasJetPack(false);
 
                                     // Update our engine State
                                     if (g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART))
