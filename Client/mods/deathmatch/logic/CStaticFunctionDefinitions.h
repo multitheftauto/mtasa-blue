@@ -675,7 +675,7 @@ public:
 
     // Shape create funcs
     static CClientColCircle*    CreateColCircle(CResource& Resource, const CVector2D& vecPosition, float fRadius);
-    static CClientColCuboid*    CreateColCuboid(CResource& Resource, const CVector& vecPosition, const CVector& vecSize);
+    static CClientColCuboid*    CreateColCuboid(CResource& Resource, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation = CVector());
     static CClientColSphere*    CreateColSphere(CResource& Resource, const CVector& vecPosition, float fRadius);
     static CClientColRectangle* CreateColRectangle(CResource& Resource, const CVector2D& vecPosition, const CVector2D& vecSize);
     static CClientColPolygon*   CreateColPolygon(CResource& Resource, const CVector2D& vecPosition);

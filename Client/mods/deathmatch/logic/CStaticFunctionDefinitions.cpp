@@ -450,6 +450,13 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
             Projectile.GetRotationDegrees(vecRotation);
             break;
         }
+        case CCLIENTCOLSHAPE:
+        {
+            Entity.GetRotationDegrees(vecRotation);
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            break;
+        }
         case CCLIENTCAMERA:
         case CCLIENTEFFECT:
         {
@@ -462,6 +469,8 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
 
     return true;
 }
+
+
 
 bool CStaticFunctionDefinitions::GetElementVelocity(CClientEntity& Entity, CVector& vecVelocity)
 {
@@ -1162,6 +1171,18 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
             Projectile.SetRotationDegrees(const_cast<CVector&>(vecRotation));
             break;
         }
+        case CCLIENTCOLSHAPE:
+        {
+            auto& shape = static_cast<CClientColShape&>(Entity);
+            if (shape.GetShapeType() != COLSHAPE_CUBOID)
+                return false;
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
+                Entity.SetRotationDegrees(vecRotation);
+            else
+                Entity.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY));
+            RefreshColShapeColliders(&shape);
+            break;
+        }
         case CCLIENTCAMERA:
         case CCLIENTEFFECT:
         {
@@ -1174,6 +1195,8 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
 
     return true;
 }
+
+
 
 bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const CVector& vecVelocity)
 {
@@ -7481,9 +7504,12 @@ CClientColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource& Resourc
     return pShape;
 }
 
-CClientColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource& Resource, const CVector& vecPosition, const CVector& vecSize)
+CClientColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource& Resource, const CVector& vecPosition, const CVector& vecSize,
+                                                               const CVector& vecRotation)
 {
-    CClientColCuboid* pShape = new CClientColCuboid(m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize);
+    CVector vecRotationRadians = vecRotation;
+    ConvertDegreesToRadians(vecRotationRadians);
+    CClientColCuboid* pShape = new CClientColCuboid(m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize, vecRotationRadians);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
     return pShape;
