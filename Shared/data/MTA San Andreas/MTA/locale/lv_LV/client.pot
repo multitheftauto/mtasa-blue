@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-08 15:06+0000\n"
-"PO-Revision-Date: 2026-01-08 17:19\n"
+"POT-Creation-Date: 2026-03-02 01:15+0000\n"
+"PO-Revision-Date: 2026-03-02 01:21\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -17,27 +17,253 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/loader/Utils.cpp:535
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/loader/Dialogs.cpp:64 Client/gui/CGUIMessageBox_Impl.cpp:72
+#: Client/core/CSettings.cpp:2104 Client/core/CSettings.cpp:2128
+#: Client/core/CSettings.cpp:5643 Client/core/CSettings.cpp:5717
+#: Client/core/CSettings.cpp:5747 Client/core/CSettings.cpp:5796
+#: Client/core/CSettings.cpp:5858 Client/core/CMainMenu.cpp:1245
+#: Client/core/CQuestionBox.cpp:195 Client/core/CVersionUpdater.cpp:1635
+#: Client/core/CVersionUpdater.cpp:1653 Client/core/CVersionUpdater.cpp:1922
+#: Client/core/CVersionUpdater.cpp:1941
+#: Client/core/ServerBrowser/CServerInfo.cpp:563
+msgid "Yes"
+msgstr "Jā"
+
+#: Client/loader/Dialogs.cpp:65 Client/core/CSettings.cpp:2103
+#: Client/core/CSettings.cpp:2127 Client/core/CSettings.cpp:5642
+#: Client/core/CSettings.cpp:5716 Client/core/CSettings.cpp:5746
+#: Client/core/CSettings.cpp:5795 Client/core/CSettings.cpp:5857
+#: Client/core/CMainMenu.cpp:1244 Client/core/CQuestionBox.cpp:194
+#: Client/core/CVersionUpdater.cpp:1634 Client/core/CVersionUpdater.cpp:1652
+#: Client/core/CVersionUpdater.cpp:1921 Client/core/CVersionUpdater.cpp:1940
+#: Client/core/ServerBrowser/CServerInfo.cpp:563
+msgid "No"
+msgstr "Nē"
+
+#. Create buttons
+#. OK button
+#: Client/loader/Dialogs.cpp:66 Client/gui/CGUIMessageBox_Impl.cpp:64
+#: Client/core/CSettings.cpp:557 Client/core/CSettings.cpp:6016
+#: Client/core/CMainMenu.cpp:1265 Client/core/CVersionUpdater.cpp:1670
+#: Client/core/CVersionUpdater.cpp:1886 Client/core/CVersionUpdater.cpp:1979
+#: Client/core/CVersionUpdater.cpp:2001 Client/core/CVersionUpdater.cpp:2019
+#: Client/core/CVersionUpdater.cpp:2031 Client/core/CVersionUpdater.cpp:2183
+#: Client/core/CVersionUpdater.cpp:2192 Client/core/CVersionUpdater.cpp:2201
+#: Client/core/CVersionUpdater.cpp:2215
+msgid "OK"
+msgstr "LABI"
+
+#: Client/loader/Dialogs.cpp:67
+msgid "Quit"
+msgstr "Iziet"
+
+#: Client/loader/Dialogs.cpp:68
+#: Client/core/ServerBrowser/CServerBrowser.cpp:717
+msgid "Help"
+msgstr "Palīdzība"
+
+#. Cancel button
+#: Client/loader/Dialogs.cpp:69
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/core/CSettings.cpp:562
+#: Client/core/CSettings.cpp:6015 Client/core/CVersionUpdater.cpp:1853
+#: Client/core/CVersionUpdater.cpp:1869 Client/core/CVersionUpdater.cpp:1904
+msgid "Cancel"
+msgstr "Atcelt"
+
+#: Client/loader/Dialogs.cpp:84
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas radās kļūda"
+
+#: Client/loader/Dialogs.cpp:85
+msgid "Crash information"
+msgstr "Avārijas informācija"
+
+#: Client/loader/Dialogs.cpp:86
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Atķeksējiet lai aizsūtītu šo avārijas informāciju MTA ražotājiem"
+
+#: Client/loader/Dialogs.cpp:87
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Tādējādi jūs paaugstināsiet izredzes šai avārijai tikt novērstai."
+
+#: Client/loader/Dialogs.cpp:88
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "Vai jūs vēlaties restartēt MTA: San Andreas ?"
+
+#: Client/loader/Dialogs.cpp:95
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - Brīdinājums"
+
+#: Client/loader/Dialogs.cpp:96
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr "Jūsu Grand Theft Auto: San Andreas instalācijas direktorija sastāv no šādiem failiem:"
+
+#: Client/loader/Dialogs.cpp:98
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr "Šie faili nav vajadzīgi un var traucēt grafisko līdzekļu darbību šajā MTA:SA versijā.\n\n"
+"Ieteicams šos failus noņemt vai pārdēvēt."
+
+#: Client/loader/Dialogs.cpp:100
+msgid "Keep these files, but also show this warning on next start"
+msgstr "Saglabāt šos failus un parādiet šo brīdinājumu arī nākamajā palaišanas reizē"
+
+#: Client/loader/Dialogs.cpp:101
+msgid "Do not remind me about these files again"
+msgstr "Neatgādināt par šiem failiem atkārtoti"
+
+#: Client/loader/Dialogs.cpp:102
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr "Pārdēvēt šos failus no *.dll uz *.dll.bak"
+
+#: Client/loader/Dialogs.cpp:103
+msgid "Show me these files"
+msgstr "Parādīt šos failus"
+
+#: Client/loader/Dialogs.cpp:104
+msgid "Play MTA:SA"
+msgstr "Spēlēt MTA:SA"
+
+#: Client/loader/Dialogs.cpp:110
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - Nepareizas opcijas"
+
+#: Client/loader/Dialogs.cpp:111
+msgid "NVidia Optimus detected!"
+msgstr "Tika konstatēts NVidia Optimus!"
+
+#: Client/loader/Dialogs.cpp:112
+msgid "Try each option and see what works:"
+msgstr "Pamēģiniet katru no šīm opcijām, un izvēlieties to, kura strādā:"
+
+#: Client/loader/Dialogs.cpp:113
+msgid "A - Standard NVidia"
+msgstr "A - Standarta NVidia"
+
+#: Client/loader/Dialogs.cpp:114
+msgid "B - Alternate NVidia"
+msgstr "B - Alternatīvā NVidia"
+
+#: Client/loader/Dialogs.cpp:115
+msgid "C - Standard Intel"
+msgstr "C - Standarta Intel"
+
+#: Client/loader/Dialogs.cpp:116
+msgid "D - Alternate Intel"
+msgstr "D - Alternatīvā Intel"
+
+#: Client/loader/Dialogs.cpp:117
+msgid "If you get desperate, this might help:"
+msgstr "Ja jūs nevarat atrisināt problēmu, šis var palīdzēt:"
+
+#: Client/loader/Dialogs.cpp:118
+msgid "If you have already selected an option that works, this might help:"
+msgstr "Ja jūs jau esat izvēlējušies opciju kura darbojas, šim vajadzētu palīdzēt:"
+
+#: Client/loader/Dialogs.cpp:119
+msgid "Force windowed mode"
+msgstr "Piespiedu loga režīms"
+
+#: Client/loader/Dialogs.cpp:120
+msgid "Don't show again"
+msgstr "Nerādīt atkārtoti"
+
+#: Client/loader/Dialogs.cpp:127 Client/game_sa/CSettingsSA.cpp:911
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
+
+#: Client/loader/Dialogs.cpp:128
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Brīdinājums: Nevarēja atrast antivīrusa programmu"
+
+#: Client/loader/Dialogs.cpp:130
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA nevarēja noteikt anti-vīrusa aplikāciju jūsu PC.\n\n"
+"Vīrusi sabojā MTA darbību un var samazināt veiktspēju.\n\n"
+"Nospiediet 'Help' vairāk informācijas iegūšanai."
+
+#: Client/loader/Dialogs.cpp:133
+msgid "I have already installed an anti-virus"
+msgstr "Esmu jau instalējis antivīrusu"
+
+#: Client/loader/Dialogs.cpp:135
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "Es neinstalēšu antivīrusu.\n"
+"Es vēlos, lai mans PC lagotu un būtu iekš botneta."
+
+#: Client/loader/Dialogs.cpp:716
+msgid "The crash you experienced is due to memory abuse by servers.\n\n"
+"Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
+"Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:722
+msgid "MTA: San Andreas - Out of Memory Information"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:1070
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Meklē pēc Grand Theft Auto San Andreas"
+
+#: Client/loader/Dialogs.cpp:1073
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Lūdzu palaidiet Grand Theft Auto San Andreas"
+
+#: Client/loader/Dialogs.cpp:1081 Client/loader/Install.cpp:867
+msgid "Installing update..."
+msgstr "Instalē atjauninājumus..."
+
+#: Client/loader/Dialogs.cpp:1089 Client/loader/Install.cpp:949
+msgid "Extracting files..."
+msgstr "Atspiež failus..."
+
+#: Client/loader/Dialogs.cpp:1094 Client/loader/Utils.cpp:1451
+msgid "Copying files..."
+msgstr "Kopē failus..."
+
+#: Client/loader/Dialogs.cpp:1099 Client/loader/Utils.cpp:1511
+msgid "Copy finished early. Everything OK."
+msgstr "Kopēšana pabeigta. Viss kārtībā."
+
+#: Client/loader/Dialogs.cpp:1104 Client/loader/Utils.cpp:1517
+msgid "Finishing..."
+msgstr "Pabeidz..."
+
+#: Client/loader/Dialogs.cpp:1108 Client/loader/Utils.cpp:1519
+msgid "Done!"
+msgstr "Gatavs!"
+
+#: Client/loader/Utils.cpp:537
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
 msgstr "Ieslēdz Grand Theft Auto: San Andreas.\n"
 "Pārbaudi, vai spēle atrodas \"Program Files (x86)\" mapē."
 
-#: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
+#: Client/loader/Utils.cpp:538 Client/loader/Utils.cpp:554
 msgid "Searching for GTA: San Andreas"
 msgstr ""
 
-#: Client/loader/Utils.cpp:548
+#: Client/loader/Utils.cpp:552
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
 msgstr ""
 
-#: Client/loader/Utils.cpp:606
+#: Client/loader/Utils.cpp:622
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Izvēlieties Jūsu Grand Theft Auto: San Andreas instalācijas mapi"
 
-#: Client/loader/Utils.cpp:974 Client/loader/CInstallManager.cpp:376
+#: Client/loader/Utils.cpp:1025 Client/loader/CInstallManager.cpp:434
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -46,94 +272,89 @@ msgstr "MTA:SA ir nepieciešama Administratora piekļuve sekojošam uzdevumam:\n
 "  '%s'\n\n"
 "Lūdzu apstipriniet nākošajā logā."
 
-#: Client/loader/Utils.cpp:1075
+#: Client/loader/Utils.cpp:1126
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Kļūda ielādējot %s moduli! (%s)"
 
-#: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
-msgid "Copying files..."
-msgstr "Kopē failus..."
-
-#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
-msgid "Copy finished early. Everything OK."
-msgstr "Kopēšana pabeigta. Viss kārtībā."
-
-#: Client/loader/Utils.cpp:1466 Client/loader/Dialogs.cpp:1058
-msgid "Finishing..."
-msgstr "Pabeidz..."
-
-#: Client/loader/Utils.cpp:1468 Client/loader/Dialogs.cpp:1062
-msgid "Done!"
-msgstr "Gatavs!"
-
-#: Client/loader/Utils.cpp:1508
+#: Client/loader/Utils.cpp:1559
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Jauna %s instalācija atrasta.\n\n"
 "Vai Jūs vēlaties kopēt Jūsu iestatījumus no %s?"
 
-#: Client/loader/Utils.cpp:1547
+#: Client/loader/Utils.cpp:1598
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA notika kļūme atverot failu '%s'"
 
-#: Client/loader/Utils.cpp:1569
+#: Client/loader/Utils.cpp:1620
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA ir pazudis fails '%s'."
 
-#: Client/loader/Utils.cpp:1594
+#: Client/loader/Utils.cpp:1645
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA ir kļūme ielādējot modeli."
 
-#: Client/loader/Utils.cpp:1596
+#: Client/loader/Utils.cpp:1647
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Ja jūs nesen modificējāt gta3.img, tad pamēģiniet pārinstalēt GTA:SA."
 
-#: Client/loader/Utils.cpp:1621
+#: Client/loader/Utils.cpp:1672
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA ir kļūme pievienojot uzlabojumu transportlīdzeklim."
 
-#: Client/loader/Utils.cpp:1640
+#: Client/loader/Utils.cpp:1691
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA atrada kļūdu failā '%s'"
 
-#: Client/loader/Utils.cpp:1722
+#: Client/loader/Utils.cpp:1773
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Vai Jūsu dators restartējās, kad spēlējāt MTA:SA?"
 
-#: Client/loader/Utils.cpp:1787
+#: Client/loader/Utils.cpp:1838
 msgid "Please terminate the following programs before continuing:"
 msgstr "Lūdzu, aiztaisiet sekojošas programmas, pirms turpiniet:"
 
-#: Client/loader/MainFunctions.cpp:321
+#: Client/loader/MainFunctions.cpp:196 Client/loader/MainFunctions.cpp:2018
+msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:196 Client/loader/MainFunctions.cpp:1048
+#: Client/loader/MainFunctions.cpp:1055 Client/loader/MainFunctions.cpp:2018
+#: Client/game_sa/CGameSA.cpp:272 Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1723
+msgid "Information"
+msgstr "Informācija"
+
+#: Client/loader/MainFunctions.cpp:378
 msgid "Invalid module path detected.\n"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:348
+#: Client/loader/MainFunctions.cpp:402
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Faila versijas neatbilstības kļūda. Pārinstalējiet MTA:SA, ja Jums ar to ir problēmas.\n"
 
-#: Client/loader/MainFunctions.cpp:356
+#: Client/loader/MainFunctions.cpp:410
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Daži faili ir pazuduši. Pārinstalējiet MTA:SA, ja Jums ar to ir problēmas.\n"
 
-#: Client/loader/MainFunctions.cpp:367
+#: Client/loader/MainFunctions.cpp:420
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA nav saderīgs ar Windows 'Safe Mode'.\n\n"
 "Lūdzu restartējiet jūsu datoru.\n"
 
-#: Client/loader/MainFunctions.cpp:546
+#: Client/loader/MainFunctions.cpp:599
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "Vai Jums ir problēmas ar MTA:SA darbību?\n\n"
 "Vai vēlaties atgriezt vecāku versiju?"
 
-#: Client/loader/MainFunctions.cpp:574
+#: Client/loader/MainFunctions.cpp:627
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -141,48 +362,48 @@ msgstr "Notika problēma palaižot MTA:SA.\n"
 "Atgriežot GTA iestatījumus, dažreiz šo problēmu izdodās salabot.\n\n"
 "Vai jūs vēlaties atgriezt GTA iestatījumus?"
 
-#: Client/loader/MainFunctions.cpp:589
+#: Client/loader/MainFunctions.cpp:642
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "GTA uzstādījumi tika atgriezti.\n\n"
 "Spiediet LABI, lai turpinātu."
 
-#: Client/loader/MainFunctions.cpp:594
+#: Client/loader/MainFunctions.cpp:647
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "Failu nevar izdzēst: '%s'"
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:602
+#: Client/loader/MainFunctions.cpp:655
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "Vai jums ir problēmas ar MTA:SA dabināšanu?.\n\n"
 "Vai jūs vēlaties saņemt tiešsaistes palīdzību?"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:639
+#: Client/loader/MainFunctions.cpp:692
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "Vai jums ir problēmas startēt MTA:SA?.\n\n"
 "Vai vēlaties nomainīt norādītās opcijas?"
 
-#: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1161
-#: Client/core/CSettings.cpp:1672
+#: Client/loader/MainFunctions.cpp:693 Client/core/CSettings.cpp:1161
+#: Client/core/CSettings.cpp:1666
 msgid "Fullscreen mode:"
 msgstr "Pilnekrāna režīms:"
 
-#: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1171
-#: Client/core/CSettings.cpp:2337
+#: Client/loader/MainFunctions.cpp:693 Client/core/CSettings.cpp:1171
+#: Client/core/CSettings.cpp:2332
 msgid "Borderless window"
 msgstr "Bez-rāmju logs"
 
-#: Client/loader/MainFunctions.cpp:711
+#: Client/loader/MainFunctions.cpp:762
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "Vai jums ir problēmas startēt MTA:SA?.\n\n"
 "Mēģiniet atspējot norādītos produktus no GTA un MTA:"
 
-#: Client/loader/MainFunctions.cpp:744
+#: Client/loader/MainFunctions.cpp:797
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -190,28 +411,20 @@ msgstr "BRĪDINĀJUMS\n\n"
 "MTA:SA konstatēja neparastu aktivitāti.\n"
 "Lūdzu veiciet datora skenēšanu lai novērstu draudus sistēmai.\n\n"
 
-#: Client/loader/MainFunctions.cpp:747
+#: Client/loader/MainFunctions.cpp:800
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "Konstatētais fails bija:  %s\n"
 
-#: Client/loader/MainFunctions.cpp:995
+#: Client/loader/MainFunctions.cpp:1047
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "Kāda no GTA: San Andreas instancēm šobrīd darbojās. Tām ir jābūt aizvērtām, pirms startējat MTA:SA. Vai vēlaties to darīt tagad?"
 
-#: Client/loader/MainFunctions.cpp:996 Client/loader/MainFunctions.cpp:1003
-#: Client/loader/MainFunctions.cpp:1969
-#: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1708
-#: Client/game_sa/CGameSA.cpp:270
-msgid "Information"
-msgstr "Informācija"
-
-#: Client/loader/MainFunctions.cpp:1002
+#: Client/loader/MainFunctions.cpp:1054
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "Nespēj apturēt GTA: San Andreas. Ja problēma joprojām pastāv, restartējiet datoru."
 
-#: Client/loader/MainFunctions.cpp:1131
+#: Client/loader/MainFunctions.cpp:1188
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -221,124 +434,223 @@ msgstr "Kļūda restartējot MTA:SA\n\n"
 "apstādiniet 'gta_sa.exe' un 'Multi Theft Auto.exe' procesus\n\n\n"
 "Mēģināt palaist MTA:SA vēlreiz?"
 
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
-#: Client/loader/MainFunctions.cpp:1136 Client/loader/MainFunctions.cpp:1157
-#: Client/loader/MainFunctions.cpp:1161 Client/loader/MainFunctions.cpp:1572
-#: Client/loader/CInstallManager.cpp:1079
-#: Client/loader/CInstallManager.cpp:1088 Client/core/CConnectManager.cpp:86
-#: Client/core/CConnectManager.cpp:117 Client/core/CConnectManager.cpp:133
-#: Client/core/CConnectManager.cpp:271 Client/core/CConnectManager.cpp:329
-#: Client/core/CConnectManager.cpp:415 Client/core/CConnectManager.cpp:422
-#: Client/core/CConnectManager.cpp:432 Client/core/CSettings.cpp:3839
-#: Client/core/CSettings.cpp:5215 Client/core/CSettings.cpp:5243
-#: Client/core/CSettings.cpp:5982 Client/core/CCore.cpp:1375
-#: Client/core/CGUI.cpp:94 Client/core/DXHook/CDirect3DHook9.cpp:128
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1601
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1623
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1682
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1758
-#: Client/game_sa/CGameSA.cpp:263 Client/game_sa/CGameSA.cpp:274
-#: Client/mods/deathmatch/logic/CClientGame.cpp:673
-#: Client/mods/deathmatch/logic/CClientGame.cpp:741
-#: Client/mods/deathmatch/logic/CClientGame.cpp:765
-#: Client/mods/deathmatch/logic/CClientGame.cpp:787
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1199
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1279
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1358
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1395
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1444
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/loader/MainFunctions.cpp:1193 Client/loader/MainFunctions.cpp:1215
+#: Client/loader/MainFunctions.cpp:1220 Client/loader/MainFunctions.cpp:1627
+#: Client/loader/CInstallManager.cpp:1116
+#: Client/loader/CInstallManager.cpp:1125 Client/game_sa/CGameSA.cpp:265
+#: Client/game_sa/CGameSA.cpp:276
+#: Client/mods/deathmatch/logic/CClientGame.cpp:681
+#: Client/mods/deathmatch/logic/CClientGame.cpp:749
+#: Client/mods/deathmatch/logic/CClientGame.cpp:773
+#: Client/mods/deathmatch/logic/CClientGame.cpp:795
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1211
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1291
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1301
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1370
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1407
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1456
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1468
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/core/CSettings.cpp:3833 Client/core/CSettings.cpp:5209
+#: Client/core/CSettings.cpp:5237 Client/core/CSettings.cpp:5995
+#: Client/core/CConnectManager.cpp:86 Client/core/CConnectManager.cpp:117
+#: Client/core/CConnectManager.cpp:133 Client/core/CConnectManager.cpp:273
+#: Client/core/CConnectManager.cpp:331 Client/core/CConnectManager.cpp:417
+#: Client/core/CConnectManager.cpp:424 Client/core/CConnectManager.cpp:434
+#: Client/core/CCore.cpp:1397 Client/core/CGUI.cpp:94
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1616
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1638
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1697
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1771
+#: Client/core/DXHook/CDirect3DHook9.cpp:128
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Error"
 msgstr "Kļūda"
 
-#: Client/loader/MainFunctions.cpp:1155
+#: Client/loader/MainFunctions.cpp:1213
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "Cita MTA instance darbojās.\n\n"
 "Ja šī problēma atkārtojās, lūdzu restartējiet savu datoru"
 
-#: Client/loader/MainFunctions.cpp:1159
+#: Client/loader/MainFunctions.cpp:1218
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "Cita MTA instance darbojās.\n\n"
 "Vai vēlaties to izbeigt?"
 
-#: Client/loader/MainFunctions.cpp:1196
+#: Client/loader/MainFunctions.cpp:1255
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "Iztrūkst reģistru ieraksti. Lūdzu pārinstalējiet Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:1202
+#: Client/loader/MainFunctions.cpp:1260
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "Ceļs uz Jūsu GTA: San Andreas instalāciju satur neatbalstītas (unicode) rakstzīmes. Lūdzu pārvietojiet savu Grand Theft Auto: San Andreas instalāciju, lai izveidotu saderīgu ceļu, kurš satur standarta ASCII rakstzīmes un lūdzu pārinstalējiet Multi Theft Auto San Andreas."
 
-#: Client/loader/MainFunctions.cpp:1215
+#: Client/loader/MainFunctions.cpp:1273
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1398
+#: Client/loader/MainFunctions.cpp:1461
 msgid "Invalid installation paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1529
+#: Client/loader/MainFunctions.cpp:1589
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Ielāde neizdevās. Lūdzu pārliecinieties, ka pēdējie datu faili ir uzinstalēti pareizi."
 
-#: Client/loader/MainFunctions.cpp:1538
+#: Client/loader/MainFunctions.cpp:1598
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Ielāde neizdevās. Lūdzu pārliecinieties, ka %s ir instalēts pareizi."
 
-#: Client/loader/MainFunctions.cpp:1547
+#: Client/loader/MainFunctions.cpp:1605
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Ielāde neizdevās. Nespēj atrast gta_sa.exe iekš %s."
 
-#: Client/loader/MainFunctions.cpp:1561
+#: Client/loader/MainFunctions.cpp:1616
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Ielāde neizdevās. %s atrodas GTA mapē. Lūdzu izdzēsiet, pirms turpiniet."
 
-#: Client/loader/MainFunctions.cpp:1571
+#: Client/loader/MainFunctions.cpp:1626
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Galvenajam failam ir nepareizs nosaukums (%s)"
 
-#: Client/loader/MainFunctions.cpp:1618
+#: Client/loader/MainFunctions.cpp:1668
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1626
+#: Client/loader/MainFunctions.cpp:1675
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1650
+#: Client/loader/MainFunctions.cpp:1698
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1819
+#: Client/loader/MainFunctions.cpp:1865
 msgid "Invalid game paths detected."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1827
+#: Client/loader/MainFunctions.cpp:1873
 msgid "Fix configuration issue"
 msgstr "Labot konfigurācijas kļūdu"
 
-#: Client/loader/MainFunctions.cpp:1969
-msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
+#: Client/loader/CInstallManager.cpp:449
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA nespēj izpildīt sekojošu uzdevumu:\n\n"
+"  '%s'\n"
+
+#: Client/loader/CInstallManager.cpp:518
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** Avārija notika graphics driver error **\n\n"
+"** Lūdzu atjaunojiet graphics drivers **"
+
+#: Client/loader/CInstallManager.cpp:528
+msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
 msgstr ""
+
+#: Client/loader/CInstallManager.cpp:534
+msgid "** Enhanced crash capture will be attempted on next launch. **"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1096
+msgid "Install updated MTA:SA files"
+msgstr "Instalēt atjaunotos MTA:SA failus"
+
+#: Client/loader/CInstallManager.cpp:1116
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Nespēj atjaunot failu konfliktu dēļ. Lūdzu aizveriet citas aplikācijas un atkārtojiet"
+
+#: Client/loader/CInstallManager.cpp:1125
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto netika uzinstalēts pareizi, lūdzu pārinstalējiet. %s"
+
+#: Client/loader/CInstallManager.cpp:1200
+msgid "MTA:SA cannot launch because copying a file failed:"
+msgstr "MTA:SA nevar tikt palaists, jo faila kopēšana neizdevās:"
+
+#: Client/loader/CInstallManager.cpp:1206
+#: Client/loader/CInstallManager.cpp:1246
+msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
+msgstr "MTA:SA nevar tikt palaists, jo MTA:SA fails ir nepareizs vai trūkst:"
+
+#: Client/loader/CInstallManager.cpp:1215
+msgid "Copy MTA:SA files"
+msgstr "Kopēt MTA:SA failus"
+
+#: Client/loader/CInstallManager.cpp:1238
+#: Client/loader/CInstallManager.cpp:1316
+msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
+msgstr "MTA:SA nevar tikt palaists, jo GTA:SA fails ir nepareizs vai trūkst:"
+
+#: Client/loader/CInstallManager.cpp:1323
+msgid "Patch GTA:SA dependency"
+msgstr "Izlabot GTA:SA bibliotēkas"
+
+#: Client/loader/CInstallManager.cpp:1371
+msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
+msgstr "MTA:SA nevar tikt palaists, jo GTA:SA izpildāmais fails ir nepareizs vai trūkst:"
+
+#: Client/loader/CInstallManager.cpp:1375
+msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
+msgstr "Lūdzu, pārbaudiet savu pretvīrusa programmu, iespējams, notikusi nepamatota pozitīva atklāšana. Mēģiniet pievienot izņēmumu GTA:SA izpildāmajam failam un restartējiet MTA:SA."
+
+#: Client/loader/CInstallManager.cpp:1381
+msgid "Generate GTA:SA"
+msgstr "Ģenerēt GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:1396
+msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
+msgstr "MTA:SA nevar tikt palaists, jo GTA:SA izpildāmais fails nav ielādējams:"
+
+#: Client/loader/CInstallManager.cpp:1403
+#: Client/loader/CInstallManager.cpp:1426
+msgid "Patch GTA:SA"
+msgstr "Izlabot GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:1419
+msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
+msgstr "MTA:SA nevar palaist, jo GTA:SA labošana neizdevās:"
+
+#: Client/loader/CInstallManager.cpp:1600 Client/core/CCore.cpp:851
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA instalācija nevar turpināties, jo %s diskā nav vietas."
+
+#: Client/loader/CInstallManager.cpp:1656
+msgid "Missing file:"
+msgstr "Nevar atrast failu:"
+
+#: Client/loader/CInstallManager.cpp:1660
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Ja MTA nespēj ieslēgties, lūdzu pārinstalējiet GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:1695
+msgid "Update install settings"
+msgstr "Atjaunot instalācijas uzstādījumus"
+
+#: Client/loader/CInstallManager.cpp:1850
+msgid "Update compatibility settings"
+msgstr "Atjaunot saderības uzstādījumus"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
@@ -364,2413 +676,20 @@ msgstr "Jūsu instalācija varētu būt bojāta.\n\n"
 "Jums vajadzētu pārinstalēt Multi Theft Auto no vietnes www.multitheftauto.com\n"
 "vai mēģināt palaist atjaunošanu ar administratora tiesībām."
 
-#: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1035
-msgid "Installing update..."
-msgstr "Instalē atjauninājumus..."
-
-#: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1043
-msgid "Extracting files..."
-msgstr "Atspiež failus..."
-
-#: Client/loader/CInstallManager.cpp:391
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA nespēj izpildīt sekojošu uzdevumu:\n\n"
-"  '%s'\n"
-
-#: Client/loader/CInstallManager.cpp:460
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** Avārija notika graphics driver error **\n\n"
-"** Lūdzu atjaunojiet graphics drivers **"
-
-#: Client/loader/CInstallManager.cpp:470
-msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:476
-msgid "** Enhanced crash capture will be attempted on next launch. **"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1059
-msgid "Install updated MTA:SA files"
-msgstr "Instalēt atjaunotos MTA:SA failus"
-
-#: Client/loader/CInstallManager.cpp:1079
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Nespēj atjaunot failu konfliktu dēļ. Lūdzu aizveriet citas aplikācijas un atkārtojiet"
-
-#: Client/loader/CInstallManager.cpp:1088
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto netika uzinstalēts pareizi, lūdzu pārinstalējiet. %s"
-
-#: Client/loader/CInstallManager.cpp:1140
-msgid "Create GTA:SA junctions"
-msgstr "Izveidojiet GTA:SA saites"
-
-#: Client/loader/CInstallManager.cpp:1184
-msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA nevar tikt palaists, jo faila kopēšana neizdevās:"
-
-#: Client/loader/CInstallManager.cpp:1190
-#: Client/loader/CInstallManager.cpp:1230
-msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SA nevar tikt palaists, jo MTA:SA fails ir nepareizs vai trūkst:"
-
-#: Client/loader/CInstallManager.cpp:1199
-msgid "Copy MTA:SA files"
-msgstr "Kopēt MTA:SA failus"
-
-#: Client/loader/CInstallManager.cpp:1222
-#: Client/loader/CInstallManager.cpp:1300
-msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "MTA:SA nevar tikt palaists, jo GTA:SA fails ir nepareizs vai trūkst:"
-
-#: Client/loader/CInstallManager.cpp:1307
-msgid "Patch GTA:SA dependency"
-msgstr "Izlabot GTA:SA bibliotēkas"
-
-#: Client/loader/CInstallManager.cpp:1355
-msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "MTA:SA nevar tikt palaists, jo GTA:SA izpildāmais fails ir nepareizs vai trūkst:"
-
-#: Client/loader/CInstallManager.cpp:1359
-msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "Lūdzu, pārbaudiet savu pretvīrusa programmu, iespējams, notikusi nepamatota pozitīva atklāšana. Mēģiniet pievienot izņēmumu GTA:SA izpildāmajam failam un restartējiet MTA:SA."
-
-#: Client/loader/CInstallManager.cpp:1365
-msgid "Generate GTA:SA"
-msgstr "Ģenerēt GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:1380
-msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "MTA:SA nevar tikt palaists, jo GTA:SA izpildāmais fails nav ielādējams:"
-
-#: Client/loader/CInstallManager.cpp:1387
-#: Client/loader/CInstallManager.cpp:1410
-msgid "Patch GTA:SA"
-msgstr "Izlabot GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:1403
-msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "MTA:SA nevar palaist, jo GTA:SA labošana neizdevās:"
-
-#: Client/loader/CInstallManager.cpp:1584 Client/core/CCore.cpp:846
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA instalācija nevar turpināties, jo %s diskā nav vietas."
-
-#: Client/loader/CInstallManager.cpp:1640
-msgid "Missing file:"
-msgstr "Nevar atrast failu:"
-
-#: Client/loader/CInstallManager.cpp:1644
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Ja MTA nespēj ieslēgties, lūdzu pārinstalējiet GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:1679
-msgid "Update install settings"
-msgstr "Atjaunot instalācijas uzstādījumus"
-
-#: Client/loader/CInstallManager.cpp:1832
-msgid "Update compatibility settings"
-msgstr "Atjaunot saderības uzstādījumus"
-
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:63 Client/core/CVersionUpdater.cpp:1635
-#: Client/core/CVersionUpdater.cpp:1653 Client/core/CVersionUpdater.cpp:1922
-#: Client/core/CVersionUpdater.cpp:1941 Client/core/CSettings.cpp:2109
-#: Client/core/CSettings.cpp:2133 Client/core/CSettings.cpp:5630
-#: Client/core/CSettings.cpp:5704 Client/core/CSettings.cpp:5734
-#: Client/core/CSettings.cpp:5783 Client/core/CSettings.cpp:5845
-#: Client/core/CMainMenu.cpp:1238 Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:565
-#: Client/gui/CGUIMessageBox_Impl.cpp:72
-msgid "Yes"
-msgstr "Jā"
-
-#: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
-#: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
-#: Client/core/CVersionUpdater.cpp:1940 Client/core/CSettings.cpp:2108
-#: Client/core/CSettings.cpp:2132 Client/core/CSettings.cpp:5629
-#: Client/core/CSettings.cpp:5703 Client/core/CSettings.cpp:5733
-#: Client/core/CSettings.cpp:5782 Client/core/CSettings.cpp:5844
-#: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
-#: Client/core/ServerBrowser/CServerInfo.cpp:565
-msgid "No"
-msgstr "Nē"
-
-#. Create buttons
-#. OK button
-#: Client/loader/Dialogs.cpp:65 Client/core/CVersionUpdater.cpp:1670
-#: Client/core/CVersionUpdater.cpp:1886 Client/core/CVersionUpdater.cpp:1979
-#: Client/core/CVersionUpdater.cpp:2001 Client/core/CVersionUpdater.cpp:2019
-#: Client/core/CVersionUpdater.cpp:2031 Client/core/CVersionUpdater.cpp:2183
-#: Client/core/CVersionUpdater.cpp:2192 Client/core/CVersionUpdater.cpp:2201
-#: Client/core/CVersionUpdater.cpp:2215 Client/core/CSettings.cpp:561
-#: Client/core/CSettings.cpp:6003 Client/core/CMainMenu.cpp:1258
-#: Client/gui/CGUIMessageBox_Impl.cpp:64
-msgid "OK"
-msgstr "LABI"
-
-#: Client/loader/Dialogs.cpp:66
-msgid "Quit"
-msgstr "Iziet"
-
-#: Client/loader/Dialogs.cpp:67
-#: Client/core/ServerBrowser/CServerBrowser.cpp:717
-msgid "Help"
-msgstr "Palīdzība"
-
-#. Cancel button
-#: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
-#: Client/core/CVersionUpdater.cpp:1869 Client/core/CVersionUpdater.cpp:1904
-#: Client/core/CSettings.cpp:566 Client/core/CSettings.cpp:6002
-#: Client/gui/CGUIMessageBox_Impl.cpp:68
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-msgid "Cancel"
-msgstr "Atcelt"
-
-#: Client/loader/Dialogs.cpp:83
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas radās kļūda"
-
-#: Client/loader/Dialogs.cpp:84
-msgid "Crash information"
-msgstr "Avārijas informācija"
-
-#: Client/loader/Dialogs.cpp:85
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Atķeksējiet lai aizsūtītu šo avārijas informāciju MTA ražotājiem"
-
-#: Client/loader/Dialogs.cpp:86
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Tādējādi jūs paaugstināsiet izredzes šai avārijai tikt novērstai."
-
-#: Client/loader/Dialogs.cpp:87
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Vai jūs vēlaties restartēt MTA: San Andreas ?"
-
-#: Client/loader/Dialogs.cpp:94
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Brīdinājums"
-
-#: Client/loader/Dialogs.cpp:95
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Jūsu Grand Theft Auto: San Andreas instalācijas direktorija sastāv no šādiem failiem:"
-
-#: Client/loader/Dialogs.cpp:97
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr "Šie faili nav vajadzīgi un var traucēt grafisko līdzekļu darbību šajā MTA:SA versijā.\n\n"
-"Ieteicams šos failus noņemt vai pārdēvēt."
-
-#: Client/loader/Dialogs.cpp:99
-msgid "Keep these files, but also show this warning on next start"
-msgstr "Saglabāt šos failus un parādiet šo brīdinājumu arī nākamajā palaišanas reizē"
-
-#: Client/loader/Dialogs.cpp:100
-msgid "Do not remind me about these files again"
-msgstr "Neatgādināt par šiem failiem atkārtoti"
-
-#: Client/loader/Dialogs.cpp:101
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Pārdēvēt šos failus no *.dll uz *.dll.bak"
-
-#: Client/loader/Dialogs.cpp:102
-msgid "Show me these files"
-msgstr "Parādīt šos failus"
-
-#: Client/loader/Dialogs.cpp:103
-msgid "Play MTA:SA"
-msgstr "Spēlēt MTA:SA"
-
-#: Client/loader/Dialogs.cpp:109
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Nepareizas opcijas"
-
-#: Client/loader/Dialogs.cpp:110
-msgid "NVidia Optimus detected!"
-msgstr "Tika konstatēts NVidia Optimus!"
-
-#: Client/loader/Dialogs.cpp:111
-msgid "Try each option and see what works:"
-msgstr "Pamēģiniet katru no šīm opcijām, un izvēlieties to, kura strādā:"
-
-#: Client/loader/Dialogs.cpp:112
-msgid "A - Standard NVidia"
-msgstr "A - Standarta NVidia"
-
-#: Client/loader/Dialogs.cpp:113
-msgid "B - Alternate NVidia"
-msgstr "B - Alternatīvā NVidia"
-
-#: Client/loader/Dialogs.cpp:114
-msgid "C - Standard Intel"
-msgstr "C - Standarta Intel"
-
-#: Client/loader/Dialogs.cpp:115
-msgid "D - Alternate Intel"
-msgstr "D - Alternatīvā Intel"
-
-#: Client/loader/Dialogs.cpp:116
-msgid "If you get desperate, this might help:"
-msgstr "Ja jūs nevarat atrisināt problēmu, šis var palīdzēt:"
-
-#: Client/loader/Dialogs.cpp:117
-msgid "If you have already selected an option that works, this might help:"
-msgstr "Ja jūs jau esat izvēlējušies opciju kura darbojas, šim vajadzētu palīdzēt:"
-
-#: Client/loader/Dialogs.cpp:118
-msgid "Force windowed mode"
-msgstr "Piespiedu loga režīms"
-
-#: Client/loader/Dialogs.cpp:119
-msgid "Don't show again"
-msgstr "Nerādīt atkārtoti"
-
-#: Client/loader/Dialogs.cpp:126 Client/game_sa/CSettingsSA.cpp:910
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
-#: Client/loader/Dialogs.cpp:127
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Brīdinājums: Nevarēja atrast antivīrusa programmu"
-
-#: Client/loader/Dialogs.cpp:129
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA nevarēja noteikt anti-vīrusa aplikāciju jūsu PC.\n\n"
-"Vīrusi sabojā MTA darbību un var samazināt veiktspēju.\n\n"
-"Nospiediet 'Help' vairāk informācijas iegūšanai."
-
-#: Client/loader/Dialogs.cpp:132
-msgid "I have already installed an anti-virus"
-msgstr "Esmu jau instalējis antivīrusu"
-
-#: Client/loader/Dialogs.cpp:134
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "Es neinstalēšu antivīrusu.\n"
-"Es vēlos, lai mans PC lagotu un būtu iekš botneta."
-
-#: Client/loader/Dialogs.cpp:667
-msgid "The crash you experienced is due to memory abuse by servers.\n\n"
-"Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
-"Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:673
-msgid "MTA: San Andreas - Out of Memory Information"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:1024
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Meklē pēc Grand Theft Auto San Andreas"
-
-#: Client/loader/Dialogs.cpp:1027
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Lūdzu palaidiet Grand Theft Auto San Andreas"
-
-#: Client/core/CConnectManager.cpp:85
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Savienojums neizdevās. Norādīts nederīgs segvārds!"
-
-#: Client/core/CConnectManager.cpp:116
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Savienošanās neizdevās. Norādīts nederīgs hosts!"
-
-#: Client/core/CConnectManager.cpp:132
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Savienošanās ar %s caur %u portu neizdevās!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:153
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Savienojas ar %s:%u ..."
-
-#: Client/core/CConnectManager.cpp:155
-#, c-format
-msgid "Reconnecting to %s:%u ..."
-msgstr ""
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:156
-#: Client/mods/deathmatch/logic/CClientGame.cpp:689
-msgid "CONNECTING"
-msgstr "SAVIENOJAS"
-
-#: Client/core/CConnectManager.cpp:271
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1358
-msgid "Connection timed out"
-msgstr "Savienojums iztecējis"
-
-#: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1406
-msgid "Disconnected: unknown protocol error"
-msgstr "Atvienošanās: nezināma protokola kļūda"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1410
-msgid "Disconnected: disconnected remotely"
-msgstr "Atvienošanās: savienojums pazuda attālināti"
-
-#: Client/core/CConnectManager.cpp:297
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1414
-msgid "Disconnected: connection lost remotely"
-msgstr "Atvienošanās: savienojums pazuda attālināti"
-
-#: Client/core/CConnectManager.cpp:301
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1418
-msgid "Disconnected: you are banned from this server"
-msgstr "Atvienots: jums ir liegta piekļuve šim serverim"
-
-#: Client/core/CConnectManager.cpp:308
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1426
-msgid "Disconnected: disconnected from the server"
-msgstr "Atvienots: atvienojās no servera"
-
-#: Client/core/CConnectManager.cpp:312
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1430
-msgid "Disconnected: connection to the server was lost"
-msgstr "Atvienojās: pārtrūka savienojums ar serveri"
-
-#: Client/core/CConnectManager.cpp:319
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1438
-msgid "Disconnected: connection was refused"
-msgstr "Atvienots: neizdevās savienoties"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:414
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Nav ieinstalēta šī modifikācija (%s)"
-
-#: Client/core/CConnectManager.cpp:422
-msgid "Bad server response (2)"
-msgstr "Nav servera atbildes (2)"
-
-#: Client/core/CConnectManager.cpp:432
-msgid "Bad server response (1)"
-msgstr "Nav servera atbildes (1)"
-
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Latviešu"
-
-#: Client/core/CVersionUpdater.cpp:627
-msgid "Busy"
-msgstr "Aizņemts"
-
-#: Client/core/CVersionUpdater.cpp:627
-msgid "Can't check for updates right now"
-msgstr "Šobrīd nespēj pārbaudīt atjauninājumus"
-
-#: Client/core/CVersionUpdater.cpp:1630 Client/core/CVersionUpdater.cpp:1650
-#: Client/core/CVersionUpdater.cpp:1668
-#, c-format
-msgid "MTA:SA %s required"
-msgstr "MTA:SA %s pieprasa"
-
-#: Client/core/CVersionUpdater.cpp:1631
-#, c-format
-msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
-"Do you want to download and install MTA:SA %s ?"
-msgstr "MTA:SA %s atjauninājums ir nepieciešams, lai pievienotos izvēlētajam serverim.\n\n"
-"Vai vēlaties lejupielādēt un instalēt MTA:SA %s ?"
-
-#: Client/core/CVersionUpdater.cpp:1651
-#, c-format
-msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Vai Jūs vēlaties palaist MTA:SA %s un pievienoties šim serverim ?"
-
-#: Client/core/CVersionUpdater.cpp:1669
-msgid "It is not possible to connect at this time.\n\n"
-"Please try later."
-msgstr "Šobrīd, nav iespējams savienoties.\n\n"
-"Mēģiniet vēlāk."
-
-#: Client/core/CVersionUpdater.cpp:1851
-msgid "Connecting"
-msgstr "Savienojās"
-
-#: Client/core/CVersionUpdater.cpp:1852 Client/core/CVersionUpdater.cpp:1868
-msgid "Please wait..."
-msgstr "Lūdzu uzgaidiet..."
-
-#: Client/core/CVersionUpdater.cpp:1867
-msgid "CHECKING"
-msgstr "PĀRBAUDA"
-
-#: Client/core/CVersionUpdater.cpp:1884 Client/core/CVersionUpdater.cpp:1977
-msgid "UPDATE CHECK"
-msgstr "ATJAUNINĀJUMA PĀRBAUDE"
-
-#: Client/core/CVersionUpdater.cpp:1885
-msgid "No update needed"
-msgstr "Nav nepieciešams atjauninājums"
-
-#: Client/core/CVersionUpdater.cpp:1902
-msgid "DOWNLOADING"
-msgstr "LEJUPIELĀDĒ"
-
-#: Client/core/CVersionUpdater.cpp:1903
-msgid "waiting..."
-msgstr "gaida..."
-
-#: Client/core/CVersionUpdater.cpp:1919
-msgid "MANDATORY UPDATE"
-msgstr "OBLIGĀTS ATJAUNINĀJUMS"
-
-#: Client/core/CVersionUpdater.cpp:1920
-msgid "To join this server, you must update MTA.\n\n"
-" Do you want to update now ?"
-msgstr "Lai pievienotos šim serverim, Jums ir jāatjauno MTA.\n\n"
-" Vai Jūs vēlaties atjaunot tagad ?"
-
-#: Client/core/CVersionUpdater.cpp:1938
-msgid "OPTIONAL UPDATE"
-msgstr "IETEICAMS ATJAUNINĀJUMS"
-
-#: Client/core/CVersionUpdater.cpp:1939
-msgid "Server says an update is recommended, but not essential.\n\n"
-" Do you want to update now ?"
-msgstr "Serveris saka, ka ir atjauninājums ir ieteicams, bet ne obligāti.\n\n"
-"Vai Jūs vēlaties atjaunot tagad ?"
-
-#: Client/core/CVersionUpdater.cpp:1978
-msgid "An update is currently not available.\n\n"
-"Please check www.multitheftauto.com"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1999 Client/core/CVersionUpdater.cpp:2181
-msgid "ERROR SAVING"
-msgstr "KĻŪDAS SAGLABĀŠANA"
-
-#: Client/core/CVersionUpdater.cpp:2000 Client/core/CVersionUpdater.cpp:2182
-msgid "Unable to create the file."
-msgstr "Nespēj izveidot failu."
-
-#: Client/core/CVersionUpdater.cpp:2008 Client/core/CVersionUpdater.cpp:2017
-#: Client/core/CVersionUpdater.cpp:2190 Client/core/CVersionUpdater.cpp:2199
-msgid "ERROR DOWNLOADING"
-msgstr "KĻŪDA LEJUPIELĀDĒJOT"
-
-#: Client/core/CVersionUpdater.cpp:2009 Client/core/CVersionUpdater.cpp:2191
-msgid "The downloaded file appears to be incorrect."
-msgstr "Lejupielādētais fails izskatās nederīgs."
-
-#: Client/core/CVersionUpdater.cpp:2018 Client/core/CVersionUpdater.cpp:2200
-msgid "For some reason."
-msgstr "Kāda iemesla dēļ."
-
-#: Client/core/CVersionUpdater.cpp:2029 Client/core/CVersionUpdater.cpp:2213
-msgid "DOWNLOAD COMPLETE"
-msgstr "LEJUPIELĀDE PABEIGTA"
-
-#: Client/core/CVersionUpdater.cpp:2053
-msgid " - Unknown problem in _DialogUpdateResult"
-msgstr " - Nezināma problēma iekš _DialogUpdateResult"
-
-#: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5731
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "PĀRVEIDOTIE GTA:SA FAILI"
-
-#: Client/core/CVersionUpdater.cpp:2151 Client/core/CVersionUpdater.cpp:2161
-msgid "Ok"
-msgstr "Labi"
-
-#: Client/core/CVersionUpdater.cpp:2159
-msgid "ERROR"
-msgstr "KĻŪDA"
-
-#: Client/core/CVersionUpdater.cpp:2160
-msgid "Some MTA:SA data files are missing.\n\n\n"
-"Please reinstall MTA:SA"
-msgstr "Daži MTA:SA datu faili ir pazuduši.\n\n\n"
-"Lūdzu pārinstalējiet MTA:SA"
-
-#: Client/core/CVersionUpdater.cpp:2837
-#, c-format
-msgid "%3d %% completed"
-msgstr "%3d %% pabeigti"
-
-#: Client/core/CVersionUpdater.cpp:2840
-#, c-format
-msgid "\n\n"
-"Waiting for response  -  %-3d"
-msgstr "\n\n"
-"Gaida atbildi  -  %-3d"
-
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ KOMANDAS PALIDZIBA ]***\n"
-
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Pareizs laiks ir %d:%02d:%02d"
-
-#: Client/core/CCommandFuncs.cpp:191
-msgid "connect: Network is not ready, please wait a moment"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:225
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "connect: Pareiza forma ir 'connect <hosts> [<ports> <segvārds> <parole>]'"
-
-#: Client/core/CCommandFuncs.cpp:233
-msgid "connect: Bad port number"
-msgstr "connect: Nepareizs ports"
-
-#: Client/core/CCommandFuncs.cpp:255
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "connect: Pieslēdzas pie %s:%u..."
-
-#: Client/core/CCommandFuncs.cpp:259
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "connect: Neizdevās pieslēgties pie %s:%u!"
-
-#: Client/core/CCommandFuncs.cpp:264
-msgid "connect: Failed to unload current mod"
-msgstr "connect: Neizdevās atslēgt esošo modu"
-
-#: Client/core/CCommandFuncs.cpp:284
-msgid "reconnect: Network is not ready, please wait a moment"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:306
-msgid "reconnect: Bad port number"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:325
-#, c-format
-msgid "reconnect: Reconnecting to %s:%u..."
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:329
-#, c-format
-msgid "reconnect: could not connect to %s:%u!"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:363
-msgid "Bound all controls from GTA"
-msgstr "Iebindotas visas kontroles no GTA"
-
-#: Client/core/CCommandFuncs.cpp:377
-msgid "Saved configuration file"
-msgstr "Konfigurācijas fails tika saglabāts"
-
-#. Print it
-#: Client/core/CCommandFuncs.cpp:456
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* Jūsu sērijas kods ir: %s"
-
-#. Create window (with frame) if it will fit inside the screen resolution
-#: Client/core/CSettings.cpp:503
-msgid "SETTINGS"
-msgstr "UZSTĀDĪJUMI"
-
-#: Client/core/CSettings.cpp:549
-msgid "Multiplayer"
-msgstr "Daudzspēlētāju"
-
-#: Client/core/CSettings.cpp:550
-msgid "Video"
-msgstr "Video"
-
-#: Client/core/CSettings.cpp:551
-msgid "PostFX"
-msgstr ""
-
-#: Client/core/CSettings.cpp:552
-msgid "Audio"
-msgstr "Skaņa"
-
-#: Client/core/CSettings.cpp:553
-msgid "Binds"
-msgstr "Saistības"
-
-#: Client/core/CSettings.cpp:554
-msgid "Controls"
-msgstr "Vadība"
-
-#: Client/core/CSettings.cpp:555
-msgid "Interface"
-msgstr "Intrefeiss"
-
-#: Client/core/CSettings.cpp:556
-msgid "Web Browser"
-msgstr "Interneta pārlūks"
-
-#: Client/core/CSettings.cpp:557
-msgid "Advanced"
-msgstr "Paplašināts"
-
-#: Client/core/CSettings.cpp:582 Client/core/CSettings.cpp:790
-#: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
-msgid "Load defaults"
-msgstr "Ielādēt noklusējuma"
-
-#. *
-#. *  Controls tab
-#. *
-#: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:623
-msgid "Mouse sensitivity:"
-msgstr "Peles jūtīgums:"
-
-#. VerticalAimSensitivity
-#: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:644
-msgid "Vertical aim sensitivity:"
-msgstr "Vertikālās mērķēšanas jūtīgums:"
-
-#. Mouse Options
-#: Client/core/CSettings.cpp:602
-msgid "Mouse options"
-msgstr "Peles opcijas"
-
-#: Client/core/CSettings.cpp:609
-msgid "Invert mouse vertically"
-msgstr "Apvērst peli vertikāli"
-
-#: Client/core/CSettings.cpp:613
-msgid "Steer with mouse"
-msgstr "Stūrēt ar peli"
-
-#: Client/core/CSettings.cpp:617
-msgid "Fly with mouse"
-msgstr "Lidot ar peli"
-
-#: Client/core/CSettings.cpp:663
-msgid "Use mouse sensitivity for aiming"
-msgstr ""
-
-#. Joypad options
-#: Client/core/CSettings.cpp:669
-msgid "Joypad options"
-msgstr "Joypada opcijas"
-
-#: Client/core/CSettings.cpp:682
-msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Standarta vadība (Pele + Tastatūra)"
-
-#: Client/core/CSettings.cpp:689
-msgid "Classic controls (Joypad)"
-msgstr "Klasiska vadība (Joypad)"
-
-#: Client/core/CSettings.cpp:726
-msgid "Dead Zone"
-msgstr "Melnā zona"
-
-#: Client/core/CSettings.cpp:731
-msgid "Saturation"
-msgstr "Piesātinājums"
-
-#: Client/core/CSettings.cpp:737
-msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Izmantojiet 'Saistības' sadaļu priekš joypada pogām."
-
-#: Client/core/CSettings.cpp:776
-msgid "Left Stick"
-msgstr "Kreisā"
-
-#: Client/core/CSettings.cpp:782
-msgid "Right Stick"
-msgstr "Labā"
-
-#: Client/core/CSettings.cpp:797
-msgid "DESCRIPTION"
-msgstr "APRAKSTS"
-
-#: Client/core/CSettings.cpp:798
-msgid "KEY"
-msgstr "POGA"
-
-#: Client/core/CSettings.cpp:800
-msgid "ALT. KEY"
-msgstr "ALT. POGA"
-
-#. *
-#. *    Multiplayer tab
-#. *
-#: Client/core/CSettings.cpp:805 Client/core/CSettings.cpp:808
-msgid "Nick:"
-msgstr "Segvārds:"
-
-#: Client/core/CSettings.cpp:830
-msgid "Save server passwords"
-msgstr "Saglabāt serveru paroles"
-
-#: Client/core/CSettings.cpp:835
-msgid "Auto-refresh server browser"
-msgstr "Automātiskā atjaunošanās serveru pārlūkā"
-
-#: Client/core/CSettings.cpp:840
-msgid "Allow screen upload"
-msgstr "Ļaut ekrāna augšupielādi"
-
-#: Client/core/CSettings.cpp:845
-msgid "Allow external sounds"
-msgstr "Atļaut ārējās skaņas"
-
-#: Client/core/CSettings.cpp:850
-msgid "Always show download window"
-msgstr "Atļaut redzēt lejupielādes logu"
-
-#: Client/core/CSettings.cpp:855
-msgid "Allow connecting with Discord Rich Presence"
-msgstr "Atļaut savienojumu ar Discord Rich Presence"
-
-#: Client/core/CSettings.cpp:860
-msgid "Allow GTA:SA ingame status on Steam"
-msgstr ""
-
-#. Enable camera photos getting saved to documents folder
-#: Client/core/CSettings.cpp:866
-msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr ""
-
-#: Client/core/CSettings.cpp:871
-msgid "Ask before disconnecting from server using main menu"
-msgstr ""
-
-#: Client/core/CSettings.cpp:876
-msgid "Use customized GTA:SA files"
-msgstr "Lietot pārveidotos GTA:SA failus"
-
-#: Client/core/CSettings.cpp:881
-msgid "Map rendering options"
-msgstr "Kartes utilizācijas opcijas"
-
-#: Client/core/CSettings.cpp:889
-msgid "Opacity:"
-msgstr "Caurredzamība:"
-
-#: Client/core/CSettings.cpp:912
-msgid "Image resolution:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:919
-msgid "1024 x 1024 (Default)"
-msgstr ""
-
-#. index 0
-#: Client/core/CSettings.cpp:920
-msgid "2048 x 2048"
-msgstr ""
-
-#. *
-#. *  Audio tab
-#. *
-#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:935
-msgid "Master volume:"
-msgstr "Galvenais skaļums:"
-
-#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:957
-msgid "Radio volume:"
-msgstr "Radio skaļums:"
-
-#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:979
-msgid "SFX volume:"
-msgstr "SFX skaļums:"
-
-#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:1001
-msgid "MTA volume:"
-msgstr "MTA skaļums:"
-
-#: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1023
-msgid "Voice volume:"
-msgstr "Balss skaļums:"
-
-#: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1067
-msgid "Play mode:"
-msgstr "Spēlēšanas veids:"
-
-#: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1548
-#: Client/core/CSettings.cpp:2916
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-msgid "General"
-msgstr "Vispārējs"
-
-#: Client/core/CSettings.cpp:1045
-msgid "Radio options"
-msgstr "Radio opcijas"
-
-#: Client/core/CSettings.cpp:1051
-msgid "Radio Equalizer"
-msgstr "Radio Ekvalaizers"
-
-#: Client/core/CSettings.cpp:1056
-msgid "Radio Auto-tune"
-msgstr "Radio Automātiskā Uzstādīšana"
-
-#: Client/core/CSettings.cpp:1061
-msgid "Usertrack options"
-msgstr "Lietotāja dziesmu opcijas"
-
-#: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:4001
-msgid "Radio"
-msgstr "Radio"
-
-#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:4003
-msgid "Random"
-msgstr "Nejaušs"
-
-#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:4005
-msgid "Sequential"
-msgstr "Secīgs"
-
-#: Client/core/CSettings.cpp:1080
-msgid "Automatic Media Scan"
-msgstr "Automātiskā Multivides Pārbaudīšana"
-
-#: Client/core/CSettings.cpp:1087
-msgid "Mute options"
-msgstr "Skaņas iestatījumi"
-
-#: Client/core/CSettings.cpp:1093
-msgid "Mute All sounds when minimized"
-msgstr "Apklusināt visas skaņas, ja minimizēts"
-
-#: Client/core/CSettings.cpp:1098
-msgid "Mute Radio sounds when minimized"
-msgstr "Apklusināt Radio skaņas, ja minimizēts"
-
-#: Client/core/CSettings.cpp:1103
-msgid "Mute SFX sounds when minimized"
-msgstr "Apklusināt SFX skaņas, ja minimizēts"
-
-#: Client/core/CSettings.cpp:1108
-msgid "Mute MTA sounds when minimized"
-msgstr "Apklusināt MTA skaņas, ja minimizēts"
-
-#: Client/core/CSettings.cpp:1113
-msgid "Mute Voice sounds when minimized"
-msgstr "Apklusināt Balss skaņas, ja minimizēts"
-
-#. *
-#. *  Video tab
-#. *
-#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1135
-msgid "Resolution:"
-msgstr "Izšķirtspēja:"
-
-#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1190
-msgid "FOV:"
-msgstr "FOV:"
-
-#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1209
-msgid "Draw Distance:"
-msgstr "Redzamības Attālums:"
-
-#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1230
-#: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1461
-msgid "Brightness:"
-msgstr "Spilgtums:"
-
-#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1251
-msgid "FX Quality:"
-msgstr "FX Kvalitāte:"
-
-#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1265
-msgid "Anisotropic filtering:"
-msgstr "Anizotropā filtrēšana:"
-
-#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1302
-msgid "Anti-aliasing:"
-msgstr "Anti-aliasingi:"
-
-#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1316
-msgid "Aspect Ratio:"
-msgstr "Izmēru Attiecība:"
-
-#: Client/core/CSettings.cpp:1147
-msgid "Windowed"
-msgstr "Loga režīms"
-
-#: Client/core/CSettings.cpp:1153
-msgid "DPI aware"
-msgstr "DPI Iespējošana"
-
-#: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2335
-msgid "Standard"
-msgstr "Standarta"
-
-#: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2339
-msgid "Borderless keep res"
-msgstr "Bez-rāmju keep res"
-
-#: Client/core/CSettings.cpp:1175
-msgid "Mip Mapping"
-msgstr "Mip Mappings"
-
-#: Client/core/CSettings.cpp:1182
-msgid "V-Sync"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2239
-msgid "Low"
-msgstr "Zema"
-
-#: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2241
-msgid "Medium"
-msgstr "Vidēja"
-
-#: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1755
-#: Client/core/CSettings.cpp:2243 Client/core/CSettings.cpp:4059
-msgid "High"
-msgstr "Augsta"
-
-#: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2245
-msgid "Very high"
-msgstr "Ļoti augsta"
-
-#: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
-#: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1686
-#: Client/core/CSettings.cpp:1740 Client/core/CSettings.cpp:1889
-#: Client/core/CSettings.cpp:2249 Client/core/CSettings.cpp:4066
-#: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4144
-#: Client/core/CSettings.cpp:5375
-msgid "Off"
-msgstr "Izslēgts"
-
-#: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2251
-msgid "1x"
-msgstr "x1"
-
-#: Client/core/CSettings.cpp:1312 Client/core/CSettings.cpp:2253
-msgid "2x"
-msgstr "x2"
-
-#: Client/core/CSettings.cpp:1313 Client/core/CSettings.cpp:2255
-msgid "3x"
-msgstr "x3"
-
-#: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1688
-#: Client/core/CSettings.cpp:2261 Client/core/CSettings.cpp:4068
-msgid "Auto"
-msgstr "Automātiski"
-
-#: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2263
-msgid "4:3"
-msgstr "4:3"
-
-#: Client/core/CSettings.cpp:1328 Client/core/CSettings.cpp:2265
-msgid "16:10"
-msgstr "16:10"
-
-#: Client/core/CSettings.cpp:1329 Client/core/CSettings.cpp:2267
-msgid "16:9"
-msgstr "16:9"
-
-#: Client/core/CSettings.cpp:1332
-msgid "HUD Match Aspect Ratio"
-msgstr "HUD Savietošana ar malu attiecību"
-
-#: Client/core/CSettings.cpp:1338
-msgid "Volumetric Shadows"
-msgstr "Volumetriskas Ēnas"
-
-#: Client/core/CSettings.cpp:1342
-msgid "Grass effect"
-msgstr "Zāles efekts"
-
-#: Client/core/CSettings.cpp:1346
-msgid "Heat haze"
-msgstr "Siltuma tveice"
-
-#: Client/core/CSettings.cpp:1350
-msgid "Tyre Smoke etc"
-msgstr "Riepu dūmi utml"
-
-#: Client/core/CSettings.cpp:1354
-msgid "Dynamic ped shadows"
-msgstr "Dinamiskas ped ēnas"
-
-#: Client/core/CSettings.cpp:1358
-msgid "Motion blur"
-msgstr "Kustību miglošana"
-
-#: Client/core/CSettings.cpp:1362
-msgid "Corona rain reflections"
-msgstr "Ūdens atspulgs"
-
-#: Client/core/CSettings.cpp:1367
-msgid "Full Screen Minimize"
-msgstr "Pilnekrāna Minimizēšana"
-
-#: Client/core/CSettings.cpp:1379
-msgid "Enable Device Selection Dialog"
-msgstr "Iespējot Ierīces Izvēles Dialogu"
-
-#: Client/core/CSettings.cpp:1391
-msgid "Show unsafe resolutions"
-msgstr "Parādīt nedrošas izšķirtspējas"
-
-#: Client/core/CSettings.cpp:1403
-msgid "Render vehicles always in high detail"
-msgstr "Vienmēr attēlot transportu augstā kvalitātē"
-
-#: Client/core/CSettings.cpp:1407
-msgid "Render peds always in high detail"
-msgstr "Vienmēr attēlot personāžus augstā kvalitātē"
-
-#: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1441
-msgid "Gamma:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1481
-msgid "Contrast:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1501
-msgid "Saturation:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1517
-msgid "Apply adjustments in windowed mode"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1523
-msgid "Apply adjustments in fullscreen mode"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1554
-msgid "Enable remote websites"
-msgstr "Atļaut attālas mājaslapas"
-
-#: Client/core/CSettings.cpp:1559
-msgid "Enable Javascript on remote websites"
-msgstr "Iespējot Javascript attālās vietnēs"
-
-#: Client/core/CSettings.cpp:1564
-msgid "Enable GPU rendering"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1568
-msgid "Custom blacklist"
-msgstr "Bloķētās vietnes"
-
-#: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1625
-msgid "Enter a domain e.g. google.com"
-msgstr "Ievadīt jebkādu domēmu, piem. google.com"
-
-#: Client/core/CSettings.cpp:1587
-msgid "Block"
-msgstr "Bloķēt"
-
-#: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1646
-msgid "Domain"
-msgstr "Domēns"
-
-#: Client/core/CSettings.cpp:1604 Client/core/CSettings.cpp:1648
-msgid "Remove domain"
-msgstr "Noņemt domeinu"
-
-#: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
-msgid "Remove all"
-msgstr ""
-
-#. Reset vecTemp
-#: Client/core/CSettings.cpp:1614
-msgid "Custom whitelist"
-msgstr "Slēgtais saraksts"
-
-#: Client/core/CSettings.cpp:1633 Client/cefweb/CWebsiteRequests.cpp:51
-msgid "Allow"
-msgstr "Atļaut"
-
-#. Misc section label
-#: Client/core/CSettings.cpp:1665
-msgid "Misc"
-msgstr "Dažādi"
-
-#. Fast clothes loading
-#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1679
-#: Client/core/CSettings.cpp:6021
-msgid "Fast CJ clothes loading:"
-msgstr "Ātrā CJ apģērbu ielādēšana:"
-
-#. Browser scan speed
-#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1693
-#: Client/core/CSettings.cpp:6023
-msgid "Browser speed:"
-msgstr "Pārlūkošanas ātrums:"
-
-#. Single download
-#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1707
-#: Client/core/CSettings.cpp:6025
-msgid "Single connection:"
-msgstr "Viens savienojums:"
-
-#. Packet tag
-#: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1720
-#: Client/core/CSettings.cpp:6027
-msgid "Packet tag:"
-msgstr "Pakešu marķēšana:"
-
-#. Progress animation
-#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1733
-#: Client/core/CSettings.cpp:6029
-msgid "Progress animation:"
-msgstr "Pakešu marķēšana:"
-
-#. Process priority
-#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1746
-#: Client/core/CSettings.cpp:6019
-msgid "Process priority:"
-msgstr "Procesu prioritāte:"
-
-#. Debug setting
-#: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1760
-#: Client/core/CSettings.cpp:6031
-msgid "Debug setting:"
-msgstr "Atkļūdošanas uzstādījumi:"
-
-#. Streaming memory
-#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1783
-#: Client/core/CSettings.cpp:6033
-msgid "Streaming memory:"
-msgstr "Straumēšanas atmiņa:"
-
-#. Update build type
-#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1903
-msgid "Update build type:"
-msgstr "Atjauninājumu veids:"
-
-#. UpdateAutoInstall
-#: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1882
-msgid "Install important updates:"
-msgstr "Instalēt svarīgus atjauninājumus:"
-
-#: Client/core/CSettings.cpp:1687 Client/core/CSettings.cpp:1715
-#: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:4070
-#: Client/core/CSettings.cpp:4086 Client/core/CSettings.cpp:4093
-msgid "On"
-msgstr "Ieslēgts"
-
-#: Client/core/CSettings.cpp:1700 Client/core/CSettings.cpp:4075
-msgid "Very slow"
-msgstr "Ļoti lēni"
-
-#: Client/core/CSettings.cpp:1701 Client/core/CSettings.cpp:1714
-#: Client/core/CSettings.cpp:1727 Client/core/CSettings.cpp:1741
-#: Client/core/CSettings.cpp:1767 Client/core/CSettings.cpp:1779
-#: Client/core/CSettings.cpp:1890 Client/core/CSettings.cpp:1910
-#: Client/core/CSettings.cpp:4077 Client/core/CSettings.cpp:4084
-#: Client/core/CSettings.cpp:4091 Client/core/CSettings.cpp:4100
-#: Client/core/CSettings.cpp:4137
-msgid "Default"
-msgstr "Noklusējuma"
-
-#: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
-msgid "Fast"
-msgstr "Ātri"
-
-#: Client/core/CSettings.cpp:1753 Client/core/CSettings.cpp:4055
-msgid "Normal"
-msgstr "Normāls"
-
-#: Client/core/CSettings.cpp:1754 Client/core/CSettings.cpp:4057
-msgid "Above normal"
-msgstr "Virs normāla"
-
-#: Client/core/CSettings.cpp:1790
-msgid "Min"
-msgstr "Minimālais"
-
-#: Client/core/CSettings.cpp:1815
-msgid "Max"
-msgstr "Maks."
-
-#. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1823
-msgid "Windows 8 compatibility:"
-msgstr "Windows 8 saderība:"
-
-#: Client/core/CSettings.cpp:1827
-msgid "16-bit color"
-msgstr "16-bitu krāsas"
-
-#: Client/core/CSettings.cpp:1832
-msgid "Mouse fix"
-msgstr "Fiksēta pele"
-
-#. Cache path info
-#: Client/core/CSettings.cpp:1850
-msgid "Client resource files:"
-msgstr "Klienta resursi:"
-
-#: Client/core/CSettings.cpp:1854
-msgid "Show in Explorer"
-msgstr "Parādīt iekš Windows:"
-
-#. Process affinity
-#: Client/core/CSettings.cpp:1869
-msgid "Set CPU 0 affinity to improve game performance"
-msgstr ""
-
-#. Auto updater section label
-#: Client/core/CSettings.cpp:1875 Client/core/CSettings.cpp:1878
-msgid "Auto updater"
-msgstr "Automātiskais atjaunotājs"
-
-#. Check for updates
-#: Client/core/CSettings.cpp:1916
-msgid "Check for update now"
-msgstr "Pārbaudīt atjauninājumus"
-
-#: Client/core/CSettings.cpp:2102
-msgid "Some settings will be changed when you next start MTA"
-msgstr "Daži uzstādījumi tiks mainīti, kad jūs nākošajā reizē startēsiet MTA"
-
-#: Client/core/CSettings.cpp:2103
-msgid "\n\n"
-"Do you want to restart now?"
-msgstr "\n\n"
-"Vai vēlaties restartēt šobrīd?"
-
-#: Client/core/CSettings.cpp:2106
-msgid "RESTART REQUIRED"
-msgstr "NEPIECIEŠAMS RESTARTS"
-
-#: Client/core/CSettings.cpp:2126
-msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Daži uzstādījumi tiks mainīti, kad atslēgsieties no servera"
-
-#: Client/core/CSettings.cpp:2127
-msgid "\n\n"
-"Do you want to disconnect now?"
-msgstr "\n\n"
-"Vai vēlaties atslēgties?"
-
-#: Client/core/CSettings.cpp:2130
-msgid "DISCONNECT REQUIRED"
-msgstr "Nepieciešams atslēgties"
-
-#. Update the joystick name
-#: Client/core/CSettings.cpp:2572
-msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Joypad nav atrasts  -  Pārbaudiet savienojumu un restartējiet spēli"
-
-#: Client/core/CSettings.cpp:2828
-msgid "Binding axis"
-msgstr "Saistīt asis"
-
-#: Client/core/CSettings.cpp:2828
-msgid "Move an axis to bind, or escape to clear"
-msgstr "Pakustiniet asi, lai savienotu, vai esc, lai iztīrītu"
-
-#: Client/core/CSettings.cpp:2907
-msgid "Language:"
-msgstr "Valoda:"
-
-#: Client/core/CSettings.cpp:2907
-msgid "Skin:"
-msgstr "Motīvs:"
-
-#: Client/core/CSettings.cpp:2907
-msgid "Presets:"
-msgstr "Iepriekšējie:"
-
-#: Client/core/CSettings.cpp:2956
-msgid "Chat"
-msgstr "Sarakste"
-
-#: Client/core/CSettings.cpp:2973
-msgid "Load"
-msgstr "Ielādēt"
-
-#: Client/core/CSettings.cpp:2985
-msgid "Colors"
-msgstr "Krāsas"
-
-#: Client/core/CSettings.cpp:2986
-msgid "Layout"
-msgstr "Izkārtojums"
-
-#: Client/core/CSettings.cpp:2987 Client/core/CSettings.cpp:3233
-msgid "Options"
-msgstr "Opcijas"
-
-#: Client/core/CSettings.cpp:2993
-msgid "Chat Background"
-msgstr "Čata fons"
-
-#: Client/core/CSettings.cpp:2993
-msgid "Chat Text"
-msgstr "Sarakstes Teksts"
-
-#: Client/core/CSettings.cpp:2993
-msgid "Input Background"
-msgstr "Teksta ievades fons"
-
-#: Client/core/CSettings.cpp:2993
-msgid "Input Text"
-msgstr "Ievades Teksts"
-
-#: Client/core/CSettings.cpp:3016
-msgid "Lines:"
-msgstr "Līnijas:"
-
-#: Client/core/CSettings.cpp:3016
-msgid "Scale:"
-msgstr "Mērogs:"
-
-#: Client/core/CSettings.cpp:3016
-msgid "Width:"
-msgstr "Platums:"
-
-#: Client/core/CSettings.cpp:3019
-msgid "Size"
-msgstr "Lielums"
-
-#: Client/core/CSettings.cpp:3068
-msgid "after"
-msgstr "pēc"
-
-#: Client/core/CSettings.cpp:3068
-msgid "for"
-msgstr "priekš"
-
-#: Client/core/CSettings.cpp:3068
-msgid "sec"
-msgstr "sek"
-
-#: Client/core/CSettings.cpp:3071
-msgid "Fading"
-msgstr "Ieslīdēšana"
-
-#: Client/core/CSettings.cpp:3077
-msgid "Fade out old lines"
-msgstr "Izgaisināt vecās līnijas"
-
-#: Client/core/CSettings.cpp:3117
-msgid "Horizontal:"
-msgstr "Horizontālais:"
-
-#: Client/core/CSettings.cpp:3117
-msgid "Vertical:"
-msgstr "Vertikālais:"
-
-#: Client/core/CSettings.cpp:3117
-msgid "Text-Align:"
-msgstr "Teksta izkārtojums:"
-
-#: Client/core/CSettings.cpp:3117
-msgid "X-Offset:"
-msgstr "X-Nobīde:"
-
-#: Client/core/CSettings.cpp:3118
-msgid "Y-Offset:"
-msgstr "Y-Nobīde:"
-
-#: Client/core/CSettings.cpp:3124
-msgid "Position"
-msgstr "Pozīcija"
-
-#: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
-#: Client/core/CKeyBinds.cpp:191
-msgid "Left"
-msgstr "Pa kreisi"
-
-#: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
-msgid "Center"
-msgstr "Centrs"
-
-#: Client/core/CSettings.cpp:3140 Client/core/CSettings.cpp:3167
-#: Client/core/CKeyBinds.cpp:192
-msgid "Right"
-msgstr "Pa labi"
-
-#: Client/core/CSettings.cpp:3152
-msgid "Top"
-msgstr "Augša"
-
-#: Client/core/CSettings.cpp:3154
-msgid "Bottom"
-msgstr "Apakša"
-
-#: Client/core/CSettings.cpp:3202
-msgid "Font"
-msgstr "Fonts"
-
-#: Client/core/CSettings.cpp:3239
-msgid "Hide background when not typing"
-msgstr "Paslēpt fonu, ja neraksta"
-
-#: Client/core/CSettings.cpp:3244
-msgid "Nickname completion using the \"Tab\" key"
-msgstr "Nika pabeigšana izmantojot 'TAB' pogu"
-
-#: Client/core/CSettings.cpp:3249
-msgid "Allow server to flash the window"
-msgstr "Atļaut serverim iemirdzināt logu"
-
-#: Client/core/CSettings.cpp:3254
-msgid "Allow tray balloon notifications"
-msgstr "Atļaut paziņojumus Windows vidē"
-
-#: Client/core/CSettings.cpp:3259
-msgid "Chat text black/white outline"
-msgstr "Čata teksta melnais/baltais rāmis"
-
-#. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:3508 Client/core/CSettings.cpp:3515
-msgid "Press a key to bind, or escape to clear"
-msgstr "Nospiediet pogu, pie kuras piesaistīt, vai arī esc, lai iztīrītu"
-
-#: Client/core/CSettings.cpp:3509
-msgid "Binding a primary key"
-msgstr "Saistīt primāro pogu"
-
-#: Client/core/CSettings.cpp:3516
-msgid "Binding a secondary key"
-msgstr "Saistīt sekundāro pogu"
-
-#: Client/core/CSettings.cpp:3592
-msgid "GTA GAME CONTROLS"
-msgstr "GTA SPĒLES KONTROLES"
-
-#: Client/core/CSettings.cpp:3594
-msgid "MULTIPLAYER CONTROLS"
-msgstr "MULTIPLAYER KONTROLES"
-
-#: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5982
-msgid "Your nickname contains invalid characters!"
-msgstr "Jūsu segvārds satur neatļautas rakstzīmes!"
-
-#: Client/core/CSettings.cpp:4441 Client/core/CCore.cpp:709
-#: Client/core/CMainMenu.cpp:303
-#: Client/mods/deathmatch/logic/CClientGame.cpp:552
-msgid "Main menu"
-msgstr "Galvenā izvēlne"
-
-#: Client/core/CSettings.cpp:4445 Client/core/CCore.cpp:709
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1115
-#: Client/mods/deathmatch/logic/CResource.cpp:384
-msgid "In-game"
-msgstr "Iekš spēles"
-
-#: Client/core/CSettings.cpp:4798
-msgid "Red:"
-msgstr "Sarkans:"
-
-#: Client/core/CSettings.cpp:4798
-msgid "Green:"
-msgstr "Zaļš:"
-
-#: Client/core/CSettings.cpp:4798
-msgid "Blue:"
-msgstr "Zils:"
-
-#: Client/core/CSettings.cpp:4798
-msgid "Transparency:"
-msgstr "Caurredzamība:"
-
-#: Client/core/CSettings.cpp:4801
-msgid "Color"
-msgstr "Krāsa"
-
-#: Client/core/CSettings.cpp:4907
-msgid "Preview"
-msgstr "Apskatīt"
-
-#: Client/core/CSettings.cpp:5215
-msgid "Please disconnect before changing language"
-msgstr "Lūdzu atslēdzieties pirms maināt valodu"
-
-#: Client/core/CSettings.cpp:5243
-msgid "Please disconnect before changing skin"
-msgstr "Lūdzu atslēdzieties pirms maināt motīvu"
-
-#: Client/core/CSettings.cpp:5623
-msgid "Volmetric shadows can cause some systems to slow down.\n\n"
-"Are you sure you want to enable them?"
-msgstr "Volumektriskās ēnas var palēlināt sistēmas darbīnu.\n\n"
-"Vai Jūs tik tiešām vēlaties tās iespējot?"
-
-#: Client/core/CSettings.cpp:5627
-msgid "PERFORMANCE WARNING"
-msgstr "VEIKTSPĒJAS BRĪDINĀJUMS"
-
-#: Client/core/CSettings.cpp:5647
-msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
-"(The chat box and GUI is excluded from the upload)\n"
-msgstr "Ekrāna augšupielāde ir dažos serveros nepieciešama kā anti-chear līdzeklis.\n\n"
-"(Sarakste un GUI logi netiek attēloti augšupielādēs)\n"
-
-#: Client/core/CSettings.cpp:5649
-msgid "SCREEN UPLOAD INFORMATION"
-msgstr "EKRĀNA AUGŠUPIELĀDES INFORMĀCIJA"
-
-#: Client/core/CSettings.cpp:5664
-msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
-"Disabling this setting may decrease network\n"
-"bandwidth consumption.\n"
-msgstr "Daži skripti atskaņo skaņas, piemēram radio no interneta.\n\n"
-"Atspējojot šo opciju, var samazināties \n"
-"tīkla noslogojums.\n"
-
-#: Client/core/CSettings.cpp:5667
-msgid "EXTERNAL SOUNDS"
-msgstr "ĀRĒJĀS SKAŅAS"
-
-#: Client/core/CSettings.cpp:5696
-msgid "Rich Presence is currently enabled.\n"
-"Do you want to allow data sharing with servers you connect to?\n\n"
-"This includes your Discord client ID, and game state info."
-msgstr ""
-
-#: Client/core/CSettings.cpp:5701
-msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr "Piekrišana datu dalīšanai"
-
-#: Client/core/CSettings.cpp:5725
-msgid "Some files in your GTA:SA data directory are customized.\n"
-"MTA will only use these modified files if this check box is ticked.\n\n"
-"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
-"Are you sure you want to use them?"
-msgstr "Daži faili iekš Jūsu GTA:SA datu mapē ir laboti.\n"
-"MTA izmantos tikai šos failus, ja šī rūtiņa ir ieķeksēta.\n\n"
-"Jebkurā ziņā, LABOTI GTA:SA FAILI IR BLOĶĒTI VAIRĀKOS SERVEROS\n\n"
-"Vai Jūs tik tiešām vēlaties izmantot?"
-
-#: Client/core/CSettings.cpp:5774
-msgid "Enabling DPI awareness is an experimental feature and\n"
-"we only recommend it when you play MTA:SA on a scaled monitor.\n"
-"You may experience graphical issues if you enable this option.\n\n"
-"Are you sure you want to enable this option?"
-msgstr "DPI ir eksperimentāls produkts, kuru iesakām iespējot \n"
-"tikai spēlējot MTA:SA uz mērogota monitora.\n"
-"Iespējojot šo opciju ir iespēja sastapties ar grafiskām nepilnībām.\n\n"
-"Vai esi drošs ka vēlies to darīt?"
-
-#: Client/core/CSettings.cpp:5780 Client/core/CSettings.cpp:5835
-msgid "EXPERIMENTAL FEATURE"
-msgstr "EKSPERIMENTĀLS PRODUKTS"
-
-#: Client/core/CSettings.cpp:5837
-msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
-"Are you sure you want to disable it?"
-msgstr ""
-
-#: Client/core/CSettings.cpp:6000
-msgid "Please enter a nickname"
-msgstr "Lūdzu ievadiet segvārdu"
-
-#: Client/core/CSettings.cpp:6001
-msgid "Please enter a nickname to be used ingame.  \n"
-"This will be your name when you connect to and play in a server"
-msgstr "Lūdzu ievadiet segvārdu, kuru izmantosiet spēlējot.  \n"
-"Tas būs Jūsu vārds, ar kuru savienosieties uz spēlēsiet serverī"
-
-#: Client/core/CSettings.cpp:6019
-msgid "Very experimental feature."
-msgstr "Ļoti eksperimentāla funkcija."
-
-#: Client/core/CSettings.cpp:6021
-msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "Aptur stendus ar CJ variācijām (Izmanto 65MB vairāk RAM)"
-
-#: Client/core/CSettings.cpp:6023
-msgid "Older routers may require a slower scan speed."
-msgstr "Vecākiem maršrutētājiem ieteicams lēnāks meklēšanas ātrums."
-
-#: Client/core/CSettings.cpp:6025
-msgid "Switch on to use only one connection when downloading."
-msgstr "Ieslēdziet, lai izmantotu tikai vienu savienojumu lejupielādējot."
-
-#: Client/core/CSettings.cpp:6027
-msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "Atzīmējiet tīkla paketes, lai palīdzētu ISP identificēt MTA trafiku."
-
-#: Client/core/CSettings.cpp:6029
-msgid "Spinning circle animation at the bottom of the screen"
-msgstr "Rotējoša apļa animācija ekrāna apakšā"
-
-#: Client/core/CSettings.cpp:6031
-msgid "Select default always. (This setting is not saved)"
-msgstr "Vienmēr izvēlēts sākotnēs. (Šis uzstādījums netiek saglabāts)"
-
-#: Client/core/CSettings.cpp:6033
-msgid "Maximum is usually best"
-msgstr "Maksimālais vienmēr ir labākais"
-
-#: Client/core/CSettings.cpp:6035 Client/core/CSettings.cpp:6037
-msgid "Auto updater:"
-msgstr "Automātiskais atjaunotājs:"
-
-#: Client/core/CSettings.cpp:6035
-msgid "Select default unless you like filling out bug reports."
-msgstr "Izvēlieties sākotnēju, ja vien jums patīk aizpildīt kļūdu ziņojumus."
-
-#: Client/core/CSettings.cpp:6037
-msgid "Select default to automatically install important updates."
-msgstr "Izvēlies noklusējuma, lai automātiski instalētu vajadzīgos atjauninājumus."
-
-#: Client/core/CSettings.cpp:6039
-msgid "16-bit color:"
-msgstr "16 bitu krāsa:"
-
-#: Client/core/CSettings.cpp:6039
-msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "Iespējot 16 bitu krāsu režīmus - Nepieciešama MTA restartēšana"
-
-#: Client/core/CSettings.cpp:6041
-msgid "Mouse fix:"
-msgstr "Peles fiksēšana:"
-
-#: Client/core/CSettings.cpp:6041
-msgid "Mouse movement fix - May need PC restart"
-msgstr "Peles kustības fiksēšana - Nepieciešama MTA restartēšana"
-
-#: Client/core/CSettings.cpp:6043
-msgid "CPU affinity:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:6043
-msgid "Only change if you're having stability issues."
-msgstr ""
-
-#: Client/core/CCore.cpp:848 Shared/mods/deathmatch/logic/Utils.cpp:129
-msgid "Fatal error"
-msgstr "Fatāla kļūda"
-
-#: Client/core/CCore.cpp:969
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "Lai salabotu, izdzēs šo failu:"
-
-#: Client/core/CCore.cpp:1001
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s modulis ir nepareizs!"
-
-#: Client/core/CCore.cpp:1375
-msgid "Error executing URL"
-msgstr "Kļūda izpildot URL"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1470
-msgid "this help screen"
-msgstr "šis palīdzības ekrāns"
-
-#: Client/core/CCore.cpp:1471 Client/core/CCore.cpp:1472
-msgid "exits the application"
-msgstr "iziet no aplikācijas"
-
-#: Client/core/CCore.cpp:1473
-msgid "shows the version"
-msgstr "uzrāda versiju"
-
-#: Client/core/CCore.cpp:1474
-msgid "shows the time"
-msgstr "uzrāda laiku"
-
-#: Client/core/CCore.cpp:1475
-msgid "shows the hud"
-msgstr "uzrāda hud"
-
-#: Client/core/CCore.cpp:1476
-msgid "shows all the binds"
-msgstr "uzrāda visas saistības"
-
-#: Client/core/CCore.cpp:1477
-msgid "shows your serial"
-msgstr "uzrāda jūsu seriālu"
-
-#: Client/core/CCore.cpp:1486
-msgid "connects to a server (host port nick pass)"
-msgstr "savienojās ar serveri (hosts pors segvārds parole)"
-
-#: Client/core/CCore.cpp:1487
-msgid "connects to a previous server"
-msgstr "savienojās ar iepriekšējo serveri"
-
-#: Client/core/CCore.cpp:1488
-msgid "binds a key (key control)"
-msgstr "savieno pogu (pogu kontrole)"
-
-#: Client/core/CCore.cpp:1489
-msgid "unbinds a key (key)"
-msgstr "atvieno pogu (poga)"
-
-#: Client/core/CCore.cpp:1490
-msgid "copies the default gta controls"
-msgstr "nokopē noklusējuma gta vadības"
-
-#: Client/core/CCore.cpp:1491
-msgid "outputs a screenshot"
-msgstr "izveido ekrānšāviņu"
-
-#: Client/core/CCore.cpp:1492
-msgid "immediately saves the config"
-msgstr "nekavējoties saglabā konfigurāciju"
-
-#: Client/core/CCore.cpp:1494
-msgid "clears the debug view"
-msgstr "iztīra atkļūdošanās logu"
-
-#: Client/core/CCore.cpp:1495
-msgid "scrolls the chatbox upwards"
-msgstr "pavirza saraksti uz augšu"
-
-#: Client/core/CCore.cpp:1496
-msgid "scrolls the chatbox downwards"
-msgstr "pavirza saraksti uz leju"
-
-#: Client/core/CCore.cpp:1497
-msgid "scrolls the debug view upwards"
-msgstr "pavirza atkļūdošanās skatu uz augšu"
-
-#: Client/core/CCore.cpp:1498
-msgid "scrolls the debug view downwards"
-msgstr "pavirza atkļūdošanās skatu uz leju"
-
-#: Client/core/CCore.cpp:1501
-msgid "shows the memory statistics"
-msgstr "uzrāda atmiņas statistiku"
-
-#: Client/core/CCore.cpp:1502
-msgid "shows the frame timing graph"
-msgstr "uzrāda kadru laikošanas grafiku"
-
-#: Client/core/CCore.cpp:1506
-msgid "for developers: reload news"
-msgstr "izstrādātājiem: pārlādēt ziņas"
-
-#: Client/core/CMainMenu.cpp:332
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Jūs izmantojat feature-branch build! Šis ir testa veidojums, kas nevar tikt izmantots lai savienotos ar publiskajiem serveriem!"
-
-#: Client/core/CMainMenu.cpp:351
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA vairs nesniegs atjauninājumus XP/Vista lietotājiem pēc 2019. gada jūlija."
-
-#: Client/core/CMainMenu.cpp:1231
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Šī darbība Jūs atslēgs no esošā servera.\n\n"
-"Vai Jūs tik tiešām vēlaties atslēgties?"
-
-#: Client/core/CMainMenu.cpp:1235
-msgid "DISCONNECT WARNING"
-msgstr "ATSLĒGŠANĀS BRĪDINĀJUMS"
-
-#: Client/core/CMainMenu.cpp:1256
-msgid "INFORMATION"
-msgstr ""
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:154
-msgid "NEWS"
-msgstr "JAUNUMI"
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
-msgid "Visit latest news article"
-msgstr "Apskatiet jaunākās ziņas"
-
-#: Client/core/CScreenShot.cpp:200
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ekrānšāviņš aizņēma %d baitus, bet paredzēts %d"
-
-#: Client/core/CScreenShot.cpp:206
-msgid "Screenshot failed"
-msgstr "Ekrānšāviņš neizdevās"
-
-#: Client/core/CScreenShot.cpp:256
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Ekrāņšāviņš izveidots: '%s'"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:233
-msgid "Unknown command or cvar: "
-msgstr "Nezināma komanda vai cvar:"
-
-#: Client/core/CKeyBinds.cpp:186
-msgid "Fire"
-msgstr "Uguns"
-
-#: Client/core/CKeyBinds.cpp:187
-msgid "Next weapon"
-msgstr "Nākošais ierocis"
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Previous weapon"
-msgstr "Iepriekšējais ierocis"
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Forwards"
-msgstr "Uz priekšu"
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Backwards"
-msgstr "Atpakaļ"
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Zoom in"
-msgstr "Pietuvināšana"
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Zoom out"
-msgstr "Attālināšana"
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Enter/Exit"
-msgstr "Iekāpšana/Izkāpšana"
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Change camera"
-msgstr "Mainīt kameru"
-
-#. 10
-#: Client/core/CKeyBinds.cpp:197
-msgid "Jump"
-msgstr "Lekt"
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Sprint"
-msgstr "Skriet"
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Look behind"
-msgstr "Paskatīties uz atpakaļu"
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Crouch"
-msgstr "Notupties"
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Action"
-msgstr "Darbība"
-
-#: Client/core/CKeyBinds.cpp:202
-msgid "Walk"
-msgstr "Iet"
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Vehicle fire"
-msgstr "Šaušana no transporta"
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Vehicle secondary fire"
-msgstr "Transportlīdzekļa alternatīvā šaušana"
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Vehicle left"
-msgstr "Braukt pa kreisi"
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Vehicle right"
-msgstr "Braukt pa labi"
-
-#. 20
-#: Client/core/CKeyBinds.cpp:207
-msgid "Steer forwards/down"
-msgstr "Stūrēt uz priekšu/atpakaļ"
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Steer backwards/up"
-msgstr "Stūrēt atpakaļ/uz priekšu"
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Accelerate"
-msgstr "Akselerācija"
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Brake/Reverse"
-msgstr "Bremzes/Atpakaļgaita"
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Radio next"
-msgstr "Nākošais radio"
-
-#: Client/core/CKeyBinds.cpp:212
-msgid "Radio previous"
-msgstr "Iepriekšējais radio"
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Radio user track skip"
-msgstr "Lietotāja dziesmas pārslēgšana"
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Horn"
-msgstr "Signāls"
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Sub-mission"
-msgstr "Pieteikšanās"
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Handbrake"
-msgstr "Rokas bremze"
-
-#. 30
-#: Client/core/CKeyBinds.cpp:217
-msgid "Vehicle look left"
-msgstr "Skats pa kreisi no transportlīdzekļa"
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Vehicle look right"
-msgstr "Transportlīdzekļa skats pa labi"
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Vehicle look behind"
-msgstr "Transportlīdzekļa aizmugurējais skats"
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Vehicle mouse look"
-msgstr "Transportlīdzekļa peles skats"
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Special control left"
-msgstr "Īpašā vadība pa kreisi"
-
-#: Client/core/CKeyBinds.cpp:222
-msgid "Special control right"
-msgstr "Īpašā vadība pa labi"
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Special control down"
-msgstr "Īpašā vadība uz leju"
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Special control up"
-msgstr "Īpašā vadība uz augšu"
-
-#: Client/core/CKeyBinds.cpp:225
-msgid "Aim weapon"
-msgstr "Ieroča mērķēšana"
-
-#: Client/core/CKeyBinds.cpp:226
-msgid "Conversation yes"
-msgstr "Sarunas piekrišana"
-
-#. 40
-#: Client/core/CKeyBinds.cpp:227
-msgid "Conversation no"
-msgstr "Sarunas noraidījums"
-
-#: Client/core/CKeyBinds.cpp:228
-msgid "Group control forwards"
-msgstr "Grupas kontrole uz priekšu"
-
-#: Client/core/CKeyBinds.cpp:229
-msgid "Group control backwards"
-msgstr "Grupas kontrole uz atpakaļu"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:93
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Motīvs, kuru Jūs izvēlējaties, nav iespējams ielādēt un sākotnējo motīvu arī nevar ielādēt, lūdzu pārinstalējiet MTA."
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1462
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Vai jūs vēlaties atrast kādu tiešsaistes palīdzību saistībā ar šo problēmu ?"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONSOLE"
-
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "Programmēšana"
-
-#: Client/core/CCredits.cpp:65
-msgid "Contributors"
-msgstr "Atbalstītāji"
-
-#: Client/core/CCredits.cpp:85
-msgid "Game Design / Scripting"
-msgstr "Spēles Dizains / Kodējums"
-
-#: Client/core/CCredits.cpp:105
-msgid "Language Localization"
-msgstr "Valodas Lokalizācija"
-
-#: Client/core/CCredits.cpp:111
-msgid "Patch contributors"
-msgstr "Ielāpa atbalstītāji"
-
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "Īpašas Pateicības"
-
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr "Šī programmatūra un projekts izmanto šādas bibliotēkas un programmatūru:"
-
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Akselerācijas Ass"
-
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Bremžu Ass"
-
-#: Client/core/DXHook/CDirect3DHook9.cpp:125
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Nespēj inicializēt Direct3D9.\n\n"
-"Lūdzu pārliecinieties, ka DirectX End-User Runtime un\n"
-"pēdējās Windows Servisu Pakotnes ir uzstādītas pareizi."
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-#: Client/core/ServerBrowser/CServerList.cpp:63
-msgid "Idle"
-msgstr "Dīkstāve"
-
-#: Client/core/ServerBrowser/CServerList.cpp:168
-#: Client/core/ServerBrowser/CServerBrowser.cpp:3158
-msgid "player"
-msgid_plural "players"
-msgstr[0] "spēlētājs"
-msgstr[1] "spēlētāji"
-msgstr[2] "spēlētāji"
-
-#: Client/core/ServerBrowser/CServerList.cpp:169
-msgid "on"
-msgstr "uz"
-
-#: Client/core/ServerBrowser/CServerList.cpp:172
-#: Client/core/ServerBrowser/CServerBrowser.cpp:3164
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "serveris"
-msgstr[1] "serveri"
-msgstr[2] "serveri"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:306
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Pieprasa serveru sarakstu (%lu ms pagājušas)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:324
-msgid "Master server list could not be parsed."
-msgstr "Servera sarakstu nespēj parsēt."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:334
-msgid "Master server list could not be retrieved."
-msgstr "Servera sarakstu nespēj saņemt."
-
-#: Client/core/ServerBrowser/CServerList.cpp:349
-msgid "(Backup server list)"
-msgstr "(Rezerves servera saraksts)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:419
-msgid "Cannot create LAN-broadcast socket"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerList.cpp:429
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "Nespēj savienot LAN-apraides soketu"
-
-#: Client/core/ServerBrowser/CServerList.cpp:472
-msgid "Attempting to discover LAN servers"
-msgstr "Mēģina atklāt LAN serverus"
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "SERVERIS IR PILNS"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "Nosaukums:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "Servera Adrese:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "Gamemods:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "Mape:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "Spēlētāji:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "Parole:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "Latensija:"
-
-#. Column for player names
-#. Player List Columns
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-#: Client/core/ServerBrowser/CServerBrowser.cpp:635
-msgid "Player list"
-msgstr "Spēlētāju saraksts"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "Aizvērt"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "Pievienoties"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "Lūdzu ievadiet servera paroli:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "Pievienoties serverim, kad tajā atbrīvojās brīva vieta."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "LŪDZU IEVADIET SERVERA PAROLI"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "Timed Out"
-msgstr "Noilgums"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:515
-msgid "Querying..."
-msgstr "Pārbauda..."
-
-#. Create the window
-#: Client/core/ServerBrowser/CServerBrowser.cpp:189
-msgid "SERVER BROWSER"
-msgstr "SERVERA PĀRLŪKS"
-
-#. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:237
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-msgid "Internet"
-msgstr "Interneta"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:238
-msgid "Local"
-msgstr "Lokālie"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:239
-msgid "Favourites"
-msgstr "Favorīti"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:240
-msgid "Recent"
-msgstr "Nesenie"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:309
-msgid "FOR QUICK CONNECT:\n\n"
-"Type the address and port into the address bar.\n"
-"Or select a server from the history list and press 'Connect'"
-msgstr "ĀTRAIS SAVIENOJUMS:\n\n"
-"Ievadiet servera adresi un portu adrešu joslā.\n"
-"Vai izvēlieties serveri no vēstures un spiediet 'Vienoties'"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:321
-msgid "HELP"
-msgstr "PALĪDZĪBA"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:330
-#: Client/core/ServerBrowser/CServerBrowser.cpp:371
-msgid "Refresh"
-msgstr "Atjaunot"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:330
-#: Client/core/ServerBrowser/CServerBrowser.cpp:372
-msgid "Add Favorite"
-msgstr "Pievienot Favorītiem"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:330
-#: Client/core/ServerBrowser/CServerBrowser.cpp:373
-#: Client/core/ServerBrowser/CServerBrowser.cpp:457
-#: Client/core/ServerBrowser/CServerBrowser.cpp:528
-msgid "Connect"
-msgstr "Vienoties"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:330
-#: Client/core/ServerBrowser/CServerBrowser.cpp:374
-msgid "Server information"
-msgstr "Servera informācija"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:331
-#: Client/core/ServerBrowser/CServerBrowser.cpp:375
-msgid "Search servers"
-msgstr "Meklēt serverus"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:331
-#: Client/core/ServerBrowser/CServerBrowser.cpp:376
-msgid "Search players"
-msgstr "Meklēt spēlētājus"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:331
-#: Client/core/ServerBrowser/CServerBrowser.cpp:377
-msgid "Start search"
-msgstr "Sākt meklēt"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:331
-#: Client/core/ServerBrowser/CServerBrowser.cpp:378
-msgid "Delete from recent"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:455
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2086
-msgid "Search players..."
-msgstr "Meklēt spēlētājus..."
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:578
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2084
-msgid "Search servers..."
-msgstr "Meklēt serverus..."
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:610
-msgid "Name"
-msgstr "Vārds"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:611
-msgid "Players"
-msgstr "Spēlētāji"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:612
-msgid "Ping"
-msgstr "Pings"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:613
-msgid "Gamemode"
-msgstr "Gamemods"
-
-#. Include label
-#: Client/core/ServerBrowser/CServerBrowser.cpp:647
-msgid "Include:"
-msgstr "Iekļaut:"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:653
-msgid "Empty"
-msgstr "Tukšs"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:659
-msgid "Full"
-msgstr "Pilns"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:665
-msgid "Locked"
-msgstr "Slēgts"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:677
-msgid "Offline"
-msgstr "Nepieejams"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:690
-msgid "Other Versions"
-msgstr "Citas Versijas"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:711
-msgid "Back"
-msgstr "Atpakaļ"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1012
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1026
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1718
-msgid "Loading..."
-msgstr "Ielādē..."
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1563
-#: Client/core/ServerBrowser/CServerBrowser.cpp:3039
-msgid "  ..loading.."
-msgstr "  ..ielādē.."
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1601
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1758
-msgid "No address specified!"
-msgstr "Nav norādīta adrese!"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1614
-msgid "Unknown protocol"
-msgstr "Nezināms protokols"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1614
-msgid "Please use the mtasa:// protocol!"
-msgstr "Lūdzu izmantojiet mtasa:// protokolu!"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1623
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1682
-#: Client/mods/deathmatch/logic/CClientGame.cpp:673
-#: Client/mods/deathmatch/logic/CClientGame.cpp:765
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Nederīgs segvārds! Lūdzu dodieties uz Uzstādījumiem un uzstādiet citu!"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1708
-msgid "You have to select a server to connect to."
-msgstr "Jums ir jāizvēlas serveris, pie kura pievienoties."
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2225
-msgid "Problem with graphics driver"
-msgstr "Problēmas ar grafiskajiem draiveriem"
-
-#: Client/game_sa/CSettingsSA.cpp:832
+#: Client/game_sa/CSettingsSA.cpp:833
 msgid "Can't find valid screen resolution."
 msgstr "Nevar atrast derīgu ekrāna izšķirtspēju."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:908
+#: Client/game_sa/CSettingsSA.cpp:909
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Vai jūs esat pārliecināts, ka vēlaties izmantot šo izšķirtspēju?"
 
-#: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
+#: Client/game_sa/CGameSA.cpp:259 Client/game_sa/CGameSA.cpp:270
 msgid "Failed initialization game_sa"
 msgstr ""
 
-#: Client/game_sa/CGameSA.cpp:259
+#: Client/game_sa/CGameSA.cpp:261
 msgid "Memory allocations failed"
 msgstr ""
 
@@ -2790,6 +709,10 @@ msgstr "NEKAD NEIEVADIET PRIVĀTU INFORMĀCIJU, LAI PASARGĀTU TO NO NOZAGŠANAS
 msgid "Remember decision"
 msgstr "Atcerēties izvēli"
 
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:1625
+msgid "Allow"
+msgstr "Atļaut"
+
 #: Client/cefweb/CWebsiteRequests.cpp:57
 msgid "Deny"
 msgstr "Neļaut"
@@ -2798,120 +721,175 @@ msgstr "Neļaut"
 msgid "This version has expired."
 msgstr "Šī versija ir iztecējusi."
 
-#: Client/mods/deathmatch/CClient.cpp:58
+#: Client/mods/deathmatch/CClient.cpp:59
 msgid "disconnect from the game"
 msgstr "atslēgties no spēles"
 
-#: Client/mods/deathmatch/CClient.cpp:59
+#: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the nametags"
 msgstr "parāda namtagus"
 
-#: Client/mods/deathmatch/CClient.cpp:60
+#: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the chatbox"
 msgstr "uzrāda saraksti"
 
-#: Client/mods/deathmatch/CClient.cpp:61
+#: Client/mods/deathmatch/CClient.cpp:62
 msgid "shows the network statistics"
 msgstr "uzrāda tīkla statistiku"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:64
+#: Client/mods/deathmatch/CClient.cpp:65
 msgid "open the chat input"
 msgstr "atver sarakstes ievadi"
 
-#: Client/mods/deathmatch/CClient.cpp:65
+#: Client/mods/deathmatch/CClient.cpp:66
 msgid "transmits voice to other players"
 msgstr "pārraida balsi citiem spēlētājiem"
 
-#: Client/mods/deathmatch/CClient.cpp:66
+#: Client/mods/deathmatch/CClient.cpp:67
 msgid "enters a car as passenger"
 msgstr "iekāp kā pasažieris"
 
-#: Client/mods/deathmatch/CClient.cpp:67
+#: Client/mods/deathmatch/CClient.cpp:68
 msgid "next radio channel"
 msgstr "nākošā radio stacija"
 
-#: Client/mods/deathmatch/CClient.cpp:68
+#: Client/mods/deathmatch/CClient.cpp:69
 msgid "previous radio channel"
 msgstr "iepriekšējā radio stacija"
 
-#: Client/mods/deathmatch/CClient.cpp:69
+#: Client/mods/deathmatch/CClient.cpp:70
 msgid "enables the player-map view"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:70
+#: Client/mods/deathmatch/CClient.cpp:71
 msgid "zooms the player-map in"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:71
+#: Client/mods/deathmatch/CClient.cpp:72
 msgid "zooms the player-map out"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:72
+#: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map north"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:73
+#: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map south"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:74
+#: Client/mods/deathmatch/CClient.cpp:75
 msgid "moves the player-map east"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:75
+#: Client/mods/deathmatch/CClient.cpp:76
 msgid "moves the player-map west"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:76
+#: Client/mods/deathmatch/CClient.cpp:77
 msgid "attaches the player-map"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:77
+#: Client/mods/deathmatch/CClient.cpp:78
 msgid "reduces player-map opacity"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:78
+#: Client/mods/deathmatch/CClient.cpp:79
 msgid "increases player-map opacity"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:79
+#: Client/mods/deathmatch/CClient.cpp:80
 msgid "toggles player-map help text"
 msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:80
+#: Client/mods/deathmatch/CClient.cpp:81
 msgid "sends a message to the targetted player"
 msgstr "nosūta ziņojumu mērķētajam spēlētājam"
 
-#: Client/mods/deathmatch/CClient.cpp:81
+#: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "pārmaina uz nākošo ieroci atrodoties transportlīdzeklī"
 
-#: Client/mods/deathmatch/CClient.cpp:82
+#: Client/mods/deathmatch/CClient.cpp:83
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "pārmaina uz iepriekšējo ieroci atrodoties transportlīdzeklī"
 
-#: Client/mods/deathmatch/CClient.cpp:83
+#: Client/mods/deathmatch/CClient.cpp:84
 msgid "outputs info about the current server"
 msgstr "izvada informāciju par pašreizējo serveri"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:86
+#: Client/mods/deathmatch/CClient.cpp:87
 msgid "defines the scale multiplier of all text-displays"
 msgstr "definē mērogu reizinātāju visiem attēlotajiem tekstiem"
 
 #. Development mode
-#: Client/mods/deathmatch/CClient.cpp:93
+#: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) shows the colshapes"
 msgstr "(Izstrādātāja režīms) attēlo colshapes"
 
-#: Client/mods/deathmatch/CClient.cpp:94
+#: Client/mods/deathmatch/CClient.cpp:95
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Izstrādātāja režīms) attēlo pasaules skaņas id iekš atkļūdošanas loga"
+
+#: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
+#, c-format
+msgid "Change mode: %s"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPlayerMap.cpp:81
+#, c-format
+msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
+#, c-format
+msgid "Toggle map: %s     Toggle help text: %s"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPlayerMap.cpp:792
+msgid "Following Player"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPlayerMap.cpp:794
+msgid "Free Movement"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CResource.cpp:386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1127
+#: Client/core/CSettings.cpp:4439 Client/core/CCore.cpp:714
+msgid "In-game"
+msgstr "Iekš spēles"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Mapes lejupielādes progress:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Lejupielādes Progress:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s no %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Atslēdzieties, lai atceltu lejupielādi"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "HOSTĒT SPĒLI"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1538
+#: Client/core/CSettings.cpp:2910
+msgid "General"
+msgstr "Vispārējs"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:53
@@ -2942,6 +920,12 @@ msgstr "Apraide:"
 msgid "LAN"
 msgstr "LAN"
 
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:237
+msgid "Internet"
+msgstr "Interneta"
+
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
 msgstr "Izvēlēts"
@@ -2953,49 +937,6 @@ msgstr "Visi"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
 msgstr "Sākt"
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
-#, c-format
-msgid "Change mode: %s"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
-#, c-format
-msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
-#, c-format
-msgid "Toggle map: %s     Toggle help text: %s"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
-msgid "Following Player"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
-msgid "Free Movement"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Mapes lejupielādes progress:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Lejupielādes Progress:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s no %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Atslēdzieties, lai atceltu lejupielādi"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnected: Invalid nickname"
@@ -3310,85 +1251,144 @@ msgstr "Vajā haizivs"
 msgid "Choking to death in"
 msgstr "Aizrijies līdz nāvei iekš"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:689
+#: Client/mods/deathmatch/logic/CClientGame.cpp:555
+#: Client/core/CSettings.cpp:4435 Client/core/CMainMenu.cpp:311
+#: Client/core/CCore.cpp:714
+msgid "Main menu"
+msgstr "Galvenā izvēlne"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:681
+#: Client/mods/deathmatch/logic/CClientGame.cpp:773
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1638
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1697
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Nederīgs segvārds! Lūdzu dodieties uz Uzstādījumiem un uzstādiet citu!"
+
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:697
+#: Client/core/CConnectManager.cpp:156
+msgid "CONNECTING"
+msgstr "SAVIENOJAS"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:697
 msgid "Entering the game ..."
 msgstr "Ieiet spēlē ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:741
+#: Client/mods/deathmatch/logic/CClientGame.cpp:749
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "Nepieslēdzās; līdzu izmantojiet Ātro Savienojumu vai 'connect' komandu, lai pieslēgtos serverim."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:787
+#: Client/mods/deathmatch/logic/CClientGame.cpp:795
 msgid "Could not start the local server. See console for details."
 msgstr "Nespēj palaist lokālo serveri. Skatiet konsoli, lai redzēti detaļas."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:797
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:805
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
 msgid "Local Server"
 msgstr "Lokālais Serveris"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:797
+#: Client/mods/deathmatch/logic/CClientGame.cpp:805
 msgid "Starting local server ..."
 msgstr "Startē lokālo serveri ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1045
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1055
 msgid "Area 51"
 msgstr "Arena 51"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1054
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1064
 msgid "Walking around "
 msgstr "Staigā apkārt "
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1199
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1211
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Jūs tikāt izmests no spēles ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
 msgid "Connecting to local server..."
 msgstr "Savienojās ar lokālo serveri..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1279
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1291
 msgid "Error connecting to server."
 msgstr "Kļūda savienojoties ar serveri."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1301
 msgid "Connecting to local server timed out. See console for details."
 msgstr "Savienošanās ar lokālo serveri iztecēja. Apskaties konsoli priekš detaļām."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1395
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1370
+#: Client/core/CConnectManager.cpp:273
+msgid "Connection timed out"
+msgstr "Savienojums iztecējis"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1407
 msgid "Connection with the server was lost"
 msgstr "Savienojums ar serveri pazuda"
 
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1418
+#: Client/core/CConnectManager.cpp:287 Client/core/CConnectManager.cpp:291
+msgid "Disconnected: unknown protocol error"
+msgstr "Atvienošanās: nezināma protokola kļūda"
+
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1422
+#: Client/core/CConnectManager.cpp:295
+msgid "Disconnected: disconnected remotely"
+msgstr "Atvienošanās: savienojums pazuda attālināti"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1426
+#: Client/core/CConnectManager.cpp:299
+msgid "Disconnected: connection lost remotely"
+msgstr "Atvienošanās: savienojums pazuda attālināti"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1430
+#: Client/core/CConnectManager.cpp:303
+msgid "Disconnected: you are banned from this server"
+msgstr "Atvienots: jums ir liegta piekļuve šim serverim"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1434
 msgid "Disconnected: the server is currently full"
 msgstr "Atslēgšanās: serveris šobrīd ir pilns"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1434
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1438
+#: Client/core/CConnectManager.cpp:310
+msgid "Disconnected: disconnected from the server"
+msgstr "Atvienots: atvienojās no servera"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1442
+#: Client/core/CConnectManager.cpp:314
+msgid "Disconnected: connection to the server was lost"
+msgstr "Atvienojās: pārtrūka savienojums ar serveri"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1446
 msgid "Disconnected: invalid password specified"
 msgstr "Atslēgšanās: norādīta nederīga parole"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1456
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1450
+#: Client/core/CConnectManager.cpp:321
+msgid "Disconnected: connection was refused"
+msgstr "Atvienots: neizdevās savienoties"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1468
 msgid "MTA Client verification failed!"
 msgstr "MTA Klineta pārbaude neizdevās!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5691
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5727
 msgid "In a ditch"
 msgstr "Iekš grāvja"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5691
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5727
 msgid "En-route to hospital"
 msgstr "Ceļā uz slimnīcu"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5691
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5727
 msgid "Meeting their maker"
 msgstr "Sasniedz savu marķieri"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5691
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5727
 msgid "Regretting their decisions"
 msgstr "Nožēlo savas izvēles"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5691
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5727
 msgid "Wasted"
 msgstr "Miris"
 
@@ -3397,6 +1397,2001 @@ msgstr "Miris"
 #, c-format
 msgid "Download error: %s"
 msgstr "Lejupielādes kļūda: %s"
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2438
+msgid "Problem with graphics driver"
+msgstr "Problēmas ar grafiskajiem draiveriem"
+
+#. Create window (with frame) if it will fit inside the screen resolution
+#: Client/core/CSettings.cpp:498
+msgid "SETTINGS"
+msgstr "UZSTĀDĪJUMI"
+
+#: Client/core/CSettings.cpp:545
+msgid "Multiplayer"
+msgstr "Daudzspēlētāju"
+
+#: Client/core/CSettings.cpp:546
+msgid "Video"
+msgstr "Video"
+
+#: Client/core/CSettings.cpp:547
+msgid "PostFX"
+msgstr ""
+
+#: Client/core/CSettings.cpp:548
+msgid "Audio"
+msgstr "Skaņa"
+
+#: Client/core/CSettings.cpp:549
+msgid "Binds"
+msgstr "Saistības"
+
+#: Client/core/CSettings.cpp:550
+msgid "Controls"
+msgstr "Vadība"
+
+#: Client/core/CSettings.cpp:551
+msgid "Interface"
+msgstr "Intrefeiss"
+
+#: Client/core/CSettings.cpp:552
+msgid "Web Browser"
+msgstr "Interneta pārlūks"
+
+#: Client/core/CSettings.cpp:553
+msgid "Advanced"
+msgstr "Paplašināts"
+
+#: Client/core/CSettings.cpp:578 Client/core/CSettings.cpp:787
+#: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
+#: Client/core/CSettings.cpp:1510
+msgid "Load defaults"
+msgstr "Ielādēt noklusējuma"
+
+#. *
+#. *  Controls tab
+#. *
+#: Client/core/CSettings.cpp:595 Client/core/CSettings.cpp:619
+msgid "Mouse sensitivity:"
+msgstr "Peles jūtīgums:"
+
+#. VerticalAimSensitivity
+#: Client/core/CSettings.cpp:595 Client/core/CSettings.cpp:640
+msgid "Vertical aim sensitivity:"
+msgstr "Vertikālās mērķēšanas jūtīgums:"
+
+#. Mouse Options
+#: Client/core/CSettings.cpp:598
+msgid "Mouse options"
+msgstr "Peles opcijas"
+
+#: Client/core/CSettings.cpp:605
+msgid "Invert mouse vertically"
+msgstr "Apvērst peli vertikāli"
+
+#: Client/core/CSettings.cpp:609
+msgid "Steer with mouse"
+msgstr "Stūrēt ar peli"
+
+#: Client/core/CSettings.cpp:613
+msgid "Fly with mouse"
+msgstr "Lidot ar peli"
+
+#: Client/core/CSettings.cpp:660
+msgid "Use mouse sensitivity for aiming"
+msgstr ""
+
+#. Joypad options
+#: Client/core/CSettings.cpp:666
+msgid "Joypad options"
+msgstr "Joypada opcijas"
+
+#: Client/core/CSettings.cpp:679
+msgid "Standard controls (Mouse + Keyboard)"
+msgstr "Standarta vadība (Pele + Tastatūra)"
+
+#: Client/core/CSettings.cpp:686
+msgid "Classic controls (Joypad)"
+msgstr "Klasiska vadība (Joypad)"
+
+#: Client/core/CSettings.cpp:723
+msgid "Dead Zone"
+msgstr "Melnā zona"
+
+#: Client/core/CSettings.cpp:728
+msgid "Saturation"
+msgstr "Piesātinājums"
+
+#: Client/core/CSettings.cpp:734
+msgid "Use the 'Binds' tab for joypad buttons."
+msgstr "Izmantojiet 'Saistības' sadaļu priekš joypada pogām."
+
+#: Client/core/CSettings.cpp:773
+msgid "Left Stick"
+msgstr "Kreisā"
+
+#: Client/core/CSettings.cpp:779
+msgid "Right Stick"
+msgstr "Labā"
+
+#: Client/core/CSettings.cpp:794
+msgid "DESCRIPTION"
+msgstr "APRAKSTS"
+
+#: Client/core/CSettings.cpp:795
+msgid "KEY"
+msgstr "POGA"
+
+#: Client/core/CSettings.cpp:797
+msgid "ALT. KEY"
+msgstr "ALT. POGA"
+
+#. *
+#. *    Multiplayer tab
+#. *
+#: Client/core/CSettings.cpp:802 Client/core/CSettings.cpp:805
+msgid "Nick:"
+msgstr "Segvārds:"
+
+#: Client/core/CSettings.cpp:827
+msgid "Save server passwords"
+msgstr "Saglabāt serveru paroles"
+
+#: Client/core/CSettings.cpp:832
+msgid "Auto-refresh server browser"
+msgstr "Automātiskā atjaunošanās serveru pārlūkā"
+
+#: Client/core/CSettings.cpp:837
+msgid "Allow screen upload"
+msgstr "Ļaut ekrāna augšupielādi"
+
+#: Client/core/CSettings.cpp:842
+msgid "Allow external sounds"
+msgstr "Atļaut ārējās skaņas"
+
+#: Client/core/CSettings.cpp:847
+msgid "Always show download window"
+msgstr "Atļaut redzēt lejupielādes logu"
+
+#: Client/core/CSettings.cpp:853
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Atļaut savienojumu ar Discord Rich Presence"
+
+#: Client/core/CSettings.cpp:858
+msgid "Allow GTA:SA ingame status on Steam"
+msgstr ""
+
+#: Client/core/CSettings.cpp:865
+msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
+msgstr ""
+
+#: Client/core/CSettings.cpp:871
+msgid "Ask before disconnecting from server using main menu"
+msgstr ""
+
+#: Client/core/CSettings.cpp:876
+msgid "Use customized GTA:SA files"
+msgstr "Lietot pārveidotos GTA:SA failus"
+
+#: Client/core/CSettings.cpp:881
+msgid "Map rendering options"
+msgstr "Kartes utilizācijas opcijas"
+
+#: Client/core/CSettings.cpp:889
+msgid "Opacity:"
+msgstr "Caurredzamība:"
+
+#: Client/core/CSettings.cpp:912
+msgid "Image resolution:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:919
+msgid "1024 x 1024 (Default)"
+msgstr ""
+
+#. index 0
+#: Client/core/CSettings.cpp:920
+msgid "2048 x 2048"
+msgstr ""
+
+#. *
+#. *  Audio tab
+#. *
+#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:935
+msgid "Master volume:"
+msgstr "Galvenais skaļums:"
+
+#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:957
+msgid "Radio volume:"
+msgstr "Radio skaļums:"
+
+#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:979
+msgid "SFX volume:"
+msgstr "SFX skaļums:"
+
+#: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:1001
+msgid "MTA volume:"
+msgstr "MTA skaļums:"
+
+#: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1023
+msgid "Voice volume:"
+msgstr "Balss skaļums:"
+
+#: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1067
+msgid "Play mode:"
+msgstr "Spēlēšanas veids:"
+
+#: Client/core/CSettings.cpp:1045
+msgid "Radio options"
+msgstr "Radio opcijas"
+
+#: Client/core/CSettings.cpp:1051
+msgid "Radio Equalizer"
+msgstr "Radio Ekvalaizers"
+
+#: Client/core/CSettings.cpp:1056
+msgid "Radio Auto-tune"
+msgstr "Radio Automātiskā Uzstādīšana"
+
+#: Client/core/CSettings.cpp:1061
+msgid "Usertrack options"
+msgstr "Lietotāja dziesmu opcijas"
+
+#: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:3995
+msgid "Radio"
+msgstr "Radio"
+
+#: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:3997
+msgid "Random"
+msgstr "Nejaušs"
+
+#: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:3999
+msgid "Sequential"
+msgstr "Secīgs"
+
+#: Client/core/CSettings.cpp:1080
+msgid "Automatic Media Scan"
+msgstr "Automātiskā Multivides Pārbaudīšana"
+
+#: Client/core/CSettings.cpp:1087
+msgid "Mute options"
+msgstr "Skaņas iestatījumi"
+
+#: Client/core/CSettings.cpp:1093
+msgid "Mute All sounds when minimized"
+msgstr "Apklusināt visas skaņas, ja minimizēts"
+
+#: Client/core/CSettings.cpp:1098
+msgid "Mute Radio sounds when minimized"
+msgstr "Apklusināt Radio skaņas, ja minimizēts"
+
+#: Client/core/CSettings.cpp:1103
+msgid "Mute SFX sounds when minimized"
+msgstr "Apklusināt SFX skaņas, ja minimizēts"
+
+#: Client/core/CSettings.cpp:1108
+msgid "Mute MTA sounds when minimized"
+msgstr "Apklusināt MTA skaņas, ja minimizēts"
+
+#: Client/core/CSettings.cpp:1113
+msgid "Mute Voice sounds when minimized"
+msgstr "Apklusināt Balss skaņas, ja minimizēts"
+
+#. *
+#. *  Video tab
+#. *
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1135
+msgid "Resolution:"
+msgstr "Izšķirtspēja:"
+
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1190
+msgid "FOV:"
+msgstr "FOV:"
+
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1209
+msgid "Draw Distance:"
+msgstr "Redzamības Attālums:"
+
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1230
+#: Client/core/CSettings.cpp:1430 Client/core/CSettings.cpp:1452
+msgid "Brightness:"
+msgstr "Spilgtums:"
+
+#: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1251
+msgid "FX Quality:"
+msgstr "FX Kvalitāte:"
+
+#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1265
+msgid "Anisotropic filtering:"
+msgstr "Anizotropā filtrēšana:"
+
+#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1302
+msgid "Anti-aliasing:"
+msgstr "Anti-aliasingi:"
+
+#: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1316
+msgid "Aspect Ratio:"
+msgstr "Izmēru Attiecība:"
+
+#: Client/core/CSettings.cpp:1147
+msgid "Windowed"
+msgstr "Loga režīms"
+
+#: Client/core/CSettings.cpp:1153
+msgid "DPI aware"
+msgstr "DPI Iespējošana"
+
+#: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2330
+msgid "Standard"
+msgstr "Standarta"
+
+#: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2334
+msgid "Borderless keep res"
+msgstr "Bez-rāmju keep res"
+
+#: Client/core/CSettings.cpp:1175
+msgid "Mip Mapping"
+msgstr "Mip Mappings"
+
+#: Client/core/CSettings.cpp:1182
+msgid "V-Sync"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2234
+msgid "Low"
+msgstr "Zema"
+
+#: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2236
+msgid "Medium"
+msgstr "Vidēja"
+
+#: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1749
+#: Client/core/CSettings.cpp:2238 Client/core/CSettings.cpp:4053
+msgid "High"
+msgstr "Augsta"
+
+#: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2240
+msgid "Very high"
+msgstr "Ļoti augsta"
+
+#: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
+#: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1680
+#: Client/core/CSettings.cpp:1734 Client/core/CSettings.cpp:1884
+#: Client/core/CSettings.cpp:2244 Client/core/CSettings.cpp:4060
+#: Client/core/CSettings.cpp:4092 Client/core/CSettings.cpp:4138
+#: Client/core/CSettings.cpp:5388
+msgid "Off"
+msgstr "Izslēgts"
+
+#: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2246
+msgid "1x"
+msgstr "x1"
+
+#: Client/core/CSettings.cpp:1312 Client/core/CSettings.cpp:2248
+msgid "2x"
+msgstr "x2"
+
+#: Client/core/CSettings.cpp:1313 Client/core/CSettings.cpp:2250
+msgid "3x"
+msgstr "x3"
+
+#: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1682
+#: Client/core/CSettings.cpp:2256 Client/core/CSettings.cpp:4062
+msgid "Auto"
+msgstr "Automātiski"
+
+#: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2258
+msgid "4:3"
+msgstr "4:3"
+
+#: Client/core/CSettings.cpp:1328 Client/core/CSettings.cpp:2260
+msgid "16:10"
+msgstr "16:10"
+
+#: Client/core/CSettings.cpp:1329 Client/core/CSettings.cpp:2262
+msgid "16:9"
+msgstr "16:9"
+
+#: Client/core/CSettings.cpp:1332
+msgid "HUD Match Aspect Ratio"
+msgstr "HUD Savietošana ar malu attiecību"
+
+#: Client/core/CSettings.cpp:1338
+msgid "Volumetric Shadows"
+msgstr "Volumetriskas Ēnas"
+
+#: Client/core/CSettings.cpp:1342
+msgid "Grass effect"
+msgstr "Zāles efekts"
+
+#: Client/core/CSettings.cpp:1346
+msgid "Heat haze"
+msgstr "Siltuma tveice"
+
+#: Client/core/CSettings.cpp:1350
+msgid "Tyre Smoke etc"
+msgstr "Riepu dūmi utml"
+
+#: Client/core/CSettings.cpp:1354
+msgid "Dynamic ped shadows"
+msgstr "Dinamiskas ped ēnas"
+
+#: Client/core/CSettings.cpp:1358
+msgid "Motion blur"
+msgstr "Kustību miglošana"
+
+#: Client/core/CSettings.cpp:1362
+msgid "Corona rain reflections"
+msgstr "Ūdens atspulgs"
+
+#: Client/core/CSettings.cpp:1367
+msgid "Full Screen Minimize"
+msgstr "Pilnekrāna Minimizēšana"
+
+#: Client/core/CSettings.cpp:1379
+msgid "Enable Device Selection Dialog"
+msgstr "Iespējot Ierīces Izvēles Dialogu"
+
+#: Client/core/CSettings.cpp:1391
+msgid "Show unsafe resolutions"
+msgstr "Parādīt nedrošas izšķirtspējas"
+
+#: Client/core/CSettings.cpp:1403
+msgid "Render vehicles always in high detail"
+msgstr "Vienmēr attēlot transportu augstā kvalitātē"
+
+#: Client/core/CSettings.cpp:1407
+msgid "Render peds always in high detail"
+msgstr "Vienmēr attēlot personāžus augstā kvalitātē"
+
+#: Client/core/CSettings.cpp:1430 Client/core/CSettings.cpp:1436
+msgid "Gamma:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1430 Client/core/CSettings.cpp:1468
+msgid "Contrast:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1430 Client/core/CSettings.cpp:1484
+msgid "Saturation:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1500
+msgid "Apply adjustments in windowed/borderless mode"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1506
+msgid "Apply adjustments in fullscreen mode"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1544
+msgid "Enable remote websites"
+msgstr "Atļaut attālas mājaslapas"
+
+#: Client/core/CSettings.cpp:1549
+msgid "Enable Javascript on remote websites"
+msgstr "Iespējot Javascript attālās vietnēs"
+
+#: Client/core/CSettings.cpp:1554
+msgid "Enable GPU rendering"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1558
+msgid "Custom blacklist"
+msgstr "Bloķētās vietnes"
+
+#: Client/core/CSettings.cpp:1569 Client/core/CSettings.cpp:1617
+msgid "Enter a domain e.g. google.com"
+msgstr "Ievadīt jebkādu domēmu, piem. google.com"
+
+#: Client/core/CSettings.cpp:1577
+msgid "Block"
+msgstr "Bloķēt"
+
+#: Client/core/CSettings.cpp:1592 Client/core/CSettings.cpp:1638
+msgid "Domain"
+msgstr "Domēns"
+
+#: Client/core/CSettings.cpp:1594 Client/core/CSettings.cpp:1640
+msgid "Remove domain"
+msgstr "Noņemt domeinu"
+
+#: Client/core/CSettings.cpp:1599 Client/core/CSettings.cpp:1645
+msgid "Remove all"
+msgstr ""
+
+#. Reset vecTemp
+#: Client/core/CSettings.cpp:1606
+msgid "Custom whitelist"
+msgstr "Slēgtais saraksts"
+
+#. Misc section label
+#: Client/core/CSettings.cpp:1659
+msgid "Misc"
+msgstr "Dažādi"
+
+#. Fast clothes loading
+#: Client/core/CSettings.cpp:1665 Client/core/CSettings.cpp:1673
+#: Client/core/CSettings.cpp:6034
+msgid "Fast CJ clothes loading:"
+msgstr "Ātrā CJ apģērbu ielādēšana:"
+
+#. Browser scan speed
+#: Client/core/CSettings.cpp:1665 Client/core/CSettings.cpp:1687
+#: Client/core/CSettings.cpp:6036
+msgid "Browser speed:"
+msgstr "Pārlūkošanas ātrums:"
+
+#. Single download
+#: Client/core/CSettings.cpp:1665 Client/core/CSettings.cpp:1701
+#: Client/core/CSettings.cpp:6038
+msgid "Single connection:"
+msgstr "Viens savienojums:"
+
+#. Packet tag
+#: Client/core/CSettings.cpp:1665 Client/core/CSettings.cpp:1714
+#: Client/core/CSettings.cpp:6040
+msgid "Packet tag:"
+msgstr "Pakešu marķēšana:"
+
+#. Progress animation
+#: Client/core/CSettings.cpp:1666 Client/core/CSettings.cpp:1727
+#: Client/core/CSettings.cpp:6042
+msgid "Progress animation:"
+msgstr "Pakešu marķēšana:"
+
+#. Process priority
+#: Client/core/CSettings.cpp:1666 Client/core/CSettings.cpp:1740
+#: Client/core/CSettings.cpp:6032
+msgid "Process priority:"
+msgstr "Procesu prioritāte:"
+
+#. Debug setting
+#: Client/core/CSettings.cpp:1666 Client/core/CSettings.cpp:1754
+#: Client/core/CSettings.cpp:6044
+msgid "Debug setting:"
+msgstr "Atkļūdošanas uzstādījumi:"
+
+#. Streaming memory
+#: Client/core/CSettings.cpp:1667 Client/core/CSettings.cpp:1777
+#: Client/core/CSettings.cpp:6046
+msgid "Streaming memory:"
+msgstr "Straumēšanas atmiņa:"
+
+#. Update build type
+#: Client/core/CSettings.cpp:1667 Client/core/CSettings.cpp:1898
+msgid "Update build type:"
+msgstr "Atjauninājumu veids:"
+
+#. UpdateAutoInstall
+#: Client/core/CSettings.cpp:1667 Client/core/CSettings.cpp:1877
+msgid "Install important updates:"
+msgstr "Instalēt svarīgus atjauninājumus:"
+
+#: Client/core/CSettings.cpp:1681 Client/core/CSettings.cpp:1709
+#: Client/core/CSettings.cpp:1722 Client/core/CSettings.cpp:4064
+#: Client/core/CSettings.cpp:4080 Client/core/CSettings.cpp:4087
+msgid "On"
+msgstr "Ieslēgts"
+
+#: Client/core/CSettings.cpp:1694 Client/core/CSettings.cpp:4069
+msgid "Very slow"
+msgstr "Ļoti lēni"
+
+#: Client/core/CSettings.cpp:1695 Client/core/CSettings.cpp:1708
+#: Client/core/CSettings.cpp:1721 Client/core/CSettings.cpp:1735
+#: Client/core/CSettings.cpp:1761 Client/core/CSettings.cpp:1773
+#: Client/core/CSettings.cpp:1885 Client/core/CSettings.cpp:1905
+#: Client/core/CSettings.cpp:4071 Client/core/CSettings.cpp:4078
+#: Client/core/CSettings.cpp:4085 Client/core/CSettings.cpp:4094
+#: Client/core/CSettings.cpp:4131
+msgid "Default"
+msgstr "Noklusējuma"
+
+#: Client/core/CSettings.cpp:1696 Client/core/CSettings.cpp:4073
+msgid "Fast"
+msgstr "Ātri"
+
+#: Client/core/CSettings.cpp:1747 Client/core/CSettings.cpp:4049
+msgid "Normal"
+msgstr "Normāls"
+
+#: Client/core/CSettings.cpp:1748 Client/core/CSettings.cpp:4051
+msgid "Above normal"
+msgstr "Virs normāla"
+
+#: Client/core/CSettings.cpp:1784
+msgid "Min"
+msgstr "Minimālais"
+
+#: Client/core/CSettings.cpp:1809
+msgid "Max"
+msgstr "Maks."
+
+#. Windows 8 compatibility
+#: Client/core/CSettings.cpp:1817
+msgid "Windows 8 compatibility:"
+msgstr "Windows 8 saderība:"
+
+#: Client/core/CSettings.cpp:1821
+msgid "16-bit color"
+msgstr "16-bitu krāsas"
+
+#: Client/core/CSettings.cpp:1826
+msgid "Mouse fix"
+msgstr "Fiksēta pele"
+
+#. Cache path info
+#: Client/core/CSettings.cpp:1844
+msgid "Client resource files:"
+msgstr "Klienta resursi:"
+
+#: Client/core/CSettings.cpp:1848
+msgid "Show in Explorer"
+msgstr "Parādīt iekš Windows:"
+
+#: Client/core/CSettings.cpp:1864
+msgid "Set CPU 0 affinity to improve game performance"
+msgstr ""
+
+#. Auto updater section label
+#: Client/core/CSettings.cpp:1870 Client/core/CSettings.cpp:1873
+msgid "Auto updater"
+msgstr "Automātiskais atjaunotājs"
+
+#. Check for updates
+#: Client/core/CSettings.cpp:1911
+msgid "Check for update now"
+msgstr "Pārbaudīt atjauninājumus"
+
+#: Client/core/CSettings.cpp:2097
+msgid "Some settings will be changed when you next start MTA"
+msgstr "Daži uzstādījumi tiks mainīti, kad jūs nākošajā reizē startēsiet MTA"
+
+#: Client/core/CSettings.cpp:2098
+msgid "\n\n"
+"Do you want to restart now?"
+msgstr "\n\n"
+"Vai vēlaties restartēt šobrīd?"
+
+#: Client/core/CSettings.cpp:2101
+msgid "RESTART REQUIRED"
+msgstr "NEPIECIEŠAMS RESTARTS"
+
+#: Client/core/CSettings.cpp:2121
+msgid "Some settings will be changed when you disconnect the current server"
+msgstr "Daži uzstādījumi tiks mainīti, kad atslēgsieties no servera"
+
+#: Client/core/CSettings.cpp:2122
+msgid "\n\n"
+"Do you want to disconnect now?"
+msgstr "\n\n"
+"Vai vēlaties atslēgties?"
+
+#: Client/core/CSettings.cpp:2125
+msgid "DISCONNECT REQUIRED"
+msgstr "Nepieciešams atslēgties"
+
+#. Update the joystick name
+#: Client/core/CSettings.cpp:2569
+msgid "Joypad not detected  -  Check connections and restart game"
+msgstr "Joypad nav atrasts  -  Pārbaudiet savienojumu un restartējiet spēli"
+
+#: Client/core/CSettings.cpp:2822
+msgid "Binding axis"
+msgstr "Saistīt asis"
+
+#: Client/core/CSettings.cpp:2822
+msgid "Move an axis to bind, or escape to clear"
+msgstr "Pakustiniet asi, lai savienotu, vai esc, lai iztīrītu"
+
+#: Client/core/CSettings.cpp:2901
+msgid "Language:"
+msgstr "Valoda:"
+
+#: Client/core/CSettings.cpp:2901
+msgid "Skin:"
+msgstr "Motīvs:"
+
+#: Client/core/CSettings.cpp:2901
+msgid "Presets:"
+msgstr "Iepriekšējie:"
+
+#: Client/core/CSettings.cpp:2950
+msgid "Chat"
+msgstr "Sarakste"
+
+#: Client/core/CSettings.cpp:2967
+msgid "Load"
+msgstr "Ielādēt"
+
+#: Client/core/CSettings.cpp:2979
+msgid "Colors"
+msgstr "Krāsas"
+
+#: Client/core/CSettings.cpp:2980
+msgid "Layout"
+msgstr "Izkārtojums"
+
+#: Client/core/CSettings.cpp:2981 Client/core/CSettings.cpp:3227
+msgid "Options"
+msgstr "Opcijas"
+
+#: Client/core/CSettings.cpp:2987
+msgid "Chat Background"
+msgstr "Čata fons"
+
+#: Client/core/CSettings.cpp:2987
+msgid "Chat Text"
+msgstr "Sarakstes Teksts"
+
+#: Client/core/CSettings.cpp:2987
+msgid "Input Background"
+msgstr "Teksta ievades fons"
+
+#: Client/core/CSettings.cpp:2987
+msgid "Input Text"
+msgstr "Ievades Teksts"
+
+#: Client/core/CSettings.cpp:3010
+msgid "Lines:"
+msgstr "Līnijas:"
+
+#: Client/core/CSettings.cpp:3010
+msgid "Scale:"
+msgstr "Mērogs:"
+
+#: Client/core/CSettings.cpp:3010
+msgid "Width:"
+msgstr "Platums:"
+
+#: Client/core/CSettings.cpp:3013
+msgid "Size"
+msgstr "Lielums"
+
+#: Client/core/CSettings.cpp:3062
+msgid "after"
+msgstr "pēc"
+
+#: Client/core/CSettings.cpp:3062
+msgid "for"
+msgstr "priekš"
+
+#: Client/core/CSettings.cpp:3062
+msgid "sec"
+msgstr "sek"
+
+#: Client/core/CSettings.cpp:3065
+msgid "Fading"
+msgstr "Ieslīdēšana"
+
+#: Client/core/CSettings.cpp:3071
+msgid "Fade out old lines"
+msgstr "Izgaisināt vecās līnijas"
+
+#: Client/core/CSettings.cpp:3111
+msgid "Horizontal:"
+msgstr "Horizontālais:"
+
+#: Client/core/CSettings.cpp:3111
+msgid "Vertical:"
+msgstr "Vertikālais:"
+
+#: Client/core/CSettings.cpp:3111
+msgid "Text-Align:"
+msgstr "Teksta izkārtojums:"
+
+#: Client/core/CSettings.cpp:3111
+msgid "X-Offset:"
+msgstr "X-Nobīde:"
+
+#: Client/core/CSettings.cpp:3112
+msgid "Y-Offset:"
+msgstr "Y-Nobīde:"
+
+#: Client/core/CSettings.cpp:3118
+msgid "Position"
+msgstr "Pozīcija"
+
+#: Client/core/CSettings.cpp:3132 Client/core/CSettings.cpp:3160
+#: Client/core/CKeyBinds.cpp:191
+msgid "Left"
+msgstr "Pa kreisi"
+
+#: Client/core/CSettings.cpp:3133 Client/core/CSettings.cpp:3147
+msgid "Center"
+msgstr "Centrs"
+
+#: Client/core/CSettings.cpp:3134 Client/core/CSettings.cpp:3161
+#: Client/core/CKeyBinds.cpp:192
+msgid "Right"
+msgstr "Pa labi"
+
+#: Client/core/CSettings.cpp:3146
+msgid "Top"
+msgstr "Augša"
+
+#: Client/core/CSettings.cpp:3148
+msgid "Bottom"
+msgstr "Apakša"
+
+#: Client/core/CSettings.cpp:3196
+msgid "Font"
+msgstr "Fonts"
+
+#: Client/core/CSettings.cpp:3233
+msgid "Hide background when not typing"
+msgstr "Paslēpt fonu, ja neraksta"
+
+#: Client/core/CSettings.cpp:3238
+msgid "Nickname completion using the \"Tab\" key"
+msgstr "Nika pabeigšana izmantojot 'TAB' pogu"
+
+#: Client/core/CSettings.cpp:3243
+msgid "Allow server to flash the window"
+msgstr "Atļaut serverim iemirdzināt logu"
+
+#: Client/core/CSettings.cpp:3248
+msgid "Allow tray balloon notifications"
+msgstr "Atļaut paziņojumus Windows vidē"
+
+#: Client/core/CSettings.cpp:3253
+msgid "Chat text black/white outline"
+msgstr "Čata teksta melnais/baltais rāmis"
+
+#. Create a messagebox to notify the user
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. Create a messagebox to notify the user
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#: Client/core/CSettings.cpp:3502 Client/core/CSettings.cpp:3509
+msgid "Press a key to bind, or escape to clear"
+msgstr "Nospiediet pogu, pie kuras piesaistīt, vai arī esc, lai iztīrītu"
+
+#: Client/core/CSettings.cpp:3503
+msgid "Binding a primary key"
+msgstr "Saistīt primāro pogu"
+
+#: Client/core/CSettings.cpp:3510
+msgid "Binding a secondary key"
+msgstr "Saistīt sekundāro pogu"
+
+#: Client/core/CSettings.cpp:3586
+msgid "GTA GAME CONTROLS"
+msgstr "GTA SPĒLES KONTROLES"
+
+#: Client/core/CSettings.cpp:3588
+msgid "MULTIPLAYER CONTROLS"
+msgstr "MULTIPLAYER KONTROLES"
+
+#: Client/core/CSettings.cpp:3833 Client/core/CSettings.cpp:5995
+msgid "Your nickname contains invalid characters!"
+msgstr "Jūsu segvārds satur neatļautas rakstzīmes!"
+
+#: Client/core/CSettings.cpp:4792
+msgid "Red:"
+msgstr "Sarkans:"
+
+#: Client/core/CSettings.cpp:4792
+msgid "Green:"
+msgstr "Zaļš:"
+
+#: Client/core/CSettings.cpp:4792
+msgid "Blue:"
+msgstr "Zils:"
+
+#: Client/core/CSettings.cpp:4792
+msgid "Transparency:"
+msgstr "Caurredzamība:"
+
+#: Client/core/CSettings.cpp:4795
+msgid "Color"
+msgstr "Krāsa"
+
+#: Client/core/CSettings.cpp:4901
+msgid "Preview"
+msgstr "Apskatīt"
+
+#: Client/core/CSettings.cpp:5209
+msgid "Please disconnect before changing language"
+msgstr "Lūdzu atslēdzieties pirms maināt valodu"
+
+#: Client/core/CSettings.cpp:5237
+msgid "Please disconnect before changing skin"
+msgstr "Lūdzu atslēdzieties pirms maināt motīvu"
+
+#: Client/core/CSettings.cpp:5636
+msgid "Volmetric shadows can cause some systems to slow down.\n\n"
+"Are you sure you want to enable them?"
+msgstr "Volumektriskās ēnas var palēlināt sistēmas darbīnu.\n\n"
+"Vai Jūs tik tiešām vēlaties tās iespējot?"
+
+#: Client/core/CSettings.cpp:5640
+msgid "PERFORMANCE WARNING"
+msgstr "VEIKTSPĒJAS BRĪDINĀJUMS"
+
+#: Client/core/CSettings.cpp:5660
+msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
+"(The chat box and GUI is excluded from the upload)\n"
+msgstr "Ekrāna augšupielāde ir dažos serveros nepieciešama kā anti-chear līdzeklis.\n\n"
+"(Sarakste un GUI logi netiek attēloti augšupielādēs)\n"
+
+#: Client/core/CSettings.cpp:5662
+msgid "SCREEN UPLOAD INFORMATION"
+msgstr "EKRĀNA AUGŠUPIELĀDES INFORMĀCIJA"
+
+#: Client/core/CSettings.cpp:5677
+msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
+"Disabling this setting may decrease network\n"
+"bandwidth consumption.\n"
+msgstr "Daži skripti atskaņo skaņas, piemēram radio no interneta.\n\n"
+"Atspējojot šo opciju, var samazināties \n"
+"tīkla noslogojums.\n"
+
+#: Client/core/CSettings.cpp:5680
+msgid "EXTERNAL SOUNDS"
+msgstr "ĀRĒJĀS SKAŅAS"
+
+#: Client/core/CSettings.cpp:5709
+msgid "Rich Presence is currently enabled.\n"
+"Do you want to allow data sharing with servers you connect to?\n\n"
+"This includes your Discord client ID, and game state info."
+msgstr ""
+
+#: Client/core/CSettings.cpp:5714
+msgid "CONSENT TO ALLOW DATA SHARING"
+msgstr "Piekrišana datu dalīšanai"
+
+#: Client/core/CSettings.cpp:5738
+msgid "Some files in your GTA:SA data directory are customized.\n"
+"MTA will only use these modified files if this check box is ticked.\n\n"
+"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
+"Are you sure you want to use them?"
+msgstr "Daži faili iekš Jūsu GTA:SA datu mapē ir laboti.\n"
+"MTA izmantos tikai šos failus, ja šī rūtiņa ir ieķeksēta.\n\n"
+"Jebkurā ziņā, LABOTI GTA:SA FAILI IR BLOĶĒTI VAIRĀKOS SERVEROS\n\n"
+"Vai Jūs tik tiešām vēlaties izmantot?"
+
+#: Client/core/CSettings.cpp:5744 Client/core/CVersionUpdater.cpp:2144
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "PĀRVEIDOTIE GTA:SA FAILI"
+
+#: Client/core/CSettings.cpp:5787
+msgid "Enabling DPI awareness is an experimental feature and\n"
+"we only recommend it when you play MTA:SA on a scaled monitor.\n"
+"You may experience graphical issues if you enable this option.\n\n"
+"Are you sure you want to enable this option?"
+msgstr "DPI ir eksperimentāls produkts, kuru iesakām iespējot \n"
+"tikai spēlējot MTA:SA uz mērogota monitora.\n"
+"Iespējojot šo opciju ir iespēja sastapties ar grafiskām nepilnībām.\n\n"
+"Vai esi drošs ka vēlies to darīt?"
+
+#: Client/core/CSettings.cpp:5793 Client/core/CSettings.cpp:5848
+msgid "EXPERIMENTAL FEATURE"
+msgstr "EKSPERIMENTĀLS PRODUKTS"
+
+#: Client/core/CSettings.cpp:5850
+msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
+"Are you sure you want to disable it?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:6013
+msgid "Please enter a nickname"
+msgstr "Lūdzu ievadiet segvārdu"
+
+#: Client/core/CSettings.cpp:6014
+msgid "Please enter a nickname to be used ingame.  \n"
+"This will be your name when you connect to and play in a server"
+msgstr "Lūdzu ievadiet segvārdu, kuru izmantosiet spēlējot.  \n"
+"Tas būs Jūsu vārds, ar kuru savienosieties uz spēlēsiet serverī"
+
+#: Client/core/CSettings.cpp:6032
+msgid "Very experimental feature."
+msgstr "Ļoti eksperimentāla funkcija."
+
+#: Client/core/CSettings.cpp:6034
+msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
+msgstr "Aptur stendus ar CJ variācijām (Izmanto 65MB vairāk RAM)"
+
+#: Client/core/CSettings.cpp:6036
+msgid "Older routers may require a slower scan speed."
+msgstr "Vecākiem maršrutētājiem ieteicams lēnāks meklēšanas ātrums."
+
+#: Client/core/CSettings.cpp:6038
+msgid "Switch on to use only one connection when downloading."
+msgstr "Ieslēdziet, lai izmantotu tikai vienu savienojumu lejupielādējot."
+
+#: Client/core/CSettings.cpp:6040
+msgid "Tag network packets to help ISPs identify MTA traffic."
+msgstr "Atzīmējiet tīkla paketes, lai palīdzētu ISP identificēt MTA trafiku."
+
+#: Client/core/CSettings.cpp:6042
+msgid "Spinning circle animation at the bottom of the screen"
+msgstr "Rotējoša apļa animācija ekrāna apakšā"
+
+#: Client/core/CSettings.cpp:6044
+msgid "Select default always. (This setting is not saved)"
+msgstr "Vienmēr izvēlēts sākotnēs. (Šis uzstādījums netiek saglabāts)"
+
+#: Client/core/CSettings.cpp:6046
+msgid "Maximum is usually best"
+msgstr "Maksimālais vienmēr ir labākais"
+
+#: Client/core/CSettings.cpp:6048 Client/core/CSettings.cpp:6050
+msgid "Auto updater:"
+msgstr "Automātiskais atjaunotājs:"
+
+#: Client/core/CSettings.cpp:6048
+msgid "Select default unless you like filling out bug reports."
+msgstr "Izvēlieties sākotnēju, ja vien jums patīk aizpildīt kļūdu ziņojumus."
+
+#: Client/core/CSettings.cpp:6050
+msgid "Select default to automatically install important updates."
+msgstr "Izvēlies noklusējuma, lai automātiski instalētu vajadzīgos atjauninājumus."
+
+#: Client/core/CSettings.cpp:6052
+msgid "16-bit color:"
+msgstr "16 bitu krāsa:"
+
+#: Client/core/CSettings.cpp:6052
+msgid "Enable 16 bit color modes - Requires MTA restart"
+msgstr "Iespējot 16 bitu krāsu režīmus - Nepieciešama MTA restartēšana"
+
+#: Client/core/CSettings.cpp:6054
+msgid "Mouse fix:"
+msgstr "Peles fiksēšana:"
+
+#: Client/core/CSettings.cpp:6054
+msgid "Mouse movement fix - May need PC restart"
+msgstr "Peles kustības fiksēšana - Nepieciešama MTA restartēšana"
+
+#: Client/core/CSettings.cpp:6056
+msgid "CPU affinity:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:6056
+msgid "Only change if you're having stability issues."
+msgstr ""
+
+#. Unknown command
+#: Client/core/CCommands.cpp:233
+msgid "Unknown command or cvar: "
+msgstr "Nezināma komanda vai cvar:"
+
+#: Client/core/CMainMenu.cpp:340
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Jūs izmantojat feature-branch build! Šis ir testa veidojums, kas nevar tikt izmantots lai savienotos ar publiskajiem serveriem!"
+
+#: Client/core/CMainMenu.cpp:359
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA vairs nesniegs atjauninājumus XP/Vista lietotājiem pēc 2019. gada jūlija."
+
+#: Client/core/CMainMenu.cpp:1238
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Šī darbība Jūs atslēgs no esošā servera.\n\n"
+"Vai Jūs tik tiešām vēlaties atslēgties?"
+
+#: Client/core/CMainMenu.cpp:1242
+msgid "DISCONNECT WARNING"
+msgstr "ATSLĒGŠANĀS BRĪDINĀJUMS"
+
+#: Client/core/CMainMenu.cpp:1263
+msgid "INFORMATION"
+msgstr ""
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:154
+msgid "NEWS"
+msgstr "JAUNUMI"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
+msgid "Visit latest news article"
+msgstr "Apskatiet jaunākās ziņas"
+
+#: Client/core/CScreenShot.cpp:200
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Ekrānšāviņš aizņēma %d baitus, bet paredzēts %d"
+
+#: Client/core/CScreenShot.cpp:206
+msgid "Screenshot failed"
+msgstr "Ekrānšāviņš neizdevās"
+
+#: Client/core/CScreenShot.cpp:256
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Ekrāņšāviņš izveidots: '%s'"
+
+#: Client/core/CConnectManager.cpp:85
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Savienojums neizdevās. Norādīts nederīgs segvārds!"
+
+#: Client/core/CConnectManager.cpp:116
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Savienošanās neizdevās. Norādīts nederīgs hosts!"
+
+#: Client/core/CConnectManager.cpp:132
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Savienošanās ar %s caur %u portu neizdevās!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:153
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Savienojas ar %s:%u ..."
+
+#: Client/core/CConnectManager.cpp:155
+#, c-format
+msgid "Reconnecting to %s:%u ..."
+msgstr ""
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:416
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Nav ieinstalēta šī modifikācija (%s)"
+
+#: Client/core/CConnectManager.cpp:424
+msgid "Bad server response (2)"
+msgstr "Nav servera atbildes (2)"
+
+#: Client/core/CConnectManager.cpp:434
+msgid "Bad server response (1)"
+msgstr "Nav servera atbildes (1)"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1473
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Vai jūs vēlaties atrast kādu tiešsaistes palīdzību saistībā ar šo problēmu ?"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "Programmēšana"
+
+#: Client/core/CCredits.cpp:67
+msgid "Contributors"
+msgstr "Atbalstītāji"
+
+#: Client/core/CCredits.cpp:86
+msgid "Game Design / Scripting"
+msgstr "Spēles Dizains / Kodējums"
+
+#: Client/core/CCredits.cpp:105
+msgid "Language Localization"
+msgstr "Valodas Lokalizācija"
+
+#: Client/core/CCredits.cpp:111
+msgid "Patch contributors"
+msgstr "Ielāpa atbalstītāji"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "Īpašas Pateicības"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr "Šī programmatūra un projekts izmanto šādas bibliotēkas un programmatūru:"
+
+#: Client/core/CVersionUpdater.cpp:627
+msgid "Busy"
+msgstr "Aizņemts"
+
+#: Client/core/CVersionUpdater.cpp:627
+msgid "Can't check for updates right now"
+msgstr "Šobrīd nespēj pārbaudīt atjauninājumus"
+
+#: Client/core/CVersionUpdater.cpp:1630 Client/core/CVersionUpdater.cpp:1650
+#: Client/core/CVersionUpdater.cpp:1668
+#, c-format
+msgid "MTA:SA %s required"
+msgstr "MTA:SA %s pieprasa"
+
+#: Client/core/CVersionUpdater.cpp:1631
+#, c-format
+msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr "MTA:SA %s atjauninājums ir nepieciešams, lai pievienotos izvēlētajam serverim.\n\n"
+"Vai vēlaties lejupielādēt un instalēt MTA:SA %s ?"
+
+#: Client/core/CVersionUpdater.cpp:1651
+#, c-format
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "Vai Jūs vēlaties palaist MTA:SA %s un pievienoties šim serverim ?"
+
+#: Client/core/CVersionUpdater.cpp:1669
+msgid "It is not possible to connect at this time.\n\n"
+"Please try later."
+msgstr "Šobrīd, nav iespējams savienoties.\n\n"
+"Mēģiniet vēlāk."
+
+#: Client/core/CVersionUpdater.cpp:1851
+msgid "Connecting"
+msgstr "Savienojās"
+
+#: Client/core/CVersionUpdater.cpp:1852 Client/core/CVersionUpdater.cpp:1868
+msgid "Please wait..."
+msgstr "Lūdzu uzgaidiet..."
+
+#: Client/core/CVersionUpdater.cpp:1867
+msgid "CHECKING"
+msgstr "PĀRBAUDA"
+
+#: Client/core/CVersionUpdater.cpp:1884 Client/core/CVersionUpdater.cpp:1977
+msgid "UPDATE CHECK"
+msgstr "ATJAUNINĀJUMA PĀRBAUDE"
+
+#: Client/core/CVersionUpdater.cpp:1885
+msgid "No update needed"
+msgstr "Nav nepieciešams atjauninājums"
+
+#: Client/core/CVersionUpdater.cpp:1902
+msgid "DOWNLOADING"
+msgstr "LEJUPIELĀDĒ"
+
+#: Client/core/CVersionUpdater.cpp:1903
+msgid "waiting..."
+msgstr "gaida..."
+
+#: Client/core/CVersionUpdater.cpp:1919
+msgid "MANDATORY UPDATE"
+msgstr "OBLIGĀTS ATJAUNINĀJUMS"
+
+#: Client/core/CVersionUpdater.cpp:1920
+msgid "To join this server, you must update MTA.\n\n"
+" Do you want to update now ?"
+msgstr "Lai pievienotos šim serverim, Jums ir jāatjauno MTA.\n\n"
+" Vai Jūs vēlaties atjaunot tagad ?"
+
+#: Client/core/CVersionUpdater.cpp:1938
+msgid "OPTIONAL UPDATE"
+msgstr "IETEICAMS ATJAUNINĀJUMS"
+
+#: Client/core/CVersionUpdater.cpp:1939
+msgid "Server says an update is recommended, but not essential.\n\n"
+" Do you want to update now ?"
+msgstr "Serveris saka, ka ir atjauninājums ir ieteicams, bet ne obligāti.\n\n"
+"Vai Jūs vēlaties atjaunot tagad ?"
+
+#: Client/core/CVersionUpdater.cpp:1978
+msgid "An update is currently not available.\n\n"
+"Please check www.multitheftauto.com"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1999 Client/core/CVersionUpdater.cpp:2181
+msgid "ERROR SAVING"
+msgstr "KĻŪDAS SAGLABĀŠANA"
+
+#: Client/core/CVersionUpdater.cpp:2000 Client/core/CVersionUpdater.cpp:2182
+msgid "Unable to create the file."
+msgstr "Nespēj izveidot failu."
+
+#: Client/core/CVersionUpdater.cpp:2008 Client/core/CVersionUpdater.cpp:2017
+#: Client/core/CVersionUpdater.cpp:2190 Client/core/CVersionUpdater.cpp:2199
+msgid "ERROR DOWNLOADING"
+msgstr "KĻŪDA LEJUPIELĀDĒJOT"
+
+#: Client/core/CVersionUpdater.cpp:2009 Client/core/CVersionUpdater.cpp:2191
+msgid "The downloaded file appears to be incorrect."
+msgstr "Lejupielādētais fails izskatās nederīgs."
+
+#: Client/core/CVersionUpdater.cpp:2018 Client/core/CVersionUpdater.cpp:2200
+msgid "For some reason."
+msgstr "Kāda iemesla dēļ."
+
+#: Client/core/CVersionUpdater.cpp:2029 Client/core/CVersionUpdater.cpp:2213
+msgid "DOWNLOAD COMPLETE"
+msgstr "LEJUPIELĀDE PABEIGTA"
+
+#: Client/core/CVersionUpdater.cpp:2053
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr " - Nezināma problēma iekš _DialogUpdateResult"
+
+#: Client/core/CVersionUpdater.cpp:2151 Client/core/CVersionUpdater.cpp:2161
+msgid "Ok"
+msgstr "Labi"
+
+#: Client/core/CVersionUpdater.cpp:2159
+msgid "ERROR"
+msgstr "KĻŪDA"
+
+#: Client/core/CVersionUpdater.cpp:2160
+msgid "Some MTA:SA data files are missing.\n\n\n"
+"Please reinstall MTA:SA"
+msgstr "Daži MTA:SA datu faili ir pazuduši.\n\n\n"
+"Lūdzu pārinstalējiet MTA:SA"
+
+#: Client/core/CVersionUpdater.cpp:2840
+#, c-format
+msgid "%3d %% completed"
+msgstr "%3d %% pabeigti"
+
+#: Client/core/CVersionUpdater.cpp:2843
+#, c-format
+msgid "\n\n"
+"Waiting for response  -  %-3d"
+msgstr "\n\n"
+"Gaida atbildi  -  %-3d"
+
+#: Client/core/CCore.cpp:853 Shared/mods/deathmatch/logic/Utils.cpp:129
+msgid "Fatal error"
+msgstr "Fatāla kļūda"
+
+#: Client/core/CCore.cpp:974
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "Lai salabotu, izdzēs šo failu:"
+
+#: Client/core/CCore.cpp:1006
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s modulis ir nepareizs!"
+
+#: Client/core/CCore.cpp:1397
+msgid "Error executing URL"
+msgstr "Kļūda izpildot URL"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1492
+msgid "this help screen"
+msgstr "šis palīdzības ekrāns"
+
+#: Client/core/CCore.cpp:1493 Client/core/CCore.cpp:1494
+msgid "exits the application"
+msgstr "iziet no aplikācijas"
+
+#: Client/core/CCore.cpp:1495
+msgid "shows the version"
+msgstr "uzrāda versiju"
+
+#: Client/core/CCore.cpp:1496
+msgid "shows the time"
+msgstr "uzrāda laiku"
+
+#: Client/core/CCore.cpp:1497
+msgid "shows the hud"
+msgstr "uzrāda hud"
+
+#: Client/core/CCore.cpp:1498
+msgid "shows all the binds"
+msgstr "uzrāda visas saistības"
+
+#: Client/core/CCore.cpp:1499
+msgid "shows your serial"
+msgstr "uzrāda jūsu seriālu"
+
+#: Client/core/CCore.cpp:1508
+msgid "connects to a server (host port nick pass)"
+msgstr "savienojās ar serveri (hosts pors segvārds parole)"
+
+#: Client/core/CCore.cpp:1509
+msgid "connects to a previous server"
+msgstr "savienojās ar iepriekšējo serveri"
+
+#: Client/core/CCore.cpp:1510
+msgid "binds a key (key control)"
+msgstr "savieno pogu (pogu kontrole)"
+
+#: Client/core/CCore.cpp:1511
+msgid "unbinds a key (key)"
+msgstr "atvieno pogu (poga)"
+
+#: Client/core/CCore.cpp:1512
+msgid "copies the default gta controls"
+msgstr "nokopē noklusējuma gta vadības"
+
+#: Client/core/CCore.cpp:1513
+msgid "outputs a screenshot"
+msgstr "izveido ekrānšāviņu"
+
+#: Client/core/CCore.cpp:1514
+msgid "immediately saves the config"
+msgstr "nekavējoties saglabā konfigurāciju"
+
+#: Client/core/CCore.cpp:1516
+msgid "clears the debug view"
+msgstr "iztīra atkļūdošanās logu"
+
+#: Client/core/CCore.cpp:1517
+msgid "scrolls the chatbox upwards"
+msgstr "pavirza saraksti uz augšu"
+
+#: Client/core/CCore.cpp:1518
+msgid "scrolls the chatbox downwards"
+msgstr "pavirza saraksti uz leju"
+
+#: Client/core/CCore.cpp:1519
+msgid "scrolls the debug view upwards"
+msgstr "pavirza atkļūdošanās skatu uz augšu"
+
+#: Client/core/CCore.cpp:1520
+msgid "scrolls the debug view downwards"
+msgstr "pavirza atkļūdošanās skatu uz leju"
+
+#: Client/core/CCore.cpp:1523
+msgid "shows the memory statistics"
+msgstr "uzrāda atmiņas statistiku"
+
+#: Client/core/CCore.cpp:1524
+msgid "shows the frame timing graph"
+msgstr "uzrāda kadru laikošanas grafiku"
+
+#: Client/core/CCore.cpp:1528
+msgid "for developers: reload news"
+msgstr "izstrādātājiem: pārlādēt ziņas"
+
+#: Client/core/CKeyBinds.cpp:186
+msgid "Fire"
+msgstr "Uguns"
+
+#: Client/core/CKeyBinds.cpp:187
+msgid "Next weapon"
+msgstr "Nākošais ierocis"
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Previous weapon"
+msgstr "Iepriekšējais ierocis"
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Forwards"
+msgstr "Uz priekšu"
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Backwards"
+msgstr "Atpakaļ"
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Zoom in"
+msgstr "Pietuvināšana"
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Zoom out"
+msgstr "Attālināšana"
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Enter/Exit"
+msgstr "Iekāpšana/Izkāpšana"
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Change camera"
+msgstr "Mainīt kameru"
+
+#. 10
+#: Client/core/CKeyBinds.cpp:197
+msgid "Jump"
+msgstr "Lekt"
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Sprint"
+msgstr "Skriet"
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Look behind"
+msgstr "Paskatīties uz atpakaļu"
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Crouch"
+msgstr "Notupties"
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Action"
+msgstr "Darbība"
+
+#: Client/core/CKeyBinds.cpp:202
+msgid "Walk"
+msgstr "Iet"
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Vehicle fire"
+msgstr "Šaušana no transporta"
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Vehicle secondary fire"
+msgstr "Transportlīdzekļa alternatīvā šaušana"
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Vehicle left"
+msgstr "Braukt pa kreisi"
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Vehicle right"
+msgstr "Braukt pa labi"
+
+#. 20
+#: Client/core/CKeyBinds.cpp:207
+msgid "Steer forwards/down"
+msgstr "Stūrēt uz priekšu/atpakaļ"
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Steer backwards/up"
+msgstr "Stūrēt atpakaļ/uz priekšu"
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Accelerate"
+msgstr "Akselerācija"
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Brake/Reverse"
+msgstr "Bremzes/Atpakaļgaita"
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Radio next"
+msgstr "Nākošais radio"
+
+#: Client/core/CKeyBinds.cpp:212
+msgid "Radio previous"
+msgstr "Iepriekšējais radio"
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Radio user track skip"
+msgstr "Lietotāja dziesmas pārslēgšana"
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Horn"
+msgstr "Signāls"
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Sub-mission"
+msgstr "Pieteikšanās"
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Handbrake"
+msgstr "Rokas bremze"
+
+#. 30
+#: Client/core/CKeyBinds.cpp:217
+msgid "Vehicle look left"
+msgstr "Skats pa kreisi no transportlīdzekļa"
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Vehicle look right"
+msgstr "Transportlīdzekļa skats pa labi"
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Vehicle look behind"
+msgstr "Transportlīdzekļa aizmugurējais skats"
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Vehicle mouse look"
+msgstr "Transportlīdzekļa peles skats"
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Special control left"
+msgstr "Īpašā vadība pa kreisi"
+
+#: Client/core/CKeyBinds.cpp:222
+msgid "Special control right"
+msgstr "Īpašā vadība pa labi"
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Special control down"
+msgstr "Īpašā vadība uz leju"
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Special control up"
+msgstr "Īpašā vadība uz augšu"
+
+#: Client/core/CKeyBinds.cpp:225
+msgid "Aim weapon"
+msgstr "Ieroča mērķēšana"
+
+#: Client/core/CKeyBinds.cpp:226
+msgid "Conversation yes"
+msgstr "Sarunas piekrišana"
+
+#. 40
+#: Client/core/CKeyBinds.cpp:227
+msgid "Conversation no"
+msgstr "Sarunas noraidījums"
+
+#: Client/core/CKeyBinds.cpp:228
+msgid "Group control forwards"
+msgstr "Grupas kontrole uz priekšu"
+
+#: Client/core/CKeyBinds.cpp:229
+msgid "Group control backwards"
+msgstr "Grupas kontrole uz atpakaļu"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:93
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Motīvs, kuru Jūs izvēlējaties, nav iespējams ielādēt un sākotnējo motīvu arī nevar ielādēt, lūdzu pārinstalējiet MTA."
+
+#: Client/core/CJoystickManager.cpp:1584
+msgid "Accelerate Axis"
+msgstr "Akselerācijas Ass"
+
+#: Client/core/CJoystickManager.cpp:1586
+msgid "Brake Axis"
+msgstr "Bremžu Ass"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONSOLE"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Latviešu"
+
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ KOMANDAS PALIDZIBA ]***\n"
+
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Pareizs laiks ir %d:%02d:%02d"
+
+#: Client/core/CCommandFuncs.cpp:191
+msgid "connect: Network is not ready, please wait a moment"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:225
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "connect: Pareiza forma ir 'connect <hosts> [<ports> <segvārds> <parole>]'"
+
+#: Client/core/CCommandFuncs.cpp:233
+msgid "connect: Bad port number"
+msgstr "connect: Nepareizs ports"
+
+#: Client/core/CCommandFuncs.cpp:255
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "connect: Pieslēdzas pie %s:%u..."
+
+#: Client/core/CCommandFuncs.cpp:259
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "connect: Neizdevās pieslēgties pie %s:%u!"
+
+#: Client/core/CCommandFuncs.cpp:264
+msgid "connect: Failed to unload current mod"
+msgstr "connect: Neizdevās atslēgt esošo modu"
+
+#: Client/core/CCommandFuncs.cpp:284
+msgid "reconnect: Network is not ready, please wait a moment"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:306
+msgid "reconnect: Bad port number"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:325
+#, c-format
+msgid "reconnect: Reconnecting to %s:%u..."
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:329
+#, c-format
+msgid "reconnect: could not connect to %s:%u!"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:363
+msgid "Bound all controls from GTA"
+msgstr "Iebindotas visas kontroles no GTA"
+
+#: Client/core/CCommandFuncs.cpp:377
+msgid "Saved configuration file"
+msgstr "Konfigurācijas fails tika saglabāts"
+
+#. Print it
+#: Client/core/CCommandFuncs.cpp:456
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Jūsu sērijas kods ir: %s"
+
+#: Client/core/ServerBrowser/CServerList.cpp:25
+#: Client/core/ServerBrowser/CServerList.cpp:63
+msgid "Idle"
+msgstr "Dīkstāve"
+
+#: Client/core/ServerBrowser/CServerList.cpp:168
+#: Client/core/ServerBrowser/CServerBrowser.cpp:3169
+msgid "player"
+msgid_plural "players"
+msgstr[0] "spēlētājs"
+msgstr[1] "spēlētāji"
+msgstr[2] "spēlētāji"
+
+#: Client/core/ServerBrowser/CServerList.cpp:169
+msgid "on"
+msgstr "uz"
+
+#: Client/core/ServerBrowser/CServerList.cpp:172
+#: Client/core/ServerBrowser/CServerBrowser.cpp:3175
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "serveris"
+msgstr[1] "serveri"
+msgstr[2] "serveri"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:307
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Pieprasa serveru sarakstu (%lu ms pagājušas)"
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:325
+msgid "Master server list could not be parsed."
+msgstr "Servera sarakstu nespēj parsēt."
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:335
+msgid "Master server list could not be retrieved."
+msgstr "Servera sarakstu nespēj saņemt."
+
+#: Client/core/ServerBrowser/CServerList.cpp:350
+msgid "(Backup server list)"
+msgstr "(Rezerves servera saraksts)"
+
+#: Client/core/ServerBrowser/CServerList.cpp:420
+msgid "Cannot create LAN-broadcast socket"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:430
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "Nespēj savienot LAN-apraides soketu"
+
+#: Client/core/ServerBrowser/CServerList.cpp:473
+msgid "Attempting to discover LAN servers"
+msgstr "Mēģina atklāt LAN serverus"
+
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "SERVERIS IR PILNS"
+
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "Nosaukums:"
+
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "Servera Adrese:"
+
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "Gamemods:"
+
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "Mape:"
+
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "Spēlētāji:"
+
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "Parole:"
+
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "Latensija:"
+
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:635
+msgid "Player list"
+msgstr "Spēlētāju saraksts"
+
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "Aizvērt"
+
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "Pievienoties"
+
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "Lūdzu ievadiet servera paroli:"
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "Pievienoties serverim, kad tajā atbrīvojās brīva vieta."
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "LŪDZU IEVADIET SERVERA PAROLI"
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:477
+msgid "Timed Out"
+msgstr "Noilgums"
+
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:513
+msgid "Querying..."
+msgstr "Pārbauda..."
+
+#. Create the window
+#: Client/core/ServerBrowser/CServerBrowser.cpp:189
+msgid "SERVER BROWSER"
+msgstr "SERVERA PĀRLŪKS"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:238
+msgid "Local"
+msgstr "Lokālie"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:239
+msgid "Favourites"
+msgstr "Favorīti"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:240
+msgid "Recent"
+msgstr "Nesenie"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:309
+msgid "FOR QUICK CONNECT:\n\n"
+"Type the address and port into the address bar.\n"
+"Or select a server from the history list and press 'Connect'"
+msgstr "ĀTRAIS SAVIENOJUMS:\n\n"
+"Ievadiet servera adresi un portu adrešu joslā.\n"
+"Vai izvēlieties serveri no vēstures un spiediet 'Vienoties'"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:321
+msgid "HELP"
+msgstr "PALĪDZĪBA"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:330
+#: Client/core/ServerBrowser/CServerBrowser.cpp:371
+msgid "Refresh"
+msgstr "Atjaunot"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:330
+#: Client/core/ServerBrowser/CServerBrowser.cpp:372
+msgid "Add Favorite"
+msgstr "Pievienot Favorītiem"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:330
+#: Client/core/ServerBrowser/CServerBrowser.cpp:373
+#: Client/core/ServerBrowser/CServerBrowser.cpp:457
+#: Client/core/ServerBrowser/CServerBrowser.cpp:528
+msgid "Connect"
+msgstr "Vienoties"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:330
+#: Client/core/ServerBrowser/CServerBrowser.cpp:374
+msgid "Server information"
+msgstr "Servera informācija"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:331
+#: Client/core/ServerBrowser/CServerBrowser.cpp:375
+msgid "Search servers"
+msgstr "Meklēt serverus"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:331
+#: Client/core/ServerBrowser/CServerBrowser.cpp:376
+msgid "Search players"
+msgstr "Meklēt spēlētājus"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:331
+#: Client/core/ServerBrowser/CServerBrowser.cpp:377
+msgid "Start search"
+msgstr "Sākt meklēt"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:331
+#: Client/core/ServerBrowser/CServerBrowser.cpp:378
+msgid "Delete from recent"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:455
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2098
+msgid "Search players..."
+msgstr "Meklēt spēlētājus..."
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:578
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2096
+msgid "Search servers..."
+msgstr "Meklēt serverus..."
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:610
+msgid "Name"
+msgstr "Vārds"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:611
+msgid "Players"
+msgstr "Spēlētāji"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:612
+msgid "Ping"
+msgstr "Pings"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:613
+msgid "Gamemode"
+msgstr "Gamemods"
+
+#. Include label
+#: Client/core/ServerBrowser/CServerBrowser.cpp:647
+msgid "Include:"
+msgstr "Iekļaut:"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:653
+msgid "Empty"
+msgstr "Tukšs"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:659
+msgid "Full"
+msgstr "Pilns"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:665
+msgid "Locked"
+msgstr "Slēgts"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:677
+msgid "Offline"
+msgstr "Nepieejams"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:690
+msgid "Other Versions"
+msgstr "Citas Versijas"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:711
+msgid "Back"
+msgstr "Atpakaļ"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1012
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1026
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1733
+msgid "Loading..."
+msgstr "Ielādē..."
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1578
+#: Client/core/ServerBrowser/CServerBrowser.cpp:3051
+msgid "  ..loading.."
+msgstr "  ..ielādē.."
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1616
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1771
+msgid "No address specified!"
+msgstr "Nav norādīta adrese!"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1629
+msgid "Unknown protocol"
+msgstr "Nezināms protokols"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1629
+msgid "Please use the mtasa:// protocol!"
+msgstr "Lūdzu izmantojiet mtasa:// protokolu!"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1723
+msgid "You have to select a server to connect to."
+msgstr "Jums ir jāizvēlas serveris, pie kura pievienoties."
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:125
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Nespēj inicializēt Direct3D9.\n\n"
+"Lūdzu pārliecinieties, ka DirectX End-User Runtime un\n"
+"pēdējās Windows Servisu Pakotnes ir uzstādītas pareizi."
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
@@ -3421,7 +3416,7 @@ msgstr "Savienojuma kļūda"
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto nav ticis pareizi uzinstalēts, lūdzu pārinstalējiet."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:1476
+#: Shared/sdk/SharedUtil.Misc.hpp:1487
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Jūsu pārlūks uzrādīs tīmekļa vietni ar palīdzības informāciju.\n\n"
