@@ -15,14 +15,82 @@
 #include "CWorldSA.h"
 #include "CGameSA.h"
 #include "CPoolsSA.h"
+#include "HookSystem.h"
 
 extern CGameSA* pGame;
+
+// Checks whether pEntity still occupies a live slot in the building, dummy, or object pool.
+static bool IsEntityPoolSlotOccupied(CEntitySAInterface* pEntity)
+{
+    CPoolSAInterface<CBuildingSAInterface>* pBuildingPool = *reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
+    if (pBuildingPool)
+    {
+        std::int32_t iIndex = pBuildingPool->GetObjectIndexSafe(reinterpret_cast<CBuildingSAInterface*>(pEntity));
+        if (iIndex != -1)
+            return pBuildingPool->IsContains(iIndex);
+    }
+
+    CPoolSAInterface<CEntitySAInterface>* pDummyPool = *reinterpret_cast<CPoolSAInterface<CEntitySAInterface>**>(CLASS_CDummyPool);
+    if (pDummyPool)
+    {
+        std::int32_t iIndex = pDummyPool->GetObjectIndexSafe(pEntity);
+        if (iIndex != -1)
+            return pDummyPool->IsContains(iIndex);
+    }
+
+    CPoolSAInterface<CObjectSAInterface>* pObjectPool = *reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
+    if (pObjectPool)
+    {
+        std::int32_t iIndex = pObjectPool->GetObjectIndexSafe(reinterpret_cast<CObjectSAInterface*>(pEntity));
+        if (iIndex != -1)
+            return pObjectPool->IsContains(iIndex);
+    }
+
+    return false;
+}
+
+static bool IsExpectedRemovalModel(CEntitySAInterface* pEntity, uint16_t usExpectedModel)
+{
+    if (!pEntity)
+        return false;
+
+    const int iModelIndex = pEntity->m_nModelIndex;
+    if (iModelIndex < 0 || iModelIndex > 0xFFFF)
+        return false;
+
+    return static_cast<uint16_t>(iModelIndex) == usExpectedModel;
+}
+
+static void LogStaleTrackedEntity(const char* szContext, CEntitySAInterface* pEntity, const char* szReason, int& iLogCount, bool& bSuppressed)
+{
+    constexpr int kMaxStaleLogsPerCall = 32;
+    if (iLogCount < kMaxStaleLogsPerCall)
+    {
+        AddReportLog(5562, SString("%s: stale entity 0x%08x skipped (%s)", szContext, pEntity, szReason), 10);
+        ++iLogCount;
+    }
+    else if (!bSuppressed)
+    {
+        AddReportLog(5562, SString("%s: additional stale entities suppressed this call", szContext), 10);
+        bSuppressed = true;
+    }
+}
 
 CBuildingRemovalSA::CBuildingRemovalSA()
 {
     m_pBuildingRemovals = new std::multimap<uint16_t, SBuildingRemoval*>;
     m_pDataBuildings = new std::multimap<uint16_t, sDataBuildingRemovalItem*>;
     m_pBinaryBuildings = new std::multimap<uint16_t, sBuildingRemovalItem*>;
+}
+
+void CBuildingRemovalSA::ClearEntityTracking(CEntitySAInterface* pInterface)
+{
+    if (!pInterface)
+        return;
+
+    const DWORD dwEntityKey = reinterpret_cast<DWORD>(pInterface);
+    m_pRemovedEntities.erase(dwEntityKey);
+    m_pAddedEntities.erase(dwEntityKey);
 }
 
 void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior, size_t* pOutAmount)
@@ -83,7 +151,7 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
                             if (!pInterface->IsPlaceableVTBL())
                             {
                                 // Add the Data Building to the list
-                                pRemoval->AddDataBuilding(pInterface);
+                                pRemoval->AddDataBuilding(pInterface, pInterface->m_iplIndex);
                                 // Remove the model from the world
                                 pGame->GetWorld()->Remove(pInterface, BuildingRemoval2);
                                 m_pRemovedEntities[(DWORD)pInterface] = true;
@@ -142,7 +210,7 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
                             if (!pInterface->IsPlaceableVTBL())
                             {
                                 // Add the Data Building to the list
-                                pRemoval->AddBinaryBuilding(pInterface);
+                                pRemoval->AddBinaryBuilding(pInterface, pInterface->m_iplIndex);
                                 // Remove the model from the world
                                 pGame->GetWorld()->Remove(pInterface, BuildingRemoval2);
                                 m_pRemovedEntities[(DWORD)pInterface] = true;
@@ -170,6 +238,8 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
 {
     bool bSuccess = false;
     uint uiAmount = 0;
+    int  iStaleLogCount = 0;
+    bool bStaleLogSuppressed = false;
 
     // Init some variables
     std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
@@ -192,23 +262,35 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
             if (fDistance <= pFind->m_fRadius && (cInterior == -1 || pFind->m_cInterior == cInterior))
             {
                 // Init some variables
-                CEntitySAInterface*                            pEntity = NULL;
-                std::list<CEntitySAInterface*>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
+                CEntitySAInterface*                       pEntity = NULL;
+                std::list<SRemovedEntity>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
                 if (pFind->m_pBinaryRemoveList->empty() == false)
                 {
                     // Loop through the Binary object list
                     for (; entityIter != pFind->m_pBinaryRemoveList->end();)
                     {
                         // Grab the pEntity
-                        pEntity = (*entityIter);
+                        pEntity = entityIter->m_pInterface;
                         // if it's valid re-add it to the world.
                         if (pEntity != NULL)
                         {
                             // Remove it from the binary list
                             pFind->m_pBinaryRemoveList->erase(entityIter++);
+
+                            // Skip if pool slot was freed or reused with a different model
+                            if (!IsEntityPoolSlotOccupied(pEntity))
+                            {
+                                LogStaleTrackedEntity("RestoreBuilding", pEntity, "pool slot freed", iStaleLogCount, bStaleLogSuppressed);
+                                ClearEntityTracking(pEntity);
+                            }
+                            else if (!IsExpectedRemovalModel(pEntity, pFind->m_usModel))
+                            {
+                                LogStaleTrackedEntity("RestoreBuilding", pEntity, "model mismatch", iStaleLogCount, bStaleLogSuppressed);
+                                ClearEntityTracking(pEntity);
+                            }
                             // if the building type is dummy or building and it's not already being removed
-                            if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                                pEntity->bRemoveFromWorld != 1)
+                            else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
+                                     pEntity->bRemoveFromWorld != 1)
                             {
                                 // Don't call this on entities being removed.
                                 if (!pEntity->IsPlaceableVTBL())
@@ -234,14 +316,26 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                     for (; entityIter != pFind->m_pDataRemoveList->end();)
                     {
                         // Grab the pEntity
-                        pEntity = (*entityIter);
+                        pEntity = entityIter->m_pInterface;
                         // if it's valid re-add it to the world.
                         if (pEntity != NULL)
                         {
                             pFind->m_pDataRemoveList->erase(entityIter++);
+
+                            // Skip if pool slot was freed or reused with a different model
+                            if (!IsEntityPoolSlotOccupied(pEntity))
+                            {
+                                LogStaleTrackedEntity("RestoreBuilding", pEntity, "pool slot freed", iStaleLogCount, bStaleLogSuppressed);
+                                ClearEntityTracking(pEntity);
+                            }
+                            else if (!IsExpectedRemovalModel(pEntity, pFind->m_usModel))
+                            {
+                                LogStaleTrackedEntity("RestoreBuilding", pEntity, "model mismatch", iStaleLogCount, bStaleLogSuppressed);
+                                ClearEntityTracking(pEntity);
+                            }
                             // if the building type is dummy or building and it's not already being removed
-                            if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                                pEntity->bRemoveFromWorld != 1)
+                            else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
+                                     pEntity->bRemoveFromWorld != 1)
                             {
                                 if (!pEntity->IsPlaceableVTBL())
                                 {
@@ -342,9 +436,13 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
 bool CBuildingRemovalSA::IsRemovedModelInRadius(SIPLInst* pInst)
 {
     // Init some variables
-    std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
-        m_pBuildingRemovals->equal_range(static_cast<uint16_t>(pInst->m_nModelIndex));
+    const int modelIndex = pInst->m_nModelIndex;
+    if (modelIndex < 0 || modelIndex > 0xFFFF)
+        return false;
 
+    const uint16_t usModelIndex = static_cast<uint16_t>(modelIndex);
+    std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
+        m_pBuildingRemovals->equal_range(usModelIndex);
     std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
 
     // Loop through the buildings list
@@ -374,8 +472,13 @@ bool CBuildingRemovalSA::IsRemovedModelInRadius(SIPLInst* pInst)
 bool CBuildingRemovalSA::IsObjectRemoved(CEntitySAInterface* pInterface)
 {
     // Init some variables
+    const int modelIndex = pInterface->m_nModelIndex;
+    if (modelIndex < 0 || modelIndex > 0xFFFF)
+        return false;
+
+    const uint16_t usModelIndex = static_cast<uint16_t>(modelIndex);
     std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
-        m_pBuildingRemovals->equal_range(pInterface->m_nModelIndex);
+        m_pBuildingRemovals->equal_range(usModelIndex);
     std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
     // Loop through the buildings list
     for (; iter != iterators.second; ++iter)
@@ -434,6 +537,8 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
 {
     // Ensure no memory leaks by deleting items.
     uint                                                       uiAmount = 0;
+    int                                                        iStaleLogCount = 0;
+    bool                                                       bStaleLogSuppressed = false;
     std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = m_pBuildingRemovals->begin();
 
     for (; iter != m_pBuildingRemovals->end();)
@@ -442,21 +547,32 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
         if (pFind)
         {
             // Init some variables
-            CEntitySAInterface*                            pEntity = NULL;
-            std::list<CEntitySAInterface*>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
+            CEntitySAInterface*                       pEntity = NULL;
+            std::list<SRemovedEntity>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
             if (pFind->m_pBinaryRemoveList->empty() == false)
             {
                 // Loop through the Binary remove list
                 for (; entityIter != pFind->m_pBinaryRemoveList->end(); ++entityIter)
                 {
                     // Grab the pEntity
-                    pEntity = (*entityIter);
+                    pEntity = entityIter->m_pInterface;
                     // if it's valid re-add it to the world.
                     if (pEntity && pEntity != NULL)
                     {
+                        // Skip if pool slot was freed or reused with a different model
+                        if (!IsEntityPoolSlotOccupied(pEntity))
+                        {
+                            ClearEntityTracking(pEntity);
+                            LogStaleTrackedEntity("ClearRemovedBuildingLists", pEntity, "pool slot freed", iStaleLogCount, bStaleLogSuppressed);
+                        }
+                        else if (!IsExpectedRemovalModel(pEntity, pFind->m_usModel))
+                        {
+                            ClearEntityTracking(pEntity);
+                            LogStaleTrackedEntity("ClearRemovedBuildingLists", pEntity, "model mismatch", iStaleLogCount, bStaleLogSuppressed);
+                        }
                         // if the building type is dummy or building and it's not already being removed
-                        if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                            pEntity->bRemoveFromWorld != 1)
+                        else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
+                                 pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
                             if (!pEntity->IsPlaceableVTBL())
@@ -476,13 +592,24 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                 for (; entityIter != pFind->m_pDataRemoveList->end(); ++entityIter)
                 {
                     // Grab the pEntity
-                    pEntity = (*entityIter);
+                    pEntity = entityIter->m_pInterface;
                     // if it's valid re-add it to the world.
                     if (pEntity && pEntity != NULL)
                     {
+                        // Skip if pool slot was freed or reused with a different model
+                        if (!IsEntityPoolSlotOccupied(pEntity))
+                        {
+                            ClearEntityTracking(pEntity);
+                            LogStaleTrackedEntity("ClearRemovedBuildingLists", pEntity, "pool slot freed", iStaleLogCount, bStaleLogSuppressed);
+                        }
+                        else if (!IsExpectedRemovalModel(pEntity, pFind->m_usModel))
+                        {
+                            ClearEntityTracking(pEntity);
+                            LogStaleTrackedEntity("ClearRemovedBuildingLists", pEntity, "model mismatch", iStaleLogCount, bStaleLogSuppressed);
+                        }
                         // if the building type is dummy or building and it's not already being removed
-                        if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
-                            pEntity->bRemoveFromWorld != 1)
+                        else if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
+                                 pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
                             if (!pEntity->IsPlaceableVTBL())
@@ -495,6 +622,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                 }
             }
             m_pBuildingRemovals->erase(iter++);
+            delete pFind;
         }
         else
             iter++;
@@ -528,6 +656,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
     // Create new
     m_pBuildingRemovals = new std::multimap<uint16_t, SBuildingRemoval*>;
     m_pRemovedEntities.clear();
+    m_pAddedEntities.clear();
 
     if (pOutAmount)
         *pOutAmount = uiAmount;
@@ -537,8 +666,13 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
 SBuildingRemoval* CBuildingRemovalSA::GetBuildingRemoval(CEntitySAInterface* pInterface)
 {
     // Init some variables
+    const int modelIndex = pInterface->m_nModelIndex;
+    if (modelIndex < 0 || modelIndex > 0xFFFF)
+        return NULL;
+
+    const uint16_t usModelIndex = static_cast<uint16_t>(modelIndex);
     std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
-        m_pBuildingRemovals->equal_range(pInterface->m_nModelIndex);
+        m_pBuildingRemovals->equal_range(usModelIndex);
     std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
     // Loop through the buildings list
     for (; iter != iterators.second; ++iter)
@@ -567,17 +701,23 @@ SBuildingRemoval* CBuildingRemovalSA::GetBuildingRemoval(CEntitySAInterface* pIn
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
 {
+    const int modelIndex = pInterface->m_nModelIndex;
+    if (modelIndex < 0 || modelIndex > 0xFFFF)
+        return;
+
+    const uint16_t usModelIndex = static_cast<uint16_t>(modelIndex);
     if (m_pAddedEntities.find((DWORD)pInterface) == m_pAddedEntities.end() || m_pAddedEntities[(DWORD)pInterface] == false)
     {
         // Create a new building removal
         sDataBuildingRemovalItem* pBuildingRemoval = new sDataBuildingRemovalItem(pInterface, true);
+        pBuildingRemoval->m_iplIndex = pInterface->m_iplIndex;  // CEntitySAInterface is forward-decl in the SDK header; m_iplIndex only accessible here
         // Insert it with the model index so we can fast lookup
-        m_pDataBuildings->insert(std::pair<uint16_t, sDataBuildingRemovalItem*>((uint16_t)pInterface->m_nModelIndex, pBuildingRemoval));
+        m_pDataBuildings->insert(std::pair<uint16_t, sDataBuildingRemovalItem*>(usModelIndex, pBuildingRemoval));
         m_pAddedEntities[(DWORD)pInterface] = true;
         m_pRemovedEntities[(DWORD)pInterface] = false;
     }
@@ -585,12 +725,18 @@ void CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
 
 void CBuildingRemovalSA::AddBinaryBuilding(CEntitySAInterface* pInterface)
 {
+    const int modelIndex = pInterface->m_nModelIndex;
+    if (modelIndex < 0 || modelIndex > 0xFFFF)
+        return;
+
+    const uint16_t usModelIndex = static_cast<uint16_t>(modelIndex);
     if (m_pAddedEntities.find((DWORD)pInterface) == m_pAddedEntities.end() || m_pAddedEntities[(DWORD)pInterface] == false)
     {
         // Create a new building removal
         sBuildingRemovalItem* pBuildingRemoval = new sBuildingRemovalItem(pInterface, false);
+        pBuildingRemoval->m_iplIndex = pInterface->m_iplIndex;  // CEntitySAInterface is forward-decl in the SDK header; m_iplIndex only accessible here
         // Insert it with the model index so we can fast lookup
-        m_pBinaryBuildings->insert(std::pair<uint16_t, sBuildingRemovalItem*>((uint16_t)pInterface->m_nModelIndex, pBuildingRemoval));
+        m_pBinaryBuildings->insert(std::pair<uint16_t, sBuildingRemovalItem*>(usModelIndex, pBuildingRemoval));
         m_pAddedEntities[(DWORD)pInterface] = true;
         m_pRemovedEntities[(DWORD)pInterface] = false;
     }
@@ -598,8 +744,13 @@ void CBuildingRemovalSA::AddBinaryBuilding(CEntitySAInterface* pInterface)
 
 void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface)
 {
+    const int modelIndex = pInterface->m_nModelIndex;
+    if (modelIndex < 0 || modelIndex > 0xFFFF)
+        return;
+
+    const uint16_t usModelIndex = static_cast<uint16_t>(modelIndex);
     std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
-        m_pBuildingRemovals->equal_range(pInterface->m_nModelIndex);
+        m_pBuildingRemovals->equal_range(usModelIndex);
     std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
 
     // Loop through the buildings list
@@ -614,11 +765,11 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
             if (pFind->m_pBinaryRemoveList->empty() == false)
             {
                 // grab the beginning
-                std::list<CEntitySAInterface*>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
+                std::list<SRemovedEntity>::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin();
                 // Loop through the binary remove list
                 for (; entityIter != pFind->m_pBinaryRemoveList->end();)
                 {
-                    pEntity = (*entityIter);
+                    pEntity = entityIter->m_pInterface;
                     // is the pointer the same as the one being deleted
                     if ((DWORD)pEntity == (DWORD)pInterface)
                     {
@@ -631,12 +782,12 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
             }
             if (pFind->m_pDataRemoveList->empty() == false)
             {
-                std::list<CEntitySAInterface*>::const_iterator entityIter = pFind->m_pDataRemoveList->begin();
+                std::list<SRemovedEntity>::const_iterator entityIter = pFind->m_pDataRemoveList->begin();
                 // Loop through the Data list
                 for (; entityIter != pFind->m_pDataRemoveList->end();)
                 {
                     // Grab the pEntity
-                    pEntity = (*entityIter);
+                    pEntity = entityIter->m_pInterface;
                     // is the pointer the same as the one being deleted
                     if ((DWORD)pEntity == (DWORD)pInterface)
                     {
@@ -652,7 +803,7 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
     {
         // Init some variables
         std::pair<std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator> dataIterators =
-            m_pDataBuildings->equal_range(pInterface->m_nModelIndex);
+            m_pDataBuildings->equal_range(usModelIndex);
         std::multimap<uint16_t, sDataBuildingRemovalItem*>::const_iterator iterator = dataIterators.first;
         for (; iterator != dataIterators.second;)
         {
@@ -676,7 +827,7 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
     {
         // Init some variables
         std::pair<std::multimap<uint16_t, sBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sBuildingRemovalItem*>::iterator> binaryIterators =
-            m_pBinaryBuildings->equal_range(pInterface->m_nModelIndex);
+            m_pBinaryBuildings->equal_range(usModelIndex);
         std::multimap<uint16_t, sBuildingRemovalItem*>::const_iterator iteratorBinary = binaryIterators.first;
         for (; iteratorBinary != binaryIterators.second;)
         {
@@ -697,8 +848,7 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
                 iteratorBinary++;
         }
     }
-    m_pRemovedEntities[(DWORD)pInterface] = false;
-    m_pAddedEntities[(DWORD)pInterface] = false;
+    ClearEntityTracking(pInterface);
 }
 
 void CBuildingRemovalSA::DropCaches()
@@ -724,4 +874,218 @@ void CBuildingRemovalSA::DropCaches()
         pRemoval.second->m_pDataRemoveList->clear();
         pRemoval.second->m_pBinaryRemoveList->clear();
     }
+}
+
+void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
+{
+    // m_iplIndex is a BYTE, so only slots 0-255 can be matched by IPL index.
+    const bool canMatchByIpl = (iplSlotIndex >= 0 && iplSlotIndex <= 255);
+    const BYTE iplIndex = canMatchByIpl ? static_cast<BYTE>(iplSlotIndex) : 0;
+
+    // Purge matching entity pointers from all SBuildingRemoval tracked lists
+    for (auto& entry : *m_pBuildingRemovals)
+    {
+        SBuildingRemoval* pRemoval = entry.second;
+        if (!pRemoval)
+            continue;
+
+        for (auto it = pRemoval->m_pBinaryRemoveList->begin(); it != pRemoval->m_pBinaryRemoveList->end();)
+        {
+            CEntitySAInterface* pEntity = it->m_pInterface;
+            if (!pEntity)
+            {
+                ++it;
+                continue;
+            }
+
+            // m_iplIndex was cached when the entity was first tracked.
+            // Skip pool-slot and model checks for entries from a different IPL.
+            if (canMatchByIpl && it->m_iplIndex != iplIndex)
+            {
+                ++it;
+                continue;
+            }
+
+            bool bPoolSlotOccupied = IsEntityPoolSlotOccupied(pEntity);
+            bool bMatchesIpl = false;
+            if (bPoolSlotOccupied)
+            {
+                if (!IsExpectedRemovalModel(pEntity, pRemoval->m_usModel))
+                    bPoolSlotOccupied = false;
+                else
+                    bMatchesIpl = canMatchByIpl && pEntity->m_iplIndex == iplIndex;
+            }
+
+            if (!bPoolSlotOccupied || bMatchesIpl)
+            {
+                ClearEntityTracking(pEntity);
+                it = pRemoval->m_pBinaryRemoveList->erase(it);
+            }
+            else
+                ++it;
+        }
+
+        for (auto it = pRemoval->m_pDataRemoveList->begin(); it != pRemoval->m_pDataRemoveList->end();)
+        {
+            CEntitySAInterface* pEntity = it->m_pInterface;
+            if (!pEntity)
+            {
+                ++it;
+                continue;
+            }
+
+            // Same m_iplIndex early-out as the binary list loop above.
+            if (canMatchByIpl && it->m_iplIndex != iplIndex)
+            {
+                ++it;
+                continue;
+            }
+
+            bool bPoolSlotOccupied = IsEntityPoolSlotOccupied(pEntity);
+            bool bMatchesIpl = false;
+            if (bPoolSlotOccupied)
+            {
+                if (!IsExpectedRemovalModel(pEntity, pRemoval->m_usModel))
+                    bPoolSlotOccupied = false;
+                else
+                    bMatchesIpl = canMatchByIpl && pEntity->m_iplIndex == iplIndex;
+            }
+
+            if (!bPoolSlotOccupied || bMatchesIpl)
+            {
+                ClearEntityTracking(pEntity);
+                it = pRemoval->m_pDataRemoveList->erase(it);
+            }
+            else
+                ++it;
+        }
+    }
+
+    // Purge matching entries from the data buildings catalog
+    for (auto it = m_pDataBuildings->begin(); it != m_pDataBuildings->end();)
+    {
+        sDataBuildingRemovalItem* pItem = it->second;
+        CEntitySAInterface*       pEntity = pItem ? pItem->m_pInterface : nullptr;
+        if (!pEntity)
+        {
+            ++it;
+            continue;
+        }
+
+        // m_iplIndex was cached when the entity was first tracked (entity was live at that
+        // point). Skip pool-slot and model checks for entries from a different IPL; those
+        // entities remain in the world and are visited when their own IPL unloads.
+        if (canMatchByIpl && pItem->m_iplIndex != iplIndex)
+        {
+            ++it;
+            continue;
+        }
+
+        bool bPoolSlotOccupied = IsEntityPoolSlotOccupied(pEntity);
+        bool bMatchesIpl = false;
+        if (bPoolSlotOccupied)
+        {
+            if (!IsExpectedRemovalModel(pEntity, it->first))
+                bPoolSlotOccupied = false;
+            else
+                bMatchesIpl = canMatchByIpl && pEntity->m_iplIndex == iplIndex;
+        }
+
+        if (!bPoolSlotOccupied || bMatchesIpl)
+        {
+            ClearEntityTracking(pEntity);
+            delete pItem;
+            it = m_pDataBuildings->erase(it);
+        }
+        else
+            ++it;
+    }
+
+    // Purge matching entries from the binary buildings catalog
+    for (auto it = m_pBinaryBuildings->begin(); it != m_pBinaryBuildings->end();)
+    {
+        sBuildingRemovalItem* pItem = it->second;
+        CEntitySAInterface*   pEntity = pItem ? pItem->m_pInterface : nullptr;
+        if (!pEntity)
+        {
+            ++it;
+            continue;
+        }
+
+        // Same m_iplIndex early-out as the data buildings loop above.
+        if (canMatchByIpl && pItem->m_iplIndex != iplIndex)
+        {
+            ++it;
+            continue;
+        }
+
+        bool bPoolSlotOccupied = IsEntityPoolSlotOccupied(pEntity);
+        bool bMatchesIpl = false;
+        if (bPoolSlotOccupied)
+        {
+            if (!IsExpectedRemovalModel(pEntity, it->first))
+                bPoolSlotOccupied = false;
+            else
+                bMatchesIpl = canMatchByIpl && pEntity->m_iplIndex == iplIndex;
+        }
+
+        if (!bPoolSlotOccupied || bMatchesIpl)
+        {
+            ClearEntityTracking(pEntity);
+            delete pItem;
+            it = m_pBinaryBuildings->erase(it);
+        }
+        else
+            ++it;
+    }
+}
+
+// Pre-hook for CIplStore::RemoveIpl (0x404B20).
+// When GTA streams out an IPL sector, it frees all entity pool slots in that sector.
+// We hook in before that happens to purge tracked pointers that are about to become stale.
+
+#define HOOKPOS_CIplStore_RemoveIpl  0x404B20
+#define HOOKSIZE_CIplStore_RemoveIpl 5
+static DWORD RETURN_CIplStore_RemoveIpl = 0x404B25;
+
+#define VAR_CIplStore_msPool 0x8E3FB0
+
+static void __cdecl OnIplRemovePre(int iplSlotIndex)
+{
+    if (!pGame)
+        return;
+
+    auto* pBuildingRemoval = static_cast<CBuildingRemovalSA*>(pGame->GetBuildingRemoval());
+    if (pBuildingRemoval)
+        pBuildingRemoval->OnRemoveIpl(iplSlotIndex);
+}
+
+static void __declspec(naked) HOOK_CIplStore_RemoveIpl()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    [esp+32+4]          // iplSlotIndex (past 8 pushad regs + return address)
+        call    OnIplRemovePre
+        add     esp, 4
+        popad
+
+        // Overwritten instruction: mov eax, ds:[CIplStore::ms_pPool]
+        mov     eax, ds:[VAR_CIplStore_msPool]
+        jmp     RETURN_CIplStore_RemoveIpl
+    }
+    // clang-format on
+}
+
+void CBuildingRemovalSA::StaticSetHooks()
+{
+    static bool bHooksInstalled = false;
+    if (bHooksInstalled)
+        return;
+
+    EZHookInstall(CIplStore_RemoveIpl);
+    bHooksInstalled = true;
 }

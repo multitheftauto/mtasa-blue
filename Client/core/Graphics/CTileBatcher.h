@@ -27,12 +27,12 @@ struct SPDTVertex
     buf++;
 
 #define WRITE_QUAD_INDICES(buf, row0, row1) \
-    *buf++ = (row0); \
-    *buf++ = (row0) + 1; \
-    *buf++ = (row1); \
-    *buf++ = (row1); \
-    *buf++ = (row0) + 1; \
-    *buf++ = (row1) + 1;
+    *buf++ = static_cast<WORD>(row0); \
+    *buf++ = static_cast<WORD>((row0) + 1); \
+    *buf++ = static_cast<WORD>(row1); \
+    *buf++ = static_cast<WORD>(row1); \
+    *buf++ = static_cast<WORD>((row0) + 1); \
+    *buf++ = static_cast<WORD>((row1) + 1);
 
 //
 // Batches draws using the same material

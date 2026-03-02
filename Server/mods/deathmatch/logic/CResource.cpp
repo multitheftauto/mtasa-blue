@@ -2581,14 +2581,14 @@ HttpStatusCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpRespons
 std::string Unescape(std::string_view sv)
 {
     // Converts a character to a hexadecimal value
-    auto toHex = [](char c) -> unsigned char
+    auto toHex = [](char c) -> uint8_t
     {
         if (c >= '0' && c <= '9')
-            return c - '0';
+            return static_cast<uint8_t>(c - '0');
         if (c >= 'a' && c <= 'f')
-            return c - 'a' + 10;
+            return static_cast<uint8_t>(c - 'a' + 10);
         if (c >= 'A' && c <= 'F')
-            return c - 'A' + 10;
+            return static_cast<uint8_t>(c - 'A' + 10);
         return 0;
     };
 
@@ -2911,7 +2911,8 @@ static HttpStatusCode ParseLuaHttpRouterResponse(CLuaArguments& luaResponse, Htt
         {
             if (std::string_view body; argValue->TryGetString(body))
             {
-                if (body.size() <= (size_t)std::numeric_limits<int>::max())
+                const auto maxInt = static_cast<size_t>(std::numeric_limits<int>::max());
+                if (body.size() <= maxInt)
                 {
                     hasBody = true;
                     httpResponse.SetBody(body.data(), body.size());

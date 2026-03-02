@@ -89,17 +89,22 @@ inline constexpr std::string_view DEBUG_PREFIX_EXCEPTION_INFO = "ExceptionInfo: 
 inline constexpr std::string_view DEBUG_PREFIX_WATCHDOG = "WATCHDOG: ";
 inline constexpr std::string_view DEBUG_SEPARATOR = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 // Helpers implemented in CrashHandler.cpp to avoid __try in inline functions
-void OutputDebugStringSafeImpl(const char* message);
-void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
-void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
+void                     OutputDebugStringSafeImpl(const char* message);
+void                     SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
+void                     SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
+extern thread_local bool g_bCrashHandlerStackOverflow;
 
 // Helper to safely call OutputDebugStringA with SEH guards
 inline void OutputDebugStringSafe(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     OutputDebugStringSafeImpl(message);
 }
 inline void SafeDebugOutput(std::string_view message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     const char* data = message.data();
     std::size_t remaining = message.size();
 
@@ -125,12 +130,16 @@ inline void SafeDebugOutput(std::string_view message)
 // Overload for C-string literals (backward compatibility)
 inline void SafeDebugOutput(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     OutputDebugStringSafeImpl(message);
 }
 
 // Overload for std::string (for string_view concatenation)
 inline void SafeDebugOutput(const std::string& message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (!message.empty())
     {
         OutputDebugStringSafeImpl(message.c_str());

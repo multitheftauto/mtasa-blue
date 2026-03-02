@@ -132,7 +132,11 @@ CVehicle::~CVehicle()
             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
             {
                 // Does it have an occupant and is the occupant the requesting ped?
-                unsigned int occupiedSeat = pPed->GetOccupiedVehicleSeat();
+                const uint uiOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                if (uiOccupiedSeat > 0xFF)
+                    continue;
+
+                unsigned char occupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                 if (pPed == GetOccupant(occupiedSeat))
                 {
                     // Mark the ped/vehicle as empty

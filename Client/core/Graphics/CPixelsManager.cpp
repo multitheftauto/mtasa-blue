@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include "CFileFormat.h"
 #include "CPixelsManager.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 
 extern CCore* g_pCore;
 
@@ -701,21 +702,21 @@ bool CPixelsManager::IsPixels(const CPixels& pixels)
 ////////////////////////////////////////////////////////////////
 bool CPixelsManager::SetPlainDimensions(CPixels& pixels, uint uiWidth, uint uiHeight)
 {
-    uint        uiDataSize = pixels.GetSize();
-    const char* pData = pixels.GetData();
+    uint  uiDataSize = pixels.GetSize();
+    char* pData = pixels.GetData();
 
-    uint ReqSize = uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL;
+    if (uiWidth > 0xFFFF || uiHeight > 0xFFFF)
+        return false;
 
-    if (ReqSize == uiDataSize)
-    {
-        // Fixup plain format tail
-        WORD* pPlainTail = (WORD*)(pData + uiDataSize - SIZEOF_PLAIN_TAIL);
-        pPlainTail[0] = static_cast<WORD>(uiWidth);
-        pPlainTail[1] = static_cast<WORD>(uiHeight);
-        return true;
-    }
+    const uint64_t reqSize64 = static_cast<uint64_t>(uiWidth) * static_cast<uint64_t>(uiHeight) * 4ULL + SIZEOF_PLAIN_TAIL;
+    if (reqSize64 != uiDataSize)
+        return false;
 
-    return false;
+    // Fixup plain format tail
+    auto* pPlainTail = reinterpret_cast<WORD*>(pData + uiDataSize - SIZEOF_PLAIN_TAIL);
+    pPlainTail[0] = static_cast<WORD>(uiWidth);
+    pPlainTail[1] = static_cast<WORD>(uiHeight);
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 @echo off
 
+if not defined PREMAKE_FILE ( set PREMAKE_FILE=premake5.lua )
+
 rem Update CEF eventually
 utils\premake5.exe install_cef
 
@@ -10,7 +12,7 @@ rem Update discord-rpc
 utils\premake5.exe install_discord
 
 rem Generate solutions
-utils\premake5.exe vs2026
+utils\premake5.exe "--file=%PREMAKE_FILE%" vs2026
 
 rem Create symlink from utils\settings.VisualStudio.json to Build\settings.VisualStudio.json
 if exist "%~dp0\Build\settings.VisualStudio.json" del "%~dp0\Build\settings.VisualStudio.json"

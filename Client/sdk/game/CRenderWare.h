@@ -97,7 +97,7 @@ public:
     virtual bool HasClothesReplacementChanged() = 0;
     virtual bool ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) = 0;
     virtual bool ClothesRemoveFile(char* fileData) = 0;
-    virtual bool HasClothesFile(const char* fileName) const noexcept = 0;
+    virtual bool HasClothesFile(const char* fileName) const = 0;
     virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
     virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
     virtual CColModel*       ReadCOL(const SString& buffer) = 0;
@@ -112,6 +112,7 @@ public:
     virtual void             RepositionAtomic(RpClump* pDst, RpClump* pSrc, const char* szName) = 0;
     virtual void             AddAllAtomics(RpClump* pDst, RpClump* pSrc) = 0;
     virtual bool             ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) = 0;
+    virtual bool             ReplaceClumpModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplacePedModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
@@ -146,8 +147,20 @@ public:
     virtual void RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId) = 0;
 
     // Cleanup TXD slots created to isolate engineRequestModel clones.
-    virtual void CleanupIsolatedTxdForModel(unsigned short usModelId) = 0;
+    // bSkipStreamingLoads: When true, skip blocking streaming loads (use during session reset when streaming system may be unsafe)
+    virtual void CleanupIsolatedTxdForModel(unsigned short usModelId, bool bSkipStreamingLoads = false) = 0;
 
     // Rebind single atomic's material textures to current TXD textures
     virtual void RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId) = 0;
+
+    // Remove tracking state without destroying textures; used during shutdown.
+    virtual void ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementTextures) = 0;
+
+    // Parses TXD buffer data and injects it directly into an allocated pool slot
+    virtual bool LoadTxdSlotFromBuffer(std::uint32_t uiSlotId, const std::string& buffer) = 0;
+
+    // Clean up replacement texture tracking for a TXD slot that is about to be destroyed.
+    // Detaches all SReplacementTextures from this slot, orphans copy textures, and removes
+    // the ms_ModelTexturesInfoMap entry so later CClientTXD cleanup won't access freed data.
+    virtual void CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId) = 0;
 };

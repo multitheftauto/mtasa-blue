@@ -38,6 +38,9 @@ using namespace std;
 
 namespace fs = std::filesystem;
 
+// Set to true to enable the freeze watchdog (monitors main thread responsiveness)
+constexpr bool bFreezeWatchdogEnabled = false;
+
 static float fTest = 1;
 
 extern CCore* g_pCore;
@@ -128,6 +131,7 @@ CCore::CCore()
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
+    m_uiNextRenderTargetRetryTime = 0;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Create our Direct3DData handler.
@@ -182,7 +186,8 @@ CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
-    StopWatchdogThread();
+    if constexpr (bFreezeWatchdogEnabled)
+        StopWatchdogThread();
 
     // Reset Discord rich presence
     if (m_pDiscordRichPresence)
@@ -1051,6 +1056,19 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+
+    // Apply CPU affinity here (GTA allocates threads on startup, so we have to do it here instead of earlier)
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+    if (!affinity)
+        return;
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+    HANDLE    process = GetCurrentProcess();
+    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 void CCore::CreateGUI()
@@ -1285,7 +1303,8 @@ void CCore::DoPreFramePulse()
 {
     TIMING_CHECKPOINT("+CorePreFrame");
 
-    UpdateWatchdogHeartbeat();
+    if constexpr (bFreezeWatchdogEnabled)
+        UpdateWatchdogHeartbeat();
 
     m_pKeyBinds->DoPreFramePulse();
 
@@ -1345,9 +1364,12 @@ void CCore::DoPostFramePulse()
 
             // Start watchdog thread now that initial loading is complete
             // Use 120 second timeout to allow for large mod asset loading
-            if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+            if constexpr (bFreezeWatchdogEnabled)
             {
-                WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+                {
+                    WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                }
             }
 
             // Disable vsync while it's all dark
@@ -1854,18 +1876,23 @@ void CCore::UpdateRecentlyPlayed()
     std::string  strHost;
     CVARS_GET("host", strHost);
     CVARS_GET("port", uiPort);
+
+    if (uiPort == 0 || uiPort > 0xFFFF)
+        return;
+
+    const ushort usPort = static_cast<ushort>(uiPort);
     // Save the connection details into the recently played servers list
     in_addr Address;
     if (CServerListItem::Parse(strHost.c_str(), Address))
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
-        pRecentList->Remove(Address, static_cast<ushort>(uiPort));
-        pRecentList->AddUnique(Address, static_cast<ushort>(uiPort), true);
+        pRecentList->Remove(Address, usPort);
+        pRecentList->AddUnique(Address, usPort, true);
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())
-            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", uiPort), m_pConnectManager->m_strLastPassword);
+            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", usPort), m_pConnectManager->m_strLastPassword);
     }
     // Save our configuration file
     CCore::GetSingleton().SaveConfig();
@@ -1915,18 +1942,6 @@ void CCore::ApplyCoreInitSettings()
     int       priority = CVARS_GET_VALUE<int>("process_priority") % 3;
 
     SetPriorityClass(process, priorities[priority]);
-
-    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
-
-    if (!affinity)
-        return;
-
-    DWORD_PTR mask;
-    DWORD_PTR sys;
-    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
-
-    if (result)
-        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //
@@ -1988,6 +2003,7 @@ void CCore::OnDeviceRestore()
 {
     m_iUnminimizeFrameCounter = 4;  // Tell script we have restored after 4 frames to avoid double sends
     m_bDidRecreateRenderTargets = true;
+    m_uiNextRenderTargetRetryTime = 0;
 }
 
 //
@@ -2011,6 +2027,13 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
+    const uint uiNow = GetTickCount32();
+    if (uiNow >= m_uiNextRenderTargetRetryTime)
+    {
+        CGraphics::GetSingleton().RetryInvalidRenderTargets();
+        m_uiNextRenderTargetRetryTime = uiNow + 250;
+    }
+
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff

@@ -277,7 +277,7 @@ DWORD WINAPI CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
 
 void CScreenShot::StartSaveThread()
 {
-    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(ThreadProc), NULL, CREATE_SUSPENDED, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, &CScreenShot::ThreadProc, NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot thread.");

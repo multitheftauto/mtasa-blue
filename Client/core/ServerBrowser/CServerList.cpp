@@ -262,6 +262,7 @@ void CServerListInternet::Refresh()
     }
     m_nScanned = 0;
     m_nSkipped = 0;
+    m_iRevision++;
 }
 
 static bool SortByASEVersionCallback(const CServerListItem* const d1, const CServerListItem* const d2)

@@ -20,8 +20,8 @@ class CClientModelManager;
 #include "CClientModel.h"
 
 #define MAX_MODEL_DFF_ID 20000
-#define MAX_MODEL_TXD_ID 25000
-#define MAX_MODEL_ID     25000
+#define MAX_MODEL_TXD_ID 52768
+#define MAX_MODEL_ID     52768
 
 class CClientModelManager
 {

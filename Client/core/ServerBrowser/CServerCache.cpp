@@ -160,7 +160,11 @@ bool CServerCache::LoadServerCache()
         if (const SString* pString = MapFind(item.attributeMap, "ip"))
             key.ulIp = inet_addr(*pString);
         if (const SString* pString = MapFind(item.attributeMap, "port"))
-            key.usGamePort = static_cast<ushort>(atoi(*pString));
+        {
+            const int iPort = atoi(*pString);
+            if (iPort > 0 && iPort <= 0xFFFF)
+                key.usGamePort = static_cast<ushort>(iPort);
+        }
         if (const SString* pString = MapFind(item.attributeMap, "nPlayers"))
             info.nPlayers.SetFromString(*pString);
         if (const SString* pString = MapFind(item.attributeMap, "nMaxPlayers"))
@@ -186,7 +190,7 @@ bool CServerCache::LoadServerCache()
         if (const SString* pString = MapFind(item.attributeMap, "strVersion"))
             info.strVersion = *pString;
 
-        if (key.ulIp == 0)
+        if (key.ulIp == 0 || key.usGamePort == 0)
             continue;
 
         MapSet(m_ServerCachedMap, key, info);
@@ -217,7 +221,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         ms_ServerCachedMap = m_ServerCachedMap;
 
         // Start save thread
-        HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerCache::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
+        HANDLE hThread = CreateThread(NULL, 0, &CServerCache::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL);
         if (!hThread)
         {
             CCore::GetSingleton().GetConsole()->Printf("Could not create server cache thread.");
@@ -355,8 +359,8 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
             pItem->strMap = pInfo->strMap;
             pItem->strVersion = pInfo->strVersion;
             pItem->uiCacheNoReplyCount = pInfo->uiCacheNoReplyCount;
-            pItem->m_usHttpPort = static_cast<unsigned short>(pInfo->usHttpPort);
-            pItem->m_ucSpecialFlags = static_cast<unsigned char>(pInfo->ucSpecialFlags);
+            pItem->m_usHttpPort = static_cast<ushort>(pInfo->usHttpPort);
+            pItem->m_ucSpecialFlags = static_cast<uchar>(pInfo->ucSpecialFlags);
             pItem->PostChange();
         }
         else if (pItem->GetDataQuality() < SERVER_INFO_QUERY)

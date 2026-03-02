@@ -195,6 +195,9 @@ public:
     virtual void LeavingMTARenderZone() = 0;
     virtual void MaybeEnteringMTARenderZone() = 0;
     virtual void MaybeLeavingMTARenderZone() = 0;
+    virtual void MarkViewportRefreshPending() = 0;
+    virtual void RefreshViewportIfNeeded() = 0;
+    virtual void ApplyMTARenderViewportIfNeeded() = 0;
 
     // Texture data manipulation
     virtual bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,

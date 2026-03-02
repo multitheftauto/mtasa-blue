@@ -1033,6 +1033,13 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
     if (!IsJoypadConnected())
         return;
 
+    int leftStickX = cs.LeftStickX;
+    int leftStickY = cs.LeftStickY;
+    int rightStickX = cs.RightStickX;
+    int rightStickY = cs.RightStickY;
+    int buttonCross = cs.ButtonCross;
+    int buttonSquare = cs.ButtonSquare;
+
     // Map each half axis
     for (int i = 0; i < NUMELMS(m_currentMapping); i++)
     {
@@ -1056,27 +1063,27 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
         auto sValue = static_cast<short>(Round(value * line.MaxValue));
 
         if (line.OutputAxisIndex == eLeftStickX)
-            cs.LeftStickX += sValue;
+            leftStickX += sValue;
         else if (line.OutputAxisIndex == eLeftStickY)
-            cs.LeftStickY += sValue;
+            leftStickY += sValue;
         else if (line.OutputAxisIndex == eRightStickX)
-            cs.RightStickX += sValue;
+            rightStickX += sValue;
         else if (line.OutputAxisIndex == eRightStickY)
-            cs.RightStickY += sValue;
+            rightStickY += sValue;
         else if (line.OutputAxisIndex == eAccelerate && bInVehicle)
-            cs.ButtonCross += sValue;
+            buttonCross += sValue;
         else if (line.OutputAxisIndex == eBrake && bInVehicle)
-            cs.ButtonSquare += sValue;
+            buttonSquare += sValue;
     }
 
     // Keep everything in range
-    cs.LeftStickX = Clamp<const short>(-128, cs.LeftStickX, 128);
-    cs.LeftStickY = Clamp<const short>(-128, cs.LeftStickY, 128);
-    cs.RightStickX = Clamp<const short>(-128, cs.RightStickX, 128);
-    cs.RightStickY = Clamp<const short>(-128, cs.RightStickY, 128);
+    cs.LeftStickX = static_cast<short>(Clamp<int>(-128, leftStickX, 128));
+    cs.LeftStickY = static_cast<short>(Clamp<int>(-128, leftStickY, 128));
+    cs.RightStickX = static_cast<short>(Clamp<int>(-128, rightStickX, 128));
+    cs.RightStickY = static_cast<short>(Clamp<int>(-128, rightStickY, 128));
 
-    cs.ButtonCross = Clamp<const short>(0, cs.ButtonCross, 255);
-    cs.ButtonSquare = Clamp<const short>(0, cs.ButtonSquare, 255);
+    cs.ButtonCross = static_cast<short>(Clamp<int>(0, buttonCross, 255));
+    cs.ButtonSquare = static_cast<short>(Clamp<int>(0, buttonSquare, 255));
 
     // Debug output
 #ifdef MTA_DEBUG

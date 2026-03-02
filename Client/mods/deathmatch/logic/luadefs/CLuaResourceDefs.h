@@ -27,6 +27,7 @@ public:
     LUA_DECLARE(GetResourceDynamicElementRoot);
     LUA_DECLARE(GetResourceExportedFunctions);
     LUA_DECLARE(GetResourceState);
+    static std::vector<CResource*> GetResources();
     LUA_DECLARE(LoadString);
     LUA_DECLARE(Load);
 

@@ -20,6 +20,7 @@ CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelT
 
 CClientModel::~CClientModel(void)
 {
+    RestoreEntitiesUsingThisModel();
     Deallocate();
 }
 
@@ -46,6 +47,8 @@ bool CClientModel::Allocate(ushort usParentID)
     {
         case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
+            // Parent ID 0 (CJ) bypasses TXD isolation in downstream logic
+            pModelInfo->SetParentID(usParentID ? usParentID : 7);
             allocated = true;
             break;
         case eClientModelType::OBJECT:
@@ -105,21 +108,27 @@ bool CClientModel::Deallocate()
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
     if (!pModelInfo || !pModelInfo->IsValid())
     {
+        // Model already gone - cleanup any orphaned TXD slot
         if (m_eModelType != eClientModelType::TXD)
         {
             if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
                 pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(m_iModelID));
         }
         m_bAllocatedByUs = false;
-        return false;
+        return true;
     }
 
     if (m_eModelType != eClientModelType::TXD)
     {
+        // Clean up TXD isolation BEFORE deallocating - cleanup needs valid model info
         if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
             pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(m_iModelID));
 
         pModelInfo->DeallocateModel();
+
+        // Log if model still has refs
+        if (pModelInfo->IsValid())
+            AddReportLog(9406, SString("Deallocate: Model %d still valid after DeallocateModel (refs=%d)", m_iModelID, pModelInfo->GetRefCount()), 10);
     }
 
     m_bAllocatedByUs = false;
@@ -128,6 +137,15 @@ bool CClientModel::Deallocate()
 
 void CClientModel::RestoreEntitiesUsingThisModel()
 {
+    // TXD cleanup does not depend on GetModelInfo. Overflow TXDs (pool index >= 5000)
+    // map to model IDs in the COL/IPL range or beyond the ModelInfo array, so
+    // GetModelInfo would return wrong or null entries for them.
+    if (m_eModelType == eClientModelType::TXD)
+    {
+        RestoreTXD();
+        return;
+    }
+
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
     if (!pModelInfo || !pModelInfo->IsValid())
         return;
@@ -142,9 +160,6 @@ void CClientModel::RestoreEntitiesUsingThisModel()
         case eClientModelType::VEHICLE:
             RestoreDFF(pModelInfo);
             return;
-        case eClientModelType::TXD:
-            RestoreTXD(pModelInfo);
-            return;
         default:
             return;
     }
@@ -153,6 +168,11 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 {
     if (!g_pClientGame || !g_pClientGame->GetManager())
+        return;
+
+    // DFFManager is destroyed before ModelManager during CClientManager cleanup.
+    // If null, sub-managers are already torn down - skip restoration.
+    if (!g_pClientGame->GetManager()->GetDFFManager())
         return;
 
     const int  modelId = m_iModelID;
@@ -231,7 +251,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         case eClientModelType::TIMED_OBJECT:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
-            unsigned short usParentID = pModelInfo->GetParentID();
+            unsigned short usParentID = static_cast<unsigned short>(pModelInfo->GetParentID());
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [usParentID](auto& element) { element.SetModel(usParentID); });
 
@@ -245,13 +265,13 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID,
                                                  [usParentID](auto& element) { element.SetModel(usParentID); });
 
-            g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(modelId);
+            g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(static_cast<unsigned short>(modelId));
             break;
         }
         case eClientModelType::VEHICLE:
         {
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
-            unsigned short         usParentID = pModelInfo->GetParentID();
+            unsigned short         usParentID = static_cast<unsigned short>(pModelInfo->GetParentID());
 
             unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
                                       [usParentID](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });
@@ -259,7 +279,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         }
     }
 
-    g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(modelId);
+    g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(static_cast<unsigned short>(modelId));
 }
 
 bool CClientModel::AllocateTXD(std::string& strTxdName)
@@ -276,13 +296,18 @@ bool CClientModel::AllocateTXD(std::string& strTxdName)
     return false;
 }
 
-void CClientModel::RestoreTXD(CModelInfo* pModelInfo)
+void CClientModel::RestoreTXD()
 {
-    const uint txdModelId = pModelInfo->GetModel();
-    if (txdModelId < MAX_MODEL_DFF_ID)
+    if (m_iModelID < MAX_MODEL_DFF_ID)
         return;
-    const uint txdSlotId = txdModelId - MAX_MODEL_DFF_ID;
 
+    const uint txdSlotId = static_cast<uint>(m_iModelID - MAX_MODEL_DFF_ID);
+
+    // Slot may already have been freed (e.g. resource stopped then model destroyed)
+    if (g_pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(txdSlotId))
+        return;
+
+    // Reset any DFF models that reference this TXD slot back to the default
     const uint limit = static_cast<uint>(g_pGame->GetBaseIDforCOL());
     for (uint modelId = 0; modelId < limit; modelId++)
     {
@@ -291,9 +316,29 @@ void CClientModel::RestoreTXD(CModelInfo* pModelInfo)
             continue;
 
         if (pIter->GetTextureDictionaryID() == txdSlotId)
-            pIter->SetTextureDictionaryID(0);
+        {
+            pIter->ResetTextureDictionaryID();
+
+            // If still referencing this slot (no stored default, or the
+            // default's pool slot was freed), redirect to TXD 0 so
+            // streaming won't hit the freed slot later.
+            if (pIter->GetTextureDictionaryID() == txdSlotId)
+                pIter->SetTextureDictionaryID(0);
+        }
     }
 
+    // Detach any replacement texture tracking from this TXD slot before the slot
+    // is destroyed. Without this, CClientTXD destructors that run later (queued
+    // by DeleteRecursive) would access freed TXD data via stale perTxdList entries.
+    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
+        pRenderWare->CleanupReplacementsInTxdSlot(static_cast<unsigned short>(txdSlotId));
+
     g_pGame->GetPools()->GetTxdPool().RemoveTextureDictonarySlot(txdSlotId);
-    g_pGame->GetStreaming()->SetStreamingInfo(txdModelId, 0, 0, 0, -1);
+
+    // Only clear streaming info for TXDs within SA's streaming range.
+    // Overflow TXDs (pool index >= 5000) map to model IDs in the COL/IPL
+    // range or beyond the ModelInfo array and have no streaming entry.
+    const uint txdModelId = static_cast<uint>(m_iModelID);
+    if (txdModelId < static_cast<uint>(g_pGame->GetBaseIDforCOL()))
+        g_pGame->GetStreaming()->SetStreamingInfo(txdModelId, 0, 0, 0, -1);
 }

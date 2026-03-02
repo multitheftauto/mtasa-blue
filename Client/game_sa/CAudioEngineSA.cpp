@@ -97,6 +97,9 @@ void CAudioEngineSA::StopRadio()
 
 void CAudioEngineSA::StartRadio(unsigned int station)
 {
+    if (station > 0xFF)
+        return;
+
     m_ucRadioChannel = static_cast<unsigned char>(station);
     m_bRadioOn = true;
 

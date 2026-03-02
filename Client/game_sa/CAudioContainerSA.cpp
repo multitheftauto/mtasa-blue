@@ -94,10 +94,13 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
     if (numBanks == 0)
         return false;
 
+    if (bankIndex < 0 || bankIndex >= numBanks || bankIndex > 0xFF)
+        return false;
+
     // Get archive file size
     std::ifstream archive(FromUTF8(GetAudioArchiveName(lookupIndex)), std::ios::binary);
 
-    SAudioLookupEntrySA* lookupEntry = m_pLookupTable->GetEntry(lookupIndex, static_cast<uint8_t>(bankIndex));
+    SAudioLookupEntrySA* lookupEntry = m_pLookupTable->GetEntry(lookupIndex, static_cast<uint8>(bankIndex));
     if (!lookupEntry)
         return false;
 
