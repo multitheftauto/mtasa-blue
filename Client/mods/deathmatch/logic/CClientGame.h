@@ -527,11 +527,11 @@ private:
     bool OnMouseEnter(CGUIMouseEventArgs Args);
     bool OnMouseLeave(CGUIMouseEventArgs Args);
     bool OnMouseWheel(CGUIMouseEventArgs Args);
-    void TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szState);
     bool OnMove(CGUIElement* pElement);
     bool OnSize(CGUIElement* pElement);
     bool OnFocusGain(CGUIFocusEventArgs Args);
     bool OnFocusLoss(CGUIFocusEventArgs Args);
+    void TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szState);
 
     // Network update functions
     void DoVehicleInKeyCheck();
