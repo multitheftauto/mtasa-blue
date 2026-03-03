@@ -53,7 +53,7 @@ public:
     CBouncingPanelSAInterface m_panels[3];
     CDoorSAInterface          m_swingingChassis;
     CColPointSAInterface      m_wheelColPoint[MAX_WHEELS];
-    float                     m_wheelRatios[4]; // supension compression, 0 = fully compressed, 1 = fully relaxed
+    float                     m_wheelRatios[4];  // supension compression, 0 = fully compressed, 1 = fully relaxed
     float                     m_prevWheelRatios[4];
     float                     m_wheelCollisionState[4];
     float                     field_800;

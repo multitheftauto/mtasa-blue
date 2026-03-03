@@ -44,5 +44,6 @@ bool CBikeSA::IsAnyWheelTouchingGround() const
     if (!bikeInterface)
         return false;
 
-    return bikeInterface->m_wheelRatios[0] < 1.0f || bikeInterface->m_wheelRatios[1] < 1.0f || bikeInterface->m_wheelRatios[2] < 1.0f || bikeInterface->m_wheelRatios[3] < 1.0f;
+    return bikeInterface->m_wheelRatios[0] < 1.0f || bikeInterface->m_wheelRatios[1] < 1.0f || bikeInterface->m_wheelRatios[2] < 1.0f ||
+           bikeInterface->m_wheelRatios[3] < 1.0f;
 }
