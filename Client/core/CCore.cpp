@@ -953,7 +953,7 @@ void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
     // Save current directory (shouldn't change anyway)
     SString strSavedCwd = GetSystemCurrentDirectory();
 
-    // Load approrpiate compilation-specific library.
+    // Load appropriate compilation-specific library.
 #ifdef MTA_DEBUG
     SString strModuleFileName = strModuleName + "_d.dll";
 #else
