@@ -1387,7 +1387,7 @@ static void TryWriteReentrantFlag(DWORD exceptionCode)
     }
     else
     {
-        return;  //Can't proceed without path
+        return;  // Can't proceed without path
     }
 
     __try
