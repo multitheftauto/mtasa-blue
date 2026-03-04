@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-02 01:15+0000\n"
-"PO-Revision-Date: 2026-03-02 01:21\n"
+"PO-Revision-Date: 2026-03-04 16:42\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -1870,7 +1870,7 @@ msgstr "Nasycenie:"
 
 #: Client/core/CSettings.cpp:1500
 msgid "Apply adjustments in windowed/borderless mode"
-msgstr ""
+msgstr "Zastosuj zmiany w trybie okienkowym"
 
 #: Client/core/CSettings.cpp:1506
 msgid "Apply adjustments in fullscreen mode"
