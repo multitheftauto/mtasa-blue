@@ -1,18 +1,25 @@
 @echo off
+setlocal
 
-if not defined PREMAKE_FILE ( set PREMAKE_FILE=premake5.lua )
+rem If PREMAKE_FILE is set by a caller, use it;
+rem otherwise continue to the default premake5.lua with no extra flags.
+if defined PREMAKE_FILE (
+    set "PREMAKE5_FLAGS=--file=%PREMAKE_FILE%"
+) else (
+    set "PREMAKE5_FLAGS="
+)
 
 rem Update CEF eventually
-utils\premake5.exe install_cef
+utils\premake5.exe %PREMAKE5_FLAGS% install_cef
 
 rem Update Unifont
-utils\premake5.exe install_unifont
+utils\premake5.exe %PREMAKE5_FLAGS% install_unifont
 
 rem Update discord-rpc
-utils\premake5.exe install_discord
+utils\premake5.exe %PREMAKE5_FLAGS% install_discord
 
 rem Generate solutions
-utils\premake5.exe "--file=%PREMAKE_FILE%" vs2026
+utils\premake5.exe %PREMAKE5_FLAGS% vs2026
 
 rem Create symlink from utils\settings.VisualStudio.json to Build\settings.VisualStudio.json
 if exist "%~dp0\Build\settings.VisualStudio.json" del "%~dp0\Build\settings.VisualStudio.json"
