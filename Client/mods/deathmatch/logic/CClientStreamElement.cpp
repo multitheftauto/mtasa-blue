@@ -20,6 +20,7 @@ CClientStreamElement::CClientStreamElement(CClientStreamer* pStreamer, ElementID
     m_fExpDistance = 0.0f;
     m_bStreamedIn = false;
     m_bAttemptingToStreamIn = false;
+    m_lastStreamOutTime = 0u;
     m_usStreamReferences = 0;
     m_usStreamReferencesScript = 0;
     m_pStreamer->AddElement(this);
@@ -67,6 +68,7 @@ void CClientStreamElement::InternalStreamOut()
     {
         StreamOut();
         m_bStreamedIn = false;
+        m_lastStreamOutTime = static_cast<std::uint32_t>(CClientTime::GetTime());
 
         // Stream out attached elements
         CClientObject* thisObject = DynamicCast<CClientObject>(this);
