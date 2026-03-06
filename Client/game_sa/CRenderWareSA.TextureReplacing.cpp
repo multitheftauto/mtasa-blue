@@ -1345,6 +1345,38 @@ namespace
         return usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY;
     }
 
+    // Cancel any SA streaming operation for this TXD slot before MTA takes
+    // ownership. SA may have queued a load request whose pool allocation
+    // hasn't happened yet (pool slot is empty but streaming info is active).
+    // Without cancellation, ProcessLoadingChannel would later load SA's data
+    // into the slot MTA now owns, adding it to the loaded list behind MTA's
+    // back and corrupting the linked list on cleanup.
+    static void CancelPendingStreamingForSlot(unsigned short usTxdSlotId)
+    {
+        if (!pGame || !pGame->GetStreaming())
+            return;
+
+        if (!IsStreamingInfoSlot(usTxdSlotId))
+            return;
+
+        const int32_t       baseTxdId = pGame->GetBaseIDforTXD();
+        const std::uint32_t streamId = static_cast<std::uint32_t>(usTxdSlotId) + static_cast<std::uint32_t>(baseTxdId);
+        CStreamingInfo*     pStreamInfo = GetStreamingInfoSafe(streamId);
+        if (!pStreamInfo)
+            return;
+
+        // Only cancel pending states (Requested, Reading, Finishing).
+        // LOADED entries have pool data and RemoveModel would call RemoveTxd
+        // which crashes on empty pool slots. LOADED + empty pool is an
+        // inconsistent SA state that can't arise normally; the manual
+        // unlink in SetStreamingInfoLoaded handles those as a safety net.
+        if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED &&
+            pStreamInfo->loadState != eModelLoadState::LOADSTATE_LOADED)
+        {
+            pGame->GetStreaming()->RemoveModel(streamId);
+        }
+    }
+
     std::unordered_set<RwTexture*> MakeTextureSet(const std::vector<RwTexture*>& textures)
     {
         return std::unordered_set<RwTexture*>(textures.begin(), textures.end());
@@ -2326,6 +2358,8 @@ namespace
             return false;
         }
 
+        CancelPendingStreamingForSlot(static_cast<unsigned short>(uiNewTxdId));
+
         std::string txdName = SString("mta_iso_%u", usModelId);
         if (txdName.size() > MAX_TEX_DICTIONARY_NAME_LENGTH)
             txdName.resize(MAX_TEX_DICTIONARY_NAME_LENGTH);
@@ -2542,6 +2576,8 @@ namespace
             MarkIsolationDenied();
             return false;
         }
+
+        CancelPendingStreamingForSlot(static_cast<unsigned short>(uiNewTxdId));
 
         std::string txdName = SString("mta_iso_%u", usModelId);
         if (txdName.size() > MAX_TEX_DICTIONARY_NAME_LENGTH)
