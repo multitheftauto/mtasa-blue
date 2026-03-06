@@ -13,7 +13,7 @@
 extern CClientGame* g_pClientGame;
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+    #define M_PI 3.14159265358979323846
 #endif
 
 unsigned int CClientMarker::m_uiStreamedInMarkers = 0;
@@ -318,11 +318,11 @@ void CClientMarker::SetSize(float fSize)
         {
             CClientColTube* pShape = static_cast<CClientColTube*>(m_pCollision);
             pShape->SetRadius(fSize);
-            pShape->SetHeight(fSize <= 1.5 ? fSize + 1 : fSize);   
+            pShape->SetHeight(fSize <= 1.5 ? fSize + 1 : fSize);
             break;
         }
     }
-   
+
     m_pMarker->SetSize(fSize);
 }
 
@@ -425,16 +425,16 @@ void CClientMarker::Callback_OnCollision(CClientColShape& shape, CClientEntity& 
 
     // Call the marker hit event
     CLuaArguments arguments;
-    arguments.PushElement(&entity);                                            // Hit element
-    arguments.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    arguments.PushElement(&entity);                                  // Hit element
+    arguments.PushBoolean(GetDimension() == entity.GetDimension());  // Matching dimension?
     CallEvent("onClientMarkerHit", arguments, true);
 
     if (!IS_PLAYER(&entity))
         return;
 
     CLuaArguments arguments2;
-    arguments2.PushElement(this);                                               // marker
-    arguments2.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    arguments2.PushElement(this);                                     // marker
+    arguments2.PushBoolean(GetDimension() == entity.GetDimension());  // Matching dimension?
     entity.CallEvent("onClientPlayerMarkerHit", arguments2, false);
 }
 
@@ -445,16 +445,16 @@ void CClientMarker::Callback_OnLeave(CClientColShape& shape, CClientEntity& enti
 
     // Call the marker leave event
     CLuaArguments arguments;
-    arguments.PushElement(&entity);                                            // Hit element
-    arguments.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    arguments.PushElement(&entity);                                  // Hit element
+    arguments.PushBoolean(GetDimension() == entity.GetDimension());  // Matching dimension?
     CallEvent("onClientMarkerLeave", arguments, true);
 
     if (!IS_PLAYER(&entity))
         return;
 
     CLuaArguments arguments2;
-    arguments2.PushElement(this);                                               // marker
-    arguments2.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    arguments2.PushElement(this);                                     // marker
+    arguments2.PushBoolean(GetDimension() == entity.GetDimension());  // Matching dimension?
     entity.CallEvent("onPlayerMarkerLeave", arguments2, false);
 }
 

@@ -60,8 +60,7 @@ namespace
         FormattedStackFrame result;
         for (const auto& mod : modules)
         {
-            if (mod.size <= (0xFFFFFFFFFFFFFFFF - mod.baseAddress) &&
-                address >= mod.baseAddress && address < mod.baseAddress + mod.size)
+            if (mod.size <= (0xFFFFFFFFFFFFFFFF - mod.baseAddress) && address >= mod.baseAddress && address < mod.baseAddress + mod.size)
             {
                 const DWORD64 offset = address - mod.baseAddress;
                 result.text = SString("%s+0x%llX", mod.name.c_str(), static_cast<unsigned long long>(offset));
@@ -90,7 +89,7 @@ namespace
         const ULARGE_INTEGER uliWrite{ftWrite.dwLowDateTime, ftWrite.dwHighDateTime};
 
         constexpr ULONGLONG kFileTimeUnitsPerSecond = 10000000ULL;
-        const ULONGLONG maxAge = maxAgeMinutes * 60 * kFileTimeUnitsPerSecond;
+        const ULONGLONG     maxAge = maxAgeMinutes * 60 * kFileTimeUnitsPerSecond;
 
         return uliNow.QuadPart >= uliWrite.QuadPart && (uliNow.QuadPart - uliWrite.QuadPart) < maxAge;
     }
@@ -144,8 +143,8 @@ namespace WerCrash
         }
 
         PMINIDUMP_DIRECTORY pExceptionDir = nullptr;
-        PVOID pExceptionStream = nullptr;
-        ULONG streamSize = 0;
+        PVOID               pExceptionStream = nullptr;
+        ULONG               streamSize = 0;
 
         if (MiniDumpReadDumpStream(pBase, ExceptionStream, &pExceptionDir, &pExceptionStream, &streamSize))
         {
@@ -156,8 +155,8 @@ namespace WerCrash
                 regs.exceptionAddress = pExInfo->ExceptionRecord.ExceptionAddress;
 
                 PMINIDUMP_DIRECTORY pThreadListDir = nullptr;
-                PVOID pThreadListStream = nullptr;
-                ULONG threadListSize = 0;
+                PVOID               pThreadListStream = nullptr;
+                ULONG               threadListSize = 0;
 
                 if (MiniDumpReadDumpStream(pBase, ThreadListStream, &pThreadListDir, &pThreadListStream, &threadListSize))
                 {
@@ -214,8 +213,8 @@ namespace WerCrash
         constexpr size_t kMaxFrames = 64;
         constexpr size_t kMinFramesBeforeRawScan = 3;
         constexpr size_t kRawStackScanBytes = 8192;
-        constexpr DWORD kMinCodeAddress = 0x00400000;
-        constexpr DWORD kMaxCodeAddress = 0x7FFFFFFF;
+        constexpr DWORD  kMinCodeAddress = 0x00400000;
+        constexpr DWORD  kMaxCodeAddress = 0x7FFFFFFF;
 
         const HANDLE hFile = CreateFileA(dumpPath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
         if (hFile == INVALID_HANDLE_VALUE)
@@ -245,9 +244,9 @@ namespace WerCrash
         }
 
         std::vector<MinidumpModuleInfo> modules;
-        PMINIDUMP_DIRECTORY pModuleListDir = nullptr;
-        PVOID pModuleListStream = nullptr;
-        ULONG moduleListSize = 0;
+        PMINIDUMP_DIRECTORY             pModuleListDir = nullptr;
+        PVOID                           pModuleListStream = nullptr;
+        ULONG                           moduleListSize = 0;
 
         if (MiniDumpReadDumpStream(pBase, ModuleListStream, &pModuleListDir, &pModuleListStream, &moduleListSize))
         {
@@ -257,7 +256,7 @@ namespace WerCrash
                 modules.reserve(pModuleList->NumberOfModules);
                 for (ULONG i = 0; i < pModuleList->NumberOfModules; i++)
                 {
-                    const auto& mod = pModuleList->Modules[i];
+                    const auto&        mod = pModuleList->Modules[i];
                     MinidumpModuleInfo info;
                     info.baseAddress = mod.BaseOfImage;
                     info.size = mod.SizeOfImage;
@@ -272,12 +271,11 @@ namespace WerCrash
                             if (pModName->Length <= availableForString)
                             {
                                 std::wstring wname(pModName->Buffer, pModName->Length / sizeof(wchar_t));
-                                auto lastSlash = wname.find_last_of(L"\\/");
+                                auto         lastSlash = wname.find_last_of(L"\\/");
                                 if (lastSlash != std::wstring::npos)
                                     wname = wname.substr(lastSlash + 1);
 
-                                std::string name(wname.begin(), wname.end());
-                                info.name = name.c_str();
+                                info.name = UTF16ToMbUTF8(wname);
                             }
                         }
                     }
@@ -289,9 +287,9 @@ namespace WerCrash
         }
 
         std::map<DWORD64, std::vector<BYTE>> memoryRegions;
-        PMINIDUMP_DIRECTORY pMemoryListDir = nullptr;
-        PVOID pMemoryListStream = nullptr;
-        ULONG memoryListSize = 0;
+        PMINIDUMP_DIRECTORY                  pMemoryListDir = nullptr;
+        PVOID                                pMemoryListStream = nullptr;
+        ULONG                                memoryListSize = 0;
 
         if (MiniDumpReadDumpStream(pBase, MemoryListStream, &pMemoryListDir, &pMemoryListStream, &memoryListSize))
         {
@@ -310,13 +308,14 @@ namespace WerCrash
             }
         }
 
-        const auto readDword = [&memoryRegions](DWORD64 address) noexcept -> std::optional<DWORD> {
+        const auto readDword = [&memoryRegions](DWORD64 address) noexcept -> std::optional<DWORD>
+        {
             for (const auto& [baseAddr, data] : memoryRegions)
             {
                 if (address >= baseAddr && address + sizeof(DWORD) <= baseAddr + data.size())
                 {
                     const auto offset = static_cast<size_t>(address - baseAddr);
-                    DWORD value = 0;
+                    DWORD      value = 0;
                     std::memcpy(&value, data.data() + offset, sizeof(DWORD));
                     return value;
                 }
@@ -324,17 +323,18 @@ namespace WerCrash
             return std::nullopt;
         };
 
-        const auto isAddressInModule = [&modules](DWORD64 addr) noexcept -> bool {
+        const auto isAddressInModule = [&modules](DWORD64 addr) noexcept -> bool
+        {
             for (const auto& mod : modules)
             {
-                if (mod.size <= (0xFFFFFFFFFFFFFFFF - mod.baseAddress) &&
-                    addr >= mod.baseAddress && addr < mod.baseAddress + mod.size)
+                if (mod.size <= (0xFFFFFFFFFFFFFFFF - mod.baseAddress) && addr >= mod.baseAddress && addr < mod.baseAddress + mod.size)
                     return true;
             }
             return false;
         };
 
-        const auto isLikelyCodeAddress = [&](DWORD addr) noexcept -> bool {
+        const auto isLikelyCodeAddress = [&](DWORD addr) noexcept -> bool
+        {
             if (addr < kMinCodeAddress || addr > kMaxCodeAddress)
                 return false;
             return isAddressInModule(addr);
@@ -347,7 +347,7 @@ namespace WerCrash
         frames.push_back(regs.eip);
         seenAddresses.insert(regs.eip);
 
-        DWORD currentEbp = regs.ebp;
+        DWORD           currentEbp = regs.ebp;
         std::set<DWORD> visitedFrames;
 
         for (size_t i = 0; i < kMaxFrames && currentEbp != 0; i++)
@@ -379,7 +379,7 @@ namespace WerCrash
         if (frames.size() < kMinFramesBeforeRawScan)
         {
             DWORD64 stackPtr = regs.esp;
-            size_t bytesScanned = 0;
+            size_t  bytesScanned = 0;
 
             while (bytesScanned < kRawStackScanBytes && frames.size() < kMaxFrames)
             {
@@ -433,11 +433,10 @@ namespace WerCrash
             const auto addr = frames[i];
             const auto formatted = FormatAddressWithModules(addr, modules);
             if (formatted.isDll)
-                stackTrace += SString("#%02u %s [0x%08X] - IDA Address: 0x%08X\n",
-                    static_cast<unsigned int>(i), formatted.text.c_str(), static_cast<unsigned int>(addr), formatted.idaOffset);
+                stackTrace += SString("#%02u %s [0x%08X] - IDA Address: 0x%08X\n", static_cast<unsigned int>(i), formatted.text.c_str(),
+                                      static_cast<unsigned int>(addr), formatted.idaOffset);
             else
-                stackTrace += SString("#%02u %s [0x%08X]\n",
-                    static_cast<unsigned int>(i), formatted.text.c_str(), static_cast<unsigned int>(addr));
+                stackTrace += SString("#%02u %s [0x%08X]\n", static_cast<unsigned int>(i), formatted.text.c_str(), static_cast<unsigned int>(addr));
         }
 
         UnmapViewOfFile(pBase);
@@ -446,15 +445,14 @@ namespace WerCrash
         return stackTrace;
     }
 
-    void AppendWerInfoToDump(const SString& dumpPath, const SString& moduleName, DWORD offset, DWORD exceptionCode,
-                            const MinidumpRegisters& regs)
+    void AppendWerInfoToDump(const SString& dumpPath, const SString& moduleName, DWORD offset, DWORD exceptionCode, const MinidumpRegisters& regs)
     {
         if (dumpPath.empty())
             return;
 
-        const char* exceptionName = (exceptionCode == 0xC0000409) ? "Stack Buffer Overrun"
-                                   : (exceptionCode == 0xC0000374) ? "Heap Corruption"
-                                                                  : "Security Exception";
+        const char* exceptionName = (exceptionCode == 0xC0000409)   ? "Stack Buffer Overrun"
+                                    : (exceptionCode == 0xC0000374) ? "Heap Corruption"
+                                                                    : "Security Exception";
         const DWORD idaAddress = (offset <= (0xFFFFFFFF - kDefaultDllBase)) ? (kDefaultDllBase + offset) : 0;
 
         SYSTEMTIME st{};
@@ -474,8 +472,7 @@ namespace WerCrash
         if (regs.valid)
         {
             werInfo += "\nRegisters:\n";
-            werInfo += SString("EAX=%08X EBX=%08X ECX=%08X EDX=%08X ESI=%08X EDI=%08X\n", regs.eax, regs.ebx, regs.ecx, regs.edx, regs.esi,
-                               regs.edi);
+            werInfo += SString("EAX=%08X EBX=%08X ECX=%08X EDX=%08X ESI=%08X EDI=%08X\n", regs.eax, regs.ebx, regs.ecx, regs.edx, regs.esi, regs.edi);
             werInfo += SString("EBP=%08X ESP=%08X EIP=%08X FLG=%08X\n", regs.ebp, regs.esp, regs.eip, regs.eflags);
             werInfo += SString("CS=%04X DS=%04X SS=%04X ES=%04X FS=%04X GS=%04X\n", regs.cs, regs.ds, regs.ss, regs.es, regs.fs, regs.gs);
         }
@@ -486,7 +483,8 @@ namespace WerCrash
         std::vector<BYTE> buffer;
         buffer.reserve(sizeof(DWORD) * 6 + dataSize);
 
-        const auto appendDword = [&buffer](DWORD value) {
+        const auto appendDword = [&buffer](DWORD value)
+        {
             const auto* bytes = reinterpret_cast<const BYTE*>(&value);
             buffer.insert(buffer.end(), bytes, bytes + sizeof(DWORD));
         };
@@ -502,8 +500,8 @@ namespace WerCrash
         FileAppend(dumpPath, buffer.data(), static_cast<unsigned long>(buffer.size()));
     }
 
-    SString RenameWerDumpToMtaFormat(const SString& sourcePath, const SString& dumpDir, const SString& moduleName,
-                                    DWORD offset, DWORD exceptionCode, const MinidumpRegisters& regs)
+    SString RenameWerDumpToMtaFormat(const SString& sourcePath, const SString& dumpDir, const SString& moduleName, DWORD offset, DWORD exceptionCode,
+                                     const MinidumpRegisters& regs)
     {
         SYSTEMTIME st{};
         GetLocalTime(&st);
@@ -537,10 +535,9 @@ namespace WerCrash
             }
         }
 
-        SString newFilename =
-            SString("client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp", strMTAVersionFull.c_str(), cleanedModuleName.c_str(),
-                    offset, exceptionCode & 0xffff, strPathCode.c_str(), uiServerIP, uiServerPort, uiServerDuration, strSerialPart.c_str(), st.wYear,
-                    st.wMonth, st.wDay, st.wHour, st.wMinute);
+        SString newFilename = SString("client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp", strMTAVersionFull.c_str(),
+                                      cleanedModuleName.c_str(), offset, exceptionCode & 0xffff, strPathCode.c_str(), uiServerIP, uiServerPort,
+                                      uiServerDuration, strSerialPart.c_str(), st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute);
 
         SString newPath = PathJoin(dumpDir, newFilename);
 
@@ -566,9 +563,9 @@ namespace WerCrash
         if (werDumpFiles.empty())
             return {};
 
-        SString selectedPath;
+        SString  selectedPath;
         FILETIME selectedWrite{};
-        bool hasSelected = false;
+        bool     hasSelected = false;
 
         for (const auto& dumpFile : werDumpFiles)
         {
@@ -582,7 +579,7 @@ namespace WerCrash
                 continue;
             }
 
-            FILETIME ftWrite{};
+            FILETIME   ftWrite{};
             const BOOL gotTime = GetFileTime(hFile, nullptr, nullptr, &ftWrite);
             CloseHandle(hFile);
 
@@ -626,7 +623,7 @@ namespace WerCrash
         const SString sourceFilename = ExtractFilename(selectedPath);
         OutputDebugStringA(SString("FindAndRenameWerDump: Renaming %s\n", selectedPath.c_str()));
         const MinidumpRegisters regs = ExtractRegistersFromMinidump(selectedPath);
-        const SString newPath = RenameWerDumpToMtaFormat(selectedPath, dumpDir, moduleName, offset, exceptionCode, regs);
+        const SString           newPath = RenameWerDumpToMtaFormat(selectedPath, dumpDir, moduleName, offset, exceptionCode, regs);
         if (newPath.empty())
         {
             OutputDebugStringA(SString("FindAndRenameWerDump: Rename failed (error %lu)\n", GetLastError()));
@@ -663,10 +660,11 @@ namespace WerCrash
         struct InternalModuleEntry
         {
             SString entry;
-            bool isMta;
+            bool    isMta;
         };
 
-        auto storeCurrentOnly = [&, prevChunkCount](bool truncatedFlag) {
+        auto storeCurrentOnly = [&, prevChunkCount](bool truncatedFlag)
+        {
             HMODULE hCurrent = nullptr;
             if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
                                    reinterpret_cast<LPCWSTR>(&UpdateModuleBases), &hCurrent))
@@ -681,9 +679,8 @@ namespace WerCrash
                     MODULEINFO modInfo = {};
                     if (GetModuleInformation(hProcess, hCurrent, &modInfo, sizeof(modInfo)))
                     {
-                        SString strEntry = SString("%s=%08X,%08X", filename.c_str(),
-                            static_cast<DWORD>(reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll)),
-                            modInfo.SizeOfImage);
+                        SString strEntry = SString("%s=%08X,%08X", filename.c_str(), static_cast<DWORD>(reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll)),
+                                                   modInfo.SizeOfImage);
                         SetApplicationSetting("diagnostics", "module-bases", strEntry);
                         for (int i = 1; i < prevChunkCount; ++i)
                             SetApplicationSetting("diagnostics", SString("module-bases-%d", i), "");
@@ -749,28 +746,25 @@ namespace WerCrash
                 continue;
 
             SString lower = filename.ToLower();
-            bool isMta = lower.Contains("core") || lower.Contains("client") || lower.Contains("game_sa") ||
-                         lower.Contains("multiplayer") || lower.Contains("netc") || lower.Contains("gta_sa") ||
-                         lower.Contains("proxy_sa") || lower.Contains("cef") || lower.Contains("mta") ||
-                         lower.Contains("deathmatch") || lower.Contains("gui") || lower.Contains("xmll") ||
-                         lower.Contains("loader");
+            bool    isMta = lower.Contains("core") || lower.Contains("client") || lower.Contains("game_sa") || lower.Contains("multiplayer") ||
+                         lower.Contains("netc") || lower.Contains("gta_sa") || lower.Contains("proxy_sa") || lower.Contains("cef") || lower.Contains("mta") ||
+                         lower.Contains("deathmatch") || lower.Contains("gui") || lower.Contains("xmll") || lower.Contains("loader");
 
             InternalModuleEntry m;
-            m.entry = SString("%s=%08X,%08X", filename.c_str(),
-                static_cast<DWORD>(reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll)),
-                modInfo.SizeOfImage);
+            m.entry = SString("%s=%08X,%08X", filename.c_str(), static_cast<DWORD>(reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll)), modInfo.SizeOfImage);
             m.isMta = isMta;
             entries.push_back(m);
         }
 
         const size_t maxValueLen = 60000;
         const size_t maxChunks = 256;
-        bool truncated = false;
+        bool         truncated = false;
 
         std::vector<SString> chunks;
         chunks.reserve(prevChunkCount > 0 ? static_cast<size_t>(prevChunkCount) : 6);
 
-        auto tryAppend = [&](const SString& entry) -> bool {
+        auto tryAppend = [&](const SString& entry) -> bool
+        {
             if (entry.length() > maxValueLen)
             {
                 truncated = true;
@@ -799,7 +793,8 @@ namespace WerCrash
             return true;
         };
 
-        auto appendEntries = [&](bool mtaFirst) {
+        auto appendEntries = [&](bool mtaFirst)
+        {
             for (const auto& e : entries)
             {
                 if (e.isMta != mtaFirst)
@@ -833,7 +828,8 @@ namespace WerCrash
             return;
         }
 
-        auto setChunk = [&](size_t idx, const SString& value) {
+        auto setChunk = [&](size_t idx, const SString& value)
+        {
             if (idx == 0)
                 SetApplicationSetting("diagnostics", "module-bases", value);
             else
@@ -967,7 +963,7 @@ namespace WerCrash
                 result.moduleBase = mod.base;
                 result.rva = crashAddress - mod.base;
 
-                const bool isExe = result.moduleName.EndsWithI(".exe");
+                const bool  isExe = result.moduleName.EndsWithI(".exe");
                 const DWORD idaBase = isExe ? kDefaultExeBase : kDefaultDllBase;
                 if (result.rva <= (0xFFFFFFFF - idaBase))
                     result.idaAddress = idaBase + result.rva;
@@ -992,8 +988,7 @@ namespace WerCrash
             return result;
         }
 
-        const HANDLE hFile = CreateFileA(dumpPath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
-                                         OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        const HANDLE hFile = CreateFileA(dumpPath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
         if (hFile == INVALID_HANDLE_VALUE)
         {
             result.debugFailReason = 1;
@@ -1027,8 +1022,8 @@ namespace WerCrash
         }
 
         PMINIDUMP_DIRECTORY pModuleListDir = nullptr;
-        PVOID pModuleListStream = nullptr;
-        ULONG moduleListSize = 0;
+        PVOID               pModuleListStream = nullptr;
+        ULONG               moduleListSize = 0;
 
         if (MiniDumpReadDumpStream(pBase, ModuleListStream, &pModuleListDir, &pModuleListStream, &moduleListSize))
         {
@@ -1044,8 +1039,7 @@ namespace WerCrash
             auto* pModuleList = static_cast<MINIDUMP_MODULE_LIST*>(pModuleListStream);
             if (pModuleList && pModuleList->NumberOfModules > 0 && pModuleList->NumberOfModules < 10000)
             {
-                const SIZE_T requiredSize = sizeof(MINIDUMP_MODULE_LIST) +
-                    (static_cast<SIZE_T>(pModuleList->NumberOfModules) - 1) * sizeof(MINIDUMP_MODULE);
+                const SIZE_T requiredSize = sizeof(MINIDUMP_MODULE_LIST) + (static_cast<SIZE_T>(pModuleList->NumberOfModules) - 1) * sizeof(MINIDUMP_MODULE);
                 if (moduleListSize < requiredSize)
                 {
                     result.debugFailReason = 2;
@@ -1059,7 +1053,7 @@ namespace WerCrash
 
                 for (ULONG i = 0; i < pModuleList->NumberOfModules; i++)
                 {
-                    const auto& mod = pModuleList->Modules[i];
+                    const auto&   mod = pModuleList->Modules[i];
                     const DWORD64 modBase = mod.BaseOfImage;
                     const DWORD32 modSize = mod.SizeOfImage;
 
@@ -1069,9 +1063,7 @@ namespace WerCrash
                     if (crashAddress >= modBase && crashAddress < modBase + modSize)
                     {
                         SString modName;
-                        if (mod.ModuleNameRva != 0 &&
-                            mod.ModuleNameRva < mappedSize &&
-                            mod.ModuleNameRva <= mappedSize - sizeof(ULONG32))
+                        if (mod.ModuleNameRva != 0 && mod.ModuleNameRva < mappedSize && mod.ModuleNameRva <= mappedSize - sizeof(ULONG32))
                         {
                             auto* pModName = reinterpret_cast<MINIDUMP_STRING*>(static_cast<BYTE*>(pBase) + mod.ModuleNameRva);
                             if (pModName->Length > 0 && pModName->Length < 1024)
@@ -1085,7 +1077,7 @@ namespace WerCrash
                                         try
                                         {
                                             std::wstring wname(pModName->Buffer, pModName->Length / sizeof(wchar_t));
-                                            auto lastSlash = wname.find_last_of(L"\\/");
+                                            auto         lastSlash = wname.find_last_of(L"\\/");
                                             if (lastSlash != std::wstring::npos)
                                                 wname = wname.substr(lastSlash + 1);
                                             std::string name(wname.begin(), wname.end());
@@ -1105,7 +1097,7 @@ namespace WerCrash
                             result.moduleBase = static_cast<DWORD>(modBase);
                             result.rva = crashAddress - static_cast<DWORD>(modBase);
 
-                            const bool isExe = result.moduleName.EndsWithI(".exe");
+                            const bool  isExe = result.moduleName.EndsWithI(".exe");
                             const DWORD idaBase = isExe ? kDefaultExeBase : kDefaultDllBase;
                             if (result.rva <= (0xFFFFFFFF - idaBase))
                                 result.idaAddress = idaBase + result.rva;

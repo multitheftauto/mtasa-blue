@@ -3,6 +3,7 @@ project "Client Core"
 	kind "SharedLib"
 	targetname "core"
 	targetdir(buildpath("mta"))
+	clangtidy "On"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }

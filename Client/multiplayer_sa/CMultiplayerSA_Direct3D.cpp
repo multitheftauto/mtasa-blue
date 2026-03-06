@@ -21,7 +21,7 @@ namespace
     D3DPRESENT_PARAMETERS* ms_pPresentationParameters = NULL;
     IDirect3DDevice9**     ms_ppReturnedDeviceInterface = NULL;
     bool                   ms_hasDeviceArgs = false;
-}            // namespace
+}  // namespace
 
 DWORD RESTORE_Addr_PreCreateDevice;
 DWORD RESTORE_Size_PreCreateDevice;
@@ -38,9 +38,7 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
                               D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
     // Safely unpatch with validation
-    if (RESTORE_Addr_PreCreateDevice && 
-        RESTORE_Size_PreCreateDevice > 0 && 
-        RESTORE_Size_PreCreateDevice <= sizeof(RESTORE_Bytes_PreCreateDevice))
+    if (RESTORE_Addr_PreCreateDevice && RESTORE_Size_PreCreateDevice > 0 && RESTORE_Size_PreCreateDevice <= sizeof(RESTORE_Bytes_PreCreateDevice))
     {
         MemCpy((PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice);
     }
@@ -67,9 +65,9 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 }
 
 // Hook info
-#define HOOKPOS_PreCreateDevice             0x007F675B
-#define HOOKSIZE_PreCreateDevice            6
-DWORD RETURN_PreCreateDevice = 0x07F6781;
+#define HOOKPOS_PreCreateDevice  0x007F675B
+#define HOOKSIZE_PreCreateDevice 6
+DWORD                         RETURN_PreCreateDevice = 0x07F6781;
 static void __declspec(naked) HOOK_PreCreateDevice()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -161,17 +159,17 @@ HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
         return hResult;
     }
 
-    HRESULT result = g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
-                                                 ms_ppReturnedDeviceInterface);
+    HRESULT result = g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags,
+                                                 ms_pPresentationParameters, ms_ppReturnedDeviceInterface);
     ms_hasDeviceArgs = false;
     return result;
 }
 
 // Hook info
-#define HOOKPOS_PostCreateDevice            0x07F6784
-#define HOOKSIZE_PostCreateDevice           6
-DWORD RETURN_PostCreateDevice = 0x07F678A;
-DWORD RETURN_PostCreateDeviceB = 0x07F6799;
+#define HOOKPOS_PostCreateDevice  0x07F6784
+#define HOOKSIZE_PostCreateDevice 6
+DWORD                         RETURN_PostCreateDevice = 0x07F678A;
+DWORD                         RETURN_PostCreateDeviceB = 0x07F6799;
 static void __declspec(naked) HOOK_PostCreateDevice()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

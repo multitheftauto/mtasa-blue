@@ -12,6 +12,8 @@
 
 #include "CClientCommon.h"
 #include <list>
+#include <unordered_map>
+#include <unordered_set>
 class CClientStreamSector;
 class CClientStreamSectorRow;
 class CClientStreamElement;
@@ -35,7 +37,7 @@ public:
     std::list<CClientStreamElement*>::iterator ActiveElementsBegin() { return m_ActiveElements.begin(); }
     std::list<CClientStreamElement*>::iterator ActiveElementsEnd() { return m_ActiveElements.end(); }
 
-    std::uint16_t                              GetDimension() const noexcept { return m_usDimension; }
+    std::uint16_t GetDimension() const noexcept { return m_usDimension; }
 
 private:
     void CreateSectors(std::list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight);
@@ -61,19 +63,20 @@ private:
     void OnElementForceStreamOut(CClientStreamElement* pElement);
     void OnElementDimension(CClientStreamElement* pElement);
 
-    const float                        m_fSectorSize;
-    const float                        m_fRowSize;
-    float                              m_fMaxDistanceExp;
-    float                              m_fMaxDistanceThreshold;
-    StreamerLimitReachedFunction*      m_pLimitReachedFunc;
-    std::list<CClientStreamSectorRow*> m_WorldRows;
-    std::list<CClientStreamSectorRow*> m_ExtraRows;
-    CClientStreamSectorRow*            m_pRow;
-    CClientStreamSector*               m_pSector;
-    CVector                            m_vecPosition;
-    unsigned short                     m_usDimension;
-    std::list<CClientStreamElement*>   m_ActiveElements;
-    std::list<CClientStreamElement*>   m_ToStreamOut;
+    const float                                      m_fSectorSize;
+    const float                                      m_fRowSize;
+    float                                            m_fMaxDistanceExp;
+    float                                            m_fMaxDistanceThreshold;
+    StreamerLimitReachedFunction*                    m_pLimitReachedFunc;
+    std::list<CClientStreamSectorRow*>               m_WorldRows;
+    std::unordered_map<int, CClientStreamSectorRow*> m_ExtraRows;
+    CClientStreamSectorRow*                          m_pRow;
+    CClientStreamSector*                             m_pSector;
+    CVector                                          m_vecPosition;
+    unsigned short                                   m_usDimension;
+    std::list<CClientStreamElement*>                 m_ActiveElements;
+    std::unordered_set<CClientStreamElement*>        m_ActiveElementSet;
+    std::list<CClientStreamElement*>                 m_ToStreamOut;
 
     static void* pAddingElement;
 };

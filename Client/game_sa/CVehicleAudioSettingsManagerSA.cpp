@@ -14,7 +14,7 @@
 #include <array>
 
 const auto (&ORIGINAL_AUDIO_SETTINGS)[VEHICLES_COUNT] = *reinterpret_cast<const tVehicleAudioSettings (*)[VEHICLES_COUNT]>(0x860AF0);
-tVehicleAudioSettings const * pNextVehicleAudioSettings = nullptr;
+tVehicleAudioSettings const* pNextVehicleAudioSettings = nullptr;
 
 CVehicleAudioSettingsManagerSA::CVehicleAudioSettingsManagerSA()
 {
@@ -23,7 +23,7 @@ CVehicleAudioSettingsManagerSA::CVehicleAudioSettingsManagerSA()
 
 std::unique_ptr<CVehicleAudioSettingsEntry> CVehicleAudioSettingsManagerSA::CreateVehicleAudioSettingsData(uint32_t modelId)
 {
-    auto settings = std::make_unique<CVehicleAudioSettingsEntrySA>();
+    auto        settings = std::make_unique<CVehicleAudioSettingsEntrySA>();
     const auto& fromSetting = GetVehicleModelAudioSettingsData(modelId);
     settings->Assign(fromSetting);
     return settings;
@@ -58,7 +58,7 @@ void CVehicleAudioSettingsManagerSA::ResetAudioSettingsData() noexcept
 
 void CVehicleAudioSettingsManagerSA::StaticSetHooks() noexcept
 {
-    // Replace 
+    // Replace
     // 8D 34 B5 F0 0A 86 00 ; lea esi, _VehicleAudioProperties.m_eVehicleSoundType[esi*4]
     // to
     // 8b 35 XX XX XX XX ; mov esi, [pNextVehicleAudioSettings]

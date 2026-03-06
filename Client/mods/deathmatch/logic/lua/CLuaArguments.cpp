@@ -15,14 +15,15 @@
 using namespace std;
 
 #ifndef VERIFY_ENTITY
-#define VERIFY_ENTITY(entity) (CStaticFunctionDefinitions::GetRootElement()->IsMyChild(entity,true)&&!entity->IsBeingDeleted())
+    #define VERIFY_ENTITY(entity) (CStaticFunctionDefinitions::GetRootElement()->IsMyChild(entity, true) && !entity->IsBeingDeleted())
 #endif
 
 extern CClientGame* g_pClientGame;
 
 CLuaArguments::CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
 {
-    ReadFromBitStream(bitStream, pKnownTables);
+    if (!ReadFromBitStream(bitStream, pKnownTables))
+        DeleteArguments();
 }
 
 CLuaArguments::CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
@@ -114,10 +115,10 @@ void CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<co
     {
         /* uses 'key' (at index -2) and 'value' (at index -1) */
         CLuaArgument* pArgument = new CLuaArgument(luaVM, -2, pKnownTables);
-        m_Arguments.push_back(pArgument);            // push the key first
+        m_Arguments.push_back(pArgument);  // push the key first
 
         pArgument = new CLuaArgument(luaVM, -1, pKnownTables);
-        m_Arguments.push_back(pArgument);            // then the value
+        m_Arguments.push_back(pArgument);  // then the value
 
         /* removes 'value'; keeps 'key' for next iteration */
         lua_pop(luaVM, 1);
@@ -174,9 +175,9 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end() && (iter + 1) != m_Arguments.end(); iter++)
     {
-        (*iter)->Push(luaVM, pKnownTables);            // index
+        (*iter)->Push(luaVM, pKnownTables);  // index
         iter++;
-        (*iter)->Push(luaVM, pKnownTables);            // value
+        (*iter)->Push(luaVM, pKnownTables);  // value
         lua_settable(luaVM, -3);
     }
 
@@ -225,7 +226,7 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
         while (lua_gettop(luaVM) - luaStackPointer > 0)
             lua_pop(luaVM, 1);
 
-        return false;            // the function call failed
+        return false;  // the function call failed
     }
     else
     {
@@ -289,7 +290,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
         while (lua_gettop(luaVM) - luaStackPointer > 0)
             lua_pop(luaVM, 1);
 
-        return false;            // the function call failed
+        return false;  // the function call failed
     }
     else
     {
@@ -471,10 +472,26 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     unsigned int uiNumArgs;
     if (bitStream.ReadCompressed(uiNumArgs))
     {
+        // Each argument needs at least 4 bits (SLuaTypeSync), reject obviously corrupt counts
+        int unreadBits = bitStream.GetNumberOfUnreadBits();
+        if (unreadBits < 0 || uiNumArgs > static_cast<unsigned int>(unreadBits) / 4)
+        {
+            if (bKnownTablesCreated)
+                delete pKnownTables;
+            return false;
+        }
+
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
-            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables);
+            CLuaArgument* pArgument = new CLuaArgument();
+            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
+            {
+                delete pArgument;
+                if (bKnownTablesCreated)
+                    delete pKnownTables;
+                return false;
+            }
             m_Arguments.push_back(pArgument);
         }
     }
@@ -520,7 +537,7 @@ bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int
     if (my_array)
     {
         strJSON = json_object_to_json_string_ext(my_array, flags);
-        json_object_put(my_array);            // dereference - causes a crash, is actually commented out in the example too
+        json_object_put(my_array);  // dereference - causes a crash, is actually commented out in the example too
         return true;
     }
     return false;
@@ -558,7 +575,7 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
     pKnownTables->insert({this, pKnownTables->size()});
 
     bool                                                 bIsArray = true;
-    std::vector<std::pair<std::uint32_t, CLuaArgument*>> vecSortedArguments;            // lua arrays are not necessarily sorted
+    std::vector<std::pair<std::uint32_t, CLuaArgument*>> vecSortedArguments;  // lua arrays are not necessarily sorted
     std::vector<CLuaArgument*>::const_iterator           iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); iter += 2)
     {
@@ -577,7 +594,7 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
         }
     }
 
-    if (bIsArray && !vecSortedArguments.empty())            // the table could possibly be an array
+    if (bIsArray && !vecSortedArguments.empty())  // the table could possibly be an array
     {
         // sort the table based on the keys (already handled correctly by std::pair)
         std::sort(vecSortedArguments.begin(), vecSortedArguments.end());
@@ -587,7 +604,7 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
         auto const iFirstKey = vecSortedArguments.front().first;
         auto const iLastKey = vecSortedArguments.back().first;
 
-        auto const iFirstArrayPos = 1U;            // lua arrays are 1 based
+        auto const iFirstArrayPos = 1U;  // lua arrays are 1 based
         auto const iLastArrayPos = static_cast<std::uint32_t>(vecSortedArguments.size());
 
         if (iFirstKey != iFirstArrayPos || iLastKey != iLastArrayPos)
@@ -596,7 +613,7 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
         }
     }
 
-    if (bIsArray)            // the table is definitely an array
+    if (bIsArray)  // the table is definitely an array
     {
         json_object* my_array = json_object_new_array();
         for (auto const& [iKey, pArgument] : vecSortedArguments)
@@ -624,11 +641,11 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
             char szKey[255];
             szKey[0] = '\0';
             CLuaArgument* pArgument = *iter;
-            if (!pArgument->WriteToString(szKey, 255))            // index
+            if (!pArgument->WriteToString(szKey, 255))  // index
                 break;
             iter++;
             pArgument = *iter;
-            json_object* object = pArgument->WriteToJSONObject(bSerialize, pKnownTables);            // value
+            json_object* object = pArgument->WriteToJSONObject(bSerialize, pKnownTables);  // value
 
             if (object)
             {
@@ -672,11 +689,11 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();
                 bSuccess = pArgument->ReadFromJSONObject(arrayObject, &knownTables);
-                m_Arguments.push_back(pArgument);            // then the value
+                m_Arguments.push_back(pArgument);  // then the value
                 if (!bSuccess)
                     break;
             }
-            json_object_put(object);            // dereference
+            json_object_put(object);  // dereference
             return bSuccess;
         }
         else if (json_object_get_type(object) == json_type_object)
@@ -684,12 +701,12 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
             std::vector<CLuaArguments*> knownTables;
             CLuaArgument*               pArgument = new CLuaArgument();
             bool                        bSuccess = pArgument->ReadFromJSONObject(object, &knownTables);
-            m_Arguments.push_back(pArgument);            // value
+            m_Arguments.push_back(pArgument);  // value
             json_object_put(object);
 
             return bSuccess;
         }
-        json_object_put(object);            // dereference
+        json_object_put(object);  // dereference
     }
     //    else
     //        g_pClientGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
@@ -718,9 +735,9 @@ bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArgu
             {
                 CLuaArgument* pArgument = new CLuaArgument();
                 pArgument->ReadString(key);
-                m_Arguments.push_back(pArgument);            // push the key first
+                m_Arguments.push_back(pArgument);  // push the key first
                 pArgument = new CLuaArgument();
-                bSuccess = pArgument->ReadFromJSONObject(val, pKnownTables);            // then the value
+                bSuccess = pArgument->ReadFromJSONObject(val, pKnownTables);  // then the value
                 m_Arguments.push_back(pArgument);
                 if (!bSuccess)
                     break;
@@ -756,12 +773,12 @@ bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArgum
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();
-                pArgument->ReadNumber(i + 1);            // push the key
+                pArgument->ReadNumber(i + 1);  // push the key
                 m_Arguments.push_back(pArgument);
 
                 pArgument = new CLuaArgument();
                 bSuccess = pArgument->ReadFromJSONObject(arrayObject, pKnownTables);
-                m_Arguments.push_back(pArgument);            // then the valoue
+                m_Arguments.push_back(pArgument);  // then the valoue
                 if (!bSuccess)
                     break;
             }

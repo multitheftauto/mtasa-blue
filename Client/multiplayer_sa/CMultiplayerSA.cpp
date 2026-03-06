@@ -50,16 +50,16 @@ extern CGame* pGameInterface;
 #define HOOKPOS_ComputeDamageResponse_StartChoking       0x4C05B9
 #define HOOKPOS_CAutomobile__ProcessSwingingDoor         0x6A9DAF
 
-#define FUNC_CStreaming_Update                           0x40E670
-#define FUNC_CAudioEngine__DisplayRadioStationName       0x507030
-#define FUNC_CHud_Draw                                   0x58FAE0
-#define FUNC_CPlayerInfoBase                             0xB7CD98
+#define FUNC_CStreaming_Update                     0x40E670
+#define FUNC_CAudioEngine__DisplayRadioStationName 0x507030
+#define FUNC_CHud_Draw                             0x58FAE0
+#define FUNC_CPlayerInfoBase                       0xB7CD98
 
-#define ADDR_CursorHiding                                0x7481CD
-#define ADDR_GotFocus                                    0x748054
+#define ADDR_CursorHiding 0x7481CD
+#define ADDR_GotFocus     0x748054
 
-#define HOOKPOS_FxManager_CreateFxSystem                    0x4A9BE0
-#define HOOKPOS_FxManager_DestroyFxSystem                   0x4A9810
+#define HOOKPOS_FxManager_CreateFxSystem  0x4A9BE0
+#define HOOKPOS_FxManager_DestroyFxSystem 0x4A9810
 
 DWORD RETURN_FxManager_CreateFxSystem = 0x4A9BE8;
 DWORD RETURN_FxManager_DestroyFxSystem = 0x4A9817;
@@ -72,227 +72,227 @@ DWORD RETURN_CCam_ProcessFixed = 0x51D475;
 DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon = 0x6859A7;
 DWORD RETURN_CPed_IsPlayer = 0x5DF8F6;
 
-#define VAR_CollisionStreamRead_ModelInfo                   0x9689E0
-#define HOOKPOS_CollisionStreamRead                         0x41B1D0
+#define VAR_CollisionStreamRead_ModelInfo 0x9689E0
+#define HOOKPOS_CollisionStreamRead       0x41B1D0
 DWORD RETURN_CollisionStreamRead = 0x41B1D6;
 
-#define CALL_Render3DStuff                                  0x53EABF
-#define FUNC_Render3DStuff                                  0x53DF40
+#define CALL_Render3DStuff 0x53EABF
+#define FUNC_Render3DStuff 0x53DF40
 
-#define CALL_CRenderer_Render                               0x53EA12
-#define FUNC_CRenderer_Render                               0x727140
+#define CALL_CRenderer_Render 0x53EA12
+#define FUNC_CRenderer_Render 0x727140
 
-#define CALL_CTrafficLights_GetPrimaryLightState             0x49DB5F
-#define CALL_CTrafficLights_GetSecondaryLightState             0x49DB6D
-#define HOOKPOS_CTrafficLights_DisplayActualLight           0x49E1D9
+#define CALL_CTrafficLights_GetPrimaryLightState   0x49DB5F
+#define CALL_CTrafficLights_GetSecondaryLightState 0x49DB6D
+#define HOOKPOS_CTrafficLights_DisplayActualLight  0x49E1D9
 DWORD RETURN_CTrafficLights_DisplayActualLight = 0x49E1FF;
 
-#define HOOKPOS_CGame_Process                               0x53C095
+#define HOOKPOS_CGame_Process 0x53C095
 DWORD RETURN_CGame_Process = 0x53C09F;
 
-#define HOOKPOS_Idle                                        0x53E981
+#define HOOKPOS_Idle 0x53E981
 DWORD RETURN_Idle = 0x53E98B;
 
 DWORD FUNC_CEntity_Render = 0x534310;
 
-#define HOOKPOS_VehicleCamStart                             0x5245ED
+#define HOOKPOS_VehicleCamStart 0x5245ED
 DWORD RETURN_VehicleCamStart_success = 0x5245F3;
 DWORD RETURN_VehicleCamStart_failure = 0x525E43;
-#define HOOKPOS_VehicleCamTargetZTweak                      0x524A68
+#define HOOKPOS_VehicleCamTargetZTweak 0x524A68
 DWORD RETURN_VehicleCamTargetZTweak = 0x524AA4;
-#define HOOKPOS_VehicleCamLookDir1                          0x524DF1
+#define HOOKPOS_VehicleCamLookDir1 0x524DF1
 DWORD RETURN_VehicleCamLookDir1 = 0x524DF6;
-#define HOOKPOS_VehicleCamLookDir2                          0x525B0E
+#define HOOKPOS_VehicleCamLookDir2 0x525B0E
 DWORD RETURN_VehicleCamLookDir2 = 0x525B73;
-#define HOOKPOS_VehicleCamHistory                           0x525C56
+#define HOOKPOS_VehicleCamHistory 0x525C56
 DWORD RETURN_VehicleCamHistory = 0x525D4A;
-#define HOOKPOS_VehicleCamColDetect                         0x525D8D
+#define HOOKPOS_VehicleCamColDetect 0x525D8D
 DWORD RETURN_VehicleCamColDetect = 0x525D92;
-#define CALL_VehicleCamUp                                   0x525E1F
-#define HOOKPOS_VehicleCamEnd                               0x525E3C
+#define CALL_VehicleCamUp     0x525E1F
+#define HOOKPOS_VehicleCamEnd 0x525E3C
 DWORD RETURN_VehicleCamEnd = 0x525E42;
 
-#define HOOKPOS_VehicleLookBehind                           0x5207E3
+#define HOOKPOS_VehicleLookBehind 0x5207E3
 DWORD RETURN_VehicleLookBehind = 0x520891;
-#define CALL_VehicleLookBehindUp                            0x520E2A
-#define HOOKPOS_VehicleLookAside                            0x520F70
+#define CALL_VehicleLookBehindUp 0x520E2A
+#define HOOKPOS_VehicleLookAside 0x520F70
 DWORD RETURN_VehicleLookAside = 0x520FDC;
-#define CALL_VehicleLookAsideUp                             0x5211E0
+#define CALL_VehicleLookAsideUp 0x5211E0
 
-#define HOOKPOS_OccupiedVehicleBurnCheck                    0x570C84
+#define HOOKPOS_OccupiedVehicleBurnCheck 0x570C84
 DWORD RETURN_OccupiedVehicleBurnCheck = 0x570C8A;
-#define HOOKPOS_UnoccupiedVehicleBurnCheck                  0x6A76DC
+#define HOOKPOS_UnoccupiedVehicleBurnCheck 0x6A76DC
 DWORD RETURN_UnoccupiedVehicleBurnCheck = 0x6A76E4;
-#define HOOKPOS_ApplyCarBlowHop                             0x6B3816
+#define HOOKPOS_ApplyCarBlowHop 0x6B3816
 DWORD RETURN_ApplyCarBlowHop = 0x6B3831;
 
-#define HOOKPOS_CVehicle_ApplyBoatWaterResistance           0x6D2771
+#define HOOKPOS_CVehicle_ApplyBoatWaterResistance 0x6D2771
 DWORD RETURN_CVehicle_ApplyBoatWaterResistance = 0x6D2777;
 
-#define HOOKPOS_CPhysical_ApplyGravity                      0x543081
+#define HOOKPOS_CPhysical_ApplyGravity 0x543081
 DWORD RETURN_CPhysical_ApplyGravity = 0x543093;
 
-#define HOOKPOS_CWorld_SetWorldOnFire                       0x56B983
+#define HOOKPOS_CWorld_SetWorldOnFire 0x56B983
 DWORD RETURN_CWorld_SetWorldOnFire = 0x56B989;
-#define HOOKPOS_CTaskSimplePlayerOnFire_ProcessPed          0x6336DA
+#define HOOKPOS_CTaskSimplePlayerOnFire_ProcessPed 0x6336DA
 DWORD RETURN_CTaskSimplePlayerOnFire_ProcessPed = 0x6336E0;
-#define HOOKPOS_CFire_ProcessFire                           0x53AC1A
+#define HOOKPOS_CFire_ProcessFire 0x53AC1A
 DWORD RETURN_CFire_ProcessFire = 0x53AC1F;
-#define HOOKPOS_CExplosion_Update                           0x7377D3
+#define HOOKPOS_CExplosion_Update 0x7377D3
 DWORD RETURN_CExplosion_Update = 0x7377D8;
-#define HOOKPOS_CWeapon_FireAreaEffect                      0x73EBFE
+#define HOOKPOS_CWeapon_FireAreaEffect 0x73EBFE
 DWORD RETURN_CWeapon_FireAreaEffect = 0x73EC03;
 
-#define CALL_RenderScene_Plants                             0x53E103
-#define HOOKPOS_RenderScene_end                             0x53E159
-#define HOOKPOS_CPlantMgr_Render                            0x5DBC4C
+#define CALL_RenderScene_Plants  0x53E103
+#define HOOKPOS_RenderScene_end  0x53E159
+#define HOOKPOS_CPlantMgr_Render 0x5DBC4C
 DWORD RETURN_CPlantMgr_Render_success = 0x5DBC52;
 
-#define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
+#define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse 0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 
-#define HOOKPOS_CAnimBlendAssocGroupCopyAnimation           0x4CE130
+#define HOOKPOS_CAnimBlendAssocGroupCopyAnimation 0x4CE130
 
-#define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
+#define HOOKPOS_CPed_GetWeaponSkill 0x5e3b60
 DWORD RETURN_CPed_GetWeaponSkill = 0x5E3B68;
 
-#define HOOKPOS_CPed_AddGogglesModel                        0x5E3ACB
+#define HOOKPOS_CPed_AddGogglesModel 0x5E3ACB
 DWORD RETURN_CPed_AddGogglesModel = 0x5E3AD4;
 
-#define FUNC_CWorld_Remove                                  0x563280
-#define FUNC_CTagManager_ShutdownForRestart                 0x49CC60
+#define FUNC_CWorld_Remove                  0x563280
+#define FUNC_CTagManager_ShutdownForRestart 0x49CC60
 unsigned int* VAR_NumTags = (unsigned int*)0xA9AD70;
 DWORD**       VAR_TagInfoArray = (DWORD**)0xA9A8C0;
 
-#define HOOKPOS_CPhysical_ProcessCollisionSectorList        0x54BB93
+#define HOOKPOS_CPhysical_ProcessCollisionSectorList 0x54BB93
 DWORD RETURN_CPhysical_ProcessCollisionSectorList = 0x54BB9A;
 
-#define HOOKPOS_CheckAnimMatrix                          	0x7C5A5C
+#define HOOKPOS_CheckAnimMatrix 0x7C5A5C
 DWORD RETURN_CheckAnimMatrix = 0x7C5A61;
 
-#define HOOKPOS_VehColCB                                    0x04C838D
+#define HOOKPOS_VehColCB 0x04C838D
 DWORD RETURN_VehColCB = 0x04C83AA;
 
-#define HOOKPOS_VehCol                                      0x06D6603
+#define HOOKPOS_VehCol 0x06D6603
 DWORD RETURN_VehCol = 0x06D660C;
 
 #define HOOKPOS_Transmission_CalculateDriveAcceleration 0x6D05E0
 DWORD RETURN_Transmission_CalculateDriveAcceleration = 0x6D05E6;
 // Handling fix - driveType is per model
-#define HOOKPOS_CHandlingData_isNotRWD              0x6A048C
+#define HOOKPOS_CHandlingData_isNotRWD 0x6A048C
 DWORD RETURN_CHandlingData_isNotRWD = 0x6A0493;
-#define HOOKPOS_CHandlingData_isNotFWD              0x6A04BC
+#define HOOKPOS_CHandlingData_isNotFWD 0x6A04BC
 DWORD RETURN_CHandlingData_isNotFWD = 0x6A04C3;
 // end of handling fix
-#define CALL_CAutomobile_ProcessEntityCollision             0x6AD053
-#define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
+#define CALL_CAutomobile_ProcessEntityCollision   0x6AD053
+#define CALL_CMonsterTruck_ProcessEntityCollision 0x6C8B9E
 DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 
-#define HOOKPOS_PreFxRender                                     0x049E650
+#define HOOKPOS_PreFxRender 0x049E650
 DWORD RETURN_PreFxRender = 0x0404D1E;
 
-#define HOOKPOS_PostColorFilterRender                             0x705099
+#define HOOKPOS_PostColorFilterRender 0x705099
 DWORD RETURN_PostColorFilterRender = 0x70509E;
 
-#define HOOKPOS_PreHUDRender                                      0x053EAD8
+#define HOOKPOS_PreHUDRender 0x053EAD8
 DWORD RETURN_PreHUDRender = 0x053EADD;
 
-#define HOOKPOS_LoadIPLInstance                                    0x4061E8
+#define HOOKPOS_LoadIPLInstance 0x4061E8
 DWORD CALL_LoadIPLInstance = 0x538090;
 DWORD RETURN_LoadIPLInstance = 0x04061ED;
 
-#define HOOKPOS_CWorld_LOD_SETUP                                  0x406224
-#define HOOKPOS_CWorld_LOD_SETUP2                                 0x406326
+#define HOOKPOS_CWorld_LOD_SETUP  0x406224
+#define HOOKPOS_CWorld_LOD_SETUP2 0x406326
 DWORD CALL_CWorld_LODSETUP = 0x404C90;
 
-#define HOOKPOS_CBuilding_DTR                                     0x404180
+#define HOOKPOS_CBuilding_DTR 0x404180
 DWORD JMP_CBuilding_DTR = 0x535E90;
 
-#define HOOKPOS_CDummy_DTR                                        0x532566
+#define HOOKPOS_CDummy_DTR 0x532566
 DWORD JMP_CDummy_DTR = 0x535E90;
 
-#define HOOKPOS_CObject_DTR                                       0x59F680
+#define HOOKPOS_CObject_DTR 0x59F680
 DWORD JMP_CObject_DTR = 0x59F686;
 
-#define HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd             0x5B5348
+#define HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd 0x5B5348
 DWORD JMP_CWorld_Add_AddBuildingInstancesToWorld_CALL_CWorldAdd = 0x563220;
 DWORD RETURN_AddBuildingInstancesToWorld_CWorldAdd = 0x5B534D;
 
-#define HOOKPOS_CWorld_Remove_CPopulation_ConvertToDummyObject    0x6146F8
+#define HOOKPOS_CWorld_Remove_CPopulation_ConvertToDummyObject 0x6146F8
 
-#define HOOKPOS_CWorld_ADD_CPopulation_ConvertToRealObject              0x6145C7
+#define HOOKPOS_CWorld_ADD_CPopulation_ConvertToRealObject 0x6145C7
 DWORD JMP_CWorld_Add_CPopulation_ConvertToRealObject_Retn = 0x6145CC;
 DWORD JMP_CWorld_Add_CPopulation_ConvertToRealObject_CallCWorldAdd = 0x563220;
 
-#define HOOKPOS_ConvertToObject_CPopulationManageDummy            0x616091
+#define HOOKPOS_ConvertToObject_CPopulationManageDummy 0x616091
 DWORD CALL_Convert_To_Real_Object_CPopulation_ManageDummy = 0x614580;
 DWORD JMP_RETN_Called_CPopulation_ManageDummy = 0x616097;
 DWORD JMP_RETN_Cancel_CPopulation_ManageDummy = 0x616098;
 
-#define HOOKPOS_CWorld_ADD_CPopulation_ConvertToDummyObject       0x61470C
+#define HOOKPOS_CWorld_ADD_CPopulation_ConvertToDummyObject 0x61470C
 DWORD CALL_CWorld_Add_CPopulation_ConvertToDummyObject = 0x563220;
 DWORD JMP_RETN_Called_CPopulation_ConvertToDummyObject = 0x614712;
 DWORD JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject = 0x614715;
 
-#define HOOKPOS_CEntity_IsOnScreen_FixObjectsScale      0x534575
+#define HOOKPOS_CEntity_IsOnScreen_FixObjectsScale 0x534575
 DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
 
-#define HOOKPOS_CClothes_RebuildPlayer                      0x5A82C0
+#define HOOKPOS_CClothes_RebuildPlayer 0x5A82C0
 DWORD RETURN_CClothes_RebuildPlayera = 0x5A82C8;
 DWORD RETURN_CClothes_RebuildPlayerb = 0x5A837F;
 
-#define HOOKPOS_CProjectileInfo_FindPlayerPed               0x739321
-#define HOOKPOS_CProjectileInfo_FindPlayerVehicle           0x739570
+#define HOOKPOS_CProjectileInfo_FindPlayerPed     0x739321
+#define HOOKPOS_CProjectileInfo_FindPlayerVehicle 0x739570
 
-#define HOOKPOS_CHeli_ProcessHeliKill                       0x6DB201
+#define HOOKPOS_CHeli_ProcessHeliKill 0x6DB201
 DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cancel = 0x6DB9E0;
 DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero = 0x6DB207;
 DWORD RETURN_CHeli_ProcessHeliKill_6DB437h = 0x6DB437;
 
-#define HOOKPOS_CObject_ProcessBreak                        0x5A0F0F
+#define HOOKPOS_CObject_ProcessBreak 0x5A0F0F
 DWORD RETURN_CObject_ProcessBreak = 0x5A0F14;
-#define HOOKPOS_CObject_ProcessDamage                       0x5A0E0D
+#define HOOKPOS_CObject_ProcessDamage 0x5A0E0D
 DWORD RETURN_CObject_ProcessDamage = 0x5A0E13;
 DWORD RETURN_CObject_ProcessDamage_Cancel = 0x5A1241;
-#define HOOKPOS_CObject_ProcessCollision                    0x548DC7
+#define HOOKPOS_CObject_ProcessCollision 0x548DC7
 DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
 DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
-#define HOOKPOS_CGlass_WindowRespondsToCollision           0x71BC40
+#define HOOKPOS_CGlass_WindowRespondsToCollision 0x71BC40
 DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
-#define HOOKPOS_CGlass__BreakGlassPhysically                0x71D14B
+#define HOOKPOS_CGlass__BreakGlassPhysically 0x71D14B
 DWORD RETURN_CGlass__BreakGlassPhysically = 0x71D150;
-#define HOOKPOS_CGlass_WindowRespondsToExplosion            0x71C255
-DWORD RETURN_CGlass_WindowRespondsToExplosion = 0x71C25A;
+#define HOOKPOS_CGlass_WindowRespondsToExplosion 0x71C255
+DWORD                 RETURN_CGlass_WindowRespondsToExplosion = 0x71C25A;
 constexpr const DWORD CALL_FROM_CGlass_WindowRespondsToExplosion = 0x71C28E;
 constexpr const DWORD CALL_FROM_CGlass_WasGlassHitByBullet = 0x71C192;
 constexpr const DWORD CALL_FROM_CPhysical_ApplyCollision = 0x548F39;
 constexpr const DWORD CALL_FROM_CPhysical_ApplyCollision_2 = 0x5490AE;
 constexpr const DWORD CALL_FROM_CPhysical_ApplySoftCollision = 0x54A816;
 
-#define HOOKPOS_FxManager_c__DestroyFxSystem                0x4A989A
+#define HOOKPOS_FxManager_c__DestroyFxSystem 0x4A989A
 
-#define HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed          0x62D5A7
+#define HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed 0x62D5A7
 DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
 
 #define HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex 0x4EA296
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex = 0x4EA2A0;
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex_Regenerate = 0x04EA286;
 
-#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli     0x4FE9B9
+#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli 0x4FE9B9
 DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli = 0x4FEDFB;
 DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli = FUNC_CAEVehicleAudioEntity__ProcessAIHeli;
 
-#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp     0x4FD96D
+#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp 0x4FD96D
 DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp = 0x4FDFAB;
 DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
-#define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
+#define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance 0x68A4EF
 DWORD       RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 const DWORD HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA03;
 const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
-#define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio    0x4D7198
-#define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio     0x4D71E7
+#define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio 0x4D7198
+#define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio  0x4D71E7
 
 #define HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles 0x6A6FF0
 
@@ -320,13 +320,13 @@ bool          bTrafficLightsBlocked = false;
 bool          bInteriorSoundsEnabled = true;
 bool          bInteriorFurnitureStates[5] = {true, true, true, true, true};
 
-bool  bUsingCustomSkyGradient = false;
-BYTE  ucSkyGradientTopR = 0;
-BYTE  ucSkyGradientTopG = 0;
-BYTE  ucSkyGradientTopB = 0;
-BYTE  ucSkyGradientBottomR = 0;
-BYTE  ucSkyGradientBottomG = 0;
-BYTE  ucSkyGradientBottomB = 0;
+bool bUsingCustomSkyGradient = false;
+BYTE ucSkyGradientTopR = 0;
+BYTE ucSkyGradientTopG = 0;
+BYTE ucSkyGradientTopB = 0;
+BYTE ucSkyGradientBottomR = 0;
+BYTE ucSkyGradientBottomG = 0;
+BYTE ucSkyGradientBottomB = 0;
 
 bool  bUsingCustomAmbientColor = false;
 float fAmbientColorR = 0.0F;
@@ -365,22 +365,22 @@ extern bool bWeaponFire;
 float       fDuckingHealthThreshold;
 
 static const std::array<uint32_t, 16> shadowAddr{
-    0x6FAD5D,            // CRegisteredCorona::Update
-    0x7041DB,            // CPostEffects::Fog
-    0x7085A9,            // CShadows::RenderStaticShadows
-    0x709B2F,            // CShadows::CastShadowEntityXY
-    0x709B8E,            // CShadows::CastShadowEntityXY
-    0x709BC7,            // CShadows::CastShadowEntityXY
-    0x709BF6,            // CShadows::CastShadowEntityXY
-    0x709C93,            // CShadows::CastShadowEntityXY
-    0x709E9E,            // IntersectEntityRenderTriangleCB
-    0x709EBC,            // IntersectEntityRenderTriangleCB
-    0x709ED7,            // IntersectEntityRenderTriangleCB
-    0x70B221,            // CShadows::RenderStoredShadows
-    0x70B373,            // CShadows::RenderStoredShadows
-    0x70B4D1,            // CShadows::RenderStoredShadows
-    0x70B635,            // CShadows::RenderStoredShadows
-    0x73A48F             // CWeapon::AddGunshell
+    0x6FAD5D,  // CRegisteredCorona::Update
+    0x7041DB,  // CPostEffects::Fog
+    0x7085A9,  // CShadows::RenderStaticShadows
+    0x709B2F,  // CShadows::CastShadowEntityXY
+    0x709B8E,  // CShadows::CastShadowEntityXY
+    0x709BC7,  // CShadows::CastShadowEntityXY
+    0x709BF6,  // CShadows::CastShadowEntityXY
+    0x709C93,  // CShadows::CastShadowEntityXY
+    0x709E9E,  // IntersectEntityRenderTriangleCB
+    0x709EBC,  // IntersectEntityRenderTriangleCB
+    0x709ED7,  // IntersectEntityRenderTriangleCB
+    0x70B221,  // CShadows::RenderStoredShadows
+    0x70B373,  // CShadows::RenderStoredShadows
+    0x70B4D1,  // CShadows::RenderStoredShadows
+    0x70B635,  // CShadows::RenderStoredShadows
+    0x73A48F   // CWeapon::AddGunshell
 };
 
 PreContextSwitchHandler*                   m_pPreContextSwitchHandler = NULL;
@@ -416,7 +416,7 @@ DrivebyAnimationHandler*                   m_pDrivebyAnimationHandler = NULL;
 AudioZoneRadioSwitchHandler*               m_pAudioZoneRadioSwitchHandler = NULL;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
-CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
+CEntitySAInterface* activeEntityForStreaming = 0;  // the entity that the streaming system considers active
 
 void HOOK_FindPlayerCoors();
 void HOOK_FindPlayerCentreOfWorld();
@@ -584,7 +584,7 @@ CMultiplayerSA::CMultiplayerSA()
     m_pProjectileStopHandler = NULL;
 
     MemSetFast(&localStatsData, 0, sizeof(CStatsData));
-    localStatsData.StatTypesFloat[24] = 569.0f;            // Max Health
+    localStatsData.StatTypesFloat[24] = 569.0f;  // Max Health
 
     m_fAircraftMaxHeight = 800.0f;
 
@@ -741,7 +741,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10);
     HookInstall(HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8);
     HookInstall(HOOKPOS_CGlass__BreakGlassPhysically, (DWORD)HOOK_CGlass__BreakGlassPhysically, 5);
-    
+
     // Post-destruction hook for FxSystems
     HookInstall(HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
 
@@ -838,6 +838,12 @@ void CMultiplayerSA::InitHooks()
     //*(BYTE *)0x4C9890 = 0xC3;
 
     // MemSet ( (void*)0x408A1B, 0x90, 5 );
+
+    // CTxdStore::GetNumRefs freed-slot error path does xor eax,eax then movsx eax,[eax+4]
+    // which is a null-deref (reads address 0x4). In SA its dead code, but MTA can reach it
+    // when a stale streaming entry references a freed TXD pool slot. NOP the movsx so
+    // freed slots return 0 refs instead of crashing.
+    MemSet((void*)0x731AB5, 0x90, 4);
 
     // Hack to make the choke task use 0 time left remaining when he starts t
     // just stand there looking. So he won't do that.
@@ -966,11 +972,11 @@ void CMultiplayerSA::InitHooks()
     MemSet((LPVOID)0x6B5B17, 0x90, 6);
 
     // Increase VehicleStruct pool size
-    MemPut<BYTE>(0x5B8342 + 0, 0x33);            // xor eax, eax
+    MemPut<BYTE>(0x5B8342 + 0, 0x33);  // xor eax, eax
     MemPut<BYTE>(0x5B8342 + 1, 0xC0);
-    MemPut<BYTE>(0x5B8342 + 2, 0xB0);            // mov al, 0xFF
+    MemPut<BYTE>(0x5B8342 + 2, 0xB0);  // mov al, 0xFF
     MemPut<BYTE>(0x5B8342 + 3, 0xFF);
-    MemPut<BYTE>(0x5B8342 + 4, 0x8B);            // mov edi, eax
+    MemPut<BYTE>(0x5B8342 + 4, 0x8B);  // mov edi, eax
     MemPut<BYTE>(0x5B8342 + 5, 0xF8);
 
     /*
@@ -1029,8 +1035,8 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x44C39A + 4, 0x00);
     MemPut<BYTE>(0x44C39A + 5, 0x00);
 
-    // Avoid garage doors closing when you change your model
-    MemSet((LPVOID)0x4486F7, 0x90, 4);
+    // Disable CGarages::PlayerArrestedOrDied to stop the game from automatically closing/opening garages
+    MemSet((void*)0x442303, 0x90, 5);
 
     // Disable CStats::IncrementStat (returns at start of function)
     MemPut<BYTE>(0x55C180, 0xC3);
@@ -1092,7 +1098,7 @@ void CMultiplayerSA::InitHooks()
     // Prevent TRAINS spawning with PEDs
     MemPut<BYTE>(0x6F7865, 0xEB);
     MemPut<BYTE>(0x6F8E7B, 0xE9);
-    MemPut<DWORD>(0x6F8E7C, 0x109);            // jmp to 0x6F8F89
+    MemPut<DWORD>(0x6F8E7C, 0x109);  // jmp to 0x6F8F89
     MemPut<BYTE>(0x6F8E80, 0x90);
 
     // DISABLE PLANES
@@ -1299,8 +1305,8 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x748B0E, 5);
 
     // Skip copyright screen
-    MemSet((void*)0x748C2B, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeIn
-    MemSet((void*)0x748C9A, 0x90, 5);            // call CLoadingScreen::DoPCTitleFadeOut
+    MemSet((void*)0x748C2B, 0x90, 5);  // call CLoadingScreen::DoPCTitleFadeIn
+    MemSet((void*)0x748C9A, 0x90, 5);  // call CLoadingScreen::DoPCTitleFadeOut
 
     // Force triggering of the damage event for players on fire
     MemSet((void*)0x633695, 0x90, 6);
@@ -1377,7 +1383,7 @@ void CMultiplayerSA::InitHooks()
 
     // Disable the loading screen tune.
     MemSet((void*)0x748CF6, 0x90, 5);
-	
+
     // Do not render the loading screen.
     MemSet((void*)0x590D7C, 0x90, 5);
     MemSet((void*)0x590DB3, 0x90, 5);
@@ -1501,8 +1507,8 @@ void CMultiplayerSA::InitHooks()
     MemSetFast((void*)0x60D861, 0x90, 14);
 
     // Allow water cannon to hit objects and players visually
-    MemSet((void*)0x72925D, 0x1, 1);            // objects
-    MemSet((void*)0x729263, 0x1, 1);            // players
+    MemSet((void*)0x72925D, 0x1, 1);  // objects
+    MemSet((void*)0x729263, 0x1, 1);  // players
 
     // Allow crouching with 1HP
     MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
@@ -1563,6 +1569,10 @@ void CMultiplayerSA::InitHooks()
     // Allow alpha change for helicopter rotor (#523)
     MemSet((void*)0x6C444B, 0x90, 6);
     MemSet((void*)0x6C4453, 0x90, 0x68);
+
+    // Allow model ID 432 (Rhino) to render headlight cones and coronas
+    MemSet((void*)0x6A2EAB, 0x90, 6);
+    MemSet((void*)0x6ABC81, 0x90, 6);
 
     // Disable Z position changes in the matrix in the C3dMarkers::PlaceMarker (#4000, #536)
     // To prevent arrow-type markers from snapping to the ground
@@ -1693,33 +1703,23 @@ void CMultiplayerSA::DisablePadHandler(bool bDisabled)
 
 void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
 {
-    int*  CPostEffects__m_HeatHazeFXIntensity = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXIntensity)>(0x8D50E8);
-    int*  CPostEffects__m_HeatHazeFXRandomShift = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRandomShift)>(0xC402C0);
-    int*  CPostEffects__m_HeatHazeFXSpeedMin = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMin)>(0xC402C0);
-    int*  CPostEffects__m_HeatHazeFXSpeedMax = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMax)>(0x8D50F0);
-    int*  CPostEffects__m_HeatHazeFXScanSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeX)>(0xC40304);
-    int*  CPostEffects__m_HeatHazeFXScanSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeY)>(0xC40308);
-    int*  CPostEffects__m_HeatHazeFXRenderSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRenderSizeX)>(0xC4030C);
-    int*  CPostEffects__m_HeatHazeFXRenderSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRenderSizeY)>(0xC40310);
-    bool* CPostEffects__m_bHeatHazeFX = reinterpret_cast<decltype(CPostEffects__m_bHeatHazeFX)>(0xC402BA);
-
-    settings.ucIntensity = static_cast<uchar>(*CPostEffects__m_HeatHazeFXIntensity);
-    settings.ucRandomShift = static_cast<uchar>(*CPostEffects__m_HeatHazeFXRandomShift);
-    settings.usSpeedMin = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMin);
-    settings.usSpeedMax = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMax);
-    settings.sScanSizeX = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeY);
-    settings.sScanSizeY = static_cast<short>(*CPostEffects__m_HeatHazeFXSpeedMax);
-    settings.usRenderSizeX = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeX);
-    settings.usRenderSizeY = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeY);
-    settings.bInsideBuilding = *CPostEffects__m_bHeatHazeFX;
+    settings.ucIntensity = *(uchar*)0x8D50E8;
+    settings.ucRandomShift = *(uchar*)0xC402C0;
+    settings.usSpeedMin = *(ushort*)0x8D50EC;
+    settings.usSpeedMax = *(ushort*)0x8D50F0;
+    settings.sScanSizeX = *(short*)0xC40304;
+    settings.sScanSizeY = *(short*)0xC40308;
+    settings.usRenderSizeX = *(ushort*)0xC4030C;
+    settings.usRenderSizeY = *(ushort*)0xC40310;
+    settings.bInsideBuilding = *(bool*)0xC402BA;
 }
 
 void CMultiplayerSA::ResetColorFilter()
 {
     if (*(BYTE*)0x7036EC == 0xB8)
     {
-        static BYTE DefaultBytes[5] = {0xC1, 0xE0, 0x08, 0x0B, 0xC1};            // shl     eax, 8
-                                                                                 // or      eax, ecx
+        static BYTE DefaultBytes[5] = {0xC1, 0xE0, 0x08, 0x0B, 0xC1};  // shl     eax, 8
+                                                                       // or      eax, ecx
         MemCpy((void*)0x7036EC, DefaultBytes, sizeof(DefaultBytes));
         MemCpy((void*)0x70373D, DefaultBytes, sizeof(DefaultBytes));
     }
@@ -1732,14 +1732,14 @@ void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
     // Update a pass0 color if needed
     if (!bEnabled || *(DWORD*)0x7036ED != dwPass0Color)
     {
-        MemPut<BYTE>(0x7036EC, 0xB8);            // mov eax
+        MemPut<BYTE>(0x7036EC, 0xB8);  // mov eax
         MemPut<DWORD>(0x7036ED, dwPass0Color);
     }
 
     // Update a pass1 color if needed
     if (!bEnabled || *(DWORD*)0x70373E != dwPass1Color)
     {
-        MemPut<BYTE>(0x70373D, 0xB8);            // mov eax
+        MemPut<BYTE>(0x70373D, 0xB8);  // mov eax
         MemPut<DWORD>(0x70373E, dwPass1Color);
     }
 }
@@ -1748,7 +1748,8 @@ void CMultiplayerSA::GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bo
 {
     // GTASA PC has 2 color filters, one of them is static color filter, and another one is blended by time cycle
     bool bUseTimeCycle = *(BYTE*)0x7036EC == 0xC1;
-    if (bUseTimeCycle || isOriginal){ //If we are using color filter from time cycle or we specified color filter from time cycle
+    if (bUseTimeCycle || isOriginal)
+    {  // If we are using color filter from time cycle or we specified color filter from time cycle
         SColorRGBA pass0SColor(*(float*)0xB7C518, *(float*)0xB7C51C, *(float*)0xB7C520, *(float*)0xB7C524);
         SColorRGBA pass1SColor(*(float*)0xB7C528, *(float*)0xB7C52C, *(float*)0xB7C530, *(float*)0xB7C534);
         dwPass0Color = pass0SColor.ulARGB;
@@ -1781,17 +1782,17 @@ void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int i
     MemPutFast<bool>(0xC402BA, settings.bInsideBuilding);
 
     if (bAllowAutoTypeChange)
-        MemPut<BYTE>(0x701455, 0x83);            // sub
+        MemPut<BYTE>(0x701455, 0x83);  // sub
     else
-        MemPut<BYTE>(0x701455, 0xC3);            // retn
+        MemPut<BYTE>(0x701455, 0xC3);  // retn
 }
 
 void CMultiplayerSA::SetHeatHaze(const SHeatHazeSettings& settings)
 {
     if (settings.ucIntensity != 0)
-        DoSetHeatHazePokes(settings, 0, 24, 1.0f, 1.0f, false);            // 24 hrs
+        DoSetHeatHazePokes(settings, 0, 24, 1.0f, 1.0f, false);  // 24 hrs
     else
-        DoSetHeatHazePokes(settings, 38, 39, 1.0f, 1.0f, false);            // 0 hrs
+        DoSetHeatHazePokes(settings, 38, 39, 1.0f, 1.0f, false);  // 0 hrs
 
     m_bHeatHazeCustomized = true;
     ApplyHeatHazeEnabled();
@@ -1810,7 +1811,7 @@ void CMultiplayerSA::ResetHeatHaze()
     settings.usRenderSizeY = 0x55;
     settings.bInsideBuilding = false;
 
-    DoSetHeatHazePokes(settings, 10, 19, 0.05f, 1.0f, true);            // defaults
+    DoSetHeatHazePokes(settings, 10, 19, 0.05f, 1.0f, true);  // defaults
 
     m_bHeatHazeCustomized = false;
     ApplyHeatHazeEnabled();
@@ -2228,7 +2229,7 @@ void CMultiplayerSA::ResetSky()
 
 void CMultiplayerSA::SetMoonSize(int iSize)
 {
-    MemPutFast(0x8D4B60, static_cast<BYTE>(iSize));
+    MemPutFast<BYTE>(0x8D4B60, static_cast<BYTE>(iSize));
 }
 
 int CMultiplayerSA::GetMoonSize()
@@ -3647,7 +3648,7 @@ void CRunningScript_Process()
         pCamera->SetFadeColor(0, 0, 0);
         pCamera->Fade(0.0f, FADE_OUT);
 
-        DWORD dwFunc = 0x409D10;            // RequestSpecialModel
+        DWORD dwFunc = 0x409D10;  // RequestSpecialModel
 
         char szModelName[64];
         strcpy(szModelName, "player");
@@ -3663,7 +3664,7 @@ void CRunningScript_Process()
         }
         // clang-format on
 
-        dwFunc = 0x40EA10;            // load all requested models
+        dwFunc = 0x40EA10;  // load all requested models
         // clang-format off
         __asm
         {
@@ -3673,7 +3674,7 @@ void CRunningScript_Process()
         }
         // clang-format on
 
-        dwFunc = 0x60D790;            // setup player ped
+        dwFunc = 0x60D790;  // setup player ped
         // clang-format off
         __asm
         {
@@ -3704,7 +3705,7 @@ void CRunningScript_Process()
         }
         // clang-format on
 */
-        dwFunc = 0x420B80;            // set position
+        dwFunc = 0x420B80;  // set position
         fX = 2488.562f;
         fY = -1666.864f;
         fZ = 12.8757f;
@@ -3791,7 +3792,7 @@ static void __declspec(naked) HOOK_CRunningScript_Process()
     // clang-format on
 }
 
-static CVehicleSAInterface* pDerailingTrain = NULL;
+static CVehicleSAInterface*   pDerailingTrain = NULL;
 static void __declspec(naked) HOOK_CTrain_ProcessControl_Derail()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -3928,7 +3929,7 @@ static void SetVehicleAlpha()
         bEntityHasAlpha = false;
 }
 
-static DWORD dwCVehicle_SetupRender_ret = 0x6D6517;
+static DWORD                  dwCVehicle_SetupRender_ret = 0x6D6517;
 static void __declspec(naked) HOOK_CVehicle_SetupRender()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -3954,7 +3955,7 @@ static void __declspec(naked) HOOK_CVehicle_SetupRender()
     // clang-format on
 }
 
-static DWORD dwCVehicle_ResetAfterRender_ret = 0x6D0E43;
+static DWORD                  dwCVehicle_ResetAfterRender_ret = 0x6D0E43;
 static void __declspec(naked) HOOK_CVehicle_ResetAfterRender()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -4101,23 +4102,23 @@ static void __declspec(naked) HOOK_EndWorldColors()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-     // clang-format off
+    // clang-format off
      __asm
     {
         call DoEndWorldColorsPokes
         ret
     }
-     // clang-format on
+    // clang-format on
 }
 
 // This hook modifies the code in CWorld::ProcessVerticalLineSectorList to
 // force it to also check the world objects, so we can get a reliable ground
 // position on custom object maps. This will make getGroundPosition, jetpacks
 // and molotovs to work.
-static DWORD dwObjectsChecked = 0;
-static DWORD dwProcessVerticalKeepLooping = 0x5632D1;
-static DWORD dwProcessVerticalEndLooping = 0x56335F;
-static DWORD dwGlobalListOfObjects = 0xB9ACCC;
+static DWORD                  dwObjectsChecked = 0;
+static DWORD                  dwProcessVerticalKeepLooping = 0x5632D1;
+static DWORD                  dwProcessVerticalEndLooping = 0x56335F;
+static DWORD                  dwGlobalListOfObjects = 0xB9ACCC;
 static void __declspec(naked) HOOK_CWorld_ProcessVerticalLineSectorList()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -4148,9 +4149,9 @@ stop_looping:
 }
 
 // Hook to detect when a player is choking
-static DWORD         dwChokingChoke = 0x4C05C1;
-static DWORD         dwChokingDontchoke = 0x4C0620;
-static unsigned char ucChokingWeaponType = 0;
+static DWORD                  dwChokingChoke = 0x4C05C1;
+static DWORD                  dwChokingDontchoke = 0x4C0620;
+static unsigned char          ucChokingWeaponType = 0;
 static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -4161,7 +4162,7 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         // Get weapon type before pushad to avoid stack offset corruption
         mov     al, [esp+0x8]
         mov     ucChokingWeaponType, al
-        
+
         pushad
 
         mov     ebx, [m_pChokingHandler]
@@ -4178,7 +4179,7 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         jnz     continueWithOriginalCode
         popad
         jmp     dwChokingDontchoke
-    
+
         continueWithOriginalCode:
         popad
         mov     ecx, [edi]
@@ -4529,7 +4530,7 @@ static void __declspec(naked) HOOK_CollisionStreamRead()
     }
 }
 
-unsigned char ucDesignatedLightState = 0;
+unsigned char                 ucDesignatedLightState = 0;
 static void __declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -4543,17 +4544,17 @@ static void __declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
 
     if (ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8)
     {
-        ucDesignatedLightState = 0;            // Green
+        ucDesignatedLightState = 0;  // Green
     }
     else if (ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7)
     {
-        ucDesignatedLightState = 1;            // Amber
+        ucDesignatedLightState = 1;  // Amber
     }
     else if (ucTrafficLightState == 9)
     {
-        ucDesignatedLightState = 4;            // Off
+        ucDesignatedLightState = 4;  // Off
     }
-    else ucDesignatedLightState = 2;            // Red
+    else ucDesignatedLightState = 2;  // Red
 
     // clang-format off
     __asm
@@ -4578,17 +4579,17 @@ static void __declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState()
 
     if (ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7)
     {
-        ucDesignatedLightState = 0;            // Green
+        ucDesignatedLightState = 0;  // Green
     }
     else if (ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8)
     {
-        ucDesignatedLightState = 1;            // Amber
+        ucDesignatedLightState = 1;  // Amber
     }
     else if (ucTrafficLightState == 9)
     {
-        ucDesignatedLightState = 4;            // Off
+        ucDesignatedLightState = 4;  // Off
     }
-    else ucDesignatedLightState = 2;            // Red
+    else ucDesignatedLightState = 2;  // Red
 
     // clang-format off
     __asm
@@ -4615,8 +4616,14 @@ static void __declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
     {
         ucDesignatedLightState = 0;
     }
-    else if (ucTrafficLightState == 9) { ucDesignatedLightState = 1; }
-    else { ucDesignatedLightState = 2; }
+    else if (ucTrafficLightState == 9)
+    {
+        ucDesignatedLightState = 1;
+    }
+    else
+    {
+        ucDesignatedLightState = 2;
+    }
 
     // clang-format off
     __asm
@@ -4810,7 +4817,7 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     }
 }
 
-const float kfTimeStepOrg = 5.0f / 3.0f;
+const float                   kfTimeStepOrg = 5.0f / 3.0f;
 static void __declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -5326,7 +5333,7 @@ static void Post_CGame_Process()
     TIMING_CHECKPOINT("-CWorld_Process");
 }
 
-DWORD CALL_CWorld_Process = 0x5684a0;
+DWORD                         CALL_CWorld_Process = 0x5684a0;
 static void __declspec(naked) HOOK_CGame_Process()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -5354,8 +5361,6 @@ void __cdecl HandleIdle()
     {
         bAnimGroupArrayAddressLogged = true;
         DWORD dwAnimGroupArrayAddress = 0xb4ea34;
-        LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
-                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
     }
 
     ProcessDeferredStreamingMemoryRelief();
@@ -5383,7 +5388,7 @@ static void IdleWithTiming()
     TIMING_CHECKPOINT("-Idle");
 }
 
-DWORD CALL_CGame_Process = 0x53BEE0;
+DWORD                         CALL_CGame_Process = 0x53BEE0;
 static void __declspec(naked) HOOK_Idle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -5490,25 +5495,25 @@ void vehicle_lights_init()
 
 #else
 
-#define HOOKPOS_CVehicle_DoVehicleLights                    0x6e1a60
+    #define HOOKPOS_CVehicle_DoVehicleLights 0x6e1a60
 DWORD RETURN_CVehicle_DoVehicleLights = 0x6e1a68;
 
-#define HOOKPOS_CVehicle_DoHeadLightBeam_1                  0x6E0E20
+    #define HOOKPOS_CVehicle_DoHeadLightBeam_1 0x6E0E20
 DWORD RETURN_CVehicle_DoHeadLightBeam_1 = 0x6E0E26;
 
-#define HOOKPOS_CVehicle_DoHeadLightBeam_2                  0x6E13A4
+    #define HOOKPOS_CVehicle_DoHeadLightBeam_2 0x6E13A4
 DWORD RETURN_CVehicle_DoHeadLightBeam_2 = 0x6E13AE;
 
-#define HOOKPOS_CVehicle_DoHeadLightEffect_1                0x6E0D01
+    #define HOOKPOS_CVehicle_DoHeadLightEffect_1 0x6E0D01
 DWORD RETURN_CVehicle_DoHeadLightEffect_1 = 0x6E0D09;
 
-#define HOOKPOS_CVehicle_DoHeadLightEffect_2                0x6E0DF7
+    #define HOOKPOS_CVehicle_DoHeadLightEffect_2 0x6E0DF7
 DWORD RETURN_CVehicle_DoHeadLightEffect_2 = 0x6E0DFF;
 
-#define HOOKPOS_CVehicle_DoHeadLightReflectionTwin          0x6E170F
+    #define HOOKPOS_CVehicle_DoHeadLightReflectionTwin 0x6E170F
 DWORD RETURN_CVehicle_DoHeadLightReflectionTwin = 0x6E1717;
 
-#define HOOKPOS_CVehicle_DoHeadLightReflectionSingle        0x6E15E2
+    #define HOOKPOS_CVehicle_DoHeadLightReflectionSingle 0x6E15E2
 DWORD RETURN_CVehicle_DoHeadLightReflectionSingle = 0x6E15EA;
 
 void HOOK_CVehicle_DoVehicleLights();
@@ -5536,7 +5541,7 @@ void vehicle_lights_init()
     MemPut<BYTE>(0x6E1D4F, 2);
 }
 
-CVehicleSAInterface* pLightsVehicleInterface = NULL;
+CVehicleSAInterface*          pLightsVehicleInterface = NULL;
 static void __declspec(naked) HOOK_CVehicle_DoVehicleLights()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -5552,6 +5557,20 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights()
     // clang-format on
 }
 
+static unsigned long ClampFloatToByteULong(float value)
+{
+    if (!(value > 0.0f))
+        return 0;
+    if (value >= 255.0f)
+        return 255;
+    return static_cast<unsigned long>(value + 0.5f);
+}
+
+static unsigned char ULongToByte(unsigned long value)
+{
+    return static_cast<unsigned char>(value & 0xFFu);
+}
+
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
 {
@@ -5564,12 +5583,12 @@ void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float 
     }
 
     // Scale our color values to the defaults ..looks dodgy but its needed!
-    ulHeadLightR = (unsigned char)std::min(255.f, color.R * (1 / 255.0f) * fR);
-    ulHeadLightG = (unsigned char)std::min(255.f, color.G * (1 / 255.0f) * fG);
-    ulHeadLightB = (unsigned char)std::min(255.f, color.B * (1 / 255.0f) * fB);
+    ulHeadLightR = ClampFloatToByteULong(color.R * (1.0f / 255.0f) * fR);
+    ulHeadLightG = ClampFloatToByteULong(color.G * (1.0f / 255.0f) * fG);
+    ulHeadLightB = ClampFloatToByteULong(color.B * (1.0f / 255.0f) * fB);
 }
 
-CVehicleSAInterface* pHeadLightBeamVehicleInterface = NULL;
+CVehicleSAInterface*          pHeadLightBeamVehicleInterface = NULL;
 static void __declspec(naked) HOOK_CVehicle_DoHeadLightBeam_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -5594,7 +5613,7 @@ void         CVehicle_DoHeadLightBeam()
     for (unsigned int i = 0; i < uiHeadLightNumVerts; i++)
     {
         unsigned char alpha = COLOR_ARGB_A(pHeadLightVerts[i].color);
-        pHeadLightVerts[i].color = COLOR_ARGB(alpha, (unsigned char)ulHeadLightR, (unsigned char)ulHeadLightG, (unsigned char)ulHeadLightB);
+        pHeadLightVerts[i].color = COLOR_ARGB(alpha, ULongToByte(ulHeadLightR), ULongToByte(ulHeadLightG), ULongToByte(ulHeadLightB));
     }
 }
 
@@ -5625,7 +5644,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2()
     // clang-format on
 }
 
-DWORD dwCCoronas_RegisterCorona = 0x6FC580;
+DWORD                         dwCCoronas_RegisterCorona = 0x6FC580;
 static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -5692,7 +5711,7 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2()
     // clang-format on
 }
 
-DWORD dwCShadows_StoreCarLightShadow = 0x70C500;
+DWORD                         dwCShadows_StoreCarLightShadow = 0x70C500;
 static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -6072,7 +6091,7 @@ void                     CEventHandler_ComputeKnockOffBikeResponse()
         pEvent->Destroy();
 }
 
-DWORD dw_CEventDamage_AffectsPed = 0x4b35a0;
+DWORD                         dw_CEventDamage_AffectsPed = 0x4b35a0;
 static void __declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -6404,7 +6423,7 @@ void _cdecl CheckMatrix(float* pMatrix)
         pMatrix[6] = 0.0f;
         pMatrix[8] = 0.0f;
         pMatrix[9] = 0.0f;
-        pMatrix[10] = scale; // This one was missing for a long time (pre-Sept 2025)
+        pMatrix[10] = scale;  // This one was missing for a long time (pre-Sept 2025)
         pMatrix[12] = 0.0f;
         pMatrix[13] = 0.0f;
         pMatrix[14] = 1.0f;
@@ -6556,14 +6575,39 @@ void* SetModelSuspensionLinesToVehiclePrivate(CVehicleSAInterface* pVehicleIntf)
 {
     // Set the per-model suspension line data of the vehicle's model to the per-vehicle
     // suspension line data so that collision processing will use that instead.
-    CVehicle*   pVehicle = pVehicleIntf->m_pVehicle;
+    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
+    if (!pVehicle)
+        return nullptr;
+
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
-    return pModelInfo->SetVehicleSuspensionData(pVehicle->GetPrivateSuspensionLines());
+    if (!pModelInfo)
+        return nullptr;
+
+    void* pOriginalSuspensionLines = pModelInfo->GetVehicleSuspensionData();
+    if (!pOriginalSuspensionLines)
+        return nullptr;
+
+    void* pPrivateSuspensionLines = pVehicle->GetPrivateSuspensionLines();
+    if (!pPrivateSuspensionLines)
+        return nullptr;
+
+    pModelInfo->SetVehicleSuspensionData(pPrivateSuspensionLines);
+    return pOriginalSuspensionLines;
 }
 
 void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensionLines)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicleIntf->m_pVehicle->GetModelIndex());
+    if (!pVehicleIntf || !pSuspensionLines)
+        return;
+
+    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
+    if (!pVehicle)
+        return;
+
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
+    if (!pModelInfo)
+        return;
+
     pModelInfo->SetVehicleSuspensionData(pSuspensionLines);
 }
 // Some variables.
@@ -6581,7 +6625,7 @@ bool                 CheckHasSuspensionChanged()
             return false;
 
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
-        if (pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
+        if (pModelInfo && pModelInfo->GetInterface() && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
             return true;
         else
             return false;
@@ -6679,7 +6723,7 @@ bool CheckRemovedModelNoSet()
     if (pBuildingRemoval)
     {
         // Is the model in question even removed?
-        if (pBuildingRemoval->IsModelRemoved(static_cast<uint16_t>(pEntityWorldAdd->m_nModelIndex)))
+        if (pBuildingRemoval->IsModelRemoved(static_cast<std::uint16_t>(pEntityWorldAdd->m_nModelIndex)))
         {
             // is the replaced model in the spherical radius of any building removal
             if (pGameInterface->GetBuildingRemoval()->IsRemovedModelInRadius(pEntityWorldAdd))
@@ -6745,7 +6789,7 @@ void HideEntitySomehow()
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
         {
             // Add the LOD to the list
-            pBuildingRemoval->AddBinaryBuilding(pInterface);
+            pBuildingRemoval->AddBinaryBuilding(pInterface, pInterface->m_iplIndex);
             // Remove the model from the world
             pGameInterface->GetWorld()->Remove(pInterface, BuildingRemoval);
             // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
@@ -6870,13 +6914,13 @@ void RemoveObjectIfNeeded()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
         if (!pLODInterface->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pLODInterface);
+            pBuildingRemoval->AddDataBuilding(pLODInterface, pLODInterface->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
         }
     }
@@ -6905,8 +6949,7 @@ static void __declspec(naked) HOOK_ConvertToObject_CPopulationManageDummy()
         pop ecx
         mov pLODInterface, ecx
         pushad
-    }
-    // clang-format on
+    }  // clang-format on
     RemoveObjectIfNeeded();
     // clang-format off
     __asm
@@ -6970,7 +7013,7 @@ void RemoveDummyIfReplaced()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);
         }
     }
@@ -7054,7 +7097,7 @@ static void __declspec(naked) Hook_CDummy_DTR()
     // clang-format on
 }
 
-DWORD dwObjectVtbl = 0x866F60;
+DWORD                         dwObjectVtbl = 0x866F60;
 static void __declspec(naked) Hook_CObject_DTR()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -7077,8 +7120,8 @@ static void __declspec(naked) Hook_CObject_DTR()
     // clang-format on
 }
 
-static DWORD dwEntityVtbl;
-static DWORD dwMultResult;
+static DWORD                  dwEntityVtbl;
+static DWORD                  dwMultResult;
 static void __declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -7105,8 +7148,8 @@ static void __declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale()
     }
     // clang-format on
 
-IsOnScreen_IsObject:
-    // clang-format off
+    IsOnScreen_IsObject :
+        // clang-format off
     __asm
     {
         popad
@@ -7189,8 +7232,8 @@ void CMultiplayerSA::SetVehicleEngineAutoStartEnabled(bool enabled)
     }
     else
     {
-        MemSet((void*)0x64BC03, 0x90, 5);                          // prevent vehicle engine from turning on (driver enter)
-        MemCpy((void*)0x6C4EA9, "\xE9\x15\x03\x00", 4);            // prevent aircraft engine from turning off (driver exit)
+        MemSet((void*)0x64BC03, 0x90, 5);                // prevent vehicle engine from turning on (driver enter)
+        MemCpy((void*)0x6C4EA9, "\xE9\x15\x03\x00", 4);  // prevent aircraft engine from turning off (driver exit)
     }
 }
 
@@ -7402,7 +7445,7 @@ static void __declspec(naked) HOOK_CObject_ProcessCollision()
     }
 }
 
-DWORD WindowRespondsToCollision_CalledFrom = 0;
+DWORD                         WindowRespondsToCollision_CalledFrom = 0;
 static void __declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -7451,7 +7494,7 @@ static void __declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
         }
         // clang-format on
 
-        if (!pObjectAttacker || (pObjectAttacker && !pObjectAttacker->m_pRwObject)) // WasGlassHitByBullet called from CBulletInfo::Update
+        if (!pObjectAttacker || (pObjectAttacker && !pObjectAttacker->m_pRwObject))  // WasGlassHitByBullet called from CBulletInfo::Update
         {
             // clang-format off
             __asm
@@ -7476,7 +7519,7 @@ static void __declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
         // clang-format on
     }
 
-    if (pObjectAttacker && !pObjectAttacker->m_pRwObject) // Still wrong?
+    if (pObjectAttacker && !pObjectAttacker->m_pRwObject)  // Still wrong?
         pObjectAttacker = nullptr;
 
     if (TriggerObjectBreakEvent())
@@ -7503,7 +7546,7 @@ static void __declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
 }
 
 // Called when glass object is being broken by ped melee attack
-DWORD dummy_404350 = 0x404350;
+DWORD                         dummy_404350 = 0x404350;
 static void __declspec(naked) HOOK_CGlass__BreakGlassPhysically()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -7595,7 +7638,7 @@ void  CTaskSimpleGangDriveBy__ProcessPed()
         *pRequiredAnim = m_pDrivebyAnimationHandler(*pRequiredAnim, requiredAnimGroup);
 }
 
-DWORD RETURN_CTaskSimpleGangDriveBy_ProcessPed_Cancel = 0x62D5C1;
+DWORD                         RETURN_CTaskSimpleGangDriveBy_ProcessPed_Cancel = 0x62D5C1;
 static void __declspec(naked) HOOK_CTaskSimpleGangDriveBy__ProcessPed()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -7630,17 +7673,17 @@ BYTE            bTrackID = 0;
 DWORD           dwNumberOfTracks = 0;
 
 const DWORD pTrackNumbers[] = {
-    0x2,             // radio off, somewhere 2 is subtracted from this so that's why it's 2
-    0xB,             // playback fm
-    0xF,             // k-rose
-    0xF,             // k-dst
-    0xE,             // bounce fm
-    0x10,            // sf-ur
-    0xE,             // rls
-    0xD,             // radio x
-    0xD,             // csr
-    0xE,             // k-jah
-    0xC,             // master sounds
+    0x2,   // radio off, somewhere 2 is subtracted from this so that's why it's 2
+    0xB,   // playback fm
+    0xF,   // k-rose
+    0xF,   // k-dst
+    0xE,   // bounce fm
+    0x10,  // sf-ur
+    0xE,   // rls
+    0xD,   // radio x
+    0xD,   // csr
+    0xE,   // k-jah
+    0xC,   // master sounds
     0x1F,
 };
 
@@ -7878,7 +7921,7 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
     // clang-format on
 }
 
-const float kfTimeStepOriginal = 1.66f;
+const float                   kfTimeStepOriginal = 1.66f;
 static void __declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -7943,7 +7986,7 @@ void PostCWorld_ProcessPedsAfterPreRender()
     }
 }
 
-const DWORD CWorld_ProcessPedsAfterPreRender = 0x563430;
+const DWORD                   CWorld_ProcessPedsAfterPreRender = 0x563430;
 static void __declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -8022,19 +8065,28 @@ static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, C
         SColor colors[4];
         pVehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
 
-        RwColor color = {
-            static_cast<unsigned char>(colors[0].R * pVehicleInterface->m_fLighting),
-            static_cast<unsigned char>(colors[0].G * pVehicleInterface->m_fLighting),
-            static_cast<unsigned char>(colors[0].B * pVehicleInterface->m_fLighting),
-            0xFF
+        const float fLighting = pVehicleInterface->m_fLighting;
+        const auto  ClampFloatToByte = [](float value) -> unsigned char
+        {
+            if (value <= 0.0f)
+                return 0;
+            if (value >= 255.0f)
+                return 255;
+            return static_cast<unsigned char>(value);
         };
+
+        RwColor color;
+        color.r = ClampFloatToByte(static_cast<float>(colors[0].R) * fLighting);
+        color.g = ClampFloatToByte(static_cast<float>(colors[0].G) * fLighting);
+        color.b = ClampFloatToByte(static_cast<float>(colors[0].B) * fLighting);
+        color.a = 0xFF;
 
         // Fx_c::AddDebris
         ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(CLASS_CFx, vecPosition, color, 0.06f, count / 100 + 1);
     }
 }
 
-const DWORD RETURN_CAutomobile__dmgDrawCarCollidingParticles = 0x6A7081;
+const DWORD                   RETURN_CAutomobile__dmgDrawCarCollidingParticles = 0x6A7081;
 static void __declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -8061,7 +8113,7 @@ static void TakePhotograph()
     g_pCore->InitiateScreenShot(true);
 }
 
-const DWORD RETURN_CWeapon__TakePhotograph = 0x73C273;
+const DWORD                   RETURN_CWeapon__TakePhotograph = 0x73C273;
 static void __declspec(naked) HOOK_CWeapon__TakePhotograph()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -8090,18 +8142,18 @@ bool CanEntityCollideWithCamera(CEntitySAInterface* pEntity)
     switch (pEntity->m_nModelIndex)
     {
         // projectiles
-        case 342:            // grenade
-        case 343:            // teargas
-        case 344:            // molotov
-        case 363:            // satchel
+        case 342:  // grenade
+        case 343:  // teargas
+        case 344:  // molotov
+        case 363:  // satchel
 
         // vehicle parts
-        case 374:            // car_door
-        case 375:            // car_bumper
-        case 376:            // car_panel
-        case 377:            // car_bonnet
-        case 378:            // car_boot
-        case 379:            // car_wheel
+        case 374:  // car_door
+        case 375:  // car_bumper
+        case 376:  // car_panel
+        case 377:  // car_bonnet
+        case 378:  // car_boot
+        case 379:  // car_wheel
             return false;
     }
 

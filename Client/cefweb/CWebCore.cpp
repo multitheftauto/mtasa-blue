@@ -17,7 +17,7 @@
 #include <cef3/cef/include/cef_parser.h>
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
-#include "CWebAppAuth.h"            // For GenerateAuthCode()
+#include "CWebAppAuth.h"  // For GenerateAuthCode()
 #include <algorithm>
 #include <ranges>
 #include <filesystem>
@@ -28,13 +28,20 @@
     #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
-CWebCore::EventEntry::EventEntry(const std::function<void()>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_) {}
+CWebCore::EventEntry::EventEntry(const std::function<void()>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_)
+{
+}
 
 #ifdef MTA_DEBUG
-CWebCore::EventEntry::EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_) : callback(callback_), pWebView(pWebView_), name(name_) {}
+CWebCore::EventEntry::EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_)
+    : callback(callback_), pWebView(pWebView_), name(name_)
+{
+}
 #endif
 
-CWebCore::TaskEntry::TaskEntry(std::function<void(bool)> callback, CWebView* webView) : task(callback), webView(webView) {}
+CWebCore::TaskEntry::TaskEntry(std::function<void(bool)> callback, CWebView* webView) : task(callback), webView(webView)
+{
+}
 
 CWebCore::CWebCore()
 {
@@ -59,10 +66,12 @@ CWebCore::CWebCore()
 
 CWebCore::~CWebCore()
 {
-    std::ranges::for_each(m_WebViews, [](const auto& pWebView) {
-        if (pWebView) [[likely]]
-            pWebView->CloseBrowser();
-    });
+    std::ranges::for_each(m_WebViews,
+                          [](const auto& pWebView)
+                          {
+                              if (pWebView) [[likely]]
+                                  pWebView->CloseBrowser();
+                          });
     m_WebViews.clear();
     CefClearSchemeHandlerFactories();
 
@@ -106,8 +115,9 @@ bool CWebCore::Initialise(bool gpuEnabled)
 #else
     // On Wine/Proton: Use environment variable for library search
     const char* existingPath = std::getenv("LD_LIBRARY_PATH");
-    SString newPath = strCEFDir;
-    if (existingPath) {
+    SString     newPath = strCEFDir;
+    if (existingPath)
+    {
         newPath = SString("%s:%s", strCEFDir.c_str(), existingPath);
     }
     // Note: setenv is not available in MSVC, but _putenv is.
@@ -118,20 +128,23 @@ bool CWebCore::Initialise(bool gpuEnabled)
     // SetDllDirectoryW handles the Windows loader.
 
     // Log for debugging
-    if (std::getenv("WINE") || std::getenv("WINEPREFIX")) {
+    if (std::getenv("WINE") || std::getenv("WINEPREFIX"))
+    {
         g_pCore->GetConsole()->Printf("DEBUG: CEF library path set via SetDllDirectoryW: %s", strCEFDir.c_str());
     }
 #endif
 
     // Read GTA path from registry to pass to CEF subprocess
-    int iRegistryResult = 0;
+    int           iRegistryResult = 0;
     const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iRegistryResult);
 
     // Check if process is running with elevated privileges
     // CEF subprocesses may have communication issues when running elevated
-    const bool bIsElevated = []() -> bool {
+    const bool bIsElevated = []() -> bool
+    {
         // Check for Wine environment
-        if (std::getenv("WINE") || std::getenv("WINEPREFIX")) {
+        if (std::getenv("WINE") || std::getenv("WINEPREFIX"))
+        {
             // In Wine, privilege escalation works differently
             // Assume not elevated for browser feature purposes
             return false;
@@ -145,7 +158,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
         const std::unique_ptr<void, decltype(&CloseHandle)> tokenGuard(hToken, &CloseHandle);
 
         TOKEN_ELEVATION elevation{};
-        DWORD dwSize = sizeof(elevation);
+        DWORD           dwSize = sizeof(elevation);
         if (!GetTokenInformation(hToken, TokenElevation, &elevation, sizeof(elevation), &dwSize))
             return false;
 
@@ -154,19 +167,17 @@ bool CWebCore::Initialise(bool gpuEnabled)
 
     if (bIsElevated && !std::getenv("WINE"))
     {
-        AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
-        AddReportLog(8022, "CEF browser features may not work correctly when running as Administrator");
-        AddReportLog(8023, "Consider running MTA without Administrator privileges for full browser functionality");
         g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
 
     // Verify CEFLauncher can run in current environment
-    auto CanExecuteCEFLauncher = []() -> bool {
-        #ifdef _WIN32
-            // On Windows, we know it works
-            if (!std::getenv("WINE") && !std::getenv("WINEPREFIX") && !std::getenv("PROTON_VERSION"))
-                return true;
-        #endif
+    auto CanExecuteCEFLauncher = []() -> bool
+    {
+#ifdef _WIN32
+        // On Windows, we know it works
+        if (!std::getenv("WINE") && !std::getenv("WINEPREFIX") && !std::getenv("PROTON_VERSION"))
+            return true;
+#endif
 
         // Check if Wine can execute the launcher
         // This is a basic check - if we are in Wine, we assume it works unless proven otherwise
@@ -182,7 +193,8 @@ bool CWebCore::Initialise(bool gpuEnabled)
         return false;
     }
 
-    if (!CanExecuteCEFLauncher()) {
+    if (!CanExecuteCEFLauncher())
+    {
         g_pCore->GetConsole()->Printf("CEF initialization skipped - Wine/Proton not available");
         AddReportLog(8026, "CEF initialization skipped - Wine/Proton not available or misconfigured");
         m_bInitialised = false;
@@ -217,10 +229,12 @@ bool CWebCore::Initialise(bool gpuEnabled)
     }
 
     // RAII scope guard to restore CWD, even if CefInitialize throws or returns early
-    struct CwdGuard {
+    struct CwdGuard
+    {
         fs::path savedPath;
         explicit CwdGuard(fs::path path) : savedPath(std::move(path)) {}
-        ~CwdGuard() {
+        ~CwdGuard()
+        {
             std::error_code restoreEc;
             fs::current_path(savedPath, restoreEc);
         }
@@ -236,8 +250,8 @@ bool CWebCore::Initialise(bool gpuEnabled)
         return false;
     }
 
-    CefMainArgs        mainArgs;
-    void*              sandboxInfo = nullptr;
+    CefMainArgs mainArgs;
+    void*       sandboxInfo = nullptr;
 
     CefRefPtr<CWebApp> app(new CWebApp);
 
@@ -482,14 +496,16 @@ void CWebCore::RemoveWebViewTasks(CWebView* webView)
 {
     std::scoped_lock lock(m_TaskQueueMutex);
 
-    std::erase_if(m_TaskQueue, [webView](TaskEntry& entry) {
-        if (entry.webView == webView)
-        {
-            entry.task(true);
-            return true;
-        }
-        return false;
-    });
+    std::erase_if(m_TaskQueue,
+                  [webView](TaskEntry& entry)
+                  {
+                      if (entry.webView == webView)
+                      {
+                          entry.task(true);
+                          return true;
+                      }
+                      return false;
+                  });
 }
 
 void CWebCore::DoTaskQueuePulse()
@@ -519,7 +535,7 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
 
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
     static constexpr const char* wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
-                                                         "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
+                                                        "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
     for (const auto& pattern : wildcardWhitelist)
     {
@@ -713,7 +729,7 @@ std::unordered_set<SString> CWebCore::AllowPendingPages(bool bRemember)
 
     if (bRemember)
     {
-        std::vector<std::pair<SString, bool>> result;            // Contains only allowed entries
+        std::vector<std::pair<SString, bool>> result;  // Contains only allowed entries
         GetFilterEntriesByType(result, eWebFilterType::WEBFILTER_USER, eWebFilterState::WEBFILTER_ALLOWED);
         std::vector<SString> customWhitelist;
         for (std::vector<std::pair<SString, bool>>::iterator iter = result.begin(); iter != result.end(); ++iter)
@@ -723,7 +739,7 @@ std::unordered_set<SString> CWebCore::AllowPendingPages(bool bRemember)
     }
 
     auto allowedRequests(std::move(m_PendingRequests));
-    m_PendingRequests.clear();            // MSVC's move constructor already clears the list which isn't specified by the C++ standard though
+    m_PendingRequests.clear();  // MSVC's move constructor already clears the list which isn't specified by the C++ standard though
 
     return allowedRequests;
 }
@@ -777,7 +793,7 @@ void CWebCore::OnPostScreenshot()
 
 void CWebCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    dassert(g_pCore->GetNetwork() != nullptr);            // Ensure network module is loaded
+    dassert(g_pCore->GetNetwork() != nullptr);  // Ensure network module is loaded
     for (auto& webView : m_WebViews)
     {
         if (auto browser = webView->GetCefBrowser(); browser) [[likely]]

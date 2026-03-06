@@ -15,8 +15,8 @@
 
 extern CMultiplayerSA* pMultiplayer;
 
-DWORD dwCurrentPlayerPed = 0;            // stores the player ped temporarily during hooks
-DWORD dwCurrentVehicle = 0;              // stores the current vehicle during the hooks
+DWORD dwCurrentPlayerPed = 0;  // stores the player ped temporarily during hooks
+DWORD dwCurrentVehicle = 0;    // stores the current vehicle during the hooks
 
 DWORD dwParameter = 0;
 
@@ -201,7 +201,7 @@ VOID ReturnContextToLocalPlayer()
 
         bNotInLocalContext = false;
 
-        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
+        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);  // the player
         CPedSA* pLocalPlayerPedSA = dynamic_cast<CPedSA*>(pLocalPlayerPed);
         if (pLocalPlayerPedSA)
         {
@@ -222,7 +222,7 @@ VOID ReturnContextToLocalPlayer()
         // Store any changes to the local-players stats?
         if (!bLocalStatsStatic)
         {
-            assert(0);            // bLocalStatsStatic is always true
+            assert(0);  // bLocalStatsStatic is always true
             MemCpyFast(&localStatsData.StatTypesFloat, (void*)0xb79380, sizeof(float) * MAX_FLOAT_STATS);
             MemCpyFast(&localStatsData.StatTypesInt, (void*)0xb79000, sizeof(int) * MAX_INT_STATS);
             MemCpyFast(&localStatsData.StatReactionValue, (void*)0xb78f10, sizeof(float) * MAX_REACTION_STATS);
@@ -245,7 +245,7 @@ void SwitchContext(CPed* thePed)
     if (thePed && !bNotInLocalContext)
     {
         // Grab the local ped and the local pad
-        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
+        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);  // the player
         CPad*            pLocalPad = pGameInterface->GetPad();
         CPadSAInterface* pLocalPadInterface = ((CPadSA*)pLocalPad)->GetInterface();
 
@@ -253,7 +253,7 @@ void SwitchContext(CPed* thePed)
         if (thePed != pLocalPlayerPed)
         {
             // Store the local pad
-            pLocalPad->Store();            // store a copy of the local pad internally
+            pLocalPad->Store();  // store a copy of the local pad internally
 
             // Grab the remote data storage for the player we're context switching to
             CPlayerPed* thePlayerPed = dynamic_cast<CPlayerPed*>(thePed);
@@ -314,7 +314,8 @@ void SwitchContext(CPed* thePed)
 
                     // Disable mouse look if they're not in a fight task and not aiming (strafing)
                     // Fix GitHub Issue #395
-                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && data->m_pad.NewState.RightShoulder1 != 0 && thePed->GetPedIntelligence()->GetFightTask())
+                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && data->m_pad.NewState.RightShoulder1 != 0 &&
+                        thePed->GetPedIntelligence()->GetFightTask())
                         bDisableMouseLook = false;
 
                     // Disable mouse look if they're not underwater (Ped vertical rotation when diving)

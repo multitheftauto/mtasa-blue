@@ -72,16 +72,16 @@ bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint8_t playerDebugLeve
 {
     switch (messageDebugLevel)
     {
-    case MESSAGE_TYPE_ERROR:
-        return playerDebugLevel >= ERRORS_ONLY;
-    case MESSAGE_TYPE_WARNING:
-        return playerDebugLevel >= ERRORS_AND_WARNINGS;
-    case MESSAGE_TYPE_INFO:
-    case MESSAGE_TYPE_CUSTOM:
-    case MESSAGE_TYPE_DEBUG:
-        return playerDebugLevel == ALL;
-    default:
-        break;
+        case MESSAGE_TYPE_ERROR:
+            return playerDebugLevel >= ERRORS_ONLY;
+        case MESSAGE_TYPE_WARNING:
+            return playerDebugLevel >= ERRORS_AND_WARNINGS;
+        case MESSAGE_TYPE_INFO:
+        case MESSAGE_TYPE_CUSTOM:
+        case MESSAGE_TYPE_DEBUG:
+            return playerDebugLevel == ALL;
+        default:
+            break;
     }
 
     return false;

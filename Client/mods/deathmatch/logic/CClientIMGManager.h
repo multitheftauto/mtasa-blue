@@ -37,11 +37,11 @@ public:
 
 private:
     size_t CalculateLargestFile() const;
-    void AddToList(CClientIMG* pIMG) { m_List.push_back(pIMG); }
-    void RemoveFromList(CClientIMG* pIMG);
+    void   AddToList(CClientIMG* pIMG) { m_List.push_back(pIMG); }
+    void   RemoveFromList(CClientIMG* pIMG);
 
     std::list<CClientIMG*> m_List;
     bool                   m_bRemoveFromList;
     uint32                 m_GTALargestFileSizeBlocks;
-    uint32                 m_LargestFileSizeBlocks; // Size of the largest file [in streaming blocks/sectors] in any of the loaded imgs
+    uint32                 m_LargestFileSizeBlocks;  // Size of the largest file [in streaming blocks/sectors] in any of the loaded imgs
 };

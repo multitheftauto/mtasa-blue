@@ -480,8 +480,29 @@ void CCommandFuncs::FakeLag(const char* szCmdLine)
     if (parts.size() > 3)
         iKBPSLimit = atoi(parts[3]);
 
-    g_pCore->GetNetwork()->SetFakeLag(static_cast<unsigned short>(iPacketLoss), static_cast<unsigned short>(iExtraPing),
-                                      static_cast<unsigned short>(iExtraPingVary), iKBPSLimit);
+    if (iPacketLoss < 0 || iPacketLoss > 100)
+    {
+        g_pCore->GetConsole()->Print("fakelag: packet loss must be 0-100");
+        return;
+    }
+
+    if (iExtraPing < 0 || iExtraPing > 0xFFFF || iExtraPingVary < 0 || iExtraPingVary > 0xFFFF)
+    {
+        g_pCore->GetConsole()->Print("fakelag: ping values must be 0-65535");
+        return;
+    }
+
+    if (iKBPSLimit < 0)
+    {
+        g_pCore->GetConsole()->Print("fakelag: KBPS limit must be 0 or higher");
+        return;
+    }
+
+    const unsigned short usPacketLoss = static_cast<unsigned short>(iPacketLoss);
+    const unsigned short usExtraPing = static_cast<unsigned short>(iExtraPing);
+    const unsigned short usExtraPingVary = static_cast<unsigned short>(iExtraPingVary);
+
+    g_pCore->GetNetwork()->SetFakeLag(usPacketLoss, usExtraPing, usExtraPingVary, iKBPSLimit);
     g_pCore->GetConsole()->Print(SString("Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit",
                                          iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit));
 }

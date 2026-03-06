@@ -13,9 +13,9 @@
 
 #ifdef WITH_OBJECT_SYNC
 
-#include "CPlayerManager.h"
-#include "CObjectManager.h"
-#include "packets/CObjectSyncPacket.h"
+    #include "CPlayerManager.h"
+    #include "CObjectManager.h"
+    #include "packets/CObjectSyncPacket.h"
 
 class CObjectSync
 {

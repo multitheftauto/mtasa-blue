@@ -26,6 +26,7 @@ PropertyID propertyid(const std::string_view& name)
         {"height", PropertyID::Height},
         {"href", PropertyID::Href},
         {"id", PropertyID::Id},
+        {"lengthAdjust", PropertyID::LengthAdjust},
         {"markerHeight", PropertyID::MarkerHeight},
         {"markerUnits", PropertyID::MarkerUnits},
         {"markerWidth", PropertyID::MarkerWidth},
@@ -46,6 +47,7 @@ PropertyID propertyid(const std::string_view& name)
         {"ry", PropertyID::Ry},
         {"spreadMethod", PropertyID::SpreadMethod},
         {"style", PropertyID::Style},
+        {"textLength", PropertyID::TextLength},
         {"transform", PropertyID::Transform},
         {"viewBox", PropertyID::ViewBox},
         {"width", PropertyID::Width},
@@ -53,7 +55,7 @@ PropertyID propertyid(const std::string_view& name)
         {"x1", PropertyID::X1},
         {"x2", PropertyID::X2},
         {"xlink:href", PropertyID::Href},
-        {"xml:space", PropertyID::WhiteSpace},
+        {"xml:space", PropertyID::White_Space},
         {"y", PropertyID::Y},
         {"y1", PropertyID::Y1},
         {"y2", PropertyID::Y2}
@@ -86,6 +88,7 @@ PropertyID csspropertyid(const std::string_view& name)
         {"font-size", PropertyID::Font_Size},
         {"font-style", PropertyID::Font_Style},
         {"font-weight", PropertyID::Font_Weight},
+        {"letter-spacing", PropertyID::Letter_Spacing},
         {"marker-end", PropertyID::Marker_End},
         {"marker-mid", PropertyID::Marker_Mid},
         {"marker-start", PropertyID::Marker_Start},
@@ -93,6 +96,7 @@ PropertyID csspropertyid(const std::string_view& name)
         {"mask-type", PropertyID::Mask_Type},
         {"opacity", PropertyID::Opacity},
         {"overflow", PropertyID::Overflow},
+        {"pointer-events", PropertyID::Pointer_Events},
         {"stop-color", PropertyID::Stop_Color},
         {"stop-opacity", PropertyID::Stop_Opacity},
         {"stroke", PropertyID::Stroke},
@@ -104,8 +108,11 @@ PropertyID csspropertyid(const std::string_view& name)
         {"stroke-opacity", PropertyID::Stroke_Opacity},
         {"stroke-width", PropertyID::Stroke_Width},
         {"text-anchor", PropertyID::Text_Anchor},
+        {"text-orientation", PropertyID::Text_Orientation},
         {"visibility", PropertyID::Visibility},
-        {"white-space", PropertyID::WhiteSpace}
+        {"white-space", PropertyID::White_Space},
+        {"word-spacing", PropertyID::Word_Spacing},
+        {"writing-mode", PropertyID::Writing_Mode}
     };
 
     auto it = std::lower_bound(table, std::end(table), name, [](const auto& item, const auto& name) { return item.name < name; });
@@ -155,6 +162,17 @@ bool SVGEnumeration<MarkerUnits>::parse(std::string_view input)
     static const SVGEnumerationEntry<MarkerUnits> entries[] = {
         {MarkerUnits::StrokeWidth, "strokeWidth"},
         {MarkerUnits::UserSpaceOnUse, "userSpaceOnUse"}
+    };
+
+    return parseEnum(input, entries);
+}
+
+template<>
+bool SVGEnumeration<LengthAdjust>::parse(std::string_view input)
+{
+    static const SVGEnumerationEntry<LengthAdjust> entries[] = {
+        {LengthAdjust::Spacing, "spacing"},
+        {LengthAdjust::SpacingAndGlyphs, "spacingAndGlyphs"}
     };
 
     return parseEnum(input, entries);

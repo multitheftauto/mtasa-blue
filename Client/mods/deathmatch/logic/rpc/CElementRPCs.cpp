@@ -105,7 +105,7 @@ void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterfa
 {
     // Read out the name length
     unsigned short usNameLength;
-    bool           bRecursive;            // Unused
+    bool           bRecursive;  // Unused
     if (bitStream.ReadCompressed(usNameLength))
     {
         SString strName;
@@ -359,7 +359,7 @@ void CElementRPCs::DetachElements(CClientEntity* pSource, NetBitStreamInterface&
         return;
     }
 
-    ElementID usAttachedToID;
+    ElementID      usAttachedToID;
     CClientEntity* pAttachedToEntity = CElementIDs::GetElement(usAttachedToID);
 
     CVector vecPosition;
@@ -470,7 +470,8 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
                     pPed->SetHealth(fHealth);
                     // If server sets health to 0 for local player, mark as server-processed death
                     // to prevent DoWastedCheck from firing with stale local damage data
-                    if (fHealth == 0.0f && pPed->IsLocalPlayer()) {
+                    if (fHealth == 0.0f && pPed->IsLocalPlayer())
+                    {
                         g_pClientGame->ClearDamageData();
                     }
                 }

@@ -16,21 +16,21 @@
 struct RwColor;
 class FxSystem_c;
 
-#define FUNC_CFx_AddBlood                  0x49eb00
-#define FUNC_CFx_AddWood                   0x49ee10
-#define FUNC_CFx_AddSparks                 0x49f040
-#define FUNC_CFx_AddTyreBurst              0x49f300
-#define FUNC_CFx_AddBulletImpact           0x49f3d0
-#define FUNC_CFx_AddPunchImpact            0x49f670
-#define FUNC_CFx_AddDebris                 0x49f750
-#define FUNC_CFx_AddGlass                  0x49f970
-#define FUNC_CFx_TriggerWaterHydrant       0x4a0d70
-#define FUNC_CFx_TriggerGunshot            0x4a0de0
-#define FUNC_CFx_TriggerTankFire           0x4a0fa0
-#define FUNC_CFx_TriggerWaterSplash        0x4a1070
-#define FUNC_CFx_TriggerBulletSplash       0x4a10e0
-#define FUNC_CFx_TriggerFootSplash         0x4a1150
-#define FUNC_FXSystem_c_AddParticle        0x4AA440
+#define FUNC_CFx_AddBlood            0x49eb00
+#define FUNC_CFx_AddWood             0x49ee10
+#define FUNC_CFx_AddSparks           0x49f040
+#define FUNC_CFx_AddTyreBurst        0x49f300
+#define FUNC_CFx_AddBulletImpact     0x49f3d0
+#define FUNC_CFx_AddPunchImpact      0x49f670
+#define FUNC_CFx_AddDebris           0x49f750
+#define FUNC_CFx_AddGlass            0x49f970
+#define FUNC_CFx_TriggerWaterHydrant 0x4a0d70
+#define FUNC_CFx_TriggerGunshot      0x4a0de0
+#define FUNC_CFx_TriggerTankFire     0x4a0fa0
+#define FUNC_CFx_TriggerWaterSplash  0x4a1070
+#define FUNC_CFx_TriggerBulletSplash 0x4a10e0
+#define FUNC_CFx_TriggerFootSplash   0x4a1150
+#define FUNC_FXSystem_c_AddParticle  0x4AA440
 
 class CFxSAInterface
 {
@@ -76,7 +76,8 @@ public:
     void TriggerWaterSplash(CVector& vecPosition);
     void TriggerBulletSplash(CVector& vecPosition);
     void TriggerFootSplash(CVector& vecPosition);
-    void AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife);
+    void AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA,
+                     bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife);
 
 private:
     CFxSAInterface* m_pInterface;

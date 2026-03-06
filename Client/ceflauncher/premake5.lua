@@ -5,6 +5,7 @@ project "CEFLauncher"
 	targetdir(buildpath("mta/cef"))
 	includedirs { "../sdk" }
 	links { "CEFLauncher DLL"}
+	clangtidy "On"
 
 	vpaths {
 		["Headers/*"] = "**.h",
@@ -21,7 +22,7 @@ project "CEFLauncher"
 	}
 
 	filter "system:windows"
-		buildoptions { 
+		buildoptions {
 			"/Zc:inline",
 			"/Zc:throwingNew",
 			"/diagnostics:caret",
@@ -45,6 +46,6 @@ project "CEFLauncher"
 
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
-	
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }

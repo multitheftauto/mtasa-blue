@@ -54,7 +54,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
 
     SetInterface((CEntitySAInterface*)dwPedPointer);
 
-    Init();            // init our interfaces
+    Init();  // init our interfaces
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
@@ -267,7 +267,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         if (pAnimBlock && !pAnimBlock->IsLoaded())
         {
             pAnimBlock->Request(BLOCKING, true);
-            MapInsert(ms_DoneAnimBlockRefMap, strBlockName);            // Request() adds a ref for us
+            MapInsert(ms_DoneAnimBlockRefMap, strBlockName);  // Request() adds a ref for us
         }
 
         // Load fail?
@@ -446,9 +446,9 @@ __declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAI
 }
 
 // Hook info
-#define HOOKPOS_CPlayerPed_ProcessAnimGroups_Mid        0x0609A44
-#define HOOKSIZE_CPlayerPed_ProcessAnimGroups_Mid       6
-DWORD RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
+#define HOOKPOS_CPlayerPed_ProcessAnimGroups_Mid  0x0609A44
+#define HOOKSIZE_CPlayerPed_ProcessAnimGroups_Mid 6
+DWORD                         RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
 static void __declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -502,9 +502,9 @@ __declspec(noinline) int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqM
 }
 
 // Hook info
-#define HOOKPOS_CClothes_GetDefaultPlayerMotionGroup        0x05A81B0
-#define HOOKSIZE_CClothes_GetDefaultPlayerMotionGroup       5
-DWORD RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
+#define HOOKPOS_CClothes_GetDefaultPlayerMotionGroup  0x05A81B0
+#define HOOKSIZE_CClothes_GetDefaultPlayerMotionGroup 5
+DWORD                         RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
 static void __declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

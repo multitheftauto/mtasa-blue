@@ -17,9 +17,9 @@ class CSettings;
 #include "CMainMenu.h"
 #include "CCore.h"
 
-#define SKINS_PATH                    "skins/*"
-#define CHAT_PRESETS_PATH             "mta/config/chatboxpresets.xml"
-#define CHAT_PRESETS_ROOT             "chatboxpresets"
+#define SKINS_PATH        "skins/*"
+#define CHAT_PRESETS_PATH "mta/config/chatboxpresets.xml"
+#define CHAT_PRESETS_ROOT "chatboxpresets"
 
 // #define SHOWALLSETTINGS
 
@@ -56,7 +56,7 @@ struct SKeyBindSection
         if (szOriginalTitle)
             delete[] szOriginalTitle;
     }
-    int                 currentIndex;            // temporarily stores the index while the list is being created
+    int                 currentIndex;  // temporarily stores the index while the list is being created
     char*               szTitle;
     char*               szOriginalTitle;
     int                 rowCount;
@@ -123,28 +123,28 @@ public:
     void ShowRichPresenceShareDataQuestionBox() const;
 
 protected:
-    const static int SecKeyNum = 3;            // Number of secondary keys
+    const static int SecKeyNum = 3;  // Number of secondary keys
 
     // Keep these protected so we can access them in the event handlers of CClientGame
-    CGUIElement*  m_pWindow;
-    CGUITabPanel* m_pTabs;
-    CGUITab*      m_pTabMultiplayer;
-    CGUITab*      m_pTabVideo;
-    CGUITab*      m_pTabInterface;
-    CGUITab*      m_pTabBrowser;
-    CGUITab*      m_pTabPostFX;
-    CGUITab*      m_pTabAudio;
-    CGUITab*      m_pTabBinds;
-    CGUITab*      m_pTabControls;
-    CGUITab*      m_pTabAdvanced;
-    CGUIButton*   m_pButtonOK;
-    CGUIButton*   m_pButtonCancel;
-    CGUILabel*    m_pLabelNick;
-    CGUIButton*   m_pButtonGenerateNick;
-    CGUIStaticImage*   m_pButtonGenerateNickIcon;
-    CGUIEdit*     m_pEditNick;
-    CGUICheckBox* m_pSavePasswords;
-    CGUICheckBox* m_pAutoRefreshBrowser;
+    CGUIElement*     m_pWindow;
+    CGUITabPanel*    m_pTabs;
+    CGUITab*         m_pTabMultiplayer;
+    CGUITab*         m_pTabVideo;
+    CGUITab*         m_pTabInterface;
+    CGUITab*         m_pTabBrowser;
+    CGUITab*         m_pTabPostFX;
+    CGUITab*         m_pTabAudio;
+    CGUITab*         m_pTabBinds;
+    CGUITab*         m_pTabControls;
+    CGUITab*         m_pTabAdvanced;
+    CGUIButton*      m_pButtonOK;
+    CGUIButton*      m_pButtonCancel;
+    CGUILabel*       m_pLabelNick;
+    CGUIButton*      m_pButtonGenerateNick;
+    CGUIStaticImage* m_pButtonGenerateNickIcon;
+    CGUIEdit*        m_pEditNick;
+    CGUICheckBox*    m_pSavePasswords;
+    CGUICheckBox*    m_pAutoRefreshBrowser;
 
     CGUILabel*     m_pVideoGeneralLabel;
     CGUILabel*     m_pVideoResolutionLabel;
@@ -186,23 +186,20 @@ protected:
     CGUIScrollBar* m_pBrightness;
     CGUILabel*     m_pBrightnessValueLabel;
     CGUICheckBox*  m_pBorderlessGammaToggle;
-    CGUILabel*     m_pBorderlessGammaLabel;
     CGUIScrollBar* m_pBorderlessGamma;
     CGUILabel*     m_pBorderlessGammaValueLabel;
     CGUICheckBox*  m_pBorderlessBrightnessToggle;
-    CGUILabel*     m_pBorderlessBrightnessLabel;
     CGUIScrollBar* m_pBorderlessBrightness;
     CGUILabel*     m_pBorderlessBrightnessValueLabel;
     CGUICheckBox*  m_pBorderlessContrastToggle;
-    CGUILabel*     m_pBorderlessContrastLabel;
     CGUIScrollBar* m_pBorderlessContrast;
     CGUILabel*     m_pBorderlessContrastValueLabel;
     CGUICheckBox*  m_pBorderlessSaturationToggle;
-    CGUILabel*     m_pBorderlessSaturationLabel;
     CGUIScrollBar* m_pBorderlessSaturation;
     CGUILabel*     m_pBorderlessSaturationValueLabel;
     CGUICheckBox*  m_pCheckBoxApplyBorderless;
     CGUICheckBox*  m_pCheckBoxApplyFullscreen;
+    CGUIButton*    m_pPostFXDefButton;
     CGUILabel*     m_pAnisotropicLabel;
     CGUIScrollBar* m_pAnisotropic;
     CGUILabel*     m_pAnisotropicValueLabel;
@@ -402,6 +399,7 @@ protected:
     bool OnBorderlessSaturationToggleClicked(CGUIElement* pElement);
     bool OnBorderlessApplyBorderlessClicked(CGUIElement* pElement);
     bool OnBorderlessApplyFullscreenClicked(CGUIElement* pElement);
+    bool OnPostFXDefaultClick(CGUIElement* pElement);
     bool OnAnisotropicChanged(CGUIElement* pElement);
     bool OnMapAlphaChanged(CGUIElement* pElement);
     bool OnMasterVolumeChanged(CGUIElement* pElement);

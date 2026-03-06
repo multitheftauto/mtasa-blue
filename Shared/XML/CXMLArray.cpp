@@ -13,7 +13,7 @@
 
 using namespace std;
 
-#define XML_ARRAY_BASE_ID    0x01000000
+#define XML_ARRAY_BASE_ID 0x01000000
 
 CStack<unsigned long, 1> CXMLArray::m_IDStack;
 std::vector<CXMLCommon*> CXMLArray::m_Elements;

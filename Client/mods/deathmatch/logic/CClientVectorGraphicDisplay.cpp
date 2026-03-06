@@ -13,8 +13,20 @@
 
 using namespace lunasvg;
 
-CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID)
-    : CClientDisplay(ID)
+static bool SafeSvgRender(Document* doc, Bitmap& bitmap, const Matrix& matrix)
+{
+    __try
+    {
+        doc->render(bitmap, matrix);
+        return true;
+    }
+    __except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+    {
+        return false;
+    }
+}
+
+CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientVectorGraphic* pVectorGraphic, int ID) : CClientDisplay(ID)
 {
     m_pVectorGraphic = pVectorGraphic;
     m_bVisible = true;
@@ -51,10 +63,10 @@ void CClientVectorGraphicDisplay::UnpremultiplyBitmap(Bitmap& bitmap)
     auto stride = bitmap.stride();
     auto rowData = bitmap.data();
 
-    for (int y = 0; y < height; y++)
+    for (decltype(height) y = 0; y < height; y++)
     {
         auto data = rowData;
-        for (int x = 0; x < width; x++)
+        for (decltype(width) x = 0; x < width; x++)
         {
             auto& b = data[0];
             auto& g = data[1];
@@ -92,8 +104,27 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     if (!surface)
         return;
 
-    // SVG has a predefined width and height. We need transform it to the requested size
-    const Matrix transformationMatrix(pVectorGraphicItem->m_uiSizeX / svgDocument->width(), 0, 0, pVectorGraphicItem->m_uiSizeY / svgDocument->height(), 0, 0);
+    // Validate render item dimensions
+    if (pVectorGraphicItem->m_uiSizeX == 0 || pVectorGraphicItem->m_uiSizeY == 0)
+        return;
+
+    // Validate SVG document dimensions (reject zero, negative, NaN, Inf)
+    float svgWidth = svgDocument->width();
+    float svgHeight = svgDocument->height();
+    if (svgWidth <= 0 || svgHeight <= 0 || !std::isfinite(svgWidth) || !std::isfinite(svgHeight))
+        return;
+
+    // Reject documents whose content bounding box is degenerate.
+    // Catches fully-empty or NaN-dimension documents before they reach the renderer.
+    Box bbox = svgDocument->boundingBox();
+    if (bbox.w <= 0 || bbox.h <= 0 || !std::isfinite(bbox.w) || !std::isfinite(bbox.h) || !std::isfinite(bbox.x) || !std::isfinite(bbox.y))
+        return;
+
+    // SVG has a predefined width and height. We need to transform it to the requested size
+    float scaleX = pVectorGraphicItem->m_uiSizeX / svgWidth;
+    float scaleY = pVectorGraphicItem->m_uiSizeY / svgHeight;
+
+    const Matrix transformationMatrix(scaleX, 0, 0, scaleY, 0, 0);
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;
@@ -104,7 +135,15 @@ void CClientVectorGraphicDisplay::UpdateTexture()
 
         Bitmap bitmap{surfaceData, (int32_t)pVectorGraphicItem->m_uiSizeX, (int32_t)pVectorGraphicItem->m_uiSizeY, stride};
         bitmap.clear(0);
-        svgDocument->render(bitmap, transformationMatrix);
+
+        if (!SafeSvgRender(svgDocument, bitmap, transformationMatrix))
+        {
+            // SVG triggered an access violation during rendering (malformed content)
+            surface->UnlockRect();
+            m_bHasUpdated = false;
+            return;
+        }
+
         UnpremultiplyBitmap(bitmap);
 
         // Unlock surface

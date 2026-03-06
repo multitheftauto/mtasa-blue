@@ -47,20 +47,21 @@ void SharedUtil_Tests()
 //
 ///////////////////////////////////////////////////////////////
 #define TEST_FUNCTION \
-        struct testStruct { \
-            void Test(int testIndex) \
-            { \
-                testStruct dataCopy = *this;    // Info when debugging
+    struct testStruct \
+    { \
+        void Test(int testIndex) \
+        { \
+            testStruct dataCopy = *this;  // Info when debugging
 
-#define TEST_VARS \
-            }
+#define TEST_VARS }
 
 #define TEST_DATA \
-        } testData[]
+    } \
+    testData[]
 
 #define TEST_END \
-        for (uint i = 0 ; i < NUMELMS(testData) ; i++) \
-            testData[i].Test(i);
+    for (uint i = 0; i < NUMELMS(testData); i++) \
+        testData[i].Test(i);
 
 ///////////////////////////////////////////////////////////////
 //
@@ -946,7 +947,11 @@ void SharedUtil_Hash_Tests()
         TEST_END
     }
 
-    #define szTempFilename "hash_""\xD0""\x98""_test"
+#define szTempFilename \
+    "hash_" \
+    "\xD0" \
+    "\x98" \
+    "_test"
 
     // MD5
     {

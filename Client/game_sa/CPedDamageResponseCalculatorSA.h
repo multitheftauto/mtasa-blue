@@ -19,9 +19,9 @@ class CEntitySAInterface;
 class CPed;
 class CPedDamageResponse;
 
-#define FUNC_CPedDamageResponseCalculator_Constructor               0x4ad3f0
-#define FUNC_CPedDamageResponseCalculator_Destructor                0x4ad420
-#define FUNC_CPedDamageResponseCalculator_ComputeDamageResponse     0x4b5ac0
+#define FUNC_CPedDamageResponseCalculator_Constructor           0x4ad3f0
+#define FUNC_CPedDamageResponseCalculator_Destructor            0x4ad420
+#define FUNC_CPedDamageResponseCalculator_ComputeDamageResponse 0x4b5ac0
 
 class CPedDamageResponseCalculatorSAInterface
 {
@@ -30,7 +30,7 @@ public:
     float               fDamage;
     ePedPieceTypes      bodyPart;
     eWeaponType         weaponType;
-    bool                bSpeak;            // refers to a CPed::Say call (the dying scream?)
+    bool                bSpeak;  // refers to a CPed::Say call (the dying scream?)
 };
 
 class CPedDamageResponseCalculatorSA : public CPedDamageResponseCalculator

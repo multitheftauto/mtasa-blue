@@ -10,6 +10,18 @@
 
 #include <StdInc.h>
 
+struct SPendingTxdImport
+{
+    CClientTXD*    pTXD = nullptr;
+    unsigned short usModelId = 0;
+    uint32_t       uiQueuedTick = 0;
+    uint8_t        ucRetryCount = 0;
+};
+
+static std::vector<SPendingTxdImport> s_PendingTxdImports;
+static uint32_t                       s_uiLastPendingImportProcessTime = 0;
+static uint32_t                       s_uiLastPendingImportDropLogTime = 0;
+
 CClientTXD::CClientTXD(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     // Init
@@ -19,30 +31,38 @@ CClientTXD::CClientTXD(class CClientManager* pManager, ElementID ID) : ClassInit
 
 CClientTXD::~CClientTXD()
 {
+    RemovePendingImports();
+
     if (!g_pGame || !g_pGame->GetRenderWare())
     {
         // RenderWare already destroyed (SA is unpredictable)
         return;
     }
 
-    const auto usedTxdIdsSnapshot = m_ReplacementTextures.usedInTxdIds;
+    // During session shutdown (CClientManager being destroyed), element destruction
+    // order is arbitrary. Skip full cleanup which would access RW data that other
+    // elements' destructors may have already freed. Resource stop uses the full path
+    // below - CClientManager is still alive so full cleanup is safe.
+    if (m_pManager && m_pManager->IsBeingDeleted())
+    {
+        g_pGame->GetRenderWare()->ModelInfoTXDDeferCleanup(&m_ReplacementTextures);
+
+        // Remove clothes buffer references so OnCStreaming_RequestModel_Mid
+        // won't serve up our soon-to-be-freed m_FileData pointer
+        g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_FileData.data());
+        g_pGame->GetRenderWare()->ClothesRemoveFile(m_FileData.data());
+        return;
+    }
 
     g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);
 
-    // Restream affected models
-    std::vector<unsigned short> restreamModelIds;
-    restreamModelIds.reserve(m_ReplacementTextures.usedInModelIds.size());
+    // Restream all models that used our replacement textures. Don't filter by current
+    // TXD ID - if CClientDFF was destroyed before us, CleanupIsolatedTxdForModel may
+    // have moved the model back to its parent TXD, making the old TXD ID stale.
     for (unsigned short modelId : m_ReplacementTextures.usedInModelIds)
-        restreamModelIds.push_back(modelId);
-
-    for (unsigned short modelId : restreamModelIds)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId, true);
         if (!pModelInfo || !pModelInfo->IsValid())
-            continue;
-
-        // Only restream if model uses a TXD that was affected
-        if (!usedTxdIdsSnapshot.empty() && usedTxdIdsSnapshot.count(pModelInfo->GetTextureDictionaryID()) == 0)
             continue;
         Restream(modelId);
     }
@@ -111,6 +131,31 @@ bool CClientTXD::AddClothingTexture(const std::string& modelName)
 
 bool CClientTXD::Import(unsigned short usModelID)
 {
+    return ImportInternal(usModelID, true);
+}
+
+bool CClientTXD::IsDeviceLost() const
+{
+    IDirect3DDevice9* pDevice = g_pCore ? g_pCore->GetGraphics()->GetDevice() : nullptr;
+    if (!pDevice)
+        return true;
+
+    const HRESULT hr = pDevice->TestCooperativeLevel();
+    return hr != D3D_OK;
+}
+
+void CClientTXD::RemovePendingImports()
+{
+    if (s_PendingTxdImports.empty())
+        return;
+
+    s_PendingTxdImports.erase(
+        std::remove_if(s_PendingTxdImports.begin(), s_PendingTxdImports.end(), [this](const SPendingTxdImport& entry) { return entry.pTXD == this; }),
+        s_PendingTxdImports.end());
+}
+
+bool CClientTXD::ImportInternal(unsigned short usModelID, bool bAllowQueue)
+{
     m_strLastError.clear();
 
     if (usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST)
@@ -165,7 +210,8 @@ bool CClientTXD::Import(unsigned short usModelID)
                     return false;
                 }
 
-                if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled, &m_strLastError))
+                if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled,
+                                                                        &m_strLastError))
                 {
                     if (m_strLastError.empty())
                         m_strLastError = SString("Failed to load textures for model %d: %s", usModelID, ExtractFilename(strUseFilename).c_str());
@@ -196,11 +242,95 @@ bool CClientTXD::Import(unsigned short usModelID)
             return true;
         }
 
+        if (bAllowQueue && IsDeviceLost())
+        {
+            const std::size_t kMaxPendingImports = 2048;
+            const uint32_t    uiNow = GetTickCount32();
+
+            if (s_PendingTxdImports.size() >= kMaxPendingImports)
+            {
+                s_PendingTxdImports.erase(s_PendingTxdImports.begin());
+                if (uiNow - s_uiLastPendingImportDropLogTime >= 1000)
+                    s_uiLastPendingImportDropLogTime = uiNow;
+            }
+
+            for (const SPendingTxdImport& entry : s_PendingTxdImports)
+            {
+                if (entry.pTXD == this && entry.usModelId == usModelID)
+                    return true;
+            }
+
+            SPendingTxdImport entry;
+            entry.pTXD = this;
+            entry.usModelId = usModelID;
+            entry.uiQueuedTick = uiNow;
+            entry.ucRetryCount = 0;
+            s_PendingTxdImports.push_back(entry);
+            return true;
+        }
+
         if (m_strLastError.empty())
-            m_strLastError = SString("Cannot apply textures to model %d (already applied or invalid model)", usModelID);
+            m_strLastError = SString("Failed to apply textures to model %d (texture import failed or was deferred)", usModelID);
     }
 
     return false;
+}
+
+void CClientTXD::ProcessPendingImports()
+{
+    if (s_PendingTxdImports.empty())
+        return;
+
+    const uint32_t uiNow = GetTickCount32();
+    if (uiNow - s_uiLastPendingImportProcessTime < 250)
+        return;
+
+    s_uiLastPendingImportProcessTime = uiNow;
+
+    IDirect3DDevice9* pDevice = g_pCore ? g_pCore->GetGraphics()->GetDevice() : nullptr;
+    if (!pDevice)
+        return;
+
+    const HRESULT hr = pDevice->TestCooperativeLevel();
+    if (hr != D3D_OK)
+        return;
+
+    const uint32_t kTimeoutMs = 30000;
+    const uint8_t  kMaxRetries = 10;
+
+    for (auto it = s_PendingTxdImports.begin(); it != s_PendingTxdImports.end();)
+    {
+        SPendingTxdImport& entry = *it;
+        if (!entry.pTXD || entry.pTXD->IsBeingDeleted())
+        {
+            it = s_PendingTxdImports.erase(it);
+            continue;
+        }
+
+        if (uiNow - entry.uiQueuedTick > kTimeoutMs || entry.ucRetryCount >= kMaxRetries)
+        {
+            if (uiNow - s_uiLastPendingImportDropLogTime >= 1000)
+                s_uiLastPendingImportDropLogTime = uiNow;
+            it = s_PendingTxdImports.erase(it);
+            continue;
+        }
+
+        if (entry.pTXD->ImportInternal(entry.usModelId, false))
+        {
+            it = s_PendingTxdImports.erase(it);
+            continue;
+        }
+
+        ++entry.ucRetryCount;
+        ++it;
+    }
+}
+
+void CClientTXD::ClearPendingImports()
+{
+    s_PendingTxdImports.clear();
+    s_uiLastPendingImportProcessTime = 0;
+    s_uiLastPendingImportDropLogTime = 0;
 }
 
 bool CClientTXD::IsImportableModel(unsigned short usModelID)
@@ -283,11 +413,11 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
     CDownloadableResource* pResFile = nullptr;
     bool                   bChecksumAlreadyValidated = false;
 
-    static const CChecksum  zeroChecksum;
+    static const CChecksum zeroChecksum;
 
-    CChecksum               serverChecksum;
-    bool                   bServerHasChecksum = false;
-    long long              cachedFileSize = -1;
+    CChecksum serverChecksum;
+    bool      bServerHasChecksum = false;
+    long long cachedFileSize = -1;
 
     if (g_pClientGame)
     {
@@ -318,7 +448,8 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
             }
             if (cachedFileSize != expectedSize)
             {
-                m_strLastError = SString("Download incomplete: %s (got %lld of %lld bytes)", ExtractFilename(m_strFilename).c_str(), cachedFileSize, expectedSize);
+                m_strLastError =
+                    SString("Download incomplete: %s (got %lld of %lld bytes)", ExtractFilename(m_strFilename).c_str(), cachedFileSize, expectedSize);
                 return false;
             }
         }
@@ -357,7 +488,7 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
     if (pResFile)
     {
         const long long expectedSize = static_cast<long long>(pResFile->GetDownloadSize());
-        
+
         // Cache file size for reuse (also used in RightSizeTxd logging)
         if (cachedFileSize < 0)
             cachedFileSize = static_cast<long long>(FileSize(m_strFilename));
@@ -448,8 +579,8 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
             FileAppend(strShrunkFilename, GenerateSha256HexStringFromFile(strShrunkFilename));
             // Use cached file size if available, otherwise compute it
             const long long originalSizeKB = (cachedFileSize >= 0 ? cachedFileSize : FileSize(m_strFilename)) / 1024;
-            AddReportLog(9400, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8),
-                                       (uint)originalSizeKB, (uint)(FileSize(strShrunkFilename) / 1024)));
+            AddReportLog(9400, SString("RightSized %s(%s) from %d KB => %d KB", *ExtractFilename(m_strFilename), *strLargeSha256.Left(8), (uint)originalSizeKB,
+                                       (uint)(FileSize(strShrunkFilename) / 1024)));
         }
         else
         {

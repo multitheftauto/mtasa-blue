@@ -265,7 +265,6 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
     // clang-format on
 }
 
-
 auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector start, CVector end) -> SProcessLineOfSightMaterialInfoResult
 {
     assert(targetEntity);
@@ -274,21 +273,22 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
 
     struct Context
     {
-        float               minHitDistSq{};                    //< [squared] hit distance from the line segment's origin
-        CVector             originOS, endOS, dirOS;            //< Line origin, end and dir [in object space]
-        CMatrix             entMat, entInvMat;                 //< The hit entity's matrix, and it's inverse
-        RpTriangle*         hitTri{};                          //< The triangle hit
-        RpAtomic*           hitAtomic{};                       //< The atomic of the hit triangle's geometry
-        RpGeometry*         hitGeo{};                          //< The geometry of the hit triangle
-        CVector             hitBary{};                         //< Barycentric coordinates [on the hit triangle] of the hit
-        CVector             hitPosOS{};                        //< Hit position in object space
-        CEntitySAInterface* entity{};                          //< The hit entity
+        float               minHitDistSq{};          //< [squared] hit distance from the line segment's origin
+        CVector             originOS, endOS, dirOS;  //< Line origin, end and dir [in object space]
+        CMatrix             entMat, entInvMat;       //< The hit entity's matrix, and it's inverse
+        RpTriangle*         hitTri{};                //< The triangle hit
+        RpAtomic*           hitAtomic{};             //< The atomic of the hit triangle's geometry
+        RpGeometry*         hitGeo{};                //< The geometry of the hit triangle
+        CVector             hitBary{};               //< Barycentric coordinates [on the hit triangle] of the hit
+        CVector             hitPosOS{};              //< Hit position in object space
+        CEntitySAInterface* entity{};                //< The hit entity
     } c = {};
 
     c.entity = targetEntity;
 
-    if (!c.entity->m_pRwObject) {
-        return ret; // isValid will be false in this case
+    if (!c.entity->m_pRwObject)
+    {
+        return ret;  // isValid will be false in this case
     }
 
     // Get matrix, and it's inverse
@@ -305,50 +305,50 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
     c.originOS = c.entInvMat.TransformVector(start);
     c.endOS = c.entInvMat.TransformVector(end);
     c.dirOS = c.endOS - c.originOS;
-    c.minHitDistSq = c.dirOS.LengthSquared();            // By setting it to this value we avoid collisions that would be detected after the line segment
+    c.minHitDistSq = c.dirOS.LengthSquared();  // By setting it to this value we avoid collisions that would be detected after the line segment
     // [but are still ont the ray]
 
     // Do raycast against the DFF to get hit position material UV and name
     // This is very slow
     // Perhaps we could parallelize it somehow? [OpenMP?]
     const auto ProcessOneAtomic = [](RpAtomic* a, void* data)
+    {
+        Context* const c = static_cast<Context*>(data);
+        RwFrame* const f = RpAtomicGetFrame(a);
+
+        const auto GetFrameCMatrix = [](RwFrame* f)
         {
-            Context* const c = static_cast<Context*>(data);
-            RwFrame* const f = RpAtomicGetFrame(a);
+            CMatrix out;
+            pGame->GetRenderWare()->RwMatrixToCMatrix(*RwFrameGetMatrix(f), out);
+            return out;
+        };
 
-            const auto GetFrameCMatrix = [](RwFrame* f)
-                {
-                    CMatrix out;
-                    pGame->GetRenderWare()->RwMatrixToCMatrix(*RwFrameGetMatrix(f), out);
-                    return out;
-                };
+        // Atomic not visible
+        if (!a->renderCallback || !(a->object.object.flags & 0x04 /*rpATOMICRENDER*/))
+        {
+            return true;
+        }
 
-            // Atomic not visible
-            if (!a->renderCallback || !(a->object.object.flags & 0x04 /*rpATOMICRENDER*/))
-            {
-                return true;
-            }
+        // Sometimes atomics have no geometry [I don't think that should be possible, but okay]
+        RpGeometry* const geo = a->geometry;
+        if (!geo)
+        {
+            return true;
+        }
 
-            // Sometimes atomics have no geometry [I don't think that should be possible, but okay]
-            RpGeometry* const geo = a->geometry;
-            if (!geo)
-            {
-                return true;
-            }
+        // Calculate transformation by traversing the hierarchy from the bottom (this frame) -> top (root frame)
+        CMatrix localToObjTransform{};
+        for (RwFrame* i = f; i && i != i->root; i = RwFrameGetParent(i))
+        {
+            localToObjTransform = GetFrameCMatrix(i) * localToObjTransform;
+        }
+        const CMatrix objToLocalTransform = localToObjTransform.Inverse();
 
-            // Calculate transformation by traversing the hierarchy from the bottom (this frame) -> top (root frame)
-            CMatrix localToObjTransform{};
-            for (RwFrame* i = f; i && i != i->root; i = RwFrameGetParent(i))
-            {
-                localToObjTransform = GetFrameCMatrix(i) * localToObjTransform;
-            }
-            const CMatrix objToLocalTransform = localToObjTransform.Inverse();
+        const auto ObjectToLocalSpace = [&](const CVector& in) { return objToLocalTransform.TransformVector(in); };
 
-            const auto ObjectToLocalSpace = [&](const CVector& in) { return objToLocalTransform.TransformVector(in); };
-
-            // Transform from object space, into local (the frame's) space
-            const CVector localOrigin = ObjectToLocalSpace(c->originOS);
-            const CVector localEnd = ObjectToLocalSpace(c->endOS);
+        // Transform from object space, into local (the frame's) space
+        const CVector localOrigin = ObjectToLocalSpace(c->originOS);
+        const CVector localEnd = ObjectToLocalSpace(c->endOS);
 
 #if 0
             if (!CCollisionSA::TestLineSphere(
@@ -358,42 +358,42 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
                 return true; // Line segment doesn't touch bsp
             }
 #endif
-            const CVector localDir = localEnd - localOrigin;
+        const CVector localDir = localEnd - localOrigin;
 
-            const CVector* const verts = reinterpret_cast<CVector*>(geo->morph_target->verts);            // It's fine, trust me bro
-            for (auto i = geo->triangles_size; i-- > 0;)
+        const CVector* const verts = reinterpret_cast<CVector*>(geo->morph_target->verts);  // It's fine, trust me bro
+        for (auto i = geo->triangles_size; i-- > 0;)
+        {
+            RpTriangle* const tri = &geo->triangles[i];
+
+            // Process the line against the triangle
+            CVector hitBary, hitPos;
+            if (!localOrigin.IntersectsSegmentTriangle(localDir, verts[tri->verts[0]], verts[tri->verts[1]], verts[tri->verts[2]], &hitPos, &hitBary))
             {
-                RpTriangle* const tri = &geo->triangles[i];
-
-                // Process the line against the triangle
-                CVector hitBary, hitPos;
-                if (!localOrigin.IntersectsSegmentTriangle(localDir, verts[tri->verts[0]], verts[tri->verts[1]], verts[tri->verts[2]], &hitPos, &hitBary))
-                {
-                    continue;            // No intersection at all
-                }
-
-                // Intersection, check if it's closer than the previous one
-                const float hitDistSq = (hitPos - localOrigin).LengthSquared();
-                if (c->minHitDistSq > hitDistSq)
-                {
-                    c->minHitDistSq = hitDistSq;
-                    c->hitGeo = geo;
-                    c->hitAtomic = a;
-                    c->hitTri = tri;
-                    c->hitBary = hitBary;
-                    c->hitPosOS = localToObjTransform.TransformVector(hitPos);            // Transform back into object space
-                }
+                continue;  // No intersection at all
             }
 
-            return true;
-        };
+            // Intersection, check if it's closer than the previous one
+            const float hitDistSq = (hitPos - localOrigin).LengthSquared();
+            if (c->minHitDistSq > hitDistSq)
+            {
+                c->minHitDistSq = hitDistSq;
+                c->hitGeo = geo;
+                c->hitAtomic = a;
+                c->hitTri = tri;
+                c->hitBary = hitBary;
+                c->hitPosOS = localToObjTransform.TransformVector(hitPos);  // Transform back into object space
+            }
+        }
+
+        return true;
+    };
 
     if (c.entity->m_pRwObject->object.type == 2 /*rpCLUMP*/)
     {
         RpClumpForAllAtomics(c.entity->m_pRwObject, ProcessOneAtomic, &c);
     }
     else
-    {            // Object is a single atomic, so process directly
+    {  // Object is a single atomic, so process directly
         ProcessOneAtomic(reinterpret_cast<RpAtomic*>(c.entity->m_pRwObject), &c);
     }
 
@@ -402,22 +402,39 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
         // Now, calculate texture UV, etc based on the hit [if we've hit anything at all]
         // Since we have the barycentric coords of the hit, calculating it is easy
         ret.uv = {};
-        for (int i = 0; i < 3; i++)
+
+        // Index of the UV set to use
+        const int uvSetIdx = 0;
+
+        // Check if texcoords exist (some models only have colored mesh without textures)
+        if (c.hitGeo->texcoords[uvSetIdx])
         {
-            // UV set index - Usually models only use level 0 indices, so let's stick with that
-            const int uvSetIdx = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                // Vertex's UV position
+                RwTextureCoordinates* const vtxUV = &c.hitGeo->texcoords[uvSetIdx][c.hitTri->verts[i]];
 
-            // Vertex's UV position
-            RwTextureCoordinates* const vtxUV = &c.hitGeo->texcoords[uvSetIdx][c.hitTri->verts[i]];
-
-            // Now, just interpolate
-            ret.uv += CVector2D{vtxUV->u, vtxUV->v} * c.hitBary[i];
+                // Now, just interpolate
+                ret.uv += CVector2D{vtxUV->u, vtxUV->v} * c.hitBary[i];
+            }
+        }
+        else
+        {
+            // No texture coords available, use barycentric coords as UV fallback
+            ret.uv = CVector2D{c.hitBary.fX, c.hitBary.fY};
         }
 
         // Find out material texture name
         // For some reason this is sometimes null
-        RwTexture* const tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
-        ret.textureName = tex ? tex->name : nullptr;
+        if (c.hitGeo->materials.materials && c.hitGeo->materials.materials[c.hitTri->materialId])
+        {
+            RwTexture* const tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
+            ret.textureName = tex ? tex->name : nullptr;
+        }
+        else
+        {
+            ret.textureName = nullptr;
+        }
 
         RwFrame* const hitFrame = RpAtomicGetFrame(c.hitAtomic);
         ret.frameName = hitFrame ? hitFrame->szName : nullptr;
@@ -432,8 +449,8 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
 bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
                                   const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult, SProcessLineOfSightMaterialInfoResult* outMatInfo)
 {
-    DWORD dwPadding[100];            // stops the function missbehaving and overwriting the return address
-    dwPadding[0] = 0;                // prevent the warning and eventual compiler optimizations from removing it
+    DWORD dwPadding[100];  // stops the function missbehaving and overwriting the return address
+    dwPadding[0] = 0;      // prevent the warning and eventual compiler optimizations from removing it
 
     CColPointSA*          pColPointSA = new CColPointSA();
     CColPointSAInterface* pColPointSAInterface = pColPointSA->GetInterface();
@@ -551,14 +568,17 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
     return bReturn;
 }
 
-CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result)
+CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles,
+                                          bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result)
 {
-    auto entity = ((CEntitySAInterface*(__cdecl*)(CVector, float, CEntitySAInterface*, bool, bool, bool, bool, bool, bool))FUNC_CWorld_TestSphereAgainstWorld)(sphereCenter, radius, ignoredEntity ? ignoredEntity->GetInterface() : nullptr, checkBuildings, checkVehicles, checkPeds, checkObjects, checkDummies, cameraIgnore);
+    auto entity = ((CEntitySAInterface * (__cdecl*)(CVector, float, CEntitySAInterface*, bool, bool, bool, bool, bool, bool))
+                       FUNC_CWorld_TestSphereAgainstWorld)(sphereCenter, radius, ignoredEntity ? ignoredEntity->GetInterface() : nullptr, checkBuildings,
+                                                           checkVehicles, checkPeds, checkObjects, checkDummies, cameraIgnore);
     if (!entity)
         return nullptr;
-    
+
     result.collisionDetected = true;
-    result.modelID = entity->m_nModelIndex;   
+    result.modelID = entity->m_nModelIndex;
     if (entity->matrix)
     {
         result.entityPosition = entity->matrix->vPos;
@@ -715,27 +735,27 @@ void CWorldSA::SetOcclusionsEnabled(bool bEnabled)
 {
     if (!bEnabled)
     {
-        MemPut<BYTE>(FUNC_COcclusion_ProcessBeforeRendering, 0xC3);            // retn
+        MemPut<BYTE>(FUNC_COcclusion_ProcessBeforeRendering, 0xC3);  // retn
         MemPutFast<int>(VAR_COcclusion_NumActiveOccluders, 0);
-        MemCpy((void*)CALL_CCullZones_FindTunnelAttributesForCoors, "\xB8\x80\x28\x00\x00", 5);            // mov eax, 0x2880
+        MemCpy((void*)CALL_CCullZones_FindTunnelAttributesForCoors, "\xB8\x80\x28\x00\x00", 5);  // mov eax, 0x2880
     }
     else
     {
-        MemPut<BYTE>(FUNC_COcclusion_ProcessBeforeRendering, 0x51);                                        // Standard value
-        MemCpy((void*)CALL_CCullZones_FindTunnelAttributesForCoors, "\xE8\xDE\x82\x1D\x00", 5);            // call 0x72D9F0
+        MemPut<BYTE>(FUNC_COcclusion_ProcessBeforeRendering, 0x51);                              // Standard value
+        MemCpy((void*)CALL_CCullZones_FindTunnelAttributesForCoors, "\xE8\xDE\x82\x1D\x00", 5);  // call 0x72D9F0
     }
 }
 
 bool CWorldSA::GetOcclusionsEnabled()
 {
-    if (*(BYTE*)FUNC_COcclusion_ProcessBeforeRendering == 0x51)            // Is standard value ?
+    if (*(BYTE*)FUNC_COcclusion_ProcessBeforeRendering == 0x51)  // Is standard value ?
         return true;
     return false;
 }
 
 void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition)
 {
-    DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition;            // __cdecl
+    DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition;  // __cdecl
 
     // clang-format off
     __asm
@@ -769,8 +789,10 @@ int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutT
             {
                 SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
 
-                float fDistance = sqrtf(powf(vecPosition.fZ - railNode.sZ * 0.125f, 2) + powf(vecPosition.fY - railNode.sY * 0.125f, 2) +
-                                       powf(vecPosition.fX - railNode.sX * 0.125f, 2));
+                const float fDeltaZ = vecPosition.fZ - railNode.sZ * 0.125f;
+                const float fDeltaY = vecPosition.fY - railNode.sY * 0.125f;
+                const float fDeltaX = vecPosition.fX - railNode.sX * 0.125f;
+                const float fDistance = std::sqrt(fDeltaZ * fDeltaZ + fDeltaY * fDeltaY + fDeltaX * fDeltaX);
                 if (fDistance < fMinDistance)
                 {
                     fMinDistance = fDistance;
@@ -934,4 +956,4 @@ namespace
         0x10, 0x10, 0x00, 0x00, 0x04, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x02, 0x04, 0x10, 0x10, 0x00, 0x0a, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x02, 0x01, 0x10,
         0x10, 0x00, 0x12, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x02, 0x01, 0x90, 0x01, 0x00, 0x22, 0x00, 0x00};
     static_assert(sizeof(CSurfaceType) == sizeof(aOriginalSurfaceInfo), "invalid size of aOriginalSurfaceInfo");
-}            // namespace
+}  // namespace

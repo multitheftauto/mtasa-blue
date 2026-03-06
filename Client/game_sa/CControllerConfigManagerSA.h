@@ -13,12 +13,12 @@
 
 #include <game/CControllerConfigManager.h>
 
-#define FUNC_SetControllerKeyAssociatedWithAction       0x530490
-#define FUNC_GetControllerKeyAssociatedWithAction       0x52F4F0
-#define FUNC_GetNumOfSettingsForAction                  0x52F4A0
-#define FUNC_ClearSettingsAssociatedWithAction          0x52FD70
+#define FUNC_SetControllerKeyAssociatedWithAction 0x530490
+#define FUNC_GetControllerKeyAssociatedWithAction 0x52F4F0
+#define FUNC_GetNumOfSettingsForAction            0x52F4A0
+#define FUNC_ClearSettingsAssociatedWithAction    0x52FD70
 
-#define CLASS_CControllerConfigManager                  0xB70198
+#define CLASS_CControllerConfigManager 0xB70198
 
 class CControllerConfigManagerSA : public CControllerConfigManager
 {

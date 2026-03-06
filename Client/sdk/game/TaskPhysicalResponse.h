@@ -16,7 +16,7 @@
 class CTaskSimpleChoking : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleChoking(){};
+    virtual ~CTaskSimpleChoking() {};
 
     virtual CPed*        GetAttacker() = 0;
     virtual unsigned int GetTimeRemaining() = 0;

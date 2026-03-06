@@ -203,7 +203,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 
 ;@INSERT_TRANSLATIONS@
 
-LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.multitheftauto.com."
+LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "Multi Theft Auto does not support Windows XP or Vista.  Please upgrade your computer."
 LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
 LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
@@ -256,15 +256,26 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
 
+    # MTA isn't supported on XP/Vista
     ${If} ${AtMostWinVista}
         MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
         ExecShell "open" "https://multitheftauto.com"
         Quit
-    ${ElseIf} ${AtMostWin8.1}
-        MessageBox MB_OK "$(GET_WIN81_PLEASE)"
-        ExecShell "open" "https://multitheftauto.com"
-        Quit
     ${EndIf}
+
+    !ifdef MTA_MAETRO
+        ${If} ${AtLeastWin10}
+            MessageBox MB_OK "$(GET_MASTER_PLEASE)"
+            ExecShell "open" "https://multitheftauto.com"
+            Quit
+        ${EndIf}
+    !else
+        ${If} ${AtMostWin8.1}
+            MessageBox MB_OK "$(GET_WIN81_PLEASE)"
+            ExecShell "open" "https://multitheftauto.com"
+            Quit
+        ${EndIf}
+    !endif
 
     File /oname=$TEMP\image.bmp "connect.bmp"
 
@@ -707,11 +718,21 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
         File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
         File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
-        File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+        !ifdef MTA_MAETRO
+            File /oname=d3dcompiler_47.dll "${FILES_ROOT}\mta\d3dcompiler_47.maetro.dll"
+            File "${FILES_ROOT}\maetro32.dll"
+            File "${FILES_ROOT}\mta\maetro64.dll"
+        !else
+            File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+        !endif
 
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
+
+        !ifdef MTA_MAETRO
+            File "${FILES_ROOT}\maetro32.dll"
+        !endif
 
 
 	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
@@ -727,7 +748,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         #File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
         #File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
         #File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
-		
+
 	# Below file was included in the deprecation referenced above, but already disabled in MTA beforehand
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
 
@@ -750,7 +771,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
 
             File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
-            File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+            !ifdef MTA_MAETRO
+                File /oname=d3dcompiler_47.dll "${FILES_ROOT}\mta\d3dcompiler_47.maetro.dll"
+            !else
+                File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+            !endif
 
             SetOutPath "$INSTDIR\MTA\data"
             File "${FILES_ROOT}\mta\data\gta_sa_diff.dat"
@@ -828,6 +853,10 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SetOutPath "$INSTDIR"
         File "${FILES_ROOT}\Multi Theft Auto.exe"
 
+        !ifdef MTA_MAETRO
+            File "${FILES_ROOT}\maetro32.dll"
+        !endif
+
         # Ensure exe file can be updated without admin
         AccessControl::GrantOnFile "$INSTDIR\Multi Theft Auto.exe" "($PermissionsGroup)" "FullAccess"
 
@@ -867,6 +896,9 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
+        !ifdef MTA_MAETRO
+            File "${FILES_ROOT}\maetro32.dll"
+        !endif
         ${LogText} "-Section end - SERVER CORE"
     SectionEnd
 
@@ -1108,45 +1140,25 @@ Section Uninstall
 
     preservemapsfolder:
         Call un.DoServiceUninstall
-        ; server CORE FILES
-        Delete "$INSTDIR\server\core.dll"
-        Delete "$INSTDIR\server\MTA Server.exe"
-        Delete "$INSTDIR\server\net.dll"
-        Delete "$INSTDIR\server\pthread.dll"
-        Delete "$INSTDIR\server\xmll.dll"
-
         ; server files
-        Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\libcrypto-3.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\libssl-3.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
-
-        ; server x64 CORE FILES
-        Delete "$INSTDIR\server\MTA Server64.exe"
-        Delete "$INSTDIR\server\x64\core.dll"
-        Delete "$INSTDIR\server\x64\net.dll"
-        Delete "$INSTDIR\server\x64\pthread.dll"
-        Delete "$INSTDIR\server\x64\xmll.dll"
+        Delete "$INSTDIR\server\MTA Server.exe"
+        Delete "$INSTDIR\server\*.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\*.dll"
 
         ; server x64 files
-        Delete "$INSTDIR\server\x64\dbconmy.dll"
-        Delete "$INSTDIR\server\x64\deathmatch.dll"
-        Delete "$INSTDIR\server\x64\libmysql.dll"
-        Delete "$INSTDIR\server\x64\libcrypto-3-x64.dll"
-        Delete "$INSTDIR\server\x64\libssl-3-x64.dll"
-        Delete "$INSTDIR\server\x64\lua5.1.dll"
-        Delete "$INSTDIR\server\x64\pcre3.dll"
+        Delete "$INSTDIR\server\MTA Server64.exe"
+        Delete "$INSTDIR\server\x64\*.dll"
         RmDir "$INSTDIR\server\x64"
 
         Delete "$INSTDIR\Multi Theft Auto.exe"
         Delete "$INSTDIR\Multi Theft Auto.exe.dat"
         Delete "$INSTDIR\Uninstall.exe"
 
-        Delete "$INSTDIR\mods\deathmatch\client.dll"
-        Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
+        !ifdef MTA_MAETRO
+            Delete "$INSTDIR\maetro32.dll"
+        !endif
+
+        Delete "$INSTDIR\mods\deathmatch\*.dll"
 
         RmDir /r "$INSTDIR\MTA\cgui"
         RmDir /r "$INSTDIR\MTA\data"

@@ -1,0 +1,5 @@
+---
+Checks: 'readability-braces-around-statements,modernize-redundant-void-arg'
+CheckOptions:
+  - key: readability-braces-around-statements.ShortStatementLines
+    value: '2'

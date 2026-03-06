@@ -9,8 +9,15 @@ local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "143.0.13+g30cb3bd+chromium-143.0.7499.170"
-local CEF_HASH = "eba58e6abd6dba6abf2ec70d4bba6c084b4ae3a21b3ddaf758c1eb82b33b4106"
+local CEF_VERSION = "144.0.13+g9f739aa+chromium-144.0.7559.133"
+local CEF_HASH = "f39f2c31a2ac08f4e134b147072708468dc0861ca35ddcd333f4a8494beb3433"
+
+-- Stuck in the past for maetro
+if os.getenv("MTA_MAETRO") == "true" then
+	CEF_URL_PREFIX = "https://mirror-cdn.multitheftauto.com/vendor/cef/cef_binary_"
+	CEF_VERSION = "109.1.18+gf1c41e4+chromium-109.0.5414.120"
+	CEF_HASH = "ac78ea1e9f9d386130de16ca951acef1ba5a37ad9aef9d66f3d5f3529672c21c"
+end
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..CEF_VERSION..CEF_URL_SUFFIX

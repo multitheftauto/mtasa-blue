@@ -17,7 +17,7 @@
 #pragma once
 
 // ignore the return type warning for the -> operator when we are potentially using pointers themselves
-#pragma warning(disable:4284)
+#pragma warning(disable : 4284)
 
 #include <windows.h>
 
@@ -271,7 +271,7 @@ public:
     void remove(CIterator& itNode, BOOL bIterateForwards = TRUE)
     {
         CNode<T>* pTempNode = itNode.m_pCurrent;
-        CNode<T>* pTempSingleNode = NULL;            // will be used if only a single node remains
+        CNode<T>* pTempSingleNode = NULL;  // will be used if only a single node remains
 
         BOOL bIteratorSet = FALSE;
 

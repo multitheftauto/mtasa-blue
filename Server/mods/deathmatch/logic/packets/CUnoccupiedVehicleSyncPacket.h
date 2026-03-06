@@ -26,7 +26,7 @@ public:
     };
 
 public:
-    CUnoccupiedVehicleSyncPacket(){};
+    CUnoccupiedVehicleSyncPacket() {};
     ~CUnoccupiedVehicleSyncPacket();
 
     ePacketID     GetPacketID() const { return PACKET_ID_UNOCCUPIED_VEHICLE_SYNC; };

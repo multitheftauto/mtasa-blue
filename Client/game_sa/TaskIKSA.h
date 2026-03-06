@@ -17,11 +17,11 @@
 
 typedef DWORD IKChain_c;
 
-#define FUNC_CTaskSimpleIKChain__Constructor            0x6339C0
-#define FUNC_CTaskSimpleIKLookAt__Constructor           0x633E00
-#define FUNC_CTaskSimpleIKManager__Constructor          0x6337F0
+#define FUNC_CTaskSimpleIKChain__Constructor   0x6339C0
+#define FUNC_CTaskSimpleIKLookAt__Constructor  0x633E00
+#define FUNC_CTaskSimpleIKManager__Constructor 0x6337F0
 
-#define FUNC_CTaskSimpleTriggerLookAt__Constructor      0x634440
+#define FUNC_CTaskSimpleTriggerLookAt__Constructor 0x634440
 
 // ##############################################################################
 // ## Name:    CTaskSimpleIKChain
@@ -58,7 +58,7 @@ public:
 class CTaskSimpleIKChainSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleIKChain
 {
 public:
-    CTaskSimpleIKChainSA(){};
+    CTaskSimpleIKChainSA() {};
     CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, CVector effectorVec, int pivotBoneTag, CEntity* pEntity, int offsetBoneTag, CVector offsetPos,
                          float speed, int time = 99999999, int blendTime = 1000);
 };
@@ -78,7 +78,7 @@ public:
 class CTaskSimpleIKLookAtSA : public virtual CTaskSimpleIKChainSA, public virtual CTaskSimpleIKLookAt
 {
 public:
-    CTaskSimpleIKLookAtSA(){};
+    CTaskSimpleIKLookAtSA() {};
     CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso = false, float speed = 0.25f,
                           int blendTime = 1000, int m_priority = 3);
 };
@@ -154,7 +154,7 @@ public:
 class CTaskSimpleTriggerLookAtSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleTriggerLookAt
 {
 public:
-    CTaskSimpleTriggerLookAtSA(){};
+    CTaskSimpleTriggerLookAtSA() {};
     CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso = false, float speed = 0.25f,
                                int blendTime = 1000, int priority = 3);
 };

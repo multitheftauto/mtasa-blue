@@ -11,10 +11,10 @@
 
 #include "StdInc.h"
 
-#define     FUNC_CPedModelInfo_DeleteRwObject               0x04C6C50
-#define     FUNC_CPedModelInfo_SetClump                     0x04C7340
-#define     FUNC_CClumpModelInfo_SetClump                   0x04C4F70
-DWORD       ADDR_CPedModelInfo_SetClump_AfterHook           = 0x04C7349;
+#define FUNC_CPedModelInfo_DeleteRwObject 0x04C6C50
+#define FUNC_CPedModelInfo_SetClump       0x04C7340
+#define FUNC_CClumpModelInfo_SetClump     0x04C4F70
+DWORD ADDR_CPedModelInfo_SetClump_AfterHook = 0x04C7349;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -65,9 +65,9 @@ void      OnMy_CClothesDeleteRwObject()
 }
 
 // Hook info
-#define HOOKPOS_CClothesDeleteRwObject                          0x5A8243
-#define HOOKSIZE_CClothesDeleteRwObject                         5
-DWORD RETURN_CClothesDeleteRwObject = 0x5A8248;
+#define HOOKPOS_CClothesDeleteRwObject  0x5A8243
+#define HOOKSIZE_CClothesDeleteRwObject 5
+DWORD                         RETURN_CClothesDeleteRwObject = 0x5A8248;
 static void __declspec(naked) HOOK_CClothesDeleteRwObject()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -120,9 +120,9 @@ void OnMy_PostCPedDress()
 }
 
 // Hook info
-#define HOOKPOS_PostCPedDress                           0x5A835C
-#define HOOKSIZE_PostCPedDress                          5
-DWORD RETURN_PostCPedDress = 0x5A8361;
+#define HOOKPOS_PostCPedDress  0x5A835C
+#define HOOKSIZE_PostCPedDress 5
+DWORD                         RETURN_PostCPedDress = 0x5A8361;
 static void __declspec(naked) HOOK_PostCPedDress()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

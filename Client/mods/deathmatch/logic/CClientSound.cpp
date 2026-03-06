@@ -388,7 +388,7 @@ double CClientSound::GetLength(bool bAvoidLoad)
     {
         // Not loaded by this entity yet
 
-#if 0       // TODO
+#if 0  // TODO
         if ( bAvoidLoad )
         {
             // Caller wants to avoid loading the file to find out the length,
@@ -508,14 +508,14 @@ void CClientSound::SetPaused(bool bPaused)
         {
             // call onClientSoundStopped
             CLuaArguments Arguments;
-            Arguments.PushString("paused");            // Reason
+            Arguments.PushString("paused");  // Reason
             this->CallEvent("onClientSoundStopped", Arguments, false);
         }
         else
         {
             // call onClientSoundStarted
             CLuaArguments Arguments;
-            Arguments.PushString("resumed");            // Reason
+            Arguments.PushString("resumed");  // Reason
             this->CallEvent("onClientSoundStarted", Arguments, false);
         }
     }
@@ -756,7 +756,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
                     if (Create())
                     {
                         CLuaArguments Arguments;
-                        Arguments.PushString("enabled");            // Reason
+                        Arguments.PushString("enabled");  // Reason
                         CallEvent("onClientSoundStarted", Arguments, false);
                     }
                 }
@@ -766,7 +766,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
         {
             Destroy();
             CLuaArguments Arguments;
-            Arguments.PushString("disabled");            // Reason
+            Arguments.PushString("disabled");  // Reason
             CallEvent("onClientSoundStopped", Arguments, false);
         }
     }

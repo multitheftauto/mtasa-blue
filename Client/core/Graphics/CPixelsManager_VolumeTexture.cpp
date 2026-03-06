@@ -400,7 +400,7 @@ bool CPixelsManager::D3DXGetVolumePixels(IDirect3DVolumeTexture9* pD3DVolumeText
 
     bool bNeedToConvert = dxFileFormat == D3DXIFF_DDS;
     if (bNeedToConvert && Desc.Format == dxFormat && !bMipMaps)
-        bNeedToConvert = false; // No need to convert DDS if compression is the same and no mipmaps required
+        bNeedToConvert = false;  // No need to convert DDS if compression is the same and no mipmaps required
 
     ID3DXBuffer*                dxBuffer;
     CAutoReleaseMe<ID3DXBuffer> Thanks2(dxBuffer);

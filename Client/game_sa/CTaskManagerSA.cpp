@@ -26,7 +26,7 @@ CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface* taskManagerInterface, CP
 
 void CTaskManagerSA::RemoveTask(const int iTaskPriority)
 {
-    if (iTaskPriority != TASK_PRIORITY_DEFAULT)            // TASK_PRIORITY_DEFAULT removed = crash
+    if (iTaskPriority != TASK_PRIORITY_DEFAULT)  // TASK_PRIORITY_DEFAULT removed = crash
     {
         SetTask(NULL, iTaskPriority);
     }

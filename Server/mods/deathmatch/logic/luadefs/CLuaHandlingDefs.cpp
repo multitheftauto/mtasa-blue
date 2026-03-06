@@ -98,7 +98,7 @@ int CLuaHandlingDefs::SetVehicleHandling(lua_State* luaVM)
                             }
                             break;
                         }
-                        case HANDLING_PERCENTSUBMERGED:            // unsigned int
+                        case HANDLING_PERCENTSUBMERGED:  // unsigned int
                         // case HANDLING_MONETARY:
                         case HANDLING_HANDLINGFLAGS:
                         case HANDLING_MODELFLAGS:
@@ -275,7 +275,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                                     }
                                     break;
                                 }
-                                case HANDLING_PERCENTSUBMERGED:            // unsigned int
+                                case HANDLING_PERCENTSUBMERGED:  // unsigned int
                                 // case HANDLING_MONETARY:
                                 case HANDLING_HANDLINGFLAGS:
                                 case HANDLING_MODELFLAGS:
@@ -498,7 +498,7 @@ int CLuaHandlingDefs::GetVehicleHandling(lua_State* luaVM)
             lua_pushstring(luaVM, "rwd");
         else if (eDriveType == CHandlingEntry::FOURWHEEL)
             lua_pushstring(luaVM, "awd");
-        else            // What the ... (yeah, security)
+        else  // What the ... (yeah, security)
             lua_pushnil(luaVM);
         lua_setfield(luaVM, -2, "driveType");
 
@@ -664,7 +664,7 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
                     lua_pushstring(luaVM, "rwd");
                 else if (eDriveType == CHandlingEntry::FOURWHEEL)
                     lua_pushstring(luaVM, "awd");
-                else            // What the ... (yeah, security)
+                else  // What the ... (yeah, security)
                     lua_pushnil(luaVM);
                 lua_setfield(luaVM, -2, "driveType");
 
@@ -828,7 +828,7 @@ int CLuaHandlingDefs::GetOriginalHandling(lua_State* luaVM)
                     lua_pushstring(luaVM, "rwd");
                 else if (eDriveType == CHandlingEntry::FOURWHEEL)
                     lua_pushstring(luaVM, "awd");
-                else            // What the ... (yeah, security)
+                else  // What the ... (yeah, security)
                     lua_pushnil(luaVM);
                 lua_setfield(luaVM, -2, "driveType");
                 CHandlingEntry::eEngineType eEngineType = entry->GetCarEngineType();

@@ -65,7 +65,7 @@ public:
     static void SetRightJustifyWrap(float wrap);
 
     static void SetDropShadowPosition(std::int16_t offset);
-    static void SetEdge(std::int16_t edgeSize);            // outline
+    static void SetEdge(std::int16_t edgeSize);  // outline
 
     static void SetProportional(bool enable);
 

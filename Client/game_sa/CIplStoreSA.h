@@ -23,7 +23,7 @@ public:
     ~CIplStoreSA() = default;
 
     void SetDynamicIplStreamingEnabled(bool state);
-    void SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface *ipl)> filter);
+    void SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface* ipl)> filter);
 
 private:
     void UnloadAndDisableStreaming(int iplId);

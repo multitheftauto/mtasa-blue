@@ -48,7 +48,7 @@ CServerInfo::CServerInfo()
     unsigned int LabelPosX = LabelTitlePosX + LabelTitleSizeX + 2;
     unsigned int LabelSizeX = INFO_WINDOW_DEFAULTWIDTH;
     unsigned int LabelSizeY = 15;
-    unsigned int DrawPosY = 10;            // Start position
+    unsigned int DrawPosY = 10;  // Start position
     // Server Name
     m_pServerNameLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Name:")));
     m_pServerNameLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
@@ -178,7 +178,7 @@ CServerInfo::CServerInfo()
     m_pCheckboxAutojoin->AutoSize(m_pCheckboxAutojoin->GetText().c_str(), 20.0f, LabelSizeY);
     m_pCheckboxAutojoin->SetPosition(
         CVector2D((INFO_WINDOW_DEFAULTWIDTH - m_pCheckboxAutojoin->GetSize().fX) / 2, DrawPosY - INFO_WINDOW_VSPACING - LabelSizeY * 2),
-        false);            // Horizontally center align
+        false);  // Horizontally center align
 }
 
 CServerInfo::~CServerInfo()
@@ -373,8 +373,7 @@ void CServerInfo::SetServerInformation(const char* szHost, unsigned short usPort
         strAddressHost = szHost;
     m_Server.strHost = strAddressHost;
     m_Server.strEndpoint = SString("%s:%u", *strAddressHost, m_Server.usGamePort);
-    m_Server.strEndpointSortKey =
-        SString("%02x%02x%02x%02x-%04x", addressBytes[0], addressBytes[1], addressBytes[2], addressBytes[3], m_Server.usGamePort);
+    m_Server.strEndpointSortKey = SString("%02x%02x%02x%02x-%04x", addressBytes[0], addressBytes[1], addressBytes[2], addressBytes[3], m_Server.usGamePort);
 
     if (pInitialServerListItem && CServerListItem::StaticIsValid(pInitialServerListItem))
     {
@@ -457,8 +456,7 @@ void CServerInfo::DoPulse()
         {
             ResetServerGUI(&m_Server);
 
-            if (m_pCurrentWindowType == eWindowTypes::SERVER_INFO_QUEUE && m_pCheckboxAutojoin->GetSelected() &&
-                m_Server.nPlayers < m_Server.nMaxPlayers)
+            if (m_pCurrentWindowType == eWindowTypes::SERVER_INFO_QUEUE && m_pCheckboxAutojoin->GetSelected() && m_Server.nPlayers < m_Server.nMaxPlayers)
             {
                 Connect();
                 return;
@@ -535,12 +533,12 @@ void CServerInfo::Connect()
     std::string strPassword = m_strPassword;
     if (m_pCurrentWindowType == eWindowTypes::SERVER_INFO_PASSWORD)
         strPassword = m_pEnterPasswordEdit->GetText();
-    else if (m_Server.bPassworded)            // If we're not in a passworded window, but the server is passworded
+    else if (m_Server.bPassworded)  // If we're not in a passworded window, but the server is passworded
     {
         // Try to grab a saved password
         strPassword = g_pCore->GetLocalGUI()->GetMainMenu()->GetServerBrowser()->GetServerPassword(m_Server.GetEndpoint().c_str());
 
-        if (strPassword.empty())            // No password could be found, repopup the window in password mode.
+        if (strPassword.empty())  // No password could be found, repopup the window in password mode.
         {
             Show(eWindowTypes::SERVER_INFO_PASSWORD, m_Server.strHost.c_str(), m_Server.usGamePort, "", &m_Server);
             return;
@@ -561,7 +559,7 @@ void CServerInfo::ResetServerGUI(CServerListItem* pServer)
     m_pGamemodeLabel->SetText(pServer->strGameMode.c_str());
     m_pMapLabel->SetText(pServer->strMap.c_str());
     m_pPlayersLabel->SetText(SString("%d / %d %s", pServer->nPlayers, pServer->nMaxPlayers, *strVerified).c_str());
-    
+
     m_pPasswordedLabel->SetText(pServer->bPassworded ? _("Yes") : _("No"));
     m_pLatencyLabel->SetText(SString("%i", pServer->nPing));
 

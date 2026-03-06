@@ -14,6 +14,8 @@
 #include "profiler/SharedUtil.Profiler.h"
 #include "CServerIdManager.h"
 
+#include <limits>
+
 using namespace std;
 
 extern CClientGame* g_pClientGame;
@@ -39,7 +41,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
     m_pLuaManager = g_pClientGame->GetLuaManager();
     m_pRootEntity = g_pClientGame->GetRootEntity();
-    m_pDefaultElementGroup = new CElementGroup();            // for use by scripts
+    m_pDefaultElementGroup = new CElementGroup();  // for use by scripts
     m_pResourceEntity = pResourceEntity;
     m_pResourceDynamicEntity = pResourceDynamicEntity;
 
@@ -114,11 +116,11 @@ CResource::~CResource()
 
     // Remove all keybinds on this VM
     g_pClientGame->GetScriptKeyBinds()->RemoveAllKeys(m_pLuaVM);
-    
+
     // Remove all resource-specific command bindings while preserving user bindings
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     pKeyBinds->SetAllCommandsActive(m_strResourceName, false);
-    
+
     // Additional cleanup: remove any remaining resource bindings that weren't caught by SetAllCommandsActive
     for (auto& bind : *pKeyBinds)
     {
@@ -382,7 +384,16 @@ void CResource::Stop()
         {
             discord->ResetDiscordData();
             discord->SetPresenceState(_("In-game"), false);
-            discord->SetPresenceStartTimestamp(static_cast<unsigned long>(time(nullptr)));
+            const time_t  now = time(nullptr);
+            unsigned long startTimestamp = 0;
+            if (now > 0)
+            {
+                const auto maxValue = std::numeric_limits<unsigned long>::max();
+                const auto nowUnsigned = static_cast<unsigned long long>(now);
+                startTimestamp = (nowUnsigned > maxValue) ? maxValue : static_cast<unsigned long>(now);
+            }
+
+            discord->SetPresenceStartTimestamp(startTimestamp);
             discord->UpdatePresence();
         }
     }

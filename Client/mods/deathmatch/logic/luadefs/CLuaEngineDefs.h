@@ -74,7 +74,7 @@ public:
     static bool                                            EngineRemoveImage(CClientIMG* pImg);
     static uint                                            EngineImageGetFilesCount(CClientIMG* pImg);
     static bool                                            EngineImageLinkDFF(CClientIMG* pImg, std::variant<size_t, std::string_view> file, uint uiModelID);
-    static bool                                            EngineImageLinkTXD(CClientIMG* pImg, std::variant<size_t, std::string_view> file, uint uiModelID);
+    static bool                                            EngineImageLinkTXD(CClientIMG* pImg, std::variant<size_t, std::string_view> file, uint uiTxdID);
     static bool                                            EngineRestoreDFFImage(uint uiModelID);
     static bool                                            EngineRestoreTXDImage(uint uiModelID);
     static std::vector<std::string_view>                   EngineImageGetFileList(CClientIMG* pImg);
@@ -89,7 +89,7 @@ public:
     static bool   EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t newSize);
 
     static std::variant<bool, uint> EngineRequestTXD(lua_State* const luaVM, std::string strTxdName);
-    static bool EngineFreeTXD(uint txdID);
+    static bool                     EngineFreeTXD(uint txdID);
 
     static bool EngineStreamingRequestModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking);
     static bool EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference);

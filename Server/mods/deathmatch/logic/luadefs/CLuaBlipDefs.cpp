@@ -17,14 +17,18 @@
 
 static constexpr std::uint8_t MAX_BLIP_SIZE = 25;
 
-std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, const CVector vecPosition, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance, std::optional<CElement*> visibleTo)
+std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, const CVector vecPosition, std::optional<std::uint8_t> icon,
+                                                    std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
+                                                    std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering,
+                                                    std::optional<std::uint16_t> visibleDistance, std::optional<CElement*> visibleTo)
 {
     if (icon.has_value() && !CBlipManager::IsValidIcon(icon.value()))
         throw std::invalid_argument("Invalid icon");
 
     if (size.has_value() && size.value() > MAX_BLIP_SIZE)
     {
-        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.", MAX_BLIP_SIZE, size.value(), MAX_BLIP_SIZE));
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.",
+                                                      MAX_BLIP_SIZE, size.value(), MAX_BLIP_SIZE));
         size = MAX_BLIP_SIZE;
     }
 
@@ -41,14 +45,19 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, const CVec
     return radarMarker;
 }
 
-std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, CElement* entity, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance, std::optional<CElement*> visibleTo)
+std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, CElement* entity, std::optional<std::uint8_t> icon,
+                                                              std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
+                                                              std::optional<std::uint8_t> b, std::optional<std::uint8_t> a,
+                                                              std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance,
+                                                              std::optional<CElement*> visibleTo)
 {
     if (icon.has_value() && !CBlipManager::IsValidIcon(icon.value()))
         throw std::invalid_argument("Invalid icon");
 
     if (size.has_value() && size.value() > MAX_BLIP_SIZE)
     {
-        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.", MAX_BLIP_SIZE, size.value(), MAX_BLIP_SIZE));
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.",
+                                                      MAX_BLIP_SIZE, size.value(), MAX_BLIP_SIZE));
         size = MAX_BLIP_SIZE;
     }
 
@@ -104,7 +113,8 @@ bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* radarMarker, std::uin
 {
     if (size > MAX_BLIP_SIZE)
     {
-        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.", MAX_BLIP_SIZE, size, MAX_BLIP_SIZE));
+        m_pScriptDebugging->LogWarning(
+            luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.", MAX_BLIP_SIZE, size, MAX_BLIP_SIZE));
         size = MAX_BLIP_SIZE;
     }
 

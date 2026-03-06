@@ -17,14 +17,14 @@
 #define PI_2 6.283185307179586476925286766559f
 
 // Camera FOV constants
-constexpr const std::uintptr_t VAR_CurrentCameraFOV = 0x8D5038; // CCamera::CurrentFOV
+constexpr const std::uintptr_t VAR_CurrentCameraFOV = 0x8D5038;  // CCamera::CurrentFOV
 
 namespace
 {
-    constexpr float kPi = 3.1415926535897932384626433832795f;
-    constexpr float kMatrixTolerance = 1e-4f;
-    constexpr float kAngleTolerance = 1e-4f;
-    constexpr float kRollLookupStep = 15.0f;
+    constexpr float       kPi = 3.1415926535897932384626433832795f;
+    constexpr float       kMatrixTolerance = 1e-4f;
+    constexpr float       kAngleTolerance = 1e-4f;
+    constexpr float       kRollLookupStep = 15.0f;
     constexpr std::size_t kRollLookupSize = static_cast<std::size_t>(360.0f / kRollLookupStep);
 
     struct RollLookupEntry
@@ -34,7 +34,8 @@ namespace
         float sinValue;
     };
 
-    const std::array<RollLookupEntry, kRollLookupSize> kRollLookup = []() {
+    const std::array<RollLookupEntry, kRollLookupSize> kRollLookup = []()
+    {
         std::array<RollLookupEntry, kRollLookupSize> table = {};
         for (std::size_t i = 0; i < kRollLookupSize; ++i)
         {
@@ -92,9 +93,9 @@ namespace
     inline bool RequiresOrthonormalization(const CMatrix& matrix) noexcept
     {
         constexpr float lengthTarget = 1.0f;
-        const bool frontValid = AlmostEqual(matrix.vFront.LengthSquared(), lengthTarget, 1e-3f);
-        const bool upValid = AlmostEqual(matrix.vUp.LengthSquared(), lengthTarget, 1e-3f);
-        const bool orthogonal = AlmostEqual(matrix.vFront.DotProduct(&matrix.vUp), 0.0f, 1e-3f);
+        const bool      frontValid = AlmostEqual(matrix.vFront.LengthSquared(), lengthTarget, 1e-3f);
+        const bool      upValid = AlmostEqual(matrix.vUp.LengthSquared(), lengthTarget, 1e-3f);
+        const bool      orthogonal = AlmostEqual(matrix.vFront.DotProduct(&matrix.vUp), 0.0f, 1e-3f);
         return !(frontValid && upValid && orthogonal);
     }
 
@@ -787,7 +788,7 @@ CClientEntity* CClientCamera::GetTargetEntity()
     CClientEntity* pReturn = NULL;
     if (m_pCamera)
     {
-        CCam*    pCam = m_pCamera->GetCam(m_pCamera->GetActiveCam());
+        CCam* pCam = m_pCamera->GetCam(m_pCamera->GetActiveCam());
         if (!pCam)
             return nullptr;
 
@@ -864,7 +865,7 @@ CMatrix CClientCamera::GetGtaMatrix() const
     matResult.vFront = *pCam->GetFront();
     matResult.vUp = *pCam->GetUp();
     matResult.vPos = *pCam->GetSource();
-    matResult.vRight = -matResult.vRight;            // Camera has this the other way
+    matResult.vRight = -matResult.vRight;  // Camera has this the other way
     matResult.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
     return matResult;
 }
@@ -877,9 +878,7 @@ void CClientCamera::SetGtaMatrix(const CMatrix& matInNew, CCam* pCam) const
     if (!m_pCamera)
         return;
 
-    auto isFiniteVector = [](const CVector& vec) {
-        return std::isfinite(vec.fX) && std::isfinite(vec.fY) && std::isfinite(vec.fZ);
-    };
+    auto isFiniteVector = [](const CVector& vec) { return std::isfinite(vec.fX) && std::isfinite(vec.fY) && std::isfinite(vec.fZ); };
 
     if (!isFiniteVector(matInNew.vFront) || !isFiniteVector(matInNew.vUp) || !isFiniteVector(matInNew.vRight) || !isFiniteVector(matInNew.vPos))
         return;
@@ -890,7 +889,7 @@ void CClientCamera::SetGtaMatrix(const CMatrix& matInNew, CCam* pCam) const
 
     CMatrix matNew = matInNew;
     EnsureOrthonormal(matNew);
-    matNew.vRight = -matNew.vRight;            // Camera has this the other way
+    matNew.vRight = -matNew.vRight;  // Camera has this the other way
     m_pCamera->SetMatrix(&matNew);
     *targetCam->GetUp() = matNew.vUp;
     *targetCam->GetFront() = matNew.vFront;
@@ -1003,7 +1002,7 @@ CMatrix CClientCamera::GetInterpolatedCameraMatrix() const
     CMatrix matrix;
     if (m_pCamera && m_pCamera->GetTransitionMatrix(matrix))
         return matrix;
-    
+
     return CMatrix();
 }
 
@@ -1011,9 +1010,9 @@ float CClientCamera::GetAccurateFOV() const
 {
     if (!m_pCamera)
         return DEFAULT_FOV;
-    
+
     if (IsInCameraTransition())
         return m_pCamera->GetTransitionFOV();
-    
+
     return *(float*)VAR_CurrentCameraFOV;
 }

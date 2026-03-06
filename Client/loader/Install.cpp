@@ -572,7 +572,7 @@ static int RunInstall()
     {
         SString archiveDirectory, archiveFileName;
         sourceRoot.Split("\\", &archiveDirectory, &archiveFileName, -1);
-        archiveFileName = archiveFileName.SubStr(1).SplitLeft("_tmp_", nullptr, -1);            // Cut archive name out of '_<archiveFileName>_tmp_'
+        archiveFileName = archiveFileName.SubStr(1).SplitLeft("_tmp_", nullptr, -1);  // Cut archive name out of '_<archiveFileName>_tmp_'
 
         archivePath = MakeGenericPath(PathJoin(archiveDirectory, archiveFileName));
     }
@@ -603,6 +603,20 @@ static int RunInstall()
 
     if (archiveFiles.empty())
         return 0;
+
+    // Check if server is installed, if not, skip server files during update
+    if (!DirectoryExists(CalcMTASAPath("server")))
+    {
+        // Filter out server files
+        size_t originalCount = archiveFiles.size();
+        archiveFiles.erase(std::remove_if(archiveFiles.begin(), archiveFiles.end(), [](const ManifestFile& file)
+                                          { return file.relativePath.compare(0, 7, "server/") == 0 || file.relativePath.compare(0, 7, "server\\") == 0; }),
+                           archiveFiles.end());
+
+        size_t filteredCount = originalCount - archiveFiles.size();
+        if (filteredCount > 0)
+            OutputDebugLine(SString("RunInstall: Skipped %zu server files (server not installed)", filteredCount));
+    }
 
     // Create a backup directory for disaster recovery.
     const SString backupRoot = CreateWritableDirectory(sourceRoot + "_bak_");
@@ -803,7 +817,8 @@ static int RunInstall()
     else
         OutputDebugLine(SString("RunInstall: Updated %zu files", files.size()));
 
-    const auto Rollback = [&]() {
+    const auto Rollback = [&]()
+    {
         if (size_t disasterCounter = RunRollback(files); disasterCounter > 0)
         {
             // Do not delete the backup directory if we need it for recovery.

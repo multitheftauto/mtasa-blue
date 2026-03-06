@@ -51,8 +51,8 @@ public:
     LUA_DECLARE(GetPedRotation);
     LUA_DECLARE(CanPedBeKnockedOffBike);
 
-    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBonePosition(CClientPed* ped, const std::uint16_t bone);
-    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBoneRotation(CClientPed* ped, const std::uint16_t bone);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>>        GetElementBonePosition(CClientPed* ped, const std::uint16_t bone);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>>        GetElementBoneRotation(CClientPed* ped, const std::uint16_t bone);
     static std::variant<bool, CLuaMultiReturn<float, float, float, float>> GetElementBoneQuaternion(CClientPed* ped, const std::uint16_t bone);
     static std::variant<bool, std::array<std::array<float, 4>, 4>>         GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone);
 
@@ -96,8 +96,7 @@ public:
     static bool IsPedReloadingWeapon(CClientPed* const ped) noexcept;
     LUA_DECLARE(AddPedClothes);
     LUA_DECLARE(RemovePedClothes);
-    static bool SetPedControlState(std::variant<CClientPed*, std::string> first, std::variant<std::string, bool> second,
-                                   std::optional<bool> maybeState);
+    static bool SetPedControlState(std::variant<CClientPed*, std::string> first, std::variant<std::string, bool> second, std::optional<bool> maybeState);
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
     static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);
@@ -112,11 +111,12 @@ public:
     LUA_DECLARE(RemovePedFromVehicle);
     LUA_DECLARE(SetPedOxygenLevel);
     LUA_DECLARE(SetPedStat);
-    static bool SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<std::variant<bool, unsigned int>> seatOrPassenger);
+    static bool SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle,
+                                   std::optional<std::variant<bool, unsigned int>> seatOrPassenger);
     static bool SetPedExitVehicle(CClientPed* pPed);
     static bool IsPedBleeding(CClientPed* ped);
     static bool SetPedBleeding(CClientPed* ped, bool bleeding);
-    
+
     static bool killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully);
 
     static void PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<float> probability);
