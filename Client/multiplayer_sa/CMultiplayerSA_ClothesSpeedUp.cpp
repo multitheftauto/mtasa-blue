@@ -339,7 +339,7 @@ bool SetClothingDirectorySize(int directorySize)
 #define HOOKSIZE_CClothesBuilder_CopyTexture 5
 static constexpr DWORD RETURN_CClothesBuilder_CopyTexture = 0x5A5735;
 
-void _declspec(naked) HOOK_CClothesBuilder_CopyTexture()
+static void _declspec(naked) HOOK_CClothesBuilder_CopyTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
