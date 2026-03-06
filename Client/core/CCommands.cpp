@@ -102,7 +102,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             // His line starts with '/'?
             if (*szParameters == '/')
             {
-                // Copy the characters after the slash to the 0 terminator to a separate buffer
+                // Copy the characters after the slash to the 0 terminator to a seperate buffer
                 char szBuffer[256];
                 strncpy(szBuffer, szParameters + 1, 256);
                 szBuffer[255] = 0;

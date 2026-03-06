@@ -1624,8 +1624,9 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
         return false;
     }
 
-    pElement->SetAttachedOffsets(vecPosition, vecRotation);
     ConvertDegreesToRadians(vecRotation);
+
+    pElement->SetAttachedOffsets(vecPosition, vecRotation);
     pElement->AttachTo(pAttachedToElement);
 
     if (IS_MARKER(pElement))

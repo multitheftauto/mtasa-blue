@@ -1273,9 +1273,7 @@ void CElement::GetAttachedRotation(CVector& vecRotation)
     if (m_pAttachedTo)
     {
         m_pAttachedTo->GetRotation(vecRotation);
-        ConvertRadiansToDegrees(vecRotation);
         vecRotation += m_vecAttachedRotation;
-        ConvertDegreesToRadians(vecRotation);
     }
 }
 

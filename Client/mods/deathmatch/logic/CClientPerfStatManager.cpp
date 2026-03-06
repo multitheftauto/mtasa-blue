@@ -219,7 +219,7 @@ void CClientPerfStatTimingImpl::GetStats(CClientPerfStatResult* pResult, const s
         const SStatResultSection& section = itSection->second;
         const bool                bSectionMatches = RowMatchesFilter(sectionName, strFilter);
 
-        SClientTimingRow          sectionRow;
+        SClientTimingRow sectionRow;
         sectionRow.strName = sectionName;
         sectionRow.uiFrameCalls = 0;
         sectionRow.fFrameMs = 0;
@@ -263,11 +263,11 @@ void CClientPerfStatTimingImpl::GetStats(CClientPerfStatResult* pResult, const s
 
         // Derive section overhead from .Total minus known child timings
         const SClientTimingRow* pTotalRow = NULL;
-        float fKnownFrameMs = 0;
-        float fKnownWindowMs = 0;
-        float fKnownWindowPercent = 0;
-        int   iKnownFrameCalls = 0;
-        int   iKnownWindowCalls = 0;
+        float                   fKnownFrameMs = 0;
+        float                   fKnownWindowMs = 0;
+        float                   fKnownWindowPercent = 0;
+        int                     iKnownFrameCalls = 0;
+        int                     iKnownWindowCalls = 0;
         for (uint i = 0; i < childRows.size(); ++i)
         {
             const SClientTimingRow& row = childRows[i];

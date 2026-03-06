@@ -91,15 +91,6 @@ struct SVehicleFrame
     std::vector<RwFrame*> frameList;  // Frames from root to parent
 };
 
-enum class VehicleComponentType
-{
-    NONE = -1,
-
-    DOOR,
-    PANEL,
-    WHEEL,
-};
-
 class CVehicle : public virtual CPhysical
 {
 public:

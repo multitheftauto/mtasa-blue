@@ -136,8 +136,10 @@ void CClientObject::GetRotationDegrees(CVector& vecRotation) const
 
 void CClientObject::GetRotationRadians(CVector& vecRotation) const
 {
-    if (m_pObject)
+    if (m_pObject && m_pAttachedToEntity)  // Temp fix for static objects->
     {
+        // We've been returning the rotation that got set last so far (::m_vecRotation)..
+        //   but we need to get the real rotation for when the game moves the objects..
         CMatrix matTemp;
         m_pObject->GetMatrix(&matTemp);
         vecRotation = matTemp.GetRotation();
@@ -643,28 +645,16 @@ void CClientObject::StreamedInPulse()
     // Are we not frozen
     if (!m_bIsFrozen)
     {
-        // Model physics enabled?
-        if ((m_pModelInfo && m_pModelInfo->GetObjectPropertiesGroup() != -1) || !m_pModelInfo)
+        // Grab our actual position (as GTA moves it too)
+        CVector vecPosition = *m_pObject->GetPosition();
+
+        // Has it moved without MTA knowing?
+        if (vecPosition != m_vecPosition)
         {
-            // Grab our actual position & rotation (as GTA moves it too)
-            CVector vecPosition = *m_pObject->GetPosition();
+            m_vecPosition = vecPosition;
 
-            CVector vecRot;
-            GetRotationRadians(vecRot);
-
-            // Has it moved without MTA knowing?
-            if (vecPosition != m_vecPosition)
-            {
-                m_vecPosition = vecPosition;
-
-                // Update our streaming position
-                UpdateStreamPosition(m_vecPosition);
-            }
-
-            if (vecRot != m_vecRotation)
-            {
-                m_vecRotation = vecRot;
-            }
+            // Update our streaming position
+            UpdateStreamPosition(m_vecPosition);
         }
     }
 }

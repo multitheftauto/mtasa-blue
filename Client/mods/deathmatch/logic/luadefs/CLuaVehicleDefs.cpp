@@ -4215,18 +4215,13 @@ bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, con
 
 int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel)
 {
-    if (wheel >= MAX_WHEELS)
+    if (wheel < 0 || wheel > 3)
         throw std::invalid_argument("Invalid wheel number");
 
-    auto vehicleType = pVehicle->GetVehicleType();
+    if (CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) != CLIENTVEHICLE_CAR)
+        throw std::invalid_argument("Invalid vehicle type");
 
-    if (vehicleType == CLIENTVEHICLE_CAR || vehicleType == CLIENTVEHICLE_MONSTERTRUCK || vehicleType == CLIENTVEHICLE_QUADBIKE ||
-        vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX || vehicleType == CLIENTVEHICLE_TRAILER)
-    {
-        return pVehicle->GetWheelFrictionState(wheel);
-    }
-
-    throw std::invalid_argument("Invalid vehicle type");
+    return pVehicle->GetWheelFrictionState(wheel);
 }
 
 std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, VehicleDummies dummy)

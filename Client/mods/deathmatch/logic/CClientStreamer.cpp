@@ -48,9 +48,10 @@ CClientStreamer::~CClientStreamer()
     m_WorldRows.clear();
 
     // Clear our extra rows
-    for (auto& [key, pRow] : m_ExtraRows)
+    iter = m_ExtraRows.begin();
+    for (; iter != m_ExtraRows.end(); iter++)
     {
-        delete pRow;
+        delete *iter;
     }
     m_ExtraRows.clear();
 }
@@ -243,21 +244,24 @@ CClientStreamSectorRow* CClientStreamer::FindOrCreateRow(CVector& vecPosition, C
         }
     }
 
-    // Search through our extra rows using map lookup
+    // Search through our extra rows
+    iter = m_ExtraRows.begin();
+    for (; iter != m_ExtraRows.end(); iter++)
+    {
+        pRow = *iter;
+        if (pRow->DoesContain(vecPosition))
+        {
+            return pRow;
+        }
+    }
+    // We need a new row, align it with the others
     float fBottom = float((int)(vecPosition.fY / m_fRowSize)) * m_fRowSize;
     if (vecPosition.fY < 0.0f)
         fBottom -= m_fRowSize;
-    int iRowIndex = (int)(fBottom / m_fRowSize);
-
-    auto it = m_ExtraRows.find(iRowIndex);
-    if (it != m_ExtraRows.end())
-        return it->second;
-
-    // We need a new row, align it with the others
     pRow = new CClientStreamSectorRow(fBottom, fBottom + m_fRowSize, m_fSectorSize, m_fRowSize);
     ConnectRow(pRow);
     pRow->SetExtra(true);
-    m_ExtraRows[iRowIndex] = pRow;
+    m_ExtraRows.push_back(pRow);
     return pRow;
 }
 
@@ -275,16 +279,16 @@ CClientStreamSectorRow* CClientStreamer::FindRow(float fY)
         }
     }
 
-    // Search through our extra rows using map lookup
-    float fBottom = float((int)(fY / m_fRowSize)) * m_fRowSize;
-    if (fY < 0.0f)
-        fBottom -= m_fRowSize;
-    int iRowIndex = (int)(fBottom / m_fRowSize);
-
-    auto it = m_ExtraRows.find(iRowIndex);
-    if (it != m_ExtraRows.end())
-        return it->second;
-
+    // Search through our extra rows
+    iter = m_ExtraRows.begin();
+    for (; iter != m_ExtraRows.end(); iter++)
+    {
+        pRow = *iter;
+        if (pRow->DoesContain(fY))
+        {
+            return pRow;
+        }
+    }
     return NULL;
 }
 
@@ -329,7 +333,6 @@ void CClientStreamer::RemoveElement(CClientStreamElement* pElement)
 {
     OnElementEnterSector(pElement, NULL);
     m_ActiveElements.remove(pElement);
-    m_ActiveElementSet.erase(pElement);
     m_ToStreamOut.remove(pElement);
 }
 
@@ -352,14 +355,27 @@ void CClientStreamer::AddToSortedList(list<CClientStreamElement*>* pList, CClien
     float fDistance = pElement->GetDistanceToBoundingBoxSquared(m_vecPosition);
     pElement->SetExpDistance(fDistance);
 
-    // Don't add if already in the list (O(1) check)
-    if (m_ActiveElementSet.count(pElement))
+    // Don't add if already in the list
+    if (ListContains(*pList, pElement))
         return;
 
-    // Track in the set
-    m_ActiveElementSet.insert(pElement);
+    // Search through our list. Add it behind the first item further away than this
+    CClientStreamElement*                 pTemp = NULL;
+    list<CClientStreamElement*>::iterator iter = pList->begin();
+    for (; iter != pList->end(); iter++)
+    {
+        pTemp = *iter;
 
-    // Append unsorted - DoPulse sorts the list every frame via m_ActiveElements.sort()
+        // Is it further than the one we add?
+        if (pTemp->GetDistanceToBoundingBoxSquared(m_vecPosition) > fDistance)
+        {
+            // Add it before here
+            pList->insert(iter, pElement);
+            return;
+        }
+    }
+
+    // We have no elements in the list, add it at the beginning
     pList->push_back(pElement);
 }
 
@@ -370,7 +386,15 @@ bool CClientStreamer::CompareExpDistance(CClientStreamElement* p1, CClientStream
 
 bool CClientStreamer::IsActiveElement(CClientStreamElement* pElement)
 {
-    return m_ActiveElementSet.count(pElement) > 0;
+    list<CClientStreamElement*>::iterator iter = m_ActiveElements.begin();
+    for (; iter != m_ActiveElements.end(); iter++)
+    {
+        if (*iter == pElement)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void CClientStreamer::Restream(bool bMovedFar)
@@ -626,7 +650,7 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
                             m_ToStreamOut.push_back(pElement);
                         }
                     }
-                    pTempSector->RemoveElements(&m_ActiveElements, &m_ActiveElementSet);
+                    pTempSector->RemoveElements(&m_ActiveElements);
                     pTempSector->SetActivated(false);
                 }
             }
@@ -642,7 +666,7 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
             pTempSector = *iter;
             if (!pTempSector->IsActivated())
             {
-                pTempSector->AddElements(&m_ActiveElements, &m_ActiveElementSet);
+                pTempSector->AddElements(&m_ActiveElements);
                 pTempSector->SetActivated(true);
             }
         }
@@ -684,7 +708,7 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
             // Should we activate this sector?
             if (pSector->IsExtra() && (m_pSector->IsMySurroundingSector(pSector) || m_pSector == pSector))
             {
-                pSector->AddElements(&m_ActiveElements, &m_ActiveElementSet);
+                pSector->AddElements(&m_ActiveElements);
                 pSector->SetActivated(true);
             }
             // If we're in a deactivated sector and streamed in, stream us out

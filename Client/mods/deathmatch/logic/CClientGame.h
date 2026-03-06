@@ -531,7 +531,6 @@ private:
     bool OnSize(CGUIElement* pElement);
     bool OnFocusGain(CGUIFocusEventArgs Args);
     bool OnFocusLoss(CGUIFocusEventArgs Args);
-    void TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szState);
 
     // Network update functions
     void DoVehicleInKeyCheck();
