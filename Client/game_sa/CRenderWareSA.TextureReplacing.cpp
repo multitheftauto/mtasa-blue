@@ -243,10 +243,10 @@ namespace
     constexpr int         TXD_POOL_HARD_LIMIT_PERCENT = 95;
 
     // Pool pressure thresholds for stale slot reclamation
-    constexpr int           TXD_POOL_PROACTIVE_CLEANUP_PERCENT = 80;
-    constexpr int           TXD_POOL_MEDIUM_PRESSURE_PERCENT = 85;
+    constexpr int           TXD_POOL_PROACTIVE_CLEANUP_PERCENT = 70;
+    constexpr int           TXD_POOL_MEDIUM_PRESSURE_PERCENT = 80;
     constexpr int           TXD_POOL_AGGRESSIVE_CLEANUP_PERCENT = 90;
-    constexpr uint32_t      ISOLATION_STALE_TIMEOUT_MS = 30000;
+    constexpr uint32_t      ISOLATION_STALE_TIMEOUT_MS = 15000;
     constexpr uint32_t      STALE_CLEANUP_INTERVAL_MS = 1000;
     constexpr int           TXD_POOL_RESERVED_SLOTS = 64;
     constexpr int           TXD_POOL_RESERVED_PERCENT = 10;
@@ -975,6 +975,24 @@ namespace
     static void ClearIsolatedTxdLastUse(unsigned short usModelId)
     {
         g_IsolatedTxdLastUseTime.erase(usModelId);
+    }
+
+    // Mark an isolated slot for early stale reclamation by zeroing its last-use
+    // time. (now - 0) always exceeds any stale timeout, so the slot will be
+    // picked up on the next TryReclaimStaleIsolatedSlots pass.
+    // Called when all replacement tracking is removed from a TXD but the slot
+    // could not be freed (e.g. leaked texture refs prevent destruction).
+    static void MarkIsolatedSlotReadyForReclamation(unsigned short usTxdId)
+    {
+        auto itOwner = g_IsolatedModelByTxd.find(usTxdId);
+        if (itOwner == g_IsolatedModelByTxd.end())
+            return;
+
+        const unsigned short usModelId = itOwner->second;
+        if (g_IsolatedTxdByModel.count(usModelId) == 0)
+            return;
+
+        g_IsolatedTxdLastUseTime[usModelId] = 0;
     }
 
     // Reclaim isolated TXD slots unused for ISOLATION_STALE_TIMEOUT_MS under pool pressure
@@ -2598,23 +2616,14 @@ namespace
             g_IsolatedTxdByModel.erase(itExisting);
         }
 
-        // Pool pressure: try to reclaim stale slots before allocating
-        const int iPoolSize = pTxdPoolSA->GetPoolSize();
-        if (iPoolSize > 0)
+        // Reclaim stale and orphaned isolated slots before allocating.
+        // This keeps the pool clean and lets the allocation below reuse a
+        // freed slot instead of always usig a fresh one.
+        TryReclaimStaleIsolatedSlots();
+        if (!g_OrphanedIsolatedTxdSlots.empty())
         {
-            constexpr int iIsolationPoolSize = CTxdPoolSA::SA_TXD_POOL_CAPACITY;
-            const int     iUsedSlots = pTxdPoolSA->GetUsedSlotCountInRange(static_cast<std::uint32_t>(iIsolationPoolSize));
-            if (iUsedSlots >= 0)
-            {
-                const int iUsagePercent = (iUsedSlots * 100) / iIsolationPoolSize;
-                if (iUsagePercent >= TXD_POOL_HARD_LIMIT_PERCENT)
-                {
-                    TryReclaimStaleIsolatedSlots();
-                    if (!g_OrphanedIsolatedTxdSlots.empty())
-                        TryCleanupOrphanedIsolatedSlots(true);
-                    MarkTxdPoolCountDirty();
-                }
-            }
+            TryCleanupOrphanedIsolatedSlots(true);
+            MarkTxdPoolCountDirty();
         }
 
         // Store usParentIndex=0xFFFF when the parent TXD is not yet loaded; ProcessPendingIsolatedModels
@@ -6115,6 +6124,20 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         auto itOwner = g_IsolatedModelByTxd.find(usTxdId);
         if (itOwner != g_IsolatedModelByTxd.end())
             CleanupIsolatedTxdForModel(itOwner->second);
+    }
+
+    // For isolated slots whose replacements were all removed but the slot
+    // could not be freed (leaked texture refs or deferred state),
+    // mark for early stale reclamation so the next allocation or periodic
+    // cleanup pass reclaims the slot without waiting for the full timeout.
+    for (unsigned short usTxdId : processedTxdIds)
+    {
+        if (cleanedTxdIds.count(usTxdId) > 0)
+            continue;
+
+        auto* pRemainingInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
+        if (pRemainingInfo && pRemainingInfo->usedByReplacements.empty())
+            MarkIsolatedSlotReadyForReclamation(usTxdId);
     }
 
     // Invalidate caches for all TXDs that were modified
