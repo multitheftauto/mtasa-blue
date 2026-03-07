@@ -982,7 +982,7 @@ CClientEntity* CClientEntity::FindChildByTypeIndex(unsigned int uiTypeHash, unsi
     return NULL;
 }
 
-void CClientEntity::FindAllChildrenByType(const char* szType, lua_State* luaVM, bool bStreamedIn)
+void CClientEntity::FindAllChildrenByType(const char* szType, lua_State* luaVM, bool bStreamedIn, bool bOnScreenOnly)
 {
     assert(szType);
     assert(luaVM);
@@ -993,15 +993,15 @@ void CClientEntity::FindAllChildrenByType(const char* szType, lua_State* luaVM, 
 
     if (this == g_pClientGame->GetRootEntity())
     {
-        GetEntitiesFromRoot(uiTypeHash, luaVM, bStreamedIn);
+        GetEntitiesFromRoot(uiTypeHash, luaVM, bStreamedIn, bOnScreenOnly);
     }
     else
     {
-        FindAllChildrenByTypeIndex(uiTypeHash, luaVM, uiIndex, bStreamedIn);
+        FindAllChildrenByTypeIndex(uiTypeHash, luaVM, uiIndex, bStreamedIn, bOnScreenOnly);
     }
 }
 
-void CClientEntity::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* luaVM, unsigned int& uiIndex, bool bStreamedIn)
+void CClientEntity::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* luaVM, unsigned int& uiIndex, bool bStreamedIn, bool bOnScreenOnly)
 {
     assert(luaVM);
 
@@ -1015,10 +1015,14 @@ void CClientEntity::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_Stat
         // Only streamed in elements?
         if (!bStreamedIn || !IsStreamingCompatibleClass() || reinterpret_cast<CClientStreamElement*>(this)->IsStreamedIn())
         {
-            // Add it to the table
-            lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushelement(luaVM, this);
-            lua_settable(luaVM, -3);
+            bool bVisibleOnScreen = false;
+            if (!bOnScreenOnly || (CStaticFunctionDefinitions::IsElementOnScreen(*this, bVisibleOnScreen) && bVisibleOnScreen))
+            {
+                // Add it to the table
+                lua_pushnumber(luaVM, ++uiIndex);
+                lua_pushelement(luaVM, this);
+                lua_settable(luaVM, -3);
+            }
         }
     }
 
@@ -1026,7 +1030,7 @@ void CClientEntity::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_Stat
     CChildListType ::const_iterator iter = m_Children.begin();
     for (; iter != m_Children.end(); iter++)
     {
-        (*iter)->FindAllChildrenByTypeIndex(uiTypeHash, luaVM, uiIndex, bStreamedIn);
+        (*iter)->FindAllChildrenByTypeIndex(uiTypeHash, luaVM, uiIndex, bStreamedIn, bOnScreenOnly);
     }
 }
 
@@ -1436,7 +1440,7 @@ void CClientEntity::RemoveEntityFromRoot(unsigned int uiTypeHash, CClientEntity*
         CClientEntity::RemoveEntityFromRoot((*iter)->GetTypeHash(), *iter);
 }
 
-void CClientEntity::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn)
+void CClientEntity::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn, bool bOnScreenOnly)
 {
 #if CHECK_ENTITIES_FROM_ROOT
     _CheckEntitiesFromRoot(uiTypeHash);
@@ -1456,12 +1460,16 @@ void CClientEntity::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaV
             // Only streamed in elements?
             if (!bStreamedIn || !pEntity->IsStreamingCompatibleClass() || reinterpret_cast<CClientStreamElement*>(pEntity)->IsStreamedIn())
             {
-                if (!pEntity->IsBeingDeleted())
+                bool bVisibleOnScreen = false;
+                if (!bOnScreenOnly || (CStaticFunctionDefinitions::IsElementOnScreen(*pEntity, bVisibleOnScreen) && bVisibleOnScreen))
                 {
-                    // Add it to the table
-                    lua_pushnumber(luaVM, ++uiIndex);
-                    lua_pushelement(luaVM, pEntity);
-                    lua_settable(luaVM, -3);
+                    if (!pEntity->IsBeingDeleted())
+                    {
+                        // Add it to the table
+                        lua_pushnumber(luaVM, ++uiIndex);
+                        lua_pushelement(luaVM, pEntity);
+                        lua_settable(luaVM, -3);
+                    }
                 }
             }
         }
