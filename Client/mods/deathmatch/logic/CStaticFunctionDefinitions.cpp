@@ -1074,7 +1074,7 @@ bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, CStrin
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
             // Write element ID, name length and name for server-side removal handling
             pBitStream->Write(Entity.GetID());
-            uint16_t nameLength = static_cast<uint16_t>(name->length());
+            std::uint16_t nameLength = static_cast<std::uint16_t>(name->length());
             pBitStream->WriteCompressed(nameLength);
             pBitStream->Write(name.ToCString(), nameLength);
 
