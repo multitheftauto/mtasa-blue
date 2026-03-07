@@ -124,7 +124,8 @@ namespace
         unsigned int          uiExpectedParentModelId = 0;
         unsigned short        usExpectedParentTxdId = 0;
         unsigned char         ucRetryCount = 0;
-        uint32_t              uiQueuedTick = 0;
+        uint32_t              uiFirstQueueTick = 0;
+        uint32_t              uiNextRetryTick = 0;
         uint32_t              uiSessionId = 0;
     };
 
@@ -252,8 +253,9 @@ namespace
     constexpr std::size_t   MAX_LEAK_RETRY_COUNT = 1024;
     constexpr std::size_t   MAX_PENDING_REPLACEMENT_MODELS = 512;
     constexpr std::size_t   MAX_PENDING_REPLACEMENTS_PER_MODEL = 8;
-    constexpr unsigned char MAX_PENDING_REPLACEMENT_RETRIES = 3;
-    constexpr uint32_t      PENDING_REPLACEMENT_TIMEOUT_MS = 10000;
+    constexpr unsigned char MAX_PENDING_REPLACEMENT_RETRIES = 10;
+    constexpr uint32_t      PENDING_REPLACEMENT_MAX_AGE_MS = 300000;
+    constexpr uint32_t      PENDING_REPLACEMENT_RETRY_INTERVAL_MS = 250;
     constexpr std::size_t   MAX_PENDING_REPLACEMENTS_PER_TICK = 64;
     constexpr uint32_t      PENDING_ISOLATION_TIMEOUT_MS = 15000;
     constexpr std::size_t   MAX_PENDING_ISOLATED_PER_TICK = 64;
@@ -382,6 +384,7 @@ namespace
         }
 
         UnregisterReplacement(pReplacementTextures);
+        pReplacementTextures->pendingOnModelIds.clear();
     }
 
     std::vector<CD3DDUMMY*>& GetShaderRegList(SReplacementTextures* pReplacement, unsigned short usTxdId)
@@ -540,36 +543,74 @@ namespace
 
         if (pReplacement->uiSessionId != ms_uiTextureReplacingSession)
             return;
-
         RegisterReplacement(pReplacement);
 
-        if (g_PendingReplacementByModel.size() >= MAX_PENDING_REPLACEMENT_MODELS &&
-            g_PendingReplacementByModel.find(usModelId) == g_PendingReplacementByModel.end())
+        std::unordered_map<unsigned short, std::vector<SPendingReplacement>>::iterator itPendingReplacements = g_PendingReplacementByModel.find(usModelId);
+        if (itPendingReplacements == g_PendingReplacementByModel.end())
         {
-            return;
+            if (g_PendingReplacementByModel.size() >= MAX_PENDING_REPLACEMENT_MODELS)
+            {
+                AddReportLog(9401, SString("Pending replacement queue is full while deferring model %u", usModelId));
+                return;
+            }
+
+            itPendingReplacements = g_PendingReplacementByModel.emplace(usModelId, std::vector<SPendingReplacement>()).first;
         }
 
-        std::vector<SPendingReplacement>& vecPending = g_PendingReplacementByModel[usModelId];
-        if (vecPending.size() >= MAX_PENDING_REPLACEMENTS_PER_MODEL)
-            return;
+        std::vector<SPendingReplacement>& vecPending = itPendingReplacements->second;
 
         for (const SPendingReplacement& entry : vecPending)
         {
             if (entry.pReplacement == pReplacement)
+            {
+                pReplacement->pendingOnModelIds.insert(usModelId);
                 return;
+            }
         }
+
+        if (vecPending.size() >= MAX_PENDING_REPLACEMENTS_PER_MODEL)
+        {
+            AddReportLog(9401, SString("Pending replacement list is full for model %u", usModelId));
+            return;
+        }
+
+        const uint32_t uiNow = GetTickCount32();
+
+        pReplacement->pendingOnModelIds.insert(usModelId);
 
         SPendingReplacement entry;
         entry.pReplacement = pReplacement;
         entry.uiExpectedParentModelId = uiExpectedParentModelId;
         entry.usExpectedParentTxdId = usExpectedParentTxdId;
         entry.ucRetryCount = 0;
-        entry.uiQueuedTick = GetTickCount32();
+        entry.uiFirstQueueTick = uiNow;
+        entry.uiNextRetryTick = uiNow;
         entry.uiSessionId = ms_uiTextureReplacingSession;
         vecPending.push_back(entry);
+    }
 
-        if (!g_bProcessingPendingReplacements)
-            TryApplyPendingReplacements();
+    static void KeepPendingReplacement(unsigned short usModelId, const SPendingReplacement& pendingEntry)
+    {
+        if (!pendingEntry.pReplacement)
+            return;
+
+        if (pendingEntry.uiSessionId != ms_uiTextureReplacingSession)
+            return;
+
+        if (!IsReplacementActive(pendingEntry.pReplacement))
+            return;
+
+        std::vector<SPendingReplacement>& vecPending = g_PendingReplacementByModel[usModelId];
+        for (SPendingReplacement& existingEntry : vecPending)
+        {
+            if (existingEntry.pReplacement == pendingEntry.pReplacement)
+            {
+                existingEntry = pendingEntry;
+                return;
+            }
+        }
+
+        vecPending.push_back(pendingEntry);
     }
 
     static void RequeuePendingReplacement(unsigned short usModelId, const SPendingReplacement& pendingEntry, bool bIncrementRetry)
@@ -584,23 +625,12 @@ namespace
             return;
 
         SPendingReplacement pendingEntryCopy = pendingEntry;
-        if (bIncrementRetry)
-        {
-            if (pendingEntryCopy.ucRetryCount >= MAX_PENDING_REPLACEMENT_RETRIES)
-                return;
-
+        if (bIncrementRetry && pendingEntryCopy.ucRetryCount < MAX_PENDING_REPLACEMENT_RETRIES)
             ++pendingEntryCopy.ucRetryCount;
-        }
 
-        if (g_PendingReplacementByModel.size() >= MAX_PENDING_REPLACEMENT_MODELS &&
-            g_PendingReplacementByModel.find(usModelId) == g_PendingReplacementByModel.end())
-        {
-            return;
-        }
+        pendingEntryCopy.uiNextRetryTick = GetTickCount32() + PENDING_REPLACEMENT_RETRY_INTERVAL_MS;
 
         std::vector<SPendingReplacement>& vecPending = g_PendingReplacementByModel[usModelId];
-        if (vecPending.size() >= MAX_PENDING_REPLACEMENTS_PER_MODEL)
-            return;
 
         for (SPendingReplacement& existingEntry : vecPending)
         {
@@ -650,10 +680,7 @@ namespace
             if (bReachedLimit)
             {
                 for (const SPendingReplacement& entry : vecPending)
-                {
-                    if (uiNow - entry.uiQueuedTick <= PENDING_REPLACEMENT_TIMEOUT_MS)
-                        RequeuePendingReplacement(usModelId, entry, false);
-                }
+                    RequeuePendingReplacement(usModelId, entry, false);
                 continue;
             }
 
@@ -662,8 +689,8 @@ namespace
             {
                 for (const SPendingReplacement& entry : vecPending)
                 {
-                    if (uiNow - entry.uiQueuedTick <= PENDING_REPLACEMENT_TIMEOUT_MS)
-                        RequeuePendingReplacement(usModelId, entry, false);
+                    if (entry.pReplacement && entry.uiSessionId == ms_uiTextureReplacingSession && IsReplacementActive(entry.pReplacement))
+                        entry.pReplacement->pendingOnModelIds.erase(usModelId);
                 }
                 continue;
             }
@@ -700,19 +727,42 @@ namespace
                 if (entry.uiSessionId != ms_uiTextureReplacingSession)
                     continue;
 
-                if (uiNow - entry.uiQueuedTick > PENDING_REPLACEMENT_TIMEOUT_MS)
+                if (uiNow - entry.uiFirstQueueTick >= PENDING_REPLACEMENT_MAX_AGE_MS)
+                {
+                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
+                    AddReportLog(9401, SString("Dropping stale pending replacement for model %u", usModelId));
                     continue;
+                }
+
+                if (entry.ucRetryCount >= MAX_PENDING_REPLACEMENT_RETRIES)
+                {
+                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
+                    AddReportLog(
+                        9401, SString("Dropping pending replacement for model %u after %u retries", usModelId, static_cast<unsigned int>(entry.ucRetryCount)));
+                    continue;
+                }
+
+                if (uiNow < entry.uiNextRetryTick)
+                {
+                    KeepPendingReplacement(usModelId, entry);
+                    continue;
+                }
 
                 if (entry.uiExpectedParentModelId != 0 && entry.uiExpectedParentModelId != uiCurrentParentModelId)
+                {
+                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
                     continue;
+                }
 
                 if (entry.usExpectedParentTxdId != 0 && entry.usExpectedParentTxdId != usCurrentParentTxdId)
+                {
+                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
                     continue;
+                }
 
                 if (!bModelLoaded)
                 {
-                    if (uiNow - entry.uiQueuedTick <= PENDING_REPLACEMENT_TIMEOUT_MS)
-                        RequeuePendingReplacement(usModelId, entry, false);
+                    RequeuePendingReplacement(usModelId, entry, false);
                     continue;
                 }
 
@@ -725,8 +775,7 @@ namespace
                 if (uiProcessedCount >= MAX_PENDING_REPLACEMENTS_PER_TICK)
                 {
                     bReachedLimit = true;
-                    if (uiNow - entry.uiQueuedTick <= PENDING_REPLACEMENT_TIMEOUT_MS)
-                        RequeuePendingReplacement(usModelId, entry, false);
+                    RequeuePendingReplacement(usModelId, entry, false);
                     continue;
                 }
 
@@ -744,6 +793,10 @@ namespace
                     {
                         RequeuePendingReplacement(usModelId, entry, true);
                     }
+                }
+                else
+                {
+                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
                 }
             }
         }
@@ -811,6 +864,25 @@ namespace
     {
         g_PendingIsolatedModels.erase(usModelId);
         g_PendingIsolatedModelTimes.erase(usModelId);
+    }
+
+    static void ClearPendingReplacementStateForModel(unsigned short usModelId)
+    {
+        std::unordered_map<unsigned short, std::vector<SPendingReplacement>>::iterator itPendingReplacements = g_PendingReplacementByModel.find(usModelId);
+        if (itPendingReplacements == g_PendingReplacementByModel.end())
+            return;
+
+        for (const SPendingReplacement& pendingReplacement : itPendingReplacements->second)
+        {
+            SReplacementTextures* pPendingReplacement = pendingReplacement.pReplacement;
+            if (!pPendingReplacement)
+                continue;
+
+            if (pendingReplacement.uiSessionId != ms_uiTextureReplacingSession)
+                continue;
+
+            pPendingReplacement->pendingOnModelIds.erase(usModelId);
+        }
     }
 
     static void RegisterReplacement(SReplacementTextures* pReplacement)
@@ -1030,6 +1102,7 @@ namespace
             CTxdStore_RemoveRef(usParentTxdId);  // Release parent pin
             g_IsolatedTxdByModel.erase(itIsolated);
             ClearPendingIsolatedModel(usModelId);
+            ClearPendingReplacementStateForModel(usModelId);
             g_PendingReplacementByModel.erase(usModelId);
 
             g_OrphanedIsolatedTxdSlots.insert(usTxdId);
@@ -1128,6 +1201,7 @@ namespace
                 {
                     ClearPendingIsolatedModel(itModel->first);
                     ClearIsolatedTxdLastUse(itModel->first);
+                    ClearPendingReplacementStateForModel(itModel->first);
                     g_PendingReplacementByModel.erase(itModel->first);
                     CTxdStore_RemoveRef(itModel->second.usParentTxdId);  // Release parent pin
                     itModel = g_IsolatedTxdByModel.erase(itModel);
@@ -1370,8 +1444,7 @@ namespace
         // which crashes on empty pool slots. LOADED + empty pool is an
         // inconsistent SA state that can't arise normally; the manual
         // unlink in SetStreamingInfoLoaded handles those as a safety net.
-        if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED &&
-            pStreamInfo->loadState != eModelLoadState::LOADSTATE_LOADED)
+        if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED && pStreamInfo->loadState != eModelLoadState::LOADSTATE_LOADED)
         {
             pGame->GetStreaming()->RemoveModel(streamId);
         }
@@ -2770,6 +2843,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
                 g_IsolatedModelByTxd.erase(itOwner);
+            ClearPendingReplacementStateForModel(usModelId);
             g_PendingReplacementByModel.erase(usModelId);
             RemoveTxdFromReplacementTracking(childTxdId);
             const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(childTxdId).second;
@@ -2801,6 +2875,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
                 g_IsolatedModelByTxd.erase(itOwner);
+            ClearPendingReplacementStateForModel(usModelId);
             g_PendingReplacementByModel.erase(usModelId);
             RemoveTxdFromReplacementTracking(childTxdId);
             g_OrphanedIsolatedTxdSlots.insert(childTxdId);
@@ -2925,6 +3000,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
                 g_IsolatedModelByTxd.erase(itOwner);
+            ClearPendingReplacementStateForModel(usModelId);
             g_PendingReplacementByModel.erase(usModelId);
             RemoveTxdFromReplacementTracking(childTxdId);
             const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(childTxdId).second;
@@ -2947,6 +3023,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
                 g_IsolatedModelByTxd.erase(itOwner);
+            ClearPendingReplacementStateForModel(usModelId);
             g_PendingReplacementByModel.erase(usModelId);
             RemoveTxdFromReplacementTracking(childTxdId);
             const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(childTxdId).second;
@@ -2990,6 +3067,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(childTxdId);
             if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
                 g_IsolatedModelByTxd.erase(itOwner);
+            ClearPendingReplacementStateForModel(usModelId);
             g_PendingReplacementByModel.erase(usModelId);
             RemoveTxdFromReplacementTracking(childTxdId);
             const bool bInserted = g_OrphanedIsolatedTxdSlots.insert(childTxdId).second;
@@ -3901,8 +3979,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     ClearIsolatedTxdLastUse(usModelId);
                     ClearPendingIsolatedModel(usModelId);
                     g_IsolatedTxdByModel.erase(itPrevIsolated);
-                    if (!g_bProcessingPendingReplacements)
-                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                     return false;
                 }
             }
@@ -3914,22 +3991,22 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 // The existing isolation entry proves a conflict was detected before.
                 if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
                 {
-                    // Isolation failed - fall through to shared TXD injection instead.
-                    // May cause texture mixing, but avoids permanent white textures.
-                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (re-isolation), using shared TXD", usModelId));
+                    // Prior isolation proves the TXD is shared. Defer rather
+                    // than going through to shared injection.
+                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (re-isolation), deferring", usModelId));
+                    QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
                 }
             }
             else if (itPrevIsolated == g_IsolatedTxdByModel.end())
             {
-                // Isolate on first injection so the shared TXD stays clean - otherwise child
-                // TXDs inherit our textures via the RW parent chain (texture mixing).
-                // If the parent TXD is not loaded yet, AllocateIsolatedTxdForVanillaModel
-                // creates the slot with usParentIndex=0xFFFF and defers parent-chain setup
-                // to ProcessPendingIsolatedModels (non-blocking).
+                // Keep vanilla replacements on a private TXD so later model
+                // loads and child TXDs dont pick them up from the shared slot.
                 if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
                 {
-                    // Pool exhausted; fall through to shared TXD injection as a last resort.
-                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u, using shared TXD", usModelId));
+                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u, deferring", usModelId));
+                    QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
                 }
             }
             else
@@ -3937,15 +4014,17 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 // Parent TXD changed since last isolation - re-isolate with new parent.
                 if (!AllocateIsolatedTxdForVanillaModel(usModelId, usCurrentTxdId))
                 {
-                    // Isolation failed - fall through to shared TXD injection instead.
-                    // May cause texture mixing, but avoids permanent white textures.
-                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (parent changed), using shared TXD", usModelId));
+                    // Prior isolation proves the TXD was shared. Defer to
+                    // avoid shared injection on a multi-model TXD.
+                    AddReportLog(9401, SString("AllocateIsolatedTxdForVanillaModel failed for model %u (parent changed), deferring", usModelId));
+                    QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
                 }
             }
         }
         else
         {
-            // Reapply path for vanilla-isolated models: verify isolation still exists
+            // Reapply path for vanilla models: keep using the isolated slot if it still exists.
             auto itIsolated = g_IsolatedTxdByModel.find(usModelId);
             if (itIsolated != g_IsolatedTxdByModel.end())
             {
@@ -3975,11 +4054,16 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                         ClearIsolatedTxdLastUse(usModelId);
                         ClearPendingIsolatedModel(usModelId);
                         g_IsolatedTxdByModel.erase(itIsolated);
+                        QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                         return false;
                     }
                 }
             }
-            // Non-isolated vanilla models during reapply: fall through normally
+            else
+            {
+                QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                return false;
+            }
         }
     }
 
@@ -4102,6 +4186,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 pInfo->pTxd = pCurrentTxd;
 
             pReplacementTextures->usedInModelIds.insert(usModelId);
+            pReplacementTextures->pendingOnModelIds.erase(usModelId);
             return true;
         }
 
@@ -4633,6 +4718,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
     pInfo->usedByReplacements.push_back(pReplacementTextures);
 
     pReplacementTextures->usedInModelIds.insert(usModelId);
+    pReplacementTextures->pendingOnModelIds.erase(usModelId);
 
     TextureSwapMap parentSwapMap;
     for (std::size_t idx = 0; idx < perTxdInfo.usingTextures.size(); ++idx)
@@ -4974,6 +5060,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
     std::unordered_map<unsigned short, unsigned short>::iterator itOwner = g_IsolatedModelByTxd.find(usIsolatedTxdId);
     if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
         g_IsolatedModelByTxd.erase(itOwner);
+    ClearPendingReplacementStateForModel(usModelId);
     g_PendingReplacementByModel.erase(usModelId);
 }
 

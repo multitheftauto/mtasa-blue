@@ -52,6 +52,7 @@ struct SReplacementTextures
     std::vector<SPerTxd>               perTxdList;        // TXD's which have been modified
     std::unordered_set<unsigned short> usedInTxdIds;      // contains/erase for streaming hot path
     std::unordered_set<unsigned short> usedInModelIds;    // contains/erase for streaming hot path
+    std::unordered_set<unsigned short> pendingOnModelIds; // Models waiting for a later apply
     uint32_t                           uiSessionId = 0;   // Texture-replacing session generation (used to ignore stale cross-session cleanup)
     SString                            strDebugName;      // Source path or description for logging
     SString                            strDebugHash;      // Short hash of the loaded TXD bytes

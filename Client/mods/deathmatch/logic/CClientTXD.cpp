@@ -18,9 +18,60 @@ struct SPendingTxdImport
     uint8_t        ucRetryCount = 0;
 };
 
+struct SPendingRenderWareImport
+{
+    CClientTXD*    pTXD = nullptr;
+    unsigned short usModelId = 0;
+};
+
 static std::vector<SPendingTxdImport> s_PendingTxdImports;
+static std::vector<SPendingRenderWareImport> s_PendingRenderWareImports;
 static uint32_t                       s_uiLastPendingImportProcessTime = 0;
 static uint32_t                       s_uiLastPendingImportDropLogTime = 0;
+
+constexpr std::size_t MAX_PENDING_RENDER_WARE_IMPORTS = 4096;
+
+static bool IsDeviceLossImportQueued(const CClientTXD* pTXD, unsigned short usModelID)
+{
+    for (const SPendingTxdImport& pendingTxdImport : s_PendingTxdImports)
+    {
+        if (pendingTxdImport.pTXD == pTXD && pendingTxdImport.usModelId == usModelID)
+            return true;
+    }
+
+    return false;
+}
+
+static bool IsRenderWareImportQueued(const CClientTXD* pTXD, unsigned short usModelID)
+{
+    for (const SPendingRenderWareImport& pendingRenderWareImport : s_PendingRenderWareImports)
+    {
+        if (pendingRenderWareImport.pTXD == pTXD && pendingRenderWareImport.usModelId == usModelID)
+            return true;
+    }
+
+    return false;
+}
+
+static void PrunePendingRenderWareImports()
+{
+    for (auto it = s_PendingRenderWareImports.begin(); it != s_PendingRenderWareImports.end();)
+    {
+        if (!it->pTXD || it->pTXD->IsBeingDeleted())
+        {
+            it = s_PendingRenderWareImports.erase(it);
+            continue;
+        }
+
+        if (!it->pTXD->HasPendingRenderWareImport(it->usModelId))
+        {
+            it = s_PendingRenderWareImports.erase(it);
+            continue;
+        }
+
+        ++it;
+    }
+}
 
 CClientTXD::CClientTXD(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
@@ -144,14 +195,27 @@ bool CClientTXD::IsDeviceLost() const
     return hr != D3D_OK;
 }
 
+bool CClientTXD::HasPendingRenderWareImport(unsigned short usModelID) const
+{
+    std::unordered_set<unsigned short>::const_iterator itPendingOnModel = m_ReplacementTextures.pendingOnModelIds.find(usModelID);
+    return itPendingOnModel != m_ReplacementTextures.pendingOnModelIds.end();
+}
+
 void CClientTXD::RemovePendingImports()
 {
-    if (s_PendingTxdImports.empty())
-        return;
+    if (!s_PendingTxdImports.empty())
+    {
+        s_PendingTxdImports.erase(
+            std::remove_if(s_PendingTxdImports.begin(), s_PendingTxdImports.end(), [this](const SPendingTxdImport& entry) { return entry.pTXD == this; }),
+            s_PendingTxdImports.end());
+    }
 
-    s_PendingTxdImports.erase(
-        std::remove_if(s_PendingTxdImports.begin(), s_PendingTxdImports.end(), [this](const SPendingTxdImport& entry) { return entry.pTXD == this; }),
-        s_PendingTxdImports.end());
+    if (!s_PendingRenderWareImports.empty())
+    {
+        s_PendingRenderWareImports.erase(std::remove_if(s_PendingRenderWareImports.begin(), s_PendingRenderWareImports.end(),
+                                                        [this](const SPendingRenderWareImport& entry) { return entry.pTXD == this; }),
+                                         s_PendingRenderWareImports.end());
+    }
 }
 
 bool CClientTXD::ImportInternal(unsigned short usModelID, bool bAllowQueue)
@@ -242,30 +306,51 @@ bool CClientTXD::ImportInternal(unsigned short usModelID, bool bAllowQueue)
             return true;
         }
 
+        const bool bRenderWareImportPending = HasPendingRenderWareImport(usModelID);
+        const bool bRenderWareImportQueued = IsRenderWareImportQueued(this, usModelID);
+        if (bAllowQueue && (bRenderWareImportPending || bRenderWareImportQueued))
+        {
+            if (!bRenderWareImportQueued)
+            {
+                PrunePendingRenderWareImports();
+
+                if (s_PendingRenderWareImports.size() >= MAX_PENDING_RENDER_WARE_IMPORTS)
+                {
+                    m_strLastError = SString("RenderWare deferred import queue is full for model %d", usModelID);
+                    return false;
+                }
+
+                SPendingRenderWareImport pendingRenderWareImport;
+                pendingRenderWareImport.pTXD = this;
+                pendingRenderWareImport.usModelId = usModelID;
+                s_PendingRenderWareImports.push_back(pendingRenderWareImport);
+            }
+            return true;
+        }
+
         if (bAllowQueue && IsDeviceLost())
         {
             const std::size_t kMaxPendingImports = 2048;
             const uint32_t    uiNow = GetTickCount32();
 
+            if (IsDeviceLossImportQueued(this, usModelID))
+                return true;
+
             if (s_PendingTxdImports.size() >= kMaxPendingImports)
             {
+                const SPendingTxdImport& droppedTxdImport = s_PendingTxdImports.front();
+                AddReportLog(9401, SString("Dropping device-loss TXD retry for model %u because the queue is full", droppedTxdImport.usModelId));
                 s_PendingTxdImports.erase(s_PendingTxdImports.begin());
                 if (uiNow - s_uiLastPendingImportDropLogTime >= 1000)
                     s_uiLastPendingImportDropLogTime = uiNow;
             }
 
-            for (const SPendingTxdImport& entry : s_PendingTxdImports)
-            {
-                if (entry.pTXD == this && entry.usModelId == usModelID)
-                    return true;
-            }
-
-            SPendingTxdImport entry;
-            entry.pTXD = this;
-            entry.usModelId = usModelID;
-            entry.uiQueuedTick = uiNow;
-            entry.ucRetryCount = 0;
-            s_PendingTxdImports.push_back(entry);
+            SPendingTxdImport pendingTxdImport;
+            pendingTxdImport.pTXD = this;
+            pendingTxdImport.usModelId = usModelID;
+            pendingTxdImport.uiQueuedTick = uiNow;
+            pendingTxdImport.ucRetryCount = 0;
+            s_PendingTxdImports.push_back(pendingTxdImport);
             return true;
         }
 
@@ -278,7 +363,7 @@ bool CClientTXD::ImportInternal(unsigned short usModelID, bool bAllowQueue)
 
 void CClientTXD::ProcessPendingImports()
 {
-    if (s_PendingTxdImports.empty())
+    if (s_PendingTxdImports.empty() && s_PendingRenderWareImports.empty())
         return;
 
     const uint32_t uiNow = GetTickCount32();
@@ -300,35 +385,97 @@ void CClientTXD::ProcessPendingImports()
 
     for (auto it = s_PendingTxdImports.begin(); it != s_PendingTxdImports.end();)
     {
-        SPendingTxdImport& entry = *it;
-        if (!entry.pTXD || entry.pTXD->IsBeingDeleted())
+        SPendingTxdImport& pendingTxdImport = *it;
+        if (!pendingTxdImport.pTXD || pendingTxdImport.pTXD->IsBeingDeleted())
         {
             it = s_PendingTxdImports.erase(it);
             continue;
         }
 
-        if (uiNow - entry.uiQueuedTick > kTimeoutMs || entry.ucRetryCount >= kMaxRetries)
+        if (uiNow - pendingTxdImport.uiQueuedTick > kTimeoutMs || pendingTxdImport.ucRetryCount >= kMaxRetries)
         {
+            AddReportLog(9401, SString("Dropping device-loss TXD retry for model %u after %u retries", pendingTxdImport.usModelId,
+                                       static_cast<unsigned int>(pendingTxdImport.ucRetryCount)));
             if (uiNow - s_uiLastPendingImportDropLogTime >= 1000)
                 s_uiLastPendingImportDropLogTime = uiNow;
             it = s_PendingTxdImports.erase(it);
             continue;
         }
 
-        if (entry.pTXD->ImportInternal(entry.usModelId, false))
+        if (pendingTxdImport.pTXD->ImportInternal(pendingTxdImport.usModelId, false))
         {
             it = s_PendingTxdImports.erase(it);
             continue;
         }
 
-        ++entry.ucRetryCount;
+        if (pendingTxdImport.pTXD->HasPendingRenderWareImport(pendingTxdImport.usModelId))
+        {
+            if (!IsRenderWareImportQueued(pendingTxdImport.pTXD, pendingTxdImport.usModelId))
+            {
+                PrunePendingRenderWareImports();
+
+                if (s_PendingRenderWareImports.size() >= MAX_PENDING_RENDER_WARE_IMPORTS)
+                {
+                    ++pendingTxdImport.ucRetryCount;
+                    ++it;
+                    continue;
+                }
+
+                SPendingRenderWareImport pendingRenderWareImport;
+                pendingRenderWareImport.pTXD = pendingTxdImport.pTXD;
+                pendingRenderWareImport.usModelId = pendingTxdImport.usModelId;
+                s_PendingRenderWareImports.push_back(pendingRenderWareImport);
+            }
+
+            it = s_PendingTxdImports.erase(it);
+            continue;
+        }
+
+        ++pendingTxdImport.ucRetryCount;
         ++it;
+    }
+
+    for (auto it = s_PendingRenderWareImports.begin(); it != s_PendingRenderWareImports.end();)
+    {
+        SPendingRenderWareImport& pendingRenderWareImport = *it;
+        if (!pendingRenderWareImport.pTXD || pendingRenderWareImport.pTXD->IsBeingDeleted())
+        {
+            it = s_PendingRenderWareImports.erase(it);
+            continue;
+        }
+
+        if (pendingRenderWareImport.pTXD->HasPendingRenderWareImport(pendingRenderWareImport.usModelId))
+        {
+            ++it;
+            continue;
+        }
+
+        if (pendingRenderWareImport.pTXD->ImportInternal(pendingRenderWareImport.usModelId, false))
+        {
+            it = s_PendingRenderWareImports.erase(it);
+            continue;
+        }
+
+        if (pendingRenderWareImport.pTXD->HasPendingRenderWareImport(pendingRenderWareImport.usModelId))
+        {
+            ++it;
+            continue;
+        }
+
+        SString strError = pendingRenderWareImport.pTXD->GetLastError();
+        if (strError.empty())
+            strError = SString("Deferred texture import failed for model %u", pendingRenderWareImport.usModelId);
+
+        AddReportLog(9401, SString("Deferred TXD import failed for model %u: %s", pendingRenderWareImport.usModelId, strError.c_str()));
+
+        it = s_PendingRenderWareImports.erase(it);
     }
 }
 
 void CClientTXD::ClearPendingImports()
 {
     s_PendingTxdImports.clear();
+    s_PendingRenderWareImports.clear();
     s_uiLastPendingImportProcessTime = 0;
     s_uiLastPendingImportDropLogTime = 0;
 }
