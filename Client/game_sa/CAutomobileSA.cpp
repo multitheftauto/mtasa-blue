@@ -21,6 +21,7 @@ CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* pInterface)
     Init();
 }
 
+// Returns true when any wheel is partially compressed (not fully relaxed)
 bool CAutomobileSA::IsAnyWheelTouchingGround() const
 {
     CAutomobileSAInterface* autoInterface = GetAutomobileInterface();
