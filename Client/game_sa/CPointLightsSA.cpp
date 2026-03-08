@@ -75,7 +75,7 @@ void CPointLightsSA::RenderHeliLight(const CVector& vecStart, const CVector& vec
     CVector mat[] = {CVector(), CVector(), CVector()};
 
     // Set color
-    SColor currentColor = searchLightColor;
+    SColor originalColor = searchLightColor;
     searchLightColor = color;
 
     // Set render states and render
@@ -83,7 +83,7 @@ void CPointLightsSA::RenderHeliLight(const CVector& vecStart, const CVector& vec
 
     // Set previous color
     // Keep the maverick default searchlight color
-    searchLightColor = currentColor;
+    searchLightColor = originalColor;
 }
 
 struct RxObjSpace3DVertex
