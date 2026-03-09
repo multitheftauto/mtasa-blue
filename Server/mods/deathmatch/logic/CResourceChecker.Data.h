@@ -251,6 +251,5 @@ namespace
         {false, "isPedOnGround", "isElementOnGround"},
 
         // Vehicle
-        {false, "isVehicleOnGround", "isElementOnGround"}
-    };
-}            // namespace
+        {false, "isVehicleOnGround", "isElementOnGround"}};
+}  // namespace
