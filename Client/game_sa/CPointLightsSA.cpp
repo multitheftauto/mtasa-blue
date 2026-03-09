@@ -111,8 +111,8 @@ static RxObjSpace3DVertex* CSearchLight_PreRender3DVertexBuffer(RxObjSpace3DVert
     return ((RxObjSpace3DVertex * (__cdecl*)(RxObjSpace3DVertex*, std::uint32_t, RwMatrix*, std::uint32_t))0x7EF450)(buffer, numVerts, ltm, flags);
 }
 
-static void CSearchLight_RenderShadow(char type, void* texture, CVector* pos, float x1, float y1, float x2, float y2, std::int16_t intensity, char r,
-                                            char g, char b, float zDistance, bool drawOnWater, float scale, void* shadowData, bool drawOnBuildings)
+static void CSearchLight_RenderShadow(char type, void* texture, CVector* pos, float x1, float y1, float x2, float y2, std::int16_t intensity, char r, char g,
+                                      char b, float zDistance, bool drawOnWater, float scale, void* shadowData, bool drawOnBuildings)
 {
     // Get original color intensity multiplier
     float colorIntensity = static_cast<float>(intensity) / 128.0f;
@@ -125,10 +125,9 @@ static void CSearchLight_RenderShadow(char type, void* texture, CVector* pos, fl
                                      drawOnBuildings);
 }
 
-static void CSearchLight_RenderCorona(int ID, void* entity, unsigned char r, unsigned char g, unsigned char b, unsigned char a, CVector* pos,
-                                            float radius, float farClip, int type, char flareType, bool enableReflection, bool checkObstacles,
-                                            int unknownUnused, float angle, bool longDistance, float nearClip, bool fadeState, float fadeSpeed,
-                                            bool onlyFromBelow, bool reflectionDelay)
+static void CSearchLight_RenderCorona(int ID, void* entity, unsigned char r, unsigned char g, unsigned char b, unsigned char a, CVector* pos, float radius,
+                                      float farClip, int type, char flareType, bool enableReflection, bool checkObstacles, int unknownUnused, float angle,
+                                      bool longDistance, float nearClip, bool fadeState, float fadeSpeed, bool onlyFromBelow, bool reflectionDelay)
 {
     // CCoronas::RegisterCorona
     ((void(__cdecl*)(int, void*, unsigned char, unsigned char, unsigned char, unsigned char, CVector*, float, float, int, char, bool, bool, int, float, bool,
