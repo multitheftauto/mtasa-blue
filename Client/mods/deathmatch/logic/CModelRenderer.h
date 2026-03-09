@@ -17,15 +17,10 @@ public:
     struct SModelToRender final
     {
         CModelInfo* pModelInfo;
-        CMatrix matrix;
-        float lighting;
+        CMatrix     matrix;
+        float       lighting;
 
-        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f) :
-            pModelInfo(pModelInfo),
-            matrix(matrix),
-            lighting(lighting)
-        {
-        }
+        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting = 0.0f) : pModelInfo(pModelInfo), matrix(matrix), lighting(lighting) {}
     };
 
     bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting);
@@ -34,9 +29,13 @@ public:
 
     void Render();
 
+    // Must be called after GTA's RenderFadingInEntities completes to release
+    // the queue memory that the alpha entity list's callbacks reference.
+    void NotifyFrameEnd();
+
     static void RenderEntity(SModelToRender* entity, float distance);
 
-private:  
-
+private:
     std::vector<SModelToRender> m_Queue;
+    bool                        m_bAlphaRefsActive = false;
 };

@@ -17,5 +17,5 @@
 class CGUIButton : public CGUIElement
 {
 public:
-    virtual ~CGUIButton(){};
+    virtual ~CGUIButton() {};
 };

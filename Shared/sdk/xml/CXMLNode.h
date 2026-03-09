@@ -19,7 +19,7 @@
 class CXMLNode : public CXMLCommon
 {
 public:
-    virtual ~CXMLNode(){};
+    virtual ~CXMLNode() {};
 
     virtual CXMLNode* CreateSubNode(const char* szTagName, CXMLNode* pInsertAfter = nullptr) = 0;
     virtual void      DeleteSubNode(CXMLNode* pNode) = 0;

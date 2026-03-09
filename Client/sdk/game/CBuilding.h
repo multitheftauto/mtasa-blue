@@ -18,7 +18,7 @@ class CBuildingSAInterface;
 class CBuilding : public virtual CEntity
 {
 public:
-    virtual ~CBuilding(){};
+    virtual ~CBuilding() {};
 
     virtual CBuildingSAInterface* GetBuildingInterface() = 0;
     virtual void                  SetLod(CBuilding* pLod) = 0;

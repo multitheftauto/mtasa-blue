@@ -39,19 +39,19 @@ void OnMY_Rtl_fopen_Post(FILE* fh, DWORD calledFrom, const char* szFilename, con
                 return;
         }
 
-        AddReportLog(5321, SString("Rtl_fopen failed: called from:%08x  mode:%s  name:%s", calledFrom, szMode, *strFilename));
         SetApplicationSetting("diagnostics", "gta-fopen-fail", strFilename);
     }
 }
 
 // Hook info
-#define HOOKPOS_Rtl_fopen                            0x8232D8
-#define HOOKSIZE_Rtl_fopen                           6
-DWORD RETURN_Rtl_fopen = 0x8232DE;
+#define HOOKPOS_Rtl_fopen  0x8232D8
+#define HOOKSIZE_Rtl_fopen 6
+DWORD                         RETURN_Rtl_fopen = 0x8232DE;
 static void __declspec(naked) HOOK_Rtl_fopen()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         push    [esp+4*3]
@@ -75,6 +75,7 @@ inner:
         push    [esp+0x0c]
         jmp     RETURN_Rtl_fopen
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -91,13 +92,14 @@ void OnMY_Rtl_fclose(DWORD calledFrom, FILE* fh)
 }
 
 // Hook info
-#define HOOKPOS_Rtl_fclose                            0x82318B
-#define HOOKSIZE_Rtl_fclose                           6
-DWORD RETURN_Rtl_fclose = 0x823192;
+#define HOOKPOS_Rtl_fclose  0x82318B
+#define HOOKSIZE_Rtl_fclose 6
+DWORD                         RETURN_Rtl_fclose = 0x823192;
 static void __declspec(naked) HOOK_Rtl_fclose()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -111,6 +113,7 @@ static void __declspec(naked) HOOK_Rtl_fclose()
         push    0x887EC8
         jmp     RETURN_Rtl_fclose
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

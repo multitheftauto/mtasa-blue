@@ -1014,7 +1014,8 @@ CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius
     if (interior || dimension || typeHash)
     {
         result.erase(std::remove_if(result.begin(), result.end(),
-                                    [&, radiusSq = radius * radius](CElement* pElement) {
+                                    [&, radiusSq = radius * radius](CElement* pElement)
+                                    {
                                         if (typeHash && typeHash != pElement->GetTypeHash())
                                             return true;
 
@@ -1542,10 +1543,10 @@ int CLuaElementDefs::setElementID(lua_State* luaVM)
 int CLuaElementDefs::setElementData(lua_State* luaVM)
 {
     //  bool setElementData ( element theElement, string key, var value, [var syncMode = true] )
-    CElement*    pElement;
-    CStringName  key;
-    CLuaArgument value;
-    ESyncType    syncType = ESyncType::BROADCAST;
+    CElement*                             pElement;
+    CStringName                           key;
+    CLuaArgument                          value;
+    ESyncType                             syncType = ESyncType::BROADCAST;
     std::optional<eCustomDataClientTrust> clientTrust{};
 
     CScriptArgReader argStream(luaVM);
@@ -1598,7 +1599,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
 int CLuaElementDefs::removeElementData(lua_State* luaVM)
 {
     //  bool removeElementData ( element theElement, string key )
-    CElement* pElement;
+    CElement*   pElement;
     CStringName key;
 
     CScriptArgReader argStream(luaVM);
@@ -1633,9 +1634,9 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
 int CLuaElementDefs::addElementDataSubscriber(lua_State* luaVM)
 {
     //  bool addElementDataSubscriber ( element theElement, string key, player thePlayer )
-    CElement* pElement;
+    CElement*   pElement;
     CStringName key;
-    CPlayer*  pPlayer;
+    CPlayer*    pPlayer;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1662,9 +1663,9 @@ int CLuaElementDefs::addElementDataSubscriber(lua_State* luaVM)
 int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
 {
     //  bool removeElementDataSubscriber ( element theElement, string key, player thePlayer )
-    CElement* pElement;
+    CElement*   pElement;
     CStringName key;
-    CPlayer*  pPlayer;
+    CPlayer*    pPlayer;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1691,9 +1692,9 @@ int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
 int CLuaElementDefs::hasElementDataSubscriber(lua_State* luaVM)
 {
     //  bool hasElementDataSubscriber ( element theElement, string key, player thePlayer )
-    CElement* pElement;
+    CElement*   pElement;
     CStringName key;
-    CPlayer*  pPlayer;
+    CPlayer*    pPlayer;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

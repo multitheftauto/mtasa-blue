@@ -124,9 +124,10 @@ protected:
     void StreamOut();
 
 private:
-    void Create();
+    void NotifyUnableToCreate();
+    bool Create();
     void Destroy();
-    void ReCreate();
+    bool ReCreate();
 
     CClientPickupManager* m_pPickupManager;
 

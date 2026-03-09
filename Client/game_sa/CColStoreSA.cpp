@@ -44,9 +44,11 @@ int CColStoreSA::AddColSlot(const char* name)
 
 bool CColStoreSA::IsValidSlot(CollisionSlot slot)
 {
-    using Signature = bool(__cdecl*)(CollisionSlot);
+    // Native signature: bool __cdecl sub_410660(int a1)
+    // Must use int to match GTA SA's ABI - it reads a full DWORD from stack
+    using Signature = bool(__cdecl*)(int);
     const auto function = reinterpret_cast<Signature>(0x410660);
-    return function(slot);
+    return function(static_cast<int>(slot));
 }
 
 void CColStoreSA::AddCollisionNeededAtPosition(const CVector& position)
@@ -62,16 +64,16 @@ void CColStoreSA::EnsureCollisionIsInMemory(const CVector& position)
     // Race condition: MTA can trigger streaming/collision operations before GTA completes initialization.
     // GTA calls CTimer::Initialise at 0x53BDE6 during startup, which sets _timerFunction at 0x56189E.
     // If called before GTA reaches GS_INIT_PLAYING_GAME, the timer isn't initialized > crash at 0x5619E9 (CTimer::Suspend)
-    
+
     if (!pGame || pGame->GetSystemState() < SystemState::GS_INIT_PLAYING_GAME)
         return;  // GTA not ready yet - skip (will retry on next streaming update)
-    
+
     // Just in case
     constexpr auto ADDR_timerFunction = 0xB7CB28;
-    const auto timerFunction = *reinterpret_cast<void* const*>(ADDR_timerFunction);
+    const auto     timerFunction = *reinterpret_cast<void* const*>(ADDR_timerFunction);
     if (!timerFunction)
         return;  // Timer not initialized yet - skip
-    
+
     // SA function signature: void __cdecl CColStore::EnsureCollisionIsInMemory(const CVector2D&)
     // CVector implicitly converts to CVector2D (uses x, y components only)
     using Signature = void(__cdecl*)(const CVector&);
@@ -109,30 +111,36 @@ void CColStoreSA::RemoveAllCollision()
 
 void CColStoreSA::AddRef(CollisionSlot slot)
 {
-    using Signature = void(__cdecl*)(CollisionSlot);
+    // Native signature: void __cdecl CColStore::AddRef(int)
+    // Must use int to match GTA SA's ABI - it reads a full DWORD from stack
+    using Signature = void(__cdecl*)(int);
     const auto function = reinterpret_cast<Signature>(0x4107A0);
-    function(slot);
+    function(static_cast<int>(slot));
 }
 
 void CColStoreSA::RemoveRef(CollisionSlot slot)
 {
-    using Signature = void(__cdecl*)(CollisionSlot);
+    // Native signature: void __cdecl CColStore::RemoveRef(int)
+    // Must use int to match GTA SA's ABI - it reads a full DWORD from stack
+    using Signature = void(__cdecl*)(int);
     const auto function = reinterpret_cast<Signature>(0x4107D0);
-    function(slot);
+    function(static_cast<int>(slot));
 }
 
 void CColStoreSA::RemoveCol(CollisionSlot slot)
 {
-    using Signature = void(__cdecl*)(CollisionSlot);
+    // Native expects int parameter
+    using Signature = void(__cdecl*)(int);
     const auto function = reinterpret_cast<Signature>(0x410730);
-    function(slot);
+    function(static_cast<int>(slot));
 }
 
 void CColStoreSA::RemoveColSlot(CollisionSlot slot)
 {
-    using Signature = void(__cdecl*)(CollisionSlot);
+    // Native expects int parameter
+    using Signature = void(__cdecl*)(int);
     const auto function = reinterpret_cast<Signature>(0x411330);
-    function(slot);
+    function(static_cast<int>(slot));
 }
 
 void CColStoreSA::LoadAllBoundingBoxes()
@@ -144,28 +152,32 @@ void CColStoreSA::LoadAllBoundingBoxes()
 
 CColStore::BoundingBox CColStoreSA::GetBoundingBox(CollisionSlot slot)
 {
-    using Signature = BoundingBox&(__cdecl*)(CollisionSlot);
+    // Native expects int parameter
+    using Signature = BoundingBox&(__cdecl*)(int);
     const auto function = reinterpret_cast<Signature>(0x410800);
-    return function(slot);
+    return function(static_cast<int>(slot));
 }
 
 void CColStoreSA::IncludeModelIndex(CollisionSlot slot, std::uint16_t model)
 {
-    using Signature = void(__cdecl*)(CollisionSlot, int);
+    // Native expects int parameters
+    using Signature = void(__cdecl*)(int, int);
     const auto function = reinterpret_cast<Signature>(0x410820);
-    function(slot, model);
+    function(static_cast<int>(slot), static_cast<int>(model));
 }
 
 int CColStoreSA::GetFirstModel(CollisionSlot slot)
 {
-    using Signature = int(__cdecl*)(CollisionSlot);
+    // Native expects int parameter
+    using Signature = int(__cdecl*)(int);
     const auto function = reinterpret_cast<Signature>(0x537A80);
-    return function(slot);
+    return function(static_cast<int>(slot));
 }
 
 int CColStoreSA::GetLastModel(CollisionSlot slot)
 {
-    using Signature = int(__cdecl*)(CollisionSlot);
+    // Native expects int parameter
+    using Signature = int(__cdecl*)(int);
     const auto function = reinterpret_cast<Signature>(0x537AB0);
-    return function(slot);
+    return function(static_cast<int>(slot));
 }

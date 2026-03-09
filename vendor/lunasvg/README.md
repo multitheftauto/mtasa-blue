@@ -1,6 +1,9 @@
-[![Releases](https://img.shields.io/badge/Version-3.2.0-orange.svg)](https://github.com/sammycage/lunasvg/releases)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/sammycage/lunasvg/blob/master/LICENSE)
-[![Build Status](https://github.com/sammycage/lunasvg/actions/workflows/main.yml/badge.svg)](https://github.com/sammycage/lunasvg/actions)
+[![Actions](https://github.com/sammycage/lunasvg/actions/workflows/main.yml/badge.svg)](https://github.com/sammycage/lunasvg/actions)
+[![License](https://img.shields.io/github/license/sammycage/lunasvg)](https://github.com/sammycage/lunasvg/blob/master/LICENSE)
+[![Releases](https://img.shields.io/github/v/release/sammycage/lunasvg)](https://github.com/sammycage/lunasvg/releases)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.me/sammycage)
+
+> Interested in HTML rendering? Explore a related library, [PlutoBook](https://github.com/plutoprint/plutobook), built for paged HTML rendering.
 
 # LunaSVG
 
@@ -95,6 +98,69 @@ int main()
 | --- | --- |
 | ![summer.png](https://github.com/user-attachments/assets/c7f16780-23f8-4acd-906a-2242f2d0d33b) | ![winter.png](https://github.com/user-attachments/assets/fdd65288-11c7-4e16-bb5a-2bf28de57145) |
 
+---
+
+## Hit Testing
+
+This example demonstrates SVG element hit testing using `elementFromPoint(x, y)` in LunaSVG. It loads an SVG containing three shapes, performs point-based hit detection, and applies a skew transform with a black stroke to each matched element. The results are saved as `original.png` and `modified.png` for visual comparison.
+
+```cpp
+#include <lunasvg.h>
+
+#include <utility>
+#include <iostream>
+
+using namespace lunasvg;
+
+static const char kSVGContent[] = R"SVG(
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect id="red-rect" x="20" y="20" width="100" height="100" fill="red"/>
+  <circle id="blue-circle" cx="200" cy="70" r="50" fill="blue"/>
+  <rect id="green-rect" x="300" y="30" width="70" height="130" fill="green"/>
+</svg>
+)SVG";
+
+int main()
+{
+    auto document = Document::loadFromData(kSVGContent);
+
+    document->renderToBitmap().writeToPng("original.png");
+
+    const std::pair<float, float> points[] = {
+        {30,  30}, // inside red-rect
+        {200, 70}, // center of blue-circle
+        {310, 50}, // inside green-rect
+        {0,    0}, // outside all shapes
+    };
+
+    for(const auto& [x, y] : points) {
+        if(auto element = document->elementFromPoint(x, y)) {
+            std::cout << "Element at (" << x << ", " << y << "): " << element.getAttribute("id") << "\n";
+
+            element.setAttribute("stroke", "black");
+            element.setAttribute("stroke-width", "3");
+            element.setAttribute("transform", "skewX(9)");
+        } else {
+            std::cout << "No element found at (" << x << ", " << y << ")\n";
+        }
+    }
+
+    document->renderToBitmap().writeToPng("modified.png");
+    return 0;
+}
+```
+
+| `original.png` | `modified.png` |
+| --- | --- |
+| ![original.png](https://github.com/user-attachments/assets/bbffbd84-6311-484b-bfe3-219d7aec055b) | ![modified.png](https://github.com/user-attachments/assets/a7f6e502-a64f-48d5-8a01-901ad15b108b) |
+
+```log
+Element at (30, 30): red-rect
+Element at (200, 70): blue-circle
+Element at (310, 50): green-rect
+No element found at (0, 0)
+```
+
 ## Features
 
 LunaSVG supports nearly all graphical features outlined in the SVG 1.1 and SVG 1.2 Tiny specifications. The primary exceptions are animation, filters, and scripts. As LunaSVG is designed for static rendering, animation is unlikely to be supported in the future. However, support for filters may be added. It currently handles a wide variety of elements, including:
@@ -108,7 +174,7 @@ Follow the steps below to install LunaSVG using either [CMake](https://cmake.org
 ### Using CMake
 
 ```bash
-git clone --recursive https://github.com/sammycage/lunasvg.git
+git clone https://github.com/sammycage/lunasvg.git
 cd lunasvg
 cmake -B build .
 cmake --build build
@@ -140,6 +206,17 @@ target_link_libraries(your_target_name PRIVATE lunasvg::lunasvg)
 ```
 
 Replace `your_target_name` with the name of your executable or library target.
+
+Build Options
+LunaSVG provides several build options that can be configured using -D flags when running cmake. Below is a list of available options:
+
+USE_SYSTEM_PLUTOVG (default: OFF): Use the system-installed plutovg library (version 1.0.0 or higher) instead of the bundled submodule. If the system library is not found, the build will fall back to using the submodule.
+Example:
+
+```bash
+cmake -B build -DUSE_SYSTEM_PLUTOVG=ON .
+cmake --build build
+```
 
 ### Using Meson
 
@@ -207,3 +284,8 @@ $ svg2png input.svg 512x512 0xff00ffff
 - [eScada Solutions](https://www.escadasolutions.com)
 - [CARLA Simulator](https://carla.org/)
 - [AUI Framework](https://github.com/aui-framework/aui)
+- [Software Companions](http://www.softwarecompanions.com)
+
+## License
+
+LunaSVG is licensed under the MIT License, see [LICENSE](https://github.com/sammycage/lunasvg/blob/master/LICENSE) for more information.

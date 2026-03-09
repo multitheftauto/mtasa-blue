@@ -27,9 +27,13 @@
 
 class CClientVariables : public CCVarsInterface, public CSingleton<CClientVariables>
 {
-    // Sanity macros   << Who ever did this is idiot
-    #define SAN     if(!m_pStorage) return
-    #define SANGET  if(!Node(strVariable)) return false
+// Sanity macros   << Who ever did this is idiot
+#define SAN \
+    if (!m_pStorage) \
+    return
+#define SANGET \
+    if (!Node(strVariable)) \
+    return false
 
 public:
     CClientVariables();

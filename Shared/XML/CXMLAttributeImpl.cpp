@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-#define XML_ATTRIBUTE_VALUE_BUFFER  40
+#define XML_ATTRIBUTE_VALUE_BUFFER 40
 
 CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, TiXmlElement& Node, const std::string& strName)
     : m_ulID(INVALID_XML_ID),

@@ -15,13 +15,13 @@
 
 class CAnimBlendAssocGroupSA;
 
-class CAnimBlockSAInterface            // 32 bytes
+class CAnimBlockSAInterface  // 32 bytes
 {
 public:
-    int GetIndex();            // hacky, i know
+    int GetIndex();  // hacky, i know
 
     char           szName[16];
-    bool           bLoaded;            // ?
+    bool           bLoaded;  // ?
     BYTE           pad[1];
     unsigned short usRefs;
     int            idOffset;

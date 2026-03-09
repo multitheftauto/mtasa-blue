@@ -66,7 +66,7 @@ CClientPlayer::CClientPlayer(CClientManager* pManager, ElementID ID, bool bIsLoc
         m_remoteDataStorage->SetProcessPlayerWeapon(true);
 
         // Enable voice playback for remote players
-        if (g_pClientGame->GetVoiceRecorder()->IsEnabled())            // If voice is enabled
+        if (g_pClientGame->GetVoiceRecorder()->IsEnabled())  // If voice is enabled
             m_voice = new CClientPlayerVoice(this, g_pClientGame->GetVoiceRecorder());
     }
 
@@ -269,7 +269,6 @@ void CClientPlayer::DischargeWeapon(eWeaponType weaponType, const CVector& vecSt
         if (weaponType != GetCurrentWeaponType())
         {
             GiveWeapon(weaponType, 99, true);
-            AddReportLog(5432, SString("DischargeWeapon adding missing weapon %d (%s)", weaponType, GetNick()), 30);
         }
 
         // Check weapon matches and is enabled for bullet sync

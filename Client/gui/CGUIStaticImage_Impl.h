@@ -45,5 +45,5 @@ private:
     CEGUI::Imageset*        m_pImageset;
     const CEGUI::Image*     m_pImage;
 
-    #include "CGUIElement_Inc.h"
+#include "CGUIElement_Inc.h"
 };

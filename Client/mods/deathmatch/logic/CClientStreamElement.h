@@ -53,7 +53,7 @@ private:
     void SetStreamRow(CClientStreamSectorRow* pRow) { m_pStreamRow = pRow; }
     void SetStreamSector(CClientStreamSector* pSector) { m_pStreamSector = pSector; }
     void SetExpDistance(float fDistance) { m_fExpDistance = fDistance; }
-    
+
     CClientStreamSectorRow* m_pStreamRow;
     CClientStreamSector*    m_pStreamSector;
     CVector                 m_vecStreamPosition;
@@ -61,9 +61,9 @@ private:
     unsigned short          m_usStreamReferences, m_usStreamReferencesScript;
 
 protected:
-    CClientStreamer*        m_pStreamer;
-    bool                    m_bStreamedIn;
-    bool                    m_bAttemptingToStreamIn;
+    CClientStreamer* m_pStreamer;
+    bool             m_bStreamedIn;
+    bool             m_bAttemptingToStreamIn;
 
 public:
     float                   m_fCachedRadius;

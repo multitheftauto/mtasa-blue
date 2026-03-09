@@ -15,7 +15,7 @@ using SharedUtil::CalcMTASAPath;
 using std::string;
 
 #define CONSOLE_INPUT_HISTORY_LENGTH 128
-#define CONSOLE_SIZE 4096
+#define CONSOLE_SIZE                 4096
 
 #define MAX_CONSOLE_COMMAND_LENGTH 255
 
@@ -368,13 +368,13 @@ void CConsole::SetNextAutoCompleteMatch()
             while (CEntryHistoryItem* pEntryHistoryItem = m_pConsoleHistory->Get(++iIndex))
             {
                 const char* szItem = *pEntryHistoryItem;
-                if (strlen(szItem) < 3)            // Skip very short lines
+                if (strlen(szItem) < 3)  // Skip very short lines
                     continue;
 
                 // Save the index of any matches
                 if (strnicmp(szItem, strInput.c_str(), strInput.length()) == 0)
                 {
-                    if (m_AutoCompleteList.size())            // Dont add duplicates of the previously added line
+                    if (m_AutoCompleteList.size())  // Dont add duplicates of the previously added line
                     {
                         CEntryHistoryItem* pPrevEntryHistoryItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_AutoCompleteList.size() - 1));
                         if (!pPrevEntryHistoryItem)
@@ -556,7 +556,7 @@ void CConsole::FlushPendingAdd()
                     uiSelectionStart = 0;
                     uiSelectionEnd -= uiBufferLengthDiff;
                 }
-                else            // Both start and end of selection are greater than length difference
+                else  // Both start and end of selection are greater than length difference
                 {
                     // Whole selection would still be visible on the screen,
                     // just a simple movement is needed

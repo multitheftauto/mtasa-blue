@@ -20,8 +20,8 @@ class CClientModelManager;
 #include "CClientModel.h"
 
 #define MAX_MODEL_DFF_ID 20000
-#define MAX_MODEL_TXD_ID 25000
-#define MAX_MODEL_ID     25000
+#define MAX_MODEL_TXD_ID 52768
+#define MAX_MODEL_ID     52768
 
 class CClientModelManager
 {
@@ -37,9 +37,9 @@ public:
     bool TryAdd(const std::shared_ptr<CClientModel>& pModel);
     bool Remove(const std::shared_ptr<CClientModel>& pModel);
 
-    int GetFirstFreeModelID(void);
+    int  GetFirstFreeModelID(void);
     void ReleaseModelID(int iModelID);
-    int GetFreeTxdModelID();
+    int  GetFreeTxdModelID();
 
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
     std::shared_ptr<CClientModel> Request(CClientManager* pManager, int iModelID, eClientModelType eType);

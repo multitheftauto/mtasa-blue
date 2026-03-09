@@ -25,11 +25,13 @@ CONDITIONAL COMPILATION :
 
 #include "StdInc.h"
 #include "CCrashHandlerAPI.h"
+
+#include <cstring>
 #ifdef WIN32
 
-#ifdef _M_IX86
-    #include <SharedUtil.Detours.h>
-#endif
+    #ifdef _M_IX86
+        #include <SharedUtil.Detours.h>
+    #endif
 
 /*//////////////////////////////////////////////////////////////////////
                       File Scope Global Variables
@@ -46,13 +48,13 @@ static LPTOP_LEVEL_EXCEPTION_FILTER g_pfnOrigFilt = NULL;
 // The exception handler
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
-/*//////////////////////////////////////////////////////////////////////
-                            Destructor Class
-//////////////////////////////////////////////////////////////////////*/
-// See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
-// Turn off warning : initializers put in library initialization area
-#pragma warning (disable : 4073)
-#pragma init_seg(lib)
+    /*//////////////////////////////////////////////////////////////////////
+                                Destructor Class
+    //////////////////////////////////////////////////////////////////////*/
+    // See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
+    // Turn off warning : initializers put in library initialization area
+    #pragma warning(disable : 4073)
+    #pragma init_seg(lib)
 class CleanUpCrashHandler
 {
 public:
@@ -89,9 +91,24 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
     }
     else
     {
-        if (TRUE == IsBadCodePtr(reinterpret_cast<FARPROC>(static_cast<void*>(pFn))))
         {
-            return (FALSE);
+            const void* address = nullptr;
+            static_assert(sizeof(address) == sizeof(pFn), "Unexpected function pointer size");
+            std::memcpy(&address, &pFn, sizeof(address));
+
+            MEMORY_BASIC_INFORMATION mbi{};
+            if (VirtualQuery(address, &mbi, sizeof(mbi)) != sizeof(mbi))
+                return (FALSE);
+            if (mbi.State != MEM_COMMIT)
+                return (FALSE);
+            if ((mbi.Protect & PAGE_GUARD) || (mbi.Protect & PAGE_NOACCESS))
+                return (FALSE);
+
+            const DWORD protect = (mbi.Protect & 0xFF);
+            const bool  isExecutable =
+                protect == PAGE_EXECUTE || protect == PAGE_EXECUTE_READ || protect == PAGE_EXECUTE_READWRITE || protect == PAGE_EXECUTE_WRITECOPY;
+            if (!isExecutable)
+                return (FALSE);
         }
         g_pfnCallBack = pFn;
 
@@ -102,11 +119,12 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
         {
             g_pfnOrigFilt = SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
 
-#ifdef _M_IX86
+    #ifdef _M_IX86
             // Stop the OS from turning off our handler
             // Ref: https://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
             LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI * RedirectedSetUnhandledExceptionFilter)
-            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER {
+            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER
+            {
                 // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
                 // our handler will not get removed.
                 return 0;
@@ -115,7 +133,7 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
                           "invalid type of RedirectedSetUnhandledExceptionFilter");
 
             DetourLibraryFunction("kernel32.dll", "SetUnhandledExceptionFilter", RedirectedSetUnhandledExceptionFilter);
-#endif
+    #endif
         }
     }
     return (TRUE);
@@ -162,7 +180,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
             // it got unloaded. If some other function loaded
             // back into the same address, however, there isn't much
             // I can do.
-            if (FALSE == IsBadCodePtr(reinterpret_cast<FARPROC>(static_cast<void*>(g_pfnCallBack))))
+            if (FALSE == IsBadCodePtr(reinterpret_cast<FARPROC>(reinterpret_cast<void*>(g_pfnCallBack))))
             {
                 lRet = g_pfnCallBack(pExPtrs);
             }

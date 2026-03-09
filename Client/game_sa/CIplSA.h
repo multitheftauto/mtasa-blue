@@ -17,8 +17,8 @@
 class CIplSAInterface
 {
 public:
-    CRect   rect;
-    char    name[16];
+    CRect    rect;
+    char     name[16];
     uint16_t unk;
     uint16_t minBuildId;
     uint16_t maxBuildId;

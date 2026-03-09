@@ -52,7 +52,7 @@ void CHandlingEntrySA::Recalculate() noexcept
     if (!m_HandlingSA)
         return;
 
-     // Copy our stored field to GTA's
+    // Copy our stored field to GTA's
     MemCpyFast(m_HandlingSA.get(), &m_Handling, sizeof(m_Handling));
     ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_HandlingSA.get());
 }

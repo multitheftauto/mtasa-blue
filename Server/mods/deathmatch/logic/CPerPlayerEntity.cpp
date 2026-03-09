@@ -77,7 +77,7 @@ void CPerPlayerEntity::OnReferencedSubtreeRemove(CElement* pElement)
 
 void CPerPlayerEntity::UpdatePerPlayer()
 {
-    if (m_PlayersAdded.empty() && m_PlayersRemoved.empty())            // This check reduces cpu usage when loading large maps (due to recursion)
+    if (m_PlayersAdded.empty() && m_PlayersRemoved.empty())  // This check reduces cpu usage when loading large maps (due to recursion)
         return;
 
     // Remove entries that match in both added and removed lists
@@ -310,7 +310,7 @@ void CPerPlayerEntity::AddPlayersBelow(CElement* pElement, std::set<CPlayer*>& A
     for (; iterChildren != pElement->IterEnd(); iterChildren++)
     {
         CElement* pElement = *iterChildren;
-        if (pElement->CountChildren() || IS_PLAYER(pElement))            // This check reduces cpu usage when loading large maps (due to recursion)
+        if (pElement->CountChildren() || IS_PLAYER(pElement))  // This check reduces cpu usage when loading large maps (due to recursion)
             AddPlayersBelow(pElement, Added);
     }
 }
@@ -338,7 +338,7 @@ void CPerPlayerEntity::RemovePlayersBelow(CElement* pElement, std::set<CPlayer*>
     for (; iterChildren != pElement->IterEnd(); iterChildren++)
     {
         CElement* pElement = *iterChildren;
-        if (pElement->CountChildren() || IS_PLAYER(pElement))            // This check reduces cpu usage when unloading large maps (due to recursion)
+        if (pElement->CountChildren() || IS_PLAYER(pElement))  // This check reduces cpu usage when unloading large maps (due to recursion)
             RemovePlayersBelow(pElement, Removed);
     }
 }

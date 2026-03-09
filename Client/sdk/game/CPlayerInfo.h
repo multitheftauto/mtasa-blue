@@ -31,13 +31,13 @@ public:
     virtual byte GetCamDrunkLevel() = 0;
     virtual void SetCamDrunkLevel(byte level) = 0;
 
-    virtual DWORD GetCarTwoWheelCounter() = 0;
-    virtual float GetCarTwoWheelDist() = 0;
-    virtual DWORD GetCarLess3WheelCounter() = 0;
-    virtual DWORD GetBikeRearWheelCounter() = 0;
-    virtual float GetBikeRearWheelDist() = 0;
-    virtual DWORD GetBikeFrontWheelCounter() = 0;
-    virtual float GetBikeFrontWheelDist() = 0;
+    virtual DWORD        GetCarTwoWheelCounter() = 0;
+    virtual float        GetCarTwoWheelDist() = 0;
+    virtual DWORD        GetCarLess3WheelCounter() = 0;
+    virtual DWORD        GetBikeRearWheelCounter() = 0;
+    virtual float        GetBikeRearWheelDist() = 0;
+    virtual DWORD        GetBikeFrontWheelCounter() = 0;
+    virtual float        GetBikeFrontWheelDist() = 0;
     virtual std::uint8_t GetMaxHealth() const = 0;
     virtual std::uint8_t GetMaxArmor() const = 0;
 };

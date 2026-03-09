@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CChecksum.h"
 
 using std::list;
 
@@ -19,6 +20,8 @@ CResourceManager::CResourceManager()
 
 CResourceManager::~CResourceManager()
 {
+    CChecksum::ClearChecksumCache();
+
     while (!m_resources.empty())
     {
         CResource* pResource = m_resources.back();
@@ -57,7 +60,7 @@ CResource* CResourceManager::GetResourceFromNetID(unsigned short usNetID)
     {
         if ((*iter)->GetNetID() == usNetID)
         {
-            assert(0);            // Should be in map
+            assert(0);  // Should be in map
             return (*iter);
         }
     }
@@ -241,8 +244,6 @@ void CResourceManager::OnFileModifedByScript(const SString& strInFilename, const
     if (pResourceFile && !pResourceFile->IsModifedByScript())
     {
         pResourceFile->SetModifedByScript(true);
-        SString strMessage("Resource file modifed by script (%s): %s ", *strReason, *ConformResourcePath(strInFilename));
-        AddReportLog(7059, strMessage + g_pNet->GetConnectedServer(true), 10);
     }
 }
 

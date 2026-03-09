@@ -37,7 +37,7 @@ CClientEffect* CClientEffectManager::Create(const SString& strEffectName, const 
 
     CFxSystem* pFxSA = g_pGame->GetFxManager()->CreateFxSystem(strEffectName, vecPosition, NULL, true, bSoundEnable);
     if (pFxSA == NULL)
-        return NULL;            // GTA was unable to create the effect (e.g. wrong effect name)
+        return NULL;  // GTA was unable to create the effect (e.g. wrong effect name)
 
     CClientEffect* pFx = new CClientEffect(m_pManager, pFxSA, strEffectName, ID);
     m_Effects.push_back(pFx);
@@ -86,7 +86,7 @@ void CClientEffectManager::SAEffectDestroyed(void* pFxSAInterface)
     g_pGame->GetFxManager()->OnFxSystemSAInterfaceDestroyed((CFxSystemSAInterface*)pFxSAInterface);
 
     if (pFx == NULL)
-        return;            // We didn't create that effect
+        return;  // We didn't create that effect
 
     pFx->SetFxSystem(NULL);
     g_pClientGame->GetElementDeleter()->Delete(pFx);

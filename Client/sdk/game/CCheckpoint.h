@@ -21,9 +21,9 @@ class CVector;
 
 enum
 {
-    CHECKPOINT_TUBE,                 // a long tube with arrow as direction
-    CHECKPOINT_ENDTUBE,              // finish flag long tube checkpoint
-    CHECKPOINT_EMPTYTUBE,            // just a long tube checkpoint
+    CHECKPOINT_TUBE,       // a long tube with arrow as direction
+    CHECKPOINT_ENDTUBE,    // finish flag long tube checkpoint
+    CHECKPOINT_EMPTYTUBE,  // just a long tube checkpoint
     CHECKPOINT_TORUS,
     CHECKPOINT_TORUS_NOFADE,
     CHECKPOINT_TORUSROT,
@@ -40,7 +40,7 @@ public:
     virtual CVector*           GetPosition() = 0;
     virtual void               SetPointDirection(CVector* vecPointDirection) = 0;
     virtual CVector*           GetPointDirection() = 0;
-    virtual DWORD              GetType() = 0;            // need enum?
+    virtual DWORD              GetType() = 0;  // need enum?
     virtual bool               IsActive() = 0;
     virtual DWORD              GetIdentifier() = 0;
     virtual SharedUtil::SColor GetColor() = 0;

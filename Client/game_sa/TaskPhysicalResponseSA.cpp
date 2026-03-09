@@ -37,6 +37,7 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
     if (!IsValid())
         return;
     DWORD dwThisInterface = (DWORD)GetInterface();
+    // clang-format off
     __asm
     {
         mov     ecx, dwThisInterface
@@ -46,6 +47,7 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
         call    dwFunc
         pop     ebx
     }
+    // clang-format on
 }
 
 CPed* CTaskSimpleChokingSA::GetAttacker()
@@ -99,6 +101,7 @@ void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTear
     // Call the func
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CTaskSimpleChoking__UpdateChoke;
+    // clang-format off
     __asm
     {
         mov         ecx, dwThisInterface
@@ -107,4 +110,5 @@ void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTear
         push        pPedInterface
         call        dwFunc
     }
+    // clang-format on
 }

@@ -3,6 +3,7 @@ project "Deathmatch"
 	kind "SharedLib"
 	targetname "deathmatch"
 	targetdir(buildpath("server/mods/deathmatch"))
+	clangtidy "On"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

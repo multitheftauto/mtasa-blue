@@ -16,5 +16,5 @@
 class CPlane : public virtual CAutomobile
 {
 public:
-    virtual ~CPlane(){};
+    virtual ~CPlane() {};
 };

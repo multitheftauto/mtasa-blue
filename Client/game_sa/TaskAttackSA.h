@@ -17,34 +17,34 @@
 
 class CWeaponInfo;
 
-#define FUNC_CTaskSimpleGangDriveBy__Constructor        0x6217d0
-#define FUNC_CTaskSimpleUseGun__Constructor             0x61de60
-#define FUNC_CTaskSimpleUseGun_ControlGun               0x61e040
-#define FUNC_CTaskSimpleUseGun_ControlGunMove           0x61e0c0
-#define FUNC_CTaskSimpleUseGun_Reset                    0x624dc0
-#define FUNC_CTaskSimpleFight__Constructor              0x61c470
-#define FUNC_CTaskSimpleUseGun_SetPedPosition           0x624ED0
-#define FUNC_CTaskSimpleUseGun_FireGun                  0x61EB10
-#define FUNC_CTaskSimpleUseGun_GetTaskType              0x61DF20
-#define FUNC_CTaskSimpleUseGun_MakeAbortable            0x624E30
-#define FUNC_CTaskSimpleUseGun_ProcessPed               0x62A380
-#define FUNC_CTaskSimpleUseGun_AbortIK                  0x61DFA0
-#define FUNC_CTaskSimpleUseGun_AimGun                   0x61ED10
-#define FUNC_CTaskSimpleUseGun_ClearAnim                0x61E190
-#define FUNC_CTaskSimpleUseGun_GetCurrentCommand        0x4ABE30
-#define FUNC_CTaskSimpleUseGun_GetDoneFiring            0x61C220
-#define FUNC_CTaskSimpleUseGun_GetIsFinished            0x61C240
-#define FUNC_CTaskSimpleUseGun_IsLineOfSightBlocked     0x61C250
-#define FUNC_CTaskSimpleUseGun_GetIsFiring              0x509950
-#define FUNC_CTaskSimpleUseGun_GetIsReloading           0x609340
-#define FUNC_CTaskSimpleUseGun_GetSkipAim               0x588840
-#define FUNC_CTaskSimpleUseGun_PlayerPassiveControlGun  0x61E0A0
-#define FUNC_CTaskSimpleUseGun_RemoveStanceAnims        0x61E8E0
-#define FUNC_CTaskSimpleUseGun_RequirePistolWhip        0x61E200
-#define FUNC_CTaskSimpleUseGun_SetBurstLength           0x61C210
-#define FUNC_CTaskSimpleUseGun_SetMoveAnim              0x61E3F0
-#define FUNC_CTaskSimpleUseGun_StartAnim                0x624F30
-#define FUNC_CTaskSimpleUseGun_StartCountDown           0x61E160
+#define FUNC_CTaskSimpleGangDriveBy__Constructor       0x6217d0
+#define FUNC_CTaskSimpleUseGun__Constructor            0x61de60
+#define FUNC_CTaskSimpleUseGun_ControlGun              0x61e040
+#define FUNC_CTaskSimpleUseGun_ControlGunMove          0x61e0c0
+#define FUNC_CTaskSimpleUseGun_Reset                   0x624dc0
+#define FUNC_CTaskSimpleFight__Constructor             0x61c470
+#define FUNC_CTaskSimpleUseGun_SetPedPosition          0x624ED0
+#define FUNC_CTaskSimpleUseGun_FireGun                 0x61EB10
+#define FUNC_CTaskSimpleUseGun_GetTaskType             0x61DF20
+#define FUNC_CTaskSimpleUseGun_MakeAbortable           0x624E30
+#define FUNC_CTaskSimpleUseGun_ProcessPed              0x62A380
+#define FUNC_CTaskSimpleUseGun_AbortIK                 0x61DFA0
+#define FUNC_CTaskSimpleUseGun_AimGun                  0x61ED10
+#define FUNC_CTaskSimpleUseGun_ClearAnim               0x61E190
+#define FUNC_CTaskSimpleUseGun_GetCurrentCommand       0x4ABE30
+#define FUNC_CTaskSimpleUseGun_GetDoneFiring           0x61C220
+#define FUNC_CTaskSimpleUseGun_GetIsFinished           0x61C240
+#define FUNC_CTaskSimpleUseGun_IsLineOfSightBlocked    0x61C250
+#define FUNC_CTaskSimpleUseGun_GetIsFiring             0x509950
+#define FUNC_CTaskSimpleUseGun_GetIsReloading          0x609340
+#define FUNC_CTaskSimpleUseGun_GetSkipAim              0x588840
+#define FUNC_CTaskSimpleUseGun_PlayerPassiveControlGun 0x61E0A0
+#define FUNC_CTaskSimpleUseGun_RemoveStanceAnims       0x61E8E0
+#define FUNC_CTaskSimpleUseGun_RequirePistolWhip       0x61E200
+#define FUNC_CTaskSimpleUseGun_SetBurstLength          0x61C210
+#define FUNC_CTaskSimpleUseGun_SetMoveAnim             0x61E3F0
+#define FUNC_CTaskSimpleUseGun_StartAnim               0x624F30
+#define FUNC_CTaskSimpleUseGun_StartCountDown          0x61E160
 
 // temporary
 class CAnimBlendAssociation;
@@ -68,9 +68,9 @@ public:
     bool m_bFromScriptCommand;
 
     char  m_nNextCommand;
-    char  m_nLastCommand;            // active command
+    char  m_nLastCommand;  // active command
     char  m_nBurstShots;
-    char  m_nDrivebyStyle;            // what type of driveby are we doing
+    char  m_nDrivebyStyle;  // what type of driveby are we doing
     char  m_nFrequencyPercentage;
     char  m_nFakeShootDirn;
     short m_nAttackTimer;
@@ -78,7 +78,7 @@ public:
     unsigned int m_nLOSCheckTime;
     bool         m_nLOSBlocked;
 
-    float m_fAbortRange;            // range from target at which this task will be aborted
+    float m_fAbortRange;  // range from target at which this task will be aborted
 
     AnimationId            m_nRequiredAnim;
     AssocGroupId           m_nRequiredAnimGroup;
@@ -92,23 +92,23 @@ public:
 class CTaskSimpleGangDriveBySA : public virtual CTaskSimpleSA, public virtual CTaskSimpleGangDriveBy
 {
 public:
-    CTaskSimpleGangDriveBySA(){};
+    CTaskSimpleGangDriveBySA() {};
     CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const CVector* pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS);
 };
 
 class CTaskSimpleUseGunSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    unsigned char m_bIsFinished;            // 0x08
+    unsigned char m_bIsFinished;  // 0x08
     unsigned char m_bIsInControl;
     unsigned char m_bMoveControl;
     unsigned char m_bFiredGun;
-    unsigned char m_bBlockedLOS;            // 0x0C
+    unsigned char m_bBlockedLOS;  // 0x0C
     unsigned char m_nFireGunThisFrame;
-    unsigned char m_bSkipAim;            // 0x0E
+    unsigned char m_bSkipAim;  // 0x0E
 
     char      m_nNextCommand;
-    char      m_nLastCommand;            // active command       (2 or 3) == is firing
+    char      m_nLastCommand;  // active command       (2 or 3) == is firing
     CVector2D m_vecMoveCommand;
 
     CEntity* m_pTargetEntity;
@@ -116,8 +116,8 @@ public:
 
     CAnimBlendAssociation* m_pAnim;
 
-    CWeaponInfo* m_pWeaponInfo;             // 0x30
-    short        m_nBurstLength;            // 0x34
+    CWeaponInfo* m_pWeaponInfo;   // 0x30
+    short        m_nBurstLength;  // 0x34
     short        m_nBurstShots;
 
     unsigned char m_nCountDownFrames;
@@ -130,7 +130,7 @@ public:
 class CTaskSimpleUseGunSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleUseGun
 {
 public:
-    CTaskSimpleUseGunSA(){};
+    CTaskSimpleUseGunSA() {};
     CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1, unsigned char bAimImmediate = false);
 
     bool ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand);
@@ -188,6 +188,6 @@ public:
 class CTaskSimpleFightSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleFight
 {
 public:
-    CTaskSimpleFightSA(){};
+    CTaskSimpleFightSA() {};
     CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
 };

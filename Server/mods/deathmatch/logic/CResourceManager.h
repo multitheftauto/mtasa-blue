@@ -19,7 +19,7 @@
 #include "ehs/ehs.h"
 #include <list>
 
-#define INVALID_RESOURCE_NET_ID     0xFFFF
+#define INVALID_RESOURCE_NET_ID 0xFFFF
 
 class CResource;
 

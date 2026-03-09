@@ -68,23 +68,23 @@ enum eBodyPart
 enum eMovementState
 {
     MOVEMENTSTATE_UNKNOWN,
-    MOVEMENTSTATE_STAND,                      // Standing still
-    MOVEMENTSTATE_WALK,                       // Walking
-    MOVEMENTSTATE_POWERWALK,                  // Walking quickly
-    MOVEMENTSTATE_JOG,                        // Jogging (Unused)
-    MOVEMENTSTATE_SPRINT,                     // Sprinting
-    MOVEMENTSTATE_CROUCH,                     // Crouching still
-    MOVEMENTSTATE_CRAWL,                      // Crouch-moving
-    MOVEMENTSTATE_ROLL,                       // Crouch-rolling
-    MOVEMENTSTATE_JUMP,                       // Jumping
-    MOVEMENTSTATE_FALL,                       // Falling
-    MOVEMENTSTATE_CLIMB,                      // Climbing
-    MOVEMENTSTATE_SWIM,                       // Swimming
-    MOVEMENTSTATE_WALK_TO_POINT,              // Entering vehicle (walking to the door)
-    MOVEMENTSTATE_ASCENT_JETPACK,             // Ascending with jetpack
-    MOVEMENTSTATE_DESCENT_JETPACK,            // Descending with jetpack
-    MOVEMENTSTATE_JETPACK,                    // Jetpack flying
-    MOVEMENTSTATE_HANGING,                    // Hanging from the whall during climbing task
+    MOVEMENTSTATE_STAND,            // Standing still
+    MOVEMENTSTATE_WALK,             // Walking
+    MOVEMENTSTATE_POWERWALK,        // Walking quickly
+    MOVEMENTSTATE_JOG,              // Jogging (Unused)
+    MOVEMENTSTATE_SPRINT,           // Sprinting
+    MOVEMENTSTATE_CROUCH,           // Crouching still
+    MOVEMENTSTATE_CRAWL,            // Crouch-moving
+    MOVEMENTSTATE_ROLL,             // Crouch-rolling
+    MOVEMENTSTATE_JUMP,             // Jumping
+    MOVEMENTSTATE_FALL,             // Falling
+    MOVEMENTSTATE_CLIMB,            // Climbing
+    MOVEMENTSTATE_SWIM,             // Swimming
+    MOVEMENTSTATE_WALK_TO_POINT,    // Entering vehicle (walking to the door)
+    MOVEMENTSTATE_ASCENT_JETPACK,   // Ascending with jetpack
+    MOVEMENTSTATE_DESCENT_JETPACK,  // Descending with jetpack
+    MOVEMENTSTATE_JETPACK,          // Jetpack flying
+    MOVEMENTSTATE_HANGING,          // Hanging from the whall during climbing task
 };
 
 enum eDeathAnims
@@ -153,7 +153,7 @@ struct SAnimationCache
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
-#pragma warning(disable:4311)
+#pragma warning(disable : 4311)
 
 class CClientPed : public CClientStreamElement, public CAntiCheatModule
 {
@@ -244,12 +244,12 @@ public:
     bool GetCanBeKnockedOffBike();
     void SetCanBeKnockedOffBike(bool bCanBeKnockedOffBike);
 
-    bool            IsInVehicle() const noexcept { return GetOccupiedVehicle() != NULL; };
+    bool IsInVehicle() const noexcept { return GetOccupiedVehicle() != NULL; };
 
     CClientVehicle*       GetOccupiedVehicle() noexcept { return m_pOccupiedVehicle; };
     const CClientVehicle* GetOccupiedVehicle() const noexcept { return m_pOccupiedVehicle; };
 
-    unsigned int    GetOccupiedVehicleSeat() const noexcept { return m_uiOccupiedVehicleSeat; };
+    unsigned int GetOccupiedVehicleSeat() const noexcept { return m_uiOccupiedVehicleSeat; };
 
     CClientVehicle*       GetOccupyingVehicle() noexcept { return m_pOccupyingVehicle; };
     const CClientVehicle* GetOccupyingVehicle() const noexcept { return m_pOccupyingVehicle; };
@@ -410,7 +410,7 @@ public:
     std::list<CClientProjectile*>::iterator ProjectilesEnd() { return m_Projectiles.end(); }
     unsigned int                            CountProjectiles(eWeaponType weaponType = WEAPONTYPE_UNARMED);
 
-    std::list<CClientProjectile*>& GetProjectiles() noexcept { return m_Projectiles; }
+    std::list<CClientProjectile*>&       GetProjectiles() noexcept { return m_Projectiles; }
     const std::list<CClientProjectile*>& GetProjectiles() const noexcept { return m_Projectiles; }
 
     void RemoveAllProjectiles();
@@ -434,21 +434,21 @@ public:
     unsigned char GetAlpha() const noexcept { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha);
 
-    bool           HasTargetPosition() const noexcept { return m_interp.pos.ulFinishTime != 0; }
-    CClientEntity* GetTargetOriginSource() noexcept { return m_interp.pTargetOriginSource; }
+    bool                 HasTargetPosition() const noexcept { return m_interp.pos.ulFinishTime != 0; }
+    CClientEntity*       GetTargetOriginSource() noexcept { return m_interp.pTargetOriginSource; }
     const CClientEntity* GetTargetOriginSource() const noexcept { return m_interp.pTargetOriginSource; }
-    void           GetTargetPosition(CVector& vecPosition);
-    void           SetTargetPosition(const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL);
-    void           RemoveTargetPosition();
-    void           UpdateTargetPosition();
-    void           UpdateUnderFloorFix(const CVector& vecTargetPosition, const CVector& vecOrigin);
+    void                 GetTargetPosition(CVector& vecPosition);
+    void                 SetTargetPosition(const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL);
+    void                 RemoveTargetPosition();
+    void                 UpdateTargetPosition();
+    void                 UpdateUnderFloorFix(const CVector& vecTargetPosition, const CVector& vecOrigin);
 
     CClientEntity* GetTargetedEntity();
     CClientPed*    GetTargetedPed();
 
     CClientEntity*       GetCurrentContactEntity() noexcept { return m_pCurrentContactEntity; }
     const CClientEntity* GetCurrentContactEntity() const noexcept { return m_pCurrentContactEntity; }
-    void           SetCurrentContactEntity(CClientEntity* pEntity) noexcept { m_pCurrentContactEntity = pEntity; }
+    void                 SetCurrentContactEntity(CClientEntity* pEntity) noexcept { m_pCurrentContactEntity = pEntity; }
 
     bool IsSunbathing();
     void SetSunbathing(bool bSunbathing, bool bStartStanding = true);
@@ -525,20 +525,16 @@ public:
 
     void                        DereferenceCustomAnimationBlock() { m_pCustomAnimationIFP = nullptr; }
     std::shared_ptr<CClientIFP> GetCustomAnimationIFP() const noexcept { return m_pCustomAnimationIFP; }
-    bool IsCustomAnimationPlaying() noexcept
-    {
-        return (m_bRequestedAnimation || m_AnimationCache.bLoop)
-            && m_pAnimationBlock && m_bisCurrentAnimationCustom;
-    }
+    bool IsCustomAnimationPlaying() noexcept { return (m_bRequestedAnimation || m_AnimationCache.bLoop) && m_pAnimationBlock && m_bisCurrentAnimationCustom; }
     void SetCustomAnimationUntriggerable() noexcept
     {
         m_bRequestedAnimation = false;
         m_AnimationCache.bLoop = false;
     }
-    bool            IsNextAnimationCustom() const noexcept { return m_bisNextAnimationCustom; }
-    void            SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName);
-    void            SetCurrentAnimationCustom(bool bCustom) noexcept { m_bisCurrentAnimationCustom = bCustom; }
-    bool            IsCurrentAnimationCustom() const noexcept { return m_bisCurrentAnimationCustom; }
+    bool                  IsNextAnimationCustom() const noexcept { return m_bisNextAnimationCustom; }
+    void                  SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName);
+    void                  SetCurrentAnimationCustom(bool bCustom) noexcept { m_bisCurrentAnimationCustom = bCustom; }
+    bool                  IsCurrentAnimationCustom() const noexcept { return m_bisCurrentAnimationCustom; }
     CIFPAnimations*       GetIFPAnimationsPointer() noexcept { return m_pIFPAnimations; }
     const CIFPAnimations* GetIFPAnimationsPointer() const noexcept { return m_pIFPAnimations; }
 
@@ -568,7 +564,7 @@ public:
     void RunClimbingTask();
 
     CTaskSimpleSwim* GetSwimmingTask() const;
-    void RunSwimTask() const;
+    void             RunSwimTask() const;
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
@@ -609,7 +605,7 @@ protected:
 public:
     void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
     // Used to control and sync entering/exiting
-    bool EnterVehicle(CClientVehicle* pVehicle, bool bPassenger);
+    bool EnterVehicle(CClientVehicle* pVehicle, bool bPassenger, std::optional<unsigned int> optSeat = std::nullopt);
     bool ExitVehicle();
     void ResetVehicleInOut();
     void UpdateVehicleInOut();
@@ -652,8 +648,8 @@ public:
     CStatsData*       m_stats;
     CControllerState* m_currentControllerState;
     CControllerState* m_lastControllerState;
-    CControllerState m_rawControllerState;            // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to
-                                                      // prevent stuff like rapid input glitch)
+    CControllerState  m_rawControllerState;  // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to
+                                             // prevent stuff like rapid input glitch)
     CRemoteDataStorage*                      m_remoteDataStorage;
     unsigned long                            m_ulLastTimeFired;
     unsigned long                            m_ulLastTimeBeganAiming;
@@ -693,7 +689,7 @@ public:
     CClientEntityPtr                         m_pTargetedEntity;
     std::list<SDelayedSyncData*>             m_SyncBuffer;
     bool                                     m_bDucked;
-    bool                                     m_bWasDucked;            // For knowing when to register standing up
+    bool                                     m_bWasDucked;  // For knowing when to register standing up
     bool                                     m_bIsChoking;
     bool                                     m_bWearingGoggles;
     bool                                     m_bVisible;
@@ -797,16 +793,16 @@ public:
     bool              m_bWarpInToVehicleRequired = false;
 
     // Enter/exit variables
-    unsigned long m_ulLastVehicleInOutTime;            // Last tick where we sent an enter/exit request
-    bool          m_bIsGettingOutOfVehicle;            // Indicates we are exiting a vehicle
-    bool          m_bIsGettingIntoVehicle;             // Indicates we are entering a vehicle
-    bool          m_bIsJackingVehicle;                 // Indicates we are jacking a vehicle
-    bool          m_bIsGettingJacked;                  // Indicates we are getting jacked
-    ElementID     m_VehicleInOutID;                    // ElementID of vehicle received from server
-    unsigned char m_ucVehicleInOutSeat;                // Seat ID we are entering/exiting received from server
-    bool          m_bNoNewVehicleTask;                 // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
-    ElementID     m_NoNewVehicleTaskReasonID;            // ElementID of the vehicle that we are waiting on
-    CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
+    unsigned long m_ulLastVehicleInOutTime;    // Last tick where we sent an enter/exit request
+    bool          m_bIsGettingOutOfVehicle;    // Indicates we are exiting a vehicle
+    bool          m_bIsGettingIntoVehicle;     // Indicates we are entering a vehicle
+    bool          m_bIsJackingVehicle;         // Indicates we are jacking a vehicle
+    bool          m_bIsGettingJacked;          // Indicates we are getting jacked
+    ElementID     m_VehicleInOutID;            // ElementID of vehicle received from server
+    unsigned char m_ucVehicleInOutSeat;        // Seat ID we are entering/exiting received from server
+    bool          m_bNoNewVehicleTask;         // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
+    ElementID     m_NoNewVehicleTaskReasonID;  // ElementID of the vehicle that we are waiting on
+    CClientPed*   m_pGettingJackedBy;          // The ped that is jacking us
 
     std::shared_ptr<CClientModel> m_clientModel;
 

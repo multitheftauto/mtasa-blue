@@ -20,7 +20,7 @@ class CClientBuilding : public CClientEntity
     friend class CClientBuildingManager;
 
 public:
-    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector &pos, const CVector &rot, uint8_t interior);
+    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector& pos, const CVector& rot, uint8_t interior);
     ~CClientBuilding();
 
     void Unlink();
@@ -50,16 +50,15 @@ public:
 
     bool IsValid() const noexcept { return m_pBuilding != nullptr; };
 
-    
     CClientBuilding* GetLowLodBuilding() const noexcept { return m_pLowBuilding; };
-    bool SetLowLodBuilding(CClientBuilding* pLod = nullptr);
-    bool IsLod() const noexcept { return m_pHighBuilding != nullptr; };
+    bool             SetLowLodBuilding(CClientBuilding* pLod = nullptr);
+    bool             IsLod() const noexcept { return m_pHighBuilding != nullptr; };
 
     float GetDistanceFromCentreOfMassToBaseOfModel();
 
 private:
-    CClientBuilding* GetHighLodBuilding() const { return m_pHighBuilding; }; 
-    void SetHighLodBuilding(CClientBuilding* pHighBuilding = nullptr) { m_pHighBuilding = pHighBuilding; };
+    CClientBuilding* GetHighLodBuilding() const { return m_pHighBuilding; };
+    void             SetHighLodBuilding(CClientBuilding* pHighBuilding = nullptr) { m_pHighBuilding = pHighBuilding; };
 
     void Recreate()
     {

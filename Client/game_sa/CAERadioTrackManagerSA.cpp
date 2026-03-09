@@ -16,12 +16,14 @@ BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
 {
     DWORD dwFunc = FUNC_GetCurrentRadioStationID;
     BYTE  bReturn = 0;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
 
     return bReturn;
 }
@@ -30,12 +32,14 @@ BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()
 {
     DWORD dwFunc = FUNC_IsVehicleRadioActive;
     BYTE  bReturn = 0;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
 
     return bReturn;
 }
@@ -45,6 +49,7 @@ char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
     DWORD dwFunc = FUNC_GetRadioStationName;
     char* cReturn = 0;
     DWORD dwStationID = bStationID;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -52,6 +57,7 @@ char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
         call    dwFunc
         mov     cReturn, eax
     }
+    // clang-format on
 
     return cReturn;
 }
@@ -60,12 +66,14 @@ bool CAERadioTrackManagerSA::IsRadioOn()
 {
     DWORD dwFunc = FUNC_IsRadioOn;
     bool  bReturn = false;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
 
     return bReturn;
 }
@@ -73,6 +81,7 @@ bool CAERadioTrackManagerSA::IsRadioOn()
 void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
 {
     DWORD dwFunc = FUNC_SetBassSetting;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -80,16 +89,19 @@ void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
         push    dwBass
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAERadioTrackManagerSA::Reset()
 {
     DWORD dwFunc = FUNC_Reset;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
@@ -97,6 +109,7 @@ void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
     DWORD dwFunc = FUNC_StartRadio;
     DWORD dwStationID = bStationID;
     DWORD dwUnknown = bUnknown;
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -106,6 +119,7 @@ void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
         push    dwStationID
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CAERadioTrackManagerSA::IsStationLoading() const

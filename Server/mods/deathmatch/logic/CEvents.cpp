@@ -158,7 +158,7 @@ void CEvents::CancelEvent(bool bCancelled, const char* szReason)
 {
     // ALWAYS set the old global variable for backward compatibility
     m_bEventCancelled = bCancelled;
-    
+
     // Also update context if it exists
     if (!m_ContextStack.empty())
     {
@@ -168,7 +168,7 @@ void CEvents::CancelEvent(bool bCancelled, const char* szReason)
         else
             pCurrentContext->Reset();
     }
-    
+
     if (szReason)
         m_strLastError = szReason;
 }
@@ -177,7 +177,7 @@ bool CEvents::WasEventCancelled()
 {
     if (!m_ContextStack.empty())
         return m_ContextStack.back()->IsCancelled();
-    
+
     return m_bEventCancelled || m_bWasEventCancelled;
 }
 

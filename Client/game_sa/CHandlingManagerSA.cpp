@@ -22,11 +22,11 @@
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
-#define ARRAY_HANDLINGDATA          0xC2B9DC
+#define ARRAY_HANDLINGDATA 0xC2B9DC
 
-#define Func_Calculate              0x6F5080
-#define Var_fTurnMassMultiplier     0x858B8C
-#define Var_fBasicDragCoeff         0x858C58
+#define Func_Calculate          0x6F5080
+#define Var_fTurnMassMultiplier 0x858B8C
+#define Var_fBasicDragCoeff     0x858C58
 
 #define DUMP_HANDLING_DATA 0
 
@@ -109,6 +109,7 @@ static __declspec(naked) void Hook_Calculate()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]
@@ -124,6 +125,7 @@ static __declspec(naked) void Hook_Calculate()
         mov     eax, 6F5085h
         jmp     eax
     }
+    // clang-format on
 }
 
 CHandlingManagerSA::CHandlingManagerSA()
@@ -156,39 +158,39 @@ CHandlingManagerSA::CHandlingManagerSA()
     HookInstall(Func_Calculate, (DWORD)Hook_Calculate, 5);
 #endif
 
-    m_HandlingNames["mass"] = HandlingProperty::HANDLING_MASS;                                                             // works (mass > 0)
-    m_HandlingNames["turnMass"] = HandlingProperty::HANDLING_TURNMASS;                                                     // works
-    m_HandlingNames["dragCoeff"] = HandlingProperty::HANDLING_DRAGCOEFF;                                                   // works
-    m_HandlingNames["centerOfMass"] = HandlingProperty::HANDLING_CENTEROFMASS;                                             // works
-    m_HandlingNames["percentSubmerged"] = HandlingProperty::HANDLING_PERCENTSUBMERGED;                                     // works
-    m_HandlingNames["tractionMultiplier"] = HandlingProperty::HANDLING_TRACTIONMULTIPLIER;                                 // works
-    m_HandlingNames["driveType"] = HandlingProperty::HANDLING_DRIVETYPE;                                                   // works
-    m_HandlingNames["engineType"] = HandlingProperty::HANDLING_ENGINETYPE;                                                 // works
-    m_HandlingNames["numberOfGears"] = HandlingProperty::HANDLING_NUMOFGEARS;                                              // works
-    m_HandlingNames["engineAcceleration"] = HandlingProperty::HANDLING_ENGINEACCELERATION;                                 // works
-    m_HandlingNames["engineInertia"] = HandlingProperty::HANDLING_ENGINEINERTIA;                                           // works
-    m_HandlingNames["maxVelocity"] = HandlingProperty::HANDLING_MAXVELOCITY;                                               // works
-    m_HandlingNames["brakeDeceleration"] = HandlingProperty::HANDLING_BRAKEDECELERATION;                                   // works
-    m_HandlingNames["brakeBias"] = HandlingProperty::HANDLING_BRAKEBIAS;                                                   // works
-    m_HandlingNames["ABS"] = HandlingProperty::HANDLING_ABS;                                                               // has no effect in vanilla gta either
-    m_HandlingNames["steeringLock"] = HandlingProperty::HANDLING_STEERINGLOCK;                                             // works
-    m_HandlingNames["tractionLoss"] = HandlingProperty::HANDLING_TRACTIONLOSS;                                             // works
-    m_HandlingNames["tractionBias"] = HandlingProperty::HANDLING_TRACTIONBIAS;                                             // works
-    m_HandlingNames["suspensionForceLevel"] = HandlingProperty::HANDLING_SUSPENSION_FORCELEVEL;                            // works
-    m_HandlingNames["suspensionDamping"] = HandlingProperty::HANDLING_SUSPENSION_DAMPING;                                  // works
-    m_HandlingNames["suspensionHighSpeedDamping"] = HandlingProperty::HANDLING_SUSPENSION_HIGHSPEEDDAMPING;                // works
-    m_HandlingNames["suspensionUpperLimit"] = HandlingProperty::HANDLING_SUSPENSION_UPPER_LIMIT;                           // works
-    m_HandlingNames["suspensionLowerLimit"] = HandlingProperty::HANDLING_SUSPENSION_LOWER_LIMIT;                           // works
-    m_HandlingNames["suspensionFrontRearBias"] = HandlingProperty::HANDLING_SUSPENSION_FRONTREARBIAS;                      // works
-    m_HandlingNames["suspensionAntiDiveMultiplier"] = HandlingProperty::HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER;            // works
-    m_HandlingNames["collisionDamageMultiplier"] = HandlingProperty::HANDLING_COLLISIONDAMAGEMULTIPLIER;                   // works
-    m_HandlingNames["seatOffsetDistance"] = HandlingProperty::HANDLING_SEATOFFSETDISTANCE;                                 // works
-    m_HandlingNames["monetary"] = HandlingProperty::HANDLING_MONETARY;                      // useless as it only influences SP stats (value of damaged property)
-    m_HandlingNames["handlingFlags"] = HandlingProperty::HANDLING_HANDLINGFLAGS;            // works
-    m_HandlingNames["modelFlags"] = HandlingProperty::HANDLING_MODELFLAGS;                  // works
-    m_HandlingNames["headLight"] = HandlingProperty::HANDLING_HEADLIGHT;                    // doesn't work
-    m_HandlingNames["tailLight"] = HandlingProperty::HANDLING_TAILLIGHT;                    // doesn't seem to work*
-    m_HandlingNames["animGroup"] = HandlingProperty::HANDLING_ANIMGROUP;                    // works model based
+    m_HandlingNames["mass"] = HandlingProperty::HANDLING_MASS;                                                   // works (mass > 0)
+    m_HandlingNames["turnMass"] = HandlingProperty::HANDLING_TURNMASS;                                           // works
+    m_HandlingNames["dragCoeff"] = HandlingProperty::HANDLING_DRAGCOEFF;                                         // works
+    m_HandlingNames["centerOfMass"] = HandlingProperty::HANDLING_CENTEROFMASS;                                   // works
+    m_HandlingNames["percentSubmerged"] = HandlingProperty::HANDLING_PERCENTSUBMERGED;                           // works
+    m_HandlingNames["tractionMultiplier"] = HandlingProperty::HANDLING_TRACTIONMULTIPLIER;                       // works
+    m_HandlingNames["driveType"] = HandlingProperty::HANDLING_DRIVETYPE;                                         // works
+    m_HandlingNames["engineType"] = HandlingProperty::HANDLING_ENGINETYPE;                                       // works
+    m_HandlingNames["numberOfGears"] = HandlingProperty::HANDLING_NUMOFGEARS;                                    // works
+    m_HandlingNames["engineAcceleration"] = HandlingProperty::HANDLING_ENGINEACCELERATION;                       // works
+    m_HandlingNames["engineInertia"] = HandlingProperty::HANDLING_ENGINEINERTIA;                                 // works
+    m_HandlingNames["maxVelocity"] = HandlingProperty::HANDLING_MAXVELOCITY;                                     // works
+    m_HandlingNames["brakeDeceleration"] = HandlingProperty::HANDLING_BRAKEDECELERATION;                         // works
+    m_HandlingNames["brakeBias"] = HandlingProperty::HANDLING_BRAKEBIAS;                                         // works
+    m_HandlingNames["ABS"] = HandlingProperty::HANDLING_ABS;                                                     // has no effect in vanilla gta either
+    m_HandlingNames["steeringLock"] = HandlingProperty::HANDLING_STEERINGLOCK;                                   // works
+    m_HandlingNames["tractionLoss"] = HandlingProperty::HANDLING_TRACTIONLOSS;                                   // works
+    m_HandlingNames["tractionBias"] = HandlingProperty::HANDLING_TRACTIONBIAS;                                   // works
+    m_HandlingNames["suspensionForceLevel"] = HandlingProperty::HANDLING_SUSPENSION_FORCELEVEL;                  // works
+    m_HandlingNames["suspensionDamping"] = HandlingProperty::HANDLING_SUSPENSION_DAMPING;                        // works
+    m_HandlingNames["suspensionHighSpeedDamping"] = HandlingProperty::HANDLING_SUSPENSION_HIGHSPEEDDAMPING;      // works
+    m_HandlingNames["suspensionUpperLimit"] = HandlingProperty::HANDLING_SUSPENSION_UPPER_LIMIT;                 // works
+    m_HandlingNames["suspensionLowerLimit"] = HandlingProperty::HANDLING_SUSPENSION_LOWER_LIMIT;                 // works
+    m_HandlingNames["suspensionFrontRearBias"] = HandlingProperty::HANDLING_SUSPENSION_FRONTREARBIAS;            // works
+    m_HandlingNames["suspensionAntiDiveMultiplier"] = HandlingProperty::HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER;  // works
+    m_HandlingNames["collisionDamageMultiplier"] = HandlingProperty::HANDLING_COLLISIONDAMAGEMULTIPLIER;         // works
+    m_HandlingNames["seatOffsetDistance"] = HandlingProperty::HANDLING_SEATOFFSETDISTANCE;                       // works
+    m_HandlingNames["monetary"] = HandlingProperty::HANDLING_MONETARY;            // useless as it only influences SP stats (value of damaged property)
+    m_HandlingNames["handlingFlags"] = HandlingProperty::HANDLING_HANDLINGFLAGS;  // works
+    m_HandlingNames["modelFlags"] = HandlingProperty::HANDLING_MODELFLAGS;        // works
+    m_HandlingNames["headLight"] = HandlingProperty::HANDLING_HEADLIGHT;          // doesn't work
+    m_HandlingNames["tailLight"] = HandlingProperty::HANDLING_TAILLIGHT;          // doesn't seem to work*
+    m_HandlingNames["animGroup"] = HandlingProperty::HANDLING_ANIMGROUP;          // works model based
 }
 
 CHandlingManagerSA::~CHandlingManagerSA()
@@ -8276,28 +8278,28 @@ void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
     m_OriginalHandlingData[209].ucTailLight = 1;
     m_OriginalHandlingData[209].ucAnimGroup = 0;
 
-    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];            // HT_HOTRINA = HT_HOTRING
+    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];  // HT_HOTRINA = HT_HOTRING
     m_OriginalHandlingData[210].iVehicleID = 210;
 
-    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];            // HT_HOTRINB = HT_HOTRING
+    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];  // HT_HOTRINB = HT_HOTRING
     m_OriginalHandlingData[211].iVehicleID = 211;
 
-    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];            // HT_SADLSHIT = HT_SADLER
+    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];  // HT_SADLSHIT = HT_SADLER
     m_OriginalHandlingData[212].iVehicleID = 212;
 
-    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];            // HT_GLENSHIT = HT_GLENDALE
+    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];  // HT_GLENSHIT = HT_GLENDALE
     m_OriginalHandlingData[213].iVehicleID = 213;
 
-    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];            // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];  // HT_FAGGIO = HT_PIZZABOY
     m_OriginalHandlingData[214].iVehicleID = 214;
 
-    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];            // HT_FIRELA = HT_FIRETRUK
+    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];  // HT_FIRELA = HT_FIRETRUK
     m_OriginalHandlingData[215].iVehicleID = 215;
 
-    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];            // HT_RNCHLURE = HT_RANCHER
+    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];  // HT_RNCHLURE = HT_RANCHER
     m_OriginalHandlingData[216].iVehicleID = 216;
 
-    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];            // HT_FREIBOX = HT_FREIFLAT
+    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];  // HT_FREIBOX = HT_FREIFLAT
     m_OriginalHandlingData[217].iVehicleID = 217;
 
     // Aircrafts handling
@@ -9127,7 +9129,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
     m_OriginalBikeHandlingData[12].fWheelieStabMult = 0.5f;
     m_OriginalBikeHandlingData[12].fStoppieStabMult = 0.3f;
 
-    m_OriginalBikeHandlingData[13] = m_OriginalBikeHandlingData[1];            // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalBikeHandlingData[13] = m_OriginalBikeHandlingData[1];  // HT_FAGGIO = HT_PIZZABOY
     m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 

@@ -191,7 +191,13 @@ bool CClientIMG::StreamDisable()
 
     m_pImgManager->UpdateStreamerBufferSize();
 
-    g_pClientGame->RestreamWorld();
+    // During session shutdown (CClientManager being destroyed), element destruction
+    // order is arbitrary. Skip restreaming because earlier element cleanup may have
+    // already freed TXD pool slots, and ReinitStreaming would flush pending
+    // streaming channels that reference those freed parent slots.
+    if (!m_pManager || !m_pManager->IsBeingDeleted())
+        g_pClientGame->RestreamWorld();
+
     return true;
 }
 
@@ -209,7 +215,7 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
         return false;
 
     if (pCurrInfo->archiveId == m_ucArchiveID)
-        return true;            // Already linked
+        return true;  // Already linked
 
     m_restoreInfo.emplace_back(uiModelID, pCurrInfo->offsetInBlocks, pCurrInfo->sizeInBlocks, pCurrInfo->archiveId);
 

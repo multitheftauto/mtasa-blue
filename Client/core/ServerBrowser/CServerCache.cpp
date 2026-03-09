@@ -25,24 +25,24 @@ namespace
 
     struct CCachedInfo
     {
-        CValueInt nPlayers;               // Current players
-        CValueInt nMaxPlayers;            // Maximum players
-        CValueInt nPing;                  // Ping time
-        CValueInt bPassworded;            // Password protected
+        CValueInt nPlayers;     // Current players
+        CValueInt nMaxPlayers;  // Maximum players
+        CValueInt nPing;        // Ping time
+        CValueInt bPassworded;  // Password protected
         CValueInt bKeepFlag;
         CValueInt uiCacheNoReplyCount;
         CValueInt usHttpPort;
         CValueInt ucSpecialFlags;
-        SString   strName;                // Server name
-        SString   strGameMode;            // Game mode
-        SString   strMap;                 // Map name
-        SString   strVersion;             // Version
+        SString   strName;      // Server name
+        SString   strGameMode;  // Game mode
+        SString   strMap;       // Map name
+        SString   strVersion;   // Version
     };
 
     // Variables used for saving the server cache file on a separate thread
     static bool                              ms_bIsSaving = false;
     static std::map<CCachedKey, CCachedInfo> ms_ServerCachedMap;
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -160,7 +160,11 @@ bool CServerCache::LoadServerCache()
         if (const SString* pString = MapFind(item.attributeMap, "ip"))
             key.ulIp = inet_addr(*pString);
         if (const SString* pString = MapFind(item.attributeMap, "port"))
-            key.usGamePort = static_cast<ushort>(atoi(*pString));
+        {
+            const int iPort = atoi(*pString);
+            if (iPort > 0 && iPort <= 0xFFFF)
+                key.usGamePort = static_cast<ushort>(iPort);
+        }
         if (const SString* pString = MapFind(item.attributeMap, "nPlayers"))
             info.nPlayers.SetFromString(*pString);
         if (const SString* pString = MapFind(item.attributeMap, "nMaxPlayers"))
@@ -186,7 +190,7 @@ bool CServerCache::LoadServerCache()
         if (const SString* pString = MapFind(item.attributeMap, "strVersion"))
             info.strVersion = *pString;
 
-        if (key.ulIp == 0)
+        if (key.ulIp == 0 || key.usGamePort == 0)
             continue;
 
         MapSet(m_ServerCachedMap, key, info);
@@ -217,7 +221,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         ms_ServerCachedMap = m_ServerCachedMap;
 
         // Start save thread
-        HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerCache::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
+        HANDLE hThread = CreateThread(NULL, 0, &CServerCache::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL);
         if (!hThread)
         {
             CCore::GetSingleton().GetConsole()->Printf("Could not create server cache thread.");
@@ -289,7 +293,6 @@ void CServerCache::StaticSaveServerCache()
     CDataInfoSet dataSet;
     for (const auto& [key, info] : ms_ServerCachedMap)
     {
-
         // Only exclude servers that have failed multiple consecutive query attempts
         if (info.uiCacheNoReplyCount > 3)
             continue;
@@ -356,8 +359,8 @@ void CServerCache::GetServerCachedInfo(CServerListItem* pItem)
             pItem->strMap = pInfo->strMap;
             pItem->strVersion = pInfo->strVersion;
             pItem->uiCacheNoReplyCount = pInfo->uiCacheNoReplyCount;
-            pItem->m_usHttpPort = static_cast<unsigned short>(pInfo->usHttpPort);
-            pItem->m_ucSpecialFlags = static_cast<unsigned char>(pInfo->ucSpecialFlags);
+            pItem->m_usHttpPort = static_cast<ushort>(pInfo->usHttpPort);
+            pItem->m_ucSpecialFlags = static_cast<uchar>(pInfo->ucSpecialFlags);
             pItem->PostChange();
         }
         else if (pItem->GetDataQuality() < SERVER_INFO_QUERY)
@@ -452,7 +455,7 @@ void CServerCache::GetServerListCachedInfo(CServerList* pList)
         CServerListItem* pItem = *it;
         if (!pItem)
             continue;
-        CCachedKey       key;
+        CCachedKey key;
         key.ulIp = pItem->Address.s_addr;
         key.usGamePort = pItem->usGamePort;
         if (CCachedInfo* pInfo = MapFind(m_ServerCachedMap, key))
@@ -494,7 +497,6 @@ bool CServerCache::GenerateServerList(CServerList* pList, bool bAllowNonRespondi
 
     for (const auto& [key, info] : m_ServerCachedMap)
     {
-
         // When master server is offline, include all cached servers. Otherwise exclude servers that
         // have consistently failed to respond (uiCacheNoReplyCount > 3). New servers without response data
         // should still be included since they may not have been queried yet.
