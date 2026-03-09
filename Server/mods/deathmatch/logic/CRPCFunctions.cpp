@@ -379,8 +379,8 @@ void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
         return;
     }
 
-    ElementID elementId;
-    std::uint16_t  nameLength;
+    ElementID     elementId;
+    std::uint16_t nameLength;
     if (bitStream.Read(elementId) && bitStream.ReadCompressed(nameLength) && nameLength > 0 && nameLength <= MAX_CUSTOMDATA_NAME_LENGTH)
     {
         char customDataName[MAX_CUSTOMDATA_NAME_LENGTH + 1];
@@ -396,7 +396,7 @@ void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
                 element->GetCustomData(customDataName, false, &lastSyncType, &clientChangesMode);
 
                 const bool changesAllowed = clientChangesMode == eCustomDataClientTrust::UNSET ? !g_pGame->GetConfig()->IsElementDataWhitelisted()
-                                                                                                : clientChangesMode == eCustomDataClientTrust::ALLOW;
+                                                                                               : clientChangesMode == eCustomDataClientTrust::ALLOW;
                 if (!changesAllowed)
                 {
                     CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", m_pSourcePlayer->GetNick(), customDataName);
@@ -423,10 +423,10 @@ void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
                             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), m_pSourcePlayer);
                         else
                             m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), element,
-                                                                        customDataName, m_pSourcePlayer);
+                                                                      customDataName, m_pSourcePlayer);
 
                         CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(customDataName, m_pPlayerManager->Count(),
-                                                                                                    outBitStream.pBitStream->GetNumberOfBytesUsed());
+                                                                                                 outBitStream.pBitStream->GetNumberOfBytesUsed());
                     }
 
                     if (lastSyncType == ESyncType::SUBSCRIBE)
