@@ -24,10 +24,10 @@ struct SPendingRenderWareImport
     unsigned short usModelId = 0;
 };
 
-static std::vector<SPendingTxdImport> s_PendingTxdImports;
+static std::vector<SPendingTxdImport>        s_PendingTxdImports;
 static std::vector<SPendingRenderWareImport> s_PendingRenderWareImports;
-static uint32_t                       s_uiLastPendingImportProcessTime = 0;
-static uint32_t                       s_uiLastPendingImportDropLogTime = 0;
+static uint32_t                              s_uiLastPendingImportProcessTime = 0;
+static uint32_t                              s_uiLastPendingImportDropLogTime = 0;
 
 constexpr std::size_t MAX_PENDING_RENDER_WARE_IMPORTS = 4096;
 
