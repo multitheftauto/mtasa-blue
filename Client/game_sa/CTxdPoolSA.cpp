@@ -311,6 +311,19 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
     }
     // clang-format on
 
+    // Clear stale parent references: any alive slot whose usParentIndex
+    // points to the slot being freed must be reset to 0xFFFF so SA's
+    // getTexDictionary doesnt read a free pool entry and crash.
+    {
+        auto*      pool = *m_ppTxdPoolInterface;
+        const auto parentVal = static_cast<unsigned short>(uiTxdId);
+        for (int i = 0; i < pool->m_nSize; ++i)
+        {
+            if (!pool->m_byteMap[i].bEmpty && pool->m_pObjects[i].usParentIndex == parentVal)
+                pool->m_pObjects[i].usParentIndex = static_cast<unsigned short>(-1);
+        }
+    }
+
     (*m_ppTxdPoolInterface)->Release(uiTxdId);
 }
 
