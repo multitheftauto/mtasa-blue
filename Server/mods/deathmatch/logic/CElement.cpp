@@ -753,7 +753,7 @@ bool CElement::SetCustomData(const CStringName& name, const CLuaArgument& Variab
     return true;
 }
 
-bool CElement::DeleteCustomData(const CStringName& name)
+bool CElement::DeleteCustomData(const CStringName& name, CPlayer* pClient)
 {
     // Grab the old variable
     SCustomData* pData = m_CustomData.Get(name);
@@ -770,7 +770,7 @@ bool CElement::DeleteCustomData(const CStringName& name)
         Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(CLuaArgument());  // Use nil as the new value to indicate the data has been removed
-        if (!CallEvent("onElementDataChange", Arguments))
+        if (!CallEvent("onElementDataChange", Arguments, pClient))
         {
             // Event was cancelled, restore previous value
             m_CustomData.Set(name, oldVariable, oldSyncType);

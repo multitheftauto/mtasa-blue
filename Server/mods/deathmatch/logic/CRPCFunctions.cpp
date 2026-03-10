@@ -410,7 +410,7 @@ void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
                     return;
                 }
 
-                if (element->DeleteCustomData(customDataName))
+                if (element->DeleteCustomData(customDataName, m_pSourcePlayer))
                 {
                     if (lastSyncType != ESyncType::LOCAL)
                     {
