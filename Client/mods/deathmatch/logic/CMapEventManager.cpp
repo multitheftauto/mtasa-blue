@@ -163,7 +163,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                 if (pSource == pThis || pMapEvent->IsPropagated())
                 {
                     // Grab the current VM
-                    CLuaMain* luaMain = pMapEvent->GetVM();
+                    CLuaMain*  luaMain = pMapEvent->GetVM();
                     lua_State* pState = luaMain->GetVM();
 
                     if (minClientVersion != nullptr)
