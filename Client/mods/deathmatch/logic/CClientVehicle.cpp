@@ -3566,23 +3566,56 @@ float CClientVehicle::GetDistanceFromGround()
 
 bool CClientVehicle::IsOnGround()
 {
-    if (m_pModelInfo)
-    {
-        CBoundingBox* pBoundingBox = m_pModelInfo->GetBoundingBox();
-        if (pBoundingBox)
-        {
-            CVector vecMin = pBoundingBox->vecBoundMin;
-            CVector vecPosition;
-            GetPosition(vecPosition);
-            vecMin += vecPosition;
-            float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
+    if (!m_pVehicle)
+        return m_bIsOnGround;
 
-            /* Is the lowest point of the bounding box lower than 0.5 above the floor,
-            or is the lowest point of the bounding box higher than 0.3 below the floor */
-            return ((fGroundLevel > vecMin.fZ && (fGroundLevel - vecMin.fZ) < 0.5f) || (vecMin.fZ > fGroundLevel && (vecMin.fZ - fGroundLevel) < 0.3f));
-        }
+    int type = m_pVehicle->GetBaseVehicleType();  // 0 = Automobile, 9 = Bike, 10 = BMX
+    if ((type == 0 && dynamic_cast<CAutomobile*>(m_pVehicle)->IsAnyWheelTouchingGround()) ||
+        ((type == 9 || type == 10) && dynamic_cast<CBike*>(m_pVehicle)->IsAnyWheelTouchingGround()))
+    {
+        return true;
     }
-    return m_bIsOnGround;
+
+    CVector vehPos;
+    GetPosition(vehPos);
+    float groundZ = g_pGame->GetWorld()->FindGroundZFor3DPosition(&vehPos);
+
+    // Is vehicle under the ground?
+    if (DefinitelyLessThan(vehPos.fZ, groundZ, 1e-4f))
+        return false;
+
+    if (!m_pModelInfo)
+        return m_bIsOnGround;
+
+    CBoundingBox* bbox = m_pModelInfo->GetBoundingBox();
+    if (!bbox)
+        return m_bIsOnGround;
+
+    const CVector& min = bbox->vecBoundMin;
+    const CVector& max = bbox->vecBoundMax;
+
+    // Is vehicle too high above the ground?
+    float halfHeight = (max.fZ - min.fZ) * 0.5f;
+    if (DefinitelyGreaterThan(vehPos.fZ - halfHeight, groundZ + halfHeight + 0.3f, 1e-4f))
+        return false;
+
+    // OBB check
+    CMatrix mat;
+    GetMatrix(mat);
+
+    CVector localPoints[8] = {CVector(min.fX, min.fY, min.fZ), CVector(min.fX, min.fY, max.fZ), CVector(min.fX, max.fY, min.fZ),
+                              CVector(min.fX, max.fY, max.fZ), CVector(max.fX, min.fY, min.fZ), CVector(max.fX, min.fY, max.fZ),
+                              CVector(max.fX, max.fY, min.fZ), CVector(max.fX, max.fY, max.fZ)};
+
+    float lowestZ = FLT_MAX;
+    for (const auto& lp : localPoints)
+    {
+        float z = mat.TransformVector(lp).fZ;
+        if (z < lowestZ)
+            lowestZ = z;
+    }
+
+    return DefinitelyLessThan((lowestZ - groundZ), 0.3f, 1e-4f) || EssentiallyEqual((lowestZ - groundZ), 0.3f, 1e-4f);
 }
 
 void CClientVehicle::LockSteering(bool bLock)

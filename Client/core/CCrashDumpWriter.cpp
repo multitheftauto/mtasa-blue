@@ -1387,7 +1387,7 @@ static void TryWriteReentrantFlag(DWORD exceptionCode)
     }
     else
     {
-        return;  // Cant proceed without path
+        return;  // Can't proceed without path
     }
 
     __try
@@ -1562,7 +1562,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
 
             if (!bHandledSafely)
             {
-                SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Client exception handler failrd - forcing crash dump\n");
+                SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Client exception handler failed - forcing crash dump\n");
             }
 
             bClientHandled = true;
