@@ -78,6 +78,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         // Player position
         SPositionSync position(false);
         bool          positionRead = BitStream.Read(&position);
+        const CVector vecRelativePosition = position.data.vecPosition;
 
         if (positionRead && pContactElement != nullptr)
         {
@@ -201,7 +202,10 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         // Read the camera orientation
         CVector vecCamPosition, vecCamFwd;
-        ReadCameraOrientation(position.data.vecPosition, BitStream, vecCamPosition, vecCamFwd);
+        // Camera orientation is encoded against the same position basis the client wrote.
+        CVector vecCameraBasePosition = pContactElement ? vecRelativePosition : position.data.vecPosition;
+
+        ReadCameraOrientation(vecCameraBasePosition, BitStream, vecCamPosition, vecCamFwd);
         pSourcePlayer->SetCameraOrientation(vecCamPosition, vecCamFwd);
 
         if (flags.data.bHasAWeapon)
