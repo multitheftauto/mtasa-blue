@@ -272,7 +272,7 @@ public:
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
 
-    bool IsWindowFocused() const { return m_bFocused; }
+    bool IsWindowFocused() const;
 
     // Accessors
 

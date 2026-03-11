@@ -6044,6 +6044,21 @@ bool CClientGame::OnFocusLoss(CGUIFocusEventArgs Args)
     return true;
 }
 
+bool CClientGame::IsWindowFocused() const
+{
+    HWND foregroundWindow = GetForegroundWindow();
+    if (!foregroundWindow)
+        return false;
+
+    HWND hookedWindow = g_pCore->GetHookedWindow();
+    if (foregroundWindow == hookedWindow || GetAncestor(foregroundWindow, GA_ROOTOWNER) == hookedWindow)
+        return true;
+
+    std::uint32_t processId = 0;
+    GetWindowThreadProcessId(foregroundWindow, &processId);
+    return processId == GetCurrentProcessId();
+}
+
 //
 // Display a progress dialog if a big packet is coming in
 //
