@@ -211,6 +211,8 @@ public:
 
     float GetFPS();
     float GetTimeStep();
+    float GetTimeStepInSeconds();
+    float GetTimeStepInMS();
     float GetOldTimeStep();
     float GetTimeScale();
     void  SetTimeScale(float fTimeScale);

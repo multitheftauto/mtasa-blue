@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #pragma once
+class FxSystem_c;
 
 #define FUNC_CWeapon_CheckForShootingVehicleOccupant 0x73f480
 #define FUNC_CBirds_CheckForHit                      0x712E40

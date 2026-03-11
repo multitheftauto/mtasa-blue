@@ -4765,7 +4765,7 @@ void CPacketHandler::Packet_FireSync(NetBitStreamInterface& bitStream)
 
         // TODO: Ping compensate
 
-        g_pGame->GetFireManager()->StartFire(vecPosition, fSize);
+        g_pGame->GetFireManager()->StartFire(vecPosition, fSize, pCreator ? pCreator->GetGameEntity() : nullptr, 5000, 100);
     }
 }
 

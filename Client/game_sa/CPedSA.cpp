@@ -426,22 +426,15 @@ bool CPedSA::SetOnFire(bool onFire)
 
     if (onFire)
     {
-        CFire* fire = fireManager->StartFire(this, nullptr, static_cast<float>(DEFAULT_FIRE_PARTICLE_SIZE));
+        CFire* fire = fireManager->StartFire(this, nullptr, 5000, 0);
         if (!fire)
             return false;
 
-        // Start the fire
-        fire->SetTarget(this);
-        fire->Ignite();
-        fire->SetStrength(1.0f);
-        // Attach the fire only to the player, do not let it
-        // create child fires when moving.
-        fire->SetNumGenerationsAllowed(0);
         pInterface->pFireOnPed = fire->GetInterface();
     }
     else
     {
-        CFire* fire = fireManager->GetFire(static_cast<CFireSAInterface*>(pInterface->pFireOnPed));
+        CFire* fire = fireManager->GetFire(pInterface->pFireOnPed);
         if (!fire)
             return false;
 
@@ -596,6 +589,15 @@ void CPedSA::SetInWaterFlags(bool inWater)
 
     physicalInterface->bTouchingWater = inWater;
     physicalInterface->bSubmergedInWater = inWater;
+}
+
+bool CPedSA::IsPedInControl() const
+{
+    CPedSAInterface* pedInterface = GetPedInterface();
+    if (!pedInterface)
+        return false;
+
+    return ((bool(__thiscall*)(CPedSAInterface*))0x5E3960)(pedInterface);
 }
 
 ////////////////////////////////////////////////////////////////

@@ -44,6 +44,7 @@ class CClientManager;
 #include "CClientModelManager.h"
 #include "CClientIMGManager.h"
 #include "CClientBuildingManager.h"
+#include "CClientFireManager.h"
 
 class CClientProjectileManager;
 class CClientExplosionManager;
@@ -98,6 +99,7 @@ public:
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
     CClientIMGManager*           GetIMGManager() { return m_pImgManager; }
     CClientBuildingManager*      GetBuildingManager() const noexcept { return m_pBuildingManager; }
+    CClientFireManager*          GetFireManager() const noexcept { return m_fireManager; }
 
     bool IsGameLoaded()
     {
@@ -154,6 +156,7 @@ private:
     CClientIMGManager*           m_pImgManager;
     CClientPacketRecorder*       m_pPacketRecorder;
     CClientBuildingManager*      m_pBuildingManager;
+    CClientFireManager*          m_fireManager;
     bool                         m_bBeingDeleted;
     bool                         m_bGameUnloadedFlag;
     int                          m_iNumLowLODElements;

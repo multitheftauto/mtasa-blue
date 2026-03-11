@@ -445,6 +445,8 @@ public:
     bool IsOnFire() const override { return GetPedInterface()->pFireOnPed != nullptr; }
     bool SetOnFire(bool onFire) override;
 
+    bool IsFireProof() const override { return static_cast<CPhysicalSAInterface*>(GetInterface())->bFireProof; }
+
     bool GetStayInSamePlace() const override { return GetPedInterface()->pedFlags.bStayInSamePlace; }
     void SetStayInSamePlace(bool stay) override { GetPedInterface()->pedFlags.bStayInSamePlace = stay; }
 
@@ -476,6 +478,8 @@ public:
     void GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const override;
 
     void SetInWaterFlags(bool inWater) override;
+
+    bool IsPedInControl() const override;
 
     static void StaticSetHooks();
 

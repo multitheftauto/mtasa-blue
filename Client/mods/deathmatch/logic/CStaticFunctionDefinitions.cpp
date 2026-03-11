@@ -4628,23 +4628,6 @@ bool CStaticFunctionDefinitions::DetonateSatchels()
     return false;
 }
 
-bool CStaticFunctionDefinitions::CreateFire(CVector& vecPosition, float fSize)
-{
-    return g_pGame->GetFireManager()->StartFire(vecPosition, fSize) != NULL;
-}
-
-bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, float fRadius)
-{
-    g_pGame->GetFireManager()->ExtinguishPoint(vecPosition, fRadius);
-    return true;
-}
-
-bool CStaticFunctionDefinitions::ExtinguishAllFires()
-{
-    g_pGame->GetFireManager()->ExtinguishAllFires();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::PlaySoundFrontEnd(unsigned char ucSound)
 {
     g_pGame->GetAudioEngine()->PlayFrontEndSound(ucSound);
