@@ -4028,8 +4028,6 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     CTxdStore_RemoveRef(usParentTxdId);
                     ClearIsolatedTxdLastUse(usModelId);
                     ClearPendingIsolatedModel(usModelId);
-                    ClearPendingReplacementStateForModel(usModelId);
-                    g_PendingReplacementByModel.erase(usModelId);
                     g_IsolatedTxdByModel.erase(itPrevIsolated);
                     QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                     return false;
@@ -4105,8 +4103,6 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                         }
                         ClearIsolatedTxdLastUse(usModelId);
                         ClearPendingIsolatedModel(usModelId);
-                        ClearPendingReplacementStateForModel(usModelId);
-                        g_PendingReplacementByModel.erase(usModelId);
                         g_IsolatedTxdByModel.erase(itIsolated);
                         QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                         return false;
@@ -4128,8 +4124,6 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     CTxdStore_RemoveRef(usParentTxdId);
                     ClearIsolatedTxdLastUse(usModelId);
                     ClearPendingIsolatedModel(usModelId);
-                    ClearPendingReplacementStateForModel(usModelId);
-                    g_PendingReplacementByModel.erase(usModelId);
                     g_IsolatedTxdByModel.erase(itIsolated);
                     QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                     return false;
