@@ -3258,21 +3258,26 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             bool bNeedVehicleFallback = false;
             for (SReplacementTextures* pReplacement : info.usedByReplacements)
             {
-                if (pReplacement)
-                    originalUsed.push_back(pReplacement);
+                if (!pReplacement)
+                    continue;
+
+                originalUsed.push_back(pReplacement);
                 std::vector<unsigned short> modelIds;
                 for (unsigned short modelId : pReplacement->usedInModelIds)
                 {
                     auto& pCachedModInfo = modelInfoCache[modelId];
                     if (!pCachedModInfo)
                         pCachedModInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(modelId));
-                    if (!pCachedModInfo || !pCachedModInfo->GetRwObject())
+                    if (!pCachedModInfo)
                         continue;
+
                     if (pCachedModInfo->GetTextureDictionaryID() == usTxdId)
                     {
-                        modelIds.push_back(modelId);
                         if (!bNeedVehicleFallback && ShouldUseVehicleTxdFallback(modelId))
                             bNeedVehicleFallback = true;
+
+                        if (pCachedModInfo->GetRwObject())
+                            modelIds.push_back(modelId);
                     }
                 }
                 if (!pReplacement->textures.empty() && !modelIds.empty())
