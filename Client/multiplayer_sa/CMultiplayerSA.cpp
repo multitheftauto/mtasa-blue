@@ -1586,6 +1586,10 @@ void CMultiplayerSA::InitHooks()
     MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
     MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
 
+    // Fix objects with alpha below 141 are invisible (#425)
+    MemPut<BYTE>(0x553AD9, 0);
+    MemPut<BYTE>(0x732C2F, 0);
+
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
 
