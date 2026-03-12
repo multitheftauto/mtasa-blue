@@ -321,23 +321,6 @@ namespace
             outMap[kv.first] = kv.second;
     }
 
-    void PurgeModelIdFromReplacementTracking(unsigned short usModelId)
-    {
-        for (auto& entry : ms_ModelTexturesInfoMap)
-        {
-            auto& info = entry.second;
-
-            const auto usedBy = info.usedByReplacements;
-            for (SReplacementTextures* pReplacement : usedBy)
-            {
-                if (!pReplacement)
-                    continue;
-
-                pReplacement->usedInModelIds.erase(usModelId);
-            }
-        }
-    }
-
     // Remove pReplacementTextures from all usedByReplacements vectors in the map.
     // Uses usedInTxdIds as fast path, then does a safety scan for orphaned references.
     void RemoveReplacementFromTracking(SReplacementTextures* pReplacementTextures)
@@ -4814,8 +4797,6 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
         return;
 
     ClearIsolatedTxdLastUse(usModelId);
-
-    PurgeModelIdFromReplacementTracking(usModelId);
 
     auto itModelInfo = g_IsolatedTxdByModel.find(usModelId);
     if (itModelInfo == g_IsolatedTxdByModel.end())
