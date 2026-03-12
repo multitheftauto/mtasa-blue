@@ -56,39 +56,45 @@ namespace
     using TextureSwapMap = std::unordered_map<RwTexture*, RwTexture*>;
 
     // Content-hashed key avoids allocations
-    struct TextureNameHash
+    struct SafeTextureName
     {
-        std::size_t operator()(const char* s) const noexcept
-        {
-            if (!s)
-                return 0;
+        char        m_name[RW_TEXTURE_NAME_LENGTH];
+        std::size_t m_len;
 
-            std::size_t h = 2166136261u;
-            for (std::size_t i = 0; i < RW_TEXTURE_NAME_LENGTH; ++i)
+        SafeTextureName(const char* str)
+        {
+            if (str)
             {
-                const unsigned char c = static_cast<unsigned char>(s[i]);
-                if (c == 0)
-                    break;
-                h ^= c;
+                m_len = strnlen(str, RW_TEXTURE_NAME_LENGTH);
+                memcpy(m_name, str, m_len);
+                if (m_len < RW_TEXTURE_NAME_LENGTH)
+                    m_name[m_len] = '\0';
+            }
+            else
+            {
+                m_len = 0;
+                m_name[0] = '\0';
+            }
+        }
+
+        bool operator==(const SafeTextureName& other) const noexcept { return m_len == other.m_len && memcmp(m_name, other.m_name, m_len) == 0; }
+    };
+
+    struct SafeTextureNameHash
+    {
+        std::size_t operator()(const SafeTextureName& key) const noexcept
+        {
+            std::size_t h = 2166136261u;
+            for (std::size_t i = 0; i < key.m_len; ++i)
+            {
+                h ^= static_cast<unsigned char>(key.m_name[i]);
                 h *= 16777619u;
             }
             return h;
         }
     };
 
-    struct TextureNameEq
-    {
-        bool operator()(const char* a, const char* b) const noexcept
-        {
-            if (a == b)
-                return true;
-            if (!a || !b)
-                return false;
-            return strncmp(a, b, RW_TEXTURE_NAME_LENGTH) == 0;
-        }
-    };
-
-    using TxdTextureMap = std::unordered_map<const char*, RwTexture*, TextureNameHash, TextureNameEq>;
+    using TxdTextureMap = std::unordered_map<SafeTextureName, RwTexture*, SafeTextureNameHash>;
     struct ReplacementShaderKey
     {
         SReplacementTextures* pReplacement;
@@ -272,7 +278,17 @@ namespace
 
         bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
         {
-            return pTxd != nullptr && pTxd == pCurrentTxd && pListHead == pCurrentTxd->textures.root.next;
+            if (pTxd == nullptr || pTxd != pCurrentTxd || pListHead != pCurrentTxd->textures.root.next)
+                return false;
+
+            if (pListHead && pListHead != &pCurrentTxd->textures.root)
+            {
+                RwTexture* pFirstTex = (RwTexture*)((char*)pListHead - offsetof(RwTexture, TXDList));
+                auto       it = textureMap.find(pFirstTex->name);
+                if (it == textureMap.end() || it->second != pFirstTex)
+                    return false;
+            }
+            return true;
         }
     };
     std::unordered_map<unsigned short, SCachedTxdTextureMap> g_TxdTextureMapCache;
@@ -756,13 +772,13 @@ namespace
 
                 if (!bModelLoaded)
                 {
-                    RequeuePendingReplacement(usModelId, entry, false);
+                    RequeuePendingReplacement(usModelId, entry, true);
                     continue;
                 }
 
                 if (bParentStreamingBusy)
                 {
-                    RequeuePendingReplacement(usModelId, entry, false);
+                    RequeuePendingReplacement(usModelId, entry, true);
                     continue;
                 }
 
@@ -775,18 +791,10 @@ namespace
 
                 ++uiProcessedCount;
 
-                const uint32_t uiStartSerial = g_uiIsolationDeniedSerial;
-                const bool     bApplied = pRenderWareSA->ModelInfoTXDAddTextures(entry.pReplacement, usModelId);
+                const bool bApplied = pRenderWareSA->ModelInfoTXDAddTextures(entry.pReplacement, usModelId);
                 if (!bApplied)
                 {
-                    if (WasIsolationDenied(uiStartSerial))
-                    {
-                        RequeuePendingReplacement(usModelId, entry, false);
-                    }
-                    else
-                    {
-                        RequeuePendingReplacement(usModelId, entry, true);
-                    }
+                    RequeuePendingReplacement(usModelId, entry, true);
                 }
                 else
                 {
@@ -1657,7 +1665,14 @@ namespace
         if (!CanDestroyOrphanedTexture(pTexture))
             return;
 
-        reinterpret_cast<RwRaster* volatile&>(pTexture->raster) = nullptr;
+        // If this is the final reference, RwTextureDestroy will attempt to free the raster.
+        // We only clear it if refs <= 1. If refs > 1, the struct won't be freed anyway, so clearing
+        // the raster just needlessly breaks any other materials still keeping this copy alive.
+        if (pTexture->refs <= 1)
+        {
+            reinterpret_cast<RwRaster* volatile&>(pTexture->raster) = nullptr;
+        }
+
         RwTextureDestroy(pTexture);
     }
 
@@ -1762,7 +1777,22 @@ namespace
         // Streaming can destroy and reload a TXD at the same address (pool/allocator reuse),
         // which leaves the cache with dangling texture name pointers.
         RwListEntry* pListHead = pVehicleTxd->textures.root.next;
-        if (pVehicleTxd != g_pCachedVehicleTxd || pListHead != g_pCachedVehicleTxdListHead)
+        RwTexture*   pFirstTex = nullptr;
+        if (pListHead && pListHead != &pVehicleTxd->textures.root)
+            pFirstTex = (RwTexture*)((char*)pListHead - offsetof(RwTexture, TXDList));
+
+        bool bInvalidate = (pVehicleTxd != g_pCachedVehicleTxd || pListHead != g_pCachedVehicleTxdListHead);
+
+        if (!bInvalidate && pFirstTex && !g_CachedVehicleTxdMap.empty())
+        {
+            auto it = g_CachedVehicleTxdMap.find(pFirstTex->name);
+            if (it == g_CachedVehicleTxdMap.end() || it->second != pFirstTex)
+            {
+                bInvalidate = true;
+            }
+        }
+
+        if (bInvalidate)
         {
             g_CachedVehicleTxdMap.clear();
             g_pCachedVehicleTxd = pVehicleTxd;
@@ -3998,6 +4028,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     CTxdStore_RemoveRef(usParentTxdId);
                     ClearIsolatedTxdLastUse(usModelId);
                     ClearPendingIsolatedModel(usModelId);
+                    ClearPendingReplacementStateForModel(usModelId);
+                    g_PendingReplacementByModel.erase(usModelId);
                     g_IsolatedTxdByModel.erase(itPrevIsolated);
                     QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                     return false;
@@ -4073,6 +4105,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                         }
                         ClearIsolatedTxdLastUse(usModelId);
                         ClearPendingIsolatedModel(usModelId);
+                        ClearPendingReplacementStateForModel(usModelId);
+                        g_PendingReplacementByModel.erase(usModelId);
                         g_IsolatedTxdByModel.erase(itIsolated);
                         QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                         return false;
@@ -4094,6 +4128,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     CTxdStore_RemoveRef(usParentTxdId);
                     ClearIsolatedTxdLastUse(usModelId);
                     ClearPendingIsolatedModel(usModelId);
+                    ClearPendingReplacementStateForModel(usModelId);
+                    g_PendingReplacementByModel.erase(usModelId);
                     g_IsolatedTxdByModel.erase(itIsolated);
                     QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                     return false;
