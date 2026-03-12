@@ -3281,6 +3281,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
             std::unordered_map<unsigned short, CModelInfoSA*>                          modelInfoCache;
             std::vector<std::pair<SReplacementTextures*, std::vector<unsigned short>>> replacementsToReapply;
+            std::vector<std::pair<SReplacementTextures*, std::vector<unsigned short>>> pendingGeometryLess;
             std::vector<SReplacementTextures*>                                         originalUsed;
 
             // Computed before the collection loop; that loop erases from usedInModelIds,
@@ -3293,6 +3294,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
                 originalUsed.push_back(pReplacement);
                 std::vector<unsigned short> modelIds;
+                std::vector<unsigned short> geometryLessIds;
                 for (unsigned short modelId : pReplacement->usedInModelIds)
                 {
                     auto& pCachedModInfo = modelInfoCache[modelId];
@@ -3308,10 +3310,14 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
                         if (pCachedModInfo->GetRwObject())
                             modelIds.push_back(modelId);
+                        else
+                            geometryLessIds.push_back(modelId);
                     }
                 }
                 if (!pReplacement->textures.empty() && !modelIds.empty())
                     replacementsToReapply.emplace_back(pReplacement, std::move(modelIds));
+                if (!pReplacement->textures.empty() && !geometryLessIds.empty())
+                    pendingGeometryLess.emplace_back(pReplacement, std::move(geometryLessIds));
             }
 
             for (auto& entry : replacementsToReapply)
@@ -3685,6 +3691,18 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     g_bInTxdReapply = bPrevInReapply;
                 }
                 info.bReapplyingTextures = false;
+            }
+
+            // Queue deferred texture application for models that had no geometry
+            // during stale reapply. Their perTxdList entries were cleaned above;
+            // TryApplyPendingReplacements will apply when streaming loads geometry.
+            if (!pendingGeometryLess.empty())
+            {
+                for (auto& pendingEntry : pendingGeometryLess)
+                {
+                    for (unsigned short usModelId : pendingEntry.second)
+                        QueuePendingReplacement(usModelId, pendingEntry.first, 0, 0);
+                }
             }
         }
 
