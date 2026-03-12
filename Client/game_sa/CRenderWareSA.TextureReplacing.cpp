@@ -2162,6 +2162,7 @@ namespace
                 auto*                slot = pTxdPoolSA->GetTextureDictonarySlot(existingTxdId);
                 if (slot && slot->rwTexDictonary && slot->usParentIndex == usParentTxdId)
                 {
+                    itExisting->second.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
                     g_IsolatedModelByTxd[existingTxdId] = usModelId;
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
@@ -2585,6 +2586,7 @@ namespace
                         ClearPendingIsolatedModel(usModelId);
                     }
 
+                    itExisting->second.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
                     g_IsolatedModelByTxd[existingTxdId] = usModelId;
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
@@ -3961,6 +3963,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     QueuePendingReplacement(usModelId, pReplacementTextures, uiParentModelId, usParentTxdId);
                     return false;
                 }
+
+                itIsolated->second.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
             }
         }
         else if (!g_bInTxdReapply)
@@ -3982,6 +3986,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 auto itOwner = g_IsolatedModelByTxd.find(usCurrentTxdId);
                 if (CTxdStore_GetTxd(usCurrentTxdId) != nullptr && itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
                 {
+                    itPrevIsolated->second.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
                     UpdateIsolatedTxdLastUse(usModelId);
                 }
                 else
@@ -4105,6 +4110,8 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
                     return false;
                 }
+
+                itIsolated->second.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
             }
             else
             {
