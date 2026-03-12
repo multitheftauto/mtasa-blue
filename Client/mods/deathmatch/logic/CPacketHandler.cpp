@@ -468,6 +468,12 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
     g_pCore->UpdateRecentlyPlayed();
 
+    // Update focus state after joining
+    // m_bFocused is set in the CClientGame constructor - immediately after clicking "join."
+    // This means that if the window loses focus while joining the game, the game still believes it has focus,
+    // and isMTAWindowFocused returns true even when the user is doing anything outside the MTA window.
+    g_pClientGame->m_bFocused = g_pCore->IsFocused();
+
     auto discord = g_pCore->GetDiscord();
     if (discord && discord->IsDiscordRPCEnabled())
     {
