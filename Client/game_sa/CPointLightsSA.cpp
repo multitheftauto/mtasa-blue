@@ -89,7 +89,7 @@ struct RxObjSpace3DVertex
     float   v;
 };
 
-static void __cdecl PreRenderSearchLight3DVertexBuffer(RxObjSpace3DVertex* buffer, int numVerts, RwMatrix* ltm, int flags)
+static RxObjSpace3DVertex* CSearchLight_PreRender3DVertexBuffer(RxObjSpace3DVertex* buffer, std::uint32_t numVerts, RwMatrix* ltm, std::uint32_t flags)
 {
     // Light cone color
     if (buffer && numVerts > 0)
@@ -106,27 +106,13 @@ static void __cdecl PreRenderSearchLight3DVertexBuffer(RxObjSpace3DVertex* buffe
                                          static_cast<std::uint8_t>(searchLightColor.B * intensity), 0);
         }
     }
+
+    // Call RwIm3DTransform
+    return ((RxObjSpace3DVertex * (__cdecl*)(RxObjSpace3DVertex*, std::uint32_t, RwMatrix*, std::uint32_t))0x7EF450)(buffer, numVerts, ltm, flags);
 }
 
-static constexpr std::uintptr_t HOOK_CSearchLight_PreRender3DVertexBuffer = 0x6C6293;
-static constexpr std::uintptr_t TansformFunc = 0x7EF450;
-static void __declspec(naked)   CSearchLight_PreRender3DVertexBuffer()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        call PreRenderSearchLight3DVertexBuffer
-        call TansformFunc
-
-        jmp HOOK_CSearchLight_PreRender3DVertexBuffer
-    }
-    // clang-format on
-}
-
-static void __cdecl RenderSearchLightShadow(char type, void* texture, CVector* pos, float x1, float y1, float x2, float y2, std::int16_t intensity, char r,
-                                            char g, char b, float zDistance, bool drawOnWater, float scale, void* shadowData, bool drawOnBuildings)
+static void CSearchLight_RenderShadow(char type, void* texture, CVector* pos, float x1, float y1, float x2, float y2, std::int16_t intensity, char r, char g,
+                                      char b, float zDistance, bool drawOnWater, float scale, void* shadowData, bool drawOnBuildings)
 {
     // Get original color intensity multiplier
     float colorIntensity = static_cast<float>(intensity) / 128.0f;
@@ -139,24 +125,9 @@ static void __cdecl RenderSearchLightShadow(char type, void* texture, CVector* p
                                      drawOnBuildings);
 }
 
-static constexpr std::uintptr_t RETURN_CSearchLight_RenderShadow = 0x6C64FC;
-static void __declspec(naked)   CSearchLight_RenderShadow()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        call RenderSearchLightShadow
-        jmp RETURN_CSearchLight_RenderShadow
-    }
-    // clang-format on
-}
-
-static void __cdecl RenderSearchLightCorona(int ID, void* entity, unsigned char r, unsigned char g, unsigned char b, unsigned char a, CVector* pos,
-                                            float radius, float farClip, int type, char flareType, bool enableReflection, bool checkObstacles,
-                                            int unknownUnused, float angle, bool longDistance, float nearClip, bool fadeState, float fadeSpeed,
-                                            bool onlyFromBelow, bool reflectionDelay)
+static void CSearchLight_RenderCorona(int ID, void* entity, unsigned char r, unsigned char g, unsigned char b, unsigned char a, CVector* pos, float radius,
+                                      float farClip, int type, char flareType, bool enableReflection, bool checkObstacles, int unknownUnused, float angle,
+                                      bool longDistance, float nearClip, bool fadeState, float fadeSpeed, bool onlyFromBelow, bool reflectionDelay)
 {
     // CCoronas::RegisterCorona
     ((void(__cdecl*)(int, void*, unsigned char, unsigned char, unsigned char, unsigned char, CVector*, float, float, int, char, bool, bool, int, float, bool,
@@ -165,23 +136,9 @@ static void __cdecl RenderSearchLightCorona(int ID, void* entity, unsigned char 
                                                                fadeState, fadeSpeed, onlyFromBelow, reflectionDelay);
 }
 
-static constexpr std::uintptr_t RETURN_CSearchLight_RenderCorona = 0x6C5B24;
-static void _declspec(naked)    CSearchLight_RenderCorona()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        call RenderSearchLightCorona
-        jmp RETURN_CSearchLight_RenderCorona
-    }
-    // clang-format on
-}
-
 void CPointLightsSA::StaticSetHooks()
 {
-    HookInstall(0x6C628E, (DWORD)CSearchLight_PreRender3DVertexBuffer);
-    HookInstall(0x6C64F7, (DWORD)CSearchLight_RenderShadow);
-    HookInstall(0x6C5B1F, (DWORD)CSearchLight_RenderCorona);
+    HookInstallCall(0x6C628E, (DWORD)CSearchLight_PreRender3DVertexBuffer);
+    HookInstallCall(0x6C64F7, (DWORD)CSearchLight_RenderShadow);
+    HookInstallCall(0x6C5B1F, (DWORD)CSearchLight_RenderCorona);
 }
