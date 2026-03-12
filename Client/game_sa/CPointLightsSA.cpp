@@ -18,7 +18,8 @@ using CHeli_SearchLightCone_t = void(__cdecl*)(int handleId, CVector startPos, C
 using CHeli_PreSearchLightCone_t = int(__cdecl*)();
 using CHeli_PostSearchLightCone_t = int(__cdecl*)();
 
-static SColor searchLightColor{};
+// Init default searchlight color
+static SColor searchLightColor = SColorRGBA(200, 200, 255, 0);
 
 void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SharedUtil::SColor color, unsigned char uc_8,
                               bool bCreatesShadow, CEntity* pAffected)
@@ -74,10 +75,15 @@ void CPointLightsSA::RenderHeliLight(const CVector& vecStart, const CVector& vec
     CVector mat[] = {CVector(), CVector(), CVector()};
 
     // Set color
+    SColor originalColor = searchLightColor;
     searchLightColor = color;
 
     // Set render states and render
     CHeli_SearchLightCone(0, vecStart, vecEnd, endRadius, 1.0f, 0, renderSpot, &mat[0], &mat[1], &mat[2], 1, startRadius);
+
+    // Set previous color
+    // Keep the maverick default searchlight color
+    searchLightColor = originalColor;
 }
 
 struct RxObjSpace3DVertex
@@ -96,10 +102,6 @@ static RxObjSpace3DVertex* CSearchLight_PreRender3DVertexBuffer(RxObjSpace3DVert
     {
         for (int i = 0; i < numVerts; i++)
         {
-            std::uint8_t r = (buffer[i].color >> 16) & 0xFF;
-            std::uint8_t g = (buffer[i].color >> 8) & 0xFF;
-            std::uint8_t b = (buffer[i].color >> 0) & 0xFF;
-
             float intensity = (buffer[i].color & 0xFF) / 255.0f;  // Get original intensity
 
             buffer[i].color = COLOR_RGBA(static_cast<std::uint8_t>(searchLightColor.R * intensity), static_cast<std::uint8_t>(searchLightColor.G * intensity),
