@@ -216,6 +216,7 @@ namespace
     uint32_t g_uiIsolationDeniedSerial = 0;
     bool     g_bProcessingPendingReplacements = false;
     bool     g_bProcessingPendingIsolatedModels = false;
+    uint32_t g_uiNextPendingRetryTick = 0;
 
     void                   BuildTxdTextureMapFast(RwTexDictionary* pTxd, TxdTextureMap& outMap);
     static void            AddVehicleTxdFallback(TxdTextureMap& outMap);
@@ -253,7 +254,7 @@ namespace
     constexpr std::size_t   MAX_LEAK_RETRY_COUNT = 1024;
     constexpr std::size_t   MAX_PENDING_REPLACEMENT_MODELS = 512;
     constexpr std::size_t   MAX_PENDING_REPLACEMENTS_PER_MODEL = 8;
-    constexpr unsigned char MAX_PENDING_REPLACEMENT_RETRIES = 10;
+    constexpr unsigned char MAX_PENDING_REPLACEMENT_RETRIES = 120;
     constexpr uint32_t      PENDING_REPLACEMENT_MAX_AGE_MS = 300000;
     constexpr uint32_t      PENDING_REPLACEMENT_RETRY_INTERVAL_MS = 250;
     constexpr std::size_t   MAX_PENDING_REPLACEMENTS_PER_TICK = 64;
@@ -587,6 +588,9 @@ namespace
         entry.uiNextRetryTick = uiNow;
         entry.uiSessionId = ms_uiTextureReplacingSession;
         vecPending.push_back(entry);
+
+        if (g_uiNextPendingRetryTick == 0 || entry.uiNextRetryTick < g_uiNextPendingRetryTick)
+            g_uiNextPendingRetryTick = entry.uiNextRetryTick;
     }
 
     static void KeepPendingReplacement(unsigned short usModelId, const SPendingReplacement& pendingEntry)
@@ -639,6 +643,10 @@ namespace
                 // Keep the higher retry count so escalation is never lost
                 if (pendingEntryCopy.ucRetryCount > existingEntry.ucRetryCount)
                     existingEntry.ucRetryCount = pendingEntryCopy.ucRetryCount;
+                // Enforce delayed retry so a fresh QueuePendingReplacement
+                // inside ModelInfoTXDAddTextures cant keep the entry eligible every frame.
+                if (pendingEntryCopy.uiNextRetryTick > existingEntry.uiNextRetryTick)
+                    existingEntry.uiNextRetryTick = pendingEntryCopy.uiNextRetryTick;
                 return;
             }
         }
@@ -652,6 +660,9 @@ namespace
             return;
 
         if (g_PendingReplacementByModel.empty())
+            return;
+
+        if (g_uiNextPendingRetryTick != 0 && static_cast<int32_t>(GetTickCount32() - g_uiNextPendingRetryTick) < 0)
             return;
 
         CRenderWareSA* pRenderWareSA = pGame ? pGame->GetRenderWareSA() : nullptr;
@@ -800,6 +811,13 @@ namespace
                 }
             }
         }
+
+        // Update earliest eligible time so frames between retries skip the swap.
+        g_uiNextPendingRetryTick = UINT32_MAX;
+        for (const auto& pair : g_PendingReplacementByModel)
+            for (const auto& pendEntry : pair.second)
+                if (pendEntry.uiNextRetryTick < g_uiNextPendingRetryTick)
+                    g_uiNextPendingRetryTick = pendEntry.uiNextRetryTick;
     }
 
     static bool OrphanTxdTexturesBounded(RwTexDictionary* pTxd, bool bClearList)
@@ -4067,6 +4085,26 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                         return false;
                     }
                 }
+                else if (CTxdStore_GetTxd(usModelTxdId) == nullptr)
+                {
+                    // Isolated dict was destroyed while model still points to it.
+                    // Restore the model to its parent TXD before releasing the pin so it doesnst remain pointed at the dead slot.
+                    const unsigned short usParentTxdId = itIsolated->second.usParentTxdId;
+                    auto                 itOwner = g_IsolatedModelByTxd.find(usModelTxdId);
+                    if (itOwner != g_IsolatedModelByTxd.end() && itOwner->second == usModelId)
+                    {
+                        RemoveTxdFromReplacementTracking(usModelTxdId);
+                        g_IsolatedModelByTxd.erase(itOwner);
+                    }
+                    if (pModelInfo->GetTextureDictionaryID() == usModelTxdId)
+                        pModelInfo->SetTextureDictionaryID(usParentTxdId);
+                    CTxdStore_RemoveRef(usParentTxdId);
+                    ClearIsolatedTxdLastUse(usModelId);
+                    ClearPendingIsolatedModel(usModelId);
+                    g_IsolatedTxdByModel.erase(itIsolated);
+                    QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                    return false;
+                }
             }
             else
             {
@@ -6182,6 +6220,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_uiIsolationDeniedSerial = 0;
     g_bProcessingPendingReplacements = false;
     g_bProcessingPendingIsolatedModels = false;
+    g_uiNextPendingRetryTick = 0;
     const uint32_t uiNow = GetTickCount32();
     g_uiLastOrphanCleanupTime = uiNow;
     g_uiLastOrphanLogTime = uiNow;
