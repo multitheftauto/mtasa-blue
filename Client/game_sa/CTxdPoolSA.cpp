@@ -180,6 +180,7 @@ static void __declspec(naked) HOOK_RequestModelStream_TxdCheck()
 // RemoveModel calls for streaming IDs >= 25000.
 static void __declspec(naked) HOOK_SetMissionDoesntRequireModel_TxdCheck()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
@@ -207,6 +208,7 @@ static void __declspec(naked) HOOK_SetMissionDoesntRequireModel_TxdCheck()
 // Same principle as SetMissionDoesntRequireModel.
 static void __declspec(naked) HOOK_SetModelTxdIsDeletable_TxdCheck()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
@@ -234,6 +236,7 @@ static void __declspec(naked) HOOK_SetModelTxdIsDeletable_TxdCheck()
 // Validates parent index and slot liveness before allowing RemoveModel cascade.
 static void __declspec(naked) HOOK_RemoveTxd_ParentCascade()
 {
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
     // clang-format off
     __asm
     {
