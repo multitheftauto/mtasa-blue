@@ -2602,6 +2602,18 @@ namespace
 
                     itExisting->second.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
                     g_IsolatedModelByTxd[existingTxdId] = usModelId;
+
+                    // If the parent chain is still incomplete, keep the model on
+                    // its current TXD so it renders with original textures rather
+                    // than white from an empty, unlinked child TXD.
+                    if (slot->usParentIndex == static_cast<unsigned short>(-1))
+                    {
+                        UpdateIsolatedTxdLastUse(usModelId);
+                        if (!g_PendingIsolatedModels.count(usModelId))
+                            AddPendingIsolatedModel(usModelId);
+                        return false;
+                    }
+
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
                     UpdateIsolatedTxdLastUse(usModelId);
@@ -2741,7 +2753,11 @@ namespace
 
         CTxdStore_AddRef(usParentTxdId);  // Pin parent before SetTextureDictionaryID transfers entity refs
 
-        pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
+        // Only assign the model to the child TXD when the parent chain is ready.
+        // Without a parent chain, texture lookups on the empty child TXD find
+        // nothing and the model renders white until the deferred setup completes.
+        if (bParentAvailable)
+            pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
 
         g_IsolatedTxdByModel[usModelId] = info;
         g_IsolatedModelByTxd[info.usTxdId] = usModelId;
@@ -2753,7 +2769,10 @@ namespace
         UpdateIsolatedTxdLastUse(usModelId);
 
         if (!bParentAvailable)
+        {
             AddPendingIsolatedModel(usModelId);
+            return false;
+        }
         return true;
     }
 
@@ -2937,7 +2956,7 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
             // TXD is not yet loaded; detect that state and complete setup here once it arrives.
             auto*      pChildSlot = pTxdPoolSA->GetTextureDictonarySlot(childTxdId);
             const bool bIsDeferredVanillaSetup = pChildSlot && pChildSlot->rwTexDictonary && pChildSlot->usParentIndex == static_cast<unsigned short>(-1) &&
-                                                 pModelInfo->GetTextureDictionaryID() == childTxdId;
+                                                 (pModelInfo->GetTextureDictionaryID() == childTxdId || pModelInfo->GetTextureDictionaryID() == parentTxdId);
 
             if (bIsDeferredVanillaSetup)
             {
