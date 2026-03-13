@@ -89,6 +89,8 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     optionsMap.Get("batch", m_bAutomaticTransactionsEnabled, 1);
     optionsMap.Get("multi_statements", m_bMultipleStatements, 0);
     optionsMap.Get("use_ssl", m_bUseSSL, 0);
+    // MySQL 9+ uses caching_sha2_password by default (mysql_native_password removed in 9.0)
+    // MYSQL_OPT_GET_SERVER_PUBLIC_KEY enables secure password exchange with caching_sha2_password
     optionsMap.Get("get_server_public_key", getServerPublicKey, 1);
 
     SString strHostname;
