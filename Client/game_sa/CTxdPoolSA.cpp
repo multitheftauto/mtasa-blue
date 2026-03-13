@@ -75,20 +75,20 @@ static const DWORD RETURN_RequestModelStream_TxdCheck = 0x40CDA6;
 
 // SetMissionDoesntRequireModel TXD cleanup hook:
 // Prevents overlap/overflow TXD indices from being turned into out-of-bounds stream IDs.
-#define HOOKPOS_SetMissionDoesntRequireModel_TxdCheck   0x409CFC
-#define HOOKSIZE_SetMissionDoesntRequireModel_TxdCheck  10
+#define HOOKPOS_SetMissionDoesntRequireModel_TxdCheck  0x409CFC
+#define HOOKSIZE_SetMissionDoesntRequireModel_TxdCheck 10
 static const DWORD RETURN_SetMissionDoesntRequireModel_TxdCheck = 0x409CA0;
 
 // SetModelTxdIsDeletable hook:
 // Prevents overlap/overflow TXD indices from being sent to SetModelIsDeletable.
-#define HOOKPOS_SetModelTxdIsDeletable_TxdCheck   0x409C7B
-#define HOOKSIZE_SetModelTxdIsDeletable_TxdCheck  10
+#define HOOKPOS_SetModelTxdIsDeletable_TxdCheck  0x409C7B
+#define HOOKSIZE_SetModelTxdIsDeletable_TxdCheck 10
 static const DWORD RETURN_SetModelTxdIsDeletable_TxdCheck = 0x409C85;
 
 // RemoveTxd parent cascade hook:
 // Prevents overflow parent indices from causing out-of-bounds RemoveModel calls.
-#define HOOKPOS_RemoveTxd_ParentCascade   0x731ED4
-#define HOOKSIZE_RemoveTxd_ParentCascade  8
+#define HOOKPOS_RemoveTxd_ParentCascade  0x731ED4
+#define HOOKSIZE_RemoveTxd_ParentCascade 8
 
 extern CGameSA* pGame;
 
@@ -362,10 +362,12 @@ void CTxdPoolSA::InstallPoolHooks()
     HookInstall(HOOKPOS_RequestModelStream_TxdCheck, reinterpret_cast<DWORD>(HOOK_RequestModelStream_TxdCheck), HOOKSIZE_RequestModelStream_TxdCheck);
 
     // CStreaming::SetMissionDoesntRequireModel TXD cleanup hook
-    HookInstall(HOOKPOS_SetMissionDoesntRequireModel_TxdCheck, reinterpret_cast<DWORD>(HOOK_SetMissionDoesntRequireModel_TxdCheck), HOOKSIZE_SetMissionDoesntRequireModel_TxdCheck);
+    HookInstall(HOOKPOS_SetMissionDoesntRequireModel_TxdCheck, reinterpret_cast<DWORD>(HOOK_SetMissionDoesntRequireModel_TxdCheck),
+                HOOKSIZE_SetMissionDoesntRequireModel_TxdCheck);
 
     // CStreaming::SetModelTxdIsDeletable hook
-    HookInstall(HOOKPOS_SetModelTxdIsDeletable_TxdCheck, reinterpret_cast<DWORD>(HOOK_SetModelTxdIsDeletable_TxdCheck), HOOKSIZE_SetModelTxdIsDeletable_TxdCheck);
+    HookInstall(HOOKPOS_SetModelTxdIsDeletable_TxdCheck, reinterpret_cast<DWORD>(HOOK_SetModelTxdIsDeletable_TxdCheck),
+                HOOKSIZE_SetModelTxdIsDeletable_TxdCheck);
 
     // CTxdStore::RemoveTxd parent cascade hook
     HookInstall(HOOKPOS_RemoveTxd_ParentCascade, reinterpret_cast<DWORD>(HOOK_RemoveTxd_ParentCascade), HOOKSIZE_RemoveTxd_ParentCascade);
