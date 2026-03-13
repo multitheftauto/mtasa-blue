@@ -457,14 +457,15 @@ public:
     int    GetSyncFPS() { return m_iSyncFPS; }
     void   SetSyncFPS(int iSyncFPS) { m_iSyncFPS = iSyncFPS; }
 
-    void HandleBackup();
-    void HandleCrashDumpEncryption();
-    void EnableLatentSends(bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL, ushort usResourceNetId = 0xFFFF);
-    void SendPacketBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream);
-    bool SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
-                    NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability,
-                    ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT);
-    void SendPacketBatchEnd();
+    void     HandleBackup();
+    void     HandleCrashDumpEncryption();
+    void     EnableLatentSends(bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL, ushort usResourceNetId = 0xFFFF);
+    void     SendPacketBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream);
+    bool     SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
+                        NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability,
+                        ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT);
+    void     SendPacketBatchEnd();
+    uint32_t GetLastSentHandle() const noexcept { return m_LastSentHandle; }
 
     bool IsBulletSyncActive();
     void SendSyncSettings(CPlayer* pPlayer = NULL);
@@ -671,6 +672,7 @@ private:
     int       m_iLatentSendsBandwidth;
     CLuaMain* m_pLatentSendsLuaMain;
     ushort    m_usLatentSendsResourceNetId;
+    uint32_t  m_LastSentHandle;
 
     CMtaVersion m_strPrevMinClientKickRequirement;
     CMtaVersion m_strPrevMinClientConnectRequirement;
