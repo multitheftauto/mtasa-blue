@@ -1311,6 +1311,9 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
         player->SetTeleported(true);
     }
 
+    // Get element old position
+    CVector elementOldPosition = pElement->GetPosition();
+
     // Update our position for that entity.
     pElement->SetPosition(vecPosition);
 
@@ -1345,6 +1348,27 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     CPed* ped = IS_PED(pElement) ? static_cast<CPed*>(pElement) : nullptr;
     if (ped && ped->HasJetPack())
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, GIVE_PED_JETPACK, *BitStream.pBitStream));
+
+    // This event is triggered server-side to allow anti-cheat scripts to distinguish between
+    // position changes made by the server (e.g., elevators, scripted teleports) and those made by the client.
+    // Without this event, anti-cheat systems may falsely detect legitimate server-side teleports as cheats,
+    // since they only check the distance between old and new positions.
+    // By listening to this event, anti-cheat scripts can safely ignore server-initiated position changes.
+    CLuaArguments Arguments;
+    Arguments.PushElement(pElement);
+    Arguments.PushNumber(elementOldPosition.fX);
+    Arguments.PushNumber(elementOldPosition.fY);
+    Arguments.PushNumber(elementOldPosition.fZ);
+    Arguments.PushNumber(vecPosition.fX);
+    Arguments.PushNumber(vecPosition.fY);
+    Arguments.PushNumber(vecPosition.fZ);
+    Arguments.PushBool(bWarp);
+     
+
+    if (!pElement->CallEvent("onElementPositionChange", Arguments))
+    {
+       return false;
+    }
 
     return true;
 }
