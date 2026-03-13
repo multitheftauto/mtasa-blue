@@ -43,7 +43,22 @@ public:
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
     virtual unsigned long   GetFlags() const = 0;
 
+    // Overridden when it's an incoming packet.
+    //
+    // Incoming packets always have CPlayer* as the source element.
+    //
+    // - Examples of incoming-only packets: CPlayerDiagnosticPacket, CCommandPacket
+    // - Examples of dual packets: CBulletsyncPacket, CVoiceDataPacket
     virtual bool Read(NetBitStreamInterface& BitStream) { return false; };
+
+    // Overridden when it's an outgoing packet.
+    //
+    // Outgoing packets may have any element type as the source element. As of
+    // 2026-01, CStaticFunctionDefinitions::SetPedStat is the caller of
+    // SetSourceElement with a non-player source.
+    //
+    // - Examples of outgoing-only packets: CPlayerStatsPacket, CDebugEchoPacket
+    // - Examples of dual packets: CBulletsyncPacket, CVoiceDataPacket
     virtual bool Write(NetBitStreamInterface& BitStream) const { return false; };
 
     void                     SetSourceElement(CElement* pSource) { m_pSourceElement = pSource; };
