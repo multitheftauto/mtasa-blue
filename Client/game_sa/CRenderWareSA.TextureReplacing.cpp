@@ -2660,19 +2660,22 @@ namespace
             MarkTxdPoolCountDirty();
         }
 
-        // Store usParentIndex=0xFFFF when the parent TXD is not yet loaded; ProcessPendingIsolatedModels
-        // completes the RW parent linkage once it arrives, mirroring EnsureIsolatedTxdForRequestedModel.
-        const bool bParentAvailable = (CTxdStore_GetTxd(usParentTxdId) != nullptr);
+        // Load the parent TXD with a blocking request so the parent chain is
+        // set up immediately. Deferred setup (usParentIndex=0xFFFF) leaves
+        // non-replaced textures unresolvable until ProcessPendingIsolatedModels
+        // completes the linkage, causing white surfaces on world objs.
+        bool bParentAvailable = (CTxdStore_GetTxd(usParentTxdId) != nullptr);
         if (!bParentAvailable && pGame->GetStreaming())
         {
-            // Changing the model's TXD to childTxdId removes SA's own reference count on
-            // parentTxdId, so it will never load naturally; nudge the streaming system here
-            // and again each tick in ProcessPendingIsolatedModels until the TXD arrives.
+            // Switching the model to the child TXD removes SA's streaming refs
+            // on the parent, so the parent won't load on its own.
             const int iBaseIDforTXD = pGame->GetBaseIDforTXD();
             if (iBaseIDforTXD > 0)
             {
                 const unsigned int uiTxdStreamId = usParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
                 pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+                pGame->GetStreaming()->LoadAllRequestedModels(true, "AllocateIsolatedTxdForVanillaModel-parentTxd");
+                bParentAvailable = (CTxdStore_GetTxd(usParentTxdId) != nullptr);
             }
         }
 
