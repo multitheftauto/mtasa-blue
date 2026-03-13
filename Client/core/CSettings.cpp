@@ -4381,6 +4381,9 @@ void CSettings::SaveData()
     if (CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem())
     {
         gameSettings->SetFXQuality((int)pQualitySelected->GetData());
+
+        // Update grass draw distance to reflect new FX quality setting
+        g_pCore->GetMultiplayer()->RefreshGrassDrawDistance();
     }
 
     // Aspect ratio
