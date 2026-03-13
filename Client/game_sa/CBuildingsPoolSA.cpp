@@ -199,7 +199,12 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
             RemoveBuildingFromWorld(building);
 
             if (building->HasMatrix())
+            {
+                // Keep original matrix
+                m_buildingMatrix[building] = *building->matrix;
+
                 building->RemoveMatrix();
+            }
 
             pBuildsingsPool->Release(i);
 
@@ -230,6 +235,21 @@ void CBuildingsPoolSA::RestoreBackup()
         {
             auto* pBuilding = pBuildsingsPool->AllocateAtNoInit(i);
             std::memcpy(pBuilding, &originalData[i].second, sizeof(CBuildingSAInterface));
+
+            // Restore matrix if it was removed
+            auto it = m_buildingMatrix.find(pBuilding);
+            if (it != m_buildingMatrix.end())
+            {
+                if (!pBuilding->HasMatrix())
+                    pBuilding->AllocateMatrix();
+
+                pBuilding->matrix->vRight = it->second.vRight;
+                pBuilding->matrix->vFront = it->second.vFront;
+                pBuilding->matrix->vUp = it->second.vUp;
+                pBuilding->matrix->vPos = it->second.vPos;
+
+                m_buildingMatrix.erase(it);
+            }
 
             worldSA->Add(pBuilding, CBuildingPool_Constructor);
             buildingRemovealSA->AddDataBuilding(pBuilding);
