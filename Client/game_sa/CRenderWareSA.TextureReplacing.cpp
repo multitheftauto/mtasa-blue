@@ -2537,11 +2537,12 @@ namespace
         info.usParentTxdId = usParentTxdId;
         info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
 
+        CTxdStore_AddRef(usParentTxdId);  // Pin parent before SetTextureDictionaryID transfers entity refs
+
         pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
 
         g_IsolatedTxdByModel[usModelId] = info;
         g_IsolatedModelByTxd[info.usTxdId] = usModelId;
-        CTxdStore_AddRef(usParentTxdId);  // Pin parent while child exists
 
         // Pin the child TXD itself so SA's streaming never reaches ref-count 0
         // while MTA still tracks its textures.  Without this, model unloading
@@ -2735,11 +2736,12 @@ namespace
         info.usParentTxdId = usParentTxdId;
         info.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
 
+        CTxdStore_AddRef(usParentTxdId);  // Pin parent before SetTextureDictionaryID transfers entity refs
+
         pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
 
         g_IsolatedTxdByModel[usModelId] = info;
         g_IsolatedModelByTxd[info.usTxdId] = usModelId;
-        CTxdStore_AddRef(usParentTxdId);
 
         // Pin child TXD so streaming cannot destroy it while MTA tracks its textures
         CTxdStore_AddRef(uiNewTxdId);
