@@ -2746,6 +2746,35 @@ void CModelInfoSA::MakePedModel(const char* szTexture)
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
+void CModelInfoSA::MakePedModel(ushort usParentID)
+{
+    CBaseModelInfoSAInterface* pParentInfo = ppModelInfo[usParentID];
+    if (!IsValidModelInfoPtr(pParentInfo))
+    {
+        ppModelInfo[m_dwModelID] = nullptr;
+        m_pInterface = nullptr;
+        m_dwParentID = 0;
+        ClearModelDefaults(m_dwModelID);
+
+        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
+        if (pStreamingInfo)
+            *pStreamingInfo = CStreamingInfo{};
+        return;
+    }
+
+    CPedModelInfoSAInterface* pNewInterface = new CPedModelInfoSAInterface();
+    MemCpyFast(pNewInterface, pParentInfo, sizeof(CPedModelInfoSAInterface));
+    pNewInterface->usNumberOfRefs = 0;
+    pNewInterface->pRwObject = nullptr;
+    pNewInterface->usUnknown = 65535;
+    pNewInterface->usDynamicIndex = 65535;
+
+    ppModelInfo[m_dwModelID] = pNewInterface;
+
+    m_dwParentID = usParentID;
+    CopyStreamingInfoFromModel(usParentID);
+}
+
 void CModelInfoSA::MakeObjectModel(ushort usBaseID)
 {
     CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];

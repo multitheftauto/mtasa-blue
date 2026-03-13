@@ -485,6 +485,7 @@ public:
 
     // CModelInfoSA methods
     void         MakePedModel(const char* szTexture);
+    void         MakePedModel(ushort usParentID);
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;
     void         MakeVehicleAutomobile(ushort usBaseModelID);
