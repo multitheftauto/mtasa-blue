@@ -73,6 +73,23 @@ static const DWORD RETURN_GetNextFileOnCd_TxdCheck = 0x408ED6;
 #define HOOKSIZE_RequestModelStream_TxdCheck 7
 static const DWORD RETURN_RequestModelStream_TxdCheck = 0x40CDA6;
 
+// SetMissionDoesntRequireModel TXD cleanup hook:
+// Prevents overlap/overflow TXD indices from being turned into out-of-bounds stream IDs.
+#define HOOKPOS_SetMissionDoesntRequireModel_TxdCheck   0x409CFC
+#define HOOKSIZE_SetMissionDoesntRequireModel_TxdCheck  10
+static const DWORD RETURN_SetMissionDoesntRequireModel_TxdCheck = 0x409CA0;
+
+// SetModelTxdIsDeletable hook:
+// Prevents overlap/overflow TXD indices from being sent to SetModelIsDeletable.
+#define HOOKPOS_SetModelTxdIsDeletable_TxdCheck   0x409C7B
+#define HOOKSIZE_SetModelTxdIsDeletable_TxdCheck  10
+static const DWORD RETURN_SetModelTxdIsDeletable_TxdCheck = 0x409C85;
+
+// RemoveTxd parent cascade hook:
+// Prevents overflow parent indices from causing out-of-bounds RemoveModel calls.
+#define HOOKPOS_RemoveTxd_ParentCascade   0x731ED4
+#define HOOKSIZE_RemoveTxd_ParentCascade  8
+
 extern CGameSA* pGame;
 
 // Hook for GetNextFileOnCd's TXD dependency check (0x408ECE).
@@ -152,6 +169,109 @@ static void __declspec(naked) HOOK_RequestModelStream_TxdCheck()
     overflow_loaded:
         mov     al, 1                      // LOADSTATE_LOADED
         jmp     RETURN_RequestModelStream_TxdCheck
+    }
+    // clang-format on
+}
+
+// Hook for SetMissionDoesntRequireModel TXD check (0x409CFC)
+// Replaces: movsx esi, word ptr [ecx+0Ah]
+//           add esi, 4E20h
+// For overflow TXD slots, skipping the conversion prevents out of bounds
+// RemoveModel calls for streaming IDs >= 25000.
+static void __declspec(naked) HOOK_SetMissionDoesntRequireModel_TxdCheck()
+{
+    // clang-format off
+    __asm
+    {
+        movsx   esi, word ptr [ecx+0Ah]
+        
+        test    esi, esi
+        js      skip_txd
+        cmp     esi, 5000                  // SA_TXD_POOL_CAPACITY
+        jge     skip_txd
+        
+        add     esi, 20000                 // 4E20h
+        jmp     RETURN_SetMissionDoesntRequireModel_TxdCheck // 0x409CA0
+
+    skip_txd:
+        // Original loop tail exit from 0x409D08
+        pop     esi
+        retn
+    }
+    // clang-format on
+}
+
+// Hook for SetModelTxdIsDeletable TXD check (0x409C7B)
+// Replaces: movsx edx, word ptr [ecx+0Ah]
+//           add edx, 4E20h
+// Same principle as SetMissionDoesntRequireModel.
+static void __declspec(naked) HOOK_SetModelTxdIsDeletable_TxdCheck()
+{
+    // clang-format off
+    __asm
+    {
+        movsx   edx, word ptr [ecx+0Ah]
+        
+        test    edx, edx
+        js      skip_txd
+        cmp     edx, 5000                  // SA_TXD_POOL_CAPACITY
+        jge     skip_txd
+
+        add     edx, 20000                 // 4E20h
+        jmp     RETURN_SetModelTxdIsDeletable_TxdCheck // 0x409C85
+
+    skip_txd:
+        // SetModelTxdIsDeletable is a void __cdecl function that does a tail JMP.
+        // We simply return, caller removes args.
+        retn
+    }
+    // clang-format on
+}
+
+// Hook for CTxdStore::RemoveTxd parent cascade block (0x731ED4)
+// Replaces: mov ax, [esi+6]
+//           cmp ax, 0FFFFh
+// Validates parent index and slot liveness before allowing RemoveModel cascade.
+static void __declspec(naked) HOOK_RemoveTxd_ParentCascade()
+{
+    // clang-format off
+    __asm
+    {
+        movsx   eax, word ptr [esi+6]      // parentIndex
+        cmp     ax, -1
+        je      skip_parent_cascade
+
+        test    eax, eax
+        js      skip_parent_cascade
+
+        cmp     eax, 5000                  // SA_TXD_POOL_CAPACITY
+        jge     skip_parent_cascade
+
+        // Validate parent slot is still allocated
+        mov     edx, [ecx+4]               // bytemap pointer
+        cmp     byte ptr [edx+eax], 0
+        jns     continue_cascade           // sign bit clear = slot is allocated
+        jmp     skip_parent_cascade        // slot is free, skip
+
+    continue_cascade:
+        mov     ecx, [ecx]                 // pool objects base
+        lea     edx, [eax+eax*2]
+        lea     ecx, [ecx+edx*4]           // parent object pointer
+
+        dec     word ptr [ecx+4]           // parent usUsagesCount
+        cmp     word ptr [ecx+4], 0
+        jg      skip_parent_cascade
+
+        add     eax, 20000
+        push    eax
+        mov     edx, 0x4089A0              // CStreaming::RemoveModel
+        call    edx
+        add     esp, 4
+
+    skip_parent_cascade:
+        mov     dword ptr [esi], 0
+        pop     esi
+        retn
     }
     // clang-format on
 }
@@ -242,6 +362,15 @@ void CTxdPoolSA::InstallPoolHooks()
 
     // RequestModelStream TXD dependency check when packing streaming requests.
     HookInstall(HOOKPOS_RequestModelStream_TxdCheck, reinterpret_cast<DWORD>(HOOK_RequestModelStream_TxdCheck), HOOKSIZE_RequestModelStream_TxdCheck);
+
+    // CStreaming::SetMissionDoesntRequireModel TXD cleanup hook
+    HookInstall(HOOKPOS_SetMissionDoesntRequireModel_TxdCheck, reinterpret_cast<DWORD>(HOOK_SetMissionDoesntRequireModel_TxdCheck), HOOKSIZE_SetMissionDoesntRequireModel_TxdCheck);
+
+    // CStreaming::SetModelTxdIsDeletable hook
+    HookInstall(HOOKPOS_SetModelTxdIsDeletable_TxdCheck, reinterpret_cast<DWORD>(HOOK_SetModelTxdIsDeletable_TxdCheck), HOOKSIZE_SetModelTxdIsDeletable_TxdCheck);
+
+    // CTxdStore::RemoveTxd parent cascade hook
+    HookInstall(HOOKPOS_RemoveTxd_ParentCascade, reinterpret_cast<DWORD>(HOOK_RemoveTxd_ParentCascade), HOOKSIZE_RemoveTxd_ParentCascade);
 }
 
 std::uint32_t CTxdPoolSA::AllocateTextureDictonarySlot(std::uint32_t uiSlotId, std::string& strTxdName)
