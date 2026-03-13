@@ -2780,6 +2780,8 @@ void CModelInfoSA::MakePedModel(ushort usParentID)
     pNewInterface->pRwObject = nullptr;
     pNewInterface->usUnknown = 65535;
     pNewInterface->usDynamicIndex = 65535;
+    pNewInterface->pHitColModel = nullptr;
+    pNewInterface->bIsColLoaded = 0;
 
     ppModelInfo[m_dwModelID] = pNewInterface;
 
