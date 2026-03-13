@@ -271,6 +271,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)  // Max of 4 connections per 30
     m_WorldSpecialProps[WorldSpecialProperty::IGNOREFIRESTATE] = false;
     m_WorldSpecialProps[WorldSpecialProperty::FLYINGCOMPONENTS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::VEHICLEBURNEXPLOSIONS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLEBURNBLOWUP] = true;
     m_WorldSpecialProps[WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
@@ -4474,6 +4475,7 @@ void CGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::IGNOREFIRESTATE, false);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, true);
+        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNBLOWUP, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART, true);
     }
 
