@@ -29,7 +29,7 @@ public:
     DECLARE_ELEMENT_RPC(SetVehicleDoorsUndamageable);
     DECLARE_ELEMENT_RPC(SetVehicleSireneOn);
     DECLARE_ELEMENT_RPC(SetVehicleLandingGearDown);
-    DECLARE_ELEMENT_RPC(SetHelicopterRotorSpeed);
+    DECLARE_ELEMENT_RPC(SetVehicleRotorSpeed);
     DECLARE_ELEMENT_RPC(AddVehicleUpgrade);
     DECLARE_ELEMENT_RPC(AddAllVehicleUpgrades);
     DECLARE_ELEMENT_RPC(RemoveVehicleUpgrade);
@@ -59,4 +59,5 @@ public:
     DECLARE_ELEMENT_RPC(SetVehiclePlateText);
     DECLARE_ELEMENT_RPC(SpawnVehicleFlyingComponent);
     DECLARE_ELEMENT_RPC(SetVehicleNitroActivated);
+    DECLARE_ELEMENT_RPC(SetVehicleRotorState);
 };
