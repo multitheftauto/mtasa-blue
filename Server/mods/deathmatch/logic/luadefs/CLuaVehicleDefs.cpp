@@ -70,6 +70,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
         {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
+        {"isVehicleSmokeTrailEnabled", ArgumentParser<IsVehicleSmokeTrailEnabled>},
 
         // Vehicle set funcs
         {"fixVehicle", FixVehicle},
@@ -128,6 +129,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleSirenParams", GetVehicleSirenParams},
         {"setVehiclePlateText", SetVehiclePlateText},
         {"setVehicleNitroActivated", ArgumentParser<SetVehicleNitroActivated>},
+        {"setVehicleSmokeTrailEnabled", ArgumentParser<SetVehicleSmokeTrailEnabled>},
     };
 
     // Add functions
@@ -217,6 +219,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isRespawnable", "isVehicleRespawnable");
     lua_classfunction(luaVM, "getRespawnDelay", "getVehicleRespawnDelay");
     lua_classfunction(luaVM, "getIdleRespawnDelay", "getVehicleIdleRespawnDelay");
+    lua_classfunction(luaVM, "isSmokeTrailEnabled", "isVehicleSmokeTrailEnabled");
 
     lua_classfunction(luaVM, "setColor", "setVehicleColor");
     lua_classfunction(luaVM, "setDamageProof", "setVehicleDamageProof");
@@ -253,6 +256,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");  // Reduce confusion
     lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
+    lua_classfunction(luaVM, "setSmokeTrailEnabled", "setVehicleSmokeTrailEnabled");
 
     lua_classvariable(luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof");
     lua_classvariable(luaVM, "locked", "setVehicleLocked", "isVehicleLocked");
@@ -296,6 +300,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "sirens", NULL, "getVehicleSirens");
     lua_classvariable(luaVM, "handling", nullptr, "getVehicleHandling");
     lua_classvariable(luaVM, "occupant", NULL, "getVehicleOccupant");
+    lua_classvariable(luaVM, "smokeTrailEnabled", "setVehicleSmokeTrailEnabled", "isVehicleSmokeTrailEnabled");
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
@@ -3069,4 +3074,24 @@ bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) no
 
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
     return true;
+}
+
+bool CLuaVehicleDefs::SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state)
+{
+    std::uint16_t model = vehicle->GetModel();
+    if (model != 512 && model != 513)
+        return false;
+
+    vehicle->SetSmokeTrailEnabled(state);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(state);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_SMOKE_TRAIL_ENABLED, *BitStream.pBitStream));
+    return true;
+}
+
+bool CLuaVehicleDefs::IsVehicleSmokeTrailEnabled(CVehicle* vehicle) noexcept
+{
+    return vehicle->IsSmokeTrailEnabled();
 }
