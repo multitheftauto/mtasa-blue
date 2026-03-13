@@ -126,27 +126,6 @@ struct SLastSyncedVehData
     bool      bDerailed;
     bool      bIsInWater;
 };
-struct SVehicleComponentData
-{
-    SVehicleComponentData()
-    {
-        m_bPositionChanged = false;
-        m_bRotationChanged = false;
-        m_bScaleChanged = false;
-        m_bVisible = true;
-    }
-    SString m_strParentName;
-    CVector m_vecComponentPosition;          // Parent relative
-    CVector m_vecComponentRotation;          // Parent relative radians
-    CVector m_vecComponentScale;             // Parent relative
-    CVector m_vecOriginalComponentPosition;  // Parent relative
-    CVector m_vecOriginalComponentRotation;  // Parent relative radians
-    CVector m_vecOriginalComponentScale;     // Parent relative
-    bool    m_bPositionChanged;
-    bool    m_bRotationChanged;
-    bool    m_bScaleChanged;
-    bool    m_bVisible;
-};
 
 static std::array<std::string, NUM_VEHICLE_TYPES> g_vehicleTypePrefixes;
 
