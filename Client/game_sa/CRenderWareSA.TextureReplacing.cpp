@@ -2173,12 +2173,33 @@ namespace
             {
                 const unsigned short existingTxdId = itExisting->second.usTxdId;
                 auto*                slot = pTxdPoolSA->GetTextureDictonarySlot(existingTxdId);
-                if (slot && slot->rwTexDictonary && slot->usParentIndex == usParentTxdId)
+                if (slot && slot->rwTexDictonary && (slot->usParentIndex == usParentTxdId || slot->usParentIndex == static_cast<unsigned short>(-1)))
                 {
+                    // Complete deferred parent chain when the parent TXD is now loaded
+                    if (slot->usParentIndex == static_cast<unsigned short>(-1) && CTxdStore_GetTxd(usParentTxdId) != nullptr)
+                    {
+                        slot->usParentIndex = usParentTxdId;
+                        CTxdStore_SetupTxdParent(existingTxdId);
+                        ClearPendingIsolatedModel(usModelId);
+                    }
+
                     itExisting->second.bNeedsVehicleFallback = ShouldUseVehicleTxdFallback(usModelId);
                     g_IsolatedModelByTxd[existingTxdId] = usModelId;
+
+                    // Parent chain still incomplete - keep the model on its
+                    // current TXD so it renders with original textures rather
+                    // than white from an empty, unlinked child TXD.
+                    if (slot->usParentIndex == static_cast<unsigned short>(-1))
+                    {
+                        UpdateIsolatedTxdLastUse(usModelId);
+                        if (!g_PendingIsolatedModels.count(usModelId))
+                            AddPendingIsolatedModel(usModelId);
+                        return false;
+                    }
+
                     if (pModelInfo->GetTextureDictionaryID() != existingTxdId)
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
+                    UpdateIsolatedTxdLastUse(usModelId);
                     return true;
                 }
             }
@@ -2539,7 +2560,12 @@ namespace
 
         CTxdStore_AddRef(usParentTxdId);  // Pin parent before SetTextureDictionaryID transfers entity refs
 
-        pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
+        // Only assign the model to the child TXD when the parent chain is
+        // ready. Without a parent chain, texture lookups on the empty child
+        // TXD find nothing and the model renders white for every material
+        // whose texture name is not among the replacement set.
+        if (bParentAvailable)
+            pModelInfo->SetTextureDictionaryID(static_cast<unsigned short>(uiNewTxdId));
 
         g_IsolatedTxdByModel[usModelId] = info;
         g_IsolatedModelByTxd[info.usTxdId] = usModelId;
@@ -2547,8 +2573,8 @@ namespace
         // Pin the child TXD itself so SA's streaming never reaches ref-count 0
         // while MTA still tracks its textures.  Without this, model unloading
         // via CBaseModelInfo::RemoveRef can drop the child TXD ref to 0 and
-        // CStreaming::RemoveModel → CTxdStore::RemoveTxd destroys the RW dict
-        // and its textures before MTA's cleanup can orphan them — causing
+        // CStreaming::RemoveModel -> CTxdStore::RemoveTxd destroys the RW dict
+        // and its textures before MTA's cleanup can orphan them - causing
         // use-after-free / heap corruption.
         CTxdStore_AddRef(uiNewTxdId);
         pTxdPoolSA->ProtectSlotFromStreaming(static_cast<unsigned short>(uiNewTxdId));
@@ -2556,7 +2582,10 @@ namespace
         UpdateIsolatedTxdLastUse(usModelId);
 
         if (!bParentAvailable)
+        {
             AddPendingIsolatedModel(usModelId);
+            return false;
+        }
         return true;
     }
 
