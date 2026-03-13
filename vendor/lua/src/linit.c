@@ -22,10 +22,10 @@ static const luaL_Reg lualibs[] = {
   {LUA_OSLIBNAME, luaopen_os},
   {LUA_STRLIBNAME, luaopen_string},
   {LUA_MATHLIBNAME, luaopen_math},
+  {LUA_VECLIBNAME, luaopen_vec}, /* LUA-VEC */
   {LUA_DBLIBNAME, luaopen_debug},
   {NULL, NULL}
 };
-
 
 LUALIB_API void luaL_openlibs (lua_State *L) {
   const luaL_Reg *lib = lualibs;
@@ -35,4 +35,3 @@ LUALIB_API void luaL_openlibs (lua_State *L) {
     lua_call(L, 1, 0);
   }
 }
-
