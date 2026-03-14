@@ -180,6 +180,7 @@ public:
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
+    CModelInfo*                     GetModelInfo(CBaseModelInfoSAInterface* baseModelInfo);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
     uint32_t GetBaseIDforDFF() override { return 0; }
@@ -299,6 +300,7 @@ public:
     void         ResetAlphaTransparencies();
     void         DisableVSync();
     void         ResetModelTimes();
+    void         ResetModelAnimations() override;
 
     void  OnPedContextChange(CPed* pPedContext);
     CPed* GetPedContext();
