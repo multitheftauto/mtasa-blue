@@ -48,6 +48,7 @@
 #include <stdio.h>
 #include <string>
 #include <string_view>
+#include <TlHelp32.h>
 #include <variant>
 #include <vector>
 #if defined(_MSC_VER)
@@ -3224,20 +3225,57 @@ namespace
             if (elapsed.count() >= static_cast<std::chrono::seconds::rep>(timeoutSecs))
             {
 #ifdef MTA_DEBUG
-                // In debug builds, the stall may just be a breakpoint pause
-                // Generate a dump so the frozen stack is collected, then 
-                // reset the heartbeat and keep monitoring instead of terminating.
-                OutputDebugStringA("WATCHDOG: Freeze detected - generating dump (no termination)\n");
-                
-                AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u, debug build)", 
-                                           static_cast<long long>(elapsed.count()), timeoutSecs));
+                BOOL isDebuggerAttached = FALSE;
+                if (IsDebuggerPresent() != FALSE)
+                    isDebuggerAttached = TRUE;
 
-                TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+                if (isDebuggerAttached == FALSE)
+                    CheckRemoteDebuggerPresent(GetCurrentProcess(), &isDebuggerAttached);
 
-                g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
-                std::this_thread::sleep_for(kCheckInterval);
-                continue;
-#else
+                if (isDebuggerAttached == FALSE)
+                {
+                    // Check if parent process (e.g. VS attached to the launcher) has a debugger
+                    if (HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); hSnapshot != INVALID_HANDLE_VALUE)
+                    {
+                        PROCESSENTRY32 pe32{};
+                        pe32.dwSize = sizeof(pe32);
+                        if (Process32First(hSnapshot, &pe32))
+                        {
+                            const DWORD currentPid = GetCurrentProcessId();
+                            do
+                            {
+                                if (pe32.th32ProcessID == currentPid)
+                                {
+                                    if (HANDLE hParent = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ParentProcessID))
+                                    {
+                                        CheckRemoteDebuggerPresent(hParent, &isDebuggerAttached);
+                                        CloseHandle(hParent);
+                                    }
+                                    break;
+                                }
+                            } while (Process32Next(hSnapshot, &pe32));
+                        }
+                        CloseHandle(hSnapshot);
+                    }
+                }
+
+                if (isDebuggerAttached != FALSE)
+                {
+                    // In debug builds with a debugger attached, the stall may just be a breakpoint pause.
+                    // Generate a dump so the frozen stack is collected, then
+                    // reset the heartbeat and keep monitoring instead of terminating.
+                    OutputDebugStringA("WATCHDOG: Freeze detected - generating dump (no termination)\n");
+
+                    AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u, debugger attached)",
+                                               static_cast<long long>(elapsed.count()), timeoutSecs));
+
+                    TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+
+                    g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
+                    std::this_thread::sleep_for(kCheckInterval);
+                    continue;
+                }
+#endif
                 AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)", static_cast<long long>(elapsed.count()), timeoutSecs));
 
                 const bool triggered = TriggerWatchdogException(targetThread.get(), targetThreadId);
@@ -3248,7 +3286,6 @@ namespace
 
                 // Exit after triggering - crash dump handler will terminate process
                 break;
-#endif
             }
 
             std::this_thread::sleep_for(kCheckInterval);
