@@ -3027,7 +3027,21 @@ namespace
 
     inline WatchdogState g_watchdogState{};
 
-    [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId)
+    static bool TryGenerateWatchdogDump(EXCEPTION_POINTERS* pExPtrs, CExceptionInformation_Impl* pExInfo)
+    {
+        __try
+        {
+            CCrashDumpWriter::DumpCoreLog(pExPtrs, pExInfo);
+            CCrashDumpWriter::DumpMiniDump(pExPtrs, pExInfo);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
+    [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId, bool dumpOnly = false)
     {
         AddReportLog(9300, SString("Watchdog freeze detected after %u seconds (thread %u)", g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed),
                                    targetThreadId));
@@ -3079,6 +3093,7 @@ namespace
         // Now we can safely resume the thread - we have everything we need
         if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
         {
+            OutputDebugStringA("WATCHDOG: Failed to resume thread after stack capture\n");
             AddReportLog(9304, SString("Watchdog failed to resume thread %u after stack capture", targetThreadId));
             // Continue anyway - we still want the crash dump even if resume failed
         }
@@ -3151,6 +3166,25 @@ namespace
             }
         }
 
+        if (dumpOnly)
+        {
+            // Write dump without dialog or termination so the
+            // contributor can continue debugging after a breakpoint pause.
+            auto* pExInfo = new (std::nothrow) CExceptionInformation_Impl;
+            if (pExInfo)
+            {
+                pExInfo->Set(exceptionRecord.ExceptionCode, &exceptionPointers);
+
+                if (!TryGenerateWatchdogDump(&exceptionPointers, pExInfo))
+                {
+                    AddReportLog(9316, "Watchdog: SEH exception caught during dump generation");
+                }
+
+                delete pExInfo;
+            }
+            return true;
+        }
+
         // Trigger the global exception handler
         CCrashDumpWriter::HandleExceptionGlobal(&exceptionPointers);
 
@@ -3190,14 +3224,20 @@ namespace
             if (elapsed.count() >= static_cast<std::chrono::seconds::rep>(timeoutSecs))
             {
 #ifdef MTA_DEBUG
-                if (IsDebuggerPresent() == TRUE)
-                {
-                    g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
-                    std::this_thread::sleep_for(kCheckInterval);
-                    continue;
-                }
-#endif
+                // In debug builds, the stall may just be a breakpoint pause
+                // Generate a dump so the frozen stack is collected, then 
+                // reset the heartbeat and keep monitoring instead of terminating.
+                OutputDebugStringA("WATCHDOG: Freeze detected - generating dump (no termination)\n");
+                
+                AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u, debug build)", 
+                                           static_cast<long long>(elapsed.count()), timeoutSecs));
 
+                TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+
+                g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
+                std::this_thread::sleep_for(kCheckInterval);
+                continue;
+#else
                 AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)", static_cast<long long>(elapsed.count()), timeoutSecs));
 
                 const bool triggered = TriggerWatchdogException(targetThread.get(), targetThreadId);
@@ -3208,6 +3248,7 @@ namespace
 
                 // Exit after triggering - crash dump handler will terminate process
                 break;
+#endif
             }
 
             std::this_thread::sleep_for(kCheckInterval);
