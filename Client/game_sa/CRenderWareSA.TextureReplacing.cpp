@@ -1940,7 +1940,9 @@ namespace
                 bNeedsDestruction = true;
             }
 
-            if (bNeedsDestruction && !bSkipRasterNull)
+            // Only null the raster if this is the final reference. If refs > 1,
+            // a material (like a shared LOD or missed chassis_vlo) is still using this texture.
+            if (bNeedsDestruction && !bSkipRasterNull && pTexture->refs <= 1)
             {
                 if (pTexture->raster)
                     bAnyRasterNulled = true;
@@ -1978,7 +1980,7 @@ namespace
                 bNeedsDestruction = true;
             }
 
-            if (bNeedsDestruction && !bSkipRasterNull)
+            if (bNeedsDestruction && !bSkipRasterNull && pReplaced->refs <= 1)
                 pReplaced->raster = nullptr;
 
             if (bNeedsDestruction && CanDestroyOrphanedTexture(pReplaced))
@@ -2017,7 +2019,7 @@ namespace
         }
     }
 
-    bool ReplaceTextureInAtomicCB(RpAtomic* pAtomic, void* userData)
+    bool __cdecl ReplaceTextureInAtomicCB(RpAtomic* pAtomic, void* userData)
     {
         if (!pAtomic)
             return true;
@@ -2028,6 +2030,58 @@ namespace
 
         ReplaceTextureInGeometry(pAtomic->geometry, *swapMap);
         return true;
+    }
+
+    RwObject* __cdecl ReplaceTextureInFrameObjectCB(RwObject* pObject, void* data)
+    {
+        if (pObject && pObject->type == RP_TYPE_ATOMIC)
+        {
+            RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pObject);
+            // Specifically target detached atomics like chassis_vlo that aren't in the clump list
+            if (pAtomic->clump == nullptr && pAtomic->geometry)
+            {
+                auto* pSwapMap = static_cast<TextureSwapMap*>(data);
+                ReplaceTextureInGeometry(pAtomic->geometry, *pSwapMap);
+            }
+        }
+        return pObject;
+    }
+
+    void ReplaceTextureInFrameHierarchy(RwFrame* pFrame, TextureSwapMap& swapMap, std::vector<RwFrame*>& visitedFrames, int depth = 0)
+    {
+        if (!pFrame)
+            return;
+
+        if (depth > 128)
+        {
+            AddReportLog(9410, SString("ReplaceTextureInFrameHierarchy: depth cap reached (%d)", depth));
+            return;
+        }
+
+        for (RwFrame* pVisited : visitedFrames)
+        {
+            if (pVisited == pFrame)
+                return;
+        }
+        visitedFrames.push_back(pFrame);
+
+        RwFrameForAllObjects(pFrame, reinterpret_cast<void*>(ReplaceTextureInFrameObjectCB), &swapMap);
+
+        if (pFrame->child)
+        {
+            RwFrame* pChild = pFrame->child;
+            int      nChildren = 0;
+            while (pChild)
+            {
+                ReplaceTextureInFrameHierarchy(pChild, swapMap, visitedFrames, depth + 1);
+                pChild = pChild->next;
+                if (++nChildren > 1024)
+                {
+                    AddReportLog(9410, SString("ReplaceTextureInFrameHierarchy: child limit hit at depth %d", depth));
+                    break;
+                }
+            }
+        }
     }
 
     bool ReplaceTextureInModel(CModelInfoSA* pModelInfo, TextureSwapMap& swapMap)
@@ -2056,7 +2110,14 @@ namespace
             {
                 auto* pClump = reinterpret_cast<RpClump*>(pRwObject);
                 if (pClump)
+                {
                     RpClumpForAllAtomics(pClump, ReplaceTextureInAtomicCB, &swapMap);
+                    if (RwFrame* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
+                    {
+                        std::vector<RwFrame*> visitedFrames;
+                        ReplaceTextureInFrameHierarchy(pRootFrame, swapMap, visitedFrames);
+                    }
+                }
                 return true;
             }
 
@@ -2088,7 +2149,14 @@ namespace
 
                 RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
                 if (pClump)
+                {
                     RpClumpForAllAtomics(pClump, ReplaceTextureInAtomicCB, &swapMap);
+                    if (RwFrame* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
+                    {
+                        std::vector<RwFrame*> visitedFrames;
+                        ReplaceTextureInFrameHierarchy(pRootFrame, swapMap, visitedFrames);
+                    }
+                }
                 return true;
             }
 
@@ -2865,6 +2933,61 @@ namespace
     }
 }
 
+namespace
+{
+    RwObject* __cdecl RebindTexturesInFrameObjectCB(RwObject* pObject, void* data)
+    {
+        if (pObject && pObject->type == RP_TYPE_ATOMIC)
+        {
+            RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pObject);
+            // Specifically target detached atomics that aren't in the clump list
+            if (pAtomic->clump == nullptr && pAtomic->geometry)
+            {
+                const auto* pTxdTextureMap = static_cast<const TxdTextureMap*>(data);
+                RebindAtomicMaterialsFromMap(pAtomic, *pTxdTextureMap);
+            }
+        }
+        return pObject;
+    }
+
+    void RebindTexturesInFrameHierarchy(RwFrame* pFrame, const TxdTextureMap& txdTextureMap, std::vector<RwFrame*>& visitedFrames, int depth = 0)
+    {
+        if (!pFrame)
+            return;
+
+        if (depth > 128)
+        {
+            AddReportLog(9410, SString("RebindTexturesInFrameHierarchy: depth cap reached (%d)", depth));
+            return;
+        }
+
+        for (RwFrame* pVisited : visitedFrames)
+        {
+            if (pVisited == pFrame)
+                return;
+        }
+        visitedFrames.push_back(pFrame);
+
+        RwFrameForAllObjects(pFrame, reinterpret_cast<void*>(RebindTexturesInFrameObjectCB), const_cast<void*>(reinterpret_cast<const void*>(&txdTextureMap)));
+
+        if (pFrame->child)
+        {
+            RwFrame* pChild = pFrame->child;
+            int      nChildren = 0;
+            while (pChild)
+            {
+                RebindTexturesInFrameHierarchy(pChild, txdTextureMap, visitedFrames, depth + 1);
+                pChild = pChild->next;
+                if (++nChildren > 1024)
+                {
+                    AddReportLog(9410, SString("RebindTexturesInFrameHierarchy: child limit hit at depth %d", depth));
+                    break;
+                }
+            }
+        }
+    }
+}
+
 // Process deferred parent TXD setup for per-model isolated TXDs
 // Called periodically after streaming updates to finalize parent linkage once the parent TXD is loaded
 void CRenderWareSA::ProcessPendingIsolatedModels()
@@ -3055,10 +3178,16 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
                             case eModelInfoType::VEHICLE:
                             case eModelInfoType::CLUMP:
                             {
+                                RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
                                 std::vector<RpAtomic*> atomicList;
-                                CRenderWareSA::GetClumpAtomicList(reinterpret_cast<RpClump*>(pRwObject), atomicList);
+                                CRenderWareSA::GetClumpAtomicList(pClump, atomicList);
                                 for (RpAtomic* pAtomic : atomicList)
                                     RebindAtomicMaterialsFromMap(pAtomic, txdTextureMap);
+                                if (RwFrame* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
+                                {
+                                    std::vector<RwFrame*> visitedFrames;
+                                    RebindTexturesInFrameHierarchy(pRootFrame, txdTextureMap, visitedFrames);
+                                }
                                 break;
                             }
                             case eModelInfoType::ATOMIC:
@@ -3232,10 +3361,16 @@ void CRenderWareSA::ProcessPendingIsolatedModels()
                     case eModelInfoType::VEHICLE:
                     case eModelInfoType::CLUMP:
                     {
+                        RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
                         std::vector<RpAtomic*> atomicList;
-                        CRenderWareSA::GetClumpAtomicList(reinterpret_cast<RpClump*>(pRwObject), atomicList);
+                        CRenderWareSA::GetClumpAtomicList(pClump, atomicList);
                         for (RpAtomic* pAtomic : atomicList)
                             RebindAtomicMaterialsFromMap(pAtomic, txdTextureMap);
+                        if (RwFrame* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
+                        {
+                            std::vector<RwFrame*> visitedFrames;
+                            RebindTexturesInFrameHierarchy(pRootFrame, txdTextureMap, visitedFrames);
+                        }
                         break;
                     }
                     case eModelInfoType::ATOMIC:
