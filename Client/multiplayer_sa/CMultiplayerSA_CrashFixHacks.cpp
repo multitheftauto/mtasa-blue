@@ -18,6 +18,7 @@
 #include "../game_sa/CFxSystemBPSA.h"
 #include "../game_sa/CFxSystemSA.h"
 #include "../game_sa/CColModelSA.h"
+#include "../game_sa/CTxdPoolSA.h"
 
 extern CCoreInterface* g_pCore;
 
@@ -1285,6 +1286,64 @@ static void _declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 static constexpr std::size_t TextureNameSize = 32;
 static constexpr char        RemapPrefix[] = "remap";
 
+typedef RwTexDictionary*(__cdecl* CTxdStore_GetTxd_t)(unsigned int id);
+typedef int(__cdecl* CTxdStore_GetParentTxdSlot_t)(int index);
+
+// Cached dict-to-slot mapping to avoid repeated pool scans
+static RwTexDictionary* s_cachedTxdPtr = nullptr;
+static int              s_cachedSlotIndex = -1;
+
+// Reads the runtime TXD pool size from SA's pool struct at 0xC8800C.
+// Returns 0 if the pool hasn't been created yet.
+static int GetRuntimeTxdPoolSize() noexcept
+{
+    auto* pPool = *reinterpret_cast<CPoolSAInterface<CTextureDictonarySAInterface>**>(0xC8800C);
+    if (!pPool)
+        return 0;
+    return pPool->m_nSize;
+}
+
+// Finds the pool slot index for a given RwTexDictionary pointer by scanning
+// non-empty slots within the pool bounds. Uses a one-entry cache to skip
+// the scan when the same dictionary is looked up again.
+static int FindTxdSlotForDict(RwTexDictionary* pDict) noexcept
+{
+    if (!pDict)
+        return -1;
+
+    // Check cached result first
+    if (s_cachedTxdPtr == pDict && s_cachedSlotIndex >= 0)
+    {
+        // Check the slot still holds this dictionary
+        auto* pPool = *reinterpret_cast<CPoolSAInterface<CTextureDictonarySAInterface>**>(0xC8800C);
+        if (pPool && pPool->m_byteMap && pPool->m_pObjects && s_cachedSlotIndex < pPool->m_nSize &&
+            !pPool->m_byteMap[s_cachedSlotIndex].bEmpty && pPool->m_pObjects[s_cachedSlotIndex].rwTexDictonary == pDict)
+        {
+            return s_cachedSlotIndex;
+        }
+        s_cachedTxdPtr = nullptr;
+        s_cachedSlotIndex = -1;
+    }
+
+    auto* pPool = *reinterpret_cast<CPoolSAInterface<CTextureDictonarySAInterface>**>(0xC8800C);
+    if (!pPool || pPool->m_nSize <= 0 || !pPool->m_byteMap || !pPool->m_pObjects)
+        return -1;
+
+    const int scanLimit = (pPool->m_nSize < CTxdPoolSA::TXD_POOL_MAX_CAPACITY) ? pPool->m_nSize : CTxdPoolSA::TXD_POOL_MAX_CAPACITY;
+    for (int i = 0; i < scanLimit; ++i)
+    {
+        if (pPool->m_byteMap[i].bEmpty)
+            continue;
+        if (pPool->m_pObjects[i].rwTexDictonary == pDict)
+        {
+            s_cachedTxdPtr = pDict;
+            s_cachedSlotIndex = i;
+            return i;
+        }
+    }
+    return -1;
+}
+
 static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
 {
     if (name == nullptr)
@@ -1293,6 +1352,8 @@ static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
     const auto RwTexDictionaryFindNamedTexture =
         reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(reinterpret_cast<void*>(TrampolineRwTexDictionaryFindNamedTexture));
     const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
+    const auto CTxdStore_GetTxd = reinterpret_cast<CTxdStore_GetTxd_t>(0x00408340);
+    const auto CTxdStore_GetParentTxdSlot = reinterpret_cast<CTxdStore_GetParentTxdSlot_t>(0x00408370);
 
     RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
     if (vehicleTxd != nullptr)
@@ -1308,29 +1369,72 @@ static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
     if (currentTxd == nullptr)
         return nullptr;
 
-    RwTexture* tex = RwTexDictionaryFindNamedTexture(currentTxd, name);
+    RwTexture* tex = nullptr;
+    const bool bIsRemap = (std::strncmp(name, RemapPrefix, sizeof(RemapPrefix) - 1) == 0);
 
-    if (std::strncmp(name, RemapPrefix, sizeof(RemapPrefix) - 1) == 0)
+    constexpr int kMaxDepth = 32;
+    int           depth = 0;
+    int           slotIndex = -1;
+    bool          slotLookedUp = false;
+
+    char remapName[TextureNameSize];
+    if (bIsRemap)
     {
-        if (tex == nullptr)
+        const std::size_t nameLen = strnlen(name, TextureNameSize);
+        if (nameLen >= TextureNameSize)
         {
-            const std::size_t nameLen = strnlen(name, TextureNameSize);
-            if (nameLen >= TextureNameSize)
-            {
-                OnCrashAverted(39);
-                return nullptr;
-            }
-            char tmp[TextureNameSize];
-            std::memcpy(tmp, name, nameLen + 1);
-            tmp[0] = '#';
-            return RwTexDictionaryFindNamedTexture(currentTxd, tmp);
+            OnCrashAverted(39);
+            return nullptr;
         }
-        else
+        std::memcpy(remapName, name, nameLen + 1);
+        remapName[0] = '#';
+    }
+
+    RwTexDictionary* txd = currentTxd;
+    while (txd != nullptr && depth < kMaxDepth)
+    {
+        tex = RwTexDictionaryFindNamedTexture(txd, name);
+        if (tex != nullptr)
+            break;
+
+        if (bIsRemap)
         {
-            if (IsWritablePtr(tex, sizeof(RwTexture)))
-            {
-                tex->name[0] = '#';
-            }
+            tex = RwTexDictionaryFindNamedTexture(txd, remapName);
+            if (tex != nullptr)
+                break;
+        }
+
+        if (!slotLookedUp)
+        {
+            slotLookedUp = true;
+            slotIndex = FindTxdSlotForDict(currentTxd);
+        }
+
+        if (slotIndex < 0)
+            break;
+
+        int parentSlot = CTxdStore_GetParentTxdSlot(slotIndex);
+        if (parentSlot < 0 || parentSlot == slotIndex)
+            break;
+
+        // Check parentSlot is within pool bounds
+        const int poolSize = GetRuntimeTxdPoolSize();
+        if (parentSlot >= poolSize)
+            break;
+
+        slotIndex = parentSlot;
+        txd = CTxdStore_GetTxd(static_cast<unsigned int>(parentSlot));
+        ++depth;
+    }
+
+    if (depth >= kMaxDepth)
+        AddReportLog(8540, SString("FindTextureCB: parent chain depth cap reached for '%s'", name));
+
+    if (tex != nullptr && bIsRemap)
+    {
+        if (IsWritablePtr(tex, sizeof(RwTexture)))
+        {
+            tex->name[0] = '#';
         }
     }
 
