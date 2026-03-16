@@ -46,11 +46,16 @@ bool CClientModel::Allocate(ushort usParentID)
     switch (m_eModelType)
     {
         case eClientModelType::PED:
-            pModelInfo->MakePedModel("PSYCHO");
+        {
             // Parent ID 0 (CJ) bypasses TXD isolation in downstream logic
-            pModelInfo->SetParentID(usParentID ? usParentID : 7);
-            allocated = true;
+            const unsigned short usEffectiveParent = usParentID ? usParentID : 7;
+            if (CClientPlayerManager::IsValidModel(usEffectiveParent))
+            {
+                pModelInfo->MakePedModel(usEffectiveParent);
+                allocated = true;
+            }
             break;
+        }
         case eClientModelType::OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
