@@ -360,11 +360,24 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
 }
 
 //
+// Set the MTASA base dir manually
+//
+static SString strInstallRootOverride;
+
+void SharedUtil::SetMTASABaseDirOverride(const SString& strPath)
+{
+    strInstallRootOverride = strPath;
+}
+
+//
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
 //
 SString SharedUtil::GetMTASABaseDir()
 {
+    if (!strInstallRootOverride.empty())
+        return strInstallRootOverride;
+
     static SString strInstallRoot;
     if (strInstallRoot.empty())
     {
