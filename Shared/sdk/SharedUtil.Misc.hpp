@@ -384,7 +384,15 @@ SString SharedUtil::GetMTASABaseDir()
         if (IsGTAProcess())
         {
             // Try to get base dir from parent process
-            strInstallRoot = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
+            SString strParentDir = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
+            if (FileExists(PathJoin(strParentDir, "mta", "core.dll")) || FileExists(PathJoin(strParentDir, "MTA", "core.dll")))
+            {
+                strInstallRoot = strParentDir;
+            }
+        }
+        if (strInstallRoot.empty())
+        {
+            strInstallRoot = GetMTAProcessBaseDir();
         }
         if (strInstallRoot.empty())
         {
@@ -414,8 +422,34 @@ SString SharedUtil::CalcMTASAPath(const SString& strPath)
 //
 bool SharedUtil::IsGTAProcess()
 {
+    static int iResult = -1;
+    if (iResult != -1)
+        return iResult != 0;
+
     SString strLaunchPathFilename = GetLaunchPathFilename();
-    return strLaunchPathFilename.EndsWithI("gta_sa.exe");
+    SString strExecutable = ExtractFilename(strLaunchPathFilename);
+
+    if (strExecutable.EndsWithI("gta_sa.exe"))
+    {
+        iResult = 1;
+        return true;
+    }
+
+    if (strExecutable.EndsWithI("Multi Theft Auto.exe"))
+    {
+        iResult = 0;
+        return false;
+    }
+
+    SString strBaseDir = ExtractPath(strLaunchPathFilename);
+    if (FileExists(PathJoin(strBaseDir, "models", "gta3.img")) || FileExists(PathJoin(strBaseDir, "data", "gta3.dat")))
+    {
+        iResult = 1;
+        return true;
+    }
+
+    iResult = 0;
+    return false;
 }
 
 bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
