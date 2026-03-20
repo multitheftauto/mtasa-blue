@@ -17,6 +17,11 @@
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
 
+typedef RwRaster*(__cdecl* RwRasterUnlock_t)(RwRaster* raster);
+typedef RwRaster*(__cdecl* RwRasterLock_t)(RwRaster* raster, unsigned char level, int lockmode);
+extern RwRasterUnlock_t RwRasterUnlock;
+extern RwRasterLock_t   RwRasterLock;
+
 class CEventDamageSAInterface;
 
 extern CCoreInterface* g_pCore;
@@ -38,6 +43,8 @@ extern CGame* pGameInterface;
 #define HOOKPOS_CRunningScript_Process                   0x469F00
 #define HOOKPOS_CExplosion_AddExplosion                  0x736A50
 #define HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic 0x6FF35B
+#define HOOKPOS_CEntity__CreateEffects_RoadsignAtomic    0x53388C
+#define HOOKPOS_RoadsignGenerateTextRaster               0x6FEB70
 #define HOOKPOS_Trailer_BreakTowLink                     0x6E0027
 #define HOOKPOS_CRadar__DrawRadarGangOverlay             0x586650
 #define HOOKPOS_CTaskComplexJump__CreateSubTask          0x67DABE
@@ -54,6 +61,9 @@ extern CGame* pGameInterface;
 #define FUNC_CAudioEngine__DisplayRadioStationName 0x507030
 #define FUNC_CHud_Draw                             0x58FAE0
 #define FUNC_CPlayerInfoBase                       0xB7CD98
+#define FUNC_RoadsignGetLineAndRow                 0x6FE260
+
+#define VAR_RoadsignRasterLockedData 0xC3EF88
 
 #define ADDR_CursorHiding 0x7481CD
 #define ADDR_GotFocus     0x748054
@@ -61,8 +71,10 @@ extern CGame* pGameInterface;
 #define HOOKPOS_FxManager_CreateFxSystem  0x4A9BE0
 #define HOOKPOS_FxManager_DestroyFxSystem 0x4A9810
 
-DWORD RETURN_FxManager_CreateFxSystem = 0x4A9BE8;
-DWORD RETURN_FxManager_DestroyFxSystem = 0x4A9817;
+DWORD                           RETURN_FxManager_CreateFxSystem = 0x4A9BE8;
+DWORD                           RETURN_FxManager_DestroyFxSystem = 0x4A9817;
+static constexpr std::uintptr_t RETURN_CEntity__CreateEffects_RoadsignAtomic = 0x533891;
+static constexpr std::uintptr_t RETURN_CEntity__CreateEffects_RoadsignSkip = 0x5337E7;
 
 #define HOOKPOS_CCam_ProcessFixed                           0x51D470
 #define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon 0x6859a0
@@ -433,6 +445,8 @@ void HOOK_CHud_Draw_Caller();
 void HOOK_CRunningScript_Process();
 void HOOK_CExplosion_AddExplosion();
 void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
+void HOOK_CEntity__CreateEffects_RoadsignAtomic();
+void HOOK_RoadsignGenerateTextRaster();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
 void HOOK_CTaskComplexJump__CreateSubTask();
@@ -644,6 +658,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
     HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
     HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
+    HookInstall(HOOKPOS_CEntity__CreateEffects_RoadsignAtomic, (DWORD)HOOK_CEntity__CreateEffects_RoadsignAtomic, 5);
+    HookInstall(HOOKPOS_RoadsignGenerateTextRaster, (DWORD)HOOK_RoadsignGenerateTextRaster, 5);
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
     HookInstall(HOOKPOS_CTaskComplexJump__CreateSubTask, (DWORD)HOOK_CTaskComplexJump__CreateSubTask, 6);
@@ -3076,6 +3092,128 @@ void _declspec(naked) HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic()
 no_render:
         mov     edx, 0x6FF40B
         jmp     edx
+    }
+    // clang-format on
+}
+
+// Mirror the existing roadsign render guard in the create path.
+// CreateEffects stores the loop index and model info on the stack, so restore them
+// before continuing with the switch loop when roadsign atomic creation fails.
+void _declspec(naked) HOOK_CEntity__CreateEffects_RoadsignAtomic()
+{
+    // clang-format off
+    __asm
+    {
+        mov     ebx, eax
+        test    ebx, ebx
+        jz      no_atomic
+
+        mov     edi, [ebx+4]
+        mov     edx, RETURN_CEntity__CreateEffects_RoadsignAtomic
+        jmp     edx
+
+    no_atomic:
+        mov     dword ptr [esi+2Ch], 0
+        mov     edi, [esp+40h]
+        mov     ebx, [esp+44h]
+        add     esp, 24h
+        mov     edx, RETURN_CEntity__CreateEffects_RoadsignSkip
+        jmp     edx
+    }
+    // clang-format on
+}
+
+static void CallRoadsignGetLineAndRow(char cLetter, int* pCol, int* pRow) noexcept
+{
+    // SA passes the character in AL for this helper.
+    __asm
+        {
+        mov     al, cLetter
+        push    pRow
+        push    pCol
+        mov     edx, FUNC_RoadsignGetLineAndRow
+        call    edx
+        add     esp, 8
+        }
+}
+
+[[nodiscard]] static bool RoadsignGenerateTextRaster_Fixed(const char* szRoadName, int iNumLetters, RwRaster* pCharsetRaster, RwRaster* pSignRaster) noexcept
+{
+    constexpr int SIGN_CHAR_WIDTH = 8;
+    constexpr int SIGN_CHAR_HEIGHT = 16;
+    constexpr int SIGN_PIXEL_BYTES = 4;
+    constexpr int CHARSET_COLS_PER_ROW = 64;
+    constexpr int LOCKMODE_WRITE_NOFETCH = 5;
+
+    struct SRoadsignRasterView
+    {
+        void*         pParent;
+        std::uint8_t* pPixels;
+        std::uint8_t* pPalette;
+        int           iWidth;
+        int           iHeight;
+        int           iDepth;
+        int           iStride;
+    };
+
+    auto* pSignLock = reinterpret_cast<std::uint8_t*>(RwRasterLock(pSignRaster, 0, LOCKMODE_WRITE_NOFETCH));
+    if (!pSignLock)
+        return false;
+
+    bool bSuccess = false;
+    do
+    {
+        auto*& pCharsetLockRef = *reinterpret_cast<std::uint8_t**>(VAR_RoadsignRasterLockedData);
+        if (!pCharsetLockRef)
+            pCharsetLockRef = reinterpret_cast<std::uint8_t*>(RwRasterLock(pCharsetRaster, 0, RASTER_LOCK_READ));
+
+        auto* pCharsetLock = pCharsetLockRef;
+        if (!pCharsetLock)
+            break;
+
+        const int iCharsetStride = reinterpret_cast<const SRoadsignRasterView*>(pCharsetRaster)->iStride;
+        if (!iCharsetStride)
+            break;
+
+        const int iSignStride = reinterpret_cast<const SRoadsignRasterView*>(pSignRaster)->iStride;
+        if (!iSignStride)
+            break;
+
+        for (int iLetter = 0; iLetter < iNumLetters; ++iLetter)
+        {
+            int iCol = 1;
+            int iRow = 1;
+            CallRoadsignGetLineAndRow(szRoadName[iLetter], &iCol, &iRow);
+
+            auto* pCharsetPixels = pCharsetLock + SIGN_CHAR_WIDTH * SIGN_PIXEL_BYTES * (iCol + iRow * CHARSET_COLS_PER_ROW);
+            auto* pSignPixels = pSignLock + iLetter * SIGN_CHAR_WIDTH * SIGN_PIXEL_BYTES;
+
+            for (int iRasterRow = 0; iRasterRow < SIGN_CHAR_HEIGHT; ++iRasterRow)
+            {
+                std::memcpy(pSignPixels, pCharsetPixels, SIGN_CHAR_WIDTH * SIGN_PIXEL_BYTES);
+                pCharsetPixels += iCharsetStride;
+                pSignPixels += iSignStride;
+            }
+        }
+
+        bSuccess = true;
+    } while (false);
+
+    RwRasterUnlock(pSignRaster);
+    return bSuccess;
+}
+
+static bool __cdecl HOOK_RoadsignGenerateTextRaster_Impl(char* szRoadName, int iNumLetters, RwRaster* pCharsetRaster, int, RwRaster* pSignRaster) noexcept
+{
+    return RoadsignGenerateTextRaster_Fixed(szRoadName, iNumLetters, pCharsetRaster, pSignRaster);
+}
+
+void _declspec(naked) HOOK_RoadsignGenerateTextRaster()
+{
+    // clang-format off
+    __asm
+    {
+        jmp HOOK_RoadsignGenerateTextRaster_Impl
     }
     // clang-format on
 }
