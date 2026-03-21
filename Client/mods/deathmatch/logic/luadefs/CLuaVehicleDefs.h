@@ -43,6 +43,7 @@ public:
     LUA_DECLARE(GetVehicleUpgradeSlotName);
     LUA_DECLARE(GetVehicleCompatibleUpgrades);
     LUA_DECLARE(GetVehicleWheelStates);
+    static std::variant<unsigned char, bool> GetVehicleWheelState(CClientVehicle* vehicle, std::uint8_t wheelIndex);
     LUA_DECLARE(IsVehicleWheelCollided);
     LUA_DECLARE(GetVehicleDoorState);
     LUA_DECLARE(GetVehicleLightState);
