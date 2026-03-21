@@ -143,6 +143,11 @@ namespace SharedUtil
     SString GetParentProcessPathFilename(int pid);
 
     //
+    // Set the MTASA base dir manually
+    //
+    void SetMTASABaseDirOverride(const SString& strPath);
+
+    //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
     //
