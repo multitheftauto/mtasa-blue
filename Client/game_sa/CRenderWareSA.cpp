@@ -387,9 +387,6 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         std::memcpy(&chunkType, headerData.data(), sizeof(chunkType));
         std::memcpy(&chunkSize, headerData.data() + 4, sizeof(chunkSize));
 
-        if (chunkType != RW_CHUNK_TYPE_DFF)
-            return nullptr;
-
         if (chunkSize > MAX_SANE_CHUNK_SIZE)
             return nullptr;
 
@@ -404,9 +401,6 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 
         std::memcpy(&chunkType, buffer.data(), sizeof(chunkType));
         std::memcpy(&chunkSize, buffer.data() + 4, sizeof(chunkSize));
-
-        if (chunkType != RW_CHUNK_TYPE_DFF)
-            return nullptr;
 
         if (chunkSize > MAX_SANE_CHUNK_SIZE)
             return nullptr;
