@@ -108,6 +108,7 @@ typedef RpHAnimHierarchy*(__cdecl* GetAnimHierarchyFromSkinClump_t)(RpClump*);
 typedef int(__cdecl* RpHAnimIDGetIndex_t)(RpHAnimHierarchy*, int);
 typedef RwMatrix*(__cdecl* RpHAnimHierarchyGetMatrixArray_t)(RpHAnimHierarchy*);
 typedef RtQuat*(__cdecl* RtQuatRotate_t)(RtQuat* quat, const RwV3d* axis, float angle, RwOpCombineType combineOp);
+using RwFrameForAllChildren_t = RwFrame*(__cdecl*)(RwFrame * frame, void* callback, void* data);
 
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
@@ -200,6 +201,7 @@ RWFUNC(GetAnimHierarchyFromSkinClump_t GetAnimHierarchyFromSkinClump, (GetAnimHi
 RWFUNC(RpHAnimIDGetIndex_t RpHAnimIDGetIndex, (RpHAnimIDGetIndex_t)0xDEAD)
 RWFUNC(RpHAnimHierarchyGetMatrixArray_t RpHAnimHierarchyGetMatrixArray, (RpHAnimHierarchyGetMatrixArray_t)0xDEAD)
 RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
+RWFUNC(RwFrameForAllChildren_t RwFrameForAllChildren, (RwFrameForAllChildren_t)0xDEAD)
 
 /*****************************************************************************/
 /** GTA function definitions and mappings                                   **/
