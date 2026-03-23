@@ -37,6 +37,42 @@ extern float      fLocalPlayerGravity;
 extern PreContextSwitchHandler*  m_pPreContextSwitchHandler;
 extern PostContextSwitchHandler* m_pPostContextSwitchHandler;
 
+#define NUM_FirstStreamEngineSlot            7
+#define NUM_LastStreamEngineSlot             16
+#define NUM_LocalVehicleAudioContext         0x0
+#define NUM_RemoteVehicleAudioContext        0x1
+#define VAR_VehicleAudioContext              0x50230C
+
+namespace
+{
+    bool HasValidVehicleAudioContext(const CAEVehicleAudioEntitySAInterface* pAudioInterface) noexcept
+    {
+        if (!pAudioInterface)
+            return false;
+
+        if (pAudioInterface->m_wEngineBankSlotId >= NUM_FirstStreamEngineSlot && pAudioInterface->m_wEngineBankSlotId <= NUM_LastStreamEngineSlot)
+            return true;
+
+        return pAudioInterface->m_wEngineAccelerateSoundBankId >= 0 || pAudioInterface->m_wEngineDecelerateSoundBankId >= 0;
+    }
+
+    void SetVehicleAudioContext(CVehicleSA* pVehicleSA, BYTE ucContext)
+    {
+        if (ucContext == NUM_LocalVehicleAudioContext && pVehicleSA)
+        {
+            auto* pVehicleAudioEntity = pVehicleSA->GetVehicleAudioEntity();
+            auto* pAudioInterface = pVehicleAudioEntity ? pVehicleAudioEntity->GetInterface() : nullptr;
+            if (!HasValidVehicleAudioContext(pAudioInterface))
+                return;
+        }
+
+        if (*reinterpret_cast<BYTE*>(VAR_VehicleAudioContext) == ucContext)
+            return;
+
+        MemPutFast<BYTE>(VAR_VehicleAudioContext, ucContext);
+    }
+}
+
 VOID InitKeysyncHooks()
 {
     // OutputDebugString("InitKeysyncHooks");
@@ -148,7 +184,7 @@ void         PostContextSwitch()
 
         // Prevent the game making remote players vehicle's audio behave like locals (and deleting
         // radio etc when they are removed) - issue #95
-        MemPutFast<BYTE>(0x50230C, 0x1);
+        SetVehicleAudioContext(nullptr, NUM_RemoteVehicleAudioContext);
 
         bRadioHackInstalled = FALSE;
     }
@@ -442,7 +478,7 @@ void SwitchContext(CVehicle* pVehicle)
         {
             // Prevent the game making remote players vehicle's audio behave like locals (and deleting
             // radio etc when they are removed) - issue #95
-            MemPutFast<BYTE>(0x50230C, 0x0);
+            SetVehicleAudioContext(pVehicleSA, NUM_LocalVehicleAudioContext);
 
             // For tanks, to prevent our mouse movement affecting remote tanks
             // 006AEA25   0F85 60010000    JNZ gta_sa.006AEB8B

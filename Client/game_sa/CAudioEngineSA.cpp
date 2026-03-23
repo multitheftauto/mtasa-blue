@@ -11,12 +11,37 @@
 
 #include "StdInc.h"
 #include "CAESoundManagerSA.h"
+#include "CAEAudioHardwareSA.h"
 #include "CAudioEngineSA.h"
 #include "CGameSA.h"
 #include "CPhysicalSA.h"
 #include "CSettingsSA.h"
 
 extern CGameSA* pGame;
+
+#define NUM_MaxWorldSoundIndex                399
+#define NUM_FallbackWorldSoundBankSlotCount   (BANKSLOT_44 + 1)
+#define NUM_AudioHardwareBankLoaderOffset     0xD98
+#define NUM_BankLoaderSlotCountOffset         0x0C
+
+namespace
+{
+    bool IsValidWorldSoundBankSlot(unsigned short usBankSlot) noexcept
+    {
+        auto* pAudioHardware = reinterpret_cast<const BYTE*>(CLASS_CAEAudioHardware);
+        auto* pBankLoader = *reinterpret_cast<void* const*>(pAudioHardware + NUM_AudioHardwareBankLoaderOffset);
+        if (!pBankLoader)
+            return usBankSlot < NUM_FallbackWorldSoundBankSlotCount;
+
+        const auto usBankSlotCount = *reinterpret_cast<const unsigned short*>(reinterpret_cast<const BYTE*>(pBankLoader) + NUM_BankLoaderSlotCountOffset);
+        return usBankSlot < usBankSlotCount;
+    }
+
+    bool IsValidWorldSoundRequest(const CAESound* pAESound) noexcept
+    {
+        return pAESound && pAESound->usIndex <= NUM_MaxWorldSoundIndex && IsValidWorldSoundBankSlot(pAESound->usGroup);
+    }
+}
 
 #define HOOKPOS_CAEAmbienceTrackManager_CheckForPause 0x4D6E21
 DWORD RETURN_CAEAmbienceTrackManager_CheckForPause = 0x4D6E27;
@@ -518,6 +543,9 @@ void CAudioEngineSA::SetWorldSoundHandler(WorldSoundHandler* pHandler)
 
 bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
 {
+    if (!IsValidWorldSoundRequest(pAESound))
+        return false;
+
     if (!IsWorldSoundEnabled(pAESound->usGroup, pAESound->usIndex))
         return false;
 
@@ -545,6 +573,9 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
 // Return false to skip sound
 __declspec(noinline) bool _cdecl On_CAESoundManager_RequestNewSound(CAESound* pAESound)
 {
+    if (!IsValidWorldSoundRequest(pAESound) || !g_pAudioSA)
+        return false;
+
     return g_pAudioSA->OnWorldSound(pAESound);
 }
 

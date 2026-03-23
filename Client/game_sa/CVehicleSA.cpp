@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <core/CCoreInterface.h>
+#include <game/CAESoundManager.h>
 #include <multiplayer/CMultiplayer.h>
 #include "CAutomobileSA.h"
 #include "CBikeSA.h"
@@ -151,8 +152,29 @@ static void _declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
     // clang-format on
 }
 
+#define NUM_FirstStreamEngineSlot            7
+#define NUM_LastStreamEngineSlot             16
+#define NUM_AllSoundIndices                  0xFFFFFFFF
+#define NUM_ResidentEngineSlot               40
+#define NUM_LocalVehicleAudioContext         0x0
+#define VAR_VehicleAudioContext              0x50230C
+
 namespace
 {
+    void CancelVehicleAudioSlots(CAEVehicleAudioEntitySAInterface* pAudioInterface)
+    {
+        auto* pSoundManager = pGame ? pGame->GetAESoundManager() : nullptr;
+        if (!pAudioInterface || !pSoundManager)
+            return;
+
+        if (pAudioInterface->m_wEngineBankSlotId >= NUM_FirstStreamEngineSlot && pAudioInterface->m_wEngineBankSlotId <= NUM_LastStreamEngineSlot)
+            pSoundManager->CancelSoundsInBankSlot(pAudioInterface->m_wEngineBankSlotId, NUM_AllSoundIndices);
+
+        if (pAudioInterface->m_bPlayerDriver || pAudioInterface->m_bPlayerPassenger ||
+            *reinterpret_cast<const BYTE*>(VAR_VehicleAudioContext) == NUM_LocalVehicleAudioContext)
+            pSoundManager->CancelSoundsInBankSlot(NUM_ResidentEngineSlot, NUM_AllSoundIndices);
+    }
+
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
     {
         CVehicleSA* pVehicleSA = (CVehicleSA*)data;
@@ -2536,13 +2558,20 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
 
 void CVehicleSA::ReinitAudio()
 {
-    auto* audioInterface = m_pVehicleAudioEntity->GetInterface();
+    if (!m_pVehicleAudioEntity)
+        return;
 
-    audioInterface->TerminateAudio();
-    audioInterface->InitAudio(GetVehicleInterface());
+    auto* pAudioInterface = m_pVehicleAudioEntity->GetInterface();
+    if (!pAudioInterface)
+        return;
+
+    CancelVehicleAudioSlots(pAudioInterface);
+
+    pAudioInterface->TerminateAudio();
+    pAudioInterface->InitAudio(GetVehicleInterface());
 
     CPed* pLocalPlayer = pGame->GetPedContext();
 
     if (IsPassenger(pLocalPlayer) || GetDriver() == pLocalPlayer)
-        audioInterface->SoundJoin();
+        pAudioInterface->SoundJoin();
 }

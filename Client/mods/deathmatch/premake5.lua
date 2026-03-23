@@ -32,6 +32,7 @@ project "Client Deathmatch"
 			".",
 			"./logic",
 			"../../sdk/",
+			"../../",
 			"../../../vendor/pthreads/include",
 			"../../../vendor/bochs",
 			"../../../vendor/bass",
