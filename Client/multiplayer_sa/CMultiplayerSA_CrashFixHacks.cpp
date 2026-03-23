@@ -1253,6 +1253,98 @@ bail:
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::GetSoundBuffer
+//
+// Reject impossible sound-count, sound-id, or bank-id metadata
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc45  0x4E02E8
+#define HOOKSIZE_CrashFix_Misc45 5
+DWORD                 RETURN_CrashFix_Misc45 = 0x4E02ED;
+DWORD                 RETURN_CrashFix_Misc45B = 0x4E036C;
+void _declspec(naked) HOOK_CrashFix_Misc45()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Reject impossible sound-count metadata
+        cmp     dx, 0FFFFh
+        je      check_bank
+        test    dx, dx
+        jle     bail45
+        cmp     dx, 190h
+        jg      bail45
+
+check_bank:
+        // Reject values that would later index outside the 400-entry sound header table
+        cmp     di, 190h
+        jae     bail45
+
+        // Reject slot metadata whose bank id points outside the lookup table
+        mov     ax, [ebx+esi+10h]
+        cmp     ax, word ptr [ecx+0Eh]
+        jae     bail45
+
+        // Execute replaced code
+        cmp     di, 190h
+        jmp     RETURN_CrashFix_Misc45
+
+bail45:
+        push    45
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc45B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::GetSoundBuffer
+//
+// Computed sound size or offset exceeds the slot buffer capacity,
+// caused by stale or inconsistent slot metadata after a slot reload
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc44  0x4E0347
+#define HOOKSIZE_CrashFix_Misc44 7
+DWORD                 RETURN_CrashFix_Misc44 = 0x4E034E;
+void _declspec(naked) HOOK_CrashFix_Misc44()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // At this point size was written to *a4.
+        // ecx = this, ebx = m_pBankSlotsInfos, esi = bankSlotInfoId * 4820,
+        // edi = bankSlotInfoId * 4820 + 12 * soundId
+
+        // Read the computed size
+        mov     edx, [esp+1Ch]
+        mov     eax, [edx]
+
+        // Verify sound_offset + size fits within the slot buffer
+        add     eax, [edi+ebx+14h]
+        jc      bail44
+        cmp     eax, [ebx+esi+4]
+        ja      bail44
+
+        // Execute replaced code
+        mov     edx, [ecx]
+        mov     ax, [edi+edx+1Ch]
+        jmp     RETURN_CrashFix_Misc44
+
+bail44:
+        push    44
+        call    CrashAverted
+        pop     edi
+        pop     esi
+        pop     ebp
+        xor     eax, eax
+        pop     ebx
+        retn    10h
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CAnimBlendAssociation::SetFinishCallback
 //
 // "this" is invalid
@@ -3376,6 +3468,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc28);
     EZHookInstall(CrashFix_Misc29);
     EZHookInstall(CrashFix_Misc43);
+    EZHookInstall(CrashFix_Misc45);
+    EZHookInstall(CrashFix_Misc44);
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
     EZHookInstall(CrashFix_Misc33);
