@@ -21,11 +21,31 @@
 #include <game/CStreaming.h>
 #include <game/CVehicleAudioSettingsManager.h>
 #include <enums/VehicleType.h>
+#include <game_sa/CVehicleSA.h>
+#include <game_sa/CVehicleAudioSettingsEntrySA.h>
 
 using std::list;
 
 extern CClientGame*            g_pClientGame;
 std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
+
+namespace
+{
+    bool HasPendingAudioSettingsChange(CVehicle* pVehicle, const CVehicleAudioSettingsEntry& settings)
+    {
+        auto* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
+        if (!pVehicleSA)
+            return true;
+
+        auto* pVehicleAudioEntity = pVehicleSA->GetVehicleAudioEntity();
+        auto* pAudioInterface = pVehicleAudioEntity ? pVehicleAudioEntity->GetInterface() : nullptr;
+        if (!pAudioInterface)
+            return true;
+
+        const auto& desiredSettings = static_cast<const CVehicleAudioSettingsEntrySA&>(settings).GetInterface();
+        return std::memcmp(&pAudioInterface->m_nSettings, &desiredSettings, sizeof(desiredSettings)) != 0;
+    }
+}
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
 #pragma warning(disable : 4311)
@@ -5201,7 +5221,11 @@ void CClientVehicle::ApplyAudioSettings()
     if (!m_pVehicle)
         return;
 
-    g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(&GetAudioSettings());
+    const auto& audioSettings = GetAudioSettings();
+    if (!HasPendingAudioSettingsChange(m_pVehicle, audioSettings))
+        return;
+
+    g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(&audioSettings);
     m_pVehicle->ReinitAudio();
 }
 
