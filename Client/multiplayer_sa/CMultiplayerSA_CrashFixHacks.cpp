@@ -1167,9 +1167,11 @@ void _declspec(naked) HOOK_CrashFix_Misc29()
         // Execute replaced code
         movsx   eax,word ptr [esp+8]
 
-        // Check word being -1
-        cmp     al, 0xffff
-        jz      cont
+        // Check for out-of-range BankSlotId
+        test    eax, eax
+        js      cont
+        cmp     ax, word ptr [ecx+0Ch]
+        jae     cont
 
         // Continue standard path
         jmp     RETURN_CrashFix_Misc29
@@ -1179,6 +1181,45 @@ cont:
         call    CrashAverted
         // Skip much code
         jmp     RETURN_CrashFix_Misc29B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::GetSoundBuffer
+//
+// The value of the argument bankSlotInfoId is out of range
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc43  0x4E028C
+#define HOOKSIZE_CrashFix_Misc43 5
+DWORD                 RETURN_CrashFix_Misc43 = 0x4E0291;
+void _declspec(naked) HOOK_CrashFix_Misc43()
+{
+    // clang-format off
+    __asm
+    {
+        // Validate bankSlotInfoId range
+        movsx   eax, word ptr [esp+8]
+
+        test    eax, eax
+        js      bail
+        cmp     ax, word ptr [ecx+0Ch]
+        jae     bail
+
+        // Execute replaced code
+        push    ebx
+        mov     ebx, [ecx]
+        push    ebp
+        push    esi
+        // Continue standard path
+        jmp     RETURN_CrashFix_Misc43
+
+bail:
+        push    43
+        call    CrashAverted
+        // Return null buffer
+        xor     eax, eax
+        retn    10h
     }
     // clang-format on
 }
@@ -1316,8 +1357,8 @@ static int FindTxdSlotForDict(RwTexDictionary* pDict) noexcept
     {
         // Check the slot still holds this dictionary
         auto* pPool = *reinterpret_cast<CPoolSAInterface<CTextureDictonarySAInterface>**>(0xC8800C);
-        if (pPool && pPool->m_byteMap && pPool->m_pObjects && s_cachedSlotIndex < pPool->m_nSize &&
-            !pPool->m_byteMap[s_cachedSlotIndex].bEmpty && pPool->m_pObjects[s_cachedSlotIndex].rwTexDictonary == pDict)
+        if (pPool && pPool->m_byteMap && pPool->m_pObjects && s_cachedSlotIndex < pPool->m_nSize && !pPool->m_byteMap[s_cachedSlotIndex].bEmpty &&
+            pPool->m_pObjects[s_cachedSlotIndex].rwTexDictonary == pDict)
         {
             return s_cachedSlotIndex;
         }
@@ -3239,6 +3280,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc27);
     EZHookInstall(CrashFix_Misc28);
     EZHookInstall(CrashFix_Misc29);
+    EZHookInstall(CrashFix_Misc43);
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
     EZHookInstall(CrashFix_Misc33);
