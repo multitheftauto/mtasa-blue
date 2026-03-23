@@ -2417,8 +2417,13 @@ eMovementState CClientPed::GetMovementState()
         GetControllerState(cs);
 
         // Get his current task(s)
-        const char* szComplexTaskName = GetTaskManager()->GetActiveTask()->GetTaskName();
-        const char* szSimpleTaskName = GetTaskManager()->GetSimplestActiveTask()->GetTaskName();
+        CTask* pActiveTask = GetTaskManager()->GetActiveTask();
+        CTask* pSimplestTask = GetTaskManager()->GetSimplestActiveTask();
+        if (!pActiveTask || !pSimplestTask)
+            return MOVEMENTSTATE_UNKNOWN;
+
+        const char* szComplexTaskName = pActiveTask->GetTaskName();
+        const char* szSimpleTaskName = pSimplestTask->GetTaskName();
 
         // Check tasks
         if (strcmp(szSimpleTaskName, "TASK_SIMPLE_CLIMB") == 0)  // Is he climbing?

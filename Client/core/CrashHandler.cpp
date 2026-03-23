@@ -48,6 +48,7 @@
 #include <stdio.h>
 #include <string>
 #include <string_view>
+#include <TlHelp32.h>
 #include <variant>
 #include <vector>
 #if defined(_MSC_VER)
@@ -62,6 +63,7 @@
 
 using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
 static std::atomic<bool> g_bWerLocalDumpConfigured{false};
+thread_local bool        g_bCrashHandlerStackOverflow{false};
 
 [[nodiscard]] constexpr bool IsMemoryException(DWORD code)
 {
@@ -99,6 +101,8 @@ static std::atomic<bool> g_bWerLocalDumpConfigured{false};
 // Helpers to isolate __try usage and prevent crashes in debug output itself
 void OutputDebugStringSafeImpl(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (message == nullptr)
         return;
 
@@ -113,6 +117,8 @@ void OutputDebugStringSafeImpl(const char* message)
 
 void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (buffer == nullptr || bufferSize == 0 || format == nullptr)
         return;
 
@@ -134,6 +140,8 @@ void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format
 
 void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     char buffer[DEBUG_BUFFER_SIZE] = {};
 
     std::size_t offset = 0;
@@ -2748,6 +2756,21 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     }
 
     const DWORD dwExceptionCode{pExPtrs->ExceptionRecord->ExceptionCode};
+    const bool  isStackOverflow = (dwExceptionCode == EXCEPTION_STACK_OVERFLOW);
+    struct StackOverflowScope
+    {
+        bool active;
+        explicit StackOverflowScope(bool enable) : active(enable)
+        {
+            if (active)
+                g_bCrashHandlerStackOverflow = true;
+        }
+        ~StackOverflowScope()
+        {
+            if (active)
+                g_bCrashHandlerStackOverflow = false;
+        }
+    } stackOverflowScope(isStackOverflow);
 
     // Special handling for release build-affecting assertions from 3rd-party libs (e.g CEF) that overuse them
     if (IsDebuggerPresent() == FALSE && pExPtrs->ContextRecord != nullptr)
@@ -3005,7 +3028,21 @@ namespace
 
     inline WatchdogState g_watchdogState{};
 
-    [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId)
+    static bool TryGenerateWatchdogDump(EXCEPTION_POINTERS* pExPtrs, CExceptionInformation_Impl* pExInfo)
+    {
+        __try
+        {
+            CCrashDumpWriter::DumpCoreLog(pExPtrs, pExInfo);
+            CCrashDumpWriter::DumpMiniDump(pExPtrs, pExInfo);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
+    [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId, bool dumpOnly = false)
     {
         AddReportLog(9300, SString("Watchdog freeze detected after %u seconds (thread %u)", g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed),
                                    targetThreadId));
@@ -3057,6 +3094,7 @@ namespace
         // Now we can safely resume the thread - we have everything we need
         if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
         {
+            OutputDebugStringA("WATCHDOG: Failed to resume thread after stack capture\n");
             AddReportLog(9304, SString("Watchdog failed to resume thread %u after stack capture", targetThreadId));
             // Continue anyway - we still want the crash dump even if resume failed
         }
@@ -3129,6 +3167,25 @@ namespace
             }
         }
 
+        if (dumpOnly)
+        {
+            // Write dump without dialog or termination so the
+            // contributor can continue debugging after a breakpoint pause.
+            auto* pExInfo = new (std::nothrow) CExceptionInformation_Impl;
+            if (pExInfo)
+            {
+                pExInfo->Set(exceptionRecord.ExceptionCode, &exceptionPointers);
+
+                if (!TryGenerateWatchdogDump(&exceptionPointers, pExInfo))
+                {
+                    AddReportLog(9316, "Watchdog: SEH exception caught during dump generation");
+                }
+
+                delete pExInfo;
+            }
+            return true;
+        }
+
         // Trigger the global exception handler
         CCrashDumpWriter::HandleExceptionGlobal(&exceptionPointers);
 
@@ -3167,6 +3224,58 @@ namespace
 
             if (elapsed.count() >= static_cast<std::chrono::seconds::rep>(timeoutSecs))
             {
+#ifdef MTA_DEBUG
+                BOOL isDebuggerAttached = FALSE;
+                if (IsDebuggerPresent() != FALSE)
+                    isDebuggerAttached = TRUE;
+
+                if (isDebuggerAttached == FALSE)
+                    CheckRemoteDebuggerPresent(GetCurrentProcess(), &isDebuggerAttached);
+
+                if (isDebuggerAttached == FALSE)
+                {
+                    // Check if parent process (e.g. VS attached to the launcher) has a debugger
+                    if (HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); hSnapshot != INVALID_HANDLE_VALUE)
+                    {
+                        PROCESSENTRY32 pe32{};
+                        pe32.dwSize = sizeof(pe32);
+                        if (Process32First(hSnapshot, &pe32))
+                        {
+                            const DWORD currentPid = GetCurrentProcessId();
+                            do
+                            {
+                                if (pe32.th32ProcessID == currentPid)
+                                {
+                                    if (HANDLE hParent = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ParentProcessID))
+                                    {
+                                        CheckRemoteDebuggerPresent(hParent, &isDebuggerAttached);
+                                        CloseHandle(hParent);
+                                    }
+                                    break;
+                                }
+                            } while (Process32Next(hSnapshot, &pe32));
+                        }
+                        CloseHandle(hSnapshot);
+                    }
+                }
+
+                if (isDebuggerAttached != FALSE)
+                {
+                    // In debug builds with a debugger attached, the stall may just be a breakpoint pause.
+                    // Generate a dump so the frozen stack is collected, then
+                    // reset the heartbeat and keep monitoring instead of terminating.
+                    OutputDebugStringA("WATCHDOG: Freeze detected - generating dump (no termination)\n");
+
+                    AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u, debugger attached)",
+                                               static_cast<long long>(elapsed.count()), timeoutSecs));
+
+                    TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+
+                    g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
+                    std::this_thread::sleep_for(kCheckInterval);
+                    continue;
+                }
+#endif
                 AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)", static_cast<long long>(elapsed.count()), timeoutSecs));
 
                 const bool triggered = TriggerWatchdogException(targetThread.get(), targetThreadId);

@@ -20,6 +20,7 @@
 #include "CProjectileInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 #include "CFireManagerSA.h"
+#include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
 
@@ -305,7 +306,10 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* position)
 
     // NOTE(botder): A crash used to occur at 0x7C51A8 in RpHAnimIDGetIndex, because the clump pointer might have been null
     // for a broken model.
-    if (entity->m_pRwObject)
+    // NOTE: A further crash occurs at 0x7C51B9 in RpHAnimIDGetIndex when the clump exists but lacks animation hierarchy data,
+    // because GTA:SA's GetTransformedBonePosition doesn't check if GetAnimHierarchyFromSkinClump returns NULL.
+    RpClump* clump = reinterpret_cast<RpClump*>(entity->m_pRwObject);
+    if (clump && GetAnimHierarchyFromSkinClump(clump))
         // RwV3D *__thiscall CPed::GetTransformedBonePosition(CPed *this, RwV3D *pointsIn, int boneId, char bUpdateBones)
         ((RwV3d * (__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool)) FUNC_GetTransformedBonePosition)(entity, position, bone, true);
 

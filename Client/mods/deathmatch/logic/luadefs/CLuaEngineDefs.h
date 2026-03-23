@@ -74,7 +74,7 @@ public:
     static bool                                            EngineRemoveImage(CClientIMG* pImg);
     static uint                                            EngineImageGetFilesCount(CClientIMG* pImg);
     static bool                                            EngineImageLinkDFF(CClientIMG* pImg, std::variant<size_t, std::string_view> file, uint uiModelID);
-    static bool                                            EngineImageLinkTXD(CClientIMG* pImg, std::variant<size_t, std::string_view> file, uint uiModelID);
+    static bool                                            EngineImageLinkTXD(CClientIMG* pImg, std::variant<size_t, std::string_view> file, uint uiTxdID);
     static bool                                            EngineRestoreDFFImage(uint uiModelID);
     static bool                                            EngineRestoreTXDImage(uint uiModelID);
     static std::vector<std::string_view>                   EngineImageGetFileList(CClientIMG* pImg);

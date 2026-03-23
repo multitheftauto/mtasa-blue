@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CAdditionalVertexStreamManager.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 #include <limits>
 #include <mutex>
 

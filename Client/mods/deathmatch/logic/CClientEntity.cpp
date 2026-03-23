@@ -146,8 +146,7 @@ CClientEntity::~CClientEntity()
     }
 
     // Remove from spatial database
-    if (!g_pClientGame->IsBeingDeleted())
-        GetClientSpatialDatabase()->RemoveEntity(this);
+    GetClientSpatialDatabase()->RemoveEntity(this);
 
     // Ensure not referenced in the disabled collisions list
     assert(!MapContains(g_pClientGame->m_AllDisabledCollisions, this));
@@ -742,7 +741,7 @@ bool CClientEntity::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaF
     return m_pEventManager->Add(pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod);
 }
 
-bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren)
+bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren, const char* minClientVersion)
 {
     if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, NULL))
         return false;
@@ -755,12 +754,12 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
     pEvents->PreEventPulse();
 
     // Call the event on our parents/us first
-    CallParentEvent(szName, Arguments, this);
+    CallParentEvent(szName, Arguments, this, minClientVersion);
 
     if (bCallOnChildren)
     {
         // Call it on all our children
-        CallEventNoParent(szName, Arguments, this);
+        CallEventNoParent(szName, Arguments, this, minClientVersion);
     }
 
     // Tell the event manager that we're done calling the event
@@ -779,13 +778,13 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
     return (!pEvents->WasEventCancelled());
 }
 
-void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource)
+void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion)
 {
     // Call it on us if this isn't the same class it was raised on
     // TODO not sure why the null check is necessary (eAi)
     if (pSource != this && m_pEventManager != NULL && m_pEventManager->HasEvents())
     {
-        m_pEventManager->Call(szName, Arguments, pSource, this);
+        m_pEventManager->Call(szName, Arguments, pSource, this, minClientVersion);
     }
 
     // Call it on all our children
@@ -798,7 +797,7 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
             {
                 if (!pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents() || !pEntity->m_Children.empty())
                 {
-                    pEntity->CallEventNoParent(szName, Arguments, pSource);
+                    pEntity->CallEventNoParent(szName, Arguments, pSource, minClientVersion);
                     if (m_bBeingDeleted)
                         break;
                 }
@@ -807,18 +806,18 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
     }
 }
 
-void CClientEntity::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource)
+void CClientEntity::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion)
 {
     // Call the event on us
     if (m_pEventManager && m_pEventManager->HasEvents())
     {
-        m_pEventManager->Call(szName, Arguments, pSource, this);
+        m_pEventManager->Call(szName, Arguments, pSource, this, minClientVersion);
     }
 
     // Call parent's handler
     if (m_pParent)
     {
-        m_pParent->CallParentEvent(szName, Arguments, pSource);
+        m_pParent->CallParentEvent(szName, Arguments, pSource, minClientVersion);
     }
 }
 

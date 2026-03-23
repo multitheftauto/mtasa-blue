@@ -142,7 +142,7 @@ public:
         catch (...)
         {
         }
-        bool          hasMeta = !wide.empty() && GetFileAttributesExWithTimeout(wide.c_str(), attr, 5000);
+        bool          hasMeta = !wide.empty() && GetFileAttributesExWithTimeout(wide.c_str(), attr, 500);
         std::uint64_t sz = 0, mt = 0;
         if (hasMeta)
         {
@@ -160,7 +160,7 @@ public:
         }
 
         SString buf;
-        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 10000))
+        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 2000))
         {
             if (!hasMeta)
                 return SString("File not found or inaccessible: %s", strFilename.c_str());
@@ -171,7 +171,7 @@ public:
         r.ulCRC = CRCGenerator::GetCRCFromBuffer(buf.data(), buf.size());
         CMD5Hasher().Calculate(buf.data(), buf.size(), r.md5);
 
-        if (hasMeta && GetFileAttributesExWithTimeout(wide.c_str(), attr, 5000) && sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
+        if (hasMeta && GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) && sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
             mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime))
         {
             std::lock_guard<std::mutex> l(CacheMtx());

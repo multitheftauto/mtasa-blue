@@ -21,11 +21,31 @@
 #include <game/CStreaming.h>
 #include <game/CVehicleAudioSettingsManager.h>
 #include <enums/VehicleType.h>
+#include <game_sa/CVehicleSA.h>
+#include <game_sa/CVehicleAudioSettingsEntrySA.h>
 
 using std::list;
 
 extern CClientGame*            g_pClientGame;
 std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
+
+namespace
+{
+    bool HasPendingAudioSettingsChange(CVehicle* pVehicle, const CVehicleAudioSettingsEntry& settings)
+    {
+        auto* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
+        if (!pVehicleSA)
+            return true;
+
+        auto* pVehicleAudioEntity = pVehicleSA->GetVehicleAudioEntity();
+        auto* pAudioInterface = pVehicleAudioEntity ? pVehicleAudioEntity->GetInterface() : nullptr;
+        if (!pAudioInterface)
+            return true;
+
+        const auto& desiredSettings = static_cast<const CVehicleAudioSettingsEntrySA&>(settings).GetInterface();
+        return std::memcmp(&pAudioInterface->m_nSettings, &desiredSettings, sizeof(desiredSettings)) != 0;
+    }
+}
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
 #pragma warning(disable : 4311)
@@ -2789,11 +2809,13 @@ void CClientVehicle::Create()
             switch (m_eVehicleType)
             {
                 case CLIENTVEHICLE_BOAT:
-                    dynamic_cast<CBoat*>(m_pVehicle)->SetBoatHandlingData(m_BoatHandlingEntry.get());
+                    if (auto* pBoat = dynamic_cast<CBoat*>(m_pVehicle))
+                        pBoat->SetBoatHandlingData(m_BoatHandlingEntry.get());
                     break;
                 case CLIENTVEHICLE_BIKE:
                 case CLIENTVEHICLE_BMX:
-                    dynamic_cast<CBike*>(m_pVehicle)->SetBikeHandlingData(m_BikeHandlingEntry.get());
+                    if (auto* pBike = dynamic_cast<CBike*>(m_pVehicle))
+                        pBike->SetBikeHandlingData(m_BikeHandlingEntry.get());
                     break;
             }
 
@@ -2980,11 +3002,23 @@ void CClientVehicle::Destroy()
         switch (m_eVehicleType)
         {
             case CLIENTVEHICLE_BOAT:
-                m_BoatHandlingEntry->Assign(dynamic_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData());
+                if (auto* pBoat = dynamic_cast<CBoat*>(m_pVehicle))
+                {
+                    if (!m_BoatHandlingEntry)
+                        m_BoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
+
+                    m_BoatHandlingEntry->Assign(pBoat->GetBoatHandlingData());
+                }
                 break;
             case CLIENTVEHICLE_BIKE:
             case CLIENTVEHICLE_BMX:
-                m_BikeHandlingEntry->Assign(dynamic_cast<CBike*>(m_pVehicle)->GetBikeHandlingData());
+                if (auto* pBike = dynamic_cast<CBike*>(m_pVehicle))
+                {
+                    if (!m_BikeHandlingEntry)
+                        m_BikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
+
+                    m_BikeHandlingEntry->Assign(pBike->GetBikeHandlingData());
+                }
                 break;
             default:
                 break;
@@ -3090,6 +3124,12 @@ void CClientVehicle::Destroy()
         // Destroy the vehicle
         g_pGame->GetPools()->RemoveVehicle(m_pVehicle);
         m_pVehicle = NULL;
+
+        // Clear our component data, but backup the visibility states so we can restore them on next create
+        m_ComponentVisibilityBackup.clear();
+        for (const auto& pair : m_ComponentData)
+            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
+        m_ComponentData.clear();
 
         // Remove reference to its model
         m_pModelInfo->RemoveRef();
@@ -3552,23 +3592,56 @@ float CClientVehicle::GetDistanceFromGround()
 
 bool CClientVehicle::IsOnGround()
 {
-    if (m_pModelInfo)
-    {
-        CBoundingBox* pBoundingBox = m_pModelInfo->GetBoundingBox();
-        if (pBoundingBox)
-        {
-            CVector vecMin = pBoundingBox->vecBoundMin;
-            CVector vecPosition;
-            GetPosition(vecPosition);
-            vecMin += vecPosition;
-            float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
+    if (!m_pVehicle)
+        return m_bIsOnGround;
 
-            /* Is the lowest point of the bounding box lower than 0.5 above the floor,
-            or is the lowest point of the bounding box higher than 0.3 below the floor */
-            return ((fGroundLevel > vecMin.fZ && (fGroundLevel - vecMin.fZ) < 0.5f) || (vecMin.fZ > fGroundLevel && (vecMin.fZ - fGroundLevel) < 0.3f));
-        }
+    int type = m_pVehicle->GetBaseVehicleType();  // 0 = Automobile, 9 = Bike, 10 = BMX
+    if ((type == 0 && dynamic_cast<CAutomobile*>(m_pVehicle)->IsAnyWheelTouchingGround()) ||
+        ((type == 9 || type == 10) && dynamic_cast<CBike*>(m_pVehicle)->IsAnyWheelTouchingGround()))
+    {
+        return true;
     }
-    return m_bIsOnGround;
+
+    CVector vehPos;
+    GetPosition(vehPos);
+    float groundZ = g_pGame->GetWorld()->FindGroundZFor3DPosition(&vehPos);
+
+    // Is vehicle under the ground?
+    if (DefinitelyLessThan(vehPos.fZ, groundZ, 1e-4f))
+        return false;
+
+    if (!m_pModelInfo)
+        return m_bIsOnGround;
+
+    CBoundingBox* bbox = m_pModelInfo->GetBoundingBox();
+    if (!bbox)
+        return m_bIsOnGround;
+
+    const CVector& min = bbox->vecBoundMin;
+    const CVector& max = bbox->vecBoundMax;
+
+    // Is vehicle too high above the ground?
+    float halfHeight = (max.fZ - min.fZ) * 0.5f;
+    if (DefinitelyGreaterThan(vehPos.fZ - halfHeight, groundZ + halfHeight + 0.3f, 1e-4f))
+        return false;
+
+    // OBB check
+    CMatrix mat;
+    GetMatrix(mat);
+
+    CVector localPoints[8] = {CVector(min.fX, min.fY, min.fZ), CVector(min.fX, min.fY, max.fZ), CVector(min.fX, max.fY, min.fZ),
+                              CVector(min.fX, max.fY, max.fZ), CVector(max.fX, min.fY, min.fZ), CVector(max.fX, min.fY, max.fZ),
+                              CVector(max.fX, max.fY, min.fZ), CVector(max.fX, max.fY, max.fZ)};
+
+    float lowestZ = FLT_MAX;
+    for (const auto& lp : localPoints)
+    {
+        float z = mat.TransformVector(lp).fZ;
+        if (z < lowestZ)
+            lowestZ = z;
+    }
+
+    return DefinitelyLessThan((lowestZ - groundZ), 0.3f, 1e-4f) || EssentiallyEqual((lowestZ - groundZ), 0.3f, 1e-4f);
 }
 
 void CClientVehicle::LockSteering(bool bLock)
@@ -4307,7 +4380,8 @@ void CClientVehicle::ApplyHandling()
     m_pVehicle->RecalculateHandling();
 
     if (m_eVehicleType == CLIENTVEHICLE_BMX || m_eVehicleType == CLIENTVEHICLE_BIKE)
-        dynamic_cast<CBike*>(m_pVehicle)->RecalculateBikeHandling();
+        if (auto* pBike = dynamic_cast<CBike*>(m_pVehicle))
+            pBike->RecalculateBikeHandling();
 }
 
 CHandlingEntry* CClientVehicle::GetHandlingData()
@@ -5147,7 +5221,11 @@ void CClientVehicle::ApplyAudioSettings()
     if (!m_pVehicle)
         return;
 
-    g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(&GetAudioSettings());
+    const auto& audioSettings = GetAudioSettings();
+    if (!HasPendingAudioSettingsChange(m_pVehicle, audioSettings))
+        return;
+
+    g_pGame->GetVehicleAudioSettingsManager()->SetNextSettings(&audioSettings);
     m_pVehicle->ReinitAudio();
 }
 

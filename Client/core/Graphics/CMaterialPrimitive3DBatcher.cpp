@@ -11,6 +11,7 @@
  *****************************************************************************/
 #include <StdInc.h>
 #include "CMaterialPrimitive3DBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 ////////////////////////////////////////////////////////////////
 //
 // CMaterialPrimitive3DBatcher::CMaterialPrimitive3DBatcher
@@ -123,6 +124,20 @@ void CMaterialPrimitive3DBatcher::Flush()
 
         if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
         {
+            if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTextureItem))
+            {
+                if (!pRenderTarget->TryEnsureValid())
+                    continue;
+            }
+            else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTextureItem))
+            {
+                if (!pScreenSource->TryEnsureValid())
+                    continue;
+            }
+
+            if (!pTextureItem->m_pD3DTexture)
+                continue;
+
             m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
             DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
         }

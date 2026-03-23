@@ -13,13 +13,13 @@
 
 namespace MemSA
 {
-    size_t msize(const void* p)
+    inline size_t msize(const void* p)
     {
         using gta_msize = size_t (*)(const void*);
         return reinterpret_cast<gta_msize>(0x828C4A)(p);
     };
 
-    void* malloc(size_t count)
+    inline void* malloc(size_t count)
     {
         using gta_malloc = void* (*)(size_t);
         return reinterpret_cast<gta_malloc>(0x824257)(count);
@@ -31,7 +31,7 @@ namespace MemSA
         return static_cast<T*>(MemSA::malloc(sizeof(T) * count));
     }
 
-    void free(void* p)
+    inline void free(void* p)
     {
         using gta_free = void (*)(void*);
         return reinterpret_cast<gta_free>(0x82413F)(p);

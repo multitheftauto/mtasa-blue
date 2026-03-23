@@ -251,6 +251,8 @@ CGameSA::CGameSA()
         CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
         CVehicleAudioSettingsManagerSA::StaticSetHooks();
+        CPointLightsSA::StaticSetHooks();
+        CBuildingRemovalSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {
@@ -479,6 +481,10 @@ void CGameSA::Reset()
 
         // Restore default world state
         RestoreGameWorld();
+
+        // Reset building pool to default capacity if a server enlarged it
+        if (m_Pools->GetBuildingsPool().GetSize() != MAX_BUILDINGS)
+            SetBuildingPoolSize(MAX_BUILDINGS);
     }
 }
 
@@ -495,6 +501,12 @@ void CGameSA::Terminate()
 
 void CGameSA::Initialize()
 {
+    // Expand TXD pool from SA's default 5000 to our maximum capacity.
+    // Can't run in CTxdPoolSA's constructor (pool at 0xC8800C doesn't
+    // exist yet). Safe here: pool access is main-thread only and SA
+    // derefs m_pObjects on every access (no cached pointers).
+    static_cast<CTxdPoolSA&>(m_Pools->GetTxdPool()).InitialisePool();
+
     // Initialize garages
     m_pGarages->Initialize();
     SetupSpecialCharacters();
@@ -1132,6 +1144,21 @@ void CGameSA::RestoreGameWorld()
 bool CGameSA::SetBuildingPoolSize(size_t size)
 {
     const bool shouldRemoveWorld = !m_isGameWorldRemoved;
+
+    const int iCurrentBuildingPoolSize = m_Pools->GetBuildingsPool().GetSize();
+    if (iCurrentBuildingPoolSize >= 0 && static_cast<size_t>(iCurrentBuildingPoolSize) == size)
+    {
+        // Keep same-size behavior unchanged while world is active.
+        // If world is already removed, skip no-op resize and only drop caches.
+        if (!shouldRemoveWorld)
+        {
+            static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
+            return true;
+        }
+
+        // World is active here, so continue with remove and restore flow.
+    }
+
     if (shouldRemoveWorld)
         RemoveGameWorld();
     else

@@ -241,6 +241,7 @@ public:
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
     virtual void      MakePedModel(const char* szTexture) = 0;
+    virtual void      MakePedModel(unsigned short usParentID) = 0;
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeObjectDamageableModel(std::uint16_t baseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
@@ -261,4 +262,8 @@ public:
     virtual void         SetParentID(unsigned int id) = 0;
     virtual bool         IsDynamic() = 0;
     virtual bool         IsDamageableAtomic() = 0;
+
+    // Clear m_pCustomClump without touching GTA streaming or RW objects.
+    // Used during shutdown when RW operations are unsafe.
+    virtual void ClearCustomModel() = 0;
 };
