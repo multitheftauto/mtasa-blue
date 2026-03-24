@@ -1286,7 +1286,7 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     bool    bFreeModule = false;
 
     const SString strInstallPath = GetInstallPathForLauncher();
-    if (IsUsableInstallRoot(strInstallPath))
+    if (IsUsableMtasaInstallRoot(strInstallPath))
     {
         hModule = LoadVersionModule(strInstallPath, dwLastError);
         bFreeModule = hModule != NULL;
@@ -1585,7 +1585,7 @@ void CleanDownloadCache()
 
             if (bIsExtractedTempDir)
             {
-                if (!strLaunchPath.CompareI(strPathFilename) || !strCurrentDir.CompareI(strPathFilename) || strLaunchPath.BeginsWithI(strPathFilename + "\\") ||
+                if (strLaunchPath.CompareI(strPathFilename) || strCurrentDir.CompareI(strPathFilename) || strLaunchPath.BeginsWithI(strPathFilename + "\\") ||
                     strCurrentDir.BeginsWithI(strPathFilename + "\\"))
                     continue;
             }
