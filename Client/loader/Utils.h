@@ -78,6 +78,7 @@ auto GetMTARootDirectory() -> std::filesystem::path;
 auto GetGameBaseDirectory() -> std::filesystem::path;
 auto GetGameLaunchDirectory() -> std::filesystem::path;
 auto GetGameExecutablePath() -> std::filesystem::path;
+SString GetInstallPathForLauncher();
 
 void            SetMTASAPathSource(bool bReadFromRegistry);
 SString         GetMTASAPath();
