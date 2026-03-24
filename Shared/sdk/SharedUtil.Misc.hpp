@@ -62,6 +62,9 @@ namespace SharedUtil
 }
 
 #if defined(SHAREDUTIL_PLATFORM_WINDOWS)
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
     #include <windows.h>
     #include <ctime>
     #include <direct.h>
@@ -81,6 +84,12 @@ namespace SharedUtil
     #if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
         #include <filesystem>
     #endif
+
+struct HKeyDeleter
+{
+    void operator()(HKEY hk) const noexcept { RegCloseKey(hk); }
+};
+using UniqueHKey = std::unique_ptr<std::remove_pointer_t<HKEY>, HKeyDeleter>;
 
 namespace SharedUtil
 {
@@ -204,6 +213,20 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
 
                                 if (folderName == L"mta")
                                 {
+                                    const SString strCurrentPath = ToUTF8(currentPath);
+                                    const bool    bHasKnownModule =
+                                        FileExists(PathJoin(strCurrentPath, "core.dll")) || FileExists(PathJoin(strCurrentPath, "core_d.dll")) ||
+                                        FileExists(PathJoin(strCurrentPath, "loader.dll")) || FileExists(PathJoin(strCurrentPath, "loader_d.dll"));
+
+                                    if (!bHasKnownModule)
+                                    {
+                                        if (lastSep != std::wstring::npos)
+                                            currentPath = currentPath.substr(0, lastSep);
+                                        else
+                                            break;
+                                        continue;
+                                    }
+
                                     // Found MTA folder - base directory is its parent
                                     // Stop searching immediately to avoid finding outer "MTA" folders (e.g user with custom install dir)
                                     if (lastSep != std::wstring::npos)
@@ -373,6 +396,53 @@ void SharedUtil::SetMTASABaseDirOverride(const SString& strPath)
     strInstallRootOverride = strPath;
 }
 
+static bool IsUsableMtasaInstallRoot(const SString& strPath)
+{
+    if (strPath.empty())
+        return false;
+
+    return FileExists(PathJoin(strPath, "Multi Theft Auto.exe")) || FileExists(PathJoin(strPath, "Multi Theft Auto_d.exe")) ||
+           FileExists(PathJoin(strPath, "mta", "core.dll")) || FileExists(PathJoin(strPath, "MTA", "core.dll")) ||
+           FileExists(PathJoin(strPath, "mta", "core_d.dll")) || FileExists(PathJoin(strPath, "MTA", "core_d.dll"));
+}
+
+static SString ReadInstallRootRegistryValue64()
+{
+    #if defined(KEY_WOW64_64KEY)
+    const WString wstrSubKey = FromUTF8(PathJoin(GetProductRegistryPath(), GetMajorVersionString()).TrimEnd("\\"));
+    const WString wstrValue = FromUTF8("Last Run Location");
+
+    HKEY hkTemp = NULL;
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hkTemp) != ERROR_SUCCESS || !hkTemp)
+        return "";
+
+    DWORD dwType = REG_SZ;
+    DWORD dwSize = 0;
+    LONG  result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, NULL, &dwSize);
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize == 0)
+    {
+        RegCloseKey(hkTemp);
+        return "";
+    }
+
+    std::vector<wchar_t> buffer((dwSize / sizeof(wchar_t)) + 1u, L'\0');
+    result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwSize);
+    RegCloseKey(hkTemp);
+
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ))
+        return "";
+
+    if (dwSize >= sizeof(wchar_t))
+        buffer[(dwSize / sizeof(wchar_t)) - 1u] = L'\0';
+    else
+        buffer[0] = L'\0';
+
+    return ToUTF8(buffer.data());
+    #else
+    return "";
+    #endif
+}
+
 //
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
@@ -383,6 +453,7 @@ SString SharedUtil::GetMTASABaseDir()
         return strInstallRootOverride;
 
     static SString strInstallRoot;
+    static SString strInstallRootSource;
     if (strInstallRoot.empty())
     {
         if (IsGTAProcess())
@@ -392,22 +463,58 @@ SString SharedUtil::GetMTASABaseDir()
             if (FileExists(PathJoin(strParentDir, "mta", "core.dll")) || FileExists(PathJoin(strParentDir, "MTA", "core.dll")))
             {
                 strInstallRoot = strParentDir;
+                strInstallRootSource = "parent process";
             }
         }
         if (strInstallRoot.empty())
         {
-            strInstallRoot = GetMTAProcessBaseDir();
+            HMODULE hCoreModule = nullptr;
+    #ifdef MTA_DEBUG
+            if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, L"core_d.dll", &hCoreModule))
+    #endif
+                GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, L"core.dll", &hCoreModule);
+
+            if (hCoreModule)
+            {
+                strInstallRoot = GetMTAProcessBaseDir();
+                if (!strInstallRoot.empty())
+                    strInstallRootSource = "loaded core module";
+            }
         }
         if (strInstallRoot.empty())
         {
             strInstallRoot = GetRegistryValue("", "Last Run Location");
+            if (!IsUsableMtasaInstallRoot(strInstallRoot))
+            {
+                const SString strRegistry32InstallRoot = strInstallRoot;
+                const SString strRegistry64InstallRoot = ReadInstallRootRegistryValue64();
+                if (IsUsableMtasaInstallRoot(strRegistry64InstallRoot))
+                {
+                    strInstallRoot = strRegistry64InstallRoot;
+                    strInstallRootSource = "registry64";
+                }
+                else
+                {
+                    if (!strRegistry32InstallRoot.empty())
+                    {
+                        AddReportLog(1042, SString("GetMTASABaseDir: ignoring unusable registry path '%s'", strRegistry32InstallRoot.c_str()), 1);
+                    }
+                    strInstallRoot.clear();
+                }
+            }
             if (strInstallRoot.empty())
             {
+                AddReportLog(1042, "GetMTASABaseDir: unable to resolve install root", 1);
                 MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
                                MB_OK | MB_ICONERROR | MB_TOPMOST);
                 TerminateProcess(GetCurrentProcess(), 9);
             }
+            if (strInstallRootSource.empty())
+                strInstallRootSource = "registry";
         }
+
+        if (!strInstallRoot.empty())
+            AddReportLog(1042, SString("GetMTASABaseDir: resolved '%s' via %s", strInstallRoot.c_str(), strInstallRootSource.c_str()), 1);
     }
     return strInstallRoot;
 }
@@ -609,40 +716,328 @@ static void WriteRegistryStringValue(HKEY hkRoot, const char* szSubKey, const ch
 //
 // Read a registry string value
 //
-static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
+namespace
 {
-    // Clear output
-    SString strOutResult = "";
+    constexpr DWORD kMaxRegistryValueBytes = 1024 * 1024;  // Cap to avoid runaway allocations
+    constexpr DWORD kMinStringAlloc = sizeof(wchar_t);
+    constexpr DWORD kMinBinaryAlloc = static_cast<DWORD>(sizeof(unsigned long long));
 
-    bool    bResult = false;
-    HKEY    hkTemp = NULL;
-    WString wstrSubKey = FromUTF8(szSubKey);
-    WString wstrValue = FromUTF8(szValue);
-    if (RegOpenKeyExW(hkRoot, wstrSubKey, 0, KEY_READ, &hkTemp) != ERROR_SUCCESS)
+    bool ComputeNextAllocation(DWORD current, DWORD requested, DWORD minimum, DWORD& outNext)
     {
-        // Fallback
-        RegOpenKeyExW(hkRoot, wstrSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hkTemp);
+        const ULONGLONG requestedSize = requested != 0 ? static_cast<ULONGLONG>(requested) : static_cast<ULONGLONG>(current) * 2ULL;
+        const ULONGLONG adjusted = std::max<ULONGLONG>(requestedSize, static_cast<ULONGLONG>(minimum));
+        if (adjusted > kMaxRegistryValueBytes)
+            return false;
+        outNext = static_cast<DWORD>(adjusted);
+        return true;
     }
 
-    if (hkTemp)
+    size_t ComputeWideBufferCapacity(DWORD bytes)
     {
-        DWORD dwBufferSize;
-        if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize) == ERROR_SUCCESS)
+        const size_t rounded = static_cast<size_t>(bytes) + (sizeof(wchar_t) - 1u);
+        return (rounded / sizeof(wchar_t)) + 1u;  // +1 for null terminator
+    }
+
+    WString CollapseMultiSz(const wchar_t* data, size_t wcharCount)
+    {
+        const wchar_t* current = data;
+        const wchar_t* end = current + wcharCount;
+        WString        combined;
+        while (current < end && *current != L'\0')
         {
-            CScopeAlloc<wchar_t> szBuffer(dwBufferSize + sizeof(wchar_t));
-            if (RegQueryValueExW(hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize) == ERROR_SUCCESS)
+            if (!combined.empty())
+                combined.push_back(L'\n');
+            const wchar_t* segmentEnd = current;
+            while (segmentEnd < end && *segmentEnd != L'\0')
+                ++segmentEnd;
+            combined.append(current, static_cast<size_t>(segmentEnd - current));
+            current = segmentEnd;
+            if (current >= end)
+                break;
+            ++current;
+        }
+        return combined;
+    }
+
+    SString ExpandEnvironmentToUtf8(const wchar_t* raw)
+    {
+        const DWORD expandedChars = ExpandEnvironmentStringsW(raw, NULL, 0);
+        const DWORD maxExpandChars = kMaxRegistryValueBytes / sizeof(wchar_t);
+        if (expandedChars > 0 && expandedChars <= maxExpandChars)
+        {
+            std::vector<wchar_t> expanded(expandedChars, L'\0');
+            if (ExpandEnvironmentStringsW(raw, expanded.data(), expandedChars))
             {
-                // Ensure null termination - dwBufferSize is in bytes, convert to wchar_t units
-                size_t wcharCount = dwBufferSize / sizeof(wchar_t);
-                szBuffer[wcharCount] = 0;
-                strOutResult = ToUTF8((wchar_t*)szBuffer);
-                bResult = true;
+                WString expandedString;
+                expandedString.assign(expanded.data());
+                return ToUTF8(expandedString);
             }
         }
-        RegCloseKey(hkTemp);
+
+        WString fallback;
+        fallback.assign(raw);
+        return ToUTF8(fallback);
     }
+
+    SString BinaryBufferToHex(const unsigned char* data, DWORD size)
+    {
+        if (size == 0)
+            return SString();
+
+        static const char hexDigits[] = "0123456789ABCDEF";
+        std::string       hex;
+        hex.reserve(static_cast<size_t>(size) * 2u);
+        for (DWORD i = 0; i < size; ++i)
+        {
+            const unsigned char byte = data[i];
+            hex.push_back(hexDigits[(byte >> 4) & 0x0F]);
+            hex.push_back(hexDigits[byte & 0x0F]);
+        }
+        SString result;
+        result = hex.c_str();
+        return result;
+    }
+
+    bool TryReadStringValue(HKEY key, const wchar_t* valueName, DWORD& dwType, DWORD initialSize, SString& outValue, int& status)
+    {
+        DWORD                allocSize = std::max<DWORD>(initialSize, kMinStringAlloc);
+        std::vector<wchar_t> buffer(ComputeWideBufferCapacity(allocSize), L'\0');
+
+        while (true)
+        {
+            DWORD dwTempSize = allocSize;
+            LONG  readResult = RegQueryValueExW(key, valueName, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwTempSize);
+
+            if (readResult == ERROR_MORE_DATA)
+            {
+                if (dwTempSize > kMaxRegistryValueBytes)
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                DWORD newSize = 0;
+                if (!ComputeNextAllocation(allocSize, dwTempSize, kMinStringAlloc, newSize))
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                allocSize = newSize;
+                buffer.assign(ComputeWideBufferCapacity(allocSize), L'\0');
+                continue;
+            }
+
+            if (readResult != ERROR_SUCCESS)
+            {
+                status = -static_cast<int>(readResult);
+                return false;
+            }
+
+            size_t wcharCount = static_cast<size_t>(dwTempSize) / sizeof(wchar_t);
+            if (wcharCount >= buffer.size())
+                wcharCount = buffer.size() - 1u;
+            buffer[wcharCount] = L'\0';
+
+            if (dwType == REG_MULTI_SZ)
+            {
+                outValue = ToUTF8(CollapseMultiSz(buffer.data(), wcharCount));
+            }
+            else if (dwType == REG_EXPAND_SZ)
+            {
+                outValue = ExpandEnvironmentToUtf8(buffer.data());
+            }
+            else
+            {
+                WString direct;
+                direct.assign(buffer.data());
+                outValue = ToUTF8(direct);
+            }
+
+            status = 1;
+            return true;
+        }
+    }
+
+    bool TryReadBinaryValue(HKEY key, const wchar_t* valueName, DWORD& dwType, DWORD initialSize, SString& outValue, int& status)
+    {
+        DWORD                      allocSize = std::max<DWORD>(initialSize, kMinBinaryAlloc);
+        std::vector<unsigned char> buffer(static_cast<size_t>(allocSize), 0u);
+
+        while (true)
+        {
+            DWORD dwTempSize = allocSize;
+            LONG  readResult = RegQueryValueExW(key, valueName, NULL, &dwType, buffer.data(), &dwTempSize);
+
+            if (readResult == ERROR_MORE_DATA)
+            {
+                if (dwTempSize > kMaxRegistryValueBytes)
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                DWORD newSize = 0;
+                if (!ComputeNextAllocation(allocSize, dwTempSize, kMinBinaryAlloc, newSize))
+                {
+                    status = -static_cast<int>(ERROR_MORE_DATA);
+                    return false;
+                }
+
+                allocSize = newSize;
+                buffer.assign(static_cast<size_t>(allocSize), 0u);
+                continue;
+            }
+
+            if (readResult != ERROR_SUCCESS)
+            {
+                status = -static_cast<int>(readResult);
+                return false;
+            }
+
+            switch (dwType)
+            {
+                case REG_DWORD:
+                {
+                    DWORD       value = 0;
+                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, sizeof(DWORD));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                        value |= static_cast<DWORD>(buffer[i]) << (8u * i);
+                    outValue.Format("%lu", static_cast<unsigned long>(value));
+                    break;
+                }
+                case REG_DWORD_BIG_ENDIAN:
+                {
+                    DWORD       value = 0;
+                    const DWORD copyBytes = std::min<DWORD>(dwTempSize, sizeof(DWORD));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                    {
+                        value <<= 8;
+                        value |= buffer[i];
+                    }
+                    outValue.Format("%lu", static_cast<unsigned long>(value));
+                    break;
+                }
+                case REG_QWORD:
+                {
+                    unsigned long long value = 0ull;
+                    const DWORD        copyBytes = std::min<DWORD>(dwTempSize, static_cast<DWORD>(sizeof(value)));
+                    for (DWORD i = 0; i < copyBytes; ++i)
+                        value |= static_cast<unsigned long long>(buffer[i]) << (8ull * i);
+                    outValue.Format("%llu", static_cast<unsigned long long>(value));
+                    break;
+                }
+                case REG_BINARY:
+                case REG_LINK:
+                case REG_RESOURCE_LIST:
+                case REG_FULL_RESOURCE_DESCRIPTOR:
+                case REG_RESOURCE_REQUIREMENTS_LIST:
+                case REG_NONE:
+                default:
+                {
+                    outValue = BinaryBufferToHex(buffer.data(), dwTempSize);
+                    break;
+                }
+            }
+
+            status = 1;
+            return true;
+        }
+    }
+
+    bool PopulateValueFromKey(HKEY key, const wchar_t* valueName, int& status, SString& outValue)
+    {
+        DWORD dwType = REG_NONE;
+        DWORD dwBufferSize = 0;
+        LONG  queryResult = RegQueryValueExW(key, valueName, NULL, &dwType, NULL, &dwBufferSize);
+
+        if (queryResult != ERROR_SUCCESS && queryResult != ERROR_MORE_DATA)
+        {
+            status = -static_cast<int>(queryResult);
+            return false;
+        }
+
+        if (dwBufferSize > kMaxRegistryValueBytes)
+        {
+            status = -static_cast<int>(ERROR_MORE_DATA);
+            return false;
+        }
+
+        int        localStatus = 0;
+        const bool isStringType = (dwType == REG_SZ || dwType == REG_EXPAND_SZ || dwType == REG_MULTI_SZ);
+        const bool success = isStringType ? TryReadStringValue(key, valueName, dwType, dwBufferSize, outValue, localStatus)
+                                          : TryReadBinaryValue(key, valueName, dwType, dwBufferSize, outValue, localStatus);
+
+        if (localStatus != 0)
+            status = localStatus;
+
+        return success;
+    }
+
+}
+
+static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
+{
+    SString strOutResult;
+    int     status = 0;
+    bool    success = false;
+
+    const char* szSafeSubKey = szSubKey ? szSubKey : "";
+    const char* szSafeValue = szValue ? szValue : "";
+
+    WString        wstrSubKey;
+    const wchar_t* pSubKey = L"";
+    if (szSafeSubKey[0] != '\0')
+    {
+        wstrSubKey = FromUTF8(szSafeSubKey);
+        pSubKey = wstrSubKey.c_str();
+    }
+
+    static constexpr wchar_t kDefaultValueName[] = L"";
+    WString                  wstrValue;
+    const wchar_t*           pValueName = kDefaultValueName;
+    if (szSafeValue[0] != '\0')
+    {
+        wstrValue = FromUTF8(szSafeValue);
+        pValueName = wstrValue.c_str();
+    }
+
+    constexpr size_t                     kAccessMaskSlots = 3u;
+    std::array<REGSAM, kAccessMaskSlots> accessMasks{};
+    size_t                               maskCount = 0;
+    #ifdef KEY_WOW64_64KEY
+    accessMasks[maskCount++] = KEY_READ | KEY_WOW64_64KEY;
+    #endif
+    #ifdef KEY_WOW64_32KEY
+    accessMasks[maskCount++] = KEY_READ | KEY_WOW64_32KEY;
+    #endif
+    accessMasks[maskCount++] = KEY_READ;
+
+    for (size_t maskIndex = 0; maskIndex < maskCount && !success; ++maskIndex)
+    {
+        HKEY       hkTemp = nullptr;
+        const LONG openResult = RegOpenKeyExW(hkRoot, pSubKey, 0, accessMasks[maskIndex], &hkTemp);
+        if (openResult != ERROR_SUCCESS)
+        {
+            status = -static_cast<int>(openResult);
+            continue;
+        }
+
+        UniqueHKey keyGuard(hkTemp);
+
+        if (PopulateValueFromKey(hkTemp, pValueName, status, strOutResult))
+        {
+            success = true;
+            break;
+        }
+    }
+
     if (iResult)
-        *iResult = bResult;
+        *iResult = status;
+
+    if (!success)
+        strOutResult.clear();
+
     return strOutResult;
 }
 
@@ -665,9 +1060,9 @@ SString SharedUtil::GetMajorVersionString()
 //
 // GetSystemRegistryValue
 //
-SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName)
+SString SharedUtil::GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, NULL);
+    return ReadRegistryStringValue((HKEY)hKey, strPath, strName, iResult);
 }
 
 //
@@ -691,9 +1086,9 @@ void SharedUtil::SetRegistryValue(const SString& strPath, const SString& strName
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, strValue, bFlush);
 }
 
-SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName)
+SString SharedUtil::GetRegistryValue(const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(GetMajorVersionString(), strPath), strName, iResult);
 }
 
 bool SharedUtil::RemoveRegistryKey(const SString& strPath)
@@ -707,9 +1102,9 @@ void SharedUtil::SetVersionRegistryValue(const SString& strVersion, const SStrin
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, strValue);
 }
 
-SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName)
+SString SharedUtil::GetVersionRegistryValue(const SString& strVersion, const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath(strVersion, strPath), strName, iResult);
 }
 
 // Get/set registry values for all versions (common)
@@ -718,9 +1113,9 @@ void SharedUtil::SetCommonRegistryValue(const SString& strPath, const SString& s
     WriteRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, strValue);
 }
 
-SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName)
+SString SharedUtil::GetCommonRegistryValue(const SString& strPath, const SString& strName, int* iResult /*= nullptr*/)
 {
-    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, NULL);
+    return ReadRegistryStringValue(HKEY_LOCAL_MACHINE, MakeVersionRegistryPath("Common", strPath), strName, iResult);
 }
 
 //
@@ -740,6 +1135,12 @@ void SharedUtil::SetOnQuitCommand(const SString& strOperation, const SString& st
 void SharedUtil::SetOnRestartCommand(const SString& strOperation, const SString& strFile, const SString& strParameters, const SString& strDirectory,
                                      const SString& strShowCmd)
 {
+    if (strOperation.empty() && strFile.empty() && strParameters.empty() && strDirectory.empty() && strShowCmd.empty())
+    {
+        SetRegistryValue("", "OnRestartCommand", "");
+        return;
+    }
+
     // Encode into a string and set a registry key
     SString strVersion("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
     SString strValue("%s\t%s\t%s\t%s\t%s\t%s", strOperation.c_str(), strFile.c_str(), strParameters.c_str(), strDirectory.c_str(), strShowCmd.c_str(),
@@ -753,7 +1154,6 @@ void SharedUtil::SetOnRestartCommand(const SString& strOperation, const SString&
 bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SString& strParameters, SString& strDirectory, SString& strShowCmd)
 {
     SString strOnRestartCommand = GetRegistryValue("", "OnRestartCommand");
-    SetOnRestartCommand("");
 
     std::vector<SString> vecParts;
     strOnRestartCommand.Split("\t", vecParts);
@@ -770,6 +1170,14 @@ bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SS
             return true;
         }
         AddReportLog(4000, SString("OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str(), strVersion.c_str()));
+        SetOnRestartCommand("");
+        return false;
+    }
+
+    if (!strOnRestartCommand.empty())
+    {
+        AddReportLog(4001, SString("OnRestartCommand disregarded due to invalid format '%s'", strOnRestartCommand.c_str()));
+        SetOnRestartCommand("");
     }
     return false;
 }

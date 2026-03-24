@@ -459,8 +459,10 @@ void InitLocalization(bool bShowErrors)
     if (bInitialized)
         return;
 
+    const SString strLaunchPath = GetLaunchPath();
+
     // Check for core.dll
-    const SString strCoreDLL = PathJoin(GetLaunchPath(), "mta", MTA_DLL_NAME);
+    const SString strCoreDLL = PathJoin(strLaunchPath, "mta", MTA_DLL_NAME);
     if (!FileExists(strCoreDLL))
     {
         if (!bShowErrors)
@@ -496,7 +498,7 @@ void InitLocalization(bool bShowErrors)
                 SString strSrc = PathJoin(strMTASAPath, "mta", SString("%s_mta.dll", xinputModules[i]));
                 if (!FileExists(strSrc))
                 {
-                    strSrc = PathJoin(GetLaunchPath(), "mta", SString("%s_mta.dll", xinputModules[i]));
+                    strSrc = PathJoin(strLaunchPath, "mta", SString("%s_mta.dll", xinputModules[i]));
                 }
                 FileCopy(strSrc, strDest);
             }
@@ -814,27 +816,12 @@ void ConfigureWerDumpPath()
 {
     using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
 
-    // Get loader's own path directly - this is the install root where Multi Theft Auto.exe lives
-    wchar_t loaderPath[MAX_PATH * 2];
-    DWORD   len = GetModuleFileNameW(NULL, loaderPath, NUMELMS(loaderPath));
-    if (len == 0 || len >= NUMELMS(loaderPath))
-        return;
-
-    // Extract directory from full path
-    wchar_t* lastSlash = wcsrchr(loaderPath, L'\\');
-    if (!lastSlash)
-        lastSlash = wcsrchr(loaderPath, L'/');
-    if (!lastSlash)
-        return;  // No directory separator found - cannot determine install root
-    *lastSlash = L'\0';
-
-    // Sanity check - ensure we have a non-empty directory
-    if (loaderPath[0] == L'\0')
+    const SString strInstallPath = GetInstallPathForLauncher();
+    if (strInstallPath.empty())
         return;
 
     // Build dump path: <install root>\MTA\dumps\private
-    std::wstring dumpPathW = loaderPath;
-    dumpPathW += L"\\MTA\\dumps\\private";
+    std::wstring dumpPathW = FromUTF8(PathJoin(strInstallPath, "MTA", "dumps", "private"));
 
     SString mtaDumpPath = UTF16ToMbUTF8(dumpPathW);
     if (mtaDumpPath.empty())
@@ -1479,7 +1466,7 @@ void CheckDataFiles()
 
             // Check all 3 game roots
             const std::vector<SString> directoriesToCheck = {
-                GetLaunchPath(),                                // MTA installation folder root
+                GetInstallPathForLauncher(),                    // MTA installation folder root
                 strGTAPath,                                     // Real GTA:SA installation folder root. As chosen by DiscoverGTAPath()
                 PathJoin(GetMTADataPath(), "GTA San Andreas"),  // Proxy-mirror that MTA uses for core GTA data files (C:\ProgramData\MTA San Andreas All\<MTA
                                                                 // major version>\GTA San Andreas)
@@ -1577,6 +1564,7 @@ void CheckDataFiles()
         const SString filePath = PathJoin(strMTASAPath, dataFiles[i]);
         if (!ValidatePath(filePath) || !FileExists(filePath))
         {
+            AddReportLog(3211, SString("CheckDataFiles: missing required file '%s' (base='%s')", filePath.c_str(), strMTASAPath.c_str()));
             DisplayErrorMessageBox(_("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL16"),
                                    "mta-datafiles-missing");
             ExitProcess(EXIT_ERROR);
