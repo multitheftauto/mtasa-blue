@@ -821,6 +821,11 @@ bool ProcessDamageEvent(CEventDamageSAInterface* event, CPedSAInterface* affects
 
         if (pPed)
         {
+            // The damage handler runs Lua events that may call CPed::Teleport
+            // (via setElementPosition), which nulls m_pCollidedEntity. Save and
+            // restore it so ScanForCollisionEvents can use it after this hook.
+            CEntitySAInterface* pSavedCollidedEntity = affectsPed->m_pCollidedEntity;
+
             // This creates a CEventDamageSA for us
             CEventDamage* pEvent = pGameInterface->GetEventList()->GetEventDamage(event);
             pEvent->SetDamageReason(g_GenerateDamageEventReason);
@@ -828,6 +833,9 @@ bool ProcessDamageEvent(CEventDamageSAInterface* event, CPedSAInterface* affects
             bool bReturn = m_pDamageHandler(pPed, pEvent);
             // Destroy the CEventDamageSA (so we dont get a leak)
             pEvent->Destroy();
+
+            affectsPed->m_pCollidedEntity = pSavedCollidedEntity;
+
             // Finally, return
             return bReturn;
         }
