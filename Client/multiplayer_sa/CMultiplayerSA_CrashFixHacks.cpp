@@ -1345,6 +1345,151 @@ bail44:
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_LOAD_ONE_SOUND)
+//
+// BankNumBytes is corrupt, causing a memcpy buffer overflow
+// at 0x4DFE92 (rep movsd). Validate that the copy fits within both
+// the shared m_Buffer and the slot's own NumBytes region.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc47  0x4DFE7D
+#define HOOKSIZE_CrashFix_Misc47 5
+DWORD                 RETURN_CrashFix_Misc47 = 0x4DFE82;
+DWORD                 RETURN_CrashFix_Misc47B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc47()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced code
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx]              // edi = SlotInfo->OffsetBytes
+
+        // Bounds check: OffsetBytes + BankNumBytes <= m_BufferSize
+        mov     ecx, [ebx-12h]          // ecx = req.BankNumBytes
+        mov     eax, edi                // eax = OffsetBytes
+        add     eax, ecx               // eax = OffsetBytes + BankNumBytes
+        jc      bail47                  // unsigned overflow
+        cmp     eax, [ebp+18h]          // compare with m_BufferSize
+        ja      bail47                  // exceeds buffer
+
+        // Slot-local check: BankNumBytes must fit within the slot
+        cmp     ecx, [edx+4]            // compare with SlotInfo->NumBytes
+        ja      bail47                  // exceeds slot region
+
+        jmp     RETURN_CrashFix_Misc47
+
+bail47:
+        push    47
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc47B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_READ, whole-bank path)
+//
+// Same buffer overflow risk as Misc47, but on the whole-bank memcpy
+// at 0x4DFF90. Validate that the copy fits within both the shared
+// m_Buffer and the slot's own NumBytes region.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc48  0x4DFF78
+#define HOOKSIZE_CrashFix_Misc48 5
+DWORD                 RETURN_CrashFix_Misc48 = 0x4DFF7D;
+DWORD                 RETURN_CrashFix_Misc48B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc48()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced code
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx]              // edi = SlotInfo->OffsetBytes
+
+        // Bounds check: OffsetBytes + BankNumBytes <= m_BufferSize
+        mov     ecx, [ebx-12h]          // ecx = req.BankNumBytes
+        mov     eax, edi                // eax = OffsetBytes
+        add     eax, ecx               // eax = OffsetBytes + BankNumBytes
+        jc      bail48                  // unsigned overflow
+        cmp     eax, [ebp+18h]          // compare with m_BufferSize
+        ja      bail48                  // exceeds buffer
+
+        // Slot-local check: BankNumBytes must fit within the slot
+        cmp     ecx, [edx+4]            // compare with SlotInfo->NumBytes
+        ja      bail48                  // exceeds slot region
+
+        jmp     RETURN_CrashFix_Misc48
+
+bail48:
+        push    48
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc48B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_READ, single-sound path)
+//
+// The BankNumBytes subtraction at 0x4E0094 can underflow when the
+// AEAudioStream header contains corrupt data, producing a size that
+// overflows the subsequent Malloc + CdStreamRead allocation. Also
+// validates that the header-derived sound range stays within the
+// bank before it is used to position the next CdStreamRead.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc49  0x4E0094
+#define HOOKSIZE_CrashFix_Misc49 5
+DWORD                 RETURN_CrashFix_Misc49 = 0x4E0099;
+DWORD                 RETURN_CrashFix_Misc49B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc49()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced subtraction
+        sub     ecx, [eax]              // ecx = nextOrEnd - Sounds[SoundID].BankOffsetBytes
+
+        // Reject negative (underflow)
+        test    ecx, ecx
+        js      bail49
+
+        // Reject sizes exceeding the slot capacity
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx+4]            // edi = SlotInfo->NumBytes
+        cmp     ecx, edi                // BankNumBytes > NumBytes?
+        ja      bail49
+
+        // Reject sound ranges that run past the actual bank end
+        movsx   edx, word ptr [ebx-2]   // edx = req.Bank
+        test    edx, edx
+        js      bail49
+        cmp     dx, [ebp+0Eh]           // compare with m_BankLkupCnt
+        jae     bail49
+        lea     edx, [edx+edx*2]        // edx = bank index * 3
+        mov     esi, [ebp+4]            // esi = m_BankLkups
+        mov     esi, [esi+edx*4+8]      // esi = GetBankLookup(req.Bank).NumBytes
+        mov     edx, [eax]              // edx = Sounds[SoundID].BankOffsetBytes
+        add     edx, ecx                // edx = sound end within the bank
+        jc      bail49
+        cmp     edx, esi                // sound end > bank size?
+        ja      bail49
+
+        // Store result and continue
+        mov     [ebx-12h], ecx          // req.BankNumBytes = ecx
+        jmp     RETURN_CrashFix_Misc49
+
+bail49:
+        push    49
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc49B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CAnimBlendAssociation::SetFinishCallback
 //
 // "this" is invalid
@@ -3520,6 +3665,9 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc43);
     EZHookInstall(CrashFix_Misc45);
     EZHookInstall(CrashFix_Misc44);
+    EZHookInstall(CrashFix_Misc47);
+    EZHookInstall(CrashFix_Misc48);
+    EZHookInstall(CrashFix_Misc49);
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
     EZHookInstall(CrashFix_Misc33);
