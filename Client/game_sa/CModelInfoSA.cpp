@@ -1201,6 +1201,8 @@ void CModelInfoSA::ResetTextureDictionaryID()
     if (pGame && pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(targetId))
     {
         ms_DefaultTxdIDMap.erase(it);
+        AddReportLog(9401, SString("ResetTextureDictionaryID: target TXD %u freed, model %u stays on TXD %u", targetId, static_cast<unsigned int>(m_dwModelID),
+                                   static_cast<unsigned int>(GetInterface()->usTextureDictionary)));
         return;
     }
 

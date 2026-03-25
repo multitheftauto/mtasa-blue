@@ -772,13 +772,13 @@ namespace
 
                 if (!bModelLoaded)
                 {
-                    RequeuePendingReplacement(usModelId, entry, true);
+                    RequeuePendingReplacement(usModelId, entry, false);
                     continue;
                 }
 
                 if (bParentStreamingBusy)
                 {
-                    RequeuePendingReplacement(usModelId, entry, true);
+                    RequeuePendingReplacement(usModelId, entry, false);
                     continue;
                 }
 
@@ -4292,6 +4292,20 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     // If the isolated slot is still valid, rebind the model to it.
                     if (CTxdStore_GetTxd(itIsolated->second.usTxdId) != nullptr)
                     {
+                        // Verify the child slot has its parent chain linked before binding.
+                        // Without a valid parent chain, SA's texture walk wont find
+                        // non-replaced textures and the model renders partly white.
+                        auto* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+                        auto* pChildSlot = pTxdPoolSA->GetTextureDictonarySlot(itIsolated->second.usTxdId);
+                        if (!pChildSlot || pChildSlot->usParentIndex == static_cast<unsigned short>(-1))
+                        {
+                            UpdateIsolatedTxdLastUse(usModelId);
+                            if (!g_PendingIsolatedModels.count(usModelId))
+                                AddPendingIsolatedModel(usModelId);
+                            QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                            return false;
+                        }
+
                         pModelInfo->SetTextureDictionaryID(itIsolated->second.usTxdId);
                         UpdateIsolatedTxdLastUse(usModelId);
                     }
