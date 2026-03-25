@@ -3348,7 +3348,61 @@ namespace
         if (!pRwObject)
             return;
 
-        TxdTextureMap txdTextureMap = BuildTxdTextureMap(usTxdId);
+        RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
+        if (!pTxd)
+            return;
+
+        // Walk the full parent chain (child -> parent -> grandparent -> ...) with bounded depth and cycle protection,
+        // then merge root-to-child so child textures win on name conflict
+        constexpr std::size_t kMaxChainDepth = 16;
+        unsigned short        chain[kMaxChainDepth];
+        std::size_t           chainLen = 0;
+        unsigned short        usFirstParentId = static_cast<unsigned short>(-1);
+
+        CTxdPoolSA* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+        for (unsigned short id = usTxdId; pTxdPoolSA && chainLen < kMaxChainDepth;)
+        {
+            bool bCycle = false;
+            for (std::size_t j = 0; j < chainLen; ++j)
+            {
+                if (chain[j] == id)
+                {
+                    bCycle = true;
+                    break;
+                }
+            }
+            if (bCycle)
+                break;
+
+            chain[chainLen++] = id;
+
+            CTextureDictonarySAInterface* pSlot = pTxdPoolSA->GetTextureDictonarySlot(id);
+            if (!pSlot || pSlot->usParentIndex == static_cast<unsigned short>(-1))
+                break;
+
+            if (usFirstParentId == static_cast<unsigned short>(-1))
+                usFirstParentId = pSlot->usParentIndex;
+
+            id = pSlot->usParentIndex;
+        }
+
+        TxdTextureMap txdTextureMap;
+        for (std::size_t i = chainLen; i > 0; --i)
+        {
+            RwTexDictionary* pChainTxd = CTxdStore_GetTxd(chain[i - 1]);
+            if (pChainTxd)
+                MergeCachedTxdTextureMap(chain[i - 1], pChainTxd, txdTextureMap);
+        }
+
+        bool bNeedVehicleFallback = (usFirstParentId != static_cast<unsigned short>(-1)) && TxdChainContainsVehicleTxd(usFirstParentId);
+        if (!bNeedVehicleFallback)
+        {
+            if (pModelInfo->IsVehicle() || pModelInfo->IsUpgrade())
+                bNeedVehicleFallback = true;
+        }
+        if (bNeedVehicleFallback)
+            AddVehicleTxdFallback(txdTextureMap);
+
         if (txdTextureMap.empty())
             return;
 
