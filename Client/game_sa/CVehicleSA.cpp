@@ -839,9 +839,25 @@ void CVehicleSA::LockDoors(bool bLocked)
     }
 }
 
+static DWORD GetCustomUpgradeParentModelID(DWORD dwModelID)
+{
+    CModelInfo* pModelInfo = pGame->GetModelInfo(dwModelID);
+    if (pModelInfo && pModelInfo->GetParentID() != 0)
+    {
+        unsigned int parentID = pModelInfo->GetParentID();
+        if (parentID >= 1000 && parentID <= 1193)
+        {
+            return parentID;
+        }
+    }
+    return dwModelID;
+}
+
 void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
 {
-    if (dwModelID >= 1000 && dwModelID <= 1193)
+    DWORD dwActualModelID = GetCustomUpgradeParentModelID(dwModelID);
+
+    if (dwActualModelID >= 1000 && dwActualModelID <= 1193)
     {
         DWORD dwThis = (DWORD)m_pInterface;
 
@@ -850,7 +866,7 @@ void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
         __asm
         {
             mov     ecx, dwThis
-            push    dwModelID
+            push    dwActualModelID
             call    dwFunc
         }
         // clang-format on
@@ -859,6 +875,8 @@ void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
 
 void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
 {
+    DWORD dwActualModelID = GetCustomUpgradeParentModelID(dwModelID);
+
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CVehicle_RemoveVehicleUpgrade;
 
@@ -866,7 +884,7 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
     __asm
     {
         mov     ecx, dwThis
-        push    dwModelID
+        push    dwActualModelID
         call    dwFunc
     }
     // clang-format on
@@ -875,7 +893,7 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
     // In the case of hydraulics and nitro, this function does not return false and the upgrade is never removed from the array
     for (std::int16_t& upgrade : GetVehicleInterface()->m_upgrades)
     {
-        if (upgrade == dwModelID)
+        if (upgrade == dwModelID || upgrade == dwActualModelID)
         {
             upgrade = -1;
             break;
