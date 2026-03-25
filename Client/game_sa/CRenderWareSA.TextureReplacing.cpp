@@ -4158,7 +4158,73 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
             if (bScriptManagedTxd)
             {
-                // Textures go directly into the script-assigned TXD
+                // Check if another model already has replacement textures in this
+                // script TXD. Importing into a shared TXD overwrites earlier
+                // replacements and causes wrong textures on wrong models.
+                bool bSharedTxdConflict = false;
+                auto itScriptTexInfo = ms_ModelTexturesInfoMap.find(usModelCurrentTxdId);
+                if (itScriptTexInfo != ms_ModelTexturesInfoMap.end())
+                {
+                    for (SReplacementTextures* pExisting : itScriptTexInfo->second.usedByReplacements)
+                    {
+                        if (!pExisting)
+                            continue;
+                        for (unsigned short usExistingModelId : pExisting->usedInModelIds)
+                        {
+                            if (usExistingModelId != usModelId)
+                            {
+                                bSharedTxdConflict = true;
+                                break;
+                            }
+                        }
+                        if (bSharedTxdConflict)
+                            break;
+                    }
+                }
+
+                if (bSharedTxdConflict)
+                {
+                    // Isolate this model to its own TXD so its replacements don't
+                    // overwrite another model's textures in the shared script TXD.
+                    const bool bIsolatedOk = EnsureIsolatedTxdForRequestedModel(usModelId);
+                    if (!bIsolatedOk)
+                    {
+                        QueuePendingReplacement(usModelId, pReplacementTextures, uiParentModelId, usParentTxdId);
+                        return false;
+                    }
+                    // Model is now on a private TXD - fall through to add logic
+                }
+                else
+                {
+                    // Script TXDs from engineRequestTXD have no parent chain
+                    // (usParentIndex == 0xFFFF). Without one, SA's texture walk
+                    // can't find non-replaced textures from the base model's
+                    // TXD, so unreplaced materials go white. Link the script TXD
+                    // to the base model's parent TXD so the walk reaches them.
+                    auto* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+                    auto* pScriptSlot = pTxdPoolSA ? pTxdPoolSA->GetTextureDictonarySlot(usModelCurrentTxdId) : nullptr;
+
+                    if (pScriptSlot && pScriptSlot->usParentIndex == static_cast<unsigned short>(-1) && pScriptSlot->rwTexDictonary)
+                    {
+                        bool bParentAvailable = CTxdStore_GetTxd(usParentTxdId) != nullptr;
+                        if (!bParentAvailable && pParentInfo)
+                        {
+                            pParentInfo->Request(BLOCKING, "ModelInfoTXDAddTextures-scriptParent");
+                            bParentAvailable = CTxdStore_GetTxd(usParentTxdId) != nullptr;
+                        }
+
+                        if (bParentAvailable)
+                        {
+                            pScriptSlot->usParentIndex = usParentTxdId;
+                            CTxdStore_SetupTxdParent(usModelCurrentTxdId);
+                        }
+                        else
+                        {
+                            QueuePendingReplacement(usModelId, pReplacementTextures, uiParentModelId, usParentTxdId);
+                            return false;
+                        }
+                    }
+                }
             }
             else if (!g_bInTxdReapply)
             {
