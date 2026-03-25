@@ -2159,6 +2159,56 @@ static void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// _RwD3D9DynamicVertexBufferCreate
+//
+// NULL VB pointer crash when reusing a DynamicVertexBuffer list entry
+// whose prior CreateVertexBuffer call failed (out of video mem).
+// The entry has in_use=0, pVB=NULL, size=old_size. When the function
+// finds this entry with a non-matching size, it tries to Release() the
+// old VB through a NULL pointer (crash at 0x003F5A3A / 0x7F5A3A: mov ecx,[eax]).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+//
+// Hook at 0x7F5A36 replaces: mov eax,[esi+8]; push eax; mov ecx,[eax]
+// On NULL, skip the Release() block and continue to VB reallocation.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_DynVBCreateNull   0x7F5A36
+#define HOOKSIZE_CrashFix_DynVBCreateNull  6
+#define HOOKCHECK_CrashFix_DynVBCreateNull 0x8B
+DWORD RETURN_CrashFix_DynVBCreateNull = 0x7F5A3C;
+DWORD RETURN_CrashFix_DynVBCreateNull_Skip = 0x7F5A8F;
+
+static void _declspec(naked) HOOK_CrashFix_DynVBCreateNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esi+8]                         // load VB pointer from list entry
+        test    eax, eax
+        jz      bail_out_dynvb
+
+        // Replicate overwritten bytes (push eax; mov ecx,[eax])
+        push    eax
+        mov     ecx, [eax]
+        jmp     RETURN_CrashFix_DynVBCreateNull
+
+    bail_out_dynvb:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    46
+        call    CrashAverted
+        jmp     RETURN_CrashFix_DynVBCreateNull_Skip
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CClumpModelInfo::GetFrameFromId
 //
 // Invalid frame
@@ -3481,6 +3531,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_VBInstV3dNull);
     EZHookInstallChecked(CrashFix_VBInstV3dMorphNull);
     EZHookInstallChecked(CrashFix_VBInstWeightsNull);
+    EZHookInstallChecked(CrashFix_DynVBCreateNull);
     EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
