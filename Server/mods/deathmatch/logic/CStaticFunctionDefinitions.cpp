@@ -1624,9 +1624,8 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
         return false;
     }
 
-    ConvertDegreesToRadians(vecRotation);
-
     pElement->SetAttachedOffsets(vecPosition, vecRotation);
+    ConvertDegreesToRadians(vecRotation);
     pElement->AttachTo(pAttachedToElement);
 
     if (IS_MARKER(pElement))
@@ -3367,7 +3366,7 @@ bool CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(CElement* pElement, u
         {
             CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-            if (pPlayer->SetScriptDebugLevel(static_cast<uint8_t>(uiLevel)))
+            if (pPlayer->SetScriptDebugLevel(static_cast<std::uint8_t>(uiLevel)))
                 return SetPlayerDebuggerVisible(pElement, uiLevel != 0);
         }
     }

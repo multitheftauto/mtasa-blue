@@ -280,16 +280,24 @@ void CClientIFP::ReadSequenceVersion2(SSequenceHeaderV2& ObjectNode)
 bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames,
                                        bool isUncompressed)
 {
-    size_t iCompressedFrameSize = GetSizeOfCompressedFrame(iFrameType, isUncompressed);
-    if (iCompressedFrameSize)
-    {
-        BYTE* pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(iCompressedFrameSize * cFrames);
-        pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed && !isUncompressed, pKeyFrames);
-        ReadKeyFrames(pAnimationSequence, iFrameType, cFrames, isUncompressed);
+    if (cFrames <= 0)
+        return false;
 
-        return true;
+    size_t iCompressedFrameSize = GetSizeOfCompressedFrame(iFrameType, isUncompressed);
+    if (iCompressedFrameSize == 0)
+      return false;
+
+    BYTE* pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(iCompressedFrameSize * cFrames);
+    if (!pKeyFrames)
+    {
+        // Advance stream past frame data to keep subsequent reads aligned
+        SkipBytes(static_cast<std::uint32_t>(iSourceFrameSize * cFrames));
+        return false;
     }
-    return false;
+
+    pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed && !isUncompressed, pKeyFrames);
+    ReadKeyFrames(pAnimationSequence, iFrameType, cFrames, isUncompressed);
+    return true;
 }
 
 void CClientIFP::ReadHeaderVersion1(SInfo& Info)
@@ -612,6 +620,9 @@ void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence
 
     const size_t FramesDataSizeInBytes = FrameSize * cKeyFrames;
     BYTE*        pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(FramesDataSizeInBytes);
+    if (!pKeyFrames)
+        return;
+
     pAnimationSequence->SetKeyFrames(cKeyFrames, bHasTranslationValues, m_kbAllKeyFramesCompressed && !isUncompressed, pKeyFrames);
     CopyDummyKeyFrameByBoneID(pKeyFrames, dwBoneID);
 }

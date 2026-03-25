@@ -187,6 +187,7 @@ public:
     virtual ERenderFormat  GetDepthBufferFormat() = 0;
     virtual void           SaveReadableDepthBuffer() = 0;
     virtual void           FlushNonAARenderTarget() = 0;
+    virtual bool           IsUsingDefaultRenderTarget() = 0;
     virtual HRESULT        HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                              int Filter) = 0;
 };
@@ -482,18 +483,21 @@ class CFileTextureItem : public CTextureItem
 class CVectorGraphicItem : public CTextureItem
 {
     DECLARE_CLASS(CVectorGraphicItem, CTextureItem)
-    CVectorGraphicItem() : ClassInit(this) {}
+    CVectorGraphicItem() : ClassInit(this), m_uiLastEnsureAttempt(0), m_uiEnsureDelayMs(0) {}
     virtual void PostConstruct(CRenderItemManager* pRenderItemManager, uint width, uint height);
     virtual void PreDestruct();
     virtual bool IsValid();
     virtual void OnLostDevice();
     virtual void OnResetDevice();
+    bool         TryEnsureValid();
     void         CreateUnderlyingData();
     void         ReleaseUnderlyingData();
     void         UpdateTexture();
     virtual void Resize(const CVector2D& size);
 
     IDirect3DSurface9* m_pD3DRenderTargetSurface;
+    uint               m_uiLastEnsureAttempt;
+    uint               m_uiEnsureDelayMs;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -504,13 +508,14 @@ class CVectorGraphicItem : public CTextureItem
 class CRenderTargetItem : public CTextureItem
 {
     DECLARE_CLASS(CRenderTargetItem, CTextureItem)
-    CRenderTargetItem() : ClassInit(this) {}
+    CRenderTargetItem() : ClassInit(this), m_uiLastEnsureAttempt(0), m_uiEnsureDelayMs(0) {}
     virtual void PostConstruct(CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel, int surfaceFormat,
                                bool bIncludeInMemoryStats);
     virtual void PreDestruct();
     virtual bool IsValid();
     virtual void OnLostDevice();
     virtual void OnResetDevice();
+    bool         TryEnsureValid();
     void         CreateUnderlyingData();
     void         ReleaseUnderlyingData();
     bool         ReadPixels(CBuffer& outBuffer, SString& strOutError);
@@ -521,6 +526,8 @@ class CRenderTargetItem : public CTextureItem
     IDirect3DSurface9* m_pD3DRenderTargetSurface;
     IDirect3DSurface9* m_pD3DZStencilSurface;
     IDirect3DSurface9* m_pD3DReadSurface;
+    uint               m_uiLastEnsureAttempt;
+    uint               m_uiEnsureDelayMs;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -531,17 +538,20 @@ class CRenderTargetItem : public CTextureItem
 class CScreenSourceItem : public CTextureItem
 {
     DECLARE_CLASS(CScreenSourceItem, CTextureItem)
-    CScreenSourceItem() : ClassInit(this) {}
+    CScreenSourceItem() : ClassInit(this), m_uiLastEnsureAttempt(0), m_uiEnsureDelayMs(0) {}
     virtual void PostConstruct(CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY);
     virtual void PreDestruct();
     virtual bool IsValid();
     virtual void OnLostDevice();
     virtual void OnResetDevice();
+    bool         TryEnsureValid();
     void         CreateUnderlyingData();
     void         ReleaseUnderlyingData();
 
     IDirect3DSurface9* m_pD3DRenderTargetSurface;
     uint               m_uiRevision;
+    uint               m_uiLastEnsureAttempt;
+    uint               m_uiEnsureDelayMs;
 };
 
 ////////////////////////////////////////////////////////////////

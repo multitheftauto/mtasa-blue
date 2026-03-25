@@ -655,11 +655,14 @@ void CHudSA::RenderHealthBar(int x, int y)
     float barWidth = useCustomSize ? componentProperties.hpBar.placement.customWidth : componentProperties.hpBar.placement.width;
 
     // Calc bar width depending on MAX_HEALTH stat
-    float statModifier = ((float(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
-    float totalWidth = (barWidth * maxHealth) / statModifier;
+    const double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
+    if (statModifier <= 0.0)
+        return;
 
-    float         posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + x);
-    float         posY = useCustomPosition ? componentProperties.hpBar.placement.customY : y;
+    const float totalWidth = static_cast<float>((static_cast<double>(barWidth) * maxHealth) / statModifier);
+
+    const float   posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + static_cast<float>(x));
+    const float   posY = useCustomPosition ? componentProperties.hpBar.placement.customY : static_cast<float>(y);
     std::uint32_t barHeight =
         static_cast<std::uint32_t>(useCustomSize ? componentProperties.hpBar.placement.customHeight : componentProperties.hpBar.placement.height);
 
@@ -687,21 +690,24 @@ void CHudSA::RenderBreathBar(int x, int y)
     }
 
     // Calc bar width depending on AIR_IN_LUNG stat
-    float statModifier = ((float(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(8);
+    const double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(8);
+    if (statModifier <= 0.0)
+        return;
 
     // Use custom position/size?
     bool useCustomPosition = componentProperties.breathBar.placement.useCustomPosition;
     bool useCustomSize = componentProperties.breathBar.placement.useCustomSize;
 
-    float         posX = useCustomPosition ? componentProperties.breathBar.placement.customX : x;
-    float         posY = useCustomPosition ? componentProperties.breathBar.placement.customY : y;
+    const float   posX = useCustomPosition ? componentProperties.breathBar.placement.customX : static_cast<float>(x);
+    const float   posY = useCustomPosition ? componentProperties.breathBar.placement.customY : static_cast<float>(y);
     std::uint16_t barWidth =
         static_cast<std::uint16_t>(useCustomSize ? componentProperties.breathBar.placement.customWidth : componentProperties.breathBar.placement.width);
     std::uint32_t barHeight =
         static_cast<std::uint32_t>(useCustomSize ? componentProperties.breathBar.placement.customHeight : componentProperties.breathBar.placement.height);
 
     // call CSprite2d::DrawBarChart
-    DrawBarChart(posX, posY, barWidth, barHeight, playerPed->GetOxygenLevel() / statModifier * 100.0f, false, componentProperties.breathBar.drawPercentage,
+    const float breathPercent = static_cast<float>((static_cast<double>(playerPed->GetOxygenLevel()) / statModifier) * 100.0);
+    DrawBarChart(posX, posY, barWidth, barHeight, breathPercent, false, componentProperties.breathBar.drawPercentage,
                  componentProperties.breathBar.drawBlackBorder, componentProperties.breathBar.fillColor, COLOR_BLACK);
 }
 
@@ -727,8 +733,8 @@ void CHudSA::RenderArmorBar(int x, int y)
     bool useCustomPosition = componentProperties.hpBar.placement.useCustomPosition;
     bool useCustomSize = componentProperties.hpBar.placement.useCustomSize;
 
-    float         posX = useCustomPosition ? componentProperties.armorBar.placement.customX : x;
-    float         posY = useCustomPosition ? componentProperties.armorBar.placement.customY : y;
+    const float   posX = useCustomPosition ? componentProperties.armorBar.placement.customX : static_cast<float>(x);
+    const float   posY = useCustomPosition ? componentProperties.armorBar.placement.customY : static_cast<float>(y);
     std::uint16_t barWidth =
         static_cast<std::uint16_t>(useCustomSize ? componentProperties.armorBar.placement.customWidth : componentProperties.armorBar.placement.width);
     std::uint32_t barHeight =

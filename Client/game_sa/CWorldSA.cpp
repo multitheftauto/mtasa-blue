@@ -789,8 +789,10 @@ int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutT
             {
                 SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
 
-                float fDistance = sqrtf(powf(vecPosition.fZ - railNode.sZ * 0.125f, 2) + powf(vecPosition.fY - railNode.sY * 0.125f, 2) +
-                                        powf(vecPosition.fX - railNode.sX * 0.125f, 2));
+                const float fDeltaZ = vecPosition.fZ - railNode.sZ * 0.125f;
+                const float fDeltaY = vecPosition.fY - railNode.sY * 0.125f;
+                const float fDeltaX = vecPosition.fX - railNode.sX * 0.125f;
+                const float fDistance = std::sqrt(fDeltaZ * fDeltaZ + fDeltaY * fDeltaY + fDeltaX * fDeltaX);
                 if (fDistance < fMinDistance)
                 {
                     fMinDistance = fDistance;

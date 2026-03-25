@@ -101,13 +101,14 @@ struct SShaderInfo
 struct STexInfo
 {
     STexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData)
-        : texTag(texTag), strTextureName(strTextureName.ToLower()), pD3DData(pD3DData), pAssociatedTexNameInfo(nullptr)
+        : texTag(texTag), strTextureName(strTextureName.ToLower()), pD3DData(pD3DData), pAssociatedTexNameInfo(nullptr), bInTexInfoMap(false)
     {
     }
     STexTag          texTag;
     const SString    strTextureName;  // Always lower case
     CD3DDUMMY* const pD3DData;
     STexNameInfo*    pAssociatedTexNameInfo;
+    bool             bInTexInfoMap;
 };
 
 struct SShaderInfoInstance
@@ -172,28 +173,13 @@ struct STexNameInfo
     {
         // Mark invalid without clearing bSet - preserves data for safe renderer access
         // Data will be rebuilt on next access when bValid=false is detected
-        for (auto& shader : texNoEntityShaders)
+        for (STexShaderReplacement& shader : texNoEntityShaders)
         {
             shader.bValid = false;
         }
-        for (auto& pair : texEntityShaderMap)
+        for (CFastHashMap<CClientEntityBase*, STexShaderReplacement>::value_type& pair : texEntityShaderMap)
         {
             pair.second.bValid = false;
-        }
-    }
-
-    // Remove entries that have been marked invalid (deferred cleanup)
-    void CleanupInvalidatedEntries()
-    {
-        // Remove invalidated entity shader mappings
-        for (auto iter = texEntityShaderMap.begin(); iter != texEntityShaderMap.end();)
-        {
-            if (!iter->second.bValid)
-            {
-                texEntityShaderMap.erase(iter++);
-            }
-            else
-                ++iter;
         }
     }
 

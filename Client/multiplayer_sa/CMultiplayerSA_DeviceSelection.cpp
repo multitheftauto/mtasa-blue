@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#include <cstring>
 #define FUNC_rwDeviceSystemRequest     0x7F2AB0
 #define FUNC_DialogFunc                0x745E50
 #define FUNC_RwEngineGetSubSystemInfo  0x7F2C30
@@ -26,9 +28,28 @@ std::unordered_map<std::string, std::string> GetFriendlyMonitorNamesForDevicePat
     if (!user32Lib)
         return monitorNames;
 
-    auto* getDisplayConfigBufferSizes = (decltype(GetDisplayConfigBufferSizes)*)static_cast<void*>(GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes"));
-    auto* queryDisplayConfig = (decltype(QueryDisplayConfig)*)static_cast<void*>(GetProcAddress(user32Lib, "QueryDisplayConfig"));
-    auto* displayConfigGetDeviceInfo = (decltype(DisplayConfigGetDeviceInfo)*)static_cast<void*>(GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo"));
+    using GetDisplayConfigBufferSizesFn = decltype(&GetDisplayConfigBufferSizes);
+    using QueryDisplayConfigFn = decltype(&QueryDisplayConfig);
+    using DisplayConfigGetDeviceInfoFn = decltype(&DisplayConfigGetDeviceInfo);
+
+    GetDisplayConfigBufferSizesFn getDisplayConfigBufferSizes = nullptr;
+    QueryDisplayConfigFn          queryDisplayConfig = nullptr;
+    DisplayConfigGetDeviceInfoFn  displayConfigGetDeviceInfo = nullptr;
+
+    const auto procGetDisplayConfigBufferSizes = GetProcAddress(user32Lib, "GetDisplayConfigBufferSizes");
+    const auto procQueryDisplayConfig = GetProcAddress(user32Lib, "QueryDisplayConfig");
+    const auto procDisplayConfigGetDeviceInfo = GetProcAddress(user32Lib, "DisplayConfigGetDeviceInfo");
+
+    static_assert(sizeof(getDisplayConfigBufferSizes) == sizeof(procGetDisplayConfigBufferSizes), "Unexpected function pointer size");
+    static_assert(sizeof(queryDisplayConfig) == sizeof(procQueryDisplayConfig), "Unexpected function pointer size");
+    static_assert(sizeof(displayConfigGetDeviceInfo) == sizeof(procDisplayConfigGetDeviceInfo), "Unexpected function pointer size");
+
+    if (procGetDisplayConfigBufferSizes)
+        std::memcpy(&getDisplayConfigBufferSizes, &procGetDisplayConfigBufferSizes, sizeof(getDisplayConfigBufferSizes));
+    if (procQueryDisplayConfig)
+        std::memcpy(&queryDisplayConfig, &procQueryDisplayConfig, sizeof(queryDisplayConfig));
+    if (procDisplayConfigGetDeviceInfo)
+        std::memcpy(&displayConfigGetDeviceInfo, &procDisplayConfigGetDeviceInfo, sizeof(displayConfigGetDeviceInfo));
     if (!getDisplayConfigBufferSizes || !queryDisplayConfig || !displayConfigGetDeviceInfo)
     {
         FreeLibrary(user32Lib);
@@ -65,14 +86,14 @@ std::unordered_map<std::string, std::string> GetFriendlyMonitorNamesForDevicePat
         targetName.header.id = paths[i].targetInfo.id;
         targetName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME;
         targetName.header.size = sizeof(targetName);
-        const LONG targetNameResult = DisplayConfigGetDeviceInfo(&targetName.header);
+        const LONG targetNameResult = displayConfigGetDeviceInfo(&targetName.header);
 
         DISPLAYCONFIG_SOURCE_DEVICE_NAME sourceName = {};
         sourceName.header.adapterId = paths[i].sourceInfo.adapterId;
         sourceName.header.id = paths[i].sourceInfo.id;
         sourceName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
         sourceName.header.size = sizeof(sourceName);
-        const LONG sourceNameResult = DisplayConfigGetDeviceInfo(&sourceName.header);
+        const LONG sourceNameResult = displayConfigGetDeviceInfo(&sourceName.header);
         if (targetNameResult == ERROR_SUCCESS && sourceNameResult == ERROR_SUCCESS && targetName.monitorFriendlyDeviceName[0] != '\0')
         {
             char gdiDeviceName[std::size(sourceName.viewGdiDeviceName)];

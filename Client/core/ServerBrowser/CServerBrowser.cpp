@@ -2141,7 +2141,7 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
                 if (CServerListItem::Parse(pHostAttribute->GetValue().c_str(), Address))
                 {
                     iPort = atoi(pPortAttribute->GetValue().c_str());
-                    if (iPort > 0)
+                    if (iPort > 0 && iPort <= 0xFFFF)
                         pList->AddUnique(Address, static_cast<ushort>(iPort));
                 }
             }

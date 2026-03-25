@@ -117,6 +117,11 @@ void CGraphStats::AddTimingPoint(const char* szName)
     std::uint32_t viewportWidth = pGraphics->GetViewportWidth();
     std::uint32_t sizeX = viewportWidth / 4;  // one quarter of screen width
 
+    if (sizeX == 0)
+        return;
+
+    const int iSizeX = static_cast<int>(sizeX);
+
     // Start of next frame?
     if (szName[0] == 0)
     {
@@ -137,7 +142,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
                 for (int i = 0; i < Dups; i++)
                 {
                     pLine->iDataPos++;
-                    if (pLine->iDataPos > static_cast<int>(sizeX - 1))
+                    if (pLine->iDataPos >= iSizeX)
                         pLine->iDataPos = 0;
                     pLine->dataHistory[pLine->iDataPos] = Data;
                 }
@@ -158,7 +163,6 @@ void CGraphStats::AddTimingPoint(const char* szName)
         MapSet(m_LineList, szName, SGraphStatLine());
         pLine = MapFind(m_LineList, szName);
         pLine->dataHistory.resize(sizeX);
-        memset(&pLine->dataHistory[0], 0, pLine->dataHistory.size());
         pLine->iDataPos = 0;
         pLine->prevData = 0;
         pLine->strName = szName;
@@ -169,9 +173,10 @@ void CGraphStats::AddTimingPoint(const char* szName)
         uchar* p = md5.data;
         while (p[0] + p[1] + p[2] < 128)
         {
-            int f = rand() % NUMELMS(md5.data);
-            int t = rand() % 3;
-            p[t] = std::min<unsigned char>(255, p[t] + p[f] + 1);
+            int       f = rand() % NUMELMS(md5.data);
+            int       t = rand() % 3;
+            const int newValue = std::min(255, static_cast<int>(p[t]) + static_cast<int>(p[f]) + 1);
+            p[t] = static_cast<uchar>(newValue);
         }
         pLine->color = SColorRGBA(p[0], p[1], p[2], 255);
     }
@@ -183,7 +188,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
 
     // Inc position
     pLine->iDataPos++;
-    if (pLine->iDataPos > static_cast<int>(sizeX - 1))
+    if (pLine->iDataPos >= iSizeX)
         pLine->iDataPos = 0;
 
     // Insert data point
@@ -228,6 +233,11 @@ void CGraphStats::Draw()
     std::uint32_t sizeY = viewportHeight / 4;                       // set the height of graph to 1/4 of current resolution
     std::uint32_t rangeY = 100;                                     // 100ms
 
+    if (sizeX == 0)
+        return;
+
+    const int iSizeX = static_cast<int>(sizeX);
+
     originY = originY + sizeY + 30;  // add graph height plus a little gap to the overall Y position
 
     float fLineScale = 1 / 1000.f / rangeY * sizeY;
@@ -245,7 +255,7 @@ void CGraphStats::Draw()
         int                   iDataPos = line.iDataPos;
         int                   iDataPosPrev = iDataPos;
 
-        for (int i = sizeX - 1; i > 0; i--)
+        for (int i = iSizeX - 1; i > 0; i--)
         {
             float fY0 = line.dataHistory[iDataPos] * fLineScale;
             float fY1 = line.dataHistory[iDataPosPrev] * fLineScale;
@@ -253,11 +263,11 @@ void CGraphStats::Draw()
             iDataPosPrev = iDataPos;
             iDataPos--;
             if (iDataPos == -1)
-                iDataPos = sizeX - 1;
+                iDataPos = iSizeX - 1;
 
             pGraphics->DrawLineQueued(originX + i - 1, originY - fY0, originX + i, originY - fY1, 1, line.color, true);
 
-            if (i == sizeX - 1)
+            if (i == iSizeX - 1)
             {
                 // Line from graph to label
                 pGraphics->DrawLineQueued(originX + i - 1, originY - fY0, fLabelX - 2, fLabelY + fLineHeight / 2, 1, line.color, true);

@@ -271,6 +271,11 @@ private:
     {
         BYTE*  pKeyFrames = pAnimationSequence->GetKeyFrames();
         size_t iSizeInBytes = sizeof(T) * iFrames;
+        if (!pKeyFrames)
+        {
+            SkipBytes(static_cast<std::uint32_t>(iSizeInBytes));
+            return;
+        }
         ReadBytes(pKeyFrames, iSizeInBytes);
     }
 

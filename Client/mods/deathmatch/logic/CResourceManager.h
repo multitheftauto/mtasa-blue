@@ -39,6 +39,9 @@ public:
     CResource* GetResourceFromLuaState(struct lua_State* luaVM);
     SString    GetResourceName(struct lua_State* luaVM);
 
+    std::list<CResource*>::const_iterator IterBegin() { return m_resources.begin(); };
+    std::list<CResource*>::const_iterator IterEnd() { return m_resources.end(); };
+
     bool RemoveResource(unsigned short usID);
     void Remove(CResource* pResource);
     bool Exists(CResource* pResource);

@@ -17,6 +17,11 @@
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
 
+typedef RwRaster*(__cdecl* RwRasterUnlock_t)(RwRaster* raster);
+typedef RwRaster*(__cdecl* RwRasterLock_t)(RwRaster* raster, unsigned char level, int lockmode);
+extern RwRasterUnlock_t RwRasterUnlock;
+extern RwRasterLock_t   RwRasterLock;
+
 class CEventDamageSAInterface;
 
 extern CCoreInterface* g_pCore;
@@ -38,6 +43,8 @@ extern CGame* pGameInterface;
 #define HOOKPOS_CRunningScript_Process                   0x469F00
 #define HOOKPOS_CExplosion_AddExplosion                  0x736A50
 #define HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic 0x6FF35B
+#define HOOKPOS_CEntity__CreateEffects_RoadsignAtomic    0x53388C
+#define HOOKPOS_RoadsignGenerateTextRaster               0x6FEB70
 #define HOOKPOS_Trailer_BreakTowLink                     0x6E0027
 #define HOOKPOS_CRadar__DrawRadarGangOverlay             0x586650
 #define HOOKPOS_CTaskComplexJump__CreateSubTask          0x67DABE
@@ -54,6 +61,9 @@ extern CGame* pGameInterface;
 #define FUNC_CAudioEngine__DisplayRadioStationName 0x507030
 #define FUNC_CHud_Draw                             0x58FAE0
 #define FUNC_CPlayerInfoBase                       0xB7CD98
+#define FUNC_RoadsignGetLineAndRow                 0x6FE260
+
+#define VAR_RoadsignRasterLockedData 0xC3EF88
 
 #define ADDR_CursorHiding 0x7481CD
 #define ADDR_GotFocus     0x748054
@@ -61,8 +71,10 @@ extern CGame* pGameInterface;
 #define HOOKPOS_FxManager_CreateFxSystem  0x4A9BE0
 #define HOOKPOS_FxManager_DestroyFxSystem 0x4A9810
 
-DWORD RETURN_FxManager_CreateFxSystem = 0x4A9BE8;
-DWORD RETURN_FxManager_DestroyFxSystem = 0x4A9817;
+DWORD                           RETURN_FxManager_CreateFxSystem = 0x4A9BE8;
+DWORD                           RETURN_FxManager_DestroyFxSystem = 0x4A9817;
+static constexpr std::uintptr_t RETURN_CEntity__CreateEffects_RoadsignAtomic = 0x533891;
+static constexpr std::uintptr_t RETURN_CEntity__CreateEffects_RoadsignSkip = 0x5337E7;
 
 #define HOOKPOS_CCam_ProcessFixed                           0x51D470
 #define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon 0x6859a0
@@ -426,6 +438,8 @@ void HOOK_CHud_Draw_Caller();
 void HOOK_CRunningScript_Process();
 void HOOK_CExplosion_AddExplosion();
 void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
+void HOOK_CEntity__CreateEffects_RoadsignAtomic();
+void HOOK_RoadsignGenerateTextRaster();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
 void HOOK_CTaskComplexJump__CreateSubTask();
@@ -637,6 +651,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
     HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
     HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
+    HookInstall(HOOKPOS_CEntity__CreateEffects_RoadsignAtomic, (DWORD)HOOK_CEntity__CreateEffects_RoadsignAtomic, 5);
+    HookInstall(HOOKPOS_RoadsignGenerateTextRaster, (DWORD)HOOK_RoadsignGenerateTextRaster, 5);
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
     HookInstall(HOOKPOS_CTaskComplexJump__CreateSubTask, (DWORD)HOOK_CTaskComplexJump__CreateSubTask, 6);
@@ -839,6 +855,12 @@ void CMultiplayerSA::InitHooks()
 
     // MemSet ( (void*)0x408A1B, 0x90, 5 );
 
+    // CTxdStore::GetNumRefs freed-slot error path does xor eax,eax then movsx eax,[eax+4]
+    // which is a null-deref (reads address 0x4). In SA its dead code, but MTA can reach it
+    // when a stale streaming entry references a freed TXD pool slot. NOP the movsx so
+    // freed slots return 0 refs instead of crashing.
+    MemSet((void*)0x731AB5, 0x90, 4);
+
     // Hack to make the choke task use 0 time left remaining when he starts t
     // just stand there looking. So he won't do that.
     MemPut<unsigned char>(0x620607, 0x33);
@@ -1029,8 +1051,8 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x44C39A + 4, 0x00);
     MemPut<BYTE>(0x44C39A + 5, 0x00);
 
-    // Avoid garage doors closing when you change your model
-    MemSet((LPVOID)0x4486F7, 0x90, 4);
+    // Disable CGarages::PlayerArrestedOrDied to stop the game from automatically closing/opening garages
+    MemSet((void*)0x442303, 0x90, 5);
 
     // Disable CStats::IncrementStat (returns at start of function)
     MemPut<BYTE>(0x55C180, 0xC3);
@@ -1564,6 +1586,10 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x6C444B, 0x90, 6);
     MemSet((void*)0x6C4453, 0x90, 0x68);
 
+    // Allow model ID 432 (Rhino) to render headlight cones and coronas
+    MemSet((void*)0x6A2EAB, 0x90, 6);
+    MemSet((void*)0x6ABC81, 0x90, 6);
+
     // Disable Z position changes in the matrix in the C3dMarkers::PlaceMarker (#4000, #536)
     // To prevent arrow-type markers from snapping to the ground
     MemCpy((void*)0x725844, "\xDD\xD8\x90", 3);
@@ -1575,6 +1601,10 @@ void CMultiplayerSA::InitHooks()
     // Disable spreading fires (Moved from multiplayer_shotsync)
     MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
     MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
+
+    // Fix objects with alpha below 141 are invisible (#425)
+    MemPut<BYTE>(0x553AD9, 0);
+    MemPut<BYTE>(0x732C2F, 0);
 
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
@@ -1693,25 +1723,15 @@ void CMultiplayerSA::DisablePadHandler(bool bDisabled)
 
 void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
 {
-    int*  CPostEffects__m_HeatHazeFXIntensity = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXIntensity)>(0x8D50E8);
-    int*  CPostEffects__m_HeatHazeFXRandomShift = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRandomShift)>(0xC402C0);
-    int*  CPostEffects__m_HeatHazeFXSpeedMin = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMin)>(0xC402C0);
-    int*  CPostEffects__m_HeatHazeFXSpeedMax = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMax)>(0x8D50F0);
-    int*  CPostEffects__m_HeatHazeFXScanSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeX)>(0xC40304);
-    int*  CPostEffects__m_HeatHazeFXScanSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeY)>(0xC40308);
-    int*  CPostEffects__m_HeatHazeFXRenderSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRenderSizeX)>(0xC4030C);
-    int*  CPostEffects__m_HeatHazeFXRenderSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRenderSizeY)>(0xC40310);
-    bool* CPostEffects__m_bHeatHazeFX = reinterpret_cast<decltype(CPostEffects__m_bHeatHazeFX)>(0xC402BA);
-
-    settings.ucIntensity = static_cast<uchar>(*CPostEffects__m_HeatHazeFXIntensity);
-    settings.ucRandomShift = static_cast<uchar>(*CPostEffects__m_HeatHazeFXRandomShift);
-    settings.usSpeedMin = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMin);
-    settings.usSpeedMax = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMax);
-    settings.sScanSizeX = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeY);
-    settings.sScanSizeY = static_cast<short>(*CPostEffects__m_HeatHazeFXSpeedMax);
-    settings.usRenderSizeX = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeX);
-    settings.usRenderSizeY = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeY);
-    settings.bInsideBuilding = *CPostEffects__m_bHeatHazeFX;
+    settings.ucIntensity = *(uchar*)0x8D50E8;
+    settings.ucRandomShift = *(uchar*)0xC402C0;
+    settings.usSpeedMin = *(ushort*)0x8D50EC;
+    settings.usSpeedMax = *(ushort*)0x8D50F0;
+    settings.sScanSizeX = *(short*)0xC40304;
+    settings.sScanSizeY = *(short*)0xC40308;
+    settings.usRenderSizeX = *(ushort*)0xC4030C;
+    settings.usRenderSizeY = *(ushort*)0xC40310;
+    settings.bInsideBuilding = *(bool*)0xC402BA;
 }
 
 void CMultiplayerSA::ResetColorFilter()
@@ -2229,7 +2249,7 @@ void CMultiplayerSA::ResetSky()
 
 void CMultiplayerSA::SetMoonSize(int iSize)
 {
-    MemPutFast(0x8D4B60, static_cast<BYTE>(iSize));
+    MemPutFast<BYTE>(0x8D4B60, static_cast<BYTE>(iSize));
 }
 
 int CMultiplayerSA::GetMoonSize()
@@ -3091,6 +3111,130 @@ static void __declspec(naked) HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic()
 no_render:
         mov     edx, 0x6FF40B
         jmp     edx
+    }
+    // clang-format on
+}
+
+// Mirror the existing roadsign render guard in the create path.
+// CreateEffects stores the loop index and model info on the stack, so restore them
+// before continuing with the switch loop when roadsign atomic creation fails.
+void _declspec(naked) HOOK_CEntity__CreateEffects_RoadsignAtomic()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        mov     ebx, eax
+        test    ebx, ebx
+        jz      no_atomic
+
+        mov     edi, [ebx+4]
+        mov     edx, RETURN_CEntity__CreateEffects_RoadsignAtomic
+        jmp     edx
+
+    no_atomic:
+        mov     dword ptr [esi+2Ch], 0
+        mov     edi, [esp+40h]
+        mov     ebx, [esp+44h]
+        add     esp, 24h
+        mov     edx, RETURN_CEntity__CreateEffects_RoadsignSkip
+        jmp     edx
+    }
+    // clang-format on
+}
+
+static void CallRoadsignGetLineAndRow(char cLetter, int* pCol, int* pRow) noexcept
+{
+    // SA passes the character in AL for this helper.
+    __asm
+        {
+        mov     al, cLetter
+        push    pRow
+        push    pCol
+        mov     edx, FUNC_RoadsignGetLineAndRow
+        call    edx
+        add     esp, 8
+        }
+}
+
+[[nodiscard]] static bool RoadsignGenerateTextRaster_Fixed(const char* szRoadName, int iNumLetters, RwRaster* pCharsetRaster, RwRaster* pSignRaster) noexcept
+{
+    constexpr int SIGN_CHAR_WIDTH = 8;
+    constexpr int SIGN_CHAR_HEIGHT = 16;
+    constexpr int SIGN_PIXEL_BYTES = 4;
+    constexpr int CHARSET_COLS_PER_ROW = 64;
+    constexpr int LOCKMODE_WRITE_NOFETCH = 5;
+
+    struct SRoadsignRasterView
+    {
+        void*         pParent;
+        std::uint8_t* pPixels;
+        std::uint8_t* pPalette;
+        int           iWidth;
+        int           iHeight;
+        int           iDepth;
+        int           iStride;
+    };
+
+    auto* pSignLock = reinterpret_cast<std::uint8_t*>(RwRasterLock(pSignRaster, 0, LOCKMODE_WRITE_NOFETCH));
+    if (!pSignLock)
+        return false;
+
+    bool bSuccess = false;
+    do
+    {
+        auto*& pCharsetLockRef = *reinterpret_cast<std::uint8_t**>(VAR_RoadsignRasterLockedData);
+        if (!pCharsetLockRef)
+            pCharsetLockRef = reinterpret_cast<std::uint8_t*>(RwRasterLock(pCharsetRaster, 0, RASTER_LOCK_READ));
+
+        auto* pCharsetLock = pCharsetLockRef;
+        if (!pCharsetLock)
+            break;
+
+        const int iCharsetStride = reinterpret_cast<const SRoadsignRasterView*>(pCharsetRaster)->iStride;
+        if (!iCharsetStride)
+            break;
+
+        const int iSignStride = reinterpret_cast<const SRoadsignRasterView*>(pSignRaster)->iStride;
+        if (!iSignStride)
+            break;
+
+        for (int iLetter = 0; iLetter < iNumLetters; ++iLetter)
+        {
+            int iCol = 1;
+            int iRow = 1;
+            CallRoadsignGetLineAndRow(szRoadName[iLetter], &iCol, &iRow);
+
+            auto* pCharsetPixels = pCharsetLock + SIGN_CHAR_WIDTH * SIGN_PIXEL_BYTES * (iCol + iRow * CHARSET_COLS_PER_ROW);
+            auto* pSignPixels = pSignLock + iLetter * SIGN_CHAR_WIDTH * SIGN_PIXEL_BYTES;
+
+            for (int iRasterRow = 0; iRasterRow < SIGN_CHAR_HEIGHT; ++iRasterRow)
+            {
+                std::memcpy(pSignPixels, pCharsetPixels, SIGN_CHAR_WIDTH * SIGN_PIXEL_BYTES);
+                pCharsetPixels += iCharsetStride;
+                pSignPixels += iSignStride;
+            }
+        }
+
+        bSuccess = true;
+    } while (false);
+
+    RwRasterUnlock(pSignRaster);
+    return bSuccess;
+}
+
+static bool __cdecl HOOK_RoadsignGenerateTextRaster_Impl(char* szRoadName, int iNumLetters, RwRaster* pCharsetRaster, int, RwRaster* pSignRaster) noexcept
+{
+    return RoadsignGenerateTextRaster_Fixed(szRoadName, iNumLetters, pCharsetRaster, pSignRaster);
+}
+
+void _declspec(naked) HOOK_RoadsignGenerateTextRaster()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        jmp HOOK_RoadsignGenerateTextRaster_Impl
     }
     // clang-format on
 }
@@ -4162,7 +4306,7 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         // Get weapon type before pushad to avoid stack offset corruption
         mov     al, [esp+0x8]
         mov     ucChokingWeaponType, al
-        
+
         pushad
 
         mov     ebx, [m_pChokingHandler]
@@ -4179,7 +4323,7 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         jnz     continueWithOriginalCode
         popad
         jmp     dwChokingDontchoke
-    
+
         continueWithOriginalCode:
         popad
         mov     ecx, [edi]
@@ -5361,8 +5505,6 @@ void __cdecl HandleIdle()
     {
         bAnimGroupArrayAddressLogged = true;
         DWORD dwAnimGroupArrayAddress = 0xb4ea34;
-        LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
-                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
     }
 
     ProcessDeferredStreamingMemoryRelief();
@@ -5559,6 +5701,20 @@ static void __declspec(naked) HOOK_CVehicle_DoVehicleLights()
     // clang-format on
 }
 
+static unsigned long ClampFloatToByteULong(float value)
+{
+    if (!(value > 0.0f))
+        return 0;
+    if (value >= 255.0f)
+        return 255;
+    return static_cast<unsigned long>(value + 0.5f);
+}
+
+static unsigned char ULongToByte(unsigned long value)
+{
+    return static_cast<unsigned char>(value & 0xFFu);
+}
+
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
 {
@@ -5571,9 +5727,9 @@ void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float 
     }
 
     // Scale our color values to the defaults ..looks dodgy but its needed!
-    ulHeadLightR = (unsigned char)std::min(255.f, color.R * (1 / 255.0f) * fR);
-    ulHeadLightG = (unsigned char)std::min(255.f, color.G * (1 / 255.0f) * fG);
-    ulHeadLightB = (unsigned char)std::min(255.f, color.B * (1 / 255.0f) * fB);
+    ulHeadLightR = ClampFloatToByteULong(color.R * (1.0f / 255.0f) * fR);
+    ulHeadLightG = ClampFloatToByteULong(color.G * (1.0f / 255.0f) * fG);
+    ulHeadLightB = ClampFloatToByteULong(color.B * (1.0f / 255.0f) * fB);
 }
 
 CVehicleSAInterface*          pHeadLightBeamVehicleInterface = NULL;
@@ -5601,7 +5757,7 @@ void         CVehicle_DoHeadLightBeam()
     for (unsigned int i = 0; i < uiHeadLightNumVerts; i++)
     {
         unsigned char alpha = COLOR_ARGB_A(pHeadLightVerts[i].color);
-        pHeadLightVerts[i].color = COLOR_ARGB(alpha, (unsigned char)ulHeadLightR, (unsigned char)ulHeadLightG, (unsigned char)ulHeadLightB);
+        pHeadLightVerts[i].color = COLOR_ARGB(alpha, ULongToByte(ulHeadLightR), ULongToByte(ulHeadLightG), ULongToByte(ulHeadLightB));
     }
 }
 
@@ -6711,7 +6867,7 @@ bool CheckRemovedModelNoSet()
     if (pBuildingRemoval)
     {
         // Is the model in question even removed?
-        if (pBuildingRemoval->IsModelRemoved(static_cast<uint16_t>(pEntityWorldAdd->m_nModelIndex)))
+        if (pBuildingRemoval->IsModelRemoved(static_cast<std::uint16_t>(pEntityWorldAdd->m_nModelIndex)))
         {
             // is the replaced model in the spherical radius of any building removal
             if (pGameInterface->GetBuildingRemoval()->IsRemovedModelInRadius(pEntityWorldAdd))
@@ -6777,7 +6933,7 @@ void HideEntitySomehow()
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
         {
             // Add the LOD to the list
-            pBuildingRemoval->AddBinaryBuilding(pInterface);
+            pBuildingRemoval->AddBinaryBuilding(pInterface, pInterface->m_iplIndex);
             // Remove the model from the world
             pGameInterface->GetWorld()->Remove(pInterface, BuildingRemoval);
             // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
@@ -6902,13 +7058,13 @@ void RemoveObjectIfNeeded()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval3);
         }
 
         if (!pLODInterface->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pLODInterface);
+            pBuildingRemoval->AddDataBuilding(pLODInterface, pLODInterface->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
         }
     }
@@ -7001,7 +7157,7 @@ void RemoveDummyIfReplaced()
     {
         if (!pBuildingAdd->IsPlaceableVTBL())
         {
-            pBuildingRemoval->AddDataBuilding(pBuildingAdd);
+            pBuildingRemoval->AddDataBuilding(pBuildingAdd, pBuildingAdd->m_iplIndex);
             pGameInterface->GetWorld()->Remove(pBuildingAdd, BuildingRemoval5);
         }
     }
@@ -8053,9 +8209,21 @@ static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, C
         SColor colors[4];
         pVehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
 
-        RwColor color = {static_cast<unsigned char>(colors[0].R * pVehicleInterface->m_fLighting),
-                         static_cast<unsigned char>(colors[0].G * pVehicleInterface->m_fLighting),
-                         static_cast<unsigned char>(colors[0].B * pVehicleInterface->m_fLighting), 0xFF};
+        const float fLighting = pVehicleInterface->m_fLighting;
+        const auto  ClampFloatToByte = [](float value) -> unsigned char
+        {
+            if (value <= 0.0f)
+                return 0;
+            if (value >= 255.0f)
+                return 255;
+            return static_cast<unsigned char>(value);
+        };
+
+        RwColor color;
+        color.r = ClampFloatToByte(static_cast<float>(colors[0].R) * fLighting);
+        color.g = ClampFloatToByte(static_cast<float>(colors[0].G) * fLighting);
+        color.b = ClampFloatToByte(static_cast<float>(colors[0].B) * fLighting);
+        color.a = 0xFF;
 
         // Fx_c::AddDebris
         ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(CLASS_CFx, vecPosition, color, 0.06f, count / 100 + 1);

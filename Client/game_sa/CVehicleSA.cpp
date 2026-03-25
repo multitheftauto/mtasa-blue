@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <core/CCoreInterface.h>
+#include <game/CAESoundManager.h>
 #include <multiplayer/CMultiplayer.h>
 #include "CAutomobileSA.h"
 #include "CBikeSA.h"
@@ -147,8 +148,29 @@ static void __declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
     // clang-format on
 }
 
+#define NUM_FirstStreamEngineSlot            7
+#define NUM_LastStreamEngineSlot             16
+#define NUM_AllSoundIndices                  0xFFFFFFFF
+#define NUM_ResidentEngineSlot               40
+#define NUM_LocalVehicleAudioContext         0x0
+#define VAR_VehicleAudioContext              0x50230C
+
 namespace
 {
+    void CancelVehicleAudioSlots(CAEVehicleAudioEntitySAInterface* pAudioInterface)
+    {
+        auto* pSoundManager = pGame ? pGame->GetAESoundManager() : nullptr;
+        if (!pAudioInterface || !pSoundManager)
+            return;
+
+        if (pAudioInterface->m_wEngineBankSlotId >= NUM_FirstStreamEngineSlot && pAudioInterface->m_wEngineBankSlotId <= NUM_LastStreamEngineSlot)
+            pSoundManager->CancelSoundsInBankSlot(pAudioInterface->m_wEngineBankSlotId, NUM_AllSoundIndices);
+
+        if (pAudioInterface->m_bPlayerDriver || pAudioInterface->m_bPlayerPassenger ||
+            *reinterpret_cast<const BYTE*>(VAR_VehicleAudioContext) == NUM_LocalVehicleAudioContext)
+            pSoundManager->CancelSoundsInBankSlot(NUM_ResidentEngineSlot, NUM_AllSoundIndices);
+    }
+
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
     {
         CVehicleSA* pVehicleSA = (CVehicleSA*)data;
@@ -183,7 +205,7 @@ namespace
                 RwFrameDump(ret, pVehicleSA);
             }
             // don't re-add, check ret for validity, if it has an empty string at this point it isn't a variant or it's already added
-            if (pVehicleSA->IsComponentPresent(ret->szName) == false && ret->szName != "")
+            if (pVehicleSA->IsComponentPresent(ret->szName) == false && ret->szName[0] != '\0')
             {
                 pVehicleSA->AddComponent(ret, true);
             }
@@ -210,6 +232,41 @@ namespace
     void GetAllAtomicObjects(RwFrame* frame, std::vector<RwObject*>& result)
     {
         RwFrameForAllObjects(frame, (void*)GetAllAtomicObjectCB, &result);
+    }
+
+    int GetComponentIDFromName(const SString& name)
+    {
+        if (name == "bonnet_dummy")
+            return eDoors::BONNET;
+        else if (name == "boot_dummy")
+            return eDoors::BOOT;
+        else if (name == "door_lf_dummy")
+            return eDoors::FRONT_LEFT_DOOR;
+        else if (name == "door_rf_dummy")
+            return eDoors::FRONT_RIGHT_DOOR;
+        else if (name == "door_lb_dummy")
+            return eDoors::REAR_LEFT_DOOR;
+        else if (name == "door_rb_dummy")
+            return eDoors::REAR_RIGHT_DOOR;
+        else if (name == "bump_front_dummy")
+            return ePanels::FRONT_BUMPER;
+        else if (name == "bump_rear_dummy")
+            return ePanels::REAR_BUMPER;
+        else if (name == "windscreen_dummy")
+            return ePanels::WINDSCREEN_PANEL;
+    }
+
+    VehicleComponentType GetComponentTypeFromName(const SString& name)
+    {
+        if (name == "bonnet_dummy" || name == "boot_dummy" || name == "door_lf_dummy" || name == "door_rf_dummy" || name == "door_lb_dummy" ||
+            name == "door_rb_dummy")
+            return VehicleComponentType::DOOR;
+        else if (name == "bump_front_dummy" || name == "bump_rear_dummy" || name == "windscreen_dummy")
+            return VehicleComponentType::PANEL;
+        else if (name == "wheel_lb_dummy" || name == "wheel_rb_dummy" || name == "wheel_lf_dummy" || name == "wheel_rf_dummy")
+            return VehicleComponentType::WHEEL;
+
+        return VehicleComponentType::NONE;
     }
 }  // namespace
 
@@ -1523,8 +1580,20 @@ bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 
 int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
 {
-    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    return vehicle->m_wheelFrictionState[eWheelPosition];
+    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    {
+        case VehicleClass::BIKE:
+        case VehicleClass::BMX:
+        {
+            auto* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
+            return bikeInterface->m_aiWheelState[eWheelPosition];
+        }
+        default:
+        {
+            auto* vehicleInterface = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+            return vehicleInterface->m_wheelFrictionState[eWheelPosition];
+        }
+    }
 }
 
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)
@@ -2194,7 +2263,7 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
         return;
 
     // if the frame already exists ignore it
-    if (IsComponentPresent(pFrame->szName) || pFrame->szName == "")
+    if (IsComponentPresent(pFrame->szName) || pFrame->szName[0] == '\0')
         return;
 
     SString strName = pFrame->szName;
@@ -2273,17 +2342,46 @@ bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequ
 
         if (bRequestVisible && uiNumAtomicsCurrentlyVisible == 0)
         {
-            // Make atomic (undamaged version) visible. TODO - Check if damaged version should be made visible instead
+            bool isComponentDamaged = false;
+            bool isComponentFallenOff = false;
+            int  componentID = GetComponentIDFromName(vehicleComponent);
+            auto damageManager = GetDamageManager();
+
+            switch (GetComponentTypeFromName(vehicleComponent))
+            {
+                case VehicleComponentType::DOOR:
+                {
+                    std::uint8_t doorStatus = damageManager->GetDoorStatus(static_cast<eDoors>(componentID));
+
+                    isComponentDamaged = (doorStatus > 1);
+                    isComponentFallenOff = (doorStatus == 4);
+                    break;
+                }
+                case VehicleComponentType::PANEL:
+                {
+                    std::uint8_t panelStatus = damageManager->GetPanelStatus(static_cast<std::uint8_t>(componentID));
+
+                    isComponentDamaged = (panelStatus > 0);
+                    isComponentFallenOff = (panelStatus == 3);
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            // We don't want to show the component that fell off
+            if (isComponentFallenOff)
+                return false;
+
+            // Make atomic visible.
             for (uint i = 0; i < atomicList.size(); i++)
             {
                 RwObject* pAtomic = atomicList[i];
                 int       AtomicId = pGame->GetVisibilityPlugins()->GetAtomicId(pAtomic);
 
-                if (!(AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED))
-                {
-                    // Either only one version, or two versions and this is the undamaged one
+                if ((isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED)) ||
+                    (!isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED)))
                     pAtomic->flags |= 0x04;
-                }
             }
         }
         else if (!bRequestVisible && uiNumAtomicsCurrentlyVisible > 0)
@@ -2532,13 +2630,20 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
 
 void CVehicleSA::ReinitAudio()
 {
-    auto* audioInterface = m_pVehicleAudioEntity->GetInterface();
+    if (!m_pVehicleAudioEntity)
+        return;
 
-    audioInterface->TerminateAudio();
-    audioInterface->InitAudio(GetVehicleInterface());
+    auto* pAudioInterface = m_pVehicleAudioEntity->GetInterface();
+    if (!pAudioInterface)
+        return;
+
+    CancelVehicleAudioSlots(pAudioInterface);
+
+    pAudioInterface->TerminateAudio();
+    pAudioInterface->InitAudio(GetVehicleInterface());
 
     CPed* pLocalPlayer = pGame->GetPedContext();
 
     if (IsPassenger(pLocalPlayer) || GetDriver() == pLocalPlayer)
-        audioInterface->SoundJoin();
+        pAudioInterface->SoundJoin();
 }

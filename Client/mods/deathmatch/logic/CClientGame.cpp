@@ -75,6 +75,8 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
+#define MIN_CLIENT_REQ_ON_MOUSE_BUTTON_DOWN "1.7.0-7.26369"
+
 static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
 
 CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
@@ -474,6 +476,9 @@ CClientGame::~CClientGame()
     // Singular file download manager
     SAFE_DELETE(m_pSingularFileDownloadManager);
 
+    // Clear cached clothes from this session
+    g_pMultiplayer->FlushClothesCache();
+
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler(NULL);
     g_pMultiplayer->SetPostContextSwitchHandler(NULL);
@@ -557,6 +562,7 @@ CClientGame::~CClientGame()
     // StaticReset calls. TXD destructors need intact bookkeeping to clean up propery.
 
     // Destroy our stuff
+    CClientTXD::ClearPendingImports();
     SAFE_DELETE(m_pManager);  // Will trigger onClientResourceStop
 
     SAFE_DELETE(m_pNametags);
@@ -578,6 +584,10 @@ CClientGame::~CClientGame()
     SAFE_DELETE(m_pResourceFileDownloadManager);
 
     SAFE_DELETE(m_pRootEntity);
+
+    // Unload models that had custom DFF geometry cleared during DoDeleteAll.
+    // Must run after m_pRootEntity is gone and before StaticResetModelTextureReplacing.
+    CClientDFF::FlushDeferredModelRestores();
 
     // Clear any remaining texture replacement/shader state after destroying entities.
     // This ordering prevents global reset from running before late element destructors
@@ -833,6 +843,8 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 {
     // Allow scripted dxSetRenderTarget for old scripts
     g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(true);
+
+    CClientTXD::ProcessPendingImports();
 
     // If appropriate, call onClientRestore
     if (bDidUnminimize)
@@ -1094,7 +1106,9 @@ void CClientGame::DoPulsePostFrame()
                         const int stateCount = taskStates.size();
                         if (stateCount > 0)
                         {
-                            std::srand(static_cast<unsigned int>(GetTickCount64_()));
+                            const std::uint64_t tickCount = static_cast<std::uint64_t>(GetTickCount64_());
+                            const unsigned int  seed = static_cast<unsigned int>(tickCount ^ (tickCount >> 32));
+                            std::srand(seed);
                             const int   index = (std::rand() % stateCount);
                             const auto& taskState = taskStates[index];
 
@@ -3660,6 +3674,9 @@ void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
 
 void CClientGame::StaticPreFxRenderHandler()
 {
+    // RenderFadingInEntities is done at this point, so alpha entity list callbacks
+    // no longer reference CModelRenderer's queue elements.
+    g_pClientGame->GetModelRenderer()->NotifyFrameEnd();
     g_pCore->OnPreFxRender();
 }
 
@@ -3756,6 +3773,11 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         CClientEntity* pClientEntity = pPools->GetClientEntity((DWORD*)pGameEntity);
         if (pClientEntity)
         {
+            if (pClientEntity->IsBeingDeleted())
+            {
+                g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+                return;
+            }
             int    iTypeMask;
             ushort usModelId = 0xFFFF;
             switch (pClientEntity->GetType())
@@ -3783,7 +3805,7 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         }
     }
 
-    g_pGame->GetRenderWare()->SetRenderingClientEntity(NULL, 0xFFFF, TYPE_MASK_WORLD);
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
 }
 
 void CClientGame::StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -4964,20 +4986,36 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
     return false;
 }
 
-// Validate known objects
+// Called when GTA:SA destroys an entity (e.g., during map streaming).
+// Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
+// Note: This may leak the CObjectSA/CVehicleSA/CPedSA wrapper if MTA created it, but we cannot
+// safely delete it here since the game entity is mid-destruction. The leak is acceptable
+// as this is an abnormal code path (GTA destroying MTA-managed entities).
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
-    // m_pGameEntityXRefManager->OnGameEntityDestruct(pObject);
+    if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))
+    {
+        pSlot->pEntity = nullptr;
+        pSlot->pClientEntity = nullptr;
+    }
 }
 
 void CClientGame::GameVehicleDestructHandler(CEntitySAInterface* pVehicle)
 {
-    // m_pGameEntityXRefManager->OnGameEntityDestruct(pVehicle);
+    if (auto* pSlot = g_pGame->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(pVehicle)))
+    {
+        pSlot->pEntity = nullptr;
+        pSlot->pClientEntity = nullptr;
+    }
 }
 
 void CClientGame::GamePlayerDestructHandler(CEntitySAInterface* pPlayer)
 {
-    // m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
+    if (auto* pSlot = g_pGame->GetPools()->GetPed(reinterpret_cast<DWORD*>(pPlayer)))
+    {
+        pSlot->pEntity = nullptr;
+        pSlot->pClientEntity = nullptr;
+    }
 }
 
 void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
@@ -5704,26 +5742,22 @@ bool CClientGame::OnKeyDown(CGUIKeyEventArgs Args)
     return true;
 }
 
-bool CClientGame::OnMouseClick(CGUIMouseEventArgs Args)
+void CClientGame::TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szState, const char* minClientVersion)
 {
     if (!Args.pWindow)
-        return false;
+        return;
 
     const char* szButton = NULL;
-    const char* szState = NULL;
     switch (Args.button)
     {
         case CGUIMouse::LeftButton:
             szButton = "left";
-            szState = "up";
             break;
         case CGUIMouse::MiddleButton:
             szButton = "middle";
-            szState = "up";
             break;
         case CGUIMouse::RightButton:
             szButton = "right";
-            szState = "up";
             break;
     }
 
@@ -5738,10 +5772,14 @@ bool CClientGame::OnMouseClick(CGUIMouseEventArgs Args)
         CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
         if (GetGUIManager()->Exists(pGUIElement))
         {
-            pGUIElement->CallEvent("onClientGUIClick", Arguments, true);
+            pGUIElement->CallEvent("onClientGUIClick", Arguments, true, minClientVersion);
         }
     }
+}
 
+bool CClientGame::OnMouseClick(CGUIMouseEventArgs Args)
+{
+    TriggerGUIClickEvent(Args, "up", nullptr);
     return true;
 }
 
@@ -5807,17 +5845,20 @@ bool CClientGame::OnMouseButtonDown(CGUIMouseEventArgs Args)
 
     if (szButton)
     {
-        CLuaArguments Arguments;
-        Arguments.PushString(szButton);
-        Arguments.PushNumber(Args.position.fX);
-        Arguments.PushNumber(Args.position.fY);
-
         CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
         if (GetGUIManager()->Exists(pGUIElement))
         {
+            // Fire onClientGUIMouseDown for backward compatibility
+            CLuaArguments Arguments;
+            Arguments.PushString(szButton);
+            Arguments.PushNumber(Args.position.fX);
+            Arguments.PushNumber(Args.position.fY);
             pGUIElement->CallEvent("onClientGUIMouseDown", Arguments, true);
         }
     }
+
+    // Fire onClientGUIClick with state="down"
+    TriggerGUIClickEvent(Args, "down", MIN_CLIENT_REQ_ON_MOUSE_BUTTON_DOWN);
 
     return true;
 }
@@ -6397,8 +6438,8 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
 
-        auto usPartNumber = static_cast<ushort>(i);
-        auto usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
+        ushort usPartNumber = static_cast<ushort>(i);
+        ushort usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
         assert(usBytesThisPart != 0);
 
         pBitStream->Write((uchar)EPlayerScreenShotResult::SUCCESS);
@@ -6611,7 +6652,7 @@ void CClientGame::OutputServerInfo()
 
         for (unsigned char i = 0; i < NUM_GLITCHES; i++)
         {
-            if (IsGlitchEnabled(i))
+            if (IsGlitchEnabled(static_cast<unsigned char>(i)))
             {
                 if (!strEnabledGlitches.empty())
                     strEnabledGlitches += ", ";
@@ -6895,7 +6936,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::VEHICLE))
         {
-            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
         }
 
         m_pManager->GetVehicleManager()->RestreamAllVehicles();
@@ -6905,7 +6946,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED))
         {
-            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
         }
 
         m_pManager->GetPedManager()->RestreamAllPeds();
@@ -6920,7 +6961,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
         {
             for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(type))
             {
-                g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
+                g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
             }
         }
 
@@ -7095,6 +7136,18 @@ void CClientGame::OnWindowFocusChange(bool state)
         return;
 
     m_bFocused = state;
+    if (m_pPlayerMap)
+    {
+        if (state)
+        {
+            g_pCore->GetGraphics()->MarkViewportRefreshPending();
+            m_pPlayerMap->MarkViewportRefreshPending();
+        }
+        else
+        {
+            m_pPlayerMap->ClearMovementFlags();
+        }
+    }
 
     CLuaArguments Arguments;
     Arguments.PushBoolean(state);

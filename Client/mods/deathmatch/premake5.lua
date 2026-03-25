@@ -3,6 +3,7 @@ project "Client Deathmatch"
 	kind "SharedLib"
 	targetname "client"
 	targetdir(buildpath("mods/deathmatch"))
+	clangtidy "On"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
@@ -32,6 +33,7 @@ project "Client Deathmatch"
 			".",
 			"./logic",
 			"../../sdk/",
+			"../../",
 			"../../../vendor/pthreads/include",
 			"../../../vendor/bochs",
 			"../../../vendor/bass",

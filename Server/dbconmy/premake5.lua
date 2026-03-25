@@ -3,6 +3,7 @@ project "Dbconmy"
 	kind "SharedLib"
 	targetname "dbconmy"
 	targetdir(buildpath("server/mods/deathmatch"))
+	clangtidy "On"
 
 	filter "system:windows"
 		includedirs {
@@ -35,6 +36,15 @@ project "Dbconmy"
 
 	filter "system:linux"
 		includedirs { "/usr/include/mysql" }
+		libdirs {
+			-- RHEL/Fedora distributions put MySQL client libraries of their mysql-devel
+			-- package under a subdirectory not picked up by Premake's default library
+			-- search path
+			os.findlib("mysqlclient", {
+				"/usr/lib/mysql",
+				"/usr/lib64/mysql",
+			})
+		}
 		links { "rt" }
 
 	filter "system:macosx"

@@ -62,7 +62,6 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             BitStream.Read(iRemoteModelID);
 
             eVehicleType vehicleType = pVehicle->GetVehicleType();
-            // TODO: GetVehicleType does not support the range of 'int'.
             eVehicleType remoteVehicleType = CVehicleManager::GetVehicleType(static_cast<unsigned short>(iRemoteModelID));
 
             // Read out its position
@@ -276,6 +275,27 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 }
             }
 
+            // Update Damage info
+            if (BitStream.Version() >= 0x047)
+            {
+                if (BitStream.ReadBit() == true)
+                {
+                    ElementID DamagerID;
+                    if (!BitStream.Read(DamagerID))
+                        return false;
+
+                    SWeaponTypeSync weaponType;
+                    if (!BitStream.Read(&weaponType))
+                        return false;
+
+                    SBodypartSync bodyPart;
+                    if (!BitStream.Read(&bodyPart))
+                        return false;
+
+                    pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
+                }
+            }
+
             // Player health
             SPlayerHealthSync health;
             if (!BitStream.Read(&health))
@@ -433,7 +453,8 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(pSourcePlayer->GetSyncTimeContext());
 
             // Write his ping divided with 2 plus a small number so the client can find out when this packet was sent
-            auto usLatency = static_cast<unsigned short>(pSourcePlayer->GetPing());
+            const unsigned int   uiPing = pSourcePlayer->GetPing();
+            const unsigned short usLatency = uiPing <= 0xFFFF ? static_cast<unsigned short>(uiPing) : 0xFFFF;
             BitStream.WriteCompressed(usLatency);
 
             // Write the keysync data
@@ -658,7 +679,6 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStrea
     }
 
     // Door angles.
-    // TODO: HasDoors does not support the range of 'int'.
     if (CVehicleManager::HasDoors(static_cast<unsigned short>(iRemoteModel)))
     {
         SDoorOpenRatioSync door;

@@ -477,9 +477,12 @@ void CPed::SetSyncer(CPlayer* pPlayer)
         {
             case VEHICLEACTION_ENTERING:
             {
-                CVehicle*    pVehicle = GetOccupiedVehicle();
-                unsigned int occupiedSeat = GetOccupiedVehicleSeat();
-                // Does it have an occupant and is the occupant us?
+                CVehicle*          pVehicle = GetOccupiedVehicle();
+                const unsigned int uiOccupiedSeat = GetOccupiedVehicleSeat();
+                if (uiOccupiedSeat > 0xFF)
+                    break;
+
+                const unsigned char occupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                 if (pVehicle && (this == pVehicle->GetOccupant(occupiedSeat)))
                 {
                     // Warp us into vehicle
@@ -489,9 +492,12 @@ void CPed::SetSyncer(CPlayer* pPlayer)
 
             case VEHICLEACTION_EXITING:
             {
-                CVehicle*    pVehicle = GetOccupiedVehicle();
-                unsigned int occupiedSeat = GetOccupiedVehicleSeat();
-                // Does it have an occupant and is the occupant us?
+                CVehicle*          pVehicle = GetOccupiedVehicle();
+                const unsigned int uiOccupiedSeat = GetOccupiedVehicleSeat();
+                if (uiOccupiedSeat > 0xFF)
+                    break;
+
+                const unsigned char occupiedSeat = static_cast<unsigned char>(uiOccupiedSeat);
                 if (pVehicle && (this == pVehicle->GetOccupant(occupiedSeat)))
                 {
                     // Warp us out of vehicle

@@ -167,9 +167,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
 
     if (bIsElevated && !std::getenv("WINE"))
     {
-        AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
-        AddReportLog(8022, "CEF browser features may not work correctly when running as Administrator");
-        AddReportLog(8023, "Consider running MTA without Administrator privileges for full browser functionality");
         g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
 
