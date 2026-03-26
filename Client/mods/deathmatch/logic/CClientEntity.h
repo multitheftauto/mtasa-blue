@@ -262,8 +262,8 @@ public:
     CClientEntity* FindChildIndex(const char* szType, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
     CClientEntity* FindChildByType(const char* szType, unsigned int uiIndex, bool bRecursive);
     CClientEntity* FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
-    void           FindAllChildrenByType(const char* szType, struct lua_State* luaVM, bool bStreamedIn = false);
-    void           FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* luaVM, unsigned int& uiIndex, bool bStreamedIn = false);
+    void           FindAllChildrenByType(const char* szType, struct lua_State* luaVM, bool bStreamedIn = false, bool bOnScreenOnly = false);
+    void FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* luaVM, unsigned int& uiIndex, bool bStreamedIn = false, bool bOnScreenOnly = false);
 
     unsigned int CountChildren() { return static_cast<unsigned int>(m_Children.size()); };
 
@@ -388,7 +388,7 @@ private:
     static bool IsFromRoot(CClientEntity* pEntity);
     static void AddEntityFromRoot(unsigned int uiTypeHash, CClientEntity* pEntity, bool bDebugCheck = true);
     static void RemoveEntityFromRoot(unsigned int uiTypeHash, CClientEntity* pEntity);
-    static void GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn);
+    static void GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn, bool bOnScreenOnly);
 
 #if CHECK_ENTITIES_FROM_ROOT
     static void _CheckEntitiesFromRoot(unsigned int uiTypeHash);

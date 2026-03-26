@@ -809,6 +809,7 @@ int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
             CClientEntity* pStartAt = m_pRootEntity;
             CClientEntity* pEntity = NULL;
             bool           bStreamedIn = false;
+            bool           bOnScreenOnly = false;
 
             if (argStream.NextIsUserData())
             {
@@ -822,9 +823,13 @@ int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
                     lua_pushboolean(luaVM, false);
                     return 1;
                 }
+
                 if (argStream.NextIsBool())
                 {
                     argStream.ReadBool(bStreamedIn);
+
+                    if (argStream.NextIsBool())
+                        argStream.ReadBool(bOnScreenOnly);
                 }
             }
 
@@ -832,7 +837,7 @@ int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
             lua_newtable(luaVM);
 
             // Add all the elements with a matching type to it
-            pStartAt->FindAllChildrenByType(strType.c_str(), luaVM, bStreamedIn);
+            pStartAt->FindAllChildrenByType(strType.c_str(), luaVM, bStreamedIn, bOnScreenOnly);
             return 1;
         }
     }
