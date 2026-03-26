@@ -19,8 +19,13 @@
 #include "CRemoteDataSA.h"
 
 class CRemoteDataSA;
-#define DEFAULT_NEAR_CLIP_DISTANCE (0.3f)
-#define DEFAULT_SHADOWS_OFFSET     (0.013f)  // GTA default = 0.06f
+#define DEFAULT_NEAR_CLIP_DISTANCE   (0.3f)
+#define DEFAULT_SHADOWS_OFFSET       (0.013f)  // GTA default = 0.06f
+#define DEFAULT_GRASS_CLOSE_DISTANCE (3.0f)
+#define DEFAULT_GRASS_FAR_DISTANCE   (60.0f)
+
+#define VAR_CGrassCloseDist 0xC02DBC
+#define VAR_CGrassFarDist   0x8D132C
 
 enum eRadioStationID
 {
@@ -192,6 +197,10 @@ public:
     float GetFogDistance();
     void  SetFogDistance(float fDistance);
     void  RestoreFogDistance();
+    void  SetGrassDrawDistance(float closeDistance, float farDistance) override;
+    void  GetGrassDrawDistance(float& closeDistance, float& farDistance) const override;
+    void  ResetGrassDrawDistance() override;
+    void  RefreshGrassDrawDistance() override;
     void  GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen,
                       unsigned char& ucCoronaBlue);
     void  SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen,
@@ -391,6 +400,8 @@ private:
     eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
+    float               m_grassCloseDistance;
+    float               m_grassFarDistance;
 
     bool m_isRapidVehicleStopFixEnabled{false};
 

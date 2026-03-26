@@ -28,7 +28,8 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
                                unsigned char ucSunCoreR, unsigned char ucSunCoreG, unsigned char ucSunCoreB, unsigned char ucSunCoronaR,
                                unsigned char ucSunCoronaG, unsigned char ucSunCoronaB, bool bOverrideWindVelocity, float fWindVelX, float fWindVelY,
                                float fWindVelZ, bool bOverrideFarClipDistance, float fFarClip, bool bOverrideFogDistance, float fFogDistance,
-                               float fAircraftMaxHeight, float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize)
+                               float fAircraftMaxHeight, float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize, bool overrideGrassDrawDistance,
+                               float grassCloseDistance, float grassFarDistance)
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -80,6 +81,9 @@ CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherB
     m_fFarClip = fFarClip;
     m_bOverrideFogDistance = bOverrideFogDistance;
     m_fFogDistance = fFogDistance;
+    m_overrideGrassDrawDistance = overrideGrassDrawDistance;
+    m_grassCloseDistance = grassCloseDistance;
+    m_grassFarDistance = grassFarDistance;
     m_fAircraftMaxHeight = fAircraftMaxHeight;
     m_fAircraftMaxVelocity = fAircraftMaxVelocity;
     m_bOverrideMoonSize = bOverrideMoonSize;
@@ -356,6 +360,14 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
 
     bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled();
     BitStream.WriteBit(bOcclusionsEnabled);
+
+    // Grass draw distance
+    BitStream.WriteBit(m_overrideGrassDrawDistance);
+    if (m_overrideGrassDrawDistance)
+    {
+        BitStream.Write(m_grassCloseDistance);
+        BitStream.Write(m_grassFarDistance);
+    }
 
     return true;
 }
