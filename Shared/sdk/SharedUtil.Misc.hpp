@@ -203,6 +203,20 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
 
                                 if (folderName == L"mta")
                                 {
+                                    const SString strCurrentPath = ToUTF8(currentPath.wstring());
+                                    const bool    bHasKnownModule =
+                                        FileExists(PathJoin(strCurrentPath, "core.dll")) || FileExists(PathJoin(strCurrentPath, "core_d.dll")) ||
+                                        FileExists(PathJoin(strCurrentPath, "loader.dll")) || FileExists(PathJoin(strCurrentPath, "loader_d.dll"));
+
+                                    if (!bHasKnownModule)
+                                    {
+                                        if (currentPath.has_parent_path())
+                                            currentPath = currentPath.parent_path();
+                                        else
+                                            break;
+                                        continue;
+                                    }
+
                                     // Found MTA folder - base directory is its parent
                                     // Stop searching immediately to avoid finding outer "MTA" folders (e.g user with custom intall dir)
                                     if (currentPath.has_parent_path())
@@ -369,6 +383,53 @@ void SharedUtil::SetMTASABaseDirOverride(const SString& strPath)
     strInstallRootOverride = strPath;
 }
 
+static bool IsUsableMtasaInstallRoot(const SString& strPath)
+{
+    if (strPath.empty())
+        return false;
+
+    return FileExists(PathJoin(strPath, "Multi Theft Auto.exe")) || FileExists(PathJoin(strPath, "Multi Theft Auto_d.exe")) ||
+           FileExists(PathJoin(strPath, "mta", "core.dll")) || FileExists(PathJoin(strPath, "MTA", "core.dll")) ||
+           FileExists(PathJoin(strPath, "mta", "core_d.dll")) || FileExists(PathJoin(strPath, "MTA", "core_d.dll"));
+}
+
+static SString ReadInstallRootRegistryValue64()
+{
+    #if defined(KEY_WOW64_64KEY)
+    const WString wstrSubKey = FromUTF8(PathJoin(GetProductRegistryPath(), GetMajorVersionString()).TrimEnd("\\"));
+    const WString wstrValue = FromUTF8("Last Run Location");
+
+    HKEY hkTemp = NULL;
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hkTemp) != ERROR_SUCCESS || !hkTemp)
+        return "";
+
+    DWORD dwType = REG_SZ;
+    DWORD dwSize = 0;
+    LONG  result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, NULL, &dwSize);
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize == 0)
+    {
+        RegCloseKey(hkTemp);
+        return "";
+    }
+
+    std::vector<wchar_t> buffer((dwSize / sizeof(wchar_t)) + 1u, L'\0');
+    result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwSize);
+    RegCloseKey(hkTemp);
+
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ))
+        return "";
+
+    if (dwSize >= sizeof(wchar_t))
+        buffer[(dwSize / sizeof(wchar_t)) - 1u] = L'\0';
+    else
+        buffer[0] = L'\0';
+
+    return ToUTF8(buffer.data());
+    #else
+    return "";
+    #endif
+}
+
 //
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
@@ -379,6 +440,7 @@ SString SharedUtil::GetMTASABaseDir()
         return strInstallRootOverride;
 
     static SString strInstallRoot;
+    static SString strInstallRootSource;
     if (strInstallRoot.empty())
     {
         if (IsGTAProcess())
@@ -388,22 +450,58 @@ SString SharedUtil::GetMTASABaseDir()
             if (FileExists(PathJoin(strParentDir, "mta", "core.dll")) || FileExists(PathJoin(strParentDir, "MTA", "core.dll")))
             {
                 strInstallRoot = strParentDir;
+                strInstallRootSource = "parent process";
             }
         }
         if (strInstallRoot.empty())
         {
-            strInstallRoot = GetMTAProcessBaseDir();
+            HMODULE hCoreModule = nullptr;
+    #ifdef MTA_DEBUG
+            if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, L"core_d.dll", &hCoreModule))
+    #endif
+                GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, L"core.dll", &hCoreModule);
+
+            if (hCoreModule)
+            {
+                strInstallRoot = GetMTAProcessBaseDir();
+                if (!strInstallRoot.empty())
+                    strInstallRootSource = "loaded core module";
+            }
         }
         if (strInstallRoot.empty())
         {
             strInstallRoot = GetRegistryValue("", "Last Run Location");
+            if (!IsUsableMtasaInstallRoot(strInstallRoot))
+            {
+                const SString strRegistry32InstallRoot = strInstallRoot;
+                const SString strRegistry64InstallRoot = ReadInstallRootRegistryValue64();
+                if (IsUsableMtasaInstallRoot(strRegistry64InstallRoot))
+                {
+                    strInstallRoot = strRegistry64InstallRoot;
+                    strInstallRootSource = "registry64";
+                }
+                else
+                {
+                    if (!strRegistry32InstallRoot.empty())
+                    {
+                        AddReportLog(1042, SString("GetMTASABaseDir: ignoring unusable registry path '%s'", strRegistry32InstallRoot.c_str()), 1);
+                    }
+                    strInstallRoot.clear();
+                }
+            }
             if (strInstallRoot.empty())
             {
+                AddReportLog(1042, "GetMTASABaseDir: unable to resolve install root", 1);
                 MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
                                MB_OK | MB_ICONERROR | MB_TOPMOST);
                 TerminateProcess(GetCurrentProcess(), 9);
             }
+            if (strInstallRootSource.empty())
+                strInstallRootSource = "registry";
         }
+
+        if (!strInstallRoot.empty())
+            AddReportLog(1042, SString("GetMTASABaseDir: resolved '%s' via %s", strInstallRoot.c_str(), strInstallRootSource.c_str()), 1);
     }
     return strInstallRoot;
 }
@@ -662,6 +760,7 @@ namespace
                 return ToUTF8(expandedString);
             }
         }
+
         WString fallback;
         fallback.assign(raw);
         return ToUTF8(fallback);
@@ -861,6 +960,7 @@ namespace
 
         return success;
     }
+
 }
 
 static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
@@ -1022,6 +1122,12 @@ void SharedUtil::SetOnQuitCommand(const SString& strOperation, const SString& st
 void SharedUtil::SetOnRestartCommand(const SString& strOperation, const SString& strFile, const SString& strParameters, const SString& strDirectory,
                                      const SString& strShowCmd)
 {
+    if (strOperation.empty() && strFile.empty() && strParameters.empty() && strDirectory.empty() && strShowCmd.empty())
+    {
+        SetRegistryValue("", "OnRestartCommand", "");
+        return;
+    }
+
     // Encode into a string and set a registry key
     SString strVersion("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
     SString strValue("%s\t%s\t%s\t%s\t%s\t%s", strOperation.c_str(), strFile.c_str(), strParameters.c_str(), strDirectory.c_str(), strShowCmd.c_str(),
@@ -1035,7 +1141,6 @@ void SharedUtil::SetOnRestartCommand(const SString& strOperation, const SString&
 bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SString& strParameters, SString& strDirectory, SString& strShowCmd)
 {
     SString strOnRestartCommand = GetRegistryValue("", "OnRestartCommand");
-    SetOnRestartCommand("");
 
     std::vector<SString> vecParts;
     strOnRestartCommand.Split("\t", vecParts);
@@ -1052,6 +1157,14 @@ bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SS
             return true;
         }
         AddReportLog(4000, SString("OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str(), strVersion.c_str()));
+        SetOnRestartCommand("");
+        return false;
+    }
+
+    if (!strOnRestartCommand.empty())
+    {
+        AddReportLog(4001, SString("OnRestartCommand disregarded due to invalid format '%s'", strOnRestartCommand.c_str()));
+        SetOnRestartCommand("");
     }
     return false;
 }

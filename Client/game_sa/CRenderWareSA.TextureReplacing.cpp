@@ -25,6 +25,7 @@
 #include "gamesa_renderware.h"
 #include <game/RenderWareD3D.h>
 
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -35,6 +36,9 @@
 #include <utility>
 
 extern CGameSA* pGame;
+
+#define FUNC_CTxdStore__SetTxdParent 0x7316E0
+#define FUNC_CTxdStore__GetTxdParent 0x731700
 
 struct CModelTexturesInfo
 {
@@ -772,13 +776,13 @@ namespace
 
                 if (!bModelLoaded)
                 {
-                    RequeuePendingReplacement(usModelId, entry, true);
+                    RequeuePendingReplacement(usModelId, entry, false);
                     continue;
                 }
 
                 if (bParentStreamingBusy)
                 {
-                    RequeuePendingReplacement(usModelId, entry, true);
+                    RequeuePendingReplacement(usModelId, entry, false);
                     continue;
                 }
 
@@ -1276,6 +1280,354 @@ namespace
             return pReplacement->strDebugHash;
 
         return "<unknown>";
+    }
+
+    struct SScriptManagedTxdUsage
+    {
+        bool bHasOtherUsers = false;
+        bool bHasIncompatibleUsers = false;
+    };
+
+    using TextureNameSet = std::unordered_set<std::string>;
+
+    static std::string CopyTextureNameForCompare(const char* szTextureName)
+    {
+        if (!szTextureName)
+            return std::string();
+
+        const std::size_t nameLen = strnlen(szTextureName, RW_TEXTURE_NAME_LENGTH);
+        if (nameLen >= RW_TEXTURE_NAME_LENGTH)
+            return std::string();
+
+        std::string strTextureName(szTextureName, nameLen);
+        std::transform(strTextureName.begin(), strTextureName.end(), strTextureName.begin(),
+                       [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+        return strTextureName;
+    }
+
+    static void AddTextureNameVariant(TextureNameSet& names, const char* szTextureName)
+    {
+        const std::string strTextureName = CopyTextureNameForCompare(szTextureName);
+        if (!strTextureName.empty())
+            names.insert(strTextureName);
+    }
+
+    static void CollectTextureNameVariants(TextureNameSet& names, const char* szTextureName)
+    {
+        AddTextureNameVariant(names, szTextureName);
+
+        const std::string strTextureName = CopyTextureNameForCompare(szTextureName);
+        if (strTextureName.empty())
+            return;
+
+        AddTextureNameVariant(names, CRenderWareSA::GetInternalTextureName(strTextureName.c_str()));
+        AddTextureNameVariant(names, CRenderWareSA::GetExternalTextureName(strTextureName.c_str()));
+    }
+
+    static bool CollectMaterialTextureNamesFromGeometry(TextureNameSet& names, RpGeometry* pGeometry)
+    {
+        if (!pGeometry || !pGeometry->materials.materials || pGeometry->materials.entries <= 0)
+            return true;
+
+        constexpr int kMaxMaterials = 10000;
+        if (pGeometry->materials.entries > kMaxMaterials)
+            return false;
+
+        for (int i = 0; i < pGeometry->materials.entries; ++i)
+        {
+            RpMaterial* pMaterial = pGeometry->materials.materials[i];
+            if (!pMaterial || !pMaterial->texture)
+                continue;
+
+            CollectTextureNameVariants(names, pMaterial->texture->name);
+        }
+
+        return true;
+    }
+
+    static RwObject* __cdecl CollectMaterialTextureNamesFromFrameObjectCB(RwObject* pObject, void* data)
+    {
+        if (pObject && pObject->type == RP_TYPE_ATOMIC)
+        {
+            RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pObject);
+            if (pAtomic->clump == nullptr && pAtomic->geometry)
+            {
+                auto* pNames = static_cast<TextureNameSet*>(data);
+                CollectMaterialTextureNamesFromGeometry(*pNames, pAtomic->geometry);
+            }
+        }
+
+        return pObject;
+    }
+
+    static bool CollectMaterialTextureNamesFromFrameHierarchy(TextureNameSet& names, RwFrame* pFrame, std::vector<RwFrame*>& visitedFrames, int depth = 0)
+    {
+        if (!pFrame)
+            return true;
+
+        if (depth > 128)
+            return false;
+
+        for (RwFrame* pVisited : visitedFrames)
+        {
+            if (pVisited == pFrame)
+                return true;
+        }
+        visitedFrames.push_back(pFrame);
+
+        RwFrameForAllObjects(pFrame, reinterpret_cast<void*>(CollectMaterialTextureNamesFromFrameObjectCB), &names);
+
+        if (!pFrame->child)
+            return true;
+
+        RwFrame* pChild = pFrame->child;
+        int      nChildren = 0;
+        while (pChild)
+        {
+            if (!CollectMaterialTextureNamesFromFrameHierarchy(names, pChild, visitedFrames, depth + 1))
+                return false;
+
+            pChild = pChild->next;
+            if (++nChildren > 1024)
+                return false;
+        }
+
+        return true;
+    }
+
+    static bool CollectModelMaterialTextureNames(TextureNameSet& names, unsigned short usModelId)
+    {
+        names.clear();
+
+        if (!pGame)
+            return false;
+
+        auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usModelId));
+        if (!pModelInfo)
+            return false;
+
+        RwObject* pRwObject = pModelInfo->GetRwObject();
+        if (!pRwObject)
+            return false;
+
+        const eModelInfoType modelType = pModelInfo->GetModelType();
+        if (modelType == eModelInfoType::PED || modelType == eModelInfoType::WEAPON || modelType == eModelInfoType::VEHICLE || modelType == eModelInfoType::CLUMP ||
+            (modelType == eModelInfoType::UNKNOWN && pRwObject->type == RP_TYPE_CLUMP))
+        {
+            RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
+            std::vector<RpAtomic*> atomicList;
+            CRenderWareSA::GetClumpAtomicList(pClump, atomicList);
+
+            for (RpAtomic* pAtomic : atomicList)
+            {
+                if (!CollectMaterialTextureNamesFromGeometry(names, pAtomic ? pAtomic->geometry : nullptr))
+                    return false;
+            }
+
+            if (RwFrame* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
+            {
+                std::vector<RwFrame*> visitedFrames;
+                if (!CollectMaterialTextureNamesFromFrameHierarchy(names, pRootFrame, visitedFrames))
+                    return false;
+            }
+
+            return true;
+        }
+
+        if (modelType == eModelInfoType::ATOMIC || modelType == eModelInfoType::LOD_ATOMIC || modelType == eModelInfoType::TIME ||
+            (modelType == eModelInfoType::UNKNOWN && pRwObject->type == RP_TYPE_ATOMIC))
+        {
+            RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
+            return CollectMaterialTextureNamesFromGeometry(names, pAtomic ? pAtomic->geometry : nullptr);
+        }
+
+        return false;
+    }
+
+    static void CollectReplacementTextureNames(TextureNameSet& names, const SReplacementTextures* pReplacement)
+    {
+        names.clear();
+
+        if (!pReplacement)
+            return;
+
+        for (RwTexture* pTexture : pReplacement->textures)
+            CollectTextureNameVariants(names, pTexture ? pTexture->name : nullptr);
+    }
+
+    static void CollectPerTxdUsingTextureNames(TextureNameSet& names, const SReplacementTextures* pReplacement, unsigned short usTxdId)
+    {
+        names.clear();
+
+        if (!pReplacement)
+            return;
+
+        auto itPerTxd = std::find_if(pReplacement->perTxdList.begin(), pReplacement->perTxdList.end(),
+                                     [usTxdId](const SReplacementTextures::SPerTxd& entry) { return entry.usTxdId == usTxdId; });
+        if (itPerTxd == pReplacement->perTxdList.end())
+            return;
+
+        for (RwTexture* pTexture : itPerTxd->usingTextures)
+            CollectTextureNameVariants(names, pTexture ? pTexture->name : nullptr);
+    }
+
+    static bool HasTextureNameIntersection(const TextureNameSet& leftNames, const TextureNameSet& rightNames)
+    {
+        if (leftNames.empty() || rightNames.empty())
+            return false;
+
+        const TextureNameSet* pSmallerSet = &leftNames;
+        const TextureNameSet* pLargerSet = &rightNames;
+        if (pSmallerSet->size() > pLargerSet->size())
+            std::swap(pSmallerSet, pLargerSet);
+
+        for (const std::string& strName : *pSmallerSet)
+        {
+            if (pLargerSet->count(strName) != 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    static bool HasScriptManagedTxdConflict(const SReplacementTextures* pNewReplacement, unsigned short usModelId, unsigned short usTxdId,
+                                            unsigned short usParentTxdId, const SScriptManagedTxdUsage& scriptTxdUsage)
+    {
+        if (scriptTxdUsage.bHasIncompatibleUsers || !scriptTxdUsage.bHasOtherUsers)
+            return scriptTxdUsage.bHasIncompatibleUsers;
+
+        TextureNameSet newTexNames;
+        TextureNameSet modelTexNames;
+        CollectReplacementTextureNames(newTexNames, pNewReplacement);
+        if (!CollectModelMaterialTextureNames(modelTexNames, usModelId))
+            return true;
+
+        auto itScriptTexInfo = ms_ModelTexturesInfoMap.find(usTxdId);
+        if (itScriptTexInfo == ms_ModelTexturesInfoMap.end())
+            return false;
+
+        const unsigned int uiModelLimit = static_cast<unsigned int>(pGame->GetBaseIDforCOL());
+        for (unsigned int uiOtherModelId = 0; uiOtherModelId < uiModelLimit; ++uiOtherModelId)
+        {
+            if (uiOtherModelId == usModelId)
+                continue;
+
+            auto* pOtherModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiOtherModelId));
+            if (!pOtherModelInfo || pOtherModelInfo->GetTextureDictionaryID() != usTxdId)
+                continue;
+
+            auto* pOtherParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(pOtherModelInfo->GetParentID()));
+            if (!pOtherParentInfo || pOtherParentInfo->GetTextureDictionaryID() != usParentTxdId)
+                return true;
+
+            TextureNameSet otherMatNames;
+            if (!CollectModelMaterialTextureNames(otherMatNames, static_cast<unsigned short>(uiOtherModelId)))
+                return true;
+
+            if (HasTextureNameIntersection(newTexNames, otherMatNames))
+                return true;
+
+            for (SReplacementTextures* pExisting : itScriptTexInfo->second.usedByReplacements)
+            {
+                if (!pExisting || pExisting == pNewReplacement)
+                    continue;
+
+                bool bUsedByOther = false;
+                for (unsigned short usExistingModelId : pExisting->usedInModelIds)
+                {
+                    if (usExistingModelId == uiOtherModelId)
+                    {
+                        bUsedByOther = true;
+                        break;
+                    }
+                }
+
+                if (!bUsedByOther)
+                    continue;
+
+                TextureNameSet otherTexNames;
+                CollectReplacementTextureNames(otherTexNames, pExisting);
+                if (HasTextureNameIntersection(otherTexNames, modelTexNames))
+                    return true;
+            }
+        }
+
+        // Check replacements whose models no longer point at this TXD.
+        // The textures are still in the dictionary and will affect any
+        // model that reuses it.
+        for (SReplacementTextures* pExisting : itScriptTexInfo->second.usedByReplacements)
+        {
+            if (!pExisting || pExisting == pNewReplacement)
+                continue;
+
+            bool bHasOtherModel = false;
+            bool bStillOnTxd = false;
+            for (unsigned short usExistingModelId : pExisting->usedInModelIds)
+            {
+                if (usExistingModelId == usModelId)
+                    continue;
+
+                bHasOtherModel = true;
+
+                auto* pExistingModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usExistingModelId));
+                if (pExistingModelInfo && pExistingModelInfo->GetTextureDictionaryID() == usTxdId)
+                {
+                    bStillOnTxd = true;
+                    break;
+                }
+            }
+
+            if (!bHasOtherModel || bStillOnTxd)
+                continue;
+
+            TextureNameSet perTxdNames;
+            CollectPerTxdUsingTextureNames(perTxdNames, pExisting, usTxdId);
+            if (HasTextureNameIntersection(perTxdNames, modelTexNames))
+                return true;
+        }
+
+        return false;
+    }
+
+    static SScriptManagedTxdUsage GetScriptManagedTxdUsage(unsigned short usModelId, unsigned short usTxdId, unsigned short usParentTxdId)
+    {
+        SScriptManagedTxdUsage usage;
+
+        if (!pGame)
+            return usage;
+
+        const unsigned int uiModelLimit = static_cast<unsigned int>(pGame->GetBaseIDforCOL());
+        for (unsigned int uiOtherModelId = 0; uiOtherModelId < uiModelLimit; ++uiOtherModelId)
+        {
+            if (uiOtherModelId == usModelId)
+                continue;
+
+            auto* pOtherModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiOtherModelId));
+            if (!pOtherModelInfo)
+                continue;
+
+            if (pOtherModelInfo->GetTextureDictionaryID() != usTxdId)
+                continue;
+
+            usage.bHasOtherUsers = true;
+
+            const unsigned int uiOtherParentModelId = pOtherModelInfo->GetParentID();
+            if (uiOtherParentModelId == 0)
+            {
+                usage.bHasIncompatibleUsers = true;
+                break;
+            }
+
+            auto* pOtherParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiOtherParentModelId));
+            const unsigned short usOtherParentTxdId = pOtherParentInfo ? pOtherParentInfo->GetTextureDictionaryID() : 0;
+            if (!pOtherParentInfo || usOtherParentTxdId != usParentTxdId)
+            {
+                usage.bHasIncompatibleUsers = true;
+                break;
+            }
+        }
+
+        return usage;
     }
 
     static bool IsReadableTexture(RwTexture* pTexture)
@@ -2986,6 +3338,114 @@ namespace
             }
         }
     }
+
+    void RebindLoadedModelToCurrentTxd(CModelInfoSA* pModelInfo, unsigned short usTxdId)
+    {
+        if (!pGame || !pModelInfo)
+            return;
+
+        RwObject* pRwObject = pModelInfo->GetRwObject();
+        if (!pRwObject)
+            return;
+
+        RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
+        if (!pTxd)
+            return;
+
+        // Walk the full parent chain (child -> parent -> grandparent -> ...) with bounded depth and cycle protection,
+        // then merge root-to-child so child textures win on name conflict
+        constexpr std::size_t kMaxChainDepth = 16;
+        unsigned short        chain[kMaxChainDepth];
+        std::size_t           chainLen = 0;
+        unsigned short        usFirstParentId = static_cast<unsigned short>(-1);
+
+        CTxdPoolSA* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+        for (unsigned short id = usTxdId; pTxdPoolSA && chainLen < kMaxChainDepth;)
+        {
+            bool bCycle = false;
+            for (std::size_t j = 0; j < chainLen; ++j)
+            {
+                if (chain[j] == id)
+                {
+                    bCycle = true;
+                    break;
+                }
+            }
+            if (bCycle)
+                break;
+
+            chain[chainLen++] = id;
+
+            CTextureDictonarySAInterface* pSlot = pTxdPoolSA->GetTextureDictonarySlot(id);
+            if (!pSlot || pSlot->usParentIndex == static_cast<unsigned short>(-1))
+                break;
+
+            if (usFirstParentId == static_cast<unsigned short>(-1))
+                usFirstParentId = pSlot->usParentIndex;
+
+            id = pSlot->usParentIndex;
+        }
+
+        TxdTextureMap txdTextureMap;
+        for (std::size_t i = chainLen; i > 0; --i)
+        {
+            RwTexDictionary* pChainTxd = CTxdStore_GetTxd(chain[i - 1]);
+            if (pChainTxd)
+                MergeCachedTxdTextureMap(chain[i - 1], pChainTxd, txdTextureMap);
+        }
+
+        bool bNeedVehicleFallback = (usFirstParentId != static_cast<unsigned short>(-1)) && TxdChainContainsVehicleTxd(usFirstParentId);
+        if (!bNeedVehicleFallback)
+        {
+            if (pModelInfo->IsVehicle() || pModelInfo->IsUpgrade())
+                bNeedVehicleFallback = true;
+        }
+        if (bNeedVehicleFallback)
+            AddVehicleTxdFallback(txdTextureMap);
+
+        if (txdTextureMap.empty())
+            return;
+
+        eModelInfoType modelType = pModelInfo->GetModelType();
+        if (modelType == eModelInfoType::UNKNOWN)
+        {
+            if (pRwObject->type == RP_TYPE_ATOMIC)
+                modelType = eModelInfoType::ATOMIC;
+            else if (pRwObject->type == RP_TYPE_CLUMP)
+                modelType = eModelInfoType::CLUMP;
+        }
+
+        switch (modelType)
+        {
+            case eModelInfoType::PED:
+            case eModelInfoType::WEAPON:
+            case eModelInfoType::VEHICLE:
+            case eModelInfoType::CLUMP:
+            {
+                RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
+                std::vector<RpAtomic*> atomicList;
+                CRenderWareSA::GetClumpAtomicList(pClump, atomicList);
+                for (RpAtomic* pAtomic : atomicList)
+                    RebindAtomicMaterialsFromMap(pAtomic, txdTextureMap);
+
+                if (RwFrame* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
+                {
+                    std::vector<RwFrame*> visitedFrames;
+                    RebindTexturesInFrameHierarchy(pRootFrame, txdTextureMap, visitedFrames);
+                }
+                break;
+            }
+            case eModelInfoType::ATOMIC:
+            case eModelInfoType::LOD_ATOMIC:
+            case eModelInfoType::TIME:
+            {
+                RebindAtomicMaterialsFromMap(reinterpret_cast<RpAtomic*>(pRwObject), txdTextureMap);
+                break;
+            }
+            default:
+                break;
+        }
+    }
 }
 
 // Process deferred parent TXD setup for per-model isolated TXDs
@@ -4158,7 +4618,76 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
             if (bScriptManagedTxd)
             {
-                // Textures go directly into the script-assigned TXD
+                auto* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+                auto* pScriptSlot = pTxdPoolSA ? pTxdPoolSA->GetTextureDictonarySlot(usModelCurrentTxdId) : nullptr;
+
+                const SScriptManagedTxdUsage scriptTxdUsage = GetScriptManagedTxdUsage(usModelId, usModelCurrentTxdId, usParentTxdId);
+                const bool bSharedTxdConflict = HasScriptManagedTxdConflict(pReplacementTextures, usModelId, usModelCurrentTxdId, usParentTxdId, scriptTxdUsage);
+
+                if (bSharedTxdConflict)
+                {
+                    // Isolate this model to its own TXD so its replacements don't
+                    // overwrite another model's textures in the shared script TXD.
+                    const bool bIsolatedOk = EnsureIsolatedTxdForRequestedModel(usModelId);
+                    if (!bIsolatedOk)
+                    {
+                        QueuePendingReplacement(usModelId, pReplacementTextures, uiParentModelId, usParentTxdId);
+                        return false;
+                    }
+                    // Model is now on a private TXD - fall through to add logic
+                }
+                else if (pScriptSlot && pScriptSlot->rwTexDictonary)
+                {
+                    // Script TXDs from engineRequestTXD have no parent
+                    // (usParentIndex == 0xFFFF), so SA's texture walk can't
+                    // find non-replaced textures and materials go white.
+                    // If the slot already has a compatible parent from earlier
+                    // reuse, relink it instead of forcing isolation.
+                    const unsigned short usSlotParentTxdId = pScriptSlot->usParentIndex;
+                    using SetTxdParent_t = void(__cdecl*)(RwTexDictionary*, RwTexDictionary*);
+                    using GetTxdParent_t = RwTexDictionary*(__cdecl*)(RwTexDictionary*);
+
+                    const SetTxdParent_t SetTxdParent = reinterpret_cast<SetTxdParent_t>(FUNC_CTxdStore__SetTxdParent);
+                    const GetTxdParent_t GetTxdParent = reinterpret_cast<GetTxdParent_t>(FUNC_CTxdStore__GetTxdParent);
+
+                    bool bParentAvailable = CTxdStore_GetTxd(usParentTxdId) != nullptr;
+                    RwTexDictionary* pParentTxd = bParentAvailable ? CTxdStore_GetTxd(usParentTxdId) : nullptr;
+                    RwTexDictionary* pCurrentParent = GetTxdParent(pScriptSlot->rwTexDictonary);
+
+                    if (!bParentAvailable)
+                    {
+                        if (usSlotParentTxdId != static_cast<unsigned short>(-1) && usSlotParentTxdId != usParentTxdId)
+                            CTxdStore_RemoveRef(usSlotParentTxdId);
+
+                        if (usSlotParentTxdId != usParentTxdId)
+                            CTxdStore_AddRef(usParentTxdId);
+
+                        pScriptSlot->usParentIndex = usParentTxdId;
+                        if (pCurrentParent != nullptr)
+                            SetTxdParent(pScriptSlot->rwTexDictonary, nullptr);
+
+                        if (pParentInfo)
+                            pParentInfo->Request(NON_BLOCKING, "ModelInfoTXDAddTextures-scriptParent");
+
+                        QueuePendingReplacement(usModelId, pReplacementTextures, uiParentModelId, usParentTxdId);
+                        return false;
+                    }
+
+                    if (usSlotParentTxdId != usParentTxdId)
+                    {
+                        if (usSlotParentTxdId != static_cast<unsigned short>(-1))
+                            CTxdStore_RemoveRef(usSlotParentTxdId);
+
+                        pScriptSlot->usParentIndex = usParentTxdId;
+                        CTxdStore_SetupTxdParent(usModelCurrentTxdId);
+                        RebindLoadedModelToCurrentTxd(pModelInfo, usModelCurrentTxdId);
+                    }
+                    else if (pCurrentParent != pParentTxd)
+                    {
+                        SetTxdParent(pScriptSlot->rwTexDictonary, pParentTxd);
+                        RebindLoadedModelToCurrentTxd(pModelInfo, usModelCurrentTxdId);
+                    }
+                }
             }
             else if (!g_bInTxdReapply)
             {
@@ -4292,6 +4821,20 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     // If the isolated slot is still valid, rebind the model to it.
                     if (CTxdStore_GetTxd(itIsolated->second.usTxdId) != nullptr)
                     {
+                        // Verify the child slot has its parent chain linked before binding.
+                        // Without a valid parent chain, SA's texture walk wont find
+                        // non-replaced textures and the model renders partly white.
+                        auto* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+                        auto* pChildSlot = pTxdPoolSA->GetTextureDictonarySlot(itIsolated->second.usTxdId);
+                        if (!pChildSlot || pChildSlot->usParentIndex == static_cast<unsigned short>(-1))
+                        {
+                            UpdateIsolatedTxdLastUse(usModelId);
+                            if (!g_PendingIsolatedModels.count(usModelId))
+                                AddPendingIsolatedModel(usModelId);
+                            QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                            return false;
+                        }
+
                         pModelInfo->SetTextureDictionaryID(itIsolated->second.usTxdId);
                         UpdateIsolatedTxdLastUse(usModelId);
                     }

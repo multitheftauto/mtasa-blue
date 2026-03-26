@@ -1345,6 +1345,151 @@ bail44:
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_LOAD_ONE_SOUND)
+//
+// BankNumBytes is corrupt, causing a memcpy buffer overflow
+// at 0x4DFE92 (rep movsd). Validate that the copy fits within both
+// the shared m_Buffer and the slot's own NumBytes region.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc47  0x4DFE7D
+#define HOOKSIZE_CrashFix_Misc47 5
+DWORD                 RETURN_CrashFix_Misc47 = 0x4DFE82;
+DWORD                 RETURN_CrashFix_Misc47B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc47()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced code
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx]              // edi = SlotInfo->OffsetBytes
+
+        // Bounds check: OffsetBytes + BankNumBytes <= m_BufferSize
+        mov     ecx, [ebx-12h]          // ecx = req.BankNumBytes
+        mov     eax, edi                // eax = OffsetBytes
+        add     eax, ecx               // eax = OffsetBytes + BankNumBytes
+        jc      bail47                  // unsigned overflow
+        cmp     eax, [ebp+18h]          // compare with m_BufferSize
+        ja      bail47                  // exceeds buffer
+
+        // Slot-local check: BankNumBytes must fit within the slot
+        cmp     ecx, [edx+4]            // compare with SlotInfo->NumBytes
+        ja      bail47                  // exceeds slot region
+
+        jmp     RETURN_CrashFix_Misc47
+
+bail47:
+        push    47
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc47B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_READ, whole-bank path)
+//
+// Same buffer overflow risk as Misc47, but on the whole-bank memcpy
+// at 0x4DFF90. Validate that the copy fits within both the shared
+// m_Buffer and the slot's own NumBytes region.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc48  0x4DFF78
+#define HOOKSIZE_CrashFix_Misc48 5
+DWORD                 RETURN_CrashFix_Misc48 = 0x4DFF7D;
+DWORD                 RETURN_CrashFix_Misc48B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc48()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced code
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx]              // edi = SlotInfo->OffsetBytes
+
+        // Bounds check: OffsetBytes + BankNumBytes <= m_BufferSize
+        mov     ecx, [ebx-12h]          // ecx = req.BankNumBytes
+        mov     eax, edi                // eax = OffsetBytes
+        add     eax, ecx               // eax = OffsetBytes + BankNumBytes
+        jc      bail48                  // unsigned overflow
+        cmp     eax, [ebp+18h]          // compare with m_BufferSize
+        ja      bail48                  // exceeds buffer
+
+        // Slot-local check: BankNumBytes must fit within the slot
+        cmp     ecx, [edx+4]            // compare with SlotInfo->NumBytes
+        ja      bail48                  // exceeds slot region
+
+        jmp     RETURN_CrashFix_Misc48
+
+bail48:
+        push    48
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc48B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_READ, single-sound path)
+//
+// The BankNumBytes subtraction at 0x4E0094 can underflow when the
+// AEAudioStream header contains corrupt data, producing a size that
+// overflows the subsequent Malloc + CdStreamRead allocation. Also
+// validates that the header-derived sound range stays within the
+// bank before it is used to position the next CdStreamRead.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc49  0x4E0094
+#define HOOKSIZE_CrashFix_Misc49 5
+DWORD                 RETURN_CrashFix_Misc49 = 0x4E0099;
+DWORD                 RETURN_CrashFix_Misc49B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc49()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced subtraction
+        sub     ecx, [eax]              // ecx = nextOrEnd - Sounds[SoundID].BankOffsetBytes
+
+        // Reject negative (underflow)
+        test    ecx, ecx
+        js      bail49
+
+        // Reject sizes exceeding the slot capacity
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx+4]            // edi = SlotInfo->NumBytes
+        cmp     ecx, edi                // BankNumBytes > NumBytes?
+        ja      bail49
+
+        // Reject sound ranges that run past the actual bank end
+        movsx   edx, word ptr [ebx-2]   // edx = req.Bank
+        test    edx, edx
+        js      bail49
+        cmp     dx, [ebp+0Eh]           // compare with m_BankLkupCnt
+        jae     bail49
+        lea     edx, [edx+edx*2]        // edx = bank index * 3
+        mov     esi, [ebp+4]            // esi = m_BankLkups
+        mov     esi, [esi+edx*4+8]      // esi = GetBankLookup(req.Bank).NumBytes
+        mov     edx, [eax]              // edx = Sounds[SoundID].BankOffsetBytes
+        add     edx, ecx                // edx = sound end within the bank
+        jc      bail49
+        cmp     edx, esi                // sound end > bank size?
+        ja      bail49
+
+        // Store result and continue
+        mov     [ebx-12h], ecx          // req.BankNumBytes = ecx
+        jmp     RETURN_CrashFix_Misc49
+
+bail49:
+        push    49
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc49B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CAnimBlendAssociation::SetFinishCallback
 //
 // "this" is invalid
@@ -2154,6 +2299,56 @@ static void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
         mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
         mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
         ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// _RwD3D9DynamicVertexBufferCreate
+//
+// NULL VB pointer crash when reusing a DynamicVertexBuffer list entry
+// whose prior CreateVertexBuffer call failed (out of video mem).
+// The entry has in_use=0, pVB=NULL, size=old_size. When the function
+// finds this entry with a non-matching size, it tries to Release() the
+// old VB through a NULL pointer (crash at 0x003F5A3A / 0x7F5A3A: mov ecx,[eax]).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+//
+// Hook at 0x7F5A36 replaces: mov eax,[esi+8]; push eax; mov ecx,[eax]
+// On NULL, skip the Release() block and continue to VB reallocation.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_DynVBCreateNull   0x7F5A36
+#define HOOKSIZE_CrashFix_DynVBCreateNull  6
+#define HOOKCHECK_CrashFix_DynVBCreateNull 0x8B
+DWORD RETURN_CrashFix_DynVBCreateNull = 0x7F5A3C;
+DWORD RETURN_CrashFix_DynVBCreateNull_Skip = 0x7F5A8F;
+
+static void _declspec(naked) HOOK_CrashFix_DynVBCreateNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esi+8]                         // load VB pointer from list entry
+        test    eax, eax
+        jz      bail_out_dynvb
+
+        // Replicate overwritten bytes (push eax; mov ecx,[eax])
+        push    eax
+        mov     ecx, [eax]
+        jmp     RETURN_CrashFix_DynVBCreateNull
+
+    bail_out_dynvb:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    46
+        call    CrashAverted
+        jmp     RETURN_CrashFix_DynVBCreateNull_Skip
     }
     // clang-format on
 }
@@ -3470,6 +3665,9 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc43);
     EZHookInstall(CrashFix_Misc45);
     EZHookInstall(CrashFix_Misc44);
+    EZHookInstall(CrashFix_Misc47);
+    EZHookInstall(CrashFix_Misc48);
+    EZHookInstall(CrashFix_Misc49);
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
     EZHookInstall(CrashFix_Misc33);
@@ -3481,6 +3679,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_VBInstV3dNull);
     EZHookInstallChecked(CrashFix_VBInstV3dMorphNull);
     EZHookInstallChecked(CrashFix_VBInstWeightsNull);
+    EZHookInstallChecked(CrashFix_DynVBCreateNull);
     EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);

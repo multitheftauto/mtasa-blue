@@ -459,6 +459,146 @@ auto GetGameExecutablePath() -> std::filesystem::path
     return executable;
 }
 
+namespace
+{
+    SString MakeCurrentVersionRegistryPath(const SString& strPath)
+    {
+        return PathJoin(GetProductRegistryPath(), GetMajorVersionString(), strPath).TrimEnd("\\");
+    }
+
+    bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath)
+    {
+        if (strLaunchPath.empty())
+            return false;
+
+        if (!strLaunchPath.ContainsI("\\upcache\\"))
+            return false;
+
+        return ExtractFilename(strLaunchPath).ContainsI("_tmp_");
+    }
+
+    bool IsUsableMtasaInstallRoot(const SString& strPath)
+    {
+        if (strPath.empty())
+            return false;
+
+        return FileExists(PathJoin(strPath, "Multi Theft Auto.exe")) || FileExists(PathJoin(strPath, "Multi Theft Auto_d.exe")) ||
+               FileExists(PathJoin(strPath, "mta", "core.dll")) || FileExists(PathJoin(strPath, "MTA", "core.dll")) ||
+               FileExists(PathJoin(strPath, "mta", "core_d.dll")) || FileExists(PathJoin(strPath, "MTA", "core_d.dll"));
+    }
+
+    bool HasDistinct64BitRegistryView()
+    {
+#if defined(_WIN64)
+        return false;
+#elif defined(KEY_WOW64_64KEY)
+        using IsWow64ProcessFn = BOOL(WINAPI*)(HANDLE, PBOOL);
+
+        static IsWow64ProcessFn fnIsWow64Process = nullptr;
+        static bool             bResolved = false;
+
+        if (!bResolved)
+        {
+            bResolved = true;
+
+            if (HMODULE hKernel32 = GetModuleHandleW(L"kernel32.dll"); hKernel32)
+            {
+                FARPROC procAddr = GetProcAddress(hKernel32, "IsWow64Process");
+                if (procAddr)
+                {
+                    static_assert(sizeof(fnIsWow64Process) == sizeof(procAddr), "Unexpected function pointer size");
+                    std::memcpy(&fnIsWow64Process, &procAddr, sizeof(fnIsWow64Process));
+                }
+            }
+        }
+
+        if (!fnIsWow64Process)
+            return false;
+
+        BOOL bIsWow64 = FALSE;
+        return fnIsWow64Process(GetCurrentProcess(), &bIsWow64) && bIsWow64;
+#else
+        return false;
+#endif
+    }
+
+    SString GetRegistryValue64(const SString& strPath, const SString& strName)
+    {
+        if (!HasDistinct64BitRegistryView())
+            return GetRegistryValue(strPath, strName);
+
+        const WString wstrSubKey = FromUTF8(MakeCurrentVersionRegistryPath(strPath));
+        const WString wstrValueName = FromUTF8(strName);
+
+        HKEY hKey = nullptr;
+        if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey.c_str(), 0, KEY_READ | KEY_WOW64_64KEY, &hKey) != ERROR_SUCCESS || !hKey)
+            return "";
+
+        DWORD valueType = REG_SZ;
+        DWORD valueSize = 0;
+        LONG  result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, nullptr, &valueSize);
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize == 0)
+        {
+            RegCloseKey(hKey);
+            return "";
+        }
+
+        std::vector<wchar_t> buffer((valueSize / sizeof(wchar_t)) + 1, L'\0');
+        result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, reinterpret_cast<LPBYTE>(buffer.data()), &valueSize);
+        RegCloseKey(hKey);
+
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ))
+            return "";
+
+        if (valueSize >= sizeof(wchar_t))
+            buffer[(valueSize / sizeof(wchar_t)) - 1] = L'\0';
+        else
+            buffer[0] = L'\0';
+
+        return ToUTF8(buffer.data());
+    }
+
+    void SetRegistryValue64(const SString& strPath, const SString& strName, const SString& strValue)
+    {
+        if (!HasDistinct64BitRegistryView())
+        {
+            SetRegistryValue(strPath, strName, strValue);
+            return;
+        }
+
+        const WString wstrSubKey = FromUTF8(MakeCurrentVersionRegistryPath(strPath));
+        const WString wstrValueName = FromUTF8(strName);
+        const WString wstrValue = FromUTF8(strValue);
+
+        HKEY hKey = nullptr;
+        if (RegCreateKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS | KEY_WOW64_64KEY, nullptr, &hKey,
+                            nullptr) != ERROR_SUCCESS ||
+            !hKey)
+            return;
+
+        RegSetValueExW(hKey, wstrValueName.c_str(), 0, REG_SZ, reinterpret_cast<const BYTE*>(wstrValue.c_str()),
+                       static_cast<DWORD>((wstrValue.length() + 1) * sizeof(wchar_t)));
+        RegCloseKey(hKey);
+    }
+}
+
+SString GetInstallPathForLauncher()
+{
+    const SString strLaunchPath = GetLaunchPath();
+    if (!IsTemporaryUpdateLaunchPath(strLaunchPath))
+        return strLaunchPath;
+
+    const SString strSavedInstallPath = GetRegistryValue("", "Last Run Location");
+    if (IsUsableMtasaInstallRoot(strSavedInstallPath) && !IsTemporaryUpdateLaunchPath(strSavedInstallPath))
+        return strSavedInstallPath;
+
+    const SString strSavedInstallPath64 = GetRegistryValue64("", "Last Run Location");
+    if (IsUsableMtasaInstallRoot(strSavedInstallPath64) && !IsTemporaryUpdateLaunchPath(strSavedInstallPath64))
+        return strSavedInstallPath64;
+
+    return strLaunchPath;
+}
+
 void SetMTASAPathSource(bool bReadFromRegistry)
 {
     if (bReadFromRegistry)
@@ -469,6 +609,16 @@ void SetMTASAPathSource(bool bReadFromRegistry)
     {
         // Get current module full path
         SString strLaunchPathFilename = GetLaunchPathFilename();
+        SString strLaunchPath = GetLaunchPath();
+        SString strInstallPath = GetInstallPathForLauncher();
+
+        if (!strInstallPath.CompareI(strLaunchPath))
+        {
+            AddReportLog(1063, SString("SetMTASAPathSource: preserving install path '%s' for temp launcher '%s'", strInstallPath.c_str(),
+                                       strLaunchPathFilename.c_str()));
+            g_strMTASAPath = strInstallPath;
+            return;
+        }
 
         SString strHash = "-";
         {
@@ -483,14 +633,16 @@ void SetMTASAPathSource(bool bReadFromRegistry)
         }
 
         SetRegistryValue("", "Last Run Path", strLaunchPathFilename);
+        SetRegistryValue64("", "Last Run Path", strLaunchPathFilename);
         SetRegistryValue("", "Last Run Path Hash", strHash);
+        SetRegistryValue64("", "Last Run Path Hash", strHash);
         SetRegistryValue("", "Last Run Path Version", MTA_DM_ASE_VERSION);
+        SetRegistryValue64("", "Last Run Path Version", MTA_DM_ASE_VERSION);
 
         // Strip the module name out of the path.
-        SString strLaunchPath = GetLaunchPath();
-
         // Save to a temp registry key
         SetRegistryValue("", "Last Run Location", strLaunchPath);
+        SetRegistryValue64("", "Last Run Location", strLaunchPath);
         g_strMTASAPath = strLaunchPath;
     }
 }
@@ -1104,8 +1256,48 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
         usNetRel = static_cast<unsigned short>(atoi(parts[5]));
     }
 
+    const auto LoadVersionModule = [&](const SString& strRootPath, DWORD& dwOutLastError) -> HMODULE
+    {
+        if (strRootPath.empty())
+            return NULL;
+
+        const SString strLibPath = PathJoin(strRootPath, "mta");
+        const SString strLibPathFilename = PathJoin(strLibPath, strFilename);
+        if (!FileExists(strLibPathFilename))
+        {
+            dwOutLastError = ERROR_FILE_NOT_FOUND;
+            return NULL;
+        }
+
+        const SString strPrevCurDir = GetSystemCurrentDirectory();
+        SetCurrentDirectory(strLibPath);
+        SetDllDirectory(strLibPath);
+
+        HMODULE hLoadedModule = LoadLibrary(strLibPathFilename);
+        dwOutLastError = GetLastError();
+
+        SetCurrentDirectory(strPrevCurDir);
+        SetDllDirectory(strPrevCurDir);
+        return hLoadedModule;
+    };
+
     DWORD   dwLastError = 0;
-    HMODULE hModule = GetLibraryHandle(strFilename, &dwLastError);
+    HMODULE hModule = NULL;
+    bool    bFreeModule = false;
+
+    const SString strInstallPath = GetInstallPathForLauncher();
+    if (IsUsableMtasaInstallRoot(strInstallPath))
+    {
+        hModule = LoadVersionModule(strInstallPath, dwLastError);
+        bFreeModule = hModule != NULL;
+    }
+
+    if (!hModule)
+    {
+        hModule = LoadVersionModule(GetLaunchPath(), dwLastError);
+        bFreeModule = hModule != NULL;
+    }
+
     if (hModule)
     {
         typedef void (*PFNINITNETREV)(const char*, const char*, const char*);
@@ -1126,6 +1318,9 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
         SString strMessage(_("Error loading %s module! (%s)"), *strFilename.ToLower(), *strError);
         DisplayErrorMessageBox(strMessage, _E("CL38"), "module-not-loadable&name=" + ExtractBeforeExtension(strFilename));
     }
+
+    if (bFreeModule)
+        FreeLibrary(hModule);
 
     if (!bQuiet)
         SetApplicationSetting("mta-version-ext", SString("%d.%d.%d-%d.%05d.%c.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE,
@@ -1364,8 +1559,11 @@ void CleanDownloadCache()
 {
     const uint uiMaxCleanTime = 5;                 // Limit clean time (seconds)
     const uint uiCleanFileAge = 60 * 60 * 24 * 7;  // Delete files older than this
+    const uint uiTmpDirCleanAge = 60 * 60 * 24;    // Delete stale extracted temp dirs older than this
 
-    const time_t tMaxEndTime = time(NULL) + uiMaxCleanTime;
+    const time_t  tMaxEndTime = time(NULL) + uiMaxCleanTime;
+    const SString strLaunchPath = GetLaunchPath();
+    const SString strCurrentDir = GetSystemCurrentDirectory();
 
     // Search possible cache locations
     std::list<SString> cacheLocationList;
@@ -1382,8 +1580,18 @@ void CleanDownloadCache()
         for (uint i = 0; i < fileList.size(); i++)
         {
             const SString strPathFilename = PathJoin(strCacheLocation, fileList[i]);
+            const bool    bIsExtractedTempDir = DirectoryExists(strPathFilename) && ExtractFilename(strPathFilename).ContainsI("_tmp_");
+            const uint    uiRequiredAge = bIsExtractedTempDir ? uiTmpDirCleanAge : uiCleanFileAge;
+
+            if (bIsExtractedTempDir)
+            {
+                if (strLaunchPath.CompareI(strPathFilename) || strCurrentDir.CompareI(strPathFilename) || strLaunchPath.BeginsWithI(strPathFilename + "\\") ||
+                    strCurrentDir.BeginsWithI(strPathFilename + "\\"))
+                    continue;
+            }
+
             // Check if over 7 days old
-            if (GetFileAge(strPathFilename) > uiCleanFileAge)
+            if (GetFileAge(strPathFilename) > uiRequiredAge)
             {
                 // Delete as directory or file
                 if (DirectoryExists(strPathFilename))
