@@ -56,28 +56,39 @@ bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLeng
 
 void CModManager::DoPulsePreFrame()
 {
+    CLOCK_SET_SECTION("CModManager::DoPulsePreFrame");
+    CLOCK1("Total");
+
     TIMING_GRAPH("+DoPulsePreFrame");
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameStart();  // Prepare FPS limiting for this frame
+    CLOCK_CALL1(CCore::GetSingleton().GetFPSLimiter()->OnFrameStart(););  // Prepare FPS limiting for this frame
 
     if (m_client)
     {
-        m_client->PreFrameExecutionHandler();
+        CLOCK_CALL1(m_client->PreFrameExecutionHandler(););
     }
     TIMING_GRAPH("-DoPulsePreFrame");
+    UNCLOCK1("Total");
 }
 
 void CModManager::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets)
 {
+    CLOCK_SET_SECTION("CModManager::DoPulsePreHUDRender");
+    CLOCK1("Total");
+
     TIMING_GRAPH("+DoPulsePreHUDRender");
     if (m_client)
     {
-        m_client->PreHUDRenderExecutionHandler(bDidUnminimize, bDidRecreateRenderTargets);
+        CLOCK_CALL1(m_client->PreHUDRenderExecutionHandler(bDidUnminimize, bDidRecreateRenderTargets););
     }
     TIMING_GRAPH("-DoPulsePreHUDRender");
+    UNCLOCK1("Total");
 }
 
 void CModManager::DoPulsePostFrame()
 {
+    CLOCK_SET_SECTION("CModManager::DoPulsePostFrame");
+    CLOCK1("Total");
+
     auto handleStateChange = [&]()
     {
         if (m_state == State::PendingStart)
@@ -88,26 +99,27 @@ void CModManager::DoPulsePostFrame()
 
     TIMING_GRAPH("+DoPulsePostFrame");
 
-    handleStateChange();  // Handle state changes before pulse
+    CLOCK_CALL1(handleStateChange(););  // Handle state changes before pulse
 
     if (m_client)
     {
-        m_client->PostFrameExecutionHandler();
+        CLOCK_CALL1(m_client->PostFrameExecutionHandler(););
     }
     else
     {
-        CCore::GetSingleton().GetNetwork()->DoPulse();
+        CLOCK_CALL1(CCore::GetSingleton().GetNetwork()->DoPulse(););
     }
 
-    CCore::GetSingleton().DoReliablePulse();  // Do reliable pulse
+    CLOCK_CALL1(CCore::GetSingleton().DoReliablePulse(););  // Do reliable pulse
 
-    handleStateChange();  // Handle state changes after pulse
+    CLOCK_CALL1(handleStateChange(););  // Handle state changes after pulse
 
     // TODO: ENSURE "CModManager::DoPulsePostFrame" IS THE LAST THING BEFORE THE FRAME ENDS
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();  // Apply FPS limiting
+    CLOCK_CALL1(CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd(););  // Apply FPS limiting
 
     TIMING_GRAPH("-DoPulsePostFrame");
     TIMING_GRAPH("");
+    UNCLOCK1("Total");
 }
 
 bool CModManager::Load(const char* arguments)

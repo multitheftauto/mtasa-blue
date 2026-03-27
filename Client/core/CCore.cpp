@@ -1315,25 +1315,32 @@ bool CCore::IsWindowMinimized()
 
 void CCore::DoPreFramePulse()
 {
+    CLOCK_SET_SECTION("CCore::DoPreFramePulse");
+    CLOCK1("Total");
+
     TIMING_CHECKPOINT("+CorePreFrame");
 
     if constexpr (bFreezeWatchdogEnabledInCurrentBuild)
         UpdateWatchdogHeartbeat();
 
-    m_pKeyBinds->DoPreFramePulse();
+    CLOCK_CALL1(m_pKeyBinds->DoPreFramePulse(););
 
     // Notify the mod manager
-    m_pModManager->DoPulsePreFrame();
+    CLOCK_CALL1(m_pModManager->DoPulsePreFrame(););
 
-    m_pLocalGUI->DoPulse();
+    CLOCK_CALL1(m_pLocalGUI->DoPulse(););
 
     CCrashDumpWriter::UpdateCounters();
 
     TIMING_CHECKPOINT("-CorePreFrame");
+    UNCLOCK1("Total");
 }
 
 void CCore::DoPostFramePulse()
 {
+    CLOCK_SET_SECTION("CCore::DoPostFramePulse");
+    CLOCK1("Total");
+
     TIMING_CHECKPOINT("+CorePostFrame1");
     if (m_bQuitOnPulse)
         Quit();
@@ -1441,19 +1448,19 @@ void CCore::DoPostFramePulse()
         m_bLastFocused = true;
     }
 
-    GetJoystickManager()->DoPulse();  // Note: This may indirectly call CMessageLoopHook::ProcessMessage
-    m_pKeyBinds->DoPostFramePulse();
+    CLOCK_CALL1(GetJoystickManager()->DoPulse(););  // Note: This may indirectly call CMessageLoopHook::ProcessMessage
+    CLOCK_CALL1(m_pKeyBinds->DoPostFramePulse(););
 
     if (m_pWebCore)
-        m_pWebCore->DoPulse();
+        CLOCK_CALL1(m_pWebCore->DoPulse(););
 
     // Notify the mod manager and the connect manager
     TIMING_CHECKPOINT("-CorePostFrame1");
-    m_pModManager->DoPulsePostFrame();
+    CLOCK_CALL1(m_pModManager->DoPulsePostFrame(););
     TIMING_CHECKPOINT("+CorePostFrame2");
-    GetMemStats()->Draw();
-    GetGraphStats()->Draw();
-    m_pConnectManager->DoPulse();
+    CLOCK_CALL1(GetMemStats()->Draw(););
+    CLOCK_CALL1(GetGraphStats()->Draw(););
+    CLOCK_CALL1(m_pConnectManager->DoPulse(););
 
     // Update Discord Rich Presence status
     if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
@@ -1470,6 +1477,7 @@ void CCore::DoPostFramePulse()
     }
 
     TIMING_CHECKPOINT("-CorePostFrame2");
+    UNCLOCK1("Total");
 }
 
 // Called after MOD is unloaded
