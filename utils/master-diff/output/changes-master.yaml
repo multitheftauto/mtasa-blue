@@ -1,0 +1,410 @@
+- commit: 859e6cec95130df1f7b03b7114734869841249e2  # Remove outdated bitstream checks
+- commit: fe761e52e4f187df465e1e8079adefa299c1ab55  # Remove unused jump section in HOOK_CPlantMgr_Render
+- commit: bbf74ba0d31e0934e84b2001291b6277fe9dad48  # Include or exclude VERSION_TYPE_UNTESTED in some places
+- commit: 7108a8d261b937ceda528c96bd52caf68e3903ab  # Improve client-side markers & Fix logic (PR #3324, Fixes #3310)
+- commit: b97ce4fbbedffad2074e0c6457d70448f6367a09  # Fix arrow type marker snapping to the ground (PR #4027, Fixes #536, Fixes #4000)
+- commit: 45bb3d5b234b91e62488c78117d487671d5cbd60  # Swapped the order of Hotring Racer 2 and Hotring Racer 3 (PR #3797)
+- commit: 4653b7e2b7d74f756a1a5a1db83daa0d73b2bbf9  # Fix max health formula (PR #3934, Fixes #3807)
+- commit: 886194e076c34035f4f0e6bd518130f6ba1b41ff  # Fix Purple Dildo and Silver Vibrator weapon names (PR #3801, Fixes #514)
+- commit: 1b815b5ee9e9fe23d812b83c91151e1efa89ac0d  # Fix setVehicleVariant turns on the engine (PR #3486, Fixes #542)
+- commit: df28972b757a59601ed5c4095d43c58ebcd6756f  # Fix the reversed zoom in/out control states in getControlState (PR #3467, Fixes #2570)
+- commit: 820c22ea7a7e58f7650eb15dc24c2c4e9e207306  # Fix Lua array detection and order preservation when using toJSON (PR #3369)
+- commit: 17c2b28d9cb76512978be3ae013214a2a31d4f6d  # Attach events & rotation fix (PR #3353, Fixes #3273)
+- commit: 841bf30b9594d677888538c98e0bcd8d0ccbab77  # Fix cylinder marker colshape and collision radius not matching visual (PR #3436)
+- commit: a5d97d61f57b6ebc5c2e7c86e4b098a9e1f85688  # Use BASE_URL in install_data.lua build action
+- commit: 1e24eac340bede901a452d17030a3bb10790b1d6  # Restore "Fix anim progress & speed (PR #4245)"
+- commit: 602d160388fe649aa46ac88269f15af2dd08d803  # Fix version type checks
+- commit: 7856d8bc19646c902002036de8a9cb3b43aebeae  # New Crowdin updates (PR #4315)
+- commit: bb5666741878130a4010c8cc52abb2b5cdf529cb  # Increase vehicle model id range in packet (PR #4324)
+- commit: 7b75f69df4ec238e089b5be1e8e83129e7a8d769  # Improve players animation sync (PR #4326)
+- commit: 602b26e8f8116379ce73d2886fd186aa1107cdd9  # Refresh sound settings after setVehicleModelAudioSetting (PR #4321, Fixes #4314)
+- commit: 9c4397707dd2a94d8a6124d6b502d39793f0d2ba  # Fix friendly fire does not prevent the player from burning (PR #4320, Fixes #399)
+- commit: f5e8e69ce3db8a3cea389df67f04a609a07fa6be  # Add collision type check to getColPolygonHeight and setColPolygonHeight (PR #4318, Fixes #4305)
+- commit: 078d46b13164c940f3a713039e1a1be6d52c6c76  # Add event onAccountNameChange (PR #4270, Fixes #4246)
+- commit: c43c1b98b8ec0b7253d98c65b405ead482a765d8  # Improve function getPedMoveState (PR #4316)
+- commit: 66cf087137e9a3edb11b1df0ebb948761dc71e7a  # Bump NETCODE_VERSION
+- commit: 8b199c40c70296d848de33bd223592a3f3af3551  # Follow-up to pull request #4326 (PR #4328)
+- commit: a9bd854a842455a8af6b115ab3339bdef3592470  # Make cross compiling the project using msvc-wine on Linux possible (PR #4332)
+- commit: 7fa778bb22313ac16263421f588ef2ecb9781602  # Update CEF to 138.0.36+g52669d7+chromium-138.0.7204.184
+- commit: 1113a8083e828f29a4955741fa5d466a4faf7acf  # New Crowdin updates (PR #4335)
+- commit: 4cf1a65a91bdcc9f4dff360d8f4672eb550f3e83  # Update crowdin-translators.json
+- commit: d59555ed3b4999d5af8f108d44c9fd227d1416b3  # Update CEF to 139.0.17+g6c347eb+chromium-139.0.7258.31
+- commit: 797331fadbca4367f6cfd43633e48af44a99a115  # Add "hanging" movement state to getPedMoveState (PR #4350)
+- commit: 1dbbfd025c5ff791f31e1ef4f255514198f88d0c  # Fix engineReplaceModel memory leak & crash for vehicles (PR #4349, Fixes #4348)
+- commit: 4ef760c3315ac5a4dbc01356a6ad512077a0878d  # Update dependencies in /utils/localization/generate-images (PR #4343)
+- commit: c51e87d63a5ff54ed22b848cff8289cbae13bb43  # New Crowdin updates (PR #4345)
+- commit: 36f905439a8b062e93b0f216d874ed407fc775de  # Test for codeql.yml
+- commit: c7d718b8bc9a1bc757d5de6fca6d1c0efb43e41c  # Update freetype to adc7b85 (PR #4355)
+- commit: 0adb35578ce4922c6ab477e0a3585e825e5e2427  # Delete .github/workflows/codeql.yml
+- commit: b3240ff1aa1eaa6898c23e6b4cf23a8a703c0db6  # Addendum (codeql), to force-config workflow it had to first be deleted
+- commit: c684463fb68395e3fdd91bd4f07da8b19475ac66  # Possible fix for codeql
+- commit: 4cefa4d060e4543b2be3ffbd14eb465edc01e6d7  # Fix client-side `createExplosion` not triggering `onClientExplosion` event (#4341)
+- commit: be395665c0f5094793b923e9f4fb94056ccff961  # Show disconnect warning when using Quick Connect while connected (#4344)
+- commit: b98c091713ad133f9f472d36995795c7622cdb71  # Add ability to show/hide radar components (#4331)
+- commit: 257f4cd12a8d6e8141eb50574c7b0f1402b5d086  # Fix isPedOnGround (#4317)
+- commit: 0c2433cdfc9f241a74f3ca32ea4c7cff5a0f2f07  # Use actual type names in recent changes
+- commit: 4a8b307905a7b630c3f6dbd1417dd40d58f96641  # update SQLite to 3.50.4
+- commit: 80a5d8969e978ce34da3370267f54de5f99fbd4b  # Update nvapi from R575 to R580
+- commit: 2359d7f2846da19f703e5876d7dafd6e98f1c94c  # Fix client side debugscript level filtering (#3498) (#4323)
+- commit: 22c54a15603e865adf851e94d3f346f1c7d61783  # Revert "Update cURL to 8.15.0 (#4358)" for now, due to incompatibilities
+- commit: d9477bd0b5199137aa22c062bf0ca0129e2f9d53  # New Crowdin updates (PR #4351)
+- commit: 274d865f505c2d73045d752a434d175536816428  # Fixes #2680 - GetGarageSize returns wrong values (#4360)
+- commit: 7b236543b74fe77666321b060bc03b2bc2e7a50b  # Add textures created by svgCreate to showmemstat (#4365)
+- commit: 899c84cde6657a81b877f5a47e5a1fa3045e92c8  # Reintroduce 2f4a0a4: "Fix sourceResourceRoot for client-sided events" for release 1.7
+- commit: bc431d85746d4abde150129a761783d064744a30  # Refactor mtaserver.conf.template (#3857)
+- commit: 49fb0a8f2f78f6577208388fcd8ca69898121ae6  # Update installer en_US pot
+- commit: 4764404ede4bccd3430a4c0350879c3e60cfc1ef  # Update CEF to 139.0.23+g34a5b51+chromium-139.0.7258.128
+- commit: 9a0b1d59233f7001e991262b4df9d1c17850dc08  # Fix chat message length calculation with colorCoded enabled (#4370)
+- commit: fef07beaaa7ca29cc203435f444111e78da87c23  # Tell IntelliSense to chill and stop freaking out about fake template errors (#4372)
+- commit: 38e550f295d40751f001d58ccb1d278bad5fb993  # Add `onClientPlayerWeaponReload` and `onClientPedWeaponReload` events (#4373)
+- commit: 5c3b98886bd533cb530695739de752998fba8ba1  # Revert "Refactor mtaserver.conf.template (#3857)" This reverts commit bc431d85746d4abde150129a761783d064744a30.
+- commit: 09d87e42fa46b9eef5350b2a237ab531e3c6a737  # Update installer en_US pot
+- commit: 434f285e5c4b061a548174173011e4918a300827  # Update CEF to 139.0.26+g9d80e0d+chromium-139.0.7258.139
+- commit: c44b19ac1fe952582d63abd8738446e7c044f9ce  # update CryptoPP to 3ee8003 @ https://github.com/Dutchman101/cryptopp-updated
+- commit: 11b9762fdf64e3db9ff9d8c1f79ee1274b8d25d3  # Fix build error
+- commit: d3bf6f759f750fa493ef82156df821759166ce30  # Re-do "Fix build error"
+- commit: 4b203770c133d34ce63ef9347373255519eac3e3  # Better tolerance for isPedOnGround (#4379)
+- commit: 9ff02d55884e760ac17c7e2850be7ed4356f3dcb  # CCamSA, CCameraSA, CCameraRPC fixes
+- commit: ffff9d150a89bd5d5182228a6fb8e7dabaaade2e  # New Crowdin updates (PR #4368)
+- commit: 1a105c3c6d7e90564b95f6078546e57cbf2648df  # Addendum to 9ff02d5
+- commit: 2d42a4249a9294eea07ed4a2f22b8787085dec21  # Set hasObjectPermissionTo defaultPermission to false (#4388)
+- commit: afce8bf17b65c8b3c5dba7a4705a6779990e2f6b  # Addendum to 2d42a42 (MainFunctions.cpp improvements)
+- commit: 798a480c37f0129163a9505907f4aa00d53230ad  # Update Docker build image to Ubuntu Noble with GCC 15
+- commit: f5e59ac6534452eeaf4c6453cd5329bcd7cb46bc  # Fix compilation issues after update to GCC 15 (pt. 1)
+- commit: 362e171e47440f34cbd107c024fce037b5e97c05  # Fix compilation issues after update to GCC 15 (pt. 2)
+- commit: 2bb356cf205e79ccb049c209fb4ca860b803220b  # Use docker-entrypoint.sh in Linux build jobs
+- commit: ea47d21651c425b0b3d86ef054a540a93504ab6b  # Update CEF to 139.0.28+g55ab8a8+chromium-139.0.7258.139
+- commit: 1762b18b5f3f6a7cc5b977f297a650ac86e4f497  # Add MSVC build option /permissive-
+- commit: 4dcf1402fe5fd43897d6746c750ddae49dbc1209  # Resolve errors and warnings in vendor
+- commit: 17f73866e79d659888a1931c2e81353a9bb0dd5d  # Resolve errors and warnings in Shared
+- commit: e2e7e98633929a016ebd7e1f8372bb8ed8a81fe6  # Resolve errors and warnings in Server
+- commit: 73489af19e459384835954a955b663a268d89867  # Resolve errors and warnings in Client
+- commit: 7b9842440fcd5530ff15e23185cde4c436a46430  # Resolve errors and warnings in Client Deathmatch
+- commit: 52308a3d70eb1c95ca170a5a47ecb3a397815e51  # Resolve errors and warnings in remainder
+- commit: a57ae58bb93e1ce6d10e822500673196af95253c  # Remove /SAFESEH:NO
+- commit: ba48e3456a000d9ee88bf22d2c6b40542e792b4f  # Switch to C++23
+- commit: 3d01dbb2473870321ed95192f3b6dbd17f5f09bb  # Default to GCC-15 for macOS
+- commit: aa7653e081a763b9dc40ccfaface040fa36649dd  # Update Premake from 5.0.0-b5 to Update Premake from 5.0.0-b7
+- commit: ea834e26ac0a4ea65bf24dca1b95fbf83356c14f  # Fix for commit 3d01dbb2473870321ed95192f3b6dbd17f5f09bb
+- commit: 224172fbd28c64b4d4cc437eb7c91c5599791ff8  # Fix warning in json-c
+- commit: 6fabe57e540d9fb76ae35cb9434810f819dee027  # Fix Linux compiler error
+- commit: 539bd29671000277f2669c70cb8da890a2c82f40  # Switch to macOS-15 runner image
+- commit: 3300770b966c103ae02c4e151dbfd44bdf6e3ce3  # Fix Linux compile error and some warnings
+- commit: 328ea8f1999c6fb2a78c6996d63f844ba61ffd8c  # Remove x64 for macOS
+- commit: 2ecdac74eb270f85b60fcbac34fa158e06ff8a3e  # Change linux-build defaults for macOS
+- commit: 2b80fbf8310855be7624c90947068adc9a9036ed  # Remove env step for macOS build
+- commit: 39a9ff5bd1dcaddd9b0974b97cf02d665f64daaa  # Move destructor of dwarf2reader::CompilationUnit to cc file
+- commit: f855b36457fdf159ac84017127e6b3c58257a9d1  # Limit some disablewarnings to system:windows
+- commit: dede110c6441ea6e60e7a33081e5d3992369f3c4  # Remove NetBitStreamInterfaceNoVersion
+- commit: 4138edb454653e638d6ebc2c299bb08be3f65a3f  # Remove objcopy for libmysqlclient.a
+- commit: e33bf1cddda9ed836204f71f6635b5ed352ca908  # Bump net module version after dede110c6441ea6e60e7a33081e5d3992369f3c4
+- commit: 428a2d517f879c81cca1ac7a1e4af43b6ba2eea5  # New Crowdin updates (PR #4382)
+- commit: 2e12e98b4ac3a23fe6b4b601413e350e62f2ad46  # Use double underscore for __declspec(naked)
+- commit: 49ec768b374b8576ad47d8ab99fe9cd64e0f3c21  # Use double underscore for __asm
+- commit: f535ff12c0965f5bd10e56d03caf056328cca145  # Replace byte with uint8_t in CTransmission
+- commit: 6f4bc9c56d97b272d5096e8d25f019e3dbe1e673  # Add hookcheck utility program
+- commit: 6c3bd6989c162e3f0fbbcd2eb4c42d6101f821a1  # Switch to C++23 in game_sa
+- commit: 1af8a67362ed0ad731a9794497bbb96d3a2da2a2  # Switch to C++23 in multiplayer_sa (part 1)
+- commit: 3ce2cc1a303749cbf8b0bfbf01881d52a81c9c8d  # Switch to C++23 in multiplayer_sa (part 2)
+- commit: c81113a2053b71430a62dabe020677cf92bcf4a1  # Switch to registration-free COM for hookcheck
+- commit: 82dc4b00ccb409022a80fc63e914977eec7977a6  # Use MSBuild property TargetPath in postbuildcommands
+- commit: 92c1947fb7c797c19112c195a664fdc7585f937f  # Fix typo in gen_language_list build-solution.bat
+- commit: e4bea3bac45237a6940625ab4488660e4d61e066  # Remove cppdialect for glob and lunasvg
+- commit: 75bfec8905342be7f9c037c44416e28ab3e712df  # Update hookcheck
+- commit: 8d150a2b143fa7926f5e42024f54711b47eb60f1  # Addendum for commit 75bfec8905342be7f9c037c44416e28ab3e712df
+- commit: 8dcc2073c6be510c36147303c1c65d2b0ae7ec5f  # Fix client-side peds not being able to enter/exit local vehicles (#4396)
+- commit: ac7351fb751dc56f5a1f6af66612e939e87fdabe  # Fix camera behavior and `getCameraMatrix` return values (#1282 & #1284) (#4393)
+- commit: 2df92c64160f5c983e749eb2fae3c90fffbb5192  # Set Application ID on client shortcut
+- commit: 6fd08251070239f2cf48c1bb4e17569232f8be5d  # Update installer en_US pot
+- commit: bd7f4c31c1eafaeda7e99bdc1b77ccdaf1c63fb9  # Clamp values in CWaterLevel::TestLineAgainstWater
+- commit: 63b91ff36ed0c00fed721fd4b417e7fb1d4b8b9b  # Improve internal buffer management for voice packets
+- commit: cce4967c6d88d593fc5ec469c8112f3b824a6dd2  # Add onPlayerResourceStart trigger check
+- commit: 7bd161de840b9b76f0d08ef4411cccb2d0f9fb88  # Refactor mtaserver.conf.template (#3857)
+- commit: 8c9f53d7c0d2f8806def5e2712e8a4a85052b9f8  # Update installer en_US pot
+- commit: ea3362ae1cc34d2c3a6560122898ee0a13bb1c59  # Improve exception handling in hookcheck program
+- commit: d5f4af11f65edf476c253ef39814f8cc471e1251  # Fixes #3655 - prevent duplicate command registration (#4313)
+- commit: 0d930ac5ecb4a6365b8f84dc0c643199a2fcec7e  # Fix dependency issue with define for MessageBoxUTF8
+- commit: 24d6d697f93fe3a4490fa8c0bc4206a6624b3a3b  # Fix macOS paths in dbconmy
+- commit: e4906166065530083c07a032b4f938545c8c70c0  # Fix `onClientWorldSound` event cancellation for non-entity sounds (#3269) (#4416)
+- commit: 460ad51ed9e9a631ae728ec955ba0fa7dab2b133  # Fix `getTrainSpeed` returning 0 for negative speeds (#2732) (#4415)
+- commit: 76b02d25b5011be07a4320d6fb82fbe418c150ec  # New Crowdin updates (PR #4406)
+- commit: bd9652209dfdb0fc0899648edbe5988d0addd755  # Fix argument parser not handling noexcept functions (PR #4404)
+- commit: 8d5224e678bc04f1b3129e488b1fce3c0f85f0dc  # Revert "Fix compilation issues after update to GCC 15 (pt. 2)"
+- commit: 0f01e5d407ab4be2e1319c6b90be86f2307f1e24  # Death Event Parameters Synchronization Fix (#4418)
+- commit: 8b29ce81f5cd3c188e3b0290d578a5a811b2ebd7  # Fix missing climbing animation (PR #4387, Fixes #1016)
+- commit: a7903751119afbebbf4ca0eb55bdc1397f157ac3  # Bump _NETCODE_VERSION
+- commit: d0e210a4c5f08fe8164653581134462c39e0d65b  # Fix ACL request detection when using refresh (#1824) (#4409)
+- commit: 62486c0803ddacaf550c0a452d59fd97f88bda2e  # #4393 Follow-Up (Roll value) (#4424)
+- commit: c3a1ddfc9523bdecc7648b2b56cfcf842d286b0a  # Fix cross-resource timer access (#827) (#4422)
+- commit: fc1bd622e99dbc5b539235b81b7508a826d328f9  # Fixes #4347 - Colshape desync on parent move (#4429)
+- commit: 7c2004b2ebe420126b3eecc177822db6ba117a87  # Fix client-side ped exit logic (#4432)
+- commit: 4e9dfc9777892721aadfc19ce5fa85d761004217  # Fix missing new line in log (#4441)
+- commit: 5211e3b1f55279a6e37e4d136c51b88d07462e51  # Launcher: Revert all recent changes
+- commit: 71e3f3314f031770b5a196caa9188838c077dbd3  # Fix marker cylinder events not trigger (#4449)
+- commit: 1d7962b9cc7ff2ebf412b3ef39890ea41e80b6ce  # Refactor Launcher with C++ 23
+- commit: 67add5bbbaa089162fb5aa24cdaf5d85e435e90f  # Addendum to 72a6059
+- commit: 27338cc1c78cb5c39bce741a1138e3b46f1a0cab  # Loader update
+- commit: f4155960c286d3b6a19aeea6886db876c86fece9  # Update Freetype to 2.14.1
+- commit: bba0f0c458722e8e3b73dcab61d9f1f726e57a1d  # Fix teargas crash (introduced by 3ce2cc1)
+- commit: ca66c9bc10bcf2a467c61b40813fba163e63674c  # Fix shitty CheckMatrix function (anim validation)
+- commit: 3304f263792084e419db7ebfe6a88f7f67dbdb42  # Try to fix non-functional crashfix (0x000CFCD6)
+- commit: aa645925f288cec725e25f952eb06953594ee7b3  # Improve and document CMultiplayerSA_Direct3D.cpp
+- commit: 6862921d1de55d407a2eada23ee2b1a267318a43  # Fix crash in CAEAmbienceTrackManager::CheckForPause hook
+- commit: 5b4abf6748b49c84f2f4d831e3f33cdbee39373b  # Fix the colors of Borderless Windowed/Keep Res mode to match Fullscreen (Standard) This (lower brightness) has been the major downside of using Borderless for years, so this is a fix of great value to MTA.
+- commit: 4b4c4c1c1a8c2b898fa05f0f0f95547187f54883  # Fix frozen state rotation return value (#1291) (#4436)
+- commit: 74483dcf1dd722922ea0fccc03d6167a5dd15b4b  # Fix `guiSetInputMode` cursor bug (#4015) (#4439)
+- commit: 48921f869c12ad2110819afe4a94ed5d2ff7292c  # Fix object rotation desync after moveObject animation completes (#549) (#4445)
+- commit: 5e8fb14f4b0c9719ace101509ffc4f14379163de  # Fix missing mtaserver.conf setting added from template not receiving attributes (#4452)
+- commit: d344f85809b7a12d8eae5030b7a77f7865b26067  # Bump the npm_and_yarn group across 2 directories with 1 update (#4461)
+- commit: 02bc65460f3b59d5c0efa3c224f1c9b39774d714  # Document SStringX (differences with SString)
+- commit: f38bdd50b72db10f8edcc3ed9fe182c61af76ef3  # Update launcher
+- commit: 853a7d54a25bc09ee421ac837f22201882ece1b7  # Add missing trashcan in help (#4471)
+- commit: 1c7c72184ade9c6562a21772ec5fdf40c91970e6  # Fix refresh restarting resources (#4469)
+- commit: 21b379e3124e4affc5c2e0fd724f2df4b534a99f  # Fix vehiclesunglare crash (Fixes #4474)
+- commit: b83fa91daf71d289a1ef92a244ac867ec3443d86  # Update launcher (344922c)
+- commit: 095a124ab288fa1744f5d876b62ce68f97d6d349  # Safer memory access
+- commit: dde9a7fd7e2f0027508a340e88a73958d04c7c9b  # Refactor framerate limiter to reduce CPU consumption (#4385)
+- commit: 775d6dd3e088108f377682bfde4b4674848a0ef3  # Limit non-added event logging (#4466) (#4467)
+- commit: b5df742316ee9194c00ad44d9370928a18252c10  # Sort the screen resolutions in the in-game video settings (#4456)
+- commit: 0a36c6309f0e0f679c15b533fb723c9fe66ca029  # Use non-system include for FPSLimiter in Core
+- commit: 2e7ef2631e1e667a1cfdc29539bad94f82c06d5a  # New Crowdin updates (PR #4472)
+- commit: 068e26bcc433fb1cad05db6660c75d871e45d2ce  # Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)
+- commit: a1940e930d92136a1ce95893545cb71397660d7f  # Revert "Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)"
+- commit: 378beda9c1526f10e00bb8ae7f64c9ad2084ae25  # Revert "Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)"
+- commit: 4a85f2cfde4f4d5afee576113158347b541b2caa  # Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)
+- commit: 7e92595a904326234b1c5114c90f1f7b9ec26270  # Revert "Add high-performance, carefully engineered allocator (Addendum to 5dc09d9)" for now (Clean-up is underway)
+- commit: e75b43cba191ceaedca9e02647982aacd76145e9  # Restore known-good version of MainFunctions.cpp (as of cd46ab2)
+- commit: 6f58ebf1e28f8f213d91ee016a6869f4f60ce6a8  # Update launcher
+- commit: 72c5a9290a6bcb30baeeed10209c635274744d64  # Fix #4482 (onPlayerWasted not trigerring with setElementHealth to 0) (#4486)
+- commit: c71577b577e6d796205839bedd936041639191f8  # Fix double sided not syncing false (#4481)
+- commit: 117f804cb2aa844608f939ab749bf280929a003a  # Fix `showCursor` not updating controls state when cursor already visible (#1034) (#4448)
+- commit: eb76ac61b9383ff947138c363f2eed3a3d48af40  # Add functionality to re-stream models separately (#4357)
+- commit: da8e50058293a4b587b5bc172877f1f1a0a6cf32  # processLineAgainstMesh crash fix (#4491)
+- commit: ad2efc3322ba9cb1d73e0c50c1882d60e04c2ec7  # Final version of 5dc09d9 (Allocator)
+- commit: 02997bd4748e40c491390099be36f6b98c091af5  # The second iteration of element data optimization (#4492)
+- commit: bf11c4ceb7d32c5a3a7420d52faaf3a622f3e7fd  # Fixed a bunch of vertex-related memory leaks
+- commit: 3ec9b5c5a4e6f2a3783a3ae2c1c9eb9802678f31  # Fix network desync when `removePedFromVehicle` called during vehicle enter (#1519) (#4450)
+- commit: 679199e16daef3fcbe8734b882c6de6cd56e08e0  # Fix vehicle state desync when `warpPedIntoVehicle` is called during `onVehicleStartExit` (#4458)
+- commit: eb36bb70ab9211ae32b6a8a3caa01af30f461e76  # Improve heap safety in allocator
+- commit: 37d8d4e4c03bf55602328ba4d8d583373d9ff945  # Fixed memory and thread safety issues in CProxyDirect3D
+- commit: 65de0f2af8b4392193f908d343b25d2cb83ed3b3  # Add SharedUtil::IsReadablePointer and touch up headers
+- commit: 8779c72924e2a1466acf1505587aea8940bb0dbc  # Addendum to c029a6f
+- commit: 9ed5455aeef84e0deee71b9d0ca29be72a7d529d  # Fix CCore memory leaks
+- commit: b7ce215530465bec10e6f3dc25781f812b561bea  # Addendum to f2e93f2 (CSettings leak): Use new cleanup helper
+- commit: fe5140b80bd0c2e388f3244dd9cc1602842b4a5e  # New Crowdin updates (PR #4493)
+- commit: f7b912430439e694f5b4837ee83fac01b74e887b  # Various fixes for camera-related code: Performance, Memory safety, and alignment (interplay of functions with eachother and RPC's). Fixes identified performance regression and improves smoothness of looking around/aiming with mouse on low spec machines, due to less overhead each tick.
+- commit: 6e19a734879d0d088d3121b39a238d6275395af7  # Replace ReadRegistryStringValue
+- commit: ca5ca197b63926c220dd3cdb451674e99021a304  # Rewrite Crash handler (to more reliably catch, dialog, dump and process all types of exceptions, even stack buffer overruns) Aims to reduce "MTA closed without anything", the handler was on ancient code and badly needed modernization away from deprecated API's as well.
+- commit: 8a09b5bb59cf9f8d496dbf4f0812a478ab109524  # Add SharedUtil::TryGetProcAddress, use it in various places, and address misc issues exposed during implementation
+- commit: cf3c60284e625d18732f3fe309b6d9c84cb390b6  # Improve server list (+list interface) performance, and reduce background overhead
+- commit: 22c62f761a3d343a7402aa8c17503bec58d84a7e  # Addendum #2 to 6e19a73
+- commit: 29a10a4d4d88fe2652e29c55365fc4a410a82e08  # Rework clipboard handling and add SharedUtil::MakeGlobalUnlockGuard
+- commit: 49e52651bfb38246006d6e589dc0d13a7665f1b9  # Rewrite CRenderWareSA.TextureReplacing.cpp for performance, memory, and stability
+- commit: b1673e74ebfa9c00a12811371ad0137b85805648  # New Crowdin updates (#4509)
+- commit: 20d36cd3ef687108acf99f97b02965fa5dd6003b  # `getElementDistanceFromCentreOfMassToBaseOfModel` add 'building' (#4504)
+- commit: 3ab39b825cb47bc9aba14263157ff665ba1a576f  # Cancel data change (#4503)
+- commit: 24bd2187c099a60881cabb001fbb6bb326044c81  # Fix getElementsWithinRange not working in client-side with building (#4502)
+- commit: f2701527f6f45cf40e65bf6f89ff255631940a89  # Update crowdin-translators.json
+- commit: 6a17b64a9373ac9f4e609b325fcc00127c0769a5  # Fix for missing vehicle paintjobs after model replacement (#4402)
+- commit: 8f8592449b513221a66d9cc86305c962d0de6bcf  # Fix jump control triggering weapon zoom while aiming (#2798) (#4454)
+- commit: 24de73286629421b228d8e160f62c8763b234443  # Fix remote player fist/melee strafing sync (#4431)
+- commit: f333bab62301b27bf74c40a4c7bdd55ae83d701c  # Fix chat message word wrapping after scale change (#4425) (#4437)
+- commit: 809c296850758ffbfb68055276b0603f19f5b0f2  # Fixes (#4036) - Preserve user key bindings when unbinding resource keys (#4440)
+- commit: e02a473f0f1a0f3327a41fa84269c5d982edd102  # Fix vehicle upgrades (engineRequestModel) (#4398)
+- commit: b8b63de8bb365b87169e93e7806cb1e3f8e0cd5b  # Fix "Climbing over certain objects kills you" (#4395)
+- commit: 61c9305d5ea5504fc0cef68fdfcfd55d42696117  # Fix missing swimming animation (#4401)
+- commit: 6d4fab9c5644fc9f95c1289fe3d2d194ccf78b4d  # Addendum to 1ba43ce: Actually fix performance hit
+- commit: 0f1cac6ad8c5d4e433fde7dea4156cd411fcfee8  # make performance fix from 1ba43ce actually work, and a few minor tweaks
+- commit: 7e4bd58ce6113446520cd440a9b4512990d85feb  # fix Linux compile error
+- commit: 13e9c0c562bc5c75832d4d8f6d44680855ed6cd7  # New Crowdin updates (PR #4510)
+- commit: 7a89e595a7b8cd35f257d2c362fdc56dddec1210  # Update crowdin-translators.json
+- commit: 651cea5728d3232ea3d6eaf691f7fe2927fb7f3d  # Part 2 of "Rewrite crash handler" (after ca5ca19)
+- commit: a146677e461be8fda4b163338b609e13a5d779ae  # New Crowdin updates (PR #4511)
+- commit: c787113dfa1dd37a62b88ab8f1ad6de837c2fd67  # Addendum to 49e5265: Fix crashes introduced, and other pre-existing issues that surfaced, including mem leaks. Memory fragmentation-related crashes due to texture replacing/allocation spam in loop are also reduced or gone (This wasn't out of mem.. it could happen even with 800MB usage), which is huge for MTA.
+- commit: 20a14e8a02da42f76d609fad3fd1f619080004e3  # Addendum #2 to 49e5265 (after c787113), to include fixes for MTA's top 5 crashes that include SA offsets 0x003F3A17 & 0x003F374A, as well as other bugs and memory leaks.
+- commit: 8d6eb30df140dd95f550824685cef5720b8dcbfb  # Improve crash fix from 20a14e8
+- commit: 07808b8a87f25e9e305df7c16d1398bc9fcd87fe  # Fix destructor leaks and bad asm
+- commit: 21c8ac9b5a93af28a519f54c7b41dd67fd0b51a5  # Addendum to 07808b8
+- commit: cf668bfb15795d4c7b1f95eb89a78793ec71c335  # New Crowdin updates (PR #4514)
+- commit: 895be40b5348ebb110a2c05876c528d0f7b51b3c  # Revert "Rewrite CRenderWareSA.TextureReplacing.cpp for performance, memory, and stability" and related recent changes. To be reintroduced later when more stable.
+- commit: c0440e86e5a22f8092417838b8e95a07fb477f7f  # Fix recently introduced suspension bug
+- commit: 8a09cdf1a9b327f33386fb47b5cbaac69ffacaa5  # New Crowdin updates (PR #4517)
+- commit: 6e5ba55319d85ebe343484f26acea6351f4948a7  # Revert suspension related changes for now, as we need stable master. It will be re-introduced later (revised).
+- commit: baad050253fbc25c57e63242d7ccc5ceb83eb7aa  # Improvements for 07808b8 ("Fix destructor leaks and bad asm")
+- commit: 1281716e5a6ccf79a23730c1c9bdd723d3d3b16a  # Fix 3 issues: MTA freeze on quit, CEF crash on quit (non-user facing), and 'Quit' closing the game being slow to clear the last frame due to redundant blocking operation.
+- commit: a32fc5f0351bab64563ae5247cde6aab34ae97ac  # update CEFLauncher
+- commit: 251f9d0cfa4827a4d7a9cba237c8f7f71edbc6ba  # Addendum to 1281716 - Makes "Quit" close the game instantly without last frame-hang, and avoids risk of ungraceful exit code
+- commit: 5c9f4b82d2379c285dc602d7e3549ae529d385bd  # Crash handler improvements (Includes: don't try to symbolize stack traces on non-dev builds)
+- commit: f234efd0d4901b031cec7c84a4d66b9cb1370a19  # Addendum to a32fc5f
+- commit: 116b86c925d07944ea5ea4a6df155ca0eccbbcb9  # Add forgotten stack trace helpers file from 5c9f4b8
+- commit: bb0b32cb90f3379853fb9eab0a651caabd837d6f  # Fix build error risks with sparsehash
+- commit: 74326a34f747fd74e2590744ab3f5698c4a7cc43  # Addendum #2 to a32fc5f
+- commit: 35129ebc3527a7719b3a571d36fdcd9754fd58d3  # Improve streamer performance.
+- commit: ec248d49697d23f621f9e4fe76007f3f6166a04a  # CEF reworks #2: Miscelanneous
+- commit: 0772fcc4b644da6f4f5d1b43176c8fdcc0065217  # Minor things missed
+- commit: b66d52cafa91782bc32e2c800e46435a2922c1e8  # Addendum to 2e56bd0 & ec248d4: Further improve CEF implementation, and fix any bugs encountered along the way.
+- commit: 6d22c22a86715802df5dd1d50f322b338f11bbb3  # Update CEFLauncher binary after b66d52c
+- commit: e75755f37f4881438be8294c000466b2c1eb7693  # Addendum to b66d52c: Forgot to make base dir check release-build ready
+- commit: 0f4976860b6705379c8a0bd2b85af29bb139b7fe  # Addendum to b66d52c (Fixes crash)
+- commit: 6d29fb5436502d4b0d0a8d2ff4a479b5831af2fb  # GTA streamer bug-fix round #1. This heavily reduces bug load, which is very limiting/blocking. "Bug load" indicates that MTA uses hacks nad workarounds until now to avoid mostly race conditions from SA.
+- commit: c4fe546afbe0466dff78af2f63053b4088f8e7f8  # Fix shutdown crash in CRenderWareSA.TextureReplacing.cpp (+ some other safe tweaks/modernisations)
+- commit: 045bde9b6ca205ecaa3dce0849d3d6f28844a692  # CEF reworks #3: Miscellaneous and refactors
+- commit: 9a5c9165d8c1a17f36e1e52c368560a17f22fb15  # Update CEFLauncher
+- commit: 1dc93689b37b9109507db51db4cd167d50d1ff42  # Fix some threadpool flaws, including: - Memory leaks - Infinite loop - Race condition - Server/resource shutdown
+- commit: 3c268657d6477334b308be26b31282833e63da82  # Fix crashes introduced by PR #3845 Like a common one at gta_sa 0x0116112B
+- commit: 1f2dc7a19257a1a0b893837e986355a4b2733325  # Addendum to d2ef262 (Also fix some issues with other CTimer hooks)
+- commit: 288bc65757a17075f008e1701f0dcee5a2cd021e  # Addendum to 1f2dc7a
+- commit: ceaadd4617eb344a15f9cdc28462ec09bb05b81b  # Texture replacing stability/debugging tweaks
+- commit: d3a311cf8416980fe98ed9431be7ce06b5323d0a  # Fix crash introduced by PR #4544
+- commit: 81c457ca0583ddeaf94c469d9959e30721e611f8  # Update crash handler capabilities and, making use of that, add temp alloc instrumentation to OOM crash hotspots (To help identify leaks/suboptimal procedures)
+- commit: 36c50b860cfe89c691f78c0bd3e63ad083396793  # Crash handler: Fix stack symbolization issues
+- commit: 3da39e686a7e701654882454a1edf6f0d63df014  # Update .git-blame-ignore-revs
+- commit: 2646504c522b38717f5d4dc466bb4269459db21f  # Fix CEF AJAX after 4761859 (and migrate from SString to std::string)
+- commit: 4bf580179911f49825fbdfac33932b57ba215a38  # Performance tweaks for CEF AJAX
+- commit: e1220e946e97c8255d1ea73f47867d046285c5d8  # Fix browser list buttons still misaligned in settings (#4557)
+- commit: 259959e503d34bd80a4813fb943c9ca5c131ee49  # Fix a bunch of server list issues, including with sort and server-info button
+- commit: 90967efbbac1cb77bb1fee10073dd6e517a13703  # Fix build
+- commit: ed025e582ae17f203b37a5a2e5d3dbe44683d935  # Fix some CEF issues, and add Wine/PlayOnLinux compatibility improvements
+- commit: c757a89f7c92fa7c814572b28384ca5985fff5bb  # Switch to VS2026 - Build server has also been updated to Visual Studio 2026 18.0.1 (11217.181) with v145, so nightly builds from now on will use the new toolchain. This means we will have to watch for UB and compiler optimization bugs for a while, as with every major upgrade.
+- commit: 5c84cf879f03c0c06310e01e2cbbc9a51ec40db4  # New Crowdin updates (PR #4558)
+- commit: 0d4944982d28d530d70e59993c58b4facd8d6c9d  # Revert recent changes to CRenderWareSA.TextureReplacing.cpp (and related) once again after following 895be40 i tried to made less intrusive 'safe' changes again, but touching this stuff in any way just causes too many issues. Crash fixes also only cause the crash to relocate. It all started with a desire to avert an old crash reported by Xenius (who was using txd's with invalid/null textures), but it only relocated it and caused new ones.
+- commit: 58877e66f9bf35ebe9dec2215d19a10ecfd54956  # Remove telemetry instrumentation from places
+- commit: 106b725ba63d411c58a8dd1264196023614ca022  # Early initialize CStaticFunctionDefinitions to avoid crashes when something calls into it early. This fixes a popular crash where LunaSVG called into OutputChatBox before core and other pointers were valid
+- commit: 1eaaec410e4c086ff5b7604a4e931c6a82a3b7b5  # Don't use noexcept in crash handler
+- commit: 46cdd9d419828281469db690215c7d90e995a9e5  # Fix warnings in crash handler
+- commit: 0483b29518b8f4c10e2f54afe6eeb21be04eafef  # Fix area name showing for a second when joining to server for first time (#4549)
+- commit: 62d4a53bd32b4acae27837c7592931758307b762  # CEF reworks #5: Better safety and less memory waste/fix edge-case mem leaks
+- commit: 744b0cb7cb8b41a30946af78084ef6927cf34052  # Fix ped rotation sync is broken when using setElementFrozen instantly (#4566)
+- commit: 8d41e19b1765dee0c1da5e821a477078f6c2dc6b  # Resolve Event Context Loss in Nested Event Cacnellation (#4529)
+- commit: 7ebcf5905ad9f3df39c1b8d9960e0afd1fb3f67d  # Simplify ACL request refresh detection (improves #4409) (#4483)
+- commit: f43cb3b53a43f3860e81fdfaa176454905d00ffe  # Fix position desync with dead players (#928) (#4453)
+- commit: 3466e0fac9e6ae9b147b0c3d036fc3be6869d228  # Revert "Revert recent changes to CRenderWareSA.TextureReplacing.cpp (and related) once again after following 895be40 i tried to made less intrusive 'safe' changes again, but touching this stuff in any way just causes too many issues."
+- commit: b870f4c224062c977479579ebff2c67584d7c3cb  # Fix `getVehicleCompatibleUpgrades` returns different value on client/server (#4569)
+- commit: c41b49fdd89846685ddb0056f6448a0beae15b98  # Addendum to e8b6966
+- commit: 6fa8a13f3063ae8facc82f50c6a23c3546eef67e  # Addendum to e8b6966
+- commit: c02b23c9cce0f3a047fa7401c9885f575169a9b1  # Addendum to e8b6966
+- commit: 32f79302a2e7f75863c740b8a0ff09cdaee87937  # Add the ability to set the aiming sensitivity the same as the mouse sensitivity (#4570)
+- commit: 4ca27f56725e36570e470248ee8900cc6bb3149d  # Fix img crash when game shutting down (#4551)
+- commit: 15bdd6d6ac16825c91905712b47d34a3d637a9a5  # Fixes #551 - `onMarkerHit` on attached elements  (#4571)
+- commit: 09c94aee490fe91816413582a95dcb1821cb97ea  # Improve IplStoreSA validation to avoid crashes (#4572)
+- commit: 93bea6c571198f08945aaa4c47ed1bceab1490c4  # CEF safety fixes (fix UAF/UB/race)
+- commit: 937bc63d37db6b0ce65063beee28035c31641b2b  # Crash handler improvements against some cases it can't handle (game just terminates)
+- commit: 03e66524c27001da17351c6413d489bc38fda6de  # Improve texture loading system with fixes that include addendums for 53945f2, c637d39, and individually fix texture loss, memory leaks in stale states, and stacked replacement corruption (Accidentally destroying textures still used by another replacement)
+- commit: f6a729419285ef0a031919cc9d033944074e774e  # Further improvements for texture loading system after a235955 (including performance)
+- commit: c2c62e14fbe1fbd7a139515d1ab4cfcea13194d9  # Fix `isPedDead` didn't check network dead state for players (#4576)
+- commit: 243ef2423288f662a65d99f055efd56a406c41a8  # New Crowdin updates (PR #4564)
+- commit: 345583706669caf525d29e22d153a7fd85d62bb6  # Fix `Camper`'s third seat not working (#4578)
+- commit: 93d5f91c79b1acaf74f6f5c8fd04671e855fe095  # Convert SString to std:: for JPEG handling code in 1.7
+- commit: c6820b08c64a78e5f5f690aae089c180c68fe63c  # Fix 1.7 streaming sectors crash when moving around a total replacement map (like VC) that presents itself as if in CShadows::CastShadowSectorList but it wasn't that straightforward..
+- commit: fd34d6a0d39f4b23c070f8984b4678c3167bd030  # Fix `getVehiclePaintjob` returning -1 when the game engine hasn't applied a paintjob yet during stream-in (#4585)
+- commit: 3f8067827dc729b95deea302a0f384402d386012  # 1.7: Better texture-related error handling and debugscript return values
+- commit: c1b3052516def629aa2367907d8ac6c5744cca84  # Fix old, top 5 SA crash @ 0x001D85AA (0x5D85AA)
+- commit: 06aad7e540c306d2c069ca428a229b00c5297778  # Crash handler: Always log registers (creating a full .dmp can fail)
+- commit: 280b6cd9917eb8e624fa037f3783eb958123a7a2  # Add ability to remove all domains (#4465)
+- commit: 9425de076b257c09f2def1ec48c1f2003575a7d1  # Fix build error in certain configurations (custom builds)
+- commit: 61c5d9e83d580943eb9438c8c0f82ea5cdf95036  # Fix build error in certain configurations (custom builds) #2
+- commit: c2f884d1e07af948a2f69a5146bd42982a4af445  # Addendum #2 to 61c5d9e
+- commit: 917878c7d519a7a1f1ce7ab5c24e09669d07cb22  # New Crowdin updates (PR #4581)
+- commit: be2b2be4fe055634b0a7354f6421a9a07430f0e8  # Improve texture/shader loading system
+- commit: 09d8852ca0777c4789659fc96bc476313ccdde26  # Fix streaming bugs and txd leak
+- commit: 3ec89878945c5e86d64e560c7b1fe6e02665d5db  # Fix texture mem leaks and performance issues
+- commit: 23f7911287b3db31eec3aad5eb75e2d5a8ddfb91  # Fix texture freezes/linked list corruption
+- commit: 6cf8cc6c18b035eea37054057931be89e00c88e0  # [1.7] Push ALL changes from our temporary mtasa-blue repo to GitHub's mtasa-blue
+- commit: 4c474025fc83ab757a84092a45de1bda42a96128  # Fix SBO in CKeyBinds
+- commit: 010645ff5c6d8cdfb0a97c0253487a6bb132504b  # 1.7: Update crash handler to handle & dump 0xC0000374 and 0xC0000409 crash exits This is a fully functional handler for these types of crashes, despite Windows API having it severely limited to bricked/blocked, my implementation found workarounds to achieve the following:
+- commit: 8348e98106d926d26900a5808cc88c7e5df05e0f  # Update installer en_US pot
+- commit: 1c590fbc46884bb25809d85d1017c08f779c6a28  # Update copyright year (#4605)
+- commit: 81677d9e1a3632bd5e03b660c0bb37fe4234c7f8  # Remove unused `SCRIPT_VERIFY_*` macros (#4606)
+- commit: c78be3a36b5ec6f3358e4729e8faa8f6b3af8924  # train-tracks: enable for custom builds only (#4610)
+- commit: e7c3619a5d5e0b6bf352befde6ff33c5921032b2  # codemod: disable clang-format for `__asm` directives (#4611)
+- commit: b1d33b48d2ccc681a4880a4f66ed2f33ff72ff79  # train-tracks: fix track IDs shifting when you delete a default track (#4609)
+- commit: 0530c83c7a762abb4e60f3c5fe895f4b32378c00  # Memory safety, crash, and SBO fixes
+- commit: 1d63b0c56913ca990e462f9137b241ca2ab4cf72  # Add .github/CODEOWNERS
+- commit: fb7ee23e761d51ba4c76ae2af4bf69297bb0c92b  # credits: correct patrik's location
+- commit: d68922739eb715090a7f5ad9a40c6f98aba749c8  # credits: move Megadreams to programming section (#4617)
+- commit: c6a7122ef2195b6a365f9fd1338a956f0aaefbe3  # Simplify CODEOWNERS to only include blue-collaborators (#4618)
+- commit: 4963645560effb026a92816f096d73b2f137a2dd  # Update .git-blame-ignore-revs with #4611 (#4619)
+- commit: 9490ddb7fa626438c16ce484c51a5b000f4a7bc1  # Update "first time" rich presence dialog wording (#4622)
+- commit: c54faebeba6c305d38fdf6821588c140b581faa3  # Improve pull request template with test plan + motivation (#4621)
+- commit: bae6ff8f37af2a719e180e09ed9eee50d60e1661  # Update Crowdin configuration file
+- commit: 965f8226953b449bf13b437cb6239ebe807fdcf9  # Bump qs from 6.14.0 to 6.14.1 in /utils/localization/generate-images in the npm_and_yarn group across 1 directory (#4608)
+- commit: 2ac449ea90168cc9b3b260338b657b4b630b0243  # New Crowdin updates (PR #4624)
+- commit: e0bbc889c322eca45cbacb93bd0752047c6d428c  # Addendum to 0530c83: Fix last cases of SBO crash exit (which was only deferred on last patch)
+- commit: 7be6d053605b91a15509246eb966961e5d1a7af7  # Add seat parameter to `setPedEnterVehicle` (#4573)
+- commit: ea9b3df1ba2af82080e0ea5044fa4ca354fa46ee  # Enforce clang-format in CI (#4626)
+- commit: 7c27c416263017edec87fb8e6a0fdd4f90443cec  # Rebuild pots every week instead of every push (#4628)
+- commit: 66eba7a3936a54fae97b46e6152c92fb7b618d69  # Improve pickup handling safety, also fixes SA crash @ 0x00154244 (0x554244 - where caller is 0x45593B inside CPickups::DoPickUpEffects)
+- commit: 40dcf45aeb2940e01f4e38eba9bcf746f24f8a29  # Fix build error
+- commit: 748adfafd074464620ad6438eff87cea22d5cf23  # Disable warnings in vendor projects (#4629)
+- commit: 6de438d9d070c341eba459c359d81c96abf19c92  # Move Dutchman101 to programming section (#4631)
+- commit: b4d0e27a005bebc5e43b8efe6f5fe0f356fef227  # Move Lpsd to programming section (#4633)
+- commit: 8fc6d49c79b50451880766e4da15c0fbb4846dbb  # Refactors for safety, common crash, and UB/visual bug paths.
+- commit: 31cda26a0f94c760a59481eb2eaefefcd7858add  # Addendum to 1dc9368 ("Fix some threadpool flaws") to fix new crash
+- commit: a8957f9c31aa09a35312f03b2967c96e90131a0e  # Various improvements for path, file and CRC operations. Replaces 00668ef as well. This also targets the "CRC could not open file: Permission denied" issue (Although we still need to find and fix the leaked handle from where it originates)
+- commit: 5b1c7d15ac9fe32d4370e445bc7060fa07578393  # Bump LunaSVG to 0dd60d1 (#4615)
+- commit: 209d70e6f83150c14a557469042402b89408f0dd  # Addendum to 8fc6d49 (forwardport from 1.6 needs 100% parity)
+- commit: 5907fb017173dc9c5c23138d6df81127bc86e525  # Addendum to 3db6667: Handle and log invalid states that can lead to crashes. All callers properly handle failure return values.
+- commit: 0f43464425ca0fff9e456d44355fa2dd61fcb1b4  # Undo accidental commit inclusion (For proper tracking)
+- commit: bfaed0ac437f79012d936f5163116dd104bd292b  # Fix shutdown crash
+- commit: c82169cb128658bb6214f7f0cb64373fdc33cac8  # Change clang-format rules
+- commit: c2a0ba939f0fabba96450d02ec56a111658230d6  # Run ./utils/clang-format.ps1
+- commit: ab74393e45abb3fc8dbcb84d7039f75851bf9b23  # fastmod '}  // namespace [a-zA-Z0-9]+$' '}' Client/ Server/ Shared/
+- commit: 6be278d2d37f5f9686984856b72573290852ed74  # Remove more FixNamespaceComments changes (#4638)
+- commit: a665e0144e7f71a4c7898f024262393f019f6b7b  # Revert back to pre-enforcement
+- commit: 682f972b36053bc854076a19e3621c03e950140a  # Stop discarding `Client/loader/MainFunctions.cpp` in maetro sync (#4639)
+- commit: effc779c9e2b4ead6ec8560cbdaeae1d7ca2a1ed  # Move maetro patches to master behind MTA_MAETRO env var (#4641)
+- commit: 53d04bb968e2a7c52c6a6ab11bab611f1a954635  # maetro: stop discarding locale (#4643)
+- commit: 0968ccd4030975fbfdc1e60fe36862f932ab390c  # Store maetro d3dcompiler_47.dll in master branch too (#4644)
+- commit: c0a32672a4380c1c544b065be0b6e286e9d8077d  # Update installer en_US pot
+- commit: 5e391352c2d4ba5c37dd5f58b594803785fb2892  # Delete .github/workflows/sync-master-to-maetro.yaml (#4646)
+- commit: e75ba93362c6ae99d30a95d3f20a1e04ba46a22e  # Run utils/clang-format.ps1
+- commit: 954f7416d83f25683e3db9d18c687e9d7d4f243a  # update .git-blame-ignore-revs (#4650)
+- commit: 83321683df0d24ae481e68679654e9918a52f128  # clang-format.ps1: store tools in a config, for future clang-tidy support (#4653)
+- commit: 9d738a466a64882a1f46e69ce8d0a9214325d363  # Update .git-blame-ignore-revs with new entries
+- commit: 654b7fcd8d752f633935cf1a0b752db9ca97a512  # Add another entry
+- commit: f00772702e8032fb59392720532df28a9d8d8f65  # Make server components optional (#4657)
+- commit: 1b4e5a2c093a102b94b5d554f126efa47fc93fc1  # Create MAETRO.md for maetro release documentation (#4654)
+- commit: 8fa9c976e4740da63b3d62735ef65229d5507010  # clang-format.ps1: check powershell version (#4661)
+- commit: fc574ffc4a585aea60a17125b148489892663a31  # Skip antivirus warning when running under Wine (#4536)
+- commit: 07dc7ade56b4fa3a2ee8aea4c41088df74f2be42  # New Crowdin updates (PR #4649)
+- commit: 7bc2315081840572be19adcc5936abf99870f94a  # Fix additional game freezes where something that internally called NtCreateFile / CreateFileInternal hung forever. Many other recent "freeze fixes" targeted potential causes of this type of freeze, such as: .. 8432922 (Later reworked in 51d01e1), 17650bb, e3a7998, f7a8130
+- commit: 8a6e73afc5283b4167f4bac5965745cbbdfa3eb6  # Fix compiler warnings and (type) safety issues across codebase. Modernized & improved a lot of code. - Add explicit static_cast for narrowing conversions - Replace reinterpret_cast on function pointers with memcpy (fixes UB) - Modernize deprecated APIs (inet_addr > InetPtonA, GetVersionEx > RtlGetVersion - old one lies about Windows version) - Add range validation for colors, ports, model IDs, array indices - Fix signed/unsigned comparison warnings - Add overflow checks before narrowing 64-bit to 32-bit values - Fix regex escaping in URL validation - Add missing return statements and WINAPI calling conventions
+- commit: c2c51a8ec886289632cd4fce1ff3e6dbbc42d1af  # Addendum to 8a6e73a (clang format)
+- commit: 12add3bcd3bf041ae018af217828ecf1f079fe28  # Run clang-format on every push (#4668)
+- commit: 104c58e9d216b48836b1e95d7c3981b799ba922b  # add `.clang-tidy` for in-editor feedback (#4667)
+- commit: 5ab1e03469536f250992fc44dde84f203b882867  # Implement `getResources` on client side (#4542)
+- commit: 8eb71357f9b74517b87282b841b63b98a7216a1c  # Fix server build on RHEL/Fedora with `mysql-devel` package (PR #4672)
+- commit: f6c2b2dda3cf8b797eb45bf0933dbe3f440f917d  # New Crowdin updates (PR #4665)
+- commit: ac0fc467d00d127c584c2b926baa142060727f32  # Fix SA crash at 0x003336AE
+- commit: 9b74e061762ec6cfe6e53749c9127b00183e9d5d  # fix(typo): correct spelling in CMainMenu.cpp comments (#4677)
+- commit: 44ae6e7bbe67463f2c414ebad78a3074c261502d  # D3D-proxy system improvements: fix state cache corruption, vtable crashes, and device-loss recovery Fix graphics corruption and crashes in the D3D9 proxy layer.
+- commit: 6a3b3af02f3e812f092a60f8dced8e630824e017  # Fix SA crash @ 0x00352BA7 (Out of video mem) similarly to how i fixed 0x003C91CC, MTA's #1 crash, earlier. For details of "earlier", see the comment https://github.com/multitheftauto/mtasa-blue/issues/3840#issuecomment-3736738172 or CrashFix_Misc38
+- commit: 7a7d1ae1f8d2b53cfe5406ce2ec0a163e6050555  # Correct asm of vehicle dummy hooks in multiplayer_sa (straight up mistakes) Avoid crashing on some 'bad' models or dummy initialization race conditions (GTA/MTA) Prepare for further manipulation of 'GTA-side vehicles' (not managed by MTA or its pools) for MTA feature development - run into less immediate obstacles that would lead to crashes and various odd bugs
+- commit: 42a6a437604e7e62f1109f69d2e617db9e25c095  # Fix `CElement::GetAttachedPosition` to return correct positions for rotated parents (#4680)
+- commit: afe8ad533248a4523afe08e627aeeb0879389480  # Expand TXD pool from 5,000 to 32,768 slots Set the TXD pool at startup to 32,768 (max safe value before movsx sign issues) so total-conversion maps can use far more custom models.
+- commit: 0a661ef16151fdd6c0f6eeb09ad87b57a70ba39a  # Fix 3 streaming freezes in TXD pool expansion ASM hooks
+- commit: a276a18cf53ef2b1d600e5b2ce4f8107b66ad62d  # Fix freeze
+- commit: 2381b120c43ee8e473d5022cec8a492e8a051226  # Addendum to 6a3b3af
+- commit: 4f227fc5802b4db5f9928faeba39393f72ad5629  # Clean up some old, redundant logging
+- commit: f6f5326a72e58d8b5bcf029d64dcceeb37645600  # - Fix crash in building removal after IPL streaming (streaming out an IPL sector) - Attach pointer lifetime to actual entity lifetime, preventing leaked tracking refs from building up across IPL stream cycles.
+- commit: 5ece86b8acdd8ae3ad0ceb1f0627452341af56a9  # Fix crash in CClientPed::GetMovementState
+- commit: 85829da9e3c1e1266ad54f0c1a9e0d613df631a1  # Addendum to f6f5326 (Fix build)
+- commit: 0d8ff91d044e0b97f439b3cd4a562211e6c74690  # Fix SA crash @ 0x00352905 (Out of video mem) similarly to how i fixed 0x003C91CC, MTA's #1 crash, earlier. For details of "earlier", see the closing comment at https://github.com/multitheftauto/mtasa-blue/issues/3840#issuecomment-3736738172 or CrashFix_Misc38
+- commit: b46f5feb901d2070f06d78af2138c8cfe26a64f1  # Fix SA crash at 0x00154918 (Similar/related to the fixes of crash offset 0x00154244 from 4eb4a7c, 00e6631, 66eba7a)
+- commit: f97247901ecf49ce06b815de849b93f2e08d27fc  # Addendum to 663c61a ("Fix old, popular SA crash @ 0x001A5735") as it didn't fix all cases
+- commit: 5aa6455703067a7512d5d42a17e8268be395f891  # Fix entity cleanup bugs in building pool and pool stride mismatch Rewrite vehicle/ped entity pointer cleanup to iterate GTA pools directly instead of MTA wrappers, fixing missed GTA-native entities and wrong loop bounds. Add missing object pool cleanup. Replace dynamic_cast with direct pool index 0 access for player ped.
+- commit: 4912d2b55218406b5c40fd39617596b29b4d0935  # Fix pool index type safety
+- commit: f212c93bb41ea20a2d37a5ceadaefbf24dd4c89c  # Build maetro32 to the output root directory
+- commit: 50911988d520c66a26d5e79743637314303a618e  # Various performance tweaks
+- commit: cee3f88980524f8ca90c07aa9bb2f080f4c18300  # Adapt installer logic for maetro32
+- commit: 5f27442f24fa21bf194b0d2c37876c6e3b8c6430  # Update launchers for maetro
+- commit: c2935aef6f42d15a062fffc04ea58f8e8aea4efe  # Update maetro launchers
+- commit: d52b161029214d878a696f2214ae676a8222ed91  # New Crowdin updates (PR #4708)
+- commit: f600a76c9f57900a7f8e17e053f013a824b7a648  # Switch to 'windows-2025-vs2026' in Windows build workflow
+- commit: 62028cfecfd34b44aee4a9f493614eac8b0327f0  # Fix setVehicleComponentVisible always showing the _ok state component (#4688)
+- commit: 3e879e6b2f9281c65a43615e40962fab20289b1d  # Fix garages automatically closing/opening (#4684)
+- commit: 889b4c2d2a6c225004d7416b33e0ed3f7d7a1b90  # Fix physical objects rotation after restream (#4718)
+- commit: d39819be601a298b39b814952a17cd11e87fd93d  # delete codeql (#4719)
+- commit: e5b7f24eef93384178cfdaa4b9f4b78c7ba6b8d0  # Support for getVehicleWheelFrictionState on Bikes, Quads, and Monster Truck (#4537)
+- commit: c40bae13feea134b77a2350e7b36254058a46321  # Add function setSearchLightColor & getSearchLightColor (#4666)
+- commit: 1468c16637eca4b403c6844adf10774b7533f50e  # Update installer en_US pot
