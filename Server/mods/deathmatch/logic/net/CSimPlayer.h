@@ -50,6 +50,7 @@ public:
     ushort    m_usLatency;
     uchar     m_ucSyncTimeContext;
     uchar     m_ucWeaponType;
+    bool      m_hasJetPack;
 
     // Used in CSimVehiclePuresyncPacket
     ushort                m_usVehicleModel;

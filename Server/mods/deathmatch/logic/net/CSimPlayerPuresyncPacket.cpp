@@ -13,14 +13,15 @@
 #include "CWeaponNames.h"
 
 CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType,
-                                                   float WeaponRange, CControllerState& sharedControllerState)
+                                                   float WeaponRange, CControllerState& sharedControllerState, bool hasJetPack)
 
     : m_PlayerID(PlayerID),
       m_PlayerLatency(PlayerLatency),
       m_PlayerSyncTimeContext(PlayerSyncTimeContext),
       m_PlayerGotWeaponType(PlayerGotWeaponType),
       m_WeaponRange(WeaponRange),
-      m_sharedControllerState(sharedControllerState)
+      m_sharedControllerState(sharedControllerState),
+      m_hasJetPack(hasJetPack)
 {
 }
 
@@ -178,6 +179,9 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         m_Cache.usAmmoInClip = 1;
         m_Cache.usTotalAmmo = 1;
     }
+
+    // Enforce we use server-side jetpack state
+    m_Cache.flags.data.bHasJetPack = m_hasJetPack;
 
     // Success
     return true;
