@@ -5082,7 +5082,7 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
     if (ucVariant == 254 && ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
-    if (CVehicleManager::IsValidModel(usModel) && (ucVariation <= 5 || ucVariation == 255) && (ucVariation2 <= 5 || ucVariation2 == 255))
+    if (CVehicleManager::IsValidModel(usModel) && (ucVariation <= 255) && (ucVariation2 <= 255))
     {
         CVehicle* const pVehicle = m_pVehicleManager->Create(pResource->GetDynamicElementRoot(), usModel, ucVariation, ucVariation2);
 
@@ -5120,7 +5120,7 @@ bool CStaticFunctionDefinitions::SetVehicleVariant(CVehicle* pVehicle, unsigned 
     if (ucVariant == 254 && ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(pVehicle->GetModel(), ucVariation, ucVariation2);
 
-    if ((ucVariation <= 5 || ucVariation == 255) && (ucVariation2 <= 5 || ucVariation2 == 255))
+    if ((ucVariation <= 255) && (ucVariation2 <= 255))
     {
         pVehicle->SetVariants(ucVariation, ucVariation2);
 
