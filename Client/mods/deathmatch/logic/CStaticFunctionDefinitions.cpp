@@ -1062,7 +1062,31 @@ bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, CStringNa
 
 bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, CStringName name)
 {
-    // TODO
+    assert(name);
+    assert(name->length() <= MAX_CUSTOMDATA_NAME_LENGTH);
+
+    bool          isSynced;
+    CLuaArgument* currentVariable = Entity.GetCustomData(name, false, &isSynced);
+    if (currentVariable)
+    {
+        if (isSynced && !Entity.IsLocalEntity())
+        {
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+            // Write element ID, name length and name for server-side removal handling
+            pBitStream->Write(Entity.GetID());
+            std::uint16_t nameLength = static_cast<std::uint16_t>(name->length());
+            pBitStream->WriteCompressed(nameLength);
+            pBitStream->Write(name.ToCString(), nameLength);
+
+            // Send RPC and deallocate
+            g_pClientGame->GetNetAPI()->RPC(REMOVE_ELEMENT_DATA_RPC, pBitStream);
+            g_pNet->DeallocateNetBitStream(pBitStream);
+        }
+
+        Entity.DeleteCustomData(name);
+        return true;
+    }
+
     return false;
 }
 

@@ -77,7 +77,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementID", SetElementID},
         {"setElementParent", SetElementParent},
         {"setElementData", SetElementData},
-        // {"removeElementData", RemoveElementData}, TODO Clientside
+        {"removeElementData", RemoveElementData},
         {"setElementMatrix", SetElementMatrix},
         {"setElementPosition", SetElementPosition},
         {"setElementRotation", SetElementRotation},
@@ -121,7 +121,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "attach", "attachElements");
     lua_classfunction(luaVM, "detach", "detachElements");
     lua_classfunction(luaVM, "destroy", "destroyElement");
-
+    lua_classfunction(luaVM, "removeData", "removeElementData");
     // Get functions
     lua_classfunction(luaVM, "getCollisionsEnabled", "getElementCollisionsEnabled");
     lua_classfunction(luaVM, "isWithinColShape", "isElementWithinColShape");
