@@ -109,6 +109,7 @@ public:
                                                                AnimationId animID);
     std::unique_ptr<CAnimBlendAssociation> BlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta);
     std::unique_ptr<CAnimBlendAssociation> BlendAnimation(RpClump* pClump, CAnimBlendHierarchy* pHierarchy, int ID, float fBlendDelta);
+    std::unique_ptr<CAnimBlendAssociation> BlendAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pHierarchyInterface, int ID, float fBlendDelta);
 
     void AddAnimBlockRef(int ID);
     void RemoveAnimBlockRef(int ID);
