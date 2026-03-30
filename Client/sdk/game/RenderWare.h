@@ -51,6 +51,7 @@ typedef struct RwObjectFrame        RwObjectFrame;
 typedef struct RpAtomic             RpAtomic;
 typedef struct RwCamera             RwCamera;
 typedef struct RpLight              RpLight;
+typedef struct RtAnimAnimation      RtAnimAnimation;
 
 typedef RwCamera* (*RwCameraPreCallback)(RwCamera* camera);
 typedef RwCamera* (*RwCameraPostCallback)(RwCamera* camera);
@@ -198,6 +199,21 @@ enum RpLightFlags
     LIGHT_ILLUMINATES_ATOMICS = 1,
     LIGHT_ILLUMINATES_GEOMETRY = 2,
     LIGHT_FLAGS_LAST = RW_STRUCT_ALIGN
+};
+
+enum RpHAnimHierarchyFlag
+{
+    /* creation flags */
+    rpHANIMHIERARCHYSUBHIERARCHY = 0x01, /**< This hierarchy is a sub-hierarchy */
+    rpHANIMHIERARCHYNOMATRICES = 0x02,   /**< This hierarchy has no local matrices */
+
+    /* update flags */
+    rpHANIMHIERARCHYUPDATEMODELLINGMATRICES = 0x1000, /**< This hierarchy updates modeling matrices */
+    rpHANIMHIERARCHYUPDATELTMS = 0x2000,              /**< This hierarchy updates LTMs */
+    rpHANIMHIERARCHYLOCALSPACEMATRICES = 0x4000,      /**< This hierarchy calculates matrices in a space
+                                                           relative to its root */
+
+    rpHANIMHIERARCHYFLAGFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
 };
 
 // RenderWare/plugin base types
