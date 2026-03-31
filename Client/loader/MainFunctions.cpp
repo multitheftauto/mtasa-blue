@@ -69,9 +69,11 @@ namespace
     return exceptionCode == 0xC0000409 || exceptionCode == 0xC0000374;
 }
 
-[[nodiscard]] static bool IsNetcModule(const SString& moduleName) noexcept
+[[nodiscard]] static bool IsHighIntegrityModule(const SString& moduleName) noexcept
 {
-    return _stricmp(PathFindFileNameA(moduleName.c_str()), "netc.dll") == 0;
+    const char* szFileName = PathFindFileNameA(moduleName.c_str());
+    return _stricmp(szFileName, "netc.dll") == 0 || _stricmp(szFileName, "core.dll") == 0 ||
+           _stricmp(szFileName, "client.dll") == 0;
 }
 
 struct DebuggerCrashCapture
@@ -249,9 +251,9 @@ static DWORD RunDebuggerLoop(HANDLE hProcess, DWORD processId, DebuggerCrashCapt
                                 // This provides fallback if registry-based resolution fails
                                 capture.moduleInfo = ResolveModuleCrashAddress(capture.threadContext.Eip, hProcess);
 
-                                // Do not collect a dump or store registers for netc.dll crashes.
+                                // Do not collect a dump or store registers for high-integrity module crashes.
                                 // These are deliberate security fastfails.
-                                if (!IsNetcModule(capture.moduleInfo.moduleName))
+                                if (!IsHighIntegrityModule(capture.moduleInfo.moduleName))
                                 {
                                     WriteFailFastDump(hProcess, processId, debugEvent.dwThreadId, &debugEvent.u.Exception.ExceptionRecord,
                                                       &capture.threadContext, capture);
@@ -1101,6 +1103,7 @@ void HandleDuplicateLaunching()
         ExitProcess(EXIT_ERROR);  // Max Windows command line length
 
     bool bIsCrashDialog = (cmdLineLen > 0 && strstr(lpCmdLine, "install_stage=crashed") != NULL);
+    bool bIsDetachedDialog = bIsCrashDialog;
 
     int recheckTime = 2000;  // 2 seconds recheck time
 
@@ -1109,7 +1112,7 @@ void HandleDuplicateLaunching()
     //
     // Normal behavior: Loop here if mutex is held, try to pass command line to existing instance
     // Crash dialog: Skip this entirely (bIsCrashDialog=true), proceed directly to showing dialog
-    while (!bIsCrashDialog && !CreateSingleInstanceMutex())
+    while (!bIsDetachedDialog && !CreateSingleInstanceMutex())
     {
         if (cmdLineLen > 0)
         {
@@ -2082,7 +2085,7 @@ int LaunchGame(SString strCmdLine)
 
             if (debugCapture.captured)
             {
-                if (IsFailFastException(debugCapture.exceptionCode) && IsNetcModule(debugCapture.moduleInfo.moduleName))
+                if (IsFailFastException(debugCapture.exceptionCode) && IsHighIntegrityModule(debugCapture.moduleInfo.moduleName))
                 {
                     isAcDefense = true;
                     AddReportLog(7210, SString("Loader - AC integrity exit detected in debugger capture (module=%s code=0x%08X)",
@@ -2125,7 +2128,7 @@ int LaunchGame(SString strCmdLine)
             {
                 WerCrashInfo werInfo = QueryWerCrashInfo(rawExitCode);
 
-                if (werInfo.found && IsFailFastException(werInfo.exceptionCode) && IsNetcModule(werInfo.moduleName))
+                if (werInfo.found && IsFailFastException(werInfo.exceptionCode) && IsHighIntegrityModule(werInfo.moduleName))
                 {
                     isAcDefense = true;
                     AddReportLog(7210, SString("Loader - AC integrity exit detected via WER (module=%s code=0x%08X)", werInfo.moduleName.c_str(),
@@ -2278,8 +2281,17 @@ int LaunchGame(SString strCmdLine)
 
                 if (!isAcDefense && IsFailFastException(rawExitCode))
                 {
+                    isAcDefense = true;
+                    AddReportLog(7210, SString("Loader - AC integrity exit detected via exit code (code=0x%08X)",
+                                               static_cast<unsigned int>(rawExitCode)));
+                    MessageBoxUTF8(nullptr,
+                                   "MTA: San Andreas has been terminated due to an integrity violation.\n\n"
+                                   "Make sure that no external program is modifying the game. Note that some unreliable "
+                                   "AV's (such as Bitdefender) are known to interfere in a way that can lead to this problem.",
+                                   "MTA: San Andreas", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+
                     SetApplicationSetting("diagnostics", "debugger-crash-capture", "1");
-                    WriteDebugEvent(SString("Loader - Enabled one-shot debugger capture for next run (exit code 0x%08X)", rawExitCode));
+                    WriteDebugEvent(SString("Loader - AC integrity exit via exit code, one-shot debugger flag SET (exit code 0x%08X)", rawExitCode));
                     AddReportLog(7204, SString("Loader - One-shot debugger flag SET for next launch (exit code 0x%08X)", rawExitCode));
                 }
             }
