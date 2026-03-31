@@ -781,6 +781,52 @@ namespace
                 RpMaterialSetTexture(pMaterial, pNewTexture);
         }
     }
+
+    static RwObject* __cdecl RebindTexturesInFrameObjectCB(RwObject* pObject, void* pData)
+    {
+        if (pObject && pObject->type == RP_TYPE_ATOMIC)
+        {
+            auto* pAtomic = reinterpret_cast<RpAtomic*>(pObject);
+            if (pAtomic->clump == nullptr && pAtomic->geometry)
+            {
+                auto* pTxdTextureMap = static_cast<const TxdTextureMap*>(pData);
+                RebindAtomicMaterials(pAtomic, *pTxdTextureMap);
+            }
+        }
+
+        return pObject;
+    }
+
+    static void RebindTexturesInFrameHierarchy(RwFrame* pFrame, const TxdTextureMap& mapTxdTextures, std::vector<RwFrame*>& vecVisitedFrames, int iDepth = 0)
+    {
+        if (!pFrame)
+            return;
+
+        if (iDepth > 128)  // cap recursion depth
+            return;
+
+        for (RwFrame* pVisitedFrame : vecVisitedFrames)
+        {
+            if (pVisitedFrame == pFrame)
+                return;
+        }
+        vecVisitedFrames.push_back(pFrame);
+
+        RwFrameForAllObjects(pFrame, RebindTexturesInFrameObjectCB, const_cast<TxdTextureMap*>(&mapTxdTextures));
+
+        if (!pFrame->child)
+            return;
+
+        RwFrame* pChild = pFrame->child;
+        int      iChildCount = 0;
+        while (pChild)
+        {
+            RebindTexturesInFrameHierarchy(pChild, mapTxdTextures, vecVisitedFrames, iDepth + 1);
+            pChild = pChild->next;
+            if (++iChildCount > 1024)  // guard against corrupt frame linked lists
+                return;
+        }
+    }
 }
 
 void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId)
@@ -788,15 +834,21 @@ void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usT
     if (!pClump)
         return;
 
-    TxdTextureMap txdTextureMap = BuildTxdTextureMap(usTxdId);
-    if (txdTextureMap.empty())
+    TxdTextureMap mapTxdTextures = BuildTxdTextureMap(usTxdId);
+    if (mapTxdTextures.empty())
         return;
 
-    std::vector<RpAtomic*> atomicList;
-    GetClumpAtomicList(pClump, atomicList);
+    std::vector<RpAtomic*> vecAtomics;
+    GetClumpAtomicList(pClump, vecAtomics);
 
-    for (RpAtomic* pAtomic : atomicList)
-        RebindAtomicMaterials(pAtomic, txdTextureMap);
+    for (RpAtomic* pAtomic : vecAtomics)
+        RebindAtomicMaterials(pAtomic, mapTxdTextures);
+
+    if (auto* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
+    {
+        std::vector<RwFrame*> vecVisitedFrames;
+        RebindTexturesInFrameHierarchy(pRootFrame, mapTxdTextures, vecVisitedFrames);
+    }
 }
 
 void CRenderWareSA::RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId)
