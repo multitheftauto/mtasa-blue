@@ -1439,12 +1439,11 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
     if (usTxdId >= usMaxTxdSlots)
         throw std::invalid_argument("Expected a valid TXD ID at argument 2");
 
-    // Clean up TXD isolation before changing TXD slot
-    if (pModelInfo->GetParentID() != 0)
-    {
-        if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
-            pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(uiModelID));
-    }
+    // Clean up any existing isolation entry before changing the model's TXD.
+    // This applies to clone and vanilla models; the cleanup is a no-op when
+    // theh model has no isolated TXD.
+    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
+        pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(uiModelID));
 
     pModelInfo->SetTextureDictionaryID(usTxdId);
     return true;
@@ -1460,12 +1459,11 @@ bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
     if (!pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    // Clean up TXD isolation before resetting TXD slot
-    if (pModelInfo->GetParentID() != 0)
-    {
-        if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
-            pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(uiModelID));
-    }
+    // Clean up any existing isolation entry before resetting the model TXD.
+    // This applies to clone and vanilla models; the cleanup is a no-op when
+    // the model has no isolated TXD.
+    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
+        pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(uiModelID));
 
     pModelInfo->ResetTextureDictionaryID();
     return true;
