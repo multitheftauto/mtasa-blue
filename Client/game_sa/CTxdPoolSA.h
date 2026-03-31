@@ -33,6 +33,7 @@ public:
     std::uint32_t GetFreeTextureDictonarySlotInRange(std::uint32_t maxExclusive) override;
     std::uint32_t GetFreeTextureDictonarySlotAbove(std::uint32_t minInclusive) override;
     int           GetUsedSlotCountInRange(std::uint32_t maxExclusive) const override;
+    bool          IsTxdLoaded(std::uint32_t uiTxdId) override;
 
     int GetPoolSize() const noexcept;
     int GetUsedSlotCount() const noexcept;

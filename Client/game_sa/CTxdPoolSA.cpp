@@ -453,7 +453,14 @@ bool CTxdPoolSA::IsFreeTextureDictonarySlot(std::uint32_t uiTxdId)
     if (!m_ppTxdPoolInterface || !(*m_ppTxdPoolInterface))
         return false;
 
-    return (*m_ppTxdPoolInterface)->IsEmpty(uiTxdId);
+    // IsContains is bounds-checked; returns false for out-of-range indices.
+    return !(*m_ppTxdPoolInterface)->IsContains(static_cast<std::int32_t>(uiTxdId));
+}
+
+bool CTxdPoolSA::IsTxdLoaded(std::uint32_t uiTxdId)
+{
+    auto* pSlot = GetTextureDictonarySlot(uiTxdId);
+    return pSlot && pSlot->rwTexDictonary != nullptr;
 }
 
 std::uint32_t CTxdPoolSA::GetFreeTextureDictonarySlot()
