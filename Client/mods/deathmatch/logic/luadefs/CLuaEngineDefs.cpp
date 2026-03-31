@@ -1436,6 +1436,10 @@ uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 
 bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 {
+    static uint32_t      uiLastPendingTargetLogTime = 0;
+    static uint          uiLastPendingTargetModelId = 0;
+    static unsigned short usLastPendingTargetTxdId = 0xFFFF;    // 0xFFFF = no previous TXD recorded
+
     const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
     if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
         throw std::invalid_argument("Expected a valid model ID at argument 1");
@@ -1455,6 +1459,42 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
     // theh model has no isolated TXD.
     if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
         pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(uiModelID));
+
+    const bool bModelLoaded = pModelInfo->IsLoaded();
+    const bool bTargetSlotAllocated = !g_pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usTxdId);
+    const bool bTargetTxdLoaded = g_pGame->GetPools()->GetTxdPool().IsTxdLoaded(usTxdId);
+    if (bModelLoaded && bTargetSlotAllocated && !bTargetTxdLoaded)
+    {
+        const unsigned short usCurrentTxdId = pModelInfo->GetTextureDictionaryID();
+        const unsigned int   uiParentModelId = pModelInfo->GetParentID();
+        unsigned short       usParentTxdId = 0xFFFF;    // 0xFFFF = none
+
+        if (uiParentModelId != 0)
+        {
+            if (CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(uiParentModelId))
+                usParentTxdId = pParentModelInfo->GetTextureDictionaryID();
+        }
+
+        const char* szTargetBand = "standard";
+        if (usTxdId >= static_cast<unsigned short>(CTxdPool::MAX_STREAMING_TXD_SLOT))
+            szTargetBand = "overflow";
+        else if (usTxdId >= static_cast<unsigned short>(CTxdPool::SA_TXD_POOL_CAPACITY))
+            szTargetBand = "overlap-reserved";
+
+        const uint32_t uiNow = GetTickCount32();
+        const bool     bSameModelAndTxdPair = (uiLastPendingTargetModelId == uiModelID && usLastPendingTargetTxdId == usTxdId);
+        // 1000 ms - log at most once per second for the same model/TXD pair
+        if (!bSameModelAndTxdPair || uiNow - uiLastPendingTargetLogTime >= 1000)
+        {
+            uiLastPendingTargetLogTime = uiNow;
+            uiLastPendingTargetModelId = uiModelID;
+            usLastPendingTargetTxdId = usTxdId;
+
+            AddReportLog(9401,
+                         SString("EngineSetModelTXDID: model %u assigned to TXD slot %u (%s band) with no RwTexDictionary; curTxd=%u parentModel=%u parentTxd=%u",
+                                 uiModelID, usTxdId, szTargetBand, usCurrentTxdId, uiParentModelId, usParentTxdId));
+        }
+    }
 
     pModelInfo->SetTextureDictionaryID(usTxdId);
     return true;
