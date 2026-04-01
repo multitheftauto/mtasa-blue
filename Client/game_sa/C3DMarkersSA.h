@@ -30,6 +30,6 @@ public:
 
     C3DMarker* CreateMarker(DWORD Identifier, T3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b, BYTE a);
     C3DMarker* FindFreeMarker();
-    C3DMarker* FindMarker(DWORD Identifier);
+    C3DMarker* FindMarker(DWORD Identifier) override;
     void       ReinitMarkers();
 };

@@ -9,6 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/CVisibilityPlugins.h"
+#include "game/CCoronas.h"
+#include "game/CRegisteredCorona.h"
 
 extern CClientGame* g_pClientGame;
 
@@ -539,4 +542,62 @@ CSphere CClientMarker::GetWorldBoundingSphere()
 void CClientMarker::SetIgnoreAlphaLimits(bool ignore)
 {
     m_pMarker->SetIgnoreAlphaLimits(ignore);
+}
+
+bool CClientMarker::IsOnScreen() const
+{
+    if (!m_pMarker)
+        return false;
+
+    // Check if marker's atomic is visible on the screen
+    // Always false for corona (corona is just a texture)
+    bool isVisible = g_pGame->GetVisibilityPlugins()->IsAtomicVisible(m_pMarker->GetAtomic());
+
+    // The above check for atomic visibility may return false at certain camera angles, even though the marker is partially visible on the screen
+    // This happens because the sphere of its atomic is no fully visible on the screen.
+    // So instead, we check whether the marker’s position along with its size is visible on the screen.
+    if (!isVisible)
+    {
+        CVector pos;
+        GetPosition(pos);
+
+        // A radius of 2.0 is the size that is checked when rendering a 3D marker.
+        // If the camera is outside this area, large markers will disappear even though
+        // they are partially visible on the screen.
+        // See C3dMarkers::Render()
+        isVisible = g_pGame->GetCamera()->IsSphereVisible(&pos, 2.0f);
+    }
+
+    // The above camera check returns a false positive even when the corona is not visible on the screen,
+    // because the area with that radius is within the camera’s range.
+    // To eliminate this false positive, we check whether the corona is actually visible on the screen.
+    // The point is that you can move away from the corona and completely lose sight of it,
+    // yet the area is still within the camera’s range.
+
+    // For coronas, we need to check if they are within the camera’s view because simply checking the screen coordinates
+    // is insufficient and often returns true even when the corona is not visible on the screen.
+    // (GTA renders coronas with some offset outside the screen area).
+    if (isVisible && GetMarkerType() == MARKER_CORONA)
+    {
+        CVector outPos;
+        float   w;
+        float   h;
+
+        CVector camPos;
+        m_pManager->GetCamera()->GetPosition(camPos);
+
+        CRegisteredCorona* corona = g_pGame->GetCoronas()->FindCorona(static_cast<CClientCorona*>(m_pMarker)->GetIdentifier());
+        if (!corona)
+            return false;
+
+        CVector diff = m_vecPosition - camPos;
+        diff.Normalize();
+
+        CVector inPos = m_vecPosition - diff * corona->GetNearClipDistance();
+
+        // Call CSprite::CalcScreenCoors
+        isVisible = ((bool(__cdecl*)(const CVector*, CVector*, float*, float*, bool, bool))0x70CE30)(&inPos, &outPos, &w, &h, true, true);
+    }
+
+    return isVisible;
 }

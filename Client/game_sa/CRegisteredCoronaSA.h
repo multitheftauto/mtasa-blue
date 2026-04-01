@@ -72,6 +72,7 @@ public:
     void     SetFlareType(BYTE fFlareType);
     void     SetReflectionType(BYTE reflectionType);
     DWORD    GetIdentifier() { return internalInterface->Identifier; }
+    float    GetNearClipDistance() override { return internalInterface->PullTowardsCam; }
     DWORD    GetID();
     void     Init(DWORD Identifier);
     void     Disable();

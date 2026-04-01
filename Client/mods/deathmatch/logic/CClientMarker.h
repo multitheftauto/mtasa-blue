@@ -87,6 +87,8 @@ public:
     void SetIgnoreAlphaLimits(bool ignore);
     bool AreAlphaLimitsIgnored() const noexcept { return m_pMarker->AreAlphaLimitsIgnored(); };
 
+    bool IsOnScreen() const;
+
 protected:
     void StreamIn(bool bInstantly);
     void StreamOut();

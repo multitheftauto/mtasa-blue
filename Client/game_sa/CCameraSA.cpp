@@ -738,3 +738,12 @@ bool CCameraSA::GetTransitionMatrix(CMatrix& matrix) const
 
     return true;
 }
+
+bool CCameraSA::IsSphereVisible(CVector* center, float radius) const
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface)
+        return false;
+
+    return ((bool(__thiscall*)(CCameraSAInterface*, CVector*, float))0x420D40)(cameraInterface, center, radius);
+}

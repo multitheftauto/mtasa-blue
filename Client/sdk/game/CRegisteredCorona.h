@@ -37,4 +37,5 @@ public:
     virtual DWORD    GetID() = 0;
     virtual void     Refresh() = 0;
     virtual void     Disable() = 0;
+    virtual float    GetNearClipDistance() = 0;
 };

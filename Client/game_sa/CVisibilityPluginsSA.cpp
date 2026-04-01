@@ -62,3 +62,11 @@ bool CVisibilityPluginsSA::InsertEntityIntoEntityList(void* entity, float distan
 {
     return ((bool(_cdecl*)(void*, float, void*))FUNC_CVisibilityPlugins_InsertEntityIntoEntityList)(entity, distance, callback);
 }
+
+bool CVisibilityPluginsSA::IsAtomicVisible(RpAtomic* atomic) const
+{
+    if (!atomic)
+        return false;
+
+    return ((bool(__cdecl*)(RpAtomic*))0x732990)(atomic);
+}
