@@ -549,6 +549,8 @@ bool CClientMarker::IsOnScreen() const
     if (!m_pMarker)
         return false;
 
+    bool isCorona = GetMarkerType() == MARKER_CORONA;
+
     // Check if marker's atomic is visible on the screen
     // Always false for corona (corona is just a texture)
     bool isVisible = g_pGame->GetVisibilityPlugins()->IsAtomicVisible(m_pMarker->GetAtomic());
@@ -565,7 +567,7 @@ bool CClientMarker::IsOnScreen() const
         // If the camera is outside this area, large markers will disappear even though
         // they are partially visible on the screen.
         // See C3dMarkers::Render()
-        isVisible = g_pGame->GetCamera()->IsSphereVisible(&pos, 2.0f);
+        isVisible = g_pGame->GetCamera()->IsSphereVisible(&pos, isCorona ? GetSize() : 2.0f);
     }
 
     // The above camera check returns a false positive even when the corona is not visible on the screen,
@@ -577,7 +579,7 @@ bool CClientMarker::IsOnScreen() const
     // For coronas, we need to check if they are within the camera’s view because simply checking the screen coordinates
     // is insufficient and often returns true even when the corona is not visible on the screen.
     // (GTA renders coronas with some offset outside the screen area).
-    if (isVisible && GetMarkerType() == MARKER_CORONA)
+    if (isVisible && isCorona)
     {
         CVector outPos;
         float   w;
