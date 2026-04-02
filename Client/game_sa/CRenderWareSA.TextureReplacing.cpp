@@ -134,6 +134,7 @@ namespace
         unsigned int          uiExpectedParentModelId = 0;
         unsigned short        usExpectedParentTxdId = 0;
         unsigned char         ucRetryCount = 0;
+        uint32_t              uiWaitConditionSerial = 0;
         uint32_t              uiFirstQueueTick = 0;
         uint32_t              uiNextRetryTick = 0;
         uint32_t              uiSessionId = 0;
@@ -226,7 +227,89 @@ namespace
     uint32_t g_uiIsolationDeniedSerial = 0;
     bool     g_bProcessingPendingReplacements = false;
     bool     g_bProcessingPendingIsolatedModels = false;
+    uint32_t g_uiPendingReplacementConditionSerial = 0;
     uint32_t g_uiNextPendingRetryTick = 0;
+    const std::unordered_map<unsigned short, std::vector<SPendingReplacement>>* g_pPendingReplacementSnapshot = nullptr;
+
+    static uint32_t NextPendingReplacementConditionSerial()
+    {
+        ++g_uiPendingReplacementConditionSerial;
+        if (g_uiPendingReplacementConditionSerial == 0)
+            ++g_uiPendingReplacementConditionSerial;
+
+        return g_uiPendingReplacementConditionSerial;
+    }
+
+    static bool ClearPendingOnModelIfNoLiveEntry(unsigned short usModelId, const SPendingReplacement& pendingEntry)
+    {
+        if (!pendingEntry.pReplacement)
+            return false;
+
+        auto itPendingReplacements = g_PendingReplacementByModel.find(usModelId);
+        if (itPendingReplacements != g_PendingReplacementByModel.end())
+        {
+            for (const SPendingReplacement& liveEntry : itPendingReplacements->second)
+            {
+                if (liveEntry.pReplacement == pendingEntry.pReplacement && liveEntry.uiSessionId == pendingEntry.uiSessionId)
+                    return false;
+            }
+        }
+
+        pendingEntry.pReplacement->pendingOnModelIds.erase(usModelId);
+        return true;
+    }
+
+    static void RemoveLivePendingEntries(unsigned short usModelId, const SPendingReplacement& pendingEntry)
+    {
+        if (!pendingEntry.pReplacement)
+            return;
+
+        auto itPendingReplacements = g_PendingReplacementByModel.find(usModelId);
+        if (itPendingReplacements == g_PendingReplacementByModel.end())
+            return;
+
+        std::vector<SPendingReplacement>& vecPending = itPendingReplacements->second;
+        vecPending.erase(std::remove_if(vecPending.begin(), vecPending.end(),
+                                        [&pendingEntry](const SPendingReplacement& e)
+                                        {
+                                            return e.pReplacement == pendingEntry.pReplacement && e.uiSessionId == pendingEntry.uiSessionId &&
+                                                   e.uiWaitConditionSerial == pendingEntry.uiWaitConditionSerial;
+                                        }),
+                         vecPending.end());
+
+        if (vecPending.empty())
+            g_PendingReplacementByModel.erase(itPendingReplacements);
+    }
+
+    static void CompletePendingReplacement(unsigned short usModelId, const SPendingReplacement& pendingEntry)
+    {
+        if (!pendingEntry.pReplacement)
+            return;
+
+        RemoveLivePendingEntries(usModelId, pendingEntry);
+        ClearPendingOnModelIfNoLiveEntry(usModelId, pendingEntry);
+    }
+
+    static const SPendingReplacement* FindPendingSnapshotEntry(unsigned short usModelId, const SReplacementTextures* pReplacement)
+    {
+        if (!g_pPendingReplacementSnapshot || !pReplacement)
+            return nullptr;
+
+        if (pReplacement->pendingOnModelIds.find(usModelId) == pReplacement->pendingOnModelIds.end())
+            return nullptr;
+
+        auto itPendingReplacements = g_pPendingReplacementSnapshot->find(usModelId);
+        if (itPendingReplacements == g_pPendingReplacementSnapshot->end())
+            return nullptr;
+
+        for (const SPendingReplacement& snapshotEntry : itPendingReplacements->second)
+        {
+            if (snapshotEntry.pReplacement == pReplacement && snapshotEntry.uiSessionId == ms_uiTextureReplacingSession)
+                return &snapshotEntry;
+        }
+
+        return nullptr;
+    }
 
     void                   BuildTxdTextureMapFast(RwTexDictionary* pTxd, TxdTextureMap& outMap);
     static void            AddVehicleTxdFallback(TxdTextureMap& outMap);
@@ -563,11 +646,30 @@ namespace
         }
 
         std::vector<SPendingReplacement>& vecPending = itPendingReplacements->second;
+        const uint32_t                    uiNow = GetTickCount32();
 
-        for (const SPendingReplacement& entry : vecPending)
+        for (SPendingReplacement& entry : vecPending)
         {
             if (entry.pReplacement == pReplacement)
             {
+                const bool bExpectedStateChanged =
+                    entry.uiExpectedParentModelId != uiExpectedParentModelId || entry.usExpectedParentTxdId != usExpectedParentTxdId;
+
+                entry.uiExpectedParentModelId = uiExpectedParentModelId;
+                entry.usExpectedParentTxdId = usExpectedParentTxdId;
+
+                // Parent changed - new wait condition, so wipe timing and retry state.
+                if (bExpectedStateChanged)
+                {
+                    entry.uiWaitConditionSerial = NextPendingReplacementConditionSerial();
+                    entry.uiFirstQueueTick = uiNow;
+                    entry.ucRetryCount = 0;
+                    entry.uiNextRetryTick = uiNow;
+
+                    if (g_uiNextPendingRetryTick == 0 || uiNow < g_uiNextPendingRetryTick)
+                        g_uiNextPendingRetryTick = uiNow;
+                }
+
                 pReplacement->pendingOnModelIds.insert(usModelId);
                 return;
             }
@@ -579,18 +681,32 @@ namespace
             return;
         }
 
-        const uint32_t uiNow = GetTickCount32();
-
-        pReplacement->pendingOnModelIds.insert(usModelId);
-
         SPendingReplacement entry;
         entry.pReplacement = pReplacement;
         entry.uiExpectedParentModelId = uiExpectedParentModelId;
         entry.usExpectedParentTxdId = usExpectedParentTxdId;
-        entry.ucRetryCount = 0;
-        entry.uiFirstQueueTick = uiNow;
-        entry.uiNextRetryTick = uiNow;
         entry.uiSessionId = ms_uiTextureReplacingSession;
+
+        const auto* pSnapshotEntry = FindPendingSnapshotEntry(usModelId, pReplacement);
+        const bool  bMatchesSnapshotWaitCondition = pSnapshotEntry && pSnapshotEntry->uiExpectedParentModelId == uiExpectedParentModelId &&
+                                                    pSnapshotEntry->usExpectedParentTxdId == usExpectedParentTxdId;
+
+        if (bMatchesSnapshotWaitCondition)
+        {
+            entry.uiWaitConditionSerial = pSnapshotEntry->uiWaitConditionSerial;
+            entry.ucRetryCount = pSnapshotEntry->ucRetryCount;
+            entry.uiFirstQueueTick = pSnapshotEntry->uiFirstQueueTick;
+            entry.uiNextRetryTick = pSnapshotEntry->uiNextRetryTick;
+        }
+        else
+        {
+            entry.uiWaitConditionSerial = NextPendingReplacementConditionSerial();
+            entry.ucRetryCount = 0;
+            entry.uiFirstQueueTick = uiNow;
+            entry.uiNextRetryTick = uiNow;
+        }
+
+        pReplacement->pendingOnModelIds.insert(usModelId);
         vecPending.push_back(entry);
 
         if (g_uiNextPendingRetryTick == 0 || entry.uiNextRetryTick < g_uiNextPendingRetryTick)
@@ -613,7 +729,19 @@ namespace
         {
             if (existingEntry.pReplacement == pendingEntry.pReplacement)
             {
-                existingEntry = pendingEntry;
+                const bool bSameWaitCondition = existingEntry.uiWaitConditionSerial == pendingEntry.uiWaitConditionSerial;
+
+                if (bSameWaitCondition)
+                {
+                    if (pendingEntry.ucRetryCount > existingEntry.ucRetryCount)
+                        existingEntry.ucRetryCount = pendingEntry.ucRetryCount;
+
+                    if (existingEntry.uiFirstQueueTick == 0 || pendingEntry.uiFirstQueueTick < existingEntry.uiFirstQueueTick)
+                        existingEntry.uiFirstQueueTick = pendingEntry.uiFirstQueueTick;
+
+                    if (pendingEntry.uiNextRetryTick > existingEntry.uiNextRetryTick)
+                        existingEntry.uiNextRetryTick = pendingEntry.uiNextRetryTick;
+                }
                 return;
             }
         }
@@ -644,9 +772,14 @@ namespace
         {
             if (existingEntry.pReplacement == pendingEntryCopy.pReplacement)
             {
-                // Keep the higher retry count so escalation is never lost
-                if (pendingEntryCopy.ucRetryCount > existingEntry.ucRetryCount)
-                    existingEntry.ucRetryCount = pendingEntryCopy.ucRetryCount;
+                const bool bSameWaitCondition = existingEntry.uiWaitConditionSerial == pendingEntryCopy.uiWaitConditionSerial;
+
+                if (bSameWaitCondition)
+                {
+                    // Keep the higher retry count so escalation is never lost
+                    if (pendingEntryCopy.ucRetryCount > existingEntry.ucRetryCount)
+                        existingEntry.ucRetryCount = pendingEntryCopy.ucRetryCount;
+                }
                 // Enforce delayed retry so a fresh QueuePendingReplacement
                 // inside ModelInfoTXDAddTextures cant keep the entry eligible every frame.
                 if (pendingEntryCopy.uiNextRetryTick > existingEntry.uiNextRetryTick)
@@ -684,6 +817,18 @@ namespace
         std::unordered_map<unsigned short, std::vector<SPendingReplacement>> mapPendingSnapshot;
         mapPendingSnapshot.swap(g_PendingReplacementByModel);
 
+        struct SPendingSnapshotGuard
+        {
+            const std::unordered_map<unsigned short, std::vector<SPendingReplacement>>*& pSnapshot;
+            SPendingSnapshotGuard(const std::unordered_map<unsigned short, std::vector<SPendingReplacement>>*& pRef,
+                                  const std::unordered_map<unsigned short, std::vector<SPendingReplacement>>*  pValue)
+                : pSnapshot(pRef)
+            {
+                pSnapshot = pValue;
+            }
+            ~SPendingSnapshotGuard() { pSnapshot = nullptr; }
+        } snapshotGuard(g_pPendingReplacementSnapshot, &mapPendingSnapshot);
+
         std::size_t uiProcessedCount = 0;
         bool        bReachedLimit = false;
 
@@ -705,7 +850,7 @@ namespace
                 for (const SPendingReplacement& entry : vecPending)
                 {
                     if (entry.pReplacement && entry.uiSessionId == ms_uiTextureReplacingSession && IsReplacementActive(entry.pReplacement))
-                        entry.pReplacement->pendingOnModelIds.erase(usModelId);
+                        CompletePendingReplacement(usModelId, entry);
                 }
                 continue;
             }
@@ -744,16 +889,18 @@ namespace
 
                 if (uiNow - entry.uiFirstQueueTick >= PENDING_REPLACEMENT_MAX_AGE_MS)
                 {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
-                    AddReportLog(9401, SString("Dropping stale pending replacement for model %u", usModelId));
+                    if (ClearPendingOnModelIfNoLiveEntry(usModelId, entry))
+                        AddReportLog(9401, SString("Dropping stale pending replacement for model %u", usModelId));
                     continue;
                 }
 
                 if (entry.ucRetryCount >= MAX_PENDING_REPLACEMENT_RETRIES)
                 {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
-                    AddReportLog(
-                        9401, SString("Dropping pending replacement for model %u after %u retries", usModelId, static_cast<unsigned int>(entry.ucRetryCount)));
+                    if (ClearPendingOnModelIfNoLiveEntry(usModelId, entry))
+                    {
+                        AddReportLog(9401, SString("Dropping pending replacement for model %u after %u retries", usModelId,
+                                                   static_cast<unsigned int>(entry.ucRetryCount)));
+                    }
                     continue;
                 }
 
@@ -763,15 +910,16 @@ namespace
                     continue;
                 }
 
-                if (entry.uiExpectedParentModelId != 0 && entry.uiExpectedParentModelId != uiCurrentParentModelId)
+                if ((entry.uiExpectedParentModelId != 0 && entry.uiExpectedParentModelId != uiCurrentParentModelId) ||
+                    (entry.usExpectedParentTxdId != 0 && entry.usExpectedParentTxdId != usCurrentParentTxdId))
                 {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
-                    continue;
-                }
-
-                if (entry.usExpectedParentTxdId != 0 && entry.usExpectedParentTxdId != usCurrentParentTxdId)
-                {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
+                    SPendingReplacement updated = entry;
+                    updated.uiExpectedParentModelId = uiCurrentParentModelId;
+                    updated.usExpectedParentTxdId = usCurrentParentTxdId;
+                    updated.uiWaitConditionSerial = NextPendingReplacementConditionSerial();
+                    updated.ucRetryCount = 0;
+                    updated.uiFirstQueueTick = uiNow;
+                    RequeuePendingReplacement(usModelId, updated, false);
                     continue;
                 }
 
@@ -803,7 +951,7 @@ namespace
                 }
                 else
                 {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
+                    CompletePendingReplacement(usModelId, entry);
                 }
             }
         }
@@ -7164,7 +7312,9 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_uiIsolationDeniedSerial = 0;
     g_bProcessingPendingReplacements = false;
     g_bProcessingPendingIsolatedModels = false;
+    g_uiPendingReplacementConditionSerial = 0;
     g_uiNextPendingRetryTick = 0;
+    g_pPendingReplacementSnapshot = nullptr;
     const uint32_t uiNow = GetTickCount32();
     g_uiLastOrphanCleanupTime = uiNow;
     g_uiLastOrphanLogTime = uiNow;
