@@ -38,6 +38,7 @@ std::map<DWORD, CTimeInfoSAInterface>                                CModelInfoS
 std::unordered_map<DWORD, unsigned short>                            CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                   CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 std::map<unsigned short, int>                                        CModelInfoSA::ms_DefaultTxdIDMap;
+std::uint32_t                                                        CModelInfoSA::ms_uiTxdAssignmentGeneration = 0;
 
 void CModelInfoSA::ClearModelDefaults(DWORD modelId)
 {
@@ -1111,6 +1112,7 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
             if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
                 ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
 
+            ++ms_uiTxdAssignmentGeneration;
             m_pInterface->usTextureDictionary = usID;
             return;
         }
@@ -1125,6 +1127,7 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
         ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
 
+    ++ms_uiTxdAssignmentGeneration;
     m_pInterface->usTextureDictionary = usID;
 
     // Pin the new TXD before rebinding so textures remain valid during the switch

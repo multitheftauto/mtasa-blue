@@ -359,6 +359,7 @@ protected:
     static std::unordered_map<DWORD, unsigned short>                            ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                   ms_VehicleModelDefaultWheelSizes;
     static std::map<unsigned short, int>                                        ms_DefaultTxdIDMap;
+    static std::uint32_t                                                        ms_uiTxdAssignmentGeneration;
     SVehicleSupportedUpgrades                                                   m_ModelSupportedUpgrades;
     static void                                                                 ClearModelDefaults(DWORD modelId);
 
@@ -414,6 +415,7 @@ public:
     void               SetTextureDictionaryID(unsigned short usID);
     void               ResetTextureDictionaryID();
     static void        StaticResetTextureDictionaries();
+    static std::uint32_t GetTxdAssignmentGeneration() noexcept { return ms_uiTxdAssignmentGeneration; }
     float              GetLODDistance();
     float              GetOriginalLODDistance();
     void               SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
