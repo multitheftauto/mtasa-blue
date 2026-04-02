@@ -334,13 +334,9 @@ void CResource::Load()
         }
         else if (pResourceFile->IsAutoDownload())
         {
-            // Only re-read from disk if the constructor checksum didn't already match
             if (!pResourceFile->DoesClientAndServerChecksumMatch())
             {
-                if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) != pResourceFile->GetServerChecksum())
-                {
-                    HandleDownloadedFileTrouble(pResourceFile, false);
-                }
+                HandleDownloadedFileTrouble(pResourceFile, false);
             }
         }
     }
@@ -528,20 +524,18 @@ void CResource::AddToElementGroup(CClientEntity* pElement)
 //
 void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript)
 {
-    auto checksumResult = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
-
     SString errorMessage;
-    if (std::holds_alternative<std::string>(checksumResult))
-        errorMessage = std::get<std::string>(checksumResult);
+
+    CChecksum clientChecksum = pResourceFile->GetLastClientChecksum();
+    if (clientChecksum == CChecksum())
+    {
+        errorMessage = SString("File not readable: %s", pResourceFile->GetName());
+    }
     else
     {
-        CChecksum checksum = std::get<CChecksum>(checksumResult);
-
-        // Compose message
-        uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
-        SString strGotMd5 = ConvertDataToHexString(checksum.md5.data, sizeof(MD5));
+        SString strGotMd5 = ConvertDataToHexString(clientChecksum.md5.data, sizeof(MD5));
         SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
-        errorMessage = SString("Got size:%d MD5:%s, wanted MD5:%s", uiGotFileSize, *strGotMd5, *strWantedMd5);
+        errorMessage = SString("Got MD5:%s, wanted MD5:%s", *strGotMd5, *strWantedMd5);
     }
 
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));
