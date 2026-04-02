@@ -31,6 +31,7 @@ namespace SharedUtil
     bool FileLoad(std::nothrow_t, const SString& filePath, SString& outBuffer, size_t maxSize = INT_MAX, size_t offset = 0) noexcept;
 
 #if defined(_WIN32) && defined(MTA_CLIENT)
+    bool GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_ATTRIBUTE_DATA& attr, DWORD timeoutMs) noexcept;
     bool FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs) noexcept;
 #endif
 

@@ -334,10 +334,13 @@ void CResource::Load()
         }
         else if (pResourceFile->IsAutoDownload())
         {
-            // Check the file contents
-            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) != pResourceFile->GetServerChecksum())
+            // Only re-read from disk if the constructor checksum didn't already match
+            if (!pResourceFile->DoesClientAndServerChecksumMatch())
             {
-                HandleDownloadedFileTrouble(pResourceFile, false);
+                if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) != pResourceFile->GetServerChecksum())
+                {
+                    HandleDownloadedFileTrouble(pResourceFile, false);
+                }
             }
         }
     }
