@@ -451,6 +451,10 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
     }
 
     (*m_ppTxdPoolInterface)->Release(uiTxdId);
+
+    // Lower the free-slot hint so the next search starts here
+    if (uiTxdId < m_uiFreeSlotHint)
+        m_uiFreeSlotHint = uiTxdId;
 }
 
 bool CTxdPoolSA::IsFreeTextureDictonarySlot(std::uint32_t uiTxdId)
@@ -486,10 +490,26 @@ std::uint32_t CTxdPoolSA::GetFreeTextureDictonarySlotInRange(std::uint32_t maxEx
         return static_cast<std::uint32_t>(-1);
 
     const std::uint32_t limit = std::min(maxExclusive, static_cast<std::uint32_t>(pool->m_nSize));
-    for (std::uint32_t i = 0; i < limit; ++i)
+
+    // Start from the hint to skip known-occupied lower slots
+    std::uint32_t start = (m_uiFreeSlotHint < limit) ? m_uiFreeSlotHint : 0;
+    for (std::uint32_t i = start; i < limit; ++i)
     {
         if (pool->m_byteMap[i].bEmpty)
+        {
+            m_uiFreeSlotHint = i + 1;
             return i;
+        }
+    }
+
+    // Hint was stale; scan the range below the hint
+    for (std::uint32_t i = 0; i < start; ++i)
+    {
+        if (pool->m_byteMap[i].bEmpty)
+        {
+            m_uiFreeSlotHint = i + 1;
+            return i;
+        }
     }
 
     return static_cast<std::uint32_t>(-1);

@@ -63,4 +63,9 @@ private:
     void InstallPoolHooks();
 
     CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;
+
+    // Hint for GetFreeTextureDictonarySlotInRange: slots below this index
+    // are likely occupied. Advanced past each slot the function returns,
+    // lowered when a slot below the hint is freed.
+    std::uint32_t m_uiFreeSlotHint = 0;
 };
