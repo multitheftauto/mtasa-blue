@@ -1435,6 +1435,7 @@ namespace
     {
         bool bHasOtherUsers = false;
         bool bHasIncompatibleUsers = false;
+        std::vector<unsigned short> otherUserModelIds;
     };
 
     using TextureNameSet = std::unordered_set<std::string>;
@@ -1655,22 +1656,10 @@ namespace
         if (itScriptTexInfo == ms_ModelTexturesInfoMap.end())
             return false;
 
-        const unsigned int uiModelLimit = static_cast<unsigned int>(pGame->GetBaseIDforCOL());
-        for (unsigned int uiOtherModelId = 0; uiOtherModelId < uiModelLimit; ++uiOtherModelId)
+        for (unsigned short usOtherModelId : scriptTxdUsage.otherUserModelIds)
         {
-            if (uiOtherModelId == usModelId)
-                continue;
-
-            auto* pOtherModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiOtherModelId));
-            if (!pOtherModelInfo || pOtherModelInfo->GetTextureDictionaryID() != usTxdId)
-                continue;
-
-            auto* pOtherParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(pOtherModelInfo->GetParentID()));
-            if (!pOtherParentInfo || pOtherParentInfo->GetTextureDictionaryID() != usParentTxdId)
-                return true;
-
             TextureNameSet otherMatNames;
-            if (!CollectModelMaterialTextureNames(otherMatNames, static_cast<unsigned short>(uiOtherModelId)))
+            if (!CollectModelMaterialTextureNames(otherMatNames, usOtherModelId))
                 return true;
 
             if (HasTextureNameIntersection(newTexNames, otherMatNames))
@@ -1684,7 +1673,7 @@ namespace
                 bool bUsedByOther = false;
                 for (unsigned short usExistingModelId : pExisting->usedInModelIds)
                 {
-                    if (usExistingModelId == uiOtherModelId)
+                    if (usExistingModelId == usOtherModelId)
                     {
                         bUsedByOther = true;
                         break;
@@ -1764,6 +1753,7 @@ namespace
             if (uiOtherParentModelId == 0)
             {
                 usage.bHasIncompatibleUsers = true;
+                usage.otherUserModelIds.clear();
                 break;
             }
 
@@ -1772,8 +1762,11 @@ namespace
             if (!pOtherParentInfo || usOtherParentTxdId != usParentTxdId)
             {
                 usage.bHasIncompatibleUsers = true;
+                usage.otherUserModelIds.clear();
                 break;
             }
+
+            usage.otherUserModelIds.push_back(static_cast<unsigned short>(uiOtherModelId));
         }
 
         return usage;
@@ -2043,9 +2036,8 @@ namespace
         // Both masters and copies share the same raster, so a raster-level check
         // catches both without needing separate copy tracking.
         //
-        // The global portion (g_ActiveReplacements, g_LeakedMasterTextures, g_OrphanedCopyRasters)
-        // is cached and only rebuilt when those globals change. The entry-local portion
-        // (info.usedByReplacements) is always added fresh per call.
+        // The set (g_ActiveReplacements, g_LeakedMasterTextures, g_OrphanedCopyRasters)
+        // is cached and only rebuilt when those globals change.
         if (g_uiGlobalMtaRasterCacheGeneration != g_uiGlobalMtaRasterGeneration)
         {
             g_GlobalMtaRasterCache.clear();
@@ -2073,28 +2065,13 @@ namespace
             g_uiGlobalMtaRasterCacheGeneration = g_uiGlobalMtaRasterGeneration;
         }
 
-        // Start with cached global rasters, then add entry-local rasters
-        std::unordered_set<RwRaster*> mtaRasters = g_GlobalMtaRasterCache;
-
-        for (const SReplacementTextures* pReplacement : info.usedByReplacements)
-        {
-            if (!pReplacement || !IsReplacementActive(pReplacement))
-                continue;
-
-            for (RwTexture* pMasterTex : pReplacement->textures)
-            {
-                if (pMasterTex && pMasterTex->raster)
-                    mtaRasters.insert(pMasterTex->raster);
-            }
-        }
-
         for (RwTexture* pTex : allTextures)
         {
             if (!pTex)
                 continue;
 
             // Reject textures whose raster belongs to an MTA master or copy
-            if (!mtaRasters.empty() && pTex->raster && mtaRasters.count(pTex->raster) != 0)
+            if (!g_GlobalMtaRasterCache.empty() && pTex->raster && g_GlobalMtaRasterCache.count(pTex->raster) != 0)
                 continue;
 
             info.originalTextures.insert(pTex);
