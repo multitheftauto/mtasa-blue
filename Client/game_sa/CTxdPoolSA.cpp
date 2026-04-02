@@ -447,9 +447,11 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
 
     (*m_ppTxdPoolInterface)->Release(uiTxdId);
 
-    // Lower the free-slot hint so the next search starts here
+    // Lower the free-slot hints so the next search starts here
     if (uiTxdId < m_uiFreeSlotHint)
         m_uiFreeSlotHint = uiTxdId;
+    if (uiTxdId >= static_cast<std::uint32_t>(MAX_STREAMING_TXD_SLOT) && uiTxdId < m_uiFreeSlotHintAbove)
+        m_uiFreeSlotHintAbove = uiTxdId;
 }
 
 bool CTxdPoolSA::IsFreeTextureDictonarySlot(std::uint32_t uiTxdId)
@@ -520,10 +522,27 @@ std::uint32_t CTxdPoolSA::GetFreeTextureDictonarySlotAbove(std::uint32_t minIncl
     if (!pool->m_byteMap || pool->m_nSize <= static_cast<int>(minInclusive))
         return static_cast<std::uint32_t>(-1);
 
-    for (std::uint32_t i = minInclusive; i < static_cast<std::uint32_t>(pool->m_nSize); ++i)
+    const std::uint32_t poolSize = static_cast<std::uint32_t>(pool->m_nSize);
+
+    // Start from the hint to skip known-occupied lower slots
+    std::uint32_t start = (m_uiFreeSlotHintAbove >= minInclusive && m_uiFreeSlotHintAbove < poolSize) ? m_uiFreeSlotHintAbove : minInclusive;
+    for (std::uint32_t i = start; i < poolSize; ++i)
     {
         if (pool->m_byteMap[i].bEmpty)
+        {
+            m_uiFreeSlotHintAbove = i + 1;
             return i;
+        }
+    }
+
+    // Hint was stale; scan the range below the hint
+    for (std::uint32_t i = minInclusive; i < start; ++i)
+    {
+        if (pool->m_byteMap[i].bEmpty)
+        {
+            m_uiFreeSlotHintAbove = i + 1;
+            return i;
+        }
     }
 
     return static_cast<std::uint32_t>(-1);
