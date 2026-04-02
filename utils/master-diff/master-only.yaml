@@ -1,0 +1,27 @@
+# Master-only commits deliberately not backported to release/1.6.0 (fork).
+# Each entry is either a full commit SHA or an exact commit title (first line).
+#
+# Examples:
+#   - commit: aabbccddeeff00112233445566778899aabbccdd
+#   - title: Fix something not relevant to 1.6.0
+- title: Update client en_US pot
+- title: Update launchers
+- title: Update launchers x64
+- title: clang fix
+
+- commit: 764f5ab0100c212b565c4ae597aa893a0e2716fb  # Set version to 1.6.1
+- commit: 25e07c46840360caf58f4241e17ecb7288468e04  # Remove remaining minimum client checks
+- commit: 3707b53acd09c1b2dd59bdf544e5c74865091bb6  # Disable empty CResourceChecker data arrays
+
+# not sure of the motivation behind this change
+# - commit: fe761e52e4f187df465e1e8079adefa299c1ab55  # Remove unused jump section in HOOK_CPlantMgr_Render
+
+- commit: d302d3c56d0fba41b7f71bcb78c60e4aab097a8e  # Remove outdated community account handling
+- commit: 47bc53fe4540244d7c0571521f9ae659896ca6da  # Remove outdated bitstream checks
+- commit: 92763f84aacd54b6263e72699a936489e7072a15  # Remove outdated bitstream checks
+- commit: 4be957b8af46d073cd1da35d285a25664abe7f94  # Remove outdated bitstream checks
+
+# not sure why this wasn't backported? seems harmless
+# - commit: bbf74ba0d31e0934e84b2001291b6277fe9dad48  # Include or exclude VERSION_TYPE_UNTESTED in some places
+
+- commit: 60094d17432eb1395335bb10025dd928a0ab2dff  # Set version to 1.7
