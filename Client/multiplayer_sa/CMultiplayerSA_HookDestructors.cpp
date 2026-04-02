@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+extern CGame* pGameInterface;
+
 namespace
 {
     CAnimBlendAssocDestructorHandler*  m_pCAnimBlendAssocDestructorHandler = nullptr;
@@ -516,11 +518,22 @@ inner:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
-void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, ushort usModelId)
+bool _cdecl OnCStreamingRemoveModel(DWORD calledFrom, ushort usModelId)
 {
-    // Tell client to check for things going away
-    if (pGameModelRemoveHandler)
+    bool bAllowRemove = true;
+
+    if (pGameInterface)
+    {
+        StreamingRemoveModelCallback pCallback = pGameInterface->GetStreamingRemoveModelCallback();
+        if (pCallback)
+            bAllowRemove = pCallback(usModelId);
+    }
+
+    // Tell client to check for things going away only when the removal will proceed.
+    if (bAllowRemove && pGameModelRemoveHandler)
         pGameModelRemoveHandler(usModelId);
+
+    return bAllowRemove;
 }
 
 // Hook info
@@ -537,11 +550,16 @@ void _declspec(naked) HOOK_CStreamingRemoveModel()
         push    [esp+32+4*1]
         call    OnCStreamingRemoveModel
         add     esp, 4*2
+        test    al, al
         popad
+        jz      skipRemoval
 
         push    esi
         mov     esi, [esp+8]
         jmp     RETURN_CStreamingRemoveModel
+
+skipRemoval:
+        ret
     }
     // clang-format on
 }

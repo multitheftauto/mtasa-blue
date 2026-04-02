@@ -14,23 +14,20 @@
 
 #pragma once
 
+#include <atomic>
 #include <mutex>
 #include <unordered_map>
 
 class CStreamingGC
 {
 public:
-    // Installs hooks into GTA SA's model removal function
+    // Marks the protection system ready for use.
+    // The actual remove-model hook is installed by the multiplayer hook layer.
     static void Initialize();
 
-    // Shutdown and remove all hooks
+    // Stops accepting new protections and releases current ones.
+    // The actual remove-model hook remains installed elsewhere.
     static void Shutdown();
-
-    // Protect a model from garbage collection. Returns true if protection was successful (model loaded)
-    static bool ProtectModel(std::uint32_t modelId);
-
-    // Unprotect a model, allowing GC. Returns true if protection was removed
-    [[nodiscard]] static bool UnprotectModel(std::uint32_t modelId);
 
     // Check if model is protected. Returns true if model is protected from GC
     static bool IsModelProtected(std::uint32_t modelId);
@@ -48,12 +45,15 @@ public:
     class Guard
     {
     public:
-        explicit Guard(std::uint32_t modelId) : m_modelId(modelId) { m_bActive = ProtectModel(m_modelId); }
+        explicit Guard(std::uint32_t modelId) : m_modelId(modelId), m_generation(0)
+        {
+            m_bActive = ProtectModelWithGeneration(m_modelId, &m_generation);
+        }
 
         ~Guard() noexcept
         {
             if (m_bActive)
-                static_cast<void>(UnprotectModel(m_modelId));
+                static_cast<void>(UnprotectModelForGeneration(m_modelId, m_generation));
         }
 
         // Prevent copying
@@ -61,18 +61,24 @@ public:
         Guard& operator=(const Guard&) = delete;
 
         // Allow moving
-        Guard(Guard&& other) noexcept : m_modelId(other.m_modelId), m_bActive(other.m_bActive) { other.m_bActive = false; }
+        Guard(Guard&& other) noexcept : m_modelId(other.m_modelId), m_bActive(other.m_bActive), m_generation(other.m_generation)
+        {
+            other.m_bActive = false;
+            other.m_generation = 0;
+        }
 
         Guard& operator=(Guard&& other) noexcept
         {
             if (this != &other)
             {
                 if (m_bActive)
-                    static_cast<void>(UnprotectModel(m_modelId));
+                    static_cast<void>(UnprotectModelForGeneration(m_modelId, m_generation));
 
                 m_modelId = other.m_modelId;
                 m_bActive = other.m_bActive;
+                m_generation = other.m_generation;
                 other.m_bActive = false;
+                other.m_generation = 0;
             }
             return *this;
         }
@@ -80,10 +86,17 @@ public:
     private:
         std::uint32_t m_modelId;
         bool          m_bActive;
+        std::uint64_t m_generation;
     };
 
 private:
+    static bool                                             ProtectModel(std::uint32_t modelId);
+    [[nodiscard]] static bool                               UnprotectModel(std::uint32_t modelId);
+    static bool                                             ProtectModelWithGeneration(std::uint32_t modelId, std::uint64_t* pGenerationOut);
+    static bool                                             UnprotectModelForGeneration(std::uint32_t modelId, std::uint64_t generation);
     static std::unordered_map<std::uint32_t, std::uint32_t> ms_protectedModels;
     static std::mutex                                       ms_mutex;
-    static bool                                             ms_bInitialized;
+    static std::atomic_bool                                 ms_bInitialized;
+    static std::atomic_bool                                 ms_bShuttingDown;
+    static std::atomic_uint64_t                             ms_generation;
 };
