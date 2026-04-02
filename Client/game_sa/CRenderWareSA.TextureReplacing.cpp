@@ -173,6 +173,45 @@ namespace
     uint32_t                      g_uiGlobalMtaRasterGeneration = 0;
     uint32_t                      g_uiGlobalMtaRasterCacheGeneration = 0;  // Generation at last cache rebuild
 
+    // Reverse map: TXD slot -> model IDs assigned to that slot.
+    // Rebuilt lazily when CModelInfoSA::ms_uiTxdAssignmentGeneration changes.
+    std::unordered_map<unsigned short, std::vector<unsigned short>> g_TxdToModelMap;
+    std::uint32_t                                                   g_uiTxdToModelMapGeneration = ~0u;  // Forces rebuild on first access
+
+    static void RebuildTxdToModelMap()
+    {
+        g_TxdToModelMap.clear();
+
+        if (!pGame)
+            return;
+
+        const unsigned int uiModelLimit = static_cast<unsigned int>(pGame->GetBaseIDforCOL());
+        for (unsigned int uiModelId = 0; uiModelId < uiModelLimit; ++uiModelId)
+        {
+            auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiModelId));
+            if (!pModelInfo)
+                continue;
+
+            const unsigned short usTxdId = pModelInfo->GetTextureDictionaryID();
+            if (usTxdId == 0)
+                continue;
+
+            g_TxdToModelMap[usTxdId].push_back(static_cast<unsigned short>(uiModelId));
+        }
+
+        g_uiTxdToModelMapGeneration = CModelInfoSA::GetTxdAssignmentGeneration();
+    }
+
+    static const std::vector<unsigned short>& GetModelsForTxd(unsigned short usTxdId)
+    {
+        if (g_uiTxdToModelMapGeneration != CModelInfoSA::GetTxdAssignmentGeneration())
+            RebuildTxdToModelMap();
+
+        static const std::vector<unsigned short> empty;
+        auto                                     it = g_TxdToModelMap.find(usTxdId);
+        return it != g_TxdToModelMap.end() ? it->second : empty;
+    }
+
     static void InvalidateGlobalMtaRasterCache()
     {
         ++g_uiGlobalMtaRasterGeneration;
@@ -426,7 +465,7 @@ namespace
     }
 
     // Remove pReplacementTextures from all usedByReplacements vectors in the map.
-    // Uses usedInTxdIds as fast path, then does a safety scan for orphaned references.
+    // Uses usedInTxdIds for direct lookup. Debug builds verify no orphaned references exist.
     void RemoveReplacementFromTracking(SReplacementTextures* pReplacementTextures)
     {
         if (!pReplacementTextures)
@@ -446,15 +485,18 @@ namespace
             }
         }
 
-        // Safety scan: catch orphaned references not tracked in usedInTxdIds.
-        for (auto& entry : ms_ModelTexturesInfoMap)
+#ifdef MTA_DEBUG
+        // Debug-only: verify fast path didbt miss any references.
+        // If usedInTxdIds bookkeeping is correct, no entry outside
+        // that set should contain this replacement.
+        for (const auto& entry : ms_ModelTexturesInfoMap)
         {
             if (pReplacementTextures->usedInTxdIds.count(entry.first) != 0)
-                continue;  // Already handled by fast path
-            auto& usedBy = entry.second.usedByReplacements;
-            if (!usedBy.empty())
-                ListRemove(usedBy, pReplacementTextures);
+                continue;
+            const auto& usedBy = entry.second.usedByReplacements;
+            dassert(std::find(usedBy.begin(), usedBy.end(), pReplacementTextures) == usedBy.end());
         }
+#endif
 
         if (!g_PendingReplacementByModel.empty())
         {
@@ -1433,8 +1475,8 @@ namespace
 
     struct SScriptManagedTxdUsage
     {
-        bool bHasOtherUsers = false;
-        bool bHasIncompatibleUsers = false;
+        bool                        bHasOtherUsers = false;
+        bool                        bHasIncompatibleUsers = false;
         std::vector<unsigned short> otherUserModelIds;
     };
 
@@ -1734,13 +1776,14 @@ namespace
         if (!pGame)
             return usage;
 
-        const unsigned int uiModelLimit = static_cast<unsigned int>(pGame->GetBaseIDforCOL());
-        for (unsigned int uiOtherModelId = 0; uiOtherModelId < uiModelLimit; ++uiOtherModelId)
+        const std::vector<unsigned short>& modelsOnTxd = GetModelsForTxd(usTxdId);
+
+        for (unsigned short usOtherModelId : modelsOnTxd)
         {
-            if (uiOtherModelId == usModelId)
+            if (usOtherModelId == usModelId)
                 continue;
 
-            auto* pOtherModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiOtherModelId));
+            auto* pOtherModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usOtherModelId));
             if (!pOtherModelInfo)
                 continue;
 
@@ -1766,7 +1809,7 @@ namespace
                 break;
             }
 
-            usage.otherUserModelIds.push_back(static_cast<unsigned short>(uiOtherModelId));
+            usage.otherUserModelIds.push_back(usOtherModelId);
         }
 
         return usage;
@@ -7973,6 +8016,9 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
     g_GlobalMtaRasterCache.clear();
     InvalidateGlobalMtaRasterCache();
+
+    g_TxdToModelMap.clear();
+    g_uiTxdToModelMapGeneration = ~0u;
 
     g_ReleasedD3DTextures.clear();
 }
