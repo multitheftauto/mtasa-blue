@@ -11,6 +11,24 @@
 
 #include <StdInc.h>
 
+static bool    s_bChecksumBatchActive = false;
+static int64_t s_checksumBatchAccumMs = 0;
+
+void CDownloadableResource::BeginChecksumBatch()
+{
+    if (!s_bChecksumBatchActive)
+    {
+        s_bChecksumBatchActive = true;
+        s_checksumBatchAccumMs = 0;
+    }
+}
+
+void CDownloadableResource::EndChecksumBatch()
+{
+    s_bChecksumBatchActive = false;
+    s_checksumBatchAccumMs = 0;
+}
+
 CDownloadableResource::CDownloadableResource(CResource* pResource, eResourceType resourceType, const char* szName, const char* szNameShort, uint uiDownloadSize,
                                              CChecksum serverChecksum, bool bAutoDownload)
 {
@@ -43,13 +61,26 @@ bool CDownloadableResource::DoesClientAndServerChecksumMatch()
 
 CChecksum CDownloadableResource::GenerateClientChecksum()
 {
+    constexpr int64_t BATCH_BUDGET_MS = 5000;
+
+    if (s_bChecksumBatchActive && s_checksumBatchAccumMs >= BATCH_BUDGET_MS)
+    {
+        m_LastClientChecksum = CChecksum();
+        return m_LastClientChecksum;
+    }
+
+    long long startMs = GetTickCount64_();
     m_LastClientChecksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strName);
+
+    if (s_bChecksumBatchActive)
+        s_checksumBatchAccumMs += GetTickCount64_() - startMs;
+
     return m_LastClientChecksum;
 }
 
 CChecksum CDownloadableResource::GenerateClientChecksum(CBuffer& outFileData)
 {
-    // If LoadFromFile fails, a default initialized checksum is returned (just like GenerateClientChecksum() behaves)
+    // On LoadFromFile failure, m_LastClientChecksum keeps its previous value
     if (outFileData.LoadFromFile(m_strName))
         m_LastClientChecksum = CChecksum::GenerateChecksumFromBuffer(outFileData.GetData(), outFileData.GetSize());
 

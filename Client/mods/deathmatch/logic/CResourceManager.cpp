@@ -102,6 +102,8 @@ CResource* CResourceManager::GetResource(const char* szResourceName)
 
 void CResourceManager::OnDownloadGroupFinished()
 {
+    CDownloadableResource::EndChecksumBatch();
+
     // Try to load newly ready resources
     for (std::list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); ++iter)
     {
