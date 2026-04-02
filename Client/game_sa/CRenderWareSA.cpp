@@ -1027,7 +1027,23 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
     auto* pModelData = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(buffer.data())) + sizeof(ColModelFileHeader);
 
     // Create a new CColModel
-    auto* pColModel = new CColModelSA();
+    CColModelSA* pColModel = nullptr;
+    try
+    {
+        pColModel = new CColModelSA();
+    }
+    catch (const std::exception& e)
+    {
+        AddReportLog(8625, SString("ReadCOL: Failed to construct col model for '%s': %s", header.name, e.what()));
+        return nullptr;
+    }
+
+    if (!pColModel->IsValid() || !pColModel->GetInterface())
+    {
+        AddReportLog(8626, SString("ReadCOL: Constructed invalid col model for '%s'", header.name));
+        delete pColModel;
+        return nullptr;
+    }
 
     // Load appropriate collision version
     switch (header.version[3])

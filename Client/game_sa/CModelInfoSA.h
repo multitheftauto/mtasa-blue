@@ -434,6 +434,8 @@ public:
     static void StaticResetAlphaTransparencies();
 
     void ModelAddRef(EModelRequestType requestType, const char* szTag);
+    void ModelAddRefNonBlocking(const char* szTag);
+    bool TryAddRefIfLoaded();
     int  GetRefCount();
     void RemoveRef(bool bRemoveExtraGTARef = false);
     bool ForceUnload();

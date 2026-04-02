@@ -1727,6 +1727,35 @@ void CModelInfoSA::ModelAddRef(EModelRequestType requestType, const char* szTag)
     m_dwReferences++;
 }
 
+void CModelInfoSA::ModelAddRefNonBlocking(const char* szTag)
+{
+    ModelAddRef(NON_BLOCKING, szTag);
+}
+
+bool CModelInfoSA::TryAddRefIfLoaded()
+{
+    if (!IsLoaded())
+        return false;
+
+    if (m_dwReferences == 0)
+    {
+        assert(!m_dwPendingInterfaceRef);
+
+        m_pInterface = ppModelInfo[m_dwModelID];
+        if (!IsValidModelInfoPtr(m_pInterface))
+        {
+            m_pInterface = nullptr;
+            return false;
+        }
+
+        m_pInterface->usNumberOfRefs++;
+        CTxdStore_AddRef(m_pInterface->usTextureDictionary);
+    }
+
+    m_dwReferences++;
+    return true;
+}
+
 int CModelInfoSA::GetRefCount()
 {
     return static_cast<int>(m_dwReferences);
