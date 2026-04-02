@@ -129,4 +129,6 @@ public:
     static bool SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType,
                                             std::optional<std::uint32_t> removalTime);
     static bool SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept;
+    static bool SetVehicleSmokeTrailEnabled(CVehicle* vehicle, bool state);
+    static bool IsVehicleSmokeTrailEnabled(CVehicle* vehicle) noexcept;
 };
