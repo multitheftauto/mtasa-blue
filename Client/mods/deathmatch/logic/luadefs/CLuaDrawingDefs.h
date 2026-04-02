@@ -83,7 +83,7 @@ public:
                                   const std::optional<float> lineWidth, const std::optional<unsigned int> iterations);
 
     static bool DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale,
-                              const std::optional<float> lighting);
+                              const std::optional<float> lighting, std::optional<bool> doubleSided);
 
 private:
     static void AddDxMaterialClass(lua_State* luaVM);
