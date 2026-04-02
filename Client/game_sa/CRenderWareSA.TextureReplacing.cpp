@@ -4254,7 +4254,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     {
                         RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
 
-                        // Load parent TXD if models with geometry need texture restoration
+                        // Load parent TXD (and TXD data when also unloaded) if models with geometry need texture restoration
                         if (!pParentTxd && pGame->GetStreaming())
                         {
                             bool bAnyModelHasGeometry = false;
@@ -4274,6 +4274,24 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                 {
                                     const unsigned int uiTxdStreamId = usParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
                                     pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+
+                                    // When the TXD data also needs loading,
+                                    // request it now so both stream in one blocking wait
+                                    // instead of a second LoadAllRequestedModels after cleanup.
+                                    // Pending non-priority requests run on the next streaming update.
+                                    if (!pCurrentTxd && usTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
+                                    {
+                                        const unsigned int uiTxdDataStreamId =
+                                            usTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                                        CStreamingInfo* pStreamInfo = GetStreamingInfoSafe(uiTxdDataStreamId);
+                                        const bool bBusyOrLoaded = pStreamInfo &&
+                                            (pStreamInfo->loadState == eModelLoadState::LOADSTATE_READING ||
+                                             pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING ||
+                                             pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED);
+                                        if (!bBusyOrLoaded)
+                                            pGame->GetStreaming()->RequestModel(uiTxdDataStreamId, 0x16);
+                                    }
+
                                     pGame->GetStreaming()->LoadAllRequestedModels(true, "GetModelTexturesInfo-parentTxd");
                                     pParentTxd = CTxdStore_GetTxd(usParentTxdId);
                                 }
