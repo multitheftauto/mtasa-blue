@@ -167,11 +167,12 @@ namespace
 
     // Cached global MTA raster set for PopulateOriginalTextures.
     // Contains rasters from g_ActiveReplacements, g_LeakedMasterTextures, and g_OrphanedCopyRasters.
-    // Rebuilt when g_uiGlobalMtaRasterGeneration changes (incremented on any mutaton of those globals
-    // or when tracked textures have their raster pointers nulled during cleanup).
+    // Kept incrementally on additive changes (register, leak, orphan).
+    // Rebuilt from scratch on subtractive changes (unregister, raster null, erase)
+    // via the generation counter pair below.
     std::unordered_set<RwRaster*> g_GlobalMtaRasterCache;
     uint32_t                      g_uiGlobalMtaRasterGeneration = 0;
-    uint32_t                      g_uiGlobalMtaRasterCacheGeneration = 0;  // Generation at last cache rebuild
+    uint32_t                      g_uiGlobalMtaRasterCacheGeneration = 0;
 
     // Reverse map: TXD slot -> model IDs assigned to that slot.
     // Rebuilt lazily when CModelInfoSA::ms_uiTxdAssignmentGeneration changes.
@@ -1094,7 +1095,13 @@ namespace
         if (pReplacement)
         {
             if (g_ActiveReplacements.insert(pReplacement).second)
-                InvalidateGlobalMtaRasterCache();
+            {
+                for (RwTexture* pTex : pReplacement->textures)
+                {
+                    if (pTex && pTex->raster)
+                        g_GlobalMtaRasterCache.insert(pTex->raster);
+                }
+            }
         }
     }
 
@@ -2079,8 +2086,9 @@ namespace
         // Both masters and copies share the same raster, so a raster-level check
         // catches both without needing separate copy tracking.
         //
-        // The set (g_ActiveReplacements, g_LeakedMasterTextures, g_OrphanedCopyRasters)
-        // is cached and only rebuilt when those globals change.
+        // Additive changes (register, leak, orphan) insert into the cache directly.
+        // Subtractive changes (unregister, raster null, erase) bump the generation
+        // counter, triggering a full rebuild here on the next call.
         if (g_uiGlobalMtaRasterCacheGeneration != g_uiGlobalMtaRasterGeneration)
         {
             g_GlobalMtaRasterCache.clear();
@@ -6133,7 +6141,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                             if (!g_OrphanedCopyRasters.insert(pTex->raster).second)
                                 pTex->raster = nullptr;
                             else
-                                InvalidateGlobalMtaRasterCache();
+                                g_GlobalMtaRasterCache.insert(pTex->raster);
                         }
                     }
                 }
@@ -6384,14 +6392,11 @@ void CRenderWareSA::ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementT
     // Masters are always orphaned (txd=nullptr, self-circular TXDList) - they were
     // never added to any game TXD; only copies were. Their rasters are shared with
     // copies still in TXDs; the destruction loop's mopupFreedRasters handles that.
-    bool bLeakedMastersMutated = false;
     for (RwTexture* pMaster : pReplacementTextures->textures)
     {
-        if (pMaster)
-            bLeakedMastersMutated |= g_LeakedMasterTextures.insert(pMaster).second;
+        if (pMaster && g_LeakedMasterTextures.insert(pMaster).second && pMaster->raster)
+            g_GlobalMtaRasterCache.insert(pMaster->raster);
     }
-    if (bLeakedMastersMutated)
-        InvalidateGlobalMtaRasterCache();
 
     RemoveReplacementFromTracking(pReplacementTextures);
 }
@@ -7254,16 +7259,14 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
     else
     {
         // Track masters that weren't destroyed for cleanup at StaticReset
-        bool bLeakedMastersInserted = false;
         for (RwTexture* pTexture : pReplacementTextures->textures)
         {
             if (pTexture && destroyedTextures.find(pTexture) == destroyedTextures.end())
             {
-                bLeakedMastersInserted |= g_LeakedMasterTextures.insert(pTexture).second;
+                if (g_LeakedMasterTextures.insert(pTexture).second && pTexture->raster)
+                    g_GlobalMtaRasterCache.insert(pTexture->raster);
             }
         }
-        if (bLeakedMastersInserted)
-            InvalidateGlobalMtaRasterCache();
     }
 
     // TXD-only removals skip CleanupIsolatedTxdForModel since it only runs from
@@ -7848,8 +7851,8 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
             // Track for destruction at the end of StaticReset (g_LeakedMasterTextures loop).
             // Without this, the orphaned RwTexture + raster + D3D texture leak permanently.
-            if (g_LeakedMasterTextures.insert(pCurrent).second)
-                InvalidateGlobalMtaRasterCache();
+            if (g_LeakedMasterTextures.insert(pCurrent).second && pCurrent->raster)
+                g_GlobalMtaRasterCache.insert(pCurrent->raster);
         }
 
         // Re-add originals that were orphaned during ModelInfoTXDAddTextures
