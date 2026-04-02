@@ -68,4 +68,8 @@ private:
     // are likely occupied. Advanced past each slot the function returns,
     // lowered when a slot below the hint is freed.
     std::uint32_t m_uiFreeSlotHint = 0;
+
+    // Same hint for GetFreeTextureDictonarySlotAbove: slots below this
+    // index (within the above-range) are likely occupied.
+    std::uint32_t m_uiFreeSlotHintAbove = MAX_STREAMING_TXD_SLOT;
 };
