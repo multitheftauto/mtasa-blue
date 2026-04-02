@@ -56,6 +56,11 @@ CChecksum CDownloadableResource::GenerateClientChecksum(CBuffer& outFileData)
     return m_LastClientChecksum;
 }
 
+CChecksum CDownloadableResource::GetLastClientChecksum()
+{
+    return m_LastClientChecksum;
+}
+
 CChecksum CDownloadableResource::GetServerChecksum()
 {
     return m_ServerChecksum;
