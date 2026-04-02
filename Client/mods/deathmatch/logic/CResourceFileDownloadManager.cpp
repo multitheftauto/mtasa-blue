@@ -309,6 +309,7 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
 
     if (result.bSuccess)
     {
+        CDownloadableResource::EndChecksumBatch();
         CChecksum checksum = pResourceFile->GenerateClientChecksum();
         if (checksum != pResourceFile->GetServerChecksum())
         {
