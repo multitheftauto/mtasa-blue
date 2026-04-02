@@ -446,6 +446,8 @@ bool CClientDFF::ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlpha
     // or so.
     m_pManager->GetPedManager()->RestreamWeapon(usModel);
     m_pManager->GetPickupManager()->RestreamPickups(usModel);
+    m_pManager->GetObjectManager()->RestreamObjects(usModel);
+    g_pGame->GetModelInfo(usModel)->RestreamIPL();
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);

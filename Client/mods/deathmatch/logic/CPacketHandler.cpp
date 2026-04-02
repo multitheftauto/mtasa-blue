@@ -5175,6 +5175,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                                                   strMinClientReq, bEnableOOP);
     if (pResource)
     {
+        CDownloadableResource::BeginChecksumBatch();
+
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
         pResource->SetStartCounter(startCounter);
@@ -5339,6 +5341,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
             // Are there any resources to being downloaded?
             if (!g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles())
             {
+                CDownloadableResource::EndChecksumBatch();
+
                 // Load the resource now
                 if (pResource->CanBeLoaded())
                 {
@@ -5353,6 +5357,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
     if (bFatalError)
     {
+        CDownloadableResource::EndChecksumBatch();
         g_pClientGame->m_pResourceManager->Remove(pResource);
         RaiseFatalError(2081);
     }

@@ -55,66 +55,6 @@ private:
         return m;
     }
 
-    struct GetAttributesParams
-    {
-        wchar_t*                  pathCopy;
-        WIN32_FILE_ATTRIBUTE_DATA attrLocal;
-        BOOL                      result;
-    };
-
-    static DWORD WINAPI GetAttributesThread(LPVOID param)
-    {
-        auto* p = static_cast<GetAttributesParams*>(param);
-        p->result = GetFileAttributesExW(p->pathCopy, GetFileExInfoStandard, &p->attrLocal);
-        return 0;
-    }
-
-    static bool GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_ATTRIBUTE_DATA& attr, DWORD timeoutMs) noexcept
-    {
-        size_t   pathLen = wcslen(path) + 1;
-        wchar_t* pathCopy = new (std::nothrow) wchar_t[pathLen];
-        if (!pathCopy)
-            return false;
-
-    #ifdef _MSC_VER
-        wcscpy_s(pathCopy, pathLen, path);
-    #else
-        wcscpy(pathCopy, path);
-    #endif
-
-        auto* params = new (std::nothrow) GetAttributesParams{pathCopy, {}, FALSE};
-        if (!params)
-        {
-            delete[] pathCopy;
-            return false;
-        }
-
-        DWORD  threadId;
-        HANDLE thread = CreateThread(nullptr, 0, GetAttributesThread, params, 0, &threadId);
-        if (!thread)
-        {
-            delete[] params->pathCopy;
-            delete params;
-            return false;
-        }
-
-        DWORD waitResult = WaitForSingleObject(thread, timeoutMs);
-
-        if (waitResult == WAIT_OBJECT_0)
-        {
-            CloseHandle(thread);
-            attr = params->attrLocal;
-            bool success = params->result != FALSE;
-            delete[] params->pathCopy;
-            delete params;
-            return success;
-        }
-
-        // Timeout - abandon thread and leak params (acceptable: small leak vs game freeze)
-        CloseHandle(thread);
-        return false;
-    }
-
 public:
     static void ClearChecksumCache()
     {
@@ -142,7 +82,7 @@ public:
         catch (...)
         {
         }
-        bool          hasMeta = !wide.empty() && GetFileAttributesExWithTimeout(wide.c_str(), attr, 500);
+        bool          hasMeta = !wide.empty() && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500);
         std::uint64_t sz = 0, mt = 0;
         if (hasMeta)
         {
@@ -171,7 +111,7 @@ public:
         r.ulCRC = CRCGenerator::GetCRCFromBuffer(buf.data(), buf.size());
         CMD5Hasher().Calculate(buf.data(), buf.size(), r.md5);
 
-        if (hasMeta && GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) && sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
+        if (hasMeta && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) && sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
             mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime))
         {
             std::lock_guard<std::mutex> l(CacheMtx());

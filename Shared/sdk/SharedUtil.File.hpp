@@ -21,6 +21,7 @@
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.Buffer.h"
 #include <algorithm>
+#include <atomic>
 #include <cctype>
 #include <cstring>
 
@@ -1773,60 +1774,67 @@ namespace
         wchar_t*                  pathCopy;
         WIN32_FILE_ATTRIBUTE_DATA attrLocal;
         BOOL                      result;
+        std::atomic<bool>         abandoned;
     };
 
     DWORD WINAPI GetAttributesThread(LPVOID param)
     {
         auto* p = static_cast<GetAttributesParams*>(param);
         p->result = GetFileAttributesExW(p->pathCopy, GetFileExInfoStandard, &p->attrLocal);
+        if (p->abandoned.load(std::memory_order_acquire))
+        {
+            delete[] p->pathCopy;
+            delete p;
+        }
         return 0;
     }
+}
 
-    bool GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_ATTRIBUTE_DATA& attr, DWORD timeoutMs) noexcept
+bool SharedUtil::GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_ATTRIBUTE_DATA& attr, DWORD timeoutMs) noexcept
+{
+    size_t   pathLen = wcslen(path) + 1;
+    wchar_t* pathCopy = new (std::nothrow) wchar_t[pathLen];
+    if (!pathCopy)
+        return false;
+
+#ifdef _MSC_VER
+    wcscpy_s(pathCopy, pathLen, path);
+#else
+    wcscpy(pathCopy, path);
+#endif
+
+    auto* params = new (std::nothrow) GetAttributesParams{pathCopy, {}, FALSE, {false}};
+    if (!params)
     {
-        size_t   pathLen = wcslen(path) + 1;
-        wchar_t* pathCopy = new (std::nothrow) wchar_t[pathLen];
-        if (!pathCopy)
-            return false;
-
-    #ifdef _MSC_VER
-        wcscpy_s(pathCopy, pathLen, path);
-    #else
-        wcscpy(pathCopy, path);
-    #endif
-
-        auto* params = new (std::nothrow) GetAttributesParams{pathCopy, {}, FALSE};
-        if (!params)
-        {
-            delete[] pathCopy;
-            return false;
-        }
-
-        DWORD  threadId;
-        HANDLE thread = CreateThread(nullptr, 0, GetAttributesThread, params, 0, &threadId);
-        if (!thread)
-        {
-            delete[] params->pathCopy;
-            delete params;
-            return false;
-        }
-
-        DWORD waitResult = WaitForSingleObject(thread, timeoutMs);
-
-        if (waitResult == WAIT_OBJECT_0)
-        {
-            CloseHandle(thread);
-            attr = params->attrLocal;
-            bool success = params->result != FALSE;
-            delete[] params->pathCopy;
-            delete params;
-            return success;
-        }
-
-        // Timeout - abandon thread and leak params (acceptable: small leak vs game freeze)
-        CloseHandle(thread);
+        delete[] pathCopy;
         return false;
     }
+
+    DWORD  threadId;
+    HANDLE thread = CreateThread(nullptr, 0, GetAttributesThread, params, 0, &threadId);
+    if (!thread)
+    {
+        delete[] params->pathCopy;
+        delete params;
+        return false;
+    }
+
+    DWORD waitResult = WaitForSingleObject(thread, timeoutMs);
+
+    if (waitResult == WAIT_OBJECT_0)
+    {
+        CloseHandle(thread);
+        attr = params->attrLocal;
+        bool success = params->result != FALSE;
+        delete[] params->pathCopy;
+        delete params;
+        return success;
+    }
+
+    // Timeout - let the worker thread clean up when it finishes
+    params->abandoned.store(true, std::memory_order_release);
+    CloseHandle(thread);
+    return false;
 }
 
 bool SharedUtil::FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs) noexcept

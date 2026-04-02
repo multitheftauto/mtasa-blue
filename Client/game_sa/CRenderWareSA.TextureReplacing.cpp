@@ -134,6 +134,7 @@ namespace
         unsigned int          uiExpectedParentModelId = 0;
         unsigned short        usExpectedParentTxdId = 0;
         unsigned char         ucRetryCount = 0;
+        uint32_t              uiWaitConditionSerial = 0;
         uint32_t              uiFirstQueueTick = 0;
         uint32_t              uiNextRetryTick = 0;
         uint32_t              uiSessionId = 0;
@@ -166,11 +167,51 @@ namespace
 
     // Cached global MTA raster set for PopulateOriginalTextures.
     // Contains rasters from g_ActiveReplacements, g_LeakedMasterTextures, and g_OrphanedCopyRasters.
-    // Rebuilt when g_uiGlobalMtaRasterGeneration changes (incremented on any mutaton of those globals
-    // or when tracked textures have their raster pointers nulled during cleanup).
+    // Kept incrementally on additive changes (register, leak, orphan).
+    // Rebuilt from scratch on subtractive changes (unregister, raster null, erase)
+    // via the generation counter pair below.
     std::unordered_set<RwRaster*> g_GlobalMtaRasterCache;
     uint32_t                      g_uiGlobalMtaRasterGeneration = 0;
-    uint32_t                      g_uiGlobalMtaRasterCacheGeneration = 0;  // Generation at last cache rebuild
+    uint32_t                      g_uiGlobalMtaRasterCacheGeneration = 0;
+
+    // Reverse map: TXD slot -> model IDs assigned to that slot.
+    // Rebuilt lazily when CModelInfoSA::ms_uiTxdAssignmentGeneration changes.
+    std::unordered_map<unsigned short, std::vector<unsigned short>> g_TxdToModelMap;
+    std::uint32_t                                                   g_uiTxdToModelMapGeneration = ~0u;  // Forces rebuild on first access
+
+    static void RebuildTxdToModelMap()
+    {
+        g_TxdToModelMap.clear();
+
+        if (!pGame)
+            return;
+
+        const unsigned int uiModelLimit = static_cast<unsigned int>(pGame->GetBaseIDforCOL());
+        for (unsigned int uiModelId = 0; uiModelId < uiModelLimit; ++uiModelId)
+        {
+            auto* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiModelId));
+            if (!pModelInfo)
+                continue;
+
+            const unsigned short usTxdId = pModelInfo->GetTextureDictionaryID();
+            if (usTxdId == 0)
+                continue;
+
+            g_TxdToModelMap[usTxdId].push_back(static_cast<unsigned short>(uiModelId));
+        }
+
+        g_uiTxdToModelMapGeneration = CModelInfoSA::GetTxdAssignmentGeneration();
+    }
+
+    static const std::vector<unsigned short>& GetModelsForTxd(unsigned short usTxdId)
+    {
+        if (g_uiTxdToModelMapGeneration != CModelInfoSA::GetTxdAssignmentGeneration())
+            RebuildTxdToModelMap();
+
+        static const std::vector<unsigned short> empty;
+        auto                                     it = g_TxdToModelMap.find(usTxdId);
+        return it != g_TxdToModelMap.end() ? it->second : empty;
+    }
 
     static void InvalidateGlobalMtaRasterCache()
     {
@@ -226,7 +267,89 @@ namespace
     uint32_t g_uiIsolationDeniedSerial = 0;
     bool     g_bProcessingPendingReplacements = false;
     bool     g_bProcessingPendingIsolatedModels = false;
+    uint32_t g_uiPendingReplacementConditionSerial = 0;
     uint32_t g_uiNextPendingRetryTick = 0;
+    const std::unordered_map<unsigned short, std::vector<SPendingReplacement>>* g_pPendingReplacementSnapshot = nullptr;
+
+    static uint32_t NextPendingReplacementConditionSerial()
+    {
+        ++g_uiPendingReplacementConditionSerial;
+        if (g_uiPendingReplacementConditionSerial == 0)
+            ++g_uiPendingReplacementConditionSerial;
+
+        return g_uiPendingReplacementConditionSerial;
+    }
+
+    static bool ClearPendingOnModelIfNoLiveEntry(unsigned short usModelId, const SPendingReplacement& pendingEntry)
+    {
+        if (!pendingEntry.pReplacement)
+            return false;
+
+        auto itPendingReplacements = g_PendingReplacementByModel.find(usModelId);
+        if (itPendingReplacements != g_PendingReplacementByModel.end())
+        {
+            for (const SPendingReplacement& liveEntry : itPendingReplacements->second)
+            {
+                if (liveEntry.pReplacement == pendingEntry.pReplacement && liveEntry.uiSessionId == pendingEntry.uiSessionId)
+                    return false;
+            }
+        }
+
+        pendingEntry.pReplacement->pendingOnModelIds.erase(usModelId);
+        return true;
+    }
+
+    static void RemoveLivePendingEntries(unsigned short usModelId, const SPendingReplacement& pendingEntry)
+    {
+        if (!pendingEntry.pReplacement)
+            return;
+
+        auto itPendingReplacements = g_PendingReplacementByModel.find(usModelId);
+        if (itPendingReplacements == g_PendingReplacementByModel.end())
+            return;
+
+        std::vector<SPendingReplacement>& vecPending = itPendingReplacements->second;
+        vecPending.erase(std::remove_if(vecPending.begin(), vecPending.end(),
+                                        [&pendingEntry](const SPendingReplacement& e)
+                                        {
+                                            return e.pReplacement == pendingEntry.pReplacement && e.uiSessionId == pendingEntry.uiSessionId &&
+                                                   e.uiWaitConditionSerial == pendingEntry.uiWaitConditionSerial;
+                                        }),
+                         vecPending.end());
+
+        if (vecPending.empty())
+            g_PendingReplacementByModel.erase(itPendingReplacements);
+    }
+
+    static void CompletePendingReplacement(unsigned short usModelId, const SPendingReplacement& pendingEntry)
+    {
+        if (!pendingEntry.pReplacement)
+            return;
+
+        RemoveLivePendingEntries(usModelId, pendingEntry);
+        ClearPendingOnModelIfNoLiveEntry(usModelId, pendingEntry);
+    }
+
+    static const SPendingReplacement* FindPendingSnapshotEntry(unsigned short usModelId, const SReplacementTextures* pReplacement)
+    {
+        if (!g_pPendingReplacementSnapshot || !pReplacement)
+            return nullptr;
+
+        if (pReplacement->pendingOnModelIds.find(usModelId) == pReplacement->pendingOnModelIds.end())
+            return nullptr;
+
+        auto itPendingReplacements = g_pPendingReplacementSnapshot->find(usModelId);
+        if (itPendingReplacements == g_pPendingReplacementSnapshot->end())
+            return nullptr;
+
+        for (const SPendingReplacement& snapshotEntry : itPendingReplacements->second)
+        {
+            if (snapshotEntry.pReplacement == pReplacement && snapshotEntry.uiSessionId == ms_uiTextureReplacingSession)
+                return &snapshotEntry;
+        }
+
+        return nullptr;
+    }
 
     void                   BuildTxdTextureMapFast(RwTexDictionary* pTxd, TxdTextureMap& outMap);
     static void            AddVehicleTxdFallback(TxdTextureMap& outMap);
@@ -343,7 +466,7 @@ namespace
     }
 
     // Remove pReplacementTextures from all usedByReplacements vectors in the map.
-    // Uses usedInTxdIds as fast path, then does a safety scan for orphaned references.
+    // Uses usedInTxdIds for direct lookup. Debug builds verify no orphaned references exist.
     void RemoveReplacementFromTracking(SReplacementTextures* pReplacementTextures)
     {
         if (!pReplacementTextures)
@@ -363,15 +486,18 @@ namespace
             }
         }
 
-        // Safety scan: catch orphaned references not tracked in usedInTxdIds.
-        for (auto& entry : ms_ModelTexturesInfoMap)
+#ifdef MTA_DEBUG
+        // Debug-only: verify fast path didbt miss any references.
+        // If usedInTxdIds bookkeeping is correct, no entry outside
+        // that set should contain this replacement.
+        for (const auto& entry : ms_ModelTexturesInfoMap)
         {
             if (pReplacementTextures->usedInTxdIds.count(entry.first) != 0)
-                continue;  // Already handled by fast path
-            auto& usedBy = entry.second.usedByReplacements;
-            if (!usedBy.empty())
-                ListRemove(usedBy, pReplacementTextures);
+                continue;
+            const auto& usedBy = entry.second.usedByReplacements;
+            dassert(std::find(usedBy.begin(), usedBy.end(), pReplacementTextures) == usedBy.end());
         }
+#endif
 
         if (!g_PendingReplacementByModel.empty())
         {
@@ -563,11 +689,30 @@ namespace
         }
 
         std::vector<SPendingReplacement>& vecPending = itPendingReplacements->second;
+        const uint32_t                    uiNow = GetTickCount32();
 
-        for (const SPendingReplacement& entry : vecPending)
+        for (SPendingReplacement& entry : vecPending)
         {
             if (entry.pReplacement == pReplacement)
             {
+                const bool bExpectedStateChanged =
+                    entry.uiExpectedParentModelId != uiExpectedParentModelId || entry.usExpectedParentTxdId != usExpectedParentTxdId;
+
+                entry.uiExpectedParentModelId = uiExpectedParentModelId;
+                entry.usExpectedParentTxdId = usExpectedParentTxdId;
+
+                // Parent changed - new wait condition, so wipe timing and retry state.
+                if (bExpectedStateChanged)
+                {
+                    entry.uiWaitConditionSerial = NextPendingReplacementConditionSerial();
+                    entry.uiFirstQueueTick = uiNow;
+                    entry.ucRetryCount = 0;
+                    entry.uiNextRetryTick = uiNow;
+
+                    if (g_uiNextPendingRetryTick == 0 || uiNow < g_uiNextPendingRetryTick)
+                        g_uiNextPendingRetryTick = uiNow;
+                }
+
                 pReplacement->pendingOnModelIds.insert(usModelId);
                 return;
             }
@@ -579,18 +724,32 @@ namespace
             return;
         }
 
-        const uint32_t uiNow = GetTickCount32();
-
-        pReplacement->pendingOnModelIds.insert(usModelId);
-
         SPendingReplacement entry;
         entry.pReplacement = pReplacement;
         entry.uiExpectedParentModelId = uiExpectedParentModelId;
         entry.usExpectedParentTxdId = usExpectedParentTxdId;
-        entry.ucRetryCount = 0;
-        entry.uiFirstQueueTick = uiNow;
-        entry.uiNextRetryTick = uiNow;
         entry.uiSessionId = ms_uiTextureReplacingSession;
+
+        const auto* pSnapshotEntry = FindPendingSnapshotEntry(usModelId, pReplacement);
+        const bool  bMatchesSnapshotWaitCondition = pSnapshotEntry && pSnapshotEntry->uiExpectedParentModelId == uiExpectedParentModelId &&
+                                                    pSnapshotEntry->usExpectedParentTxdId == usExpectedParentTxdId;
+
+        if (bMatchesSnapshotWaitCondition)
+        {
+            entry.uiWaitConditionSerial = pSnapshotEntry->uiWaitConditionSerial;
+            entry.ucRetryCount = pSnapshotEntry->ucRetryCount;
+            entry.uiFirstQueueTick = pSnapshotEntry->uiFirstQueueTick;
+            entry.uiNextRetryTick = pSnapshotEntry->uiNextRetryTick;
+        }
+        else
+        {
+            entry.uiWaitConditionSerial = NextPendingReplacementConditionSerial();
+            entry.ucRetryCount = 0;
+            entry.uiFirstQueueTick = uiNow;
+            entry.uiNextRetryTick = uiNow;
+        }
+
+        pReplacement->pendingOnModelIds.insert(usModelId);
         vecPending.push_back(entry);
 
         if (g_uiNextPendingRetryTick == 0 || entry.uiNextRetryTick < g_uiNextPendingRetryTick)
@@ -613,7 +772,19 @@ namespace
         {
             if (existingEntry.pReplacement == pendingEntry.pReplacement)
             {
-                existingEntry = pendingEntry;
+                const bool bSameWaitCondition = existingEntry.uiWaitConditionSerial == pendingEntry.uiWaitConditionSerial;
+
+                if (bSameWaitCondition)
+                {
+                    if (pendingEntry.ucRetryCount > existingEntry.ucRetryCount)
+                        existingEntry.ucRetryCount = pendingEntry.ucRetryCount;
+
+                    if (existingEntry.uiFirstQueueTick == 0 || pendingEntry.uiFirstQueueTick < existingEntry.uiFirstQueueTick)
+                        existingEntry.uiFirstQueueTick = pendingEntry.uiFirstQueueTick;
+
+                    if (pendingEntry.uiNextRetryTick > existingEntry.uiNextRetryTick)
+                        existingEntry.uiNextRetryTick = pendingEntry.uiNextRetryTick;
+                }
                 return;
             }
         }
@@ -644,9 +815,14 @@ namespace
         {
             if (existingEntry.pReplacement == pendingEntryCopy.pReplacement)
             {
-                // Keep the higher retry count so escalation is never lost
-                if (pendingEntryCopy.ucRetryCount > existingEntry.ucRetryCount)
-                    existingEntry.ucRetryCount = pendingEntryCopy.ucRetryCount;
+                const bool bSameWaitCondition = existingEntry.uiWaitConditionSerial == pendingEntryCopy.uiWaitConditionSerial;
+
+                if (bSameWaitCondition)
+                {
+                    // Keep the higher retry count so escalation is never lost
+                    if (pendingEntryCopy.ucRetryCount > existingEntry.ucRetryCount)
+                        existingEntry.ucRetryCount = pendingEntryCopy.ucRetryCount;
+                }
                 // Enforce delayed retry so a fresh QueuePendingReplacement
                 // inside ModelInfoTXDAddTextures cant keep the entry eligible every frame.
                 if (pendingEntryCopy.uiNextRetryTick > existingEntry.uiNextRetryTick)
@@ -684,6 +860,18 @@ namespace
         std::unordered_map<unsigned short, std::vector<SPendingReplacement>> mapPendingSnapshot;
         mapPendingSnapshot.swap(g_PendingReplacementByModel);
 
+        struct SPendingSnapshotGuard
+        {
+            const std::unordered_map<unsigned short, std::vector<SPendingReplacement>>*& pSnapshot;
+            SPendingSnapshotGuard(const std::unordered_map<unsigned short, std::vector<SPendingReplacement>>*& pRef,
+                                  const std::unordered_map<unsigned short, std::vector<SPendingReplacement>>*  pValue)
+                : pSnapshot(pRef)
+            {
+                pSnapshot = pValue;
+            }
+            ~SPendingSnapshotGuard() { pSnapshot = nullptr; }
+        } snapshotGuard(g_pPendingReplacementSnapshot, &mapPendingSnapshot);
+
         std::size_t uiProcessedCount = 0;
         bool        bReachedLimit = false;
 
@@ -705,7 +893,7 @@ namespace
                 for (const SPendingReplacement& entry : vecPending)
                 {
                     if (entry.pReplacement && entry.uiSessionId == ms_uiTextureReplacingSession && IsReplacementActive(entry.pReplacement))
-                        entry.pReplacement->pendingOnModelIds.erase(usModelId);
+                        CompletePendingReplacement(usModelId, entry);
                 }
                 continue;
             }
@@ -744,16 +932,18 @@ namespace
 
                 if (uiNow - entry.uiFirstQueueTick >= PENDING_REPLACEMENT_MAX_AGE_MS)
                 {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
-                    AddReportLog(9401, SString("Dropping stale pending replacement for model %u", usModelId));
+                    if (ClearPendingOnModelIfNoLiveEntry(usModelId, entry))
+                        AddReportLog(9401, SString("Dropping stale pending replacement for model %u", usModelId));
                     continue;
                 }
 
                 if (entry.ucRetryCount >= MAX_PENDING_REPLACEMENT_RETRIES)
                 {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
-                    AddReportLog(
-                        9401, SString("Dropping pending replacement for model %u after %u retries", usModelId, static_cast<unsigned int>(entry.ucRetryCount)));
+                    if (ClearPendingOnModelIfNoLiveEntry(usModelId, entry))
+                    {
+                        AddReportLog(9401, SString("Dropping pending replacement for model %u after %u retries", usModelId,
+                                                   static_cast<unsigned int>(entry.ucRetryCount)));
+                    }
                     continue;
                 }
 
@@ -763,15 +953,16 @@ namespace
                     continue;
                 }
 
-                if (entry.uiExpectedParentModelId != 0 && entry.uiExpectedParentModelId != uiCurrentParentModelId)
+                if ((entry.uiExpectedParentModelId != 0 && entry.uiExpectedParentModelId != uiCurrentParentModelId) ||
+                    (entry.usExpectedParentTxdId != 0 && entry.usExpectedParentTxdId != usCurrentParentTxdId))
                 {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
-                    continue;
-                }
-
-                if (entry.usExpectedParentTxdId != 0 && entry.usExpectedParentTxdId != usCurrentParentTxdId)
-                {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
+                    SPendingReplacement updated = entry;
+                    updated.uiExpectedParentModelId = uiCurrentParentModelId;
+                    updated.usExpectedParentTxdId = usCurrentParentTxdId;
+                    updated.uiWaitConditionSerial = NextPendingReplacementConditionSerial();
+                    updated.ucRetryCount = 0;
+                    updated.uiFirstQueueTick = uiNow;
+                    RequeuePendingReplacement(usModelId, updated, false);
                     continue;
                 }
 
@@ -803,7 +994,7 @@ namespace
                 }
                 else
                 {
-                    entry.pReplacement->pendingOnModelIds.erase(usModelId);
+                    CompletePendingReplacement(usModelId, entry);
                 }
             }
         }
@@ -904,7 +1095,13 @@ namespace
         if (pReplacement)
         {
             if (g_ActiveReplacements.insert(pReplacement).second)
-                InvalidateGlobalMtaRasterCache();
+            {
+                for (RwTexture* pTex : pReplacement->textures)
+                {
+                    if (pTex && pTex->raster)
+                        g_GlobalMtaRasterCache.insert(pTex->raster);
+                }
+            }
         }
     }
 
@@ -1285,8 +1482,9 @@ namespace
 
     struct SScriptManagedTxdUsage
     {
-        bool bHasOtherUsers = false;
-        bool bHasIncompatibleUsers = false;
+        bool                        bHasOtherUsers = false;
+        bool                        bHasIncompatibleUsers = false;
+        std::vector<unsigned short> otherUserModelIds;
     };
 
     using TextureNameSet = std::unordered_set<std::string>;
@@ -1507,22 +1705,10 @@ namespace
         if (itScriptTexInfo == ms_ModelTexturesInfoMap.end())
             return false;
 
-        const unsigned int uiModelLimit = static_cast<unsigned int>(pGame->GetBaseIDforCOL());
-        for (unsigned int uiOtherModelId = 0; uiOtherModelId < uiModelLimit; ++uiOtherModelId)
+        for (unsigned short usOtherModelId : scriptTxdUsage.otherUserModelIds)
         {
-            if (uiOtherModelId == usModelId)
-                continue;
-
-            auto* pOtherModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiOtherModelId));
-            if (!pOtherModelInfo || pOtherModelInfo->GetTextureDictionaryID() != usTxdId)
-                continue;
-
-            auto* pOtherParentInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(pOtherModelInfo->GetParentID()));
-            if (!pOtherParentInfo || pOtherParentInfo->GetTextureDictionaryID() != usParentTxdId)
-                return true;
-
             TextureNameSet otherMatNames;
-            if (!CollectModelMaterialTextureNames(otherMatNames, static_cast<unsigned short>(uiOtherModelId)))
+            if (!CollectModelMaterialTextureNames(otherMatNames, usOtherModelId))
                 return true;
 
             if (HasTextureNameIntersection(newTexNames, otherMatNames))
@@ -1536,7 +1722,7 @@ namespace
                 bool bUsedByOther = false;
                 for (unsigned short usExistingModelId : pExisting->usedInModelIds)
                 {
-                    if (usExistingModelId == uiOtherModelId)
+                    if (usExistingModelId == usOtherModelId)
                     {
                         bUsedByOther = true;
                         break;
@@ -1597,13 +1783,14 @@ namespace
         if (!pGame)
             return usage;
 
-        const unsigned int uiModelLimit = static_cast<unsigned int>(pGame->GetBaseIDforCOL());
-        for (unsigned int uiOtherModelId = 0; uiOtherModelId < uiModelLimit; ++uiOtherModelId)
+        const std::vector<unsigned short>& modelsOnTxd = GetModelsForTxd(usTxdId);
+
+        for (unsigned short usOtherModelId : modelsOnTxd)
         {
-            if (uiOtherModelId == usModelId)
+            if (usOtherModelId == usModelId)
                 continue;
 
-            auto* pOtherModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(uiOtherModelId));
+            auto* pOtherModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(usOtherModelId));
             if (!pOtherModelInfo)
                 continue;
 
@@ -1616,6 +1803,7 @@ namespace
             if (uiOtherParentModelId == 0)
             {
                 usage.bHasIncompatibleUsers = true;
+                usage.otherUserModelIds.clear();
                 break;
             }
 
@@ -1624,8 +1812,11 @@ namespace
             if (!pOtherParentInfo || usOtherParentTxdId != usParentTxdId)
             {
                 usage.bHasIncompatibleUsers = true;
+                usage.otherUserModelIds.clear();
                 break;
             }
+
+            usage.otherUserModelIds.push_back(usOtherModelId);
         }
 
         return usage;
@@ -1895,9 +2086,9 @@ namespace
         // Both masters and copies share the same raster, so a raster-level check
         // catches both without needing separate copy tracking.
         //
-        // The global portion (g_ActiveReplacements, g_LeakedMasterTextures, g_OrphanedCopyRasters)
-        // is cached and only rebuilt when those globals change. The entry-local portion
-        // (info.usedByReplacements) is always added fresh per call.
+        // Additive changes (register, leak, orphan) insert into the cache directly.
+        // Subtractive changes (unregister, raster null, erase) bump the generation
+        // counter, triggering a full rebuild here on the next call.
         if (g_uiGlobalMtaRasterCacheGeneration != g_uiGlobalMtaRasterGeneration)
         {
             g_GlobalMtaRasterCache.clear();
@@ -1925,28 +2116,13 @@ namespace
             g_uiGlobalMtaRasterCacheGeneration = g_uiGlobalMtaRasterGeneration;
         }
 
-        // Start with cached global rasters, then add entry-local rasters
-        std::unordered_set<RwRaster*> mtaRasters = g_GlobalMtaRasterCache;
-
-        for (const SReplacementTextures* pReplacement : info.usedByReplacements)
-        {
-            if (!pReplacement || !IsReplacementActive(pReplacement))
-                continue;
-
-            for (RwTexture* pMasterTex : pReplacement->textures)
-            {
-                if (pMasterTex && pMasterTex->raster)
-                    mtaRasters.insert(pMasterTex->raster);
-            }
-        }
-
         for (RwTexture* pTex : allTextures)
         {
             if (!pTex)
                 continue;
 
             // Reject textures whose raster belongs to an MTA master or copy
-            if (!mtaRasters.empty() && pTex->raster && mtaRasters.count(pTex->raster) != 0)
+            if (!g_GlobalMtaRasterCache.empty() && pTex->raster && g_GlobalMtaRasterCache.count(pTex->raster) != 0)
                 continue;
 
             info.originalTextures.insert(pTex);
@@ -4078,7 +4254,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     {
                         RwTexDictionary* pParentTxd = CTxdStore_GetTxd(usParentTxdId);
 
-                        // Load parent TXD if models with geometry need texture restoration
+                        // Load parent TXD (and TXD data when also unloaded) if models with geometry need texture restoration
                         if (!pParentTxd && pGame->GetStreaming())
                         {
                             bool bAnyModelHasGeometry = false;
@@ -4098,6 +4274,24 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                 {
                                     const unsigned int uiTxdStreamId = usParentTxdId + static_cast<unsigned int>(iBaseIDforTXD);
                                     pGame->GetStreaming()->RequestModel(uiTxdStreamId, 0x16);
+
+                                    // When the TXD data also needs loading,
+                                    // request it now so both stream in one blocking wait
+                                    // instead of a second LoadAllRequestedModels after cleanup.
+                                    // Pending non-priority requests run on the next streaming update.
+                                    if (!pCurrentTxd && usTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
+                                    {
+                                        const unsigned int uiTxdDataStreamId =
+                                            usTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                                        CStreamingInfo* pStreamInfo = GetStreamingInfoSafe(uiTxdDataStreamId);
+                                        const bool bBusyOrLoaded = pStreamInfo &&
+                                            (pStreamInfo->loadState == eModelLoadState::LOADSTATE_READING ||
+                                             pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING ||
+                                             pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED);
+                                        if (!bBusyOrLoaded)
+                                            pGame->GetStreaming()->RequestModel(uiTxdDataStreamId, 0x16);
+                                    }
+
                                     pGame->GetStreaming()->LoadAllRequestedModels(true, "GetModelTexturesInfo-parentTxd");
                                     pParentTxd = CTxdStore_GetTxd(usParentTxdId);
                                 }
@@ -5965,7 +6159,7 @@ void CRenderWareSA::CleanupIsolatedTxdForModel(unsigned short usModelId, bool bS
                             if (!g_OrphanedCopyRasters.insert(pTex->raster).second)
                                 pTex->raster = nullptr;
                             else
-                                InvalidateGlobalMtaRasterCache();
+                                g_GlobalMtaRasterCache.insert(pTex->raster);
                         }
                     }
                 }
@@ -6216,14 +6410,11 @@ void CRenderWareSA::ModelInfoTXDDeferCleanup(SReplacementTextures* pReplacementT
     // Masters are always orphaned (txd=nullptr, self-circular TXDList) - they were
     // never added to any game TXD; only copies were. Their rasters are shared with
     // copies still in TXDs; the destruction loop's mopupFreedRasters handles that.
-    bool bLeakedMastersMutated = false;
     for (RwTexture* pMaster : pReplacementTextures->textures)
     {
-        if (pMaster)
-            bLeakedMastersMutated |= g_LeakedMasterTextures.insert(pMaster).second;
+        if (pMaster && g_LeakedMasterTextures.insert(pMaster).second && pMaster->raster)
+            g_GlobalMtaRasterCache.insert(pMaster->raster);
     }
-    if (bLeakedMastersMutated)
-        InvalidateGlobalMtaRasterCache();
 
     RemoveReplacementFromTracking(pReplacementTextures);
 }
@@ -7086,16 +7277,14 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
     else
     {
         // Track masters that weren't destroyed for cleanup at StaticReset
-        bool bLeakedMastersInserted = false;
         for (RwTexture* pTexture : pReplacementTextures->textures)
         {
             if (pTexture && destroyedTextures.find(pTexture) == destroyedTextures.end())
             {
-                bLeakedMastersInserted |= g_LeakedMasterTextures.insert(pTexture).second;
+                if (g_LeakedMasterTextures.insert(pTexture).second && pTexture->raster)
+                    g_GlobalMtaRasterCache.insert(pTexture->raster);
             }
         }
-        if (bLeakedMastersInserted)
-            InvalidateGlobalMtaRasterCache();
     }
 
     // TXD-only removals skip CleanupIsolatedTxdForModel since it only runs from
@@ -7164,7 +7353,9 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
     g_uiIsolationDeniedSerial = 0;
     g_bProcessingPendingReplacements = false;
     g_bProcessingPendingIsolatedModels = false;
+    g_uiPendingReplacementConditionSerial = 0;
     g_uiNextPendingRetryTick = 0;
+    g_pPendingReplacementSnapshot = nullptr;
     const uint32_t uiNow = GetTickCount32();
     g_uiLastOrphanCleanupTime = uiNow;
     g_uiLastOrphanLogTime = uiNow;
@@ -7678,8 +7869,8 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
             // Track for destruction at the end of StaticReset (g_LeakedMasterTextures loop).
             // Without this, the orphaned RwTexture + raster + D3D texture leak permanently.
-            if (g_LeakedMasterTextures.insert(pCurrent).second)
-                InvalidateGlobalMtaRasterCache();
+            if (g_LeakedMasterTextures.insert(pCurrent).second && pCurrent->raster)
+                g_GlobalMtaRasterCache.insert(pCurrent->raster);
         }
 
         // Re-add originals that were orphaned during ModelInfoTXDAddTextures
@@ -7846,6 +8037,9 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
     g_GlobalMtaRasterCache.clear();
     InvalidateGlobalMtaRasterCache();
+
+    g_TxdToModelMap.clear();
+    g_uiTxdToModelMapGeneration = ~0u;
 
     g_ReleasedD3DTextures.clear();
 }
