@@ -678,15 +678,17 @@ bool CModelInfoSA::DoIsLoaded()
                         constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
                         const unsigned short     prev = pStreamInfo->prevId;
                         const unsigned short     next = pStreamInfo->nextId;
-                        if (prev != kInvalid && next != kInvalid)
+                        if (prev != kInvalid)
                         {
                             CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
-                            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
-                            if (pPrev && pNext)
-                            {
+                            if (pPrev)
                                 pPrev->nextId = next;
+                        }
+                        if (next != kInvalid)
+                        {
+                            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+                            if (pNext)
                                 pNext->prevId = prev;
-                            }
                         }
                     }
                     pStreamInfo->prevId = static_cast<unsigned short>(-1);
@@ -2769,6 +2771,35 @@ void CModelInfoSA::SetVoice(const char* szVoiceType, const char* szVoice)
     SetVoice(sVoiceType, sVoiceID);
 }
 
+static void UnlinkAndResetStreamingInfo(CStreamingInfo* pStreamInfo)
+{
+    if (!pStreamInfo)
+        return;
+
+    if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED && pGame && pGame->GetStreaming())
+    {
+        constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
+        const unsigned short     prev = pStreamInfo->prevId;
+        const unsigned short     next = pStreamInfo->nextId;
+        if (prev != kInvalid)
+        {
+            CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
+            if (pPrev)
+                pPrev->nextId = next;
+        }
+        if (next != kInvalid)
+        {
+            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+            if (pNext)
+                pNext->prevId = prev;
+        }
+    }
+    *pStreamInfo = CStreamingInfo{};
+    pStreamInfo->prevId = static_cast<unsigned short>(-1);
+    pStreamInfo->nextId = static_cast<unsigned short>(-1);
+    pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
+}
+
 void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
 {
     CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
@@ -2777,7 +2808,7 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
     if (!pBaseModelStreamingInfo || !pTargetModelStreamingInfo)
         return;
 
-    *pTargetModelStreamingInfo = CStreamingInfo{};
+    UnlinkAndResetStreamingInfo(pTargetModelStreamingInfo);
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
     pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
@@ -2802,9 +2833,7 @@ void CModelInfoSA::MakePedModel(ushort usParentID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2833,9 +2862,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2862,9 +2889,7 @@ void CModelInfoSA::MakeObjectDamageableModel(std::uint16_t baseModel)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2892,9 +2917,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2922,9 +2945,7 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2951,9 +2972,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -3129,9 +3148,7 @@ void CModelInfoSA::DeallocateModel()
             return;
     }
 
-    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-    if (pStreamingInfo)
-        *pStreamingInfo = CStreamingInfo{};
+    UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //
