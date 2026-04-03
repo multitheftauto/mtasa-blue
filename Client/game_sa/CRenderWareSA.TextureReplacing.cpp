@@ -1876,16 +1876,20 @@ namespace
             {
                 const std::uint16_t     prev = pStreamInfo->prevId;
                 const std::uint16_t     next = pStreamInfo->nextId;
-                constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
-
-                if (prev != kInvalidLink && next != kInvalidLink && pGame->GetStreaming())
+                if (pGame->GetStreaming())
                 {
-                    CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
-                    CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
-                    if (pPrev && pNext)
+                    constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
+                    if (prev != kInvalidLink)
                     {
-                        pPrev->nextId = next;
-                        pNext->prevId = prev;
+                        CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
+                        if (pPrev)
+                            pPrev->nextId = next;
+                    }
+                    if (next != kInvalidLink)
+                    {
+                        CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+                        if (pNext)
+                            pNext->prevId = prev;
                     }
                 }
             }
