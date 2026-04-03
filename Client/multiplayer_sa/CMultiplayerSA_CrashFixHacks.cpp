@@ -2250,6 +2250,59 @@ static void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstIndicesRemap
+//
+// Same NULL locked VB crash as InstV3d/InstV3dMorph and InstWeights,
+// but in the bone index remap path. Called only from __rpD3D9SkinGeometryReinstance
+// when rendering skinned meshes (peds, deformable vehicles).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// The caller adds a vertex element byte offset to the locked pointer, so mem
+// is typically a small non-zero value (e.g 0x28) rather than exact NULL.
+// Any address below 0x10000 (Windows null guard page) is invalid.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=remap, [esp+14]=numVerts, [esp+18]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstIndicesRemapNull   0x754C80
+#define HOOKSIZE_CrashFix_VBInstIndicesRemapNull  8
+#define HOOKCHECK_CrashFix_VBInstIndicesRemapNull 0x8B
+DWORD RETURN_CrashFix_VBInstIndicesRemapNull = 0x754C88;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstIndicesRemapNull()
+{
+    // clang-format off
+    __asm
+    {
+        cmp     dword ptr [esp+8], 10000h            // mem below 64KB null guard page?
+        jb      bail_out_remap
+
+        // Replicate overwritten prologue (8 bytes: mov edx,[esp+4]; mov eax,[esp+0Ch])
+        mov     edx, [esp+4]                         // type
+        mov     eax, [esp+0Ch]                       // src
+        jmp     RETURN_CrashFix_VBInstIndicesRemapNull
+
+    bail_out_remap:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    53
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // _RwD3D9DynamicVertexBufferCreate
 //
 // NULL VB pointer crash when reusing a DynamicVertexBuffer list entry
@@ -3655,6 +3708,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_VBInstV3dNull);
     EZHookInstallChecked(CrashFix_VBInstV3dMorphNull);
     EZHookInstallChecked(CrashFix_VBInstWeightsNull);
+    EZHookInstallChecked(CrashFix_VBInstIndicesRemapNull);
     EZHookInstallChecked(CrashFix_DynVBCreateNull);
     EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
