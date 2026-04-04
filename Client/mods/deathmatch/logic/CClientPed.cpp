@@ -3129,14 +3129,10 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
             // Disable the fire keys whilst crouching as well
             Current.ButtonCircle = 0;
             Current.LeftShoulder1 = 0;
-            if (m_ulLastTimeBeganCrouch >= ulNow - 400.0f * fSpeedRatio)
-            {
-                // Disable double crouching (another anim cut)
-                if (g_pClientGame->IsUsingAlternatePulseOrder())
-                    Current.ShockButtonL = 255;  // Do this differently if we have changed the pulse order
-                else
-                    Current.ShockButtonL = 0;
-            }
+
+            // Disable double crouching (another anim cut)
+            if (ulNow - m_ulLastTimeBeganCrouch < 500 * fSpeedRatio)
+                Current.ShockButtonL = IsDucked() ? 255 : 0;
         }
     }
     // If we just started aiming, make sure they dont try and crouch
