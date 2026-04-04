@@ -726,21 +726,35 @@ CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string st
         // Create the img handle
         CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
 
-        // Fix path encoding for sdt::filesystem
+        // Fix path encoding for std::filesystem
         std::wstring utf8Path = SharedUtil::MbUTF8ToUTF16(strFullPath);
 
-        // Attempt loading the file
-        if (pImg->Load(std::move(utf8Path)))
+        std::error_code ec;
+        const bool      bIsFolder = std::filesystem::is_directory(utf8Path, ec) && !ec;
+
+        // Detect if this is a folder IMG or a regular file IMG and call the appropriate loading function.
+        bool bLoaded = false;
+        if (bIsFolder)
+        {
+            const SString               strResourceRoot = pResource->GetResourceDirectoryPath();
+            const std::filesystem::path resourceRootPath = SharedUtil::MbUTF8ToUTF16(strResourceRoot);
+            bLoaded = pImg->LoadFolder(std::move(utf8Path), resourceRootPath);
+        }
+        else
+        {
+            bLoaded = pImg->Load(std::move(utf8Path));
+        }
+
+        if (bLoaded)
         {
             // Success. Make it a child of the resource img root
             pImg->SetParent(pRoot);
-
             return pImg;
         }
         else
         {
             delete pImg;
-            throw std::invalid_argument("Error loading IMG");
+            throw std::invalid_argument(bIsFolder ? "Error creating runtime IMG from folder" : "Error loading IMG");
         }
     }
 
