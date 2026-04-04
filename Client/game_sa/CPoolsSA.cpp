@@ -110,8 +110,12 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     // Note: Vehicles with custom DFFs (no embedded collision) are handled in CModelInfoSA::SetCustomModel
     // where collision is reloaded after SetClump to restore pool-managed collision data
 
-    MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
-    MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
+    // GTA SA's m_pExtra[] array only has 6 slots (indices 0-5). Passing a value > 5 would cause
+    // an out-of-bounds read in CCarCtrl::CreateCarForScript. Use 255 (no extra) for unsupported values.
+    const std::uint8_t safeVariation = (variation > 5 && variation != 255) ? 255 : variation;
+    const std::uint8_t safeVariation2 = (variation2 > 5 && variation2 != 255) ? 255 : variation2;
+    MemSetFast((void*)VAR_CVehicle_Variation1, safeVariation, 1);
+    MemSetFast((void*)VAR_CVehicle_Variation2, safeVariation2, 1);
 
     // Valid model?
     if (!CModelInfoSA::IsVehicleModel(model))

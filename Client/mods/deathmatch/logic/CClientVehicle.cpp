@@ -2940,8 +2940,30 @@ void CClientVehicle::Create()
                 // Make sure it's different
                 if ((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
                 {
-                    // apple our new scale
+                    // apply our new scale
                     SetComponentScale(strTemp, (*iter).second.m_vecComponentScale);
+                }
+            }
+            // Handle custom variation components. These are components that are named "extraX" where X is the variation number.
+            // We hide all of them by default and only show the ones that match the current variation.
+            if (strTemp.rfind("extra", 0) == 0)
+            {
+                unsigned int id = atoi(strTemp.substr(5).c_str());
+
+                // Hide extras > 6 by default
+                if (id > 6)
+                {
+                    (*iter).second.m_bVisible = false;
+                }
+
+                // Show if matches variant
+                if (m_ucVariation > 5 && m_ucVariation < 254 && id == static_cast<unsigned int>(m_ucVariation) + 1)
+                {
+                    (*iter).second.m_bVisible = true;
+                }
+                if (m_ucVariation2 > 5 && m_ucVariation2 < 254 && id == static_cast<unsigned int>(m_ucVariation2) + 1)
+                {
+                    (*iter).second.m_bVisible = true;
                 }
             }
             // set our visibility

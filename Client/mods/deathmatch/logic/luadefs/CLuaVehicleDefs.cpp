@@ -4152,7 +4152,7 @@ bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, std::optional<
     if (ucVariant == 254 && ucVariant2 == 254)
         CClientVehicleManager::GetRandomVariation(pVehicle->GetModel(), ucVariant, ucVariant2);
 
-    if ((ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
+    if ((ucVariant <= 255) && (ucVariant2 <= 255))
     {
         pVehicle->SetVariant(ucVariant, ucVariant2);
         return true;
