@@ -52,6 +52,8 @@ private:
 
     std::unique_ptr<backup_container_t> m_pOriginalBuildingsBackup;
 
+    std::unordered_map<CBuildingSAInterface*, CMatrix_Padded> m_buildingMatrix{};
+
     // Set by RemoveAllWithBackup after sweeping stale entity links (vehicle damage,
     // ped contact, object entity refs). Cleared by Resize to skip a redundant pass
     // when SetBuildingPoolSize calls both in the same remove/resize cycle.
